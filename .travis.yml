@@ -48,7 +48,7 @@ install:
 script:
   - mkdir build && cd build
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ../cmake-3.4.3-Linux-x86_64/bin/cmake .. ;fi
-  - make all && make test
+  - make
 
 notifications:
     email: false
