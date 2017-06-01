@@ -51,11 +51,14 @@ Getting and building from source:
 
 A quick test is to double check the versions of the HELICS player and recorder (located in the build\src\helics\player\Debug folder):
 
-````
-$ helics_player --version
+```bash
+cd C:\Path\To\build\src\helics\player\Debug
+
+> helics_player.exe --version
 0.1
-$ helics_recorder --version
+
+> helics_recorder.exe --version
 0.1
-````
+```
 
 See the `/examples/README.md` for additional examples to try.
