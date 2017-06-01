@@ -1,20 +1,20 @@
-# Ubuntu Setup #
+# Ubuntu Setup
 
-## Requirements ##
+## Requirements
 
-  * Ubuntu 16 or newer
-  * C++11 compiler (C++14 preferred)
-  * CMake 3.4 or newer
-  * git
-  * Boost 1.58 or newer
-  * ZeroMQ 4.1.4 or newer (if ZeroMQ support is needed)
-  * OpenMPI v8 or newer (if MPI support is needed)
+* Ubuntu 16 or newer
+* C++11 compiler (C++14 preferred)
+* CMake 3.4 or newer
+* git
+* Boost 1.58 or newer
+* ZeroMQ 4.1.4 or newer (if ZeroMQ support is needed)
+* [for future versions] OpenMPI v8 or newer (if MPI support is needed)
 
-## Setup ##
+## Setup
 
-To set up your environment:
+### To set up your environment:
 
-   1. Install most dependencies using apt-get.
+   1. Install dependencies using apt-get.
       1. sudo apt-get install libboost-dev
       2. sudo apt-get install libboost-program-options-dev
       3. sudo apt-get install libboost-test-dev
@@ -23,11 +23,11 @@ To set up your environment:
       6. sudo apt-get install libzmq5-dev
    2. Make sure *cmake* and *git* are available in the Command Prompt. If they aren't, add them to the system PATH variable.
 
-Getting and building from source:
+### Getting and building from source:
 
-   1. Use git clone to to check out a copy of HELICS.
-   2. Create a build folder. Run cmake and give it the path that HELICS was checked out into.
-   3. Run "make".
+1. Use `git clone` to to check out a copy of HELICS.
+2. Create a build folder. Run cmake and give it the path that HELICS was checked out into.
+3. Run "make".
 
 ```bash
 git clone https://github.com/GMLC-TDC/HELICS-src
