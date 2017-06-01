@@ -18,6 +18,12 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
+            - libboost-dev
+            - libboost-program-options-dev
+            - libboost-test-dev
+            - libboost-filesystem-dev
+            - libboost-date-time-dev
+            - libzmq5-dev
       env: COMPILER=g++-4.9
       os:
         - linux
@@ -29,6 +35,11 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
+            - libboost-program-options-dev
+            - libboost-test-dev
+            - libboost-filesystem-dev
+            - libboost-date-time-dev
+            - libzmq5-dev
       env: COMPILER=clang++-3.6
       os:
         - linux
