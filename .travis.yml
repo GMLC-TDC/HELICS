@@ -51,6 +51,7 @@ before_install:
   - eval "${MATRIX_EVAL}"
 
 install:
+  - if [[ "$CXX" = "g++" ]]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
   - sudo apt-get update -qq
   - sudo apt-get install -y -qq lcov curl
   - echo "*** build libzmq"
