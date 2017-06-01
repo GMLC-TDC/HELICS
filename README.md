@@ -6,7 +6,7 @@ Repository for the source code for the Hierarchical Engine for Large-scale Infra
 
 [Windows](./installing-on-windows.md)
 
-[Mac](./installing-on-mac.md)
+[Mac](./installing-on-osx.md)
 
 [Ubuntu](./installing-on-ubuntu.md)
 
