@@ -13,6 +13,8 @@ if (BUILD_HELICS_TESTS)
 enable_testing ()
 endif(BUILD_HELICS_TESTS)
 
+OPTION(BUILD_PYTHON "Build Python extension" OFF)
+
 OPTION(BUILD_SHARED_LIBS "Build Shared Libraries" ON)
 #SET(LIB_TYPE STATIC)
 #IF(BUILD_SHARED_LIBS)
@@ -320,4 +322,7 @@ INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
 
 endif(BUILD_HELICS_TESTS)
 
+if (BUILD_PYTHON)
+add_subdirectory (python)
+endif(BUILD_PYTHON)
 
