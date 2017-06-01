@@ -23,7 +23,6 @@ matrix:
             - libboost-test-dev
             - libboost-filesystem-dev
             - libboost-date-time-dev
-            - libzmq-dev
       env: COMPILER=g++-4.9
       os:
         - linux
@@ -39,7 +38,6 @@ matrix:
             - libboost-test-dev
             - libboost-filesystem-dev
             - libboost-date-time-dev
-            - libzmq-dev
       env: COMPILER=clang++-3.6
       os:
         - linux
