@@ -212,9 +212,10 @@ void broker (ZeroMQCore *core)
             }
         }
 
+        /*
 		if (!any_event) {
             LOG(INFO) << "no events detected, busy sleeping 1s with thread yield" << ENDL;
-			// "busy sleep" while suggesting that other threads run 
+			// "busy sleep" while suggesting that other threads run
 			// for a small amount of time
             auto us = std::chrono::seconds(1);
 			auto start = std::chrono::high_resolution_clock::now();
@@ -223,6 +224,7 @@ void broker (ZeroMQCore *core)
 				std::this_thread::yield();
 			} while (std::chrono::high_resolution_clock::now() < end);
 		}
+        */
     }
 
     rc = zmq_close(zsock);
@@ -798,7 +800,7 @@ void ZeroMQCore::dereference(message_t *msg)
 
 		delete msg;
 	}
-	
+
 }
 
 
@@ -976,7 +978,7 @@ void ZeroMQCore::sendEvent (Time time,
 	msg->origsrc = srcCopy;
 	msg->src = srcCopy;
 	msg->dst = dstCopy;
-	
+
 	queueMessage(msg);
 }
 
@@ -1031,7 +1033,7 @@ void ZeroMQCore::queueMessage(message_t *message)
 
 	//make sure it was found
 	if ((dest == nullptr)||(fed_id==0xFFFF'FFFF)) {
-		//THROW something here?  
+		//THROW something here?
 		return;
 	}
 
