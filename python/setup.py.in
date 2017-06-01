@@ -1,0 +1,37 @@
+# Copyright (C) 2017, Battelle Memorial Institute
+# All rights reserved.
+# This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+
+import os
+from distutils.core import setup, Extension
+from Cython.Build import cythonize
+
+HELICS_INSTALL = os.getenv("HELICS_INSTALL", '${CMAKE_INSTALL_PREFIX}')
+
+if HELICS_INSTALL is None:
+
+    print("Unable to find HELICS_INSTALL environment variable. Please check the documentation or contact the developers.")
+    import sys
+    sys.exit()
+
+
+lib_dir_name = os.path.abspath(os.path.join(HELICS_INSTALL, 'lib'))
+include_dir_name = os.path.abspath(os.path.join(HELICS_INSTALL, 'include'))
+
+os.environ['CFLAGS'] = '-Wall -I"{}" -I"{}" -fPIC -std=c++14'.format(
+        include_dir_name,
+        os.path.join(include_dir_name, 'helics'),
+        )
+
+os.environ['LDFLAGS'] = '-shared -lzmq -L"{}"'.format(lib_dir_name)
+
+extensions = [Extension("helics",
+                        sources=["helics.pyx"],
+                        libraries=["helics"],
+                        language='c++'
+                        )]
+
+setup(name='helics', version='${PYHELICS_PACKAGE_VERSION}', ext_modules=cythonize(
+    extensions, gdb_debug=True
+))
