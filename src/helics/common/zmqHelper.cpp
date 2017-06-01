@@ -1,0 +1,85 @@
+/*
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+*/
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil;  eval: (c-set-offset 'innamespace 0); -*- */
+/*
+* LLNS Copyright Start
+* Copyright (c) 2017, Lawrence Livermore National Security
+* This work was performed under the auspices of the U.S. Department
+* of Energy by Lawrence Livermore National Laboratory in part under
+* Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
+* Produced at the Lawrence Livermore National Laboratory.
+* All rights reserved.
+* For details, see the LICENSE file.
+* LLNS Copyright End
+*/
+
+#include "zmqHelper.h"
+#include "cppzmq/zmq.hpp"
+#include <map>
+#include <cctype>
+using namespace zmq;
+/*
+req = ZMQ_REQ,
+rep = ZMQ_REP,
+dealer = ZMQ_DEALER,
+router = ZMQ_ROUTER,
+pub = ZMQ_PUB,
+sub = ZMQ_SUB,
+xpub = ZMQ_XPUB,
+xsub = ZMQ_XSUB,
+push = ZMQ_PUSH,
+pull = ZMQ_PULL,
+#if ZMQ_VERSION_MAJOR < 4
+	pair = ZMQ_PAIR
+#else
+	pair = ZMQ_PAIR,
+	stream = ZMQ_STREAM
+	*/
+
+
+	/* *INDENT-OFF* */
+static const std::map<std::string,zmq::socket_type> socketMap
+{
+	{"req",socket_type::req},
+	{"request",socket_type::req},
+	{"rep",socket_type::rep},
+	{"reply",socket_type::rep},
+	{"dealer",socket_type::dealer},
+	{"router",socket_type::router},
+	{"pub",socket_type::pub},
+	{"publish",socket_type::pub},
+	{"sub",socket_type::sub},
+	{"subscribe",socket_type::sub},
+	{"xpub",socket_type::xpub},
+	{"xsub",socket_type::xsub},
+	{"push",socket_type::push},
+	{"pull",socket_type::pull},
+	{"pair",socket_type::pair},
+//	{"stream",socket_type::stream}
+};
+/* *INDENT-ON* */
+
+socket_type socketTypeFromString(const std::string &socketType)
+{
+	auto fnd = socketMap.find(socketType);
+	if (fnd != socketMap.end())
+	{
+		return fnd->second;
+	}
+	
+	/* try making it lower case*/
+	std::string lowerCase(socketType);
+	std::transform(socketType.cbegin(), socketType.cend(), lowerCase.begin(), ::tolower);
+	fnd = socketMap.find(lowerCase);
+	if (fnd != socketMap.end())
+	{
+		return fnd->second;
+	}
+	assert(false);  //NEED to make this a throw operation instead once exceptions are integrated
+	return socket_type::req;
+}
+

@@ -1,0 +1,35 @@
+#ifndef GCONFIG_H
+#define GCONFIG_H
+#pragma once
+
+#cmakedefine HAVE_STRING_VIEW
+
+#cmakedefine HAVE_EXP_STRING_VIEW
+
+#cmakedefine HAVE_FILESYSTEM
+
+#cmakedefine HAVE_OPTIONAL
+
+#cmakedefine HAVE_EXP_OPTIONAL
+
+#cmakedefine HAVE_VARIANT
+
+#cmakedefine HAVE_VARIABLE_TEMPLATES
+
+#cmakedefine HAVE_CONSTEXPR_IF
+
+#cmakedefine HAVE_FALLTHROUGH
+
+#cmakedefine HAVE_UNUSED
+
+#cmakedefine HAVE_CLAMP
+
+#cmakedefine HAVE_HYPOT3
+
+#ifdef HAVE_FALLTHROUGH
+#define FALLTHROUGH [[fallthrough]];
+#else
+#define FALLTHROUGH 
+#endif
+
+#endif
