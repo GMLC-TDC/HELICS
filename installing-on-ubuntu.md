@@ -54,5 +54,6 @@ $ helics_recorder --version
 0.1
 ```
 
-See the `/examples/README.md` for additional examples to try.
+See the [`/examples/README.md`](./examples/README.md) for additional examples to try.
+
 
