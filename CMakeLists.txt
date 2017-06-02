@@ -15,12 +15,12 @@ endif(BUILD_HELICS_TESTS)
 
 OPTION(BUILD_PYTHON "Build Python extension" OFF)
 
-OPTION(BUILD_SHARED_LIBS "Build Shared Libraries" ON)
-#SET(LIB_TYPE STATIC)
-#IF(BUILD_SHARED_LIBS)
-#    SET(LIB_TYPE SHARED)
-#    SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
-#ENDIF(BUILD_SHARED_LIBS)
+OPTION(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
+SET(LIB_TYPE STATIC)
+IF(BUILD_SHARED_LIBS)
+    SET(LIB_TYPE SHARED)
+    SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
+ENDIF(BUILD_SHARED_LIBS)
 
 #-----------------------------------------------------------------------------
 # General project wide configuration
