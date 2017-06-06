@@ -33,6 +33,8 @@ include_directories(${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 
 if (${ZMQ_FOUND})
+OPTION(BUILD_BROKER "Build a helics Broker" ON)
+if (BUILD_BROKER)
    add_executable(helics_broker zmq/zmq-broker.cc)
    target_link_libraries(helics_broker helics)
 
@@ -46,5 +48,7 @@ add_custom_command(TARGET helics_broker POST_BUILD        # Adds a post-build ev
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:helics_broker>/")                 # <--this is out-file path
 endforeach(keyfile)
+endif()
+
 endif (${ZMQ_FOUND})
 

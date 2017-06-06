@@ -23,20 +23,27 @@ set(RECORDER_INCLUDE_FILES
 
 )
 
+OPTION(BUILD_PLAYER "Build a helics player" ON)
+
+if (BUILD_PLAYER)
 add_executable(helics_player ${PLAYER_SRC_FILES} ${PLAYER_INCLUDE_FILES})
 target_link_libraries(helics_player helics)
 target_link_libraries(helics_player ${external_library_list})
+endif()
 
+OPTION(BUILD_RECORDER "Build a helics recorder" ON)
 
+if (BUILD_RECORDER)
 add_executable(helics_recorder ${RECORDER_SRC_FILES} ${RECORDER_INCLUDE_FILES})
 target_link_libraries(helics_recorder helics)
 target_link_libraries(helics_recorder ${external_library_list})
+endif()
 
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 
+if (BUILD_PLAYER)
 INSTALL(TARGETS helics_player DESTINATION bin)
-INSTALL(TARGETS helics_recorder DESTINATION bin)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET helics_player POST_BUILD        # Adds a post-build event to core tests
@@ -44,3 +51,19 @@ add_custom_command(TARGET helics_player POST_BUILD        # Adds a post-build ev
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:helics_player>/")                 # <--this is out-file path
 endforeach(keyfile)
+
+endif()
+
+if (BUILD_RECORDER)
+INSTALL(TARGETS helics_recorder DESTINATION bin)
+if (NOT BUILD_PLAYER)
+foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
+add_custom_command(TARGET helics_recorder POST_BUILD        # Adds a post-build event to core tests
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        "${keyfile}"      # <--this is in-file
+        "$<TARGET_FILE_DIR:helics_recorder>/")                 # <--this is out-file path
+endforeach(keyfile)
+endif()
+endif()
+
+

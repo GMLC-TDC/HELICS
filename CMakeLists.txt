@@ -264,7 +264,11 @@ target_link_libraries(helics Threads::Threads)
 
 if (${ZMQ_FOUND})
    target_link_libraries(helics ${ZMQ_LIBRARY})
-endif (${ZMQ_FOUND})
+else()
+   if (ZMQ_ENABLE)
+   message(WARNING "ZMQ not found")
+   endif()
+endif ()
 
 if (${MPI_C_FOUND})
    target_link_libraries(helics ${MPI_C_LIBRARIES})
@@ -303,9 +307,6 @@ configure_file (
 #-----------------------------------------------------------------------------
 # CMAKE Subdirectories 
 #-----------------------------------------------------------------------------
-
-# Need to turn on testing so tests in subdirectories are included in test target.
-enable_testing ()
 
 add_subdirectory (src)
 

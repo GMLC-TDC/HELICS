@@ -17,6 +17,14 @@ set(ZMQ_FOUND 0)
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ZeroMQ (x64);DisplayIcon]"
     )
 
+# this is to deal with something weird when specifying the install path from an external source
+
+if ("${ZMQ_INSTALL_PATH}" STREQUAL "")
+set(ZMQ_PATH2 "")
+else()
+STRING(REPLACE "?" "" ZMQ_PATH2 ${ZMQ_INSTALL_PATH})
+endif()
+
 find_path(ZMQ_ROOT_DIR
   NAMES
     include/zmq.h
@@ -24,6 +32,7 @@ find_path(ZMQ_ROOT_DIR
     ${ZMQ_REGISTRY_PATH}
 	${ZMQ_INSTALL_PATH}
 	${ZMQ_INCLUDE_PATH}
+	${ZMQ_PATH2}
   PATHS
     /usr
     /usr/local
@@ -39,7 +48,7 @@ if (MSVC)
   # Get Visual studio version number
   
  
-  message(STATUS "toolset =${CMAKE_VS_PLATFORM_TOOLSET}")
+  #message(STATUS "toolset =${CMAKE_VS_PLATFORM_TOOLSET}")
 
   if (${ZMQ_NAME} MATCHES "registry") # if key was not found, the string "registry" is returned
     set(_ZMQ_VERSIONS "4_2_2" "4_2_1" "4_2_0" "4_1_5" "4_1_4" "4_0_4" "4_0_3" "4_0_2" "4_0_1" "4_0_0")
@@ -63,7 +72,8 @@ find_library(ZMQ_LIBRARY
     ${ZMQ_LIBRARY_NAME}
 HINTS
 	"${ZMQ_ROOT_DIR}/lib"
-	"${ZMQ_INSTALL_DIR}/lib"
+	"${ZMQ_INSTALL_PATH}/lib"
+	${ZMQ_PATH2}/lib
 	"${ZMQ_LIBRARY_PATH}"
   PATHS
     /lib
