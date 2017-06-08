@@ -18,7 +18,7 @@ MessageTimeOperator::MessageTimeOperator(std::function<Time(Time)> userTimeFunct
 
 }
 
-message_t MessageTimeOperator::operator() (message_t *message)
+message_t MessageTimeOperator::process(message_t *message)
 {
 	if (TimeFunction)
 	{
@@ -42,7 +42,7 @@ void MessageDataOperator::setDataFunction(std::function<data_view(data_view)> us
 	dataFunction = userDataFunction;
 }
 
-message_t MessageDataOperator::operator() (message_t *message)
+message_t MessageDataOperator::process (message_t *message)
 {
 	if (dataFunction)
 	{

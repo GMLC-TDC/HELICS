@@ -26,7 +26,7 @@ namespace helics
 		/**constructor taking a federate information structure and using the default core
 		@param[in] fi  a federate information structure
 		*/
-		ValueFederate(const FederateInfo &fi);
+		ValueFederate(const FederateInfo_app &fi);
 		/**constructor taking a string with the required information
 		@param[in] jsonString can be either a json file or a string containing json code
 		*/
@@ -93,7 +93,7 @@ namespace helics
 		@return an identifier for use with this publication
 		*/
 		template<typename X>
-		publication_id_t registerPublicationIndexed(const std::string &name, int index1, const std::string &units = "")
+		publication_id_t registerPublication(const std::string &name, int index1, const std::string &units = "")
 		{
 			return registerGlobalPublication<X>(name + '_' + std::to_string(index1), units);
 		}
@@ -107,7 +107,7 @@ namespace helics
 		@return an identifier for use with this publication
 		*/
 		template<typename X>
-		publication_id_t registerPublicationIndexed(const std::string &name, int index1, int index2, const std::string &units = "")
+		publication_id_t registerPublication(const std::string &name, int index1, int index2, const std::string &units = "")
 		{
 			return registerGlobalPublication<X>(name + '_' + std::to_string(index1) + '_' + std::to_string(index2), units);
 		}
@@ -135,7 +135,7 @@ namespace helics
 		@param[in] units the optional units on the subscription
 		*/
 		template<typename X>
-		subscription_id_t registerRequiredSubscriptionIndexed(const std::string &name, int index1, const std::string &units = "")
+		subscription_id_t registerRequiredSubscription(const std::string &name, int index1, const std::string &units = "")
 		{
 			return registerRequiredSubscription<X>(name + '_' + std::to_string(index1), units);
 		}
@@ -148,7 +148,7 @@ namespace helics
 		@param[in] units the optional units on the subscription
 		*/
 		template<typename X>
-		subscription_id_t registerRequiredSubscriptionIndexed(const std::string &name, int index1, int index2, const std::string &units = "")
+		subscription_id_t registerRequiredSubscription(const std::string &name, int index1, int index2, const std::string &units = "")
 		{
 			return registerRequiredSubscription<X>(name + '_' + std::to_string(index1) + '_' + std::to_string(index2), units);
 		}
@@ -177,7 +177,7 @@ namespace helics
 		@param[in] units the optional units on the subscription
 		*/
 		template<typename X>
-		subscription_id_t registerOptionalSubscriptionIndexed(const std::string &name, int index1, const std::string &units = "")
+		subscription_id_t registerOptionalSubscription(const std::string &name, int index1, const std::string &units = "")
 		{
 			return registerOptionalSubscription<X>(name+'_'+std::to_string(index1), units);
 		}
@@ -190,7 +190,7 @@ namespace helics
 		@param[in] units the optional units on the subscription
 		*/
 		template<typename X>
-		subscription_id_t registerOptionalSubscriptionIndexed(const std::string &name, int index1, int index2, const std::string &units = "")
+		subscription_id_t registerOptionalSubscription(const std::string &name, int index1, int index2, const std::string &units = "")
 		{
 			return registerOptionalSubscription<X>(name+'_'+std::to_string(index1)+'_'+std::to_string(index2), units);
 		}

@@ -134,7 +134,7 @@ int main (int argc, char *argv[])
 			corename = vm["core"].as<std::string>();
 		}
 
-		helics::FederateInfo fi(name);
+		helics::FederateInfo_app fi(name);
 		fi.coreType = corename;
 		fi.coreInitString = "2";
 		if (vm.count("coreinit") > 0)

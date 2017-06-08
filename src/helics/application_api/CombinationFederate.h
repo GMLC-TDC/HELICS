@@ -1,5 +1,4 @@
 /*
-
 Copyright (C) 2017, Battelle Memorial Institute
 All rights reserved.
 
@@ -24,7 +23,7 @@ namespace helics
 		/**constructor taking a federate information structure and using the default core
 		@param[in] fi  a federate information structure
 		*/
-		CombinationFederate(const FederateInfo &fi);
+		CombinationFederate(const FederateInfo_app &fi);
 		/**constructor taking a file with the required information
 		@param[in] file a file defining the federate information
 		*/

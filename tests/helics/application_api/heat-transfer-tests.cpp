@@ -1,3 +1,10 @@
+/*
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+*/
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -46,25 +53,25 @@ public:
 	void initialize(const std::string &coreName)
 	{
 		std::string name = "heatUnit_(" + std::to_string(x) + "," + std::to_string(y) + ")";
-		helics::FederateInfo fi(name);
+		helics::FederateInfo_app fi(name);
 		fi.coreName = coreName;
 		fi.timeDelta = deltaTime;
 		vFed=std::make_unique<helics::ValueFederate>(fi);
-		pub = vFed->registerPublicationIndexed<double>("temp", x, y);
+		pub = vFed->registerPublication<double>("temp", x, y);
 		if (x - 1 < 0)
 		{
 			sub[0] = vFed->registerRequiredSubscription<double>("temp_wall");
 		}
 		else
 		{
-			sub[0] = vFed->registerRequiredSubscriptionIndexed<double>("temp",x-1,y);
+			sub[0] = vFed->registerRequiredSubscription<double>("temp",x-1,y);
 		}
 		vFed->setDefaultValue(sub[0], T);
-		sub[1] = vFed->registerOptionalSubscriptionIndexed<double>("temp", x + 1, y);
+		sub[1] = vFed->registerOptionalSubscription<double>("temp", x + 1, y);
 		vFed->setDefaultValue(sub[1], -512.0);
-		sub[2] = vFed->registerOptionalSubscriptionIndexed<double>("temp", x, y-1);
+		sub[2] = vFed->registerOptionalSubscription<double>("temp", x, y-1);
 		vFed->setDefaultValue(sub[2], -512.0);
-		sub[3] = vFed->registerOptionalSubscriptionIndexed<double>("temp", x, y+1);
+		sub[3] = vFed->registerOptionalSubscription<double>("temp", x, y+1);
 		vFed->setDefaultValue(sub[3], -512.0);
 		initialized = true;
 	}
@@ -123,7 +130,7 @@ public:
 	void initialize(const std::string &coreName)
 	{
 		std::string name = "Wall";
-		helics::FederateInfo fi(name);
+		helics::FederateInfo_app fi(name);
 		fi.coreName = coreName;
 		vFed = std::make_unique<helics::ValueFederate>(fi);
 		pub = vFed->registerGlobalPublication<double>("temp_wall");
@@ -192,7 +199,7 @@ public:
 	void initialize(const std::string &coreName)
 	{
 		std::string name = "observer";
-		helics::FederateInfo fi(name);
+		helics::FederateInfo_app fi(name);
 		fi.coreName = coreName;
 		fi.observer = true;
 		fi.timeDelta = 10.0;

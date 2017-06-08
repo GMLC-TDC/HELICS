@@ -23,7 +23,7 @@ MpiCore::MpiCore () {}
 
 MpiCore::~MpiCore () {}
 
-void MpiCore::initialize (const char *initializationString)
+void MpiCore::initialize (const std::string &initializationString)
 {
     int provided;
 
@@ -32,6 +32,19 @@ void MpiCore::initialize (const char *initializationString)
     assert (provided == MPI_THREAD_FUNNELED);
 }
 
+void MpiCore::terminate()
+{
+}
+
+void MpiCore::transmit(int route_id, ActionMessage & cmd)
+{
+}
+
+void MpiCore::addRoute(int route_id, const std::string & routeInfo)
+{
+}
+
+/*
 bool MpiCore::isInitialized () { return false; }
 
 void MpiCore::error (Core::federate_id_t federateId, int errorCode){}
@@ -154,6 +167,7 @@ uint64_t MpiCore::receiveFilterCount(federate_id_t federateID) { return 0; }
 std::pair<const Core::Handle, message_t*> MpiCore::receiveAnyFilter(federate_id_t federateID) { return{ 0xFFFFFFFF, nullptr }; }
 
 void MpiCore::setFilterOperator(Handle filter, FilterOperator* callback) {}
+*/
 }  // namespace helics
 
 #endif

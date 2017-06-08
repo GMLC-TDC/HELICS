@@ -146,7 +146,7 @@ int main (int argc, char *argv[])
     {
         stopTime = vm["stop"].as<double> ();
     }
-    helics::FederateInfo fi (name);
+    helics::FederateInfo_app fi (name);
     fi.coreType = corename;
     fi.coreInitString = "1";
     if (vm.count ("coreinit") > 0)

@@ -1,3 +1,10 @@
+/*
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+*/
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -19,7 +26,7 @@ BOOST_AUTO_TEST_CASE (value_federate_initialize_tests)
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
 
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -41,7 +48,7 @@ BOOST_AUTO_TEST_CASE (value_federate_publication_registration)
 {
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -82,7 +89,7 @@ BOOST_AUTO_TEST_CASE (value_federate_subscription_registration)
 
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -123,7 +130,7 @@ BOOST_AUTO_TEST_CASE (value_federate_subscription_registration)
 
 BOOST_AUTO_TEST_CASE (value_federate_subscription_and_publication_registration)
 {
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -182,7 +189,7 @@ BOOST_AUTO_TEST_CASE (value_federate_single_transfer)
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
 
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -228,7 +235,7 @@ void runFederateTest (const X &defaultValue, const X &testValue1, const X &testV
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
 
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -278,7 +285,7 @@ void runFederateTestv2 (const X &defaultValue, const X &testValue1, const X &tes
 {
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -294,123 +301,57 @@ void runFederateTestv2 (const X &defaultValue, const X &testValue1, const X &tes
     vFed->publish<X> (pubid, testValue1);
 
     X val;
-	try
-	{
-		vFed->getValue<X>(subid, val);
-		BOOST_CHECK(val == defaultValue);
-	}
-	catch (const std::invalid_argument &)
-	{
-		BOOST_CHECK(false);
-	}
-    
+    vFed->getValue<X> (subid, val);
+    BOOST_CHECK (val == defaultValue);
 
     auto gtime = vFed->requestTime (1.0);
     BOOST_CHECK_EQUAL (gtime, 1.0);
     // get the value
-	try
-	{
-		vFed->getValue(subid, val);
-		BOOST_CHECK(val == testValue1);
-	}
-	catch (const std::invalid_argument &)
-	{
-		BOOST_CHECK_MESSAGE(false, "ERROR thrown wrong data size");
-   }
+    vFed->getValue (subid, val);
     // make sure the string is what we expect
 
-    
+    BOOST_CHECK (val == testValue1);
     // publish a second string
     vFed->publish (pubid, testValue2);
     // make sure the value is still what we expect
-	try
-	{
-		vFed->getValue(subid, val);
-		BOOST_CHECK(val == testValue1);
-	}
-	catch (const std::invalid_argument &)
-	{
-		BOOST_CHECK_MESSAGE(false, "ERROR thrown wrong data size");
-	}
+    vFed->getValue (subid, val);
+
+    BOOST_CHECK (val == testValue1);
     // advance time
     gtime = vFed->requestTime (2.0);
     // make sure the value was updated
     BOOST_CHECK_EQUAL (gtime, 2.0);
-	try
-	{
-		vFed->getValue(subid, val);
-		BOOST_CHECK(val == testValue2);
-	}
-	catch (std::invalid_argument &)
-	{
-		BOOST_CHECK_MESSAGE(false,"ERROR thrown wrong data size");
-	}
-    
+    vFed->getValue (subid, val);
+    BOOST_CHECK (val == testValue2);
     vFed->finalize ();
 	auto finalval = fut.get();
 	BOOST_CHECK_EQUAL(finalval, 0);
 }
 
 
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_double)
+BOOST_AUTO_TEST_CASE (value_federate_single_transfer_types)
 {
-	runFederateTest<double>(10.3, 45.3, 22.7);
+    runFederateTest<double> (10.3, 45.3, 22.7);
 	runFederateTest<double>(1.0, 0.0, 3.0);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_int)
-{
-	runFederateTest<int>(5, 8, 43);
-	runFederateTest<int>(-5, 1241515, -43);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_short)
-{
-	runFederateTest<short>(-5, 23023, -43);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_uint64)
-{
-	runFederateTest<uint64_t>(234252315, 0xFFF1'2345'7124'1412, 23521513412);
-
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_float)
-{
-	runFederateTest<float>(10.3f, 45.3f, 22.7f);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_string)
-{
-	runFederateTest<std::string>("start", "inside of the functional relationship of helics",
-		std::string("I am a string"));
-
-	runFederateTest<std::string>("\n\n\n\n\n\n\n\n\n\n\0\0  \0\0\t\t\t\n\n\n\r\0\r\0", R"(\0\n\0\b\t\r234#$%*(&!@*#&!_%!#%!#*&!(#*$!)",
-		std::string("this is\n\r an awkward string"));
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_double_vector)
-{
-	runFederateTestv2<std::vector<double>>({ 34.3, 24.2 }, { 12.4, 14.7, 16.34, 18.17 }, { 9.9999, 8.8888, 7.7777 });
-	runFederateTestv2<std::vector<double>>({ 0.0, 2.0 }, { 3.0, std::nan(nullptr), 1e-245, 5.0 }, { std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 50.0 });
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_string_vector)
-{
-	std::vector<std::string> sv1{ "hip", "hop" };
-	std::vector<std::string> sv2{ "this is the first string\n", "this is the second string",
-		"this is the third\0"
-		" string" };
-	std::vector<std::string> sv3{ "string1", "String2", "string3", "string4", "string5", "string6", "string8" };
-	runFederateTestv2(sv1, sv2, sv3);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_complex)
-{
-	std::complex<double> def = { 54.23233, 0.7 };
-	std::complex<double> v1 = std::polar(10.0, 0.43);
-	std::complex<double> v2 = { -3e45, 1e-23 };
-	runFederateTest<std::complex<double>>(def, v1, v2);
+    runFederateTest<int> (5, 8, 43);
+	printf("%x vs %x  and %x vs %x\n", -248, 8, -213, 43);
+    runFederateTest<int> (-5, 1241515, -43);
+    runFederateTest<short> (-5, 23023, -43);
+    runFederateTest<uint64_t> (234252315, 0xFFF1'2345'7024'1412, 23521513412);
+    runFederateTest<float> (10.3f, 45.3f, 22.7f);
+    runFederateTest<std::string> ("start", "inside of the functional relationship of helics",
+                                  std::string ("I am a string"));
+    runFederateTestv2<std::vector<double>> ({34.3, 24.2}, {12.4, 14.7, 0.0, 18.17}, {9.9999, 8.8888, 7.7777});
+    std::vector<std::string> sv1{"hip", "hop"};
+    std::vector<std::string> sv2{"this is the first string\n", "this is the second string",
+                                 "this is the third\0"
+                                 " string"};
+    std::vector<std::string> sv3{"string1", "String2", "string3", "string4", "string5", "string6", "string8"};
+    runFederateTestv2 (sv1, sv2, sv3);
+    std::complex<double> def = {54.23233, 0.7};
+    std::complex<double> v1 = std::polar (10.0, 0.43);
+    std::complex<double> v2 = {-3e45, 1e-23};
+    runFederateTest<std::complex<double>> (def, v1, v2);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

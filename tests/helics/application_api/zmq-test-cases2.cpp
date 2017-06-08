@@ -1,3 +1,10 @@
+/*
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+*/
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -5,8 +12,6 @@
 #include "test_configuration.h"
 #include "zmqBrokerRunner.h"
 #include <future>
-#include <limits>
-
 /** these test cases test out the value federates
  */
 
@@ -20,7 +25,7 @@ BOOST_AUTO_TEST_CASE (value_federate_dual_transfer)
 {
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -78,7 +83,7 @@ void runDualFederateTest (const X &defaultValue, const X &testValue1, const X &t
 {
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -143,7 +148,7 @@ void runDualFederateTestv2 (const X &defaultValue, const X &testValue1, const X 
 {
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -198,63 +203,37 @@ void runDualFederateTestv2 (const X &defaultValue, const X &testValue1, const X 
 	BOOST_CHECK_EQUAL(finalval, 0);
 }
 
-/** test cases checking that the transfer between two federates works as expected
-*/
+/** test case checking that the transfer between two federates works as expected
+ */
+BOOST_AUTO_TEST_CASE (value_federate_dual_transfer_types)
+{
+    runDualFederateTest<double> (10.3, 45.3, 22.7);
+    runDualFederateTest<int> (5, 8, 43);
+    runDualFederateTest<int> (-5, 1241515, -43);
+    runDualFederateTest<char> ('c', '\0', '\n');
 
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_double)
-{
-	runDualFederateTest<double>(10.3, 45.3, 10.0);
-}
+    runDualFederateTest<uint64_t> (234252315, 0xFFF1'2345'7124'1412, 23521513412);
+    runDualFederateTest<float> (10.3f, 45.3f, 22.7f);
+    runDualFederateTest<std::string> ("start", "inside of the functional relationship of helics",
+                                      std::string ("I am a string"));
+    // this one is going to test really ugly strings
+    runDualFederateTest<std::string> (std::string (862634, '\0'),
+                                      "inside\n\0 of the \0\n functional\r \brelationship of helics\n",
+                                      std::string (""));
+    runDualFederateTestv2<std::vector<double>> ({34.3, 24.2}, {12.4, 14.7, 16.34, 18.17},
+                                                {9.9999, 8.8888, 7.7777});
+    std::complex<double> def = {54.23233, 0.7};
+    std::complex<double> v1 = std::polar (10.0, 0.43);
+    std::complex<double> v2 = {-3e45, 1e-23};
+    runDualFederateTest<std::complex<double>> (def, v1, v2);
 
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_int)
-{
-	runDualFederateTest<int>(5, 8, 43);
-	runDualFederateTest<int>(-5, 1241515, -43);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_char)
-{
-	runDualFederateTest<char>('c', '\0', '\n');
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_uint64)
-{
-	runDualFederateTest<uint64_t>(234252315, 0xFFF1'2345'7124'1412, 23521513412);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_float)
-{
-	runDualFederateTest<float>(10.3f, 45.3f, 22.7f);
-
-}
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_string)
-{
-	runDualFederateTest<std::string>("start", "inside of the functional relationship of helics",
-		std::string("I am a string"));
-	// this one is going to test really ugly strings
-	runDualFederateTest<std::string>(std::string(862634, '\0'),
-		"inside\n\0 of the \0\n functional\r \brelationship of helics\n",
-		std::string(""));
-}
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_vector_double)
-{
-	runDualFederateTestv2<std::vector<double>>({ 34.3, 24.2 }, { 12.4, 14.7, 16.34, 18.17 },
-	{ 9.9999, 8.8888, 7.7777 });
-
-}
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_complex)
-{
-	std::complex<double> def = { 54.23233, 0.7 };
-	std::complex<double> v1 = std::polar(10.0, 0.43);
-	std::complex<double> v2 = { -3e45, 1e-23 };
-	runDualFederateTest<std::complex<double>>(def, v1, v2);
 }
 
 BOOST_AUTO_TEST_CASE(value_federate_single_init_publish)
 {
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
-	helics::FederateInfo fi("test1");
+	helics::FederateInfo_app fi("test1");
 	fi.coreType = ZMQ_CORE_TYPE;
 	fi.coreInitString = "1";
 

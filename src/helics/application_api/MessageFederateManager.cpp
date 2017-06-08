@@ -166,8 +166,7 @@ void MessageFederateManager::sendMessage (endpoint_id_t source, Message_view mes
     if (source.value () < local_endpoints.size ())
     {
         auto m = generateCoreMessage (message);
-        m.src = local_endpoints[source.value ()].name.c_str ();
-        coreObject->sendMessage (&m);
+        coreObject->sendMessage (local_endpoints[source.value()].handle,&m);
     }
     else
     {

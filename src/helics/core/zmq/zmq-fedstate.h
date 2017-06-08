@@ -20,12 +20,15 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 namespace helics
 {
 
+typedef Core::federate_id_t federate_id_t;
+typedef Core::Handle Handle;
+
 class ZeroMQHandle;
 
-class ZeroMQFederateState
+class FederateState
 {
   public:
-    ZeroMQFederateState (const char *name_, const Core::FederateInfo &info_)
+    FederateState (const char *name_, const Core::FederateInfo &info_)
         : name (name_), info (info_), state (HELICS_CREATED)
 
     {
@@ -56,8 +59,8 @@ class ZeroMQFederateState
 
     /** DISABLE_COPY_AND_ASSIGN */
   private:
-    ZeroMQFederateState (const ZeroMQFederateState &) = delete;
-    ZeroMQFederateState &operator= (const ZeroMQFederateState &) = delete;
+    FederateState (const FederateState &) = delete;
+    FederateState &operator= (const FederateState &) = delete;
 };
 
 } // namespace helics

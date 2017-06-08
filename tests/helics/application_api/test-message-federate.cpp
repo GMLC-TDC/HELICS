@@ -1,3 +1,10 @@
+/*
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+*/
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -15,7 +22,7 @@ BOOST_AUTO_TEST_SUITE(message_federate_tests)
 /** test simple creation and destruction*/
 BOOST_AUTO_TEST_CASE(message_federate_initialize_tests)
 {
-	helics::FederateInfo fi("test1");
+	helics::FederateInfo_app fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -32,7 +39,7 @@ BOOST_AUTO_TEST_CASE(message_federate_initialize_tests)
 
 BOOST_AUTO_TEST_CASE(message_federate_endpoint_registration)
 {
-	helics::FederateInfo fi("test1");
+	helics::FederateInfo_app fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -48,7 +55,7 @@ BOOST_AUTO_TEST_CASE(message_federate_endpoint_registration)
 
 	auto sv = mFed->getEndpointName(epid);
 	auto sv2 = mFed->getEndpointName(epid2);
-	BOOST_CHECK_EQUAL(sv, "test1/ep1");
+	BOOST_CHECK_EQUAL(sv, "test1.ep1");
 	BOOST_CHECK_EQUAL(sv2, "ep2");
 	
 
@@ -56,7 +63,7 @@ BOOST_AUTO_TEST_CASE(message_federate_endpoint_registration)
 	BOOST_CHECK_EQUAL(mFed->getEndpointType(epid2), "random");
 
 	BOOST_CHECK(mFed->getEndpointId("ep1") == epid);
-	BOOST_CHECK(mFed->getEndpointId("test1/ep1") == epid);
+	BOOST_CHECK(mFed->getEndpointId("test1.ep1") == epid);
 	BOOST_CHECK(mFed->getEndpointId("ep2") == epid2);
 	mFed->finalize();
 
@@ -66,7 +73,7 @@ BOOST_AUTO_TEST_CASE(message_federate_endpoint_registration)
 
 BOOST_AUTO_TEST_CASE(message_federate_send_receive)
 {
-	helics::FederateInfo fi("test1");
+	helics::FederateInfo_app fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -107,7 +114,7 @@ BOOST_AUTO_TEST_CASE(message_federate_send_receive)
 
 BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed)
 {
-	helics::FederateInfo fi("test1");
+	helics::FederateInfo_app fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "2";
 
@@ -166,7 +173,7 @@ BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed)
 
 BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed_multisend)
 {
-	helics::FederateInfo fi("test1");
+	helics::FederateInfo_app fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "2";
 
@@ -266,7 +273,7 @@ public:
 private:
 	void initialize()
 	{
-		helics::FederateInfo fi(name);
+		helics::FederateInfo_app fi(name);
 		fi.coreName = "test";
 		fi.coreType = CORE_TYPE_TO_TEST;
 		fi.coreInitString = "3";
@@ -360,12 +367,12 @@ BOOST_AUTO_TEST_CASE(threefedPingPong)
 	pingpongFed p2("fedB", 0.5);
 	pingpongFed p3("fedC", 0.5);
 
-	p1.addTrigger(0.5, "fedB/port");
-	p1.addTrigger(0.5, "fedC/port");
-	p1.addTrigger(3.0, "fedB/port");
-	p2.addTrigger(1.5, "fedA/port");
-	p3.addTrigger(3.0, "fedB/port");
-	p3.addTrigger(4.0, "fedA/port");
+	p1.addTrigger(0.5, "fedB.port");
+	p1.addTrigger(0.5, "fedC.port");
+	p1.addTrigger(3.0, "fedB.port");
+	p2.addTrigger(1.5, "fedA.port");
+	p3.addTrigger(3.0, "fedB.port");
+	p3.addTrigger(4.0, "fedA.port");
 
 	auto t1 = std::thread([&p1]() {p1.run(6.0); });
 	auto t2 = std::thread([&p2]() {p2.run(6.0); });
@@ -385,7 +392,7 @@ BOOST_AUTO_TEST_CASE(threefedPingPong)
 
 BOOST_AUTO_TEST_CASE(test_time_interruptions)
 {
-	helics::FederateInfo fi("test1");
+	helics::FederateInfo_app fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "2";
 
@@ -411,7 +418,7 @@ BOOST_AUTO_TEST_CASE(test_time_interruptions)
 	helics::data_block data2(400, 'b');
 
 	mFed1->sendMessage(epid, "ep2", data);
-	mFed2->sendMessage(epid2, "test1/ep1", data2);
+	mFed2->sendMessage(epid2, "test1.ep1", data2);
 	//move the time to 1.0
 	auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
 	auto gtime = mFed2->requestTime(1.0);

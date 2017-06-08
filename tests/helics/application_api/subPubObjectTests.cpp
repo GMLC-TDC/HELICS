@@ -1,4 +1,10 @@
+/*
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
 
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+*/
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -18,7 +24,7 @@ BOOST_AUTO_TEST_SUITE(subpubObject_tests)
 
 BOOST_AUTO_TEST_CASE(subscriptionObject_tests)
 {
-	helics::FederateInfo fi("test1");
+	helics::FederateInfo_app fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 

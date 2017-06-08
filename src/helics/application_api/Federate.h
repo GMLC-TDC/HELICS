@@ -1,5 +1,4 @@
 /*
-
 Copyright (C) 2017, Battelle Memorial Institute
 All rights reserved.
 
@@ -27,7 +26,7 @@ namespace helics {
 	class Core;
 	/** data class defining federate properties and information
 	*/
-	class FederateInfo
+	class FederateInfo_app
 	{
 	public:
 		std::string name;  //!< federate name
@@ -43,9 +42,9 @@ namespace helics {
 		Time lookAhead=timeZero;	//!< the lookahead value 
 		Time impactWindow = timeZero; //!< the impact window
 		std::string coreInitString;  //!< an initialization string for the core API object
-		FederateInfo() {};
-		FederateInfo(std::string fedname) :name(fedname) {};
-		FederateInfo(std::string fedname, std::string cType) :name(fedname), coreType(cType) {};
+		FederateInfo_app() {};
+		FederateInfo_app(std::string fedname) :name(fedname) {};
+		FederateInfo_app(std::string fedname, std::string cType) :name(fedname), coreType(cType) {};
 	};
 
 	class Core;
@@ -81,14 +80,14 @@ namespace helics {
 	protected:
 		std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
 		Time currentTime = timeZero;  //!< the current simulation time
-		FederateInfo FedInfo;	//!< the information structure that contains the data on the federate
+		FederateInfo_app FedInfo;	//!< the information structure that contains the data on the federate
 	private:
 		std::unique_ptr<asyncFedCallInfo> asyncCallInfo; //!< pointer to a class defining the async call information
 	public:
 		/**constructor taking a federate information structure and using the default core
 		@param[in] fi  a federate information structure
 		*/
-		Federate(const FederateInfo &fi);
+		Federate(const FederateInfo_app &fi);
 		/**constructor taking a file with the required information
 		@param[in] jsonString can be either a json file or a string containing json code
 		*/
@@ -234,7 +233,7 @@ namespace helics {
 
 	};
 
-	FederateInfo LoadFederateInfo(const std::string &jsonString);
+	FederateInfo_app LoadFederateInfo(const std::string &jsonString);
 
 	/** defining an exception class for state transition errors*/
 	class InvalidStateTransition :public std::runtime_error

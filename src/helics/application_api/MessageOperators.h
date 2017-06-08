@@ -26,7 +26,7 @@ class MessageOperator :public helics::FilterOperator
 public:
 	MessageOperator() {};
 private:
-	virtual message_t operator() (message_t *) override = 0;
+	virtual message_t process(message_t *) override = 0;
 };
 
 class MessageTimeOperator :public MessageOperator
@@ -37,7 +37,7 @@ public:
 	void setTimeFunction(std::function<Time(Time)> userTimeFunction);
 private:
 	std::function<Time(Time)> TimeFunction;
-	virtual message_t operator() (message_t *) override;
+	virtual message_t process(message_t *) override;
 };
 
 class MessageDataOperator :public MessageOperator
@@ -48,7 +48,7 @@ public:
 	void setDataFunction(std::function<data_view(data_view)> userDataFunction);
 private:
 	std::function<data_view(data_view)> dataFunction;
-	virtual message_t operator() (message_t *) override;
+	virtual message_t process(message_t *) override;
 };
 
 }

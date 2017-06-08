@@ -9,6 +9,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #ifndef _HELICS_CORE_C_
 #define _HELICS_CORE_C_
 
+
 #include <stdint.h>
 
 #include "core-types.h"

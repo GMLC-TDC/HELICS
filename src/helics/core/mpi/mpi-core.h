@@ -14,6 +14,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #if HELICS_HAVE_MPI
 
 #include "helics/core/helics-time.h"
+#include "helics/core/core-common.h"
 #include "helics/core/core.h"
 
 #include <cstdint>
@@ -21,14 +22,21 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics {
 
-class MpiCore : public Core {
+class MpiCore : public CommonCore {
 
 public:
 
   MpiCore();
   virtual ~MpiCore();
-  virtual void initialize (const char *initializationString) override;
+  virtual void initialize (const std::string &initializationString) override;
+
           void terminate();
+
+protected:
+	virtual void transmit(int route_id, ActionMessage &cmd);
+	virtual void addRoute(int route_id, const std::string &routeInfo);
+
+  /*
   virtual bool isInitialized () override;
   virtual void error (federate_id_t federateID, int errorCode) override;
   virtual void finalize (federate_id_t federateID) override;
@@ -73,6 +81,7 @@ public:
   virtual uint64_t receiveFilterCount(federate_id_t federateID) override;
   virtual std::pair<const Handle, message_t*> receiveAnyFilter(federate_id_t federateID) override;
   virtual void setFilterOperator(Handle filter, FilterOperator* callback) override;
+  */
 };
 
 } // namespace helics

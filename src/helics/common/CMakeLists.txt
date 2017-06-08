@@ -9,9 +9,11 @@ set(common_headers
 simpleQueue.hpp
 timeRepresentation.hpp
 blocking_queue.h
+simpleArgParser.h
 )
 
 set(common_sources
+simpleArgParser.cpp
 )
 
 set(zmq_headers

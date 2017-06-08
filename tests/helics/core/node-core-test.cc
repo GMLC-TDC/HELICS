@@ -1,4 +1,11 @@
+/*
 
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+*/
 #include "helics/core/core-factory.h"
 #include "helics/core/core.h"
 #include "helics/core/core-types.h"
@@ -39,7 +46,7 @@ static std::ostream& log(std::string str, bool condition) {
 #define CHECK_EQ(A,B) log(#A " == " #B, A == B)
 #define CHECK_STREQ(A,B) log(#A " == " #B, std::string(A) == std::string(B))
 #endif
-
+using helics::FederateInfo;
 using helics::Core;
 using helics::CoreFactory;
 
@@ -49,7 +56,7 @@ void simA (Core * core, const char *NAME)
 {
   Core::federate_id_t id = core->registerFederate(
       NAME,
-      Core::FederateInfo()
+      FederateInfo()
   );
   LOG(INFO) << NAME << ": " << "id " << id << ENDL;
   CHECK_STREQ(NAME, core->getFederateName(id));
@@ -125,7 +132,7 @@ void simB (Core * core, const char *NAME)
 {
   Core::federate_id_t id = core->registerFederate(
       NAME,
-      Core::FederateInfo()
+      FederateInfo()
   );
   LOG(INFO) << NAME << ": " << "id " << id << ENDL;
   CHECK_STREQ(NAME, core->getFederateName(id));

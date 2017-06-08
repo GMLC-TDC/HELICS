@@ -1,3 +1,10 @@
+/*
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+*/
 #include <boost/test/unit_test.hpp>
 
 #include "helics/core/core-factory.h"
@@ -32,7 +39,7 @@ BOOST_AUTO_TEST_CASE(testcore_pubsub_value_test)
 
 	BOOST_CHECK_EQUAL(core->getFederationSize(), 1u);
 
-	Core::federate_id_t id = core->registerFederate("sim1", Core::FederateInfo());
+	Core::federate_id_t id = core->registerFederate("sim1", helics::FederateInfo());
 	
 	BOOST_CHECK_EQUAL(core->getFederateName(id), "sim1");
 	BOOST_CHECK_EQUAL(core->getFederateId("sim1"), id);
@@ -107,7 +114,7 @@ BOOST_AUTO_TEST_CASE(testcore_send_receive_test)
 
 	BOOST_CHECK_EQUAL(core->getFederationSize(), 1u);
 
-	Core::federate_id_t id = core->registerFederate("sim1", Core::FederateInfo());
+	Core::federate_id_t id = core->registerFederate("sim1", helics::FederateInfo());
 
 	BOOST_CHECK_EQUAL(core->getFederateName(id), "sim1");
 	BOOST_CHECK_EQUAL(core->getFederateId("sim1"), id);
@@ -152,7 +159,7 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_source_test)
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
 
-	Core::federate_id_t id = core->registerFederate("sim1", Core::FederateInfo());
+	Core::federate_id_t id = core->registerFederate("sim1", helics::FederateInfo());
 
 	Core::Handle end1 = core->registerEndpoint(id, "end1", "type");
 	Core::Handle end2 = core->registerEndpoint(id, "end2", "type");
@@ -177,7 +184,7 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_source_test)
 	BOOST_CHECK_EQUAL(msgAny.second->origsrc, "end1");
 	BOOST_CHECK_EQUAL(msgAny.second->src, "end1");
 	msgAny.second->src = srcFilterName.c_str();
-	core->sendMessage(msgAny.second);
+	core->sendMessage(helics::invalid_Handle,msgAny.second);
 
 	// dereference the original message should not cause problems; set src back to origsrc (srcFilterName.c_str is on stack, not heap)
 	msgAny.second->src = msgAny.second->origsrc;
@@ -204,14 +211,7 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_callback_test)
 			strcpy(filterName, name);
 		}
 
-		~TestOperator() {
-			if (filterName != 0)
-			{
-				delete filterName;
-			}
-		}
-
-		helics::message_t operator() (helics::message_t *msg) override {
+		helics::message_t process (helics::message_t *msg) override {
 			if (msg->origsrc != msg->src) {
 				delete msg->src;
 			}
@@ -234,11 +234,8 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_callback_test)
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
 
-	// Should probably change this to use two federates and std::async
-	Core::FederateInfo fed_info = Core::FederateInfo();
-	fed_info.time_agnostic = true;
+	Core::federate_id_t id = core->registerFederate("sim1", helics::FederateInfo());
 
-	Core::federate_id_t id = core->registerFederate("sim1", fed_info);
 
 	Core::Handle end1 = core->registerEndpoint(id, "end1", "type");
 	Core::Handle end2 = core->registerEndpoint(id, "end2", "type");

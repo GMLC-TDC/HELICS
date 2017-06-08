@@ -24,9 +24,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-Core::FederateInfo generateCoreInfo (const FederateInfo &fi)
+FederateInfo generateCoreInfo (const FederateInfo_app &fi)
 {
-    Core::FederateInfo cfi;
+    FederateInfo cfi;
     cfi.lookAhead = fi.lookAhead;
 	cfi.impactWindow = fi.impactWindow;
     cfi.observer = fi.observer;
@@ -37,7 +37,7 @@ Core::FederateInfo generateCoreInfo (const FederateInfo &fi)
     return cfi;
 }
 
-Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
+Federate::Federate (const FederateInfo_app &fi) : FedInfo (fi)
 {
     coreObject = initializeCore (fi.coreName, coreTypeFromString (fi.coreType), fi.coreInitString);
     if (!coreObject)
@@ -508,9 +508,9 @@ void Federate::registerInterfaces (const std::string & /*jsonString*/)
     // child classes would implement this
 }
 
-FederateInfo LoadFederateInfo (const std::string &jsonString)
+FederateInfo_app LoadFederateInfo (const std::string &jsonString)
 {
-    FederateInfo fi;
+    FederateInfo_app fi;
     std::ifstream file (jsonString);
 	Json::Value doc;
 	

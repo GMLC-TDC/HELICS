@@ -1,10 +1,16 @@
+/*
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+*/
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include "helics/application_api/ValueFederate.h"
 #include "test_configuration.h"
 #include <future>
-#include <limits>
 /** these test cases test out the value federates
  */
 
@@ -13,7 +19,7 @@ BOOST_AUTO_TEST_SUITE (value_federate_tests)
 /** test simple creation and destruction*/
 BOOST_AUTO_TEST_CASE (value_federate_initialize_tests)
 {
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
@@ -30,7 +36,7 @@ BOOST_AUTO_TEST_CASE (value_federate_initialize_tests)
 
 BOOST_AUTO_TEST_CASE (value_federate_publication_registration)
 {
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
@@ -56,7 +62,7 @@ BOOST_AUTO_TEST_CASE (value_federate_publication_registration)
 
 	BOOST_CHECK(vFed->getPublicationId("pub1") == pubid);
 	BOOST_CHECK(vFed->getPublicationId("pub2") == pubid2);
-	BOOST_CHECK(vFed->getPublicationId("test1/pub1") == pubid);
+	BOOST_CHECK(vFed->getPublicationId("test1.pub1") == pubid);
     vFed->finalize ();
 
     BOOST_CHECK (vFed->currentState () == helics::Federate::op_states::finalize);
@@ -65,7 +71,7 @@ BOOST_AUTO_TEST_CASE (value_federate_publication_registration)
 
 BOOST_AUTO_TEST_CASE (value_federate_subscription_registration)
 {
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
@@ -104,7 +110,7 @@ BOOST_AUTO_TEST_CASE (value_federate_subscription_registration)
 
 BOOST_AUTO_TEST_CASE (value_federate_subscription_and_publication_registration)
 {
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
@@ -141,10 +147,10 @@ BOOST_AUTO_TEST_CASE (value_federate_subscription_and_publication_registration)
 
     sv = vFed->getPublicationName (pubid);
     sv2 = vFed->getPublicationName (pubid2);
-    BOOST_CHECK_EQUAL (sv, "test1/pub1");
+    BOOST_CHECK_EQUAL (sv, "test1.pub1");
     BOOST_CHECK_EQUAL (sv2, "pub2");
     auto pub3name = vFed->getPublicationName (pubid3);
-    BOOST_CHECK_EQUAL (pub3name, "test1/pub3");
+    BOOST_CHECK_EQUAL (pub3name, "test1.pub3");
 
     BOOST_CHECK_EQUAL (vFed->getPublicationType (pubid3), "double");
     BOOST_CHECK_EQUAL (vFed->getPublicationUnits (pubid3), "V");
@@ -155,7 +161,7 @@ BOOST_AUTO_TEST_CASE (value_federate_subscription_and_publication_registration)
 
 BOOST_AUTO_TEST_CASE (value_federate_single_transfer)
 {
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
@@ -196,7 +202,7 @@ BOOST_AUTO_TEST_CASE (value_federate_single_transfer)
 template <class X>
 void runFederateTest (const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
@@ -242,7 +248,7 @@ void runFederateTest (const X &defaultValue, const X &testValue1, const X &testV
 template <class X>
 void runFederateTestv2 (const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
@@ -283,71 +289,35 @@ void runFederateTestv2 (const X &defaultValue, const X &testValue1, const X &tes
     vFed->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_double)
+
+BOOST_AUTO_TEST_CASE (value_federate_single_transfer_types)
 {
-	runFederateTest<double>(10.3, 45.3, 22.7);
+    runFederateTest<double> (10.3, 45.3, 22.7);
 	runFederateTest<double>(1.0, 0.0, 3.0);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_int)
-{
-	runFederateTest<int>(5, 8, 43);
-	runFederateTest<int>(-5, 1241515, -43);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_short)
-{
-	runFederateTest<short>(-5, 23023, -43);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_uint64)
-{
-	runFederateTest<uint64_t>(234252315, 0xFFF1'2345'7124'1412, 23521513412);
-
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_float)
-{
-	runFederateTest<float>(10.3f, 45.3f, 22.7f);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_string)
-{
-	runFederateTest<std::string>("start", "inside of the functional relationship of helics",
-		std::string("I am a string"));
-
-	runFederateTest<std::string>("\n\n\n\n\n\n\n\n\n\n\0\0  \0\0\t\t\t\n\n\n\r\0\r\0", R"(\0\n\0\b\t\r234#$%*(&!@*#&!_%!#%!#*&!(#*$!)",
-		std::string("this is\n\r an awkward string"));
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_double_vector)
-{
-	runFederateTestv2<std::vector<double>>({ 34.3, 24.2 }, { 12.4, 14.7, 16.34, 18.17 }, { 9.9999, 8.8888, 7.7777 });
-	runFederateTestv2<std::vector<double>>({ 0.0, 2.0 }, {3.0, std::nan(nullptr), 1e-245, 5.0 }, { std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 50.0 });
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_string_vector)
-{
-	std::vector<std::string> sv1{ "hip", "hop" };
-	std::vector<std::string> sv2{ "this is the first string\n", "this is the second string",
-		"this is the third\0"
-		" string" };
-	std::vector<std::string> sv3{ "string1", "String2", "string3", "string4", "string5", "string6", "string8" };
-	runFederateTestv2(sv1, sv2, sv3);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_single_transfer_complex)
-{
-	std::complex<double> def = { 54.23233, 0.7 };
-	std::complex<double> v1 = std::polar(10.0, 0.43);
-	std::complex<double> v2 = { -3e45, 1e-23 };
-	runFederateTest<std::complex<double>>(def, v1, v2);
+    runFederateTest<int> (5, 8, 43);
+    runFederateTest<int> (-5, 1241515, -43);
+    runFederateTest<short> (-5, 23023, -43);
+    runFederateTest<uint64_t> (234252315, 0xFFF1'2345'7124'1412, 23521513412);
+    runFederateTest<float> (10.3f, 45.3f, 22.7f);
+    runFederateTest<std::string> ("start", "inside of the functional relationship of helics",
+                                  std::string ("I am a string"));
+    runFederateTestv2<std::vector<double>> ({34.3, 24.2}, {12.4, 14.7, 16.34, 18.17}, {9.9999, 8.8888, 7.7777});
+    std::vector<std::string> sv1{"hip", "hop"};
+    std::vector<std::string> sv2{"this is the first string\n", "this is the second string",
+                                 "this is the third\0"
+                                 " string"};
+    std::vector<std::string> sv3{"string1", "String2", "string3", "string4", "string5", "string6", "string8"};
+    runFederateTestv2 (sv1, sv2, sv3);
+    std::complex<double> def = {54.23233, 0.7};
+    std::complex<double> v1 = std::polar (10.0, 0.43);
+    std::complex<double> v2 = {-3e45, 1e-23};
+    runFederateTest<std::complex<double>> (def, v1, v2);
 }
 
 
 BOOST_AUTO_TEST_CASE (value_federate_dual_transfer)
 {
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "2";
 
@@ -401,7 +371,7 @@ BOOST_AUTO_TEST_CASE (value_federate_dual_transfer)
 template <class X>
 void runDualFederateTest (const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "2";
 
@@ -462,7 +432,7 @@ void runDualFederateTest (const X &defaultValue, const X &testValue1, const X &t
 template <class X>
 void runDualFederateTestv2 (const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-    helics::FederateInfo fi ("test1");
+    helics::FederateInfo_app fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "2";
 
@@ -515,61 +485,34 @@ void runDualFederateTestv2 (const X &defaultValue, const X &testValue1, const X 
     vFed2->finalize ();
 }
 
-/** test cases checking that the transfer between two federates works as expected
+/** test case checking that the transfer between two federates works as expected
  */
+BOOST_AUTO_TEST_CASE (value_federate_dual_transfer_types)
+{
+    runDualFederateTest<double> (10.3, 45.3, 22.7);
+    runDualFederateTest<int> (5, 8, 43);
+    runDualFederateTest<int> (-5, 1241515, -43);
+    runDualFederateTest<char> ('c', '\0', '\n');
 
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_double)
-{
-	runDualFederateTest<double>(10.3, 45.3, 10.0);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_int)
-{
-	runDualFederateTest<int>(5, 8, 43);
-	runDualFederateTest<int>(-5, 1241515, -43);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_char)
-{
-	runDualFederateTest<char>('c', '\0', '\n');
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_uint64)
-{
-	runDualFederateTest<uint64_t>(234252315, 0xFFF1'2345'7124'1412, 23521513412);
-}
-
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_float)
-{
-	runDualFederateTest<float>(10.3f, 45.3f, 22.7f);
-
-}
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_string)
-{
-	runDualFederateTest<std::string>("start", "inside of the functional relationship of helics",
-		std::string("I am a string"));
-	// this one is going to test really ugly strings
-	runDualFederateTest<std::string>(std::string(862634, '\0'),
-		"inside\n\0 of the \0\n functional\r \brelationship of helics\n",
-		std::string(""));
-}
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_vector_double)
-{
-	runDualFederateTestv2<std::vector<double>>({ 34.3, 24.2 }, { 12.4, 14.7, 16.34, 18.17 },
-	{ 9.9999, 8.8888, 7.7777 });
-
-}
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_complex)
-{
-	std::complex<double> def = { 54.23233, 0.7 };
-	std::complex<double> v1 = std::polar(10.0, 0.43);
-	std::complex<double> v2 = { -3e45, 1e-23 };
-	runDualFederateTest<std::complex<double>>(def, v1, v2);
+    runDualFederateTest<uint64_t> (234252315, 0xFFF1'2345'7124'1412, 23521513412);
+    runDualFederateTest<float> (10.3f, 45.3f, 22.7f);
+    runDualFederateTest<std::string> ("start", "inside of the functional relationship of helics",
+                                      std::string ("I am a string"));
+    // this one is going to test really ugly strings
+    runDualFederateTest<std::string> (std::string (862634, '\0'),
+                                      "inside\n\0 of the \0\n functional\r \brelationship of helics\n",
+                                      std::string (""));
+    runDualFederateTestv2<std::vector<double>> ({34.3, 24.2}, {12.4, 14.7, 16.34, 18.17},
+                                                {9.9999, 8.8888, 7.7777});
+    std::complex<double> def = {54.23233, 0.7};
+    std::complex<double> v1 = std::polar (10.0, 0.43);
+    std::complex<double> v2 = {-3e45, 1e-23};
+    runDualFederateTest<std::complex<double>> (def, v1, v2);
 }
 
 BOOST_AUTO_TEST_CASE(value_federate_single_init_publish)
 {
-	helics::FederateInfo fi("test1");
+	helics::FederateInfo_app fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -586,7 +529,7 @@ BOOST_AUTO_TEST_CASE(value_federate_single_init_publish)
 	// get the value set at initialization
 	double val;
 	vFed->getValue(subid, val);
-	BOOST_CHECK_MESSAGE(val==1.0,"THIS IS STILL EXPECTED TO FAIL, WILL BE CORRECTED IN COMMON_CORE UPDATE");
+	BOOST_CHECK_EQUAL(val, 1.0);
 	// publish string1 at time=0.0;
 	vFed->publish(pubid, 2.0);
 	auto gtime = vFed->requestTime(1.0);

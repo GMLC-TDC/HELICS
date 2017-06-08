@@ -94,5 +94,5 @@ bool CoreFactory::available (helics_core_type type) {
   return available;
 }
 
-} // namespace helics
+} // namespace 
 

@@ -1,3 +1,10 @@
+/*
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+*/
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -13,7 +20,7 @@ BOOST_AUTO_TEST_SUITE(value_federate_tests2)
 /** test block send and receive*/
 BOOST_AUTO_TEST_CASE(test_block_send_receive)
 {
-	helics::FederateInfo fi("test1");
+	helics::FederateInfo_app fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -41,7 +48,7 @@ BOOST_AUTO_TEST_CASE(test_block_send_receive)
 /** test the all callback*/
 BOOST_AUTO_TEST_CASE(test_all_callback)
 {
-	helics::FederateInfo fi("test1");
+	helics::FederateInfo_app fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -100,7 +107,7 @@ BOOST_AUTO_TEST_CASE(test_all_callback)
 /** test the callback specification with a vector list*/
 BOOST_AUTO_TEST_CASE(test_vector_callback_lists)
 {
-	helics::FederateInfo fi("test1");
+	helics::FederateInfo_app fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -145,20 +152,20 @@ BOOST_AUTO_TEST_CASE(test_vector_callback_lists)
 /** test the publish/subscribe to a vectorized array*/
 BOOST_AUTO_TEST_CASE(test_indexed_pubs_subs)
 {
-	helics::FederateInfo fi("test1");
+	helics::FederateInfo_app fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
 	auto vFed = std::make_shared<helics::ValueFederate>(fi);
 
-	auto pubid1 = vFed->registerPublicationIndexed<double>("pub1",0);
-	auto pubid2 = vFed->registerPublicationIndexed<double>("pub1",1);
+	auto pubid1 = vFed->registerPublication<double>("pub1",0);
+	auto pubid2 = vFed->registerPublication<double>("pub1",1);
 
-	auto pubid3 = vFed->registerPublicationIndexed<double>("pub1", 2);
+	auto pubid3 = vFed->registerPublication<double>("pub1", 2);
 
-	auto sub1 = vFed->registerOptionalSubscriptionIndexed<double>("pub1", 0);
-	auto sub2 = vFed->registerOptionalSubscriptionIndexed<double>("pub1", 1);
-	auto sub3 = vFed->registerOptionalSubscriptionIndexed<double>("pub1", 2);
+	auto sub1 = vFed->registerOptionalSubscription<double>("pub1", 0);
+	auto sub2 = vFed->registerOptionalSubscription<double>("pub1", 1);
+	auto sub3 = vFed->registerOptionalSubscription<double>("pub1", 2);
 	vFed->enterExecutionState();
 
 	vFed->publish(pubid1, 10.0);
@@ -178,7 +185,7 @@ BOOST_AUTO_TEST_CASE(test_indexed_pubs_subs)
 /** test the publish/subscribe to a vectorized array*/
 BOOST_AUTO_TEST_CASE(test_async_calls)
 {
-	helics::FederateInfo fi("test1");
+	helics::FederateInfo_app fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "2";
 
@@ -241,7 +248,7 @@ BOOST_AUTO_TEST_CASE(test_move_calls)
 {
 	helics::ValueFederate vFed;
 	
-	helics::FederateInfo fi("test1", CORE_TYPE_TO_TEST);
+	helics::FederateInfo_app fi("test1", CORE_TYPE_TO_TEST);
 	fi.coreInitString = "3";
 	vFed = helics::ValueFederate(fi);
 	BOOST_CHECK(vFed.getName() == "test1");

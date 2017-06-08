@@ -54,7 +54,14 @@ namespace helics
 	public:
 		FilterOperator() {};
 		virtual ~FilterOperator() = default;
-		virtual message_t operator() (message_t *) = 0;
+		virtual message_t process(message_t *m) = 0;
+		message_t operator() (message_t *m)
+		{
+			return process(m);
+		}
+		
 	};
+
+	
 }
 #endif
