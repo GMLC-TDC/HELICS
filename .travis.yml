@@ -32,13 +32,13 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-4.9
+            - g++-4.9.3
             - libboost-dev
             - libboost-program-options-dev
             - libboost-test-dev
             - libboost-filesystem-dev
             - libboost-date-time-dev
-      env: MATRIX_EVAL="COMPILER=g++-4.9 && CC=gcc-4.9 && CXX=g++-4.9"
+      env: MATRIX_EVAL="COMPILER=g++-4.9.3 && CC=gcc-4.9.3 && CXX=g++-4.9.3"
       os:
         - linux
     - compiler: clang
