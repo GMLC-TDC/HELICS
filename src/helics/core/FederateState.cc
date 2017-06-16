@@ -45,7 +45,7 @@ void FederateState::createSubscription (Core::Handle handle,
     subNames.emplace (key, sub.get ());
 
     // need to sort the vectors so the find works properly
-    if (handle > subscriptions.back ()->id)
+    if (subscriptions.empty() || handle > subscriptions.back ()->id)
     {
         subscriptions.push_back (std::move (sub));
     }
@@ -63,7 +63,7 @@ void FederateState::createPublication (Core::Handle handle, const std::string &k
     pubNames.emplace (key, pub.get ());
 
     // need to sort the vectors so the find works properly
-    if (handle > publications.back ()->id)
+    if (publications.empty() || handle > publications.back ()->id)
     {
         publications.push_back (std::move (pub));
     }
@@ -81,7 +81,7 @@ void FederateState::createEndpoint (Core::Handle handle, const std::string &key,
     std::lock_guard<std::mutex> lock (_mutex);
     epNames.emplace (key, ep.get ());
     hasEndpoints = true;
-    if (handle > endpoints.back ()->id)
+    if (endpoints.empty() || handle > endpoints.back ()->id)
     {
         endpoints.push_back (std::move (ep));
     }
@@ -102,7 +102,7 @@ void FederateState::createFilter (Core::Handle handle,
     std::lock_guard<std::mutex> lock (_mutex);
     filterNames.emplace (key, filt.get ());
 
-    if (handle > filters.back ()->id)
+    if (filters.empty() || handle > filters.back ()->id)
     {
         filters.push_back (std::move (filt));
     }

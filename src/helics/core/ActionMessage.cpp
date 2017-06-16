@@ -21,14 +21,15 @@ ActionMessage::ActionMessage (action_t action) : action_ (action),name(payload)
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
     : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
       dest_handle (act.dest_handle), iterationComplete (act.iterationComplete), required (act.required),
-      Time (act.Time), payload (std::move (act.payload)),name(payload), info_ (std::move (act.info_))
+	  error(act.error), flag(act.flag), Time(act.Time), payload(std::move(act.payload)), name(payload),
+      info_(std::move(act.info_))
 {
 }
 
 ActionMessage::ActionMessage (const ActionMessage &act)
     : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
       dest_handle (act.dest_handle), iterationComplete (act.iterationComplete), required (act.required),
-      Time (act.Time), payload (act.payload),name(payload)
+	  error(act.error), flag(act.flag), Time(act.Time), payload(act.payload), name(payload)
 
 {
     if (act.info_)
@@ -82,8 +83,8 @@ void ActionMessage::setAction(action_t action)
 		{
 			info_ = std::make_unique<AdditionalInfo>();
 		}
-		
 	}
+	action_ = action;
 }
 
 ActionMessage::AdditionalInfo &ActionMessage::info ()

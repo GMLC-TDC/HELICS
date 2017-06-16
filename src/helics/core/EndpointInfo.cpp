@@ -56,16 +56,13 @@ static auto msgSorter = [](const message_t *m1, const message_t *m2)
 	int32_t EndpointInfo::queueSize(Time maxTime)
 	{
 		//TODO make thread safe
-		if (message_queue.empty())
-		{
-			return 0;
-		}
-		auto mb = message_queue.begin();
 		int32_t cnt = 0;
-		while ((*mb)->time<=maxTime)
+		for (auto msg : message_queue)
 		{
-			++cnt;
-			++mb;
+			if (msg->time <= maxTime)
+				++cnt;
+			else
+				break;
 		}
 		return cnt;
 	}
