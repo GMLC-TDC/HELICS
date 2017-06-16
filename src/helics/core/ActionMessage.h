@@ -95,7 +95,7 @@ public:
 	bool required = false;  //!< flag indicating a publication is required
 	bool error = false;		//!< flag indicating an error condition associated with the command
 	bool flag = false;     //!< general flag for many purposes
-	Time Time=timeZero;		//32
+	Time actionTime=timeZero;		//32
 	std::string payload;			//56 std::string is 24 bytes on most platforms
 	std::string &name;  //!<alias payload to a name reference for registration functions
 private:

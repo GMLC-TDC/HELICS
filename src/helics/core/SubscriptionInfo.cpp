@@ -9,6 +9,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "SubscriptionInfo.h"
 //#include "core/core-data.h"
 #include <algorithm>
+#include <cstring>
+
 namespace helics
 {
 data_t *SubscriptionInfo::getData()

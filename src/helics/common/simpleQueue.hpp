@@ -6,9 +6,10 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#pragma once
+
 #ifndef SIMPLE_QUEUE_H_
 #define SIMPLE_QUEUE_H_
+#pragma once
 
 #include <algorithm>
 #include <mutex>
@@ -31,7 +32,7 @@ class simpleQueue
     std::vector<X> pullElements;  //!< vector of elements waiting extraction
   public:
     /** default constructor */
-    simpleQueue () noexcept= default;
+    simpleQueue ()= default;
     /** constructor with a reservation size
     @param[in] capacity  the initial storage capacity of the queue*/
     simpleQueue (size_t capacity)

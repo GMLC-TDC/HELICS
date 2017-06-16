@@ -382,7 +382,7 @@ bool FederateState::processQueue ()
 			auto subI = getSubscription(cmd.dest_handle);
 			if (cmd.source_id == subI->target.first)
 			{
-				subI->updateData(cmd.Time, cmd.payload);
+				subI->updateData(cmd.actionTime, cmd.payload);
 			}
 		}
             break;
@@ -516,15 +516,15 @@ int FederateState::processExternalTimeMessage (ActionMessage &cmd)
         {
         case CMD_TIME_REQUEST:
             ofed.grant = false;
-            ofed.Tnext = cmd.Time;
+            ofed.Tnext = cmd.actionTime;
             ofed.Te = cmd.info ().Te;
             ofed.Tdemin = cmd.info ().Tdemin;
             break;
         case CMD_TIME_GRANT:
             ofed.grant = true;
-            ofed.Tnext = cmd.Time;
-            ofed.Te = cmd.Time;
-            ofed.Tdemin = cmd.Time;
+            ofed.Tnext = cmd.actionTime;
+            ofed.Te = cmd.actionTime;
+            ofed.Tdemin = cmd.actionTime;
             break;
         }
         return updateTimeFactors ();

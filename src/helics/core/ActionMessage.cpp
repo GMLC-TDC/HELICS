@@ -21,7 +21,7 @@ ActionMessage::ActionMessage (action_t action) : action_ (action),name(payload)
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
     : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
       dest_handle (act.dest_handle), iterationComplete (act.iterationComplete), required (act.required),
-	  error(act.error), flag(act.flag), Time(act.Time), payload(std::move(act.payload)), name(payload),
+	  error(act.error), flag(act.flag), actionTime(act.actionTime), payload(std::move(act.payload)), name(payload),
       info_(std::move(act.info_))
 {
 }
@@ -29,7 +29,7 @@ ActionMessage::ActionMessage (ActionMessage &&act) noexcept
 ActionMessage::ActionMessage (const ActionMessage &act)
     : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
       dest_handle (act.dest_handle), iterationComplete (act.iterationComplete), required (act.required),
-	  error(act.error), flag(act.flag), Time(act.Time), payload(act.payload), name(payload)
+	  error(act.error), flag(act.flag), actionTime(act.actionTime), payload(act.payload), name(payload)
 
 {
     if (act.info_)
@@ -49,7 +49,7 @@ ActionMessage &ActionMessage::operator= (const ActionMessage &act)
     dest_handle = act.dest_handle;
     iterationComplete = act.iterationComplete;
     required = act.required;
-    Time = act.Time;
+    actionTime = act.actionTime;
     payload = act.payload;
 
     if (act.info_)
@@ -68,7 +68,7 @@ ActionMessage &ActionMessage::operator= (ActionMessage &&act) noexcept
     dest_handle = act.dest_handle;
     iterationComplete = act.iterationComplete;
     required = act.required;
-    Time = act.Time;
+    actionTime = act.actionTime;
     payload = std::move (act.payload);
     act.info_ = std::move (act.info_);
     return *this;
@@ -109,7 +109,7 @@ message_t *createMessage (const ActionMessage &cmd)
     char *dataCopy = new char[cmd.payload.size () + 1];
     memcpy (dataCopy, cmd.payload.data (), cmd.payload.size ());
 
-    msg->time = cmd.Time;
+    msg->time = cmd.actionTime;
     msg->data = dataCopy;
     msg->len = cmd.payload.size ();
     msg->origsrc = origSrcCopy;
@@ -142,7 +142,7 @@ message_t createTempMessage(ActionMessage &cmd)
 	tMessage.dst = cmd.info().target.c_str();
 	tMessage.len = cmd.payload.size();
 	tMessage.data = cmd.payload.data();
-	tMessage.time = cmd.Time;
+	tMessage.time = cmd.actionTime;
 	return tMessage;
 }
 }

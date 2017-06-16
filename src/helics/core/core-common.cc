@@ -802,7 +802,7 @@ void CommonCore::send (Handle sourceHandle, const std::string &destination, cons
 
     m.payload = std::string (data, length);
     m.info ().target = destination;
-    m.Time = fed->time_granted;
+    m.actionTime = fed->time_granted;
 
     queueMessage (processMessage (hndl, m));
 
@@ -830,7 +830,7 @@ void CommonCore::sendEvent (Time time,
 
     m.payload = std::string (data, length);
     m.info ().target = destination;
-    m.Time = time;
+    m.actionTime = time;
 
     queueMessage (processMessage (hndl, m));
 }
@@ -859,7 +859,7 @@ void CommonCore::sendMessage (Handle sourceHandle, message_t *message)
     }
     m.payload = std::string (message->data, message->len);
     m.info ().target = message->dst;
-    m.Time = message->time;
+    m.actionTime = message->time;
     m.source_handle = sourceHandle;
 
     queueMessage (processMessage (hndl, m));
@@ -885,7 +885,7 @@ ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage 
                 m.payload = std::string (nmessage.data, nmessage.len);
                 delete[] nmessage.data;
             }
-            m.Time = nmessage.time;
+            m.actionTime = nmessage.time;
         }
     }
     if (filtFunc->hasSourceFilter)
@@ -923,7 +923,7 @@ void CommonCore::queueMessage (ActionMessage &message)
                 message.payload = std::string (nmessage.data, nmessage.len);
                 delete[] nmessage.data;
             }
-            message.Time = nmessage.time;
+            message.actionTime = nmessage.time;
         }
         auto fed = getFederate (localP->local_fed_id);
         fed->queue.push (message);
