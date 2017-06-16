@@ -8,6 +8,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 #include "ActionMessage.h"
 
+#include <cstring>
 namespace helics
 {
 ActionMessage::ActionMessage (action_t action) : action_ (action),name(payload)

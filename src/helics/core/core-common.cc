@@ -89,7 +89,7 @@ FederateState *CommonCore::getFederate (federate_id_t federateID) const
     if (_operating)
     {
         // this list is now constant no need to lock
-        if ((federateID < _federates.size ()) && (federateID >= 0))
+        if ((federateID < static_cast<federate_id_t>(_federates.size ())) && (federateID >= 0))
         {
             return _federates[federateID].get ();
         }
@@ -106,7 +106,7 @@ FederateState *CommonCore::getFederate (federate_id_t federateID) const
     {
         // need to lock here since the list could be changing
         std::lock_guard<std::mutex> lock (_mutex);
-        if ((federateID < _federates.size ()) && (federateID >= 0))
+        if ((federateID < static_cast<federate_id_t>(_federates.size ())) && (federateID >= 0))
         {
             return _federates[federateID].get ();
         }
@@ -128,7 +128,7 @@ FederateState *CommonCore::getHandleFederate (Handle id_)
     if (_operating)
     {
         // this list is now constant no need to lock
-        if ((id_ < handles.size ()) && (id_ >= 0))
+        if ((id_ < static_cast<decltype(id_)>(handles.size ())) && (id_ >= 0))
         {
             return _federates[handles[id_]->local_fed_id].get ();
         }
@@ -137,7 +137,7 @@ FederateState *CommonCore::getHandleFederate (Handle id_)
     {
         // need to lock here since the list could be changing
         std::lock_guard<std::mutex> lock (_mutex);
-        if ((id_ < handles.size ()) && (id_ >= 0))
+        if ((id_ < static_cast<decltype(id_)>(handles.size ())) && (id_ >= 0))
         {
             return _federates[handles[id_]->local_fed_id].get ();
         }
@@ -150,7 +150,7 @@ BasicHandleInfo *CommonCore::getHandleInfo (Handle id_) const
     if (_operating)
     {
         // this list is now constant no need to lock
-        if ((id_ < handles.size ()) && (id_ >= 0))
+        if ((id_ < static_cast<decltype(id_)>(handles.size ())) && (id_ >= 0))
         {
             return handles[id_].get ();
         }
@@ -159,7 +159,7 @@ BasicHandleInfo *CommonCore::getHandleInfo (Handle id_) const
     {
         // need to lock here since the list could be changing
         std::lock_guard<std::mutex> lock (_mutex);
-        if ((id_ < handles.size ()) && (id_ >= 0))
+        if ((id_ < static_cast<decltype(id_)>(handles.size ())) && (id_ >= 0))
         {
             return handles[id_].get ();
         }
@@ -219,7 +219,7 @@ bool CommonCore::allInitReady () const
 {
     std::lock_guard<std::mutex> lock (_mutex);
 	//the federate count must be greater than the min size
-	if (_federates.size() < _min_federates)
+	if (static_cast<decltype(_min_federates)>(_federates.size()) < _min_federates)
 	{
 		return false;
 	}
@@ -473,7 +473,7 @@ void CommonCore::createBasicHandle (Handle id_,
     std::lock_guard<std::mutex> lock (_mutex);
 
     // may need to resize the handles
-    if (handles.size () <= id_)
+    if (static_cast<Handle>(handles.size ()) <= id_)
     {
         handles.resize (id_ + 5);
     }

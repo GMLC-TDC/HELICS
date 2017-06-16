@@ -35,8 +35,8 @@ public:
 		fed_id(fed_id_),
 		key(key_),
 		type(type_),
-		filterTarget(target_),
-		dest_filter(destFilter_)
+		dest_filter(destFilter_),
+		filterTarget(target_)
 	{
 	}
 
