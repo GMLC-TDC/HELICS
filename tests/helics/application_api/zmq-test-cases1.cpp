@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE (value_federate_initialize_tests)
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
 
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE (value_federate_publication_registration)
 {
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE (value_federate_subscription_registration)
 
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE (value_federate_subscription_registration)
 
 BOOST_AUTO_TEST_CASE (value_federate_subscription_and_publication_registration)
 {
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE (value_federate_single_transfer)
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
 
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -235,7 +235,7 @@ void runFederateTest (const X &defaultValue, const X &testValue1, const X &testV
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
 
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 
@@ -285,7 +285,7 @@ void runFederateTestv2 (const X &defaultValue, const X &testValue1, const X &tes
 {
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
 

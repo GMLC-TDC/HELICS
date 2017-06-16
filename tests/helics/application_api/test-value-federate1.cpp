@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_SUITE (value_federate_tests)
 /** test simple creation and destruction*/
 BOOST_AUTO_TEST_CASE (value_federate_initialize_tests)
 {
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE (value_federate_initialize_tests)
 
 BOOST_AUTO_TEST_CASE (value_federate_publication_registration)
 {
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE (value_federate_publication_registration)
 
 BOOST_AUTO_TEST_CASE (value_federate_subscription_registration)
 {
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE (value_federate_subscription_registration)
 
 BOOST_AUTO_TEST_CASE (value_federate_subscription_and_publication_registration)
 {
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE (value_federate_subscription_and_publication_registration)
 
 BOOST_AUTO_TEST_CASE (value_federate_single_transfer)
 {
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE (value_federate_single_transfer)
 template <class X>
 void runFederateTest (const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
@@ -248,7 +248,7 @@ void runFederateTest (const X &defaultValue, const X &testValue1, const X &testV
 template <class X>
 void runFederateTestv2 (const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
@@ -317,7 +317,7 @@ BOOST_AUTO_TEST_CASE (value_federate_single_transfer_types)
 
 BOOST_AUTO_TEST_CASE (value_federate_dual_transfer)
 {
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "2";
 
@@ -371,7 +371,7 @@ BOOST_AUTO_TEST_CASE (value_federate_dual_transfer)
 template <class X>
 void runDualFederateTest (const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "2";
 
@@ -432,7 +432,7 @@ void runDualFederateTest (const X &defaultValue, const X &testValue1, const X &t
 template <class X>
 void runDualFederateTestv2 (const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-    helics::FederateInfo_app fi ("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "2";
 
@@ -512,7 +512,7 @@ BOOST_AUTO_TEST_CASE (value_federate_dual_transfer_types)
 
 BOOST_AUTO_TEST_CASE(value_federate_single_init_publish)
 {
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 

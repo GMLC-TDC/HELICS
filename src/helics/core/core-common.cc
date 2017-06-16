@@ -278,7 +278,7 @@ bool CommonCore::enterExecutingState (federate_id_t federateID, bool iterationCo
 }
 
 
-federate_id_t CommonCore::registerFederate (const std::string &name, const FederateInfo &info)
+federate_id_t CommonCore::registerFederate (const std::string &name, const CoreFederateInfo &info)
 {
     
 

@@ -25,7 +25,7 @@ namespace helics
 {
 MessageFilterFederate::MessageFilterFederate () {}
 
-MessageFilterFederate::MessageFilterFederate (const FederateInfo_app &fi) : Federate (fi), MessageFederate (true)
+MessageFilterFederate::MessageFilterFederate (const FederateInfo &fi) : Federate (fi), MessageFederate (true)
 {
     filterManager = std::make_unique<MessageFilterFederateManager> (coreObject, getID ());
 }

@@ -42,7 +42,7 @@ namespace helics
 
 
  /** class defining some required information about the federate*/
-class FederateInfo
+class CoreFederateInfo
 {
 public:
 	Time timeDelta = timeZero;  // for periodic federates this is the period or minimum time resolution of a
@@ -147,7 +147,7 @@ class Core
      *
      * May only be invoked in initialize state otherwise throws an error
      */
-    virtual federate_id_t registerFederate (const std::string &name, const FederateInfo &info) = 0;
+    virtual federate_id_t registerFederate (const std::string &name, const CoreFederateInfo &info) = 0;
 
     /**
      * Returns the federate name.

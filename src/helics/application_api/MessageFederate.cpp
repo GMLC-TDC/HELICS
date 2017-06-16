@@ -24,7 +24,7 @@ namespace helics {
 
 
 
-	MessageFederate::MessageFederate(const FederateInfo_app &fi) :Federate(fi)
+	MessageFederate::MessageFederate(const FederateInfo &fi) :Federate(fi)
 	{
 		mfManager = std::make_unique<MessageFederateManager>(coreObject, getID());
 	}

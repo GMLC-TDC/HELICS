@@ -55,7 +55,7 @@ void MpiCore::enterInitializingState(Core::federate_id_t federateID) { }
 
 bool MpiCore::enterExecutingState (Core::federate_id_t federateID, bool iterationCompleted){ return true; }
 
-Core::federate_id_t MpiCore::registerFederate (const char *name, const FederateInfo &info)
+Core::federate_id_t MpiCore::registerFederate (const char *name, const CoreFederateInfo &info)
 {
     return static_cast<Core::federate_id_t> (0);
 }

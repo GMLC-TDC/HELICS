@@ -26,7 +26,7 @@ namespace helics
 		/**constructor taking a federate information structure and using the default core
 		@param[in] fi  a federate information structure
 		*/
-		ValueFederate(const FederateInfo_app &fi);
+		ValueFederate(const FederateInfo &fi);
 		/**constructor taking a string with the required information
 		@param[in] jsonString can be either a json file or a string containing json code
 		*/

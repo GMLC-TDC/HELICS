@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_SUITE(federate_tests)
 BOOST_AUTO_TEST_CASE(federate_initialize_tests)
 {
 
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 	
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(federate_initialize_tests)
 BOOST_AUTO_TEST_CASE(federate_time_step_tests)
 {
 
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(federate_time_step_tests)
 BOOST_AUTO_TEST_CASE(federate_multiple_federates)
 {
 
-	helics::FederateInfo_app fi("fed1");
+	helics::FederateInfo fi("fed1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "2";
 
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(federate_multiple_federates)
 BOOST_AUTO_TEST_CASE(federate_multiple_federates_async_calls)
 {
 
-	helics::FederateInfo_app fi("fed1");
+	helics::FederateInfo fi("fed1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "2";
 

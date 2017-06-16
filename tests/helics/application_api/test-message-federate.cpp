@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_SUITE(message_federate_tests)
 /** test simple creation and destruction*/
 BOOST_AUTO_TEST_CASE(message_federate_initialize_tests)
 {
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(message_federate_initialize_tests)
 
 BOOST_AUTO_TEST_CASE(message_federate_endpoint_registration)
 {
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(message_federate_endpoint_registration)
 
 BOOST_AUTO_TEST_CASE(message_federate_send_receive)
 {
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(message_federate_send_receive)
 
 BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed)
 {
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "2";
 
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed)
 
 BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed_multisend)
 {
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "2";
 
@@ -273,7 +273,7 @@ public:
 private:
 	void initialize()
 	{
-		helics::FederateInfo_app fi(name);
+		helics::FederateInfo fi(name);
 		fi.coreName = "test";
 		fi.coreType = CORE_TYPE_TO_TEST;
 		fi.coreInitString = "3";
@@ -392,7 +392,7 @@ BOOST_AUTO_TEST_CASE(threefedPingPong)
 
 BOOST_AUTO_TEST_CASE(test_time_interruptions)
 {
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "2";
 

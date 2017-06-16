@@ -47,7 +47,7 @@ public:
   virtual void finalize (federate_id_t federateID) override;
   virtual void enterInitializingState (federate_id_t federateID) override;
   virtual bool enterExecutingState(federate_id_t federateID, bool iterationCompleted = true) override;
-  virtual federate_id_t registerFederate (const std::string &name, const FederateInfo &info) override;
+  virtual federate_id_t registerFederate (const std::string &name, const CoreFederateInfo &info) override;
   virtual const std::string &getFederateName (federate_id_t federateId) const override;
   virtual federate_id_t getFederateId (const std::string &name) override;
   virtual void setFederationSize (unsigned int size);

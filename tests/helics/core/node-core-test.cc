@@ -46,7 +46,7 @@ static std::ostream& log(std::string str, bool condition) {
 #define CHECK_EQ(A,B) log(#A " == " #B, A == B)
 #define CHECK_STREQ(A,B) log(#A " == " #B, std::string(A) == std::string(B))
 #endif
-using helics::FederateInfo;
+using helics::CoreFederateInfo;
 using helics::Core;
 using helics::CoreFactory;
 
@@ -56,7 +56,7 @@ void simA (Core * core, const char *NAME)
 {
   Core::federate_id_t id = core->registerFederate(
       NAME,
-      FederateInfo()
+      CoreFederateInfo()
   );
   LOG(INFO) << NAME << ": " << "id " << id << ENDL;
   CHECK_STREQ(NAME, core->getFederateName(id));
@@ -132,7 +132,7 @@ void simB (Core * core, const char *NAME)
 {
   Core::federate_id_t id = core->registerFederate(
       NAME,
-      FederateInfo()
+      CoreFederateInfo()
   );
   LOG(INFO) << NAME << ": " << "id " << id << ENDL;
   CHECK_STREQ(NAME, core->getFederateName(id));

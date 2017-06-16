@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_SUITE(message_filter_federate_tests)
 /** test simple creation and destruction*/
 BOOST_AUTO_TEST_CASE(message_filter_federate_initialize_tests)
 {
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(message_filter_federate_initialize_tests)
 /** test registration of filters*/
 BOOST_AUTO_TEST_CASE(message_filter_federate_registration)
 {
-	helics::FederateInfo_app fi("filter");
+	helics::FederateInfo fi("filter");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "2";
 
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(message_filter_federate_registration)
 /** test basic operation of filters*/
 BOOST_AUTO_TEST_CASE(message_filter_basic_ops)
 {
-	helics::FederateInfo_app fi("filter");
+	helics::FederateInfo fi("filter");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "2";
 	fi.timeDelta = 1.0;

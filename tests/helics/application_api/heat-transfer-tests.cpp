@@ -53,7 +53,7 @@ public:
 	void initialize(const std::string &coreName)
 	{
 		std::string name = "heatUnit_(" + std::to_string(x) + "," + std::to_string(y) + ")";
-		helics::FederateInfo_app fi(name);
+		helics::FederateInfo fi(name);
 		fi.coreName = coreName;
 		fi.timeDelta = deltaTime;
 		vFed=std::make_unique<helics::ValueFederate>(fi);
@@ -130,7 +130,7 @@ public:
 	void initialize(const std::string &coreName)
 	{
 		std::string name = "Wall";
-		helics::FederateInfo_app fi(name);
+		helics::FederateInfo fi(name);
 		fi.coreName = coreName;
 		vFed = std::make_unique<helics::ValueFederate>(fi);
 		pub = vFed->registerGlobalPublication<double>("temp_wall");
@@ -199,7 +199,7 @@ public:
 	void initialize(const std::string &coreName)
 	{
 		std::string name = "observer";
-		helics::FederateInfo_app fi(name);
+		helics::FederateInfo fi(name);
 		fi.coreName = coreName;
 		fi.observer = true;
 		fi.timeDelta = 10.0;

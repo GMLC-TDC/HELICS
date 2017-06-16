@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(testcore_pubsub_value_test)
 
 	BOOST_CHECK_EQUAL(core->getFederationSize(), 1u);
 
-	Core::federate_id_t id = core->registerFederate("sim1", helics::FederateInfo());
+	Core::federate_id_t id = core->registerFederate("sim1", helics::CoreFederateInfo());
 	
 	BOOST_CHECK_EQUAL(core->getFederateName(id), "sim1");
 	BOOST_CHECK_EQUAL(core->getFederateId("sim1"), id);
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(testcore_send_receive_test)
 
 	BOOST_CHECK_EQUAL(core->getFederationSize(), 1u);
 
-	Core::federate_id_t id = core->registerFederate("sim1", helics::FederateInfo());
+	Core::federate_id_t id = core->registerFederate("sim1", helics::CoreFederateInfo());
 
 	BOOST_CHECK_EQUAL(core->getFederateName(id), "sim1");
 	BOOST_CHECK_EQUAL(core->getFederateId("sim1"), id);
@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_source_test)
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
 
-	Core::federate_id_t id = core->registerFederate("sim1", helics::FederateInfo());
+	Core::federate_id_t id = core->registerFederate("sim1", helics::CoreFederateInfo());
 
 	Core::Handle end1 = core->registerEndpoint(id, "end1", "type");
 	Core::Handle end2 = core->registerEndpoint(id, "end2", "type");
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_callback_test)
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
 
-	Core::federate_id_t id = core->registerFederate("sim1", helics::FederateInfo());
+	Core::federate_id_t id = core->registerFederate("sim1", helics::CoreFederateInfo());
 
 
 	Core::Handle end1 = core->registerEndpoint(id, "end1", "type");

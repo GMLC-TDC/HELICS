@@ -25,7 +25,7 @@ namespace helics {
 
 	/**constructor taking a core engine and federate info structure
 	*/
-	ValueFederate::ValueFederate(const FederateInfo_app &fi):Federate(fi)
+	ValueFederate::ValueFederate(const FederateInfo &fi):Federate(fi)
 	{
 		vfManager = std::make_unique<ValueFederateManager>(coreObject, getID());
 	}

@@ -15,7 +15,7 @@ CombinationFederate::CombinationFederate()
 {
 
 }
-	CombinationFederate::CombinationFederate(const FederateInfo_app &fi) :Federate(fi), ValueFederate(true), MessageFederate(true)
+	CombinationFederate::CombinationFederate(const FederateInfo &fi) :Federate(fi), ValueFederate(true), MessageFederate(true)
 	{
 
 	}

@@ -58,14 +58,14 @@ public:
 class FederateState
 {
 public:
-	FederateState(const std::string &name_, const FederateInfo &info_)
+	FederateState(const std::string &name_, const CoreFederateInfo &info_)
 		: name(name_),info(info_)
 	{
 		state = HELICS_CREATED;
 	}
 
 	std::string name;
-	FederateInfo info;
+	CoreFederateInfo info;
 	Core::federate_id_t local_id = invalid_fed_id; //!< id code, default to something invalid
 	Core::federate_id_t global_id = invalid_fed_id; //!< global id code, default to invalid
 	

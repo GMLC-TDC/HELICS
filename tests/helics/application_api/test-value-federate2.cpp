@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_SUITE(value_federate_tests2)
 /** test block send and receive*/
 BOOST_AUTO_TEST_CASE(test_block_send_receive)
 {
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(test_block_send_receive)
 /** test the all callback*/
 BOOST_AUTO_TEST_CASE(test_all_callback)
 {
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(test_all_callback)
 /** test the callback specification with a vector list*/
 BOOST_AUTO_TEST_CASE(test_vector_callback_lists)
 {
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE(test_vector_callback_lists)
 /** test the publish/subscribe to a vectorized array*/
 BOOST_AUTO_TEST_CASE(test_indexed_pubs_subs)
 {
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
 
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE(test_indexed_pubs_subs)
 /** test the publish/subscribe to a vectorized array*/
 BOOST_AUTO_TEST_CASE(test_async_calls)
 {
-	helics::FederateInfo_app fi("test1");
+	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "2";
 
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_CASE(test_move_calls)
 {
 	helics::ValueFederate vFed;
 	
-	helics::FederateInfo_app fi("test1", CORE_TYPE_TO_TEST);
+	helics::FederateInfo fi("test1", CORE_TYPE_TO_TEST);
 	fi.coreInitString = "3";
 	vFed = helics::ValueFederate(fi);
 	BOOST_CHECK(vFed.getName() == "test1");

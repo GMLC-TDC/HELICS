@@ -42,7 +42,7 @@ protected:
   virtual void finalize (federate_id_t federateID) override;
   virtual void enterInitializingState (federate_id_t federateID) override;
   virtual bool enterExecutingState(federate_id_t federateID, bool iterationCompleted = true) override;
-  virtual federate_id_t registerFederate (const char *name, const FederateInfo &info) override;
+  virtual federate_id_t registerFederate (const char *name, const CoreFederateInfo &info) override;
   virtual const char* getFederateName (federate_id_t federateId) override;
   virtual federate_id_t getFederateId (const char *name) override;
   virtual void setFederationSize (unsigned int size);
