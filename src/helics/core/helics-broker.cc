@@ -4,6 +4,8 @@
 #include <boost/filesystem.hpp>
 
 #include <iostream>
+#include <fstream>
+
 #define USE_LOGGING 1
 #if USE_LOGGING
 #if HELICS_HAVE_GLOG
