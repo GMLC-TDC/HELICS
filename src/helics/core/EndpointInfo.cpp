@@ -10,6 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 //#include "core/core-data.h"
 
 #include <cstring>
+#include <algorithm>
 
 namespace helics
 {
