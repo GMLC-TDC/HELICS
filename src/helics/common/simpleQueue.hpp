@@ -31,7 +31,7 @@ class simpleQueue
     std::vector<X> pullElements;  //!< vector of elements waiting extraction
   public:
     /** default constructor */
-    simpleQueue () noexcept= default;
+    simpleQueue ()= default;
     /** constructor with a reservation size
     @param[in] capacity  the initial storage capacity of the queue*/
     simpleQueue (size_t capacity)
