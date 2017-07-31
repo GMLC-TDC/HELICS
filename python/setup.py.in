@@ -7,8 +7,13 @@ import os
 from distutils.core import setup, Extension
 from Cython.Build import cythonize
 
-os_specific_cflags = '-stdlib=libc++'  # ''
-os_specific_ldflags = ''  # '-shared'
+if platform.system() == 'Darwin'
+    os_specific_cflags = '-stdlib=libc++'
+    os_specific_ldflags = ''  # '-shared'
+else:
+    os_specific_cflags = ''
+    os_specific_ldflags = '-shared'
+
 
 HELICS_INSTALL = os.getenv("HELICS_INSTALL", '${CMAKE_INSTALL_PREFIX}')
 
