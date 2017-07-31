@@ -6,8 +6,9 @@
 import os
 from distutils.core import setup, Extension
 from Cython.Build import cythonize
+import platform
 
-if platform.system() == 'Darwin'
+if platform.system() == 'Darwin':
     os_specific_cflags = '-stdlib=libc++'
     os_specific_ldflags = ''  # '-shared'
 else:
