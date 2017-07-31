@@ -31,7 +31,7 @@ cdef class PyFederateInfo(object):
         self.ptr_fi = new FederateInfo()
 
         deref(self.ptr_fi).coreType = "zmq";
-        deref(self.ptr_fi).coreInitString = str(number);
+        deref(self.ptr_fi).coreInitString = str(number).encode('ascii');
 
     # def __del__(self):
         # logger.debug("Python: running {}.__del__".format(self.__class__.__name__))
