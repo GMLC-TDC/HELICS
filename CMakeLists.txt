@@ -302,8 +302,6 @@ configure_file (
   )
   install(FILES ${CMAKE_BINARY_DIR}/include/helics/config.h DESTINATION include/helics)
 
-  install(DIRECTORY ThirdParty/ DESTINATION include
-        FILES_MATCHING PATTERN "*.h*")		
 #-----------------------------------------------------------------------------
 # CMAKE Subdirectories 
 #-----------------------------------------------------------------------------
