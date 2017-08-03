@@ -11,7 +11,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_MESSAGE_H_
 #pragma once
 
-#include "extra_includes/string_view.h"
+#include "helics_includes/string_view.h"
 #include "helics/config.h"
 #include "helics/core/helics-time.h"
 #include <memory>

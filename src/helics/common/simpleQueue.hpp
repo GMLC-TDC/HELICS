@@ -15,7 +15,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <type_traits>
 #include <vector>
 
-#include <extra_includes/optional.h>
+#include <helics_includes/optional.h>
 
 /** class for very simple thread safe queue
 @details  uses two vectors for the operations,  once the pull vector is empty it swaps the vectors
