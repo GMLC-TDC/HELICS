@@ -502,11 +502,11 @@ void CoreBroker::checkFilters()
 bool CoreBroker::allInitReady() const
 {
 	//the federate count must be greater than the min size
-	if (_federates.size() < _min_federates)
+	if (static_cast<decltype(_min_federates)>(_federates.size()) < _min_federates)
 	{
 		return false;
 	}
-	if (_brokers.size() < _min_brokers)
+	if (static_cast<decltype(_min_brokers)>(_brokers.size()) < _min_brokers)
 	{
 		return false;
 	}

@@ -25,6 +25,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <cassert>
 #include <cstring>
 #include <sstream>
+#include <fstream>
 #include <boost/program_options.hpp>
 
 

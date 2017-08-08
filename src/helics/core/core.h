@@ -212,11 +212,10 @@ class Core
      * May only be invoked in Executing state.
      *
      * Non-reiterative federates may not invoke this method.
-     *
-     * \param next
-     * \param localConverged has the local federate converged
+     *@param federateId the identifier for the federate to process
+     * @param next the requested time
+     * @param localConverged has the local federate converged
      */
-    // SGS TODO make this not a pair for C API?
     virtual std::pair<Time, bool>
     requestTimeIterative (federate_id_t federateId, Time next, bool localConverged) = 0;
 

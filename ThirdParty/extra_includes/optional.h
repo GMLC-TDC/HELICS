@@ -38,7 +38,7 @@
             using std::nullopt;
             using std::make_optional;
             using std::in_place_t;
-            using std::in_place
+			using std::in_place;
         }
 #       define STX_HAVE_STD_OPTIONAL 1
 #   elif __has_include(<experimental/optional>)
