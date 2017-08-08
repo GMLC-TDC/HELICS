@@ -81,8 +81,8 @@ namespace helics
 		/* get a packet for the specified filter
 		@details the call is blocking
 		@param[in] filter the specified filter
-		@return a Message_view object containing the Message*/
-		Message_view getMessageToFilter(filter_id_t filter);
+		@return a pointer to the message*/
+		std::unique_ptr<Message> getMessageToFilter(filter_id_t filter);
 
 		/** get the name of a filer
 		@param[in] id the filter to query

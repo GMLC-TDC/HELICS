@@ -117,13 +117,13 @@ namespace helics {
 			throw(InvalidFunctionCall("cannot call register Interfaces after entering initialization mode"));
 		}
 		std::ifstream file(jsonString);
-		Json::Value doc;
+		Json_helics::Value doc;
 
 		if (file.is_open())
 		{
-			Json::CharReaderBuilder rbuilder;
+			Json_helics::CharReaderBuilder rbuilder;
 			std::string errs;
-			bool ok = Json::parseFromStream(rbuilder, file, &doc, &errs);
+			bool ok = Json_helics::parseFromStream(rbuilder, file, &doc, &errs);
 			if (!ok)
 			{
 				// should I throw an error here?
@@ -132,7 +132,7 @@ namespace helics {
 		}
 		else
 		{
-			Json::Reader stringReader;
+			Json_helics::Reader stringReader;
 			bool ok = stringReader.parse(jsonString, doc, false);
 			if (!ok)
 			{

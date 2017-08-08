@@ -37,7 +37,7 @@ void TestCore::initialize (const std::string &initializationString)
 
 TestCore::~TestCore() = default;
 
-void TestCore::transmit(int route_id, ActionMessage &cmd)
+void TestCore::transmit(int route_id, const ActionMessage &cmd)
 {
 	if (route_id==0)
 	{

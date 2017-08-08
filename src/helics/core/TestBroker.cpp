@@ -11,10 +11,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-TestBroker::TestBroker()
-{
 
-}
 
 void TestBroker::transmit(int32_t route_id, const ActionMessage &cmd)
 {

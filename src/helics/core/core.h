@@ -15,6 +15,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "core-data.h"
 #include <utility>
 #include <string>
+#include <memory>
 
 /**
  * HELICS Core API
@@ -56,13 +57,14 @@ public:
 	bool time_agnostic = false;  //!< flag indicating that the federate does not participate in time advancement and should be ignored in all timeRequest operations
 	bool source_only = false;   //!< flag indicating that the federate does not recieve or do anything with received information.  
 	bool filter_only = false; //!< flag indicating that the source filter federate is not modifying the destination of a filtered message only time or content
+	//there are 3 bytes undefined in this structure
 };
 
 
 class Core
 {
   public:
-    Core (){};
+    Core ()=default;
     virtual ~Core () = default;
 
     /**
@@ -320,27 +322,16 @@ class Core
      *
      * Returned pointer is valid until dereference() is invoked.
      */
-    virtual data_t *getValue (Handle handle) = 0;
+    virtual std::shared_ptr<const data_block> getValue (Handle handle) = 0;
 
-    /**
-     * Completed referencing the data.
-     *
-     * It is invalid to access data after this call.  Core is free to delete the data.
-     */
-    virtual void dereference (data_t *data) = 0;
-
-    /**
-     * Completed referencing the data.
-     *
-     * It is invalid to access data after this call.  Core is free to delete the data.
-     */
-    virtual void dereference (message_t *msg) = 0;
+    
 
     /**
      * Returns array of subscription handles that received an update during the last
-     * time request.
-     *
-     * /param size set to the size of the array.
+     * time request.  The data remains valid until the next call to getValueUpdates for the given federateID
+     *@param federateID the identification code of the federate to query
+     * @param[out] size set to the size of the array.
+	 @return a reference to the location of an array of handles that have been updated
      */
     virtual const Handle *getValueUpdates (federate_id_t federateId, uint64_t *size) = 0;
 
@@ -425,7 +416,7 @@ class Core
      * Continues sending the message to the next filter or to final destination.
      *
      */
-    virtual void sendMessage (Handle sourceHandle, message_t *message) = 0;
+    virtual void sendMessage (Handle sourceHandle, std::unique_ptr<Message> message) = 0;
 
     /**
      * Returns the number of pending receives for the specified destination endpoint or filter.
@@ -435,12 +426,12 @@ class Core
     /**
      * Returns the next buffered message the specified destination endpoint or filter.
      */
-    virtual message_t *receive (Handle destination) = 0;
+    virtual std::unique_ptr<Message> receive (Handle destination) = 0;
 
     /**
      * Receives a message for any destination.
      */
-    virtual std::pair<const Handle, message_t*> receiveAny (federate_id_t federateId) = 0;
+    virtual std::pair<const Handle, std::unique_ptr<Message>> receiveAny (federate_id_t federateId) = 0;
 
     /**
      * Returns number of messages for all destinations.
@@ -456,11 +447,10 @@ class Core
 
 	/** set the filter callback *  setting a filter callback implies that the filter has no time or order dependency
 	and the filter is an independent function
-	@details the lifetime of the FilterOperator is managed by the user and should remain alive during the entire run of the simulation
 	@param[in] filter  the handle of the filter
 	@param[in] callback the function to operate on the message
 	*/
-	virtual void setFilterOperator(Handle filter, FilterOperator* callback) = 0;
+	virtual void setFilterOperator(Handle filter, std::shared_ptr<FilterOperator> callback) = 0;
 
 	/**
 	* Returns number of messages for all filters.
@@ -470,7 +460,7 @@ class Core
 	/**
 	* Receives a message for any filter.
 	*/
-	virtual std::pair<const Handle, message_t*> receiveAnyFilter(federate_id_t federateID) = 0;
+	virtual std::pair<const Handle, std::unique_ptr<Message>> receiveAnyFilter(federate_id_t federateID) = 0;
 };
 
 // set at a large negative number but not the largest negative number

@@ -74,15 +74,15 @@ namespace helics
 		return (filter.value() < filters.size()) ? (!filterQueues[filter.value()].empty()) : false;
 	}
 		
-	Message_view MessageFilterFederateManager::getMessageToFilter(filter_id_t filter)
+	std::unique_ptr<Message> MessageFilterFederateManager::getMessageToFilter(filter_id_t filter)
 	{
 		if (filter.value() < filters.size())
 		{
 			auto ms = filterQueues[filter.value()].pop();
-			return (ms) ? (*ms) : Message_view();
+			return (ms) ? (std::move(*ms)) : nullptr;
 			
 		}
-		return Message_view();
+		return nullptr;
 	}
 
 	static const std::string nullStr;
@@ -106,10 +106,8 @@ namespace helics
 			if (fid != handleLookup.end())
 			{  // assign the data
 
-			   /** making a shared pointer with custom deleter*/
-				auto sd = std::shared_ptr<message_t>(msgp.second, [=](message_t *m) { coreObject->dereference(m); });
 				auto localfilterIndex = fid->second.value();
-				filterQueues[localfilterIndex].emplace(std::move(sd));
+				filterQueues[localfilterIndex].emplace(std::move(msgp.second));
 				if (filters[localfilterIndex].callbackIndex >= 0)
 				{
 					auto cb = callbacks[filters[localfilterIndex].callbackIndex];
@@ -244,7 +242,7 @@ namespace helics
 		operators.push_back(mo);
 		for (auto &flt : filters)
 		{
-			coreObject->setFilterOperator(flt.handle, mo.get());
+			coreObject->setFilterOperator(flt.handle, mo);
 		}
 
 	}
@@ -255,7 +253,7 @@ namespace helics
 		{
 			std::lock_guard<std::mutex> fLock(filterLock);
 			operators.push_back(mo);
-			coreObject->setFilterOperator(filters[id.value()].handle, mo.get());
+			coreObject->setFilterOperator(filters[id.value()].handle, mo);
 		}
 		else
 		{
@@ -271,7 +269,7 @@ namespace helics
 		{
 			if (id.value() < filters.size())
 			{
-				coreObject->setFilterOperator(filters[id.value()].handle, mo.get());
+				coreObject->setFilterOperator(filters[id.value()].handle, mo);
 			}
 		}
 	}

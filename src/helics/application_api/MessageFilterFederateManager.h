@@ -80,7 +80,7 @@ namespace helics
 		@param[in] filter the specified filter
 		@return a message View object
 		*/
-		Message_view getMessageToFilter(filter_id_t filter);
+		std::unique_ptr<Message> getMessageToFilter(filter_id_t filter);
 
 
 		/** update the time from oldTime to newTime
@@ -173,7 +173,7 @@ namespace helics
 
 		std::unordered_map<std::string, filter_id_t> SourceFilterNames;  //!< map for source filters
 		std::unordered_map<std::string, filter_id_t> DestFilterNames;		//!< map for destination filters
-		std::vector<simpleQueue<Message_view>> filterQueues; //!< the storage for the message queues
+		std::vector<simpleQueue<std::unique_ptr<Message>>> filterQueues; //!< the storage for the message queues
 		std::map<Core::Handle, filter_id_t> handleLookup; //!< map to lookup endpoints from core handles
 		std::vector<filter_info> filters; //!< vector the filters
 		std::vector<std::function<void(filter_id_t,Time)>> callbacks;

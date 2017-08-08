@@ -52,12 +52,9 @@ using helics::CoreFactory;
 
 static helics::Barrier barrier(4);
 
-void simA (Core * core, const char *NAME)
+void simA (std::shared_ptr<Core> core, const std::string &NAME)
 {
-  Core::federate_id_t id = core->registerFederate(
-      NAME,
-      CoreFederateInfo()
-  );
+  Core::federate_id_t id = core->registerFederate(NAME,CoreFederateInfo());
   LOG(INFO) << NAME << ": " << "id " << id << ENDL;
   CHECK_STREQ(NAME, core->getFederateName(id));
   CHECK_EQ(id, core->getFederateId(NAME));
@@ -81,7 +78,6 @@ void simA (Core * core, const char *NAME)
   LOG(INFO) << NAME << ": " << "entered executing state" << ENDL;
 
   // time loop
-  helics::data_t *data;
   const Core::Handle *events;
   uint64_t events_size = 0;
 
@@ -89,31 +85,28 @@ void simA (Core * core, const char *NAME)
   std::string str1 = "hello world";
   core->setValue(pub1, str1.data(), str1.size());
   //data = core->getValue(pub1); // this would assert
-  data = core->getValue(sub1); // should be empty so far
+  auto data = core->getValue(sub1); // should be empty so far
   events = core->getValueUpdates(id, &events_size);
   assert(0 == events_size);
-  LOG(INFO) << "GET VALUE size " << data->len << ENDL;
-  core->dereference(data);
+  LOG(INFO) << "GET VALUE size " << data->size() << ENDL;
   core->timeRequest(id, 100);
   events = core->getValueUpdates(id, &events_size);
   assert(1 == events_size);
   data = core->getValue(sub1);
   
-  LOG(INFO) << "GET VALUE size " << data->len << " and handle " << *events << ENDL;
-  std::string str2(data->data, data->len);
+  LOG(INFO) << "GET VALUE size " << data->size() << " and handle " << *events << ENDL;
+  std::string str2(data->to_string());
   
   CHECK_EQ(str1, str2);
-  assert(data->len == str1.size());
-  core->dereference(data);
+  assert(data->size() == str1.size());
   core->setValue(pub1, "hello\n\0helloAgain", 17);
   core->timeRequest(id, 150);
   events = core->getValueUpdates(id, &events_size);
   LOG(INFO) << "events_size=" << events_size << ENDL;
   assert(1 == events_size);
   data = core->getValue(sub1);
-  LOG(INFO) << "GET VALUE size " << data->len << " and handle " << *events << ENDL;
-  assert(data->len == 17);
-  core->dereference(data);
+  LOG(INFO) << "GET VALUE size " << data->size() << " and handle " << *events << ENDL;
+  assert(data->size() == 17);
 
   core->timeRequest(id, 200);
   core->send(end1, "simA1", "test123", 8);
@@ -121,18 +114,16 @@ void simA (Core * core, const char *NAME)
   LOG(INFO) << NAME << " RECEIVECOUNT " << core->receiveCount(end1) << ENDL;
   while (core->receiveCount(end1) > 0) {
 	  auto end1_recv = core->receive(end1);
-	  LOG(INFO) << NAME << " RECEIVE " << end1_recv->data << ENDL;
+	  LOG(INFO) << NAME << " RECEIVE " << end1_recv->data.to_string() << ENDL;
   }
 
   core->finalize(id);
 }
 
 
-void simB (Core * core, const char *NAME)
+void simB (std::shared_ptr<Core> core, const std::string &NAME)
 {
-  Core::federate_id_t id = core->registerFederate(
-      NAME,
-      CoreFederateInfo()
+  Core::federate_id_t id = core->registerFederate(NAME,CoreFederateInfo()
   );
   LOG(INFO) << NAME << ": " << "id " << id << ENDL;
   CHECK_STREQ(NAME, core->getFederateName(id));
@@ -182,8 +173,7 @@ int main (int argc, char **argv)
     LOG(INFO) << "ZeroMQ Core Factory Test" << ENDL;
   }
 
-  Core* core = CoreFactory::create (
-      type, initializationString);
+  std::shared_ptr<Core> core = CoreFactory::create (type, initializationString);
 
   if (core) {
     LOG(INFO) << "Created Test Core" << ENDL;
@@ -207,7 +197,6 @@ int main (int argc, char **argv)
   simB1_thread.join();
   simB2_thread.join();
 
-  delete core;
 
   LOG(INFO) << "Deleted core" << ENDL;
 

@@ -14,6 +14,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "Message.h"
 #include "core/core-data.h"
+/** @file
+@brief define helper classes to scope filter operations
+*/
 
 namespace helics
 {
@@ -24,31 +27,40 @@ this class is virtual
 class MessageOperator :public helics::FilterOperator
 {
 public:
-	MessageOperator() {};
+	/** default constructor*/
+	MessageOperator()=default;
 private:
-	virtual message_t process(message_t *) override = 0;
+	virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override = 0;
 };
 
+/** class defining an message operator that operates purely on the time aspect of a message*/
 class MessageTimeOperator :public MessageOperator
 {
 public:
-	MessageTimeOperator() {};
+	/** default constructor*/
+	MessageTimeOperator()=default;
+	/** set the function to modify the time of the message in the constructor*/
 	MessageTimeOperator(std::function<Time(Time)> userTimeFunction);
+	/** set the function to modify the time of the message*/
 	void setTimeFunction(std::function<Time(Time)> userTimeFunction);
 private:
-	std::function<Time(Time)> TimeFunction;
-	virtual message_t process(message_t *) override;
+	std::function<Time(Time)> TimeFunction; //!< the function that actually does the processing
+	virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
 };
 
+/** class defining an message operator that operates purely on the data aspect of a message*/
 class MessageDataOperator :public MessageOperator
 {
 public:
-	MessageDataOperator() {};
+	/** default constructor*/
+	MessageDataOperator()=default;
+	/** set the function to modify the data of the message in the constructor*/
 	MessageDataOperator(std::function<data_view(data_view)> userDataFunction);
+	/** set the function to modify the data of the message*/
 	void setDataFunction(std::function<data_view(data_view)> userDataFunction);
 private:
-	std::function<data_view(data_view)> dataFunction;
-	virtual message_t process(message_t *) override;
+	std::function<data_view(data_view)> dataFunction; //!< the function actually doing the processing
+	virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
 };
 
 }

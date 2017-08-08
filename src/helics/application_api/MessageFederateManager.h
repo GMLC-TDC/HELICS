@@ -81,16 +81,17 @@ namespace helics
 		/** receive a packet from a particular endpoint
 		@param[in] endpoint the identifier for the endpoint
 		@return a message object*/
-		Message_view getMessage(endpoint_id_t endpoint);
+		std::unique_ptr<Message> getMessage(endpoint_id_t endpoint);
 		/* receive a communication message for any endpoint in the federate*/
-		Message_view getMessage();
+		std::unique_ptr<Message> getMessage();
 
 		/**/
 		void sendMessage(endpoint_id_t source, const char *dest, data_view message);
 
 		void sendMessage(endpoint_id_t source, const char *dest, data_view message, Time sendTime);
 
-		void sendMessage(endpoint_id_t source, Message_view message);
+		void sendMessage(endpoint_id_t source, std::unique_ptr<Message> message);
+
 
 		/** update the time from oldTime to newTime
 		@param[in] newTime the newTime of the federate
@@ -144,11 +145,11 @@ namespace helics
 		std::shared_ptr<Core> coreObject; //!< the pointer to the actual core
 		Core::federate_id_t fedID; //!< storage for the federate ID
 		mutable std::mutex endpointLock;  //!< lock for protecting the endpoint list
-		std::vector<simpleQueue<Message_view>> messageQueues; //!< the storage for the message queues
+		std::vector<simpleQueue<std::unique_ptr<Message>>> messageQueues; //!< the storage for the message queues
 		std::vector<unsigned int> messageOrder; //!< maintaining a list of the ordered messages
 		std::mutex morderMutex;  //!< mutex to protect the global ordered list
 		int allCallbackIndex = -1; //!< index of the all callback function
-		bool hasSubscriptions = false;
+		bool hasSubscriptions = false; //!< indicator that the message filter subscribes to data values
 	private: //private functions
 		void removeOrderedMessage(unsigned int index);
 	};

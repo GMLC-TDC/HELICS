@@ -47,8 +47,8 @@ bool isAvailable(const std::string &name);
 */
 std::shared_ptr<helics::Core> getCore(const std::string &name);
 
-/** close the named core interface for new Federates
-@details this does not destroy the core for Federates that are already using it, only removes its ability to accept new federates
+/** close the named core interface to new Federates
+@details this does not destroy the core for Federates that are already using it, only removes its ability to accept new federates from the getCore function
 */
 void closeCore(const std::string &name);
 

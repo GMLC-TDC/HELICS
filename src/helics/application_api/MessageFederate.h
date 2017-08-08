@@ -92,12 +92,12 @@ public:
     /** receive a packet from a particular endpoint
     @param[in] endpoint the identifier for the endpoint
     @return a message object*/
-    Message_view getMessage (endpoint_id_t endpoint);
+	std::unique_ptr<Message> getMessage (endpoint_id_t endpoint);
     /** receive a communication message for any endpoint in the federate
     @details the return order will in order of endpoint creation then order of arrival
     all messages for the first endpoint, then all for the second, and so on
     @return a Message_view object containing the message data*/
-    Message_view getMessage ();
+	std::unique_ptr<Message> getMessage ();
 
     /** send a message
 	@details send a message to a specific destination
@@ -140,10 +140,16 @@ public:
 	/** send an event message at a particular time
 	@details send a message to a specific destination
 	@param[in] source the source endpoint
-	@param[in] message a view of the message
+	@param[in] message a pointer to the message
 	*/
-    void sendMessage (endpoint_id_t source, const Message_view &message);
+    void sendMessage (endpoint_id_t source, std::unique_ptr<Message> message);
 
+	/** send an event message at a particular time
+	@details send a message to a specific destination
+	@param[in] source the source endpoint
+	@param[in] message a message object
+	*/
+	void sendMessage(endpoint_id_t source, const Message &message);
 
     /** get the name of an endpoint from its id
     @param[in] id the endpoint to query

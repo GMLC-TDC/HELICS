@@ -13,6 +13,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/common/blocking_queue.h"
 #include "helics/config.h"
 #include "helics/core/core.h"
+#include "core/core-data.h"
 
 #include <cstdint>
 #include <map>
@@ -20,13 +21,14 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <thread>
 #include <utility>
 #include <vector>
-#include <string>
 
 namespace helics
 {
+/** data class for managing information about a subscription*/
 class SubscriptionInfo
 {
   public:
+	  /** constructor with all the information*/
     SubscriptionInfo (Core::Handle id_,
                       Core::federate_id_t fed_id_,
                       const std::string &key_,
@@ -37,22 +39,22 @@ class SubscriptionInfo
     {
     }
 
-    ~SubscriptionInfo () {}
-
-    Core::Handle id;
-    Core::federate_id_t fed_id;
-    std::string key;
-    std::string type;
-    std::string units;
-    bool required;
-    bool has_target = false;
-	std::string current_data;
-	std::pair<Core::federate_id_t, Core::Handle> target;
+    Core::Handle id;	//!< identifier for the handle
+    Core::federate_id_t fed_id;	//!< the federate that created the handle
+    std::string key;	//!< the identifier for the subscription
+    std::string type;	//! the type of data for the subscription
+    std::string units;	//!< the units of the subscription
+    bool required;	//!< flag indicating that the subscription requires a matching publication
+    bool has_target = false;	//!< flag indicating that a target publication was found
+	std::shared_ptr<const data_block> current_data;	//!< the most recent published data
+	std::pair<Core::federate_id_t, Core::Handle> target;	//!< the publication information
 private:
-	std::vector<std::pair<Time, std::string>> data_queue;
+	std::vector<std::pair<Time, std::shared_ptr<const data_block>>> data_queue; //!< queue of the data
 public:
-	data_t *getData();
-	void updateData(Time updateTime, const std::string &data);
+	/** get the current data*/
+	std::shared_ptr<const data_block> getData();
+	/** move time forward to update the current data*/
+	void updateData(Time updateTime, std::shared_ptr<const data_block> data);
 };
 }  // namespace helics
 

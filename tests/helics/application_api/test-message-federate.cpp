@@ -103,9 +103,9 @@ BOOST_AUTO_TEST_CASE(message_federate_send_receive)
 	BOOST_CHECK(res);
 
 	auto M = mFed->getMessage(epid2);
-	BOOST_REQUIRE_EQUAL(M.data.size(), data.size());
+	BOOST_REQUIRE_EQUAL(M->data.size(), data.size());
 
-	BOOST_CHECK_EQUAL(M.data[245], data[245]);
+	BOOST_CHECK_EQUAL(M->data[245], data[245]);
 	mFed->finalize();
 
 	BOOST_CHECK(mFed->currentState() == helics::Federate::op_states::finalize);
@@ -156,14 +156,14 @@ BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed)
 	BOOST_CHECK(res);
 
 	auto M1 = mFed1->getMessage(epid);
-	BOOST_REQUIRE_EQUAL(M1.data.size(), data2.size());
+	BOOST_REQUIRE_EQUAL(M1->data.size(), data2.size());
 
-	BOOST_CHECK_EQUAL(M1.data[245], data2[245]);
+	BOOST_CHECK_EQUAL(M1->data[245], data2[245]);
 
 	auto M2 = mFed2->getMessage(epid2);
-	BOOST_REQUIRE_EQUAL(M2.data.size(), data.size());
+	BOOST_REQUIRE_EQUAL(M2->data.size(), data.size());
 
-	BOOST_CHECK_EQUAL(M2.data[245], data[245]);
+	BOOST_CHECK_EQUAL(M2->data[245], data[245]);
 	mFed1->finalize();
 	mFed2->finalize();
 
@@ -217,28 +217,28 @@ BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed_multisend)
 	BOOST_CHECK_EQUAL(cnt,4);
 
 	auto M1 = mFed2->getMessage(epid2);
-	BOOST_REQUIRE_EQUAL(M1.data.size(), data1.size());
+	BOOST_REQUIRE_EQUAL(M1->data.size(), data1.size());
 	
 
-	BOOST_CHECK_EQUAL(M1.data[245], data1[245]);
+	BOOST_CHECK_EQUAL(M1->data[245], data1[245]);
 	//check the count decremented
 	cnt = mFed2->receiveCount(epid2);
 	BOOST_CHECK_EQUAL(cnt, 3);
 	auto M2 = mFed2->getMessage();
-	BOOST_REQUIRE_EQUAL(M2.data.size(), data2.size());
-	BOOST_CHECK_EQUAL(M2.data[245], data2[245]);
+	BOOST_REQUIRE_EQUAL(M2->data.size(), data2.size());
+	BOOST_CHECK_EQUAL(M2->data[245], data2[245]);
 	cnt = mFed2->receiveCount(epid2);
 	BOOST_CHECK_EQUAL(cnt, 2);
 	
 	auto M3 = mFed2->getMessage();
 	auto M4 = mFed2->getMessage(epid2);
-	BOOST_CHECK_EQUAL(M3.data.size(), data3.size());
-	BOOST_CHECK_EQUAL(M4.data.size(), data4.size());
+	BOOST_CHECK_EQUAL(M3->data.size(), data3.size());
+	BOOST_CHECK_EQUAL(M4->data.size(), data4.size());
 
-	BOOST_CHECK_EQUAL(M4.src.to_string(), "test1/ep1");
-	BOOST_CHECK_EQUAL(M4.dest.to_string(), "ep2");
-	BOOST_CHECK_EQUAL(M4.origsrc.to_string(), "test1/ep1");
-	BOOST_CHECK_EQUAL(M4.time, 0.0);
+	BOOST_CHECK_EQUAL(M4->src, "test1/ep1");
+	BOOST_CHECK_EQUAL(M4->dest, "ep2");
+	BOOST_CHECK_EQUAL(M4->origsrc, "test1/ep1");
+	BOOST_CHECK_EQUAL(M4->time, 0.0);
 	mFed1->finalize();
 	mFed2->finalize();
 
@@ -291,25 +291,25 @@ private:
 		while (mFed->hasMessage(ep))
 		{
 			auto mess = mFed->getMessage(ep);
-			auto messString = mess.data.string();
+			auto messString = mess->data.to_string();
 			if (messString == "ping")
 			{
 #ifdef ENABLE_OUTPUT
-				std::cout << name << " :receive ping from " << std::string(mess.src) << " at time " << static_cast<double>(currentTime) << '\n';
+				std::cout << name << " :receive ping from " << std::string(mess->src) << " at time " << static_cast<double>(currentTime) << '\n';
 #endif
-				mess.data = "pong";
-				mess.dest = mess.src;
-				mess.src = name;
-				mess.origsrc = mess.src;
-				mess.time = currentTime;
-				mFed->sendMessage(ep, mess);
+				mess->data = "pong";
+				mess->dest = mess->src;
+				mess->src = name;
+				mess->origsrc = mess->src;
+				mess->time = currentTime;
+				mFed->sendMessage(ep, std::move(mess));
 				pings++;
 			}
 			else if (messString == "pong")
 			{
 				pongs++;
 #ifdef ENABLE_OUTPUT
-				std::cout << name << " :receive pong from " << std::string(mess.src) << " at time " << static_cast<double>(currentTime) << '\n';
+				std::cout << name << " :receive pong from " << std::string(mess->src) << " at time " << static_cast<double>(currentTime) << '\n';
 #endif
 			}
 		}
@@ -430,18 +430,18 @@ BOOST_AUTO_TEST_CASE(test_time_interruptions)
 	
 
 	auto M1 = mFed1->getMessage(epid);
-	BOOST_REQUIRE_EQUAL(M1.data.size(), data2.size());
+	BOOST_REQUIRE_EQUAL(M1->data.size(), data2.size());
 
-	BOOST_CHECK_EQUAL(M1.data[245], data2[245]);
+	BOOST_CHECK_EQUAL(M1->data[245], data2[245]);
 
 	gtime = mFed2->requestTime(1.0);
 	BOOST_CHECK_EQUAL(f1time.get(), 0.5);
 	BOOST_CHECK_EQUAL(gtime, 1.0);
 
 	auto M2 = mFed2->getMessage(epid2);
-	BOOST_REQUIRE_EQUAL(M2.data.size(), data.size());
+	BOOST_REQUIRE_EQUAL(M2->data.size(), data.size());
 
-	BOOST_CHECK_EQUAL(M2.data[245], data[245]);
+	BOOST_CHECK_EQUAL(M2->data[245], data[245]);
 
 	BOOST_CHECK(mFed1->hasMessage()==false);
 	mFed1->finalize();

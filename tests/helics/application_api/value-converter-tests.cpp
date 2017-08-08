@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(test_block_vectors)
 	BOOST_CHECK_EQUAL(res[0].size(), vb[0].size());
 	BOOST_CHECK_EQUAL(res[0][5], vb[0][5]);
 
-	BOOST_CHECK(res[1].string() == vb[1].string());
+	BOOST_CHECK(res[1].string() == vb[1].to_string());
 
 	BOOST_CHECK_EQUAL(3.1415, helics::ValueConverter<double>::interpret(res[2]));
 	BOOST_CHECK_EQUAL(9999, helics::ValueConverter<int>::interpret(res[3]));
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(test_block_vectors)
 	BOOST_CHECK_EQUAL(res2[0].size(), vb[0].size());
 	BOOST_CHECK_EQUAL(res2[0][5], vb[0][5]);
 
-	BOOST_CHECK(res2[1].string() == vb[1].string());
+	BOOST_CHECK(res2[1].to_string() == vb[1].to_string());
 
 	BOOST_CHECK_EQUAL(3.1415, helics::ValueConverter<double>::interpret(res2[2]));
 	BOOST_CHECK_EQUAL(9999, helics::ValueConverter<int>::interpret(res2[3]));

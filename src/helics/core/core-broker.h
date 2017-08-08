@@ -25,24 +25,26 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
+/** class defining the common information for a federate*/
 class BasicFedInfo
 {
 public:
-	std::string name;
-	Core::federate_id_t global_id=invalid_fed_id;
-	int32_t route_id=invalid_fed_id;
-	bool broker_ = false;
+	std::string name; //!< name of the federate
+	Core::federate_id_t global_id=invalid_fed_id; //!< the identification code for the federate
+	int32_t route_id=invalid_fed_id; //!< the routing information for data to be sent to the federate
+	bool broker_ = false; //!< flag indicating the federate is a broker for other federates
 	BasicFedInfo(const std::string &fedname) :name(fedname) {};
 };
 
+/** class defining the common information about a broker federate*/
 class BasicBrokerInfo
 {
 public:
-	std::string name;
-	Core::federate_id_t global_id=invalid_fed_id;
-	int32_t route_id=invalid_fed_id;
-	std::string routeInfo;
-	bool _initRequested = false;
+	std::string name; //!< the name of the broker
+	Core::federate_id_t global_id=invalid_fed_id;	//!< the global identifier for the broker
+	int32_t route_id=invalid_fed_id;	//!< the identifier for the route to take to the broker
+	std::string routeInfo;	//!< string describing the connection information for the route
+	bool _initRequested = false;	//!< flag indicating the broker has requesting initialization
 	BasicBrokerInfo(const std::string &brokerName) :name(brokerName) {};
 	
 };
@@ -58,11 +60,11 @@ protected:
 	bool _isRoot = false;  //!< set to true if this object is a root broker
 	bool _gateway = false;  //!< set to true if this broker should act as a gateway.  
 private:
+	int32_t global_broker_id;  //!< the identifier for the broker
 	std::vector<std::pair<Core::federate_id_t, bool>> localBrokersInit; //!< indicator if the local brokers are ready to init
 	std::vector<BasicFedInfo> _federates; //!< container for all federates
 	std::vector<BasicHandleInfo> _handles; //!< container for the basic info for all handles
 	std::vector<BasicBrokerInfo> _brokers;  //!< container for the basic broker info for all subbrokers
-	int32_t global_broker_id;  //!< the identifier for the broker
 	std::string local_broker_identifier;  //!< a randomly generated string  or assigned name for initial identification of the broker
 	BlockingQueue<ActionMessage> _queue; //!< primary routing queue
 	std::map<std::string, int32_t> fedNames;  //!< a map to lookup federates
@@ -108,8 +110,12 @@ protected:
 	*/
 	virtual void addRoute(int route_id, const std::string &routeInfo) = 0;
 public:
+	/**default constructor
+	@param isRoot  set to true to indicate this object is a root broker*/
 	CoreBroker(bool isRoot = false) noexcept;
-	~CoreBroker();
+	/** destructor*/
+	virtual ~CoreBroker();
+	/** start up the broker with an inditialization string containing commands and parameters*/
 	virtual void Initialize(const std::string &initializationString);
 	/** add a message to the queue to process*/
 	void addMessage(const ActionMessage &m);
@@ -117,7 +123,9 @@ public:
 	@return true if everyone is ready, false otherwise
 	*/
 	bool allInitReady() const;
+	/** set the local identification string for the broker*/
 	void setIdentifier(const std::string &name);
+	/** get the local identification for the broker*/
 	const std::string &getIdentifier() const
 	{
 		return local_broker_identifier;

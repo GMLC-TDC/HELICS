@@ -14,6 +14,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 
 #include "Message.h"
+#include "core/core-data.h"
 #include <string>
 #include <cstring>
 #include <vector>

@@ -7,9 +7,11 @@
 
 add_executable(core-factory-test core-factory-test.cc)
 target_link_libraries(core-factory-test helics)
+target_link_libraries(core-factory-test ${external_library_list})
 
 add_executable(node-core-test node-core-test.cc)
 target_link_libraries(node-core-test helics)
+target_link_libraries(node-core-test ${external_library_list})
 
 add_test(NAME core-factory-test COMMAND core-factory-test)
 

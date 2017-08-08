@@ -30,7 +30,6 @@ set(application_api_sources
 CombinationFederate.cpp
 coreInstantiation.cpp
 Federate.cpp
-Message.cpp
 MessageFederate.cpp
 MessageFederateManager.cpp
 MessageFilterFederate.cpp

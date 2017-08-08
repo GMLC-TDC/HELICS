@@ -11,6 +11,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 
 #include "helics/core/core-types.h"
+#include <memory>
+#include <string>
 
 namespace helics {
 
@@ -26,7 +28,7 @@ public:
    *
    * Invokes initialize() on the instantiated Core object.
    */
-  static Core* create (helics_core_type type, const char *initializationString);
+  static std::unique_ptr<Core> create (helics_core_type type, const std::string &initializationString);
 
   /**
    * Returns true if type specified is available in current compilation.

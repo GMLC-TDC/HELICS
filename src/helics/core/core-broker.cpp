@@ -7,7 +7,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 */
 #include "core-broker.h"
-
+#include "common/stringToCmdLine.h"
 namespace helics
 {
 
@@ -392,6 +392,7 @@ void CoreBroker::Initialize(const std::string &initializationString)
 	bool exp = false;
 	if (_initialized.compare_exchange_strong(exp,true))
 	{
+		stringToCmdLine strcmd(initializationString);
 		_broker_thread = std::thread(&CoreBroker::broker, this);
 	}
 	

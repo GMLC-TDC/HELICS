@@ -14,18 +14,18 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-message_t *EndpointInfo::getMessage(Time maxTime)
+std::unique_ptr<Message> EndpointInfo::getMessage(Time maxTime)
 {
-	//TODO make thread safe
+	std::lock_guard<std::mutex> lock(queueLock);
 	if (message_queue.empty())
 	{
 		return nullptr;
 	}
 	if (message_queue.front()->time <= maxTime)
 	{
-		auto msg = message_queue.front();
+		auto msg = std::move(message_queue.front());
 		message_queue.pop_front();
-		return msg;
+		return std::move(msg);
 	}
 	else
 	{
@@ -34,31 +34,29 @@ message_t *EndpointInfo::getMessage(Time maxTime)
 }
 
 
-Time EndpointInfo::firstMessageTime()
+Time EndpointInfo::firstMessageTime() const
 {
+	std::lock_guard<std::mutex> lock(queueLock);
 	return (message_queue.empty()) ? Time::maxVal() : message_queue.front()->time;
 }
-static auto msgSorter = [](const message_t *m1, const message_t *m2)
+static auto msgSorter = [](const auto &m1, const auto &m2)
 {
 	//first by time
-	if (m1->time != m2->time)
-	{
-		return (m1->time < m2->time);
-	}
-	return (strcmp(m1->origsrc, m2->origsrc) < 0);
+	return (m1->time != m2->time) ? (m1->time < m2->time) : (m1->origsrc < m2->origsrc);
 };
 
-    void EndpointInfo::addMessage (message_t *m) 
+    void EndpointInfo::addMessage (std::unique_ptr<Message> m)
 	{
-		message_queue.push_back(m);
+		std::lock_guard<std::mutex> lock(queueLock);
+		message_queue.push_back(std::move(m));
 		std::sort(message_queue.begin(), message_queue.end(), msgSorter);
 	}
 
-	int32_t EndpointInfo::queueSize(Time maxTime)
+	int32_t EndpointInfo::queueSize(Time maxTime) const
 	{
-		//TODO make thread safe
+		std::lock_guard<std::mutex> lock(queueLock);
 		int32_t cnt = 0;
-		for (auto msg : message_queue)
+		for (auto &msg : message_queue)
 		{
 			if (msg->time <= maxTime)
 				++cnt;

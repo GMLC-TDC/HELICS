@@ -13,16 +13,16 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-message_t *FilterInfo::getMessage(Time maxTime)
+std::unique_ptr<Message> FilterInfo::getMessage(Time maxTime)
 {
-	//TODO make thread safe
+	std::lock_guard<std::mutex> lock(queueLock);
 	if (message_queue.empty())
 	{
 		return nullptr;
 	}
 	if (message_queue.front()->time <= maxTime)
 	{
-		auto msg = message_queue.front();
+		auto msg = std::move(message_queue.front());
 		message_queue.pop_front();
 		return msg;
 	}
@@ -33,32 +33,30 @@ message_t *FilterInfo::getMessage(Time maxTime)
 }
 
 
-Time FilterInfo::firstMessageTime()
+Time FilterInfo::firstMessageTime() const
 {
+	std::lock_guard<std::mutex> lock(queueLock);
 	return (message_queue.empty()) ? Time::maxVal() : message_queue.front()->time;
 }
 
-static auto msgSorter = [](const message_t *m1, const message_t *m2)
+static auto msgSorter = [](const auto &m1, const auto &m2)
 {
 	//first by time
-	if (m1->time != m2->time)
-	{
-		return (m1->time < m2->time);
-	}
-	return (strcmp(m1->origsrc, m2->origsrc) < 0);
+	return (m1->time != m2->time) ? (m1->time < m2->time) : (m1->origsrc < m2->origsrc);
 };
 
-void FilterInfo::addMessage(message_t *m)
+void FilterInfo::addMessage(std::unique_ptr<Message> message)
 {
-	message_queue.push_back(m);
+	std::lock_guard<std::mutex> lock(queueLock);
+	message_queue.push_back(std::move(message));
 	std::sort(message_queue.begin(), message_queue.end(), msgSorter);
 }
 
-int32_t FilterInfo::queueSize(Time maxTime)
+int32_t FilterInfo::queueSize(Time maxTime) const
 {
-	//TODO make thread safe
+	std::lock_guard<std::mutex> lock(queueLock);
 	int32_t cnt = 0;
-	for (auto msg : message_queue)
+	for (auto &msg : message_queue)
 	{
 		if (msg->time <= maxTime)
 			++cnt;

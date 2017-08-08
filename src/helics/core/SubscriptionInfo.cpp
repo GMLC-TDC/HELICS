@@ -7,34 +7,21 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 */
 #include "SubscriptionInfo.h"
-//#include "core/core-data.h"
+
 #include <algorithm>
-#include <cstring>
 
 namespace helics
 {
-data_t *SubscriptionInfo::getData()
+std::shared_ptr<const data_block> SubscriptionInfo::getData()
 {
-	auto ndata = new data_t;
-	if (!current_data.empty())
-	{
-		ndata->data = new char[current_data.size()];
-		memcpy(ndata->data, current_data.data(), current_data.size());
-		ndata->len = current_data.size();
-	}
-	else
-	{
-		ndata->data = nullptr;
-		ndata->len = 0;
-	}
-	return ndata;
+	return current_data;
 }
 
 
-void SubscriptionInfo::updateData(Time updateTime, const std::string &data)
+void SubscriptionInfo::updateData(Time updateTime, std::shared_ptr<const data_block> data)
 {
 	auto m = std::upper_bound(data_queue.begin(), data_queue.end(), updateTime, [](auto &time, auto &tm) {return (time < tm.first); });
-	data_queue.emplace(m, updateTime, data);
+	data_queue.emplace(m, updateTime, std::move(data));
 }
 
 }

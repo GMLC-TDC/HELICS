@@ -39,7 +39,16 @@ ActionMessage::ActionMessage (const ActionMessage &act)
     }
 }
 
-ActionMessage::~ActionMessage () {}
+ActionMessage::ActionMessage(std::unique_ptr<Message> message):action_(action_t::cmd_send_message), actionTime(message->time), payload(std::move(message->data.to_string())),name(payload)
+{
+	info_ = std::make_unique<AdditionalInfo>();
+	info_->source = std::move(message->src);
+	info_->orig_source = std::move(message->origsrc);
+	info_->target = std::move(message->dest);
+
+}
+
+ActionMessage::~ActionMessage() = default;
 
 ActionMessage &ActionMessage::operator= (const ActionMessage &act)
 {
@@ -97,53 +106,39 @@ ActionMessage::AdditionalInfo &ActionMessage::info ()
     return *info_;
 }
 
-message_t *createMessage (const ActionMessage &cmd)
+const ActionMessage::AdditionalInfo emptyAddInfo;
+
+const ActionMessage::AdditionalInfo &ActionMessage::info() const
 {
-    auto msg = new message_t;
-    char *origSrcCopy = new char[cmd.info ().orig_source.size () + 1];
+	if (info_)
+	{
+		return *info_;
+	}
+	return emptyAddInfo;
+}
 
-    strcpy (origSrcCopy, cmd.info ().orig_source.c_str ());
-
-    char *dstCopy = new char[cmd.info ().target.size () + 1];
-    strcpy (dstCopy, cmd.info ().target.c_str ());
-
-    char *dataCopy = new char[cmd.payload.size () + 1];
-    memcpy (dataCopy, cmd.payload.data (), cmd.payload.size ());
-
-    msg->time = cmd.actionTime;
-    msg->data = dataCopy;
-    msg->len = cmd.payload.size ();
-    msg->origsrc = origSrcCopy;
-    if (cmd.info ().source == cmd.info ().orig_source)
-    {
-        msg->src = msg->origsrc;
-    }
-    else
-    {
-        char *srcCopy = new char[cmd.info ().source.size ()];
-        strcpy (srcCopy, cmd.info ().source.c_str ());
-        msg->src = srcCopy;
-    }
-    msg->dst = dstCopy;
+std::unique_ptr<Message> createMessage (const ActionMessage &cmd)
+{
+	auto msg = std::make_unique<Message>();
+	msg->origsrc = cmd.info().orig_source;
+	msg->dest = cmd.info().target;
+	msg->data = cmd.payload;
+	msg->time = cmd.actionTime;
+	msg->src = cmd.info().source;
+	
     return msg;
 }
 
-message_t createTempMessage(ActionMessage &cmd)
+std::unique_ptr<Message> createMessage(ActionMessage &&cmd)
 {
-	message_t tMessage;
-	tMessage.origsrc = cmd.info().orig_source.c_str();
-	if (cmd.info().source == cmd.info().orig_source)
-	{
-		tMessage.src = tMessage.origsrc;
-	}
-	else
-	{
-		tMessage.src = cmd.info().source.c_str();
-	}
-	tMessage.dst = cmd.info().target.c_str();
-	tMessage.len = cmd.payload.size();
-	tMessage.data = cmd.payload.data();
-	tMessage.time = cmd.actionTime;
-	return tMessage;
+	auto msg = std::make_unique<Message>();
+	msg->origsrc = std::move(cmd.info().orig_source);
+	msg->dest = std::move(cmd.info().target);
+	msg->data = std::move(cmd.payload);
+	msg->time = cmd.actionTime;
+	msg->src = std::move(cmd.info().source);
+
+	return msg;
 }
+
 }

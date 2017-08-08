@@ -37,8 +37,9 @@ enum BasicHandleType:char;
 class CommonCore : public Core {
 
 public:
-
-	CommonCore();
+	/** default constructor*/
+CommonCore() noexcept;
+/** virtual destructor*/
   virtual ~CommonCore();
   virtual void initialize (const std::string &initializationString) override;
           void terminate();
@@ -66,9 +67,8 @@ public:
   virtual const std::string &getUnits (Handle handle) const override;
   virtual const std::string &getType (Handle handle) const override;
   virtual void setValue (Handle handle, const char *data, uint64_t len) override;
-  virtual data_t* getValue (Handle handle) override;
-  virtual void dereference(data_t *data) override;
-  virtual void dereference(message_t *data) override;
+  virtual std::shared_ptr<const data_block> getValue (Handle handle) override;
+
   virtual const Handle* getValueUpdates (federate_id_t federateId, uint64_t *size) override;
   virtual Handle registerEndpoint (federate_id_t federateId, const std::string &name, const std::string &type) override;
   virtual Handle registerSourceFilter (federate_id_t federateId, const std::string &filterName, const std::string &source, const std::string &type_in) override;
@@ -77,34 +77,42 @@ public:
   virtual void registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) override;
   virtual void send (Handle sourceHandle, const std::string &destination, const char *data, uint64_t length) override;
   virtual void sendEvent (Time time, Handle sourceHandle, const std::string &destination, const char *data, uint64_t length) override;
-  virtual void sendMessage (Handle sourceHandle, message_t *message) override;
+  virtual void sendMessage (Handle sourceHandle, std::unique_ptr<Message> message) override;
   virtual uint64_t receiveCount (Handle destination) override;
-  virtual message_t* receive (Handle destination) override;
-  virtual std::pair<const Handle, message_t*> receiveAny (federate_id_t federateId) override;
+  virtual std::unique_ptr<Message> receive (Handle destination) override;
+  virtual std::pair<const Handle, std::unique_ptr<Message>> receiveAny (federate_id_t federateId) override;
   virtual uint64_t receiveCountAny (federate_id_t federateId) override;
   virtual void logMessage(federate_id_t federateId, int logCode, const std::string &logMessage) override;
-  virtual void setFilterOperator(Handle filter, FilterOperator* callback) override;
+  virtual void setFilterOperator(Handle filter, std::shared_ptr<FilterOperator> callback) override;
 
   virtual uint64_t receiveFilterCount(federate_id_t federateID) override;
 
-  virtual std::pair<const Handle, message_t*> receiveAnyFilter(federate_id_t federateID) override;
-
+  virtual std::pair<const Handle, std::unique_ptr<Message>> receiveAnyFilter(federate_id_t federateID) override;
+  /** set the local identification for the core*/
   void setIdentifier(const std::string &name);
+  /** get the local identifier for the core*/
   const std::string &getIdentifier() const
   {
 	  return identifier;
   }
-
+  /** add a command to the process queue*/
   virtual void addCommand(const ActionMessage &m)
   {
 	  _queue.push(m);
   }
 protected:
+	/** start main broker loop*/
   void broker();
-
+  /** process a single command action
+  @details cmd may be modified by this function*/
   virtual void processCommand(ActionMessage &cmd);
-
-  virtual void transmit(int route_id, ActionMessage &cmd) = 0;
+  /** transit an ActionMessage to another core or broker
+  @param route_id the identifier for the route information to send the message to
+  @param[in] cmd the actionMessage to send*/
+  virtual void transmit(int route_id, const ActionMessage &cmd) = 0;
+  /** add a route to whatever internal structure manages the routes
+  @param route_id the identification of the route
+  @param routeInfo a string containing the information necessary to connect*/
   virtual void addRoute(int route_id, const std::string &routeInfo) = 0;
   /** get the federate Information from the federateId*/
   FederateState *getFederate(federate_id_t federateId) const;
@@ -114,9 +122,11 @@ protected:
   Core::Handle getNewHandle();
   /** get the basic handle information*/
   BasicHandleInfo *getHandleInfo(Handle id_) const;
+  /** get a localEndpoint from the name*/
   BasicHandleInfo *getLocalEndpoint(const std::string &name);
+  /** get a filtering function object*/
   FilterFunctions *getFilterFunctions(Handle id_);
-  
+  /** check if all federates managed by the core are ready to enter initialization state*/
   bool allInitReady() const;
 private:
 	int32_t global_broker_id;  //!< the identifier for the broker
@@ -144,6 +154,7 @@ protected:
   mutable std::mutex _mutex;
 
 protected:
+	/** add a message to the queue*/
 	void queueMessage(ActionMessage &m);
   /** function to deal with an source filters*/
   ActionMessage &processMessage(BasicHandleInfo *hndl, ActionMessage &m);

@@ -26,7 +26,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <map>
 #include <mutex>
 #include <sstream>
-#include <string>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -40,6 +39,7 @@ class EndpointInfo;
 class FilterInfo;
 class CommonCore;
 
+/** data class containing information about interfederate dependencies*/
 class DependencyInfo
 {
 public:
@@ -55,6 +55,7 @@ public:
 	DependencyInfo(Core::federate_id_t id) :fedID(id) {};
 };
 
+/** class managing the information about a single federate*/
 class FederateState
 {
 public:
@@ -64,21 +65,21 @@ public:
 		state = HELICS_CREATED;
 	}
 
-	std::string name;
-	CoreFederateInfo info;
+	std::string name; //!< the name of the federate
+	CoreFederateInfo info;	//!< basic federate info the core uses
 	Core::federate_id_t local_id = invalid_fed_id; //!< id code, default to something invalid
 	Core::federate_id_t global_id = invalid_fed_id; //!< global id code, default to invalid
 	
 private:
-	std::atomic<helics_federate_state_type> state{ HELICS_NONE };
-	std::map<std::string, SubscriptionInfo *> subNames;
-	std::map<std::string, PublicationInfo *> pubNames;
-	std::map<std::string, EndpointInfo *> epNames;
-	std::map<std::string, FilterInfo *> filterNames;
-	std::vector<std::unique_ptr<SubscriptionInfo>> subscriptions;
-	std::vector<std::unique_ptr<PublicationInfo>> publications;
-	std::vector<std::unique_ptr<EndpointInfo>> endpoints;
-	std::vector<std::unique_ptr<FilterInfo>> filters;
+	std::atomic<helics_federate_state_type> state{ HELICS_NONE };	//!< the current state of the federate
+	std::map<std::string, SubscriptionInfo *> subNames;	//!< translate names to subscriptions
+	std::map<std::string, PublicationInfo *> pubNames;	//!< translate names to publications
+	std::map<std::string, EndpointInfo *> epNames;	//!< translat names to endpoints
+	std::map<std::string, FilterInfo *> filterNames;	//!< translate names to filterObjects
+	std::vector<std::unique_ptr<SubscriptionInfo>> subscriptions;	//!< storage for all the subscriptions
+	std::vector<std::unique_ptr<PublicationInfo>> publications;	//!< storage for all the publications
+	std::vector<std::unique_ptr<EndpointInfo>> endpoints; //!< storage for all the endpoints
+	std::vector<std::unique_ptr<FilterInfo>> filters; //!< storage for all the filters
 
 	CommonCore *parent_=nullptr;  //!< pointer to the higher level;  
 public:
@@ -87,26 +88,27 @@ public:
 private:
 	std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time
 public:
-	bool init_requested = true;
-	bool processing = false;
-	bool iterating = false;
-	bool hasEndpoints = false;
-	std::atomic<int> iteration{ 0 };
-	Time time_granted = timeZero;
-	Time time_requested = timeZero;
-	Time time_next = timeZero;
-	Time time_minDe = timeZero;
-	Time time_minTe = timeZero;
-	Time time_event = timeZero;
-	std::uint64_t max_iterations = 3;
-	std::vector<Core::Handle> events;
-	std::map<Core::Handle, std::deque<message_t *>> message_queue;
-	std::mutex _mutex;
+	bool init_requested = true; //!< this federate has requested entry to initialization
+	bool processing = false;	//!< the federate is processing
+	bool iterating = false;	//!< the federate is iterating at a timestep
+	bool hasEndpoints = false;	//!< the federate has endpoints
+	std::atomic<int> iteration{ 0 };  //!< iteration counter
+	Time time_granted = timeZero;	//!< the most recent time granted
+	Time time_requested = timeZero;	//!< the most recent time requested
+	Time time_next = timeZero;	//!< the next time to process
+	Time time_minDe = timeZero;	//!< the minimum dependent event
+	Time time_minTe = timeZero;	//!< the minimum event time
+	Time time_event = timeZero;	//!< the time of the next processing event
+	std::uint64_t max_iterations = 3;  //!< the maximum allowable number of iterations
+	std::vector<Core::Handle> events;	//!< list of events to process
+	std::map<Core::Handle, std::vector<std::unique_ptr<Message>>> message_queue; //structure of message queues
+	mutable std::mutex _mutex;
 
 	std::vector<DependencyInfo> dependencies;  //federates which this Federate is temporally dependent on
 	std::vector<Core::federate_id_t> dependents;	//federates which temporally depend on this federate
-	/** DISABLE_COPY_AND_ASSIGN */
+	
 private:
+	/** DISABLE_COPY_AND_ASSIGN */
 	FederateState(const FederateState &) = delete;
 	FederateState &operator= (const FederateState &) = delete;
 
@@ -147,21 +149,22 @@ public:
 	uint64_t getQueueSize(Core::Handle id) const;
 	uint64_t getQueueSize() const;
 	uint64_t getFilterQueueSize() const;
-	message_t *receive(Core::Handle id);
-	std::pair<Core::Handle, message_t*> receive();
-	std::pair<Core::Handle, message_t*> receiveForFilter();
+	std::unique_ptr<Message> receive(Core::Handle id);
+	std::pair<Core::Handle, std::unique_ptr<Message>> receive();
+	std::pair<Core::Handle, std::unique_ptr<Message>> receiveForFilter();
 	/** process the federate queue until returnable event
 	@details processQueue will process messages until one of 3 things occur
 	1.  the init state has been entered
 	2.  the executation state has been granted (or init state reentered from a iterative request)
 	3.  time has been granted
+	4. a break event is encountered
 	@return will return false if iteration is allowed --entering init state will always return true
 	*/
 	bool processQueue();
 
 	void generateKnownDependencies();
-	void addDependency(Core::federate_id_t);
-	void addDependent(Core::federate_id_t);
+	void addDependency(Core::federate_id_t fedToDependOn);
+	void addDependent(Core::federate_id_t fedThatDependsOnThis);
 
 	void setCoreObject(CommonCore *parent);
 

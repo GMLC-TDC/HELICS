@@ -250,7 +250,7 @@ uint64_t FederateState::getFilterQueueSize() const
 	return cnt;
 }
 
-message_t *FederateState::receive (Core::Handle handle_)
+std::unique_ptr<Message> FederateState::receive (Core::Handle handle_)
 {
     auto epI = getEndpoint (handle_);
     if (epI != nullptr)
@@ -266,7 +266,7 @@ message_t *FederateState::receive (Core::Handle handle_)
 }
 
 
-std::pair<Core::Handle, message_t *> FederateState::receive ()
+std::pair<Core::Handle, std::unique_ptr<Message>> FederateState::receive ()
 {
     Time earliest_time = Time::maxVal ();
     EndpointInfo *endpointI = nullptr;
@@ -286,12 +286,12 @@ std::pair<Core::Handle, message_t *> FederateState::receive ()
     {
         auto result = endpointI->getMessage(time_granted);
        
-        return {endpointI->id, result};
+		return{ endpointI->id, std::move(result) };
     }
     return {invalid_Handle, nullptr};
 }
 
-std::pair<Core::Handle, message_t *> FederateState::receiveForFilter()
+std::pair<Core::Handle, std::unique_ptr<Message>> FederateState::receiveForFilter()
 {
 	Time earliest_time = Time::maxVal();
 	FilterInfo *filterI = nullptr;
@@ -311,7 +311,7 @@ std::pair<Core::Handle, message_t *> FederateState::receiveForFilter()
 	{
 		auto result = filterI->getMessage(time_granted);
 
-		return{ filterI->id, result };
+		return{ filterI->id, std::move(result) };
 	}
 	return{ invalid_Handle, nullptr };
 }
@@ -382,7 +382,7 @@ bool FederateState::processQueue ()
 			auto subI = getSubscription(cmd.dest_handle);
 			if (cmd.source_id == subI->target.first)
 			{
-				subI->updateData(cmd.actionTime, cmd.payload);
+				subI->updateData(cmd.actionTime, std::make_shared<const data_block>(cmd.payload));
 			}
 		}
             break;

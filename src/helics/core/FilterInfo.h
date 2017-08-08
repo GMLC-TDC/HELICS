@@ -14,15 +14,14 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/common/blocking_queue.h"
 #include "helics/core/core.h"
 
-#include <cstdint>
 #include <mutex> 
 #include <thread> 
-#include <utility> 
 #include <vector> 
 #include <map>
 
 namespace helics {
 
+/** data class definining the information about a filter*/
 class FilterInfo
 {
 public:
@@ -40,24 +39,29 @@ public:
 	{
 	}
 
-	~FilterInfo() {}
-
-	Core::Handle id;
-	Core::federate_id_t fed_id;
-	std::string key;
-	std::string type;
-	bool has_update = false;
-	bool dest_filter = false;
-	FilterOperator *filterOp = nullptr;
-	std::string filterTarget;
-	std::pair<Core::federate_id_t, Core::Handle> target;
+	Core::Handle id; //!< id handle of the filter
+	Core::federate_id_t fed_id;	//!< id of the federate that manages the filter
+	std::string key;	//!< the identifier of the filter
+	std::string type;	//!< the type of data for the filter
+	bool has_update = false;	//!< indicator that the filter has updates
+	bool dest_filter = false;	//! indicator that the filter is a destination filter
+	std::shared_ptr<FilterOperator> filterOp;	//!< the callback operation of the filter
+	std::string filterTarget;	//!< the target endpoint name of the filter
+	std::pair<Core::federate_id_t, Core::Handle> target;	//!< the actual target information for the filter
 private:
-	std::deque<message_t *>message_queue;
+	std::deque<std::unique_ptr<Message>>message_queue; //!< data structure containing the queued messages
+	mutable std::mutex queueLock;	//!< the lock for multithread access to the queue
 public:
-	message_t* getMessage(Time maxTime);
-	int32_t queueSize(Time maxTime);
-	void addMessage(message_t *);
-	Time firstMessageTime();
+	/** get the next message in the queue that comes at or before the given time
+	*/
+	std::unique_ptr<Message> getMessage(Time maxTime);
+	/** get the current size of the queue with message up to maxTime
+	*/
+	int32_t queueSize(Time maxTime) const;
+	/** add a message to the queue*/
+	void addMessage(std::unique_ptr<Message> message);
+	/** get the time of the first message in the queue*/
+	Time firstMessageTime() const;
 };
 } // namespace helics
 

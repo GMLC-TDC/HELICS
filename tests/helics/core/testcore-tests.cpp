@@ -18,21 +18,20 @@ using helics::CoreFactory;
 
 BOOST_AUTO_TEST_CASE(testcore_initialization_test)
 {
-	const char *initializationString = "4";
-	Core* core = CoreFactory::create(HELICS_TEST, initializationString);
+	std::string initializationString = "4";
+	auto core = CoreFactory::create(HELICS_TEST, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
 
 	BOOST_CHECK_EQUAL(core->getFederationSize(), 4u);
 
-	delete core;
 }
 
 BOOST_AUTO_TEST_CASE(testcore_pubsub_value_test)
 {
 	const char *initializationString = "1";
-	Core* core = CoreFactory::create(HELICS_TEST, initializationString);
+	auto core = CoreFactory::create(HELICS_TEST, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
@@ -60,7 +59,6 @@ BOOST_AUTO_TEST_CASE(testcore_pubsub_value_test)
 
 	core->enterExecutingState(id);
 	
-	helics::data_t *data;
 	const Core::Handle *valueUpdates;
 	uint64_t update_size = 0;
 
@@ -70,21 +68,19 @@ BOOST_AUTO_TEST_CASE(testcore_pubsub_value_test)
 	valueUpdates = core->getValueUpdates(id, &update_size);
 	BOOST_CHECK(valueUpdates == nullptr);
 	BOOST_CHECK_EQUAL(update_size, 0u);
-	data = core->getValue(sub1);
-	BOOST_CHECK(data->data == nullptr);
-	BOOST_CHECK_EQUAL(data->len, 0u);
-	core->dereference(data);
+	auto data = core->getValue(sub1);
+	BOOST_CHECK(data == nullptr);
+	BOOST_CHECK_EQUAL(data->size(), 0u);
 	
 	core->timeRequest(id, 100.0);
 	valueUpdates = core->getValueUpdates(id, &update_size);
 	BOOST_CHECK_EQUAL(valueUpdates[0], sub1);
 	BOOST_CHECK_EQUAL(update_size, 1u);
 	data = core->getValue(sub1);
-	std::string str2(data->data, data->len);
+	std::string str2(data->to_string());
 	BOOST_CHECK_EQUAL(str1, str2);
-	BOOST_CHECK_EQUAL(data->data, "hello world");
-	BOOST_CHECK_EQUAL(data->len, str1.size());
-	core->dereference(data);
+	BOOST_CHECK_EQUAL(data->to_string(), "hello world");
+	BOOST_CHECK_EQUAL(data->size(), str1.size());
 
 	core->setValue(pub1, "hello\n\0helloAgain", 17);
 	core->timeRequest(id, 150.0);
@@ -92,22 +88,20 @@ BOOST_AUTO_TEST_CASE(testcore_pubsub_value_test)
 	BOOST_CHECK_EQUAL(valueUpdates[0], sub1);
 	BOOST_CHECK_EQUAL(update_size, 1u);
 	data = core->getValue(sub1);
-	BOOST_CHECK_EQUAL(data->data, "hello\n\0helloAgain");
-	BOOST_CHECK_EQUAL(data->len, 17u);
-	core->dereference(data);
+	BOOST_CHECK_EQUAL(data->to_string(), "hello\n\0helloAgain");
+	BOOST_CHECK_EQUAL(data->size(), 17u);
 
 	core->timeRequest(id, 200.0);
 	valueUpdates = core->getValueUpdates(id, &update_size);
 	BOOST_CHECK(valueUpdates == nullptr);
 	BOOST_CHECK_EQUAL(update_size, 0);
-	
-	delete core;
+
 }
 
 BOOST_AUTO_TEST_CASE(testcore_send_receive_test)
 {
 	const char *initializationString = "1";
-	Core* core = CoreFactory::create(HELICS_TEST, initializationString);
+	auto core = CoreFactory::create(HELICS_TEST, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
@@ -131,7 +125,7 @@ BOOST_AUTO_TEST_CASE(testcore_send_receive_test)
 
 	core->enterExecutingState(id);
 
-	helics::message_t *msg;
+	
 	std::string str1 = "hello world";
 	core->timeRequest(id, 50.0);
 	core->send(end1, "end2", str1.data(), str1.size());
@@ -139,22 +133,20 @@ BOOST_AUTO_TEST_CASE(testcore_send_receive_test)
 	core->timeRequest(id, 100.0);
 	BOOST_CHECK_EQUAL(core->receiveCount(end1), 0);
 	BOOST_CHECK_EQUAL(core->receiveCount(end2), 1u);
-	msg = core->receive(end1);
+	auto msg = core->receive(end1);
 	BOOST_CHECK(msg == nullptr);
 	msg = core->receive(end2);
 	BOOST_CHECK_EQUAL(core->receiveCount(end2), 0);
-	std::string str2(msg->data, msg->len);
+	std::string str2(msg->data.to_string());
 	BOOST_CHECK_EQUAL(str1, str2);
-	BOOST_CHECK_EQUAL(msg->len, str1.size());
-	core->dereference(msg);
-	
-	delete core;
+	BOOST_CHECK_EQUAL(msg->data.size(), str1.size());
+
 }
 
 BOOST_AUTO_TEST_CASE(testcore_messagefilter_source_test)
 {
 	const char *initializationString = "1";
-	Core *core = CoreFactory::create(HELICS_TEST, initializationString);
+	auto core = CoreFactory::create(HELICS_TEST, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
@@ -170,8 +162,6 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_source_test)
 	core->enterInitializingState(id);
 	core->enterExecutingState(id);
 
-	helics::message_t *msg;
-	std::pair<Core::Handle, helics::message_t*> msgAny;
 	std::string msgData = "hello world";
 	std::string srcFilterName = "sourceFilter";
 	core->send(end1, "end2", msgData.data(), msgData.size());
@@ -180,24 +170,19 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_source_test)
 	
 	// Get message to filter. Update src and send to destination.
 	BOOST_CHECK_EQUAL(core->receiveFilterCount(id), 1u);
-	msgAny = core->receiveAnyFilter(id);
+	auto msgAny = core->receiveAnyFilter(id);
 	BOOST_CHECK_EQUAL(msgAny.second->origsrc, "end1");
 	BOOST_CHECK_EQUAL(msgAny.second->src, "end1");
 	msgAny.second->src = srcFilterName.c_str();
-	core->sendMessage(helics::invalid_Handle,msgAny.second);
+	core->sendMessage(helics::invalid_Handle,std::move(msgAny.second));
 
-	// dereference the original message should not cause problems; set src back to origsrc (srcFilterName.c_str is on stack, not heap)
-	msgAny.second->src = msgAny.second->origsrc;
-	core->dereference(msgAny.second);
 
 	// Receive the filtered message
 	BOOST_CHECK_EQUAL(core->receiveCount(end2), 1u);
-	msg = core->receive(end2);
+	auto msg = core->receive(end2);
 	BOOST_CHECK_EQUAL(msg->origsrc, "end1");
 	BOOST_CHECK_EQUAL(msg->src, "sourceFilter");
 
-	core->dereference(msg);
-	delete core;
 }
 
 
@@ -206,30 +191,24 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_callback_test)
 	// Create filter operator
 	class TestOperator : public helics::FilterOperator {
 	public:
-		TestOperator(const char *name) {
-			filterName = new char[strlen(name) + 1];
-			strcpy(filterName, name);
+		TestOperator(const std::string &name) :filterName(name){
 		}
 
-		helics::message_t process (helics::message_t *msg) override {
-			if (msg->origsrc != msg->src) {
-				delete msg->src;
-			}
-			char *srcName = new char[strlen(filterName) + 1];
-			strcpy(srcName, filterName);
-			msg->src = srcName;
+		std::unique_ptr<helics::Message> process (std::unique_ptr<helics::Message> msg) override {
+			
+			msg->src = filterName;
 
-			if (msg->len > 0) {
-				((char*)msg->data)[0] = ((char*)msg->data)[0]++;
+			if (msg->data.size() > 0) {
+				++msg->data[0];
 			}
-			return *msg;
+			return msg;
 		}
 
-		char *filterName = 0;
+		std::string filterName;
 	};
 
-	const char *initializationString = "1";
-	Core *core = CoreFactory::create(HELICS_TEST, initializationString);
+	std::string initializationString = "1";
+	auto core = CoreFactory::create(HELICS_TEST, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
@@ -243,10 +222,10 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_callback_test)
 	Core::Handle srcFilter = core->registerSourceFilter(id, "srcFilter", "end1", "type");
 	Core::Handle dstFilter = core->registerDestinationFilter(id, "dstFilter", "end2", "type");
 
-	TestOperator *testSrcFilter = new TestOperator("sourceFilter");
+	auto testSrcFilter = std::make_shared<TestOperator>("sourceFilter");
 	BOOST_CHECK_EQUAL(testSrcFilter->filterName, "sourceFilter");
 
-	TestOperator *testDstFilter = new TestOperator("destinationFilter");
+	auto testDstFilter = std::make_shared<TestOperator>("destinationFilter");
 	BOOST_CHECK_EQUAL(testDstFilter->filterName, "destinationFilter");
 
 	core->setFilterOperator(srcFilter, testSrcFilter);
@@ -255,8 +234,6 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_callback_test)
 	core->enterInitializingState(id);
 	core->enterExecutingState(id);
 
-	helics::message_t *msg;
-	std::pair<Core::Handle, helics::message_t*> msgAny;
 	std::string msgData = "hello world";
 	core->send(end1, "end2", msgData.data(), msgData.size()+1);
 
@@ -267,15 +244,10 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_callback_test)
 
 	// Receive the filtered message
 	BOOST_CHECK_EQUAL(core->receiveCount(end2), 1u);
-	msg = core->receive(end2);
+	auto msg = core->receive(end2);
 	BOOST_CHECK_EQUAL(msg->origsrc, "end1");
-	BOOST_CHECK_EQUAL(msg->data, "jello world");
+	BOOST_CHECK_EQUAL(msg->data.to_string(), "jello world");
 
-	core->dereference(msg);
-
-	delete testSrcFilter;
-	delete testDstFilter;
-	delete core;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

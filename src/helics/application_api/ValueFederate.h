@@ -32,6 +32,7 @@ namespace helics
 		*/
 		ValueFederate(const std::string &jsonString);
 
+		/** default constructor*/
 		ValueFederate();
 	//protected:
 		//protected constructor called by child class to initialize the class vs the default constructor
@@ -39,6 +40,7 @@ namespace helics
 	public:
 		ValueFederate(const ValueFederate &fed) = delete;
 		ValueFederate(ValueFederate &&fed) noexcept;
+		/** destructor*/
 		virtual ~ValueFederate();
 
 		/** default move assignment*/

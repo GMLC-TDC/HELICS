@@ -15,6 +15,7 @@ enum helics_core_type
 	HELICS_ZMQ,
 	HELICS_MPI,
 	HELICS_TEST,
+	HELICS_INTERPROCESS,
 };
 
 enum helics_federate_state_type

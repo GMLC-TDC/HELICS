@@ -16,16 +16,15 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics {
 
-
+/** implementation for the core that uses zmq messages to communicate*/
 class ZeroMQCore : public CommonCore {
 
 public:
-
-  ZeroMQCore() {};
-  virtual ~ZeroMQCore();
+	/** default constructor*/
+  ZeroMQCore()=default;
   virtual void initialize (const std::string &initializationString) override;
          
-  virtual void transmit(int route_id, ActionMessage &cmd) override;
+  virtual void transmit(int route_id, const ActionMessage &cmd) override;
   virtual void addRoute(int route_id, const std::string &routeInfo) override;
 private:
   

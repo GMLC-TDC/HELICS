@@ -511,13 +511,13 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
 {
     FederateInfo fi;
     std::ifstream file (jsonString);
-	Json::Value doc;
+	Json_helics::Value doc;
 	
     if (file.is_open ())
     {
-		Json::CharReaderBuilder rbuilder;
+		Json_helics::CharReaderBuilder rbuilder;
 		std::string errs;
-		bool ok = Json::parseFromStream(rbuilder, file, &doc, &errs);
+		bool ok = Json_helics::parseFromStream(rbuilder, file, &doc, &errs);
 		if (!ok)
 		{
 			// should I throw an error here?
@@ -526,7 +526,7 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     }
 	else
 	{
-		Json::Reader stringReader;
+		Json_helics::Reader stringReader;
 		bool ok = stringReader.parse(jsonString, doc, false);
 		if (!ok)
 		{

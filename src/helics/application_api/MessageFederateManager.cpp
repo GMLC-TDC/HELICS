@@ -10,16 +10,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/core/core.h"
 namespace helics
 {
-message_t generateCoreMessage (const Message_view &mv)
-{
-    message_t m;
-    m.src = mv.src.data ();
-    m.dst = mv.dest.data ();
-    m.origsrc = mv.origsrc.data ();
-    m.data = mv.data.data ();
-    m.len = mv.data.size ();
-    return m;
-}
 
 MessageFederateManager::MessageFederateManager (std::shared_ptr<Core> coreOb, Core::federate_id_t id)
     : coreObject (std::move (coreOb)), fedID (id)
@@ -105,20 +95,20 @@ uint64_t MessageFederateManager::receiveCount () const
     return sz;
 }
 
-Message_view MessageFederateManager::getMessage (endpoint_id_t endpoint)
+std::unique_ptr<Message> MessageFederateManager::getMessage (endpoint_id_t endpoint)
 {
     if (endpoint.value () < local_endpoints.size ())
     {
         auto mv = messageQueues[endpoint.value ()].pop ();
         if (mv)
         {
-            return *mv;
+            return std::move(*mv);
         }
     }
-    return Message_view{};
+    return nullptr;
 }
 
-Message_view MessageFederateManager::getMessage ()
+std::unique_ptr<Message> MessageFederateManager::getMessage ()
 {
     // just start with the first endpoint and check until a queue isn't empty
     for (auto &mq : messageQueues)
@@ -128,11 +118,11 @@ Message_view MessageFederateManager::getMessage ()
             auto ms = mq.pop ();
             if (ms)
             {
-                return *ms;
+                return std::move(*ms);
             }
         }
     }
-    return Message_view{};
+    return nullptr;
 }
 
 
@@ -161,12 +151,11 @@ void MessageFederateManager::sendMessage (endpoint_id_t source, const char *dest
     }
 }
 
-void MessageFederateManager::sendMessage (endpoint_id_t source, Message_view message)
+void MessageFederateManager::sendMessage (endpoint_id_t source, std::unique_ptr<Message> message)
 {
     if (source.value () < local_endpoints.size ())
     {
-        auto m = generateCoreMessage (message);
-        coreObject->sendMessage (local_endpoints[source.value()].handle,&m);
+        coreObject->sendMessage (local_endpoints[source.value()].handle,std::move(message));
     }
     else
     {
@@ -194,10 +183,8 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
         if (fid != handleLookup.end ())
         {  // assign the data
 
-            /** making a shared pointer with custom deleter*/
-            auto sd = std::shared_ptr<message_t> (msgp.second, [=](message_t *m) { coreObject->dereference (m); });
             auto localEndpointIndex = fid->second.value ();
-            messageQueues[localEndpointIndex].emplace (std::move (sd));
+            messageQueues[localEndpointIndex].emplace (std::move (msgp.second));
             if (local_endpoints[localEndpointIndex].callbackIndex >= 0)
             {
 				auto cb = callbacks[local_endpoints[localEndpointIndex].callbackIndex];
@@ -222,18 +209,16 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             auto sfnd = subHandleLookup.find (handles[ii]);
             if (sfnd != subHandleLookup.end ())
             {
-                Message_view mv;
-                mv.src = sfnd->second.second;
+				auto mv = std::make_unique<Message>();
+                mv->src = sfnd->second.second;
                 auto localEndpointIndex = sfnd->second.first.value ();
-                mv.dest = local_endpoints[localEndpointIndex].name;
-                mv.origsrc = mv.src;
+                mv->dest = local_endpoints[localEndpointIndex].name;
+                mv->origsrc = mv->src;
                 // get the data value
                 auto data = coreObject->getValue (handles[ii]);
-                /** making a shared pointer with custom deleter*/
-                auto sd = std::shared_ptr<data_t> (data, [=](data_t *v) { coreObject->dereference (v); });
 
-                mv.data = data_view (std::move (sd));
-                mv.time = CurrentTime;
+                mv->data = *data;
+                mv->time = CurrentTime;
                 messageQueues[localEndpointIndex].push (std::move (mv));
                 if (local_endpoints[localEndpointIndex].callbackIndex >= 0)
                 {

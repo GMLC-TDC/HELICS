@@ -83,7 +83,7 @@ public:
 		
 		
 	};
-	//want to make sure this object is under 64 bytes in size to fit in cache lines
+	//need to make sure this object is under 64 bytes in size to fit in cache lines
 private:
 	int32_t action_ = action_t::cmd_ignore; //4 -- command
 public:
@@ -95,30 +95,39 @@ public:
 	bool required = false;  //!< flag indicating a publication is required
 	bool error = false;		//!< flag indicating an error condition associated with the command
 	bool flag = false;     //!< general flag for many purposes
-	Time actionTime=timeZero;		//32
-	std::string payload;			//56 std::string is 24 bytes on most platforms
+	Time actionTime=timeZero;	//!< the time an action took place or will take place	//32
+	std::string payload;		//!< string containing the data	//56 std::string is 24 bytes on most platforms
 	std::string &name;  //!<alias payload to a name reference for registration functions
 private:
-	std::unique_ptr<AdditionalInfo> info_;   //64
+	std::unique_ptr<AdditionalInfo> info_;   //!< pointer to an additional info structure with more data if required
 public:	
-	
+	/** default constructor*/
 	ActionMessage() noexcept:name(payload) {};
+	/** construct from an action type*/
 	ActionMessage(action_t action);
+	/** move constructor*/
 	ActionMessage(ActionMessage &&act) noexcept;
+	/** build an action message from a message*/
+	ActionMessage(std::unique_ptr<Message> message);
+	/** destructor*/
 	~ActionMessage();
+	/** copy constructor*/
 	ActionMessage(const ActionMessage &act);
+	/** copy operator*/
 	ActionMessage &operator=(const ActionMessage &);
+	/** move assignment*/
 	ActionMessage &operator=(ActionMessage && act) noexcept;
+	/** get the action of the message*/
 	int32_t action() const noexcept
 	{
 		return action_;
 	}
+	/** set the action*/
 	void setAction(action_t action);
+	/** get a reference to the additional info structure*/
 	AdditionalInfo &info();
-	const AdditionalInfo &info() const
-	{
-		return *info_;
-	}
+	/** get a const ref to the info structure*/
+	const AdditionalInfo &info() const;
 };
 
 
@@ -151,12 +160,16 @@ public:
 
 /** create a new message object that copies all the information from the cmd into newly allocated memory for the message
 */
-message_t *createMessage(const ActionMessage &cmd);
+std::unique_ptr<Message> createMessage(const ActionMessage &cmd);
 
-/** create a message object that references into the cmd object
+/** create a new message object that moves all the information from the cmd into newly allocated memory for the message
+*/
+std::unique_ptr<Message> createMessage(ActionMessage &&cmd);
+
+/** create an actual Message object
 no memory is allocated
 */
-message_t createTempMessage(ActionMessage &cmd);
+Message createTempMessage(const ActionMessage &cmd);
 
 } //namespace helics
 #endif

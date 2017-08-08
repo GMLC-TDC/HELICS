@@ -16,6 +16,7 @@ set(SRC_FILES
 	ActionMessage.cpp
 	core-broker.cpp
 	TestBroker.cpp
+	core-data.cpp
 	
 )
 
@@ -70,9 +71,11 @@ include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 
 OPTION(BUILD_BROKER "Build a helics Broker" ON)
 if (BUILD_BROKER)
+link_directories(${external_link_directories})
 add_executable(helics_broker helics-broker.cc)
    target_link_libraries(helics_broker helics)
    target_link_libraries(helics_broker ${external_library_list})
+   
    set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "build folder location of the broker")
    #message(STATUS "bloc ${CMAKE_CURRENT_BINARY_DIR}")
    INSTALL(TARGETS helics_broker DESTINATION bin)

@@ -14,19 +14,16 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/common/blocking_queue.h"
 #include "helics/core/core.h"
 
-#include <cstdint>
-#include <mutex> 
-#include <thread> 
-#include <utility> 
-#include <vector> 
 #include <deque>
-#include <map>
+#include <mutex>
 
 namespace helics {
 
+/** data class containing the information about an endpoint*/
 class EndpointInfo
 {
 public:
+	/** constructor from all data*/
 	EndpointInfo(Core::Handle id_,Core::federate_id_t fed_id_,
 		const std::string &key_,
 		const std::string &type_)
@@ -37,20 +34,23 @@ public:
 	{
 	}
 
-	~EndpointInfo() {}
-
-	Core::Handle id;
+	Core::Handle id;	//!< identifier for the endpoint
 	Core::federate_id_t fed_id; //!< local federate id
 	std::string key; //!< name of the endpoint
 	std::string type;	//!< type of the endpoint
 private:
-	std::deque<message_t *>message_queue;
+	std::deque<std::unique_ptr<Message>>message_queue;  //!< storage for the messages
+	mutable std::mutex queueLock;	//!< the lock for multithread access to the queue
 public:
-	bool hasFilter;
-	message_t* getMessage(Time maxTime);
-	int32_t queueSize(Time maxTime);
-	void addMessage(message_t *);
-	Time firstMessageTime();
+	bool hasFilter = false; //!< indicator that the message has a filter
+	/** get the next message up to the specified time*/
+	std::unique_ptr<Message> getMessage(Time maxTime);
+	/** get the number of messages in the queue up to the specified time*/
+	int32_t queueSize(Time maxTime) const;
+	/** add a message to the queue*/
+	void addMessage(std::unique_ptr<Message> message);
+	/** get the timestamp of the first message in the queue*/
+	Time firstMessageTime() const;
 
 
 

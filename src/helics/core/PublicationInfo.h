@@ -23,9 +23,11 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics {
 
+/** data class containing the information about a publication*/
 class PublicationInfo
 {
 public:
+	/** constructor from the basic information*/
 	PublicationInfo(Core::Handle id_, Core::federate_id_t fed_id_,
 		const std::string &key_,
 		const std::string &type_,
@@ -37,17 +39,17 @@ public:
 		units(units_)
 	{
 	}
+	/** destructor*/
+	~PublicationInfo() = default;
 
-	~PublicationInfo() {}
-
-	Core::Handle id;
-	Core::federate_id_t fed_id;
-	std::string key;
-	std::string type;
-	std::string units;
-	bool has_update = false;
-	std::string data;
-	std::vector<std::pair<Core::federate_id_t, Core::Handle>> subscribers;
+	Core::Handle id;  //!< the handle id 
+	Core::federate_id_t fed_id;	//!< the indentifier for the containing federate
+	std::string key;	//!< the key identifier for the publication
+	std::string type;	//!< the type of the publication data
+	std::string units;	//!< the units of the publication data
+	bool has_update = false;	//!< indicator that the publication has updates
+	std::string data;	//!< the most recent publication data
+	std::vector<std::pair<Core::federate_id_t, Core::Handle>> subscribers; //!< container for all the subscribers of a publcation
 };
 } // namespace helics
 

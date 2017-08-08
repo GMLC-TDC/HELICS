@@ -97,7 +97,7 @@ void ValueFederateManager::setDefaultValue (subscription_id_t id, data_view bloc
         {
             lastData.resize (subs.size ());
         }
-        lastData[id.value ()] = data_view (std::make_shared<data_block> (block));
+        lastData[id.value ()] = data_view (std::make_shared<data_block> (block.to_data_block()));
         subs[id.value ()].lastUpdate = CurrentTime;
     }
     else
@@ -110,14 +110,13 @@ void ValueFederateManager::setDefaultValue (subscription_id_t id, data_view bloc
 void ValueFederateManager::getUpdateFromCore (Core::Handle updatedHandle)
 {
     auto data = coreObject->getValue (updatedHandle);
-    /** making a shared pointer with custom deleter*/
-    auto sd = std::shared_ptr<data_t> (data, [=](data_t *v) { coreObject->dereference (v); });
+
     /** find the id*/
     auto fid = handleLookup.find (updatedHandle);
     if (fid != handleLookup.end ())
     {  // assign the data
         std::lock_guard<std::mutex> sublock (subscription_mutex);
-        lastData[fid->second.value ()] = data_view (sd);
+        lastData[fid->second.value ()] = data_view (std::move(data));
         subs[fid->second.value ()].lastUpdate = CurrentTime;
     }
 }
@@ -197,12 +196,10 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
         if (fid != handleLookup.end ())
         {  // assign the data
             auto data = coreObject->getValue (handles[ii]);
-            /** making a shared pointer with custom deleter*/
-            /** capture of the coreObject shared_ptr*/
-            auto sd = std::shared_ptr<data_t> (data, [=](data_t *v) { coreObject->dereference (v); });
+         
             auto subIndex = fid->second.value ();
 			//move the data into the container
-            lastData[subIndex] = std::move (sd);
+            lastData[subIndex] = std::move (data);
             subs[subIndex].lastUpdate = CurrentTime;
             if (subs[subIndex].callbackIndex >= 0)
             {

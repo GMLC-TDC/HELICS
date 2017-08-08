@@ -15,10 +15,11 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-	/** class defining the value based interface */
+	/** class defining a federate that can use both the value and message interfaces */
 	class CombinationFederate :public ValueFederate, public MessageFederate 
 	{
 	public:
+		/** default constructor*/
 		CombinationFederate();
 		/**constructor taking a federate information structure and using the default core
 		@param[in] fi  a federate information structure
@@ -29,10 +30,11 @@ namespace helics
 		*/
 		CombinationFederate(const std::string &file);
 
+		/** move construction*/
 		CombinationFederate(CombinationFederate &&fed) noexcept;
-
+		/** destructor*/
 		virtual ~CombinationFederate();
-
+		/** move assignment*/
 		CombinationFederate &operator=(CombinationFederate &&fed) noexcept;
 	protected:
 		virtual void updateTime(Time newTime, Time oldTime) override;

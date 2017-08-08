@@ -20,7 +20,7 @@ namespace helics {
 template<typename T>
 class BlockingQueue {
   public:
-    explicit BlockingQueue();
+	  BlockingQueue() = default;
 
 	/** DISABLE_COPY_AND_ASSIGN */
 	BlockingQueue(const BlockingQueue&) = delete;
@@ -28,6 +28,16 @@ class BlockingQueue {
 
     void push(const T& t);
 
+	template <class... Args>
+	void emplace(Args &&... args)
+	{
+		std::unique_lock<std::mutex> lock(mutex_);
+		queue_.emplace(std::forward(args)...);
+		//lock.unlock();
+		condition_.notify_one();
+		// unlock occurs when we go out of scope, and only in extreme cases
+		// should we not hold the lock before signalling
+	}
     bool try_pop(T* t);
 
     // This logs a message if the threads needs to be blocked
@@ -42,17 +52,12 @@ class BlockingQueue {
     size_t size() const;
 
   protected:
-    std::queue<T> queue_;
-    mutable std::mutex mutex_;
-    std::condition_variable condition_;
+    std::queue<T> queue_;  //!< the actual storage for the data
+    mutable std::mutex mutex_;	//!< mutex protecting the queue
+    std::condition_variable condition_;	//!< condition variable for notification of new data
 
 
 };
-
-template<typename T>
-BlockingQueue<T>::BlockingQueue()
-{
-}
 
 template<typename T>
 void BlockingQueue<T>::push(const T& t) {
@@ -66,7 +71,7 @@ void BlockingQueue<T>::push(const T& t) {
 
 template<typename T>
 bool BlockingQueue<T>::try_pop(T* t) {
-  std::unique_lock<std::mutex> lock(mutex_);
+  std::lock_guard<std::mutex> lock(mutex_);
 
   if (queue_.empty()) {
     return false;
@@ -95,7 +100,7 @@ T BlockingQueue<T>::pop(const std::string& log_on_wait) {
 
 template<typename T>
 bool BlockingQueue<T>::try_peek(T* t) {
-  std::unique_lock<std::mutex> lock(mutex_);
+  std::lock_guard<std::mutex> lock(mutex_);
 
   if (queue_.empty()) {
     return false;
@@ -118,7 +123,7 @@ T BlockingQueue<T>::peek() {
 
 template<typename T>
 size_t BlockingQueue<T>::size() const {
-  std::unique_lock<std::mutex> lock(mutex_);
+  std::lock_guard<std::mutex> lock(mutex_);
   return queue_.size();
 }
 

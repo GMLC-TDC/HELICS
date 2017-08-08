@@ -14,19 +14,23 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
+/** define the type of the handle*/
 enum BasicHandleType:char
 {
 	HANDLE_UNKNOWN,
-    HANDLE_PUB,
-    HANDLE_SUB,
-    HANDLE_END,
-    HANDLE_FILTER,
+    HANDLE_PUB,  //!< handle to publish interface
+    HANDLE_SUB,	//!< handle to a subscribe interface
+    HANDLE_END,	//!< handle to an endpoint
+    HANDLE_FILTER,	//!< handle to a filter
 };
 
+/** class definining and capturing basic information about a handle*/
 class BasicHandleInfo
 {
   public:
-	  BasicHandleInfo() noexcept {};
+	  /** default constructor*/
+	  BasicHandleInfo()=default;
+	  /** construct from the data*/
     BasicHandleInfo (Core::Handle id_,
                      Core::federate_id_t fed_id_,
                      BasicHandleType what_,
@@ -44,16 +48,16 @@ class BasicHandleInfo
 		}
     }
 
-    Core::Handle id=invalid_Handle;
-    Core::federate_id_t fed_id=invalid_fed_id;
-	Core::federate_id_t local_fed_id=invalid_fed_id;
-    BasicHandleType what=HANDLE_UNKNOWN;
-    bool flag=false;
-	bool destFilter = false;
-    std::string key;
-    std::string type;
-    std::string units;
-	std::string target;
+    Core::Handle id=invalid_Handle;  //!< the identification number for the handle
+    Core::federate_id_t fed_id=invalid_fed_id; //!< the global federate id for the creator of the handle
+	Core::federate_id_t local_fed_id=invalid_fed_id;	//!< the local federate id of the handle
+    BasicHandleType what=HANDLE_UNKNOWN;	//!< the type of the handle
+    bool flag=false;	//!< indicator flag
+	bool destFilter = false;	//!< indicator if the handle is a destination filter
+    std::string key;	//!< the name of the handle
+    std::string type;	//!< the type of data used by the handle
+    std::string units;	//!< the units associated with the handle
+	std::string target;	//!< the target of the handle
 };
 }
 #endif

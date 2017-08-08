@@ -36,7 +36,7 @@ class identifier_id_t
     BaseType _value; //!< the underlying index value
 
   public:
-	  static const identifiers identity{ ID };
+	  static const identifiers identity{ ID }; //!< the type of the identifier
 	  using underlyingType = BaseType;
     /** default constructor*/
     constexpr identifier_id_t() noexcept : _value (invalidValue){};
@@ -59,6 +59,7 @@ class identifier_id_t
 
     /** get the underlying value*/
     BaseType value () const noexcept { return _value; };
+	/** equality operator*/
     bool operator== (identifier_id_t id) const noexcept { return (_value == id._value); };
 	bool operator!= (identifier_id_t id) const noexcept { return (_value != id._value); };
     bool operator< (identifier_id_t id) const noexcept { return (_value < id._value); };

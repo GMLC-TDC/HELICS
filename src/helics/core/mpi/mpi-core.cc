@@ -21,7 +21,6 @@ namespace helics
 {
 MpiCore::MpiCore () {}
 
-MpiCore::~MpiCore () {}
 
 void MpiCore::initialize (const std::string &initializationString)
 {
@@ -36,7 +35,7 @@ void MpiCore::terminate()
 {
 }
 
-void MpiCore::transmit(int route_id, ActionMessage & cmd)
+void MpiCore::transmit(int route_id, const ActionMessage & cmd)
 {
 }
 

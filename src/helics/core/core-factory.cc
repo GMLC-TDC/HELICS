@@ -24,16 +24,16 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics {
 
-Core *CoreFactory::create (helics_core_type type, const char *initializationString) {
+std::unique_ptr<Core> CoreFactory::create(helics_core_type type, const std::string &initializationString) {
 
-  Core* core = 0;
+  std::unique_ptr<Core> core;
 
   switch(type)
     {
     case HELICS_ZMQ:
       {
 #if HELICS_HAVE_ZEROMQ
-        core = new ZeroMQCore ();
+        core = std::make_unique<ZeroMQCore> ();
 #else
         assert (false);
 #endif
@@ -42,7 +42,7 @@ Core *CoreFactory::create (helics_core_type type, const char *initializationStri
     case HELICS_MPI:
       {
 #if HELICS_HAVE_MPI
-        core = new MpiCore ();
+        core = std::make_unique<MpiCore> ();
 #else
         assert (false);
 #endif
@@ -50,7 +50,7 @@ Core *CoreFactory::create (helics_core_type type, const char *initializationStri
       }
     case HELICS_TEST:
       {
-        core = new TestCore ();
+        core = std::make_unique<TestCore> ();
         break;
       }
     default:

@@ -13,26 +13,19 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/core/helics-time.h"
 #include "helics/core/zmq/zmq-core.h"
 #include "helics/core/zmq/zmq-helper.h"
-#include "helics/core/ActionMessage.h"
 
 #include <algorithm>
 #include <cassert>
 #include <chrono>
 #include <cstdint>
 #include <cstring>
-#include <map>
-#include <mutex>
 #include <sstream>
-#include <string>
-#include <thread>
-#include <utility>
-#include <vector>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid.hpp>            // uuid class
 #include <boost/uuid/uuid_generators.hpp> // generators
 #include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
-
+#include "common/stringToCmdLine.h"
 #include <zmq.h>
 
 #define USE_LOGGING 1
@@ -70,16 +63,13 @@ namespace helics
 void ZeroMQCore::initialize (const std::string &initializationString)
 {
 	//do something with initialization the transmit sockets and other ZMQ speficic stuff
-
+	stringToCmdLine strcmd(initializationString);
 	CommonCore::initialize(initializationString);
 }
 
 
-ZeroMQCore::~ZeroMQCore() = default;
 
-
-
-void ZeroMQCore::transmit(int route_id, ActionMessage &cmd)
+void ZeroMQCore::transmit(int route_id, const ActionMessage &cmd)
 {
 
 }

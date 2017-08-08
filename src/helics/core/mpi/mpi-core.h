@@ -33,7 +33,7 @@ public:
           void terminate();
 
 protected:
-	virtual void transmit(int route_id, ActionMessage &cmd);
+	virtual void transmit(int route_id, const ActionMessage &cmd);
 	virtual void addRoute(int route_id, const std::string &routeInfo);
 
   /*

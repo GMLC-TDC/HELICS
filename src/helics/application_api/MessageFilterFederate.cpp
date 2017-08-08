@@ -72,13 +72,13 @@ void MessageFilterFederate::registerInterfaces (const std::string &jsonString)
 {
     MessageFederate::registerInterfaces (jsonString);
     std::ifstream file (jsonString);
-    Json::Value doc;
+    Json_helics::Value doc;
 
     if (file.is_open ())
     {
-        Json::CharReaderBuilder rbuilder;
+        Json_helics::CharReaderBuilder rbuilder;
         std::string errs;
-        bool ok = Json::parseFromStream (rbuilder, file, &doc, &errs);
+        bool ok = Json_helics::parseFromStream (rbuilder, file, &doc, &errs);
         if (!ok)
         {
             // should I throw an error here?
@@ -87,7 +87,7 @@ void MessageFilterFederate::registerInterfaces (const std::string &jsonString)
     }
     else
     {
-        Json::Reader stringReader;
+        Json_helics::Reader stringReader;
         bool ok = stringReader.parse (jsonString, doc, false);
         if (!ok)
         {
@@ -195,7 +195,7 @@ bool MessageFilterFederate::hasMessageToFilter (filter_id_t filter) const
     return filterManager->hasMessageToFilter (filter);
 }
 
-Message_view MessageFilterFederate::getMessageToFilter (filter_id_t filter)
+std::unique_ptr<Message> MessageFilterFederate::getMessageToFilter (filter_id_t filter)
 {
     return filterManager->getMessageToFilter (filter);
 }

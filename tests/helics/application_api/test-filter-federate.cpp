@@ -97,18 +97,18 @@ BOOST_AUTO_TEST_CASE(message_filter_basic_ops)
 	auto res = fFed->hasMessageToFilter(f1);
 	BOOST_CHECK(res);
 	auto m = fFed->getMessageToFilter(f1);
-	BOOST_REQUIRE_EQUAL(m.data.size(),data.size());
-	fFed->sendMessage(ep1, m);
+	BOOST_REQUIRE_EQUAL(m->data.size(),data.size());
+	fFed->sendMessage(ep1, std::move(m));
 
 	mFed->requestTimeAsync(2.0);
 	fFed->requestTime(2.0);
 	mFed->requestTimeFinalize();
 	BOOST_REQUIRE(mFed->hasMessage(p2));
 	auto m2 = mFed->getMessage(p2);
-	BOOST_CHECK_EQUAL(m2.src,"filter1.fout");
-	BOOST_CHECK_EQUAL(m2.origsrc,"port1");
-	BOOST_CHECK_EQUAL(m2.dest, "port2");
-	BOOST_CHECK_EQUAL(m2.data.size(), data.size());
+	BOOST_CHECK_EQUAL(m2->src,"filter1.fout");
+	BOOST_CHECK_EQUAL(m2->origsrc,"port1");
+	BOOST_CHECK_EQUAL(m2->dest, "port2");
+	BOOST_CHECK_EQUAL(m2->data.size(), data.size());
 	mFed->finalize();
 	fFed->finalize();
 	BOOST_CHECK(fFed->currentState() == helics::Federate::op_states::finalize);
