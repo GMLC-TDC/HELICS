@@ -12,7 +12,10 @@ project (HELICS)
 # HELICS Version number
 #-----------------------------------------------------------------------------
 set (HELICS_VERSION_MAJOR 0)
-set (HELICS_VERSION_MINOR 1)
+set (HELICS_VERSION_MINOR 2)
+set (HELICS_VERSION_PATCH 0)
+
+set (HELICS_DATE "08-15-2017")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing

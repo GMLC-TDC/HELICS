@@ -28,7 +28,7 @@ public:
 
   MpiCore();
   virtual ~MpiCore();
-  virtual void initialize (const std::string &initializationString) override;
+  virtual void initializeFromArgs (int argc, char *argv[]) override;
 
           void terminate();
 

@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(testcore_initialization_test)
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
 
-	BOOST_CHECK_EQUAL(core->getFederationSize(), 4u);
+	BOOST_CHECK_EQUAL(core->getFederationSize(), 4);
 
 }
 
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(testcore_pubsub_value_test)
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
 
-	BOOST_CHECK_EQUAL(core->getFederationSize(), 1u);
+	BOOST_CHECK_EQUAL(core->getFederationSize(), 1);
 
 	Core::federate_id_t id = core->registerFederate("sim1", helics::CoreFederateInfo());
 	
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(testcore_send_receive_test)
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
 
-	BOOST_CHECK_EQUAL(core->getFederationSize(), 1u);
+	BOOST_CHECK_EQUAL(core->getFederationSize(), 1);
 
 	Core::federate_id_t id = core->registerFederate("sim1", helics::CoreFederateInfo());
 
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_source_test)
 
 	Core::Handle end1 = core->registerEndpoint(id, "end1", "type");
 	Core::Handle end2 = core->registerEndpoint(id, "end2", "type");
-	Core::Handle end_filt = core->registerEndpoint(id, "end_filt", "type");
+	Core::Handle endp = core->registerEndpoint(id, "end_filt", "type");
 
 	Core::Handle srcFilter = core->registerSourceFilter(id, "srcFilter", "end1", "type");
 
@@ -170,6 +170,8 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_source_test)
 	
 	// Get message to filter. Update src and send to destination.
 	BOOST_CHECK_EQUAL(core->receiveFilterCount(id), 1u);
+
+	BOOST_CHECK_EQUAL(core->receiveCount(srcFilter), 1u);
 	auto msgAny = core->receiveAnyFilter(id);
 	BOOST_CHECK_EQUAL(msgAny.second->origsrc, "end1");
 	BOOST_CHECK_EQUAL(msgAny.second->src, "end1");

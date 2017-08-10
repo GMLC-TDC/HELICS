@@ -16,21 +16,26 @@ namespace helics
 {
 class TestCore;
 /** class implementing a basic broker that links to other brokers in process memory*/
-class TestBroker : public CoreBroker
+class TestBroker : public CoreBroker,std::enable_shared_from_this<TestBroker>
 {
 public:
 	/** default constructor*/
 	TestBroker() = default;
 
+	/** construct with a pointer to a broker*/
+	TestBroker(std::shared_ptr<TestBroker> nbroker);
+
+	virtual void InitializeFromArgs(int argC, char *argv[]) override;
+
 	virtual void transmit(int32_t route, const ActionMessage &command) override;
 
 	virtual void addRoute(int route_id, const std::string &routeInfo) override;
 private:
-	std::shared_ptr<TestBroker> tbroker;  //the underlying broker;
+	std::shared_ptr<TestBroker> tbroker;  //the parent broker;
 										  //void computeDependencies();
 	std::map<int32_t, std::shared_ptr<TestBroker>> brokerRoutes; //!< map of the routes to other brokers
 	std::map < int32_t, std::shared_ptr<TestCore>>  coreRoutes; //!< map of the routes to other cores
-	mutable std::mutex routeMutex;
+	mutable std::mutex routeMutex; //!< mutex lock protectingthe route maps
 };
 }
 #endif

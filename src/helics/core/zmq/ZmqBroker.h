@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define ZMQ_BROKER_H_
 #pragma once
 
-#include "core-broker.h"
+#include "core/core-broker.h"
 
 namespace helics
 {
@@ -21,7 +21,7 @@ class ZmqBroker :public CoreBroker
 {
 	ZmqBroker();
 
-	void initialize(const std::string &initializationString) override;
+	void InitializeFromArgs(int argc, char *argv[]) override;
 
 	virtual ~ZmqBroker();
 	virtual void transmit(int32_t route, const ActionMessage &command) override;

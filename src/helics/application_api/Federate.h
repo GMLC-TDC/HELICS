@@ -47,7 +47,7 @@ class FederateInfo
     Time lookAhead = timeZero;  //!< the lookahead value
     Time impactWindow = timeZero;  //!< the impact window
     std::string coreInitString;  //!< an initialization string for the core API object
-    FederateInfo (){};
+    FederateInfo ()=default;
     FederateInfo (std::string fedname) : name (fedname){};
     FederateInfo (std::string fedname, std::string cType) : name (fedname), coreType (cType){};
 };

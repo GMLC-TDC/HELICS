@@ -8,6 +8,10 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 #include "core-broker.h"
 #include "common/stringToCmdLine.h"
+
+#include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
+
 namespace helics
 {
 
@@ -53,50 +57,38 @@ void CoreBroker::setIdentifier(const std::string &name)
 }
 int32_t CoreBroker::getRoute(Core::federate_id_t fedid) const
 {
-	if (_initialized)
-	{
+	// only activate the lock if we not in an operating state
+	// only activate the lock if we not in an operating state
+	auto lock = (_operating) ? std::unique_lock<std::mutex>(mutex_, std::defer_lock) :
+		std::unique_lock<std::mutex>(mutex_);
+
 		auto fnd = routing_table.find(fedid);
 		return (fnd != routing_table.end()) ? fnd->second : 0;
-	}
-	else
-	{
-		std::lock_guard<std::mutex> lock(mutex_);
-		auto fnd = routing_table.find(fedid);
-		return (fnd != routing_table.end()) ? fnd->second : 0;
-	}
-	
 }
 
 
 int32_t CoreBroker::getFedByName(const std::string &fedName) const
 {
-	if (_initialized)
-	{
+	// only activate the lock if we not in an operating state
+	auto lock = (_operating) ? std::unique_lock<std::mutex>(mutex_, std::defer_lock) :
+		std::unique_lock<std::mutex>(mutex_);
+
 		auto fnd = fedNames.find(fedName);
 		return (fnd != fedNames.end()) ? fnd->second : -1;
-	}
-	else
-	{
-		std::lock_guard<std::mutex> lock(mutex_);
-		auto fnd = fedNames.find(fedName);
-		return (fnd != fedNames.end()) ? fnd->second : -1;
-	}
+	
+
 }
 
 
 int32_t CoreBroker::getBrokerByName(const std::string &brokerName) const
 {
-	if (_initialized)
-	{
+	// only activate the lock if we not in an operating state
+	auto lock = (_operating) ? std::unique_lock<std::mutex>(mutex_, std::defer_lock) :
+		std::unique_lock<std::mutex>(mutex_);
+
 		auto fnd = brokerNames.find(brokerName);
 		return (fnd != brokerNames.end()) ? fnd->second : -1;
-	}
-	else
-	{
-		std::lock_guard<std::mutex> lock(mutex_);
-		auto fnd = brokerNames.find(brokerName);
-		return (fnd != brokerNames.end()) ? fnd->second : -1;
-	}
+	
 }
 
 bool isPriorityCommand(const ActionMessage &command)
@@ -137,7 +129,7 @@ void CoreBroker::processPriorityCommand(const ActionMessage &command)
 	{
 	case CMD_REG_FED:
 	{
-		if (!_initialized)
+		if (!_operating)
 		{
 			if (allInitReady())
 			{
@@ -183,7 +175,7 @@ void CoreBroker::processPriorityCommand(const ActionMessage &command)
 	break;
 	case CMD_CONNECT:
 	{
-		if (!_initialized)
+		if (!_operating)
 		{
 			if (allInitReady())
 			{
@@ -382,6 +374,9 @@ void CoreBroker::processCommand(ActionMessage &command)
 	}
 }
 
+static void argumentParser(int argc, char *argv[], boost::program_options::variables_map &vm_map);
+
+
 CoreBroker::CoreBroker(bool isRoot) noexcept : _isRoot(isRoot)
 {
 
@@ -389,15 +384,131 @@ CoreBroker::CoreBroker(bool isRoot) noexcept : _isRoot(isRoot)
 
 void CoreBroker::Initialize(const std::string &initializationString)
 {
-	bool exp = false;
-	if (_initialized.compare_exchange_strong(exp,true))
+	if (!_initialized)
 	{
-		stringToCmdLine strcmd(initializationString);
+		stringToCmdLine cmdline(initializationString);
+		InitializeFromArgs(cmdline.getArgCount(), cmdline.getArgV());
+	}
+}
+
+void CoreBroker::InitializeFromArgs(int argc, char *argv[])
+{
+	namespace po = boost::program_options;
+	bool exp = false;
+	if (_initialized.compare_exchange_strong(exp, true))
+	{
+		po::variables_map vm;
+		argumentParser(argc, argv, vm);
+		if (vm.count("min") > 0)
+		{
+			_min_federates = vm["min"].as<int>();
+		}
+		if (vm.count("minfed") > 0)
+		{
+			_min_federates = vm["minfed"].as<int>();
+		}
+		
+		if (vm.count("name") > 0)
+		{
+			local_broker_identifier = vm["name"].as<std::string>();
+		}
+
+		if (vm.count("identifier") > 0)
+		{
+			local_broker_identifier = vm["identifier"].as<std::string>();
+		}
+
 		_broker_thread = std::thread(&CoreBroker::broker, this);
 	}
 	
 }
 
+
+void argumentParser(int argc, char *argv[], boost::program_options::variables_map &vm_map)
+{
+	namespace po = boost::program_options;
+	po::options_description cmd_only("command line only");
+	po::options_description config("configuration");
+	po::options_description hidden("hidden");
+
+	// clang-format off
+	// input boost controls
+	cmd_only.add_options()
+		("help,h", "produce help message")
+		("version,v", "helics version number")
+		("config-file", po::value<std::string>(), "specify a configuration file to use");
+
+
+	config.add_options()
+		("broker,b", po::value<std::string>(), "address to connect the broker to")
+		("name,n", po::value<std::string>(), "name of the core")
+		("minfed", po::value<int>(), "type of the publication to use")
+		("identifier", po::value<std::string>(), "name of the core");
+
+	hidden.add_options() ("min", po::value<int>(), "minimum number of federates");
+	// clang-format on
+
+	po::options_description cmd_line("command line options");
+	po::options_description config_file("configuration file options");
+	po::options_description visible("allowed options");
+
+	cmd_line.add(cmd_only).add(config).add(hidden);
+	config_file.add(config);
+	visible.add(cmd_only).add(config);
+
+	po::positional_options_description p;
+	p.add("input", -1);
+
+	po::variables_map cmd_vm;
+	try
+	{
+		po::store(po::command_line_parser(argc, argv).options(cmd_line).positional(p).allow_unregistered().run(), cmd_vm);
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << e.what() << std::endl;
+		throw (e);
+	}
+
+	po::notify(cmd_vm);
+
+	// objects/pointers/variables/constants
+
+
+	// program options control
+	if (cmd_vm.count("help") > 0)
+	{
+		std::cout << visible << '\n';
+		return;
+	}
+
+	if (cmd_vm.count("version") > 0)
+	{
+		std::cout << 0.1 << '\n';
+		return;
+	}
+
+
+	po::store(po::command_line_parser(argc, argv).options(cmd_line).positional(p).allow_unregistered().run(), vm_map);
+
+	if (cmd_vm.count("config-file") > 0)
+	{
+		std::string config_file_name = cmd_vm["config-file"].as<std::string>();
+		if (!boost::filesystem::exists(config_file_name))
+		{
+			std::cerr << "config file " << config_file_name << " does not exist\n";
+			throw (std::invalid_argument("unknown config file"));
+		}
+		else
+		{
+			std::ifstream fstr(config_file_name.c_str());
+			po::store(po::parse_config_file(fstr, config_file), vm_map);
+			fstr.close();
+		}
+	}
+
+	po::notify(vm_map);
+}
 
 void CoreBroker::checkPublications()
 {

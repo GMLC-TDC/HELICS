@@ -18,22 +18,22 @@ namespace helics {
 class TestBroker;
 /** an object implementing a local core object that can communicate in process
 */
-class TestCore : public CommonCore {
+class TestCore : public CommonCore,std::enable_shared_from_this<TestCore> {
 
 public:
 	/** default constructor*/
   TestCore()=default;
-  //* construct with a pointer to a broker*
+  /** construct with a pointer to a broker*/
   TestCore(std::shared_ptr<TestBroker> nbroker);
   /** destructor*/
   virtual ~TestCore();  //the destructor is defined so the definition of TestBroker does not need to be available in the header
-  virtual void initialize (const std::string &initializationString) override;
+  virtual void initializeFromArgs (int argC, char *argv[]) override;
 
 protected:
 	virtual void transmit(int route_id, const ActionMessage &cmd) override;
 	virtual void addRoute(int route_id, const std::string &routeInfo) override;
 private:
-	std::shared_ptr<TestBroker> tbroker;  //the underlying broker;
+	std::shared_ptr<TestBroker> tbroker;  //!<the parent broker;
 	//void computeDependencies();
 	std::map<int32_t, std::shared_ptr<TestBroker>> brokerRoutes; //!< map of the the different brokers
 	std::map < int32_t, std::shared_ptr<TestCore>>  coreRoutes;	//!< map of the different cores that can be routed to

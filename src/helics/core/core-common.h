@@ -41,8 +41,12 @@ public:
 CommonCore() noexcept;
 /** virtual destructor*/
   virtual ~CommonCore();
-  virtual void initialize (const std::string &initializationString) override;
-          void terminate();
+  virtual void initialize (const std::string &initializationString) override final;
+  /** initialize the core manager with command line arguments
+  @param[in] argc the number of arguments
+  @param[in] argv char pointers to the arguments
+  */
+  virtual void initializeFromArgs(int argc, char *argv[]);
   virtual bool isInitialized () const override;
   virtual void error (federate_id_t federateID, int errorCode=-1) override;
   virtual void finalize (federate_id_t federateID) override;
@@ -51,7 +55,6 @@ CommonCore() noexcept;
   virtual federate_id_t registerFederate (const std::string &name, const CoreFederateInfo &info) override;
   virtual const std::string &getFederateName (federate_id_t federateId) const override;
   virtual federate_id_t getFederateId (const std::string &name) override;
-  virtual void setFederationSize (unsigned int size);
   virtual int32_t getFederationSize () override;
   virtual Time timeRequest (federate_id_t federateId, Time next) override;
   virtual std::pair<Time, bool> requestTimeIterative (federate_id_t federateId, Time next, bool localConverged) override;

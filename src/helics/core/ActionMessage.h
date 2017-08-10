@@ -128,6 +128,8 @@ public:
 	AdditionalInfo &info();
 	/** get a const ref to the info structure*/
 	const AdditionalInfo &info() const;
+
+	void moveInfo(std::unique_ptr<Message> message);
 };
 
 
@@ -166,10 +168,7 @@ std::unique_ptr<Message> createMessage(const ActionMessage &cmd);
 */
 std::unique_ptr<Message> createMessage(ActionMessage &&cmd);
 
-/** create an actual Message object
-no memory is allocated
-*/
-Message createTempMessage(const ActionMessage &cmd);
+
 
 } //namespace helics
 #endif

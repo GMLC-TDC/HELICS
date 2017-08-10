@@ -116,7 +116,10 @@ public:
 	/** destructor*/
 	virtual ~CoreBroker();
 	/** start up the broker with an inditialization string containing commands and parameters*/
-	virtual void Initialize(const std::string &initializationString);
+	void Initialize(const std::string &initializationString);
+	/** initialize from command line arguments
+	*/
+	virtual void InitializeFromArgs(int argc, char *argv[]);
 	/** add a message to the queue to process*/
 	void addMessage(const ActionMessage &m);
 	/** check if all the local federates are ready to be initialized
