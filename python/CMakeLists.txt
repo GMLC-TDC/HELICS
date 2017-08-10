@@ -28,5 +28,7 @@ if (PYTHON)
 
     add_custom_target(target ALL DEPENDS ${OUTPUT})
 
+    execute_process(COMMAND ${CMAKE_COMMAND} -E conda install cython)
+
     install(CODE "execute_process(COMMAND ${PYTHON} ${SETUP_PY} build_ext install)")
 endif()
