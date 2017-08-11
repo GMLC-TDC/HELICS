@@ -168,7 +168,7 @@ public:
 
 	void setCoreObject(CommonCore *parent);
 
-	std::pair<Time, bool> requestTime(Time nextTime, bool iterationRequested);
+	iterationTime requestTime(Time nextTime, convergence_state converged);
 };
 
 }

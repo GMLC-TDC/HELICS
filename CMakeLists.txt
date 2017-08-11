@@ -222,21 +222,27 @@ find_package(Threads REQUIRED)
 IF (MSVC)
 find_path(BOOST_TEST_PATH 
 			NAMES 			boost/version.hpp
-			PATHS		C:/boost_1_64_0
+			PATHS		C:/boost_1_65_0
+						C:/boost_1_64_0
 						C:/boost_1_63_0
 						C:/boost_1_61_0
+						D:/boost_1_65_0
 						D:/boost_1_64_0
 						D:/boost_1_63_0
 						D:/boost_1_61_0
+						C:/boost/boost_1_65_0
 						C:/boost/boost_1_64_0
 						C:/boost/boost_1_63_0
 						C:/boost/boost_1_61_0
+						D:/boost/boost_1_65_0
 						D:/boost/boost_1_64_0
 						D:/boost/boost_1_63_0
 						D:/boost/boost_1_61_0
+						C:/local/boost_1_65_0
 						C:/local/boost_1_64_0
 						C:/local/boost_1_63_0
 						C:/local/boost_1_61_0
+						D:/local/boost_1_65_0
 						D:/local/boost_1_64_0
 						D:/local/boost_1_63_0
 						D:/local/boost_1_61_0
@@ -251,9 +257,9 @@ SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
 
 if (${MPI_C_FOUND})
   #find_package(Boost COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
-  find_package(Boost COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
+  find_package(Boost COMPONENTS program_options unit_test_framework filesystem system serialization date_time REQUIRED)
 ELSE(${MPI_C_FOUND})
-  find_package(Boost COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
+  find_package(Boost COMPONENTS program_options unit_test_framework filesystem system serialization date_time REQUIRED)
 ENDIF(${MPI_C_FOUND})
 
 mark_as_advanced(CLEAR BOOST_ROOT)

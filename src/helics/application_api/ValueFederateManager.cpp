@@ -186,16 +186,16 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;
 	uint64_t subCount;
-    auto handles = coreObject->getValueUpdates (fedID, &subCount);
+    auto handles = coreObject->getValueUpdates (fedID);
     // lock the data updates
     std::unique_lock<std::mutex> sublock (subscription_mutex);
-    for (uint64_t ii = 0; ii < subCount; ++ii)
+	for (auto handle:handles)
     {
         /** find the id*/
-        auto fid = handleLookup.find (handles[ii]);
+        auto fid = handleLookup.find (handle);
         if (fid != handleLookup.end ())
         {  // assign the data
-            auto data = coreObject->getValue (handles[ii]);
+            auto data = coreObject->getValue (handle);
          
             auto subIndex = fid->second.value ();
 			//move the data into the container
@@ -204,19 +204,19 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             if (subs[subIndex].callbackIndex >= 0)
             {
 				//first copy the callback in case it gets changed via another operation
-				auto cb = callbacks[subs[subIndex].callbackIndex];
+				auto callbackFunction = callbacks[subs[subIndex].callbackIndex];
                 sublock.unlock ();
                 // callbacks can do all sorts of things, best not to have it locked during the callback
-                cb(fid->second, CurrentTime);
+				callbackFunction(fid->second, CurrentTime);
                 sublock.lock ();
             }
             else if (allCallbackIndex >= 0)
             {
 				//first copy the callback in case it gets changed via another operation
-				auto ac = callbacks[allCallbackIndex];
+				auto allCallBackFunction = callbacks[allCallbackIndex];
                 sublock.unlock ();
                 // callbacks can do all sorts of strange things, best not to have it locked during the callback
-                ac(fid->second, CurrentTime);
+				allCallBackFunction(fid->second, CurrentTime);
                 sublock.lock ();
             }
         }

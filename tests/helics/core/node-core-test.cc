@@ -86,34 +86,31 @@ void simA (std::shared_ptr<Core> core, const std::string &NAME)
                << "entered executing state" << ENDL;
 
     // time loop
-    const Core::Handle *events;
-    uint64_t events_size = 0;
-
     core->timeRequest (id, 50);
     std::string str1 = "hello world";
     core->setValue (pub1, str1.data (), str1.size ());
     // data = core->getValue(pub1); // this would assert
     auto data = core->getValue (sub1);  // should be empty so far
-    events = core->getValueUpdates (id, &events_size);
-    assert (0 == events_size);
+    auto events = core->getValueUpdates (id);
+    assert (events.empty());
     LOG (INFO) << "GET VALUE size " << data->size () << ENDL;
     core->timeRequest (id, 100);
-    events = core->getValueUpdates (id, &events_size);
-    assert (1 == events_size);
+    events = core->getValueUpdates (id);
+    assert (1u == events.size());
     data = core->getValue (sub1);
 
-    LOG (INFO) << "GET VALUE size " << data->size () << " and handle " << *events << ENDL;
+    LOG (INFO) << "GET VALUE size " << data->size () << " and handle " << events[0] << ENDL;
     std::string str2 (data->to_string ());
 
     CHECK_EQ (str1, str2);
     assert (data->size () == str1.size ());
     core->setValue (pub1, "hello\n\0helloAgain", 17);
     core->timeRequest (id, 150);
-    events = core->getValueUpdates (id, &events_size);
-    LOG (INFO) << "events_size=" << events_size << ENDL;
-    assert (1 == events_size);
+    events = core->getValueUpdates (id);
+    LOG (INFO) << "events_size=" << events.size() << ENDL;
+    assert (1u == events.size());
     data = core->getValue (sub1);
-    LOG (INFO) << "GET VALUE size " << data->size () << " and handle " << *events << ENDL;
+    LOG (INFO) << "GET VALUE size " << data->size () << " and handle " << events[0] << ENDL;
     assert (data->size () == 17);
 
     core->timeRequest (id, 200);
@@ -156,10 +153,10 @@ void simB (std::shared_ptr<Core> core, const std::string &NAME)
 
     // time loop
 
-    core->requestTimeIterative (id, 100, false);
-    core->requestTimeIterative (id, 100, true);
-    core->requestTimeIterative (id, 105, false);
-    core->requestTimeIterative (id, 105, true);
+    core->requestTimeIterative (id, 100, convergence_state::nonconverged);
+    core->requestTimeIterative (id, 100, convergence_state::complete);
+    core->requestTimeIterative (id, 105, convergence_state::nonconverged);
+    core->requestTimeIterative (id, 105, convergence_state::complete);
     core->finalize (id);
 }
 

@@ -48,7 +48,7 @@ protected:
   virtual void setFederationSize (unsigned int size);
   virtual unsigned int getFederationSize () override;
   virtual Time timeRequest (federate_id_t federateId, Time next) override;
-  virtual std::pair<Time, bool> requestTimeIterative (federate_id_t federateId, Time next, bool localConverged) override;
+  virtual iterationTime requestTimeIterative (federate_id_t federateId, Time next, bool localConverged) override;
   virtual uint64_t getCurrentReiteration (federate_id_t federateId) override;
   virtual void setMaximumIterations (federate_id_t federateId, uint64_t iterations) override;
   virtual void setTimeDelta (federate_id_t federateId, Time time) override;
@@ -62,9 +62,8 @@ protected:
   virtual const char *getType (Handle handle) override;
   virtual void setValue (Handle handle, const char *data, uint64_t len) override;
   virtual data_t* getValue (Handle handle) override;
-  virtual void dereference (data_t *data) override;
-  virtual void dereference(message_t *msg) override;
-  virtual const Handle* getValueUpdates (federate_id_t federateId, uint64_t *size) override;
+
+  virtual const std::vector<Handle> &getValueUpdates (federate_id_t federateId) override;
   virtual Handle registerEndpoint (federate_id_t federateId, const char *name, const char *type) override;
   virtual Handle registerSourceFilter (federate_id_t federateId, const char *filterName, const char *source, const char *type_in) override;
   virtual Handle registerDestinationFilter (federate_id_t federateId, const char *filterName, const char *dest, const char *type_in) override;

@@ -8,6 +8,10 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 #include "ActionMessage.h"
 
+#include <cereal/archives/portable_binary.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+
 namespace helics
 {
 ActionMessage::ActionMessage (action_t action) : action_ (action),name(payload)
@@ -130,6 +134,46 @@ const ActionMessage::AdditionalInfo &ActionMessage::info() const
 	}
 	return emptyAddInfo;
 }
+
+
+void ActionMessage::toByteArray(char *data, size_t buffer_size) const
+{
+	boost::iostreams::basic_array_sink<char> sr(data, buffer_size);
+	boost::iostreams::stream< boost::iostreams::basic_array_sink<char> > s(sr);
+
+	cereal::PortableBinaryOutputArchive oa(s);
+
+	save(oa);
+}
+
+void ActionMessage::to_string(std::string &data) const
+{
+	data.clear();
+
+	boost::iostreams::back_insert_device<std::string> inserter(data);
+	boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
+	cereal::PortableBinaryOutputArchive oa(s);
+
+	save(oa);
+
+	// don't forget to flush the stream to finish writing into the buffer
+	s.flush();
+
+}
+
+void ActionMessage::fromByteArray(const char *data, size_t buffer_size)
+{
+	boost::iostreams::basic_array_source<char> device(data, buffer_size);
+	boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s(device);
+	cereal::PortableBinaryInputArchive ia(s);
+	load(ia);
+}
+
+void ActionMessage::from_string(const std::string &data)
+{
+	fromByteArray(data.data(), data.size());
+}
+
 
 std::unique_ptr<Message> createMessage (const ActionMessage &cmd)
 {

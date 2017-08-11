@@ -186,19 +186,19 @@ void Federate::enterInitializationStateFinalize()
 	
 }
 
-bool Federate::enterExecutionState (bool ProcessComplete)
+convergence_state Federate::enterExecutionState (convergence_state ProcessComplete)
 {
-    bool res = true;
+	convergence_state res = convergence_state::complete;
     switch (state)
     {
     case op_states::startup:
 	case op_states::pendingInit:
         enterInitializationState ();
-    // FALLTHROUGH
+    //FALLTHROUGH
     case op_states::initialization:
     {
         res = coreObject->enterExecutingState (fedID, ProcessComplete);
-        if (res)
+        if (res==convergence_state::complete)
         {
             state = op_states::execution;
             InitializeToExecuteStateTransition ();
@@ -225,7 +225,7 @@ bool Federate::enterExecutionState (bool ProcessComplete)
     return res;
 }
 
-void Federate::enterExecutionStateAsync(bool ProcessComplete)
+void Federate::enterExecutionStateAsync(convergence_state ProcessComplete)
 {
 	switch (state)
 	{
@@ -275,12 +275,12 @@ void Federate::enterExecutionStateAsync(bool ProcessComplete)
 	}
 }
 
-bool Federate::enterExecutionStateFinalize()
+convergence_state Federate::enterExecutionStateFinalize()
 {
 	if (state == op_states::pendingExec)
 	{
 		auto res = asyncCallInfo->execFuture.get();
-		if (res)
+		if (convergence_state::complete==res)
 		{
 			state = op_states::execution;
 			InitializeToExecuteStateTransition();
@@ -388,18 +388,18 @@ Time Federate::requestTime (Time nextInternalTimeStep)
 	}
 }
 
-std::pair<Time, bool> Federate::requestTimeIterative(Time nextInternalTimeStep, bool iterationComplete)
+iterationTime Federate::requestTimeIterative(Time nextInternalTimeStep, convergence_state iterationComplete)
 {
 	if (state == op_states::execution)
 	{
-		auto iPair = coreObject->requestTimeIterative(fedID, nextInternalTimeStep, iterationComplete);
+		auto iterationTime = coreObject->requestTimeIterative(fedID, nextInternalTimeStep, iterationComplete);
 		Time oldTime = currentTime;
-		if (iPair.second)
+		if (iterationTime.state==convergence_state::complete)
 		{
-			currentTime = iPair.first;
+			currentTime = iterationTime.stepTime;
 		}
 		updateTime(currentTime, oldTime);
-		return iPair;
+		return iterationTime;
 	}
 	else
 	{
@@ -428,7 +428,7 @@ void Federate::requestTimeAsync(Time nextInternalTimeStep)
 /** request a time advancement
 @param[in] the next requested time step
 @return the granted time step*/
-void Federate::requestTimeIterativeAsync(Time nextInternalTimeStep, bool iterationComplete)
+void Federate::requestTimeIterativeAsync(Time nextInternalTimeStep, convergence_state iterationComplete)
 {
 	if (state == op_states::execution)
 	{
@@ -468,19 +468,19 @@ Time Federate::requestTimeFinalize()
 
 /** finalize the time advancement request
 @return the granted time step*/
-std::pair<Time, bool> Federate::requestTimeIterativeFinalize()
+iterationTime Federate::requestTimeIterativeFinalize()
 {
 	if (state == op_states::pendingIterativeTime)
 	{
-		auto iPair = asyncCallInfo->timeRequestIterativeFuture.get();
+		auto iterativeTime = asyncCallInfo->timeRequestIterativeFuture.get();
 		state = op_states::execution;
 		Time oldTime = currentTime;
-		if (iPair.second)
+		if (iterativeTime.state==convergence_state::complete)
 		{
-			currentTime = iPair.first;
+			currentTime = iterativeTime.stepTime;
 		}
 		updateTime(currentTime, oldTime);
-		return iPair;
+		return iterativeTime;
 	}
 	else
 	{

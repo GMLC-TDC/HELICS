@@ -443,12 +443,12 @@ DependencyInfo &FederateState::getDependencyInfo (Core::federate_id_t ofed)
 }
 
 
-std::pair<Time, bool>  FederateState::requestTime(Time nextTime, bool iterationRequested)
+iterationTime  FederateState::requestTime(Time nextTime, convergence_state converged)
 {
-	iterating = iterationRequested;
+	iterating = (converged!=convergence_state::complete);
 	time_requested = nextTime;
 	auto ret = processQueue();
-	return{ time_granted,ret };
+	return{ time_granted,ret?convergence_state::complete:convergence_state::nonconverged };
 }
 
 int FederateState::processExecRequest(ActionMessage &cmd)

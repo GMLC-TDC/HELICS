@@ -47,19 +47,23 @@ class FederateInfo
     Time lookAhead = timeZero;  //!< the lookahead value
     Time impactWindow = timeZero;  //!< the impact window
     std::string coreInitString;  //!< an initialization string for the core API object
+	/** default constructor*/
     FederateInfo ()=default;
+	/** construct from the federate name*/
     FederateInfo (std::string fedname) : name (fedname){};
+	/** construct from the name and type*/
     FederateInfo (std::string fedname, std::string cType) : name (fedname), coreType (cType){};
 };
 
 class Core;
 
 
-/** base class for a federate
+/** base class for a federate in the application API
  */
 class Federate
 {
   public:
+	  
     /** the allowable states of the federate*/
     enum class op_states : char
     {
@@ -125,16 +129,16 @@ class Federate
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
-    bool enterExecutionState (bool ProcessComplete = true);
+    convergence_state enterExecutionState (convergence_state ProcessComplete =convergence_state::complete);
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
-    void enterExecutionStateAsync (bool ProcessComplete = true);
+    void enterExecutionStateAsync (convergence_state ProcessComplete = convergence_state::complete);
     /** finalize the async call for entering Execution state
     @details call will not block but will return quickly.  The enterInitializationStateFinalize must be called
     before doing other operations
     */
-    bool enterExecutionStateFinalize ();
+	convergence_state enterExecutionStateFinalize ();
     /** terminate the simulation
     @details call is normally non-blocking, but may block if called in the midst of an
     asynchronous call sequence*/
@@ -157,7 +161,7 @@ class Federate
     /** request a time advancement
     @param[in] the next requested time step
     @return the granted time step*/
-    std::pair<Time, bool> requestTimeIterative (Time nextInternalTimeStep, bool iterationComplete);
+	iterationTime requestTimeIterative (Time nextInternalTimeStep, convergence_state iterationComplete);
 
     /** request a time advancement
     @param[in] the next requested time step
@@ -167,7 +171,7 @@ class Federate
     /** request a time advancement
     @param[in] the next requested time step
     @return the granted time step*/
-    void requestTimeIterativeAsync (Time nextInternalTimeStep, bool iterationComplete);
+    void requestTimeIterativeAsync (Time nextInternalTimeStep, convergence_state iterationComplete);
 
     /** request a time advancement
     @param[in] the next requested time step
@@ -176,7 +180,7 @@ class Federate
 
     /** finalize the time advancement request
     @return the granted time step*/
-    std::pair<Time, bool> requestTimeIterativeFinalize ();
+    iterationTime requestTimeIterativeFinalize ();
 
     /** set the mimimum time delta for the federate
     @param[in] tdelta the minimum time delta to return from a time request function
@@ -212,12 +216,18 @@ class Federate
     virtual void registerInterfaces (const std::string &jsonString);
     /** get the underlying federateID for the core*/
     unsigned int getID () const noexcept { return fedID; }
+	/** get the current state of the federate*/
     op_states currentState () const { return state; }
+	/** get the current Time
+	@details the most recent granted time of the federate*/
     Time getCurrentTime () const { return currentTime; }
+	/** get the federate name*/
     const std::string &getName () const { return FedInfo.name; }
+	/** get a pointer to the core object used by the federate*/
     std::shared_ptr<Core> getCorePointer () { return coreObject; }
 };
-
+/** generate a FederateInfo object from a json file
+*/
 FederateInfo LoadFederateInfo (const std::string &jsonString);
 
 /** defining an exception class for state transition errors*/

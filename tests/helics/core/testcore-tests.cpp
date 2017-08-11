@@ -59,23 +59,19 @@ BOOST_AUTO_TEST_CASE(testcore_pubsub_value_test)
 
 	core->enterExecutingState(id);
 	
-	const Core::Handle *valueUpdates;
-	uint64_t update_size = 0;
-
 	core->timeRequest(id, 50.0);
 	std::string str1 = "hello world";
 	core->setValue(pub1, str1.data(), str1.size());
-	valueUpdates = core->getValueUpdates(id, &update_size);
-	BOOST_CHECK(valueUpdates == nullptr);
-	BOOST_CHECK_EQUAL(update_size, 0u);
+	auto valueUpdates = core->getValueUpdates(id);
+	BOOST_CHECK(valueUpdates.empty());
 	auto data = core->getValue(sub1);
 	BOOST_CHECK(data == nullptr);
 	BOOST_CHECK_EQUAL(data->size(), 0u);
 	
 	core->timeRequest(id, 100.0);
-	valueUpdates = core->getValueUpdates(id, &update_size);
+	valueUpdates = core->getValueUpdates(id);
 	BOOST_CHECK_EQUAL(valueUpdates[0], sub1);
-	BOOST_CHECK_EQUAL(update_size, 1u);
+	BOOST_CHECK_EQUAL(valueUpdates.size(), 1u);
 	data = core->getValue(sub1);
 	std::string str2(data->to_string());
 	BOOST_CHECK_EQUAL(str1, str2);
@@ -84,17 +80,16 @@ BOOST_AUTO_TEST_CASE(testcore_pubsub_value_test)
 
 	core->setValue(pub1, "hello\n\0helloAgain", 17);
 	core->timeRequest(id, 150.0);
-	valueUpdates = core->getValueUpdates(id, &update_size);
+	valueUpdates = core->getValueUpdates(id);
 	BOOST_CHECK_EQUAL(valueUpdates[0], sub1);
-	BOOST_CHECK_EQUAL(update_size, 1u);
+	BOOST_CHECK_EQUAL(valueUpdates.size(), 1u);
 	data = core->getValue(sub1);
 	BOOST_CHECK_EQUAL(data->to_string(), "hello\n\0helloAgain");
 	BOOST_CHECK_EQUAL(data->size(), 17u);
 
 	core->timeRequest(id, 200.0);
-	valueUpdates = core->getValueUpdates(id, &update_size);
-	BOOST_CHECK(valueUpdates == nullptr);
-	BOOST_CHECK_EQUAL(update_size, 0);
+	valueUpdates = core->getValueUpdates(id);
+	BOOST_CHECK(valueUpdates.empty());
 
 }
 

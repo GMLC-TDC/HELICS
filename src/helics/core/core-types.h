@@ -41,5 +41,14 @@ enum helics_time_unit
 	PS
 };
 
+
+/** enumeration of the possible states of convergence*/
+enum class convergence_state :char
+{
+	complete = 0,  //!< indicator that the iterations have completed
+	nonconverged = 1,	//!< indicator that the iterations are continuing
+
+};
+
 #endif
 

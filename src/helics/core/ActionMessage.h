@@ -14,6 +14,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "core-types.h"
 #include <string>
 #include <memory>
+#include <cereal/types/memory.hpp>
 
 namespace helics
 {
@@ -38,6 +39,30 @@ public:
 		{};
 		AdditionalInfo(AdditionalInfo &&ai) noexcept:Te(ai.Te), Tdemin(ai.Tdemin), source(std::move(ai.source)), type(source), target(std::move(ai.target)), units(target), orig_source(std::move(ai.orig_source))
 		{};
+		template<class Archive>
+		void save(Archive & ar) const
+		{
+			auto btc = Te.getBaseTimeCode();
+			ar & btc;
+			btc = Tdemin.getBaseTimeCode();
+			ar & btc;
+			ar & source;
+			ar & target;
+			ar & orig_source;
+		}
+
+		template<class Archive>
+		void load(Archive & ar)
+		{
+			decltype(Te.getBaseTimeCode()) btc;
+			ar & btc;
+			Te.setBaseTimeCode(btc);
+			ar & btc;
+			Tdemin.setBaseTimeCode(btc);
+			ar & source;
+			ar & target;
+			ar & orig_source;
+		}
 
 	};
 	/** enumeration of globally recognized commands
@@ -130,6 +155,62 @@ public:
 	const AdditionalInfo &info() const;
 
 	void moveInfo(std::unique_ptr<Message> message);
+
+	template<class Archive>
+	void save(Archive & ar) const
+	{
+		ar & action_;
+		ar & source_id;
+		ar & source_handle;
+		ar & dest_id;
+		ar & dest_handle;
+		ar & iterationComplete;
+		ar & required;
+		ar & error;
+		ar & flag;
+		auto btc = actionTime.getBaseTimeCode();
+		ar & btc;
+		ar & payload;
+		if (action_ >= cmd_info_basis)
+		{
+			ar & info_;
+		}
+
+	}
+
+	template<class Archive>
+	void load(Archive & ar)
+	{
+		ar & action_;
+		ar & source_id;
+		ar & source_handle;
+		ar & dest_id;
+		ar & dest_handle;
+		ar & iterationComplete;
+		ar & required;
+		ar & error;
+		ar & flag;
+		decltype(actionTime.getBaseTimeCode()) btc;
+		ar & btc;
+		actionTime.setBaseTimeCode(btc);
+		ar & payload;
+		if (action_ >= cmd_info_basis)
+		{
+			if (!info_)
+			{
+				info_ = std::make_unique<AdditionalInfo>();
+			}
+			ar & info_;
+		}
+
+	}
+
+	/** functions that convert to and from a byte stream*/
+	void toByteArray(char *data, size_t buffer_size) const;
+	void to_string(std::string &data) const;
+	void fromByteArray(const char *data,size_t buffer_size);
+	void from_string(const std::string &data);
+
 };
 
 

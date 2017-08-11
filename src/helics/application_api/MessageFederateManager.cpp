@@ -203,10 +203,10 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     }
     if (hasSubscriptions)
     {
-        auto handles = coreObject->getValueUpdates (fedID, &epCount);
-        for (decltype (epCount) ii = 0; ii < epCount; ++ii)
+        auto handles = coreObject->getValueUpdates (fedID);
+		for (auto handle:handles)
         {
-            auto sfnd = subHandleLookup.find (handles[ii]);
+            auto sfnd = subHandleLookup.find (handle);
             if (sfnd != subHandleLookup.end ())
             {
 				auto mv = std::make_unique<Message>();
@@ -215,7 +215,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
                 mv->dest = local_endpoints[localEndpointIndex].name;
                 mv->origsrc = mv->src;
                 // get the data value
-                auto data = coreObject->getValue (handles[ii]);
+                auto data = coreObject->getValue (handle);
 
                 mv->data = *data;
                 mv->time = CurrentTime;

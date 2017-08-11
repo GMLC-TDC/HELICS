@@ -60,11 +60,13 @@ public:
 	//there are 3 bytes undefined in this structure
 };
 
-
+/** the object defining the core interface through an abstract class*/
 class Core
 {
   public:
+	  /** default constructor/
     Core ()=default;
+	/**virtual destructor*/
     virtual ~Core () = default;
 
     /**
@@ -135,11 +137,11 @@ class Core
      * May only be invoked in Initializing state.
      @param[in] federateID  the identifier of the federate
      @param[in] iterationCompleted  if true no more iterations on this federate are requested
-     if false the federate requests an iterative update
-     @return false if the executing state has not been entered and there are updates, true if the simulation is
+     if nonconverged the federate requests an iterative update
+     @return nonconverged if the executing state has not been entered and there are updates, complete if the simulation is
      ready to move on to the executing state
      */
-    virtual bool enterExecutingState (federate_id_t federateID, bool iterationCompleted = true) = 0;
+    virtual convergence_state enterExecutingState (federate_id_t federateID, convergence_state converged = convergence_state::complete) = 0;
 
     /**
      * Register a federate.
@@ -215,9 +217,9 @@ class Core
      *@param federateId the identifier for the federate to process
      * @param next the requested time
      * @param localConverged has the local federate converged
+	 @return an iterationTime object with two field stepTime and a bool indicating the iteration has completed
      */
-    virtual std::pair<Time, bool>
-    requestTimeIterative (federate_id_t federateId, Time next, bool localConverged) = 0;
+    virtual iterationTime requestTimeIterative (federate_id_t federateId, Time next, convergence_state localConverged) = 0;
 
     /**
      * Returns the current reiteration count for the specified federate.
@@ -326,13 +328,12 @@ class Core
     
 
     /**
-     * Returns array of subscription handles that received an update during the last
+     * Returns vector of subscription handles that received an update during the last
      * time request.  The data remains valid until the next call to getValueUpdates for the given federateID
      *@param federateID the identification code of the federate to query
-     * @param[out] size set to the size of the array.
 	 @return a reference to the location of an array of handles that have been updated
      */
-    virtual const Handle *getValueUpdates (federate_id_t federateId, uint64_t *size) = 0;
+    virtual const std::vector<Handle> &getValueUpdates (federate_id_t federateId) = 0;
 
     /**
      * Message interface.

@@ -228,45 +228,28 @@ FederateState *CommonCore::getFederate (federate_id_t federateID) const
 FederateState *CommonCore::getHandleFederate (Handle id_)
 {
     assert (isInitialized ());
-    if (_operating)
+    // only activate the lock if we not in an operating state
+    auto lock = (_operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
+                               std::unique_lock<std::mutex> (_mutex);
+    // this list is now constant no need to lock
+    if (isValidIndex (id_, handles))
     {
-        // this list is now constant no need to lock
-        if (isValidIndex (id_, handles))
-        {
-            return _federates[handles[id_]->local_fed_id].get ();
-        }
+        return _federates[handles[id_]->local_fed_id].get ();
     }
-    else
-    {
-        // need to lock here since the list could be changing
-        std::lock_guard<std::mutex> lock (_mutex);
-        if (isValidIndex (id_, handles))
-        {
-            return _federates[handles[id_]->local_fed_id].get ();
-        }
-    }
+
     return nullptr;
 }
 
 BasicHandleInfo *CommonCore::getHandleInfo (Handle id_) const
 {
-    if (_operating)
+    // only activate the lock if we not in an operating state
+    auto lock = (_operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
+                               std::unique_lock<std::mutex> (_mutex);
+    if (isValidIndex (id_, handles))
     {
-        // this list is now constant no need to lock
-        if (isValidIndex (id_, handles))
-        {
-            return handles[id_].get ();
-        }
+        return handles[id_].get ();
     }
-    else
-    {
-        // need to lock here since the list could be changing
-        std::lock_guard<std::mutex> lock (_mutex);
-        if (isValidIndex (id_, handles))
-        {
-            return handles[id_].get ();
-        }
-    }
+
     return nullptr;
 }
 
@@ -361,22 +344,22 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
 }
 
 
-bool CommonCore::enterExecutingState (federate_id_t federateID, bool iterationCompleted)
+convergence_state CommonCore::enterExecutingState (federate_id_t federateID, convergence_state converged)
 {
     auto fed = getFederate (federateID);
     if (HELICS_EXECUTING == fed->getState ())
     {
-        return true;
+        return convergence_state::complete;
     }
     assert (HELICS_INITIALIZING == fed->getState ());
 
     ActionMessage exec (CMD_EXEC_REQUEST);
-    exec.iterationComplete = iterationCompleted;
+    exec.iterationComplete = (converged==convergence_state::complete);
     _queue.push (exec);
 
     auto ret = fed->processQueue ();
 
-    return ret;
+    return ret?convergence_state::complete:convergence_state::nonconverged;
 }
 
 
@@ -438,7 +421,7 @@ int32_t CommonCore::getFederationSize ()
     {
         return _global_federation_size;
     }
-    // if we are not initialization return the local federation size
+    // if we are in initialization return the local federation size
     std::lock_guard<std::mutex> lock (_mutex);
     return static_cast<int32_t> (_federates.size ());
 }
@@ -449,14 +432,14 @@ Time CommonCore::timeRequest (federate_id_t federateID, Time next)
     auto fed = getFederate (federateID);
     if (HELICS_EXECUTING == fed->getState ())
     {
-        auto ret = fed->requestTime (next, true);
-        return ret.first;
+        auto ret = fed->requestTime (next, convergence_state::complete);
+        return ret.stepTime;
     }
     throw (invalidFunctionCall ());
 }
 
 
-std::pair<Time, bool> CommonCore::requestTimeIterative (federate_id_t federateID, Time next, bool localConverged)
+iterationTime CommonCore::requestTimeIterative (federate_id_t federateID, Time next, convergence_state converged)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -466,15 +449,15 @@ std::pair<Time, bool> CommonCore::requestTimeIterative (federate_id_t federateID
     if (HELICS_EXECUTING == fed->getState ())
     {
         // limit the iterations
-        if (localConverged == false)
+        if (converged != convergence_state::complete)
         {
             if (fed->iteration >= _max_iterations)
             {
-                localConverged = true;
+                converged = convergence_state::complete;
             }
         }
 
-        return fed->requestTime (next, localConverged);
+        return fed->requestTime (next, converged);
     }
     throw (invalidFunctionCall ());
 }
@@ -719,23 +702,14 @@ std::shared_ptr<const data_block> CommonCore::getValue (Handle handle_)
 }
 
 
-const Handle *CommonCore::getValueUpdates (federate_id_t federateID, uint64_t *size)
+const std::vector<Handle> &CommonCore::getValueUpdates (federate_id_t federateID)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
         throw (invalidIdentifier ());
     }
-    *size = fed->events.size ();
-
-    if (0 == *size)
-    {
-        return nullptr;
-    }
-    else
-    {
-        return fed->events.data ();
-    }
+	return fed->events;
 }
 
 
@@ -1045,6 +1019,7 @@ void CommonCore::logMessage (federate_id_t federateID, int logCode, const std::s
         throw (invalidIdentifier ());
     }
     m.source_id = fed->global_id;
+	m.source_handle = logCode;  //this is just a way to transmit the log code
     m.payload = logMessage;
     _queue.push (m);
 }

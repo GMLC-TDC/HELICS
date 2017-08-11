@@ -15,8 +15,8 @@ class asyncFedCallInfo
 {
 public:
 	std::future<void> initFuture; /**future for the init call*/
-	std::future<bool> execFuture; /** future for the enter execution mode call*/
+	std::future<convergence_state> execFuture; /** future for the enter execution mode call*/
 	std::future<helics::Time> timeRequestFuture; /** future for the timeRequest call*/
-	std::future<std::pair<helics::Time, bool>> timeRequestIterativeFuture; /** future for the time request iterative call*/
+	std::future<helics::iterationTime> timeRequestIterativeFuture; /** future for the time request iterative call*/
 };
 #endif
