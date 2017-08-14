@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+#include <fstream>
 
 namespace helics
 {

@@ -18,6 +18,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "mpi.h"
 
 #include <cassert>
+#include <fstream>
 
 namespace helics
 {
