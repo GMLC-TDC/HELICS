@@ -201,7 +201,7 @@ void TestBroker::addRoute (int route_id, const std::string &routeInfo)
         brokerRoutes.emplace (route_id, std::move (brk));
         return;
     }
-    auto tcore = findCore (routeInfo);
+    auto tcore = CoreFactory::findCore (routeInfo);
     if (tcore)
     {
         std::lock_guard<std::mutex> lock (routeMutex);

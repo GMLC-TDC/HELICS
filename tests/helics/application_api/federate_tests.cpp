@@ -9,7 +9,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <boost/test/floating_point_comparison.hpp>
 #include "helics/core/core.h"
 #include "helics/application_api/Federate.h"
-#include "helics/application_api/coreInstantiation.h"
+#include "helics/core/coreFactory.h"
 #include "test_configuration.h"
 #include <future>
 /** these test cases test out the value converters
@@ -37,8 +37,7 @@ BOOST_AUTO_TEST_CASE(federate_initialize_tests)
 	BOOST_CHECK(Fed->currentState() == helics::Federate::op_states::initialization);
 	Fed->enterExecutionState();
 	BOOST_CHECK(Fed->currentState() == helics::Federate::op_states::execution);
-	Fed = nullptr;
-	closeCore(core->getIdentifier());
+	Fed = nullptr;  //force the destructor
 }
 
 
@@ -66,8 +65,6 @@ BOOST_AUTO_TEST_CASE(federate_time_step_tests)
 	res = Fed->requestTime(3.0);
 	BOOST_CHECK_EQUAL(res, 3.0);
 
-
-	Fed = nullptr;
 }
 
 

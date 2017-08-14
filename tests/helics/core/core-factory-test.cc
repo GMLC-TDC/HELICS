@@ -22,7 +22,7 @@ int main (int argc, char** argv)
   const bool haveZmq = false;
 #endif
 
-  const bool foundZmq = helics::CoreFactory::available (HELICS_ZMQ);
+  const bool foundZmq = helics::CoreFactory::isAvailable (HELICS_ZMQ);
   passed &= (haveZmq == foundZmq);
   if (haveZmq == foundZmq)
     {
@@ -38,7 +38,7 @@ int main (int argc, char** argv)
   const bool haveMpi = false;
 #endif
 
-  const bool foundMpi = helics::CoreFactory::available (HELICS_MPI);
+  const bool foundMpi = helics::CoreFactory::isAvailable (HELICS_MPI);
   passed &= (haveMpi == foundMpi);
   if (haveMpi == foundMpi)
     {

@@ -7,7 +7,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 */
 #include "Federate.h"
-#include "coreInstantiation.h"
+#include "core/CoreFactory.h"
 #include "helics/core/core.h"
 #include "asyncFedCallInfo.h"
 #ifdef _MSC_VER
@@ -39,24 +39,18 @@ CoreFederateInfo generateCoreInfo (const FederateInfo &fi)
 
 Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
 {
-    coreObject = initializeCore (fi.coreName, coreTypeFromString (fi.coreType), fi.coreInitString);
+	if (fi.coreName.empty())
+	{
+		coreObject = CoreFactory::create(coreTypeFromString(fi.coreType), fi.coreInitString);
+	}
+	else
+	{
+		coreObject = CoreFactory::FindOrCreate(coreTypeFromString(fi.coreType), fi.coreName, fi.coreInitString);
+	}
     if (!coreObject)
     {
-        if (isAvailable (fi.coreName))
-        {  // if it shows as available but wasn't built then we can try starting it over again
-            closeCore (fi.coreName);
-            coreObject = initializeCore (fi.coreName, coreTypeFromString (fi.coreType), fi.coreInitString);
-            if (!coreObject)
-            {
-                state = op_states::error;
-                return;
-            }
-        }
-        else
-        {
-            state = op_states::error;
-            return;
-        }
+         state = op_states::error;
+         return;
     }
     fedID = coreObject->registerFederate (fi.name.c_str (), generateCoreInfo (fi));
 }

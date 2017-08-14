@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 
 #include "helics/application_api/ValueFederate.h"
-#include "helics/application_api/coreInstantiation.h"
+#include "helics/core/CoreFactory.h"
 #include "helics/application_api/Subscriptions.hpp"
 
 #include "test_configuration.h"
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_SUITE(heat_tranfer_tests)
 
 BOOST_AUTO_TEST_CASE(linear_tests)
 {
-	auto wcore = initializeCore("wallcore", core_types::test_core, "22");
+	auto wcore = helics::CoreFactory::FindOrCreate(HELICS_TEST, "wallcore", "22");
 	Wall w;
 	w.initialize("wallcore");
 	int blockCount = 20;

@@ -165,18 +165,18 @@ void CommonCore::disconnect()
 	otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
 	that will be destroyed on function exit
 	*/
-	auto keepCoreAlive = findCore(identifier);
+	auto keepCoreAlive = CoreFactory::findCore(identifier);
 	if (keepCoreAlive)
 	{
-		unregisterCore(identifier);
+		CoreFactory::unregisterCore(identifier);
 	}
 	
 	if (!prevIdentifier.empty())
 	{
-		auto keepCoreAlive2 = findCore(prevIdentifier);
+		auto keepCoreAlive2 = CoreFactory::findCore(prevIdentifier);
 		if (keepCoreAlive2)
 		{
-			unregisterCore(prevIdentifier);
+			CoreFactory::unregisterCore(prevIdentifier);
 		}
 		
 	}

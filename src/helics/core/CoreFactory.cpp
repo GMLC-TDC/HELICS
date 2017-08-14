@@ -24,10 +24,68 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics {
 
+
+
+std::string helicsTypeString(helics_core_type type)
+{
+	switch (type)
+	{
+	case HELICS_MPI:
+		return "_mpi";
+	case HELICS_TEST:
+		return "_test";
+	case HELICS_ZMQ:
+		return "_zmq";
+	case HELICS_INTERPROCESS:
+		return "_ipc";
+	default:
+		return "";
+	}
+}
+
+helics_core_type coreTypeFromString(const std::string &type)
+{
+	if ((type.empty()) || (type == "default"))
+	{
+		return HELICS_DEFAULT;
+	}
+	else if ((type == "mpi") || (type == "MPI"))
+	{
+		return HELICS_MPI;
+	}
+	else if ((type == "0mq") || (type == "zmq") || (type == "zeromq") || (type == "ZMQ"))
+	{
+		return HELICS_ZMQ;
+	}
+	else if ((type == "interprocess") || (type == "ipc"))
+	{
+		return HELICS_INTERPROCESS;
+	}
+	else if ((type == "test") || (type == "test1") || (type == "local"))
+	{
+		return HELICS_TEST;
+	}
+	throw (std::invalid_argument("unrecognized core type"));
+}
+
 std::shared_ptr<Core> CoreFactory::create(helics_core_type type, const std::string &initializationString) {
 
   std::shared_ptr<Core> core;
-
+  if (type == HELICS_DEFAULT)
+  { //deal with the default type
+	  if (isAvailable(HELICS_ZMQ))
+	  {
+		  type = HELICS_ZMQ;
+	  }
+	  else if (isAvailable(HELICS_INTERPROCESS))
+	  {
+		  type = HELICS_INTERPROCESS;
+	  }
+	  else
+	  {
+		  type = HELICS_TEST;
+	  }
+  }
   switch(type)
     {
     case HELICS_ZMQ:
@@ -62,15 +120,33 @@ std::shared_ptr<Core> CoreFactory::create(helics_core_type type, const std::stri
   auto ccore = std::dynamic_pointer_cast<CommonCore>(core);
   if (ccore)
   {
-	  registerCore(ccore);
+	  registerCommonCore(ccore);
   }
   return core;
 }
 
-std::shared_ptr<Core> CoreFactory::create(helics_core_type type,const std::string &core_name, const std::string &initializationString) {
+std::shared_ptr<Core> CoreFactory::FindOrCreate(helics_core_type type,const std::string &core_name, const std::string &initializationString) {
 
-	std::shared_ptr<Core> core;
-
+	std::shared_ptr<Core> core = findCore(core_name);
+	if (core)
+	{
+		return core;
+	}
+	if (type == HELICS_DEFAULT)
+	{ //deal with the default type
+		if (isAvailable(HELICS_ZMQ))
+		{
+			type = HELICS_ZMQ;
+		}
+		else if (isAvailable(HELICS_INTERPROCESS))
+		{
+			type = HELICS_INTERPROCESS;
+		}
+		else
+		{
+			type = HELICS_TEST;
+		}
+	}
 	switch (type)
 	{
 	case HELICS_ZMQ:
@@ -97,6 +173,7 @@ std::shared_ptr<Core> CoreFactory::create(helics_core_type type,const std::strin
 		break;
 	}
 	case HELICS_INTERPROCESS:
+		assert(false);
 		break;
 	default:
 		assert(false);
@@ -105,13 +182,13 @@ std::shared_ptr<Core> CoreFactory::create(helics_core_type type,const std::strin
 	auto ccore = std::dynamic_pointer_cast<CommonCore>(core);
 	if (ccore)
 	{
-		registerCore(ccore);
+		registerCommonCore(ccore);
 	}
 	return core;
 }
 
 
-bool CoreFactory::available (helics_core_type type) {
+bool CoreFactory::isAvailable (helics_core_type type) {
 
   bool available = false;
 
@@ -161,7 +238,7 @@ what we do is delay the destruction until it is called in a different thread whi
 without issue*/
 static std::vector<std::shared_ptr<CommonCore>> delayedDestruction;
 
-std::shared_ptr<CommonCore> findCore(const std::string &name)
+std::shared_ptr<CommonCore> CoreFactory::findCore(const std::string &name)
 {
 	std::lock_guard<std::mutex> lock(mapLock);
 	auto fnd = CoreMap.find(name);
@@ -172,7 +249,7 @@ std::shared_ptr<CommonCore> findCore(const std::string &name)
 	return nullptr;
 }
 
-bool registerCore(std::shared_ptr<CommonCore> tcore)
+bool CoreFactory::registerCommonCore(std::shared_ptr<CommonCore> tcore)
 {
 	std::lock_guard<std::mutex> lock(mapLock);
 	if (!delayedDestruction.empty())
@@ -184,13 +261,13 @@ bool registerCore(std::shared_ptr<CommonCore> tcore)
 }
 
 
-void cleanUpCores()
+void CoreFactory::cleanUpCores()
 {
 	std::lock_guard<std::mutex> lock(mapLock);
 	delayedDestruction.clear();
 }
 
-void copyCoreIdentifier(const std::string &copyFromName, const std::string &copyToName)
+void CoreFactory::copyCoreIdentifier(const std::string &copyFromName, const std::string &copyToName)
 {
 	std::lock_guard<std::mutex> lock(mapLock);
 	auto fnd = CoreMap.find(copyFromName);
@@ -201,7 +278,7 @@ void copyCoreIdentifier(const std::string &copyFromName, const std::string &copy
 	}
 }
 
-void unregisterCore(const std::string &name)
+void CoreFactory::unregisterCore(const std::string &name)
 {
 	std::lock_guard<std::mutex> lock(mapLock);
 	auto fnd = CoreMap.find(name);

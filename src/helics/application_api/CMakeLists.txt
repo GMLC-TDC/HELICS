@@ -7,7 +7,6 @@
 set(application_api_headers
 application_api.h
 CombinationFederate.h
-coreInstantiation.h
 Publications.hpp
 Subscriptions.hpp
 Endpoints.hpp
@@ -28,7 +27,6 @@ asyncFedCallInfo.h
 
 set(application_api_sources
 CombinationFederate.cpp
-coreInstantiation.cpp
 Federate.cpp
 MessageFederate.cpp
 MessageFederateManager.cpp
