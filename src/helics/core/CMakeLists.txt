@@ -5,16 +5,17 @@
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 ##############################################################################
 set(SRC_FILES
-    core-factory.cc
-    test-core.cc
-	core-common.cc
+    CoreFactory.cpp
+	BrokerFactory.cpp
+    TestCore.cpp
+	CommonCore.cpp
     mpi/mpi-core.cc
-	FederateState.cc
+	FederateState.cpp
 	SubscriptionInfo.cpp
 	FilterInfo.cpp
 	EndpointInfo.cpp
 	ActionMessage.cpp
-	core-broker.cpp
+	CoreBroker.cpp
 	TestBroker.cpp
 	core-data.cpp
 	
@@ -29,15 +30,16 @@ set (ZMQ_SOURCE_FILES
 set(INCLUDE_FILES
     core-c.h
     core-data.h
-    core-factory.h
+    CoreFactory.h
+	BrokerFactory.h
 	core-exceptions.h
     core.h
     core-types.h
     helics-time.h
-    test-core.h
-	core-broker.h
+    TestCore.h
+	CoreBroker.h
 	ActionMessage.h
-	core-common.h
+	CommonCore.h
     mpi/mpi-core.h
     
 	FederateState.h

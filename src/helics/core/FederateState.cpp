@@ -266,7 +266,7 @@ std::unique_ptr<Message> FederateState::receive (Core::Handle handle_)
 }
 
 
-std::pair<Core::Handle, std::unique_ptr<Message>> FederateState::receive ()
+ std::unique_ptr<Message> FederateState::receiveAny (Core::Handle &id)
 {
     Time earliest_time = Time::maxVal ();
     EndpointInfo *endpointI = nullptr;
@@ -285,13 +285,14 @@ std::pair<Core::Handle, std::unique_ptr<Message>> FederateState::receive ()
     if (earliest_time<=time_granted)
     {
         auto result = endpointI->getMessage(time_granted);
-       
-		return{ endpointI->id, std::move(result) };
+		id = endpointI->id;
+		return result;
     }
-    return {invalid_Handle, nullptr};
+	id = invalid_Handle;
+    return nullptr;
 }
 
-std::pair<Core::Handle, std::unique_ptr<Message>> FederateState::receiveForFilter()
+std::unique_ptr<Message> FederateState::receiveForFilter(Core::Handle &id)
 {
 	Time earliest_time = Time::maxVal();
 	FilterInfo *filterI = nullptr;
@@ -310,10 +311,11 @@ std::pair<Core::Handle, std::unique_ptr<Message>> FederateState::receiveForFilte
 	if (earliest_time <= time_granted)
 	{
 		auto result = filterI->getMessage(time_granted);
-
-		return{ filterI->id, std::move(result) };
+		id = filterI->id;
+		return result;
 	}
-	return{ invalid_Handle, nullptr };
+	id = invalid_Handle;
+	return nullptr;
 }
 
 
@@ -340,30 +342,64 @@ bool FederateState::processQueue ()
 			}
 			else if (grant == 2)
 			{
-				//send a time granted message
+				//TODO: send a time granted message
+				setState(HELICS_EXECUTING);
 				return true;
 			}
 		}
             break;
+		case CMD_EXEC_CHECK:  //just check the time for entry
+		{
+			auto grant = checkExecEntry();
+			if (grant == 1)
+			{
+				return false;
+			}
+			else if (grant == 2)
+			{
+				//TODO: send a time granted message
+				setState(HELICS_EXECUTING);
+				return true;
+			}
+		}
+		break;
         case CMD_STOP:
-        case CMD_BYE:
-			setState(HELICS_FINISHED);
-            return false;
+        case CMD_DISCONNECT:
+			if (cmd.dest_id == global_id)
+			{
+				setState(HELICS_FINISHED);
+				return false;
+			}
+			break;
         case CMD_TIME_REQUEST:
         case CMD_TIME_GRANT:
 		{
 			auto update = processExternalTimeMessage(cmd);
 			if (update == 1)
 			{
-				// send an update externally
+				//TODO: send an update externally
 			}
 			else if (update == 2)
 			{
-				//send a time granted message
+				//TODO: send a time granted message
 				return true;
 			}
 		}
             break;
+		case CMD_TIME_CHECK:
+		{
+			auto update = updateTimeFactors();
+			if (update == 1)
+			{
+				//TODO: send an update externally
+			}
+			else if (update == 2)
+			{
+				//TODO: send a time granted message
+				return true;
+			}
+		}
+		break;
         case CMD_SEND_MESSAGE:
         {
             auto epi = getEndpoint (cmd.dest_handle);

@@ -71,19 +71,21 @@ public:
 	enum action_t : int32_t
 	{
 		cmd_ignore = 0,
-		cmd_connect=2,  //!< for a broker to connect with a higher level broker
+		
 		cmd_disconnect=3, //!< command to disconnect a broker from a higher level broker
 		cmd_init=5,	//!< request entry to init mode
 		cmd_init_grant=7, //!< grant entry to initialization mode
 		cmd_init_not_ready=8,  //!< retract an init ready command
 		cmd_exec_request=9, //!< request an iteration or entry to execution mode
 		cmd_exec_grant=10,	//!< grant entry to exec mode or iterate
+		cmd_exec_check=12,  //!< command to run a check on execution entry
 		cmd_register_route=15, //!< instructions to create a direct route to another federate
 		cmd_stop=20, //!< halt execution
 		cmd_fed_ack=25,  //!<a reply with the global id or an error if the fed registration failed
 		cmd_broker_ack=27,  //a reply to the connect command with a global route id
 		cmd_add_route=32,  //!< command to define a route
 		cmd_time_grant=35,	//!< grant a time or iteration
+		cmd_time_check= 36, //!< command to run a check on whether time can be granted
 		cmd_pub=45, //!< publish a value
 		cmd_bye=50,  //!< message stating this is the last communication from a federate
 		cmd_log=55,	//!< log a message with the root broker
@@ -99,11 +101,12 @@ public:
 		cmd_send_message = cmd_info_basis + 20,	//!< send a message
 		cmd_send_for_filter = cmd_info_basis + 30,	//!< send a message to be filtered
 
-		cmd_reg_pub = cmd_info_basis + 40,	//!< register a publication
-		cmd_reg_dst = cmd_info_basis + 50,	//!< register a destination filter
-		cmd_reg_sub = cmd_info_basis + 60,	//!< register a subscription
-		cmd_reg_src = cmd_info_basis + 70,	//!< register a source filter
-		cmd_reg_end = cmd_info_basis + 80,	//!< register an endpoint
+		cmd_reg_broker = cmd_info_basis + 40,  //!< for a broker to connect with a higher level broker
+		cmd_reg_pub = cmd_info_basis + 50,	//!< register a publication
+		cmd_reg_dst = cmd_info_basis + 60,	//!< register a destination filter
+		cmd_reg_sub = cmd_info_basis + 70,	//!< register a subscription
+		cmd_reg_src = cmd_info_basis + 80,	//!< register a source filter
+		cmd_reg_end = cmd_info_basis + 90,	//!< register an endpoint
 		
 		
 		
@@ -159,21 +162,25 @@ public:
 	template<class Archive>
 	void save(Archive & ar) const
 	{
-		ar & action_;
-		ar & source_id;
-		ar & source_handle;
-		ar & dest_id;
-		ar & dest_handle;
-		ar & iterationComplete;
-		ar & required;
-		ar & error;
-		ar & flag;
+		ar(action_, source_id, source_handle, dest_id, dest_handle);
+		//ar & action_;
+		//ar & source_id;
+		//ar & source_handle;
+		//ar & dest_id;
+		//ar & dest_handle;
+		ar(iterationComplete, required, error, flag);
+		//ar & iterationComplete;
+		//ar & required;
+		//ar & error;
+		//ar & flag;
 		auto btc = actionTime.getBaseTimeCode();
-		ar & btc;
-		ar & payload;
+		ar(btc, payload);
+		//ar & btc;
+		//ar & payload;
 		if (action_ >= cmd_info_basis)
 		{
-			ar & info_;
+			//ar & info_;
+			ar(info_);
 		}
 
 	}
@@ -181,26 +188,30 @@ public:
 	template<class Archive>
 	void load(Archive & ar)
 	{
-		ar & action_;
-		ar & source_id;
-		ar & source_handle;
-		ar & dest_id;
-		ar & dest_handle;
-		ar & iterationComplete;
-		ar & required;
-		ar & error;
-		ar & flag;
+		ar(action_, source_id, source_handle, dest_id, dest_handle);
+		//ar & action_;
+		//ar & source_id;
+		//ar & source_handle;
+		//ar & dest_id;
+		//ar & dest_handle;
+		ar(iterationComplete, required, error, flag);
+		//ar & iterationComplete;
+		//ar & required;
+		//ar & error;
+		//ar & flag;
 		decltype(actionTime.getBaseTimeCode()) btc;
-		ar & btc;
+		ar(btc, payload);
+		//ar & btc;
 		actionTime.setBaseTimeCode(btc);
-		ar & payload;
+		//ar & payload;
 		if (action_ >= cmd_info_basis)
 		{
 			if (!info_)
 			{
 				info_ = std::make_unique<AdditionalInfo>();
 			}
-			ar & info_;
+			ar(info_);
+			//ar & info_;
 		}
 
 	}
@@ -215,21 +226,22 @@ public:
 
 
 #define CMD_IGNORE ActionMessage::action_t::cmd_ignore
-#define CMD_CONNECT ActionMessage::action_t::cmd_connect
+#define CMD_REG_BROKER ActionMessage::action_t::cmd_reg_broker
 #define CMD_DISCONNECT ActionMessage::action_t::cmd_disconnect
 #define CMD_INIT ActionMessage::action_t::cmd_init
 #define CMD_INIT_NOT_READY ActionMessage::action_t::cmd_init_not_ready
 #define CMD_INIT_GRANT ActionMessage::action_t::cmd_init_grant
 #define CMD_EXEC_REQUEST ActionMessage::action_t::cmd_exec_request
 #define CMD_EXEC_GRANT ActionMessage::action_t::cmd_exec_grant
+#define CMD_EXEC_CHECK ActionMessage::action_t::cmd_exec_check
 #define CMD_REG_ROUTE ActionMessage::action_t::cmd_register_route
 #define CMD_STOP ActionMessage::action_t::cmd_stop
 #define CMD_TIME_REQUEST ActionMessage::action_t::cmd_time_request
 #define CMD_TIME_GRANT ActionMessage::action_t::cmd_time_grant
+#define CMD_TIME_CHECK ActionMessage::action_t::cmd_time_check
 #define CMD_SEND_MESSAGE ActionMessage::action_t::cmd_send_message
 #define CMD_SEND_FOR_FILTER ActionMessage::action_t::cmd_send_for_filter
 #define CMD_PUB ActionMessage::action_t::cmd_pub
-#define CMD_BYE ActionMessage::action_t::cmd_bye
 #define CMD_LOG ActionMessage::action_t::cmd_log
 #define CMD_ERROR ActionMessage::action_t::cmd_error
 #define CMD_REG_PUB ActionMessage::action_t::cmd_reg_pub
@@ -249,6 +261,7 @@ std::unique_ptr<Message> createMessage(const ActionMessage &cmd);
 */
 std::unique_ptr<Message> createMessage(ActionMessage &&cmd);
 
+bool isPriorityCommand(const ActionMessage &command);
 
 
 } //namespace helics

@@ -9,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "helics/common/barrier.hpp"
-#include "helics/core/core-factory.h"
+#include "helics/core/CoreFactory.h"
 #include "helics/core/core-types.h"
 #include "helics/core/core.h"
 

@@ -7,7 +7,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 #include <boost/test/unit_test.hpp>
 
-#include "helics/core/core-factory.h"
+#include "helics/core/CoreFactory.h"
 #include "helics/core/core.h"
 #include "helics/core/core-types.h"
 
@@ -59,8 +59,6 @@ BOOST_AUTO_TEST_CASE(zeromqcore_pubsub_value_test)
 
 	core->enterExecutingState(id);
 	
-	uint64_t update_size = 0;
-
 	core->timeRequest(id, 50.0);
 	std::string str1 = "hello world";
 	core->setValue(pub1, str1.data(), str1.size());

@@ -14,20 +14,23 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <mutex>
 #include <queue>
 #include <string>
+#include <extra_includes/optional.h>
 
 namespace helics {
 
 template<typename T>
 class BlockingQueue {
   public:
+	  /** default constructor*/
 	  BlockingQueue() = default;
 
 	/** DISABLE_COPY_AND_ASSIGN */
 	BlockingQueue(const BlockingQueue&) = delete;
 	BlockingQueue& operator=(const BlockingQueue&) = delete;
 
+	/** push an object onto the queue*/
     void push(const T& t);
-
+	/** construct on object in place on the queue*/
 	template <class... Args>
 	void emplace(Args &&... args)
 	{
@@ -38,17 +41,25 @@ class BlockingQueue {
 		// unlock occurs when we go out of scope, and only in extreme cases
 		// should we not hold the lock before signalling
 	}
-    bool try_pop(T* t);
+	/** try to pop an object from the queue
+	@param[out] t the location in which to place the object
+	@return true if the operation was successful
+	*/
+    stx::optional<T> try_pop();
 
     // This logs a message if the threads needs to be blocked
     // useful for detecting e.g. when data feeding is too slow
     T pop(const std::string& log_on_wait = "");
 
-    bool try_peek(T* t);
+	/** try to peek at an object without popping it from the stack
+	@return an optional object with an objec of type T if available
+	*/
+	stx::optional<T> try_peek() const;
 
-    // Return element without removing it
+    /** Return element without removing it */
     T peek();
 
+	/** get the current size of the queue*/
     size_t size() const;
 
   protected:
@@ -70,16 +81,16 @@ void BlockingQueue<T>::push(const T& t) {
 }
 
 template<typename T>
-bool BlockingQueue<T>::try_pop(T* t) {
+stx::optional<T> BlockingQueue<T>::try_pop() {
   std::lock_guard<std::mutex> lock(mutex_);
 
   if (queue_.empty()) {
-    return false;
+    return{};
   }
 
-  *t = queue_.front();
+  auto t = queue_.front();
   queue_.pop();
-  return true;
+  return t;
 }
 
 template<typename T>
@@ -99,15 +110,15 @@ T BlockingQueue<T>::pop(const std::string& log_on_wait) {
 }
 
 template<typename T>
-bool BlockingQueue<T>::try_peek(T* t) {
+stx::optional<T> BlockingQueue<T>::try_peek() const {
   std::lock_guard<std::mutex> lock(mutex_);
 
   if (queue_.empty()) {
-    return false;
+    return {};
   }
 
-  *t = queue_.front();
-  return true;
+  auto t = queue_.front();
+  return t;
 }
 
 template<typename T>

@@ -7,7 +7,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 #include <boost/test/unit_test.hpp>
 
-#include "helics/core/core-factory.h"
+#include "helics/core/CoreFactory.h"
 #include "helics/core/core.h"
 #include "helics/core/core-types.h"
 
@@ -167,11 +167,12 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_source_test)
 	BOOST_CHECK_EQUAL(core->receiveFilterCount(id), 1u);
 
 	BOOST_CHECK_EQUAL(core->receiveCount(srcFilter), 1u);
-	auto msgAny = core->receiveAnyFilter(id);
-	BOOST_CHECK_EQUAL(msgAny.second->origsrc, "end1");
-	BOOST_CHECK_EQUAL(msgAny.second->src, "end1");
-	msgAny.second->src = srcFilterName.c_str();
-	core->sendMessage(helics::invalid_Handle,std::move(msgAny.second));
+	Core::Handle filter_id;
+	auto msgAny = core->receiveAnyFilter(id,filter_id);
+	BOOST_CHECK_EQUAL(msgAny->origsrc, "end1");
+	BOOST_CHECK_EQUAL(msgAny->src, "end1");
+	msgAny->src = srcFilterName.c_str();
+	core->sendMessage(helics::invalid_Handle,std::move(msgAny));
 
 
 	// Receive the filtered message

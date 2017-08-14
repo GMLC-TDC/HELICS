@@ -13,45 +13,59 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <stdexcept>
 namespace helics
 {
+/** base exception class for helics*/
 class HelicsException : public std::exception
 {
 public:
-	HelicsException() {};
+	HelicsException()=default;
 	
 };
 
+/** exception class indicating that a function has failed for some reason*/
+class functionExecutionFailure : public HelicsException
+{
+public:
+	functionExecutionFailure() = default;
+
+};
+
+/** exception for an invalid identification Handle*/
 class invalidIdentifier : public HelicsException
 {
 public:
-	invalidIdentifier() {};
+	invalidIdentifier()=default;
 
 };
 
+/** exception when one or more of the parameters in the function call were invalid*/
 class invalidParameter : public HelicsException
 {
 public:
-	invalidParameter() {};
+	invalidParameter()=default;
 
 };
 
+/** exception thrown when a function call was made at an innapropriate time*/
 class invalidFunctionCall : public HelicsException
 {
 public:
-	invalidFunctionCall() {};
+	invalidFunctionCall()=default;
 
 };
 
+/** exception indicating that the registration of an object has failed*/
 class registrationFailure : public HelicsException
 {
 public:
-	registrationFailure() {};
+	registrationFailure()=default;
 
 };
 
+/** severe exception indicating helics has terminated*/
 class helicsTerminated : public HelicsException
 {
 public:
-	helicsTerminated() {};
+	helicsTerminated()=default;
 
 };
 }

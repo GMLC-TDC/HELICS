@@ -1,0 +1,196 @@
+/*
+
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+*/
+#include "helics/config.h"
+#include "CoreFactory.h"
+#include "core-types.h"
+
+#if HELICS_HAVE_ZEROMQ
+#include "zmq/zmq-core.h"
+#endif
+
+#if HELICS_HAVE_MPI
+#include "mpi/mpi-core.h"
+#endif
+
+#include "TestCore.h"
+
+#include <cassert>
+
+namespace helics {
+
+std::shared_ptr<Core> CoreFactory::create(helics_core_type type, const std::string &initializationString) {
+
+  std::shared_ptr<Core> core;
+
+  switch(type)
+    {
+    case HELICS_ZMQ:
+      {
+#if HELICS_HAVE_ZEROMQ
+        core = std::make_shared<ZeroMQCore> ();
+#else
+        assert (false);
+#endif
+        break;
+      }
+    case HELICS_MPI:
+      {
+#if HELICS_HAVE_MPI
+        core = std::make_shared<MpiCore> ();
+#else
+        assert (false);
+#endif
+        break;
+      }
+    case HELICS_TEST:
+      {
+        core = std::make_shared<TestCore> ();
+        break;
+      }
+	case HELICS_INTERPROCESS:
+		break;
+    default:
+      assert (false);
+    }
+  core->initialize(initializationString);
+  auto ccore = std::dynamic_pointer_cast<CommonCore>(core);
+  if (ccore)
+  {
+	  registerCore(ccore);
+  }
+  return core;
+}
+
+std::shared_ptr<Core> CoreFactory::create(helics_core_type type,const std::string &core_name, const std::string &initializationString) {
+
+	std::shared_ptr<Core> core;
+
+	switch (type)
+	{
+	case HELICS_ZMQ:
+	{
+#if HELICS_HAVE_ZEROMQ
+		core = std::make_shared<ZeroMQCore>(core_name);
+#else
+		assert(false);
+#endif
+		break;
+	}
+	case HELICS_MPI:
+	{
+#if HELICS_HAVE_MPI
+		core = std::make_shared<MpiCore>(core_name);
+#else
+		assert(false);
+#endif
+		break;
+	}
+	case HELICS_TEST:
+	{
+		core = std::make_shared<TestCore>(core_name);
+		break;
+	}
+	case HELICS_INTERPROCESS:
+		break;
+	default:
+		assert(false);
+	}
+	core->initialize(initializationString);
+	auto ccore = std::dynamic_pointer_cast<CommonCore>(core);
+	if (ccore)
+	{
+		registerCore(ccore);
+	}
+	return core;
+}
+
+
+bool CoreFactory::available (helics_core_type type) {
+
+  bool available = false;
+
+  switch(type)
+    {
+    case HELICS_ZMQ:
+      {
+#if HELICS_HAVE_ZEROMQ
+        available = true;
+#endif
+        break;
+      }
+    case HELICS_MPI:
+      {
+#if HELICS_HAVE_MPI
+        available = true;
+#endif
+        break;
+      }
+    case HELICS_TEST:
+      {
+        available = true;
+        break;
+      }
+	case HELICS_INTERPROCESS:
+	{
+		available = false;
+		break;
+	}
+    default:
+      assert (false);
+    }
+
+  return available;
+}
+
+
+
+static std::map<std::string, std::shared_ptr<CommonCore>> CoreMap;
+
+static std::mutex mapLock;  //!<lock for the broker and core maps
+
+std::shared_ptr<CommonCore> findCore(const std::string &name)
+{
+	std::lock_guard<std::mutex> lock(mapLock);
+	auto fnd = CoreMap.find(name);
+	if (fnd != CoreMap.end())
+	{
+		return fnd->second;
+	}
+	return nullptr;
+}
+
+bool registerCore(std::shared_ptr<CommonCore> tcore)
+{
+	std::lock_guard<std::mutex> lock(mapLock);
+	auto res = CoreMap.emplace(tcore->getIdentifier(), std::move(tcore));
+	return res.second;
+}
+
+
+
+void unregisterCore(const std::string &name)
+{
+	std::lock_guard<std::mutex> lock(mapLock);
+	auto fnd = CoreMap.find(name);
+	if (fnd != CoreMap.end())
+	{
+		CoreMap.erase(fnd);
+		return;
+	}
+	for (auto core = CoreMap.begin(); core != CoreMap.end(); ++core)
+	{
+		if (core->second->getIdentifier() == name)
+		{
+			CoreMap.erase(core);
+			return;
+		}
+	}
+}
+} // namespace 
+

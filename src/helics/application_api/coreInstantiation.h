@@ -19,6 +19,7 @@ enum class core_types
 	default_core,  //!< automatic selection
 	zmq_core,	//!< use the zmq_core type
 	mpi_core,	//!< use the mpi_core type
+	ipc_core,	//!< core for interprocess communication
 	test_core,  //!< use the test_core type
 };
 
@@ -30,7 +31,7 @@ namespace helics
 }
 
 /** initialize a named core interface
-@param[in] name  the name of the core interface -leave empty for the default
+@param[in] name  the name of the core interface -leave empty for the default  used a value arguments since it is potentially modified inside the function if it is empty
 @param[in] type the type of core to create  either core_types::zmq_core for a zmq based core
 or core_types::mpi_core for the mpi based core using core_types::default lets the system pick
 @param[in] initialization_string  a string of arguments for the core initialization

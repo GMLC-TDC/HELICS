@@ -8,24 +8,24 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "TestBroker.h"
+
 #include "TestCore.h"
 #include "BrokerFactory.h"
 #include "CoreFactory.h"
-
+#include "CoreBroker.h"
+#include "ActionMessage.h"
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
 namespace helics
 {
+using federate_id_t = Core::federate_id_t;
+using Handle = Core::Handle;
 
-TestBroker::TestBroker(bool rootBroker) noexcept:CoreBroker(rootBroker)
+TestCore::TestCore(const std::string &core_name) :CommonCore(core_name)
 {}
 
-TestBroker::TestBroker(const std::string &broker_name) :CoreBroker(broker_name)
-{}
-
-TestBroker::TestBroker (std::shared_ptr<TestBroker> nbroker) : tbroker (std::move (nbroker)) {}
+TestCore::TestCore (std::shared_ptr<CoreBroker> nbroker) : tbroker (std::move (nbroker)) {}
 
 static void argumentParser (int argc, char *argv[], boost::program_options::variables_map &vm_map)
 {
@@ -56,6 +56,8 @@ static void argumentParser (int argc, char *argv[], boost::program_options::vari
     config_file.add (config);
     visible.add (cmd_only).add (config);
 
+    // po::positional_options_description p;
+    // p.add("input", -1);
 
     po::variables_map cmd_vm;
     try
@@ -102,7 +104,7 @@ static void argumentParser (int argc, char *argv[], boost::program_options::vari
 }
 
 
-void TestBroker::InitializeFromArgs (int argc, char *argv[])
+void TestCore::initializeFromArgs (int argc, char *argv[])
 {
     namespace po = boost::program_options;
     if (!_initialized)
@@ -114,65 +116,49 @@ void TestBroker::InitializeFromArgs (int argc, char *argv[])
         {
             brokerName = vm["broker"].as<std::string> ();
         }
-      
-        if (vm.count ("brokerinit") > 0)
-        {
-			brokerInitString=vm["brokerinit"].as<std::string> ();
-        }
-        CoreBroker::InitializeFromArgs (argc, argv);
-       
-		
-    };
+			if (vm.count("brokerinit") > 0)
+			{
+				brokerInitString=vm["brokerinit"].as<std::string>();
+			}
+        CommonCore::initializeFromArgs (argc, argv);
+
+    }
 }
 
-
-bool TestBroker::brokerConnect()
+bool TestCore::brokerConnect()
 {
 	if (!tbroker)
 	{
-		if (_isRoot)
+		tbroker = findBroker(brokerName);
+		if (!tbroker)
 		{
-			return true;
-		}
-		if ((brokerName.empty()) && (brokerInitString.empty()))
-		{
-			_isRoot = true;
-			return true;
-		}
-		else
-		{
-			tbroker = findBroker(brokerName);
-			if (!tbroker)
-			{
-				tbroker = BrokerFactory::create(helics_core_type::HELICS_TEST, brokerName, brokerInitString);
-			}
+			tbroker = BrokerFactory::create(helics_core_type::HELICS_TEST, brokerName, brokerInitString);
 		}
 		
 	}
-
+	if (tbroker)
+	{
+		tbroker->connect();
+	}
 	return static_cast<bool>(tbroker);
 }
 
-void TestBroker::brokerDisconnect()
+void TestCore::brokerDisconnect()
 {
-	if (!_isRoot)
-	{
-		tbroker = nullptr;
-	}
+	tbroker = nullptr;
 }
 
-void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
+TestCore::~TestCore () = default;
+
+void TestCore::transmit (int route_id, const ActionMessage &cmd)
 {
-    if ((!_isRoot) && (route_id == 0))
+    if (route_id == 0)
     {
-		
         tbroker->addMessage (cmd);
         return;
     }
-    // only activate the lock if we not in an operating state
     auto lock = (_operating) ? std::unique_lock<std::mutex> (routeMutex, std::defer_lock) :
                                std::unique_lock<std::mutex> (routeMutex);
-
     auto brkfnd = brokerRoutes.find (route_id);
     if (brkfnd != brokerRoutes.end ())
     {
@@ -186,13 +172,10 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
         return;
     }
 
-    if (!_isRoot)
-    {
-        tbroker->addMessage (cmd);
-    }
+    tbroker->addMessage (cmd);
 }
 
-void TestBroker::addRoute (int route_id, const std::string &routeInfo)
+void TestCore::addRoute (int route_id, const std::string &routeInfo)
 {
     auto brk = findBroker (routeInfo);
     if (brk)
@@ -212,9 +195,35 @@ void TestBroker::addRoute (int route_id, const std::string &routeInfo)
 }
 
 
-std::string TestBroker::getAddress() const
+std::string TestCore::getAddress() const
 {
 	return getIdentifier();
 }
+
+/*
+void TestCore::computeDependencies()
+{
+    for (auto &fed : _federates)
+    {
+        fed->generateKnownDependencies();
+    }
+    //TODO:: work in the additional rules for endpoints to reduce dependencies
+    for (auto &fed : _federates)
+    {
+        if (fed->hasEndpoints)
+        {
+            for (auto &fedD : _federates)
+            {
+                if (fedD->hasEndpoints)
+                {
+                    fed->addDependency(fedD->id);
+                    fedD->addDependent(fed->id);
+                }
+            }
+        }
+    }
+}
+
+*/
 
 }  // namespace helics

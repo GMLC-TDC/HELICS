@@ -199,4 +199,20 @@ std::unique_ptr<Message> createMessage(ActionMessage &&cmd)
 	return msg;
 }
 
+
+bool isPriorityCommand(const ActionMessage &command)
+{
+	switch (command.action())
+	{
+	case CMD_REG_BROKER:
+	case CMD_REG_ROUTE:
+	case CMD_REG_FED:
+	case CMD_FED_ACK:
+	case CMD_BROKER_ACK:
+		//case CMD_ROUTE_ACK:
+		return true;
+	default:
+		return false;
+	}
+}
 }

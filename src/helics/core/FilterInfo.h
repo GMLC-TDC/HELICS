@@ -25,6 +25,7 @@ namespace helics {
 class FilterInfo
 {
 public:
+	/** constructor from all fields*/
 	FilterInfo(Core::Handle id_,Core::federate_id_t fed_id_,
 		const std::string &key_,
 		const std::string &type_,
@@ -45,6 +46,7 @@ public:
 	std::string type;	//!< the type of data for the filter
 	bool has_update = false;	//!< indicator that the filter has updates
 	bool dest_filter = false;	//! indicator that the filter is a destination filter
+	// there is a 6 byte gap here
 	std::shared_ptr<FilterOperator> filterOp;	//!< the callback operation of the filter
 	std::string filterTarget;	//!< the target endpoint name of the filter
 	std::pair<Core::federate_id_t, Core::Handle> target;	//!< the actual target information for the filter

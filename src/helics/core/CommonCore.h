@@ -12,14 +12,13 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/config.h"
 #include "helics-time.h"
 #include "helics/common/blocking_queue.h"
+#include "helics/common/simpleQueue.hpp"
 #include "helics/core/core.h"
 #include "core/ActionMessage.h"
 
-#include <cstdint>
-#include <mutex> 
+#include <cstdint> 
 #include <thread> 
 #include <utility> 
-#include <vector> 
 #include <atomic>
 #include <map>
 #include <unordered_map>
@@ -34,11 +33,17 @@ class FilterFunctions;
 
 enum BasicHandleType:char;
 
+/** base class implementing a standard interaction strategy between federates
+@details the CommonCore is virtual class that manages local federates and handles most of the
+interaction between federate it is meant to be instantiated for specific interfederate communication
+strategies*/
 class CommonCore : public Core {
 
 public:
 	/** default constructor*/
 CommonCore() noexcept;
+/** construct from a core name*/
+CommonCore(const std::string &core_name);
 /** virtual destructor*/
   virtual ~CommonCore();
   virtual void initialize (const std::string &initializationString) override final;
@@ -83,32 +88,47 @@ CommonCore() noexcept;
   virtual void sendMessage (Handle sourceHandle, std::unique_ptr<Message> message) override;
   virtual uint64_t receiveCount (Handle destination) override;
   virtual std::unique_ptr<Message> receive (Handle destination) override;
-  virtual std::pair<const Handle, std::unique_ptr<Message>> receiveAny (federate_id_t federateId) override;
+  virtual std::unique_ptr<Message> receiveAny (federate_id_t federateId, Handle &endpoint_id) override;
   virtual uint64_t receiveCountAny (federate_id_t federateId) override;
   virtual void logMessage(federate_id_t federateId, int logCode, const std::string &logMessage) override;
   virtual void setFilterOperator(Handle filter, std::shared_ptr<FilterOperator> callback) override;
 
   virtual uint64_t receiveFilterCount(federate_id_t federateID) override;
 
-  virtual std::pair<const Handle, std::unique_ptr<Message>> receiveAnyFilter(federate_id_t federateID) override;
+  virtual std::unique_ptr<Message> receiveAnyFilter(federate_id_t federateID, Handle &filter_id) override;
   /** set the local identification for the core*/
   void setIdentifier(const std::string &name);
   /** get the local identifier for the core*/
-  const std::string &getIdentifier() const
+  const std::string &getIdentifier() const override final
   {
 	  return identifier;
   }
+  /** get a string representing the connection info to send data to this object*/
+  virtual std::string getAddress() const=0;
   /** add a command to the process queue*/
-  virtual void addCommand(const ActionMessage &m)
-  {
-	  _queue.push(m);
-  }
+  virtual void addCommand(const ActionMessage &m);
+ virtual bool connect() override final;
+ virtual bool isConnected() const override final;
+ virtual void disconnect() override final;
+private:
+	/** implementation details of the connection process
+	*/
+	virtual bool brokerConnect()=0;
+	/** implementation details of the disconnection process
+	*/
+	virtual void brokerDisconnect() = 0;
 protected:
 	/** start main broker loop*/
-  void broker();
+  void queueProcessingLoop();
   /** process a single command action
   @details cmd may be modified by this function*/
   virtual void processCommand(ActionMessage &cmd);
+  /** function to process a priority command independent of the main queue
+  @detailed called from addMessage function which detects if the command is a priority command
+  this mainly deals with some of the registration functions
+  @param[in] command the command to process
+  */
+  void processPriorityCommand(const ActionMessage &command);
   /** transit an ActionMessage to another core or broker
   @param route_id the identifier for the route information to send the message to
   @param[in] cmd the actionMessage to send*/
@@ -131,35 +151,41 @@ protected:
   FilterFunctions *getFilterFunctions(Handle id_);
   /** check if all federates managed by the core are ready to enter initialization state*/
   bool allInitReady() const;
+  /** check if all federates have said good-bye*/
+  bool allDisconnected() const;
 private:
-	int32_t global_broker_id;  //!< the identifier for the broker
-	std::string identifier;  //!< a randomly generated string for initial identification of the broker
+	std::atomic<int32_t> global_broker_id{ 0 };  //!< global identifier for the broker
+	std::string identifier;  //!< an identifier for the broker
+	std::string prevIdentifier;  //!< storage for the case of requiring a renaming
 	BlockingQueue<ActionMessage> _queue; //!< primary routing queue
 	std::map<Core::federate_id_t, Core::federate_id_t> global_id_translation; //!< map to translate global ids to local ones
 	std::map<Core::federate_id_t, int32_t> routing_table;  //!< map for external routes  <global federate id, route id>
+	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delays for a certain time
 	std::unordered_map<std::string, int32_t> knownExternalEndpoints; //!< external map for all known external endpoints with names and route
+	
+	void transmitDelayedMessages();
 protected:
-  std::atomic<bool> _operating; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
+	std::atomic<bool> _operating{ false }; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
   std::vector<std::unique_ptr<FederateState>> _federates; //!< local federate information
   std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
   int32_t _min_federates;  //!< the minimum number of federates that must connect before entering init mode
   int32_t _max_iterations; //!< the maximum allowable number of iterations
-
-  std::thread _broker_thread;	//!< thread for the broker loop
-  int32_t _global_federation_size;  //!< total size of the federation
+  std::atomic<bool> _connected{ false };  //!<indicator that the core has been connected
+  std::thread _queue_processing_thread;	//!< thread for processing the queue
+  int32_t _global_federation_size=0;  //!< total size of the federation
   std::atomic<Core::Handle> handleCounter{ 1 };	//!< counter for the handle index
   
   std::unordered_map<std::string, Handle> publications;	//!< map of all local publications
   std::unordered_map<std::string, Handle> endpoints;	//!< map of all local endpoints
-  std::atomic<bool> _initialized;  //!< indicator that the structure has been initialized
+  std::atomic<bool> _initialized{ false };  //!< indicator that the structure has been initialized
   std::map<Handle, std::unique_ptr<FilterFunctions>> filters; //!< map of all filters
  private:
-  mutable std::mutex _mutex;
+  mutable std::mutex _mutex; //!< mutex protecting the federate and handle structures
 
 protected:
 	/** add a message to the queue*/
 	void queueMessage(ActionMessage &m);
-  /** function to deal with an source filters*/
+  /** function to deal with a source filters*/
   ActionMessage &processMessage(BasicHandleInfo *hndl, ActionMessage &m);
   void createBasicHandle(Handle id_, federate_id_t federateId, BasicHandleType HandleType, const std::string &key, const std::string &type, const std::string &units, bool required);
 
@@ -172,7 +198,6 @@ protected:
   @return 0 if unknown, otherwise returns the route_id*/
   int32_t getRoute(Core::federate_id_t global_id) const;
 };
-
 
 
 } // namespace helics

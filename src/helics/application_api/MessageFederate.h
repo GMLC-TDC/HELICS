@@ -32,15 +32,17 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
 	@param[in] jsonString can be either a json file or a string containing json code
 	*/
 	MessageFederate(const std::string &jsonString);
-
+	/** move constructor*/
 	MessageFederate(MessageFederate &&mFed) noexcept;
+	/** default constructor*/
     MessageFederate ();
 	/** special constructor should only be used by child classes in constructor due to virtual inheritance*/
 	MessageFederate(bool res);
+	//copy constructor and copy assignment are disabled
 public:
     /** destructor */
     ~MessageFederate ();
-
+	/** move assignement*/
 	MessageFederate &operator= (MessageFederate &&mFed) noexcept;
   protected:
     virtual void StartupToInitializeStateTransition () override;
@@ -86,7 +88,7 @@ public:
 	*/
 	uint64_t receiveCount(endpoint_id_t id) const;
 	/**
-	* Returns the number of pending receives for the specified destination endpoint.
+	* Returns the number of pending receives for all endpoints.
 	*/
 	uint64_t receiveCount() const;
     /** receive a packet from a particular endpoint
@@ -94,9 +96,9 @@ public:
     @return a message object*/
 	std::unique_ptr<Message> getMessage (endpoint_id_t endpoint);
     /** receive a communication message for any endpoint in the federate
-    @details the return order will in order of endpoint creation then order of arrival
+    @details the return order will be in order of endpoint creation then order of arrival
     all messages for the first endpoint, then all for the second, and so on
-    @return a Message_view object containing the message data*/
+    @return a unique_ptr to a Message object containing the message data*/
 	std::unique_ptr<Message> getMessage ();
 
     /** send a message

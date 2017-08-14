@@ -21,10 +21,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <cstring>
 #include <sstream>
 
-#include <boost/lexical_cast.hpp>
-#include <boost/uuid/uuid.hpp>            // uuid class
-#include <boost/uuid/uuid_generators.hpp> // generators
-#include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
+
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -46,16 +43,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 static const std::string DEFAULT_BROKER = "tcp://localhost:5555";
 
-static inline std::string gen_id() {
-    boost::uuids::uuid uuid = boost::uuids::random_generator()();
-		std::string uuid_str = boost::lexical_cast<std::string>(uuid);
-#ifdef _WIN32
-    std::string pid_str = boost::lexical_cast<std::string>(GetCurrentProcessId());
-#else
-    std::string pid_str = boost::lexical_cast<std::string>(getpid());
-#endif
-    return pid_str+"-"+uuid_str;
-}
+
 
 namespace helics
 {
@@ -141,6 +129,8 @@ static void argumentParser(int argc, char *argv[], boost::program_options::varia
 }
 
 
+ZeroMQCore::ZeroMQCore(const std::string &core_name) :CommonCore(core_name) {}
+
 void ZeroMQCore::initializeFromArgs(int argc, char *argv[])
 {
 	namespace po = boost::program_options;
@@ -163,7 +153,15 @@ void ZeroMQCore::initializeFromArgs(int argc, char *argv[])
 	}
 }
 
+bool ZeroMQCore::brokerConnect()
+{
+	return true;
+}
 
+void ZeroMQCore::brokerDisconnect()
+{
+	
+}
 
 void ZeroMQCore::transmit(int route_id, const ActionMessage &cmd)
 {
@@ -175,4 +173,9 @@ void ZeroMQCore::addRoute(int route_id, const std::string &routeInfo)
 
 }
 
+
+std::string ZeroMQCore::getAddress() const
+{
+	return "";
+}
 }  // namespace helics

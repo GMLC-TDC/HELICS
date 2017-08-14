@@ -11,7 +11,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 
-#include "core-common.h"
+#include "CommonCore.h"
 #include "helics-time.h"
 #include "helics/config.h"
 #include "helics/common/blocking_queue.h"
@@ -43,15 +43,16 @@ class CommonCore;
 class DependencyInfo
 {
 public:
-	Core::federate_id_t fedID;
-	bool grant=false;
-	bool converged=false;
-	bool exec_requested = false;
+	Core::federate_id_t fedID;  //!< identifier for the dependent federate
+	bool grant=false;	//!< whether time has been granted
+	bool converged=false;	//!< whether it is currently converged
+	bool exec_requested = false;	//!< whether execution state has been granted
 	Time Tnext=timeZero;  //!<next time computation
 	Time Te=timeZero;		//!< executation time computation
 	Time Tdemin=timeZero;	//!< min dependency event time
-	
+	/** default constructor*/
 	DependencyInfo() = default;
+	/** construct from a federate id*/
 	DependencyInfo(Core::federate_id_t id) :fedID(id) {};
 };
 
@@ -59,6 +60,7 @@ public:
 class FederateState
 {
 public:
+	/** constructor from name and information structure*/
 	FederateState(const std::string &name_, const CoreFederateInfo &info_)
 		: name(name_),info(info_)
 	{
@@ -74,7 +76,7 @@ private:
 	std::atomic<helics_federate_state_type> state{ HELICS_NONE };	//!< the current state of the federate
 	std::map<std::string, SubscriptionInfo *> subNames;	//!< translate names to subscriptions
 	std::map<std::string, PublicationInfo *> pubNames;	//!< translate names to publications
-	std::map<std::string, EndpointInfo *> epNames;	//!< translat names to endpoints
+	std::map<std::string, EndpointInfo *> epNames;	//!< translate names to endpoints
 	std::map<std::string, FilterInfo *> filterNames;	//!< translate names to filterObjects
 	std::vector<std::unique_ptr<SubscriptionInfo>> subscriptions;	//!< storage for all the subscriptions
 	std::vector<std::unique_ptr<PublicationInfo>> publications;	//!< storage for all the publications
@@ -83,26 +85,27 @@ private:
 
 	CommonCore *parent_=nullptr;  //!< pointer to the higher level;  
 public:
+	std::atomic<bool> init_requested{ false }; //!< this federate has requested entry to initialization
+	bool processing = false;	//!< the federate is processing
+	bool iterating = false;	//!< the federate is iterating at a timestep
+	bool hasEndpoints = false;	//!< the federate has endpoints
 	BlockingQueue<ActionMessage> queue; //!< processing queue for messages incoming to a federate
 
 private:
 	std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time
 public:
-	bool init_requested = true; //!< this federate has requested entry to initialization
-	bool processing = false;	//!< the federate is processing
-	bool iterating = false;	//!< the federate is iterating at a timestep
-	bool hasEndpoints = false;	//!< the federate has endpoints
-	std::atomic<int> iteration{ 0 };  //!< iteration counter
+	
 	Time time_granted = timeZero;	//!< the most recent time granted
 	Time time_requested = timeZero;	//!< the most recent time requested
 	Time time_next = timeZero;	//!< the next time to process
 	Time time_minDe = timeZero;	//!< the minimum dependent event
 	Time time_minTe = timeZero;	//!< the minimum event time
 	Time time_event = timeZero;	//!< the time of the next processing event
-	std::uint64_t max_iterations = 3;  //!< the maximum allowable number of iterations
+	std::atomic<int> iteration{ 0 };  //!< iteration counter
+	std::uint32_t max_iterations = 3;  //!< the maximum allowable number of iterations
 	std::vector<Core::Handle> events;	//!< list of events to process
 	std::map<Core::Handle, std::vector<std::unique_ptr<Message>>> message_queue; //structure of message queues
-	mutable std::mutex _mutex;
+	mutable std::mutex _mutex; //!< the mutex protecting the fed state
 
 	std::vector<DependencyInfo> dependencies;  //federates which this Federate is temporally dependent on
 	std::vector<Core::federate_id_t> dependents;	//federates which temporally depend on this federate
@@ -150,8 +153,12 @@ public:
 	uint64_t getQueueSize() const;
 	uint64_t getFilterQueueSize() const;
 	std::unique_ptr<Message> receive(Core::Handle id);
-	std::pair<Core::Handle, std::unique_ptr<Message>> receive();
-	std::pair<Core::Handle, std::unique_ptr<Message>> receiveForFilter();
+	/** get any message ready for reception
+	@param[out] id the the endpoint related to the message*/
+	std::unique_ptr<Message> receiveAny(Core::Handle &id);
+	/** get any message ready for processing by a filter
+	@param[out] id the the filter related to the message*/
+	std::unique_ptr<Message> receiveForFilter(Core::Handle &id);
 	/** process the federate queue until returnable event
 	@details processQueue will process messages until one of 3 things occur
 	1.  the init state has been entered

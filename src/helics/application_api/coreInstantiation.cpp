@@ -8,7 +8,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 
 #include "coreInstantiation.h"
-#include "helics/core/core-factory.h"
+#include "helics/core/CoreFactory.h"
 #include "helics/core/core.h"
 #include <map>
 #include <mutex>
@@ -18,6 +18,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 static std::map<std::string, std::weak_ptr<helics::Core>> availableCores;
 /** map of the types of the named cores*/
 static std::map<std::string, helics_core_type> namedCoreType;
+
+/** map of synonyms for core names*/
+static std::map<std::string, std::string> core_pairs;
 /** we expect operations on core object that modify the map to be rare but we absolutely need them to be thread
  safe so we are going to use a lock that is entirely controlled by this file*/
 static std::mutex mapLock;
@@ -32,6 +35,8 @@ helics_core_type gethcType (core_types type)
         return HELICS_MPI;
     case core_types::test_core:
         return HELICS_TEST;
+	case core_types::ipc_core:
+		return HELICS_INTERPROCESS;
     case core_types::zmq_core:
     default:
         return HELICS_ZMQ;
@@ -48,6 +53,8 @@ std::string helicsTypeString (helics_core_type type)
         return "_test";
     case HELICS_ZMQ:
         return "_zmq";
+	case HELICS_INTERPROCESS:
+		return "_ipc";
     default:
         return "";
     }
@@ -67,6 +74,10 @@ core_types coreTypeFromString (const std::string &type)
     {
         return core_types::zmq_core;
     }
+	else if ((type == "interprocess") || (type == "ipc"))
+	{
+		return core_types::ipc_core;
+	}
     else if ((type == "test") || (type == "test1")||(type=="local"))
     {
         return core_types::test_core;
@@ -83,9 +94,9 @@ initializeCore (std::string name, core_types type, const std::string &initializa
         {
             type = core_types::zmq_core;
         }
-        else if (helics::CoreFactory::available (HELICS_MPI))
+        else if (helics::CoreFactory::available (HELICS_INTERPROCESS))
         {
-            type = core_types::mpi_core;
+            type = core_types::ipc_core;
         }
         else
         {
@@ -105,8 +116,7 @@ initializeCore (std::string name, core_types type, const std::string &initializa
     {
         if (helics::CoreFactory::available (hctype))
         {
-            auto newCore =
-              std::shared_ptr<helics::Core> (helics::CoreFactory::create (hctype, initialization_string.c_str ()));
+            auto newCore =helics::CoreFactory::create (hctype, initialization_string.c_str ());
             availableCores.emplace (name, newCore);
             namedCoreType.emplace (name, hctype);
 			if (emptyNameFlag)
@@ -117,6 +127,13 @@ initializeCore (std::string name, core_types type, const std::string &initializa
 					availableCores.emplace("", newCore);
 					namedCoreType.emplace("", hctype);
 				}
+			}
+			newCore->connect();
+			if (name != newCore->getIdentifier())
+			{
+				availableCores.emplace(newCore->getIdentifier(), newCore);
+				core_pairs.emplace(newCore->getIdentifier(), name);
+				core_pairs.emplace(name, newCore->getIdentifier());
 			}
             return newCore;
         }
@@ -132,9 +149,15 @@ initializeCore (std::string name, core_types type, const std::string &initializa
             availableCores.erase (fnd);  // erase the expired version
                                          // make a new one that is not expired
             auto cType = namedCoreType[name];
-            auto newCore =
-              std::shared_ptr<helics::Core> (helics::CoreFactory::create (cType, initialization_string.c_str ()));
+            auto newCore =helics::CoreFactory::create (cType, name,initialization_string.c_str ());
             availableCores.emplace (name, newCore);
+			newCore->connect();
+			if (name != newCore->getIdentifier())
+			{
+				availableCores.emplace(newCore->getIdentifier(), newCore);
+				core_pairs.emplace(newCore->getIdentifier(), name);
+				core_pairs.emplace(name, newCore->getIdentifier());
+			}
             return newCore;
         }
         else
@@ -147,9 +170,15 @@ initializeCore (std::string name, core_types type, const std::string &initializa
             {
                 availableCores.erase (fnd);  // erase the expired version
                                              // make a new one that is not expired
-                auto newCore = std::shared_ptr<helics::Core> (
-                  helics::CoreFactory::create (hctype, initialization_string.c_str ()));
+                auto newCore = helics::CoreFactory::create (hctype,name, initialization_string.c_str ());
                 availableCores.emplace (name, newCore);
+				newCore->connect();
+				if (name != newCore->getIdentifier())
+				{
+					availableCores.emplace(newCore->getIdentifier(), newCore);
+					core_pairs.emplace(newCore->getIdentifier(), name);
+					core_pairs.emplace(name, newCore->getIdentifier());
+				}
                 return newCore;
             }
         }
@@ -172,8 +201,16 @@ bool isAvailable (const std::string &name)
 */
 std::shared_ptr<helics::Core> getCore (const std::string &name)
 {
-    std::lock_guard<std::mutex> corelock (
-      mapLock);  // just to ensure that nothing funny happens if you try to get a core
+	std::unique_lock<std::mutex> corelock(
+		mapLock);  // just to ensure that nothing funny happens if you try to get a core
+	if (name.empty())
+	{
+		auto cType = namedCoreType[name];
+		auto tString = helicsTypeString(cType);
+		corelock.unlock();
+		return getCore(tString);
+	}
+   
     // while it is being constructed
     auto fnd = availableCores.find (name);
     if (fnd != availableCores.end ())
@@ -184,7 +221,7 @@ std::shared_ptr<helics::Core> getCore (const std::string &name)
         }
         catch (const std::bad_weak_ptr &)
         {
-            return std::shared_ptr<helics::Core> ();
+            return nullptr;
         }
     }
     else
@@ -195,28 +232,42 @@ std::shared_ptr<helics::Core> getCore (const std::string &name)
 
 /** close the named core interface for new Federates
 @details this does not destroy the core for Federates that are already using it, only removes its ability to accept
-new federates
+new federates through this interface
 */
 void closeCore(const std::string &name)
 {
-	std::lock_guard<std::mutex> corelock(mapLock);
+	std::unique_lock<std::mutex> corelock(mapLock);
+	if (name.empty())
+	{
+		auto cType = namedCoreType[name];
+		auto tString = helicsTypeString(cType);
+		corelock.unlock();
+		//must be unlocked for the recursive call
+		closeCore(tString);
+		corelock.lock();
+		namedCoreType.erase(name);
+	}
+
 	auto fnd = availableCores.find(name);
 	if (fnd != availableCores.end())
 	{
 		availableCores.erase(fnd);
-		if (name.empty())
+		auto syn = core_pairs.find(name);
+		if (syn != core_pairs.end())
 		{
-			auto cType = namedCoreType[name];
-			auto tString = helicsTypeString(cType);
-			auto fnd2 = availableCores.find(tString);
-			if (fnd2 != availableCores.end())
-			{
-				availableCores.erase(fnd2);
-				namedCoreType.erase(tString);
-			}
-			namedCoreType.erase(name);
+			corelock.unlock();
+			//must be unlocked for the recursive call
+			closeCore(syn->second);
+			corelock.lock();
+			core_pairs.erase(syn);
 		}
+		
 
+	}
+	else  //not listed probably means the name changed somehow
+	{
+		
+		
 	}
 
 }

@@ -8,7 +8,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/core/core-common.h"
+#include "CommonCore.h"
 #include "ActionMessage.h"
 #include "BasicHandleInfo.h"
 #include "EndpointInfo.h"
@@ -22,6 +22,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "FilterFunctions.h"
 #include "helics/core/core-exceptions.h"
+#include "CoreFactory.h"
 
 #include <algorithm>
 #include <boost/program_options.hpp>
@@ -30,6 +31,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <fstream>
 #include <sstream>
 
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid.hpp>            // uuid class
+#include <boost/uuid/uuid_generators.hpp> // generators
+#include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
 
 #define USE_LOGGING 1
 #if USE_LOGGING
@@ -45,15 +50,32 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define ENDL std::endl
 #endif
 
+static inline std::string gen_id() {
+	boost::uuids::uuid uuid = boost::uuids::random_generator()();
+	std::string uuid_str = boost::lexical_cast<std::string>(uuid);
+#ifdef _WIN32
+	std::string pid_str = boost::lexical_cast<std::string>(GetCurrentProcessId());
+#else
+	std::string pid_str = boost::lexical_cast<std::string>(getpid());
+#endif
+	return pid_str + "-" + uuid_str;
+}
+
 namespace helics
 {
 using federate_id_t = Core::federate_id_t;
 using Handle = Core::Handle;
 
 
+
+
 static void argumentParser (int argc, char *argv[], boost::program_options::variables_map &vm_map);
 
 CommonCore::CommonCore () noexcept {}
+
+CommonCore::CommonCore(const std::string &core_name) :identifier(core_name)
+{
+}
 
 void CommonCore::initialize (const std::string &initializationString)
 {
@@ -96,10 +118,70 @@ void CommonCore::initializeFromArgs (int argC, char *argv[])
             identifier = vm["identifier"].as<std::string> ();
         }
 
-        _broker_thread = std::thread (&CommonCore::broker, this);
+		if (identifier.empty())
+		{
+			identifier = gen_id();
+		}
+        _queue_processing_thread = std::thread (&CommonCore::queueProcessingLoop, this);
+
     }
 }
 
+bool CommonCore::connect()
+{
+	if (_initialized)
+	{
+		bool exp = false;
+		if (_connected.compare_exchange_strong(exp, true))
+		{
+			auto res = brokerConnect();
+			if (res)
+			{
+				// now register this core object as a broker
+				ActionMessage m(CMD_REG_BROKER);
+				m.name = getIdentifier();
+				m.info().target = getAddress();
+				transmit(0, m);
+				_connected = true;
+			}
+			return res;
+		}
+		return true;
+	}
+	return false;
+}
+
+
+bool CommonCore::isConnected() const
+{
+	return _connected;
+}
+
+void CommonCore::disconnect()
+{
+	brokerDisconnect();
+	_connected = false;
+	/*We need to enrure that the destructor is not called immediately upon calling unregister
+	otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
+	that will be destroyed on function exit
+	*/
+	auto keepCoreAlive = findCore(identifier);
+	if (keepCoreAlive)
+	{
+		unregisterCore(identifier);
+	}
+	
+	if (!prevIdentifier.empty())
+	{
+		auto keepCoreAlive2 = findCore(prevIdentifier);
+		if (keepCoreAlive2)
+		{
+			unregisterCore(prevIdentifier);
+		}
+		
+	}
+
+}
 
 void argumentParser (int argc, char *argv[], boost::program_options::variables_map &vm_map)
 {
@@ -197,8 +279,11 @@ CommonCore::~CommonCore ()
 {
     if (_initialized)
     {
-        _queue.push (CMD_STOP);
-        _broker_thread.join ();
+		if (_queue_processing_thread.get_id() != std::this_thread::get_id())
+		{
+			_queue.push(CMD_STOP);
+			_queue_processing_thread.join();
+		}
     }
 }
 
@@ -295,7 +380,7 @@ void CommonCore::finalize (federate_id_t federateID)
 {
     auto fed = getFederate (federateID);
     fed->setState (HELICS_FINISHED);
-    ActionMessage bye (CMD_BYE);
+    ActionMessage bye (CMD_DISCONNECT);
     bye.source_id = fed->global_id;
     _queue.push (bye);
 }
@@ -319,28 +404,48 @@ bool CommonCore::allInitReady () const
     return true;
 }
 
+
+bool CommonCore::allDisconnected() const
+{
+	// all federates must have hit finished state
+	for (auto &fed : _federates)
+	{
+		if (fed->getState()!= HELICS_FINISHED)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 void CommonCore::enterInitializingState (federate_id_t federateID)
 {
     auto fed = getFederate (federateID);
     if (HELICS_INITIALIZING == fed->getState ())
     {
+		//no need to do anything if we are already in the appropriate state
         return;
     }
-    assert (HELICS_CREATED == fed->getState ());
+	if (HELICS_CREATED != fed->getState())
+	{
+		throw (invalidFunctionCall());
+	}
+	bool exp = false;
+	if (fed->init_requested.compare_exchange_strong(exp, true))
+	{ //only enter this loop once per federate
+		ActionMessage m(CMD_INIT);
+		m.source_id = fed->global_id;
+		_queue.push(m);
 
-    std::unique_lock<std::mutex> lock (fed->_mutex);
-    fed->init_requested = true;
-    lock.unlock ();
-    ActionMessage m (CMD_INIT);
-    m.source_id = fed->global_id;
-    _queue.push (m);
-
-    auto check = fed->processQueue ();
-    if (check == false)
-    {
-        assert (false);
-        // TODO::throw an error here
-    }
+		bool check = fed->processQueue();
+		if (!check)
+		{
+			fed->init_requested = false;
+			throw(functionExecutionFailure());
+		}
+		return;
+	}
+	throw(invalidFunctionCall());
 }
 
 
@@ -351,12 +456,17 @@ convergence_state CommonCore::enterExecutingState (federate_id_t federateID, con
     {
         return convergence_state::complete;
     }
-    assert (HELICS_INITIALIZING == fed->getState ());
+	if (HELICS_INITIALIZING != fed->getState())
+	{
+		throw(invalidFunctionCall());
+	}
 
     ActionMessage exec (CMD_EXEC_REQUEST);
     exec.iterationComplete = (converged==convergence_state::complete);
     _queue.push (exec);
-
+	//do an exec check on the fed to process previously received messages so it can't get in a deadlocked state
+	exec.setAction(CMD_EXEC_CHECK);
+	fed->queue.push(exec);
     auto ret = fed->processQueue ();
 
     return ret?convergence_state::complete:convergence_state::nonconverged;
@@ -374,10 +484,24 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
 
     _federates.push_back (std::move (fed));
     lock.unlock ();
+
     ActionMessage m (CMD_REG_FED);
     m.name = name;
-    transmit (0, m);  // just directly transmit, no need to process in the queue
-    auto valid = fed->processQueue ();
+	if (global_broker_id != 0)
+	{
+		m.source_id = global_broker_id;
+
+		transmit(0, m);  // just directly transmit, no need to process in the queue
+	}
+	else
+	{
+		//this will get processed when this core is assigned a global id
+		delayTransmitQueue.push(m);
+	}
+	
+
+	//now wait for the federateQueue to get the response
+    auto valid = getFederate(id)->processQueue ();
     if (valid)
     {
         return id;
@@ -979,7 +1103,7 @@ std::unique_ptr<Message> CommonCore::receive (Handle destination)
 }
 
 
-std::pair<const Handle, std::unique_ptr<Message>> CommonCore::receiveAny (federate_id_t federateID)
+std::unique_ptr<Message> CommonCore::receiveAny (federate_id_t federateID, Handle &endpoint_id)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -988,9 +1112,10 @@ std::pair<const Handle, std::unique_ptr<Message>> CommonCore::receiveAny (federa
     }
     if (fed->getState () != HELICS_EXECUTING)
     {
-        return {invalid_Handle, nullptr};
+		endpoint_id = invalid_Handle;
+        return nullptr;
     }
-    return fed->receive ();
+    return fed->receiveAny (endpoint_id);
 }
 
 
@@ -1067,7 +1192,7 @@ uint64_t CommonCore::receiveFilterCount (federate_id_t federateID)
     return fed->getQueueSize ();
 }
 
-std::pair<const Handle, std::unique_ptr<Message>> CommonCore::receiveAnyFilter (federate_id_t federateID)
+std::unique_ptr<Message> CommonCore::receiveAnyFilter (federate_id_t federateID, Handle &filter_id)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -1076,9 +1201,10 @@ std::pair<const Handle, std::unique_ptr<Message>> CommonCore::receiveAnyFilter (
     }
     if (fed->getState () != HELICS_EXECUTING)
     {
-        return {invalid_Handle, nullptr};
+		filter_id = invalid_Handle;
+        return nullptr;
     }
-    return fed->receive ();
+    return fed->receiveAny (filter_id);
 }
 
 
@@ -1091,7 +1217,21 @@ void CommonCore::setIdentifier (const std::string &name)
     }
 }
 
-void CommonCore::broker ()
+
+void CommonCore::addCommand(const ActionMessage &m)
+{
+	if (isPriorityCommand(m))
+	{
+		processPriorityCommand(m);
+	}
+	else
+	{
+		//just route to the general queue;
+		_queue.push(m);
+	}
+}
+
+void CommonCore::queueProcessingLoop()
 {
     while (true)
     {
@@ -1104,7 +1244,7 @@ void CommonCore::broker ()
             break;
         case CMD_STOP:
             processCommand (command);
-            return;
+			return disconnect(); //this can potential cause object destruction so do nothing after this call
         default:
             processCommand (command);
         }
@@ -1112,29 +1252,84 @@ void CommonCore::broker ()
 }
 
 
+
+void CommonCore::processPriorityCommand(const ActionMessage &command)
+{
+	//deal with a few types of message immediately
+	switch (command.action())
+	{
+	case CMD_REG_FED:
+	case CMD_REG_BROKER:
+		//These really shouldn't happen here probably means something went wrong in setup but we can handle it
+		// forward the connection request to the higher level
+		transmit(0, command);  
+		break;
+	case CMD_BROKER_ACK:
+		if (command.payload == identifier)
+		{
+			if (!command.error)
+			{
+				global_broker_id = command.dest_id;
+				transmitDelayedMessages();
+				return;
+			}
+			else
+			{
+				//generate error messages in response to all the delayed messages
+			}
+		}
+		break;
+	case CMD_FED_ACK:
+	{
+		auto id = getFederateId(command.name);
+		if (id != invalid_fed_id)
+		{
+			auto fed = getFederate(id);
+			// now add the new global id to the translation table
+			{ //scope for the lock
+				std::lock_guard<std::mutex> lock(_mutex);
+				global_id_translation.emplace(fed->local_id, command.dest_id);
+			}
+			//push the command to the local queue
+			fed->queue.push(command);
+			
+		}
+	}
+	break;
+	}
+
+}
+
+
+void CommonCore::transmitDelayedMessages()
+{
+	auto msg = delayTransmitQueue.pop();
+	while (msg)
+	{
+		msg->source_id = global_broker_id;
+		transmit(0, *msg);
+		msg= delayTransmitQueue.pop();
+	}
+}
+
 void CommonCore::processCommand (ActionMessage &command)
 {
     // LOG (INFO) << "\"\"\"" << command << std::endl << "\"\"\"" << ENDL
     switch (command.action ())
     {
     case CMD_IGNORE:
-    default:
         break;
-    case CMD_CONNECT:
-        // forward the connection request to the higher level
-        transmit (0, command);
-        break;
-
     case CMD_REG_ROUTE:
         addRoute (command.dest_handle, command.payload);
         break;
     case CMD_STOP:
-    {
-        ActionMessage m (CMD_DISCONNECT);
-        m.source_id = global_broker_id;
-        transmit (0, m);
-    }
-        return;  // the exit point of the simulation
+		if (!allDisconnected())
+		{ //only send a disconnect message if we haven't done so already
+			ActionMessage m(CMD_DISCONNECT);
+			m.source_id = global_broker_id;
+			transmit(0, m);
+		}
+		break;
     case CMD_TIME_REQUEST:
     case CMD_TIME_GRANT:
     case CMD_EXEC_GRANT:
@@ -1190,7 +1385,13 @@ void CommonCore::processCommand (ActionMessage &command)
         }
     }
     break;
-    case CMD_BYE:
+    case CMD_DISCONNECT:
+		if (allDisconnected())
+		{
+			command.source_id = global_broker_id;
+			transmit(0, command);
+			addCommand(CMD_STOP);
+		}
         break;
     case CMD_LOG:
     case CMD_ERROR:
@@ -1211,28 +1412,6 @@ void CommonCore::processCommand (ActionMessage &command)
     case CMD_REG_SRC:
         transmit (0, command);
         break;
-    case CMD_REG_FED:
-        transmit (0, command);
-        break;
-    case CMD_BROKER_ACK:
-        if (command.payload == identifier)
-        {
-            global_broker_id = command.dest_id;
-        }
-        break;
-    case CMD_FED_ACK:
-    {
-        auto id = getFederateId (command.payload.c_str ());
-        if (id != invalid_fed_id)
-        {
-            auto fed = getFederate (id);
-            fed->queue.push (command);
-            // now add the new global id to the translation table
-            std::lock_guard<std::mutex> lock (_mutex);
-            global_id_translation.emplace (fed->local_id, command.dest_id);
-        }
-    }
-    break;
     case CMD_INIT:
         if (allInitReady ())
         {
@@ -1273,6 +1452,12 @@ void CommonCore::processCommand (ActionMessage &command)
         }
     }
     break;
+	default:
+		if (isPriorityCommand(command))
+		{ //this is a backup if somehow one of these message got here
+			processPriorityCommand(command);
+		}
+		break;
     }
 }
 

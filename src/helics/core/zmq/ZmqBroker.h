@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define ZMQ_BROKER_H_
 #pragma once
 
-#include "core/core-broker.h"
+#include "core/CoreBroker.h"
 
 namespace helics
 {
@@ -19,16 +19,25 @@ class ZmqConnection;
 
 class ZmqBroker :public CoreBroker
 {
-	ZmqBroker();
+public:
+	/** default constructor*/
+	ZmqBroker(bool isRoot_ = false) noexcept;
+	ZmqBroker(const std::string &broker_name);
 
 	void InitializeFromArgs(int argc, char *argv[]) override;
 
+	/**destructor*/
 	virtual ~ZmqBroker();
 	virtual void transmit(int32_t route, const ActionMessage &command) override;
 
 	virtual void addRoute(int route_id, const std::string &routeInfo) override;
+
+	virtual std::string getAddress() const override;
 private:
-	std::unique_ptr<ZmqConnection> zmqConn;  //!< object containing the ZmqConnection Information for Pimpl 
+	virtual bool brokerConnect() override;
+	virtual void brokerDisconnect() override;
+private:
+	//std::unique_ptr<ZmqConnection> zmqConn;  //!< object containing the ZmqConnection Information for Pimpl 
 };
 }
 #endif

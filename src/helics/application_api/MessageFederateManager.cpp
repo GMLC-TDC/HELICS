@@ -170,21 +170,22 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     auto epCount = coreObject->receiveCountAny (fedID);
     // lock the data updates
     std::unique_lock<std::mutex> eplock (endpointLock);
+	Core::Handle endpoint_id;
     for (size_t ii = 0; ii < epCount; ++ii)
     {
-        auto msgp = coreObject->receiveAny (fedID);
-        if (msgp.second == nullptr)
+        auto message = coreObject->receiveAny (fedID,endpoint_id);
+        if (!message)
         {
             break;
         }
 
         /** find the id*/
-        auto fid = handleLookup.find (msgp.first);
+        auto fid = handleLookup.find (endpoint_id);
         if (fid != handleLookup.end ())
         {  // assign the data
 
             auto localEndpointIndex = fid->second.value ();
-            messageQueues[localEndpointIndex].emplace (std::move (msgp.second));
+            messageQueues[localEndpointIndex].emplace (std::move (message));
             if (local_endpoints[localEndpointIndex].callbackIndex >= 0)
             {
 				auto cb = callbacks[local_endpoints[localEndpointIndex].callbackIndex];

@@ -48,6 +48,7 @@ public:
 	std::string type;	//!< the type of the publication data
 	std::string units;	//!< the units of the publication data
 	bool has_update = false;	//!< indicator that the publication has updates
+	//7 byte gap here
 	std::string data;	//!< the most recent publication data
 	std::vector<std::pair<Core::federate_id_t, Core::Handle>> subscribers; //!< container for all the subscribers of a publcation
 };

@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_ZEROMQ_CORE_
 #pragma once
 
-#include "helics/core/core-common.h"
+#include "core/CommonCore.h"
 
 
 
@@ -22,12 +22,16 @@ class ZeroMQCore : public CommonCore {
 public:
 	/** default constructor*/
   ZeroMQCore()=default;
+  ZeroMQCore(const std::string &core_name);
   virtual void initializeFromArgs (int argc, char *argv[]) override;
          
   virtual void transmit(int route_id, const ActionMessage &cmd) override;
   virtual void addRoute(int route_id, const std::string &routeInfo) override;
+public:
+	virtual std::string getAddress() const override;
 private:
-  
+	virtual bool brokerConnect() override;
+	virtual void brokerDisconnect() override;
  
 };
 

@@ -54,6 +54,7 @@ class BasicHandleInfo
     BasicHandleType what=HANDLE_UNKNOWN;	//!< the type of the handle
     bool flag=false;	//!< indicator flag
 	bool destFilter = false;	//!< indicator if the handle is a destination filter
+	//5 byte hole here
     std::string key;	//!< the name of the handle
     std::string type;	//!< the type of data used by the handle
     std::string units;	//!< the units associated with the handle

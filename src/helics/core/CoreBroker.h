@@ -11,17 +11,16 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include <atomic>
-#include <vector>
 #include <memory>
 #include <string>
 #include <thread>
-#include <mutex>
 #include <map>
 #include <unordered_map>
 
 #include "BasicHandleInfo.h"
 #include "ActionMessage.h"
 #include "common/blocking_queue.h"
+#include "common/simpleQueue.hpp"
 
 namespace helics
 {
@@ -32,7 +31,6 @@ public:
 	std::string name; //!< name of the federate
 	Core::federate_id_t global_id=invalid_fed_id; //!< the identification code for the federate
 	int32_t route_id=invalid_fed_id; //!< the routing information for data to be sent to the federate
-	bool broker_ = false; //!< flag indicating the federate is a broker for other federates
 	BasicFedInfo(const std::string &fedname) :name(fedname) {};
 };
 
@@ -45,9 +43,12 @@ public:
 	int32_t route_id=invalid_fed_id;	//!< the identifier for the route to take to the broker
 	std::string routeInfo;	//!< string describing the connection information for the route
 	bool _initRequested = false;	//!< flag indicating the broker has requesting initialization
+	bool _disconnected = false;		//!< flag indicating that the broker has disconnected
 	BasicBrokerInfo(const std::string &brokerName) :name(brokerName) {};
 	
 };
+/** a shift in the global id index to discriminate between global ids of brokers vs federates*/
+constexpr Core::federate_id_t global_broker_id_shift = 50'000'000;
 
 /** class implementing most of the functionality of a generic broker
 Basically acts as a router for information,  deals with stuff internally if it can and sends higher up if it can't
@@ -60,22 +61,25 @@ protected:
 	bool _isRoot = false;  //!< set to true if this object is a root broker
 	bool _gateway = false;  //!< set to true if this broker should act as a gateway.  
 private:
-	int32_t global_broker_id;  //!< the identifier for the broker
+	std::atomic<int32_t> global_broker_id{ 0 };  //!< the identifier for the broker
 	std::vector<std::pair<Core::federate_id_t, bool>> localBrokersInit; //!< indicator if the local brokers are ready to init
 	std::vector<BasicFedInfo> _federates; //!< container for all federates
 	std::vector<BasicHandleInfo> _handles; //!< container for the basic info for all handles
 	std::vector<BasicBrokerInfo> _brokers;  //!< container for the basic broker info for all subbrokers
 	std::string local_broker_identifier;  //!< a randomly generated string  or assigned name for initial identification of the broker
+	std::string previous_local_broker_identifier; //!< the previous identifier in case a rename is required
 	BlockingQueue<ActionMessage> _queue; //!< primary routing queue
-	std::map<std::string, int32_t> fedNames;  //!< a map to lookup federates
-	std::map<std::string, int32_t> brokerNames;  //!< a map to lookup brokers
+	std::map<std::string, int32_t> fedNames;  //!< a map to lookup federates <fed name, local federate index>
+	std::map<std::string, int32_t> brokerNames;  //!< a map to lookup brokers <broker name, local broker index>
 	std::map<std::string, int32_t> publications; //!< map of publications;
 	std::map<std::string, int32_t> endpoints;  //!< map of endpoints
+	std::atomic<bool> _connected{ false };  //!< indicator that the broker is connected to its parent broker
 	std::map<Core::federate_id_t, int32_t> global_id_translation; //!< map to translate global ids to local ones
 	std::map<Core::federate_id_t, int32_t> routing_table;  //!< map for external routes  <global federate id, route id>
-	std::map<Core::federate_id_t, int32_t> broker_table;  //!< map for brokers to map federates to brokers
+	std::map<Core::federate_id_t, int32_t> broker_table;  //!< map for translating global broker id's to a local index
+	std::map<Core::federate_id_t, int32_t> federate_table; //!< map for translating global federate id's to a local index
 	std::unordered_map<std::string, int32_t> knownExternalEndpoints; //!< external map for all known external endpoints with names and route
-	std::thread _broker_thread;  //!< thread for running the broker
+	std::thread _queue_processing_thread;  //!< thread for running the broker
 protected:
 	std::atomic<bool> _initialized{ false }; //!< indicator if the system is initialized (mainly if the thread is running)
 private:
@@ -84,7 +88,7 @@ private:
 	mutable std::mutex mutex_;  //!< mutex lock for the federate information that could come in from multiple sources
 	/** primary thread executable --the function that continually loops to process all the messages
 	*/
-	void broker();
+	void queueProcessingLoop();
 	/** function that processes all the messages
 	@param[in] command -- the message to process
 	*/
@@ -95,6 +99,24 @@ private:
 	@param[in] command the command to process
 	*/
 	void processPriorityCommand(const ActionMessage &command);
+
+	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delays for a certain time
+
+	void transmitDelayedMessages();
+public:
+	/** connect the core to its broker
+	@details should be done after initialization has complete*/
+	bool connect();
+	/** disconnect the broker from any other brokers and communications
+	*/
+	void disconnect();
+private:
+	/** implementation details of the connection process
+	*/
+	virtual bool brokerConnect()=0;
+	/** implementation details of the disconnection process
+	*/
+	virtual void brokerDisconnect() = 0;
 protected:
 	/** this function is the one that will change for various flavors of broker communication
 	@details it takes a route info- a code of where to send the data and an action message
@@ -113,6 +135,8 @@ public:
 	/**default constructor
 	@param isRoot  set to true to indicate this object is a root broker*/
 	CoreBroker(bool isRoot = false) noexcept;
+	/** constructor to set the name of the broker*/
+	CoreBroker(const std::string &broker_name);
 	/** destructor*/
 	virtual ~CoreBroker();
 	/** start up the broker with an inditialization string containing commands and parameters*/
@@ -126,6 +150,7 @@ public:
 	@return true if everyone is ready, false otherwise
 	*/
 	bool allInitReady() const;
+	bool allDisconnected() const;
 	/** set the local identification string for the broker*/
 	void setIdentifier(const std::string &name);
 	/** get the local identification for the broker*/
@@ -133,15 +158,23 @@ public:
 	{
 		return local_broker_identifier;
 	}
+
+	virtual std::string getAddress() const = 0;
 private:
 	void checkPublications();
 	void checkEndpoints();
 	void checkFilters();
 	/** locate the route to take to a particular federate*/
 	int32_t getRoute(Core::federate_id_t fedid) const;
+	/** locate the route in a previously locked context*/
+	int32_t getRouteNoLock(Core::federate_id_t fedid) const;
 	int32_t getFedByName(const std::string &fedName) const;
 	int32_t getBrokerByName(const std::string &brokerName) const;
+	int32_t getBrokerById(Core::federate_id_t fedid) const;
+	int32_t getFedById(Core::federate_id_t fedid) const;
 };
+
+
 } //namespace helics
 
 #endif

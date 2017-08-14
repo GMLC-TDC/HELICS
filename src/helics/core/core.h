@@ -64,7 +64,7 @@ public:
 class Core
 {
   public:
-	  /** default constructor/
+	  /** default constructor*/
     Core ()=default;
 	/**virtual destructor*/
     virtual ~Core () = default;
@@ -96,7 +96,24 @@ class Core
      * Returns true if the core has been initialized.
      */
     virtual bool isInitialized () const = 0;
+	/** 
+	* connect the core to a broker if needed
+	@return true if the connection was successful
+	*/
+	virtual bool connect() = 0;
+	/** 
+	* check if the core is connected properly
+	*/
+	virtual bool isConnected() const = 0;
 
+	/**
+	* disconnect the core from its broker
+	*/
+	virtual void disconnect() = 0;
+
+	/** get and identifier string for the core
+	*/
+	virtual const std::string &getIdentifier() const = 0;
     /**
      * Federate has encountered an unrecoverable error.
      */
@@ -430,8 +447,10 @@ class Core
 
     /**
      * Receives a message for any destination.
+	 @param federateID the identifier for the federate
+	 @param[out] endpoint_id the endpoint handle related to the message gets stored here
      */
-    virtual std::pair<const Handle, std::unique_ptr<Message>> receiveAny (federate_id_t federateId) = 0;
+    virtual std::unique_ptr<Message> receiveAny (federate_id_t federateId,Handle &enpoint_id) = 0;
 
     /**
      * Returns number of messages for all destinations.
@@ -459,8 +478,10 @@ class Core
 
 	/**
 	* Receives a message for any filter.
+	@param federateID the identifier for the federate
+	@param[out] filter_id the filter handle related to the message gets stored here
 	*/
-	virtual std::pair<const Handle, std::unique_ptr<Message>> receiveAnyFilter(federate_id_t federateID) = 0;
+	virtual std::unique_ptr<Message> receiveAnyFilter(federate_id_t federateID, Handle &filter_id) = 0;
 };
 
 // set at a large negative number but not the largest negative number

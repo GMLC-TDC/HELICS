@@ -93,21 +93,22 @@ namespace helics
 		auto epCount = coreObject->receiveFilterCount(fedID);
 		// lock the data updates
 		std::unique_lock<std::mutex> filtlock(filterLock);
+		Core::Handle filterID;
 		for (size_t ii = 0; ii < epCount; ++ii)
 		{
-			auto msgp = coreObject->receiveAnyFilter(fedID);
-			if (msgp.second == nullptr)
+			auto message = coreObject->receiveAnyFilter(fedID, filterID);
+			if (!message)
 			{
 				break;
 			}
 
 			/** find the id*/
-			auto fid = handleLookup.find(msgp.first);
+			auto fid = handleLookup.find(filterID);
 			if (fid != handleLookup.end())
 			{  // assign the data
 
 				auto localfilterIndex = fid->second.value();
-				filterQueues[localfilterIndex].emplace(std::move(msgp.second));
+				filterQueues[localfilterIndex].emplace(std::move(message));
 				if (filters[localfilterIndex].callbackIndex >= 0)
 				{
 					auto cb = callbacks[filters[localfilterIndex].callbackIndex];

@@ -6,7 +6,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 */
 #include "helics/config.h"
-#include "helics/core/core-factory.h"
+#include "helics/core/CoreFactory.h"
 
 #include <iostream>
 

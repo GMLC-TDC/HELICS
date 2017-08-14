@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(federate_initialize_tests)
 	Fed->enterExecutionState();
 	BOOST_CHECK(Fed->currentState() == helics::Federate::op_states::execution);
 	Fed = nullptr;
-	closeCore("");
+	closeCore(core->getIdentifier());
 }
 
 

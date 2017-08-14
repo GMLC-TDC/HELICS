@@ -21,13 +21,16 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <utility>
 
 namespace helics {
-
+/** class implementing an MPI communications for a core object*/
 class MpiCore : public CommonCore {
 
 public:
-
-  MpiCore();
+	/** default constructor*/
+  MpiCore() noexcept;
+  MpiCore(const std::string &core_name);
+  /** destructor*/
   virtual ~MpiCore();
+
   virtual void initializeFromArgs (int argc, char *argv[]) override;
 
           void terminate();
@@ -35,6 +38,9 @@ public:
 protected:
 	virtual void transmit(int route_id, const ActionMessage &cmd);
 	virtual void addRoute(int route_id, const std::string &routeInfo);
+private:
+	virtual bool brokerConnect() override;
+	virtual void brokerDisconnect() override;
 
   /*
   virtual bool isInitialized () override;

@@ -10,18 +10,18 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define TEST_BROKER_H_
 #pragma once
 
-#include "core-broker.h"
+#include "CoreBroker.h"
 
 namespace helics
 {
-class TestCore;
+class CommonCore;
 /** class implementing a basic broker that links to other brokers in process memory*/
-class TestBroker : public CoreBroker,std::enable_shared_from_this<TestBroker>
+class TestBroker : public CoreBroker
 {
 public:
 	/** default constructor*/
-	TestBroker() = default;
-
+	TestBroker( bool isRoot_=false) noexcept;
+	TestBroker(const std::string &broker_name);
 	/** construct with a pointer to a broker*/
 	TestBroker(std::shared_ptr<TestBroker> nbroker);
 
@@ -30,11 +30,18 @@ public:
 	virtual void transmit(int32_t route, const ActionMessage &command) override;
 
 	virtual void addRoute(int route_id, const std::string &routeInfo) override;
+
+	virtual std::string getAddress() const override;
+
+	virtual bool brokerConnect() override;
+	virtual void brokerDisconnect() override;
 private:
-	std::shared_ptr<TestBroker> tbroker;  //the parent broker;
+	std::string brokerName;  //!< the name of the higher level broker to connect to
+	std::string brokerInitString;  //!< the initialization string for the higher level broker
+	std::shared_ptr<CoreBroker> tbroker;  //the parent broker;
 										  //void computeDependencies();
-	std::map<int32_t, std::shared_ptr<TestBroker>> brokerRoutes; //!< map of the routes to other brokers
-	std::map < int32_t, std::shared_ptr<TestCore>>  coreRoutes; //!< map of the routes to other cores
+	std::map<int32_t, std::shared_ptr<CoreBroker>> brokerRoutes; //!< map of the routes to other brokers
+	std::map < int32_t, std::shared_ptr<CommonCore>>  coreRoutes; //!< map of the routes to other cores
 	mutable std::mutex routeMutex; //!< mutex lock protectingthe route maps
 };
 }
