@@ -279,11 +279,8 @@ CommonCore::~CommonCore ()
 {
     if (_initialized)
     {
-		if (_queue_processing_thread.get_id() != std::this_thread::get_id())
-		{
-			_queue.push(CMD_STOP);
-			_queue_processing_thread.join();
-		}
+		_queue.push(CMD_STOP);
+		_queue_processing_thread.join();
     }
 }
 

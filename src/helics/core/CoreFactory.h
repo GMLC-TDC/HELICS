@@ -40,13 +40,14 @@ public:
 
 
 
-/** container for building a bunch of cores and brokers accessible in local memory*/
-/** locate a Core by name
+/** locate a registered Core by name
 @param name the name of the core to find
 @return a shared_ptr to the testCore*/
 std::shared_ptr<CommonCore> findCore(const std::string &name);
 
 /** register a testCore so it can be found by others
+@details also cleans up any leftover bCoresrokers that were previously unregistered this can be controlled by calling cleanUpBrokers
+earlier if desired
 @param tcore a pointer to a testCore object that should be found globally
 @return true if the registration was successful false otherwise*/
 bool registerCore(std::shared_ptr<CommonCore> tcore);
@@ -55,7 +56,15 @@ bool registerCore(std::shared_ptr<CommonCore> tcore);
 @param name the name of the Core to unregister
 */
 void unregisterCore(const std::string &name);
+/** clean up unused cores
+@details when Cores are unregisterd they get put in a holding area that gets cleaned up when a new Core is registered
+or when the clean up function is called this prevents some odd threading issues
+*/
+void cleanUpCores();
 
+/** make a copy of the broker pointer to allow access to the new name
+*/
+void copyCoreIdentifier(const std::string &copyFromName, const std::string &copyToName);
 } // namespace helics
 
 #endif

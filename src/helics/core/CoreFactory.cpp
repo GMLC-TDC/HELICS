@@ -154,6 +154,13 @@ static std::map<std::string, std::shared_ptr<CommonCore>> CoreMap;
 
 static std::mutex mapLock;  //!<lock for the broker and core maps
 
+/** so the problem this is addressing is that unregister can potentially cause a destructor to fire
+that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
+can do the unregister operation and destroy itself meaning it is unable to join and thus will call std::terminate
+what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if need be
+without issue*/
+static std::vector<std::shared_ptr<CommonCore>> delayedDestruction;
+
 std::shared_ptr<CommonCore> findCore(const std::string &name)
 {
 	std::lock_guard<std::mutex> lock(mapLock);
@@ -168,11 +175,31 @@ std::shared_ptr<CommonCore> findCore(const std::string &name)
 bool registerCore(std::shared_ptr<CommonCore> tcore)
 {
 	std::lock_guard<std::mutex> lock(mapLock);
+	if (!delayedDestruction.empty())
+	{
+		delayedDestruction.clear();
+	}
 	auto res = CoreMap.emplace(tcore->getIdentifier(), std::move(tcore));
 	return res.second;
 }
 
 
+void cleanUpCores()
+{
+	std::lock_guard<std::mutex> lock(mapLock);
+	delayedDestruction.clear();
+}
+
+void copyCoreIdentifier(const std::string &copyFromName, const std::string &copyToName)
+{
+	std::lock_guard<std::mutex> lock(mapLock);
+	auto fnd = CoreMap.find(copyFromName);
+	if (fnd != CoreMap.end())
+	{
+		auto newCorePtr = fnd->second;
+		CoreMap.emplace(copyToName, std::move(newCorePtr));
+	}
+}
 
 void unregisterCore(const std::string &name)
 {
@@ -180,6 +207,7 @@ void unregisterCore(const std::string &name)
 	auto fnd = CoreMap.find(name);
 	if (fnd != CoreMap.end())
 	{
+		delayedDestruction.push_back(std::move(fnd->second));
 		CoreMap.erase(fnd);
 		return;
 	}
@@ -187,6 +215,7 @@ void unregisterCore(const std::string &name)
 	{
 		if (core->second->getIdentifier() == name)
 		{
+			delayedDestruction.push_back(std::move(core->second));
 			CoreMap.erase(core);
 			return;
 		}

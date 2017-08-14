@@ -343,6 +343,9 @@ bool FederateState::processQueue ()
 			else if (grant == 2)
 			{
 				//TODO: send a time granted message
+				//ActionMessage grant(CMD_EXEC_GRANT);
+				//grant.source_id = global_id;
+				
 				setState(HELICS_EXECUTING);
 				return true;
 			}
@@ -483,8 +486,11 @@ iterationTime  FederateState::requestTime(Time nextTime, convergence_state conve
 {
 	iterating = (converged!=convergence_state::complete);
 	time_requested = nextTime;
-	auto ret = processQueue();
-	return{ time_granted,ret?convergence_state::complete:convergence_state::nonconverged };
+	time_event = time_requested; //TODO: this is not correct yet but will pass the next case
+	//*push a message to check whether time can be granted
+	queue.push(CMD_TIME_CHECK);
+	bool ret = processQueue();
+	return{ time_event,ret?convergence_state::complete:convergence_state::nonconverged };
 }
 
 int FederateState::processExecRequest(ActionMessage &cmd)

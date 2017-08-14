@@ -44,6 +44,8 @@ public:
 std::shared_ptr<CoreBroker> findBroker(const std::string &brokerName);
 
 /** register a coreBroker so it can be found by others
+@details also cleans up any leftover brokers that were previously unregistered this can be controlled by calling cleanUpBrokers
+earlier if desired
 @param tbroker a pointer to a CoreBroker object that should be able to be found globally
 @return true if the registration was successful false otherwise*/
 bool registerBroker(std::shared_ptr<CoreBroker> tbroker);
@@ -51,6 +53,15 @@ bool registerBroker(std::shared_ptr<CoreBroker> tbroker);
 @param name the name of the broker to unregister
 */
 void unregisterBroker(const std::string &name);
+/** clean up unused brokers
+@details when brokers are unregisterd they get put in a holding area that gets cleaned up when a new broker is registered
+or when the clean up function is called this prevents some odd threading issues
+*/
+void cleanUpBrokers();
+
+/** make a copy of the broker pointer to allow access to the new name
+*/
+void copyBrokerIdentifier(const std::string &copyFromName, const std::string &copyToName);
 
 } // namespace helics
 

@@ -62,12 +62,8 @@ CoreBroker::~CoreBroker ()
 {
     if (_initialized)
     {
-		if (_queue_processing_thread.get_id() != std::this_thread::get_id())
-		{ //if this is called from inside the processing loop then we don't need to do this
-			// and doing so would cause an error
-			_queue.push(CMD_STOP);
-			_queue_processing_thread.join();
-		}
+		_queue.push(CMD_STOP);
+		_queue_processing_thread.join();
     }
 }
 

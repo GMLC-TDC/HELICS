@@ -36,10 +36,9 @@ class BlockingQueue {
 	{
 		std::unique_lock<std::mutex> lock(mutex_);
 		queue_.emplace(std::forward(args)...);
-		//lock.unlock();
+		lock.unlock();
 		condition_.notify_one();
 		// unlock occurs when we go out of scope, and only in extreme cases
-		// should we not hold the lock before signalling
 	}
 	/** try to pop an object from the queue
 	@param[out] t the location in which to place the object
@@ -74,10 +73,9 @@ template<typename T>
 void BlockingQueue<T>::push(const T& t) {
   std::unique_lock<std::mutex> lock(mutex_);
   queue_.push(t);
-  //lock.unlock();
+  lock.unlock();
   condition_.notify_one();
   // unlock occurs when we go out of scope, and only in extreme cases
-  // should we not hold the lock before signalling
 }
 
 template<typename T>
