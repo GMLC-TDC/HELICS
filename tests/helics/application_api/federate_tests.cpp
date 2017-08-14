@@ -9,7 +9,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <boost/test/floating_point_comparison.hpp>
 #include "helics/core/core.h"
 #include "helics/application_api/Federate.h"
-#include "helics/core/coreFactory.h"
+#include "helics/core/CoreFactory.h"
 #include "test_configuration.h"
 #include <future>
 /** these test cases test out the value converters
