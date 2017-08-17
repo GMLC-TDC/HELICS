@@ -23,7 +23,7 @@ CoreFactory-tests.cpp
 TestCore-tests.cpp
 ZeromqCore-tests.cpp
 MpiCore-tests.cpp
-node-core-test.cc
+Node_Core-tests.cpp
 testFixtures.cpp)
 
 
