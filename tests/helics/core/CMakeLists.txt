@@ -5,27 +5,27 @@
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 ##############################################################################
 
-add_executable(core-factory-test core-factory-test.cc)
-target_link_libraries(core-factory-test helics)
-target_link_libraries(core-factory-test ${external_library_list})
-
-add_executable(node-core-test node-core-test.cc)
-target_link_libraries(node-core-test helics)
-target_link_libraries(node-core-test ${external_library_list})
-
-add_test(NAME core-factory-test COMMAND core-factory-test)
-
 #-----------------------------------------------------------------------------
 # Core tests using Boost
 #-----------------------------------------------------------------------------
 
 set(core_test_headers
-)
+testFixtures.h)
 
 set(core_test_sources
 core-tests.cpp
-zeromqcore-tests.cpp
-testcore-tests.cpp)
+InfoClass-tests.cpp
+FederateState-tests.cpp
+ActionMessage-tests.cpp
+#CoreBroker-tests.cpp
+CoreFactory-tests.cpp
+#CommonCore-tests.cpp
+TestCore-tests.cpp
+ZeromqCore-tests.cpp
+MpiCore-tests.cpp
+node-core-test.cc
+testFixtures.cpp)
+
 
 add_executable(core-tests ${core_test_sources} ${core_test_headers})
 target_link_libraries(core-tests helics)
