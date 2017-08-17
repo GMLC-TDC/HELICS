@@ -70,7 +70,7 @@ void simA (std::shared_ptr<Core> core, const std::string &NAME)
     LOG (INFO) << NAME << ": exiting barrier" << ENDL;
 
     core->setTimeDelta (id, 1);
-    Core::Handle sub1 = core->registerSubscription (id, NAME, "type", "units", true);
+    Core::Handle sub1 = core->registerSubscription (id, NAME, "type", "units", handle_check_mode::required);
     CHECK_EQ (sub1, core->getSubscription (id, NAME));
 
     Core::Handle pub1 = core->registerPublication (id, NAME, "type", "units");
@@ -140,7 +140,7 @@ void simB (std::shared_ptr<Core> core, const std::string &NAME)
     LOG (INFO) << NAME << ": exiting barrier" << ENDL;
 
     core->setTimeDelta (id, 1);
-    Core::Handle sub1 = core->registerSubscription (id, NAME, "type", "units", true);
+    Core::Handle sub1 = core->registerSubscription (id, NAME, "type", "units", handle_check_mode::required);
     CHECK_EQ (sub1, core->getSubscription (id, NAME));
 
     core->enterInitializingState (id);

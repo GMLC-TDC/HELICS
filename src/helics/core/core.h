@@ -297,14 +297,14 @@ class Core
      * @param[in] key the name of the subscription
      * @param[in] type a string describing the type of the federate
      * @param[in] units a string naming the units of the federate
-     * @param[in] required  if set to true the core will error if the subscription does not have a corresponding
+     * @param[in] check_mode  if set to required the core will error if the subscription does not have a corresponding
      * publication when converting to init mode
      */
     virtual Handle registerSubscription (federate_id_t federateId,
                                          const std::string &key,
                                          const std::string &(type),
                                          const std::string &units,
-                                         bool required) = 0;
+										handle_check_mode check_mode) = 0;
 
     virtual Handle getSubscription (federate_id_t federateId, const std::string &key) = 0;
 
@@ -442,11 +442,13 @@ class Core
 
     /**
      * Returns the next buffered message the specified destination endpoint or filter.
+	 @details this is a non-blocking call and will return a nullptr if no message are available
      */
     virtual std::unique_ptr<Message> receive (Handle destination) = 0;
 
     /**
      * Receives a message for any destination.
+	 @details this is a non-blocking call and will return a nullptr if no messages are available
 	 @param federateID the identifier for the federate
 	 @param[out] endpoint_id the endpoint handle related to the message gets stored here
      */
@@ -478,6 +480,7 @@ class Core
 
 	/**
 	* Receives a message for any filter.
+	@details this is a non-blocking call and will return nullptr if no messages are available
 	@param federateID the identifier for the federate
 	@param[out] filter_id the filter handle related to the message gets stored here
 	*/

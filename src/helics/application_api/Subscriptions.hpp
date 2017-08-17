@@ -265,7 +265,7 @@ class VectorSubscription2d
             {
                 for (auto ind_y = startIndex_y; ind_y < startIndex_y + count_y; ++ind_y)
                 {
-                    auto id = fed->registerRequiredSubscription<X> (m_name, ind_x, ind_y, m_units);
+                    auto id = fed->registerRequiredSubscriptionIndexed<X> (m_name, ind_x, ind_y, m_units);
                     ids.push_back (id);
                 }
             }
@@ -276,7 +276,7 @@ class VectorSubscription2d
             {
                 for (auto ind_y = startIndex_y; ind_y < startIndex_y + count_y; ++ind_y)
                 {
-                    auto id = fed->registerOptionalSubscription<X> (m_name, ind_x, ind_y, m_units);
+                    auto id = fed->registerOptionalSubscriptionIndexed<X> (m_name, ind_x, ind_y, m_units);
                     ids.push_back (id);
                 }
             }

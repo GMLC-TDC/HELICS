@@ -71,8 +71,11 @@ private:
 	BlockingQueue<ActionMessage> _queue; //!< primary routing queue
 	std::map<std::string, int32_t> fedNames;  //!< a map to lookup federates <fed name, local federate index>
 	std::map<std::string, int32_t> brokerNames;  //!< a map to lookup brokers <broker name, local broker index>
-	std::map<std::string, int32_t> publications; //!< map of publications;
-	std::map<std::string, int32_t> endpoints;  //!< map of endpoints
+	std::unordered_map<std::string, int32_t> publications; //!< map of publications;
+	std::unordered_multimap<std::string, int32_t> subscriptions; //!< multimap of subscriptions
+	std::unordered_map<std::string, int32_t> endpoints;  //!< map of endpoints
+	std::unordered_multimap<std::string, int32_t> filters;  //!< multimap for all the filters
+
 	std::atomic<bool> _connected{ false };  //!< indicator that the broker is connected to its parent broker
 	std::map<Core::federate_id_t, int32_t> global_id_translation; //!< map to translate global ids to local ones
 	std::map<Core::federate_id_t, int32_t> routing_table;  //!< map for external routes  <global federate id, route id>
@@ -161,9 +164,14 @@ public:
 
 	virtual std::string getAddress() const = 0;
 private:
-	void checkPublications();
+	void checkSubscriptions();
+	bool FindandNotifySubscriptionPublisher(BasicHandleInfo &handleInfo);
+	void FindandNotifyPublicationSubscribers(BasicHandleInfo &handleInfo);
 	void checkEndpoints();
 	void checkFilters();
+	bool FindandNotifyFilterEndpoint(BasicHandleInfo &handleInfo);
+	void FindandNotifyEndpointFilters(BasicHandleInfo &handleInfo);
+
 	/** locate the route to take to a particular federate*/
 	int32_t getRoute(Core::federate_id_t fedid) const;
 	/** locate the route in a previously locked context*/
@@ -172,6 +180,13 @@ private:
 	int32_t getBrokerByName(const std::string &brokerName) const;
 	int32_t getBrokerById(Core::federate_id_t fedid) const;
 	int32_t getFedById(Core::federate_id_t fedid) const;
+
+	void addLocalInfo(BasicHandleInfo &handleInfo, const ActionMessage &m);
+	void addPublication(ActionMessage &m);
+	void addSubscription(ActionMessage &m);
+	void addEndpoint(ActionMessage &m);
+	void addDestFilter(ActionMessage &m);
+	void addSourceFilter(ActionMessage &m);
 };
 
 

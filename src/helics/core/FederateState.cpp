@@ -37,9 +37,9 @@ void FederateState::createSubscription (Core::Handle handle,
                                         const std::string &key,
                                         const std::string &type,
                                         const std::string &units,
-                                        bool required)
+                                        handle_check_mode check_mode)
 {
-    auto sub = std::make_unique<SubscriptionInfo> (handle, global_id, key, type, units, required);
+    auto sub = std::make_unique<SubscriptionInfo> (handle, global_id, key, type, units, (check_mode==handle_check_mode::required));
 
     std::lock_guard<std::mutex> lock (_mutex);
     subNames.emplace (key, sub.get ());
@@ -91,13 +91,13 @@ void FederateState::createEndpoint (Core::Handle handle, const std::string &key,
         std::sort (endpoints.begin (), endpoints.end (), compareFunc);
     }
 }
-void FederateState::createFilter (Core::Handle handle,
-                                  bool destFilter,
+
+void FederateState::createSourceFilter (Core::Handle handle,
                                   const std::string &key,
                                   const std::string &target,
                                   const std::string &type)
 {
-    auto filt = std::make_unique<FilterInfo> (handle, global_id, key, target, type, destFilter);
+    auto filt = std::make_unique<FilterInfo> (handle, global_id, key, target, type, false);
 
     std::lock_guard<std::mutex> lock (_mutex);
     filterNames.emplace (key, filt.get ());
@@ -111,6 +111,27 @@ void FederateState::createFilter (Core::Handle handle,
         filters.push_back (std::move (filt));
         std::sort (filters.begin (), filters.end (), compareFunc);
     }
+}
+
+void FederateState::createDestFilter(Core::Handle handle,
+	const std::string &key,
+	const std::string &target,
+	const std::string &type)
+{
+	auto filt = std::make_unique<FilterInfo>(handle, global_id, key, target, type, true);
+
+	std::lock_guard<std::mutex> lock(_mutex);
+	filterNames.emplace(key, filt.get());
+
+	if (filters.empty() || handle > filters.back()->id)
+	{
+		filters.push_back(std::move(filt));
+	}
+	else
+	{
+		filters.push_back(std::move(filt));
+		std::sort(filters.begin(), filters.end(), compareFunc);
+	}
 }
 
 SubscriptionInfo *FederateState::getSubscription (const std::string &subName) const
@@ -429,22 +450,27 @@ bool FederateState::processQueue ()
 			setState(HELICS_ERROR);
 			return false;
         case CMD_REG_PUB:
+		case CMD_NOTIFY_PUB:
 		{
 			auto subI = getSubscription(cmd.dest_handle);
 			subI->target = { cmd.source_id,cmd.source_handle };
 		}
             break;
         case CMD_REG_SUB:
+		case CMD_NOTIFY_SUB:
 		{
 			auto pubI = getPublication(cmd.dest_handle);
 			pubI->subscribers.emplace_back(cmd.source_id, cmd.source_handle);
 		}
             break;
         case CMD_REG_END:
+		case CMD_NOTIFY_END:
             break;
-        case CMD_REG_DST:
+        case CMD_REG_DST_FILTER:
+		case CMD_NOTIFY_DST_FILTER:
             break;
-        case CMD_REG_SRC:
+        case CMD_REG_SRC_FILTER:
+		case CMD_NOTIFY_SRC_FILTER:
 		{
 			auto endI = getEndpoint(cmd.dest_handle);
 			endI->hasFilter = true;
@@ -490,7 +516,7 @@ iterationTime  FederateState::requestTime(Time nextTime, convergence_state conve
 	//*push a message to check whether time can be granted
 	queue.push(CMD_TIME_CHECK);
 	bool ret = processQueue();
-	return{ time_event,ret?convergence_state::complete:convergence_state::nonconverged };
+	return{ time_granted,ret?convergence_state::complete:convergence_state::nonconverged };
 }
 
 int FederateState::processExecRequest(ActionMessage &cmd)

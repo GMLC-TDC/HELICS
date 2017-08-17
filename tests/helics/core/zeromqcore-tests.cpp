@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(zeromqcore_pubsub_value_test)
 
 	core->setTimeDelta(id, 1.0);
 	
-	Core::Handle sub1 = core->registerSubscription(id, "sim1_pub", "type", "units", false);
+	Core::Handle sub1 = core->registerSubscription(id, "sim1_pub", "type", "units", handle_check_mode::optional);
 	BOOST_CHECK_EQUAL(core->getSubscription(id, "sim1_pub"), sub1);
 	BOOST_CHECK_EQUAL(core->getType(sub1), "type");
 	BOOST_CHECK_EQUAL(core->getUnits(sub1), "units");

@@ -158,14 +158,14 @@ BOOST_AUTO_TEST_CASE(test_indexed_pubs_subs)
 
 	auto vFed = std::make_shared<helics::ValueFederate>(fi);
 
-	auto pubid1 = vFed->registerPublication<double>("pub1",0);
-	auto pubid2 = vFed->registerPublication<double>("pub1",1);
+	auto pubid1 = vFed->registerPublicationIndexed<double>("pub1",0);
+	auto pubid2 = vFed->registerPublicationIndexed<double>("pub1",1);
 
-	auto pubid3 = vFed->registerPublication<double>("pub1", 2);
+	auto pubid3 = vFed->registerPublicationIndexed<double>("pub1", 2);
 
-	auto sub1 = vFed->registerOptionalSubscription<double>("pub1", 0);
-	auto sub2 = vFed->registerOptionalSubscription<double>("pub1", 1);
-	auto sub3 = vFed->registerOptionalSubscription<double>("pub1", 2);
+	auto sub1 = vFed->registerOptionalSubscriptionIndexed<double>("pub1", 0);
+	auto sub2 = vFed->registerOptionalSubscriptionIndexed<double>("pub1", 1);
+	auto sub3 = vFed->registerOptionalSubscriptionIndexed<double>("pub1", 2);
 	vFed->enterExecutionState();
 
 	vFed->publish(pubid1, 10.0);

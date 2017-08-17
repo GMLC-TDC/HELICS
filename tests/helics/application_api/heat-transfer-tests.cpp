@@ -57,21 +57,21 @@ public:
 		fi.coreName = coreName;
 		fi.timeDelta = deltaTime;
 		vFed=std::make_unique<helics::ValueFederate>(fi);
-		pub = vFed->registerPublication<double>("temp", x, y);
+		pub = vFed->registerPublicationIndexed<double>("temp", x, y);
 		if (x - 1 < 0)
 		{
 			sub[0] = vFed->registerRequiredSubscription<double>("temp_wall");
 		}
 		else
 		{
-			sub[0] = vFed->registerRequiredSubscription<double>("temp",x-1,y);
+			sub[0] = vFed->registerRequiredSubscriptionIndexed<double>("temp",x-1,y);
 		}
 		vFed->setDefaultValue(sub[0], T);
-		sub[1] = vFed->registerOptionalSubscription<double>("temp", x + 1, y);
+		sub[1] = vFed->registerOptionalSubscriptionIndexed<double>("temp", x + 1, y);
 		vFed->setDefaultValue(sub[1], -512.0);
-		sub[2] = vFed->registerOptionalSubscription<double>("temp", x, y-1);
+		sub[2] = vFed->registerOptionalSubscriptionIndexed<double>("temp", x, y-1);
 		vFed->setDefaultValue(sub[2], -512.0);
-		sub[3] = vFed->registerOptionalSubscription<double>("temp", x, y+1);
+		sub[3] = vFed->registerOptionalSubscriptionIndexed<double>("temp", x, y+1);
 		vFed->setDefaultValue(sub[3], -512.0);
 		initialized = true;
 	}

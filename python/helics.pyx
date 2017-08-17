@@ -30,8 +30,8 @@ cdef class PyFederateInfo(object):
         logger.debug("Cython: running {}.__alloc__".format(self.__class__.__name__))
         self.ptr_fi = new FederateInfo()
 
-        deref(self.ptr_fi).coreType = "zmq";
-        deref(self.ptr_fi).coreInitString = str(number);
+        deref(self.ptr_fi).coreType = "zmq".encode('ascii');
+        deref(self.ptr_fi).coreInitString = str(number).encode('ascii');
 
     # def __del__(self):
         # logger.debug("Python: running {}.__del__".format(self.__class__.__name__))
@@ -42,7 +42,7 @@ cdef class PyFederateInfo(object):
             # del self.ptr_fi
 
     def setName(self, name):
-        deref(self.ptr_fi).name = name;
+        deref(self.ptr_fi).name = name.encode('ascii');
 
 
 cdef class PyValueFederate(object):
@@ -65,8 +65,8 @@ cdef class PyValueFederate(object):
             list publications=[]):
 
 
-        self._string_type = "string"
-        self._empty_string = ""
+        self._string_type = "string".encode('ascii')
+        self._empty_string = "".encode('ascii')
 
         logger.debug("Cython: running {}.__alloc__".format(self.__class__.__name__))
 
@@ -78,16 +78,20 @@ cdef class PyValueFederate(object):
 
         logger.debug("Storing a reference to all publications")
         for i, p in enumerate(publications):
-            self._pubid = deref(self.vFed).registerGlobalPublication(p, self._string_type)
+            logger.debug("Storing {p}".format(p=p))
+            self._pubid = deref(self.vFed).registerGlobalPublication(p.encode('ascii'), self._string_type)
             self.publication_vector.push_back(self._pubid)
-            self.p_string.push_back(p)
+            self.p_string.push_back(p.encode('ascii'))
 
         logger.debug("Storing a reference to all subscriptions")
         for i, s in enumerate(subscriptions):
-            self._subid = deref(self.vFed).registerRequiredSubscription(s, self._string_type)
-            deref(self.vFed).setDefaultValue[int](self._subid, defaultValue)
+            logger.debug("Storing {s}".format(s=s))
+            self._subid = deref(self.vFed).registerRequiredSubscription(s.encode('ascii'), self._string_type)
+            logger.debug("Stored {s} locally".format(s=s))
+            # deref(self.vFed).setDefaultValue[int](self._subid, defaultValue)
+            # logger.debug("Set default value")
             self.subscription_vector.push_back(self._subid)
-            self.s_string.push_back(s)
+            self.s_string.push_back(s.encode('ascii'))
 
         logger.debug("Setting timeDelta")
         deref(self.vFed).setTimeDelta(timeDelta)
@@ -105,14 +109,14 @@ cdef class PyValueFederate(object):
     def send(self, value, publication_id):
         exists = False
         for i, p in enumerate(self.p_string):
-            if <string> p == <string> publication_id:
+            if <string> p == <string> publication_id.encode('ascii'):
                 exists = True
                 break
         if exists is False:
-            raise KeyError("Unable to find '{}' in list of publications".format(<string>publication_id))
+            raise KeyError("Unable to find '{}' in list of publications".format(<string> publication_id.encode('ascii')))
         else:
             self._pubid = self.publication_vector[i]
-            deref(self.vFed).publish(self._pubid, <string> value)
+            deref(self.vFed).publish(self._pubid, <string> value.encode('ascii'))
 
     def recv_all(self):
         for i, s in enumerate(self.s_string):
@@ -126,11 +130,11 @@ cdef class PyValueFederate(object):
         else:
             exists = False
             for i, s in enumerate(self.s_string):
-                if <string> s == <string> subscription_id:
+                if <string> s == <string> subscription_id.encode('ascii'):
                     exists = True
                     break
             if exists is False:
-                raise KeyError("Unable to find '{}' in list of subscriptions".format(<string>subscription_id))
+                raise KeyError("Unable to find '{}' in list of subscriptions".format(<string> subscription_id.encode('ascii')))
             else:
                 self._subid = self.subscription_vector[i]
                 value = self.cGetValue(self._subid)

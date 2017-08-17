@@ -140,13 +140,15 @@ public:
 	void createSubscription(Core::Handle id_, const std::string &key,
 		const std::string &type,
 		const std::string &units,
-		bool required);
+		handle_check_mode check_mode);
 	void createPublication(Core::Handle id_, const std::string &key,
 		const std::string &type,
 		const std::string &units);
 	void createEndpoint(Core::Handle id_, const std::string &key,
 		const std::string &type);
-	void createFilter(Core::Handle id_, bool destFilter, const std::string &key, const std::string &target,
+	void createSourceFilter(Core::Handle id_, const std::string &key, const std::string &target,
+		const std::string &type);
+	void createDestFilter(Core::Handle id_, const std::string &key, const std::string &target,
 		const std::string &type);
 
 	uint64_t getQueueSize(Core::Handle id) const;

@@ -28,7 +28,9 @@ class stringToCmdLine
 public:
 	/** construct from a string*/
 	stringToCmdLine(const std::string &cmdString);
-	/** load a string */
+	/** load a string 
+	@param cmdString a single string containing command line arguments
+	*/
 	void load(const std::string &cmdString);
 	/** get the number of separate arguments corresponding to argc*/
 	int getArgCount() const { return argCount; }

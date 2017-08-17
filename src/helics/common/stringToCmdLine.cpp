@@ -68,11 +68,17 @@ void stringToCmdLine::load (const std::string &cmdString)
 static const std::string quoteChars(R"raw("'`)raw");
 
 static const std::string delimChars(" \t\n\r");
-//generalized_section_splitting(line, delimiters, quoteChars, pmap, compress);
 
 std::vector<std::string> splitlineQuotes(const std::string &line)
 {
 	auto sectionLoc = line.find_first_of(quoteChars);
+	if ((sectionLoc!=std::string::npos)&&(sectionLoc > 0))
+	{
+		while (line[sectionLoc - 1] != '\\') //check for escape character
+		{
+			sectionLoc = line.find_first_of(quoteChars, sectionLoc + 1);
+		}
+	}
 	std::vector<std::string> strVec;
 	decltype (sectionLoc) start = 0;
 	if (sectionLoc == std::string::npos)

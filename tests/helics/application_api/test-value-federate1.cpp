@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE (value_federate_publication_registration)
 
 	BOOST_CHECK(vFed->getPublicationId("pub1") == pubid);
 	BOOST_CHECK(vFed->getPublicationId("pub2") == pubid2);
-	BOOST_CHECK(vFed->getPublicationId("test1.pub1") == pubid);
+	BOOST_CHECK(vFed->getPublicationId("test1/pub1") == pubid);
     vFed->finalize ();
 
     BOOST_CHECK (vFed->currentState () == helics::Federate::op_states::finalize);
@@ -81,9 +81,9 @@ BOOST_AUTO_TEST_CASE (value_federate_subscription_registration)
     auto subid2 = vFed->registerRequiredSubscription<int> ("sub2");
 
     auto subid3 = vFed->registerOptionalSubscription ("sub3", "double", "V");
-    vFed->enterExecutionState ();
+   // vFed->enterExecutionState ();
 
-    BOOST_CHECK (vFed->currentState () == helics::Federate::op_states::execution);
+   // BOOST_CHECK (vFed->currentState () == helics::Federate::op_states::execution);
 
     auto sv = vFed->getSubscriptionName (subid);
     auto sv2 = vFed->getSubscriptionName (subid2);
@@ -147,10 +147,10 @@ BOOST_AUTO_TEST_CASE (value_federate_subscription_and_publication_registration)
 
     sv = vFed->getPublicationName (pubid);
     sv2 = vFed->getPublicationName (pubid2);
-    BOOST_CHECK_EQUAL (sv, "test1.pub1");
+    BOOST_CHECK_EQUAL (sv, "test1/pub1");
     BOOST_CHECK_EQUAL (sv2, "pub2");
     auto pub3name = vFed->getPublicationName (pubid3);
-    BOOST_CHECK_EQUAL (pub3name, "test1.pub3");
+    BOOST_CHECK_EQUAL (pub3name, "test1/pub3");
 
     BOOST_CHECK_EQUAL (vFed->getPublicationType (pubid3), "double");
     BOOST_CHECK_EQUAL (vFed->getPublicationUnits (pubid3), "V");

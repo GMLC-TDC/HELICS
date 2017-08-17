@@ -385,7 +385,7 @@ void CoreBroker::processCommand (ActionMessage &command)
         {
             if (_isRoot)
             {
-                checkPublications ();
+                checkSubscriptions ();
                 checkEndpoints ();
                 checkFilters ();
                 // computeDependencies();
@@ -479,14 +479,64 @@ void CoreBroker::processCommand (ActionMessage &command)
         }
         break;
     case CMD_REG_PUB:
+		if (!_isRoot)
+		{
+			if (command.dest_id != 0)
+			{
+				auto rt = getRoute(command.dest_id);
+				transmit(rt, command);
+				break;
+			}
+		}
+		addPublication(command);
         break;
     case CMD_REG_SUB:
+		if (!_isRoot)
+		{
+			if (command.dest_id != 0)
+			{
+				auto rt = getRoute(command.dest_id);
+				transmit(rt, command);
+				break;
+			}
+		}
+		addSubscription(command);
         break;
     case CMD_REG_END:
+		if (!_isRoot)
+		{
+			if (command.dest_id != 0)
+			{
+				auto rt = getRoute(command.dest_id);
+				transmit(rt, command);
+				break;
+			}
+		}
+		addEndpoint(command);
         break;
-    case CMD_REG_DST:
+    case CMD_REG_DST_FILTER:
+		if (!_isRoot)
+		{
+			if (command.dest_id != 0)
+			{
+				auto rt = getRoute(command.dest_id);
+				transmit(rt, command);
+				break;
+			}
+		}
+		addDestFilter(command);
         break;
-    case CMD_REG_SRC:
+    case CMD_REG_SRC_FILTER:
+		if (!_isRoot)
+		{
+			if (command.dest_id != 0)
+			{
+				auto rt = getRoute(command.dest_id);
+				transmit(rt, command);
+				break;
+			}
+		}
+		addSourceFilter(command);
         break;
     default:
         // check again if it is a priority command and if so process it in that function
@@ -496,6 +546,87 @@ void CoreBroker::processCommand (ActionMessage &command)
             break;
         }
     }
+}
+
+
+void CoreBroker::addLocalInfo(BasicHandleInfo &handleInfo, const ActionMessage &m)
+{
+	std::unique_lock<std::mutex> lock(mutex_);
+	auto res = global_id_translation.find(m.source_id);
+	if (res != global_id_translation.end())
+	{
+		handleInfo.local_fed_id = res->second;
+	}
+}
+
+void CoreBroker::addPublication(ActionMessage &m)
+{
+	_handles.emplace_back(m.source_handle, m.source_id, HANDLE_PUB, m.name, m.info().type, m.info().units);
+	publications.emplace(m.name, static_cast<int32_t>(_handles.size() - 1));
+	
+	addLocalInfo(_handles.back(), m);
+	if (!_isRoot)
+	{
+		transmit(0, m);
+	}
+	else
+	{
+		FindandNotifyPublicationSubscribers(_handles.back());
+	}
+	
+	
+}
+void CoreBroker::addSubscription(ActionMessage &m)
+{
+	_handles.emplace_back(m.source_handle, m.source_id, HANDLE_SUB, m.name, m.info().type, m.info().units);
+	addLocalInfo(_handles.back(), m);
+	subscriptions.emplace(m.name, static_cast<int32_t>(_handles.size() - 1));
+	bool proc = FindandNotifySubscriptionPublisher(_handles.back());
+	if (!_isRoot)
+	{
+		//just let any higher level brokers know we have found the publisher and let them know
+		m.processingComplete = proc;
+		transmit(0, m);
+	}
+}
+
+void CoreBroker::addEndpoint(ActionMessage &m)
+{
+	_handles.emplace_back(m.source_handle, m.source_id, HANDLE_END, m.name, m.info().type, m.info().units);
+	endpoints.emplace(m.name, static_cast<int32_t>(_handles.size() - 1));
+
+	addLocalInfo(_handles.back(), m);
+	
+	if (!_isRoot)
+	{
+		transmit(0, m);
+	}
+	else
+	{
+		FindandNotifyEndpointFilters(_handles.back());
+	}
+}
+void CoreBroker::addSourceFilter(ActionMessage &m)
+{
+	_handles.emplace_back(m.source_handle, m.source_id, HANDLE_SOURCE_FILTER, m.name, m.info().type, m.info().target);
+	addLocalInfo(_handles.back(), m);
+	bool proc = FindandNotifyFilterEndpoint(_handles.back());
+	if (!_isRoot)
+	{
+		m.processingComplete = proc;
+		transmit(0, m);
+	}
+}
+void CoreBroker::addDestFilter(ActionMessage &m)
+{
+	_handles.emplace_back(m.source_handle, m.source_id, HANDLE_DEST_FILTER, m.name, m.info().type, m.info().target,true);
+	addLocalInfo(_handles.back(), m);
+	bool proc = FindandNotifyFilterEndpoint(_handles.back());
+	if (!_isRoot)
+	{
+		m.processingComplete = proc;
+		transmit(0, m);
+	}
 }
 
 static void argumentParser (int argc, char *argv[], boost::program_options::variables_map &vm_map);
@@ -638,7 +769,7 @@ void argumentParser (int argc, char *argv[], boost::program_options::variables_m
     visible.add (cmd_only).add (config);
 
     po::positional_options_description p;
-    p.add ("input", -1);
+    p.add ("min", -1);
 
     po::variables_map cmd_vm;
     try
@@ -694,7 +825,155 @@ void argumentParser (int argc, char *argv[], boost::program_options::variables_m
     po::notify (vm_map);
 }
 
-void CoreBroker::checkPublications ()
+bool CoreBroker::FindandNotifySubscriptionPublisher(BasicHandleInfo &handleInfo)
+{
+	if (!handleInfo.processed)
+	{
+		auto pubHandle = publications.find(handleInfo.key);
+		if (pubHandle != publications.end())
+		{
+			auto &pubInfo = _handles[pubHandle->second];
+			if (!matchingTypes(pubInfo.type, handleInfo.type))
+			{
+				// LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
+				// pubInfo->type << ENDL;
+			}
+			//notify the subscription about its publisher
+			ActionMessage m(CMD_NOTIFY_PUB);
+			m.source_id = pubInfo.fed_id;
+			m.source_handle = pubInfo.id;
+			m.dest_id = handleInfo.fed_id;
+			m.dest_handle = handleInfo.id;
+
+			transmit(getRoute(m.dest_id), m);
+
+			//notify the publisher about its subscription
+			m.setAction(CMD_NOTIFY_SUB);
+			m.source_id = handleInfo.fed_id;
+			m.source_handle = handleInfo.id;
+			m.dest_id = pubInfo.fed_id;
+			m.dest_handle = pubInfo.id;
+
+			transmit(getRoute(m.dest_id), m);
+
+			handleInfo.processed = true;
+		}
+	}
+	return handleInfo.processed;
+}
+
+void CoreBroker::FindandNotifyPublicationSubscribers(BasicHandleInfo &handleInfo)
+{
+		auto subHandles = subscriptions.equal_range(handleInfo.key);
+		for (auto sub = subHandles.first; sub != subHandles.second; ++sub)
+		{
+			auto &subInfo = _handles[sub->second];
+			if (subInfo.processed)
+			{
+				continue;
+			}
+			if (!matchingTypes(subInfo.type, handleInfo.type))
+			{
+				// LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
+				// pubInfo->type << ENDL;
+			}
+			//notify the subscription about its publisher
+			ActionMessage m(CMD_NOTIFY_SUB);
+			m.source_id = subInfo.fed_id;
+			m.source_handle = subInfo.id;
+			m.dest_id = handleInfo.fed_id;
+			m.dest_handle = handleInfo.id;
+
+			transmit(getRoute(m.dest_id), m);
+
+			//notify the publisher about its subscription
+			m.setAction(CMD_NOTIFY_PUB);
+			m.source_id = handleInfo.fed_id;
+			m.source_handle = handleInfo.id;
+			m.dest_id = subInfo.fed_id;
+			m.dest_handle = subInfo.id;
+
+			transmit(getRoute(m.dest_id), m);
+			subInfo.processed = true;
+		}
+
+}
+
+bool CoreBroker::FindandNotifyFilterEndpoint(BasicHandleInfo &handleInfo)
+{
+	if (!handleInfo.processed)
+	{
+		auto endHandle = endpoints.find(handleInfo.target);
+		if (endHandle != endpoints.end())
+		{
+			auto &endInfo = _handles[endHandle->second];
+			if (!matchingTypes(endInfo.type, handleInfo.type))
+			{
+				// LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
+				// pubInfo->type << ENDL;
+			}
+			//notify the filter about its endpoint
+			ActionMessage m(CMD_NOTIFY_END);
+			m.source_id = endInfo.fed_id;
+			m.source_handle = endInfo.id;
+			m.dest_id = handleInfo.fed_id;
+			m.dest_handle = handleInfo.id;
+
+			transmit(getRoute(m.dest_id), m);
+
+			//notify the endpoint about its filter
+			m.setAction((handleInfo.what == HANDLE_SOURCE_FILTER) ? CMD_NOTIFY_SRC_FILTER : CMD_NOTIFY_DST_FILTER);
+			m.source_id = handleInfo.fed_id;
+			m.source_handle = handleInfo.id;
+			m.dest_id = endInfo.fed_id;
+			m.dest_handle = endInfo.id;
+
+			transmit(getRoute(m.dest_id), m);
+
+			handleInfo.processed = true;
+		}
+	}
+	return handleInfo.processed;
+}
+
+
+void CoreBroker::FindandNotifyEndpointFilters(BasicHandleInfo &handleInfo)
+{
+	auto filtHandles = filters.equal_range(handleInfo.target);
+	for (auto filt = filtHandles.first; filt != filtHandles.second; ++filt)
+	{
+		auto &filtInfo = _handles[filt->second];
+		if (filtInfo.processed)
+		{
+			continue;
+		}
+		if (!matchingTypes(filtInfo.type, handleInfo.type))
+		{
+			// LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
+			// pubInfo->type << ENDL;
+		}
+		//notify the endpoint about a filter
+		ActionMessage m((handleInfo.what == HANDLE_SOURCE_FILTER) ? CMD_NOTIFY_SRC_FILTER : CMD_NOTIFY_DST_FILTER);
+		m.source_id = filtInfo.fed_id;
+		m.source_handle = filtInfo.id;
+		m.dest_id = handleInfo.fed_id;
+		m.dest_handle = handleInfo.id;
+
+		transmit(getRoute(m.dest_id), m);
+
+		//notify the publisher about its subscription
+		m.setAction(CMD_NOTIFY_END);
+		m.source_id = handleInfo.fed_id;
+		m.source_handle = handleInfo.id;
+		m.dest_id = filtInfo.fed_id;
+		m.dest_handle = filtInfo.id;
+
+		transmit(getRoute(m.dest_id), m);
+		filtInfo.processed = true;
+	}
+}
+
+void CoreBroker::checkSubscriptions ()
 {
     // pub/sub checks
     // LOG(INFO) << "performing pub/sub check" << ENDL;
@@ -702,23 +981,16 @@ void CoreBroker::checkPublications ()
     {
         if (hndl.what == HANDLE_SUB)
         {
-            auto pubHandle = publications.find (hndl.key);
-            if (pubHandle != publications.end ())
-            {
-                auto pubInfo = _handles[pubHandle->second];
-                if (!matchingTypes (pubInfo.type, hndl.type))
-                {
-                    // LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
-                    // pubInfo->type << ENDL;
-                }
-                // TODO::send a message to the subscriber and publisher
-                // auto pubInfoComplete = getFederate(pubInfo->fed_id)->getPublication(pubInfo->id);
-                // pubInfoComplete->subscribers.emplace_back(hndl->fed_id, hndl->id);
-            }
-            else if (hndl.flag)
-            {
-                // LOG(WARN) << "sub " << hndl->key << " has no corresponding pub" << ENDL;
-            }
+			if (!hndl.processed)
+			{
+				auto fnd=FindandNotifySubscriptionPublisher(hndl);
+				if ((!fnd)&&(hndl.flag))
+				{
+					// LOG(WARN) << "sub " << hndl->key << " has no corresponding pub" << ENDL;
+				}
+			}
+            
+         
         }
     }
 }
@@ -730,64 +1002,13 @@ void CoreBroker::checkFilters ()
     // LOG(INFO) << "performing filter check" << ENDL;
     for (auto &hndl : _handles)
     {
-        if (hndl.what == HANDLE_FILTER)
+        if ((hndl.what == HANDLE_DEST_FILTER)||(hndl.what==HANDLE_SOURCE_FILTER))
         {
-            auto target = endpoints.find (hndl.target);
-            if (target != endpoints.end ())
-            {
-                // flag that the endpoint has a filter
-                //	auto filterI = getFederate(hndl->fed_id)->getFilter(hndl->id);
-                //	auto epI = getHandleInfo(target->second);
-                //	epI->flag = true;  //flag indicates that the endpoint has filters
-                // get the filter Functions
-                //	auto ffunc = getFilterFunctions(epI->id);
-                //	if (hndl->destFilter)
-                //	{
-                // get the detailed info
-                //		if (filterI->filterOp == nullptr)
-                //		{
-                //		LOG(WARN) << "destination filter for" << hndl->target << " must use filter operators" <<
-                // ENDL;
-                //		}
-                //		epI->destFilter;
-                //		if (ffunc->hasDestOperator)
-                //		{
-                //			LOG(WARN) << "multiple destination Filters set for" << hndl->target << ENDL;
-                //		}
-                //		else
-                //		{
-                //			ffunc->destOperator = { hndl->fed_id,hndl->id };
-                //			ffunc->hasDestOperator = true;
-                //		}
-                //	}
-                //	else
-                //	{
-                // is the filter an operator or a different Federate
-                //		if (filterI->filterOp != nullptr)
-                //		{
-                //			ffunc->hasSourceOperators = true;
-                //			ffunc->sourceOperators.emplace_back(hndl->fed_id, hndl->id);
-                //		}
-                //		else
-                //		{
-                //			if (ffunc->hasSourceFilter)
-                //			{
-                //				LOG(WARN) << "multiple non-operator Source Filters set for" << hndl->target <<
-                // ENDL;
-                //			}
-                //			else
-                //			{
-                //				ffunc->finalSourceFilter = { hndl->fed_id,hndl->id };
-                //				ffunc->hasSourceFilter = true;
-                //			}
-                //		}
-                //	}
-
-                //}
-                // else
-                //{
-                //	LOG(WARN) << "filter for" << hndl->target << " has no corresponding endpoint" << ENDL;
-            }
+			auto fnd = FindandNotifyFilterEndpoint(hndl);
+			if (!fnd)
+			{
+				// LOG(WARN) << "sub " << hndl->key << " has no corresponding pub" << ENDL;
+			}
         }
     }
 }

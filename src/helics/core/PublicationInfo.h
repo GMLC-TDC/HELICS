@@ -39,18 +39,18 @@ public:
 		units(units_)
 	{
 	}
-	/** destructor*/
-	~PublicationInfo() = default;
 
 	Core::Handle id;  //!< the handle id 
 	Core::federate_id_t fed_id;	//!< the indentifier for the containing federate
+	std::vector<std::pair<Core::federate_id_t, Core::Handle>> subscribers; //!< container for all the subscribers of a publcation
 	std::string key;	//!< the key identifier for the publication
 	std::string type;	//!< the type of the publication data
 	std::string units;	//!< the units of the publication data
+	std::string data;	//!< the most recent publication data
 	bool has_update = false;	//!< indicator that the publication has updates
 	//7 byte gap here
-	std::string data;	//!< the most recent publication data
-	std::vector<std::pair<Core::federate_id_t, Core::Handle>> subscribers; //!< container for all the subscribers of a publcation
+	
+	
 };
 } // namespace helics
 

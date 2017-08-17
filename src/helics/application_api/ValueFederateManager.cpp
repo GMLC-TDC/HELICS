@@ -39,7 +39,7 @@ publication_id_t ValueFederateManager::registerPublication (const std::string &n
     pubs.back ().id = id;
     pubs.back ().size = sz;
     publicationNames.emplace (name, id);
-    pubs.back ().coreID = coreObject->registerPublication (fedID, name.c_str (), type.c_str (), units.c_str ());
+    pubs.back ().coreID = coreObject->registerPublication (fedID, name, type, units);
     return id;
 }
 
@@ -53,8 +53,9 @@ subscription_id_t ValueFederateManager::registerRequiredSubscription (const std:
     subs.back ().id = id;
     subscriptionNames.emplace (name, id);
     subs.back ().coreID =
-      coreObject->registerSubscription (fedID, name.c_str (), type.c_str (), units.c_str (), true);
+      coreObject->registerSubscription (fedID, name, type, units, handle_check_mode::required);
     handleLookup.emplace (subs.back ().coreID, id);
+	lastData.resize(id.value());
     return id;
 }
 
@@ -69,8 +70,9 @@ subscription_id_t ValueFederateManager::registerOptionalSubscription (const std:
     subs.back ().id = id;
     subscriptionNames.emplace (name, id);
     subs.back ().coreID =
-      coreObject->registerSubscription (fedID, name.c_str (), type.c_str (), units.c_str (), false);
+      coreObject->registerSubscription (fedID, name, type, units, handle_check_mode::optional);
     handleLookup.emplace (subs.back ().coreID, id);
+	lastData.resize(id.value());
     return id;
 }
 
@@ -93,11 +95,7 @@ void ValueFederateManager::setDefaultValue (subscription_id_t id, data_view bloc
     {
         std::lock_guard<std::mutex> sublock (subscription_mutex);
         /** copy the data first since we are not entirely sure of the lifetime of the data_view*/
-        if (lastData.size () <= id.value ())
-        {
-            lastData.resize (subs.size ());
-        }
-        lastData[id.value ()] = data_view (std::make_shared<data_block> (block.to_data_block()));
+        lastData[id.value ()] = block;
         subs[id.value ()].lastUpdate = CurrentTime;
     }
     else

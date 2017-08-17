@@ -45,7 +45,8 @@ static void argumentParser (int argc, char *argv[], boost::program_options::vari
 
 	config.add_options()
 		("broker,b", po::value<std::string>(), "identifier for the broker")
-		("brokerinit", po::value<int>(), "the initialization string for the broker");
+		("brokername", po::value<std::string>(), "identifier for the broker-same as broker")
+		("brokerinit", po::value<std::string>(), "the initialization string for the broker");
 
 
     // clang-format on
@@ -118,6 +119,10 @@ void TestCore::initializeFromArgs (int argc, char *argv[])
         {
             brokerName = vm["broker"].as<std::string> ();
         }
+		else if (vm.count("brokername") > 0)
+		{
+			brokerName = vm["brokername"].as<std::string>();
+		}
 			if (vm.count("brokerinit") > 0)
 			{
 				brokerInitString=vm["brokerinit"].as<std::string>();

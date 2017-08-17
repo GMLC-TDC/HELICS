@@ -23,7 +23,7 @@ endpoint_id_t MessageFederateManager::registerEndpoint (const std::string &name,
     endpoint_id_t id = static_cast<identifier_type> (local_endpoints.size ());
     local_endpoints.emplace_back (name, type);
     local_endpoints.back ().id = id;
-    local_endpoints.back ().handle = coreObject->registerEndpoint (fedID, name.c_str (), type.c_str ());
+    local_endpoints.back ().handle = coreObject->registerEndpoint (fedID, name, type);
     endpointNames.emplace (name, id);
     handleLookup.emplace (local_endpoints.back ().handle, id);
     return id;
@@ -35,8 +35,8 @@ void MessageFederateManager::registerKnownCommunicationPath (endpoint_id_t local
 {
     if (localEndpoint.value () < local_endpoints.size ())
     {
-        coreObject->registerFrequentCommunicationsPair (local_endpoints[localEndpoint.value ()].name.c_str (),
-                                                        remoteEndpoint.c_str ());
+        coreObject->registerFrequentCommunicationsPair (local_endpoints[localEndpoint.value ()].name,
+                                                        remoteEndpoint);
     }
 }
 
@@ -44,7 +44,7 @@ void MessageFederateManager::subscribe (endpoint_id_t endpoint, const std::strin
 {
     if (endpoint.value () < local_endpoints.size ())
     {
-        auto h = coreObject->registerSubscription (fedID, name.c_str (), type.c_str (), "", false);
+        auto h = coreObject->registerSubscription (fedID, name, type, "", handle_check_mode::optional);
         std::lock_guard<std::mutex> eLock (endpointLock);
         subHandleLookup.emplace (h, std::make_pair (endpoint, name));
         hasSubscriptions = true;

@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(testcore_pubsub_value_test)
 
 	core->setTimeDelta(id, 1.0);
 	
-	Core::Handle sub1 = core->registerSubscription(id, "sim1_pub", "type", "units", false);
+	Core::Handle sub1 = core->registerSubscription(id, "sim1_pub", "type", "units", handle_check_mode::optional);
 	BOOST_CHECK_EQUAL(core->getSubscription(id, "sim1_pub"), sub1);
 	BOOST_CHECK_EQUAL(core->getType(sub1), "type");
 	BOOST_CHECK_EQUAL(core->getUnits(sub1), "units");
@@ -152,6 +152,7 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_source_test)
 	Core::Handle end2 = core->registerEndpoint(id, "end2", "type");
 	Core::Handle endp = core->registerEndpoint(id, "end_filt", "type");
 
+	
 	Core::Handle srcFilter = core->registerSourceFilter(id, "srcFilter", "end1", "type");
 
 	core->enterInitializingState(id);
@@ -177,6 +178,7 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_source_test)
 
 	// Receive the filtered message
 	BOOST_CHECK_EQUAL(core->receiveCount(end2), 1u);
+	BOOST_CHECK_EQUAL(core->receiveCount(endp), 0);
 	auto msg = core->receive(end2);
 	BOOST_CHECK_EQUAL(msg->origsrc, "end1");
 	BOOST_CHECK_EQUAL(msg->src, "sourceFilter");

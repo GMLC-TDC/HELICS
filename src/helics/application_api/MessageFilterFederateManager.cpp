@@ -29,7 +29,7 @@ namespace helics
 		filters.emplace_back(filterName, sourceEndpoint, inputType);
 		filters.back().id = id;
 		filters.back().ftype = filter_type::source_filter;
-		filters.back().handle = coreObject->registerSourceFilter(fedID, filterName.c_str(), sourceEndpoint.c_str(), inputType.c_str());
+		filters.back().handle = coreObject->registerSourceFilter(fedID, filterName, sourceEndpoint, inputType);
 		SourceFilterNames.emplace(filterName, id);
 		if (filterName != sourceEndpoint)
 		{
@@ -52,7 +52,7 @@ namespace helics
 		{
 			DestFilterNames.emplace(destEndpoint, id);
 		}
-		filters.back().handle = coreObject->registerDestinationFilter(fedID, filterName.c_str(), destEndpoint.c_str(), inputType.c_str());
+		filters.back().handle = coreObject->registerDestinationFilter(fedID, filterName, destEndpoint, inputType);
 		handleLookup.emplace(filters.back().handle, id);
 		return id;
 	}

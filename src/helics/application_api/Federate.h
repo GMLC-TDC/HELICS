@@ -101,7 +101,7 @@ class Federate
     */
     Federate (const std::string &jsonString);
 
-    Federate ();
+    Federate () noexcept;
     Federate (Federate &&fed) noexcept;
     Federate (const Federate &fed) = delete;
     /** virtual destructor function */

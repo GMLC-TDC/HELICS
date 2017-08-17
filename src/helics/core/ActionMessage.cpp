@@ -14,7 +14,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-ActionMessage::ActionMessage (action_t action) : action_ (action),name(payload)
+ActionMessage::ActionMessage (action_t action) : action_ (action), index(dest_handle), processingComplete(iterationComplete), name(payload)
 {
 	if (action >= cmd_info_basis)
 	{
@@ -24,7 +24,7 @@ ActionMessage::ActionMessage (action_t action) : action_ (action),name(payload)
 
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
     : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
-      dest_handle (act.dest_handle), iterationComplete (act.iterationComplete), required (act.required),
+      dest_handle (act.dest_handle), index(dest_handle), iterationComplete (act.iterationComplete), processingComplete(iterationComplete), required (act.required),
 	  error(act.error), flag(act.flag), actionTime(act.actionTime), payload(std::move(act.payload)), name(payload),
       info_(std::move(act.info_))
 {
@@ -32,7 +32,7 @@ ActionMessage::ActionMessage (ActionMessage &&act) noexcept
 
 ActionMessage::ActionMessage (const ActionMessage &act)
     : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
-      dest_handle (act.dest_handle), iterationComplete (act.iterationComplete), required (act.required),
+      dest_handle (act.dest_handle), index(dest_handle), iterationComplete (act.iterationComplete), processingComplete(iterationComplete), required (act.required),
 	  error(act.error), flag(act.flag), actionTime(act.actionTime), payload(act.payload), name(payload)
 
 {
@@ -42,13 +42,29 @@ ActionMessage::ActionMessage (const ActionMessage &act)
     }
 }
 
-ActionMessage::ActionMessage(std::unique_ptr<Message> message):action_(action_t::cmd_send_message), actionTime(message->time), payload(std::move(message->data.to_string())),name(payload)
+ActionMessage::ActionMessage(std::unique_ptr<Message> message):action_(action_t::cmd_send_message), index(dest_handle), processingComplete(iterationComplete), actionTime(message->time), payload(std::move(message->data.to_string())),name(payload)
 {
 	info_ = std::make_unique<AdditionalInfo>();
 	info_->source = std::move(message->src);
 	info_->orig_source = std::move(message->origsrc);
 	info_->target = std::move(message->dest);
 
+}
+
+
+ActionMessage::ActionMessage(const std::string &bytes):ActionMessage()
+{
+	from_string(bytes);
+}
+
+ActionMessage::ActionMessage(const std::vector<char> &bytes): ActionMessage()
+{
+	from_vector(bytes);
+}
+
+ActionMessage::ActionMessage(const char *data, size_t size): ActionMessage()
+{
+	fromByteArray(data, size);
 }
 
 ActionMessage::~ActionMessage() = default;
@@ -135,15 +151,46 @@ const ActionMessage::AdditionalInfo &ActionMessage::info() const
 	return emptyAddInfo;
 }
 
+using archiver = cereal::PortableBinaryOutputArchive;
+
+using retriever = cereal::PortableBinaryInputArchive;
 
 void ActionMessage::toByteArray(char *data, size_t buffer_size) const
 {
 	boost::iostreams::basic_array_sink<char> sr(data, buffer_size);
 	boost::iostreams::stream< boost::iostreams::basic_array_sink<char> > s(sr);
 
-	cereal::PortableBinaryOutputArchive oa(s);
+	archiver oa(s);
 
 	save(oa);
+}
+
+std::string ActionMessage::to_string() const
+{
+	std::string data;
+	boost::iostreams::back_insert_device<std::string> inserter(data);
+	boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
+	archiver oa(s);
+
+	save(oa);
+
+	// don't forget to flush the stream to finish writing into the buffer
+	s.flush();
+	return data;
+}
+
+std::vector<char> ActionMessage::to_vector() const
+{
+	std::vector<char> data;
+	boost::iostreams::back_insert_device<std::vector<char>> inserter(data);
+	boost::iostreams::stream<boost::iostreams::back_insert_device<std::vector<char>> > s(inserter);
+	archiver oa(s);
+
+	save(oa);
+
+	// don't forget to flush the stream to finish writing into the buffer
+	s.flush();
+	return data;
 }
 
 void ActionMessage::to_string(std::string &data) const
@@ -152,7 +199,7 @@ void ActionMessage::to_string(std::string &data) const
 
 	boost::iostreams::back_insert_device<std::string> inserter(data);
 	boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
-	cereal::PortableBinaryOutputArchive oa(s);
+	archiver oa(s);
 
 	save(oa);
 
@@ -165,7 +212,7 @@ void ActionMessage::fromByteArray(const char *data, size_t buffer_size)
 {
 	boost::iostreams::basic_array_source<char> device(data, buffer_size);
 	boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s(device);
-	cereal::PortableBinaryInputArchive ia(s);
+	retriever ia(s);
 	load(ia);
 }
 
@@ -174,6 +221,10 @@ void ActionMessage::from_string(const std::string &data)
 	fromByteArray(data.data(), data.size());
 }
 
+void ActionMessage::from_vector(const std::vector<char> &data)
+{
+	fromByteArray(data.data(), data.size());
+}
 
 std::unique_ptr<Message> createMessage (const ActionMessage &cmd)
 {

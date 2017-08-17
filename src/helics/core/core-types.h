@@ -51,5 +51,11 @@ enum class convergence_state :char
 
 };
 
+enum class handle_check_mode : char
+{
+	required=0,
+	optional=1,
+};
+
 #endif
 

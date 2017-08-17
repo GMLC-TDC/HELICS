@@ -52,6 +52,11 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
          state = op_states::error;
          return;
     }
+	/** make sure the core is connected */
+	if (!coreObject->isConnected())
+	{
+		coreObject->connect();
+	}
     fedID = coreObject->registerFederate (fi.name.c_str (), generateCoreInfo (fi));
 }
 
@@ -64,7 +69,7 @@ Federate::Federate (const std::string &file) : Federate (LoadFederateInfo (file)
 }
 
 
-Federate::Federate ()
+Federate::Federate () noexcept
 {
 	
     // this function needs to be defined for the virtual inheritance to compile but shouldn't actually be executed

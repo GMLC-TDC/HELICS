@@ -68,7 +68,7 @@ CommonCore(const std::string &core_name);
   virtual void setTimeDelta (federate_id_t federateId, Time time) override;
   virtual void setLookAhead(federate_id_t federateId, Time timeLookAhead) override;
   virtual void setImpactWindow(federate_id_t federateId, Time timeImpact) override;
-  virtual Handle registerSubscription (federate_id_t federateId, const std::string &key, const std::string &type, const std::string &units, bool required) override;
+  virtual Handle registerSubscription (federate_id_t federateId, const std::string &key, const std::string &type, const std::string &units, handle_check_mode check_mode) override;
   virtual Handle getSubscription (federate_id_t federateId, const std::string &key) override;
   virtual Handle registerPublication (federate_id_t federateId, const std::string &key, const std::string &type, const std::string &units) override;
   virtual Handle getPublication (federate_id_t federateId, const std::string &key) override;
@@ -167,6 +167,7 @@ private:
 protected:
 	std::atomic<bool> _operating{ false }; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
   std::vector<std::unique_ptr<FederateState>> _federates; //!< local federate information
+  //using pointers to minimize time in a critical section- though this should be timed more in the future
   std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
   int32_t _min_federates;  //!< the minimum number of federates that must connect before entering init mode
   int32_t _max_iterations; //!< the maximum allowable number of iterations
@@ -180,7 +181,8 @@ protected:
   std::atomic<bool> _initialized{ false };  //!< indicator that the structure has been initialized
   std::map<Handle, std::unique_ptr<FilterFunctions>> filters; //!< map of all filters
  private:
-  mutable std::mutex _mutex; //!< mutex protecting the federate and handle structures
+  mutable std::mutex _mutex; //!< mutex protecting the federate creation and modification
+  mutable std::mutex _handlemutex; //!< mutex protecting the publications and subscription structures
 
 protected:
 	/** add a message to the queue*/
