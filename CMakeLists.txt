@@ -257,9 +257,9 @@ SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
 
 if (${MPI_C_FOUND})
   #find_package(Boost COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
-  find_package(Boost COMPONENTS program_options unit_test_framework filesystem system serialization date_time REQUIRED)
+  find_package(Boost COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
 ELSE(${MPI_C_FOUND})
-  find_package(Boost COMPONENTS program_options unit_test_framework filesystem system serialization date_time REQUIRED)
+  find_package(Boost COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
 ENDIF(${MPI_C_FOUND})
 
 mark_as_advanced(CLEAR BOOST_ROOT)
