@@ -65,6 +65,50 @@ BOOST_AUTO_TEST_CASE(action_test1)
 	BOOST_CHECK(m.actionTime = fr.actionTime);
 }
 
+BOOST_AUTO_TEST_CASE(action_test2)
+{
+	helics::ActionMessage m(CMD_REG_SUB);
+	/*
+	auto b = sizeof(m);
+	BOOST_CHECK_LT(b, 64);
+	if (b > 64)
+	{
+	printf("sizeof(info_)=%d\n", static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>)));
+	printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.info_)) - reinterpret_cast<char *>(&m)));
+	}
+	*/
+	m.actionTime = 47.2342;
+	m.payload = "this is a string that is sufficiently long";
+	m.source_handle = 4;
+	m.source_id = 232324;
+	m.dest_id = 22552215;
+	m.dest_handle = 2322342;
+	m.info().source = "this is a message source of something else";
+	m.info().orig_source="this is a different message source of something else";
+	m.info().target = "a message target";
+	m.info().Tdemin = 2342342.23423;
+	m.info().Te = 24.2;
+	
+	std::string data;
+	m.to_string(data);
+
+	ActionMessage fr;
+	fr.from_string(data);
+	BOOST_CHECK(m.action() == fr.action());
+	BOOST_CHECK_EQUAL(m.payload, fr.payload);
+	BOOST_CHECK_EQUAL(m.source_handle, fr.source_handle);
+	BOOST_CHECK_EQUAL(m.source_id, fr.source_id);
+	BOOST_CHECK_EQUAL(m.dest_handle, fr.dest_handle);
+	BOOST_CHECK_EQUAL(m.dest_id, fr.dest_id);
+	BOOST_CHECK(m.actionTime == fr.actionTime);
+	BOOST_CHECK_EQUAL(m.info().source, fr.info().source);
+	
+	BOOST_CHECK_EQUAL(m.info().orig_source, fr.info().orig_source);
+	BOOST_CHECK_EQUAL(m.info().target ,fr.info().target);
+	BOOST_CHECK(m.info().Tdemin == fr.info().Tdemin);
+	BOOST_CHECK(m.info().Te == fr.info().Te);
+
+}
 
 
 BOOST_AUTO_TEST_SUITE_END()

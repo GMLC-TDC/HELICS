@@ -7,8 +7,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 */
 #include "ActionMessage.h"
-
+#include <complex>
 #include <cereal/archives/portable_binary.hpp>
+//#include <cereal/archives/binary.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>
 

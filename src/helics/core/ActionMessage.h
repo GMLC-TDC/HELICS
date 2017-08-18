@@ -212,6 +212,7 @@ class ActionMessage
     void fromByteArray (const char *data, size_t buffer_size);
     void from_string (const std::string &data);
 	void from_vector(const std::vector<char> &data);
+
 };
 
 

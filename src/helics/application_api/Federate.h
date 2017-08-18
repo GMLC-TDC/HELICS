@@ -41,6 +41,7 @@ class FederateInfo
     bool uninterruptible =
       false;  //!< indicator that the time request cannot return something other than the requested time
     bool sourceOnly = false;  //!< indicator that the federate is a source only
+	int16_t max_iterations = 10;  //!< the maximum number of iteration cycles a federate should execute
     std::string coreType;  //!< the type of the core
     std::string coreName;  //!< the name of the core
     Time timeDelta = timeZero;  //!< the period of the federate
