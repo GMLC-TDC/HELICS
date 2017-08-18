@@ -7,7 +7,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 #include <boost/test/unit_test.hpp>
 
-#include "helics/core/actionMessage.h"
+#include "helics/core/ActionMessage.h"
 #include <cstdio>
 
 BOOST_AUTO_TEST_SUITE(ActionMessage_tests)
