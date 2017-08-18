@@ -62,7 +62,7 @@ void simA (std::shared_ptr<helics::Core> core, const std::string &NAME)
     std::string str2 (data->to_string ());
 
     BOOST_CHECK_EQUAL(str1, str2);
-    assert (data->size () == str1.size ());
+    BOOST_CHECK_EQUAL(data->size(), str1.size ());
     core->setValue (pub1, "hello\n\0helloAgain", 17);
     core->timeRequest (id, 150);
     events = core->getValueUpdates (id);
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_SUITE(Node_Core_tests, *boost::unit_test::disabled())
 
 BOOST_AUTO_TEST_CASE(TestCore_node_tests)
 {
-    std::shared_ptr<helics::Core> core = helics::CoreFactory::create(HELICS_TEST, "4");
+    auto core = helics::CoreFactory::create(HELICS_TEST, "4");
     BOOST_CHECK(core != nullptr);
     BOOST_CHECK(core->isInitialized());
 
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(TestCore_node_tests)
 
 BOOST_AUTO_TEST_CASE(ZeromqCore_node_tests)
 {
-    std::shared_ptr<helics::Core> core = helics::CoreFactory::create(HELICS_ZMQ, "1");
+    auto core = helics::CoreFactory::create(HELICS_ZMQ, "1");
     BOOST_CHECK(core != nullptr);
     BOOST_CHECK(core->isInitialized());
 
