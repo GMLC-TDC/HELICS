@@ -32,7 +32,7 @@ public:
 private:
 	std::unique_ptr<AdditionalInfo> info_;   //!< pointer to an additional info structure with more data if required
 */
-BOOST_AUTO_TEST_CASE(action_test1)
+BOOST_AUTO_TEST_CASE(action_test_to_string_conversion)
 {
 	helics::ActionMessage m(CMD_IGNORE);
 	/*
@@ -64,6 +64,52 @@ BOOST_AUTO_TEST_CASE(action_test1)
 	BOOST_CHECK_EQUAL(m.dest_id, fr.dest_id);
 	BOOST_CHECK(m.actionTime = fr.actionTime);
 }
+
+BOOST_AUTO_TEST_CASE(action_test_to_string_conversion_info)
+{
+	helics::ActionMessage m(CMD_REG_SUB);
+	/*
+	auto b = sizeof(m);
+	BOOST_CHECK_LT(b, 64);
+	if (b > 64)
+	{
+	printf("sizeof(info_)=%d\n", static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>)));
+	printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.info_)) - reinterpret_cast<char *>(&m)));
+	}
+	*/
+	m.actionTime = 47.2342;
+	m.payload = "this is a string that is sufficiently long";
+	m.source_handle = 4;
+	m.source_id = 232324;
+	m.dest_id = 22552215;
+	m.dest_handle = 2322342;
+
+	m.info().source = "this is a long source string to test";
+	m.info().orig_source= "this is a longer alternate source string to test";
+	m.info().target = "this is a target";
+	m.info().Tdemin = 2342532.2342;
+	m.info().Te = Time::epsilon();
+
+	std::string data;
+	m.to_string(data);
+
+	ActionMessage fr;
+	fr.from_string(data);
+	BOOST_CHECK(m.action() == fr.action());
+	BOOST_CHECK_EQUAL(m.payload, fr.payload);
+	BOOST_CHECK_EQUAL(m.source_handle, fr.source_handle);
+	BOOST_CHECK_EQUAL(m.source_id, fr.source_id);
+	BOOST_CHECK_EQUAL(m.dest_handle, fr.dest_handle);
+	BOOST_CHECK_EQUAL(m.dest_id, fr.dest_id);
+	BOOST_CHECK(m.actionTime == fr.actionTime);
+
+	BOOST_CHECK_EQUAL(m.info().source, fr.info().source);
+	BOOST_CHECK_EQUAL(m.info().orig_source, fr.info().orig_source);
+	BOOST_CHECK_EQUAL(m.info().target, fr.info().target);
+	BOOST_CHECK(m.info().Te==fr.info().Te);
+	BOOST_CHECK(m.info().Tdemin == fr.info().Tdemin);
+}
+
 
 BOOST_AUTO_TEST_CASE(constructor_test)
 {
