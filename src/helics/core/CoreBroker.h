@@ -16,6 +16,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <thread>
 #include <map>
 #include <unordered_map>
+#include <functional>
 
 #include "BasicHandleInfo.h"
 #include "ActionMessage.h"
@@ -83,6 +84,8 @@ private:
 	std::map<Core::federate_id_t, int32_t> federate_table; //!< map for translating global federate id's to a local index
 	std::unordered_map<std::string, int32_t> knownExternalEndpoints; //!< external map for all known external endpoints with names and route
 	std::thread _queue_processing_thread;  //!< thread for running the broker
+	/** a logging function for logging or printing messages*/
+	std::function<void(int, const std::string &, const std::string &)> loggerFunction;
 protected:
 	std::atomic<bool> _initialized{ false }; //!< indicator if the system is initialized (mainly if the thread is running)
 private:
@@ -163,6 +166,11 @@ public:
 	}
 
 	virtual std::string getAddress() const = 0;
+
+	void setLogger(std::function<void(int, const std::string &, const std::string &)> logFunction)
+	{
+		loggerFunction = std::move(logFunction);
+	}
 private:
 	void checkSubscriptions();
 	bool FindandNotifySubscriptionPublisher(BasicHandleInfo &handleInfo);

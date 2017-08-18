@@ -14,6 +14,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "SubscriptionInfo.h"
 
 #include <algorithm>
+#include <chrono>
+#include <thread>
+
 namespace helics
 {
 void FederateState::setState (helics_federate_state_type newState)
@@ -32,6 +35,11 @@ helics_federate_state_type FederateState::getState () const { return state; }
 
 static auto compareFunc = [](const auto &A, const auto &B) { return (A->id < B->id); };
 
+void FederateState::UpdateFederateInfo(CoreFederateInfo &newInfo)
+{
+	std::lock_guard<std::mutex> lock(_mutex);
+	info = newInfo;
+}
 
 void FederateState::createSubscription (Core::Handle handle,
                                         const std::string &key,
@@ -339,6 +347,79 @@ std::unique_ptr<Message> FederateState::receiveForFilter(Core::Handle &id)
 	return nullptr;
 }
 
+void FederateState::addAction(const ActionMessage &action)
+{
+	if (action.action() != CMD_IGNORE)
+	{
+		queue.push(action);
+	}
+	
+}
+
+
+bool FederateState::waitSetup()
+{
+	bool expected = false;
+	if (processing.compare_exchange_strong(expected, true))
+	{ //only enter this loop once per federate
+		bool ret=processQueue();
+		processing = false;
+		return ret;
+	}
+	else
+	{
+		while (!processing.compare_exchange_weak(expected, true))
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(20));
+		}
+		bool ret = (getState() != HELICS_ERROR);
+		processing = false;
+		return ret;
+	}
+}
+/** process until the init state has been entered or there is a failure*/
+bool FederateState::enterInitState()
+{
+	bool expected = false;
+	if (processing.compare_exchange_strong(expected, true))
+	{ //only enter this loop once per federate
+		bool ret=processQueue();
+		processing = false;
+		return ret;
+	}
+	else
+	{
+		while (!processing.compare_exchange_weak(expected, true))
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(20));
+		}
+		bool ret = (getState() >= HELICS_INITIALIZING);
+		processing = false;
+		return ret;
+	}
+}
+
+convergence_state FederateState::enterExecutingState()
+{
+	bool expected = false;
+	if (processing.compare_exchange_strong(expected, true))
+	{ //only enter this loop once per federate
+		bool ret = processQueue();
+		auto retconv= ret ? convergence_state::complete : convergence_state::nonconverged;
+		processing = false;
+		return retconv;
+	}
+	else
+	{
+		while (!processing.compare_exchange_weak(expected, true))
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(20));
+		}
+		auto retconv= (getState() == HELICS_EXECUTING) ? convergence_state::complete : convergence_state::nonconverged;
+		processing = false;
+		return retconv;
+	}
+}
 
 bool FederateState::processQueue ()
 {
@@ -453,14 +534,22 @@ bool FederateState::processQueue ()
 		case CMD_NOTIFY_PUB:
 		{
 			auto subI = getSubscription(cmd.dest_handle);
-			subI->target = { cmd.source_id,cmd.source_handle };
+			if (subI != nullptr)
+			{
+				subI->target = { cmd.source_id,cmd.source_handle };
+			}
+			
 		}
             break;
         case CMD_REG_SUB:
 		case CMD_NOTIFY_SUB:
 		{
 			auto pubI = getPublication(cmd.dest_handle);
-			pubI->subscribers.emplace_back(cmd.source_id, cmd.source_handle);
+			if (pubI != nullptr)
+			{
+				pubI->subscribers.emplace_back(cmd.source_id, cmd.source_handle);
+			}
+			
 		}
             break;
         case CMD_REG_END:
@@ -473,7 +562,11 @@ bool FederateState::processQueue ()
 		case CMD_NOTIFY_SRC_FILTER:
 		{
 			auto endI = getEndpoint(cmd.dest_handle);
-			endI->hasFilter = true;
+			if (endI != nullptr)
+			{
+				endI->hasFilter = true;
+			}
+			
 			//todo probably need to do something more here
 		}
             break;
@@ -510,13 +603,33 @@ DependencyInfo &FederateState::getDependencyInfo (Core::federate_id_t ofed)
 
 iterationTime  FederateState::requestTime(Time nextTime, convergence_state converged)
 {
-	iterating = (converged!=convergence_state::complete);
-	time_requested = nextTime;
-	time_event = time_requested; //TODO: this is not correct yet but will pass the next case
-	//*push a message to check whether time can be granted
-	queue.push(CMD_TIME_CHECK);
-	bool ret = processQueue();
-	return{ time_granted,ret?convergence_state::complete:convergence_state::nonconverged };
+	bool expected = false;
+	if (processing.compare_exchange_strong(expected, true))
+	{ //only enter this loop once per federate
+		iterating = (converged != convergence_state::complete);
+		time_requested = nextTime;
+		time_event = time_requested; //TODO: this is not correct yet but will pass the next case
+									 //*push a message to check whether time can be granted
+		queue.push(CMD_TIME_CHECK);
+		bool ret = processQueue();
+		
+		iterating = !ret;
+		iterationTime retTime= { time_granted,ret ? convergence_state::complete : convergence_state::nonconverged };
+		processing = false;
+		return retTime;
+	}
+	else
+	{
+		while (!processing.compare_exchange_weak(expected, true))
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(20));
+		}
+		iterationTime retTime = { time_granted,iterating ? convergence_state::nonconverged : convergence_state::complete };
+		processing = false;
+		return retTime;
+		
+	}
+	
 }
 
 int FederateState::processExecRequest(ActionMessage &cmd)

@@ -581,6 +581,10 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     {
         fi.coreInitString = doc["coreInit"].asString ();
     }
+	if (doc.isMember("maxiterations"))
+	{
+		fi.max_iterations = static_cast<int16_t>(doc["maxiterations"].asInt());
+	}
     if (doc.isMember ("period"))
     {
         if (doc["period"].isObject ())

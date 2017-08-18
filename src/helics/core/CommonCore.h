@@ -90,7 +90,7 @@ CommonCore(const std::string &core_name);
   virtual std::unique_ptr<Message> receive (Handle destination) override;
   virtual std::unique_ptr<Message> receiveAny (federate_id_t federateId, Handle &endpoint_id) override;
   virtual uint64_t receiveCountAny (federate_id_t federateId) override;
-  virtual void logMessage(federate_id_t federateId, int logCode, const std::string &logMessage) override;
+  virtual void logMessage(federate_id_t federateId, int logLevel, const std::string &logMessage) override;
   virtual void setFilterOperator(Handle filter, std::shared_ptr<FilterOperator> callback) override;
 
   virtual uint64_t receiveFilterCount(federate_id_t federateID) override;
@@ -103,6 +103,9 @@ CommonCore(const std::string &core_name);
   {
 	  return identifier;
   }
+
+  virtual void setLoggingFunction(federate_id_t federateID, std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
+  
   /** get a string representing the connection info to send data to this object*/
   virtual std::string getAddress() const=0;
   /** add a command to the process queue*/
@@ -153,6 +156,9 @@ protected:
   bool allInitReady() const;
   /** check if all federates have said good-bye*/
   bool allDisconnected() const;
+  /** sendaMessage to the logging system
+  */
+  void sendToLogger(federate_id_t federateID, int logLevel, const std::string &name, const std::string &message) const;
 private:
 	std::atomic<int32_t> global_broker_id{ 0 };  //!< global identifier for the broker
 	std::string identifier;  //!< an identifier for the broker
@@ -163,6 +169,7 @@ private:
 	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delays for a certain time
 	std::unordered_map<std::string, int32_t> knownExternalEndpoints; //!< external map for all known external endpoints with names and route
 	
+	/** actually transmit messages that were delayed until the core was actually registered*/
 	void transmitDelayedMessages();
 protected:
 	std::atomic<bool> _operating{ false }; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
@@ -178,6 +185,7 @@ protected:
   
   std::unordered_map<std::string, Handle> publications;	//!< map of all local publications
   std::unordered_map<std::string, Handle> endpoints;	//!< map of all local endpoints
+  std::unordered_map<std::string, federate_id_t> federateNames;  //!< map of federate names to id
   std::atomic<bool> _initialized{ false };  //!< indicator that the structure has been initialized
   std::map<Handle, std::unique_ptr<FilterFunctions>> filters; //!< map of all filters
  private:

@@ -16,6 +16,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <utility>
 #include <string>
 #include <memory>
+#include <functional>
 
 /**
  * HELICS Core API
@@ -50,6 +51,7 @@ public:
 								// federate
 	Time lookAhead = timeZero;  //!< the lookahead value, the window of time between the time request return and the availability of values
 	Time impactWindow = timeZero;  //!< the time it takes values to propagate to the Federate
+	
 								   //TODO: make into a bitfield with named constants and add setFlags function
 	bool observer = false;  //!< flag indicating that the federate is an observer
 	bool uninteruptible =
@@ -57,7 +59,8 @@ public:
 	bool time_agnostic = false;  //!< flag indicating that the federate does not participate in time advancement and should be ignored in all timeRequest operations
 	bool source_only = false;   //!< flag indicating that the federate does not recieve or do anything with received information.  
 	bool filter_only = false; //!< flag indicating that the source filter federate is not modifying the destination of a filtered message only time or content
-	//there are 3 bytes undefined in this structure
+	int16_t max_iterations = 3;	//!< the maximum number of iterations allowed for the federate
+							  //there are 3 bytes undefined in this structure
 };
 
 /** the object defining the core interface through an abstract class*/
@@ -461,10 +464,10 @@ class Core
 
     /** send a log message to the Core for logging
     @param[in] federateId the federate that is sending the log message
-    @param[in] logCode  an integer based logging code
+    @param[in] logLevel  an integer for the log level (0- error, 1- warning, 2-status, 3-debug)
     @param[in] logMessage the message to log
     */
-    virtual void logMessage (federate_id_t federateId, int logCode, const std::string &logMessage) = 0;
+    virtual void logMessage (federate_id_t federateId, int logLevel, const std::string &logMessage) = 0;
 
 	/** set the filter callback *  setting a filter callback implies that the filter has no time or order dependency
 	and the filter is an independent function
@@ -485,6 +488,14 @@ class Core
 	@param[out] filter_id the filter handle related to the message gets stored here
 	*/
 	virtual std::unique_ptr<Message> receiveAnyFilter(federate_id_t federateID, Handle &filter_id) = 0;
+
+	/** define a logging function to use for logging message and notices from the federation and individual federate
+	@param federateID  the identifier for the individual federate
+	@param logFunction the callback function for doing something with a log message
+	it takes 3 inputs an integer for logLevel 0-4  0 -error, 1- warning 2-status, 3-debug
+	A string indicating the source of the message and another string with the actual message
+	*/
+	virtual void setLoggingFunction(federate_id_t federateID, std::function<void(int, const std::string &, const std::string &)> logFunction) = 0;
 };
 
 // set at a large negative number but not the largest negative number
