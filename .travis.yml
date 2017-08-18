@@ -77,8 +77,8 @@ install:
   - tar xzvf boost_1_64_0.tar.gz
   - cd boost_1_64_0/
   - ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test
-  - ./b2 link=shared threading=multi variant=release
-  - sudo ./b2 install
+  - ./b2 link=shared threading=multi variant=release > /dev/null
+  - sudo ./b2 install > /dev/null
   - cd ..
   - pwd
   - ls
