@@ -11,7 +11,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/core/core.h"
 #include "helics/core/core-types.h"
 
-BOOST_AUTO_TEST_SUITE(zeromqcore_tests)
+BOOST_AUTO_TEST_SUITE(ZeromqCore_tests)
 
 using helics::Core;
 using helics::CoreFactory;

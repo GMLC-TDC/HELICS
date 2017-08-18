@@ -45,6 +45,7 @@ class BasicHandleInfo
 		if ((what == HANDLE_SOURCE_FILTER)||(what==HANDLE_DEST_FILTER))
 		{
 			target = units;
+            destFilter = (what == HANDLE_DEST_FILTER);
 		}
     }
 
