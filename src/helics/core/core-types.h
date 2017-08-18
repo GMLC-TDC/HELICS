@@ -46,8 +46,10 @@ enum helics_time_unit
 /** enumeration of the possible states of convergence*/
 enum class convergence_state :char
 {
+	error = -5,		//!< indicator that an error has occured
 	complete = 0,  //!< indicator that the iterations have completed
 	nonconverged = 1,	//!< indicator that the iterations are continuing
+	halted = 3,	//!< indicator that the simulation has been halted
 
 };
 
