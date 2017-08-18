@@ -377,21 +377,48 @@ bool CommonCore::isInitialized () const { return _initialized; }
 void CommonCore::error (federate_id_t federateID, int errorCode)
 {
     auto fed = getFederate (federateID);
-    fed->setState (HELICS_ERROR);
-    ActionMessage m (ActionMessage::action_t::cmd_error);
+	if (fed == nullptr)
+	{
+		throw(invalidIdentifier());
+	}
+    ActionMessage m (CMD_ERROR);
     m.source_id = fed->global_id;
     m.source_handle = errorCode;
     _queue.push (m);
+	fed->addAction(m);
+	convergence_state ret = convergence_state::complete;
+	while (ret != convergence_state::error)
+	{
+		ret = fed->genericUnspecifiedQueueProcess();
+		if (ret == convergence_state::halted)
+		{
+			break;
+		}
+	}
 }
 
 
 void CommonCore::finalize (federate_id_t federateID)
 {
     auto fed = getFederate (federateID);
-    fed->setState (HELICS_FINISHED);
+	if (fed == nullptr)
+	{
+		throw(invalidIdentifier());
+	}
     ActionMessage bye (CMD_DISCONNECT);
     bye.source_id = fed->global_id;
     _queue.push (bye);
+	fed->addAction(bye);
+	convergence_state ret = convergence_state::complete;
+	while (ret != convergence_state::halted)
+	{
+		ret = fed->genericUnspecifiedQueueProcess();
+		if (ret == convergence_state::error)
+		{
+			break;
+		}
+	}
+	
 }
 
 bool CommonCore::allInitReady () const
@@ -446,8 +473,8 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
 		m.source_id = fed->global_id;
 		_queue.push(m);
 
-		bool check = fed->enterInitState();
-		if (!check)
+		auto check = fed->enterInitState();
+		if (check!=convergence_state::complete)
 		{
 			fed->init_requested = false;
 			throw(functionExecutionFailure());
@@ -510,7 +537,7 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
 
 	//now wait for the federateQueue to get the response
     auto valid = getFederate(id)->waitSetup();
-    if (valid)
+    if (valid==convergence_state::complete)
     {
 		lock.lock(); //relock the mutex
 		federateNames.emplace(name, id);
@@ -560,6 +587,10 @@ int32_t CommonCore::getFederationSize ()
 Time CommonCore::timeRequest (federate_id_t federateID, Time next)
 {
     auto fed = getFederate (federateID);
+	if (fed == nullptr)
+	{
+		throw(invalidIdentifier());
+	}
     if (HELICS_EXECUTING == fed->getState ())
     {
         auto ret = fed->requestTime (next, convergence_state::complete);

@@ -31,9 +31,27 @@ void FederateState::setState (helics_federate_state_type newState)
     state = newState;
 }
 
+void FederateState::reset()
+{
+	state = HELICS_CREATED;
+	//TODO:: this probably needs to do a lot more
+}
+/** reset the federate to the initializing state*/
+void FederateState::reInit()
+{
+	state == HELICS_INITIALIZING;
+	// TODO:: this needs to reset a bunch of stuff as well as check a few things
+}
 helics_federate_state_type FederateState::getState () const { return state; }
 
 static auto compareFunc = [](const auto &A, const auto &B) { return (A->id < B->id); };
+
+CoreFederateInfo FederateState::getInfo() const 
+{
+	//lock the mutex to ensure we have the latest values
+	std::lock_guard<std::mutex> lock(_mutex); 
+	return info; 
+}
 
 void FederateState::UpdateFederateInfo(CoreFederateInfo &newInfo)
 {
@@ -279,6 +297,8 @@ uint64_t FederateState::getFilterQueueSize() const
 	return cnt;
 }
 
+
+
 std::unique_ptr<Message> FederateState::receive (Core::Handle handle_)
 {
     auto epI = getEndpoint (handle_);
@@ -357,12 +377,12 @@ void FederateState::addAction(const ActionMessage &action)
 }
 
 
-bool FederateState::waitSetup()
+convergence_state FederateState::waitSetup()
 {
 	bool expected = false;
 	if (processing.compare_exchange_strong(expected, true))
 	{ //only enter this loop once per federate
-		bool ret=processQueue();
+		auto ret=processQueue();
 		processing = false;
 		return ret;
 	}
@@ -372,18 +392,31 @@ bool FederateState::waitSetup()
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		}
-		bool ret = (getState() != HELICS_ERROR);
+		convergence_state ret;
+		switch (getState())
+		{
+		case HELICS_ERROR:
+			ret=convergence_state::error;
+			break;
+		case HELICS_FINISHED:
+			ret=convergence_state::halted;
+			break;
+		default:
+			ret=convergence_state::complete;
+			break;
+		}
+
 		processing = false;
 		return ret;
 	}
 }
 /** process until the init state has been entered or there is a failure*/
-bool FederateState::enterInitState()
+convergence_state FederateState::enterInitState()
 {
 	bool expected = false;
 	if (processing.compare_exchange_strong(expected, true))
 	{ //only enter this loop once per federate
-		bool ret=processQueue();
+		auto ret=processQueue();
 		processing = false;
 		return ret;
 	}
@@ -393,7 +426,23 @@ bool FederateState::enterInitState()
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		}
-		bool ret = (getState() >= HELICS_INITIALIZING);
+		convergence_state ret;
+		switch (getState())
+		{
+		case HELICS_ERROR:
+			ret = convergence_state::error;
+			break;
+		case HELICS_FINISHED:
+			ret = convergence_state::halted;
+			break;
+		case HELICS_CREATED:
+			//not sure this can actually happen
+			ret = convergence_state::nonconverged;
+			break;
+		default: //everything >= HELICS_INITIALIZING
+			ret = convergence_state::complete;
+			break;
+		}
 		processing = false;
 		return ret;
 	}
@@ -404,10 +453,9 @@ convergence_state FederateState::enterExecutingState()
 	bool expected = false;
 	if (processing.compare_exchange_strong(expected, true))
 	{ //only enter this loop once per federate
-		bool ret = processQueue();
-		auto retconv= ret ? convergence_state::complete : convergence_state::nonconverged;
+		auto ret = processQueue();
 		processing = false;
-		return retconv;
+		return ret;
 	}
 	else
 	{
@@ -415,13 +463,51 @@ convergence_state FederateState::enterExecutingState()
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		}
-		auto retconv= (getState() == HELICS_EXECUTING) ? convergence_state::complete : convergence_state::nonconverged;
+		convergence_state ret;
+		switch (getState())
+		{
+		case HELICS_ERROR:
+			ret = convergence_state::error;
+			break;
+		case HELICS_FINISHED:
+			ret = convergence_state::halted;
+			break;
+		case HELICS_CREATED:
+		case HELICS_INITIALIZING:
+		default:
+			ret = convergence_state::nonconverged;
+			break;
+		case HELICS_EXECUTING:
+			ret = convergence_state::complete;
+			break;
+		}
 		processing = false;
-		return retconv;
+		return ret;
 	}
 }
 
-bool FederateState::processQueue ()
+
+convergence_state FederateState::genericUnspecifiedQueueProcess()
+{
+	bool expected = false;
+	if (processing.compare_exchange_strong(expected, true))
+	{ //only enter this loop once per federate
+		auto ret = processQueue();
+		processing = false;
+		return ret;
+	}
+	else
+	{
+		while (!processing.compare_exchange_weak(expected, true))
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(20));
+		}
+		processing = false;
+		return convergence_state::complete;
+	}
+}
+
+convergence_state FederateState::processQueue ()
 {
     auto cmd = queue.pop ();
     while (1)
@@ -433,38 +519,32 @@ bool FederateState::processQueue ()
             break;
         case CMD_INIT_GRANT:
             setState (HELICS_INITIALIZING);
-            return true;
+            return convergence_state::complete;
         case CMD_EXEC_REQUEST:
         case CMD_EXEC_GRANT:
-		{
-			auto grant = processExecRequest(cmd);
-			if (grant == 1)
+			if (!processExecRequest(cmd))
 			{
-				return false;
+				break;
 			}
-			else if (grant == 2)
-			{
-				//TODO: send a time granted message
-				//ActionMessage grant(CMD_EXEC_GRANT);
-				//grant.source_id = global_id;
-				
-				setState(HELICS_EXECUTING);
-				return true;
-			}
-		}
-            break;
+			//FALLTHROUGH
 		case CMD_EXEC_CHECK:  //just check the time for entry
 		{
 			auto grant = checkExecEntry();
-			if (grant == 1)
+			switch (grant)
 			{
-				return false;
-			}
-			else if (grant == 2)
-			{
-				//TODO: send a time granted message
+			case convergence_state::nonconverged:
+
+				return grant;
+			case convergence_state::complete:
 				setState(HELICS_EXECUTING);
-				return true;
+				//TODO: send a time granted message
+				//ActionMessage grant(CMD_EXEC_GRANT);
+				//grant.source_id = global_id;
+				return grant;
+			case convergence_state::continue_processing:
+				break;
+			default:
+				return grant;
 			}
 		}
 		break;
@@ -473,35 +553,34 @@ bool FederateState::processQueue ()
 			if (cmd.dest_id == global_id)
 			{
 				setState(HELICS_FINISHED);
-				return false;
+				return convergence_state::halted;
 			}
 			break;
         case CMD_TIME_REQUEST:
         case CMD_TIME_GRANT:
-		{
-			auto update = processExternalTimeMessage(cmd);
-			if (update == 1)
+			if (!processExternalTimeMessage(cmd))
 			{
-				//TODO: send an update externally
+				break;
 			}
-			else if (update == 2)
-			{
-				//TODO: send a time granted message
-				return true;
-			}
-		}
-            break;
+		//FALLTHROUGH
 		case CMD_TIME_CHECK:
 		{
 			auto update = updateTimeFactors();
-			if (update == 1)
+			switch (update)
 			{
+			case convergence_state::nonconverged:
 				//TODO: send an update externally
-			}
-			else if (update == 2)
-			{
+				break;
+			case convergence_state::complete:
+				setState(HELICS_EXECUTING);
 				//TODO: send a time granted message
-				return true;
+				//ActionMessage grant(CMD_EXEC_GRANT);
+				//grant.source_id = global_id;
+				return update;
+			case convergence_state::continue_processing:
+				break;
+			default:
+				return update;
 			}
 		}
 		break;
@@ -509,6 +588,7 @@ bool FederateState::processQueue ()
         {
             auto epi = getEndpoint (cmd.dest_handle);
             epi->addMessage (createMessage (cmd));
+			//add function to update times if necessary
         }
         break;
         case CMD_SEND_FOR_FILTER:
@@ -516,6 +596,7 @@ bool FederateState::processQueue ()
 			//this should only be non time_agnostic filters
 			auto fI = getFilter(cmd.dest_handle);
 			fI->addMessage(createMessage(cmd));
+			//add function to update times if necessary
 		}
             break;
         case CMD_PUB:
@@ -529,7 +610,7 @@ bool FederateState::processQueue ()
             break;
         case CMD_ERROR:
 			setState(HELICS_ERROR);
-			return false;
+			return convergence_state::error;
         case CMD_REG_PUB:
 		case CMD_NOTIFY_PUB:
 		{
@@ -576,10 +657,10 @@ bool FederateState::processQueue ()
                 if (cmd.error)
                 {
                     setState (HELICS_ERROR);
-                    return false;
+                    return convergence_state::error;
                 }
                 global_id = cmd.dest_id;
-				return true;
+				return convergence_state::complete;
             }
             break;
         }
@@ -611,10 +692,10 @@ iterationTime  FederateState::requestTime(Time nextTime, convergence_state conve
 		time_event = time_requested; //TODO: this is not correct yet but will pass the next case
 									 //*push a message to check whether time can be granted
 		queue.push(CMD_TIME_CHECK);
-		bool ret = processQueue();
+		auto ret = processQueue();
 		
-		iterating = !ret;
-		iterationTime retTime= { time_granted,ret ? convergence_state::complete : convergence_state::nonconverged };
+		iterating = (ret==convergence_state::nonconverged);
+		iterationTime retTime= { time_granted,ret};
 		processing = false;
 		return retTime;
 	}
@@ -632,7 +713,7 @@ iterationTime  FederateState::requestTime(Time nextTime, convergence_state conve
 	
 }
 
-int FederateState::processExecRequest(ActionMessage &cmd)
+bool FederateState::processExecRequest(ActionMessage &cmd)
 {
 	auto &ofed = getDependencyInfo(cmd.source_id);
 	if (ofed.fedID == cmd.source_id)
@@ -648,12 +729,12 @@ int FederateState::processExecRequest(ActionMessage &cmd)
 			ofed.converged = cmd.iterationComplete;
 			break;
 		}
-		return checkExecEntry();
+		return true;
 	}
-	return 0;
+	return false;
 }
 
-int FederateState::checkExecEntry()
+convergence_state FederateState::checkExecEntry()
 {
 	if (iterating)
 	{
@@ -661,14 +742,14 @@ int FederateState::checkExecEntry()
 		{
 			if (!dep.exec_requested)
 			{
-				return 0;
+				return convergence_state::continue_processing;
 			}
 			if (!dep.exec_requested)
 			{
-				return 0;
+				return convergence_state::continue_processing;
 			}
 		}
-		return 1;  //todo add a check for updates and iteration limit
+		return convergence_state::nonconverged;  //todo add a check for updates and iteration limit
 	}
 	else
 	{
@@ -676,19 +757,19 @@ int FederateState::checkExecEntry()
 		{
 			if (!dep.exec_requested)
 			{
-				return 0;
+				return convergence_state::continue_processing;
 			}
 			if (!dep.converged)
 			{
-				return 0;
+				return convergence_state::continue_processing;
 			}
 		}
-		return 2;
+		return convergence_state::complete;
 	}
 	
 }
 
-int FederateState::processExternalTimeMessage (ActionMessage &cmd)
+bool FederateState::processExternalTimeMessage (ActionMessage &cmd)
 {
     auto &ofed = getDependencyInfo (cmd.source_id);
     if (ofed.fedID == cmd.source_id)
@@ -708,13 +789,18 @@ int FederateState::processExternalTimeMessage (ActionMessage &cmd)
             ofed.Tdemin = cmd.actionTime;
             break;
         }
-        return updateTimeFactors ();
+        return true;
     }
-	return 0;
+	return false;
 }
 
+void FederateState::computeNextEventTime(Time requested)
+{
+	time_event = std::min(time_message, time_value);
+	time_event = std::min(requested, time_event);
+}
 
-int FederateState::updateTimeFactors () 
+convergence_state FederateState::updateTimeFactors ()
 {
 	Time minNext = Time::maxVal();
 	Time minDe = Time::maxVal();
@@ -755,9 +841,9 @@ int FederateState::updateTimeFactors ()
 	Time Tallow(std::max(time_next, time_minDe));
 	if (time_event <= Tallow)
 	{
-		return 2;  //we can grant the time request
+		return convergence_state::complete;  //we can grant the time request
 	}
-	return (update) ? 1 : 0;
+	return (update) ? convergence_state::nonconverged : convergence_state::continue_processing;
 }
 
 void FederateState::generateKnownDependencies ()
@@ -813,10 +899,7 @@ void FederateState::addDependency (Core::federate_id_t fedID)
     {
         return;
     }
-    else
-    {
-        dependencies.emplace (dep, fedID);
-    }
+    dependencies.emplace (dep, fedID);
 }
 
 void FederateState::addDependent (Core::federate_id_t fedID)
@@ -826,10 +909,7 @@ void FederateState::addDependent (Core::federate_id_t fedID)
     {
         return;
     }
-    else
-    {
-        dependents.insert (dep, fedID);
-    }
+    dependents.insert (dep, fedID);
 }
 
 

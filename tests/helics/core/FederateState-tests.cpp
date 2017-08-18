@@ -34,8 +34,9 @@ BOOST_AUTO_TEST_CASE(constructor_test)
 	BOOST_CHECK_EQUAL(fs->getInfo().filter_only, false);
 
 	// Check other default state values
-	//BOOST_CHECK_EQUAL(fs->queue.size(), 0);
-	//BOOST_CHECK_EQUAL(fs->events.size(), 0);
+	BOOST_CHECK_EQUAL(fs->getQueueSize(), 0);
+	BOOST_CHECK_EQUAL(fs->getEvents().size(), 0);
+	BOOST_CHECK_EQUAL(fs->getFilterQueueSize(), 0);
 	//BOOST_CHECK_EQUAL(fs->message_queue.size(), 0);
 	//BOOST_CHECK_EQUAL(fs->dependencies.size(), 0);
 	BOOST_CHECK_EQUAL(fs->getDependents().size(), 0);
@@ -53,20 +54,6 @@ BOOST_AUTO_TEST_CASE(constructor_test)
 	//BOOST_CHECK_EQUAL(fs->time_minTe, helics::Time::zeroVal());
 	//BOOST_CHECK_EQUAL(fs->time_event, helics::Time::zeroVal());
 	BOOST_CHECK_EQUAL(fs->getInfo().max_iterations, 3);
-}
-
-BOOST_AUTO_TEST_CASE(set_state_test)
-{
-	BOOST_CHECK_EQUAL(fs->getState(), helics_federate_state_type::HELICS_CREATED);
-	fs->setState(helics_federate_state_type::HELICS_INITIALIZING);
-	BOOST_CHECK_EQUAL(fs->getState(), helics_federate_state_type::HELICS_INITIALIZING);
-
-	fs->setState(helics_federate_state_type::HELICS_EXECUTING);
-	BOOST_CHECK_EQUAL(fs->getState(), helics_federate_state_type::HELICS_EXECUTING);
-
-	// Attempt to set state back to initializing from executing, should not work
-	fs->setState(helics_federate_state_type::HELICS_INITIALIZING);
-	BOOST_CHECK_EQUAL(fs->getState(), helics_federate_state_type::HELICS_EXECUTING);
 }
 
 BOOST_AUTO_TEST_CASE(create_subscription_test)
@@ -270,7 +257,7 @@ BOOST_AUTO_TEST_CASE(basic_processmessage_test)
 	BOOST_CHECK_EQUAL(fs->getState(), helics_federate_state_type::HELICS_CREATED);
 	fs->addAction(cmd);
 	fs_process.wait();
-	BOOST_CHECK_EQUAL(fs_process.get(), true);
+	BOOST_CHECK(fs_process.get()==convergence_state::complete);
 	BOOST_CHECK_EQUAL(fs->getState(), helics_federate_state_type::HELICS_INITIALIZING);
 
 	// Test returning when the finished state is entered
@@ -295,7 +282,7 @@ BOOST_AUTO_TEST_CASE(basic_processmessage_test)
 	BOOST_CHECK_EQUAL(fs->getState(), helics_federate_state_type::HELICS_ERROR);
 
 	// Return to created state
-	fs->setState(helics_federate_state_type::HELICS_CREATED);
+	fs->reset();
 
 	// Test CMD_FED_ACK message when no error
 	cmd.setAction(helics::CMD_FED_ACK);
@@ -305,7 +292,7 @@ BOOST_AUTO_TEST_CASE(basic_processmessage_test)
 	fs_process = std::async(std::launch::async, [&]() { return fs->waitSetup(); });
 	fs->addAction(cmd);
 	fs_process.wait();
-	BOOST_CHECK_EQUAL(fs_process.get(), true);
+	BOOST_CHECK(fs_process.get()==convergence_state::complete);
 	BOOST_CHECK_EQUAL(fs->global_id, 22);
 
 	// Test CMD_FED_ACK message with an error
@@ -315,12 +302,12 @@ BOOST_AUTO_TEST_CASE(basic_processmessage_test)
 	fs_process = std::async(std::launch::async, [&]() { return fs->waitSetup(); });
 	fs->addAction(cmd);
 	fs_process.wait();
-	BOOST_CHECK_EQUAL(fs_process.get(), false);
+	BOOST_CHECK(fs_process.get()==convergence_state::error);
 	BOOST_CHECK_EQUAL(fs->global_id, 22);
 	BOOST_CHECK_EQUAL(fs->getState(), helics_federate_state_type::HELICS_ERROR);
 
 	// Return to initializing state
-	fs->setState(helics_federate_state_type::HELICS_INITIALIZING);
+	fs->reInit();
 
 	// Test CMD_EXEC_REQUEST/CMD_EXEC_GRANT returns 0 if dependencies/dependents aren't done; returns 1 if fs->iterating is true, 2 otherwise; if 1 ret false, if 2 ret true
 	cmd.setAction(helics::CMD_EXEC_GRANT);

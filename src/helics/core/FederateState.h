@@ -20,6 +20,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics-time.h"
 #include "helics/common/blocking_queue.h"
 #include "helics/config.h"
+#include "core/core-types.h"
 
 #include <algorithm>
 #include <atomic>
@@ -101,13 +102,15 @@ class FederateState
     // the variables for time coordination
     Time time_granted = timeZero;  //!< the most recent time granted
     Time time_requested = timeZero;  //!< the most recent time requested
-    Time time_next = timeZero;  //!< the next time to process
-    Time time_minDe = timeZero;  //!< the minimum dependent event
-    Time time_minTe = timeZero;  //!< the minimum event time
-    Time time_event = timeZero;  //!< the time of the next processing event
+    Time time_next = Time::maxVal();  //!< the next time to process
+    Time time_minDe = Time::maxVal();  //!< the minimum dependent event
+    Time time_minTe = Time::maxVal();  //!< the minimum event time
+    Time time_event = Time::maxVal();  //!< the time of the next processing event
+	Time time_message = Time::maxVal();	//!< the time of the earliest message
+	Time time_value = Time::maxVal();	//!< the time of the earliest value 
 
     std::atomic<int32_t> iteration{0};  //!< iteration counter
-    std::vector<Core::Handle> events;  //!< list of events to process
+    std::vector<Core::Handle> events;  //!< list of value events to process
     std::map<Core::Handle, std::vector<std::unique_ptr<Message>>> message_queue;  // structure of message queues
 
     mutable std::mutex _mutex;  //!< the mutex protecting the fed state
@@ -119,19 +122,34 @@ class FederateState
     FederateState (const FederateState &) = delete;
     FederateState &operator= (const FederateState &) = delete;
 
-    int processExternalTimeMessage (ActionMessage &cmd);
-    int updateTimeFactors ();
+	/** process a message related to exec request
+	@return true if it did anything
+	*/
+	bool processExecRequest(ActionMessage &cmd);
+	/** check if entry to the executing state can be granted*/
+	convergence_state checkExecEntry();
+	/** process a message related to time
+	@return true if it did anything
+	*/
+	bool processExternalTimeMessage (ActionMessage &cmd);
+	/** compute updates to time and determine if time could be granted*/
+	convergence_state updateTimeFactors ();
 
-    int processExecRequest (ActionMessage &cmd);
-
-    int checkExecEntry ();
+	
     // take a global id and get a reference to the dependencyInfo for the other fed
     DependencyInfo &getDependencyInfo (Core::federate_id_t ofed);
     /** a logging function for logging or printing messages*/
     std::function<void(int, const std::string &, const std::string &)> loggerFunction;
 
+	/** helper function for computing various time values*/
+	void computeNextEventTime(Time requested);
+	/** update the federate state */
+	void setState(helics_federate_state_type newState);
   public:
-    void setState (helics_federate_state_type newState);
+   /** reset the federate to created state*/
+	  void reset();
+	  /** reset the federate to the initializing state*/
+	  void reInit();
     helics_federate_state_type getState () const;
 
     SubscriptionInfo *getSubscription (const std::string &subName) const;
@@ -162,10 +180,19 @@ class FederateState
                            const std::string &target,
                            const std::string &type);
 
+	/** get the size of a message queue for a specific endpoint or filter handle*/
     uint64_t getQueueSize (Core::Handle id) const;
+	/** get the sum of all message queue sizes ie the total number of messages available in all endpoints*/
     uint64_t getQueueSize () const;
+	/** get the sum of all messages in filter queues*/
+	uint64_t getFilterQueueSize() const;
+	/** get the current iteration counter for an iterative call
+	@details this will work properly even when a federate is processing
+	*/
     int32_t getCurrentIteration () const { return iteration; }
-    uint64_t getFilterQueueSize () const;
+    /** get the next available message for an endpoint
+	@param id the handle of an endpoint or filter
+	@return a pointer to a message -the ownership of the message is transfered to the caller*/
     std::unique_ptr<Message> receive (Core::Handle id);
     /** get any message ready for reception
     @param[out] id the the endpoint related to the message*/
@@ -181,38 +208,49 @@ class FederateState
     2.  the executation state has been granted (or init state reentered from a iterative request)
     3.  time has been granted
     4. a break event is encountered
-    @return will return false if iteration is allowed --entering init state will always return true
+    @return a convergence state value with an indicator of return reason and state of convergence
     */
-    bool processQueue ();
+	convergence_state processQueue ();
+
 
   public:
-    CoreFederateInfo getInfo () const { return info; }
-
+	  /** get the info structure for the federate
+	  */
+	  CoreFederateInfo getInfo() const;
+	/** update the info structure as an atomic operation
+	*/
     void UpdateFederateInfo (CoreFederateInfo &newInfo);
 
+	/** get the granted time of a federate*/
     Time grantedTime () const { return time_granted; }
-
+	/**get a reference to the handles of subscriptions with value updates
+	*/
     const std::vector<Core::Handle> &getEvents () const { return events; }
-
+	/** get a reference to the global ids of dependent federates
+	*/
     const std::vector<Core::federate_id_t> &getDependents () const { return dependents; }
-
+	/** compute all the known dependencies
+	*/
     void generateKnownDependencies ();
     void addDependency (Core::federate_id_t fedToDependOn);
     void addDependent (Core::federate_id_t fedThatDependsOnThis);
-
+	/** specify the core object that manages this federate*/
     void setCoreObject (CommonCore *parent);
-	//the next 4 functions are the processing functions that actually process the queue
+	//the next 5 functions are the processing functions that actually process the queue
 	/** process until the federate has verified its membership and assigned a global id number*/
-	bool waitSetup();
+	convergence_state waitSetup();
 	/** process until the init state has been entered or there is a failure*/
-	bool enterInitState();
+	convergence_state enterInitState();
     /** function to call when enterering execution state
     returns either converged or nonconverged depening on whether an iteration is needed
     */
     convergence_state enterExecutingState ();
 
     iterationTime requestTime (Time nextTime, convergence_state converged);
-
+	/** function to process the queue in a generic fashion used to just process messages
+	with no specific end in mind
+	*/
+	convergence_state genericUnspecifiedQueueProcess();
     void addAction (const ActionMessage &action);
 
     void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
