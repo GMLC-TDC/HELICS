@@ -73,6 +73,13 @@ install:
   - git clone git://github.com/zeromq/libzmq.git
   - ( cd libzmq; ./autogen.sh; ./configure; make check; sudo make install; sudo ldconfig )
   - echo "*** built zmq successfully"
+  - wget -O boost_1_64_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.64.0/boost_1_64_0.tar.gz/download
+  - tar xzvf boost_1_64_0.tar.gz
+  - cd boost_1_64_0/
+  - ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test
+  - ./b2 link=shared threading=multi variant=release
+  - sudo ./b2 install
+  - cd ..
   - pwd
   - ls
   - if [[ ! -f "cmake-3.4.3-Linux-x86_64/bin/cmake" ]]; then wget --no-check-certificate http://cmake.org/files/v3.4/cmake-3.4.3-Linux-x86_64.tar.gz && tar -xvf cmake-3.4.3-Linux-x86_64.tar.gz; fi
