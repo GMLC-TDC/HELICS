@@ -59,9 +59,9 @@ install:
   - git clone git://github.com/zeromq/libzmq.git
   - ( cd libzmq; ./autogen.sh; ./configure; make check; sudo make install; sudo ldconfig )
   - echo "*** built zmq successfully"
-  - wget -O boost_1_64_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.64.0/boost_1_64_0.tar.gz/download
-  - tar xzvf boost_1_64_0.tar.gz
-  - cd boost_1_64_0/
+  - wget -O boost_1_61_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz/download
+  - tar xzvf boost_1_61_0.tar.gz
+  - cd boost_1_61_0/
   - ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test
   - ./b2 link=shared threading=multi variant=release > /dev/null
   - sudo ./b2 install > /dev/null
