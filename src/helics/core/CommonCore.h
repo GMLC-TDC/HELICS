@@ -171,6 +171,9 @@ private:
 	
 	/** actually transmit messages that were delayed until the core was actually registered*/
 	void transmitDelayedMessages();
+	/**function for doing the actual routing either to a local fed or up the broker chain*/
+	void routeMessage(ActionMessage &cmd, federate_id_t dest);
+	void routeMessage(const ActionMessage &cmd);
 protected:
 	std::atomic<bool> _operating{ false }; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
   std::vector<std::unique_ptr<FederateState>> _federates; //!< local federate information

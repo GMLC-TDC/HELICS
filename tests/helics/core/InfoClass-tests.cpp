@@ -379,13 +379,13 @@ BOOST_AUTO_TEST_CASE(subscriptioninfo_test)
 
 	// No data available, shouldn't get a data_block back
 	ret_data = subI.getData();
-	BOOST_CHECK(ret_data == nullptr);
+	BOOST_CHECK(!ret_data);
 
 	// Expect this to fail
     auto hello_data = std::make_shared<helics::data_block>("hello world");
 	subI.updateData(helics::Time::zeroVal(), hello_data);
 	ret_data = subI.getData();
-    BOOST_CHECK(ret_data == nullptr);
+	BOOST_CHECK(!(ret_data));
     
     // When movement of data is updated (see above), this can be uncommmented and updated
 	/*BOOST_CHECK_EQUAL(ret_data->size(), 11);

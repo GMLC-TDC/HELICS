@@ -164,7 +164,9 @@ BOOST_AUTO_TEST_CASE (value_federate_single_transfer)
     helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
-
+	auto val = 0x7000'0000 - 0x0001'0000;
+	printf("num Federates possible=%d\n", val);
+	printf("num Brokers possible=%d\n", 0x7FFF'FFFF - 0x7000'0000);
     auto vFed = std::make_shared<helics::ValueFederate> (fi);
     // register the publications
     auto pubid = vFed->registerGlobalPublication<std::string> ("pub1");

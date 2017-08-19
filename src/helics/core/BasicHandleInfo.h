@@ -57,7 +57,8 @@ class BasicHandleInfo
 	bool processed = false;	//!< indicator if the handle has been processed (subscription or endpoint found)
 	bool mapped = false;	
 	bool destFilter = false;
-	//3 byte hole here
+	bool used = false;			//!< indicator that the publication or filter is used
+	//2 byte hole here
     std::string key;	//!< the name of the handle
     std::string type;	//!< the type of data used by the handle
     std::string units;	//!< the units associated with the handle

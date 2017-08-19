@@ -48,9 +48,16 @@ public:
 	BasicBrokerInfo(const std::string &brokerName) :name(brokerName) {};
 	
 };
-/** a shift in the global id index to discriminate between global ids of brokers vs federates*/
-constexpr Core::federate_id_t global_broker_id_shift = 50'000'000;
 
+/** a shift in the global federate id numbers to allow discrimination between local ids and global ones
+this value allows 65535 federates to be available in each core 
+1,878,982,656 allowable federates in the system and
+268,435,455 brokers allowed  if we need more than that this program has been phenomanally successful beyond 
+all wildest imaginations and we can probably afford to change these to 64 bit numbers to accomodate
+*/
+constexpr Core::federate_id_t global_federate_id_shift = 0x0001'0000;
+/** a shift in the global id index to discriminate between global ids of brokers vs federates*/
+constexpr Core::federate_id_t global_broker_id_shift = 0x7000'0000;
 /** class implementing most of the functionality of a generic broker
 Basically acts as a router for information,  deals with stuff internally if it can and sends higher up if it can't
 or does something else if it is the root of the tree

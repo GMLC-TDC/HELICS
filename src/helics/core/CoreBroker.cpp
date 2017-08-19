@@ -51,7 +51,7 @@ void CoreBroker::queueProcessingLoop ()
             break;
         case CMD_STOP:
 			processCommand(command);
-			return disconnect(); //this can potential cause object destruction so do nothing after this call
+			return disconnect();
         default:
             processCommand (command);
             break;
@@ -135,7 +135,7 @@ int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
 {
     if (_isRoot)
     {
-        return static_cast<int32_t> (fedid);
+        return static_cast<int32_t> (fedid-global_federate_id_shift);
     }
     else
     {
@@ -215,7 +215,7 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
         }
         else
         {
-            _federates.back ().global_id = static_cast<Core::federate_id_t> (_federates.size ()) - 1;
+            _federates.back ().global_id = static_cast<Core::federate_id_t> (_federates.size ()) - 1+global_federate_id_shift;
             auto route_id = _federates.back ().route_id;
             auto global_id = _federates.back ().global_id;
             routing_table.emplace (global_id, route_id);
@@ -581,13 +581,18 @@ void CoreBroker::addSubscription(ActionMessage &m)
 	_handles.emplace_back(m.source_handle, m.source_id, HANDLE_SUB, m.name, m.info().type, m.info().units);
 	addLocalInfo(_handles.back(), m);
 	subscriptions.emplace(m.name, static_cast<int32_t>(_handles.size() - 1));
-	bool proc = FindandNotifySubscriptionPublisher(_handles.back());
-	if (!_isRoot)
+	_handles.back().processed = m.processingComplete;
+	if (!m.processingComplete)
 	{
-		//just let any higher level brokers know we have found the publisher and let them know
-		m.processingComplete = proc;
-		transmit(0, m);
+		bool proc = FindandNotifySubscriptionPublisher(_handles.back());
+		if (!_isRoot)
+		{
+			//just let any higher level brokers know we have found the publisher and let them know
+			m.processingComplete = proc;
+			transmit(0, m);
+		}
 	}
+	
 }
 
 void CoreBroker::addEndpoint(ActionMessage &m)

@@ -19,16 +19,33 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
+//define the allowable state transitions for a federate
 void FederateState::setState (helics_federate_state_type newState)
 {
-    if (newState == HELICS_INITIALIZING)
-    {
-        if (state != HELICS_CREATED)
-        {
-            return;
-        }
-    }
-    state = newState;
+	if (state == newState)
+	{
+		return;
+	}
+	switch (newState)
+	{
+	case HELICS_ERROR:
+	case HELICS_FINISHED:
+	case HELICS_CREATED:
+		state = newState;
+		break;
+	case HELICS_INITIALIZING:
+	{
+		auto reqState = HELICS_CREATED;
+		state.compare_exchange_strong(reqState, newState);
+		break;
+	}
+	case HELICS_EXECUTING:
+	{
+		auto reqState = HELICS_INITIALIZING;
+		state.compare_exchange_strong(reqState, newState);
+		break;
+	}
+	}
 }
 
 void FederateState::reset()
@@ -39,7 +56,7 @@ void FederateState::reset()
 /** reset the federate to the initializing state*/
 void FederateState::reInit()
 {
-	state == HELICS_INITIALIZING;
+	state = HELICS_INITIALIZING;
 	// TODO:: this needs to reset a bunch of stuff as well as check a few things
 }
 helics_federate_state_type FederateState::getState () const { return state; }
@@ -491,7 +508,7 @@ convergence_state FederateState::genericUnspecifiedQueueProcess()
 {
 	bool expected = false;
 	if (processing.compare_exchange_strong(expected, true))
-	{ //only enter this loop once per federate
+	{ //only 1 thread can enter this loop once per federate
 		auto ret = processQueue();
 		processing = false;
 		return ret;
@@ -569,13 +586,9 @@ convergence_state FederateState::processQueue ()
 			switch (update)
 			{
 			case convergence_state::nonconverged:
-				//TODO: send an update externally
 				break;
 			case convergence_state::complete:
 				setState(HELICS_EXECUTING);
-				//TODO: send a time granted message
-				//ActionMessage grant(CMD_EXEC_GRANT);
-				//grant.source_id = global_id;
 				return update;
 			case convergence_state::continue_processing:
 				break;
@@ -587,16 +600,23 @@ convergence_state FederateState::processQueue ()
         case CMD_SEND_MESSAGE:
         {
             auto epi = getEndpoint (cmd.dest_handle);
-            epi->addMessage (createMessage (cmd));
-			//add function to update times if necessary
+			if (epi != nullptr)
+			{
+				updateMessageTime(cmd);
+				epi->addMessage(createMessage(std::move(cmd)));
+			}
         }
         break;
         case CMD_SEND_FOR_FILTER:
 		{
 			//this should only be non time_agnostic filters
 			auto fI = getFilter(cmd.dest_handle);
-			fI->addMessage(createMessage(cmd));
-			//add function to update times if necessary
+			if (fI != nullptr)
+			{
+				updateMessageTime(cmd);
+				fI->addMessage(createMessage(std::move(cmd)));
+			}
+			
 		}
             break;
         case CMD_PUB:
@@ -604,7 +624,8 @@ convergence_state FederateState::processQueue ()
 			auto subI = getSubscription(cmd.dest_handle);
 			if (cmd.source_id == subI->target.first)
 			{
-				subI->updateData(cmd.actionTime, std::make_shared<const data_block>(cmd.payload));
+				subI->updateData(cmd.actionTime, std::make_shared<const data_block>(std::move(cmd.payload)));
+				updateValueTime(cmd);
 			}
 		}
             break;
@@ -618,6 +639,7 @@ convergence_state FederateState::processQueue ()
 			if (subI != nullptr)
 			{
 				subI->target = { cmd.source_id,cmd.source_handle };
+				addDependency(cmd.source_id);
 			}
 			
 		}
@@ -629,12 +651,24 @@ convergence_state FederateState::processQueue ()
 			if (pubI != nullptr)
 			{
 				pubI->subscribers.emplace_back(cmd.source_id, cmd.source_handle);
+				addDependent(cmd.source_id);
 			}
 			
 		}
             break;
         case CMD_REG_END:
 		case CMD_NOTIFY_END:
+		{
+			auto filtI = getFilter(cmd.dest_handle);
+			if (filtI != nullptr)
+			{
+				filtI->target = { cmd.source_id,cmd.source_handle };
+				addDependency(cmd.source_id);
+				//todo probably need to do something more here
+			}
+
+
+		}
             break;
         case CMD_REG_DST_FILTER:
 		case CMD_NOTIFY_DST_FILTER:
@@ -646,9 +680,12 @@ convergence_state FederateState::processQueue ()
 			if (endI != nullptr)
 			{
 				endI->hasFilter = true;
+				//TODO: this should be conditional on whether it is a operational filter
+				addDependent(cmd.source_id);
+				//todo probably need to do something more here
 			}
 			
-			//todo probably need to do something more here
+			
 		}
             break;
         case CMD_FED_ACK:
@@ -689,13 +726,31 @@ iterationTime  FederateState::requestTime(Time nextTime, convergence_state conve
 	{ //only enter this loop once per federate
 		iterating = (converged != convergence_state::complete);
 		time_requested = nextTime;
-		time_event = time_requested; //TODO: this is not correct yet but will pass the next case
-									 //*push a message to check whether time can be granted
+		updateNextEventTime(time_requested); 
+		if (parent_ != nullptr)
+		{
+			ActionMessage treq(CMD_TIME_REQUEST);
+			treq.source_id = global_id;
+			treq.actionTime = time_next;
+			treq.info().Te = time_event;
+			treq.info().Tdemin = time_minDe;
+			parent_->addCommand(treq);
+		}
+		
+		
+		//push a message to check whether time can be granted
 		queue.push(CMD_TIME_CHECK);
 		auto ret = processQueue();
 		
 		iterating = (ret==convergence_state::nonconverged);
 		iterationTime retTime= { time_granted,ret};
+		if (parent_ != nullptr)
+		{
+			ActionMessage treq(CMD_TIME_GRANT);
+			treq.source_id = global_id;
+			treq.actionTime = time_granted;
+			parent_->addCommand(treq);
+		}
 		processing = false;
 		return retTime;
 	}
@@ -794,10 +849,36 @@ bool FederateState::processExternalTimeMessage (ActionMessage &cmd)
 	return false;
 }
 
-void FederateState::computeNextEventTime(Time requested)
+void FederateState::updateNextEventTime(Time requested)
 {
 	time_event = std::min(time_message, time_value);
 	time_event = std::min(requested, time_event);
+}
+
+void FederateState::updateValueTime(const ActionMessage &cmd)
+{
+	if (cmd.actionTime < time_value)
+	{
+		if (cmd.actionTime < time_granted)
+		{
+			//if this condition is true then the value update is ignored for timing purposes
+			return;  
+		}
+		time_value = cmd.actionTime;
+	}
+}
+
+void FederateState::updateMessageTime(const ActionMessage &cmd)
+{
+	if (cmd.actionTime < time_message)
+	{
+		if (cmd.actionTime < time_granted)
+		{
+			//if this condition is true then the value update is ignored for timing purposes
+			return;
+		}
+		time_message = cmd.actionTime;
+	}
 }
 
 convergence_state FederateState::updateTimeFactors ()
@@ -897,6 +978,7 @@ void FederateState::addDependency (Core::federate_id_t fedID)
     auto dep = std::lower_bound (dependencies.begin (), dependencies.end (), fedID, dependencyCompare);
     if (dep->fedID == fedID)
     {
+		//the dependency is already present
         return;
     }
     dependencies.emplace (dep, fedID);

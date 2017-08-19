@@ -135,6 +135,8 @@ class FederateState
 	/** compute updates to time and determine if time could be granted*/
 	convergence_state updateTimeFactors ();
 
+	void updateValueTime(const ActionMessage &cmd);
+	void updateMessageTime(const ActionMessage &cmd);
 	
     // take a global id and get a reference to the dependencyInfo for the other fed
     DependencyInfo &getDependencyInfo (Core::federate_id_t ofed);
@@ -142,7 +144,7 @@ class FederateState
     std::function<void(int, const std::string &, const std::string &)> loggerFunction;
 
 	/** helper function for computing various time values*/
-	void computeNextEventTime(Time requested);
+	void updateNextEventTime(Time requested);
 	/** update the federate state */
 	void setState(helics_federate_state_type newState);
   public:
