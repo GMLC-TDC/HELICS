@@ -16,8 +16,16 @@ namespace helics
 /** base exception class for helics*/
 class HelicsException : public std::exception
 {
+private:
+	std::string message_ = "HELICS EXCEPTION";
 public:
 	HelicsException()=default;
+	HelicsException(const std::string &message) :message_(message)
+	{}
+	virtual const char *what() const noexcept override
+	{
+		return message_.c_str();
+	}
 	
 };
 
@@ -25,15 +33,14 @@ public:
 class functionExecutionFailure : public HelicsException
 {
 public:
-	functionExecutionFailure() = default;
-
+	functionExecutionFailure(const std::string &message="Helics execution failure") :HelicsException(message) {};
 };
 
 /** exception for an invalid identification Handle*/
 class invalidIdentifier : public HelicsException
 {
 public:
-	invalidIdentifier()=default;
+	invalidIdentifier(const std::string &message = "invalid identifier") :HelicsException(message) {};
 
 };
 
@@ -41,7 +48,7 @@ public:
 class invalidParameter : public HelicsException
 {
 public:
-	invalidParameter()=default;
+	invalidParameter(const std::string &message = "invalid parameter") :HelicsException(message) {};
 
 };
 
@@ -49,7 +56,7 @@ public:
 class invalidFunctionCall : public HelicsException
 {
 public:
-	invalidFunctionCall()=default;
+	invalidFunctionCall(const std::string &message = "invalid function call") :HelicsException(message) {};
 
 };
 
@@ -57,7 +64,7 @@ public:
 class registrationFailure : public HelicsException
 {
 public:
-	registrationFailure()=default;
+	registrationFailure(const std::string &message = "registration failure") :HelicsException(message) {};
 
 };
 
@@ -65,7 +72,7 @@ public:
 class helicsTerminated : public HelicsException
 {
 public:
-	helicsTerminated()=default;
+	helicsTerminated(const std::string &message = "Helics termination") :HelicsException(message) {};
 
 };
 }

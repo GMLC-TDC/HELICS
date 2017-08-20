@@ -86,7 +86,7 @@ stx::optional<T> BlockingQueue<T>::try_pop() {
     return{};
   }
 
-  auto t = queue_.front();
+  auto t = std::move(queue_.front());
   queue_.pop();
   return t;
 }
@@ -102,7 +102,7 @@ T BlockingQueue<T>::pop(const std::string& log_on_wait) {
     condition_.wait(lock);
   }
 
-  T t = queue_.front();
+  T t = std::move(queue_.front());
   queue_.pop();
   return t;
 }

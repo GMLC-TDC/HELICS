@@ -48,10 +48,11 @@ class DependencyInfo
   public:
     Core::federate_id_t fedID;  //!< identifier for the dependent federate
     bool grant = false;  //!< whether time has been granted
-    bool converged = false;  //!< whether it is currently converged
+    bool exec_converged = false;  //!< whether the executing state has requested iteration
     bool exec_requested = false;  //!< whether execution state has been granted
-    Time Tnext = timeZero;  //!<next time computation
-    Time Te = timeZero;  //!< executation time computation
+	bool time_converged = false;	//!< whether the current time point has requested iteration
+    Time Tnext = timeZero;  //!<next possible message or value 
+    Time Te = timeZero;  //!< the next currently scheduled event
     Time Tdemin = timeZero;  //!< min dependency event time
     /** default constructor*/
     DependencyInfo () = default;
@@ -100,12 +101,12 @@ class FederateState
     std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time
 
     // the variables for time coordination
-    Time time_granted = timeZero;  //!< the most recent time granted
+    Time time_granted = Time::minVal();  //!< the most recent time granted
     Time time_requested = timeZero;  //!< the most recent time requested
-    Time time_next = Time::maxVal();  //!< the next time to process
-    Time time_minDe = Time::maxVal();  //!< the minimum dependent event
-    Time time_minTe = Time::maxVal();  //!< the minimum event time
-    Time time_event = Time::maxVal();  //!< the time of the next processing event
+    Time time_next = timeZero;  //!< the next possible internal event time
+    Time time_minDe = timeZero;  //!< the minimum dependent event
+    Time time_minTe = timeZero;  //!< the minimum event time
+    Time time_exec = Time::maxVal();  //!< the time of the next targetted execution
 	Time time_message = Time::maxVal();	//!< the time of the earliest message
 	Time time_value = Time::maxVal();	//!< the time of the earliest value 
 
@@ -138,13 +139,20 @@ class FederateState
 	void updateValueTime(const ActionMessage &cmd);
 	void updateMessageTime(const ActionMessage &cmd);
 	
-    // take a global id and get a reference to the dependencyInfo for the other fed
-    DependencyInfo &getDependencyInfo (Core::federate_id_t ofed);
+    /** take a global id and get a pointer to the dependencyInfo for the other fed
+	will be nullptr if it doesn't exist
+	*/
+    DependencyInfo *getDependencyInfo (Core::federate_id_t ofed);
+	/** check whether a federate is a dependency*/
+	bool isDependency(Core::federate_id_t ofed) const;
     /** a logging function for logging or printing messages*/
     std::function<void(int, const std::string &, const std::string &)> loggerFunction;
 
-	/** helper function for computing various time values*/
-	void updateNextEventTime(Time requested);
+	/** helper function for computing the next event time*/
+	void updateNextExecutionTime();
+	/** helper function for computing the next possible time to generate an external event
+	*/
+	void updateNextPossibleEventTime(convergence_state converged);
 	/** update the federate state */
 	void setState(helics_federate_state_type newState);
   public:
@@ -202,7 +210,11 @@ class FederateState
     /** get any message ready for processing by a filter
     @param[out] id the the filter related to the message*/
     std::unique_ptr<Message> receiveForFilter (Core::Handle &id);
-
+	/** set the CommonCore object that is managing this Federate*/
+	void setParent(CommonCore *coreObject)
+	{
+		parent_ = coreObject;
+	}
   private:
     /** process the federate queue until returnable event
     @details processQueue will process messages until one of 3 things occur
@@ -244,17 +256,23 @@ class FederateState
 	/** process until the init state has been entered or there is a failure*/
 	convergence_state enterInitState();
     /** function to call when enterering execution state
+	@param converged indicator of whether the fed should iterate if need be or not
     returns either converged or nonconverged depening on whether an iteration is needed
     */
-    convergence_state enterExecutingState ();
-
+    convergence_state enterExecutingState (convergence_state converged);
+	/** request a time advancement
+	@param nextTime the time of the requested advancement
+	@param converged set to complete to end dense time step iteration, nonconverged to continue iterating if need be
+	@return an iteration time with two elements the granted time and the convergence state
+	*/
     iterationTime requestTime (Time nextTime, convergence_state converged);
 	/** function to process the queue in a generic fashion used to just process messages
 	with no specific end in mind
 	*/
 	convergence_state genericUnspecifiedQueueProcess();
+	/** add an action message to the queue*/
     void addAction (const ActionMessage &action);
-
+	void addAction(ActionMessage &&action);
     void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
     {
         loggerFunction = std::move (logFunction);

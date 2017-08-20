@@ -2,7 +2,9 @@
 Copyright (C) 2017, Battelle Memorial Institute
 All rights reserved.
 
-This software was modified by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+This software was modified by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute;
+the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence
+Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
 /*
  * LLNS Copyright Start
@@ -21,8 +23,8 @@ This software was modified by Pacific Northwest National Laboratory, operated by
 #define TIME_REPRESENTATION_H_
 #pragma once
 #include <cmath>
-#include <limits>
 #include <cstdint>
+#include <limits>
 #include <type_traits>
 
 // enumeration of different time units
@@ -74,7 +76,7 @@ class integer_time
     static constexpr baseType maxVal () noexcept { return (std::numeric_limits<baseType>::max) (); }
     static constexpr baseType minVal () noexcept { return (std::numeric_limits<baseType>::min) (); }
     static constexpr baseType zeroVal () noexcept { return 0; }
-	static constexpr baseType epsilon() noexcept { return 1; }
+    static constexpr baseType epsilon () noexcept { return 1; }
     /** convert to a base type representation*/
     static constexpr baseType convert (double t) noexcept
     {
@@ -106,11 +108,11 @@ class integer_time
     */
     static std::int64_t toCount (baseType val, timeUnits units) noexcept
     {
-        return static_cast<std::int64_t> (toDouble (val) * timeCountforward[static_cast<int>(units)]);
+        return static_cast<std::int64_t> (toDouble (val) * timeCountforward[static_cast<int> (units)]);
     }
-	static baseType fromCount(std::uint64_t count, timeUnits units) noexcept
-	{
-		return static_cast<baseType> (toDouble(count) / timeCountforward[static_cast<int>(units)]);
+    static baseType fromCount (std::uint64_t count, timeUnits units) noexcept
+    {
+        return static_cast<baseType> (toDouble (count) / timeCountforward[static_cast<int> (units)]);
     }
     /** convert to an integer count in seconds */
     static std::int64_t seconds (baseType val) noexcept { return static_cast<std::int64_t> (val >> N); }
@@ -118,21 +120,21 @@ class integer_time
 
 
 constexpr std::int64_t fac10[16]{1,
-                                  10,
-                                  100,
-                                  1000,
-                                  10'000,
-                                  100'000,
-                                  1'000'000,
-                                  10'000'000,
-                                  100'000'000,
-                                  1'000'000'000,
-                                  10'000'000'000,
-                                  100'000'000'000,
-                                  1'000'000'000'000,
-                                  10'000'000'000'000,
-                                  100'000'000'000'000,
-                                  1'000'000'000'000'000};
+                                 10,
+                                 100,
+                                 1000,
+                                 10'000,
+                                 100'000,
+                                 1'000'000,
+                                 10'000'000,
+                                 100'000'000,
+                                 1'000'000'000,
+                                 10'000'000'000,
+                                 100'000'000'000,
+                                 1'000'000'000'000,
+                                 10'000'000'000'000,
+                                 100'000'000'000'000,
+                                 1'000'000'000'000'000};
 
 /** defining doubles of various powers of 10*/
 constexpr double fac10f[16]{1.0,
@@ -170,7 +172,7 @@ class count_time
     static constexpr baseType maxVal () noexcept { return (std::numeric_limits<baseType>::max) (); }
     static constexpr baseType minVal () noexcept { return (std::numeric_limits<baseType>::min) (); }
     static constexpr baseType zeroVal () noexcept { return baseType (0); }
-	static constexpr baseType epsilon() noexcept { return baseType(1); }
+    static constexpr baseType epsilon () noexcept { return baseType (1); }
     static constexpr baseType convert (double t) noexcept
     {
         return (t > -1e12) ? (static_cast<baseType> (t * dFactor)) : minVal ();
@@ -186,7 +188,7 @@ class count_time
     {
         switch (units)
         {
-		case timeUnits::ps:
+        case timeUnits::ps:
             return (N >= 12) ? static_cast<std::int64_t> (val / fac10[N - 12]) :
                                static_cast<std::int64_t> (val * fac10[12 - N]);
         case timeUnits::ns:
@@ -203,39 +205,39 @@ class count_time
         default:
             return seconds (val);
         case timeUnits::minutes:
-            return static_cast<std::int64_t> (val / (iFactor*60));
+            return static_cast<std::int64_t> (val / (iFactor * 60));
         case timeUnits::hr:
             return static_cast<std::int64_t> (val / (iFactor * 3600));
         case timeUnits::day:
             return static_cast<std::int64_t> (val / (iFactor * 86400));
         }
     }
-	static baseType fromCount(std::int64_t val, timeUnits units) noexcept
-	{
-		switch (units)
-		{
-		case timeUnits::ps:
-			return (N >= 12) ? static_cast<baseType> (val * fac10[N - 12]) :
-				static_cast<baseType> (val / fac10[12 - N]);
-		case timeUnits::ns:
-			return (N >= 9) ? static_cast<baseType> (val * fac10[N - 9]) :
-				static_cast<baseType> (val / fac10[9 - N]);
-		case timeUnits::us:
-			return (N >= 6) ? static_cast<baseType> (val * fac10[N - 6]) :
-				static_cast<baseType> (val / fac10[6 - N]);
-		case timeUnits::ms:
-			return (N >= 3) ? static_cast<baseType> (val * fac10[N - 3]) :
-				static_cast<baseType> (val / fac10[3 - N]);
-		case timeUnits::s:
-		case timeUnits::sec:
-		default:
-			return static_cast<baseType>(val*iFactor);
-		case timeUnits::minutes:
-			return static_cast<baseType> (val * 60 * iFactor);
-		case timeUnits::hr:
-			return static_cast<baseType> (val * 3600 * iFactor);
-		case timeUnits::day:
-			return static_cast<baseType> (val * 86400 * iFactor);
+    static baseType fromCount (std::int64_t val, timeUnits units) noexcept
+    {
+        switch (units)
+        {
+        case timeUnits::ps:
+            return (N >= 12) ? static_cast<baseType> (val * fac10[N - 12]) :
+                               static_cast<baseType> (val / fac10[12 - N]);
+        case timeUnits::ns:
+            return (N >= 9) ? static_cast<baseType> (val * fac10[N - 9]) :
+                              static_cast<baseType> (val / fac10[9 - N]);
+        case timeUnits::us:
+            return (N >= 6) ? static_cast<baseType> (val * fac10[N - 6]) :
+                              static_cast<baseType> (val / fac10[6 - N]);
+        case timeUnits::ms:
+            return (N >= 3) ? static_cast<baseType> (val * fac10[N - 3]) :
+                              static_cast<baseType> (val / fac10[3 - N]);
+        case timeUnits::s:
+        case timeUnits::sec:
+        default:
+            return static_cast<baseType> (val * iFactor);
+        case timeUnits::minutes:
+            return static_cast<baseType> (val * 60 * iFactor);
+        case timeUnits::hr:
+            return static_cast<baseType> (val * 3600 * iFactor);
+        case timeUnits::day:
+            return static_cast<baseType> (val * 86400 * iFactor);
         }
     }
 
@@ -253,14 +255,14 @@ class double_time
     static constexpr baseType maxVal () noexcept { return (1e49); }
     static constexpr baseType minVal () noexcept { return (-1.456e47); }
     static constexpr baseType zeroVal () noexcept { return 0.0; }
-	static constexpr baseType epsilon() noexcept { return 1e-86; }
+    static constexpr baseType epsilon () noexcept { return 1e-86; }
     static std::int64_t toCount (baseType val, timeUnits units) noexcept
     {
-        return static_cast<std::int64_t> (val * timeCountforward[static_cast<int>(units)]);
+        return static_cast<std::int64_t> (val * timeCountforward[static_cast<int> (units)]);
     }
-	static baseType fromCount(std::int64_t val, timeUnits units) noexcept
+    static baseType fromCount (std::int64_t val, timeUnits units) noexcept
     {
-		return static_cast<baseType> (val * timeCountReverse[static_cast<int>(units)]);
+        return static_cast<baseType> (val * timeCountReverse[static_cast<int> (units)]);
     }
     static constexpr std::int64_t seconds (baseType val) noexcept { return static_cast<std::int64_t> (val); }
 };
@@ -289,7 +291,7 @@ class timeRepresentation
 #endif
   public:
     /** default constructor*/
-    timeRepresentation () noexcept{};
+    timeRepresentation () noexcept {};
 
   private:
 /** explicit means to generate a constexpr timeRepresentation at time 0, negTime and maxTime and min time delta*/
@@ -300,8 +302,8 @@ class timeRepresentation
         : timecode_ (Tconv::minVal ()), dtime_ (-1.456e47){};
     constexpr explicit timeRepresentation (std::integral_constant<int, 1>) noexcept
         : timecode_ (Tconv::maxVal ()), dtime_ (1e49){};
-	constexpr explicit timeRepresentation(std::integral_constant<int, 2>) noexcept
-		: timecode_(Tconv::epsilon()), dtime_(1e-9) {};
+    constexpr explicit timeRepresentation (std::integral_constant<int, 2>) noexcept
+        : timecode_ (Tconv::epsilon ()), dtime_ (1e-9){};
 #else
     constexpr explicit timeRepresentation (std::integral_constant<int, 0>) noexcept
         : timecode_ (Tconv::zeroVal ()){};
@@ -309,24 +311,25 @@ class timeRepresentation
         : timecode_ (Tconv::minVal ()){};
     constexpr explicit timeRepresentation (std::integral_constant<int, 1>) noexcept
         : timecode_ (Tconv::maxVal ()){};
-	constexpr explicit timeRepresentation(std::integral_constant<int, 2>) noexcept
-		: timecode_(Tconv::epsilon()) {};
+    constexpr explicit timeRepresentation (std::integral_constant<int, 2>) noexcept
+        : timecode_ (Tconv::epsilon ()){};
 #endif
 
   public:
 #ifdef _DEBUG
     /** normal time constructor from a double representation of seconds*/
     constexpr timeRepresentation (double t) noexcept : timecode_ (Tconv::convert (t)), dtime_ (t) {}
-	timeRepresentation(std::int64_t count, timeUnits units) noexcept : timecode_(Tconv::fromCount(count, units))
-	{
-		DOUBLETIME
-	}
+    timeRepresentation (std::int64_t count, timeUnits units) noexcept : timecode_ (Tconv::fromCount (count, units))
+    {
+        DOUBLETIME
+    }
 #else
     /** normal time constructor from a double representation of seconds*/
     constexpr timeRepresentation (double t) noexcept : timecode_ (Tconv::convert (t)) {}
-	constexpr timeRepresentation(std::int64_t count, timeUnits units) noexcept : timecode_(Tconv::fromCount(count, units))
-	{
-	}
+    constexpr timeRepresentation (std::int64_t count, timeUnits units) noexcept
+        : timecode_ (Tconv::fromCount (count, units))
+    {
+    }
 #endif
 
     constexpr timeRepresentation (const timeRepresentation &x) noexcept = default;
@@ -345,16 +348,16 @@ class timeRepresentation
     {
         return timeRepresentation (std::integral_constant<int, 0> ());
     }
-	/** generate a timeRepresentation of 0*/
-	static constexpr timeRepresentation epsilon() noexcept
-	{
-		return timeRepresentation(std::integral_constant<int, 2>());
-	}
+    /** generate a timeRepresentation of 0*/
+    static constexpr timeRepresentation epsilon () noexcept
+    {
+        return timeRepresentation (std::integral_constant<int, 2> ());
+    }
     /** generate the time in seconds*/
-	std::int64_t seconds () const noexcept { return Tconv::seconds (timecode_); }
-	std::int64_t toCount (timeUnits units) const noexcept { return Tconv::toCount (timecode_, units); }
+    std::int64_t seconds () const noexcept { return Tconv::seconds (timecode_); }
+    std::int64_t toCount (timeUnits units) const noexcept { return Tconv::toCount (timecode_, units); }
 
-   
+
     /** default copy operation*/
     timeRepresentation &operator= (const timeRepresentation &x) noexcept = default;
 
@@ -435,7 +438,8 @@ class timeRepresentation
         }
         else
         {
-            timecode_ = Tconv::convert (std::fmod (Tconv::toDouble (timecode_), Tconv::toDouble (other.timecode_)));
+            timecode_ =
+              Tconv::convert (std::fmod (Tconv::toDouble (timecode_), Tconv::toDouble (other.timecode_)));
         }
         DOUBLETIME
         return *this;
@@ -510,65 +514,128 @@ class timeRepresentation
 by the class definition
 */
 /** division operator with double as the numerator*/
-template<class Tconv>
-inline double operator/ (double x, timeRepresentation<Tconv> t) { return x / static_cast<double> (t); }
+template <class Tconv>
+inline double operator/ (double x, timeRepresentation<Tconv> t)
+{
+    return x / static_cast<double> (t);
+}
 /** we are distinguishing here between a time as the first operator and time as the second
 @details it is a semantic difference time as the first element of a multiplication should produce a time
 time as the second should be treated as a number and produce another number*/
-template<class Tconv>
-inline double operator* (double x, timeRepresentation<Tconv> t) { return x * static_cast<double> (t); }
+template <class Tconv>
+inline double operator* (double x, timeRepresentation<Tconv> t)
+{
+    return x * static_cast<double> (t);
+}
+/** convenience operator to allow the int multiplier to be the first argument*/
+template <class Tconv>
+inline timeRepresentation<Tconv> operator* (int x, timeRepresentation<Tconv> t)
+{
+    return t.operator* (x);
+}
 
 /** dividing two times is a ratio and should produce a numerical output not a time output*/
-template<class Tconv>
-inline double operator/ (timeRepresentation<Tconv> t1, timeRepresentation<Tconv> t2) { return static_cast<double> (t1) / static_cast<double> (t2); }
+template <class Tconv>
+inline double operator/ (timeRepresentation<Tconv> t1, timeRepresentation<Tconv> t2)
+{
+    return static_cast<double> (t1) / static_cast<double> (t2);
+}
 
-template<class Tconv>
-inline timeRepresentation<Tconv> operator- (timeRepresentation<Tconv> t, double x) { return t - timeRepresentation<Tconv>(x); }
+template <class Tconv>
+inline timeRepresentation<Tconv> operator- (timeRepresentation<Tconv> t, double x)
+{
+    return t - timeRepresentation<Tconv> (x);
+}
 
-template<class Tconv>
-inline timeRepresentation<Tconv> operator- (double x, timeRepresentation<Tconv> t) { return timeRepresentation<Tconv>(x) - t; }
+template <class Tconv>
+inline timeRepresentation<Tconv> operator- (double x, timeRepresentation<Tconv> t)
+{
+    return timeRepresentation<Tconv> (x) - t;
+}
 
-template<class Tconv>
-inline timeRepresentation<Tconv> operator+ (timeRepresentation<Tconv> t, double x) { return t + timeRepresentation<Tconv>(x); }
+template <class Tconv>
+inline timeRepresentation<Tconv> operator+ (timeRepresentation<Tconv> t, double x)
+{
+    return t + timeRepresentation<Tconv> (x);
+}
 
-template<class Tconv>
-inline timeRepresentation<Tconv> operator+ (double x, timeRepresentation<Tconv> t) { return timeRepresentation<Tconv>(x) + t; }
+template <class Tconv>
+inline timeRepresentation<Tconv> operator+ (double x, timeRepresentation<Tconv> t)
+{
+    return timeRepresentation<Tconv> (x) + t;
+}
 
-template<class Tconv>
-inline bool operator== (timeRepresentation<Tconv> t1, double rhs) { return (t1 == timeRepresentation<Tconv>(rhs)); }
+template <class Tconv>
+inline bool operator== (timeRepresentation<Tconv> t1, double rhs)
+{
+    return (t1 == timeRepresentation<Tconv> (rhs));
+}
 
-template<class Tconv>
-inline bool operator!= (timeRepresentation<Tconv> t1, double rhs) { return (t1 != timeRepresentation<Tconv>(rhs)); }
+template <class Tconv>
+inline bool operator!= (timeRepresentation<Tconv> t1, double rhs)
+{
+    return (t1 != timeRepresentation<Tconv> (rhs));
+}
 
-template<class Tconv>
-inline bool operator> (timeRepresentation<Tconv> t1, double rhs) { return (t1 > timeRepresentation<Tconv>(rhs)); }
+template <class Tconv>
+inline bool operator> (timeRepresentation<Tconv> t1, double rhs)
+{
+    return (t1 > timeRepresentation<Tconv> (rhs));
+}
 
-template<class Tconv>
-inline bool operator< (timeRepresentation<Tconv> t1, double rhs) { return (t1 < timeRepresentation<Tconv>(rhs)); }
+template <class Tconv>
+inline bool operator< (timeRepresentation<Tconv> t1, double rhs)
+{
+    return (t1 < timeRepresentation<Tconv> (rhs));
+}
 
-template<class Tconv>
-inline bool operator>= (timeRepresentation<Tconv> t1, double rhs) { return (t1 >= timeRepresentation<Tconv>(rhs)); }
+template <class Tconv>
+inline bool operator>= (timeRepresentation<Tconv> t1, double rhs)
+{
+    return (t1 >= timeRepresentation<Tconv> (rhs));
+}
 
-template<class Tconv>
-inline bool operator<= (timeRepresentation<Tconv> t1, double rhs) { return (t1 <= timeRepresentation<Tconv>(rhs)); }
+template <class Tconv>
+inline bool operator<= (timeRepresentation<Tconv> t1, double rhs)
+{
+    return (t1 <= timeRepresentation<Tconv> (rhs));
+}
 
-template<class Tconv>
-inline bool operator== (double lhs, timeRepresentation<Tconv> t1) { return (timeRepresentation<Tconv>(lhs) == t1); }
+template <class Tconv>
+inline bool operator== (double lhs, timeRepresentation<Tconv> t1)
+{
+    return (timeRepresentation<Tconv> (lhs) == t1);
+}
 
-template<class Tconv>
-inline bool operator!= (double lhs, timeRepresentation<Tconv>t1) { return (timeRepresentation<Tconv>(lhs) != t1); }
+template <class Tconv>
+inline bool operator!= (double lhs, timeRepresentation<Tconv> t1)
+{
+    return (timeRepresentation<Tconv> (lhs) != t1);
+}
 
-template<class Tconv>
-inline bool operator> (double lhs, timeRepresentation<Tconv> t1) { return (timeRepresentation<Tconv>(lhs) > t1); }
+template <class Tconv>
+inline bool operator> (double lhs, timeRepresentation<Tconv> t1)
+{
+    return (timeRepresentation<Tconv> (lhs) > t1);
+}
 
-template<class Tconv>
-inline bool operator< (double lhs, timeRepresentation<Tconv> t1) { return (timeRepresentation<Tconv>(lhs) < t1); }
+template <class Tconv>
+inline bool operator< (double lhs, timeRepresentation<Tconv> t1)
+{
+    return (timeRepresentation<Tconv> (lhs) < t1);
+}
 
-template<class Tconv>
-inline bool operator>= (double lhs, timeRepresentation<Tconv> t1) { return (timeRepresentation<Tconv>(lhs) >= t1); }
+template <class Tconv>
+inline bool operator>= (double lhs, timeRepresentation<Tconv> t1)
+{
+    return (timeRepresentation<Tconv> (lhs) >= t1);
+}
 
-template<class Tconv>
-inline bool operator<= (double lhs, timeRepresentation<Tconv> t1) { return (timeRepresentation<Tconv>(lhs) <= t1); }
+template <class Tconv>
+inline bool operator<= (double lhs, timeRepresentation<Tconv> t1)
+{
+    return (timeRepresentation<Tconv> (lhs) <= t1);
+}
 
 
 #endif
