@@ -18,11 +18,50 @@ std::shared_ptr<const data_block> SubscriptionInfo::getData()
 }
 
 
-void SubscriptionInfo::updateData(Time updateTime, std::shared_ptr<const data_block> data)
+void SubscriptionInfo::addData(Time updateTime, std::shared_ptr<const data_block> data)
 {
-	auto m = std::upper_bound(data_queue.begin(), data_queue.end(), updateTime, [](auto &time, auto &tm) {return (time < tm.first); });
-	data_queue.emplace(m, updateTime, std::move(data));
+	if (data_queue.empty())
+	{
+		data_queue.emplace_back(updateTime, std::move(data));
+	}
+	else
+	{
+		auto m = std::upper_bound(data_queue.begin(), data_queue.end(), updateTime, [](auto &time, auto &tm) {return (time < tm.first); });
+		data_queue.emplace(m, updateTime, std::move(data));
+	}
+	
 }
 
+bool SubscriptionInfo::updateTime(Time newTime)
+{
+	auto currentValue = data_queue.begin();
+	auto last = currentValue;
+	auto it_final = data_queue.end();
+	if (currentValue == it_final)
+	{
+		return false;
+	}
+	while ((currentValue !=it_final)&&(currentValue->first <= newTime))
+	{
+		last = currentValue;
+		++currentValue;
+	}
+	if (currentValue != last)
+	{
+		current_data = std::move(last->second);
+		data_queue.erase(data_queue.begin(), currentValue);
+		return true;
+	}
+	return false;
+}
+
+Time SubscriptionInfo::nextValueTime() const
+{
+	if (data_queue.empty())
+	{
+		return Time::maxVal();
+	}
+	return data_queue.front().first;
+}
 }
 

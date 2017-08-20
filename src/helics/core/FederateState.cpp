@@ -534,7 +534,14 @@ iterationTime FederateState::requestTime (Time nextTime, convergence_state conve
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
         iterating = (converged != convergence_state::complete);
+		if (nextTime <= time_granted)
+		{
+			nextTime = time_granted + info.timeDelta;
+		}
         time_requested = nextTime;
+		events.clear(); //clear the event queue
+		time_value=nextValueTime();
+		time_message = nextMessageTime();
         updateNextExecutionTime ();
         updateNextPossibleEventTime (converged);
         if (parent_ != nullptr)
@@ -561,22 +568,46 @@ iterationTime FederateState::requestTime (Time nextTime, convergence_state conve
             treq.actionTime = time_granted;
             parent_->addCommand (treq);
         }
+		//now fill the event vector so exernal systems know what has been updated
+		fillEventVector(time_granted);
         processing = false;
         return retTime;
     }
     else
     {
         // this would not be good practice to get into this part of the function
-        // but the area must protect itself
+        // but the area must protect itself and should return something sensible
         while (!processing.compare_exchange_weak (expected, true))
         {
             std::this_thread::sleep_for (std::chrono::milliseconds (20));
         }
-        iterationTime retTime = {time_granted,
-                                 iterating ? convergence_state::nonconverged : convergence_state::complete};
+		convergence_state ret = iterating ? convergence_state::nonconverged : convergence_state::complete;
+		if (state == HELICS_FINISHED)
+		{
+			ret = convergence_state::halted;
+		}
+		else if (state == HELICS_ERROR)
+		{
+			ret = convergence_state::error;
+		}
+		iterationTime retTime = { time_granted,ret };
         processing = false;
         return retTime;
     }
+}
+
+void FederateState::fillEventVector(Time currentTime)
+{
+	events.clear();
+	for (auto &sub : subscriptions)
+	{
+		bool updated=sub->updateTime(currentTime);
+		if (updated)
+		{
+			events.push_back(sub->id);
+		}
+
+	}
 }
 
 convergence_state FederateState::genericUnspecifiedQueueProcess ()
@@ -597,6 +628,17 @@ convergence_state FederateState::genericUnspecifiedQueueProcess ()
         processing = false;
         return convergence_state::complete;
     }
+}
+
+const std::vector<Core::Handle> emptyHandles;
+
+const std::vector<Core::Handle> &FederateState::getEvents() const
+{
+	if (!processing)
+	{ //!< if we are processing this vector is in an unstable state
+		return events;
+	}
+	return emptyHandles;
 }
 
 convergence_state FederateState::processQueue ()
@@ -658,7 +700,7 @@ convergence_state FederateState::processQueue ()
         break;
         case CMD_STOP:
         case CMD_DISCONNECT:
-            if (cmd.dest_id == global_id)
+            if ((cmd.dest_id == global_id)||(cmd.dest_id==0))
             {
                 setState (HELICS_FINISHED);
                 return convergence_state::halted;
@@ -707,7 +749,7 @@ convergence_state FederateState::processQueue ()
             auto epi = getEndpoint (cmd.dest_handle);
             if (epi != nullptr)
             {
-                updateMessageTime (cmd);
+                updateMessageTime (cmd.actionTime+info.impactWindow);
                 epi->addMessage (createMessage (std::move (cmd)));
             }
         }
@@ -718,7 +760,7 @@ convergence_state FederateState::processQueue ()
             auto fI = getFilter (cmd.dest_handle);
             if (fI != nullptr)
             {
-                updateMessageTime (cmd);
+                updateMessageTime (cmd.actionTime + info.impactWindow);
                 fI->addMessage (createMessage (std::move (cmd)));
             }
         }
@@ -726,10 +768,14 @@ convergence_state FederateState::processQueue ()
         case CMD_PUB:
         {
             auto subI = getSubscription (cmd.dest_handle);
+			if (subI == nullptr)
+			{
+				break;
+			}
             if (cmd.source_id == subI->target.first)
             {
-                subI->updateData (cmd.actionTime, std::make_shared<const data_block> (std::move (cmd.payload)));
-                updateValueTime (cmd);
+                subI->addData (cmd.actionTime+info.impactWindow, std::make_shared<const data_block> (std::move (cmd.payload)));
+                updateValueTime (cmd.actionTime + info.impactWindow);
             }
         }
         break;
@@ -924,15 +970,56 @@ bool FederateState::processExternalTimeMessage (ActionMessage &cmd)
     return true;
 }
 
+Time FederateState::nextValueTime() const
+{
+	auto firstValueTime = Time::maxVal();
+	for (auto &sub : subscriptions)
+	{
+		auto nvt = sub->nextValueTime();
+		if (nvt >= time_granted)
+		{
+			if (nvt<firstValueTime)
+			{
+				firstValueTime = nvt;
+			}
+		}
+		
+	}
+	return firstValueTime;
+}
+
+/** find the next Message Event*/
+Time FederateState::nextMessageTime() const
+{
+	auto firstMessageTime = Time::maxVal();
+	for (auto &ep:endpoints)
+	{
+		auto messageTime = ep->firstMessageTime();
+		if (messageTime >= time_granted)
+		{
+			if (messageTime < firstMessageTime)
+			{
+				firstMessageTime = messageTime;
+			}
+		}
+	}
+	return firstMessageTime;
+}
+
 void FederateState::updateNextExecutionTime ()
 {
     time_exec = std::min (time_message, time_value) + info.impactWindow;
     time_exec = std::min (time_requested, time_exec);
+	if (time_exec <= time_granted)
+	{
+		time_exec = time_granted;
+	}
     if (info.timeDelta > Time::epsilon ())
     {
         auto blk = static_cast<int> (std::ceil ((time_exec - time_granted) / info.timeDelta));
         time_exec = time_granted + blk * info.timeDelta;
     }
+	
 }
 
 
@@ -948,29 +1035,30 @@ void FederateState::updateNextPossibleEventTime (convergence_state converged)
         time_next = time_granted + info.lookAhead;
     }
 }
-void FederateState::updateValueTime (const ActionMessage &cmd)
+void FederateState::updateValueTime (Time valueUpdateTime)
 {
-    if (cmd.actionTime < time_value)
+	
+    if (valueUpdateTime < time_value)
     {
-        if (cmd.actionTime < time_granted)
+        if (valueUpdateTime < time_granted)
         {
             // if this condition is true then the value update is ignored for timing purposes
             return;
         }
-        time_value = cmd.actionTime;
+        time_value = valueUpdateTime;
     }
 }
 
-void FederateState::updateMessageTime (const ActionMessage &cmd)
+void FederateState::updateMessageTime (Time messageUpdateTime)
 {
-    if (cmd.actionTime < time_message)
+    if (messageUpdateTime < time_message)
     {
-        if (cmd.actionTime < time_granted)
+        if (messageUpdateTime < time_granted)
         {
             // if this condition is true then the value update is ignored for timing purposes
             return;
         }
-        time_message = cmd.actionTime;
+        time_message = messageUpdateTime;
     }
 }
 

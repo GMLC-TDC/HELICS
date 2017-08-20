@@ -135,9 +135,12 @@ class FederateState
 	bool processExternalTimeMessage (ActionMessage &cmd);
 	/** compute updates to time and determine if time could be granted*/
 	convergence_state updateTimeFactors ();
-
-	void updateValueTime(const ActionMessage &cmd);
-	void updateMessageTime(const ActionMessage &cmd);
+	/** update the time_value variable with a new value if needed
+	*/
+	void updateValueTime(Time valueUpdateTime);
+	/** update the time_message variable with a new value if needed
+	*/
+	void updateMessageTime(Time messageUpdateTime);
 	
     /** take a global id and get a pointer to the dependencyInfo for the other fed
 	will be nullptr if it doesn't exist
@@ -147,7 +150,10 @@ class FederateState
 	bool isDependency(Core::federate_id_t ofed) const;
     /** a logging function for logging or printing messages*/
     std::function<void(int, const std::string &, const std::string &)> loggerFunction;
-
+	/** find the next Value Event*/
+	Time nextValueTime() const;
+	/** find the next Message Event*/
+	Time nextMessageTime() const;
 	/** helper function for computing the next event time*/
 	void updateNextExecutionTime();
 	/** helper function for computing the next possible time to generate an external event
@@ -226,6 +232,10 @@ class FederateState
     */
 	convergence_state processQueue ();
 
+	/** fill event list
+	@param the time of the update
+	*/
+	void fillEventVector(Time currentTime);
 
   public:
 	  /** get the info structure for the federate
@@ -239,7 +249,7 @@ class FederateState
     Time grantedTime () const { return time_granted; }
 	/**get a reference to the handles of subscriptions with value updates
 	*/
-    const std::vector<Core::Handle> &getEvents () const { return events; }
+	const std::vector<Core::Handle> &getEvents() const;
 	/** get a reference to the global ids of dependent federates
 	*/
     const std::vector<Core::federate_id_t> &getDependents () const { return dependents; }

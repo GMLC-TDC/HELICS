@@ -200,7 +200,10 @@ protected:
 	void queueMessage(ActionMessage &m);
   /** function to deal with a source filters*/
   ActionMessage &processMessage(BasicHandleInfo *hndl, ActionMessage &m);
-  void createBasicHandle(Handle id_, federate_id_t federateId, BasicHandleType HandleType, const std::string &key, const std::string &type, const std::string &units, bool required);
+  /** add a new handle to the generic structure
+  and return a ptr to it
+  */
+  BasicHandleInfo* createBasicHandle(Handle id_, federate_id_t global_federateId, federate_id_t local_federateId, BasicHandleType HandleType, const std::string &key, const std::string &type, const std::string &units, bool required);
 
   /** check if a global id represents a local federate
   @param[in] global_id the federate global id

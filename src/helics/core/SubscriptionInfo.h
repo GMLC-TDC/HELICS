@@ -53,8 +53,17 @@ private:
 public:
 	/** get the current data*/
 	std::shared_ptr<const data_block> getData();
-	/** move time forward to update the current data*/
-	void updateData(Time updateTime, std::shared_ptr<const data_block> data);
+	/** add a data block into the queue*/
+	void addData(Time updateTime, std::shared_ptr<const data_block> data);
+
+	/** update current status to new time
+	@param newTime the time to move the subscription to
+	@return true if the value has changed
+	*/
+	bool updateTime(Time newTime);
+
+	Time nextValueTime() const;
+
 };
 }  // namespace helics
 

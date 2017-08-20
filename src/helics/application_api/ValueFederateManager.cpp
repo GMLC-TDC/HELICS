@@ -183,7 +183,6 @@ Time ValueFederateManager::queryLastUpdate (subscription_id_t sub_id) const
 void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;
-	uint64_t subCount;
     auto handles = coreObject->getValueUpdates (fedID);
     // lock the data updates
     std::unique_lock<std::mutex> sublock (subscription_mutex);

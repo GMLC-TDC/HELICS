@@ -720,16 +720,17 @@ Core::Handle CommonCore::getNewHandle () { return handleCounter++; }
 // comparison auto lambda  Functions like a template
 static auto compareFunc = [](const auto &A, const auto &B) { return (A->id < B->id); };
 
-void CommonCore::createBasicHandle (Handle id_,
-                                    federate_id_t federateId,
+BasicHandleInfo* CommonCore::createBasicHandle (Handle id_,
+                                    federate_id_t global_federateId,
+									federate_id_t local_federateId,
                                     BasicHandleType HandleType,
                                     const std::string &key,
                                     const std::string &type,
                                     const std::string &units,
                                     bool required)
 {
-    auto hndl = std::make_unique<BasicHandleInfo> (id_, federateId, HandleType, key, type, units, required);
-
+    auto hndl = std::make_unique<BasicHandleInfo> (id_, global_federateId, HandleType, key, type, units, required);
+	hndl->local_fed_id = local_federateId;
     std::lock_guard<std::mutex> lock (_handlemutex);
 
     // may need to resize the handles
@@ -737,7 +738,9 @@ void CommonCore::createBasicHandle (Handle id_,
     {
         handles.resize (id_ + 5);
     }
+	auto infoPtr = hndl.get();
     handles[id_] = std::move (hndl);
+	return infoPtr;
 }
 
 Handle CommonCore::registerSubscription (federate_id_t federateID,
@@ -761,9 +764,10 @@ Handle CommonCore::registerSubscription (federate_id_t federateID,
     auto id = getNewHandle ();
     fed->createSubscription (id, key, type, units, check_mode);
 
-    createBasicHandle (id, fed->global_id, HANDLE_SUB, key, type, units,
+    createBasicHandle (id, fed->global_id, fed->local_id,HANDLE_SUB, key, type, units,
                        (check_mode == handle_check_mode::required));
 
+	
     ActionMessage m (CMD_REG_SUB);
     m.source_id = fed->global_id;
     m.source_handle = id;
@@ -845,7 +849,7 @@ Handle CommonCore::registerPublication (federate_id_t federateID,
     lock.unlock ();
     fed->createPublication (id, key, type, units);
 
-    createBasicHandle (id, fed->global_id, HANDLE_PUB, key, type, units, false);
+    createBasicHandle (id, fed->global_id,fed->local_id, HANDLE_PUB, key, type, units, false);
 
     ActionMessage m (CMD_REG_PUB);
     m.source_id = fed->global_id;
@@ -975,7 +979,7 @@ Handle CommonCore::registerEndpoint (federate_id_t federateID, const std::string
 
     fed->createEndpoint (id, name, type);
 
-    createBasicHandle (id, federateID, HANDLE_END, name, type, "", false);
+    createBasicHandle (id, fed->global_id,fed->local_id, HANDLE_END, name, type, "", false);
 
     ActionMessage m (CMD_REG_END);
     m.source_id = fed->global_id;
@@ -1006,7 +1010,7 @@ Handle CommonCore::registerSourceFilter (federate_id_t federateID,
     auto id = getNewHandle ();
     fed->createSourceFilter (id, filterName, source, type_in);
 
-    createBasicHandle (id, federateID, HANDLE_SOURCE_FILTER, filterName, type_in, source, false);
+    createBasicHandle (id, fed->global_id,fed->local_id, HANDLE_SOURCE_FILTER, filterName, type_in, source, false);
 
     ActionMessage m (CMD_REG_SRC_FILTER);
     m.source_id = fed->global_id;
@@ -1059,7 +1063,7 @@ Handle CommonCore::registerDestinationFilter (federate_id_t federateID,
     auto id = getNewHandle ();
     fed->createDestFilter (id, filterName, dest, type_in);
 
-    createBasicHandle (id, federateID, HANDLE_DEST_FILTER, filterName, type_in, dest, true);
+    createBasicHandle (id, fed->global_id,fed->local_id, HANDLE_DEST_FILTER, filterName, type_in, dest, true);
 
     ActionMessage m (CMD_REG_DST_FILTER);
     m.source_id = fed->global_id;
