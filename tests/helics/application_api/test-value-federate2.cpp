@@ -51,6 +51,7 @@ BOOST_AUTO_TEST_CASE(test_all_callback)
 	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
+	fi.timeDelta = 1.0;
 
 	auto vFed = std::make_shared<helics::ValueFederate>(fi);
 
@@ -110,7 +111,7 @@ BOOST_AUTO_TEST_CASE(test_vector_callback_lists)
 	helics::FederateInfo fi("test1");
 	fi.coreType = CORE_TYPE_TO_TEST;
 	fi.coreInitString = "1";
-
+	fi.timeDelta = 1.0;
 	auto vFed = std::make_shared<helics::ValueFederate>(fi);
 
 	auto pubid1 = vFed->registerPublication<std::string>("pub1");

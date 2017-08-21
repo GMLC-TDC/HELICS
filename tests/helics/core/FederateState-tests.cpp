@@ -21,7 +21,7 @@ BOOST_FIXTURE_TEST_SUITE(FederateState_tests, federateStateTestFixture)
 BOOST_AUTO_TEST_CASE(constructor_test)
 {
 	// Check setting of name, initial state, and info by the constructor
-	BOOST_CHECK(fs->name.compare("fed_name") == 0);
+	BOOST_CHECK_EQUAL(fs->getIdentifier(),"fed_name");
 	BOOST_CHECK_EQUAL(fs->getState(), helics_federate_state_type::HELICS_CREATED);
 
 	BOOST_CHECK_EQUAL(fs->getInfo().timeDelta, helics::Time::zeroVal());

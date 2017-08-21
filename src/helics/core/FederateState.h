@@ -65,13 +65,11 @@ class FederateState
 {
   public:
     /** constructor from name and information structure*/
-    FederateState (const std::string &name_, const CoreFederateInfo &info_) : name (name_), info (info_)
-    {
-        state = HELICS_CREATED;
-    }
+	FederateState(const std::string &name_, const CoreFederateInfo &info_);
 
-    std::string name;  //!< the name of the federate
   private:
+
+	  std::string name;  //!< the name of the federate
     CoreFederateInfo info;  //!< basic federate info the core uses
   public:
     Core::federate_id_t local_id = invalid_fed_id;  //!< id code, default to something invalid
@@ -104,11 +102,12 @@ class FederateState
     Time time_granted = Time::minVal();  //!< the most recent time granted
     Time time_requested = timeZero;  //!< the most recent time requested
     Time time_next = timeZero;  //!< the next possible internal event time
-    Time time_minDe = timeZero;  //!< the minimum dependent event
-    Time time_minTe = timeZero;  //!< the minimum event time
+    Time time_minminDe = timeZero;  //!< the minimum  of the minimum dependency event Time
+    Time time_minDe = timeZero;  //!< the minimum event time of the dependencies
+	Time time_allow = Time::minVal();  //!< the current allowable time 
     Time time_exec = Time::maxVal();  //!< the time of the next targetted execution
-	Time time_message = Time::maxVal();	//!< the time of the earliest message
-	Time time_value = Time::maxVal();	//!< the time of the earliest value 
+	Time time_message = Time::maxVal();	//!< the time of the earliest message event
+	Time time_value = Time::maxVal();	//!< the time of the earliest value event
 
     std::atomic<int32_t> iteration{0};  //!< iteration counter
     std::vector<Core::Handle> events;  //!< list of value events to process
@@ -133,8 +132,10 @@ class FederateState
 	@return true if it did anything
 	*/
 	bool processExternalTimeMessage (ActionMessage &cmd);
-	/** compute updates to time and determine if time could be granted*/
-	convergence_state updateTimeFactors ();
+	/** compute updates to time values
+	@return true if they have been modified
+	*/
+	bool updateTimeFactors ();
 	/** update the time_value variable with a new value if needed
 	*/
 	void updateValueTime(Time valueUpdateTime);
@@ -166,6 +167,11 @@ class FederateState
 	  void reset();
 	  /** reset the federate to the initializing state*/
 	  void reInit();
+	  /** get the name of the federate*/
+	  const std::string &getIdentifier() const
+	  {
+		  return name;
+	  }
     helics_federate_state_type getState () const;
 
     SubscriptionInfo *getSubscription (const std::string &subName) const;

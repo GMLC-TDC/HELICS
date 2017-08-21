@@ -556,7 +556,7 @@ const std::string &CommonCore::getFederateName (federate_id_t federateID) const
     {
         throw (invalidIdentifier ("federateID not valid"));
     }
-    return fed->name;
+    return fed->getIdentifier();
 }
 
 
@@ -1333,7 +1333,7 @@ void CommonCore::logMessage (federate_id_t federateID, int logLevel, const std::
     m.index = logLevel;
     m.payload = logMessage;
     _queue.push (m);
-    sendToLogger (federateID, logLevel, fed->name, logMessage);
+    sendToLogger (federateID, logLevel, fed->getIdentifier(), logMessage);
 }
 
 void CommonCore::sendToLogger (federate_id_t federateID,
