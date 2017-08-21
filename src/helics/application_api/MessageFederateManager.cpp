@@ -126,7 +126,7 @@ std::unique_ptr<Message> MessageFederateManager::getMessage ()
 }
 
 
-void MessageFederateManager::sendMessage (endpoint_id_t source, const char *dest, data_view message)
+void MessageFederateManager::sendMessage (endpoint_id_t source, const std::string &dest, data_view message)
 {
     if (source.value () < local_endpoints.size ())
     {
@@ -138,7 +138,7 @@ void MessageFederateManager::sendMessage (endpoint_id_t source, const char *dest
     }
 }
 
-void MessageFederateManager::sendMessage (endpoint_id_t source, const char *dest, data_view message, Time sendTime)
+void MessageFederateManager::sendMessage (endpoint_id_t source, const std::string &dest, data_view message, Time sendTime)
 {
     if (source.value () < local_endpoints.size ())
     {

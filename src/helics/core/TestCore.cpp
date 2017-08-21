@@ -10,10 +10,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "TestCore.h"
-#include "BrokerFactory.h"
-#include "CoreFactory.h"
-#include "CoreBroker.h"
 #include "ActionMessage.h"
+#include "BrokerFactory.h"
+#include "CoreBroker.h"
+#include "CoreFactory.h"
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <fstream>
@@ -24,8 +24,7 @@ namespace helics
 using federate_id_t = Core::federate_id_t;
 using Handle = Core::Handle;
 
-TestCore::TestCore(const std::string &core_name) :CommonCore(core_name)
-{}
+TestCore::TestCore (const std::string &core_name) : CommonCore (core_name) {}
 
 TestCore::TestCore (std::shared_ptr<CoreBroker> nbroker) : tbroker (std::move (nbroker)) {}
 
@@ -110,7 +109,8 @@ static void argumentParser (int argc, char *argv[], boost::program_options::vari
 void TestCore::initializeFromArgs (int argc, char *argv[])
 {
     namespace po = boost::program_options;
-    if (!_initialized)
+    bool exp = false;
+    if (initialized_.compare_exchange_strong (exp, true))
     {
         po::variables_map vm;
         argumentParser (argc, argv, vm);
@@ -119,41 +119,39 @@ void TestCore::initializeFromArgs (int argc, char *argv[])
         {
             brokerName = vm["broker"].as<std::string> ();
         }
-		else if (vm.count("brokername") > 0)
-		{
-			brokerName = vm["brokername"].as<std::string>();
-		}
-			if (vm.count("brokerinit") > 0)
-			{
-				brokerInitString=vm["brokerinit"].as<std::string>();
-			}
+        else if (vm.count ("brokername") > 0)
+        {
+            brokerName = vm["brokername"].as<std::string> ();
+        }
+        if (vm.count ("brokerinit") > 0)
+        {
+            brokerInitString = vm["brokerinit"].as<std::string> ();
+        }
+    }
+    if (coreState == created)
+    {
         CommonCore::initializeFromArgs (argc, argv);
-
     }
 }
 
-bool TestCore::brokerConnect()
+bool TestCore::brokerConnect ()
 {
-	if (!tbroker)
-	{
-		tbroker = findBroker(brokerName);
-		if (!tbroker)
-		{
-			tbroker = BrokerFactory::create(helics_core_type::HELICS_TEST, brokerName, brokerInitString);
-		}
-		
-	}
-	if (tbroker)
-	{
-		tbroker->connect();
-	}
-	return static_cast<bool>(tbroker);
+    if (!tbroker)
+    {
+        tbroker = findBroker (brokerName);
+        if (!tbroker)
+        {
+            tbroker = BrokerFactory::create (helics_core_type::HELICS_TEST, brokerName, brokerInitString);
+        }
+    }
+    if (tbroker)
+    {
+        tbroker->connect ();
+    }
+    return static_cast<bool> (tbroker);
 }
 
-void TestCore::brokerDisconnect()
-{
-	tbroker = nullptr;
-}
+void TestCore::brokerDisconnect () { tbroker = nullptr; }
 
 TestCore::~TestCore () = default;
 
@@ -164,8 +162,8 @@ void TestCore::transmit (int route_id, const ActionMessage &cmd)
         tbroker->addMessage (cmd);
         return;
     }
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (routeMutex, std::defer_lock) :
-                               std::unique_lock<std::mutex> (routeMutex);
+    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (routeMutex, std::defer_lock) :
+                                           std::unique_lock<std::mutex> (routeMutex);
     auto brkfnd = brokerRoutes.find (route_id);
     if (brkfnd != brokerRoutes.end ())
     {
@@ -202,10 +200,7 @@ void TestCore::addRoute (int route_id, const std::string &routeInfo)
 }
 
 
-std::string TestCore::getAddress() const
-{
-	return getIdentifier();
-}
+std::string TestCore::getAddress () const { return getIdentifier (); }
 
 /*
 void TestCore::computeDependencies()

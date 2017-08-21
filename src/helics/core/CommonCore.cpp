@@ -77,7 +77,7 @@ CommonCore::CommonCore (const std::string &core_name) : identifier (core_name) {
 
 void CommonCore::initialize (const std::string &initializationString)
 {
-    if (!_initialized)  // don't do the compare exchange here since we do that in the initialize fromArgs
+    if ((coreState == created))  // don't do the compare exchange here since we do that in the initialize fromArgs
     {  // and we can tolerate a spurious call
         stringToCmdLine cmdline (initializationString);
         initializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
@@ -87,8 +87,8 @@ void CommonCore::initialize (const std::string &initializationString)
 void CommonCore::initializeFromArgs (int argC, char *argv[])
 {
     namespace po = boost::program_options;
-    bool exp = false;
-    if (_initialized.compare_exchange_strong (exp, true))
+    core_state_t exp = created;
+    if (coreState.compare_exchange_strong (exp, core_state_t::initialized))
     {
         po::variables_map vm;
         argumentParser (argC, argv, vm);
@@ -126,12 +126,12 @@ void CommonCore::initializeFromArgs (int argC, char *argv[])
 
 bool CommonCore::connect ()
 {
-    if (_initialized)
+    if (coreState >= core_state_t::initialized)
     {
-        bool exp = false;
-        if (_connected.compare_exchange_strong (exp, true))
+        core_state_t exp = core_state_t::initialized;
+        if (coreState.compare_exchange_strong (exp, core_state_t::connected))
         {
-            auto res = brokerConnect ();
+            bool res = brokerConnect ();
             if (res)
             {
                 // now register this core object as a broker
@@ -139,7 +139,10 @@ bool CommonCore::connect ()
                 m.name = getIdentifier ();
                 m.info ().target = getAddress ();
                 transmit (0, m);
-                _connected = true;
+            }
+            else
+            {
+                coreState = core_state_t::initialized;
             }
             return res;
         }
@@ -149,12 +152,12 @@ bool CommonCore::connect ()
 }
 
 
-bool CommonCore::isConnected () const { return _connected; }
+bool CommonCore::isConnected () const { return ((coreState == operating) || (coreState == connected)); }
 
 void CommonCore::disconnect ()
 {
     brokerDisconnect ();
-    _connected = false;
+    coreState = terminated;
     /*We need to enrure that the destructor is not called immediately upon calling unregister
     otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
     that will be destroyed on function exit
@@ -269,7 +272,7 @@ void argumentParser (int argc, char *argv[], boost::program_options::variables_m
 
 CommonCore::~CommonCore ()
 {
-    if (_initialized)
+    if (_queue_processing_thread.joinable ())
     {
         _queue.push (CMD_STOP);
         _queue_processing_thread.join ();
@@ -279,8 +282,8 @@ CommonCore::~CommonCore ()
 FederateState *CommonCore::getFederate (federate_id_t federateID) const
 {
     // only activate the lock if we not in an operating state
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                               std::unique_lock<std::mutex> (_mutex);
+    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
+                                           std::unique_lock<std::mutex> (_mutex);
 
     if (isValidIndex (federateID, _federates))
     {
@@ -301,13 +304,13 @@ FederateState *CommonCore::getFederate (federate_id_t federateID) const
 FederateState *CommonCore::getHandleFederate (Handle id_)
 {
     // only activate the lock if we not in an operating state
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
-                               std::unique_lock<std::mutex> (_handlemutex);
+    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
+                                           std::unique_lock<std::mutex> (_handlemutex);
     // this list is now constant no need to lock
     if (isValidIndex (id_, handles))
     {  // now need to be careful about deadlock here
-        auto lock2 = (_operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                                    std::unique_lock<std::mutex> (_mutex);
+        auto lock2 = (coreState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
+                                                std::unique_lock<std::mutex> (_mutex);
         return _federates[handles[id_]->local_fed_id].get ();
     }
 
@@ -317,8 +320,8 @@ FederateState *CommonCore::getHandleFederate (Handle id_)
 BasicHandleInfo *CommonCore::getHandleInfo (Handle id_) const
 {
     // only activate the lock if we not in an operating state
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
-                               std::unique_lock<std::mutex> (_handlemutex);
+    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
+                                           std::unique_lock<std::mutex> (_handlemutex);
     if (isValidIndex (id_, handles))
     {
         return handles[id_].get ();
@@ -331,8 +334,8 @@ BasicHandleInfo *CommonCore::getHandleInfo (Handle id_) const
 BasicHandleInfo *CommonCore::getLocalEndpoint (const std::string &name)
 {
     // only activate the lock if we not in an operating state
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
-                               std::unique_lock<std::mutex> (_handlemutex);
+    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
+                                           std::unique_lock<std::mutex> (_handlemutex);
     auto fnd = endpoints.find (name);
     if (fnd != endpoints.end ())
     {
@@ -345,8 +348,8 @@ BasicHandleInfo *CommonCore::getLocalEndpoint (const std::string &name)
 bool CommonCore::isLocal (Core::federate_id_t global_id) const
 {
     // only activate the lock if we not in an operating state
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                               std::unique_lock<std::mutex> (_mutex);
+    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
+                                           std::unique_lock<std::mutex> (_mutex);
     auto fnd = global_id_translation.find (global_id);
     return (fnd != global_id_translation.end ());
 }
@@ -354,15 +357,15 @@ bool CommonCore::isLocal (Core::federate_id_t global_id) const
 int32_t CommonCore::getRoute (Core::federate_id_t global_id) const
 {
     // only activate the lock if we not in an operating state
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                               std::unique_lock<std::mutex> (_mutex);
+    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
+                                           std::unique_lock<std::mutex> (_mutex);
     auto fnd = routing_table.find (global_id);
     return (fnd != routing_table.end ()) ? fnd->second : 0;
 }
 
-bool CommonCore::isInitialized () const { return _initialized; }
+bool CommonCore::isInitialized () const { return (coreState >= initialized); }
 
-
+bool CommonCore::isJoinable () const { return ((coreState != created) && (coreState < operating)); }
 void CommonCore::error (federate_id_t federateID, int errorCode)
 {
     auto fed = getFederate (federateID);
@@ -483,7 +486,7 @@ convergence_state CommonCore::enterExecutingState (federate_id_t federateID, con
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid"));
     }
     if (HELICS_EXECUTING == fed->getState ())
     {
@@ -503,20 +506,20 @@ convergence_state CommonCore::enterExecutingState (federate_id_t federateID, con
 
 federate_id_t CommonCore::registerFederate (const std::string &name, const CoreFederateInfo &info)
 {
-    if (!_initialized)
+    if (coreState == created)
     {
-        throw (invalidFunctionCall ());
+        throw (invalidFunctionCall ("Core has not been initialized yet"));
     }
-    if (_operating)
+    if (coreState >= operating)
     {
-        throw (invalidFunctionCall ());
+        throw (invalidFunctionCall ("Core has already moved to operating state"));
     }
     auto fed = std::make_unique<FederateState> (name, info);
 
     std::unique_lock<std::mutex> lock (_mutex);
     auto id = fed->local_id = static_cast<decltype (fed->local_id)> (_federates.size ());
 
-	fed->setParent(this);
+    fed->setParent (this);
     _federates.push_back (std::move (fed));
     federateNames.emplace (name, id);
     lock.unlock ();
@@ -573,7 +576,7 @@ federate_id_t CommonCore::getFederateId (const std::string &name)
 
 int32_t CommonCore::getFederationSize ()
 {
-    if (_operating)
+    if (coreState >= operating)
     {
         return _global_federation_size;
     }
@@ -720,17 +723,17 @@ Core::Handle CommonCore::getNewHandle () { return handleCounter++; }
 // comparison auto lambda  Functions like a template
 static auto compareFunc = [](const auto &A, const auto &B) { return (A->id < B->id); };
 
-BasicHandleInfo* CommonCore::createBasicHandle (Handle id_,
-                                    federate_id_t global_federateId,
-									federate_id_t local_federateId,
-                                    BasicHandleType HandleType,
-                                    const std::string &key,
-                                    const std::string &type,
-                                    const std::string &units,
-                                    bool required)
+BasicHandleInfo *CommonCore::createBasicHandle (Handle id_,
+                                                federate_id_t global_federateId,
+                                                federate_id_t local_federateId,
+                                                BasicHandleType HandleType,
+                                                const std::string &key,
+                                                const std::string &type,
+                                                const std::string &units,
+                                                bool required)
 {
     auto hndl = std::make_unique<BasicHandleInfo> (id_, global_federateId, HandleType, key, type, units, required);
-	hndl->local_fed_id = local_federateId;
+    hndl->local_fed_id = local_federateId;
     std::lock_guard<std::mutex> lock (_handlemutex);
 
     // may need to resize the handles
@@ -738,9 +741,9 @@ BasicHandleInfo* CommonCore::createBasicHandle (Handle id_,
     {
         handles.resize (id_ + 5);
     }
-	auto infoPtr = hndl.get();
+    auto infoPtr = hndl.get ();
     handles[id_] = std::move (hndl);
-	return infoPtr;
+    return infoPtr;
 }
 
 Handle CommonCore::registerSubscription (federate_id_t federateID,
@@ -764,10 +767,10 @@ Handle CommonCore::registerSubscription (federate_id_t federateID,
     auto id = getNewHandle ();
     fed->createSubscription (id, key, type, units, check_mode);
 
-    createBasicHandle (id, fed->global_id, fed->local_id,HANDLE_SUB, key, type, units,
+    createBasicHandle (id, fed->global_id, fed->local_id, HANDLE_SUB, key, type, units,
                        (check_mode == handle_check_mode::required));
 
-	
+
     ActionMessage m (CMD_REG_SUB);
     m.source_id = fed->global_id;
     m.source_handle = id;
@@ -849,7 +852,7 @@ Handle CommonCore::registerPublication (federate_id_t federateID,
     lock.unlock ();
     fed->createPublication (id, key, type, units);
 
-    createBasicHandle (id, fed->global_id,fed->local_id, HANDLE_PUB, key, type, units, false);
+    createBasicHandle (id, fed->global_id, fed->local_id, HANDLE_PUB, key, type, units, false);
 
     ActionMessage m (CMD_REG_PUB);
     m.source_id = fed->global_id;
@@ -904,10 +907,10 @@ const std::string &CommonCore::getType (Handle handle) const
 void CommonCore::setValue (Handle handle_, const char *data, uint64_t len)
 {
     auto handleInfo = getHandleInfo (handle_);
-	if (handleInfo == nullptr)
-	{
-		throw(invalidIdentifier("Handle not valid"));
-	}
+    if (handleInfo == nullptr)
+    {
+        throw (invalidIdentifier ("Handle not valid"));
+    }
     if (handleInfo->what != HANDLE_PUB)
     {
         throw (invalidIdentifier ("handle does not point to a publication"));
@@ -979,7 +982,7 @@ Handle CommonCore::registerEndpoint (federate_id_t federateID, const std::string
 
     fed->createEndpoint (id, name, type);
 
-    createBasicHandle (id, fed->global_id,fed->local_id, HANDLE_END, name, type, "", false);
+    createBasicHandle (id, fed->global_id, fed->local_id, HANDLE_END, name, type, "", false);
 
     ActionMessage m (CMD_REG_END);
     m.source_id = fed->global_id;
@@ -1010,7 +1013,8 @@ Handle CommonCore::registerSourceFilter (federate_id_t federateID,
     auto id = getNewHandle ();
     fed->createSourceFilter (id, filterName, source, type_in);
 
-    createBasicHandle (id, fed->global_id,fed->local_id, HANDLE_SOURCE_FILTER, filterName, type_in, source, false);
+    createBasicHandle (id, fed->global_id, fed->local_id, HANDLE_SOURCE_FILTER, filterName, type_in, source,
+                       false);
 
     ActionMessage m (CMD_REG_SRC_FILTER);
     m.source_id = fed->global_id;
@@ -1063,7 +1067,7 @@ Handle CommonCore::registerDestinationFilter (federate_id_t federateID,
     auto id = getNewHandle ();
     fed->createDestFilter (id, filterName, dest, type_in);
 
-    createBasicHandle (id, fed->global_id,fed->local_id, HANDLE_DEST_FILTER, filterName, type_in, dest, true);
+    createBasicHandle (id, fed->global_id, fed->local_id, HANDLE_DEST_FILTER, filterName, type_in, dest, true);
 
     ActionMessage m (CMD_REG_DST_FILTER);
     m.source_id = fed->global_id;
@@ -1117,10 +1121,10 @@ void CommonCore::send (Handle sourceHandle, const std::string &destination, cons
         throw (invalidIdentifier ("handle is not valid"));
     }
 
-	if (hndl->what != HANDLE_END)
-	{
-		throw(invalidIdentifier("handle does not point to an endpoint"));
-	}
+    if (hndl->what != HANDLE_END)
+    {
+        throw (invalidIdentifier ("handle does not point to an endpoint"));
+    }
     auto fed = getFederate (hndl->local_fed_id);
     ActionMessage m (CMD_SEND_MESSAGE);
 
@@ -1148,10 +1152,10 @@ void CommonCore::sendEvent (Time time,
     {
         throw (invalidIdentifier ("handle is not valid"));
     }
-	if (hndl->what != HANDLE_END)
-	{
-		throw(invalidIdentifier("handle does not point to an endpoint"));
-	}
+    if (hndl->what != HANDLE_END)
+    {
+        throw (invalidIdentifier ("handle does not point to an endpoint"));
+    }
     ActionMessage m (CMD_SEND_MESSAGE);
     m.source_handle = sourceHandle;
     m.source_id = hndl->fed_id;
@@ -1173,10 +1177,10 @@ void CommonCore::sendMessage (Handle sourceHandle, std::unique_ptr<Message> mess
     {
         throw (invalidIdentifier ("handle is not valid"));
     }
-	if (hndl->what != HANDLE_END)
-	{
-		throw(invalidIdentifier("handle does not point to an endpoint"));
-	}
+    if (hndl->what != HANDLE_END)
+    {
+        throw (invalidIdentifier ("handle does not point to an endpoint"));
+    }
     ActionMessage m (CMD_SEND_MESSAGE);
 
     m.info ().orig_source = std::move (message->origsrc);
@@ -1318,13 +1322,12 @@ uint64_t CommonCore::receiveCountAny (federate_id_t federateID)
 
 void CommonCore::logMessage (federate_id_t federateID, int logLevel, const std::string &logMessage)
 {
-   
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
         throw (invalidIdentifier ("FederateID is not valid"));
     }
-	ActionMessage m(CMD_LOG);
+    ActionMessage m (CMD_LOG);
 
     m.source_id = fed->global_id;
     m.index = logLevel;
@@ -1361,10 +1364,10 @@ void CommonCore::setLoggingFunction (
 void CommonCore::setFilterOperator (Handle filter, std::shared_ptr<FilterOperator> callback)
 {
     auto hndl = getHandleInfo (filter);
-	if (hndl == nullptr)
-	{
-		throw(invalidIdentifier("filter is not a valid handle"));
-	}
+    if (hndl == nullptr)
+    {
+        throw (invalidIdentifier ("filter is not a valid handle"));
+    }
     if ((hndl->what != HANDLE_DEST_FILTER) && (hndl->what != HANDLE_SOURCE_FILTER))
     {
         throw (invalidIdentifier ("filter identifier does not point a filter"));
@@ -1378,18 +1381,18 @@ void CommonCore::setFilterOperator (Handle filter, std::shared_ptr<FilterOperato
 FilterFunctions *CommonCore::getFilterFunctions (Handle id_)
 {
     auto hndl = getHandleInfo (id_);
-	if (hndl == nullptr)
-	{
-		throw(invalidIdentifier("filter is not a valid handle"));
-	}
-	if ((hndl->what != HANDLE_DEST_FILTER) && (hndl->what != HANDLE_SOURCE_FILTER))
-	{
-		throw (invalidIdentifier("filter identifier does not point a filter"));
-	}
+    if (hndl == nullptr)
+    {
+        throw (invalidIdentifier ("filter is not a valid handle"));
+    }
+    if ((hndl->what != HANDLE_DEST_FILTER) && (hndl->what != HANDLE_SOURCE_FILTER))
+    {
+        throw (invalidIdentifier ("filter identifier does not point a filter"));
+    }
     auto fnd = filters.find (id_);
     if (fnd == filters.end ())
     {
-		//just make a dummy filterFunction so we have something to return
+        // just make a dummy filterFunction so we have something to return
         auto ff = std::make_unique<FilterFunctions> ();
         auto ffp = ff.get ();
         filters.emplace (id_, std::move (ff));
@@ -1435,15 +1438,15 @@ std::unique_ptr<Message> CommonCore::receiveAnyFilter (federate_id_t federateID,
 
 void CommonCore::setIdentifier (const std::string &name)
 {
-    if (!_initialized)
+    if (coreState == created)
     {
         std::lock_guard<std::mutex> lock (_mutex);
         identifier = name;
     }
-	else
-	{
-		throw(invalidFunctionCall("setIdentifier can only be called before the core is initialized"));
-	}
+    else
+    {
+        throw (invalidFunctionCall ("setIdentifier can only be called before the core is initialized"));
+    }
 }
 
 
@@ -1721,10 +1724,15 @@ void CommonCore::processCommand (ActionMessage &command)
         }
         break;
     case CMD_INIT_GRANT:
-        // forward the grant to all federates
-        for (auto &fed : _federates)
         {
-            fed->addAction (command);
+            core_state_t exp = connected;
+            if (coreState.compare_exchange_strong (exp, core_state_t::operating))
+            {// forward the grant to all federates
+                for (auto &fed : _federates)
+                {
+                    fed->addAction (command);
+                }
+            }
         }
         break;
 

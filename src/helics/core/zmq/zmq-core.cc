@@ -134,7 +134,7 @@ ZeroMQCore::ZeroMQCore(const std::string &core_name) :CommonCore(core_name) {}
 void ZeroMQCore::initializeFromArgs(int argc, char *argv[])
 {
 	namespace po = boost::program_options;
-	if (!_initialized)
+	if (coreState==created)
 	{
 		po::variables_map vm;
 		argumentParser(argc, argv, vm);

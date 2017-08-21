@@ -114,6 +114,9 @@ class Core
 	*/
 	virtual void disconnect() = 0;
 
+	/** check if the core is joinable i.e. it is accepting new federates
+	*/
+	virtual bool isJoinable() const = 0;
 	/** get and identifier string for the core
 	*/
 	virtual const std::string &getIdentifier() const = 0;

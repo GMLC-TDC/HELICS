@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_source_test)
 	auto msgAny = core->receiveAnyFilter(id,filter_id);
 	BOOST_CHECK_EQUAL(msgAny->origsrc, "end1");
 	BOOST_CHECK_EQUAL(msgAny->src, "end1");
-	msgAny->src = srcFilterName.c_str();
+	msgAny->src = srcFilterName;
 	core->sendMessage(helics::invalid_Handle,std::move(msgAny));
 
 

@@ -40,9 +40,11 @@ class TestCore : public CommonCore
 public:
 	virtual std::string getAddress() const override;
 private:
+	//these should only be called by the CommonCore code
 	virtual bool brokerConnect() override;
 	virtual void brokerDisconnect() override;
-  private:
+private:
+	  std::atomic<bool> initialized_{ false };  //!< atomic protecting local initialization
     std::shared_ptr<CoreBroker> tbroker;  //!<the parent broker;
 	std::string brokerInitString;  //!< the initialization string to use for the Broker
 	std::string brokerName;  //!< the name of the broker to connect to

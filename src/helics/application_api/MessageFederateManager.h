@@ -86,9 +86,9 @@ namespace helics
 		std::unique_ptr<Message> getMessage();
 
 		/**/
-		void sendMessage(endpoint_id_t source, const char *dest, data_view message);
+		void sendMessage(endpoint_id_t source, const std::string &dest, data_view message);
 
-		void sendMessage(endpoint_id_t source, const char *dest, data_view message, Time sendTime);
+		void sendMessage(endpoint_id_t source, const std::string &dest, data_view message, Time sendTime);
 
 		void sendMessage(endpoint_id_t source, std::unique_ptr<Message> message);
 

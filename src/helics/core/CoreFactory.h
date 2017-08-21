@@ -38,7 +38,8 @@ public:
   /** tries to find a named core if it fails it creates a new one
   */
   static std::shared_ptr<Core> FindOrCreate(helics_core_type type, const std::string &coreName, const std::string &initializationString);
-
+  /** try to find a joinable core of a specific type*/
+  static std::shared_ptr<Core> findJoinableCoreOfType(helics_core_type type);
   /**
    * Returns true if type specified is available in current compilation.
    */

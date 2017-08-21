@@ -40,6 +40,7 @@ strategies*/
 class CommonCore : public Core {
 
 public:
+
 	/** default constructor*/
 CommonCore() noexcept;
 /** construct from a core name*/
@@ -53,6 +54,7 @@ CommonCore(const std::string &core_name);
   */
   virtual void initializeFromArgs(int argc, char *argv[]);
   virtual bool isInitialized () const override;
+  virtual bool isJoinable() const override; 
   virtual void error (federate_id_t federateID, int errorCode=-1) override;
   virtual void finalize (federate_id_t federateID) override;
   virtual void enterInitializingState (federate_id_t federateID) override;
@@ -175,13 +177,22 @@ private:
 	void routeMessage(ActionMessage &cmd, federate_id_t dest);
 	void routeMessage(const ActionMessage &cmd);
 protected:
-	std::atomic<bool> _operating{ false }; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
+	/** enumeration of the possible core states*/
+	enum core_state_t:int
+	{
+		created=-5,
+		initialized=-3,
+		connected=-1,
+		operating=0,
+		terminated=3,
+		errored=7,
+	};
+	std::atomic<core_state_t> coreState{created}; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
   std::vector<std::unique_ptr<FederateState>> _federates; //!< local federate information
   //using pointers to minimize time in a critical section- though this should be timed more in the future
   std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
   int32_t _min_federates;  //!< the minimum number of federates that must connect before entering init mode
   int32_t _max_iterations; //!< the maximum allowable number of iterations
-  std::atomic<bool> _connected{ false };  //!<indicator that the core has been connected
   std::thread _queue_processing_thread;	//!< thread for processing the queue
   int32_t _global_federation_size=0;  //!< total size of the federation
   std::atomic<Core::Handle> handleCounter{ 1 };	//!< counter for the handle index
@@ -189,7 +200,6 @@ protected:
   std::unordered_map<std::string, Handle> publications;	//!< map of all local publications
   std::unordered_map<std::string, Handle> endpoints;	//!< map of all local endpoints
   std::unordered_map<std::string, federate_id_t> federateNames;  //!< map of federate names to id
-  std::atomic<bool> _initialized{ false };  //!< indicator that the structure has been initialized
   std::map<Handle, std::unique_ptr<FilterFunctions>> filters; //!< map of all filters
  private:
   mutable std::mutex _mutex; //!< mutex protecting the federate creation and modification

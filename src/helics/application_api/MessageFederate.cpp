@@ -256,7 +256,7 @@ namespace helics {
 	{
 		if (state == op_states::execution)
 		{
-			mfManager->sendMessage(source, dest.c_str(), data);
+			mfManager->sendMessage(source, dest, data);
 			return;
 		}
 		throw(InvalidFunctionCall("cannot send message outside of execution state"));
@@ -267,7 +267,7 @@ namespace helics {
 	{
 		if (state == op_states::execution)
 		{
-			mfManager->sendMessage(source, dest.c_str(), data, sendTime);
+			mfManager->sendMessage(source, dest, data, sendTime);
 			return;
 		}
 		throw(InvalidFunctionCall("cannot send message outside of execution state"));

@@ -37,6 +37,7 @@ private:
 	virtual bool brokerConnect() override;
 	virtual void brokerDisconnect() override;
 private:
+	std::atomic<bool> initialized_{ false };  //!< atomic protecting local initialization
 	//std::unique_ptr<ZmqConnection> zmqConn;  //!< object containing the ZmqConnection Information for Pimpl 
 };
 }

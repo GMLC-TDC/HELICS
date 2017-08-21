@@ -496,6 +496,7 @@ convergence_state FederateState::enterExecutingState (convergence_state converge
             parent_->addCommand (execgrant);
         }
         time_granted = timeZero;
+		fillEventVector(time_granted);
         processing = false;
         return ret;
     }

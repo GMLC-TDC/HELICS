@@ -125,6 +125,8 @@ std::shared_ptr<Core> CoreFactory::create(helics_core_type type, const std::stri
   return core;
 }
 
+
+
 std::shared_ptr<Core> CoreFactory::FindOrCreate(helics_core_type type,const std::string &core_name, const std::string &initializationString) {
 
 	std::shared_ptr<Core> core = findCore(core_name);
@@ -245,6 +247,60 @@ std::shared_ptr<CommonCore> CoreFactory::findCore(const std::string &name)
 	if (fnd != CoreMap.end())
 	{
 		return fnd->second;
+	}
+	return nullptr;
+}
+
+std::shared_ptr<Core> CoreFactory::findJoinableCoreOfType(helics_core_type type)
+{
+	std::lock_guard<std::mutex> lock(mapLock);
+	for (auto &cmap : CoreMap)
+	{
+		if (cmap.second->isJoinable())
+		{
+			switch (type)
+			{
+			case HELICS_ZMQ:
+			{
+#if HELICS_HAVE_ZEROMQ
+				if (dynamic_cast<ZeroMQCore *>(cmap.second.get()) != nullptr)
+				{
+					return cmap.second;
+				}
+#endif
+				break;
+			}
+			case HELICS_MPI:
+			{
+#if HELICS_HAVE_MPI
+				if (dynamic_cast<MPICore *>(cmap.second.get()) != nullptr)
+				{
+					return cmap.second;
+				}
+#endif
+				break;
+			}
+			case HELICS_TEST:
+			{
+				if (dynamic_cast<TestCore *>(cmap.second.get()) != nullptr)
+				{
+					return cmap.second;
+				}
+				break;
+			}
+			case HELICS_INTERPROCESS:
+			{
+				//if (dynamic_cast<ZeroMQCore *>(cmap.second.get()) != nullptr)
+				//{
+				//	return cmap.second;
+				//}
+				break;
+			}
+			default:
+				return cmap.second;
+			}
+			
+		}
 	}
 	return nullptr;
 }

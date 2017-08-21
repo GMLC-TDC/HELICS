@@ -34,18 +34,26 @@ CoreFederateInfo generateCoreInfo (const FederateInfo &fi)
     cfi.uninteruptible = fi.uninterruptible;
     cfi.time_agnostic = fi.timeAgnostic;
 	cfi.source_only = fi.sourceOnly;
+	cfi.max_iterations = fi.max_iterations;
     return cfi;
 }
 
 Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
 {
+	auto ctype = coreTypeFromString(fi.coreType);
 	if (fi.coreName.empty())
 	{
-		coreObject = CoreFactory::create(coreTypeFromString(fi.coreType), fi.coreInitString);
+		
+		coreObject = CoreFactory::findJoinableCoreOfType(ctype);
+		if (!coreObject)
+		{
+			coreObject = CoreFactory::create(ctype, fi.coreInitString);
+		}
+		
 	}
 	else
 	{
-		coreObject = CoreFactory::FindOrCreate(coreTypeFromString(fi.coreType), fi.coreName, fi.coreInitString);
+		coreObject = CoreFactory::FindOrCreate(ctype, fi.coreName, fi.coreInitString);
 	}
     if (!coreObject)
     {
@@ -57,7 +65,7 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
 	{
 		coreObject->connect();
 	}
-    fedID = coreObject->registerFederate (fi.name.c_str (), generateCoreInfo (fi));
+    fedID = coreObject->registerFederate (fi.name, generateCoreInfo (fi));
 }
 
 Federate::Federate (const std::string &file) : Federate (LoadFederateInfo (file))
@@ -361,13 +369,13 @@ void Federate::error (int errorcode)
 {
     state = op_states::error;
     std::string errorString = "error " + std::to_string (errorcode) + " in federate " + FedInfo.name;
-    coreObject->logMessage (fedID, errorcode, errorString.c_str ());
+    coreObject->logMessage (fedID, errorcode, errorString);
 }
 
 void Federate::error (int errorcode, const std::string &message)
 {
     state = op_states::error;
-    coreObject->logMessage (fedID, errorcode, message.c_str ());
+    coreObject->logMessage (fedID, errorcode, message);
 }
 
 
