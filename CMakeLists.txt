@@ -268,6 +268,10 @@ message("Using Boost include files : ${Boost_INCLUDE_DIR}")
 message("Using Boost libraries ${Boost_LIBRARY_DIRS}")
 
 list(APPEND external_library_list ${Boost_LIBRARIES})
+if (UNIX)
+list(APPEND external_library_list rt)
+endif(UNIX)
+
   list(APPEND external_link_directories ${Boost_LIBRARY_DIRS})
   
   
