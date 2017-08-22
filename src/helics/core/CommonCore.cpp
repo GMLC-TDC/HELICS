@@ -376,7 +376,7 @@ void CommonCore::error (federate_id_t federateID, int errorCode)
     ActionMessage m (CMD_ERROR);
     m.source_id = fed->global_id;
     m.source_handle = errorCode;
-    _queue.push (m);
+    addCommand(m);
     fed->addAction (m);
     convergence_state ret = convergence_state::complete;
     while (ret != convergence_state::error)
@@ -399,8 +399,8 @@ void CommonCore::finalize (federate_id_t federateID)
     }
     ActionMessage bye (CMD_DISCONNECT);
     bye.source_id = fed->global_id;
-    _queue.push (bye);
-    fed->addAction (bye);
+    addCommand(bye);
+	fed->addAction(bye);
     convergence_state ret = convergence_state::complete;
     while (ret != convergence_state::halted)
     {
@@ -467,7 +467,7 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
     {  // only enter this loop once per federate
         ActionMessage m (CMD_INIT);
         m.source_id = fed->global_id;
-        _queue.push (m);
+        addCommand(m);
 
         auto check = fed->enterInitState ();
         if (check != convergence_state::complete)
@@ -1528,6 +1528,18 @@ void CommonCore::processPriorityCommand (const ActionMessage &command)
         // TODO:: double check this
         addRoute (command.dest_handle, command.payload);
         break;
+	case CMD_DISCONNECT:
+		if (allDisconnected())
+		{
+			coreState = core_state_t::terminated;
+			ActionMessage dis(CMD_DISCONNECT);
+			dis.source_id = global_broker_id;
+			transmit(0, dis);
+			addCommand(CMD_STOP);
+		}
+		break;
+	//case CMD_DISCONNECT_ACK:
+	//	break;
     }
 }
 
@@ -1598,14 +1610,7 @@ void CommonCore::processCommand (ActionMessage &command)
         }
     }
     break;
-    case CMD_DISCONNECT:
-        if (allDisconnected ())
-        {
-            command.source_id = global_broker_id;
-            transmit (0, command);
-            addCommand (CMD_STOP);
-        }
-        break;
+   
     case CMD_LOG:
     case CMD_ERROR:
         routeMessage (command);

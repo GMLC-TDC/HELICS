@@ -351,7 +351,25 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
         }
     }
     break;
-        break;
+	case CMD_DISCONNECT:
+	{
+		auto brkNum = getBrokerById(command.source_id);
+		if (brkNum >= 0)
+		{
+			_brokers[brkNum]._disconnected = true;
+		}
+		if (allDisconnected())
+		{
+			if (!_isRoot)
+			{
+				ActionMessage dis(CMD_DISCONNECT);
+				dis.source_id = global_broker_id;
+				transmit(0, dis);
+			}
+			addMessage(CMD_STOP);
+		}
+	}
+	break;
     }
 }
 
@@ -440,24 +458,7 @@ void CoreBroker::processCommand (ActionMessage &command)
     case CMD_PUB:
         transmit (getRoute (command.dest_id), command);
         break;
-    case CMD_DISCONNECT:
-    {
-        auto brkNum = getBrokerById (command.source_id);
-        if (brkNum >= 0)
-        {
-            _brokers[brkNum]._disconnected = true;
-        }
-        if (allDisconnected ())
-        {
-            if (!_isRoot)
-            {
-                command.source_id = global_broker_id;
-                transmit (0, command);
-            }
-			addMessage(CMD_STOP);
-        }
-    }
-    break;
+    
     case CMD_LOG:
         if (_isRoot)
         {

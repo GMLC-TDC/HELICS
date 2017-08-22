@@ -275,6 +275,8 @@ bool isPriorityCommand(const ActionMessage &command)
 	case CMD_FED_ACK:
 	case CMD_BROKER_ACK:
 	case CMD_ROUTE_ACK:
+	case CMD_DISCONNECT:
+	//case CMD_DISCONNECT_ACK:
 		return true;
 	default:
 		return false;

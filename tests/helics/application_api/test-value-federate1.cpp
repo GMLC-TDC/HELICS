@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE (value_federate_subscription_registration)
     auto subid2 = vFed->registerRequiredSubscription<int> ("sub2");
 
     auto subid3 = vFed->registerOptionalSubscription ("sub3", "double", "V");
-   // vFed->enterExecutionState ();
+    vFed->enterExecutionState ();
 
    // BOOST_CHECK (vFed->currentState () == helics::Federate::op_states::execution);
 
