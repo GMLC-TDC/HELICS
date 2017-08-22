@@ -663,215 +663,249 @@ convergence_state FederateState::processQueue ()
     {
         return convergence_state::error;
     }
-    auto cmd = queue.pop ();
-    while (1)
-    {
-        switch (cmd.action ())
-        {
-        case CMD_IGNORE:
-        default:
-            break;
-        case CMD_INIT_GRANT:
-            if (state == HELICS_CREATED)
-            {
-                setState (HELICS_INITIALIZING);
-                return convergence_state::complete;
-            }
-            break;
-        case CMD_EXEC_REQUEST:
-        case CMD_EXEC_GRANT:
-            if (!processExecRequest (cmd))
-            {
-                break;
-            }
-        // FALLTHROUGH
-        case CMD_EXEC_CHECK:  // just check the time for entry
-        {
-            if (state != HELICS_INITIALIZING)
-            {
-                break;
-            }
-            auto grant = checkExecEntry ();
-            switch (grant)
-            {
-            case convergence_state::nonconverged:
+	convergence_state ret_code = convergence_state::continue_processing;
 
-                return grant;
-            case convergence_state::complete:
-                setState (HELICS_EXECUTING);
-                // TODO: send a time granted message
-                // ActionMessage grant(CMD_EXEC_GRANT);
-                // grant.source_id = global_id;
-                return grant;
-            case convergence_state::continue_processing:
-                break;
-            default:
-                return grant;
-            }
-        }
-        break;
-        case CMD_STOP:
-        case CMD_DISCONNECT:
-            if ((cmd.dest_id == global_id) || (cmd.dest_id == 0))
-            {
-                setState (HELICS_FINISHED);
-                return convergence_state::halted;
-            }
-            break;
-        case CMD_TIME_REQUEST:
-        case CMD_TIME_GRANT:
-            if (!processExternalTimeMessage (cmd))
-            {
-                break;
-            }
-        // FALLTHROUGH
-        case CMD_TIME_CHECK:
-        {
-            if (state != HELICS_EXECUTING)
-            {
-                break;
-            }
-            bool update = updateTimeFactors ();
-            if (!iterating)
-            {
-                if (time_allow >= time_exec)
-                {
-                    time_granted = time_exec;
-                    return convergence_state::complete;
-                }
-            }
-            else
-            {
-                if (time_allow > time_exec)
-                {
-                    time_granted = time_exec;
-                    return convergence_state::complete;
-                }
-                else
-                {
-                    // TODO:: something with the iteration conditions
-                }
-            }
+	//process the delay Queue first
+	if (!delayQueue.empty())
+	{
+		//copy the messages over since they could just be placed on the delay queue again
+		decltype(delayQueue) tempQueue;
+		std::swap(delayQueue, tempQueue);
+		while ((ret_code == convergence_state::continue_processing) && (!tempQueue.empty()))
+		{
+			auto cmd = tempQueue.front();
+			tempQueue.pop_front();
+			ret_code = processActionMessage(cmd);
+		}
+		if (ret_code != convergence_state::continue_processing)
+		{
+			if (!tempQueue.empty())
+			{
+				while (!tempQueue.empty())
+				{
+					auto cmd = tempQueue.back();
+					tempQueue.pop_back();
+					delayQueue.push_front(cmd);
+				}
+			}
+			return ret_code;
+		}
+	}
+	
+		
 
-            // if we haven't returned we need to update the time messages
-            if ((update) && (parent_ != nullptr))
-            {
-                ActionMessage upd (CMD_TIME_REQUEST);
-                upd.source_id = global_id;
-                upd.actionTime = time_next;
-                upd.info ().Te = time_exec;
-                upd.info ().Tdemin = time_minDe;
-                parent_->addCommand (upd);
-            }
-        }
-        break;
-        case CMD_SEND_MESSAGE:
-        {
-            auto epi = getEndpoint (cmd.dest_handle);
-            if (epi != nullptr)
-            {
-                updateMessageTime (cmd.actionTime + info.impactWindow);
-                epi->addMessage (createMessage (std::move (cmd)));
-            }
-        }
-        break;
-        case CMD_SEND_FOR_FILTER:
-        {
-            // this should only be non time_agnostic filters
-            auto fI = getFilter (cmd.dest_handle);
-            if (fI != nullptr)
-            {
-                updateMessageTime (cmd.actionTime + info.impactWindow);
-                fI->addMessage (createMessage (std::move (cmd)));
-            }
-        }
-        break;
-        case CMD_PUB:
-        {
-            auto subI = getSubscription (cmd.dest_handle);
-            if (subI == nullptr)
-            {
-                break;
-            }
-            if (cmd.source_id == subI->target.first)
-            {
-                subI->addData (cmd.actionTime + info.impactWindow,
-                               std::make_shared<const data_block> (std::move (cmd.payload)));
-                updateValueTime (cmd.actionTime + info.impactWindow);
-            }
-        }
-        break;
-        case CMD_ERROR:
-            setState (HELICS_ERROR);
-            return convergence_state::error;
-        case CMD_REG_PUB:
-        case CMD_NOTIFY_PUB:
-        {
-            auto subI = getSubscription (cmd.dest_handle);
-            if (subI != nullptr)
-            {
-                subI->target = {cmd.source_id, cmd.source_handle};
-                addDependency (cmd.source_id);
-            }
-        }
-        break;
-        case CMD_REG_SUB:
-        case CMD_NOTIFY_SUB:
-        {
-            auto pubI = getPublication (cmd.dest_handle);
-            if (pubI != nullptr)
-            {
-                pubI->subscribers.emplace_back (cmd.source_id, cmd.source_handle);
-                addDependent (cmd.source_id);
-            }
-        }
-        break;
-        case CMD_REG_END:
-        case CMD_NOTIFY_END:
-        {
-            auto filtI = getFilter (cmd.dest_handle);
-            if (filtI != nullptr)
-            {
-                filtI->target = {cmd.source_id, cmd.source_handle};
-                addDependency (cmd.source_id);
-            }
-        }
-        break;
-        case CMD_REG_DST_FILTER:
-        case CMD_NOTIFY_DST_FILTER:
-            break;
-        case CMD_REG_SRC_FILTER:
-        case CMD_NOTIFY_SRC_FILTER:
-        {
-            auto endI = getEndpoint (cmd.dest_handle);
-            if (endI != nullptr)
-            {
-                endI->hasFilter = true;
-                // TODO: this should be conditional on whether it is a operational filter
-                addDependent (cmd.source_id);
-                // todo probably need to do something more here
-            }
-        }
-        break;
-        case CMD_FED_ACK:
-            if (state != HELICS_CREATED)
-            {
-                break;
-            }
-            if (cmd.name == name)
-            {
-                if (cmd.error)
-                {
-                    setState (HELICS_ERROR);
-                    return convergence_state::error;
-                }
-                global_id = cmd.dest_id;
-                return convergence_state::complete;
-            }
-            break;
-        }
-        cmd = queue.pop ();
-    }
+	while (ret_code==convergence_state::continue_processing)
+	{
+		auto cmd = queue.pop();
+		ret_code = processActionMessage(cmd);
+	}
+	return ret_code;
+}
+
+convergence_state FederateState::processActionMessage(ActionMessage &cmd)
+	{
+	switch (cmd.action())
+	{
+	case CMD_IGNORE:
+	default:
+		break;
+	case CMD_INIT_GRANT:
+		if (state == HELICS_CREATED)
+		{
+			setState(HELICS_INITIALIZING);
+			return convergence_state::complete;
+		}
+		break;
+	case CMD_EXEC_REQUEST:
+	case CMD_EXEC_GRANT:
+		if (!processExecRequest(cmd))
+		{
+			break;
+		}
+		// FALLTHROUGH
+	case CMD_EXEC_CHECK:  // just check the time for entry
+	{
+		if (state != HELICS_INITIALIZING)
+		{
+			break;
+		}
+		auto grant = checkExecEntry();
+		switch (grant)
+		{
+		case convergence_state::nonconverged:
+
+			return grant;
+		case convergence_state::complete:
+			setState(HELICS_EXECUTING);
+			return grant;
+		case convergence_state::continue_processing:
+			break;
+		default:
+			return grant;
+		}
+	}
+	break;
+	case CMD_STOP:
+	case CMD_DISCONNECT:
+		if ((cmd.dest_id == global_id) || (cmd.dest_id == 0))
+		{
+			setState(HELICS_FINISHED);
+			return convergence_state::halted;
+		}
+		break;
+	case CMD_TIME_REQUEST:
+	case CMD_TIME_GRANT:
+		if (!processExternalTimeMessage(cmd))
+		{
+			break;
+		}
+		// FALLTHROUGH
+	case CMD_TIME_CHECK:
+	{
+		if (state != HELICS_EXECUTING)
+		{
+			break;
+		}
+		bool update = updateTimeFactors();
+		if (!iterating)
+		{
+			if (time_allow >= time_exec)
+			{
+				time_granted = time_exec;
+				return convergence_state::complete;
+			}
+		}
+		else
+		{
+			if (time_allow > time_exec)
+			{
+				time_granted = time_exec;
+				return convergence_state::complete;
+			}
+			else
+			{
+				// TODO:: something with the iteration conditions
+			}
+		}
+
+		// if we haven't returned we need to update the time messages
+		if ((update) && (parent_ != nullptr))
+		{
+			ActionMessage upd(CMD_TIME_REQUEST);
+			upd.source_id = global_id;
+			upd.actionTime = time_next;
+			upd.info().Te = time_exec;
+			upd.info().Tdemin = time_minDe;
+			parent_->addCommand(upd);
+		}
+	}
+	break;
+	case CMD_SEND_MESSAGE:
+	{
+		auto epi = getEndpoint(cmd.dest_handle);
+		if (epi != nullptr)
+		{
+			updateMessageTime(cmd.actionTime + info.impactWindow);
+			epi->addMessage(createMessage(std::move(cmd)));
+		}
+	}
+	break;
+	case CMD_SEND_FOR_FILTER:
+	{
+		// this should only be non time_agnostic filters
+		auto fI = getFilter(cmd.dest_handle);
+		if (fI != nullptr)
+		{
+			updateMessageTime(cmd.actionTime + info.impactWindow);
+			fI->addMessage(createMessage(std::move(cmd)));
+		}
+	}
+	break;
+	case CMD_PUB:
+	{
+		auto subI = getSubscription(cmd.dest_handle);
+		if (subI == nullptr)
+		{
+			break;
+		}
+		if (cmd.source_id == subI->target.first)
+		{
+			subI->addData(cmd.actionTime + info.impactWindow,
+				std::make_shared<const data_block>(std::move(cmd.payload)));
+			updateValueTime(cmd.actionTime + info.impactWindow);
+		}
+	}
+	break;
+	case CMD_ERROR:
+		setState(HELICS_ERROR);
+		return convergence_state::error;
+	case CMD_REG_PUB:
+	case CMD_NOTIFY_PUB:
+	{
+		auto subI = getSubscription(cmd.dest_handle);
+		if (subI != nullptr)
+		{
+			subI->target = { cmd.source_id, cmd.source_handle };
+			addDependency(cmd.source_id);
+		}
+	}
+	break;
+	case CMD_REG_SUB:
+	case CMD_NOTIFY_SUB:
+	{
+		auto pubI = getPublication(cmd.dest_handle);
+		if (pubI != nullptr)
+		{
+			pubI->subscribers.emplace_back(cmd.source_id, cmd.source_handle);
+			addDependent(cmd.source_id);
+		}
+	}
+	break;
+	case CMD_REG_END:
+	case CMD_NOTIFY_END:
+	{
+		auto filtI = getFilter(cmd.dest_handle);
+		if (filtI != nullptr)
+		{
+			filtI->target = { cmd.source_id, cmd.source_handle };
+			addDependency(cmd.source_id);
+		}
+	}
+	break;
+	case CMD_REG_DST_FILTER:
+	case CMD_NOTIFY_DST_FILTER:
+		break;
+	case CMD_REG_SRC_FILTER:
+	case CMD_NOTIFY_SRC_FILTER:
+	{
+		auto endI = getEndpoint(cmd.dest_handle);
+		if (endI != nullptr)
+		{
+			endI->hasFilter = true;
+			// TODO: this should be conditional on whether it is a operational filter
+			addDependent(cmd.source_id);
+			// todo probably need to do something more here
+		}
+	}
+	break;
+	case CMD_FED_ACK:
+		if (state != HELICS_CREATED)
+		{
+			break;
+		}
+		if (cmd.name == name)
+		{
+			if (cmd.error)
+			{
+				setState(HELICS_ERROR);
+				return convergence_state::error;
+			}
+			global_id = cmd.dest_id;
+			return convergence_state::complete;
+		}
+		break;
+	}
+	return convergence_state::continue_processing;
 }
 
 

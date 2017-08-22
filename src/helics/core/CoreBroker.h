@@ -22,6 +22,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "ActionMessage.h"
 #include "common/blocking_queue.h"
 #include "common/simpleQueue.hpp"
+#include "DependencyInfo.h"
 
 namespace helics
 {
@@ -67,7 +68,8 @@ class CoreBroker
 protected:
 	std::atomic<bool> _operating{ false }; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
 	bool _isRoot = false;  //!< set to true if this object is a root broker
-	bool _gateway = false;  //!< set to true if this broker should act as a gateway.  
+	bool _gateway = false;  //!< set to true if this broker should act as a gateway.
+	bool _hasEndpoints = false; //!< set to true if the broker has endpoints;  
 private:
 	std::atomic<int32_t> global_broker_id{ 0 };  //!< the identifier for the broker
 	std::vector<std::pair<Core::federate_id_t, bool>> localBrokersInit; //!< indicator if the local brokers are ready to init
@@ -93,6 +95,16 @@ private:
 	std::thread _queue_processing_thread;  //!< thread for running the broker
 	/** a logging function for logging or printing messages*/
 	std::function<void(int, const std::string &, const std::string &)> loggerFunction;
+
+	//for the virtual timing dependency of the broker
+	Time time_next = timeZero;  //!< the next possible internal event time
+	Time time_minminDe = timeZero;  //!< the minimum  of the minimum dependency event Time
+	Time time_minDe = timeZero;  //!< the minimum event time of the dependencies
+	Time time_allow = Time::minVal();  //!< the current allowable time 
+	Time time_exec = Time::maxVal();  //!< the time of the next targetted execution
+
+	std::vector<DependencyInfo> dependencies;  // federates which this Federate is temporally dependent on
+	std::vector<Core::federate_id_t> dependents;  // federates which temporally depend on this federate
 protected:
 	std::atomic<bool> _initialized{ false }; //!< indicator if the system is initialized (mainly if the thread is running)
 private:

@@ -25,12 +25,9 @@ std::unique_ptr<Message> EndpointInfo::getMessage(Time maxTime)
 	{
 		auto msg = std::move(message_queue.front());
 		message_queue.pop_front();
-		return std::move(msg);
+		return msg;
 	}
-	else
-	{
-		return nullptr;
-	}
+	return nullptr;
 }
 
 
@@ -59,9 +56,13 @@ static auto msgSorter = [](const auto &m1, const auto &m2)
 		for (auto &msg : message_queue)
 		{
 			if (msg->time <= maxTime)
+			{
 				++cnt;
+			}
 			else
+			{
 				break;
+			}
 		}
 		return cnt;
 	}

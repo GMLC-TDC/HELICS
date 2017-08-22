@@ -81,6 +81,7 @@ class ActionMessage
 		cmd_exec_grant = 10,  //!< grant entry to exec mode or iterate
 		cmd_exec_check = 12,  //!< command to run a check on execution entry
 		cmd_register_route = 15,  //!< instructions to create a direct route to another federate
+		cmd_route_ack = 16,	//!< acknowledge reply to a route registration
 		cmd_stop = 20,  //!< halt execution
 		cmd_fed_ack = 25,  //!<a reply with the global id or an error if the fed registration failed
 		cmd_broker_ack = 27,  // a reply to the connect command with a global route id
@@ -209,6 +210,7 @@ class ActionMessage
     void toByteArray (char *data, size_t buffer_size) const;
     void to_string (std::string &data) const;
 	std::string to_string() const;
+	void to_vector(std::vector<char> &data) const;
 	std::vector<char> to_vector() const;
     void fromByteArray (const char *data, size_t buffer_size);
     void from_string (const std::string &data);
@@ -227,6 +229,7 @@ class ActionMessage
 #define CMD_EXEC_GRANT ActionMessage::action_t::cmd_exec_grant
 #define CMD_EXEC_CHECK ActionMessage::action_t::cmd_exec_check
 #define CMD_REG_ROUTE ActionMessage::action_t::cmd_register_route
+#define CMD_ROUTE_ACK ActionMessage::action_t::cmd_route_ack
 #define CMD_STOP ActionMessage::action_t::cmd_stop
 #define CMD_TIME_REQUEST ActionMessage::action_t::cmd_time_request
 #define CMD_TIME_GRANT ActionMessage::action_t::cmd_time_grant

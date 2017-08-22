@@ -100,7 +100,7 @@ ActionMessage &ActionMessage::operator= (ActionMessage &&act) noexcept
     required = act.required;
     actionTime = act.actionTime;
     payload = std::move (act.payload);
-    act.info_ = std::move (act.info_);
+    info_ = std::move (act.info_);
     return *this;
 }
 
@@ -194,6 +194,19 @@ std::vector<char> ActionMessage::to_vector() const
 	return data;
 }
 
+void ActionMessage::to_vector(std::vector<char> &data) const
+{
+	data.clear();
+	boost::iostreams::back_insert_device<std::vector<char>> inserter(data);
+	boost::iostreams::stream<boost::iostreams::back_insert_device<std::vector<char>> > s(inserter);
+	archiver oa(s);
+
+	save(oa);
+
+	// don't forget to flush the stream to finish writing into the buffer
+	s.flush();
+}
+
 void ActionMessage::to_string(std::string &data) const
 {
 	data.clear();
@@ -261,7 +274,7 @@ bool isPriorityCommand(const ActionMessage &command)
 	case CMD_REG_FED:
 	case CMD_FED_ACK:
 	case CMD_BROKER_ACK:
-		//case CMD_ROUTE_ACK:
+	case CMD_ROUTE_ACK:
 		return true;
 	default:
 		return false;

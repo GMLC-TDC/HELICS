@@ -22,16 +22,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/config.h"
 #include "core/core-types.h"
 
-#include <algorithm>
+#include "DependencyInfo.h"
+
 #include <atomic>
-#include <cassert>
-#include <cstdint>
-#include <cstring>
 #include <map>
 #include <mutex>
-#include <sstream>
-#include <thread>
-#include <utility>
 #include <vector>
 
 namespace helics
@@ -42,23 +37,7 @@ class EndpointInfo;
 class FilterInfo;
 class CommonCore;
 
-/** data class containing information about interfederate dependencies*/
-class DependencyInfo
-{
-  public:
-    Core::federate_id_t fedID;  //!< identifier for the dependent federate
-    bool grant = false;  //!< whether time has been granted
-    bool exec_converged = false;  //!< whether the executing state has requested iteration
-    bool exec_requested = false;  //!< whether execution state has been granted
-	bool time_converged = false;	//!< whether the current time point has requested iteration
-    Time Tnext = timeZero;  //!<next possible message or value 
-    Time Te = timeZero;  //!< the next currently scheduled event
-    Time Tdemin = timeZero;  //!< min dependency event time
-    /** default constructor*/
-    DependencyInfo () = default;
-    /** construct from a federate id*/
-    DependencyInfo (Core::federate_id_t id) : fedID (id){};
-};
+
 
 /** class managing the information about a single federate*/
 class FederateState
@@ -237,7 +216,10 @@ class FederateState
     @return a convergence state value with an indicator of return reason and state of convergence
     */
 	convergence_state processQueue ();
-
+	/** process a single message
+	@return a convergence state value with an indicator of return reason and state of convergence
+	*/
+	convergence_state processActionMessage(ActionMessage &m);
 	/** fill event list
 	@param the time of the update
 	*/

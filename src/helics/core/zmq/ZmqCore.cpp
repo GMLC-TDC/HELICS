@@ -158,10 +158,14 @@ bool ZmqCore::brokerConnect()
 {
 	return true;
 }
+#define NEW_ROUTE 233
+#define DISCONNECT 2523
 
 void ZmqCore::brokerDisconnect()
 {
-	
+	ActionMessage rt(CMD_PROTOCOL);
+	rt.index = DISCONNECT;
+	transmit(-1, rt);
 }
 
 void ZmqCore::transmit(int route_id, const ActionMessage &cmd)
@@ -169,7 +173,7 @@ void ZmqCore::transmit(int route_id, const ActionMessage &cmd)
 	txQueue.push(std::pair<int,ActionMessage>(route_id, cmd));
 }
 
-#define NEW_ROUTE 233
+
 
 void ZmqCore::addRoute(int route_id, const std::string &routeInfo)
 {
@@ -199,25 +203,46 @@ void ZmqCore::transmitData()
 	controlSocket.bind(controlsockString.c_str());
 	//the receiver thread that is managed by this thread
 	std::thread rxThread;  
+	std::vector<char> buffer;
+	std::vector<char> rxbuffer(4096);
 	while (1)
 	{
-		auto cmd = txQueue.pop();
-		if (cmd.second.action() == CMD_PROTOCOL)
+		int route_id;
+		ActionMessage cmd;
+		std::tie(route_id,cmd) = txQueue.pop();
+		if (cmd.action() == CMD_PROTOCOL)
 		{
-
+			if (route_id = -1)
+			{
+				//do something local
+			}
 		}
-
-		if (isPriorityCommand(cmd.second))
+		cmd.to_vector(buffer);
+		if (isPriorityCommand(cmd))
 		{
+			reqSocket.send(buffer.data(), buffer.size());
 
+			//TODO:: need to figure out how to catch overflow and resize the rxbuffer
+			//admittedly this would probably be a very very long name but it could happen
+			int nsize = reqSocket.recv(rxbuffer.data(), rxbuffer.size());
+			ActionMessage rxcmd(rxbuffer.data(), rxbuffer.size());
+			addCommand(rxcmd);
 		}
-		if (cmd.first == 0)
+		if (route_id == 0)
 		{
-
+			brokerPushSocket.send(buffer.data(), buffer.size());
 		}
 		else
 		{
-
+			auto rt_find = pushSockets.find(route_id);
+			if (rt_find != pushSockets.end())
+			{
+				rt_find->second.send(buffer.data(), buffer.size());
+			}
+			else
+			{
+				brokerPushSocket.send(buffer.data(), buffer.size());
+			}
 		}
 	}
 	reqSocket.close();
