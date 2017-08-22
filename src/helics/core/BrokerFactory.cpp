@@ -20,6 +20,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/mpi/mpiBroker.h"
 #endif
 
+#include "helics/core/ipc/IpcBroker.h"
 #include "helics/core/TestBroker.h"
 
 #include <cassert>
@@ -57,6 +58,7 @@ std::shared_ptr<CoreBroker> BrokerFactory::create (helics_core_type type, const 
         break;
     }
     case HELICS_INTERPROCESS:
+		broker = std::make_shared<IpcBroker>();
         break;
     default:
         assert (false);
@@ -99,6 +101,7 @@ BrokerFactory::create (helics_core_type type, const std::string &broker_name, st
         break;
     }
     case HELICS_INTERPROCESS:
+		broker = std::make_shared<IpcBroker>(broker_name);
         break;
     default:
         assert (false);
@@ -136,7 +139,7 @@ bool BrokerFactory::available (helics_core_type type)
     }
     case HELICS_INTERPROCESS:
     {
-        available = false;
+        available = true;
         break;
     }
     default:

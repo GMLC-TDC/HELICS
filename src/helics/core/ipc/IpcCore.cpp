@@ -7,12 +7,10 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 */
 #include "helics/config.h"
-#include "helics/common/blocking_queue.h"
 #include "helics/core/core.h"
 #include "helics/core/core-data.h"
 #include "helics/core/helics-time.h"
-#include "helics/core/zmq/zmq-core.h"
-#include "helics/core/zmq/zmq-helper.h"
+#include "helics/core/ipc/IpcCore.h"
 
 #include <algorithm>
 #include <cassert>
@@ -25,7 +23,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
-#include <zmq.h>
+
+#define CLOSE_IPC 23425215
 
 #define USE_LOGGING 1
 #if USE_LOGGING
@@ -41,15 +40,14 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define ENDL std::endl
 #endif
 
-static const std::string DEFAULT_BROKER = "tcp://localhost:5555";
-
-
-
 namespace helics
 {
 
+constexpr size_t maxMessageSize = 16 * 1024;
 
+constexpr size_t maxMessageCount = 1024;
 
+using ipc_queue = boost::interprocess::message_queue;
 
 static void argumentParser(int argc, char *argv[], boost::program_options::variables_map &vm_map)
 {
@@ -66,8 +64,9 @@ static void argumentParser(int argc, char *argv[], boost::program_options::varia
 
 
 	config.add_options()
+		("queueloc", po::value<std::string>(), "the file location of the shared queue")
 		("broker,b", po::value<std::string>(), "identifier for the broker")
-		("brokerinit", po::value<int>(), "the initialization string for the broker")
+		("brokerloc", po::value<int>(), "the file location for the broker")
 		("register", "register the core for global locating");
 
 
@@ -129,9 +128,22 @@ static void argumentParser(int argc, char *argv[], boost::program_options::varia
 }
 
 
-ZeroMQCore::ZeroMQCore(const std::string &core_name) :CommonCore(core_name) {}
+IpcCore::IpcCore(const std::string &core_name) :CommonCore(core_name) {}
 
-void ZeroMQCore::initializeFromArgs(int argc, char *argv[])
+
+IpcCore::~IpcCore()
+{
+	if (queue_watcher.joinable())
+	{
+		ActionMessage cmd(CMD_PROTOCOL);
+		cmd.index = CLOSE_IPC;
+		transmit(-1, cmd);
+		queue_watcher.join();
+		ipc_queue::remove(fileloc.c_str());
+	}
+}
+
+void IpcCore::initializeFromArgs(int argc, char *argv[])
 {
 	namespace po = boost::program_options;
 	if (coreState==created)
@@ -141,41 +153,124 @@ void ZeroMQCore::initializeFromArgs(int argc, char *argv[])
 
 		if (vm.count("broker") > 0)
 		{
-			auto brstring = vm["broker"].as<std::string>();
-			//tbroker = findTestBroker(brstring);
+			brokername = vm["broker"].as<std::string>();
 		}
 		
-		if (vm.count("brokerinit") > 0)
+		if (vm.count("brokerloc") > 0)
 		{
-			//tbroker->Initialize(vm["brokerinit"].as<std::string>());
+			brokerloc = vm["brokerloc"].as<std::string>();
 		}
+
+		if (vm.count("fileloc") > 0)
+		{
+			fileloc = vm["fileloc"].as<std::string>();
+		}
+
 		CommonCore::initializeFromArgs(argc, argv);
 	}
 }
 
-bool ZeroMQCore::brokerConnect()
+bool IpcCore::brokerConnect()
 {
-	return true;
+	if (fileloc.empty())
+	{
+		auto tempPath = boost::filesystem::temp_directory_path();
+		auto tname = tempPath / (getIdentifier() + "_queue.hqf");
+		fileloc = tname.string();
+	}
+	rxQueue = std::make_unique<ipc_queue>(boost::interprocess::create_only, fileloc.c_str(), maxMessageCount, maxMessageSize);
+
+	queue_watcher = std::thread(&IpcCore::queue_rx_function, this);
+	if (brokerloc.empty())
+	{
+		auto tempPath = boost::filesystem::temp_directory_path();
+		if (brokername.empty())
+		{
+			brokername = "_ipc";
+		}
+		auto tname = tempPath / (brokername + "_queue.hqf");
+		brokerloc = tname.string();
+	}
+	if (boost::filesystem::exists(brokerloc))
+	{
+		brokerQueue=std::make_unique<ipc_queue>(boost::interprocess::open_only, brokerloc.c_str());
+		return true;
+	}
+	return false;
 }
 
-void ZeroMQCore::brokerDisconnect()
+void IpcCore::brokerDisconnect()
 {
-	
+	if (queue_watcher.joinable())
+	{
+		ActionMessage cmd(CMD_PROTOCOL);
+		cmd.index = CLOSE_IPC;
+		transmit(-1, cmd);
+		queue_watcher.join();
+		ipc_queue::remove(fileloc.c_str());
+	}
+	brokerQueue = nullptr;
+	rxQueue = nullptr;
+	ipc_queue::remove(fileloc.c_str());
 }
 
-void ZeroMQCore::transmit(int route_id, const ActionMessage &cmd)
+void IpcCore::transmit(int route_id, const ActionMessage &cmd)
 {
-
+	std::string buffer = cmd.to_string();
+	if (route_id == 0)
+	{
+		brokerQueue->send(buffer.data(), buffer.size(), 1);
+	}
+	else if (route_id == -1)
+	{
+		rxQueue->send(buffer.data(), buffer.size(), 1);
+	}
+	else
+	{
+		auto routeFnd = routes.find(route_id);
+		if (routeFnd != routes.end())
+		{
+			routeFnd->second->send(buffer.data(), buffer.size(), 1);
+		}
+	}
 }
 
-void ZeroMQCore::addRoute(int route_id, const std::string &routeInfo)
+void IpcCore::addRoute(int route_id, const std::string &routeInfo)
 {
-
+	if (boost::filesystem::exists(routeInfo))
+	{
+		auto newQueue = std::make_unique<ipc_queue>(boost::interprocess::open_only, routeInfo.c_str());
+		routes.emplace(route_id, std::move(newQueue));
+	}
 }
 
 
-std::string ZeroMQCore::getAddress() const
+std::string IpcCore::getAddress() const
 {
-	return "";
+	return fileloc;
 }
+
+void IpcCore::queue_rx_function()
+{
+	unsigned int priority;
+	size_t rx_size;
+	char buffer[maxMessageSize];
+
+	while (1)
+	{
+		rxQueue->receive(buffer, maxMessageSize, rx_size, priority);
+		ActionMessage cmd(buffer, rx_size);
+		if ((cmd.action() == CMD_PROTOCOL) || (cmd.action() == CMD_PROTOCOL_BIG))
+		{
+			if (cmd.index == CLOSE_IPC)
+			{
+				return;
+			}
+			continue;
+		}
+
+		addCommand(cmd);
+	}
+}
+
 }  // namespace helics

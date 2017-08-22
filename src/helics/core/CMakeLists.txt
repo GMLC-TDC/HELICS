@@ -18,11 +18,13 @@ set(SRC_FILES
 	CoreBroker.cpp
 	TestBroker.cpp
 	core-data.cpp
+	ipc/IpcCore.cpp
+	ipc/IpcBroker.cpp
 	
 )
 
 set (ZMQ_SOURCE_FILES
-	zmq/zmq-core.cc
+	zmq/ZmqCore.cpp
     zmq/zmq-helper.cc
 	zmq/ZmqBroker.cpp
 )
@@ -41,6 +43,8 @@ set(INCLUDE_FILES
 	ActionMessage.h
 	CommonCore.h
     mpi/mpi-core.h
+	ipc/IpcCore.h
+	ipc/IpcBroker.h
     
 	FederateState.h
 	SubscriptionInfo.h
@@ -54,7 +58,7 @@ set(INCLUDE_FILES
 )
 
 set(ZMQ_HEADER_FILES
-	zmq/zmq-core.h
+	zmq/ZmqCore.h
     zmq/zmq-helper.h
 	zmq/ZmqBroker.h
 )

@@ -11,13 +11,14 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "core-types.h"
 
 #if HELICS_HAVE_ZEROMQ
-#include "zmq/zmq-core.h"
+#include "zmq/ZmqCore.h"
 #endif
 
 #if HELICS_HAVE_MPI
 #include "mpi/mpi-core.h"
 #endif
 
+#include "ipc/IpcCore.h"
 #include "TestCore.h"
 
 #include <cassert>
@@ -91,7 +92,7 @@ std::shared_ptr<Core> CoreFactory::create(helics_core_type type, const std::stri
     case HELICS_ZMQ:
       {
 #if HELICS_HAVE_ZEROMQ
-        core = std::make_shared<ZeroMQCore> ();
+        core = std::make_shared<ZmqCore> ();
 #else
         assert (false);
 #endif
@@ -112,6 +113,7 @@ std::shared_ptr<Core> CoreFactory::create(helics_core_type type, const std::stri
         break;
       }
 	case HELICS_INTERPROCESS:
+		core = std::make_shared<IpcCore>();
 		break;
     default:
       assert (false);
@@ -154,7 +156,7 @@ std::shared_ptr<Core> CoreFactory::FindOrCreate(helics_core_type type,const std:
 	case HELICS_ZMQ:
 	{
 #if HELICS_HAVE_ZEROMQ
-		core = std::make_shared<ZeroMQCore>(core_name);
+		core = std::make_shared<ZmqCore>(core_name);
 #else
 		assert(false);
 #endif
@@ -175,7 +177,7 @@ std::shared_ptr<Core> CoreFactory::FindOrCreate(helics_core_type type,const std:
 		break;
 	}
 	case HELICS_INTERPROCESS:
-		assert(false);
+		core = std::make_shared<IpcCore>(core_name);
 		break;
 	default:
 		assert(false);
@@ -217,7 +219,7 @@ bool CoreFactory::isAvailable (helics_core_type type) {
       }
 	case HELICS_INTERPROCESS:
 	{
-		available = false;
+		available = true;
 		break;
 	}
     default:
@@ -263,7 +265,7 @@ std::shared_ptr<Core> CoreFactory::findJoinableCoreOfType(helics_core_type type)
 			case HELICS_ZMQ:
 			{
 #if HELICS_HAVE_ZEROMQ
-				if (dynamic_cast<ZeroMQCore *>(cmap.second.get()) != nullptr)
+				if (dynamic_cast<ZmqCore *>(cmap.second.get()) != nullptr)
 				{
 					return cmap.second;
 				}
@@ -290,10 +292,10 @@ std::shared_ptr<Core> CoreFactory::findJoinableCoreOfType(helics_core_type type)
 			}
 			case HELICS_INTERPROCESS:
 			{
-				//if (dynamic_cast<ZeroMQCore *>(cmap.second.get()) != nullptr)
-				//{
-				//	return cmap.second;
-				//}
+				if (dynamic_cast<IpcCore *>(cmap.second.get()) != nullptr)
+				{
+					return cmap.second;
+				}
 				break;
 			}
 			default:

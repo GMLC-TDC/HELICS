@@ -12,17 +12,17 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "core/CommonCore.h"
 
-
+#define DEFAULT_BROKER_PORT 23405
 
 namespace helics {
 
 /** implementation for the core that uses zmq messages to communicate*/
-class ZeroMQCore : public CommonCore {
+class ZmqCore : public CommonCore {
 
 public:
 	/** default constructor*/
-  ZeroMQCore()=default;
-  ZeroMQCore(const std::string &core_name);
+  ZmqCore()=default;
+  ZmqCore(const std::string &core_name);
   virtual void initializeFromArgs (int argc, char *argv[]) override;
          
   virtual void transmit(int route_id, const ActionMessage &cmd) override;
@@ -30,8 +30,21 @@ public:
 public:
 	virtual std::string getAddress() const override;
 private:
+	std::string pullSocket;
+	std::string brokerAddress;
+	int portNumber;
+	int brokerPortNumber;
+	std::string brokerRepAddress;
+
 	virtual bool brokerConnect() override;
 	virtual void brokerDisconnect() override;
+	BlockingQueue<std::pair<int, ActionMessage>> txQueue; //!< set of messages waiting to transmitted
+
+	std::thread transmitThread;
+	std::thread rx_queue_thread;
+
+	void transmitData();
+	void receiveData();
  
 };
 
