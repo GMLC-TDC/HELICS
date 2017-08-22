@@ -1209,24 +1209,28 @@ ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage 
     {
         return m;
     }
-    auto filtFunc = getFilterFunctions (hndl->id);
-    if (filtFunc->hasSourceOperators)
-    {
-        auto tempMessage = createMessage (std::move (m));
-        for (auto &so : filtFunc->sourceOperators)
-        {
-            auto FiltI = getFederate (so.first)->getFilter (so.second);
-            assert (FiltI->filterOp != nullptr);
-            tempMessage = FiltI->filterOp->process (std::move (tempMessage));
-        }
-        m = ActionMessage (std::move (tempMessage));
-    }
-    if (filtFunc->hasSourceFilter)
-    {
-        m.setAction (CMD_SEND_FOR_FILTER);
-        m.dest_handle = filtFunc->finalSourceFilter.second;
-        m.dest_id = filtFunc->finalSourceFilter.first;
-    }
+	if (hndl->hasSourceFilter)
+	{
+		auto filtFunc = getFilterFunctions(hndl->id);
+		if (filtFunc->hasSourceOperators)
+		{
+			auto tempMessage = createMessage(std::move(m));
+			for (auto &so : filtFunc->sourceOperators)
+			{
+				auto FiltI = getFederate(so.first)->getFilter(so.second);
+				assert(FiltI->filterOp != nullptr);
+				tempMessage = FiltI->filterOp->process(std::move(tempMessage));
+			}
+			m = ActionMessage(std::move(tempMessage));
+		}
+		if (filtFunc->hasSourceFilter)
+		{
+			m.setAction(CMD_SEND_FOR_FILTER);
+			m.dest_handle = filtFunc->finalSourceFilter.second;
+			m.dest_id = filtFunc->finalSourceFilter.first;
+		}
+	}
+    
     return m;
 }
 
@@ -1248,16 +1252,15 @@ void CommonCore::queueMessage (ActionMessage &message)
             auto FiltI = getFederate (ffunc->destOperator.first)->getFilter (ffunc->destOperator.second);
             assert (FiltI->filterOp != nullptr);
 
-            auto tempMessage = createMessage (message);
+            auto tempMessage = createMessage (std::move(message));
             auto nmessage = FiltI->filterOp->process (std::move (tempMessage));
 
-            message.payload = std::move (nmessage->data.to_string ());
-
-
-            message.actionTime = nmessage->time;
+            message.moveInfo(std::move(nmessage));
         }
+		message.dest_id = localP->fed_id;
+		message.dest_handle = localP->id;
         auto fed = getFederate (localP->local_fed_id);
-        fed->addAction (message);
+        fed->addAction (std::move(message));
     }
 }
 
@@ -1380,15 +1383,6 @@ void CommonCore::setFilterOperator (Handle filter, std::shared_ptr<FilterOperato
 
 FilterFunctions *CommonCore::getFilterFunctions (Handle id_)
 {
-    auto hndl = getHandleInfo (id_);
-    if (hndl == nullptr)
-    {
-        throw (invalidIdentifier ("filter is not a valid handle"));
-    }
-    if ((hndl->what != HANDLE_DEST_FILTER) && (hndl->what != HANDLE_SOURCE_FILTER))
-    {
-        throw (invalidIdentifier ("filter identifier does not point a filter"));
-    }
     auto fnd = filters.find (id_);
     if (fnd == filters.end ())
     {
@@ -1417,7 +1411,7 @@ uint64_t CommonCore::receiveFilterCount (federate_id_t federateID)
         return 0;
     }
 
-    return fed->getQueueSize ();
+	return fed->getFilterQueueSize();
 }
 
 std::unique_ptr<Message> CommonCore::receiveAnyFilter (federate_id_t federateID, Handle &filter_id)

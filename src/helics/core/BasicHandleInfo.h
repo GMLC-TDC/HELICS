@@ -55,10 +55,11 @@ class BasicHandleInfo
 	BasicHandleType what=HANDLE_UNKNOWN;	//!< the type of the handle
     bool flag=false;	//!< indicator flag
 	bool processed = false;	//!< indicator if the handle has been processed (subscription or endpoint found)
-	bool mapped = false;	
-	bool destFilter = false;
+	bool mapped = false;
+	bool hasSourceFilter = false; //!< indicator that an endpoint handle has a source filter
+	bool destFilter = false;	//!< indicator that an endpoint has a destination filter
 	bool used = false;			//!< indicator that the publication or filter is used
-	//2 byte hole here
+	//1 byte hole here
     std::string key;	//!< the name of the handle
     std::string type;	//!< the type of data used by the handle
     std::string units;	//!< the units associated with the handle

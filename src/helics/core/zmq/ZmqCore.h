@@ -30,7 +30,7 @@ public:
 public:
 	virtual std::string getAddress() const override;
 private:
-	std::string pullSocket;
+	std::string pullSocketAddress;
 	std::string brokerAddress;
 	int portNumber;
 	int brokerPortNumber;
@@ -41,7 +41,6 @@ private:
 	BlockingQueue<std::pair<int, ActionMessage>> txQueue; //!< set of messages waiting to transmitted
 
 	std::thread transmitThread;
-	std::thread rx_queue_thread;
 
 	void transmitData();
 	void receiveData();

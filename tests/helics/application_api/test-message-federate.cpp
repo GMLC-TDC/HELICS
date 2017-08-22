@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(message_federate_endpoint_registration)
 
 	auto sv = mFed->getEndpointName(epid);
 	auto sv2 = mFed->getEndpointName(epid2);
-	BOOST_CHECK_EQUAL(sv, "test1.ep1");
+	BOOST_CHECK_EQUAL(sv, "test1/ep1");
 	BOOST_CHECK_EQUAL(sv2, "ep2");
 	
 
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(message_federate_endpoint_registration)
 	BOOST_CHECK_EQUAL(mFed->getEndpointType(epid2), "random");
 
 	BOOST_CHECK(mFed->getEndpointId("ep1") == epid);
-	BOOST_CHECK(mFed->getEndpointId("test1.ep1") == epid);
+	BOOST_CHECK(mFed->getEndpointId("test1/ep1") == epid);
 	BOOST_CHECK(mFed->getEndpointId("ep2") == epid2);
 	mFed->finalize();
 
@@ -103,6 +103,7 @@ BOOST_AUTO_TEST_CASE(message_federate_send_receive)
 	BOOST_CHECK(res);
 
 	auto M = mFed->getMessage(epid2);
+	BOOST_REQUIRE(M);
 	BOOST_REQUIRE_EQUAL(M->data.size(), data.size());
 
 	BOOST_CHECK_EQUAL(M->data[245], data[245]);

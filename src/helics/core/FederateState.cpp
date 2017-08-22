@@ -358,7 +358,7 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::Handle &id)
         auto t = end_point->firstMessageTime ();
         if (t < earliest_time)
         {
-            t = earliest_time;
+            earliest_time=t;
             endpointI = end_point.get ();
         }
     }
@@ -384,7 +384,7 @@ std::unique_ptr<Message> FederateState::receiveForFilter (Core::Handle &id)
         auto t = filt->firstMessageTime ();
         if (t < earliest_time)
         {
-            t = earliest_time;
+            earliest_time=t;
             filterI = filt.get ();
         }
     }

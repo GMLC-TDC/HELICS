@@ -193,6 +193,12 @@ void ZmqCore::transmitData()
 	reqSocket.connect(brokerRepAddress.c_str());
 	zmq::socket_t brokerPushSocket(ctx->getContext(), ZMQ_PUSH);
 	std::map<int,zmq::socket_t> pushSockets; // for all the other possible routes
+	zmq::socket_t controlSocket(ctx->getContext(), ZMQ_PAIR);
+
+	std::string controlsockString = "inproc://" + getIdentifier() + "_control";
+	controlSocket.bind(controlsockString.c_str());
+	//the receiver thread that is managed by this thread
+	std::thread rxThread;  
 	while (1)
 	{
 		auto cmd = txQueue.pop();
@@ -219,8 +225,17 @@ void ZmqCore::transmitData()
 	pushSockets.clear();
 }
 
-void receiveData()
+void ZmqCore::receiveData()
 {
+	auto ctx = zmqContextManager::getContextPointer();
+	zmq::socket_t pullSocket(ctx->getContext(), ZMQ_PULL);
+	
+	pullSocket.bind(pullSocketAddress.c_str());
+	zmq::socket_t controlSocket(ctx->getContext(), ZMQ_PAIR);
+	std::string controlsockString = "inproc://" + getIdentifier() + "_control";
+	controlSocket.connect(controlsockString.c_str());
+
+	//TODO:: manage the polling loop
 
 }
 
