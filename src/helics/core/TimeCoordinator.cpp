@@ -180,6 +180,13 @@ convergence_state TimeCoordinator::checkTimeGrant()
 		if (time_allow >= time_exec)
 		{
 			time_granted = time_exec;
+			if ((sendMessageFunction)&&sendTimeGrantMessage)
+			{
+				ActionMessage treq(CMD_TIME_GRANT);
+				treq.source_id = source_id;
+				treq.actionTime = time_granted;
+				sendMessageFunction(treq);
+			}
 			return convergence_state::complete;
 		}
 	}
@@ -188,6 +195,13 @@ convergence_state TimeCoordinator::checkTimeGrant()
 		if (time_allow > time_exec)
 		{
 			time_granted = time_exec;
+			if ((sendMessageFunction) && sendTimeGrantMessage)
+			{
+				ActionMessage treq(CMD_TIME_GRANT);
+				treq.source_id = source_id;
+				treq.actionTime = time_granted;
+				sendMessageFunction(treq);
+			}
 			return convergence_state::complete;
 		}
 		else
@@ -235,11 +249,12 @@ DependencyInfo *TimeCoordinator::getDependencyInfo(Core::federate_id_t ofed)
 	return &(*res);
 }
 
-void TimeCoordinator::addDependency(Core::federate_id_t fedID)
+bool TimeCoordinator::addDependency(Core::federate_id_t fedID)
 {
 	if (dependencies.empty())
 	{
 		dependencies.push_back(fedID);
+		return true;
 	}
 	auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), fedID, dependencyCompare);
 	if (dep == dependencies.end())
@@ -251,37 +266,64 @@ void TimeCoordinator::addDependency(Core::federate_id_t fedID)
 		if (dep->fedID == fedID)
 		{
 			// the dependency is already present
-			return;
+			return false;
 		}
 		dependencies.emplace(dep, fedID);
 	}
+	return true;
 }
 
-void TimeCoordinator::addDependent(Core::federate_id_t fedID)
+bool TimeCoordinator::addDependent(Core::federate_id_t fedID)
 {
 	if (dependents.empty())
 	{
 		dependents.push_back(fedID);
+		return true;
 	}
 	auto dep = std::lower_bound(dependents.begin(), dependents.end(), fedID);
 	if (dep == dependents.end())
 	{
 		dependents.push_back(fedID);
+		
 	}
 	else
 	{
 		if (*dep == fedID)
 		{
-			return;
+			return false;
 		}
 		dependents.insert(dep, fedID);
 	}
+	return true;
 }
 
+void TimeCoordinator::removeDependency(Core::federate_id_t fedID)
+{
+	auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), fedID, dependencyCompare);
+	if (dep != dependencies.end())
+	{
+		if (dep->fedID == fedID)
+		{
+			dependencies.erase(dep);
+		}
+	}
+}
 
+void TimeCoordinator::removeDependent(Core::federate_id_t fedID)
+{
+	auto dep = std::lower_bound(dependents.begin(), dependents.end(), fedID);
+	if (dep != dependents.end())
+	{
+		if (*dep == fedID)
+		{
+			dependents.erase(dep);
+		}
+	}
+}
 
 convergence_state TimeCoordinator::checkExecEntry()
 {
+	convergence_state ret = convergence_state::continue_processing;
 	if (iterating)
 	{
 		for (auto &dep : dependencies)
@@ -299,13 +341,18 @@ convergence_state TimeCoordinator::checkExecEntry()
 		{
 			if (iteration > info.max_iterations)
 			{
-				time_granted = timeZero;
-				return convergence_state::complete;
+				ret=convergence_state::complete;
 			}
-			return convergence_state::nonconverged;
+			else
+			{
+				ret=convergence_state::nonconverged;
+			}
 		}
-		time_granted = timeZero;
-		return convergence_state::complete;  // todo add a check for updates and iteration limit
+		else
+		{
+			ret=convergence_state::complete;  // todo add a check for updates and iteration limit
+		}
+		
 	}
 	else
 	{
@@ -320,9 +367,39 @@ convergence_state TimeCoordinator::checkExecEntry()
 				return convergence_state::continue_processing;
 			}
 		}
-		time_granted = timeZero;
-		return convergence_state::complete;
+		ret= convergence_state::complete;
 	}
+
+	if (ret == convergence_state::complete)
+	{
+		time_granted = timeZero;
+		executionMode = true;
+		if (sendExecGrantMessage)
+		{
+			if (sendMessageFunction)
+			{
+				ActionMessage execgrant(CMD_EXEC_GRANT);
+				execgrant.source_id = source_id;
+				execgrant.iterationComplete = true;
+				sendMessageFunction(execgrant);
+			}
+			
+		}
+	}
+	else if (ret == convergence_state::nonconverged)
+	{
+		if (sendExecGrantMessage)
+		{
+			if (sendMessageFunction)
+			{
+				ActionMessage execgrant(CMD_EXEC_GRANT);
+				execgrant.source_id = source_id;
+				execgrant.iterationComplete = false;
+				sendMessageFunction(execgrant);
+			}
+		}
+	}
+	return ret;
 }
 
 

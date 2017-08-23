@@ -1595,6 +1595,10 @@ void CommonCore::processCommand (ActionMessage &command)
         }
     }
     break;
+	case CMD_ADD_DEPENDENCY:
+	case CMD_REMOVE_DEPENDENCY:
+		routeMessage(command);
+		break;
     case CMD_SEND_FOR_FILTER:
         routeMessage (command);
         break;

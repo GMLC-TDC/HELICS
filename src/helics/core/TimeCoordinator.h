@@ -42,6 +42,7 @@ private:
 public:
 	Core::federate_id_t source_id;  //!< the identifier for inserting into the source id field of any generated messages;
 	bool iterating=false; //!< indicator that the coordinator should be iterating if need be
+	bool executionMode = false;	//!< flag that the coordinator has entered the execution Mode
 	bool sendExecGrantMessage = false;	//!flag indicating that the timeCoordinator should send the grant message
 	bool sendTimeGrantMessage = false;	//!< flag indicating that the timeCoordinator should send the time grant message
 private:
@@ -108,8 +109,17 @@ public:
 	*/
 	bool processExternalTimeMessage(ActionMessage &cmd);
 
-	void addDependency(Core::federate_id_t fedID);
-	void addDependent(Core::federate_id_t fedID);
+	/** add a federate dependency
+	@return true if it was actually added, false if the federate was already present
+	*/
+	bool addDependency(Core::federate_id_t fedID);
+	/** add a dependent federate
+	@return true if it was actually added, false if the federate was already present
+	*/
+	bool addDependent(Core::federate_id_t fedID);
+
+	void removeDependency(Core::federate_id_t fedID);
+	void removeDependent(Core::federate_id_t fedID);
 
 	/** process a message related to exec request
 	@return true if it did anything

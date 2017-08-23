@@ -96,8 +96,8 @@ class ActionMessage
 
 		cmd_send_route = 75,  //!< command to define a route information
 		cmd_subscriber = 85,  // !< command to send a subscriber
-		cmd_send_dependency = 95,  //!< command to send a federate dependency information
-
+		cmd_add_dependency = 95,  //!< command to send a federate dependency information
+		cmd_remove_dependency = 97, //!< command to remove a dependency
 		cmd_reg_fed = 105,  //!< register a federate
 		// commands that require the extra info allocation have numbers greater than cmd_info_basis
 		cmd_time_request = cmd_info_basis + 10,  //!< request a time or iteration
@@ -250,6 +250,8 @@ class ActionMessage
 #define CMD_NOTIFY_DST_FILTER ActionMessage::action_t::cmd_notify_dst
 #define CMD_REG_SRC_FILTER ActionMessage::action_t::cmd_reg_src
 #define CMD_NOTIFY_SRC_FILTER ActionMessage::action_t::cmd_notify_src
+#define CMD_ADD_DEPENDENCY ActionMessage::action_t::cmd_add_dependency
+#define CMD_REMOVE_DEPENDENCY ActionMessage::action_t::cmd_remove_dependency
 #define CMD_REG_FED ActionMessage::action_t::cmd_reg_fed
 #define CMD_BROKER_ACK ActionMessage::action_t::cmd_broker_ack
 #define CMD_FED_ACK ActionMessage::action_t::cmd_fed_ack

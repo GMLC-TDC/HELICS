@@ -513,13 +513,6 @@ convergence_state FederateState::enterExecutingState (convergence_state converge
         }
 		timeCoord->iterating = (converged == convergence_state::nonconverged);
         auto ret = processQueue ();
-        if (parent_ != nullptr)
-        {
-            ActionMessage execgrant (CMD_EXEC_GRANT);
-            execgrant.source_id = global_id;
-            execgrant.iterationComplete = (ret == convergence_state::complete);
-            parent_->addCommand (execgrant);
-        }
         time_granted = timeZero;
         fillEventVector (time_granted);
         processing = false;
@@ -567,13 +560,6 @@ iterationTime FederateState::requestTime (Time nextTime, convergence_state conve
 		time_granted = timeCoord->getGrantedTime();
         iterating = (ret == convergence_state::nonconverged);
         iterationTime retTime = {time_granted, ret};
-        if (parent_ != nullptr)
-        {
-            ActionMessage treq (CMD_TIME_GRANT);
-            treq.source_id = global_id;
-            treq.actionTime = time_granted;
-            parent_->addCommand (treq);
-        }
         // now fill the event vector so exernal systems know what has been updated
         fillEventVector (time_granted);
         processing = false;
@@ -840,6 +826,9 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 		}
 	}
 	break;
+	case CMD_ADD_DEPENDENCY:
+		timeCoord->addDependency(cmd.source_id);
+		break;
 	case CMD_REG_DST_FILTER:
 	case CMD_NOTIFY_DST_FILTER:
 		break;

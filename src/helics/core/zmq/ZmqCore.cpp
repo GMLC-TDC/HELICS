@@ -212,7 +212,7 @@ void ZmqCore::transmitData()
 		std::tie(route_id,cmd) = txQueue.pop();
 		if (cmd.action() == CMD_PROTOCOL)
 		{
-			if (route_id = -1)
+			if (route_id == -1)
 			{
 				//do something local
 			}

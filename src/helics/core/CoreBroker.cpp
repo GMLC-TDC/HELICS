@@ -440,14 +440,12 @@ void CoreBroker::processCommand (ActionMessage &command)
 		}
 		break;
     case CMD_EXEC_REQUEST:
-        transmit (getRoute (command.dest_id), command);
-        break;
-    case CMD_EXEC_GRANT:
-        transmit (getRoute (command.dest_id), command);
-        break;
-    
-    case CMD_TIME_REQUEST:
-		if (command.source_id == global_broker_id)
+	case CMD_EXEC_GRANT:
+		if (command.dest_id == global_broker_id)
+		{
+			timeCoord->processExecRequest(command);
+		}
+		else if (command.source_id == global_broker_id)
 		{
 			for (auto dep : timeCoord->getDependents())
 			{
@@ -461,8 +459,25 @@ void CoreBroker::processCommand (ActionMessage &command)
 		}
         
         break;
-    case CMD_TIME_GRANT:
-        transmit (getRoute (command.dest_id), command);
+    case CMD_TIME_REQUEST:
+	case CMD_TIME_GRANT:
+		if (command.source_id == global_broker_id)
+		{
+			for (auto dep : timeCoord->getDependents())
+			{
+				command.dest_id = dep;
+				transmit(getRoute(dep), command);
+			}
+		}
+		else if (command.dest_id == global_broker_id)
+		{
+			timeCoord->processExternalTimeMessage(command);
+		}
+		else
+		{
+			transmit(getRoute(command.dest_id), command);
+		}
+        
         break;
     case CMD_SEND_MESSAGE:
         transmit (getRoute (command.dest_id), command);
@@ -620,7 +635,25 @@ void CoreBroker::addEndpoint(ActionMessage &m)
 	
 	if (!_isRoot)
 	{
+		bool addDep = (!m.processingComplete);
+		
+		m.processingComplete = true;
+		
+		
 		transmit(0, m);
+		if (addDep)
+		{
+			bool added = timeCoord->addDependency(m.source_id);
+			if (added)
+			{
+				ActionMessage add(CMD_ADD_DEPENDENCY);
+				add.source_id = global_broker_id;
+				add.dest_id = m.source_id;
+				transmit(getRoute(add.source_id), add);
+				timeCoord->addDependent(m.source_id);
+			}
+		}
+		
 	}
 	else
 	{
