@@ -20,6 +20,7 @@ set(SRC_FILES
 	core-data.cpp
 	ipc/IpcCore.cpp
 	ipc/IpcBroker.cpp
+	TimeCoordinator.cpp
 	
 )
 
@@ -34,7 +35,9 @@ set(INCLUDE_FILES
     core-data.h
     CoreFactory.h
 	BrokerFactory.h
+	DependencyInfo.h
 	core-exceptions.h
+	TimeCoordinator.h
     core.h
     core-types.h
     helics-time.h

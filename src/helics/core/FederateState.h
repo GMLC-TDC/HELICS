@@ -37,7 +37,7 @@ class EndpointInfo;
 class FilterInfo;
 class CommonCore;
 
-
+class TimeCoordinator;
 
 /** class managing the information about a single federate*/
 class FederateState
@@ -45,11 +45,11 @@ class FederateState
   public:
     /** constructor from name and information structure*/
 	FederateState(const std::string &name_, const CoreFederateInfo &info_);
-
+	~FederateState();
   private:
 
 	  std::string name;  //!< the name of the federate
-    CoreFederateInfo info;  //!< basic federate info the core uses
+	  std::unique_ptr<TimeCoordinator> timeCoord;
   public:
     Core::federate_id_t local_id = invalid_fed_id;  //!< id code, default to something invalid
     Core::federate_id_t global_id = invalid_fed_id;  //!< global id code, default to invalid
@@ -77,68 +77,27 @@ class FederateState
 
     std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time
 
-    // the variables for time coordination
-    Time time_granted = Time::minVal();  //!< the most recent time granted
-    Time time_requested = timeZero;  //!< the most recent time requested
-    Time time_next = timeZero;  //!< the next possible internal event time
-    Time time_minminDe = timeZero;  //!< the minimum  of the minimum dependency event Time
-    Time time_minDe = timeZero;  //!< the minimum event time of the dependencies
-	Time time_allow = Time::minVal();  //!< the current allowable time 
-    Time time_exec = Time::maxVal();  //!< the time of the next targetted execution
-	Time time_message = Time::maxVal();	//!< the time of the earliest message event
-	Time time_value = Time::maxVal();	//!< the time of the earliest value event
-
-    std::atomic<int32_t> iteration{0};  //!< iteration counter
+   
     std::vector<Core::Handle> events;  //!< list of value events to process
     std::map<Core::Handle, std::vector<std::unique_ptr<Message>>> message_queue;  // structure of message queues
-
+	Time time_granted = Time::minVal();  //!< the most recent granted time;
     mutable std::mutex _mutex;  //!< the mutex protecting the fed state
-    std::vector<DependencyInfo> dependencies;  // federates which this Federate is temporally dependent on
-    std::vector<Core::federate_id_t> dependents;  // federates which temporally depend on this federate
+   
     std::atomic<bool> processing{false};  //!< the federate is processing
   private:
     /** DISABLE_COPY_AND_ASSIGN */
     FederateState (const FederateState &) = delete;
     FederateState &operator= (const FederateState &) = delete;
 
-	/** process a message related to exec request
-	@return true if it did anything
-	*/
-	bool processExecRequest(ActionMessage &cmd);
-	/** check if entry to the executing state can be granted*/
-	convergence_state checkExecEntry();
-	/** process a message related to time
-	@return true if it did anything
-	*/
-	bool processExternalTimeMessage (ActionMessage &cmd);
-	/** compute updates to time values
-	@return true if they have been modified
-	*/
-	bool updateTimeFactors ();
-	/** update the time_value variable with a new value if needed
-	*/
-	void updateValueTime(Time valueUpdateTime);
-	/** update the time_message variable with a new value if needed
-	*/
-	void updateMessageTime(Time messageUpdateTime);
 	
-    /** take a global id and get a pointer to the dependencyInfo for the other fed
-	will be nullptr if it doesn't exist
-	*/
-    DependencyInfo *getDependencyInfo (Core::federate_id_t ofed);
-	/** check whether a federate is a dependency*/
-	bool isDependency(Core::federate_id_t ofed) const;
+	
     /** a logging function for logging or printing messages*/
     std::function<void(int, const std::string &, const std::string &)> loggerFunction;
 	/** find the next Value Event*/
 	Time nextValueTime() const;
 	/** find the next Message Event*/
 	Time nextMessageTime() const;
-	/** helper function for computing the next event time*/
-	void updateNextExecutionTime();
-	/** helper function for computing the next possible time to generate an external event
-	*/
-	void updateNextPossibleEventTime(convergence_state converged);
+	
 	/** update the federate state */
 	void setState(helics_federate_state_type newState);
   public:
@@ -190,7 +149,7 @@ class FederateState
 	/** get the current iteration counter for an iterative call
 	@details this will work properly even when a federate is processing
 	*/
-    int32_t getCurrentIteration () const { return iteration; }
+	int32_t getCurrentIteration() const;
     /** get the next available message for an endpoint
 	@param id the handle of an endpoint or filter
 	@return a pointer to a message -the ownership of the message is transfered to the caller*/
@@ -202,10 +161,7 @@ class FederateState
     @param[out] id the the filter related to the message*/
     std::unique_ptr<Message> receiveForFilter (Core::Handle &id);
 	/** set the CommonCore object that is managing this Federate*/
-	void setParent(CommonCore *coreObject)
-	{
-		parent_ = coreObject;
-	}
+	void setParent(CommonCore *coreObject);
   private:
     /** process the federate queue until returnable event
     @details processQueue will process messages until one of 3 things occur
@@ -240,11 +196,10 @@ class FederateState
 	const std::vector<Core::Handle> &getEvents() const;
 	/** get a reference to the global ids of dependent federates
 	*/
-    const std::vector<Core::federate_id_t> &getDependents () const { return dependents; }
-	/** compute all the known dependencies
-	*/
-    void generateKnownDependencies ();
+	const std::vector<Core::federate_id_t> &getDependents() const;
+	/** add a dependency to the timing coordination*/
     void addDependency (Core::federate_id_t fedToDependOn);
+	/** add a dependent federate*/
     void addDependent (Core::federate_id_t fedThatDependsOnThis);
 	/** specify the core object that manages this federate*/
     void setCoreObject (CommonCore *parent);

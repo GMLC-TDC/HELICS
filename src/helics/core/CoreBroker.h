@@ -50,6 +50,8 @@ public:
 	
 };
 
+class TimeCoordinator;
+
 /** a shift in the global federate id numbers to allow discrimination between local ids and global ones
 this value allows 65535 federates to be available in each core 
 1,878,982,656 allowable federates in the system and
@@ -96,15 +98,7 @@ private:
 	/** a logging function for logging or printing messages*/
 	std::function<void(int, const std::string &, const std::string &)> loggerFunction;
 
-	//for the virtual timing dependency of the broker
-	Time time_next = timeZero;  //!< the next possible internal event time
-	Time time_minminDe = timeZero;  //!< the minimum  of the minimum dependency event Time
-	Time time_minDe = timeZero;  //!< the minimum event time of the dependencies
-	Time time_allow = Time::minVal();  //!< the current allowable time 
-	Time time_exec = Time::maxVal();  //!< the time of the next targetted execution
-
-	std::vector<DependencyInfo> dependencies;  // federates which this Federate is temporally dependent on
-	std::vector<Core::federate_id_t> dependents;  // federates which temporally depend on this federate
+	std::unique_ptr<TimeCoordinator> timeCoord;
 protected:
 	std::atomic<bool> _initialized{ false }; //!< indicator if the system is initialized (mainly if the thread is running)
 private:

@@ -19,6 +19,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/uuid/uuid.hpp>  // uuid class
 #include <boost/uuid/uuid_generators.hpp>  // generators
 #include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
+#include "TimeCoordinator.h"
 #include <fstream>
 
 
@@ -370,6 +371,8 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
 		}
 	}
 	break;
+	case CMD_REG_ROUTE:
+		break;
     }
 }
 
@@ -390,6 +393,7 @@ void CoreBroker::processCommand (ActionMessage &command)
     switch (command.action ())
     {
     case CMD_IGNORE:
+	case CMD_PROTOCOL:
         break;
     case CMD_INIT:
     {
@@ -441,10 +445,21 @@ void CoreBroker::processCommand (ActionMessage &command)
     case CMD_EXEC_GRANT:
         transmit (getRoute (command.dest_id), command);
         break;
-    case CMD_REG_ROUTE:
-        break;
+    
     case CMD_TIME_REQUEST:
-        transmit (getRoute (command.dest_id), command);
+		if (command.source_id == global_broker_id)
+		{
+			for (auto dep : timeCoord->getDependents())
+			{
+				command.dest_id = dep;
+				transmit(getRoute(dep), command);
+			}
+		}
+		else
+		{
+			transmit(getRoute(command.dest_id), command);
+		}
+        
         break;
     case CMD_TIME_GRANT:
         transmit (getRoute (command.dest_id), command);

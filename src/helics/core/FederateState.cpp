@@ -14,6 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "FilterInfo.h"
 #include "PublicationInfo.h"
 #include "SubscriptionInfo.h"
+#include "TimeCoordinator.h"
 
 #include <algorithm>
 #include <chrono>
@@ -21,14 +22,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_) : name (name_), info (info_)
+FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_) : name (name_)
 {
     state = HELICS_CREATED;
-    if (info.timeDelta <= timeZero)
-    {
-        info.timeDelta = timeEpsilon;
-    }
+	timeCoord = std::make_unique<TimeCoordinator>(info_);
+    
 }
+
+FederateState::~FederateState() = default;
+
 // define the allowable state transitions for a federate
 void FederateState::setState (helics_federate_state_type newState)
 {
@@ -71,23 +73,33 @@ void FederateState::reInit ()
 }
 helics_federate_state_type FederateState::getState () const { return state; }
 
+int32_t FederateState::getCurrentIteration() const { return timeCoord->getCurrentIteration(); }
+
+void FederateState::setParent(CommonCore *coreObject)
+{
+	parent_ = coreObject;
+	timeCoord->setMessageSender([coreObject](const ActionMessage &msg) {coreObject->addCommand(msg); });
+
+}
+
 static auto compareFunc = [](const auto &A, const auto &B) { return (A->id < B->id); };
 
 CoreFederateInfo FederateState::getInfo () const
 {
     // lock the mutex to ensure we have the latest values
     std::lock_guard<std::mutex> lock (_mutex);
-    return info;
+    return timeCoord->getFedInfo();
 }
 
 void FederateState::UpdateFederateInfo (CoreFederateInfo &newInfo)
 {
+	//TODO:: change the check into the timeCoord
     if (newInfo.timeDelta <= timeZero)
     {
         newInfo.timeDelta = timeEpsilon;
     }
     std::lock_guard<std::mutex> lock (_mutex);
-    info = newInfo;
+	timeCoord->setInfo(newInfo);
 }
 
 void FederateState::createSubscription (Core::Handle handle,
@@ -499,6 +511,7 @@ convergence_state FederateState::enterExecutingState (convergence_state converge
             execreq.iterationComplete = (converged == convergence_state::complete);
             parent_->addCommand (execreq);
         }
+		timeCoord->iterating = (converged == convergence_state::nonconverged);
         auto ret = processQueue ();
         if (parent_ != nullptr)
         {
@@ -546,32 +559,12 @@ iterationTime FederateState::requestTime (Time nextTime, convergence_state conve
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
-        iterating = (converged != convergence_state::complete);
-        if (nextTime <= time_granted)
-        {
-            nextTime = time_granted + info.timeDelta;
-        }
-        time_requested = nextTime;
-        events.clear ();  // clear the event queue
-        time_value = nextValueTime ();
-        time_message = nextMessageTime ();
-        updateNextExecutionTime ();
-        updateNextPossibleEventTime (converged);
-        if (parent_ != nullptr)
-        {
-            ActionMessage treq (CMD_TIME_REQUEST);
-            treq.source_id = global_id;
-            treq.actionTime = time_next;
-            treq.info ().Te = time_exec + info.lookAhead;
-            treq.info ().Tdemin = time_minDe;
-            parent_->addCommand (treq);
-        }
-
-
-        // push a message to check whether time can be granted
+        iterating=timeCoord->iterating = (converged != convergence_state::complete);
+		events.clear();  // clear the event queue
+		timeCoord->timeRequest(nextTime, nextValueTime(), nextMessageTime());
         queue.push (CMD_TIME_CHECK);
         auto ret = processQueue ();
-
+		time_granted = timeCoord->getGrantedTime();
         iterating = (ret == convergence_state::nonconverged);
         iterationTime retTime = {time_granted, ret};
         if (parent_ != nullptr)
@@ -628,6 +621,7 @@ convergence_state FederateState::genericUnspecifiedQueueProcess ()
     if (processing.compare_exchange_strong (expected, true))
     {  // only 1 thread can enter this loop once per federate
         auto ret = processQueue ();
+		time_granted = timeCoord->getGrantedTime();
         processing = false;
         return ret;
     }
@@ -718,7 +712,7 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 		break;
 	case CMD_EXEC_REQUEST:
 	case CMD_EXEC_GRANT:
-		if (!processExecRequest(cmd))
+		if (!timeCoord->processExecRequest(cmd))
 		{
 			break;
 		}
@@ -729,7 +723,7 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 		{
 			break;
 		}
-		auto grant = checkExecEntry();
+		auto grant = timeCoord->checkExecEntry();
 		switch (grant)
 		{
 		case convergence_state::nonconverged:
@@ -755,7 +749,7 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 		break;
 	case CMD_TIME_REQUEST:
 	case CMD_TIME_GRANT:
-		if (!processExternalTimeMessage(cmd))
+		if (!timeCoord->processExternalTimeMessage(cmd))
 		{
 			break;
 		}
@@ -766,37 +760,11 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 		{
 			break;
 		}
-		bool update = updateTimeFactors();
-		if (!iterating)
+		auto ret=timeCoord->checkTimeGrant();
+		if (ret != convergence_state::continue_processing)
 		{
-			if (time_allow >= time_exec)
-			{
-				time_granted = time_exec;
-				return convergence_state::complete;
-			}
-		}
-		else
-		{
-			if (time_allow > time_exec)
-			{
-				time_granted = time_exec;
-				return convergence_state::complete;
-			}
-			else
-			{
-				// TODO:: something with the iteration conditions
-			}
-		}
-
-		// if we haven't returned we need to update the time messages
-		if ((update) && (parent_ != nullptr))
-		{
-			ActionMessage upd(CMD_TIME_REQUEST);
-			upd.source_id = global_id;
-			upd.actionTime = time_next;
-			upd.info().Te = time_exec;
-			upd.info().Tdemin = time_minDe;
-			parent_->addCommand(upd);
+			time_granted = timeCoord->getGrantedTime();
+			return ret;
 		}
 	}
 	break;
@@ -805,7 +773,7 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 		auto epi = getEndpoint(cmd.dest_handle);
 		if (epi != nullptr)
 		{
-			updateMessageTime(cmd.actionTime + info.impactWindow);
+			timeCoord->updateMessageTime(cmd.actionTime);
 			epi->addMessage(createMessage(std::move(cmd)));
 		}
 	}
@@ -816,7 +784,7 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 		auto fI = getFilter(cmd.dest_handle);
 		if (fI != nullptr)
 		{
-			updateMessageTime(cmd.actionTime + info.impactWindow);
+			timeCoord->updateMessageTime(cmd.actionTime);
 			fI->addMessage(createMessage(std::move(cmd)));
 		}
 	}
@@ -830,9 +798,9 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 		}
 		if (cmd.source_id == subI->target.first)
 		{
-			subI->addData(cmd.actionTime + info.impactWindow,
+			subI->addData(cmd.actionTime + timeCoord->getFedInfo().impactWindow,
 				std::make_shared<const data_block>(std::move(cmd.payload)));
-			updateValueTime(cmd.actionTime + info.impactWindow);
+			timeCoord->updateValueTime(cmd.actionTime);
 		}
 	}
 	break;
@@ -901,6 +869,7 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 				return convergence_state::error;
 			}
 			global_id = cmd.dest_id;
+			timeCoord->source_id = global_id;
 			return convergence_state::complete;
 		}
 		break;
@@ -908,123 +877,21 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 	return convergence_state::continue_processing;
 }
 
-
-// an info sink no one cares about
-static DependencyInfo dummyInfo;
-
-static auto dependencyCompare = [](const auto &dep, auto &target) { return (dep.fedID < target); };
-
-bool FederateState::isDependency (Core::federate_id_t ofed) const
+const std::vector<Core::federate_id_t> &FederateState::getDependents() const
 {
-    auto res = std::lower_bound (dependencies.begin (), dependencies.end (), ofed, dependencyCompare);
-    if (res == dependencies.end ())
-    {
-        return false;
-    }
-    return (res->fedID == ofed);
+	return timeCoord->getDependents();
 }
 
-DependencyInfo *FederateState::getDependencyInfo (Core::federate_id_t ofed)
+void FederateState::addDependency(Core::federate_id_t fedToDependOn)
 {
-    auto res = std::lower_bound (dependencies.begin (), dependencies.end (), ofed, dependencyCompare);
-    if ((res == dependencies.end ()) || (res->fedID != ofed))
-    {
-        return nullptr;
-    }
-
-    return &(*res);
+	timeCoord->addDependency(fedToDependOn);
 }
 
-
-bool FederateState::processExecRequest (ActionMessage &cmd)
+void FederateState::addDependent(Core::federate_id_t fedThatDependsOnThis)
 {
-    auto ofed = getDependencyInfo (cmd.source_id);
-    if (ofed == nullptr)
-    {
-        return false;
-    }
-
-    switch (cmd.action ())
-    {
-    case CMD_EXEC_REQUEST:
-        ofed->exec_requested = true;
-        ofed->exec_converged = cmd.iterationComplete;
-        break;
-    case CMD_EXEC_GRANT:
-        ofed->exec_requested = false;
-        ofed->exec_converged = cmd.iterationComplete;
-        break;
-    }
-    return true;
+	timeCoord->addDependent(fedThatDependsOnThis);
 }
 
-convergence_state FederateState::checkExecEntry ()
-{
-    if (iterating)
-    {
-        for (auto &dep : dependencies)
-        {
-            if (!dep.exec_requested)
-            {
-                return convergence_state::continue_processing;
-            }
-            if (!dep.exec_requested)
-            {
-                return convergence_state::continue_processing;
-            }
-        }
-        if (time_value == timeZero)
-        {
-            if (iteration > info.max_iterations)
-            {
-                return convergence_state::complete;
-            }
-            return convergence_state::nonconverged;
-        }
-        return convergence_state::complete;  // todo add a check for updates and iteration limit
-    }
-    else
-    {
-        for (auto &dep : dependencies)
-        {
-            if (!dep.exec_requested)
-            {
-                return convergence_state::continue_processing;
-            }
-            if (!dep.exec_converged)
-            {
-                return convergence_state::continue_processing;
-            }
-        }
-        return convergence_state::complete;
-    }
-}
-
-bool FederateState::processExternalTimeMessage (ActionMessage &cmd)
-{
-    auto ofed = getDependencyInfo (cmd.source_id);
-    if (ofed == nullptr)
-    {
-        return false;
-    }
-
-    switch (cmd.action ())
-    {
-    case CMD_TIME_REQUEST:
-        ofed->grant = false;
-        ofed->Tnext = cmd.actionTime;
-        ofed->Te = cmd.info ().Te;
-        ofed->Tdemin = cmd.info ().Tdemin;
-        break;
-    case CMD_TIME_GRANT:
-        ofed->grant = true;
-        ofed->Tnext = cmd.actionTime;
-        ofed->Te = cmd.actionTime;
-        ofed->Tdemin = cmd.actionTime;
-        break;
-    }
-    return true;
-}
 
 Time FederateState::nextValueTime () const
 {
@@ -1060,213 +927,6 @@ Time FederateState::nextMessageTime () const
     }
     return firstMessageTime;
 }
-
-void FederateState::updateNextExecutionTime ()
-{
-    time_exec = std::min (time_message, time_value) + info.impactWindow;
-    time_exec = std::min (time_requested, time_exec);
-    if (time_exec <= time_granted)
-    {
-        time_exec = (iterating)?time_granted:(time_granted+info.timeDelta);
-    }
-    if (info.timeDelta > timeEpsilon)
-    {
-        auto blk = static_cast<int> (std::ceil ((time_exec - time_granted) / info.timeDelta));
-        time_exec = time_granted + blk * info.timeDelta;
-    }
-}
-
-
-void FederateState::updateNextPossibleEventTime (convergence_state converged)
-{
-    if (converged == convergence_state::complete)
-    {
-        time_next = time_granted + info.timeDelta + info.lookAhead;
-        time_next = std::max (time_next, time_minDe + info.impactWindow + info.lookAhead);
-    }
-    else
-    {
-        time_next = time_granted + info.lookAhead;
-    }
-}
-void FederateState::updateValueTime (Time valueUpdateTime)
-{
-    if (valueUpdateTime < time_value)
-    {
-        if (valueUpdateTime <= time_granted)
-        {
-            if (iterating)
-            {
-                time_value = time_granted;
-            }
-            else
-            {
-                time_value = time_granted + info.timeDelta;
-            }
-        }
-        time_value = valueUpdateTime;
-    }
-}
-
-void FederateState::updateMessageTime (Time messageUpdateTime)
-{
-    if (messageUpdateTime < time_message)
-    {
-        if (messageUpdateTime <= time_granted)
-        {
-            if (iterating)
-            {
-                time_message = time_granted;
-            }
-            else
-            {
-                time_message = time_granted + info.timeDelta;
-            }
-        }
-        else
-        {
-            time_message = messageUpdateTime;
-        }
-    }
-}
-
-bool FederateState::updateTimeFactors ()
-{
-    Time minNext = Time::maxVal ();
-    Time minminDe = Time::maxVal ();
-    Time minDe = Time::maxVal ();
-    for (auto &dep : dependencies)
-    {
-        if (dep.Tnext < minNext)
-        {
-            minNext = dep.Tnext;
-        }
-        if (dep.Tdemin < minDe)
-        {
-            minminDe = dep.Tdemin;
-        }
-        if (dep.Te < minDe)
-        {
-            minDe = dep.Te;
-        }
-    }
-    bool update = false;
-
-    Time calc_next;
-    if (!iterating)
-    {
-        calc_next = std::max (time_granted + info.timeDelta, info.impactWindow + minminDe) + info.lookAhead;
-    }
-	else
-	{
-		calc_next = time_granted + info.lookAhead;
-	}
-
-    if (calc_next > time_next)
-    {
-        update = true;
-        time_next = calc_next;
-    }
-    time_minminDe = minminDe;
-    if (minDe != time_minDe)
-    {
-        update = true;
-        time_minDe = minDe;
-    }
-    time_allow = info.impactWindow + minNext;
-	updateNextExecutionTime();
-    return update;
-}
-
-void FederateState::generateKnownDependencies ()
-{
-    std::vector<Core::federate_id_t> dependenciesList;
-    std::vector<Core::federate_id_t> dependentList;
-    // start with the subscriptions
-    for (auto &sub : subscriptions)
-    {
-        if (sub->has_target)
-        {
-            dependenciesList.push_back (sub->target.first);
-        }
-    }
-    // publications for dependent operations
-    for (auto &pub : publications)
-    {
-        if (!pub->subscribers.empty ())
-        {
-            for (auto &pubTarget : pub->subscribers)
-            {
-                dependentList.push_back (pubTarget.first);
-            }
-        }
-    }
-    // filters for dependencies
-    for (auto &filt : filters)
-    {
-        if (filt->filterOp == nullptr)
-        {
-            dependenciesList.push_back (filt->target.first);
-        }
-    }
-    auto last1 = std::unique (dependenciesList.begin (), dependenciesList.end ());
-    dependenciesList.erase (last1, dependenciesList.end ());
-    auto last2 = std::unique (dependentList.begin (), dependentList.end ());
-    dependenciesList.erase (last2, dependentList.end ());
-
-    dependencies.resize (dependenciesList.size ());
-    for (size_t ii = 0; ii < dependenciesList.size (); ++ii)
-    {
-        dependencies[ii].fedID = dependenciesList[ii];
-    }
-
-    dependents = dependentList;
-}
-
-
-void FederateState::addDependency (Core::federate_id_t fedID)
-{
-    if (dependencies.empty ())
-    {
-        dependencies.push_back (fedID);
-    }
-    auto dep = std::lower_bound (dependencies.begin (), dependencies.end (), fedID, dependencyCompare);
-    if (dep == dependencies.end ())
-    {
-        dependencies.emplace_back (fedID);
-    }
-    else
-    {
-        if (dep->fedID == fedID)
-        {
-            // the dependency is already present
-            return;
-        }
-        dependencies.emplace (dep, fedID);
-    }
-}
-
-void FederateState::addDependent (Core::federate_id_t fedID)
-{
-    if (dependents.empty ())
-    {
-        dependents.push_back (fedID);
-    }
-    auto dep = std::lower_bound (dependents.begin (), dependents.end (), fedID);
-    if (dep == dependents.end ())
-    {
-        dependents.push_back (fedID);
-    }
-    else
-    {
-        if (*dep == fedID)
-        {
-            return;
-        }
-        dependents.insert (dep, fedID);
-    }
-}
-
 
 void FederateState::setCoreObject (CommonCore *parent)
 {
