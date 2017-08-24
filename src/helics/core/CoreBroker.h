@@ -41,11 +41,14 @@ class BasicBrokerInfo
 {
 public:
 	std::string name; //!< the name of the broker
+	
 	Core::federate_id_t global_id=invalid_fed_id;	//!< the global identifier for the broker
 	int32_t route_id=invalid_fed_id;	//!< the identifier for the route to take to the broker
-	std::string routeInfo;	//!< string describing the connection information for the route
+	
 	bool _initRequested = false;	//!< flag indicating the broker has requesting initialization
 	bool _disconnected = false;		//!< flag indicating that the broker has disconnected
+	bool _hasEndpoints = true;		//!< flag indicating that a broker has endpoints it is coordinating
+	std::string routeInfo;	//!< string describing the connection information for the route
 	BasicBrokerInfo(const std::string &brokerName) :name(brokerName) {};
 	
 };
@@ -69,10 +72,11 @@ class CoreBroker
 {
 protected:
 	std::atomic<bool> _operating{ false }; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
-	bool _isRoot = false;  //!< set to true if this object is a root broker
+	
 	bool _gateway = false;  //!< set to true if this broker should act as a gateway.
 	bool _hasEndpoints = false; //!< set to true if the broker has endpoints;  
 private:
+	bool _isRoot = false;  //!< set to true if this object is a root broker
 	std::atomic<int32_t> global_broker_id{ 0 };  //!< the identifier for the broker
 	std::vector<std::pair<Core::federate_id_t, bool>> localBrokersInit; //!< indicator if the local brokers are ready to init
 	std::vector<BasicFedInfo> _federates; //!< container for all federates
@@ -88,7 +92,6 @@ private:
 	std::unordered_map<std::string, int32_t> endpoints;  //!< map of endpoints
 	std::unordered_multimap<std::string, int32_t> filters;  //!< multimap for all the filters
 
-	std::atomic<bool> _connected{ false };  //!< indicator that the broker is connected to its parent broker
 	std::map<Core::federate_id_t, int32_t> global_id_translation; //!< map to translate global ids to local ones
 	std::map<Core::federate_id_t, int32_t> routing_table;  //!< map for external routes  <global federate id, route id>
 	std::map<Core::federate_id_t, int32_t> broker_table;  //!< map for translating global broker id's to a local index
@@ -100,7 +103,18 @@ private:
 
 	std::unique_ptr<TimeCoordinator> timeCoord;
 protected:
-	std::atomic<bool> _initialized{ false }; //!< indicator if the system is initialized (mainly if the thread is running)
+	/** enumeration of the possible core states*/
+	enum broker_state_t :int
+	{
+		created = -5,
+		initialized = -4,
+		connectedA = -3,
+		connected = -2,
+		operating = 0,
+		terminated = 3,
+		errored = 7,
+	};
+	std::atomic<broker_state_t> brokerState{ created }; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
 private:
 	int32_t _min_federates=1;  //!< storage for the min number of federates
 	int32_t _min_brokers=1;	//!< storage for the min number of brokers before starting
@@ -122,6 +136,7 @@ private:
 	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delays for a certain time
 
 	void transmitDelayedMessages();
+	bool enteredExecutionMode = false; //!< flag indicating that the broker has entered execution mode
 public:
 	/** connect the core to its broker
 	@details should be done after initialization has complete*/
@@ -129,6 +144,15 @@ public:
 	/** disconnect the broker from any other brokers and communications
 	*/
 	void disconnect();
+	
+	/** set the broker to be a root broker
+	@details only valid before the initialization function is called*/
+	void setAsRoot();
+	/** return true if the broker is a root broker
+	*/
+	bool isRoot() {
+		return _isRoot;
+	};
 private:
 	/** implementation details of the connection process
 	*/

@@ -15,7 +15,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-ActionMessage::ActionMessage (action_t action) : action_ (action), index(dest_handle), processingComplete(iterationComplete), name(payload)
+ActionMessage::ActionMessage (action_message_def::action_t action) : action_ (action), index(dest_handle), processingComplete(iterationComplete), name(payload)
 {
 	if (action >= cmd_info_basis)
 	{
@@ -43,7 +43,7 @@ ActionMessage::ActionMessage (const ActionMessage &act)
     }
 }
 
-ActionMessage::ActionMessage(std::unique_ptr<Message> message):action_(action_t::cmd_send_message), index(dest_handle), processingComplete(iterationComplete), actionTime(message->time), payload(std::move(message->data.to_string())),name(payload)
+ActionMessage::ActionMessage(std::unique_ptr<Message> message):action_(CMD_SEND_MESSAGE), index(dest_handle), processingComplete(iterationComplete), actionTime(message->time), payload(std::move(message->data.to_string())),name(payload)
 {
 	info_ = std::make_unique<AdditionalInfo>();
 	info_->source = std::move(message->src);
@@ -107,7 +107,7 @@ ActionMessage &ActionMessage::operator= (ActionMessage &&act) noexcept
 void ActionMessage::moveInfo(std::unique_ptr<Message> message)
 {
 	
-	action_ = action_t::cmd_send_message;
+	action_ = CMD_SEND_MESSAGE;
 	payload = std::move(message->data.to_string());
 	actionTime = message->time;
 	if (!info_)
@@ -120,7 +120,7 @@ void ActionMessage::moveInfo(std::unique_ptr<Message> message)
 
 }
 
-void ActionMessage::setAction(action_t action)
+void ActionMessage::setAction(action_message_def::action_t action)
 {
 	if (action >= cmd_info_basis)
 	{

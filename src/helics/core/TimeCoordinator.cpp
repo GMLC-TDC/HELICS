@@ -25,8 +25,27 @@ TimeCoordinator::TimeCoordinator(const CoreFederateInfo &info_) :info(info_)
 	}
 }
 
-void TimeCoordinator::timeRequest(Time nextTime,Time newValueTime, Time newMessageTime)
+void TimeCoordinator::enteringExecMode(convergence_state mode)
 {
+	if (executionMode == true)
+	{
+		return;
+	}
+	iterating = (mode == convergence_state::nonconverged);
+	checkingExec= true;
+	if ((!dependents.empty())&&(sendMessageFunction))
+	{
+		ActionMessage execreq(CMD_EXEC_REQUEST);
+		execreq.source_id = source_id;
+		execreq.iterationComplete = !iterating;
+		sendMessageFunction(execreq);
+	}
+	
+}
+
+void TimeCoordinator::timeRequest(Time nextTime,convergence_state converged, Time newValueTime, Time newMessageTime)
+{
+	iterating = (converged == convergence_state::nonconverged);
 	if (nextTime <= time_granted)
 	{
 		nextTime = time_granted + info.timeDelta;
@@ -37,9 +56,10 @@ void TimeCoordinator::timeRequest(Time nextTime,Time newValueTime, Time newMessa
 	time_message = newMessageTime;
 	updateNextExecutionTime();
 	updateNextPossibleEventTime();
-	if (sendMessageFunction)
+	if ((!dependents.empty()) && (sendMessageFunction))
 	{
 		ActionMessage treq(CMD_TIME_REQUEST);
+		treq.iterationComplete = !iterating;
 		treq.source_id = source_id;
 		treq.actionTime = time_next;
 		treq.info().Te = time_exec + info.lookAhead;
@@ -180,7 +200,7 @@ convergence_state TimeCoordinator::checkTimeGrant()
 		if (time_allow >= time_exec)
 		{
 			time_granted = time_exec;
-			if ((sendMessageFunction)&&sendTimeGrantMessage)
+			if ((!dependents.empty()) && (sendMessageFunction))
 			{
 				ActionMessage treq(CMD_TIME_GRANT);
 				treq.source_id = source_id;
@@ -195,7 +215,7 @@ convergence_state TimeCoordinator::checkTimeGrant()
 		if (time_allow > time_exec)
 		{
 			time_granted = time_exec;
-			if ((sendMessageFunction) && sendTimeGrantMessage)
+			if ((!dependents.empty()) && (sendMessageFunction))
 			{
 				ActionMessage treq(CMD_TIME_GRANT);
 				treq.source_id = source_id;
@@ -211,7 +231,7 @@ convergence_state TimeCoordinator::checkTimeGrant()
 	}
 
 	// if we haven't returned we need to update the time messages
-	if ((update) && (sendMessageFunction))
+	if ((!dependents.empty()) && (update))
 	{
 		ActionMessage upd(CMD_TIME_REQUEST);
 		upd.source_id = source_id;
@@ -219,6 +239,7 @@ convergence_state TimeCoordinator::checkTimeGrant()
 		upd.info().Te = time_exec;
 		upd.info().Tdemin = time_minDe;
 		sendMessageFunction(upd);
+		//printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next), static_cast<double>(time_exec), static_cast<double>(time_minDe));
 	}
 	return convergence_state::continue_processing;
 }
@@ -332,7 +353,7 @@ convergence_state TimeCoordinator::checkExecEntry()
 			{
 				return convergence_state::continue_processing;
 			}
-			if (!dep.exec_requested)
+			if (dep.exec_iterating)
 			{
 				return convergence_state::continue_processing;
 			}
@@ -358,12 +379,13 @@ convergence_state TimeCoordinator::checkExecEntry()
 	{
 		for (auto &dep : dependencies)
 		{
+			//if exec mode has not been requesting
 			if (!dep.exec_requested)
 			{
 				return convergence_state::continue_processing;
 			}
-			if (!dep.exec_converged)
-			{
+			if (dep.exec_iterating)
+			{ //if the dependency is iterating we cannot grant
 				return convergence_state::continue_processing;
 			}
 		}
@@ -374,8 +396,7 @@ convergence_state TimeCoordinator::checkExecEntry()
 	{
 		time_granted = timeZero;
 		executionMode = true;
-		if (sendExecGrantMessage)
-		{
+		
 			if (sendMessageFunction)
 			{
 				ActionMessage execgrant(CMD_EXEC_GRANT);
@@ -383,13 +404,10 @@ convergence_state TimeCoordinator::checkExecEntry()
 				execgrant.iterationComplete = true;
 				sendMessageFunction(execgrant);
 			}
-			
-		}
+
 	}
 	else if (ret == convergence_state::nonconverged)
 	{
-		if (sendExecGrantMessage)
-		{
 			if (sendMessageFunction)
 			{
 				ActionMessage execgrant(CMD_EXEC_GRANT);
@@ -397,7 +415,6 @@ convergence_state TimeCoordinator::checkExecEntry()
 				execgrant.iterationComplete = false;
 				sendMessageFunction(execgrant);
 			}
-		}
 	}
 	return ret;
 }
@@ -415,11 +432,11 @@ bool TimeCoordinator::processExecRequest(ActionMessage &cmd)
 	{
 	case CMD_EXEC_REQUEST:
 		ofed->exec_requested = true;
-		ofed->exec_converged = cmd.iterationComplete;
+		ofed->exec_iterating = !cmd.iterationComplete;
 		break;
 	case CMD_EXEC_GRANT:
 		ofed->exec_requested = false;
-		ofed->exec_converged = cmd.iterationComplete;
+		ofed->exec_iterating = !cmd.iterationComplete;
 		break;
 	}
 	return true;
@@ -437,12 +454,14 @@ bool TimeCoordinator::processExternalTimeMessage(ActionMessage &cmd)
 	{
 	case CMD_TIME_REQUEST:
 		ofed->grant = false;
+		ofed->time_iterating = !cmd.iterationComplete;
 		ofed->Tnext = cmd.actionTime;
 		ofed->Te = cmd.info().Te;
 		ofed->Tdemin = cmd.info().Tdemin;
 		break;
 	case CMD_TIME_GRANT:
 		ofed->grant = true;
+		ofed->time_iterating = !cmd.iterationComplete;
 		ofed->Tnext = cmd.actionTime;
 		ofed->Te = cmd.actionTime;
 		ofed->Tdemin = cmd.actionTime;

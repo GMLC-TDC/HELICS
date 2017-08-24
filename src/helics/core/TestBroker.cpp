@@ -107,7 +107,7 @@ static void argumentParser (int argc, char *argv[], boost::program_options::vari
 void TestBroker::InitializeFromArgs (int argc, char *argv[])
 {
     namespace po = boost::program_options;
-    if (!_initialized)
+    if (brokerState==broker_state_t::created)
     {
         po::variables_map vm;
         argumentParser (argc, argv, vm);
@@ -135,13 +135,13 @@ bool TestBroker::brokerConnect()
 {
 	if (!tbroker)
 	{
-		if (_isRoot)
+		if (isRoot())
 		{
 			return true;
 		}
 		if ((brokerName.empty()) && (brokerInitString.empty()))
 		{
-			_isRoot = true;
+			setAsRoot();
 			return true;
 		}
 		else
@@ -160,15 +160,13 @@ bool TestBroker::brokerConnect()
 
 void TestBroker::brokerDisconnect()
 {
-	if (!_isRoot)
-	{
+	
 		tbroker = nullptr;
-	}
 }
 
 void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
 {
-    if ((!_isRoot) && (route_id == 0))
+    if ((tbroker) && (route_id == 0))
     {
 		
         tbroker->addMessage (cmd);
@@ -191,7 +189,7 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
         return;
     }
 
-    if (!_isRoot)
+    if (!isRoot())
     {
         tbroker->addMessage (cmd);
     }

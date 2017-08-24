@@ -3,29 +3,31 @@
 Copyright (C) 2017, Battelle Memorial Institute
 All rights reserved.
 
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/config.h"
-#include "helics/common/blocking_queue.h"
-#include "helics/core/core.h"
-#include "helics/core/core-data.h"
-#include "helics/core/helics-time.h"
 #include "helics/core/zmq/ZmqCore.h"
+#include "helics/common/blocking_queue.h"
 #include "helics/common/zmqContextManager.h"
-#include "helics/common/zmqSocketDescriptor.h"
 #include "helics/common/zmqHelper.h"
+#include "helics/common/zmqSocketDescriptor.h"
+#include "helics/config.h"
+#include "helics/core/core-data.h"
+#include "helics/core/core.h"
+#include "helics/core/helics-time.h"
 
 #include <algorithm>
 #include <cassert>
 #include <chrono>
 #include <cstdint>
-#include <sstream>
 #include <fstream>
+#include <sstream>
 
 
-#include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
 
 #define USE_LOGGING 1
 #if USE_LOGGING
@@ -37,29 +39,25 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define ENDL std::endl
 #endif
 #else
-#define LOG(LEVEL) std::ostringstream()
+#define LOG(LEVEL) std::ostringstream ()
 #define ENDL std::endl
 #endif
 
 static const std::string DEFAULT_BROKER = "tcp://localhost";
 constexpr int defaultBrokerREPport = 23405;
-constexpr int defaultBrokerPULLport = 23406; 
+constexpr int defaultBrokerPULLport = 23406;
 
 
 namespace helics
 {
-
-
-
-
-static void argumentParser(int argc, char *argv[], boost::program_options::variables_map &vm_map)
+static void argumentParser (int argc, char *argv[], boost::program_options::variables_map &vm_map)
 {
-	namespace po = boost::program_options;
-	po::options_description cmd_only("command line only");
-	po::options_description config("configuration");
-	po::options_description hidden("hidden");
+    namespace po = boost::program_options;
+    po::options_description cmd_only ("command line only");
+    po::options_description config ("configuration");
+    po::options_description hidden ("hidden");
 
-	// clang-format off
+    // clang-format off
 	// input boost controls
 	cmd_only.add_options()
 		("help,h", "produce help message")
@@ -72,196 +70,192 @@ static void argumentParser(int argc, char *argv[], boost::program_options::varia
 		("register", "register the core for global locating");
 
 
-	// clang-format on
+    // clang-format on
 
-	po::options_description cmd_line("command line options");
-	po::options_description config_file("configuration file options");
-	po::options_description visible("allowed options");
+    po::options_description cmd_line ("command line options");
+    po::options_description config_file ("configuration file options");
+    po::options_description visible ("allowed options");
 
-	cmd_line.add(cmd_only).add(config);
-	config_file.add(config);
-	visible.add(cmd_only).add(config);
+    cmd_line.add (cmd_only).add (config);
+    config_file.add (config);
+    visible.add (cmd_only).add (config);
 
-	//po::positional_options_description p;
-	//p.add("input", -1);
+    // po::positional_options_description p;
+    // p.add("input", -1);
 
-	po::variables_map cmd_vm;
-	try
-	{
-		po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().run(), cmd_vm);
-	}
-	catch (std::exception &e)
-	{
-		std::cerr << e.what() << std::endl;
-		throw (e);
-	}
+    po::variables_map cmd_vm;
+    try
+    {
+        po::store (po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered ().run (), cmd_vm);
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << e.what () << std::endl;
+        throw (e);
+    }
 
-	po::notify(cmd_vm);
+    po::notify (cmd_vm);
 
-	// objects/pointers/variables/constants
+    // objects/pointers/variables/constants
 
 
-	// program options control
-	if (cmd_vm.count("help") > 0)
-	{
-		std::cout << visible << '\n';
-		return;
-	}
+    // program options control
+    if (cmd_vm.count ("help") > 0)
+    {
+        std::cout << visible << '\n';
+        return;
+    }
 
-	po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().run(), vm_map);
+    po::store (po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered ().run (), vm_map);
 
-	if (cmd_vm.count("config-file") > 0)
-	{
-		std::string config_file_name = cmd_vm["config-file"].as<std::string>();
-		if (!boost::filesystem::exists(config_file_name))
-		{
-			std::cerr << "config file " << config_file_name << " does not exist\n";
-			throw (std::invalid_argument("unknown config file"));
-		}
-		else
-		{
-			std::ifstream fstr(config_file_name.c_str());
-			po::store(po::parse_config_file(fstr, config_file), vm_map);
-			fstr.close();
-		}
-	}
+    if (cmd_vm.count ("config-file") > 0)
+    {
+        std::string config_file_name = cmd_vm["config-file"].as<std::string> ();
+        if (!boost::filesystem::exists (config_file_name))
+        {
+            std::cerr << "config file " << config_file_name << " does not exist\n";
+            throw (std::invalid_argument ("unknown config file"));
+        }
+        else
+        {
+            std::ifstream fstr (config_file_name.c_str ());
+            po::store (po::parse_config_file (fstr, config_file), vm_map);
+            fstr.close ();
+        }
+    }
 
-	po::notify(vm_map);
+    po::notify (vm_map);
 }
 
 
-ZmqCore::ZmqCore(const std::string &core_name) :CommonCore(core_name) {}
+ZmqCore::ZmqCore (const std::string &core_name) : CommonCore (core_name) {}
 
-void ZmqCore::initializeFromArgs(int argc, char *argv[])
+void ZmqCore::initializeFromArgs (int argc, char *argv[])
 {
-	namespace po = boost::program_options;
-	if (coreState==created)
-	{
-		po::variables_map vm;
-		argumentParser(argc, argv, vm);
+    namespace po = boost::program_options;
+    if (coreState == created)
+    {
+        po::variables_map vm;
+        argumentParser (argc, argv, vm);
 
-		if (vm.count("broker") > 0)
-		{
-			auto brstring = vm["broker"].as<std::string>();
-			//tbroker = findTestBroker(brstring);
-		}
-		
-		if (vm.count("brokerinit") > 0)
-		{
-			//tbroker->Initialize(vm["brokerinit"].as<std::string>());
-		}
-		CommonCore::initializeFromArgs(argc, argv);
-	}
+        if (vm.count ("broker") > 0)
+        {
+            auto brstring = vm["broker"].as<std::string> ();
+            // tbroker = findTestBroker(brstring);
+        }
+
+        if (vm.count ("brokerinit") > 0)
+        {
+            // tbroker->Initialize(vm["brokerinit"].as<std::string>());
+        }
+        CommonCore::initializeFromArgs (argc, argv);
+    }
 }
 
-bool ZmqCore::brokerConnect()
-{
-	return true;
-}
+bool ZmqCore::brokerConnect () { return true; }
 #define NEW_ROUTE 233
 #define DISCONNECT 2523
 
-void ZmqCore::brokerDisconnect()
+void ZmqCore::brokerDisconnect ()
 {
-	ActionMessage rt(CMD_PROTOCOL);
-	rt.index = DISCONNECT;
-	transmit(-1, rt);
+    ActionMessage rt (CMD_PROTOCOL);
+    rt.index = DISCONNECT;
+    transmit (-1, rt);
 }
 
-void ZmqCore::transmit(int route_id, const ActionMessage &cmd)
+void ZmqCore::transmit (int route_id, const ActionMessage &cmd)
 {
-	txQueue.push(std::pair<int,ActionMessage>(route_id, cmd));
-}
-
-
-
-void ZmqCore::addRoute(int route_id, const std::string &routeInfo)
-{
-	ActionMessage rt(CMD_PROTOCOL);
-	rt.payload = routeInfo;
-	rt.index = NEW_ROUTE;
-	rt.source_id = route_id;
-	transmit(-1, rt);
+    txQueue.push (std::pair<int, ActionMessage> (route_id, cmd));
 }
 
 
-std::string ZmqCore::getAddress() const
+void ZmqCore::addRoute (int route_id, const std::string &routeInfo)
 {
-	return "";
+    ActionMessage rt (CMD_PROTOCOL);
+    rt.payload = routeInfo;
+    rt.index = NEW_ROUTE;
+    rt.source_id = route_id;
+    transmit (-1, rt);
 }
 
-void ZmqCore::transmitData()
-{
-	auto ctx = zmqContextManager::getContextPointer();
-	zmq::socket_t reqSocket(ctx->getContext(), ZMQ_REQ);
-	reqSocket.connect(brokerRepAddress.c_str());
-	zmq::socket_t brokerPushSocket(ctx->getContext(), ZMQ_PUSH);
-	std::map<int,zmq::socket_t> pushSockets; // for all the other possible routes
-	zmq::socket_t controlSocket(ctx->getContext(), ZMQ_PAIR);
 
-	std::string controlsockString = "inproc://" + getIdentifier() + "_control";
-	controlSocket.bind(controlsockString.c_str());
-	//the receiver thread that is managed by this thread
-	std::thread rxThread;  
-	std::vector<char> buffer;
-	std::vector<char> rxbuffer(4096);
-	while (1)
-	{
-		int route_id;
-		ActionMessage cmd;
-		std::tie(route_id,cmd) = txQueue.pop();
-		if (cmd.action() == CMD_PROTOCOL)
-		{
-			if (route_id == -1)
+std::string ZmqCore::getAddress () const { return pullSocketAddress; }
+
+void ZmqCore::transmitData ()
+{
+    auto ctx = zmqContextManager::getContextPointer ();
+    zmq::socket_t reqSocket (ctx->getContext (), ZMQ_REQ);
+    reqSocket.connect (brokerRepAddress.c_str ());
+    zmq::socket_t brokerPushSocket (ctx->getContext (), ZMQ_PUSH);
+    std::map<int, zmq::socket_t> pushSockets;  // for all the other possible routes
+    zmq::socket_t controlSocket (ctx->getContext (), ZMQ_PAIR);
+
+    std::string controlsockString = "inproc://" + getIdentifier () + "_control";
+    controlSocket.bind (controlsockString.c_str ());
+    // the receiver thread that is managed by this thread
+    std::thread rxThread;
+    std::vector<char> buffer;
+    std::vector<char> rxbuffer (4096);
+    while (1)
+    {
+        int route_id;
+        ActionMessage cmd;
+        std::tie (route_id, cmd) = txQueue.pop ();
+        if (cmd.action () == CMD_PROTOCOL)
+        {
+            if (route_id == -1)
+            {
+                // do something local
+            }
+        }
+        cmd.to_vector (buffer);
+        if (isPriorityCommand (cmd))
+        {
+            reqSocket.send (buffer.data (), buffer.size ());
+
+            // TODO:: need to figure out how to catch overflow and resize the rxbuffer
+            // admittedly this would probably be a very very long name but it could happen
+            auto nsize = reqSocket.recv (rxbuffer.data (), rxbuffer.size ());
+			if ((nsize > 0) && (nsize < rxbuffer.size()))
 			{
-				//do something local
+				ActionMessage rxcmd(rxbuffer.data(), rxbuffer.size());
+				addCommand(rxcmd);
 			}
-		}
-		cmd.to_vector(buffer);
-		if (isPriorityCommand(cmd))
-		{
-			reqSocket.send(buffer.data(), buffer.size());
-
-			//TODO:: need to figure out how to catch overflow and resize the rxbuffer
-			//admittedly this would probably be a very very long name but it could happen
-			int nsize = reqSocket.recv(rxbuffer.data(), rxbuffer.size());
-			ActionMessage rxcmd(rxbuffer.data(), rxbuffer.size());
-			addCommand(rxcmd);
-		}
-		if (route_id == 0)
-		{
-			brokerPushSocket.send(buffer.data(), buffer.size());
-		}
-		else
-		{
-			auto rt_find = pushSockets.find(route_id);
-			if (rt_find != pushSockets.end())
-			{
-				rt_find->second.send(buffer.data(), buffer.size());
-			}
-			else
-			{
-				brokerPushSocket.send(buffer.data(), buffer.size());
-			}
-		}
-	}
-	reqSocket.close();
-	brokerPushSocket.close();
-	pushSockets.clear();
+            
+        }
+        if (route_id == 0)
+        {
+            brokerPushSocket.send (buffer.data (), buffer.size ());
+        }
+        else
+        {
+            auto rt_find = pushSockets.find (route_id);
+            if (rt_find != pushSockets.end ())
+            {
+                rt_find->second.send (buffer.data (), buffer.size ());
+            }
+            else
+            {
+                brokerPushSocket.send (buffer.data (), buffer.size ());
+            }
+        }
+    }
+    reqSocket.close ();
+    brokerPushSocket.close ();
+    pushSockets.clear ();
 }
 
-void ZmqCore::receiveData()
+void ZmqCore::receiveData ()
 {
-	auto ctx = zmqContextManager::getContextPointer();
-	zmq::socket_t pullSocket(ctx->getContext(), ZMQ_PULL);
-	
-	pullSocket.bind(pullSocketAddress.c_str());
-	zmq::socket_t controlSocket(ctx->getContext(), ZMQ_PAIR);
-	std::string controlsockString = "inproc://" + getIdentifier() + "_control";
-	controlSocket.connect(controlsockString.c_str());
+    auto ctx = zmqContextManager::getContextPointer ();
+    zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
 
-	//TODO:: manage the polling loop
+    pullSocket.bind (pullSocketAddress.c_str ());
+    zmq::socket_t controlSocket (ctx->getContext (), ZMQ_PAIR);
+    std::string controlsockString = "inproc://" + getIdentifier () + "_control";
+    controlSocket.connect (controlsockString.c_str ());
 
+    // TODO:: manage the polling loop
 }
 
 }  // namespace helics

@@ -25,7 +25,7 @@ class TimeCoordinator
 private:
 	// the variables for time coordination
 	Time time_granted = Time::minVal();  //!< the most recent time granted
-	Time time_requested = timeZero;  //!< the most recent time requested
+	Time time_requested = Time::maxVal();  //!< the most recent time requested
 	Time time_next = timeZero;  //!< the next possible internal event time
 	Time time_minminDe = timeZero;  //!< the minimum  of the minimum dependency event Time
 	Time time_minDe = timeZero;  //!< the minimum event time of the dependencies
@@ -42,9 +42,9 @@ private:
 public:
 	Core::federate_id_t source_id;  //!< the identifier for inserting into the source id field of any generated messages;
 	bool iterating=false; //!< indicator that the coordinator should be iterating if need be
+	bool checkingExec = false; //!< flag indicating that the coordinator is trying to enter the exec mode
 	bool executionMode = false;	//!< flag that the coordinator has entered the execution Mode
-	bool sendExecGrantMessage = false;	//!flag indicating that the timeCoordinator should send the grant message
-	bool sendTimeGrantMessage = false;	//!< flag indicating that the timeCoordinator should send the time grant message
+	
 private:
 	std::atomic<int32_t> iteration{ 0 };  //!< iteration counter
 public:
@@ -98,12 +98,13 @@ public:
 	/** check whether a federate is a dependency*/
 	bool isDependency(Core::federate_id_t ofed) const;
 
+private:
 	/** helper function for computing the next event time*/
 	void updateNextExecutionTime();
 	/** helper function for computing the next possible time to generate an external event
 	*/
 	void updateNextPossibleEventTime();
-
+public:
 	/** process a message related to time
 	@return true if it did anything
 	*/
@@ -129,7 +130,8 @@ public:
 	convergence_state checkExecEntry();
 	
 
-	void timeRequest(Time nextTime, Time newValueTime, Time newMessageTime);
+	void timeRequest(Time nextTime, convergence_state converged, Time newValueTime, Time newMessageTime);
+	void enteringExecMode(convergence_state mode);
 	/** check if it is valid to grant a time*/
 	convergence_state checkTimeGrant();
 };

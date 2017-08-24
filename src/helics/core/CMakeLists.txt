@@ -43,6 +43,7 @@ set(INCLUDE_FILES
     helics-time.h
     TestCore.h
 	CoreBroker.h
+	ActionMessageDefintions.h
 	ActionMessage.h
 	CommonCore.h
     mpi/mpi-core.h

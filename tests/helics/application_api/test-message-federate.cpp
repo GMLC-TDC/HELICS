@@ -427,7 +427,7 @@ BOOST_AUTO_TEST_CASE(test_time_interruptions)
 
 	BOOST_REQUIRE_EQUAL(gtime,0.5);
 	
-	BOOST_CHECK(mFed1->hasMessage(epid));
+	BOOST_REQUIRE(mFed1->hasMessage(epid));
 	
 
 	auto M1 = mFed1->getMessage(epid);

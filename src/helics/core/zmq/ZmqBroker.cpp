@@ -138,7 +138,7 @@ ZmqBroker::~ZmqBroker() = default;
 void ZmqBroker::InitializeFromArgs(int argc, char *argv[])
 {
 	namespace po = boost::program_options;
-	if (!_initialized)
+	if (brokerState == broker_state_t::created)
 	{
 		po::variables_map vm;
 		argumentParser(argc, argv, vm);

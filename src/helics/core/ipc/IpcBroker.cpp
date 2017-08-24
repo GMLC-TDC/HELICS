@@ -137,7 +137,7 @@ IpcBroker::~IpcBroker()
 void IpcBroker::InitializeFromArgs(int argc, char *argv[])
 {
 	namespace po = boost::program_options;
-	if (!_initialized)
+	if (brokerState == broker_state_t::created)
 	{
 		po::variables_map vm;
 		argumentParser(argc, argv, vm);
@@ -174,7 +174,7 @@ bool IpcBroker::brokerConnect()
 	queue_watcher = std::thread(&IpcBroker::queue_rx_function, this);
 	if ((brokerloc.empty()) && (brokername.empty()))
 	{
-		_isRoot = true;
+		setAsRoot();
 		return true;
 	}
 	if (brokerloc.empty())
@@ -212,7 +212,7 @@ void IpcBroker::transmit(int route_id, const ActionMessage &cmd)
 	std::string buffer = cmd.to_string();
 	if (route_id == 0)
 	{
-		if (!_isRoot)
+		if (!isRoot())
 		{
 			brokerQueue->send(buffer.data(), buffer.size(), 1);
 		}

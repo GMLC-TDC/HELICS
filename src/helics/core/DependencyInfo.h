@@ -23,9 +23,9 @@ class DependencyInfo
 public:
 	Core::federate_id_t fedID;  //!< identifier for the dependent federate
 	bool grant = false;  //!< whether time has been granted
-	bool exec_converged = false;  //!< whether the executing state has requested iteration
+	bool exec_iterating = false;  //!< whether the executing state has requested iteration
 	bool exec_requested = false;  //!< whether execution state has been granted
-	bool time_converged = false;	//!< whether the current time point has requested iteration
+	bool time_iterating = false;	//!< whether the current time point has requested iteration
 	Time Tnext = timeZero;  //!<next possible message or value 
 	Time Te = timeZero;  //!< the next currently scheduled event
 	Time Tdemin = timeZero;  //!< min dependency event time

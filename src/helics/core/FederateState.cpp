@@ -26,7 +26,6 @@ FederateState::FederateState (const std::string &name_, const CoreFederateInfo &
 {
     state = HELICS_CREATED;
 	timeCoord = std::make_unique<TimeCoordinator>(info_);
-    
 }
 
 FederateState::~FederateState() = default;
@@ -504,14 +503,7 @@ convergence_state FederateState::enterExecutingState (convergence_state converge
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
-        if (parent_ != nullptr)
-        {
-            ActionMessage execreq (CMD_EXEC_REQUEST);
-            execreq.source_id = global_id;
-            execreq.iterationComplete = (converged == convergence_state::complete);
-            parent_->addCommand (execreq);
-        }
-		timeCoord->iterating = (converged == convergence_state::nonconverged);
+		timeCoord->enteringExecMode(converged);
         auto ret = processQueue ();
         time_granted = timeZero;
         fillEventVector (time_granted);
@@ -552,9 +544,8 @@ iterationTime FederateState::requestTime (Time nextTime, convergence_state conve
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
-        iterating=timeCoord->iterating = (converged != convergence_state::complete);
 		events.clear();  // clear the event queue
-		timeCoord->timeRequest(nextTime, nextValueTime(), nextMessageTime());
+		timeCoord->timeRequest(nextTime,converged, nextValueTime(), nextMessageTime());
         queue.push (CMD_TIME_CHECK);
         auto ret = processQueue ();
 		time_granted = timeCoord->getGrantedTime();
@@ -827,8 +818,31 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 	}
 	break;
 	case CMD_ADD_DEPENDENCY:
-		timeCoord->addDependency(cmd.source_id);
+		if (cmd.dest_id == global_id)
+		{
+			timeCoord->addDependency(cmd.source_id);
+		}
+		
 		break;
+	case CMD_ADD_DEPENDENT:
+		if (cmd.dest_id == global_id)
+		{
+			timeCoord->addDependent(cmd.source_id);
+		}
+		break;
+	case CMD_REMOVE_DEPENDENCY:
+		if (cmd.dest_id == global_id)
+		{
+			timeCoord->removeDependency(cmd.source_id);
+		}
+		break;
+	case CMD_REMOVE_DEPENDENT:
+		if (cmd.dest_id == global_id)
+		{
+			timeCoord->removeDependent(cmd.source_id);
+		}
+		break;
+
 	case CMD_REG_DST_FILTER:
 	case CMD_NOTIFY_DST_FILTER:
 		break;

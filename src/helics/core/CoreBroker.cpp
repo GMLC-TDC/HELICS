@@ -62,7 +62,7 @@ void CoreBroker::queueProcessingLoop ()
 
 CoreBroker::~CoreBroker ()
 {
-    if (_initialized)
+    if (_queue_processing_thread.joinable())
     {
 		_queue.push(CMD_STOP);
 		_queue_processing_thread.join();
@@ -72,7 +72,7 @@ CoreBroker::~CoreBroker ()
 
 void CoreBroker::setIdentifier (const std::string &name)
 {
-    if (!_connected)  // can't be changed after initialization
+    if (brokerState==broker_state_t::created)  // can't be changed after initialization
     {
         std::lock_guard<std::mutex> lock (mutex_);
         local_broker_identifier = name;
@@ -321,6 +321,7 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
             if (!command.error)
             {
                 global_broker_id = command.dest_id;
+				timeCoord->source_id = global_broker_id;
                 transmitDelayedMessages ();
                 return;
             }
@@ -422,6 +423,13 @@ void CoreBroker::processCommand (ActionMessage &command)
                 command.source_id = global_broker_id;
                 transmit (0, command);
             }
+			timeCoord->enteringExecMode(convergence_state::complete);
+			auto res = timeCoord->checkExecEntry();
+			if (res == convergence_state::complete)
+			{
+				enteredExecutionMode = true;
+				timeCoord->timeRequest(Time::maxVal(), convergence_state::complete, Time::maxVal(), Time::maxVal());
+			}
         }
     }
     break;
@@ -444,6 +452,15 @@ void CoreBroker::processCommand (ActionMessage &command)
 		if (command.dest_id == global_broker_id)
 		{
 			timeCoord->processExecRequest(command);
+			if (enteredExecutionMode == false)
+			{
+				auto res = timeCoord->checkExecEntry();
+				if (res == convergence_state::complete)
+				{
+					enteredExecutionMode = true;
+					timeCoord->timeRequest(Time::maxVal(), convergence_state::complete, Time::maxVal(), Time::maxVal());
+				}
+			}
 		}
 		else if (command.source_id == global_broker_id)
 		{
@@ -471,7 +488,11 @@ void CoreBroker::processCommand (ActionMessage &command)
 		}
 		else if (command.dest_id == global_broker_id)
 		{
-			timeCoord->processExternalTimeMessage(command);
+			if (timeCoord->processExternalTimeMessage(command))
+			{
+				timeCoord->checkTimeGrant();
+			}
+
 		}
 		else
 		{
@@ -569,6 +590,50 @@ void CoreBroker::processCommand (ActionMessage &command)
 		}
 		addSourceFilter(command);
         break;
+	case CMD_ADD_DEPENDENCY:
+		if (command.dest_id != global_broker_id)
+		{
+			auto rt = getRoute(command.dest_id);
+			transmit(rt, command);
+		}
+		else
+		{
+			timeCoord->addDependency(command.source_id);
+		}
+		break;
+	case CMD_ADD_DEPENDENT:
+		if (command.dest_id != global_broker_id)
+		{
+			auto rt = getRoute(command.dest_id);
+			transmit(rt, command);
+		}
+		else
+		{
+			timeCoord->addDependent(command.source_id);
+		}
+		break;
+	case CMD_REMOVE_DEPENDENT:
+		if (command.dest_id != global_broker_id)
+		{
+			auto rt = getRoute(command.dest_id);
+			transmit(rt, command);
+		}
+		else
+		{
+			timeCoord->removeDependent(command.source_id);
+		}
+		break;
+	case CMD_REMOVE_DEPENDENCY:
+		if (command.dest_id != global_broker_id)
+		{
+			auto rt = getRoute(command.dest_id);
+			transmit(rt, command);
+		}
+		else
+		{
+			timeCoord->removeDependency(command.source_id);
+		}
+		break;
     default:
         // check again if it is a priority command and if so process it in that function
         if (isPriorityCommand (command))
@@ -576,6 +641,11 @@ void CoreBroker::processCommand (ActionMessage &command)
             processPriorityCommand (command);
             break;
         }
+		else if (command.dest_id!=global_broker_id)
+		{
+			auto rt = getRoute(command.dest_id);
+			transmit(rt, command);
+		}
     }
 }
 
@@ -633,31 +703,32 @@ void CoreBroker::addEndpoint(ActionMessage &m)
 
 	addLocalInfo(_handles.back(), m);
 	
+	bool addDep = (!m.processingComplete);
 	if (!_isRoot)
 	{
-		bool addDep = (!m.processingComplete);
-		
 		m.processingComplete = true;
-		
-		
 		transmit(0, m);
-		if (addDep)
-		{
-			bool added = timeCoord->addDependency(m.source_id);
-			if (added)
-			{
-				ActionMessage add(CMD_ADD_DEPENDENCY);
-				add.source_id = global_broker_id;
-				add.dest_id = m.source_id;
-				transmit(getRoute(add.source_id), add);
-				timeCoord->addDependent(m.source_id);
-			}
-		}
-		
 	}
 	else
 	{
 		FindandNotifyEndpointFilters(_handles.back());
+	}
+
+	if (addDep)
+	{
+		bool added = timeCoord->addDependency(m.source_id);
+		if (added)
+		{
+			ActionMessage add(CMD_ADD_DEPENDENCY);
+			add.source_id = global_broker_id;
+			add.dest_id = m.source_id;
+			auto rt = getRoute(m.source_id);
+			transmit(rt, add);
+			add.setAction(CMD_ADD_DEPENDENT);
+			transmit(rt, add);
+			timeCoord->addDependent(m.source_id);
+
+		}
 	}
 }
 void CoreBroker::addSourceFilter(ActionMessage &m)
@@ -693,7 +764,7 @@ CoreBroker::CoreBroker (const std::string &broker_name) : local_broker_identifie
 
 void CoreBroker::Initialize (const std::string &initializationString)
 {
-    if (!_initialized)
+    if (brokerState==broker_state_t::created)
     {
         stringToCmdLine cmdline (initializationString);
         InitializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
@@ -703,8 +774,8 @@ void CoreBroker::Initialize (const std::string &initializationString)
 void CoreBroker::InitializeFromArgs (int argc, char *argv[])
 {
     namespace po = boost::program_options;
-    bool exp = false;
-    if (_initialized.compare_exchange_strong (exp, true))
+    broker_state_t exp = broker_state_t::created;
+    if (brokerState.compare_exchange_strong (exp, broker_state_t::initialized))
     {
         po::variables_map vm;
         argumentParser (argc, argv, vm);
@@ -729,23 +800,37 @@ void CoreBroker::InitializeFromArgs (int argc, char *argv[])
         {
             local_broker_identifier = vm["identifier"].as<std::string> ();
         }
-
+		if (vm.count("root") > 0)
+		{
+			setAsRoot();
+		}
         if (local_broker_identifier.empty ())
         {  // don't allow an empty identifier, that causes all sorts of issues
             local_broker_identifier = gen_id ();
         }
-
+		timeCoord = std::make_unique<TimeCoordinator>();
+		timeCoord->setMessageSender([this](const ActionMessage & msg) {addMessage(msg); });
         _queue_processing_thread = std::thread (&CoreBroker::queueProcessingLoop, this);
     }
 }
 
+void CoreBroker::setAsRoot()
+{
+	if (brokerState<broker_state_t::connected)
+	{
+		_isRoot = true;
+		global_broker_id = 1;
+	}
+}
+
+
 
 bool CoreBroker::connect ()
 {
-    if (_initialized)
+    if (brokerState<broker_state_t::connectedA)
     {
-        bool exp = false;
-        if (_connected.compare_exchange_strong (exp, true))
+        broker_state_t exp = broker_state_t::initialized;
+        if (brokerState.compare_exchange_strong (exp, broker_state_t::connectedA))
         {
             auto res = brokerConnect ();
             if (res)
@@ -757,7 +842,11 @@ bool CoreBroker::connect ()
                     m.info ().target = getAddress ();
                     transmit (0, m);
                 }
-                _connected = true;
+				else
+				{
+					timeCoord->source_id = global_broker_id;
+				}
+				brokerState = broker_state_t::connected;
             }
             return res;
         }
@@ -768,25 +857,28 @@ bool CoreBroker::connect ()
 
 void CoreBroker::disconnect()
 {
-	brokerDisconnect();
-	_connected = false;
-	/*We need to enrure that the destructor is not called immediately upon calling unregister
-	otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
-	that will be destroyed on function exit
-	*/
-	auto keepBrokerAlive = findBroker(local_broker_identifier);
-	if (keepBrokerAlive)
+	if (brokerState > broker_state_t::initialized)
 	{
-		unregisterBroker(local_broker_identifier);
-	}
-	if (!previous_local_broker_identifier.empty())
-	{
-		auto keepBrokerAlive2 = findBroker(previous_local_broker_identifier);
-		if (keepBrokerAlive2)
+		brokerDisconnect();
+		brokerState = broker_state_t::terminated;
+		/*We need to enrure that the destructor is not called immediately upon calling unregister
+		otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
+		that will be destroyed on function exit
+		*/
+		auto keepBrokerAlive = findBroker(local_broker_identifier);
+		if (keepBrokerAlive)
 		{
-			unregisterBroker(previous_local_broker_identifier);
+			unregisterBroker(local_broker_identifier);
 		}
-		
+		if (!previous_local_broker_identifier.empty())
+		{
+			auto keepBrokerAlive2 = findBroker(previous_local_broker_identifier);
+			if (keepBrokerAlive2)
+			{
+				unregisterBroker(previous_local_broker_identifier);
+			}
+
+		}
 	}
 }
 
@@ -808,6 +900,7 @@ void argumentParser (int argc, char *argv[], boost::program_options::variables_m
 	config.add_options()
 		("broker,b", po::value<std::string>(), "address to connect the broker to")
 		("name,n", po::value<std::string>(), "name of the core")
+		("root","specify that the broker is a root broker")
 		("minfed", po::value<int>(), "type of the publication to use")
 		("identifier", po::value<std::string>(), "name of the core");
 
