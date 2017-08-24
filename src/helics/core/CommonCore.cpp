@@ -289,7 +289,7 @@ CommonCore::~CommonCore ()
 {
     if (_queue_processing_thread.joinable ())
     {
-        _queue.push (CMD_HARD_STOP);
+        _queue.push (CMD_TERMINATE_IMMEDIATELY);
         _queue_processing_thread.join ();
     }
 }
@@ -1483,7 +1483,7 @@ void CommonCore::queueProcessingLoop ()
         {
         case CMD_IGNORE:
             break;
-		case CMD_HARD_STOP:
+		case CMD_TERMINATE_IMMEDIATELY:
 			return; //immediate return
         case CMD_STOP:
             processCommand (command);

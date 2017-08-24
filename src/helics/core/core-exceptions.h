@@ -61,6 +61,14 @@ public:
 };
 
 /** exception indicating that the registration of an object has failed*/
+class connectionFailure : public HelicsException
+{
+public:
+	connectionFailure(const std::string &message = "failed to connect") :HelicsException(message) {};
+
+};
+
+/** exception indicating that the registration of an object has failed*/
 class registrationFailure : public HelicsException
 {
 public:

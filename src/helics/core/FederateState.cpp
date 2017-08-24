@@ -751,6 +751,7 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 		if (epi != nullptr)
 		{
 			timeCoord->updateMessageTime(cmd.actionTime);
+			cmd.actionTime += timeCoord->getFedInfo().impactWindow;
 			epi->addMessage(createMessage(std::move(cmd)));
 		}
 	}

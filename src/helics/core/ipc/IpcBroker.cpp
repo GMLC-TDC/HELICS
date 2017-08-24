@@ -169,8 +169,14 @@ bool IpcBroker::brokerConnect()
 		auto tname = tempPath / (getIdentifier() + "_queue.hqf");
 		fileloc = tname.string();
 	}
+	try
+	{
 	rxQueue = std::make_unique<ipc_queue>(boost::interprocess::create_only, fileloc.c_str(), 1024, 16 * 1024);
-
+	}
+	catch (boost::interprocess::interprocess_exception const& ipe)
+	{
+		return false;
+	}
 	queue_watcher = std::thread(&IpcBroker::queue_rx_function, this);
 	if ((brokerloc.empty()) && (brokername.empty()))
 	{
@@ -183,12 +189,25 @@ bool IpcBroker::brokerConnect()
 		auto tname = tempPath / (brokername + "_queue.hqf");
 		brokerloc = tname.string();
 	}
-	if (boost::filesystem::exists(brokerloc))
+	int sleep_counter = 50;
+	while (!boost::filesystem::exists(brokerloc))
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_counter));
+		sleep_counter *= 2;
+		if (sleep_counter > 1700)
+		{
+			break;
+		}
+	}
+	try
 	{
 		brokerQueue = std::make_unique<ipc_queue>(boost::interprocess::open_only, brokerloc.c_str());
 		return true;
 	}
-	return false;
+	catch (boost::interprocess::interprocess_exception const& ipe)
+	{
+		return false;
+	}
 	
 }
 
@@ -235,8 +254,16 @@ void IpcBroker::addRoute(int route_id, const std::string &routeInfo)
 {
 	if (boost::filesystem::exists(routeInfo))
 	{
-		auto newQueue = std::make_unique<ipc_queue>(boost::interprocess::open_only, routeInfo.c_str());
-		routes.emplace(route_id, std::move(newQueue));
+		try
+		{
+			auto newQueue = std::make_unique<ipc_queue>(boost::interprocess::open_only, routeInfo.c_str());
+			routes.emplace(route_id, std::move(newQueue));
+		}
+		catch (const boost::interprocess::interprocess_exception &ipe)
+		{
+
+		}
+		
 	}
 }
 

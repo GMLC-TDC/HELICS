@@ -11,6 +11,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/core/core-data.h"
 #include "helics/core/helics-time.h"
 #include "helics/core/ipc/IpcCore.h"
+#include "helics/core/core-exceptions.h"
 
 #include <algorithm>
 #include <cassert>
@@ -67,6 +68,8 @@ static void argumentParser(int argc, char *argv[], boost::program_options::varia
 		("queueloc", po::value<std::string>(), "the file location of the shared queue")
 		("broker,b", po::value<std::string>(), "identifier for the broker")
 		("brokerloc", po::value<int>(), "the file location for the broker")
+		("broker_auto_start","automatically start the broker")
+		("broker_init",po::value<std::string>(),"the init string to pass to the broker upon startup-will only be used if the autostart is activated")
 		("register", "register the core for global locating");
 
 
@@ -178,8 +181,15 @@ bool IpcCore::brokerConnect()
 		auto tname = tempPath / (getIdentifier() + "_queue.hqf");
 		fileloc = tname.string();
 	}
-	rxQueue = std::make_unique<ipc_queue>(boost::interprocess::create_only, fileloc.c_str(), maxMessageCount, maxMessageSize);
 
+		try
+		{
+			rxQueue = std::make_unique<ipc_queue>(boost::interprocess::create_only, fileloc.c_str(), maxMessageCount, maxMessageSize);
+		}
+		catch (boost::interprocess::interprocess_exception const& ipe)
+		{
+			throw(connectionFailure("failed open receive queue"));
+		}
 	queue_watcher = std::thread(&IpcCore::queue_rx_function, this);
 	if (brokerloc.empty())
 	{
@@ -191,12 +201,27 @@ bool IpcCore::brokerConnect()
 		auto tname = tempPath / (brokername + "_queue.hqf");
 		brokerloc = tname.string();
 	}
-	if (boost::filesystem::exists(brokerloc))
+	int sleep_counter = 50;
+	while (!boost::filesystem::exists(brokerloc))
 	{
-		brokerQueue=std::make_unique<ipc_queue>(boost::interprocess::open_only, brokerloc.c_str());
-		return true;
+		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_counter));
+		sleep_counter *= 2;
+		if (sleep_counter > 1700)
+		{
+			break;
+		}
 	}
-	return false;
+		try
+		{
+			brokerQueue = std::make_unique<ipc_queue>(boost::interprocess::open_only, brokerloc.c_str());
+			return true;
+		}
+		catch (boost::interprocess::interprocess_exception const& ipe)
+		{
+			
+			return false;
+		}
+
 }
 
 void IpcCore::brokerDisconnect()

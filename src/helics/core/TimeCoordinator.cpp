@@ -89,7 +89,7 @@ void TimeCoordinator::updateNextPossibleEventTime()
 	if (!iterating)
 	{
 		time_next = time_granted + info.timeDelta + info.lookAhead;
-		time_next = std::max(time_next, time_minDe + info.impactWindow + info.lookAhead);
+		time_next = std::max(time_next, time_minminDe + info.impactWindow + info.lookAhead);
 	}
 	else
 	{
@@ -101,20 +101,27 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime)
 	valueUpdateTime += info.impactWindow;
 	if (valueUpdateTime < time_value)
 	{
-		if (valueUpdateTime <= time_granted)
+		if (iterating)
 		{
-			if (iterating)
+			if (valueUpdateTime <= time_granted)
 			{
 				time_value = time_granted;
 			}
 			else
 			{
-				time_value = time_granted + info.timeDelta;
+				time_value = valueUpdateTime;
 			}
 		}
 		else
 		{
-			time_value = valueUpdateTime;
+			if (valueUpdateTime <= time_granted + info.timeDelta)
+			{
+				time_value = time_granted + info.timeDelta;
+			}
+			else
+			{
+				time_value = valueUpdateTime;
+			}
 		}
 		
 	}
@@ -125,21 +132,29 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
 	messageUpdateTime += info.impactWindow;
 	if (messageUpdateTime < time_message)
 	{
-		if (messageUpdateTime <= time_granted)
+		if (iterating)
 		{
-			if (iterating)
+			if (messageUpdateTime <= time_granted)
 			{
 				time_message = time_granted;
 			}
 			else
 			{
-				time_message = time_granted + info.timeDelta;
+				time_message = messageUpdateTime;
 			}
 		}
 		else
 		{
-			time_message = messageUpdateTime;
+			if (messageUpdateTime <= time_granted + info.timeDelta)
+			{
+				time_message = time_granted + info.timeDelta;
+			}
+			else
+			{
+				time_message = messageUpdateTime;
+			}
 		}
+		
 	}
 }
 
@@ -164,23 +179,16 @@ bool TimeCoordinator::updateTimeFactors()
 		}
 	}
 	bool update = false;
-
-	Time calc_next;
-	if (!iterating)
-	{
-		calc_next = std::max(time_granted + info.timeDelta, info.impactWindow + minminDe) + info.lookAhead;
-	}
-	else
-	{
-		calc_next = time_granted + info.lookAhead;
-	}
-
-	if (calc_next > time_next)
+	time_minminDe = std::min(minDe, minminDe);
+	Time prev_next = time_next;
+	updateNextPossibleEventTime();
+	
+//	printf("%d UDPATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next), static_cast<double>(minminDe), static_cast<double>(minDe));
+	if (prev_next != time_next)
 	{
 		update = true;
-		time_next = calc_next;
 	}
-	time_minminDe = minminDe;
+	
 	if (minDe != time_minDe)
 	{
 		update = true;
@@ -207,6 +215,7 @@ convergence_state TimeCoordinator::checkTimeGrant()
 				treq.actionTime = time_granted;
 				sendMessageFunction(treq);
 			}
+			//printf("%d GRANT allow=%f next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_allow), static_cast<double>(time_next), static_cast<double>(time_exec), static_cast<double>(time_minDe));
 			return convergence_state::complete;
 		}
 	}
@@ -239,7 +248,8 @@ convergence_state TimeCoordinator::checkTimeGrant()
 		upd.info().Te = time_exec;
 		upd.info().Tdemin = time_minDe;
 		sendMessageFunction(upd);
-		//printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next), static_cast<double>(time_exec), static_cast<double>(time_minDe));
+		
+	//	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next), static_cast<double>(time_exec), static_cast<double>(time_minDe));
 	}
 	return convergence_state::continue_processing;
 }

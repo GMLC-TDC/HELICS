@@ -248,19 +248,20 @@ BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed_multisend)
 }
 
 #define ENABLE_OUTPUT
-//trivial Federate that sends Messages and echos a ping with a pong
+/**trivial Federate that sends Messages and echos a ping with a pong
+*/
 class pingpongFed
 {
 private:
 	std::unique_ptr<helics::MessageFederate> mFed;
-	helics::Time delta;
-	std::string name;
+	helics::Time delta; //the minimum time delta for the federate
+	std::string name;	//!< the name of the federate
 	std::vector<std::pair<helics::Time, std::string>> triggers;
 	helics::endpoint_id_t ep;
 	int index = 0;
 public:
-	int pings=0;
-	int pongs=0;
+	int pings=0;  //!< the number of pings received
+	int pongs=0;	//!< the number of pongs received
 public:
 	pingpongFed(std::string fname,helics::Time tDelta) :
 		delta(tDelta),name(std::move(fname))
@@ -430,22 +431,22 @@ BOOST_AUTO_TEST_CASE(test_time_interruptions)
 
 	BOOST_REQUIRE_EQUAL(gtime,0.5);
 	
-	BOOST_REQUIRE(mFed1->hasMessage(epid));
+	BOOST_REQUIRE(mFed2->hasMessage(epid));
 	
 
-	auto M1 = mFed1->getMessage(epid);
-	BOOST_REQUIRE_EQUAL(M1->data.size(), data2.size());
+	auto M2 = mFed2->getMessage(epid2);
+	BOOST_REQUIRE_EQUAL(M2->data.size(), data.size());
 
-	BOOST_CHECK_EQUAL(M1->data[245], data2[245]);
+	BOOST_CHECK_EQUAL(M2->data[245], data[245]);
 
 	gtime = mFed2->requestTime(1.0);
 	BOOST_CHECK_EQUAL(gtime, 1.0);
 
 	BOOST_CHECK_EQUAL(f1time.get(), 1.0);
-	auto M2 = mFed2->getMessage(epid2);
-	BOOST_REQUIRE_EQUAL(M2->data.size(), data.size());
+	auto M1 = mFed1->getMessage(epid);
+	BOOST_REQUIRE_EQUAL(M1->data.size(), data2.size());
 
-	BOOST_CHECK_EQUAL(M2->data[245], data[245]);
+	BOOST_CHECK_EQUAL(M1->data[245], data2[245]);
 
 	BOOST_CHECK(mFed1->hasMessage()==false);
 	mFed1->finalize();
