@@ -129,16 +129,18 @@ bool CommonCore::connect ()
     if (coreState >= core_state_t::initialized)
     {
         core_state_t exp = core_state_t::initialized;
-        if (coreState.compare_exchange_strong (exp, core_state_t::connected))
+        if (coreState.compare_exchange_strong (exp, core_state_t::connecting))
         {
             bool res = brokerConnect ();
             if (res)
             {
                 // now register this core object as a broker
+				
                 ActionMessage m (CMD_REG_BROKER);
                 m.name = getIdentifier ();
                 m.info ().target = getAddress ();
                 transmit (0, m);
+				coreState = core_state_t::connected;
             }
             else
             {
@@ -146,9 +148,15 @@ bool CommonCore::connect ()
             }
             return res;
         }
-        return true;
+		if (coreState == core_state_t::connecting)
+		{
+			while (coreState == core_state_t::connecting)
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(20));
+			}
+		}
     }
-    return false;
+    return isConnected();
 }
 
 
@@ -165,7 +173,11 @@ void CommonCore::disconnect ()
     auto keepCoreAlive = CoreFactory::findCore (identifier);
     if (keepCoreAlive)
     {
-        CoreFactory::unregisterCore (identifier);
+		if (keepCoreAlive.get() == this)
+		{
+			CoreFactory::unregisterCore(identifier);
+		}
+       
     }
 
     if (!prevIdentifier.empty ())
@@ -173,7 +185,10 @@ void CommonCore::disconnect ()
         auto keepCoreAlive2 = CoreFactory::findCore (prevIdentifier);
         if (keepCoreAlive2)
         {
-            CoreFactory::unregisterCore (prevIdentifier);
+			if (keepCoreAlive2.get() == this)
+			{
+				CoreFactory::unregisterCore(prevIdentifier);
+			}
         }
     }
 }
@@ -274,7 +289,7 @@ CommonCore::~CommonCore ()
 {
     if (_queue_processing_thread.joinable ())
     {
-        _queue.push (CMD_STOP);
+        _queue.push (CMD_HARD_STOP);
         _queue_processing_thread.join ();
     }
 }
@@ -1468,6 +1483,8 @@ void CommonCore::queueProcessingLoop ()
         {
         case CMD_IGNORE:
             break;
+		case CMD_HARD_STOP:
+			return; //immediate return
         case CMD_STOP:
             processCommand (command);
             return disconnect ();  // this can potential cause object destruction so do nothing after this call
@@ -1563,12 +1580,15 @@ void CommonCore::processCommand (ActionMessage &command)
     case CMD_IGNORE:
         break;
     case CMD_STOP:
-        if (!allDisconnected ())
-        {  // only send a disconnect message if we haven't done so already
-            ActionMessage m (CMD_DISCONNECT);
-            m.source_id = global_broker_id;
-            transmit (0, m);
-        }
+		if (isConnected())
+		{
+			if (!allDisconnected())
+			{  // only send a disconnect message if we haven't done so already
+				ActionMessage m(CMD_DISCONNECT);
+				m.source_id = global_broker_id;
+				transmit(0, m);
+			}
+		}
         break;
     case CMD_TIME_REQUEST:
     case CMD_TIME_GRANT:

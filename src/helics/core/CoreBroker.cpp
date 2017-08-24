@@ -50,6 +50,8 @@ void CoreBroker::queueProcessingLoop ()
         {
         case CMD_IGNORE:
             break;
+		case CMD_HARD_STOP:
+			return; //immediate return
         case CMD_STOP:
 			processCommand(command);
 			return disconnect();
@@ -64,7 +66,7 @@ CoreBroker::~CoreBroker ()
 {
     if (_queue_processing_thread.joinable())
     {
-		_queue.push(CMD_STOP);
+		_queue.push(CMD_HARD_STOP);
 		_queue_processing_thread.join();
     }
 }
@@ -827,10 +829,10 @@ void CoreBroker::setAsRoot()
 
 bool CoreBroker::connect ()
 {
-    if (brokerState<broker_state_t::connectedA)
+    if (brokerState<broker_state_t::connected)
     {
         broker_state_t exp = broker_state_t::initialized;
-        if (brokerState.compare_exchange_strong (exp, broker_state_t::connectedA))
+        if (brokerState.compare_exchange_strong (exp, broker_state_t::connecting))
         {
             auto res = brokerConnect ();
             if (res)
@@ -848,12 +850,25 @@ bool CoreBroker::connect ()
 				}
 				brokerState = broker_state_t::connected;
             }
+			else
+			{
+				brokerState = broker_state_t::initialized;
+			}
             return res;
         }
-        return true;
+		if (brokerState == broker_state_t::connecting)
+		{
+			while (brokerState == broker_state_t::connecting)
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(20));
+			}
+		}
     }
-    return false;
+	return isConnected();
 }
+
+
+bool CoreBroker::isConnected() const { return ((brokerState == operating) || (brokerState == connected)); }
 
 void CoreBroker::disconnect()
 {

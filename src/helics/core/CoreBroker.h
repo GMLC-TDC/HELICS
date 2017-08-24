@@ -108,7 +108,7 @@ protected:
 	{
 		created = -5,
 		initialized = -4,
-		connectedA = -3,
+		connecting = -3,
 		connected = -2,
 		operating = 0,
 		terminated = 3,
@@ -144,7 +144,8 @@ public:
 	/** disconnect the broker from any other brokers and communications
 	*/
 	void disconnect();
-	
+	/** check if the broker is connected*/
+	bool isConnected() const;
 	/** set the broker to be a root broker
 	@details only valid before the initialization function is called*/
 	void setAsRoot();

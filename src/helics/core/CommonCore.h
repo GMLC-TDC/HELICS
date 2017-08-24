@@ -178,11 +178,12 @@ private:
 	void routeMessage(const ActionMessage &cmd);
 protected:
 	/** enumeration of the possible core states*/
-	enum core_state_t:int
+	enum core_state_t :int
 	{
-		created=-5,
-		initialized=-3,
-		connected=-1,
+		created = -5,
+		initialized = -3,
+		connecting = -2,
+		connected = -1,
 		operating=0,
 		terminated=3,
 		errored=7,

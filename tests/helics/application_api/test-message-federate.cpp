@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed_multisend)
 	BOOST_CHECK(mFed2->currentState() == helics::Federate::op_states::finalize);
 }
 
-//#define ENABLE_OUTPUT
+#define ENABLE_OUTPUT
 //trivial Federate that sends Messages and echos a ping with a pong
 class pingpongFed
 {
@@ -275,15 +275,18 @@ private:
 	void initialize()
 	{
 		helics::FederateInfo fi(name);
-		fi.coreName = "test";
+		fi.coreName = "pptest";
 		fi.coreType = CORE_TYPE_TO_TEST;
 		fi.coreInitString = "3";
 		fi.timeDelta = delta;
+#ifdef ENABLE_OUTPUT
+		std::cout << std::string("about to create federate ") + name + "\n";
+#endif
 		mFed = std::make_unique<helics::MessageFederate>(fi);
-		ep=mFed->registerEndpoint("port");
 #ifdef ENABLE_OUTPUT
 		std::cout << std::string("registering federate ")+name+"\n";
 #endif
+		ep = mFed->registerEndpoint("port");
 	}
 
 private:
@@ -368,12 +371,12 @@ BOOST_AUTO_TEST_CASE(threefedPingPong)
 	pingpongFed p2("fedB", 0.5);
 	pingpongFed p3("fedC", 0.5);
 
-	p1.addTrigger(0.5, "fedB.port");
-	p1.addTrigger(0.5, "fedC.port");
-	p1.addTrigger(3.0, "fedB.port");
-	p2.addTrigger(1.5, "fedA.port");
-	p3.addTrigger(3.0, "fedB.port");
-	p3.addTrigger(4.0, "fedA.port");
+	p1.addTrigger(0.5, "fedB/port");
+	p1.addTrigger(0.5, "fedC/port");
+	p1.addTrigger(3.0, "fedB/port");
+	p2.addTrigger(1.5, "fedA/port");
+	p3.addTrigger(3.0, "fedB/port");
+	p3.addTrigger(4.0, "fedA/port");
 
 	auto t1 = std::thread([&p1]() {p1.run(6.0); });
 	auto t2 = std::thread([&p2]() {p2.run(6.0); });
@@ -419,7 +422,7 @@ BOOST_AUTO_TEST_CASE(test_time_interruptions)
 	helics::data_block data2(400, 'b');
 
 	mFed1->sendMessage(epid, "ep2", data);
-	mFed2->sendMessage(epid2, "test1.ep1", data2);
+	mFed2->sendMessage(epid2, "test1/ep1", data2);
 	//move the time to 1.0
 	auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
 	auto gtime = mFed2->requestTime(1.0);
@@ -436,9 +439,9 @@ BOOST_AUTO_TEST_CASE(test_time_interruptions)
 	BOOST_CHECK_EQUAL(M1->data[245], data2[245]);
 
 	gtime = mFed2->requestTime(1.0);
-	BOOST_CHECK_EQUAL(f1time.get(), 0.5);
 	BOOST_CHECK_EQUAL(gtime, 1.0);
 
+	BOOST_CHECK_EQUAL(f1time.get(), 1.0);
 	auto M2 = mFed2->getMessage(epid2);
 	BOOST_REQUIRE_EQUAL(M2->data.size(), data.size());
 

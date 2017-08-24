@@ -186,7 +186,15 @@ std::shared_ptr<Core> CoreFactory::FindOrCreate(helics_core_type type,const std:
 	auto ccore = std::dynamic_pointer_cast<CommonCore>(core);
 	if (ccore)
 	{
-		registerCommonCore(ccore);
+		bool success=registerCommonCore(ccore);
+		if (!success)
+		{
+			core = findCore(core_name);
+			if (core)
+			{
+				return core;
+			}
+		}
 	}
 	return core;
 }

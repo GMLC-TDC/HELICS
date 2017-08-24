@@ -35,6 +35,7 @@ enum action_t : int32_t
 	cmd_register_route = 15,  //!< instructions to create a direct route to another federate
 	cmd_route_ack = 16,  //!< acknowledge reply to a route registration
 	cmd_stop = 20,  //!< halt execution
+	cmd_hard_stop = 22, //!< immediate halt no-disconnect;
 	cmd_fed_ack = 25,  //!<a reply with the global id or an error if the fed registration failed
 	cmd_broker_ack = 27,  // a reply to the connect command with a global route id
 	cmd_add_route = 32,  //!< command to define a route
@@ -88,6 +89,7 @@ enum action_t : int32_t
 #define CMD_REG_ROUTE action_message_def::action_t::cmd_register_route
 #define CMD_ROUTE_ACK action_message_def::action_t::cmd_route_ack
 #define CMD_STOP action_message_def::action_t::cmd_stop
+#define CMD_HARD_STOP action_message_def::action_t::cmd_hard_stop
 #define CMD_TIME_REQUEST action_message_def::action_t::cmd_time_request
 #define CMD_TIME_GRANT action_message_def::action_t::cmd_time_grant
 #define CMD_TIME_CHECK action_message_def::action_t::cmd_time_check

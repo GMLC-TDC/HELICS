@@ -107,7 +107,11 @@ BrokerFactory::create (helics_core_type type, const std::string &broker_name, st
         assert (false);
     }
     broker->Initialize (initializationString);
-    registerBroker (broker);
+    bool reg=registerBroker (broker);
+	if (!reg)
+	{
+
+	}
     return broker;
 }
 
