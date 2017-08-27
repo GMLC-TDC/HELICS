@@ -84,9 +84,6 @@ public:
 			if (pullElements.empty())
 			{  // if it is still empty push the single element on that vector
 				pullElements.push_back(std::forward<Z>(val));
-				pullLock.unlock();
-				condition_.notify_one();
-				// unlock occurs when we go out of scope, and only in extreme cases
 			}
 			else
 			{  // this really shouldn't happen except in rare instances of high contention
@@ -95,6 +92,8 @@ public:
 				std::lock_guard<std::mutex> pushLock(m_pushLock);  // second pushLock
 				pushElements.push_back(std::forward<Z>(val));
 			}
+			pullLock.unlock();
+			condition_.notify_one();
 		}
 
 	}
@@ -115,8 +114,6 @@ public:
 			if (pullElements.empty())
 			{  // if it is still empty emplace the single element on the pull vector
 				pullElements.emplace_back(std::forward<Args>(args)...);
-				pullLock.unlock();
-				condition_.notify_one();
 			}
 			else
 			{  // this really shouldn't happen except in rare instances
@@ -125,6 +122,8 @@ public:
 				std::lock_guard<std::mutex> pushLock(m_pushLock);  // second pushLock
 				pushElements.emplace_back(std::forward<Args>(args)...);
 			}
+			pullLock.unlock();
+			condition_.notify_one();
 		}
 	}
 
