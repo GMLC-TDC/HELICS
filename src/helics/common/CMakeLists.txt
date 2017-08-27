@@ -7,6 +7,7 @@
 
 set(common_headers
 simpleQueue.hpp
+BlockingQueue.hpp
 timeRepresentation.hpp
 blocking_queue.h
 stringToCmdLine.h

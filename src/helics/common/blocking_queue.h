@@ -120,17 +120,6 @@ stx::optional<T> BlockingQueue<T>::try_peek() const {
 }
 
 template<typename T>
-T BlockingQueue<T>::peek() {
-  std::unique_lock<std::mutex> lock(mutex_);
-
-  while (queue_.empty()) {
-    condition_.wait(lock);
-  }
-
-  return queue_.front();
-}
-
-template<typename T>
 size_t BlockingQueue<T>::size() const {
   std::lock_guard<std::mutex> lock(mutex_);
   return queue_.size();

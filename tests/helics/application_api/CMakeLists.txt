@@ -15,6 +15,7 @@ application-api-tests.cpp
 data-block-tests.cpp
 data-view-tests.cpp
 test-simple-queue.cpp
+testBlockingQueue.cpp
 test-value-federate1.cpp
 test-value-federate2.cpp
 test-message-federate.cpp

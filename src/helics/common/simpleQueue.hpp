@@ -56,7 +56,10 @@ class simpleQueue
         return *this;
     }
     // const functions should be thread safe
-    /** check whether there are any elements in the queue*/
+    /** check whether there are any elements in the queue
+	because this is meant for mutlti threaded applications this may or may not have any meaning
+	depending on the number of consumers
+	*/
     bool empty () const 
 	{ 
 		std::lock_guard<std::mutex> pullLock(m_pullLock);  // first pullLock
