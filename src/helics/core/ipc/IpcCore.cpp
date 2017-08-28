@@ -242,20 +242,21 @@ void IpcCore::brokerDisconnect()
 void IpcCore::transmit(int route_id, const ActionMessage &cmd)
 {
 	std::string buffer = cmd.to_string();
+	int priority = isPriorityCommand(cmd) ? 3 : 0;
 	if (route_id == 0)
 	{
-		brokerQueue->send(buffer.data(), buffer.size(), 1);
+		brokerQueue->send(buffer.data(), buffer.size(), priority);
 	}
 	else if (route_id == -1)
 	{
-		rxQueue->send(buffer.data(), buffer.size(), 1);
+		rxQueue->send(buffer.data(), buffer.size(), priority);
 	}
 	else
 	{
 		auto routeFnd = routes.find(route_id);
 		if (routeFnd != routes.end())
 		{
-			routeFnd->second->send(buffer.data(), buffer.size(), 1);
+			routeFnd->second->send(buffer.data(), buffer.size(), priority);
 		}
 	}
 }
@@ -264,8 +265,15 @@ void IpcCore::addRoute(int route_id, const std::string &routeInfo)
 {
 	if (boost::filesystem::exists(routeInfo))
 	{
-		auto newQueue = std::make_unique<ipc_queue>(boost::interprocess::open_only, routeInfo.c_str());
-		routes.emplace(route_id, std::move(newQueue));
+		try
+		{
+			auto newQueue = std::make_unique<ipc_queue>(boost::interprocess::open_only, routeInfo.c_str());
+			routes.emplace(route_id, std::move(newQueue));
+		}
+		catch (boost::interprocess::interprocess_exception const& ipe)
+		{
+			//TODO:: what todo now?  
+		}
 	}
 }
 

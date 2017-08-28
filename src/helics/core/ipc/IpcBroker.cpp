@@ -228,24 +228,26 @@ void IpcBroker::brokerDisconnect()
 
 void IpcBroker::transmit(int route_id, const ActionMessage &cmd)
 {
+	int priority = isPriorityCommand(cmd) ? 3 : 0;
 	std::string buffer = cmd.to_string();
+
 	if (route_id == 0)
 	{
 		if (!isRoot())
 		{
-			brokerQueue->send(buffer.data(), buffer.size(), 1);
+			brokerQueue->send(buffer.data(), buffer.size(), priority);
 		}
 	}
 	else if (route_id == -1)
 	{
-		rxQueue->send(buffer.data(), buffer.size(), 1);
+		rxQueue->send(buffer.data(), buffer.size(), priority);
 	}
 	else
 	{
 		auto routeFnd = routes.find(route_id);
 		if (routeFnd != routes.end())
 		{
-			routeFnd->second->send(buffer.data(), buffer.size(), 1);
+			routeFnd->second->send(buffer.data(), buffer.size(), priority);
 		}
 	}
 }
