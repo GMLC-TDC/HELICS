@@ -26,17 +26,6 @@ subPubObjectTests.cpp
 testFixtures.cpp
 )
 
-set (zmq_test_sources
-BrokerRunner.cpp
-BrokerRunner.h
-zmq-test-cases1.cpp
-zmq-test-cases2.cpp
-)
-
-if (${ZMQ_FOUND})
-   list(APPEND application_api_test_sources ${zmq_test_sources})
-endif (${ZMQ_FOUND})
-
 add_executable(application-api-tests ${application_api_test_sources} ${application_api_test_headers})
 target_link_libraries(application-api-tests helics)
 
