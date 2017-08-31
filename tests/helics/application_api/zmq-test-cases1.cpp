@@ -10,14 +10,14 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "helics/application_api/ValueFederate.h"
 #include "test_configuration.h"
-#include "zmqBrokerRunner.h"
+#include "BrokerRunner.h"
 #include <future>
 /** these test cases test out the value federates
  */
 
 BOOST_AUTO_TEST_SUITE (zmq_value_federate_tests1)
 
-static const BrokerRunner zmqRunner(HELICSINSTALL_LOCATION, HELICS_ZMQ_BROKER_LOCATION, "helics_broker");
+static const BrokerRunner zmqRunner(HELICS_INSTALL_LOCATION, HELICS_BROKER_LOCATION, "helics_broker");
 #define ZMQ_CORE_TYPE "zmq"
 
 /** test simple creation and destruction*/

@@ -20,7 +20,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <future>
 
 
-BOOST_AUTO_TEST_SUITE(subpubObject_tests)
+BOOST_AUTO_TEST_SUITE(subPubObject_tests)
 
 BOOST_AUTO_TEST_CASE(subscriptionObject_tests)
 {

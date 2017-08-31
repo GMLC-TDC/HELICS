@@ -6,6 +6,7 @@
 ##############################################################################
 
 set(application_api_test_headers
+testFixtures.h
 )
 
 set(application_api_test_sources
@@ -22,11 +23,12 @@ test-filter-federate.cpp
 federate_tests.cpp
 heat-transfer-tests.cpp
 subPubObjectTests.cpp
+testFixtures.cpp
 )
 
 set (zmq_test_sources
-zmqBrokerRunner.cpp
-zmqBrokerRunner.h
+BrokerRunner.cpp
+BrokerRunner.h
 zmq-test-cases1.cpp
 zmq-test-cases2.cpp
 )
@@ -44,8 +46,8 @@ include_directories(${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 
 target_link_libraries(application-api-tests ${external_library_list})
-ADD_DEFINITIONS(-DHELICS_ZMQ_BROKER_LOCATION="${HELICS_BROKER_LOC}")
-ADD_DEFINITIONS(-DHELICSINSTALL_LOCATION="${CMAKE_INSTALL_PREFIX}")
+ADD_DEFINITIONS(-DHELICS_BROKER_LOCATION="${HELICS_BROKER_LOC}")
+ADD_DEFINITIONS(-DHELICS_INSTALL_LOCATION="${CMAKE_INSTALL_PREFIX}")
 
 add_test(NAME application-api-tests COMMAND application-api-tests)
 

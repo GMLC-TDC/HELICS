@@ -7,192 +7,177 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
 
 #include "helics/application_api/ValueFederate.h"
 #include "helics/application_api/Message.h"
 #include "test_configuration.h"
+#include "testFixtures.h"
 #include <future>
 /** these test cases test out the value converters and some of the other functions
 */
 
-BOOST_AUTO_TEST_SUITE(value_federate_tests2)
+BOOST_FIXTURE_TEST_SUITE(value_federate_tests2, ValueFederateTestFixture)
+
+namespace bdata = boost::unit_test::data;
+const std::string core_types[] = { "test" };
+
 
 /** test block send and receive*/
-BOOST_AUTO_TEST_CASE(test_block_send_receive)
+BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type)
 {
-	helics::FederateInfo fi("test1");
-	fi.coreType = CORE_TYPE_TO_TEST;
-	fi.coreInitString = "1";
+    Setup1FederateTest(core_type);
 
-	auto vFed = std::make_shared<helics::ValueFederate>(fi);
+	vFed1->registerPublication<std::string>("pub1");
+	vFed1->registerGlobalPublication<int>("pub2");
 
-	vFed->registerPublication<std::string>("pub1");
-	vFed->registerGlobalPublication<int>("pub2");
+	auto pubid3 = vFed1->registerPublication("pub3", "");
 
-	auto pubid3 = vFed->registerPublication("pub3", "");
-
-	auto sub1 = vFed->registerOptionalSubscription("test1/pub3","");
+	auto sub1 = vFed1->registerOptionalSubscription("test1/pub3","");
 
 	helics::data_block db(547, ';');
 
-	vFed->enterExecutionState();
-	vFed->publish(pubid3, db);
-	vFed->requestTime(1.0);
-	BOOST_CHECK(vFed->isUpdated(sub1));
-	auto res = vFed->getValueRaw(sub1);
+	vFed1->enterExecutionState();
+	vFed1->publish(pubid3, db);
+	vFed1->requestTime(1.0);
+	BOOST_CHECK(vFed1->isUpdated(sub1));
+	auto res = vFed1->getValueRaw(sub1);
 	BOOST_CHECK_EQUAL(res.size(), db.size());
-	BOOST_CHECK(vFed->isUpdated(sub1)==false);
+	BOOST_CHECK(vFed1->isUpdated(sub1)==false);
 
 }
 
+
 /** test the all callback*/
-BOOST_AUTO_TEST_CASE(test_all_callback)
+BOOST_DATA_TEST_CASE(test_all_callback, bdata::make(core_types), core_type)
 {
-	helics::FederateInfo fi("test1");
-	fi.coreType = CORE_TYPE_TO_TEST;
-	fi.coreInitString = "1";
-	fi.timeDelta = 1.0;
+    Setup1FederateTest(core_type, 1.0);
 
-	auto vFed = std::make_shared<helics::ValueFederate>(fi);
+	auto pubid1 = vFed1->registerPublication<std::string>("pub1");
+	auto pubid2 = vFed1->registerGlobalPublication<int>("pub2");
 
-	auto pubid1 = vFed->registerPublication<std::string>("pub1");
-	auto pubid2 = vFed->registerGlobalPublication<int>("pub2");
+	auto pubid3 = vFed1->registerPublication("pub3", "");
 
-	auto pubid3 = vFed->registerPublication("pub3", "");
-
-	auto sub1 = vFed->registerOptionalSubscription("test1/pub1", "");
-	auto sub2 = vFed->registerOptionalSubscription("pub2", "");
-	auto sub3 = vFed->registerOptionalSubscription("test1/pub3", "");
+	auto sub1 = vFed1->registerOptionalSubscription("test1/pub1", "");
+	auto sub2 = vFed1->registerOptionalSubscription("pub2", "");
+	auto sub3 = vFed1->registerOptionalSubscription("test1/pub3", "");
 
 	helics::data_block db(547, ';');
 	helics::subscription_id_t lastId;
 	helics::Time lastTime;
-	vFed->registerSubscriptionNotificationCallback([&](helics::subscription_id_t subid, helics::Time callTime) {lastTime = callTime; lastId = subid; });
-	vFed->enterExecutionState();
-	vFed->publish(pubid3, db);
-	vFed->requestTime(1.0);
+	vFed1->registerSubscriptionNotificationCallback([&](helics::subscription_id_t subid, helics::Time callTime) {lastTime = callTime; lastId = subid; });
+	vFed1->enterExecutionState();
+	vFed1->publish(pubid3, db);
+	vFed1->requestTime(1.0);
 	//the callback should have occured here
 	BOOST_CHECK(lastId == sub3);
 	BOOST_CHECK_EQUAL(lastTime, 1.0);
-	BOOST_CHECK_EQUAL(vFed->getLastUpdateTime(sub3), lastTime);
-	vFed->publish(pubid2, 4);
-	vFed->requestTime(2.0);
+	BOOST_CHECK_EQUAL(vFed1->getLastUpdateTime(sub3), lastTime);
+	vFed1->publish(pubid2, 4);
+	vFed1->requestTime(2.0);
 	//the callback should have occured here
 	BOOST_CHECK(lastId == sub2);
 	BOOST_CHECK_EQUAL(lastTime, 2.0);
-	vFed->publish(pubid1, "this is a test");
-	vFed->requestTime(3.0);
+	vFed1->publish(pubid1, "this is a test");
+	vFed1->requestTime(3.0);
 	//the callback should have occured here
 	BOOST_CHECK(lastId == sub1);
 	BOOST_CHECK_EQUAL(lastTime, 3.0);
 
 	int ccnt = 0;
-	vFed->registerSubscriptionNotificationCallback([&](helics::subscription_id_t , helics::Time ) {++ccnt; });
+	vFed1->registerSubscriptionNotificationCallback([&](helics::subscription_id_t , helics::Time ) {++ccnt; });
 
-	vFed->publish(pubid3, db);
-	vFed->publish(pubid2, 4);
-	vFed->requestTime(4.0);
+	vFed1->publish(pubid3, db);
+	vFed1->publish(pubid2, 4);
+	vFed1->requestTime(4.0);
 	//the callback should have occured here
 	BOOST_CHECK_EQUAL(ccnt,2);
 	ccnt = 0; //reset the counter
-	vFed->publish(pubid3, db);
-	vFed->publish(pubid2, 4);
-	vFed->publish(pubid1, "test string2");
-	vFed->requestTime(5.0);
+	vFed1->publish(pubid3, db);
+	vFed1->publish(pubid2, 4);
+	vFed1->publish(pubid1, "test string2");
+	vFed1->requestTime(5.0);
 	//the callback should have occured here
 	BOOST_CHECK_EQUAL(ccnt, 3);
-	vFed->finalize();
+	vFed1->finalize();
 }
 
 
 /** test the callback specification with a vector list*/
-BOOST_AUTO_TEST_CASE(test_vector_callback_lists)
+BOOST_DATA_TEST_CASE(test_vector_callback_lists, bdata::make(core_types), core_type)
 {
-	helics::FederateInfo fi("test1");
-	fi.coreType = CORE_TYPE_TO_TEST;
-	fi.coreInitString = "1";
-	fi.timeDelta = 1.0;
-	auto vFed = std::make_shared<helics::ValueFederate>(fi);
+    Setup1FederateTest(core_type, 1.0);
 
-	auto pubid1 = vFed->registerPublication<std::string>("pub1");
-	auto pubid2 = vFed->registerGlobalPublication<int>("pub2");
+	auto pubid1 = vFed1->registerPublication<std::string>("pub1");
+	auto pubid2 = vFed1->registerGlobalPublication<int>("pub2");
 
-	auto pubid3 = vFed->registerPublication("pub3", "");
+	auto pubid3 = vFed1->registerPublication("pub3", "");
 
-	auto sub1 = vFed->registerOptionalSubscription("test1/pub1", "");
-	auto sub2 = vFed->registerOptionalSubscription("pub2", "");
-	auto sub3 = vFed->registerOptionalSubscription("test1/pub3", "");
+	auto sub1 = vFed1->registerOptionalSubscription("test1/pub1", "");
+	auto sub2 = vFed1->registerOptionalSubscription("pub2", "");
+	auto sub3 = vFed1->registerOptionalSubscription("test1/pub3", "");
 
 	helics::data_block db(547, ';');
 	helics::subscription_id_t lastId;
 	int ccnt = 0;
 	//set subscriptions 1 and 2 to have callbacks
-	vFed->registerSubscriptionNotificationCallback({ sub1,sub2 },[&](helics::subscription_id_t, helics::Time ) {++ccnt; });
-	vFed->enterExecutionState();
-	vFed->publish(pubid3, db);
-	vFed->requestTime(1.0);
+	vFed1->registerSubscriptionNotificationCallback({ sub1,sub2 },[&](helics::subscription_id_t, helics::Time ) {++ccnt; });
+	vFed1->enterExecutionState();
+	vFed1->publish(pubid3, db);
+	vFed1->requestTime(1.0);
 	//callbacks here
 	BOOST_CHECK_EQUAL(ccnt, 0);
 	
-	vFed->publish(pubid1, "this is a test");
-	vFed->requestTime(3.0);
+	vFed1->publish(pubid1, "this is a test");
+	vFed1->requestTime(3.0);
 	BOOST_CHECK_EQUAL(ccnt, 1);
 
 	ccnt = 0; //reset the counter
-	vFed->publish(pubid3, db);
-	vFed->publish(pubid2, 4);
-	vFed->publish(pubid1, "test string2");
-	vFed->requestTime(5.0);
+	vFed1->publish(pubid3, db);
+	vFed1->publish(pubid2, 4);
+	vFed1->publish(pubid1, "test string2");
+	vFed1->requestTime(5.0);
 	BOOST_CHECK_EQUAL(ccnt, 2);
 
-	BOOST_CHECK_CLOSE(static_cast<double>(vFed->getLastUpdateTime(sub3)), 3.0,0.000001);
-	vFed->finalize();
+	BOOST_CHECK_CLOSE(static_cast<double>(vFed1->getLastUpdateTime(sub3)), 3.0,0.000001);
+	vFed1->finalize();
 }
 
 
 /** test the publish/subscribe to a vectorized array*/
-BOOST_AUTO_TEST_CASE(test_indexed_pubs_subs)
+BOOST_DATA_TEST_CASE(test_indexed_pubs_subs, bdata::make(core_types), core_type)
 {
-	helics::FederateInfo fi("test1");
-	fi.coreType = CORE_TYPE_TO_TEST;
-	fi.coreInitString = "1";
+    Setup1FederateTest(core_type);
 
-	auto vFed = std::make_shared<helics::ValueFederate>(fi);
+	auto pubid1 = vFed1->registerPublicationIndexed<double>("pub1",0);
+	auto pubid2 = vFed1->registerPublicationIndexed<double>("pub1",1);
 
-	auto pubid1 = vFed->registerPublicationIndexed<double>("pub1",0);
-	auto pubid2 = vFed->registerPublicationIndexed<double>("pub1",1);
+	auto pubid3 = vFed1->registerPublicationIndexed<double>("pub1", 2);
 
-	auto pubid3 = vFed->registerPublicationIndexed<double>("pub1", 2);
+	auto sub1 = vFed1->registerOptionalSubscriptionIndexed<double>("pub1", 0);
+	auto sub2 = vFed1->registerOptionalSubscriptionIndexed<double>("pub1", 1);
+	auto sub3 = vFed1->registerOptionalSubscriptionIndexed<double>("pub1", 2);
+	vFed1->enterExecutionState();
 
-	auto sub1 = vFed->registerOptionalSubscriptionIndexed<double>("pub1", 0);
-	auto sub2 = vFed->registerOptionalSubscriptionIndexed<double>("pub1", 1);
-	auto sub3 = vFed->registerOptionalSubscriptionIndexed<double>("pub1", 2);
-	vFed->enterExecutionState();
-
-	vFed->publish(pubid1, 10.0);
-	vFed->publish(pubid2, 20.0);
-	vFed->publish(pubid3, 30.0);
-	vFed->requestTime(2.0);
-	auto v1 = vFed->getValue<double>(sub1);
-	auto v2 = vFed->getValue<double>(sub2);
-	auto v3 = vFed->getValue<double>(sub3);
+	vFed1->publish(pubid1, 10.0);
+	vFed1->publish(pubid2, 20.0);
+	vFed1->publish(pubid3, 30.0);
+	vFed1->requestTime(2.0);
+	auto v1 = vFed1->getValue<double>(sub1);
+	auto v2 = vFed1->getValue<double>(sub2);
+	auto v3 = vFed1->getValue<double>(sub3);
 
 	BOOST_CHECK_CLOSE(10.0, v1, 0.00000001);
 	BOOST_CHECK_CLOSE(20.0, v2, 0.00000001);
 	BOOST_CHECK_CLOSE(30.0, v3, 0.00000001);
-	vFed->finalize();
 }
 
-/** test the publish/subscribe to a vectorized array*/
-BOOST_AUTO_TEST_CASE(test_async_calls)
-{
-	helics::FederateInfo fi("test1");
-	fi.coreType = CORE_TYPE_TO_TEST;
-	fi.coreInitString = "2";
 
-	auto vFed1 = std::make_shared<helics::ValueFederate>(fi);
-	fi.name = "test2";
-	auto vFed2 = std::make_shared<helics::ValueFederate>(fi);
+/** test the publish/subscribe to a vectorized array*/
+BOOST_DATA_TEST_CASE(test_async_calls, bdata::make(core_types), core_type)
+{
+    Setup2FederateTest(core_type);
+
 	// register the publications
 	auto pubid = vFed1->registerGlobalPublication<std::string>("pub1");
 
@@ -244,18 +229,19 @@ BOOST_AUTO_TEST_CASE(test_async_calls)
 	vFed2->finalize();
 }
 
+
 /** test the default constructor and move constructor and move assignment*/
-BOOST_AUTO_TEST_CASE(test_move_calls)
+BOOST_DATA_TEST_CASE(test_move_calls, bdata::make(core_types), core_type)
 {
 	helics::ValueFederate vFed;
 	
-	helics::FederateInfo fi("test1", CORE_TYPE_TO_TEST);
+	helics::FederateInfo fi("test1", core_type);
 	fi.coreInitString = "3";
 	vFed = helics::ValueFederate(fi);
 	BOOST_CHECK(vFed.getName() == "test1");
 
-	helics::ValueFederate vFed2(std::move(vFed));
-	BOOST_CHECK(vFed2.getName() == "test1");
+	helics::ValueFederate vFedMoved(std::move(vFed));
+	BOOST_CHECK(vFedMoved.getName() == "test1");
 	BOOST_CHECK(vFed.getName().empty());
 }
 
