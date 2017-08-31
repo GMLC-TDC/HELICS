@@ -177,9 +177,7 @@ bool IpcCore::brokerConnect()
 {
 	if (fileloc.empty())
 	{
-		auto tempPath = boost::filesystem::temp_directory_path();
-		auto tname = tempPath / (getIdentifier() + "_queue.hqf");
-		fileloc = tname.string();
+		fileloc = getIdentifier() + "_queue.hqf";
 	}
 
 		try
@@ -198,8 +196,7 @@ bool IpcCore::brokerConnect()
 		{
 			brokername = "_ipc";
 		}
-		auto tname = tempPath / (brokername + "_queue.hqf");
-		brokerloc = tname.string();
+		brokerloc = brokername + "_queue.hqf";
 	}
 	int sleep_counter = 50;
 	while (!boost::filesystem::exists(brokerloc))
