@@ -193,7 +193,7 @@ void ZmqCore::transmitData ()
     std::string controlsockString = "inproc://" + getIdentifier () + "_control";
     controlSocket.bind (controlsockString.c_str ());
     // the receiver thread that is managed by this thread
-    std::thread rxThread;
+	std::thread rxThread;
     std::vector<char> buffer;
     std::vector<char> rxbuffer (4096);
     while (1)
@@ -243,6 +243,9 @@ void ZmqCore::transmitData ()
     reqSocket.close ();
     brokerPushSocket.close ();
     pushSockets.clear ();
+	controlSocket.send("close");
+	controlSocket.close();
+	rxThread.join();
 }
 
 void ZmqCore::receiveData ()
@@ -255,7 +258,52 @@ void ZmqCore::receiveData ()
     std::string controlsockString = "inproc://" + getIdentifier () + "_control";
     controlSocket.connect (controlsockString.c_str ());
 
-    // TODO:: manage the polling loop
+	zmq::socket_t repSocket(ctx->getContext(), ZMQ_REP);
+	repSocket.bind(brokerRepAddress.c_str());
+	std::vector<zmq::pollitem_t> poller(3);
+	poller[0].socket = static_cast<void *>(controlSocket);
+	poller[0].events= ZMQ_POLLIN;
+	poller[1].socket = static_cast<void *>(pullSocket);
+	poller[1].events = ZMQ_POLLIN;
+	poller[2].socket = static_cast<void *>(repSocket);
+	poller[2].events = ZMQ_POLLIN;
+	while (1)
+	{
+		auto rc = zmq::poll(poller);
+		if (rc > 0)
+		{
+			if ((poller[0].revents&ZMQ_POLLIN) != 0)
+			{
+				zmq::message_t msg;
+				controlSocket.recv(&msg);
+				if (msg.size() == 5)
+				{
+					if (std::string(static_cast<char *>(msg.data()), msg.size()) == "close")
+					{
+						break;
+					}
+				}
+			}
+			if ((poller[1].revents&ZMQ_POLLIN) != 0)
+			{
+				zmq::message_t msg;
+				pullSocket.recv(&msg);
+				ActionMessage M(static_cast<char *>(msg.data()), msg.size());
+				addCommand(std::move(M));
+			}
+			if ((poller[2].revents&ZMQ_POLLIN) != 0)
+			{
+				zmq::message_t msg;
+				repSocket.recv(&msg);
+				ActionMessage M(static_cast<char *>(msg.data()), msg.size());
+				addCommand(M);
+				ActionMessage resp(CMD_PRIORITY_ACK);
+				auto str = resp.to_string();
+				
+				repSocket.send(str.data(), str.size());
+			}
+		}
+	}
 }
 
 }  // namespace helics

@@ -17,12 +17,13 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 BOOST_AUTO_TEST_SUITE (zmq_value_federate_tests2)
 
-static const BrokerRunner zmqRunner(HELICSINSTALL_LOCATION, HELICS_ZMQ_BROKER_LOCATION, "helics_broker");
+
 #define ZMQ_CORE_TYPE "zmq"
 
 
 BOOST_AUTO_TEST_CASE (value_federate_dual_transfer)
 {
+	BrokerRunner zmqRunner(HELICSINSTALL_LOCATION, HELICS_ZMQ_BROKER_LOCATION, "helics_broker");
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
     helics::FederateInfo fi ("test1");
@@ -81,6 +82,7 @@ BOOST_AUTO_TEST_CASE (value_federate_dual_transfer)
 template <class X>
 void runDualFederateTest (const X &defaultValue, const X &testValue1, const X &testValue2)
 {
+	BrokerRunner zmqRunner(HELICSINSTALL_LOCATION, HELICS_ZMQ_BROKER_LOCATION, "helics_broker");
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
     helics::FederateInfo fi ("test1");
@@ -146,6 +148,7 @@ void runDualFederateTest (const X &defaultValue, const X &testValue1, const X &t
 template <class X>
 void runDualFederateTestv2 (const X &defaultValue, const X &testValue1, const X &testValue2)
 {
+	BrokerRunner zmqRunner(HELICSINSTALL_LOCATION, HELICS_ZMQ_BROKER_LOCATION, "helics_broker");
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
     helics::FederateInfo fi ("test1");
@@ -231,6 +234,7 @@ BOOST_AUTO_TEST_CASE (value_federate_dual_transfer_types)
 
 BOOST_AUTO_TEST_CASE(value_federate_single_init_publish)
 {
+	BrokerRunner zmqRunner(HELICSINSTALL_LOCATION, HELICS_ZMQ_BROKER_LOCATION, "helics_broker");
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
 	helics::FederateInfo fi("test1");

@@ -68,17 +68,17 @@ class ActionMessage
         }
     };
    
-    // need to make sure this object is under 64 bytes in size to fit in cache lines
+    // need to try to make sure this object is under 64 bytes in size to fit in cache lines
   private:
-    int32_t action_ = CMD_IGNORE;  // 4 -- command
+    action_message_def::action_t action_ = CMD_IGNORE;  // 4 -- command
   public:
     int32_t source_id = 0;  // 8 -- for federate_id or route_id
     int32_t source_handle = 0;  // 12 -- for local handle or local code
     int32_t dest_id = 0;  // 16 fed_id for a targeted message
     int32_t dest_handle = 0;  // 20 local handle for a targetted message
 	int32_t &index;			//alias to dest_handle 
-    bool iterationComplete = false;  // 24
-	bool &processingComplete;  //Alias to iterationComplete
+    bool iterationComplete = false;  // 24 indicator that iteration has been completed
+	bool &processingComplete;  //Alias to iterationComplete indictator that processing has been completed
     bool required = false;  //!< flag indicating a publication is required
     bool error = false;  //!< flag indicating an error condition associated with the command
     bool flag = false;  //!< general flag for many purposes
@@ -111,14 +111,17 @@ class ActionMessage
     /** move assignment*/
     ActionMessage &operator= (ActionMessage &&act) noexcept;
     /** get the action of the message*/
-    int32_t action () const noexcept { return action_; }
+    action_message_def::action_t action () const noexcept { return action_; }
     /** set the action*/
     void setAction (action_message_def::action_t action);
     /** get a reference to the additional info structure*/
     AdditionalInfo &info ();
     /** get a const ref to the info structure*/
     const AdditionalInfo &info () const;
-
+	/** move a message data into the actionMessage
+	@details take ownership of the message and move the contents out then destroy the message shell
+	@param message the message to move.  
+	*/
     void moveInfo (std::unique_ptr<Message> message);
 
     template <class Archive>
@@ -129,7 +132,7 @@ class ActionMessage
 
         auto btc = actionTime.getBaseTimeCode ();
         ar (btc, payload);
-        if (action_ >= cmd_info_basis)
+        if (hasInfo(action_))
         {
             ar (info_);
         }
@@ -145,7 +148,7 @@ class ActionMessage
         decltype (actionTime.getBaseTimeCode ()) btc;
         ar (btc, payload);
         actionTime.setBaseTimeCode (btc);
-        if (action_ >= cmd_info_basis)
+        if (hasInfo(action_))
         {
             if (!info_)
             {
@@ -166,6 +169,11 @@ class ActionMessage
 	void from_vector(const std::vector<char> &data);
 
 };
+
+inline bool hasInfo(action_message_def::action_t action)
+{
+	return ((action > action_message_def::action_t::null_info_command) || (action < action_message_def::action_t::priority_null_info_command));
+}
 
 
 /** create a new message object that copies all the information from the cmd into newly allocated memory for the

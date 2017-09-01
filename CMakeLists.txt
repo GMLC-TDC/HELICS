@@ -338,7 +338,6 @@ add_subdirectory (tests)
 #-----------------------------------------------------------------------------
 include (CTest)
 
-
 INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
 
 endif(BUILD_HELICS_TESTS)

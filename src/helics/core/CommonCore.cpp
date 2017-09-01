@@ -43,7 +43,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <glog/logging.h>
 #define ENDL ""
 #else
-#define LOG(LEVEL) std::cout
+#define LOG(LEVEL) std::cout 
 #define ENDL std::endl
 #endif
 #else
@@ -212,6 +212,10 @@ void argumentParser (int argc, char *argv[], boost::program_options::variables_m
 		("name,n", po::value<std::string>(), "name of the core")
 		("minfed", po::value<int>(), "type of the publication to use")
 		("maxiter",po::value<int>(),"maximum number of iterations")
+		("logfile",po::value<std::string>(),"the file to log message to")
+		("loglevel",po::value<int>(),"the level which to log the higher this is set to the more gets logs (-1) for no logging")
+		("fileloglevel",po::value<int>(),"the level at which messages get sent to the file")
+		("consoleloglevel",po::value<int>(),"the level at which message get sent to the console")
 		("identifier", po::value<std::string>(), "name of the core");
 		
 
@@ -1495,7 +1499,7 @@ void CommonCore::queueProcessingLoop ()
 }
 
 
-void CommonCore::processPriorityCommand (const ActionMessage &command)
+void CommonCore::processPriorityCommand(const ActionMessage &command)
 {
     // deal with a few types of message immediately
     switch (command.action ())
@@ -1555,6 +1559,21 @@ void CommonCore::processPriorityCommand (const ActionMessage &command)
 			addCommand(CMD_STOP);
 		}
 		break;
+		
+	case CMD_PRIORITY_ACK:
+	case CMD_ROUTE_ACK:
+		break;
+	default:
+	{
+		if (!isPriorityCommand(command))
+		{
+			//make a copy and go through the regular processing
+			ActionMessage cmd(command);
+			processCommand(cmd);
+		}
+		
+	}
+		
 	//case CMD_DISCONNECT_ACK:
 	//	break;
     }

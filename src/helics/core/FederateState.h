@@ -47,9 +47,9 @@ class FederateState
 	FederateState(const std::string &name_, const CoreFederateInfo &info_);
 	~FederateState();
   private:
-
+	  std::atomic<int> logLevel{ 2 }; //!< the logging level to use for logging
 	  std::string name;  //!< the name of the federate
-	  std::unique_ptr<TimeCoordinator> timeCoord;
+	  std::unique_ptr<TimeCoordinator> timeCoord;  //!< object that manages the time to determine granting
   public:
     Core::federate_id_t local_id = invalid_fed_id;  //!< id code, default to something invalid
     Core::federate_id_t global_id = invalid_fed_id;  //!< global id code, default to invalid
@@ -162,6 +162,7 @@ class FederateState
     std::unique_ptr<Message> receiveForFilter (Core::Handle &id);
 	/** set the CommonCore object that is managing this Federate*/
 	void setParent(CommonCore *coreObject);
+	
   private:
     /** process the federate queue until returnable event
     @details processQueue will process messages until one of 3 things occur
@@ -225,7 +226,19 @@ class FederateState
 	convergence_state genericUnspecifiedQueueProcess();
 	/** add an action message to the queue*/
     void addAction (const ActionMessage &action);
+	/** move a message to the queue*/
 	void addAction(ActionMessage &&action);
+
+	/** log a message to the federate logger
+	@param level the logging level of the message
+	@param logMessageSource- the name of the object that sent the message
+	@param message the message to log
+	*/
+	void logMessage(int level, const std::string &logMessageSource, const std::string &message) const;
+
+	/** set the logging function 
+	@details function must have signature void(int level, const std::string &sourceName, const std::string &message)
+	*/
     void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
     {
         loggerFunction = std::move (logFunction);

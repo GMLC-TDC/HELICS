@@ -26,6 +26,7 @@ FederateState::FederateState (const std::string &name_, const CoreFederateInfo &
 {
     state = HELICS_CREATED;
 	timeCoord = std::make_unique<TimeCoordinator>(info_);
+	logLevel = info_.logLevel;
 }
 
 FederateState::~FederateState() = default;
@@ -936,5 +937,13 @@ void FederateState::setCoreObject (CommonCore *parent)
 {
     std::lock_guard<std::mutex> lock (_mutex);
     parent_ = parent;
+}
+
+void FederateState::logMessage(int level, const std::string &logMessageSource, const std::string &message) const
+{
+	if ((loggerFunction)&& (level <= logLevel))
+	{
+		loggerFunction(level, logMessageSource, message);
+	}
 }
 }

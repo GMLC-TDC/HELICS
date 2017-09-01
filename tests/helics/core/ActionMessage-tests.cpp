@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(constructor_test)
 {
     // Default constructor
     helics::ActionMessage cmd;
-    BOOST_CHECK_EQUAL(cmd.action(), helics::CMD_IGNORE);
+    BOOST_CHECK(cmd.action()==helics::CMD_IGNORE);
     BOOST_CHECK_EQUAL(cmd.source_id, 0);
     BOOST_CHECK_EQUAL(cmd.source_handle, 0);
     BOOST_CHECK_EQUAL(cmd.dest_id, 0);
@@ -127,8 +127,8 @@ BOOST_AUTO_TEST_CASE(constructor_test)
     BOOST_CHECK(cmd.payload.empty());
 
     // Additional info defaults
-    BOOST_CHECK_EQUAL(cmd.info().Te, helics::Time::zeroVal());
-    BOOST_CHECK_EQUAL(cmd.info().Tdemin, helics::Time::zeroVal());
+    BOOST_CHECK_EQUAL(cmd.info().Te, helics::timeZero);
+    BOOST_CHECK_EQUAL(cmd.info().Tdemin, helics::timeZero);
     BOOST_CHECK(cmd.info().source.empty());
     BOOST_CHECK(cmd.info().target.empty());
     BOOST_CHECK(cmd.info().type.empty());
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(constructor_test)
 
     // Action constructor
     helics::ActionMessage cmd2(helics::CMD_INIT);
-    BOOST_CHECK_EQUAL(cmd2.action(), helics::CMD_INIT);
+    BOOST_CHECK(cmd2.action()==helics::CMD_INIT);
 }
 
 BOOST_AUTO_TEST_CASE(copy_constructor_test)
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE(copy_constructor_test)
 
     // Check operator= override
     helics::ActionMessage cmd_copy(cmd);
-    BOOST_CHECK_EQUAL(cmd_copy.action(), helics::CMD_INIT);
+    BOOST_CHECK(cmd_copy.action()==helics::CMD_INIT);
     BOOST_CHECK_EQUAL(cmd_copy.source_id, 1);
     BOOST_CHECK_EQUAL(cmd_copy.source_handle, 2);
     BOOST_CHECK_EQUAL(cmd_copy.dest_id, 3);
@@ -203,7 +203,7 @@ BOOST_AUTO_TEST_CASE(assignment_test)
 
     // Check operator= override
     helics::ActionMessage cmd_assign = cmd;
-    BOOST_CHECK_EQUAL(cmd_assign.action(), helics::CMD_INIT);
+    BOOST_CHECK(cmd_assign.action()==helics::CMD_INIT);
     BOOST_CHECK_EQUAL(cmd_assign.source_id, 1);
     BOOST_CHECK_EQUAL(cmd_assign.source_handle, 2);
     BOOST_CHECK_EQUAL(cmd_assign.dest_id, 3);

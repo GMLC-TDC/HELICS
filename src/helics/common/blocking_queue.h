@@ -55,8 +55,6 @@ class BlockingQueue {
 	*/
 	stx::optional<T> try_peek() const;
 
-    /** Return element without removing it */
-    T peek();
 
 	/** get the current size of the queue*/
     size_t size() const;

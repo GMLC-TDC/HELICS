@@ -16,6 +16,10 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <vector>
 #include <extra_includes/optional.h>
 
+/** class implementing a blocking queue
+@details this class uses locks one for push and pull it can exhibit longer blocking times if the internal operations require
+a swap, however in high contention the two locks will reduce contention in most cases.  
+*/
 template<typename T>
 class BlockingQueue2 {
 private:
@@ -23,12 +27,17 @@ private:
 	mutable std::mutex m_pullLock;  //!< lock for elements on the pullLock vector
 	std::vector<T> pushElements;  //!< vector of elements being added
 	std::vector<T> pullElements;  //!< vector of elements waiting extraction
-
+	//the condition variable should be keyed of the pullLock
 	std::condition_variable condition_;	//!< condition variable for notification of new data
 public:
 	/** default constructor*/
 	BlockingQueue2() = default;
 
+	/** constructor with the capacity numbers
+	@details there are two internal vectors that alternate
+	so the actual reserve is 2x the capacity numbers in two different vectors
+	@param capacity the initial reserve capacity for the arrays
+	*/
 	BlockingQueue2(size_t capacity)
 	{  // don't need to lock since we aren't out of the constructor yet
 		pushElements.reserve(capacity);
@@ -98,7 +107,7 @@ public:
 
 	}
 
-	/** construct on object in place on the queue*/
+	/** construct on object in place on the queue */
 	template <class... Args>
 	void emplace(Args &&... args)
 	{
@@ -146,7 +155,8 @@ public:
 	}
 
 	/** try to pop an object from the queue
-	@return an optional containing the value if successful
+	@return an optional containing the value if successful the optional will be empty if there is no 
+	element in the queue
 	*/
 	stx::optional<T> try_pop();
 
@@ -170,9 +180,16 @@ public:
 				val = try_pop();
 			}
 		}
+		//move the value out of the optional
 		return std::move(*val);
 	}
 
+	/** blocking call that will call the specified functor
+	if the queue is empty
+	@param callOnWaitFunction an nullary functiod that will be called if the initial query does not return a value
+	@details  after calling the function the call will check again and if still empty
+	will block and wait.  
+	*/
 	template< typename Functor>
 	T pop(Functor callOnWaitFunction)
 	{
@@ -188,6 +205,7 @@ public:
 				return actval;
 			}
 			condition_.wait(pullLock);
+			//need to check again to handle spurious wake-up
 			if (!pullElements.empty())
 			{
 				auto actval = std::move(pullElements.back());
@@ -215,10 +233,6 @@ depending on the number of consumers
 	@details this may or may not have much meaning depending on the number of consumers
 	*/
 	size_t size() const;
-
-
-
-
 };
 
 

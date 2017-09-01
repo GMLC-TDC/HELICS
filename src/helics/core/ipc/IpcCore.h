@@ -23,6 +23,7 @@ public:
 	/** default constructor*/
   IpcCore()=default;
   IpcCore(const std::string &core_name);
+  /** destructor*/
   ~IpcCore();
   virtual void initializeFromArgs (int argc, char *argv[]) override;
          
@@ -34,17 +35,17 @@ private:
 	virtual bool brokerConnect() override;
 	virtual void brokerDisconnect() override;
  
-	std::string fileloc;
-	std::string brokerloc;
-	std::string brokername;
+	std::string fileloc; //!< the location of the file queue
+	std::string brokerloc;	//!< the location of the broker	queue
+	std::string brokername;	//!< the name of the broker
 
-	std::unique_ptr<boost::interprocess::message_queue> rxQueue;
-	std::unique_ptr<boost::interprocess::message_queue> brokerQueue;
+	std::unique_ptr<boost::interprocess::message_queue> rxQueue; //!< the receive queue
+	std::unique_ptr<boost::interprocess::message_queue> brokerQueue;	//!< the queue of the broker
 
-	std::map<int, std::unique_ptr<boost::interprocess::message_queue>> routes;
+	std::map<int, std::unique_ptr<boost::interprocess::message_queue>> routes; //!< table of the routes to other brokers
 
-	std::thread queue_watcher;
-	void queue_rx_function();
+	std::thread queue_watcher; //!< thread monitoring the receive queue
+	void queue_rx_function();	//!< the functional loop for the receive queue
 };
 
 

@@ -23,7 +23,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-MessageFilterFederate::MessageFilterFederate () {}
+MessageFilterFederate::MessageFilterFederate() = default;
 
 MessageFilterFederate::MessageFilterFederate (const FederateInfo &fi) : Federate (fi), MessageFederate (true)
 {

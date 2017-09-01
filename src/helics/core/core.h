@@ -52,7 +52,8 @@ public:
 	Time lookAhead = timeZero;  //!< the lookahead value, the window of time between the time request return and the availability of values
 	Time impactWindow = timeZero;  //!< the time it takes values to propagate to the Federate
 	
-								   //TODO: make into a bitfield with named constants and add setFlags function
+	int logLevel;	//!< the logging level above which not to log to file
+	//4 byte gap
 	bool observer = false;  //!< flag indicating that the federate is an observer
 	bool uninteruptible =
 		false;  //!< flag indicating that the federate should never return a time other than requested

@@ -17,7 +17,7 @@ namespace helics
 {
 ActionMessage::ActionMessage (action_message_def::action_t action) : action_ (action), index(dest_handle), processingComplete(iterationComplete), name(payload)
 {
-	if (action >= cmd_info_basis)
+	if (hasInfo(action))
 	{
 		info_ = std::make_unique<AdditionalInfo>();
 	}
@@ -122,7 +122,7 @@ void ActionMessage::moveInfo(std::unique_ptr<Message> message)
 
 void ActionMessage::setAction(action_message_def::action_t action)
 {
-	if (action >= cmd_info_basis)
+	if (hasInfo(action))
 	{
 		if (!info_)
 		{
@@ -267,19 +267,6 @@ std::unique_ptr<Message> createMessage(ActionMessage &&cmd)
 
 bool isPriorityCommand(const ActionMessage &command)
 {
-	switch (command.action())
-	{
-	case CMD_REG_BROKER:
-	case CMD_REG_ROUTE:
-	case CMD_REG_FED:
-	case CMD_FED_ACK:
-	case CMD_BROKER_ACK:
-	case CMD_ROUTE_ACK:
-	case CMD_DISCONNECT:
-	//case CMD_DISCONNECT_ACK:
-		return true;
-	default:
-		return false;
-	}
+	return (command.action()<action_message_def::action_t::cmd_ignore);
 }
 }

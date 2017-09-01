@@ -25,7 +25,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 
-#define CLOSE_IPC 23425215
+
 
 #define USE_LOGGING 1
 #if USE_LOGGING
@@ -139,7 +139,7 @@ IpcCore::~IpcCore()
 	if (queue_watcher.joinable())
 	{
 		ActionMessage cmd(CMD_PROTOCOL);
-		cmd.index = CLOSE_IPC;
+		cmd.index = CLOSE_RECEIVER;
 		transmit(-1, cmd);
 		queue_watcher.join();
 		ipc_queue::remove(fileloc.c_str());
@@ -229,7 +229,7 @@ void IpcCore::brokerDisconnect()
 	if (queue_watcher.joinable())
 	{
 		ActionMessage cmd(CMD_PROTOCOL);
-		cmd.index = CLOSE_IPC;
+		cmd.index = CLOSE_RECEIVER;
 		transmit(-1, cmd);
 		queue_watcher.join();
 		ipc_queue::remove(fileloc.c_str());
@@ -295,7 +295,7 @@ void IpcCore::queue_rx_function()
 		ActionMessage cmd(buffer, rx_size);
 		if ((cmd.action() == CMD_PROTOCOL) || (cmd.action() == CMD_PROTOCOL_BIG))
 		{
-			if (cmd.index == CLOSE_IPC)
+			if (cmd.index == CLOSE_RECEIVER)
 			{
 				return;
 			}

@@ -17,12 +17,12 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 BOOST_AUTO_TEST_SUITE (zmq_value_federate_tests1)
 
-static const BrokerRunner zmqRunner(HELICSINSTALL_LOCATION, HELICS_ZMQ_BROKER_LOCATION, "helics_broker");
 #define ZMQ_CORE_TYPE "zmq"
 
 /** test simple creation and destruction*/
 BOOST_AUTO_TEST_CASE (value_federate_initialize_tests)
 {
+	BrokerRunner zmqRunner(HELICSINSTALL_LOCATION, HELICS_ZMQ_BROKER_LOCATION, "helics_broker");
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
 
@@ -46,6 +46,7 @@ BOOST_AUTO_TEST_CASE (value_federate_initialize_tests)
 
 BOOST_AUTO_TEST_CASE (value_federate_publication_registration)
 {
+	BrokerRunner zmqRunner(HELICSINSTALL_LOCATION, HELICS_ZMQ_BROKER_LOCATION, "helics_broker");
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
     helics::FederateInfo fi ("test1");
@@ -86,7 +87,7 @@ BOOST_AUTO_TEST_CASE (value_federate_publication_registration)
 
 BOOST_AUTO_TEST_CASE (value_federate_subscription_registration)
 {
-
+	BrokerRunner zmqRunner(HELICSINSTALL_LOCATION, HELICS_ZMQ_BROKER_LOCATION, "helics_broker");
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
     helics::FederateInfo fi ("test1");
@@ -130,6 +131,7 @@ BOOST_AUTO_TEST_CASE (value_federate_subscription_registration)
 
 BOOST_AUTO_TEST_CASE (value_federate_subscription_and_publication_registration)
 {
+	BrokerRunner zmqRunner(HELICSINSTALL_LOCATION, HELICS_ZMQ_BROKER_LOCATION, "helics_broker");
     helics::FederateInfo fi ("test1");
     fi.coreType = ZMQ_CORE_TYPE;
     fi.coreInitString = "1";
@@ -186,6 +188,7 @@ BOOST_AUTO_TEST_CASE (value_federate_subscription_and_publication_registration)
 
 BOOST_AUTO_TEST_CASE (value_federate_single_transfer)
 {
+	BrokerRunner zmqRunner(HELICSINSTALL_LOCATION, HELICS_ZMQ_BROKER_LOCATION, "helics_broker");
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
 
@@ -232,6 +235,7 @@ BOOST_AUTO_TEST_CASE (value_federate_single_transfer)
 template <class X>
 void runFederateTest (const X &defaultValue, const X &testValue1, const X &testValue2)
 {
+	BrokerRunner zmqRunner(HELICSINSTALL_LOCATION, HELICS_ZMQ_BROKER_LOCATION, "helics_broker");
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
 
@@ -283,6 +287,7 @@ void runFederateTest (const X &defaultValue, const X &testValue1, const X &testV
 template <class X>
 void runFederateTestv2 (const X &defaultValue, const X &testValue1, const X &testValue2)
 {
+	BrokerRunner zmqRunner(HELICSINSTALL_LOCATION, HELICS_ZMQ_BROKER_LOCATION, "helics_broker");
 	//launch the broker
 	auto fut = std::async(std::launch::async, [&]() {return zmqRunner.run("1"); });
     helics::FederateInfo fi ("test1");

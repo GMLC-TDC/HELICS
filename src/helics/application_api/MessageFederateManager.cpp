@@ -223,6 +223,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
                 messageQueues[localEndpointIndex].push (std::move (mv));
                 if (local_endpoints[localEndpointIndex].callbackIndex >= 0)
                 {
+					//make sure the lock is not engaged for the callback
 					auto cb = callbacks[local_endpoints[localEndpointIndex].callbackIndex];
                     eplock.unlock ();
                     cb(sfnd->second.first, newTime);
@@ -230,6 +231,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
                 }
                 else if (allCallbackIndex >= 0)
                 {
+					//make sure the lock is not engaged for the callback
 					auto ac = callbacks[allCallbackIndex];
                     eplock.unlock ();
                     ac(sfnd->second.first, CurrentTime);

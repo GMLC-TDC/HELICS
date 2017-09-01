@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(message_filter_basic_ops)
 	mFed->requestTimeFinalize();
 	BOOST_REQUIRE(mFed->hasMessage(p2));
 	auto m2 = mFed->getMessage(p2);
-	BOOST_CHECK_EQUAL(m2->src,"filter1.fout");
+	BOOST_CHECK_EQUAL(m2->src,"filter1/fout");
 	BOOST_CHECK_EQUAL(m2->origsrc,"port1");
 	BOOST_CHECK_EQUAL(m2->dest, "port2");
 	BOOST_CHECK_EQUAL(m2->data.size(), data.size());

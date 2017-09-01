@@ -175,7 +175,9 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
         {
             if (allInitReady ())
             {
-                // send an init not ready
+				ActionMessage noInit(CMD_INIT_NOT_READY);
+				noInit.source_id = global_broker_id;
+				transmit(0, noInit);
             }
         }
         else  // we are initialized already
@@ -419,27 +421,47 @@ void CoreBroker::processCommand (ActionMessage &command)
                 {
                     transmit (brk.route_id, m);
                 }
+				timeCoord->enteringExecMode(convergence_state::complete);
+				auto res = timeCoord->checkExecEntry();
+				if (res == convergence_state::complete)
+				{
+					enteredExecutionMode = true;
+					timeCoord->timeRequest(Time::maxVal(), convergence_state::complete, Time::maxVal(), Time::maxVal());
+				}
             }
             else
             {
                 command.source_id = global_broker_id;
                 transmit (0, command);
             }
-			timeCoord->enteringExecMode(convergence_state::complete);
-			auto res = timeCoord->checkExecEntry();
-			if (res == convergence_state::complete)
-			{
-				enteredExecutionMode = true;
-				timeCoord->timeRequest(Time::maxVal(), convergence_state::complete, Time::maxVal(), Time::maxVal());
-			}
+			
         }
     }
     break;
+	case CMD_INIT_NOT_READY:
+		auto brkNum = getBrokerById(command.source_id);
+		if (allInitReady())
+		{
+			transmit(0, command);
+		}
+		if (brkNum >= 0)
+		{
+			std::lock_guard<std::mutex> lock(mutex_);
+			_brokers[brkNum]._initRequested = false;
+		}
+		break;
     case CMD_INIT_GRANT:
         for (auto &brk : _brokers)
         {
             transmit (brk.route_id, command);
         }
+		timeCoord->enteringExecMode(convergence_state::complete);
+		auto res = timeCoord->checkExecEntry();
+		if (res == convergence_state::complete)
+		{
+			enteredExecutionMode = true;
+			timeCoord->timeRequest(Time::maxVal(), convergence_state::complete, Time::maxVal(), Time::maxVal());
+		}
         break;
 	case CMD_STOP:
 		if ((!allDisconnected())&&(!_isRoot))
@@ -916,6 +938,10 @@ void argumentParser (int argc, char *argv[], boost::program_options::variables_m
 		("broker,b", po::value<std::string>(), "address to connect the broker to")
 		("name,n", po::value<std::string>(), "name of the core")
 		("root","specify that the broker is a root broker")
+		("logfile", po::value<std::string>(), "the file to log message to")
+		("loglevel", po::value<int>(), "the level which to log the higher this is set to the more gets logs (-1) for no logging")
+		("fileloglevel", po::value<int>(), "the level at which messages get sent to the file")
+		("consoleloglevel", po::value<int>(), "the level at which message get sent to the console")
 		("minfed", po::value<int>(), "type of the publication to use")
 		("identifier", po::value<std::string>(), "name of the core");
 
