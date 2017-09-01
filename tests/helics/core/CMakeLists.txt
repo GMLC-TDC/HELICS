@@ -10,7 +10,8 @@
 #-----------------------------------------------------------------------------
 
 set(core_test_headers
-testFixtures.h)
+testFixtures.h
+)
 
 set(core_test_sources
 core-tests.cpp
@@ -24,7 +25,8 @@ TestCore-tests.cpp
 ZeromqCore-tests.cpp
 MpiCore-tests.cpp
 Node_Core-tests.cpp
-testFixtures.cpp)
+testFixtures.cpp
+)
 
 
 add_executable(core-tests ${core_test_sources} ${core_test_headers})
