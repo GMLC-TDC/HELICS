@@ -376,20 +376,36 @@ class Core
      * Register source filter.
      *
      * May only be invoked in the Initialization state.
+	 @param federateId the identifier for the federate
+	 @param filterName the name of the filter (may be left blank)
+	 @param source the target endpoint for the filter
+	 @param type_in the input type of the filter
+	 @param type_out the output type of the filter (may be left blank if the filter doesn't change type)
+	 this is important for ordering in filters with operators
+	 @return the handle for the new filter
      */
     virtual Handle registerSourceFilter (federate_id_t federateId,
                                          const std::string &filterName,
                                          const std::string &source,
-                                         const std::string &type_in) = 0;
+                                         const std::string &type_in,
+										const std::string &type_out) = 0;
 	/**
 	* Register destination filter.
+	@details a destination filter will create an additional processing step of messages before they get to a destination endpoint
 	*
 	* May only be invoked in the Initialization state.
+	@param federateId the identifier for the federate
+	@param filterName the name of the filter (may be left blank)
+	@param dest the target endpoint for the filter
+	@param type_in the input type of the filter (may be left blank,  this is for error checking and will produce a warning if it doesn't 
+	match with the input type of the target endpoint
+	@return the handle for the new filter
 	*/
     virtual Handle registerDestinationFilter (federate_id_t federateId,
                                               const std::string &filterName,
                                               const std::string &dest,
-                                              const std::string &type_in) = 0;
+                                              const std::string &type_in,
+											  const std::string &type_out) = 0;
 	/**
 	* add a time dependency between federates
 	* @details this function is primarily useful for Message federates which do not otherwise restrict the dependencies
@@ -431,6 +447,11 @@ class Core
      * events between discrete event federates.  For this use case
      * the receiving federate can deserialize the data and schedule
      * an event for the specified time.
+	 @param time the time the event is scheduled for
+	 @param sourceHandle the source of the event
+	 @param destination  the target of the event 
+	 @param data the raw data for the event
+	 @param length the record length of the event
      */
     virtual void
     sendEvent (Time time, Handle sourceHandle, const std::string &destination, const char *data, uint64_t length) = 0;
@@ -501,6 +522,17 @@ class Core
 	A string indicating the source of the message and another string with the actual message
 	*/
 	virtual void setLoggingFunction(federate_id_t federateID, std::function<void(int, const std::string &, const std::string &)> logFunction) = 0;
+	
+	/** make a query for information from the co-simulation
+	@details the format is somewhat unspecified  target is the name of an object typically one of 
+	"federation",  "broker", "core", or the name of a specific object
+	query is a broken 
+	@param target the specific target of the query
+	@param queryStr the actual query
+	@return a string containing the response to the query.  Query is a blocking call and will not return until the query is answered
+	so use with caution
+	*/
+	virtual std::string query(const std::string &target, const std::string &queryStr) = 0;
 };
 
 // set at a large negative number but not the largest negative number

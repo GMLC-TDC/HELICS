@@ -37,16 +37,17 @@ class ActionMessage
         std::string target;  //!< target or destination
         std::string &units;  //!< alias type to target for registration
         std::string orig_source;  //!< the original source
+		std::string &type_out;  //!< alias type_out to orig_source for filter
 		/** constructor*/
-        AdditionalInfo () noexcept : type (source), units (target){};
+        AdditionalInfo () noexcept : type (source), units (target),type_out(orig_source){};
 		/** copy constructor*/
         AdditionalInfo (const AdditionalInfo &ai)
             : Te (ai.Te), Tdemin (ai.Tdemin), source (ai.source), type (source), target (ai.target),
-              units (target), orig_source (ai.orig_source){};
+              units (target), orig_source (ai.orig_source), type_out(orig_source) {};
 		/** move constructor*/
         AdditionalInfo (AdditionalInfo &&ai) noexcept
             : Te (ai.Te), Tdemin (ai.Tdemin), source (std::move (ai.source)), type (source),
-              target (std::move (ai.target)), units (target), orig_source (std::move (ai.orig_source)){};
+              target (std::move (ai.target)), units (target), orig_source (std::move (ai.orig_source)), type_out(orig_source) {};
         template <class Archive>
         void save (Archive &ar) const
         {
@@ -68,7 +69,7 @@ class ActionMessage
         }
     };
    
-    // need to try to make sure this object is under 64 bytes in size to fit in cache lines
+    // need to try to make sure this object is under 64 bytes in size to fit in cache lines NOT there yet
   private:
     action_message_def::action_t action_ = CMD_IGNORE;  // 4 -- command
   public:

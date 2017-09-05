@@ -514,6 +514,91 @@ void Federate::registerInterfaces (const std::string & /*jsonString*/)
     // child classes would implement this
 }
 
+std::string Federate::query(const std::string &queryStr)
+{
+	if (queryStr == "name")
+	{
+		return getName();
+	}
+	else if (queryStr == "endpoints")
+	{
+		return "";
+	}
+	else if (queryStr == "publications")
+	{
+		return "";
+	}
+	else if (queryStr == "subscriptions")
+	{
+		return "";
+	}
+	else if (queryStr == "filters")
+	{
+		return "";
+	}
+	return coreObject->query("federation", queryStr);
+}
+
+std::string Federate::query(const std::string &target, const std::string &queryStr)
+{
+	return coreObject->query(target, queryStr);
+}
+
+
+int Federate::queryAsync(const std::string &target, const std::string &queryStr)
+{
+	if (!asyncCallInfo)
+	{
+		asyncCallInfo = std::make_unique<asyncFedCallInfo>();
+	}
+	int cnt = asyncCallInfo->queryCounter++;
+
+	auto queryFut = std::async(std::launch::async, [this, target, queryStr]() {return coreObject->query(target, queryStr); });
+	asyncCallInfo->inFlightQueries.emplace(cnt, std::move(queryFut));
+	return cnt;
+}
+
+int Federate::queryAsync( const std::string &queryStr)
+{
+	if (!asyncCallInfo)
+	{
+		asyncCallInfo = std::make_unique<asyncFedCallInfo>();
+	}
+	int cnt = asyncCallInfo->queryCounter++;
+
+	auto queryFut = std::async(std::launch::async, [this, queryStr]() {return query(queryStr); });
+	asyncCallInfo->inFlightQueries.emplace(cnt, std::move(queryFut));
+	return cnt;
+}
+
+std::string Federate::queryFinalize(int queryIndex)
+{
+	if (asyncCallInfo)
+	{
+		auto fnd = asyncCallInfo->inFlightQueries.find(queryIndex);
+		if (fnd != asyncCallInfo->inFlightQueries.end())
+		{
+			return (fnd->second.get());
+		}
+	}
+	return "#invalid";
+}
+
+
+bool Federate::queryCompleted(int queryIndex) const
+{
+	if (asyncCallInfo)
+	{
+		auto fnd = asyncCallInfo->inFlightQueries.find(queryIndex);
+		if (fnd!=asyncCallInfo->inFlightQueries.end())
+		{
+			return (fnd->second.wait_for(std::chrono::seconds(0)) == std::future_status::ready);
+		}
+	}
+	return false;
+}
+
+
 FederateInfo LoadFederateInfo (const std::string &jsonString)
 {
     FederateInfo fi;

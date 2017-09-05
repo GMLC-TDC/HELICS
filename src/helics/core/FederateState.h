@@ -60,7 +60,10 @@ class FederateState
     std::map<std::string, PublicationInfo *> pubNames;  //!< translate names to publications
     std::map<std::string, EndpointInfo *> epNames;  //!< translate names to endpoints
     std::map<std::string, FilterInfo *> filterNames;  //!< translate names to filterObjects
-    std::vector<std::unique_ptr<SubscriptionInfo>> subscriptions;  //!< storage for all the subscriptions
+public:
+	std::atomic<bool> init_transmitted{ false }; //!< the init request has been transmitted
+private:
+	std::vector<std::unique_ptr<SubscriptionInfo>> subscriptions;  //!< storage for all the subscriptions
     std::vector<std::unique_ptr<PublicationInfo>> publications;  //!< storage for all the publications
     std::vector<std::unique_ptr<EndpointInfo>> endpoints;  //!< storage for all the endpoints
     std::vector<std::unique_ptr<FilterInfo>> filters;  //!< storage for all the filters
@@ -68,7 +71,7 @@ class FederateState
     CommonCore *parent_ = nullptr;  //!< pointer to the higher level;
   public:
     std::atomic<bool> init_requested{false};  //!< this federate has requested entry to initialization
-
+	
     bool iterating = false;  //!< the federate is iterating at a timestep
     bool hasEndpoints = false;  //!< the federate has endpoints
   private:
@@ -159,7 +162,7 @@ class FederateState
     std::unique_ptr<Message> receiveAny (Core::Handle &id);
     /** get any message ready for processing by a filter
     @param[out] id the the filter related to the message*/
-    std::unique_ptr<Message> receiveForFilter (Core::Handle &id);
+    std::unique_ptr<Message> receiveAnyFilter (Core::Handle &id);
 	/** set the CommonCore object that is managing this Federate*/
 	void setParent(CommonCore *coreObject);
 	

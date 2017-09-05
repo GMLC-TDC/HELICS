@@ -30,7 +30,8 @@ class BasicHandleInfo
 {
   public:
 	  /** default constructor*/
-	  BasicHandleInfo()=default;
+	  BasicHandleInfo() noexcept : type_out(units)
+	  {};
 	  /** construct from the data*/
     BasicHandleInfo (Core::Handle id_,
                      Core::federate_id_t fed_id_,
@@ -39,15 +40,24 @@ class BasicHandleInfo
                      const std::string &type_,
                      const std::string &units_,
                      bool flag_ = false)
-        : id (id_), fed_id (fed_id_), what (what_), flag (flag_), key (key_), type (type_), units (units_)
+        : id (id_), fed_id (fed_id_), what (what_), flag (flag_), key (key_), type (type_), units (units_),type_out(units)
 
     {
-		if ((what == HANDLE_SOURCE_FILTER)||(what==HANDLE_DEST_FILTER))
-		{
-			target = units;
-            destFilter = (what == HANDLE_DEST_FILTER);
-		}
+
     }
+	/** construct from the data for filters*/
+	BasicHandleInfo(Core::Handle id_,
+		Core::federate_id_t fed_id_,
+		BasicHandleType what_,
+		const std::string &key_,
+		const std::string &target_,
+		const std::string &type_in_,
+		const std::string &type_out_)
+		: id(id_), fed_id(fed_id_), what(what_), key(key_), type(type_in_), units(type_out_), target(target_),type_out(units)
+
+	{
+
+	}
 
     Core::Handle id=invalid_Handle;  //!< the identification number for the handle
     Core::federate_id_t fed_id=invalid_fed_id; //!< the global federate id for the creator of the handle
@@ -57,13 +67,14 @@ class BasicHandleInfo
 	bool processed = false;	//!< indicator if the handle has been processed (subscription or endpoint found)
 	bool mapped = false;
 	bool hasSourceFilter = false; //!< indicator that an endpoint handle has a source filter
-	bool destFilter = false;	//!< indicator that an endpoint has a destination filter
+	bool hasDestFilter = false;	//!< indicator that an endpoint has a destination filter
 	bool used = false;			//!< indicator that the publication or filter is used
-	//1 byte hole here
+	//5 byte hole here
     std::string key;	//!< the name of the handle
     std::string type;	//!< the type of data used by the handle
     std::string units;	//!< the units associated with the handle
-	std::string target;	//!< the target of the handle
+	std::string target;	//!< the target of the handle mapped onto units since they will not be used together
+	std::string &type_out; //!< the output type of a filter
 };
 }
 #endif

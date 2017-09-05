@@ -51,14 +51,14 @@ namespace helics
 		@param[in] the name of the endpoint
 		@param[in] the inputType which the source filter can receive
 		*/
-		filter_id_t registerSourceFilter(const std::string &filterName, const std::string &sourceEndpoint, const std::string &inputType = "");
+		filter_id_t registerSourceFilter(const std::string &filterName, const std::string &sourceEndpoint, const std::string &inputType = "", const std::string &outputType = "");
 		/** define a filter interface for a destination
 		@details a destination filter will be sent any packets that are going to a particular destination
 		multiple filters are not allowed to specify the same destination
 		@param[in] the name of the destination endpoint
 		@param[in] the inputType which the destination filter can receive
 		*/
-		filter_id_t registerDestinationFilter(const std::string &filterName, const std::string &destEndpoint, const std::string &inputType = "");
+		filter_id_t registerDestinationFilter(const std::string &filterName, const std::string &destEndpoint, const std::string &inputType = "",const std::string &outputType = "");
 		/** define a filter interface on a source
 		@details a source filter will be sent any packets that come from a particular source
 		if multiple filters are defined on the same source, they will be placed in some order defined by the core
@@ -94,10 +94,15 @@ namespace helics
 		@return empty string if an invalid id is passed*/
 		std::string getFilterEndpoint(filter_id_t id) const;
 
-		/** get the type of a filter from its id
+		/** get the input type of a filter from its id
 		@param[in] id the endpoint to query
 		@return empty string if an invalid id is passed*/
-		std::string getFilterType(filter_id_t id) const;
+		std::string getFilterInputType(filter_id_t id) const;
+
+		/** get the output type of a filter from its id
+		@param[in] id the endpoint to query
+		@return empty string if an invalid id is passed*/
+		std::string getFilterOutputType(filter_id_t id) const;
 		/** get the id of a source filter from the name of the endpoint
 		@param[in] filterName the name of the filter
 		@return invalid_filter_id if name is not recognized otherwise returns the filter id*/

@@ -40,8 +40,8 @@ public:
 	{
 	}
 
-	Core::Handle id; //!< id handle of the filter
-	Core::federate_id_t fed_id;	//!< id of the federate that manages the filter
+	Core::Handle id=invalid_fed_id; //!< id handle of the filter
+	Core::federate_id_t fed_id=invalid_Handle;	//!< id of the federate that manages the filter
 	std::string key;	//!< the identifier of the filter
 	std::string type;	//!< the type of data for the filter
 	bool has_update = false;	//!< indicator that the filter has updates
@@ -49,7 +49,7 @@ public:
 	// there is a 6 byte gap here
 	std::shared_ptr<FilterOperator> filterOp;	//!< the callback operation of the filter
 	std::string filterTarget;	//!< the target endpoint name of the filter
-	std::pair<Core::federate_id_t, Core::Handle> target;	//!< the actual target information for the filter
+	std::pair<Core::federate_id_t, Core::Handle> target{ invalid_fed_id,invalid_Handle };	//!< the actual target information for the filter
 private:
 	std::deque<std::unique_ptr<Message>>message_queue; //!< data structure containing the queued messages
 	mutable std::mutex queueLock;	//!< the lock for multithread access to the queue

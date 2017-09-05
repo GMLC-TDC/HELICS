@@ -29,7 +29,7 @@ class TestHandle;
 class FederateState;
 
 class BasicHandleInfo;
-class FilterFunctions;
+class FilterCoordinator;
 
 enum BasicHandleType:char;
 
@@ -81,8 +81,8 @@ CommonCore(const std::string &core_name);
 
   virtual const std::vector<Handle> &getValueUpdates (federate_id_t federateId) override;
   virtual Handle registerEndpoint (federate_id_t federateId, const std::string &name, const std::string &type) override;
-  virtual Handle registerSourceFilter (federate_id_t federateId, const std::string &filterName, const std::string &source, const std::string &type_in) override;
-  virtual Handle registerDestinationFilter (federate_id_t federateId, const std::string &filterName, const std::string &dest, const std::string &type_in) override;
+  virtual Handle registerSourceFilter (federate_id_t federateId, const std::string &filterName, const std::string &source, const std::string &type_in,const std::string &type_out) override;
+  virtual Handle registerDestinationFilter (federate_id_t federateId, const std::string &filterName, const std::string &dest, const std::string &type_in,const std::string &type_out) override;
   virtual void addDependency(federate_id_t federateId, const std::string &federateName) override;
   virtual void registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) override;
   virtual void send (Handle sourceHandle, const std::string &destination, const char *data, uint64_t length) override;
@@ -108,6 +108,8 @@ CommonCore(const std::string &core_name);
 
   virtual void setLoggingFunction(federate_id_t federateID, std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
   
+  virtual std::string query(const std::string &target, const std::string &queryStr);
+
   /** get a string representing the connection info to send data to this object*/
   virtual std::string getAddress() const=0;
   /** add a command to the process queue*/
@@ -153,7 +155,7 @@ protected:
   /** get a localEndpoint from the name*/
   BasicHandleInfo *getLocalEndpoint(const std::string &name);
   /** get a filtering function object*/
-  FilterFunctions *getFilterFunctions(Handle id_);
+  FilterCoordinator *getFilterCoordinator(Handle id_);
   /** check if all federates managed by the core are ready to enter initialization state*/
   bool allInitReady() const;
   /** check if all federates have said good-bye*/
@@ -181,16 +183,17 @@ protected:
 	enum core_state_t :int
 	{
 		created = -5,
-		initialized = -3,
-		connecting = -2,
-		connected = -1,
+		initialized = -4,
+		connecting = -3,
+		connected = -2,
+		initializing=-1,
 		operating=0,
 		terminated=3,
 		errored=7,
 	};
 	std::atomic<core_state_t> coreState{created}; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
   std::vector<std::unique_ptr<FederateState>> _federates; //!< local federate information
-  //using pointers to minimize time in a critical section- though this should be timed more in the future
+														  //using pointers to minimize time in a critical section- though this should be timed more in the future
   std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
   int32_t _min_federates;  //!< the minimum number of federates that must connect before entering init mode
   int32_t _max_iterations; //!< the maximum allowable number of iterations
@@ -201,7 +204,7 @@ protected:
   std::unordered_map<std::string, Handle> publications;	//!< map of all local publications
   std::unordered_map<std::string, Handle> endpoints;	//!< map of all local endpoints
   std::unordered_map<std::string, federate_id_t> federateNames;  //!< map of federate names to id
-  std::map<Handle, std::unique_ptr<FilterFunctions>> filters; //!< map of all filters
+  std::map<Handle, std::unique_ptr<FilterCoordinator>> filters; //!< map of all filters
  private:
   mutable std::mutex _mutex; //!< mutex protecting the federate creation and modification
   mutable std::mutex _handlemutex; //!< mutex protecting the publications and subscription structures
@@ -215,6 +218,18 @@ protected:
   and return a ptr to it
   */
   BasicHandleInfo* createBasicHandle(Handle id_, federate_id_t global_federateId, federate_id_t local_federateId, BasicHandleType HandleType, const std::string &key, const std::string &type, const std::string &units, bool required);
+  /** add a new handle to the generic structure
+  and return a ptr to it
+  variation targetted at filters
+  */
+  BasicHandleInfo *createBasicHandle(Handle id_,
+	  federate_id_t global_federateId,
+	  federate_id_t local_federateId,
+	  BasicHandleType HandleType,
+	  const std::string &key,
+	  const std::string &target,
+	  const std::string &type_in,
+	  const std::string &type_out);
 
   /** check if a global id represents a local federate
   @param[in] global_id the federate global id
@@ -224,6 +239,16 @@ protected:
   @param[in] global_id the federate global id
   @return 0 if unknown, otherwise returns the route_id*/
   int32_t getRoute(Core::federate_id_t global_id) const;
+
+  /** process a message for potential additions to the filter ordering
+  @param command the message to process
+  */
+  void processFilterInfo(ActionMessage &command);
+
+  /** organize filters
+  @detsils organize the filter and report and potential warnings and errors
+  */
+  void organizeFilterOperations();
 };
 
 

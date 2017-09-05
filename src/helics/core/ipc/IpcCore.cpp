@@ -67,7 +67,7 @@ static void argumentParser(int argc, char *argv[], boost::program_options::varia
 	config.add_options()
 		("queueloc", po::value<std::string>(), "the file location of the shared queue")
 		("broker,b", po::value<std::string>(), "identifier for the broker")
-		("brokerloc", po::value<int>(), "the file location for the broker")
+		("brokerloc", po::value<std::string>(), "the file location for the broker")
 		("broker_auto_start","automatically start the broker")
 		("broker_init",po::value<std::string>(),"the init string to pass to the broker upon startup-will only be used if the autostart is activated")
 		("register", "register the core for global locating");

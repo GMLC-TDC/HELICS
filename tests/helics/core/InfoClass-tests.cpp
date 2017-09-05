@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(basichandleinfo_test)
 	BOOST_CHECK_EQUAL(defHnd.local_fed_id, helics::invalid_fed_id);
 	BOOST_CHECK_EQUAL(defHnd.what, helics::HANDLE_UNKNOWN);
 	BOOST_CHECK_EQUAL(defHnd.flag, false);
-	BOOST_CHECK_EQUAL(defHnd.destFilter, false);
+	BOOST_CHECK_EQUAL(defHnd.hasDestFilter, false);
 	BOOST_CHECK(defHnd.key.empty());
 	BOOST_CHECK(defHnd.type.empty());
 	BOOST_CHECK(defHnd.units.empty());
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(basichandleinfo_test)
 	BOOST_CHECK_EQUAL(hnd1.local_fed_id, helics::invalid_fed_id);
 	BOOST_CHECK_EQUAL(hnd1.what, helics::HANDLE_END);
 	BOOST_CHECK_EQUAL(hnd1.flag, false);
-	BOOST_CHECK_EQUAL(hnd1.destFilter, false);
+	BOOST_CHECK_EQUAL(hnd1.hasDestFilter, false);
 	BOOST_CHECK(hnd1.key.compare("key") == 0);
 	BOOST_CHECK(hnd1.type.compare("type") == 0);
 	BOOST_CHECK(hnd1.units.compare("units") == 0);
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(basichandleinfo_test)
 	BOOST_CHECK_EQUAL(hnd2.local_fed_id, helics::invalid_fed_id);
 	BOOST_CHECK_EQUAL(hnd2.what, helics::HANDLE_END);
 	BOOST_CHECK_EQUAL(hnd2.flag, true);
-	BOOST_CHECK_EQUAL(hnd2.destFilter, false);
+	BOOST_CHECK_EQUAL(hnd2.hasDestFilter, false);
 	BOOST_CHECK(hnd2.key.compare("key") == 0);
 	BOOST_CHECK(hnd2.type.compare("type") == 0);
 	BOOST_CHECK(hnd2.units.compare("units") == 0);
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(basichandleinfo_test)
 	BOOST_CHECK_EQUAL(srcFiltHnd.local_fed_id, helics::invalid_fed_id);
 	BOOST_CHECK_EQUAL(srcFiltHnd.what, helics::HANDLE_SOURCE_FILTER);
 	BOOST_CHECK_EQUAL(srcFiltHnd.flag, false);
-	BOOST_CHECK_EQUAL(srcFiltHnd.destFilter, false);
+	BOOST_CHECK_EQUAL(srcFiltHnd.hasDestFilter, false);
 	BOOST_CHECK(srcFiltHnd.key.compare("key") == 0);
 	BOOST_CHECK(srcFiltHnd.type.compare("type") == 0);
 	BOOST_CHECK(srcFiltHnd.units.compare("target") == 0);
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(basichandleinfo_test)
 	BOOST_CHECK_EQUAL(dstFiltHnd.local_fed_id, helics::invalid_fed_id);
 	BOOST_CHECK_EQUAL(dstFiltHnd.what, helics::HANDLE_DEST_FILTER);
 	BOOST_CHECK_EQUAL(dstFiltHnd.flag, true);
-	BOOST_CHECK_EQUAL(dstFiltHnd.destFilter, true);
+	BOOST_CHECK_EQUAL(dstFiltHnd.hasDestFilter, true);
 	BOOST_CHECK(dstFiltHnd.key.compare("key") == 0);
 	BOOST_CHECK(dstFiltHnd.type.compare("type") == 0);
 	BOOST_CHECK(dstFiltHnd.units.compare("target") == 0);

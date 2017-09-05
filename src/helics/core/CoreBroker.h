@@ -85,14 +85,15 @@ private:
 	std::string local_broker_identifier;  //!< a randomly generated string  or assigned name for initial identification of the broker
 	std::string previous_local_broker_identifier; //!< the previous identifier in case a rename is required
 	BlockingQueue<ActionMessage> _queue; //!< primary routing queue
-	std::map<std::string, int32_t> fedNames;  //!< a map to lookup federates <fed name, local federate index>
-	std::map<std::string, int32_t> brokerNames;  //!< a map to lookup brokers <broker name, local broker index>
+	std::unordered_map<std::string, int32_t> fedNames;  //!< a map to lookup federates <fed name, local federate index>
+	std::unordered_map<std::string, int32_t> brokerNames;  //!< a map to lookup brokers <broker name, local broker index>
 	std::unordered_map<std::string, int32_t> publications; //!< map of publications;
 	std::unordered_multimap<std::string, int32_t> subscriptions; //!< multimap of subscriptions
 	std::unordered_map<std::string, int32_t> endpoints;  //!< map of endpoints
 	std::unordered_multimap<std::string, int32_t> filters;  //!< multimap for all the filters
 
 	std::map<Core::federate_id_t, int32_t> global_id_translation; //!< map to translate global ids to local ones
+	std::unordered_map<uint64_t, int32_t> handle_table; //!< map to translate global handles to local ones
 	std::map<Core::federate_id_t, int32_t> routing_table;  //!< map for external routes  <global federate id, route id>
 	std::map<Core::federate_id_t, int32_t> broker_table;  //!< map for translating global broker id's to a local index
 	std::map<Core::federate_id_t, int32_t> federate_table; //!< map for translating global federate id's to a local index
@@ -137,6 +138,7 @@ private:
 
 	void transmitDelayedMessages();
 	bool enteredExecutionMode = false; //!< flag indicating that the broker has entered execution mode
+	
 public:
 	/** connect the core to its broker
 	@details should be done after initialization has complete*/
@@ -233,8 +235,14 @@ private:
 	void addEndpoint(ActionMessage &m);
 	void addDestFilter(ActionMessage &m);
 	void addSourceFilter(ActionMessage &m);
+	bool updateSourceFilterOperator(ActionMessage &m);
 };
 
+
+inline uint64_t makeGlobalHandleIdentifier(Core::federate_id_t fed_id, Core::Handle handle)
+{
+	return (static_cast<uint64_t>(fed_id) << 32) + static_cast<uint64_t>(handle);
+}
 
 } //namespace helics
 

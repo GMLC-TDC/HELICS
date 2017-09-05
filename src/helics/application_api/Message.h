@@ -21,13 +21,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-/** forward declaration*/
-class data_view;
-
-
-
-
-
 /** class containing a constant view of data block*/
 class data_view
 {

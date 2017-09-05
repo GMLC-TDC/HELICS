@@ -201,6 +201,55 @@ class Federate
     */
     void setImpactWindow (Time window);
 
+	/** make a query of the core
+	@details this call is blocking until the value is returned which make take some time depending on the size of the federation and the specific string being 
+	queried
+	@param target  the target of the query can be "federation", "federate", "broker", "core", or a specific name of a federate, core, or broker
+	@param queryStr a string with the query see other documentation for specific properties to query, can be defined by the federate
+	@return a string with the value requested.  this is either going to be a single string value or a json structure.  The string "#invalid" is returned if the query was
+	not valid
+	*/
+	std::string query(const std::string &target, const std::string &queryStr);
+
+	/** make a query of the core
+	@details this call is blocking until the value is returned which make take some time depending on the size of the federation and the specific string being
+	queried
+	@param queryStr a string with the query see other documentation for specific properties to query, can be defined by the federate if the local federate does not recognize the query it sends it on to the federation
+	@return a string with the value requested.  this is either going to be a single string value or a json structure.  The string "#invalid" is returned if the query was
+	not valid
+	*/
+	std::string query(const std::string &queryStr);
+	
+	/** make a query of the core in an async fashion
+	@details this call is blocking until the value is returned which make take some time depending on the size of the federation and the specific string being
+	queried
+	@param target  the target of the query can be "federation", "federate", "broker", "core", or a specific name of a federate, core, or broker
+	@param queryStr a string with the query see other documentation for specific properties to query, can be defined by the federate
+	@return an integer used to get the results of the query in the future
+	*/
+	int queryAsync(const std::string &target, const std::string &queryStr);
+
+	/** make a query of the core in an async fashion
+	@details this call is blocking until the value is returned which make take some time depending on the size of the federation and the specific string being
+	queried
+	@param queryStr a string with the query see other documentation for specific properties to query, can be defined by the federate
+	@return an integer used to get the results of the query in the future
+	*/
+	int queryAsync(const std::string &queryStr);
+
+	/** get the results of an async query
+	@details the call will block until the results are returned inquiry of queryCompleted() to check if the results have been returned or not yet
+
+	@param queryIndex the int value returned from the queryAsync call
+	@return a string with the value requested.  this is either going to be a single string value or a json structure.
+	*/
+	std::string queryFinalize(int queryIndex);
+
+	/** check if an asynchronous query call has been completed
+	@return true if the results are ready for @queryFinalize
+	*/
+	bool queryCompleted(int queryIndex) const;
+
   protected:
     /** function to deal with any operations that need to occur on a time update*/
     virtual void updateTime (Time newTime, Time oldTime);

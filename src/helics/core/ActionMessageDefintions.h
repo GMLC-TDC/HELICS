@@ -25,18 +25,22 @@ across different compilers*/
 enum class action_t : int32_t
 {
 	//priority commands
+	cmd_disconnect = -3,  //!< command to disconnect a broker from a higher level broker
 	cmd_fed_ack = -25,  //!<a reply with the global id or an error if the fed registration failed
+
 	cmd_broker_ack = -27,  // a reply to the connect command with a global route id
 	cmd_add_route = -32,  //!< command to define a route
 	cmd_route_ack = -16,  //!< acknowledge reply to a route registration
 	cmd_register_route = -15,  //!< instructions to create a direct route to another federate
 	cmd_reg_fed = -105,  //!< register a federate
 	cmd_priority_ack = -254, //!< priority commands usually have an ack this is an ack that doesn't do anything
+	cmd_query = -cmd_info_basis - 37,  //!< send a query
+	cmd_query_reply = -cmd_info_basis -38, //!< response to a query
 	cmd_reg_broker = -cmd_info_basis - 40,  //!< for a broker to connect with a higher level broker
 
 
 	cmd_ignore = 0, //!< null command
-	cmd_disconnect =  3,  //!< command to disconnect a broker from a higher level broker
+	
 	cmd_init = 5,  //!< request entry to init mode
 	cmd_init_grant = 7,  //!< grant entry to initialization mode
 	cmd_init_not_ready = 8,  //!< retract an init ready command
@@ -68,23 +72,26 @@ enum class action_t : int32_t
 						// commands that require the extra info allocation have numbers greater than cmd_info_basis
 						cmd_time_request = cmd_info_basis + 10,  //!< request a time or iteration
 						cmd_send_message = cmd_info_basis + 20,  //!< send a message
-						cmd_send_for_filter = cmd_info_basis + 30,  //!< send a message to be filtered
-
+						cmd_send_for_filter = cmd_info_basis + 30,  //!< send a message to be filtered and forward on to the destination
+						cmd_send_for_filter_op = cmd_info_basis+32, //!< send a message to be filters via a callback operation and return to the source
 						
 						cmd_reg_pub = cmd_info_basis + 50,  //!< register a publication
 						cmd_notify_pub =  50,  //!< notify of a publication
-						cmd_reg_dst = cmd_info_basis + 60,  //!< register a destination filter
-						cmd_notify_dst =   60,  //!< notify of a destination filter
+						cmd_reg_dst_filter = cmd_info_basis + 60,  //!< register a destination filter
+						cmd_notify_dst_filter =   cmd_info_basis+62,  //!< notify of a destination filter
 						cmd_reg_sub = cmd_info_basis + 70,  //!< register a subscription
 						cmd_notify_sub =  70,  //!< notify of a subscription
-						cmd_reg_src = cmd_info_basis + 80,  //!< register a source filter
-						cmd_notify_src =  80,  //!< notify of a source
+						cmd_reg_src_filter = cmd_info_basis + 80,  //!< register a source filter
+						cmd_notify_src_filter = cmd_info_basis + 82,  //!< notify of a source
+						cmd_src_filter_has_operator =82, //!< notify that a source filter has an operator
 						cmd_reg_end = cmd_info_basis + 90,  //!< register an endpoint
 						cmd_notify_end =  90,  //!< notify of an endpoint
 
-						cmd_protocol_priority=-60000,
+						cmd_has_operator= 92, //!< notify that a filter has an operator
+						cmd_protocol_priority=-60000, //!< priority cmd used by protocol stacks and ignored by core
 						cmd_protocol =  60000,  //!< cmd used in the protocol stacks and ignored by the core
 						cmd_protocol_big = cmd_info_basis + 60000  //!< cmd used in the protocol stacks with the additional info
+						
 };
 
 }  //namespace action_message_def
@@ -107,6 +114,7 @@ enum class action_t : int32_t
 #define CMD_TIME_CHECK action_message_def::action_t::cmd_time_check
 #define CMD_SEND_MESSAGE action_message_def::action_t::cmd_send_message
 #define CMD_SEND_FOR_FILTER action_message_def::action_t::cmd_send_for_filter
+#define CMD_SEND_FOR_FILTER_OPERATION action_message_def::action_t::cmd_send_for_filter_op
 #define CMD_PUB action_message_def::action_t::cmd_pub
 #define CMD_LOG action_message_def::action_t::cmd_log
 #define CMD_WARNING action_message_def::action_t::cmd_warning
@@ -117,10 +125,11 @@ enum class action_t : int32_t
 #define CMD_NOTIFY_SUB action_message_def::action_t::cmd_notify_sub
 #define CMD_REG_END action_message_def::action_t::cmd_reg_end
 #define CMD_NOTIFY_END action_message_def::action_t::cmd_notify_end
-#define CMD_REG_DST_FILTER action_message_def::action_t::cmd_reg_dst
-#define CMD_NOTIFY_DST_FILTER action_message_def::action_t::cmd_notify_dst
-#define CMD_REG_SRC_FILTER action_message_def::action_t::cmd_reg_src
-#define CMD_NOTIFY_SRC_FILTER action_message_def::action_t::cmd_notify_src
+#define CMD_REG_DST_FILTER action_message_def::action_t::cmd_reg_dst_filter
+#define CMD_NOTIFY_DST_FILTER action_message_def::action_t::cmd_notify_dst_filter
+#define CMD_REG_SRC_FILTER action_message_def::action_t::cmd_reg_src_filter
+#define CMD_NOTIFY_SRC_FILTER action_message_def::action_t::cmd_notify_src_filter
+#define CMD_SRC_FILTER_HAS_OPERATOR action_message_def::action_t::cmd_src_filter_has_operator
 
 #define CMD_ADD_DEPENDENCY action_message_def::action_t::cmd_add_dependency
 #define CMD_REMOVE_DEPENDENCY action_message_def::action_t::cmd_remove_dependency
@@ -135,6 +144,9 @@ enum class action_t : int32_t
 #define CMD_PROTOCOL_BIG action_message_def::action_t::cmd_protocol_big
 
 #define CMD_PRIORITY_ACK action_message_def::action_t::cmd_priority_ack
+
+#define CMD_QUERY action_message_def::action_t::cmd_query
+#define CMD_QUERY_REPLY action_message_def::action_t::cmd_query_reply
 
 // definitions for the protocol options
 #define PROTOCOL_PING 10

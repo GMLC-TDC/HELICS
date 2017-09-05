@@ -10,6 +10,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 #include "core/helics-time.h"
 #include <future>
+#include <map>
+#include <string>
+
 /** helper class for Federate info that holds the futures for async calls*/
 class asyncFedCallInfo
 {
@@ -18,5 +21,8 @@ public:
 	std::future<convergence_state> execFuture; /** future for the enter execution mode call*/
 	std::future<helics::Time> timeRequestFuture; /** future for the timeRequest call*/
 	std::future<helics::iterationTime> timeRequestIterativeFuture; /** future for the time request iterative call*/
+	std::atomic<int> queryCounter{ 0 }; //!< counter for the number of queries
+	std::map<int, std::future<std::string>> inFlightQueries; //!< the queries that are actually in flight at a given time
 };
+
 #endif

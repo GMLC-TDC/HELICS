@@ -26,6 +26,7 @@ ZeromqCore-tests.cpp
 MpiCore-tests.cpp
 Node_Core-tests.cpp
 testFixtures.cpp
+IPCcore_tests.cpp
 )
 
 

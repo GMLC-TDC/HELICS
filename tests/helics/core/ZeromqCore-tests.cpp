@@ -166,8 +166,8 @@ BOOST_AUTO_TEST_CASE(zeromqcore_messagefilter_test)
 	Core::Handle end2 = core->registerEndpoint(id, "end2", "type");
 	Core::Handle end3 = core->registerEndpoint(id, "end3", "type");
 
-	Core::Handle srcFilter = core->registerSourceFilter(id, "srcFilter", "end1", "type");
-	Core::Handle dstFilter = core->registerDestinationFilter(id, "dstFilter", "end3", "type");
+	Core::Handle srcFilter = core->registerSourceFilter(id, "srcFilter", "end1", "type","");
+	Core::Handle dstFilter = core->registerDestinationFilter(id, "dstFilter", "end3", "type","");
 
 	auto testSrcFilter = std::make_shared<TestOperator>("sourceFilter");
 	BOOST_CHECK_EQUAL(testSrcFilter->filterName, "sourceFilter");

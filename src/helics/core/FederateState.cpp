@@ -386,7 +386,7 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::Handle &id)
     return nullptr;
 }
 
-std::unique_ptr<Message> FederateState::receiveForFilter (Core::Handle &id)
+std::unique_ptr<Message> FederateState::receiveAnyFilter (Core::Handle &id)
 {
     Time earliest_time = Time::maxVal ();
     FilterInfo *filterI = nullptr;
@@ -847,7 +847,15 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 
 	case CMD_REG_DST_FILTER:
 	case CMD_NOTIFY_DST_FILTER:
+	{
+		auto endI = getEndpoint(cmd.dest_handle);
+		if (endI != nullptr)
+		{
+			addDependency(cmd.source_id);
+			// todo probably need to do something more here
+		}
 		break;
+	}
 	case CMD_REG_SRC_FILTER:
 	case CMD_NOTIFY_SRC_FILTER:
 	{
@@ -855,7 +863,6 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 		if (endI != nullptr)
 		{
 			endI->hasFilter = true;
-			// TODO: this should be conditional on whether it is a operational filter
 			addDependent(cmd.source_id);
 			// todo probably need to do something more here
 		}
