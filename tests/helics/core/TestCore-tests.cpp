@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_source_test)
 	Core::Handle endp = core->registerEndpoint(id, "end_filt", "type");
 
 	
-	Core::Handle srcFilter = core->registerSourceFilter(id, "srcFilter", "end1", "type");
+	Core::Handle srcFilter = core->registerSourceFilter(id, "srcFilter", "end1", "type","type");
 
 	core->enterInitializingState(id);
 	core->enterExecutingState(id);
@@ -219,8 +219,8 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_callback_test)
 	Core::Handle end1 = core->registerEndpoint(id, "end1", "type");
 	Core::Handle end2 = core->registerEndpoint(id, "end2", "type");
 
-	Core::Handle srcFilter = core->registerSourceFilter(id, "srcFilter", "end1", "type");
-	Core::Handle dstFilter = core->registerDestinationFilter(id, "dstFilter", "end2", "type");
+	Core::Handle srcFilter = core->registerSourceFilter(id, "srcFilter", "end1", "type","type");
+	Core::Handle dstFilter = core->registerDestinationFilter(id, "dstFilter", "end2", "type","type");
 
 	auto testSrcFilter = std::make_shared<TestOperator>("sourceFilter");
 	BOOST_CHECK_EQUAL(testSrcFilter->filterName, "sourceFilter");
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_callback_test)
 	BOOST_CHECK_EQUAL(core->receiveCount(end2), 1u);
 	auto msg = core->receive(end2);
 	BOOST_CHECK_EQUAL(msg->origsrc, "end1");
-	BOOST_CHECK_EQUAL(msg->data.to_string(), "jello world");
+	BOOST_CHECK_EQUAL(msg->data.to_string(), "hello world");
 
 }
 

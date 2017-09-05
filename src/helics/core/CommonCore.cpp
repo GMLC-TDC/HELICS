@@ -1270,7 +1270,7 @@ ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage 
 		if (filtFunc->hasSourceOperators)
 		{
 			
-			for (int ii=0;ii <filtFunc->sourceOperators.size();++ii)
+			for (int ii=0;ii <static_cast<int>(filtFunc->sourceOperators.size());++ii)
 			{
 				auto fed = getFederate(filtFunc->sourceOperators[ii].fed_id);
 				if (fed != nullptr)
@@ -1286,10 +1286,9 @@ ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage 
 				{
 					m.dest_id = filtFunc->sourceOperators[ii].fed_id;
 					m.dest_handle = filtFunc->sourceOperators[ii].handle;
-					if ((ii < filtFunc->sourceOperators.size() - 1)|| (filtFunc->finalSourceFilter.fed_id != invalid_fed_id))
+					if ((ii < static_cast<int>(filtFunc->sourceOperators.size() - 1))|| (filtFunc->finalSourceFilter.fed_id != invalid_fed_id))
 					{
 						m.setAction(CMD_SEND_FOR_FILTER_OPERATION);
-						
 					}
 					else
 					{
@@ -2055,6 +2054,9 @@ void CommonCore::processFilterInfo(ActionMessage &command)
 				break;
 			}
 		}
+		break;
+	default:
+		//all other commands do not impact filters
 		break;
 	}
 }

@@ -57,6 +57,9 @@ void FederateState::setState (helics_federate_state_type newState)
         state.compare_exchange_strong (reqState, newState);
         break;
     }
+	case HELICS_NONE:
+	default:
+		break;
     }
 }
 

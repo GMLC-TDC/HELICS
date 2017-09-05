@@ -14,6 +14,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <mutex>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <extra_includes/optional.h>
 
 /** class implementing a blocking queue
@@ -45,7 +46,7 @@ public:
 	}
 	/** enable the move constructor not the copy constructor*/
 	BlockingQueue2(BlockingQueue2 &&bq) noexcept
-		: pushElements(std::move(sq.pushElements)), pullElements(std::move(sq.pullElements))
+		: pushElements(std::move(bq.pushElements)), pullElements(std::move(bq.pullElements))
 	{
 	}
 

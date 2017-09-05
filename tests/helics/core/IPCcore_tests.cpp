@@ -12,7 +12,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/core/core-types.h"
 #include "helics/core/ipc/IpcCore.h"
 #include "boost/interprocess/ipc/message_queue.hpp"
-#include "boost/process.hpp"
+//#include "boost/process.hpp"
 
 BOOST_AUTO_TEST_SUITE(IPCCore_tests)
 

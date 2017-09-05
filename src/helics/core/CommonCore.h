@@ -108,7 +108,7 @@ CommonCore(const std::string &core_name);
 
   virtual void setLoggingFunction(federate_id_t federateID, std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
   
-  virtual std::string query(const std::string &target, const std::string &queryStr);
+  virtual std::string query(const std::string &target, const std::string &queryStr) override;
 
   /** get a string representing the connection info to send data to this object*/
   virtual std::string getAddress() const=0;

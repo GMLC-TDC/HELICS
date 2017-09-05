@@ -153,5 +153,10 @@ enum class action_t : int32_t
 #define PROTOCOL_PONG 11
 #define CLOSE_RECEIVER 23425215
 
+
+inline bool hasInfo(action_message_def::action_t action)
+{
+	return ((action > action_message_def::action_t::null_info_command) || (action < action_message_def::action_t::priority_null_info_command));
+}
 }  // namespace helics
 #endif  // ACTION_MESSAGE_DEFINITIONS_

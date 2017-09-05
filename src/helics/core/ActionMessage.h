@@ -171,10 +171,7 @@ class ActionMessage
 
 };
 
-inline bool hasInfo(action_message_def::action_t action)
-{
-	return ((action > action_message_def::action_t::null_info_command) || (action < action_message_def::action_t::priority_null_info_command));
-}
+
 
 
 /** create a new message object that copies all the information from the cmd into newly allocated memory for the
