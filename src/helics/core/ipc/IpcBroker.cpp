@@ -186,15 +186,6 @@ bool IpcBroker::brokerConnect()
 		brokerloc = brokername + "_queue.hqf";
 	}
 	int sleep_counter = 50;
-	while (!boost::filesystem::exists(brokerloc))
-	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_counter));
-		sleep_counter *= 2;
-		if (sleep_counter > 1700)
-		{
-			break;
-		}
-	}
 	try
 	{
 		brokerQueue = std::make_unique<ipc_queue>(boost::interprocess::open_only, brokerloc.c_str());
@@ -202,8 +193,10 @@ bool IpcBroker::brokerConnect()
 	}
 	catch (boost::interprocess::interprocess_exception const& ipe)
 	{
-		return false;
+		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_counter));
+		sleep_counter *= 2;
 	}
+	return false;
 	
 }
 
@@ -250,7 +243,8 @@ void IpcBroker::transmit(int route_id, const ActionMessage &cmd)
 
 void IpcBroker::addRoute(int route_id, const std::string &routeInfo)
 {
-	if (boost::filesystem::exists(routeInfo))
+	int tries = 0;
+	while (tries < 2)
 	{
 		try
 		{
@@ -259,9 +253,9 @@ void IpcBroker::addRoute(int route_id, const std::string &routeInfo)
 		}
 		catch (const boost::interprocess::interprocess_exception &ipe)
 		{
-
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			++tries;
 		}
-		
 	}
 }
 

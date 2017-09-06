@@ -21,7 +21,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 BOOST_FIXTURE_TEST_SUITE (value_federate_tests, ValueFederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-const std::string core_types[] = { "test" };
+const std::string core_types[] = { "ipc" };
 
 
 /** test simple creation and destruction*/
