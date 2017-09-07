@@ -61,9 +61,7 @@ bool CommsInterface::connect()
 		{
 			if (queue_transmitter.joinable())
 			{
-				ActionMessage rt(CMD_PROTOCOL);
-				rt.index = DISCONNECT;
-				transmit(-1, rt);
+				closeTransmitter();
 				queue_transmitter.join();
 			}
 		}
@@ -76,7 +74,7 @@ bool CommsInterface::connect()
 		{
 			if (queue_watcher.joinable())
 			{
-				//todo:: what to do here  --we lost the ability to transmit
+				closeReceiver();
 				queue_watcher.join();
 			}
 		}
@@ -90,21 +88,17 @@ void CommsInterface::disconnect()
 {
 	if (queue_watcher.joinable())
 	{
-		ActionMessage cmd(CMD_PROTOCOL);
-		cmd.index = CLOSE_RECEIVER;
-		transmit(-1, cmd);
+		closeReceiver();
 		queue_watcher.join();
 	}
 	if (queue_transmitter.joinable())
 	{
-		ActionMessage rt(CMD_PROTOCOL);
-		rt.index = DISCONNECT;
-		transmit(-1, rt);
+		closeTransmitter();
 		queue_transmitter.join();
 	}
 }
 
-void CommsInterface::setCallback(std::function<void(ActionMessage)> callback)
+void CommsInterface::setCallback(std::function<void(ActionMessage &&)> callback)
 {
 	ActionCallback = std::move(callback);
 }

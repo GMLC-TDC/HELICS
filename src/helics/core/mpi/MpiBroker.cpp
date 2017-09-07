@@ -11,8 +11,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/core/core.h"
 #include "helics/core/core-data.h"
 #include "helics/core/helics-time.h"
-#include "helics/core/zmq/ZmqBroker.h"
-#include "helics/core/zmq/ZmqComms.h"
+#include "MpiBroker.h"
+#include "MpiComms.h"
 
 #include <algorithm>
 #include <cassert>
@@ -52,20 +52,20 @@ static const std::vector<std::tuple<std::string, std::string, std::string>> extr
 	{ "brokerinit", "string", "the initialization string for the broker" }
 };
 
-ZmqBroker::ZmqBroker(bool rootBroker) noexcept:CoreBroker(rootBroker)
+MpiBroker::MpiBroker(bool rootBroker) noexcept:CoreBroker(rootBroker)
 {}
 
-ZmqBroker::ZmqBroker(const std::string &broker_name) :CoreBroker(broker_name) {}
+MpiBroker::MpiBroker(const std::string &broker_name) : CoreBroker(broker_name) {}
 
-ZmqBroker::~ZmqBroker() = default;
+MpiBroker::~MpiBroker() = default;
 
-void ZmqBroker::InitializeFromArgs(int argc, char *argv[])
+void MpiBroker::InitializeFromArgs(int argc, char *argv[])
 {
 	namespace po = boost::program_options;
 	if (brokerState == broker_state_t::created)
 	{
 		po::variables_map vm;
-		argumentParser(argc, argv, vm,extraArgs);
+		argumentParser(argc, argv, vm, extraArgs);
 
 		if (vm.count("broker") > 0)
 		{
@@ -81,32 +81,32 @@ void ZmqBroker::InitializeFromArgs(int argc, char *argv[])
 	}
 }
 
-bool ZmqBroker::brokerConnect()
+bool MpiBroker::brokerConnect()
 {
 
-	comms = std::make_unique<ZmqComms>("", "");
+	comms = std::make_unique<MpiComms>("", "");
 	comms->setCallback([this](ActionMessage M) {addCommand(std::move(M)); });
 	//comms->setMessageSize(maxMessageSize, maxMessageCount);
 	return comms->connect();
 }
 
-void ZmqBroker::brokerDisconnect()
+void MpiBroker::brokerDisconnect()
 {
 	comms->disconnect();
 }
 
-void ZmqBroker::transmit(int route_id, const ActionMessage &cmd)
+void MpiBroker::transmit(int route_id, const ActionMessage &cmd)
 {
 	comms->transmit(route_id, cmd);
 }
 
-void ZmqBroker::addRoute(int route_id, const std::string &routeInfo)
+void MpiBroker::addRoute(int route_id, const std::string &routeInfo)
 {
 	comms->addRoute(route_id, routeInfo);
 }
 
 
-std::string ZmqBroker::getAddress() const
+std::string MpiBroker::getAddress() const
 {
 	return "";
 }

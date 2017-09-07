@@ -32,7 +32,7 @@ public:
 	void addRoute(int route_id, const std::string &routeInfo);
 	bool connect();
 	void disconnect();
-	void setCallback(std::function<void(ActionMessage)> callback);
+	void setCallback(std::function<void(ActionMessage &&)> callback);
 	void setMessageSize(int maxMessageSize, int maxQueueSize);
 protected:
 	//enumeration of the connection status flags for more immediate feedback from the processing threads
@@ -49,7 +49,7 @@ protected:
 	std::string brokerTarget_;	//!< the identifier for the broker target
 	int maxMessageSize_ = 16 * 1024; //!< the maximum message size for the queues (if needed)
 	int maxMessageCount_ = 1024;  //!< the maximum number of message to buffer (if needed)
-	std::function<void(ActionMessage)> ActionCallback; //!< the callback for what to do with a received message
+	std::function<void(ActionMessage &&)> ActionCallback; //!< the callback for what to do with a received message
 	BlockingQueue2<std::pair<int, ActionMessage>> txQueue; //!< set of messages waiting to be transmitted
 	std::atomic<connection_status> tx_status{ connection_status::startup }; //!< the status of the transmitter thread
 private:
@@ -57,6 +57,8 @@ private:
 	std::thread queue_watcher; //!< thread monitoring the receive queue
 	virtual void queue_rx_function()=0;	//!< the functional loop for the receive queue
 	virtual void queue_tx_function()=0;  //!< the loop for transmitting data
+	virtual void closeTransmitter() = 0; //!< function to instruct the transmitter loop to close
+	virtual void closeReceiver() = 0;  //!< function to instruct the receiver loop to close
 };
 
 

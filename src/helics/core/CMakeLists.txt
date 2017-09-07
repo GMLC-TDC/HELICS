@@ -9,7 +9,6 @@ set(SRC_FILES
 	BrokerFactory.cpp
     TestCore.cpp
 	CommonCore.cpp
-    mpi/mpi-core.cc
 	FederateState.cpp
 	SubscriptionInfo.cpp
 	FilterInfo.cpp
@@ -23,12 +22,20 @@ set(SRC_FILES
 	ipc/IpcComms.cpp
 	TimeCoordinator.cpp
 	CommsInterface.cpp
+	argParser.cpp
+)
+
+set (MPI_SOURCE_FILES
+	mpi/MpiCore.cpp
+	mpi/MpiBroker.cpp
+	mpi/MpiComms.cpp
 )
 
 set (ZMQ_SOURCE_FILES
 	zmq/ZmqCore.cpp
     zmq/zmq-helper.cc
 	zmq/ZmqBroker.cpp
+	zmq/ZmqComms.cpp
 )
 
 set(INCLUDE_FILES
@@ -47,7 +54,6 @@ set(INCLUDE_FILES
 	ActionMessageDefintions.h
 	ActionMessage.h
 	CommonCore.h
-    mpi/mpi-core.h
 	ipc/IpcCore.h
 	ipc/IpcBroker.h
 	ipc/IpcComms.h
@@ -61,19 +67,29 @@ set(INCLUDE_FILES
 	BasicHandleInfo.h
 	FilterFunctions.h
 	TestBroker.h
-	
+	argParser.h
 )
 
 set(ZMQ_HEADER_FILES
 	zmq/ZmqCore.h
     zmq/zmq-helper.h
 	zmq/ZmqBroker.h
+	zmq/ZmqComms.h
 )
+
+set(MPI_HEADER_FILES
+	mpi/MpiCore.h
+	mpi/MpiBroker.h
+	mpi/MpiComms.h
+	)
 
 if (${ZMQ_FOUND})
    list(APPEND SRC_FILES ${ZMQ_SOURCE_FILES})
    list(APPEND INCLUDE_FILES ${ZMQ_HEADER_FILES})
 endif (${ZMQ_FOUND})
+
+list(APPEND SRC_FILES ${MPI_SOURCE_FILES})
+list(APPEND INCLUDE_FILES ${MPI_HEADER_FILES})
 
 include_directories(${Boost_INCLUDE_DIR})
 add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES})

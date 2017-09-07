@@ -225,4 +225,27 @@ IpcComms::~IpcComms()
 		tx_status = connection_status::terminated;
 	}
 	
+
+
+void IpcComms::closeTransmitter()
+{
+	ActionMessage rt(CMD_PROTOCOL);
+	rt.index = DISCONNECT;
+	transmit(-1, rt);
+}
+
+void IpcComms::closeReceiver()
+{
+	if (tx_status == connection_status::connected)
+	{
+		ActionMessage cmd(CMD_PROTOCOL);
+		cmd.index = CLOSE_RECEIVER;
+		transmit(-1, cmd);
+	}
+	else
+	{
+		//TODO:: what to do here
+	}
+}
+
 }

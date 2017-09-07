@@ -16,15 +16,20 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 namespace helics {
 
 /** implementation for the core that uses zmq messages to communicate*/
-class IpcComms:public CommsInterface {
+class ZmqComms:public CommsInterface {
 
 public:
 	/** default constructor*/
-	IpcComms() = default;
-	IpcComms(const std::string &brokerTarget, const std::string &localTarget);
+	ZmqComms() = default;
+	ZmqComms(const std::string &brokerTarget, const std::string &localTarget);
 	/** destructor*/
-	~IpcComms();
+	~ZmqComms();
+	void setPortNumbers(int repPort, int pullPort);
+	void setReplyCallback(std::function<ActionMessage(ActionMessage &&)> callback);
 private:
+	int repPortNumber = -1;
+	int pullPortNumber = -1;
+	std::function<ActionMessage(ActionMessage &&)> replyCallback;
 	virtual void queue_rx_function() override;	//!< the functional loop for the receive queue
 	virtual void queue_tx_function() override;  //!< the loop for transmitting data
 	virtual void closeTransmitter() override; //!< function to instruct the transmitter loop to close
