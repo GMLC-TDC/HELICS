@@ -27,7 +27,7 @@ TestCore::TestCore (const std::string &core_name) : CommonCore (core_name) {}
 
 TestCore::TestCore (std::shared_ptr<CoreBroker> nbroker) : tbroker (std::move (nbroker)) {}
 
-static const std::vector<std::tuple<std::string, std::string, std::string>> extraArgs
+static const argDescriptors extraArgs
 {
 	{ "brokername", "string", "identifier for the broker-same as broker" },
 	{ "brokerinit", "string", "the initialization string for the broker" }

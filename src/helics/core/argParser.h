@@ -19,7 +19,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-void argumentParser(int argc, char *argv[], boost::program_options::variables_map &vm_map, const std::vector<std::tuple<std::string, std::string, std::string>> &additionalArgs);
+using argDescriptors = std::vector<std::tuple<std::string, std::string, std::string>>;
+
+void argumentParser(int argc, char *argv[], boost::program_options::variables_map &vm_map, const argDescriptors &additionalArgs);
 }
 
-#endif _ARG_PARSER_
+#endif //_ARG_PARSER_

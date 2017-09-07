@@ -28,7 +28,7 @@ TestBroker::TestBroker(const std::string &broker_name) :CoreBroker(broker_name)
 TestBroker::TestBroker (std::shared_ptr<TestBroker> nbroker) : tbroker (std::move (nbroker)) {}
 
 
-static const std::vector<std::tuple<std::string, std::string, std::string>> extraArgs
+static const argDescriptors extraArgs
 {
 	{ "brokername", "string", "identifier for the broker-same as broker" },
 	{ "brokerinit", "string", "the initialization string for the broker" }

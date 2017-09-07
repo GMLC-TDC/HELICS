@@ -45,7 +45,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 namespace helics
 {
 
-static const std::vector<std::tuple<std::string, std::string, std::string>> extraArgs
+static const argDescriptors extraArgs
 {
 	{"queueloc", "string", "the file location of the shared queue"},
 	{"brokerloc", "string", "the file location for the broker"},

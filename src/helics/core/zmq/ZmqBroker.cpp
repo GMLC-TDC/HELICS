@@ -47,7 +47,7 @@ namespace helics
 {
 
 
-static const std::vector<std::tuple<std::string, std::string, std::string>> extraArgs
+static const argDescriptors extraArgs
 {
 	{ "brokerinit", "string", "the initialization string for the broker" }
 };

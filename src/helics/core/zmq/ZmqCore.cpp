@@ -48,7 +48,7 @@ constexpr int defaultBrokerPULLport = 23406;
 namespace helics
 {
 
-static const std::vector<std::tuple<std::string, std::string, std::string>> extraArgs
+static const argDescriptors extraArgs
 {
 	{ "brokerport", "int", "port number for the broker" },
 	{ "port", "int", "port number for the broker" },

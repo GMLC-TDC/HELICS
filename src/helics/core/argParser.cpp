@@ -15,7 +15,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-void argumentParser(int argc, char *argv[], boost::program_options::variables_map &vm_map, const std::vector<std::tuple<std::string, std::string,std::string>> &additionalArgs)
+void argumentParser(int argc, char *argv[], boost::program_options::variables_map &vm_map, const argDescriptors &additionalArgs)
 {
 	namespace po = boost::program_options;
 	po::options_description cmd_only("command line only");

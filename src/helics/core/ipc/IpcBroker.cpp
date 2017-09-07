@@ -39,7 +39,7 @@ constexpr size_t maxMessageCount = 1024 * 8;
 namespace helics
 {
 
-static const std::vector<std::tuple<std::string, std::string, std::string>> extraArgs
+static const argDescriptors extraArgs
 {
 	{"queueloc", "string", "the named location of the shared queue"},
 	{"brokerloc", "string", "the queue location for the broker" },
