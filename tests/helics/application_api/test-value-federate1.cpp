@@ -14,6 +14,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/application_api/ValueFederate.h"
 #include "test_configuration.h"
 #include "testFixtures.h"
+#include "helics/core/CoreFactory.h"
+#include "helics/core/BrokerFactory.h"
+
 
 /** these test cases test out the value federates
  */
@@ -192,11 +195,14 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer, bdata::make(core_types), co
 
 
 template <class X>
-void runFederateTest (const std::string &core_type, const X &defaultValue, const X &testValue1, const X &testValue2)
+void runFederateTest (const std::string &core_type_str, const X &defaultValue, const X &testValue1, const X &testValue2)
 {
+	auto core_type = helics::coreTypeFromString(core_type_str);
+	auto brk = helics::BrokerFactory::create(core_type, "1");
+
     helics::FederateInfo fi ("test1");
-    fi.coreType = core_type;
-    fi.coreInitString = "1";
+    fi.coreType = core_type_str;
+    fi.coreInitString = "--broker=" + brk->getIdentifier() + " --federates 1";
 
     auto vFed = std::make_shared<helics::ValueFederate> (fi);
     // register the publications
@@ -238,11 +244,14 @@ void runFederateTest (const std::string &core_type, const X &defaultValue, const
 }
 
 template <class X>
-void runFederateTestv2 (const std::string &core_type, const X &defaultValue, const X &testValue1, const X &testValue2)
+void runFederateTestv2 (const std::string &core_type_str, const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-    helics::FederateInfo fi ("test1");
-    fi.coreType = core_type;
-    fi.coreInitString = "1";
+	auto core_type = helics::coreTypeFromString(core_type_str);
+	auto brk = helics::BrokerFactory::create(core_type, "1");
+
+	helics::FederateInfo fi("test1");
+	fi.coreType = core_type_str;
+	fi.coreInitString = "--broker=" + brk->getIdentifier() + " --federates 1";
 
     auto vFed = std::make_shared<helics::ValueFederate> (fi);
     // register the publications
@@ -284,8 +293,6 @@ void runFederateTestv2 (const std::string &core_type, const X &defaultValue, con
 
 BOOST_DATA_TEST_CASE(value_federate_single_transfer_types, bdata::make(core_types), core_type)
 {
-    StartBroker(core_type, "1");
-
     runFederateTest<double> (core_type, 10.3, 45.3, 22.7);
 	runFederateTest<double>(core_type, 1.0, 0.0, 3.0);
     runFederateTest<int> (core_type, 5, 8, 43);
@@ -355,11 +362,14 @@ BOOST_DATA_TEST_CASE(value_federate_dual_transfer, bdata::make(core_types), core
 
 
 template <class X>
-void runDualFederateTest (const std::string &core_type, const X &defaultValue, const X &testValue1, const X &testValue2)
+void runDualFederateTest (const std::string &core_type_str, const X &defaultValue, const X &testValue1, const X &testValue2)
 {
+	auto core_type = helics::coreTypeFromString(core_type_str);
+	auto brk = helics::BrokerFactory::create(core_type, "2");
+
     helics::FederateInfo fi ("test1");
-    fi.coreType = core_type;
-    fi.coreInitString = "2";
+    fi.coreType = core_type_str;
+    fi.coreInitString = "--broker=" + brk->getIdentifier() + " --federates 2";
 
     auto vFed1 = std::make_shared<helics::ValueFederate> (fi);
     fi.name = "test2";
@@ -418,11 +428,14 @@ void runDualFederateTest (const std::string &core_type, const X &defaultValue, c
 
 
 template <class X>
-void runDualFederateTestv2 (const std::string &core_type, X &defaultValue, const X &testValue1, const X &testValue2)
+void runDualFederateTestv2 (const std::string &core_type_str, X &defaultValue, const X &testValue1, const X &testValue2)
 {
-    helics::FederateInfo fi ("test1");
-    fi.coreType = core_type;
-    fi.coreInitString = "2";
+	auto core_type = helics::coreTypeFromString(core_type_str);
+	auto brk = helics::BrokerFactory::create(core_type, "2");
+
+	helics::FederateInfo fi("test1");
+	fi.coreType = core_type_str;
+	fi.coreInitString = "--broker=" + brk->getIdentifier() + " --federates 2";
 
     auto vFed1 = std::make_shared<helics::ValueFederate> (fi);
     fi.name = "test2";
@@ -478,8 +491,7 @@ void runDualFederateTestv2 (const std::string &core_type, X &defaultValue, const
  */
 BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types, bdata::make(core_types), core_type)
 {
-    StartBroker(core_type, "2");
-
+   
     runDualFederateTest<double> (core_type, 10.3, 45.3, 22.7);
     runDualFederateTest<int> (core_type, 5, 8, 43);
     runDualFederateTest<int> (core_type, -5, 1241515, -43);

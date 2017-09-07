@@ -96,9 +96,9 @@ void CommonCore::initializeFromArgs (int argC, char *argv[])
         {
             _min_federates = vm["min"].as<int> ();
         }
-        if (vm.count ("minfed") > 0)
+        if (vm.count ("federates") > 0)
         {
-            _min_federates = vm["minfed"].as<int> ();
+            _min_federates = vm["federates"].as<int> ();
         }
 
         if (vm.count ("maxiter") > 0)
@@ -210,7 +210,7 @@ void argumentParser (int argc, char *argv[], boost::program_options::variables_m
 
 	config.add_options()
 		("name,n", po::value<std::string>(), "name of the core")
-		("minfed", po::value<int>(), "type of the publication to use")
+		("federates", po::value<int>(), "the minimum number of federates that will be connecting")
 		("maxiter",po::value<int>(),"maximum number of iterations")
 		("logfile",po::value<std::string>(),"the file to log message to")
 		("loglevel",po::value<int>(),"the level which to log the higher this is set to the more gets logs (-1) for no logging")
