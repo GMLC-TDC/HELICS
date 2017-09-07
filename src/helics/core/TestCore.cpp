@@ -159,7 +159,7 @@ void TestCore::transmit (int route_id, const ActionMessage &cmd)
 {
     if (route_id == 0)
     {
-        tbroker->addMessage (cmd);
+        tbroker->addCommand (cmd);
         return;
     }
     auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (routeMutex, std::defer_lock) :
@@ -167,7 +167,7 @@ void TestCore::transmit (int route_id, const ActionMessage &cmd)
     auto brkfnd = brokerRoutes.find (route_id);
     if (brkfnd != brokerRoutes.end ())
     {
-        brkfnd->second->addMessage (cmd);
+        brkfnd->second->addCommand (cmd);
         return;
     }
     auto crfnd = coreRoutes.find (route_id);
@@ -177,7 +177,7 @@ void TestCore::transmit (int route_id, const ActionMessage &cmd)
         return;
     }
 
-    tbroker->addMessage (cmd);
+    tbroker->addCommand (cmd);
 }
 
 void TestCore::addRoute (int route_id, const std::string &routeInfo)

@@ -153,8 +153,7 @@ void ZmqCore::initializeFromArgs (int argc, char *argv[])
 }
 
 bool ZmqCore::brokerConnect () { return true; }
-#define NEW_ROUTE 233
-#define DISCONNECT 2523
+
 
 void ZmqCore::brokerDisconnect ()
 {

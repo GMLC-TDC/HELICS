@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/core/core.h"
 #include "helics/core/core-data.h"
 #include "helics/core/helics-time.h"
-#include "helics/core/ipc/IpcCore.h"
+#include "IpcCore.h"
 #include "helics/core/core-exceptions.h"
 
 #include <algorithm>
@@ -21,6 +21,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <sstream>
 #include <fstream>
 
+#include "IpcComms.h"
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -43,12 +44,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-
-constexpr size_t maxMessageSize = 16 * 1024;
-
-constexpr size_t maxMessageCount = 1024;
-
-using ipc_queue = boost::interprocess::message_queue;
 
 static void argumentParser(int argc, char *argv[], boost::program_options::variables_map &vm_map)
 {
@@ -130,20 +125,15 @@ static void argumentParser(int argc, char *argv[], boost::program_options::varia
 	po::notify(vm_map);
 }
 
+IpcCore::IpcCore() noexcept
+{}
 
 IpcCore::IpcCore(const std::string &core_name) :CommonCore(core_name) {}
 
 
 IpcCore::~IpcCore()
 {
-	if (queue_watcher.joinable())
-	{
-		ActionMessage cmd(CMD_PROTOCOL);
-		cmd.index = CLOSE_RECEIVER;
-		transmit(-1, cmd);
-		queue_watcher.join();
-		ipc_queue::remove(fileloc.c_str());
-	}
+	
 }
 
 void IpcCore::initializeFromArgs(int argc, char *argv[])
@@ -180,15 +170,8 @@ bool IpcCore::brokerConnect()
 		fileloc = getIdentifier() + "_queue.hqf";
 	}
 
-		try
-		{
-			rxQueue = std::make_unique<ipc_queue>(boost::interprocess::create_only, fileloc.c_str(), maxMessageCount, maxMessageSize);
-		}
-		catch (boost::interprocess::interprocess_exception const& ipe)
-		{
-			throw(connectionFailure("failed open receive queue"));
-		}
-	queue_watcher = std::thread(&IpcCore::queue_rx_function, this);
+	
+	
 	if (brokerloc.empty())
 	{
 		if (brokername.empty())
@@ -197,76 +180,29 @@ bool IpcCore::brokerConnect()
 		}
 		brokerloc = brokername + "_queue.hqf";
 	}
-	int sleep_counter = 50;
-	while (sleep_counter < 1700)
-	{
-		try
-		{
-			brokerQueue = std::make_unique<ipc_queue>(boost::interprocess::open_only, brokerloc.c_str());
-			return true;
-		}
-		catch (boost::interprocess::interprocess_exception const& )
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(sleep_counter));
-			sleep_counter *= 2;
-		}
-	}
-	return false;
+	
+	comms = std::make_unique<IpcComms>(fileloc,brokerloc );
+	comms->setCallback([this](ActionMessage M) {addCommand(std::move(M)); });
+	return comms->connect();
 }
 
 void IpcCore::brokerDisconnect()
 {
-	if (queue_watcher.joinable())
-	{
-		ActionMessage cmd(CMD_PROTOCOL);
-		cmd.index = CLOSE_RECEIVER;
-		transmit(-1, cmd);
-		queue_watcher.join();
-		ipc_queue::remove(fileloc.c_str());
-	}
-	brokerQueue = nullptr;
-	rxQueue = nullptr;
-	ipc_queue::remove(fileloc.c_str());
+	comms->disconnect();
 }
 
 void IpcCore::transmit(int route_id, const ActionMessage &cmd)
 {
-	std::string buffer = cmd.to_string();
-	int priority = isPriorityCommand(cmd) ? 3 : 0;
-	if (route_id == 0)
-	{
-		brokerQueue->send(buffer.data(), buffer.size(), priority);
-	}
-	else if (route_id == -1)
-	{
-		rxQueue->send(buffer.data(), buffer.size(), priority);
-	}
-	else
-	{
-		auto routeFnd = routes.find(route_id);
-		if (routeFnd != routes.end())
-		{
-			routeFnd->second->send(buffer.data(), buffer.size(), priority);
-		}
-	}
+	
+	comms->transmit(route_id, cmd);
+	
 }
 
 void IpcCore::addRoute(int route_id, const std::string &routeInfo)
 {
-	int tries = 0;
-	while (tries < 3)
-	{
-		try
-		{
-			auto newQueue = std::make_unique<ipc_queue>(boost::interprocess::open_only, routeInfo.c_str());
-			routes.emplace(route_id, std::move(newQueue));
-		}
-		catch (boost::interprocess::interprocess_exception const& ipe)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			++tries;
-		}
-	}
+	
+	comms->addRoute(route_id, routeInfo);
+	
 	
 }
 
@@ -276,27 +212,5 @@ std::string IpcCore::getAddress() const
 	return fileloc;
 }
 
-void IpcCore::queue_rx_function()
-{
-	unsigned int priority;
-	size_t rx_size;
-	char buffer[maxMessageSize];
-
-	while (1)
-	{
-		rxQueue->receive(buffer, maxMessageSize, rx_size, priority);
-		ActionMessage cmd(buffer, rx_size);
-		if ((cmd.action() == CMD_PROTOCOL) || (cmd.action() == CMD_PROTOCOL_BIG))
-		{
-			if (cmd.index == CLOSE_RECEIVER)
-			{
-				return;
-			}
-			continue;
-		}
-
-		addCommand(cmd);
-	}
-}
 
 }  // namespace helics

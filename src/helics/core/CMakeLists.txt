@@ -20,8 +20,9 @@ set(SRC_FILES
 	core-data.cpp
 	ipc/IpcCore.cpp
 	ipc/IpcBroker.cpp
+	ipc/IpcComms.cpp
 	TimeCoordinator.cpp
-	
+	CommsInterface.cpp
 )
 
 set (ZMQ_SOURCE_FILES
@@ -49,7 +50,9 @@ set(INCLUDE_FILES
     mpi/mpi-core.h
 	ipc/IpcCore.h
 	ipc/IpcBroker.h
+	ipc/IpcComms.h
     
+	CommsInterface.h
 	FederateState.h
 	SubscriptionInfo.h
 	PublicationInfo.h

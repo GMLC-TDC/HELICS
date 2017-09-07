@@ -12,16 +12,16 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "core/CommonCore.h"
 
-#include <boost/interprocess/ipc/message_queue.hpp>
-
 namespace helics {
+
+class IpcComms;
 
 /** implementation for the core that uses zmq messages to communicate*/
 class IpcCore : public CommonCore {
 
 public:
 	/** default constructor*/
-  IpcCore()=default;
+  IpcCore() noexcept;
   IpcCore(const std::string &core_name);
   /** destructor*/
   ~IpcCore();
@@ -38,14 +38,7 @@ private:
 	std::string fileloc; //!< the location of the file queue
 	std::string brokerloc;	//!< the location of the broker	queue
 	std::string brokername;	//!< the name of the broker
-
-	std::unique_ptr<boost::interprocess::message_queue> rxQueue; //!< the receive queue
-	std::unique_ptr<boost::interprocess::message_queue> brokerQueue;	//!< the queue of the broker
-
-	std::map<int, std::unique_ptr<boost::interprocess::message_queue>> routes; //!< table of the routes to other brokers
-
-	std::thread queue_watcher; //!< thread monitoring the receive queue
-	void queue_rx_function();	//!< the functional loop for the receive queue
+	std::unique_ptr<IpcComms> comms;	//!< object to handle the actual interprocess Connections
 };
 
 

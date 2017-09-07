@@ -38,7 +38,7 @@ private:
 
 	virtual bool brokerConnect() override;
 	virtual void brokerDisconnect() override;
-	BlockingQueue<std::pair<int, ActionMessage>> txQueue; //!< set of messages waiting to transmitted
+	BlockingQueue2<std::pair<int, ActionMessage>> txQueue; //!< set of messages waiting to transmitted
 
 	std::thread transmitThread;
 

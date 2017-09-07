@@ -20,7 +20,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "BasicHandleInfo.h"
 #include "ActionMessage.h"
-#include "common/blocking_queue.h"
+#include "common/BlockingQueue.hpp"
 #include "common/simpleQueue.hpp"
 #include "DependencyInfo.h"
 
@@ -84,7 +84,7 @@ private:
 	std::vector<BasicBrokerInfo> _brokers;  //!< container for the basic broker info for all subbrokers
 	std::string local_broker_identifier;  //!< a randomly generated string  or assigned name for initial identification of the broker
 	std::string previous_local_broker_identifier; //!< the previous identifier in case a rename is required
-	BlockingQueue<ActionMessage> _queue; //!< primary routing queue
+	BlockingQueue2<ActionMessage> _queue; //!< primary routing queue
 	std::unordered_map<std::string, int32_t> fedNames;  //!< a map to lookup federates <fed name, local federate index>
 	std::unordered_map<std::string, int32_t> brokerNames;  //!< a map to lookup brokers <broker name, local broker index>
 	std::unordered_map<std::string, int32_t> publications; //!< map of publications;
@@ -191,7 +191,8 @@ public:
 	*/
 	virtual void InitializeFromArgs(int argc, char *argv[]);
 	/** add a message to the queue to process*/
-	void addMessage(const ActionMessage &m);
+	void addCommand(const ActionMessage &m);
+	void addCommand(ActionMessage &&m);
 	/** check if all the local federates are ready to be initialized
 	@return true if everyone is ready, false otherwise
 	*/

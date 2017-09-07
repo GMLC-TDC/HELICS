@@ -11,7 +11,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "helics/config.h"
 #include "helics-time.h"
-#include "helics/common/blocking_queue.h"
+#include "helics/common/BlockingQueue.hpp"
 #include "helics/common/simpleQueue.hpp"
 #include "helics/core/core.h"
 #include "core/ActionMessage.h"
@@ -113,7 +113,8 @@ CommonCore(const std::string &core_name);
   /** get a string representing the connection info to send data to this object*/
   virtual std::string getAddress() const=0;
   /** add a command to the process queue*/
-  virtual void addCommand(const ActionMessage &m);
+ void addCommand(const ActionMessage &m);
+ void addCommand(ActionMessage &&m);
  virtual bool connect() override final;
  virtual bool isConnected() const override final;
  virtual void disconnect() override final;
@@ -167,7 +168,7 @@ private:
 	std::atomic<int32_t> global_broker_id{ 0 };  //!< global identifier for the broker
 	std::string identifier;  //!< an identifier for the broker
 	std::string prevIdentifier;  //!< storage for the case of requiring a renaming
-	BlockingQueue<ActionMessage> _queue; //!< primary routing queue
+	BlockingQueue2<ActionMessage> _queue; //!< primary routing queue
 	std::map<Core::federate_id_t, Core::federate_id_t> global_id_translation; //!< map to translate global ids to local ones
 	std::map<Core::federate_id_t, int32_t> routing_table;  //!< map for external routes  <global federate id, route id>
 	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delays for a certain time

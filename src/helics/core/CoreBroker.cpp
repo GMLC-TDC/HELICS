@@ -150,7 +150,7 @@ int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
     }
 }
 
-void CoreBroker::addMessage (const ActionMessage &m)
+void CoreBroker::addCommand (const ActionMessage &m)
 {
     if (isPriorityCommand (m))
     {
@@ -163,6 +163,18 @@ void CoreBroker::addMessage (const ActionMessage &m)
     }
 }
 
+void CoreBroker::addCommand(ActionMessage &&m)
+{
+	if (isPriorityCommand(m))
+	{
+		processPriorityCommand(m);
+	}
+	else
+	{
+		// just route to the general queue;
+		_queue.push(std::move(m));
+	}
+}
 
 void CoreBroker::processPriorityCommand (const ActionMessage &command)
 {
@@ -372,7 +384,7 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
 				dis.source_id = global_broker_id;
 				transmit(0, dis);
 			}
-			addMessage(CMD_STOP);
+			addCommand(CMD_STOP);
 		}
 	}
 	break;
@@ -880,7 +892,7 @@ void CoreBroker::InitializeFromArgs (int argc, char *argv[])
             local_broker_identifier = gen_id ();
         }
 		timeCoord = std::make_unique<TimeCoordinator>();
-		timeCoord->setMessageSender([this](const ActionMessage & msg) {addMessage(msg); });
+		timeCoord->setMessageSender([this](const ActionMessage & msg) {addCommand(msg); });
         _queue_processing_thread = std::thread (&CoreBroker::queueProcessingLoop, this);
     }
 }

@@ -47,7 +47,7 @@ enum class action_t : int32_t
 	cmd_exec_request =  9,  //!< request an iteration or entry to execution mode
 	cmd_exec_grant = 10,  //!< grant entry to exec mode or iterate
 	cmd_exec_check = 12,  //!< command to run a check on execution entry
-
+	cmd_ack = 254,  //!< acknowledge command to for various purposes
 
 	cmd_stop = 20,  //!< halt execution
 	cmd_terminate_immediately = 22, //!< immediate halt no-disconnect;
@@ -143,6 +143,7 @@ enum class action_t : int32_t
 #define CMD_PROTOCOL action_message_def::action_t::cmd_protocol
 #define CMD_PROTOCOL_BIG action_message_def::action_t::cmd_protocol_big
 
+#define CMD_ACK action_message_def::action_t::cmd_ack
 #define CMD_PRIORITY_ACK action_message_def::action_t::cmd_priority_ack
 
 #define CMD_QUERY action_message_def::action_t::cmd_query
@@ -152,7 +153,8 @@ enum class action_t : int32_t
 #define PROTOCOL_PING 10
 #define PROTOCOL_PONG 11
 #define CLOSE_RECEIVER 23425215
-
+#define NEW_ROUTE 233
+#define DISCONNECT 2523
 
 inline bool hasInfo(action_message_def::action_t action)
 {

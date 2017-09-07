@@ -11,10 +11,11 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "core/CoreBroker.h"
-#include <boost/interprocess/ipc/message_queue.hpp>
 
 namespace helics
 {
+
+class IpcComms;
 
 class IpcBroker :public CoreBroker
 {
@@ -42,14 +43,7 @@ private:
 	std::string fileloc;
 	std::string brokerloc;
 	std::string brokername;
-
-	std::unique_ptr<boost::interprocess::message_queue> rxQueue;
-	std::unique_ptr<boost::interprocess::message_queue> brokerQueue; //send queue for the higher level broker
-
-	std::map<int, std::unique_ptr<boost::interprocess::message_queue>> routes;
-
-	std::thread queue_watcher;
-	void queue_rx_function();
+	std::unique_ptr<IpcComms> comms;
 };
 }
 #endif

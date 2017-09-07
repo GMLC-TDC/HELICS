@@ -1608,6 +1608,19 @@ void CommonCore::addCommand (const ActionMessage &m)
     }
 }
 
+void CommonCore::addCommand(ActionMessage &&m)
+{
+	if (isPriorityCommand(m))
+	{
+		processPriorityCommand(m);
+	}
+	else
+	{
+		// just route to the general queue;
+		_queue.emplace(std::move(m));
+	}
+}
+
 void CommonCore::queueProcessingLoop ()
 {
     while (true)
