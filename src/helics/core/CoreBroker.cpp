@@ -390,6 +390,9 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
 	break;
 	case CMD_REG_ROUTE:
 		break;
+	default:
+		//must not have been a priority command
+		break;
     }
 }
 

@@ -46,10 +46,10 @@ static const std::string DEFAULT_BROKER = "tcp://localhost:5555";
 namespace helics
 {
 
-
+using namespace std::string_literals;
 static const argDescriptors extraArgs
 {
-	{ "brokerinit", "string", "the initialization string for the broker" }
+	{ "brokerinit"s, "string"s, "the initialization string for the broker"s }
 };
 
 MpiBroker::MpiBroker(bool rootBroker) noexcept:CoreBroker(rootBroker)

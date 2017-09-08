@@ -47,17 +47,17 @@ constexpr int defaultBrokerPULLport = 23406;
 
 namespace helics
 {
-
+using namespace std::string_literals;
 static const argDescriptors extraArgs
 {
-	{ "brokerport", "int", "port number for the broker" },
-	{ "port", "int", "port number for the broker" },
+	{ "brokerport"s, "int"s, "port number for the broker"s },
+	{ "port"s, "int"s, "port number for the broker"s },
 };
 
 
 
 ZmqCore::ZmqCore() noexcept
-{};
+{}
 
 ZmqCore::~ZmqCore() = default;
 

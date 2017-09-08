@@ -27,11 +27,11 @@ TestBroker::TestBroker(const std::string &broker_name) :CoreBroker(broker_name)
 
 TestBroker::TestBroker (std::shared_ptr<TestBroker> nbroker) : tbroker (std::move (nbroker)) {}
 
-
+using namespace std::string_literals;
 static const argDescriptors extraArgs
 {
-	{ "brokername", "string", "identifier for the broker-same as broker" },
-	{ "brokerinit", "string", "the initialization string for the broker" }
+	{ "brokername"s, "string"s, "identifier for the broker-same as broker"s },
+	{ "brokerinit"s, "string"s, "the initialization string for the broker"s }
 };
 
 

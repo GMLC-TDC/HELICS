@@ -44,15 +44,15 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-
+using namespace std::string_literals;
 static const argDescriptors extraArgs
 {
-	{"queueloc", "string", "the file location of the shared queue"},
-	{"brokerloc", "string", "the file location for the broker"},
-	{"broker_auto_start", "","automatically start the broker"},
-	{"broker_init", "string", "the init string to pass to the broker upon startup-will only be used if the autostart is activated"},
-	{ "brokername", "string", "identifier for the broker-same as broker" },
-	{ "brokerinit", "string", "the initialization string for the broker" }
+	{"queueloc"s, "string"s, "the file location of the shared queue"s},
+	{"brokerloc"s, "string"s, "the file location for the broker"s},
+	{"broker_auto_start"s, "","automatically start the broker"s},
+	{"broker_init"s, "string"s, "the init string to pass to the broker upon startup-will only be used if the autostart is activated"s},
+	{ "brokername"s, "string"s, "identifier for the broker-same as broker"s },
+	{ "brokerinit"s, "string"s, "the initialization string for the broker"s }
 };
 
 

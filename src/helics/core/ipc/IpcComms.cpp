@@ -36,14 +36,14 @@ IpcComms::~IpcComms()
 		{
 			rxQueue = std::make_unique<ipc_queue>(boost::interprocess::create_only, localTarget_.c_str(), maxMessageCount_, maxMessageSize_);
 		}
-		catch (boost::interprocess::interprocess_exception const& ipe)
+		catch (boost::interprocess::interprocess_exception const& )
 		{
 			boost::interprocess::message_queue::remove(localTarget_.c_str());
 			try
 			{
 				rxQueue = std::make_unique<ipc_queue>(boost::interprocess::create_only, localTarget_.c_str(), maxMessageCount_, maxMessageSize_);
 			}
-			catch (boost::interprocess::interprocess_exception const& ipe)
+			catch (boost::interprocess::interprocess_exception const& )
 			{
 				ActionMessage err(CMD_ERROR);
 				err.payload = "Unable to open local connection";

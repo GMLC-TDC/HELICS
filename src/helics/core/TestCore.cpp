@@ -26,11 +26,11 @@ using Handle = Core::Handle;
 TestCore::TestCore (const std::string &core_name) : CommonCore (core_name) {}
 
 TestCore::TestCore (std::shared_ptr<CoreBroker> nbroker) : tbroker (std::move (nbroker)) {}
-
+using namespace std::string_literals;
 static const argDescriptors extraArgs
 {
-	{ "brokername", "string", "identifier for the broker-same as broker" },
-	{ "brokerinit", "string", "the initialization string for the broker" }
+	{ "brokername"s, "string"s, "identifier for the broker-same as broker"s },
+	{ "brokerinit"s, "string"s, "the initialization string for the broker"s }
 };
 
 void TestCore::initializeFromArgs (int argc, char *argv[])

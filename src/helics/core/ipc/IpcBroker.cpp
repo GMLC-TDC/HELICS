@@ -39,11 +39,12 @@ constexpr size_t maxMessageCount = 1024 * 8;
 namespace helics
 {
 
+using namespace std::string_literals;
 static const argDescriptors extraArgs
 {
-	{"queueloc", "string", "the named location of the shared queue"},
-	{"brokerloc", "string", "the queue location for the broker" },
-	{ "brokerinit", "string", "the initialization string for the broker" }
+	{"queueloc"s, "string"s, "the named location of the shared queue"s},
+	{"brokerloc"s, "string"s, "the queue location for the broker"s },
+	{ "brokerinit"s, "string"s, "the initialization string for the broker"s }
 };
 
 IpcBroker::IpcBroker(bool rootBroker) noexcept:CoreBroker(rootBroker)
