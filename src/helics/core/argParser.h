@@ -14,12 +14,23 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 
 #include <boost/program_options.hpp>
-#include <tuple>
 #include <vector>
+#include <string>
 
 namespace helics
 {
-using argDescriptors = std::vector<std::tuple<std::string, std::string, std::string>>;
+class argDescriptor
+{
+public:
+	std::string flag_;
+	std::string type_;
+	std::string desc_;
+	argDescriptor() = default;
+	argDescriptor(std::string flag, std::string type, std::string desc)
+		:flag_(std::move(flag)), type_(std::move(type)), desc_(std::move(desc))
+	{}
+};
+using argDescriptors = std::vector<argDescriptor>;
 
 void argumentParser(int argc, char *argv[], boost::program_options::variables_map &vm_map, const argDescriptors &additionalArgs);
 }

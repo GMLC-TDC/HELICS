@@ -35,30 +35,30 @@ void argumentParser(int argc, char *argv[], boost::program_options::variables_ma
 
 	for (auto &addArg : additionalArgs)
 	{
-		if (std::get<1>(addArg).empty())
+		if (addArg.type_.empty())
 		{
 			config.add_options()
-				(std::get<0>(addArg).c_str(), std::get<2>(addArg).c_str());
+				(addArg.flag_.c_str(), addArg.desc_.c_str());
 		}
-		else if (std::get<1>(addArg) == "string")
+		else if (addArg.type_ == "string")
 		{
 			config.add_options()
-				(std::get<0>(addArg).c_str(), po::value <std::string>(), std::get<2>(addArg).c_str());
+				(addArg.flag_.c_str(), po::value <std::string>(), addArg.desc_.c_str());
 		}
-		else if (std::get<1>(addArg) == "int")
+		else if (addArg.type_ == "int")
 		{
 			config.add_options()
-				(std::get<0>(addArg).c_str(), po::value <int>(), std::get<2>(addArg).c_str());
+				(addArg.flag_.c_str(), po::value <int>(), addArg.desc_.c_str());
 		}
-		else if (std::get<1>(addArg) == "double")
+		else if (addArg.type_ == "double")
 		{
 			config.add_options()
-				(std::get<0>(addArg).c_str(), po::value <double>(), std::get<2>(addArg).c_str());
+				(addArg.flag_.c_str(), po::value <double>(), addArg.desc_.c_str());
 		}
-		else if (std::get<1>(addArg) == "vector_string")
+		else if (addArg.type_ == "vector_string")
 		{
 			config.add_options()
-				(std::get<0>(addArg).c_str(), po::value <std::vector<std::string>>(), std::get<2>(addArg).c_str());
+				(addArg.flag_.c_str(), po::value <std::vector<std::string>>(), addArg.desc_.c_str());
 		}
 	}
 	// clang-format on
