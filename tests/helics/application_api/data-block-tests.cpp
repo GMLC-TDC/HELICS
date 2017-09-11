@@ -1,3 +1,10 @@
+/*
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+*/
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
@@ -24,10 +31,10 @@ BOOST_AUTO_TEST_CASE(simple_data_block_tests)
 	db[5] = '!';
 	db[6] = '!';
 	BOOST_CHECK_EQUAL(db[3], 'p');
-	BOOST_CHECK_EQUAL(db.string(), "happy!!");
+	BOOST_CHECK_EQUAL(db.to_string(), "happy!!");
 
 	data_block db2("test_string");
-	BOOST_CHECK_EQUAL(db2.string(), "test_string");
+	BOOST_CHECK_EQUAL(db2.to_string(), "test_string");
 
 }
 
@@ -36,17 +43,17 @@ BOOST_AUTO_TEST_CASE(data_block_constructor_tests)
 	data_block db(3,'t');
 	BOOST_CHECK_EQUAL(db.size(), 3);
 
-	BOOST_CHECK_EQUAL(db.string(), "ttt");
+	BOOST_CHECK_EQUAL(db.to_string(), "ttt");
 
 	const char *str = "this is a test string";
 
 	data_block db2(str);
 	BOOST_CHECK_EQUAL(db2.size(), strlen(str));
-	BOOST_CHECK_EQUAL(db2.string(), str);
+	BOOST_CHECK_EQUAL(db2.to_string(), str);
 
 	data_block db3(str,7);
 	BOOST_CHECK_EQUAL(db3.size(), 7);
-	BOOST_CHECK_EQUAL(db3.string(), "this is");
+	BOOST_CHECK_EQUAL(db3.to_string(), "this is");
 
 	data_block db4(400, 'r');
 	//test move constructor
@@ -77,7 +84,7 @@ BOOST_AUTO_TEST_CASE(data_block_assignment_tests)
 {
 	data_block db(3, 't');
 
-	BOOST_CHECK_EQUAL(db.string(), "ttt");
+	BOOST_CHECK_EQUAL(db.to_string(), "ttt");
 
 	const char *str = "this is a test string";
 

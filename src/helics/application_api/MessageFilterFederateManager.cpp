@@ -22,14 +22,14 @@ namespace helics
 
 	}
 
-	filter_id_t MessageFilterFederateManager::registerSourceFilter(const std::string &filterName, const std::string &sourceEndpoint, const std::string &inputType)
+	filter_id_t MessageFilterFederateManager::registerSourceFilter(const std::string &filterName, const std::string &sourceEndpoint, const std::string &inputType, const std::string &outputType)
 	{
 		std::lock_guard<std::mutex> fLock(filterLock);
 		filter_id_t id = static_cast<identifier_type>(filters.size());
-		filters.emplace_back(filterName, sourceEndpoint, inputType);
+		filters.emplace_back(filterName, sourceEndpoint, inputType,outputType);
 		filters.back().id = id;
 		filters.back().ftype = filter_type::source_filter;
-		filters.back().handle = coreObject->registerSourceFilter(fedID, filterName.c_str(), sourceEndpoint.c_str(), inputType.c_str());
+		filters.back().handle = coreObject->registerSourceFilter(fedID, filterName, sourceEndpoint, inputType,outputType);
 		SourceFilterNames.emplace(filterName, id);
 		if (filterName != sourceEndpoint)
 		{
@@ -40,11 +40,11 @@ namespace helics
 		return id;
 	}
 		
-	filter_id_t MessageFilterFederateManager::registerDestinationFilter(const std::string &filterName, const std::string &destEndpoint, const std::string &inputType)
+	filter_id_t MessageFilterFederateManager::registerDestinationFilter(const std::string &filterName, const std::string &destEndpoint, const std::string &inputType, const std::string &outputType)
 	{
 		std::lock_guard<std::mutex> fLock(filterLock);
 		filter_id_t id = static_cast<identifier_type>(filters.size());
-		filters.emplace_back(filterName, destEndpoint, inputType);
+		filters.emplace_back(filterName, destEndpoint, inputType,outputType);
 		filters.back().id = id;
 		filters.back().ftype = filter_type::dest_filter;
 		DestFilterNames.emplace(filterName, id);
@@ -52,7 +52,7 @@ namespace helics
 		{
 			DestFilterNames.emplace(destEndpoint, id);
 		}
-		filters.back().handle = coreObject->registerDestinationFilter(fedID, filterName.c_str(), destEndpoint.c_str(), inputType.c_str());
+		filters.back().handle = coreObject->registerDestinationFilter(fedID, filterName, destEndpoint, inputType,outputType);
 		handleLookup.emplace(filters.back().handle, id);
 		return id;
 	}
@@ -74,15 +74,15 @@ namespace helics
 		return (filter.value() < filters.size()) ? (!filterQueues[filter.value()].empty()) : false;
 	}
 		
-	Message_view MessageFilterFederateManager::getMessageToFilter(filter_id_t filter)
+	std::unique_ptr<Message> MessageFilterFederateManager::getMessageToFilter(filter_id_t filter)
 	{
 		if (filter.value() < filters.size())
 		{
 			auto ms = filterQueues[filter.value()].pop();
-			return (ms) ? (*ms) : Message_view();
+			return (ms) ? (std::move(*ms)) : nullptr;
 			
 		}
-		return Message_view();
+		return nullptr;
 	}
 
 	static const std::string nullStr;
@@ -93,23 +93,22 @@ namespace helics
 		auto epCount = coreObject->receiveFilterCount(fedID);
 		// lock the data updates
 		std::unique_lock<std::mutex> filtlock(filterLock);
+		Core::Handle filterID;
 		for (size_t ii = 0; ii < epCount; ++ii)
 		{
-			auto msgp = coreObject->receiveAnyFilter(fedID);
-			if (msgp.second == nullptr)
+			auto message = coreObject->receiveAnyFilter(fedID, filterID);
+			if (!message)
 			{
 				break;
 			}
 
 			/** find the id*/
-			auto fid = handleLookup.find(msgp.first);
+			auto fid = handleLookup.find(filterID);
 			if (fid != handleLookup.end())
 			{  // assign the data
 
-			   /** making a shared pointer with custom deleter*/
-				auto sd = std::shared_ptr<message_t>(msgp.second, [=](message_t *m) { coreObject->dereference(m); });
 				auto localfilterIndex = fid->second.value();
-				filterQueues[localfilterIndex].emplace(std::move(sd));
+				filterQueues[localfilterIndex].emplace(std::move(message));
 				if (filters[localfilterIndex].callbackIndex >= 0)
 				{
 					auto cb = callbacks[filters[localfilterIndex].callbackIndex];
@@ -151,12 +150,17 @@ namespace helics
 		return (id.value() < filters.size()) ? (filters[id.value()].endpoint) : nullStr;
 	}
 
-	std::string  MessageFilterFederateManager::getFilterType(filter_id_t id) const
+	std::string  MessageFilterFederateManager::getFilterInputType(filter_id_t id) const
 	{
 		std::lock_guard<std::mutex> fLock(filterLock);
-		return (id.value() < filters.size()) ? (filters[id.value()].type) : nullStr;
+		return (id.value() < filters.size()) ? (filters[id.value()].inputType) : nullStr;
 	}
 
+	std::string  MessageFilterFederateManager::getFilterOutputType(filter_id_t id) const
+	{
+		std::lock_guard<std::mutex> fLock(filterLock);
+		return (id.value() < filters.size()) ? (filters[id.value()].outputType) : nullStr;
+	}
 
 	filter_id_t MessageFilterFederateManager::getFilterId(const std::string &filterName) const
 	{
@@ -244,7 +248,7 @@ namespace helics
 		operators.push_back(mo);
 		for (auto &flt : filters)
 		{
-			coreObject->setFilterOperator(flt.handle, mo.get());
+			coreObject->setFilterOperator(flt.handle, mo);
 		}
 
 	}
@@ -255,7 +259,7 @@ namespace helics
 		{
 			std::lock_guard<std::mutex> fLock(filterLock);
 			operators.push_back(mo);
-			coreObject->setFilterOperator(filters[id.value()].handle, mo.get());
+			coreObject->setFilterOperator(filters[id.value()].handle, mo);
 		}
 		else
 		{
@@ -271,7 +275,7 @@ namespace helics
 		{
 			if (id.value() < filters.size())
 			{
-				coreObject->setFilterOperator(filters[id.value()].handle, mo.get());
+				coreObject->setFilterOperator(filters[id.value()].handle, mo);
 			}
 		}
 	}

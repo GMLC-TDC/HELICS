@@ -6,9 +6,10 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#pragma once
+
 #ifndef SIMPLE_QUEUE_H_
 #define SIMPLE_QUEUE_H_
+#pragma once
 
 #include <algorithm>
 #include <mutex>
@@ -55,7 +56,10 @@ class simpleQueue
         return *this;
     }
     // const functions should be thread safe
-    /** check whether there are any elements in the queue*/
+    /** check whether there are any elements in the queue
+	because this is meant for mutlti threaded applications this may or may not have any meaning
+	depending on the number of consumers
+	*/
     bool empty () const 
 	{ 
 		std::lock_guard<std::mutex> pullLock(m_pullLock);  // first pullLock

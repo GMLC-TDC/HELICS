@@ -32,15 +32,17 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
 	@param[in] jsonString can be either a json file or a string containing json code
 	*/
 	MessageFederate(const std::string &jsonString);
-
+	/** move constructor*/
 	MessageFederate(MessageFederate &&mFed) noexcept;
+	/** default constructor*/
     MessageFederate ();
 	/** special constructor should only be used by child classes in constructor due to virtual inheritance*/
 	MessageFederate(bool res);
+	//copy constructor and copy assignment are disabled
 public:
     /** destructor */
     ~MessageFederate ();
-
+	/** move assignement*/
 	MessageFederate &operator= (MessageFederate &&mFed) noexcept;
   protected:
     virtual void StartupToInitializeStateTransition () override;
@@ -86,18 +88,18 @@ public:
 	*/
 	uint64_t receiveCount(endpoint_id_t id) const;
 	/**
-	* Returns the number of pending receives for the specified destination endpoint.
+	* Returns the number of pending receives for all endpoints.
 	*/
 	uint64_t receiveCount() const;
     /** receive a packet from a particular endpoint
     @param[in] endpoint the identifier for the endpoint
     @return a message object*/
-    Message_view getMessage (endpoint_id_t endpoint);
+	std::unique_ptr<Message> getMessage (endpoint_id_t endpoint);
     /** receive a communication message for any endpoint in the federate
-    @details the return order will in order of endpoint creation then order of arrival
+    @details the return order will be in order of endpoint creation then order of arrival
     all messages for the first endpoint, then all for the second, and so on
-    @return a Message_view object containing the message data*/
-    Message_view getMessage ();
+    @return a unique_ptr to a Message object containing the message data*/
+	std::unique_ptr<Message> getMessage ();
 
     /** send a message
 	@details send a message to a specific destination
@@ -140,10 +142,16 @@ public:
 	/** send an event message at a particular time
 	@details send a message to a specific destination
 	@param[in] source the source endpoint
-	@param[in] message a view of the message
+	@param[in] message a pointer to the message
 	*/
-    void sendMessage (endpoint_id_t source, const Message_view &message);
+    void sendMessage (endpoint_id_t source, std::unique_ptr<Message> message);
 
+	/** send an event message at a particular time
+	@details send a message to a specific destination
+	@param[in] source the source endpoint
+	@param[in] message a message object
+	*/
+	void sendMessage(endpoint_id_t source, const Message &message);
 
     /** get the name of an endpoint from its id
     @param[in] id the endpoint to query

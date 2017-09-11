@@ -39,7 +39,7 @@ publication_id_t ValueFederateManager::registerPublication (const std::string &n
     pubs.back ().id = id;
     pubs.back ().size = sz;
     publicationNames.emplace (name, id);
-    pubs.back ().coreID = coreObject->registerPublication (fedID, name.c_str (), type.c_str (), units.c_str ());
+    pubs.back ().coreID = coreObject->registerPublication (fedID, name, type, units);
     return id;
 }
 
@@ -53,9 +53,9 @@ subscription_id_t ValueFederateManager::registerRequiredSubscription (const std:
     subs.back ().id = id;
     subscriptionNames.emplace (name, id);
     subs.back ().coreID =
-      coreObject->registerSubscription (fedID, name.c_str (), type.c_str (), units.c_str (), true);
+      coreObject->registerSubscription (fedID, name, type, units, handle_check_mode::required);
     handleLookup.emplace (subs.back ().coreID, id);
-	lastData.resize(id.value());
+    lastData.resize(id.value()+1);
     return id;
 }
 
@@ -70,9 +70,9 @@ subscription_id_t ValueFederateManager::registerOptionalSubscription (const std:
     subs.back ().id = id;
     subscriptionNames.emplace (name, id);
     subs.back ().coreID =
-      coreObject->registerSubscription (fedID, name.c_str (), type.c_str (), units.c_str (), false);
+      coreObject->registerSubscription (fedID, name, type, units, handle_check_mode::optional);
     handleLookup.emplace (subs.back ().coreID, id);
-	lastData.resize(id.value());
+    lastData.resize(id.value()+1);
     return id;
 }
 
@@ -95,7 +95,7 @@ void ValueFederateManager::setDefaultValue (subscription_id_t id, data_view bloc
     {
         std::lock_guard<std::mutex> sublock (subscription_mutex);
         /** copy the data first since we are not entirely sure of the lifetime of the data_view*/
-        lastData[id.value ()] = data_view (std::make_shared<data_block> (block));
+        lastData[id.value ()] = data_view (std::make_shared<data_block> (block.data(),block.size()));
         subs[id.value ()].lastUpdate = CurrentTime;
     }
     else
@@ -108,14 +108,13 @@ void ValueFederateManager::setDefaultValue (subscription_id_t id, data_view bloc
 void ValueFederateManager::getUpdateFromCore (Core::Handle updatedHandle)
 {
     auto data = coreObject->getValue (updatedHandle);
-    /** making a shared pointer with custom deleter*/
-    auto sd = std::shared_ptr<data_t> (data, [=](data_t *v) { coreObject->dereference (v); });
+
     /** find the id*/
     auto fid = handleLookup.find (updatedHandle);
     if (fid != handleLookup.end ())
     {  // assign the data
         std::lock_guard<std::mutex> sublock (subscription_mutex);
-        lastData[fid->second.value ()] = data_view (sd);
+        lastData[fid->second.value ()] = data_view (std::move(data));
         subs[fid->second.value ()].lastUpdate = CurrentTime;
     }
 }
@@ -184,40 +183,37 @@ Time ValueFederateManager::queryLastUpdate (subscription_id_t sub_id) const
 void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;
-	uint64_t subCount;
-    auto handles = coreObject->getValueUpdates (fedID, &subCount);
+    auto handles = coreObject->getValueUpdates (fedID);
     // lock the data updates
     std::unique_lock<std::mutex> sublock (subscription_mutex);
-    for (uint64_t ii = 0; ii < subCount; ++ii)
+	for (auto handle:handles)
     {
         /** find the id*/
-        auto fid = handleLookup.find (handles[ii]);
+        auto fid = handleLookup.find (handle);
         if (fid != handleLookup.end ())
         {  // assign the data
-            auto data = coreObject->getValue (handles[ii]);
-            /** making a shared pointer with custom deleter*/
-            /** capture of the coreObject shared_ptr*/
-            auto sd = std::shared_ptr<data_t> (data, [=](data_t *v) { coreObject->dereference (v); });
+            auto data = coreObject->getValue (handle);
+
             auto subIndex = fid->second.value ();
 			//move the data into the container
-            lastData[subIndex] = std::move (sd);
+            lastData[subIndex] = std::move (data);
             subs[subIndex].lastUpdate = CurrentTime;
             if (subs[subIndex].callbackIndex >= 0)
             {
 				//first copy the callback in case it gets changed via another operation
-				auto cb = callbacks[subs[subIndex].callbackIndex];
+				auto callbackFunction = callbacks[subs[subIndex].callbackIndex];
                 sublock.unlock ();
                 // callbacks can do all sorts of things, best not to have it locked during the callback
-                cb(fid->second, CurrentTime);
+				callbackFunction(fid->second, CurrentTime);
                 sublock.lock ();
             }
             else if (allCallbackIndex >= 0)
             {
 				//first copy the callback in case it gets changed via another operation
-				auto ac = callbacks[allCallbackIndex];
+				auto allCallBackFunction = callbacks[allCallbackIndex];
                 sublock.unlock ();
                 // callbacks can do all sorts of strange things, best not to have it locked during the callback
-                ac(fid->second, CurrentTime);
+				allCallBackFunction(fid->second, CurrentTime);
                 sublock.lock ();
             }
         }

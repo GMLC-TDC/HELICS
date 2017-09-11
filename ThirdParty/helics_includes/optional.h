@@ -27,9 +27,11 @@
 #if !defined(STX_NO_STD_OPTIONAL) && defined(__GNUC__) && (__cplusplus < 201402)
 #define STX_NO_STD_OPTIONAL
 #endif
+// disable usage of <optional> but allow <experimental/optional>
+#define STD_NO_LIBRARY_OPTIONAL 1
 
 #if defined(__has_include) && !defined(STX_NO_STD_OPTIONAL)
-#    if __has_include(<optional>)
+#    if __has_include(<optional>) && !defined(STD_NO_LIBRARY_OPTIONAL)
 #       include <optional>
         namespace STX_NAMESPACE_NAME {
             using std::optional;
@@ -38,7 +40,7 @@
             using std::nullopt;
             using std::make_optional;
             using std::in_place_t;
-            using std::in_place
+			using std::in_place;
         }
 #       define STX_HAVE_STD_OPTIONAL 1
 #   elif __has_include(<experimental/optional>)

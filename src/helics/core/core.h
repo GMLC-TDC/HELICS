@@ -10,63 +10,13 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_CORE_
 #pragma once
 
-/**
- * Open Issues:
 
- * Initializing state and communication.   There was talk of being able to communicate during the initializing
- state. There is a potential problem since there are no synchronization points so value based communication won't
- complete.
-
- * Processing updates
-    - Loop over all destinations
-    - Query for which topics/endpoints have updates, loop over those, i.e. getValueUpdates()
-    - Register callback functions, one per topic/endpoint
-
- * How best to handle DES simulations
-    - Timestamped messages
-    - What does delay mean?
-    - Current time callback?
-    - State changes occur during time request sync points?
-
- *  Object oriented interface or quasi-singleton (i.e. HLA, FMI) ?
-    Should C interface for core have an explicit core object in every method.
-    Core class is a singleton so that is not strictly necessary; could assume the this pointer from a global.
-
- * What is time?
-      - Units?
-      - Data type?
-      - Federates with different time units?
-      - What can we learn from HLA/FMI?
-
-      SGS - I proposed a simple Time object that has units.  This
-       hides the underlying data type and enables units.  If needed in
-       future finer time resolution than ns could be added.  I'm
-       concerned that if we say "ns" 2 years from now that won't be
-       sufficient.  Looking at the history of time in NS-3 and another
-       project of mine, time got progressively more complex over
-       time.x I think Philip wanted just an int64 on telecon.  Is this
-       simple enough to not be a huge pain?
-
-  * Related to time, federate types
-      - Time stepped
-      - DES
-      - Supports reiteration or not
-      - Periodic?
-      - Continuous
-      - Others?
-
-  * Unit translation for value exchanges
-      - If core is only byte-based API, translation not possible.
-      - Application API could maintain units, cast bytes retrieved from core to appropriate data type, and
- translate?
-
-  * How does data get from one point to another?
-      - Does the core own/cache the values (e.g., FNCS) or pass them on (e.g., MPI)?
-
-*/
 
 #include "core-data.h"
 #include <utility>
+#include <string>
+#include <memory>
+#include <functional>
 
 /**
  * HELICS Core API
@@ -82,9 +32,6 @@ namespace helics
  * nature of some calls, like nextTime(), federates need to be in
  * separate threads in order to function correctly.
  *
- * Since this class is intended to be exposed via a C interface,
- * C++ specific features are minimized to enable easier wrapping
- * (e.g. char * instead of string).
  *
  *  For Memory management all message_t and data_t pointers return from the core API should be released via 
  a call to the dereference function,  the core assumes all data given it via send or publish calls could be invalid after
@@ -96,41 +43,46 @@ namespace helics
  */
 
 
+ /** class defining some required information about the federate*/
+class CoreFederateInfo
+{
+public:
+	Time timeDelta = timeEpsilon;  // for periodic federates this is the period or minimum time resolution of a
+								// federate
+	Time lookAhead = timeZero;  //!< the lookahead value, the window of time between the time request return and the availability of values
+	Time impactWindow = timeZero;  //!< the time it takes values to propagate to the Federate
+	
+	int logLevel;	//!< the logging level above which not to log to file
+	//4 byte gap
+	bool observer = false;  //!< flag indicating that the federate is an observer
+	bool uninteruptible =
+		false;  //!< flag indicating that the federate should never return a time other than requested
+	bool time_agnostic = false;  //!< flag indicating that the federate does not participate in time advancement and should be ignored in all timeRequest operations
+	bool source_only = false;   //!< flag indicating that the federate does not recieve or do anything with received information.  
+	bool filter_only = false; //!< flag indicating that the source filter federate is not modifying the destination of a filtered message only time or content
+							  //there is 1 bytes undefined in this structure
+	int16_t max_iterations = 3;	//!< the maximum number of iterations allowed for the federate
+							  
+};
 
-
+/** the object defining the core interface through an abstract class*/
 class Core
 {
   public:
-    Core (){};
+	  /** default constructor*/
+    Core ()=default;
+	/**virtual destructor*/
     virtual ~Core () = default;
-
-
-    /** class defining some information about the federate*/
-    class FederateInfo
-    {
-      public:
-        Time timeDelta = timeZero;  // for periodic federates this is the period or minimum time resolution of a
-                               // federate
-        Time lookAhead = timeZero;  //!< the lookahead value, the window of time between the time request return and the availability of values
-		Time impactWindow = timeZero;  //!< the time it takes values to propagate to the Federate
-		//TODO: make into a bitfield with named constants and add setFlags function
-        bool observer = false;  //!< flag indicating that the federate is an observer
-        bool uninteruptible =
-          false;  //!< flag indicating that the federate should never return a time other than requested
-		bool time_agnostic = false;  //!< flag indicating that the federate does not participate in time advancement and should be ignored in all timeRequest operations
-		bool source_only = false;   //!< flag indicating that the federate does not recieve or do anything with received information.  
-		bool filter_only = false; //!< flag indicating that the source filter federate is not modifying the destination of a filtered message only time or content
-	};
 
     /**
      * FederateID uniquely identifies a federate.
      */
-	using federate_id_t = unsigned int;
+	using federate_id_t = int32_t;
 
     /**
      * HandleID uniquely identifies a handle.
      */
-    using Handle= unsigned int;
+    using Handle= int32_t;
 
     /**
      * Simulator control.
@@ -141,18 +93,35 @@ class Core
      *
      * Should be invoked a single time to initialize the co-simulation core.
      *
-     * This is potentially a blocking call that does not complete until all federates
-     * have called initialize.
-     *
      * Invoked by the CoreFactory, users should call directly.
      */
-    virtual void initialize (const char *initializationString) = 0;
+    virtual void initialize (const std::string &initializationString) = 0;
 
     /**
      * Returns true if the core has been initialized.
      */
-    virtual bool isInitialized () = 0;
+    virtual bool isInitialized () const = 0;
+	/** 
+	* connect the core to a broker if needed
+	@return true if the connection was successful
+	*/
+	virtual bool connect() = 0;
+	/** 
+	* check if the core is connected properly
+	*/
+	virtual bool isConnected() const = 0;
 
+	/**
+	* disconnect the core from its broker
+	*/
+	virtual void disconnect() = 0;
+
+	/** check if the core is joinable i.e. it is accepting new federates
+	*/
+	virtual bool isJoinable() const = 0;
+	/** get and identifier string for the core
+	*/
+	virtual const std::string &getIdentifier() const = 0;
     /**
      * Federate has encountered an unrecoverable error.
      */
@@ -163,8 +132,6 @@ class Core
      *
      * Should be invoked a single time to complete the simulation.
      *
-     * This is potentially a blocking call that does not return until all federates
-     * have called finalize.
      */
     virtual void finalize (federate_id_t federateID) = 0;
 
@@ -179,13 +146,13 @@ class Core
      *       Configure of the simulation state prior to the start of timestepping.
      *       State begins when enterInitializingState() is invoked and ends when enterExecutingState(true) is invoked.
      *    -# Executing
-     *       State begins when enterExicutingState() is invoked and ends when Finalize() is invoked.
+     *       State begins when enterExecutingState() is invoked and ends when Finalize() is invoked.
      */
 
     /**
      * Change the federate state to the Initializing state.
      *
-     * May only be invoked in Created state.
+     * May only be invoked in Created state otherwise an error is thrown
      */
     virtual void enterInitializingState (federate_id_t federateID) = 0;
 
@@ -195,11 +162,11 @@ class Core
      * May only be invoked in Initializing state.
      @param[in] federateID  the identifier of the federate
      @param[in] iterationCompleted  if true no more iterations on this federate are requested
-     if false the federate requests an iterative update
-     @return false if the executing state has not been entered and there are updates, true if the simulation is
+     if nonconverged the federate requests an iterative update
+     @return nonconverged if the executing state has not been entered and there are updates, complete if the simulation is
      ready to move on to the executing state
      */
-    virtual bool enterExecutingState (federate_id_t federateID, bool iterationCompleted = true) = 0;
+    virtual convergence_state enterExecutingState (federate_id_t federateID, convergence_state converged = convergence_state::complete) = 0;
 
     /**
      * Register a federate.
@@ -207,31 +174,27 @@ class Core
      * The returned FederateId is local to invoking process,
      * FederateId's should not be used as a global identifier.
      *
-     * May only be invoked in initialize state.
+     * May only be invoked in initialize state otherwise throws an error
      */
-    virtual federate_id_t registerFederate (const char *name, const FederateInfo &info) = 0;
+    virtual federate_id_t registerFederate (const std::string &name, const CoreFederateInfo &info) = 0;
 
     /**
      * Returns the federate name.
      *
-     * May only be invoked in Initializing and Executing states
      */
-    virtual const char *getFederateName (federate_id_t federateId) = 0;
+    virtual const std::string &getFederateName (federate_id_t federateId) const = 0;
 
     /**
      * Returns the federate Id.
      *
-     * May only be invoked in Initializing and Executing states
      */
-    virtual federate_id_t getFederateId (const char *name) = 0;
+    virtual federate_id_t getFederateId (const std::string &name) = 0;
 
 
     /**
-     * Returns the global number of federates that are registered.
-     *
-     * May only be invoked in Initializing and Executing States.
+     * Returns the global number of federates that are registered only return accurately after the initialization state has been entered
      */
-    virtual unsigned int getFederationSize () = 0;
+    virtual int32_t getFederationSize () = 0;
 
     /**
      * Time management.
@@ -276,13 +239,12 @@ class Core
      * May only be invoked in Executing state.
      *
      * Non-reiterative federates may not invoke this method.
-     *
-     * \param next
-     * \param localConverged has the local federate converged
+     *@param federateId the identifier for the federate to process
+     * @param next the requested time
+     * @param localConverged has the local federate converged
+	 @return an iterationTime object with two field stepTime and a bool indicating the iteration has completed
      */
-    // SGS TODO make this not a pair for C API?
-    virtual std::pair<Time, bool>
-    requestTimeIterative (federate_id_t federateId, Time next, bool localConverged) = 0;
+    virtual iterationTime requestTimeIterative (federate_id_t federateId, Time next, convergence_state localConverged) = 0;
 
     /**
      * Returns the current reiteration count for the specified federate.
@@ -343,16 +305,16 @@ class Core
      * @param[in] key the name of the subscription
      * @param[in] type a string describing the type of the federate
      * @param[in] units a string naming the units of the federate
-     * @param[in] required  if set to true the core will error if the subscription does not have a corresponding
+     * @param[in] check_mode  if set to required the core will error if the subscription does not have a corresponding
      * publication when converting to init mode
      */
     virtual Handle registerSubscription (federate_id_t federateId,
-                                         const char *key,
-                                         const char *type,
-                                         const char *units,
-                                         bool required) = 0;
+                                         const std::string &key,
+                                         const std::string &(type),
+                                         const std::string &units,
+										handle_check_mode check_mode) = 0;
 
-    virtual Handle getSubscription (federate_id_t federateId, const char *key) = 0;
+    virtual Handle getSubscription (federate_id_t federateId, const std::string &key) = 0;
 
     /**
      * Register a publication.
@@ -360,19 +322,19 @@ class Core
      * May only be invoked in the initialize state.
      */
     virtual Handle
-    registerPublication (federate_id_t federateId, const char *key, const char *type, const char *units) = 0;
+    registerPublication (federate_id_t federateId, const std::string &key, const std::string &type, const std::string &units) = 0;
 
-    virtual Handle getPublication (federate_id_t federateId, const char *key) = 0;
+    virtual Handle getPublication (federate_id_t federateId, const std::string &key) = 0;
 
     /**
      * Returns units for specified handle.
      */
-    virtual const char *getUnits (Handle handle) = 0;
+    virtual const std::string &getUnits (Handle handle) const= 0;
 
     /**
      * Returns type for specified handle.
      */
-    virtual const char *getType (Handle handle) = 0;
+    virtual const std::string &getType (Handle handle) const= 0;
 
     /**
      * Publish specified data to the specified key.
@@ -386,29 +348,17 @@ class Core
      *
      * Returned pointer is valid until dereference() is invoked.
      */
-    virtual data_t *getValue (Handle handle) = 0;
+    virtual std::shared_ptr<const data_block> getValue (Handle handle) = 0;
+
+    
 
     /**
-     * Completed referencing the data.
-     *
-     * It is invalid to access data after this call.  Core is free to delete the data.
+     * Returns vector of subscription handles that received an update during the last
+     * time request.  The data remains valid until the next call to getValueUpdates for the given federateID
+     *@param federateID the identification code of the federate to query
+	 @return a reference to the location of an array of handles that have been updated
      */
-    virtual void dereference (data_t *data) = 0;
-
-    /**
-     * Completed referencing the data.
-     *
-     * It is invalid to access data after this call.  Core is free to delete the data.
-     */
-    virtual void dereference (message_t *msg) = 0;
-
-    /**
-     * Returns array of subscription handles that received an update during the last
-     * time request.
-     *
-     * /param size set to the size of the array.
-     */
-    virtual const Handle *getValueUpdates (federate_id_t federateId, uint64_t *size) = 0;
+    virtual const std::vector<Handle> &getValueUpdates (federate_id_t federateId) = 0;
 
     /**
      * Message interface.
@@ -420,26 +370,42 @@ class Core
      *
      * May only be invoked in the Initialization state.
      */
-    virtual Handle registerEndpoint (federate_id_t federateId, const char *name, const char *type) = 0;
+    virtual Handle registerEndpoint (federate_id_t federateId, const std::string &name, const std::string &type)=0;
 
     /**
      * Register source filter.
      *
      * May only be invoked in the Initialization state.
+	 @param federateId the identifier for the federate
+	 @param filterName the name of the filter (may be left blank)
+	 @param source the target endpoint for the filter
+	 @param type_in the input type of the filter
+	 @param type_out the output type of the filter (may be left blank if the filter doesn't change type)
+	 this is important for ordering in filters with operators
+	 @return the handle for the new filter
      */
     virtual Handle registerSourceFilter (federate_id_t federateId,
-                                         const char *filterName,
-                                         const char *source,
-                                         const char *type_in) = 0;
+                                         const std::string &filterName,
+                                         const std::string &source,
+                                         const std::string &type_in,
+										const std::string &type_out) = 0;
 	/**
 	* Register destination filter.
+	@details a destination filter will create an additional processing step of messages before they get to a destination endpoint
 	*
 	* May only be invoked in the Initialization state.
+	@param federateId the identifier for the federate
+	@param filterName the name of the filter (may be left blank)
+	@param dest the target endpoint for the filter
+	@param type_in the input type of the filter (may be left blank,  this is for error checking and will produce a warning if it doesn't 
+	match with the input type of the target endpoint
+	@return the handle for the new filter
 	*/
     virtual Handle registerDestinationFilter (federate_id_t federateId,
-                                              const char *filterName,
-                                              const char *dest,
-                                              const char *type_in) = 0;
+                                              const std::string &filterName,
+                                              const std::string &dest,
+                                              const std::string &type_in,
+											  const std::string &type_out) = 0;
 	/**
 	* add a time dependency between federates
 	* @details this function is primarily useful for Message federates which do not otherwise restrict the dependencies
@@ -448,14 +414,14 @@ class Core
 	@param[in] federateId  the identifier for the federate
 	@param[in] federateName the name of the dependent federate
 	*/
-	virtual void addDependency(federate_id_t federateId, const char *federateName)=0;
+	virtual void addDependency(federate_id_t federateId, const std::string &federateName)=0;
     /**
      * Register known frequently communicating source/destination end points.
      *
      * May be used for error checking for compatible types and possible optimization by
      * pre-registering the intent for these endpoints to communicate.
      */
-    virtual void registerFrequentCommunicationsPair (const char *source, const char *dest) = 0;
+    virtual void registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) = 0;
 
     /**
      * Send data from source to destination.
@@ -469,7 +435,7 @@ class Core
      * communication network.  This enables simulations to be run with/without
      * a communications model present.
      */
-    virtual void send (Handle sourceHandle, const char *destination, const char *data, uint64_t length) = 0;
+    virtual void send (Handle sourceHandle, const std::string &destination, const char *data, uint64_t length) = 0;
 
     /**
      * Send data from source to destination with explicit expected delivery time.
@@ -481,9 +447,14 @@ class Core
      * events between discrete event federates.  For this use case
      * the receiving federate can deserialize the data and schedule
      * an event for the specified time.
+	 @param time the time the event is scheduled for
+	 @param sourceHandle the source of the event
+	 @param destination  the target of the event 
+	 @param data the raw data for the event
+	 @param length the record length of the event
      */
     virtual void
-    sendEvent (Time time, Handle sourceHandle, const char *destination, const char *data, uint64_t length) = 0;
+    sendEvent (Time time, Handle sourceHandle, const std::string &destination, const char *data, uint64_t length) = 0;
 
     /**
      * Send for filters.
@@ -491,22 +462,26 @@ class Core
      * Continues sending the message to the next filter or to final destination.
      *
      */
-    virtual void sendMessage (message_t *message) = 0;
+    virtual void sendMessage (Handle sourceHandle, std::unique_ptr<Message> message) = 0;
 
     /**
-     * Returns the number of pending receives for the specified destination endpoint.
+     * Returns the number of pending receives for the specified destination endpoint or filter.
      */
     virtual uint64_t receiveCount (Handle destination) = 0;
 
     /**
-     * Returns the next buffered message the specified destination endpoint.
+     * Returns the next buffered message the specified destination endpoint or filter.
+	 @details this is a non-blocking call and will return a nullptr if no message are available
      */
-    virtual message_t *receive (Handle destination) = 0;
+    virtual std::unique_ptr<Message> receive (Handle destination) = 0;
 
     /**
      * Receives a message for any destination.
+	 @details this is a non-blocking call and will return a nullptr if no messages are available
+	 @param federateID the identifier for the federate
+	 @param[out] endpoint_id the endpoint handle related to the message gets stored here
      */
-    virtual std::pair<const Handle, message_t*> receiveAny (federate_id_t federateId) = 0;
+    virtual std::unique_ptr<Message> receiveAny (federate_id_t federateId,Handle &enpoint_id) = 0;
 
     /**
      * Returns number of messages for all destinations.
@@ -515,18 +490,17 @@ class Core
 
     /** send a log message to the Core for logging
     @param[in] federateId the federate that is sending the log message
-    @param[in] logCode  an integer based logging code
+    @param[in] logLevel  an integer for the log level (0- error, 1- warning, 2-status, 3-debug)
     @param[in] logMessage the message to log
     */
-    virtual void logMessage (federate_id_t federateId, int logCode, const char *logMessage) = 0;
+    virtual void logMessage (federate_id_t federateId, int logLevel, const std::string &logMessage) = 0;
 
 	/** set the filter callback *  setting a filter callback implies that the filter has no time or order dependency
 	and the filter is an independent function
-	@details the lifetime of the FilterOperator is managed by the user and should remain alive during the entire run of the simulation
 	@param[in] filter  the handle of the filter
 	@param[in] callback the function to operate on the message
 	*/
-	virtual void setFilterOperator(Handle filter, FilterOperator* callback) = 0;
+	virtual void setFilterOperator(Handle filter, std::shared_ptr<FilterOperator> callback) = 0;
 
 	/**
 	* Returns number of messages for all filters.
@@ -535,9 +509,35 @@ class Core
 
 	/**
 	* Receives a message for any filter.
+	@details this is a non-blocking call and will return nullptr if no messages are available
+	@param federateID the identifier for the federate
+	@param[out] filter_id the filter handle related to the message gets stored here
 	*/
-	virtual std::pair<const Handle, message_t*> receiveAnyFilter(federate_id_t federateID) = 0;
+	virtual std::unique_ptr<Message> receiveAnyFilter(federate_id_t federateID, Handle &filter_id) = 0;
+
+	/** define a logging function to use for logging message and notices from the federation and individual federate
+	@param federateID  the identifier for the individual federate
+	@param logFunction the callback function for doing something with a log message
+	it takes 3 inputs an integer for logLevel 0-4  0 -error, 1- warning 2-status, 3-debug
+	A string indicating the source of the message and another string with the actual message
+	*/
+	virtual void setLoggingFunction(federate_id_t federateID, std::function<void(int, const std::string &, const std::string &)> logFunction) = 0;
+	
+	/** make a query for information from the co-simulation
+	@details the format is somewhat unspecified  target is the name of an object typically one of 
+	"federation",  "broker", "core", or the name of a specific object
+	query is a broken 
+	@param target the specific target of the query
+	@param queryStr the actual query
+	@return a string containing the response to the query.  Query is a blocking call and will not return until the query is answered
+	so use with caution
+	*/
+	virtual std::string query(const std::string &target, const std::string &queryStr) = 0;
 };
+
+// set at a large negative number but not the largest negative number
+constexpr Core::federate_id_t invalid_fed_id = -2'000'000'000;
+constexpr Core::Handle invalid_Handle = -2'000'000'000;
 
 }  // namespace helics
 

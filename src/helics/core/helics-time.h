@@ -32,5 +32,15 @@ constexpr Time operator "" _t(long double val)
 	return Time(val);
 }
 
+/** simple struct with the time and completion marker for iterations or dense time steps*/
+struct iterationTime
+{
+public:
+	Time stepTime;
+	convergence_state state;
+	iterationTime() = default;
+	iterationTime(Time t, convergence_state convergence) :stepTime(t), state(convergence)
+	{};
+};
 }
 #endif

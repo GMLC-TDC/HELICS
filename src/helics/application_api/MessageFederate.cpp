@@ -101,13 +101,13 @@ namespace helics {
 			throw(InvalidFunctionCall("cannot call register Interfaces after entering initialization mode"));
 		}
 		std::ifstream file(jsonString);
-		Json::Value doc;
+		Json_helics::Value doc;
 
 		if (file.is_open())
 		{
-			Json::CharReaderBuilder rbuilder;
+			Json_helics::CharReaderBuilder rbuilder;
 			std::string errs;
-			bool ok = Json::parseFromStream(rbuilder, file, &doc, &errs);
+			bool ok = Json_helics::parseFromStream(rbuilder, file, &doc, &errs);
 			if (!ok)
 			{
 				// should I throw an error here?
@@ -116,7 +116,7 @@ namespace helics {
 		}
 		else
 		{
-			Json::Reader stringReader;
+			Json_helics::Reader stringReader;
 			bool ok = stringReader.parse(jsonString, doc, false);
 			if (!ok)
 			{
@@ -234,29 +234,29 @@ namespace helics {
 		return 0;
 	}
 
-	Message_view MessageFederate::getMessage()
+	std::unique_ptr<Message> MessageFederate::getMessage()
 	{
 		if (state == op_states::execution)
 		{
 			return mfManager->getMessage();
 		}
-		return Message_view();
+		return nullptr;
 	}
 
-	Message_view MessageFederate::getMessage(endpoint_id_t endpoint)
+	std::unique_ptr<Message> MessageFederate::getMessage(endpoint_id_t endpoint)
 	{
 		if (state == op_states::execution)
 		{
 			return mfManager->getMessage(endpoint);
 		}
-		return Message_view();
+		return nullptr;
 	}
 
 	void MessageFederate::sendMessage(endpoint_id_t source, const std::string &dest, const data_view &data)
 	{
 		if (state == op_states::execution)
 		{
-			mfManager->sendMessage(source, dest.c_str(), data);
+			mfManager->sendMessage(source, dest, data);
 			return;
 		}
 		throw(InvalidFunctionCall("cannot send message outside of execution state"));
@@ -267,22 +267,33 @@ namespace helics {
 	{
 		if (state == op_states::execution)
 		{
-			mfManager->sendMessage(source, dest.c_str(), data, sendTime);
+			mfManager->sendMessage(source, dest, data, sendTime);
 			return;
 		}
 		throw(InvalidFunctionCall("cannot send message outside of execution state"));
 		
 	}
 
-	void MessageFederate::sendMessage(endpoint_id_t source, const Message_view &message)
+	void MessageFederate::sendMessage(endpoint_id_t source, std::unique_ptr<Message> message)
 	{
 		if (state == op_states::execution)
 		{
-			mfManager->sendMessage(source, message);
+			mfManager->sendMessage(source, std::move(message));
 			return;
 		}
 		throw(InvalidFunctionCall("cannot send message outside of execution state"));
 		
+	}
+
+	void MessageFederate::sendMessage(endpoint_id_t source, const Message &message)
+	{
+		if (state == op_states::execution)
+		{
+			mfManager->sendMessage(source, std::make_unique<Message>(message));
+			return;
+		}
+		throw(InvalidFunctionCall("cannot send message outside of execution state"));
+
 	}
 
 

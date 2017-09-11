@@ -7,7 +7,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 */
 #include "Federate.h"
-#include "coreInstantiation.h"
+#include "core/CoreFactory.h"
 #include "helics/core/core.h"
 #include "asyncFedCallInfo.h"
 #ifdef _MSC_VER
@@ -24,9 +24,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-Core::FederateInfo generateCoreInfo (const FederateInfo &fi)
+CoreFederateInfo generateCoreInfo (const FederateInfo &fi)
 {
-    Core::FederateInfo cfi;
+    CoreFederateInfo cfi;
     cfi.lookAhead = fi.lookAhead;
 	cfi.impactWindow = fi.impactWindow;
     cfi.observer = fi.observer;
@@ -34,31 +34,38 @@ Core::FederateInfo generateCoreInfo (const FederateInfo &fi)
     cfi.uninteruptible = fi.uninterruptible;
     cfi.time_agnostic = fi.timeAgnostic;
 	cfi.source_only = fi.sourceOnly;
+	cfi.max_iterations = fi.max_iterations;
     return cfi;
 }
 
 Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
 {
-    coreObject = initializeCore (fi.coreName, coreTypeFromString (fi.coreType), fi.coreInitString);
+	auto ctype = coreTypeFromString(fi.coreType);
+	if (fi.coreName.empty())
+	{
+		
+		coreObject = CoreFactory::findJoinableCoreOfType(ctype);
+		if (!coreObject)
+		{
+			coreObject = CoreFactory::create(ctype, fi.coreInitString);
+		}
+		
+	}
+	else
+	{
+		coreObject = CoreFactory::FindOrCreate(ctype, fi.coreName, fi.coreInitString);
+	}
     if (!coreObject)
     {
-        if (isAvailable (fi.coreName))
-        {  // if it shows as available but wasn't built then we can try starting it over again
-            closeCore (fi.coreName);
-            coreObject = initializeCore (fi.coreName, coreTypeFromString (fi.coreType), fi.coreInitString);
-            if (!coreObject)
-            {
-                state = op_states::error;
-                return;
-            }
-        }
-        else
-        {
-            state = op_states::error;
-            return;
-        }
+         state = op_states::error;
+         return;
     }
-    fedID = coreObject->registerFederate (fi.name.c_str (), generateCoreInfo (fi));
+	/** make sure the core is connected */
+	if (!coreObject->isConnected())
+	{
+		coreObject->connect();
+	}
+    fedID = coreObject->registerFederate (fi.name, generateCoreInfo (fi));
 }
 
 Federate::Federate (const std::string &file) : Federate (LoadFederateInfo (file))
@@ -70,7 +77,7 @@ Federate::Federate (const std::string &file) : Federate (LoadFederateInfo (file)
 }
 
 
-Federate::Federate ()
+Federate::Federate () noexcept
 {
 	
     // this function needs to be defined for the virtual inheritance to compile but shouldn't actually be executed
@@ -186,19 +193,19 @@ void Federate::enterInitializationStateFinalize()
 	
 }
 
-bool Federate::enterExecutionState (bool ProcessComplete)
+convergence_state Federate::enterExecutionState (convergence_state ProcessComplete)
 {
-    bool res = true;
+	convergence_state res = convergence_state::complete;
     switch (state)
     {
     case op_states::startup:
 	case op_states::pendingInit:
         enterInitializationState ();
-    // FALLTHROUGH
+    //FALLTHROUGH
     case op_states::initialization:
     {
         res = coreObject->enterExecutingState (fedID, ProcessComplete);
-        if (res)
+        if (res==convergence_state::complete)
         {
             state = op_states::execution;
             InitializeToExecuteStateTransition ();
@@ -225,7 +232,7 @@ bool Federate::enterExecutionState (bool ProcessComplete)
     return res;
 }
 
-void Federate::enterExecutionStateAsync(bool ProcessComplete)
+void Federate::enterExecutionStateAsync(convergence_state ProcessComplete)
 {
 	switch (state)
 	{
@@ -275,12 +282,12 @@ void Federate::enterExecutionStateAsync(bool ProcessComplete)
 	}
 }
 
-bool Federate::enterExecutionStateFinalize()
+convergence_state Federate::enterExecutionStateFinalize()
 {
 	if (state == op_states::pendingExec)
 	{
 		auto res = asyncCallInfo->execFuture.get();
-		if (res)
+		if (convergence_state::complete==res)
 		{
 			state = op_states::execution;
 			InitializeToExecuteStateTransition();
@@ -351,7 +358,6 @@ void Federate::finalize ()
     case op_states::finalize:
 		return;
         // do nothing
-        break;
     default://basically only error state
 		throw(InvalidFunctionCall("cannot call finalize in present state"));
     }
@@ -363,13 +369,13 @@ void Federate::error (int errorcode)
 {
     state = op_states::error;
     std::string errorString = "error " + std::to_string (errorcode) + " in federate " + FedInfo.name;
-    coreObject->logMessage (fedID, errorcode, errorString.c_str ());
+    coreObject->logMessage (fedID, errorcode, errorString);
 }
 
 void Federate::error (int errorcode, const std::string &message)
 {
     state = op_states::error;
-    coreObject->logMessage (fedID, errorcode, message.c_str ());
+    coreObject->logMessage (fedID, errorcode, message);
 }
 
 
@@ -389,18 +395,18 @@ Time Federate::requestTime (Time nextInternalTimeStep)
 	}
 }
 
-std::pair<Time, bool> Federate::requestTimeIterative(Time nextInternalTimeStep, bool iterationComplete)
+iterationTime Federate::requestTimeIterative(Time nextInternalTimeStep, convergence_state iterationComplete)
 {
 	if (state == op_states::execution)
 	{
-		auto iPair = coreObject->requestTimeIterative(fedID, nextInternalTimeStep, iterationComplete);
+		auto iterationTime = coreObject->requestTimeIterative(fedID, nextInternalTimeStep, iterationComplete);
 		Time oldTime = currentTime;
-		if (iPair.second)
+		if (iterationTime.state==convergence_state::complete)
 		{
-			currentTime = iPair.first;
+			currentTime = iterationTime.stepTime;
 		}
 		updateTime(currentTime, oldTime);
-		return iPair;
+		return iterationTime;
 	}
 	else
 	{
@@ -429,7 +435,7 @@ void Federate::requestTimeAsync(Time nextInternalTimeStep)
 /** request a time advancement
 @param[in] the next requested time step
 @return the granted time step*/
-void Federate::requestTimeIterativeAsync(Time nextInternalTimeStep, bool iterationComplete)
+void Federate::requestTimeIterativeAsync(Time nextInternalTimeStep, convergence_state iterationComplete)
 {
 	if (state == op_states::execution)
 	{
@@ -469,19 +475,19 @@ Time Federate::requestTimeFinalize()
 
 /** finalize the time advancement request
 @return the granted time step*/
-std::pair<Time, bool> Federate::requestTimeIterativeFinalize()
+iterationTime Federate::requestTimeIterativeFinalize()
 {
 	if (state == op_states::pendingIterativeTime)
 	{
-		auto iPair = asyncCallInfo->timeRequestIterativeFuture.get();
+		auto iterativeTime = asyncCallInfo->timeRequestIterativeFuture.get();
 		state = op_states::execution;
 		Time oldTime = currentTime;
-		if (iPair.second)
+		if (iterativeTime.state==convergence_state::complete)
 		{
-			currentTime = iPair.first;
+			currentTime = iterativeTime.stepTime;
 		}
 		updateTime(currentTime, oldTime);
-		return iPair;
+		return iterativeTime;
 	}
 	else
 	{
@@ -508,17 +514,102 @@ void Federate::registerInterfaces (const std::string & /*jsonString*/)
     // child classes would implement this
 }
 
+std::string Federate::query(const std::string &queryStr)
+{
+	if (queryStr == "name")
+	{
+		return getName();
+	}
+	else if (queryStr == "endpoints")
+	{
+		return "";
+	}
+	else if (queryStr == "publications")
+	{
+		return "";
+	}
+	else if (queryStr == "subscriptions")
+	{
+		return "";
+	}
+	else if (queryStr == "filters")
+	{
+		return "";
+	}
+	return coreObject->query("federation", queryStr);
+}
+
+std::string Federate::query(const std::string &target, const std::string &queryStr)
+{
+	return coreObject->query(target, queryStr);
+}
+
+
+int Federate::queryAsync(const std::string &target, const std::string &queryStr)
+{
+	if (!asyncCallInfo)
+	{
+		asyncCallInfo = std::make_unique<asyncFedCallInfo>();
+	}
+	int cnt = asyncCallInfo->queryCounter++;
+
+	auto queryFut = std::async(std::launch::async, [this, target, queryStr]() {return coreObject->query(target, queryStr); });
+	asyncCallInfo->inFlightQueries.emplace(cnt, std::move(queryFut));
+	return cnt;
+}
+
+int Federate::queryAsync( const std::string &queryStr)
+{
+	if (!asyncCallInfo)
+	{
+		asyncCallInfo = std::make_unique<asyncFedCallInfo>();
+	}
+	int cnt = asyncCallInfo->queryCounter++;
+
+	auto queryFut = std::async(std::launch::async, [this, queryStr]() {return query(queryStr); });
+	asyncCallInfo->inFlightQueries.emplace(cnt, std::move(queryFut));
+	return cnt;
+}
+
+std::string Federate::queryFinalize(int queryIndex)
+{
+	if (asyncCallInfo)
+	{
+		auto fnd = asyncCallInfo->inFlightQueries.find(queryIndex);
+		if (fnd != asyncCallInfo->inFlightQueries.end())
+		{
+			return (fnd->second.get());
+		}
+	}
+	return "#invalid";
+}
+
+
+bool Federate::queryCompleted(int queryIndex) const
+{
+	if (asyncCallInfo)
+	{
+		auto fnd = asyncCallInfo->inFlightQueries.find(queryIndex);
+		if (fnd!=asyncCallInfo->inFlightQueries.end())
+		{
+			return (fnd->second.wait_for(std::chrono::seconds(0)) == std::future_status::ready);
+		}
+	}
+	return false;
+}
+
+
 FederateInfo LoadFederateInfo (const std::string &jsonString)
 {
     FederateInfo fi;
     std::ifstream file (jsonString);
-	Json::Value doc;
+	Json_helics::Value doc;
 	
     if (file.is_open ())
     {
-		Json::CharReaderBuilder rbuilder;
+		Json_helics::CharReaderBuilder rbuilder;
 		std::string errs;
-		bool ok = Json::parseFromStream(rbuilder, file, &doc, &errs);
+		bool ok = Json_helics::parseFromStream(rbuilder, file, &doc, &errs);
 		if (!ok)
 		{
 			// should I throw an error here?
@@ -527,7 +618,7 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     }
 	else
 	{
-		Json::Reader stringReader;
+		Json_helics::Reader stringReader;
 		bool ok = stringReader.parse(jsonString, doc, false);
 		if (!ok)
 		{
@@ -583,6 +674,10 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     {
         fi.coreInitString = doc["coreInit"].asString ();
     }
+	if (doc.isMember("maxiterations"))
+	{
+		fi.max_iterations = static_cast<int16_t>(doc["maxiterations"].asInt());
+	}
     if (doc.isMember ("period"))
     {
         if (doc["period"].isObject ())

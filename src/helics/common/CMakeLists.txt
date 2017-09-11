@@ -7,11 +7,16 @@
 
 set(common_headers
 simpleQueue.hpp
+BlockingQueue.hpp
 timeRepresentation.hpp
 blocking_queue.h
+stringToCmdLine.h
+logger.h
 )
 
 set(common_sources
+stringToCmdLine.cpp
+logger.cpp
 )
 
 set(zmq_headers

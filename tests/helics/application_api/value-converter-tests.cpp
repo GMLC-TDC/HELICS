@@ -1,4 +1,10 @@
+/*
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
 
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+*/
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -143,7 +149,7 @@ BOOST_AUTO_TEST_CASE(test_block_vectors)
 	BOOST_CHECK_EQUAL(res[0].size(), vb[0].size());
 	BOOST_CHECK_EQUAL(res[0][5], vb[0][5]);
 
-	BOOST_CHECK(res[1].string() == vb[1].string());
+	BOOST_CHECK(res[1].string() == vb[1].to_string());
 
 	BOOST_CHECK_EQUAL(3.1415, helics::ValueConverter<double>::interpret(res[2]));
 	BOOST_CHECK_EQUAL(9999, helics::ValueConverter<int>::interpret(res[3]));
@@ -154,7 +160,7 @@ BOOST_AUTO_TEST_CASE(test_block_vectors)
 	BOOST_CHECK_EQUAL(res2[0].size(), vb[0].size());
 	BOOST_CHECK_EQUAL(res2[0][5], vb[0][5]);
 
-	BOOST_CHECK(res2[1].string() == vb[1].string());
+	BOOST_CHECK(res2[1].to_string() == vb[1].to_string());
 
 	BOOST_CHECK_EQUAL(3.1415, helics::ValueConverter<double>::interpret(res2[2]));
 	BOOST_CHECK_EQUAL(9999, helics::ValueConverter<int>::interpret(res2[3]));

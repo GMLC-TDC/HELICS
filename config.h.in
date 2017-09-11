@@ -18,7 +18,19 @@
 
 #cmakedefine HAVE_CONSTEXPR_IF
 
+#ifdef HAVE_CONSTEXPR_IF
+#define CONSTEXPR_IF constexpr
+#else
+#define CONSTEXPR_IF /*disables code*/
+#endif
+
 #cmakedefine HAVE_FALLTHROUGH
+
+#ifdef HAVE_FALLTHROUGH
+#define FALLTHROUGH [[fallthrough]];
+#else
+#define FALLTHROUGH //Fallthrough
+#endif
 
 #cmakedefine HAVE_UNUSED
 
@@ -26,10 +38,6 @@
 
 #cmakedefine HAVE_HYPOT3
 
-#ifdef HAVE_FALLTHROUGH
-#define FALLTHROUGH [[fallthrough]];
-#else
-#define FALLTHROUGH 
-#endif
+
 
 #endif

@@ -34,16 +34,22 @@ namespace helics
 	struct filter_info
 	{
 		std::string name;  //!< the name of the filter
-		std::string endpoint; //!< the name of the endpoint
-		std::string type;  //!< the type of the endpoint
+		std::string endpoint; //!< the name of the endpoint the filter is targetting
+		std::string inputType;  //!< the input type of the filter
+		std::string outputType; //!< the output type of the filter
 		filter_id_t id = 0;	
 		Core::Handle handle;
 		filter_type ftype = filter_type::source_filter;
 		int callbackIndex=-1;
 
-		filter_info(std::string filtername, std::string n_endpoint, std::string n_type) :name(filtername),
-			endpoint(n_endpoint), type(n_type)
-		{};
+		filter_info(const std::string &filterName, const std::string &endpoint_, const std::string &inType, const std::string &outType) :name(filterName),
+			endpoint(endpoint_), inputType(inType), outputType(outType)
+		{
+			if (outputType.empty())
+			{
+				outputType = inputType;
+			}
+		};
 	};
 
 	class MessageOperator;
@@ -52,7 +58,12 @@ namespace helics
 	class MessageFilterFederateManager
 	{
 	public:
+		/** constructor
+		@param coreOb  a shared ptr to the core that is to be used
+		@param id the identifier for the federate
+		*/
 		MessageFilterFederateManager(std::shared_ptr<Core> coreOb, Core::federate_id_t id);
+		/** destructor */
 		~MessageFilterFederateManager();
 
 		/** define a filter interface on a source
@@ -61,14 +72,14 @@ namespace helics
 		@param[in] the name of the endpoint
 		@param[in] the inputType which the source filter can receive
 		*/
-		filter_id_t registerSourceFilter(const std::string &filterName, const std::string &sourceEndpoint, const std::string &inputType);
+		filter_id_t registerSourceFilter(const std::string &filterName, const std::string &sourceEndpoint, const std::string &inputType, const std::string &outputType);
 		/** define a filter interface for a destination
 		@details a destination filter will be sent any packets that are going to a particular destination
 		multiple filters are not allowed to specify the same destination
 		@param[in] the name of the destination endpoint
 		@param[in] the inputType which the destination filter can receive
 		*/
-		filter_id_t registerDestinationFilter(const std::string &filterName, const std::string &destEndpoint, const std::string &inputType);
+		filter_id_t registerDestinationFilter(const std::string &filterName, const std::string &destEndpoint, const std::string &inputType, const std::string &outputType);
 
 
 		/** check if any registered filters have packets*/
@@ -80,7 +91,7 @@ namespace helics
 		@param[in] filter the specified filter
 		@return a message View object
 		*/
-		Message_view getMessageToFilter(filter_id_t filter);
+		std::unique_ptr<Message> getMessageToFilter(filter_id_t filter);
 
 
 		/** update the time from oldTime to newTime
@@ -102,10 +113,14 @@ namespace helics
 		@return empty string if an invalid id is passed*/
 		std::string getFilterEndpoint(filter_id_t id) const;
 
-		/** get the name of an endpoint from its id
+		/** get the input Type of an endpoint from its id
 		@param[in] id the endpoint to query
-		@return empty string if an invalid id is passed*/
-		std::string getFilterType(filter_id_t id) const;
+		@return empty string if an invalid id is passed otherwise the string of the input type*/
+		std::string getFilterInputType(filter_id_t id) const;
+		/** get the output type of an endpoint from its id
+		@param[in] id the endpoint to query
+		@return empty string if an invalid id is passed otherwise the string of the output type*/
+		std::string getFilterOutputType(filter_id_t id) const;
 
 		/** get the id of a source filter from the name of the endpoint
 		@param[in] filterName the name of the filter
@@ -173,7 +188,7 @@ namespace helics
 
 		std::unordered_map<std::string, filter_id_t> SourceFilterNames;  //!< map for source filters
 		std::unordered_map<std::string, filter_id_t> DestFilterNames;		//!< map for destination filters
-		std::vector<simpleQueue<Message_view>> filterQueues; //!< the storage for the message queues
+		std::vector<simpleQueue<std::unique_ptr<Message>>> filterQueues; //!< the storage for the message queues
 		std::map<Core::Handle, filter_id_t> handleLookup; //!< map to lookup endpoints from core handles
 		std::vector<filter_info> filters; //!< vector the filters
 		std::vector<std::function<void(filter_id_t,Time)>> callbacks;

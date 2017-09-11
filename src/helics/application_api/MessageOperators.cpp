@@ -18,13 +18,13 @@ MessageTimeOperator::MessageTimeOperator(std::function<Time(Time)> userTimeFunct
 
 }
 
-message_t MessageTimeOperator::operator() (message_t *message)
+std::unique_ptr<Message> MessageTimeOperator::process(std::unique_ptr<Message> message)
 {
 	if (TimeFunction)
 	{
-		message->time = TimeFunction(message ->time);
+		message->time = TimeFunction(message->time);
 	}
-	return *message;
+	return message;
 }
 
 void MessageTimeOperator::setTimeFunction(std::function<Time(Time)> userTimeFunction)
@@ -42,21 +42,14 @@ void MessageDataOperator::setDataFunction(std::function<data_view(data_view)> us
 	dataFunction = userDataFunction;
 }
 
-message_t MessageDataOperator::operator() (message_t *message)
+std::unique_ptr<Message> MessageDataOperator::process (std::unique_ptr<Message> message)
 {
 	if (dataFunction)
 	{
-		auto dv = dataFunction(data_view(message->data, message->len));
-		message_t newMessage;
-		newMessage.src = message->src;
-		newMessage.origsrc = message->origsrc;
-		newMessage.dst = message->dst;
-		newMessage.data = dv.data();
-		newMessage.len = dv.size();
-		newMessage.time = message->time;
-		return newMessage;
+		auto dv = dataFunction(data_view(message->data));
+		message->data = dv.to_data_block();
 	}
-	return *message;
+	return message;
 }
 
 

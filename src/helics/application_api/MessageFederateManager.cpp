@@ -10,16 +10,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/core/core.h"
 namespace helics
 {
-message_t generateCoreMessage (const Message_view &mv)
-{
-    message_t m;
-    m.src = mv.src.data ();
-    m.dst = mv.dest.data ();
-    m.origsrc = mv.origsrc.data ();
-    m.data = mv.data.data ();
-    m.len = mv.data.size ();
-    return m;
-}
 
 MessageFederateManager::MessageFederateManager (std::shared_ptr<Core> coreOb, Core::federate_id_t id)
     : coreObject (std::move (coreOb)), fedID (id)
@@ -33,7 +23,7 @@ endpoint_id_t MessageFederateManager::registerEndpoint (const std::string &name,
     endpoint_id_t id = static_cast<identifier_type> (local_endpoints.size ());
     local_endpoints.emplace_back (name, type);
     local_endpoints.back ().id = id;
-    local_endpoints.back ().handle = coreObject->registerEndpoint (fedID, name.c_str (), type.c_str ());
+    local_endpoints.back ().handle = coreObject->registerEndpoint (fedID, name, type);
     endpointNames.emplace (name, id);
     handleLookup.emplace (local_endpoints.back ().handle, id);
     return id;
@@ -45,8 +35,8 @@ void MessageFederateManager::registerKnownCommunicationPath (endpoint_id_t local
 {
     if (localEndpoint.value () < local_endpoints.size ())
     {
-        coreObject->registerFrequentCommunicationsPair (local_endpoints[localEndpoint.value ()].name.c_str (),
-                                                        remoteEndpoint.c_str ());
+        coreObject->registerFrequentCommunicationsPair (local_endpoints[localEndpoint.value ()].name,
+                                                        remoteEndpoint);
     }
 }
 
@@ -54,7 +44,7 @@ void MessageFederateManager::subscribe (endpoint_id_t endpoint, const std::strin
 {
     if (endpoint.value () < local_endpoints.size ())
     {
-        auto h = coreObject->registerSubscription (fedID, name.c_str (), type.c_str (), "", false);
+        auto h = coreObject->registerSubscription (fedID, name, type, "", handle_check_mode::optional);
         std::lock_guard<std::mutex> eLock (endpointLock);
         subHandleLookup.emplace (h, std::make_pair (endpoint, name));
         hasSubscriptions = true;
@@ -105,20 +95,20 @@ uint64_t MessageFederateManager::receiveCount () const
     return sz;
 }
 
-Message_view MessageFederateManager::getMessage (endpoint_id_t endpoint)
+std::unique_ptr<Message> MessageFederateManager::getMessage (endpoint_id_t endpoint)
 {
     if (endpoint.value () < local_endpoints.size ())
     {
         auto mv = messageQueues[endpoint.value ()].pop ();
         if (mv)
         {
-            return *mv;
+            return std::move(*mv);
         }
     }
-    return Message_view{};
+    return nullptr;
 }
 
-Message_view MessageFederateManager::getMessage ()
+std::unique_ptr<Message> MessageFederateManager::getMessage ()
 {
     // just start with the first endpoint and check until a queue isn't empty
     for (auto &mq : messageQueues)
@@ -128,15 +118,15 @@ Message_view MessageFederateManager::getMessage ()
             auto ms = mq.pop ();
             if (ms)
             {
-                return *ms;
+                return std::move(*ms);
             }
         }
     }
-    return Message_view{};
+    return nullptr;
 }
 
 
-void MessageFederateManager::sendMessage (endpoint_id_t source, const char *dest, data_view message)
+void MessageFederateManager::sendMessage (endpoint_id_t source, const std::string &dest, data_view message)
 {
     if (source.value () < local_endpoints.size ())
     {
@@ -148,7 +138,7 @@ void MessageFederateManager::sendMessage (endpoint_id_t source, const char *dest
     }
 }
 
-void MessageFederateManager::sendMessage (endpoint_id_t source, const char *dest, data_view message, Time sendTime)
+void MessageFederateManager::sendMessage (endpoint_id_t source, const std::string &dest, data_view message, Time sendTime)
 {
     if (source.value () < local_endpoints.size ())
     {
@@ -161,13 +151,11 @@ void MessageFederateManager::sendMessage (endpoint_id_t source, const char *dest
     }
 }
 
-void MessageFederateManager::sendMessage (endpoint_id_t source, Message_view message)
+void MessageFederateManager::sendMessage (endpoint_id_t source, std::unique_ptr<Message> message)
 {
     if (source.value () < local_endpoints.size ())
     {
-        auto m = generateCoreMessage (message);
-        m.src = local_endpoints[source.value ()].name.c_str ();
-        coreObject->sendMessage (&m);
+        coreObject->sendMessage (local_endpoints[source.value()].handle,std::move(message));
     }
     else
     {
@@ -182,23 +170,22 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     auto epCount = coreObject->receiveCountAny (fedID);
     // lock the data updates
     std::unique_lock<std::mutex> eplock (endpointLock);
+	Core::Handle endpoint_id;
     for (size_t ii = 0; ii < epCount; ++ii)
     {
-        auto msgp = coreObject->receiveAny (fedID);
-        if (msgp.second == nullptr)
+        auto message = coreObject->receiveAny (fedID,endpoint_id);
+        if (!message)
         {
             break;
         }
 
         /** find the id*/
-        auto fid = handleLookup.find (msgp.first);
+        auto fid = handleLookup.find (endpoint_id);
         if (fid != handleLookup.end ())
         {  // assign the data
 
-            /** making a shared pointer with custom deleter*/
-            auto sd = std::shared_ptr<message_t> (msgp.second, [=](message_t *m) { coreObject->dereference (m); });
             auto localEndpointIndex = fid->second.value ();
-            messageQueues[localEndpointIndex].emplace (std::move (sd));
+            messageQueues[localEndpointIndex].emplace (std::move (message));
             if (local_endpoints[localEndpointIndex].callbackIndex >= 0)
             {
 				auto cb = callbacks[local_endpoints[localEndpointIndex].callbackIndex];
@@ -217,27 +204,26 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     }
     if (hasSubscriptions)
     {
-        auto handles = coreObject->getValueUpdates (fedID, &epCount);
-        for (decltype (epCount) ii = 0; ii < epCount; ++ii)
+        auto handles = coreObject->getValueUpdates (fedID);
+		for (auto handle:handles)
         {
-            auto sfnd = subHandleLookup.find (handles[ii]);
+            auto sfnd = subHandleLookup.find (handle);
             if (sfnd != subHandleLookup.end ())
             {
-                Message_view mv;
-                mv.src = sfnd->second.second;
+				auto mv = std::make_unique<Message>();
+                mv->src = sfnd->second.second;
                 auto localEndpointIndex = sfnd->second.first.value ();
-                mv.dest = local_endpoints[localEndpointIndex].name;
-                mv.origsrc = mv.src;
+                mv->dest = local_endpoints[localEndpointIndex].name;
+                mv->origsrc = mv->src;
                 // get the data value
-                auto data = coreObject->getValue (handles[ii]);
-                /** making a shared pointer with custom deleter*/
-                auto sd = std::shared_ptr<data_t> (data, [=](data_t *v) { coreObject->dereference (v); });
+                auto data = coreObject->getValue (handle);
 
-                mv.data = data_view (std::move (sd));
-                mv.time = CurrentTime;
+                mv->data = *data;
+                mv->time = CurrentTime;
                 messageQueues[localEndpointIndex].push (std::move (mv));
                 if (local_endpoints[localEndpointIndex].callbackIndex >= 0)
                 {
+					//make sure the lock is not engaged for the callback
 					auto cb = callbacks[local_endpoints[localEndpointIndex].callbackIndex];
                     eplock.unlock ();
                     cb(sfnd->second.first, newTime);
@@ -245,6 +231,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
                 }
                 else if (allCallbackIndex >= 0)
                 {
+					//make sure the lock is not engaged for the callback
 					auto ac = callbacks[allCallbackIndex];
                     eplock.unlock ();
                     ac(sfnd->second.first, CurrentTime);

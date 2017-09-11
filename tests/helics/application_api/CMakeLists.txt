@@ -1,6 +1,12 @@
+##############################################################################
+#Copyright (C) 2017, Battelle Memorial Institute
+#All rights reserved.
 
+#This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+##############################################################################
 
 set(application_api_test_headers
+testFixtures.h
 )
 
 set(application_api_test_sources
@@ -10,6 +16,7 @@ application-api-tests.cpp
 data-block-tests.cpp
 data-view-tests.cpp
 test-simple-queue.cpp
+testBlockingQueue.cpp
 test-value-federate1.cpp
 test-value-federate2.cpp
 test-message-federate.cpp
@@ -17,18 +24,8 @@ test-filter-federate.cpp
 federate_tests.cpp
 heat-transfer-tests.cpp
 subPubObjectTests.cpp
+testFixtures.cpp
 )
-
-set (zmq_test_sources
-zmqBrokerRunner.cpp
-zmqBrokerRunner.h
-zmq-test-cases1.cpp
-zmq-test-cases2.cpp
-)
-
-if (${ZMQ_FOUND})
-   list(APPEND application_api_test_sources ${zmq_test_sources})
-endif (${ZMQ_FOUND})
 
 add_executable(application-api-tests ${application_api_test_sources} ${application_api_test_headers})
 target_link_libraries(application-api-tests helics)
@@ -39,8 +36,8 @@ include_directories(${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 
 target_link_libraries(application-api-tests ${external_library_list})
-ADD_DEFINITIONS(-DHELICS_ZMQ_BROKER_LOCATION="${HELICS_BROKER_LOC}")
-ADD_DEFINITIONS(-DHELICSINSTALL_LOCATION="${CMAKE_INSTALL_PREFIX}")
+ADD_DEFINITIONS(-DHELICS_BROKER_LOCATION="${HELICS_BROKER_LOC}")
+ADD_DEFINITIONS(-DHELICS_INSTALL_LOCATION="${CMAKE_INSTALL_PREFIX}")
 
 add_test(NAME application-api-tests COMMAND application-api-tests)
 

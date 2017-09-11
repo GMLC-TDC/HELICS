@@ -9,7 +9,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/application_api/ValueFederate.h"
 #include <fstream>
 #include <iostream>
-#include <string>
 #include <regex>
 #include <stdexcept>
 #include <boost/program_options.hpp>

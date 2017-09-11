@@ -2,9 +2,8 @@
 Copyright (C) 2017, Battelle Memorial Institute
 All rights reserved.
 
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+This software was modified by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil;  eval: (c-set-offset 'innamespace 0); -*- */
 /*
 * LLNS Copyright Start
 * Copyright (c) 2017, Lawrence Livermore National Security
@@ -188,10 +187,12 @@ void zmqReactor::reactorLoop()
 				while (socketop)
 				{
 					int index;
-					switch ((*socketop).first)
+					auto instruction = (*socketop).first;
+					auto &descriptor = (*socketop).second;
+					switch (instruction)
 					{
 					case reactorInstruction::close:
-						index = findSocketByName((*socketop).second.name,socketNames);
+						index = findSocketByName(descriptor.name,socketNames);
 						if (index < static_cast<int>(sockets.size()))
 						{
 							sockets[index].close();
@@ -203,9 +204,9 @@ void zmqReactor::reactorLoop()
 						}
 						break;
 					case reactorInstruction::newSocket:
-						sockets.push_back((*socketop).second.makeSocket(contextManager->getContext()));
-						socketNames.push_back((*socketop).second.name);
-						socketCallbacks.push_back((*socketop).second.callback);
+						sockets.push_back(descriptor.makeSocket(contextManager->getContext()));
+						socketNames.push_back(descriptor.name);
+						socketCallbacks.push_back(descriptor.callback);
 						socketPolls.resize(socketPolls.size() + 1);
 						socketPolls.back().socket = sockets.back();
 						socketPolls.back().fd = 0;
@@ -214,15 +215,15 @@ void zmqReactor::reactorLoop()
 						++socketCount;
 						break;
 					case reactorInstruction::modify:
-						index = findSocketByName((*socketop).second.name, socketNames);
+						index = findSocketByName(descriptor.name, socketNames);
 						if (index < static_cast<int>(sockets.size()))
 						{
-							(*socketop).second.modifySocket(sockets[index]);
+							descriptor.modifySocket(sockets[index]);
 						}
 						//replace the callback if needed
-						if ((*socketop).second.callback)
+						if (descriptor.callback)
 						{
-							socketCallbacks[index] = (*socketop).second.callback;
+							socketCallbacks[index] = descriptor.callback;
 						}
 						break;
 					case reactorInstruction::terminate:		

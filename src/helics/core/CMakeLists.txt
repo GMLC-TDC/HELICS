@@ -5,44 +5,110 @@
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 ##############################################################################
 set(SRC_FILES
-    core-factory.cc
-    test-core.cc
-    mpi/mpi-core.cc
-    zmq/zmq-core.cc
-    zmq/zmq-helper.cc
+    CoreFactory.cpp
+	BrokerFactory.cpp
+    TestCore.cpp
+	CommonCore.cpp
+	FederateState.cpp
+	SubscriptionInfo.cpp
+	FilterInfo.cpp
+	EndpointInfo.cpp
+	ActionMessage.cpp
+	CoreBroker.cpp
+	TestBroker.cpp
+	core-data.cpp
+	ipc/IpcCore.cpp
+	ipc/IpcBroker.cpp
+	ipc/IpcComms.cpp
+	TimeCoordinator.cpp
+	CommsInterface.cpp
+	argParser.cpp
 )
+
+set (MPI_SOURCE_FILES
+	mpi/MpiCore.cpp
+	mpi/MpiBroker.cpp
+	mpi/MpiComms.cpp
+)
+
+set (ZMQ_SOURCE_FILES
+	zmq/ZmqCore.cpp
+    zmq/zmq-helper.cc
+	zmq/ZmqBroker.cpp
+	zmq/ZmqComms.cpp
+)
+
 set(INCLUDE_FILES
     core-c.h
     core-data.h
-    core-factory.h
+    CoreFactory.h
+	BrokerFactory.h
+	DependencyInfo.h
+	core-exceptions.h
+	TimeCoordinator.h
     core.h
     core-types.h
     helics-time.h
-    test-core.h
-    mpi/mpi-core.h
-    zmq/zmq-core.h
-    zmq/zmq-fedstate.h
-    zmq/zmq-handle.h
-    zmq/zmq-helper.h
+    TestCore.h
+	CoreBroker.h
+	ActionMessageDefintions.h
+	ActionMessage.h
+	CommonCore.h
+	ipc/IpcCore.h
+	ipc/IpcBroker.h
+	ipc/IpcComms.h
+    
+	CommsInterface.h
+	FederateState.h
+	SubscriptionInfo.h
+	PublicationInfo.h
+	EndpointInfo.h
+	FilterInfo.h
+	BasicHandleInfo.h
+	FilterFunctions.h
+	TestBroker.h
+	argParser.h
 )
 
+set(ZMQ_HEADER_FILES
+	zmq/ZmqCore.h
+    zmq/zmq-helper.h
+	zmq/ZmqBroker.h
+	zmq/ZmqComms.h
+)
+
+set(MPI_HEADER_FILES
+	mpi/MpiCore.h
+	mpi/MpiBroker.h
+	mpi/MpiComms.h
+	)
+
+if (${ZMQ_FOUND})
+   list(APPEND SRC_FILES ${ZMQ_SOURCE_FILES})
+   list(APPEND INCLUDE_FILES ${ZMQ_HEADER_FILES})
+endif (${ZMQ_FOUND})
+
+list(APPEND SRC_FILES ${MPI_SOURCE_FILES})
+list(APPEND INCLUDE_FILES ${MPI_HEADER_FILES})
+
+include_directories(${Boost_INCLUDE_DIR})
 add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES})
 
 
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 
-if (${ZMQ_FOUND})
 OPTION(BUILD_BROKER "Build a helics Broker" ON)
 if (BUILD_BROKER)
-   add_executable(helics_broker zmq/zmq-broker.cc)
+link_directories(${external_link_directories})
+add_executable(helics_broker helics-broker.cc)
    target_link_libraries(helics_broker helics)
-
+   target_link_libraries(helics_broker ${external_library_list})
+   
    set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "build folder location of the broker")
    #message(STATUS "bloc ${CMAKE_CURRENT_BINARY_DIR}")
    INSTALL(TARGETS helics_broker DESTINATION bin)
-   
-   foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
+foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET helics_broker POST_BUILD        # Adds a post-build event to core tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "${keyfile}"      # <--this is in-file
@@ -50,5 +116,4 @@ add_custom_command(TARGET helics_broker POST_BUILD        # Adds a post-build ev
 endforeach(keyfile)
 endif()
 
-endif (${ZMQ_FOUND})
 

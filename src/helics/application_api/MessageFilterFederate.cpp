@@ -23,7 +23,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-MessageFilterFederate::MessageFilterFederate () {}
+MessageFilterFederate::MessageFilterFederate() = default;
 
 MessageFilterFederate::MessageFilterFederate (const FederateInfo &fi) : Federate (fi), MessageFederate (true)
 {
@@ -72,13 +72,13 @@ void MessageFilterFederate::registerInterfaces (const std::string &jsonString)
 {
     MessageFederate::registerInterfaces (jsonString);
     std::ifstream file (jsonString);
-    Json::Value doc;
+    Json_helics::Value doc;
 
     if (file.is_open ())
     {
-        Json::CharReaderBuilder rbuilder;
+        Json_helics::CharReaderBuilder rbuilder;
         std::string errs;
-        bool ok = Json::parseFromStream (rbuilder, file, &doc, &errs);
+        bool ok = Json_helics::parseFromStream (rbuilder, file, &doc, &errs);
         if (!ok)
         {
             // should I throw an error here?
@@ -87,7 +87,7 @@ void MessageFilterFederate::registerInterfaces (const std::string &jsonString)
     }
     else
     {
-        Json::Reader stringReader;
+        Json_helics::Reader stringReader;
         bool ok = stringReader.parse (jsonString, doc, false);
         if (!ok)
         {
@@ -135,45 +135,49 @@ void MessageFilterFederate::registerInterfaces (const std::string &jsonString)
 
 filter_id_t MessageFilterFederate::registerSourceFilter (const std::string &filterName,
                                                          const std::string &sourceEndpoint,
-                                                         const std::string &inputType)
+                                                         const std::string &inputType,
+														 const std::string &outputType)
 {
     if (state == op_states::startup)
     {
         ++filterCount;
         if (!filterName.empty ())
         {
-            return filterManager->registerSourceFilter (filterName, sourceEndpoint, inputType);
+            return filterManager->registerSourceFilter (filterName, sourceEndpoint, inputType, outputType);
         }
         auto cnt = filterCount.load ();
-        return filterManager->registerSourceFilter ("filter" + std::to_string (cnt), sourceEndpoint, inputType);
+        return filterManager->registerSourceFilter ("filter" + std::to_string (cnt), sourceEndpoint, inputType,outputType);
     }
     throw (InvalidFunctionCall ("filters can only be created in startup mode"));
 }
 
 filter_id_t MessageFilterFederate::registerDestinationFilter (const std::string &filterName,
                                                               const std::string &destEndpoint,
-                                                              const std::string &inputType)
+                                                              const std::string &inputType,
+																const std::string &outputType)
 {
     if (state == op_states::startup)
     {
         ++filterCount;
         if (!filterName.empty ())
         {
-            return filterManager->registerDestinationFilter (filterName, destEndpoint, inputType);
+            return filterManager->registerDestinationFilter (filterName, destEndpoint, inputType, outputType);
         }
         auto cnt = filterCount.load ();
-        return filterManager->registerDestinationFilter ("filter" + std::to_string (cnt), destEndpoint, inputType);
+        return filterManager->registerDestinationFilter ("filter" + std::to_string (cnt), destEndpoint, inputType, outputType);
     }
     throw (InvalidFunctionCall ("filters can only be created in startup mode"));
 }
 
+
+static const std::string nullStr;
 
 filter_id_t MessageFilterFederate::registerSourceFilter (const std::string &sourceEndpoint)
 {
     if (state == op_states::startup)
     {
         auto cnt = filterCount++;
-        return filterManager->registerSourceFilter ("filter" + std::to_string (cnt), sourceEndpoint, "");
+        return filterManager->registerSourceFilter ("filter" + std::to_string (cnt), sourceEndpoint, nullStr, nullStr);
     }
     throw (InvalidFunctionCall ("filters can only be created in startup mode"));
 }
@@ -183,7 +187,7 @@ filter_id_t MessageFilterFederate::registerDestinationFilter (const std::string 
     if (state == op_states::startup)
     {
         auto cnt = filterCount++;
-        return filterManager->registerDestinationFilter ("filter" + std::to_string (cnt), destEndpoint, "");
+        return filterManager->registerDestinationFilter ("filter" + std::to_string (cnt), destEndpoint, nullStr, nullStr);
     }
     throw (InvalidFunctionCall ("filters can only be created in startup mode"));
 }
@@ -195,7 +199,7 @@ bool MessageFilterFederate::hasMessageToFilter (filter_id_t filter) const
     return filterManager->hasMessageToFilter (filter);
 }
 
-Message_view MessageFilterFederate::getMessageToFilter (filter_id_t filter)
+std::unique_ptr<Message> MessageFilterFederate::getMessageToFilter (filter_id_t filter)
 {
     return filterManager->getMessageToFilter (filter);
 }
@@ -210,9 +214,14 @@ std::string MessageFilterFederate::getFilterEndpoint (filter_id_t id) const
     return filterManager->getFilterEndpoint (id);
 }
 
-std::string MessageFilterFederate::getFilterType (filter_id_t id) const
+std::string MessageFilterFederate::getFilterInputType (filter_id_t id) const
 {
-    return filterManager->getFilterType (id);
+    return filterManager->getFilterInputType (id);
+}
+
+std::string MessageFilterFederate::getFilterOutputType(filter_id_t id) const
+{
+	return filterManager->getFilterOutputType(id);
 }
 
 filter_id_t MessageFilterFederate::getFilterId (const std::string &filterName) const
@@ -246,59 +255,19 @@ void MessageFilterFederate::registerFilterCallback (const std::vector<filter_id_
 
 void MessageFilterFederate::registerMessageOperator (std::shared_ptr<MessageOperator> mo)
 {
-    if (FedInfo.timeAgnostic)
-    {
-        if ((state == op_states::startup) || (state == op_states::initialization))
-        {
             filterManager->registerMessageOperator (mo);
-        }
-        else
-        {
-            throw (InvalidFunctionCall ("MessageOperators  can only be setup during startup"));
-        }
-    }
-    else
-    {
-        throw (InvalidFunctionCall ("MessageOperators  can only be used by time agnostistic federates"));
-    }
 }
 
 void MessageFilterFederate::registerMessageOperator (filter_id_t filter, std::shared_ptr<MessageOperator> mo)
 {
-    if (FedInfo.timeAgnostic)
-    {
-        if ((state == op_states::startup) || (state == op_states::initialization))
-        {
-            filterManager->registerMessageOperator (filter, mo);
-        }
-        else
-        {
-            throw (InvalidFunctionCall ("MessageOperators  can only be setup during startup and initialization"));
-        }
-    }
-    else
-    {
-        throw (InvalidFunctionCall ("MessageOperators  can only be used by time agnostistic federates"));
-    }
+   
+   filterManager->registerMessageOperator (filter, mo);
+     
 }
 
 void MessageFilterFederate::registerMessageOperator (const std::vector<filter_id_t> &filters,
                                                      std::shared_ptr<MessageOperator> mo)
 {
-    if (FedInfo.timeAgnostic)
-    {
-        if ((state == op_states::startup) || (state == op_states::initialization))
-        {
-            filterManager->registerMessageOperator (filters, mo);
-        }
-        else
-        {
-            throw (InvalidFunctionCall ("MessageOperators  can only be setup during startup and initialization"));
-        }
-    }
-    else
-    {
-        throw (InvalidFunctionCall ("MessageOperators  can only be used by time agnostistic federates"));
-    }
+         filterManager->registerMessageOperator (filters, mo);
 }
 }
