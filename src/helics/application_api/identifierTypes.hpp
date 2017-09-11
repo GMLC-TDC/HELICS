@@ -16,6 +16,7 @@ using identifier_type = unsigned long;
 
 constexpr identifier_type invalid_id_value = (identifier_type) (-1);  //!< defining an invalid id value
 
+/** the known types of identifiers*/
 enum class identifiers : char
 {
 	publication,
@@ -61,7 +62,9 @@ class identifier_id_t
     BaseType value () const noexcept { return _value; };
 	/** equality operator*/
     bool operator== (identifier_id_t id) const noexcept { return (_value == id._value); };
+	/** iequality operator*/
 	bool operator!= (identifier_id_t id) const noexcept { return (_value != id._value); };
+	/** less than operator for sorting*/
     bool operator< (identifier_id_t id) const noexcept { return (_value < id._value); };
 };
 

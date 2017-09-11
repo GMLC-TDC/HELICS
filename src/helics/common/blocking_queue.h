@@ -14,10 +14,11 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <mutex>
 #include <queue>
 #include <string>
-#include <extra_includes/optional.h>
+#include <helics_includes/optional.h>
 
 namespace helics {
-
+/** a queue that blocks while waiting for an input
+*/
 template<typename T>
 class BlockingQueue {
   public:

@@ -47,18 +47,18 @@ namespace helics
 class CoreFederateInfo
 {
 public:
-	Time timeDelta = timeEpsilon;  // for periodic federates this is the period or minimum time resolution of a
+	Time timeDelta = timeEpsilon;  // the minimum time advance allowed by the federate
 								// federate
 	Time lookAhead = timeZero;  //!< the lookahead value, the window of time between the time request return and the availability of values
 	Time impactWindow = timeZero;  //!< the time it takes values to propagate to the Federate
-	
+	Time period = timeZero; //!< a period value,  all granted times must be on this period
 	int logLevel;	//!< the logging level above which not to log to file
-	//4 byte gap
 	bool observer = false;  //!< flag indicating that the federate is an observer
 	bool uninteruptible =
 		false;  //!< flag indicating that the federate should never return a time other than requested
 	bool time_agnostic = false;  //!< flag indicating that the federate does not participate in time advancement and should be ignored in all timeRequest operations
 	bool source_only = false;   //!< flag indicating that the federate does not recieve or do anything with received information.  
+								//4 byte gap
 	bool filter_only = false; //!< flag indicating that the source filter federate is not modifying the destination of a filtered message only time or content
 							  //there is 1 bytes undefined in this structure
 	int16_t max_iterations = 3;	//!< the maximum number of iterations allowed for the federate

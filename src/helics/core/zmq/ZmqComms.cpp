@@ -87,13 +87,11 @@ void ZmqComms::setReplyCallback(std::function<ActionMessage(ActionMessage &&)> c
 				}
 				if ((poller[1].revents&ZMQ_POLLIN) != 0)
 				{
-					zmq::message_t msg;
 					pullSocket.recv(&msg);
 					
 				}
 				if ((poller[2].revents&ZMQ_POLLIN) != 0)
 				{
-					zmq::message_t msg;
 					repSocket.recv(&msg);
 					ActionMessage M(static_cast<char *>(msg.data()), msg.size());
 					if (replyCallback)
