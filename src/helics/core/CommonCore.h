@@ -114,6 +114,7 @@ CommonCore(const std::string &core_name);
   virtual std::string getAddress() const=0;
   /** add a command to the process queue*/
  void addCommand(const ActionMessage &m);
+ /** move a command into the commandQueue*/
  void addCommand(ActionMessage &&m);
  virtual bool connect() override final;
  virtual bool isConnected() const override final;
@@ -132,9 +133,10 @@ protected:
   @details cmd may be modified by this function*/
   virtual void processCommand(ActionMessage &cmd);
   /** function to process a priority command independent of the main queue
-  @detailed called from addMessage function which detects if the command is a priority command
+  @detailed called when processing a priority command.  The priority command has a response message which gets sent
   this mainly deals with some of the registration functions
   @param[in] command the command to process
+  @return a action message response to the priority command 
   */
   void processPriorityCommand(const ActionMessage &command);
   /** transit an ActionMessage to another core or broker
@@ -178,6 +180,7 @@ private:
 	void transmitDelayedMessages();
 	/**function for doing the actual routing either to a local fed or up the broker chain*/
 	void routeMessage(ActionMessage &cmd, federate_id_t dest);
+	/** function for routing a message from based on the destination specified in the ActionMessage*/
 	void routeMessage(const ActionMessage &cmd);
 protected:
 	/** enumeration of the possible core states*/
