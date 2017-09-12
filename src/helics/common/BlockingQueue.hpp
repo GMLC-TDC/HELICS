@@ -15,7 +15,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <string>
 #include <vector>
 #include <algorithm>
-#include "helics_includes\optional.h"
+#include "helics_includes/optional.h"
 
 /** class implementing a blocking queue
 @details this class uses locks one for push and pull it can exhibit longer blocking times if the internal operations require
