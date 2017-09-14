@@ -1004,7 +1004,8 @@ void argumentParser (int argc, char *argv[], boost::program_options::variables_m
 		("loglevel", po::value<int>(), "the level which to log the higher this is set to the more gets logs (-1) for no logging")
 		("fileloglevel", po::value<int>(), "the level at which messages get sent to the file")
 		("consoleloglevel", po::value<int>(), "the level at which message get sent to the console")
-		("minfed", po::value<int>(), "type of the publication to use")
+		("minfed", po::value<int>(), "the minimum number of federates")
+		("minbroker",po::value<int>(), "the minimum number of core/brokers that need to be connected")
 		("identifier", po::value<std::string>(), "name of the core");
 
 	hidden.add_options() ("min", po::value<int>(), "minimum number of federates");
@@ -1048,7 +1049,7 @@ void argumentParser (int argc, char *argv[], boost::program_options::variables_m
 
     if (cmd_vm.count ("version") > 0)
     {
-        std::cout << 0.1 << '\n';
+        std::cout << HELICS_VERSION_MAJOR<<'.'<<HELICS_VERSION_MINOR<<'.'<<HELICS_VERSION_PATCH<<" (" <<HELICS_DATE<<")\n";
         return;
     }
 

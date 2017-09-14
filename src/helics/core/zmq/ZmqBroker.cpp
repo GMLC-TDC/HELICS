@@ -39,9 +39,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define ENDL std::endl
 #endif
 
-static const std::string DEFAULT_BROKER = "tcp://localhost:5555";
-
-
 
 namespace helics
 {
@@ -49,7 +46,12 @@ namespace helics
 using namespace std::string_literals;
 static const argDescriptors extraArgs
 {
-	{ "brokerinit"s, "string"s, "the initialization string for the broker"s }
+	{ "local_interface,i"s,"string"s,"the local interface to use for the receive ports"s },
+	{ "brokerport"s, "int"s, "port number for the broker priority port"s },
+	{ "pullport"s,"int"s,"port number for the primary receive port"s },
+	{ "repport"s,"int"s,"port number for the priority receive port"s },
+	{ "port"s, "int"s, "port number for the broker's priority port"s },
+	{"portstart"s,"int"s,"starting port for automatic port definitions"s}
 };
 
 ZmqBroker::ZmqBroker(bool rootBroker) noexcept:CoreBroker(rootBroker)
@@ -69,13 +71,37 @@ void ZmqBroker::InitializeFromArgs(int argc, char *argv[])
 
 		if (vm.count("broker") > 0)
 		{
-			auto brstring = vm["broker"].as<std::string>();
-			//tbroker = findTestBroker(brstring);
-		}
+			auto brkprt = extractInterfaceandPort(vm["broker"].as<std::string>());
+			brokerAddress = brkprt.first;
+			brokerReqPort = brkprt.second;
 
-		if (vm.count("brokerinit") > 0)
+			// tbroker = findTestBroker(brstring);
+		}
+		if (vm.count("local_interface") > 0)
 		{
-			//tbroker->Initialize(vm["brokerinit"].as<std::string>());
+			auto localprt = extractInterfaceandPort(vm["local_interface"].as<std::string>());
+			localInterface = localprt.first;
+			repPortNumber = localprt.second;
+		}
+		if (vm.count("port") > 0)
+		{
+			brokerReqPort = vm["port"].as<int>();
+		}
+		if (vm.count("brokerport") > 0)
+		{
+			brokerReqPort = vm["brokerport"].as<int>();
+		}
+		if (vm.count("pullport") > 0)
+		{
+			pullPortNumber = vm["pullport"].as<int>();
+		}
+		if (vm.count("repport") > 0)
+		{
+			repPortNumber = vm["repport"].as<int>();
+		}
+		if (vm.count("portstart") > 0)
+		{
+			portStart = vm["portstart"].as<int>();
 		}
 		CoreBroker::InitializeFromArgs(argc, argv);
 	}
@@ -83,9 +109,15 @@ void ZmqBroker::InitializeFromArgs(int argc, char *argv[])
 
 bool ZmqBroker::brokerConnect()
 {
-
-	comms = std::make_unique<ZmqComms>("", "");
+	comms = std::make_unique<ZmqComms>(localInterface, brokerAddress);
 	comms->setCallback([this](ActionMessage M) {addCommand(std::move(M)); });
+	comms->setName(getIdentifier());
+	comms->setPortNumbers(repPortNumber, pullPortNumber);
+	comms->setBrokerPorts(brokerReqPort, brokerPushPort);
+	if (portStart > 0)
+	{
+		comms->setAutomaticPortStartPort(portStart);
+	}
 	//comms->setMessageSize(maxMessageSize, maxMessageCount);
 	return comms->connect();
 }
@@ -108,6 +140,6 @@ void ZmqBroker::addRoute(int route_id, const std::string &routeInfo)
 
 std::string ZmqBroker::getAddress() const
 {
-	return "";
+	return comms->getRequestAddress() + ";" + comms->getPushAddress();
 }
 }  // namespace helics

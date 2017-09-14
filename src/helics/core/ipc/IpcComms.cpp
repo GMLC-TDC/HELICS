@@ -26,7 +26,7 @@ IpcComms::IpcComms(const std::string &brokerTarget, const std::string &localTarg
 /** destructor*/
 IpcComms::~IpcComms()
 {
-
+	disconnect();
 }
 
 	void IpcComms::queue_rx_function()

@@ -156,6 +156,12 @@ enum class action_t : int32_t
 #define NEW_ROUTE 233
 #define DISCONNECT 2523
 
+//for requesting port definitions on a computer
+#define PORT_DEFINITIONS 1451
+#define REQUEST_PORTS 1455
+#define SET_USED_PORTS 1457
+#define NULL_REPLY 0;
+
 inline bool hasInfo(action_message_def::action_t action)
 {
 	return ((action > action_message_def::action_t::null_info_command) || (action < action_message_def::action_t::priority_null_info_command));

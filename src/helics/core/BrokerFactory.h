@@ -30,7 +30,10 @@ public:
 	*/
 	static std::shared_ptr<CoreBroker> create(helics_core_type type, const std::string &initializationString);
 
+	static std::shared_ptr<CoreBroker> create(helics_core_type type, int argc, char *argv[]);
+
 	static std::shared_ptr<CoreBroker> create(helics_core_type type, const std::string &broker_name, std::string &initializationString);
+	static std::shared_ptr<CoreBroker> create(helics_core_type type, const std::string &broker_name, int argc, char *argv[]);
 
 	/**
 	* Returns true if type specified is available in current compilation.

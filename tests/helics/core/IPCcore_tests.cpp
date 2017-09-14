@@ -123,12 +123,6 @@ BOOST_AUTO_TEST_CASE(ipcComm_transmit_through)
 	BOOST_REQUIRE_EQUAL(counter2, 1);
 	BOOST_CHECK(act2.action() == helics::action_message_def::action_t::cmd_ack);
 
-	/*
-	comm2.transmit(0, helics::CMD_ACK);
-	std::this_thread::sleep_for(std::chrono::milliseconds(250));
-	BOOST_REQUIRE_EQUAL(counter, 1);
-	BOOST_CHECK(act.action() == helics::action_message_def::action_t::cmd_ack);
-	*/
 	comm.disconnect();
 	comm2.disconnect();
 }

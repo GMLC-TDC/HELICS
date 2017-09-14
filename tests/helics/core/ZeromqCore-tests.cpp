@@ -10,202 +10,282 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/core/CoreFactory.h"
 #include "helics/core/core.h"
 #include "helics/core/core-types.h"
+#include "helics/core/zmq/ZmqCore.h"
+#include "helics/core/zmq/ZmqComms.h"
+#include "helics/common/cppzmq/zmq.hpp"
+#include "helics/core/zmq/ZmqBroker.h"
+#include "helics/common/zmqContextManager.h"
+#include "helics/core/ActionMessage.h"
+//#include "boost/process.hpp"
+#include <future>
 
-BOOST_AUTO_TEST_SUITE(ZeromqCore_tests)
+BOOST_AUTO_TEST_SUITE(ZMQCore_tests)
 
 using helics::Core;
 using helics::CoreFactory;
 
-BOOST_AUTO_TEST_CASE(zeromqcore_initialization_test)
+BOOST_AUTO_TEST_CASE(zmqComms_broker_test)
 {
-	std::string initializationString = "4";
+	std::atomic<int> counter{ 0 };
+	std::string host = "tcp://127.0.0.1";
+	helics::ZmqComms comm(host,host);
+
+	auto ctx = zmqContextManager::getContextPointer();
+	zmq::socket_t repSocket(ctx->getContext(), ZMQ_REP);
+	repSocket.bind("tcp://127.0.0.1:23405");
+	
+
+	comm.setCallback([&counter](helics::ActionMessage m) {++counter; });
+	comm.setBrokerPorts(23405);
+	auto confut = std::async(std::launch::async, [&comm]() {return comm.connect(); });
+	
+	zmq::message_t rxmsg;
+	
+	repSocket.recv(&rxmsg);
+	
+	BOOST_CHECK_GT(rxmsg.size(), 32);
+	
+	
+
+	
+	helics::ActionMessage rM(static_cast<char *>(rxmsg.data()), rxmsg.size());
+	BOOST_CHECK(rM.action() == helics::action_message_def::action_t::cmd_protocol);
+	rM.index = DISCONNECT;
+	repSocket.send(rM.to_string());
+	auto connected = confut.get();
+	BOOST_CHECK(!connected);
+}
+
+BOOST_AUTO_TEST_CASE(zmqComms_broker_test_transmit)
+{
+	std::atomic<int> counter{ 0 };
+	std::string host = "tcp://127.0.0.1";
+	helics::ZmqComms comm(host, host);
+
+	auto ctx = zmqContextManager::getContextPointer();
+	zmq::socket_t repSocket(ctx->getContext(), ZMQ_REP);
+	repSocket.bind("tcp://127.0.0.1:23405");
+
+	zmq::socket_t pullSocket(ctx->getContext(), ZMQ_PULL);
+	pullSocket.bind("tcp://127.0.0.1:23406");
+
+
+	comm.setCallback([&counter](helics::ActionMessage m) {++counter; });
+	comm.setBrokerPorts(23405);
+	comm.setPortNumbers(23407);
+
+	bool connected=comm.connect();
+	BOOST_REQUIRE(connected);
+	comm.transmit(0, helics::CMD_IGNORE);
+	zmq::message_t rxmsg;
+
+	pullSocket.recv(&rxmsg);
+
+	BOOST_CHECK_GT(rxmsg.size(), 32);
+	helics::ActionMessage rM(static_cast<char *>(rxmsg.data()), rxmsg.size());
+	BOOST_CHECK(rM.action() == helics::action_message_def::action_t::cmd_ignore);
+	comm.disconnect();
+}
+
+BOOST_AUTO_TEST_CASE(zmqComms_rx_test)
+{
+	std::atomic<int> counter{ 0 };
+	helics::ActionMessage act;
+	std::string host = "tcp://127.0.0.1";
+	helics::ZmqComms comm(host, host);
+
+	auto ctx = zmqContextManager::getContextPointer();
+	zmq::socket_t repSocket(ctx->getContext(), ZMQ_REP);
+	repSocket.bind("tcp://127.0.0.1:23405");
+
+	zmq::socket_t pullSocket(ctx->getContext(), ZMQ_PULL);
+	pullSocket.bind("tcp://127.0.0.1:23406");
+
+
+	comm.setBrokerPorts(23405,23406);
+	comm.setPortNumbers(23407,23408);
+
+	comm.setCallback([&counter, &act](helics::ActionMessage m) {++counter; act = m; });
+
+	bool connected = comm.connect();
+	BOOST_REQUIRE(connected);
+
+	zmq::socket_t pushSocket(ctx->getContext(), ZMQ_PUSH);
+	pushSocket.connect("tcp://127.0.0.1:23408");
+
+	helics::ActionMessage cmd(helics::CMD_ACK);
+	std::string buffer = cmd.to_string();
+	try
+	{
+		auto cnt=pushSocket.send(buffer, ZMQ_DONTWAIT);
+		BOOST_REQUIRE_EQUAL(cnt,buffer.size());
+	}
+	catch (const zmq::error_t &ze)
+	{
+		BOOST_REQUIRE_MESSAGE(false,"Message failed to send");
+	}
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	BOOST_REQUIRE_EQUAL(counter, 1);
+	BOOST_CHECK(act.action() == helics::action_message_def::action_t::cmd_ack);
+	comm.disconnect();
+
+}
+
+
+BOOST_AUTO_TEST_CASE(zmqComm_transmit_through)
+{
+
+	std::atomic<int> counter{ 0 };
+	std::atomic<int> counter2{ 0 };
+	helics::ActionMessage act;
+	helics::ActionMessage act2;
+
+	std::string host = "tcp://127.0.0.1";
+	helics::ZmqComms comm(host, host);
+	helics::ZmqComms comm2(host, "");
+
+	comm.setBrokerPorts(23405, 23406);
+
+	comm2.setPortNumbers(23405, 23406);
+	comm.setBrokerPorts(23407, 23408);
+	comm.setPortNumbers(23409, 23410);
+	
+
+	comm.setCallback([&counter, &act](helics::ActionMessage m) {++counter; act = m; });
+
+
+	comm.setCallback([&counter, &act](helics::ActionMessage m) {++counter; act = m; });
+	comm2.setCallback([&counter2, &act2](helics::ActionMessage m) {++counter2; act2 = m; });
+
+	//need to launch the connection commands at the same time since they depend on eachother in this case
+	auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
+
+	bool connected = comm2.connect();
+	BOOST_REQUIRE(connected);
+	connected = connected_fut.get();
+	connected = comm.connect();
+	BOOST_REQUIRE(connected);
+
+	comm.transmit(0, helics::CMD_ACK);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	BOOST_REQUIRE_EQUAL(counter2, 1);
+	BOOST_CHECK(act2.action() == helics::action_message_def::action_t::cmd_ack);
+
+
+	comm.disconnect();
+	comm2.disconnect();
+}
+
+BOOST_AUTO_TEST_CASE(zmqComm_transmit_add_route)
+{
+
+	std::atomic<int> counter{ 0 };
+	std::string brokerLoc = "brokerIPC";
+	std::string localLoc = "localIPC";
+	std::string localLocB = "localIPC2";
+	//just to make sure these are not already present from a failure
+//	boost::interprocess::message_queue::remove(brokerLoc.c_str());
+//	boost::interprocess::message_queue::remove(localLoc.c_str());
+//	boost::interprocess::message_queue::remove(localLocB.c_str());
+
+	std::atomic<int> counter2{ 0 };
+	std::atomic<int> counter3{ 0 };
+	helics::ActionMessage act;
+	helics::ActionMessage act2;
+	helics::ActionMessage act3;
+
+	helics::ZmqComms comm(localLoc, brokerLoc);
+	helics::ZmqComms comm2(brokerLoc, "");
+	helics::ZmqComms comm3(localLocB, brokerLoc);
+
+	comm.setCallback([&counter, &act](helics::ActionMessage m) {++counter; act = m; });
+	comm2.setCallback([&counter2, &act2](helics::ActionMessage m) {++counter2; act2 = m; });
+	comm3.setCallback([&counter3, &act3](helics::ActionMessage m) {++counter3; act3 = m; });
+
+	//need to launch the connection commands at the same time since they depend on eachother in this case
+	//auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
+
+	bool connected = comm2.connect();
+	BOOST_REQUIRE(connected);
+	//connected = connected_fut.get();
+	connected = comm.connect();
+	BOOST_REQUIRE(connected);
+	connected = comm3.connect();
+
+	comm.transmit(0, helics::CMD_ACK);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	BOOST_REQUIRE_EQUAL(counter2, 1);
+	BOOST_CHECK(act2.action() == helics::action_message_def::action_t::cmd_ack);
+
+	comm3.transmit(0, helics::CMD_ACK);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	BOOST_REQUIRE_EQUAL(counter2, 2);
+	BOOST_CHECK(act2.action() == helics::action_message_def::action_t::cmd_ack);
+
+	comm2.addRoute(3, localLocB);
+
+	comm2.transmit(3, helics::CMD_ACK);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	if (counter3 != 1)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	}
+	BOOST_REQUIRE_EQUAL(counter3, 1);
+	BOOST_CHECK(act3.action() == helics::action_message_def::action_t::cmd_ack);
+
+	comm2.addRoute(4, localLoc);
+
+	comm2.transmit(4, helics::CMD_ACK);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	BOOST_REQUIRE_EQUAL(counter, 1);
+	BOOST_CHECK(act.action() == helics::action_message_def::action_t::cmd_ack);
+
+	comm.disconnect();
+	comm2.disconnect();
+	comm3.disconnect();
+}
+
+BOOST_AUTO_TEST_CASE(zmqCore_initialization_test)
+{
+	std::string initializationString = "1 --brokerloc=testbroker --name=core1";
 	auto  core = CoreFactory::create(HELICS_ZMQ, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
+//	std::unique_ptr<boost::interprocess::message_queue> mq;
+	/*try
+	{
 
-	BOOST_CHECK_EQUAL(core->getFederationSize(), 4);
+		mq = std::make_unique<boost::interprocess::message_queue>(boost::interprocess::create_only, "testbroker", 1024, 1024);
+	}
+	catch (boost::interprocess::interprocess_exception &ipe)
+	{
+		boost::interprocess::message_queue::remove("testbroker");
+		mq = std::make_unique<boost::interprocess::message_queue>(boost::interprocess::create_only, "testbroker", 1024, 1024);
+	}
+	*/
+	core->connect();
 
-}
+	char data[1024];
+	size_t sz = 0;
+	unsigned int pri;
+	while (sz < 31)
+	{
+	//	mq->receive(data, 1024, sz, pri);
+	}
 
-BOOST_AUTO_TEST_CASE(zeromqcore_pubsub_value_test)
-{
-	std::string initializationString = "1";
-	auto core = CoreFactory::create(HELICS_ZMQ, initializationString);
-
-	BOOST_REQUIRE(core != nullptr);
-	BOOST_CHECK(core->isInitialized());
-
-	BOOST_CHECK_EQUAL(core->getFederationSize(), 1);
-
-	Core::federate_id_t id = core->registerFederate("sim1", helics::CoreFederateInfo());
-	
-	BOOST_CHECK_EQUAL(core->getFederateName(id), "sim1");
-	BOOST_CHECK_EQUAL(core->getFederateId("sim1"), id);
-
-	core->setTimeDelta(id, 1.0);
-	
-	Core::Handle sub1 = core->registerSubscription(id, "sim1_pub", "type", "units", handle_check_mode::optional);
-	BOOST_CHECK_EQUAL(core->getSubscription(id, "sim1_pub"), sub1);
-	BOOST_CHECK_EQUAL(core->getType(sub1), "type");
-	BOOST_CHECK_EQUAL(core->getUnits(sub1), "units");
-
-	Core::Handle pub1 = core->registerPublication(id, "sim1_pub", "type", "units");
-	BOOST_CHECK_EQUAL(core->getPublication(id, "sim1_pub"), pub1);
-	BOOST_CHECK_EQUAL(core->getType(pub1), "type");
-	BOOST_CHECK_EQUAL(core->getUnits(pub1), "units");
-
-	core->enterInitializingState(id);
-
-	core->enterExecutingState(id);
-	
-	core->timeRequest(id, 50.0);
-	std::string str1 = "hello world";
-	core->setValue(pub1, str1.data(), str1.size());
-	auto valueUpdates = core->getValueUpdates(id);
-	BOOST_CHECK(valueUpdates.empty());
-	auto data = core->getValue(sub1);
-	BOOST_CHECK(data == nullptr);
-	BOOST_CHECK_EQUAL(data->size(), 0u);
-	
-	core->timeRequest(id, 100.0);
-	valueUpdates = core->getValueUpdates(id);
-	BOOST_CHECK_EQUAL(valueUpdates[0], sub1);
-	BOOST_CHECK_EQUAL(valueUpdates.size(), 1u);
-	data = core->getValue(sub1);
-	std::string str2(data->to_string());
-	BOOST_CHECK_EQUAL(str1, str2);
-	BOOST_CHECK_EQUAL(data->to_string(), "hello world");
-	BOOST_CHECK_EQUAL(data->size(), str1.size());
-
-	core->setValue(pub1, "hello\n\0helloAgain", 17);
-	core->timeRequest(id, 150.0);
-	valueUpdates = core->getValueUpdates(id);
-	BOOST_CHECK_EQUAL(valueUpdates[0], sub1);
-	BOOST_CHECK_EQUAL(valueUpdates.size(), 1u);
-	data = core->getValue(sub1);
-	BOOST_CHECK_EQUAL(data->to_string(), "hello\n\0helloAgain");
-	BOOST_CHECK_EQUAL(data->size(), 17u);
-
-	core->timeRequest(id, 200.0);
-	valueUpdates = core->getValueUpdates(id);
-	BOOST_CHECK(valueUpdates.empty());
-	
-}
-
-BOOST_AUTO_TEST_CASE(zeromqcore_send_receive_test)
-{
-	std::string initializationString = "1";
-	auto core = CoreFactory::create(HELICS_ZMQ, initializationString);
-
-	BOOST_REQUIRE(core != nullptr);
-	BOOST_CHECK(core->isInitialized());
-
-	BOOST_CHECK_EQUAL(core->getFederationSize(), 1);
-
-	Core::federate_id_t id = core->registerFederate("sim1", helics::CoreFederateInfo());
-
-	BOOST_CHECK_EQUAL(core->getFederateName(id), "sim1");
-	BOOST_CHECK_EQUAL(core->getFederateId("sim1"), id);
-
-	core->setTimeDelta(id, 1.0);
-	
-	Core::Handle end1 = core->registerEndpoint(id, "end1", "type");
-	BOOST_CHECK_EQUAL(core->getType(end1), "type");
-
-	Core::Handle end2 = core->registerEndpoint(id, "end2", "type");
-	BOOST_CHECK_EQUAL(core->getType(end2), "type");
-
-	core->enterInitializingState(id);
-
-	core->enterExecutingState(id);
-
-	std::string str1 = "hello world";
-	core->timeRequest(id, 50.0);
-	core->send(end1, "end2", str1.data(), str1.size());
-
-	core->timeRequest(id, 100.0);
-	BOOST_CHECK_EQUAL(core->receiveCount(end1), 0);
-	BOOST_CHECK_EQUAL(core->receiveCount(end2), 1u);
-	auto msg = core->receive(end1);
-	BOOST_CHECK(msg == nullptr);
-	msg = core->receive(end2);
-	BOOST_CHECK_EQUAL(core->receiveCount(end2), 0);
-	std::string str2(msg->data.to_string());
-	BOOST_CHECK_EQUAL(str1, str2);
-	BOOST_CHECK_EQUAL(msg->data.size(), str1.size());
-	
-}
-
-BOOST_AUTO_TEST_CASE(zeromqcore_messagefilter_test)
-{
-	// Create filter operator
-	class TestOperator : public helics::FilterOperator {
-	public:
-		TestOperator(const std::string &name):filterName(name) {
-		}
-
-		std::unique_ptr<helics::Message> process (std::unique_ptr<helics::Message> msg) override {
-			
-			msg->src = filterName;
-			return msg;
-		}
-
-	std::string filterName = 0;
-	};
-
-	std::string initializationString = "1";
-	auto core = CoreFactory::create(HELICS_ZMQ, initializationString);
-
-	BOOST_REQUIRE(core != nullptr);
-	BOOST_CHECK(core->isInitialized());
-
-	Core::federate_id_t id = core->registerFederate("sim1", helics::CoreFederateInfo());
-
-	Core::Handle end1 = core->registerEndpoint(id, "end1", "type");
-	Core::Handle end2 = core->registerEndpoint(id, "end2", "type");
-	Core::Handle end3 = core->registerEndpoint(id, "end3", "type");
-
-	Core::Handle srcFilter = core->registerSourceFilter(id, "srcFilter", "end1", "type","");
-	Core::Handle dstFilter = core->registerDestinationFilter(id, "dstFilter", "end3", "type","");
-
-	auto testSrcFilter = std::make_shared<TestOperator>("sourceFilter");
-	BOOST_CHECK_EQUAL(testSrcFilter->filterName, "sourceFilter");
-
-	auto testDstFilter = std::make_shared<TestOperator>("destinationFilter");
-	BOOST_CHECK_EQUAL(testDstFilter->filterName, "destinationFilter");
-
-	core->setFilterOperator(srcFilter, testSrcFilter);
-	core->setFilterOperator(dstFilter, testDstFilter);
-
-	core->enterInitializingState(id);
-	core->enterExecutingState(id);
-
-	std::string msgData = "hello world";
-	core->send(end1, "end2", msgData.data(), msgData.size());
-
-	core->timeRequest(id, 50.0);
-	BOOST_CHECK_EQUAL(core->receiveCount(end2), 1u);
-	auto msg = core->receive(end2);
-	BOOST_CHECK_EQUAL(msg->origsrc, "end1");
-	BOOST_CHECK_EQUAL(msg->src, testSrcFilter->filterName);
-
-	core->send(end1, "end3", msgData.data(), msgData.size());
-
-	core->timeRequest(id, 100.0);
-	BOOST_CHECK_EQUAL(core->receiveCount(end3), 1u);
-	msg = core->receive(end3);
-	BOOST_CHECK_EQUAL(msg->origsrc, "end1");
-	BOOST_CHECK_EQUAL(msg->src, testDstFilter->filterName);
-
-	core->send(end3, "end1", msgData.data(), msgData.size());
-
-	core->timeRequest(id, 150.0);
-	BOOST_CHECK_EQUAL(core->receiveCount(end1), 1u);
-	msg = core->receive(end1);
-	BOOST_CHECK_EQUAL(msg->origsrc, "end3");
-	BOOST_CHECK_EQUAL(msg->src, "end3");
-
+	BOOST_CHECK_GT(sz, 31);
+	helics::ActionMessage rM(data, sz);
+	BOOST_CHECK_EQUAL(rM.name, "core1");
+	BOOST_CHECK(rM.action() == helics::action_message_def::action_t::cmd_reg_broker);
+	core->disconnect();
+	//boost::interprocess::message_queue::remove("testbroker");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

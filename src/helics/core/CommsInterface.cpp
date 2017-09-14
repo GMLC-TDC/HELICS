@@ -20,7 +20,14 @@ CommsInterface::CommsInterface(const std::string &localTarget, const std::string
 /** destructor*/
 CommsInterface::~CommsInterface()
 {
-	disconnect();
+	if (queue_watcher.joinable())
+	{
+		queue_watcher.join();
+	}
+	if (queue_transmitter.joinable())
+	{
+		queue_transmitter.join();
+	}
 }
 
 void CommsInterface::transmit(int route_id, const ActionMessage &cmd)
@@ -44,6 +51,14 @@ bool CommsInterface::connect()
 		std::cerr << "no callback specified, the receiver cannot start\n";
 		return false;
 	}
+	if (name.empty())
+	{
+		name = localTarget_;
+	}
+	if (localTarget_.empty())
+	{
+		localTarget_ = name;
+	}
 	queue_watcher = std::thread([this] {queue_rx_function(); });
 	queue_transmitter = std::thread([this] {queue_tx_function(); });
 
@@ -65,6 +80,7 @@ bool CommsInterface::connect()
 				queue_transmitter.join();
 			}
 		}
+		queue_watcher.join();
 		return false;
 	}
 
@@ -78,12 +94,16 @@ bool CommsInterface::connect()
 				queue_watcher.join();
 			}
 		}
+		queue_transmitter.join();
 		return false;
 	}
 	return true;
 }
 
-
+void CommsInterface::setName(const std::string &name_)
+{
+	name = name_;
+}
 void CommsInterface::disconnect()
 {
 	if (queue_watcher.joinable())

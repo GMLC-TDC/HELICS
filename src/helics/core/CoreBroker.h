@@ -134,8 +134,8 @@ private:
 	*/
 	void processPriorityCommand(const ActionMessage &command);
 
-	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delays for a certain time
-
+	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
+	/* function to transmit the delayed messages*/
 	void transmitDelayedMessages();
 	bool enteredExecutionMode = false; //!< flag indicating that the broker has entered execution mode
 	

@@ -32,6 +32,7 @@ public:
 	void addRoute(int route_id, const std::string &routeInfo);
 	bool connect();
 	void disconnect();
+	void setName(const std::string &name);
 	void setCallback(std::function<void(ActionMessage &&)> callback);
 	void setMessageSize(int maxMessageSize, int maxQueueSize);
 protected:
@@ -45,8 +46,9 @@ protected:
 
 	};
 	std::atomic<connection_status> rx_status{ connection_status::startup }; //!< the status of the receiver thread
-	std::string localTarget_; //!< the identifier for the receive target
-	std::string brokerTarget_;	//!< the identifier for the broker target
+	std::string name;  //!< the name of the object
+	std::string localTarget_; //!< the identifier for the receive address
+	std::string brokerTarget_;	//!< the identifier for the broker address
 	int maxMessageSize_ = 16 * 1024; //!< the maximum message size for the queues (if needed)
 	int maxMessageCount_ = 1024;  //!< the maximum number of message to buffer (if needed)
 	std::function<void(ActionMessage &&)> ActionCallback; //!< the callback for what to do with a received message

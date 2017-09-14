@@ -2,6 +2,8 @@
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
+#include "helics/core/BrokerFactory.h"
+#include "helics/core/CoreBroker.h"
 
 #include <iostream>
 #include <fstream>
@@ -26,12 +28,39 @@ namespace filesystem = boost::filesystem;
 
 void argumentParser(int argc, char *argv[], po::variables_map &vm_map);
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
 
 	po::variables_map vm;
 	argumentParser(argc, argv, vm);
-
+	std::string name = (vm.count("name") > 0) ? vm["name"].as<std::string>() : "";
+	std::string btype = (vm.count("type") > 0) ? vm["type"].as<std::string>() : "zmq";
+	
+	helics_core_type type;
+	try
+	{
+		type = helics::coreTypeFromString(btype);
+	}
+	catch (std::invalid_argument &ie)
+	{
+		std::cerr<< "Unable to generate broker: " << ie.what() << '\n';
+		return (-2);
+	}
+	auto broker=helics::BrokerFactory::create(type, argc, argv);
+	if (broker->isConnected())
+	{
+		do //sleep until the broker finishes
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+			
+		} while (broker->isConnected());
+		
+	}
+	else
+	{
+		std::cerr << "Broker is unable to connect\n";
+		return (-1);
+	}
     return 0;
 }
 
@@ -50,15 +79,8 @@ void argumentParser(int argc, char *argv[], po::variables_map &vm_map)
 
 
 	config.add_options()
-		("broker,b", po::value<std::string>(), "address to connect of the higer broker to if not specfied assumed to be root")
 		("name,n", po::value<std::string>(), "name of the broker")
-		("core,c", po::value<std::string>(), "type of the broker")
-		("stop", po::value<double>(), "the time to stop the simulation")
-		("federates",po::value<int32_t>(),"the minimum number of federates to connect before initialization")
-		("brokers_min",po::value<int32_t>(),"the minimum number of brokers to connect before initialization")
-		("connection",po::value<std::string>(),"the port/address to list for incoming connections")
-		("connection2",po::value<std::string>(),"the port for the second connection for a gateway configuration")
-		("coreinit,i", po::value<std::string>(), "the broker initializion string");
+		("type,t", po::value<std::string>(), "type of the broker");
 
 	// clang-format on
 
@@ -97,7 +119,7 @@ void argumentParser(int argc, char *argv[], po::variables_map &vm_map)
 
 	if (cmd_vm.count("version") > 0)
 	{
-		std::cout << 0.1 << '\n';
+		std::cout << HELICS_VERSION_MAJOR << '.' << HELICS_VERSION_MINOR << '.' << HELICS_VERSION_PATCH << " (" << HELICS_DATE << ")\n";
 		return;
 	}
 

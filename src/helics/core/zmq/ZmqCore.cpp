@@ -50,8 +50,11 @@ namespace helics
 using namespace std::string_literals;
 static const argDescriptors extraArgs
 {
-	{ "brokerport"s, "int"s, "port number for the broker"s },
-	{ "port"s, "int"s, "port number for the broker"s },
+	{ "local_interface,i"s,"string"s,"the local interface to use for the receive ports"s },
+	{ "brokerport"s, "int"s, "port number for the broker priority port"s },
+	{"pullport"s,"int"s,"port number for the primary receive port"s},
+	{"repport"s,"int"s,"port number for the priority receive port"s},
+	{ "port"s, "int"s, "port number for the broker's priority port"s },
 };
 
 
@@ -73,22 +76,46 @@ void ZmqCore::initializeFromArgs (int argc, char *argv[])
 
         if (vm.count ("broker") > 0)
         {
-            auto brstring = vm["broker"].as<std::string> ();
+           auto brkprt=extractInterfaceandPort(vm["broker"].as<std::string> ());
+		   brokerAddress = brkprt.first;
+		   brokerReqPort = brkprt.second;
+			
             // tbroker = findTestBroker(brstring);
         }
-
-        if (vm.count ("brokerinit") > 0)
-        {
-            // tbroker->Initialize(vm["brokerinit"].as<std::string>());
-        }
+		if (vm.count("local_interface") > 0)
+		{
+			auto localprt = extractInterfaceandPort(vm["local_interface"].as<std::string>());
+			localInterface = localprt.first;
+			repPortNumber = localprt.second;
+		}
+		if (vm.count("port") > 0)
+		{
+			brokerReqPort = vm["port"].as<int>();
+		}
+		if (vm.count("brokerport") > 0)
+		{
+			brokerReqPort = vm["brokerport"].as<int>();
+		}
+		if (vm.count("pullport") > 0)
+		{
+			pullPortNumber = vm["pullport"].as<int>();
+		}
+		if (vm.count("repport") > 0)
+		{
+			repPortNumber = vm["repport"].as<int>();
+		}
+        
         CommonCore::initializeFromArgs (argc, argv);
     }
 }
 
 bool ZmqCore::brokerConnect () 
 { 
-	comms = std::make_unique<ZmqComms>(getIdentifier(), brokerAddress);
+	comms = std::make_unique<ZmqComms>(localInterface, brokerAddress);
 	comms->setCallback([this](ActionMessage M) {addCommand(std::move(M)); });
+	comms->setName(getIdentifier());
+	comms->setPortNumbers(repPortNumber, pullPortNumber);
+	comms->setBrokerPorts(brokerReqPort, brokerPushPort);
 	return comms->connect();
 }
 
@@ -110,7 +137,10 @@ void ZmqCore::addRoute (int route_id, const std::string &routeInfo)
 }
 
 
-std::string ZmqCore::getAddress () const { return pullSocketAddress; }
+std::string ZmqCore::getAddress () const 
+{ 
+	return comms->getRequestAddress() + ";" + comms->getPushAddress();
+}
 
 
 

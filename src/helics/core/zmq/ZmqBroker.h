@@ -37,6 +37,14 @@ private:
 	virtual bool brokerConnect() override;
 	virtual void brokerDisconnect() override;
 	
+
+	std::string brokerAddress;	//!< the protocol string for the broker location
+	std::string localInterface; //!< the interface to use for the local receive ports
+	int repPortNumber=-1;	//!< the port number for the reply port
+	int pullPortNumber=-1;	//!< the port number for the pull port
+	int brokerReqPort=-1;  //!< the port number to use for the broker priority request port
+	int brokerPushPort=-1;  //!< the port number to use for the broker regular push port
+	int portStart = -1;  //!< the starting port for automatic port definitions
 private:
 	std::atomic<bool> initialized_{ false };  //!< atomic protecting local initialization
 	std::unique_ptr<ZmqComms> comms;  //!< pointer to the comms object handling the actions connection

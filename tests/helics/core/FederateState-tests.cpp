@@ -58,6 +58,7 @@ BOOST_AUTO_TEST_CASE(constructor_test)
 
 BOOST_AUTO_TEST_CASE(create_subscription_test)
 {
+	using namespace helics;
 	fs->createSubscription(0, "first!", "type", "units", handle_check_mode::required);
 	fs->createSubscription(1, "second", "type", "units", handle_check_mode::required);
 	fs->createSubscription(3, "last", "type", "units", handle_check_mode::optional);
@@ -248,8 +249,8 @@ BOOST_AUTO_TEST_CASE(create_destfilter_test)
 
 BOOST_AUTO_TEST_CASE(basic_processmessage_test)
 {
-
-	helics::ActionMessage cmd;
+	using namespace helics;
+	ActionMessage cmd;
 
 	// Test returning when the init state is entered
 	cmd.setAction(helics::CMD_INIT_GRANT);

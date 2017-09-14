@@ -12,8 +12,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "core/CommonCore.h"
 
-#define DEFAULT_BROKER_PORT 23405
-
 namespace helics {
 
 class ZmqComms;
@@ -32,16 +30,18 @@ public:
 public:
 	virtual std::string getAddress() const override;
 private:
-	std::string pullSocketAddress;
-	std::string brokerAddress;
-	int repPortNumber;
-	int pullPortNumber;
-	std::string brokerRepAddress;
+	
+	std::string brokerAddress;	//!< the protocol string for the broker location
+	std::string localInterface; //!< the interface to use for the local receive ports
+	int repPortNumber=-1;	//!< the port number for the reply port
+	int pullPortNumber=-1;	//!< the port number for the pull port
+	int brokerReqPort=-1;  //!< the port number to use for the broker priority request port
+	int brokerPushPort=-1;  //!< the port number to use for the broker regular push port
 
 	virtual bool brokerConnect() override;
 	virtual void brokerDisconnect() override;
 
-	std::unique_ptr<ZmqComms> comms;
+	std::unique_ptr<ZmqComms> comms; //!< object controlling the actual comm work
  
 };
 

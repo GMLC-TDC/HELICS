@@ -24,11 +24,11 @@ IndentCaseLabels: false
 IndentFunctionDeclarationAfterType: false
 IndentWidth: 4
 Language: Cpp
-MaxEmptyLinesToKeep: 2
+MaxEmptyLinesToKeep: 1
 NamespaceIndentation: None
 ObjCSpaceAfterProperty: true
 ObjCSpaceBeforeProtocolList: true
-PenaltyBreakBeforeFirstCallParameter: 100
+PenaltyBreakBeforeFirstCallParameter: 120
 PenaltyBreakComment: 300
 PenaltyBreakFirstLessLess: 0
 PenaltyBreakString: 1000
@@ -43,6 +43,13 @@ SpacesInCStyleCastParentheses: false
 SpacesInContainerLiterals: false
 SpacesInParentheses: false
 SortIncludes: true
+IncludeCategories:
+  - Regex:           '^<boost/test/unit_test.hpp'
+    Priority:        2
+  - Regex:           '(boost)/'
+    Priority:        3
+  - Regex:           '.*'
+    Priority:        1
 Standard: Cpp11
 TabWidth: 4
 UseTab: Never

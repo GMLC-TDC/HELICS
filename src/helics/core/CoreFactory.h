@@ -25,8 +25,6 @@ class CommonCore;
  /** available core types*/
 
 
-helics_core_type coreTypeFromString(const std::string &type);
-
 class CoreFactory {
 public:
   /**

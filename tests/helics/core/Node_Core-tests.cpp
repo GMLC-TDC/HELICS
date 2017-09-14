@@ -35,7 +35,7 @@ void simA (std::shared_ptr<helics::Core> core, const std::string &NAME)
     barrier.Wait ();
 
     core->setTimeDelta (id, 1);
-    auto sub1 = core->registerSubscription (id, NAME, "type", "units", handle_check_mode::required);
+    auto sub1 = core->registerSubscription (id, NAME, "type", "units", PUBLICATION_REQUIRED);
     BOOST_CHECK_EQUAL(sub1, core->getSubscription (id, NAME));
 
     auto pub1 = core->registerPublication (id, NAME, "type", "units");
@@ -94,7 +94,7 @@ void simB (std::shared_ptr<helics::Core> core, const std::string &NAME)
     barrier.Wait ();
 
     core->setTimeDelta (id, 1);
-    auto sub1 = core->registerSubscription (id, NAME, "type", "units", handle_check_mode::required);
+    auto sub1 = core->registerSubscription (id, NAME, "type", "units", PUBLICATION_REQUIRED);
     BOOST_CHECK_EQUAL(sub1, core->getSubscription (id, NAME));
 
     core->enterInitializingState (id);
@@ -103,10 +103,10 @@ void simB (std::shared_ptr<helics::Core> core, const std::string &NAME)
 
     // time loop
 
-    core->requestTimeIterative (id, 100, convergence_state::nonconverged);
-    core->requestTimeIterative (id, 100, convergence_state::complete);
-    core->requestTimeIterative (id, 105, convergence_state::nonconverged);
-    core->requestTimeIterative (id, 105, convergence_state::complete);
+    core->requestTimeIterative (id, 100, helics::convergence_state::nonconverged);
+    core->requestTimeIterative (id, 100, helics::convergence_state::complete);
+    core->requestTimeIterative (id, 105, helics::convergence_state::nonconverged);
+    core->requestTimeIterative (id, 105, helics::convergence_state::complete);
     core->finalize (id);
 }
 
