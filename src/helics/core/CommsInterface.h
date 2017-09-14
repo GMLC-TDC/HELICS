@@ -18,7 +18,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics {
 
-/** implementation for the core that uses zmq messages to communicate*/
+/** implementation of a generic communications interface
+*/
 class CommsInterface {
 
 public:
@@ -27,14 +28,30 @@ public:
 	CommsInterface(const std::string &localTarget, const std::string &brokerTarget);
 	/** destructor*/
 	virtual ~CommsInterface();
-
+	/** transmit a message along a particular route
+	*/
 	void transmit(int route_id, const ActionMessage &cmd);
+	/** add a new route assigned to the appropriate id
+	*/
 	void addRoute(int route_id, const std::string &routeInfo);
+	/** connect the commsInterface
+	@return true if the connection was successful false otherwise
+	*/
 	bool connect();
+	/** disconnected the comms interface
+	*/
 	void disconnect();
+	/** set the name of the communicator*/
 	void setName(const std::string &name);
+	/** set the callback for processing the messages
+	*/
 	void setCallback(std::function<void(ActionMessage &&)> callback);
+	/** set the max message size and max Queue size 
+	*/
 	void setMessageSize(int maxMessageSize, int maxQueueSize);
+	/** check if the commInterface is connected
+	*/
+	bool isConnected() const;
 protected:
 	//enumeration of the connection status flags for more immediate feedback from the processing threads
 	enum class connection_status :int

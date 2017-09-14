@@ -46,7 +46,7 @@ namespace helics
 using namespace std::string_literals;
 static const argDescriptors extraArgs
 {
-	{ "local_interface,i"s,"string"s,"the local interface to use for the receive ports"s },
+	{ "local_interface"s,"string"s,"the local interface to use for the receive ports"s },
 	{ "brokerport"s, "int"s, "port number for the broker priority port"s },
 	{ "pullport"s,"int"s,"port number for the primary receive port"s },
 	{ "repport"s,"int"s,"port number for the priority receive port"s },

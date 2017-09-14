@@ -46,6 +46,18 @@ void CommsInterface::addRoute(int route_id, const std::string &routeInfo)
 
 bool CommsInterface::connect()
 {
+	if (isConnected())
+	{
+		return true;
+	}
+	if (rx_status != connection_status::startup)
+	{
+		return false;
+	}
+	if (tx_status != connection_status::startup)
+	{
+		return false;
+	}
 	if (!ActionCallback)
 	{
 		std::cerr << "no callback specified, the receiver cannot start\n";
@@ -134,6 +146,11 @@ void CommsInterface::setMessageSize(int maxMessageSize, int maxMessageCount)
 		maxMessageCount_ = maxMessageCount;
 	}
 	
+}
+
+bool CommsInterface::isConnected() const
+{
+	return ((tx_status == connection_status::connected) && (rx_status == connection_status::connected));
 }
 
 }

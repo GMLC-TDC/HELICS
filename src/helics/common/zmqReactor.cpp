@@ -226,8 +226,9 @@ void zmqReactor::reactorLoop()
 							socketCallbacks[index] = descriptor.callback;
 						}
 						break;
-					case reactorInstruction::terminate:		
-						return;  //this is the function exit point
+					case reactorInstruction::terminate:	
+						//jumpt out of the loop
+						goto REACTOR_HALT;
 					default:
 						break;
 					}
@@ -242,6 +243,7 @@ void zmqReactor::reactorLoop()
 			}
 		}
 	}
+REACTOR_HALT:
 	reactorLoopRunning = false;
 
 }

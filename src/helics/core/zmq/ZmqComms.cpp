@@ -29,8 +29,11 @@ namespace helics
 
 ZmqComms::ZmqComms(const std::string &brokerTarget, const std::string &localTarget):CommsInterface(brokerTarget,localTarget)
 {
-	localTarget_.empty();
-	localTarget_ = "tcp:/*";
+	if (localTarget_.empty())
+	{
+		localTarget_ = "tcp://*";
+	}
+	
 }
 /** destructor*/
 ZmqComms::~ZmqComms()
@@ -407,6 +410,7 @@ void ZmqComms::setReplyCallback(std::function<ActionMessage(ActionMessage &&)> c
 							}
 						
 					}
+					break;
 					case DISCONNECT:
 						tx_status = connection_status::terminated;
 						return;

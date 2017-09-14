@@ -50,7 +50,7 @@ namespace helics
 using namespace std::string_literals;
 static const argDescriptors extraArgs
 {
-	{ "local_interface,i"s,"string"s,"the local interface to use for the receive ports"s },
+	{ "local_interface"s,"string"s,"the local interface to use for the receive ports"s },
 	{ "brokerport"s, "int"s, "port number for the broker priority port"s },
 	{"pullport"s,"int"s,"port number for the primary receive port"s},
 	{"repport"s,"int"s,"port number for the priority receive port"s},
@@ -88,6 +88,10 @@ void ZmqCore::initializeFromArgs (int argc, char *argv[])
 			localInterface = localprt.first;
 			repPortNumber = localprt.second;
 		}
+		else
+		{
+			localInterface = "tcp://127.0.0.1";
+		}
 		if (vm.count("port") > 0)
 		{
 			brokerReqPort = vm["port"].as<int>();
@@ -103,6 +107,13 @@ void ZmqCore::initializeFromArgs (int argc, char *argv[])
 		if (vm.count("repport") > 0)
 		{
 			repPortNumber = vm["repport"].as<int>();
+			if (pullPortNumber < 0)
+			{
+				if (repPortNumber > 0)
+				{
+					pullPortNumber = repPortNumber + 1;
+				}
+			}
 		}
         
         CommonCore::initializeFromArgs (argc, argv);
@@ -111,10 +122,17 @@ void ZmqCore::initializeFromArgs (int argc, char *argv[])
 
 bool ZmqCore::brokerConnect () 
 { 
+	if (brokerAddress.empty()) //cores require a broker
+	{
+		brokerAddress = "tcp://127.0.0.1";
+	}
 	comms = std::make_unique<ZmqComms>(localInterface, brokerAddress);
 	comms->setCallback([this](ActionMessage M) {addCommand(std::move(M)); });
 	comms->setName(getIdentifier());
-	comms->setPortNumbers(repPortNumber, pullPortNumber);
+	if (repPortNumber > 0)
+	{
+		comms->setPortNumbers(repPortNumber, pullPortNumber);
+	}
 	comms->setBrokerPorts(brokerReqPort, brokerPushPort);
 	return comms->connect();
 }
