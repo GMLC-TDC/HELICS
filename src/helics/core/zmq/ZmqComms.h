@@ -13,6 +13,12 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/core/CommsInterface.h"
 #include <atomic>
 #include <set>
+
+namespace zmq
+{
+class message_t;
+class socket_t;
+}
 namespace helics {
 
 /** generate a string with a full address based on an interface string and port number
@@ -63,6 +69,11 @@ private:
 	virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
 	/** find two open ports for a subBroker*/
 	std::pair<int, int> findOpenPorts();  
+	/** process an incoming message
+	return code for required action 0=NONE, -1 TERMINATE*/
+	int processIncomingMessage(zmq::message_t &msg);
+
+	int replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &);
 public:
 	/** get the port number of the comms object to send requests to*/
 	int getRequestPort() const { return repPortNumber; };

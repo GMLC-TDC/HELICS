@@ -79,8 +79,12 @@ void IpcBroker::InitializeFromArgs(int argc, char *argv[])
 		{
 			fileloc = vm["fileloc"].as<std::string>();
 		}
-
+		
 		CoreBroker::InitializeFromArgs(argc, argv);
+		if (getIdentifier().empty())
+		{
+			setIdentifier("_ipc_broker");
+		}
 	}
 }
 

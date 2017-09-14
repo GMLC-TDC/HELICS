@@ -1797,13 +1797,28 @@ void CommonCore::processCommand (ActionMessage &command)
     case CMD_PUB:
     {
         // route the message to all the subscribers
-        auto pubInfo = getFederate (command.source_id)->getPublication (command.source_handle);
-        for (auto &subscriber : pubInfo->subscribers)
-        {
-            command.dest_id = subscriber.first;
-            command.dest_handle = subscriber.second;
-            routeMessage (command);
-        }
+		if (command.dest_id == 0)
+		{
+			auto fed = getFederate(command.source_id);
+			if (fed == nullptr)
+			{
+				auto pubInfo = fed->getPublication(command.source_handle);
+				if (pubInfo != nullptr)
+				{
+					for (auto &subscriber : pubInfo->subscribers)
+					{
+						command.dest_id = subscriber.first;
+						command.dest_handle = subscriber.second;
+						routeMessage(command);
+					}
+				}
+
+			}
+		}
+		else 
+		{
+			routeMessage(command);
+		}
     }
     break;
    

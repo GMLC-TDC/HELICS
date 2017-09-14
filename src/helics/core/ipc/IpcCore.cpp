@@ -107,7 +107,7 @@ bool IpcCore::brokerConnect()
 	{
 		if (brokername.empty())
 		{
-			brokername = "_ipc";
+			brokername = "_ipc_broker";
 		}
 		brokerloc = brokername + "_queue.hqf";
 	}

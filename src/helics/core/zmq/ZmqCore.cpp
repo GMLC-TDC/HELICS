@@ -52,6 +52,7 @@ static const argDescriptors extraArgs
 {
 	{ "local_interface"s,"string"s,"the local interface to use for the receive ports"s },
 	{ "brokerport"s, "int"s, "port number for the broker priority port"s },
+	{ "brokerpushport"s, "int"s, "port number for the broker primary push port"s },
 	{"pullport"s,"int"s,"port number for the primary receive port"s},
 	{"repport"s,"int"s,"port number for the priority receive port"s},
 	{ "port"s, "int"s, "port number for the broker's priority port"s },
@@ -100,6 +101,10 @@ void ZmqCore::initializeFromArgs (int argc, char *argv[])
 		{
 			brokerReqPort = vm["brokerport"].as<int>();
 		}
+		if (vm.count("brokerpushport") > 0)
+		{
+			brokerPushPort = vm["brokerpushport"].as<int>();
+		}
 		if (vm.count("pullport") > 0)
 		{
 			pullPortNumber = vm["pullport"].as<int>();
@@ -129,12 +134,28 @@ bool ZmqCore::brokerConnect ()
 	comms = std::make_unique<ZmqComms>(localInterface, brokerAddress);
 	comms->setCallback([this](ActionMessage M) {addCommand(std::move(M)); });
 	comms->setName(getIdentifier());
-	if (repPortNumber > 0)
+	if ((repPortNumber > 0)||(pullPortNumber>0))
 	{
 		comms->setPortNumbers(repPortNumber, pullPortNumber);
 	}
-	comms->setBrokerPorts(brokerReqPort, brokerPushPort);
-	return comms->connect();
+	if ((brokerReqPort > 0) || (brokerPushPort > 0))
+	{
+		comms->setBrokerPorts(brokerReqPort, brokerPushPort);
+	}
+	
+	auto res=comms->connect();
+	if (res)
+	{
+		if (repPortNumber < 0)
+		{
+			repPortNumber = comms->getRequestPort();
+		}
+		if (pullPortNumber < 0)
+		{
+			pullPortNumber = comms->getPushPort();
+		}
+	}
+	return res;
 }
 
 

@@ -8,6 +8,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <boost/test/unit_test.hpp>
 
 #include "helics/core/CoreFactory.h"
+#include "helics/core/BrokerFactory.h"
+#include "helics/core/CoreBroker.h"
 #include "helics/core/core.h"
 #include "helics/core/core-types.h"
 #include "helics/core/ipc/IpcCore.h"
@@ -236,4 +238,27 @@ BOOST_AUTO_TEST_CASE(ipccore_initialization_test)
 	boost::interprocess::message_queue::remove("testbroker");
 }
 
+
+
+/** test case checks default values and makes sure they all mesh together
+also tests the automatic port determination for cores
+*/
+BOOST_AUTO_TEST_CASE(ipcCore_core_broker_default_test)
+{
+	std::string initializationString = "1";
+
+	auto  broker = helics::BrokerFactory::create(HELICS_INTERPROCESS, initializationString);
+
+	auto  core = CoreFactory::create(HELICS_INTERPROCESS, initializationString);
+	bool connected = broker->isConnected();
+	BOOST_CHECK(connected);
+	connected = core->connect();
+	BOOST_CHECK(connected);
+
+	auto ccore = static_cast<helics::IpcCore *>(core.get());
+	//this will test the automatic port allocation
+	BOOST_CHECK_EQUAL(ccore->getAddress(), "tcp://127.0.0.1:23500;tcp://127.0.0.1:23501");
+	core->disconnect();
+	broker->disconnect();
+}
 BOOST_AUTO_TEST_SUITE_END()

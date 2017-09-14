@@ -74,7 +74,7 @@ CoreBroker::~CoreBroker ()
 
 void CoreBroker::setIdentifier (const std::string &name)
 {
-    if (brokerState==broker_state_t::created)  // can't be changed after initialization
+    if (brokerState<=broker_state_t::connecting)  // can't be changed after initialization
     {
         std::lock_guard<std::mutex> lock (mutex_);
         local_broker_identifier = name;
@@ -890,10 +890,7 @@ void CoreBroker::InitializeFromArgs (int argc, char *argv[])
 		{
 			setAsRoot();
 		}
-        if (local_broker_identifier.empty ())
-        {  // don't allow an empty identifier, that causes all sorts of issues
-            local_broker_identifier = gen_id ();
-        }
+       
 		timeCoord = std::make_unique<TimeCoordinator>();
 		timeCoord->setMessageSender([this](const ActionMessage & msg) {addCommand(msg); });
         _queue_processing_thread = std::thread (&CoreBroker::queueProcessingLoop, this);
@@ -918,6 +915,10 @@ bool CoreBroker::connect ()
         broker_state_t exp = broker_state_t::initialized;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::connecting))
         {
+			if (getIdentifier().empty())
+			{  // don't allow an empty identifier, that causes all sorts of issues
+				setIdentifier(gen_id());
+			}
             auto res = brokerConnect ();
             if (res)
             {

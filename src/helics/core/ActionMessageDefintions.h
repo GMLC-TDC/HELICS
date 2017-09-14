@@ -158,6 +158,7 @@ enum class action_t : int32_t
 
 //for requesting port definitions on a computer
 #define PORT_DEFINITIONS 1451
+#define QUERY_PORTS 1453
 #define REQUEST_PORTS 1455
 #define SET_USED_PORTS 1457
 #define NULL_REPLY 0;

@@ -58,6 +58,7 @@ bool CommsInterface::connect()
 	{
 		return false;
 	}
+	//bool exp = false;
 	if (!ActionCallback)
 	{
 		std::cerr << "no callback specified, the receiver cannot start\n";

@@ -43,11 +43,13 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 namespace helics
 {
 
+
 using namespace std::string_literals;
 static const argDescriptors extraArgs
 {
 	{ "local_interface"s,"string"s,"the local interface to use for the receive ports"s },
 	{ "brokerport"s, "int"s, "port number for the broker priority port"s },
+	{ "brokerpushport"s, "int"s, "port number for the broker primary push port"s },
 	{ "pullport"s,"int"s,"port number for the primary receive port"s },
 	{ "repport"s,"int"s,"port number for the priority receive port"s },
 	{ "port"s, "int"s, "port number for the broker's priority port"s },
@@ -91,6 +93,10 @@ void ZmqBroker::InitializeFromArgs(int argc, char *argv[])
 		{
 			brokerReqPort = vm["brokerport"].as<int>();
 		}
+		if (vm.count("brokerpushport") > 0)
+		{
+			brokerPushPort = vm["brokerpushport"].as<int>();
+		}
 		if (vm.count("pullport") > 0)
 		{
 			pullPortNumber = vm["pullport"].as<int>();
@@ -109,17 +115,40 @@ void ZmqBroker::InitializeFromArgs(int argc, char *argv[])
 
 bool ZmqBroker::brokerConnect()
 {
+	if (brokerAddress.empty())
+	{
+		setAsRoot();
+	}
 	comms = std::make_unique<ZmqComms>(localInterface, brokerAddress);
 	comms->setCallback([this](ActionMessage M) {addCommand(std::move(M)); });
 	comms->setName(getIdentifier());
-	comms->setPortNumbers(repPortNumber, pullPortNumber);
-	comms->setBrokerPorts(brokerReqPort, brokerPushPort);
+	if ((repPortNumber > 0) || (pullPortNumber > 0))
+	{
+		comms->setPortNumbers(repPortNumber, pullPortNumber);
+	}
+	if ((brokerReqPort > 0) || (brokerPushPort > 0))
+	{
+		comms->setBrokerPorts(brokerReqPort, brokerPushPort);
+	}
+	
 	if (portStart > 0)
 	{
 		comms->setAutomaticPortStartPort(portStart);
 	}
 	//comms->setMessageSize(maxMessageSize, maxMessageCount);
-	return comms->connect();
+	auto res = comms->connect();
+	if (res)
+	{
+		if (repPortNumber < 0)
+		{
+			repPortNumber = comms->getRequestPort();
+		}
+		if (pullPortNumber < 0)
+		{
+			pullPortNumber = comms->getPushPort();
+		}
+	}
+	return res;
 }
 
 void ZmqBroker::brokerDisconnect()

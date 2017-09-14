@@ -121,8 +121,12 @@ void ZmqComms::setPortNumbers(int repPort, int pullPort)
 	if (rx_status == connection_status::startup)
 	{
 		repPortNumber = repPort;
-		auto currentPullPort = pullPortNumber.load();
-		pullPortNumber = (pullPort > 0) ? pullPort : (currentPullPort<0)?repPort + 1: currentPullPort;
+		if (repPort > 0)
+		{
+			auto currentPullPort = pullPortNumber.load();
+			pullPortNumber = (pullPort > 0) ? pullPort : (currentPullPort<0) ? repPort + 1 : currentPullPort;
+		}
+		
 	}
 	
 }
@@ -135,6 +139,90 @@ void ZmqComms::setAutomaticPortStartPort(int startingPort)
 void ZmqComms::setReplyCallback(std::function<ActionMessage(ActionMessage &&)> callback)
 {
 	replyCallback = std::move(callback);
+}
+
+
+int ZmqComms::processIncomingMessage(zmq::message_t &msg)
+{
+	if (msg.size() == 5)
+	{
+		std::string str(static_cast<char *>(msg.data()), msg.size());
+		if (str == "close")
+		{
+			rx_status = connection_status::terminated;
+			return (-1);
+		}
+	}
+	ActionMessage M(static_cast<char *>(msg.data()), msg.size());
+	if (M.action() == CMD_PROTOCOL)
+	{
+		switch (M.index)
+		{
+		case CLOSE_RECEIVER:
+			rx_status = connection_status::terminated;
+			return (-1);
+		default:
+			break;
+		}
+	}
+	ActionCallback(std::move(M));
+	return 0;
+}
+
+
+int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
+{
+	
+	ActionMessage M(static_cast<char *>(msg.data()), msg.size());
+	if (M.action() == CMD_PROTOCOL)
+	{
+		switch (M.index)
+		{
+		case QUERY_PORTS:
+		{
+			ActionMessage portReply(CMD_PROTOCOL);
+			portReply.index = PORT_DEFINITIONS;
+			portReply.source_id = pullPortNumber;
+			sock.send(portReply.to_string());
+		}
+		break;
+		case REQUEST_PORTS:
+		{
+			auto openPorts = findOpenPorts();
+			ActionMessage portReply(CMD_PROTOCOL);
+			portReply.index = PORT_DEFINITIONS;
+			portReply.source_id = pullPortNumber;
+			portReply.source_handle = openPorts.first;
+			portReply.dest_id = openPorts.second;
+			sock.send(portReply.to_string());
+		}
+		break;
+		case CLOSE_RECEIVER:
+			rx_status = connection_status::terminated;
+			return (-1);
+		default:
+			M.index = NULL_REPLY;
+			sock.send(M.to_string());
+			break;
+		}
+		return 0;
+	}
+	if (replyCallback)
+	{
+		auto Mresp = replyCallback(std::move(M));
+		auto str = Mresp.to_string();
+
+		sock.send(str.data(), str.size());
+	}
+	else
+	{
+		ActionCallback(std::move(M));
+		ActionMessage resp(CMD_PRIORITY_ACK);
+		auto str = resp.to_string();
+
+		sock.send(str.data(), str.size());
+	}
+	return 0;
 }
 
 	void ZmqComms::queue_rx_function()
@@ -159,7 +247,11 @@ void ZmqComms::setReplyCallback(std::function<ActionMessage(ActionMessage &&)> c
 				if (M.index == PORT_DEFINITIONS)
 				{
 					pullPortNumber = M.dest_id;
-					repPortNumber = M.source_handle;
+					if (repPortNumber < 0)
+					{
+						repPortNumber = M.source_handle;
+					}
+					
 				}
 				else if (M.index == DISCONNECT)
 				{
@@ -196,86 +288,56 @@ void ZmqComms::setReplyCallback(std::function<ActionMessage(ActionMessage &&)> c
 				if ((poller[0].revents&ZMQ_POLLIN) != 0)
 				{
 					controlSocket.recv(&msg);
-					if (msg.size() == 5)
-					{
-						std::string str(static_cast<char *>(msg.data()), msg.size());
-						if (str == "close")
-						{
-							break;
-						}
-					}
 					
+					auto status = processIncomingMessage(msg);
+					if (status < 0)
+					{
+						return;
+					}
 
 				}
 				if ((poller[1].revents&ZMQ_POLLIN) != 0)
 				{
 					pullSocket.recv(&msg);
+					auto status = processIncomingMessage(msg);
+					if (status < 0)
+					{
+						return;
+					}
 					
 				}
 				if ((poller[2].revents&ZMQ_POLLIN) != 0)
 				{
 					repSocket.recv(&msg);
-					ActionMessage M(static_cast<char *>(msg.data()), msg.size());
-					if (M.action() == CMD_PROTOCOL)
+					auto status = replyToIncomingMessage(msg,repSocket);
+					if (status < 0)
 					{
-						switch (M.index)
-						{
-						case REQUEST_PORTS:
-						{
-							auto openPorts = findOpenPorts();
-							ActionMessage portReply(CMD_PROTOCOL);
-							portReply.index = PORT_DEFINITIONS;
-							portReply.source_handle = openPorts.first;
-							portReply.dest_id = openPorts.second;
-							repSocket.send(portReply.to_string());
-						}	
-							break;
-						default:
-							M.index = NULL_REPLY;
-							repSocket.send(M.to_string());
-						}
-						continue;
+						return;
 					}
-					if (replyCallback)
-					{
-						auto Mresp = replyCallback(std::move(M));
-						auto str = Mresp.to_string();
-
-						repSocket.send(str.data(), str.size());
-					}
-					else
-					{
-						ActionCallback(std::move(M));
-						ActionMessage resp(CMD_PRIORITY_ACK);
-						auto str = resp.to_string();
-
-						repSocket.send(str.data(), str.size());
-					}
-					
 					continue;
 				}
-				ActionMessage M(static_cast<char *>(msg.data()), msg.size());
-				if (M.action() == CMD_PROTOCOL)
-				{
-					switch (M.index)
-					{
-					case CLOSE_RECEIVER:
-						rx_status = connection_status::terminated;
-						return;
-					default:
-						break;
-					}
-				}
-				ActionCallback(std::move(M));
+				
 			}
 		}
 		rx_status = connection_status::terminated;
 	}
 
+	class waitingResponse
+	{
+	public:
+		int route;
+		int loops = 0;
+		zmq::socket_t *sock;
+		ActionMessage txmsg;
+		
+		
+	};
 	void ZmqComms::queue_tx_function()
 	{
 		std::vector<char> buffer;
 		std::vector<char> rxbuffer(4096);
+		std::vector<zmq::pollitem_t> poller;
+
 		auto ctx = zmqContextManager::getContextPointer();
 		zmq::socket_t reqSocket(ctx->getContext(), ZMQ_REQ);
 
@@ -287,41 +349,93 @@ void ZmqComms::setReplyCallback(std::function<ActionMessage(ActionMessage &&)> c
 
 		if (!brokerTarget_.empty())
 		{
+			if (brokerReqPort < 0)
+			{
+				brokerReqPort = DEFAULT_BROKER_REP_PORT_NUMBER;
+			}
 			reqSocket.connect(makePortAddress(brokerTarget_,brokerReqPort));
 			hasBroker = true;
 			int cnt = 0;
-			while (pullPortNumber == -1)
+			if (pullPortNumber > 0)
 			{
-				ActionMessage getPorts(CMD_PROTOCOL);
-				getPorts.index = REQUEST_PORTS;
-				auto str = getPorts.to_string();
-				reqSocket.send(str);
-				auto nsize = reqSocket.recv(rxbuffer.data(), rxbuffer.size());
-				if ((nsize > 0) && (nsize < rxbuffer.size()))
+				while (brokerPushPort < 0)
 				{
-					ActionMessage rxcmd(rxbuffer.data(), rxbuffer.size());
-					if (rxcmd.action() == CMD_PROTOCOL)
+					ActionMessage getPorts(CMD_PROTOCOL);
+					getPorts.index = QUERY_PORTS;
+					auto str = getPorts.to_string();
+					reqSocket.send(str);
+					auto nsize = reqSocket.recv(rxbuffer.data(), rxbuffer.size());
+					if ((nsize > 0) && (nsize < rxbuffer.size()))
 					{
-						if (rxcmd.index == PORT_DEFINITIONS)
+						ActionMessage rxcmd(rxbuffer.data(), rxbuffer.size());
+						if (rxcmd.action() == CMD_PROTOCOL)
 						{
-							controlSocket.send(rxbuffer.data(), rxbuffer.size());
-						}
-						else if (rxcmd.index == DISCONNECT)
-						{
-							controlSocket.send(rxbuffer.data(), rxbuffer.size());
-							tx_status = connection_status::terminated;
-							return;
+							if (rxcmd.index == PORT_DEFINITIONS)
+							{
+								if (rxcmd.source_id > 0)
+								{
+									brokerPushPort = rxcmd.source_id;
+								}
+							}
+							else if (rxcmd.index == DISCONNECT)
+							{
+								controlSocket.send(rxbuffer.data(), rxbuffer.size());
+								tx_status = connection_status::terminated;
+								return;
+							}
 						}
 					}
+					++cnt;
+					if (cnt > 10)
+					{
+						//we can't get the broker to respond with port numbers
+						tx_status = connection_status::error;
+						return;
+					}
 				}
-				++cnt;
-				if (cnt > 10)
+				
+			}
+			else
+			{
+				while (pullPortNumber == -1)
 				{
-					//we can't get the broker to respond with port numbers
-					tx_status = connection_status::error;
-					return; 
+					ActionMessage getPorts(CMD_PROTOCOL);
+					getPorts.index = REQUEST_PORTS;
+					auto str = getPorts.to_string();
+					reqSocket.send(str);
+					auto nsize = reqSocket.recv(rxbuffer.data(), rxbuffer.size());
+					if ((nsize > 0) && (nsize < rxbuffer.size()))
+					{
+						ActionMessage rxcmd(rxbuffer.data(), rxbuffer.size());
+						if (rxcmd.action() == CMD_PROTOCOL)
+						{
+							if (rxcmd.index == PORT_DEFINITIONS)
+							{
+								if (rxcmd.source_id > 0)
+								{
+									brokerPushPort = rxcmd.source_id;
+								}
+								controlSocket.send(rxbuffer.data(), rxbuffer.size());
+							}
+							else if (rxcmd.index == DISCONNECT)
+							{
+								controlSocket.send(rxbuffer.data(), rxbuffer.size());
+								tx_status = connection_status::terminated;
+								return;
+							}
+						}
+					}
+					++cnt;
+					if (cnt > 10)
+					{
+						//we can't get the broker to respond with port numbers
+						tx_status = connection_status::error;
+						return;
+					}
 				}
 			}
+			
+			
 		}
 		else
 		{
@@ -440,6 +554,7 @@ void ZmqComms::setReplyCallback(std::function<ActionMessage(ActionMessage &&)> c
 					if (rt_find != priority_routes.end())
 					{
 						rt_find->second.send(buffer.data(), buffer.size());
+
 						auto nsize = rt_find->second.recv(rxbuffer.data(), rxbuffer.size());
 						if ((nsize > 0) && (nsize < rxbuffer.size()))
 						{
