@@ -255,9 +255,9 @@ BOOST_AUTO_TEST_CASE(ipcCore_core_broker_default_test)
 	connected = core->connect();
 	BOOST_CHECK(connected);
 
-	auto ccore = static_cast<helics::IpcCore *>(core.get());
+	//auto ccore = static_cast<helics::IpcCore *>(core.get());
 	//this will test the automatic port allocation
-	BOOST_CHECK_EQUAL(ccore->getAddress(), "tcp://127.0.0.1:23500;tcp://127.0.0.1:23501");
+	//BOOST_CHECK_EQUAL(ccore->getAddress(), "tcp://127.0.0.1:23500;tcp://127.0.0.1:23501");
 	core->disconnect();
 	broker->disconnect();
 }

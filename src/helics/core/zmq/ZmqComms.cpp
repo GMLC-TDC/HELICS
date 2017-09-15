@@ -321,41 +321,30 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 		}
 		rx_status = connection_status::terminated;
 	}
-
+	/**helper class to manage REQ sockets that are awaiting a response*/
 	class waitingResponse
 	{
 	public:
 		int route;
 		int loops = 0;
-		zmq::socket_t *sock;
 		ActionMessage txmsg;
 		
-		
 	};
-	void ZmqComms::queue_tx_function()
+
+
+	int ZmqComms::initializeBrokerConnections(zmq::socket_t &brokerReq, zmq::socket_t &controlSocket)
 	{
-		std::vector<char> buffer;
-		std::vector<char> rxbuffer(4096);
-		std::vector<zmq::pollitem_t> poller;
-
-		auto ctx = zmqContextManager::getContextPointer();
-		zmq::socket_t reqSocket(ctx->getContext(), ZMQ_REQ);
-
-		//Setup the control socket for comms with the receiver
-		zmq::socket_t controlSocket(ctx->getContext(), ZMQ_PAIR);
-
-		std::string controlsockString = std::string("inproc://") + name + "_control";
-		controlSocket.connect(controlsockString);
-
+		zmq::pollitem_t poller;
 		if (!brokerTarget_.empty())
 		{
 			if (brokerReqPort < 0)
 			{
 				brokerReqPort = DEFAULT_BROKER_REP_PORT_NUMBER;
 			}
-			reqSocket.connect(makePortAddress(brokerTarget_,brokerReqPort));
+			brokerReq.connect(makePortAddress(brokerTarget_, brokerReqPort));
 			hasBroker = true;
 			int cnt = 0;
+			zmq::message_t msg;
 			if (pullPortNumber > 0)
 			{
 				while (brokerPushPort < 0)
@@ -363,11 +352,25 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 					ActionMessage getPorts(CMD_PROTOCOL);
 					getPorts.index = QUERY_PORTS;
 					auto str = getPorts.to_string();
-					reqSocket.send(str);
-					auto nsize = reqSocket.recv(rxbuffer.data(), rxbuffer.size());
-					if ((nsize > 0) && (nsize < rxbuffer.size()))
+					brokerReq.send(str);
+					poller.socket = static_cast<void *>(brokerReq);
+					poller.events = ZMQ_POLLIN;
+					auto rc = zmq::poll(&poller,1, std::chrono::milliseconds(3000));
+					if (rc < 0)
 					{
-						ActionMessage rxcmd(rxbuffer.data(), rxbuffer.size());
+						std::cerr << "unable to connect with broker\n";
+						tx_status = connection_status::error;
+						return (-1);
+					}
+					else if (rc == 0)
+					{
+						std::cerr << "broker connection timed out\n";
+						tx_status = connection_status::error;
+						return (-1);
+					}
+					auto nsize = brokerReq.recv(&msg);
+					
+						ActionMessage rxcmd(msg.data, msg.size());
 						if (rxcmd.action() == CMD_PROTOCOL)
 						{
 							if (rxcmd.index == PORT_DEFINITIONS)
@@ -379,21 +382,21 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 							}
 							else if (rxcmd.index == DISCONNECT)
 							{
-								controlSocket.send(rxbuffer.data(), rxbuffer.size());
+								controlSocket.send(msg);
 								tx_status = connection_status::terminated;
-								return;
+								return (-3);
 							}
 						}
-					}
+					
 					++cnt;
 					if (cnt > 10)
 					{
 						//we can't get the broker to respond with port numbers
 						tx_status = connection_status::error;
-						return;
+						return (-1);
 					}
 				}
-				
+
 			}
 			else
 			{
@@ -402,11 +405,25 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 					ActionMessage getPorts(CMD_PROTOCOL);
 					getPorts.index = REQUEST_PORTS;
 					auto str = getPorts.to_string();
-					reqSocket.send(str);
-					auto nsize = reqSocket.recv(rxbuffer.data(), rxbuffer.size());
-					if ((nsize > 0) && (nsize < rxbuffer.size()))
+					brokerReq.send(str);
+					poller.socket = static_cast<void *>(brokerReq);
+					poller.events = ZMQ_POLLIN;
+					auto rc = zmq::poll(&poller, 1,std::chrono::milliseconds(3000));
+					if (rc < 0)
 					{
-						ActionMessage rxcmd(rxbuffer.data(), rxbuffer.size());
+						std::cerr << "unable to connect with broker\n";
+						tx_status = connection_status::error;
+						return (-1);
+					}
+					else if (rc == 0)
+					{
+						std::cerr << "broker connection timed out\n";
+						tx_status = connection_status::error;
+						return (-1);
+					}
+					auto nsize = brokerReq.recv(&msg);
+					
+						ActionMessage rxcmd(msg.data, msg.size());
 						if (rxcmd.action() == CMD_PROTOCOL)
 						{
 							if (rxcmd.index == PORT_DEFINITIONS)
@@ -415,31 +432,31 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 								{
 									brokerPushPort = rxcmd.source_id;
 								}
-								controlSocket.send(rxbuffer.data(), rxbuffer.size());
+								controlSocket.send(msg);
 							}
 							else if (rxcmd.index == DISCONNECT)
 							{
-								controlSocket.send(rxbuffer.data(), rxbuffer.size());
+								controlSocket.send(msg);
 								tx_status = connection_status::terminated;
-								return;
+								return (-3);
 							}
 						}
-					}
+					
 					++cnt;
 					if (cnt > 10)
 					{
 						//we can't get the broker to respond with port numbers
 						tx_status = connection_status::error;
-						return;
+						return (-1);
 					}
 				}
 			}
-			
-			
+
+
 		}
 		else
 		{
-			if ((pullPortNumber == -1)||(repPortNumber==-1))
+			if ((pullPortNumber == -1) || (repPortNumber == -1))
 			{
 				if (pullPortNumber == -1)
 				{
@@ -451,14 +468,35 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 					repPortNumber = DEFAULT_BROKER_REP_PORT_NUMBER;
 				}
 				ActionMessage setPorts(CMD_PROTOCOL);
-				setPorts.index =PORT_DEFINITIONS;
-				setPorts.dest_id=pullPortNumber;
-				setPorts.source_handle=repPortNumber;
+				setPorts.index = PORT_DEFINITIONS;
+				setPorts.dest_id = pullPortNumber;
+				setPorts.source_handle = repPortNumber;
 				auto str = setPorts.to_string();
 				controlSocket.send(str);
 			}
-			
+
 		}
+		return 0;
+	}
+
+	void ZmqComms::queue_tx_function()
+	{
+		std::vector<char> buffer;
+
+		auto ctx = zmqContextManager::getContextPointer();
+		zmq::socket_t reqSocket(ctx->getContext(), ZMQ_REQ);
+
+		//Setup the control socket for comms with the receiver
+		zmq::socket_t controlSocket(ctx->getContext(), ZMQ_PAIR);
+
+		std::string controlsockString = std::string("inproc://") + name + "_control";
+		controlSocket.connect(controlsockString);
+		auto res = initializeBrokerConnections(reqSocket, controlSocket);
+		if (res < 0)
+		{
+			return;
+		}
+		
 		
 		
 		zmq::socket_t brokerPushSocket(ctx->getContext(), ZMQ_PUSH);
@@ -470,8 +508,9 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 		{
 			brokerPushSocket.connect(makePortAddress(brokerTarget_, brokerPushPort));
 		}
-		
+		std::vector<zmq::pollitem_t> poller;
 		tx_status = connection_status::connected;
+		zmq::message_t msg;
 		while (1)
 		{
 			int route_id;
@@ -538,14 +577,11 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 				{
 					reqSocket.send(buffer.data(), buffer.size());
 
-					// TODO:: need to figure out how to catch overflow and resize the rxbuffer
-					// admittedly this would probably be a very very long name but it could happen
-					auto nsize = reqSocket.recv(rxbuffer.data(), rxbuffer.size());
-					if ((nsize > 0) && (nsize < rxbuffer.size()))
-					{
-						ActionMessage rxcmd(rxbuffer.data(), rxbuffer.size());
-						ActionCallback(std::move(rxcmd));
-					}
+					auto nsize = reqSocket.recv(&msg);
+					
+					ActionMessage rxcmd(msg.data, msg.size());
+					ActionCallback(std::move(rxcmd));
+					
 					continue;
 				}
 				else
@@ -555,12 +591,11 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 					{
 						rt_find->second.send(buffer.data(), buffer.size());
 
-						auto nsize = rt_find->second.recv(rxbuffer.data(), rxbuffer.size());
-						if ((nsize > 0) && (nsize < rxbuffer.size()))
-						{
-							ActionMessage rxcmd(rxbuffer.data(), rxbuffer.size());
-							ActionCallback(std::move(rxcmd));
-						}
+						auto nsize = rt_find->second.recv(&msg);
+						
+						ActionMessage rxcmd(msg.data, msg.size());
+						ActionCallback(std::move(rxcmd));
+						
 						continue;
 					}
 					
@@ -600,7 +635,6 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 		reqSocket.close();
 
 		brokerPushSocket.close();
-		
 		
 		routes.clear();
 		controlSocket.send("close");

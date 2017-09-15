@@ -73,7 +73,9 @@ private:
 	return code for required action 0=NONE, -1 TERMINATE*/
 	int processIncomingMessage(zmq::message_t &msg);
 
-	int replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &);
+	int replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &rep);
+
+	int initializeBrokerConnections(zmq::socket_t &brokerRep, zmq::socket_t &controlSocket);
 public:
 	/** get the port number of the comms object to send requests to*/
 	int getRequestPort() const { return repPortNumber; };
