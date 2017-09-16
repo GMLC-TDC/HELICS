@@ -37,7 +37,7 @@ void ValueFederateTestFixture::Setup1FederateTest(const std::string &core_type_n
     helics::FederateInfo fi("test1");
     fi.coreType = core_type_name;
     fi.timeDelta = time_delta;
-    fi.coreInitString = "--broker=" + broker->getIdentifier() + " --federates 1";
+    fi.coreInitString = "--broker=" + broker->getIdentifier() + " --broker_address="+broker->getAddress()+" --federates 1";
 
     vFed1 = std::make_shared<helics::ValueFederate>(fi);
 }
@@ -49,7 +49,7 @@ void ValueFederateTestFixture::Setup2FederateTest(const std::string &core_type_n
     helics::FederateInfo fi("test1");
     fi.coreType = core_type_name;
     fi.timeDelta = time_delta;
-    fi.coreInitString = "--broker=" + broker->getIdentifier() + " --federates 2";
+    fi.coreInitString = "--broker=" + broker->getIdentifier() + " --broker_address=" + broker->getAddress() + " --federates 2";
 
     vFed1 = std::make_shared<helics::ValueFederate>(fi);
 

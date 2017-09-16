@@ -337,7 +337,18 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 				brokerReqPort = DEFAULT_BROKER_REP_PORT_NUMBER;
 			}
 			zmq::socket_t brokerReq(ctx->getContext(), ZMQ_REQ);
-			brokerReq.connect(makePortAddress(brokerTarget_, brokerReqPort));
+			try
+			{
+				brokerReq.connect(makePortAddress(brokerTarget_, brokerReqPort));
+				
+			}
+			catch (zmq::error_t &ze)
+			{
+				std::cerr << "unable to connect with broker:"<<ze.what()<<'\n';
+				tx_status = connection_status::error;
+				return (-1);
+			}
+
 			hasBroker = true;
 			int cnt = 0;
 			zmq::message_t msg;
@@ -364,7 +375,7 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 						tx_status = connection_status::error;
 						return (-1);
 					}
-					auto nsize = brokerReq.recv(&msg);
+					brokerReq.recv(&msg);
 					
 						ActionMessage rxcmd(static_cast<char *>(msg.data()), msg.size());
 						if (rxcmd.action() == CMD_PROTOCOL)
@@ -417,7 +428,7 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 						tx_status = connection_status::error;
 						return (-1);
 					}
-					auto nsize = brokerReq.recv(&msg);
+					brokerReq.recv(&msg);
 					
 						ActionMessage rxcmd(static_cast<char *>(msg.data()), msg.size());
 						if (rxcmd.action() == CMD_PROTOCOL)
@@ -493,15 +504,13 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 			return;
 		}
 		
-		
-		
 		zmq::socket_t brokerPushSocket(ctx->getContext(), ZMQ_PUSH);
 		std::map<int, zmq::socket_t> routes;  // for all the other possible routes
 		ZmqRequestSets priority_routes; //!< object to handle the management of the priority routes
 
-		priority_routes.addRoutes(0, makePortAddress(brokerTarget_, brokerReqPort));
 		if (hasBroker)
 		{
+			priority_routes.addRoutes(0, makePortAddress(brokerTarget_, brokerReqPort));
 			brokerPushSocket.connect(makePortAddress(brokerTarget_, brokerPushPort));
 		}
 		tx_status = connection_status::connected;

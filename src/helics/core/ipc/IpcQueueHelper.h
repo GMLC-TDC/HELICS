@@ -14,6 +14,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <memory>
 #include <algorithm>
 #include <cctype>
+#include <helics_includes/optional.h>
 #include <boost/interprocess/ipc/message_queue.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
@@ -78,7 +79,8 @@ public:
 
 	void changeState(queue_state_t newState);
 
-	ActionMessage getMessage(int timeout);
+	stx::optional<ActionMessage> getMessage(int timeout);
+	ActionMessage getMessage();
 
 	const std::string &getError() const
 	{

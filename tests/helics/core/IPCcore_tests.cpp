@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(ipccomms_broker_test)
 	BOOST_REQUIRE(connected);
 	comm.transmit(0,helics::CMD_IGNORE);
 
-	helics::ActionMessage rM = mq.getMessage(-1);
+	helics::ActionMessage rM = mq.getMessage();
 	BOOST_CHECK(rM.action() == helics::action_message_def::action_t::cmd_ignore);
 	comm.disconnect();
 }
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(ipcComm_transmit_add_route)
 
 BOOST_AUTO_TEST_CASE(ipccore_initialization_test)
 {
-	std::string initializationString = "1 --brokerloc=testbroker --name=core1";
+	std::string initializationString = "1 --broker_address=testbroker --name=core1";
 	auto  core = CoreFactory::create(HELICS_INTERPROCESS, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(ipccore_initialization_test)
 	
 	core->connect();
 
-	helics::ActionMessage rM = mq.getMessage(-1);
+	helics::ActionMessage rM = mq.getMessage();
 	BOOST_CHECK_EQUAL(rM.name, "core1");
 	BOOST_CHECK(rM.action() == helics::action_message_def::action_t::cmd_reg_broker);
 	core->disconnect();

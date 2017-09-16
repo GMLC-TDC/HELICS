@@ -51,6 +51,10 @@ void TestBroker::InitializeFromArgs (int argc, char *argv[])
 		{
 			brokerName = vm["brokername"].as<std::string>();
 		}
+		else if (vm.count("broker_address") > 0)
+		{
+			brokerName = vm["broker_address"].as<std::string>();
+		}
         if (vm.count ("brokerinit") > 0)
         {
 			brokerInitString=vm["brokerinit"].as<std::string> ();

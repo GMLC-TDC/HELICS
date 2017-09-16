@@ -75,13 +75,33 @@ void ZmqCore::initializeFromArgs (int argc, char *argv[])
         po::variables_map vm;
         argumentParser (argc, argv, vm,extraArgs);
 
-        if (vm.count ("broker") > 0)
+        if (vm.count ("broker_address") > 0)
         {
-           auto brkprt=extractInterfaceandPort(vm["broker"].as<std::string> ());
-		   brokerAddress = brkprt.first;
-		   brokerReqPort = brkprt.second;
-			
-            // tbroker = findTestBroker(brstring);
+			auto addr = vm["broker_address"].as<std::string>();
+			auto sc = addr.find_first_of(';',7);
+			if (sc == std::string::npos)
+			{
+				auto brkprt = extractInterfaceandPort(addr);
+				brokerAddress = brkprt.first;
+				brokerReqPort = brkprt.second;
+			}
+			else
+			{
+				auto brkprt = extractInterfaceandPort(addr.substr(0, sc));
+				brokerAddress = brkprt.first;
+				brokerReqPort = brkprt.second;
+				brkprt = extractInterfaceandPort(addr.substr(sc + 1));
+				if (brkprt.first != brokerAddress)
+				{
+					//TODO::Print a message?  
+				}
+				brokerPushPort = brkprt.second;
+
+			}
+			if (brokerAddress == "tcp://*")
+			{ //the broker address can't use a wild card
+				brokerAddress = "tcp://127.0.0.1";
+			}
         }
 		if (vm.count("local_interface") > 0)
 		{

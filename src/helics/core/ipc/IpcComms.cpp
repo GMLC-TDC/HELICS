@@ -54,7 +54,7 @@ IpcComms::~IpcComms()
 		bool operating = false;
 		while (1)
 		{
-			ActionMessage cmd = rxQueue.getMessage(-1);
+			ActionMessage cmd = rxQueue.getMessage();
 			if ((cmd.action() == CMD_PROTOCOL) || (cmd.action() == CMD_PROTOCOL_BIG))
 			{
 				if (cmd.index == CLOSE_RECEIVER)

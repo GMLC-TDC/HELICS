@@ -9,8 +9,11 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "IpcQueueHelper.h"
 #include <thread>
 
-#include "boost/date_time/posix_time/posix_time.hpp"
+#include <boost/date_time/posix_time/ptime.hpp>
 
+#include <boost/date_time/microsec_time_clock.hpp>
+
+#include <boost/date_time/local_time/local_time.hpp>
 namespace ipc = boost::interprocess;
 
 namespace helics
@@ -78,11 +81,31 @@ namespace helics
 		
 	}
 
-	ActionMessage ownedQueue::getMessage(int timeout)
+	ActionMessage ownedQueue::getMessage()
 	{
 		if (!connected)
 		{
 			return (CMD_ERROR);
+		}
+		size_t rx_size = 0;
+		unsigned int priority;
+		while (1)
+		{
+			rqueue->receive(buffer.data(), mxSize, rx_size, priority);
+			if (rx_size < 8)
+			{
+				continue;
+			}
+			ActionMessage cmd(buffer.data(), rx_size);
+			return cmd;
+		}
+	}
+
+	stx::optional<ActionMessage> ownedQueue::getMessage(int timeout)
+	{
+		if (!connected)
+		{
+			return{};
 		}
 		size_t rx_size=0;
 		unsigned int priority;
@@ -90,18 +113,24 @@ namespace helics
 		{
 			if (timeout >= 0)
 			{
-				//boost::posix_time::ptime abs_time = boost::date_time::microsec_clock::universal_time() + ;
-
-				//rqueue->timed_receive(buffer.data(), mxSize, rx_size, priority, timeoutp);
+				
+				boost::posix_time::ptime abs_time = boost::date_time::microsec_clock<boost::posix_time::ptime>::universal_time();
+				abs_time += boost::posix_time::milliseconds(timeout);
+				bool res=rqueue->timed_receive(buffer.data(), mxSize, rx_size, priority, abs_time);
+				if (!res)
+				{
+					return{};
+				}
 			}
-			else if (timeout == 0)
+			else if (timeout <= 0)
 			{
-
+				bool res=rqueue->try_receive(buffer.data(), mxSize, rx_size, priority);
+				if (!res)
+				{
+					return{};
+				}
 			}
-			else
-			{
-				rqueue->receive(buffer.data(), mxSize, rx_size, priority);
-			}
+			
 			if (rx_size < 8)
 			{
 				continue;

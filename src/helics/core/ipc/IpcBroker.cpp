@@ -43,7 +43,6 @@ using namespace std::string_literals;
 static const argDescriptors extraArgs
 {
 	{"queueloc"s, "string"s, "the named location of the shared queue"s},
-	{"brokerloc"s, "string"s, "the queue location for the broker"s },
 	{ "brokerinit"s, "string"s, "the initialization string for the broker"s }
 };
 
@@ -70,9 +69,9 @@ void IpcBroker::InitializeFromArgs(int argc, char *argv[])
 			brokername = vm["broker"].as<std::string>();
 		}
 
-		if (vm.count("brokerloc") > 0)
+		if (vm.count("broker_address") > 0)
 		{
-			brokerloc = vm["brokerloc"].as<std::string>();
+			brokerloc = vm["broker_address"].as<std::string>();
 		}
 
 		if (vm.count("fileloc") > 0)

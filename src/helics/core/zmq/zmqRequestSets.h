@@ -39,23 +39,29 @@ class ZmqRequestSets
 public:
 	/** constructor*/
 	ZmqRequestSets();
+	/** add a route to the request set*/
 	void addRoutes(int routeNumber, const std::string &routeInfo);
+	/** transmit a command to a specific route number*/
 	bool transmit(int routeNumber, const ActionMessage &command);
-
+	/** check if the request set is waiting on any on responses*/
 	bool waiting() const;
+	/** check for messages with a 0 second timeout*/
 	bool checkForMessages();
+	/** check for messages with an explicit timeout*/
 	bool checkForMessages(std::chrono::milliseconds timeout);
+	/** get any messages that have been received*/
 	stx::optional<ActionMessage> getMessage();
 private:
+	/** check to send any messages that have been delayed waiting for a previous send*/
 	void checkDelayedSend();
 private:
-	std::map<int, std::unique_ptr<zmq::socket_t>> routes;
-	std::map<int, bool> routes_waiting;
-	std::vector<zmq::pollitem_t> active_routes;
-	std::vector<waitingResponse> active_messages;
-	std::vector<std::pair<int, ActionMessage>> waiting_messages;
-	std::deque<ActionMessage> Responses;
-	std::shared_ptr<zmqContextManager> ctx;
+	std::map<int, std::unique_ptr<zmq::socket_t>> routes; //!< map of all the routes
+	std::map<int, bool> routes_waiting;	//!< routes that are waiting to be sent
+	std::vector<zmq::pollitem_t> active_routes; //!< active routes for zmq poller
+	std::vector<waitingResponse> active_messages; //!< more information about waiting messages
+	std::vector<std::pair<int, ActionMessage>> waiting_messages; //!< messages that are queued up to send
+	std::deque<ActionMessage> Responses;	//!< message that have been received and are waiting to be sent to the holder
+	std::shared_ptr<zmqContextManager> ctx; //!< the zmq context manager
 
 };
 } //namespace helics
