@@ -119,15 +119,13 @@ void CommsInterface::setName(const std::string &name_)
 }
 void CommsInterface::disconnect()
 {
-	if (queue_watcher.joinable())
+	if (rx_status==connection_status::connected)
 	{
 		closeReceiver();
-		queue_watcher.join();
 	}
-	if (queue_transmitter.joinable())
+	if (tx_status==connection_status::connected)
 	{
 		closeTransmitter();
-		queue_transmitter.join();
 	}
 }
 

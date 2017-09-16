@@ -8,16 +8,24 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 #include "IpcComms.h"
 #include "helics/core/ActionMessage.h"
+#include "IpcQueueHelper.h"
 #include <memory>
+#include <algorithm>
+#include <cctype>
 #include <boost/interprocess/ipc/message_queue.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
+#include <boost/interprocess/sync/interprocess_mutex.hpp>
+#include "boost/date_time/posix_time/posix_time.hpp"
 
+
+#define SET_TO_OPERATING 135111
 
 using ipc_queue = boost::interprocess::message_queue;
+using ipc_state = boost::interprocess::shared_memory_object;
+namespace ipc = boost::interprocess;
 
 namespace helics
 {
-
-
 
 IpcComms::IpcComms(const std::string &brokerTarget, const std::string &localTarget):CommsInterface(brokerTarget,localTarget)
 {
@@ -31,94 +39,77 @@ IpcComms::~IpcComms()
 
 	void IpcComms::queue_rx_function()
 	{
-		std::unique_ptr<boost::interprocess::message_queue> rxQueue; //!< the receive queue
-		try
+		ownedQueue rxQueue;
+		bool connected=rxQueue.connect(localTarget_, maxMessageCount_, maxMessageSize_);
+		if (!connected)
 		{
-			rxQueue = std::make_unique<ipc_queue>(boost::interprocess::create_only, localTarget_.c_str(), maxMessageCount_, maxMessageSize_);
-		}
-		catch (boost::interprocess::interprocess_exception const& )
-		{
-			boost::interprocess::message_queue::remove(localTarget_.c_str());
-			try
-			{
-				rxQueue = std::make_unique<ipc_queue>(boost::interprocess::create_only, localTarget_.c_str(), maxMessageCount_, maxMessageSize_);
-			}
-			catch (boost::interprocess::interprocess_exception const& )
-			{
 				ActionMessage err(CMD_ERROR);
-				err.payload = "Unable to open local connection";
+				err.payload = rxQueue.getError();
 				ActionCallback(std::move(err));
 				rx_status = connection_status::error; //the connection has failed
+				rxQueue.changeState(queue_state_t::closing);
 				return;
-			}
 		}
 		rx_status = connection_status::connected; //this is a atomic indicator that the rx queue is ready
-		unsigned int priority;
-		size_t rx_size;
-		std::vector<char> buffer(maxMessageSize_);
-
+		bool operating = false;
 		while (1)
 		{
-			rxQueue->receive(buffer.data(), maxMessageSize_, rx_size, priority);
-			if (rx_size < 8)
-			{
-				continue;
-			}
-			ActionMessage cmd(buffer.data(), rx_size);
+			ActionMessage cmd = rxQueue.getMessage(-1);
 			if ((cmd.action() == CMD_PROTOCOL) || (cmd.action() == CMD_PROTOCOL_BIG))
 			{
 				if (cmd.index == CLOSE_RECEIVER)
 				{
 					break;
 				}
+				if (cmd.index == SET_TO_OPERATING)
+				{
+					if (!operating)
+					{
+						rxQueue.changeState(queue_state_t::operating);
+						operating = true;
+					}
+					
+				}
 				continue;
 			}
-
+			if (cmd.action() == CMD_INIT_GRANT)
+			{
+				if (!operating)
+				{
+					rxQueue.changeState(queue_state_t::operating);
+					operating = true;
+				}
+			}
 			ActionCallback(std::move(cmd));
 		}
-		rxQueue.reset();
-		boost::interprocess::message_queue::remove(localTarget_.c_str());
+		rxQueue.changeState(queue_state_t::closing);
 		rx_status = connection_status::terminated;
 	}
 
 	void IpcComms::queue_tx_function()
 	{
-		std::unique_ptr<boost::interprocess::message_queue> brokerQueue;	//!< the queue of the broker
-		std::unique_ptr<boost::interprocess::message_queue> rxQueue;
-		std::map<int, std::unique_ptr<boost::interprocess::message_queue>> routes; //!< table of the routes to other brokers
+		sendToQueue brokerQueue;	//!< the queue of the broker
+		sendToQueue rxQueue;
+		std::map<int, sendToQueue> routes; //!< table of the routes to other brokers
 		bool hasBroker = false;
 		
 		int sleep_counter = 50;
 		if (!brokerTarget_.empty())
 		{
-			while (sleep_counter < 1700)
+			bool conn = brokerQueue.connect(brokerTarget_, true, 20);
+			if (!conn)
 			{
-				try
-				{
-					int test = 1;
-					brokerQueue = std::make_unique<ipc_queue>(boost::interprocess::open_only, brokerTarget_.c_str());
-					brokerQueue->send(&test, sizeof(int), 1);
-					//brokerQueue->send(&test, sizeof(int), 2);
-					//brokerQueue->send(&test, sizeof(int), 3);
-					break;
-				}
-				catch (boost::interprocess::interprocess_exception const&)
-				{
-					std::this_thread::sleep_for(std::chrono::milliseconds(sleep_counter));
-					sleep_counter *= 2;
-					if (sleep_counter > 1700)
-					{
-						ActionMessage err(CMD_ERROR);
-						err.payload = "Unable to open broker connection";
-						ActionCallback(std::move(err));
-						tx_status = connection_status::error;
-						return;
-					}
-				}
+
+					ActionMessage err(CMD_ERROR);
+					err.payload = std::string("Unable to open broker connection ->")+brokerQueue.getError();
+					ActionCallback(std::move(err));
+					tx_status = connection_status::error;
+					return;
 			}
 			hasBroker = true;
 		}
 		sleep_counter = 50;
+		//wait for the receiver to startup
 		while (rx_status == connection_status::startup)
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(sleep_counter));
@@ -138,21 +129,18 @@ IpcComms::~IpcComms()
 			tx_status = connection_status::error;
 			return;
 		}
-			try
-			{
-				int test = 1;
-				rxQueue = std::make_unique<ipc_queue>(boost::interprocess::open_only, localTarget_.c_str());
-				rxQueue->send(&test, sizeof(int), 1);
-			}
-			catch (boost::interprocess::interprocess_exception const&)
-			{
-					ActionMessage err(CMD_ERROR);
-					err.payload = "Unable to open receiver connection";
-					ActionCallback(std::move(err));
-					tx_status = connection_status::error;
-					return;
-			}
-			tx_status = connection_status::connected;
+		bool conn=rxQueue.connect(localTarget_, false, 0);
+		if (!conn)
+		{
+			ActionMessage err(CMD_ERROR);
+			err.payload = std::string("Unable to open receiver connection ->") + brokerQueue.getError();
+			ActionCallback(std::move(err));
+			tx_status = connection_status::error;
+			return;
+		}
+		
+		tx_status = connection_status::connected;
+		bool operating = false;
 		while (1)
 		{
 			int route_id;
@@ -166,20 +154,11 @@ IpcComms::~IpcComms()
 					{
 					case NEW_ROUTE:
 					{
-						int tries = 0;
-						while (tries < 3)
+						sendToQueue newQueue;
+						bool newQconnected=newQueue.connect(cmd.payload, false, 3);
+						if (newQconnected)
 						{
-							try
-							{
-								auto newQueue = std::make_unique<ipc_queue>(boost::interprocess::open_only, cmd.payload.c_str());
-								routes.emplace(cmd.dest_id, std::move(newQueue));
-								break;
-							}
-							catch (boost::interprocess::interprocess_exception const& ipe)
-							{
-								std::this_thread::sleep_for(std::chrono::milliseconds(100));
-								++tries;
-							}
+							routes.emplace(cmd.dest_id, std::move(newQueue));
 						}
 						continue;
 					}
@@ -189,33 +168,42 @@ IpcComms::~IpcComms()
 					}
 				}
 			}
+			if (cmd.action() == CMD_INIT_GRANT)
+			{
+				if (!operating)
+				{
+					ActionMessage op(CMD_PROTOCOL);
+					op.index = SET_TO_OPERATING;
+					rxQueue.sendMessage(op, 3);
+				}
+			}
 			std::string buffer = cmd.to_string();
 			int priority = isPriorityCommand(cmd) ? 3 : 1;
 			if (route_id == 0)
 			{
 				//brokerQueue->send(&priority, sizeof(int), 3);
-				if (brokerQueue)
+				if (hasBroker)
 				{
-					brokerQueue->send(buffer.data(), buffer.size(), priority);
+					brokerQueue.sendMessage(cmd, priority);
 				}
 				
 			}
 			else if (route_id == -1)
 			{
-				rxQueue->send(buffer.data(), buffer.size(), priority);
+				rxQueue.sendMessage(cmd, priority);
 			}
 			else
 			{
 				auto routeFnd = routes.find(route_id);
 				if (routeFnd != routes.end())
 				{
-					routeFnd->second->send(buffer.data(), buffer.size(), priority);
+					routeFnd->second.sendMessage(cmd, priority);
 				}
 				else
 				{
-					if (brokerQueue)
+					if (hasBroker)
 					{
-						brokerQueue->send(buffer.data(), buffer.size(), priority);
+						brokerQueue.sendMessage(cmd, priority);
 					}
 					
 				}
@@ -236,15 +224,29 @@ void IpcComms::closeTransmitter()
 
 void IpcComms::closeReceiver()
 {
+	if ((rx_status == connection_status::error)||(rx_status==connection_status::terminated))
+	{
+		return;
+	}
+	ActionMessage cmd(CMD_PROTOCOL);
+	cmd.index = CLOSE_RECEIVER;
 	if (tx_status == connection_status::connected)
 	{
-		ActionMessage cmd(CMD_PROTOCOL);
-		cmd.index = CLOSE_RECEIVER;
 		transmit(-1, cmd);
 	}
 	else
 	{
-		//TODO:: what to do here
+		
+		try
+		{
+			auto rxQueue = std::make_unique<ipc_queue>(boost::interprocess::open_only, stringTranslateToCppName(localTarget_).c_str());
+			std::string buffer = cmd.to_string();
+			rxQueue->send(buffer.data(), buffer.size(), 3);
+		}
+		catch (boost::interprocess::interprocess_exception const& ipe)
+		{
+			std::cerr << "unable to send close message\n";
+		}
 	}
 }
 

@@ -20,6 +20,7 @@ set(SRC_FILES
 	ipc/IpcCore.cpp
 	ipc/IpcBroker.cpp
 	ipc/IpcComms.cpp
+	Ipc/IpcQueueHelper.cpp
 	TimeCoordinator.cpp
 	CommsInterface.cpp
 	argParser.cpp
@@ -36,6 +37,7 @@ set (ZMQ_SOURCE_FILES
     zmq/zmq-helper.cc
 	zmq/ZmqBroker.cpp
 	zmq/ZmqComms.cpp
+	zmq/ZmqRequestSets.cpp
 )
 
 set(INCLUDE_FILES
@@ -57,6 +59,7 @@ set(INCLUDE_FILES
 	ipc/IpcCore.h
 	ipc/IpcBroker.h
 	ipc/IpcComms.h
+	Ipc/IpcQueueHelper.h
     
 	CommsInterface.h
 	FederateState.h
@@ -75,6 +78,7 @@ set(ZMQ_HEADER_FILES
     zmq/zmq-helper.h
 	zmq/ZmqBroker.h
 	zmq/ZmqComms.h
+	zmq/ZmqRequestSets.h
 )
 
 set(MPI_HEADER_FILES

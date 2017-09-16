@@ -25,7 +25,7 @@ across different compilers*/
 enum class action_t : int32_t
 {
 	//priority commands
-	cmd_disconnect = -3,  //!< command to disconnect a broker from a higher level broker
+	cmd_priority_disconnect = -3,  //!< command to disconnect a broker from a higher level broker
 	cmd_fed_ack = -25,  //!<a reply with the global id or an error if the fed registration failed
 
 	cmd_broker_ack = -27,  // a reply to the connect command with a global route id
@@ -40,7 +40,7 @@ enum class action_t : int32_t
 
 
 	cmd_ignore = 0, //!< null command
-	
+	cmd_disconnect=3, //!< disconnect command
 	cmd_init = 5,  //!< request entry to init mode
 	cmd_init_grant = 7,  //!< grant entry to initialization mode
 	cmd_init_not_ready = 8,  //!< retract an init ready command
@@ -98,6 +98,7 @@ enum class action_t : int32_t
 
 #define CMD_IGNORE action_message_def::action_t::cmd_ignore
 #define CMD_REG_BROKER action_message_def::action_t::cmd_reg_broker
+#define CMD_PRIORITY_DISCONNECT action_message_def::action_t::cmd_priority_disconnect
 #define CMD_DISCONNECT action_message_def::action_t::cmd_disconnect
 #define CMD_INIT action_message_def::action_t::cmd_init
 #define CMD_INIT_NOT_READY action_message_def::action_t::cmd_init_not_ready
@@ -167,5 +168,8 @@ inline bool hasInfo(action_message_def::action_t action)
 {
 	return ((action > action_message_def::action_t::null_info_command) || (action < action_message_def::action_t::priority_null_info_command));
 }
+
+std::string actionMessageType(action_message_def::action_t action);
+
 }  // namespace helics
 #endif  // ACTION_MESSAGE_DEFINITIONS_

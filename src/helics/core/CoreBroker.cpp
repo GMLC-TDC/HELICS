@@ -179,6 +179,7 @@ void CoreBroker::addCommand(ActionMessage &&m)
 void CoreBroker::processPriorityCommand (const ActionMessage &command)
 {
     // deal with a few types of message immediately
+	std::cout << "broker " << global_broker_id << "||priority_cmd:" << actionMessageType(command.action()) << " from " << command.source_id << '\n';
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -369,7 +370,7 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
         }
     }
     break;
-	case CMD_DISCONNECT:
+	case CMD_PRIORITY_DISCONNECT:
 	{
 		auto brkNum = getBrokerById(command.source_id);
 		if (brkNum >= 0)
@@ -380,7 +381,7 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
 		{
 			if (!_isRoot)
 			{
-				ActionMessage dis(CMD_DISCONNECT);
+				ActionMessage dis(CMD_PRIORITY_DISCONNECT);
 				dis.source_id = global_broker_id;
 				transmit(0, dis);
 			}
@@ -410,6 +411,7 @@ void CoreBroker::transmitDelayedMessages ()
 
 void CoreBroker::processCommand (ActionMessage &command)
 {
+	std::cout << "broker " << global_broker_id << "||cmd:" << actionMessageType(command.action()) << " from " << command.source_id << '\n';
     switch (command.action ())
     {
     case CMD_IGNORE:
@@ -482,6 +484,25 @@ void CoreBroker::processCommand (ActionMessage &command)
 			}
 		}
         break;
+	case CMD_DISCONNECT:
+	{
+		auto brkNum = getBrokerById(command.source_id);
+		if (brkNum >= 0)
+		{
+			_brokers[brkNum]._disconnected = true;
+		}
+		if (allDisconnected())
+		{
+			if (!_isRoot)
+			{
+				ActionMessage dis(CMD_DISCONNECT);
+				dis.source_id = global_broker_id;
+				transmit(0, dis);
+			}
+			addCommand(CMD_STOP);
+		}
+	}
+	break;
 	case CMD_STOP:
 		if ((!allDisconnected())&&(!_isRoot))
 		{ //only send a disconnect message if we haven't done so already

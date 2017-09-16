@@ -1651,6 +1651,7 @@ void CommonCore::queueProcessingLoop ()
 void CommonCore::processPriorityCommand(const ActionMessage &command)
 {
     // deal with a few types of message immediately
+	std::cout << "core " << global_broker_id << "||priority_cmd:" << actionMessageType(command.action()) << " from " << command.source_id << '\n';
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -1698,7 +1699,7 @@ void CommonCore::processPriorityCommand(const ActionMessage &command)
         // TODO:: double check this
         addRoute (command.dest_handle, command.payload);
         break;
-	case CMD_DISCONNECT:
+	case CMD_PRIORITY_DISCONNECT:
 		if (allDisconnected())
 		{
 			coreState = core_state_t::terminated;
@@ -1743,6 +1744,7 @@ void CommonCore::transmitDelayedMessages ()
 void CommonCore::processCommand (ActionMessage &command)
 {
     // LOG (INFO) << "\"\"\"" << command << std::endl << "\"\"\"" << ENDL
+	std::cout <<"core "<<global_broker_id<< "||cmd:" << actionMessageType(command.action()) << " from " << command.source_id << '\n';
     switch (command.action ())
     {
     case CMD_IGNORE:
@@ -1783,6 +1785,16 @@ void CommonCore::processCommand (ActionMessage &command)
         }
     }
     break;
+	case CMD_DISCONNECT:
+		if (allDisconnected())
+		{
+			coreState = core_state_t::terminated;
+			ActionMessage dis(CMD_DISCONNECT);
+			dis.source_id = global_broker_id;
+			transmit(0, dis);
+			addCommand(CMD_STOP);
+		}
+		break;
 	case CMD_ADD_DEPENDENCY:
 	case CMD_REMOVE_DEPENDENCY:
 	case CMD_ADD_DEPENDENT:
@@ -1800,7 +1812,7 @@ void CommonCore::processCommand (ActionMessage &command)
 		if (command.dest_id == 0)
 		{
 			auto fed = getFederate(command.source_id);
-			if (fed == nullptr)
+			if (fed != nullptr)
 			{
 				auto pubInfo = fed->getPublication(command.source_handle);
 				if (pubInfo != nullptr)

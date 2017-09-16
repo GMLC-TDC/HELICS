@@ -90,6 +90,7 @@ void TimeCoordinator::updateNextPossibleEventTime()
 	{
 		time_next = time_granted + info.timeDelta + info.lookAhead;
 		time_next = std::max(time_next, time_minminDe + info.impactWindow + info.lookAhead);
+		time_next = std::min(time_next, time_exec);
 	}
 	else
 	{

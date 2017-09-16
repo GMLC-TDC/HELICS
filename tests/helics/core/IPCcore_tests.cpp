@@ -16,6 +16,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "boost/interprocess/ipc/message_queue.hpp"
 #include "helics/core/ipc/IpcComms.h"
 #include "helics/core/ActionMessage.h"
+
+#include "helics/core/ipc/IpcQueueHelper.h"
+
 //#include "boost/process.hpp"
 #include <future>
 
@@ -31,36 +34,19 @@ BOOST_AUTO_TEST_CASE(ipccomms_broker_test)
 	std::string localLoc = "localIPC";
 	helics::IpcComms comm(localLoc,brokerLoc);
 
-	std::unique_ptr<boost::interprocess::message_queue> mq;
-	try
-	{
-		mq = std::make_unique<boost::interprocess::message_queue>(boost::interprocess::create_only, brokerLoc.c_str(), 1024, 1024);
-	}
-	catch (boost::interprocess::interprocess_exception &ipe)
-	{
-		boost::interprocess::message_queue::remove(brokerLoc.c_str());
-		mq = std::make_unique<boost::interprocess::message_queue>(boost::interprocess::create_only, brokerLoc.c_str(), 1024, 1024);
-	}
-
+	helics::ownedQueue mq;
+	bool mqConn=mq.connect(brokerLoc, 1024, 1024);
+	BOOST_REQUIRE(mqConn);
+	
 	comm.setCallback([&counter](helics::ActionMessage m) {++counter; });
 
 	bool connected=comm.connect();
 	BOOST_REQUIRE(connected);
 	comm.transmit(0,helics::CMD_IGNORE);
 
-	char data[1024];
-	size_t sz=0;
-	unsigned int pri;
-	while (sz < 32)
-	{
-		mq->receive(data, 1024, sz, pri);
-	}
-	
-	BOOST_CHECK_GT(sz, 32);
-	helics::ActionMessage rM(data, sz);
+	helics::ActionMessage rM = mq.getMessage(-1);
 	BOOST_CHECK(rM.action() == helics::action_message_def::action_t::cmd_ignore);
 	comm.disconnect();
-	boost::interprocess::message_queue::remove(brokerLoc.c_str());
 }
 
 BOOST_AUTO_TEST_CASE(ipccomms_rx_test)
@@ -71,17 +57,16 @@ BOOST_AUTO_TEST_CASE(ipccomms_rx_test)
 	std::string localLoc = "localIPC";
 	helics::IpcComms comm(localLoc,brokerLoc);
 
-	std::unique_ptr<boost::interprocess::message_queue> mq;
-	
 	comm.setCallback([&counter, &act](helics::ActionMessage m) {++counter; act = m; });
 
 	bool connected = comm.connect();
 	BOOST_REQUIRE(connected);
-	mq = std::make_unique<boost::interprocess::message_queue>(boost::interprocess::open_only, localLoc.c_str());
-	
+	helics::sendToQueue mq;
+	mq.connect(localLoc, true, 2);
+
 	helics::ActionMessage cmd(helics::CMD_ACK);
-	std::string buffer = cmd.to_string();
-	mq->send(buffer.data(), buffer.size(), 2);
+	
+	mq.sendMessage(cmd, 1);
 	std::this_thread::sleep_for(std::chrono::milliseconds(250));
 	BOOST_REQUIRE_EQUAL(counter, 1);
 	BOOST_CHECK(act.action() == helics::action_message_def::action_t::cmd_ack);
@@ -97,8 +82,6 @@ BOOST_AUTO_TEST_CASE(ipcComm_transmit_through)
 	std::string brokerLoc = "brokerIPC";
 	std::string localLoc = "localIPC";
 	//just to make sure these are not already present from a failure
-	boost::interprocess::message_queue::remove(brokerLoc.c_str());
-	boost::interprocess::message_queue::remove(localLoc.c_str());
 	std::atomic<int> counter2{ 0 };
 	helics::ActionMessage act;
 	helics::ActionMessage act2;
@@ -209,29 +192,14 @@ BOOST_AUTO_TEST_CASE(ipccore_initialization_test)
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
-	std::unique_ptr<boost::interprocess::message_queue> mq;
-	try
-	{
 
-		mq=std::make_unique<boost::interprocess::message_queue>(boost::interprocess::create_only, "testbroker",1024,1024);
-	}
-	catch (boost::interprocess::interprocess_exception &ipe)
-	{
-		boost::interprocess::message_queue::remove("testbroker");
-		mq = std::make_unique<boost::interprocess::message_queue>(boost::interprocess::create_only, "testbroker", 1024, 1024);
-	}
+	helics::ownedQueue mq;
+	bool mqConn = mq.connect("testBroker", 1024, 1024);
+	BOOST_REQUIRE(mqConn);
+	
 	core->connect();
 
-	char data[1024];
-	size_t sz=0;
-	unsigned int pri;
-	while (sz < 31)
-	{
-		mq->receive(data, 1024, sz, pri);
-	}
-	
-	BOOST_CHECK_GT(sz, 31);
-	helics::ActionMessage rM(data, sz);
+	helics::ActionMessage rM = mq.getMessage(-1);
 	BOOST_CHECK_EQUAL(rM.name, "core1");
 	BOOST_CHECK(rM.action() == helics::action_message_def::action_t::cmd_reg_broker);
 	core->disconnect();
