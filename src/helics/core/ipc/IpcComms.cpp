@@ -163,8 +163,7 @@ IpcComms::~IpcComms()
 						continue;
 					}
 					case DISCONNECT:
-						tx_status = connection_status::terminated;
-						return;
+						goto DISCONNECT_TX_QUEUE;
 					}
 				}
 			}
@@ -210,6 +209,7 @@ IpcComms::~IpcComms()
 			}
 
 		}
+	  DISCONNECT_TX_QUEUE:
 		tx_status = connection_status::terminated;
 	}
 	

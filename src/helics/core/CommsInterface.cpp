@@ -74,7 +74,7 @@ bool CommsInterface::connect()
 	}
 	queue_watcher = std::thread([this] {queue_rx_function(); });
 	queue_transmitter = std::thread([this] {queue_tx_function(); });
-
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	while (rx_status == connection_status::startup)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));

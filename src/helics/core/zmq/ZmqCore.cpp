@@ -40,11 +40,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define ENDL std::endl
 #endif
 
-static const std::string DEFAULT_BROKER = "tcp://localhost";
-constexpr int defaultBrokerREPport = 23405;
-constexpr int defaultBrokerPULLport = 23406;
-
-
 namespace helics
 {
 using namespace std::string_literals;

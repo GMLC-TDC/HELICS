@@ -149,7 +149,6 @@ int ZmqComms::processIncomingMessage(zmq::message_t &msg)
 		std::string str(static_cast<char *>(msg.data()), msg.size());
 		if (str == "close")
 		{
-			rx_status = connection_status::terminated;
 			return (-1);
 		}
 	}
@@ -159,7 +158,6 @@ int ZmqComms::processIncomingMessage(zmq::message_t &msg)
 		switch (M.index)
 		{
 		case CLOSE_RECEIVER:
-			rx_status = connection_status::terminated;
 			return (-1);
 		default:
 			break;
@@ -198,7 +196,6 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 		}
 		break;
 		case CLOSE_RECEIVER:
-			rx_status = connection_status::terminated;
 			return (-1);
 		default:
 			M.index = NULL_REPLY;
@@ -292,7 +289,7 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 					auto status = processIncomingMessage(msg);
 					if (status < 0)
 					{
-						return;
+						break;
 					}
 
 				}
@@ -302,7 +299,7 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 					auto status = processIncomingMessage(msg);
 					if (status < 0)
 					{
-						return;
+						break;
 					}
 					
 				}
@@ -312,7 +309,7 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 					auto status = replyToIncomingMessage(msg,repSocket);
 					if (status < 0)
 					{
-						return;
+						break;
 					}
 					continue;
 				}
@@ -600,8 +597,7 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 					}
 					break;
 					case DISCONNECT:
-						tx_status = connection_status::terminated;
-						return;
+						goto CLOSE_TX_LOOP;  //break out of loop
 					}
 				}
 			}
@@ -650,11 +646,15 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock)
 				}
 			}
 		}
-
+CLOSE_TX_LOOP:
 		brokerPushSocket.close();
 		
 		routes.clear();
-		controlSocket.send("close");
+		if (rx_status == connection_status::connected)
+		{
+			controlSocket.send("close");
+		}
+		
 		controlSocket.close();
 		
 		tx_status = connection_status::terminated;

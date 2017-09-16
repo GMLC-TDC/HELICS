@@ -489,6 +489,8 @@ void CoreBroker::processCommand (ActionMessage &command)
 		auto brkNum = getBrokerById(command.source_id);
 		if (brkNum >= 0)
 		{
+			auto lock = (_operating) ? std::unique_lock<std::mutex>(mutex_, std::defer_lock) :
+				std::unique_lock<std::mutex>(mutex_);
 			_brokers[brkNum]._disconnected = true;
 		}
 		if (allDisconnected())
@@ -1311,6 +1313,8 @@ bool CoreBroker::allInitReady () const
 bool CoreBroker::allDisconnected () const
 {
     // all subBrokers must be disconnected
+	auto lock = (_operating) ? std::unique_lock<std::mutex>(mutex_, std::defer_lock) :
+		std::unique_lock<std::mutex>(mutex_);
     for (auto &brk : _brokers)
     {
         if (!brk._disconnected)

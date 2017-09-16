@@ -95,6 +95,10 @@ void ZmqBroker::InitializeFromArgs(int argc, char *argv[])
 				brokerPushPort = brkprt.second;
 
 			}
+			if (brokerAddress == "tcp://*")
+			{ //the broker address can't use a wild card
+				brokerAddress = "tcp://127.0.0.1";
+			}
 		}
 		if (vm.count("local_interface") > 0)
 		{

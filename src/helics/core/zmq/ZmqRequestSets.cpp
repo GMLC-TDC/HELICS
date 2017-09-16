@@ -78,7 +78,7 @@ bool ZmqRequestSets::checkForMessages(std::chrono::milliseconds timeout)
 		return false;
 	}
 	zmq::message_t msg;
-	for (int ii = 0; ii < active_routes.size(); ++ii)
+	for (size_t ii = 0; ii < active_routes.size(); ++ii)
 	{
 		if (active_routes[ii].revents&ZMQ_POLLIN)
 		{

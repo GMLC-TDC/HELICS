@@ -36,7 +36,9 @@ namespace helics
 		connectionName = stringTranslateToCppName(connection);
 		stateName = connectionName + "_state";
 		ipc_queue::remove(connectionName.c_str());
+		
 		ipc_state::remove(stateName.c_str());
+		
 		try
 		{
 			queue_state = std::make_unique<ipc_state>(ipc::create_only, stateName.c_str(), ipc::read_write);
