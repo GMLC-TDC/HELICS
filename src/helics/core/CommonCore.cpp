@@ -459,6 +459,8 @@ bool CommonCore::allInitReady () const
 
 bool CommonCore::allDisconnected () const
 {
+	auto lock = (coreState == operating) ? std::unique_lock<std::mutex>(_mutex, std::defer_lock) :
+		std::unique_lock<std::mutex>(_mutex);
     // all federates must have hit finished state
     for (auto &fed : _federates)
     {
