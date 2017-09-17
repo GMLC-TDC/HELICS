@@ -81,7 +81,7 @@ int32_t FederateState::getCurrentIteration() const { return timeCoord->getCurren
 void FederateState::setParent(CommonCore *coreObject)
 {
 	parent_ = coreObject;
-	timeCoord->setMessageSender([coreObject](const ActionMessage &msg) {coreObject->addCommand(msg); });
+	timeCoord->setMessageSender([coreObject](const ActionMessage &msg) {coreObject->addActionMessage(msg); });
 
 }
 

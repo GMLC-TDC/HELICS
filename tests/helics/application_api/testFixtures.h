@@ -19,8 +19,8 @@ struct ValueFederateTestFixture
 	ValueFederateTestFixture() = default;
 	~ValueFederateTestFixture();
 
-    void Setup1FederateTest(const std::string &core_type_name, helics::Time time_delta = helics::timeZero);
-    void Setup2FederateTest(const std::string &core_type_name, helics::Time time_delta = helics::timeZero);
+    void Setup1FederateTest(std::string core_type_name, helics::Time time_delta = helics::timeZero);
+    void Setup2FederateTest(std::string core_type_name, helics::Time time_delta = helics::timeZero);
 
     void StartBroker(const std::string &core_type_name, const std::string &initialization_string);
 
@@ -44,4 +44,17 @@ struct MessageFederateTestFixture
     std::shared_ptr<helics::MessageFederate> mFed2;
 };
 
+
+struct MultipleValueFederateTestFixture
+{
+	MultipleValueFederateTestFixture() = default;
+	~MultipleValueFederateTestFixture();
+
+	void SetupFederateTests(std::string core_type_name, int cnt, helics::Time time_delta = helics::timeZero);
+
+	void StartBroker(const std::string &core_type_name, const std::string &initialization_string);
+
+	std::shared_ptr<helics::CoreBroker> broker;
+	std::vector<std::shared_ptr<helics::ValueFederate>> federates;
+};
 #endif

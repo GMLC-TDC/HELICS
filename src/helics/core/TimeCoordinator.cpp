@@ -449,6 +449,8 @@ bool TimeCoordinator::processExecRequest(ActionMessage &cmd)
 		ofed->exec_requested = false;
 		ofed->exec_iterating = !cmd.iterationComplete;
 		break;
+	default:
+		return false;
 	}
 	return true;
 }
@@ -477,6 +479,8 @@ bool TimeCoordinator::processExternalTimeMessage(ActionMessage &cmd)
 		ofed->Te = cmd.actionTime;
 		ofed->Tdemin = cmd.actionTime;
 		break;
+	default:
+		return false;
 	}
 	return true;
 }

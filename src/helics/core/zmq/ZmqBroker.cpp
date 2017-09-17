@@ -128,7 +128,7 @@ bool ZmqBroker::brokerConnect()
 		setAsRoot();
 	}
 	comms = std::make_unique<ZmqComms>(localInterface, brokerAddress);
-	comms->setCallback([this](ActionMessage M) {addCommand(std::move(M)); });
+	comms->setCallback([this](ActionMessage M) {addActionMessage(std::move(M)); });
 	comms->setName(getIdentifier());
 	if ((repPortNumber > 0) || (pullPortNumber > 0))
 	{

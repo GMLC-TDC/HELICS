@@ -48,7 +48,7 @@ ZmqCore::~ZmqCore() = default;
 
 ZmqCore::ZmqCore (const std::string &core_name) : CommonCore (core_name) {}
 
-void ZmqCore::initializeFromArgs (int argc, char *argv[])
+void ZmqCore::InitializeFromArgs (int argc, char *argv[])
 {
     namespace po = boost::program_options;
     if (coreState == created)
@@ -122,7 +122,7 @@ void ZmqCore::initializeFromArgs (int argc, char *argv[])
 			}
 		}
         
-        CommonCore::initializeFromArgs (argc, argv);
+        CommonCore::InitializeFromArgs (argc, argv);
     }
 }
 
@@ -133,7 +133,7 @@ bool ZmqCore::brokerConnect ()
 		brokerAddress = "tcp://127.0.0.1";
 	}
 	comms = std::make_unique<ZmqComms>(localInterface, brokerAddress);
-	comms->setCallback([this](ActionMessage M) {addCommand(std::move(M)); });
+	comms->setCallback([this](ActionMessage M) {addActionMessage(std::move(M)); });
 	comms->setName(getIdentifier());
 	if ((repPortNumber > 0)||(pullPortNumber>0))
 	{

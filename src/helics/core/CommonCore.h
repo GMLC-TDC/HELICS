@@ -8,6 +8,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 #ifndef _HELICS_COMMON_CORE_
 #define _HELICS_COMMON_CORE_
+#pragma once
 
 #include "helics/config.h"
 #include "helics-time.h"
@@ -15,6 +16,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/common/simpleQueue.hpp"
 #include "helics/core/core.h"
 #include "core/ActionMessage.h"
+#include "BrokerBase.h"
 
 #include <cstdint> 
 #include <thread> 
@@ -38,7 +40,7 @@ enum BasicHandleType:char;
 @details the CommonCore is virtual class that manages local federates and handles most of the
 interaction between federate it is meant to be instantiated for specific interfederate communication
 strategies*/
-class CommonCore : public Core {
+class CommonCore : public Core, public BrokerBase {
 
 public:
 
@@ -53,7 +55,7 @@ CommonCore(const std::string &core_name);
   @param[in] argc the number of arguments
   @param[in] argv char pointers to the arguments
   */
-  virtual void initializeFromArgs(int argc, char *argv[]);
+  virtual void InitializeFromArgs(int argc, char *argv[]) override;
   virtual bool isInitialized () const override final;
   virtual bool isJoinable() const override final; 
   virtual void error (federate_id_t federateID, int errorCode=-1) override final;
@@ -113,10 +115,7 @@ CommonCore(const std::string &core_name);
 
   /** get a string representing the connection info to send data to this object*/
   virtual std::string getAddress() const=0;
-  /** add a command to the process queue*/
- void addCommand(const ActionMessage &m);
- /** move a command into the commandQueue*/
- void addCommand(ActionMessage &&m);
+
  virtual bool connect() override final;
  virtual bool isConnected() const override final;
  virtual void disconnect() override final;
@@ -128,18 +127,12 @@ private:
 	*/
 	virtual void brokerDisconnect() = 0;
 protected:
-	/** start main broker loop*/
-  void queueProcessingLoop();
-  /** process a single command action
-  @details cmd may be modified by this function*/
-  virtual void processCommand(ActionMessage &cmd);
-  /** function to process a priority command independent of the main queue
-  @detailed called when processing a priority command.  The priority command has a response message which gets sent
-  this mainly deals with some of the registration functions
-  @param[in] command the command to process
-  @return a action message response to the priority command 
-  */
-  void processPriorityCommand(const ActionMessage &command);
+
+  virtual void processCommand(ActionMessage &&cmd) override final;
+  
+  virtual void processPriorityCommand(const ActionMessage &command) override final;
+
+  virtual void processDisconnect() override final;
   /** transit an ActionMessage to another core or broker
   @param route_id the identifier for the route information to send the message to
   @param[in] cmd the actionMessage to send*/
@@ -165,20 +158,16 @@ protected:
   bool allInitReady() const;
   /** check if all federates have said good-bye*/
   bool allDisconnected() const;
-  /** sendaMessage to the logging system
-  */
-  void sendToLogger(federate_id_t federateID, int logLevel, const std::string &name, const std::string &message) const;
+
+
+  virtual bool sendToLogger(federate_id_t federateID, int logLevel, const std::string &name, const std::string &message) const override;
 private:
-	std::atomic<int32_t> global_broker_id{ 0 };  //!< global identifier for the broker
-	int maxLogLevel=1;  //!< the logging level to use levels >=this will be logged
-	std::string identifier;  //!< an identifier for the broker
 	std::string prevIdentifier;  //!< storage for the case of requiring a renaming
-	BlockingQueue2<ActionMessage> _queue; //!< primary routing queue
+	
 	std::map<Core::federate_id_t, Core::federate_id_t> global_id_translation; //!< map to translate global ids to local ones
 	std::map<Core::federate_id_t, int32_t> routing_table;  //!< map for external routes  <global federate id, route id>
 	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delays for a certain time
 	std::unordered_map<std::string, int32_t> knownExternalEndpoints; //!< external map for all known external endpoints with names and route
-	std::unique_ptr<logger> loggingObj;  //!< default logging object to use if the logging callback is not specified
 
 	/** actually transmit messages that were delayed until the core was actually registered*/
 	void transmitDelayedMessages();
@@ -205,10 +194,6 @@ protected:
 	std::vector<std::unique_ptr<FederateState>> _federates; //!< local federate information
 														  //using pointers to minimize time in a critical section- though this should be timed more in the future
   std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
-  int32_t _min_federates;  //!< the minimum number of federates that must connect before entering init mode
-  int32_t _max_iterations; //!< the maximum allowable number of iterations
-  std::thread _queue_processing_thread;	//!< thread for processing the queue
-  std::string logFile;  //!< file to log to
   std::atomic<Core::Handle> handleCounter{ 1 };	//!< counter for the handle index
   
   std::unordered_map<std::string, Handle> publications;	//!< map of all local publications
@@ -219,7 +204,7 @@ protected:
   mutable std::mutex _mutex; //!< mutex protecting the federate creation and modification
   mutable std::mutex _handlemutex; //!< mutex protecting the publications and subscription structures
 /** a logging function for logging or printing messages*/
-  std::function<void(int, const std::string &, const std::string &)> loggerFunction;
+  
 protected:
 	/** add a message to the queue*/
 	void queueMessage(ActionMessage &m);
@@ -262,43 +247,6 @@ protected:
   void organizeFilterOperations();
 };
 
-//just enumerating some print levels 
-enum print_level : int
-{
-	no_print = 0,  //!< never print
-	error = 1,  //!< only print errors
-	warning = 2,  //!< print/log warning and errors
-	normal = 3,  //!< defualt print level
-	debug = 4,  //!< debug level prints
-	trace = 5,  //!< trace level printing
-};
-
-#define LOG_ERROR(id,ident, message) sendToLogger (id,print_level::error,ident,message);
-#define LOG_WARNING(id, ident, message) sendToLogger (id,print_level::warning,ident,message);
-
-#define LOG_ENABLE
-#define DEBUG_LOG_ENABLE
-#define TRACE_LOG_ENABLE
-
-#ifdef LOG_ENABLE
-#define LOG_NORMAL(id, ident, message) if (maxLogLevel>=print_level::normal){sendToLogger (id,print_level::normal,ident,message);}
-
-#ifdef DEBUG_LOG_ENABLE
-#define LOG_DEBUG(id, ident, message) if (maxLogLevel>=print_level::debug){sendToLogger (id,print_level::debug,ident,message);}
-#else
-#define LOG_DEBUG(id, ident, message)
-#endif
-
-#ifdef TRACE_LOG_ENABLE
-#define LOG_TRACE(id, ident, message) if (maxLogLevel>=print_level::trace){sendToLogger (id,print_level::debug,ident,message);}
-#else
-#define LOG_TRACE(id, ident, message)
-#endif
-#else
-#define LOG_NORMAL(id, ident, message)
-#define LOG_DEBUG(id, ident, message)
-#define LOG_TRACE(id,ident,message)
-#endif
 
 } // namespace helics
  

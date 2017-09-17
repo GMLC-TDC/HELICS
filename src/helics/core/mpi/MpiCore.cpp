@@ -53,7 +53,7 @@ MpiCore::~MpiCore()
 
 }
 
-void MpiCore::initializeFromArgs(int argc, char *argv[])
+void MpiCore::InitializeFromArgs(int argc, char *argv[])
 {
 	namespace po = boost::program_options;
 	if (coreState == created)
@@ -76,7 +76,7 @@ void MpiCore::initializeFromArgs(int argc, char *argv[])
 			fileloc = vm["fileloc"].as<std::string>();
 		}
 
-		CommonCore::initializeFromArgs(argc, argv);
+		CommonCore::InitializeFromArgs(argc, argv);
 	}
 }
 
@@ -99,7 +99,7 @@ bool MpiCore::brokerConnect()
 	}
 
 	comms = std::make_unique<MpiComms>(fileloc, brokerloc);
-	comms->setCallback([this](ActionMessage M) {addCommand(std::move(M)); });
+	comms->setCallback([this](ActionMessage M) {addActionMessage(std::move(M)); });
 	return comms->connect();
 }
 

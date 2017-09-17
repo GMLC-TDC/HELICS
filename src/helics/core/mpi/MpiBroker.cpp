@@ -72,7 +72,7 @@ bool MpiBroker::brokerConnect()
 {
 
 	comms = std::make_unique<MpiComms>("", "");
-	comms->setCallback([this](ActionMessage M) {addCommand(std::move(M)); });
+	comms->setCallback([this](ActionMessage M) {addActionMessage(std::move(M)); });
 	//comms->setMessageSize(maxMessageSize, maxMessageCount);
 	return comms->connect();
 }

@@ -33,7 +33,7 @@ static const argDescriptors extraArgs
 	{ "brokerinit"s, "string"s, "the initialization string for the broker"s }
 };
 
-void TestCore::initializeFromArgs (int argc, char *argv[])
+void TestCore::InitializeFromArgs (int argc, char *argv[])
 {
     namespace po = boost::program_options;
     bool exp = false;
@@ -64,7 +64,7 @@ void TestCore::initializeFromArgs (int argc, char *argv[])
     }
     if (coreState == created)
     {
-        CommonCore::initializeFromArgs (argc, argv);
+        CommonCore::InitializeFromArgs (argc, argv);
     }
 }
 
@@ -93,7 +93,7 @@ void TestCore::transmit (int route_id, const ActionMessage &cmd)
 {
     if (route_id == 0)
     {
-        tbroker->addCommand (cmd);
+        tbroker->addActionMessage (cmd);
         return;
     }
     auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (routeMutex, std::defer_lock) :
@@ -101,17 +101,17 @@ void TestCore::transmit (int route_id, const ActionMessage &cmd)
     auto brkfnd = brokerRoutes.find (route_id);
     if (brkfnd != brokerRoutes.end ())
     {
-        brkfnd->second->addCommand (cmd);
+        brkfnd->second->addActionMessage (cmd);
         return;
     }
     auto crfnd = coreRoutes.find (route_id);
     if (crfnd != coreRoutes.end ())
     {
-        crfnd->second->addCommand (cmd);
+        crfnd->second->addActionMessage (cmd);
         return;
     }
 
-    tbroker->addCommand (cmd);
+    tbroker->addActionMessage (cmd);
 }
 
 void TestCore::addRoute (int route_id, const std::string &routeInfo)

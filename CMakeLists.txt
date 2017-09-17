@@ -129,6 +129,15 @@ ELSE ()
 set(CMAKE_CXX_STANDARD 14)
 ENDIF ()
 
+# ------------------------------------------------------------
+# Enable message logging
+# -------------------------------------------------------------
+OPTION(LOGGING_ENABLED "enable non-warning/error logging messages" ON)
+
+IF(LOGGING_ENABLE)
+OPTION(DEBUG_LOGGING_ENABLED "enable debug logging messages(Note: logging is still controlled via program options this is for program size and speed)" ON)
+OPTION(TRACE_LOGGING_ENABLED "enable trace logging messages(Note: logging is still controlled via program options this is for program size and speed)" ON)
+ENDIF(LOGGING_ENABLE)
 
 option (HELICS_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
 

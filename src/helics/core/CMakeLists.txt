@@ -7,6 +7,7 @@
 set(SRC_FILES
     CoreFactory.cpp
 	BrokerFactory.cpp
+	BrokerBase.cpp
     TestCore.cpp
 	CommonCore.cpp
 	FederateState.cpp
@@ -42,11 +43,13 @@ set (ZMQ_SOURCE_FILES
 set(INCLUDE_FILES
     core-c.h
     core-data.h
+	BrokerBase.h
     CoreFactory.h
 	BrokerFactory.h
 	DependencyInfo.h
 	core-exceptions.h
 	TimeCoordinator.h
+	loggingHelper.hpp
     core.h
     core-types.h
     helics-time.h

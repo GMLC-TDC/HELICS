@@ -25,7 +25,7 @@ public:
   IpcCore(const std::string &core_name);
   /** destructor*/
   ~IpcCore();
-  virtual void initializeFromArgs (int argc, char *argv[]) override;
+  virtual void InitializeFromArgs (int argc, char *argv[]) override;
          
   virtual void transmit(int route_id, const ActionMessage &cmd) override;
   virtual void addRoute(int route_id, const std::string &routeInfo) override;

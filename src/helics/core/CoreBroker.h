@@ -23,7 +23,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "common/BlockingQueue.hpp"
 #include "common/simpleQueue.hpp"
 #include "DependencyInfo.h"
-
+#include "BrokerBase.h"
 namespace helics
 {
 /** class defining the common information for a federate*/
@@ -68,7 +68,7 @@ constexpr Core::federate_id_t global_broker_id_shift = 0x7000'0000;
 Basically acts as a router for information,  deals with stuff internally if it can and sends higher up if it can't
 or does something else if it is the root of the tree
 */
-class CoreBroker
+class CoreBroker : public BrokerBase
 {
 protected:
 	std::atomic<bool> _operating{ false }; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
@@ -77,16 +77,13 @@ protected:
 	bool _hasEndpoints = false; //!< set to true if the broker has endpoints;  
 private:
 	bool _isRoot = false;  //!< set to true if this object is a root broker
-	std::atomic<int32_t> global_broker_id{ 0 };  //!< the identifier for the broker
-	int maxLogLevel = 1;  //!< the max level to log
+	
 	std::vector<std::pair<Core::federate_id_t, bool>> localBrokersInit; //!< indicator if the local brokers are ready to init
 	std::vector<BasicFedInfo> _federates; //!< container for all federates
 	std::vector<BasicHandleInfo> _handles; //!< container for the basic info for all handles
 	std::vector<BasicBrokerInfo> _brokers;  //!< container for the basic broker info for all subbrokers
-	std::unique_ptr<logger> loggingObj;  //!< default logging object to use if the logging callback is not specified
-	std::string local_broker_identifier;  //!< a randomly generated string  or assigned name for initial identification of the broker
 	std::string previous_local_broker_identifier; //!< the previous identifier in case a rename is required
-	BlockingQueue2<ActionMessage> _queue; //!< primary routing queue
+	
 	std::unordered_map<std::string, int32_t> fedNames;  //!< a map to lookup federates <fed name, local federate index>
 	std::unordered_map<std::string, int32_t> brokerNames;  //!< a map to lookup brokers <broker name, local broker index>
 	std::unordered_map<std::string, int32_t> publications; //!< map of publications;
@@ -100,11 +97,7 @@ private:
 	std::map<Core::federate_id_t, int32_t> broker_table;  //!< map for translating global broker id's to a local index
 	std::map<Core::federate_id_t, int32_t> federate_table; //!< map for translating global federate id's to a local index
 	std::unordered_map<std::string, int32_t> knownExternalEndpoints; //!< external map for all known external endpoints with names and route
-	std::thread _queue_processing_thread;  //!< thread for running the broker
-	/** a logging function for logging or printing messages*/
-	std::function<void(int, const std::string &, const std::string &)> loggerFunction;
-	std::string logFile; //< the file to log message to
-	std::unique_ptr<TimeCoordinator> timeCoord; //!< object managing the time control
+	
 protected:
 	/** enumeration of the possible core states*/
 	enum broker_state_t :int
@@ -119,22 +112,19 @@ protected:
 	};
 	std::atomic<broker_state_t> brokerState{ created }; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
 private:
-	int32_t _min_federates=1;  //!< storage for the min number of federates
-	int32_t _min_brokers=1;	//!< storage for the min number of brokers before starting
+
 	mutable std::mutex mutex_;  //!< mutex lock for the federate information that could come in from multiple sources
-	/** primary thread executable --the function that continually loops to process all the messages
-	*/
-	void queueProcessingLoop();
+	
 	/** function that processes all the messages
 	@param[in] command -- the message to process
 	*/
-	virtual void processCommand(ActionMessage &command);
+	virtual void processCommand(ActionMessage &&command) override;
 	/** function to process a priority command independent of the main queue
 	@detailed called from addMessage function which detects if the command is a priority command
 	this mainly deals with some of the registration functions
 	@param[in] command the command to process
 	*/
-	void processPriorityCommand(const ActionMessage &command);
+	void processPriorityCommand(const ActionMessage &command) override;
 
 	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
 	/* function to transmit the delayed messages*/
@@ -148,6 +138,8 @@ public:
 	/** disconnect the broker from any other brokers and communications
 	*/
 	void disconnect();
+	
+	virtual void processDisconnect() override final;
 	/** check if the broker is connected*/
 	bool isConnected() const;
 	/** set the broker to be a root broker
@@ -179,6 +171,7 @@ protected:
 	@param[in] routeInfo  a string describing the connection info
 	*/
 	virtual void addRoute(int route_id, const std::string &routeInfo) = 0;
+
 public:
 	/**default constructor
 	@param isRoot  set to true to indicate this object is a root broker*/
@@ -191,10 +184,8 @@ public:
 	void Initialize(const std::string &initializationString);
 	/** initialize from command line arguments
 	*/
-	virtual void InitializeFromArgs(int argc, char *argv[]);
-	/** add a message to the queue to process*/
-	void addCommand(const ActionMessage &m);
-	void addCommand(ActionMessage &&m);
+	virtual void InitializeFromArgs(int argc, char *argv[]) override;
+
 	/** check if all the local federates are ready to be initialized
 	@return true if everyone is ready, false otherwise
 	*/
@@ -205,15 +196,11 @@ public:
 	/** get the local identification for the broker*/
 	const std::string &getIdentifier() const
 	{
-		return local_broker_identifier;
+		return identifier;
 	}
 
 	virtual std::string getAddress() const = 0;
 
-	void setLogger(std::function<void(int, const std::string &, const std::string &)> logFunction)
-	{
-		loggerFunction = std::move(logFunction);
-	}
 private:
 	void checkSubscriptions();
 	bool FindandNotifySubscriptionPublisher(BasicHandleInfo &handleInfo);

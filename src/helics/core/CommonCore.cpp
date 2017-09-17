@@ -20,6 +20,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/common/stringToCmdLine.h"
 #include "helics/common/logger.h"
+#include "loggingHelper.hpp"
 #include "CoreFactory.h"
 #include "FilterFunctions.h"
 #include "helics/core/core-exceptions.h"
@@ -61,72 +62,25 @@ static void argumentParser (int argc, char *argv[], boost::program_options::vari
 
 CommonCore::CommonCore () noexcept {}
 
-CommonCore::CommonCore (const std::string &core_name) : identifier (core_name) {}
+CommonCore::CommonCore (const std::string &core_name) : BrokerBase (core_name) {}
 
 void CommonCore::initialize (const std::string &initializationString)
 {
     if ((coreState == created))  // don't do the compare exchange here since we do that in the initialize fromArgs
     {  // and we can tolerate a spurious call
         stringToCmdLine cmdline (initializationString);
-        initializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
+        InitializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
     }
 }
 
-void CommonCore::initializeFromArgs (int argC, char *argv[])
+void CommonCore::InitializeFromArgs (int argC, char *argv[])
 {
     namespace po = boost::program_options;
     core_state_t exp = created;
     if (coreState.compare_exchange_strong (exp, core_state_t::initialized))
     {
-        po::variables_map vm;
-        argumentParser (argC, argv, vm);
-        if (vm.count ("min") > 0)
-        {
-            _min_federates = vm["min"].as<int> ();
-        }
-		if (vm.count("minfed") > 0)
-		{
-			_min_federates = vm["minfed"].as<int>();
-		}
-        if (vm.count ("federates") > 0)
-        {
-            _min_federates = vm["federates"].as<int> ();
-        }
-
-        if (vm.count ("maxiter") > 0)
-        {
-            _max_iterations = vm["maxiter"].as<int> ();
-        }
-
-        if (vm.count ("name") > 0)
-        {
-            identifier = vm["name"].as<std::string> ();
-        }
-
-        if (vm.count ("identifier") > 0)
-        {
-            identifier = vm["identifier"].as<std::string> ();
-        }
-		if (vm.count("loglevel") > 0)
-		{
-			maxLogLevel = vm["loglevel"].as<int>();
-		}
-		if (vm.count("logfile"))
-		{
-			logFile = vm["logfile"].as<std::string>();
-
-		}
-        if (identifier.empty ())
-        {
-            identifier = gen_id ();
-        }
-		loggingObj = std::make_unique<logger>();
-		if (!logFile.empty())
-		{
-			loggingObj->openFile(logFile);
-		}
-		loggingObj->startLogging(maxLogLevel, maxLogLevel);
-        _queue_processing_thread = std::thread (&CommonCore::queueProcessingLoop, this);
+		BrokerBase::InitializeFromArgs(argC, argv);
+        
     }
 }
 
@@ -168,6 +122,11 @@ bool CommonCore::connect ()
 
 bool CommonCore::isConnected () const { return ((coreState == operating) || (coreState == connected)); }
 
+void CommonCore::processDisconnect()
+{
+	disconnect();
+}
+
 void CommonCore::disconnect ()
 {
     brokerDisconnect ();
@@ -199,109 +158,10 @@ void CommonCore::disconnect ()
     }
 }
 
-void argumentParser (int argc, char *argv[], boost::program_options::variables_map &vm_map)
-{
-    namespace po = boost::program_options;
-    po::options_description cmd_only ("command line only");
-    po::options_description config ("configuration");
-    po::options_description hidden ("hidden");
-
-    // clang-format off
-	// input boost controls
-	cmd_only.add_options()
-		("help,h", "produce help message")
-		("version,v", "helics version number")
-		("config-file", po::value<std::string>(), "specify a configuration file to use");
-
-
-	config.add_options()
-		("name,n", po::value<std::string>(), "name of the core")
-		("federates", po::value<int>(), "the minimum number of federates that will be connecting")
-		("minfed",po::value<int>(),"the minimum number of federates that will be connecting")
-		("maxiter",po::value<int>(),"maximum number of iterations")
-		("logfile",po::value<std::string>(),"the file to log message to")
-		("loglevel",po::value<int>(),"the level which to log the higher this is set to the more gets logs (-1) for no logging")
-		("fileloglevel",po::value<int>(),"the level at which messages get sent to the file")
-		("consoleloglevel",po::value<int>(),"the level at which message get sent to the console")
-		("identifier", po::value<std::string>(), "name of the core");
-		
-
-	hidden.add_options() ("min", po::value<int>(), "minimum number of federates");
-
-    // clang-format on
-
-    po::options_description cmd_line ("command line options");
-    po::options_description config_file ("configuration file options");
-    po::options_description visible ("allowed options");
-
-    cmd_line.add (cmd_only).add (config).add (hidden);
-    config_file.add (config);
-    visible.add (cmd_only).add (config);
-
-    po::positional_options_description p;
-    p.add ("min", -1);
-
-    po::variables_map cmd_vm;
-    try
-    {
-        po::store (
-          po::command_line_parser (argc, argv).options (cmd_line).positional (p).allow_unregistered ().run (),
-          cmd_vm);
-    }
-    catch (std::exception &e)
-    {
-        std::cerr << e.what () << std::endl;
-        throw (e);
-    }
-
-    po::notify (cmd_vm);
-
-    // objects/pointers/variables/constants
-
-
-    // program options control
-    if (cmd_vm.count ("help") > 0)
-    {
-        std::cout << visible << '\n';
-        return;
-    }
-
-    if (cmd_vm.count ("version") > 0)
-    {
-        std::cout << HELICS_VERSION_MAJOR << '.' << HELICS_VERSION_MINOR << '.' << HELICS_VERSION_PATCH << " (" << HELICS_DATE << ")\n";
-        return;
-    }
-
-
-    po::store (po::command_line_parser (argc, argv).options (cmd_line).positional (p).allow_unregistered ().run (),
-               vm_map);
-
-    if (cmd_vm.count ("config-file") > 0)
-    {
-        std::string config_file_name = cmd_vm["config-file"].as<std::string> ();
-        if (!boost::filesystem::exists (config_file_name))
-        {
-            std::cerr << "config file " << config_file_name << " does not exist\n";
-            throw (std::invalid_argument ("unknown config file"));
-        }
-        else
-        {
-            std::ifstream fstr (config_file_name.c_str ());
-            po::store (po::parse_config_file (fstr, config_file), vm_map);
-            fstr.close ();
-        }
-    }
-
-    po::notify (vm_map);
-}
 
 CommonCore::~CommonCore ()
 {
-    if (_queue_processing_thread.joinable ())
-    {
-        _queue.push (CMD_TERMINATE_IMMEDIATELY);
-        _queue_processing_thread.join ();
-    }
+    
 }
 
 FederateState *CommonCore::getFederate (federate_id_t federateID) const
@@ -401,7 +261,7 @@ void CommonCore::error (federate_id_t federateID, int errorCode)
     ActionMessage m (CMD_ERROR);
     m.source_id = fed->global_id;
     m.source_handle = errorCode;
-    addCommand(m);
+    addActionMessage(m);
     fed->addAction (m);
     convergence_state ret = convergence_state::complete;
     while (ret != convergence_state::error)
@@ -435,7 +295,7 @@ void CommonCore::finalize (federate_id_t federateID)
 			break;
 		}
 	}
-    addCommand(bye);
+    addActionMessage(bye);
 	
 }
 
@@ -497,7 +357,7 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
     {  // only enter this loop once per federate
         ActionMessage m (CMD_INIT);
         m.source_id = fed->global_id;
-        addCommand(m);
+        addActionMessage(m);
 
         auto check = fed->enterInitState ();
         if (check != convergence_state::complete)
@@ -842,12 +702,12 @@ Handle CommonCore::registerSubscription (federate_id_t federateID,
         lock.unlock ();
         m.processingComplete = true;
         // send to broker and core
-        addCommand (m);
+        addActionMessage (m);
         // now send the same command to the publication
         m.dest_handle = pubhandle;
         m.dest_id = pubid;
         // send to
-        addCommand (m);
+        addActionMessage (m);
         // now send the notification to the subscription
         ActionMessage notice (CMD_NOTIFY_PUB);
         notice.dest_id = fed->global_id;
@@ -860,7 +720,7 @@ Handle CommonCore::registerSubscription (federate_id_t federateID,
     {
         lock.unlock ();
         // we didn't find it so just pass it on to the broker
-        addCommand (m);
+        addActionMessage (m);
     }
 
     return id;
@@ -1091,18 +951,18 @@ Handle CommonCore::registerSourceFilter (federate_id_t federateID,
         lock.unlock ();
         m.processingComplete = true;
         // send to broker and core
-        addCommand (m);
+        addActionMessage (m);
         // now send the same command to the endpoint
         m.dest_handle = endhandle;
         m.dest_id = endid;
         // send to
-        addCommand (m);
+        addActionMessage (m);
     }
     else
     {
         lock.unlock ();
         //
-        addCommand (m);
+        addActionMessage (m);
     }
     return id;
 }
@@ -1152,18 +1012,18 @@ Handle CommonCore::registerDestinationFilter (federate_id_t federateID,
         lock.unlock ();
         m.processingComplete = true;
         // send to broker and core
-        addCommand (m);
+        addActionMessage (m);
         // now send the same command to the endpoint
         m.dest_handle = endhandle;
         m.dest_id = endid;
         // send to
-        addCommand (m);
+        addActionMessage (std::move(m));
     }
     else
     {
         lock.unlock ();
         //
-        addCommand (m);
+        addActionMessage (std::move(m));
     }
     return id;
 }
@@ -1333,7 +1193,7 @@ void CommonCore::queueMessage (ActionMessage &message)
 		auto localP = getLocalEndpoint(message.info().target);
 		if (localP == nullptr)
 		{  // must be a remote endpoint push it to the main queue to deal with
-			addCommand(message);
+			addActionMessage(message);
 			return;
 		}
 		if (localP->hasDestFilter)  // the endpoint has a destination filter
@@ -1350,13 +1210,13 @@ void CommonCore::queueMessage (ActionMessage &message)
 		}
 		message.dest_id = localP->fed_id;
 		message.dest_handle = localP->id;
-		addCommand(message);
+		addActionMessage(message);
 	}
 	break;
 	case CMD_SEND_FOR_FILTER:
 	case CMD_SEND_FOR_FILTER_OPERATION:
 	{
-		addCommand(message);
+		addActionMessage(message);
 	}
 	break;
 	default:
@@ -1439,36 +1299,21 @@ void CommonCore::logMessage (federate_id_t federateID, int logLevel, const std::
     sendToLogger (federateID, logLevel, fed->getIdentifier(), logMessage);
 }
 
-void CommonCore::sendToLogger (federate_id_t federateID,
+bool CommonCore::sendToLogger (federate_id_t federateID,
                                int logLevel,
                                const std::string &name,
                                const std::string &message) const
 {
-	if (federateID == 0)
-	{
-		if (logLevel > maxLogLevel)
-		{
-			//check the logging level
-			return;
-		}
-		if (loggerFunction)
-		{
-			loggerFunction(logLevel, name, message);
-		}
-		else if (loggingObj)
-		{
-			loggingObj->log(logLevel, name + "::" + message);
-		}
-	}
-	else
+	if (!BrokerBase::sendToLogger(federateID, logLevel, name, message))
 	{
 		auto fed = getFederate(federateID);
 		if (fed == nullptr)
 		{
-			throw (invalidIdentifier());
+			return false;
 		}
 		fed->logMessage(logLevel, name, message);
 	}
+	return true;
     
     
 }
@@ -1479,24 +1324,9 @@ void CommonCore::setLoggingCallback (
 {
 	if (federateID == 0)
 	{
-		std::unique_lock<std::mutex>   lock(_mutex);
-		loggerFunction = std::move(logFunction);
-		lock.unlock();
-		if (loggerFunction)
-		{
-			if (loggingObj)
-			{
-				if (loggingObj->isRunning())
-				{
-					loggingObj->haltLogging();
-				}
-			}
-		}
-		else if (!loggingObj->isRunning())
-		{
-			loggingObj->startLogging();
-		}
-		
+		std::lock_guard<std::mutex>   lock(_mutex);
+		setLoggerFunction(std::move(logFunction));
+
 	}
 	else
 	{
@@ -1549,7 +1379,7 @@ void CommonCore::setFilterOperator (Handle filter, std::shared_ptr<FilterOperato
 					cmd.dest_handle = endhandle;
 				}
 			}
-			addCommand(cmd);
+			addActionMessage(cmd);
 			
 		}
 		
@@ -1653,53 +1483,6 @@ std::string CommonCore::query(const std::string &target, const std::string &quer
 
 }
 
-void CommonCore::addCommand (const ActionMessage &m)
-{
-    if (isPriorityCommand (m))
-    {
-        processPriorityCommand (m);
-    }
-    else
-    {
-        // just route to the general queue;
-        _queue.push (m);
-    }
-}
-
-void CommonCore::addCommand(ActionMessage &&m)
-{
-	if (isPriorityCommand(m))
-	{
-		processPriorityCommand(m);
-	}
-	else
-	{
-		// just route to the general queue;
-		_queue.emplace(std::move(m));
-	}
-}
-
-void CommonCore::queueProcessingLoop ()
-{
-    while (true)
-    {
-        auto command = _queue.pop ();
-        // LOG (INFO) << "\"\"\"" << command << std::endl << "\"\"\"" << ENDL;
-
-        switch (command.action ())
-        {
-        case CMD_IGNORE:
-            break;
-		case CMD_TERMINATE_IMMEDIATELY:
-			return; //immediate return
-        case CMD_STOP:
-            processCommand (command);
-            return disconnect ();  // this can potential cause object destruction so do nothing after this call
-        default:
-            processCommand (command);
-        }
-    }
-}
 
 
 void CommonCore::processPriorityCommand(const ActionMessage &command)
@@ -1760,7 +1543,7 @@ void CommonCore::processPriorityCommand(const ActionMessage &command)
 			ActionMessage dis(CMD_DISCONNECT);
 			dis.source_id = global_broker_id;
 			transmit(0, dis);
-			addCommand(CMD_STOP);
+			addActionMessage(CMD_STOP);
 		}
 		break;
 		
@@ -1773,7 +1556,7 @@ void CommonCore::processPriorityCommand(const ActionMessage &command)
 		{
 			//make a copy and go through the regular processing
 			ActionMessage cmd(command);
-			processCommand(cmd);
+			processCommand(std::move(cmd));
 		}
 		
 	}
@@ -1795,7 +1578,7 @@ void CommonCore::transmitDelayedMessages ()
     }
 }
 
-void CommonCore::processCommand (ActionMessage &command)
+void CommonCore::processCommand (ActionMessage &&command)
 {
 	LOG_TRACE(0, getIdentifier(), (boost::format("|| cmd:%s from %d") % actionMessageType(command.action()) % command.source_id).str());
 	switch (command.action ())
@@ -1845,7 +1628,7 @@ void CommonCore::processCommand (ActionMessage &command)
 			ActionMessage dis(CMD_DISCONNECT);
 			dis.source_id = global_broker_id;
 			transmit(0, dis);
-			addCommand(CMD_STOP);
+			addActionMessage(CMD_STOP);
 		}
 		break;
 	case CMD_ADD_DEPENDENCY:

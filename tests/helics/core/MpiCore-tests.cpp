@@ -7,12 +7,17 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 #include <boost/test/unit_test.hpp>
 #include "testFixtures.h"
+#include "helics/config.h"
 
-/*BOOST_FIXTURE_TEST_SUITE (MpiCore_tests, mpiCoreTestFixture)
+#if HELICS_HAVE_MPI
+BOOST_FIXTURE_TEST_SUITE (MpiCore_tests, mpiCoreTestFixture)
 
 BOOST_AUTO_TEST_CASE(init_test)
 {
 
 }
 
-BOOST_AUTO_TEST_SUITE_END ()*/
+BOOST_AUTO_TEST_SUITE_END ()
+
+#endif
+

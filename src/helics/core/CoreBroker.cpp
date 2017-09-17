@@ -13,13 +13,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "BrokerFactory.h"
 
 #include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
+#include "helics/core/argParser.h"
+#include <boost/format.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid.hpp>  // uuid class
 #include <boost/uuid/uuid_generators.hpp>  // generators
 #include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
 #include "TimeCoordinator.h"
+#include "loggingHelper.hpp"
 #include "helics/common/logger.h"
 #include <fstream>
 
@@ -36,40 +38,26 @@ static inline std::string gen_id ()
     return pid_str + "-" + uuid_str;
 }
 
+
+
+
 namespace helics
 {
+
+using namespace std::string_literals;
+
+static const argDescriptors extraArgs
+{
+	{ "root"s, ""s, "specify whether the broker is a root"s },
+};
+
 bool matchingTypes (const std::string &type1, const std::string &type2);
 
-void CoreBroker::queueProcessingLoop ()
-{
-    while (true)
-    {
-        auto command = _queue.pop ();
-        // LOG (INFO) << "\"\"\"" << command << std::endl << "\"\"\"" << ENDL;
 
-        switch (command.action ())
-        {
-        case CMD_IGNORE:
-            break;
-		case CMD_TERMINATE_IMMEDIATELY:
-			return; //immediate return
-        case CMD_STOP:
-			processCommand(command);
-			return disconnect();
-        default:
-            processCommand (command);
-            break;
-        }
-    }
-}
 
 CoreBroker::~CoreBroker ()
 {
-    if (_queue_processing_thread.joinable())
-    {
-		_queue.push(CMD_TERMINATE_IMMEDIATELY);
-		_queue_processing_thread.join();
-    }
+
 }
 
 
@@ -78,7 +66,7 @@ void CoreBroker::setIdentifier (const std::string &name)
     if (brokerState<=broker_state_t::connecting)  // can't be changed after initialization
     {
         std::lock_guard<std::mutex> lock (mutex_);
-        local_broker_identifier = name;
+        identifier = name;
     }
 }
 int32_t CoreBroker::getRoute (Core::federate_id_t fedid) const
@@ -151,36 +139,14 @@ int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
     }
 }
 
-void CoreBroker::addCommand (const ActionMessage &m)
-{
-    if (isPriorityCommand (m))
-    {
-        processPriorityCommand (m);
-    }
-    else
-    {
-        // just route to the general queue;
-        _queue.push (m);
-    }
-}
 
-void CoreBroker::addCommand(ActionMessage &&m)
-{
-	if (isPriorityCommand(m))
-	{
-		processPriorityCommand(m);
-	}
-	else
-	{
-		// just route to the general queue;
-		_queue.push(std::move(m));
-	}
-}
+
+
 
 void CoreBroker::processPriorityCommand (const ActionMessage &command)
 {
     // deal with a few types of message immediately
-	std::cout << "broker " << global_broker_id << "||priority_cmd:" << actionMessageType(command.action()) << " from " << command.source_id << '\n';
+	LOG_TRACE(0, getIdentifier(), (boost::format("|| priority_cmd:%s from %d") % actionMessageType(command.action()) % command.source_id).str());
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -334,7 +300,7 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
     break;
     case CMD_BROKER_ACK:
     {  // we can't be root if we got one of these
-        if (command.name == local_broker_identifier)
+        if (command.name == identifier)
         {
             if (!command.error)
             {
@@ -386,7 +352,7 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
 				dis.source_id = global_broker_id;
 				transmit(0, dis);
 			}
-			addCommand(CMD_STOP);
+			addActionMessage(CMD_STOP);
 		}
 	}
 	break;
@@ -410,7 +376,7 @@ void CoreBroker::transmitDelayedMessages ()
     }
 }
 
-void CoreBroker::processCommand (ActionMessage &command)
+void CoreBroker::processCommand (ActionMessage &&command)
 {
 	std::cout << "broker " << global_broker_id << "||cmd:" << actionMessageType(command.action()) << " from " << command.source_id << '\n';
     switch (command.action ())
@@ -502,7 +468,7 @@ void CoreBroker::processCommand (ActionMessage &command)
 				dis.source_id = global_broker_id;
 				transmit(0, dis);
 			}
-			addCommand(CMD_STOP);
+			addActionMessage(CMD_STOP);
 		}
 	}
 	break;
@@ -870,7 +836,7 @@ static void argumentParser (int argc, char *argv[], boost::program_options::vari
 CoreBroker::CoreBroker (bool isRoot) noexcept : _isRoot (isRoot) {}
 
 
-CoreBroker::CoreBroker (const std::string &broker_name) : local_broker_identifier (broker_name) {}
+CoreBroker::CoreBroker (const std::string &broker_name) : BrokerBase (broker_name) {}
 
 void CoreBroker::Initialize (const std::string &initializationString)
 {
@@ -887,51 +853,17 @@ void CoreBroker::InitializeFromArgs (int argc, char *argv[])
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong (exp, broker_state_t::initialized))
     {
-        po::variables_map vm;
-        argumentParser (argc, argv, vm);
-        if (vm.count ("min") > 0)
-        {
-            _min_federates = vm["min"].as<int> ();
-        }
-        if (vm.count ("minfed") > 0)
-        {
-            _min_federates = vm["minfed"].as<int> ();
-        }
-        if (vm.count ("minbrokers") > 0)
-        {
-            _min_brokers = vm["minbrokers"].as<int> ();
-        }
-        if (vm.count ("name") > 0)
-        {
-            local_broker_identifier = vm["name"].as<std::string> ();
-        }
-		if (vm.count("loglevel") > 0)
-		{
-			maxLogLevel = vm["loglevel"].as<int>();
-		}
-		if (vm.count("logfile"))
-		{
-			logFile = vm["logfile"].as<std::string>();
-
-		}
-        if (vm.count ("identifier") > 0)
-        {
-            local_broker_identifier = vm["identifier"].as<std::string> ();
-        }
+		namespace po = boost::program_options;
+		
+		po::variables_map vm;
+		argumentParser(argc, argv, vm, extraArgs);
+		BrokerBase::InitializeFromArgs(argc, argv);
+       
 		if (vm.count("root") > 0)
 		{
 			setAsRoot();
 		}
-       
-		timeCoord = std::make_unique<TimeCoordinator>();
-		timeCoord->setMessageSender([this](const ActionMessage & msg) {addCommand(msg); });
-		loggingObj = std::make_unique<logger>();
-		if (!logFile.empty())
-		{
-			loggingObj->openFile(logFile);
-		}
-		loggingObj->startLogging(maxLogLevel, maxLogLevel);
-		_queue_processing_thread = std::thread (&CoreBroker::queueProcessingLoop, this);
+    
     }
 }
 
@@ -993,6 +925,11 @@ bool CoreBroker::connect ()
 
 bool CoreBroker::isConnected() const { return ((brokerState == operating) || (brokerState == connected)); }
 
+void CoreBroker::processDisconnect()
+{
+	disconnect();
+}
+
 void CoreBroker::disconnect()
 {
 	if (brokerState > broker_state_t::initialized)
@@ -1003,10 +940,10 @@ void CoreBroker::disconnect()
 		otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
 		that will be destroyed on function exit
 		*/
-		auto keepBrokerAlive = findBroker(local_broker_identifier);
+		auto keepBrokerAlive = findBroker(identifier);
 		if (keepBrokerAlive)
 		{
-			unregisterBroker(local_broker_identifier);
+			unregisterBroker(identifier);
 		}
 		if (!previous_local_broker_identifier.empty())
 		{
@@ -1018,101 +955,6 @@ void CoreBroker::disconnect()
 
 		}
 	}
-}
-
-void argumentParser (int argc, char *argv[], boost::program_options::variables_map &vm_map)
-{
-    namespace po = boost::program_options;
-    po::options_description cmd_only ("command line only");
-    po::options_description config ("configuration");
-    po::options_description hidden ("hidden");
-
-    // clang-format off
-	// input boost controls
-	cmd_only.add_options()
-		("help,h", "produce help message")
-		("version,v", "helics version number")
-		("config-file", po::value<std::string>(), "specify a configuration file to use");
-
-
-	config.add_options()
-		("broker,b", po::value<std::string>(), "address to connect the broker to")
-		("name,n", po::value<std::string>(), "name of the core")
-		("root","specify that the broker is a root broker")
-		("logfile", po::value<std::string>(), "the file to log message to")
-		("loglevel", po::value<int>(), "the level which to log the higher this is set to the more gets logs (-1) for no logging")
-		("fileloglevel", po::value<int>(), "the level at which messages get sent to the file")
-		("consoleloglevel", po::value<int>(), "the level at which message get sent to the console")
-		("minfed", po::value<int>(), "the minimum number of federates")
-		("minbroker",po::value<int>(), "the minimum number of core/brokers that need to be connected")
-		("identifier", po::value<std::string>(), "name of the core");
-
-	hidden.add_options() ("min", po::value<int>(), "minimum number of federates");
-    // clang-format on
-
-    po::options_description cmd_line ("command line options");
-    po::options_description config_file ("configuration file options");
-    po::options_description visible ("allowed options");
-
-    cmd_line.add (cmd_only).add (config).add (hidden);
-    config_file.add (config);
-    visible.add (cmd_only).add (config);
-
-    po::positional_options_description p;
-    p.add ("min", -1);
-
-    po::variables_map cmd_vm;
-    try
-    {
-        po::store (
-          po::command_line_parser (argc, argv).options (cmd_line).positional (p).allow_unregistered ().run (),
-          cmd_vm);
-    }
-    catch (std::exception &e)
-    {
-        std::cerr << e.what () << std::endl;
-        throw (e);
-    }
-
-    po::notify (cmd_vm);
-
-    // objects/pointers/variables/constants
-
-
-    // program options control
-    if (cmd_vm.count ("help") > 0)
-    {
-        std::cout << visible << '\n';
-        return;
-    }
-
-    if (cmd_vm.count ("version") > 0)
-    {
-        std::cout << HELICS_VERSION_MAJOR<<'.'<<HELICS_VERSION_MINOR<<'.'<<HELICS_VERSION_PATCH<<" (" <<HELICS_DATE<<")\n";
-        return;
-    }
-
-
-    po::store (po::command_line_parser (argc, argv).options (cmd_line).positional (p).allow_unregistered ().run (),
-               vm_map);
-
-    if (cmd_vm.count ("config-file") > 0)
-    {
-        std::string config_file_name = cmd_vm["config-file"].as<std::string> ();
-        if (!boost::filesystem::exists (config_file_name))
-        {
-            std::cerr << "config file " << config_file_name << " does not exist\n";
-            throw (std::invalid_argument ("unknown config file"));
-        }
-        else
-        {
-            std::ifstream fstr (config_file_name.c_str ());
-            po::store (po::parse_config_file (fstr, config_file), vm_map);
-            fstr.close ();
-        }
-    }
-
-    po::notify (vm_map);
 }
 
 bool CoreBroker::FindandNotifySubscriptionPublisher(BasicHandleInfo &handleInfo)

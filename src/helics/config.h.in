@@ -8,3 +8,7 @@
 #cmakedefine01 HELICS_HAVE_GLOG
 #cmakedefine01 HELICS_HAVE_ZEROMQ
 #cmakedefine01 HELICS_HAVE_MPI
+
+#cmakedefine01 LOGGING_ENABLED
+#cmakedefine01 DEBUG_LOGGING_ENABLED
+#cmakedefine01 TRACE_LOGGING_ENABLED

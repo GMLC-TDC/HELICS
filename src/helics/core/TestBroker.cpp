@@ -104,7 +104,7 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
     if ((tbroker) && (route_id == 0))
     {
 		
-        tbroker->addCommand (cmd);
+        tbroker->addActionMessage (cmd);
         return;
     }
     // only activate the lock if we not in an operating state
@@ -114,19 +114,19 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
     auto brkfnd = brokerRoutes.find (route_id);
     if (brkfnd != brokerRoutes.end ())
     {
-        brkfnd->second->addCommand (cmd);
+        brkfnd->second->addActionMessage (cmd);
         return;
     }
     auto crfnd = coreRoutes.find (route_id);
     if (crfnd != coreRoutes.end ())
     {
-        crfnd->second->addCommand (cmd);
+        crfnd->second->addActionMessage (cmd);
         return;
     }
 
     if (!isRoot())
     {
-        tbroker->addCommand (cmd);
+        tbroker->addActionMessage (cmd);
     }
 }
 

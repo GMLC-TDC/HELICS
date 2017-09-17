@@ -52,7 +52,7 @@ IpcCore::~IpcCore()
 	
 }
 
-void IpcCore::initializeFromArgs(int argc, char *argv[])
+void IpcCore::InitializeFromArgs(int argc, char *argv[])
 {
 	namespace po = boost::program_options;
 	if (coreState==created)
@@ -75,7 +75,7 @@ void IpcCore::initializeFromArgs(int argc, char *argv[])
 			fileloc = vm["fileloc"].as<std::string>();
 		}
 
-		CommonCore::initializeFromArgs(argc, argv);
+		CommonCore::InitializeFromArgs(argc, argv);
 	}
 }
 
@@ -98,7 +98,7 @@ bool IpcCore::brokerConnect()
 	}
 	
 	comms = std::make_unique<IpcComms>(fileloc,brokerloc );
-	comms->setCallback([this](ActionMessage M) {addCommand(std::move(M)); });
+	comms->setCallback([this](ActionMessage M) {addActionMessage(std::move(M)); });
 	return comms->connect();
 }
 

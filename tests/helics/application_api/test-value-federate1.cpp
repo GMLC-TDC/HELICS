@@ -194,14 +194,11 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer, bdata::make(core_types), co
 template <class X>
 void runFederateTest (const std::string &core_type_str, const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-	auto core_type = helics::coreTypeFromString(core_type_str);
-	auto brk = helics::BrokerFactory::create(core_type, "1");
+	ValueFederateTestFixture fixture;
 
-    helics::FederateInfo fi ("test1");
-    fi.coreType = core_type_str;
-    fi.coreInitString = "--broker=" + brk->getIdentifier() + " --federates 1";
+	fixture.Setup1FederateTest(core_type_str);
 
-    auto vFed = std::make_shared<helics::ValueFederate> (fi);
+	auto &vFed = fixture.vFed1;
     // register the publications
     auto pubid = vFed->registerGlobalPublication<X> ("pub1");
 
@@ -243,14 +240,11 @@ void runFederateTest (const std::string &core_type_str, const X &defaultValue, c
 template <class X>
 void runFederateTestv2 (const std::string &core_type_str, const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-	auto core_type = helics::coreTypeFromString(core_type_str);
-	auto brk = helics::BrokerFactory::create(core_type, "1");
+	ValueFederateTestFixture fixture;
 
-	helics::FederateInfo fi("test1");
-	fi.coreType = core_type_str;
-	fi.coreInitString = "--broker=" + brk->getIdentifier() + " --federates 1";
+	fixture.Setup1FederateTest(core_type_str);
 
-    auto vFed = std::make_shared<helics::ValueFederate> (fi);
+	auto &vFed = fixture.vFed1;
     // register the publications
     auto pubid = vFed->registerGlobalPublication<X> ("pub1");
 
@@ -361,126 +355,115 @@ BOOST_DATA_TEST_CASE(value_federate_dual_transfer, bdata::make(core_types), core
 template <class X>
 void runDualFederateTest (const std::string &core_type_str, const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-	auto core_type = helics::coreTypeFromString(core_type_str);
-	auto brk = helics::BrokerFactory::create(core_type, "2");
+	ValueFederateTestFixture fixture;
 
-    helics::FederateInfo fi ("test1");
-    fi.coreType = core_type_str;
-    fi.coreInitString = "--broker=" + brk->getIdentifier() + " --federates 2";
+	fixture.Setup2FederateTest(core_type_str);
 
-    auto vFed1 = std::make_shared<helics::ValueFederate> (fi);
-    fi.name = "test2";
-    auto vFed2 = std::make_shared<helics::ValueFederate> (fi);
+	auto &fedA = fixture.vFed1;
+	auto &fedB = fixture.vFed2;
+
     // register the publications
-    auto pubid = vFed1->registerGlobalPublication<X> ("pub1");
+    auto pubid = fedA->registerGlobalPublication<X> ("pub1");
 
-    auto subid = vFed2->registerRequiredSubscription<X> ("pub1");
-    vFed1->setTimeDelta (1.0);
-    vFed2->setTimeDelta (1.0);
+    auto subid = fedB->registerRequiredSubscription<X> ("pub1");
+    fedA->setTimeDelta (1.0);
+    fedB->setTimeDelta (1.0);
 
-    vFed2->setDefaultValue<X> (subid, defaultValue);
+    fedB->setDefaultValue<X> (subid, defaultValue);
 
-    auto f1finish = std::async (std::launch::async, [&]() { vFed1->enterExecutionState (); });
-    vFed2->enterExecutionState ();
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutionState (); });
+    fedB->enterExecutionState ();
     f1finish.wait ();
     // publish string1 at time=0.0;
-    vFed1->publish<X> (pubid, testValue1);
+    fedA->publish<X> (pubid, testValue1);
 
     X val;
-    vFed2->getValue<X> (subid, val);
+    fedB->getValue<X> (subid, val);
 
     BOOST_CHECK_EQUAL (val, defaultValue);
 
-    auto f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (1.0); });
-    auto gtime = vFed2->requestTime (1.0);
+    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
+    auto gtime = fedB->requestTime (1.0);
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
     BOOST_CHECK_EQUAL (f1time.get (), 1.0);
     // get the value
-    vFed2->getValue (subid, val);
+    fedB->getValue (subid, val);
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (val, testValue1);
 
     // publish a second string
-    vFed1->publish (pubid, testValue2);
+    fedA->publish (pubid, testValue2);
     // make sure the value is still what we expect
-    vFed2->getValue (subid, val);
+    fedB->getValue (subid, val);
 
     BOOST_CHECK_EQUAL (val, testValue1);
 
     // advance time
-    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (2.0); });
-    gtime = vFed2->requestTime (2.0);
+    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
+    gtime = fedB->requestTime (2.0);
 
     BOOST_CHECK_EQUAL (gtime, 2.0);
     BOOST_CHECK_EQUAL (f1time.get (), 2.0);
 
     // make sure the value was updated
-    vFed2->getValue (subid, val);
+    fedB->getValue (subid, val);
     BOOST_CHECK_EQUAL (val, testValue2);
-
-    vFed1->finalize ();
-    vFed2->finalize ();
 }
 
 
 template <class X>
 void runDualFederateTestv2 (const std::string &core_type_str, X &defaultValue, const X &testValue1, const X &testValue2)
 {
-	auto core_type = helics::coreTypeFromString(core_type_str);
-	auto brk = helics::BrokerFactory::create(core_type, "2");
+	ValueFederateTestFixture fixture;
 
-	helics::FederateInfo fi("test1");
-	fi.coreType = core_type_str;
-	fi.coreInitString = "--broker=" + brk->getIdentifier() + " --federates 2";
+	fixture.Setup2FederateTest(core_type_str);
 
-    auto vFed1 = std::make_shared<helics::ValueFederate> (fi);
-    fi.name = "test2";
-    auto vFed2 = std::make_shared<helics::ValueFederate> (fi);
+	auto &fedA = fixture.vFed1;
+	auto &fedB = fixture.vFed2;
     // register the publications
-    auto pubid = vFed1->registerGlobalPublication<X> ("pub1");
+    auto pubid = fedA->registerGlobalPublication<X> ("pub1");
 
-    auto subid = vFed2->registerRequiredSubscription<X> ("pub1");
-    vFed1->setTimeDelta (1.0);
-    vFed2->setTimeDelta (1.0);
+    auto subid = fedB->registerRequiredSubscription<X> ("pub1");
+    fedA->setTimeDelta (1.0);
+    fedB->setTimeDelta (1.0);
 
-    vFed2->setDefaultValue<X> (subid, defaultValue);
+    fedB->setDefaultValue<X> (subid, defaultValue);
 
-    auto f1finish = std::async (std::launch::async, [&]() { vFed1->enterExecutionState (); });
-    vFed2->enterExecutionState ();
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutionState (); });
+    fedB->enterExecutionState ();
     f1finish.wait ();
     // publish string1 at time=0.0;
-    vFed1->publish<X> (pubid, testValue1);
+    fedA->publish<X> (pubid, testValue1);
 
     X val;
-    vFed2->getValue<X> (subid, val);
+    fedB->getValue<X> (subid, val);
     BOOST_CHECK (val == defaultValue);
-    auto f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (1.0); });
-    auto gtime = vFed2->requestTime (1.0);
+    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
+    auto gtime = fedB->requestTime (1.0);
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
     BOOST_CHECK_EQUAL (f1time.get (), 1.0);
     // get the value
-    vFed2->getValue (subid, val);
+    fedB->getValue (subid, val);
     // make sure the string is what we expect
     BOOST_CHECK (val == testValue1);
     // publish a second string
-    vFed1->publish (pubid, testValue2);
+    fedA->publish (pubid, testValue2);
     // make sure the value is still what we expect
-    vFed2->getValue (subid, val);
+    fedB->getValue (subid, val);
     BOOST_CHECK (val == testValue1);
     // advance time
-    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (2.0); });
-    gtime = vFed2->requestTime (2.0);
+    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
+    gtime = fedB->requestTime (2.0);
 
     BOOST_CHECK_EQUAL (gtime, 2.0);
     BOOST_CHECK_EQUAL (f1time.get (), 2.0);
 
     // make sure the value was updated
-    vFed2->getValue (subid, val);
+    fedB->getValue (subid, val);
     BOOST_CHECK (val == testValue2);
-    vFed1->finalize ();
-    vFed2->finalize ();
+
 }
 
 
