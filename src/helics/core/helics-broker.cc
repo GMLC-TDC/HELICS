@@ -8,19 +8,7 @@
 #include <iostream>
 #include <fstream>
 
-#define USE_LOGGING 1
-#if USE_LOGGING
-#if HELICS_HAVE_GLOG
-#include <glog/logging.h>
-#define ENDL ""
-#else
-#define LOG(LEVEL) std::cout
-#define ENDL std::endl
-#endif
-#else
-#define LOG(LEVEL) std::ostringstream()
-#define ENDL std::endl
-#endif
+
 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;

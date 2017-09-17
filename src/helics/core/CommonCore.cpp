@@ -19,7 +19,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/filesystem.hpp>
 
 #include "helics/common/stringToCmdLine.h"
-
+#include "helics/common/logger.h"
 #include "CoreFactory.h"
 #include "FilterFunctions.h"
 #include "helics/core/core-exceptions.h"
@@ -37,19 +37,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/uuid/uuid_generators.hpp>  // generators
 #include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
 
-#define USE_LOGGING 1
-#if USE_LOGGING
-#if HELICS_HAVE_GLOG
-#include <glog/logging.h>
-#define ENDL ""
-#else
-#define LOG(LEVEL) std::cout 
-#define ENDL std::endl
-#endif
-#else
-#define LOG(LEVEL) std::ostringstream ()
-#define ENDL std::endl
-#endif
+#include <boost/format.hpp>
 
 static inline std::string gen_id ()
 {
@@ -119,11 +107,25 @@ void CommonCore::initializeFromArgs (int argC, char *argv[])
         {
             identifier = vm["identifier"].as<std::string> ();
         }
+		if (vm.count("loglevel") > 0)
+		{
+			maxLogLevel = vm["loglevel"].as<int>();
+		}
+		if (vm.count("logfile"))
+		{
+			logFile = vm["logfile"].as<std::string>();
 
+		}
         if (identifier.empty ())
         {
             identifier = gen_id ();
         }
+		loggingObj = std::make_unique<logger>();
+		if (!logFile.empty())
+		{
+			loggingObj->openFile(logFile);
+		}
+		loggingObj->startLogging(maxLogLevel, maxLogLevel);
         _queue_processing_thread = std::thread (&CommonCore::queueProcessingLoop, this);
     }
 }
@@ -749,7 +751,7 @@ void CommonCore::setImpactWindow (federate_id_t federateID, Time impactTime)
 Core::Handle CommonCore::getNewHandle () { return handleCounter++; }
 
 // comparison auto lambda  Functions like a template
-static auto compareFunc = [](const auto &A, const auto &B) { return (A->id < B->id); };
+//static auto compareFunc = [](const auto &A, const auto &B) { return (A->id < B->id); };
 
 BasicHandleInfo *CommonCore::createBasicHandle (Handle id_,
                                                 federate_id_t global_federateId,
@@ -803,9 +805,10 @@ Handle CommonCore::registerSubscription (federate_id_t federateID,
                                          const std::string &units,
                                          handle_check_mode check_mode)
 {
-    LOG (INFO) << "registering SUB " << key << ENDL;
+   
 
     auto fed = getFederate (federateID);
+	
     if (fed == nullptr)
     {
         throw (invalidIdentifier ("federateID not valid"));
@@ -814,7 +817,7 @@ Handle CommonCore::registerSubscription (federate_id_t federateID,
     {
         throw (invalidFunctionCall ());
     }
-
+	LOG_DEBUG(0, fed->getIdentifier(), (boost::format("registering SUB %s") % key).str());
     auto id = getNewHandle ();
     fed->createSubscription (id, key, type, units, check_mode);
 
@@ -880,7 +883,7 @@ Handle CommonCore::registerPublication (federate_id_t federateID,
                                         const std::string &type,
                                         const std::string &units)
 {
-    LOG (INFO) << "registering PUB " << key << ENDL;
+	
 
 
     auto fed = getFederate (federateID);
@@ -892,6 +895,7 @@ Handle CommonCore::registerPublication (federate_id_t federateID,
     {
         throw (invalidFunctionCall ());
     }
+	LOG_DEBUG(0, fed->getIdentifier(), (boost::format("registering PUB %s") % key).str());
     std::unique_lock<std::mutex> lock (_handlemutex);
     auto fnd = publications.find (key);
     if (fnd != publications.end ())  // this key is already found
@@ -972,11 +976,13 @@ void CommonCore::setValue (Handle handle_, const char *data, uint64_t len)
     {
         return;  // if the value is not required do nothing
     }
-    LOG (INFO) << "setValue: '" << std::string (data, len) << "'" << ENDL;
+	auto fed = getFederate(handleInfo->local_fed_id);
+	LOG_DEBUG(0, fed->getIdentifier(), (boost::format("setting Value for %s size %d") % handleInfo->key%len).str());
     ActionMessage mv (CMD_PUB);
     mv.source_id = handleInfo->fed_id;
     mv.source_handle = handle_;
     mv.payload = std::string (data, len);
+	mv.actionTime = fed->grantedTime();
 
     _queue.push (mv);
 }
@@ -1438,24 +1444,70 @@ void CommonCore::sendToLogger (federate_id_t federateID,
                                const std::string &name,
                                const std::string &message) const
 {
-    auto fed = getFederate (federateID);
-    if (fed == nullptr)
-    {
-        throw (invalidIdentifier ());
-    }
-    // TODO:: make federateState logging function
+	if (federateID == 0)
+	{
+		if (logLevel > maxLogLevel)
+		{
+			//check the logging level
+			return;
+		}
+		if (loggerFunction)
+		{
+			loggerFunction(logLevel, name, message);
+		}
+		else if (loggingObj)
+		{
+			loggingObj->log(logLevel, name + "::" + message);
+		}
+	}
+	else
+	{
+		auto fed = getFederate(federateID);
+		if (fed == nullptr)
+		{
+			throw (invalidIdentifier());
+		}
+		fed->logMessage(logLevel, name, message);
+	}
+    
+    
 }
 
-void CommonCore::setLoggingFunction (
+void CommonCore::setLoggingCallback (
   federate_id_t federateID,
   std::function<void(int, const std::string &, const std::string &)> logFunction)
 {
-    auto fed = getFederate (federateID);
-    if (fed == nullptr)
-    {
-        throw (invalidIdentifier ("Invalid FederateID"));
-    }
-    fed->setLogger (std::move (logFunction));
+	if (federateID == 0)
+	{
+		std::unique_lock<std::mutex>   lock(_mutex);
+		loggerFunction = std::move(logFunction);
+		lock.unlock();
+		if (loggerFunction)
+		{
+			if (loggingObj)
+			{
+				if (loggingObj->isRunning())
+				{
+					loggingObj->haltLogging();
+				}
+			}
+		}
+		else if (!loggingObj->isRunning())
+		{
+			loggingObj->startLogging();
+		}
+		
+	}
+	else
+	{
+		auto fed = getFederate(federateID);
+		if (fed == nullptr)
+		{
+			throw (invalidIdentifier("Invalid FederateID"));
+		}
+		fed->setLogger(std::move(logFunction));
+	}
+   
 }
 
 void CommonCore::setFilterOperator (Handle filter, std::shared_ptr<FilterOperator> callback)
@@ -1653,8 +1705,8 @@ void CommonCore::queueProcessingLoop ()
 void CommonCore::processPriorityCommand(const ActionMessage &command)
 {
     // deal with a few types of message immediately
-	std::cout << "core " << global_broker_id << "||priority_cmd:" << actionMessageType(command.action()) << " from " << command.source_id << '\n';
-    switch (command.action ())
+	LOG_TRACE(0, getIdentifier(), (boost::format("|| priority_cmd:%s from %d") % actionMessageType(command.action()) % command.source_id).str());
+	switch (command.action ())
     {
     case CMD_REG_FED:
     case CMD_REG_BROKER:
@@ -1745,9 +1797,8 @@ void CommonCore::transmitDelayedMessages ()
 
 void CommonCore::processCommand (ActionMessage &command)
 {
-    // LOG (INFO) << "\"\"\"" << command << std::endl << "\"\"\"" << ENDL
-	std::cout <<"core "<<global_broker_id<< "||cmd:" << actionMessageType(command.action()) << " from " << command.source_id << '\n';
-    switch (command.action ())
+	LOG_TRACE(0, getIdentifier(), (boost::format("|| cmd:%s from %d") % actionMessageType(command.action()) % command.source_id).str());
+	switch (command.action ())
     {
     case CMD_IGNORE:
         break;

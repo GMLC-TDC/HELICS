@@ -516,12 +516,12 @@ class Core
 	virtual std::unique_ptr<Message> receiveAnyFilter(federate_id_t federateID, Handle &filter_id) = 0;
 
 	/** define a logging function to use for logging message and notices from the federation and individual federate
-	@param federateID  the identifier for the individual federate
+	@param federateID  the identifier for the individual federate or 0 for the Core logger
 	@param logFunction the callback function for doing something with a log message
-	it takes 3 inputs an integer for logLevel 0-4  0 -error, 1- warning 2-status, 3-debug
+	it takes 3 inputs an integer for logLevel 0-3+  0 -error, 1- warning 2-status, 3-debug
 	A string indicating the source of the message and another string with the actual message
 	*/
-	virtual void setLoggingFunction(federate_id_t federateID, std::function<void(int, const std::string &, const std::string &)> logFunction) = 0;
+	virtual void setLoggingCallback(federate_id_t federateID, std::function<void(int, const std::string &, const std::string &)> logFunction) = 0;
 	
 	/** make a query for information from the co-simulation
 	@details the format is somewhat unspecified  target is the name of an object typically one of 

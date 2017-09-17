@@ -21,13 +21,16 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 #include "logger.h"
 #include <iostream>
 
-namespace utilities
+namespace helics
 {
 logger::~logger ()
 {
     if (loggingThread.joinable ())
     {
-        loggingQueue.emplace ("!!!close");
+		if (!halted)
+		{
+			loggingQueue.emplace("!!>close");
+		}
         loggingThread.join ();
     }
 }
@@ -35,7 +38,7 @@ void logger::openFile (const std::string &file)
 {
     if (loggingThread.joinable ())
     {
-        loggingQueue.emplace ("!!!close");
+        loggingQueue.emplace ("!!>close");
         loggingThread.join ();
         outFile.open (file.c_str ());
         startLogging ();
@@ -48,15 +51,35 @@ void logger::openFile (const std::string &file)
 
 void logger::startLogging (int cLevel, int fLevel)
 {
-    if (loggingThread.joinable ())
-    {
-        return;
-    }
+	if (!halted)
+	{
+		if (loggingThread.joinable())
+		{
+			return;
+		}
+	}
+	else
+	{
+		if (loggingThread.joinable())
+		{
+			loggingThread.join();
+		}
+	}
+	
     consoleLevel = cLevel;
     fileLevel = fLevel;
     loggingThread = std::thread (&logger::loggerLoop, this);
 }
 
+void logger::haltLogging()
+{
+	bool exp = false;
+	if (halted.compare_exchange_strong(exp, true))
+	{
+		loggingQueue.emplace("!!>close");
+	}
+
+}
 void logger::changeLevels (int cLevel, int fLevel)
 {
     consoleLevel = cLevel;
@@ -65,17 +88,21 @@ void logger::changeLevels (int cLevel, int fLevel)
 
 void logger::log (int level, std::string logMessage)
 {
-    logMessage.push_back ((level <= consoleLevel) ? 'c' : 'n');
-    logMessage.push_back ((level <= fileLevel) ? 'f' : 'n');
-    loggingQueue.emplace (std::move (logMessage));
+	if (!halted)
+	{
+		logMessage.push_back((level <= consoleLevel) ? 'c' : 'n');
+		logMessage.push_back((level <= fileLevel) ? 'f' : 'n');
+		loggingQueue.emplace(std::move(logMessage));
+	}
 }
 
-void logger::flush () { loggingQueue.emplace ("!!!flush"); }
-bool logger::isRunning () const { return loggingThread.joinable (); }
+void logger::flush () { loggingQueue.emplace ("!!>flush"); }
+bool logger::isRunning() const { return (!halted) && (loggingThread.joinable()); }
 
 
 void logger::loggerLoop ()
 {
+	halted = false;
     while (true)
     {
         auto msg = loggingQueue.pop ();
@@ -84,7 +111,7 @@ void logger::loggerLoop ()
 		{
 			continue;
 		}
-            if (msg.front () == '!')
+		if (msg.compare(0, 3, "!!>") == 0)
             {
                 if (msg.compare (3, 5, "close") == 0)
                 {

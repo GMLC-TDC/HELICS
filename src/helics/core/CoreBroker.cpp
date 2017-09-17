@@ -20,6 +20,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/uuid/uuid_generators.hpp>  // generators
 #include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
 #include "TimeCoordinator.h"
+#include "helics/common/logger.h"
 #include <fstream>
 
 
@@ -904,7 +905,15 @@ void CoreBroker::InitializeFromArgs (int argc, char *argv[])
         {
             local_broker_identifier = vm["name"].as<std::string> ();
         }
+		if (vm.count("loglevel") > 0)
+		{
+			maxLogLevel = vm["loglevel"].as<int>();
+		}
+		if (vm.count("logfile"))
+		{
+			logFile = vm["logfile"].as<std::string>();
 
+		}
         if (vm.count ("identifier") > 0)
         {
             local_broker_identifier = vm["identifier"].as<std::string> ();
@@ -916,7 +925,13 @@ void CoreBroker::InitializeFromArgs (int argc, char *argv[])
        
 		timeCoord = std::make_unique<TimeCoordinator>();
 		timeCoord->setMessageSender([this](const ActionMessage & msg) {addCommand(msg); });
-        _queue_processing_thread = std::thread (&CoreBroker::queueProcessingLoop, this);
+		loggingObj = std::make_unique<logger>();
+		if (!logFile.empty())
+		{
+			loggingObj->openFile(logFile);
+		}
+		loggingObj->startLogging(maxLogLevel, maxLogLevel);
+		_queue_processing_thread = std::thread (&CoreBroker::queueProcessingLoop, this);
     }
 }
 

@@ -54,7 +54,7 @@ public:
 };
 
 class TimeCoordinator;
-
+class logger;
 /** a shift in the global federate id numbers to allow discrimination between local ids and global ones
 this value allows 65535 federates to be available in each core 
 1,878,982,656 allowable federates in the system and
@@ -78,10 +78,12 @@ protected:
 private:
 	bool _isRoot = false;  //!< set to true if this object is a root broker
 	std::atomic<int32_t> global_broker_id{ 0 };  //!< the identifier for the broker
+	int maxLogLevel = 1;  //!< the max level to log
 	std::vector<std::pair<Core::federate_id_t, bool>> localBrokersInit; //!< indicator if the local brokers are ready to init
 	std::vector<BasicFedInfo> _federates; //!< container for all federates
 	std::vector<BasicHandleInfo> _handles; //!< container for the basic info for all handles
 	std::vector<BasicBrokerInfo> _brokers;  //!< container for the basic broker info for all subbrokers
+	std::unique_ptr<logger> loggingObj;  //!< default logging object to use if the logging callback is not specified
 	std::string local_broker_identifier;  //!< a randomly generated string  or assigned name for initial identification of the broker
 	std::string previous_local_broker_identifier; //!< the previous identifier in case a rename is required
 	BlockingQueue2<ActionMessage> _queue; //!< primary routing queue
@@ -101,8 +103,8 @@ private:
 	std::thread _queue_processing_thread;  //!< thread for running the broker
 	/** a logging function for logging or printing messages*/
 	std::function<void(int, const std::string &, const std::string &)> loggerFunction;
-
-	std::unique_ptr<TimeCoordinator> timeCoord;
+	std::string logFile; //< the file to log message to
+	std::unique_ptr<TimeCoordinator> timeCoord; //!< object managing the time control
 protected:
 	/** enumeration of the possible core states*/
 	enum broker_state_t :int

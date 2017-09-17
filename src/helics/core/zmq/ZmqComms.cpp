@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/common/zmqContextManager.h"
 #include "helics/common/zmqHelper.h"
 #include "helics/common/zmqSocketDescriptor.h"
-#include "zmqRequestSets.h"
+#include "ZmqRequestSets.h"
 #include "helics/core/ActionMessage.h"
 #include <memory>
 

@@ -28,20 +28,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 
 
-#define USE_LOGGING 1
-#if USE_LOGGING
-#if HELICS_HAVE_GLOG
-#include <glog/logging.h>
-#define ENDL ""
-#else
-#define LOG(LEVEL) std::cout
-#define ENDL std::endl
-#endif
-#else
-#define LOG(LEVEL) std::ostringstream()
-#define ENDL std::endl
-#endif
-
 namespace helics
 {
 using namespace std::string_literals;

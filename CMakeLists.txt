@@ -145,14 +145,7 @@ if(DOXYGEN_FOUND)
 )
 endif(DOXYGEN_FOUND)
 endif (HELICS_GENERATE_DOXYGEN_DOC)
-# -------------------------------------------------------------
-# finding glog
-# -------------------------------------------------------------
-#find_package (glog)
-#if (${GLOG_FOUND})
-#    set(HELICS_HAVE_GLOG TRUE)
-#    include_directories("${GLOG_INCLUDE_DIRS}")
-#endif (${GLOG_FOUND})
+
 
 # -------------------------------------------------------------
 # finding ZMQ

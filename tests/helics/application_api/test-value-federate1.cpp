@@ -24,7 +24,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 BOOST_FIXTURE_TEST_SUITE (value_federate_tests, ValueFederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-const std::string core_types[] = { "zmq" };
+const std::string core_types[] = { "test" };
 
 
 /** test simple creation and destruction*/
@@ -159,9 +159,6 @@ BOOST_DATA_TEST_CASE(value_federate_subscription_and_publication_registration, b
 BOOST_DATA_TEST_CASE(value_federate_single_transfer, bdata::make(core_types), core_type)
 {
     Setup1FederateTest(core_type);
-	auto val = 0x7000'0000 - 0x0001'0000;
-	printf("num Federates possible=%d\n", val);
-	printf("num Brokers possible=%d\n", 0x7FFF'FFFF - 0x7000'0000);
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 

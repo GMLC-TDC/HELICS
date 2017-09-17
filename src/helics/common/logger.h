@@ -27,7 +27,7 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 #include <atomic>
 #include <thread>
 
-namespace utilities
+namespace helics
 {
 /** class implementing a thread safe logger 
 @details the logger uses a queing mechanism and condition variable to store messages to a queue and print/display them
@@ -37,6 +37,7 @@ class logger
 {
 
 private:
+	std::atomic<bool> halted{ true };
 	BlockingQueue2<std::string> loggingQueue;  //!< the actual queue containing the strings to log
 	std::ofstream outFile;	//!< the stream to write the log messages
 	std::thread loggingThread;	//!< the thread object containing the thread running the actual logger
@@ -60,6 +61,8 @@ public:
 	{
 		startLogging(consoleLevel, fileLevel);
 	}
+	/** stop logging for a time messages received while halted are ignored*/
+	void haltLogging();
 	/** log a message at a particular level
 	@param[in] level the level of the message
 	@param[in] logMessage the actual message to log
