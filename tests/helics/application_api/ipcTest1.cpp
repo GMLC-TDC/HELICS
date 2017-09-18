@@ -45,7 +45,7 @@ int main(int, char**)
     fed_info.coreType = "ipc";
     fed_info.coreInitString = "--broker=stevebroker --federates 1";
     fed_info.timeDelta = delta_t;
-
+	fed_info.logLevel = 5;
     helics::ValueFederate fed(fed_info);
 
     auto id = fed.registerGlobalPublication("testA","double");

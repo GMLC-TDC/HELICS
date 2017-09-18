@@ -52,6 +52,7 @@ public:
 	Time lookAhead = timeZero;  //!< the lookahead value, the window of time between the time request return and the availability of values
 	Time impactWindow = timeZero;  //!< the time it takes values to propagate to the Federate
 	Time period = timeZero; //!< a period value,  all granted times must be on this period
+	Time offset = timeZero;  //!< offset to the time period
 	int logLevel;	//!< the logging level above which not to log to file
 	bool observer = false;  //!< flag indicating that the federate is an observer
 	bool uninteruptible =
@@ -284,15 +285,41 @@ class Core
      */
     virtual void setLookAhead (federate_id_t federateId, Time timeLookAhead) = 0;
 	/**
+	* Set the period for a specified federate.
+	*
+	* The value is used to determine the interaction amongs various federates as to
+	* when a specific federate can influence another
+	* \param federateId  the identifier for the federate
+	* \param timeLookAhead
+	*/
+	virtual void setPeriod(federate_id_t federateId, Time timePeriod) = 0;
+	/**
+	* Set the periodic offset for a specified federate.
+	*
+	* The value is used as a time shift for calculating the allowable time in a federate
+	the granted time must one of N*period+offset
+	
+	* \param federateId  the identifier for the federate
+	* \param timeOffset the periodic phase shift
+	*/
+	virtual void setTimeOffset(federate_id_t federateId, Time timeOffset) = 0;
+	/**
 	* Set the ImpactWindow time.
 	*
 	* The value is used to determine the interaction amongs various federates as to
 	* when a specific federate can influence another
 	* \param federateId  the identifier for the federate
-	* \param timeImpact
+	* \param timeImpact the length of time it take outside message to propagate into a federate
 	*/
 	virtual void setImpactWindow(federate_id_t federateId, Time timeImpact) = 0;
-
+	/** 
+	Set the logging level
+	@details set the logging level for an individual federate
+	set federateId to 0 for the core logging level
+	* \param federateId  the identifier for the federate
+	* \param timeImpact the length of time it take outside message to propagate into a federate
+	*/
+	virtual void setLoggingLevel(federate_id_t federateId, int loggingLevel) = 0;
     /**
      * Value interface.
      */

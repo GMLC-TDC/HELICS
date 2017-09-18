@@ -187,5 +187,9 @@ std::unique_ptr<Message> createMessage (ActionMessage &&cmd);
 bool isPriorityCommand (const ActionMessage &command);
 
 
+std::string prettyPrintString(const ActionMessage &command);
+
+std::ostream& operator<<(std::ostream& os, const ActionMessage & command);
+
 }  // namespace helics
 #endif

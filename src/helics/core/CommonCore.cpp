@@ -377,8 +377,12 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
         throw (invalidFunctionCall ("Core has already moved to operating state"));
     }
     auto fed = std::make_unique<FederateState> (name, info);
-
-    std::unique_lock<std::mutex> lock (_mutex);
+	//setting up the logger
+	auto ptr = fed.get();
+	//if we are using the logger, log all messages coming from the federates so they can control the level*/
+	fed->setLogger([this, ptr](int /*level*/, const std::string &ident, const std::string &message) {sendToLogger(0, -2, ident, message); });
+    
+	std::unique_lock<std::mutex> lock (_mutex);
     auto id = fed->local_id = static_cast<decltype (fed->local_id)> (_federates.size ());
 
     fed->setParent (this);
@@ -579,6 +583,47 @@ void CommonCore::setImpactWindow (federate_id_t federateID, Time impactTime)
     fed->UpdateFederateInfo (info);
 }
 
+
+void CommonCore::setPeriod(federate_id_t federateID, Time timePeriod)
+{
+	auto fed = getFederate(federateID);
+	if (fed == nullptr)
+	{
+		throw (invalidIdentifier("federateID not valid"));
+	}
+	if (timePeriod < timeZero)
+	{
+		throw (invalidParameter());
+	}
+	auto info = fed->getInfo();
+	info.period = timePeriod;
+	fed->UpdateFederateInfo(info);
+}
+void CommonCore::setTimeOffset(federate_id_t federateID, Time timeOffset)
+{
+	auto fed = getFederate(federateID);
+	if (fed == nullptr)
+	{
+		throw (invalidIdentifier("federateID not valid"));
+	}
+	
+	auto info = fed->getInfo();
+	info.offset = timeOffset;
+	fed->UpdateFederateInfo(info);
+}
+
+void CommonCore::setLoggingLevel(federate_id_t federateID, int loggingLevel)
+{
+	auto fed = getFederate(federateID);
+	if (fed == nullptr)
+	{
+		throw (invalidIdentifier("federateID not valid"));
+	}
+	
+	auto info = fed->getInfo();
+	info.logLevel = loggingLevel;
+	fed->UpdateFederateInfo(info);
+}
 
 Core::Handle CommonCore::getNewHandle () { return handleCounter++; }
 

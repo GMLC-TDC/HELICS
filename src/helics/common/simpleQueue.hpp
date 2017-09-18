@@ -105,19 +105,32 @@ class simpleQueue
         }
         else
         {
-            // acquire the lock for the pull stack
-            std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
-            if (pullElements.empty ())
-            {  // if it is still empty push the single element on that vector
-                pullElements.push_back (std::forward<Z> (val));
-            }
-            else
-            {  // this really shouldn't happen except in rare instances of high contention
-               // we need to acquire the push lock and do the normal thing while holding the pull lock so the
-               // last_element function will still behave properly
-                std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
-                pushElements.push_back (std::forward<Z> (val));
-            }
+			// acquire the lock for the pull stack
+			std::unique_lock<std::mutex> pullLock(m_pullLock);  // first pullLock
+			std::unique_lock<std::mutex> pushLock(m_pushLock);  // second pushLock
+			if (pullElements.empty())
+			{
+				if (pushElements.empty())
+				{
+					pushLock.unlock();
+					pullElements.push_back(std::forward<Z>(val));
+				}
+				else
+				{
+					std::swap(pushElements, pullElements);
+					pushLock.unlock();  // we can free the push function to accept more elements after the swap call;
+					pullElements.push_back(std::forward<Z>(val));
+					std::reverse(pullElements.begin(), pullElements.end());
+				}
+			}
+			else
+			{  // this really shouldn't happen except in rare instances of high contention
+			   // we need to acquire the push lock and do the normal thing while holding the pull lock so the
+			   // last_element function will still behave properly
+
+				pushElements.push_back(std::forward<Z>(val));
+				pushLock.unlock();  // we can free the push function to accept more elements after the swap call;
+			}
         }
     }
     /** push an element onto the queue
@@ -133,19 +146,32 @@ class simpleQueue
         }
         else
         {
-            // acquire the lock for the pull stack
-            std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
-            if (pullElements.empty ())
-            {  // if it is still empty emplace the single element on the pull vector
-                pullElements.emplace_back (std::forward<Args> (args)...);
-            }
-            else
-            {  // this really shouldn't happen except in rare instances
-               // now we need to acquire the push lock and do the normal thing while holding the pull lock so the
-               // last_element function will still behave properly
-                std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
-                pushElements.emplace_back (std::forward<Args> (args)...);
-            }
+			// acquire the lock for the pull stack
+			std::unique_lock<std::mutex> pullLock(m_pullLock);  // first pullLock
+			std::unique_lock<std::mutex> pushLock(m_pushLock);  // second pushLock
+			if (pullElements.empty())
+			{
+				if (pushElements.empty())
+				{
+					pushLock.unlock();
+					pullElements.emplace_back(std::forward<Args>(args)...);
+				}
+				else
+				{
+					std::swap(pushElements, pullElements);
+					pushLock.unlock();  // we can free the push function to accept more elements after the swap call;
+					pullElements.emplace_back(std::forward<Args>(args)...);
+					std::reverse(pullElements.begin(), pullElements.end());
+				}
+			}
+			else
+			{  // this really shouldn't happen except in rare instances of high contention
+			   // we need to acquire the push lock and do the normal thing while holding the pull lock so the
+			   // last_element function will still behave properly
+
+				pushElements.emplace_back(std::forward<Args>(args)...);
+				pushLock.unlock();  // we can free the push function to accept more elements after the swap call;
+			}
         }
     }
     /*make sure there is no path to lock the push first then the pull second

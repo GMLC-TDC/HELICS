@@ -170,11 +170,22 @@ BOOST_AUTO_TEST_CASE(pop_tests)
 	sq.push(-1); 
 	};
 	
-	auto cons = [&]() {auto res = sq.pop(); long long cnt = 0;
+	auto cons = [&]() {auto res = sq.pop(); long long cnt = 1;
 	while (res>=0)
 	{
-		++cnt;
-		res = sq.pop();
+		auto nres = sq.pop();
+		if (nres > res)
+		{
+			++cnt;
+		}
+		else
+		{
+			if (nres > 0)
+			{
+				printf("%d came before %d\n", static_cast<int>(nres), static_cast<int>(res));
+			}
+		}
+		res = nres;
 	}
 	return cnt; };
 

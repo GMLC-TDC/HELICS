@@ -47,7 +47,6 @@ class FederateState
 	FederateState(const std::string &name_, const CoreFederateInfo &info_);
 	~FederateState();
   private:
-	  std::atomic<int> logLevel{ 2 }; //!< the logging level to use for logging
 	  std::string name;  //!< the name of the federate
 	  std::unique_ptr<TimeCoordinator> timeCoord;  //!< object that manages the time to determine granting
   public:
@@ -67,13 +66,14 @@ private:
     std::vector<std::unique_ptr<PublicationInfo>> publications;  //!< storage for all the publications
     std::vector<std::unique_ptr<EndpointInfo>> endpoints;  //!< storage for all the endpoints
     std::vector<std::unique_ptr<FilterInfo>> filters;  //!< storage for all the filters
-
+	
     CommonCore *parent_ = nullptr;  //!< pointer to the higher level;
   public:
     std::atomic<bool> init_requested{false};  //!< this federate has requested entry to initialization
 	
     bool iterating = false;  //!< the federate is iterating at a timestep
     bool hasEndpoints = false;  //!< the federate has endpoints
+	int logLevel=1;
   private:
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
 

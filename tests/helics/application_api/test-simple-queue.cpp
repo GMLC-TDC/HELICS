@@ -137,13 +137,24 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests)
 	auto cons = [&]() {auto res = sq.pop(); long long cnt = 0;
 	while ((res))
 	{
-		++cnt;
-		res = sq.pop();
-		if (!res)
+		auto nres = sq.pop();
+		if (!nres)
 		{	//make an additional sleep period so the producer can catch up
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			res = sq.pop();
+			nres = sq.pop();
 		}
+		if (*nres > *res)
+		{
+			++cnt;
+		}
+		else
+		{
+			if (*nres > 0)
+			{
+				printf("%d came before %d\n", static_cast<int>(*nres), static_cast<int>(*res));
+			}
+		}
+		res = nres;
 	}
 	return cnt; };
 

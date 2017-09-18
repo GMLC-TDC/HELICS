@@ -20,6 +20,33 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <chrono>
 #include <thread>
 
+#include "config.h"
+#include <boost/foreach.hpp>
+
+
+#define LOG_ERROR(message) logMessage (0,"",message);
+#define LOG_WARNING(message) logMessage (1,"",message);
+
+#ifdef LOGGING_ENABLED
+#define LOG_NORMAL(message) if (logLevel>=2){logMessage (2,"",message);}
+
+#ifdef DEBUG_LOGGING_ENABLED
+#define LOG_DEBUG(message) if (logLevel>=3){logMessage(3,"",message);}
+#else
+#define LOG_DEBUG(message)
+#endif
+
+#ifdef TRACE_LOGGING_ENABLED
+#define LOG_TRACE(message) if (logLevel>=4){logMessage (4,"",message);}
+#else
+#define LOG_TRACE( message)
+#endif
+#else
+#define LOG_NORMAL( message)
+#define LOG_DEBUG(message)
+#define LOG_TRACE(message)
+#endif
+
 namespace helics
 {
 FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_) : name (name_)
@@ -102,6 +129,7 @@ void FederateState::UpdateFederateInfo (CoreFederateInfo &newInfo)
         newInfo.timeDelta = timeEpsilon;
     }
     std::lock_guard<std::mutex> lock (_mutex);
+	logLevel = newInfo.logLevel;
 	timeCoord->setInfo(newInfo);
 }
 
@@ -679,6 +707,7 @@ convergence_state FederateState::processQueue ()
 
 convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 	{
+	LOG_TRACE("processing cmd " + actionMessageType(cmd.action()));
 	switch (cmd.action())
 	{
 	case CMD_IGNORE:
@@ -953,7 +982,9 @@ void FederateState::logMessage(int level, const std::string &logMessageSource, c
 {
 	if ((loggerFunction)&& (level <= logLevel))
 	{
-		loggerFunction(level, logMessageSource, message);
+		loggerFunction(level, (logMessageSource.empty())?name:logMessageSource, message);
 	}
 }
+
+
 }

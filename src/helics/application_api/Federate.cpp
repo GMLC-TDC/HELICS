@@ -31,6 +31,9 @@ CoreFederateInfo generateCoreInfo (const FederateInfo &fi)
 	cfi.impactWindow = fi.impactWindow;
     cfi.observer = fi.observer;
     cfi.timeDelta = fi.timeDelta;
+	cfi.period = fi.period;
+	cfi.offset = fi.offset;
+	cfi.logLevel = fi.logLevel;
     cfi.uninteruptible = fi.uninterruptible;
     cfi.time_agnostic = fi.timeAgnostic;
 	cfi.source_only = fi.sourceOnly;
@@ -332,6 +335,23 @@ void Federate::setImpactWindow(Time window)
 		throw(InvalidParameterValue("Impact Window must be >=0"));
 	}
 	coreObject->setImpactWindow(fedID, window);
+}
+
+
+void Federate::setPeriod(Time period, Time offset)
+{
+	if (period < timeZero)
+	{
+		throw(InvalidParameterValue("period must be >=0"));
+	}
+	
+	coreObject->setPeriod(fedID, period);
+	coreObject->setTimeOffset(fedID, offset);
+}
+
+void Federate::setLoggingLevel(int loggingLevel)
+{
+	coreObject->setLoggingLevel(fedID, loggingLevel);
 }
 
 void Federate::finalize ()

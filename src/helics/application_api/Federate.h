@@ -45,19 +45,23 @@ class FederateInfo
     bool uninterruptible =
       false;  //!< indicator that the time request cannot return something other than the requested time
     bool sourceOnly = false;  //!< indicator that the federate is a source only
-	int16_t max_iterations = 10;  //!< the maximum number of iteration cycles a federate should execute
-    std::string coreType;  //!< the type of the core
+	int32_t max_iterations = 10;  //!< the maximum number of iteration cycles a federate should execute
+	int32_t logLevel = 1;  //!< the logging level for the federate (-1: none, 0: error, 1:warning,2:normal,3:debug,4:trace)
+	std::string coreType;  //!< the type of the core
     std::string coreName;  //!< the name of the core
-    Time timeDelta = timeZero;  //!< the period of the federate
+    Time timeDelta = timeZero;  //!< the minimum time between granted time requests
     Time lookAhead = timeZero;  //!< the lookahead value
     Time impactWindow = timeZero;  //!< the impact window
-    std::string coreInitString;  //!< an initialization string for the core API object
+	Time period = timeZero; //!< the peiodicity of the Federate granted time can only come on integer multipliers of the period
+	Time offset = timeZero; //!< the offset to the time period
+	std::string coreInitString;  //!< an initialization string for the core API object
+	
 	/** default constructor*/
     FederateInfo ()=default;
 	/** construct from the federate name*/
     FederateInfo (std::string fedname) : name (fedname){};
 	/** construct from the name and type*/
-    FederateInfo (std::string fedname, std::string cType) : name (fedname), coreType (cType){};
+    FederateInfo (std::string fedname, std::string cType) : name (std::move(fedname)), coreType (std::move(cType)){};
 };
 
 class Core;
@@ -204,6 +208,17 @@ class Federate
     @param[in] lookAhead the look ahead time
     */
     void setImpactWindow (Time window);
+	/** set the period and offset of the federate
+	@details the federate will on grant time on N*period+offset interval
+	@param[in] period the length of time between each subsequent grants
+	@param[in] offset the shift of the period from 0  offset must be < period
+	*/
+	void setPeriod(Time period,Time offset=timeZero);
+	/**  set the logging level for the federate
+	@ details debug and trace only do anything if they were enabled in the compilation
+	@param loggingLevel (-1: none, 0: error_only, 1: warings, 2: normal, 3: debug, 4: trace)
+	*/
+	void setLoggingLevel(int loggingLevel);
 
 	/** make a query of the core
 	@details this call is blocking until the value is returned which make take some time depending on the size of the federation and the specific string being

@@ -354,4 +354,41 @@ std::string actionMessageType(action_message_def::action_t action)
 	}
 	return nullStr;
 }
+
+
+std::string prettyPrintString(const ActionMessage &command)
+{
+	std::string ret = actionMessageType(command.action());
+	switch (command.action())
+	{
+	case CMD_REG_FED:
+		ret.push_back(':');
+		ret.append(command.name);
+	case CMD_FED_ACK:
+		ret.push_back(':');
+		ret.append(command.name);
+		ret.append("--");
+		if (command.error)
+		{
+			ret.append("error");
+		}
+		else
+		{
+			ret.append(std::to_string(command.dest_id));
+		}
+	case CMD_REG_BROKER:
+		ret.push_back(':');
+		ret.append(command.name);
+	default:
+		break;
+	}
+	return ret;
+}
+
+std::ostream& operator<<(std::ostream& os, const ActionMessage & command)
+{
+	os << prettyPrintString(command);
+	return os;
+}
+
 }

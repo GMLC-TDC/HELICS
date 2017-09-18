@@ -22,12 +22,12 @@ using elsewhere is probably not going to work.  Someday this will be made more g
 //just enumerating some print levels 
 enum print_level : int
 {
-	no_print = 0,  //!< never print
-	error = 1,  //!< only print errors
-	warning = 2,  //!< print/log warning and errors
-	normal = 3,  //!< defualt print level
-	debug = 4,  //!< debug level prints
-	trace = 5,  //!< trace level printing
+	no_print = -1,  //!< never print
+	error = 0,  //!< only print errors
+	warning = 1,  //!< print/log warning and errors
+	normal = 2,  //!< defualt print level
+	debug = 3,  //!< debug level prints
+	trace = 4,  //!< trace level printing
 };
 
 #define LOG_ERROR(id,ident, message) sendToLogger (id,print_level::error,ident,message);

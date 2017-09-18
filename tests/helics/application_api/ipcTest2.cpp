@@ -25,9 +25,9 @@ int main(int, char**)
 
     helics::FederateInfo fed_info("TestB Federate");
     fed_info.coreType = "ipc";
-    fed_info.coreInitString = "--broker=stevebroker --federates 1";
+    fed_info.coreInitString = "--broker=stevebroker --federates 1 --loglevel 5";
     fed_info.timeDelta = 0.1;
-
+	fed_info.logLevel = 5;
     fed_info.observer=false;
 
     std::cout << "Creating federate." << std::endl;
