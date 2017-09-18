@@ -31,26 +31,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <cstring>
 #include <fstream>
 #include <functional>
-#include <sstream>
-
-#include <boost/lexical_cast.hpp>
-#include <boost/uuid/uuid.hpp>  // uuid class
-#include <boost/uuid/uuid_generators.hpp>  // generators
-#include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
 
 #include <boost/format.hpp>
 
-static inline std::string gen_id ()
-{
-    boost::uuids::uuid uuid = boost::uuids::random_generator () ();
-    std::string uuid_str = boost::lexical_cast<std::string> (uuid);
-#ifdef _WIN32
-    std::string pid_str = boost::lexical_cast<std::string> (GetCurrentProcessId ());
-#else
-    std::string pid_str = boost::lexical_cast<std::string> (getpid ());
-#endif
-    return pid_str + "-" + uuid_str;
-}
+
 
 namespace helics
 {
@@ -308,14 +292,8 @@ bool CommonCore::allInitReady () const
         return false;
     }
     // all federates must be requesting init
-    for (auto &fed : _federates)
-    {
-        if (fed->init_transmitted == false)
-        {
-            return false;
-        }
-    }
-    return true;
+	return std::all_of(_federates.begin(), _federates.end(), [](const auto &fed) {return fed->init_transmitted.load(); });
+    
 }
 
 
@@ -324,15 +302,9 @@ bool CommonCore::allDisconnected () const
 	auto lock = (coreState == operating) ? std::unique_lock<std::mutex>(_mutex, std::defer_lock) :
 		std::unique_lock<std::mutex>(_mutex);
     // all federates must have hit finished state
-    for (auto &fed : _federates)
-    {
-        if ((fed->getState () == HELICS_FINISHED)|| (fed->getState() == HELICS_ERROR))
-        {
-            continue;
-        }
-		return false;
-    }
-    return true;
+	auto pred = [](const auto &fed) {auto state = fed->getState();
+			return (HELICS_FINISHED == state) || (HELICS_ERROR == state); };
+	return std::all_of(_federates.begin(), _federates.end(), pred);
 }
 
 void CommonCore::enterInitializingState (federate_id_t federateID)
@@ -1671,8 +1643,24 @@ void CommonCore::processCommand (ActionMessage &&command)
     break;
    
     case CMD_LOG:
+		if (command.dest_id == global_broker_id)
+		{
+			sendToLogger(0, command.index, getFederateName(command.source_id), command.payload);
+		}
+		else
+		{
+			routeMessage(command);
+		}
+		break;
     case CMD_ERROR:
-        routeMessage (command);
+		if (command.dest_id == global_broker_id)
+		{
+
+		}
+		else
+		{
+			routeMessage(command);
+		}
         break;
     case CMD_REG_SUB:
         // for these registration filters any processing is already done in the

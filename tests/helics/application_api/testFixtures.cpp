@@ -59,7 +59,7 @@ auto StartBrokerImp(const std::string &core_type_name, const std::string &initia
 
 void ValueFederateTestFixture::StartBroker(const std::string &core_type_name, const std::string &initialization_string)
 {
-	StartBrokerImp(core_type_name, initialization_string);
+	broker=StartBrokerImp(core_type_name, initialization_string);
 }
 
 void ValueFederateTestFixture::Setup1FederateTest(std::string core_type_name, helics::Time time_delta)
@@ -149,7 +149,7 @@ MessageFederateTestFixture::~MessageFederateTestFixture()
 
 void MessageFederateTestFixture::StartBroker(const std::string &core_type_name, const std::string &initialization_string)
 {
-	StartBrokerImp(core_type_name, initialization_string);
+	broker=StartBrokerImp(core_type_name, initialization_string);
 }
 
 void MessageFederateTestFixture::Setup1FederateTest(const std::string &core_type_name)
@@ -219,7 +219,7 @@ void MultipleValueFederateTestFixture::SetupFederateTests(std::string core_type_
 	case 2:
 	{
 		
-		std::string initString = std::string("--broker=") + broker->getIdentifier() + " --broker_address=" + broker->getAddress() + " --federates 1";
+		std::string initString = std::string("--broker=") + broker->getIdentifier() + " --broker_address=" + broker->getAddress() + " --federates "+std::to_string(cnt);
 		auto core_type = helics::coreTypeFromString(core_type_name);
 
 		helics::FederateInfo fi("test1");
@@ -241,5 +241,5 @@ void MultipleValueFederateTestFixture::SetupFederateTests(std::string core_type_
 
 void MultipleValueFederateTestFixture::StartBroker(const std::string &core_type_name, const std::string &initialization_string)
 {
-	StartBrokerImp(core_type_name, initialization_string);
+	broker=StartBrokerImp(core_type_name, initialization_string);
 }

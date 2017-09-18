@@ -238,6 +238,11 @@ bool BrokerBase::sendToLogger(Core::federate_id_t federateID,
 	return false;
 }
 
+void BrokerBase::generateNewIdentifier()
+{
+	identifier= gen_id();
+}
+
 void BrokerBase::setLoggerFunction(std::function<void(int, const std::string &, const std::string &)> logFunction)
 {
 	loggerFunction = std::move(logFunction);

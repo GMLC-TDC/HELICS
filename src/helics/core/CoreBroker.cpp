@@ -16,27 +16,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/argParser.h"
 #include <boost/format.hpp>
 
-#include <boost/lexical_cast.hpp>
-#include <boost/uuid/uuid.hpp>  // uuid class
-#include <boost/uuid/uuid_generators.hpp>  // generators
-#include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
 #include "TimeCoordinator.h"
 #include "loggingHelper.hpp"
 #include "helics/common/logger.h"
 #include <fstream>
 
 
-static inline std::string gen_id ()
-{
-    boost::uuids::uuid uuid = boost::uuids::random_generator () ();
-    std::string uuid_str = boost::lexical_cast<std::string> (uuid);
-#ifdef _WIN32
-    std::string pid_str = boost::lexical_cast<std::string> (GetCurrentProcessId ());
-#else
-    std::string pid_str = boost::lexical_cast<std::string> (getpid ());
-#endif
-    return pid_str + "-" + uuid_str;
-}
 
 
 
@@ -139,14 +124,10 @@ int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
     }
 }
 
-
-
-
-
 void CoreBroker::processPriorityCommand (const ActionMessage &command)
 {
     // deal with a few types of message immediately
-	LOG_TRACE(0, getIdentifier(), (boost::format("|| priority_cmd:%s from %d") % actionMessageType(command.action()) % command.source_id).str());
+	LOG_DEBUG(0, getIdentifier(), (boost::format("|| priority_cmd:%s from %d") % actionMessageType(command.action()) % command.source_id).str());
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -378,8 +359,8 @@ void CoreBroker::transmitDelayedMessages ()
 
 void CoreBroker::processCommand (ActionMessage &&command)
 {
-	std::cout << "broker " << global_broker_id << "||cmd:" << actionMessageType(command.action()) << " from " << command.source_id << '\n';
-    switch (command.action ())
+	LOG_TRACE(0, getIdentifier(), (boost::format("|| priority_cmd:%s from %d") % actionMessageType(command.action()) % command.source_id).str());
+	switch (command.action ())
     {
     case CMD_IGNORE:
 	case CMD_PROTOCOL:
@@ -885,10 +866,6 @@ bool CoreBroker::connect ()
         broker_state_t exp = broker_state_t::initialized;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::connecting))
         {
-			if (getIdentifier().empty())
-			{  // don't allow an empty identifier, that causes all sorts of issues
-				setIdentifier(gen_id());
-			}
             auto res = brokerConnect ();
             if (res)
             {
@@ -1156,15 +1133,7 @@ bool CoreBroker::allInitReady () const
     {
         return false;
     }
-    // all subBrokers must be requesting init
-    for (auto &brk : _brokers)
-    {
-        if (!brk._initRequested)
-        {
-            return false;
-        }
-    }
-    return true;
+	return std::all_of(_brokers.begin(), _brokers.end(), [](auto &brk) {return brk._initRequested; });
 }
 
 bool CoreBroker::allDisconnected () const
@@ -1172,14 +1141,7 @@ bool CoreBroker::allDisconnected () const
     // all subBrokers must be disconnected
 	auto lock = (_operating) ? std::unique_lock<std::mutex>(mutex_, std::defer_lock) :
 		std::unique_lock<std::mutex>(mutex_);
-    for (auto &brk : _brokers)
-    {
-        if (!brk._disconnected)
-        {
-            return false;
-        }
-    }
-    return true;
+	return std::all_of(_brokers.begin(), _brokers.end(), [](auto &brk) {return brk._disconnected; });
 }
 
 bool matchingTypes (const std::string &type1, const std::string &type2)

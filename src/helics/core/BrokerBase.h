@@ -90,6 +90,7 @@ protected:
 	*/
 	virtual bool sendToLogger(Core::federate_id_t federateID, int logLevel, const std::string &name, const std::string &message) const;
 
+	void generateNewIdentifier();
 private:
 
 
