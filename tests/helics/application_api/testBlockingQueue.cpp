@@ -16,14 +16,14 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 
 #include "helics/common/blocking_queue.h"
-#include "helics/common/BlockingQueue.hpp"
+#include "helics/common/BlockingQueue3.hpp"
 
 BOOST_AUTO_TEST_SUITE(blocking_queue_tests)
 
 /** test basic operations */
 BOOST_AUTO_TEST_CASE(basic_tests)
 {
-	BlockingQueue2<int> sq;
+	BlockingQueue3<int> sq;
 
 	sq.push(45);
 	sq.push(54);
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(basic_tests)
 /** test with a move only element*/
 BOOST_AUTO_TEST_CASE(move_only_tests)
 {
-	BlockingQueue2<std::unique_ptr<double>> sq;
+	BlockingQueue3<std::unique_ptr<double>> sq;
 
 	sq.push(std::make_unique<double>(4534.23));
 
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(move_only_tests)
 
 BOOST_AUTO_TEST_CASE(ordering_tests)
 {
-	BlockingQueue2<int> sq;
+	BlockingQueue3<int> sq;
 
 	for (int ii = 1; ii < 10; ++ii)
 	{
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(ordering_tests)
 
 BOOST_AUTO_TEST_CASE(emplace_tests)
 {
-	BlockingQueue2<std::pair<int, double>> sq;
+	BlockingQueue3<std::pair<int, double>> sq;
 
 	sq.emplace(10, 45.4);
 	sq.emplace(11, 34.1);
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(emplace_tests)
 /** test with single consumer/single producer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests)
 {
-	BlockingQueue2<long long> sq(1010000);
+	BlockingQueue3<long long> sq(1010000);
 
 	for (long long ii = 0; ii < 10'000; ++ii)
 	{
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests)
 /** test with single consumer / single producer */
 BOOST_AUTO_TEST_CASE(pop_tests)
 {
-	BlockingQueue2<long long> sq(1010000);
+	BlockingQueue3<long long> sq(1010000);
 
 	
 	auto prod1 = [&]() {for (long long ii = 0; ii < 1'000'000; ++ii)
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(pop_tests)
 /** test with multiple consumer/single producer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests2)
 {
-	BlockingQueue2<long long> sq(1010000);
+	BlockingQueue3<long long> sq(1010000);
 
 	for (long long ii = 0; ii < 10'000; ++ii)
 	{
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests2)
 /** test with multiple producer/multiple consumer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests3)
 {
-	BlockingQueue2<long long> sq;
+	BlockingQueue3<long long> sq;
 	sq.reserve(3'010'000);
 	for (long long ii = 0; ii < 10'000; ++ii)
 	{
@@ -286,7 +286,7 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests3)
 /** test with multiple producer/multiple consumer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests3_pop)
 {
-	BlockingQueue2<long long> sq;
+	BlockingQueue3<long long> sq;
 	sq.reserve(3'010'000);
 	
 	auto prod1 = [&]() {for (long long ii = 0; ii < 1'000'000; ++ii)
@@ -323,7 +323,7 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests3_pop)
 /** test with multiple producer/multiple consumer*/
 BOOST_AUTO_TEST_CASE(pop_callback_tests)
 {
-	BlockingQueue2<long long> sq;
+	BlockingQueue3<long long> sq;
 	int pushcnt = 0;
 	auto prod1 = [&]()
 	{
@@ -347,7 +347,7 @@ BOOST_AUTO_TEST_CASE(pop_callback_tests)
 	BOOST_CHECK_EQUAL(pushcnt, 127 + 25);
 }
 
-//#define PERFORMANCE_TESTS
+#define PERFORMANCE_TESTS
 
 
 
@@ -358,7 +358,7 @@ const std::pair<std::string, std::string>  pairString{ "this is a test string th
 /** test with multiple producer/multiple consumer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests_perf)
 {
-	BlockingQueue2<std::pair<std::string,std::string>> sq;
+	BlockingQueue3<std::pair<std::string,std::string>> sq;
 	long long cnt = 5'000'000;
 	sq.reserve(3*cnt);
 
@@ -400,7 +400,7 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests_perf)
 	auto stop_t = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> time_taken = stop_t - start_t;
 
-	printf("BlockingQueue2 3 prod 3 cons completed in %f\n", time_taken.count());
+	printf("BlockingQueue3 3 prod 3 cons completed in %f\n", time_taken.count());
 
 	BOOST_CHECK_EQUAL(V1 /*+ V2 + V3*/, 3*cnt);
 }

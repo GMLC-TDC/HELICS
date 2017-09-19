@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "core-data.h"
 #include "core.h"
 #include "helics-time.h"
-#include "helics/common/blocking_queue.h"
+#include "helics/common/BlockingQueue3.hpp"
 #include "helics/config.h"
 #include "core/core-types.h"
 
@@ -75,7 +75,7 @@ private:
     bool hasEndpoints = false;  //!< the federate has endpoints
 	int logLevel=1;
   private:
-    BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
+    BlockingQueue3<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
 
 
     std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time

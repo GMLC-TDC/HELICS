@@ -22,7 +22,7 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 #define UTILITIES_LOGGER_H_
 #pragma once
 
-#include "BlockingQueue.hpp"
+#include "BlockingQueue3.hpp"
 #include <fstream>
 #include <atomic>
 #include <thread>
@@ -38,7 +38,7 @@ class logger
 
 private:
 	std::atomic<bool> halted{ true };
-	BlockingQueue2<std::string> loggingQueue;  //!< the actual queue containing the strings to log
+	BlockingQueue3<std::string> loggingQueue;  //!< the actual queue containing the strings to log
 	std::ofstream outFile;	//!< the stream to write the log messages
 	std::thread loggingThread;	//!< the thread object containing the thread running the actual logger
 public:

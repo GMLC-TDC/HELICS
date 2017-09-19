@@ -23,7 +23,7 @@ and some common methods used cores and brokers
 
 #include "core.h"
 #include "ActionMessage.h"
-#include "common/BlockingQueue.hpp"
+#include "helics/common/BlockingQueue3.hpp"
 namespace helics
 {
 
@@ -49,7 +49,7 @@ protected:
 	std::function<void(int, const std::string &, const std::string &)> loggerFunction;
 	std::string logFile; //< the file to log message to
 	std::unique_ptr<TimeCoordinator> timeCoord; //!< object managing the time control
-	BlockingQueue2<ActionMessage> _queue; //!< primary routing queue
+	BlockingQueue3<ActionMessage> _queue; //!< primary routing queue
 public:
 	BrokerBase() noexcept;
 	BrokerBase(const std::string &broker_name);

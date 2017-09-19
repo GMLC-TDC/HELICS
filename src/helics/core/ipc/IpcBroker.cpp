@@ -33,7 +33,7 @@ static const std::string DEFAULT_BROKER = "tcp://localhost:5555";
 
 constexpr size_t maxMessageSize = 16 * 1024;
 
-constexpr size_t maxMessageCount = 1024 * 8;
+constexpr size_t maxMessageCount = 256;
 
 #define CLOSE_IPC 23425
 namespace helics

@@ -682,7 +682,15 @@ CLOSE_TX_LOOP:
 			//try connecting with the receivers push socket
 			auto ctx = zmqContextManager::getContextPointer();
 			zmq::socket_t pushSocket(ctx->getContext(), ZMQ_PUSH);
-			pushSocket.connect(makePortAddress(localTarget_, pullPortNumber));
+			if (localTarget_ == "tcp://*")
+			{
+				pushSocket.connect(makePortAddress("tcp://127.0.0.1", pullPortNumber));
+			}
+			else
+			{
+				pushSocket.connect(makePortAddress(localTarget_, pullPortNumber));
+			}
+			
 			ActionMessage cmd(CMD_PROTOCOL);
 			cmd.index = CLOSE_RECEIVER;
 			pushSocket.send(cmd.to_string());

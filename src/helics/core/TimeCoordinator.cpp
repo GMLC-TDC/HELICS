@@ -76,10 +76,10 @@ void TimeCoordinator::updateNextExecutionTime()
 	{
 		time_exec = (iterating) ? time_granted : (time_granted + info.timeDelta);
 	}
-	if (info.timeDelta > timeEpsilon)
+	if (info.period > timeEpsilon)
 	{
-		auto blk = static_cast<int> (std::ceil((time_exec - time_granted) / info.timeDelta));
-		time_exec = time_granted + blk * info.timeDelta;
+		auto blk = static_cast<int> (std::ceil((time_exec - time_granted) / info.period));
+		time_exec = time_granted + blk * info.period;
 	}
 }
 

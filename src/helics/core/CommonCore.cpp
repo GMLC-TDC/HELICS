@@ -41,9 +41,6 @@ namespace helics
 using federate_id_t = Core::federate_id_t;
 using Handle = Core::Handle;
 
-
-static void argumentParser (int argc, char *argv[], boost::program_options::variables_map &vm_map);
-
 CommonCore::CommonCore () noexcept {}
 
 CommonCore::CommonCore (const std::string &core_name) : BrokerBase (core_name) {}
@@ -378,9 +375,9 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
     }
     auto fed = std::make_unique<FederateState> (name, info);
 	//setting up the logger
-	auto ptr = fed.get();
+	//auto ptr = fed.get();
 	//if we are using the logger, log all messages coming from the federates so they can control the level*/
-	fed->setLogger([this, ptr](int /*level*/, const std::string &ident, const std::string &message) {sendToLogger(0, -2, ident, message); });
+	fed->setLogger([this](int /*level*/, const std::string &ident, const std::string &message) {sendToLogger(0, -2, ident, message); });
     
 	std::unique_lock<std::mutex> lock (_mutex);
     auto id = fed->local_id = static_cast<decltype (fed->local_id)> (_federates.size ());
@@ -1505,7 +1502,7 @@ std::string CommonCore::query(const std::string &target, const std::string &quer
 void CommonCore::processPriorityCommand(const ActionMessage &command)
 {
     // deal with a few types of message immediately
-	LOG_TRACE(0, getIdentifier(), (boost::format("|| priority_cmd:%s from %d") % actionMessageType(command.action()) % command.source_id).str());
+	LOG_TRACE(0, getIdentifier(), (boost::format("|| priority_cmd:%s from %d") % prettyPrintString(command) % command.source_id).str());
 	switch (command.action ())
     {
     case CMD_REG_FED:
@@ -1597,7 +1594,7 @@ void CommonCore::transmitDelayedMessages ()
 
 void CommonCore::processCommand (ActionMessage &&command)
 {
-	LOG_TRACE(0, getIdentifier(), (boost::format("|| cmd:%s from %d") % actionMessageType(command.action()) % command.source_id).str());
+	LOG_TRACE(0, getIdentifier(), (boost::format("|| cmd:%s from %d") % prettyPrintString(command) % command.source_id).str());
 	switch (command.action ())
     {
     case CMD_IGNORE:

@@ -127,7 +127,7 @@ int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
 void CoreBroker::processPriorityCommand (const ActionMessage &command)
 {
     // deal with a few types of message immediately
-	LOG_DEBUG(0, getIdentifier(), (boost::format("|| priority_cmd:%s from %d") % actionMessageType(command.action()) % command.source_id).str());
+	LOG_TRACE(0, getIdentifier(), (boost::format("|| priority_cmd:%s from %d") % prettyPrintString(command) % command.source_id).str());
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -359,7 +359,7 @@ void CoreBroker::transmitDelayedMessages ()
 
 void CoreBroker::processCommand (ActionMessage &&command)
 {
-	LOG_TRACE(0, getIdentifier(), (boost::format("|| priority_cmd:%s from %d") % actionMessageType(command.action()) % command.source_id).str());
+	LOG_TRACE(0, getIdentifier(), (boost::format("|| priority_cmd:%s from %d") % prettyPrintString(command) % command.source_id).str());
 	switch (command.action ())
     {
     case CMD_IGNORE:
@@ -810,8 +810,6 @@ void CoreBroker::addDestFilter(ActionMessage &m)
 		transmit(0, m);
 	}
 }
-
-static void argumentParser (int argc, char *argv[], boost::program_options::variables_map &vm_map);
 
 
 CoreBroker::CoreBroker (bool isRoot) noexcept : _isRoot (isRoot) {}

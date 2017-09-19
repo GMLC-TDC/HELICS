@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests)
 		sq.push(ii);
 	}};
 	
-	auto cons = [&]() {auto res = sq.pop(); long long cnt = 0;
+	auto cons = [&]() {auto res = sq.pop(); long long cnt = 1;
 	while ((res))
 	{
 		auto nres = sq.pop();
@@ -143,15 +143,18 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests)
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			nres = sq.pop();
 		}
-		if (*nres > *res)
+		if (nres)
 		{
-			++cnt;
-		}
-		else
-		{
-			if (*nres > 0)
+			if (*nres > *res)
 			{
-				printf("%d came before %d\n", static_cast<int>(*nres), static_cast<int>(*res));
+				++cnt;
+			}
+			else
+			{
+				if (*nres > 0)
+				{
+					printf("%d came before %d\n", static_cast<int>(*nres), static_cast<int>(*res));
+				}
 			}
 		}
 		res = nres;

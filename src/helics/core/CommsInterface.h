@@ -11,7 +11,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "ActionMessage.h"
-#include "common/BlockingQueue.hpp"
+#include "common/BlockingQueue3.hpp"
 #include <functional>
 #include <thread>
 #include <atomic>
@@ -67,9 +67,9 @@ protected:
 	std::string localTarget_; //!< the identifier for the receive address
 	std::string brokerTarget_;	//!< the identifier for the broker address
 	int maxMessageSize_ = 16 * 1024; //!< the maximum message size for the queues (if needed)
-	int maxMessageCount_ = 1024;  //!< the maximum number of message to buffer (if needed)
+	int maxMessageCount_ = 512;  //!< the maximum number of message to buffer (if needed)
 	std::function<void(ActionMessage &&)> ActionCallback; //!< the callback for what to do with a received message
-	BlockingQueue2<std::pair<int, ActionMessage>> txQueue; //!< set of messages waiting to be transmitted
+	BlockingQueue3<std::pair<int, ActionMessage>> txQueue; //!< set of messages waiting to be transmitted
 	std::atomic<connection_status> tx_status{ connection_status::startup }; //!< the status of the transmitter thread
 private:
 	std::thread queue_transmitter; //!< single thread for sending data
