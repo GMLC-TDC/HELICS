@@ -262,47 +262,12 @@ static auto dependencyCompare = [](const auto &dep, auto &target) { return (dep.
 
 bool TimeCoordinator::isDependency(Core::federate_id_t ofed) const
 {
-	auto res = std::lower_bound(dependencies.begin(), dependencies.end(), ofed, dependencyCompare);
-	if (res == dependencies.end())
-	{
-		return false;
-	}
-	return (res->fedID == ofed);
-}
-
-DependencyInfo *TimeCoordinator::getDependencyInfo(Core::federate_id_t ofed)
-{
-	auto res = std::lower_bound(dependencies.begin(), dependencies.end(), ofed, dependencyCompare);
-	if ((res == dependencies.end()) || (res->fedID != ofed))
-	{
-		return nullptr;
-	}
-
-	return &(*res);
+	return dependencies.isDependency(ofed);
 }
 
 bool TimeCoordinator::addDependency(Core::federate_id_t fedID)
 {
-	if (dependencies.empty())
-	{
-		dependencies.push_back(fedID);
-		return true;
-	}
-	auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), fedID, dependencyCompare);
-	if (dep == dependencies.end())
-	{
-		dependencies.emplace_back(fedID);
-	}
-	else
-	{
-		if (dep->fedID == fedID)
-		{
-			// the dependency is already present
-			return false;
-		}
-		dependencies.emplace(dep, fedID);
-	}
-	return true;
+	return dependencies.addDependency(fedID);
 }
 
 bool TimeCoordinator::addDependent(Core::federate_id_t fedID)
@@ -331,14 +296,8 @@ bool TimeCoordinator::addDependent(Core::federate_id_t fedID)
 
 void TimeCoordinator::removeDependency(Core::federate_id_t fedID)
 {
-	auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), fedID, dependencyCompare);
-	if (dep != dependencies.end())
-	{
-		if (dep->fedID == fedID)
-		{
-			dependencies.erase(dep);
-		}
-	}
+	dependencies.removeDependency(fedID);
+	
 }
 
 void TimeCoordinator::removeDependent(Core::federate_id_t fedID)
@@ -353,22 +312,21 @@ void TimeCoordinator::removeDependent(Core::federate_id_t fedID)
 	}
 }
 
+
+DependencyInfo *TimeCoordinator::getDependencyInfo(Core::federate_id_t ofed)
+{
+	return dependencies.getDependencyInfo(ofed);
+}
+
 convergence_state TimeCoordinator::checkExecEntry()
 {
 	convergence_state ret = convergence_state::continue_processing;
+	if (!dependencies.checkIfReadyForExecEntry(iterating))
+	{
+		return ret;
+	}
 	if (iterating)
 	{
-		for (auto &dep : dependencies)
-		{
-			if (!dep.exec_requested)
-			{
-				return convergence_state::continue_processing;
-			}
-			if (dep.exec_iterating)
-			{
-				return convergence_state::continue_processing;
-			}
-		}
 		if (time_value == timeZero)
 		{
 			if (iteration > info.max_iterations)
@@ -388,18 +346,6 @@ convergence_state TimeCoordinator::checkExecEntry()
 	}
 	else
 	{
-		for (auto &dep : dependencies)
-		{
-			//if exec mode has not been requesting
-			if (!dep.exec_requested)
-			{
-				return convergence_state::continue_processing;
-			}
-			if (dep.exec_iterating)
-			{ //if the dependency is iterating we cannot grant
-				return convergence_state::continue_processing;
-			}
-		}
 		ret= convergence_state::complete;
 	}
 
@@ -419,6 +365,7 @@ convergence_state TimeCoordinator::checkExecEntry()
 	}
 	else if (ret == convergence_state::nonconverged)
 	{
+		dependencies.ResetIteratingExecRequests();
 			if (sendMessageFunction)
 			{
 				ActionMessage execgrant(CMD_EXEC_GRANT);
@@ -430,58 +377,8 @@ convergence_state TimeCoordinator::checkExecEntry()
 	return ret;
 }
 
-
-bool TimeCoordinator::processExecRequest(ActionMessage &cmd)
+bool TimeCoordinator::processTimeMessage(ActionMessage &cmd)
 {
-	auto ofed = getDependencyInfo(cmd.source_id);
-	if (ofed == nullptr)
-	{
-		return false;
-	}
-
-	switch (cmd.action())
-	{
-	case CMD_EXEC_REQUEST:
-		ofed->exec_requested = true;
-		ofed->exec_iterating = !cmd.iterationComplete;
-		break;
-	case CMD_EXEC_GRANT:
-		ofed->exec_requested = false;
-		ofed->exec_iterating = !cmd.iterationComplete;
-		break;
-	default:
-		return false;
-	}
-	return true;
-}
-
-bool TimeCoordinator::processExternalTimeMessage(ActionMessage &cmd)
-{
-	auto ofed = getDependencyInfo(cmd.source_id);
-	if (ofed == nullptr)
-	{
-		return false;
-	}
-
-	switch (cmd.action())
-	{
-	case CMD_TIME_REQUEST:
-		ofed->grant = false;
-		ofed->time_iterating = !cmd.iterationComplete;
-		ofed->Tnext = cmd.actionTime;
-		ofed->Te = cmd.info().Te;
-		ofed->Tdemin = cmd.info().Tdemin;
-		break;
-	case CMD_TIME_GRANT:
-		ofed->grant = true;
-		ofed->time_iterating = !cmd.iterationComplete;
-		ofed->Tnext = cmd.actionTime;
-		ofed->Te = cmd.actionTime;
-		ofed->Tdemin = cmd.actionTime;
-		break;
-	default:
-		return false;
-	}
-	return true;
+	return dependencies.updateTime(cmd);
 }
 } //namespace helics

@@ -23,6 +23,7 @@ set(SRC_FILES
 	ipc/IpcComms.cpp
 	ipc/IpcQueueHelper.cpp
 	TimeCoordinator.cpp
+	TimeDependencies.cpp
 	CommsInterface.cpp
 	argParser.cpp
 )
@@ -46,7 +47,7 @@ set(INCLUDE_FILES
 	BrokerBase.h
     CoreFactory.h
 	BrokerFactory.h
-	DependencyInfo.h
+	TimeDependencies.h
 	core-exceptions.h
 	TimeCoordinator.h
 	loggingHelper.hpp

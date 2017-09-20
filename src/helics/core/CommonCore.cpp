@@ -1297,7 +1297,7 @@ uint64_t CommonCore::receiveCountAny (federate_id_t federateID)
     return fed->getQueueSize ();
 }
 
-void CommonCore::logMessage (federate_id_t federateID, int logLevel, const std::string &logMessage)
+void CommonCore::logMessage (federate_id_t federateID, int logLevel, const std::string &message)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -1308,9 +1308,9 @@ void CommonCore::logMessage (federate_id_t federateID, int logLevel, const std::
 
     m.source_id = fed->global_id;
     m.index = logLevel;
-    m.payload = logMessage;
+    m.payload = message;
     _queue.push (m);
-    sendToLogger (federateID, logLevel, fed->getIdentifier(), logMessage);
+    sendToLogger (federateID, logLevel, fed->getIdentifier(), message);
 }
 
 bool CommonCore::sendToLogger (federate_id_t federateID,

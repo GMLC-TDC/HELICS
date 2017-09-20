@@ -23,6 +23,8 @@ test-message-federate.cpp
 test-filter-federate.cpp
 federate_tests.cpp
 heat-transfer-tests.cpp
+timing_tests.cpp
+iteration_tests.cpp
 subPubObjectTests.cpp
 testFixtures.cpp
 )

@@ -22,7 +22,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/config.h"
 #include "core/core-types.h"
 
-#include "DependencyInfo.h"
+#include "TimeDependencies.h"
 
 #include <atomic>
 #include <map>

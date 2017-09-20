@@ -120,16 +120,16 @@ void ActionMessage::moveInfo(std::unique_ptr<Message> message)
 
 }
 
-void ActionMessage::setAction(action_message_def::action_t action)
+void ActionMessage::setAction(action_message_def::action_t newAction)
 {
-	if (hasInfo(action))
+	if (hasInfo(newAction))
 	{
 		if (!info_)
 		{
 			info_ = std::make_unique<AdditionalInfo>();
 		}
 	}
-	action_ = action;
+	action_ = newAction;
 }
 
 ActionMessage::AdditionalInfo &ActionMessage::info ()
@@ -341,6 +341,7 @@ std::string actionMessageType(action_message_def::action_t action)
 		{ action_message_def::action_t::cmd_notify_end,"notify_end" },
 
 		{ action_message_def::action_t::cmd_has_operator,"has_operator" },
+		//protocol messages are meant for the communication standard and are not used in the Cores/Brokers
 		{ action_message_def::action_t::cmd_protocol_priority,"protocol_priority" },
 		{ action_message_def::action_t::cmd_protocol,"protocol" },
 		{ action_message_def::action_t::cmd_protocol_big,"protocol_big" }

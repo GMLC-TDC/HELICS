@@ -368,10 +368,10 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests_perf)
 	}
 	};
 
-	auto cons = [&]() {auto res = sq.pop(); long long cnt = 0;
+	auto cons = [&]() {auto res = sq.pop(); long long cntr = 0;
 	while (!res.first.empty())
 	{
-		++cnt;
+		++cntr;
 		res = sq.pop();
 	}
 	return cnt; };
@@ -416,10 +416,10 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests_perf_bq)
 	}
 	};
 
-	auto cons = [&]() {auto res = sq.pop(); long long cnt = 0;
+	auto cons = [&]() {auto res = sq.pop(); long long cntr = 0;
 	while (!res.first.empty())
 	{
-		++cnt;
+		++cntr;
 		res = sq.pop();
 	}
 	return cnt; };

@@ -465,7 +465,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
 	case CMD_EXEC_GRANT:
 		if (command.dest_id == global_broker_id)
 		{
-			timeCoord->processExecRequest(command);
+			timeCoord->processTimeMessage(command);
 			if (enteredExecutionMode == false)
 			{
 				auto res = timeCoord->checkExecEntry();
@@ -502,7 +502,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
 		}
 		else if (command.dest_id == global_broker_id)
 		{
-			if (timeCoord->processExternalTimeMessage(command))
+			if (timeCoord->processTimeMessage(command))
 			{
 				timeCoord->checkTimeGrant();
 			}

@@ -707,7 +707,7 @@ convergence_state FederateState::processQueue ()
 
 convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 	{
-	LOG_TRACE("processing cmd " + actionMessageType(cmd.action()));
+	LOG_TRACE("processing cmd " + prettyPrintString(cmd.action()));
 	switch (cmd.action())
 	{
 	case CMD_IGNORE:
@@ -722,7 +722,7 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 		break;
 	case CMD_EXEC_REQUEST:
 	case CMD_EXEC_GRANT:
-		if (!timeCoord->processExecRequest(cmd))
+		if (!timeCoord->processTimeMessage(cmd))
 		{
 			break;
 		}
@@ -759,7 +759,7 @@ convergence_state FederateState::processActionMessage(ActionMessage &cmd)
 		break;
 	case CMD_TIME_REQUEST:
 	case CMD_TIME_GRANT:
-		if (!timeCoord->processExternalTimeMessage(cmd))
+		if (!timeCoord->processTimeMessage(cmd))
 		{
 			break;
 		}

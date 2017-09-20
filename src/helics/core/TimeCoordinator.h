@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define TIME_COORDINATOR_H_
 #pragma once
 
-#include "core/DependencyInfo.h"
+#include "TimeDependencies.h"
 #include "ActionMessage.h"
 #include <atomic>
 #include <functional>
@@ -34,7 +34,7 @@ private:
 	Time time_message = Time::maxVal();	//!< the time of the earliest message event
 	Time time_value = Time::maxVal();	//!< the time of the earliest value event
 
-	std::vector<DependencyInfo> dependencies;  // federates which this Federate is temporally dependent on
+	TimeDependencies dependencies;  // federates which this Federate is temporally dependent on
 	std::vector<Core::federate_id_t> dependents;  // federates which temporally depend on this federate
 
 	CoreFederateInfo info;  //!< basic federate info the core uses
@@ -108,7 +108,7 @@ public:
 	/** process a message related to time
 	@return true if it did anything
 	*/
-	bool processExternalTimeMessage(ActionMessage &cmd);
+	bool processTimeMessage(ActionMessage &cmd);
 
 	/** add a federate dependency
 	@return true if it was actually added, false if the federate was already present
@@ -122,10 +122,6 @@ public:
 	void removeDependency(Core::federate_id_t fedID);
 	void removeDependent(Core::federate_id_t fedID);
 
-	/** process a message related to exec request
-	@return true if it did anything
-	*/
-	bool processExecRequest(ActionMessage &cmd);
 	/** check if entry to the executing state can be granted*/
 	convergence_state checkExecEntry();
 	
