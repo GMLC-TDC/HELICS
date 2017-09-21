@@ -89,29 +89,30 @@ void TimeCoordinator::updateNextPossibleEventTime()
 	if (!iterating)
 	{
 		time_next = time_granted + info.timeDelta + info.lookAhead;
-		time_next = std::max(time_next, time_minminDe + info.impactWindow + info.lookAhead);
-		time_next = std::min(time_next, time_exec);
 	}
 	else
 	{
 		time_next = time_granted + info.lookAhead;
 	}
+	time_next = std::max(time_next, time_minminDe + info.impactWindow + info.lookAhead);
+	time_next = std::min(time_next, time_exec);
 }
 void TimeCoordinator::updateValueTime(Time valueUpdateTime)
 {
+	if (!executionMode) //updates before exec mode
+	{
+		if (valueUpdateTime < timeZero)
+		{
+			hasInitUpdates = true;
+		}
+		return;
+	}
 	valueUpdateTime += info.impactWindow;
 	if (valueUpdateTime < time_value)
 	{
 		if (iterating)
 		{
-			if (valueUpdateTime <= time_granted)
-			{
-				time_value = time_granted;
-			}
-			else
-			{
-				time_value = valueUpdateTime;
-			}
+			time_value = (valueUpdateTime <= time_granted) ? time_granted : valueUpdateTime;
 		}
 		else
 		{
@@ -130,19 +131,20 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime)
 
 void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
 {
+	if (!executionMode) //updates before exec mode
+	{
+		if (messageUpdateTime < timeZero)
+		{
+			hasInitUpdates = true;
+		}
+		return;
+	}
 	messageUpdateTime += info.impactWindow;
 	if (messageUpdateTime < time_message)
 	{
 		if (iterating)
 		{
-			if (messageUpdateTime <= time_granted)
-			{
-				time_message = time_granted;
-			}
-			else
-			{
-				time_message = messageUpdateTime;
-			}
+			time_message = (messageUpdateTime <= time_granted) ? time_granted : messageUpdateTime;
 		}
 		else
 		{
@@ -204,7 +206,7 @@ bool TimeCoordinator::updateTimeFactors()
 convergence_state TimeCoordinator::checkTimeGrant()
 {
 	bool update = updateTimeFactors();
-	if (!iterating)
+	if ((!iterating)||(time_exec>time_granted))
 	{
 		if (time_allow >= time_exec)
 		{
@@ -232,11 +234,22 @@ convergence_state TimeCoordinator::checkTimeGrant()
 				treq.actionTime = time_granted;
 				sendMessageFunction(treq);
 			}
-			return convergence_state::complete;
+			return convergence_state::nonconverged;
 		}
-		else
+		else if (time_allow==time_exec) //time_allow==time_exec==time_granted
 		{
-			// TODO:: something with the iteration conditions
+			if (dependencies.checkIfReadyForTimeGrant(true, time_exec))
+			{
+				dependencies.ResetIteratingTimeRequests(time_exec);
+				if ((!dependents.empty()) && (sendMessageFunction))
+				{
+					ActionMessage treq(CMD_TIME_GRANT);
+					treq.source_id = source_id;
+					treq.actionTime = time_granted;
+					sendMessageFunction(treq);
+				}
+				return convergence_state::nonconverged;
+			}
 		}
 	}
 
@@ -327,7 +340,7 @@ convergence_state TimeCoordinator::checkExecEntry()
 	}
 	if (iterating)
 	{
-		if (time_value == timeZero)
+		if (hasInitUpdates)
 		{
 			if (iteration > info.max_iterations)
 			{
@@ -366,6 +379,7 @@ convergence_state TimeCoordinator::checkExecEntry()
 	else if (ret == convergence_state::nonconverged)
 	{
 		dependencies.ResetIteratingExecRequests();
+		hasInitUpdates = false;
 			if (sendMessageFunction)
 			{
 				ActionMessage execgrant(CMD_EXEC_GRANT);

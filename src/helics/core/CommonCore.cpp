@@ -499,8 +499,17 @@ iterationTime CommonCore::requestTimeIterative (federate_id_t federateID, Time n
     return fed->requestTime (next, converged);
 }
 
+Time CommonCore::getCurrentTime(federate_id_t federateID) const
+{
+	auto fed = getFederate(federateID);
+	if (fed == nullptr)
+	{
+		throw invalidIdentifier("federateID not valid");
+	}
+	return fed->grantedTime();
+}
 
-uint64_t CommonCore::getCurrentReiteration (federate_id_t federateID)
+uint64_t CommonCore::getCurrentReiteration (federate_id_t federateID) const
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)

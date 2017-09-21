@@ -500,6 +500,10 @@ convergence_state FederateState::enterInitState ()
     {  // only enter this loop once per federate
         auto ret = processQueue ();
         processing = false;
+		if (ret == convergence_state::complete)
+		{
+			time_granted = initialTime;
+		}
         return ret;
     }
     else
@@ -537,7 +541,10 @@ convergence_state FederateState::enterExecutingState (convergence_state converge
     {  // only enter this loop once per federate
 		timeCoord->enteringExecMode(converged);
         auto ret = processQueue ();
-        time_granted = timeZero;
+		if (ret == convergence_state::complete)
+		{
+			time_granted = timeZero;
+		}
         fillEventVector (time_granted);
         processing = false;
         return ret;
@@ -582,6 +589,7 @@ iterationTime FederateState::requestTime (Time nextTime, convergence_state conve
         auto ret = processQueue ();
 		time_granted = timeCoord->getGrantedTime();
         iterating = (ret == convergence_state::nonconverged);
+		
         iterationTime retTime = {time_granted, ret};
         // now fill the event vector so exernal systems know what has been updated
         fillEventVector (time_granted);

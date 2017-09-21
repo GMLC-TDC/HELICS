@@ -250,8 +250,13 @@ class Core
     /**
      * Returns the current reiteration count for the specified federate.
      */
-    virtual uint64_t getCurrentReiteration (federate_id_t federateId) = 0;
-
+    virtual uint64_t getCurrentReiteration (federate_id_t federateId) const = 0;
+	
+	/** get the most recent granted Time
+	@param federateId, the id of the federate to get the time
+	@return the most recent granted time or the startup time
+	*/
+	virtual Time getCurrentTime(federate_id_t federateId) const = 0;
     /**
      * Set the maximum number of iterations allowed.
      *
@@ -261,6 +266,8 @@ class Core
      *
      * May only be invoked in the initialize state.
      */
+
+	
     virtual void setMaximumIterations (federate_id_t federateId, uint64_t iterations) = 0;
 
     /**

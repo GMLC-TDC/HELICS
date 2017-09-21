@@ -69,6 +69,7 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
 		coreObject->connect();
 	}
     fedID = coreObject->registerFederate (fi.name, generateCoreInfo (fi));
+	currentTime = coreObject->getCurrentTime(fedID);
 }
 
 Federate::Federate (const std::string &file) : Federate (LoadFederateInfo (file))
@@ -129,6 +130,7 @@ void Federate::enterInitializationState ()
     {
         coreObject->enterInitializingState (fedID);
         state = op_states::initialization;
+		currentTime = coreObject->getCurrentTime(fedID);
         StartupToInitializeStateTransition ();
     }
 	else if (state == op_states::pendingInit)
@@ -185,8 +187,9 @@ void Federate::enterInitializationStateFinalize()
 {
 	if (state == op_states::pendingInit)
 	{
-		asyncCallInfo->initFuture.get();
+		asyncCallInfo->initFuture.get(); 
 		state = op_states::initialization;
+		currentTime = coreObject->getCurrentTime(fedID);
 		StartupToInitializeStateTransition();
 	}
 	else
@@ -213,10 +216,11 @@ convergence_state Federate::enterExecutionState (convergence_state ProcessComple
             state = op_states::execution;
             InitializeToExecuteStateTransition ();
         }
-        else
-        {
-            //?? not sure how this all works yet
-        }
+		else
+		{
+			state = op_states::initialization;
+			updateTime(getCurrentTime(), getCurrentTime());
+		}
         break;
     }
 	case op_states::pendingExec:
@@ -299,7 +303,7 @@ convergence_state Federate::enterExecutionStateFinalize()
 		else
 		{
 			state = op_states::initialization;
-			//?? not sure how this all works yet
+			updateTime(getCurrentTime(), getCurrentTime());
 		}
 		return res;
 	}

@@ -44,7 +44,7 @@ public:
 	bool iterating=false; //!< indicator that the coordinator should be iterating if need be
 	bool checkingExec = false; //!< flag indicating that the coordinator is trying to enter the exec mode
 	bool executionMode = false;	//!< flag that the coordinator has entered the execution Mode
-	
+	bool hasInitUpdates = false;//!< flag indicating that a value or message was received during init stage
 private:
 	std::atomic<int32_t> iteration{ 0 };  //!< iteration counter
 public:

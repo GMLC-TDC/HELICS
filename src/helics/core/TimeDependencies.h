@@ -97,8 +97,9 @@ public:
 	DependencyInfo *getDependencyInfo(Core::federate_id_t id);
 
 	bool checkIfReadyForExecEntry(bool iterating) const;
-
+	bool checkIfReadyForTimeGrant(bool iterating,Time desiredGrantTime) const;
 	void ResetIteratingExecRequests();
+	void ResetIteratingTimeRequests(Time requestTime);
 };
 
 }

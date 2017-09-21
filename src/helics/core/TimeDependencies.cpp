@@ -166,5 +166,50 @@ void TimeDependencies::ResetIteratingExecRequests()
 	}
 }
 
+bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating, Time desiredGrantTime) const
+{
+	if (iterating)
+	{
+		for (auto &dep : dependencies)
+		{
+			if (dep.Tnext < desiredGrantTime)
+			{
+				return false;
+			}
+			if ((dep.Tnext == desiredGrantTime)&&(dep.time_state==DependencyInfo::time_state_t::time_granted))
+			{
+				return false;
+			}
+		}
+	}
+	else
+	{
+		for (auto &dep : dependencies)
+		{
+			if (dep.Tnext < desiredGrantTime)
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+void TimeDependencies::ResetIteratingTimeRequests(helics::Time requestTime)
+{
+	for (auto &dep : dependencies)
+	{
+		if (dep.time_state == DependencyInfo::time_state_t::time_requested_iterative)
+		{
+			if (dep.Tnext == requestTime)
+			{
+				dep.time_state = DependencyInfo::time_state_t::time_granted;
+				dep.Te = requestTime;
+				dep.Tdemin = requestTime;
+			}
+		}
+	}
+}
+
 } // namespace helics
 

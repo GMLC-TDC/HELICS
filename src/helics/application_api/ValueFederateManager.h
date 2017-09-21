@@ -180,7 +180,7 @@ namespace helics
 		std::vector<publication_info> pubs;	//!< all the publication info
 		std::vector<std::function<void(subscription_id_t,Time)>> callbacks;	//!< the all callback function
 		std::vector<data_view> lastData;	//!< the last data to arrive
-		Time CurrentTime; //!< the current simulation time
+		Time CurrentTime=Time(-1.0); //!< the current simulation time
 		std::shared_ptr<Core> coreObject; //!< the pointer to the actual core
 		Core::federate_id_t fedID;  //!< the federation ID from the core API
 		int allCallbackIndex = -1;	//!< index of the allCallback function

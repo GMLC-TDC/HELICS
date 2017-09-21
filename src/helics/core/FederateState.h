@@ -39,12 +39,15 @@ class CommonCore;
 
 class TimeCoordinator;
 
+constexpr Time startupTime = Time::minVal();
+constexpr Time initialTime{ -1000000.0 };
 /** class managing the information about a single federate*/
 class FederateState
 {
   public:
     /** constructor from name and information structure*/
 	FederateState(const std::string &name_, const CoreFederateInfo &info_);
+	/** destructor*/
 	~FederateState();
   private:
 	  std::string name;  //!< the name of the federate
@@ -83,7 +86,7 @@ private:
    
     std::vector<Core::Handle> events;  //!< list of value events to process
     std::map<Core::Handle, std::vector<std::unique_ptr<Message>>> message_queue;  // structure of message queues
-	Time time_granted = Time::minVal();  //!< the most recent granted time;
+	Time time_granted = startupTime;  //!< the most recent granted time;
     mutable std::mutex _mutex;  //!< the mutex protecting the fed state
    
     std::atomic<bool> processing{false};  //!< the federate is processing

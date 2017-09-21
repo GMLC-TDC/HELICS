@@ -96,7 +96,7 @@ class Federate
 
   protected:
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
-    Time currentTime = timeZero;  //!< the current simulation time
+    Time currentTime;  //!< the current simulation time
     FederateInfo FedInfo;  //!< the information structure that contains the data on the federate
   private:
     std::unique_ptr<asyncFedCallInfo> asyncCallInfo;  //!< pointer to a class defining the async call information

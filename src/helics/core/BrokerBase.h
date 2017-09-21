@@ -38,9 +38,9 @@ protected:
 	int32_t maxLogLevel = 1;  //!< the logging level to use levels >=this will be logged
 	int32_t consoleLogLevel = 1; //!< the logging level for console display
 	int32_t fileLogLevel = 1; //!< the logging level for logging to a file
-	int32_t _min_federates;  //!< the minimum number of federates that must connect before entering init mode
-	int32_t _min_brokers;  //!< the minimum number of brokers that must connect before entering init mode
-	int32_t _max_iterations;
+	int32_t _min_federates=1;  //!< the minimum number of federates that must connect before entering init mode
+	int32_t _min_brokers=0;  //!< the minimum number of brokers that must connect before entering init mode
+	int32_t _max_iterations=10000; //!< the maximum number of iterative loops that are allowed
 	std::string identifier;  //!< an identifier for the broker
 
 	std::unique_ptr<logger> loggingObj;  //!< default logging object to use if the logging callback is not specified
@@ -82,7 +82,7 @@ protected:
 	@return a action message response to the priority command
 	*/
 	virtual void processPriorityCommand(const ActionMessage &command) = 0;
-
+	/* process a disconnect signal*/
 	virtual void processDisconnect() = 0;
 
 	/** send a Message to the logging system
