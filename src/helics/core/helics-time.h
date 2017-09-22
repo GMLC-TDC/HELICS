@@ -36,10 +36,12 @@ constexpr Time operator "" _t(long double val)
 struct iterationTime
 {
 public:
-	Time stepTime;
-	convergence_state state;
-	iterationTime() = default;
-	iterationTime(Time t, convergence_state convergence) :stepTime(t), state(convergence)
+	Time stepTime; //!< the time of the granted step
+	convergence_state state;	//!< the convergence state
+	/** default constructor*/
+	iterationTime() noexcept {};
+	/** construct from properties*/
+	constexpr iterationTime(Time t, convergence_state convergence) :stepTime(t), state(convergence)
 	{};
 };
 }

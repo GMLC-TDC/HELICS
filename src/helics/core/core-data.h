@@ -125,11 +125,11 @@ class data_block
 class Message
 {
   public:
-    std::string origsrc;  //!< the orignal source of the message
+	Time time;  //!< the event time the message is sent
+	data_block data;  //!< the data packet for the message
     std::string src;  //!< the most recent source of the message
     std::string dest;  //!< the destination of the message
-    data_block data;  //!< the data packet for the message
-    Time time;  //!< the event time the message is sent
+	std::string origsrc;  //!< the orignal source of the message
 
   public:
     /** default constructor*/

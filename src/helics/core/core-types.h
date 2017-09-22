@@ -57,6 +57,9 @@ enum class convergence_state :signed char
 
 };
 
+#define CONVERGED helics::convergence_state::complete
+#define NONCONVERGED helics::convergence_state::nonconverged
+
 /** defining some check modes for dealing with required or optional components*/
 enum class handle_check_mode : char
 {
