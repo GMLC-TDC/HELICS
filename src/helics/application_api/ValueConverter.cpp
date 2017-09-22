@@ -12,12 +12,12 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-	template ValueConverter<double>;
-	template ValueConverter<int64_t>;
-	template ValueConverter<char>;
-	template ValueConverter<std::complex<double>>;
-	template ValueConverter<float>;
-	template ValueConverter<short>;
+	template class ValueConverter<double>;
+	template class ValueConverter<int64_t>;
+	template class ValueConverter<char>;
+	template class ValueConverter<std::complex<double>>;
+	template class ValueConverter<float>;
+	template class ValueConverter<short>;
 }
 
 
