@@ -1,4 +1,5 @@
 
+/*
 Copyright (C) 2017, Battelle Memorial Institute
 All rights reserved.
 
@@ -42,12 +43,14 @@ typedef struct data_t
 */
 typedef struct message_t
 {
+	helics_time_t time;
+	const char *data;
+	uint64_t len;
 	const char *origsrc;
 	const char *src;
 	const char *dst;
-	const char *data;
-	uint64_t len;
-	helics_time_t time;
+	
+	
 } message_t;
 
 typedef struct federate_info_t
@@ -63,6 +66,8 @@ typedef struct federate_info_t
 	helics_time_t timeDelta;  //!< the period of the federate
 	helics_time_t lookAhead;	//!< the lookahead value 
 	helics_time_t impactWindow; //!< the impact window
+	helics_time_t period;  //!< the period of the federate
+	helics_time_t offset;  //!< the offset shift in the time periods
 	const char* coreInitString;  //!< an initialization string for the core API object
 } federate_info_t;
 

@@ -11,6 +11,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "ValueConverter.hpp"
+#include "core/core-data.h"
+#include "Message.h"
 #include "Federate.h"
 #include "identifierTypes.hpp"
 #include <functional>

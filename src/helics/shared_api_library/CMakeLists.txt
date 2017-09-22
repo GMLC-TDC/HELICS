@@ -27,7 +27,8 @@ add_library(helicsSharedLib SHARED ${helicsShared_sources} ${helicsShared_header
 
 
 target_link_libraries(helicsSharedLib helics)
-
+link_directories(${external_link_directories})
+target_link_libraries(helicsSharedLib ${external_library_list})
 
 
 INSTALL(TARGETS helicsSharedLib DESTINATION lib)

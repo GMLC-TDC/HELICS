@@ -1,10 +1,3 @@
-##############################################################################
-#Copyright (C) 2017, Battelle Memorial Institute
-#All rights reserved.
-
-#This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-##############################################################################
-
 cmake_minimum_required (VERSION 3.4)
 project (HELICS)
 
@@ -12,10 +5,8 @@ project (HELICS)
 # HELICS Version number
 #-----------------------------------------------------------------------------
 set (HELICS_VERSION_MAJOR 0)
-set (HELICS_VERSION_MINOR 2)
+set (HELICS_VERSION_MINOR 3)
 set (HELICS_VERSION_PATCH 0)
-
-set (HELICS_DATE "09-12-2017")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -129,15 +120,6 @@ ELSE ()
 set(CMAKE_CXX_STANDARD 14)
 ENDIF ()
 
-# ------------------------------------------------------------
-# Enable message logging
-# -------------------------------------------------------------
-OPTION(LOGGING_ENABLED "enable non-warning/error logging messages" ON)
-
-IF(LOGGING_ENABLE)
-OPTION(DEBUG_LOGGING_ENABLED "enable debug logging messages(Note: logging is still controlled via program options this is for program size and speed)" ON)
-OPTION(TRACE_LOGGING_ENABLED "enable trace logging messages(Note: logging is still controlled via program options this is for program size and speed)" ON)
-ENDIF(LOGGING_ENABLE)
 
 option (HELICS_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
 
@@ -154,7 +136,14 @@ if(DOXYGEN_FOUND)
 )
 endif(DOXYGEN_FOUND)
 endif (HELICS_GENERATE_DOXYGEN_DOC)
-
+# -------------------------------------------------------------
+# finding glog
+# -------------------------------------------------------------
+#find_package (glog)
+#if (${GLOG_FOUND})
+#    set(HELICS_HAVE_GLOG TRUE)
+#    include_directories("${GLOG_INCLUDE_DIRS}")
+#endif (${GLOG_FOUND})
 
 # -------------------------------------------------------------
 # finding ZMQ
@@ -222,32 +211,64 @@ find_package(Threads REQUIRED)
 # -------------------------------------------------------------
 
 IF (MSVC)
+
+set( boost_paths
+C:/boost_1_65_1
+ C:/boost_1_64_0
+C:/boost_1_63_0
+C:/boost_1_61_0
+)
+IF (IS_DIRECTORY C:/boost)
+list(APPEND boost_paths
+C:/boost/boost_1_65_1
+ C:/boost/boost_1_64_0
+C:/boost/boost_1_63_0
+C:/boost/boost_1_61_0
+)
+ENDIF()
+
+IF (IS_DIRECTORY C:/local)
+list(APPEND boost_paths
+C:/local/boost_1_65_1
+ C:/local/boost_1_64_0
+C:/local/boost_1_63_0
+C:/local/boost_1_61_0
+)
+ENDIF()
+
+
+IF (EXISTS D:/)
+list(APPEND boost_paths
+D:/boost_1_65_1
+ D:/boost_1_64_0
+D:/boost_1_63_0
+D:/boost_1_61_0
+)
+IF (IS_DIRECTORY D:/boost)
+list(APPEND boost_paths
+D:/boost/boost_1_65_1
+ D:/boost/boost_1_64_0
+D:/boost/boost_1_63_0
+D:/boost/boost_1_61_0
+)
+ENDIF()
+
+IF (IS_DIRECTORY D:/local)
+list(APPEND boost_paths
+D:/local/boost_1_65_1
+ D:/local/boost_1_64_0
+D:/local/boost_1_63_0
+D:/local/boost_1_61_0
+)
+ENDIF()
+
+ENDIF()
+
+ message(STATUS ${boost_paths})
+ 
 find_path(BOOST_TEST_PATH 
 			NAMES 			boost/version.hpp
-			PATHS		C:/boost_1_65_0
-						C:/boost_1_64_0
-						C:/boost_1_63_0
-						C:/boost_1_61_0
-						D:/boost_1_65_0
-						D:/boost_1_64_0
-						D:/boost_1_63_0
-						D:/boost_1_61_0
-						C:/boost/boost_1_65_0
-						C:/boost/boost_1_64_0
-						C:/boost/boost_1_63_0
-						C:/boost/boost_1_61_0
-						D:/boost/boost_1_65_0
-						D:/boost/boost_1_64_0
-						D:/boost/boost_1_63_0
-						D:/boost/boost_1_61_0
-						C:/local/boost_1_65_0
-						C:/local/boost_1_64_0
-						C:/local/boost_1_63_0
-						C:/local/boost_1_61_0
-						D:/local/boost_1_65_0
-						D:/local/boost_1_64_0
-						D:/local/boost_1_63_0
-						D:/local/boost_1_61_0
+			PATHS		${boost_paths}
 		)
 		
 		if (BOOST_TEST_PATH)
@@ -270,10 +291,6 @@ message("Using Boost include files : ${Boost_INCLUDE_DIR}")
 message("Using Boost libraries ${Boost_LIBRARY_DIRS}")
 
 list(APPEND external_library_list ${Boost_LIBRARIES})
-if (UNIX)
-list(APPEND external_library_list rt)
-endif(UNIX)
-
   list(APPEND external_link_directories ${Boost_LIBRARY_DIRS})
   
   
@@ -339,6 +356,7 @@ add_subdirectory (tests)
 # Setup CTEST environment
 #-----------------------------------------------------------------------------
 include (CTest)
+
 
 INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
 

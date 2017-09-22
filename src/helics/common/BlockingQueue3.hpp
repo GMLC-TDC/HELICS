@@ -53,7 +53,7 @@ public:
 		queueEmptyFlag = pullElements.empty();
 	}
 
-	/** enable the move assignment not the copy assignement*/
+	/** enable the move assignment not the copy assignment*/
 	BlockingQueue3 &operator= (BlockingQueue3 &&sq)
 	{
 		std::lock_guard<std::mutex> pullLock(m_pullLock);  // first pullLock
@@ -104,7 +104,7 @@ public:
 					{
 						pullElements.push_back(std::forward<Z>(val));
 						pullLock.unlock();
-						condition_.notify_one();
+						condition_.notify_all();
 					}
 					else
 					{
@@ -142,7 +142,7 @@ public:
 				{
 					pullElements.emplace_back(std::forward<Args>(args)...);
 					pullLock.unlock();
-					condition_.notify_one();
+					condition_.notify_all();
 				}
 				else
 				{
@@ -195,7 +195,7 @@ public:
 				return actval;
 			}
 			condition_.wait(pullLock);  //now wait
-			if (!pullElements.empty()) //check for spurious wakeups
+			if (!pullElements.empty()) //check for spurious wake-ups
 			{
 				auto actval = std::move(pullElements.back());
 				pullElements.pop_back();
@@ -252,7 +252,7 @@ public:
 
 	
 	/** check whether there are any elements in the queue
-because this is meant for mutlti threaded applications this may or may not have any meaning
+because this is meant for multi-threaded applications this may or may not have any meaning
 depending on the number of consumers
 */
 	bool empty() const;

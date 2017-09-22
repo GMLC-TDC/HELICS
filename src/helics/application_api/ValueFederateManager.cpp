@@ -17,9 +17,9 @@ ValueFederateManager::ValueFederateManager (std::shared_ptr<Core> &coreOb, Core:
 ValueFederateManager::~ValueFederateManager () = default;
 
 static const std::map<std::string, int> typeSizes = {
-  {"char", 1},      {"uchar", 1},     {"block_4", 8},  {"block_8", 12},   {"block_12", 16}, {"block_16", 20},
-  {"block_20", 24}, {"block_24", 30}, {"double", 12},  {"float", 8},      {"int32", 8},     {"uint32", 8},
-  {"int64", 12},    {"uint64", 12},   {"complex", 20}, {"complex_f", 12},
+  {"char", 2},      {"uchar", 2},     {"block_4", 5},  {"block_8", 9},   {"block_12", 13}, {"block_16", 17},
+  {"block_20", 24}, {"block_24", 30}, {"double", 9},  {"float", 5},      {"int32", 5},     {"uint32", 5},
+  {"int64", 9},    {"uint64", 9},   {"complex", 17}, {"complex_f", 9},
 };
 
 int getTypeSize (const std::string type)

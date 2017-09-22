@@ -20,6 +20,7 @@ MessageFilterFederate.h
 MessageFilterFederateManager.h
 MessageOperators.h
 ValueConverter.hpp
+ValueConverter_impl.hpp
 ValueFederate.h
 ValueFederateManager.h
 asyncFedCallInfo.h
@@ -34,12 +35,15 @@ MessageFilterFederate.cpp
 MessageFilterFederateManager.cpp
 MessageOperators.cpp
 ValueFederate.cpp
+ValueConverter.cpp
 ValueFederateManager.cpp
 )
 
 list(APPEND application_api_sources ${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp.cpp)
 
 add_library(application_api OBJECT ${application_api_sources} ${application_api_headers})
+
+include_directories(${Boost_INCLUDE_DIR})
 
 link_directories(${external_link_directories})
 

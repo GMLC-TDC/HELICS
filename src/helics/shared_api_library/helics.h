@@ -42,7 +42,7 @@ extern "C" {
 
 
 /* Version number */
-#define HelicsVersion "0.1"
+#define HelicsVersion "0.3"
 
 
 /***************************************************
@@ -66,13 +66,19 @@ Common Functions
 	HELICS_Export helics_subscription_id_t helicsRegisterSubscription(helics_federate_id_t fedID, const char *name, const char *type, const char *units);
 	HELICS_Export helics_subscription_id_t helicsRegisterDoubleSubscription(helics_federate_id_t fedID, const char *name, const char *units);
 	HELICS_Export helics_subscription_id_t helicsRegisterStringSubscription(helics_federate_id_t fedID, const char *name, const char *units);
+	HELICS_Export helics_subscription_id_t helicsRegisterComplexSubscription(helics_federate_id_t fedID, const char *name, const char *units);
+	HELICS_Export helics_subscription_id_t helicsRegisterVectorSubscription(helics_federate_id_t fedID, const char *name, const char *units);
 
 	HELICS_Export helics_publication_id_t  helicsRegisterPublication(helics_federate_id_t fedID, const char *name, const char *type, const char *units);
 	HELICS_Export helics_publication_id_t  helicsRegisterDoublePublication(helics_federate_id_t fedID, const char *name, const char *units);
 	HELICS_Export helics_publication_id_t  helicsRegisterStringPublication(helics_federate_id_t fedID, const char *name, const char *units);
+	HELICS_Export helics_publication_id_t  helicsRegisterComplexPublication(helics_federate_id_t fedID, const char *name, const char *units);
+	HELICS_Export helics_publication_id_t  helicsRegisterVectorPublication(helics_federate_id_t fedID, const char *name, const char *units);
 	HELICS_Export helics_publication_id_t  helicsRegisterGlobalPublication(helics_federate_id_t fedID, const char *name, const char *type, const char *units);
 	HELICS_Export helics_publication_id_t  helicsRegisterGlobalDoublePublication(helics_federate_id_t fedID, const char *name, const char *units);
 	HELICS_Export helics_publication_id_t  helicsRegisterGlobalStringPublication(helics_federate_id_t fedID, const char *name, const char *units);
+	HELICS_Export helics_publication_id_t  helicsRegisterGlobalComplexPublication(helics_federate_id_t fedID, const char *name, const char *units);
+	HELICS_Export helics_publication_id_t  helicsRegisterGlobalVectorPublication(helics_federate_id_t fedID, const char *name, const char *units);
 	/* initialization, execution, and time requests */
 	HELICS_Export helicsStatus helicsEnterInitializationMode(helics_federate_id_t fedID);
 
@@ -87,11 +93,19 @@ Common Functions
 
    HELICS_Export helicsStatus helicsPublishDouble(helics_federate_id_t fedID, helics_publication_id_t pubID, double val);
 
+   HELICS_Export helicsStatus helicsPublishComplex(helics_federate_id_t fedID, helics_publication_id_t pubID, double real, double imag);
+
+   HELICS_Export helicsStatus helicsPublishVector(helics_federate_id_t fedID, helics_publication_id_t pubID, double *data, uint64_t len);
+
    HELICS_Export uint64_t helicsGetValue(helics_federate_id_t fedID, helics_publication_id_t pubID, char *data, uint64_t maxlen);
 
    HELICS_Export helicsStatus helicsGetString(helics_federate_id_t fedID, helics_publication_id_t pubID, char *str, uint64_t maxlen);
 
    HELICS_Export helicsStatus helicsGetDouble(helics_federate_id_t fedID, helics_publication_id_t pubID, double *val);
+
+   HELICS_Export helicsStatus helicsGetComplex(helics_federate_id_t fedID, helics_publication_id_t pubID, double *real, double *imag);
+
+   HELICS_Export helicsStatus helicsGetVector(helics_federate_id_t fedID, helics_publication_id_t pubID, double *data, uint64_t len);
 
    
 #ifdef __cplusplus

@@ -105,6 +105,8 @@ class data_block
     void resize (size_t newSize) { m_data.resize (newSize); }
     /** resize the data storage*/
     void resize (size_t newSize, char T) { m_data.resize (newSize, T); }
+	/** reserve space in a data_block*/
+	void reserve(size_t space) { m_data.reserve(space); }
     /** get a string reference*/
     const std::string &to_string () const { return m_data; }
     /** bracket operator to get a character value*/
@@ -119,6 +121,8 @@ class data_block
     auto cbegin () const { return m_data.cbegin (); }
     /** const iterator end*/
     auto cend () const { return m_data.cend (); }
+	/** add a character to the data*/
+	void push_back(char newchar) { m_data.push_back(newchar); }
 };
 
 /** class containing a message structure*/

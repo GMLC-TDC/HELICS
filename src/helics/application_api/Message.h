@@ -46,6 +46,11 @@ public:
 	data_view(const char *dt, size_t len) noexcept : dblock(dt, len) {};
 	/** construct from a string*/
 	data_view(const std::string &str) noexcept : dblock(str) {};
+	/** construct from a rValue to a string*/
+	data_view(std::string &&str) :data_view(std::make_shared<data_block>(std::move(str)))
+	{
+
+	}
 	/** construct from a char vector*/
 	data_view(const std::vector<char> &dvec) noexcept : dblock(dvec.data(), dvec.size()) {};
 	/** construct from a string_view*/

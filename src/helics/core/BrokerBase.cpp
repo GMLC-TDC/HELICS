@@ -21,6 +21,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "TimeCoordinator.h"
 #include <boost/filesystem.hpp>
+#include <iostream>
 
 static inline std::string gen_id()
 {
