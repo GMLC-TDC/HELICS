@@ -19,6 +19,11 @@ api-data.h
 
 set(helicsShared_sources
 helicsExport.cpp
+FederateExport.cpp
+ValueFederateExport.cpp
+MessageFederateExport.cpp
+MessageFilterFederateExport.cpp
+
 )
 
 

@@ -42,52 +42,54 @@ double doubleFromHelicsTime(helics_time_t time)
 	val.setBaseTimeCode(time);
 	return static_cast<double>(val);
  }
+
 /** this needs to preserve lifetime for multithreaded purposes*/
 std::shared_ptr<helics::Federate> getFed(helics_federate_id_t fedID)
 {
+	std::lock_guard<std::mutex> lock(helicsLock);
 	if (fedID < federates.size())
 	{
-		std::lock_guard<std::mutex> lock(helicsLock);
 		return federates[fedID];
 	}
 	return nullptr;
 }
 
-std::shared_ptr<helics::ValueFederate> getValueFed(helics_federate_id_t fedID)
+helics::ValueFederate *getValueFed(helics_federate_id_t fedID)
 {
 	if (fedID < federates.size())
 	{
 		std::lock_guard<std::mutex> lock(helicsLock);
 		if ((fedTypes[fedID] == valueFed) || (fedTypes[fedID] == combinFed))
 		{
-			return std::dynamic_pointer_cast<helics::ValueFederate>(federates[fedID]);
+			//need to use dynamic cast here due to virtual inheritance
+			return dynamic_cast<helics::ValueFederate *>(federates[fedID].get());
 		}
 		
 	}
 	return nullptr;
 }
 
-std::shared_ptr<helics::MessageFederate> getMessageFed(helics_federate_id_t fedID)
+helics::MessageFederate * getMessageFed(helics_federate_id_t fedID)
 {
+	std::lock_guard<std::mutex> lock(helicsLock);
 	if (fedID < federates.size())
 	{
-		std::lock_guard<std::mutex> lock(helicsLock);
 		if (fedTypes[fedID] != valueFed)
 		{
-			return std::dynamic_pointer_cast<helics::MessageFederate>(federates[fedID]);
+			return dynamic_cast<helics::MessageFederate *>(federates[fedID].get());
 		}
 	}
 	return nullptr;
 }
 
-std::shared_ptr<helics::MessageFilterFederate> getFilterFed(helics_federate_id_t fedID)
+helics::MessageFilterFederate * getFilterFed(helics_federate_id_t fedID)
 {
+	std::lock_guard<std::mutex> lock(helicsLock);
 	if (fedID < federates.size())
 	{
-		std::lock_guard<std::mutex> lock(helicsLock);
 		if (fedTypes[fedID] == filterFed)
 		{
-			return std::dynamic_pointer_cast<helics::MessageFilterFederate>(federates[fedID]);
+			return dynamic_cast<helics::MessageFilterFederate *>(federates[fedID].get());
 		}
 	}
 	return nullptr;
@@ -122,6 +124,8 @@ void helicsInitializeFederateInfo(federate_info_t *fi)
 	fi->obeserver = false;
 	fi->timeAgnostic = false;
 	fi->timeDelta = 0;
+	fi->period = 0;
+	fi->offset = 0;
  }
 
 helicsStatus helicsFinalize(helics_federate_id_t fedID)

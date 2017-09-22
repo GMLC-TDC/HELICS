@@ -6,6 +6,7 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
+
 #ifndef HELICS_API_DATA_H_
 #define HELICS_API_DATA_H_
 
@@ -21,6 +22,10 @@ typedef enum {
 typedef uint32_t helics_subscription_id_t;
 typedef uint32_t helics_publication_id_t;
 typedef uint32_t helics_federate_id_t;
+typedef uint32_t helics_value_federate_id_t;
+typedef uint32_t helics_message_federate_id_t;
+typedef uint32_t helics_message_filter_federate_id_t;
+typedef uint32_t helics_combo_federate_id_t;
 
 const helics_subscription_id_t invalid_subscription_id = 0xFFFFFFFF;
 const helics_publication_id_t invalid_publication_id = 0xFFFFFFFF;
@@ -39,20 +44,30 @@ typedef struct data_t
 } data_t;
 
 /**
-*  Message.
+*  Message_t mapped to a c compatible structure
 */
 typedef struct message_t
 {
-	helics_time_t time;
-	const char *data;
-	uint64_t len;
-	const char *origsrc;
-	const char *src;
-	const char *dst;
+	helics_time_t time; //!< message time
+	const char *data;	//!< message data
+	uint64_t len;	//!< message length
+	const char *origsrc;	//!< original source
+	const char *src;	//!< the most recent source
+	const char *dst;	//!< the final destination
 	
 	
 } message_t;
 
+
+typedef enum
+{
+	nonconverged,
+	converged,
+	halted,
+	error,
+} convergence_status;
+
+/** federate information structure*/
 typedef struct federate_info_t
 {
 	const char *name;  //!< federate name
