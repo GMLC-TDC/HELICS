@@ -15,6 +15,9 @@ ENDIF(UNIX)
 set(helicsShared_headers
 helics.h
 api-data.h
+ValueFederate_c.h
+MessageFederate_c.h
+MessageFilterFederate_c.h
 )
 
 set(helicsShared_sources
@@ -34,6 +37,7 @@ add_library(helicsSharedLib SHARED ${helicsShared_sources} ${helicsShared_header
 target_link_libraries(helicsSharedLib helics)
 link_directories(${external_link_directories})
 target_link_libraries(helicsSharedLib ${external_library_list})
+
 
 
 INSTALL(TARGETS helicsSharedLib DESTINATION lib)

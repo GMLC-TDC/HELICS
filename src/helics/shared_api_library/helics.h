@@ -6,11 +6,8 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#pragma once
 #ifndef HELICS_APISHARED_FUNCTIONS_H_
 #define HELICS_APISHARED_FUNCTIONS_H_
-
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,14 +54,6 @@ Common Functions
 
 
 /* Creation and destruction of Federates */
-	HELICS_Export helics_value_federate_id_t helicsCreateValueFederate(federate_info_t *fi);
-	HELICS_Export helics_value_federate_id_t helicsCreateValueFederateFromFile(const char *);
-
-	HELICS_Export helics_message_federate_id_t helicsCreateMessageFederate(federate_info_t *fi);
-	HELICS_Export helics_message_federate_id_t helicsCreateMessageFederateFromFile(const char *);
-
-	HELICS_Export helics_federate_id_t helicsCreateMessageFilterFederate(federate_info_t *fi);
-	HELICS_Export helics_federate_id_t helicsCreateMessageFilterFederateFromFile(const char *);
 
 	HELICS_Export helics_federate_id_t helicsCreateComboFederate(federate_info_t *fi);
 	HELICS_Export helics_federate_id_t helicsCreateComboFederateFromFile(const char *);
@@ -72,53 +61,20 @@ Common Functions
 	HELICS_Export void helicsInitializeFederateInfo(federate_info_t *fi);
 
 	HELICS_Export helicsStatus helicsFinalize(helics_federate_id_t fedID);
-/* sub/pub registration */
-	HELICS_Export helics_subscription_id_t helicsRegisterSubscription(helics_value_federate_id_t fedID, const char *name, const char *type, const char *units);
-	HELICS_Export helics_subscription_id_t helicsRegisterDoubleSubscription(helics_value_federate_id_t fedID, const char *name, const char *units);
-	HELICS_Export helics_subscription_id_t helicsRegisterStringSubscription(helics_value_federate_id_t fedID, const char *name, const char *units);
-	HELICS_Export helics_subscription_id_t helicsRegisterComplexSubscription(helics_value_federate_id_t fedID, const char *name, const char *units);
-	HELICS_Export helics_subscription_id_t helicsRegisterVectorSubscription(helics_value_federate_id_t fedID, const char *name, const char *units);
 
-	HELICS_Export helics_publication_id_t  helicsRegisterPublication(helics_value_federate_id_t fedID, const char *name, const char *type, const char *units);
-	HELICS_Export helics_publication_id_t  helicsRegisterDoublePublication(helics_value_federate_id_t fedID, const char *name, const char *units);
-	HELICS_Export helics_publication_id_t  helicsRegisterStringPublication(helics_value_federate_id_t fedID, const char *name, const char *units);
-	HELICS_Export helics_publication_id_t  helicsRegisterComplexPublication(helics_value_federate_id_t fedID, const char *name, const char *units);
-	HELICS_Export helics_publication_id_t  helicsRegisterVectorPublication(helics_value_federate_id_t fedID, const char *name, const char *units);
-	HELICS_Export helics_publication_id_t  helicsRegisterGlobalPublication(helics_value_federate_id_t fedID, const char *name, const char *type, const char *units);
-	HELICS_Export helics_publication_id_t  helicsRegisterGlobalDoublePublication(helics_value_federate_id_t fedID, const char *name, const char *units);
-	HELICS_Export helics_publication_id_t  helicsRegisterGlobalStringPublication(helics_value_federate_id_t fedID, const char *name, const char *units);
-	HELICS_Export helics_publication_id_t  helicsRegisterGlobalComplexPublication(helics_value_federate_id_t fedID, const char *name, const char *units);
-	HELICS_Export helics_publication_id_t  helicsRegisterGlobalVectorPublication(helics_value_federate_id_t fedID, const char *name, const char *units);
 	/* initialization, execution, and time requests */
 	HELICS_Export helicsStatus helicsEnterInitializationMode(helics_federate_id_t fedID);
 
 	HELICS_Export helicsStatus helicsEnterExecutionMode(helics_federate_id_t fedID);
+	HELICS_Export helicsStatus helicsEnterExecutionModeIterative(helics_federate_id_t fedID,convergence_status converged, convergence_status *outConverged);
 
    HELICS_Export helics_time_t helicsRequestTime(helics_federate_id_t fedID, helics_time_t requestTime);
-   HELICS_Export helics_time_t helicsRequestTime(helics_federate_id_t fedID, helics_time_t requestTime);
+   HELICS_Export helics_iterative_time helicsRequestTimeIterative(helics_federate_id_t fedID, helics_time_t requestTime, convergence_status converged);
    
-   /* getting and publishing values */
-   HELICS_Export helicsStatus helicsPublish(helics_value_federate_id_t fedID, helics_publication_id_t pubID, const char *data, uint64_t len);
-
-   HELICS_Export helicsStatus helicsPublishString(helics_value_federate_id_t fedID, helics_publication_id_t pubID, const char *str);
-
-   HELICS_Export helicsStatus helicsPublishDouble(helics_value_federate_id_t fedID, helics_publication_id_t pubID, double val);
-
-   HELICS_Export helicsStatus helicsPublishComplex(helics_value_federate_id_t fedID, helics_publication_id_t pubID, double real, double imag);
-
-   HELICS_Export helicsStatus helicsPublishVector(helics_value_federate_id_t fedID, helics_publication_id_t pubID, double *data, uint64_t len);
-
-   HELICS_Export uint64_t helicsGetValue(helics_value_federate_id_t fedID, helics_publication_id_t pubID, char *data, uint64_t maxlen);
-
-   HELICS_Export helicsStatus helicsGetString(helics_value_federate_id_t fedID, helics_publication_id_t pubID, char *str, uint64_t maxlen);
-
-   HELICS_Export helicsStatus helicsGetDouble(helics_value_federate_id_t fedID, helics_publication_id_t pubID, double *val);
-
-   HELICS_Export helicsStatus helicsGetComplex(helics_value_federate_id_t fedID, helics_publication_id_t pubID, double *real, double *imag);
-
-   HELICS_Export helicsStatus helicsGetVector(helics_value_federate_id_t fedID, helics_publication_id_t pubID, double *data, uint64_t len);
+  
 
    
+
 #ifdef __cplusplus
 }  /* end of extern "C" { */
 #endif

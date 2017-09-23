@@ -21,6 +21,10 @@ typedef enum {
 
 typedef uint32_t helics_subscription_id_t;
 typedef uint32_t helics_publication_id_t;
+typedef uint32_t helics_endpoint_id_t;
+typedef uint32_t helics_source_filter_id_t;
+typedef uint32_t helics_destination_filter_id_t;
+
 typedef uint32_t helics_federate_id_t;
 typedef uint32_t helics_value_federate_id_t;
 typedef uint32_t helics_message_federate_id_t;
@@ -29,9 +33,28 @@ typedef uint32_t helics_combo_federate_id_t;
 
 const helics_subscription_id_t invalid_subscription_id = 0xFFFFFFFF;
 const helics_publication_id_t invalid_publication_id = 0xFFFFFFFF;
+const helics_endpoint_id_t invalid_endpoint_id = 0xFFFFFFFF;
+const helics_source_filter_id_t invalid_source_filter_id = 0xFFFFFFFF;
+const helics_destination_filter_id_t invalid_dest_filter_id = 0xFFFFFFFF;
+
 const helics_federate_id_t invalid_federate_id = 0xFFFFFFFF;
 
 typedef int64_t helics_time_t;
+
+typedef enum
+{
+	nonconverged,
+	converged,
+	halted,
+	error,
+} convergence_status;
+
+typedef struct helics_iterative_time
+{
+	helics_time_t time;
+	convergence_status status;
+} helics_iterative_time;
+
 /**
 * Data to be communicated.
 *
@@ -55,17 +78,10 @@ typedef struct message_t
 	const char *src;	//!< the most recent source
 	const char *dst;	//!< the final destination
 	
-	
 } message_t;
 
 
-typedef enum
-{
-	nonconverged,
-	converged,
-	halted,
-	error,
-} convergence_status;
+
 
 /** federate information structure*/
 typedef struct federate_info_t
