@@ -11,9 +11,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_FEDERATE_API_
 #pragma once
 
-#include "helics_includes/string_view.h"
 #include "helics/config.h"
 #include "helics/core/helics-time.h"
+#include "helics_includes/string_view.h"
 
 #include <string>
 
@@ -41,38 +41,39 @@ class FederateInfo
     bool rollback = false;  //!< indicator that the federate has rollback features
     bool timeAgnostic = false;  //!< indicator that the federate doesn't use time
     bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must
-                                  //!support rollback if set to true]
+                                  //! support rollback if set to true]
     bool uninterruptible =
       false;  //!< indicator that the time request cannot return something other than the requested time
     bool sourceOnly = false;  //!< indicator that the federate is a source only
-	int32_t max_iterations = 10;  //!< the maximum number of iteration cycles a federate should execute
-	int32_t logLevel = 1;  //!< the logging level for the federate (-1: none, 0: error, 1:warning,2:normal,3:debug,4:trace)
-	std::string coreType;  //!< the type of the core
+    int32_t max_iterations = 10;  //!< the maximum number of iteration cycles a federate should execute
+    int32_t logLevel =
+      1;  //!< the logging level for the federate (-1: none, 0: error, 1:warning,2:normal,3:debug,4:trace)
+    std::string coreType;  //!< the type of the core
     std::string coreName;  //!< the name of the core
     Time timeDelta = timeZero;  //!< the minimum time between granted time requests
     Time lookAhead = timeZero;  //!< the lookahead value
     Time impactWindow = timeZero;  //!< the impact window
-	Time period = timeZero; //!< the peiodicity of the Federate granted time can only come on integer multipliers of the period
-	Time offset = timeZero; //!< the offset to the time period
-	std::string coreInitString;  //!< an initialization string for the core API object
-	
-	/** default constructor*/
-    FederateInfo ()=default;
-	/** construct from the federate name*/
+    Time period = timeZero;  //!< the peiodicity of the Federate granted time can only come on integer multipliers
+                             //!< of the period
+    Time offset = timeZero;  //!< the offset to the time period
+    std::string coreInitString;  //!< an initialization string for the core API object
+
+    /** default constructor*/
+    FederateInfo () = default;
+    /** construct from the federate name*/
     FederateInfo (std::string fedname) : name (fedname){};
-	/** construct from the name and type*/
-    FederateInfo (std::string fedname, std::string cType) : name (std::move(fedname)), coreType (std::move(cType)){};
+    /** construct from the name and type*/
+    FederateInfo (std::string fedname, std::string cType)
+        : name (std::move (fedname)), coreType (std::move (cType)){};
 };
 
 class Core;
-
 
 /** base class for a federate in the application API
  */
 class Federate
 {
   public:
-
     /** the allowable states of the federate*/
     enum class op_states : char
     {
@@ -82,10 +83,10 @@ class Federate
         finalize,  //!< the federate has finished executing normally final values may be retrieved
         error,  //!< error state no core communication is possible but values can be retrieved
         // the following states are for async operations
-        pendingInit,  //!<indicator that the federate is pending an init
-        pendingExec,  //!<state pending EnterExecution State
-        pendingTime,  //!<state that the federate is pending a timeRequest
-        pendingIterativeTime,  //!<state that the federate is pending an iterative time request
+        pendingInit,  //!< indicator that the federate is pending an init
+        pendingExec,  //!< state pending EnterExecution State
+        pendingTime,  //!< state that the federate is pending a timeRequest
+        pendingIterativeTime,  //!< state that the federate is pending an iterative time request
     };
 
   protected:
@@ -138,7 +139,7 @@ class Federate
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
-    convergence_state enterExecutionState (convergence_state ProcessComplete =convergence_state::complete);
+    convergence_state enterExecutionState (convergence_state ProcessComplete = convergence_state::complete);
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
@@ -147,7 +148,7 @@ class Federate
     @details call will not block but will return quickly.  The enterInitializationStateFinalize must be called
     before doing other operations
     */
-	convergence_state enterExecutionStateFinalize ();
+    convergence_state enterExecutionStateFinalize ();
     /** terminate the simulation
     @details call is normally non-blocking, but may block if called in the midst of an
     asynchronous call sequence*/
@@ -170,7 +171,7 @@ class Federate
     /** request a time advancement
     @param[in] the next requested time step
     @return the granted time step*/
-	iterationTime requestTimeIterative (Time nextInternalTimeStep, convergence_state iterationComplete);
+    iterationTime requestTimeIterative (Time nextInternalTimeStep, convergence_state iterationComplete);
 
     /** request a time advancement
     @param[in] the next requested time step
@@ -208,66 +209,74 @@ class Federate
     @param[in] lookAhead the look ahead time
     */
     void setImpactWindow (Time window);
-	/** set the period and offset of the federate
-	@details the federate will on grant time on N*period+offset interval
-	@param[in] period the length of time between each subsequent grants
-	@param[in] offset the shift of the period from 0  offset must be < period
-	*/
-	void setPeriod(Time period,Time offset=timeZero);
-	/**  set the logging level for the federate
-	@ details debug and trace only do anything if they were enabled in the compilation
-	@param loggingLevel (-1: none, 0: error_only, 1: warings, 2: normal, 3: debug, 4: trace)
-	*/
-	void setLoggingLevel(int loggingLevel);
+    /** set the period and offset of the federate
+    @details the federate will on grant time on N*period+offset interval
+    @param[in] period the length of time between each subsequent grants
+    @param[in] offset the shift of the period from 0  offset must be < period
+    */
+    void setPeriod (Time period, Time offset = timeZero);
+    /**  set the logging level for the federate
+    @ details debug and trace only do anything if they were enabled in the compilation
+    @param loggingLevel (-1: none, 0: error_only, 1: warings, 2: normal, 3: debug, 4: trace)
+    */
+    void setLoggingLevel (int loggingLevel);
 
-	/** make a query of the core
-	@details this call is blocking until the value is returned which make take some time depending on the size of the federation and the specific string being
-	queried
-	@param target  the target of the query can be "federation", "federate", "broker", "core", or a specific name of a federate, core, or broker
-	@param queryStr a string with the query see other documentation for specific properties to query, can be defined by the federate
-	@return a string with the value requested.  this is either going to be a single string value or a json structure.  The string "#invalid" is returned if the query was
-	not valid
-	*/
-	std::string query(const std::string &target, const std::string &queryStr);
+    /** make a query of the core
+    @details this call is blocking until the value is returned which make take some time depending on the size of
+    the federation and the specific string being queried
+    @param target  the target of the query can be "federation", "federate", "broker", "core", or a specific name of
+    a federate, core, or broker
+    @param queryStr a string with the query see other documentation for specific properties to query, can be
+    defined by the federate
+    @return a string with the value requested.  this is either going to be a single string value or a json
+    structure.  The string "#invalid" is returned if the query was not valid
+    */
+    std::string query (const std::string &target, const std::string &queryStr);
 
-	/** make a query of the core
-	@details this call is blocking until the value is returned which make take some time depending on the size of the federation and the specific string being
-	queried
-	@param queryStr a string with the query see other documentation for specific properties to query, can be defined by the federate if the local federate does not recognize the query it sends it on to the federation
-	@return a string with the value requested.  this is either going to be a single string value or a json structure.  The string "#invalid" is returned if the query was
-	not valid
-	*/
-	std::string query(const std::string &queryStr);
+    /** make a query of the core
+    @details this call is blocking until the value is returned which make take some time depending on the size of
+    the federation and the specific string being queried
+    @param queryStr a string with the query see other documentation for specific properties to query, can be
+    defined by the federate if the local federate does not recognize the query it sends it on to the federation
+    @return a string with the value requested.  this is either going to be a single string value or a json
+    structure.  The string "#invalid" is returned if the query was not valid
+    */
+    std::string query (const std::string &queryStr);
 
-	/** make a query of the core in an async fashion
-	@details this call is blocking until the value is returned which make take some time depending on the size of the federation and the specific string being
-	queried
-	@param target  the target of the query can be "federation", "federate", "broker", "core", or a specific name of a federate, core, or broker
-	@param queryStr a string with the query see other documentation for specific properties to query, can be defined by the federate
-	@return an integer used to get the results of the query in the future
-	*/
-	int queryAsync(const std::string &target, const std::string &queryStr);
+    /** make a query of the core in an async fashion
+    @details this call is blocking until the value is returned which make take some time depending on the size of
+    the federation and the specific string being queried
+    @param target  the target of the query can be "federation", "federate", "broker", "core", or a specific name of
+    a federate, core, or broker
+    @param queryStr a string with the query see other documentation for specific properties to query, can be
+    defined by the federate
+    @return an integer used to get the results of the query in the future
+    */
+    int queryAsync (const std::string &target, const std::string &queryStr);
 
-	/** make a query of the core in an async fashion
-	@details this call is blocking until the value is returned which make take some time depending on the size of the federation and the specific string being
-	queried
-	@param queryStr a string with the query see other documentation for specific properties to query, can be defined by the federate
-	@return an integer used to get the results of the query in the future
-	*/
-	int queryAsync(const std::string &queryStr);
+    /** make a query of the core in an async fashion
+    @details this call is blocking until the value is returned which make take some time depending on the size of
+    the federation and the specific string being queried
+    @param queryStr a string with the query see other documentation for specific properties to query, can be
+    defined by the federate
+    @return an integer used to get the results of the query in the future
+    */
+    int queryAsync (const std::string &queryStr);
 
-	/** get the results of an async query
-	@details the call will block until the results are returned inquiry of queryCompleted() to check if the results have been returned or not yet
+    /** get the results of an async query
+    @details the call will block until the results are returned inquiry of queryCompleted() to check if the results
+    have been returned or not yet
 
-	@param queryIndex the int value returned from the queryAsync call
-	@return a string with the value requested.  this is either going to be a single string value or a json structure.
-	*/
-	std::string queryFinalize(int queryIndex);
+    @param queryIndex the int value returned from the queryAsync call
+    @return a string with the value requested.  this is either going to be a single string value or a json
+    structure.
+    */
+    std::string queryFinalize (int queryIndex);
 
-	/** check if an asynchronous query call has been completed
-	@return true if the results are ready for @queryFinalize
-	*/
-	bool queryCompleted(int queryIndex) const;
+    /** check if an asynchronous query call has been completed
+    @return true if the results are ready for @queryFinalize
+    */
+    bool queryCompleted (int queryIndex) const;
 
   protected:
     /** function to deal with any operations that need to occur on a time update*/
@@ -285,18 +294,18 @@ class Federate
     virtual void registerInterfaces (const std::string &jsonString);
     /** get the underlying federateID for the core*/
     unsigned int getID () const noexcept { return fedID; }
-	/** get the current state of the federate*/
+    /** get the current state of the federate*/
     op_states currentState () const { return state; }
-	/** get the current Time
-	@details the most recent granted time of the federate*/
+    /** get the current Time
+    @details the most recent granted time of the federate*/
     Time getCurrentTime () const { return currentTime; }
-	/** get the federate name*/
+    /** get the federate name*/
     const std::string &getName () const { return FedInfo.name; }
-	/** get a pointer to the core object used by the federate*/
+    /** get a pointer to the core object used by the federate*/
     std::shared_ptr<Core> getCorePointer () { return coreObject; }
 };
 /** generate a FederateInfo object from a json file
-*/
+ */
 FederateInfo LoadFederateInfo (const std::string &jsonString);
 
 /** defining an exception class for state transition errors*/

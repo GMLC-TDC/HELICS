@@ -9,46 +9,33 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "CoreBroker.h"
-#include "common/stringToCmdLine.h"
 #include "BrokerFactory.h"
+#include "common/stringToCmdLine.h"
 
-#include <boost/filesystem.hpp>
 #include "helics/core/argParser.h"
+#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 
 #include "TimeCoordinator.h"
-#include "loggingHelper.hpp"
 #include "helics/common/logger.h"
+#include "loggingHelper.hpp"
 #include <fstream>
-
-
-
-
-
 
 namespace helics
 {
-
 using namespace std::string_literals;
 
-static const argDescriptors extraArgs
-{
-	{ "root"s, ""s, "specify whether the broker is a root"s },
+static const argDescriptors extraArgs{
+  {"root"s, ""s, "specify whether the broker is a root"s},
 };
 
 bool matchingTypes (const std::string &type1, const std::string &type2);
 
-
-
-CoreBroker::~CoreBroker ()
-{
-
-}
-
+CoreBroker::~CoreBroker () {}
 
 void CoreBroker::setIdentifier (const std::string &name)
 {
-    if (brokerState<=broker_state_t::connecting)  // can't be changed after initialization
+    if (brokerState <= broker_state_t::connecting)  // can't be changed after initialization
     {
         std::lock_guard<std::mutex> lock (mutex_);
         identifier = name;
@@ -70,7 +57,6 @@ int32_t CoreBroker::getRouteNoLock (Core::federate_id_t fedid) const
     return (fnd != routing_table.end ()) ? fnd->second : 0;  // zero is the default route
 }
 
-
 int32_t CoreBroker::getFedByName (const std::string &fedName) const
 {
     // only activate the lock if we not in an operating state
@@ -80,7 +66,6 @@ int32_t CoreBroker::getFedByName (const std::string &fedName) const
     auto fnd = fedNames.find (fedName);
     return (fnd != fedNames.end ()) ? fnd->second : -1;
 }
-
 
 int32_t CoreBroker::getBrokerByName (const std::string &brokerName) const
 {
@@ -112,7 +97,7 @@ int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
 {
     if (_isRoot)
     {
-        return static_cast<int32_t> (fedid-global_federate_id_shift);
+        return static_cast<int32_t> (fedid - global_federate_id_shift);
     }
     else
     {
@@ -127,7 +112,9 @@ int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
 void CoreBroker::processPriorityCommand (const ActionMessage &command)
 {
     // deal with a few types of message immediately
-	LOG_TRACE(0, getIdentifier(), (boost::format("|| priority_cmd:%s from %d") % prettyPrintString(command) % command.source_id).str());
+    LOG_TRACE (
+      0, getIdentifier (),
+      (boost::format ("|| priority_cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -136,9 +123,9 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
         {
             if (allInitReady ())
             {
-				ActionMessage noInit(CMD_INIT_NOT_READY);
-				noInit.source_id = global_broker_id;
-				transmit(0, noInit);
+                ActionMessage noInit (CMD_INIT_NOT_READY);
+                noInit.source_id = global_broker_id;
+                transmit (0, noInit);
             }
         }
         else  // we are initialized already
@@ -181,7 +168,8 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
         }
         else
         {
-            _federates.back ().global_id = static_cast<Core::federate_id_t> (_federates.size ()) - 1+global_federate_id_shift;
+            _federates.back ().global_id =
+              static_cast<Core::federate_id_t> (_federates.size ()) - 1 + global_federate_id_shift;
             auto route_id = _federates.back ().route_id;
             auto global_id = _federates.back ().global_id;
             routing_table.emplace (global_id, route_id);
@@ -286,7 +274,7 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
             if (!command.error)
             {
                 global_broker_id = command.dest_id;
-				timeCoord->source_id = global_broker_id;
+                timeCoord->source_id = global_broker_id;
                 transmitDelayedMessages ();
                 return;
             }
@@ -318,33 +306,32 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
         }
     }
     break;
-	case CMD_PRIORITY_DISCONNECT:
-	{
-		auto brkNum = getBrokerById(command.source_id);
-		if (brkNum >= 0)
-		{
-			_brokers[brkNum]._disconnected = true;
-		}
-		if (allDisconnected())
-		{
-			if (!_isRoot)
-			{
-				ActionMessage dis(CMD_PRIORITY_DISCONNECT);
-				dis.source_id = global_broker_id;
-				transmit(0, dis);
-			}
-			addActionMessage(CMD_STOP);
-		}
-	}
-	break;
-	case CMD_REG_ROUTE:
-		break;
-	default:
-		//must not have been a priority command
-		break;
+    case CMD_PRIORITY_DISCONNECT:
+    {
+        auto brkNum = getBrokerById (command.source_id);
+        if (brkNum >= 0)
+        {
+            _brokers[brkNum]._disconnected = true;
+        }
+        if (allDisconnected ())
+        {
+            if (!_isRoot)
+            {
+                ActionMessage dis (CMD_PRIORITY_DISCONNECT);
+                dis.source_id = global_broker_id;
+                transmit (0, dis);
+            }
+            addActionMessage (CMD_STOP);
+        }
+    }
+    break;
+    case CMD_REG_ROUTE:
+        break;
+    default:
+        // must not have been a priority command
+        break;
     }
 }
-
 
 void CoreBroker::transmitDelayedMessages ()
 {
@@ -359,11 +346,13 @@ void CoreBroker::transmitDelayedMessages ()
 
 void CoreBroker::processCommand (ActionMessage &&command)
 {
-	LOG_TRACE(0, getIdentifier(), (boost::format("|| priority_cmd:%s from %d") % prettyPrintString(command) % command.source_id).str());
-	switch (command.action ())
+    LOG_TRACE (
+      0, getIdentifier (),
+      (boost::format ("|| priority_cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
+    switch (command.action ())
     {
     case CMD_IGNORE:
-	case CMD_PROTOCOL:
+    case CMD_PROTOCOL:
         break;
     case CMD_INIT:
     {
@@ -386,133 +375,134 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 {
                     transmit (brk.route_id, m);
                 }
-				timeCoord->enteringExecMode(convergence_state::complete);
-				auto res = timeCoord->checkExecEntry();
-				if (res == convergence_state::complete)
-				{
-					enteredExecutionMode = true;
-					timeCoord->timeRequest(Time::maxVal(), convergence_state::complete, Time::maxVal(), Time::maxVal());
-				}
+                timeCoord->enteringExecMode (convergence_state::complete);
+                auto res = timeCoord->checkExecEntry ();
+                if (res == convergence_state::complete)
+                {
+                    enteredExecutionMode = true;
+                    timeCoord->timeRequest (Time::maxVal (), convergence_state::complete, Time::maxVal (),
+                                            Time::maxVal ());
+                }
             }
             else
             {
                 command.source_id = global_broker_id;
                 transmit (0, command);
             }
-			
         }
     }
     break;
-	case CMD_INIT_NOT_READY:
-	{
-		auto brkNum = getBrokerById(command.source_id);
-		if (allInitReady())
-		{
-			transmit(0, command);
-		}
-		if (brkNum >= 0)
-		{
-			std::lock_guard<std::mutex> lock(mutex_);
-			_brokers[brkNum]._initRequested = false;
-		}
-	}
-		break;
+    case CMD_INIT_NOT_READY:
+    {
+        auto brkNum = getBrokerById (command.source_id);
+        if (allInitReady ())
+        {
+            transmit (0, command);
+        }
+        if (brkNum >= 0)
+        {
+            std::lock_guard<std::mutex> lock (mutex_);
+            _brokers[brkNum]._initRequested = false;
+        }
+    }
+    break;
     case CMD_INIT_GRANT:
         for (auto &brk : _brokers)
         {
             transmit (brk.route_id, command);
         }
-		{
-			timeCoord->enteringExecMode(convergence_state::complete);
-			auto res = timeCoord->checkExecEntry();
-			if (res == convergence_state::complete)
-			{
-				enteredExecutionMode = true;
-				timeCoord->timeRequest(Time::maxVal(), convergence_state::complete, Time::maxVal(), Time::maxVal());
-			}
-		}
+        {
+            timeCoord->enteringExecMode (convergence_state::complete);
+            auto res = timeCoord->checkExecEntry ();
+            if (res == convergence_state::complete)
+            {
+                enteredExecutionMode = true;
+                timeCoord->timeRequest (Time::maxVal (), convergence_state::complete, Time::maxVal (),
+                                        Time::maxVal ());
+            }
+        }
         break;
-	case CMD_DISCONNECT:
-	{
-		auto brkNum = getBrokerById(command.source_id);
-		if (brkNum >= 0)
-		{
-			auto lock = (_operating) ? std::unique_lock<std::mutex>(mutex_, std::defer_lock) :
-				std::unique_lock<std::mutex>(mutex_);
-			_brokers[brkNum]._disconnected = true;
-		}
-		if (allDisconnected())
-		{
-			if (!_isRoot)
-			{
-				ActionMessage dis(CMD_DISCONNECT);
-				dis.source_id = global_broker_id;
-				transmit(0, dis);
-			}
-			addActionMessage(CMD_STOP);
-		}
-	}
-	break;
-	case CMD_STOP:
-		if ((!allDisconnected())&&(!_isRoot))
-		{ //only send a disconnect message if we haven't done so already
-			ActionMessage m(CMD_DISCONNECT);
-			m.source_id = global_broker_id;
-			transmit(0, m);
-		}
-		break;
+    case CMD_DISCONNECT:
+    {
+        auto brkNum = getBrokerById (command.source_id);
+        if (brkNum >= 0)
+        {
+            auto lock = (_operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
+                                       std::unique_lock<std::mutex> (mutex_);
+            _brokers[brkNum]._disconnected = true;
+        }
+        if (allDisconnected ())
+        {
+            if (!_isRoot)
+            {
+                ActionMessage dis (CMD_DISCONNECT);
+                dis.source_id = global_broker_id;
+                transmit (0, dis);
+            }
+            addActionMessage (CMD_STOP);
+        }
+    }
+    break;
+    case CMD_STOP:
+        if ((!allDisconnected ()) && (!_isRoot))
+        {  // only send a disconnect message if we haven't done so already
+            ActionMessage m (CMD_DISCONNECT);
+            m.source_id = global_broker_id;
+            transmit (0, m);
+        }
+        break;
     case CMD_EXEC_REQUEST:
-	case CMD_EXEC_GRANT:
-		if (command.dest_id == global_broker_id)
-		{
-			timeCoord->processTimeMessage(command);
-			if (enteredExecutionMode == false)
-			{
-				auto res = timeCoord->checkExecEntry();
-				if (res == convergence_state::complete)
-				{
-					enteredExecutionMode = true;
-					timeCoord->timeRequest(Time::maxVal(), convergence_state::complete, Time::maxVal(), Time::maxVal());
-				}
-			}
-		}
-		else if (command.source_id == global_broker_id)
-		{
-			for (auto dep : timeCoord->getDependents())
-			{
-				command.dest_id = dep;
-				transmit(getRoute(dep), command);
-			}
-		}
-		else
-		{
-			transmit(getRoute(command.dest_id), command);
-		}
-        
+    case CMD_EXEC_GRANT:
+        if (command.dest_id == global_broker_id)
+        {
+            timeCoord->processTimeMessage (command);
+            if (enteredExecutionMode == false)
+            {
+                auto res = timeCoord->checkExecEntry ();
+                if (res == convergence_state::complete)
+                {
+                    enteredExecutionMode = true;
+                    timeCoord->timeRequest (Time::maxVal (), convergence_state::complete, Time::maxVal (),
+                                            Time::maxVal ());
+                }
+            }
+        }
+        else if (command.source_id == global_broker_id)
+        {
+            for (auto dep : timeCoord->getDependents ())
+            {
+                command.dest_id = dep;
+                transmit (getRoute (dep), command);
+            }
+        }
+        else
+        {
+            transmit (getRoute (command.dest_id), command);
+        }
+
         break;
     case CMD_TIME_REQUEST:
-	case CMD_TIME_GRANT:
-		if (command.source_id == global_broker_id)
-		{
-			for (auto dep : timeCoord->getDependents())
-			{
-				command.dest_id = dep;
-				transmit(getRoute(dep), command);
-			}
-		}
-		else if (command.dest_id == global_broker_id)
-		{
-			if (timeCoord->processTimeMessage(command))
-			{
-				timeCoord->checkTimeGrant();
-			}
+    case CMD_TIME_GRANT:
+        if (command.source_id == global_broker_id)
+        {
+            for (auto dep : timeCoord->getDependents ())
+            {
+                command.dest_id = dep;
+                transmit (getRoute (dep), command);
+            }
+        }
+        else if (command.dest_id == global_broker_id)
+        {
+            if (timeCoord->processTimeMessage (command))
+            {
+                timeCoord->checkTimeGrant ();
+            }
+        }
+        else
+        {
+            transmit (getRoute (command.dest_id), command);
+        }
 
-		}
-		else
-		{
-			transmit(getRoute(command.dest_id), command);
-		}
-        
         break;
     case CMD_SEND_MESSAGE:
         transmit (getRoute (command.dest_id), command);
@@ -523,7 +513,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_PUB:
         transmit (getRoute (command.dest_id), command);
         break;
-    
+
     case CMD_LOG:
         if (_isRoot)
         {
@@ -545,124 +535,124 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         break;
     case CMD_REG_PUB:
-		if (!_isRoot)
-		{
-			if (command.dest_id != 0)
-			{
-				auto rt = getRoute(command.dest_id);
-				transmit(rt, command);
-				break;
-			}
-		}
-		addPublication(command);
+        if (!_isRoot)
+        {
+            if (command.dest_id != 0)
+            {
+                auto rt = getRoute (command.dest_id);
+                transmit (rt, command);
+                break;
+            }
+        }
+        addPublication (command);
         break;
     case CMD_REG_SUB:
-		if (!_isRoot)
-		{
-			if (command.dest_id != 0)
-			{
-				auto rt = getRoute(command.dest_id);
-				transmit(rt, command);
-				break;
-			}
-		}
-		addSubscription(command);
+        if (!_isRoot)
+        {
+            if (command.dest_id != 0)
+            {
+                auto rt = getRoute (command.dest_id);
+                transmit (rt, command);
+                break;
+            }
+        }
+        addSubscription (command);
         break;
     case CMD_REG_END:
-		if (!_isRoot)
-		{
-			if (command.dest_id != 0)
-			{
-				auto rt = getRoute(command.dest_id);
-				transmit(rt, command);
-				break;
-			}
-		}
-		addEndpoint(command);
+        if (!_isRoot)
+        {
+            if (command.dest_id != 0)
+            {
+                auto rt = getRoute (command.dest_id);
+                transmit (rt, command);
+                break;
+            }
+        }
+        addEndpoint (command);
         break;
     case CMD_REG_DST_FILTER:
-		if (!_isRoot)
-		{
-			if (command.dest_id != 0)
-			{
-				auto rt = getRoute(command.dest_id);
-				transmit(rt, command);
-				break;
-			}
-		}
-		addDestFilter(command);
+        if (!_isRoot)
+        {
+            if (command.dest_id != 0)
+            {
+                auto rt = getRoute (command.dest_id);
+                transmit (rt, command);
+                break;
+            }
+        }
+        addDestFilter (command);
         break;
     case CMD_REG_SRC_FILTER:
-		if (!_isRoot)
-		{
-			if (command.dest_id != 0)
-			{
-				auto rt = getRoute(command.dest_id);
-				transmit(rt, command);
-				break;
-			}
-		}
-		addSourceFilter(command);
+        if (!_isRoot)
+        {
+            if (command.dest_id != 0)
+            {
+                auto rt = getRoute (command.dest_id);
+                transmit (rt, command);
+                break;
+            }
+        }
+        addSourceFilter (command);
         break;
-	case CMD_SRC_FILTER_HAS_OPERATOR:
-		if (command.dest_id != 0)
-		{
-			auto rt = getRoute(command.dest_id);
-			transmit(rt, command);
-			break;
-		}
-		{
-			if ((!updateSourceFilterOperator(command)) && (!_isRoot))
-			{
-				transmit(0, command);
-			}
-		}
-		
-		break;
-	case CMD_ADD_DEPENDENCY:
-		if (command.dest_id != global_broker_id)
-		{
-			auto rt = getRoute(command.dest_id);
-			transmit(rt, command);
-		}
-		else
-		{
-			timeCoord->addDependency(command.source_id);
-		}
-		break;
-	case CMD_ADD_DEPENDENT:
-		if (command.dest_id != global_broker_id)
-		{
-			auto rt = getRoute(command.dest_id);
-			transmit(rt, command);
-		}
-		else
-		{
-			timeCoord->addDependent(command.source_id);
-		}
-		break;
-	case CMD_REMOVE_DEPENDENT:
-		if (command.dest_id != global_broker_id)
-		{
-			auto rt = getRoute(command.dest_id);
-			transmit(rt, command);
-		}
-		else
-		{
-			timeCoord->removeDependent(command.source_id);
-		}
-		break;
-	case CMD_REMOVE_DEPENDENCY:
-		if (command.dest_id != global_broker_id)
-		{
-			auto rt = getRoute(command.dest_id);
-			transmit(rt, command);
-		}
-		else
-		{
-			timeCoord->removeDependency(command.source_id);
-		}
-		break;
+    case CMD_SRC_FILTER_HAS_OPERATOR:
+        if (command.dest_id != 0)
+        {
+            auto rt = getRoute (command.dest_id);
+            transmit (rt, command);
+            break;
+        }
+        {
+            if ((!updateSourceFilterOperator (command)) && (!_isRoot))
+            {
+                transmit (0, command);
+            }
+        }
+
+        break;
+    case CMD_ADD_DEPENDENCY:
+        if (command.dest_id != global_broker_id)
+        {
+            auto rt = getRoute (command.dest_id);
+            transmit (rt, command);
+        }
+        else
+        {
+            timeCoord->addDependency (command.source_id);
+        }
+        break;
+    case CMD_ADD_DEPENDENT:
+        if (command.dest_id != global_broker_id)
+        {
+            auto rt = getRoute (command.dest_id);
+            transmit (rt, command);
+        }
+        else
+        {
+            timeCoord->addDependent (command.source_id);
+        }
+        break;
+    case CMD_REMOVE_DEPENDENT:
+        if (command.dest_id != global_broker_id)
+        {
+            auto rt = getRoute (command.dest_id);
+            transmit (rt, command);
+        }
+        else
+        {
+            timeCoord->removeDependent (command.source_id);
+        }
+        break;
+    case CMD_REMOVE_DEPENDENCY:
+        if (command.dest_id != global_broker_id)
+        {
+            auto rt = getRoute (command.dest_id);
+            transmit (rt, command);
+        }
+        else
+        {
+            timeCoord->removeDependency (command.source_id);
+        }
+        break;
     default:
         // check again if it is a priority command and if so process it in that function
         if (isPriorityCommand (command))
@@ -670,156 +660,155 @@ void CoreBroker::processCommand (ActionMessage &&command)
             processPriorityCommand (command);
             break;
         }
-		else if (command.dest_id!=global_broker_id)
-		{
-			auto rt = getRoute(command.dest_id);
-			transmit(rt, command);
-		}
+        else if (command.dest_id != global_broker_id)
+        {
+            auto rt = getRoute (command.dest_id);
+            transmit (rt, command);
+        }
     }
 }
 
-
-void CoreBroker::addLocalInfo(BasicHandleInfo &handleInfo, const ActionMessage &m)
+void CoreBroker::addLocalInfo (BasicHandleInfo &handleInfo, const ActionMessage &m)
 {
-	std::unique_lock<std::mutex> lock(mutex_);
-	auto res = global_id_translation.find(m.source_id);
-	if (res != global_id_translation.end())
-	{
-		handleInfo.local_fed_id = res->second;
-	}
+    std::unique_lock<std::mutex> lock (mutex_);
+    auto res = global_id_translation.find (m.source_id);
+    if (res != global_id_translation.end ())
+    {
+        handleInfo.local_fed_id = res->second;
+    }
 }
 
-void CoreBroker::addPublication(ActionMessage &m)
+void CoreBroker::addPublication (ActionMessage &m)
 {
-	_handles.emplace_back(m.source_handle, m.source_id, HANDLE_PUB, m.name, m.info().type, m.info().units);
-	
-	publications.emplace(m.name, static_cast<int32_t>(_handles.size() - 1));
-	handle_table.emplace(makeGlobalHandleIdentifier(m.source_id, m.source_handle), static_cast<int32_t>(_handles.size() - 1));
-	addLocalInfo(_handles.back(), m);
-	if (!_isRoot)
-	{
-		transmit(0, m);
-	}
-	else
-	{
-		FindandNotifyPublicationSubscribers(_handles.back());
-	}
-	
-	
-}
-void CoreBroker::addSubscription(ActionMessage &m)
-{
-	_handles.emplace_back(m.source_handle, m.source_id, HANDLE_SUB, m.name, m.info().type, m.info().units);
-	handle_table.emplace(makeGlobalHandleIdentifier(m.source_id, m.source_handle), static_cast<int32_t>(_handles.size() - 1));
-	addLocalInfo(_handles.back(), m);
-	subscriptions.emplace(m.name, static_cast<int32_t>(_handles.size() - 1));
-	_handles.back().processed = m.processingComplete;
-	if (!m.processingComplete)
-	{
-		bool proc = FindandNotifySubscriptionPublisher(_handles.back());
-		if (!_isRoot)
-		{
-			//just let any higher level brokers know we have found the publisher and let them know
-			m.processingComplete = proc;
-			transmit(0, m);
-		}
-	}
-	
-}
+    _handles.emplace_back (m.source_handle, m.source_id, HANDLE_PUB, m.name, m.info ().type, m.info ().units);
 
-void CoreBroker::addEndpoint(ActionMessage &m)
-{
-	_handles.emplace_back(m.source_handle, m.source_id, HANDLE_END, m.name, m.info().type, m.info().units);
-	endpoints.emplace(m.name, static_cast<int32_t>(_handles.size() - 1));
-	handle_table.emplace(makeGlobalHandleIdentifier(m.source_id, m.source_handle), static_cast<int32_t>(_handles.size() - 1));
-	addLocalInfo(_handles.back(), m);
-	
-	bool addDep = (!m.processingComplete);
-	if (!_isRoot)
-	{
-		m.processingComplete = true;
-		transmit(0, m);
-	}
-	else
-	{
-		FindandNotifyEndpointFilters(_handles.back());
-	}
-
-	if (addDep)
-	{
-		bool added = timeCoord->addDependency(m.source_id);
-		if (added)
-		{
-			ActionMessage add(CMD_ADD_DEPENDENCY);
-			add.source_id = global_broker_id;
-			add.dest_id = m.source_id;
-			auto rt = getRoute(m.source_id);
-			transmit(rt, add);
-			add.setAction(CMD_ADD_DEPENDENT);
-			transmit(rt, add);
-			timeCoord->addDependent(m.source_id);
-
-		}
-	}
+    publications.emplace (m.name, static_cast<int32_t> (_handles.size () - 1));
+    handle_table.emplace (makeGlobalHandleIdentifier (m.source_id, m.source_handle),
+                          static_cast<int32_t> (_handles.size () - 1));
+    addLocalInfo (_handles.back (), m);
+    if (!_isRoot)
+    {
+        transmit (0, m);
+    }
+    else
+    {
+        FindandNotifyPublicationSubscribers (_handles.back ());
+    }
 }
-void CoreBroker::addSourceFilter(ActionMessage &m)
+void CoreBroker::addSubscription (ActionMessage &m)
 {
-	_handles.emplace_back(m.source_handle, m.source_id, HANDLE_SOURCE_FILTER, m.name, m.info().type, m.info().target);
-	addLocalInfo(_handles.back(), m);
-	handle_table.emplace(makeGlobalHandleIdentifier(m.source_id, m.source_handle), static_cast<int32_t>(_handles.size() - 1));
-	bool proc = FindandNotifyFilterEndpoint(_handles.back());
-	if (!_isRoot)
-	{
-		m.processingComplete = proc;
-		transmit(0, m);
-	}
+    _handles.emplace_back (m.source_handle, m.source_id, HANDLE_SUB, m.name, m.info ().type, m.info ().units);
+    handle_table.emplace (makeGlobalHandleIdentifier (m.source_id, m.source_handle),
+                          static_cast<int32_t> (_handles.size () - 1));
+    addLocalInfo (_handles.back (), m);
+    subscriptions.emplace (m.name, static_cast<int32_t> (_handles.size () - 1));
+    _handles.back ().processed = m.processingComplete;
+    if (!m.processingComplete)
+    {
+        bool proc = FindandNotifySubscriptionPublisher (_handles.back ());
+        if (!_isRoot)
+        {
+            // just let any higher level brokers know we have found the publisher and let them know
+            m.processingComplete = proc;
+            transmit (0, m);
+        }
+    }
 }
 
-bool CoreBroker::updateSourceFilterOperator(ActionMessage &m)
+void CoreBroker::addEndpoint (ActionMessage &m)
 {
-	auto hndl_fnd = handle_table.find(makeGlobalHandleIdentifier(m.source_id, m.source_handle));
-	if (hndl_fnd != handle_table.end())
-	{
-		_handles[hndl_fnd->second].flag = true;
-		
-			auto endHandle = endpoints.find(_handles[hndl_fnd->second].target);
-			if (endHandle != endpoints.end())
-			{
-				auto &endInfo = _handles[endHandle->second];
-			
-				m.dest_id = endInfo.fed_id;
-				m.dest_handle = endInfo.id;
+    _handles.emplace_back (m.source_handle, m.source_id, HANDLE_END, m.name, m.info ().type, m.info ().units);
+    endpoints.emplace (m.name, static_cast<int32_t> (_handles.size () - 1));
+    handle_table.emplace (makeGlobalHandleIdentifier (m.source_id, m.source_handle),
+                          static_cast<int32_t> (_handles.size () - 1));
+    addLocalInfo (_handles.back (), m);
 
-				transmit(getRoute(m.dest_id), m);
-				return true;
-			}
-		
-	}
-	return false;
+    bool addDep = (!m.processingComplete);
+    if (!_isRoot)
+    {
+        m.processingComplete = true;
+        transmit (0, m);
+    }
+    else
+    {
+        FindandNotifyEndpointFilters (_handles.back ());
+    }
+
+    if (addDep)
+    {
+        bool added = timeCoord->addDependency (m.source_id);
+        if (added)
+        {
+            ActionMessage add (CMD_ADD_DEPENDENCY);
+            add.source_id = global_broker_id;
+            add.dest_id = m.source_id;
+            auto rt = getRoute (m.source_id);
+            transmit (rt, add);
+            add.setAction (CMD_ADD_DEPENDENT);
+            transmit (rt, add);
+            timeCoord->addDependent (m.source_id);
+        }
+    }
+}
+void CoreBroker::addSourceFilter (ActionMessage &m)
+{
+    _handles.emplace_back (m.source_handle, m.source_id, HANDLE_SOURCE_FILTER, m.name, m.info ().type,
+                           m.info ().target);
+    addLocalInfo (_handles.back (), m);
+    handle_table.emplace (makeGlobalHandleIdentifier (m.source_id, m.source_handle),
+                          static_cast<int32_t> (_handles.size () - 1));
+    bool proc = FindandNotifyFilterEndpoint (_handles.back ());
+    if (!_isRoot)
+    {
+        m.processingComplete = proc;
+        transmit (0, m);
+    }
 }
 
-void CoreBroker::addDestFilter(ActionMessage &m)
+bool CoreBroker::updateSourceFilterOperator (ActionMessage &m)
 {
-	_handles.emplace_back(m.source_handle, m.source_id, HANDLE_DEST_FILTER, m.name, m.info().type, m.info().target,true);
-	addLocalInfo(_handles.back(), m);
-	handle_table.emplace(makeGlobalHandleIdentifier(m.source_id, m.source_handle), static_cast<int32_t>(_handles.size() - 1));
-	bool proc = FindandNotifyFilterEndpoint(_handles.back());
-	if (!_isRoot)
-	{
-		m.processingComplete = proc;
-		transmit(0, m);
-	}
+    auto hndl_fnd = handle_table.find (makeGlobalHandleIdentifier (m.source_id, m.source_handle));
+    if (hndl_fnd != handle_table.end ())
+    {
+        _handles[hndl_fnd->second].flag = true;
+
+        auto endHandle = endpoints.find (_handles[hndl_fnd->second].target);
+        if (endHandle != endpoints.end ())
+        {
+            auto &endInfo = _handles[endHandle->second];
+
+            m.dest_id = endInfo.fed_id;
+            m.dest_handle = endInfo.id;
+
+            transmit (getRoute (m.dest_id), m);
+            return true;
+        }
+    }
+    return false;
 }
 
+void CoreBroker::addDestFilter (ActionMessage &m)
+{
+    _handles.emplace_back (m.source_handle, m.source_id, HANDLE_DEST_FILTER, m.name, m.info ().type,
+                           m.info ().target, true);
+    addLocalInfo (_handles.back (), m);
+    handle_table.emplace (makeGlobalHandleIdentifier (m.source_id, m.source_handle),
+                          static_cast<int32_t> (_handles.size () - 1));
+    bool proc = FindandNotifyFilterEndpoint (_handles.back ());
+    if (!_isRoot)
+    {
+        m.processingComplete = proc;
+        transmit (0, m);
+    }
+}
 
 CoreBroker::CoreBroker (bool isRoot) noexcept : _isRoot (isRoot) {}
-
 
 CoreBroker::CoreBroker (const std::string &broker_name) : BrokerBase (broker_name) {}
 
 void CoreBroker::Initialize (const std::string &initializationString)
 {
-    if (brokerState==broker_state_t::created)
+    if (brokerState == broker_state_t::created)
     {
         stringToCmdLine cmdline (initializationString);
         InitializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
@@ -832,34 +821,31 @@ void CoreBroker::InitializeFromArgs (int argc, char *argv[])
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong (exp, broker_state_t::initialized))
     {
-		namespace po = boost::program_options;
-		
-		po::variables_map vm;
-		argumentParser(argc, argv, vm, extraArgs);
-		BrokerBase::InitializeFromArgs(argc, argv);
-       
-		if (vm.count("root") > 0)
-		{
-			setAsRoot();
-		}
-    
+        namespace po = boost::program_options;
+
+        po::variables_map vm;
+        argumentParser (argc, argv, vm, extraArgs);
+        BrokerBase::InitializeFromArgs (argc, argv);
+
+        if (vm.count ("root") > 0)
+        {
+            setAsRoot ();
+        }
     }
 }
 
-void CoreBroker::setAsRoot()
+void CoreBroker::setAsRoot ()
 {
-	if (brokerState<broker_state_t::connected)
-	{
-		_isRoot = true;
-		global_broker_id = 1;
-	}
+    if (brokerState < broker_state_t::connected)
+    {
+        _isRoot = true;
+        global_broker_id = 1;
+    }
 }
-
-
 
 bool CoreBroker::connect ()
 {
-    if (brokerState<broker_state_t::connected)
+    if (brokerState < broker_state_t::connected)
     {
         broker_state_t exp = broker_state_t::initialized;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::connecting))
@@ -874,210 +860,205 @@ bool CoreBroker::connect ()
                     m.info ().target = getAddress ();
                     transmit (0, m);
                 }
-				else
-				{
-					timeCoord->source_id = global_broker_id;
-				}
-				brokerState = broker_state_t::connected;
+                else
+                {
+                    timeCoord->source_id = global_broker_id;
+                }
+                brokerState = broker_state_t::connected;
             }
-			else
-			{
-				brokerState = broker_state_t::initialized;
-			}
+            else
+            {
+                brokerState = broker_state_t::initialized;
+            }
             return res;
         }
-		if (brokerState == broker_state_t::connecting)
-		{
-			while (brokerState == broker_state_t::connecting)
-			{
-				std::this_thread::sleep_for(std::chrono::milliseconds(20));
-			}
-		}
+        if (brokerState == broker_state_t::connecting)
+        {
+            while (brokerState == broker_state_t::connecting)
+            {
+                std::this_thread::sleep_for (std::chrono::milliseconds (20));
+            }
+        }
     }
-	return isConnected();
+    return isConnected ();
 }
 
+bool CoreBroker::isConnected () const { return ((brokerState == operating) || (brokerState == connected)); }
 
-bool CoreBroker::isConnected() const { return ((brokerState == operating) || (brokerState == connected)); }
+void CoreBroker::processDisconnect () { disconnect (); }
 
-void CoreBroker::processDisconnect()
+void CoreBroker::disconnect ()
 {
-	disconnect();
+    if (brokerState > broker_state_t::initialized)
+    {
+        brokerDisconnect ();
+        brokerState = broker_state_t::terminated;
+        /*We need to enrure that the destructor is not called immediately upon calling unregister
+        otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
+        that will be destroyed on function exit
+        */
+        auto keepBrokerAlive = findBroker (identifier);
+        if (keepBrokerAlive)
+        {
+            unregisterBroker (identifier);
+        }
+        if (!previous_local_broker_identifier.empty ())
+        {
+            auto keepBrokerAlive2 = findBroker (previous_local_broker_identifier);
+            if (keepBrokerAlive2)
+            {
+                unregisterBroker (previous_local_broker_identifier);
+            }
+        }
+    }
 }
 
-void CoreBroker::disconnect()
+bool CoreBroker::FindandNotifySubscriptionPublisher (BasicHandleInfo &handleInfo)
 {
-	if (brokerState > broker_state_t::initialized)
-	{
-		brokerDisconnect();
-		brokerState = broker_state_t::terminated;
-		/*We need to enrure that the destructor is not called immediately upon calling unregister
-		otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
-		that will be destroyed on function exit
-		*/
-		auto keepBrokerAlive = findBroker(identifier);
-		if (keepBrokerAlive)
-		{
-			unregisterBroker(identifier);
-		}
-		if (!previous_local_broker_identifier.empty())
-		{
-			auto keepBrokerAlive2 = findBroker(previous_local_broker_identifier);
-			if (keepBrokerAlive2)
-			{
-				unregisterBroker(previous_local_broker_identifier);
-			}
+    if (!handleInfo.processed)
+    {
+        auto pubHandle = publications.find (handleInfo.key);
+        if (pubHandle != publications.end ())
+        {
+            auto &pubInfo = _handles[pubHandle->second];
+            if (!matchingTypes (pubInfo.type, handleInfo.type))
+            {
+                // LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
+                // pubInfo->type << ENDL;
+            }
+            // notify the subscription about its publisher
+            ActionMessage m (CMD_NOTIFY_PUB);
+            m.source_id = pubInfo.fed_id;
+            m.source_handle = pubInfo.id;
+            m.dest_id = handleInfo.fed_id;
+            m.dest_handle = handleInfo.id;
 
-		}
-	}
+            transmit (getRoute (m.dest_id), m);
+
+            // notify the publisher about its subscription
+            m.setAction (CMD_NOTIFY_SUB);
+            m.source_id = handleInfo.fed_id;
+            m.source_handle = handleInfo.id;
+            m.dest_id = pubInfo.fed_id;
+            m.dest_handle = pubInfo.id;
+
+            transmit (getRoute (m.dest_id), m);
+
+            handleInfo.processed = true;
+        }
+    }
+    return handleInfo.processed;
 }
 
-bool CoreBroker::FindandNotifySubscriptionPublisher(BasicHandleInfo &handleInfo)
+void CoreBroker::FindandNotifyPublicationSubscribers (BasicHandleInfo &handleInfo)
 {
-	if (!handleInfo.processed)
-	{
-		auto pubHandle = publications.find(handleInfo.key);
-		if (pubHandle != publications.end())
-		{
-			auto &pubInfo = _handles[pubHandle->second];
-			if (!matchingTypes(pubInfo.type, handleInfo.type))
-			{
-				// LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
-				// pubInfo->type << ENDL;
-			}
-			//notify the subscription about its publisher
-			ActionMessage m(CMD_NOTIFY_PUB);
-			m.source_id = pubInfo.fed_id;
-			m.source_handle = pubInfo.id;
-			m.dest_id = handleInfo.fed_id;
-			m.dest_handle = handleInfo.id;
+    auto subHandles = subscriptions.equal_range (handleInfo.key);
+    for (auto sub = subHandles.first; sub != subHandles.second; ++sub)
+    {
+        auto &subInfo = _handles[sub->second];
+        if (subInfo.processed)
+        {
+            continue;
+        }
+        if (!matchingTypes (subInfo.type, handleInfo.type))
+        {
+            // LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
+            // pubInfo->type << ENDL;
+        }
+        // notify the subscription about its publisher
+        ActionMessage m (CMD_NOTIFY_SUB);
+        m.source_id = subInfo.fed_id;
+        m.source_handle = subInfo.id;
+        m.dest_id = handleInfo.fed_id;
+        m.dest_handle = handleInfo.id;
 
-			transmit(getRoute(m.dest_id), m);
+        transmit (getRoute (m.dest_id), m);
 
-			//notify the publisher about its subscription
-			m.setAction(CMD_NOTIFY_SUB);
-			m.source_id = handleInfo.fed_id;
-			m.source_handle = handleInfo.id;
-			m.dest_id = pubInfo.fed_id;
-			m.dest_handle = pubInfo.id;
+        // notify the publisher about its subscription
+        m.setAction (CMD_NOTIFY_PUB);
+        m.source_id = handleInfo.fed_id;
+        m.source_handle = handleInfo.id;
+        m.dest_id = subInfo.fed_id;
+        m.dest_handle = subInfo.id;
 
-			transmit(getRoute(m.dest_id), m);
-
-			handleInfo.processed = true;
-		}
-	}
-	return handleInfo.processed;
+        transmit (getRoute (m.dest_id), m);
+        subInfo.processed = true;
+    }
 }
 
-void CoreBroker::FindandNotifyPublicationSubscribers(BasicHandleInfo &handleInfo)
+bool CoreBroker::FindandNotifyFilterEndpoint (BasicHandleInfo &handleInfo)
 {
-		auto subHandles = subscriptions.equal_range(handleInfo.key);
-		for (auto sub = subHandles.first; sub != subHandles.second; ++sub)
-		{
-			auto &subInfo = _handles[sub->second];
-			if (subInfo.processed)
-			{
-				continue;
-			}
-			if (!matchingTypes(subInfo.type, handleInfo.type))
-			{
-				// LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
-				// pubInfo->type << ENDL;
-			}
-			//notify the subscription about its publisher
-			ActionMessage m(CMD_NOTIFY_SUB);
-			m.source_id = subInfo.fed_id;
-			m.source_handle = subInfo.id;
-			m.dest_id = handleInfo.fed_id;
-			m.dest_handle = handleInfo.id;
+    if (!handleInfo.processed)
+    {
+        auto endHandle = endpoints.find (handleInfo.target);
+        if (endHandle != endpoints.end ())
+        {
+            auto &endInfo = _handles[endHandle->second];
+            if (!matchingTypes (endInfo.type, handleInfo.type))
+            {
+                // LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
+                // pubInfo->type << ENDL;
+            }
+            // notify the filter about its endpoint
+            ActionMessage m (CMD_NOTIFY_END);
+            m.source_id = endInfo.fed_id;
+            m.source_handle = endInfo.id;
+            m.dest_id = handleInfo.fed_id;
+            m.dest_handle = handleInfo.id;
 
-			transmit(getRoute(m.dest_id), m);
+            transmit (getRoute (m.dest_id), m);
 
-			//notify the publisher about its subscription
-			m.setAction(CMD_NOTIFY_PUB);
-			m.source_id = handleInfo.fed_id;
-			m.source_handle = handleInfo.id;
-			m.dest_id = subInfo.fed_id;
-			m.dest_handle = subInfo.id;
+            // notify the endpoint about its filter
+            m.setAction ((handleInfo.what == HANDLE_SOURCE_FILTER) ? CMD_NOTIFY_SRC_FILTER :
+                                                                     CMD_NOTIFY_DST_FILTER);
+            m.source_id = handleInfo.fed_id;
+            m.source_handle = handleInfo.id;
+            m.dest_id = endInfo.fed_id;
+            m.dest_handle = endInfo.id;
 
-			transmit(getRoute(m.dest_id), m);
-			subInfo.processed = true;
-		}
+            transmit (getRoute (m.dest_id), m);
 
+            handleInfo.processed = true;
+        }
+    }
+    return handleInfo.processed;
 }
 
-bool CoreBroker::FindandNotifyFilterEndpoint(BasicHandleInfo &handleInfo)
+void CoreBroker::FindandNotifyEndpointFilters (BasicHandleInfo &handleInfo)
 {
-	if (!handleInfo.processed)
-	{
-		auto endHandle = endpoints.find(handleInfo.target);
-		if (endHandle != endpoints.end())
-		{
-			auto &endInfo = _handles[endHandle->second];
-			if (!matchingTypes(endInfo.type, handleInfo.type))
-			{
-				// LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
-				// pubInfo->type << ENDL;
-			}
-			//notify the filter about its endpoint
-			ActionMessage m(CMD_NOTIFY_END);
-			m.source_id = endInfo.fed_id;
-			m.source_handle = endInfo.id;
-			m.dest_id = handleInfo.fed_id;
-			m.dest_handle = handleInfo.id;
+    auto filtHandles = filters.equal_range (handleInfo.target);
+    for (auto filt = filtHandles.first; filt != filtHandles.second; ++filt)
+    {
+        auto &filtInfo = _handles[filt->second];
+        if (filtInfo.processed)
+        {
+            continue;
+        }
+        if (!matchingTypes (filtInfo.type, handleInfo.type))
+        {
+            // LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
+            // pubInfo->type << ENDL;
+        }
+        // notify the endpoint about a filter
+        ActionMessage m ((handleInfo.what == HANDLE_SOURCE_FILTER) ? CMD_NOTIFY_SRC_FILTER :
+                                                                     CMD_NOTIFY_DST_FILTER);
+        m.source_id = filtInfo.fed_id;
+        m.source_handle = filtInfo.id;
+        m.dest_id = handleInfo.fed_id;
+        m.dest_handle = handleInfo.id;
+        m.flag = handleInfo.flag;
+        transmit (getRoute (m.dest_id), m);
 
-			transmit(getRoute(m.dest_id), m);
+        // notify the publisher about its subscription
+        m.setAction (CMD_NOTIFY_END);
+        m.source_id = handleInfo.fed_id;
+        m.source_handle = handleInfo.id;
+        m.dest_id = filtInfo.fed_id;
+        m.dest_handle = filtInfo.id;
 
-			//notify the endpoint about its filter
-			m.setAction((handleInfo.what == HANDLE_SOURCE_FILTER) ? CMD_NOTIFY_SRC_FILTER : CMD_NOTIFY_DST_FILTER);
-			m.source_id = handleInfo.fed_id;
-			m.source_handle = handleInfo.id;
-			m.dest_id = endInfo.fed_id;
-			m.dest_handle = endInfo.id;
-
-			transmit(getRoute(m.dest_id), m);
-
-			handleInfo.processed = true;
-		}
-	}
-	return handleInfo.processed;
-}
-
-
-void CoreBroker::FindandNotifyEndpointFilters(BasicHandleInfo &handleInfo)
-{
-	auto filtHandles = filters.equal_range(handleInfo.target);
-	for (auto filt = filtHandles.first; filt != filtHandles.second; ++filt)
-	{
-		auto &filtInfo = _handles[filt->second];
-		if (filtInfo.processed)
-		{
-			continue;
-		}
-		if (!matchingTypes(filtInfo.type, handleInfo.type))
-		{
-			// LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
-			// pubInfo->type << ENDL;
-		}
-		//notify the endpoint about a filter
-		ActionMessage m((handleInfo.what == HANDLE_SOURCE_FILTER) ? CMD_NOTIFY_SRC_FILTER : CMD_NOTIFY_DST_FILTER);
-		m.source_id = filtInfo.fed_id;
-		m.source_handle = filtInfo.id;
-		m.dest_id = handleInfo.fed_id;
-		m.dest_handle = handleInfo.id;
-		m.flag = handleInfo.flag;
-		transmit(getRoute(m.dest_id), m);
-
-		//notify the publisher about its subscription
-		m.setAction(CMD_NOTIFY_END);
-		m.source_id = handleInfo.fed_id;
-		m.source_handle = handleInfo.id;
-		m.dest_id = filtInfo.fed_id;
-		m.dest_handle = filtInfo.id;
-
-		transmit(getRoute(m.dest_id), m);
-		filtInfo.processed = true;
-	}
+        transmit (getRoute (m.dest_id), m);
+        filtInfo.processed = true;
+    }
 }
 
 void CoreBroker::checkSubscriptions ()
@@ -1088,16 +1069,14 @@ void CoreBroker::checkSubscriptions ()
     {
         if (hndl.what == HANDLE_SUB)
         {
-			if (!hndl.processed)
-			{
-				auto fnd=FindandNotifySubscriptionPublisher(hndl);
-				if ((!fnd)&&(hndl.flag))
-				{
-					// LOG(WARN) << "sub " << hndl->key << " has no corresponding pub" << ENDL;
-				}
-			}
-            
-         
+            if (!hndl.processed)
+            {
+                auto fnd = FindandNotifySubscriptionPublisher (hndl);
+                if ((!fnd) && (hndl.flag))
+                {
+                    // LOG(WARN) << "sub " << hndl->key << " has no corresponding pub" << ENDL;
+                }
+            }
         }
     }
 }
@@ -1109,13 +1088,13 @@ void CoreBroker::checkFilters ()
     // LOG(INFO) << "performing filter check" << ENDL;
     for (auto &hndl : _handles)
     {
-        if ((hndl.what == HANDLE_DEST_FILTER)||(hndl.what==HANDLE_SOURCE_FILTER))
+        if ((hndl.what == HANDLE_DEST_FILTER) || (hndl.what == HANDLE_SOURCE_FILTER))
         {
-			auto fnd = FindandNotifyFilterEndpoint(hndl);
-			if (!fnd)
-			{
-				// LOG(WARN) << "sub " << hndl->key << " has no corresponding pub" << ENDL;
-			}
+            auto fnd = FindandNotifyFilterEndpoint (hndl);
+            if (!fnd)
+            {
+                // LOG(WARN) << "sub " << hndl->key << " has no corresponding pub" << ENDL;
+            }
         }
     }
 }
@@ -1131,15 +1110,15 @@ bool CoreBroker::allInitReady () const
     {
         return false;
     }
-	return std::all_of(_brokers.begin(), _brokers.end(), [](auto &brk) {return brk._initRequested; });
+    return std::all_of (_brokers.begin (), _brokers.end (), [](auto &brk) { return brk._initRequested; });
 }
 
 bool CoreBroker::allDisconnected () const
 {
     // all subBrokers must be disconnected
-	auto lock = (_operating) ? std::unique_lock<std::mutex>(mutex_, std::defer_lock) :
-		std::unique_lock<std::mutex>(mutex_);
-	return std::all_of(_brokers.begin(), _brokers.end(), [](auto &brk) {return brk._disconnected; });
+    auto lock = (_operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
+                               std::unique_lock<std::mutex> (mutex_);
+    return std::all_of (_brokers.begin (), _brokers.end (), [](auto &brk) { return brk._disconnected; });
 }
 
 bool matchingTypes (const std::string &type1, const std::string &type2)

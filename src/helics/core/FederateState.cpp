@@ -23,26 +23,37 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "config.h"
 #include <boost/foreach.hpp>
 
-
-#define LOG_ERROR(message) logMessage (0,"",message);
-#define LOG_WARNING(message) logMessage (1,"",message);
+#define LOG_ERROR(message) logMessage (0, "", message);
+#define LOG_WARNING(message) logMessage (1, "", message);
 
 #ifdef LOGGING_ENABLED
-#define LOG_NORMAL(message) if (logLevel>=2){logMessage (2,"",message);}
+#define LOG_NORMAL(message)                                                                                       \
+    if (logLevel >= 2)                                                                                            \
+    {                                                                                                             \
+        logMessage (2, "", message);                                                                              \
+    }
 
 #ifdef DEBUG_LOGGING_ENABLED
-#define LOG_DEBUG(message) if (logLevel>=3){logMessage(3,"",message);}
+#define LOG_DEBUG(message)                                                                                        \
+    if (logLevel >= 3)                                                                                            \
+    {                                                                                                             \
+        logMessage (3, "", message);                                                                              \
+    }
 #else
 #define LOG_DEBUG(message)
 #endif
 
 #ifdef TRACE_LOGGING_ENABLED
-#define LOG_TRACE(message) if (logLevel>=4){logMessage (4,"",message);}
+#define LOG_TRACE(message)                                                                                        \
+    if (logLevel >= 4)                                                                                            \
+    {                                                                                                             \
+        logMessage (4, "", message);                                                                              \
+    }
 #else
-#define LOG_TRACE( message)
+#define LOG_TRACE(message)
 #endif
 #else
-#define LOG_NORMAL( message)
+#define LOG_NORMAL(message)
 #define LOG_DEBUG(message)
 #define LOG_TRACE(message)
 #endif
@@ -52,11 +63,11 @@ namespace helics
 FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_) : name (name_)
 {
     state = HELICS_CREATED;
-	timeCoord = std::make_unique<TimeCoordinator>(info_);
-	logLevel = info_.logLevel;
+    timeCoord = std::make_unique<TimeCoordinator> (info_);
+    logLevel = info_.logLevel;
 }
 
-FederateState::~FederateState() = default;
+FederateState::~FederateState () = default;
 
 // define the allowable state transitions for a federate
 void FederateState::setState (helics_federate_state_type newState)
@@ -84,9 +95,9 @@ void FederateState::setState (helics_federate_state_type newState)
         state.compare_exchange_strong (reqState, newState);
         break;
     }
-	case HELICS_NONE:
-	default:
-		break;
+    case HELICS_NONE:
+    default:
+        break;
     }
 }
 
@@ -103,13 +114,12 @@ void FederateState::reInit ()
 }
 helics_federate_state_type FederateState::getState () const { return state; }
 
-int32_t FederateState::getCurrentIteration() const { return timeCoord->getCurrentIteration(); }
+int32_t FederateState::getCurrentIteration () const { return timeCoord->getCurrentIteration (); }
 
-void FederateState::setParent(CommonCore *coreObject)
+void FederateState::setParent (CommonCore *coreObject)
 {
-	parent_ = coreObject;
-	timeCoord->setMessageSender([coreObject](const ActionMessage &msg) {coreObject->addActionMessage(msg); });
-
+    parent_ = coreObject;
+    timeCoord->setMessageSender ([coreObject](const ActionMessage &msg) { coreObject->addActionMessage (msg); });
 }
 
 static auto compareFunc = [](const auto &A, const auto &B) { return (A->id < B->id); };
@@ -118,19 +128,19 @@ CoreFederateInfo FederateState::getInfo () const
 {
     // lock the mutex to ensure we have the latest values
     std::lock_guard<std::mutex> lock (_mutex);
-    return timeCoord->getFedInfo();
+    return timeCoord->getFedInfo ();
 }
 
 void FederateState::UpdateFederateInfo (CoreFederateInfo &newInfo)
 {
-	//TODO:: change the check into the timeCoord
+    // TODO:: change the check into the timeCoord
     if (newInfo.timeDelta <= timeZero)
     {
         newInfo.timeDelta = timeEpsilon;
     }
     std::lock_guard<std::mutex> lock (_mutex);
-	logLevel = newInfo.logLevel;
-	timeCoord->setInfo(newInfo);
+    logLevel = newInfo.logLevel;
+    timeCoord->setInfo (newInfo);
 }
 
 void FederateState::createSubscription (Core::Handle handle,
@@ -248,7 +258,6 @@ SubscriptionInfo *FederateState::getSubscription (const std::string &subName) co
     return nullptr;
 }
 
-
 SubscriptionInfo *FederateState::getSubscription (Core::Handle handle_) const
 {
     static auto cmptr = [](const std::unique_ptr<SubscriptionInfo> &ptrA, Core::Handle handle) {
@@ -311,7 +320,6 @@ EndpointInfo *FederateState::getEndpoint (Core::Handle handle_) const
     return nullptr;
 }
 
-
 FilterInfo *FederateState::getFilter (const std::string &filterName) const
 {
     auto fnd = filterNames.find (filterName);
@@ -321,7 +329,6 @@ FilterInfo *FederateState::getFilter (const std::string &filterName) const
     }
     return nullptr;
 }
-
 
 FilterInfo *FederateState::getFilter (Core::Handle handle_) const
 {
@@ -337,7 +344,6 @@ FilterInfo *FederateState::getFilter (Core::Handle handle_) const
     return nullptr;
 }
 
-
 uint64_t FederateState::getQueueSize (Core::Handle handle_) const
 {
     auto epI = getEndpoint (handle_);
@@ -352,7 +358,6 @@ uint64_t FederateState::getQueueSize (Core::Handle handle_) const
     }
     return 0;
 }
-
 
 uint64_t FederateState::getQueueSize () const
 {
@@ -374,7 +379,6 @@ uint64_t FederateState::getFilterQueueSize () const
     return cnt;
 }
 
-
 std::unique_ptr<Message> FederateState::receive (Core::Handle handle_)
 {
     auto epI = getEndpoint (handle_);
@@ -390,7 +394,6 @@ std::unique_ptr<Message> FederateState::receive (Core::Handle handle_)
     return nullptr;
 }
 
-
 std::unique_ptr<Message> FederateState::receiveAny (Core::Handle &id)
 {
     Time earliest_time = Time::maxVal ();
@@ -401,7 +404,7 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::Handle &id)
         auto t = end_point->firstMessageTime ();
         if (t < earliest_time)
         {
-            earliest_time=t;
+            earliest_time = t;
             endpointI = end_point.get ();
         }
     }
@@ -427,7 +430,7 @@ std::unique_ptr<Message> FederateState::receiveAnyFilter (Core::Handle &id)
         auto t = filt->firstMessageTime ();
         if (t < earliest_time)
         {
-            earliest_time=t;
+            earliest_time = t;
             filterI = filt.get ();
         }
     }
@@ -500,10 +503,10 @@ convergence_state FederateState::enterInitState ()
     {  // only enter this loop once per federate
         auto ret = processQueue ();
         processing = false;
-		if (ret == convergence_state::complete)
-		{
-			time_granted = initialTime;
-		}
+        if (ret == convergence_state::complete)
+        {
+            time_granted = initialTime;
+        }
         return ret;
     }
     else
@@ -539,12 +542,12 @@ convergence_state FederateState::enterExecutingState (convergence_state converge
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
-		timeCoord->enteringExecMode(converged);
+        timeCoord->enteringExecMode (converged);
         auto ret = processQueue ();
-		if (ret == convergence_state::complete)
-		{
-			time_granted = timeZero;
-		}
+        if (ret == convergence_state::complete)
+        {
+            time_granted = timeZero;
+        }
         fillEventVector (time_granted);
         processing = false;
         return ret;
@@ -583,13 +586,13 @@ iterationTime FederateState::requestTime (Time nextTime, convergence_state conve
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
-		events.clear();  // clear the event queue
-		timeCoord->timeRequest(nextTime,converged, nextValueTime(), nextMessageTime());
+        events.clear ();  // clear the event queue
+        timeCoord->timeRequest (nextTime, converged, nextValueTime (), nextMessageTime ());
         queue.push (CMD_TIME_CHECK);
         auto ret = processQueue ();
-		time_granted = timeCoord->getGrantedTime();
+        time_granted = timeCoord->getGrantedTime ();
         iterating = (ret == convergence_state::nonconverged);
-		
+
         iterationTime retTime = {time_granted, ret};
         // now fill the event vector so exernal systems know what has been updated
         fillEventVector (time_granted);
@@ -638,7 +641,7 @@ convergence_state FederateState::genericUnspecifiedQueueProcess ()
     if (processing.compare_exchange_strong (expected, true))
     {  // only 1 thread can enter this loop once per federate
         auto ret = processQueue ();
-		time_granted = timeCoord->getGrantedTime();
+        time_granted = timeCoord->getGrantedTime ();
         processing = false;
         return ret;
     }
@@ -674,276 +677,270 @@ convergence_state FederateState::processQueue ()
     {
         return convergence_state::error;
     }
-	convergence_state ret_code = convergence_state::continue_processing;
+    convergence_state ret_code = convergence_state::continue_processing;
 
-	//process the delay Queue first
-	if (!delayQueue.empty())
-	{
-		//copy the messages over since they could just be placed on the delay queue again
-		decltype(delayQueue) tempQueue;
-		std::swap(delayQueue, tempQueue);
-		while ((ret_code == convergence_state::continue_processing) && (!tempQueue.empty()))
-		{
-			auto cmd = tempQueue.front();
-			tempQueue.pop_front();
-			ret_code = processActionMessage(cmd);
-		}
-		if (ret_code != convergence_state::continue_processing)
-		{
-			if (!tempQueue.empty())
-			{
-				while (!tempQueue.empty())
-				{
-					auto cmd = tempQueue.back();
-					tempQueue.pop_back();
-					delayQueue.push_front(cmd);
-				}
-			}
-			return ret_code;
-		}
-	}
-	
-		
+    // process the delay Queue first
+    if (!delayQueue.empty ())
+    {
+        // copy the messages over since they could just be placed on the delay queue again
+        decltype (delayQueue) tempQueue;
+        std::swap (delayQueue, tempQueue);
+        while ((ret_code == convergence_state::continue_processing) && (!tempQueue.empty ()))
+        {
+            auto cmd = tempQueue.front ();
+            tempQueue.pop_front ();
+            ret_code = processActionMessage (cmd);
+        }
+        if (ret_code != convergence_state::continue_processing)
+        {
+            if (!tempQueue.empty ())
+            {
+                while (!tempQueue.empty ())
+                {
+                    auto cmd = tempQueue.back ();
+                    tempQueue.pop_back ();
+                    delayQueue.push_front (cmd);
+                }
+            }
+            return ret_code;
+        }
+    }
 
-	while (ret_code==convergence_state::continue_processing)
-	{
-		auto cmd = queue.pop();
-		ret_code = processActionMessage(cmd);
-	}
-	return ret_code;
+    while (ret_code == convergence_state::continue_processing)
+    {
+        auto cmd = queue.pop ();
+        ret_code = processActionMessage (cmd);
+    }
+    return ret_code;
 }
 
-convergence_state FederateState::processActionMessage(ActionMessage &cmd)
-	{
-	LOG_TRACE("processing cmd " + prettyPrintString(cmd.action()));
-	switch (cmd.action())
-	{
-	case CMD_IGNORE:
-	default:
-		break;
-	case CMD_INIT_GRANT:
-		if (state == HELICS_CREATED)
-		{
-			setState(HELICS_INITIALIZING);
-			return convergence_state::complete;
-		}
-		break;
-	case CMD_EXEC_REQUEST:
-	case CMD_EXEC_GRANT:
-		if (!timeCoord->processTimeMessage(cmd))
-		{
-			break;
-		}
-		// FALLTHROUGH
-	case CMD_EXEC_CHECK:  // just check the time for entry
-	{
-		if (state != HELICS_INITIALIZING)
-		{
-			break;
-		}
-		auto grant = timeCoord->checkExecEntry();
-		switch (grant)
-		{
-		case convergence_state::nonconverged:
-
-			return grant;
-		case convergence_state::complete:
-			setState(HELICS_EXECUTING);
-			return grant;
-		case convergence_state::continue_processing:
-			break;
-		default:
-			return grant;
-		}
-	}
-	break;
-	case CMD_STOP:
-	case CMD_DISCONNECT:
-		if ((cmd.dest_id == global_id) || (cmd.dest_id == 0))
-		{
-			setState(HELICS_FINISHED);
-			return convergence_state::halted;
-		}
-		break;
-	case CMD_TIME_REQUEST:
-	case CMD_TIME_GRANT:
-		if (!timeCoord->processTimeMessage(cmd))
-		{
-			break;
-		}
-		// FALLTHROUGH
-	case CMD_TIME_CHECK:
-	{
-		if (state != HELICS_EXECUTING)
-		{
-			break;
-		}
-		auto ret=timeCoord->checkTimeGrant();
-		if (ret != convergence_state::continue_processing)
-		{
-			time_granted = timeCoord->getGrantedTime();
-			return ret;
-		}
-	}
-	break;
-	case CMD_SEND_MESSAGE:
-	{
-		auto epi = getEndpoint(cmd.dest_handle);
-		if (epi != nullptr)
-		{
-			timeCoord->updateMessageTime(cmd.actionTime);
-			cmd.actionTime += timeCoord->getFedInfo().impactWindow;
-			epi->addMessage(createMessage(std::move(cmd)));
-		}
-	}
-	break;
-	case CMD_SEND_FOR_FILTER:
-	{
-		// this should only be non time_agnostic filters
-		auto fI = getFilter(cmd.dest_handle);
-		if (fI != nullptr)
-		{
-			timeCoord->updateMessageTime(cmd.actionTime);
-			fI->addMessage(createMessage(std::move(cmd)));
-		}
-	}
-	break;
-	case CMD_PUB:
-	{
-		auto subI = getSubscription(cmd.dest_handle);
-		if (subI == nullptr)
-		{
-			break;
-		}
-		if (cmd.source_id == subI->target.first)
-		{
-			subI->addData(cmd.actionTime + timeCoord->getFedInfo().impactWindow,
-				std::make_shared<const data_block>(std::move(cmd.payload)));
-			timeCoord->updateValueTime(cmd.actionTime);
-		}
-	}
-	break;
-	case CMD_ERROR:
-		setState(HELICS_ERROR);
-		return convergence_state::error;
-	case CMD_REG_PUB:
-	case CMD_NOTIFY_PUB:
-	{
-		auto subI = getSubscription(cmd.dest_handle);
-		if (subI != nullptr)
-		{
-			subI->target = { cmd.source_id, cmd.source_handle };
-			addDependency(cmd.source_id);
-		}
-	}
-	break;
-	case CMD_REG_SUB:
-	case CMD_NOTIFY_SUB:
-	{
-		auto pubI = getPublication(cmd.dest_handle);
-		if (pubI != nullptr)
-		{
-			pubI->subscribers.emplace_back(cmd.source_id, cmd.source_handle);
-			addDependent(cmd.source_id);
-		}
-	}
-	break;
-	case CMD_REG_END:
-	case CMD_NOTIFY_END:
-	{
-		auto filtI = getFilter(cmd.dest_handle);
-		if (filtI != nullptr)
-		{
-			filtI->target = { cmd.source_id, cmd.source_handle };
-			addDependency(cmd.source_id);
-		}
-	}
-	break;
-	case CMD_ADD_DEPENDENCY:
-		if (cmd.dest_id == global_id)
-		{
-			timeCoord->addDependency(cmd.source_id);
-		}
-		
-		break;
-	case CMD_ADD_DEPENDENT:
-		if (cmd.dest_id == global_id)
-		{
-			timeCoord->addDependent(cmd.source_id);
-		}
-		break;
-	case CMD_REMOVE_DEPENDENCY:
-		if (cmd.dest_id == global_id)
-		{
-			timeCoord->removeDependency(cmd.source_id);
-		}
-		break;
-	case CMD_REMOVE_DEPENDENT:
-		if (cmd.dest_id == global_id)
-		{
-			timeCoord->removeDependent(cmd.source_id);
-		}
-		break;
-
-	case CMD_REG_DST_FILTER:
-	case CMD_NOTIFY_DST_FILTER:
-	{
-		auto endI = getEndpoint(cmd.dest_handle);
-		if (endI != nullptr)
-		{
-			addDependency(cmd.source_id);
-			// todo probably need to do something more here
-		}
-		break;
-	}
-	case CMD_REG_SRC_FILTER:
-	case CMD_NOTIFY_SRC_FILTER:
-	{
-		auto endI = getEndpoint(cmd.dest_handle);
-		if (endI != nullptr)
-		{
-			endI->hasFilter = true;
-			addDependent(cmd.source_id);
-			// todo probably need to do something more here
-		}
-	}
-	break;
-	case CMD_FED_ACK:
-		if (state != HELICS_CREATED)
-		{
-			break;
-		}
-		if (cmd.name == name)
-		{
-			if (cmd.error)
-			{
-				setState(HELICS_ERROR);
-				return convergence_state::error;
-			}
-			global_id = cmd.dest_id;
-			timeCoord->source_id = global_id;
-			return convergence_state::complete;
-		}
-		break;
-	}
-	return convergence_state::continue_processing;
-}
-
-const std::vector<Core::federate_id_t> &FederateState::getDependents() const
+convergence_state FederateState::processActionMessage (ActionMessage &cmd)
 {
-	return timeCoord->getDependents();
+    LOG_TRACE ("processing cmd " + prettyPrintString (cmd.action ()));
+    switch (cmd.action ())
+    {
+    case CMD_IGNORE:
+    default:
+        break;
+    case CMD_INIT_GRANT:
+        if (state == HELICS_CREATED)
+        {
+            setState (HELICS_INITIALIZING);
+            return convergence_state::complete;
+        }
+        break;
+    case CMD_EXEC_REQUEST:
+    case CMD_EXEC_GRANT:
+        if (!timeCoord->processTimeMessage (cmd))
+        {
+            break;
+        }
+        // FALLTHROUGH
+    case CMD_EXEC_CHECK:  // just check the time for entry
+    {
+        if (state != HELICS_INITIALIZING)
+        {
+            break;
+        }
+        auto grant = timeCoord->checkExecEntry ();
+        switch (grant)
+        {
+        case convergence_state::nonconverged:
+
+            return grant;
+        case convergence_state::complete:
+            setState (HELICS_EXECUTING);
+            return grant;
+        case convergence_state::continue_processing:
+            break;
+        default:
+            return grant;
+        }
+    }
+    break;
+    case CMD_STOP:
+    case CMD_DISCONNECT:
+        if ((cmd.dest_id == global_id) || (cmd.dest_id == 0))
+        {
+            setState (HELICS_FINISHED);
+            return convergence_state::halted;
+        }
+        break;
+    case CMD_TIME_REQUEST:
+    case CMD_TIME_GRANT:
+        if (!timeCoord->processTimeMessage (cmd))
+        {
+            break;
+        }
+        // FALLTHROUGH
+    case CMD_TIME_CHECK:
+    {
+        if (state != HELICS_EXECUTING)
+        {
+            break;
+        }
+        auto ret = timeCoord->checkTimeGrant ();
+        if (ret != convergence_state::continue_processing)
+        {
+            time_granted = timeCoord->getGrantedTime ();
+            return ret;
+        }
+    }
+    break;
+    case CMD_SEND_MESSAGE:
+    {
+        auto epi = getEndpoint (cmd.dest_handle);
+        if (epi != nullptr)
+        {
+            timeCoord->updateMessageTime (cmd.actionTime);
+            cmd.actionTime += timeCoord->getFedInfo ().impactWindow;
+            epi->addMessage (createMessage (std::move (cmd)));
+        }
+    }
+    break;
+    case CMD_SEND_FOR_FILTER:
+    {
+        // this should only be non time_agnostic filters
+        auto fI = getFilter (cmd.dest_handle);
+        if (fI != nullptr)
+        {
+            timeCoord->updateMessageTime (cmd.actionTime);
+            fI->addMessage (createMessage (std::move (cmd)));
+        }
+    }
+    break;
+    case CMD_PUB:
+    {
+        auto subI = getSubscription (cmd.dest_handle);
+        if (subI == nullptr)
+        {
+            break;
+        }
+        if (cmd.source_id == subI->target.first)
+        {
+            subI->addData (cmd.actionTime + timeCoord->getFedInfo ().impactWindow,
+                           std::make_shared<const data_block> (std::move (cmd.payload)));
+            timeCoord->updateValueTime (cmd.actionTime);
+        }
+    }
+    break;
+    case CMD_ERROR:
+        setState (HELICS_ERROR);
+        return convergence_state::error;
+    case CMD_REG_PUB:
+    case CMD_NOTIFY_PUB:
+    {
+        auto subI = getSubscription (cmd.dest_handle);
+        if (subI != nullptr)
+        {
+            subI->target = {cmd.source_id, cmd.source_handle};
+            addDependency (cmd.source_id);
+        }
+    }
+    break;
+    case CMD_REG_SUB:
+    case CMD_NOTIFY_SUB:
+    {
+        auto pubI = getPublication (cmd.dest_handle);
+        if (pubI != nullptr)
+        {
+            pubI->subscribers.emplace_back (cmd.source_id, cmd.source_handle);
+            addDependent (cmd.source_id);
+        }
+    }
+    break;
+    case CMD_REG_END:
+    case CMD_NOTIFY_END:
+    {
+        auto filtI = getFilter (cmd.dest_handle);
+        if (filtI != nullptr)
+        {
+            filtI->target = {cmd.source_id, cmd.source_handle};
+            addDependency (cmd.source_id);
+        }
+    }
+    break;
+    case CMD_ADD_DEPENDENCY:
+        if (cmd.dest_id == global_id)
+        {
+            timeCoord->addDependency (cmd.source_id);
+        }
+
+        break;
+    case CMD_ADD_DEPENDENT:
+        if (cmd.dest_id == global_id)
+        {
+            timeCoord->addDependent (cmd.source_id);
+        }
+        break;
+    case CMD_REMOVE_DEPENDENCY:
+        if (cmd.dest_id == global_id)
+        {
+            timeCoord->removeDependency (cmd.source_id);
+        }
+        break;
+    case CMD_REMOVE_DEPENDENT:
+        if (cmd.dest_id == global_id)
+        {
+            timeCoord->removeDependent (cmd.source_id);
+        }
+        break;
+
+    case CMD_REG_DST_FILTER:
+    case CMD_NOTIFY_DST_FILTER:
+    {
+        auto endI = getEndpoint (cmd.dest_handle);
+        if (endI != nullptr)
+        {
+            addDependency (cmd.source_id);
+            // todo probably need to do something more here
+        }
+        break;
+    }
+    case CMD_REG_SRC_FILTER:
+    case CMD_NOTIFY_SRC_FILTER:
+    {
+        auto endI = getEndpoint (cmd.dest_handle);
+        if (endI != nullptr)
+        {
+            endI->hasFilter = true;
+            addDependent (cmd.source_id);
+            // todo probably need to do something more here
+        }
+    }
+    break;
+    case CMD_FED_ACK:
+        if (state != HELICS_CREATED)
+        {
+            break;
+        }
+        if (cmd.name == name)
+        {
+            if (cmd.error)
+            {
+                setState (HELICS_ERROR);
+                return convergence_state::error;
+            }
+            global_id = cmd.dest_id;
+            timeCoord->source_id = global_id;
+            return convergence_state::complete;
+        }
+        break;
+    }
+    return convergence_state::continue_processing;
 }
 
-void FederateState::addDependency(Core::federate_id_t fedToDependOn)
+const std::vector<Core::federate_id_t> &FederateState::getDependents () const
 {
-	timeCoord->addDependency(fedToDependOn);
+    return timeCoord->getDependents ();
 }
 
-void FederateState::addDependent(Core::federate_id_t fedThatDependsOnThis)
+void FederateState::addDependency (Core::federate_id_t fedToDependOn) { timeCoord->addDependency (fedToDependOn); }
+
+void FederateState::addDependent (Core::federate_id_t fedThatDependsOnThis)
 {
-	timeCoord->addDependent(fedThatDependsOnThis);
+    timeCoord->addDependent (fedThatDependsOnThis);
 }
-
 
 Time FederateState::nextValueTime () const
 {
@@ -986,13 +983,11 @@ void FederateState::setCoreObject (CommonCore *parent)
     parent_ = parent;
 }
 
-void FederateState::logMessage(int level, const std::string &logMessageSource, const std::string &message) const
+void FederateState::logMessage (int level, const std::string &logMessageSource, const std::string &message) const
 {
-	if ((loggerFunction)&& (level <= logLevel))
-	{
-		loggerFunction(level, (logMessageSource.empty())?name:logMessageSource, message);
-	}
+    if ((loggerFunction) && (level <= logLevel))
+    {
+        loggerFunction (level, (logMessageSource.empty ()) ? name : logMessageSource, message);
+    }
 }
-
-
 }

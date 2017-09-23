@@ -1,8 +1,10 @@
-
+/*
 Copyright (C) 2017, Battelle Memorial Institute
 All rights reserved.
 
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
 #ifndef _HELICS_ENDPOINT_H_
@@ -86,7 +88,10 @@ class Endpoint
     @param[in] callback a function with signature void( Time time)
     time is the time the value was updated  This callback is a notification callback and doesn't return the value
     */
-    void setCallback (std::function<void(endpoint_id_t, Time)> callback) { fed->registerEndpointCallback (id, callback); }
+    void setCallback (std::function<void(endpoint_id_t, Time)> callback)
+    {
+        fed->registerEndpointCallback (id, callback);
+    }
     /** set a target destination for unspecified messages*/
     void setTargetDestination (const std::string &target) { targetDest = target; }
 };
