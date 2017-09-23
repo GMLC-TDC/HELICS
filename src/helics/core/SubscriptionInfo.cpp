@@ -18,16 +18,16 @@ std::shared_ptr<const data_block> SubscriptionInfo::getData()
 }
 
 
-void SubscriptionInfo::addData(Time updateTime, std::shared_ptr<const data_block> data)
+void SubscriptionInfo::addData(Time valueTime, std::shared_ptr<const data_block> data)
 {
 	if (data_queue.empty())
 	{
-		data_queue.emplace_back(updateTime, std::move(data));
+		data_queue.emplace_back(valueTime, std::move(data));
 	}
 	else
 	{
-		auto m = std::upper_bound(data_queue.begin(), data_queue.end(), updateTime, [](auto &time, auto &tm) {return (time < tm.first); });
-		data_queue.emplace(m, updateTime, std::move(data));
+		auto m = std::upper_bound(data_queue.begin(), data_queue.end(), valueTime, [](auto &time, auto &tm) {return (time < tm.first); });
+		data_queue.emplace(m, valueTime, std::move(data));
 	}
 	
 }
