@@ -13,7 +13,7 @@ namespace helics
 
 
 
-MessageTimeOperator::MessageTimeOperator(std::function<Time(Time)> userTimeFunction)
+	MessageTimeOperator::MessageTimeOperator(std::function<Time(Time)> userTimeFunction) :TimeFunction(std::move(userTimeFunction))
 {
 
 }
