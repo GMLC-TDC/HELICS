@@ -31,7 +31,7 @@ static const argDescriptors extraArgs{
 
 bool matchingTypes (const std::string &type1, const std::string &type2);
 
-CoreBroker::~CoreBroker () {}
+CoreBroker::~CoreBroker ()=default;
 
 void CoreBroker::setIdentifier (const std::string &name)
 {
@@ -802,7 +802,7 @@ void CoreBroker::addDestFilter (ActionMessage &m)
     }
 }
 
-CoreBroker::CoreBroker (bool isRoot) noexcept : _isRoot (isRoot) {}
+CoreBroker::CoreBroker (bool setAsRoot) noexcept : _isRoot (setAsRoot) {}
 
 CoreBroker::CoreBroker (const std::string &broker_name) : BrokerBase (broker_name) {}
 

@@ -300,6 +300,9 @@ add_library(helics STATIC
     $<TARGET_OBJECTS:helics_common>
 )
 target_link_libraries(helics Threads::Threads)
+IF (UNIX)
+target_link_libraries(helics rt)
+ENDIF(UNIX)
 
 if (${ZMQ_FOUND})
    target_link_libraries(helics ${ZMQ_LIBRARY})
@@ -313,9 +316,7 @@ if (${MPI_C_FOUND})
    target_link_libraries(helics ${MPI_C_LIBRARIES})
 endif (${MPI_C_FOUND})
 
-if (${GLOG_FOUND})
-    target_link_libraries(helics ${GLOG_LIBRARIES})
-endif (${GLOG_FOUND})
+
 install (TARGETS helics DESTINATION lib)
 
 # we aren't ready for this for the whole library yet
