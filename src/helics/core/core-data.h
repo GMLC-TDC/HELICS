@@ -105,8 +105,8 @@ class data_block
     void resize (size_t newSize) { m_data.resize (newSize); }
     /** resize the data storage*/
     void resize (size_t newSize, char T) { m_data.resize (newSize, T); }
-	/** reserve space in a data_block*/
-	void reserve(size_t space) { m_data.reserve(space); }
+    /** reserve space in a data_block*/
+    void reserve (size_t space) { m_data.reserve (space); }
     /** get a string reference*/
     const std::string &to_string () const { return m_data; }
     /** bracket operator to get a character value*/
@@ -121,19 +121,19 @@ class data_block
     auto cbegin () const { return m_data.cbegin (); }
     /** const iterator end*/
     auto cend () const { return m_data.cend (); }
-	/** add a character to the data*/
-	void push_back(char newchar) { m_data.push_back(newchar); }
+    /** add a character to the data*/
+    void push_back (char newchar) { m_data.push_back (newchar); }
 };
 
 /** class containing a message structure*/
 class Message
 {
   public:
-	Time time;  //!< the event time the message is sent
-	data_block data;  //!< the data packet for the message
-    std::string src;  //!< the most recent source of the message
+    Time time;  //!< the event time the message is sent
+    data_block data;  //!< the data packet for the message
+    std::string origsrc;  //!< the orignal source of the message
     std::string dest;  //!< the destination of the message
-	std::string origsrc;  //!< the orignal source of the message
+    std::string src;  //!< the most recent source of the message
 
   public:
     /** default constructor*/
@@ -153,9 +153,8 @@ class Message
     bool isValid () const noexcept;
 };
 
-
 /**
- * FilterOperator abstract class 
+ * FilterOperator abstract class
  @details FilterOperators will transform a message in some way in a direct fashion
  *
  */
@@ -170,7 +169,10 @@ class FilterOperator
     virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) = 0;
     /** functionalize the processing
     @details calls the process function*/
-	std::unique_ptr<Message> operator() (std::unique_ptr<Message> message) { return process (std::move(message)); }
+    std::unique_ptr<Message> operator() (std::unique_ptr<Message> message)
+    {
+        return process (std::move (message));
+    }
 };
 
 /** helper template to check whether an index is actually valid for a particular vector*/
@@ -179,8 +181,7 @@ inline bool isValidIndex (sizeType testSize, const std::vector<dataType> &vec)
 {
     return ((testSize >= sizeType (0)) && (testSize < static_cast<sizeType> (vec.size ())));
 }
-} // namespace helics
-
+}  // namespace helics
 
 namespace std
 {
@@ -189,7 +190,7 @@ inline void swap (helics::data_block &db1, helics::data_block &db2) noexcept
 {
     db1.swap (db2);
 }
-} // namespace std
+}  // namespace std
 
 namespace std
 {
@@ -198,6 +199,6 @@ inline void swap (helics::Message &m1, helics::Message &m2) noexcept
 {
     m1.swap (m2);
 }
-} // namespace std
+}  // namespace std
 
 #endif
