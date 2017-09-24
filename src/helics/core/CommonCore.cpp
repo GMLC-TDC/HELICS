@@ -1468,6 +1468,7 @@ void CommonCore::processPriorityCommand (const ActionMessage &command)
             }
             else
             {
+				LOG_ERROR(0, identifier, "broker responded with error\n");
                 // generate error messages in response to all the delayed messages
             }
         }

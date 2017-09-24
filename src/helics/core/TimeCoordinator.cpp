@@ -268,11 +268,6 @@ convergence_state TimeCoordinator::checkTimeGrant ()
     return convergence_state::continue_processing;
 }
 
-// an info sink no one cares about
-static DependencyInfo dummyInfo;
-
-static auto dependencyCompare = [](const auto &dep, auto &target) { return (dep.fedID < target); };
-
 bool TimeCoordinator::isDependency (Core::federate_id_t ofed) const { return dependencies.isDependency (ofed); }
 
 bool TimeCoordinator::addDependency (Core::federate_id_t fedID) { return dependencies.addDependency (fedID); }

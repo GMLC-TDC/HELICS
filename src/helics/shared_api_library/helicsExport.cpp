@@ -146,7 +146,7 @@ helics_subscription_id_t helicsRegisterSubscription(helics_federate_id_t fedID, 
 	auto fed = getValueFed(fedID);
 	if (!fed)
 	{
-		return helicsDiscard;
+		return nullptr;
 	}
 	try
 	{
@@ -164,7 +164,7 @@ helics_subscription_id_t helicsRegisterDoubleSubscription(helics_federate_id_t f
 	auto fed = getValueFed(fedID);
 	if (!fed)
 	{
-		return helicsDiscard;
+		return nullptr;
 	}
 	return invalid_subscription_id;
  }
@@ -173,7 +173,7 @@ helics_subscription_id_t helicsRegisterStringSubscription(helics_federate_id_t f
 	auto fed = getValueFed(fedID);
 	if (!fed)
 	{
-		return helicsDiscard;
+		return nullptr;
 	}
 	return invalid_subscription_id;
  }
@@ -183,7 +183,7 @@ helics_publication_id_t  helicsRegisterPublication(helics_federate_id_t fedID, c
 	auto fed = getValueFed(fedID);
 	if (!fed)
 	{
-		return helicsDiscard;
+		return nullptr;
 	}
 	return invalid_publication_id;
  }
@@ -192,7 +192,7 @@ helics_publication_id_t  helicsRegisterDoublePublication(helics_federate_id_t fe
 	auto fed = getValueFed(fedID);
 	if (!fed)
 	{
-		return helicsDiscard;
+		return nullptr;
 	}
 	return invalid_publication_id;
  }
@@ -201,7 +201,7 @@ helics_publication_id_t  helicsRegisterStringPublication(helics_federate_id_t fe
 	auto fed = getValueFed(fedID);
 	if (!fed)
 	{
-		return helicsDiscard;
+		return nullptr;
 	}
 	return invalid_publication_id;
  }
@@ -210,7 +210,7 @@ helics_publication_id_t  helicsRegisterGlobalPublication(helics_federate_id_t fe
 	auto fed = getValueFed(fedID);
 	if (!fed)
 	{
-		return helicsDiscard;
+		return nullptr;
 	}
 	return invalid_publication_id;
  }
@@ -219,7 +219,7 @@ helics_publication_id_t  helicsRegisterGlobalDoublePublication(helics_federate_i
 	auto fed = getValueFed(fedID);
 	if (!fed)
 	{
-		return helicsDiscard;
+		return nullptr;
 	}
 	return invalid_publication_id;
  }
@@ -228,7 +228,7 @@ helics_publication_id_t  helicsRegisterGlobalStringPublication(helics_federate_i
 	auto fed = getValueFed(fedID);
 	if (!fed)
 	{
-		return helicsDiscard;
+		return nullptr;
 	}
 	return invalid_publication_id;
  }

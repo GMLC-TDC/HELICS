@@ -19,25 +19,17 @@ typedef enum {
 	helicsError,
 } helicsStatus;
 
-typedef uint32_t helics_subscription_id_t;
-typedef uint32_t helics_publication_id_t;
-typedef uint32_t helics_endpoint_id_t;
-typedef uint32_t helics_source_filter_id_t;
-typedef uint32_t helics_destination_filter_id_t;
+typedef void * helics_subscription_id_t;
+typedef void * helics_publication_id_t;
+typedef void * helics_endpoint_id_t;
+typedef void * helics_source_filter_id_t;
+typedef void * helics_destination_filter_id_t;
 
-typedef uint32_t helics_federate_id_t;
-typedef uint32_t helics_value_federate_id_t;
-typedef uint32_t helics_message_federate_id_t;
-typedef uint32_t helics_message_filter_federate_id_t;
-typedef uint32_t helics_combo_federate_id_t;
-
-const helics_subscription_id_t invalid_subscription_id = 0xFFFFFFFF;
-const helics_publication_id_t invalid_publication_id = 0xFFFFFFFF;
-const helics_endpoint_id_t invalid_endpoint_id = 0xFFFFFFFF;
-const helics_source_filter_id_t invalid_source_filter_id = 0xFFFFFFFF;
-const helics_destination_filter_id_t invalid_dest_filter_id = 0xFFFFFFFF;
-
-const helics_federate_id_t invalid_federate_id = 0xFFFFFFFF;
+typedef void * helics_federate_id_t;
+typedef void * helics_value_federate_id_t;
+typedef void * helics_message_federate_id_t;
+typedef void * helics_message_filter_federate_id_t;
+typedef void * helics_combo_federate_id_t;
 
 typedef int64_t helics_time_t;
 
