@@ -55,21 +55,21 @@ Common Functions
 
 /* Creation and destruction of Federates */
 
-	HELICS_Export helics_federate_id_t helicsCreateComboFederate(federate_info_t *fi);
-	HELICS_Export helics_federate_id_t helicsCreateComboFederateFromFile(const char *);
+	HELICS_Export helics_federate helicsCreateComboFederate(federate_info_t *fi);
+	HELICS_Export helics_federate helicsCreateComboFederateFromFile(const char *);
 
 	HELICS_Export void helicsInitializeFederateInfo(federate_info_t *fi);
 
-	HELICS_Export helicsStatus helicsFinalize(helics_federate_id_t fedID);
+	HELICS_Export helicsStatus helicsFinalize(helics_federate fedID);
 
 	/* initialization, execution, and time requests */
-	HELICS_Export helicsStatus helicsEnterInitializationMode(helics_federate_id_t fedID);
+	HELICS_Export helicsStatus helicsEnterInitializationMode(helics_federate fedID);
 
-	HELICS_Export helicsStatus helicsEnterExecutionMode(helics_federate_id_t fedID);
-	HELICS_Export helicsStatus helicsEnterExecutionModeIterative(helics_federate_id_t fedID,convergence_status converged, convergence_status *outConverged);
+	HELICS_Export helicsStatus helicsEnterExecutionMode(helics_federate fedID);
+	HELICS_Export helicsStatus helicsEnterExecutionModeIterative(helics_federate fedID,convergence_status converged, convergence_status *outConverged);
 
-   HELICS_Export helics_time_t helicsRequestTime(helics_federate_id_t fedID, helics_time_t requestTime);
-   HELICS_Export helics_iterative_time helicsRequestTimeIterative(helics_federate_id_t fedID, helics_time_t requestTime, convergence_status converged);
+   HELICS_Export helics_time_t helicsRequestTime(helics_federate fedID, helics_time_t requestTime);
+   HELICS_Export helics_iterative_time helicsRequestTimeIterative(helics_federate fedID, helics_time_t requestTime, convergence_status converged);
    
   
 

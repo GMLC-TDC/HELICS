@@ -19,17 +19,17 @@ typedef enum {
 	helicsError,
 } helicsStatus;
 
-typedef void * helics_subscription_id_t;
-typedef void * helics_publication_id_t;
-typedef void * helics_endpoint_id_t;
-typedef void * helics_source_filter_id_t;
-typedef void * helics_destination_filter_id_t;
+typedef void * helics_subscription;
+typedef void * helics_publication;
+typedef void * helics_endpoint;
+typedef void * helics_source_filter;
+typedef void * helics_destination_filter;
 
-typedef void * helics_federate_id_t;
-typedef void * helics_value_federate_id_t;
-typedef void * helics_message_federate_id_t;
-typedef void * helics_message_filter_federate_id_t;
-typedef void * helics_combo_federate_id_t;
+typedef void * helics_federate;
+typedef void * helics_value_federate;
+typedef void * helics_message_federate;
+typedef void * helics_message_filter_federate;
+typedef void * helics_combo_federate;
 
 typedef int64_t helics_time_t;
 

@@ -14,12 +14,12 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 BOOST_AUTO_TEST_SUITE(TestCore_tests)
 
 using helics::Core;
-using helics::CoreFactory;
+using namespace helics::CoreFactory;
 
 BOOST_AUTO_TEST_CASE(testcore_initialization_test)
 {
 	std::string initializationString = "4";
-	auto core = CoreFactory::create(HELICS_TEST, initializationString);
+	auto core = create(HELICS_TEST, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(testcore_initialization_test)
 BOOST_AUTO_TEST_CASE(testcore_pubsub_value_test)
 {
 	const char *initializationString = "1";
-	auto core = CoreFactory::create(HELICS_TEST, initializationString);
+	auto core = create(HELICS_TEST, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(testcore_pubsub_value_test)
 BOOST_AUTO_TEST_CASE(testcore_send_receive_test)
 {
 	const char *initializationString = "1";
-	auto core = CoreFactory::create(HELICS_TEST, initializationString);
+	auto core = create(HELICS_TEST, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(testcore_send_receive_test)
 BOOST_AUTO_TEST_CASE(testcore_messagefilter_source_test)
 {
 	const char *initializationString = "1";
-	auto core = CoreFactory::create(HELICS_TEST, initializationString);
+	auto core = create(HELICS_TEST, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_CASE(testcore_messagefilter_callback_test)
 	};
 
 	std::string initializationString = "1";
-	auto core = CoreFactory::create(HELICS_TEST, initializationString);
+	auto core = create(HELICS_TEST, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
