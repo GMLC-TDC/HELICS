@@ -29,6 +29,11 @@ class MessageFilterFederate : public virtual MessageFederate
     @param[in] fi  a federate information structure
     */
     MessageFilterFederate (const FederateInfo &fi);
+	/**constructor taking a core and a federate information structure, sore information in fi is ignored
+	@param[in] core a shared ptr to a core to join
+	@param[in] fi  a federate information structure
+	*/
+	MessageFilterFederate(std::shared_ptr<Core> core, const FederateInfo &fi);
     /**constructor taking a string with the required information
     @param[in] jsonString can be either a json file or a string containing json code
     */

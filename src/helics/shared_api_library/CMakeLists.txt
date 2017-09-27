@@ -18,6 +18,7 @@ api-data.h
 ValueFederate_c.h
 MessageFederate_c.h
 MessageFilterFederate_c.h
+internal/api_objects.h
 )
 
 set(helicsShared_sources

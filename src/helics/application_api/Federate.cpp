@@ -72,6 +72,41 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
 	currentTime = coreObject->getCurrentTime(fedID);
 }
 
+Federate::Federate(std::shared_ptr<Core> core, const FederateInfo &fi):coreObject(std::move(core)), FedInfo(fi)
+{
+	if (!coreObject)
+	{
+		auto ctype = coreTypeFromString(fi.coreType);
+		if (fi.coreName.empty())
+		{
+
+			coreObject = CoreFactory::findJoinableCoreOfType(ctype);
+			if (!coreObject)
+			{
+				coreObject = CoreFactory::create(ctype, fi.coreInitString);
+			}
+
+		}
+		else
+		{
+			coreObject = CoreFactory::FindOrCreate(ctype, fi.coreName, fi.coreInitString);
+		}
+	}
+	
+	if (!coreObject)
+	{
+		state = op_states::error;
+		return;
+	}
+	/** make sure the core is connected */
+	if (!coreObject->isConnected())
+	{
+		coreObject->connect();
+	}
+	fedID = coreObject->registerFederate(fi.name, generateCoreInfo(fi));
+	currentTime = coreObject->getCurrentTime(fedID);
+}
+
 Federate::Federate (const std::string &file) : Federate (LoadFederateInfo (file))
 {
     if (state == op_states::startup)

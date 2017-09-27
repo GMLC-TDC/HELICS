@@ -383,7 +383,7 @@ class VectorSubscription
             handleCallback (id, tm);
         });
     };
-    /** move assignement*/
+    /** move assignment*/
     VectorSubscription &operator= (VectorSubscription &&vs) noexcept
     {
         fed = vs.fed;

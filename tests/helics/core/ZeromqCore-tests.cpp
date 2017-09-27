@@ -23,7 +23,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 BOOST_AUTO_TEST_SUITE(ZMQCore_tests)
 
 using helics::Core;
-using helics::CoreFactory;
 
 BOOST_AUTO_TEST_CASE(zmqComms_broker_test)
 {
@@ -260,7 +259,7 @@ BOOST_AUTO_TEST_CASE(zmqComm_transmit_add_route)
 BOOST_AUTO_TEST_CASE(zmqCore_initialization_test)
 {
 	std::string initializationString = "1 --brokerport=23405 --repport=23410 --local_interface=tcp://127.0.0.1 --name=core1";
-	auto  core = CoreFactory::create(HELICS_ZMQ, initializationString);
+	auto  core = helics::CoreFactory::create(HELICS_ZMQ, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
@@ -300,7 +299,7 @@ BOOST_AUTO_TEST_CASE(zmqCore_core_broker_default_test)
 	
 	auto  broker = helics::BrokerFactory::create(HELICS_ZMQ, initializationString);
 
-	auto  core = CoreFactory::create(HELICS_ZMQ, initializationString);
+	auto  core = helics::CoreFactory::create(HELICS_ZMQ, initializationString);
 	bool connected=broker->isConnected();
 	BOOST_CHECK(connected);
 	connected=core->connect();

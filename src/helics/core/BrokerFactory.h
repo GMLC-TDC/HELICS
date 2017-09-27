@@ -21,24 +21,23 @@ class CoreBroker;
 /**
 * Factory for building Core API instances.
 */
-class BrokerFactory {
-public:
+namespace BrokerFactory {
 	/**
 	* Creates a Broker object of the specified type.
 	*
 	* Invokes initialize() on the instantiated Core object.
 	*/
-	static std::shared_ptr<CoreBroker> create(helics_core_type type, const std::string &initializationString);
+	std::shared_ptr<CoreBroker> create(helics_core_type type, const std::string &initializationString);
 
-	static std::shared_ptr<CoreBroker> create(helics_core_type type, int argc, char *argv[]);
+	std::shared_ptr<CoreBroker> create(helics_core_type type, int argc, char *argv[]);
 
-	static std::shared_ptr<CoreBroker> create(helics_core_type type, const std::string &broker_name, std::string &initializationString);
-	static std::shared_ptr<CoreBroker> create(helics_core_type type, const std::string &broker_name, int argc, char *argv[]);
+	std::shared_ptr<CoreBroker> create(helics_core_type type, const std::string &broker_name, std::string &initializationString);
+	std::shared_ptr<CoreBroker> create(helics_core_type type, const std::string &broker_name, int argc, char *argv[]);
 
 	/**
 	* Returns true if type specified is available in current compilation.
 	*/
-	static bool available(helics_core_type type);
+	bool available(helics_core_type type);
 };
 
 /** locate a coreBroker by name

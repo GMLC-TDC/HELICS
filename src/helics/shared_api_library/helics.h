@@ -52,24 +52,27 @@ Common Functions
 	HELICS_Export helics_time_t helicsTimeFromDouble(double time);
 	HELICS_Export double doubleFromHelicsTime(helics_time_t time);
 
-
+	HELICS_Export helics_core helicsCreateCore(const char *type, const char *name, const char *initString);
+	HELICS_Export helics_core helicsCreateCoreFromArgs(const char *type, const char *name, int argc, char *argv[]);
 /* Creation and destruction of Federates */
 
-	HELICS_Export helics_federate_id_t helicsCreateComboFederate(federate_info_t *fi);
-	HELICS_Export helics_federate_id_t helicsCreateComboFederateFromFile(const char *);
+	HELICS_Export helics_federate helicsCreateCombinationFederate(federate_info_t *fi);
+	HELICS_Export helics_federate helicsCreateCombinationFederateFromFile(const char *filename);
 
 	HELICS_Export void helicsInitializeFederateInfo(federate_info_t *fi);
 
-	HELICS_Export helicsStatus helicsFinalize(helics_federate_id_t fedID);
+	HELICS_Export helicsStatus helicsFinalize(helics_federate fed);
 
 	/* initialization, execution, and time requests */
-	HELICS_Export helicsStatus helicsEnterInitializationMode(helics_federate_id_t fedID);
+	HELICS_Export helicsStatus helicsEnterInitializationMode(helics_federate fed);
 
-	HELICS_Export helicsStatus helicsEnterExecutionMode(helics_federate_id_t fedID);
-	HELICS_Export helicsStatus helicsEnterExecutionModeIterative(helics_federate_id_t fedID,convergence_status converged, convergence_status *outConverged);
+	HELICS_Export helicsStatus helicsEnterExecutionMode(helics_federate fed);
+	HELICS_Export helicsStatus helicsEnterExecutionModeIterative(helics_federate fed,convergence_status converged, convergence_status *outConverged);
 
-   HELICS_Export helics_time_t helicsRequestTime(helics_federate_id_t fedID, helics_time_t requestTime);
-   HELICS_Export helics_iterative_time helicsRequestTimeIterative(helics_federate_id_t fedID, helics_time_t requestTime, convergence_status converged);
+   HELICS_Export helics_time_t helicsRequestTime(helics_federate fed, helics_time_t requestTime);
+   HELICS_Export helics_iterative_time helicsRequestTimeIterative(helics_federate fed, helics_time_t requestTime, convergence_status converged);
+
+   HELICS_Export void helics_free_federate(helics_federate fed)
    
   
 

@@ -29,6 +29,11 @@ namespace helics
 		@param[in] fi  a federate information structure
 		*/
 		ValueFederate(const FederateInfo &fi);
+		/**constructor taking a core and a federate information structure, sore information in fi is ignored
+		@param[in] core a shared ptr to a core to join
+		@param[in] fi  a federate information structure
+		*/
+		ValueFederate(std::shared_ptr<Core> core, const FederateInfo &fi);
 		/**constructor taking a string with the required information
 		@param[in] jsonString can be either a json file or a string containing json code
 		*/
@@ -301,7 +306,7 @@ namespace helics
 
 		/** publish data
 		@param[in] id the publication identifier
-		@param[in] data a const char pointer to a string
+		@param[in] data a const char pointer to raw data
 		@param[in] len the length of the data
 		@throw invalid_argument if the publication id is invalid
 		*/
@@ -313,7 +318,7 @@ namespace helics
 		/** publish a value
 		@tparam X the type of the value to publish
 		@param[in] id the publication identifier
-		@param[in] value a const char pointer to a string
+		@param[in] value a reference to a value holding the data
 		@throw invalid_argument if the publication id is invalid
 		*/
 		template <typename X>

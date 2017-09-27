@@ -19,6 +19,10 @@ CombinationFederate::CombinationFederate()
 	{
 
 	}
+	CombinationFederate::CombinationFederate(std::shared_ptr<Core> core, const FederateInfo &fi) : Federate(std::move(core), fi), ValueFederate(true), MessageFederate(true)
+	{
+
+	}
 
 	CombinationFederate::CombinationFederate(const std::string &jsonString) : Federate(jsonString), ValueFederate(true), MessageFederate(true)
 	{

@@ -25,7 +25,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 BOOST_AUTO_TEST_SUITE(IPCCore_tests)
 
 using helics::Core;
-using helics::CoreFactory;
 
 BOOST_AUTO_TEST_CASE(ipccomms_broker_test)
 {
@@ -188,7 +187,7 @@ BOOST_AUTO_TEST_CASE(ipcComm_transmit_add_route)
 BOOST_AUTO_TEST_CASE(ipccore_initialization_test)
 {
 	std::string initializationString = "1 --broker_address=testbroker --name=core1";
-	auto  core = CoreFactory::create(HELICS_INTERPROCESS, initializationString);
+	auto  core = helics::CoreFactory::create(HELICS_INTERPROCESS, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
@@ -217,7 +216,7 @@ BOOST_AUTO_TEST_CASE(ipcCore_core_broker_default_test)
 
 	auto  broker = helics::BrokerFactory::create(HELICS_INTERPROCESS, initializationString);
 
-	auto  core = CoreFactory::create(HELICS_INTERPROCESS, initializationString);
+	auto  core = helics::CoreFactory::create(HELICS_INTERPROCESS, initializationString);
 	bool connected = broker->isConnected();
 	BOOST_CHECK(connected);
 	connected = core->connect();

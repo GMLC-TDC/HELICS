@@ -29,6 +29,10 @@ namespace helics {
 	{
 		vfManager = std::make_unique<ValueFederateManager>(coreObject, getID());
 	}
+	ValueFederate::ValueFederate(std::shared_ptr<Core> core, const FederateInfo &fi) : Federate(std::move(core),fi)
+	{
+		vfManager = std::make_unique<ValueFederateManager>(coreObject, getID());
+	}
 	ValueFederate::ValueFederate(const std::string &file) : Federate(file)
 	{
 		vfManager = std::make_unique<ValueFederateManager>(coreObject, getID());

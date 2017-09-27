@@ -16,7 +16,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics_includes/string_view.h"
 
 #include <string>
-
 #include <atomic>
 
 #include <memory>
@@ -53,7 +52,7 @@ class FederateInfo
     Time timeDelta = timeZero;  //!< the minimum time between granted time requests
     Time lookAhead = timeZero;  //!< the lookahead value
     Time impactWindow = timeZero;  //!< the impact window
-    Time period = timeZero;  //!< the peiodicity of the Federate granted time can only come on integer multipliers
+    Time period = timeZero;  //!< the periodicity of the Federate granted time can only come on integer multipliers
                              //!< of the period
     Time offset = timeZero;  //!< the offset to the time period
     std::string coreInitString;  //!< an initialization string for the core API object
@@ -102,10 +101,14 @@ class Federate
   private:
     std::unique_ptr<asyncFedCallInfo> asyncCallInfo;  //!< pointer to a class defining the async call information
   public:
-    /**constructor taking a federate information structure and using the default core
+    /**constructor taking a federate information structure
     @param[in] fi  a federate information structure
     */
     Federate (const FederateInfo &fi);
+	/**constructor taking a core and a federate information structure, sore information in fi is ignored
+	@param[in] fi  a federate information structure
+	*/
+	Federate(std::shared_ptr<Core> core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] jsonString can be either a json file or a string containing json code
     */

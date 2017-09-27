@@ -94,89 +94,92 @@ std::shared_ptr<CoreBroker> makeBroker(helics_core_type type, const std::string 
 	}
 	return broker;
 }
-std::shared_ptr<CoreBroker> BrokerFactory::create (helics_core_type type, const std::string &initializationString)
-{
-	auto broker = makeBroker(type, "");
-    broker->Initialize (initializationString);
-    registerBroker (broker);
-    broker->connect ();
-    return broker;
-}
 
-std::shared_ptr<CoreBroker>
-BrokerFactory::create (helics_core_type type, const std::string &broker_name, std::string &initializationString)
+namespace BrokerFactory
 {
-	auto broker = makeBroker(type, broker_name);
-    broker->Initialize (initializationString);
-    bool reg=registerBroker (broker);
-	if (!reg)
+	std::shared_ptr<CoreBroker> create(helics_core_type type, const std::string &initializationString)
 	{
-
+		auto broker = makeBroker(type, "");
+		broker->Initialize(initializationString);
+		registerBroker(broker);
+		broker->connect();
+		return broker;
 	}
-    return broker;
-}
 
-std::shared_ptr<CoreBroker> BrokerFactory::create(helics_core_type type, int argc, char *argv[])
-{
-	auto broker = makeBroker(type, "");
-	broker->InitializeFromArgs(argc,argv);
-	registerBroker(broker);
-	broker->connect();
-	return broker;
-}
-
-std::shared_ptr<CoreBroker>
-BrokerFactory::create(helics_core_type type, const std::string &broker_name, int argc, char *argv[])
-{
-	auto broker = makeBroker(type, broker_name);
-	broker->InitializeFromArgs(argc, argv);
-	bool reg = registerBroker(broker);
-	if (!reg)
+	std::shared_ptr<CoreBroker>
+		create(helics_core_type type, const std::string &broker_name, std::string &initializationString)
 	{
+		auto broker = makeBroker(type, broker_name);
+		broker->Initialize(initializationString);
+		bool reg = registerBroker(broker);
+		if (!reg)
+		{
 
+		}
+		return broker;
 	}
-	return broker;
-}
+
+	std::shared_ptr<CoreBroker> create(helics_core_type type, int argc, char *argv[])
+	{
+		auto broker = makeBroker(type, "");
+		broker->InitializeFromArgs(argc, argv);
+		registerBroker(broker);
+		broker->connect();
+		return broker;
+	}
+
+	std::shared_ptr<CoreBroker>
+		create(helics_core_type type, const std::string &broker_name, int argc, char *argv[])
+	{
+		auto broker = makeBroker(type, broker_name);
+		broker->InitializeFromArgs(argc, argv);
+		bool reg = registerBroker(broker);
+		if (!reg)
+		{
+
+		}
+		return broker;
+	}
 
 
-bool BrokerFactory::available (helics_core_type type)
-{
-    bool available = false;
+	bool available(helics_core_type type)
+	{
+		bool available = false;
 
-    switch (type)
-    {
-    case HELICS_ZMQ:
-    {
+		switch (type)
+		{
+		case HELICS_ZMQ:
+		{
 #if HELICS_HAVE_ZEROMQ
-        available = true;
+			available = true;
 #endif
-        break;
-    }
-    case HELICS_MPI:
-    {
+			break;
+		}
+		case HELICS_MPI:
+		{
 #if HELICS_HAVE_MPI
-        available = true;
+			available = true;
 #endif
-        break;
-    }
-    case HELICS_TEST:
-    {
-        available = true;
-        break;
-    }
-    case HELICS_INTERPROCESS:
-    {
-        available = true;
-        break;
-    }
-    default:
-        assert (false);
-    }
+			break;
+		}
+		case HELICS_TEST:
+		{
+			available = true;
+			break;
+		}
+		case HELICS_INTERPROCESS:
+		{
+			available = true;
+			break;
+		}
+		default:
+			assert(false);
+		}
 
-    return available;
-}
+		return available;
+	}
 
-
+} //namespace BrokerFactory
 static std::map<std::string, std::shared_ptr<CoreBroker>> BrokerMap;
 
 static std::mutex mapLock;  //!<lock for the broker and core maps

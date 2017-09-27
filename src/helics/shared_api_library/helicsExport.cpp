@@ -8,6 +8,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 #include "helics.h"
 #include "core/helics-time.h"
+#include "internal/api_objects.h"
 #include "application_api/application_api.h"
 #include <memory>
 #include <mutex>
@@ -15,21 +16,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 const char *helicsGetVersion (void) { return HelicsVersion; }
 
-static std::vector<std::shared_ptr<helics::Federate>> federates;
-
-enum vtype
-{
-	valueFed,
-	messageFed,
-	filterFed,
-	combinFed,
-};
-
-static std::vector<vtype> fedTypes;
-
-static std::mutex helicsLock;  //!< lock for allowing multi-threaded access
-
-
+/** this is a random identifier put in place when the federate gets created*/
+static const int validationIdentifier = 0x2352188;  
 helics_time_t helicsTimeFromDouble(double time)
 {
 	helics::Time val(time);
@@ -43,73 +31,150 @@ double doubleFromHelicsTime(helics_time_t time)
 	return static_cast<double>(val);
  }
 
-/** this needs to preserve lifetime for multithreaded purposes*/
-std::shared_ptr<helics::Federate> getFed(helics_federate_id_t fedID)
+
+helics::Federate *getFed(helics_federate fed)
 {
-	std::lock_guard<std::mutex> lock(helicsLock);
-	if (fedID < federates.size())
+	auto fedObj = reinterpret_cast<helics::FedObject *>(fed);
+	if (fedObj->valid == validationIdentifier)
 	{
-		return federates[fedID];
+		return fedObj->fedptr.get();
 	}
 	return nullptr;
 }
 
-helics::ValueFederate *getValueFed(helics_federate_id_t fedID)
+helics::ValueFederate *getValueFed(helics_value_federate fed)
 {
-	if (fedID < federates.size())
+	auto fedObj = reinterpret_cast<helics::FedObject *>(fed);
+	if (fedObj->valid == validationIdentifier)
 	{
-		std::lock_guard<std::mutex> lock(helicsLock);
-		if ((fedTypes[fedID] == valueFed) || (fedTypes[fedID] == combinFed))
+		if ((fedObj->type == helics::vtype::valueFed) || (fedObj->type == helics::vtype::combinFed))
 		{
-			//need to use dynamic cast here due to virtual inheritance
-			return dynamic_cast<helics::ValueFederate *>(federates[fedID].get());
+			return dynamic_cast<helics::ValueFederate *>(fedObj->fedptr.get());
 		}
-		
+	}
+	return nullptr;
+
+}
+
+helics::MessageFederate * getMessageFed(helics_message_federate fed)
+{
+	auto fedObj = reinterpret_cast<helics::FedObject *>(fed);
+	if (fedObj->valid == validationIdentifier)
+	{
+		if ((fedObj->type == helics::vtype::messageFed) || (fedObj->type == helics::vtype::combinFed) || (fedObj->type == helics::vtype::filterFed))
+		{
+			return dynamic_cast<helics::MessageFederate *>(fedObj->fedptr.get());
+		}
 	}
 	return nullptr;
 }
 
-helics::MessageFederate * getMessageFed(helics_federate_id_t fedID)
+helics::MessageFilterFederate * getFilterFed(helics_message_filter_federate fed)
 {
-	std::lock_guard<std::mutex> lock(helicsLock);
-	if (fedID < federates.size())
+	auto fedObj = reinterpret_cast<helics::FedObject *>(fed);
+	if (fedObj->valid == validationIdentifier)
 	{
-		if (fedTypes[fedID] != valueFed)
+		if (fedObj->type == helics::vtype::filterFed)
 		{
-			return dynamic_cast<helics::MessageFederate *>(federates[fedID].get());
+			return dynamic_cast<helics::MessageFilterFederate *>(fedObj->fedptr.get());
 		}
 	}
 	return nullptr;
 }
 
-helics::MessageFilterFederate * getFilterFed(helics_federate_id_t fedID)
+static helics::FederateInfo generateInfo(const federate_info_t *fi)
 {
-	std::lock_guard<std::mutex> lock(helicsLock);
-	if (fedID < federates.size())
-	{
-		if (fedTypes[fedID] == filterFed)
-		{
-			return dynamic_cast<helics::MessageFilterFederate *>(federates[fedID].get());
-		}
-	}
-	return nullptr;
+	helics::FederateInfo fedInfo;
+	fedInfo.name = fi->name;
+	fedInfo.coreInitString = fi->coreInitString;
+	fedInfo.coreType = fi->coreType;
+	fedInfo.logLevel = fi->logLevel;
+	fedInfo.forwardCompute = fi->forwardCompute;
+	fedInfo.impactWindow.setBaseTimeCode(fi->impactWindow);
+	fedInfo.timeDelta.setBaseTimeCode(fi->timeDelta);
+	fedInfo.lookAhead.setBaseTimeCode(fi->lookAhead);
+	fedInfo.period.setBaseTimeCode(fi->period);
+	fedInfo.offset.setBaseTimeCode(fi->offset);
+	fedInfo.uninterruptible = fi->uninterruptible;
+	fedInfo.timeAgnostic = fi->timeAgnostic;
+	fedInfo.rollback = fi->rollback;
+	fedInfo.max_iterations = fi->max_iterations;
+}
+/* Creation and destruction of Federates */
+helics_federate helicsCreateValueFederate(const federate_info_t *fi)
+{
+	helics::FedObject *fed = new helics::FedObject;
+	fed->fedptr = std::make_shared<helics::ValueFederate>(generateInfo(fi));
+	fed->type = helics::vtype::valueFed;
+	fed->valid = validationIdentifier;
+	return reinterpret_cast<void *>(fed);
+ }
+
+helics_federate helicsCreateValueFederateFromFile(const char *file)
+{
+	helics::FedObject *fed = new helics::FedObject;
+	fed->fedptr = std::make_shared<helics::ValueFederate>(file);
+	fed->type = helics::vtype::valueFed;
+	fed->valid = validationIdentifier;
+	return reinterpret_cast<void *>(fed);
+ }
+
+/* Creation and destruction of Federates */
+helics_federate helicsCreateMessageFederate(const federate_info_t *fi)
+{
+	helics::FedObject *fed = new helics::FedObject;
+	fed->fedptr = std::make_shared<helics::MessageFederate>(generateInfo(fi));
+	fed->type = helics::vtype::messageFed;
+	fed->valid = validationIdentifier;
+	return reinterpret_cast<void *>(fed);
+}
+
+helics_federate helicsCreateMessageFederateFromFile(const char *file)
+{
+	helics::FedObject *fed = new helics::FedObject;
+	fed->fedptr = std::make_shared<helics::MessageFederate>(file);
+	fed->type = helics::vtype::messageFed;
+	fed->valid = validationIdentifier;
+	return reinterpret_cast<void *>(fed);
 }
 
 /* Creation and destruction of Federates */
-helics_federate_id_t helicsCreateValueFederate(federate_info_t *fi)
+helics_federate helicsCreateMessageFilterFederate(const federate_info_t *fi)
 {
-	return invalid_federate_id;
- }
+	helics::FedObject *fed = new helics::FedObject;
+	fed->fedptr = std::make_shared<helics::MessageFilterFederate>(generateInfo(fi));
+	fed->type = helics::vtype::filterFed;
+	fed->valid = validationIdentifier;
+	return reinterpret_cast<void *>(fed);
+}
 
-helics_federate_id_t helicsCreateValueFederateFromFile(const char *file)
+helics_federate helicsCreateMessageFilterFederateFromFile(const char *file)
 {
-	auto fed = std::make_shared<helics::ValueFederate>(file);
-	std::lock_guard<std::mutex> lock(helicsLock);
-	auto id = federates.size();
-	federates.push_back(std::move(fed));
-	fedTypes.push_back(valueFed);
-	return static_cast<helics_federate_id_t>(id);
- }
+	helics::FedObject *fed = new helics::FedObject;
+	fed->fedptr = std::make_shared<helics::MessageFilterFederate>(file);
+	fed->type = helics::vtype::filterFed;
+	fed->valid = validationIdentifier;
+	return reinterpret_cast<void *>(fed);
+}
+
+/* Creation and destruction of Federates */
+helics_federate helicsCreateCombinationFederate(const federate_info_t *fi)
+{
+	helics::FedObject *fed = new helics::FedObject;
+	fed->fedptr = std::make_shared<helics::CombinationFederate>(generateInfo(fi));
+	fed->type = helics::vtype::combinFed;
+	fed->valid = validationIdentifier;
+	return reinterpret_cast<void *>(fed);
+}
+
+helics_federate helicsCreateCombinationFederateFromFile(const char *file)
+{
+	helics::FedObject *fed = new helics::FedObject;
+	fed->fedptr = std::make_shared<helics::CombinationFederate>(file);
+	fed->type = helics::vtype::combinFed;
+	fed->valid = validationIdentifier;
+	return reinterpret_cast<void *>(fed);
+}
 
 void helicsInitializeFederateInfo(federate_info_t *fi)
 {
@@ -119,19 +184,21 @@ void helicsInitializeFederateInfo(federate_info_t *fi)
 	fi->forwardCompute = false;
 	fi->impactWindow = 0;
 	fi->timeAgnostic = false;
-	fi->interruptible = true;
+	fi->uninterruptible = true;
 	fi->lookAhead = 0;
 	fi->obeserver = false;
 	fi->timeAgnostic = false;
 	fi->timeDelta = 0;
 	fi->period = 0;
 	fi->offset = 0;
+	fi->logLevel = 2;
+	fi->max_iterations = 10;
  }
 
-helicsStatus helicsFinalize(helics_federate_id_t fedID)
+helicsStatus helicsFinalize(helics_federate fedID)
 {
 	auto fed = getFed(fedID);
-	if (!fed)
+	if (fed==nullptr)
 	{
 		return helicsDiscard;
 	}
@@ -140,100 +207,8 @@ helicsStatus helicsFinalize(helics_federate_id_t fedID)
 	return helicsOK;
  }
 
-/* sub/pub registration */
-helics_subscription_id_t helicsRegisterSubscription(helics_federate_id_t fedID, const char *name, const char *type, const char *units)
-{
-	auto fed = getValueFed(fedID);
-	if (!fed)
-	{
-		return nullptr;
-	}
-	try
-	{
-		auto subid=fed->registerRequiredSubscription(name, type, units);
-		return subid.value();
-	}
-	catch (const helics::InvalidFunctionCall &)
-	{
-		return invalid_subscription_id;
-	}
-	
- }
-helics_subscription_id_t helicsRegisterDoubleSubscription(helics_federate_id_t fedID,const char *name, const char *units)
-{
-	auto fed = getValueFed(fedID);
-	if (!fed)
-	{
-		return nullptr;
-	}
-	return invalid_subscription_id;
- }
-helics_subscription_id_t helicsRegisterStringSubscription(helics_federate_id_t fedID, const char *name, const char *units)
-{
-	auto fed = getValueFed(fedID);
-	if (!fed)
-	{
-		return nullptr;
-	}
-	return invalid_subscription_id;
- }
-
-helics_publication_id_t  helicsRegisterPublication(helics_federate_id_t fedID, const char *name, const char *type, const char *units)
-{
-	auto fed = getValueFed(fedID);
-	if (!fed)
-	{
-		return nullptr;
-	}
-	return invalid_publication_id;
- }
-helics_publication_id_t  helicsRegisterDoublePublication(helics_federate_id_t fedID, const char *name, const char *units)
-{
-	auto fed = getValueFed(fedID);
-	if (!fed)
-	{
-		return nullptr;
-	}
-	return invalid_publication_id;
- }
-helics_publication_id_t  helicsRegisterStringPublication(helics_federate_id_t fedID, const char *name, const char *units)
-{
-	auto fed = getValueFed(fedID);
-	if (!fed)
-	{
-		return nullptr;
-	}
-	return invalid_publication_id;
- }
-helics_publication_id_t  helicsRegisterGlobalPublication(helics_federate_id_t fedID, const char *name, const char *type, const char *units)
-{
-	auto fed = getValueFed(fedID);
-	if (!fed)
-	{
-		return nullptr;
-	}
-	return invalid_publication_id;
- }
-helics_publication_id_t  helicsRegisterGlobalDoublePublication(helics_federate_id_t fedID, const char *name, const char *units)
-{
-	auto fed = getValueFed(fedID);
-	if (!fed)
-	{
-		return nullptr;
-	}
-	return invalid_publication_id;
- }
-helics_publication_id_t  helicsRegisterGlobalStringPublication(helics_federate_id_t fedID, const char *name, const char *units)
-{
-	auto fed = getValueFed(fedID);
-	if (!fed)
-	{
-		return nullptr;
-	}
-	return invalid_publication_id;
- }
 /* initialization, execution, and time requests */
-helicsStatus helicsEnterInitializationMode(helics_federate_id_t fedID)
+helicsStatus helicsEnterInitializationMode(helics_federate fedID)
 {
 	auto fed=getFed(fedID);
 	try
@@ -247,7 +222,7 @@ helicsStatus helicsEnterInitializationMode(helics_federate_id_t fedID)
 	}
  }
 
-helicsStatus helicsEnterExecutionMode(helics_federate_id_t fedID)
+helicsStatus helicsEnterExecutionMode(helics_federate fedID)
 {
 	auto fed = getFed(fedID);
 	if (!fed)
@@ -265,7 +240,62 @@ helicsStatus helicsEnterExecutionMode(helics_federate_id_t fedID)
 	}
  }
 
-helics_time_t helicsRequestTime(helics_federate_id_t fedID, helics_time_t requestTime)
+static helics::convergence_state getConvergenceState(convergence_status conv)
+{
+	switch (conv)
+	{
+	case converged:
+		return helics::convergence_state::complete;
+	case nonconverged:
+		return helics::convergence_state::nonconverged;
+	case error:
+	default:
+		return helics::convergence_state::error;
+	case halted:
+		return helics::convergence_state::halted;
+		
+	}
+}
+
+static convergence_status getConvergenceStatus(helics::convergence_state convState)
+{
+	switch (convState)
+	{
+	case helics::convergence_state::complete:
+		return converged;
+	case helics::convergence_state::nonconverged:
+	case helics::convergence_state::continue_processing:
+		return nonconverged;
+	case helics::convergence_state::error:
+	default:
+		return error;
+	case helics::convergence_state::halted:
+		return halted;
+	}
+}
+helicsStatus helicsEnterExecutionModeIterative(helics_federate fed, convergence_status converged, convergence_status *outConverged)
+{
+	auto fedObj = getFed(fed);
+	if (fedObj==nullptr)
+	{
+		return helicsDiscard;
+	}
+	try
+	{
+		auto val = fedObj->enterExecutionState(getConvergenceState(converged));
+		if (outConverged != nullptr)
+		{
+			*outConverged = getConvergenceStatus(val);
+		}
+		return helicsOK;
+	}
+	catch (helics::InvalidStateTransition &)
+	{
+		return helicsError;
+	}
+}
+
+helics_time_t helicsRequestTime(helics_federate fedID, helics_time_t requestTime)
 {
 	auto fed = getFed(fedID);
 	if (!fed)
@@ -276,7 +306,7 @@ helics_time_t helicsRequestTime(helics_federate_id_t fedID, helics_time_t reques
  }
 
 /* getting and publishing values */
-helicsStatus helicsPublish(helics_federate_id_t fedID, helics_publication_id_t pubID, const char *data, uint64_t len)
+helicsStatus helicsPublish(helics_federate fedID, helics_publication pubID, const char *data, uint64_t len)
 {
 	auto fed = getValueFed(fedID);
 	if (!fed)
@@ -286,7 +316,7 @@ helicsStatus helicsPublish(helics_federate_id_t fedID, helics_publication_id_t p
 	return helicsOK;
  }
 
-helicsStatus helicsPublishString(helics_federate_id_t fedID, helics_publication_id_t pubID, const char *str)
+helicsStatus helicsPublishString(helics_federate fedID, helics_publication pubID, const char *str)
 {
 	auto fed = getValueFed(fedID);
 	if (!fed)
@@ -296,7 +326,7 @@ helicsStatus helicsPublishString(helics_federate_id_t fedID, helics_publication_
 	return helicsOK;
  }
 
-helicsStatus helicsPublishDouble(helics_federate_id_t fedID, helics_publication_id_t pubID, double val)
+helicsStatus helicsPublishDouble(helics_federate fedID, helics_publication pubID, double val)
 {
 	auto fed = getValueFed(fedID);
 	if (!fed)
@@ -306,7 +336,7 @@ helicsStatus helicsPublishDouble(helics_federate_id_t fedID, helics_publication_
 	return helicsOK;
  }
 
-uint64_t helicsGetValue(helics_federate_id_t fedID, helics_publication_id_t pubID, char *data, uint64_t maxlen)
+uint64_t helicsGetValue(helics_federate fedID, helics_publication pubID, char *data, uint64_t maxlen)
 {
 	auto fed = getValueFed(fedID);
 	if (!fed)
@@ -316,7 +346,7 @@ uint64_t helicsGetValue(helics_federate_id_t fedID, helics_publication_id_t pubI
 	return 0;
  }
 
-helicsStatus helicsGetString(helics_federate_id_t fedID, helics_publication_id_t pubID, char *str, uint64_t maxlen)
+helicsStatus helicsGetString(helics_federate fedID, helics_publication pubID, char *str, uint64_t maxlen)
 {
 	auto fed = getValueFed(fedID);
 	if (!fed)
@@ -326,7 +356,7 @@ helicsStatus helicsGetString(helics_federate_id_t fedID, helics_publication_id_t
 	return helicsOK;
  }
 
-helicsStatus helicsGetDouble(helics_federate_id_t fedID, helics_publication_id_t pubID, double *val)
+helicsStatus helicsGetDouble(helics_federate fedID, helics_publication pubID, double *val)
 {
 	auto fed = getValueFed(fedID);
 	if (!fed)

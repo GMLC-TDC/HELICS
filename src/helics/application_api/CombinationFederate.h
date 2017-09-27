@@ -27,6 +27,11 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     @param[in] fi  a federate information structure
     */
     CombinationFederate (const FederateInfo &fi);
+	/**constructor taking a federate information structure and using the given core
+	@param core a pointer to core object which the federate can join
+	@param[in] fi  a federate information structure
+	*/
+	CombinationFederate(std::shared_ptr<Core> core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] file a file defining the federate information
     */
