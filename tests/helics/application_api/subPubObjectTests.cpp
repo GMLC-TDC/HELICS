@@ -30,9 +30,9 @@ BOOST_AUTO_TEST_CASE(subscriptionObject_tests)
 
 	auto vFed = std::make_shared<helics::ValueFederate>(fi);
 	//register the publications
-	auto pubObj = helics::Publication<std::string>(helics::GLOBAL, vFed.get(), "pub1");
+	auto pubObj = helics::PublicationT<std::string>(helics::GLOBAL, vFed.get(), "pub1");
 
-	auto subObj = helics::Subscription<std::string>(vFed.get(),"pub1");
+	auto subObj = helics::SubscriptionT<std::string>(vFed.get(),"pub1");
 	vFed->setTimeDelta(1.0);
 	vFed->enterExecutionState();
 	//publish string1 at time=0.0;

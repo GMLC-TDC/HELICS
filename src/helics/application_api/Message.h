@@ -16,8 +16,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/core/helics-time.h"
 #include "core/core-data.h"
 #include <memory>
-#include <string>
-#include <vector>
+#include "helicsTypes.hpp"
 
 namespace helics
 {
@@ -131,6 +130,12 @@ public:
 	/** end const iterator*/
 	auto cend() const { return dblock.cend(); }
 };
+
+template <>
+inline std::string typeNameString <std::vector<data_block>>()
+{
+	return "block_vector";
+}
 
 } //namespace helics
 

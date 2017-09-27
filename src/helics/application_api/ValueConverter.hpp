@@ -10,7 +10,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_VALUE_CONVERTER_
 
 #pragma once
-/** the purpose of these objects are to convert a specific type into a data block for use in the core algorithms
+/** 
+@file
+the purpose of these objects are to convert a specific type into a data block for use in the core algorithms
 */
 
 #include <string>
@@ -22,94 +24,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-	/** template class for generating a known name of a type*/
-	template <class X>
-	inline std::string typeNameString()
-	{
-		//this will probably not be the same on all platforms
-		return std::string(typeid(X).name());
-	}
-	template <>
-	inline std::string typeNameString <std::vector<std::string>>()
-	{
-		return "string_vector";
-	}
-	template <>
-	inline std::string typeNameString <std::vector<double>>()
-	{
-		return "double_vector";
-	}
-	template <>
-	inline std::string typeNameString <std::vector<data_block>>()
-	{
-		return "block_vector";
-	}
-	/** for float*/
-	template <>
-	inline std::string typeNameString<double>()
-	{
-		return "double";
-	}
-
-	/** for float*/
-	template <>
-	inline std::string typeNameString<float>()
-	{
-		return "float";
-	}
-	/** for character*/
-	template <>
-	inline std::string typeNameString<char>()
-	{
-		return "char";
-	}
-	/** for unsigned character*/
-	template <>
-	inline std::string typeNameString<unsigned char>()
-	{
-		return "uchar";
-	}
-	/** for integer*/
-	template <>
-	inline std::string typeNameString<std::int32_t>()
-	{
-		return "int32";
-	}
-	/** for unsigned integer*/
-	template <>
-	inline std::string typeNameString<std::uint32_t>()
-	{
-		return "uint32";
-	}
-	/** for 64 bit unsigned integer*/
-	template <>
-	inline std::string typeNameString<std::int64_t>()
-	{
-		return "int64";
-	}
-	/** for 64 bit unsigned integer*/
-	template <>
-	inline std::string typeNameString<std::uint64_t>()
-	{
-		return "uint64";
-	}
-	/** for complex double*/
-	template <>
-	inline std::string typeNameString<std::complex<float>>()
-	{
-		return "complex_f";
-	}
-	/** for complex double*/
-	template <>
-	inline std::string typeNameString<std::complex<double>>()
-	{
-		return "complex";
-	}
-	template <>
-	inline std::string typeNameString<std::string>()
-	{
-		return "string";
-	}
+	
 
 	/** converter for a basic value*/
 	template<class X>

@@ -12,7 +12,7 @@ Subscriptions.hpp
 Endpoints.hpp
 Filters.hpp
 Federate.h
-identifierTypes.hpp
+helicsTypes.hpp
 Message.h
 MessageFederate.h
 MessageFederateManager.h
@@ -37,6 +37,8 @@ MessageOperators.cpp
 ValueFederate.cpp
 ValueConverter.cpp
 ValueFederateManager.cpp
+Subscriptions.cpp
+Publications.cpp
 )
 
 list(APPEND application_api_sources ${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp.cpp)
