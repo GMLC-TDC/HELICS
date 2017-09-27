@@ -30,6 +30,11 @@ MessageFilterFederate::MessageFilterFederate (const FederateInfo &fi) : Federate
     filterManager = std::make_unique<MessageFilterFederateManager> (coreObject, getID ());
 }
 
+MessageFilterFederate::MessageFilterFederate(std::shared_ptr<Core> core, const FederateInfo &fi) : Federate(std::move(core),fi), MessageFederate(true)
+{
+	filterManager = std::make_unique<MessageFilterFederateManager>(coreObject, getID());
+}
+
 MessageFilterFederate::MessageFilterFederate (const std::string &file) : Federate (file), MessageFederate (true)
 {
     filterManager = std::make_unique<MessageFilterFederateManager> (coreObject, getID ());

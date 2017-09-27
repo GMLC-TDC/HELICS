@@ -24,6 +24,7 @@ typedef void * helics_publication;
 typedef void * helics_endpoint;
 typedef void * helics_source_filter;
 typedef void * helics_destination_filter;
+typedef void * helics_core; 
 
 typedef void * helics_federate;
 typedef void * helics_value_federate;
@@ -83,7 +84,7 @@ typedef struct federate_info_t
 	bool rollback = false; //!< indicator that the federate has rollback features
 	bool timeAgnostic = false;	//!< indicator that the federate doesn't use time
 	bool forwardCompute = false; //!< indicator that the federate does computation ahead of the timing call[must support rollback if set to true]
-	bool interruptible = true;  //!< indicator that the time request can return something other than the requested time
+	bool uninterruptible = false;  //!< indicator that the time request should only return the requested time
 	const char* coreType;  //!< the type of the core
 	const char* coreName;  //!< the name of the core
 	helics_time_t timeDelta;  //!< the period of the federate
@@ -92,6 +93,8 @@ typedef struct federate_info_t
 	helics_time_t period;  //!< the period of the federate
 	helics_time_t offset;  //!< the offset shift in the time periods
 	const char* coreInitString;  //!< an initialization string for the core API object
+	int logLevel = 2;  //!< the level to log messages
+	int max_iterations = 10;  //!< the maximum number of iterations to use in co-iteration
 } federate_info_t;
 
 #endif

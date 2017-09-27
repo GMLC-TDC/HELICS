@@ -20,33 +20,44 @@ namespace helics
 	class Federate;
 	class CoreBroker;
 
-	enum vtype
+	enum class vtype:int
 	{
+		genericFed,
 		valueFed,
 		messageFed,
 		filterFed,
 		combinFed,
 	};
 
-
+	/** object wrapping a broker for the c-api*/
 	class BrokerObject
 	{
 	public:
 		std::shared_ptr<CoreBroker> brokerptr;
 	};
 
+	/** object wrapping a core for the c-api*/
 	class coreObject
 	{
 	public:
 		std::shared_ptr<Core> coreptr;
 	};
 	
+	/** object wrapping a federate for the c-api*/
 	class FedObject
 	{
 	public:
 		vtype type;
+		int valid;
 		std::shared_ptr<Federate> fedptr;
 	};
+
+	
 }
+
+helics::Federate *getFed(helics_federate fed);
+helics::ValueFederate *getValueFed(helics_value_federate fed);
+helics::MessageFederate *getMessageFed(helics_message_federate fed);
+helics::MessageFilterFederate *getFilterFed(helics_message_filter_federate fed);
 
 #endif

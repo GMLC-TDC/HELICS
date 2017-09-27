@@ -28,6 +28,10 @@ namespace helics {
 	{
 		mfManager = std::make_unique<MessageFederateManager>(coreObject, getID());
 	}
+	MessageFederate::MessageFederate(std::shared_ptr<Core> core, const FederateInfo &fi) : Federate(std::move(core), fi)
+	{
+		mfManager = std::make_unique<MessageFederateManager>(coreObject, getID());
+	}
 	MessageFederate::MessageFederate(const std::string &file) : Federate(file)
 	{
 		mfManager = std::make_unique<MessageFederateManager>(coreObject, getID());
