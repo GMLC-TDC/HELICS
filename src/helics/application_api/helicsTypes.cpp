@@ -10,6 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "helicsTypes.hpp"
+#include <boost/lexical_cast.hpp>
+#include <regex>
 
 namespace helics
 {
@@ -40,4 +42,94 @@ const std::string &typeNameStringRef(helicsType_t type)
 		return nullString;
 	}
 }
+
+
+std::string helicsComplexString(double real, double imag)
+{
+	std::stringstream ss;
+	ss << real;
+	if (imag != 0.0)
+	{
+		if (imag >= 0.0)
+		{
+			ss << '+' << imag;
+		}
+		else
+		{
+			ss << imag;
+		}
+		ss << 'j';
+	}
+	return ss.str();
+}
+
+std::string helicsComplexString(std::complex<double> val)
+{
+	return helicsComplexString(val.real(), val.imag());
+}
+
+const std::regex creg("([+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?)\\s*([+-]\\s*(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?)[ji]*");
+
+std::complex<double> helicsGetComplex(const std::string &val)
+{
+
+	if (val.empty())
+	{
+		return std::complex<double>(-1e49, -1e49);
+	}
+	std::smatch m;
+	double re = 0.0;
+	double im = 0.0;
+	std::regex_search(val, m, creg);
+	if (m.size() == 9)
+	{
+		re = boost::lexical_cast<double>(m[1]);
+		im = boost::lexical_cast<double>(m[5]);
+
+	}
+	else
+	{
+		if ((val.back() == 'j') || (val.back() == 'i'))
+		{
+			im = boost::lexical_cast<double>(val.substr(0, val.size() - 1));
+
+		}
+		else
+		{
+			re = boost::lexical_cast<double>(val);
+		}
+	}
+	return std::complex<double>(re, im);
+}
+
+
+std::string helicsVectorString(const std::vector<double> &val)
+{
+	std::string vString = "[";
+	for (const auto &v : val)
+	{
+		vString.append(std::to_string(v));
+		vString.push_back(';');
+		vString.push_back(' ');
+	}
+	if (vString.size() > 2)
+	{
+		vString.pop_back();
+		vString.pop_back();
+	}
+	vString.push_back(']');
+	return vString;
+}
+
+
+std::vector<double> helicsGetVector(const std::string &val)
+{
+	return std::vector<double>();
+}
+
+void helicsGetVector(const std::string &val, std::vector<double> &data)
+{
+
+}
+
 }

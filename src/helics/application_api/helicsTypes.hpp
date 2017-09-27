@@ -175,6 +175,17 @@ enum class helicsType_t
 
 const std::string &typeNameStringRef(helicsType_t type);
 
+
+std::string helicsComplexString(double real, double imag);
+std::string helicsComplexString(std::complex<double> val);
+std::string helicsVectorString(const std::vector<double> &val);
+
+std::complex<double> helicsGetComplex(const std::string &val);
+
+std::vector<double> helicsGetVector(const std::string &val);
+
+void helicsGetVector(const std::string &val, std::vector<double> &data);
+
 /** template class for generating a known name of a type*/
 template <class X>
 constexpr helicsType_t helicsType()
