@@ -12,6 +12,54 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 namespace helics
 {
 
+
+	void Subscription::handleCallback(Time time)
+	{
+		auto dv = fed->getValueRaw(id);
+		switch (value_callback.which())
+		{
+		case stringLoc:
+		default:
+		{
+			std::string val;
+			valueExtract(dv,type, val);
+			boost::get < std::function<void(const std::string &, Time)>>(value_callback)(val, time);
+		}
+		break;
+		case doubleLoc:
+		{
+			double val;
+			valueExtract(dv, type, val);
+			boost::get < std::function<void(const double &, Time)>>(value_callback)(val, time);
+		}
+		break;
+		case intLoc:
+		{
+			int64_t val;
+			valueExtract(dv, type, val);
+			boost::get < std::function<void(const int64_t &, Time)>>(value_callback)(val, time);
+		}
+		break;
+		case complexLoc:
+		{
+			std::complex<double> val;
+			valueExtract(dv, type, val);
+			boost::get < std::function<void(const std::complex<double> &, Time)>>(value_callback)(val, time);
+		}
+		break;
+		case vectorLoc:
+		{
+			std::vector<double> val;
+			valueExtract(dv, type, val);
+			boost::get < std::function<void(const std::vector<double> &, Time)>>(value_callback)(val, time);
+		}
+		break;
+
+			
+		}
+		
+	}
+
 void valueExtract(const defV &dv, std::string &val)
 {
 	switch (dv.which())
@@ -27,7 +75,7 @@ void valueExtract(const defV &dv, std::string &val)
 		val = std::to_string(boost::get<int64_t>(dv));
 		break;
 	case 3: //complex
-		val = helicsComplexString(boost::get<std::complex<double>>(dv)));
+		val = helicsComplexString(boost::get<std::complex<double>>(dv));
 		break;
 	case 4: //vector
 		val = helicsVectorString(boost::get<std::vector<double>>(dv));
@@ -41,77 +89,177 @@ void valueExtract(const defV &dv, std::complex<double> &val)
 	{
 	case 0: //string
 	default:
-		val = boost::lexical_cast<X>(boost::get<std::string>(v));
+		val = helicsGetComplex(boost::get < std::string>(dv));
 		break;
 	case 1: //double
-		val = static_cast<X>(boost::get<double>(v));
+		val = std::complex<double>(boost::get<double>(dv), 0.0);
 		break;
 	case 2: //int64_t
-		val = static_cast<X>(boost::get<int64_t>(v));
+		val = std::complex<double>(static_cast<double>(boost::get<int64_t>(dv)), 0.0);
 		break;
 	case 3: //complex
-		val = static_cast<X>(std::abs(boost::get<std::complex<double>>(v)));
+		val = boost::get<std::complex<double>>(dv);
 		break;
 	case 4: //vector
 	{
 		auto &vec = boost::get<std::vector<double>>(dv);
-		if (!vec.empty())
+		if (vec.size() == 1)
 		{
-			val = static_cast<X>(vec.front());
+			val = std::complex<double>(vec[0], 0.0);
 		}
-		else
+		else if (vec.size() > 2)
 		{
-			val = static_cast<X>(-1e49);
+			val = std::complex<double>(vec[0], vec[1]);
 		}
 		break;
+	}
 	}
 }
 
 void valueExtract(const defV &dv, std::vector<double> &val)
 {
+	val.resize(0);
 	switch (dv.which())
 	{
-	case 0: //string
+	case stringLoc: //string
 	default:
-		val = boost::lexical_cast<X>(boost::get<std::string>(v));
+		helicsGetVector(boost::get<std::string>(dv), val);
 		break;
 	case 1: //double
-		val = static_cast<X>(boost::get<double>(v));
+		val.push_back(boost::get<double>(dv));
 		break;
 	case 2: //int64_t
-		val = static_cast<X>(boost::get<int64_t>(v));
+		val.push_back(static_cast<double>(boost::get<int64_t>(dv)));
 		break;
 	case 3: //complex
-		val = static_cast<X>(std::abs(boost::get<std::complex<double>>(v)));
-		break;
-	case 4: //vector
 	{
-		auto &vec = boost::get<std::vector<double>>(dv);
-		if (!vec.empty())
-		{
-			val = static_cast<X>(vec.front());
-		}
-		else
-		{
-			val = static_cast<X>(-1e49);
-		}
+		auto cval = boost::get<std::complex<double>>(dv);
+		val.push_back(cval.real());
+		val.push_back(cval.imag());
+	}
+	break;
+	case 4: //vector
+		val = boost::get<std::vector<double>>(dv);
 		break;
 	}
 }
 
 void valueExtract(const data_view &dv, helicsType_t baseType, std::string &val)
 {
-
+	switch (baseType)
+	{
+	case helicsType_t::helicsDouble:
+	{
+		auto V = ValueConverter<double>::interpret(dv);
+		val = std::to_string(V);
+		break;
+	}
+	case helicsType_t::helicsInt:
+	{
+		auto V = ValueConverter<int64_t>::interpret(dv);
+		val = std::to_string(V);
+		break;
+	}
+	case helicsType_t::helicsString:
+	{
+		val = dv.string();
+		break;
+	}
+	case helicsType_t::helicsVector:
+	{
+		val = helicsVectorString(ValueConverter<std::vector<double>>::interpret(dv));
+		break;
+	}
+	case helicsType_t::helicsComplex:
+	{
+		val = helicsComplexString(ValueConverter<std::complex<double>>::interpret(dv));
+		break;
+	}
+	case helicsType_t::helicsInvalid:
+	default:
+		break;
+	}
 }
 
 void valueExtract(const data_view &dv, helicsType_t baseType, std::vector<double> &val)
 {
-
+	val.resize(0);
+	switch (baseType)
+	{
+	case helicsType_t::helicsDouble:
+	{
+		val.push_back(ValueConverter<double>::interpret(dv));
+		break;
+	}
+	case helicsType_t::helicsInt:
+	{
+		val.push_back(static_cast<double>(ValueConverter<int64_t>::interpret(dv)));
+		break;
+	}
+	case helicsType_t::helicsString:
+	{
+		helicsGetVector(dv.string(),val);
+		break;
+	}
+	case helicsType_t::helicsVector:
+	{
+		ValueConverter<std::vector<double>>::interpret(dv,val);
+		break;
+	}
+	case helicsType_t::helicsComplex:
+	{
+		auto cval=ValueConverter<std::complex<double>>::interpret(dv);
+		val.push_back(cval.real());
+		val.push_back(cval.imag());
+		break;
+	}
+	case helicsType_t::helicsInvalid:
+	default:
+		break;
+	}
 }
 
 void valueExtract(const data_view &dv, helicsType_t baseType, std::complex<double> &val)
 {
-
+	switch (baseType)
+	{
+	case helicsType_t::helicsDouble:
+	{
+		val = std::complex<double>(ValueConverter<double>::interpret(dv), 0.0);
+		break;
+	}
+	case helicsType_t::helicsInt:
+	{
+		val = std::complex<double>(static_cast<double>(ValueConverter<int64_t>::interpret(dv)), 0.0);
+		break;
+	}
+	case helicsType_t::helicsString:
+	{
+		val = helicsGetComplex(dv.string());
+		break;
+	}
+	case helicsType_t::helicsVector:
+	{
+		auto vec = ValueConverter<std::vector<double>>::interpret(dv);
+		if (vec.size() == 1)
+		{
+			val = std::complex<double>(vec[0], 0.0);
+		}
+		else if (vec.size() > 2)
+		{
+			val = std::complex<double>(vec[0], vec[1]);
+		}
+		break;
+	}
+	case helicsType_t::helicsComplex:
+	{
+		val = ValueConverter<std::complex<double>>::interpret(dv);
+		break;
+	}
+	case helicsType_t::helicsInvalid:
+	default:
+		break;
+	}
 }
 
 }

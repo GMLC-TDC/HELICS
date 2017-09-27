@@ -8,6 +8,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 #include "helics.h"
 #include "core/helics-time.h"
+#include "shared_api_library/internal/api_objects.h"
 #include "application_api/application_api.h"
 #include <memory>
 #include <mutex>

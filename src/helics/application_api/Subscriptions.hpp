@@ -13,14 +13,11 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "ValueFederate.h"
 #include <algorithm>
 #include <array>
-#include <boost/variant.hpp>
+#include "HelicsPrimaryTypes.h"
 #include "helicsTypes.hpp"
 #include "boost/lexical_cast.hpp"
 namespace helics
 {
-
-
-using defV = boost::variant<std::string, double, int64_t, std::complex<double>,std::vector<double>>;
 
 // template<class X, typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, bool>::type>
 class Subscription
@@ -31,11 +28,11 @@ private:
 	ValueFederate *fed = nullptr;  //!< reference to the value federate
 	std::string key_;  //!< the name of the subscription
 	std::string units_;  //!< the defined units of the federate
-	boost::variant<std::function<void(std::string, Time)>,
-		std::function<void(double, Time)>,
-		std::function<void(int64_t, Time)>,
-		std::function<void(std::complex<double>, Time)>,
-		std::function<void(std::vector<double>, Time)>> callbacks;  //!< callback function for the federate
+	boost::variant<std::function<void(const std::string &, Time)>,
+		std::function<void(const double &, Time)>,
+		std::function<void(const int64_t &, Time)>,
+		std::function<void(const std::complex<double> &, Time)>,
+		std::function<void(const std::vector<double> &, Time)>> value_callback;  //!< callback function for the federate
 	subscription_id_t id;  //!< the id of the federate
 	helicsType_t type;  //!< the underlying type the publication is using
 	defV lastValue; //!< the last value updated
@@ -79,7 +76,7 @@ public:
 	{
 		if (fed->isUpdated(id))
 		{
-			auto dv = fed->getRawValue(id);
+			auto dv = fed->getValueRaw(id);
 			valueExtract(dv, type, out);
 			lastValue = out;
 		}
@@ -104,7 +101,7 @@ public:
 	val is the new value and time is the time the value was updated
 	*/
 	template<class X, typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, bool>::type>
-	void registerCallback(std::function<void(X, Time)> callback)
+	void registerCallback(std::function<void(const X &, Time)> callback)
 	{
 		value_callback = callback;
 		fed->registerSubscriptionNotificationCallback(id, [=](subscription_id_t, Time time) { handleCallback(time); });
@@ -148,20 +145,20 @@ void valueExtract(const defV &dv, X &val)
 {
 	switch (dv.which())
 	{
-	case 0: //string
+	case stringLoc: //string
 	default:
-		val=boost::lexical_cast<X>(boost::get<std::string>(v));
+		val=boost::lexical_cast<X>(boost::get<std::string>(dv));
 		break;
-	case 1: //double
-		val=static_cast<X>(boost::get<double>(v));
+	case doubleLoc: //double
+		val=static_cast<X>(boost::get<double>(dv));
 		break;
-	case 2: //int64_t
-		val=static_cast<X>(boost::get<int64_t>(v));
+	case intLoc: //int64_t
+		val=static_cast<X>(boost::get<int64_t>(dv));
 		break;
-	case 3: //complex
-		val=static_cast<X>(std::abs(boost::get<std::complex<double>>(v)));
+	case complexLoc: //complex
+		val=static_cast<X>(std::abs(boost::get<std::complex<double>>(dv)));
 		break;
-	case 4: //vector
+	case vectorLoc: //vector
 	{
 		auto &vec = boost::get<std::vector<double>>(dv);
 		if (!vec.empty())
@@ -183,6 +180,11 @@ void valueExtract(const data_view &dv, helicsType_t baseType, X &val)
 {
 	switch (baseType)
 	{
+	case helicsType_t::helicsString:
+	{
+		val = boost::lexical_cast<X>(dv.string());
+		break;
+	}
 	case helicsType_t::helicsDouble:
 	{
 		auto V = ValueConverter<double>::interpret(dv);
@@ -195,12 +197,7 @@ void valueExtract(const data_view &dv, helicsType_t baseType, X &val)
 		val = static_cast<X>(V);
 		break;
 	}
-	case helicsType_t::helicsString:
-	{
-		auto V = ValueConverter<std::string>::interpret(dv);
-		val = std::complex<double><X>(V);
-		break;
-	}
+	
 	case helicsType_t::helicsVector:
 	{
 		auto V = ValueConverter<std::vector<double>>::interpret(dv);
@@ -216,7 +213,7 @@ void valueExtract(const data_view &dv, helicsType_t baseType, X &val)
 	case helicsType_t::helicsInvalid:
 		break;
 	}
-};
+}
 
 /** class to handle a subscription
 @tparam X the class of the value associated with a subscription*/

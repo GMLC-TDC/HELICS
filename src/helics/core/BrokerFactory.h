@@ -38,7 +38,7 @@ namespace BrokerFactory {
 	* Returns true if type specified is available in current compilation.
 	*/
 	bool available(helics_core_type type);
-};
+} //namespace BrokerFactory
 
 /** locate a coreBroker by name
 @param name the name of the broker

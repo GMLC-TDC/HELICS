@@ -129,7 +129,7 @@ namespace CoreFactory
 		return core;
 	}
 
-	std::shared_ptr<Core> CoreFactory::FindOrCreate(helics_core_type type,
+	std::shared_ptr<Core> FindOrCreate(helics_core_type type,
 		const std::string &core_name,
 		const std::string &initializationString)
 	{

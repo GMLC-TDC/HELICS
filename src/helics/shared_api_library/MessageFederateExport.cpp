@@ -13,12 +13,3 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <mutex>
 #include <vector>
 
-helics_message_federate helicsCreateMessageFederate(const federate_info_t *fi)
-{
-
-}
-
-helics_message_federate helicsCreateMessageFederateFromFile(const char *fileName)
-{
-
- }

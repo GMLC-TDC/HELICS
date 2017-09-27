@@ -72,7 +72,7 @@ Common Functions
    HELICS_Export helics_time_t helicsRequestTime(helics_federate fed, helics_time_t requestTime);
    HELICS_Export helics_iterative_time helicsRequestTimeIterative(helics_federate fed, helics_time_t requestTime, convergence_status converged);
 
-   HELICS_Export void helics_free_federate(helics_federate fed)
+   HELICS_Export void helics_free_federate(helics_federate fed);
    
   
 

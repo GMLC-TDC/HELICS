@@ -99,6 +99,7 @@ static helics::FederateInfo generateInfo(const federate_info_t *fi)
 	fedInfo.timeAgnostic = fi->timeAgnostic;
 	fedInfo.rollback = fi->rollback;
 	fedInfo.max_iterations = fi->max_iterations;
+	return fedInfo;
 }
 /* Creation and destruction of Federates */
 helics_federate helicsCreateValueFederate(const federate_info_t *fi)

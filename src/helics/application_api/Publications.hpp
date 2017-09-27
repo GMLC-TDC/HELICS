@@ -11,24 +11,15 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "ValueFederate.h"
-#include <boost/variant.hpp>
 #include "helicsTypes.hpp"
+#include "HelicsPrimaryTypes.h"
 #include "boost/lexical_cast.hpp"
 
 
-using defV = boost::variant<std::string, double, int64_t, std::complex<double>, std::vector<double>>;
 
 namespace helics
 {
-/** enumeration of locality namespaces*/
-enum class publication_locality
-{
-    local,
-    global,
-};
 
-constexpr publication_locality GLOBAL = publication_locality::global;
-constexpr publication_locality LOCAL = publication_locality::local;
 
 class Publication
 {
@@ -40,6 +31,7 @@ private:
 	bool changeDetectionEnabled = false; //!< the change detection is enabled
 	std::string m_name;  //!< the name of the publication
 	std::string m_units;  //!< the defined units of the publication
+	mutable defV prevValue;  //!< the previous value of the publication
 public:
 	Publication() noexcept {};
 	/**constructor to build a publication object
@@ -51,7 +43,7 @@ public:
 	Publication(ValueFederate *valueFed, std::string name, std::string units = "")
 		: fed(valueFed), m_name(std::move(name)), m_units(std::move(units)), type(helicsType<X>)
 	{
-		id = fed->registerPublication(m_name, typeNameString(type), m_units);
+		id = fed->registerPublication(m_name, typeNameStringRef(type), m_units);
 	}
 	/**constructor to build a publication object
 	@param[in] valueFed  the ValueFederate to use
@@ -64,11 +56,11 @@ public:
 	{
 		if (locality == GLOBAL)
 		{
-			id = fed->registerGlobalPublication(m_name, typeNameString(type), m_units);
+			id = fed->registerGlobalPublication(m_name, typeNameStringRef(type), m_units);
 		}
 		else
 		{
-			id = fed->registerPublication(m_name, typeNameString(type), m_units);
+			id = fed->registerPublication(m_name, typeNameStringRef(type), m_units);
 		}
 	}
 	/** send a value for publication
@@ -78,7 +70,6 @@ public:
 	void publish(const char *val) const;
 	void publish(const std::string &val) const;
 	void publish(const std::vector<double> &val) const;
-	void publish(const double val[], size_t len) const;
 	void publish(std::complex<double> val) const;
 	/** secondary publish function to allow unit conversion before publication
 	@param[in] val the value to publish

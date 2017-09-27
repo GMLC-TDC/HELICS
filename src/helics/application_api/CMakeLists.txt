@@ -24,6 +24,7 @@ ValueConverter_impl.hpp
 ValueFederate.h
 ValueFederateManager.h
 asyncFedCallInfo.h
+HelicsPrimaryTypes.h
 )
 
 set(application_api_sources

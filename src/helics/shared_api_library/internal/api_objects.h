@@ -19,6 +19,9 @@ namespace helics
 	class Core;
 	class Federate;
 	class CoreBroker;
+	class ValueFederate;
+	class MessageFederate;
+	class MessageFilterFederate;
 
 	enum class vtype:int
 	{
