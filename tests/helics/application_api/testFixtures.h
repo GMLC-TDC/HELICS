@@ -55,10 +55,10 @@ struct FederateTestFixture
     std::shared_ptr<helics::CoreBroker> AddBroker(const std::string &core_type_name, const std::string &initialization_string);
 
     template<class FedType>
-    void SetupSingleBrokerTest(std::string core_type_name, int count, std::string name_prefix = "fed")
+    void SetupSingleBrokerTest(std::string core_type_name, int count, helics::Time time_delta = helics::timeZero, std::string name_prefix = "fed")
     {
         auto broker = AddBroker(core_type_name, count);
-        AddFederates<FedType>(core_type_name, count, broker, helics::timeZero, name_prefix);
+        AddFederates<FedType>(core_type_name, count, broker, time_delta, name_prefix);
     }
 
     template<class FedType>

@@ -215,7 +215,7 @@ FederateTestFixture::~FederateTestFixture()
 {
     for (auto &fed : federates)
     {
-        if (fed)
+        if (fed && fed->currentState() != helics::Federate::op_states::finalize)
         {
             fed->finalize();
         }
