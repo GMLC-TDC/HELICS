@@ -19,26 +19,22 @@ extern "C" {
 	HELICS_Export helics_value_federate helicsCreateValueFederateFromFile(const char *);
 
 	/* sub/pub registration */
+#define HELICS_STRING_TYPE 0
+#define HELICS_DOUBLE_TYPE 1
+#define HELICS_INT_TYPE 2
+#define HELICS_COMPLEX_TYPE 3
+#define HELICS_VECTOR_TYPE 4
+#define HELICS_RAW_TYPE 25
+
 	HELICS_Export helics_subscription helicsRegisterSubscription(helics_value_federate fedID, const char *name, const char *type, const char *units);
-	HELICS_Export helics_subscription helicsRegisterIntegerSubscription(helics_value_federate fedID, const char *name, const char *units);
-	HELICS_Export helics_subscription helicsRegisterDoubleSubscription(helics_value_federate fedID, const char *name, const char *units);
-	HELICS_Export helics_subscription helicsRegisterStringSubscription(helics_value_federate fedID, const char *name, const char *units);
-	HELICS_Export helics_subscription helicsRegisterComplexSubscription(helics_value_federate fedID, const char *name, const char *units);
-	HELICS_Export helics_subscription helicsRegisterVectorSubscription(helics_value_federate fedID, const char *name, const char *units);
+	HELICS_Export helics_subscription helicsRegisterTypeSubscription(helics_value_federate fedID, int type, const char *name, const char *units);
 
 	HELICS_Export helics_publication  helicsRegisterPublication(helics_value_federate fedID, const char *name, const char *type, const char *units);
-	HELICS_Export helics_publication  helicsRegisterIntegerPublication(helics_value_federate fedID, const char *name, const char *units);
-	HELICS_Export helics_publication  helicsRegisterDoublePublication(helics_value_federate fedID, const char *name, const char *units);
-	HELICS_Export helics_publication  helicsRegisterStringPublication(helics_value_federate fedID, const char *name, const char *units);
-	HELICS_Export helics_publication  helicsRegisterComplexPublication(helics_value_federate fedID, const char *name, const char *units);
-	HELICS_Export helics_publication  helicsRegisterVectorPublication(helics_value_federate fedID, const char *name, const char *units);
-
+	HELICS_Export helics_publication  helicsRegisterTypePublication(helics_value_federate fedID, int type, const char *name, const char *units);
+	
 	HELICS_Export helics_publication  helicsRegisterGlobalPublication(helics_value_federate fedID, const char *name, const char *type, const char *units);
-	HELICS_Export helics_publication  helicsRegisterGlobalIntegerPublication(helics_value_federate fedID, const char *name, const char *units);
-	HELICS_Export helics_publication  helicsRegisterGlobalDoublePublication(helics_value_federate fedID, const char *name, const char *units);
-	HELICS_Export helics_publication  helicsRegisterGlobalStringPublication(helics_value_federate fedID, const char *name, const char *units);
-	HELICS_Export helics_publication  helicsRegisterGlobalComplexPublication(helics_value_federate fedID, const char *name, const char *units);
-	HELICS_Export helics_publication  helicsRegisterGlobalVectorPublication(helics_value_federate fedID, const char *name, const char *units);
+	HELICS_Export helics_publication  helicsRegisterGlobalTypePublication(helics_value_federate fedID, int type, const char *name, const char *units);
+
 
 	/* getting and publishing values */
 	HELICS_Export helicsStatus helicsPublish(helics_publication pubID, const char *data, uint64_t len);

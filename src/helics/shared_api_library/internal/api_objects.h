@@ -13,6 +13,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include <memory>
 #include "shared_api_library/api-data.h"
+#include "application_api/helicsTypes.hpp"
 
 namespace helics
 {
@@ -22,6 +23,10 @@ namespace helics
 	class ValueFederate;
 	class MessageFederate;
 	class MessageFilterFederate;
+	class Subscription;
+	class Publication;
+	class Endpoint;
+	class Filter;
 
 	enum class vtype:int
 	{
@@ -55,12 +60,55 @@ namespace helics
 		std::shared_ptr<Federate> fedptr;
 	};
 
-	
+	/** object wrapping a subscription*/
+	class SubscriptionObject
+	{
+	public:
+		std::shared_ptr<Subscription> subptr;
+		subscription_id_t id;
+		bool rawOnly = false;
+		std::shared_ptr<ValueFederate> fedptr;
+	};
+
+	class PublicationObject
+	{
+	public:
+		std::shared_ptr<Publication> pubptr;
+		publication_id_t id;
+		bool rawOnly = false;
+		std::shared_ptr<ValueFederate> fedptr;
+	};
+
+	class EndpointObject
+	{
+	public:
+		std::shared_ptr<Subscription> endptr;
+		std::shared_ptr<MessageFederate> fedptr;
+	};
+
+	class SourceFilterObject
+	{
+	public:
+		std::shared_ptr<Filter> filtptr;
+		std::shared_ptr<MessageFilterFederate> fedptr;
+	};
+
+	class DestFilterObject
+	{
+	public:
+		std::shared_ptr<Filter> subptr;
+		std::shared_ptr<MessageFilterFederate> fedptr;
+	};
 }
 
 helics::Federate *getFed(helics_federate fed);
 helics::ValueFederate *getValueFed(helics_value_federate fed);
 helics::MessageFederate *getMessageFed(helics_message_federate fed);
 helics::MessageFilterFederate *getFilterFed(helics_message_filter_federate fed);
+
+std::shared_ptr<helics::Federate> getFedSharedPtr(helics_federate fed);
+std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(helics_value_federate fed);
+std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(helics_message_federate fed);
+std::shared_ptr<helics::MessageFilterFederate> getFilterFedSharedPtr(helics_message_filter_federate fed);
 
 #endif

@@ -12,6 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helicsTypes.hpp"
 #include <boost/lexical_cast.hpp>
 #include <regex>
+#include <map>
 
 namespace helics
 {
@@ -66,6 +67,28 @@ std::string helicsComplexString(double real, double imag)
 std::string helicsComplexString(std::complex<double> val)
 {
 	return helicsComplexString(val.real(), val.imag());
+}
+
+static const std::map<std::string, helicsType_t> typeMap
+{
+	{"double",helicsType_t::helicsDouble},
+	{"string",helicsType_t::helicsString},
+	{"float",helicsType_t::helicsDouble},
+	{"vector",helicsType_t::helicsVector},
+	{"double_vector",helicsType_t::helicsVector},
+	{"complex",helicsType_t::helicsComplex},
+	{"int",helicsType_t::helicsInt},
+	{"int64",helicsType_t::helicsInt},
+};
+
+helicsType_t getTypeFromString(const std::string &typeName)
+{
+	auto res = typeMap.find(typeName);
+	if (res == typeMap.end())
+	{
+		return helicsType_t::helicsInvalid;
+	}
+	return res->second;
 }
 
 const std::regex creg("([+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?)\\s*([+-]\\s*(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?)[ji]*");

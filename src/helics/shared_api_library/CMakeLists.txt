@@ -33,7 +33,7 @@ MessageFilterFederateExport.cpp
 
 add_library(helicsSharedLib SHARED ${helicsShared_sources} ${helicsShared_headers})
 
-
+include_directories(${Boost_INCLUDE_DIR})
 
 target_link_libraries(helicsSharedLib helics)
 link_directories(${external_link_directories})

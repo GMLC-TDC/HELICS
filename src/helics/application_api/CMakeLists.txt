@@ -40,6 +40,7 @@ ValueConverter.cpp
 ValueFederateManager.cpp
 Subscriptions.cpp
 Publications.cpp
+helicsTypes.cpp
 )
 
 list(APPEND application_api_sources ${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp.cpp)

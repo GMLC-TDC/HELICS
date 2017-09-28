@@ -36,6 +36,36 @@ public:
 	Publication() noexcept {};
 	/**constructor to build a publication object
 	@param[in] valueFed  the ValueFederate to use
+	@param type_ the defined type of the publication
+	@param[in] name the name of the subscription
+	@param[in] units the units associated with a Federate
+	*/
+	Publication(ValueFederate *valueFed,helicsType_t type_, std::string name, std::string units = "")
+		: fed(valueFed), m_name(std::move(name)), m_units(std::move(units)), type(type_)
+	{
+		id = fed->registerPublication(m_name, typeNameStringRef(type), m_units);
+	}
+	/**constructor to build a publication object
+	@param locality  set to global for for a global publication or local for a local one
+	@param[in] valueFed  the ValueFederate to use
+	@param type_ the defined type of the publication
+	@param[in] name the name of the subscription
+	@param[in] units the units associated with a Federate
+	*/
+	Publication(publication_locality locality, ValueFederate *valueFed, helicsType_t type_, std::string name, std::string units = "")
+		: fed(valueFed), m_name(std::move(name)), m_units(std::move(units)), type(type_)
+	{
+		if (locality == GLOBAL)
+		{
+			id = fed->registerGlobalPublication(m_name, typeNameStringRef(type), m_units);
+		}
+		else
+		{
+			id = fed->registerPublication(m_name, typeNameStringRef(type), m_units);
+		}
+	}
+	/**constructor to build a publication object
+	@param[in] valueFed  the ValueFederate to use
 	@param[in] name the name of the subscription
 	@param[in] units the units associated with a Federate
 	*/
@@ -46,6 +76,7 @@ public:
 		id = fed->registerPublication(m_name, typeNameStringRef(type), m_units);
 	}
 	/**constructor to build a publication object
+	@param locality  set to global for for a global publication or local for a local one
 	@param[in] valueFed  the ValueFederate to use
 	@param[in] name the name of the subscription
 	@param[in] units the units associated with a Federate

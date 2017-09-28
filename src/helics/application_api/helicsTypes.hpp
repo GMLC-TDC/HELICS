@@ -163,18 +163,20 @@ inline std::string typeNameString<std::string>()
 	return "string";
 }
 
-enum class helicsType_t
+enum class helicsType_t:int
 {
-	helicsDouble,
-	helicsInt,
-	helicsString,
-	helicsComplex,
-	helicsVector,
-	helicsInvalid,
+	helicsString = 0,
+	helicsDouble=1,
+	helicsInt=2,
+	
+	helicsComplex=3,
+	helicsVector=4,
+	helicsInvalid=23425,
 };
 
 const std::string &typeNameStringRef(helicsType_t type);
 
+helicsType_t getTypeFromString(const std::string &typeName);
 
 std::string helicsComplexString(double real, double imag);
 std::string helicsComplexString(std::complex<double> val);
