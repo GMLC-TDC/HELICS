@@ -82,6 +82,53 @@ helics::MessageFilterFederate * getFilterFed(helics_message_filter_federate fed)
 	return nullptr;
 }
 
+
+std::shared_ptr<helics::Federate> getFedSharedPtr(helics_federate fed)
+{
+	auto fedObj = reinterpret_cast<helics::FedObject *>(fed);
+	if (fedObj->valid == validationIdentifier)
+	{
+		return fedObj->fedptr;
+	}
+	return nullptr;
+}
+std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(helics_value_federate fed)
+{
+	auto fedObj = reinterpret_cast<helics::FedObject *>(fed);
+	if (fedObj->valid == validationIdentifier)
+	{
+		if ((fedObj->type == helics::vtype::valueFed) || (fedObj->type == helics::vtype::combinFed))
+		{
+			return std::dynamic_pointer_cast<helics::ValueFederate>(fedObj->fedptr);
+		}
+	}
+	return nullptr;
+}
+std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(helics_message_federate fed)
+{
+	auto fedObj = reinterpret_cast<helics::FedObject *>(fed);
+	if (fedObj->valid == validationIdentifier)
+	{
+		if ((fedObj->type == helics::vtype::messageFed) || (fedObj->type == helics::vtype::combinFed) || (fedObj->type == helics::vtype::filterFed))
+		{
+			return std::dynamic_pointer_cast<helics::MessageFederate>(fedObj->fedptr);
+		}
+	}
+	return nullptr;
+}
+std::shared_ptr<helics::MessageFilterFederate> getFilterFedSharedPtr(helics_message_filter_federate fed)
+{
+	auto fedObj = reinterpret_cast<helics::FedObject *>(fed);
+	if (fedObj->valid == validationIdentifier)
+	{
+		if (fedObj->type == helics::vtype::filterFed)
+		{
+			return std::dynamic_pointer_cast<helics::MessageFilterFederate>(fedObj->fedptr);
+		}
+	}
+	return nullptr;
+}
+
 static helics::FederateInfo generateInfo(const federate_info_t *fi)
 {
 	helics::FederateInfo fedInfo;
@@ -226,7 +273,7 @@ helicsStatus helicsEnterInitializationMode(helics_federate fedID)
 helicsStatus helicsEnterExecutionMode(helics_federate fedID)
 {
 	auto fed = getFed(fedID);
-	if (!fed)
+	if (fed==nullptr)
 	{
 		return helicsDiscard;
 	}

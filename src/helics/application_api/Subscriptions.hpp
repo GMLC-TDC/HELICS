@@ -15,7 +15,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <array>
 #include "HelicsPrimaryTypes.h"
 #include "helicsTypes.hpp"
-#include "boost/lexical_cast.hpp"
+#include <boost/lexical_cast.hpp>
 namespace helics
 {
 
