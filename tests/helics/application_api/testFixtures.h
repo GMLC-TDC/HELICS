@@ -55,14 +55,14 @@ struct FederateTestFixture
     std::shared_ptr<helics::CoreBroker> AddBroker(const std::string &core_type_name, const std::string &initialization_string);
 
     template<class FedType>
-    void SetupSingleBrokerTest(std::string core_type_name, int count)
+    void SetupSingleBrokerTest(std::string core_type_name, int count, std::string name_prefix = "fed")
     {
         auto broker = AddBroker(core_type_name, count);
-        AddFederates<FedType>(core_type_name, count, broker);
+        AddFederates<FedType>(core_type_name, count, broker, helics::timeZero, name_prefix);
     }
 
     template<class FedType>
-    std::vector<std::shared_ptr<FedType>> AddFederates(std::string core_type_name, int count, std::shared_ptr<helics::CoreBroker> broker, helics::Time time_delta = helics::timeZero)
+    std::vector<std::shared_ptr<FedType>> AddFederates(std::string core_type_name, int count, std::shared_ptr<helics::CoreBroker> broker, helics::Time time_delta = helics::timeZero, std::string name_prefix = "fed")
     {
         bool hasIndex = hasIndexCode(core_type_name);
         int setup = (hasIndex) ? getIndexCode(core_type_name) : 1;
@@ -74,7 +74,7 @@ struct FederateTestFixture
 
         std::string initString = std::string("--broker=") + broker->getIdentifier() + " --broker_address=" + broker->getAddress() + " --federates " + std::to_string(count);
 
-        helics::FederateInfo fi("test1");
+        helics::FederateInfo fi("");
         fi.coreType = core_type_name;
         fi.timeDelta = time_delta;
 
@@ -91,7 +91,7 @@ struct FederateTestFixture
             federates.resize(count);
             for (int ii = 0; ii < count; ++ii)
             {
-                fi.name = std::string("fed") + std::to_string(ii);
+                fi.name = name_prefix + std::to_string(ii);
                 auto fed = std::make_shared<FedType>(fi);
                 federates[ii] = fed;
                 federates_added.push_back(fed);
@@ -108,7 +108,7 @@ struct FederateTestFixture
                 auto core = helics::CoreFactory::create(core_type, initString);
                 fi.coreName = core->getIdentifier();
 
-                fi.name = std::string("fed") + std::to_string(ii);
+                fi.name = name_prefix + std::to_string(ii);
                 auto fed = std::make_shared<FedType>(fi);
                 federates[ii] = fed;
                 federates_added.push_back(fed);
@@ -118,6 +118,12 @@ struct FederateTestFixture
         }
 
         return federates_added;
+    }
+
+    template<class FedType>
+    std::shared_ptr<FedType> GetFederateAs(int index)
+    {
+        return std::dynamic_pointer_cast<FedType>(federates[index]);
     }
 
     std::vector<std::shared_ptr<helics::CoreBroker>> brokers;
