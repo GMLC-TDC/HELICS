@@ -21,7 +21,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 /** these test cases test out the value federates
  */
 
-BOOST_FIXTURE_TEST_SUITE (value_federate_tests, ValueFederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 const std::string core_types[] = { "test" };
@@ -30,7 +30,8 @@ const std::string core_types[] = { "test" };
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE(value_federate_initialize_tests, bdata::make(core_types), core_type)
 {
-    Setup1FederateTest(core_type);
+    SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     vFed1->enterExecutionState ();
 
@@ -44,7 +45,8 @@ BOOST_DATA_TEST_CASE(value_federate_initialize_tests, bdata::make(core_types), c
 
 BOOST_DATA_TEST_CASE(value_federate_publication_registration, bdata::make(core_types), core_type)
 {
-    Setup1FederateTest(core_type);
+    SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     auto pubid = vFed1->registerPublication<std::string> ("pub1");
     auto pubid2 = vFed1->registerGlobalPublication<int> ("pub2");
@@ -56,17 +58,17 @@ BOOST_DATA_TEST_CASE(value_federate_publication_registration, bdata::make(core_t
 
     auto sv = vFed1->getPublicationName (pubid);
     auto sv2 = vFed1->getPublicationName (pubid2);
-    BOOST_CHECK_EQUAL (sv, "test1/pub1");
+    BOOST_CHECK_EQUAL (sv, "fed0/pub1");
     BOOST_CHECK_EQUAL (sv2, "pub2");
     auto pub3name = vFed1->getPublicationName (pubid3);
-    BOOST_CHECK_EQUAL (pub3name, "test1/pub3");
+    BOOST_CHECK_EQUAL (pub3name, "fed0/pub3");
 
     BOOST_CHECK_EQUAL (vFed1->getPublicationType (pubid3), "double");
     BOOST_CHECK_EQUAL (vFed1->getPublicationUnits (pubid3), "V");
 
 	BOOST_CHECK(vFed1->getPublicationId("pub1") == pubid);
 	BOOST_CHECK(vFed1->getPublicationId("pub2") == pubid2);
-	BOOST_CHECK(vFed1->getPublicationId("test1/pub1") == pubid);
+	BOOST_CHECK(vFed1->getPublicationId("fed0/pub1") == pubid);
     vFed1->finalize ();
 
     BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
@@ -75,7 +77,8 @@ BOOST_DATA_TEST_CASE(value_federate_publication_registration, bdata::make(core_t
 
 BOOST_DATA_TEST_CASE(value_federate_subscription_registration, bdata::make(core_types), core_type)
 {
-    Setup1FederateTest(core_type);
+    SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     auto subid = vFed1->registerRequiredSubscription ("sub1", "double", "V");
     auto subid2 = vFed1->registerRequiredSubscription<int> ("sub2");
@@ -110,7 +113,8 @@ BOOST_DATA_TEST_CASE(value_federate_subscription_registration, bdata::make(core_
 
 BOOST_DATA_TEST_CASE(value_federate_subscription_and_publication_registration, bdata::make(core_types), core_type)
 {
-    Setup1FederateTest(core_type);
+    SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
     auto pubid = vFed1->registerPublication<std::string> ("pub1");
@@ -143,10 +147,10 @@ BOOST_DATA_TEST_CASE(value_federate_subscription_and_publication_registration, b
 
     sv = vFed1->getPublicationName (pubid);
     sv2 = vFed1->getPublicationName (pubid2);
-    BOOST_CHECK_EQUAL (sv, "test1/pub1");
+    BOOST_CHECK_EQUAL (sv, "fed0/pub1");
     BOOST_CHECK_EQUAL (sv2, "pub2");
     auto pub3name = vFed1->getPublicationName (pubid3);
-    BOOST_CHECK_EQUAL (pub3name, "test1/pub3");
+    BOOST_CHECK_EQUAL (pub3name, "fed0/pub3");
 
     BOOST_CHECK_EQUAL (vFed1->getPublicationType (pubid3), "double");
     BOOST_CHECK_EQUAL (vFed1->getPublicationUnits (pubid3), "V");
@@ -158,7 +162,9 @@ BOOST_DATA_TEST_CASE(value_federate_subscription_and_publication_registration, b
 
 BOOST_DATA_TEST_CASE(value_federate_single_transfer, bdata::make(core_types), core_type)
 {
-    Setup1FederateTest(core_type);
+    SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
@@ -194,11 +200,11 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer, bdata::make(core_types), co
 template <class X>
 void runFederateTest (const std::string &core_type_str, const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-	ValueFederateTestFixture fixture;
+	FederateTestFixture fixture;
 
-	fixture.Setup1FederateTest(core_type_str);
+	fixture.SetupSingleBrokerTest<helics::ValueFederate>(core_type_str, 1);
+    auto vFed = fixture.GetFederateAs<helics::ValueFederate>(0);
 
-	auto &vFed = fixture.vFed1;
     // register the publications
     auto pubid = vFed->registerGlobalPublication<X> ("pub1");
 
@@ -240,11 +246,11 @@ void runFederateTest (const std::string &core_type_str, const X &defaultValue, c
 template <class X>
 void runFederateTestv2 (const std::string &core_type_str, const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-	ValueFederateTestFixture fixture;
+    FederateTestFixture fixture;
 
-	fixture.Setup1FederateTest(core_type_str);
+    fixture.SetupSingleBrokerTest<helics::ValueFederate>(core_type_str, 1);
+    auto vFed = fixture.GetFederateAs<helics::ValueFederate>(0);
 
-	auto &vFed = fixture.vFed1;
     // register the publications
     auto pubid = vFed->registerGlobalPublication<X> ("pub1");
 
@@ -309,7 +315,10 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer_types, bdata::make(core_type
 
 BOOST_DATA_TEST_CASE(value_federate_dual_transfer, bdata::make(core_types), core_type)
 {
-    Setup2FederateTest(core_type);
+    SetupSingleBrokerTest<helics::ValueFederate>(core_type, 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
@@ -355,12 +364,11 @@ BOOST_DATA_TEST_CASE(value_federate_dual_transfer, bdata::make(core_types), core
 template <class X>
 void runDualFederateTest (const std::string &core_type_str, const X &defaultValue, const X &testValue1, const X &testValue2)
 {
-	ValueFederateTestFixture fixture;
+	FederateTestFixture fixture;
 
-	fixture.Setup2FederateTest(core_type_str);
-
-	auto &fedA = fixture.vFed1;
-	auto &fedB = fixture.vFed2;
+    fixture.SetupSingleBrokerTest<helics::ValueFederate>(core_type_str, 2);
+    auto fedA = fixture.GetFederateAs<helics::ValueFederate>(0);
+    auto fedB = fixture.GetFederateAs<helics::ValueFederate>(1);
 
     // register the publications
     auto pubid = fedA->registerGlobalPublication<X> ("pub1");
@@ -415,12 +423,12 @@ void runDualFederateTest (const std::string &core_type_str, const X &defaultValu
 template <class X>
 void runDualFederateTestv2 (const std::string &core_type_str, X &defaultValue, const X &testValue1, const X &testValue2)
 {
-	ValueFederateTestFixture fixture;
+    FederateTestFixture fixture;
 
-	fixture.Setup2FederateTest(core_type_str);
+    fixture.SetupSingleBrokerTest<helics::ValueFederate>(core_type_str, 2);
+    auto fedA = fixture.GetFederateAs<helics::ValueFederate>(0);
+    auto fedB = fixture.GetFederateAs<helics::ValueFederate>(1);
 
-	auto &fedA = fixture.vFed1;
-	auto &fedB = fixture.vFed2;
     // register the publications
     auto pubid = fedA->registerGlobalPublication<X> ("pub1");
 
@@ -471,7 +479,6 @@ void runDualFederateTestv2 (const std::string &core_type_str, X &defaultValue, c
  */
 BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types, bdata::make(core_types), core_type)
 {
-   
     runDualFederateTest<double> (core_type, 10.3, 45.3, 22.7);
     runDualFederateTest<int> (core_type, 5, 8, 43);
     runDualFederateTest<int> (core_type, -5, 1241515, -43);
@@ -498,7 +505,9 @@ BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types, bdata::make(core_types)
 
 BOOST_DATA_TEST_CASE(value_federate_single_init_publish, bdata::make(core_types), core_type)
 {
-    Setup1FederateTest(core_type);
+    SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
 	// register the publications
 	auto pubid = vFed1->registerGlobalPublication<double>("pub1");
 

@@ -17,23 +17,24 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 /** these test cases test out the value converters and some of the other functions
 */
 
-BOOST_FIXTURE_TEST_SUITE(value_federate_tests2, ValueFederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE(value_federate_tests2, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-const std::string core_types[] = { "zmq" };
+const std::string core_types[] = { "test" };
 
 
 /** test block send and receive*/
 BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type)
 {
-    Setup1FederateTest(core_type);
+    SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
 	vFed1->registerPublication<std::string>("pub1");
 	vFed1->registerGlobalPublication<int>("pub2");
 
 	auto pubid3 = vFed1->registerPublication("pub3", "");
 
-	auto sub1 = vFed1->registerOptionalSubscription("test1/pub3","");
+	auto sub1 = vFed1->registerOptionalSubscription("fed0/pub3","");
 
 	helics::data_block db(547, ';');
 
@@ -51,16 +52,17 @@ BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type
 /** test the all callback*/
 BOOST_DATA_TEST_CASE(test_all_callback, bdata::make(core_types), core_type)
 {
-    Setup1FederateTest(core_type, 1.0);
+    SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
 	auto pubid1 = vFed1->registerPublication<std::string>("pub1");
 	auto pubid2 = vFed1->registerGlobalPublication<int>("pub2");
 
 	auto pubid3 = vFed1->registerPublication("pub3", "");
 
-	auto sub1 = vFed1->registerOptionalSubscription("test1/pub1", "");
+	auto sub1 = vFed1->registerOptionalSubscription("fed0/pub1", "");
 	auto sub2 = vFed1->registerOptionalSubscription("pub2", "");
-	auto sub3 = vFed1->registerOptionalSubscription("test1/pub3", "");
+	auto sub3 = vFed1->registerOptionalSubscription("fed0/pub3", "");
 
 	helics::data_block db(547, ';');
 	helics::subscription_id_t lastId;
@@ -106,16 +108,17 @@ BOOST_DATA_TEST_CASE(test_all_callback, bdata::make(core_types), core_type)
 /** test the callback specification with a vector list*/
 BOOST_DATA_TEST_CASE(test_vector_callback_lists, bdata::make(core_types), core_type)
 {
-    Setup1FederateTest(core_type, 1.0);
+    SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
 	auto pubid1 = vFed1->registerPublication<std::string>("pub1");
 	auto pubid2 = vFed1->registerGlobalPublication<int>("pub2");
 
 	auto pubid3 = vFed1->registerPublication("pub3", "");
 
-	auto sub1 = vFed1->registerOptionalSubscription("test1/pub1", "");
+	auto sub1 = vFed1->registerOptionalSubscription("fed0/pub1", "");
 	auto sub2 = vFed1->registerOptionalSubscription("pub2", "");
-	auto sub3 = vFed1->registerOptionalSubscription("test1/pub3", "");
+	auto sub3 = vFed1->registerOptionalSubscription("fed0/pub3", "");
 
 	helics::data_block db(547, ';');
 	helics::subscription_id_t lastId;
@@ -147,7 +150,8 @@ BOOST_DATA_TEST_CASE(test_vector_callback_lists, bdata::make(core_types), core_t
 /** test the publish/subscribe to a vectorized array*/
 BOOST_DATA_TEST_CASE(test_indexed_pubs_subs, bdata::make(core_types), core_type)
 {
-    Setup1FederateTest(core_type);
+    SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
 	auto pubid1 = vFed1->registerPublicationIndexed<double>("pub1",0);
 	auto pubid2 = vFed1->registerPublicationIndexed<double>("pub1",1);
@@ -176,7 +180,9 @@ BOOST_DATA_TEST_CASE(test_indexed_pubs_subs, bdata::make(core_types), core_type)
 /** test the publish/subscribe to a vectorized array*/
 BOOST_DATA_TEST_CASE(test_async_calls, bdata::make(core_types), core_type)
 {
-    Setup2FederateTest(core_type);
+    SetupSingleBrokerTest<helics::ValueFederate>(core_type, 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
 	// register the publications
 	auto pubid = vFed1->registerGlobalPublication<std::string>("pub1");
