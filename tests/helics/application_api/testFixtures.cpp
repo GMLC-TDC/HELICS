@@ -12,19 +12,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/core/BrokerFactory.h"
 #include <cctype>
 
-ValueFederateTestFixture::~ValueFederateTestFixture()
-{
-    if (vFed1)
-    {
-        vFed1->finalize();
-    }
-
-    if (vFed2)
-    {
-        vFed2->finalize();
-    }
-}
-
 bool hasIndexCode(const std::string &type_name)
 {
 	if (std::isdigit(type_name.back()) == 1)
@@ -55,6 +42,19 @@ auto StartBrokerImp(const std::string &core_type_name, const std::string &initia
 		auto core_type = helics::coreTypeFromString(core_type_name);
 		return helics::BrokerFactory::create(core_type, initialization_string);
 	}
+}
+
+ValueFederateTestFixture::~ValueFederateTestFixture()
+{
+    if (vFed1)
+    {
+        vFed1->finalize();
+    }
+
+    if (vFed2)
+    {
+        vFed2->finalize();
+    }
 }
 
 void ValueFederateTestFixture::StartBroker(const std::string &core_type_name, const std::string &initialization_string)
@@ -106,6 +106,7 @@ void ValueFederateTestFixture::Setup2FederateTest(std::string core_type_name, he
 		fi.name = "test2";
 		vFed2 = std::make_shared<helics::ValueFederate>(fi);
 	}
+    break;
 	case 2:
 	{
 		StartBroker(core_type_name, "2");
@@ -128,10 +129,10 @@ void ValueFederateTestFixture::Setup2FederateTest(std::string core_type_name, he
 		fi.coreName = core2->getIdentifier();
 		vFed2 = std::make_shared<helics::ValueFederate>(fi);
 	}
+    break;
 	}
     
 }
-
 
 
 MessageFederateTestFixture::~MessageFederateTestFixture()
@@ -177,69 +178,63 @@ void MessageFederateTestFixture::Setup2FederateTest(const std::string &core_type
     mFed2 = std::make_shared<helics::MessageFederate>(fi);
 }
 
-MultipleValueFederateTestFixture::~MultipleValueFederateTestFixture()
+
+bool FederateTestFixture::hasIndexCode(const std::string &type_name)
 {
-	for (auto &fed : federates)
-	{
-		if (fed)
-		{
-			fed->finalize();
-		}
-	}
+    if (std::isdigit(type_name.back()) == 1)
+    {
+        if (*(type_name.end() - 2) == '_')
+        {	//this setup ignores the setup mode
+            return true;
+        }
+    }
+    return false;
 }
 
-void MultipleValueFederateTestFixture::SetupFederateTests(std::string core_type_name, int cnt, helics::Time time_delta)
+int FederateTestFixture::getIndexCode(const std::string &type_name)
 {
-	bool hasIndex = hasIndexCode(core_type_name);
-	int setup = (hasIndex) ? getIndexCode(core_type_name) : 1;
-	if (hasIndex)
-	{
-		core_type_name.pop_back();
-		core_type_name.pop_back();
-	}
-	StartBroker(core_type_name, std::to_string(cnt));
-	switch (setup)
-	{
-	case 1:
-	default:
-	{
-		
-		helics::FederateInfo fi("test1");
-		fi.coreType = core_type_name;
-		fi.timeDelta = time_delta;
-		fi.coreInitString = std::string("--broker=") + broker->getIdentifier() + " --broker_address=" + broker->getAddress() + " --federates "+std::to_string(cnt);
-
-		federates.resize(cnt);
-		for (int ii = 0; ii < cnt; ++ii)
-		{
-			fi.name = std::string("fed") + std::to_string(ii);
-			federates[ii]= std::make_shared<helics::ValueFederate>(fi);
-		}
-	}
-	case 2:
-	{
-		
-		std::string initString = std::string("--broker=") + broker->getIdentifier() + " --broker_address=" + broker->getAddress() + " --federates "+std::to_string(cnt);
-		auto core_type = helics::coreTypeFromString(core_type_name);
-
-		helics::FederateInfo fi("test1");
-		fi.coreType = core_type_name;
-		fi.timeDelta = time_delta;
-
-		federates.resize(cnt);
-		for (int ii = 0; ii < cnt; ++ii)
-		{
-			auto core = helics::CoreFactory::create(core_type, initString);
-			fi.coreName = core->getIdentifier();
-
-			fi.name = std::string("fed") + std::to_string(ii);
-			federates[ii] = std::make_shared<helics::ValueFederate>(fi);
-		}
-	}
-	}
+    return static_cast<int>(type_name.back() - '0');
 }
 
-void MultipleValueFederateTestFixture::StartBroker(const std::string &core_type_name, const std::string &initialization_string)
+auto FederateTestFixture::AddBrokerImp(const std::string &core_type_name, const std::string &initialization_string)
 {
-	broker=StartBrokerImp(core_type_name, initialization_string);
+    if (hasIndexCode(core_type_name))
+    {
+        std::string new_type(core_type_name.begin(), core_type_name.end() - 2);
+        auto core_type = helics::coreTypeFromString(new_type);
+        return helics::BrokerFactory::create(core_type, initialization_string);
+    }
+    else
+    {
+        auto core_type = helics::coreTypeFromString(core_type_name);
+        return helics::BrokerFactory::create(core_type, initialization_string);
+    }
+}
+
+FederateTestFixture::~FederateTestFixture()
+{
+    for (auto &fed : federates)
+    {
+        if (fed)
+        {
+            fed->finalize();
+        }
+    }
+
+    for (auto &broker : brokers)
+    {
+        broker->disconnect();
+    }
+}
+
+std::shared_ptr<helics::CoreBroker> FederateTestFixture::AddBroker(const std::string &core_type_name, int count)
+{
+    return AddBroker(core_type_name, std::to_string(count));
+}
+
+std::shared_ptr<helics::CoreBroker> FederateTestFixture::AddBroker(const std::string &core_type_name, const std::string &initialization_string)
+{
+    auto broker = StartBrokerImp(core_type_name, initialization_string);
+    brokers.push_back(broker);
+    return broker;
 }

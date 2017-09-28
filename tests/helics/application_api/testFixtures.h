@@ -11,7 +11,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <memory>
 
 #include "helics/core/CoreBroker.h"
+#include "helics/core/CoreFactory.h"
 #include "helics/application_api/MessageFederate.h"
+#include "helics/application_api/MessageFilterFederate.h"
 #include "helics/application_api/ValueFederate.h"
 
 struct ValueFederateTestFixture
@@ -44,17 +46,87 @@ struct MessageFederateTestFixture
     std::shared_ptr<helics::MessageFederate> mFed2;
 };
 
-
-struct MultipleValueFederateTestFixture
+struct FederateTestFixture
 {
-	MultipleValueFederateTestFixture() = default;
-	~MultipleValueFederateTestFixture();
+    FederateTestFixture() = default;
+    ~FederateTestFixture();
 
-	void SetupFederateTests(std::string core_type_name, int cnt, helics::Time time_delta = helics::timeZero);
+    std::shared_ptr<helics::CoreBroker> AddBroker(const std::string &core_type_name, int count);
+    std::shared_ptr<helics::CoreBroker> AddBroker(const std::string &core_type_name, const std::string &initialization_string);
 
-	void StartBroker(const std::string &core_type_name, const std::string &initialization_string);
+    template<class FedType>
+    void SetupSingleBrokerTest(std::string core_type_name, int count)
+    {
+        auto broker = AddBroker(core_type_name, count);
+        AddFederates<FedType>(core_type_name, count, broker);
+    }
 
-	std::shared_ptr<helics::CoreBroker> broker;
-	std::vector<std::shared_ptr<helics::ValueFederate>> federates;
+    template<class FedType>
+    std::vector<std::shared_ptr<FedType>> AddFederates(std::string core_type_name, int count, std::shared_ptr<helics::CoreBroker> broker, helics::Time time_delta = helics::timeZero)
+    {
+        bool hasIndex = hasIndexCode(core_type_name);
+        int setup = (hasIndex) ? getIndexCode(core_type_name) : 1;
+        if (hasIndex)
+        {
+            core_type_name.pop_back();
+            core_type_name.pop_back();
+        }
+
+        std::string initString = std::string("--broker=") + broker->getIdentifier() + " --broker_address=" + broker->getAddress() + " --federates " + std::to_string(count);
+
+        helics::FederateInfo fi("test1");
+        fi.coreType = core_type_name;
+        fi.timeDelta = time_delta;
+
+        std::vector<std::shared_ptr<FedType>> federates_added;
+        federates_added.resize(count);
+
+        switch (setup)
+        {
+        case 1:
+        default:
+        {
+            fi.coreInitString = initString;
+
+            federates.resize(count);
+            for (int ii = 0; ii < count; ++ii)
+            {
+                fi.name = std::string("fed") + std::to_string(ii);
+                auto fed = std::make_shared<FedType>(fi);
+                federates[ii] = fed;
+                federates_added.push_back(fed);
+            }
+        }
+        break;
+        case 2:
+        {
+            auto core_type = helics::coreTypeFromString(core_type_name);
+
+            federates.resize(count);
+            for (int ii = 0; ii < count; ++ii)
+            {
+                auto core = helics::CoreFactory::create(core_type, initString);
+                fi.coreName = core->getIdentifier();
+
+                fi.name = std::string("fed") + std::to_string(ii);
+                auto fed = std::make_shared<FedType>(fi);
+                federates[ii] = fed;
+                federates_added.push_back(fed);
+            }
+        }
+        break;
+        }
+
+        return federates_added;
+    }
+
+    std::vector<std::shared_ptr<helics::CoreBroker>> brokers;
+    std::vector<std::shared_ptr<helics::Federate>> federates;
+
+private:
+    bool hasIndexCode(const std::string &type_name);
+    int getIndexCode(const std::string &type_name);
+    auto AddBrokerImp(const std::string &core_type_name, const std::string &initialization_string);
 };
+
 #endif
