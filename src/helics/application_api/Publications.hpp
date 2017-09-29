@@ -88,7 +88,7 @@ class Publication
         : fed (valueFed), type (helicsType<X>), m_name (std::move (name)), m_units (std::move (units))
     {
         id = (locality == GLOBAL) ? fed->registerGlobalPublication (m_name, typeNameStringRef (type), m_units) :
-                                    fed->registerPublication (m_name, typeNameStringRef (type), m_units)
+                                    fed->registerPublication (m_name, typeNameStringRef (type), m_units);
     }
     /** send a value for publication
     @param[in] val the value to publish*/
