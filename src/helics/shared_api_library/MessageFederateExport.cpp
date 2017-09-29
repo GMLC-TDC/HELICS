@@ -44,7 +44,7 @@ helics_endpoint helicsRegisterEndpoint(helics_message_federate fed, const char *
 	return nullptr;
 }
 
-helics_endpoint helicsRegisterGlobalEndpoint(helics_message_federate fed, const char *name, const char *type, const char *units)
+helics_endpoint helicsRegisterGlobalEndpoint(helics_message_federate fed, const char *name, const char *type)
 {
 	//now generate a generic subscription
 	auto fedObj = getMessageFedSharedPtr(fed);

@@ -249,8 +249,10 @@ helicsStatus helicsPublishString(helics_publication pubID, const char *str)
 	}
 	return helicsOK;
 }
+
 helicsStatus helicsPublishInteger(helics_publication pubID, int64_t val)
 {
+
 	return helicsError;
 }
 helicsStatus helicsPublishDouble(helics_publication pubID, double val)
@@ -315,3 +317,4 @@ helicsStatus helicsSetDefaultVector(helics_subscription pubID, double *data, uin
 {
 	return helicsError;
 }
+

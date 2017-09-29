@@ -15,7 +15,7 @@ extern "C" {
 #include "helics.h"
 
 
-	HELICS_Export helics_message_federate helicsCreateMessageFederate(const federate_info_t *fi);
+	HELICS_Export helics_message_federate helicsCreateMessageFederate(const helics_federate_info_t fi);
 	HELICS_Export helics_message_federate helicsCreateMessageFederateFromFile(const char *fileName);
 	//MESSAGE FEDERATE calls
 

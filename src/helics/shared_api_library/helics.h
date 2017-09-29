@@ -56,10 +56,24 @@ Common Functions
 	HELICS_Export helics_core helicsCreateCoreFromArgs(const char *type, const char *name, int argc, char *argv[]);
 /* Creation and destruction of Federates */
 
-	HELICS_Export helics_federate helicsCreateCombinationFederate(federate_info_t *fi);
+	HELICS_Export helics_federate helicsCreateCombinationFederate(const helics_federate_info_t fi);
 	HELICS_Export helics_federate helicsCreateCombinationFederateFromFile(const char *filename);
 
-	HELICS_Export void helicsInitializeFederateInfo(federate_info_t *fi);
+	HELICS_Export helics_federate_info_t createFederateInfoObject();
+	HELICS_Export void freeFederateInfoObject(const helics_federate_info_t fi);
+
+	HELICS_Export helicsStatus FederateInfoSetFederateName(helics_federate_info_t fi, const char *name);
+	HELICS_Export helicsStatus FederateInfoSetCoreName(helics_federate_info_t fi, const char *corename);
+	HELICS_Export helicsStatus FederateInfoSetCoreInitString(helics_federate_info_t fi, const char *corename);
+	HELICS_Export helicsStatus FederateInfoSetCoreType(helics_federate_info_t fi, const char *coretype);
+	HELICS_Export helicsStatus FederateInfoSetFlag(helics_federate_info_t fi,int flag, int value);
+	HELICS_Export helicsStatus FederateInfoSetLookahead(helics_federate_info_t fi, helics_time_t lookahead);
+	HELICS_Export helicsStatus FederateInfoSetTimeDelta(helics_federate_info_t fi, helics_time_t timeDelta);
+	HELICS_Export helicsStatus FederateInfoSetImpactWindow(helics_federate_info_t fi, helics_time_t impactWindow);
+	HELICS_Export helicsStatus FederateInfoSetTimeOffset(helics_federate_info_t fi, helics_time_t timeOffset);
+	HELICS_Export helicsStatus FederateInfoSetPeriod(helics_federate_info_t fi, helics_time_t period);
+	HELICS_Export helicsStatus FederateInfoSetMaxIterations(helics_federate_info_t fi, int max_iterations);
+	HELICS_Export helicsStatus FederateInfoSetLoggingLevel(helics_federate_info_t fi, int max_iterations);
 
 	HELICS_Export helicsStatus helicsFinalize(helics_federate fed);
 
