@@ -41,7 +41,7 @@ public:
 	@param[in] units the units associated with a Federate
 	*/
 	Publication(ValueFederate *valueFed,helicsType_t type_, std::string name, std::string units = "")
-		: fed(valueFed), m_name(std::move(name)), m_units(std::move(units)), type(type_)
+		: fed(valueFed), type(type_), m_name(std::move(name)), m_units(std::move(units))
 	{
 		id = fed->registerPublication(m_name, typeNameStringRef(type), m_units);
 	}
@@ -53,7 +53,7 @@ public:
 	@param[in] units the units associated with a Federate
 	*/
 	Publication(publication_locality locality, ValueFederate *valueFed, helicsType_t type_, std::string name, std::string units = "")
-		: fed(valueFed), m_name(std::move(name)), m_units(std::move(units)), type(type_)
+		: fed(valueFed), type(type_), m_name(std::move(name)), m_units(std::move(units))
 	{
 		if (locality == GLOBAL)
 		{
@@ -71,19 +71,19 @@ public:
 	*/
 	template<class X, typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, bool>::type>
 	Publication(ValueFederate *valueFed, std::string name, std::string units = "")
-		: fed(valueFed), m_name(std::move(name)), m_units(std::move(units)), type(helicsType<X>)
+		: fed(valueFed), type(helicsType<X>), m_name(std::move(name)), m_units(std::move(units))
 	{
 		id = fed->registerPublication(m_name, typeNameStringRef(type), m_units);
 	}
 	/**constructor to build a publication object
-	@param locality  set to global for for a global publication or local for a local one
+	@param locality  set to global for a global publication or local for a local one
 	@param[in] valueFed  the ValueFederate to use
 	@param[in] name the name of the subscription
 	@param[in] units the units associated with a Federate
 	*/
 	template<class X, typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, bool>::type>
 	Publication(publication_locality locality, ValueFederate *valueFed, std::string name, std::string units = "")
-		: fed(valueFed), m_name(std::move(name)), m_units(std::move(units)),type(helicsType<X>)
+		: fed(valueFed), type(helicsType<X>), m_name(std::move(name)), m_units(std::move(units))
 	{
 		if (locality == GLOBAL)
 		{
