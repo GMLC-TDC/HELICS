@@ -79,7 +79,9 @@ struct FederateTestFixture
         fi.timeDelta = time_delta;
 
         std::vector<std::shared_ptr<FedType>> federates_added;
-        federates_added.resize(count);
+
+        size_t offset = federates.size();
+        federates.resize(count + offset);
 
         switch (setup)
         {
@@ -88,12 +90,11 @@ struct FederateTestFixture
         {
             fi.coreInitString = initString;
 
-            federates.resize(count);
             for (int ii = 0; ii < count; ++ii)
             {
                 fi.name = name_prefix + std::to_string(ii);
                 auto fed = std::make_shared<FedType>(fi);
-                federates[ii] = fed;
+                federates[ii+offset] = fed;
                 federates_added.push_back(fed);
             }
         }
@@ -102,7 +103,7 @@ struct FederateTestFixture
         {
             auto core_type = helics::coreTypeFromString(core_type_name);
 
-            federates.resize(count);
+            federates.resize(count+federates.size());
             for (int ii = 0; ii < count; ++ii)
             {
                 auto core = helics::CoreFactory::create(core_type, initString);
@@ -110,7 +111,7 @@ struct FederateTestFixture
 
                 fi.name = name_prefix + std::to_string(ii);
                 auto fed = std::make_shared<FedType>(fi);
-                federates[ii] = fed;
+                federates[ii+offset] = fed;
                 federates_added.push_back(fed);
             }
         }
