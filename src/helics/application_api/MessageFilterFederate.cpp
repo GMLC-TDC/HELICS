@@ -3,7 +3,9 @@
 Copyright (C) 2017, Battelle Memorial Institute
 All rights reserved.
 
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
 #include "MessageFilterFederate.h"
@@ -23,23 +25,23 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-MessageFilterFederate::MessageFilterFederate() = default;
+MessageFilterFederate::MessageFilterFederate () = default;
 
 MessageFilterFederate::MessageFilterFederate (const FederateInfo &fi) : Federate (fi), MessageFederate (true)
 {
     filterManager = std::make_unique<MessageFilterFederateManager> (coreObject, getID ());
 }
 
-MessageFilterFederate::MessageFilterFederate(std::shared_ptr<Core> core, const FederateInfo &fi) : Federate(std::move(core),fi), MessageFederate(true)
+MessageFilterFederate::MessageFilterFederate (std::shared_ptr<Core> core, const FederateInfo &fi)
+    : Federate (std::move (core), fi), MessageFederate (true)
 {
-	filterManager = std::make_unique<MessageFilterFederateManager>(coreObject, getID());
+    filterManager = std::make_unique<MessageFilterFederateManager> (coreObject, getID ());
 }
 
 MessageFilterFederate::MessageFilterFederate (const std::string &file) : Federate (file), MessageFederate (true)
 {
     filterManager = std::make_unique<MessageFilterFederateManager> (coreObject, getID ());
 }
-
 
 MessageFilterFederate::MessageFilterFederate (MessageFilterFederate &&mFed) noexcept
     : Federate (std::move (mFed)), MessageFederate (std::move (mFed)),
@@ -71,7 +73,6 @@ void MessageFilterFederate::InitializeToExecuteStateTransition ()
 {
     filterManager->InitializeToExecuteStateTransition ();
 }
-
 
 void MessageFilterFederate::registerInterfaces (const std::string &jsonString)
 {
@@ -137,11 +138,10 @@ void MessageFilterFederate::registerInterfaces (const std::string &jsonString)
     }
 }
 
-
 filter_id_t MessageFilterFederate::registerSourceFilter (const std::string &filterName,
                                                          const std::string &sourceEndpoint,
                                                          const std::string &inputType,
-														 const std::string &outputType)
+                                                         const std::string &outputType)
 {
     if (state == op_states::startup)
     {
@@ -151,7 +151,8 @@ filter_id_t MessageFilterFederate::registerSourceFilter (const std::string &filt
             return filterManager->registerSourceFilter (filterName, sourceEndpoint, inputType, outputType);
         }
         auto cnt = filterCount.load ();
-        return filterManager->registerSourceFilter ("filter" + std::to_string (cnt), sourceEndpoint, inputType,outputType);
+        return filterManager->registerSourceFilter ("filter" + std::to_string (cnt), sourceEndpoint, inputType,
+                                                    outputType);
     }
     throw (InvalidFunctionCall ("filters can only be created in startup mode"));
 }
@@ -159,7 +160,7 @@ filter_id_t MessageFilterFederate::registerSourceFilter (const std::string &filt
 filter_id_t MessageFilterFederate::registerDestinationFilter (const std::string &filterName,
                                                               const std::string &destEndpoint,
                                                               const std::string &inputType,
-																const std::string &outputType)
+                                                              const std::string &outputType)
 {
     if (state == op_states::startup)
     {
@@ -169,11 +170,11 @@ filter_id_t MessageFilterFederate::registerDestinationFilter (const std::string 
             return filterManager->registerDestinationFilter (filterName, destEndpoint, inputType, outputType);
         }
         auto cnt = filterCount.load ();
-        return filterManager->registerDestinationFilter ("filter" + std::to_string (cnt), destEndpoint, inputType, outputType);
+        return filterManager->registerDestinationFilter ("filter" + std::to_string (cnt), destEndpoint, inputType,
+                                                         outputType);
     }
     throw (InvalidFunctionCall ("filters can only be created in startup mode"));
 }
-
 
 static const std::string nullStr;
 
@@ -182,7 +183,8 @@ filter_id_t MessageFilterFederate::registerSourceFilter (const std::string &sour
     if (state == op_states::startup)
     {
         auto cnt = filterCount++;
-        return filterManager->registerSourceFilter ("filter" + std::to_string (cnt), sourceEndpoint, nullStr, nullStr);
+        return filterManager->registerSourceFilter ("filter" + std::to_string (cnt), sourceEndpoint, nullStr,
+                                                    nullStr);
     }
     throw (InvalidFunctionCall ("filters can only be created in startup mode"));
 }
@@ -192,7 +194,8 @@ filter_id_t MessageFilterFederate::registerDestinationFilter (const std::string 
     if (state == op_states::startup)
     {
         auto cnt = filterCount++;
-        return filterManager->registerDestinationFilter ("filter" + std::to_string (cnt), destEndpoint, nullStr, nullStr);
+        return filterManager->registerDestinationFilter ("filter" + std::to_string (cnt), destEndpoint, nullStr,
+                                                         nullStr);
     }
     throw (InvalidFunctionCall ("filters can only be created in startup mode"));
 }
@@ -224,16 +227,15 @@ std::string MessageFilterFederate::getFilterInputType (filter_id_t id) const
     return filterManager->getFilterInputType (id);
 }
 
-std::string MessageFilterFederate::getFilterOutputType(filter_id_t id) const
+std::string MessageFilterFederate::getFilterOutputType (filter_id_t id) const
 {
-	return filterManager->getFilterOutputType(id);
+    return filterManager->getFilterOutputType (id);
 }
 
 filter_id_t MessageFilterFederate::getFilterId (const std::string &filterName) const
 {
     return filterManager->getFilterId (filterName);
 }
-
 
 filter_id_t MessageFilterFederate::getSourceFilterId (const std::string &name) const
 {
@@ -248,7 +250,8 @@ void MessageFilterFederate::registerFilterCallback (std::function<void(filter_id
 {
     filterManager->registerFilterCallback (func);
 }
-void MessageFilterFederate::registerFilterCallback (filter_id_t filter, std::function<void(filter_id_t, Time)> func)
+void MessageFilterFederate::registerFilterCallback (filter_id_t filter,
+                                                    std::function<void(filter_id_t, Time)> func)
 {
     filterManager->registerFilterCallback (filter, func);
 }
@@ -260,19 +263,17 @@ void MessageFilterFederate::registerFilterCallback (const std::vector<filter_id_
 
 void MessageFilterFederate::registerMessageOperator (std::shared_ptr<MessageOperator> mo)
 {
-            filterManager->registerMessageOperator (mo);
+    filterManager->registerMessageOperator (mo);
 }
 
 void MessageFilterFederate::registerMessageOperator (filter_id_t filter, std::shared_ptr<MessageOperator> mo)
 {
-   
-   filterManager->registerMessageOperator (filter, mo);
-     
+    filterManager->registerMessageOperator (filter, mo);
 }
 
 void MessageFilterFederate::registerMessageOperator (const std::vector<filter_id_t> &filters,
                                                      std::shared_ptr<MessageOperator> mo)
 {
-         filterManager->registerMessageOperator (filters, mo);
+    filterManager->registerMessageOperator (filters, mo);
 }
 }

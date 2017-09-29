@@ -32,13 +32,12 @@ std::unique_ptr<Message> EndpointInfo::getMessage (Time maxTime)
     return nullptr;
 }
 
-
 Time EndpointInfo::firstMessageTime () const
 {
     std::lock_guard<std::mutex> lock (queueLock);
     return (message_queue.empty ()) ? Time::maxVal () : message_queue.front ()->time;
 }
-//this is the function which determines message order
+// this is the function which determines message order
 static auto msgSorter = [](const auto &m1, const auto &m2) {
     // first by time
     return (m1->time != m2->time) ? (m1->time < m2->time) : (m1->origsrc < m2->origsrc);

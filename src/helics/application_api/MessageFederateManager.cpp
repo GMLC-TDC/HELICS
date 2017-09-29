@@ -3,14 +3,15 @@
 Copyright (C) 2017, Battelle Memorial Institute
 All rights reserved.
 
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
 #include "MessageFederateManager.h"
 #include "helics/core/core.h"
 namespace helics
 {
-
 MessageFederateManager::MessageFederateManager (std::shared_ptr<Core> coreOb, Core::federate_id_t id)
     : coreObject (std::move (coreOb)), fedID (id)
 {
@@ -28,7 +29,6 @@ endpoint_id_t MessageFederateManager::registerEndpoint (const std::string &name,
     handleLookup.emplace (local_endpoints.back ().handle, id);
     return id;
 }
-
 
 void MessageFederateManager::registerKnownCommunicationPath (endpoint_id_t localEndpoint,
                                                              const std::string &remoteEndpoint)
@@ -72,7 +72,6 @@ bool MessageFederateManager::hasMessage (endpoint_id_t id) const
     return (id.value () < local_endpoints.size ()) ? (!messageQueues[id.value ()].empty ()) : false;
 }
 
-
 /**
  * Returns the number of pending receives for the specified destination endpoint.
  */
@@ -102,7 +101,7 @@ std::unique_ptr<Message> MessageFederateManager::getMessage (endpoint_id_t endpo
         auto mv = messageQueues[endpoint.value ()].pop ();
         if (mv)
         {
-            return std::move(*mv);
+            return std::move (*mv);
         }
     }
     return nullptr;
@@ -118,13 +117,12 @@ std::unique_ptr<Message> MessageFederateManager::getMessage ()
             auto ms = mq.pop ();
             if (ms)
             {
-                return std::move(*ms);
+                return std::move (*ms);
             }
         }
     }
     return nullptr;
 }
-
 
 void MessageFederateManager::sendMessage (endpoint_id_t source, const std::string &dest, data_view message)
 {
@@ -138,7 +136,10 @@ void MessageFederateManager::sendMessage (endpoint_id_t source, const std::strin
     }
 }
 
-void MessageFederateManager::sendMessage (endpoint_id_t source, const std::string &dest, data_view message, Time sendTime)
+void MessageFederateManager::sendMessage (endpoint_id_t source,
+                                          const std::string &dest,
+                                          data_view message,
+                                          Time sendTime)
 {
     if (source.value () < local_endpoints.size ())
     {
@@ -155,7 +156,7 @@ void MessageFederateManager::sendMessage (endpoint_id_t source, std::unique_ptr<
 {
     if (source.value () < local_endpoints.size ())
     {
-        coreObject->sendMessage (local_endpoints[source.value()].handle,std::move(message));
+        coreObject->sendMessage (local_endpoints[source.value ()].handle, std::move (message));
     }
     else
     {
@@ -163,17 +164,16 @@ void MessageFederateManager::sendMessage (endpoint_id_t source, std::unique_ptr<
     }
 }
 
-
 void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;
     auto epCount = coreObject->receiveCountAny (fedID);
     // lock the data updates
     std::unique_lock<std::mutex> eplock (endpointLock);
-	Core::Handle endpoint_id;
+    Core::Handle endpoint_id;
     for (size_t ii = 0; ii < epCount; ++ii)
     {
-        auto message = coreObject->receiveAny (fedID,endpoint_id);
+        auto message = coreObject->receiveAny (fedID, endpoint_id);
         if (!message)
         {
             break;
@@ -188,16 +188,16 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             messageQueues[localEndpointIndex].emplace (std::move (message));
             if (local_endpoints[localEndpointIndex].callbackIndex >= 0)
             {
-				auto cb = callbacks[local_endpoints[localEndpointIndex].callbackIndex];
-               eplock.unlock ();
-                cb(fid->second, CurrentTime);
+                auto cb = callbacks[local_endpoints[localEndpointIndex].callbackIndex];
+                eplock.unlock ();
+                cb (fid->second, CurrentTime);
                 eplock.lock ();
             }
             else if (allCallbackIndex >= 0)
             {
-				auto ac = callbacks[allCallbackIndex];
+                auto ac = callbacks[allCallbackIndex];
                 eplock.unlock ();
-                ac(fid->second, CurrentTime);
+                ac (fid->second, CurrentTime);
                 eplock.lock ();
             }
         }
@@ -205,12 +205,12 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     if (hasSubscriptions)
     {
         auto handles = coreObject->getValueUpdates (fedID);
-		for (auto handle:handles)
+        for (auto handle : handles)
         {
             auto sfnd = subHandleLookup.find (handle);
             if (sfnd != subHandleLookup.end ())
             {
-				auto mv = std::make_unique<Message>();
+                auto mv = std::make_unique<Message> ();
                 mv->src = sfnd->second.second;
                 auto localEndpointIndex = sfnd->second.first.value ();
                 mv->dest = local_endpoints[localEndpointIndex].name;
@@ -223,18 +223,18 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
                 messageQueues[localEndpointIndex].push (std::move (mv));
                 if (local_endpoints[localEndpointIndex].callbackIndex >= 0)
                 {
-					//make sure the lock is not engaged for the callback
-					auto cb = callbacks[local_endpoints[localEndpointIndex].callbackIndex];
+                    // make sure the lock is not engaged for the callback
+                    auto cb = callbacks[local_endpoints[localEndpointIndex].callbackIndex];
                     eplock.unlock ();
-                    cb(sfnd->second.first, newTime);
+                    cb (sfnd->second.first, newTime);
                     eplock.lock ();
                 }
                 else if (allCallbackIndex >= 0)
                 {
-					//make sure the lock is not engaged for the callback
-					auto ac = callbacks[allCallbackIndex];
+                    // make sure the lock is not engaged for the callback
+                    auto ac = callbacks[allCallbackIndex];
                     eplock.unlock ();
-                    ac(sfnd->second.first, CurrentTime);
+                    ac (sfnd->second.first, CurrentTime);
                     eplock.lock ();
                 }
             }
@@ -249,7 +249,6 @@ void MessageFederateManager::StartupToInitializeStateTransition ()
 
 void MessageFederateManager::InitializeToExecuteStateTransition () {}
 
-
 static const std::string nullStr;
 
 std::string MessageFederateManager::getEndpointName (endpoint_id_t id) const
@@ -257,7 +256,6 @@ std::string MessageFederateManager::getEndpointName (endpoint_id_t id) const
     std::lock_guard<std::mutex> eLock (endpointLock);
     return (id.value () < local_endpoints.size ()) ? local_endpoints[id.value ()].name : nullStr;
 }
-
 
 endpoint_id_t MessageFederateManager::getEndpointId (const std::string &name) const
 {

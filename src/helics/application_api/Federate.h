@@ -15,8 +15,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/helics-time.h"
 #include "helics_includes/string_view.h"
 
-#include <string>
 #include <atomic>
+#include <string>
 
 #include <memory>
 #include <stdexcept>
@@ -105,10 +105,10 @@ class Federate
     @param[in] fi  a federate information structure
     */
     Federate (const FederateInfo &fi);
-	/**constructor taking a core and a federate information structure, sore information in fi is ignored
-	@param[in] fi  a federate information structure
-	*/
-	Federate(std::shared_ptr<Core> core, const FederateInfo &fi);
+    /**constructor taking a core and a federate information structure, sore information in fi is ignored
+    @param[in] fi  a federate information structure
+    */
+    Federate (std::shared_ptr<Core> core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] jsonString can be either a json file or a string containing json code
     */

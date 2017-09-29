@@ -29,15 +29,7 @@ namespace helics
 		complexLoc = 3,
 		vectorLoc = 4,
 	};
-	/** enumeration of locality namespaces*/
-	enum class publication_locality
-	{
-		local,
-		global,
-	};
 
-	constexpr publication_locality GLOBAL = publication_locality::global;
-	constexpr publication_locality LOCAL = publication_locality::local;
 
 } //namespace helics
 

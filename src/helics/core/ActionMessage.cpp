@@ -18,10 +18,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/iostreams/stream.hpp>
 namespace helics
 {
-ActionMessage::ActionMessage (action_message_def::action_t action)
-    : action_ (action), index (dest_handle), processingComplete (iterationComplete), name (payload)
+ActionMessage::ActionMessage (action_message_def::action_t startingAction)
+    : action_ (startingAction), index (dest_handle), processingComplete (iterationComplete), name (payload)
 {
-    if (hasInfo (action))
+    if (hasInfo (startingAction))
     {
         info_ = std::make_unique<AdditionalInfo> ();
     }

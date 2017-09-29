@@ -802,7 +802,7 @@ void CoreBroker::addDestFilter (ActionMessage &m)
     }
 }
 
-CoreBroker::CoreBroker (bool setAsRoot) noexcept : _isRoot (setAsRoot) {}
+CoreBroker::CoreBroker (bool setAsRootBroker) noexcept : _isRoot (setAsRootBroker) {}
 
 CoreBroker::CoreBroker (const std::string &broker_name) : BrokerBase (broker_name) {}
 

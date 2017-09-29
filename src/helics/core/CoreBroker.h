@@ -174,8 +174,8 @@ protected:
 
 public:
 	/**default constructor
-	@param setAsRoot  set to true to indicate this object is a root broker*/
-	CoreBroker(bool setAsRoot = false) noexcept;
+	@param setAsRootBroker  set to true to indicate this object is a root broker*/
+	CoreBroker(bool setAsRootBroker = false) noexcept;
 	/** constructor to set the name of the broker*/
 	CoreBroker(const std::string &broker_name);
 	/** destructor*/

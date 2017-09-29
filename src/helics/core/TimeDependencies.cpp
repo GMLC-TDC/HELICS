@@ -53,9 +53,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
     return true;
 }
 
-// an info sink no one cares about
-static DependencyInfo dummyInfo;
-
+//comparison helper lambda for comparing dependencies
 static auto dependencyCompare = [](const auto &dep, auto &target) { return (dep.fedID < target); };
 
 bool TimeDependencies::isDependency (Core::federate_id_t ofed) const
