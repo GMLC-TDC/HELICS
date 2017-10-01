@@ -16,6 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <string>
 #include <complex>
 #include <vector>
+#include <cstdint>
 
 namespace helics
 {

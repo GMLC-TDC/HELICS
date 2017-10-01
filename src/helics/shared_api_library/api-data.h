@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #ifndef HELICS_API_DATA_H_
 #define HELICS_API_DATA_H_
 
-#include "stdint.h"
+#include <stdint.h>
 
 /* Type definitions */
 typedef enum {
@@ -36,7 +36,7 @@ typedef void * helics_combo_federate;
 
 typedef void *helics_federate_info_t;
 
-typedef long long helics_time_t;
+typedef int64_t helics_time_t;
 
 typedef enum
 {
@@ -60,7 +60,7 @@ typedef struct helics_iterative_time
 typedef struct data_t
 {
 	char *data;
-	long long length;
+	int64_t length;
 } data_t;
 
 /**
@@ -70,7 +70,7 @@ typedef struct message_t
 {
 	helics_time_t time; //!< message time
 	const char *data;	//!< message data
-	long long length;	//!< message length
+	int64_t length;	//!< message length
 	const char *origsrc;	//!< original source
 	const char *src;	//!< the most recent source
 	const char *dst;	//!< the final destination

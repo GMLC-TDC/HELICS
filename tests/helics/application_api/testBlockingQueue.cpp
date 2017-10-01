@@ -124,18 +124,18 @@ BOOST_AUTO_TEST_CASE(emplace_tests)
 /** test with single consumer/single producer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests)
 {
-	BlockingQueue3<long long> sq(1010000);
+	BlockingQueue3<int64_t> sq(1010000);
 
-	for (long long ii = 0; ii < 10'000; ++ii)
+	for (int64_t ii = 0; ii < 10'000; ++ii)
 	{
 		sq.push(ii);
 	}
-	auto prod1 = [&]() {for (long long ii = 10'000; ii < 1'010'000; ++ii)
+	auto prod1 = [&]() {for (int64_t ii = 10'000; ii < 1'010'000; ++ii)
 	{
 		sq.push(ii);
 	}};
 
-	auto cons = [&]() {auto res = sq.try_pop(); long long cnt = 0;
+	auto cons = [&]() {auto res = sq.try_pop(); int64_t cnt = 0;
 	while ((res))
 	{
 		++cnt;
@@ -160,17 +160,17 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests)
 /** test with single consumer / single producer */
 BOOST_AUTO_TEST_CASE(pop_tests)
 {
-	BlockingQueue3<long long> sq(1010000);
+	BlockingQueue3<int64_t> sq(1010000);
 
 	
-	auto prod1 = [&]() {for (long long ii = 0; ii < 1'000'000; ++ii)
+	auto prod1 = [&]() {for (int64_t ii = 0; ii < 1'000'000; ++ii)
 	{
 		sq.push(ii);
 	}
 	sq.push(-1); 
 	};
 	
-	auto cons = [&]() {auto res = sq.pop(); long long cnt = 1;
+	auto cons = [&]() {auto res = sq.pop(); int64_t cnt = 1;
 	while (res>=0)
 	{
 		auto nres = sq.pop();
@@ -202,18 +202,18 @@ BOOST_AUTO_TEST_CASE(pop_tests)
 /** test with multiple consumer/single producer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests2)
 {
-	BlockingQueue3<long long> sq(1010000);
+	BlockingQueue3<int64_t> sq(1010000);
 
-	for (long long ii = 0; ii < 10'000; ++ii)
+	for (int64_t ii = 0; ii < 10'000; ++ii)
 	{
 		sq.push(ii);
 	}
-	auto prod1 = [&]() {for (long long ii = 10'000; ii < 2'010'000; ++ii)
+	auto prod1 = [&]() {for (int64_t ii = 10'000; ii < 2'010'000; ++ii)
 	{
 		sq.push(ii);
 	}};
 
-	auto cons = [&]() {auto res = sq.try_pop(); long long cnt = 0;
+	auto cons = [&]() {auto res = sq.try_pop(); int64_t cnt = 0;
 	while ((res))
 	{
 		++cnt;
@@ -242,18 +242,18 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests2)
 /** test with multiple producer/multiple consumer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests3)
 {
-	BlockingQueue3<long long> sq;
+	BlockingQueue3<int64_t> sq;
 	sq.reserve(3'010'000);
-	for (long long ii = 0; ii < 10'000; ++ii)
+	for (int64_t ii = 0; ii < 10'000; ++ii)
 	{
 		sq.push(ii);
 	}
-	auto prod1 = [&]() {for (long long ii = 0; ii < 1'000'000; ++ii)
+	auto prod1 = [&]() {for (int64_t ii = 0; ii < 1'000'000; ++ii)
 	{
 		sq.push(ii);
 	}};
 
-	auto cons = [&]() {auto res = sq.try_pop(); long long cnt = 0;
+	auto cons = [&]() {auto res = sq.try_pop(); int64_t cnt = 0;
 	while ((res))
 	{
 		++cnt;
@@ -286,16 +286,16 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests3)
 /** test with multiple producer/multiple consumer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests3_pop)
 {
-	BlockingQueue3<long long> sq;
+	BlockingQueue3<int64_t> sq;
 	sq.reserve(3'010'000);
 	
-	auto prod1 = [&]() {for (long long ii = 0; ii < 1'000'000; ++ii)
+	auto prod1 = [&]() {for (int64_t ii = 0; ii < 1'000'000; ++ii)
 	{
 		sq.push(ii);
 	}
 	sq.push(-1); };
 
-	auto cons = [&]() {auto res = sq.pop(); long long cnt = 0;
+	auto cons = [&]() {auto res = sq.pop(); int64_t cnt = 0;
 	while (res>=0)
 	{
 		++cnt;
@@ -323,7 +323,7 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests3_pop)
 /** test with multiple producer/multiple consumer*/
 BOOST_AUTO_TEST_CASE(pop_callback_tests)
 {
-	BlockingQueue3<long long> sq;
+	BlockingQueue3<int64_t> sq;
 	int pushcnt = 0;
 	auto prod1 = [&]()
 	{
@@ -359,16 +359,16 @@ const std::pair<std::string, std::string>  pairString{ "this is a test string th
 BOOST_AUTO_TEST_CASE(multithreaded_tests_perf)
 {
 	BlockingQueue3<std::pair<std::string,std::string>> sq;
-	long long cnt = 5'000'000;
+	int64_t cnt = 5'000'000;
 	sq.reserve(3*cnt);
 
-	auto prod1 = [&]() {for (long long ii = 0; ii < cnt; ++ii)
+	auto prod1 = [&]() {for (int64_t ii = 0; ii < cnt; ++ii)
 	{
 		sq.push(pairString);
 	}
 	};
 
-	auto cons = [&]() {auto res = sq.pop(); long long cntr = 0;
+	auto cons = [&]() {auto res = sq.pop(); int64_t cntr = 0;
 	while (!res.first.empty())
 	{
 		++cntr;
@@ -409,14 +409,14 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests_perf)
 BOOST_AUTO_TEST_CASE(multithreaded_tests_perf_bq)
 {
 	helics::BlockingQueue<std::pair<std::string,std::string>> sq;
-	long long cnt = 5'000'000;
-	auto prod1 = [&]() {for (long long ii = 0; ii < cnt; ++ii)
+	int64_t cnt = 5'000'000;
+	auto prod1 = [&]() {for (int64_t ii = 0; ii < cnt; ++ii)
 	{
 		sq.push(pairString);
 	}
 	};
 
-	auto cons = [&]() {auto res = sq.pop(); long long cntr = 0;
+	auto cons = [&]() {auto res = sq.pop(); int64_t cntr = 0;
 	while (!res.first.empty())
 	{
 		++cntr;

@@ -39,21 +39,21 @@ extern "C" {
 	/* getting and publishing values */
 	HELICS_Export helicsStatus helicsPublish(helics_publication pubID, const char *data, int len);
 	HELICS_Export helicsStatus helicsPublishString(helics_publication pubID, const char *str);
-	HELICS_Export helicsStatus helicsPublishInteger( helics_publication pubID, long long val);
+	HELICS_Export helicsStatus helicsPublishInteger( helics_publication pubID, int64_t val);
 	HELICS_Export helicsStatus helicsPublishDouble( helics_publication pubID, double val);
 	HELICS_Export helicsStatus helicsPublishComplex( helics_publication pubID, double real, double imag);
 	HELICS_Export helicsStatus helicsPublishVector( helics_publication pubID, const double data[], int len);
 	
 	HELICS_Export int helicsGetValue( helics_subscription pubID, char *data, int maxlen);
 	HELICS_Export helicsStatus helicsGetString( helics_subscription pubID, char *str, int maxlen);
-	HELICS_Export helicsStatus helicsGetInteger( helics_subscription pubID, long long *val);
+	HELICS_Export helicsStatus helicsGetInteger( helics_subscription pubID, int64_t *val);
 	HELICS_Export helicsStatus helicsGetDouble( helics_subscription pubID, double *val);
 	HELICS_Export helicsStatus helicsGetComplex( helics_subscription pubID, double *real, double *imag);
 	HELICS_Export int helicsGetVector( helics_subscription pubID, double data[], int maxlen);
 
 	HELICS_Export helicsStatus helicsSetDefaultValue( helics_subscription pubID, const char *data, int len);
 	HELICS_Export helicsStatus helicsSetDefaultString( helics_subscription pubID, const char *str);
-	HELICS_Export helicsStatus helicsSetDefaultInteger( helics_subscription pubID, long long val);
+	HELICS_Export helicsStatus helicsSetDefaultInteger( helics_subscription pubID, int64_t val);
 	HELICS_Export helicsStatus helicsSetDefaultDouble(helics_subscription pubID, double val);
 	HELICS_Export helicsStatus helicsSetDefaultComplex( helics_subscription pubID, double real, double imag);
 	HELICS_Export helicsStatus helicsSetDefaultVector( helics_subscription pubID, const double *data, int len);

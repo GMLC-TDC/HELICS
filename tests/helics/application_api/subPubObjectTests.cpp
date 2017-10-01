@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(subscriptionObject_tests)
 
 	BOOST_CHECK_EQUAL(gtime, 1.0);
 	std::string s = subObj.getValue<std::string>();
-	//long long val = subObj.getValue<long long>();
+	//int64_t val = subObj.getValue<int64_t>();
 	//make sure the string is what we expect
 	BOOST_CHECK_EQUAL(s, "string1");
 	//publish a second string

@@ -123,18 +123,18 @@ BOOST_AUTO_TEST_CASE(emplace_tests)
 /** test with single consumer/single producer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests)
 {
-	simpleQueue<long long> sq(1010000);
+	simpleQueue<int64_t> sq(1010000);
 
-	for (long long ii = 0; ii < 10'000; ++ii)
+	for (int64_t ii = 0; ii < 10'000; ++ii)
 	{
 		sq.push(ii);
 	}
-	auto prod1 = [&]() {for (long long ii = 10'000; ii < 1'010'000; ++ii)
+	auto prod1 = [&]() {for (int64_t ii = 10'000; ii < 1'010'000; ++ii)
 	{
 		sq.push(ii);
 	}};
 	
-	auto cons = [&]() {auto res = sq.pop(); long long cnt = 1;
+	auto cons = [&]() {auto res = sq.pop(); int64_t cnt = 1;
 	while ((res))
 	{
 		auto nres = sq.pop();
@@ -174,18 +174,18 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests)
 /** test with multiple consumer/single producer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests2)
 {
-	simpleQueue<long long> sq(1010000);
+	simpleQueue<int64_t> sq(1010000);
 
-	for (long long ii = 0; ii < 10'000; ++ii)
+	for (int64_t ii = 0; ii < 10'000; ++ii)
 	{
 		sq.push(ii);
 	}
-	auto prod1 = [&]() {for (long long ii = 10'000; ii < 2'010'000; ++ii)
+	auto prod1 = [&]() {for (int64_t ii = 10'000; ii < 2'010'000; ++ii)
 	{
 		sq.push(ii);
 	}};
 
-	auto cons = [&]() {auto res = sq.pop(); long long cnt = 0;
+	auto cons = [&]() {auto res = sq.pop(); int64_t cnt = 0;
 	while ((res))
 	{
 		++cnt;
@@ -214,18 +214,18 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests2)
 /** test with multiple producer/multiple consumer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests3)
 {
-	simpleQueue<long long> sq;
+	simpleQueue<int64_t> sq;
 	sq.reserve(3'010'000);
-	for (long long ii = 0; ii < 10'000; ++ii)
+	for (int64_t ii = 0; ii < 10'000; ++ii)
 	{
 		sq.push(ii);
 	}
-	auto prod1 = [&]() {for (long long ii = 0; ii < 1'000'000; ++ii)
+	auto prod1 = [&]() {for (int64_t ii = 0; ii < 1'000'000; ++ii)
 	{
 		sq.push(ii);
 	}};
 
-	auto cons = [&]() {auto res = sq.pop(); long long cnt = 0;
+	auto cons = [&]() {auto res = sq.pop(); int64_t cnt = 0;
 	while ((res))
 	{
 		++cnt;

@@ -152,7 +152,7 @@ inline std::string typeNameString<std::uint32_t>()
 }
 /** for 64 bit unsigned integer*/
 template <>
-inline std::string typeNameString<long long>()
+inline std::string typeNameString<int64_t>()
 {
 	return "int64";
 }
@@ -215,7 +215,7 @@ constexpr helicsType_t helicsType()
 }
 
 template <>
-constexpr helicsType_t helicsType<long long>()
+constexpr helicsType_t helicsType<int64_t>()
 {
 	return helicsType_t::helicsInt;
 }

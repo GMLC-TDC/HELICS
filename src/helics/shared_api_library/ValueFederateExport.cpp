@@ -252,7 +252,7 @@ helicsStatus helicsPublishString(helics_publication pubID, const char *str)
 	return helicsOK;
 }
 
-helicsStatus helicsPublishInteger(helics_publication pubID, long long val)
+helicsStatus helicsPublishInteger(helics_publication pubID, int64_t val)
 {
 	if (pubID == nullptr)
 	{
@@ -376,7 +376,7 @@ helicsStatus helicsGetString(helics_subscription subID, char *str, int maxlen)
 	}
 	return helicsOK;
 }
-helicsStatus helicsGetInteger(helics_subscription subID, long long *val)
+helicsStatus helicsGetInteger(helics_subscription subID, int64_t *val)
 {
 	if (subID == nullptr)
 	{
@@ -385,7 +385,7 @@ helicsStatus helicsGetInteger(helics_subscription subID, long long *val)
 	auto subObj = reinterpret_cast<helics::SubscriptionObject *>(subID);
 	if (subObj->rawOnly)
 	{
-		*val=subObj->fedptr->getValue<long long>(subObj->id);
+		*val=subObj->fedptr->getValue<int64_t>(subObj->id);
 	}
 	else
 	{
@@ -483,7 +483,7 @@ helicsStatus helicsSetDefaultString(helics_subscription subID, char *str)
 	return helicsOK;
 }
 
-helicsStatus helicsSetDefaultInteger(helics_subscription subID, long long val)
+helicsStatus helicsSetDefaultInteger(helics_subscription subID, int64_t val)
 {
 	if (subID == nullptr)
 	{

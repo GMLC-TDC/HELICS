@@ -71,7 +71,7 @@ void valueExtract (const defV &dv, std::string &val)
         val = std::to_string (boost::get<double> (dv));
         break;
     case intLoc:  // int64_t
-        val = std::to_string (boost::get<long long> (dv));
+        val = std::to_string (boost::get<int64_t> (dv));
         break;
 	case stringLoc:  // string
 	default:
@@ -98,7 +98,7 @@ void valueExtract (const defV &dv, std::complex<double> &val)
         val = std::complex<double> (boost::get<double> (dv), 0.0);
         break;
     case intLoc:  // int64_t
-        val = std::complex<double> (static_cast<double> (boost::get<long long> (dv)), 0.0);
+        val = std::complex<double> (static_cast<double> (boost::get<int64_t> (dv)), 0.0);
         break;
 	case stringLoc:  // string
 	default:

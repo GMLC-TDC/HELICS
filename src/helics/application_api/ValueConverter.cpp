@@ -15,7 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 template class ValueConverter<double>;
-template class ValueConverter<long long>;
+template class ValueConverter<int64_t>;
 template class ValueConverter<char>;
 template class ValueConverter<std::complex<double>>;
 template class ValueConverter<float>;
