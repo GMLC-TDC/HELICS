@@ -133,11 +133,11 @@ helicsStatus helicsSendMessage(helics_endpoint endpoint, message_t *message)
 	//TODO this isn't correct yet (need to translate to a Message_view if origSrc is not this name
 	if (message->dst == nullptr)
 	{
-		endObj->endptr->send(message->data, message->len, message->time);
+		endObj->endptr->send(message->data, message->length, message->time);
 	}
 	else
 	{
-		endObj->endptr->send(message->dst,message->data, message->len, message->time);
+		endObj->endptr->send(message->dst,message->data, message->length, message->time);
 	}
 	return helicsOK;
 }
@@ -195,7 +195,7 @@ message_t emptyMessage()
 	message_t empty;
 	empty.time = 0;
 	empty.data = nullptr;
-	empty.len = 0;
+	empty.length = 0;
 	empty.dst = nullptr;
 	empty.origsrc = nullptr;
 	empty.src = nullptr;
@@ -214,7 +214,7 @@ message_t helicsEndpointGetMessage(helics_endpoint endpoint)
 	message_t mess;
 	mess.data = endObj->lastMessage->data.data();
 	mess.dst = endObj->lastMessage->dest.c_str();
-	mess.len = endObj->lastMessage->data.size();
+	mess.length = endObj->lastMessage->data.size();
 	mess.origsrc = endObj->lastMessage->origsrc.c_str();
 	mess.src = endObj->lastMessage->src.c_str();
 	mess.time = endObj->lastMessage->time.getBaseTimeCode();
@@ -237,7 +237,7 @@ message_t helicsFederateGetMessage(helics_message_federate fed)
 	message_t mess;
 	mess.data = fedObj->lastMessage->data.data();
 	mess.dst = fedObj->lastMessage->dest.c_str();
-	mess.len = fedObj->lastMessage->data.size();
+	mess.length = fedObj->lastMessage->data.size();
 	mess.origsrc = fedObj->lastMessage->origsrc.c_str();
 	mess.src = fedObj->lastMessage->src.c_str();
 	mess.time = fedObj->lastMessage->time.getBaseTimeCode();

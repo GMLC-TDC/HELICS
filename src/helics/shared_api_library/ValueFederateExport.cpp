@@ -455,7 +455,14 @@ int helicsGetVector(helics_subscription subID, double data[], int len)
 
 helicsStatus helicsSetDefaultValue(helics_subscription subID, const char *data, int len)
 {
-	return helicsError;
+	if (subID == nullptr)
+	{
+		return helicsError;
+	}
+	auto subObj = reinterpret_cast<helics::SubscriptionObject *>(subID);
+
+	subObj->fedptr->setDefaultValue(subObj->id, helics::data_view(data,len));
+	return helicsOK;
 }
 
 helicsStatus helicsSetDefaultString(helics_subscription subID, char *str)

@@ -60,7 +60,7 @@ typedef struct helics_iterative_time
 typedef struct data_t
 {
 	char *data;
-	uint64_t len;
+	long long length;
 } data_t;
 
 /**
@@ -70,7 +70,7 @@ typedef struct message_t
 {
 	helics_time_t time; //!< message time
 	const char *data;	//!< message data
-	uint64_t len;	//!< message length
+	long long length;	//!< message length
 	const char *origsrc;	//!< original source
 	const char *src;	//!< the most recent source
 	const char *dst;	//!< the final destination

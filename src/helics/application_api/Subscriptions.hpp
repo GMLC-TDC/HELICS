@@ -170,7 +170,7 @@ void valueExtract (const defV &dv, X &val)
         }
         else
         {
-            val = static_cast<X> (-1e49);
+            val = std::numeric_limits<X>::min();
         }
         break;
     }
