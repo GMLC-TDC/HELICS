@@ -232,7 +232,9 @@ namespace cereal
         auto lb = baseMap.lower_bound(baseKey);
 
         {
-          auto & derivedMap = baseMap.insert( lb, {baseKey, {}} )->second;
+          //auto & derivedMap = baseMap.insert( lb, {baseKey, {}} )->second;
+		  auto & derivedMap = baseMap.insert(lb, { baseKey,decltype(lb->second)() })->second;
+			auto & derivedMap = baseMap.insert(lb, { baseKey,{} });
           auto lbd = derivedMap.lower_bound(derivedKey);
           auto & derivedVec = derivedMap.insert( lbd, { std::move(derivedKey), {}} )->second;
           derivedVec.push_back( this );

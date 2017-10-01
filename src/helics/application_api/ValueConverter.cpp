@@ -21,6 +21,7 @@ template class ValueConverter<std::complex<double>>;
 template class ValueConverter<float>;
 template class ValueConverter<short>;
 template class ValueConverter<unsigned long>;
+template class ValueConverter<long>;
 template class ValueConverter<std::vector<double>>;
 template class ValueConverter<std::vector<std::string>>;
 template class ValueConverter<std::vector<std::complex<double>>>;

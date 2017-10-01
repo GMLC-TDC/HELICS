@@ -20,6 +20,93 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/lexical_cast.hpp>
 namespace helics
 {
+void valueExtract (const defV &dv, std::string &val);
+
+void valueExtract (const defV &dv, std::complex<double> &val);
+
+void valueExtract (const defV &dv, std::vector<double> &val);
+
+void valueExtract (const data_view &dv, helicsType_t baseType, std::string &val);
+
+void valueExtract (const data_view &dv, helicsType_t baseType, std::vector<double> &val);
+
+void valueExtract (const data_view &dv, helicsType_t baseType, std::complex<double> &val);
+
+/** assume it is some numeric type (int or double)*/
+template <class X>
+void valueExtract (const defV &dv, X &val)
+{
+    switch (dv.which ())
+    {
+    case stringLoc:  // string
+    default:
+        val = boost::lexical_cast<X> (boost::get<std::string> (dv));
+        break;
+    case doubleLoc:  // double
+        val = static_cast<X> (boost::get<double> (dv));
+        break;
+    case intLoc:  // int64_t
+        val = static_cast<X> (boost::get<int64_t> (dv));
+        break;
+    case complexLoc:  // complex
+        val = static_cast<X> (std::abs (boost::get<std::complex<double>> (dv)));
+        break;
+    case vectorLoc:  // vector
+    {
+        auto &vec = boost::get<std::vector<double>> (dv);
+        if (!vec.empty ())
+        {
+            val = static_cast<X> (vec.front ());
+        }
+        else
+        {
+            val = std::numeric_limits<X>::min ();
+        }
+        break;
+    }
+    }
+}
+
+/** assume it is some numeric type (int or double)*/
+template <class X>
+void valueExtract (const data_view &dv, helicsType_t baseType, X &val)
+{
+    switch (baseType)
+    {
+    case helicsType_t::helicsString:
+    {
+        val = boost::lexical_cast<X> (dv.string ());
+        break;
+    }
+    case helicsType_t::helicsDouble:
+    {
+        auto V = ValueConverter<double>::interpret (dv);
+        val = static_cast<X> (V);
+        break;
+    }
+    case helicsType_t::helicsInt:
+    {
+        auto V = ValueConverter<int64_t>::interpret (dv);
+        val = static_cast<X> (V);
+        break;
+    }
+
+    case helicsType_t::helicsVector:
+    {
+        auto V = ValueConverter<std::vector<double>>::interpret (dv);
+        val = static_cast<X> (V[0]);
+        break;
+    }
+    case helicsType_t::helicsComplex:
+    {
+        auto V = ValueConverter<std::complex<double>>::interpret (dv);
+        val = static_cast<X> (std::abs (V));
+        break;
+    }
+    case helicsType_t::helicsInvalid:
+        break;
+    }
+}
 // template<class X, typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, bool>::type>
 class Subscription
 {
@@ -129,94 +216,6 @@ class Subscription
   private:
     void handleCallback (Time time);
 };
-
-void valueExtract (const defV &dv, std::string &val);
-
-void valueExtract (const defV &dv, std::complex<double> &val);
-
-void valueExtract (const defV &dv, std::vector<double> &val);
-
-void valueExtract (const data_view &dv, helicsType_t baseType, std::string &val);
-
-void valueExtract (const data_view &dv, helicsType_t baseType, std::vector<double> &val);
-
-void valueExtract (const data_view &dv, helicsType_t baseType, std::complex<double> &val);
-
-/** assume it is some numeric type (int or double)*/
-template <class X>
-void valueExtract (const defV &dv, X &val)
-{
-    switch (dv.which ())
-    {
-    case stringLoc:  // string
-    default:
-        val = boost::lexical_cast<X> (boost::get<std::string> (dv));
-        break;
-    case doubleLoc:  // double
-        val = static_cast<X> (boost::get<double> (dv));
-        break;
-    case intLoc:  // int64_t
-        val = static_cast<X> (boost::get<int64_t> (dv));
-        break;
-    case complexLoc:  // complex
-        val = static_cast<X> (std::abs (boost::get<std::complex<double>> (dv)));
-        break;
-    case vectorLoc:  // vector
-    {
-        auto &vec = boost::get<std::vector<double>> (dv);
-        if (!vec.empty ())
-        {
-            val = static_cast<X> (vec.front ());
-        }
-        else
-        {
-            val = std::numeric_limits<X>::min();
-        }
-        break;
-    }
-    }
-}
-
-/** assume it is some numeric type (int or double)*/
-template <class X>
-void valueExtract (const data_view &dv, helicsType_t baseType, X &val)
-{
-    switch (baseType)
-    {
-    case helicsType_t::helicsString:
-    {
-        val = boost::lexical_cast<X> (dv.string ());
-        break;
-    }
-    case helicsType_t::helicsDouble:
-    {
-        auto V = ValueConverter<double>::interpret (dv);
-        val = static_cast<X> (V);
-        break;
-    }
-    case helicsType_t::helicsInt:
-    {
-        auto V = ValueConverter<int64_t>::interpret (dv);
-        val = static_cast<X> (V);
-        break;
-    }
-
-    case helicsType_t::helicsVector:
-    {
-        auto V = ValueConverter<std::vector<double>>::interpret (dv);
-        val = static_cast<X> (V[0]);
-        break;
-    }
-    case helicsType_t::helicsComplex:
-    {
-        auto V = ValueConverter<std::complex<double>>::interpret (dv);
-        val = static_cast<X> (std::abs (V));
-        break;
-    }
-    case helicsType_t::helicsInvalid:
-        break;
-    }
-}
 
 /** class to handle a subscription
 @tparam X the class of the value associated with a subscription*/

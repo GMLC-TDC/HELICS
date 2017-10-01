@@ -150,7 +150,7 @@ namespace BrokerFactory
 		{
 		case core_type::ZMQ:
 		{
-#if HELIC_HAVE_ZEROMQ
+#if HELICS_HAVE_ZEROMQ
 			available = true;
 #endif
 			break;
