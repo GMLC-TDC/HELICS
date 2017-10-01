@@ -14,6 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <string>
 #include <vector>
 #include <complex>
+#include <typeinfo>
 
 namespace helics
 {
@@ -21,7 +22,7 @@ using identifier_type = unsigned long;
 
 constexpr identifier_type invalid_id_value = (identifier_type)(-1);  //!< defining an invalid id value
 
-																	 /** the known types of identifiers*/
+/** the known types of identifiers*/
 enum class identifiers : char
 {
 	publication,
@@ -30,6 +31,16 @@ enum class identifiers : char
 	endpoint,
 
 };
+
+/** enumeration of locality namespaces*/
+enum class interface_visibility
+{
+	local,
+	global,
+};
+
+constexpr interface_visibility GLOBAL = interface_visibility::global;
+constexpr interface_visibility LOCAL = interface_visibility::local;
 /** class defining an  identifier type
 @details  the intent of this class is to limit the operations available on a publication identifier
 to those that are a actually required and make sense, and make it as low impact as possible.

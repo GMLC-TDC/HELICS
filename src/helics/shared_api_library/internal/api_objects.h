@@ -14,7 +14,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <memory>
 #include "shared_api_library/api-data.h"
 #include "application_api/helicsTypes.hpp"
-
+#include "core/core-data.h"
 namespace helics
 {
 	class Core;
@@ -58,6 +58,7 @@ namespace helics
 		vtype type;
 		int valid;
 		std::shared_ptr<Federate> fedptr;
+		std::unique_ptr<Message> lastMessage;
 	};
 
 	/** object wrapping a subscription*/
@@ -82,8 +83,9 @@ namespace helics
 	class EndpointObject
 	{
 	public:
-		std::shared_ptr<Subscription> endptr;
+		std::shared_ptr<Endpoint> endptr;
 		std::shared_ptr<MessageFederate> fedptr;
+		std::unique_ptr<Message> lastMessage;
 	};
 
 	class SourceFilterObject

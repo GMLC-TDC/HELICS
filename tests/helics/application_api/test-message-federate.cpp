@@ -19,7 +19,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 /** these test cases test out the message federates
 */
 
-BOOST_FIXTURE_TEST_SUITE(message_federate_tests, MessageFederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE(message_federate_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 const std::string core_types[] = { "test" };
@@ -28,7 +28,8 @@ const std::string core_types[] = { "test" };
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE(message_federate_initialize_tests, bdata::make(core_types), core_type)
 {
-    Setup1FederateTest(core_type);
+    SetupSingleBrokerTest<helics::MessageFederate>(core_type, 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
 	mFed1->enterExecutionState();
 
@@ -42,7 +43,8 @@ BOOST_DATA_TEST_CASE(message_federate_initialize_tests, bdata::make(core_types),
 
 BOOST_DATA_TEST_CASE(message_federate_endpoint_registration, bdata::make(core_types), core_type)
 {
-    Setup1FederateTest(core_type);
+    SetupSingleBrokerTest<helics::MessageFederate>(core_type, 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
 	auto epid = mFed1->registerEndpoint("ep1");
 	auto epid2 = mFed1->registerGlobalEndpoint("ep2","random");
@@ -54,7 +56,7 @@ BOOST_DATA_TEST_CASE(message_federate_endpoint_registration, bdata::make(core_ty
 
 	auto sv = mFed1->getEndpointName(epid);
 	auto sv2 = mFed1->getEndpointName(epid2);
-	BOOST_CHECK_EQUAL(sv, "test1/ep1");
+	BOOST_CHECK_EQUAL(sv, "fed0/ep1");
 	BOOST_CHECK_EQUAL(sv2, "ep2");
 	
 
@@ -72,7 +74,8 @@ BOOST_DATA_TEST_CASE(message_federate_endpoint_registration, bdata::make(core_ty
 
 BOOST_DATA_TEST_CASE(message_federate_send_receive, bdata::make(core_types), core_type)
 {
-    Setup1FederateTest(core_type);
+    SetupSingleBrokerTest<helics::MessageFederate>(core_type, 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
 	auto epid = mFed1->registerEndpoint("ep1");
 	auto epid2 = mFed1->registerGlobalEndpoint("ep2", "random");
@@ -110,7 +113,9 @@ BOOST_DATA_TEST_CASE(message_federate_send_receive, bdata::make(core_types), cor
 
 BOOST_DATA_TEST_CASE(message_federate_send_receive_2fed, bdata::make(core_types), core_type)
 {
-    Setup2FederateTest(core_type);
+    SetupSingleBrokerTest<helics::MessageFederate>(core_type, 2);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
 
 	auto epid = mFed1->registerEndpoint("ep1");
 	auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
@@ -130,7 +135,7 @@ BOOST_DATA_TEST_CASE(message_federate_send_receive_2fed, bdata::make(core_types)
 	helics::data_block data2(400, 'b');
 
 	mFed1->sendMessage(epid, "ep2", data);
-	mFed2->sendMessage(epid2, "test1/ep1", data2);
+	mFed2->sendMessage(epid2, "fed0/ep1", data2);
 	//move the time to 1.0
 	auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
 	auto gtime = mFed2->requestTime(1.0);
@@ -164,7 +169,9 @@ BOOST_DATA_TEST_CASE(message_federate_send_receive_2fed, bdata::make(core_types)
 
 BOOST_DATA_TEST_CASE(message_federate_send_receive_2fed_multisend, bdata::make(core_types), core_type)
 {
-    Setup2FederateTest(core_type);
+    SetupSingleBrokerTest<helics::MessageFederate>(core_type, 2);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
 
 	auto epid = mFed1->registerEndpoint("ep1");
 	auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
@@ -220,9 +227,9 @@ BOOST_DATA_TEST_CASE(message_federate_send_receive_2fed_multisend, bdata::make(c
 	BOOST_CHECK_EQUAL(M3->data.size(), data3.size());
 	BOOST_CHECK_EQUAL(M4->data.size(), data4.size());
 
-	BOOST_CHECK_EQUAL(M4->src, "test1/ep1");
+	BOOST_CHECK_EQUAL(M4->src, "fed0/ep1");
 	BOOST_CHECK_EQUAL(M4->dest, "ep2");
-	BOOST_CHECK_EQUAL(M4->origsrc, "test1/ep1");
+	BOOST_CHECK_EQUAL(M4->origsrc, "fed0/ep1");
 	BOOST_CHECK_EQUAL(M4->time, 0.0);
 	mFed1->finalize();
 	mFed2->finalize();
@@ -354,7 +361,7 @@ public:
 
 BOOST_DATA_TEST_CASE(threefedPingPong, bdata::make(core_types), core_type)
 {
-    StartBroker(core_type, "3");
+    AddBroker(core_type, "3");
 
 	pingpongFed p1("fedA", 0.5, core_type);
 	pingpongFed p2("fedB", 0.5, core_type);
@@ -385,7 +392,9 @@ BOOST_DATA_TEST_CASE(threefedPingPong, bdata::make(core_types), core_type)
 
 BOOST_DATA_TEST_CASE(test_time_interruptions, bdata::make(core_types), core_type)
 {
-    Setup2FederateTest(core_type);
+    SetupSingleBrokerTest<helics::MessageFederate>(core_type, 2);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
 
 	auto epid = mFed1->registerEndpoint("ep1");
 	auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
@@ -405,7 +414,7 @@ BOOST_DATA_TEST_CASE(test_time_interruptions, bdata::make(core_types), core_type
 	helics::data_block data2(400, 'b');
 
 	mFed1->sendMessage(epid, "ep2", data);
-	mFed2->sendMessage(epid2, "test1/ep1", data2);
+	mFed2->sendMessage(epid2, "fed0/ep1", data2);
 	//move the time to 1.0
 	auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
 	auto gtime = mFed2->requestTime(1.0);

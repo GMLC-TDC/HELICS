@@ -7,44 +7,48 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 */
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
 
 #include "helics/application_api/MessageFilterFederate.h"
 #include "test_configuration.h"
 #include "helics/application_api/MessageOperators.h"
+#include "testFixtures.h"
+
 #include <future>
 /** these test cases test out the message federates
 */
 
-BOOST_AUTO_TEST_SUITE(message_filter_federate_tests)
+BOOST_FIXTURE_TEST_SUITE(message_filter_federate_tests, FederateTestFixture)
+
+namespace bdata = boost::unit_test::data;
+const std::string core_types[] = { "test" };
 
 /** test simple creation and destruction*/
-BOOST_AUTO_TEST_CASE(message_filter_federate_initialize_tests)
+BOOST_DATA_TEST_CASE(message_filter_federate_initialize_tests, bdata::make(core_types), core_type)
 {
-	helics::FederateInfo fi("test1");
-	fi.coreType = CORE_TYPE_TO_TEST;
-	fi.coreInitString = "1";
+    auto broker = AddBroker(core_type, 1);
+    AddFederates<helics::MessageFilterFederate>(core_type, 1, broker);
 
-	auto mFed = std::make_shared<helics::MessageFilterFederate>(fi);
+    auto fFed = GetFederateAs<helics::MessageFilterFederate>(0);
 
-	mFed->enterExecutionState();
+	fFed->enterExecutionState();
 
-	BOOST_CHECK(mFed->currentState() == helics::Federate::op_states::execution);
+	BOOST_CHECK(fFed->currentState() == helics::Federate::op_states::execution);
 
-	mFed->finalize();
+	fFed->finalize();
 
-	BOOST_CHECK(mFed->currentState() == helics::Federate::op_states::finalize);
+	BOOST_CHECK(fFed->currentState() == helics::Federate::op_states::finalize);
 }
 
 /** test registration of filters*/
-BOOST_AUTO_TEST_CASE(message_filter_federate_registration)
+BOOST_DATA_TEST_CASE(message_filter_federate_registration, bdata::make(core_types), core_type)
 {
-	helics::FederateInfo fi("filter");
-	fi.coreType = CORE_TYPE_TO_TEST;
-	fi.coreInitString = "2";
+    auto broker = AddBroker(core_type, 2);
+    AddFederates<helics::MessageFilterFederate>(core_type, 2, broker, helics::timeZero, "filter");
+    AddFederates<helics::MessageFederate>(core_type, 2, broker, helics::timeZero, "message");
 
-	auto fFed = std::make_unique<helics::MessageFilterFederate>(fi);
-	fi.name = "message";
-	auto mFed = std::make_unique<helics::MessageFederate>(fi);
+    auto fFed = GetFederateAs<helics::MessageFilterFederate>(0);
+    auto mFed = GetFederateAs<helics::MessageFederate>(1);
 
 	mFed->registerGlobalEndpoint("port1");
 	mFed->registerGlobalEndpoint("port2");
@@ -55,7 +59,7 @@ BOOST_AUTO_TEST_CASE(message_filter_federate_registration)
 	BOOST_CHECK(f2 != f1);
 	auto ep1 = fFed->registerEndpoint("fout");
 	BOOST_CHECK(ep1.value() != helics::invalid_id_value);
-	auto f3 = fFed->registerSourceFilter("filter/fout");
+	auto f3 = fFed->registerSourceFilter("filter0/fout");
 	BOOST_CHECK(f3 != f2);
 	mFed->finalize();
 	fFed->finalize();
@@ -64,16 +68,14 @@ BOOST_AUTO_TEST_CASE(message_filter_federate_registration)
 
 
 /** test basic operation of filters*/
-BOOST_AUTO_TEST_CASE(message_filter_basic_ops)
+BOOST_DATA_TEST_CASE(message_filter_basic_ops, bdata::make(core_types), core_type)
 {
-	helics::FederateInfo fi("filter");
-	fi.coreType = CORE_TYPE_TO_TEST;
-	fi.coreInitString = "2";
-	fi.timeDelta = 1.0;
-	auto fFed = std::make_unique<helics::MessageFilterFederate>(fi);
-	
-	fi.name = "message";
-	auto mFed = std::make_unique<helics::MessageFederate>(fi);
+    auto broker = AddBroker(core_type, 2);
+    AddFederates<helics::MessageFilterFederate>(core_type, 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(core_type, 1, broker, 1.0, "message");
+
+    auto fFed = GetFederateAs<helics::MessageFilterFederate>(0);
+    auto mFed = GetFederateAs<helics::MessageFederate>(1);
 
 	auto p1=mFed->registerGlobalEndpoint("port1");
 	auto p2=mFed->registerGlobalEndpoint("port2");
@@ -107,7 +109,7 @@ BOOST_AUTO_TEST_CASE(message_filter_basic_ops)
 	mFed->requestTimeFinalize();
 	BOOST_REQUIRE(mFed->hasMessage(p2));
 	auto m2 = mFed->getMessage(p2);
-	BOOST_CHECK_EQUAL(m2->src,"filter/fout");
+	BOOST_CHECK_EQUAL(m2->src,"filter0/fout");
 	BOOST_CHECK_EQUAL(m2->origsrc,"port1");
 	BOOST_CHECK_EQUAL(m2->dest, "port2");
 	BOOST_CHECK_EQUAL(m2->data.size(), data.size());
@@ -120,16 +122,14 @@ BOOST_AUTO_TEST_CASE(message_filter_basic_ops)
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-BOOST_AUTO_TEST_CASE(message_filter_function)
+BOOST_DATA_TEST_CASE(message_filter_function, bdata::make(core_types), core_type)
 {
-	helics::FederateInfo fi("filter");
-	fi.coreType = CORE_TYPE_TO_TEST;
-	fi.coreInitString = "2";
-	fi.timeDelta = 1.0;
-	auto fFed = std::make_unique<helics::MessageFilterFederate>(fi);
+	auto broker = AddBroker(core_type, 2);
+    AddFederates<helics::MessageFilterFederate>(core_type, 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(core_type, 1, broker, 1.0, "message");
 
-	fi.name = "message";
-	auto mFed = std::make_unique<helics::MessageFederate>(fi);
+    auto fFed = GetFederateAs<helics::MessageFilterFederate>(0);
+    auto mFed = GetFederateAs<helics::MessageFederate>(1);
 
 	auto p1 = mFed->registerGlobalEndpoint("port1");
 	auto p2 = mFed->registerGlobalEndpoint("port2");

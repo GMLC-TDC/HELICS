@@ -19,10 +19,11 @@ extern "C" {
 	HELICS_Export helics_message_federate helicsCreateMessageFederateFromFile(const char *fileName);
 	//MESSAGE FEDERATE calls
 
-	HELICS_Export helics_endpoint helicsRegisterEndpoint(helics_message_federate fedID, const char *name, const char *type, const char *units);
+	HELICS_Export helics_endpoint helicsRegisterEndpoint(helics_message_federate fedID, const char *name, const char *type);
 
-	HELICS_Export helics_endpoint helicsRegisterGlobalEndpoint(helics_message_federate fedID, const char *name, const char *type, const char *units);
+	HELICS_Export helics_endpoint helicsRegisterGlobalEndpoint(helics_message_federate fedID, const char *name, const char *type);
 
+	HELICS_Export helicsStatus helicsSetDefaultDestination(helics_endpoint endpoint, const char *dest);
 	HELICS_Export helicsStatus helicsSendMessageRaw(helics_endpoint endpoint, const char *dest, const char *data, uint64_t len);
 
 	HELICS_Export helicsStatus helicsSendEventRaw( helics_endpoint endpoint, const char *dest, const char *data, uint64_t len, helics_time_t time);
@@ -47,12 +48,12 @@ extern "C" {
 	/** receive a packet from a particular endpoint
 	@param[in] endpoint the identifier for the endpoint
 	@return a message object*/
-	message_t * helicsEndpointGetMessage(helics_endpoint endpoint);
+	message_t helicsEndpointGetMessage(helics_endpoint endpoint);
 	/** receive a communication message for any endpoint in the federate
 	@details the return order will be in order of endpoint creation then order of arrival
 	all messages for the first endpoint, then all for the second, and so on
 	@return a unique_ptr to a Message object containing the message data*/
-	message_t * helicsFederateGetMessage(helics_message_federate fedID);
+	message_t helicsFederateGetMessage(helics_message_federate fedID);
 
 #ifdef __cplusplus
 }  /* end of extern "C" { */
