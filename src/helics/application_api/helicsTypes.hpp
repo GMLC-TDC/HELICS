@@ -15,10 +15,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <vector>
 #include <complex>
 #include <typeinfo>
+#include <cstdint>
 
 namespace helics
 {
-using identifier_type = unsigned long;
+using identifier_type = uint32_t;
 
 constexpr identifier_type invalid_id_value = (identifier_type)(-1);  //!< defining an invalid id value
 

@@ -113,7 +113,7 @@ namespace helics
 		void updateTime(Time newTime, Time oldTime);
 		/** transition from Startup To the Initialize State*/
 		void StartupToInitializeStateTransition();
-		/** transition from initialize to executation State*/
+		/** transition from initialize to execution State*/
 		void InitializeToExecuteStateTransition();
 
 		
