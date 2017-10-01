@@ -333,7 +333,7 @@ int helicsGetValue(helics_subscription subID, char *data, int maxlen)
 	if (subObj->rawOnly)
 	{
 		auto dv = subObj->fedptr->getValueRaw(subObj->id);
-		if (maxlen > dv.size())
+		if (maxlen > static_cast<int>(dv.size()))
 		{
 			memcpy(data,dv.data(), dv.size());
 			return static_cast<int>(dv.size());
@@ -347,7 +347,7 @@ int helicsGetValue(helics_subscription subID, char *data, int maxlen)
 	else
 	{
 		auto str = subObj->subptr->getValue<std::string>();
-		if (maxlen > str.size())
+		if (maxlen > static_cast<int>(str.size()))
 		{
 			strcpy(data, str.c_str());
 			return static_cast<int>(str.size());

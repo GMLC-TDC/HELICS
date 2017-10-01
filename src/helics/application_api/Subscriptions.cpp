@@ -22,14 +22,7 @@ void Subscription::handleCallback (Time time)
 	}
     switch (value_callback.which ())
     {
-    case stringLoc:
-    default:
-    {
-        std::string val;
-        valueExtract (dv, type, val);
-        boost::get<std::function<void(const std::string &, Time)>> (value_callback) (val, time);
-    }
-    break;
+ 
     case doubleLoc:
     {
         double val;
@@ -44,6 +37,14 @@ void Subscription::handleCallback (Time time)
         boost::get<std::function<void(const int64_t &, Time)>> (value_callback) (val, time);
     }
     break;
+	case stringLoc:
+	default:
+	{
+		std::string val;
+		valueExtract(dv, type, val);
+		boost::get<std::function<void(const std::string &, Time)>>(value_callback) (val, time);
+	}
+	break;
     case complexLoc:
     {
         std::complex<double> val;
@@ -65,16 +66,17 @@ void valueExtract (const defV &dv, std::string &val)
 {
     switch (dv.which ())
     {
-    case stringLoc:  // string
-    default:
-        val = boost::get<std::string> (dv);
-        break;
+   
     case doubleLoc:  // double
         val = std::to_string (boost::get<double> (dv));
         break;
     case intLoc:  // int64_t
-        val = std::to_string (boost::get<int64_t> (dv));
+        val = std::to_string (boost::get<long long> (dv));
         break;
+	case stringLoc:  // string
+	default:
+		val = boost::get<std::string>(dv);
+		break;
     case complexLoc:  // complex
         val = helicsComplexString (boost::get<std::complex<double>> (dv));
         break;
@@ -91,16 +93,17 @@ void valueExtract (const defV &dv, std::complex<double> &val)
 {
     switch (dv.which ())
     {
-    case stringLoc:  // string
-    default:
-        val = helicsGetComplex (boost::get<std::string> (dv));
-        break;
+   
     case doubleLoc:  // double
         val = std::complex<double> (boost::get<double> (dv), 0.0);
         break;
     case intLoc:  // int64_t
-        val = std::complex<double> (static_cast<double> (boost::get<int64_t> (dv)), 0.0);
+        val = std::complex<double> (static_cast<double> (boost::get<long long> (dv)), 0.0);
         break;
+	case stringLoc:  // string
+	default:
+		val = helicsGetComplex(boost::get<std::string>(dv));
+		break;
     case complexLoc:  // complex
         val = boost::get<std::complex<double>> (dv);
         break;
@@ -134,16 +137,17 @@ void valueExtract (const defV &dv, std::vector<double> &val)
     val.resize (0);
     switch (dv.which ())
     {
-    case stringLoc:  // string
-    default:
-        helicsGetVector (boost::get<std::string> (dv), val);
-        break;
+   
     case doubleLoc:  // double
         val.push_back (boost::get<double> (dv));
         break;
     case intLoc:  // int64_t
         val.push_back (static_cast<double> (boost::get<int64_t> (dv)));
         break;
+	case stringLoc:  // string
+	default:
+		helicsGetVector(boost::get<std::string>(dv), val);
+		break;
     case complexLoc:  // complex
     {
         auto cval = boost::get<std::complex<double>> (dv);

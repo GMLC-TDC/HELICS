@@ -70,7 +70,7 @@ class Publication
     /** send a value for publication
     @param[in] val the value to publish*/
     void publish (double val) const;
-    void publish (int64_t val) const;
+    void publish (long long val) const;
     void publish (const char *val) const;
     void publish (const std::string &val) const;
     void publish (const std::vector<double> &val) const;

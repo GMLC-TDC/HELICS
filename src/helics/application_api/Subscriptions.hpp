@@ -38,16 +38,17 @@ void valueExtract (const defV &dv, X &val)
 {
     switch (dv.which ())
     {
-    case stringLoc:  // string
-    default:
-        val = boost::lexical_cast<X> (boost::get<std::string> (dv));
-        break;
+    
     case doubleLoc:  // double
         val = static_cast<X> (boost::get<double> (dv));
         break;
     case intLoc:  // int64_t
         val = static_cast<X> (boost::get<int64_t> (dv));
         break;
+	case stringLoc:  // string
+	default:
+		val = boost::lexical_cast<X> (boost::get<std::string>(dv));
+		break;
     case complexLoc:  // complex
         val = static_cast<X> (std::abs (boost::get<std::complex<double>> (dv)));
         break;
@@ -94,7 +95,14 @@ void valueExtract (const data_view &dv, helicsType_t baseType, X &val)
     case helicsType_t::helicsVector:
     {
         auto V = ValueConverter<std::vector<double>>::interpret (dv);
-        val = static_cast<X> (V[0]);
+		if (!V.empty())
+		{
+			val = static_cast<X> (V[0]);
+		}
+		else
+		{
+			val = 0.0;
+		}
         break;
     }
     case helicsType_t::helicsComplex:
@@ -103,6 +111,19 @@ void valueExtract (const data_view &dv, helicsType_t baseType, X &val)
         val = static_cast<X> (std::abs (V));
         break;
     }
+	case helicsType_t::helicsComplexVector:
+	{
+		auto V = ValueConverter<std::vector<std::complex<double>>>::interpret(dv);
+		if (!V.empty())
+		{
+			val = static_cast<X> (std::abs(V.front()));
+		}
+		else
+		{
+			val = 0.0;
+		}
+		break;
+	}
     case helicsType_t::helicsInvalid:
         break;
     }
