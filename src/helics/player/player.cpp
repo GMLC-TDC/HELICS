@@ -146,7 +146,15 @@ int main (int argc, char *argv[])
         stopTime = vm["stop"].as<double> ();
     }
     helics::FederateInfo fi (name);
-    fi.coreType = corename;
+	try
+	{
+		fi.coreType = helics::coreTypeFromString(corename);
+	}
+	catch (std::invalid_argument &ia)
+	{
+		std::cerr << "Unrecognized core type\n";
+		return (-1);
+	}
     fi.coreInitString = "1";
     if (vm.count ("coreinit") > 0)
     {

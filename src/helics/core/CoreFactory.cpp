@@ -27,341 +27,393 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-std::string helicsTypeString (helics_core_type type)
+std::string helicsTypeString (core_type type)
 {
     switch (type)
     {
-    case HELICS_MPI:
+    case core_type::MPI:
         return "_mpi";
-    case HELICS_TEST:
+    case core_type::TEST:
         return "_test";
-    case HELICS_ZMQ:
+    case core_type::ZMQ:
         return "_zmq";
-    case HELICS_INTERPROCESS:
+    case core_type::INTERPROCESS:
+    case core_type::IPC:
         return "_ipc";
+    case core_type::TCP:
+        return "_tcp";
+    case core_type::UDP:
+        return "_udp";
     default:
         return "";
     }
 }
 
-helics_core_type coreTypeFromString (const std::string &type)
+core_type coreTypeFromString (const std::string &type)
 {
     if ((type.empty ()) || (type == "default"))
     {
-        return HELICS_DEFAULT;
+        return core_type::DEFAULT;
     }
-    else if ((type == "mpi") || (type == "MPI"))
+    else if ((type.compare (0, 3, "mpi") == 0) || (type == "MPI"))
     {
-        return HELICS_MPI;
+        return core_type::MPI;
     }
-    else if ((type == "0mq") || (type == "zmq") || (type == "zeromq") || (type == "ZMQ"))
+    else if ((type == "0mq") || (type.compare (0, 3, "zmq") == 0) || (type == "zeromq") || (type == "ZMQ"))
     {
-        return HELICS_ZMQ;
+        return core_type::ZMQ;
     }
-    else if ((type == "interprocess") || (type == "ipc"))
+    else if ((type == "interprocess") || (type.compare (0, 3, "ipc") == 0))
     {
-        return HELICS_INTERPROCESS;
+        return core_type::INTERPROCESS;
     }
-    else if ((type == "test") || (type == "test1") || (type == "local"))
+    else if ((type.compare (0, 4, "test") == 0) || (type == "test1") || (type == "local"))
     {
-        return HELICS_TEST;
+        return core_type::TEST;
+    }
+    else if ((type.compare (0, 3, "tcp") == 0) || (type == "TCP"))
+    {
+        return core_type::TCP;
+    }
+    else if ((type.compare (0, 3, "udp") == 0) || (type == "UDP"))
+    {
+        return core_type::UDP;
     }
     throw (std::invalid_argument ("unrecognized core type"));
 }
 
+std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
+{
+    std::shared_ptr<Core> core;
+
+    switch (type)
+    {
+    case core_type::ZMQ:
+    {
+#if HELICS_HAVE_ZEROMQ
+        if (name.empty ())
+        {
+            core = std::make_shared<ZmqCore> ();
+        }
+        else
+        {
+            core = std::make_shared<ZmqCore> (name);
+        }
+
+#else
+        assert (false);
+#endif
+        break;
+    }
+    case core_type::MPI:
+    {
+#if HELICS_HAVE_MPI
+        if (name.empty ())
+        {
+            core = std::make_shared<MpiCore> ();
+        }
+        else
+        {
+            core = std::make_shared<MpiCore> (name);
+        }
+#else
+        assert (false);
+#endif
+        break;
+    }
+    case core_type::TEST:
+    {
+        if (name.empty ())
+        {
+            core = std::make_shared<TestCore> ();
+        }
+        else
+        {
+            core = std::make_shared<TestCore> (name);
+        }
+        break;
+    }
+    case core_type::INTERPROCESS:
+        if (name.empty ())
+        {
+            core = std::make_shared<IpcCore> ();
+        }
+        else
+        {
+            core = std::make_shared<IpcCore> (name);
+        }
+        break;
+    default:
+        assert (false);
+    }
+    return core;
+}
+
 namespace CoreFactory
 {
-	std::shared_ptr<Core> create(helics_core_type type, const std::string &initializationString)
-	{
-		std::shared_ptr<Core> core;
-		if (type == HELICS_DEFAULT)
-		{  // deal with the default type
-			if (isAvailable(HELICS_ZMQ))
-			{
-				type = HELICS_ZMQ;
-			}
-			else if (isAvailable(HELICS_INTERPROCESS))
-			{
-				type = HELICS_INTERPROCESS;
-			}
-			else
-			{
-				type = HELICS_TEST;
-			}
-		}
-		switch (type)
-		{
-		case HELICS_ZMQ:
-		{
+std::shared_ptr<Core> create (core_type type, const std::string &initializationString)
+{
+    auto core = makeCore (type, "");
+    core->initialize (initializationString);
+    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
+    if (ccore)
+    {
+        registerCommonCore (ccore);
+    }
+    return core;
+}
+
+std::shared_ptr<Core> create (core_type type, const std::string &core_name, std::string &initializationString)
+{
+    auto core = makeCore (type, core_name);
+    core->initialize (initializationString);
+    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
+    if (ccore)
+    {
+        registerCommonCore (ccore);
+    }
+    return core;
+}
+
+std::shared_ptr<Core> create (core_type type, int argc, char *argv[])
+{
+    auto core = makeCore (type, "");
+
+    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
+    if (ccore)
+    {
+        ccore->InitializeFromArgs (argc, argv);
+        registerCommonCore (ccore);
+    }
+    return core;
+}
+
+std::shared_ptr<Core> create (core_type type, const std::string &core_name, int argc, char *argv[])
+{
+    auto core = makeCore (type, core_name);
+
+    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
+    if (ccore)
+    {
+        ccore->InitializeFromArgs (argc, argv);
+        registerCommonCore (ccore);
+    }
+    return core;
+}
+
+std::shared_ptr<Core>
+FindOrCreate (core_type type, const std::string &core_name, const std::string &initializationString)
+{
+    std::shared_ptr<Core> core = findCore (core_name);
+    if (core)
+    {
+        return core;
+    }
+    core = makeCore (type, core_name);
+    core->initialize (initializationString);
+    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
+    if (ccore)
+    {
+        bool success = registerCommonCore (ccore);
+        if (!success)
+        {
+            core = findCore (core_name);
+            if (core)
+            {
+                return core;
+            }
+        }
+    }
+    return core;
+}
+
+std::shared_ptr<Core> FindOrCreate (core_type type, const std::string &core_name, int argc, char *argv[])
+{
+    std::shared_ptr<Core> core = findCore (core_name);
+    if (core)
+    {
+        return core;
+    }
+    core = makeCore (type, core_name);
+
+    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
+    if (ccore)
+    {
+        ccore->InitializeFromArgs (argc, argv);
+        bool success = registerCommonCore (ccore);
+        if (!success)
+        {
+            core = findCore (core_name);
+            if (core)
+            {
+                return core;
+            }
+        }
+    }
+    return core;
+}
+
+bool isAvailable (core_type type)
+{
+    bool available = false;
+
+    switch (type)
+    {
+    case core_type::ZMQ:
+    {
 #if HELICS_HAVE_ZEROMQ
-			core = std::make_shared<ZmqCore>();
-#else
-			assert(false);
+        available = true;
 #endif
-			break;
-		}
-		case HELICS_MPI:
-		{
+        break;
+    }
+    case core_type::MPI:
+    {
 #if HELICS_HAVE_MPI
-			core = std::make_shared<MpiCore>();
-#else
-			assert(false);
+        available = true;
 #endif
-			break;
-		}
-		case HELICS_TEST:
-		{
-			core = std::make_shared<TestCore>();
-			break;
-		}
-		case HELICS_INTERPROCESS:
-			core = std::make_shared<IpcCore>();
-			break;
-		default:
-			assert(false);
-		}
-		core->initialize(initializationString);
-		auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
-		if (ccore)
-		{
-			registerCommonCore(ccore);
-		}
-		return core;
-	}
+        break;
+    }
+    case core_type::TEST:
+    {
+        available = true;
+        break;
+    }
+    case core_type::INTERPROCESS:
+    {
+        available = true;
+        break;
+    }
+    default:
+        assert (false);
+    }
 
-	std::shared_ptr<Core> FindOrCreate(helics_core_type type,
-		const std::string &core_name,
-		const std::string &initializationString)
-	{
-		std::shared_ptr<Core> core = findCore(core_name);
-		if (core)
-		{
-			return core;
-		}
-		if (type == HELICS_DEFAULT)
-		{  // deal with the default type
-			if (isAvailable(HELICS_ZMQ))
-			{
-				type = HELICS_ZMQ;
-			}
-			else if (isAvailable(HELICS_INTERPROCESS))
-			{
-				type = HELICS_INTERPROCESS;
-			}
-			else
-			{
-				type = HELICS_TEST;
-			}
-		}
-		switch (type)
-		{
-		case HELICS_ZMQ:
-		{
+    return available;
+}
+
+static std::map<std::string, std::shared_ptr<CommonCore>> CoreMap;
+
+static std::mutex mapLock;  //!< lock for the broker and core maps
+
+/** so the problem this is addressing is that unregister can potentially cause a destructor to fire
+that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
+can do the unregister operation and destroy itself meaning it is unable to join and thus will call std::terminate
+what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
+need be
+without issue*/
+static std::vector<std::shared_ptr<CommonCore>> delayedDestruction;
+
+std::shared_ptr<CommonCore> findCore (const std::string &name)
+{
+    std::lock_guard<std::mutex> lock (mapLock);
+    auto fnd = CoreMap.find (name);
+    if (fnd != CoreMap.end ())
+    {
+        return fnd->second;
+    }
+    return nullptr;
+}
+
+std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
+{
+    std::lock_guard<std::mutex> lock (mapLock);
+    for (auto &cmap : CoreMap)
+    {
+        if (cmap.second->isJoinable ())
+        {
+            switch (type)
+            {
+            case core_type::ZMQ:
+            {
 #if HELICS_HAVE_ZEROMQ
-			core = std::make_shared<ZmqCore>(core_name);
-#else
-			assert(false);
+                if (dynamic_cast<ZmqCore *> (cmap.second.get ()) != nullptr)
+                {
+                    return cmap.second;
+                }
 #endif
-			break;
-		}
-		case HELICS_MPI:
-		{
+                break;
+            }
+            case core_type::MPI:
+            {
 #if HELICS_HAVE_MPI
-			core = std::make_shared<MpiCore>(core_name);
-#else
-			assert(false);
+                if (dynamic_cast<MPICore *> (cmap.second.get ()) != nullptr)
+                {
+                    return cmap.second;
+                }
 #endif
-			break;
-		}
-		case HELICS_TEST:
-		{
-			core = std::make_shared<TestCore>(core_name);
-			break;
-		}
-		case HELICS_INTERPROCESS:
-			core = std::make_shared<IpcCore>(core_name);
-			break;
-		default:
-			assert(false);
-		}
-		core->initialize(initializationString);
-		auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
-		if (ccore)
-		{
-			bool success = registerCommonCore(ccore);
-			if (!success)
-			{
-				core = findCore(core_name);
-				if (core)
-				{
-					return core;
-				}
-			}
-		}
-		return core;
-	}
+                break;
+            }
+            case core_type::TEST:
+            {
+                if (dynamic_cast<TestCore *> (cmap.second.get ()) != nullptr)
+                {
+                    return cmap.second;
+                }
+                break;
+            }
+            case core_type::INTERPROCESS:
+            {
+                if (dynamic_cast<IpcCore *> (cmap.second.get ()) != nullptr)
+                {
+                    return cmap.second;
+                }
+                break;
+            }
+            default:
+                return cmap.second;
+            }
+        }
+    }
+    return nullptr;
+}
 
-	bool isAvailable(helics_core_type type)
-	{
-		bool available = false;
+bool registerCommonCore (std::shared_ptr<CommonCore> tcore)
+{
+    std::lock_guard<std::mutex> lock (mapLock);
+    if (!delayedDestruction.empty ())
+    {
+        delayedDestruction.clear ();
+    }
+    auto res = CoreMap.emplace (tcore->getIdentifier (), std::move (tcore));
+    return res.second;
+}
 
-		switch (type)
-		{
-		case HELICS_ZMQ:
-		{
-#if HELICS_HAVE_ZEROMQ
-			available = true;
-#endif
-			break;
-		}
-		case HELICS_MPI:
-		{
-#if HELICS_HAVE_MPI
-			available = true;
-#endif
-			break;
-		}
-		case HELICS_TEST:
-		{
-			available = true;
-			break;
-		}
-		case HELICS_INTERPROCESS:
-		{
-			available = true;
-			break;
-		}
-		default:
-			assert(false);
-		}
+void cleanUpCores ()
+{
+    std::lock_guard<std::mutex> lock (mapLock);
+    delayedDestruction.clear ();
+}
 
-		return available;
-	}
+void copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName)
+{
+    std::lock_guard<std::mutex> lock (mapLock);
+    auto fnd = CoreMap.find (copyFromName);
+    if (fnd != CoreMap.end ())
+    {
+        auto newCorePtr = fnd->second;
+        CoreMap.emplace (copyToName, std::move (newCorePtr));
+    }
+}
 
-	static std::map<std::string, std::shared_ptr<CommonCore>> CoreMap;
+void unregisterCore (const std::string &name)
+{
+    std::lock_guard<std::mutex> lock (mapLock);
+    auto fnd = CoreMap.find (name);
+    if (fnd != CoreMap.end ())
+    {
+        delayedDestruction.push_back (std::move (fnd->second));
+        CoreMap.erase (fnd);
+        return;
+    }
+    for (auto core = CoreMap.begin (); core != CoreMap.end (); ++core)
+    {
+        if (core->second->getIdentifier () == name)
+        {
+            delayedDestruction.push_back (std::move (core->second));
+            CoreMap.erase (core);
+            return;
+        }
+    }
+}
 
-	static std::mutex mapLock;  //!<lock for the broker and core maps
-
-	/** so the problem this is addressing is that unregister can potentially cause a destructor to fire
-	that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
-	can do the unregister operation and destroy itself meaning it is unable to join and thus will call std::terminate
-	what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
-	need be
-	without issue*/
-	static std::vector<std::shared_ptr<CommonCore>> delayedDestruction;
-
-	std::shared_ptr<CommonCore> findCore(const std::string &name)
-	{
-		std::lock_guard<std::mutex> lock(mapLock);
-		auto fnd = CoreMap.find(name);
-		if (fnd != CoreMap.end())
-		{
-			return fnd->second;
-		}
-		return nullptr;
-	}
-
-	std::shared_ptr<Core> findJoinableCoreOfType(helics_core_type type)
-	{
-		std::lock_guard<std::mutex> lock(mapLock);
-		for (auto &cmap : CoreMap)
-		{
-			if (cmap.second->isJoinable())
-			{
-				switch (type)
-				{
-				case HELICS_ZMQ:
-				{
-#if HELICS_HAVE_ZEROMQ
-					if (dynamic_cast<ZmqCore *> (cmap.second.get()) != nullptr)
-					{
-						return cmap.second;
-					}
-#endif
-					break;
-				}
-				case HELICS_MPI:
-				{
-#if HELICS_HAVE_MPI
-					if (dynamic_cast<MPICore *> (cmap.second.get()) != nullptr)
-					{
-						return cmap.second;
-					}
-#endif
-					break;
-				}
-				case HELICS_TEST:
-				{
-					if (dynamic_cast<TestCore *> (cmap.second.get()) != nullptr)
-					{
-						return cmap.second;
-					}
-					break;
-				}
-				case HELICS_INTERPROCESS:
-				{
-					if (dynamic_cast<IpcCore *> (cmap.second.get()) != nullptr)
-					{
-						return cmap.second;
-					}
-					break;
-				}
-				default:
-					return cmap.second;
-				}
-			}
-		}
-		return nullptr;
-	}
-
-	bool registerCommonCore(std::shared_ptr<CommonCore> tcore)
-	{
-		std::lock_guard<std::mutex> lock(mapLock);
-		if (!delayedDestruction.empty())
-		{
-			delayedDestruction.clear();
-		}
-		auto res = CoreMap.emplace(tcore->getIdentifier(), std::move(tcore));
-		return res.second;
-	}
-
-	void cleanUpCores()
-	{
-		std::lock_guard<std::mutex> lock(mapLock);
-		delayedDestruction.clear();
-	}
-
-	void copyCoreIdentifier(const std::string &copyFromName, const std::string &copyToName)
-	{
-		std::lock_guard<std::mutex> lock(mapLock);
-		auto fnd = CoreMap.find(copyFromName);
-		if (fnd != CoreMap.end())
-		{
-			auto newCorePtr = fnd->second;
-			CoreMap.emplace(copyToName, std::move(newCorePtr));
-		}
-	}
-
-	void unregisterCore(const std::string &name)
-	{
-		std::lock_guard<std::mutex> lock(mapLock);
-		auto fnd = CoreMap.find(name);
-		if (fnd != CoreMap.end())
-		{
-			delayedDestruction.push_back(std::move(fnd->second));
-			CoreMap.erase(fnd);
-			return;
-		}
-		for (auto core = CoreMap.begin(); core != CoreMap.end(); ++core)
-		{
-			if (core->second->getIdentifier() == name)
-			{
-				delayedDestruction.push_back(std::move(core->second));
-				CoreMap.erase(core);
-				return;
-			}
-		}
-	}
-
-} // namespace CoreFactory
+}  // namespace CoreFactory
 }  // namespace

@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_SUITE(Node_Core_tests, *boost::unit_test::disabled())
 
 BOOST_AUTO_TEST_CASE(TestCore_node_tests)
 {
-    auto core = helics::CoreFactory::create(HELICS_TEST, "4");
+    auto core = helics::CoreFactory::create(helics::core_type::TEST, "4");
     BOOST_CHECK(core != nullptr);
     BOOST_CHECK(core->isInitialized());
 
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(TestCore_node_tests)
 
 BOOST_AUTO_TEST_CASE(ZeromqCore_node_tests)
 {
-    auto core = helics::CoreFactory::create(HELICS_ZMQ, "1");
+    auto core = helics::CoreFactory::create(helics::core_type::ZMQ, "1");
     BOOST_CHECK(core != nullptr);
     BOOST_CHECK(core->isInitialized());
 

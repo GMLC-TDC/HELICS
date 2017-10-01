@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_SUITE(heat_tranfer_tests)
 
 BOOST_AUTO_TEST_CASE(linear_tests)
 {
-	auto wcore = helics::CoreFactory::FindOrCreate(HELICS_TEST, "wallcore", "22");
+	auto wcore = helics::CoreFactory::FindOrCreate(helics::core_type::TEST, "wallcore", "22");
 	Wall w;
 	w.initialize("wallcore");
 	int blockCount = 20;

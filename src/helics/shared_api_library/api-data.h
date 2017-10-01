@@ -16,6 +16,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 typedef enum {
 	helicsOK,
 	helicsDiscard,
+	helicsWarning,
 	helicsError,
 } helicsStatus;
 
@@ -82,6 +83,7 @@ typedef struct message_t
 #define UNINTERRUPTIBLE_FLAG 2
 #define FORWARD_COMPUTE_FLAG 3
 #define TIME_AGNOSTIC_FLAG 4
+#define SOURCE_ONLY_FLAG 5
 
 
 #endif

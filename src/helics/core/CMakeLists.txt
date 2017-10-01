@@ -42,7 +42,6 @@ set (ZMQ_SOURCE_FILES
 )
 
 set(INCLUDE_FILES
-    core-c.h
     core-data.h
 	BrokerBase.h
     CoreFactory.h

@@ -10,6 +10,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "core/helics-time.h"
 #include "internal/api_objects.h"
 #include "application_api/application_api.h"
+#include "core/CoreFactory.h"
+#include "core/BrokerFactory.h"
 #include <memory>
 #include <mutex>
 #include <vector>
@@ -53,6 +55,7 @@ helicsStatus FederateInfoSetFederateName(helics_federate_info_t fi, const char *
 	}
 	auto hfi = reinterpret_cast<helics::FederateInfo *>(fi);
 	hfi->name=name;
+	return helicsOK;
 }
 helicsStatus FederateInfoSetCoreName(helics_federate_info_t fi, const char *corename)
 {
@@ -62,6 +65,7 @@ helicsStatus FederateInfoSetCoreName(helics_federate_info_t fi, const char *core
 	}
 	auto hfi = reinterpret_cast<helics::FederateInfo *>(fi);
 	hfi->coreName = corename;
+	return helicsOK;
 }
 helicsStatus FederateInfoSetCoreInitString(helics_federate_info_t fi, const char *coreinit)
 {
@@ -71,15 +75,36 @@ helicsStatus FederateInfoSetCoreInitString(helics_federate_info_t fi, const char
 	}
 	auto hfi = reinterpret_cast<helics::FederateInfo *>(fi);
 	hfi->coreInitString = coreinit;
+	return helicsOK;
 }
-helicsStatus FederateInfoSetCoreType(helics_federate_info_t fi, const char *coretype)
+
+helicsStatus FederateInfoSetCoreType(helics_federate_info_t fi, int coretype)
 {
 	if (fi == nullptr)
 	{
 		return helicsDiscard;
 	}
 	auto hfi = reinterpret_cast<helics::FederateInfo *>(fi);
-	hfi->coreType = coretype;
+	hfi->coreType = static_cast<helics::core_type>(coretype);
+	return helicsOK;
+}
+
+helicsStatus FederateInfoSetCoreTypeFromString(helics_federate_info_t fi, const char *coretype)
+{
+	if (fi == nullptr)
+	{
+		return helicsDiscard;
+	}
+	auto hfi = reinterpret_cast<helics::FederateInfo *>(fi);
+	try
+	{
+		hfi->coreType = helics::coreTypeFromString(coretype);
+	}
+	catch (const std::invalid_argument &ie)
+	{
+		return helicsError;
+	}
+	return helicsOK;
 }
 helicsStatus FederateInfoSetFlag(helics_federate_info_t fi, int flag, int value)
 {
@@ -104,6 +129,9 @@ helicsStatus FederateInfoSetFlag(helics_federate_info_t fi, int flag, int value)
 		break;
 	case TIME_AGNOSTIC_FLAG:
 		hfi->timeAgnostic = (value != 0);
+		break;
+	case SOURCE_ONLY_FLAG:
+		hfi->sourceOnly = (value != 0);
 		break;
 	default:
 		return helicsDiscard;
@@ -184,4 +212,33 @@ helicsStatus FederateInfoSetMaxIterations(helics_federate_info_t fi, int max_ite
 	auto hfi = reinterpret_cast<helics::FederateInfo *>(fi);
 	hfi->max_iterations = max_iterations;
 	return helicsOK;
+}
+
+
+helics_core helicsCreateCore(const char *type, const char *name, const char *initString)
+{
+	auto *core = new helics::coreObject;
+	core->coreptr = helics::CoreFactory::FindOrCreate(helics::coreTypeFromString(type), name, initString);
+	return reinterpret_cast<helics_core>(core);
+}
+
+helics_core helicsCreateCoreFromArgs(const char *type, const char *name, int argc, char *argv[])
+{
+	auto *core = new helics::coreObject;
+	core->coreptr = helics::CoreFactory::FindOrCreate(helics::coreTypeFromString(type), name, argc, argv);
+	return reinterpret_cast<helics_core>(core);
+}
+
+helics_broker helicsCreateBroker(const char *type, const char *name, const char *initString)
+{
+	auto broker = new helics::BrokerObject;
+	broker->brokerptr = helics::BrokerFactory::create(helics::coreTypeFromString(type), name, initString);
+	return reinterpret_cast<helics_broker>(broker);
+}
+
+helics_broker helicsCreateBrokerFromArgs(const char *type, const char *name, int argc, char *argv[])
+{
+	auto *core = new helics::coreObject;
+	core->coreptr = helics::CoreFactory::FindOrCreate(helics::coreTypeFromString(type), name, argc, argv);
+	return reinterpret_cast<helics_core>(core);
 }

@@ -30,7 +30,7 @@ helics_endpoint helicsRegisterEndpoint(helics_message_federate fed, const char *
 	{
 
 		end = new helics::EndpointObject();
-		end->endptr = std::make_shared<helics::Endpoint>(fedObj.get(), name, type);
+		end->endptr = std::make_unique<helics::Endpoint>(fedObj.get(), name, type);
 		end->fedptr = std::move(fedObj);
 		return reinterpret_cast<helics_endpoint>(end);
 	}
@@ -57,7 +57,7 @@ helics_endpoint helicsRegisterGlobalEndpoint(helics_message_federate fed, const 
 	{
 
 		end = new helics::EndpointObject();
-		end->endptr = std::make_shared<helics::Endpoint>(helics::GLOBAL, fedObj.get(), name, type);
+		end->endptr = std::make_unique<helics::Endpoint>(helics::GLOBAL, fedObj.get(), name, type);
 		end->fedptr = std::move(fedObj);
 		return reinterpret_cast<helics_endpoint>(end);
 	}
@@ -82,7 +82,7 @@ helicsStatus helicsSetDefaultDestination(helics_endpoint endpoint, const char *d
 	return helicsOK;
 }
 
-helicsStatus helicsSendMessageRaw(helics_endpoint endpoint, const char *dest, const char *data, uint64_t len)
+helicsStatus helicsSendMessageRaw(helics_endpoint endpoint, const char *dest, const char *data, int len)
 {
 	if (endpoint == nullptr)
 	{
@@ -147,17 +147,17 @@ helicsStatus helicsSubscribe(helics_endpoint endpoint, const char *name, const c
 	return helicsOK;
 }
 
-bool helicsFederateHasMessage(helics_message_federate fed)
+int helicsFederateHasMessage(helics_message_federate fed)
 {
 	if (fed == nullptr)
 	{
 		return false;
 	}
 	auto mFed = getMessageFed(fed);
-	return mFed->hasMessage();
+	return (mFed->hasMessage()) ? 1 : 0;
 }
 
-bool helicsEndpointHasMessage(helics_endpoint endpoint)
+int helicsEndpointHasMessage(helics_endpoint endpoint)
 {
 	if (endpoint == nullptr)
 	{
@@ -165,11 +165,11 @@ bool helicsEndpointHasMessage(helics_endpoint endpoint)
 	}
 
 	auto endObj = reinterpret_cast<helics::EndpointObject *>(endpoint);
-	return endObj->endptr->hasMessage();
+	return (endObj->endptr->hasMessage())?1:0;
 }
 
 
-uint64_t helicsFederateReceiveCount(helics_message_federate fed)
+int helicsFederateReceiveCount(helics_message_federate fed)
 {
 	if (fed == nullptr)
 	{

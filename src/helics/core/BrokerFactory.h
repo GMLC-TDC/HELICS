@@ -27,17 +27,17 @@ namespace BrokerFactory {
 	*
 	* Invokes initialize() on the instantiated Core object.
 	*/
-	std::shared_ptr<CoreBroker> create(helics_core_type type, const std::string &initializationString);
+	std::shared_ptr<CoreBroker> create(core_type type, const std::string &initializationString);
 
-	std::shared_ptr<CoreBroker> create(helics_core_type type, int argc, char *argv[]);
+	std::shared_ptr<CoreBroker> create(core_type type, int argc, char *argv[]);
 
-	std::shared_ptr<CoreBroker> create(helics_core_type type, const std::string &broker_name, std::string &initializationString);
-	std::shared_ptr<CoreBroker> create(helics_core_type type, const std::string &broker_name, int argc, char *argv[]);
+	std::shared_ptr<CoreBroker> create(core_type type, const std::string &broker_name, const std::string &initializationString);
+	std::shared_ptr<CoreBroker> create(core_type type, const std::string &broker_name, int argc, char *argv[]);
 
 	/**
 	* Returns true if type specified is available in current compilation.
 	*/
-	bool available(helics_core_type type);
+	bool available(core_type type);
 } //namespace BrokerFactory
 
 /** locate a coreBroker by name
@@ -56,7 +56,7 @@ bool registerBroker(std::shared_ptr<CoreBroker> tbroker);
 */
 void unregisterBroker(const std::string &name);
 /** clean up unused brokers
-@details when brokers are unregisterd they get put in a holding area that gets cleaned up when a new broker is registered
+@details when brokers are unregistered they get put in a holding area that gets cleaned up when a new broker is registered
 or when the clean up function is called this prevents some odd threading issues
 */
 void cleanUpBrokers();

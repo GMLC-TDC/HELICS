@@ -28,13 +28,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 
-std::shared_ptr<CoreBroker> makeBroker(helics_core_type type, const std::string &name)
+std::shared_ptr<CoreBroker> makeBroker(core_type type, const std::string &name)
 {
 	std::shared_ptr<CoreBroker> broker;
 
 	switch (type)
 	{
-	case HELICS_ZMQ:
+	case core_type::ZMQ:
 	{
 #if HELICS_HAVE_ZEROMQ
 		if (name.empty())
@@ -51,7 +51,7 @@ std::shared_ptr<CoreBroker> makeBroker(helics_core_type type, const std::string 
 #endif
 		break;
 	}
-	case HELICS_MPI:
+	case core_type::MPI:
 	{
 #if HELICS_HAVE_MPI
 		if (name.empty())
@@ -67,7 +67,7 @@ std::shared_ptr<CoreBroker> makeBroker(helics_core_type type, const std::string 
 #endif
 		break;
 	}
-	case HELICS_TEST:
+	case core_type::TEST:
 	{
 		if (name.empty())
 		{
@@ -79,7 +79,7 @@ std::shared_ptr<CoreBroker> makeBroker(helics_core_type type, const std::string 
 		}
 		break;
 	}
-	case HELICS_INTERPROCESS:
+	case core_type::INTERPROCESS:
 		if (name.empty())
 		{
 			broker = std::make_shared<IpcBroker>();
@@ -97,7 +97,7 @@ std::shared_ptr<CoreBroker> makeBroker(helics_core_type type, const std::string 
 
 namespace BrokerFactory
 {
-	std::shared_ptr<CoreBroker> create(helics_core_type type, const std::string &initializationString)
+	std::shared_ptr<CoreBroker> create(core_type type, const std::string &initializationString)
 	{
 		auto broker = makeBroker(type, "");
 		broker->Initialize(initializationString);
@@ -107,7 +107,7 @@ namespace BrokerFactory
 	}
 
 	std::shared_ptr<CoreBroker>
-		create(helics_core_type type, const std::string &broker_name, std::string &initializationString)
+		create(core_type type, const std::string &broker_name, const std::string &initializationString)
 	{
 		auto broker = makeBroker(type, broker_name);
 		broker->Initialize(initializationString);
@@ -119,7 +119,7 @@ namespace BrokerFactory
 		return broker;
 	}
 
-	std::shared_ptr<CoreBroker> create(helics_core_type type, int argc, char *argv[])
+	std::shared_ptr<CoreBroker> create(core_type type, int argc, char *argv[])
 	{
 		auto broker = makeBroker(type, "");
 		broker->InitializeFromArgs(argc, argv);
@@ -129,7 +129,7 @@ namespace BrokerFactory
 	}
 
 	std::shared_ptr<CoreBroker>
-		create(helics_core_type type, const std::string &broker_name, int argc, char *argv[])
+		create(core_type type, const std::string &broker_name, int argc, char *argv[])
 	{
 		auto broker = makeBroker(type, broker_name);
 		broker->InitializeFromArgs(argc, argv);
@@ -142,36 +142,41 @@ namespace BrokerFactory
 	}
 
 
-	bool available(helics_core_type type)
+	bool available(core_type type)
 	{
 		bool available = false;
 
 		switch (type)
 		{
-		case HELICS_ZMQ:
+		case core_type::ZMQ:
 		{
-#if HELICS_HAVE_ZEROMQ
+#if HELIC_HAVE_ZEROMQ
 			available = true;
 #endif
 			break;
 		}
-		case HELICS_MPI:
+		case core_type::MPI:
 		{
 #if HELICS_HAVE_MPI
 			available = true;
 #endif
 			break;
 		}
-		case HELICS_TEST:
+		case core_type::TEST:
 		{
 			available = true;
 			break;
 		}
-		case HELICS_INTERPROCESS:
+		case core_type::INTERPROCESS:
+		case core_type::IPC:
 		{
 			available = true;
 			break;
 		}
+		case core_type::TCP:
+		case core_type::UDP:
+			available = false;
+			break;
 		default:
 			assert(false);
 		}

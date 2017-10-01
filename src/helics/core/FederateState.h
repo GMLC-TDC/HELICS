@@ -148,7 +148,7 @@ private:
 
 	/** get the size of a message queue for a specific endpoint or filter handle*/
     uint64_t getQueueSize (Core::Handle id) const;
-	/** get the sum of all message queue sizes ie the total number of messages available in all endpoints*/
+	/** get the sum of all message queue sizes i.e. the total number of messages available in all endpoints*/
     uint64_t getQueueSize () const;
 	/** get the sum of all messages in filter queues*/
 	uint64_t getFilterQueueSize() const;
@@ -161,10 +161,10 @@ private:
 	@return a pointer to a message -the ownership of the message is transfered to the caller*/
     std::unique_ptr<Message> receive (Core::Handle id);
     /** get any message ready for reception
-    @param[out] id the the endpoint related to the message*/
+    @param[out] id the endpoint related to the message*/
     std::unique_ptr<Message> receiveAny (Core::Handle &id);
     /** get any message ready for processing by a filter
-    @param[out] id the the filter related to the message*/
+    @param[out] id the filter related to the message*/
     std::unique_ptr<Message> receiveAnyFilter (Core::Handle &id);
 	/** set the CommonCore object that is managing this Federate*/
 	void setParent(CommonCore *coreObject);
@@ -173,7 +173,7 @@ private:
     /** process the federate queue until returnable event
     @details processQueue will process messages until one of 3 things occur
     1.  the init state has been entered
-    2.  the executation state has been granted (or init state reentered from a iterative request)
+    2.  the execution state has been granted (or init state reentered from a iterative request)
     3.  time has been granted
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
@@ -215,9 +215,9 @@ private:
 	convergence_state waitSetup();
 	/** process until the init state has been entered or there is a failure*/
 	convergence_state enterInitState();
-    /** function to call when enterering execution state
+    /** function to call when entering execution state
 	@param converged indicator of whether the fed should iterate if need be or not
-    returns either converged or nonconverged depening on whether an iteration is needed
+    returns either converged or nonconverged depending on whether an iteration is needed
     */
     convergence_state enterExecutingState (convergence_state converged);
 	/** request a time advancement

@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 	std::string name = (vm.count("name") > 0) ? vm["name"].as<std::string>() : "";
 	std::string btype = (vm.count("type") > 0) ? vm["type"].as<std::string>() : "zmq";
 	
-	helics_core_type type;
+	helics::core_type type;
 	try
 	{
 		type = helics::coreTypeFromString(btype);

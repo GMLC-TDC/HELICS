@@ -284,6 +284,11 @@ std::string ValueFederate::getPublicationType (publication_id_t id) const
     return vfManager->getPublicationType (id);
 }
 
+std::string ValueFederate::getPublicationType(subscription_id_t id) const
+{
+	return vfManager->getPublicationType(id);
+}
+
 void ValueFederate::registerSubscriptionNotificationCallback (
   std::function<void(subscription_id_t, Time)> callback)
 {

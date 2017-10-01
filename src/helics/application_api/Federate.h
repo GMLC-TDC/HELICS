@@ -47,7 +47,7 @@ class FederateInfo
     int32_t max_iterations = 10;  //!< the maximum number of iteration cycles a federate should execute
     int32_t logLevel =
       1;  //!< the logging level for the federate (-1: none, 0: error, 1:warning,2:normal,3:debug,4:trace)
-    std::string coreType;  //!< the type of the core
+    core_type coreType;  //!< the type of the core
     std::string coreName;  //!< the name of the core
     Time timeDelta = timeZero;  //!< the minimum time between granted time requests
     Time lookAhead = timeZero;  //!< the lookahead value
@@ -62,8 +62,8 @@ class FederateInfo
     /** construct from the federate name*/
     FederateInfo (std::string fedname) : name (fedname){};
     /** construct from the name and type*/
-    FederateInfo (std::string fedname, std::string cType)
-        : name (std::move (fedname)), coreType (std::move (cType)){};
+    FederateInfo (std::string fedname, core_type cType)
+        : name (std::move (fedname)), coreType (cType){};
 };
 
 class Core;
@@ -92,7 +92,7 @@ class Federate
     std::atomic<op_states> state{op_states::startup};  //!< the current state of the simulation
     char separator_ = '/';  //!< the separator between automatically prependend names
   private:
-    unsigned int fedID = (unsigned int)(-1);
+    int32_t fedID = -2'000'000'000;
 
   protected:
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API

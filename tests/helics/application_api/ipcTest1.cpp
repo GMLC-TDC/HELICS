@@ -27,7 +27,7 @@ int main(int, char**)
 
     auto init_string = std::string("2 --name=stevebroker");
     auto broker = helics::BrokerFactory::create(
-        helics_core_type::HELICS_INTERPROCESS,
+        helics::core_type::INTERPROCESS,
         init_string);
 
     std::cout << "created broker \"" << broker->getIdentifier()
@@ -42,7 +42,7 @@ int main(int, char**)
     std::ofstream ofs("TestA.log");
 
     helics::FederateInfo fed_info("TestA Federate");
-    fed_info.coreType = "ipc";
+    fed_info.coreType = helics::core_type::IPC;
     fed_info.coreInitString = "--broker=stevebroker --federates 1";
     fed_info.timeDelta = delta_t;
 	fed_info.logLevel = 5;

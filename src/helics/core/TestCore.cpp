@@ -75,7 +75,7 @@ bool TestCore::brokerConnect ()
         tbroker = findBroker (brokerName);
         if (!tbroker)
         {
-            tbroker = BrokerFactory::create (helics_core_type::HELICS_TEST, brokerName, brokerInitString);
+            tbroker = BrokerFactory::create (core_type::TEST, brokerName, brokerInitString);
         }
     }
     if (tbroker)

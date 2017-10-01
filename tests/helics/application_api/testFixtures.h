@@ -74,8 +74,7 @@ struct FederateTestFixture
 
         std::string initString = std::string("--broker=") + broker->getIdentifier() + " --broker_address=" + broker->getAddress() + " --federates " + std::to_string(count);
 
-        helics::FederateInfo fi("");
-        fi.coreType = core_type_name;
+        helics::FederateInfo fi("", helics::coreTypeFromString(core_type_name));
         fi.timeDelta = time_delta;
 
         std::vector<std::shared_ptr<FedType>> federates_added;

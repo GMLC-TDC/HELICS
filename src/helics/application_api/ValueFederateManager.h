@@ -46,6 +46,7 @@ namespace helics
 		std::string name;  //!< subscription name
 		std::string type; //!< subscription type
 		std::string units; //!< subscription units
+		std::string pubtype; //!< the listed type of the corresponding publication
 		Core::Handle coreID; //!< Handle from the core
 		subscription_id_t id=0;  //!< the id used as the identifier
 		Time lastUpdate = Time(0.0); //!< the time the subscription was last updated
@@ -156,6 +157,11 @@ namespace helics
 		@param[in] id the publication id to query
 		@return the type or empty string on unrecognized id*/
 		std::string getPublicationType(publication_id_t id) const;
+
+		/** get the type of a publication from its subscription
+		@param[in] id the subscription id to query
+		@return the type or empty string on unrecognized id*/
+		std::string getPublicationType(subscription_id_t id) const;
 
 		/** register a callback function to call when any subscribed value is updated
 		@details there can only be one generic callback

@@ -31,7 +31,7 @@ static const argDescriptors extraArgs{
 
 bool matchingTypes (const std::string &type1, const std::string &type2);
 
-CoreBroker::~CoreBroker ()=default;
+CoreBroker::~CoreBroker () = default;
 
 void CoreBroker::setIdentifier (const std::string &name)
 {
@@ -932,7 +932,7 @@ bool CoreBroker::FindandNotifySubscriptionPublisher (BasicHandleInfo &handleInfo
             m.source_handle = pubInfo.id;
             m.dest_id = handleInfo.fed_id;
             m.dest_handle = handleInfo.id;
-
+			m.payload = pubInfo.type;
             transmit (getRoute (m.dest_id), m);
 
             // notify the publisher about its subscription
@@ -962,25 +962,24 @@ void CoreBroker::FindandNotifyPublicationSubscribers (BasicHandleInfo &handleInf
         }
         if (!matchingTypes (subInfo.type, handleInfo.type))
         {
-            // LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
-            // pubInfo->type << ENDL;
+			LOG_WARNING(global_broker_id, handleInfo.key, std::string("types do not match ") + handleInfo.type + " vs " + subInfo.type);
         }
-        // notify the subscription about its publisher
+        // notify the publication about its subscriber
         ActionMessage m (CMD_NOTIFY_SUB);
         m.source_id = subInfo.fed_id;
         m.source_handle = subInfo.id;
         m.dest_id = handleInfo.fed_id;
         m.dest_handle = handleInfo.id;
-
+		
         transmit (getRoute (m.dest_id), m);
 
-        // notify the publisher about its subscription
+        // notify the subscriber about its publisher
         m.setAction (CMD_NOTIFY_PUB);
         m.source_id = handleInfo.fed_id;
         m.source_handle = handleInfo.id;
         m.dest_id = subInfo.fed_id;
         m.dest_handle = subInfo.id;
-
+		m.payload = handleInfo.type;
         transmit (getRoute (m.dest_id), m);
         subInfo.processed = true;
     }

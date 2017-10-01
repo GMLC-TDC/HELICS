@@ -12,14 +12,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include <string>
 
-enum helics_core_type
-{
-	HELICS_ZMQ,
-	HELICS_MPI,
-	HELICS_TEST,
-	HELICS_INTERPROCESS,
-	HELICS_DEFAULT,
-};
+
 
 enum helics_federate_state_type
 {
@@ -46,10 +39,24 @@ enum helics_time_unit
 
 namespace helics
 {
+
+	enum class core_type:int
+	{
+		DEFAULT=0,
+		ZMQ=1,
+		MPI=2,
+		TEST=3,
+		INTERPROCESS=4,
+		IPC=5,
+		TCP=6,
+		UDP=7,
+		UNRECOGNIZED=8,
+		
+	};
 /** enumeration of the possible states of convergence*/
 enum class convergence_state :signed char
 {
-	error = -5,		//!< indicator that an error has occured
+	error = -5,		//!< indicator that an error has occurred
 	continue_processing = -1, //!< the current loop should continue
 	complete = 0,  //!< indicator that the iterations have completed
 	nonconverged = 1,	//!< indicator that the iterations need to continue
@@ -72,7 +79,7 @@ enum class handle_check_mode : char
 @return a value of the helics_core_type enumeration
 @throws invalid_argument if the string is not recognized
 */
-helics_core_type coreTypeFromString(const std::string &type);
+core_type coreTypeFromString(const std::string &type);
 
 }
 

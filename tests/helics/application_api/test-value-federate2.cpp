@@ -240,7 +240,7 @@ BOOST_DATA_TEST_CASE (test_move_calls, bdata::make (core_types), core_type)
 {
     helics::ValueFederate vFed;
 
-    helics::FederateInfo fi ("test1", core_type);
+    helics::FederateInfo fi ("test1", helics::coreTypeFromString(core_type));
     fi.coreInitString = "3";
     vFed = helics::ValueFederate (fi);
     BOOST_CHECK (vFed.getName () == "test1");

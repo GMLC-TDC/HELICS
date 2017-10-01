@@ -3,216 +3,219 @@
 Copyright (C) 2017, Battelle Memorial Institute
 All rights reserved.
 
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
 #ifndef _HELICS_SUBSCRIPTION_H_
 #define _HELICS_SUBSCRIPTION_H_
 #pragma once
 
+#include "HelicsPrimaryTypes.h"
 #include "ValueFederate.h"
+#include "helicsTypes.hpp"
 #include <algorithm>
 #include <array>
-#include "HelicsPrimaryTypes.h"
-#include "helicsTypes.hpp"
 #include <boost/lexical_cast.hpp>
 namespace helics
 {
-
 // template<class X, typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, bool>::type>
 class Subscription
 {
-public:
-	
-private:
-	ValueFederate *fed = nullptr;  //!< reference to the value federate
-	std::string key_;  //!< the name of the subscription
-	std::string units_;  //!< the defined units of the federate
-	boost::variant<std::function<void(const std::string &, Time)>,
-		std::function<void(const double &, Time)>,
-		std::function<void(const int64_t &, Time)>,
-		std::function<void(const std::complex<double> &, Time)>,
-		std::function<void(const std::vector<double> &, Time)>> value_callback;  //!< callback function for the federate
-	subscription_id_t id;  //!< the id of the federate
-	helicsType_t type;  //!< the underlying type the publication is using
-	defV lastValue; //!< the last value updated
-public:
-	Subscription() noexcept {};
+  public:
+  private:
+    ValueFederate *fed = nullptr;  //!< reference to the value federate
+    std::string key_;  //!< the name of the subscription
+    std::string units_;  //!< the defined units of the federate
+    boost::variant<std::function<void(const std::string &, Time)>,
+                   std::function<void(const double &, Time)>,
+                   std::function<void(const int64_t &, Time)>,
+                   std::function<void(const std::complex<double> &, Time)>,
+                   std::function<void(const std::vector<double> &, Time)>>
+      value_callback;  //!< callback function for the federate
+    subscription_id_t id;  //!< the id of the federate
+    mutable helicsType_t type = helicsType_t::helicsInvalid;  //!< the underlying type the publication is using
+    defV lastValue;  //!< the last value updated
+  public:
+    Subscription () noexcept {};
 
-	Subscription(ValueFederate *valueFed, std::string key, std::string units = "")
-		: fed(valueFed), key_(std::move(key)), units_(std::move(units))
-	{
-		id = fed->registerRequiredSubscription(key_, "def", units_);
-	}
+    Subscription (ValueFederate *valueFed, std::string key, std::string units = "")
+        : fed (valueFed), key_ (std::move (key)), units_ (std::move (units))
+    {
+        id = fed->registerRequiredSubscription (key_, "def", units_);
+    }
 
-	
-	Subscription(bool required, ValueFederate *valueFed, std::string key, std::string units = "")
-		: fed(valueFed), key_(std::move(key)), units_(std::move(units))
-	{
-		if (required)
-		{
-			id = fed->registerRequiredSubscription(key_, "def", units_);
-		}
-		else
-		{
-			id = fed->registerOptionalSubscription(key_, "def", units_);
-		}
-	}
-	/** get the time of the last update
-	@return the time of the last update
-	*/
-	Time getLastUpdate() const { return fed->getLastUpdateTime(id); }
-	/** check if the value has subscription has been updated*/
-	bool isUpdated() const { return fed->isUpdated(id); }
-	subscription_id_t getID() const
-	{
-		return id;
-	}
-	/** store the value in the given variable
-	@param[out] out the location to store the value
-	*/
-	template <class X>
-	void getValue(typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, X>::type &out) const
-	{
-		if (fed->isUpdated(id))
-		{
-			auto dv = fed->getValueRaw(id);
-			valueExtract(dv, type, out);
-			lastValue = out;
-		}
-		else
-		{
-			valueExtract(lastValue, out);
-		}
-	}
-	/** get the most recent value
-	@return the value*/
-	template <class X>
-	typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, X>::type getValue() const 
-	{ 
-		X val;
-		getValue(val);
-		return val;
-	}
-	
-	/** register a callback for the update
-	@details the callback is called in the just before the time request function returns
-	@param[in] callback a function with signature void(X val, Time time)
-	val is the new value and time is the time the value was updated
-	*/
-	template<class X, typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, bool>::type>
-	void registerCallback(std::function<void(const X &, Time)> callback)
-	{
-		value_callback = callback;
-		fed->registerSubscriptionNotificationCallback(id, [=](subscription_id_t, Time time) { handleCallback(time); });
-	}
-	/** register a callback for an update notification
-	@details the callback is called in the just before the time request function returns
-	@param[in] callback a function with signature void( Time time)
-	time is the time the value was updated  This callback is a notification callback and doesn't return the value
-	*/
-	void registerCallback(std::function<void(Time)> callback)
-	{
-		fed->registerSubscriptionNotificationCallback(id, [=](subscription_id_t, Time time) { callback(time); });
-	}
+    Subscription (bool required, ValueFederate *valueFed, std::string key, std::string units = "")
+        : fed (valueFed), key_ (std::move (key)), units_ (std::move (units))
+    {
+        if (required)
+        {
+            id = fed->registerRequiredSubscription (key_, "def", units_);
+        }
+        else
+        {
+            id = fed->registerOptionalSubscription (key_, "def", units_);
+        }
+    }
+    /** get the time of the last update
+    @return the time of the last update
+    */
+    Time getLastUpdate () const { return fed->getLastUpdateTime (id); }
+    /** check if the value has subscription has been updated*/
+    bool isUpdated () const { return fed->isUpdated (id); }
+    subscription_id_t getID () const { return id; }
+    /** store the value in the given variable
+    @param[out] out the location to store the value
+    */
+    template <class X>
+    typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, void>::type getValue (X &out)
+    {
+        if (fed->isUpdated (id))
+        {
+            auto dv = fed->getValueRaw (id);
+            if (type == helicsType_t::helicsInvalid)
+            {
+                type = getTypeFromString (fed->getPublicationType (id));
+            }
+            valueExtract (dv, type, out);
+            lastValue = out;
+        }
+        else
+        {
+            valueExtract (lastValue, out);
+        }
+    }
+    /** get the most recent value
+    @return the value*/
+    template <class X>
+    typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, X>::type getValue ()
+    {
+        X val;
+        getValue (val);
+        return val;
+    }
 
-	template<class X, typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, bool>::type>
-	void setDefault(const X &val)
-	{
-		lastValue = val;
-	}
-private:
-	void handleCallback(Time time);
+    /** register a callback for the update
+    @details the callback is called in the just before the time request function returns
+    @param[in] callback a function with signature void(X val, Time time)
+    val is the new value and time is the time the value was updated
+    */
+    template <class X>
+    typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, void>::type
+    registerCallback (std::function<void(const X &, Time)> callback)
+    {
+        value_callback = callback;
+        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) {
+            handleCallback (time);
+        });
+    }
+    /** register a callback for an update notification
+    @details the callback is called in the just before the time request function returns
+    @param[in] callback a function with signature void( Time time)
+    time is the time the value was updated  This callback is a notification callback and doesn't return the value
+    */
+    void registerCallback (std::function<void(Time)> callback)
+    {
+        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) { callback (time); });
+    }
 
+    template <class X>
+    typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, void>::type setDefault (const X &val)
+    {
+        lastValue = val;
+    }
+
+  private:
+    void handleCallback (Time time);
 };
 
+void valueExtract (const defV &dv, std::string &val);
 
-void valueExtract(const defV &dv, std::string &val);
+void valueExtract (const defV &dv, std::complex<double> &val);
 
-void valueExtract(const defV &dv, std::complex<double> &val);
+void valueExtract (const defV &dv, std::vector<double> &val);
 
-void valueExtract(const defV &dv, std::vector<double> &val);
+void valueExtract (const data_view &dv, helicsType_t baseType, std::string &val);
 
-void valueExtract(const data_view &dv, helicsType_t baseType, std::string &val);
+void valueExtract (const data_view &dv, helicsType_t baseType, std::vector<double> &val);
 
-void valueExtract(const data_view &dv, helicsType_t baseType, std::vector<double> &val);
-
-void valueExtract(const data_view &dv, helicsType_t baseType, std::complex<double> &val);
+void valueExtract (const data_view &dv, helicsType_t baseType, std::complex<double> &val);
 
 /** assume it is some numeric type (int or double)*/
-template<class X>
-void valueExtract(const defV &dv, X &val)
+template <class X>
+void valueExtract (const defV &dv, X &val)
 {
-	switch (dv.which())
-	{
-	case stringLoc: //string
-	default:
-		val=boost::lexical_cast<X>(boost::get<std::string>(dv));
-		break;
-	case doubleLoc: //double
-		val=static_cast<X>(boost::get<double>(dv));
-		break;
-	case intLoc: //int64_t
-		val=static_cast<X>(boost::get<int64_t>(dv));
-		break;
-	case complexLoc: //complex
-		val=static_cast<X>(std::abs(boost::get<std::complex<double>>(dv)));
-		break;
-	case vectorLoc: //vector
-	{
-		auto &vec = boost::get<std::vector<double>>(dv);
-		if (!vec.empty())
-		{
-			val = static_cast<X>(vec.front());
-		}
-		else
-		{
-			val = static_cast<X>(-1e49);
-		}
-		break;
-	}
-	}
+    switch (dv.which ())
+    {
+    case stringLoc:  // string
+    default:
+        val = boost::lexical_cast<X> (boost::get<std::string> (dv));
+        break;
+    case doubleLoc:  // double
+        val = static_cast<X> (boost::get<double> (dv));
+        break;
+    case intLoc:  // int64_t
+        val = static_cast<X> (boost::get<int64_t> (dv));
+        break;
+    case complexLoc:  // complex
+        val = static_cast<X> (std::abs (boost::get<std::complex<double>> (dv)));
+        break;
+    case vectorLoc:  // vector
+    {
+        auto &vec = boost::get<std::vector<double>> (dv);
+        if (!vec.empty ())
+        {
+            val = static_cast<X> (vec.front ());
+        }
+        else
+        {
+            val = static_cast<X> (-1e49);
+        }
+        break;
+    }
+    }
 }
 
 /** assume it is some numeric type (int or double)*/
-template<class X>
-void valueExtract(const data_view &dv, helicsType_t baseType, X &val)
+template <class X>
+void valueExtract (const data_view &dv, helicsType_t baseType, X &val)
 {
-	switch (baseType)
-	{
-	case helicsType_t::helicsString:
-	{
-		val = boost::lexical_cast<X>(dv.string());
-		break;
-	}
-	case helicsType_t::helicsDouble:
-	{
-		auto V = ValueConverter<double>::interpret(dv);
-		val = static_cast<X>(V);
-		break;
-	}
-	case helicsType_t::helicsInt:
-	{
-		auto V = ValueConverter<int64_t>::interpret(dv);
-		val = static_cast<X>(V);
-		break;
-	}
-	
-	case helicsType_t::helicsVector:
-	{
-		auto V = ValueConverter<std::vector<double>>::interpret(dv);
-		val = static_cast<X>(V[0]);
-		break;
-	}
-	case helicsType_t::helicsComplex:
-	{
-		auto V = ValueConverter<std::complex<double>>::interpret(dv);
-		val = static_cast<X>(std::abs(V));
-		break;
-	}
-	case helicsType_t::helicsInvalid:
-		break;
-	}
+    switch (baseType)
+    {
+    case helicsType_t::helicsString:
+    {
+        val = boost::lexical_cast<X> (dv.string ());
+        break;
+    }
+    case helicsType_t::helicsDouble:
+    {
+        auto V = ValueConverter<double>::interpret (dv);
+        val = static_cast<X> (V);
+        break;
+    }
+    case helicsType_t::helicsInt:
+    {
+        auto V = ValueConverter<int64_t>::interpret (dv);
+        val = static_cast<X> (V);
+        break;
+    }
+
+    case helicsType_t::helicsVector:
+    {
+        auto V = ValueConverter<std::vector<double>>::interpret (dv);
+        val = static_cast<X> (V[0]);
+        break;
+    }
+    case helicsType_t::helicsComplex:
+    {
+        auto V = ValueConverter<std::complex<double>>::interpret (dv);
+        val = static_cast<X> (std::abs (V));
+        break;
+    }
+    case helicsType_t::helicsInvalid:
+        break;
+    }
 }
 
 /** class to handle a subscription
@@ -226,6 +229,7 @@ class SubscriptionT
     std::string m_units;  //!< the defined units of the federate
     std::function<void(X, Time)> value_callback;  //!< callback function for the federate
     subscription_id_t id;  //!< the id of the federate
+    helicsType_t type = helicsType_t::helicsInvalid;  //!< the underlying type the publication is using
   public:
     SubscriptionT () noexcept {}
     /**constructor to build a subscription object
@@ -278,7 +282,9 @@ class SubscriptionT
     void registerCallback (std::function<void(X, Time)> callback)
     {
         value_callback = callback;
-        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) { handleCallback (time); });
+        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) {
+            handleCallback (time);
+        });
     }
     /** register a callback for an update notification
     @details the callback is called in the just before the time request function returns
@@ -287,12 +293,10 @@ class SubscriptionT
     */
     void registerCallback (std::function<void(Time)> callback)
     {
-        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) { callback(time); });
+        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) { callback (time); });
     }
-	subscription_id_t getID() const
-	{
-		return id;
-	}
+    subscription_id_t getID () const { return id; }
+
   private:
     void handleCallback (Time time)
     {
@@ -301,7 +305,6 @@ class SubscriptionT
         value_callback (out, time);
     }
 };
-
 
 /** class to handle a Vector Subscription
 @tparam X the class of the value associated with the vector subscription*/
@@ -371,8 +374,7 @@ class VectorSubscription
     }
     /** move constructor*/
     VectorSubscription (VectorSubscription &&vs) noexcept
-        : fed (vs.fed), m_name (std::move (vs.m_name)),
-          m_units (std::move (vs.m_units)), ids (std::move (vs.ids)),
+        : fed (vs.fed), m_name (std::move (vs.m_name)), m_units (std::move (vs.m_units)), ids (std::move (vs.ids)),
           update_callback (std::move (vs.update_callback)), vals (std::move (vs.vals))
     {
         // need to transfer the callback to the new object
@@ -516,8 +518,7 @@ class VectorSubscription2d
     }
     /** move constructor*/
     VectorSubscription2d (VectorSubscription2d &&vs) noexcept
-        : fed (vs.fed), m_name (std::move (vs.m_name)),
-          m_units (std::move (vs.m_units)),ids (std::move (vs.ids)),
+        : fed (vs.fed), m_name (std::move (vs.m_name)), m_units (std::move (vs.m_units)), ids (std::move (vs.ids)),
           update_callback (std::move (vs.update_callback)), vals (std::move (vs.vals))
     {
         indices = vs.indices;
@@ -578,5 +579,5 @@ class VectorSubscription2d
     }
 };
 
-} //namespace helics
+}  // namespace helics
 #endif

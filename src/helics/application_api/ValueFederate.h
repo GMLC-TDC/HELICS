@@ -404,6 +404,11 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return the type or empty string on unrecognized id*/
     std::string getPublicationType (publication_id_t id) const;
 
+	/** get the type of the publication of a particular subscription
+	@param[in] id the subscription id to query
+	@return the type or empty string on unrecognized id*/
+	std::string getPublicationType(subscription_id_t id) const;
+
     /** register a callback function to call when any subscribed value is updated
     @details there can only be one generic callback
     @param[in] callback the function to call signature void(subscription_id_t, Time)

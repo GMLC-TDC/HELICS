@@ -23,6 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <cassert>
 #include <fstream>
+#include <iostream>
 
 namespace helics
 {
@@ -45,18 +46,18 @@ CoreFederateInfo generateCoreInfo (const FederateInfo &fi)
 
 Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
 {
-    auto ctype = coreTypeFromString (fi.coreType);
+   
     if (fi.coreName.empty ())
     {
-        coreObject = CoreFactory::findJoinableCoreOfType (ctype);
+        coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
         if (!coreObject)
         {
-            coreObject = CoreFactory::create (ctype, fi.coreInitString);
+            coreObject = CoreFactory::create (fi.coreType, fi.coreInitString);
         }
     }
     else
     {
-        coreObject = CoreFactory::FindOrCreate (ctype, fi.coreName, fi.coreInitString);
+        coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, fi.coreInitString);
     }
     if (!coreObject)
     {
@@ -77,18 +78,17 @@ Federate::Federate (std::shared_ptr<Core> core, const FederateInfo &fi)
 {
     if (!coreObject)
     {
-        auto ctype = coreTypeFromString (fi.coreType);
         if (fi.coreName.empty ())
         {
-            coreObject = CoreFactory::findJoinableCoreOfType (ctype);
+            coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
             if (!coreObject)
             {
-                coreObject = CoreFactory::create (ctype, fi.coreInitString);
+                coreObject = CoreFactory::create (fi.coreType, fi.coreInitString);
             }
         }
         else
         {
-            coreObject = CoreFactory::FindOrCreate (ctype, fi.coreName, fi.coreInitString);
+            coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, fi.coreInitString);
         }
     }
 
@@ -710,7 +710,14 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     }
     if (doc.isMember ("coreType"))
     {
-        fi.coreType = doc["coreType"].asString ();
+		try
+		{
+			fi.coreType = coreTypeFromString(doc["coreType"].asString());
+		}
+		catch (const std::invalid_argument &ia)
+		{
+			std::cerr << "Unrecognized core type\n";
+		}
     }
     if (doc.isMember ("coreName"))
     {

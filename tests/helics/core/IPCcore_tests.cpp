@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(ipcComm_transmit_add_route)
 BOOST_AUTO_TEST_CASE(ipccore_initialization_test)
 {
 	std::string initializationString = "1 --broker_address=testbroker --name=core1";
-	auto  core = helics::CoreFactory::create(HELICS_INTERPROCESS, initializationString);
+	auto  core = helics::CoreFactory::create(helics::core_type::INTERPROCESS, initializationString);
 
 	BOOST_REQUIRE(core != nullptr);
 	BOOST_CHECK(core->isInitialized());
@@ -214,9 +214,9 @@ BOOST_AUTO_TEST_CASE(ipcCore_core_broker_default_test)
 {
 	std::string initializationString = "1";
 
-	auto  broker = helics::BrokerFactory::create(HELICS_INTERPROCESS, initializationString);
+	auto  broker = helics::BrokerFactory::create(helics::core_type::INTERPROCESS, initializationString);
 
-	auto  core = helics::CoreFactory::create(HELICS_INTERPROCESS, initializationString);
+	auto  core = helics::CoreFactory::create(helics::core_type::INTERPROCESS, initializationString);
 	bool connected = broker->isConnected();
 	BOOST_CHECK(connected);
 	connected = core->connect();

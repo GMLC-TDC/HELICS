@@ -65,7 +65,7 @@ namespace helics
 	class SubscriptionObject
 	{
 	public:
-		std::shared_ptr<Subscription> subptr;
+		std::unique_ptr<Subscription> subptr;
 		subscription_id_t id;
 		bool rawOnly = false;
 		std::shared_ptr<ValueFederate> fedptr;
@@ -74,7 +74,7 @@ namespace helics
 	class PublicationObject
 	{
 	public:
-		std::shared_ptr<Publication> pubptr;
+		std::unique_ptr<Publication> pubptr;
 		publication_id_t id;
 		bool rawOnly = false;
 		std::shared_ptr<ValueFederate> fedptr;
@@ -83,7 +83,7 @@ namespace helics
 	class EndpointObject
 	{
 	public:
-		std::shared_ptr<Endpoint> endptr;
+		std::unique_ptr<Endpoint> endptr;
 		std::shared_ptr<MessageFederate> fedptr;
 		std::unique_ptr<Message> lastMessage;
 	};
@@ -91,14 +91,14 @@ namespace helics
 	class SourceFilterObject
 	{
 	public:
-		std::shared_ptr<Filter> filtptr;
+		std::unique_ptr<Filter> filtptr;
 		std::shared_ptr<MessageFilterFederate> fedptr;
 	};
 
 	class DestFilterObject
 	{
 	public:
-		std::shared_ptr<Filter> subptr;
+		std::unique_ptr<Filter> subptr;
 		std::shared_ptr<MessageFilterFederate> fedptr;
 	};
 }

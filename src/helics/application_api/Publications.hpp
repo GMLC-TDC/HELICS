@@ -66,30 +66,7 @@ class Publication
             id = fed->registerPublication (m_name, typeNameStringRef (type), m_units);
         }
     }
-    /**constructor to build a publication object
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the subscription
-    @param[in] units the units associated with a Federate
-    */
-    template <class X, typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, bool>::type>
-    Publication (ValueFederate *valueFed, std::string name, std::string units = "")
-        : fed (valueFed), type (helicsType<X>), m_name (std::move (name)), m_units (std::move (units))
-    {
-        id = fed->registerPublication (m_name, typeNameStringRef (type), m_units);
-    }
-    /**constructor to build a publication object
-    @param locality  set to global for a global publication or local for a local one
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the subscription
-    @param[in] units the units associated with a Federate
-    */
-    template <class X, typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, bool>::type>
-    Publication (interface_visibility locality, ValueFederate *valueFed, std::string name, std::string units = "")
-        : fed (valueFed), type (helicsType<X>), m_name (std::move (name)), m_units (std::move (units))
-    {
-        id = (locality == GLOBAL) ? fed->registerGlobalPublication (m_name, typeNameStringRef (type), m_units) :
-                                    fed->registerPublication (m_name, typeNameStringRef (type), m_units);
-    }
+
     /** send a value for publication
     @param[in] val the value to publish*/
     void publish (double val) const;
@@ -117,6 +94,22 @@ class Publication
     bool changeDetected (int64_t val) const;
 };
 
+template <class X>
+typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, std::unique_ptr<Publication>>::type
+make_publication (ValueFederate *valueFed, const std::string &name, const std::string &units = "")
+{
+    return std::make_unique<Publication> (valueFed, helicsType<X>(), name, units);
+}
+
+template <class X>
+typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, std::unique_ptr<Publication>>::type make_publication (interface_visibility locality,
+                                               ValueFederate *valueFed,
+                                               const std::string &name,
+                                               const std::string &units = "")
+{
+   return std::make_unique<Publication> (locality, valueFed, helicsType<X>(), name, units);
+}
+
 /** class to handle a publication */
 template <class X>
 class PublicationT
@@ -127,7 +120,7 @@ class PublicationT
     std::string m_units;  //!< the defined units of the publication
     publication_id_t id;  //!< the internal id of the publication
   public:
-	  PublicationT() = default;
+    PublicationT () = default;
     /**constructor to build a publication object
     @param[in] valueFed  the ValueFederate to use
     @param[in] name the name of the subscription
@@ -178,7 +171,7 @@ class PublicationOnChange : public PublicationT<X>
     X publishDelta;  //!< the delta on which to publish a value
     mutable X prev;  //!< the previous value
   public:
-	  PublicationOnChange() = default;
+    PublicationOnChange () = default;
     /**constructor to build a publishOnChange object
     @param[in] valueFed  the ValueFederate to use
     @param[in] name the name of the subscription
@@ -205,6 +198,5 @@ class PublicationOnChange : public PublicationT<X>
         }
     }
 };
-
 }
 #endif

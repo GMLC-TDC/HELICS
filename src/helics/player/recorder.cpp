@@ -134,7 +134,15 @@ int main (int argc, char *argv[])
 		}
 
 		helics::FederateInfo fi(name);
-		fi.coreType = corename;
+		try
+		{
+			fi.coreType = helics::coreTypeFromString(corename);
+		}
+		catch (std::invalid_argument &ia)
+		{
+			std::cerr << "Unrecognized core type\n";
+			return (-1);
+		}
 		fi.coreInitString = "2";
 		if (vm.count("coreinit") > 0)
 		{

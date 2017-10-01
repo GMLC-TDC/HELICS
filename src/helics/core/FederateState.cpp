@@ -828,12 +828,23 @@ convergence_state FederateState::processActionMessage (ActionMessage &cmd)
         setState (HELICS_ERROR);
         return convergence_state::error;
     case CMD_REG_PUB:
+	{
+		auto subI = getSubscription(cmd.dest_handle);
+		if (subI != nullptr)
+		{
+			subI->target = { cmd.source_id, cmd.source_handle };
+			subI->pubType = cmd.info().type;
+			addDependency(cmd.source_id);
+		}
+	}
+	break;
     case CMD_NOTIFY_PUB:
     {
         auto subI = getSubscription (cmd.dest_handle);
         if (subI != nullptr)
         {
             subI->target = {cmd.source_id, cmd.source_handle};
+			subI->pubType =cmd.payload;
             addDependency (cmd.source_id);
         }
     }

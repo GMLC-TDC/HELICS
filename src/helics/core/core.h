@@ -58,7 +58,7 @@ public:
 	bool uninteruptible =
 		false;  //!< flag indicating that the federate should never return a time other than requested
 	bool time_agnostic = false;  //!< flag indicating that the federate does not participate in time advancement and should be ignored in all timeRequest operations
-	bool source_only = false;   //!< flag indicating that the federate does not recieve or do anything with received information.  
+	bool source_only = false;   //!< flag indicating that the federate does not receive or do anything with received information.  
 								//4 byte gap
 	bool filter_only = false; //!< flag indicating that the source filter federate is not modifying the destination of a filtered message only time or content
 							  //there is 1 bytes undefined in this structure
@@ -285,7 +285,7 @@ class Core
     /**
      * Set the lookahead time for the specified federate.
      *
-     * The value is used to determine the interaction amongs various federates as to
+     * The value is used to determine the interaction amongst various federates as to
      * when a specific federate can influence another
      * \param federateId  the identifier for the federate
      * \param timeLookAhead
@@ -294,7 +294,7 @@ class Core
 	/**
 	* Set the period for a specified federate.
 	*
-	* The value is used to determine the interaction amongs various federates as to
+	* The value is used to determine the interaction amongst various federates as to
 	* when a specific federate can influence another
 	* \param federateId  the identifier for the federate
 	* \param timeLookAhead
@@ -313,7 +313,7 @@ class Core
 	/**
 	* Set the ImpactWindow time.
 	*
-	* The value is used to determine the interaction amongs various federates as to
+	* The value is used to determine the interaction amongst various federates as to
 	* when a specific federate can influence another
 	* \param federateId  the identifier for the federate
 	* \param timeImpact the length of time it take outside message to propagate into a federate
@@ -367,6 +367,9 @@ class Core
 
     /**
      * Returns type for specified handle.
+	 @details for endpoints, publications, and filters, this is the input type
+	 for subscriptions this is the type of the publication(if available)  
+	 @param handle the handle from the publication, subscription, endpoint or filter
      */
     virtual const std::string &getType (Handle handle) const= 0;
 
@@ -443,7 +446,7 @@ class Core
 	/**
 	* add a time dependency between federates
 	* @details this function is primarily useful for Message federates which do not otherwise restrict the dependencies
-	* adding a dependency gives additional information to the core that the specifed federate(given by id) will be sending Messages to
+	* adding a dependency gives additional information to the core that the specified federate(given by id) will be sending Messages to
 	the named Federate(by federateName)
 	@param[in] federateId  the identifier for the federate
 	@param[in] federateName the name of the dependent federate

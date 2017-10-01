@@ -31,16 +31,25 @@ namespace CoreFactory {
    *
    * Invokes initialize() on the instantiated Core object.
    */
-  std::shared_ptr<Core> create (helics_core_type type, const std::string &initializationString);
+	std::shared_ptr<Core> create(core_type type, const std::string &initializationString);
+
+	std::shared_ptr<Core> create(core_type type, int argc, char *argv[]);
+
+	std::shared_ptr<Core> create(core_type type, const std::string &core_name, std::string &initializationString);
+	std::shared_ptr<Core> create(core_type type, const std::string &core_name, int argc, char *argv[]);
   /** tries to find a named core if it fails it creates a new one
   */
-  std::shared_ptr<Core> FindOrCreate(helics_core_type type, const std::string &coreName, const std::string &initializationString);
+  std::shared_ptr<Core> FindOrCreate(core_type type, const std::string &coreName, const std::string &initializationString);
+
+  /** tries to find a named core if it fails it creates a new one
+  */
+  std::shared_ptr<Core> FindOrCreate(core_type type, const std::string &coreName, int argc, char *argv[]);
   /** try to find a joinable core of a specific type*/
-  std::shared_ptr<Core> findJoinableCoreOfType(helics_core_type type);
+  std::shared_ptr<Core> findJoinableCoreOfType(core_type type);
   /**
    * Returns true if type specified is available in current compilation.
    */
-  bool isAvailable (helics_core_type type);
+  bool isAvailable (core_type type);
   /** locate a registered Core by name
   @param name the name of the core to find
   @return a shared_ptr to the testCore*/
@@ -58,7 +67,7 @@ namespace CoreFactory {
   */
   void unregisterCore(const std::string &name);
   /** clean up unused cores
-  @details when Cores are unregisterd they get put in a holding area that gets cleaned up when a new Core is registered
+  @details when Cores are unregistered they get put in a holding area that gets cleaned up when a new Core is registered
   or when the clean up function is called this prevents some odd threading issues
   */
   void cleanUpCores();

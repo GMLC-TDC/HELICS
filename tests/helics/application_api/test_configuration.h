@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #ifndef CORE_TYPE_TO_TEST
-#define CORE_TYPE_TO_TEST "test"
+#define CORE_TYPE_TO_TEST helics::core_type::TEST
 #endif
 
 #endif

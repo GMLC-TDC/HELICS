@@ -78,7 +78,7 @@ public:
 	BaseType value() const noexcept { return _value; };
 	/** equality operator*/
 	bool operator== (identifier_id_t id) const noexcept { return (_value == id._value); };
-	/** iequality operator*/
+	/** inequality operator*/
 	bool operator!= (identifier_id_t id) const noexcept { return (_value != id._value); };
 	/** less than operator for sorting*/
 	bool operator< (identifier_id_t id) const noexcept { return (_value < id._value); };
@@ -105,6 +105,12 @@ template <>
 inline std::string typeNameString <std::vector<double>>()
 {
 	return "double_vector";
+}
+
+template <>
+inline std::string typeNameString <std::vector<std::complex<double>>>()
+{
+	return "complex_vector";
 }
 
 /** for float*/
@@ -146,7 +152,7 @@ inline std::string typeNameString<std::uint32_t>()
 }
 /** for 64 bit unsigned integer*/
 template <>
-inline std::string typeNameString<std::int64_t>()
+inline std::string typeNameString<long long>()
 {
 	return "int64";
 }
@@ -182,6 +188,7 @@ enum class helicsType_t:int
 	
 	helicsComplex=3,
 	helicsVector=4,
+	helicsComplexVector=5,
 	helicsInvalid=23425,
 };
 
@@ -192,19 +199,27 @@ helicsType_t getTypeFromString(const std::string &typeName);
 std::string helicsComplexString(double real, double imag);
 std::string helicsComplexString(std::complex<double> val);
 std::string helicsVectorString(const std::vector<double> &val);
-
+std::string helicsComplexVectorString(const std::vector<std::complex<double>> &val);
 std::complex<double> helicsGetComplex(const std::string &val);
 
 std::vector<double> helicsGetVector(const std::string &val);
+std::vector<std::complex<double>> helicsGetComplexVector(const std::string &val);
 
 void helicsGetVector(const std::string &val, std::vector<double> &data);
-
+void helicsGetComplexVector(const std::string &val, std::vector<std::complex<double>> &data);
 /** template class for generating a known name of a type*/
 template <class X>
 constexpr helicsType_t helicsType()
 {
 	return helicsType_t::helicsInvalid;
 }
+
+template <>
+constexpr helicsType_t helicsType<long long>()
+{
+	return helicsType_t::helicsInt;
+}
+
 template <>
 constexpr helicsType_t helicsType<std::string>()
 {
@@ -223,17 +238,7 @@ constexpr helicsType_t helicsType<float>()
 	return helicsType_t::helicsDouble;
 }
 
-template <>
-constexpr helicsType_t helicsType<int>()
-{
-	return helicsType_t::helicsInt;
-}
 
-template <>
-inline helicsType_t helicsType<int64_t>()
-{
-	return helicsType_t::helicsInt;
-}
 
 template <>
 constexpr helicsType_t helicsType<std::complex<double>>()
@@ -245,6 +250,12 @@ template <>
 constexpr helicsType_t helicsType<std::vector<double>>()
 {
 	return helicsType_t::helicsVector;
+}
+
+template <>
+constexpr helicsType_t helicsType < std::vector < std::complex<double> >> ()
+{
+	return helicsType_t::helicsComplexVector;
 }
 
 }

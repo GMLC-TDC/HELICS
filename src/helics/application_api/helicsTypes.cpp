@@ -21,6 +21,7 @@ static const std::string intString ("int64");
 static const std::string stringString ("string");
 static const std::string complexString ("complex");
 static const std::string doubleVecString ("double_vector");
+static const std::string complexVecString ("complex_vector");
 static const std::string nullString ("");
 
 const std::string &typeNameStringRef (helicsType_t type)
@@ -37,6 +38,8 @@ const std::string &typeNameStringRef (helicsType_t type)
         return complexString;
     case helicsType_t::helicsVector:
         return doubleVecString;
+    case helicsType_t::helicsComplexVector:
+        return complexVecString;
     default:
         return nullString;
     }
@@ -75,6 +78,7 @@ static const std::map<std::string, helicsType_t> typeMap{
   {"complex", helicsType_t::helicsComplex},
   {"int", helicsType_t::helicsInt},
   {"int64", helicsType_t::helicsInt},
+  {"complex_vector",helicsType_t::helicsComplexVector},
 };
 
 helicsType_t getTypeFromString (const std::string &typeName)
@@ -87,6 +91,7 @@ helicsType_t getTypeFromString (const std::string &typeName)
     return res->second;
 }
 
+//regular expression to handle complex numbers of various formats
 const std::regex creg (
   "([+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?)\\s*([+-]\\s*(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?)[ji]*");
 
@@ -121,7 +126,7 @@ std::complex<double> helicsGetComplex (const std::string &val)
 
 std::string helicsVectorString (const std::vector<double> &val)
 {
-    std::string vString = "[";
+    std::string vString = "v[";
     for (const auto &v : val)
     {
         vString.append (std::to_string (v));
@@ -137,7 +142,39 @@ std::string helicsVectorString (const std::vector<double> &val)
     return vString;
 }
 
-std::vector<double> helicsGetVector (const std::string &val) { return std::vector<double> (); }
+std::string helicsComplexVectorString (const std::vector<std::complex<double>> &val)
+{
+    std::string vString = "c[";
+    for (const auto &v : val)
+    {
+        vString.append (helicsComplexString (v.real (), v.imag ()));
+        vString.push_back (';');
+        vString.push_back (' ');
+    }
+    if (vString.size () > 2)
+    {
+        vString.pop_back ();
+        vString.pop_back ();
+    }
+    vString.push_back (']');
+    return vString;
+}
+
+std::vector<double> helicsGetVector (const std::string &val)
+{
+    std::vector<double> V;
+    helicsGetVector (val, V);
+    return V;
+}
+
+std::vector<std::complex<double>> helicsGetComplexVector (const std::string &val)
+{
+    std::vector<std::complex<double>> V;
+    helicsGetComplexVector (val, V);
+    return V;
+}
 
 void helicsGetVector (const std::string &val, std::vector<double> &data) {}
+
+void helicsGetComplexVector (const std::string &val, std::vector<std::complex<double>> &data) {}
 }

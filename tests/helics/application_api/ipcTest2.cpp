@@ -24,7 +24,7 @@ int main(int, char**)
     helics::Time stopTime = helics::Time(0.9);
 
     helics::FederateInfo fed_info("TestB Federate");
-    fed_info.coreType = "ipc";
+    fed_info.coreType = helics::core_type::IPC;
     fed_info.coreInitString = "--broker=stevebroker --federates 1 --loglevel 5";
     fed_info.timeDelta = 0.1;
 	fed_info.logLevel = 5;

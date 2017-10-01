@@ -54,6 +54,9 @@ Common Functions
 
 	HELICS_Export helics_core helicsCreateCore(const char *type, const char *name, const char *initString);
 	HELICS_Export helics_core helicsCreateCoreFromArgs(const char *type, const char *name, int argc, char *argv[]);
+
+	HELICS_Export helics_broker helicsCreateBroker(const char *type, const char *name, const char *initString);
+	HELICS_Export helics_broker helicsCreateBrokerFromArgs(const char *type, const char *name, int argc, char *argv[]);
 /* Creation and destruction of Federates */
 
 	HELICS_Export helics_federate helicsCreateCombinationFederate(const helics_federate_info_t fi);
@@ -65,7 +68,8 @@ Common Functions
 	HELICS_Export helicsStatus FederateInfoSetFederateName(helics_federate_info_t fi, const char *name);
 	HELICS_Export helicsStatus FederateInfoSetCoreName(helics_federate_info_t fi, const char *corename);
 	HELICS_Export helicsStatus FederateInfoSetCoreInitString(helics_federate_info_t fi, const char *corename);
-	HELICS_Export helicsStatus FederateInfoSetCoreType(helics_federate_info_t fi, const char *coretype);
+	HELICS_Export helicsStatus FederateInfoSetCoreTypeFromString(helics_federate_info_t fi, const char *coretype);
+	HELICS_Export helicsStatus FederateInfoSetCoreType(helics_federate_info_t fi, int coretype);
 	HELICS_Export helicsStatus FederateInfoSetFlag(helics_federate_info_t fi,int flag, int value);
 	HELICS_Export helicsStatus FederateInfoSetLookahead(helics_federate_info_t fi, helics_time_t lookahead);
 	HELICS_Export helicsStatus FederateInfoSetTimeDelta(helics_federate_info_t fi, helics_time_t timeDelta);

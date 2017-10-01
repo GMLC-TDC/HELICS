@@ -73,7 +73,7 @@ void ValueFederateTestFixture::Setup1FederateTest(std::string core_type_name, he
     StartBroker(core_type_name, "1");
 
     helics::FederateInfo fi("test1");
-    fi.coreType = core_type_name;
+    fi.coreType = helics::coreTypeFromString(core_type_name);
     fi.timeDelta = time_delta;
     fi.coreInitString = "--broker=" + broker->getIdentifier() + " --broker_address="+broker->getAddress()+" --federates 1";
 
@@ -97,7 +97,7 @@ void ValueFederateTestFixture::Setup2FederateTest(std::string core_type_name, he
 		StartBroker(core_type_name, "2");
 
 		helics::FederateInfo fi("test1");
-		fi.coreType = core_type_name;
+		fi.coreType = helics::coreTypeFromString(core_type_name);
 		fi.timeDelta = time_delta;
 		fi.coreInitString = std::string("--broker=") + broker->getIdentifier() + " --broker_address=" + broker->getAddress() + " --federates 2";
 
@@ -119,7 +119,7 @@ void ValueFederateTestFixture::Setup2FederateTest(std::string core_type_name, he
 		helics::FederateInfo fi("test1");
 		
 		fi.coreName = core1->getIdentifier();
-		fi.coreType = core_type_name;
+		fi.coreType = helics::coreTypeFromString(core_type_name);
 		fi.timeDelta = time_delta;
 		
 
@@ -158,7 +158,7 @@ void MessageFederateTestFixture::Setup1FederateTest(const std::string &core_type
     StartBroker(core_type_name, "1");
 
     helics::FederateInfo fi("test1");
-    fi.coreType = core_type_name;
+    fi.coreType = helics::coreTypeFromString(core_type_name);
     fi.coreInitString = std::string("--broker=") + broker->getIdentifier() + " --broker_address=" + broker->getAddress() + " --federates 1";
 
     mFed1 = std::make_shared<helics::MessageFederate>(fi);
@@ -169,7 +169,7 @@ void MessageFederateTestFixture::Setup2FederateTest(const std::string &core_type
     StartBroker(core_type_name, "2");
 
     helics::FederateInfo fi("test1");
-    fi.coreType = core_type_name;
+    fi.coreType = helics::coreTypeFromString(core_type_name);
     fi.coreInitString = std::string("--broker=") + broker->getIdentifier() + " --broker_address=" + broker->getAddress() + " --federates 2";
 
     mFed1 = std::make_shared<helics::MessageFederate>(fi);
