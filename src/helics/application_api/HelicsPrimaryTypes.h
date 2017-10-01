@@ -19,13 +19,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-	using defV = boost::variant<std::string, double, int64_t, std::complex<double>, std::vector<double>,std::vector<std::complex<double>>>;
+	using defV = boost::variant< double, int64_t, std::string, std::complex<double>, std::vector<double>,std::vector<std::complex<double>>>;
 
 	enum typeLocation
 	{
-		stringLoc = 0,
-		doubleLoc = 1,
-		intLoc = 2,
+		
+		doubleLoc = 0,
+		intLoc = 1,
+		stringLoc = 2,
 		complexLoc = 3,
 		vectorLoc = 4,
 		complexVectorLoc=5,
