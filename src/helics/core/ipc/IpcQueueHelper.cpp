@@ -92,7 +92,7 @@ ActionMessage ownedQueue::getMessage ()
     }
     size_t rx_size = 0;
     unsigned int priority;
-    while (1)
+    while (true)
     {
         rqueue->receive (buffer.data (), mxSize, rx_size, priority);
         if (rx_size < 8)
@@ -112,7 +112,7 @@ stx::optional<ActionMessage> ownedQueue::getMessage (int timeout)
     }
     size_t rx_size = 0;
     unsigned int priority;
-    while (1)
+    while (true)
     {
         if (timeout >= 0)
         {

@@ -133,7 +133,7 @@ static void argumentParser (int argc, char *argv[], boost::program_options::vari
 
 namespace helics
 {
-BrokerBase::BrokerBase () noexcept {}
+BrokerBase::BrokerBase() noexcept {};
 
 BrokerBase::BrokerBase (const std::string &broker_name) : identifier (broker_name) {}
 
@@ -146,12 +146,12 @@ BrokerBase::~BrokerBase ()
     }
 }
 
-void BrokerBase::InitializeFromArgs (int argC, char *argv[])
+void BrokerBase::InitializeFromArgs (int argc, char *argv[])
 {
     namespace po = boost::program_options;
 
     po::variables_map vm;
-    argumentParser (argC, argv, vm);
+    argumentParser (argc, argv, vm);
     if (vm.count ("min") > 0)
     {
         _min_federates = vm["min"].as<int> ();
@@ -298,4 +298,4 @@ void BrokerBase::queueProcessingLoop ()
         }
     }
 }
-}
+} // namespace helics

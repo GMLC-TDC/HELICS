@@ -52,13 +52,12 @@ void CommonCore::initialize (const std::string &initializationString)
     }
 }
 
-void CommonCore::InitializeFromArgs (int argC, char *argv[])
+void CommonCore::InitializeFromArgs (int argc, char *argv[])
 {
-    namespace po = boost::program_options;
     core_state_t exp = created;
     if (coreState.compare_exchange_strong (exp, core_state_t::initialized))
     {
-        BrokerBase::InitializeFromArgs (argC, argv);
+        BrokerBase::InitializeFromArgs (argc, argv);
     }
 }
 
@@ -131,7 +130,7 @@ void CommonCore::disconnect ()
     }
 }
 
-CommonCore::~CommonCore () {}
+CommonCore::~CommonCore() = default;
 
 FederateState *CommonCore::getFederate (federate_id_t federateID) const
 {

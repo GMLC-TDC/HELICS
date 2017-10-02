@@ -25,7 +25,7 @@ TimeCoordinator::TimeCoordinator (const CoreFederateInfo &info_) : info (info_)
 
 void TimeCoordinator::enteringExecMode (convergence_state mode)
 {
-    if (executionMode == true)
+    if (executionMode)
     {
         return;
     }

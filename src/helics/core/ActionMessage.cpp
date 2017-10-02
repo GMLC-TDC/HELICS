@@ -379,4 +379,4 @@ std::ostream &operator<< (std::ostream &os, const ActionMessage &command)
     os << prettyPrintString (command);
     return os;
 }
-}
+} // namespace helics

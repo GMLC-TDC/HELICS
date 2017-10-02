@@ -252,4 +252,4 @@ void unregisterBroker (const std::string &name)
         }
     }
 }
-}  // namespace
+}  // namespace helics

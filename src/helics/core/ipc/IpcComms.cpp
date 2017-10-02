@@ -49,7 +49,7 @@ void IpcComms::queue_rx_function ()
     }
     rx_status = connection_status::connected;  // this is a atomic indicator that the rx queue is ready
     bool operating = false;
-    while (1)
+    while (true)
     {
         ActionMessage cmd = rxQueue.getMessage ();
         if ((cmd.action () == CMD_PROTOCOL) || (cmd.action () == CMD_PROTOCOL_BIG))
@@ -135,7 +135,7 @@ void IpcComms::queue_tx_function ()
 
     tx_status = connection_status::connected;
     bool operating = false;
-    while (1)
+    while (true)
     {
         int route_id;
         ActionMessage cmd;

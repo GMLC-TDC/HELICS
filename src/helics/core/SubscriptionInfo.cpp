@@ -61,4 +61,4 @@ Time SubscriptionInfo::nextValueTime () const
     }
     return data_queue.front ().first;
 }
-}
+} //namespace helics

@@ -51,8 +51,10 @@ ${PROJECT_SOURCE_DIR}/src/common
 ${PROJECT_SOURCE_DIR}/src/shared_api_library
 ${PROJECT_SOURCE_DIR}/test
 ${ZMQ_INCLUDE_DIR}
+${PROJECT_SOURCE_DIR}/src/helics
 ${PROJECT_SOURCE_DIR}/src
 ${PROJECT_BINARY_DIR}/libs/include
+${PROJECT_BINARY_DIR}/include
 ${PROJECT_SOURCE_DIR}/ThirdParty
 ${Boost_INCLUDE_DIR}
 )

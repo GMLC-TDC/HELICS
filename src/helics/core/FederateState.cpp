@@ -1001,4 +1001,4 @@ void FederateState::logMessage (int level, const std::string &logMessageSource, 
         loggerFunction (level, (logMessageSource.empty ()) ? name : logMessageSource, message);
     }
 }
-}
+} //namespace helics
