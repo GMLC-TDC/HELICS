@@ -3,7 +3,9 @@
 Copyright (C) 2017, Battelle Memorial Institute
 All rights reserved.
 
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
 
@@ -32,7 +34,7 @@ class simpleQueue
     std::vector<X> pullElements;  //!< vector of elements waiting extraction
   public:
     /** default constructor */
-    simpleQueue ()= default;
+    simpleQueue () = default;
     /** constructor with a reservation size
     @param[in] capacity  the initial storage capacity of the queue*/
     simpleQueue (size_t capacity)
@@ -57,21 +59,21 @@ class simpleQueue
     }
     // const functions should be thread safe
     /** check whether there are any elements in the queue
-	because this is meant for mutlti threaded applications this may or may not have any meaning
-	depending on the number of consumers
-	*/
-    bool empty () const 
-	{ 
-		std::lock_guard<std::mutex> pullLock(m_pullLock);  // first pullLock
-		return pullElements.empty (); 
-	}
+    because this is meant for mutlti threaded applications this may or may not have any meaning
+    depending on the number of consumers
+    */
+    bool empty () const
+    {
+        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
+        return pullElements.empty ();
+    }
     /** get the current size of the queue*/
-    size_t size () const 
-	{ 
-		std::lock_guard<std::mutex> pullLock(m_pullLock);  // first pullLock
-		std::lock_guard<std::mutex> pushLock(m_pushLock);  // second pushLock
-		return pullElements.size () + pushElements.size (); 
-	}
+    size_t size () const
+    {
+        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
+        std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
+        return pullElements.size () + pushElements.size ();
+    }
     /** clear the queue*/
     void clear ()
     {
@@ -105,32 +107,33 @@ class simpleQueue
         }
         else
         {
-			// acquire the lock for the pull stack
-			std::unique_lock<std::mutex> pullLock(m_pullLock);  // first pullLock
-			std::unique_lock<std::mutex> pushLock(m_pushLock);  // second pushLock
-			if (pullElements.empty())
-			{
-				if (pushElements.empty())
-				{
-					pushLock.unlock();
-					pullElements.push_back(std::forward<Z>(val));
-				}
-				else
-				{
-					std::swap(pushElements, pullElements);
-					pushLock.unlock();  // we can free the push function to accept more elements after the swap call;
-					pullElements.push_back(std::forward<Z>(val));
-					std::reverse(pullElements.begin(), pullElements.end());
-				}
-			}
-			else
-			{  // this really shouldn't happen except in rare instances of high contention
-			   // we need to acquire the push lock and do the normal thing while holding the pull lock so the
-			   // last_element function will still behave properly
+            // acquire the lock for the pull stack
+            std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
+            std::unique_lock<std::mutex> pushLock (m_pushLock);  // second pushLock
+            if (pullElements.empty ())
+            {
+                if (pushElements.empty ())
+                {
+                    pushLock.unlock ();
+                    pullElements.push_back (std::forward<Z> (val));
+                }
+                else
+                {
+                    std::swap (pushElements, pullElements);
+                    pushLock
+                      .unlock ();  // we can free the push function to accept more elements after the swap call;
+                    pullElements.push_back (std::forward<Z> (val));
+                    std::reverse (pullElements.begin (), pullElements.end ());
+                }
+            }
+            else
+            {  // this really shouldn't happen except in rare instances of high contention
+               // we need to acquire the push lock and do the normal thing while holding the pull lock so the
+               // last_element function will still behave properly
 
-				pushElements.push_back(std::forward<Z>(val));
-				pushLock.unlock();  // we can free the push function to accept more elements after the swap call;
-			}
+                pushElements.push_back (std::forward<Z> (val));
+                pushLock.unlock ();  // we can free the push function to accept more elements after the swap call;
+            }
         }
     }
     /** push an element onto the queue
@@ -146,32 +149,33 @@ class simpleQueue
         }
         else
         {
-			// acquire the lock for the pull stack
-			std::unique_lock<std::mutex> pullLock(m_pullLock);  // first pullLock
-			std::unique_lock<std::mutex> pushLock(m_pushLock);  // second pushLock
-			if (pullElements.empty())
-			{
-				if (pushElements.empty())
-				{
-					pushLock.unlock();
-					pullElements.emplace_back(std::forward<Args>(args)...);
-				}
-				else
-				{
-					std::swap(pushElements, pullElements);
-					pushLock.unlock();  // we can free the push function to accept more elements after the swap call;
-					pullElements.emplace_back(std::forward<Args>(args)...);
-					std::reverse(pullElements.begin(), pullElements.end());
-				}
-			}
-			else
-			{  // this really shouldn't happen except in rare instances of high contention
-			   // we need to acquire the push lock and do the normal thing while holding the pull lock so the
-			   // last_element function will still behave properly
+            // acquire the lock for the pull stack
+            std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
+            std::unique_lock<std::mutex> pushLock (m_pushLock);  // second pushLock
+            if (pullElements.empty ())
+            {
+                if (pushElements.empty ())
+                {
+                    pushLock.unlock ();
+                    pullElements.emplace_back (std::forward<Args> (args)...);
+                }
+                else
+                {
+                    std::swap (pushElements, pullElements);
+                    pushLock
+                      .unlock ();  // we can free the push function to accept more elements after the swap call;
+                    pullElements.emplace_back (std::forward<Args> (args)...);
+                    std::reverse (pullElements.begin (), pullElements.end ());
+                }
+            }
+            else
+            {  // this really shouldn't happen except in rare instances of high contention
+               // we need to acquire the push lock and do the normal thing while holding the pull lock so the
+               // last_element function will still behave properly
 
-				pushElements.emplace_back(std::forward<Args>(args)...);
-				pushLock.unlock();  // we can free the push function to accept more elements after the swap call;
-			}
+                pushElements.emplace_back (std::forward<Args> (args)...);
+                pushLock.unlock ();  // we can free the push function to accept more elements after the swap call;
+            }
         }
     }
     /*make sure there is no path to lock the push first then the pull second

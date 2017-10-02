@@ -47,7 +47,7 @@ list(APPEND application_api_sources ${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp.cpp
 
 add_library(application_api OBJECT ${application_api_sources} ${application_api_headers})
 
-include_directories(${Boost_INCLUDE_DIR})
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
 link_directories(${external_link_directories})
 

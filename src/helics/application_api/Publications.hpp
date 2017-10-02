@@ -98,16 +98,17 @@ template <class X>
 typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, std::unique_ptr<Publication>>::type
 make_publication (ValueFederate *valueFed, const std::string &name, const std::string &units = "")
 {
-    return std::make_unique<Publication> (valueFed, helicsType<X>(), name, units);
+    return std::make_unique<Publication> (valueFed, helicsType<X> (), name, units);
 }
 
 template <class X>
-typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, std::unique_ptr<Publication>>::type make_publication (interface_visibility locality,
-                                               ValueFederate *valueFed,
-                                               const std::string &name,
-                                               const std::string &units = "")
+typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, std::unique_ptr<Publication>>::type
+make_publication (interface_visibility locality,
+                  ValueFederate *valueFed,
+                  const std::string &name,
+                  const std::string &units = "")
 {
-   return std::make_unique<Publication> (locality, valueFed, helicsType<X>(), name, units);
+    return std::make_unique<Publication> (locality, valueFed, helicsType<X> (), name, units);
 }
 
 /** class to handle a publication */

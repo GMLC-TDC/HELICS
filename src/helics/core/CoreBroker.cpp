@@ -932,7 +932,7 @@ bool CoreBroker::FindandNotifySubscriptionPublisher (BasicHandleInfo &handleInfo
             m.source_handle = pubInfo.id;
             m.dest_id = handleInfo.fed_id;
             m.dest_handle = handleInfo.id;
-			m.payload = pubInfo.type;
+            m.payload = pubInfo.type;
             transmit (getRoute (m.dest_id), m);
 
             // notify the publisher about its subscription
@@ -962,7 +962,8 @@ void CoreBroker::FindandNotifyPublicationSubscribers (BasicHandleInfo &handleInf
         }
         if (!matchingTypes (subInfo.type, handleInfo.type))
         {
-			LOG_WARNING(global_broker_id, handleInfo.key, std::string("types do not match ") + handleInfo.type + " vs " + subInfo.type);
+            LOG_WARNING (global_broker_id, handleInfo.key,
+                         std::string ("types do not match ") + handleInfo.type + " vs " + subInfo.type);
         }
         // notify the publication about its subscriber
         ActionMessage m (CMD_NOTIFY_SUB);
@@ -970,7 +971,7 @@ void CoreBroker::FindandNotifyPublicationSubscribers (BasicHandleInfo &handleInf
         m.source_handle = subInfo.id;
         m.dest_id = handleInfo.fed_id;
         m.dest_handle = handleInfo.id;
-		
+
         transmit (getRoute (m.dest_id), m);
 
         // notify the subscriber about its publisher
@@ -979,7 +980,7 @@ void CoreBroker::FindandNotifyPublicationSubscribers (BasicHandleInfo &handleInf
         m.source_handle = handleInfo.id;
         m.dest_id = subInfo.fed_id;
         m.dest_handle = subInfo.id;
-		m.payload = handleInfo.type;
+        m.payload = handleInfo.type;
         transmit (getRoute (m.dest_id), m);
         subInfo.processed = true;
     }

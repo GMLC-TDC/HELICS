@@ -78,7 +78,7 @@ static const std::map<std::string, helicsType_t> typeMap{
   {"complex", helicsType_t::helicsComplex},
   {"int", helicsType_t::helicsInt},
   {"int64", helicsType_t::helicsInt},
-  {"complex_vector",helicsType_t::helicsComplexVector},
+  {"complex_vector", helicsType_t::helicsComplexVector},
 };
 
 helicsType_t getTypeFromString (const std::string &typeName)
@@ -91,7 +91,7 @@ helicsType_t getTypeFromString (const std::string &typeName)
     return res->second;
 }
 
-//regular expression to handle complex numbers of various formats
+// regular expression to handle complex numbers of various formats
 const std::regex creg (
   "([+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?)\\s*([+-]\\s*(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?)[ji]*");
 

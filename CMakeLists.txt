@@ -353,6 +353,16 @@ add_subdirectory (src)
 if (BUILD_HELICS_TESTS)
 add_subdirectory (tests)
 
+# -------------------------------------------------------------
+# Enable clang analysis and formatting tools
+# -------------------------------------------------------------
+
+OPTION(ENABLE_CLANG_TOOLS "if clang is found enable some custom targets for clang formatting and tidy" OFF)
+
+if (ENABLE_CLANG_TOOLS)
+include(clang-cxx-dev-tools)
+endif(ENABLE_CLANG_TOOLS)
+
 #-----------------------------------------------------------------------------
 # Setup CTEST environment
 #-----------------------------------------------------------------------------

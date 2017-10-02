@@ -48,7 +48,6 @@ constexpr double timeCountforward[9]{1e12, 1e9, 1e6, 1e3, 1.0, 1.0, 10.0 / 60.0,
 /** defining doubles for time Multipliers*/
 constexpr double timeCountReverse[9]{1e-12, 1e-9, 1e-6, 1e-3, 1.0, 1.0, 60.0, 3600.0, 86400.0};
 
-
 /** generate powers to two as a constexpr
 @param[in] exponent the power of 2 desired*/
 inline constexpr double pow2 (unsigned int exponent)
@@ -118,7 +117,6 @@ class integer_time
     static std::int64_t seconds (baseType val) noexcept { return static_cast<std::int64_t> (val >> N); }
 };
 
-
 constexpr std::int64_t fac10[16]{1,
                                  10,
                                  100,
@@ -182,7 +180,6 @@ class count_time
     {
         return (static_cast<double> (val / iFactor) + static_cast<double> (val % iFactor) * ddivFactor);
     }
-
 
     static std::int64_t toCount (baseType val, timeUnits units) noexcept
     {
@@ -357,7 +354,6 @@ class timeRepresentation
     std::int64_t seconds () const noexcept { return Tconv::seconds (timecode_); }
     std::int64_t toCount (timeUnits units) const noexcept { return Tconv::toCount (timecode_, units); }
 
-
     /** default copy operation*/
     timeRepresentation &operator= (const timeRepresentation &x) noexcept = default;
 
@@ -460,7 +456,6 @@ class timeRepresentation
         return trep;
     }
 
-
     timeRepresentation operator* (int multiplier) const noexcept
     {
         timeRepresentation trep;
@@ -473,7 +468,6 @@ class timeRepresentation
     {
         return timeRepresentation (Tconv::toDouble (timecode_) * multiplier);
     }
-
 
     timeRepresentation operator/ (int divisor) const noexcept
     {
@@ -636,6 +630,5 @@ inline bool operator<= (double lhs, timeRepresentation<Tconv> t1)
 {
     return (timeRepresentation<Tconv> (lhs) <= t1);
 }
-
 
 #endif

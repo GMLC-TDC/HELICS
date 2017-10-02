@@ -41,24 +41,24 @@ ZmqComms::~ZmqComms()
 	disconnect();
 }
 
-std::string makePortAddress(const std::string &add, int portNumber)
+std::string makePortAddress(const std::string &networkInterface, int portNumber)
 {
-	if (add.compare(0, 3, "ipc") == 0)
+	if (networkInterface.compare(0, 3, "ipc") == 0)
 	{
-		return add;
+		return networkInterface;
 	}
-	if (add.compare(0, 3, "tcp") == 0)
+	if (networkInterface.compare(0, 3, "tcp") == 0)
 	{
-		std::string newAddress = add;
+		std::string newAddress = networkInterface;
 		newAddress.push_back(':');
 		newAddress.append(std::to_string(portNumber));
 		return newAddress;
 	}
-	if (add.compare(0, 5, "inproc") == 0)
+	if (networkInterface.compare(0, 5, "inproc") == 0)
 	{
-		return add;
+		return networkInterface;
 	}
-	return add;
+	return networkInterface;
 
 }
 

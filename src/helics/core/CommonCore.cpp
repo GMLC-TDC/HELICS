@@ -710,7 +710,7 @@ Handle CommonCore::registerSubscription (federate_id_t federateID,
         notice.dest_handle = id;
         notice.source_id = pubid;
         notice.source_handle = pubhandle;
-		notice.payload = handles[pubhandle]->type;
+        notice.payload = handles[pubhandle]->type;
         fed->addAction (notice);
     }
     else
@@ -803,25 +803,23 @@ const std::string &CommonCore::getType (Handle handle) const
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
     {
-		if (handleInfo->what == HANDLE_SUB)
-		{
-			auto fed = getFederate(handleInfo->local_fed_id);
-			auto subInfo = fed->getSubscription(handleInfo->id);
-			if (subInfo->pubType.empty())
-			{
-				return handleInfo->type;
-			}
-			else
-			{
-				return subInfo->pubType;
-			}
-
-		}
-		else
-		{
-			return handleInfo->type;
-		}
-        
+        if (handleInfo->what == HANDLE_SUB)
+        {
+            auto fed = getFederate (handleInfo->local_fed_id);
+            auto subInfo = fed->getSubscription (handleInfo->id);
+            if (subInfo->pubType.empty ())
+            {
+                return handleInfo->type;
+            }
+            else
+            {
+                return subInfo->pubType;
+            }
+        }
+        else
+        {
+            return handleInfo->type;
+        }
     }
     return nullStr;
 }

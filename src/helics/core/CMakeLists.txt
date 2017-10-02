@@ -96,12 +96,11 @@ endif (${ZMQ_FOUND})
 list(APPEND SRC_FILES ${MPI_SOURCE_FILES})
 list(APPEND INCLUDE_FILES ${MPI_HEADER_FILES})
 
-include_directories(${Boost_INCLUDE_DIR})
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES})
 
 
-include_directories(${Boost_INCLUDE_DIR})
-include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 
 OPTION(BUILD_BROKER "Build a helics Broker" ON)
 if (BUILD_BROKER)

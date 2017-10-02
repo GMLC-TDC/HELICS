@@ -3,13 +3,13 @@
 Copyright (C) 2017, Battelle Memorial Institute
 All rights reserved.
 
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
 #include "helics/application_api/ValueFederate.h"
 #include <algorithm>
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -17,6 +17,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <regex>
 #include <set>
 #include <stdexcept>
+#include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
 
 #include "PrecHelper.h"
 
@@ -29,7 +31,6 @@ class ValueSetter
     std::string pubName;
     std::string value;
 };
-
 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
@@ -48,7 +49,6 @@ int main (int argc, char *argv[])
 
     po::variables_map vm;
     argumentParser (argc, argv, vm);
-
 
     std::vector<ValueSetter> points;
     if (vm.count ("input") == 0)
@@ -146,15 +146,15 @@ int main (int argc, char *argv[])
         stopTime = vm["stop"].as<double> ();
     }
     helics::FederateInfo fi (name);
-	try
-	{
-		fi.coreType = helics::coreTypeFromString(corename);
-	}
-	catch (std::invalid_argument &ia)
-	{
-		std::cerr << "Unrecognized core type\n";
-		return (-1);
-	}
+    try
+    {
+        fi.coreType = helics::coreTypeFromString (corename);
+    }
+    catch (std::invalid_argument &ia)
+    {
+        std::cerr << "Unrecognized core type\n";
+        return (-1);
+    }
     fi.coreInitString = "1";
     if (vm.count ("coreinit") > 0)
     {
@@ -231,7 +231,6 @@ int main (int argc, char *argv[])
 
     return 0;
 }
-
 
 void sendPublication (helics::ValueFederate *vFed, ValueSetter &vs)
 {
@@ -332,7 +331,6 @@ void argumentParser (int argc, char *argv[], po::variables_map &vm_map)
 
     // objects/pointers/variables/constants
 
-
     // program options control
     if (cmd_vm.count ("help") > 0)
     {
@@ -345,7 +343,6 @@ void argumentParser (int argc, char *argv[], po::variables_map &vm_map)
         std::cout << 0.1 << '\n';
         return;
     }
-
 
     po::store (po::command_line_parser (argc, argv).options (cmd_line).positional (p).run (), vm_map);
 

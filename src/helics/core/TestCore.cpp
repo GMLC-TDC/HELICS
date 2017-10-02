@@ -17,7 +17,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "argParser.h"
 #include <fstream>
 
-
 namespace helics
 {
 using federate_id_t = Core::federate_id_t;
@@ -27,11 +26,8 @@ TestCore::TestCore (const std::string &core_name) : CommonCore (core_name) {}
 
 TestCore::TestCore (std::shared_ptr<CoreBroker> nbroker) : tbroker (std::move (nbroker)) {}
 using namespace std::string_literals;
-static const argDescriptors extraArgs
-{
-	{ "brokername"s, "string"s, "identifier for the broker-same as broker"s },
-	{ "brokerinit"s, "string"s, "the initialization string for the broker"s }
-};
+static const argDescriptors extraArgs{{"brokername"s, "string"s, "identifier for the broker-same as broker"s},
+                                      {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
 
 void TestCore::InitializeFromArgs (int argc, char *argv[])
 {
@@ -40,10 +36,8 @@ void TestCore::InitializeFromArgs (int argc, char *argv[])
     if (initialized_.compare_exchange_strong (exp, true))
     {
         po::variables_map vm;
-		
-			
-		
-        argumentParser (argc, argv, vm,extraArgs);
+
+        argumentParser (argc, argv, vm, extraArgs);
 
         if (vm.count ("broker") > 0)
         {
@@ -53,10 +47,10 @@ void TestCore::InitializeFromArgs (int argc, char *argv[])
         {
             brokerName = vm["brokername"].as<std::string> ();
         }
-		else if (vm.count("broker_address") > 0)
-		{
-			brokerName = vm["broker_address"].as<std::string>();
-		}
+        else if (vm.count ("broker_address") > 0)
+        {
+            brokerName = vm["broker_address"].as<std::string> ();
+        }
         if (vm.count ("brokerinit") > 0)
         {
             brokerInitString = vm["brokerinit"].as<std::string> ();
@@ -132,7 +126,6 @@ void TestCore::addRoute (int route_id, const std::string &routeInfo)
     }
     // the route will default to the central route
 }
-
 
 std::string TestCore::getAddress () const { return getIdentifier (); }
 

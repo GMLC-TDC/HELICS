@@ -7,16 +7,16 @@ the National Renewable Energy Laboratory, operated by the Alliance for Sustainab
 Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
 /*
-* LLNS Copyright Start
-* Copyright (c) 2017, Lawrence Livermore National Security
-* This work was performed under the auspices of the U.S. Department
-* of Energy by Lawrence Livermore National Laboratory in part under
-* Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
-* Produced at the Lawrence Livermore National Laboratory.
-* All rights reserved.
-* For details, see the LICENSE file.
-* LLNS Copyright End
-*/
+ * LLNS Copyright Start
+ * Copyright (c) 2017, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department
+ * of Energy by Lawrence Livermore National Laboratory in part under
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
+ * Produced at the Lawrence Livermore National Laboratory.
+ * All rights reserved.
+ * For details, see the LICENSE file.
+ * LLNS Copyright End
+ */
 
 #include "logger.h"
 #include <iostream>
@@ -27,10 +27,10 @@ logger::~logger ()
 {
     if (loggingThread.joinable ())
     {
-		if (!halted)
-		{
-			loggingQueue.emplace("!!>close");
-		}
+        if (!halted)
+        {
+            loggingQueue.emplace ("!!>close");
+        }
         loggingThread.join ();
     }
 }
@@ -51,34 +51,33 @@ void logger::openFile (const std::string &file)
 
 void logger::startLogging (int cLevel, int fLevel)
 {
-	if (!halted)
-	{
-		if (loggingThread.joinable())
-		{
-			return;
-		}
-	}
-	else
-	{
-		if (loggingThread.joinable())
-		{
-			loggingThread.join();
-		}
-	}
-	
+    if (!halted)
+    {
+        if (loggingThread.joinable ())
+        {
+            return;
+        }
+    }
+    else
+    {
+        if (loggingThread.joinable ())
+        {
+            loggingThread.join ();
+        }
+    }
+
     consoleLevel = cLevel;
     fileLevel = fLevel;
     loggingThread = std::thread (&logger::loggerLoop, this);
 }
 
-void logger::haltLogging()
+void logger::haltLogging ()
 {
-	bool exp = false;
-	if (halted.compare_exchange_strong(exp, true))
-	{
-		loggingQueue.emplace("!!>close");
-	}
-
+    bool exp = false;
+    if (halted.compare_exchange_strong (exp, true))
+    {
+        loggingQueue.emplace ("!!>close");
+    }
 }
 void logger::changeLevels (int cLevel, int fLevel)
 {
@@ -88,63 +87,61 @@ void logger::changeLevels (int cLevel, int fLevel)
 
 void logger::log (int level, std::string logMessage)
 {
-	if (!halted)
-	{
-		logMessage.push_back((level <= consoleLevel) ? 'c' : 'n');
-		logMessage.push_back((level <= fileLevel) ? 'f' : 'n');
-		loggingQueue.emplace(std::move(logMessage));
-	}
+    if (!halted)
+    {
+        logMessage.push_back ((level <= consoleLevel) ? 'c' : 'n');
+        logMessage.push_back ((level <= fileLevel) ? 'f' : 'n');
+        loggingQueue.emplace (std::move (logMessage));
+    }
 }
 
 void logger::flush () { loggingQueue.emplace ("!!>flush"); }
-bool logger::isRunning() const { return (!halted) && (loggingThread.joinable()); }
-
+bool logger::isRunning () const { return (!halted) && (loggingThread.joinable ()); }
 
 void logger::loggerLoop ()
 {
-	halted = false;
+    halted = false;
     while (true)
     {
         auto msg = loggingQueue.pop ();
 
-		if (msg.size()<3)
-		{
-			continue;
-		}
-		if (msg.compare(0, 3, "!!>") == 0)
+        if (msg.size () < 3)
+        {
+            continue;
+        }
+        if (msg.compare (0, 3, "!!>") == 0)
+        {
+            if (msg.compare (3, 5, "close") == 0)
             {
-                if (msg.compare (3, 5, "close") == 0)
-                {
-                    break;  // break the loop
-                }
-                if (msg.compare (3, 5, "flush") == 0)
-                {
-                    if (outFile.is_open ())
-                    {
-                        outFile.flush ();
-                    }
-                    std::cout.flush ();
-                    continue;
-                }
+                break;  // break the loop
             }
-            // if a the file should be written there will be a 'f' at the end
-            auto f = msg.back ();
-            msg.pop_back ();
-            // if a the console should be written there will be a 'c' at the end
-            auto c = msg.back ();
-            msg.pop_back ();
-            if (f == 'f')
+            if (msg.compare (3, 5, "flush") == 0)
             {
                 if (outFile.is_open ())
                 {
-                    outFile << msg << '\n';
+                    outFile.flush ();
                 }
+                std::cout.flush ();
+                continue;
             }
-            if (c == 'c')
+        }
+        // if a the file should be written there will be a 'f' at the end
+        auto f = msg.back ();
+        msg.pop_back ();
+        // if a the console should be written there will be a 'c' at the end
+        auto c = msg.back ();
+        msg.pop_back ();
+        if (f == 'f')
+        {
+            if (outFile.is_open ())
             {
-                std::cout << msg << '\n';
+                outFile << msg << '\n';
             }
-      
+        }
+        if (c == 'c')
+        {
+            std::cout << msg << '\n';
+        }
     }
 }
 
