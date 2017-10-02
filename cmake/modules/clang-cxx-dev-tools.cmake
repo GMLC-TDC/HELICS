@@ -24,7 +24,7 @@ file(GLOB
 	 
 file(GLOB
      ALL_CORE_LIB_FILES
-      src/helics/core/*.[ch]pp
+      src/helics/core/*.[ch]pp src/helics/core/zmq/*.[ch]pp src/helics/core/ipc/*.[ch]pp src/helics/core/mpi/*.[ch]pp
      )
 	 
 file(GLOB
