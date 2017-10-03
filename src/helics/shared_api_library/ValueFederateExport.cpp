@@ -564,6 +564,18 @@ helicsStatus helicsGetSubscriptionType(helics_subscription subID, char *str, int
 	{
 		return helicsError;
 	}
+	auto subObj = reinterpret_cast<helics::SubscriptionObject *> (subID);
+	auto type = subObj->subptr->getType();
+	if (static_cast<int>(type.size()) > maxlen)
+	{
+		strncpy(str, type.c_str(), maxlen);
+		str[maxlen - 1] = 0;
+	}
+	else
+	{
+		strcpy(str, type.c_str());
+	}
+	return helicsOK;
 }
 
 helicsStatus helicsGetPublicationType(helics_publication pubID, char *str, int maxlen)
@@ -572,6 +584,8 @@ helicsStatus helicsGetPublicationType(helics_publication pubID, char *str, int m
 	{
 		return helicsError;
 	}
+	auto pubObj = reinterpret_cast<helics::PublicationObject *> (pubID);
+	return helicsDiscard;
 }
 
 helicsStatus helicsGetSubscriptionKey(helics_subscription subID, char *str, int maxlen)
@@ -580,6 +594,18 @@ helicsStatus helicsGetSubscriptionKey(helics_subscription subID, char *str, int 
 	{
 		return helicsError;
 	}
+	auto subObj = reinterpret_cast<helics::SubscriptionObject *> (subID);
+	auto type = subObj->subptr->getKey();
+	if (static_cast<int>(type.size()) > maxlen)
+	{
+		strncpy(str, type.c_str(), maxlen);
+		str[maxlen - 1] = 0;
+	}
+	else
+	{
+		strcpy(str, type.c_str());
+	}
+	return helicsOK;
 }
 
 helicsStatus helicsGetPublicationKey(helics_publication pubID, char *str, int maxlen)
@@ -588,6 +614,8 @@ helicsStatus helicsGetPublicationKey(helics_publication pubID, char *str, int ma
 	{
 		return helicsError;
 	}
+	auto pubObj = reinterpret_cast<helics::PublicationObject *> (pubID);
+	return helicsDiscard;
 }
 
 helicsStatus helicsGetSubscriptionUnits(helics_subscription subID, char *str, int maxlen)
@@ -596,6 +624,18 @@ helicsStatus helicsGetSubscriptionUnits(helics_subscription subID, char *str, in
 	{
 		return helicsError;
 	}
+	auto subObj = reinterpret_cast<helics::SubscriptionObject *> (subID);
+	auto type = subObj->subptr->getUnits();
+	if (static_cast<int>(type.size()) > maxlen)
+	{
+		strncpy(str, type.c_str(), maxlen);
+		str[maxlen - 1] = 0;
+	}
+	else
+	{
+		strcpy(str, type.c_str());
+	}
+	return helicsOK;
 }
 
 helicsStatus helicsGetPublicationUnits(helics_publication pubID, char *str, int maxlen)
@@ -604,6 +644,8 @@ helicsStatus helicsGetPublicationUnits(helics_publication pubID, char *str, int 
 	{
 		return helicsError;
 	}
+	auto pubObj = reinterpret_cast<helics::PublicationObject *> (pubID);
+	return helicsDiscard;
 }
 
 void helicsClosePublication(helics_publication pubID)
