@@ -55,6 +55,11 @@ class Endpoint
         fed->sendMessage (id, dest, data_view (data, len));
     }
 
+	/** subscribe the endpoint to a particular publication*/
+	void subscribe(const std::string &key, const std::string &type)
+	{
+		fed->subscribe(id, key, type);
+	}
     /** send a data block and length
     @param[in] dest string name of the destination
     @param[in] data pointer to data location
@@ -127,6 +132,10 @@ class Endpoint
     }
     /** set a target destination for unspecified messages*/
     void setTargetDestination (const std::string &target) { targetDest = target; }
+	/** get the name of the endpoint*/
+	std::string getName() { return fed->getEndpointName(id); }
+	/** get the specified type of the endpoint*/
+	std::string getType() { return fed->getEndpointType(id); }
 };
 }  // namespace helics
 #endif
