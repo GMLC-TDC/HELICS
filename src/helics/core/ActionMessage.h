@@ -92,7 +92,7 @@ class ActionMessage
     /** default constructor*/
     ActionMessage () noexcept : index(dest_handle), processingComplete(iterationComplete), name (payload) {};
     /** construct from an action type*/
-    ActionMessage (action_message_def::action_t action);
+    ActionMessage (action_message_def::action_t startingAction);
     /** move constructor*/
     ActionMessage (ActionMessage &&act) noexcept;
     /** build an action message from a message*/
@@ -114,7 +114,7 @@ class ActionMessage
     /** get the action of the message*/
     action_message_def::action_t action () const noexcept { return action_; }
     /** set the action*/
-    void setAction (action_message_def::action_t action);
+    void setAction (action_message_def::action_t newAction);
     /** get a reference to the additional info structure*/
     AdditionalInfo &info ();
     /** get a const ref to the info structure*/

@@ -13,6 +13,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/core/CommsInterface.h"
 #include <atomic>
 #include <set>
+#include <string>
 
 namespace zmq
 {
@@ -28,7 +29,7 @@ namespace helics {
 @param portNumber the number of the port to use
 @return a string with the merged address
 */
-std::string makePortAddress(const std::string &interface, int portNumber);
+std::string makePortAddress(const std::string &networkInterface, int portNumber);
 
 /** extract a port number and interface string from an address number
 @details,  if there is no port number it default to -1 this is true if none was listed

@@ -20,7 +20,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "BasicHandleInfo.h"
 #include "ActionMessage.h"
-#include "common/BlockingQueue.hpp"
 #include "common/simpleQueue.hpp"
 #include "TimeDependencies.h"
 #include "BrokerBase.h"

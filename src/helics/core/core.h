@@ -183,7 +183,7 @@ class Core
      * Returns the federate name.
      *
      */
-    virtual const std::string &getFederateName (federate_id_t federateId) const = 0;
+    virtual const std::string &getFederateName (federate_id_t federateID) const = 0;
 
     /**
      * Returns the federate Id.
@@ -216,7 +216,7 @@ class Core
      *
      * \param next
      */
-    virtual Time timeRequest (federate_id_t federateId, Time next) = 0;
+    virtual Time timeRequest (federate_id_t federateID, Time next) = 0;
 
     /**
      * Request a new time advancement window for reiterative federates.
@@ -240,23 +240,23 @@ class Core
      * May only be invoked in Executing state.
      *
      * Non-reiterative federates may not invoke this method.
-     *@param federateId the identifier for the federate to process
+     *@param federateID the identifier for the federate to process
      * @param next the requested time
      * @param localConverged has the local federate converged
 	 @return an iterationTime object with two field stepTime and a bool indicating the iteration has completed
      */
-    virtual iterationTime requestTimeIterative (federate_id_t federateId, Time next, convergence_state localConverged) = 0;
+    virtual iterationTime requestTimeIterative (federate_id_t federateID, Time next, convergence_state localConverged) = 0;
 
     /**
      * Returns the current reiteration count for the specified federate.
      */
-    virtual uint64_t getCurrentReiteration (federate_id_t federateId) const = 0;
+    virtual uint64_t getCurrentReiteration (federate_id_t federateID) const = 0;
 	
 	/** get the most recent granted Time
-	@param federateId, the id of the federate to get the time
+	@param federateID, the id of the federate to get the time
 	@return the most recent granted time or the startup time
 	*/
-	virtual Time getCurrentTime(federate_id_t federateId) const = 0;
+	virtual Time getCurrentTime(federate_id_t federateID) const = 0;
     /**
      * Set the maximum number of iterations allowed.
      *
@@ -268,7 +268,7 @@ class Core
      */
 
 	
-    virtual void setMaximumIterations (federate_id_t federateId, uint64_t iterations) = 0;
+    virtual void setMaximumIterations (federate_id_t federateID, uint64_t iterations) = 0;
 
     /**
      * Set the minimum time resolution for the specified federate.
@@ -280,53 +280,53 @@ class Core
      *
      * \param time
      */
-    virtual void setTimeDelta (federate_id_t federateId, Time time) = 0;
+    virtual void setTimeDelta (federate_id_t federateID, Time time) = 0;
 
     /**
      * Set the lookahead time for the specified federate.
      *
      * The value is used to determine the interaction amongst various federates as to
      * when a specific federate can influence another
-     * \param federateId  the identifier for the federate
+     * \param federateID  the identifier for the federate
      * \param timeLookAhead
      */
-    virtual void setLookAhead (federate_id_t federateId, Time timeLookAhead) = 0;
+    virtual void setLookAhead (federate_id_t federateID, Time timeLookAhead) = 0;
 	/**
 	* Set the period for a specified federate.
 	*
 	* The value is used to determine the interaction amongst various federates as to
 	* when a specific federate can influence another
-	* \param federateId  the identifier for the federate
+	* \param federateID  the identifier for the federate
 	* \param timeLookAhead
 	*/
-	virtual void setPeriod(federate_id_t federateId, Time timePeriod) = 0;
+	virtual void setPeriod(federate_id_t federateID, Time timePeriod) = 0;
 	/**
 	* Set the periodic offset for a specified federate.
 	*
 	* The value is used as a time shift for calculating the allowable time in a federate
 	the granted time must one of N*period+offset
 	
-	* \param federateId  the identifier for the federate
+	* \param federateID  the identifier for the federate
 	* \param timeOffset the periodic phase shift
 	*/
-	virtual void setTimeOffset(federate_id_t federateId, Time timeOffset) = 0;
+	virtual void setTimeOffset(federate_id_t federateID, Time timeOffset) = 0;
 	/**
 	* Set the ImpactWindow time.
 	*
 	* The value is used to determine the interaction amongst various federates as to
 	* when a specific federate can influence another
-	* \param federateId  the identifier for the federate
+	* \param federateID  the identifier for the federate
 	* \param timeImpact the length of time it take outside message to propagate into a federate
 	*/
-	virtual void setImpactWindow(federate_id_t federateId, Time timeImpact) = 0;
+	virtual void setImpactWindow(federate_id_t federateID, Time timeImpact) = 0;
 	/** 
 	Set the logging level
 	@details set the logging level for an individual federate
-	set federateId to 0 for the core logging level
-	* \param federateId  the identifier for the federate
+	set federateID to 0 for the core logging level
+	* \param federateID  the identifier for the federate
 	* \param timeImpact the length of time it take outside message to propagate into a federate
 	*/
-	virtual void setLoggingLevel(federate_id_t federateId, int loggingLevel) = 0;
+	virtual void setLoggingLevel(federate_id_t federateID, int loggingLevel) = 0;
     /**
      * Value interface.
      */
@@ -342,13 +342,13 @@ class Core
      * @param[in] check_mode  if set to required the core will error if the subscription does not have a corresponding
      * publication when converting to init mode
      */
-    virtual Handle registerSubscription (federate_id_t federateId,
+    virtual Handle registerSubscription (federate_id_t federateID,
                                          const std::string &key,
                                          const std::string &(type),
                                          const std::string &units,
 										handle_check_mode check_mode) = 0;
 
-    virtual Handle getSubscription (federate_id_t federateId, const std::string &key) = 0;
+    virtual Handle getSubscription (federate_id_t federateID, const std::string &key) = 0;
 
     /**
      * Register a publication.
@@ -356,9 +356,9 @@ class Core
      * May only be invoked in the initialize state.
      */
     virtual Handle
-    registerPublication (federate_id_t federateId, const std::string &key, const std::string &type, const std::string &units) = 0;
+    registerPublication (federate_id_t federateID, const std::string &key, const std::string &type, const std::string &units) = 0;
 
-    virtual Handle getPublication (federate_id_t federateId, const std::string &key) = 0;
+    virtual Handle getPublication (federate_id_t federateID, const std::string &key) = 0;
 
     /**
      * Returns units for specified handle.
@@ -395,7 +395,7 @@ class Core
      *@param federateID the identification code of the federate to query
 	 @return a reference to the location of an array of handles that have been updated
      */
-    virtual const std::vector<Handle> &getValueUpdates (federate_id_t federateId) = 0;
+    virtual const std::vector<Handle> &getValueUpdates (federate_id_t federateID) = 0;
 
     /**
      * Message interface.
@@ -407,13 +407,13 @@ class Core
      *
      * May only be invoked in the Initialization state.
      */
-    virtual Handle registerEndpoint (federate_id_t federateId, const std::string &name, const std::string &type)=0;
+    virtual Handle registerEndpoint (federate_id_t federateID, const std::string &name, const std::string &type)=0;
 
     /**
      * Register source filter.
      *
      * May only be invoked in the Initialization state.
-	 @param federateId the identifier for the federate
+	 @param federateID the identifier for the federate
 	 @param filterName the name of the filter (may be left blank)
 	 @param source the target endpoint for the filter
 	 @param type_in the input type of the filter
@@ -421,7 +421,7 @@ class Core
 	 this is important for ordering in filters with operators
 	 @return the handle for the new filter
      */
-    virtual Handle registerSourceFilter (federate_id_t federateId,
+    virtual Handle registerSourceFilter (federate_id_t federateID,
                                          const std::string &filterName,
                                          const std::string &source,
                                          const std::string &type_in,
@@ -431,14 +431,14 @@ class Core
 	@details a destination filter will create an additional processing step of messages before they get to a destination endpoint
 	*
 	* May only be invoked in the Initialization state.
-	@param federateId the identifier for the federate
+	@param federateID the identifier for the federate
 	@param filterName the name of the filter (may be left blank)
 	@param dest the target endpoint for the filter
 	@param type_in the input type of the filter (may be left blank,  this is for error checking and will produce a warning if it doesn't 
 	match with the input type of the target endpoint
 	@return the handle for the new filter
 	*/
-    virtual Handle registerDestinationFilter (federate_id_t federateId,
+    virtual Handle registerDestinationFilter (federate_id_t federateID,
                                               const std::string &filterName,
                                               const std::string &dest,
                                               const std::string &type_in,
@@ -448,10 +448,10 @@ class Core
 	* @details this function is primarily useful for Message federates which do not otherwise restrict the dependencies
 	* adding a dependency gives additional information to the core that the specified federate(given by id) will be sending Messages to
 	the named Federate(by federateName)
-	@param[in] federateId  the identifier for the federate
+	@param[in] federateID  the identifier for the federate
 	@param[in] federateName the name of the dependent federate
 	*/
-	virtual void addDependency(federate_id_t federateId, const std::string &federateName)=0;
+	virtual void addDependency(federate_id_t federateID, const std::string &federateName)=0;
     /**
      * Register known frequently communicating source/destination end points.
      *
@@ -518,19 +518,19 @@ class Core
 	 @param federateID the identifier for the federate
 	 @param[out] endpoint_id the endpoint handle related to the message gets stored here
      */
-    virtual std::unique_ptr<Message> receiveAny (federate_id_t federateId,Handle &enpoint_id) = 0;
+    virtual std::unique_ptr<Message> receiveAny (federate_id_t federateID,Handle &enpoint_id) = 0;
 
     /**
      * Returns number of messages for all destinations.
      */
-    virtual uint64_t receiveCountAny (federate_id_t federateId) = 0;
+    virtual uint64_t receiveCountAny (federate_id_t federateID) = 0;
 
     /** send a log message to the Core for logging
-    @param[in] federateId the federate that is sending the log message
+    @param[in] federateID the federate that is sending the log message
     @param[in] logLevel  an integer for the log level (0- error, 1- warning, 2-status, 3-debug)
     @param[in] logMessage the message to log
     */
-    virtual void logMessage (federate_id_t federateId, int logLevel, const std::string &logMessage) = 0;
+    virtual void logMessage (federate_id_t federateID, int logLevel, const std::string &logMessage) = 0;
 
 	/** set the filter callback *  setting a filter callback implies that the filter has no time or order dependency
 	and the filter is an independent function

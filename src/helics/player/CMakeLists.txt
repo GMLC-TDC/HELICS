@@ -39,8 +39,8 @@ target_link_libraries(helics_recorder helics)
 target_link_libraries(helics_recorder ${external_library_list})
 endif()
 
-include_directories(${Boost_INCLUDE_DIR})
-include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 
 if (BUILD_PLAYER)
 INSTALL(TARGETS helics_player DESTINATION bin)

@@ -408,7 +408,10 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::Handle &id)
             endpointI = end_point.get ();
         }
     }
-
+	if (endpointI == nullptr)
+	{
+		return nullptr;
+	}
     // Return the message found and remove from the queue
     if (earliest_time <= time_granted)
     {
@@ -434,7 +437,10 @@ std::unique_ptr<Message> FederateState::receiveAnyFilter (Core::Handle &id)
             filterI = filt.get ();
         }
     }
-
+	if (filterI == nullptr)
+	{
+		return nullptr;
+	}
     // Return the message found and remove from the queue
     if (earliest_time <= time_granted)
     {
@@ -471,8 +477,7 @@ convergence_state FederateState::waitSetup ()
         processing = false;
         return ret;
     }
-    else
-    {
+
         while (!processing.compare_exchange_weak (expected, true))
         {
             std::this_thread::sleep_for (std::chrono::milliseconds (20));
@@ -493,7 +498,6 @@ convergence_state FederateState::waitSetup ()
 
         processing = false;
         return ret;
-    }
 }
 /** process until the init state has been entered or there is a failure*/
 convergence_state FederateState::enterInitState ()
@@ -509,8 +513,7 @@ convergence_state FederateState::enterInitState ()
         }
         return ret;
     }
-    else
-    {
+
         while (!processing.compare_exchange_weak (expected, true))
         {
             std::this_thread::sleep_for (std::chrono::milliseconds (20));
@@ -534,7 +537,6 @@ convergence_state FederateState::enterInitState ()
         }
         processing = false;
         return ret;
-    }
 }
 
 convergence_state FederateState::enterExecutingState (convergence_state converged)
@@ -552,8 +554,7 @@ convergence_state FederateState::enterExecutingState (convergence_state converge
         processing = false;
         return ret;
     }
-    else
-    {
+
         while (!processing.compare_exchange_weak (expected, true))
         {
             std::this_thread::sleep_for (std::chrono::milliseconds (20));
@@ -578,7 +579,6 @@ convergence_state FederateState::enterExecutingState (convergence_state converge
         }
         processing = false;
         return ret;
-    }
 }
 
 iterationTime FederateState::requestTime (Time nextTime, convergence_state converged)
@@ -599,8 +599,6 @@ iterationTime FederateState::requestTime (Time nextTime, convergence_state conve
         processing = false;
         return retTime;
     }
-    else
-    {
         // this would not be good practice to get into this part of the function
         // but the area must protect itself and should return something sensible
         while (!processing.compare_exchange_weak (expected, true))
@@ -619,7 +617,6 @@ iterationTime FederateState::requestTime (Time nextTime, convergence_state conve
         iterationTime retTime = {time_granted, ret};
         processing = false;
         return retTime;
-    }
 }
 
 void FederateState::fillEventVector (Time currentTime)
@@ -645,15 +642,13 @@ convergence_state FederateState::genericUnspecifiedQueueProcess ()
         processing = false;
         return ret;
     }
-    else
-    {
+
         while (!processing.compare_exchange_weak (expected, true))
         {
             std::this_thread::sleep_for (std::chrono::milliseconds (20));
         }
         processing = false;
         return convergence_state::complete;
-    }
 }
 
 const std::vector<Core::Handle> emptyHandles;
@@ -828,23 +823,23 @@ convergence_state FederateState::processActionMessage (ActionMessage &cmd)
         setState (HELICS_ERROR);
         return convergence_state::error;
     case CMD_REG_PUB:
-	{
-		auto subI = getSubscription(cmd.dest_handle);
-		if (subI != nullptr)
-		{
-			subI->target = { cmd.source_id, cmd.source_handle };
-			subI->pubType = cmd.info().type;
-			addDependency(cmd.source_id);
-		}
-	}
-	break;
+    {
+        auto subI = getSubscription (cmd.dest_handle);
+        if (subI != nullptr)
+        {
+            subI->target = {cmd.source_id, cmd.source_handle};
+            subI->pubType = cmd.info ().type;
+            addDependency (cmd.source_id);
+        }
+    }
+    break;
     case CMD_NOTIFY_PUB:
     {
         auto subI = getSubscription (cmd.dest_handle);
         if (subI != nullptr)
         {
             subI->target = {cmd.source_id, cmd.source_handle};
-			subI->pubType =cmd.payload;
+            subI->pubType = cmd.payload;
             addDependency (cmd.source_id);
         }
     }
@@ -1001,4 +996,4 @@ void FederateState::logMessage (int level, const std::string &logMessageSource, 
         loggerFunction (level, (logMessageSource.empty ()) ? name : logMessageSource, message);
     }
 }
-}
+} //namespace helics

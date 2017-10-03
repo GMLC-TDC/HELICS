@@ -3,7 +3,9 @@
 Copyright (C) 2017, Battelle Memorial Institute
 All rights reserved.
 
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
 #ifndef _BARRIER_H_
@@ -12,29 +14,30 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <condition_variable>
 #include <mutex>
 
-namespace helics {
+namespace helics
+{
+class Barrier
+{
+  public:
+    explicit Barrier (std::size_t iCount) : mThreshold (iCount), mCount (iCount), mGeneration (0) {}
 
-class Barrier {
-public:
-    explicit Barrier(std::size_t iCount) : 
-      mThreshold(iCount), 
-      mCount(iCount), 
-      mGeneration(0) {
-    }
-
-    void Wait() {
+    void Wait ()
+    {
         std::unique_lock<std::mutex> lLock{mMutex};
         auto lGen = mGeneration;
-        if (!--mCount) {
+        if (!--mCount)
+        {
             mGeneration++;
             mCount = mThreshold;
-            mCond.notify_all();
-        } else {
-            mCond.wait(lLock, [this, lGen] { return lGen != mGeneration; });
+            mCond.notify_all ();
+        }
+        else
+        {
+            mCond.wait (lLock, [this, lGen] { return lGen != mGeneration; });
         }
     }
 
-private:
+  private:
     std::mutex mMutex;
     std::condition_variable mCond;
     std::size_t mThreshold;
@@ -45,4 +48,3 @@ private:
 } /* namespace helics */
 
 #endif /* _BARRIER_H_ */
-

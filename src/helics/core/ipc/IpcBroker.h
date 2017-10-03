@@ -21,7 +21,7 @@ class IpcBroker :public CoreBroker
 {
 public:
 	/** default constructor*/
-	IpcBroker(bool isRoot_ = false) noexcept;
+	IpcBroker(bool rootBroker = false) noexcept;
 	IpcBroker(const std::string &broker_name);
 
 	void InitializeFromArgs(int argc, char *argv[]) override;
@@ -45,5 +45,5 @@ private:
 	std::string brokername;
 	std::unique_ptr<IpcComms> comms;
 };
-}
+} //namespace helics
 #endif

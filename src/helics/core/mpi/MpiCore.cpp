@@ -3,132 +3,102 @@
 Copyright (C) 2017, Battelle Memorial Institute
 All rights reserved.
 
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/config.h"
-#include "helics/core/core.h"
-#include "helics/core/core-data.h"
-#include "helics/core/helics-time.h"
 #include "MpiCore.h"
+#include "helics/config.h"
+#include "helics/core/core-data.h"
 #include "helics/core/core-exceptions.h"
+#include "helics/core/core.h"
+#include "helics/core/helics-time.h"
 
 #include <algorithm>
 #include <cassert>
 #include <chrono>
 #include <cstdint>
 #include <cstring>
-#include <sstream>
 #include <fstream>
+#include <sstream>
 
 #include "MpiComms.h"
 
 #include "helics/core/argParser.h"
 #include <boost/filesystem.hpp>
 
-
-
-
 namespace helics
 {
 using namespace std::string_literals;
-static const argDescriptors extraArgs
+static const argDescriptors extraArgs{
+  {"queueloc"s, "string"s, "the file location of the shared queue"s},
+  {"broker_auto_start"s, ""s, "automatically start the broker"s},
+  {"broker_init"s, "string"s,
+   "the init string to pass to the broker upon startup-will only be used if the autostart is activated"s},
+  {"brokername"s, "string"s, "identifier for the broker-same as broker"s},
+  {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
+
+MpiCore::MpiCore () noexcept {}
+
+MpiCore::MpiCore (const std::string &core_name) : CommonCore (core_name) {}
+
+MpiCore::~MpiCore () {}
+
+void MpiCore::InitializeFromArgs (int argc, char *argv[])
 {
-	{ "queueloc"s, "string"s, "the file location of the shared queue"s },
-	{ "broker_auto_start"s, ""s,"automatically start the broker"s },
-	{ "broker_init"s, "string"s, "the init string to pass to the broker upon startup-will only be used if the autostart is activated"s },
-	{ "brokername"s, "string"s, "identifier for the broker-same as broker"s },
-	{ "brokerinit"s, "string"s, "the initialization string for the broker"s }
-};
+    namespace po = boost::program_options;
+    if (coreState == created)
+    {
+        po::variables_map vm;
+        argumentParser (argc, argv, vm, extraArgs);
 
+        if (vm.count ("broker") > 0)
+        {
+            brokername = vm["broker"].as<std::string> ();
+        }
 
-MpiCore::MpiCore() noexcept
-{}
+        if (vm.count ("broker_address") > 0)
+        {
+            brokerloc = vm["broker_address"].as<std::string> ();
+        }
 
-MpiCore::MpiCore(const std::string &core_name) :CommonCore(core_name) {}
+        if (vm.count ("fileloc") > 0)
+        {
+            fileloc = vm["fileloc"].as<std::string> ();
+        }
 
-
-MpiCore::~MpiCore()
-{
-
+        CommonCore::InitializeFromArgs (argc, argv);
+    }
 }
 
-void MpiCore::InitializeFromArgs(int argc, char *argv[])
+bool MpiCore::brokerConnect ()
 {
-	namespace po = boost::program_options;
-	if (coreState == created)
-	{
-		po::variables_map vm;
-		argumentParser(argc, argv, vm, extraArgs);
+    if (fileloc.empty ())
+    {
+        fileloc = getIdentifier () + "_queue.hqf";
+    }
 
-		if (vm.count("broker") > 0)
-		{
-			brokername = vm["broker"].as<std::string>();
-		}
+    if (brokerloc.empty ())
+    {
+        if (brokername.empty ())
+        {
+            brokername = "_ipc";
+        }
+        brokerloc = brokername + "_queue.hqf";
+    }
 
-		if (vm.count("broker_address") > 0)
-		{
-			brokerloc = vm["broker_address"].as<std::string>();
-		}
-
-		if (vm.count("fileloc") > 0)
-		{
-			fileloc = vm["fileloc"].as<std::string>();
-		}
-
-		CommonCore::InitializeFromArgs(argc, argv);
-	}
+    comms = std::make_unique<MpiComms> (fileloc, brokerloc);
+    comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
+    return comms->connect ();
 }
 
-bool MpiCore::brokerConnect()
-{
-	if (fileloc.empty())
-	{
-		fileloc = getIdentifier() + "_queue.hqf";
-	}
+void MpiCore::brokerDisconnect () { comms->disconnect (); }
 
+void MpiCore::transmit (int route_id, const ActionMessage &cmd) { comms->transmit (route_id, cmd); }
 
+void MpiCore::addRoute (int route_id, const std::string &routeInfo) { comms->addRoute (route_id, routeInfo); }
 
-	if (brokerloc.empty())
-	{
-		if (brokername.empty())
-		{
-			brokername = "_ipc";
-		}
-		brokerloc = brokername + "_queue.hqf";
-	}
-
-	comms = std::make_unique<MpiComms>(fileloc, brokerloc);
-	comms->setCallback([this](ActionMessage M) {addActionMessage(std::move(M)); });
-	return comms->connect();
-}
-
-void MpiCore::brokerDisconnect()
-{
-	comms->disconnect();
-}
-
-void MpiCore::transmit(int route_id, const ActionMessage &cmd)
-{
-
-	comms->transmit(route_id, cmd);
-
-}
-
-void MpiCore::addRoute(int route_id, const std::string &routeInfo)
-{
-
-	comms->addRoute(route_id, routeInfo);
-
-
-}
-
-
-std::string MpiCore::getAddress() const
-{
-	return fileloc;
-}
-
+std::string MpiCore::getAddress () const { return fileloc; }
 
 }  // namespace helics
-

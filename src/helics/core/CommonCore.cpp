@@ -52,13 +52,12 @@ void CommonCore::initialize (const std::string &initializationString)
     }
 }
 
-void CommonCore::InitializeFromArgs (int argC, char *argv[])
+void CommonCore::InitializeFromArgs (int argc, char *argv[])
 {
-    namespace po = boost::program_options;
     core_state_t exp = created;
     if (coreState.compare_exchange_strong (exp, core_state_t::initialized))
     {
-        BrokerBase::InitializeFromArgs (argC, argv);
+        BrokerBase::InitializeFromArgs (argc, argv);
     }
 }
 
@@ -131,7 +130,7 @@ void CommonCore::disconnect ()
     }
 }
 
-CommonCore::~CommonCore () {}
+CommonCore::~CommonCore() = default;
 
 FederateState *CommonCore::getFederate (federate_id_t federateID) const
 {
@@ -143,14 +142,12 @@ FederateState *CommonCore::getFederate (federate_id_t federateID) const
     {
         return _federates[federateID].get ();
     }
-    else
-    {
+
         auto fnd = global_id_translation.find (federateID);
         if (fnd != global_id_translation.end ())
         {
             return _federates[fnd->second].get ();
         }
-    }
 
     return nullptr;
 }
@@ -710,7 +707,7 @@ Handle CommonCore::registerSubscription (federate_id_t federateID,
         notice.dest_handle = id;
         notice.source_id = pubid;
         notice.source_handle = pubhandle;
-		notice.payload = handles[pubhandle]->type;
+        notice.payload = handles[pubhandle]->type;
         fed->addAction (notice);
     }
     else
@@ -803,32 +800,24 @@ const std::string &CommonCore::getType (Handle handle) const
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
     {
-		if (handleInfo->what == HANDLE_SUB)
-		{
-			auto fed = getFederate(handleInfo->local_fed_id);
-			auto subInfo = fed->getSubscription(handleInfo->id);
-			if (subInfo->pubType.empty())
-			{
-				return handleInfo->type;
-			}
-			else
-			{
-				return subInfo->pubType;
-			}
-
-		}
-		else
-		{
-			return handleInfo->type;
-		}
-        
+        if (handleInfo->what == HANDLE_SUB)
+        {
+            auto fed = getFederate (handleInfo->local_fed_id);
+            auto subInfo = fed->getSubscription (handleInfo->id);
+            if (subInfo->pubType.empty ())
+            {
+                return handleInfo->type;
+            }
+            return subInfo->pubType;
+        }
+        return handleInfo->type;
     }
     return nullStr;
 }
 
-void CommonCore::setValue (Handle handle_, const char *data, uint64_t len)
+void CommonCore::setValue (Handle handle, const char *data, uint64_t len)
 {
-    auto handleInfo = getHandleInfo (handle_);
+    auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
     {
         throw (invalidIdentifier ("Handle not valid"));
@@ -847,16 +836,16 @@ void CommonCore::setValue (Handle handle_, const char *data, uint64_t len)
                (boost::format ("setting Value for %s size %d") % handleInfo->key % len).str ());
     ActionMessage mv (CMD_PUB);
     mv.source_id = handleInfo->fed_id;
-    mv.source_handle = handle_;
+    mv.source_handle = handle;
     mv.payload = std::string (data, len);
     mv.actionTime = fed->grantedTime ();
 
     _queue.push (mv);
 }
 
-std::shared_ptr<const data_block> CommonCore::getValue (Handle handle_)
+std::shared_ptr<const data_block> CommonCore::getValue (Handle handle)
 {
-    auto handleInfo = getHandleInfo (handle_);
+    auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
     {
         throw (invalidIdentifier ("Handle is invalid"));
@@ -866,7 +855,7 @@ std::shared_ptr<const data_block> CommonCore::getValue (Handle handle_)
         throw (invalidIdentifier ("Handle does not identify a subscription"));
     }
 
-    return getFederate (handleInfo->local_fed_id)->getSubscription (handle_)->getData ();
+    return getFederate (handleInfo->local_fed_id)->getSubscription (handle)->getData ();
 }
 
 const std::vector<Handle> &CommonCore::getValueUpdates (federate_id_t federateID)
@@ -1039,7 +1028,7 @@ void CommonCore::registerFrequentCommunicationsPair (const std::string &source, 
     assert (false);
 }
 
-void CommonCore::addDependency (federate_id_t federateId, const std::string &federateName) {}
+void CommonCore::addDependency (federate_id_t federateID, const std::string &federateName) {}
 
 void CommonCore::send (Handle sourceHandle, const std::string &destination, const char *data, uint64_t length)
 {
@@ -1106,23 +1095,13 @@ void CommonCore::sendMessage (Handle sourceHandle, std::unique_ptr<Message> mess
     {
         throw (invalidIdentifier ("handle does not point to an endpoint"));
     }
-    ActionMessage m (CMD_SEND_MESSAGE);
-
-    m.info ().orig_source = std::move (message->origsrc);
-
-    if (hndl == nullptr)
-    {
-        m.info ().source = std::move (message->src);
-    }
-    else
+    ActionMessage m (std::move(message));
+    if (hndl != nullptr)
     {
         m.info ().source = hndl->key;
         m.source_handle = hndl->id;
         m.source_id = hndl->fed_id;
     }
-    m.payload = std::move (message->data.to_string ());
-    m.info ().target = std::move (message->dest);
-    m.actionTime = message->time;
     m.source_handle = sourceHandle;
 
     queueMessage (processMessage (hndl, m));
@@ -1406,15 +1385,9 @@ FilterCoordinator *CommonCore::getFilterCoordinator (Handle id_)
             filters.emplace (id_, std::move (ff));
             return ffp;
         }
-        else
-        {
-            return nullptr;
-        }
+        return nullptr;
     }
-    else
-    {
-        return fnd->second.get ();
-    }
+    return fnd->second.get ();
 }
 
 uint64_t CommonCore::receiveFilterCount (federate_id_t federateID)
@@ -1479,17 +1452,16 @@ void CommonCore::processPriorityCommand (const ActionMessage &command)
     case CMD_BROKER_ACK:
         if (command.payload == identifier)
         {
-            if (!command.error)
+            if (command.error)
             {
-                global_broker_id = command.dest_id;
-                transmitDelayedMessages ();
-                return;
+				LOG_ERROR(0, identifier, "broker responded with error\n");
+				// generate error messages in response to all the delayed messages
+				break;
             }
-            else
-            {
-                LOG_ERROR (0, identifier, "broker responded with error\n");
-                // generate error messages in response to all the delayed messages
-            }
+			global_broker_id = command.dest_id;
+			transmitDelayedMessages();
+			return;
+           
         }
         break;
     case CMD_FED_ACK:

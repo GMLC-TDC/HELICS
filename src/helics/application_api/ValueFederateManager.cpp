@@ -217,14 +217,14 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     }
 }
 
-void ValueFederateManager::StartupToInitializeStateTransition () 
+void ValueFederateManager::StartupToInitializeStateTransition ()
 {
-	lastData.resize (subs.size ()); 
-	//get the actual publication types
-	for (auto &sub : subs)
-	{
-		sub.pubtype = coreObject->getType(sub.coreID);
-	}
+    lastData.resize (subs.size ());
+    // get the actual publication types
+    for (auto &sub : subs)
+    {
+        sub.pubtype = coreObject->getType (sub.coreID);
+    }
 }
 
 void ValueFederateManager::InitializeToExecuteStateTransition () { updateTime (0.0, 0.0); }
@@ -298,10 +298,10 @@ std::string ValueFederateManager::getSubscriptionType (subscription_id_t sub_id)
     return (sub_id.value () < subs.size ()) ? subs[sub_id.value ()].type : nullStr;
 }
 
-std::string ValueFederateManager::getPublicationType(subscription_id_t sub_id) const
+std::string ValueFederateManager::getPublicationType (subscription_id_t sub_id) const
 {
-	std::lock_guard<std::mutex> sublock(subscription_mutex);
-	return (sub_id.value() < subs.size()) ? subs[sub_id.value()].pubtype : nullStr;
+    std::lock_guard<std::mutex> sublock (subscription_mutex);
+    return (sub_id.value () < subs.size ()) ? subs[sub_id.value ()].pubtype : nullStr;
 }
 
 std::string ValueFederateManager::getPublicationType (publication_id_t pub_id) const

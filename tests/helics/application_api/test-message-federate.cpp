@@ -350,7 +350,7 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 {
     AddBroker (core_type, "3");
 
-	auto ctype = helics::coreTypeFromString(core_type);
+    auto ctype = helics::coreTypeFromString (core_type);
     pingpongFed p1 ("fedA", 0.5, ctype);
     pingpongFed p2 ("fedB", 0.5, ctype);
     pingpongFed p3 ("fedC", 0.5, ctype);

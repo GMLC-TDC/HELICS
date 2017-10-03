@@ -12,7 +12,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "helics/config.h"
 #include "helics-time.h"
-#include "helics/common/BlockingQueue.hpp"
 #include "helics/common/simpleQueue.hpp"
 #include "helics/core/core.h"
 #include "core/ActionMessage.h"
@@ -63,43 +62,43 @@ CommonCore(const std::string &core_name);
   virtual void enterInitializingState (federate_id_t federateID) override final;
   virtual convergence_state enterExecutingState(federate_id_t federateID, convergence_state converged = convergence_state::complete) override final;
   virtual federate_id_t registerFederate (const std::string &name, const CoreFederateInfo &info) override final;
-  virtual const std::string &getFederateName (federate_id_t federateId) const override final;
+  virtual const std::string &getFederateName (federate_id_t federateID) const override final;
   virtual federate_id_t getFederateId (const std::string &name) override final;
   virtual int32_t getFederationSize () override final;
-  virtual Time timeRequest (federate_id_t federateId, Time next) override final;
-  virtual iterationTime requestTimeIterative (federate_id_t federateId, Time next, convergence_state converged) override final;
-  virtual Time getCurrentTime(federate_id_t federateId) const override final;
-  virtual uint64_t getCurrentReiteration (federate_id_t federateId) const override final;
-  virtual void setMaximumIterations (federate_id_t federateId, uint64_t iterations) override final;
-  virtual void setTimeDelta (federate_id_t federateId, Time time) override final;
-  virtual void setLookAhead(federate_id_t federateId, Time timeLookAhead) override final;
-  virtual void setPeriod(federate_id_t federateId, Time timePeriod) override final;
-  virtual void setTimeOffset(federate_id_t federateId, Time timeOffset) override final;
-  virtual void setImpactWindow(federate_id_t federateId, Time timeImpact) override final;
-  virtual void setLoggingLevel(federate_id_t federateId, int loggingLevel) override final;
-  virtual Handle registerSubscription (federate_id_t federateId, const std::string &key, const std::string &type, const std::string &units, handle_check_mode check_mode) override final;
-  virtual Handle getSubscription (federate_id_t federateId, const std::string &key) override final;
-  virtual Handle registerPublication (federate_id_t federateId, const std::string &key, const std::string &type, const std::string &units) override final;
-  virtual Handle getPublication (federate_id_t federateId, const std::string &key) override final;
+  virtual Time timeRequest (federate_id_t federateID, Time next) override final;
+  virtual iterationTime requestTimeIterative (federate_id_t federateID, Time next, convergence_state converged) override final;
+  virtual Time getCurrentTime(federate_id_t federateID) const override final;
+  virtual uint64_t getCurrentReiteration (federate_id_t federateID) const override final;
+  virtual void setMaximumIterations (federate_id_t federateID, uint64_t iterations) override final;
+  virtual void setTimeDelta (federate_id_t federateID, Time time) override final;
+  virtual void setLookAhead(federate_id_t federateID, Time timeLookAhead) override final;
+  virtual void setPeriod(federate_id_t federateID, Time timePeriod) override final;
+  virtual void setTimeOffset(federate_id_t federateID, Time timeOffset) override final;
+  virtual void setImpactWindow(federate_id_t federateID, Time timeImpact) override final;
+  virtual void setLoggingLevel(federate_id_t federateID, int loggingLevel) override final;
+  virtual Handle registerSubscription (federate_id_t federateID, const std::string &key, const std::string &type, const std::string &units, handle_check_mode check_mode) override final;
+  virtual Handle getSubscription (federate_id_t federateID, const std::string &key) override final;
+  virtual Handle registerPublication (federate_id_t federateID, const std::string &key, const std::string &type, const std::string &units) override final;
+  virtual Handle getPublication (federate_id_t federateID, const std::string &key) override final;
   virtual const std::string &getUnits (Handle handle) const override final;
   virtual const std::string &getType (Handle handle) const override final;
   virtual void setValue (Handle handle, const char *data, uint64_t len) override final;
   virtual std::shared_ptr<const data_block> getValue (Handle handle) override final;
 
-  virtual const std::vector<Handle> &getValueUpdates (federate_id_t federateId) override final;
-  virtual Handle registerEndpoint (federate_id_t federateId, const std::string &name, const std::string &type) override final;
-  virtual Handle registerSourceFilter (federate_id_t federateId, const std::string &filterName, const std::string &source, const std::string &type_in,const std::string &type_out) override final;
-  virtual Handle registerDestinationFilter (federate_id_t federateId, const std::string &filterName, const std::string &dest, const std::string &type_in,const std::string &type_out) override final;
-  virtual void addDependency(federate_id_t federateId, const std::string &federateName) override final;
+  virtual const std::vector<Handle> &getValueUpdates (federate_id_t federateID) override final;
+  virtual Handle registerEndpoint (federate_id_t federateID, const std::string &name, const std::string &type) override final;
+  virtual Handle registerSourceFilter (federate_id_t federateID, const std::string &filterName, const std::string &source, const std::string &type_in,const std::string &type_out) override final;
+  virtual Handle registerDestinationFilter (federate_id_t federateID, const std::string &filterName, const std::string &dest, const std::string &type_in,const std::string &type_out) override final;
+  virtual void addDependency(federate_id_t federateID, const std::string &federateName) override final;
   virtual void registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) override final;
   virtual void send (Handle sourceHandle, const std::string &destination, const char *data, uint64_t length) override final;
   virtual void sendEvent (Time time, Handle sourceHandle, const std::string &destination, const char *data, uint64_t length) override final;
   virtual void sendMessage (Handle sourceHandle, std::unique_ptr<Message> message) override final;
   virtual uint64_t receiveCount (Handle destination) override final;
   virtual std::unique_ptr<Message> receive (Handle destination) override final;
-  virtual std::unique_ptr<Message> receiveAny (federate_id_t federateId, Handle &endpoint_id) override final;
-  virtual uint64_t receiveCountAny (federate_id_t federateId) override final;
-  virtual void logMessage(federate_id_t federateId, int logLevel, const std::string &logMessage) override final;
+  virtual std::unique_ptr<Message> receiveAny (federate_id_t federateID, Handle &endpoint_id) override final;
+  virtual uint64_t receiveCountAny (federate_id_t federateID) override final;
+  virtual void logMessage(federate_id_t federateID, int logLevel, const std::string &logMessage) override final;
   virtual void setFilterOperator(Handle filter, std::shared_ptr<FilterOperator> callback) override final;
 
   virtual uint64_t receiveFilterCount(federate_id_t federateID) override final;
@@ -145,8 +144,8 @@ protected:
   @param route_id the identification of the route
   @param routeInfo a string containing the information necessary to connect*/
   virtual void addRoute(int route_id, const std::string &routeInfo) = 0;
-  /** get the federate Information from the federateId*/
-  FederateState *getFederate(federate_id_t federateId) const;
+  /** get the federate Information from the federateID*/
+  FederateState *getFederate(federate_id_t federateID) const;
   /** get the federate Information from a handle
   @param id a handle identifier as generated by the one of the functions*/
   FederateState *getHandleFederate(Handle id_);

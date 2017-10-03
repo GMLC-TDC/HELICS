@@ -46,7 +46,6 @@ CoreFederateInfo generateCoreInfo (const FederateInfo &fi)
 
 Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
 {
-   
     if (fi.coreName.empty ())
     {
         coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
@@ -710,14 +709,14 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     }
     if (doc.isMember ("coreType"))
     {
-		try
-		{
-			fi.coreType = coreTypeFromString(doc["coreType"].asString());
-		}
-		catch (const std::invalid_argument &ia)
-		{
-			std::cerr << "Unrecognized core type\n";
-		}
+        try
+        {
+            fi.coreType = coreTypeFromString (doc["coreType"].asString ());
+        }
+        catch (const std::invalid_argument &ia)
+        {
+            std::cerr << "Unrecognized core type\n";
+        }
     }
     if (doc.isMember ("coreName"))
     {

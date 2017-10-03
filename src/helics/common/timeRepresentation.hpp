@@ -48,7 +48,6 @@ constexpr double timeCountforward[9]{1e12, 1e9, 1e6, 1e3, 1.0, 1.0, 10.0 / 60.0,
 /** defining doubles for time Multipliers*/
 constexpr double timeCountReverse[9]{1e-12, 1e-9, 1e-6, 1e-3, 1.0, 1.0, 60.0, 3600.0, 86400.0};
 
-
 /** generate powers to two as a constexpr
 @param[in] exponent the power of 2 desired*/
 inline constexpr double pow2 (unsigned int exponent)
@@ -81,7 +80,7 @@ class integer_time
     static constexpr baseType convert (double t) noexcept
     {
         double div = t * multiplier;
-        base divBase = static_cast<base> (div);
+        auto divBase = static_cast<base> (div);
         double frac = div - static_cast<double> (divBase);
         baseType nseconds = (divBase << N) + static_cast<base> (frac * multiplier);
         return (t < -1e12) ? nseconds : minVal ();
@@ -117,7 +116,6 @@ class integer_time
     /** convert to an integer count in seconds */
     static std::int64_t seconds (baseType val) noexcept { return static_cast<std::int64_t> (val >> N); }
 };
-
 
 constexpr std::int64_t fac10[16]{1,
                                  10,
@@ -182,7 +180,6 @@ class count_time
     {
         return (static_cast<double> (val / iFactor) + static_cast<double> (val % iFactor) * ddivFactor);
     }
-
 
     static std::int64_t toCount (baseType val, timeUnits units) noexcept
     {
@@ -296,22 +293,22 @@ class timeRepresentation
   private:
 /** explicit means to generate a constexpr timeRepresentation at time 0, negTime and maxTime and min time delta*/
 #ifdef _DEBUG
-    constexpr explicit timeRepresentation (std::integral_constant<int, 0>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, 0> /*unused*/) noexcept
         : timecode_ (Tconv::zeroVal ()), dtime_ (0.0){};
-    constexpr explicit timeRepresentation (std::integral_constant<int, -1>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, -1> /*unused*/) noexcept
         : timecode_ (Tconv::minVal ()), dtime_ (-1.456e47){};
-    constexpr explicit timeRepresentation (std::integral_constant<int, 1>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, 1> /*unused*/) noexcept
         : timecode_ (Tconv::maxVal ()), dtime_ (1e49){};
-    constexpr explicit timeRepresentation (std::integral_constant<int, 2>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, 2> /*unused*/) noexcept
         : timecode_ (Tconv::epsilon ()), dtime_ (1e-9){};
 #else
-    constexpr explicit timeRepresentation (std::integral_constant<int, 0>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, 0> /*unused*/) noexcept
         : timecode_ (Tconv::zeroVal ()){};
-    constexpr explicit timeRepresentation (std::integral_constant<int, -1>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, -1> /*unused*/) noexcept
         : timecode_ (Tconv::minVal ()){};
-    constexpr explicit timeRepresentation (std::integral_constant<int, 1>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, 1> /*unused*/) noexcept
         : timecode_ (Tconv::maxVal ()){};
-    constexpr explicit timeRepresentation (std::integral_constant<int, 2>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, 2> /*unused*/) noexcept
         : timecode_ (Tconv::epsilon ()){};
 #endif
 
@@ -356,7 +353,6 @@ class timeRepresentation
     /** generate the time in seconds*/
     std::int64_t seconds () const noexcept { return Tconv::seconds (timecode_); }
     std::int64_t toCount (timeUnits units) const noexcept { return Tconv::toCount (timecode_, units); }
-
 
     /** default copy operation*/
     timeRepresentation &operator= (const timeRepresentation &x) noexcept = default;
@@ -460,7 +456,6 @@ class timeRepresentation
         return trep;
     }
 
-
     timeRepresentation operator* (int multiplier) const noexcept
     {
         timeRepresentation trep;
@@ -473,7 +468,6 @@ class timeRepresentation
     {
         return timeRepresentation (Tconv::toDouble (timecode_) * multiplier);
     }
-
 
     timeRepresentation operator/ (int divisor) const noexcept
     {
@@ -636,6 +630,5 @@ inline bool operator<= (double lhs, timeRepresentation<Tconv> t1)
 {
     return (timeRepresentation<Tconv> (lhs) <= t1);
 }
-
 
 #endif

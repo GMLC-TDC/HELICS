@@ -7,7 +7,6 @@
 
 set(common_headers
 simpleQueue.hpp
-BlockingQueue.hpp
 BlockingQueue3.hpp
 timeRepresentation.hpp
 blocking_queue.h

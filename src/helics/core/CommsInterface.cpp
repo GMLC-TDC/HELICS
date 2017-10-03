@@ -146,4 +146,4 @@ bool CommsInterface::isConnected () const
 {
     return ((tx_status == connection_status::connected) && (rx_status == connection_status::connected));
 }
-}
+} //namespace helics
