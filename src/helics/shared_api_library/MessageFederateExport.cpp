@@ -185,7 +185,7 @@ uint64_t helicsEndpointReceiveCount (helics_endpoint endpoint)
     return endObj->endptr->receiveCount ();
 }
 
-message_t emptyMessage ()
+static message_t emptyMessage ()
 {
     message_t empty;
     empty.time = 0;

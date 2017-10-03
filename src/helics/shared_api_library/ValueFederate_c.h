@@ -77,6 +77,21 @@ HELICS_Export helicsStatus helicsSetDefaultDouble (helics_subscription pubID, do
 HELICS_Export helicsStatus helicsSetDefaultComplex (helics_subscription pubID, double real, double imag);
 HELICS_Export helicsStatus helicsSetDefaultVector (helics_subscription pubID, const double *data, int len);
 
+HELICS_Export helicsStatus helicsGetSubscriptionType(helics_subscription subID, char *str, int maxlen);
+
+HELICS_Export helicsStatus helicsGetPublicationType(helics_publication pubID, char *str, int maxlen);
+
+HELICS_Export helicsStatus helicsGetSubscriptionKey(helics_subscription subID, char *str, int maxlen);
+
+HELICS_Export helicsStatus helicsGetPublicationKey(helics_publication pubID, char *str, int maxlen);
+
+HELICS_Export helicsStatus helicsGetSubscriptionUnits(helics_subscription subID, char *str, int maxlen);
+
+HELICS_Export helicsStatus helicsGetPublicationUnits(helics_publication pubID, char *str, int maxlen);
+
+HELICS_Export void helicsClosePublication(helics_publication pubID);
+
+HELICS_Export void helicsCloseSubscription(helics_subscription subID);
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif

@@ -32,7 +32,7 @@ HELICS_Export helics_destination_filter helicsRegisterDestinationFilter (helics_
 /** check if the federate has any outstanding messages*/
 HELICS_Export int helicsFederateHasMessageToFilter (helics_message_filter_federate fedID);
 /* check if a given endpoint has any unread messages*/
-HELICS_Export int helicsFilterHasMessage (helics_message_filter_federate id);
+HELICS_Export int helicsFilterHasMessage (helics_source_filter id);
 
 /**
  * Returns the number of pending receives for the specified destination endpoint.
@@ -47,11 +47,6 @@ HELICS_Export int helicsFilterReceiveCount (helics_source_filter filter);
 @param[in] endpoint the identifier for the endpoint
 @return a message object*/
 HELICS_Export message_t helicsFilterGetMessage (helics_source_filter filter);
-/** receive a communication message for any endpoint in the federate
-@details the return order will be in order of endpoint creation then order of arrival
-all messages for the first endpoint, then all for the second, and so on
-@return a unique_ptr to a Message object containing the message data*/
-HELICS_Export message_t helicsFilterFederateGetMessage (helics_message_filter_federate fedID);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
+	/** class wrapping a source filter*/
 class SourceFilter
 {
 private:
@@ -23,26 +24,17 @@ private:
 public:
 	/**constructor to build an source filter object
 	@param[in] mFed  the MessageFederate to use
+	@param[in] target the endpoint the filter is targeting
 	@param[in] name the name of the filter
-	@param[in] target the endpoint the filter is targetting
 	@param[in] input_type the type of data the filter is expecting
 	@param[in] output_type the type of data the filter is generating
 	*/
-	SourceFilter(MessageFilterFederate *mFed, const std::string &name, const std::string &target, const std::string &input_type = "", const std::string &output_type = "")
+	SourceFilter(MessageFilterFederate *mFed,  const std::string &target, const std::string &name="", const std::string &input_type = "", const std::string &output_type = "")
 		: fed(mFed)
 	{
 		id = fed->registerSourceFilter(name, target,input_type,output_type);
 	}
 
-	/**constructor to build an source filter object
-	@param[in] mFed  the MessageFederate to use
-	@param[in] target the endpoint the filter is targetting
-	*/
-	SourceFilter(MessageFilterFederate *mFed, const std::string &target)
-		: fed(mFed)
-	{
-		id = fed->registerSourceFilter(target);
-	}
 	virtual ~SourceFilter() = default;
 		
 	auto getMessage() const { return fed->getMessageToFilter(id); }
@@ -58,9 +50,14 @@ public:
 	{
 		fed->registerFilterCallback(id, callback);
 	}
+	/** set a message operator to process the message*/
+	void setOperator(std::shared_ptr<MessageOperator> mo)
+	{
+		fed->registerMessageOperator(id,std::move(mo));
+	}
 };
 
-
+/** class wrapping a destination filter*/
 class DestinationFilter
 {
 private:
@@ -70,27 +67,36 @@ private:
 public:
 	/**constructor to build an destination filter object
 	@param[in] mFed  the MessageFederate to use
+	@param[in] target the endpoint the filter is targeting
 	@param[in] name the name of the filter
-	@param[in] target the endpoint the filter is targetting
 	@param[in] input_type the type of data the filter is expecting
 	@param[in] output_type the type of data the filter is generating
 	*/
-	DestinationFilter(MessageFilterFederate *mFed, const std::string &name, const std::string &target, const std::string &input_type = "", const std::string &output_type = "")
+	DestinationFilter(MessageFilterFederate *mFed,  const std::string &target, const std::string &name="", const std::string &input_type = "", const std::string &output_type = "")
 		: fed(mFed)
 	{
 		id = fed->registerDestinationFilter(name, target,input_type,output_type);
 	}
-	/**constructor to build an destination filter object
-	@param[in] mFed  the MessageFederate to use
-	@param[in] target the endpoint the filter is targetting
-	*/
-	DestinationFilter(MessageFilterFederate *mFed, const std::string &name, const std::string &target, const std::string &input_type = "", const std::string &output_type = "")
-		: fed(mFed)
-	{
-		id = fed->registerDestinationFilter(name, target, input_type, output_type);
-	}
 	virtual ~DestinationFilter() = default;
 
+
+	/** set a message operator to process the message*/
+	void setOperator(std::shared_ptr<MessageOperator> mo)
+	{
+		fed->registerMessageOperator(id, std::move(mo));
+	}
 };
+
+enum defined_filter_types
+{
+	custom = 0,
+	delay=1,
+	randomDelay=2,
+	randomDrop=3,
+};
+
+std::unique_ptr<DestinationFilter> make_destination_filter(defined_filter_types type, MessageFilterFederate *mFed, const std::string &target, const std::string &name = "");
+std::unique_ptr<DestinationFilter> make_Source_filter(defined_filter_types type, MessageFilterFederate *mFed, const std::string &target, const std::string &name = "");
+
 } //namespace helics
 #endif

@@ -557,3 +557,67 @@ helicsStatus helicsSetDefaultVector (helics_subscription subID, const double *da
     }
     return helicsOK;
 }
+
+helicsStatus helicsGetSubscriptionType(helics_subscription subID, char *str, int maxlen)
+{
+	if (subID == nullptr)
+	{
+		return helicsError;
+	}
+}
+
+helicsStatus helicsGetPublicationType(helics_publication pubID, char *str, int maxlen)
+{
+	if (pubID == nullptr)
+	{
+		return helicsError;
+	}
+}
+
+helicsStatus helicsGetSubscriptionKey(helics_subscription subID, char *str, int maxlen)
+{
+	if (subID == nullptr)
+	{
+		return helicsError;
+	}
+}
+
+helicsStatus helicsGetPublicationKey(helics_publication pubID, char *str, int maxlen)
+{
+	if (pubID == nullptr)
+	{
+		return helicsError;
+	}
+}
+
+helicsStatus helicsGetSubscriptionUnits(helics_subscription subID, char *str, int maxlen)
+{
+	if (subID == nullptr)
+	{
+		return helicsError;
+	}
+}
+
+helicsStatus helicsGetPublicationUnits(helics_publication pubID, char *str, int maxlen)
+{
+	if (pubID == nullptr)
+	{
+		return helicsError;
+	}
+}
+
+void helicsClosePublication(helics_publication pubID)
+{
+	if (pubID != nullptr)
+	{
+		delete reinterpret_cast<helics::PublicationObject *>(pubID);
+	}
+}
+
+void helicsCloseSubscription(helics_subscription subID)
+{
+	if (subID != nullptr)
+	{
+		delete reinterpret_cast<helics::SubscriptionObject *>(subID);
+	}
+}

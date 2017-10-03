@@ -165,7 +165,7 @@ class MessageFilterFederate : public virtual MessageFederate
     /** @brief register a operator for the specified filter
     @details for time_agnostic federates only,  all other settings would trigger an error
     The MessageOperator gets called when there is a message to filter, There is no order or state to this
-    message can come in in any order.
+    messages can come in any order.
     @param[in] filter the identifier for the filter to trigger
     @param[in] mo A shared_ptr to a message operator
     */
