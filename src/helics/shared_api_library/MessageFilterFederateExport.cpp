@@ -22,28 +22,25 @@ helics_source_filter helicsRegisterSourceFilter (helics_message_filter_federate 
                                                  const char *inputType,
                                                  const char *outputType)
 {
-	// now generate a generic subscription
-	auto fedObj = getFilterFedSharedPtr(fed);
-	if (!fedObj)
-	{
-		return nullptr;
-	}
-	helics::SourceFilterObject *filt = nullptr;
-	try
-	{
-		filt = new helics::SourceFilterObject();
-		filt->filtptr = std::make_unique<helics::SourceFilter>(fedObj.get(), name, inputType, outputType);
-		filt->fedptr = std::move(fedObj);
-		return reinterpret_cast<helics_source_filter> (filt);
-	}
-	catch (const helics::InvalidFunctionCall &)
-	{
-		if (filt != nullptr)
-		{
-			delete filt;
-		}
-	}
-	return nullptr;
+    // now generate a generic subscription
+    auto fedObj = getFilterFedSharedPtr (fed);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    helics::SourceFilterObject *filt = nullptr;
+    try
+    {
+        filt = new helics::SourceFilterObject ();
+        filt->filtptr = std::make_unique<helics::SourceFilter> (fedObj.get (), name, inputType, outputType);
+        filt->fedptr = std::move (fedObj);
+        return reinterpret_cast<helics_source_filter> (filt);
+    }
+    catch (const helics::InvalidFunctionCall &)
+    {
+        delete filt;
+    }
+    return nullptr;
 }
 
 helics_destination_filter helicsRegisterDestinationFilter (helics_message_filter_federate fed,
@@ -51,83 +48,79 @@ helics_destination_filter helicsRegisterDestinationFilter (helics_message_filter
                                                            const char *inputType,
                                                            const char *outputType)
 {
-	// now generate a generic subscription
-	auto fedObj = getFilterFedSharedPtr(fed);
-	if (!fedObj)
-	{
-		return nullptr;
-	}
-	helics::DestFilterObject *filt = nullptr;
-	try
-	{
-		filt = new helics::DestFilterObject();
-		filt->filtptr = std::make_unique<helics::DestinationFilter>(fedObj.get(), name, inputType, outputType);
-		filt->fedptr = std::move(fedObj);
-		return reinterpret_cast<helics_destination_filter> (filt);
-	}
-	catch (const helics::InvalidFunctionCall &)
-	{
-		if (filt != nullptr)
-		{
-			delete filt;
-		}
-	}
-	return nullptr;
+    // now generate a generic subscription
+    auto fedObj = getFilterFedSharedPtr (fed);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    helics::DestFilterObject *filt = nullptr;
+    try
+    {
+        filt = new helics::DestFilterObject ();
+        filt->filtptr = std::make_unique<helics::DestinationFilter> (fedObj.get (), name, inputType, outputType);
+        filt->fedptr = std::move (fedObj);
+        return reinterpret_cast<helics_destination_filter> (filt);
+    }
+    catch (const helics::InvalidFunctionCall &)
+    {
+        delete filt;
+    }
+    return nullptr;
 }
 
-int helicsFederateHasMessageToFilter (helics_message_filter_federate fed) 
-{ 
-	if (fed == nullptr)
-	{
-		return false;
-	}
-	auto mFed = getFilterFed(fed);
-	return (mFed->hasMessageToFilter()) ? 1 : 0;
+int helicsFederateHasMessageToFilter (helics_message_filter_federate fed)
+{
+    if (fed == nullptr)
+    {
+        return -1;
+    }
+    auto mFed = getFilterFed (fed);
+    return (mFed->hasMessageToFilter ()) ? 1 : 0;
 }
 
-int helicsFilterHasMessage (helics_source_filter filt) 
-{ 
-	if (filt== nullptr)
-	{
-		return false;
-	}
+int helicsFilterHasMessage (helics_source_filter filt)
+{
+    if (filt == nullptr)
+    {
+        return -1;
+    }
 
-	auto filtObj = reinterpret_cast<helics::SourceFilterObject *> (filt);
-	return (filtObj->filtptr->hasMessage()) ? 1 : 0;
+    auto filtObj = reinterpret_cast<helics::SourceFilterObject *> (filt);
+    return (filtObj->filtptr->hasMessage ()) ? 1 : 0;
 }
 
-int helicsFederateFilterReceiveCount (helics_message_filter_federate fedID) { return 0; }
+int helicsFederateFilterReceiveCount (helics_message_filter_federate fed) { return 0; }
 
 int helicsFilterReceiveCount (helics_source_filter filter) { return 0; }
 
-
-static message_t emptyMessage()
+static message_t emptyMessage ()
 {
-	message_t empty;
-	empty.time = 0;
-	empty.data = nullptr;
-	empty.length = 0;
-	empty.dst = nullptr;
-	empty.origsrc = nullptr;
-	empty.src = nullptr;
-	return empty;
+    message_t empty{};
+    empty.time = 0;
+    empty.data = nullptr;
+    empty.length = 0;
+    empty.dst = nullptr;
+    empty.origsrc = nullptr;
+    empty.src = nullptr;
+    return empty;
 }
 
-message_t helicsFilterGetMessage(helics_source_filter filter)
+message_t helicsFilterGetMessage (helics_source_filter filter)
 {
-	if (filter == nullptr)
-	{
-		return emptyMessage();
-	}
+    if (filter == nullptr)
+    {
+        return emptyMessage ();
+    }
 
-	auto filtObj = reinterpret_cast<helics::SourceFilterObject *> (filter);
-	filtObj->lastMessage = filtObj->filtptr->getMessage();
-	message_t mess;
-	mess.data = filtObj->lastMessage->data.data();
-	mess.dst = filtObj->lastMessage->dest.c_str();
-	mess.length = filtObj->lastMessage->data.size();
-	mess.origsrc = filtObj->lastMessage->origsrc.c_str();
-	mess.src = filtObj->lastMessage->src.c_str();
-	mess.time = filtObj->lastMessage->time.getBaseTimeCode();
-	return mess;
+    auto filtObj = reinterpret_cast<helics::SourceFilterObject *> (filter);
+    filtObj->lastMessage = filtObj->filtptr->getMessage ();
+    message_t mess{};
+    mess.data = filtObj->lastMessage->data.data ();
+    mess.dst = filtObj->lastMessage->dest.c_str ();
+    mess.length = filtObj->lastMessage->data.size ();
+    mess.origsrc = filtObj->lastMessage->origsrc.c_str ();
+    mess.src = filtObj->lastMessage->src.c_str ();
+    mess.time = filtObj->lastMessage->time.getBaseTimeCode ();
+    return mess;
 }

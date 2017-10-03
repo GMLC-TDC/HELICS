@@ -123,7 +123,7 @@ helics_federate helicsCreateValueFederate (const helics_federate_info_t fi)
     {
         return nullptr;
     }
-    helics::FedObject *fed = new helics::FedObject;
+    auto *fed = new helics::FedObject;
     fed->fedptr = std::make_shared<helics::ValueFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
     fed->type = helics::vtype::valueFed;
     fed->valid = validationIdentifier;
@@ -132,7 +132,7 @@ helics_federate helicsCreateValueFederate (const helics_federate_info_t fi)
 
 helics_federate helicsCreateValueFederateFromFile (const char *file)
 {
-    helics::FedObject *fed = new helics::FedObject;
+    auto *fed = new helics::FedObject;
     fed->fedptr = std::make_shared<helics::ValueFederate> (file);
     fed->type = helics::vtype::valueFed;
     fed->valid = validationIdentifier;
@@ -146,7 +146,7 @@ helics_federate helicsCreateMessageFederate (const helics_federate_info_t fi)
     {
         return nullptr;
     }
-    helics::FedObject *fed = new helics::FedObject;
+    auto *fed = new helics::FedObject;
     fed->fedptr = std::make_shared<helics::MessageFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
     fed->type = helics::vtype::messageFed;
     fed->valid = validationIdentifier;
@@ -155,7 +155,7 @@ helics_federate helicsCreateMessageFederate (const helics_federate_info_t fi)
 
 helics_federate helicsCreateMessageFederateFromFile (const char *file)
 {
-    helics::FedObject *fed = new helics::FedObject;
+    auto *fed = new helics::FedObject;
     fed->fedptr = std::make_shared<helics::MessageFederate> (file);
     fed->type = helics::vtype::messageFed;
     fed->valid = validationIdentifier;
@@ -165,7 +165,7 @@ helics_federate helicsCreateMessageFederateFromFile (const char *file)
 /* Creation and destruction of Federates */
 helics_federate helicsCreateMessageFilterFederate (const helics_federate_info_t fi)
 {
-    helics::FedObject *fed = new helics::FedObject;
+    auto *fed = new helics::FedObject;
     fed->fedptr = std::make_shared<helics::MessageFilterFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
     fed->type = helics::vtype::filterFed;
     fed->valid = validationIdentifier;
@@ -174,7 +174,7 @@ helics_federate helicsCreateMessageFilterFederate (const helics_federate_info_t 
 
 helics_federate helicsCreateMessageFilterFederateFromFile (const char *file)
 {
-    helics::FedObject *fed = new helics::FedObject;
+    auto *fed = new helics::FedObject;
     fed->fedptr = std::make_shared<helics::MessageFilterFederate> (file);
     fed->type = helics::vtype::filterFed;
     fed->valid = validationIdentifier;
@@ -184,7 +184,7 @@ helics_federate helicsCreateMessageFilterFederateFromFile (const char *file)
 /* Creation and destruction of Federates */
 helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi)
 {
-    helics::FedObject *fed = new helics::FedObject;
+    auto *fed = new helics::FedObject;
     fed->fedptr = std::make_shared<helics::CombinationFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
     fed->type = helics::vtype::combinFed;
     fed->valid = validationIdentifier;
@@ -193,32 +193,32 @@ helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi
 
 helics_federate helicsCreateCombinationFederateFromFile (const char *file)
 {
-    helics::FedObject *fed = new helics::FedObject;
+    auto *fed = new helics::FedObject;
     fed->fedptr = std::make_shared<helics::CombinationFederate> (file);
     fed->type = helics::vtype::combinFed;
     fed->valid = validationIdentifier;
     return reinterpret_cast<void *> (fed);
 }
 
-helicsStatus helicsFinalize (helics_federate fedID)
+helicsStatus helicsFinalize (helics_federate fed)
 {
-    auto fed = getFed (fedID);
-    if (fed == nullptr)
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
     {
         return helicsDiscard;
     }
-    fed->finalize ();
+    fedObj->finalize ();
 
     return helicsOK;
 }
 
 /* initialization, execution, and time requests */
-helicsStatus helicsEnterInitializationMode (helics_federate fedID)
+helicsStatus helicsEnterInitializationMode (helics_federate fed)
 {
-    auto fed = getFed (fedID);
+    auto fedObj = getFed (fed);
     try
     {
-        fed->enterInitializationState ();
+        fedObj->enterInitializationState ();
         return helicsOK;
     }
     catch (helics::InvalidStateTransition &)
@@ -227,16 +227,16 @@ helicsStatus helicsEnterInitializationMode (helics_federate fedID)
     }
 }
 
-helicsStatus helicsEnterExecutionMode (helics_federate fedID)
+helicsStatus helicsEnterExecutionMode (helics_federate fed)
 {
-    auto fed = getFed (fedID);
-    if (fed == nullptr)
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
     {
         return helicsDiscard;
     }
     try
     {
-        fed->enterExecutionState ();
+        fedObj->enterExecutionState ();
         return helicsOK;
     }
     catch (helics::InvalidStateTransition &)
@@ -302,14 +302,15 @@ helicsStatus helicsEnterExecutionModeIterative (helics_federate fed,
     }
 }
 
-helics_time_t helicsRequestTime (helics_federate fedID, helics_time_t requestTime)
+helics_time_t helicsRequestTime (helics_federate fed, helics_time_t requestTime)
 {
-    auto fed = getFed (fedID);
-    if (!fed)
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
     {
         return helicsDiscard;
     }
-    return requestTime;
+    auto tm = fedObj->requestTime (helics::Time (requestTime, timeUnits::ns));
+    return tm.getBaseTimeCode ();
 }
 
 helics_iterative_time
@@ -338,10 +339,4 @@ helicsRequestTimeIterative (helics_federate fed, helics_time_t requestTime, conv
     }
 }
 
-void helics_free_federate (helics_federate fed)
-{
-    if (fed != nullptr)
-    {
-        delete reinterpret_cast<helics::FedObject *>(fed);
-    }
-}
+void helics_free_federate (helics_federate fed) { delete reinterpret_cast<helics::FedObject *> (fed); }

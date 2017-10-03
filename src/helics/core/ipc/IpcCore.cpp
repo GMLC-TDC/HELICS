@@ -43,7 +43,7 @@ IpcCore::IpcCore () noexcept {}
 
 IpcCore::IpcCore (const std::string &core_name) : CommonCore (core_name) {}
 
-IpcCore::~IpcCore() = default;
+IpcCore::~IpcCore () = default;
 
 void IpcCore::InitializeFromArgs (int argc, char *argv[])
 {

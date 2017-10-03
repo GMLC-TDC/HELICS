@@ -10,34 +10,34 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #ifndef HELICS_APISHARED_MESSAGE_FILTER_FEDERATE_FUNCTIONS_H_
 #define HELICS_APISHARED_MESSAGE_FILTER_FEDERATE_FUNCTIONS_H_
 
+#include "helics.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "helics.h"
 
 HELICS_Export helics_message_filter_federate helicsCreateMessageFilterFederate (const helics_federate_info_t fi);
 HELICS_Export helics_message_filter_federate helicsCreateMessageFilterFederateFromFile (const char *filename);
 // MESSAGE FEDERATE calls
 
-HELICS_Export helics_source_filter helicsRegisterSourceFilter (helics_message_filter_federate fedID,
+HELICS_Export helics_source_filter helicsRegisterSourceFilter (helics_message_filter_federate fed,
                                                                const char *name,
                                                                const char *inputType,
                                                                const char *outputType);
 
-HELICS_Export helics_destination_filter helicsRegisterDestinationFilter (helics_message_filter_federate fedID,
+HELICS_Export helics_destination_filter helicsRegisterDestinationFilter (helics_message_filter_federate fed,
                                                                          const char *name,
                                                                          const char *inputType,
                                                                          const char *outputType);
 /** check if the federate has any outstanding messages*/
-HELICS_Export int helicsFederateHasMessageToFilter (helics_message_filter_federate fedID);
+HELICS_Export int helicsFederateHasMessageToFilter (helics_message_filter_federate fed);
 /* check if a given endpoint has any unread messages*/
 HELICS_Export int helicsFilterHasMessage (helics_source_filter id);
 
 /**
  * Returns the number of pending receives for the specified destination endpoint.
  */
-HELICS_Export int helicsFederateFilterReceiveCount (helics_message_filter_federate fedID);
+HELICS_Export int helicsFederateFilterReceiveCount (helics_message_filter_federate fed);
 /**
  * Returns the number of pending receives for all endpoints of particular federate.
  */

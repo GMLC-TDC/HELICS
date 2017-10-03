@@ -27,8 +27,7 @@ class Endpoint
     @param[in] name the name of the endpoint
     @param[in] type a named type associated with the endpoint
     */
-    Endpoint (MessageFederate *mFed, const std::string &name, const std::string &type = "")
-        : fed (mFed)
+    Endpoint (MessageFederate *mFed, const std::string &name, const std::string &type = "") : fed (mFed)
     {
         id = fed->registerEndpoint (name, type);
     }
@@ -38,11 +37,13 @@ class Endpoint
     @param[in] name the name of the endpoint
     @param[in] type a named type associated with the endpoint
     */
-    Endpoint (interface_visibility locality, MessageFederate *mFed, const std::string &name, const std::string &type = "")
+    Endpoint (interface_visibility locality,
+              MessageFederate *mFed,
+              const std::string &name,
+              const std::string &type = "")
         : fed (mFed)
     {
-        id = (locality == GLOBAL) ? fed->registerGlobalEndpoint (name, type) :
-                                    fed->registerEndpoint (name, type);
+        id = (locality == GLOBAL) ? fed->registerGlobalEndpoint (name, type) : fed->registerEndpoint (name, type);
     }
     /** send a data block and length
     @param[in] dest string name of the destination
@@ -122,10 +123,10 @@ class Endpoint
     */
     void setCallback (std::function<void(endpoint_id_t, Time)> callback)
     {
-        fed->registerEndpointCallback (id, callback);
+        fed->registerEndpointCallback (id, std::move (callback));
     }
     /** set a target destination for unspecified messages*/
     void setTargetDestination (const std::string &target) { targetDest = target; }
 };
-}
+}  // namespace helics
 #endif

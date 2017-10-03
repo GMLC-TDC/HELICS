@@ -660,4 +660,4 @@ void ZmqComms::closeReceiver ()
 std::string ZmqComms::getPushAddress () const { return makePortAddress (localTarget_, pullPortNumber); }
 
 std::string ZmqComms::getRequestAddress () const { return makePortAddress (localTarget_, repPortNumber); }
-} //namespace helics
+}  // namespace helics

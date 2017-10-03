@@ -45,13 +45,7 @@ helics_federate_info_t createFederateInfoObject ()
     return reinterpret_cast<void *> (fi);
 }
 
-void freeFederateInfoObject (helics_federate_info_t fi)
-{
-    if (fi != nullptr)
-    {
-        delete reinterpret_cast<helics::FederateInfo *> (fi);
-    }
-}
+void freeFederateInfoObject (helics_federate_info_t fi) { delete reinterpret_cast<helics::FederateInfo *> (fi); }
 
 helicsStatus FederateInfoSetFederateName (helics_federate_info_t fi, const char *name)
 {
