@@ -114,6 +114,7 @@ create (core_type type, const std::string &broker_name, const std::string &initi
     if (!reg)
     {
     }
+    broker->connect ();
     return broker;
 }
 
