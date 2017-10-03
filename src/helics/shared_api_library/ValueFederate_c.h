@@ -17,9 +17,6 @@ extern "C" {
 
 #include "helics.h"
 
-HELICS_Export helics_value_federate helicsCreateValueFederate (const helics_federate_info_t fi);
-HELICS_Export helics_value_federate helicsCreateValueFederateFromFile (const char *);
-
 /* sub/pub registration */
 #define HELICS_STRING_TYPE 0
 #define HELICS_DOUBLE_TYPE 1
