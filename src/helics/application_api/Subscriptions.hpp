@@ -76,7 +76,7 @@ void valueExtract (const data_view &dv, helicsType_t baseType, X &val)
     {
     case helicsType_t::helicsString:
     {
-        val = boost::lexical_cast<X> (dv.string ());
+        val = static_cast<X>(boost::lexical_cast<double> (dv.string ()));
         break;
     }
     case helicsType_t::helicsDouble:

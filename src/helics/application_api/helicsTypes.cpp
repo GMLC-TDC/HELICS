@@ -105,22 +105,35 @@ std::complex<double> helicsGetComplex (const std::string &val)
     double re = 0.0;
     double im = 0.0;
     std::regex_search (val, m, creg);
-    if (m.size () == 9)
-    {
-        re = boost::lexical_cast<double> (m[1]);
-        im = boost::lexical_cast<double> (m[5]);
-    }
-    else
-    {
-        if ((val.back () == 'j') || (val.back () == 'i'))
-        {
-            im = boost::lexical_cast<double> (val.substr (0, val.size () - 1));
-        }
-        else
-        {
-            re = boost::lexical_cast<double> (val);
-        }
-    }
+	try
+	{
+		if (m.size() == 9)
+		{
+			re = boost::lexical_cast<double> (m[1]);
+
+			im = boost::lexical_cast<double> (m[6]);
+
+			if (*m[5].first == '-')
+			{
+				im = -im;
+			}
+		}
+		else
+		{
+			if ((val.back() == 'j') || (val.back() == 'i'))
+			{
+				im = boost::lexical_cast<double> (val.substr(0, val.size() - 1));
+			}
+			else
+			{
+				re = boost::lexical_cast<double> (val);
+			}
+		}
+	}
+	catch(const boost::bad_lexical_cast &)
+	{
+		im = 0.0;
+	}
     return std::complex<double> (re, im);
 }
 
