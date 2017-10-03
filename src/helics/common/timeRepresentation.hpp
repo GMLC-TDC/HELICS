@@ -80,7 +80,7 @@ class integer_time
     static constexpr baseType convert (double t) noexcept
     {
         double div = t * multiplier;
-        base divBase = static_cast<base> (div);
+        auto divBase = static_cast<base> (div);
         double frac = div - static_cast<double> (divBase);
         baseType nseconds = (divBase << N) + static_cast<base> (frac * multiplier);
         return (t < -1e12) ? nseconds : minVal ();
@@ -293,22 +293,22 @@ class timeRepresentation
   private:
 /** explicit means to generate a constexpr timeRepresentation at time 0, negTime and maxTime and min time delta*/
 #ifdef _DEBUG
-    constexpr explicit timeRepresentation (std::integral_constant<int, 0>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, 0> /*unused*/) noexcept
         : timecode_ (Tconv::zeroVal ()), dtime_ (0.0){};
-    constexpr explicit timeRepresentation (std::integral_constant<int, -1>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, -1> /*unused*/) noexcept
         : timecode_ (Tconv::minVal ()), dtime_ (-1.456e47){};
-    constexpr explicit timeRepresentation (std::integral_constant<int, 1>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, 1> /*unused*/) noexcept
         : timecode_ (Tconv::maxVal ()), dtime_ (1e49){};
-    constexpr explicit timeRepresentation (std::integral_constant<int, 2>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, 2> /*unused*/) noexcept
         : timecode_ (Tconv::epsilon ()), dtime_ (1e-9){};
 #else
-    constexpr explicit timeRepresentation (std::integral_constant<int, 0>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, 0> /*unused*/) noexcept
         : timecode_ (Tconv::zeroVal ()){};
-    constexpr explicit timeRepresentation (std::integral_constant<int, -1>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, -1> /*unused*/) noexcept
         : timecode_ (Tconv::minVal ()){};
-    constexpr explicit timeRepresentation (std::integral_constant<int, 1>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, 1> /*unused*/) noexcept
         : timecode_ (Tconv::maxVal ()){};
-    constexpr explicit timeRepresentation (std::integral_constant<int, 2>) noexcept
+    constexpr explicit timeRepresentation (std::integral_constant<int, 2> /*unused*/) noexcept
         : timecode_ (Tconv::epsilon ()){};
 #endif
 

@@ -240,4 +240,4 @@ void sendToQueue::sendMessage (const ActionMessage &cmd, int priority)
         txqueue->send (buffer.data (), buffer.size (), priority);
     }
 }
-}
+} //namespace helics

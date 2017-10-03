@@ -34,17 +34,17 @@ class BlockingQueue3
     std::vector<T> pullElements;  //!< vector of elements waiting extraction
     std::atomic<bool> queueEmptyFlag{true};  //!< flag indicating the queue is Empty
     // the condition variable should be keyed of the pullLock
-    std::condition_variable condition_;  //!< condition variable for notification of new data
+    std::condition_variable condition;  //!< condition variable for notification of new data
   public:
     /** default constructor*/
     BlockingQueue3 () = default;
-
+	~BlockingQueue3() = default;
     /** constructor with the capacity numbers
     @details there are two internal vectors that alternate
     so the actual reserve is 2x the capacity numbers in two different vectors
     @param capacity the initial reserve capacity for the arrays
     */
-    BlockingQueue3 (size_t capacity)
+    explicit BlockingQueue3 (size_t capacity)
     {  // don't need to lock since we aren't out of the constructor yet
         pushElements.reserve (capacity);
         pullElements.reserve (capacity);
@@ -57,7 +57,7 @@ class BlockingQueue3
     }
 
     /** enable the move assignment not the copy assignment*/
-    BlockingQueue3 &operator= (BlockingQueue3 &&sq)
+    BlockingQueue3 &operator= (BlockingQueue3 &&sq) noexcept
     {
         std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
         std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
@@ -106,7 +106,7 @@ class BlockingQueue3
                 {
                     pullElements.push_back (std::forward<Z> (val));
                     pullLock.unlock ();
-                    condition_.notify_all ();
+                    condition.notify_all ();
                 }
                 else
                 {
@@ -143,7 +143,7 @@ class BlockingQueue3
                 {
                     pullElements.emplace_back (std::forward<Args> (args)...);
                     pullLock.unlock ();
-                    condition_.notify_all ();
+                    condition.notify_all ();
                 }
                 else
                 {
@@ -195,18 +195,15 @@ class BlockingQueue3
                 pullElements.pop_back ();
                 return actval;
             }
-            condition_.wait (pullLock);  // now wait
+            condition.wait (pullLock);  // now wait
             if (!pullElements.empty ())  // check for spurious wake-ups
             {
                 auto actval = std::move (pullElements.back ());
                 pullElements.pop_back ();
                 return actval;
             }
-            else
-            {
-                pullLock.unlock ();
-                val = try_pop ();
-            }
+            pullLock.unlock ();
+            val = try_pop ();
         }
         // move the value out of the optional
         return std::move (*val);
@@ -226,14 +223,14 @@ class BlockingQueue3
         {
             callOnWaitFunction ();
             std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
-            if (!pullElements
-                   .empty ())  // the callback may fill the queue or it may have been filled in the meantime
-            {
+            if (!pullElements.empty ())  
+				
+            {// the callback may fill the queue or it may have been filled in the meantime
                 auto actval = std::move (pullElements.back ());
                 pullElements.pop_back ();
                 return actval;
             }
-            condition_.wait (pullLock);
+            condition.wait (pullLock);
             // need to check again to handle spurious wake-up
             if (!pullElements.empty ())
             {
@@ -241,11 +238,8 @@ class BlockingQueue3
                 pullElements.pop_back ();
                 return actval;
             }
-            else
-            {
-                pullLock.unlock ();
-                val = try_pop ();
-            }
+            pullLock.unlock ();
+            val = try_pop ();
         }
         return std::move (*val);
     }
@@ -293,14 +287,9 @@ stx::optional<T> BlockingQueue3<T>::try_pop ()
             }
             return val;
         }
-        else
-        {
-            queueEmptyFlag = true;
-        }
+        queueEmptyFlag = true;
         return {};  // return the empty optional
     }
-    else
-    {
         stx::optional<T> val (std::move (pullElements.back ()));  // do it this way to allow moveable only types
         pullElements.pop_back ();
         if (pullElements.empty ())
@@ -319,7 +308,6 @@ stx::optional<T> BlockingQueue3<T>::try_pop ()
             }
         }
         return val;
-    }
 }
 
 template <typename T>

@@ -416,4 +416,4 @@ void unregisterCore (const std::string &name)
 }
 
 }  // namespace CoreFactory
-}  // namespace
+}  // namespace helics

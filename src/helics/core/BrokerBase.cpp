@@ -28,9 +28,9 @@ static inline std::string gen_id ()
     boost::uuids::uuid uuid = boost::uuids::random_generator () ();
     std::string uuid_str = boost::lexical_cast<std::string> (uuid);
 #ifdef _WIN32
-    std::string pid_str = boost::lexical_cast<std::string> (GetCurrentProcessId ());
+    std::string pid_str = std::to_string(GetCurrentProcessId ());
 #else
-    std::string pid_str = boost::lexical_cast<std::string> (getpid ());
+    std::string pid_str = std::to_string(getpid ());
 #endif
     return pid_str + "-" + uuid_str;
 }
@@ -186,7 +186,7 @@ void BrokerBase::InitializeFromArgs (int argc, char *argv[])
     {
         maxLogLevel = vm["loglevel"].as<int> ();
     }
-    if (vm.count ("logfile"))
+    if (vm.count ("logfile")>0)
     {
         logFile = vm["logfile"].as<std::string> ();
     }
