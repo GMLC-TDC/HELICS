@@ -70,10 +70,10 @@ int main(int argc,char **argv)
        and should be removed once helicsValueFederateisUpdated is working
        correctly
     */
-    /*   int isupdated; */
-    /*    isupdated = helicsValueFederateisUpdated(vfed,sub); */
-    /*    if(isupdated) { */
-    if(currenttimeobj > prevtimeobj) {
+       int isupdated; 
+	   isupdated = helicsIsValueUpdated(sub);
+        if(isupdated) {
+   // if(currenttimeobj > prevtimeobj) {
       status = helicsGetDouble(sub,&value);
       printf("PI RECEIVER: Received value = %4.3f at time %3.2f from PI SENDER\n",value,currenttime);
       /*    } */

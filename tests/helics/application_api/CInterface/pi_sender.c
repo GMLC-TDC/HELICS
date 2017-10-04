@@ -6,7 +6,11 @@ static char help[] = " PI SENDER: Simple program to demonstrate the usage of HEL
 
 #include <stdio.h>
 #include <ValueFederate_c.h>
+#ifdef _MSC_VER
+#include <windows.h>
+#else
 #include <unistd.h>
+#endif
 
 int main(int argc,char **argv)
 {
@@ -89,7 +93,11 @@ int main(int argc,char **argv)
 
 
   while(helicsBrokerisConnected(broker)) {
+#ifdef _MSC_VER
+	  Sleep(1);
+#else
     usleep(1000); /* Sleep for 1 millisecond */
+#endif
   }
   printf("PI SENDER: Broker disconnected\n");
 
