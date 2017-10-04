@@ -38,7 +38,7 @@ class BlockingQueue3
   public:
     /** default constructor*/
     BlockingQueue3 () = default;
-	~BlockingQueue3() = default;
+    ~BlockingQueue3 () = default;
     /** constructor with the capacity numbers
     @details there are two internal vectors that alternate
     so the actual reserve is 2x the capacity numbers in two different vectors
@@ -223,9 +223,9 @@ class BlockingQueue3
         {
             callOnWaitFunction ();
             std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
-            if (!pullElements.empty ())  
-				
-            {// the callback may fill the queue or it may have been filled in the meantime
+            if (!pullElements.empty ())
+
+            {  // the callback may fill the queue or it may have been filled in the meantime
                 auto actval = std::move (pullElements.back ());
                 pullElements.pop_back ();
                 return actval;
@@ -290,24 +290,24 @@ stx::optional<T> BlockingQueue3<T>::try_pop ()
         queueEmptyFlag = true;
         return {};  // return the empty optional
     }
-        stx::optional<T> val (std::move (pullElements.back ()));  // do it this way to allow moveable only types
-        pullElements.pop_back ();
-        if (pullElements.empty ())
-        {
-            std::unique_lock<std::mutex> pushLock (m_pushLock);  // second pushLock
-            if (!pushElements.empty ())
-            {  // this is the potential for slow operations
-                std::swap (pushElements, pullElements);
-                // we can free the push function to accept more elements after the swap call;
-                pushLock.unlock ();
-                std::reverse (pullElements.begin (), pullElements.end ());
-            }
-            else
-            {
-                queueEmptyFlag = true;
-            }
+    stx::optional<T> val (std::move (pullElements.back ()));  // do it this way to allow moveable only types
+    pullElements.pop_back ();
+    if (pullElements.empty ())
+    {
+        std::unique_lock<std::mutex> pushLock (m_pushLock);  // second pushLock
+        if (!pushElements.empty ())
+        {  // this is the potential for slow operations
+            std::swap (pushElements, pullElements);
+            // we can free the push function to accept more elements after the swap call;
+            pushLock.unlock ();
+            std::reverse (pullElements.begin (), pullElements.end ());
         }
-        return val;
+        else
+        {
+            queueEmptyFlag = true;
+        }
+    }
+    return val;
 }
 
 template <typename T>

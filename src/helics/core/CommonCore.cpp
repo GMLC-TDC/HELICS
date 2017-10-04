@@ -130,7 +130,7 @@ void CommonCore::disconnect ()
     }
 }
 
-CommonCore::~CommonCore() = default;
+CommonCore::~CommonCore () = default;
 
 FederateState *CommonCore::getFederate (federate_id_t federateID) const
 {
@@ -143,11 +143,11 @@ FederateState *CommonCore::getFederate (federate_id_t federateID) const
         return _federates[federateID].get ();
     }
 
-        auto fnd = global_id_translation.find (federateID);
-        if (fnd != global_id_translation.end ())
-        {
-            return _federates[fnd->second].get ();
-        }
+    auto fnd = global_id_translation.find (federateID);
+    if (fnd != global_id_translation.end ())
+    {
+        return _federates[fnd->second].get ();
+    }
 
     return nullptr;
 }
@@ -1095,7 +1095,7 @@ void CommonCore::sendMessage (Handle sourceHandle, std::unique_ptr<Message> mess
     {
         throw (invalidIdentifier ("handle does not point to an endpoint"));
     }
-    ActionMessage m (std::move(message));
+    ActionMessage m (std::move (message));
     if (hndl != nullptr)
     {
         m.info ().source = hndl->key;
@@ -1454,14 +1454,13 @@ void CommonCore::processPriorityCommand (const ActionMessage &command)
         {
             if (command.error)
             {
-				LOG_ERROR(0, identifier, "broker responded with error\n");
-				// generate error messages in response to all the delayed messages
-				break;
+                LOG_ERROR (0, identifier, "broker responded with error\n");
+                // generate error messages in response to all the delayed messages
+                break;
             }
-			global_broker_id = command.dest_id;
-			transmitDelayedMessages();
-			return;
-           
+            global_broker_id = command.dest_id;
+            transmitDelayedMessages ();
+            return;
         }
         break;
     case CMD_FED_ACK:

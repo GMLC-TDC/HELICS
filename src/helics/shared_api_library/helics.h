@@ -11,10 +11,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #ifndef HELICS_APISHARED_FUNCTIONS_H_
 #define HELICS_APISHARED_FUNCTIONS_H_
 
+#include "api-data.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "api-data.h"
+
 #include <stdlib.h>
 
 /*
@@ -63,7 +65,7 @@ HELICS_Export void freeFederateInfoObject (const helics_federate_info_t fi);
 
 HELICS_Export helicsStatus FederateInfoSetFederateName (helics_federate_info_t fi, const char *name);
 HELICS_Export helicsStatus FederateInfoSetCoreName (helics_federate_info_t fi, const char *corename);
-HELICS_Export helicsStatus FederateInfoSetCoreInitString (helics_federate_info_t fi, const char *corename);
+HELICS_Export helicsStatus FederateInfoSetCoreInitString (helics_federate_info_t fi, const char *coreInit);
 HELICS_Export helicsStatus FederateInfoSetCoreTypeFromString (helics_federate_info_t fi, const char *coretype);
 HELICS_Export helicsStatus FederateInfoSetCoreType (helics_federate_info_t fi, int coretype);
 HELICS_Export helicsStatus FederateInfoSetFlag (helics_federate_info_t fi, int flag, int value);

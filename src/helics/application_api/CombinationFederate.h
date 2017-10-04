@@ -35,7 +35,7 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     /**constructor taking a file with the required information
     @param[in] file a file defining the federate information
     */
-    CombinationFederate (const std::string &file);
+    CombinationFederate (const std::string &jsonString);
 
     /** move construction*/
     CombinationFederate (CombinationFederate &&fed) noexcept;

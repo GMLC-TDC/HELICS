@@ -35,10 +35,7 @@ helics_endpoint helicsRegisterEndpoint (helics_message_federate fed, const char 
     }
     catch (const helics::InvalidFunctionCall &)
     {
-        if (end != nullptr)
-        {
-            delete end;
-        }
+        delete end;
     }
     return nullptr;
 }
@@ -61,10 +58,7 @@ helics_endpoint helicsRegisterGlobalEndpoint (helics_message_federate fed, const
     }
     catch (const helics::InvalidFunctionCall &)
     {
-        if (end != nullptr)
-        {
-            delete end;
-        }
+        delete end;
     }
     return nullptr;
 }
@@ -99,7 +93,7 @@ helicsStatus helicsSendMessageRaw (helics_endpoint endpoint, const char *dest, c
 }
 
 helicsStatus
-helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, uint64_t len, helics_time_t time)
+helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time)
 {
     if (endpoint == nullptr)
     {
@@ -141,7 +135,17 @@ helicsStatus helicsSendMessage (helics_endpoint endpoint, message_t *message)
     return helicsOK;
 }
 
-helicsStatus helicsSubscribe (helics_endpoint endpoint, const char *name, const char *type) { return helicsOK; }
+helicsStatus helicsSubscribe (helics_endpoint endpoint, const char *name, const char *type) 
+{ 
+	if (endpoint == nullptr)
+	{
+		return helicsError;
+	}
+	auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
+	
+	endObj->endptr->subscribe(name, type);
+	return helicsOK;
+}
 
 int helicsFederateHasMessage (helics_message_federate fed)
 {
@@ -185,9 +189,9 @@ uint64_t helicsEndpointReceiveCount (helics_endpoint endpoint)
     return endObj->endptr->receiveCount ();
 }
 
-message_t emptyMessage ()
+static message_t emptyMessage ()
 {
-    message_t empty;
+    message_t empty{};
     empty.time = 0;
     empty.data = nullptr;
     empty.length = 0;
@@ -206,7 +210,7 @@ message_t helicsEndpointGetMessage (helics_endpoint endpoint)
 
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     endObj->lastMessage = endObj->endptr->getMessage ();
-    message_t mess;
+    message_t mess{};
     mess.data = endObj->lastMessage->data.data ();
     mess.dst = endObj->lastMessage->dest.c_str ();
     mess.length = endObj->lastMessage->data.size ();
@@ -229,7 +233,7 @@ message_t helicsFederateGetMessage (helics_message_federate fed)
         return emptyMessage ();
     }
     fedObj->lastMessage = mFed->getMessage ();
-    message_t mess;
+    message_t mess{};
     mess.data = fedObj->lastMessage->data.data ();
     mess.dst = fedObj->lastMessage->dest.c_str ();
     mess.length = fedObj->lastMessage->data.size ();
@@ -237,4 +241,45 @@ message_t helicsFederateGetMessage (helics_message_federate fed)
     mess.src = fedObj->lastMessage->src.c_str ();
     mess.time = fedObj->lastMessage->time.getBaseTimeCode ();
     return mess;
+}
+
+
+helicsStatus helicsGetEndpointType(helics_endpoint endpoint, char *str, int maxlen)
+{
+	if (endpoint == nullptr)
+	{
+		return helicsError;
+	}
+	auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
+	auto type = endObj->endptr->getType();
+	if (static_cast<int> (type.size()) > maxlen)
+	{
+		strncpy(str, type.c_str(), maxlen);
+		str[maxlen - 1] = 0;
+	}
+	else
+	{
+		strcpy(str, type.c_str());
+	}
+	return helicsOK;
+}
+
+helicsStatus helicsGetEndpointName(helics_endpoint endpoint, char *str, int maxlen)
+{
+	if (endpoint == nullptr)
+	{
+		return helicsError;
+	}
+	auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
+	auto type = endObj->endptr->getName();
+	if (static_cast<int> (type.size()) > maxlen)
+	{
+		strncpy(str, type.c_str(), maxlen);
+		str[maxlen - 1] = 0;
+	}
+	else
+	{
+		strcpy(str, type.c_str());
+	}
+	return helicsOK;
 }

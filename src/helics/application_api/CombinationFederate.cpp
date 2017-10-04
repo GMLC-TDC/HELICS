@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-CombinationFederate::CombinationFederate () {}
+CombinationFederate::CombinationFederate () = default;
 CombinationFederate::CombinationFederate (const FederateInfo &fi)
     : Federate (fi), ValueFederate (true), MessageFederate (true)
 {
@@ -55,4 +55,4 @@ void CombinationFederate::registerInterfaces (const std::string &jsonString)
     ValueFederate::registerInterfaces (jsonString);
     MessageFederate::registerInterfaces (jsonString);
 }
-}
+}  // namespace helics

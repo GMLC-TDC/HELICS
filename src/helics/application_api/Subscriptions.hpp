@@ -75,7 +75,7 @@ void valueExtract (const data_view &dv, helicsType_t baseType, X &val)
     {
     case helicsType_t::helicsString:
     {
-        val = boost::lexical_cast<X> (dv.string ());
+        val = static_cast<X> (boost::lexical_cast<double> (dv.string ()));
         break;
     }
     case helicsType_t::helicsDouble:
@@ -124,47 +124,46 @@ void valueExtract (const data_view &dv, helicsType_t baseType, X &val)
         break;
     }
     case helicsType_t::helicsInvalid:
-        break;
+        throw (std::invalid_argument ("unrecognized helics type"));
     }
 }
-// template<class X, typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, bool>::type>
-class Subscription
+class SubscriptionBase
 {
-  public:
-  private:
+  protected:
     ValueFederate *fed = nullptr;  //!< reference to the value federate
     std::string key_;  //!< the name of the subscription
-    std::string units_;  //!< the defined units of the federate
-    boost::variant<std::function<void(const std::string &, Time)>,
-                   std::function<void(const double &, Time)>,
-                   std::function<void(const int64_t &, Time)>,
-                   std::function<void(const std::complex<double> &, Time)>,
-                   std::function<void(const std::vector<double> &, Time)>>
-      value_callback;  //!< callback function for the federate
+    std::string type_;  //!< the requested type of the subscription
+    std::string units_;  //!< the defined units of the subscription
     subscription_id_t id;  //!< the id of the federate
-    mutable helicsType_t type = helicsType_t::helicsInvalid;  //!< the underlying type the publication is using
-    defV lastValue;  //!< the last value updated
   public:
-    Subscription () noexcept {};
+    SubscriptionBase () = default;
 
-    Subscription (ValueFederate *valueFed, std::string key, std::string units = "")
-        : fed (valueFed), key_ (std::move (key)), units_ (std::move (units))
+    SubscriptionBase (ValueFederate *valueFed,
+                      const std::string &key,
+                      const std::string &type = "def",
+                      const std::string &units = "")
+        : fed (valueFed), key_ (key), type_ (type), units_ (units)
     {
-        id = fed->registerRequiredSubscription (key_, "def", units_);
+        id = fed->registerRequiredSubscription (key_, type_, units_);
     }
 
-    Subscription (bool required, ValueFederate *valueFed, std::string key, std::string units = "")
-        : fed (valueFed), key_ (std::move (key)), units_ (std::move (units))
+    SubscriptionBase (bool required,
+                      ValueFederate *valueFed,
+                      const std::string &key,
+                      const std::string &type = "def",
+                      const std::string &units = "")
+        : fed (valueFed), key_ (key), type_ (type), units_ (units)
     {
         if (required)
         {
-            id = fed->registerRequiredSubscription (key_, "def", units_);
+            id = fed->registerRequiredSubscription (key_, type_, units_);
         }
         else
         {
-            id = fed->registerOptionalSubscription (key_, "def", units_);
+            id = fed->registerOptionalSubscription (key_, type_, units_);
         }
     }
+    virtual ~SubscriptionBase () = default;
     /** get the time of the last update
     @return the time of the last update
     */
@@ -172,6 +171,46 @@ class Subscription
     /** check if the value has subscription has been updated*/
     bool isUpdated () const { return fed->isUpdated (id); }
     subscription_id_t getID () const { return id; }
+
+    /** register a callback for an update notification
+    @details the callback is called in the just before the time request function returns
+    @param[in] callback a function with signature void( Time time)
+    time is the time the value was updated  This callback is a notification callback and doesn't return the value
+    */
+    void registerCallback (std::function<void(Time)> callback)
+    {
+        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) { callback (time); });
+    }
+    /** get the key for the subscription*/
+    const std::string &getKey () const { return key_; }
+    /** get the key for the subscription*/
+    std::string getType () const { return fed->getPublicationType (id); }
+    const std::string &getUnits () const { return units_; }
+};
+// template<class X, typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, bool>::type>
+class Subscription : public SubscriptionBase
+{
+  public:
+    boost::variant<std::function<void(const std::string &, Time)>,
+                   std::function<void(const double &, Time)>,
+                   std::function<void(const int64_t &, Time)>,
+                   std::function<void(const std::complex<double> &, Time)>,
+                   std::function<void(const std::vector<double> &, Time)>>
+      value_callback;  //!< callback function for the federate
+
+    mutable helicsType_t type = helicsType_t::helicsInvalid;  //!< the underlying type the publication is using
+    defV lastValue;  //!< the last value updated
+  public:
+    Subscription (ValueFederate *valueFed, const std::string &key, const std::string &units = "")
+        : SubscriptionBase (valueFed, key, "def", units)
+    {
+    }
+
+    Subscription (bool required, ValueFederate *valueFed, const std::string &key, const std::string &units = "")
+        : SubscriptionBase (required, valueFed, key, "def", units)
+    {
+    }
+
     /** store the value in the given variable
     @param[out] out the location to store the value
     */
@@ -185,8 +224,11 @@ class Subscription
             {
                 type = getTypeFromString (fed->getPublicationType (id));
             }
-            valueExtract (dv, type, out);
-            lastValue = out;
+            if (type != helicsType_t::helicsInvalid)
+            {
+                valueExtract (dv, type, out);
+                lastValue = out;
+            }
         }
         else
         {
@@ -203,6 +245,7 @@ class Subscription
         return val;
     }
 
+    using SubscriptionBase::registerCallback;
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
     @param[in] callback a function with signature void(X val, Time time)
@@ -216,15 +259,6 @@ class Subscription
         fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) {
             handleCallback (time);
         });
-    }
-    /** register a callback for an update notification
-    @details the callback is called in the just before the time request function returns
-    @param[in] callback a function with signature void( Time time)
-    time is the time the value was updated  This callback is a notification callback and doesn't return the value
-    */
-    void registerCallback (std::function<void(Time)> callback)
-    {
-        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) { callback (time); });
     }
 
     template <class X>
@@ -240,26 +274,20 @@ class Subscription
 /** class to handle a subscription
 @tparam X the class of the value associated with a subscription*/
 template <class X>
-class SubscriptionT
+class SubscriptionT : public SubscriptionBase
 {
   private:
-    ValueFederate *fed = nullptr;  //!< reference to the value federate
-    std::string m_name;  //!< the name of the subscription
-    std::string m_units;  //!< the defined units of the federate
     std::function<void(X, Time)> value_callback;  //!< callback function for the federate
-    subscription_id_t id;  //!< the id of the federate
-    helicsType_t type = helicsType_t::helicsInvalid;  //!< the underlying type the publication is using
   public:
-    SubscriptionT () noexcept {}
+    SubscriptionT () = default;
     /**constructor to build a subscription object
     @param[in] valueFed  the ValueFederate to use
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
-    SubscriptionT (ValueFederate *valueFed, std::string name, std::string units = "")
-        : fed (valueFed), m_name (std::move (name)), m_units (std::move (units))
+    SubscriptionT (ValueFederate *valueFed, const std::string &name, const std::string &units = "")
+        : SubscriptionBase (valueFed, name, ValueConverter<X>::type (), units)
     {
-        id = fed->registerRequiredSubscription<X> (m_name, m_units);
     }
     /**constructor to build a subscription object
     @param[in] required a flag indicating that the subscription is required to have a matching publication
@@ -267,17 +295,9 @@ class SubscriptionT
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
-    SubscriptionT (bool required, ValueFederate *valueFed, std::string name, std::string units = "")
-        : fed (valueFed), m_name (std::move (name)), m_units (std::move (units))
+    SubscriptionT (bool required, ValueFederate *valueFed, const std::string &name, const std::string &units = "")
+        : SubscriptionBase (required, valueFed, name, ValueConverter<X>::type (), units)
     {
-        if (required)
-        {
-            id = fed->registerRequiredSubscription<X> (m_name, m_units);
-        }
-        else
-        {
-            id = fed->registerOptionalSubscription<X> (m_name, m_units);
-        }
     }
 
     /** get the most recent value
@@ -287,12 +307,8 @@ class SubscriptionT
     @param[out] out the location to store the value
     */
     void getValue (X &out) const { fed->getValue (id, out); }
-    /** get the time of the last update
-    @return the time of the last update
-    */
-    Time getLastUpdate () const { return fed->getLastUpdateTime (id); }
-    /** check if the value has subscription has been updated*/
-    bool isUpdated () const { return fed->isUpdated (id); }
+
+    using SubscriptionBase::registerCallback;
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
     @param[in] callback a function with signature void(X val, Time time)
@@ -305,16 +321,6 @@ class SubscriptionT
             handleCallback (time);
         });
     }
-    /** register a callback for an update notification
-    @details the callback is called in the just before the time request function returns
-    @param[in] callback a function with signature void( Time time)
-    time is the time the value was updated  This callback is a notification callback and doesn't return the value
-    */
-    void registerCallback (std::function<void(Time)> callback)
-    {
-        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) { callback (time); });
-    }
-    subscription_id_t getID () const { return id; }
 
   private:
     void handleCallback (Time time)

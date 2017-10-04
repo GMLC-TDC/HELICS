@@ -26,7 +26,8 @@ namespace helics
 	class Subscription;
 	class Publication;
 	class Endpoint;
-	class Filter;
+	class SourceFilter;
+	class DestinationFilter;
 
 	enum class vtype:int
 	{
@@ -70,7 +71,7 @@ namespace helics
 		bool rawOnly = false;
 		std::shared_ptr<ValueFederate> fedptr;
 	};
-
+	/** object wrapping a publication*/
 	class PublicationObject
 	{
 	public:
@@ -79,7 +80,7 @@ namespace helics
 		bool rawOnly = false;
 		std::shared_ptr<ValueFederate> fedptr;
 	};
-
+	/** object wrapping and endpoint*/
 	class EndpointObject
 	{
 	public:
@@ -87,18 +88,19 @@ namespace helics
 		std::shared_ptr<MessageFederate> fedptr;
 		std::unique_ptr<Message> lastMessage;
 	};
-
+	/** object wrapping a source filter*/
 	class SourceFilterObject
 	{
 	public:
-		std::unique_ptr<Filter> filtptr;
+		std::unique_ptr<SourceFilter> filtptr;
 		std::shared_ptr<MessageFilterFederate> fedptr;
+		std::unique_ptr<Message> lastMessage;
 	};
-
+	/** object wrapping a destination Filter*/
 	class DestFilterObject
 	{
 	public:
-		std::unique_ptr<Filter> subptr;
+		std::unique_ptr<DestinationFilter> filtptr;
 		std::shared_ptr<MessageFilterFederate> fedptr;
 	};
 }

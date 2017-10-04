@@ -204,7 +204,7 @@ class Federate
     the federate
     @param[in] lookAhead the look ahead time
     */
-    void setLookAhead (Time lookahead);
+    void setLookAhead (Time lookAhead);
 
     /** set the impact Window time
     @details the impact window is the time window around the time request in which other federates cannot affect
@@ -292,7 +292,7 @@ class Federate
   public:
     /** register a set of interfaces defined in a file
     @details call is only valid in startup mode
-    @param[in] jsonString  the location of the file to load to generate the interfaces
+    @param[in] jsonString  the location of the file or json String to load to generate the interfaces
     */
     virtual void registerInterfaces (const std::string &jsonString);
     /** get the underlying federateID for the core*/
