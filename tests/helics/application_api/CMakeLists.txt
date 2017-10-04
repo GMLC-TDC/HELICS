@@ -5,6 +5,10 @@
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 ##############################################################################
 
+if (BUILD_SHARED_LIBS)
+add_subdirectory (CInterface)
+endif(BUILD_SHARED_LIBS)
+
 set(application_api_test_headers
 testFixtures.h
 )
