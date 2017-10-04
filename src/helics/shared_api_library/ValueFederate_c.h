@@ -56,42 +56,42 @@ HELICS_Export helics_publication helicsRegisterGlobalTypePublication (helics_val
                                                                       const char *units);
 
 /* getting and publishing values */
-HELICS_Export helicsStatus helicsPublish (helics_publication pubID, const char *data, int len);
-HELICS_Export helicsStatus helicsPublishString (helics_publication pubID, const char *str);
-HELICS_Export helicsStatus helicsPublishInteger (helics_publication pubID, int64_t val);
-HELICS_Export helicsStatus helicsPublishDouble (helics_publication pubID, double val);
-HELICS_Export helicsStatus helicsPublishComplex (helics_publication pubID, double real, double imag);
-HELICS_Export helicsStatus helicsPublishVector (helics_publication pubID, const double data[], int len);
+HELICS_Export helicsStatus helicsPublish (helics_publication pub, const char *data, int len);
+HELICS_Export helicsStatus helicsPublishString (helics_publication pub, const char *str);
+HELICS_Export helicsStatus helicsPublishInteger (helics_publication pub, int64_t val);
+HELICS_Export helicsStatus helicsPublishDouble (helics_publication pub, double val);
+HELICS_Export helicsStatus helicsPublishComplex (helics_publication pub, double real, double imag);
+HELICS_Export helicsStatus helicsPublishVector (helics_publication pub, const double data[], int len);
 
-HELICS_Export int helicsGetValue (helics_subscription pubID, char *data, int maxlen);
-HELICS_Export helicsStatus helicsGetString (helics_subscription subID, char *str, int maxlen);
-HELICS_Export helicsStatus helicsGetInteger (helics_subscription subID, int64_t *val);
-HELICS_Export helicsStatus helicsGetDouble (helics_subscription subID, double *val);
-HELICS_Export helicsStatus helicsGetComplex (helics_subscription subID, double *real, double *imag);
-HELICS_Export int helicsGetVector (helics_subscription subID, double data[], int maxlen);
+HELICS_Export int helicsGetValue (helics_subscription pub, char *data, int maxlen);
+HELICS_Export helicsStatus helicsGetString (helics_subscription sub, char *str, int maxlen);
+HELICS_Export helicsStatus helicsGetInteger (helics_subscription sub, int64_t *val);
+HELICS_Export helicsStatus helicsGetDouble (helics_subscription sub, double *val);
+HELICS_Export helicsStatus helicsGetComplex (helics_subscription sub, double *real, double *imag);
+HELICS_Export int helicsGetVector (helics_subscription sub, double data[], int maxlen);
 
-HELICS_Export helicsStatus helicsSetDefaultValue (helics_subscription subID, const char *data, int len);
-HELICS_Export helicsStatus helicsSetDefaultString (helics_subscription subID, const char *str);
-HELICS_Export helicsStatus helicsSetDefaultInteger (helics_subscription subID, int64_t val);
-HELICS_Export helicsStatus helicsSetDefaultDouble (helics_subscription subID, double val);
-HELICS_Export helicsStatus helicsSetDefaultComplex (helics_subscription subID, double real, double imag);
-HELICS_Export helicsStatus helicsSetDefaultVector (helics_subscription subID, const double *data, int len);
+HELICS_Export helicsStatus helicsSetDefaultValue (helics_subscription sub, const char *data, int len);
+HELICS_Export helicsStatus helicsSetDefaultString (helics_subscription sub, const char *str);
+HELICS_Export helicsStatus helicsSetDefaultInteger (helics_subscription sub, int64_t val);
+HELICS_Export helicsStatus helicsSetDefaultDouble (helics_subscription sub, double val);
+HELICS_Export helicsStatus helicsSetDefaultComplex (helics_subscription sub, double real, double imag);
+HELICS_Export helicsStatus helicsSetDefaultVector (helics_subscription sub, const double *data, int len);
 
-HELICS_Export helicsStatus helicsGetSubscriptionType (helics_subscription subID, char *str, int maxlen);
+HELICS_Export helicsStatus helicsGetSubscriptionType (helics_subscription sub, char *str, int maxlen);
 
-HELICS_Export helicsStatus helicsGetPublicationType (helics_publication pubID, char *str, int maxlen);
+HELICS_Export helicsStatus helicsGetPublicationType (helics_publication pub, char *str, int maxlen);
 
-HELICS_Export helicsStatus helicsGetSubscriptionKey (helics_subscription subID, char *str, int maxlen);
+HELICS_Export helicsStatus helicsGetSubscriptionKey (helics_subscription sub, char *str, int maxlen);
 
-HELICS_Export helicsStatus helicsGetPublicationKey (helics_publication pubID, char *str, int maxlen);
+HELICS_Export helicsStatus helicsGetPublicationKey (helics_publication pub, char *str, int maxlen);
 
-HELICS_Export helicsStatus helicsGetSubscriptionUnits (helics_subscription subID, char *str, int maxlen);
+HELICS_Export helicsStatus helicsGetSubscriptionUnits (helics_subscription sub, char *str, int maxlen);
 
-HELICS_Export helicsStatus helicsGetPublicationUnits (helics_publication pubID, char *str, int maxlen);
+HELICS_Export helicsStatus helicsGetPublicationUnits (helics_publication pub, char *str, int maxlen);
 
-HELICS_Export void helicsClosePublication (helics_publication pubID);
+HELICS_Export void helicsClosePublication (helics_publication pub);
 
-HELICS_Export void helicsCloseSubscription (helics_subscription subID);
+HELICS_Export void helicsCloseSubscription (helics_subscription sub);
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif

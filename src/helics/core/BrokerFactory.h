@@ -11,12 +11,11 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "helics/core/core-types.h"
+#include "helics/core/CoreBroker.h"
 #include <memory>
 #include <string>
 
 namespace helics {
-
-class CoreBroker;
 
 /**
 * Factory for building Core API instances.

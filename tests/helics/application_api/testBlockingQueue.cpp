@@ -361,7 +361,7 @@ BOOST_AUTO_TEST_CASE (pop_callback_tests)
     BOOST_CHECK_EQUAL (pushcnt, 127 + 25);
 }
 
-#define PERFORMANCE_TESTS
+//#define PERFORMANCE_TESTS
 
 #ifdef PERFORMANCE_TESTS
 #include <chrono>

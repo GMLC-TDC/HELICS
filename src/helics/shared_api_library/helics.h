@@ -52,6 +52,7 @@ HELICS_Export helics_broker helicsCreateBrokerFromArgs (const char *type,
                                                         const char *name,
                                                         int argc,
                                                         char *argv[]);
+  HELICS_Export int helicsBrokerisConnected(helics_broker broker);
 /* Creation and destruction of Federates */
 
 HELICS_Export helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi);

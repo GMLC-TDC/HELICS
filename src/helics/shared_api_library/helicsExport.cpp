@@ -230,13 +230,19 @@ helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int ar
 helics_broker helicsCreateBroker (const char *type, const char *name, const char *initString)
 {
     auto broker = new helics::BrokerObject;
-    broker->brokerptr = helics::BrokerFactory::create (helics::coreTypeFromString (type), name, initString);
+    helics::core_type ctype = helics::coreTypeFromString(type);
+    broker->brokerptr = helics::BrokerFactory::create (ctype, name, initString);
     return reinterpret_cast<helics_broker> (broker);
 }
 
-helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, char *argv[])
+helics_broker helicsCreateBrokerFromArgs (const char *type, int argc, char *argv[])
 {
-    auto *core = new helics::coreObject;
-    core->coreptr = helics::CoreFactory::FindOrCreate (helics::coreTypeFromString (type), name, argc, argv);
-    return reinterpret_cast<helics_core> (core);
+    auto *broker = new helics::BrokerObject;
+    broker->brokerptr = helics::BrokerFactory::create (helics::coreTypeFromString (type), argc, argv);
+    return reinterpret_cast<helics_broker> (broker);
+}
+
+int helicsBrokerisConnected(helics_broker broker)
+{
+  return (int)((reinterpret_cast<helics::BrokerObject*>(broker))->brokerptr->isConnected());
 }
