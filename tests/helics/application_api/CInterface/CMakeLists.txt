@@ -22,5 +22,5 @@ endforeach(keyfile)
 
 add_custom_command(TARGET pi_sender POST_BUILD        # Adds a post-build event to api tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
-        "$<TARGET_FILE_DIR:helicsSharedLib>/helicsSharedLib.dll"      # <--this is in-file
+        "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
         "$<TARGET_FILE_DIR:pi_sender>/")                 # <--this is out-file path

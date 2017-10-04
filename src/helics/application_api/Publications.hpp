@@ -85,7 +85,14 @@ class Publication
         // TODO:: figure out units
         publish (val);
     }
+	publication_id_t getID() const { return id; }
 
+	
+	/** get the key for the subscription*/
+	const std::string &getKey() const { return m_name; }
+	/** get the key for the subscription*/
+	const std::string &getType() const { return typeNameStringRef(type); }
+	const std::string &getUnits() const { return m_units; }
   private:
     bool changeDetected (const std::string &val) const;
     bool changeDetected (const std::vector<double> &val) const;
