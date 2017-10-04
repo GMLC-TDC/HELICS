@@ -337,7 +337,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
         publish (id, data_view (ValueConverter<X>::convert (value)));
     }
 
-    /** check if a given subscription has and update
+    /** check if a given subscription has an update
     @return true if the subscription id is valid and has an update*/
     bool isUpdated (subscription_id_t sub_id) const;
     /** get the time of the last update*/
