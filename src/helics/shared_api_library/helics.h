@@ -73,7 +73,7 @@ HELICS_Export helicsStatus FederateInfoSetImpactWindow (helics_federate_info_t f
 HELICS_Export helicsStatus FederateInfoSetTimeOffset (helics_federate_info_t fi, helics_time_t timeOffset);
 HELICS_Export helicsStatus FederateInfoSetPeriod (helics_federate_info_t fi, helics_time_t period);
 HELICS_Export helicsStatus FederateInfoSetMaxIterations (helics_federate_info_t fi, int max_iterations);
-HELICS_Export helicsStatus FederateInfoSetLoggingLevel (helics_federate_info_t fi, int max_iterations);
+HELICS_Export helicsStatus FederateInfoSetLoggingLevel (helics_federate_info_t fi, int logLevel);
 
 HELICS_Export helicsStatus helicsFinalize (helics_federate fed);
 
@@ -91,6 +91,8 @@ HELICS_Export helics_iterative_time helicsRequestTimeIterative (helics_federate 
                                                                 convergence_status converged);
 
 HELICS_Export void helics_free_federate (helics_federate fed);
+
+  HELICS_Export int helicsValueFederateisUpdated(helics_value_federate vfed,helics_subscription sub);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

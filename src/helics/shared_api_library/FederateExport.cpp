@@ -309,7 +309,7 @@ helics_time_t helicsRequestTime (helics_federate fedID, helics_time_t requestTim
     {
         return helicsDiscard;
     }
-    return requestTime;
+    return fed->requestTime(requestTime);
 }
 
 helics_iterative_time
