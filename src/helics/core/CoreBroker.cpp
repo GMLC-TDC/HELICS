@@ -83,14 +83,12 @@ int32_t CoreBroker::getBrokerById (Core::federate_id_t fedid) const
     {
         return static_cast<int32_t> (fedid - global_broker_id_shift);
     }
-    else
-    {
-        auto lock = (_operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
-                                   std::unique_lock<std::mutex> (mutex_);
 
-        auto fnd = broker_table.find (fedid);
-        return (fnd != broker_table.end ()) ? fnd->second : -1;
-    }
+    auto lock = (_operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
+                               std::unique_lock<std::mutex> (mutex_);
+
+    auto fnd = broker_table.find (fedid);
+    return (fnd != broker_table.end ()) ? fnd->second : -1;
 }
 
 int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
@@ -99,14 +97,12 @@ int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
     {
         return static_cast<int32_t> (fedid - global_federate_id_shift);
     }
-    else
-    {
-        auto lock = (_operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
-                                   std::unique_lock<std::mutex> (mutex_);
 
-        auto fnd = federate_table.find (fedid);
-        return (fnd != federate_table.end ()) ? fnd->second : -1;
-    }
+    auto lock = (_operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
+                               std::unique_lock<std::mutex> (mutex_);
+
+    auto fnd = federate_table.find (fedid);
+    return (fnd != federate_table.end ()) ? fnd->second : -1;
 }
 
 void CoreBroker::processPriorityCommand (const ActionMessage &command)
@@ -271,18 +267,16 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
     {  // we can't be root if we got one of these
         if (command.name == identifier)
         {
-            if (!command.error)
+            if (command.error)
             {
-                global_broker_id = command.dest_id;
-                timeCoord->source_id = global_broker_id;
-                transmitDelayedMessages ();
+                // generate an error message
                 return;
             }
-            else
-            {
-                // generate error messages in response to all the delayed messages
-                return;
-            }
+            global_broker_id = command.dest_id;
+            timeCoord->source_id = global_broker_id;
+            transmitDelayedMessages ();
+
+            return;
         }
         auto broker_num = getBrokerByName (command.name);
         int32_t route;
@@ -456,7 +450,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         if (command.dest_id == global_broker_id)
         {
             timeCoord->processTimeMessage (command);
-            if (enteredExecutionMode == false)
+            if (!enteredExecutionMode)
             {
                 auto res = timeCoord->checkExecEntry ();
                 if (res == convergence_state::complete)
@@ -817,7 +811,6 @@ void CoreBroker::Initialize (const std::string &initializationString)
 
 void CoreBroker::InitializeFromArgs (int argc, char *argv[])
 {
-    namespace po = boost::program_options;
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong (exp, broker_state_t::initialized))
     {
@@ -1145,4 +1138,4 @@ bool matchingTypes (const std::string &type1, const std::string &type2)
     }
     return false;
 }
-}
+}  // namespace helics

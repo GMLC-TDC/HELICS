@@ -300,9 +300,9 @@ add_library(helics STATIC
     $<TARGET_OBJECTS:helics_common>
 )
 target_link_libraries(helics Threads::Threads)
-IF (UNIX)
+IF (UNIX AND NOT APPLE)
 target_link_libraries(helics rt)
-ENDIF(UNIX)
+ENDIF()
 
 if (${ZMQ_FOUND})
    target_link_libraries(helics ${ZMQ_LIBRARY})

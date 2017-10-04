@@ -32,7 +32,7 @@ class TestCore : public CommonCore
     /** destructor*/
     virtual ~TestCore ();  // the destructor is defined so the definition of TestBroker does not need to be
                            // available in the header
-    virtual void InitializeFromArgs (int argC, char *argv[]) override;
+    virtual void InitializeFromArgs (int argc, char *argv[]) override;
 
   protected:
     virtual void transmit (int route_id, const ActionMessage &cmd) override;

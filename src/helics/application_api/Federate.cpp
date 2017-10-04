@@ -105,13 +105,7 @@ Federate::Federate (std::shared_ptr<Core> core, const FederateInfo &fi)
     currentTime = coreObject->getCurrentTime (fedID);
 }
 
-Federate::Federate (const std::string &file) : Federate (LoadFederateInfo (file))
-{
-    if (state == op_states::startup)
-    {
-        registerInterfaces (file);
-    }
-}
+Federate::Federate (const std::string &jsonString) : Federate (LoadFederateInfo (jsonString)) {}
 
 Federate::Federate () noexcept
 {
@@ -320,25 +314,22 @@ void Federate::enterExecutionStateAsync (convergence_state ProcessComplete)
 
 convergence_state Federate::enterExecutionStateFinalize ()
 {
-    if (state == op_states::pendingExec)
-    {
-        auto res = asyncCallInfo->execFuture.get ();
-        if (convergence_state::complete == res)
-        {
-            state = op_states::execution;
-            InitializeToExecuteStateTransition ();
-        }
-        else
-        {
-            state = op_states::initialization;
-            updateTime (getCurrentTime (), getCurrentTime ());
-        }
-        return res;
-    }
-    else
+    if (state != op_states::pendingExec)
     {
         throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
     }
+    auto res = asyncCallInfo->execFuture.get ();
+    if (convergence_state::complete == res)
+    {
+        state = op_states::execution;
+        InitializeToExecuteStateTransition ();
+    }
+    else
+    {
+        state = op_states::initialization;
+        updateTime (getCurrentTime (), getCurrentTime ());
+    }
+    return res;
 }
 
 void Federate::setTimeDelta (Time tdelta)
@@ -776,4 +767,4 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     }
     return fi;
 }
-}
+}  // namespace helics

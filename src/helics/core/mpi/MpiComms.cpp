@@ -19,7 +19,7 @@ MpiComms::MpiComms (const std::string &brokerTarget, const std::string &localTar
 {
 }
 /** destructor*/
-MpiComms::~MpiComms () {}
+MpiComms::~MpiComms () = default;
 
 void MpiComms::queue_rx_function () {}
 
@@ -43,4 +43,4 @@ void MpiComms::closeReceiver ()
         // TODO:: what to do here
     }
 }
-}
+}  // namespace helics

@@ -32,6 +32,7 @@ class data_block
   private:
     std::string m_data;  //!< using a string to represent the data
     friend class data_view;  //!< let data view access the string directly
+	friend class ActionMessage; //!< let action Message access the string directly
   public:
     /** default constructor */
     data_block () noexcept {};

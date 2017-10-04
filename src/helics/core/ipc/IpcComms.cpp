@@ -238,4 +238,4 @@ void IpcComms::closeReceiver ()
         }
     }
 }
-}
+}  // namespace helics

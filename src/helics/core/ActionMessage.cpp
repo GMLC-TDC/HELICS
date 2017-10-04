@@ -50,7 +50,7 @@ ActionMessage::ActionMessage (const ActionMessage &act)
 
 ActionMessage::ActionMessage (std::unique_ptr<Message> message)
     : action_ (CMD_SEND_MESSAGE), index (dest_handle), processingComplete (iterationComplete),
-      actionTime (message->time), payload (std::move (message->data.to_string ())), name (payload)
+      actionTime (message->time), payload (std::move (message->data.m_data)), name (payload)
 {
     info_ = std::make_unique<AdditionalInfo> ();
     info_->source = std::move (message->src);
@@ -103,7 +103,7 @@ ActionMessage &ActionMessage::operator= (ActionMessage &&act) noexcept
 void ActionMessage::moveInfo (std::unique_ptr<Message> message)
 {
     action_ = CMD_SEND_MESSAGE;
-    payload = std::move (message->data.to_string ());
+    payload = std::move (message->data.m_data);
     actionTime = message->time;
     if (!info_)
     {
@@ -379,4 +379,4 @@ std::ostream &operator<< (std::ostream &os, const ActionMessage &command)
     os << prettyPrintString (command);
     return os;
 }
-} // namespace helics
+}  // namespace helics
