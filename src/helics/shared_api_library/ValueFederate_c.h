@@ -17,9 +17,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 extern "C" {
 #endif
 
-HELICS_Export helics_value_federate helicsCreateValueFederate (const helics_federate_info_t fi);
-HELICS_Export helics_value_federate helicsCreateValueFederateFromFile (const char *);
-
 /* sub/pub registration */
 #define HELICS_STRING_TYPE 0
 #define HELICS_DOUBLE_TYPE 1
@@ -88,6 +85,10 @@ HELICS_Export helicsStatus helicsGetPublicationKey (helics_publication pub, char
 HELICS_Export helicsStatus helicsGetSubscriptionUnits (helics_subscription sub, char *str, int maxlen);
 
 HELICS_Export helicsStatus helicsGetPublicationUnits (helics_publication pub, char *str, int maxlen);
+
+HELICS_Export int helicsIsValueUpdated(helics_subscription sub);
+
+HELICS_Export helics_time_t helicsGetLastUpdateTime(helics_subscription sub);
 
 HELICS_Export void helicsClosePublication (helics_publication pub);
 

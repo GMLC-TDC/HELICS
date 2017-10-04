@@ -649,6 +649,28 @@ helicsStatus helicsGetPublicationUnits (helics_publication pub, char *str, int m
 	return helicsOK;
 }
 
+int helicsIsValueUpdated(helics_subscription sub)
+{
+	if (sub == nullptr)
+	{
+		return helicsError;
+	}
+	auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
+	auto val = subObj->subptr->isUpdated();
+	return (val) ? 1 : 0;
+ }
+
+helics_time_t helicsGetLastUpdateTime(helics_subscription sub)
+{
+	if (sub == nullptr)
+	{
+		return helicsError;
+	}
+	auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
+	auto time = subObj->subptr->getLastUpdate();
+	return time.getBaseTimeCode();
+}
+
 void helicsClosePublication (helics_publication pub)
 {
     delete reinterpret_cast<helics::PublicationObject *> (pub);
