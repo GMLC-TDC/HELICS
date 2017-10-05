@@ -235,14 +235,47 @@ helics_broker helicsCreateBroker (const char *type, const char *name, const char
     return reinterpret_cast<helics_broker> (broker);
 }
 
-helics_broker helicsCreateBrokerFromArgs (const char *type, int argc, char *argv[])
+helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, char *argv[])
 {
     auto *broker = new helics::BrokerObject;
-    broker->brokerptr = helics::BrokerFactory::create (helics::coreTypeFromString (type), argc, argv);
+    broker->brokerptr = helics::BrokerFactory::create (helics::coreTypeFromString (type),name, argc, argv);
     return reinterpret_cast<helics_broker> (broker);
 }
 
-int helicsBrokerisConnected(helics_broker broker)
+int helicsBrokerIsConnected(helics_broker broker)
 {
-  return (int)((reinterpret_cast<helics::BrokerObject*>(broker))->brokerptr->isConnected());
+	if (broker == nullptr)
+	{
+		return 0;
+	}
+	auto brokerObj = reinterpret_cast<helics::BrokerObject*>(broker);
+	if (brokerObj->brokerptr)
+	{
+		return (brokerObj->brokerptr->isConnected()) ? 1 : 0;
+  }
+	return 0;
+}
+
+int helicsCoreIsConnected(helics_core core)
+{
+	if (core == nullptr)
+	{
+		return 0;
+	}
+	auto coreObj = reinterpret_cast<helics::coreObject*>(core);
+	if (coreObj->coreptr)
+	{
+		return (coreObj->coreptr->isConnected()) ? 1 : 0;
+	}
+	return 0;
+}
+
+void helicsFreeCore(helics_core core)
+{
+	delete reinterpret_cast<helics::coreObject *>(core);
+}
+
+void helicsFreeBroker(helics_broker broker)
+{
+	delete reinterpret_cast<helics::BrokerObject *>(broker);
 }

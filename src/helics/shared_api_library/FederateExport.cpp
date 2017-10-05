@@ -339,4 +339,4 @@ helicsRequestTimeIterative (helics_federate fed, helics_time_t requestTime, conv
     }
 }
 
-void helics_free_federate (helics_federate fed) { delete reinterpret_cast<helics::FedObject *> (fed); }
+void helicsFreeFederate (helics_federate fed) { delete reinterpret_cast<helics::FedObject *> (fed); }

@@ -52,7 +52,13 @@ HELICS_Export helics_broker helicsCreateBrokerFromArgs (const char *type,
                                                         const char *name,
                                                         int argc,
                                                         char *argv[]);
-  HELICS_Export int helicsBrokerisConnected(helics_broker broker);
+  HELICS_Export int helicsBrokerIsConnected(helics_broker broker);
+
+  HELICS_Export int helicsCoreIsConnected(helics_core core);
+
+  HELICS_Export void helicsFreeCore(helics_core core);
+
+  HELICS_Export void helicsFreeBroker(helics_broker broker);
 /* Creation and destruction of Federates */
 
 HELICS_Export helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi);
@@ -90,7 +96,7 @@ HELICS_Export helics_iterative_time helicsRequestTimeIterative (helics_federate 
                                                                 helics_time_t requestTime,
                                                                 convergence_status converged);
 
-HELICS_Export void helics_free_federate (helics_federate fed);
+HELICS_Export void helicsFreeFederate (helics_federate fed);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

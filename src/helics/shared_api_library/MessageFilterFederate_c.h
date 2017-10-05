@@ -48,6 +48,10 @@ HELICS_Export int helicsFilterReceiveCount (helics_source_filter filter);
 @return a message object*/
 HELICS_Export message_t helicsFilterGetMessage (helics_source_filter filter);
 
+
+HELICS_Export void helicsFreeSourceFilter(helics_source_filter filter);
+
+HELICS_Export void helicsFreeDestinationFilter(helics_destination_filter filter);
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif
