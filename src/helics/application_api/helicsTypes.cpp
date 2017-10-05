@@ -210,7 +210,7 @@ void helicsGetVector(const std::string &val, std::vector<double> &data)
 		data.reserve(sz);
 		data.resize(0);
 		auto fb = val.find_first_of('[');
-		for (int ii = 0; ii < sz; ++ii)
+		for (decltype(sz) ii = 0; ii < sz; ++ii)
 		{
 			auto nc = val.find_first_of(",]", fb + 1);
 			try
@@ -231,7 +231,7 @@ void helicsGetVector(const std::string &val, std::vector<double> &data)
 		data.reserve(sz*2);
 		data.resize(0);
 		auto fb = val.find_first_of('[');
-		for (int ii = 0; ii < sz; ++ii)
+		for (decltype(sz) ii = 0; ii < sz; ++ii)
 		{
 			auto nc = val.find_first_of(",]", fb + 1);
 			auto V = helicsGetComplex(val.substr(fb+1,nc-fb-1));
@@ -271,7 +271,7 @@ if (val.front() == 'v')
 	data.reserve(sz/2);
 	data.resize(0);
 	auto fb = val.find_first_of('[');
-	for (int ii = 0; ii < sz-1; ii+=2)
+	for (decltype(sz) ii = 0; ii < sz-1; ii+=2)
 	{
 		auto nc = val.find_first_of(",]", fb + 1);
 		auto nc2 = val.find_first_of(",]", nc + 1);
@@ -294,7 +294,7 @@ else if (val.front() == 'c')
 	data.reserve(sz);
 	data.resize(0);
 	auto fb = val.find_first_of('[');
-	for (int ii = 0; ii < sz; ++ii)
+	for (decltype(sz) ii = 0; ii < sz; ++ii)
 	{
 		auto nc = val.find_first_of(",]", fb + 1);
 		auto V = helicsGetComplex(val.substr(fb + 1, nc - fb - 1));

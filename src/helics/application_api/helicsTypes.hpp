@@ -256,5 +256,5 @@ constexpr helicsType_t helicsType<std::vector<std::complex<double>>> ()
 {
     return helicsType_t::helicsComplexVector;
 }
-}
+} //namespace helics
 #endif

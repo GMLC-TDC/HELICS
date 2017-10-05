@@ -47,4 +47,4 @@ std::unique_ptr<Message> MessageDataOperator::process (std::unique_ptr<Message> 
     }
     return message;
 }
-}
+} //namespace helics

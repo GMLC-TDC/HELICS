@@ -153,5 +153,5 @@ class MessageFederateManager
   private:  // private functions
     void removeOrderedMessage (unsigned int index);
 };
-}
+} //namespace helics
 #endif

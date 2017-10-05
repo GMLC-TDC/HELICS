@@ -184,5 +184,5 @@ class MessageFilterFederate : public virtual MessageFederate
     std::unique_ptr<MessageFilterFederateManager> filterManager;
     std::atomic<int> filterCount{0};
 };
-}
+} //namespace helics
 #endif

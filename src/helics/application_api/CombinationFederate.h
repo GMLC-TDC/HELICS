@@ -52,5 +52,5 @@ class CombinationFederate : public ValueFederate, public MessageFederate
   public:
     virtual void registerInterfaces (const std::string &jsonString) override;
 };
-}
+} //namespace helics
 #endif

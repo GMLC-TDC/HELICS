@@ -191,7 +191,7 @@ uint64_t helicsEndpointReceiveCount (helics_endpoint endpoint)
 
 static message_t emptyMessage ()
 {
-    message_t empty{};
+    message_t empty;
     empty.time = 0;
     empty.data = nullptr;
     empty.length = 0;

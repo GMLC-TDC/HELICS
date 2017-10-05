@@ -197,5 +197,5 @@ namespace helics
 		void getUpdateFromCore(Core::Handle handle);
 	};
 
-}
+} //namespace helics
 #endif

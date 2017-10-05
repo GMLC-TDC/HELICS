@@ -308,4 +308,4 @@ void ValueFederate::registerSubscriptionNotificationCallback (
 {
     vfManager->registerCallback (ids, callback);
 }
-}
+} //namespace helics

@@ -79,24 +79,32 @@ int helicsFederateHasMessageToFilter (helics_message_filter_federate fed)
     return (mFed->hasMessageToFilter ()) ? 1 : 0;
 }
 
-int helicsFilterHasMessage (helics_source_filter filt)
+int helicsFilterHasMessage (helics_source_filter filter)
 {
-    if (filt == nullptr)
+    if (filter == nullptr)
     {
-        return -1;
+        return 0;
     }
 
-    auto filtObj = reinterpret_cast<helics::SourceFilterObject *> (filt);
+    auto filtObj = reinterpret_cast<helics::SourceFilterObject *> (filter);
     return (filtObj->filtptr->hasMessage ()) ? 1 : 0;
 }
 
-int helicsFederateFilterReceiveCount (helics_message_filter_federate fed) { return 0; }
+int helicsFilterReceiveCount(helics_source_filter filter)
+{
+	if (filter == nullptr)
+	{
+		return -1;
+	}
 
-int helicsFilterReceiveCount (helics_source_filter filter) { return 0; }
+	auto filtObj = reinterpret_cast<helics::SourceFilterObject *> (filter);
+	//this isn't right yet but I might need to enable that functionality yet
+	return (filtObj->filtptr->hasMessage()) ? 1 : 0;
+}
 
 static message_t emptyMessage ()
 {
-    message_t empty{};
+    message_t empty;
     empty.time = 0;
     empty.data = nullptr;
     empty.length = 0;

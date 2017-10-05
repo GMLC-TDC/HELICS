@@ -22,13 +22,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <stdexcept>
 #include <string>
 
-class asyncFedCallInfo;
+
 /**
  * HELICS Application API
  */
 namespace helics
 {
 class Core;
+class asyncFedCallInfo;
 /** data class defining federate properties and information
  */
 class FederateInfo
@@ -330,5 +331,5 @@ class InvalidParameterValue : public std::runtime_error
   public:
     InvalidParameterValue (const char *s) noexcept : std::runtime_error (s) {}
 };
-}
+} //namespace helics
 #endif

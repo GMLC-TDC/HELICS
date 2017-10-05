@@ -431,5 +431,5 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
     std::unique_ptr<ValueFederateManager> vfManager;
 };
-}
+} //namespace helics
 #endif

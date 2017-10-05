@@ -63,5 +63,5 @@ private:
 	virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
 };
 
-}
+} //namespace helics
 #endif
