@@ -133,7 +133,7 @@ helicsStatus helicsFederateInfoSetLookahead (helics_federate_info_t fi, helics_t
         return helicsDiscard;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->lookAhead = helics::Time (lookahead, timeUnits::ns);
+    hfi->lookAhead = lookahead;
     return helicsOK;
 }
 
@@ -144,7 +144,7 @@ helicsStatus helicsFederateInfoSetTimeDelta (helics_federate_info_t fi, helics_t
         return helicsDiscard;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->timeDelta = helics::Time (timeDelta, timeUnits::ns);
+    hfi->timeDelta = timeDelta;
     return helicsOK;
 }
 
@@ -155,7 +155,7 @@ helicsStatus helicsFederateInfoSetImpactWindow (helics_federate_info_t fi, helic
         return helicsDiscard;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->impactWindow = helics::Time (impactWindow, timeUnits::ns);
+    hfi->impactWindow = impactWindow;
     return helicsOK;
 }
 helicsStatus helicsFederateInfoSetTimeOffset (helics_federate_info_t fi, helics_time_t timeOffset)
@@ -165,7 +165,7 @@ helicsStatus helicsFederateInfoSetTimeOffset (helics_federate_info_t fi, helics_
         return helicsDiscard;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->offset = helics::Time (timeOffset, timeUnits::ns);
+    hfi->offset = timeOffset;
     return helicsOK;
 }
 helicsStatus helicsFederateInfoSetPeriod (helics_federate_info_t fi, helics_time_t period)
@@ -175,7 +175,7 @@ helicsStatus helicsFederateInfoSetPeriod (helics_federate_info_t fi, helics_time
         return helicsDiscard;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->period = helics::Time (period, timeUnits::ns);
+    hfi->period = period;
     return helicsOK;
 }
 

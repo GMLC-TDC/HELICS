@@ -90,7 +90,10 @@ class Filter
             fed->registerMessageOperator (id, std::move (mo));
         }
     }
-
+	void setFilterOperations(std::shared_ptr<FilterOperations> filterOps)
+	{
+		filtOp = std::move(filterOps);
+	}
 
 };
 /** class wrapping a source filter*/
@@ -163,10 +166,11 @@ enum defined_filter_types
     randomDrop = 3,
 };
 
-std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types type,
-                                                            MessageFilterFederate *mFed,
-                                                            const std::string &target,
-                                                            const std::string &name = "");
+std::unique_ptr<DestinationFilter> make_destination_filter(defined_filter_types type,
+	MessageFilterFederate *mFed,
+	const std::string &target,
+	const std::string &name = "");
+
 
 std::unique_ptr<SourceFilter> make_Source_filter (defined_filter_types type,
                                                   MessageFilterFederate *mFed,

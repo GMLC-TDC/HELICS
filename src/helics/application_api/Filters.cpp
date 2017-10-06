@@ -22,16 +22,48 @@ namespace helics
 		MessageFilterFederate *mFed,
 		const std::string &target,
 		const std::string &name)
-	{
-		return nullptr;
-}
+
+		{
+		auto dfilt = std::make_unique<DestinationFilter>(mFed,target,name);
+			switch (type)
+			{
+			case custom:
+			case randomDelay:
+				break;
+			case delay:
+			{
+				auto op = std::make_shared<delayFilterOperation>();
+				dfilt->setFilterOperations(std::move(op));
+			}
+			break;
+			case randomDrop:
+				break;
+			}
+			return dfilt;
+		}
+
 	std::unique_ptr<SourceFilter> make_Source_filter(defined_filter_types type,
 		MessageFilterFederate *mFed,
 		const std::string &target,
 		const std::string &name)
 	{
-		return nullptr;
-}
+		auto sfilt = std::make_unique<SourceFilter>(mFed,target,name);
+		switch (type)
+		{
+		case custom:
+		case randomDelay:
+			break;
+		case delay:
+		{
+			auto op = std::make_shared<delayFilterOperation>();
+			sfilt->setFilterOperations(std::move(op));
+		}
+		break;
+		case randomDrop:
+			break;
+		}
+		return sfilt;
+	}
 
 
 	void FilterOperations::set(const std::string &property, double val)
