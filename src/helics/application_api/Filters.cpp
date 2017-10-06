@@ -29,4 +29,40 @@ namespace helics
 		return nullptr;
 }
 
+
+	delayFilterOperation::delayFilterOperation(Time delayTime) :delay(delayTime)
+	{
+
+	}
+	void delayFilterOperation::set(const std::string &property, double val)
+	{
+
+	}
+	void delayFilterOperation::setString(const std::string &property, const std::string &val)
+	{
+
+	}
+
+	class randomDelayGenerator
+	{
+	public:
+		Time delay;
+	};
+
+	randomDelayFilterOperation::randomDelayFilterOperation()
+	{
+
+	}
+	randomDelayFilterOperation::~randomDelayFilterOperation()
+	{
+
+	}
+	void randomDelayFilterOperation::set(const std::string &property, double val)
+	{
+
+	}
+	void randomDelayFilterOperation::setString(const std::string &property, const std::string &val)
+	{
+
+	}
 } //namespace helics

@@ -12,6 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #pragma once
 
 #include "MessageFilterFederate.h"
+#include "MessageOperators.h"
 
 namespace helics
 {
@@ -22,6 +23,34 @@ namespace helics
 		virtual ~FilterOperations() = default;
 		virtual void set(const std::string &property, double val)=0;
 		virtual void setString(const std::string &property, const std::string &val) = 0;
+	};
+
+	class delayFilterOperation :public FilterOperations
+	{
+	private:
+		Time delay = timeZero;
+			MessageTimeOperator td;
+	public:
+		delayFilterOperation(Time delayTime = timeZero);
+		virtual void set(const std::string &property, double val) override;
+		virtual void setString(const std::string &property, const std::string &val) override;
+		
+	};
+
+	class randomDelayGenerator;
+
+	class randomDelayFilterOperation :public FilterOperations
+	{
+	private:
+		Time delay = timeZero;
+		MessageTimeOperator td;
+		std::unique_ptr<randomDelayGenerator> rdelayGen;
+	public:
+		randomDelayFilterOperation();
+		~randomDelayFilterOperation();
+		virtual void set(const std::string &property, double val) override;
+		virtual void setString(const std::string &property, const std::string &val) override;
+
 	};
 
 class Filter

@@ -26,28 +26,16 @@ static const std::string versionStr (std::to_string (HELICS_VERSION_MAJOR) + "."
 
 const char *helicsGetVersion (void) { return versionStr.c_str (); }
 
-helics_time_t helicsTimeFromDouble (double time)
-{
-    helics::Time val (time);
-    return val.getBaseTimeCode ();
-}
 
-double doubleFromHelicsTime (helics_time_t time)
-{
-    helics::Time val;
-    val.setBaseTimeCode (time);
-    return static_cast<double> (val);
-}
-
-helics_federate_info_t createFederateInfoObject ()
+helics_federate_info_t helicsFederateInfoCreate ()
 {
     auto *fi = new helics::FederateInfo;
     return reinterpret_cast<void *> (fi);
 }
 
-void freeFederateInfoObject (helics_federate_info_t fi) { delete reinterpret_cast<helics::FederateInfo *> (fi); }
+void helicsFederateInfoFree (helics_federate_info_t fi) { delete reinterpret_cast<helics::FederateInfo *> (fi); }
 
-helicsStatus FederateInfoSetFederateName (helics_federate_info_t fi, const char *name)
+helicsStatus helicsFederateInfoSetFederateName (helics_federate_info_t fi, const char *name)
 {
     if (fi == nullptr)
     {
@@ -57,7 +45,7 @@ helicsStatus FederateInfoSetFederateName (helics_federate_info_t fi, const char 
     hfi->name = name;
     return helicsOK;
 }
-helicsStatus FederateInfoSetCoreName (helics_federate_info_t fi, const char *corename)
+helicsStatus helicsFederateInfoSetCoreName (helics_federate_info_t fi, const char *corename)
 {
     if (fi == nullptr)
     {
@@ -67,7 +55,7 @@ helicsStatus FederateInfoSetCoreName (helics_federate_info_t fi, const char *cor
     hfi->coreName = corename;
     return helicsOK;
 }
-helicsStatus FederateInfoSetCoreInitString (helics_federate_info_t fi, const char *coreinit)
+helicsStatus helicsFederateInfoSetCoreInitString (helics_federate_info_t fi, const char *coreinit)
 {
     if (fi == nullptr)
     {
@@ -78,7 +66,7 @@ helicsStatus FederateInfoSetCoreInitString (helics_federate_info_t fi, const cha
     return helicsOK;
 }
 
-helicsStatus FederateInfoSetCoreType (helics_federate_info_t fi, int coretype)
+helicsStatus helicsFederateInfoSetCoreType (helics_federate_info_t fi, int coretype)
 {
     if (fi == nullptr)
     {
@@ -89,7 +77,7 @@ helicsStatus FederateInfoSetCoreType (helics_federate_info_t fi, int coretype)
     return helicsOK;
 }
 
-helicsStatus FederateInfoSetCoreTypeFromString (helics_federate_info_t fi, const char *coretype)
+helicsStatus helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi, const char *coretype)
 {
     if (fi == nullptr)
     {
@@ -106,7 +94,7 @@ helicsStatus FederateInfoSetCoreTypeFromString (helics_federate_info_t fi, const
     }
     return helicsOK;
 }
-helicsStatus FederateInfoSetFlag (helics_federate_info_t fi, int flag, int value)
+helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int value)
 {
     if (fi == nullptr)
     {
@@ -138,7 +126,7 @@ helicsStatus FederateInfoSetFlag (helics_federate_info_t fi, int flag, int value
     }
     return helicsOK;
 }
-helicsStatus FederateInfoSetLookahead (helics_federate_info_t fi, helics_time_t lookahead)
+helicsStatus helicsFederateInfoSetLookahead (helics_federate_info_t fi, helics_time_t lookahead)
 {
     if (fi == nullptr)
     {
@@ -149,7 +137,7 @@ helicsStatus FederateInfoSetLookahead (helics_federate_info_t fi, helics_time_t 
     return helicsOK;
 }
 
-helicsStatus FederateInfoSetTimeDelta (helics_federate_info_t fi, helics_time_t timeDelta)
+helicsStatus helicsFederateInfoSetTimeDelta (helics_federate_info_t fi, helics_time_t timeDelta)
 {
     if (fi == nullptr)
     {
@@ -160,7 +148,7 @@ helicsStatus FederateInfoSetTimeDelta (helics_federate_info_t fi, helics_time_t 
     return helicsOK;
 }
 
-helicsStatus FederateInfoSetImpactWindow (helics_federate_info_t fi, helics_time_t impactWindow)
+helicsStatus helicsFederateInfoSetImpactWindow (helics_federate_info_t fi, helics_time_t impactWindow)
 {
     if (fi == nullptr)
     {
@@ -170,7 +158,7 @@ helicsStatus FederateInfoSetImpactWindow (helics_federate_info_t fi, helics_time
     hfi->impactWindow = helics::Time (impactWindow, timeUnits::ns);
     return helicsOK;
 }
-helicsStatus FederateInfoSetTimeOffset (helics_federate_info_t fi, helics_time_t timeOffset)
+helicsStatus helicsFederateInfoSetTimeOffset (helics_federate_info_t fi, helics_time_t timeOffset)
 {
     if (fi == nullptr)
     {
@@ -180,7 +168,7 @@ helicsStatus FederateInfoSetTimeOffset (helics_federate_info_t fi, helics_time_t
     hfi->offset = helics::Time (timeOffset, timeUnits::ns);
     return helicsOK;
 }
-helicsStatus FederateInfoSetPeriod (helics_federate_info_t fi, helics_time_t period)
+helicsStatus helicsFederateInfoSetPeriod (helics_federate_info_t fi, helics_time_t period)
 {
     if (fi == nullptr)
     {
@@ -191,7 +179,7 @@ helicsStatus FederateInfoSetPeriod (helics_federate_info_t fi, helics_time_t per
     return helicsOK;
 }
 
-helicsStatus FederateInfoSetLoggingLevel (helics_federate_info_t fi, int logLevel)
+helicsStatus helicsFederateInfoSetLoggingLevel (helics_federate_info_t fi, int logLevel)
 {
     if (fi == nullptr)
     {
@@ -202,7 +190,7 @@ helicsStatus FederateInfoSetLoggingLevel (helics_federate_info_t fi, int logLeve
     return helicsOK;
 }
 
-helicsStatus FederateInfoSetMaxIterations (helics_federate_info_t fi, int max_iterations)
+helicsStatus helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int max_iterations)
 {
     if (fi == nullptr)
     {
@@ -278,4 +266,45 @@ void helicsFreeCore(helics_core core)
 void helicsFreeBroker(helics_broker broker)
 {
 	delete reinterpret_cast<helics::BrokerObject *>(broker);
+}
+
+helics_query helicsCreateQuery(const char *target, const char *query)
+{
+	auto queryObj = new helics::queryObject;
+	queryObj->query = query;
+	queryObj->target = target;
+	return reinterpret_cast<void *>(queryObj);
+}
+const char *helicsExecuteQuery(helics_federate fed, helics_query query)
+{
+	if (fed == nullptr)
+	{
+		return nullptr;
+	}
+	if (query == nullptr)
+	{
+		return nullptr;
+	}
+	auto fedObj = getFed(fed);
+	if (fedObj == nullptr)
+	{
+		return nullptr;
+	}
+
+	auto queryObj = reinterpret_cast<helics::queryObject *>(query);
+	if (queryObj->target.empty())
+	{
+		queryObj->response = fedObj->query(queryObj->query);
+	}
+	else
+	{
+		queryObj->response = fedObj->query(queryObj->target, queryObj->query);
+	}
+		
+	return queryObj->response.c_str();
+}
+
+void helicsFreeQuery(helics_query query)
+{
+	delete reinterpret_cast<helics::queryObject *>(query);
 }
