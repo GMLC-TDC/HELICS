@@ -12,44 +12,61 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #pragma once
 
 #include "MessageFilterFederate.h"
-#include "MessageOperators.h"
 
 namespace helics
 {
+	class MessageTimeOperator;
+	class MessageConditionalOperator;
+
 	class FilterOperations
 	{
 	public:
 		FilterOperations() = default;
 		virtual ~FilterOperations() = default;
-		virtual void set(const std::string &property, double val)=0;
-		virtual void setString(const std::string &property, const std::string &val) = 0;
+		virtual void set(const std::string &property, double val);
+		virtual void setString(const std::string &property, const std::string &val);
+		virtual std::shared_ptr<MessageOperator> getOperator() = 0;
 	};
 
+	/**filter for delaying a message in time*/
 	class delayFilterOperation :public FilterOperations
 	{
 	private:
-		Time delay = timeZero;
-			MessageTimeOperator td;
+		std::atomic<Time> delay{ timeZero };
+			std::shared_ptr<MessageTimeOperator> td;
 	public:
 		delayFilterOperation(Time delayTime = timeZero);
 		virtual void set(const std::string &property, double val) override;
-		virtual void setString(const std::string &property, const std::string &val) override;
-		
+		virtual std::shared_ptr<MessageOperator> getOperator() override;
 	};
 
 	class randomDelayGenerator;
-
+	/** filter for generating a random delay time for a message*/
 	class randomDelayFilterOperation :public FilterOperations
 	{
 	private:
-		Time delay = timeZero;
-		MessageTimeOperator td;
+		std::shared_ptr<MessageTimeOperator> td;
 		std::unique_ptr<randomDelayGenerator> rdelayGen;
 	public:
 		randomDelayFilterOperation();
 		~randomDelayFilterOperation();
 		virtual void set(const std::string &property, double val) override;
 		virtual void setString(const std::string &property, const std::string &val) override;
+		virtual std::shared_ptr<MessageOperator> getOperator() override;
+
+	};
+	/** filter for randomly dropping a packet*/
+	class randomDropFilterOperation :public FilterOperations
+	{
+	private:
+		std::atomic<double> dropProb {0.0};
+		std::shared_ptr<MessageConditionalOperator> tcond;
+	public:
+		randomDropFilterOperation();
+		~randomDropFilterOperation();
+		virtual void set(const std::string &property, double val) override;
+		virtual void setString(const std::string &property, const std::string &val) override;
+		virtual std::shared_ptr<MessageOperator> getOperator() override;
 
 	};
 
