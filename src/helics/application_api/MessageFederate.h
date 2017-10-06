@@ -197,5 +197,5 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     /** @brief PIMPL design pattern with the implementation details for the MessageFederate*/
     std::unique_ptr<MessageFederateManager> mfManager;
 };
-}
+} //namespace helics
 #endif

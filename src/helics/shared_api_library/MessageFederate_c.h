@@ -68,6 +68,8 @@ HELICS_Export helicsStatus helicsGetEndpointType(helics_endpoint endpoint, char 
 
 HELICS_Export helicsStatus helicsGetEndpointName(helics_endpoint endpoint, char *str, int maxlen);
 
+HELICS_Export void helicsFreeEndpoint(helics_endpoint endpoint);
+
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif

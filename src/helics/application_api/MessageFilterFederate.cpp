@@ -276,4 +276,4 @@ void MessageFilterFederate::registerMessageOperator (const std::vector<filter_id
 {
     filterManager->registerMessageOperator (filters, mo);
 }
-}
+} //namespace helics

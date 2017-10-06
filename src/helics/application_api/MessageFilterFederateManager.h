@@ -200,5 +200,5 @@ namespace helics
 		mutable std::mutex filterLock;  //!< lock protecting the filter structure
 	};
 
-}
+} //namespace helics
 #endif

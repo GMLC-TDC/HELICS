@@ -22,16 +22,16 @@ int main(int argc,char **argv)
   printf("%s",help);
 
   /* Create Federate Info object that describes the federate properties */
-  fedinfo = createFederateInfoObject();
+  fedinfo = helicsFederateInfoCreate();
   
   /* Set Federate name */
-  status = FederateInfoSetFederateName(fedinfo,"TestB Federate");
+  status = helicsFederateInfoSetFederateName(fedinfo,"TestB Federate");
 
   /* Set core type from string */
-  status = FederateInfoSetCoreTypeFromString(fedinfo,"zmq");
+  status = helicsFederateInfoSetCoreTypeFromString(fedinfo,"zmq");
 
   /* Federate init string */
-  status = FederateInfoSetCoreInitString(fedinfo,fedinitstring);
+  status = helicsFederateInfoSetCoreInitString(fedinfo,fedinitstring);
 
   /* Set the message interval (timedelta) for federate. Note that
      HELICS minimum message time interval is 1 ns and by default
@@ -39,9 +39,9 @@ int main(int argc,char **argv)
      setTimedelta routine is a multiplier for the default timedelta.
   */
   /* Set one second message interval */
-  status = FederateInfoSetTimeDelta(fedinfo,helicsTimeFromDouble(deltat));
+  status = helicsFederateInfoSetTimeDelta(fedinfo,deltat);
 
-  status = FederateInfoSetLoggingLevel(fedinfo,1);
+  status = helicsFederateInfoSetLoggingLevel(fedinfo,1);
 
   /* Create value federate */
   vfed = helicsCreateValueFederate(fedinfo);
@@ -54,15 +54,14 @@ int main(int argc,char **argv)
   status = helicsEnterExecutionMode(vfed);
   printf("PI RECEIVER: Entering execution mode\n");
 
-  helics_time_t currenttimeobj,prevtimeobj;
-  double        value=0.0,currenttime=0.0;
+  helics_time_t currenttime,prevtime;
+  double        value = 0.0;
 
-  prevtimeobj = helicsRequestTime(vfed,helicsTimeFromDouble(0.19));
+  prevtime = helicsRequestTime(vfed,0.19);
   
   while(currenttime <= 0.19) {
 
-    currenttimeobj = helicsRequestTime(vfed,helicsTimeFromDouble(0.19));
-    currenttime = doubleFromHelicsTime(currenttimeobj);
+	  currenttime = helicsRequestTime(vfed,0.19);
 
     /* HELICSVALUEFEDERATEISUPDATED IS NOT WORKING CORRECTLY.
        Trying to check if the subscription is updated with new values
@@ -78,7 +77,7 @@ int main(int argc,char **argv)
       printf("PI RECEIVER: Received value = %4.3f at time %3.2f from PI SENDER\n",value,currenttime);
       /*    } */
     }
-    prevtimeobj = currenttimeobj;
+    prevtime= currenttime;
   }
   status = helicsFinalize(vfed);
   printf("PI RECEIVER: Federate finalized\n");

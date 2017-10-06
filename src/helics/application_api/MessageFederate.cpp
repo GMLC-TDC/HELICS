@@ -313,4 +313,4 @@ void MessageFederate::registerEndpointCallback (const std::vector<endpoint_id_t>
 {
     mfManager->registerCallback (ep, func);
 }
-}
+} //namespace helics

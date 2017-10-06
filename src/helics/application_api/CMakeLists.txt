@@ -40,6 +40,7 @@ ValueConverter.cpp
 ValueFederateManager.cpp
 Subscriptions.cpp
 Publications.cpp
+Filters.cpp
 helicsTypes.cpp
 )
 

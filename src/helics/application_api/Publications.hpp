@@ -206,5 +206,5 @@ class PublicationOnChange : public PublicationT<X>
         }
     }
 };
-}
+} //namespace helics
 #endif

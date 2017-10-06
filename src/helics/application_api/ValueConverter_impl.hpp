@@ -115,5 +115,5 @@ X ValueConverter<X>::interpret (const data_view &block)
     interpret (block, val);
     return val;
 }
-}
+} //namespace helics
 #endif

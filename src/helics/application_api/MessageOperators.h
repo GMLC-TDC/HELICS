@@ -63,5 +63,23 @@ private:
 	virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
 };
 
-}
+/** class defining an message operator that either passes the message or not
+@details  the evaluation function used should return true if the message should be allowed through 
+false if it should be dropped
+*/
+class MessageConditionalOperator :public MessageOperator
+{
+public:
+	/** default constructor*/
+	MessageConditionalOperator() = default;
+	/** set the function to modify the data of the message in the constructor*/
+	MessageConditionalOperator(std::function<bool(const Message *)> userConditionalFunction);
+	/** set the function to modify the data of the message*/
+	void setConditionFunction(std::function<bool(const Message *)> userDataFunction);
+private:
+	std::function<bool(const Message *)> evalFunction; //!< the function actually doing the processing
+	virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
+};
+
+} //namespace helics
 #endif

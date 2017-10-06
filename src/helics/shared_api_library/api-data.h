@@ -41,8 +41,9 @@ typedef void *helics_message_filter_federate;
 typedef void *helics_combo_federate;
 
 typedef void *helics_federate_info_t;
+typedef void *helics_query;
 
-typedef int64_t helics_time_t;
+typedef double helics_time_t;
 
 typedef enum {
     nonconverged,

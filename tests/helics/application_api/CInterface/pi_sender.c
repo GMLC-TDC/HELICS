@@ -33,23 +33,23 @@ int main(int argc,char **argv)
   /* Create broker */
   broker = helicsCreateBroker("zmq","",initstring);
 
-  isconnected = helicsBrokerisConnected(broker);
+  isconnected = helicsBrokerIsConnected(broker);
 
   if(isconnected) {
     printf("PI SENDER: Broker created and connected\n");
   }
   
   /* Create Federate Info object that describes the federate properties */
-  fedinfo = createFederateInfoObject();
+  fedinfo = helicsFederateInfoCreate();
   
   /* Set Federate name */
-  status = FederateInfoSetFederateName(fedinfo,"TestA Federate");
+  status = helicsFederateInfoSetFederateName(fedinfo,"TestA Federate");
 
   /* Set core type from string */
-  status = FederateInfoSetCoreTypeFromString(fedinfo,"zmq");
+  status = helicsFederateInfoSetCoreTypeFromString(fedinfo,"zmq");
 
   /* Federate init string */
-  status = FederateInfoSetCoreInitString(fedinfo,fedinitstring);
+  status = helicsFederateInfoSetCoreInitString(fedinfo,fedinitstring);
 
   /* Set the message interval (timedelta) for federate. Note that
      HELICS minimum message time interval is 1 ns and by default
@@ -57,9 +57,9 @@ int main(int argc,char **argv)
      setTimedelta routine is a multiplier for the default timedelta.
   */
   /* Set one second message interval */
-  status = FederateInfoSetTimeDelta(fedinfo,helicsTimeFromDouble(deltat));
+  status = helicsFederateInfoSetTimeDelta(fedinfo,deltat);
 
-  status = FederateInfoSetLoggingLevel(fedinfo,1);
+  status = helicsFederateInfoSetLoggingLevel(fedinfo,1);
 
   /* Create value federate */
   vfed = helicsCreateValueFederate(fedinfo);
@@ -82,7 +82,7 @@ int main(int argc,char **argv)
   for(i=0; i < numsteps; i++) {
     val = i*deltat*value;
 
-    currenttime = helicsRequestTime(vfed,helicsTimeFromDouble(this_time+deltat*i));
+    currenttime = helicsRequestTime(vfed,this_time+deltat*i);
 
     printf("PI SENDER: Sending value %3.2fpi = %4.3f at time %3.2f to PI RECEIVER\n",deltat*i,val,this_time+deltat*i);
     status = helicsPublishDouble(pub,val);
@@ -92,7 +92,7 @@ int main(int argc,char **argv)
   printf("PI SENDER: Federate finalized\n");
 
 
-  while(helicsBrokerisConnected(broker)) {
+  while(helicsBrokerIsConnected(broker)) {
 #ifdef _MSC_VER
 	  Sleep(1);
 #else

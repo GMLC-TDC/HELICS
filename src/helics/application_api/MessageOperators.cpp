@@ -28,14 +28,14 @@ std::unique_ptr<Message> MessageTimeOperator::process (std::unique_ptr<Message> 
 
 void MessageTimeOperator::setTimeFunction (std::function<Time (Time)> userTimeFunction)
 {
-    TimeFunction = userTimeFunction;
+    TimeFunction = std::move(userTimeFunction);
 }
 
-MessageDataOperator::MessageDataOperator (std::function<data_view (data_view)> userDataFunction) {}
+MessageDataOperator::MessageDataOperator (std::function<data_view (data_view)> userDataFunction):dataFunction(std::move(userDataFunction)) {}
 
 void MessageDataOperator::setDataFunction (std::function<data_view (data_view)> userDataFunction)
 {
-    dataFunction = userDataFunction;
+    dataFunction = std::move(userDataFunction);
 }
 
 std::unique_ptr<Message> MessageDataOperator::process (std::unique_ptr<Message> message)
@@ -47,4 +47,28 @@ std::unique_ptr<Message> MessageDataOperator::process (std::unique_ptr<Message> 
     }
     return message;
 }
+
+MessageConditionalOperator::MessageConditionalOperator(std::function<bool(const Message *)> userConditionFunction) :evalFunction(std::move(userConditionFunction)) {}
+
+void MessageConditionalOperator::setConditionFunction(std::function<bool(const Message *)> userConditionFunction)
+{
+	evalFunction = std::move(userConditionFunction);
 }
+
+std::unique_ptr<Message> MessageConditionalOperator::process(std::unique_ptr<Message> message)
+{
+	if (evalFunction)
+	{
+		if (evalFunction(message.get()))
+		{
+			return message;
+		}
+		else
+		{
+			return nullptr;
+		}
+		
+	}
+	return message;
+}
+} //namespace helics
