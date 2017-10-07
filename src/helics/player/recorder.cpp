@@ -214,7 +214,7 @@ int main (int argc, char *argv[])
     }
     try
     {
-        while (1)
+        while (true)
         {
             auto T = vFed->requestTime (stopTime);
             if (T < stopTime)

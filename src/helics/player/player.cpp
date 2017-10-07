@@ -135,7 +135,7 @@ int main (int argc, char *argv[])
         name = vm["name"].as<std::string> ();
     }
 
-    std::string corename = "";
+    std::string corename;
     if (vm.count ("core") > 0)
     {
         corename = vm["core"].as<std::string> ();

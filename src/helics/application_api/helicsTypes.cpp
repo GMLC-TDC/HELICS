@@ -93,7 +93,7 @@ helicsType_t getTypeFromString(const std::string &typeName)
 
 // regular expression to handle complex numbers of various formats
 const std::regex creg(
-	"([+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?)\\s*([+-]\\s*(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?)[ji]*");
+	R"(([+-]?(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?)\s*([+-]\s*(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?)[ji]*)");
 
 std::complex<double> helicsGetComplex(const std::string &val)
 {
@@ -134,7 +134,7 @@ std::complex<double> helicsGetComplex(const std::string &val)
 	{
 		im = 0.0;
 	}
-	return std::complex<double>(re, im);
+	return{ re, im };
 }
 
 std::string helicsVectorString(const std::vector<double> &val)

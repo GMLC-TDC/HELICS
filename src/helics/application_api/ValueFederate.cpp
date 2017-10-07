@@ -39,7 +39,7 @@ ValueFederate::ValueFederate (const std::string &file) : Federate (file)
     vfManager = std::make_unique<ValueFederateManager> (coreObject, getID ());
 }
 
-ValueFederate::ValueFederate () {}
+ValueFederate::ValueFederate() = default;
 
 ValueFederate::ValueFederate (bool /*res*/)
 {
@@ -145,9 +145,8 @@ void ValueFederate::registerInterfaces (const std::string &jsonString)
     if (doc.isMember ("publications"))
     {
         auto pubs = doc["publications"];
-        for (auto pubIt = pubs.begin (); pubIt != pubs.end (); ++pubIt)
+		for (const auto &pub:pubs)
         {
-            auto pub = (*pubIt);
             auto name = pub["name"].asString ();
             auto type = (pub.isMember ("type")) ? pub["type"].asString () : "";
             auto units = (pub.isMember ("units")) ? pub["units"].asString () : "";
@@ -165,9 +164,8 @@ void ValueFederate::registerInterfaces (const std::string &jsonString)
     if (doc.isMember ("subscriptions"))
     {
         auto subs = doc["subscriptions"];
-        for (auto subIt = subs.begin (); subIt != subs.end (); ++subIt)
+		for (const auto &sub:subs)
         {
-            auto sub = (*subIt);
             auto name = sub["name"].asString ();
             auto units = (sub.isMember ("units")) ? sub["units"].asString () : "";
             auto type = (sub.isMember ("type")) ? sub["type"].asString () : "";
