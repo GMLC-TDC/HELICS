@@ -132,3 +132,13 @@ message_t helicsFilterGetMessage (helics_source_filter filter)
     mess.time = filtObj->lastMessage->time.getBaseTimeCode ();
     return mess;
 }
+
+void helicsFreeSourceFilter(helics_source_filter filter)
+{
+	delete reinterpret_cast<helics::SourceFilterObject *>(filter);
+}
+
+void helicsFreeDestinationFilter(helics_destination_filter filter)
+{
+	delete reinterpret_cast<helics::DestFilterObject *>(filter);
+}

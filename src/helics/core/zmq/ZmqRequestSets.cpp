@@ -148,4 +148,4 @@ private:
     std::queue<std::pair<int, ActionMessage>> waiting_messages;
     std::queue<ActionMessage> Responses;
     */
-}
+} //namespace helics

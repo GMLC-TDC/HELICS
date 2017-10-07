@@ -103,6 +103,15 @@ namespace helics
 		std::unique_ptr<DestinationFilter> filtptr;
 		std::shared_ptr<MessageFilterFederate> fedptr;
 	};
+
+	class queryObject
+	{
+	public:
+		std::string target;
+		std::string query;
+		std::string response;
+
+	};
 }
 
 helics::Federate *getFed(helics_federate fed);
