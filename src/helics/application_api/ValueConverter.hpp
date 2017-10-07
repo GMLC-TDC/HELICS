@@ -38,6 +38,9 @@ class ValueConverter
     /** convert the value and store to a specific block of data*/
     static void convert (const X &val, data_block &store);
 
+	/** convert a raw vector of objects*/
+	//static void convert(const X *vals, size_t size, data_block &store);
+
     /** interpret a view of the data and convert back to a val*/
     static X interpret (const data_view &block);
 

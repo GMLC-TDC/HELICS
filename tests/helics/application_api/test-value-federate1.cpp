@@ -18,6 +18,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/CoreFactory.h"
 #include "testFixtures.h"
 #include "test_configuration.h"
+#include "helics/application_api/Publications.hpp"
+#include "helics/application_api/Subscriptions.hpp"
 
 /** these test cases test out the value federates
  */
@@ -71,6 +73,37 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
     vFed1->finalize ();
 
     BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
+}
+
+BOOST_DATA_TEST_CASE(value_federate_publisher_registration, bdata::make(core_types), core_type)
+{
+	SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1);
+	auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+	helics::Publication pubid(vFed1.get(), "pub1",helics::helicsType<std::string>());
+	helics::PublicationT<int> pubid2(helics::GLOBAL,vFed1.get(),"pub2");
+
+	helics::Publication pubid3(vFed1.get(), "pub3", helics::helicsType<double>(),"V");
+	vFed1->enterExecutionState();
+
+	BOOST_CHECK(vFed1->currentState() == helics::Federate::op_states::execution);
+
+	auto sv = pubid.getKey();
+	auto sv2 = pubid2.getKey();
+	BOOST_CHECK_EQUAL(sv, "fed0/pub1");
+	BOOST_CHECK_EQUAL(sv2, "pub2");
+	auto pub3name = pubid3.getKey();
+	BOOST_CHECK_EQUAL(pub3name, "fed0/pub3");
+
+	BOOST_CHECK_EQUAL(pubid3.getType(), "double");
+	BOOST_CHECK_EQUAL(pubid3.getUnits(), "V");
+
+	BOOST_CHECK(vFed1->getPublicationId("pub1") == pubid.getID());
+	BOOST_CHECK(vFed1->getPublicationId("pub2") == pubid2.getID());
+	BOOST_CHECK(vFed1->getPublicationId("fed0/pub1") == pubid.getID());
+	vFed1->finalize();
+
+	BOOST_CHECK(vFed1->currentState() == helics::Federate::op_states::finalize);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (core_types), core_type)
