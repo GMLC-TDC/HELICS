@@ -66,11 +66,13 @@ protected:
 	std::string name;  //!< the name of the object
 	std::string localTarget_; //!< the identifier for the receive address
 	std::string brokerTarget_;	//!< the identifier for the broker address
+	std::atomic<connection_status> tx_status{ connection_status::startup }; //!< the status of the transmitter thread
 	int maxMessageSize_ = 16 * 1024; //!< the maximum message size for the queues (if needed)
 	int maxMessageCount_ = 512;  //!< the maximum number of message to buffer (if needed)
 	std::function<void(ActionMessage &&)> ActionCallback; //!< the callback for what to do with a received message
 	BlockingQueue3<std::pair<int, ActionMessage>> txQueue; //!< set of messages waiting to be transmitted
-	std::atomic<connection_status> tx_status{ connection_status::startup }; //!< the status of the transmitter thread
+	// closing the files or connection can take some time so there is a need for interthread communication to not spit out warning messages if it is in the process of disconnecting
+	std::atomic<bool> disconnecting{ false }; //!<flag indicating that the comm system is in the process of disconnecting
 private:
 	std::thread queue_transmitter; //!< single thread for sending data
 	std::thread queue_watcher; //!< thread monitoring the receive queue

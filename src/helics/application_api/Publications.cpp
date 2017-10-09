@@ -116,6 +116,7 @@ bool Publication::changeDetected (const std::string &val) const
     }
     return true;
 }
+
 bool Publication::changeDetected (const std::vector<double> &val) const
 {
     if (prevValue.which () == vectorLoc)

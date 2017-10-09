@@ -30,8 +30,8 @@ HELICS_Export helics_subscription helicsRegisterSubscription (helics_value_feder
                                                               const char *type,
                                                               const char *units);
 HELICS_Export helics_subscription helicsRegisterTypeSubscription (helics_value_federate fed,
-                                                                  int type,
                                                                   const char *name,
+                                                                  int type,
                                                                   const char *units);
 
 HELICS_Export helics_publication helicsRegisterPublication (helics_value_federate fed,
@@ -39,8 +39,8 @@ HELICS_Export helics_publication helicsRegisterPublication (helics_value_federat
                                                             const char *type,
                                                             const char *units);
 HELICS_Export helics_publication helicsRegisterTypePublication (helics_value_federate fed,
-                                                                int type,
                                                                 const char *name,
+                                                                int type,
                                                                 const char *units);
 
 HELICS_Export helics_publication helicsRegisterGlobalPublication (helics_value_federate fed,
@@ -48,8 +48,8 @@ HELICS_Export helics_publication helicsRegisterGlobalPublication (helics_value_f
                                                                   const char *type,
                                                                   const char *units);
 HELICS_Export helics_publication helicsRegisterGlobalTypePublication (helics_value_federate fed,
-                                                                      int type,
                                                                       const char *name,
+                                                                      int type,
                                                                       const char *units);
 
 /* getting and publishing values */
@@ -86,9 +86,9 @@ HELICS_Export helicsStatus helicsGetSubscriptionUnits (helics_subscription sub, 
 
 HELICS_Export helicsStatus helicsGetPublicationUnits (helics_publication pub, char *str, int maxlen);
 
-HELICS_Export int helicsIsValueUpdated(helics_subscription sub);
+HELICS_Export int helicsIsValueUpdated (helics_subscription sub);
 
-HELICS_Export helics_time_t helicsGetLastUpdateTime(helics_subscription sub);
+HELICS_Export helics_time_t helicsGetLastUpdateTime (helics_subscription sub);
 
 HELICS_Export void helicsClosePublication (helics_publication pub);
 

@@ -34,7 +34,7 @@ helicsRegisterSubscription (helics_value_federate fed, const char *name, const c
     auto htype = helics::getTypeFromString (type);
     if (htype != helics::helicsType_t::helicsInvalid)
     {
-        return helicsRegisterTypeSubscription (fed, static_cast<int> (htype), name, units);
+        return helicsRegisterTypeSubscription (fed, name, static_cast<int> (htype), units);
     }
     // now generate a generic subscription
     auto fedObj = getValueFedSharedPtr (fed);
@@ -58,7 +58,7 @@ helicsRegisterSubscription (helics_value_federate fed, const char *name, const c
     return nullptr;
 }
 helics_subscription
-helicsRegisterTypeSubscription (helics_value_federate fed, int type, const char *name, const char *units)
+helicsRegisterTypeSubscription (helics_value_federate fed,  const char *name,int type, const char *units)
 {
     if ((type < 0) || (type > HELICS_VECTOR_TYPE))
     {
@@ -95,7 +95,7 @@ helicsRegisterPublication (helics_value_federate fed, const char *name, const ch
     auto htype = helics::getTypeFromString (type);
     if (htype != helics::helicsType_t::helicsInvalid)
     {
-        return helicsRegisterTypePublication (fed, static_cast<int> (htype), name, units);
+        return helicsRegisterTypePublication (fed, name, static_cast<int> (htype), units);
     }
     // now generate a generic subscription
     auto fedObj = getValueFedSharedPtr (fed);
@@ -119,7 +119,7 @@ helicsRegisterPublication (helics_value_federate fed, const char *name, const ch
     return nullptr;
 }
 helics_publication
-helicsRegisterTypePublication (helics_value_federate fed, int type, const char *name, const char *units)
+helicsRegisterTypePublication (helics_value_federate fed, const char *name, int type, const char *units)
 {
     if ((type < 0) || (type > HELICS_VECTOR_TYPE))
     {
@@ -139,7 +139,7 @@ helicsRegisterTypePublication (helics_value_federate fed, int type, const char *
     {
         pub = new helics::PublicationObject ();
         pub->pubptr =
-          std::make_unique<helics::Publication> (fedObj.get (), static_cast<helics::helicsType_t> (type), name,
+          std::make_unique<helics::Publication> (fedObj.get (), name, static_cast<helics::helicsType_t> (type),
                                                  units);
         pub->fedptr = std::move (fedObj);
         return reinterpret_cast<helics_publication> (pub);
@@ -157,7 +157,7 @@ helicsRegisterGlobalPublication (helics_value_federate fed, const char *name, co
     auto htype = helics::getTypeFromString (type);
     if (htype != helics::helicsType_t::helicsInvalid)
     {
-        return helicsRegisterGlobalTypePublication (fed, static_cast<int> (htype), name, units);
+        return helicsRegisterGlobalTypePublication (fed, name, static_cast<int> (htype), units);
     }
     // now generate a generic subscription
     auto fedObj = getValueFedSharedPtr (fed);
@@ -182,7 +182,7 @@ helicsRegisterGlobalPublication (helics_value_federate fed, const char *name, co
 }
 
 helics_publication
-helicsRegisterGlobalTypePublication (helics_value_federate fed, int type, const char *name, const char *units)
+helicsRegisterGlobalTypePublication (helics_value_federate fed, const char *name, int type, const char *units)
 {
     if ((type < 0) || (type > HELICS_VECTOR_TYPE))
     {
@@ -202,8 +202,8 @@ helicsRegisterGlobalTypePublication (helics_value_federate fed, int type, const 
     {
         pub = new helics::PublicationObject ();
         pub->pubptr =
-          std::make_unique<helics::Publication> (helics::GLOBAL, fedObj.get (),
-                                                 static_cast<helics::helicsType_t> (type), name, units);
+          std::make_unique<helics::Publication> (helics::GLOBAL, fedObj.get (), name,
+                                                 static_cast<helics::helicsType_t> (type), units);
         pub->fedptr = std::move (fedObj);
         return reinterpret_cast<helics_publication> (pub);
     }

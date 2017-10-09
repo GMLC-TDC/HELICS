@@ -345,6 +345,7 @@ std::string prettyPrintString (const ActionMessage &command)
     case CMD_REG_FED:
         ret.push_back (':');
         ret.append (command.name);
+		break;
     case CMD_FED_ACK:
         ret.push_back (':');
         ret.append (command.name);
@@ -357,6 +358,7 @@ std::string prettyPrintString (const ActionMessage &command)
         {
             ret.append (std::to_string (command.dest_id));
         }
+		break;
     case CMD_REG_BROKER:
         ret.push_back (':');
         ret.append (command.name);

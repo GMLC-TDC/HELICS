@@ -594,7 +594,7 @@ iterationTime FederateState::requestTime (Time nextTime, convergence_state conve
         iterating = (ret == convergence_state::nonconverged);
 
         iterationTime retTime = {time_granted, ret};
-        // now fill the event vector so exernal systems know what has been updated
+        // now fill the event vector so external systems know what has been updated
         fillEventVector (time_granted);
         processing = false;
         return retTime;

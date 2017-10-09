@@ -113,6 +113,7 @@ create (core_type type, const std::string &broker_name, const std::string &initi
     bool reg = registerBroker (broker);
     if (!reg)
     {
+		//TODO:: do some automatic renaming?  
     }
     broker->connect ();
     return broker;
@@ -205,21 +206,29 @@ std::shared_ptr<CoreBroker> findBroker (const std::string &brokerName)
 
 bool registerBroker (std::shared_ptr<CoreBroker> tbroker)
 {
-    std::lock_guard<std::mutex> lock (mapLock);
+    std::unique_lock<std::mutex> lock (mapLock);
     auto res = BrokerMap.emplace (tbroker->getIdentifier (), std::move (tbroker));
-
     /** clear out any previously unregistered brokers*/
     if (!delayedDestruction.empty ())
     {
+		auto tempbuffer = delayedDestruction;
         delayedDestruction.clear ();
+		lock.unlock();
+		//we don't want to actually do the destruction with the lock engaged since that could be a lengthy operation so we use a temporary buffer
     }
     return res.second;
 }
 
 void cleanUpBrokers ()
 {
-    std::lock_guard<std::mutex> lock (mapLock);
-    delayedDestruction.clear ();
+    std::unique_lock<std::mutex> lock (mapLock);
+	if (!delayedDestruction.empty())
+	{
+		auto tempbuffer = delayedDestruction;
+		delayedDestruction.clear();
+		lock.unlock();
+		//we don't want to actually do the destruction with the lock engaged since that could be a lengthy operation so we use a temporary buffer
+	}
 }
 
 void copyBrokerIdentifier (const std::string &copyFromName, const std::string &copyToName)

@@ -24,6 +24,11 @@ TestBroker::TestBroker (const std::string &broker_name) : CoreBroker (broker_nam
 
 TestBroker::TestBroker (std::shared_ptr<TestBroker> nbroker) : tbroker (std::move (nbroker)) {}
 
+TestBroker::~TestBroker()
+{
+	//lock to ensure all the data is synchronized before deletion
+	std::lock_guard<std::mutex> lock(routeMutex);
+}
 using namespace std::string_literals;
 static const argDescriptors extraArgs{{"brokername"s, "string"s, "identifier for the broker-same as broker"s},
                                       {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
@@ -58,6 +63,7 @@ void TestBroker::InitializeFromArgs (int argc, char *argv[])
 
 bool TestBroker::brokerConnect ()
 {
+	std::lock_guard<std::mutex> lock(routeMutex);
     if (!tbroker)
     {
         if (isRoot ())
@@ -82,19 +88,24 @@ bool TestBroker::brokerConnect ()
     return static_cast<bool> (tbroker);
 }
 
-void TestBroker::brokerDisconnect () { tbroker = nullptr; }
+void TestBroker::brokerDisconnect () { 
+	_operating = false;
+	std::lock_guard<std::mutex> lock(routeMutex);
+	tbroker = nullptr; 
+}
 
 void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
 {
+	// only activate the lock if we not in an operating state
+	auto lock = (_operating) ? std::unique_lock<std::mutex>(routeMutex, std::defer_lock) :
+		std::unique_lock<std::mutex>(routeMutex);
+
     if ((tbroker) && (route_id == 0))
     {
         tbroker->addActionMessage (cmd);
         return;
     }
-    // only activate the lock if we not in an operating state
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (routeMutex, std::defer_lock) :
-                               std::unique_lock<std::mutex> (routeMutex);
-
+   
     auto brkfnd = brokerRoutes.find (route_id);
     if (brkfnd != brokerRoutes.end ())
     {
@@ -108,7 +119,7 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
         return;
     }
 
-    if (!isRoot ())
+    if ((!isRoot ())&&(tbroker))
     {
         tbroker->addActionMessage (cmd);
     }
