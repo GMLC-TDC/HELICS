@@ -24,6 +24,11 @@ TestBroker::TestBroker (const std::string &broker_name) : CoreBroker (broker_nam
 
 TestBroker::TestBroker (std::shared_ptr<TestBroker> nbroker) : tbroker (std::move (nbroker)) {}
 
+TestBroker::~TestBroker()
+{
+	//lock to ensure all the data is synchronized before deletion
+	std::lock_guard<std::mutex> lock(routeMutex);
+}
 using namespace std::string_literals;
 static const argDescriptors extraArgs{{"brokername"s, "string"s, "identifier for the broker-same as broker"s},
                                       {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
