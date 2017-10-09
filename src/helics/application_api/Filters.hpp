@@ -93,6 +93,7 @@ class Filter
 	void setFilterOperations(std::shared_ptr<FilterOperations> filterOps)
 	{
 		filtOp = std::move(filterOps);
+		fed->registerMessageOperator(filtOp->getOperator());
 	}
 
 };

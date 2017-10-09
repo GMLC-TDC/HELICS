@@ -49,7 +49,7 @@ private:
 	std::string brokerInitString;  //!< the initialization string to use for the Broker
 	std::string brokerName;  //!< the name of the broker to connect to
     // void computeDependencies();
-    std::map<int32_t, std::shared_ptr<CoreBroker>> brokerRoutes;  //!< map of the the different brokers
+    std::map<int32_t, std::shared_ptr<CoreBroker>> brokerRoutes;  //!< map of the different brokers
     std::map<int32_t, std::shared_ptr<CommonCore>> coreRoutes;  //!< map of the different cores that can be routed to
     mutable std::mutex routeMutex;  //!< mutex that protects the routing info
 };

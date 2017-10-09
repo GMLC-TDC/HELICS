@@ -14,9 +14,37 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <random>
 #include <thread>
+#include <memory>
 
 namespace helics
 {
+
+	static void addOperations(Filter *filt, defined_filter_types type)
+	{
+		switch (type)
+		{
+		case custom:
+			break;
+		case randomDelay:
+		{
+			auto op = std::make_shared<randomDelayFilterOperation>();
+			filt->setFilterOperations(std::move(op));
+		}
+		break;
+		case delay:
+		{
+			auto op = std::make_shared<delayFilterOperation>();
+			filt->setFilterOperations(std::move(op));
+		}
+		break;
+		case randomDrop:
+		{
+			auto op = std::make_shared<randomDropFilterOperation>();
+			filt->setFilterOperations(std::move(op));
+		}
+		break;
+		}
+	}
 
 	std::unique_ptr<DestinationFilter> make_destination_filter(defined_filter_types type,
 		MessageFilterFederate *mFed,
@@ -25,20 +53,7 @@ namespace helics
 
 		{
 		auto dfilt = std::make_unique<DestinationFilter>(mFed,target,name);
-			switch (type)
-			{
-			case custom:
-			case randomDelay:
-				break;
-			case delay:
-			{
-				auto op = std::make_shared<delayFilterOperation>();
-				dfilt->setFilterOperations(std::move(op));
-			}
-			break;
-			case randomDrop:
-				break;
-			}
+		addOperations(dfilt.get(), type);
 			return dfilt;
 		}
 
@@ -48,29 +63,16 @@ namespace helics
 		const std::string &name)
 	{
 		auto sfilt = std::make_unique<SourceFilter>(mFed,target,name);
-		switch (type)
-		{
-		case custom:
-		case randomDelay:
-			break;
-		case delay:
-		{
-			auto op = std::make_shared<delayFilterOperation>();
-			sfilt->setFilterOperations(std::move(op));
-		}
-		break;
-		case randomDrop:
-			break;
-		}
+		addOperations(sfilt.get(), type);
 		return sfilt;
 	}
 
 
-	void FilterOperations::set(const std::string &property, double val)
+	void FilterOperations::set(const std::string & /*property*/, double /*val*/)
 	{
 
 	}
-	void FilterOperations::setString(const std::string &property, const std::string &val)
+	void FilterOperations::setString(const std::string & /*property*/, const std::string & /*val*/)
 	{
 
 	}
@@ -123,15 +125,14 @@ namespace helics
 
 	double randDouble(random_dists_t dist,double p1, double p2)
 	{
-		static thread_local std::mt19937* generator = nullptr;
-		if (!generator) generator = new std::mt19937(std::random_device()() + std::hash<std::thread::id>()(std::this_thread::get_id()));
+		static thread_local std::mt19937 generator(std::random_device{}() + static_cast<unsigned int>(std::hash<std::thread::id>{}(std::this_thread::get_id())));
 		switch (dist)
 		{
 		case random_dists_t::uniform:
 		default:
 		{
 			std::uniform_real_distribution<double> distribution(p1, p2);
-			return distribution(*generator);
+			return distribution(generator);
 		}
 		//TODO:: add other distributions
 		}

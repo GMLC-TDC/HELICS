@@ -234,12 +234,6 @@ constexpr helicsType_t helicsType<double> ()
 }
 
 template <>
-constexpr helicsType_t helicsType<float> ()
-{
-    return helicsType_t::helicsDouble;
-}
-
-template <>
 constexpr helicsType_t helicsType<std::complex<double>> ()
 {
     return helicsType_t::helicsComplex;
@@ -256,5 +250,56 @@ constexpr helicsType_t helicsType<std::vector<std::complex<double>>> ()
 {
     return helicsType_t::helicsComplexVector;
 }
+
+//check if the type is directly convertible to a base HelicsType
+template <class X>
+constexpr bool isConvertableType()
+{
+	return false;
+}
+
+template <class X>
+constexpr typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, bool>::type isConvertableType()
+{
+	return false;
+}
+
+template <>
+constexpr bool isConvertableType<float>()
+{
+	return true;
+}
+
+template <>
+constexpr bool isConvertableType<int>()
+{
+	return true;
+}
+
+template <>
+constexpr bool isConvertableType<short>()
+{
+	return true;
+}
+
+template <>
+constexpr bool isConvertableType<unsigned int>()
+{
+	return true;
+}
+
+template <>
+constexpr bool isConvertableType<char>()
+{
+	return true;
+}
+
+template <>
+constexpr bool isConvertableType<uint64_t>()
+{
+	return true;
+}
+
+
 } //namespace helics
 #endif

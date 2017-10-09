@@ -24,7 +24,7 @@ public:
 	TestBroker(const std::string &broker_name);
 	/** construct with a pointer to a broker*/
 	TestBroker(std::shared_ptr<TestBroker> nbroker);
-
+	~TestBroker();
 	virtual void InitializeFromArgs(int argc, char *argv[]) override;
 
 	virtual void transmit(int32_t route, const ActionMessage &command) override;
@@ -42,7 +42,7 @@ private:
 										  //void computeDependencies();
 	std::map<int32_t, std::shared_ptr<CoreBroker>> brokerRoutes; //!< map of the routes to other brokers
 	std::map < int32_t, std::shared_ptr<CommonCore>>  coreRoutes; //!< map of the routes to other cores
-	mutable std::mutex routeMutex; //!< mutex lock protectingthe route maps
+	mutable std::mutex routeMutex; //!< mutex lock protecting the route maps
 };
 }
 #endif

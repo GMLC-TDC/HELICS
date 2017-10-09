@@ -104,8 +104,8 @@ void CommonCore::disconnect ()
 {
     brokerDisconnect ();
     coreState = terminated;
-    /*We need to enrure that the destructor is not called immediately upon calling unregister
-    otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
+    /*We need to ensure that the destructor is not called immediately upon calling unregister
+    otherwise this would be a mess and probably cause segmentation faults so we capture it in a local variable
     that will be destroyed on function exit
     */
     auto keepCoreAlive = CoreFactory::findCore (identifier);
@@ -130,7 +130,12 @@ void CommonCore::disconnect ()
     }
 }
 
-CommonCore::~CommonCore () = default;
+CommonCore::~CommonCore()
+{
+	//make sure everything is synced up so just run the lock
+	std::lock_guard<std::mutex> lock(_handlemutex);
+	std::unique_lock<std::mutex>(_mutex);
+}
 
 FederateState *CommonCore::getFederate (federate_id_t federateID) const
 {

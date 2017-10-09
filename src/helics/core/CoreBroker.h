@@ -57,8 +57,8 @@ class logger;
 /** a shift in the global federate id numbers to allow discrimination between local ids and global ones
 this value allows 65535 federates to be available in each core 
 1,878,982,656 allowable federates in the system and
-268,435,455 brokers allowed  if we need more than that this program has been phenomanally successful beyond 
-all wildest imaginations and we can probably afford to change these to 64 bit numbers to accomodate
+268,435,455 brokers allowed  if we need more than that this program has been phenomenally successful beyond 
+all wildest imaginations and we can probably afford to change these to 64 bit numbers to accommodate
 */
 constexpr Core::federate_id_t global_federate_id_shift = 0x0001'0000;
 /** a shift in the global id index to discriminate between global ids of brokers vs federates*/
@@ -70,7 +70,7 @@ or does something else if it is the root of the tree
 class CoreBroker : public BrokerBase
 {
 protected:
-	std::atomic<bool> _operating{ false }; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
+	std::atomic<bool> _operating{ false }; //!< flag indicating that the structure is past the initialization stage indicating that no more changes can be made to the number of federates or handles
 	
 	bool _gateway = false;  //!< set to true if this broker should act as a gateway.
 	bool _hasEndpoints = false; //!< set to true if the broker has endpoints;  
@@ -109,7 +109,7 @@ protected:
 		terminated = 3,
 		errored = 7,
 	};
-	std::atomic<broker_state_t> brokerState{ created }; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
+	std::atomic<broker_state_t> brokerState{ created }; //!< flag indicating that the structure is past the initialization stage indicating that no more changes can be made to the number of federates or handles
 private:
 
 	mutable std::mutex mutex_;  //!< mutex lock for the federate information that could come in from multiple sources
@@ -179,7 +179,7 @@ public:
 	CoreBroker(const std::string &broker_name);
 	/** destructor*/
 	virtual ~CoreBroker();
-	/** start up the broker with an inditialization string containing commands and parameters*/
+	/** start up the broker with an initialization string containing commands and parameters*/
 	void Initialize(const std::string &initializationString);
 	/** initialize from command line arguments
 	*/

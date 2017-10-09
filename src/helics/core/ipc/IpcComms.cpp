@@ -40,6 +40,7 @@ void IpcComms::queue_rx_function ()
     bool connected = rxQueue.connect (localTarget_, maxMessageCount_, maxMessageSize_);
     if (!connected)
     {
+		disconnecting = true;
         ActionMessage err (CMD_ERROR);
         err.payload = rxQueue.getError ();
         ActionCallback (std::move (err));
@@ -78,6 +79,7 @@ void IpcComms::queue_rx_function ()
         }
         ActionCallback (std::move (cmd));
     }
+	disconnecting = true;
     rxQueue.changeState (queue_state_t::closing);
     rx_status = connection_status::terminated;
 }
@@ -174,7 +176,6 @@ void IpcComms::queue_tx_function ()
         int priority = isPriorityCommand (cmd) ? 3 : 1;
         if (route_id == 0)
         {
-            // brokerQueue->send(&priority, sizeof(int), 3);
             if (hasBroker)
             {
                 brokerQueue.sendMessage (cmd, priority);
@@ -223,7 +224,7 @@ void IpcComms::closeReceiver ()
     {
         transmit (-1, cmd);
     }
-    else
+    else if (!disconnecting)
     {
         try
         {
@@ -234,7 +235,10 @@ void IpcComms::closeReceiver ()
         }
         catch (boost::interprocess::interprocess_exception const &ipe)
         {
-            std::cerr << "unable to send close message\n";
+			if (!disconnecting)
+			{
+				std::cerr << "unable to send close message\n";
+			}
         }
     }
 }
