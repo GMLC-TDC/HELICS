@@ -68,11 +68,11 @@ namespace helics
 	}
 
 
-	void FilterOperations::set(const std::string &property, double val)
+	void FilterOperations::set(const std::string & /*property*/, double /*val*/)
 	{
 
 	}
-	void FilterOperations::setString(const std::string &property, const std::string &val)
+	void FilterOperations::setString(const std::string & /*property*/, const std::string & /*val*/)
 	{
 
 	}
@@ -125,7 +125,7 @@ namespace helics
 
 	double randDouble(random_dists_t dist,double p1, double p2)
 	{
-		static thread_local std::mt19937 generator(std::random_device()() + static_cast<unsigned int>(std::hash<std::thread::id>()(std::this_thread::get_id())));
+		static thread_local std::mt19937 generator(std::random_device{}() + static_cast<unsigned int>(std::hash<std::thread::id>{}(std::this_thread::get_id())));
 		switch (dist)
 		{
 		case random_dists_t::uniform:

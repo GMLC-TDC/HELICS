@@ -74,7 +74,7 @@ class Publication:public PublicationBase
   private:
   
     double delta = -1.0;  //!< the minimum change to publish
-    helicsType_t type;  //!< the type of publication
+    helicsType_t pubType;  //!< the type of publication
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
     
     mutable defV prevValue;  //!< the previous value of the publication
@@ -86,7 +86,7 @@ class Publication:public PublicationBase
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
-    Publication (ValueFederate *valueFed, const std::string &key, helicsType_t type_, std::string units = ""):PublicationBase(valueFed, key, typeNameStringRef(type_),units), type(type_)
+    Publication (ValueFederate *valueFed, const std::string &key, helicsType_t type, std::string units = ""):PublicationBase(valueFed, key, typeNameStringRef(type),units), pubType(type)
     {
         
     }
@@ -100,9 +100,9 @@ class Publication:public PublicationBase
 	Publication(interface_visibility locality,
 		ValueFederate *valueFed,
 		std::string key,
-		helicsType_t type_,
+		helicsType_t type,
 		std::string units = "")
-		:PublicationBase(locality, valueFed, key, typeNameStringRef(type_), units),type(type_)
+		:PublicationBase(locality, valueFed, key, typeNameStringRef(type), units),pubType(type)
     {
        
     }

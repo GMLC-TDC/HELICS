@@ -37,7 +37,14 @@ class simpleQueue
   public:
     /** default constructor */
     simpleQueue () = default;
-	~simpleQueue() = default;
+	~simpleQueue()
+		{
+		//these locks are primarily for memory synchronization multiple access in the destructor would be a bad thing 
+			std::lock_guard<std::mutex> pullLock(m_pullLock);  // first pullLock
+			std::lock_guard<std::mutex> pushLock(m_pushLock);  // second pushLock
+			pushElements.clear();
+			pullElements.clear();
+		}
     /** constructor with a reservation size
     @param[in] capacity  the initial storage capacity of the queue*/
     simpleQueue (size_t capacity)
