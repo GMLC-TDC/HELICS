@@ -31,7 +31,12 @@ static const argDescriptors extraArgs{
 
 bool matchingTypes (const std::string &type1, const std::string &type2);
 
-CoreBroker::~CoreBroker () = default;
+CoreBroker::~CoreBroker()
+{
+	
+	std::lock_guard<std::mutex> lock(mutex_);
+	//make sure everything is synchronized
+}
 
 void CoreBroker::setIdentifier (const std::string &name)
 {

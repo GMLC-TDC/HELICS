@@ -22,7 +22,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (value_federate_tests2, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-const std::string core_types[] = {"test"};
+const std::string core_types[] = {"test","test_2"};
 
 /** test block send and receive*/
 BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_type)
@@ -73,18 +73,18 @@ BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types), core_type)
     vFed1->enterExecutionState ();
     vFed1->publish (pubid3, db);
     vFed1->requestTime (1.0);
-    // the callback should have occured here
+    // the callback should have occurred here
     BOOST_CHECK (lastId == sub3);
     BOOST_CHECK_EQUAL (lastTime, 1.0);
     BOOST_CHECK_EQUAL (vFed1->getLastUpdateTime (sub3), lastTime);
     vFed1->publish (pubid2, 4);
     vFed1->requestTime (2.0);
-    // the callback should have occured here
+    // the callback should have occurred here
     BOOST_CHECK (lastId == sub2);
     BOOST_CHECK_EQUAL (lastTime, 2.0);
     vFed1->publish (pubid1, "this is a test");
     vFed1->requestTime (3.0);
-    // the callback should have occured here
+    // the callback should have occurred here
     BOOST_CHECK (lastId == sub1);
     BOOST_CHECK_EQUAL (lastTime, 3.0);
 
@@ -94,14 +94,14 @@ BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types), core_type)
     vFed1->publish (pubid3, db);
     vFed1->publish (pubid2, 4);
     vFed1->requestTime (4.0);
-    // the callback should have occured here
+    // the callback should have occurred here
     BOOST_CHECK_EQUAL (ccnt, 2);
     ccnt = 0;  // reset the counter
     vFed1->publish (pubid3, db);
     vFed1->publish (pubid2, 4);
     vFed1->publish (pubid1, "test string2");
     vFed1->requestTime (5.0);
-    // the callback should have occured here
+    // the callback should have occurred here
     BOOST_CHECK_EQUAL (ccnt, 3);
     vFed1->finalize ();
 }
