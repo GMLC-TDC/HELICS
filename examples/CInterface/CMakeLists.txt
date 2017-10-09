@@ -10,8 +10,8 @@ include_directories ("${PROJECT_SOURCE_DIR}/src/helics/shared_api_library")
 add_executable(pi_sender pi_sender.c)
 add_executable(pi_receiver pi_receiver.c)
 
-target_link_libraries(pi_sender helicsSharedLib  ${external_library_list})
-target_link_libraries(pi_receiver helicsSharedLib  ${external_library_list})
+target_link_libraries(pi_sender helicsSharedLib )
+target_link_libraries(pi_receiver helicsSharedLib )
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET pi_sender POST_BUILD        # Adds a post-build event to api tests

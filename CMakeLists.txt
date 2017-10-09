@@ -14,6 +14,8 @@ if (BUILD_HELICS_TESTS)
 enable_testing ()
 endif(BUILD_HELICS_TESTS)
 
+OPTION(BUILD_HELICS_EXAMPLES "Enable the test Executables to be built" OFF)
+
 OPTION(BUILD_PYTHON "Build Python extension" OFF)
 
 OPTION(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
@@ -353,6 +355,20 @@ add_subdirectory (src)
 if (BUILD_HELICS_TESTS)
 add_subdirectory (tests)
 
+
+#-----------------------------------------------------------------------------
+# Setup CTEST environment
+#-----------------------------------------------------------------------------
+include (CTest)
+
+endif(BUILD_HELICS_TESTS)
+
+if (BUILD_HELICS_EXAMPLES)
+add_subdirectory (examples)
+
+endif(BUILD_HELICS_EXAMPLES)
+
+INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
 # -------------------------------------------------------------
 # Enable clang analysis and formatting tools
 # -------------------------------------------------------------
@@ -362,16 +378,6 @@ OPTION(ENABLE_CLANG_TOOLS "if clang is found enable some custom targets for clan
 if (ENABLE_CLANG_TOOLS)
 include(clang-cxx-dev-tools)
 endif(ENABLE_CLANG_TOOLS)
-
-#-----------------------------------------------------------------------------
-# Setup CTEST environment
-#-----------------------------------------------------------------------------
-include (CTest)
-
-
-INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
-
-endif(BUILD_HELICS_TESTS)
 
 if (BUILD_PYTHON)
 add_subdirectory (python)

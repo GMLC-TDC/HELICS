@@ -57,8 +57,8 @@ int main(int argc,char **argv)
   helics_time_t currenttime,prevtime;
   double        value = 0.0;
 
-  prevtime = helicsRequestTime(vfed,0.19);
-  
+  currenttime = helicsRequestTime(vfed,0.19);
+
   while(currenttime <= 0.19) {
 
 	  currenttime = helicsRequestTime(vfed,0.19);
