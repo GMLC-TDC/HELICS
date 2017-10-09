@@ -72,7 +72,7 @@ struct FederateTestFixture
             core_type_name.pop_back();
         }
 
-        std::string initString = std::string("--broker=") + broker->getIdentifier() + " --broker_address=" + broker->getAddress() + " --federates " + std::to_string(count);
+		std::string initString = std::string("--broker=") + broker->getIdentifier() + " --broker_address=" + broker->getAddress();
 
         helics::FederateInfo fi("", helics::coreTypeFromString(core_type_name));
         fi.timeDelta = time_delta;
@@ -87,7 +87,7 @@ struct FederateTestFixture
         case 1:
         default:
         {
-            fi.coreInitString = initString;
+            fi.coreInitString = initString+ " --federates " + std::to_string(count);
 
             for (int ii = 0; ii < count; ++ii)
             {
@@ -99,13 +99,12 @@ struct FederateTestFixture
         }
         break;
         case 2:
-        {
+        { //each federate has its own core
             auto core_type = helics::coreTypeFromString(core_type_name);
 
-            federates.resize(count+federates.size());
             for (int ii = 0; ii < count; ++ii)
             {
-                auto core = helics::CoreFactory::create(core_type, initString);
+                auto core = helics::CoreFactory::create(core_type, initString+ " --federates 1");
                 fi.coreName = core->getIdentifier();
 
                 fi.name = name_prefix + std::to_string(ii);

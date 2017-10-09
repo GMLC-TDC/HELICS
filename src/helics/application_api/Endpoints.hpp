@@ -133,9 +133,11 @@ class Endpoint
     /** set a target destination for unspecified messages*/
     void setTargetDestination (const std::string &target) { targetDest = target; }
 	/** get the name of the endpoint*/
-	std::string getName() { return fed->getEndpointName(id); }
+	std::string getName() const { return fed->getEndpointName(id); }
 	/** get the specified type of the endpoint*/
-	std::string getType() { return fed->getEndpointType(id); }
+	std::string getType() const { return fed->getEndpointType(id); }
+	/** get the actual endpoint id for the fed*/
+	endpoint_id_t getID() const { return id; }
 };
 }  // namespace helics
 #endif

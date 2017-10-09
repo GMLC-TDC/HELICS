@@ -70,6 +70,15 @@ class BlockingQueue3
     BlockingQueue3 (const BlockingQueue3 &) = delete;
     BlockingQueue3 &operator= (const BlockingQueue3 &) = delete;
 
+	/** clear the queue*/
+	void clear()
+	{
+		std::lock_guard<std::mutex> pullLock(m_pullLock);  // first pullLock
+		std::lock_guard<std::mutex> pushLock(m_pushLock);  // second pushLock
+		pullElements.clear();
+		pushElements.clear();
+		queueEmptyFlag = true;
+	}
     /** set the capacity of the queue
     actually double the requested the size will be reserved due to the use of two vectors internally
     @param[in] capacity  the capacity to reserve

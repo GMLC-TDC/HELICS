@@ -27,8 +27,8 @@ namespace helics
 		publication_id_t id;  //!< the internal id of the publication
 	private:
 		std::string key_;  //!< the name of the publication
-		std::string units_;  //!< the defined units of the publication
 		std::string type_;  //!< the type of the publication
+		std::string units_;  //!< the defined units of the publication
 	public:
 		PublicationBase() = default;
 		PublicationBase(ValueFederate *valueFed,

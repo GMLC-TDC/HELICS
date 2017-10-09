@@ -31,7 +31,8 @@ private:
 	virtual void closeTransmitter() override; //!< function to instruct the transmitter loop to close
 	virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
 	
-
+private:
+	
 };
 
 
