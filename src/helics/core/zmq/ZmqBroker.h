@@ -48,6 +48,7 @@ private:
 private:
 	std::atomic<bool> initialized_{ false };  //!< atomic protecting local initialization
 	std::unique_ptr<ZmqComms> comms;  //!< pointer to the comms object handling the actions connection
+	std::mutex dataLock;  //mutex protecting the local information
 	//std::unique_ptr<ZmqConnection> zmqConn;  //!< object containing the ZmqConnection Information for Pimpl 
 };
 }

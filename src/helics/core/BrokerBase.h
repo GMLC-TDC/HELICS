@@ -50,6 +50,7 @@ protected:
 	std::string logFile; //< the file to log message to
 	std::unique_ptr<TimeCoordinator> timeCoord; //!< object managing the time control
 	BlockingQueue3<ActionMessage> _queue; //!< primary routing queue
+	std::atomic<bool> processingDisabled{ false };  //atomic flag indicating that processing is halted
 public:
 	BrokerBase() noexcept;
 	BrokerBase(const std::string &broker_name);

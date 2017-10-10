@@ -79,6 +79,7 @@ void IpcBroker::InitializeFromArgs (int argc, char *argv[])
 
 bool IpcBroker::brokerConnect ()
 {
+	std::lock_guard<std::mutex> lock(dataMutex);  //mutex protecting the other information in the ipcBroker
     if (fileloc.empty ())
     {
         fileloc = getIdentifier () + "_queue.hqf";
@@ -98,7 +99,11 @@ bool IpcBroker::brokerConnect ()
     return comms->connect ();
 }
 
-void IpcBroker::brokerDisconnect () { comms->disconnect (); }
+void IpcBroker::brokerDisconnect () {
+	_operating = false;
+	std::lock_guard<std::mutex> lock(dataMutex); 
+	comms->disconnect (); 
+}
 
 void IpcBroker::transmit (int route_id, const ActionMessage &cmd) { comms->transmit (route_id, cmd); }
 

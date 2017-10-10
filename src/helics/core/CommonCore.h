@@ -192,7 +192,7 @@ protected:
 		terminated=3,
 		errored=7,
 	};
-	std::atomic<core_state_t> coreState{created}; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
+	std::atomic<core_state_t> coreState{created}; //!< flag indicating that the structure is past the initialization stage indicating that no more changes can be made to the number of federates or handles
 	int32_t _global_federation_size = 0;  //!< total size of the federation
 	std::vector<std::unique_ptr<FederateState>> _federates; //!< local federate information
 														  //using pointers to minimize time in a critical section- though this should be timed more in the future

@@ -38,12 +38,12 @@ private:
 	virtual void brokerDisconnect() override;
 private:
 	std::atomic<bool> initialized_{ false };  //!< atomic protecting local initialization
-
-
+	
 	std::string fileloc;
 	std::string brokerloc;
 	std::string brokername;
 	std::unique_ptr<IpcComms> comms;
+	std::mutex dataMutex;  //mutex protecting the other information in the ipcBroker
 };
 } //namespace helics
 #endif

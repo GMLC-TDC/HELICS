@@ -64,6 +64,7 @@ void TestCore::InitializeFromArgs (int argc, char *argv[])
 
 bool TestCore::brokerConnect ()
 {
+    std::lock_guard<std::mutex> lock (routeMutex);
     if (!tbroker)
     {
         tbroker = findBroker (brokerName);
@@ -79,19 +80,28 @@ bool TestCore::brokerConnect ()
     return static_cast<bool> (tbroker);
 }
 
-void TestCore::brokerDisconnect () { tbroker = nullptr; }
+void TestCore::brokerDisconnect ()
+{
+    std::lock_guard<std::mutex> lock (routeMutex);
+    tbroker = nullptr;
+}
 
-TestCore::~TestCore () = default;
+TestCore::~TestCore ()
+{
+    // lock to ensure all the data is synchronized before deletion
+    std::lock_guard<std::mutex> lock (routeMutex);
+}
 
 void TestCore::transmit (int route_id, const ActionMessage &cmd)
 {
+    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (routeMutex, std::defer_lock) :
+                                           std::unique_lock<std::mutex> (routeMutex);
     if (route_id == 0)
     {
         tbroker->addActionMessage (cmd);
         return;
     }
-    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (routeMutex, std::defer_lock) :
-                                           std::unique_lock<std::mutex> (routeMutex);
+
     auto brkfnd = brokerRoutes.find (route_id);
     if (brkfnd != brokerRoutes.end ())
     {

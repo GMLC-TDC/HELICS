@@ -891,7 +891,7 @@ void CoreBroker::disconnect ()
     {
         brokerDisconnect ();
         brokerState = broker_state_t::terminated;
-        /*We need to enrure that the destructor is not called immediately upon calling unregister
+        /*We need to ensure that the destructor is not called immediately upon calling unregister
         otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
         that will be destroyed on function exit
         */
