@@ -257,11 +257,7 @@ void BrokerBase::addActionMessage (const ActionMessage &m)
 {
     if (isPriorityCommand (m))
     {
-		if (!processingDisabled)
-		{
 			processPriorityCommand(m);
-		}
-        
     }
     else
     {
@@ -295,17 +291,11 @@ void BrokerBase::queueProcessingLoop ()
         case CMD_TERMINATE_IMMEDIATELY:
             return;  // immediate return
         case CMD_STOP:
-			if (!processingDisabled)
-			{
 				processCommand(std::move(command));
 				return processDisconnect();
-			}
 			return;
         default:
-			if (!processingDisabled)
-			{
 				processCommand(std::move(command));
-			}
             
         }
     }

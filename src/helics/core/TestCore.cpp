@@ -56,7 +56,7 @@ void TestCore::InitializeFromArgs (int argc, char *argv[])
             brokerInitString = vm["brokerinit"].as<std::string> ();
         }
     }
-    if (coreState == created)
+    if (brokerState == created)
     {
         CommonCore::InitializeFromArgs (argc, argv);
     }
@@ -94,7 +94,7 @@ TestCore::~TestCore ()
 
 void TestCore::transmit (int route_id, const ActionMessage &cmd)
 {
-    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (routeMutex, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (routeMutex, std::defer_lock) :
                                            std::unique_lock<std::mutex> (routeMutex);
     if (route_id == 0)
     {

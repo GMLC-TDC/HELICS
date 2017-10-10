@@ -50,7 +50,20 @@ protected:
 	std::string logFile; //< the file to log message to
 	std::unique_ptr<TimeCoordinator> timeCoord; //!< object managing the time control
 	BlockingQueue3<ActionMessage> _queue; //!< primary routing queue
-	std::atomic<bool> processingDisabled{ false };  //atomic flag indicating that processing is halted
+										  /** enumeration of the possible core states*/
+	enum broker_state_t :int
+	{
+		created = -5,
+		initialized = -4,
+		connecting = -3,
+		connected = -2,
+		initializing = -1,
+		operating = 0,
+		terminating = 1,
+		terminated = 3,
+		errored = 7,
+	};
+	std::atomic<broker_state_t> brokerState{ created }; //!< flag indicating that the structure is past the initialization stage indicating that no more changes can be made to the number of federates or handles
 public:
 	BrokerBase() noexcept;
 	BrokerBase(const std::string &broker_name);

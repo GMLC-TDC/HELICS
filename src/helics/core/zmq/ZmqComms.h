@@ -41,7 +41,7 @@ or the interface doesn't use port numbers
 std::pair<std::string, int> extractInterfaceandPort(const std::string &address);
 
 /** implementation for the communication interface that uses zmq messages to communicate*/
-class ZmqComms:public CommsInterface {
+class ZmqComms final:public CommsInterface {
 
 public:
 	/** default constructor*/

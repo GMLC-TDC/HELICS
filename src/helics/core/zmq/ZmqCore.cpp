@@ -46,7 +46,7 @@ ZmqCore::ZmqCore (const std::string &core_name) : CommonCore (core_name) {}
 void ZmqCore::InitializeFromArgs (int argc, char *argv[])
 {
     namespace po = boost::program_options;
-    if (coreState == created)
+    if (brokerState == created)
     {
         po::variables_map vm;
         argumentParser (argc, argv, vm, extraArgs);

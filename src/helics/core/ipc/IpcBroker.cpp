@@ -100,7 +100,6 @@ bool IpcBroker::brokerConnect ()
 }
 
 void IpcBroker::brokerDisconnect () {
-	_operating = false;
 	std::lock_guard<std::mutex> lock(dataMutex); 
 	comms->disconnect (); 
 }

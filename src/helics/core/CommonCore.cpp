@@ -45,7 +45,7 @@ CommonCore::CommonCore (const std::string &core_name) : BrokerBase (core_name) {
 
 void CommonCore::initialize (const std::string &initializationString)
 {
-    if ((coreState == created))  // don't do the compare exchange here since we do that in the initialize fromArgs
+    if ((brokerState == created))  // don't do the compare exchange here since we do that in the initialize fromArgs
     {  // and we can tolerate a spurious call
         stringToCmdLine cmdline (initializationString);
         InitializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
@@ -54,8 +54,8 @@ void CommonCore::initialize (const std::string &initializationString)
 
 void CommonCore::InitializeFromArgs (int argc, char *argv[])
 {
-    core_state_t exp = created;
-    if (coreState.compare_exchange_strong (exp, core_state_t::initialized))
+    broker_state_t exp = created;
+    if (brokerState.compare_exchange_strong (exp, broker_state_t::initialized))
     {
         BrokerBase::InitializeFromArgs (argc, argv);
     }
@@ -63,10 +63,10 @@ void CommonCore::InitializeFromArgs (int argc, char *argv[])
 
 bool CommonCore::connect ()
 {
-    if (coreState >= core_state_t::initialized)
+    if (brokerState >= broker_state_t::initialized)
     {
-        core_state_t exp = core_state_t::initialized;
-        if (coreState.compare_exchange_strong (exp, core_state_t::connecting))
+        broker_state_t exp = broker_state_t::initialized;
+        if (brokerState.compare_exchange_strong (exp, broker_state_t::connecting))
         {
             bool res = brokerConnect ();
             if (res)
@@ -77,17 +77,17 @@ bool CommonCore::connect ()
                 m.name = getIdentifier ();
                 m.info ().target = getAddress ();
                 transmit (0, m);
-                coreState = core_state_t::connected;
+                brokerState = broker_state_t::connected;
             }
             else
             {
-                coreState = core_state_t::initialized;
+                brokerState = broker_state_t::initialized;
             }
             return res;
         }
-        if (coreState == core_state_t::connecting)
+        if (brokerState == broker_state_t::connecting)
         {
-            while (coreState == core_state_t::connecting)
+            while (brokerState == broker_state_t::connecting)
             {
                 std::this_thread::sleep_for (std::chrono::milliseconds (20));
             }
@@ -96,38 +96,43 @@ bool CommonCore::connect ()
     return isConnected ();
 }
 
-bool CommonCore::isConnected () const { return ((coreState == operating) || (coreState == connected)); }
+bool CommonCore::isConnected () const { return ((brokerState == operating) || (brokerState == connected)); }
 
-void CommonCore::processDisconnect () { disconnect (); }
+void CommonCore::processDisconnect() { disconnect(); }
 
 void CommonCore::disconnect ()
 {
-    brokerDisconnect ();
-    coreState = terminated;
-    /*We need to ensure that the destructor is not called immediately upon calling unregister
-    otherwise this would be a mess and probably cause segmentation faults so we capture it in a local variable
-    that will be destroyed on function exit
-    */
-    auto keepCoreAlive = CoreFactory::findCore (identifier);
-    if (keepCoreAlive)
-    {
-        if (keepCoreAlive.get () == this)
-        {
-            CoreFactory::unregisterCore (identifier);
-        }
-    }
+	if (brokerState > broker_state_t::initialized)
+	{
+		brokerState = broker_state_t::terminating;
+		brokerDisconnect();
+	}
+		brokerState = terminated;
+		/*We need to ensure that the destructor is not called immediately upon calling unregister
+		otherwise this would be a mess and probably cause segmentation faults so we capture it in a local variable
+		that will be destroyed on function exit
+		*/
+		auto keepCoreAlive = CoreFactory::findCore(identifier);
+		if (keepCoreAlive)
+		{
+			if (keepCoreAlive.get() == this)
+			{
+				CoreFactory::unregisterCore(identifier);
+			}
+		}
 
-    if (!prevIdentifier.empty ())
-    {
-        auto keepCoreAlive2 = CoreFactory::findCore (prevIdentifier);
-        if (keepCoreAlive2)
-        {
-            if (keepCoreAlive2.get () == this)
-            {
-                CoreFactory::unregisterCore (prevIdentifier);
-            }
-        }
-    }
+		if (!prevIdentifier.empty())
+		{
+			auto keepCoreAlive2 = CoreFactory::findCore(prevIdentifier);
+			if (keepCoreAlive2)
+			{
+				if (keepCoreAlive2.get() == this)
+				{
+					CoreFactory::unregisterCore(prevIdentifier);
+				}
+			}
+		}
+	
 }
 
 CommonCore::~CommonCore()
@@ -140,7 +145,7 @@ CommonCore::~CommonCore()
 FederateState *CommonCore::getFederate (federate_id_t federateID) const
 {
     // only activate the lock if we not in an operating state
-    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
                                            std::unique_lock<std::mutex> (_mutex);
 
     if (isValidIndex (federateID, _federates))
@@ -160,12 +165,12 @@ FederateState *CommonCore::getFederate (federate_id_t federateID) const
 FederateState *CommonCore::getHandleFederate (Handle id_)
 {
     // only activate the lock if we not in an operating state
-    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
                                            std::unique_lock<std::mutex> (_handlemutex);
     // this list is now constant no need to lock
     if (isValidIndex (id_, handles))
     {  // now need to be careful about deadlock here
-        auto lock2 = (coreState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
+        auto lock2 = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
                                                 std::unique_lock<std::mutex> (_mutex);
         return _federates[handles[id_]->local_fed_id].get ();
     }
@@ -176,7 +181,7 @@ FederateState *CommonCore::getHandleFederate (Handle id_)
 BasicHandleInfo *CommonCore::getHandleInfo (Handle id_) const
 {
     // only activate the lock if we not in an operating state
-    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
                                            std::unique_lock<std::mutex> (_handlemutex);
     if (isValidIndex (id_, handles))
     {
@@ -189,7 +194,7 @@ BasicHandleInfo *CommonCore::getHandleInfo (Handle id_) const
 BasicHandleInfo *CommonCore::getLocalEndpoint (const std::string &name)
 {
     // only activate the lock if we not in an operating state
-    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
                                            std::unique_lock<std::mutex> (_handlemutex);
     auto fnd = endpoints.find (name);
     if (fnd != endpoints.end ())
@@ -202,7 +207,7 @@ BasicHandleInfo *CommonCore::getLocalEndpoint (const std::string &name)
 bool CommonCore::isLocal (Core::federate_id_t global_id) const
 {
     // only activate the lock if we not in an operating state
-    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
                                            std::unique_lock<std::mutex> (_mutex);
     auto fnd = global_id_translation.find (global_id);
     return (fnd != global_id_translation.end ());
@@ -211,15 +216,15 @@ bool CommonCore::isLocal (Core::federate_id_t global_id) const
 int32_t CommonCore::getRoute (Core::federate_id_t global_id) const
 {
     // only activate the lock if we not in an operating state
-    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
                                            std::unique_lock<std::mutex> (_mutex);
     auto fnd = routing_table.find (global_id);
     return (fnd != routing_table.end ()) ? fnd->second : 0;
 }
 
-bool CommonCore::isInitialized () const { return (coreState >= initialized); }
+bool CommonCore::isInitialized () const { return (brokerState >= initialized); }
 
-bool CommonCore::isJoinable () const { return ((coreState != created) && (coreState < operating)); }
+bool CommonCore::isJoinable () const { return ((brokerState != created) && (brokerState < operating)); }
 void CommonCore::error (federate_id_t federateID, int errorCode)
 {
     auto fed = getFederate (federateID);
@@ -281,7 +286,7 @@ bool CommonCore::allInitReady () const
 
 bool CommonCore::allDisconnected () const
 {
-    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
                                            std::unique_lock<std::mutex> (_mutex);
     // all federates must have hit finished state
     auto pred = [](const auto &fed) {
@@ -350,11 +355,11 @@ convergence_state CommonCore::enterExecutingState (federate_id_t federateID, con
 
 federate_id_t CommonCore::registerFederate (const std::string &name, const CoreFederateInfo &info)
 {
-    if (coreState == created)
+    if (brokerState == created)
     {
         throw (invalidFunctionCall ("Core has not been initialized yet"));
     }
-    if (coreState >= operating)
+    if (brokerState >= operating)
     {
         throw (invalidFunctionCall ("Core has already moved to operating state"));
     }
@@ -422,7 +427,7 @@ federate_id_t CommonCore::getFederateId (const std::string &name)
 
 int32_t CommonCore::getFederationSize ()
 {
-    if (coreState >= operating)
+    if (brokerState >= operating)
     {
         return _global_federation_size;
     }
@@ -1327,7 +1332,7 @@ void CommonCore::setFilterOperator (Handle filter, std::shared_ptr<FilterOperato
 
     auto FiltI = getFederate (hndl->fed_id)->getFilter (filter);
 
-    if (coreState < operating)
+    if (brokerState < operating)
     {
         FiltI->filterOp = std::move (callback);
         if (hndl->what == HANDLE_SOURCE_FILTER)
@@ -1354,7 +1359,7 @@ void CommonCore::setFilterOperator (Handle filter, std::shared_ptr<FilterOperato
             addActionMessage (cmd);
         }
     }
-    else if (coreState == operating)
+    else if (brokerState == operating)
     {
         if (FiltI->filterOp)
         {
@@ -1375,13 +1380,13 @@ void CommonCore::setFilterOperator (Handle filter, std::shared_ptr<FilterOperato
 FilterCoordinator *CommonCore::getFilterCoordinator (Handle id_)
 {
     // only activate the lock if we not in an operating state
-    auto lock = (coreState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
                                            std::unique_lock<std::mutex> (_mutex);
     auto fnd = filters.find (id_);
     if (fnd == filters.end ())
     {
         lock.unlock ();
-        if (coreState < operating)
+        if (brokerState < operating)
         {
             // just make a dummy filterFunction so we have something to return
             auto ff = std::make_unique<FilterCoordinator> ();
@@ -1427,7 +1432,7 @@ std::unique_ptr<Message> CommonCore::receiveAnyFilter (federate_id_t federateID,
 
 void CommonCore::setIdentifier (const std::string &name)
 {
-    if (coreState == created)
+    if (brokerState == created)
     {
         std::lock_guard<std::mutex> lock (_mutex);
         identifier = name;
@@ -1495,7 +1500,7 @@ void CommonCore::processPriorityCommand (const ActionMessage &command)
     case CMD_PRIORITY_DISCONNECT:
         if (allDisconnected ())
         {
-            coreState = core_state_t::terminated;
+            brokerState = broker_state_t::terminated;
             ActionMessage dis (CMD_DISCONNECT);
             dis.source_id = global_broker_id;
             transmit (0, dis);
@@ -1579,7 +1584,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_DISCONNECT:
         if (allDisconnected ())
         {
-            coreState = core_state_t::terminated;
+            brokerState = broker_state_t::terminated;
             ActionMessage dis (CMD_DISCONNECT);
             dis.source_id = global_broker_id;
             transmit (0, dis);
@@ -1804,8 +1809,8 @@ void CommonCore::processCommand (ActionMessage &&command)
             fed->init_transmitted = true;
             if (allInitReady ())
             {
-                core_state_t exp = connected;
-                if (coreState.compare_exchange_strong (exp, core_state_t::initializing))
+                broker_state_t exp = connected;
+                if (brokerState.compare_exchange_strong (exp, broker_state_t::initializing))
                 {  // make sure we only do this once
                     command.source_id = global_broker_id;
                     organizeFilterOperations ();
@@ -1817,8 +1822,8 @@ void CommonCore::processCommand (ActionMessage &&command)
     break;
     case CMD_INIT_GRANT:
     {
-        core_state_t exp = initializing;
-        if (coreState.compare_exchange_strong (exp, core_state_t::operating))
+        broker_state_t exp = initializing;
+        if (brokerState.compare_exchange_strong (exp, broker_state_t::operating))
         {  // forward the grant to all federates
             for (auto &fed : _federates)
             {

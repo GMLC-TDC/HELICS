@@ -89,7 +89,6 @@ bool TestBroker::brokerConnect ()
 }
 
 void TestBroker::brokerDisconnect () { 
-	_operating = false;
 	std::lock_guard<std::mutex> lock(routeMutex);
 	tbroker = nullptr; 
 }
@@ -97,7 +96,7 @@ void TestBroker::brokerDisconnect () {
 void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
 {
 	// only activate the lock if we not in an operating state
-	auto lock = (_operating) ? std::unique_lock<std::mutex>(routeMutex, std::defer_lock) :
+	auto lock = (brokerState==broker_state_t::operating) ? std::unique_lock<std::mutex>(routeMutex, std::defer_lock) :
 		std::unique_lock<std::mutex>(routeMutex);
 
     if ((tbroker) && (route_id == 0))

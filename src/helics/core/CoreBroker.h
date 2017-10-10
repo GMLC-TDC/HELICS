@@ -70,8 +70,6 @@ or does something else if it is the root of the tree
 class CoreBroker : public BrokerBase
 {
 protected:
-	std::atomic<bool> _operating{ false }; //!< flag indicating that the structure is past the initialization stage indicating that no more changes can be made to the number of federates or handles
-	
 	bool _gateway = false;  //!< set to true if this broker should act as a gateway.
 	bool _hasEndpoints = false; //!< set to true if the broker has endpoints;  
 private:
@@ -97,19 +95,6 @@ private:
 	std::map<Core::federate_id_t, int32_t> federate_table; //!< map for translating global federate id's to a local index
 	std::unordered_map<std::string, int32_t> knownExternalEndpoints; //!< external map for all known external endpoints with names and route
 	
-protected:
-	/** enumeration of the possible core states*/
-	enum broker_state_t :int
-	{
-		created = -5,
-		initialized = -4,
-		connecting = -3,
-		connected = -2,
-		operating = 0,
-		terminated = 3,
-		errored = 7,
-	};
-	std::atomic<broker_state_t> brokerState{ created }; //!< flag indicating that the structure is past the initialization stage indicating that no more changes can be made to the number of federates or handles
 private:
 
 	mutable std::mutex mutex_;  //!< mutex lock for the federate information that could come in from multiple sources
