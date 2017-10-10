@@ -47,6 +47,7 @@ protected:
 	std::thread _queue_processing_thread;  //!< thread for running the broker
 										   /** a logging function for logging or printing messages*/
 	std::function<void(int, const std::string &, const std::string &)> loggerFunction;
+	std::atomic<bool> haltOperations{ false };  //!< flag indicating that no further message should be processed
 	std::string logFile; //< the file to log message to
 	std::unique_ptr<TimeCoordinator> timeCoord; //!< object managing the time control
 	BlockingQueue3<ActionMessage> _queue; //!< primary routing queue
@@ -104,7 +105,10 @@ protected:
 	*/
 	virtual bool sendToLogger(Core::federate_id_t federateID, int logLevel, const std::string &name, const std::string &message) const;
 
+	/** generate a new random id based on a uuid*/
 	void generateNewIdentifier();
+	/** close all the threads*/
+	void joinAllThreads();
 private:
 
 

@@ -16,7 +16,7 @@ namespace helics {
 
 class ZmqComms;
 /** implementation for the core that uses zmq messages to communicate*/
-class ZmqCore : public CommonCore {
+class ZmqCore final: public CommonCore {
 
 public:
 	/** default constructor*/

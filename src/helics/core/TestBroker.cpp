@@ -26,6 +26,7 @@ TestBroker::TestBroker (std::shared_ptr<TestBroker> nbroker) : tbroker (std::mov
 
 TestBroker::~TestBroker()
 {
+	haltOperations = true;
 	//lock to ensure all the data is synchronized before deletion
 	std::lock_guard<std::mutex> lock(routeMutex);
 }
@@ -89,6 +90,7 @@ bool TestBroker::brokerConnect ()
 }
 
 void TestBroker::brokerDisconnect () { 
+	brokerState = broker_state_t::terminating;
 	std::lock_guard<std::mutex> lock(routeMutex);
 	tbroker = nullptr; 
 }

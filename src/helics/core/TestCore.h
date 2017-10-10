@@ -20,7 +20,7 @@ namespace helics
 class CoreBroker;
 /** an object implementing a local core object that can communicate in process
  */
-class TestCore : public CommonCore
+class TestCore final: public CommonCore
 {
   public:
     /** default constructor*/

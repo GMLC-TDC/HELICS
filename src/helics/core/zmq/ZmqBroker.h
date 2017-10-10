@@ -17,7 +17,7 @@ namespace helics
 
 class ZmqComms;
 
-class ZmqBroker :public CoreBroker
+class ZmqBroker final:public CoreBroker
 {
 public:
 	/** default constructor*/

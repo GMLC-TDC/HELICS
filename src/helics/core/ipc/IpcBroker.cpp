@@ -44,7 +44,12 @@ IpcBroker::IpcBroker (bool rootBroker) noexcept : CoreBroker (rootBroker) {}
 
 IpcBroker::IpcBroker (const std::string &broker_name) : CoreBroker (broker_name) {}
 
-IpcBroker::~IpcBroker () {}
+IpcBroker::~IpcBroker()
+{
+	haltOperations = true;
+	comms = nullptr; //need to ensure the comms are deleted before the callbacks become invalid
+
+}
 
 void IpcBroker::InitializeFromArgs (int argc, char *argv[])
 {

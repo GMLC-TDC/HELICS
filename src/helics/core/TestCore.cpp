@@ -82,12 +82,14 @@ bool TestCore::brokerConnect ()
 
 void TestCore::brokerDisconnect ()
 {
+	brokerState = broker_state_t::terminating;
     std::lock_guard<std::mutex> lock (routeMutex);
     tbroker = nullptr;
 }
 
 TestCore::~TestCore ()
 {
+	haltOperations = true;
     // lock to ensure all the data is synchronized before deletion
     std::lock_guard<std::mutex> lock (routeMutex);
 }

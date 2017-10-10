@@ -138,8 +138,9 @@ void CommonCore::disconnect ()
 CommonCore::~CommonCore()
 {
 	//make sure everything is synced up so just run the lock
-	std::lock_guard<std::mutex> lock(_handlemutex);
+	std::unique_lock<std::mutex> lock(_handlemutex);
 	std::unique_lock<std::mutex> lock2(_mutex);
+	joinAllThreads();
 }
 
 FederateState *CommonCore::getFederate (federate_id_t federateID) const

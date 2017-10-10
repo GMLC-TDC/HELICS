@@ -753,6 +753,9 @@ convergence_state FederateState::processActionMessage (ActionMessage &cmd)
         }
     }
     break;
+	case CMD_TERMINATE_IMMEDIATELY:
+		setState(HELICS_FINISHED);
+		return convergence_state::halted;
     case CMD_STOP:
     case CMD_DISCONNECT:
         if ((cmd.dest_id == global_id) || (cmd.dest_id == 0))

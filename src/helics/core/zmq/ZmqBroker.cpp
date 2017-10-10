@@ -42,7 +42,11 @@ ZmqBroker::ZmqBroker (bool rootBroker) noexcept : CoreBroker (rootBroker) {}
 
 ZmqBroker::ZmqBroker (const std::string &broker_name) : CoreBroker (broker_name) {}
 
-ZmqBroker::~ZmqBroker () = default;
+ZmqBroker::~ZmqBroker()
+{
+	haltOperations = true;
+	comms = nullptr; //need to ensure the comms are deleted before the callbacks become invalid
+}
 
 void ZmqBroker::InitializeFromArgs (int argc, char *argv[])
 {
