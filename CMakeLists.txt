@@ -382,6 +382,6 @@ include(clang-cxx-dev-tools)
 endif(ENABLE_CLANG_TOOLS)
 
 if (BUILD_PYTHON)
-add_subdirectory (python)
+add_subdirectory(swig)
 endif(BUILD_PYTHON)
 
