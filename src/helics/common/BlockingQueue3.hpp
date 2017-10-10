@@ -114,7 +114,7 @@ class BlockingQueue3
             bool expEmpty = true;
             if (queueEmptyFlag.compare_exchange_strong (expEmpty, false))
             {
-                // release the push lock
+                // release the push lock so we don't get a potential deadlock condition
                 pushLock.unlock ();
                 std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
                 queueEmptyFlag = false;
@@ -151,7 +151,7 @@ class BlockingQueue3
             bool expEmpty = true;
             if (queueEmptyFlag.compare_exchange_strong (expEmpty, false))
             {
-                // release the push lock
+                // release the push lock so we don't get a potential deadlock condition
                 pushLock.unlock ();
                 std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
                 queueEmptyFlag = false;
@@ -227,7 +227,7 @@ class BlockingQueue3
 
     /** blocking call that will call the specified functor
     if the queue is empty
-    @param callOnWaitFunction an nullary functiod that will be called if the initial query does not return a value
+    @param callOnWaitFunction an nullary functor that will be called if the initial query does not return a value
     @details  after calling the function the call will check again and if still empty
     will block and wait.
     */
@@ -284,7 +284,7 @@ stx::optional<T> BlockingQueue3<T>::try_pop ()
             pushLock.unlock ();  // we can free the push function to accept more elements after the swap call;
             std::reverse (pullElements.begin (), pullElements.end ());
             stx::optional<T> val (
-              std::move (pullElements.back ()));  // do it this way to allow moveable only types
+              std::move (pullElements.back ()));  // do it this way to allow movable only types
             pullElements.pop_back ();
             if (pullElements.empty ())
             {
@@ -306,7 +306,7 @@ stx::optional<T> BlockingQueue3<T>::try_pop ()
         queueEmptyFlag = true;
         return {};  // return the empty optional
     }
-    stx::optional<T> val (std::move (pullElements.back ()));  // do it this way to allow moveable only types
+    stx::optional<T> val (std::move (pullElements.back ()));  // do it this way to allow movable only types
     pullElements.pop_back ();
     if (pullElements.empty ())
     {

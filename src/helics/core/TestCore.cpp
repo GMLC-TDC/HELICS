@@ -90,8 +90,11 @@ void TestCore::brokerDisconnect ()
 TestCore::~TestCore ()
 {
 	haltOperations = true;
+	joinAllThreads();
     // lock to ensure all the data is synchronized before deletion
     std::lock_guard<std::mutex> lock (routeMutex);
+
+
 }
 
 void TestCore::transmit (int route_id, const ActionMessage &cmd)

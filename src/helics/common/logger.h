@@ -30,19 +30,19 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 namespace helics
 {
 /** class implementing a thread safe logger 
-@details the logger uses a queing mechanism and condition variable to store messages to a queue and print/display them
+@details the logger uses a queuing mechanism and condition variable to store messages to a queue and print/display them
 in a single thread allowing for asynchronous logging
 */
 class logger
 {
 
 private:
-	std::atomic<bool> halted{ true };
+	std::atomic<bool> halted{ true }; //!< flag indicating the logger has halted
 	BlockingQueue3<std::string> loggingQueue;  //!< the actual queue containing the strings to log
 	std::ofstream outFile;	//!< the stream to write the log messages
 	std::thread loggingThread;	//!< the thread object containing the thread running the actual logger
 public:
-	std::atomic<int> consoleLevel{ 100 };	//!< level below which we need to print to the consold
+	std::atomic<int> consoleLevel{ 100 };	//!< level below which we need to print to the console
 	std::atomic<int> fileLevel{ 100 };	//!< level below which we need to print to a file
 public:
 	/** default constructor*/
@@ -81,7 +81,7 @@ public:
 	void flush();
 	/** alter the printing levels
 	@param[in] cLevel the level to print to the console
-	@param[in] fLevel the leve to print to the file if it is open*/
+	@param[in] fLevel the level to print to the file if it is open*/
 	void changeLevels(int cLevel, int fLevel);
 private:
 	/** actual loop function to run the logger*/
@@ -94,7 +94,7 @@ class loggerNoThread
 private:
 	std::ofstream outFile;  //!< the file stream to write the log messages to
 public:
-	int consoleLevel = 100;	//!< level below which we need to print to the consold
+	int consoleLevel = 100;	//!< level below which we need to print to the console
 	int fileLevel = 100;	//!< level below which we need to print to a file
 public:
 	/** default constructor*/
@@ -131,7 +131,7 @@ public:
 	void flush();
 	/** alter the printing levels
 	@param[in] cLevel the level to print to the console
-	@param[in] fLevel the leve to print to the file if it is open*/
+	@param[in] fLevel the level to print to the file if it is open*/
 	void changeLevels(int cLevel, int fLevel);
 
 };

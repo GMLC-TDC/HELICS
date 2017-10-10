@@ -40,6 +40,7 @@ MpiBroker::MpiBroker (const std::string &broker_name) : CoreBroker (broker_name)
 MpiBroker::~MpiBroker()
 {
 	haltOperations = true;
+	joinAllThreads();
 }
 
 void MpiBroker::InitializeFromArgs (int argc, char *argv[])

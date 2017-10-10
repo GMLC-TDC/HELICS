@@ -43,6 +43,8 @@ ZmqCore::~ZmqCore()
 {
 	haltOperations = true;
 	comms = nullptr; //need to ensure the comms are deleted before the callbacks become invalid
+	joinAllThreads();
+	
 }
 
 ZmqCore::ZmqCore (const std::string &core_name) : CommonCore (core_name) {}

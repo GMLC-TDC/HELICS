@@ -47,6 +47,7 @@ IpcCore::~IpcCore()
 {
 	haltOperations = true;
 	comms = nullptr; //need to ensure the comms are deleted before the callbacks become invalid
+	joinAllThreads();
 }
 
 void IpcCore::InitializeFromArgs (int argc, char *argv[])
