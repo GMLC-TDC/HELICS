@@ -25,12 +25,12 @@ enum BasicHandleType:char
 	HANDLE_DEST_FILTER,		//!< handle to a destination filter
 };
 
-/** class definining and capturing basic information about a handle*/
+/** class defining and capturing basic information about a handle*/
 class BasicHandleInfo
 {
   public:
 	  /** default constructor*/
-	  BasicHandleInfo() noexcept : type_out(units)
+	  BasicHandleInfo() noexcept : type_in(type), type_out(units)
 	  {};
 	  /** construct from the data*/
     BasicHandleInfo (Core::Handle id_,
@@ -38,9 +38,8 @@ class BasicHandleInfo
                      BasicHandleType what_,
                      const std::string &key_,
                      const std::string &type_,
-                     const std::string &units_,
-                     bool flag_ = false)
-        : id (id_), fed_id (fed_id_), what (what_), flag (flag_), key (key_), type (type_), units (units_),type_out(units)
+                     const std::string &units_)
+        : id (id_), fed_id (fed_id_), what (what_), key (key_), type (type_), units (units_), type_in(type),type_out(units)
 
     {
 
@@ -53,7 +52,7 @@ class BasicHandleInfo
 		const std::string &target_,
 		const std::string &type_in_,
 		const std::string &type_out_)
-		: id(id_), fed_id(fed_id_), what(what_), key(key_), type(type_in_), units(type_out_), target(target_),type_out(units)
+		: id(id_), fed_id(fed_id_), what(what_), key(key_), type(type_in_), units(type_out_), target(target_),type_in(type),type_out(units)
 
 	{
 
@@ -74,6 +73,7 @@ class BasicHandleInfo
     std::string type;	//!< the type of data used by the handle
     std::string units;	//!< the units associated with the handle
 	std::string target;	//!< the target of the handle mapped onto units since they will not be used together
+	std::string &type_in; //!< the input type of a filter
 	std::string &type_out; //!< the output type of a filter
 };
 }

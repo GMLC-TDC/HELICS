@@ -33,7 +33,7 @@ public:
 class functionExecutionFailure : public HelicsException
 {
 public:
-	functionExecutionFailure(const std::string &message="Helics execution failure") :HelicsException(message) {};
+	functionExecutionFailure(const std::string &message="HELICS execution failure") :HelicsException(message) {};
 };
 
 /** exception for an invalid identification Handle*/
@@ -52,7 +52,7 @@ public:
 
 };
 
-/** exception thrown when a function call was made at an innapropriate time*/
+/** exception thrown when a function call was made at an inappropriate time*/
 class invalidFunctionCall : public HelicsException
 {
 public:
@@ -76,11 +76,11 @@ public:
 
 };
 
-/** severe exception indicating helics has terminated*/
+/** severe exception indicating HELICS has terminated*/
 class helicsTerminated : public HelicsException
 {
 public:
-	helicsTerminated(const std::string &message = "Helics termination") :HelicsException(message) {};
+	helicsTerminated(const std::string &message = "HELICS termination") :HelicsException(message) {};
 
 };
 }

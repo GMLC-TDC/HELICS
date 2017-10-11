@@ -134,6 +134,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         break;
     }
     case core_type::INTERPROCESS:
+	case core_type::IPC:
         if (name.empty ())
         {
             core = std::make_shared<IpcCore> ();
@@ -260,29 +261,25 @@ bool isAvailable (core_type type)
     switch (type)
     {
     case core_type::ZMQ:
-    {
 #if HELICS_HAVE_ZEROMQ
         available = true;
 #endif
         break;
-    }
     case core_type::MPI:
-    {
 #if HELICS_HAVE_MPI
         available = true;
 #endif
         break;
-    }
     case core_type::TEST:
-    {
         available = true;
         break;
-    }
     case core_type::INTERPROCESS:
-    {
+	case core_type::IPC:
         available = true;
+		break;
+	case core_type::TCP:
+	case core_type::UDP:
         break;
-    }
     default:
         assert (false);
     }

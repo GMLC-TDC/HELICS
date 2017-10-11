@@ -628,7 +628,8 @@ BasicHandleInfo *CommonCore::createBasicHandle (Handle id_,
                                                 const std::string &units,
                                                 bool required)
 {
-    auto hndl = std::make_unique<BasicHandleInfo> (id_, global_federateId, HandleType, key, type, units, required);
+    auto hndl = std::make_unique<BasicHandleInfo> (id_, global_federateId, HandleType, key, type, units);
+	hndl->flag = required;
     hndl->local_fed_id = local_federateId;
     std::lock_guard<std::mutex> lock (_handlemutex);
 

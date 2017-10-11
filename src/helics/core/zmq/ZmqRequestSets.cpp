@@ -24,16 +24,17 @@ void ZmqRequestSets::addRoutes (int routeNumber, const std::string &routeInfo)
 
 bool ZmqRequestSets::transmit (int routeNumber, const ActionMessage &command)
 {
+	//check if we are waiting on the route
     auto fnd = routes_waiting.find (routeNumber);
-    if (fnd == routes_waiting.end ())
+    if (fnd != routes_waiting.end ())
     {
-        return false;
+		if (fnd->second)
+		{
+			waiting_messages.emplace_back(routeNumber, command);
+			return true;
+		}
     }
-    if (fnd->second)
-    {
-        waiting_messages.emplace_back (routeNumber, command);
-        return true;
-    }
+    
     routes[routeNumber]->send (command.to_string ());
     active_routes.emplace_back (zmq::pollitem_t ());
     active_routes.back ().events = ZMQ_POLLIN;

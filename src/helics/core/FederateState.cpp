@@ -103,13 +103,19 @@ void FederateState::setState (helics_federate_state_type newState)
 
 void FederateState::reset ()
 {
+	global_id = invalid_fed_id;
+	local_id = invalid_fed_id;
     state = HELICS_CREATED;
+	queue.clear();
+	delayQueue.clear();
     // TODO:: this probably needs to do a lot more
 }
 /** reset the federate to the initializing state*/
 void FederateState::reInit ()
 {
     state = HELICS_INITIALIZING;
+	queue.clear();
+	delayQueue.clear();
     // TODO:: this needs to reset a bunch of stuff as well as check a few things
 }
 helics_federate_state_type FederateState::getState () const { return state; }
@@ -313,6 +319,10 @@ EndpointInfo *FederateState::getEndpoint (Core::Handle handle_) const
     };
 
     auto fnd = std::lower_bound (endpoints.begin (), endpoints.end (), handle_, cmptr);
+	if (fnd == endpoints.end())
+	{
+		return nullptr;
+	}
     if (fnd->operator-> ()->id == handle_)
     {
         return fnd->get ();
@@ -337,6 +347,10 @@ FilterInfo *FederateState::getFilter (Core::Handle handle_) const
     };
 
     auto fnd = std::lower_bound (filters.begin (), filters.end (), handle_, cmptr);
+	if (fnd == filters.end())
+	{
+		return nullptr;
+	}
     if (fnd->operator-> ()->id == handle_)
     {
         return fnd->get ();
