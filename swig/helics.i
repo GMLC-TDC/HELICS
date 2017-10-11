@@ -1,7 +1,5 @@
 #define __attribute__(x)
 
-#define HELICS_Export __attribute__ ((visibility ("default")))
-
 %module helics
 %{
 #include "api-data.h"
