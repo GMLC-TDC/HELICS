@@ -42,6 +42,21 @@ status = h.helicsEnterExecutionMode(vfed)
 print("PI RECEIVER: Entering execution mode")
 
 value = 0.0
+prevtime = 0
 
 currenttime = h.helicsRequestTime(vfed, 0.19)
 
+while(currenttime <= 0.19):
+
+    currenttime = h.helicsRequestTime(vfed, 0.19)
+
+    isupdated = h.helicsIsValueUpdated(sub)
+
+    if (isupdated == 1) and (currenttime > prevtime):
+        result, value = h.helicsGetDouble(sub)
+        print("PI RECEIVER: Received value = {} at time {} from PI SENDER".format(value, currenttime))
+
+    prevtime = currenttime
+
+status = h.helicsFinalize(vfed)
+print("PI RECEIVER: Federate finalized")
