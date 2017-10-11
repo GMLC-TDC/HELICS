@@ -280,12 +280,21 @@ ENDIF(MSVC)
 
 SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
 
+# Minimum version of Boost required for building HELICS
+set(BOOST_MINIMUM_VERSION 1.58)
+
 if (${MPI_C_FOUND})
-  #find_package(Boost COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
-  find_package(Boost COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
+  #find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
+  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
 ELSE(${MPI_C_FOUND})
-  find_package(Boost COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
+  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
 ENDIF(${MPI_C_FOUND})
+
+# Minimum version of Boost required for building test suite
+if (Boost_VERSION LESS 106100)
+  set(BUILD_HELICS_TESTS OFF)
+  message(WARNING "Boost version >=1.61 required for building HELICS tests (Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION})")
+endif()
 
 mark_as_advanced(CLEAR BOOST_ROOT)
 
