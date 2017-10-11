@@ -206,16 +206,9 @@ std::shared_ptr<CoreBroker> findBroker (const std::string &brokerName)
 
 bool registerBroker (std::shared_ptr<CoreBroker> tbroker)
 {
-    std::unique_lock<std::mutex> lock (mapLock);
+	cleanUpBrokers();
+    std::lock_guard<std::mutex> lock (mapLock);
     auto res = BrokerMap.emplace (tbroker->getIdentifier (), std::move (tbroker));
-    /** clear out any previously unregistered brokers*/
-    if (!delayedDestruction.empty ())
-    {
-		auto tempbuffer = delayedDestruction;
-        delayedDestruction.clear ();
-		lock.unlock();
-		//we don't want to actually do the destruction with the lock engaged since that could be a lengthy operation so we use a temporary buffer
-    }
     return res.second;
 }
 
@@ -224,9 +217,9 @@ void cleanUpBrokers ()
     std::unique_lock<std::mutex> lock (mapLock);
 	if (!delayedDestruction.empty())
 	{
-		auto tempbuffer = delayedDestruction;
-		delayedDestruction.clear();
+		auto tempbuffer = std::move(delayedDestruction);
 		lock.unlock();
+		tempbuffer.clear();
 		//we don't want to actually do the destruction with the lock engaged since that could be a lengthy operation so we use a temporary buffer
 	}
 }
