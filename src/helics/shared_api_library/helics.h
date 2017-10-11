@@ -46,10 +46,7 @@ HELICS_Export helics_core helicsCreateCore (const char *type, const char *name, 
 HELICS_Export helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, char *argv[]);
 
 HELICS_Export helics_broker helicsCreateBroker (const char *type, const char *name, const char *initString);
-HELICS_Export helics_broker helicsCreateBrokerFromArgs (const char *type,
-                                                        int argc,
-                                                        char *argv[]);
-  HELICS_Export int helicsBrokerIsConnected(helics_broker broker);
+HELICS_Export helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, char *argv[]);
 
   HELICS_Export int helicsCoreIsConnected(helics_core core);
 
