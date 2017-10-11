@@ -448,7 +448,7 @@ helicsStatus helicsSetDefaultValue (helics_subscription sub, const char *data, i
     return helicsOK;
 }
 
-helicsStatus helicsSetDefaultString (helics_subscription sub, char *str)
+helicsStatus helicsSetDefaultString (helics_subscription sub, const char *str)
 {
     if (sub == nullptr)
     {
