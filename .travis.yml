@@ -56,7 +56,7 @@ install:
 
 script:
   - mkdir build && cd build
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ../cmake-3.4.3-Linux-x86_64/bin/cmake .. -DBUILD_SHARED_LIBS=ON ;fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ../cmake-3.4.3-Linux-x86_64/bin/cmake .. -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=ON ;fi
   - make
 #  - ctest --verbose
 
