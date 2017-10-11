@@ -365,14 +365,8 @@ std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
 
 bool registerCommonCore (std::shared_ptr<CommonCore> tcore)
 {
-    std::unique_lock<std::mutex> lock (mapLock);
-    if (!delayedDestruction.empty ())
-    {
-		auto tempBuffer = delayedDestruction;
-        delayedDestruction.clear ();
-		lock.unlock();
-		//don't let the destructors get called with the lock engaged
-    }
+	cleanUpCores();
+	std::lock_guard<std::mutex> lock(mapLock);
     auto res = CoreMap.emplace (tcore->getIdentifier (), std::move (tcore));
     return res.second;
 }
@@ -382,10 +376,9 @@ void cleanUpCores ()
     std::unique_lock<std::mutex> lock (mapLock);
 	if (!delayedDestruction.empty())
 	{
-		auto tempBuffer = delayedDestruction;
-		delayedDestruction.clear();
+		auto tempBuffer = std::move(delayedDestruction);
 		lock.unlock();
-		//don't let the destructors get called with the lock engaged
+		tempBuffer.clear();
 	}
 }
 
