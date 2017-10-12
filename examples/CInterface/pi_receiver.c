@@ -51,27 +51,27 @@ int main(int argc,char **argv)
   sub = helicsRegisterSubscription(vfed,"testA","double","");
   printf("PI RECEIVER: Subscription registered\n");
 
+  /* Enter initialization mode */
+  status = helicsEnterInitializationMode(vfed);
+  printf("PI RECEIVER: Entered initialization mode\n");
+
+  /* Enter execution mode */
   status = helicsEnterExecutionMode(vfed);
-  printf("PI RECEIVER: Entering execution mode\n");
+  printf("PI RECEIVER: Entered execution mode\n");
 
-  helics_time_t currenttime,prevtime;
+  helics_time_t currenttime=0.0;
   double        value = 0.0;
+  int isupdated=0; 
 
-  currenttime = helicsRequestTime(vfed,0.19);
+  while(currenttime < 0.20) {
+    currenttime = helicsRequestTime(vfed,currenttime);
 
-  while(currenttime <= 0.19) {
-
-	  currenttime = helicsRequestTime(vfed,0.19);
-
-       int isupdated; 
-	   isupdated = helicsIsValueUpdated(sub);
-        if(isupdated) {
-   // if(currenttimeobj > prevtimeobj) {
+    isupdated = helicsIsValueUpdated(sub);
+    if(isupdated) {
+      /* NOTE: The value sent by sender at time t is received by receiver at time t+deltat */
       status = helicsGetDouble(sub,&value);
       printf("PI RECEIVER: Received value = %4.3f at time %3.2f from PI SENDER\n",value,currenttime);
-      /*    } */
     }
-    prevtime= currenttime;
   }
   status = helicsFinalize(vfed);
   printf("PI RECEIVER: Federate finalized\n");

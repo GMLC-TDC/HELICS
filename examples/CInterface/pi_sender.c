@@ -69,23 +69,27 @@ int main(int argc,char **argv)
   pub = helicsRegisterGlobalPublication(vfed,"testA","double","");
   printf("PI SENDER: Publication registered\n");
 
+  /* Enter initialization mode */
+  status = helicsEnterInitializationMode(vfed);
+  printf("PI SENDER: Entered initialization mode\n");
+
   /* Enter execution mode */
   status = helicsEnterExecutionMode(vfed);
-  printf("PI SENDER: Entering execution mode\n");
+  printf("PI SENDER: Entered execution mode\n");
 
   /* This federate will be publishing deltat*pi for numsteps steps */
   double this_time = 0.0;
   double value = 22.0/7.0,val;
-  helics_time_t currenttime;
+  helics_time_t currenttime=0.0;
   int           numsteps=20,i;
 
   for(i=0; i < numsteps; i++) {
-    val = i*deltat*value;
+    val = currenttime*value;
 
-    currenttime = helicsRequestTime(vfed,this_time+deltat*i);
-
-    printf("PI SENDER: Sending value %3.2fpi = %4.3f at time %3.2f to PI RECEIVER\n",deltat*i,val,this_time+deltat*i);
+    printf("PI SENDER: Sending value %3.2fpi = %4.3f at time %3.2f to PI RECEIVER\n",deltat*i,val,currenttime);
     status = helicsPublishDouble(pub,val);
+
+    currenttime = helicsRequestTime(vfed,currenttime);
   }
 
   status = helicsFinalize(vfed);
