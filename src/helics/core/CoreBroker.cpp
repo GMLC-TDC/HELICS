@@ -779,8 +779,7 @@ void CoreBroker::addEndpoint (ActionMessage &m)
 }
 void CoreBroker::addSourceFilter (ActionMessage &m)
 {
-    _handles.emplace_back (m.source_handle, m.source_id, HANDLE_SOURCE_FILTER, m.name, m.info ().type,
-                           m.info ().target);
+    _handles.emplace_back (m.source_handle, m.source_id, HANDLE_SOURCE_FILTER, m.name, m.info().target,m.info ().type,m.info().type_out);
     addLocalInfo (_handles.back (), m);
     handle_table.emplace (makeGlobalHandleIdentifier (m.source_id, m.source_handle),
                           static_cast<int32_t> (_handles.size () - 1));
@@ -816,8 +815,7 @@ bool CoreBroker::updateSourceFilterOperator (ActionMessage &m)
 
 void CoreBroker::addDestFilter (ActionMessage &m)
 {
-    _handles.emplace_back (m.source_handle, m.source_id, HANDLE_DEST_FILTER, m.name, m.info ().type,
-                           m.info ().target);
+	_handles.emplace_back(m.source_handle, m.source_id, HANDLE_DEST_FILTER, m.name, m.info().target, m.info().type, m.info().type_out);
     addLocalInfo (_handles.back (), m);
     handle_table.emplace (makeGlobalHandleIdentifier (m.source_id, m.source_handle),
                           static_cast<int32_t> (_handles.size () - 1));

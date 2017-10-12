@@ -1136,7 +1136,7 @@ ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage 
                 auto fed = getFederate (filtFunc->sourceOperators[ii].fed_id);
                 if (fed != nullptr)
                 {
-                    // deal with local source filters filters
+                    // deal with local source filters
                     auto tempMessage = createMessage (std::move (m));
                     auto FiltI = fed->getFilter (filtFunc->sourceOperators[ii].handle);
                     assert (FiltI->filterOp != nullptr);
