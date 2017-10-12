@@ -896,7 +896,7 @@ Handle CommonCore::registerEndpoint (federate_id_t federateID, const std::string
     auto fnd = endpoints.find (name);
     if (fnd != endpoints.end ())
     {
-        throw (-1);  // TODO: make a set of exceptions;
+		throw (invalidIdentifier("endpoint name is already used"));
     }
     auto id = getNewHandle ();
     endpoints.emplace (name, id);
@@ -1606,9 +1606,8 @@ void CommonCore::processCommand (ActionMessage &&command)
         routeMessage (command);
         break;
     case CMD_SEND_FOR_FILTER:
-        routeMessage (command);
-        break;
-    case CMD_SEND_FOR_FILTER_OPERATION:
+	case CMD_SEND_FOR_FILTER_OPERATION:
+		processMessageFilter(command);
         break;
     case CMD_PUB:
     {
@@ -1821,7 +1820,7 @@ void CommonCore::processCommand (ActionMessage &&command)
                 if (brokerState.compare_exchange_strong (exp, broker_state_t::initializing))
                 {  // make sure we only do this once
                     command.source_id = global_broker_id;
-                    organizeFilterOperations ();
+                    
                     transmit (0, command);
                 }
             }
@@ -1835,6 +1834,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         {  // forward the grant to all federates
             for (auto &fed : _federates)
             {
+				organizeFilterOperations();
                 fed->addAction (command);
             }
         }
@@ -1894,13 +1894,33 @@ void CommonCore::processFilterInfo (ActionMessage &command)
         break;
     case CMD_REG_SRC_FILTER:
     case CMD_NOTIFY_SRC_FILTER:
-        filterInfo->allSourceFilters.emplace_back (command.source_id, command.source_handle, command.info ().type,
-                                                   command.info ().type_out);
-        filterInfo->hasSourceFilter = true;
-        if (command.flag)
-        {
-            filterInfo->allSourceFilters.back ().hasOperator_flag = true;
-        }
+	{
+		bool FilterAlreadyPresent = false;
+		for (auto &filt : filterInfo->allSourceFilters)
+		{
+			if ((filt.fed_id == command.source_id) && (filt.handle == command.source_handle))
+			{
+				FilterAlreadyPresent = true;
+				if (command.flag)
+				{
+					filt.hasOperator_flag = true;
+					filterInfo->hasSourceOperators = true;
+				}
+				break;
+			}
+		}
+		if (!FilterAlreadyPresent)
+		{
+			filterInfo->allSourceFilters.emplace_back(command.source_id, command.source_handle, command.info().type,
+				command.info().type_out);
+			filterInfo->hasSourceFilter = true;
+			if (command.flag)
+			{
+				filterInfo->allSourceFilters.back().hasOperator_flag = true;
+				filterInfo->hasSourceOperators = true;
+			}
+		}
+	}
         break;
     case CMD_SRC_FILTER_HAS_OPERATOR:
         for (auto &filt : filterInfo->allSourceFilters)
@@ -2052,4 +2072,73 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
     }
 }
 
+void CommonCore::processMessageFilter(ActionMessage &cmd)
+{
+	if (cmd.dest_id == 0)
+	{
+		transmit(0, cmd);
+	}
+	else if (isLocal(cmd.dest_id))
+	{
+		auto fed = getFederate(cmd.dest_id);
+		if (fed != nullptr)
+		{
+			// deal with local source filters
+			
+			auto FiltI = fed->getFilter(cmd.dest_handle);
+			if (FiltI->filterOp != nullptr)
+			{
+				auto tempMessage = createMessage(std::move(cmd));
+				bool returnToSender = (cmd.action() == CMD_SEND_FOR_FILTER_OPERATION);
+				tempMessage = FiltI->filterOp->process(std::move(tempMessage));
+				cmd = ActionMessage(std::move(tempMessage));
+				
+				if (!returnToSender)
+				{
+					cmd.setAction(CMD_SEND_MESSAGE);
+					cmd.dest_id = 0;
+					cmd.dest_handle = 0;
+					queueMessage(cmd);
+				}
+				else
+				{
+					//TODO:: deal with multiple filters correctly (need to return to sender)
+					cmd.setAction(CMD_SEND_MESSAGE);
+					cmd.dest_id = 0;
+					cmd.dest_handle = 0;
+					queueMessage(cmd);
+				}
+				
+			}
+			else
+			{
+				fed->addAction(cmd);
+			}
+			
+		}
+		else
+		{
+			//this is a on condition (not sure what to do yet)
+		/*	m.dest_id = filtFunc->sourceOperators[ii].fed_id;
+			m.dest_handle = filtFunc->sourceOperators[ii].handle;
+			if ((ii < static_cast<int> (filtFunc->sourceOperators.size() - 1)) ||
+				(filtFunc->finalSourceFilter.fed_id != invalid_fed_id))
+			{
+				m.setAction(CMD_SEND_FOR_FILTER_OPERATION);
+			}
+			else
+			{
+				m.setAction(CMD_SEND_FOR_FILTER);
+			}
+			return m;
+			*/
+		}
+		
+	}
+	else
+	{
+		auto route = getRoute(cmd.dest_id);
+		transmit(route, cmd);
+	}
+}
 }  // namespace helics

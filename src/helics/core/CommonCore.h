@@ -178,6 +178,8 @@ private:
 	void routeMessage(ActionMessage &cmd, federate_id_t dest);
 	/** function for routing a message from based on the destination specified in the ActionMessage*/
 	void routeMessage(const ActionMessage &cmd);
+	/** process any filter or route the message*/
+	void processMessageFilter(ActionMessage &cmd);
 	
 protected:
 	
