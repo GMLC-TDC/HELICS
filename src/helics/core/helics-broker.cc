@@ -14,13 +14,19 @@ namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
 
-void argumentParser(int argc, char *argv[], po::variables_map &vm_map);
+bool argumentParser(int argc, char *argv[], po::variables_map &vm_map);
 
 int main(int argc, char *argv[])
 {
 
 	po::variables_map vm;
-	argumentParser(argc, argv, vm);
+	bool exit_early = argumentParser(argc, argv, vm);
+
+	if (exit_early)
+	{
+		return 0;
+	}
+
 	std::string name = (vm.count("name") > 0) ? vm["name"].as<std::string>() : "";
 	std::string btype = (vm.count("type") > 0) ? vm["type"].as<std::string>() : "zmq";
 	
@@ -52,7 +58,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void argumentParser(int argc, char *argv[], po::variables_map &vm_map)
+bool argumentParser(int argc, char *argv[], po::variables_map &vm_map)
 {
 	po::options_description cmd_only("command line only");
 	po::options_description config("configuration");
@@ -102,13 +108,13 @@ void argumentParser(int argc, char *argv[], po::variables_map &vm_map)
 	if (cmd_vm.count("help") > 0)
 	{
 		std::cout << visible << '\n';
-		return;
+		return true;
 	}
 
 	if (cmd_vm.count("version") > 0)
 	{
 		std::cout << HELICS_VERSION_MAJOR << '.' << HELICS_VERSION_MINOR << '.' << HELICS_VERSION_PATCH << " (" << HELICS_DATE << ")\n";
-		return;
+		return true;
 	}
 
 
@@ -136,6 +142,8 @@ void argumentParser(int argc, char *argv[], po::variables_map &vm_map)
 	{
 		std::cout << " no input file specified\n";
 		std::cout << visible << '\n';
-		return;
+		return true;
 	}
+
+    return false;
 }

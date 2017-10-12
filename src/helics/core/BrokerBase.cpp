@@ -133,7 +133,7 @@ static void argumentParser (int argc, char *argv[], boost::program_options::vari
 
 namespace helics
 {
-BrokerBase::BrokerBase () noexcept {};
+BrokerBase::BrokerBase () noexcept {}
 
 BrokerBase::BrokerBase (const std::string &broker_name) : identifier (broker_name) {}
 
