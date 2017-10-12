@@ -104,9 +104,10 @@ ELSE(UNIX)
 # -------------------------------------------------------------
 # Extra definitions for visual studio
 # -------------------------------------------------------------
-  IF(MSVC)
+IF(MSVC)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
+  add_compile_options(/bigobj)
   add_compile_options(-W4  /EHsc /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484)
 ENDIF(MSVC)
   ENDIF(MINGW)
