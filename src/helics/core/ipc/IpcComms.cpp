@@ -57,6 +57,7 @@ void IpcComms::queue_rx_function ()
         {
             if (cmd.index == CLOSE_RECEIVER)
             {
+				disconnecting = true;
                 break;
             }
             if (cmd.index == SET_TO_OPERATING)
@@ -79,7 +80,7 @@ void IpcComms::queue_rx_function ()
         }
         ActionCallback (std::move (cmd));
     }
-	disconnecting = true;
+	
     rxQueue.changeState (queue_state_t::closing);
     rx_status = connection_status::terminated;
 }

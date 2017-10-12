@@ -29,7 +29,7 @@ ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTar
 {
     if (localTarget_.empty ())
     {
-        localTarget_ = "tcp://*";
+        localTarget_ = "tcp://127.0.0.1";
     }
 }
 /** destructor*/
@@ -232,6 +232,7 @@ void ZmqComms::queue_rx_function ()
             }
             else if (M.index == DISCONNECT)
             {
+				disconnecting = true;
                 rx_status = connection_status::terminated;
                 return;
             }
@@ -244,6 +245,7 @@ void ZmqComms::queue_rx_function ()
     }
     catch (const zmq::error_t &ze)
     {
+		disconnecting = true;
         std::cerr << ze.what () << '\n';
         rx_status = connection_status::error;
         return;
@@ -293,6 +295,7 @@ void ZmqComms::queue_rx_function ()
             }
         }
     }
+	disconnecting = true;
     rx_status = connection_status::terminated;
 }
 
@@ -340,6 +343,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 }
                 else if (rc == 0)
                 {
+
                     std::cerr << "broker connection timed out\n";
                     tx_status = connection_status::error;
                     return (-1);
@@ -637,8 +641,8 @@ void ZmqComms::closeReceiver ()
         cmd.index = CLOSE_RECEIVER;
         transmit (-1, cmd);
     }
-    else
-    {
+    else if (!disconnecting)
+	{
         // try connecting with the receivers push socket
         auto ctx = zmqContextManager::getContextPointer ();
         zmq::socket_t pushSocket (ctx->getContext (), ZMQ_PUSH);

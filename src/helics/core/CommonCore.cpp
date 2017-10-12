@@ -117,6 +117,7 @@ void CommonCore::disconnect ()
 		{
 			if (keepCoreAlive.get() == this)
 			{
+				keepCoreAlive = nullptr;
 				CoreFactory::unregisterCore(identifier);
 			}
 		}
@@ -128,6 +129,7 @@ void CommonCore::disconnect ()
 			{
 				if (keepCoreAlive2.get() == this)
 				{
+					keepCoreAlive2 = nullptr;
 					CoreFactory::unregisterCore(prevIdentifier);
 				}
 			}

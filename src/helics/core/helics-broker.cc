@@ -91,7 +91,7 @@ bool argumentParser(int argc, char *argv[], po::variables_map &vm_map)
 	po::variables_map cmd_vm;
 	try
 	{
-		po::store(po::command_line_parser(argc, argv).options(cmd_line).run(), cmd_vm);
+		po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().run(), cmd_vm);
 	}
 	catch (std::exception &e)
 	{
@@ -118,7 +118,7 @@ bool argumentParser(int argc, char *argv[], po::variables_map &vm_map)
 	}
 
 
-	po::store(po::command_line_parser(argc, argv).options(cmd_line).run(), vm_map);
+	po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().run(), vm_map);
 
 	if (cmd_vm.count("config-file") > 0)
 	{
@@ -137,13 +137,7 @@ bool argumentParser(int argc, char *argv[], po::variables_map &vm_map)
 	}
 
 	po::notify(vm_map);
-	// check to make sure we have some input file
-	if (vm_map.count("input") == 0)
-	{
-		std::cout << " no input file specified\n";
-		std::cout << visible << '\n';
-		return true;
-	}
+
 
     return false;
 }

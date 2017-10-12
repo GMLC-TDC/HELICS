@@ -54,6 +54,7 @@ int main (int argc, char *argv[])
         return (-1);
     }
     fi.coreInitString = "";
+	fi.logLevel = 5;
     auto vFed = std::make_unique<helics::ValueFederate> (fi);
 
     auto id = vFed->registerGlobalPublication ("name", "type");
