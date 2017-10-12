@@ -191,7 +191,9 @@ that destructor can delete a thread variable, unfortunately it is possible that 
 can do the unregister operation and destroy itself meaning it is unable to join and thus will call std::terminate
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be without issue*/
+
 std::vector<std::shared_ptr<CoreBroker>> delayedDestruction;
+//TODO:: this needs to be wrapped in a thread safe class to ensure it gets cleaned up properly on destruction and prevent thread sanitizer triggers
 
 std::shared_ptr<CoreBroker> findBroker (const std::string &brokerName)
 {

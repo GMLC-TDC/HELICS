@@ -110,6 +110,24 @@ int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
     return (fnd != federate_table.end ()) ? fnd->second : -1;
 }
 
+int32_t CoreBroker::FillRouteInformation(ActionMessage &mess)
+{
+	auto &endpointName = mess.info().target;
+	auto fnd = endpoints.find(endpointName);
+	if (fnd != endpoints.end())
+	{
+		auto hinfo = _handles[fnd->second];
+		mess.dest_id = hinfo.fed_id;
+		mess.dest_handle = hinfo.id;
+		return getRoute(hinfo.fed_id);
+	}
+	auto fnd2 = knownExternalEndpoints.find(endpointName);
+	if (fnd2 != knownExternalEndpoints.end())
+	{
+		return fnd2->second;
+	}
+	return 0;
+}
 void CoreBroker::processPriorityCommand (const ActionMessage &command)
 {
     // deal with a few types of message immediately
@@ -506,11 +524,19 @@ void CoreBroker::processCommand (ActionMessage &&command)
 
         break;
     case CMD_SEND_MESSAGE:
-        transmit (getRoute (command.dest_id), command);
+	case CMD_SEND_FOR_FILTER:
+		if (command.dest_id == 0)
+		{
+			auto route = FillRouteInformation(command);
+			transmit(route, command);
+		}
+		else
+		{
+			transmit(getRoute(command.dest_id), command);
+		}
+        
         break;
-    case CMD_SEND_FOR_FILTER:
-        transmit (getRoute (command.dest_id), command);
-        break;
+    
     case CMD_PUB:
         transmit (getRoute (command.dest_id), command);
         break;

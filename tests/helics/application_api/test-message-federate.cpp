@@ -25,7 +25,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (message_federate_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-const std::string core_types[] = {"test"};
+const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types), core_type)
@@ -349,7 +349,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::finalize);
 }
 
-#define ENABLE_OUTPUT
+//#define ENABLE_OUTPUT
 /**trivial Federate that sends Messages and echoes a ping with a pong
  */
 class pingpongFed
@@ -471,6 +471,11 @@ class pingpongFed
 
 BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 {
+	if (core_type.compare(0, 4, "test") != 0)
+	{
+		//TODO:: modify the pingpongFed so it works with the other core types
+		return;
+	}
     AddBroker (core_type, "3");
 
     auto ctype = helics::coreTypeFromString (core_type);

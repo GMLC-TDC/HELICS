@@ -115,6 +115,7 @@ private:
 	void transmitDelayedMessages();
 	bool enteredExecutionMode = false; //!< flag indicating that the broker has entered execution mode
 	
+	int32_t FillRouteInformation(ActionMessage &mess);
 public:
 	/** connect the core to its broker
 	@details should be done after initialization has complete*/

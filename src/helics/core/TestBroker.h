@@ -24,7 +24,7 @@ public:
 	TestBroker(const std::string &broker_name);
 	/** construct with a pointer to a broker*/
 	TestBroker(std::shared_ptr<TestBroker> nbroker);
-	~TestBroker();
+	virtual ~TestBroker();
 	virtual void InitializeFromArgs(int argc, char *argv[]) override;
 
 	virtual void transmit(int32_t route, const ActionMessage &command) override;

@@ -22,7 +22,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (value_federate_tests2, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-const std::string core_types[] = {"test","test_2"};
+const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 
 /** test block send and receive*/
 BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_type)
@@ -236,11 +236,11 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
 }
 
 /** test the default constructor and move constructor and move assignment*/
-BOOST_DATA_TEST_CASE (test_move_calls, bdata::make (core_types), core_type)
+BOOST_AUTO_TEST_CASE (test_move_calls)
 {
     helics::ValueFederate vFed;
 
-    helics::FederateInfo fi ("test1", helics::coreTypeFromString (core_type));
+    helics::FederateInfo fi ("test1", helics::core_type::TEST);
     fi.coreInitString = "3";
     vFed = helics::ValueFederate (fi);
     BOOST_CHECK (vFed.getName () == "test1");
