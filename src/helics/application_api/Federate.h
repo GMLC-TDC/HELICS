@@ -67,6 +67,12 @@ class FederateInfo
         : name (std::move (fedname)), coreType (cType){};
 };
 
+std::string getHelicsVersionString();
+
+int getHelicsVersionMajor();
+int getHelicsVersionMinor();
+int getHelicsVersionPatch();
+
 class Core;
 
 /** base class for a federate in the application API

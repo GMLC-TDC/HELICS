@@ -63,12 +63,6 @@ int main(int argc,char **argv)
 
 	  currenttime = helicsRequestTime(vfed,0.19);
 
-    /* HELICSVALUEFEDERATEISUPDATED IS NOT WORKING CORRECTLY.
-       Trying to check if the subscription is updated with new values
-       by checking the current and previous time objects. This is a hack
-       and should be removed once helicsValueFederateisUpdated is working
-       correctly
-    */
        int isupdated; 
 	   isupdated = helicsIsValueUpdated(sub);
         if(isupdated) {
