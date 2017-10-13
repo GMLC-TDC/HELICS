@@ -113,7 +113,7 @@ int main(int argc,char **argv)
 
   while(helicsBrokerIsConnected(broker)) {
 #ifdef _MSC_VER
-	  Sleep(1);
+	  Sleep(10);
 #else
     usleep(1000); /* Sleep for 1 millisecond */
 #endif

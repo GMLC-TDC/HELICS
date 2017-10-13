@@ -443,23 +443,30 @@ void CoreBroker::processCommand (ActionMessage &&command)
         break;
     case CMD_DISCONNECT:
     {
-        auto brkNum = getBrokerById (command.source_id);
-        if (brkNum >= 0)
-        {
-            auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
-                                       std::unique_lock<std::mutex> (mutex_);
-            _brokers[brkNum]._disconnected = true;
-        }
-        if (allDisconnected ())
-        {
-            if (!_isRoot)
-            {
-                ActionMessage dis (CMD_DISCONNECT);
-                dis.source_id = global_broker_id;
-                transmit (0, dis);
-            }
-            addActionMessage (CMD_STOP);
-        }
+		if (command.dest_id == 0)
+		{
+			auto brkNum = getBrokerById(command.source_id);
+			if (brkNum >= 0)
+			{
+				auto lock = (brokerState == operating) ? std::unique_lock<std::mutex>(mutex_, std::defer_lock) :
+					std::unique_lock<std::mutex>(mutex_);
+				_brokers[brkNum]._disconnected = true;
+			}
+			if (allDisconnected())
+			{
+				if (!_isRoot)
+				{
+					ActionMessage dis(CMD_DISCONNECT);
+					dis.source_id = global_broker_id;
+					transmit(0, dis);
+				}
+				addActionMessage(CMD_STOP);
+			}
+		}
+		else
+		{
+			transmit(getRoute(command.dest_id), command);
+		}
     }
     break;
     case CMD_STOP:

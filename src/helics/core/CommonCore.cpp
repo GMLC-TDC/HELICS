@@ -1592,14 +1592,33 @@ void CommonCore::processCommand (ActionMessage &&command)
     }
     break;
     case CMD_DISCONNECT:
-        if (allDisconnected ())
-        {
-            brokerState = broker_state_t::terminated;
-            ActionMessage dis (CMD_DISCONNECT);
-            dis.source_id = global_broker_id;
-            transmit (0, dis);
-            addActionMessage (CMD_STOP);
-        }
+		if (command.dest_id == 0)
+		{
+			// route the message to all dependent feds
+			auto fed = getFederate(command.source_id);
+			if (fed == nullptr)
+			{
+				return;
+			}
+			auto &dep = fed->getDependents();
+			for (auto &fed_id : dep)
+			{
+				routeMessage(command, fed_id);
+			}
+			if (allDisconnected())
+			{
+				brokerState = broker_state_t::terminated;
+				ActionMessage dis(CMD_DISCONNECT);
+				dis.source_id = global_broker_id;
+				transmit(0, dis);
+				addActionMessage(CMD_STOP);
+			}
+		}
+		else
+		{
+			routeMessage(command);
+		}
+        
         break;
     case CMD_ADD_DEPENDENCY:
     case CMD_REMOVE_DEPENDENCY:

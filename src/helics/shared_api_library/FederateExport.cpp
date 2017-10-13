@@ -19,6 +19,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** this is a random identifier put in place when the federate gets created*/
 static const int validationIdentifier = 0x2352188;
 
+
 helics::Federate *getFed (helics_federate fed)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);

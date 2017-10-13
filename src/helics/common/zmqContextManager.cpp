@@ -66,7 +66,24 @@ void zmqContextManager::closeContext (const std::string &contextName)
     }
 }
 
-zmqContextManager::~zmqContextManager () = default;
+void zmqContextManager::setContextToLeakOnDelete(const std::string &contextName)
+{
+	std::lock_guard<std::mutex> conlock(contextLock);
+	auto fnd = contexts.find(contextName);
+	if (fnd != contexts.end())
+	{
+		fnd->second->leakOnDelete = true;
+	}
+ }
+zmqContextManager::~zmqContextManager()
+{
+	if (leakOnDelete)
+	{
+		//yes I am purposefully leaking this PHILIP TOP
+		auto val = zcontext.release();
+		(void)(val);
+	}
+}
 
 zmqContextManager::zmqContextManager (const std::string &contextName) : name (contextName)
 {

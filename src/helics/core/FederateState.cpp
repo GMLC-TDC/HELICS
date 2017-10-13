@@ -772,11 +772,27 @@ convergence_state FederateState::processActionMessage (ActionMessage &cmd)
 		return convergence_state::halted;
     case CMD_STOP:
     case CMD_DISCONNECT:
-        if ((cmd.dest_id == global_id) || (cmd.dest_id == 0))
+        if ((cmd.source_id == global_id) || (cmd.dest_id == 0))
         {
             setState (HELICS_FINISHED);
             return convergence_state::halted;
         }
+		else
+		{
+			if (timeCoord->processTimeMessage(cmd))
+			{
+				if (state != HELICS_EXECUTING)
+				{
+					break;
+				}
+				auto ret = timeCoord->checkTimeGrant();
+				if (ret != convergence_state::continue_processing)
+				{
+					time_granted = timeCoord->getGrantedTime();
+					return ret;
+				}
+			}
+		}
         break;
     case CMD_TIME_REQUEST:
     case CMD_TIME_GRANT:
