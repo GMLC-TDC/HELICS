@@ -13,6 +13,12 @@ add_executable(pi_receiver pi_receiver.c)
 target_link_libraries(pi_sender helicsSharedLib )
 target_link_libraries(pi_receiver helicsSharedLib )
 
+add_executable(pi_sender2 pi_sender2.c)
+add_executable(pi_receiver2 pi_receiver2.c)
+
+target_link_libraries(pi_sender2 helicsSharedLib )
+target_link_libraries(pi_receiver2 helicsSharedLib )
+
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET pi_sender POST_BUILD        # Adds a post-build event to api tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
