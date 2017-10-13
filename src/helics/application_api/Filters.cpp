@@ -125,7 +125,7 @@ namespace helics
 
 	double randDouble(random_dists_t dist,double p1, double p2)
 	{
-#ifndef __apple_clang_version__
+#ifndef __apple_build_version__
 		static thread_local std::mt19937 generator(std::random_device{}() + static_cast<unsigned int>(std::hash<std::thread::id>{}(std::this_thread::get_id())));
 #else
 #if __clang_major__>=8
