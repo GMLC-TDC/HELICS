@@ -771,8 +771,10 @@ convergence_state FederateState::processActionMessage (ActionMessage &cmd)
 		setState(HELICS_FINISHED);
 		return convergence_state::halted;
     case CMD_STOP:
+		setState(HELICS_FINISHED);
+		return convergence_state::halted;
     case CMD_DISCONNECT:
-        if ((cmd.source_id == global_id) || (cmd.dest_id == 0))
+        if (cmd.source_id == global_id)
         {
             setState (HELICS_FINISHED);
             return convergence_state::halted;
