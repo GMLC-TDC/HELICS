@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "BrokerFactory.h"
 #include "helics/config.h"
 #include "helics/core/core-types.h"
-
+#include "helics/common/delayedDestructor.hpp"
 #if HELICS_HAVE_ZEROMQ
 #include "helics/core/zmq/ZmqBroker.h"
 #endif
@@ -192,8 +192,7 @@ can do the unregister operation and destroy itself meaning it is unable to join 
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be without issue*/
 
-std::vector<std::shared_ptr<CoreBroker>> delayedDestruction;
-//TODO:: this needs to be wrapped in a thread safe class to ensure it gets cleaned up properly on destruction and prevent thread sanitizer triggers
+static DelayedDestructor<CoreBroker> delayedDestroyer;  //!< the object handling the delayed destruction
 
 std::shared_ptr<CoreBroker> findBroker (const std::string &brokerName)
 {
@@ -216,14 +215,7 @@ bool registerBroker (std::shared_ptr<CoreBroker> tbroker)
 
 void cleanUpBrokers ()
 {
-    std::unique_lock<std::mutex> lock (mapLock);
-	if (!delayedDestruction.empty())
-	{
-		auto tempbuffer = std::move(delayedDestruction);
-		lock.unlock();
-		tempbuffer.clear();
-		//we don't want to actually do the destruction with the lock engaged since that could be a lengthy operation so we use a temporary buffer
-	}
+	delayedDestroyer.destroyObjects();
 }
 
 void copyBrokerIdentifier (const std::string &copyFromName, const std::string &copyToName)
@@ -243,7 +235,7 @@ void unregisterBroker (const std::string &name)
     auto fnd = BrokerMap.find (name);
     if (fnd != BrokerMap.end ())
     {
-        delayedDestruction.push_back (std::move (fnd->second));
+        delayedDestroyer.addObjectsToBeDestroyed (std::move (fnd->second));
         BrokerMap.erase (fnd);
         return;
     }
@@ -251,7 +243,7 @@ void unregisterBroker (const std::string &name)
     {
         if (brk->second->getIdentifier () == name)
         {
-            delayedDestruction.push_back (std::move (brk->second));
+			delayedDestroyer.addObjectsToBeDestroyed(std::move(brk->second));
             BrokerMap.erase (brk);
             return;
         }

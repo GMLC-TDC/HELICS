@@ -22,7 +22,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "TestCore.h"
 #include "ipc/IpcCore.h"
-
+#include "common/delayedDestructor.hpp"
 #include <cassert>
 
 namespace helics
@@ -297,7 +297,8 @@ can do the unregister operation and destroy itself meaning it is unable to join 
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be
 without issue*/
-static std::vector<std::shared_ptr<CommonCore>> delayedDestruction;
+static DelayedDestructor<CommonCore> delayedDestroyer;  //!< the object handling the delayed destruction
+
 
 std::shared_ptr<CommonCore> findCore (const std::string &name)
 {
@@ -373,13 +374,8 @@ bool registerCommonCore (std::shared_ptr<CommonCore> tcore)
 
 void cleanUpCores ()
 {
-    std::unique_lock<std::mutex> lock (mapLock);
-	if (!delayedDestruction.empty())
-	{
-		auto tempBuffer = std::move(delayedDestruction);
-		lock.unlock();
-		tempBuffer.clear();
-	}
+	delayedDestroyer.destroyObjects();
+    
 }
 
 void copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName)
@@ -399,7 +395,7 @@ void unregisterCore (const std::string &name)
     auto fnd = CoreMap.find (name);
     if (fnd != CoreMap.end ())
     {
-        delayedDestruction.push_back (std::move (fnd->second));
+        delayedDestroyer.addObjectsToBeDestroyed (std::move (fnd->second));
         CoreMap.erase (fnd);
         return;
     }
@@ -407,7 +403,7 @@ void unregisterCore (const std::string &name)
     {
         if (core->second->getIdentifier () == name)
         {
-            delayedDestruction.push_back (std::move (core->second));
+			delayedDestroyer.addObjectsToBeDestroyed(std::move (core->second));
             CoreMap.erase (core);
             return;
         }
