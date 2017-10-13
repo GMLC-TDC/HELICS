@@ -10,8 +10,8 @@ target_link_libraries(valueFed helics ${external_library_list})
 #               ${CMAKE_CURRENT_BINARY_DIR}/run.sh
 #               COPYONLY)
 			   
-			   add_custom_command(TARGET valueFed POST_BUILD        # Adds a post-build event to api tests
+add_custom_command(TARGET valueFed POST_BUILD        # Adds a post-build event to api tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "${CMAKE_CURRENT_SOURCE_DIR}/run.sh"      # <--this is in-file
-        "$<TARGET_FILE_DIR:pi_sender>/")                 # <--this is out-file path
+	"$<TARGET_FILE_DIR:valueFed>/")                 # <--this is out-file path
 

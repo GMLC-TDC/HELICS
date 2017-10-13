@@ -42,7 +42,9 @@ add_custom_command(TARGET c_interface_tests POST_BUILD        # Adds a post-buil
         "$<TARGET_FILE_DIR:c_interface_tests>/")                 # <--this is out-file path
 endforeach(keyfile)
 
-add_custom_command(TARGET c_interface_tests POST_BUILD        # Adds a post-build event to api tests
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
-        "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
-        "$<TARGET_FILE_DIR:c_interface_tests>/")                 # <--this is out-file path
+if(BUILD_SHARED_LIBS)
+    add_custom_command(TARGET c_interface_tests POST_BUILD        # Adds a post-build event to api tests
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+            "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
+            "$<TARGET_FILE_DIR:c_interface_tests>/")                 # <--this is out-file path
+endif()
