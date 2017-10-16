@@ -171,6 +171,7 @@ bool sendToQueue::connect (const std::string &connection, bool initOnly, int ret
                     goodToConnect = true;
                 }
                 break;
+			case queue_state_t::unknown:  //probably still undergoing setup
             default:
                 break;
             }

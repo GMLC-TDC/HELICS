@@ -95,7 +95,7 @@ bool argumentParser(int argc, char *argv[], po::variables_map &vm_map)
 	}
 	catch (std::exception &e)
 	{
-		std::cerr << e.what() << std::endl;
+		std::cerr <<"invalid command line"<< e.what() << std::endl;
 		throw (e);
 	}
 

@@ -35,6 +35,7 @@ inline std::string stringTranslateToCppName(std::string in)
 
 enum class queue_state_t :int
 {
+	unknown = -1,
 	startup = 0,
 	connected = 1,
 	operating = 2,
@@ -49,8 +50,16 @@ private:
 public:
 	queue_state_t getState() const
 	{
-		boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> lock(data_lock);
-		return state;
+		try
+		{
+			boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> lock(data_lock);
+			return state;
+		}
+		catch (const boost::interprocess::lock_exception &)
+		{
+			return queue_state_t::unknown;
+		}
+		
 	}
 	void setState(queue_state_t newState)
 	{

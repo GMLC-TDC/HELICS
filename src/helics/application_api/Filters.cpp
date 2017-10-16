@@ -97,6 +97,7 @@ std::shared_ptr<MessageOperator> delayFilterOperation::getOperator ()
 // enumeration of possible random number generator distributions
 enum class random_dists_t : int
 {
+	constant,
     uniform,
     bernoulli,
     binomial,
@@ -134,16 +135,36 @@ double randDouble (random_dists_t dist, double p1, double p2)
 #endif
     switch (dist)
     {
+	case random_dists_t::constant:
+		return p1;
     case random_dists_t::uniform:
     default:
     {
         std::uniform_real_distribution<double> distribution (p1, p2);
         return distribution (generator);
     }
-        // TODO:: add other distributions
+	break;
+	case random_dists_t::normal:
+	{
+		std::normal_distribution<double> distribution(p1, p2);
+		return distribution(generator);
+	}
+	break;
+	case random_dists_t::lognormal:
+	{
+		std::lognormal_distribution<double> distribution(p1, p2);
+		return distribution(generator);
+	}
+	break;
+	case random_dists_t::cauchy:
+	{
+		std::cauchy_distribution<double> distribution(p1, p2);
+		return distribution(generator);
+	}
+	break;
     }
 
-    return 0.0;
+   // return 0.0;
 }
 
 class randomDelayGenerator

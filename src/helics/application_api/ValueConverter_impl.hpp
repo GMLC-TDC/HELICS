@@ -95,6 +95,10 @@ data_block ValueConverter<X>::convert (const X &val)
 template <class X>
 void ValueConverter<X>::interpret (const data_view &block, X &val)
 {
+	if (block.size() < sizeof(X)+1)
+	{
+		throw std::invalid_argument("invalid data size");
+	}
     boost::iostreams::basic_array_source<char> device (block.data (), block.size ());
     boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
     retriever ia (s);

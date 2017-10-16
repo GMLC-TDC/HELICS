@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <algorithm>
 
 /** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
  * threading issues*/
@@ -31,7 +32,12 @@ class DelayedDestructor
     void destroyObjects ()
     {
         std::lock_guard<std::mutex> lock (destructionLock);
-        ElementsToBeDestroyed.clear ();
+		if (!ElementsToBeDestroyed.empty())
+		{
+			auto loc = std::remove_if(ElementsToBeDestroyed.begin(), ElementsToBeDestroyed.end(), [](const auto &element) {return (element.use_count() <= 1); });
+			ElementsToBeDestroyed.erase(loc, ElementsToBeDestroyed.end());
+		}
+        
     }
     void addObjectsToBeDestroyed (std::shared_ptr<X> &&obj)
     {
