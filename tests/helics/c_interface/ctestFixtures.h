@@ -79,7 +79,7 @@ struct FederateTestFixture
     //        }
     //
     //		std::string initString = std::string("--broker=") + broker->getIdentifier() + " --broker_address=" +
-    //broker->getAddress();
+    // broker->getAddress();
     //
     //        helics::FederateInfo fi("", helics::coreTypeFromString(core_type_name));
     //        fi.timeDelta = time_delta;

@@ -172,7 +172,7 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //    BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
 //    BOOST_CHECK_EQUAL (m2->time, 2.5);
 //	//There is a bug here but It may get fixed by some API changes so i don't want to spend the time debugging
-//right now 	mFed->requestTime(3.0); 	fFed->requestTimeFinalize();
+// right now 	mFed->requestTime(3.0); 	fFed->requestTimeFinalize();
 //    mFed->finalize ();
 //    fFed->finalize ();
 //    BOOST_CHECK (fFed->currentState () == helics::Federate::op_states::finalize);

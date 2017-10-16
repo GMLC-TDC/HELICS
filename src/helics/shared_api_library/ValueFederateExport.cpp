@@ -28,8 +28,7 @@ int helicsValueFederateisUpdated (helics_value_federate vfed, helics_subscriptio
 }
 
 /* sub/pub registration */
-helics_subscription
-helicsRegisterSubscription (helics_value_federate fed, const char *name, const char *type, const char *units)
+helics_subscription helicsRegisterSubscription (helics_value_federate fed, const char *name, const char *type, const char *units)
 {
     auto htype = helics::getTypeFromString (type);
     if (htype != helics::helicsType_t::helicsInvalid)
@@ -57,8 +56,7 @@ helicsRegisterSubscription (helics_value_federate fed, const char *name, const c
     }
     return nullptr;
 }
-helics_subscription
-helicsRegisterTypeSubscription (helics_value_federate fed, const char *name, int type, const char *units)
+helics_subscription helicsRegisterTypeSubscription (helics_value_federate fed, const char *name, int type, const char *units)
 {
     if ((type < 0) || (type > HELICS_VECTOR_TYPE))
     {
@@ -89,8 +87,7 @@ helicsRegisterTypeSubscription (helics_value_federate fed, const char *name, int
     return nullptr;
 }
 
-helics_publication
-helicsRegisterPublication (helics_value_federate fed, const char *name, const char *type, const char *units)
+helics_publication helicsRegisterPublication (helics_value_federate fed, const char *name, const char *type, const char *units)
 {
     auto htype = helics::getTypeFromString (type);
     if (htype != helics::helicsType_t::helicsInvalid)
@@ -118,8 +115,7 @@ helicsRegisterPublication (helics_value_federate fed, const char *name, const ch
     }
     return nullptr;
 }
-helics_publication
-helicsRegisterTypePublication (helics_value_federate fed, const char *name, int type, const char *units)
+helics_publication helicsRegisterTypePublication (helics_value_federate fed, const char *name, int type, const char *units)
 {
     if ((type < 0) || (type > HELICS_VECTOR_TYPE))
     {
@@ -138,8 +134,7 @@ helicsRegisterTypePublication (helics_value_federate fed, const char *name, int 
     try
     {
         pub = new helics::PublicationObject ();
-        pub->pubptr = std::make_unique<helics::Publication> (fedObj.get (), name,
-                                                             static_cast<helics::helicsType_t> (type), units);
+        pub->pubptr = std::make_unique<helics::Publication> (fedObj.get (), name, static_cast<helics::helicsType_t> (type), units);
         pub->fedptr = std::move (fedObj);
         return reinterpret_cast<helics_publication> (pub);
     }
@@ -150,8 +145,7 @@ helicsRegisterTypePublication (helics_value_federate fed, const char *name, int 
     return nullptr;
 }
 
-helics_publication
-helicsRegisterGlobalPublication (helics_value_federate fed, const char *name, const char *type, const char *units)
+helics_publication helicsRegisterGlobalPublication (helics_value_federate fed, const char *name, const char *type, const char *units)
 {
     auto htype = helics::getTypeFromString (type);
     if (htype != helics::helicsType_t::helicsInvalid)
@@ -180,8 +174,7 @@ helicsRegisterGlobalPublication (helics_value_federate fed, const char *name, co
     return nullptr;
 }
 
-helics_publication
-helicsRegisterGlobalTypePublication (helics_value_federate fed, const char *name, int type, const char *units)
+helics_publication helicsRegisterGlobalTypePublication (helics_value_federate fed, const char *name, int type, const char *units)
 {
     if ((type < 0) || (type > HELICS_VECTOR_TYPE))
     {
@@ -200,8 +193,8 @@ helicsRegisterGlobalTypePublication (helics_value_federate fed, const char *name
     try
     {
         pub = new helics::PublicationObject ();
-        pub->pubptr = std::make_unique<helics::Publication> (helics::GLOBAL, fedObj.get (), name,
-                                                             static_cast<helics::helicsType_t> (type), units);
+        pub->pubptr =
+          std::make_unique<helics::Publication> (helics::GLOBAL, fedObj.get (), name, static_cast<helics::helicsType_t> (type), units);
         pub->fedptr = std::move (fedObj);
         return reinterpret_cast<helics_publication> (pub);
     }
@@ -676,12 +669,6 @@ helics_time_t helicsGetLastUpdateTime (helics_subscription sub)
     return time.getBaseTimeCode ();
 }
 
-void helicsClosePublication (helics_publication pub)
-{
-    delete reinterpret_cast<helics::PublicationObject *> (pub);
-}
+void helicsClosePublication (helics_publication pub) { delete reinterpret_cast<helics::PublicationObject *> (pub); }
 
-void helicsCloseSubscription (helics_subscription sub)
-{
-    delete reinterpret_cast<helics::SubscriptionObject *> (sub);
-}
+void helicsCloseSubscription (helics_subscription sub) { delete reinterpret_cast<helics::SubscriptionObject *> (sub); }
