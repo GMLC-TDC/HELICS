@@ -95,6 +95,7 @@ data_block ValueConverter<X>::convert (const X &val)
 template <class X>
 void ValueConverter<X>::interpret (const data_view &block, X &val)
 {
+	
     boost::iostreams::basic_array_source<char> device (block.data (), block.size ());
     boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
     retriever ia (s);

@@ -178,21 +178,11 @@ private:
 	void routeMessage(ActionMessage &cmd, federate_id_t dest);
 	/** function for routing a message from based on the destination specified in the ActionMessage*/
 	void routeMessage(const ActionMessage &cmd);
+	/** process any filter or route the message*/
+	void processMessageFilter(ActionMessage &cmd);
 	
 protected:
-	/** enumeration of the possible core states*/
-	enum core_state_t :int
-	{
-		created = -5,
-		initialized = -4,
-		connecting = -3,
-		connected = -2,
-		initializing=-1,
-		operating=0,
-		terminated=3,
-		errored=7,
-	};
-	std::atomic<core_state_t> coreState{created}; //!< flag indicating that the structure is past the initialization stage indicaing that no more changes can be made to the number of federates or handles
+	
 	int32_t _global_federation_size = 0;  //!< total size of the federation
 	std::vector<std::unique_ptr<FederateState>> _federates; //!< local federate information
 														  //using pointers to minimize time in a critical section- though this should be timed more in the future

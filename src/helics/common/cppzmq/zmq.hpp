@@ -541,7 +541,10 @@ namespace zmq
             if(ptr == NULL)
                 // already closed
                 return ;
-            int rc = zmq_close (ptr);
+			int linger = 0;
+			int rc = zmq_setsockopt(ptr, ZMQ_LINGER, &linger, sizeof(int));
+			ZMQ_ASSERT(rc == 0);
+            rc = zmq_close (ptr);
             ZMQ_ASSERT (rc == 0);
             ptr = 0 ;
         }

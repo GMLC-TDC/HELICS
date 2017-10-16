@@ -8,11 +8,15 @@ set (HELICS_VERSION_MAJOR 0)
 set (HELICS_VERSION_MINOR 3)
 set (HELICS_VERSION_PATCH 0)
 
+set (HELICS_DATE "10-16-17")
+
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
 if (BUILD_HELICS_TESTS)
 enable_testing ()
 endif(BUILD_HELICS_TESTS)
+
+OPTION(BUILD_HELICS_EXAMPLES "Enable the test Executables to be built" OFF)
 
 OPTION(BUILD_PYTHON "Build Python extension" OFF)
 
@@ -100,9 +104,10 @@ ELSE(UNIX)
 # -------------------------------------------------------------
 # Extra definitions for visual studio
 # -------------------------------------------------------------
-  IF(MSVC)
+IF(MSVC)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
+  add_compile_options(/bigobj)
   add_compile_options(-W4  /EHsc /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484)
 ENDIF(MSVC)
   ENDIF(MINGW)
@@ -353,6 +358,20 @@ add_subdirectory (src)
 if (BUILD_HELICS_TESTS)
 add_subdirectory (tests)
 
+
+#-----------------------------------------------------------------------------
+# Setup CTEST environment
+#-----------------------------------------------------------------------------
+include (CTest)
+
+endif(BUILD_HELICS_TESTS)
+
+if (BUILD_HELICS_EXAMPLES)
+add_subdirectory (examples)
+
+endif(BUILD_HELICS_EXAMPLES)
+
+INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
 # -------------------------------------------------------------
 # Enable clang analysis and formatting tools
 # -------------------------------------------------------------
@@ -363,17 +382,7 @@ if (ENABLE_CLANG_TOOLS)
 include(clang-cxx-dev-tools)
 endif(ENABLE_CLANG_TOOLS)
 
-#-----------------------------------------------------------------------------
-# Setup CTEST environment
-#-----------------------------------------------------------------------------
-include (CTest)
-
-
-INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
-
-endif(BUILD_HELICS_TESTS)
-
 if (BUILD_PYTHON)
-add_subdirectory (python)
+add_subdirectory(python)
 endif(BUILD_PYTHON)
 

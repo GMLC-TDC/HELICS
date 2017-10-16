@@ -20,6 +20,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <mutex>
 #include <vector>
 
+int helicsValueFederateisUpdated(helics_value_federate vfed,helics_subscription sub)
+{
+  helics::SubscriptionObject *subobj=reinterpret_cast<helics::SubscriptionObject*>(sub);
+  helics::ValueFederate *valuefed = reinterpret_cast<helics::ValueFederate*>(vfed);
+  return (int)(valuefed->isUpdated(subobj->id));
+}
+
 /* sub/pub registration */
 helics_subscription
 helicsRegisterSubscription (helics_value_federate fed, const char *name, const char *type, const char *units)
@@ -441,7 +448,7 @@ helicsStatus helicsSetDefaultValue (helics_subscription sub, const char *data, i
     return helicsOK;
 }
 
-helicsStatus helicsSetDefaultString (helics_subscription sub, char *str)
+helicsStatus helicsSetDefaultString (helics_subscription sub, const char *str)
 {
     if (sub == nullptr)
     {

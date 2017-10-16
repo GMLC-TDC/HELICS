@@ -12,6 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/CoreFactory.h"
 #include "helics/core/core-types.h"
 #include "helics/core/core.h"
+#include "helics/core/core-exceptions.h"
 
 BOOST_AUTO_TEST_SUITE (TestCore_tests)
 
@@ -26,7 +27,10 @@ BOOST_AUTO_TEST_CASE (testcore_initialization_test)
     BOOST_REQUIRE (core != nullptr);
     BOOST_CHECK (core->isInitialized ());
 
-    BOOST_CHECK_EQUAL (core->getFederationSize (), 4);
+	core->connect();
+	BOOST_CHECK(core->isConnected());
+	core->disconnect();
+	BOOST_CHECK_EQUAL(core->isConnected(), false);
 }
 
 BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
@@ -36,11 +40,13 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 
     BOOST_REQUIRE (core != nullptr);
     BOOST_CHECK (core->isInitialized ());
-
-    BOOST_CHECK_EQUAL (core->getFederationSize (), 1);
-
+	BOOST_CHECK_EQUAL(core->getFederationSize(), 0);
+	core->connect();
+	BOOST_REQUIRE(core->isConnected());
+    
     Core::federate_id_t id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
 
+	BOOST_CHECK_EQUAL(core->getFederationSize(), 1);
     BOOST_CHECK_EQUAL (core->getFederateName (id), "sim1");
     BOOST_CHECK_EQUAL (core->getFederateId ("sim1"), id);
 
@@ -68,7 +74,6 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
     BOOST_CHECK (valueUpdates.empty ());
     auto data = core->getValue (sub1);
     BOOST_CHECK (data == nullptr);
-    BOOST_CHECK_EQUAL (data->size (), 0u);
 
     core->timeRequest (id, 100.0);
     valueUpdates = core->getValueUpdates (id);
@@ -86,7 +91,7 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
     BOOST_CHECK_EQUAL (valueUpdates[0], sub1);
     BOOST_CHECK_EQUAL (valueUpdates.size (), 1u);
     data = core->getValue (sub1);
-    BOOST_CHECK_EQUAL (data->to_string (), "hello\n\0helloAgain");
+    BOOST_CHECK_EQUAL (data->to_string (), std::string("hello\n\0helloAgain",17));
     BOOST_CHECK_EQUAL (data->size (), 17u);
 
     core->timeRequest (id, 200.0);
@@ -102,8 +107,9 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
     BOOST_REQUIRE (core != nullptr);
     BOOST_CHECK (core->isInitialized ());
 
-    BOOST_CHECK_EQUAL (core->getFederationSize (), 1);
-
+    BOOST_CHECK_EQUAL (core->getFederationSize (), 0);
+	core->connect();
+	BOOST_REQUIRE(core->isConnected());
     Core::federate_id_t id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
 
     BOOST_CHECK_EQUAL (core->getFederateName (id), "sim1");
@@ -144,7 +150,8 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_source_test)
 
     BOOST_REQUIRE (core != nullptr);
     BOOST_CHECK (core->isInitialized ());
-
+	core->connect();
+	BOOST_REQUIRE(core->isConnected());
     Core::federate_id_t id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
 
     Core::Handle end1 = core->registerEndpoint (id, "end1", "type");
@@ -171,14 +178,17 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_source_test)
     BOOST_CHECK_EQUAL (msgAny->origsrc, "end1");
     BOOST_CHECK_EQUAL (msgAny->src, "end1");
     msgAny->src = srcFilterName;
-    core->sendMessage (helics::invalid_Handle, std::move (msgAny));
-
+	//use a dummy message to test code the error return
+	BOOST_CHECK_THROW(core->sendMessage(helics::invalid_Handle, std::make_unique<helics::Message>()), helics::invalidIdentifier);
+	//we are also testing that the error did not change the message
+	core->sendMessage(endp,std::move(msgAny));
+	core->timeRequest(id, 60.0);
     // Receive the filtered message
     BOOST_CHECK_EQUAL (core->receiveCount (end2), 1u);
     BOOST_CHECK_EQUAL (core->receiveCount (endp), 0);
     auto msg = core->receive (end2);
     BOOST_CHECK_EQUAL (msg->origsrc, "end1");
-    BOOST_CHECK_EQUAL (msg->src, "sourceFilter");
+    BOOST_CHECK_EQUAL (msg->src, "end_filt");
 }
 
 BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
@@ -208,7 +218,8 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
 
     BOOST_REQUIRE (core != nullptr);
     BOOST_CHECK (core->isInitialized ());
-
+	core->connect();
+	BOOST_REQUIRE(core->isConnected());
     Core::federate_id_t id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
 
     Core::Handle end1 = core->registerEndpoint (id, "end1", "type");
@@ -241,7 +252,8 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     BOOST_CHECK_EQUAL (core->receiveCount (end2), 1u);
     auto msg = core->receive (end2);
     BOOST_CHECK_EQUAL (msg->origsrc, "end1");
-    BOOST_CHECK_EQUAL (msg->data.to_string (), "hello world");
+	auto res = msg->data.to_string();
+    BOOST_CHECK_EQUAL (res.compare(0,11,"jello world"), 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

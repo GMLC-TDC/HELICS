@@ -18,10 +18,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <vector>
 #include <cstdint>
 
+/** @file 
+@brief naming a set of types that are interchangeable and recognizable inside the HELICS application API and core
+*/
 namespace helics
 {
+	/** define a variant with the different types*/
 	using defV = boost::variant< double, int64_t, std::string, std::complex<double>, std::vector<double>,std::vector<std::complex<double>>>;
 
+	/**enumeration of the order inside the variant so the Which function returns match the enumeration*/
 	enum typeLocation
 	{
 		

@@ -125,9 +125,18 @@ namespace helics
 
 	double randDouble(random_dists_t dist,double p1, double p2)
 	{
+#ifndef __apple_build_version__
 		static thread_local std::mt19937 generator(std::random_device{}() + static_cast<unsigned int>(std::hash<std::thread::id>{}(std::this_thread::get_id())));
+#else
+#if __clang_major__>=8
+		static thread_local std::mt19937 generator(std::random_device{}() + static_cast<unsigned int>(std::hash<std::thread::id>{}(std::this_thread::get_id())));
+#else
+		static __thread std::mt19937 *genPtr = new std::mt19937(std::random_device{}() + static_cast<unsigned int>(std::hash<std::thread::id>{}(std::this_thread::get_id())));
+		auto &generator = *genPtr;
+#endif
+#endif
 		switch (dist)
-		{
+		{ 
 		case random_dists_t::uniform:
 		default:
 		{

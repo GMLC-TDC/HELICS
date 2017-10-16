@@ -49,7 +49,7 @@ void CoreBroker::setIdentifier (const std::string &name)
 int32_t CoreBroker::getRoute (Core::federate_id_t fedid) const
 {
     // only activate the lock if we not in an operating state
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
                                std::unique_lock<std::mutex> (mutex_);
 
     auto fnd = routing_table.find (fedid);
@@ -65,7 +65,7 @@ int32_t CoreBroker::getRouteNoLock (Core::federate_id_t fedid) const
 int32_t CoreBroker::getFedByName (const std::string &fedName) const
 {
     // only activate the lock if we not in an operating state
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
                                std::unique_lock<std::mutex> (mutex_);
 
     auto fnd = fedNames.find (fedName);
@@ -75,7 +75,7 @@ int32_t CoreBroker::getFedByName (const std::string &fedName) const
 int32_t CoreBroker::getBrokerByName (const std::string &brokerName) const
 {
     // only activate the lock if we not in an operating state
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
                                std::unique_lock<std::mutex> (mutex_);
 
     auto fnd = brokerNames.find (brokerName);
@@ -89,7 +89,7 @@ int32_t CoreBroker::getBrokerById (Core::federate_id_t fedid) const
         return static_cast<int32_t> (fedid - global_broker_id_shift);
     }
 
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
                                std::unique_lock<std::mutex> (mutex_);
 
     auto fnd = broker_table.find (fedid);
@@ -103,13 +103,31 @@ int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
         return static_cast<int32_t> (fedid - global_federate_id_shift);
     }
 
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
                                std::unique_lock<std::mutex> (mutex_);
 
     auto fnd = federate_table.find (fedid);
     return (fnd != federate_table.end ()) ? fnd->second : -1;
 }
 
+int32_t CoreBroker::FillRouteInformation(ActionMessage &mess)
+{
+	auto &endpointName = mess.info().target;
+	auto fnd = endpoints.find(endpointName);
+	if (fnd != endpoints.end())
+	{
+		auto hinfo = _handles[fnd->second];
+		mess.dest_id = hinfo.fed_id;
+		mess.dest_handle = hinfo.id;
+		return getRoute(hinfo.fed_id);
+	}
+	auto fnd2 = knownExternalEndpoints.find(endpointName);
+	if (fnd2 != knownExternalEndpoints.end())
+	{
+		return fnd2->second;
+	}
+	return 0;
+}
 void CoreBroker::processPriorityCommand (const ActionMessage &command)
 {
     // deal with a few types of message immediately
@@ -120,7 +138,7 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
     {
     case CMD_REG_FED:
     {
-        if (!_operating)
+        if (brokerState != operating)
         {
             if (allInitReady ())
             {
@@ -187,7 +205,7 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
     break;
     case CMD_REG_BROKER:
     {
-        if (!_operating)
+        if (brokerState != operating)
         {
             if (allInitReady ())
             {
@@ -370,6 +388,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 checkFilters ();
                 // computeDependencies();
                 ActionMessage m (CMD_INIT_GRANT);
+				brokerState = broker_state_t::operating;
                 for (auto &brk : _brokers)
                 {
                     transmit (brk.route_id, m);
@@ -406,40 +425,48 @@ void CoreBroker::processCommand (ActionMessage &&command)
     }
     break;
     case CMD_INIT_GRANT:
+		brokerState = broker_state_t::operating;
         for (auto &brk : _brokers)
         {
             transmit (brk.route_id, command);
         }
-        {
-            timeCoord->enteringExecMode (convergence_state::complete);
-            auto res = timeCoord->checkExecEntry ();
-            if (res == convergence_state::complete)
-            {
-                enteredExecutionMode = true;
-                timeCoord->timeRequest (Time::maxVal (), convergence_state::complete, Time::maxVal (),
-                                        Time::maxVal ());
-            }
-        }
+		{
+			timeCoord->enteringExecMode(convergence_state::complete);
+			auto res = timeCoord->checkExecEntry();
+			if (res == convergence_state::complete)
+			{
+				enteredExecutionMode = true;
+				timeCoord->timeRequest(Time::maxVal(), convergence_state::complete, Time::maxVal(),
+					Time::maxVal());
+			}
+		}
         break;
     case CMD_DISCONNECT:
     {
-        auto brkNum = getBrokerById (command.source_id);
-        if (brkNum >= 0)
-        {
-            auto lock = (_operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
-                                       std::unique_lock<std::mutex> (mutex_);
-            _brokers[brkNum]._disconnected = true;
-        }
-        if (allDisconnected ())
-        {
-            if (!_isRoot)
-            {
-                ActionMessage dis (CMD_DISCONNECT);
-                dis.source_id = global_broker_id;
-                transmit (0, dis);
-            }
-            addActionMessage (CMD_STOP);
-        }
+		if (command.dest_id == 0)
+		{
+			auto brkNum = getBrokerById(command.source_id);
+			if (brkNum >= 0)
+			{
+				auto lock = (brokerState == operating) ? std::unique_lock<std::mutex>(mutex_, std::defer_lock) :
+					std::unique_lock<std::mutex>(mutex_);
+				_brokers[brkNum]._disconnected = true;
+			}
+			if (allDisconnected())
+			{
+				if (!_isRoot)
+				{
+					ActionMessage dis(CMD_DISCONNECT);
+					dis.source_id = global_broker_id;
+					transmit(0, dis);
+				}
+				addActionMessage(CMD_STOP);
+			}
+		}
+		else
+		{
+			transmit(getRoute(command.dest_id), command);
+		}
     }
     break;
     case CMD_STOP:
@@ -504,11 +531,19 @@ void CoreBroker::processCommand (ActionMessage &&command)
 
         break;
     case CMD_SEND_MESSAGE:
-        transmit (getRoute (command.dest_id), command);
+	case CMD_SEND_FOR_FILTER:
+		if (command.dest_id == 0)
+		{
+			auto route = FillRouteInformation(command);
+			transmit(route, command);
+		}
+		else
+		{
+			transmit(getRoute(command.dest_id), command);
+		}
+        
         break;
-    case CMD_SEND_FOR_FILTER:
-        transmit (getRoute (command.dest_id), command);
-        break;
+    
     case CMD_PUB:
         transmit (getRoute (command.dest_id), command);
         break;
@@ -751,8 +786,7 @@ void CoreBroker::addEndpoint (ActionMessage &m)
 }
 void CoreBroker::addSourceFilter (ActionMessage &m)
 {
-    _handles.emplace_back (m.source_handle, m.source_id, HANDLE_SOURCE_FILTER, m.name, m.info ().type,
-                           m.info ().target);
+    _handles.emplace_back (m.source_handle, m.source_id, HANDLE_SOURCE_FILTER, m.name, m.info().target,m.info ().type,m.info().type_out);
     addLocalInfo (_handles.back (), m);
     handle_table.emplace (makeGlobalHandleIdentifier (m.source_id, m.source_handle),
                           static_cast<int32_t> (_handles.size () - 1));
@@ -788,8 +822,7 @@ bool CoreBroker::updateSourceFilterOperator (ActionMessage &m)
 
 void CoreBroker::addDestFilter (ActionMessage &m)
 {
-    _handles.emplace_back (m.source_handle, m.source_id, HANDLE_DEST_FILTER, m.name, m.info ().type,
-                           m.info ().target, true);
+	_handles.emplace_back(m.source_handle, m.source_id, HANDLE_DEST_FILTER, m.name, m.info().target, m.info().type, m.info().type_out);
     addLocalInfo (_handles.back (), m);
     handle_table.emplace (makeGlobalHandleIdentifier (m.source_id, m.source_handle),
                           static_cast<int32_t> (_handles.size () - 1));
@@ -883,15 +916,17 @@ bool CoreBroker::connect ()
 
 bool CoreBroker::isConnected () const { return ((brokerState == operating) || (brokerState == connected)); }
 
-void CoreBroker::processDisconnect () { disconnect (); }
+void CoreBroker::processDisconnect() { disconnect(); }
 
 void CoreBroker::disconnect ()
 {
-    if (brokerState > broker_state_t::initialized)
-    {
-        brokerDisconnect ();
+	if (brokerState > broker_state_t::initialized)
+	{
+		brokerState = broker_state_t::terminating;
+		brokerDisconnect();
+	}
         brokerState = broker_state_t::terminated;
-        /*We need to enrure that the destructor is not called immediately upon calling unregister
+        /*We need to ensure that the destructor is not called immediately upon calling unregister
         otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
         that will be destroyed on function exit
         */
@@ -908,7 +943,6 @@ void CoreBroker::disconnect ()
                 unregisterBroker (previous_local_broker_identifier);
             }
         }
-    }
 }
 
 bool CoreBroker::FindandNotifySubscriptionPublisher (BasicHandleInfo &handleInfo)
@@ -1099,6 +1133,7 @@ void CoreBroker::checkFilters ()
 
 bool CoreBroker::allInitReady () const
 {
+	std::lock_guard<std::mutex> lock(mutex_);
     // the federate count must be greater than the min size
     if (static_cast<decltype (_min_federates)> (_federates.size ()) < _min_federates)
     {
@@ -1108,13 +1143,14 @@ bool CoreBroker::allInitReady () const
     {
         return false;
     }
+
     return std::all_of (_brokers.begin (), _brokers.end (), [](auto &brk) { return brk._initRequested; });
 }
 
 bool CoreBroker::allDisconnected () const
 {
     // all subBrokers must be disconnected
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
                                std::unique_lock<std::mutex> (mutex_);
     return std::all_of (_brokers.begin (), _brokers.end (), [](auto &brk) { return brk._disconnected; });
 }

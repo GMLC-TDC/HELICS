@@ -26,6 +26,8 @@ TestBroker::TestBroker (std::shared_ptr<TestBroker> nbroker) : tbroker (std::mov
 
 TestBroker::~TestBroker()
 {
+	haltOperations = true;
+	joinAllThreads();
 	//lock to ensure all the data is synchronized before deletion
 	std::lock_guard<std::mutex> lock(routeMutex);
 }
@@ -63,6 +65,7 @@ void TestBroker::InitializeFromArgs (int argc, char *argv[])
 
 bool TestBroker::brokerConnect ()
 {
+	std::lock_guard<std::mutex> lock(routeMutex);
     if (!tbroker)
     {
         if (isRoot ())
@@ -87,19 +90,23 @@ bool TestBroker::brokerConnect ()
     return static_cast<bool> (tbroker);
 }
 
-void TestBroker::brokerDisconnect () { tbroker = nullptr; }
+void TestBroker::brokerDisconnect () { 
+	brokerState = broker_state_t::terminating;
+	std::lock_guard<std::mutex> lock(routeMutex);
+	tbroker = nullptr; 
+}
 
 void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
 {
+	// only activate the lock if we not in an operating state
+	std::unique_lock<std::mutex>lock(routeMutex);
+
     if ((tbroker) && (route_id == 0))
     {
         tbroker->addActionMessage (cmd);
         return;
     }
-    // only activate the lock if we not in an operating state
-    auto lock = (_operating) ? std::unique_lock<std::mutex> (routeMutex, std::defer_lock) :
-                               std::unique_lock<std::mutex> (routeMutex);
-
+   
     auto brkfnd = brokerRoutes.find (route_id);
     if (brkfnd != brokerRoutes.end ())
     {
@@ -113,7 +120,7 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
         return;
     }
 
-    if (!isRoot ())
+    if ((!isRoot ())&&(tbroker))
     {
         tbroker->addActionMessage (cmd);
     }

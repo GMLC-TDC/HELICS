@@ -9,6 +9,7 @@ set(common_headers
 simpleQueue.hpp
 BlockingQueue3.hpp
 timeRepresentation.hpp
+delayedDestructor.hpp
 blocking_queue.h
 stringToCmdLine.h
 logger.h

@@ -43,12 +43,16 @@ MpiCore::MpiCore () noexcept {}
 
 MpiCore::MpiCore (const std::string &core_name) : CommonCore (core_name) {}
 
-MpiCore::~MpiCore () {}
+MpiCore::~MpiCore()
+{
+	haltOperations = true;
+	joinAllThreads();
+}
 
 void MpiCore::InitializeFromArgs (int argc, char *argv[])
 {
     namespace po = boost::program_options;
-    if (coreState == created)
+    if (brokerState == created)
     {
         po::variables_map vm;
         argumentParser (argc, argv, vm, extraArgs);

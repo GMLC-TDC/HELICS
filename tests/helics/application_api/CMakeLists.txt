@@ -5,6 +5,7 @@
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 ##############################################################################
 
+
 set(application_api_test_headers
 testFixtures.h
 )
@@ -32,16 +33,14 @@ testFixtures.cpp
 add_executable(application-api-tests ${application_api_test_sources} ${application_api_test_headers})
 target_link_libraries(application-api-tests helics)
 
-add_executable(ipcTest1 ipcTest1.cpp)
-add_executable(ipcTest2 ipcTest2.cpp)
+
 link_directories(${external_link_directories})
 
 include_directories( SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 
 target_link_libraries(application-api-tests ${external_library_list})
-target_link_libraries(ipcTest1 helics ${external_library_list})
-target_link_libraries(ipcTest2 helics ${external_library_list})
+
 ADD_DEFINITIONS(-DHELICS_BROKER_LOCATION="${HELICS_BROKER_LOC}")
 ADD_DEFINITIONS(-DHELICS_INSTALL_LOCATION="${CMAKE_INSTALL_PREFIX}")
 

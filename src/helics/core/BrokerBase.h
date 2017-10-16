@@ -47,9 +47,24 @@ protected:
 	std::thread _queue_processing_thread;  //!< thread for running the broker
 										   /** a logging function for logging or printing messages*/
 	std::function<void(int, const std::string &, const std::string &)> loggerFunction;
+	std::atomic<bool> haltOperations{ false };  //!< flag indicating that no further message should be processed
 	std::string logFile; //< the file to log message to
 	std::unique_ptr<TimeCoordinator> timeCoord; //!< object managing the time control
 	BlockingQueue3<ActionMessage> _queue; //!< primary routing queue
+										  /** enumeration of the possible core states*/
+	enum broker_state_t :int
+	{
+		created = -5,
+		initialized = -4,
+		connecting = -3,
+		connected = -2,
+		initializing = -1,
+		operating = 0,
+		terminating = 1,
+		terminated = 3,
+		errored = 7,
+	};
+	std::atomic<broker_state_t> brokerState{ created }; //!< flag indicating that the structure is past the initialization stage indicating that no more changes can be made to the number of federates or handles
 public:
 	BrokerBase() noexcept;
 	BrokerBase(const std::string &broker_name);
@@ -90,7 +105,10 @@ protected:
 	*/
 	virtual bool sendToLogger(Core::federate_id_t federateID, int logLevel, const std::string &name, const std::string &message) const;
 
+	/** generate a new random id based on a uuid*/
 	void generateNewIdentifier();
+	/** close all the threads*/
+	void joinAllThreads();
 private:
 
 

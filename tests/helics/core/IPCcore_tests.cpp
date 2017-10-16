@@ -223,6 +223,7 @@ BOOST_AUTO_TEST_CASE (ipccore_initialization_test)
 /** test case checks default values and makes sure they all mesh together
 also tests the automatic port determination for cores
 */
+/*
 BOOST_AUTO_TEST_CASE (ipcCore_core_broker_default_test)
 {
     std::string initializationString = "1";
@@ -241,4 +242,5 @@ BOOST_AUTO_TEST_CASE (ipcCore_core_broker_default_test)
     core->disconnect ();
     broker->disconnect ();
 }
+*/
 BOOST_AUTO_TEST_SUITE_END ()

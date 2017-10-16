@@ -16,7 +16,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 namespace helics {
 
 /** implementation for the core that uses boost interprocess messages to communicate*/
-class IpcComms:public CommsInterface {
+class IpcComms final:public CommsInterface {
 
 public:
 	/** default constructor*/

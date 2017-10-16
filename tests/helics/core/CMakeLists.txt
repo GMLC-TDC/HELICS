@@ -35,7 +35,7 @@ target_link_libraries(core-tests helics)
 
 link_directories(${external_link_directories})
 
-include_directories(${Boost_INCLUDE_DIR})
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 
 target_link_libraries(core-tests ${external_library_list})

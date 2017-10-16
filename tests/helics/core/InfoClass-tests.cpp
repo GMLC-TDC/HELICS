@@ -46,12 +46,11 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     BOOST_CHECK (hnd1.target.empty ());
 
     // Constructor overriding last parameter default value
-    helics::BasicHandleInfo hnd2 (100, 1500, helics::HANDLE_END, "key", "type", "units", true);
+    helics::BasicHandleInfo hnd2 (100, 1500, helics::HANDLE_END, "key", "type", "units");
     BOOST_CHECK_EQUAL (hnd2.id, 100);
     BOOST_CHECK_EQUAL (hnd2.fed_id, 1500);
     BOOST_CHECK_EQUAL (hnd2.local_fed_id, helics::invalid_fed_id);
     BOOST_CHECK_EQUAL (hnd2.what, helics::HANDLE_END);
-    BOOST_CHECK_EQUAL (hnd2.flag, true);
     BOOST_CHECK_EQUAL (hnd2.hasDestFilter, false);
     BOOST_CHECK (hnd2.key.compare ("key") == 0);
     BOOST_CHECK (hnd2.type.compare ("type") == 0);
@@ -62,7 +61,7 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
 
     // Source filter handle
     // destFilter should be false, and target should be equal to what was passed in for units
-    helics::BasicHandleInfo srcFiltHnd (1, 2, helics::HANDLE_SOURCE_FILTER, "key", "type", "target");
+    helics::BasicHandleInfo srcFiltHnd (1, 2, helics::HANDLE_SOURCE_FILTER, "key", "target","type_in", "type_out");
     BOOST_CHECK_EQUAL (srcFiltHnd.id, 1);
     BOOST_CHECK_EQUAL (srcFiltHnd.fed_id, 2);
     BOOST_CHECK_EQUAL (srcFiltHnd.local_fed_id, helics::invalid_fed_id);
@@ -70,22 +69,20 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     BOOST_CHECK_EQUAL (srcFiltHnd.flag, false);
     BOOST_CHECK_EQUAL (srcFiltHnd.hasDestFilter, false);
     BOOST_CHECK (srcFiltHnd.key.compare ("key") == 0);
-    BOOST_CHECK (srcFiltHnd.type.compare ("type") == 0);
-    BOOST_CHECK (srcFiltHnd.units.compare ("target") == 0);
+    BOOST_CHECK (srcFiltHnd.type_in.compare ("type_in") == 0);
+    BOOST_CHECK (srcFiltHnd.type_out.compare ("type_out") == 0);
     BOOST_CHECK (srcFiltHnd.target.compare ("target") == 0);
 
     // Destination filter handle
     // destFilter should be true, and target should be equal to what was passed in for units
-    helics::BasicHandleInfo dstFiltHnd (7, 3, helics::HANDLE_DEST_FILTER, "key", "type", "target", true);
+    helics::BasicHandleInfo dstFiltHnd (7, 3, helics::HANDLE_DEST_FILTER, "key", "target", "type_in", "type_out");
     BOOST_CHECK_EQUAL (dstFiltHnd.id, 7);
     BOOST_CHECK_EQUAL (dstFiltHnd.fed_id, 3);
     BOOST_CHECK_EQUAL (dstFiltHnd.local_fed_id, helics::invalid_fed_id);
     BOOST_CHECK_EQUAL (dstFiltHnd.what, helics::HANDLE_DEST_FILTER);
-    BOOST_CHECK_EQUAL (dstFiltHnd.flag, true);
-    BOOST_CHECK_EQUAL (dstFiltHnd.hasDestFilter, true);
     BOOST_CHECK (dstFiltHnd.key.compare ("key") == 0);
-    BOOST_CHECK (dstFiltHnd.type.compare ("type") == 0);
-    BOOST_CHECK (dstFiltHnd.units.compare ("target") == 0);
+    BOOST_CHECK (dstFiltHnd.type_in.compare("type_in") == 0);
+    BOOST_CHECK (dstFiltHnd.type_out.compare("type_out") == 0);
     BOOST_CHECK (dstFiltHnd.target.compare ("target") == 0);
 }
 
@@ -96,6 +93,7 @@ BOOST_AUTO_TEST_CASE (endpointinfo_test)
     helics::Time maxT = helics::Time::maxVal ();
     helics::Time minT = helics::Time::minVal ();
     helics::Time zeroT = helics::Time::zeroVal ();
+	helics::Time eps = helics::Time::epsilon();
 
     auto msg_time_max = std::make_unique<helics::Message> ();
     msg_time_max->data = "maxT";
