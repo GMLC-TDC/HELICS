@@ -10,10 +10,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "ctestFixtures.h"
 #include <boost/test/unit_test.hpp>
 
-
 #include <cctype>
 
-//bool hasIndexCode (const std::string &type_name)
+// bool hasIndexCode (const std::string &type_name)
 //{
 //    if (std::isdigit (type_name.back ()) == 1)
 //    {
@@ -25,9 +24,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    return false;
 //}
 //
-//int getIndexCode (const std::string &type_name) { return static_cast<int> (type_name.back () - '0'); }
+// int getIndexCode (const std::string &type_name) { return static_cast<int> (type_name.back () - '0'); }
 //
-//auto StartBrokerImp (const std::string &core_type_name, const std::string &initialization_string)
+// auto StartBrokerImp (const std::string &core_type_name, const std::string &initialization_string)
 //{
 //    if (hasIndexCode (core_type_name))
 //    {
@@ -42,7 +41,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    }
 //}
 //
-//ValueFederateTestFixture::~ValueFederateTestFixture ()
+// ValueFederateTestFixture::~ValueFederateTestFixture ()
 //{
 //    if (vFed1)
 //    {
@@ -55,13 +54,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    }
 //}
 //
-//void ValueFederateTestFixture::StartBroker (const std::string &core_type_name,
+// void ValueFederateTestFixture::StartBroker (const std::string &core_type_name,
 //                                            const std::string &initialization_string)
 //{
 //    broker = StartBrokerImp (core_type_name, initialization_string);
 //}
 //
-//void ValueFederateTestFixture::Setup1FederateTest (std::string core_type_name, helics::Time time_delta)
+// void ValueFederateTestFixture::Setup1FederateTest (std::string core_type_name, helics::Time time_delta)
 //{
 //    if (hasIndexCode (core_type_name))
 //    {
@@ -80,7 +79,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    vFed1 = std::make_shared<helics::ValueFederate> (fi);
 //}
 //
-//void ValueFederateTestFixture::Setup2FederateTest (std::string core_type_name, helics::Time time_delta)
+// void ValueFederateTestFixture::Setup2FederateTest (std::string core_type_name, helics::Time time_delta)
 //{
 //    bool hasIndex = hasIndexCode (core_type_name);
 //    int setup = (hasIndex) ? getIndexCode (core_type_name) : 1;
@@ -134,7 +133,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    }
 //}
 //
-//MessageFederateTestFixture::~MessageFederateTestFixture ()
+// MessageFederateTestFixture::~MessageFederateTestFixture ()
 //{
 //    if (mFed1)
 //    {
@@ -147,13 +146,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    }
 //}
 //
-//void MessageFederateTestFixture::StartBroker (const std::string &core_type_name,
+// void MessageFederateTestFixture::StartBroker (const std::string &core_type_name,
 //                                              const std::string &initialization_string)
 //{
 //    broker = StartBrokerImp (core_type_name, initialization_string);
 //}
 //
-//void MessageFederateTestFixture::Setup1FederateTest (const std::string &core_type_name)
+// void MessageFederateTestFixture::Setup1FederateTest (const std::string &core_type_name)
 //{
 //    StartBroker (core_type_name, "1");
 //
@@ -165,7 +164,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    mFed1 = std::make_shared<helics::MessageFederate> (fi);
 //}
 //
-//void MessageFederateTestFixture::Setup2FederateTest (const std::string &core_type_name)
+// void MessageFederateTestFixture::Setup2FederateTest (const std::string &core_type_name)
 //{
 //    StartBroker (core_type_name, "2");
 //
@@ -180,7 +179,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    mFed2 = std::make_shared<helics::MessageFederate> (fi);
 //}
 //
-//bool FederateTestFixture::hasIndexCode (const std::string &type_name)
+// bool FederateTestFixture::hasIndexCode (const std::string &type_name)
 //{
 //    if (std::isdigit (type_name.back ()) != 0)
 //    {
@@ -192,12 +191,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    return false;
 //}
 //
-//int FederateTestFixture::getIndexCode (const std::string &type_name)
+// int FederateTestFixture::getIndexCode (const std::string &type_name)
 //{
 //    return static_cast<int> (type_name.back () - '0');
 //}
 //
-//auto FederateTestFixture::AddBrokerImp (const std::string &core_type_name,
+// auto FederateTestFixture::AddBrokerImp (const std::string &core_type_name,
 //                                        const std::string &initialization_string)
 //{
 //    if (hasIndexCode (core_type_name))
@@ -213,7 +212,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    }
 //}
 //
-//FederateTestFixture::~FederateTestFixture ()
+// FederateTestFixture::~FederateTestFixture ()
 //{
 //    for (auto &fed : federates)
 //    {
@@ -229,13 +228,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    }
 //}
 //
-//std::shared_ptr<helics::CoreBroker> FederateTestFixture::AddBroker (const std::string &core_type_name, int count)
+// std::shared_ptr<helics::CoreBroker> FederateTestFixture::AddBroker (const std::string &core_type_name, int
+// count)
 //{
 //    return AddBroker (core_type_name, std::to_string (count));
 //}
 //
-//std::shared_ptr<helics::CoreBroker>
-//FederateTestFixture::AddBroker (const std::string &core_type_name, const std::string &initialization_string)
+// std::shared_ptr<helics::CoreBroker>
+// FederateTestFixture::AddBroker (const std::string &core_type_name, const std::string &initialization_string)
 //{
 //    auto broker = StartBrokerImp (core_type_name, initialization_string);
 //    brokers.push_back (broker);

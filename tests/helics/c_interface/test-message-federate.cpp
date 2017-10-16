@@ -14,7 +14,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "ctestFixtures.h"
 #include "test_configuration.h"
 
-
 #include <future>
 #include <iostream>
 #include <thread>
@@ -24,10 +23,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (message_federate_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
+const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2"};
 
 /** test simple creation and destruction*/
-//BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types), core_type)
 //{
 //    SetupSingleBrokerTest<helics::MessageFederate> (core_type, 1);
 //    auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -41,7 +40,7 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
 //}
 //
-//BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_types), core_type)
 //{
 //    SetupSingleBrokerTest<helics::MessageFederate> (core_type, 1);
 //    auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -70,12 +69,12 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //}
 //
 //// same as previous test case but using endpoint objects
-//BOOST_DATA_TEST_CASE(message_federate_endpoint_registration_objs, bdata::make(core_types), core_type)
+// BOOST_DATA_TEST_CASE(message_federate_endpoint_registration_objs, bdata::make(core_types), core_type)
 //{
 //	SetupSingleBrokerTest<helics::MessageFederate>(core_type, 1);
 //	auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 //
-//	
+//
 //	helics::Endpoint epid(mFed1.get(), "ep1");
 //	helics::Endpoint epid2(helics::GLOBAL, mFed1.get(), "ep2", "random");
 //	mFed1->enterExecutionState();
@@ -97,7 +96,7 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //	BOOST_CHECK(mFed1->currentState() == helics::Federate::op_states::finalize);
 //}
 //
-//BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types), core_type)
 //{
 //    SetupSingleBrokerTest<helics::MessageFederate> (core_type, 1);
 //    auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -133,7 +132,7 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
 //}
 //
-//BOOST_DATA_TEST_CASE(message_federate_send_receive_obj, bdata::make(core_types), core_type)
+// BOOST_DATA_TEST_CASE(message_federate_send_receive_obj, bdata::make(core_types), core_type)
 //{
 //	using namespace helics;
 //	SetupSingleBrokerTest<helics::MessageFederate>(core_type, 1);
@@ -171,7 +170,7 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //	BOOST_CHECK(mFed1->currentState() == helics::Federate::op_states::finalize);
 //}
 //
-//BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_types), core_type)
 //{
 //    SetupSingleBrokerTest<helics::MessageFederate> (core_type, 2);
 //    auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -224,13 +223,13 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::finalize);
 //}
 //
-//BOOST_DATA_TEST_CASE(message_federate_send_receive_2fed_obj, bdata::make(core_types), core_type)
+// BOOST_DATA_TEST_CASE(message_federate_send_receive_2fed_obj, bdata::make(core_types), core_type)
 //{
 //	using namespace helics;
 //	SetupSingleBrokerTest<MessageFederate>(core_type, 2);
 //	auto mFed1 = GetFederateAs<MessageFederate>(0);
 //	auto mFed2 = GetFederateAs<MessageFederate>(1);
-//	
+//
 //	Endpoint epid(mFed1.get(), "ep1");
 //
 //	Endpoint epid2(GLOBAL, mFed2.get(), "ep2", "random");
@@ -280,7 +279,7 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //	BOOST_CHECK(mFed2->currentState() == helics::Federate::op_states::finalize);
 //}
 //
-//BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make (core_types), core_type)
 //{
 //    SetupSingleBrokerTest<helics::MessageFederate> (core_type, 2);
 //    auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -351,7 +350,7 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 ////#define ENABLE_OUTPUT
 ///**trivial Federate that sends Messages and echoes a ping with a pong
 // */
-//class pingpongFed
+// class pingpongFed
 //{
 //  private:
 //    std::unique_ptr<helics::MessageFederate> mFed;
@@ -468,7 +467,7 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //    }
 //};
 //
-//BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 //{
 //	if (core_type.compare(0, 4, "test") != 0)
 //	{
@@ -504,7 +503,7 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //    BOOST_CHECK_EQUAL (p3.pongs, 2);
 //}
 //
-//BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_type)
 //{
 //    SetupSingleBrokerTest<helics::MessageFederate> (core_type, 2);
 //    auto mFed1 = GetFederateAs<helics::MessageFederate> (0);

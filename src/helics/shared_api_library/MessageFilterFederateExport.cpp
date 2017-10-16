@@ -90,16 +90,16 @@ int helicsFilterHasMessage (helics_source_filter filter)
     return (filtObj->filtptr->hasMessage ()) ? 1 : 0;
 }
 
-int helicsFilterReceiveCount(helics_source_filter filter)
+int helicsFilterReceiveCount (helics_source_filter filter)
 {
-	if (filter == nullptr)
-	{
-		return -1;
-	}
+    if (filter == nullptr)
+    {
+        return -1;
+    }
 
-	auto filtObj = reinterpret_cast<helics::SourceFilterObject *> (filter);
-	//this isn't right yet but I might need to enable that functionality yet
-	return (filtObj->filtptr->hasMessage()) ? 1 : 0;
+    auto filtObj = reinterpret_cast<helics::SourceFilterObject *> (filter);
+    // this isn't right yet but I might need to enable that functionality yet
+    return (filtObj->filtptr->hasMessage ()) ? 1 : 0;
 }
 
 static message_t emptyMessage ()
@@ -133,12 +133,12 @@ message_t helicsFilterGetMessage (helics_source_filter filter)
     return mess;
 }
 
-void helicsFreeSourceFilter(helics_source_filter filter)
+void helicsFreeSourceFilter (helics_source_filter filter)
 {
-	delete reinterpret_cast<helics::SourceFilterObject *>(filter);
+    delete reinterpret_cast<helics::SourceFilterObject *> (filter);
 }
 
-void helicsFreeDestinationFilter(helics_destination_filter filter)
+void helicsFreeDestinationFilter (helics_destination_filter filter)
 {
-	delete reinterpret_cast<helics::DestFilterObject *>(filter);
+    delete reinterpret_cast<helics::DestFilterObject *> (filter);
 }

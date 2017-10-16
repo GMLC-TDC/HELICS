@@ -10,8 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "argParser.h"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <boost/filesystem.hpp>
 
 namespace helics

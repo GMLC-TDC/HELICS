@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     BOOST_CHECK_EQUAL (fs->getInfo ().timeDelta, helics::Time::epsilon ());
     BOOST_CHECK_EQUAL (fs->getInfo ().lookAhead, helics::Time::zeroVal ());
     BOOST_CHECK_EQUAL (fs->getInfo ().impactWindow, helics::Time::zeroVal ());
-	BOOST_CHECK_EQUAL(fs->getInfo().period, helics::Time::zeroVal());
+    BOOST_CHECK_EQUAL (fs->getInfo ().period, helics::Time::zeroVal ());
     BOOST_CHECK_EQUAL (fs->getInfo ().observer, false);
     BOOST_CHECK_EQUAL (fs->getInfo ().uninteruptible, false);
     BOOST_CHECK_EQUAL (fs->getInfo ().time_agnostic, false);
@@ -276,7 +276,6 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     BOOST_CHECK (fs_process2.get () == convergence_state::halted);
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_FINISHED);
 
-   
     // Return to created state
     fs->reset ();
 
@@ -305,18 +304,17 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     // Return to initializing state
     fs->reInit ();
 
-	// Test returning when an error occurs
-	cmd.setAction(helics::CMD_ERROR);
-	fs_process2 =
-		std::async(std::launch::async, [&]() { return fs->enterExecutingState(convergence_state::complete); });
-	BOOST_CHECK_EQUAL(fs->getState(), helics_federate_state_type::HELICS_INITIALIZING);
-	fs->addAction(cmd);
-	fs_process2.wait();
-	BOOST_CHECK(fs_process2.get() == convergence_state::error);
-	BOOST_CHECK_EQUAL(fs->getState(), helics_federate_state_type::HELICS_ERROR);
+    // Test returning when an error occurs
+    cmd.setAction (helics::CMD_ERROR);
+    fs_process2 =
+      std::async (std::launch::async, [&]() { return fs->enterExecutingState (convergence_state::complete); });
+    BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_INITIALIZING);
+    fs->addAction (cmd);
+    fs_process2.wait ();
+    BOOST_CHECK (fs_process2.get () == convergence_state::error);
+    BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_ERROR);
 
-
-	fs->reset();
+    fs->reset ();
 
     // Test CMD_EXEC_REQUEST/CMD_EXEC_GRANT returns 0 if dependencies/dependents aren't done; returns 1 if
     // fs->iterating is true, 2 otherwise; if 1 ret false, if 2 ret true

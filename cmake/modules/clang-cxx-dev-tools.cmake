@@ -4,7 +4,12 @@
 #src/*.[ch]pp src/*.[ch]xx src/*.cc src/*.hh  src/*.[CHI] src/*.[ch]
 file(GLOB_RECURSE
      ALL_TEST_FILES
-      tests/helics/*.[ch]pp
+      tests/helics/*.[ch]pp tests/helics/*.[ch]
+     )
+	 
+file(GLOB_RECURSE
+     ALL_EXAMPLE_FILES
+      examples/*.[ch]pp examples/*.[ch]
      )
 	 
 file(GLOB
@@ -93,7 +98,16 @@ if(CLANG_FORMAT)
     ${ALL_CORE_FILES}
     )
 	
+	add_custom_target(
+    clang-format-examples
+    COMMAND ${CLANG_FORMAT}
+    -i
+    -style=file
+    ${ALL_CORE_FILES}
+    )
 	
+	add_custom_target(clang-format-all 
+                  DEPENDS clang-format-test clang-format-application clang-format-core clang-format-examples)
 endif()
 
 # Adding clang-tidy target if executable is found
@@ -129,4 +143,6 @@ if(CLANG_TIDY)
     ${INCLUDES}
     )
 	
+	add_custom_target(clang-tidy-all 
+                  DEPENDS clang-tidy-test clang-tidy-application clang-tidy-core)
 endif()

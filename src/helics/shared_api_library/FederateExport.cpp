@@ -19,7 +19,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** this is a random identifier put in place when the federate gets created*/
 static const int validationIdentifier = 0x2352188;
 
-
 helics::Federate *getFed (helics_federate fed)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
@@ -228,50 +227,50 @@ helicsStatus helicsEnterInitializationMode (helics_federate fed)
     }
 }
 
-helicsStatus helicsEnterInitializationModeAsync(helics_federate fed)
+helicsStatus helicsEnterInitializationModeAsync (helics_federate fed)
 {
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return helicsDiscard;
-	}
-	try
-	{
-		fedObj->enterInitializationStateAsync();
-		return helicsOK;
-	}
-	catch (helics::InvalidStateTransition &)
-	{
-		return helicsError;
-	}
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return helicsDiscard;
+    }
+    try
+    {
+        fedObj->enterInitializationStateAsync ();
+        return helicsOK;
+    }
+    catch (helics::InvalidStateTransition &)
+    {
+        return helicsError;
+    }
 }
 
-int helicsAsyncOperationCompleted(helics_federate fed)
+int helicsAsyncOperationCompleted (helics_federate fed)
 {
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return 0;
-	}
-	return (fedObj->asyncOperationCompleted()) ? 1 : 0;
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return 0;
+    }
+    return (fedObj->asyncOperationCompleted ()) ? 1 : 0;
 }
 
-helicsStatus helicsEneterInitializationModeFinalize(helics_federate fed)
+helicsStatus helicsEneterInitializationModeFinalize (helics_federate fed)
 {
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return helicsDiscard;
-	}
-	try
-	{
-		fedObj->enterInitializationStateFinalize();
-		return helicsOK;
-	}
-	catch (helics::InvalidStateTransition &)
-	{
-		return helicsError;
-	}
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return helicsDiscard;
+    }
+    try
+    {
+        fedObj->enterInitializationStateFinalize ();
+        return helicsOK;
+    }
+    catch (helics::InvalidStateTransition &)
+    {
+        return helicsError;
+    }
 }
 
 helicsStatus helicsEnterExecutionMode (helics_federate fed)
@@ -291,8 +290,6 @@ helicsStatus helicsEnterExecutionMode (helics_federate fed)
         return helicsError;
     }
 }
-
-
 
 static helics::convergence_state getConvergenceState (convergence_status conv)
 {
@@ -351,81 +348,79 @@ helicsStatus helicsEnterExecutionModeIterative (helics_federate fed,
     }
 }
 
-
-helicsStatus helicsEnterExecutionModeAsync(helics_federate fed)
+helicsStatus helicsEnterExecutionModeAsync (helics_federate fed)
 {
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return helicsDiscard;
-	}
-	try
-	{
-		fedObj->enterExecutionStateAsync();
-		return helicsOK;
-	}
-	catch (helics::InvalidStateTransition &)
-	{
-		return helicsError;
-	}
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return helicsDiscard;
+    }
+    try
+    {
+        fedObj->enterExecutionStateAsync ();
+        return helicsOK;
+    }
+    catch (helics::InvalidStateTransition &)
+    {
+        return helicsError;
+    }
 }
 
-helicsStatus helicsEnterExecutionModeIterativeAsync(helics_federate fed,
-	convergence_status converged)
+helicsStatus helicsEnterExecutionModeIterativeAsync (helics_federate fed, convergence_status converged)
 {
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return helicsDiscard;
-	}
-	try
-	{
-		fedObj->enterExecutionStateAsync(getConvergenceState(converged));
-		return helicsOK;
-	}
-	catch (helics::InvalidStateTransition &)
-	{
-		return helicsError;
-	}
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return helicsDiscard;
+    }
+    try
+    {
+        fedObj->enterExecutionStateAsync (getConvergenceState (converged));
+        return helicsOK;
+    }
+    catch (helics::InvalidStateTransition &)
+    {
+        return helicsError;
+    }
 }
 
-helicsStatus helicsEnterExecutionModeFinalize(helics_federate fed)
+helicsStatus helicsEnterExecutionModeFinalize (helics_federate fed)
 {
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return helicsDiscard;
-	}
-	try
-	{
-		fedObj->enterExecutionStateFinalize();
-		return helicsOK;
-	}
-	catch (helics::InvalidStateTransition &)
-	{
-		return helicsError;
-	}
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return helicsDiscard;
+    }
+    try
+    {
+        fedObj->enterExecutionStateFinalize ();
+        return helicsOK;
+    }
+    catch (helics::InvalidStateTransition &)
+    {
+        return helicsError;
+    }
 }
-helicsStatus helicsEnterExecutionModeIterativeFinalize(helics_federate fed, convergence_status *outConverged)
+helicsStatus helicsEnterExecutionModeIterativeFinalize (helics_federate fed, convergence_status *outConverged)
 {
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return helicsDiscard;
-	}
-	try
-	{
-		auto val = fedObj->enterExecutionStateFinalize();
-		if (outConverged != nullptr)
-		{
-			*outConverged = getConvergenceStatus(val);
-		}
-		return helicsOK;
-	}
-	catch (helics::InvalidStateTransition &)
-	{
-		return helicsError;
-	}
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return helicsDiscard;
+    }
+    try
+    {
+        auto val = fedObj->enterExecutionStateFinalize ();
+        if (outConverged != nullptr)
+        {
+            *outConverged = getConvergenceStatus (val);
+        }
+        return helicsOK;
+    }
+    catch (helics::InvalidStateTransition &)
+    {
+        return helicsError;
+    }
 }
 
 helics_time_t helicsRequestTime (helics_federate fed, helics_time_t requestTime)
@@ -436,7 +431,7 @@ helics_time_t helicsRequestTime (helics_federate fed, helics_time_t requestTime)
         return (-1.0);
     }
     auto tm = fedObj->requestTime (requestTime);
-    return static_cast<double>(tm);
+    return static_cast<double> (tm);
 }
 
 helics_iterative_time
@@ -465,69 +460,66 @@ helicsRequestTimeIterative (helics_federate fed, helics_time_t requestTime, conv
     }
 }
 
-
-helicsStatus helicsRequestTimeAsync(helics_federate fed, helics_time_t requestTime)
+helicsStatus helicsRequestTimeAsync (helics_federate fed, helics_time_t requestTime)
 {
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return helicsDiscard;
-	}
-	fedObj->requestTimeAsync(requestTime);
-	return helicsOK;
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return helicsDiscard;
+    }
+    fedObj->requestTimeAsync (requestTime);
+    return helicsOK;
 }
 
-helicsStatus helicsRequestTimeIterativeAsync(helics_federate fed,
-	helics_time_t requestTime,
-	convergence_status converged)
+helicsStatus
+helicsRequestTimeIterativeAsync (helics_federate fed, helics_time_t requestTime, convergence_status converged)
 {
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return helicsDiscard;
-	}
-	try
-	{
-		fedObj->requestTimeIterative(requestTime,
-			getConvergenceState(converged));
-		return helicsOK;
-	}
-	catch (helics::InvalidStateTransition &)
-	{
-		return helicsError;
-	}
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return helicsDiscard;
+    }
+    try
+    {
+        fedObj->requestTimeIterative (requestTime, getConvergenceState (converged));
+        return helicsOK;
+    }
+    catch (helics::InvalidStateTransition &)
+    {
+        return helicsError;
+    }
 }
-helics_time_t helicsRequestTimeFinalize(helics_federate fed)
+helics_time_t helicsRequestTimeFinalize (helics_federate fed)
 {
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return (-1.0);
-	}
-	auto tm = fedObj->requestTimeFinalize();
-	return static_cast<double>(tm);
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return (-1.0);
+    }
+    auto tm = fedObj->requestTimeFinalize ();
+    return static_cast<double> (tm);
 }
-helics_iterative_time helicsRequestTimeIterativeFinalize(helics_federate fed)
+helics_iterative_time helicsRequestTimeIterativeFinalize (helics_federate fed)
 {
-	helics_iterative_time itTime;
-	itTime.status = error;
-	itTime.time = 0;
+    helics_iterative_time itTime;
+    itTime.status = error;
+    itTime.time = 0;
 
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return itTime;
-	}
-	try
-	{
-		auto val = fedObj->requestTimeIterativeFinalize();
-		itTime.time = static_cast<double>(val.stepTime);
-		itTime.status = getConvergenceStatus(val.state);
-		return itTime;
-	}
-	catch (helics::InvalidStateTransition &)
-	{
-		return itTime;
-	}
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return itTime;
+    }
+    try
+    {
+        auto val = fedObj->requestTimeIterativeFinalize ();
+        itTime.time = static_cast<double> (val.stepTime);
+        itTime.status = getConvergenceStatus (val.state);
+        return itTime;
+    }
+    catch (helics::InvalidStateTransition &)
+    {
+        return itTime;
+    }
 }
 void helicsFreeFederate (helics_federate fed) { delete reinterpret_cast<helics::FedObject *> (fed); }

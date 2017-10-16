@@ -135,16 +135,16 @@ helicsStatus helicsSendMessage (helics_endpoint endpoint, message_t *message)
     return helicsOK;
 }
 
-helicsStatus helicsSubscribe (helics_endpoint endpoint, const char *name, const char *type) 
-{ 
-	if (endpoint == nullptr)
-	{
-		return helicsError;
-	}
-	auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-	
-	endObj->endptr->subscribe(name, type);
-	return helicsOK;
+helicsStatus helicsSubscribe (helics_endpoint endpoint, const char *name, const char *type)
+{
+    if (endpoint == nullptr)
+    {
+        return helicsError;
+    }
+    auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
+
+    endObj->endptr->subscribe (name, type);
+    return helicsOK;
 }
 
 int helicsFederateHasMessage (helics_message_federate fed)
@@ -243,43 +243,42 @@ message_t helicsFederateGetMessage (helics_message_federate fed)
     return mess;
 }
 
-
-helicsStatus helicsGetEndpointType(helics_endpoint endpoint, char *str, int maxlen)
+helicsStatus helicsGetEndpointType (helics_endpoint endpoint, char *str, int maxlen)
 {
-	if (endpoint == nullptr)
-	{
-		return helicsError;
-	}
-	auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-	auto type = endObj->endptr->getType();
-	if (static_cast<int> (type.size()) > maxlen)
-	{
-		strncpy(str, type.c_str(), maxlen);
-		str[maxlen - 1] = 0;
-	}
-	else
-	{
-		strcpy(str, type.c_str());
-	}
-	return helicsOK;
+    if (endpoint == nullptr)
+    {
+        return helicsError;
+    }
+    auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
+    auto type = endObj->endptr->getType ();
+    if (static_cast<int> (type.size ()) > maxlen)
+    {
+        strncpy (str, type.c_str (), maxlen);
+        str[maxlen - 1] = 0;
+    }
+    else
+    {
+        strcpy (str, type.c_str ());
+    }
+    return helicsOK;
 }
 
-helicsStatus helicsGetEndpointName(helics_endpoint endpoint, char *str, int maxlen)
+helicsStatus helicsGetEndpointName (helics_endpoint endpoint, char *str, int maxlen)
 {
-	if (endpoint == nullptr)
-	{
-		return helicsError;
-	}
-	auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-	auto type = endObj->endptr->getName();
-	if (static_cast<int> (type.size()) > maxlen)
-	{
-		strncpy(str, type.c_str(), maxlen);
-		str[maxlen - 1] = 0;
-	}
-	else
-	{
-		strcpy(str, type.c_str());
-	}
-	return helicsOK;
+    if (endpoint == nullptr)
+    {
+        return helicsError;
+    }
+    auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
+    auto type = endObj->endptr->getName ();
+    if (static_cast<int> (type.size ()) > maxlen)
+    {
+        strncpy (str, type.c_str (), maxlen);
+        str[maxlen - 1] = 0;
+    }
+    else
+    {
+        strcpy (str, type.c_str ());
+    }
+    return helicsOK;
 }

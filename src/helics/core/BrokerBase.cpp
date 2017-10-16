@@ -137,18 +137,15 @@ BrokerBase::BrokerBase () noexcept {}
 
 BrokerBase::BrokerBase (const std::string &broker_name) : identifier (broker_name) {}
 
-BrokerBase::~BrokerBase ()
-{
-	joinAllThreads();
-}
+BrokerBase::~BrokerBase () { joinAllThreads (); }
 
-void BrokerBase::joinAllThreads()
+void BrokerBase::joinAllThreads ()
 {
-	if (_queue_processing_thread.joinable())
-	{
-		_queue.push(CMD_TERMINATE_IMMEDIATELY);
-		_queue_processing_thread.join();
-	}
+    if (_queue_processing_thread.joinable ())
+    {
+        _queue.push (CMD_TERMINATE_IMMEDIATELY);
+        _queue_processing_thread.join ();
+    }
 }
 
 void BrokerBase::InitializeFromArgs (int argc, char *argv[])
@@ -262,10 +259,10 @@ void BrokerBase::addActionMessage (const ActionMessage &m)
 {
     if (isPriorityCommand (m))
     {
-		if (!haltOperations)
-		{
-			processPriorityCommand(m);
-		}
+        if (!haltOperations)
+        {
+            processPriorityCommand (m);
+        }
     }
     else
     {
@@ -278,11 +275,10 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
 {
     if (isPriorityCommand (m))
     {
-		if (!haltOperations)
-		{
-			processPriorityCommand(m);
-		}
-        
+        if (!haltOperations)
+        {
+            processPriorityCommand (m);
+        }
     }
     else
     {
@@ -303,18 +299,17 @@ void BrokerBase::queueProcessingLoop ()
         case CMD_TERMINATE_IMMEDIATELY:
             return;  // immediate return
         case CMD_STOP:
-			if (!haltOperations)
-			{
-				processCommand(std::move(command));
-				return processDisconnect();
-			}
-			return;
+            if (!haltOperations)
+            {
+                processCommand (std::move (command));
+                return processDisconnect ();
+            }
+            return;
         default:
-			if (!haltOperations)
-			{
-				processCommand(std::move(command));
-			}
-				
+            if (!haltOperations)
+            {
+                processCommand (std::move (command));
+            }
         }
     }
 }

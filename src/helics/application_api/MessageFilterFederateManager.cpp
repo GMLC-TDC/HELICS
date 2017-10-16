@@ -282,4 +282,4 @@ void MessageFilterFederateManager::registerMessageOperator (const std::vector<fi
         }
     }
 }
-} //namespace helics
+}  // namespace helics

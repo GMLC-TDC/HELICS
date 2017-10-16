@@ -183,8 +183,8 @@ class SubscriptionBase
     }
     /** get the key for the subscription*/
     const std::string &getKey () const { return key_; }
-	/** get the key for the subscription*/
-	const std::string &getName() const { return key_; }
+    /** get the key for the subscription*/
+    const std::string &getName () const { return key_; }
     /** get the key for the subscription*/
     std::string getType () const { return fed->getPublicationType (id); }
     const std::string &getUnits () const { return units_; }
@@ -323,13 +323,11 @@ class SubscriptionT : public SubscriptionBase
             handleCallback (time);
         });
     }
-	/** set a default value
-	@param val the value to set as the default
-	*/
-	void setDefault(const X &val)
-	{
-		fed->setDefaultValue(id, val);
-	}
+    /** set a default value
+    @param val the value to set as the default
+    */
+    void setDefault (const X &val) { fed->setDefaultValue (id, val); }
+
   private:
     void handleCallback (Time time)
     {

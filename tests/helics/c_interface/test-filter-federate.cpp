@@ -21,11 +21,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (message_filter_federate_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-const std::string core_types[] = { "test","test_2","ipc","ipc_2","zmq","zmq_2" };
-
+const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2"};
 
 /** test simple creation and destruction*/
-//BOOST_DATA_TEST_CASE (message_filter_federate_initialize_tests, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (message_filter_federate_initialize_tests, bdata::make (core_types), core_type)
 //{
 //    auto broker = AddBroker (core_type, 1);
 //    AddFederates<helics::MessageFilterFederate> (core_type, 1, broker);
@@ -42,7 +41,7 @@ const std::string core_types[] = { "test","test_2","ipc","ipc_2","zmq","zmq_2" }
 //}
 //
 ///** test registration of filters*/
-//BOOST_DATA_TEST_CASE (message_filter_federate_registration, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (message_filter_federate_registration, bdata::make (core_types), core_type)
 //{
 //    auto broker = AddBroker (core_type, 2);
 //    AddFederates<helics::MessageFilterFederate> (core_type, 2, broker, helics::timeZero, "filter");
@@ -68,7 +67,7 @@ const std::string core_types[] = { "test","test_2","ipc","ipc_2","zmq","zmq_2" }
 //}
 //
 ///** test basic operation of filters*/
-//BOOST_DATA_TEST_CASE (message_filter_basic_ops, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (message_filter_basic_ops, bdata::make (core_types), core_type)
 //{
 //    auto broker = AddBroker (core_type, 2);
 //    AddFederates<helics::MessageFilterFederate> (core_type, 1, broker, 1.0, "filter");
@@ -119,9 +118,9 @@ const std::string core_types[] = { "test","test_2","ipc","ipc_2","zmq","zmq_2" }
 //}
 //
 ///** test a filter operator
-//The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+// The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 //*/
-//BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_type)
 //{
 //    auto broker = AddBroker (core_type, 2);
 //    AddFederates<helics::MessageFilterFederate> (core_type, 1, broker, 1.0, "filter");
@@ -160,10 +159,10 @@ const std::string core_types[] = { "test","test_2","ipc","ipc_2","zmq","zmq_2" }
 //    mFed->requestTimeFinalize ();
 //    BOOST_REQUIRE (!mFed->hasMessage (p2));
 //
-//    
+//
 //    fFed->requestTimeAsync (3.0);
 //	auto retTime=mFed->requestTime(3.0);
-//   
+//
 //    BOOST_REQUIRE (mFed->hasMessage (p2));
 //
 //    auto m2 = mFed->getMessage (p2);
@@ -172,9 +171,8 @@ const std::string core_types[] = { "test","test_2","ipc","ipc_2","zmq","zmq_2" }
 //    BOOST_CHECK_EQUAL (m2->dest, "port2");
 //    BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
 //    BOOST_CHECK_EQUAL (m2->time, 2.5);
-//	//There is a bug here but It may get fixed by some API changes so i don't want to spend the time debugging right now
-//	mFed->requestTime(3.0);
-//	fFed->requestTimeFinalize();
+//	//There is a bug here but It may get fixed by some API changes so i don't want to spend the time debugging
+//right now 	mFed->requestTime(3.0); 	fFed->requestTimeFinalize();
 //    mFed->finalize ();
 //    fFed->finalize ();
 //    BOOST_CHECK (fFed->currentState () == helics::Federate::op_states::finalize);

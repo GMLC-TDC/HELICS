@@ -44,33 +44,23 @@ CoreFederateInfo generateCoreInfo (const FederateInfo &fi)
     return cfi;
 }
 
-std::string getHelicsVersionString()
+std::string getHelicsVersionString ()
 {
-	std::string vstr = std::to_string(HELICS_VERSION_MAJOR);
-	vstr.push_back('.');
-	vstr.append(std::to_string(HELICS_VERSION_MINOR));
-	vstr.push_back('.');
-	vstr.append(std::to_string(HELICS_VERSION_PATCH));
-	vstr += " (";
-	vstr+=HELICS_DATE;
-	vstr.push_back(')');
-	return vstr;
+    std::string vstr = std::to_string (HELICS_VERSION_MAJOR);
+    vstr.push_back ('.');
+    vstr.append (std::to_string (HELICS_VERSION_MINOR));
+    vstr.push_back ('.');
+    vstr.append (std::to_string (HELICS_VERSION_PATCH));
+    vstr += " (";
+    vstr += HELICS_DATE;
+    vstr.push_back (')');
+    return vstr;
 }
 
-int getHelicsVersionMajor()
-{
-	return HELICS_VERSION_MAJOR;
-}
+int getHelicsVersionMajor () { return HELICS_VERSION_MAJOR; }
 
-int getHelicsVersionMinor()
-{
-	return HELICS_VERSION_MINOR;
-}
-int getHelicsVersionPatch()
-{
-	return HELICS_VERSION_PATCH;
-}
-
+int getHelicsVersionMinor () { return HELICS_VERSION_MINOR; }
+int getHelicsVersionPatch () { return HELICS_VERSION_PATCH; }
 
 Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
 {

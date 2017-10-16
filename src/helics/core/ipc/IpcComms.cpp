@@ -40,7 +40,7 @@ void IpcComms::queue_rx_function ()
     bool connected = rxQueue.connect (localTarget_, maxMessageCount_, maxMessageSize_);
     if (!connected)
     {
-		disconnecting = true;
+        disconnecting = true;
         ActionMessage err (CMD_ERROR);
         err.payload = rxQueue.getError ();
         ActionCallback (std::move (err));
@@ -57,7 +57,7 @@ void IpcComms::queue_rx_function ()
         {
             if (cmd.index == CLOSE_RECEIVER)
             {
-				disconnecting = true;
+                disconnecting = true;
                 break;
             }
             if (cmd.index == SET_TO_OPERATING)
@@ -80,7 +80,7 @@ void IpcComms::queue_rx_function ()
         }
         ActionCallback (std::move (cmd));
     }
-	
+
     rxQueue.changeState (queue_state_t::closing);
     rx_status = connection_status::terminated;
 }
@@ -236,10 +236,10 @@ void IpcComms::closeReceiver ()
         }
         catch (boost::interprocess::interprocess_exception const &ipe)
         {
-			if (!disconnecting)
-			{
-				std::cerr << "unable to send close message\n";
-			}
+            if (!disconnecting)
+            {
+                std::cerr << "unable to send close message\n";
+            }
         }
     }
 }

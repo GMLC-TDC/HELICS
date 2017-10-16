@@ -14,13 +14,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "core/helics-time.h"
 #include "helics.h"
 #include "internal/api_objects.h"
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <vector>
-#include <atomic>
 
 #include "helics/config.h"
-#if HELICS_HAVE_ZEROMQ>0
+#if HELICS_HAVE_ZEROMQ > 0
 #include "helics/common/zmqContextManager.h"
 #endif
 
@@ -28,11 +28,10 @@ static const std::string versionStr (std::to_string (HELICS_VERSION_MAJOR) + "."
                                      std::to_string (HELICS_VERSION_MINOR) + "." +
                                      std::to_string (HELICS_VERSION_PATCH) + " (" + HELICS_DATE + ")");
 
-#if HELICS_HAVE_ZEROMQ>0
-static std::atomic<bool> zmqInUse{ false };
+#if HELICS_HAVE_ZEROMQ > 0
+static std::atomic<bool> zmqInUse{false};
 #endif
 const char *helicsGetVersion (void) { return versionStr.c_str (); }
-
 
 helics_federate_info_t helicsFederateInfoCreate ()
 {
@@ -81,14 +80,14 @@ helicsStatus helicsFederateInfoSetCoreType (helics_federate_info_t fi, int coret
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->coreType = static_cast<helics::core_type> (coretype);
-#if HELICS_HAVE_ZEROMQ>0
-	if (hfi->coreType == helics::core_type::ZMQ)
-	{
-		if (!zmqInUse)
-		{
-			zmqContextManager::setContextToLeakOnDelete();
-		}
-	}
+#if HELICS_HAVE_ZEROMQ > 0
+    if (hfi->coreType == helics::core_type::ZMQ)
+    {
+        if (!zmqInUse)
+        {
+            zmqContextManager::setContextToLeakOnDelete ();
+        }
+    }
 #endif
     return helicsOK;
 }
@@ -103,14 +102,14 @@ helicsStatus helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi,
     try
     {
         hfi->coreType = helics::coreTypeFromString (coretype);
-#if HELICS_HAVE_ZEROMQ>0
-		if (hfi->coreType == helics::core_type::ZMQ)
-		{
-			if (!zmqInUse)
-			{
-				zmqContextManager::setContextToLeakOnDelete();
-			}
-		}
+#if HELICS_HAVE_ZEROMQ > 0
+        if (hfi->coreType == helics::core_type::ZMQ)
+        {
+            if (!zmqInUse)
+            {
+                zmqContextManager::setContextToLeakOnDelete ();
+            }
+        }
 #endif
     }
     catch (const std::invalid_argument &ie)
@@ -229,16 +228,16 @@ helicsStatus helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int 
 helics_core helicsCreateCore (const char *type, const char *name, const char *initString)
 {
     auto *core = new helics::coreObject;
-	auto ct = helics::coreTypeFromString(type);
+    auto ct = helics::coreTypeFromString (type);
     core->coreptr = helics::CoreFactory::FindOrCreate (ct, name, initString);
-#if HELICS_HAVE_ZEROMQ>0
-	if (ct == helics::core_type::ZMQ)
-	{
-		if (!zmqInUse)
-		{
-			zmqContextManager::setContextToLeakOnDelete();
-		}
-	}
+#if HELICS_HAVE_ZEROMQ > 0
+    if (ct == helics::core_type::ZMQ)
+    {
+        if (!zmqInUse)
+        {
+            zmqContextManager::setContextToLeakOnDelete ();
+        }
+    }
 #endif
     return reinterpret_cast<helics_core> (core);
 }
@@ -246,16 +245,16 @@ helics_core helicsCreateCore (const char *type, const char *name, const char *in
 helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, char *argv[])
 {
     auto *core = new helics::coreObject;
-	auto ct = helics::coreTypeFromString(type);
+    auto ct = helics::coreTypeFromString (type);
     core->coreptr = helics::CoreFactory::FindOrCreate (ct, name, argc, argv);
-#if HELICS_HAVE_ZEROMQ>0
-	if (ct == helics::core_type::ZMQ)
-	{
-		if (!zmqInUse)
-		{
-			zmqContextManager::setContextToLeakOnDelete();
-		}
-	}
+#if HELICS_HAVE_ZEROMQ > 0
+    if (ct == helics::core_type::ZMQ)
+    {
+        if (!zmqInUse)
+        {
+            zmqContextManager::setContextToLeakOnDelete ();
+        }
+    }
 #endif
     return reinterpret_cast<helics_core> (core);
 }
@@ -263,16 +262,16 @@ helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int ar
 helics_broker helicsCreateBroker (const char *type, const char *name, const char *initString)
 {
     auto broker = new helics::BrokerObject;
-    auto ct = helics::coreTypeFromString(type);
+    auto ct = helics::coreTypeFromString (type);
     broker->brokerptr = helics::BrokerFactory::create (ct, name, initString);
-#if HELICS_HAVE_ZEROMQ>0
-	if (ct == helics::core_type::ZMQ)
-	{
-		if (!zmqInUse)
-		{
-			zmqContextManager::setContextToLeakOnDelete();
-		}
-	}
+#if HELICS_HAVE_ZEROMQ > 0
+    if (ct == helics::core_type::ZMQ)
+    {
+        if (!zmqInUse)
+        {
+            zmqContextManager::setContextToLeakOnDelete ();
+        }
+    }
 #endif
     return reinterpret_cast<helics_broker> (broker);
 }
@@ -280,95 +279,86 @@ helics_broker helicsCreateBroker (const char *type, const char *name, const char
 helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, char *argv[])
 {
     auto *broker = new helics::BrokerObject;
-	auto ct = helics::coreTypeFromString(type);
-    broker->brokerptr = helics::BrokerFactory::create (ct,name, argc, argv);
-#if HELICS_HAVE_ZEROMQ>0
-	if (ct == helics::core_type::ZMQ)
-	{
-		if (!zmqInUse)
-		{
-			zmqContextManager::setContextToLeakOnDelete();
-		}
-	}
+    auto ct = helics::coreTypeFromString (type);
+    broker->brokerptr = helics::BrokerFactory::create (ct, name, argc, argv);
+#if HELICS_HAVE_ZEROMQ > 0
+    if (ct == helics::core_type::ZMQ)
+    {
+        if (!zmqInUse)
+        {
+            zmqContextManager::setContextToLeakOnDelete ();
+        }
+    }
 #endif
     return reinterpret_cast<helics_broker> (broker);
 }
 
-int helicsBrokerIsConnected(helics_broker broker)
+int helicsBrokerIsConnected (helics_broker broker)
 {
-	if (broker == nullptr)
-	{
-		return 0;
-	}
-	auto brokerObj = reinterpret_cast<helics::BrokerObject*>(broker);
-	if (brokerObj->brokerptr)
-	{
-		return (brokerObj->brokerptr->isConnected()) ? 1 : 0;
-  }
-	return 0;
+    if (broker == nullptr)
+    {
+        return 0;
+    }
+    auto brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
+    if (brokerObj->brokerptr)
+    {
+        return (brokerObj->brokerptr->isConnected ()) ? 1 : 0;
+    }
+    return 0;
 }
 
-int helicsCoreIsConnected(helics_core core)
+int helicsCoreIsConnected (helics_core core)
 {
-	if (core == nullptr)
-	{
-		return 0;
-	}
-	auto coreObj = reinterpret_cast<helics::coreObject*>(core);
-	if (coreObj->coreptr)
-	{
-		return (coreObj->coreptr->isConnected()) ? 1 : 0;
-	}
-	return 0;
+    if (core == nullptr)
+    {
+        return 0;
+    }
+    auto coreObj = reinterpret_cast<helics::coreObject *> (core);
+    if (coreObj->coreptr)
+    {
+        return (coreObj->coreptr->isConnected ()) ? 1 : 0;
+    }
+    return 0;
 }
 
-void helicsFreeCore(helics_core core)
+void helicsFreeCore (helics_core core) { delete reinterpret_cast<helics::coreObject *> (core); }
+
+void helicsFreeBroker (helics_broker broker) { delete reinterpret_cast<helics::BrokerObject *> (broker); }
+
+helics_query helicsCreateQuery (const char *target, const char *query)
 {
-	delete reinterpret_cast<helics::coreObject *>(core);
+    auto queryObj = new helics::queryObject;
+    queryObj->query = query;
+    queryObj->target = target;
+    return reinterpret_cast<void *> (queryObj);
+}
+const char *helicsExecuteQuery (helics_federate fed, helics_query query)
+{
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
+    if (query == nullptr)
+    {
+        return nullptr;
+    }
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return nullptr;
+    }
+
+    auto queryObj = reinterpret_cast<helics::queryObject *> (query);
+    if (queryObj->target.empty ())
+    {
+        queryObj->response = fedObj->query (queryObj->query);
+    }
+    else
+    {
+        queryObj->response = fedObj->query (queryObj->target, queryObj->query);
+    }
+
+    return queryObj->response.c_str ();
 }
 
-void helicsFreeBroker(helics_broker broker)
-{
-	delete reinterpret_cast<helics::BrokerObject *>(broker);
-}
-
-helics_query helicsCreateQuery(const char *target, const char *query)
-{
-	auto queryObj = new helics::queryObject;
-	queryObj->query = query;
-	queryObj->target = target;
-	return reinterpret_cast<void *>(queryObj);
-}
-const char *helicsExecuteQuery(helics_federate fed, helics_query query)
-{
-	if (fed == nullptr)
-	{
-		return nullptr;
-	}
-	if (query == nullptr)
-	{
-		return nullptr;
-	}
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return nullptr;
-	}
-
-	auto queryObj = reinterpret_cast<helics::queryObject *>(query);
-	if (queryObj->target.empty())
-	{
-		queryObj->response = fedObj->query(queryObj->query);
-	}
-	else
-	{
-		queryObj->response = fedObj->query(queryObj->target, queryObj->query);
-	}
-		
-	return queryObj->response.c_str();
-}
-
-void helicsFreeQuery(helics_query query)
-{
-	delete reinterpret_cast<helics::queryObject *>(query);
-}
+void helicsFreeQuery (helics_query query) { delete reinterpret_cast<helics::queryObject *> (query); }

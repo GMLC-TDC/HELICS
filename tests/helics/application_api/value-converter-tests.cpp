@@ -169,11 +169,11 @@ BOOST_AUTO_TEST_CASE (test_converter_errors)
     auto vb2 = helics::ValueConverter<int>::convert (10);
 
     BOOST_CHECK_THROW (helics::ValueConverter<double>::interpret (vb2), std::invalid_argument);
-	BOOST_CHECK_LT(vb2.size(), 8);
-	BOOST_CHECK_GT(vb2.size(), 4);
-	BOOST_CHECK_THROW(helics::ValueConverter<std::complex<double>>::interpret(vb1), std::invalid_argument);
-	BOOST_CHECK_LT(vb1.size(), 12);
-	BOOST_CHECK_GT(vb1.size(), 8);
+    BOOST_CHECK_LT (vb2.size (), 8);
+    BOOST_CHECK_GT (vb2.size (), 4);
+    BOOST_CHECK_THROW (helics::ValueConverter<std::complex<double>>::interpret (vb1), std::invalid_argument);
+    BOOST_CHECK_LT (vb1.size (), 12);
+    BOOST_CHECK_GT (vb1.size (), 8);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

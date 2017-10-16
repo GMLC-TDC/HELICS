@@ -45,7 +45,8 @@ CommonCore::CommonCore (const std::string &core_name) : BrokerBase (core_name) {
 
 void CommonCore::initialize (const std::string &initializationString)
 {
-    if ((brokerState == created))  // don't do the compare exchange here since we do that in the initialize fromArgs
+    if ((brokerState ==
+         created))  // don't do the compare exchange here since we do that in the initialize fromArgs
     {  // and we can tolerate a spurious call
         stringToCmdLine cmdline (initializationString);
         InitializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
@@ -98,58 +99,57 @@ bool CommonCore::connect ()
 
 bool CommonCore::isConnected () const { return ((brokerState == operating) || (brokerState == connected)); }
 
-void CommonCore::processDisconnect() { disconnect(); }
+void CommonCore::processDisconnect () { disconnect (); }
 
 void CommonCore::disconnect ()
 {
-	if (brokerState > broker_state_t::initialized)
-	{
-		brokerState = broker_state_t::terminating;
-		brokerDisconnect();
-	}
-		brokerState = terminated;
-		/*We need to ensure that the destructor is not called immediately upon calling unregister
-		otherwise this would be a mess and probably cause segmentation faults so we capture it in a local variable
-		that will be destroyed on function exit
-		*/
-		auto keepCoreAlive = CoreFactory::findCore(identifier);
-		if (keepCoreAlive)
-		{
-			if (keepCoreAlive.get() == this)
-			{
-				keepCoreAlive = nullptr;
-				CoreFactory::unregisterCore(identifier);
-			}
-		}
+    if (brokerState > broker_state_t::initialized)
+    {
+        brokerState = broker_state_t::terminating;
+        brokerDisconnect ();
+    }
+    brokerState = terminated;
+    /*We need to ensure that the destructor is not called immediately upon calling unregister
+    otherwise this would be a mess and probably cause segmentation faults so we capture it in a local variable
+    that will be destroyed on function exit
+    */
+    auto keepCoreAlive = CoreFactory::findCore (identifier);
+    if (keepCoreAlive)
+    {
+        if (keepCoreAlive.get () == this)
+        {
+            keepCoreAlive = nullptr;
+            CoreFactory::unregisterCore (identifier);
+        }
+    }
 
-		if (!prevIdentifier.empty())
-		{
-			auto keepCoreAlive2 = CoreFactory::findCore(prevIdentifier);
-			if (keepCoreAlive2)
-			{
-				if (keepCoreAlive2.get() == this)
-				{
-					keepCoreAlive2 = nullptr;
-					CoreFactory::unregisterCore(prevIdentifier);
-				}
-			}
-		}
-	
+    if (!prevIdentifier.empty ())
+    {
+        auto keepCoreAlive2 = CoreFactory::findCore (prevIdentifier);
+        if (keepCoreAlive2)
+        {
+            if (keepCoreAlive2.get () == this)
+            {
+                keepCoreAlive2 = nullptr;
+                CoreFactory::unregisterCore (prevIdentifier);
+            }
+        }
+    }
 }
 
-CommonCore::~CommonCore()
+CommonCore::~CommonCore ()
 {
-	//make sure everything is synced up so just run the lock
-	std::unique_lock<std::mutex> lock(_handlemutex);
-	std::unique_lock<std::mutex> lock2(_mutex);
-	joinAllThreads();
+    // make sure everything is synced up so just run the lock
+    std::unique_lock<std::mutex> lock (_handlemutex);
+    std::unique_lock<std::mutex> lock2 (_mutex);
+    joinAllThreads ();
 }
 
 FederateState *CommonCore::getFederate (federate_id_t federateID) const
 {
     // only activate the lock if we not in an operating state
     auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                                           std::unique_lock<std::mutex> (_mutex);
+                                             std::unique_lock<std::mutex> (_mutex);
 
     if (isValidIndex (federateID, _federates))
     {
@@ -169,12 +169,12 @@ FederateState *CommonCore::getHandleFederate (Handle id_)
 {
     // only activate the lock if we not in an operating state
     auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
-                                           std::unique_lock<std::mutex> (_handlemutex);
+                                             std::unique_lock<std::mutex> (_handlemutex);
     // this list is now constant no need to lock
     if (isValidIndex (id_, handles))
     {  // now need to be careful about deadlock here
         auto lock2 = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                                                std::unique_lock<std::mutex> (_mutex);
+                                                  std::unique_lock<std::mutex> (_mutex);
         return _federates[handles[id_]->local_fed_id].get ();
     }
 
@@ -185,7 +185,7 @@ BasicHandleInfo *CommonCore::getHandleInfo (Handle id_) const
 {
     // only activate the lock if we not in an operating state
     auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
-                                           std::unique_lock<std::mutex> (_handlemutex);
+                                             std::unique_lock<std::mutex> (_handlemutex);
     if (isValidIndex (id_, handles))
     {
         return handles[id_].get ();
@@ -198,7 +198,7 @@ BasicHandleInfo *CommonCore::getLocalEndpoint (const std::string &name)
 {
     // only activate the lock if we not in an operating state
     auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
-                                           std::unique_lock<std::mutex> (_handlemutex);
+                                             std::unique_lock<std::mutex> (_handlemutex);
     auto fnd = endpoints.find (name);
     if (fnd != endpoints.end ())
     {
@@ -211,7 +211,7 @@ bool CommonCore::isLocal (Core::federate_id_t global_id) const
 {
     // only activate the lock if we not in an operating state
     auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                                           std::unique_lock<std::mutex> (_mutex);
+                                             std::unique_lock<std::mutex> (_mutex);
     auto fnd = global_id_translation.find (global_id);
     return (fnd != global_id_translation.end ());
 }
@@ -220,7 +220,7 @@ int32_t CommonCore::getRoute (Core::federate_id_t global_id) const
 {
     // only activate the lock if we not in an operating state
     auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                                           std::unique_lock<std::mutex> (_mutex);
+                                             std::unique_lock<std::mutex> (_mutex);
     auto fnd = routing_table.find (global_id);
     return (fnd != routing_table.end ()) ? fnd->second : 0;
 }
@@ -290,7 +290,7 @@ bool CommonCore::allInitReady () const
 bool CommonCore::allDisconnected () const
 {
     auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                                           std::unique_lock<std::mutex> (_mutex);
+                                             std::unique_lock<std::mutex> (_mutex);
     // all federates must have hit finished state
     auto pred = [](const auto &fed) {
         auto state = fed->getState ();
@@ -631,7 +631,7 @@ BasicHandleInfo *CommonCore::createBasicHandle (Handle id_,
                                                 bool required)
 {
     auto hndl = std::make_unique<BasicHandleInfo> (id_, global_federateId, HandleType, key, type, units);
-	hndl->flag = required;
+    hndl->flag = required;
     hndl->local_fed_id = local_federateId;
     std::lock_guard<std::mutex> lock (_handlemutex);
 
@@ -898,7 +898,7 @@ Handle CommonCore::registerEndpoint (federate_id_t federateID, const std::string
     auto fnd = endpoints.find (name);
     if (fnd != endpoints.end ())
     {
-		throw (invalidIdentifier("endpoint name is already used"));
+        throw (invalidIdentifier ("endpoint name is already used"));
     }
     auto id = getNewHandle ();
     endpoints.emplace (name, id);
@@ -1385,7 +1385,7 @@ FilterCoordinator *CommonCore::getFilterCoordinator (Handle id_)
 {
     // only activate the lock if we not in an operating state
     auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                                           std::unique_lock<std::mutex> (_mutex);
+                                             std::unique_lock<std::mutex> (_mutex);
     auto fnd = filters.find (id_);
     if (fnd == filters.end ())
     {
@@ -1447,12 +1447,10 @@ void CommonCore::setIdentifier (const std::string &name)
     }
 }
 
-std::string CommonCore::query (const std::string &target, const std::string &queryStr) 
+std::string CommonCore::query (const std::string &target, const std::string &queryStr)
 {
-	
-		//this is a local query
-		return "";
-	
+    // this is a local query
+    return "";
 }
 
 void CommonCore::processPriorityCommand (const ActionMessage &command)
@@ -1592,33 +1590,33 @@ void CommonCore::processCommand (ActionMessage &&command)
     }
     break;
     case CMD_DISCONNECT:
-		if (command.dest_id == 0)
-		{
-			// route the message to all dependent feds
-			auto fed = getFederate(command.source_id);
-			if (fed == nullptr)
-			{
-				return;
-			}
-			auto &dep = fed->getDependents();
-			for (auto &fed_id : dep)
-			{
-				routeMessage(command, fed_id);
-			}
-			if (allDisconnected())
-			{
-				brokerState = broker_state_t::terminated;
-				ActionMessage dis(CMD_DISCONNECT);
-				dis.source_id = global_broker_id;
-				transmit(0, dis);
-				addActionMessage(CMD_STOP);
-			}
-		}
-		else
-		{
-			routeMessage(command);
-		}
-        
+        if (command.dest_id == 0)
+        {
+            // route the message to all dependent feds
+            auto fed = getFederate (command.source_id);
+            if (fed == nullptr)
+            {
+                return;
+            }
+            auto &dep = fed->getDependents ();
+            for (auto &fed_id : dep)
+            {
+                routeMessage (command, fed_id);
+            }
+            if (allDisconnected ())
+            {
+                brokerState = broker_state_t::terminated;
+                ActionMessage dis (CMD_DISCONNECT);
+                dis.source_id = global_broker_id;
+                transmit (0, dis);
+                addActionMessage (CMD_STOP);
+            }
+        }
+        else
+        {
+            routeMessage (command);
+        }
+
         break;
     case CMD_ADD_DEPENDENCY:
     case CMD_REMOVE_DEPENDENCY:
@@ -1627,8 +1625,8 @@ void CommonCore::processCommand (ActionMessage &&command)
         routeMessage (command);
         break;
     case CMD_SEND_FOR_FILTER:
-	case CMD_SEND_FOR_FILTER_OPERATION:
-		processMessageFilter(command);
+    case CMD_SEND_FOR_FILTER_OPERATION:
+        processMessageFilter (command);
         break;
     case CMD_PUB:
     {
@@ -1841,7 +1839,7 @@ void CommonCore::processCommand (ActionMessage &&command)
                 if (brokerState.compare_exchange_strong (exp, broker_state_t::initializing))
                 {  // make sure we only do this once
                     command.source_id = global_broker_id;
-                    
+
                     transmit (0, command);
                 }
             }
@@ -1855,7 +1853,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         {  // forward the grant to all federates
             for (auto &fed : _federates)
             {
-				organizeFilterOperations();
+                organizeFilterOperations ();
                 fed->addAction (command);
             }
         }
@@ -1915,34 +1913,34 @@ void CommonCore::processFilterInfo (ActionMessage &command)
         break;
     case CMD_REG_SRC_FILTER:
     case CMD_NOTIFY_SRC_FILTER:
-	{
-		bool FilterAlreadyPresent = false;
-		for (auto &filt : filterInfo->allSourceFilters)
-		{
-			if ((filt.fed_id == command.source_id) && (filt.handle == command.source_handle))
-			{
-				FilterAlreadyPresent = true;
-				if (command.flag)
-				{
-					filt.hasOperator_flag = true;
-					filterInfo->hasSourceOperators = true;
-				}
-				break;
-			}
-		}
-		if (!FilterAlreadyPresent)
-		{
-			filterInfo->allSourceFilters.emplace_back(command.source_id, command.source_handle, command.info().type,
-				command.info().type_out);
-			filterInfo->hasSourceFilter = true;
-			if (command.flag)
-			{
-				filterInfo->allSourceFilters.back().hasOperator_flag = true;
-				filterInfo->hasSourceOperators = true;
-			}
-		}
-	}
-        break;
+    {
+        bool FilterAlreadyPresent = false;
+        for (auto &filt : filterInfo->allSourceFilters)
+        {
+            if ((filt.fed_id == command.source_id) && (filt.handle == command.source_handle))
+            {
+                FilterAlreadyPresent = true;
+                if (command.flag)
+                {
+                    filt.hasOperator_flag = true;
+                    filterInfo->hasSourceOperators = true;
+                }
+                break;
+            }
+        }
+        if (!FilterAlreadyPresent)
+        {
+            filterInfo->allSourceFilters.emplace_back (command.source_id, command.source_handle,
+                                                       command.info ().type, command.info ().type_out);
+            filterInfo->hasSourceFilter = true;
+            if (command.flag)
+            {
+                filterInfo->allSourceFilters.back ().hasOperator_flag = true;
+                filterInfo->hasSourceOperators = true;
+            }
+        }
+    }
+    break;
     case CMD_SRC_FILTER_HAS_OPERATOR:
         for (auto &filt : filterInfo->allSourceFilters)
         {
@@ -2093,73 +2091,70 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
     }
 }
 
-void CommonCore::processMessageFilter(ActionMessage &cmd)
+void CommonCore::processMessageFilter (ActionMessage &cmd)
 {
-	if (cmd.dest_id == 0)
-	{
-		transmit(0, cmd);
-	}
-	else if (isLocal(cmd.dest_id))
-	{
-		auto fed = getFederate(cmd.dest_id);
-		if (fed != nullptr)
-		{
-			// deal with local source filters
-			
-			auto FiltI = fed->getFilter(cmd.dest_handle);
-			if (FiltI->filterOp != nullptr)
-			{
-				auto tempMessage = createMessage(std::move(cmd));
-				bool returnToSender = (cmd.action() == CMD_SEND_FOR_FILTER_OPERATION);
-				tempMessage = FiltI->filterOp->process(std::move(tempMessage));
-				cmd = ActionMessage(std::move(tempMessage));
-				
-				if (!returnToSender)
-				{
-					cmd.setAction(CMD_SEND_MESSAGE);
-					cmd.dest_id = 0;
-					cmd.dest_handle = 0;
-					queueMessage(cmd);
-				}
-				else
-				{
-					//TODO:: deal with multiple filters correctly (need to return to sender)
-					cmd.setAction(CMD_SEND_MESSAGE);
-					cmd.dest_id = 0;
-					cmd.dest_handle = 0;
-					queueMessage(cmd);
-				}
-				
-			}
-			else
-			{
-				fed->addAction(cmd);
-			}
-			
-		}
-		else
-		{
-			//this is a on condition (not sure what to do yet)
-		/*	m.dest_id = filtFunc->sourceOperators[ii].fed_id;
-			m.dest_handle = filtFunc->sourceOperators[ii].handle;
-			if ((ii < static_cast<int> (filtFunc->sourceOperators.size() - 1)) ||
-				(filtFunc->finalSourceFilter.fed_id != invalid_fed_id))
-			{
-				m.setAction(CMD_SEND_FOR_FILTER_OPERATION);
-			}
-			else
-			{
-				m.setAction(CMD_SEND_FOR_FILTER);
-			}
-			return m;
-			*/
-		}
-		
-	}
-	else
-	{
-		auto route = getRoute(cmd.dest_id);
-		transmit(route, cmd);
-	}
+    if (cmd.dest_id == 0)
+    {
+        transmit (0, cmd);
+    }
+    else if (isLocal (cmd.dest_id))
+    {
+        auto fed = getFederate (cmd.dest_id);
+        if (fed != nullptr)
+        {
+            // deal with local source filters
+
+            auto FiltI = fed->getFilter (cmd.dest_handle);
+            if (FiltI->filterOp != nullptr)
+            {
+                auto tempMessage = createMessage (std::move (cmd));
+                bool returnToSender = (cmd.action () == CMD_SEND_FOR_FILTER_OPERATION);
+                tempMessage = FiltI->filterOp->process (std::move (tempMessage));
+                cmd = ActionMessage (std::move (tempMessage));
+
+                if (!returnToSender)
+                {
+                    cmd.setAction (CMD_SEND_MESSAGE);
+                    cmd.dest_id = 0;
+                    cmd.dest_handle = 0;
+                    queueMessage (cmd);
+                }
+                else
+                {
+                    // TODO:: deal with multiple filters correctly (need to return to sender)
+                    cmd.setAction (CMD_SEND_MESSAGE);
+                    cmd.dest_id = 0;
+                    cmd.dest_handle = 0;
+                    queueMessage (cmd);
+                }
+            }
+            else
+            {
+                fed->addAction (cmd);
+            }
+        }
+        else
+        {
+            // this is a on condition (not sure what to do yet)
+            /*	m.dest_id = filtFunc->sourceOperators[ii].fed_id;
+                m.dest_handle = filtFunc->sourceOperators[ii].handle;
+                if ((ii < static_cast<int> (filtFunc->sourceOperators.size() - 1)) ||
+                    (filtFunc->finalSourceFilter.fed_id != invalid_fed_id))
+                {
+                    m.setAction(CMD_SEND_FOR_FILTER_OPERATION);
+                }
+                else
+                {
+                    m.setAction(CMD_SEND_FOR_FILTER);
+                }
+                return m;
+                */
+        }
+    }
+    else
+    {
+        auto route = getRoute (cmd.dest_id);
+        transmit (route, cmd);
+    }
 }
 }  // namespace helics

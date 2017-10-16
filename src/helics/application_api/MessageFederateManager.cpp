@@ -334,4 +334,4 @@ void MessageFederateManager::removeOrderedMessage (unsigned int index)
         }
     }
 }
-} //namespace helics
+}  // namespace helics

@@ -39,7 +39,7 @@ ValueFederate::ValueFederate (const std::string &file) : Federate (file)
     vfManager = std::make_unique<ValueFederateManager> (coreObject, getID ());
 }
 
-ValueFederate::ValueFederate() = default;
+ValueFederate::ValueFederate () = default;
 
 ValueFederate::ValueFederate (bool /*res*/)
 {
@@ -145,7 +145,7 @@ void ValueFederate::registerInterfaces (const std::string &jsonString)
     if (doc.isMember ("publications"))
     {
         auto pubs = doc["publications"];
-		for (const auto &pub:pubs)
+        for (const auto &pub : pubs)
         {
             auto name = pub["name"].asString ();
             auto type = (pub.isMember ("type")) ? pub["type"].asString () : "";
@@ -164,7 +164,7 @@ void ValueFederate::registerInterfaces (const std::string &jsonString)
     if (doc.isMember ("subscriptions"))
     {
         auto subs = doc["subscriptions"];
-		for (const auto &sub:subs)
+        for (const auto &sub : subs)
         {
             auto name = sub["name"].asString ();
             auto units = (sub.isMember ("units")) ? sub["units"].asString () : "";
@@ -306,4 +306,4 @@ void ValueFederate::registerSubscriptionNotificationCallback (
 {
     vfManager->registerCallback (ids, callback);
 }
-} //namespace helics
+}  // namespace helics

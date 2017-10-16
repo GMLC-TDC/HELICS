@@ -16,11 +16,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test out the value converters
  */
 
-
 BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
 
 /** just a check that in the simple case we do actually get the time back we requested*/
-//BOOST_AUTO_TEST_CASE (execution_iteration_test)
+// BOOST_AUTO_TEST_CASE (execution_iteration_test)
 //{
 //    Setup1FederateTest ("test");
 //    // register the publications
@@ -46,7 +45,7 @@ BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
 //    BOOST_CHECK_EQUAL (val2, val);
 //}
 //
-//BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
+// BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 //{
 //    Setup2FederateTest ("test");
 //    // register the publications
@@ -77,7 +76,7 @@ BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
 //}
 //
 ///** just a check that in the simple case we do actually get the time back we requested*/
-//BOOST_AUTO_TEST_CASE (time_iteration_test)
+// BOOST_AUTO_TEST_CASE (time_iteration_test)
 //{
 //    Setup1FederateTest ("test");
 //    // register the publications
@@ -105,7 +104,7 @@ BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
 //    BOOST_CHECK_EQUAL (val2, val);
 //}
 //
-//BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
+// BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
 //{
 //    Setup2FederateTest ("test");
 //    // register the publications

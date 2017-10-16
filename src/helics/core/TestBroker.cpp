@@ -24,12 +24,12 @@ TestBroker::TestBroker (const std::string &broker_name) : CoreBroker (broker_nam
 
 TestBroker::TestBroker (std::shared_ptr<TestBroker> nbroker) : tbroker (std::move (nbroker)) {}
 
-TestBroker::~TestBroker()
+TestBroker::~TestBroker ()
 {
-	haltOperations = true;
-	joinAllThreads();
-	//lock to ensure all the data is synchronized before deletion
-	std::lock_guard<std::mutex> lock(routeMutex);
+    haltOperations = true;
+    joinAllThreads ();
+    // lock to ensure all the data is synchronized before deletion
+    std::lock_guard<std::mutex> lock (routeMutex);
 }
 using namespace std::string_literals;
 static const argDescriptors extraArgs{{"brokername"s, "string"s, "identifier for the broker-same as broker"s},
@@ -65,7 +65,7 @@ void TestBroker::InitializeFromArgs (int argc, char *argv[])
 
 bool TestBroker::brokerConnect ()
 {
-	std::lock_guard<std::mutex> lock(routeMutex);
+    std::lock_guard<std::mutex> lock (routeMutex);
     if (!tbroker)
     {
         if (isRoot ())
@@ -90,23 +90,24 @@ bool TestBroker::brokerConnect ()
     return static_cast<bool> (tbroker);
 }
 
-void TestBroker::brokerDisconnect () { 
-	brokerState = broker_state_t::terminating;
-	std::lock_guard<std::mutex> lock(routeMutex);
-	tbroker = nullptr; 
+void TestBroker::brokerDisconnect ()
+{
+    brokerState = broker_state_t::terminating;
+    std::lock_guard<std::mutex> lock (routeMutex);
+    tbroker = nullptr;
 }
 
 void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
 {
-	// only activate the lock if we not in an operating state
-	std::unique_lock<std::mutex>lock(routeMutex);
+    // only activate the lock if we not in an operating state
+    std::unique_lock<std::mutex> lock (routeMutex);
 
     if ((tbroker) && (route_id == 0))
     {
         tbroker->addActionMessage (cmd);
         return;
     }
-   
+
     auto brkfnd = brokerRoutes.find (route_id);
     if (brkfnd != brokerRoutes.end ())
     {
@@ -120,7 +121,7 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
         return;
     }
 
-    if ((!isRoot ())&&(tbroker))
+    if ((!isRoot ()) && (tbroker))
     {
         tbroker->addActionMessage (cmd);
     }

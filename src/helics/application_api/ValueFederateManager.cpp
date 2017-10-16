@@ -353,4 +353,4 @@ void ValueFederateManager::registerCallback (const std::vector<subscription_id_t
         }
     }
 }
-} //namespace helics
+}  // namespace helics

@@ -20,11 +20,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <mutex>
 #include <vector>
 
-int helicsValueFederateisUpdated(helics_value_federate vfed,helics_subscription sub)
+int helicsValueFederateisUpdated (helics_value_federate vfed, helics_subscription sub)
 {
-  helics::SubscriptionObject *subobj=reinterpret_cast<helics::SubscriptionObject*>(sub);
-  helics::ValueFederate *valuefed = reinterpret_cast<helics::ValueFederate*>(vfed);
-  return (int)(valuefed->isUpdated(subobj->id));
+    helics::SubscriptionObject *subobj = reinterpret_cast<helics::SubscriptionObject *> (sub);
+    helics::ValueFederate *valuefed = reinterpret_cast<helics::ValueFederate *> (vfed);
+    return (int)(valuefed->isUpdated (subobj->id));
 }
 
 /* sub/pub registration */
@@ -58,7 +58,7 @@ helicsRegisterSubscription (helics_value_federate fed, const char *name, const c
     return nullptr;
 }
 helics_subscription
-helicsRegisterTypeSubscription (helics_value_federate fed,  const char *name,int type, const char *units)
+helicsRegisterTypeSubscription (helics_value_federate fed, const char *name, int type, const char *units)
 {
     if ((type < 0) || (type > HELICS_VECTOR_TYPE))
     {
@@ -138,9 +138,8 @@ helicsRegisterTypePublication (helics_value_federate fed, const char *name, int 
     try
     {
         pub = new helics::PublicationObject ();
-        pub->pubptr =
-          std::make_unique<helics::Publication> (fedObj.get (), name, static_cast<helics::helicsType_t> (type),
-                                                 units);
+        pub->pubptr = std::make_unique<helics::Publication> (fedObj.get (), name,
+                                                             static_cast<helics::helicsType_t> (type), units);
         pub->fedptr = std::move (fedObj);
         return reinterpret_cast<helics_publication> (pub);
     }
@@ -201,9 +200,8 @@ helicsRegisterGlobalTypePublication (helics_value_federate fed, const char *name
     try
     {
         pub = new helics::PublicationObject ();
-        pub->pubptr =
-          std::make_unique<helics::Publication> (helics::GLOBAL, fedObj.get (), name,
-                                                 static_cast<helics::helicsType_t> (type), units);
+        pub->pubptr = std::make_unique<helics::Publication> (helics::GLOBAL, fedObj.get (), name,
+                                                             static_cast<helics::helicsType_t> (type), units);
         pub->fedptr = std::move (fedObj);
         return reinterpret_cast<helics_publication> (pub);
     }
@@ -563,17 +561,17 @@ helicsStatus helicsGetPublicationType (helics_publication pub, char *str, int ma
         return helicsError;
     }
     auto pubObj = reinterpret_cast<helics::PublicationObject *> (pub);
-	auto type = pubObj->pubptr->getType();
-	if (static_cast<int> (type.size()) > maxlen)
-	{
-		strncpy(str, type.c_str(), maxlen);
-		str[maxlen - 1] = 0;
-	}
-	else
-	{
-		strcpy(str, type.c_str());
-	}
-	return helicsOK;
+    auto type = pubObj->pubptr->getType ();
+    if (static_cast<int> (type.size ()) > maxlen)
+    {
+        strncpy (str, type.c_str (), maxlen);
+        str[maxlen - 1] = 0;
+    }
+    else
+    {
+        strcpy (str, type.c_str ());
+    }
+    return helicsOK;
 }
 
 helicsStatus helicsGetSubscriptionKey (helics_subscription sub, char *str, int maxlen)
@@ -603,17 +601,17 @@ helicsStatus helicsGetPublicationKey (helics_publication pub, char *str, int max
         return helicsError;
     }
     auto pubObj = reinterpret_cast<helics::PublicationObject *> (pub);
-	auto type = pubObj->pubptr->getKey();
-	if (static_cast<int> (type.size()) > maxlen)
-	{
-		strncpy(str, type.c_str(), maxlen);
-		str[maxlen - 1] = 0;
-	}
-	else
-	{
-		strcpy(str, type.c_str());
-	}
-	return helicsOK;
+    auto type = pubObj->pubptr->getKey ();
+    if (static_cast<int> (type.size ()) > maxlen)
+    {
+        strncpy (str, type.c_str (), maxlen);
+        str[maxlen - 1] = 0;
+    }
+    else
+    {
+        strcpy (str, type.c_str ());
+    }
+    return helicsOK;
 }
 
 helicsStatus helicsGetSubscriptionUnits (helics_subscription sub, char *str, int maxlen)
@@ -643,39 +641,39 @@ helicsStatus helicsGetPublicationUnits (helics_publication pub, char *str, int m
         return helicsError;
     }
     auto pubObj = reinterpret_cast<helics::PublicationObject *> (pub);
-	auto type = pubObj->pubptr->getUnits();
-	if (static_cast<int> (type.size()) > maxlen)
-	{
-		strncpy(str, type.c_str(), maxlen);
-		str[maxlen - 1] = 0;
-	}
-	else
-	{
-		strcpy(str, type.c_str());
-	}
-	return helicsOK;
+    auto type = pubObj->pubptr->getUnits ();
+    if (static_cast<int> (type.size ()) > maxlen)
+    {
+        strncpy (str, type.c_str (), maxlen);
+        str[maxlen - 1] = 0;
+    }
+    else
+    {
+        strcpy (str, type.c_str ());
+    }
+    return helicsOK;
 }
 
-int helicsIsValueUpdated(helics_subscription sub)
+int helicsIsValueUpdated (helics_subscription sub)
 {
-	if (sub == nullptr)
-	{
-		return helicsError;
-	}
-	auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
-	auto val = subObj->subptr->isUpdated();
-	return (val) ? 1 : 0;
- }
+    if (sub == nullptr)
+    {
+        return helicsError;
+    }
+    auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
+    auto val = subObj->subptr->isUpdated ();
+    return (val) ? 1 : 0;
+}
 
-helics_time_t helicsGetLastUpdateTime(helics_subscription sub)
+helics_time_t helicsGetLastUpdateTime (helics_subscription sub)
 {
-	if (sub == nullptr)
-	{
-		return helicsError;
-	}
-	auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
-	auto time = subObj->subptr->getLastUpdate();
-	return time.getBaseTimeCode();
+    if (sub == nullptr)
+    {
+        return helicsError;
+    }
+    auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
+    auto time = subObj->subptr->getLastUpdate ();
+    return time.getBaseTimeCode ();
 }
 
 void helicsClosePublication (helics_publication pub)

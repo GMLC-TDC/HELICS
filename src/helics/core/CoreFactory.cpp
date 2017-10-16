@@ -21,8 +21,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #endif
 
 #include "TestCore.h"
-#include "ipc/IpcCore.h"
 #include "common/delayedDestructor.hpp"
+#include "ipc/IpcCore.h"
 #include <cassert>
 
 namespace helics
@@ -134,7 +134,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         break;
     }
     case core_type::INTERPROCESS:
-	case core_type::IPC:
+    case core_type::IPC:
         if (name.empty ())
         {
             core = std::make_shared<IpcCore> ();
@@ -274,11 +274,11 @@ bool isAvailable (core_type type)
         available = true;
         break;
     case core_type::INTERPROCESS:
-	case core_type::IPC:
+    case core_type::IPC:
         available = true;
-		break;
-	case core_type::TCP:
-	case core_type::UDP:
+        break;
+    case core_type::TCP:
+    case core_type::UDP:
         break;
     default:
         assert (false);
@@ -298,7 +298,6 @@ what we do is delay the destruction until it is called in a different thread whi
 need be
 without issue*/
 static DelayedDestructor<CommonCore> delayedDestroyer;  //!< the object handling the delayed destruction
-
 
 std::shared_ptr<CommonCore> findCore (const std::string &name)
 {
@@ -366,17 +365,13 @@ std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
 
 bool registerCommonCore (std::shared_ptr<CommonCore> tcore)
 {
-	cleanUpCores();
-	std::lock_guard<std::mutex> lock(mapLock);
+    cleanUpCores ();
+    std::lock_guard<std::mutex> lock (mapLock);
     auto res = CoreMap.emplace (tcore->getIdentifier (), std::move (tcore));
     return res.second;
 }
 
-void cleanUpCores ()
-{
-	delayedDestroyer.destroyObjects();
-    
-}
+void cleanUpCores () { delayedDestroyer.destroyObjects (); }
 
 void copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {
@@ -403,7 +398,7 @@ void unregisterCore (const std::string &name)
     {
         if (core->second->getIdentifier () == name)
         {
-			delayedDestroyer.addObjectsToBeDestroyed(std::move (core->second));
+            delayedDestroyer.addObjectsToBeDestroyed (std::move (core->second));
             CoreMap.erase (core);
             return;
         }

@@ -232,7 +232,7 @@ void ZmqComms::queue_rx_function ()
             }
             else if (M.index == DISCONNECT)
             {
-				disconnecting = true;
+                disconnecting = true;
                 rx_status = connection_status::terminated;
                 return;
             }
@@ -245,7 +245,7 @@ void ZmqComms::queue_rx_function ()
     }
     catch (const zmq::error_t &ze)
     {
-		disconnecting = true;
+        disconnecting = true;
         std::cerr << ze.what () << '\n';
         rx_status = connection_status::error;
         return;
@@ -295,7 +295,7 @@ void ZmqComms::queue_rx_function ()
             }
         }
     }
-	disconnecting = true;
+    disconnecting = true;
     rx_status = connection_status::terminated;
 }
 
@@ -343,7 +343,6 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 }
                 else if (rc == 0)
                 {
-
                     std::cerr << "broker connection timed out\n";
                     tx_status = connection_status::error;
                     return (-1);
@@ -642,7 +641,7 @@ void ZmqComms::closeReceiver ()
         transmit (-1, cmd);
     }
     else if (!disconnecting)
-	{
+    {
         // try connecting with the receivers push socket
         auto ctx = zmqContextManager::getContextPointer ();
         zmq::socket_t pushSocket (ctx->getContext (), ZMQ_PUSH);

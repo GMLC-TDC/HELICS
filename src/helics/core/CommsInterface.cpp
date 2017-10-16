@@ -123,14 +123,14 @@ void CommsInterface::disconnect ()
     {
         closeTransmitter ();
     }
-	while (rx_status != connection_status::terminated)
-	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
-	}
-	while (tx_status != connection_status::terminated)
-	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
-	}
+    while (rx_status != connection_status::terminated)
+    {
+        std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    }
+    while (tx_status != connection_status::terminated)
+    {
+        std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    }
 }
 
 void CommsInterface::setCallback (std::function<void(ActionMessage &&)> callback)

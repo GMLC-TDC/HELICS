@@ -34,7 +34,8 @@ HELICS_Export helicsStatus helicsSendMessageRaw (helics_endpoint endpoint,
                                                  const char *data,
                                                  int len);
 
-HELICS_Export helicsStatus helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time);
+HELICS_Export helicsStatus
+helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time);
 
 HELICS_Export helicsStatus helicsSendMessage (helics_endpoint endpoint, message_t *message);
 
@@ -63,12 +64,11 @@ all messages for the first endpoint, then all for the second, and so on
 @return a unique_ptr to a Message object containing the message data*/
 HELICS_Export message_t helicsFederateGetMessage (helics_message_federate fed);
 
+HELICS_Export helicsStatus helicsGetEndpointType (helics_endpoint endpoint, char *str, int maxlen);
 
-HELICS_Export helicsStatus helicsGetEndpointType(helics_endpoint endpoint, char *str, int maxlen);
+HELICS_Export helicsStatus helicsGetEndpointName (helics_endpoint endpoint, char *str, int maxlen);
 
-HELICS_Export helicsStatus helicsGetEndpointName(helics_endpoint endpoint, char *str, int maxlen);
-
-HELICS_Export void helicsFreeEndpoint(helics_endpoint endpoint);
+HELICS_Export void helicsFreeEndpoint (helics_endpoint endpoint);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

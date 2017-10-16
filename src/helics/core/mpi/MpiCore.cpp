@@ -43,10 +43,10 @@ MpiCore::MpiCore () noexcept {}
 
 MpiCore::MpiCore (const std::string &core_name) : CommonCore (core_name) {}
 
-MpiCore::~MpiCore()
+MpiCore::~MpiCore ()
 {
-	haltOperations = true;
-	joinAllThreads();
+    haltOperations = true;
+    joinAllThreads ();
 }
 
 void MpiCore::InitializeFromArgs (int argc, char *argv[])

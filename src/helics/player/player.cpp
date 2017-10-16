@@ -340,7 +340,7 @@ void argumentParser (int argc, char *argv[], po::variables_map &vm_map)
 
     if (cmd_vm.count ("version") > 0)
     {
-		std::cout << helics::getHelicsVersionString() << '\n';
+        std::cout << helics::getHelicsVersionString () << '\n';
         return;
     }
 

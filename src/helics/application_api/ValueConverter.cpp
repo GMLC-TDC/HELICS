@@ -25,4 +25,4 @@ template class ValueConverter<int32_t>;
 template class ValueConverter<std::vector<double>>;
 template class ValueConverter<std::vector<std::string>>;
 template class ValueConverter<std::vector<std::complex<double>>>;
-} //namespace helics
+}  // namespace helics

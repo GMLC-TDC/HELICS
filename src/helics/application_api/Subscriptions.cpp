@@ -345,4 +345,4 @@ void valueExtract (const data_view &dv, helicsType_t baseType, std::complex<doub
         break;
     }
 }
-} //namespace helics
+}  // namespace helics

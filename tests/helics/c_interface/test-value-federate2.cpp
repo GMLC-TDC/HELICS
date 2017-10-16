@@ -22,10 +22,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (value_federate_tests2, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
+const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2"};
 
 /** test block send and receive*/
-//BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_type)
 //{
 //    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
 //    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -49,7 +49,7 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //}
 //
 ///** test the all callback*/
-//BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types), core_type)
 //{
 //    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1, 1.0);
 //    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -66,7 +66,8 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //    helics::data_block db (547, ';');
 //    helics::subscription_id_t lastId;
 //    helics::Time lastTime;
-//    vFed1->registerSubscriptionNotificationCallback ([&](helics::subscription_id_t subid, helics::Time callTime) {
+//    vFed1->registerSubscriptionNotificationCallback ([&](helics::subscription_id_t subid, helics::Time callTime)
+//    {
 //        lastTime = callTime;
 //        lastId = subid;
 //    });
@@ -107,7 +108,7 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //}
 //
 ///** test the callback specification with a vector list*/
-//BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types), core_type)
 //{
 //    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1, 1.0);
 //    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -149,7 +150,7 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //}
 //
 ///** test the publish/subscribe to a vectorized array*/
-//BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types), core_type)
 //{
 //    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
 //    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -178,7 +179,7 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //}
 //
 ///** test the publish/subscribe to a vectorized array*/
-//BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
+// BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
 //{
 //    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 2);
 //    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -236,7 +237,7 @@ const std::string core_types[] = {"test","test_2","ipc","ipc_2","zmq","zmq_2"};
 //}
 //
 ///** test the default constructor and move constructor and move assignment*/
-//BOOST_AUTO_TEST_CASE (test_move_calls)
+// BOOST_AUTO_TEST_CASE (test_move_calls)
 //{
 //    helics::ValueFederate vFed;
 //

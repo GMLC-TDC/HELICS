@@ -44,12 +44,11 @@ IpcBroker::IpcBroker (bool rootBroker) noexcept : CoreBroker (rootBroker) {}
 
 IpcBroker::IpcBroker (const std::string &broker_name) : CoreBroker (broker_name) {}
 
-IpcBroker::~IpcBroker()
+IpcBroker::~IpcBroker ()
 {
-	haltOperations = true;
-	comms = nullptr; //need to ensure the comms are deleted before the callbacks become invalid
-	joinAllThreads();
-
+    haltOperations = true;
+    comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
+    joinAllThreads ();
 }
 
 void IpcBroker::InitializeFromArgs (int argc, char *argv[])
@@ -85,7 +84,7 @@ void IpcBroker::InitializeFromArgs (int argc, char *argv[])
 
 bool IpcBroker::brokerConnect ()
 {
-	std::lock_guard<std::mutex> lock(dataMutex);  //mutex protecting the other information in the ipcBroker
+    std::lock_guard<std::mutex> lock (dataMutex);  // mutex protecting the other information in the ipcBroker
     if (fileloc.empty ())
     {
         fileloc = getIdentifier () + "_queue.hqf";
@@ -105,9 +104,10 @@ bool IpcBroker::brokerConnect ()
     return comms->connect ();
 }
 
-void IpcBroker::brokerDisconnect () {
-	std::lock_guard<std::mutex> lock(dataMutex); 
-	comms->disconnect (); 
+void IpcBroker::brokerDisconnect ()
+{
+    std::lock_guard<std::mutex> lock (dataMutex);
+    comms->disconnect ();
 }
 
 void IpcBroker::transmit (int route_id, const ActionMessage &cmd) { comms->transmit (route_id, cmd); }

@@ -14,10 +14,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #pragma once
 
 #include <algorithm>
+#include <atomic>
 #include <mutex>
 #include <type_traits>
 #include <vector>
-#include <atomic>
 
 #include <helics_includes/optional.h>
 
@@ -33,18 +33,19 @@ class simpleQueue
     mutable std::mutex m_pullLock;  //!< lock for elements on the pullLock vector
     std::vector<X> pushElements;  //!< vector of elements being added
     std::vector<X> pullElements;  //!< vector of elements waiting extraction
-	std::atomic<bool> queueEmptyFlag{ true };  //!< flag indicating the queue is Empty
+    std::atomic<bool> queueEmptyFlag{true};  //!< flag indicating the queue is Empty
   public:
     /** default constructor */
     simpleQueue () = default;
-	~simpleQueue()
-		{
-		//these locks are primarily for memory synchronization multiple access in the destructor would be a bad thing 
-			std::lock_guard<std::mutex> pullLock(m_pullLock);  // first pullLock
-			std::lock_guard<std::mutex> pushLock(m_pushLock);  // second pushLock
-			pushElements.clear();
-			pullElements.clear();
-		}
+    ~simpleQueue ()
+    {
+        // these locks are primarily for memory synchronization multiple access in the destructor would be a bad
+        // thing
+        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
+        std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
+        pushElements.clear ();
+        pullElements.clear ();
+    }
     /** constructor with a reservation size
     @param[in] capacity  the initial storage capacity of the queue*/
     simpleQueue (size_t capacity)
@@ -56,7 +57,7 @@ class simpleQueue
     simpleQueue (simpleQueue &&sq) noexcept
         : pushElements (std::move (sq.pushElements)), pullElements (std::move (sq.pullElements))
     {
-		queueEmptyFlag = pullElements.empty();
+        queueEmptyFlag = pullElements.empty ();
     }
 
     /** enable the move assignment not the copy assignment*/
@@ -66,12 +67,12 @@ class simpleQueue
         std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
         pushElements = std::move (sq.pushElements);
         pullElements = std::move (sq.pullElements);
-		queueEmptyFlag = pullElements.empty();
+        queueEmptyFlag = pullElements.empty ();
         return *this;
     }
-	/** DISABLE_COPY_AND_ASSIGN */
-	simpleQueue(const simpleQueue &) = delete;
-	simpleQueue &operator= (const simpleQueue &) = delete;
+    /** DISABLE_COPY_AND_ASSIGN */
+    simpleQueue (const simpleQueue &) = delete;
+    simpleQueue &operator= (const simpleQueue &) = delete;
 
     // const functions should be thread safe
     /** check whether there are any elements in the queue
@@ -97,7 +98,7 @@ class simpleQueue
         std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
         pullElements.clear ();
         pushElements.clear ();
-		queueEmptyFlag = true;
+        queueEmptyFlag = true;
     }
     /** set the capacity of the queue
     actually double the requested the size will be reserved due to the use of two vectors internally
@@ -117,36 +118,36 @@ class simpleQueue
     template <class Z>
     void push (Z &&val)  // forwarding reference
     {
-		std::unique_lock<std::mutex> pushLock(m_pushLock);  // only one lock on this branch
-		if (!pushElements.empty())
-		{
-			pushElements.push_back(std::forward<Z>(val));
-		}
-		else
-		{
-			bool expEmpty = true;
-			if (queueEmptyFlag.compare_exchange_strong(expEmpty, false))
-			{
-				// release the push lock
-				pushLock.unlock();
-				std::unique_lock<std::mutex> pullLock(m_pullLock);  // first pullLock
-				queueEmptyFlag = false;
-				if (pullElements.empty())
-				{
-					pullElements.push_back(std::forward<Z>(val));
-					pullLock.unlock();
-				}
-				else
-				{
-					pushLock.lock();
-					pushElements.push_back(std::forward<Z>(val));
-				}
-			}
-			else
-			{
-				pushElements.push_back(std::forward<Z>(val));
-			}
-		}
+        std::unique_lock<std::mutex> pushLock (m_pushLock);  // only one lock on this branch
+        if (!pushElements.empty ())
+        {
+            pushElements.push_back (std::forward<Z> (val));
+        }
+        else
+        {
+            bool expEmpty = true;
+            if (queueEmptyFlag.compare_exchange_strong (expEmpty, false))
+            {
+                // release the push lock
+                pushLock.unlock ();
+                std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
+                queueEmptyFlag = false;
+                if (pullElements.empty ())
+                {
+                    pullElements.push_back (std::forward<Z> (val));
+                    pullLock.unlock ();
+                }
+                else
+                {
+                    pushLock.lock ();
+                    pushElements.push_back (std::forward<Z> (val));
+                }
+            }
+            else
+            {
+                pushElements.push_back (std::forward<Z> (val));
+            }
+        }
     }
     /** push an element onto the queue
     val the value to push on the queue
@@ -154,36 +155,36 @@ class simpleQueue
     template <class... Args>
     void emplace (Args &&... args)
     {
-		std::unique_lock<std::mutex> pushLock(m_pushLock);  // only one lock on this branch
-		if (!pushElements.empty())
-		{
-			pushElements.emplace_back(std::forward<Args>(args)...);
-		}
-		else
-		{
-			bool expEmpty = true;
-			if (queueEmptyFlag.compare_exchange_strong(expEmpty, false))
-			{
-				// release the push lock
-				pushLock.unlock();
-				std::unique_lock<std::mutex> pullLock(m_pullLock);  // first pullLock
-				queueEmptyFlag = false;
-				if (pullElements.empty())
-				{
-					pullElements.emplace_back(std::forward<Args>(args)...);
-					pullLock.unlock();
-				}
-				else
-				{
-					pushLock.lock();
-					pushElements.emplace_back(std::forward<Args>(args)...);
-				}
-			}
-			else
-			{
-				pushElements.emplace_back(std::forward<Args>(args)...);
-			}
-		}
+        std::unique_lock<std::mutex> pushLock (m_pushLock);  // only one lock on this branch
+        if (!pushElements.empty ())
+        {
+            pushElements.emplace_back (std::forward<Args> (args)...);
+        }
+        else
+        {
+            bool expEmpty = true;
+            if (queueEmptyFlag.compare_exchange_strong (expEmpty, false))
+            {
+                // release the push lock
+                pushLock.unlock ();
+                std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
+                queueEmptyFlag = false;
+                if (pullElements.empty ())
+                {
+                    pullElements.emplace_back (std::forward<Args> (args)...);
+                    pullLock.unlock ();
+                }
+                else
+                {
+                    pushLock.lock ();
+                    pushElements.emplace_back (std::forward<Args> (args)...);
+                }
+            }
+            else
+            {
+                pushElements.emplace_back (std::forward<Args> (args)...);
+            }
+        }
     }
     /*make sure there is no path to lock the push first then the pull second
     as that would be a race condition
@@ -195,75 +196,75 @@ class simpleQueue
     */
     stx::optional<X> pop ()
     {
-		std::lock_guard<std::mutex> pullLock(m_pullLock);  // first pullLock
-		if (pullElements.empty())
-		{
-			std::unique_lock<std::mutex> pushLock(m_pushLock);  // second pushLock
-			if (!pushElements.empty())
-			{  // on the off chance the queue got out of sync
-				std::swap(pushElements, pullElements);
-				pushLock.unlock();  // we can free the push function to accept more elements after the swap call;
-				std::reverse(pullElements.begin(), pullElements.end());
-				stx::optional<X> val(
-					std::move(pullElements.back()));  // do it this way to allow moveable only types
-				pullElements.pop_back();
-				if (pullElements.empty())
-				{
-					pushLock.lock();  // second pushLock
-					if (!pushElements.empty())  // more elements could have been added
-					{  // this is the potential for slow operations
-						std::swap(pushElements, pullElements);
-						// we can free the push function to accept more elements after the swap call;
-						pushLock.unlock();
-						std::reverse(pullElements.begin(), pullElements.end());
-					}
-					else
-					{
-						queueEmptyFlag = true;
-					}
-				}
-				return val;
-			}
-			queueEmptyFlag = true;
-			return {};  // return the empty optional
-		}
-		stx::optional<X> val(std::move(pullElements.back()));  // do it this way to allow moveable only types
-		pullElements.pop_back();
-		if (pullElements.empty())
-		{
-			std::unique_lock<std::mutex> pushLock(m_pushLock);  // second pushLock
-			if (!pushElements.empty())
-			{  // this is the potential for slow operations
-				std::swap(pushElements, pullElements);
-				// we can free the push function to accept more elements after the swap call;
-				pushLock.unlock();
-				std::reverse(pullElements.begin(), pullElements.end());
-			}
-			else
-			{
-				queueEmptyFlag = true;
-			}
-		}
-		return val;
+        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
+        if (pullElements.empty ())
+        {
+            std::unique_lock<std::mutex> pushLock (m_pushLock);  // second pushLock
+            if (!pushElements.empty ())
+            {  // on the off chance the queue got out of sync
+                std::swap (pushElements, pullElements);
+                pushLock.unlock ();  // we can free the push function to accept more elements after the swap call;
+                std::reverse (pullElements.begin (), pullElements.end ());
+                stx::optional<X> val (
+                  std::move (pullElements.back ()));  // do it this way to allow moveable only types
+                pullElements.pop_back ();
+                if (pullElements.empty ())
+                {
+                    pushLock.lock ();  // second pushLock
+                    if (!pushElements.empty ())  // more elements could have been added
+                    {  // this is the potential for slow operations
+                        std::swap (pushElements, pullElements);
+                        // we can free the push function to accept more elements after the swap call;
+                        pushLock.unlock ();
+                        std::reverse (pullElements.begin (), pullElements.end ());
+                    }
+                    else
+                    {
+                        queueEmptyFlag = true;
+                    }
+                }
+                return val;
+            }
+            queueEmptyFlag = true;
+            return {};  // return the empty optional
+        }
+        stx::optional<X> val (std::move (pullElements.back ()));  // do it this way to allow moveable only types
+        pullElements.pop_back ();
+        if (pullElements.empty ())
+        {
+            std::unique_lock<std::mutex> pushLock (m_pushLock);  // second pushLock
+            if (!pushElements.empty ())
+            {  // this is the potential for slow operations
+                std::swap (pushElements, pullElements);
+                // we can free the push function to accept more elements after the swap call;
+                pushLock.unlock ();
+                std::reverse (pullElements.begin (), pullElements.end ());
+            }
+            else
+            {
+                queueEmptyFlag = true;
+            }
+        }
+        return val;
     }
 
-	/** try to peek at an object without popping it from the stack
-	@details only available for copy assignable objects
-	@return an optional object with an object of type T if available
-	*/
-	template <typename = std::enable_if<std::is_copy_assignable<X>::value>>
-	stx::optional<X> peek() const
-	{
-		std::lock_guard<std::mutex> lock(m_pullLock);
+    /** try to peek at an object without popping it from the stack
+    @details only available for copy assignable objects
+    @return an optional object with an object of type T if available
+    */
+    template <typename = std::enable_if<std::is_copy_assignable<X>::value>>
+    stx::optional<X> peek () const
+    {
+        std::lock_guard<std::mutex> lock (m_pullLock);
 
-		if (pullElements.empty())
-		{
-			return {};
-		}
+        if (pullElements.empty ())
+        {
+            return {};
+        }
 
-		auto t = pullElements.back();
-		return t;
-	}
+        auto t = pullElements.back ();
+        return t;
+    }
 };
 
 #endif

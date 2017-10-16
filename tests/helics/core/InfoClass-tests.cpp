@@ -61,7 +61,8 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
 
     // Source filter handle
     // destFilter should be false, and target should be equal to what was passed in for units
-    helics::BasicHandleInfo srcFiltHnd (1, 2, helics::HANDLE_SOURCE_FILTER, "key", "target","type_in", "type_out");
+    helics::BasicHandleInfo srcFiltHnd (1, 2, helics::HANDLE_SOURCE_FILTER, "key", "target", "type_in",
+                                        "type_out");
     BOOST_CHECK_EQUAL (srcFiltHnd.id, 1);
     BOOST_CHECK_EQUAL (srcFiltHnd.fed_id, 2);
     BOOST_CHECK_EQUAL (srcFiltHnd.local_fed_id, helics::invalid_fed_id);
@@ -81,8 +82,8 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     BOOST_CHECK_EQUAL (dstFiltHnd.local_fed_id, helics::invalid_fed_id);
     BOOST_CHECK_EQUAL (dstFiltHnd.what, helics::HANDLE_DEST_FILTER);
     BOOST_CHECK (dstFiltHnd.key.compare ("key") == 0);
-    BOOST_CHECK (dstFiltHnd.type_in.compare("type_in") == 0);
-    BOOST_CHECK (dstFiltHnd.type_out.compare("type_out") == 0);
+    BOOST_CHECK (dstFiltHnd.type_in.compare ("type_in") == 0);
+    BOOST_CHECK (dstFiltHnd.type_out.compare ("type_out") == 0);
     BOOST_CHECK (dstFiltHnd.target.compare ("target") == 0);
 }
 
@@ -93,7 +94,7 @@ BOOST_AUTO_TEST_CASE (endpointinfo_test)
     helics::Time maxT = helics::Time::maxVal ();
     helics::Time minT = helics::Time::minVal ();
     helics::Time zeroT = helics::Time::zeroVal ();
-	helics::Time eps = helics::Time::epsilon();
+    helics::Time eps = helics::Time::epsilon ();
 
     auto msg_time_max = std::make_unique<helics::Message> ();
     msg_time_max->data = "maxT";

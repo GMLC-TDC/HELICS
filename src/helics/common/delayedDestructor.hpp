@@ -12,37 +12,36 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define HELICS_DELAYED_DESTRUCTOR_HPP_
 #pragma once
 
+#include <memory>
 #include <mutex>
 #include <vector>
-#include <memory>
 
-/** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of threading issues*/
-template<class X>
+/** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
+ * threading issues*/
+template <class X>
 class DelayedDestructor
 {
-private:
-	std::vector<std::shared_ptr<X>> ElementsToBeDestroyed;
-	std::mutex destructionLock;
-public:
-	DelayedDestructor() = default;
-	~DelayedDestructor()
-	{
-		destroyObjects();
-	}
-	void destroyObjects()
-	{
-		std::lock_guard<std::mutex> lock(destructionLock);
-		ElementsToBeDestroyed.clear();
-	}
-	void addObjectsToBeDestroyed(std::shared_ptr<X> &&obj)
-	{
-		std::lock_guard<std::mutex> lock(destructionLock);
-		ElementsToBeDestroyed.push_back(std::move(obj));
-	}
-	void addObjectsToBeDestroyed(std::shared_ptr<X> &obj)
-	{
-		std::lock_guard<std::mutex> lock(destructionLock);
-		ElementsToBeDestroyed.push_back(obj);
-	}
+  private:
+    std::vector<std::shared_ptr<X>> ElementsToBeDestroyed;
+    std::mutex destructionLock;
+
+  public:
+    DelayedDestructor () = default;
+    ~DelayedDestructor () { destroyObjects (); }
+    void destroyObjects ()
+    {
+        std::lock_guard<std::mutex> lock (destructionLock);
+        ElementsToBeDestroyed.clear ();
+    }
+    void addObjectsToBeDestroyed (std::shared_ptr<X> &&obj)
+    {
+        std::lock_guard<std::mutex> lock (destructionLock);
+        ElementsToBeDestroyed.push_back (std::move (obj));
+    }
+    void addObjectsToBeDestroyed (std::shared_ptr<X> &obj)
+    {
+        std::lock_guard<std::mutex> lock (destructionLock);
+        ElementsToBeDestroyed.push_back (obj);
+    }
 };
-#endif // HELICS_DELAYED_DESTRUCTOR_HPP_
+#endif  // HELICS_DELAYED_DESTRUCTOR_HPP_

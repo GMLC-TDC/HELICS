@@ -82,25 +82,23 @@ bool TestCore::brokerConnect ()
 
 void TestCore::brokerDisconnect ()
 {
-	brokerState = broker_state_t::terminating;
+    brokerState = broker_state_t::terminating;
     std::lock_guard<std::mutex> lock (routeMutex);
     tbroker = nullptr;
 }
 
 TestCore::~TestCore ()
 {
-	haltOperations = true;
-	joinAllThreads();
+    haltOperations = true;
+    joinAllThreads ();
     // lock to ensure all the data is synchronized before deletion
     std::lock_guard<std::mutex> lock (routeMutex);
-
-
 }
 
 void TestCore::transmit (int route_id, const ActionMessage &cmd)
 {
     auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (routeMutex, std::defer_lock) :
-                                           std::unique_lock<std::mutex> (routeMutex);
+                                             std::unique_lock<std::mutex> (routeMutex);
     if (route_id == 0)
     {
         tbroker->addActionMessage (cmd);

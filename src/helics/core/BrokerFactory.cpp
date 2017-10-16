@@ -9,9 +9,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "BrokerFactory.h"
+#include "helics/common/delayedDestructor.hpp"
 #include "helics/config.h"
 #include "helics/core/core-types.h"
-#include "helics/common/delayedDestructor.hpp"
 #if HELICS_HAVE_ZEROMQ
 #include "helics/core/zmq/ZmqBroker.h"
 #endif
@@ -113,7 +113,7 @@ create (core_type type, const std::string &broker_name, const std::string &initi
     bool reg = registerBroker (broker);
     if (!reg)
     {
-		//TODO:: do some automatic renaming?  
+        // TODO:: do some automatic renaming?
     }
     broker->connect ();
     return broker;
@@ -207,16 +207,13 @@ std::shared_ptr<CoreBroker> findBroker (const std::string &brokerName)
 
 bool registerBroker (std::shared_ptr<CoreBroker> tbroker)
 {
-	cleanUpBrokers();
+    cleanUpBrokers ();
     std::lock_guard<std::mutex> lock (mapLock);
     auto res = BrokerMap.emplace (tbroker->getIdentifier (), std::move (tbroker));
     return res.second;
 }
 
-void cleanUpBrokers ()
-{
-	delayedDestroyer.destroyObjects();
-}
+void cleanUpBrokers () { delayedDestroyer.destroyObjects (); }
 
 void copyBrokerIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {
@@ -243,7 +240,7 @@ void unregisterBroker (const std::string &name)
     {
         if (brk->second->getIdentifier () == name)
         {
-			delayedDestroyer.addObjectsToBeDestroyed(std::move(brk->second));
+            delayedDestroyer.addObjectsToBeDestroyed (std::move (brk->second));
             BrokerMap.erase (brk);
             return;
         }

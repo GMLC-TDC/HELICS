@@ -37,10 +37,10 @@ MpiBroker::MpiBroker (bool rootBroker) noexcept : CoreBroker (rootBroker) {}
 
 MpiBroker::MpiBroker (const std::string &broker_name) : CoreBroker (broker_name) {}
 
-MpiBroker::~MpiBroker()
+MpiBroker::~MpiBroker ()
 {
-	haltOperations = true;
-	joinAllThreads();
+    haltOperations = true;
+    joinAllThreads ();
 }
 
 void MpiBroker::InitializeFromArgs (int argc, char *argv[])

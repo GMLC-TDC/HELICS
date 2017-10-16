@@ -47,12 +47,12 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Te = Tnext;
         Tdemin = Tnext;
         break;
-	case CMD_DISCONNECT:
-		time_state = time_state_t::time_granted;
-		Tnext = Time::maxVal();
-		Te = Time::maxVal();
-		Tdemin = Time::maxVal();
-		break;
+    case CMD_DISCONNECT:
+        time_state = time_state_t::time_granted;
+        Tnext = Time::maxVal ();
+        Te = Time::maxVal ();
+        Tdemin = Time::maxVal ();
+        break;
     default:
         return false;
     }

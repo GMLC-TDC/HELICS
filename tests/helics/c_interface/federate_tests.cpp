@@ -19,7 +19,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 BOOST_AUTO_TEST_SUITE (federate_tests)
 
-//BOOST_AUTO_TEST_CASE (federate_initialize_tests)
+// BOOST_AUTO_TEST_CASE (federate_initialize_tests)
 //{
 //    helics::FederateInfo fi ("test1");
 //    fi.coreType = CORE_TYPE_TO_TEST;
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_SUITE (federate_tests)
 //    Fed = nullptr;  // force the destructor
 //}
 //
-//BOOST_AUTO_TEST_CASE (federate_time_step_tests)
+// BOOST_AUTO_TEST_CASE (federate_time_step_tests)
 //{
 //    helics::FederateInfo fi ("test1");
 //    fi.coreType = CORE_TYPE_TO_TEST;
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_SUITE (federate_tests)
 //    BOOST_CHECK_EQUAL (res, 3.0);
 //}
 //
-//BOOST_AUTO_TEST_CASE (federate_multiple_federates)
+// BOOST_AUTO_TEST_CASE (federate_multiple_federates)
 //{
 //    helics::FederateInfo fi ("fed1");
 //    fi.coreType = CORE_TYPE_TO_TEST;
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_SUITE (federate_tests)
 //}
 //
 ///** the same as the previous test except with multiple cores and a single broker*/
-//BOOST_AUTO_TEST_CASE (federate_multiple_federates_multi_cores)
+// BOOST_AUTO_TEST_CASE (federate_multiple_federates_multi_cores)
 //{
 //    helics::FederateInfo fi ("fed1");
 //    fi.coreType = CORE_TYPE_TO_TEST;
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_SUITE (federate_tests)
 //    Fed2->finalize ();
 //}
 //
-//BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls)
+// BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls)
 //{
 //    helics::FederateInfo fi ("fed1");
 //    fi.coreType = CORE_TYPE_TO_TEST;

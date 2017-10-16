@@ -42,12 +42,11 @@ ZmqBroker::ZmqBroker (bool rootBroker) noexcept : CoreBroker (rootBroker) {}
 
 ZmqBroker::ZmqBroker (const std::string &broker_name) : CoreBroker (broker_name) {}
 
-ZmqBroker::~ZmqBroker()
+ZmqBroker::~ZmqBroker ()
 {
-	haltOperations = true;
-	comms = nullptr; //need to ensure the comms are deleted before the callbacks become invalid
-	joinAllThreads();
-	
+    haltOperations = true;
+    comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
+    joinAllThreads ();
 }
 
 void ZmqBroker::InitializeFromArgs (int argc, char *argv[])
@@ -121,7 +120,7 @@ void ZmqBroker::InitializeFromArgs (int argc, char *argv[])
 
 bool ZmqBroker::brokerConnect ()
 {
-	std::lock_guard<std::mutex> lock(dataLock);
+    std::lock_guard<std::mutex> lock (dataLock);
     if (brokerAddress.empty ())
     {
         setAsRoot ();
@@ -158,9 +157,10 @@ bool ZmqBroker::brokerConnect ()
     return res;
 }
 
-void ZmqBroker::brokerDisconnect () {
-	std::lock_guard<std::mutex> lock(dataLock); 
-	comms->disconnect ();
+void ZmqBroker::brokerDisconnect ()
+{
+    std::lock_guard<std::mutex> lock (dataLock);
+    comms->disconnect ();
 }
 
 void ZmqBroker::transmit (int route_id, const ActionMessage &cmd) { comms->transmit (route_id, cmd); }
