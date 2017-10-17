@@ -49,11 +49,12 @@ bool ownedQueue::connect (const std::string &connection, int maxMessages, int ma
         errorString = std::string ("Unable to open local state shared memory:") + ipe.what ();
         return false;
     }
-    queue_state->truncate (sizeof (shared_queue_state));
+    queue_state->truncate (sizeof (shared_queue_state)+256);
     // Map the whole shared memory in this process
     ipc::mapped_region region (*queue_state, ipc::read_write);
 
-    auto *sstate = reinterpret_cast<shared_queue_state *> (region.get_address ());
+    //auto *sstate = reinterpret_cast<shared_queue_state *> (region.get_address ());
+    auto *sstate = new(region.get_address()) shared_queue_state;
     sstate->setState (queue_state_t::startup);
 
     try
