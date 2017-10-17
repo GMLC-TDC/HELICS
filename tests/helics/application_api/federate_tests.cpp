@@ -120,13 +120,13 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_multi_cores)
 {
     helics::FederateInfo fi ("fed1");
     fi.coreType = CORE_TYPE_TO_TEST;
-    fi.coreName = "core1";
+    fi.coreName = "core_mc1";
     fi.coreInitString = "1 --broker=brk1 --brokerinit=2";
 
     auto Fed1 = std::make_shared<helics::Federate> (fi);
 
     fi.name = "fed2";
-    fi.coreName = "core2";
+    fi.coreName = "core_mc2";
 
     auto Fed2 = std::make_shared<helics::Federate> (fi);
 
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls)
 {
     helics::FederateInfo fi ("fed1");
     fi.coreType = CORE_TYPE_TO_TEST;
-    fi.coreName = "core1";
+    fi.coreName = "core_async";
     fi.coreInitString = "2";
 
     auto Fed1 = std::make_shared<helics::Federate> (fi);

@@ -83,6 +83,34 @@ void ValueConverter<X>::convert (const X &val, data_block &store)
     s.flush ();
     store = std::move (data);
 }
+
+template <class X>
+void ValueConverter<X>::convert(const X *vals, size_t size, data_block &store)
+{
+	std::string data;
+	data.reserve(sizeof(store) + 1);
+	boost::iostreams::back_insert_device<std::string> inserter(data);
+	boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s(inserter);
+	archiver oa(s);
+	oa(cereal::make_size_tag(size)); // number of elements
+	for (size_t ii = 0; ii < size; ++ii)
+	{
+		oa(vals[ii]);
+	}
+	// don't forget to flush the stream to finish writing into the buffer
+	s.flush();
+	store = std::move(data);
+
+}
+
+template <class X>
+data_block ValueConverter<X>::convert(const X *vals, size_t size)
+{
+	auto dv = data_block();
+	convert(vals,size, dv);
+	return dv;
+}
+
 /** converter for a basic value*/
 template <class X>
 data_block ValueConverter<X>::convert (const X &val)

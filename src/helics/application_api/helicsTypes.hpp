@@ -17,6 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <typeinfo>
 #include <vector>
 
+#include "core/core-data.h"
 /** @file
 @details basic type information and control for helicss
 */
@@ -216,6 +217,14 @@ std::vector<std::complex<double>> helicsGetComplexVector (const std::string &val
 
 void helicsGetVector (const std::string &val, std::vector<double> &data);
 void helicsGetComplexVector (const std::string &val, std::vector<std::complex<double>> &data);
+
+data_block typeConvert(helicsType_t type, double val);
+data_block typeConvert(helicsType_t type, int64_t val);
+data_block typeConvert(helicsType_t type, const std::string &val);
+data_block typeConvert(helicsType_t type, const std::vector<double> &val);
+data_block typeConvert(helicsType_t type, const std::vector<std::complex<double>> &val);
+data_block typeConvert(helicsType_t type, std::complex<double> &val);
+
 /** template class for generating a known name of a type*/
 template <class X>
 constexpr helicsType_t helicsType ()

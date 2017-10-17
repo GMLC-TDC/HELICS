@@ -15,94 +15,171 @@ namespace helics
 {
 void Publication::publish (double val) const
 {
-    if (changeDetectionEnabled)
-    {
-        if (changeDetected (val))
-        {
-            fed->publish (id, val);
-            prevValue = val;
+	bool doPublish = true;
+	if (changeDetectionEnabled) 
+	{
+		if (changeDetected(val))
+		{
+			prevValue = val;
+		}
+		else
+		{
+			doPublish = false;
+		}
+	}
+       if (doPublish)
+	   {
+			if (pubType == helicsType_t::helicsDouble)
+			{
+				fed->publish(id, val);
+			}
+			else
+			{
+
+			}
+           
         }
-    }
-    else
-    {
-        fed->publish (id, val);
-    }
+   
 }
 void Publication::publish (int64_t val) const
 {
-    if (changeDetectionEnabled)
-    {
-        if (changeDetected (val))
-        {
-            fed->publish (id, val);
-            prevValue = val;
-        }
-    }
-    else
-    {
-        fed->publish (id, val);
-    }
+	bool doPublish = true;
+	if (changeDetectionEnabled)
+	{
+		if (changeDetected(val))
+		{
+			prevValue = val;
+		}
+		else
+		{
+			doPublish = false;
+		}
+	}
+	if (doPublish)
+	{
+		if (pubType == helicsType_t::helicsDouble)
+		{
+			fed->publish(id, val);
+		}
+		else
+		{
+
+		}
+
+	}
 }
 void Publication::publish (const char *val) const
 {
-    if (changeDetectionEnabled)
-    {
-        if (changeDetected (val))
-        {
-            fed->publish (id, val);
-            prevValue = val;
-        }
-    }
-    else
-    {
-        fed->publish (id, val);
-    }
+	bool doPublish = true;
+	if (changeDetectionEnabled)
+	{
+		if (changeDetected(val))
+		{
+			prevValue = val;
+		}
+		else
+		{
+			doPublish = false;
+		}
+	}
+	if (doPublish)
+	{
+		if (pubType == helicsType_t::helicsDouble)
+		{
+			fed->publish(id, val);
+		}
+		else
+		{
+
+		}
+
+	}
 }
 void Publication::publish (const std::string &val) const
 {
-    if (changeDetectionEnabled)
-    {
-        if (changeDetected (val))
-        {
-            fed->publish (id, val);
-            prevValue = val;
-        }
-    }
-    else
-    {
-        fed->publish (id, val);
-    }
+	bool doPublish = true;
+	if (changeDetectionEnabled)
+	{
+		if (changeDetected(val))
+		{
+			prevValue = val;
+		}
+		else
+		{
+			doPublish = false;
+		}
+	}
+	if (doPublish)
+	{
+		if (pubType == helicsType_t::helicsDouble)
+		{
+			fed->publish(id, val);
+		}
+		else
+		{
+
+		}
+
+	}
 }
 void Publication::publish (const std::vector<double> &val) const
 {
-    if (changeDetectionEnabled)
-    {
-        if (changeDetected (val))
-        {
-            fed->publish (id, val);
-            prevValue = val;
-        }
-    }
-    else
-    {
-        fed->publish (id, val);
-    }
+	bool doPublish = true;
+	if (changeDetectionEnabled)
+	{
+		if (changeDetected(val))
+		{
+			prevValue = val;
+		}
+		else
+		{
+			doPublish = false;
+		}
+	}
+	if (doPublish)
+	{
+		if (pubType == helicsType_t::helicsDouble)
+		{
+			fed->publish(id, val);
+		}
+		else
+		{
+
+		}
+
+	}
 }
 
+void Publication::publish(const double *vals, int size) const
+{
+
+}
 void Publication::publish (std::complex<double> val) const
 {
-    if (changeDetectionEnabled)
-    {
-        if (changeDetected (val))
-        {
-            fed->publish (id, val);
-            prevValue = val;
-        }
-    }
-    else
-    {
-        fed->publish (id, val);
-    }
+	bool doPublish = true;
+	if (changeDetectionEnabled)
+	{
+		if (changeDetected(val))
+		{
+			prevValue = val;
+		}
+		else
+		{
+			doPublish = false;
+		}
+	}
+	if (doPublish)
+	{
+		if (pubType == helicsType_t::helicsDouble)
+		{
+			fed->publish(id, val);
+		}
+		else
+		{
+
+		}
+
+	}
 }
 
 bool Publication::changeDetected (const std::string &val) const
