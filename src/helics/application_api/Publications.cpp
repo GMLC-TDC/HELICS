@@ -29,15 +29,8 @@ void Publication::publish (double val) const
 	}
        if (doPublish)
 	   {
-			if (pubType == helicsType_t::helicsDouble)
-			{
-				fed->publish(id, val);
-			}
-			else
-			{
-
-			}
-           
+		   auto db = typeConvert(pubType, val);
+		   fed->publish(id, db);
         }
    
 }
@@ -57,15 +50,8 @@ void Publication::publish (int64_t val) const
 	}
 	if (doPublish)
 	{
-		if (pubType == helicsType_t::helicsDouble)
-		{
-			fed->publish(id, val);
-		}
-		else
-		{
-
-		}
-
+		auto db = typeConvert(pubType, val);
+		fed->publish(id, db);
 	}
 }
 void Publication::publish (const char *val) const
@@ -84,14 +70,8 @@ void Publication::publish (const char *val) const
 	}
 	if (doPublish)
 	{
-		if (pubType == helicsType_t::helicsDouble)
-		{
-			fed->publish(id, val);
-		}
-		else
-		{
-
-		}
+		auto db = typeConvert(pubType, val);
+		fed->publish(id, db);
 
 	}
 }
@@ -111,14 +91,8 @@ void Publication::publish (const std::string &val) const
 	}
 	if (doPublish)
 	{
-		if (pubType == helicsType_t::helicsDouble)
-		{
-			fed->publish(id, val);
-		}
-		else
-		{
-
-		}
+		auto db = typeConvert(pubType, val);
+		fed->publish(id, db);
 
 	}
 }
@@ -138,15 +112,8 @@ void Publication::publish (const std::vector<double> &val) const
 	}
 	if (doPublish)
 	{
-		if (pubType == helicsType_t::helicsDouble)
-		{
-			fed->publish(id, val);
-		}
-		else
-		{
-
-		}
-
+		auto db = typeConvert(pubType, val);
+		fed->publish(id, db);
 	}
 }
 
@@ -170,14 +137,8 @@ void Publication::publish (std::complex<double> val) const
 	}
 	if (doPublish)
 	{
-		if (pubType == helicsType_t::helicsDouble)
-		{
-			fed->publish(id, val);
-		}
-		else
-		{
-
-		}
+		auto db = typeConvert(pubType, val);
+		fed->publish(id, db);
 
 	}
 }
