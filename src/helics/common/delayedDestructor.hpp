@@ -28,7 +28,17 @@ class DelayedDestructor
 
   public:
     DelayedDestructor () = default;
-    ~DelayedDestructor () { destroyObjects (); }
+    ~DelayedDestructor () 
+	{ 
+		while (!ElementsToBeDestroyed.empty())
+		{
+			destroyObjects();
+			if (!ElementsToBeDestroyed.empty())
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
+			}
+		}
+	}
     void destroyObjects ()
     {
         std::lock_guard<std::mutex> lock (destructionLock);
