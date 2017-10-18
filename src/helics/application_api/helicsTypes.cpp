@@ -125,11 +125,15 @@ std::complex<double> helicsGetComplex (const std::string &val)
         {
             if ((val.back () == 'j') || (val.back () == 'i'))
             {
-                im = boost::lexical_cast<double> (val.substr (0, val.size () - 1));
+				auto strval = val.substr(0, val.size() - 1);
+				boost::algorithm::trim(strval);
+                im = boost::lexical_cast<double> (strval);
             }
             else
             {
-                re = boost::lexical_cast<double> (val);
+				auto strval = val;
+				boost::algorithm::trim(strval);
+                re = boost::lexical_cast<double> (strval);
             }
         }
     }
@@ -165,7 +169,7 @@ std::string helicsVectorString(const double *vals,size_t size)
 	std::string vString("v");
 	vString.append(std::to_string(size));
 	vString.push_back('[');
-	for (int ii=0;ii<size;++ii)
+	for (size_t ii=0;ii<size;++ii)
 	{
 		vString.append(std::to_string(vals[ii]));
 		vString.push_back(';');
@@ -191,7 +195,7 @@ std::string helicsComplexVectorString (const std::vector<std::complex<double>> &
         vString.push_back (';');
         vString.push_back (' ');
     }
-    if (vString.size () > 2)
+    if (vString.size () > 3)
     {
         vString.pop_back ();
         vString.pop_back ();
@@ -297,8 +301,8 @@ void helicsGetComplexVector (const std::string &val, std::vector<std::complex<do
         auto fb = val.find_first_of ('[');
         for (decltype (sz) ii = 0; ii < sz - 1; ii += 2)
         {
-            auto nc = val.find_first_of (",]", fb + 1);
-            auto nc2 = val.find_first_of (",]", nc + 1);
+            auto nc = val.find_first_of (",;]", fb + 1);
+            auto nc2 = val.find_first_of (",;]", nc + 1);
             try
             {
 				std::string vstr1 = val.substr(fb + 1, nc - fb - 1);
@@ -324,7 +328,7 @@ void helicsGetComplexVector (const std::string &val, std::vector<std::complex<do
         auto fb = val.find_first_of ('[');
         for (decltype (sz) ii = 0; ii < sz; ++ii)
         {
-            auto nc = val.find_first_of (",]", fb + 1);
+            auto nc = val.find_first_of (",;]", fb + 1);
             auto V = helicsGetComplex (val.substr (fb + 1, nc - fb - 1));
             data.push_back (V);
             fb = nc;
@@ -333,17 +337,8 @@ void helicsGetComplexVector (const std::string &val, std::vector<std::complex<do
     else
     {
         auto V = helicsGetComplex (val);
-        if (V.imag () == 0)
-        {
-            data.resize (1);
-            data[0] = V.real ();
-        }
-        else
-        {
-            data.resize (2);
-            data[0] = V.real ();
-            data[1] = V.imag ();
-        }
+		data.resize(0);
+		data.push_back(V);
     }
     return;
 }

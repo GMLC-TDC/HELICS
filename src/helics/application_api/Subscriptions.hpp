@@ -26,15 +26,19 @@ void valueExtract (const defV &dv, std::complex<double> &val);
 
 void valueExtract (const defV &dv, std::vector<double> &val);
 
+void valueExtract(const defV &dv, std::vector<std::complex<double>> &val);
+
 void valueExtract (const data_view &dv, helicsType_t baseType, std::string &val);
 
 void valueExtract (const data_view &dv, helicsType_t baseType, std::vector<double> &val);
 
 void valueExtract (const data_view &dv, helicsType_t baseType, std::complex<double> &val);
 
-/** assume it is some numeric type (int or double)*/
+void valueExtract(const data_view &dv, helicsType_t baseType, std::vector<std::complex<double>> &val);
+
+/** for numeric types*/
 template <class X>
-void valueExtract (const defV &dv, X &val)
+std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &val)
 {
     switch (dv.which ())
     {
@@ -64,12 +68,25 @@ void valueExtract (const defV &dv, X &val)
         }
         break;
     }
+	case complexVectorLoc: //complex vector
+	{
+		auto &vec = boost::get<std::vector<std::complex<double>>>(dv);
+		if (!vec.empty())
+		{
+			val = static_cast<X> (std::abs( vec.front()));
+		}
+		else
+		{
+			val = std::numeric_limits<X>::min();
+		}
+		break;
+	}
     }
 }
 
 /** assume it is some numeric type (int or double)*/
 template <class X>
-void valueExtract (const data_view &dv, helicsType_t baseType, X &val)
+std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv, helicsType_t baseType, X &val)
 {
     switch (baseType)
     {
@@ -197,7 +214,8 @@ class Subscription : public SubscriptionBase
                    std::function<void(const double &, Time)>,
                    std::function<void(const int64_t &, Time)>,
                    std::function<void(const std::complex<double> &, Time)>,
-                   std::function<void(const std::vector<double> &, Time)>>
+                   std::function<void(const std::vector<double> &, Time)>,
+					std::function<void(const std::vector<std::complex<double>> &, Time)>>
       value_callback;  //!< callback function for the federate
 
     mutable helicsType_t type = helicsType_t::helicsInvalid;  //!< the underlying type the publication is using
@@ -217,7 +235,7 @@ class Subscription : public SubscriptionBase
     @param[out] out the location to store the value
     */
     template <class X>
-    typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, void>::type getValue (X &out)
+    typename std::enable_if_t<helicsType<X> () != helicsType_t::helicsInvalid, void> getValue (X &out)
     {
         if (fed->isUpdated (id))
         {
@@ -240,7 +258,7 @@ class Subscription : public SubscriptionBase
     /** get the most recent value
     @return the value*/
     template <class X>
-    typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, X>::type getValue ()
+    typename std::enable_if_t<helicsType<X> () != helicsType_t::helicsInvalid, X> getValue ()
     {
         X val;
         getValue (val);
@@ -254,7 +272,7 @@ class Subscription : public SubscriptionBase
     val is the new value and time is the time the value was updated
     */
     template <class X>
-    typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, void>::type
+    typename std::enable_if_t<helicsType<X> () != helicsType_t::helicsInvalid, void>
     registerCallback (std::function<void(const X &, Time)> callback)
     {
         value_callback = callback;
@@ -264,7 +282,7 @@ class Subscription : public SubscriptionBase
     }
 
     template <class X>
-    typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, void>::type setDefault (const X &val)
+    typename std::enable_if_t<helicsType<X> () != helicsType_t::helicsInvalid, void> setDefault (const X &val)
     {
         lastValue = val;
     }

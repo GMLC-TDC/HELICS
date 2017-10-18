@@ -29,6 +29,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <iterator>
+#include <utility>
 //#include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>
@@ -122,27 +124,28 @@ struct is_vector< T,
 };
 
 
-/** template trait for figuring out if something is a vector of objects*/
+/** template trait for figuring out if something is an iterable container*/
 template <typename T, typename _ = void>
 struct is_iterable {
 	static constexpr bool value = false;
 };
 
+
 	template <typename T>
-	struct is_iterable<T,
-		typename decltype(
-			begin(std::declval<T&>()) != std::end(std::declval<T&>()), // begin/end and operator !=
+	struct is_iterable < T,
+		typename std::enable_if_t <
+		std::is_same<decltype(std::begin(T()) != std::end(T()), // begin/end and operator != and has default constructor
 			void(),
-			++std::declval<decltype(std::begin(std::declval<T&>()))&>(), // operator ++
-			void(*std::begin(std::declval<T&>())), // operator*
-			std::true_type)>
+			void(*std::begin(T())), //dereference operator
+				std::true_type{}),std::true_type>::value >>
 	{
 		static constexpr bool value = true;
 	};
 
 
+
 template<class X>
-constexpr std::enable_if_t<!(is_iterable<X>::value),size_t> getMinSize()
+constexpr std::enable_if_t<!is_iterable<X>::value && !std::is_convertible<X, std::string>::value,size_t> getMinSize()
 {
 	return sizeof(X) + 1;
 }
@@ -181,6 +184,8 @@ void ValueConverter<X>::interpret (const data_view &block, X &val)
 {
 	if (block.size() < getMinSize<X>())
 	{
+		auto ms = getMinSize<X>();
+		
 		throw std::invalid_argument("invalid data size");
 	}
     boost::iostreams::basic_array_source<char> device (block.data (), block.size ());

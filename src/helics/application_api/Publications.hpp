@@ -111,6 +111,7 @@ class Publication : public PublicationBase
     void publish (const char *val) const;
     void publish (const std::string &val) const;
     void publish (const std::vector<double> &val) const;
+	void publish(const std::vector < std::complex<double>> &val) const;
 	void publish(const double *vals, int size) const;
     void publish (std::complex<double> val) const;
     /** secondary publish function to allow unit conversion before publication
@@ -127,7 +128,7 @@ class Publication : public PublicationBase
   private:
     bool changeDetected (const std::string &val) const;
     bool changeDetected (const std::vector<double> &val) const;
-	bool changeDetected(const std::vector<std::complex<double>> &val)const;
+	bool changeDetected(const std::vector<std::complex<double>> &val) const;
 	bool changeDetected(const double *vals, size_t size) const;
     bool changeDetected (const std::complex<double> &val) const;
     bool changeDetected (double val) const;

@@ -57,6 +57,12 @@ void Subscription::handleCallback (Time time)
         valueExtract (dv, type, val);
         boost::get<std::function<void(const std::vector<double> &, Time)>> (value_callback) (val, time);
     }
+	case complexVectorLoc:
+	{
+		std::vector<std::complex<double>> val;
+		valueExtract(dv, type, val);
+		boost::get<std::function<void(const std::vector<std::complex<double>> &, Time)>>(value_callback) (val, time);
+	}
     break;
     }
 }
@@ -92,79 +98,116 @@ void valueExtract (const defV &dv, std::complex<double> &val)
     switch (dv.which ())
     {
     case doubleLoc:  // double
-        val = std::complex<double> (boost::get<double> (dv), 0.0);
-        break;
+val = std::complex<double>(boost::get<double>(dv), 0.0);
+break;
     case intLoc:  // int64_t
-        val = std::complex<double> (static_cast<double> (boost::get<int64_t> (dv)), 0.0);
-        break;
-    case stringLoc:  // string
-    default:
-        val = helicsGetComplex (boost::get<std::string> (dv));
-        break;
-    case complexLoc:  // complex
-        val = boost::get<std::complex<double>> (dv);
-        break;
-    case vectorLoc:  // vector
-    {
-        auto &vec = boost::get<std::vector<double>> (dv);
-        if (vec.size () == 1)
-        {
-            val = std::complex<double> (vec[0], 0.0);
-        }
-        else if (vec.size () > 2)
-        {
-            val = std::complex<double> (vec[0], vec[1]);
-        }
-        break;
-    }
-    case complexVectorLoc:
-    {
-        auto &vec = boost::get<std::vector<std::complex<double>>> (dv);
-        if (!vec.empty ())
-        {
-            val = vec.front ();
-        }
-        break;
-    }
-    }
+		val = std::complex<double>(static_cast<double> (boost::get<int64_t>(dv)), 0.0);
+		break;
+	case stringLoc:  // string
+	default:
+		val = helicsGetComplex(boost::get<std::string>(dv));
+		break;
+	case complexLoc:  // complex
+		val = boost::get<std::complex<double>>(dv);
+		break;
+	case vectorLoc:  // vector
+	{
+		auto &vec = boost::get<std::vector<double>>(dv);
+		if (vec.size() == 1)
+		{
+			val = std::complex<double>(vec[0], 0.0);
+		}
+		else if (vec.size() > 2)
+		{
+			val = std::complex<double>(vec[0], vec[1]);
+		}
+		break;
+	}
+	case complexVectorLoc:
+	{
+		auto &vec = boost::get<std::vector<std::complex<double>>>(dv);
+		if (!vec.empty())
+		{
+			val = vec.front();
+		}
+		break;
+	}
+	}
 }
 
-void valueExtract (const defV &dv, std::vector<double> &val)
+void valueExtract(const defV &dv, std::vector<double> &val)
 {
-    val.resize (0);
-    switch (dv.which ())
-    {
-    case doubleLoc:  // double
-        val.push_back (boost::get<double> (dv));
-        break;
-    case intLoc:  // int64_t
-        val.push_back (static_cast<double> (boost::get<int64_t> (dv)));
-        break;
-    case stringLoc:  // string
-    default:
-        helicsGetVector (boost::get<std::string> (dv), val);
-        break;
-    case complexLoc:  // complex
-    {
-        auto cval = boost::get<std::complex<double>> (dv);
-        val.push_back (cval.real ());
-        val.push_back (cval.imag ());
-    }
-    break;
-    case vectorLoc:  // vector
-        val = boost::get<std::vector<double>> (dv);
-        break;
-    case complexVectorLoc:  // complex
-    {
-        auto cv = boost::get<std::vector<std::complex<double>>> (dv);
-        val.resize (2 * cv.size ());
-        for (auto &cval : cv)
-        {
-            val.push_back (cval.real ());
-            val.push_back (cval.imag ());
-        }
-    }
-    }
+	val.resize(0);
+	switch (dv.which())
+	{
+	case doubleLoc:  // double
+		val.push_back(boost::get<double>(dv));
+		break;
+	case intLoc:  // int64_t
+		val.push_back(static_cast<double> (boost::get<int64_t>(dv)));
+		break;
+	case stringLoc:  // string
+	default:
+		helicsGetVector(boost::get<std::string>(dv), val);
+		break;
+	case complexLoc:  // complex
+	{
+		auto cval = boost::get<std::complex<double>>(dv);
+		val.push_back(cval.real());
+		val.push_back(cval.imag());
+	}
+	break;
+	case vectorLoc:  // vector
+		val = boost::get<std::vector<double>>(dv);
+		break;
+	case complexVectorLoc:  // complex
+	{
+		auto cv = boost::get<std::vector<std::complex<double>>>(dv);
+		val.resize(2 * cv.size());
+		for (auto &cval : cv)
+		{
+			val.push_back(cval.real());
+			val.push_back(cval.imag());
+		}
+	}
+	}
+}
+
+void valueExtract(const defV &dv, std::vector<std::complex<double>> &val)
+{
+	val.resize(0);
+	switch (dv.which())
+	{
+	case doubleLoc:  // double
+		val.emplace_back(boost::get<double>(dv), 0.0);
+		break;
+	case intLoc:  // int64_t
+		val.emplace_back(static_cast<double> (boost::get<int64_t>(dv)), 0.0);
+		break;
+	case stringLoc:  // string
+	default:
+		helicsGetComplexVector(boost::get<std::string>(dv), val);
+		break;
+	case complexLoc:  // complex
+	{
+		val.push_back(boost::get<std::complex<double>>(dv));
+	}
+	break;
+	case vectorLoc:  // vector
+	{
+		auto &v = boost::get<std::vector<double>>(dv);
+		val.resize(v.size() / 2);
+		for (size_t ii = 0; ii < v.size() - 1; ii+=2)
+		{
+			val.emplace_back(v[ii], v[ii + 1]);
+		}
+		break;
+	}
+	case complexVectorLoc:  // complex
+		val = boost::get<std::vector<std::complex<double>>>(dv);
+		break;
+		
+	}
 }
 
 void valueExtract (const data_view &dv, helicsType_t baseType, std::string &val)
