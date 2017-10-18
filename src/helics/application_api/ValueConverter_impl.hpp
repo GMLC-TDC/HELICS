@@ -184,8 +184,6 @@ void ValueConverter<X>::interpret (const data_view &block, X &val)
 {
 	if (block.size() < getMinSize<X>())
 	{
-		auto ms = getMinSize<X>();
-		
 		throw std::invalid_argument("invalid data size");
 	}
     boost::iostreams::basic_array_source<char> device (block.data (), block.size ());

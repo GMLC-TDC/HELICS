@@ -242,7 +242,7 @@ void ZmqComms::queue_rx_function ()
 	{
 		repSocket.bind(makePortAddress(localTarget_, repPortNumber));
 	}
-	catch (const zmq::error_t &ze)
+	catch (const zmq::error_t &)
 	{
 		std::cerr << "binding error on reply socket sleeping then will try again \n";
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -263,7 +263,7 @@ void ZmqComms::queue_rx_function ()
     {
         pullSocket.bind (makePortAddress (localTarget_, pullPortNumber));
     }
-    catch (const zmq::error_t &ze)
+    catch (const zmq::error_t &)
     {
 		std::cerr << "binding error on pull socket sleeping then will try again \n";
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
