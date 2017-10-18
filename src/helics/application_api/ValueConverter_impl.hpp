@@ -103,6 +103,62 @@ void ValueConverter<X>::convert(const X *vals, size_t size, data_block &store)
 
 }
 
+/** template trait for figuring out if something is a vector of objects*/
+template <typename T, typename _ = void>
+struct is_vector {
+	static constexpr bool value = false;
+};
+template <typename T>
+struct is_vector< T,
+	typename std::enable_if_t<
+	std::is_same<T,
+	std::vector< typename T::value_type,
+	typename T::allocator_type >
+	>::value
+	>
+>
+{
+	static constexpr bool value = true;
+};
+
+
+/** template trait for figuring out if something is a vector of objects*/
+template <typename T, typename _ = void>
+struct is_iterable {
+	static constexpr bool value = false;
+};
+
+	template <typename T>
+	struct is_iterable<T,
+		typename decltype(
+			begin(std::declval<T&>()) != std::end(std::declval<T&>()), // begin/end and operator !=
+			void(),
+			++std::declval<decltype(std::begin(std::declval<T&>()))&>(), // operator ++
+			void(*std::begin(std::declval<T&>())), // operator*
+			std::true_type)>
+	{
+		static constexpr bool value = true;
+	};
+
+
+template<class X>
+constexpr std::enable_if_t<!(is_iterable<X>::value),size_t> getMinSize()
+{
+	return sizeof(X) + 1;
+}
+
+template<class X>
+constexpr std::enable_if_t<is_iterable<X>::value && !std::is_convertible<X, std::string>::value, size_t> getMinSize()
+{
+	return 9;
+}
+
+template<class X>
+constexpr std::enable_if_t < std::is_convertible<X, std::string>::value , size_t > getMinSize()
+{
+	return 0;
+}
+
 template <class X>
 data_block ValueConverter<X>::convert(const X *vals, size_t size)
 {
@@ -123,7 +179,7 @@ data_block ValueConverter<X>::convert (const X &val)
 template <class X>
 void ValueConverter<X>::interpret (const data_view &block, X &val)
 {
-	if (block.size() < sizeof(X)+1)
+	if (block.size() < getMinSize<X>())
 	{
 		throw std::invalid_argument("invalid data size");
 	}

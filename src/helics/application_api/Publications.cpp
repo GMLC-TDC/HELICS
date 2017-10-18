@@ -119,8 +119,25 @@ void Publication::publish (const std::vector<double> &val) const
 
 void Publication::publish(const double *vals, int size) const
 {
-
+	bool doPublish = true;
+	if (changeDetectionEnabled)
+	{
+		if (changeDetected(vals,size))
+		{
+			prevValue = std::vector<double>(vals,vals+size);
+		}
+		else
+		{
+			doPublish = false;
+		}
+	}
+	if (doPublish)
+	{
+		auto db = typeConvert(pubType, vals,size);
+		fed->publish(id, db);
+	}
 }
+
 void Publication::publish (std::complex<double> val) const
 {
 	bool doPublish = true;
@@ -174,6 +191,27 @@ bool Publication::changeDetected (const std::vector<double> &val) const
     }
     return true;
 }
+
+bool Publication::changeDetected(const double *vals, size_t size) const
+{
+	if (prevValue.which() == vectorLoc)
+	{
+		const auto &prevV = boost::get<std::vector<double>>(prevValue);
+		if (size == prevV.size())
+		{
+			for (size_t ii = 0; ii < size; ++ii)
+			{
+				if (std::abs(prevV[ii] - vals[ii]) > delta)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+	return true;
+}
+
 bool Publication::changeDetected (const std::complex<double> &val) const
 {
     if (prevValue.which () == complexLoc)

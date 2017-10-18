@@ -14,6 +14,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <regex>
 #include <boost/lexical_cast.hpp>
 #include "application_api/ValueConverter.hpp"
+#include <boost/algorithm/string/trim.hpp>
+
 
 namespace helics
 {
@@ -149,13 +151,33 @@ std::string helicsVectorString (const std::vector<double> &val)
         vString.push_back (';');
         vString.push_back (' ');
     }
-    if (vString.size () > 2)
+    if (vString.size () > 3)//3 for v0[ which would be for an empty vector
     {
         vString.pop_back ();
         vString.pop_back ();
     }
     vString.push_back (']');
     return vString;
+}
+
+std::string helicsVectorString(const double *vals,size_t size)
+{
+	std::string vString("v");
+	vString.append(std::to_string(size));
+	vString.push_back('[');
+	for (int ii=0;ii<size;++ii)
+	{
+		vString.append(std::to_string(vals[ii]));
+		vString.push_back(';');
+		vString.push_back(' ');
+	}
+	if (vString.size() > 3) //3 for c0[ which would be for an empty vector
+	{
+		vString.pop_back();
+		vString.pop_back();
+	}
+	vString.push_back(']');
+	return vString;
 }
 
 std::string helicsComplexVectorString (const std::vector<std::complex<double>> &val)
@@ -213,10 +235,12 @@ void helicsGetVector (const std::string &val, std::vector<double> &data)
         auto fb = val.find_first_of ('[');
         for (decltype (sz) ii = 0; ii < sz; ++ii)
         {
-            auto nc = val.find_first_of (",]", fb + 1);
+            auto nc = val.find_first_of (";,]", fb + 1);
             try
             {
-                auto V = boost::lexical_cast<double> (val.data () + fb + 1, nc - fb - 1);
+				std::string vstr = val.substr(fb + 1, nc - fb - 1);
+				boost::algorithm::trim(vstr);
+                auto V = boost::lexical_cast<double> (vstr);
                 data.push_back (V);
             }
             catch (const boost::bad_lexical_cast &)
@@ -234,7 +258,7 @@ void helicsGetVector (const std::string &val, std::vector<double> &data)
         auto fb = val.find_first_of ('[');
         for (decltype (sz) ii = 0; ii < sz; ++ii)
         {
-            auto nc = val.find_first_of (",]", fb + 1);
+            auto nc = val.find_first_of (",;]", fb + 1);
             auto V = helicsGetComplex (val.substr (fb + 1, nc - fb - 1));
             data.push_back (V.real ());
             data.push_back (V.imag ());
@@ -277,8 +301,12 @@ void helicsGetComplexVector (const std::string &val, std::vector<std::complex<do
             auto nc2 = val.find_first_of (",]", nc + 1);
             try
             {
-                auto V1 = boost::lexical_cast<double> (val.data () + fb + 1, nc - fb - 1);
-                auto V2 = boost::lexical_cast<double> (val.data () + nc + 1, nc2 - nc - 1);
+				std::string vstr1 = val.substr(fb + 1, nc - fb - 1);
+				boost::algorithm::trim(vstr1);
+				std::string vstr2 = val.substr(nc + 1, nc2 - nc - 1);
+				boost::algorithm::trim(vstr2);
+                auto V1 = boost::lexical_cast<double> (vstr1);
+                auto V2 = boost::lexical_cast<double> (vstr2);
                 data.emplace_back (V1, V2);
             }
             catch (const boost::bad_lexical_cast &)
@@ -398,20 +426,14 @@ data_block typeConvert(helicsType_t type, const std::vector<double> &val)
 		{
 			return ValueConverter<double>::convert(0.0);
 		}
-		else
-		{
-			return ValueConverter<double>::convert(val[0]);
-		}
+		return ValueConverter<double>::convert(val[0]);
 		
 	case helicsType_t::helicsInt:
 		if (val.empty())
 		{
 			return ValueConverter<int64_t>::convert(0);
 		}
-		else
-		{
-			return ValueConverter<int64_t>::convert(static_cast<int64_t>(val[0]));
-		}
+		return ValueConverter<int64_t>::convert(static_cast<int64_t>(val[0]));
 	case helicsType_t::helicsComplex:
 	{
 		std::complex<double> V(0.0,0.0);
@@ -444,6 +466,62 @@ data_block typeConvert(helicsType_t type, const std::vector<double> &val)
 
 	}
 }
+
+data_block typeConvert(helicsType_t type, const double *vals, size_t size)
+{
+	switch (type)
+	{
+	case helicsType_t::helicsDouble:
+		if ((size==0)||(vals==nullptr))
+		{
+			return ValueConverter<double>::convert(0.0);
+		}
+		return ValueConverter<double>::convert(vals[0]);
+
+	case helicsType_t::helicsInt:
+		if ((size == 0) || (vals == nullptr))
+		{
+			return ValueConverter<int64_t>::convert(0);
+		}
+		return ValueConverter<int64_t>::convert(static_cast<int64_t>(vals[0]));
+	case helicsType_t::helicsComplex:
+	{
+		std::complex<double> V(0.0, 0.0);
+		if (size >= 2)
+		{
+			V = std::complex<double>(vals[0], vals[1]);
+		}
+		else if (size == 1)
+		{
+			V = std::complex<double>(vals[0], 0.0);
+		}
+		return ValueConverter<std::complex<double>>::convert(V);
+	}
+	case helicsType_t::helicsString:
+		
+		if ((size == 0) || (vals == nullptr))
+		{
+			return helicsVectorString(std::vector<double>()); //generate an empty vector string
+		}
+		return helicsVectorString(vals,size);
+	case helicsType_t::helicsComplexVector:
+	{
+		std::vector<std::complex<double>> CD;
+		CD.reserve(size / 2);
+		for (size_t ii = 0; ii <size - 1; ++ii)
+		{
+			CD.emplace_back(vals[ii], vals[ii + 1]);
+		}
+		return ValueConverter <std::vector<std::complex<double>>> ::convert(CD);
+	}
+	break;
+	case helicsType_t::helicsVector:
+	default:
+		return ValueConverter <double> ::convert(vals,size);
+
+	}
+}
+
 data_block typeConvert(helicsType_t type, const std::vector<std::complex<double>> &val)
 {
 	switch (type)
@@ -453,30 +531,21 @@ data_block typeConvert(helicsType_t type, const std::vector<std::complex<double>
 		{
 			return ValueConverter<double>::convert(0.0);
 		}
-		else
-		{
-			return ValueConverter<double>::convert(std::abs(val[0]));
-		}
+		return ValueConverter<double>::convert(std::abs(val[0]));
 
 	case helicsType_t::helicsInt:
 		if (val.empty())
 		{
 			return ValueConverter<int64_t>::convert(0.0);
 		}
-		else
-		{
-			return ValueConverter<int64_t>::convert(std::abs(val[0]));
-		}
+		return ValueConverter<int64_t>::convert(std::abs(val[0]));
 	case helicsType_t::helicsComplex:
 	{
 		if (val.empty())
 		{
 			return ValueConverter<std::complex<double>>::convert(std::complex<double>(0.0,0.0));
 		}
-		else
-		{
-			return ValueConverter<std::complex<double>>::convert(val[0]);
-		}
+		return ValueConverter<std::complex<double>>::convert(val[0]);
 		
 	}
 	case helicsType_t::helicsString:
@@ -493,7 +562,7 @@ data_block typeConvert(helicsType_t type, const std::vector<std::complex<double>
 			DV.push_back(val[ii].real());
 			DV.push_back(val[ii].imag());
 		}
-		return ValueConverter <std::vector<std::complex<double>>> ::convert(CD);
+		return ValueConverter <std::vector<double>> ::convert(DV);
 	}
 		
 

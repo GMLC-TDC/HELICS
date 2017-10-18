@@ -207,6 +207,7 @@ helicsType_t getTypeFromString (const std::string &typeName);
 std::string helicsComplexString (double real, double imag);
 std::string helicsComplexString (std::complex<double> val);
 std::string helicsVectorString (const std::vector<double> &val);
+std::string helicsVectorString(const double *vals, size_t size);
 std::string helicsComplexVectorString (const std::vector<std::complex<double>> &val);
 /** convert a string to a complex number*/
 std::complex<double> helicsGetComplex (const std::string &val);
@@ -222,6 +223,7 @@ data_block typeConvert(helicsType_t type, double val);
 data_block typeConvert(helicsType_t type, int64_t val);
 data_block typeConvert(helicsType_t type, const std::string &val);
 data_block typeConvert(helicsType_t type, const std::vector<double> &val);
+data_block typeConvert(helicsType_t type, const double*vals, size_t size);
 data_block typeConvert(helicsType_t type, const std::vector<std::complex<double>> &val);
 data_block typeConvert(helicsType_t type, std::complex<double> &val);
 

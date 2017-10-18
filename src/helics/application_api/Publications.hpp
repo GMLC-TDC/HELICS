@@ -127,6 +127,8 @@ class Publication : public PublicationBase
   private:
     bool changeDetected (const std::string &val) const;
     bool changeDetected (const std::vector<double> &val) const;
+	bool changeDetected(const std::vector<std::complex<double>> &val)const;
+	bool changeDetected(const double *vals, size_t size) const;
     bool changeDetected (const std::complex<double> &val) const;
     bool changeDetected (double val) const;
     bool changeDetected (int64_t val) const;

@@ -155,6 +155,37 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests)
 
     runPubSubTypeTests<int64_t, c> (2, c (2, 0));
     runPubSubTypeTests<c, double> (c (3.0, 4.0), 5.0);
+
+}
+
+BOOST_AUTO_TEST_CASE(subscriptionObject_vector_tests)
+{
+	using v = std::vector<double>;
+	using c = std::complex<double>;
+	std::vector<double> tvec1{ 12.4, 0.3,0.7 };
+	std::vector<double> tvec2{ 0.0,-1241.23,5.0,7.9 };
+	std::vector<double> eVec{};
+	runPubSubTypeTests<v, std::string>(tvec1, helics::helicsVectorString(tvec1));
+	runPubSubTypeTests<std::string, v>(helics::helicsVectorString(tvec1), tvec1);
+
+	runPubSubTypeTests<v, std::string>(tvec2, helics::helicsVectorString(tvec2));
+	runPubSubTypeTests<std::string, v>(helics::helicsVectorString(tvec2), tvec2);
+
+	runPubSubTypeTests<v, std::string>(eVec, helics::helicsVectorString(eVec));
+	runPubSubTypeTests<std::string, v>(helics::helicsVectorString(eVec), eVec);
+
+	runPubSubTypeTests<std::string, v>("3.14159-2j", v{ 3.14159, -2 });
+	runPubSubTypeTests<std::string, v>("-3.14159-2j", v{ -3.14159, -2 });
+	runPubSubTypeTests<std::string, v>("-3.14159", v{ -3.14159 });
+
+	runPubSubTypeTests<std::string, v>("2i", v{ 0, 2 });
+	//runPubSubTypeTests<c, double>(c(0, 2), 2.0);
+	//runPubSubTypeTests<c, int64_t>(c(0, 2), 2);
+
+	//runPubSubTypeTests<double, c>(2.0, c(2, 0));
+
+	//runPubSubTypeTests<int64_t, c>(2, c(2, 0));
+	//runPubSubTypeTests<c, double>(c(3.0, 4.0), 5.0);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
