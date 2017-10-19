@@ -211,8 +211,8 @@ BOOST_AUTO_TEST_CASE (ipccore_initialization_test)
     bool mqConn = mq.connect ("testBroker", 1024, 1024);
     BOOST_REQUIRE (mqConn);
 
-    bool crConn=core->connect ();
-	BOOST_REQUIRE(crConn);
+    bool crConn = core->connect ();
+    BOOST_REQUIRE (crConn);
 
     helics::ActionMessage rM = mq.getMessage ();
     BOOST_CHECK_EQUAL (rM.name, "core1");

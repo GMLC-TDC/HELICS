@@ -20,14 +20,22 @@ HELICS_Export helics_message_federate helicsCreateMessageFederate (const helics_
 HELICS_Export helics_message_federate helicsCreateMessageFederateFromFile (const char *fileName);
 // MESSAGE FEDERATE calls
 
-HELICS_Export helics_endpoint helicsRegisterEndpoint (helics_message_federate fed, const char *name, const char *type);
+HELICS_Export helics_endpoint helicsRegisterEndpoint (helics_message_federate fed,
+                                                      const char *name,
+                                                      const char *type);
 
-HELICS_Export helics_endpoint helicsRegisterGlobalEndpoint (helics_message_federate fed, const char *name, const char *type);
+HELICS_Export helics_endpoint helicsRegisterGlobalEndpoint (helics_message_federate fed,
+                                                            const char *name,
+                                                            const char *type);
 
 HELICS_Export helicsStatus helicsSetDefaultDestination (helics_endpoint endpoint, const char *dest);
-HELICS_Export helicsStatus helicsSendMessageRaw (helics_endpoint endpoint, const char *dest, const char *data, int len);
+HELICS_Export helicsStatus helicsSendMessageRaw (helics_endpoint endpoint,
+                                                 const char *dest,
+                                                 const char *data,
+                                                 int len);
 
-HELICS_Export helicsStatus helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time);
+HELICS_Export helicsStatus
+helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time);
 
 HELICS_Export helicsStatus helicsSendMessage (helics_endpoint endpoint, message_t *message);
 

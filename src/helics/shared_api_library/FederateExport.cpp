@@ -324,7 +324,9 @@ static convergence_status getConvergenceStatus (helics::convergence_state convSt
     }
 }
 
-helicsStatus helicsEnterExecutionModeIterative (helics_federate fed, convergence_status converged, convergence_status *outConverged)
+helicsStatus helicsEnterExecutionModeIterative (helics_federate fed,
+                                                convergence_status converged,
+                                                convergence_status *outConverged)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
@@ -432,7 +434,8 @@ helics_time_t helicsRequestTime (helics_federate fed, helics_time_t requestTime)
     return static_cast<double> (tm);
 }
 
-helics_iterative_time helicsRequestTimeIterative (helics_federate fed, helics_time_t requestTime, convergence_status converged)
+helics_iterative_time
+helicsRequestTimeIterative (helics_federate fed, helics_time_t requestTime, convergence_status converged)
 {
     helics_iterative_time itTime;
     itTime.status = error;
@@ -445,7 +448,8 @@ helics_iterative_time helicsRequestTimeIterative (helics_federate fed, helics_ti
     }
     try
     {
-        auto val = fedObj->requestTimeIterative (helics::Time (requestTime, timeUnits::ns), getConvergenceState (converged));
+        auto val = fedObj->requestTimeIterative (helics::Time (requestTime, timeUnits::ns),
+                                                 getConvergenceState (converged));
         itTime.time = val.stepTime.getBaseTimeCode ();
         itTime.status = getConvergenceStatus (val.state);
         return itTime;
@@ -467,7 +471,8 @@ helicsStatus helicsRequestTimeAsync (helics_federate fed, helics_time_t requestT
     return helicsOK;
 }
 
-helicsStatus helicsRequestTimeIterativeAsync (helics_federate fed, helics_time_t requestTime, convergence_status converged)
+helicsStatus
+helicsRequestTimeIterativeAsync (helics_federate fed, helics_time_t requestTime, convergence_status converged)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)

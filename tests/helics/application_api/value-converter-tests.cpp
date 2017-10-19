@@ -92,37 +92,34 @@ BOOST_AUTO_TEST_CASE (converter_tests)
     converterTests<vecd> (vec1, testv2, 0, 0, "double_vector");
 }
 
-
-
-BOOST_AUTO_TEST_CASE(test_traits)
+BOOST_AUTO_TEST_CASE (test_traits)
 {
-	BOOST_CHECK(helics::is_vector<std::vector<double>>::value == true);
-	BOOST_CHECK(helics::is_vector < std::vector < std::complex<double> >> ::value == true);
-	BOOST_CHECK(helics::is_vector < std::string> ::value == false);
-	BOOST_CHECK(helics::is_vector <double> ::value == false);
+    BOOST_CHECK (helics::is_vector<std::vector<double>>::value == true);
+    BOOST_CHECK (helics::is_vector<std::vector<std::complex<double>>>::value == true);
+    BOOST_CHECK (helics::is_vector<std::string>::value == false);
+    BOOST_CHECK (helics::is_vector<double>::value == false);
 
-	BOOST_CHECK(helics::is_iterable < std::vector < std::complex<double> >> ::value == true);
-	BOOST_CHECK(helics::is_iterable < std::string> ::value == true);
-	BOOST_CHECK(helics::is_iterable <double> ::value == false);
+    BOOST_CHECK (helics::is_iterable<std::vector<std::complex<double>>>::value == true);
+    BOOST_CHECK (helics::is_iterable<std::string>::value == true);
+    BOOST_CHECK (helics::is_iterable<double>::value == false);
 
-	BOOST_CHECK(helics::is_iterable < std::vector < std::string >> ::value == true);
-	BOOST_CHECK(helics::is_iterable < std::list<std::string>> ::value == true);
-	BOOST_CHECK(helics::is_iterable < std::list<double>> ::value == true);
-	BOOST_CHECK(helics::is_iterable < std::set<std::string>> ::value == true);
-	BOOST_CHECK(helics::is_iterable < std::set<double>> ::value == true);
-	BOOST_CHECK(helics::is_iterable <int> ::value == false);
-
+    BOOST_CHECK (helics::is_iterable<std::vector<std::string>>::value == true);
+    BOOST_CHECK (helics::is_iterable<std::list<std::string>>::value == true);
+    BOOST_CHECK (helics::is_iterable<std::list<double>>::value == true);
+    BOOST_CHECK (helics::is_iterable<std::set<std::string>>::value == true);
+    BOOST_CHECK (helics::is_iterable<std::set<double>>::value == true);
+    BOOST_CHECK (helics::is_iterable<int>::value == false);
 }
 
-BOOST_AUTO_TEST_CASE(test_minSize)
+BOOST_AUTO_TEST_CASE (test_minSize)
 {
-	BOOST_CHECK_EQUAL(helics::getMinSize<std::vector<double>>(),9);
-	BOOST_CHECK_EQUAL(helics::getMinSize<double>(), sizeof(double)+1);
-	BOOST_CHECK_EQUAL(helics::getMinSize<int>(), sizeof(int) + 1);
-	BOOST_CHECK_EQUAL(helics::getMinSize<std::complex<double>>(), sizeof(std::complex<double>)+1);
-	BOOST_CHECK_EQUAL(helics::getMinSize < std::string > (), 0);
-	BOOST_CHECK_EQUAL(helics::getMinSize <const char *>(), 0);
-	BOOST_CHECK_EQUAL(helics::getMinSize<std::set<double>>(), 9);
+    BOOST_CHECK_EQUAL (helics::getMinSize<std::vector<double>> (), 9);
+    BOOST_CHECK_EQUAL (helics::getMinSize<double> (), sizeof (double) + 1);
+    BOOST_CHECK_EQUAL (helics::getMinSize<int> (), sizeof (int) + 1);
+    BOOST_CHECK_EQUAL (helics::getMinSize<std::complex<double>> (), sizeof (std::complex<double>) + 1);
+    BOOST_CHECK_EQUAL (helics::getMinSize<std::string> (), 0);
+    BOOST_CHECK_EQUAL (helics::getMinSize<const char *> (), 0);
+    BOOST_CHECK_EQUAL (helics::getMinSize<std::set<double>> (), 9);
 }
 
 /** this one is a bit annoying to use the template so it gets its own case

@@ -86,7 +86,7 @@ void argumentParser (int argc,
     }
     catch (std::exception &e)
     {
-        std::cerr <<"unable to parse expression"<< e.what () << std::endl;
+        std::cerr << "unable to parse expression" << e.what () << std::endl;
         throw (e);
     }
 

@@ -26,7 +26,7 @@ void valueExtract (const defV &dv, std::complex<double> &val);
 
 void valueExtract (const defV &dv, std::vector<double> &val);
 
-void valueExtract(const defV &dv, std::vector<std::complex<double>> &val);
+void valueExtract (const defV &dv, std::vector<std::complex<double>> &val);
 
 void valueExtract (const data_view &dv, helicsType_t baseType, std::string &val);
 
@@ -34,7 +34,7 @@ void valueExtract (const data_view &dv, helicsType_t baseType, std::vector<doubl
 
 void valueExtract (const data_view &dv, helicsType_t baseType, std::complex<double> &val);
 
-void valueExtract(const data_view &dv, helicsType_t baseType, std::vector<std::complex<double>> &val);
+void valueExtract (const data_view &dv, helicsType_t baseType, std::vector<std::complex<double>> &val);
 
 /** for numeric types*/
 template <class X>
@@ -68,19 +68,19 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &
         }
         break;
     }
-	case complexVectorLoc: //complex vector
-	{
-		auto &vec = boost::get<std::vector<std::complex<double>>>(dv);
-		if (!vec.empty())
-		{
-			val = static_cast<X> (std::abs( vec.front()));
-		}
-		else
-		{
-			val = std::numeric_limits<X>::min();
-		}
-		break;
-	}
+    case complexVectorLoc:  // complex vector
+    {
+        auto &vec = boost::get<std::vector<std::complex<double>>> (dv);
+        if (!vec.empty ())
+        {
+            val = static_cast<X> (std::abs (vec.front ()));
+        }
+        else
+        {
+            val = std::numeric_limits<X>::min ();
+        }
+        break;
+    }
     }
 }
 
@@ -215,7 +215,7 @@ class Subscription : public SubscriptionBase
                    std::function<void(const int64_t &, Time)>,
                    std::function<void(const std::complex<double> &, Time)>,
                    std::function<void(const std::vector<double> &, Time)>,
-					std::function<void(const std::vector<std::complex<double>> &, Time)>>
+                   std::function<void(const std::vector<std::complex<double>> &, Time)>>
       value_callback;  //!< callback function for the federate
 
     mutable helicsType_t type = helicsType_t::helicsInvalid;  //!< the underlying type the publication is using

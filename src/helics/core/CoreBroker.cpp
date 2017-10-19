@@ -882,9 +882,11 @@ bool CoreBroker::connect ()
         broker_state_t exp = broker_state_t::initialized;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::connecting))
         {
+			LOG_NORMAL(0, getIdentifier(), "connecting");
             auto res = brokerConnect ();
             if (res)
             {
+				LOG_NORMAL(0, getIdentifier(), (boost::format("||connected on %s") % getAddress()).str());
                 if (!_isRoot)
                 {
                     ActionMessage m (CMD_REG_BROKER);
@@ -921,6 +923,7 @@ void CoreBroker::processDisconnect () { disconnect (); }
 
 void CoreBroker::disconnect ()
 {
+    LOG_NORMAL (0, getIdentifier (), "||disconnecting");
     if (brokerState > broker_state_t::initialized)
     {
         brokerState = broker_state_t::terminating;
@@ -934,14 +937,14 @@ void CoreBroker::disconnect ()
     auto keepBrokerAlive = BrokerFactory::findBroker (identifier);
     if (keepBrokerAlive)
     {
-		BrokerFactory::unregisterBroker (identifier);
+        BrokerFactory::unregisterBroker (identifier);
     }
     if (!previous_local_broker_identifier.empty ())
     {
         auto keepBrokerAlive2 = BrokerFactory::findBroker (previous_local_broker_identifier);
         if (keepBrokerAlive2)
         {
-			BrokerFactory::unregisterBroker (previous_local_broker_identifier);
+            BrokerFactory::unregisterBroker (previous_local_broker_identifier);
         }
     }
 }

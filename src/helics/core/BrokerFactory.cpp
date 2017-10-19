@@ -10,6 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "BrokerFactory.h"
 #include "helics/common/delayedDestructor.hpp"
+#include "helics/common/searchableObjectHolder.hpp"
 #include "helics/config.h"
 #include "helics/core/core-types.h"
 #if HELICS_HAVE_ZEROMQ
@@ -189,62 +190,34 @@ need be without issue*/
 
 static DelayedDestructor<CoreBroker> delayedDestroyer;  //!< the object handling the delayed destruction
 
-
-static std::map<std::string, std::shared_ptr<CoreBroker>> BrokerMap;
-
-static std::mutex mapLock;  //!< lock for the broker and core maps
-
+static SearchableObjectHolder<CoreBroker> searchableObjects; //!< the object managing the searchable objects
 
 std::shared_ptr<CoreBroker> findBroker (const std::string &brokerName)
 {
-    std::lock_guard<std::mutex> lock (mapLock);
-    auto fnd = BrokerMap.find (brokerName);
-    if (fnd != BrokerMap.end ())
-    {
-        return fnd->second;
-    }
-    return nullptr;
+	return searchableObjects.findObject(brokerName);
 }
 
 bool registerBroker (std::shared_ptr<CoreBroker> tbroker)
 {
     cleanUpBrokers ();
-	delayedDestroyer.addObjectsToBeDestroyed(tbroker);
-    std::lock_guard<std::mutex> lock (mapLock);
-    auto res = BrokerMap.emplace (tbroker->getIdentifier (), std::move (tbroker));
-    return res.second;
+    delayedDestroyer.addObjectsToBeDestroyed (tbroker);
+	return searchableObjects.addObject(tbroker->getIdentifier(),tbroker);
 }
 
 size_t cleanUpBrokers () { return delayedDestroyer.destroyObjects (); }
 
 void copyBrokerIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {
-    std::lock_guard<std::mutex> lock (mapLock);
-    auto fnd = BrokerMap.find (copyFromName);
-    if (fnd != BrokerMap.end ())
-    {
-        auto newBrokerPtr = fnd->second;
-        BrokerMap.emplace (copyToName, std::move (newBrokerPtr));
-    }
+	searchableObjects.copyObject(copyFromName, copyToName);
 }
 
 void unregisterBroker (const std::string &name)
 {
-    std::lock_guard<std::mutex> lock (mapLock);
-    auto fnd = BrokerMap.find (name);
-    if (fnd != BrokerMap.end ())
-    {
-        BrokerMap.erase (fnd);
-        return;
-    }
-    for (auto brk = BrokerMap.begin (); brk != BrokerMap.end (); ++brk)
-    {
-        if (brk->second->getIdentifier () == name)
-        {
-            BrokerMap.erase (brk);
-            return;
-        }
-    }
+	if (!searchableObjects.removeObject(name))
+	{
+		searchableObjects.removeObject([&name](auto &obj) {return (obj->getIdentifier() == name); });
+	}
+	
 }
 
 }  // namespace BrokerFactory

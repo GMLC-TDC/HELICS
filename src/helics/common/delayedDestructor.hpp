@@ -12,10 +12,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define HELICS_DELAYED_DESTRUCTOR_HPP_
 #pragma once
 
+#include <algorithm>
 #include <memory>
 #include <mutex>
 #include <vector>
-#include <algorithm>
 
 /** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
  * threading issues*/
@@ -23,33 +23,32 @@ template <class X>
 class DelayedDestructor
 {
   private:
-	  std::mutex destructionLock;
+    std::mutex destructionLock;
     std::vector<std::shared_ptr<X>> ElementsToBeDestroyed;
-    
 
   public:
     DelayedDestructor () = default;
-    ~DelayedDestructor () 
-	{ 
-		while (!ElementsToBeDestroyed.empty())
-		{
-			destroyObjects();
-			if (!ElementsToBeDestroyed.empty())
-			{
-				std::this_thread::sleep_for(std::chrono::milliseconds(50));
-			}
-		}
-	}
+    ~DelayedDestructor ()
+    {
+        while (!ElementsToBeDestroyed.empty ())
+        {
+            destroyObjects ();
+            if (!ElementsToBeDestroyed.empty ())
+            {
+                std::this_thread::sleep_for (std::chrono::milliseconds (50));
+            }
+        }
+    }
     size_t destroyObjects ()
     {
         std::lock_guard<std::mutex> lock (destructionLock);
-		if (!ElementsToBeDestroyed.empty())
-		{
-			auto loc = std::remove_if(ElementsToBeDestroyed.begin(), ElementsToBeDestroyed.end(), [](const auto &element) {return (element.use_count() <= 1); });
-			ElementsToBeDestroyed.erase(loc, ElementsToBeDestroyed.end());
-		}
-		return ElementsToBeDestroyed.size();
-        
+        if (!ElementsToBeDestroyed.empty ())
+        {
+            auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
+                                       [](const auto &element) { return (element.use_count () <= 1); });
+            ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
+        }
+        return ElementsToBeDestroyed.size ();
     }
     void addObjectsToBeDestroyed (std::shared_ptr<X> &&obj)
     {

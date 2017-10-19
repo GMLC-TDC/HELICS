@@ -46,7 +46,10 @@ HELICS_Export helics_core helicsCreateCore (const char *type, const char *name, 
 HELICS_Export helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, char *argv[]);
 
 HELICS_Export helics_broker helicsCreateBroker (const char *type, const char *name, const char *initString);
-HELICS_Export helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, char *argv[]);
+HELICS_Export helics_broker helicsCreateBrokerFromArgs (const char *type,
+                                                        const char *name,
+                                                        int argc,
+                                                        char *argv[]);
 
 HELICS_Export int helicsBrokerIsConnected (helics_broker broker);
 
@@ -69,12 +72,14 @@ HELICS_Export void helicsFederateInfoFree (const helics_federate_info_t fi);
 HELICS_Export helicsStatus helicsFederateInfoSetFederateName (helics_federate_info_t fi, const char *name);
 HELICS_Export helicsStatus helicsFederateInfoSetCoreName (helics_federate_info_t fi, const char *corename);
 HELICS_Export helicsStatus helicsFederateInfoSetCoreInitString (helics_federate_info_t fi, const char *coreInit);
-HELICS_Export helicsStatus helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi, const char *coretype);
+HELICS_Export helicsStatus helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi,
+                                                                    const char *coretype);
 HELICS_Export helicsStatus helicsFederateInfoSetCoreType (helics_federate_info_t fi, int coretype);
 HELICS_Export helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int value);
 HELICS_Export helicsStatus helicsFederateInfoSetLookahead (helics_federate_info_t fi, helics_time_t lookahead);
 HELICS_Export helicsStatus helicsFederateInfoSetTimeDelta (helics_federate_info_t fi, helics_time_t timeDelta);
-HELICS_Export helicsStatus helicsFederateInfoSetImpactWindow (helics_federate_info_t fi, helics_time_t impactWindow);
+HELICS_Export helicsStatus helicsFederateInfoSetImpactWindow (helics_federate_info_t fi,
+                                                              helics_time_t impactWindow);
 HELICS_Export helicsStatus helicsFederateInfoSetTimeOffset (helics_federate_info_t fi, helics_time_t timeOffset);
 HELICS_Export helicsStatus helicsFederateInfoSetPeriod (helics_federate_info_t fi, helics_time_t period);
 HELICS_Export helicsStatus helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int max_iterations);
@@ -97,10 +102,12 @@ HELICS_Export helicsStatus helicsEnterExecutionModeIterative (helics_federate fe
                                                               convergence_status *outConverged);
 
 HELICS_Export helicsStatus helicsEnterExecutionModeAsync (helics_federate fed);
-HELICS_Export helicsStatus helicsEnterExecutionModeIterativeAsync (helics_federate fed, convergence_status converged);
+HELICS_Export helicsStatus helicsEnterExecutionModeIterativeAsync (helics_federate fed,
+                                                                   convergence_status converged);
 
 HELICS_Export helicsStatus helicsEnterExecutionModeFinalize (helics_federate fed);
-HELICS_Export helicsStatus helicsEnterExecutionModeIterativeFinalize (helics_federate fed, convergence_status *outConverged);
+HELICS_Export helicsStatus helicsEnterExecutionModeIterativeFinalize (helics_federate fed,
+                                                                      convergence_status *outConverged);
 
 HELICS_Export helics_time_t helicsRequestTime (helics_federate fed, helics_time_t requestTime);
 HELICS_Export helics_iterative_time helicsRequestTimeIterative (helics_federate fed,
@@ -108,7 +115,9 @@ HELICS_Export helics_iterative_time helicsRequestTimeIterative (helics_federate 
                                                                 convergence_status converged);
 
 HELICS_Export helicsStatus helicsRequestTimeAsync (helics_federate fed, helics_time_t requestTime);
-HELICS_Export helicsStatus helicsRequestTimeIterativeAsync (helics_federate fed, helics_time_t requestTime, convergence_status converged);
+HELICS_Export helicsStatus helicsRequestTimeIterativeAsync (helics_federate fed,
+                                                            helics_time_t requestTime,
+                                                            convergence_status converged);
 HELICS_Export helics_time_t helicsRequestTimeFinalize (helics_federate fed);
 HELICS_Export helics_iterative_time helicsRequestTimeIterativeFinalize (helics_federate fed);
 

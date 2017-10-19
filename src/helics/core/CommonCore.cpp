@@ -1447,7 +1447,7 @@ void CommonCore::setIdentifier (const std::string &name)
     }
 }
 
-std::string CommonCore::query (const std::string &/*target*/, const std::string & /*queryStr*/)
+std::string CommonCore::query (const std::string & /*target*/, const std::string & /*queryStr*/)
 {
     // this is a local query
     return "";

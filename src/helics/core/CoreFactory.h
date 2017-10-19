@@ -71,7 +71,7 @@ namespace CoreFactory {
   or when the clean up function is called this prevents some odd threading issues
   @return the number of cores still operating
   */
-int cleanUpCores();
+size_t cleanUpCores();
 
   /** make a copy of the broker pointer to allow access to the new name
   */

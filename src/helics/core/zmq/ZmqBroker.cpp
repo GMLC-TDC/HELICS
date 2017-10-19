@@ -120,6 +120,7 @@ void ZmqBroker::InitializeFromArgs (int argc, char *argv[])
 
 bool ZmqBroker::brokerConnect ()
 {
+	
     std::lock_guard<std::mutex> lock (dataLock);
     if (brokerAddress.empty ())
     {

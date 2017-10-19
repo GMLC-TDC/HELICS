@@ -10,6 +10,7 @@ simpleQueue.hpp
 BlockingQueue3.hpp
 timeRepresentation.hpp
 delayedDestructor.hpp
+searchableObjectHolder.hpp
 blocking_queue.h
 stringToCmdLine.h
 logger.h

@@ -25,12 +25,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <cereal/types/vector.hpp>
 #include <complex>
 #include <cstring>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-#include <vector>
-#include <iterator>
 #include <utility>
+#include <vector>
 //#include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>
@@ -87,87 +87,83 @@ void ValueConverter<X>::convert (const X &val, data_block &store)
 }
 
 template <class X>
-void ValueConverter<X>::convert(const X *vals, size_t size, data_block &store)
+void ValueConverter<X>::convert (const X *vals, size_t size, data_block &store)
 {
-	std::string data;
-	data.reserve(sizeof(store) + 1);
-	boost::iostreams::back_insert_device<std::string> inserter(data);
-	boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s(inserter);
-	archiver oa(s);
-	oa(cereal::make_size_tag(size)); // number of elements
-	for (size_t ii = 0; ii < size; ++ii)
-	{
-		oa(vals[ii]);
-	}
-	// don't forget to flush the stream to finish writing into the buffer
-	s.flush();
-	store = std::move(data);
-
+    std::string data;
+    data.reserve (sizeof (store) + 1);
+    boost::iostreams::back_insert_device<std::string> inserter (data);
+    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
+    archiver oa (s);
+    oa (cereal::make_size_tag (size));  // number of elements
+    for (size_t ii = 0; ii < size; ++ii)
+    {
+        oa (vals[ii]);
+    }
+    // don't forget to flush the stream to finish writing into the buffer
+    s.flush ();
+    store = std::move (data);
 }
 
 /** template trait for figuring out if something is a vector of objects*/
 template <typename T, typename _ = void>
-struct is_vector {
-	static constexpr bool value = false;
+struct is_vector
+{
+    static constexpr bool value = false;
 };
 template <typename T>
-struct is_vector< T,
-	typename std::enable_if_t<
-	std::is_same<T,
-	std::vector< typename T::value_type,
-	typename T::allocator_type >
-	>::value
-	>
->
+struct is_vector<T,
+                 typename std::enable_if_t<
+                   std::is_same<T, std::vector<typename T::value_type, typename T::allocator_type>>::value>>
 {
-	static constexpr bool value = true;
+    static constexpr bool value = true;
 };
-
 
 /** template trait for figuring out if something is an iterable container*/
 template <typename T, typename _ = void>
-struct is_iterable {
-	static constexpr bool value = false;
+struct is_iterable
+{
+    static constexpr bool value = false;
 };
 
-
-	template <typename T>
-	struct is_iterable < T,
-		typename std::enable_if_t <
-		std::is_same<decltype(std::begin(T()) != std::end(T()), // begin/end and operator != and has default constructor
-			void(),
-			void(*std::begin(T())), //dereference operator
-				std::true_type{}),std::true_type>::value >>
-	{
-		static constexpr bool value = true;
-	};
-
-
-
-template<class X>
-constexpr std::enable_if_t<!is_iterable<X>::value && !std::is_convertible<X, std::string>::value,size_t> getMinSize()
+template <typename T>
+struct is_iterable<
+  T,
+  typename std::enable_if_t<std::is_same<
+    decltype (std::begin (T ()) != std::end (T ()),  // begin/end and operator != and has default constructor
+              void(),
+              void(*std::begin (T ())),  // dereference operator
+              std::true_type{}),
+    std::true_type>::value>>
 {
-	return sizeof(X) + 1;
-}
+    static constexpr bool value = true;
+};
 
-template<class X>
-constexpr std::enable_if_t<is_iterable<X>::value && !std::is_convertible<X, std::string>::value, size_t> getMinSize()
+template <class X>
+constexpr std::enable_if_t<!is_iterable<X>::value && !std::is_convertible<X, std::string>::value, size_t>
+getMinSize ()
 {
-	return 9;
-}
-
-template<class X>
-constexpr std::enable_if_t < std::is_convertible<X, std::string>::value , size_t > getMinSize()
-{
-	return 0;
+    return sizeof (X) + 1;
 }
 
 template <class X>
-data_block ValueConverter<X>::convert(const X *vals, size_t size)
+constexpr std::enable_if_t<is_iterable<X>::value && !std::is_convertible<X, std::string>::value, size_t>
+getMinSize ()
 {
-	auto dv = data_block();
-	convert(vals,size, dv);
-	return dv;
+    return 9;
+}
+
+template <class X>
+constexpr std::enable_if_t<std::is_convertible<X, std::string>::value, size_t> getMinSize ()
+{
+    return 0;
+}
+
+template <class X>
+data_block ValueConverter<X>::convert (const X *vals, size_t size)
+{
+    auto dv = data_block ();
+    convert (vals, size, dv);
+    return dv;
 }
 
 /** converter for a basic value*/
@@ -182,10 +178,10 @@ data_block ValueConverter<X>::convert (const X &val)
 template <class X>
 void ValueConverter<X>::interpret (const data_view &block, X &val)
 {
-	if (block.size() < getMinSize<X>())
-	{
-		throw std::invalid_argument("invalid data size");
-	}
+    if (block.size () < getMinSize<X> ())
+    {
+        throw std::invalid_argument ("invalid data size");
+    }
     boost::iostreams::basic_array_source<char> device (block.data (), block.size ());
     boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
     retriever ia (s);

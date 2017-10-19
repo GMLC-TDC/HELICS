@@ -22,6 +22,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "TestCore.h"
 #include "common/delayedDestructor.hpp"
+#include "common/searchableObjectHolder.hpp"
 #include "ipc/IpcCore.h"
 #include <cassert>
 
@@ -295,115 +296,70 @@ need be
 without issue*/
 static DelayedDestructor<CommonCore> delayedDestroyer;  //!< the object handling the delayed destruction
 
-static std::map<std::string, std::shared_ptr<CommonCore>> CoreMap;
-
-static std::mutex mapLock;  //!< lock for the broker and core maps
-
+static SearchableObjectHolder<CommonCore> searchableObjects; //!< the object managing the searchable objects
 
 
 std::shared_ptr<CommonCore> findCore (const std::string &name)
 {
-    std::lock_guard<std::mutex> lock (mapLock);
-    auto fnd = CoreMap.find (name);
-    if (fnd != CoreMap.end ())
-    {
-        return fnd->second;
-    }
-    return nullptr;
+	return searchableObjects.findObject(name);
 }
 
+bool isJoinableCoreOfType(core_type type, const std::shared_ptr<CommonCore> &ptr)
+{
+	if (ptr->isJoinable())
+	{
+		switch (type)
+		{
+		case core_type::ZMQ:
+#if HELICS_HAVE_ZEROMQ
+			return (dynamic_cast<ZmqCore *> (ptr.get()) != nullptr);
+#else
+			break;
+#endif
+		case core_type::MPI:
+#if HELICS_HAVE_MPI
+			return (dynamic_cast<MPICore *> (ptr.get()) != nullptr);
+#else
+			break;
+#endif
+		case core_type::TEST:
+			return (dynamic_cast<TestCore *> (ptr.get()) != nullptr);
+		case core_type::INTERPROCESS:
+		case core_type::IPC:
+			return (dynamic_cast<IpcCore *> (ptr.get()) != nullptr);
+		case core_type::TCP:
+		case core_type::UDP:
+		default:
+			return true;
+		}
+	}
+	return false;
+}
 std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
 {
-    std::lock_guard<std::mutex> lock (mapLock);
-    for (auto &cmap : CoreMap)
-    {
-        if (cmap.second->isJoinable ())
-        {
-            switch (type)
-            {
-            case core_type::ZMQ:
-            {
-#if HELICS_HAVE_ZEROMQ
-                if (dynamic_cast<ZmqCore *> (cmap.second.get ()) != nullptr)
-                {
-                    return cmap.second;
-                }
-#endif
-                break;
-            }
-            case core_type::MPI:
-            {
-#if HELICS_HAVE_MPI
-                if (dynamic_cast<MPICore *> (cmap.second.get ()) != nullptr)
-                {
-                    return cmap.second;
-                }
-#endif
-                break;
-            }
-            case core_type::TEST:
-            {
-                if (dynamic_cast<TestCore *> (cmap.second.get ()) != nullptr)
-                {
-                    return cmap.second;
-                }
-                break;
-            }
-            case core_type::INTERPROCESS:
-            {
-                if (dynamic_cast<IpcCore *> (cmap.second.get ()) != nullptr)
-                {
-                    return cmap.second;
-                }
-                break;
-            }
-            default:
-                return cmap.second;
-            }
-        }
-    }
-    return nullptr;
+	return searchableObjects.findObject([type](auto &ptr) {return isJoinableCoreOfType(type, ptr); });
 }
 
 bool registerCommonCore (std::shared_ptr<CommonCore> tcore)
 {
     cleanUpCores ();
-	delayedDestroyer.addObjectsToBeDestroyed(tcore);
-    std::lock_guard<std::mutex> lock (mapLock);
-    auto res = CoreMap.emplace (tcore->getIdentifier (), std::move (tcore));
-    return res.second;
+    delayedDestroyer.addObjectsToBeDestroyed (tcore);
+	return searchableObjects.addObject(tcore->getIdentifier(), tcore);
 }
 
 size_t cleanUpCores () { return delayedDestroyer.destroyObjects (); }
 
 void copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {
-    std::lock_guard<std::mutex> lock (mapLock);
-    auto fnd = CoreMap.find (copyFromName);
-    if (fnd != CoreMap.end ())
-    {
-        auto newCorePtr = fnd->second;
-        CoreMap.emplace (copyToName, std::move (newCorePtr));
-    }
+	searchableObjects.copyObject(copyFromName, copyToName);
 }
 
 void unregisterCore (const std::string &name)
 {
-    std::lock_guard<std::mutex> lock (mapLock);
-    auto fnd = CoreMap.find (name);
-    if (fnd != CoreMap.end ())
-    {
-        CoreMap.erase (fnd);
-        return;
-    }
-    for (auto core = CoreMap.begin (); core != CoreMap.end (); ++core)
-    {
-        if (core->second->getIdentifier () == name)
-        {
-            CoreMap.erase (core);
-            return;
-        }
-    }
+	if (!searchableObjects.removeObject(name))
+	{
+		searchableObjects.removeObject([&name](auto &obj) {return (obj->getIdentifier() == name); });
+	}
 }
 
 }  // namespace CoreFactory
