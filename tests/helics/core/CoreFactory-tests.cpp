@@ -11,6 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/config.h"
 #include "helics/core/CoreFactory.h"
+#include "helics/core/CommonCore.h"
 
 BOOST_AUTO_TEST_SUITE (CoreFactory_tests)
 
@@ -26,7 +27,9 @@ BOOST_AUTO_TEST_CASE (ZmqCore_test)
 
 #if HELICS_HAVE_ZEROMQ
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ, "");
-    BOOST_CHECK (core != nullptr);
+    BOOST_REQUIRE (core != nullptr);
+	helics::CoreFactory::unregisterCore(core->getIdentifier());
+	core = nullptr;
 #endif  // HELICS_HAVE_ZEROMQ
 }
 
@@ -42,7 +45,9 @@ BOOST_AUTO_TEST_CASE (MpiCore_test)
 
 #if HELICS_HAVE_MPI
     auto core = helics::CoreFactory::create (HELICS_MPI, "");
-    BOOST_CHECK (core != nullptr);
+	BOOST_REQUIRE(core != nullptr);
+	helics::CoreFactory::unregisterCore(core->getIdentifier());
+	core = nullptr;
 #endif  // HELICS_HAVE_MPI
 }
 
@@ -51,7 +56,9 @@ BOOST_AUTO_TEST_CASE (TestCore_test)
     BOOST_CHECK_EQUAL (helics::CoreFactory::isAvailable (helics::core_type::TEST), true);
 
     auto core = helics::CoreFactory::create (helics::core_type::TEST, "");
-    BOOST_CHECK (core != nullptr);
+	BOOST_REQUIRE(core != nullptr);
+	helics::CoreFactory::unregisterCore(core->getIdentifier());
+	core = nullptr;
 }
 
 BOOST_AUTO_TEST_CASE (InterprocessCore_test)
@@ -60,10 +67,14 @@ BOOST_AUTO_TEST_CASE (InterprocessCore_test)
     BOOST_CHECK_EQUAL (helics::CoreFactory::isAvailable (helics::core_type::IPC), true);
 
     auto core = helics::CoreFactory::create (helics::core_type::INTERPROCESS, "");
-    BOOST_CHECK (core != nullptr);
+	BOOST_REQUIRE(core != nullptr);
+	helics::CoreFactory::unregisterCore(core->getIdentifier());
+	core = nullptr;
 
     auto core2 = helics::CoreFactory::create (helics::core_type::IPC, "");
-    BOOST_CHECK (core2 != nullptr);
+	BOOST_REQUIRE(core2 != nullptr);
+	helics::CoreFactory::unregisterCore(core2->getIdentifier());
+	core2 = nullptr;
 }
 
 BOOST_AUTO_TEST_CASE (tcpCore_test)

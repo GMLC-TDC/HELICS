@@ -262,15 +262,14 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
     case CMD_FED_ACK:
     {  // we can't be root if we got one of these
         auto fed_num = getFedByName (command.name);
-        int32_t route;
         if (fed_num >= 0)
         {
             std::unique_lock<std::mutex> lock (mutex_);
             _federates[fed_num].global_id = command.dest_id;
-            route = _federates[fed_num].route_id;
+            auto route = _federates[fed_num].route_id;
             federate_table.emplace (command.dest_id, fed_num);
             lock.unlock ();
-            transmit (_federates[fed_num].route_id, command);
+            transmit (route, command);
         }
         else
         {
@@ -301,15 +300,14 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
             return;
         }
         auto broker_num = getBrokerByName (command.name);
-        int32_t route;
         if (broker_num >= 0)
         {
             std::unique_lock<std::mutex> lock (mutex_);
             _brokers[broker_num].global_id = command.dest_id;
-            route = _brokers[broker_num].route_id;
+            auto route = _brokers[broker_num].route_id;
             broker_table.emplace (command.dest_id, broker_num);
             lock.unlock ();
-            transmit (_brokers[broker_num].route_id, command);
+            transmit (route, command);
         }
         else
         {

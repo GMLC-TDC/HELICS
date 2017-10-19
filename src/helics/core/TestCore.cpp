@@ -97,11 +97,14 @@ TestCore::~TestCore ()
 
 void TestCore::transmit (int route_id, const ActionMessage &cmd)
 {
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (routeMutex, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (routeMutex);
+	std::lock_guard<std::mutex> lock(routeMutex);
     if (route_id == 0)
-    {
-        tbroker->addActionMessage (cmd);
+    { 
+		if (tbroker)
+		{
+			tbroker->addActionMessage(cmd);
+		}
+       
         return;
     }
 
@@ -117,8 +120,10 @@ void TestCore::transmit (int route_id, const ActionMessage &cmd)
         crfnd->second->addActionMessage (cmd);
         return;
     }
-
-    tbroker->addActionMessage (cmd);
+	if (tbroker)
+	{
+		tbroker->addActionMessage(cmd);
+	}
 }
 
 void TestCore::addRoute (int route_id, const std::string &routeInfo)
@@ -141,31 +146,5 @@ void TestCore::addRoute (int route_id, const std::string &routeInfo)
 }
 
 std::string TestCore::getAddress () const { return getIdentifier (); }
-
-/*
-void TestCore::computeDependencies()
-{
-    for (auto &fed : _federates)
-    {
-        fed->generateKnownDependencies();
-    }
-    //TODO:: work in the additional rules for endpoints to reduce dependencies
-    for (auto &fed : _federates)
-    {
-        if (fed->hasEndpoints)
-        {
-            for (auto &fedD : _federates)
-            {
-                if (fedD->hasEndpoints)
-                {
-                    fed->addDependency(fedD->id);
-                    fedD->addDependent(fed->id);
-                }
-            }
-        }
-    }
-}
-
-*/
 
 }  // namespace helics

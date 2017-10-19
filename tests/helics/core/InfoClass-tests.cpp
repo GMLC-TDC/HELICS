@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE (endpointinfo_test)
     helics::Time maxT = helics::Time::maxVal ();
     helics::Time minT = helics::Time::minVal ();
     helics::Time zeroT = helics::Time::zeroVal ();
-    helics::Time eps = helics::Time::epsilon ();
+   // helics::Time eps = helics::Time::epsilon ();
 
     auto msg_time_max = std::make_unique<helics::Message> ();
     msg_time_max->data = "maxT";

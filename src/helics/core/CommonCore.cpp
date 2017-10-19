@@ -105,7 +105,15 @@ void CommonCore::disconnect ()
 {
     if (brokerState > broker_state_t::initialized)
     {
-        brokerState = broker_state_t::terminating;
+		if (brokerState < broker_state_t::terminating)
+		{
+			brokerState = broker_state_t::terminating;
+			ActionMessage dis(CMD_DISCONNECT);
+			dis.source_id = global_broker_id;
+			transmit(0, dis);
+			addActionMessage(CMD_STOP);
+			return;
+		}
         brokerDisconnect ();
     }
     brokerState = terminated;
@@ -1508,7 +1516,7 @@ void CommonCore::processPriorityCommand (const ActionMessage &command)
     case CMD_PRIORITY_DISCONNECT:
         if (allDisconnected ())
         {
-            brokerState = broker_state_t::terminated;
+            brokerState = broker_state_t::terminating;
             ActionMessage dis (CMD_DISCONNECT);
             dis.source_id = global_broker_id;
             transmit (0, dis);
