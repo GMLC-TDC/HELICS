@@ -364,7 +364,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
 {
     LOG_TRACE (
       0, getIdentifier (),
-      (boost::format ("|| priority_cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
+      (boost::format ("|| cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
     switch (command.action ())
     {
     case CMD_IGNORE:

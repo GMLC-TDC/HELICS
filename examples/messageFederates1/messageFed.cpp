@@ -62,7 +62,7 @@ int main (int argc, char *argv[])
     fi.coreInitString = "";
 	fi.logLevel = 5;
     auto mFed = std::make_unique<helics::MessageFederate> (fi);
-
+	std::cout << " registering endpoint for " << mFed->getName()<<'\n';
     auto id = mFed->registerEndpoint("endpoint", "");
 
     std::cout << "entering init State\n";
@@ -71,7 +71,7 @@ int main (int argc, char *argv[])
     mFed->enterExecutionState ();
     std::cout << "entered exec State\n";
     for (int i=1; i<10; ++i) {
-		std::string message = "message sent from "+name+" at time " + std::to_string(i);
+		std::string message = "message sent from "+name+" to "+target+" at time " + std::to_string(i);
 		mFed->sendMessage(id, target, message.data(), message.size());
         auto newTime = mFed->requestTime (i);
 		std::cout << "processed time " << static_cast<double> (newTime) << "\n";
