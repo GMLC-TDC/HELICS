@@ -69,8 +69,9 @@ namespace CoreFactory {
   /** clean up unused cores
   @details when Cores are unregistered they get put in a holding area that gets cleaned up when a new Core is registered
   or when the clean up function is called this prevents some odd threading issues
+  @return the number of cores still operating
   */
-  void cleanUpCores();
+int cleanUpCores();
 
   /** make a copy of the broker pointer to allow access to the new name
   */

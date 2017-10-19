@@ -79,7 +79,7 @@ bool TestBroker::brokerConnect ()
         }
         else
         {
-            tbroker = findBroker (brokerName);
+            tbroker = BrokerFactory::findBroker (brokerName);
             if (!tbroker)
             {
                 tbroker = BrokerFactory::create (core_type::TEST, brokerName, brokerInitString);
@@ -129,7 +129,7 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
 
 void TestBroker::addRoute (int route_id, const std::string &routeInfo)
 {
-    auto brk = findBroker (routeInfo);
+    auto brk = BrokerFactory::findBroker (routeInfo);
     if (brk)
     {
         std::lock_guard<std::mutex> lock (routeMutex);

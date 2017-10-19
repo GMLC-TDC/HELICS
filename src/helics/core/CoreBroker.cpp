@@ -931,17 +931,17 @@ void CoreBroker::disconnect ()
     otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
     that will be destroyed on function exit
     */
-    auto keepBrokerAlive = findBroker (identifier);
+    auto keepBrokerAlive = BrokerFactory::findBroker (identifier);
     if (keepBrokerAlive)
     {
-        unregisterBroker (identifier);
+		BrokerFactory::unregisterBroker (identifier);
     }
     if (!previous_local_broker_identifier.empty ())
     {
-        auto keepBrokerAlive2 = findBroker (previous_local_broker_identifier);
+        auto keepBrokerAlive2 = BrokerFactory::findBroker (previous_local_broker_identifier);
         if (keepBrokerAlive2)
         {
-            unregisterBroker (previous_local_broker_identifier);
+			BrokerFactory::unregisterBroker (previous_local_broker_identifier);
         }
     }
 }

@@ -37,7 +37,7 @@ namespace BrokerFactory {
 	* Returns true if type specified is available in current compilation.
 	*/
 	bool available(core_type type);
-} //namespace BrokerFactory
+
 
 /** locate a coreBroker by name
 @param name the name of the broker
@@ -57,13 +57,15 @@ void unregisterBroker(const std::string &name);
 /** clean up unused brokers
 @details when brokers are unregistered they get put in a holding area that gets cleaned up when a new broker is registered
 or when the clean up function is called this prevents some odd threading issues
+@return the number of brokers still operating
 */
-void cleanUpBrokers();
+size_t cleanUpBrokers();
 
 /** make a copy of the broker pointer to allow access to the new name
 */
 void copyBrokerIdentifier(const std::string &copyFromName, const std::string &copyToName);
 
+} //namespace BrokerFactory
 } // namespace helics
 
 #endif  //_HELICS_BROKER_FACTORY_

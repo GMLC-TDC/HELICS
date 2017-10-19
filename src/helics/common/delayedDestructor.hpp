@@ -23,8 +23,9 @@ template <class X>
 class DelayedDestructor
 {
   private:
+	  std::mutex destructionLock;
     std::vector<std::shared_ptr<X>> ElementsToBeDestroyed;
-    std::mutex destructionLock;
+    
 
   public:
     DelayedDestructor () = default;
@@ -39,7 +40,7 @@ class DelayedDestructor
 			}
 		}
 	}
-    void destroyObjects ()
+    size_t destroyObjects ()
     {
         std::lock_guard<std::mutex> lock (destructionLock);
 		if (!ElementsToBeDestroyed.empty())
@@ -47,6 +48,7 @@ class DelayedDestructor
 			auto loc = std::remove_if(ElementsToBeDestroyed.begin(), ElementsToBeDestroyed.end(), [](const auto &element) {return (element.use_count() <= 1); });
 			ElementsToBeDestroyed.erase(loc, ElementsToBeDestroyed.end());
 		}
+		return ElementsToBeDestroyed.size();
         
     }
     void addObjectsToBeDestroyed (std::shared_ptr<X> &&obj)

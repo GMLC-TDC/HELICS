@@ -287,10 +287,6 @@ bool isAvailable (core_type type)
     return available;
 }
 
-static std::map<std::string, std::shared_ptr<CommonCore>> CoreMap;
-
-static std::mutex mapLock;  //!< lock for the broker and core maps
-
 /** so the problem this is addressing is that unregister can potentially cause a destructor to fire
 that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
 can do the unregister operation and destroy itself meaning it is unable to join and thus will call std::terminate
@@ -298,6 +294,12 @@ what we do is delay the destruction until it is called in a different thread whi
 need be
 without issue*/
 static DelayedDestructor<CommonCore> delayedDestroyer;  //!< the object handling the delayed destruction
+
+static std::map<std::string, std::shared_ptr<CommonCore>> CoreMap;
+
+static std::mutex mapLock;  //!< lock for the broker and core maps
+
+
 
 std::shared_ptr<CommonCore> findCore (const std::string &name)
 {
@@ -366,12 +368,13 @@ std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
 bool registerCommonCore (std::shared_ptr<CommonCore> tcore)
 {
     cleanUpCores ();
+	delayedDestroyer.addObjectsToBeDestroyed(tcore);
     std::lock_guard<std::mutex> lock (mapLock);
     auto res = CoreMap.emplace (tcore->getIdentifier (), std::move (tcore));
     return res.second;
 }
 
-void cleanUpCores () { delayedDestroyer.destroyObjects (); }
+size_t cleanUpCores () { return delayedDestroyer.destroyObjects (); }
 
 void copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {
@@ -390,7 +393,6 @@ void unregisterCore (const std::string &name)
     auto fnd = CoreMap.find (name);
     if (fnd != CoreMap.end ())
     {
-        delayedDestroyer.addObjectsToBeDestroyed (std::move (fnd->second));
         CoreMap.erase (fnd);
         return;
     }
@@ -398,7 +400,6 @@ void unregisterCore (const std::string &name)
     {
         if (core->second->getIdentifier () == name)
         {
-            delayedDestroyer.addObjectsToBeDestroyed (std::move (core->second));
             CoreMap.erase (core);
             return;
         }

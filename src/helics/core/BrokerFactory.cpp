@@ -181,11 +181,6 @@ bool available (core_type type)
     return available;
 }
 
-}  // namespace BrokerFactory
-static std::map<std::string, std::shared_ptr<CoreBroker>> BrokerMap;
-
-static std::mutex mapLock;  //!< lock for the broker and core maps
-
 /** so the problem this is addressing is that unregister can potentially cause a destructor to fire
 that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
 can do the unregister operation and destroy itself meaning it is unable to join and thus will call std::terminate
@@ -193,6 +188,12 @@ what we do is delay the destruction until it is called in a different thread whi
 need be without issue*/
 
 static DelayedDestructor<CoreBroker> delayedDestroyer;  //!< the object handling the delayed destruction
+
+
+static std::map<std::string, std::shared_ptr<CoreBroker>> BrokerMap;
+
+static std::mutex mapLock;  //!< lock for the broker and core maps
+
 
 std::shared_ptr<CoreBroker> findBroker (const std::string &brokerName)
 {
@@ -208,12 +209,13 @@ std::shared_ptr<CoreBroker> findBroker (const std::string &brokerName)
 bool registerBroker (std::shared_ptr<CoreBroker> tbroker)
 {
     cleanUpBrokers ();
+	delayedDestroyer.addObjectsToBeDestroyed(tbroker);
     std::lock_guard<std::mutex> lock (mapLock);
     auto res = BrokerMap.emplace (tbroker->getIdentifier (), std::move (tbroker));
     return res.second;
 }
 
-void cleanUpBrokers () { delayedDestroyer.destroyObjects (); }
+size_t cleanUpBrokers () { return delayedDestroyer.destroyObjects (); }
 
 void copyBrokerIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {
@@ -232,7 +234,6 @@ void unregisterBroker (const std::string &name)
     auto fnd = BrokerMap.find (name);
     if (fnd != BrokerMap.end ())
     {
-        delayedDestroyer.addObjectsToBeDestroyed (std::move (fnd->second));
         BrokerMap.erase (fnd);
         return;
     }
@@ -240,10 +241,11 @@ void unregisterBroker (const std::string &name)
     {
         if (brk->second->getIdentifier () == name)
         {
-            delayedDestroyer.addObjectsToBeDestroyed (std::move (brk->second));
             BrokerMap.erase (brk);
             return;
         }
     }
 }
+
+}  // namespace BrokerFactory
 }  // namespace helics

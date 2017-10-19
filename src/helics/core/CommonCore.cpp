@@ -1034,7 +1034,7 @@ Handle CommonCore::registerDestinationFilter (federate_id_t federateID,
     return id;
 }
 
-void CommonCore::registerFrequentCommunicationsPair (const std::string &source, const std::string &dest)
+void CommonCore::registerFrequentCommunicationsPair (const std::string & /*source*/, const std::string & /*dest*/)
 {
     std::lock_guard<std::mutex> lock (_mutex);
 
@@ -1042,7 +1042,7 @@ void CommonCore::registerFrequentCommunicationsPair (const std::string &source, 
     assert (false);
 }
 
-void CommonCore::addDependency (federate_id_t federateID, const std::string &federateName) {}
+void CommonCore::addDependency (federate_id_t /*federateID*/, const std::string & /*federateName*/) {}
 
 void CommonCore::send (Handle sourceHandle, const std::string &destination, const char *data, uint64_t length)
 {
@@ -1447,7 +1447,7 @@ void CommonCore::setIdentifier (const std::string &name)
     }
 }
 
-std::string CommonCore::query (const std::string &target, const std::string &queryStr)
+std::string CommonCore::query (const std::string &/*target*/, const std::string & /*queryStr*/)
 {
     // this is a local query
     return "";
