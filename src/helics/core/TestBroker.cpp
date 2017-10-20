@@ -27,13 +27,29 @@ TestBroker::TestBroker (std::shared_ptr<TestBroker> nbroker) : tbroker (std::mov
 TestBroker::~TestBroker ()
 {
     haltOperations = true;
+	// lock to ensure all the data is synchronized before deletion
+	std::unique_lock<std::mutex> lock(routeMutex);
+	lock.unlock();
     joinAllThreads ();
-    // lock to ensure all the data is synchronized before deletion
-    std::lock_guard<std::mutex> lock (routeMutex);
+    
 }
 using namespace std::string_literals;
 static const argDescriptors extraArgs{{"brokername"s, "string"s, "identifier for the broker-same as broker"s},
                                       {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
+
+
+void TestBroker::displayHelp(bool localOnly)
+{
+	std::cout << " Help for Test Broker: \n";
+	namespace po = boost::program_options;
+	po::variables_map vm;
+	char *argV[] = { "","--help" };
+	argumentParser(2, argV, vm, extraArgs);
+	if (!localOnly)
+	{
+		CoreBroker::displayHelp();
+	}
+}
 
 void TestBroker::InitializeFromArgs (int argc, char *argv[])
 {

@@ -65,6 +65,8 @@ size_t cleanUpBrokers();
 */
 void copyBrokerIdentifier(const std::string &copyFromName, const std::string &copyToName);
 
+/** display the help listing for a particular core_type*/
+void displayHelp(core_type type = core_type::UNRECOGNIZED);
 } //namespace BrokerFactory
 } // namespace helics
 

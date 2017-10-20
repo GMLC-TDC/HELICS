@@ -39,6 +39,7 @@ private:
 	std::string brokerloc;	//!< the location of the broker	queue
 	std::string brokername;	//!< the name of the broker
 	std::unique_ptr<IpcComms> comms;	//!< object to handle the actual interprocess Connections
+	mutable std::mutex dataMutex;  //mutex protecting the other information in the ipcBroker
 };
 
 

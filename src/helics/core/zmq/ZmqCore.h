@@ -42,6 +42,7 @@ private:
 	virtual void brokerDisconnect() override;
 
 	std::unique_ptr<ZmqComms> comms; //!< object controlling the actual comm work
+	mutable std::mutex dataLock;  //mutex protecting the local information
  
 };
 

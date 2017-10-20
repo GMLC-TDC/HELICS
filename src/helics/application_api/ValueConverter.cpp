@@ -22,6 +22,7 @@ template class ValueConverter<float>;
 template class ValueConverter<int16_t>;
 template class ValueConverter<uint32_t>;
 template class ValueConverter<int32_t>;
+template class ValueConverter<unsigned long>;
 template class ValueConverter<std::vector<double>>;
 template class ValueConverter<std::vector<std::string>>;
 template class ValueConverter<std::vector<std::complex<double>>>;

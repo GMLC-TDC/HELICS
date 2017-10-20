@@ -8,6 +8,7 @@
 set(common_headers
 simpleQueue.hpp
 BlockingQueue3.hpp
+BlockingPriorityQueue.hpp
 timeRepresentation.hpp
 delayedDestructor.hpp
 searchableObjectHolder.hpp

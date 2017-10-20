@@ -24,6 +24,7 @@ public:
 	IpcBroker(bool rootBroker = false) noexcept;
 	IpcBroker(const std::string &broker_name);
 
+	static void displayHelp(bool local_only = false);
 	void InitializeFromArgs(int argc, char *argv[]) override;
 
 	/**destructor*/
@@ -43,7 +44,7 @@ private:
 	std::string brokerloc;
 	std::string brokername;
 	std::unique_ptr<IpcComms> comms;
-	std::mutex dataMutex;  //mutex protecting the other information in the ipcBroker
+	mutable std::mutex dataMutex;  //mutex protecting the other information in the ipcBroker
 };
 } //namespace helics
 #endif

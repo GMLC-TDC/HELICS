@@ -40,7 +40,7 @@ or the interface doesn't use port numbers
 */
 std::pair<std::string, int> extractInterfaceandPort(const std::string &address);
 
-/** implementation for the communication interface that uses zmq messages to communicate*/
+/** implementation for the communication interface that uses ZMQ messages to communicate*/
 class ZmqComms final:public CommsInterface {
 
 public:
@@ -49,7 +49,7 @@ public:
 	ZmqComms(const std::string &brokerTarget, const std::string &localTarget);
 	/** destructor*/
 	~ZmqComms();
-	/** set the portnumbers for the local ports*/
+	/** set the port numbers for the local ports*/
 	void setBrokerPorts(int reqPort, int pushPort=-1);
 	void setPortNumbers(int repPort, int pullPort=-1);
 	void setAutomaticPortStartPort(int startingPort);

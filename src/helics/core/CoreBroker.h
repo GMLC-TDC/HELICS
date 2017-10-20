@@ -135,6 +135,8 @@ public:
 	bool isRoot() {
 		return _isRoot;
 	};
+
+	static void displayHelp();
 private:
 	/** implementation details of the connection process
 	*/

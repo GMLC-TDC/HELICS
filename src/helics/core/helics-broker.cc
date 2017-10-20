@@ -14,16 +14,20 @@ namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
 
-bool argumentParser(int argc, char *argv[], po::variables_map &vm_map);
+int argumentParser(int argc, char *argv[], po::variables_map &vm_map);
 
 int main(int argc, char *argv[])
 {
 
 	po::variables_map vm;
-	bool exit_early = argumentParser(argc, argv, vm);
+	int exit_early = argumentParser(argc, argv, vm);
 
-	if (exit_early)
+	if (exit_early != 0)
 	{
+		if (exit_early == 2)
+		{
+			helics::BrokerFactory::displayHelp();
+		}
 		return 0;
 	}
 
@@ -63,7 +67,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-bool argumentParser(int argc, char *argv[], po::variables_map &vm_map)
+int argumentParser(int argc, char *argv[], po::variables_map &vm_map)
 {
 	po::options_description cmd_only("command line only");
 	po::options_description config("configuration");
@@ -79,7 +83,7 @@ bool argumentParser(int argc, char *argv[], po::variables_map &vm_map)
 
 	config.add_options()
 		("name,n", po::value<std::string>(), "name of the broker")
-		("type,t", po::value<std::string>(), "type of the broker");
+		("type,t", po::value<std::string>(), "type of the broker (\"(zmq)\", \"ipc\", \"test\", \"mpi\", \"test\", \"tcp\", \"udp\")");
 
 	// clang-format on
 
@@ -113,13 +117,13 @@ bool argumentParser(int argc, char *argv[], po::variables_map &vm_map)
 	if (cmd_vm.count("help") > 0)
 	{
 		std::cout << visible << '\n';
-		return true;
+		return 2;
 	}
 
 	if (cmd_vm.count("version") > 0)
 	{
 		std::cout << HELICS_VERSION_MAJOR << '.' << HELICS_VERSION_MINOR << '.' << HELICS_VERSION_PATCH << " (" << HELICS_DATE << ")\n";
-		return true;
+		return 1;
 	}
 
 

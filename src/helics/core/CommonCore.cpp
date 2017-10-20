@@ -97,7 +97,10 @@ bool CommonCore::connect ()
     return isConnected ();
 }
 
-bool CommonCore::isConnected () const { return ((brokerState == operating) || (brokerState == connected)); }
+bool CommonCore::isConnected () const { 
+	auto currentState = brokerState.load();
+	return ((currentState == operating) || (currentState == connected));
+}
 
 void CommonCore::processDisconnect () { disconnect (); }
 

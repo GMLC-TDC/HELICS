@@ -35,6 +35,8 @@ public:
 
 	virtual bool brokerConnect() override;
 	virtual void brokerDisconnect() override;
+	/** static method to display the help message*/
+	static void displayHelp(bool localOnly=false);
 private:
 	std::string brokerName;  //!< the name of the higher level broker to connect to
 	std::string brokerInitString;  //!< the initialization string for the higher level broker

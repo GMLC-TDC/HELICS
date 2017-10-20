@@ -190,34 +190,73 @@ need be without issue*/
 
 static DelayedDestructor<CoreBroker> delayedDestroyer;  //!< the object handling the delayed destruction
 
-static SearchableObjectHolder<CoreBroker> searchableObjects; //!< the object managing the searchable objects
+static SearchableObjectHolder<CoreBroker> searchableObjects;  //!< the object managing the searchable objects
 
 std::shared_ptr<CoreBroker> findBroker (const std::string &brokerName)
 {
-	return searchableObjects.findObject(brokerName);
+    return searchableObjects.findObject (brokerName);
 }
 
 bool registerBroker (std::shared_ptr<CoreBroker> tbroker)
 {
     cleanUpBrokers ();
     delayedDestroyer.addObjectsToBeDestroyed (tbroker);
-	return searchableObjects.addObject(tbroker->getIdentifier(),tbroker);
+    return searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
 }
 
 size_t cleanUpBrokers () { return delayedDestroyer.destroyObjects (); }
 
 void copyBrokerIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {
-	searchableObjects.copyObject(copyFromName, copyToName);
+    searchableObjects.copyObject (copyFromName, copyToName);
 }
 
 void unregisterBroker (const std::string &name)
 {
-	if (!searchableObjects.removeObject(name))
-	{
-		searchableObjects.removeObject([&name](auto &obj) {return (obj->getIdentifier() == name); });
-	}
-	
+    if (!searchableObjects.removeObject (name))
+    {
+        searchableObjects.removeObject ([&name](auto &obj) { return (obj->getIdentifier () == name); });
+    }
+}
+
+void displayHelp (core_type type)
+{
+    switch (type)
+    {
+    case core_type::ZMQ:
+#if HELICS_HAVE_ZEROMQ
+        ZmqBroker::displayHelp (true);
+#endif
+        break;
+    case core_type::MPI:
+#if HELICS_HAVE_MPI
+        MpiBroker::displayHelp (true);
+#endif
+        break;
+    case core_type::TEST:
+        TestBroker::displayHelp (true);
+        break;
+    case core_type::INTERPROCESS:
+    case core_type::IPC:
+        IpcBroker::displayHelp (true);
+        break;
+    case core_type::TCP:
+    case core_type::UDP:
+        break;
+    default:
+#if HELICS_HAVE_ZEROMQ
+        ZmqBroker::displayHelp (true);
+#endif
+#if HELICS_HAVE_MPI
+        MpiBroker::displayHelp (true);
+#endif
+        IpcBroker::displayHelp (true);
+
+        TestBroker::displayHelp (true);
+        break;
+    }
+
+    CoreBroker::displayHelp ();
 }
 
 }  // namespace BrokerFactory

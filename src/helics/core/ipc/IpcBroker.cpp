@@ -47,8 +47,24 @@ IpcBroker::IpcBroker (const std::string &broker_name) : CoreBroker (broker_name)
 IpcBroker::~IpcBroker ()
 {
     haltOperations = true;
+	std::unique_lock<std::mutex> lock(dataMutex);
     comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
+	lock.unlock();
     joinAllThreads ();
+}
+
+
+void IpcBroker::displayHelp(bool localOnly)
+{
+	std::cout << " Help for Interprocess Broker: \n";
+	namespace po = boost::program_options;
+	po::variables_map vm;
+	char *argV[] = { "","--help" };
+	argumentParser(2, argV, vm, extraArgs);
+	if (!localOnly)
+	{
+		CoreBroker::displayHelp();
+	}
 }
 
 void IpcBroker::InitializeFromArgs (int argc, char *argv[])
@@ -104,16 +120,32 @@ bool IpcBroker::brokerConnect ()
     return comms->connect ();
 }
 
-void IpcBroker::brokerDisconnect ()
+void IpcBroker::brokerDisconnect()
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
-    comms->disconnect ();
+	std::lock_guard<std::mutex> lock(dataMutex);
+	if (comms)
+	{
+		comms->disconnect();
+	}
+    
 }
 
-void IpcBroker::transmit (int route_id, const ActionMessage &cmd) { comms->transmit (route_id, cmd); }
+void IpcBroker::transmit(int route_id, const ActionMessage &cmd) {
+	std::lock_guard<std::mutex> lock(dataMutex);
+	if (comms)
+	{
+		comms->transmit(route_id, cmd);
+	}
+}
 
-void IpcBroker::addRoute (int route_id, const std::string &routeInfo) { comms->addRoute (route_id, routeInfo); }
+void IpcBroker::addRoute(int route_id, const std::string &routeInfo) {
+	std::lock_guard<std::mutex> lock(dataMutex);
+	if (comms)
+	{
+		comms->addRoute(route_id, routeInfo);
+	}
+}
 
-std::string IpcBroker::getAddress () const { return fileloc; }
+std::string IpcBroker::getAddress () const { std::lock_guard<std::mutex> lock(dataMutex); return fileloc; }
 
 }  // namespace helics

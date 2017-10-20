@@ -46,7 +46,9 @@ IpcCore::IpcCore (const std::string &core_name) : CommonCore (core_name) {}
 IpcCore::~IpcCore ()
 {
     haltOperations = true;
+    std::unique_lock<std::mutex> lock (dataMutex);
     comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
+    lock.unlock ();
     joinAllThreads ();
 }
 
@@ -79,6 +81,7 @@ void IpcCore::InitializeFromArgs (int argc, char *argv[])
 
 bool IpcCore::brokerConnect ()
 {
+    std::lock_guard<std::mutex> lock (dataMutex);
     if (fileloc.empty ())
     {
         fileloc = getIdentifier () + "_queue.hqf";
@@ -98,12 +101,37 @@ bool IpcCore::brokerConnect ()
     return comms->connect ();
 }
 
-void IpcCore::brokerDisconnect () { comms->disconnect (); }
+void IpcCore::brokerDisconnect ()
+{
+    std::lock_guard<std::mutex> lock (dataMutex);
+    if (comms)
+    {
+        comms->disconnect ();
+    }
+}
 
-void IpcCore::transmit (int route_id, const ActionMessage &cmd) { comms->transmit (route_id, cmd); }
+void IpcCore::transmit (int route_id, const ActionMessage &cmd)
+{
+    std::lock_guard<std::mutex> lock (dataMutex);
+    if (comms)
+    {
+        comms->transmit (route_id, cmd);
+    }
+}
 
-void IpcCore::addRoute (int route_id, const std::string &routeInfo) { comms->addRoute (route_id, routeInfo); }
+void IpcCore::addRoute (int route_id, const std::string &routeInfo)
+{
+    std::lock_guard<std::mutex> lock (dataMutex);
+    if (comms)
+    {
+        comms->addRoute (route_id, routeInfo);
+    }
+}
 
-std::string IpcCore::getAddress () const { return fileloc; }
+std::string IpcCore::getAddress () const
+{
+    std::lock_guard<std::mutex> lock (dataMutex);
+    return fileloc;
+}
 
 }  // namespace helics

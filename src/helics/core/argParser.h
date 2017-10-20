@@ -19,12 +19,13 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
+	/** class to contain a descriptor for a command line argument*/
 class argDescriptor
 {
 public:
-	std::string flag_;
-	std::string type_;
-	std::string desc_;
+	std::string flag_;  //!< a key for the argument
+	std::string type_; //!< the type of argument that is expected
+	std::string desc_;	//!< a help file description
 	argDescriptor() = default;
 	argDescriptor(std::string flag, std::string type, std::string desc)
 		:flag_(std::move(flag)), type_(std::move(type)), desc_(std::move(desc))

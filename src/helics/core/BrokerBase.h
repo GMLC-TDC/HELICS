@@ -66,6 +66,7 @@ protected:
 	};
 	std::atomic<broker_state_t> brokerState{ created }; //!< flag indicating that the structure is past the initialization stage indicating that no more changes can be made to the number of federates or handles
 public:
+	static void displayHelp();
 	BrokerBase() noexcept;
 	BrokerBase(const std::string &broker_name);
 

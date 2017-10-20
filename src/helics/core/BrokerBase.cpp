@@ -35,6 +35,9 @@ static inline std::string gen_id ()
     return pid_str + "-" + uuid_str;
 }
 
+
+
+
 static void argumentParser (int argc, char *argv[], boost::program_options::variables_map &vm_map)
 {
     namespace po = boost::program_options;
@@ -51,7 +54,7 @@ static void argumentParser (int argc, char *argv[], boost::program_options::vari
 
 
 	config.add_options()
-		("name,n", po::value<std::string>(), "name of the core")
+		("name,n", po::value<std::string>(), "name of the broker/core")
 		("federates", po::value<int>(), "the minimum number of federates that will be connecting")
 		("minfed", po::value<int>(), "the minimum number of federates that will be connecting")
 		("maxiter", po::value<int>(), "maximum number of iterations")
@@ -59,8 +62,8 @@ static void argumentParser (int argc, char *argv[], boost::program_options::vari
 		("loglevel", po::value<int>(), "the level which to log the higher this is set to the more gets logs (-1) for no logging")
 		("fileloglevel", po::value<int>(), "the level at which messages get sent to the file")
 		("consoleloglevel", po::value<int>(), "the level at which message get sent to the console")
-		("minbroker", po::value<int>(), "the minimum number of core/brokers that need to be connected")
-		("identifier", po::value<std::string>(), "name of the core");
+		("minbroker", po::value<int>(), "the minimum number of core/brokers that need to be connected (ignored in cores)")
+		("identifier", po::value<std::string>(), "name of the core/broker");
 
 
 	hidden.add_options() ("min", po::value<int>(), "minimum number of federates");
@@ -138,6 +141,15 @@ BrokerBase::BrokerBase () noexcept {}
 BrokerBase::BrokerBase (const std::string &broker_name) : identifier (broker_name) {}
 
 BrokerBase::~BrokerBase () { joinAllThreads (); }
+
+void BrokerBase::displayHelp()
+{
+	std::cout << " Global options for all Brokers:\n";
+	namespace po = boost::program_options;
+	po::variables_map vm;
+	char *argV[] = { "","--help" };
+	argumentParser(2, argV, vm);
+}
 
 void BrokerBase::joinAllThreads ()
 {

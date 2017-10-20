@@ -322,6 +322,14 @@ BOOST_AUTO_TEST_CASE(message_conversion_test)
 	BOOST_CHECK_EQUAL(cmd.info().orig_source, msg->origsrc);
 	BOOST_CHECK_EQUAL(cmd.info().target, msg->dest);
 	BOOST_CHECK_EQUAL(cmd.payload, msg->data.to_string());
-	
+
+	ActionMessage cmd2;
+	cmd2.moveInfo(std::move(msg));
+	BOOST_CHECK(cmd.action() == CMD_SEND_MESSAGE);
+	BOOST_CHECK_EQUAL(cmd.actionTime, cmd2.actionTime);
+	BOOST_CHECK_EQUAL(cmd.info().source, cmd2.info().source);
+	BOOST_CHECK_EQUAL(cmd.info().orig_source, cmd2.info().orig_source);
+	BOOST_CHECK_EQUAL(cmd.info().target, cmd.info().target);
+	BOOST_CHECK_EQUAL(cmd.payload, cmd.payload);
 }
 BOOST_AUTO_TEST_SUITE_END ()

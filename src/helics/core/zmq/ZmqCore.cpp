@@ -42,7 +42,9 @@ ZmqCore::ZmqCore () noexcept {}
 ZmqCore::~ZmqCore ()
 {
     haltOperations = true;
+	std::unique_lock<std::mutex> lock(dataLock);
     comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
+	lock.unlock();
     joinAllThreads ();
 }
 
@@ -78,7 +80,7 @@ void ZmqCore::InitializeFromArgs (int argc, char *argv[])
                 }
                 brokerPushPort = brkprt.second;
             }
-            if (brokerAddress == "tcp://*")
+            if ((brokerAddress == "tcp://*")||(brokerAddress=="tcp"))
             {  // the broker address can't use a wild card
                 brokerAddress = "tcp://127.0.0.1";
             }
@@ -127,6 +129,7 @@ void ZmqCore::InitializeFromArgs (int argc, char *argv[])
 
 bool ZmqCore::brokerConnect ()
 {
+	std::lock_guard<std::mutex> lock(dataLock);
     if (brokerAddress.empty ())  // cores require a broker
     {
         brokerAddress = "tcp://127.0.0.1";
@@ -158,12 +161,38 @@ bool ZmqCore::brokerConnect ()
     return res;
 }
 
-void ZmqCore::brokerDisconnect () { comms->disconnect (); }
+void ZmqCore::brokerDisconnect() {
+	std::lock_guard<std::mutex> lock(dataLock);
+	if (comms)
+	{
+		comms->disconnect();
+	}
+}
 
-void ZmqCore::transmit (int route_id, const ActionMessage &cmd) { comms->transmit (route_id, cmd); }
+void ZmqCore::transmit(int route_id, const ActionMessage &cmd) {
+	std::lock_guard<std::mutex> lock(dataLock);
+	if (comms)
+	{
+		comms->transmit(route_id, cmd);
+	}
+}
 
-void ZmqCore::addRoute (int route_id, const std::string &routeInfo) { comms->addRoute (route_id, routeInfo); }
+void ZmqCore::addRoute (int route_id, const std::string &routeInfo) 
+{ 
+	std::lock_guard<std::mutex> lock(dataLock);
+	if (comms)
+	{
+		comms->addRoute(route_id, routeInfo);
+	}
+}
 
-std::string ZmqCore::getAddress () const { return comms->getRequestAddress () + ";" + comms->getPushAddress (); }
+std::string ZmqCore::getAddress() const {
+	std::lock_guard<std::mutex> lock(dataLock);
+	if (comms)
+	{
+		return comms->getRequestAddress() + ";" + comms->getPushAddress();
+	}
+	return makePortAddress(localInterface, repPortNumber);
+}
 
 }  // namespace helics

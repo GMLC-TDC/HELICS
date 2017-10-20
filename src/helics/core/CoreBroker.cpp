@@ -31,6 +31,17 @@ static const argDescriptors extraArgs{
 
 bool matchingTypes (const std::string &type1, const std::string &type2);
 
+
+void CoreBroker::displayHelp()
+{
+	std::cout << "Broker Specific options:\n";
+	namespace po = boost::program_options;
+	po::variables_map vm;
+	char *argV[] = { "","--help" };
+	argumentParser(2, argV, vm, extraArgs);
+	BrokerBase::displayHelp();
+}
+
 CoreBroker::~CoreBroker ()
 {
     std::lock_guard<std::mutex> lock (mutex_);

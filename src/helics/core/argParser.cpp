@@ -35,8 +35,7 @@ void argumentParser (int argc,
 
 	config.add_options()
 		("broker,b", po::value<std::string>(), "identifier for the broker")
-		("broker_address",po::value<std::string>(),"location of the broker address")
-		("register", "register the core for global locating");
+		("broker_address",po::value<std::string>(),"location of the broker address");
 
 	for (auto &addArg : additionalArgs)
 	{
