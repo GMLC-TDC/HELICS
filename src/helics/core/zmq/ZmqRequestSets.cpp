@@ -19,22 +19,28 @@ void ZmqRequestSets::addRoutes (int routeNumber, const std::string &routeInfo)
 {
     auto zsock = std::make_unique<zmq::socket_t> (ctx->getContext (), ZMQ_REQ);
     zsock->connect (routeInfo);
-    routes.emplace (routeNumber, std::move (zsock));
+    auto fnd = routes_waiting.find (routeNumber);
+    if (fnd != routes_waiting.end ())
+    {
+        routes[routeNumber] = std::move (zsock);
+    }
+    else
+    {
+        routes.emplace (routeNumber, std::move (zsock));
+    }
+
+    routes_waiting[routeNumber] = false;
 }
 
 bool ZmqRequestSets::transmit (int routeNumber, const ActionMessage &command)
 {
     // check if we are waiting on the route
-    auto fnd = routes_waiting.find (routeNumber);
-    if (fnd != routes_waiting.end ())
-    {
-        if (fnd->second)
-        {
-            waiting_messages.emplace_back (routeNumber, command);
-            return true;
-        }
+   if (routes_waiting.at(routeNumber))
+   {
+         waiting_messages.emplace_back (routeNumber, command);
+         return true;
     }
-
+   routes_waiting[routeNumber] = true;
     routes[routeNumber]->send (command.to_string ());
     active_routes.emplace_back (zmq::pollitem_t ());
     active_routes.back ().events = ZMQ_POLLIN;
@@ -55,7 +61,11 @@ bool ZmqRequestSets::checkForMessages ()
     {
         return checkForMessages (std::chrono::milliseconds (0));
     }
-    return true;
+	else
+	{
+		checkForMessages(std::chrono::milliseconds(0));
+		return true;
+	}
 }
 
 bool ZmqRequestSets::checkForMessages (std::chrono::milliseconds timeout)
@@ -70,13 +80,15 @@ bool ZmqRequestSets::checkForMessages (std::chrono::milliseconds timeout)
         return false;
     }
     zmq::message_t msg;
+	//scan the active_routes
     for (size_t ii = 0; ii < active_routes.size (); ++ii)
     {
-        if (active_routes[ii].revents & ZMQ_POLLIN)
+        if ((active_routes[ii].revents & ZMQ_POLLIN) > 0)
         {
             routes[active_messages[ii].route]->recv (&msg);
             active_routes[ii].events = 0;
-            Responses.emplace_back (static_cast<char *> (msg.data ()), msg.size ());
+            Responses.emplace_back (static_cast<char *> (msg.data ()),
+                                    msg.size ());  // convert to an ActionMessage here
             routes_waiting[active_messages[ii].route] = false;
             active_messages[ii].waiting = false;
         }

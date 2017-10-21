@@ -19,6 +19,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/zmq/ZmqBroker.h"
 #include "helics/core/zmq/ZmqComms.h"
 #include "helics/core/zmq/ZmqCore.h"
+#include "helics/core/zmq/ZmqRequestSets.h"
+
 //#include "boost/process.hpp"
 #include <future>
 
@@ -53,6 +55,62 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
     repSocket.send (rM.to_string ());
     auto connected = confut.get ();
     BOOST_CHECK (!connected);
+}
+
+/** test the request set class with various scenarios*/
+BOOST_AUTO_TEST_CASE(zmqRequestSet_test1)
+{
+	std::string host = "tcp://127.0.0.1";
+	
+	helics::ZmqRequestSets reqset;
+
+	auto ctx = zmqContextManager::getContextPointer();
+	zmq::socket_t repSocket1(ctx->getContext(), ZMQ_REP);
+	repSocket1.bind("tcp://127.0.0.1:23405");
+	zmq::socket_t repSocket2(ctx->getContext(), ZMQ_REP);
+	repSocket2.bind("tcp://127.0.0.1:23406");
+	zmq::socket_t repSocket3(ctx->getContext(), ZMQ_REP);
+	repSocket3.bind("tcp://127.0.0.1:23407");
+
+	reqset.addRoutes(1, "tcp://127.0.0.1:23405");
+	reqset.addRoutes(2, "tcp://127.0.0.1:23406");
+	reqset.addRoutes(3, "tcp://127.0.0.1:23407");
+
+	helics::ActionMessage M(helics::CMD_IGNORE);
+	M.index = 1;
+
+	reqset.transmit(1, M);
+	BOOST_CHECK(reqset.waiting());
+
+	zmq::message_t msg;
+	repSocket1.recv(&msg);
+
+	repSocket1.send(msg);
+	//should still be waiting
+	BOOST_CHECK(reqset.waiting());
+	reqset.checkForMessages();
+	BOOST_CHECK(!reqset.waiting());
+
+	auto M2 = reqset.getMessage();
+
+	BOOST_CHECK(M2->action() == helics::CMD_IGNORE);
+
+	//send two messages
+	reqset.transmit(2, M);
+	reqset.transmit(2, M);
+	BOOST_CHECK(reqset.waiting());
+
+	repSocket2.recv(&msg);
+
+	repSocket2.send(msg);
+	reqset.checkForMessages();
+	BOOST_CHECK(reqset.waiting());
+	repSocket2.recv(&msg);
+
+	repSocket2.send(msg);
+	reqset.checkForMessages();
+	BOOST_CHECK(!reqset.waiting());
+
 }
 
 BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)

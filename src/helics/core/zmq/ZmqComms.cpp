@@ -227,7 +227,7 @@ void ZmqComms::queue_rx_function ()
                 pullPortNumber = M.dest_id;
                 if (repPortNumber < 0)
                 {
-                    repPortNumber = M.source_handle;
+                    repPortNumber = M.source_handle; //aliased for the protocol message
                 }
             }
             else if (M.index == DISCONNECT)
