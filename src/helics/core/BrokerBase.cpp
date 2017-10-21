@@ -35,10 +35,7 @@ static inline std::string gen_id ()
     return pid_str + "-" + uuid_str;
 }
 
-
-
-
-static void argumentParser (int argc, char *argv[], boost::program_options::variables_map &vm_map)
+static void argumentParser (int argc, const char *const *argv, boost::program_options::variables_map &vm_map)
 {
     namespace po = boost::program_options;
     po::options_description cmd_only ("command line only");
@@ -142,13 +139,13 @@ BrokerBase::BrokerBase (const std::string &broker_name) : identifier (broker_nam
 
 BrokerBase::~BrokerBase () { joinAllThreads (); }
 
-void BrokerBase::displayHelp()
+void BrokerBase::displayHelp ()
 {
-	std::cout << " Global options for all Brokers:\n";
-	namespace po = boost::program_options;
-	po::variables_map vm;
-	char *argV[] = { "","--help" };
-	argumentParser(2, argV, vm);
+    std::cout << " Global options for all Brokers:\n";
+    namespace po = boost::program_options;
+    po::variables_map vm;
+    const char *const argV[] = {"", "--help"};
+    argumentParser (2, argV, vm);
 }
 
 void BrokerBase::joinAllThreads ()
@@ -160,7 +157,7 @@ void BrokerBase::joinAllThreads ()
     }
 }
 
-void BrokerBase::InitializeFromArgs (int argc, char *argv[])
+void BrokerBase::InitializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
 

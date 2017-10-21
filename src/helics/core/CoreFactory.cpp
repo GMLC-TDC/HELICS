@@ -177,7 +177,7 @@ std::shared_ptr<Core> create (core_type type, const std::string &core_name, std:
     return core;
 }
 
-std::shared_ptr<Core> create (core_type type, int argc, char *argv[])
+std::shared_ptr<Core> create (core_type type, int argc, const char *const *argv)
 {
     auto core = makeCore (type, "");
 
@@ -190,7 +190,7 @@ std::shared_ptr<Core> create (core_type type, int argc, char *argv[])
     return core;
 }
 
-std::shared_ptr<Core> create (core_type type, const std::string &core_name, int argc, char *argv[])
+std::shared_ptr<Core> create (core_type type, const std::string &core_name, int argc, const char *const *argv)
 {
     auto core = makeCore (type, core_name);
 
@@ -229,7 +229,8 @@ FindOrCreate (core_type type, const std::string &core_name, const std::string &i
     return core;
 }
 
-std::shared_ptr<Core> FindOrCreate (core_type type, const std::string &core_name, int argc, char *argv[])
+std::shared_ptr<Core>
+FindOrCreate (core_type type, const std::string &core_name, int argc, const char *const *argv)
 {
     std::shared_ptr<Core> core = findCore (core_name);
     if (core)
@@ -296,70 +297,66 @@ need be
 without issue*/
 static DelayedDestructor<CommonCore> delayedDestroyer;  //!< the object handling the delayed destruction
 
-static SearchableObjectHolder<CommonCore> searchableObjects; //!< the object managing the searchable objects
+static SearchableObjectHolder<CommonCore> searchableObjects;  //!< the object managing the searchable objects
 
+std::shared_ptr<CommonCore> findCore (const std::string &name) { return searchableObjects.findObject (name); }
 
-std::shared_ptr<CommonCore> findCore (const std::string &name)
+bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &ptr)
 {
-	return searchableObjects.findObject(name);
-}
-
-bool isJoinableCoreOfType(core_type type, const std::shared_ptr<CommonCore> &ptr)
-{
-	if (ptr->isJoinable())
-	{
-		switch (type)
-		{
-		case core_type::ZMQ:
+    if (ptr->isJoinable ())
+    {
+        switch (type)
+        {
+        case core_type::ZMQ:
 #if HELICS_HAVE_ZEROMQ
-			return (dynamic_cast<ZmqCore *> (ptr.get()) != nullptr);
+            return (dynamic_cast<ZmqCore *> (ptr.get ()) != nullptr);
 #else
-			break;
+            break;
 #endif
-		case core_type::MPI:
+        case core_type::MPI:
 #if HELICS_HAVE_MPI
-			return (dynamic_cast<MPICore *> (ptr.get()) != nullptr);
+            return (dynamic_cast<MPICore *> (ptr.get ()) != nullptr);
 #else
-			break;
+            break;
 #endif
-		case core_type::TEST:
-			return (dynamic_cast<TestCore *> (ptr.get()) != nullptr);
-		case core_type::INTERPROCESS:
-		case core_type::IPC:
-			return (dynamic_cast<IpcCore *> (ptr.get()) != nullptr);
-		case core_type::TCP:
-		case core_type::UDP:
-		default:
-			return true;
-		}
-	}
-	return false;
+        case core_type::TEST:
+            return (dynamic_cast<TestCore *> (ptr.get ()) != nullptr);
+        case core_type::INTERPROCESS:
+        case core_type::IPC:
+            return (dynamic_cast<IpcCore *> (ptr.get ()) != nullptr);
+        case core_type::TCP:
+        case core_type::UDP:
+        default:
+            return true;
+        }
+    }
+    return false;
 }
 std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
 {
-	return searchableObjects.findObject([type](auto &ptr) {return isJoinableCoreOfType(type, ptr); });
+    return searchableObjects.findObject ([type](auto &ptr) { return isJoinableCoreOfType (type, ptr); });
 }
 
 bool registerCommonCore (std::shared_ptr<CommonCore> tcore)
 {
     cleanUpCores ();
     delayedDestroyer.addObjectsToBeDestroyed (tcore);
-	return searchableObjects.addObject(tcore->getIdentifier(), tcore);
+    return searchableObjects.addObject (tcore->getIdentifier (), tcore);
 }
 
 size_t cleanUpCores () { return delayedDestroyer.destroyObjects (); }
 
 void copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {
-	searchableObjects.copyObject(copyFromName, copyToName);
+    searchableObjects.copyObject (copyFromName, copyToName);
 }
 
 void unregisterCore (const std::string &name)
 {
-	if (!searchableObjects.removeObject(name))
-	{
-		searchableObjects.removeObject([&name](auto &obj) {return (obj->getIdentifier() == name); });
-	}
+    if (!searchableObjects.removeObject (name))
+    {
+        searchableObjects.removeObject ([&name](auto &obj) { return (obj->getIdentifier () == name); });
+    }
 }
 
 }  // namespace CoreFactory

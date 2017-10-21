@@ -14,7 +14,7 @@ namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
 
-int argumentParser(int argc, char *argv[], po::variables_map &vm_map);
+int argumentParser(int argc, const char * const *argv, po::variables_map &vm_map);
 
 int main(int argc, char *argv[])
 {
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-int argumentParser(int argc, char *argv[], po::variables_map &vm_map)
+int argumentParser(int argc, const char * const *argv, po::variables_map &vm_map)
 {
 	po::options_description cmd_only("command line only");
 	po::options_description config("configuration");

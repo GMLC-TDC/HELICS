@@ -45,27 +45,26 @@ ZmqBroker::ZmqBroker (const std::string &broker_name) : CoreBroker (broker_name)
 ZmqBroker::~ZmqBroker ()
 {
     haltOperations = true;
-	std::unique_lock<std::mutex> lock(dataLock);
+    std::unique_lock<std::mutex> lock (dataLock);
     comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
-	lock.unlock();
+    lock.unlock ();
     joinAllThreads ();
 }
 
-
-void ZmqBroker::displayHelp(bool localOnly)
+void ZmqBroker::displayHelp (bool localOnly)
 {
-	std::cout << " Help for Zero MQ Broker: \n";
-	namespace po = boost::program_options;
-	po::variables_map vm;
-	char *argV[] = { "","--help" };
-	argumentParser(2, argV, vm, extraArgs);
-	if (!localOnly)
-	{
-		CoreBroker::displayHelp();
-	}
+    std::cout << " Help for Zero MQ Broker: \n";
+    namespace po = boost::program_options;
+    po::variables_map vm;
+    const char *const argV[] = {"", "--help"};
+    argumentParser (2, argV, vm, extraArgs);
+    if (!localOnly)
+    {
+        CoreBroker::displayHelp ();
+    }
 }
 
-void ZmqBroker::InitializeFromArgs (int argc, char *argv[])
+void ZmqBroker::InitializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == broker_state_t::created)
@@ -136,7 +135,6 @@ void ZmqBroker::InitializeFromArgs (int argc, char *argv[])
 
 bool ZmqBroker::brokerConnect ()
 {
-	
     std::lock_guard<std::mutex> lock (dataLock);
     if (brokerAddress.empty ())
     {
@@ -177,37 +175,37 @@ bool ZmqBroker::brokerConnect ()
 void ZmqBroker::brokerDisconnect ()
 {
     std::lock_guard<std::mutex> lock (dataLock);
-	if (comms)
-	{
-		comms->disconnect();
-	}
-   
+    if (comms)
+    {
+        comms->disconnect ();
+    }
 }
 
-void ZmqBroker::transmit (int route_id, const ActionMessage &cmd) 
+void ZmqBroker::transmit (int route_id, const ActionMessage &cmd)
 {
-	std::lock_guard<std::mutex> lock(dataLock);
-	if (comms)
-	{
-		comms->transmit(route_id, cmd);
-	}
+    std::lock_guard<std::mutex> lock (dataLock);
+    if (comms)
+    {
+        comms->transmit (route_id, cmd);
+    }
 }
 
-void ZmqBroker::addRoute (int route_id, const std::string &routeInfo) 
-{ 
-	std::lock_guard<std::mutex> lock(dataLock);
-	if (comms)
-	{
-		comms->addRoute(route_id, routeInfo);
-	}
+void ZmqBroker::addRoute (int route_id, const std::string &routeInfo)
+{
+    std::lock_guard<std::mutex> lock (dataLock);
+    if (comms)
+    {
+        comms->addRoute (route_id, routeInfo);
+    }
 }
 
-std::string ZmqBroker::getAddress() const {
-	std::lock_guard<std::mutex> lock(dataLock);
-	if (comms)
-	{
-		return comms->getRequestAddress() + ";" + comms->getPushAddress();
-	}
-	return makePortAddress(localInterface, repPortNumber);
+std::string ZmqBroker::getAddress () const
+{
+    std::lock_guard<std::mutex> lock (dataLock);
+    if (comms)
+    {
+        return comms->getRequestAddress () + ";" + comms->getPushAddress ();
+    }
+    return makePortAddress (localInterface, repPortNumber);
 }
 }  // namespace helics

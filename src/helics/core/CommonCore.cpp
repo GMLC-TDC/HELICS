@@ -53,7 +53,7 @@ void CommonCore::initialize (const std::string &initializationString)
     }
 }
 
-void CommonCore::InitializeFromArgs (int argc, char *argv[])
+void CommonCore::InitializeFromArgs (int argc, const char *const *argv)
 {
     broker_state_t exp = created;
     if (brokerState.compare_exchange_strong (exp, broker_state_t::initialized))
@@ -97,9 +97,10 @@ bool CommonCore::connect ()
     return isConnected ();
 }
 
-bool CommonCore::isConnected () const { 
-	auto currentState = brokerState.load();
-	return ((currentState == operating) || (currentState == connected));
+bool CommonCore::isConnected () const
+{
+    auto currentState = brokerState.load ();
+    return ((currentState == operating) || (currentState == connected));
 }
 
 void CommonCore::processDisconnect () { disconnect (); }
@@ -108,15 +109,15 @@ void CommonCore::disconnect ()
 {
     if (brokerState > broker_state_t::initialized)
     {
-		if (brokerState < broker_state_t::terminating)
-		{
-			brokerState = broker_state_t::terminating;
-			ActionMessage dis(CMD_DISCONNECT);
-			dis.source_id = global_broker_id;
-			transmit(0, dis);
-			addActionMessage(CMD_STOP);
-			return;
-		}
+        if (brokerState < broker_state_t::terminating)
+        {
+            brokerState = broker_state_t::terminating;
+            ActionMessage dis (CMD_DISCONNECT);
+            dis.source_id = global_broker_id;
+            transmit (0, dis);
+            addActionMessage (CMD_STOP);
+            return;
+        }
         brokerDisconnect ();
     }
     brokerState = terminated;

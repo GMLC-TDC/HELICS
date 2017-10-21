@@ -20,6 +20,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <type_traits>
 #include <vector>
 
+/** NOTES:: PT Went with unlocking after signaling on the basis of this page
+http://www.domaigne.com/blog/computing/condvars-signal-with-mutex-locked-or-not/
+will check performance at a later time
+*/
 /** class implementing a blocking queue
 @details this class uses locks one for push and pull it can exhibit longer blocking times if the internal
 operations require a swap, however in high contention the two locks will reduce contention in most cases.
@@ -122,7 +126,7 @@ class BlockingQueue3
                 if (pullElements.empty ())
                 {
                     pullElements.push_back (std::forward<Z> (val));
-                    pullLock.unlock ();
+                    // pullLock.unlock ();
                     condition.notify_all ();
                 }
                 else
@@ -159,7 +163,7 @@ class BlockingQueue3
                 if (pullElements.empty ())
                 {
                     pullElements.emplace_back (std::forward<Args> (args)...);
-                    pullLock.unlock ();
+                    // pullLock.unlock ();
                     condition.notify_all ();
                 }
                 else

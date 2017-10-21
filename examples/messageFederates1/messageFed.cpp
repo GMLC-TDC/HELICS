@@ -23,7 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
-bool argumentParser (int argc, char *argv[], po::variables_map &vm_map);
+bool argumentParser (int argc, const char * const *argv, po::variables_map &vm_map);
 
 
 int main (int argc, char *argv[])
@@ -87,7 +87,7 @@ int main (int argc, char *argv[])
     return 0;
 }
 
-bool argumentParser (int argc, char *argv[], po::variables_map &vm_map)
+bool argumentParser (int argc, const char * const *argv, po::variables_map &vm_map)
 {
     po::options_description opt ("options");
 

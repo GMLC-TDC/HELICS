@@ -25,7 +25,7 @@ public:
 	IpcBroker(const std::string &broker_name);
 
 	static void displayHelp(bool local_only = false);
-	void InitializeFromArgs(int argc, char *argv[]) override;
+	void InitializeFromArgs(int argc, const char * const *argv) override;
 
 	/**destructor*/
 	virtual ~IpcBroker();

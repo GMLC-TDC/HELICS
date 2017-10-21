@@ -43,7 +43,7 @@ MpiBroker::~MpiBroker ()
     joinAllThreads ();
 }
 
-void MpiBroker::InitializeFromArgs (int argc, char *argv[])
+void MpiBroker::InitializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == broker_state_t::created)

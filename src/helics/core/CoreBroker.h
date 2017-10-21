@@ -171,7 +171,7 @@ public:
 	void Initialize(const std::string &initializationString);
 	/** initialize from command line arguments
 	*/
-	virtual void InitializeFromArgs(int argc, char *argv[]) override;
+	virtual void InitializeFromArgs(int argc, const char * const *argv) override;
 
 	/** check if all the local federates are ready to be initialized
 	@return true if everyone is ready, false otherwise

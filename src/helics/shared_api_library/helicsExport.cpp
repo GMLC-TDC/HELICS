@@ -242,7 +242,7 @@ helics_core helicsCreateCore (const char *type, const char *name, const char *in
     return reinterpret_cast<helics_core> (core);
 }
 
-helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, char *argv[])
+helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, const char * const *argv)
 {
     auto *core = new helics::coreObject;
     auto ct = helics::coreTypeFromString (type);
@@ -276,7 +276,7 @@ helics_broker helicsCreateBroker (const char *type, const char *name, const char
     return reinterpret_cast<helics_broker> (broker);
 }
 
-helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, char *argv[])
+helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, const char * const *argv)
 {
     auto *broker = new helics::BrokerObject;
     auto ct = helics::coreTypeFromString (type);

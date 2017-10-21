@@ -33,17 +33,17 @@ namespace CoreFactory {
    */
 	std::shared_ptr<Core> create(core_type type, const std::string &initializationString);
 
-	std::shared_ptr<Core> create(core_type type, int argc, char *argv[]);
+	std::shared_ptr<Core> create(core_type type, int argc, const char * const *argv);
 
 	std::shared_ptr<Core> create(core_type type, const std::string &core_name, std::string &initializationString);
-	std::shared_ptr<Core> create(core_type type, const std::string &core_name, int argc, char *argv[]);
+	std::shared_ptr<Core> create(core_type type, const std::string &core_name, int argc, const char * const *argv);
   /** tries to find a named core if it fails it creates a new one
   */
   std::shared_ptr<Core> FindOrCreate(core_type type, const std::string &coreName, const std::string &initializationString);
 
   /** tries to find a named core if it fails it creates a new one
   */
-  std::shared_ptr<Core> FindOrCreate(core_type type, const std::string &coreName, int argc, char *argv[]);
+  std::shared_ptr<Core> FindOrCreate(core_type type, const std::string &coreName, int argc, const char * const *argv);
   /** try to find a joinable core of a specific type*/
   std::shared_ptr<Core> findJoinableCoreOfType(core_type type);
   /**

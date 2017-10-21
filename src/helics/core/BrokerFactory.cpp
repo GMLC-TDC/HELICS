@@ -120,7 +120,7 @@ create (core_type type, const std::string &broker_name, const std::string &initi
     return broker;
 }
 
-std::shared_ptr<CoreBroker> create (core_type type, int argc, char *argv[])
+std::shared_ptr<CoreBroker> create (core_type type, int argc, const char *const *argv)
 {
     auto broker = makeBroker (type, "");
     broker->InitializeFromArgs (argc, argv);
@@ -129,7 +129,8 @@ std::shared_ptr<CoreBroker> create (core_type type, int argc, char *argv[])
     return broker;
 }
 
-std::shared_ptr<CoreBroker> create (core_type type, const std::string &broker_name, int argc, char *argv[])
+std::shared_ptr<CoreBroker>
+create (core_type type, const std::string &broker_name, int argc, const char *const *argv)
 {
     auto broker = makeBroker (type, broker_name);
     broker->InitializeFromArgs (argc, argv);

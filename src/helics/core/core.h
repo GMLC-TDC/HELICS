@@ -144,7 +144,7 @@ class Core
      *       Configuration of the federate.
      *       State begins when registerFederate() is invoked and ends when enterInitializingState() is invoked.
      *    -# Initializing
-     *       Configure of the simulation state prior to the start of timestepping.
+     *       Configure of the simulation state prior to the start of time stepping.
      *       State begins when enterInitializingState() is invoked and ends when enterExecutingState(true) is invoked.
      *    -# Executing
      *       State begins when enterExecutingState() is invoked and ends when Finalize() is invoked.

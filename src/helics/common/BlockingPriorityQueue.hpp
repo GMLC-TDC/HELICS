@@ -16,10 +16,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
+#include <queue>
 #include <string>
 #include <type_traits>
 #include <vector>
-#include <queue>
 
 /** class implementing a blocking queue with a priority channel
 @details this class uses locks one for push and pull it can exhibit longer blocking times if the internal
@@ -34,31 +34,28 @@ class BlockingPriorityQueue
     std::vector<T> pushElements;  //!< vector of elements being added
     std::vector<T> pullElements;  //!< vector of elements waiting extraction
     std::atomic<bool> queueEmptyFlag{true};  //!< flag indicating the queue is empty
-	std::queue<T> priorityQueue; //!< the priority channel
+    std::queue<T> priorityQueue;  //!< the priority channel
     // the condition variable should be keyed of the pullLock
     std::condition_variable condition;  //!< condition variable for notification of new data
   public:
     /** default constructor*/
     BlockingPriorityQueue () = default;
 
-	/** clear the queue*/
-	void clear()
-	{
-		std::lock_guard<std::mutex> pullLock(m_pullLock);  // first pullLock
-		std::lock_guard<std::mutex> pushLock(m_pushLock);  // second pushLock
-		pullElements.clear();
-		pushElements.clear();
-		while (!priorityQueue.empty())
-		{
-			priorityQueue.pop();
-		}
-		queueEmptyFlag = true;
-	}
-
-    ~BlockingPriorityQueue ()
+    /** clear the queue*/
+    void clear ()
     {
-		clear();
+        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
+        std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
+        pullElements.clear ();
+        pushElements.clear ();
+        while (!priorityQueue.empty ())
+        {
+            priorityQueue.pop ();
+        }
+        queueEmptyFlag = true;
     }
+
+    ~BlockingPriorityQueue () { clear (); }
     /** constructor with the capacity numbers
     @details there are two internal vectors that alternate
     so the actual reserve is 2x the capacity numbers in two different vectors
@@ -70,28 +67,28 @@ class BlockingPriorityQueue
         pullElements.reserve (capacity);
     }
     /** enable the move constructor not the copy constructor*/
-	BlockingPriorityQueue(BlockingPriorityQueue &&bq) noexcept
-        : pushElements (std::move (bq.pushElements)), pullElements (std::move (bq.pullElements)),priorityQueue(std::move(bq.priorityQueue))
+    BlockingPriorityQueue (BlockingPriorityQueue &&bq) noexcept
+        : pushElements (std::move (bq.pushElements)), pullElements (std::move (bq.pullElements)),
+          priorityQueue (std::move (bq.priorityQueue))
     {
-        queueEmptyFlag = (pullElements.empty ()&&priorityQueue.empty());
+        queueEmptyFlag = (pullElements.empty () && priorityQueue.empty ());
     }
 
     /** enable the move assignment not the copy assignment*/
-	BlockingPriorityQueue &operator= (BlockingPriorityQueue &&sq) noexcept
+    BlockingPriorityQueue &operator= (BlockingPriorityQueue &&sq) noexcept
     {
         std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
         std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
         pushElements = std::move (sq.pushElements);
         pullElements = std::move (sq.pullElements);
-		priorityQueue = std::move(sq.priorityQueue);
-        queueEmptyFlag = (pullElements.empty() && priorityQueue.empty());
+        priorityQueue = std::move (sq.priorityQueue);
+        queueEmptyFlag = (pullElements.empty () && priorityQueue.empty ());
         return *this;
     }
     /** DISABLE_COPY_AND_ASSIGN */
-	BlockingPriorityQueue(const BlockingPriorityQueue &) = delete;
-	BlockingPriorityQueue &operator= (const BlockingPriorityQueue &) = delete;
+    BlockingPriorityQueue (const BlockingPriorityQueue &) = delete;
+    BlockingPriorityQueue &operator= (const BlockingPriorityQueue &) = delete;
 
-  
     /** set the capacity of the queue
     actually double the requested the size will be reserved due to the use of two vectors internally
     @param[in] capacity  the capacity to reserve
@@ -127,7 +124,7 @@ class BlockingPriorityQueue
                 if (pullElements.empty ())
                 {
                     pullElements.push_back (std::forward<Z> (val));
-                    pullLock.unlock ();
+                    // pullLock.unlock ();
                     condition.notify_all ();
                 }
                 else
@@ -164,7 +161,7 @@ class BlockingPriorityQueue
                 if (pullElements.empty ())
                 {
                     pullElements.emplace_back (std::forward<Args> (args)...);
-                    pullLock.unlock ();
+                    //  pullLock.unlock ();
                     condition.notify_all ();
                 }
                 else
@@ -271,14 +268,10 @@ because this is meant for multi-threaded applications this may or may not have a
 depending on the number of consumers
 */
     bool empty () const;
-    /** get the current size of the queue
-    @details this may or may not have much meaning depending on the number of consumers
-    */
-    size_t size () const;
 };
 
 template <typename T>
-stx::optional<T> BlockingQueue3<T>::try_pop ()
+stx::optional<T> BlockingPriorityQueue<T>::try_pop ()
 {
     std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
     if (pullElements.empty ())
@@ -332,15 +325,7 @@ stx::optional<T> BlockingQueue3<T>::try_pop ()
 }
 
 template <typename T>
-size_t BlockingQueue3<T>::size () const
-{
-    std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
-    std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
-    return pullElements.size () + pushElements.size ();
-}
-
-template <typename T>
-bool BlockingQueue3<T>::empty () const
+bool BlockingPriorityQueue<T>::empty () const
 {
     return queueEmptyFlag;
 }

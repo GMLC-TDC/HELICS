@@ -12,6 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "ZmqRequestSets.h"
 #include "helics_includes/optional.h"
 #include <algorithm>
+
 namespace helics
 {
 ZmqRequestSets::ZmqRequestSets () { ctx = zmqContextManager::getContextPointer (); }
@@ -35,12 +36,12 @@ void ZmqRequestSets::addRoutes (int routeNumber, const std::string &routeInfo)
 bool ZmqRequestSets::transmit (int routeNumber, const ActionMessage &command)
 {
     // check if we are waiting on the route
-   if (routes_waiting.at(routeNumber))
-   {
-         waiting_messages.emplace_back (routeNumber, command);
-         return true;
+    if (routes_waiting.at (routeNumber))
+    {
+        waiting_messages.emplace_back (routeNumber, command);
+        return true;
     }
-   routes_waiting[routeNumber] = true;
+    routes_waiting[routeNumber] = true;
     routes[routeNumber]->send (command.to_string ());
     active_routes.emplace_back (zmq::pollitem_t ());
     active_routes.back ().events = ZMQ_POLLIN;
@@ -55,24 +56,19 @@ bool ZmqRequestSets::transmit (int routeNumber, const ActionMessage &command)
 
 bool ZmqRequestSets::waiting () const { return (!active_routes.empty ()); }
 
-bool ZmqRequestSets::checkForMessages ()
+bool ZmqRequestSets::hasMessages () const { return (!Responses.empty ()); }
+
+int ZmqRequestSets::checkForMessages ()
 {
-    if (Responses.empty ())
-    {
-        return checkForMessages (std::chrono::milliseconds (0));
-    }
-	else
-	{
-		checkForMessages(std::chrono::milliseconds(0));
-		return true;
-	}
+    checkForMessages (std::chrono::milliseconds (0));
+    return static_cast<int> (Responses.size ());
 }
 
-bool ZmqRequestSets::checkForMessages (std::chrono::milliseconds timeout)
+int ZmqRequestSets::checkForMessages (std::chrono::milliseconds timeout)
 {
     if (active_routes.empty ())
     {
-        return false;
+        return 0;
     }
     auto rc = zmq::poll (active_routes, timeout);
     if (rc == 0)
@@ -80,7 +76,7 @@ bool ZmqRequestSets::checkForMessages (std::chrono::milliseconds timeout)
         return false;
     }
     zmq::message_t msg;
-	//scan the active_routes
+    // scan the active_routes
     for (size_t ii = 0; ii < active_routes.size (); ++ii)
     {
         if ((active_routes[ii].revents & ZMQ_POLLIN) > 0)
@@ -107,12 +103,12 @@ bool ZmqRequestSets::checkForMessages (std::chrono::milliseconds timeout)
     }
     if (!waiting_messages.empty ())
     {
-        checkDelayedSend ();
+        SendDelayedMessages ();
     }
-    return (!Responses.empty ());
+    return static_cast<int> (Responses.size ());
 }
 
-void ZmqRequestSets::checkDelayedSend ()
+void ZmqRequestSets::SendDelayedMessages ()
 {
     bool still_waiting = false;
     for (auto &delM : waiting_messages)
@@ -161,4 +157,5 @@ private:
     std::queue<std::pair<int, ActionMessage>> waiting_messages;
     std::queue<ActionMessage> Responses;
     */
+
 }  // namespace helics

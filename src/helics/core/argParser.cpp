@@ -17,7 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 void argumentParser (int argc,
-                     char *argv[],
+                     const char *const *argv,
                      boost::program_options::variables_map &vm_map,
                      const argDescriptors &additionalArgs)
 {

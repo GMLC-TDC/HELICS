@@ -49,7 +49,7 @@ MpiCore::~MpiCore ()
     joinAllThreads ();
 }
 
-void MpiCore::InitializeFromArgs (int argc, char *argv[])
+void MpiCore::InitializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == created)

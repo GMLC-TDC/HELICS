@@ -25,7 +25,7 @@ public:
 	MpiCore(const std::string &core_name);
 	/** destructor*/
 	~MpiCore();
-	virtual void InitializeFromArgs(int argc, char *argv[]) override;
+	virtual void InitializeFromArgs(int argc, const char * const *argv) override;
 
 	virtual void transmit(int route_id, const ActionMessage &cmd) override;
 	virtual void addRoute(int route_id, const std::string &routeInfo) override;

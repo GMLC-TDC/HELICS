@@ -24,7 +24,7 @@ public:
 	ZmqBroker(bool isRoot_ = false) noexcept;
 	ZmqBroker(const std::string &broker_name);
 
-	void InitializeFromArgs(int argc, char *argv[]) override;
+	void InitializeFromArgs(int argc, const char * const *argv) override;
 
 	/**destructor*/
 	virtual ~ZmqBroker();

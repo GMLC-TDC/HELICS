@@ -33,7 +33,7 @@ public:
 };
 using argDescriptors = std::vector<argDescriptor>;
 
-void argumentParser(int argc, char *argv[], boost::program_options::variables_map &vm_map, const argDescriptors &additionalArgs);
+void argumentParser(int argc, const char * const *argv, boost::program_options::variables_map &vm_map, const argDescriptors &additionalArgs);
 }
 
 #endif //_ARG_PARSER_

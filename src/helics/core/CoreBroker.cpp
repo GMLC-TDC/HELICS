@@ -31,15 +31,14 @@ static const argDescriptors extraArgs{
 
 bool matchingTypes (const std::string &type1, const std::string &type2);
 
-
-void CoreBroker::displayHelp()
+void CoreBroker::displayHelp ()
 {
-	std::cout << "Broker Specific options:\n";
-	namespace po = boost::program_options;
-	po::variables_map vm;
-	char *argV[] = { "","--help" };
-	argumentParser(2, argV, vm, extraArgs);
-	BrokerBase::displayHelp();
+    std::cout << "Broker Specific options:\n";
+    namespace po = boost::program_options;
+    po::variables_map vm;
+    const char *const argV[] = {"", "--help"};
+    argumentParser (2, argV, vm, extraArgs);
+    BrokerBase::displayHelp ();
 }
 
 CoreBroker::~CoreBroker ()
@@ -371,9 +370,8 @@ void CoreBroker::transmitDelayedMessages ()
 
 void CoreBroker::processCommand (ActionMessage &&command)
 {
-    LOG_TRACE (
-      0, getIdentifier (),
-      (boost::format ("|| cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
+    LOG_TRACE (0, getIdentifier (),
+               (boost::format ("|| cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
     switch (command.action ())
     {
     case CMD_IGNORE:
@@ -857,7 +855,7 @@ void CoreBroker::Initialize (const std::string &initializationString)
     }
 }
 
-void CoreBroker::InitializeFromArgs (int argc, char *argv[])
+void CoreBroker::InitializeFromArgs (int argc, const char *const *argv)
 {
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong (exp, broker_state_t::initialized))
@@ -891,11 +889,11 @@ bool CoreBroker::connect ()
         broker_state_t exp = broker_state_t::initialized;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::connecting))
         {
-			LOG_NORMAL(0, getIdentifier(), "connecting");
+            LOG_NORMAL (0, getIdentifier (), "connecting");
             auto res = brokerConnect ();
             if (res)
             {
-				LOG_NORMAL(0, getIdentifier(), (boost::format("||connected on %s") % getAddress()).str());
+                LOG_NORMAL (0, getIdentifier (), (boost::format ("||connected on %s") % getAddress ()).str ());
                 if (!_isRoot)
                 {
                     ActionMessage m (CMD_REG_BROKER);

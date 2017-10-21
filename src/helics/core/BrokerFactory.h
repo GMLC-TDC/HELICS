@@ -28,10 +28,10 @@ namespace BrokerFactory {
 	*/
 	std::shared_ptr<CoreBroker> create(core_type type, const std::string &initializationString);
 
-	std::shared_ptr<CoreBroker> create(core_type type, int argc, char *argv[]);
+	std::shared_ptr<CoreBroker> create(core_type type, int argc, const char * const *argv);
 
 	std::shared_ptr<CoreBroker> create(core_type type, const std::string &broker_name, const std::string &initializationString);
-	std::shared_ptr<CoreBroker> create(core_type type, const std::string &broker_name, int argc, char *argv[]);
+	std::shared_ptr<CoreBroker> create(core_type type, const std::string &broker_name, int argc, const char * const *argv);
 
 	/**
 	* Returns true if type specified is available in current compilation.

@@ -85,7 +85,7 @@ int main(int argc,char **argv)
   printf("PI SENDER: Entered execution mode\n");
 
   /* This federate will be publishing deltat*pi for numsteps steps */
-  double this_time = 0.0;
+  //double this_time = 0.0;
   double pi = 22.0/7.0,value;
   helics_time_t currenttime=0.0;
   int           numsteps=20,isupdated;

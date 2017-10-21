@@ -29,7 +29,7 @@ using namespace std::string_literals;
 static const argDescriptors extraArgs{{"brokername"s, "string"s, "identifier for the broker-same as broker"s},
                                       {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
 
-void TestCore::InitializeFromArgs (int argc, char *argv[])
+void TestCore::InitializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     bool exp = false;
@@ -97,14 +97,14 @@ TestCore::~TestCore ()
 
 void TestCore::transmit (int route_id, const ActionMessage &cmd)
 {
-	std::lock_guard<std::mutex> lock(routeMutex);
+    std::lock_guard<std::mutex> lock (routeMutex);
     if (route_id == 0)
-    { 
-		if (tbroker)
-		{
-			tbroker->addActionMessage(cmd);
-		}
-       
+    {
+        if (tbroker)
+        {
+            tbroker->addActionMessage (cmd);
+        }
+
         return;
     }
 
@@ -120,10 +120,10 @@ void TestCore::transmit (int route_id, const ActionMessage &cmd)
         crfnd->second->addActionMessage (cmd);
         return;
     }
-	if (tbroker)
-	{
-		tbroker->addActionMessage(cmd);
-	}
+    if (tbroker)
+    {
+        tbroker->addActionMessage (cmd);
+    }
 }
 
 void TestCore::addRoute (int route_id, const std::string &routeInfo)

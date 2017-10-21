@@ -52,7 +52,7 @@ IpcCore::~IpcCore ()
     joinAllThreads ();
 }
 
-void IpcCore::InitializeFromArgs (int argc, char *argv[])
+void IpcCore::InitializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == created)
