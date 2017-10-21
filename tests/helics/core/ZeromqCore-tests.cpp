@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE(zmqRequestSet_test2)
 	repSocket3.recv(&msg);
 
 	repSocket3.send(msg);
-	BOOST_CHECK_EQUAL(reqset.checkForMessages(),3);
+	BOOST_CHECK_EQUAL(reqset.checkForMessages(),6);
 
 
 }

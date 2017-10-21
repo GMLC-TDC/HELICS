@@ -76,6 +76,7 @@ protected:
 private:
 	std::thread queue_transmitter; //!< single thread for sending data
 	std::thread queue_watcher; //!< thread monitoring the receive queue
+	std::mutex threadSyncLock; //!< lock to handle thread operations
 	virtual void queue_rx_function()=0;	//!< the functional loop for the receive queue
 	virtual void queue_tx_function()=0;  //!< the loop for transmitting data
 	virtual void closeTransmitter() = 0; //!< function to instruct the transmitter loop to close

@@ -258,88 +258,88 @@ bool isPriorityCommand (const ActionMessage &command)
     return (command.action () < action_message_def::action_t::cmd_ignore);
 }
 
-constexpr char nullStr[]= "unknown";
+constexpr char nullStr[] = "unknown";
 
-constexpr std::pair<action_message_def::action_t, const char*> actionStrings[]=
-{
-	// priority commands
-	{ action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect" },
-	{ action_message_def::action_t::cmd_disconnect, "disconnect" },
-	{ action_message_def::action_t::cmd_fed_ack, "fed_ack" },
+constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
+  // priority commands
+  {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
+  {action_message_def::action_t::cmd_disconnect, "disconnect"},
+  {action_message_def::action_t::cmd_fed_ack, "fed_ack"},
 
-	{ action_message_def::action_t::cmd_broker_ack, "broker_ack" },
-	{ action_message_def::action_t::cmd_add_route, "add_route" },
-	{ action_message_def::action_t::cmd_route_ack, "route_ack" },
-	{ action_message_def::action_t::cmd_register_route, "register_route" },
-	{ action_message_def::action_t::cmd_reg_fed, "reg_fed" },
-	{ action_message_def::action_t::cmd_priority_ack, "priority_ack" },
-	{ action_message_def::action_t::cmd_query, "query" },
-	{ action_message_def::action_t::cmd_query_reply, "query_reply" },
-	{ action_message_def::action_t::cmd_reg_broker, "reg_broker" },
+  {action_message_def::action_t::cmd_broker_ack, "broker_ack"},
+  {action_message_def::action_t::cmd_add_route, "add_route"},
+  {action_message_def::action_t::cmd_route_ack, "route_ack"},
+  {action_message_def::action_t::cmd_register_route, "register_route"},
+  {action_message_def::action_t::cmd_reg_fed, "reg_fed"},
+  {action_message_def::action_t::cmd_priority_ack, "priority_ack"},
+  {action_message_def::action_t::cmd_query, "query"},
+  {action_message_def::action_t::cmd_query_reply, "query_reply"},
+  {action_message_def::action_t::cmd_reg_broker, "reg_broker"},
 
-	{ action_message_def::action_t::cmd_ignore, "ignore" },
+  {action_message_def::action_t::cmd_ignore, "ignore"},
 
-	{ action_message_def::action_t::cmd_init, "init" },
-	{ action_message_def::action_t::cmd_init_grant, "init_grant" },
-	{ action_message_def::action_t::cmd_init_not_ready, "init_not_ready" },
-	{ action_message_def::action_t::cmd_exec_request, "exec_request" },
-	{ action_message_def::action_t::cmd_exec_grant, "exec_grant" },
-	{ action_message_def::action_t::cmd_exec_check, "exec_check" },
-	{ action_message_def::action_t::cmd_ack, "ack" },
+  {action_message_def::action_t::cmd_init, "init"},
+  {action_message_def::action_t::cmd_init_grant, "init_grant"},
+  {action_message_def::action_t::cmd_init_not_ready, "init_not_ready"},
+  {action_message_def::action_t::cmd_exec_request, "exec_request"},
+  {action_message_def::action_t::cmd_exec_grant, "exec_grant"},
+  {action_message_def::action_t::cmd_exec_check, "exec_check"},
+  {action_message_def::action_t::cmd_ack, "ack"},
 
-	{ action_message_def::action_t::cmd_stop, "stop" },
-	{ action_message_def::action_t::cmd_terminate_immediately, "terminate_immediately" },
+  {action_message_def::action_t::cmd_stop, "stop"},
+  {action_message_def::action_t::cmd_terminate_immediately, "terminate_immediately"},
 
-	{ action_message_def::action_t::cmd_time_grant, "time_grant" },
-	{ action_message_def::action_t::cmd_time_check, "time_check" },
-	{ action_message_def::action_t::cmd_pub, "pub" },
-	{ action_message_def::action_t::cmd_bye, "bye" },
-	{ action_message_def::action_t::cmd_log, "log" },
-	{ action_message_def::action_t::cmd_warning, "warning" },
-	{ action_message_def::action_t::cmd_error, "error" },
+  {action_message_def::action_t::cmd_time_grant, "time_grant"},
+  {action_message_def::action_t::cmd_time_check, "time_check"},
+  {action_message_def::action_t::cmd_pub, "pub"},
+  {action_message_def::action_t::cmd_bye, "bye"},
+  {action_message_def::action_t::cmd_log, "log"},
+  {action_message_def::action_t::cmd_warning, "warning"},
+  {action_message_def::action_t::cmd_error, "error"},
 
-	{ action_message_def::action_t::cmd_send_route, "send_route" },
-	{ action_message_def::action_t::cmd_subscriber, "subscriber" },
-	{ action_message_def::action_t::cmd_add_dependency, "add_dependency" },
-	{ action_message_def::action_t::cmd_remove_dependency, "remove_dependency" },
-	{ action_message_def::action_t::cmd_add_dependent, "add_dependent" },
-	{ action_message_def::action_t::cmd_remove_dependent, "remove_dependent" },
+  {action_message_def::action_t::cmd_send_route, "send_route"},
+  {action_message_def::action_t::cmd_subscriber, "subscriber"},
+  {action_message_def::action_t::cmd_add_dependency, "add_dependency"},
+  {action_message_def::action_t::cmd_remove_dependency, "remove_dependency"},
+  {action_message_def::action_t::cmd_add_dependent, "add_dependent"},
+  {action_message_def::action_t::cmd_remove_dependent, "remove_dependent"},
 
-	{ action_message_def::action_t::null_info_command, "null_info" },
-	{ action_message_def::action_t::priority_null_info_command, "priority_null_info" },
-	{ action_message_def::action_t::cmd_time_request, "time_request" },
-	{ action_message_def::action_t::cmd_send_message, "send_message" },
-	{ action_message_def::action_t::cmd_send_for_filter, "send_for_filter" },
-	{ action_message_def::action_t::cmd_send_for_filter_op, "send_for_filter_op" },
+  {action_message_def::action_t::null_info_command, "null_info"},
+  {action_message_def::action_t::priority_null_info_command, "priority_null_info"},
+  {action_message_def::action_t::cmd_time_request, "time_request"},
+  {action_message_def::action_t::cmd_send_message, "send_message"},
+  {action_message_def::action_t::cmd_send_for_filter, "send_for_filter"},
+  {action_message_def::action_t::cmd_send_for_filter_op, "send_for_filter_op"},
 
-	{ action_message_def::action_t::cmd_reg_pub, "reg_pub" },
-	{ action_message_def::action_t::cmd_notify_pub, "notify_pub" },
-	{ action_message_def::action_t::cmd_reg_dst_filter, "reg_dst_filter" },
-	{ action_message_def::action_t::cmd_notify_dst_filter, "notify_dst_filter" },
-	{ action_message_def::action_t::cmd_reg_sub, "reg_sub" },
-	{ action_message_def::action_t::cmd_notify_sub, "notify_sub" },
-	{ action_message_def::action_t::cmd_reg_src_filter, "reg_src_filter" },
-	{ action_message_def::action_t::cmd_notify_src_filter, "notify_src_filter" },
-	{ action_message_def::action_t::cmd_src_filter_has_operator, "src_filter_has_operator" },
-	{ action_message_def::action_t::cmd_reg_end, "reg_end" },
-	{ action_message_def::action_t::cmd_notify_end, "notify_end" },
+  {action_message_def::action_t::cmd_reg_pub, "reg_pub"},
+  {action_message_def::action_t::cmd_notify_pub, "notify_pub"},
+  {action_message_def::action_t::cmd_reg_dst_filter, "reg_dst_filter"},
+  {action_message_def::action_t::cmd_notify_dst_filter, "notify_dst_filter"},
+  {action_message_def::action_t::cmd_reg_sub, "reg_sub"},
+  {action_message_def::action_t::cmd_notify_sub, "notify_sub"},
+  {action_message_def::action_t::cmd_reg_src_filter, "reg_src_filter"},
+  {action_message_def::action_t::cmd_notify_src_filter, "notify_src_filter"},
+  {action_message_def::action_t::cmd_src_filter_has_operator, "src_filter_has_operator"},
+  {action_message_def::action_t::cmd_reg_end, "reg_end"},
+  {action_message_def::action_t::cmd_notify_end, "notify_end"},
 
-	{ action_message_def::action_t::cmd_has_operator, "has_operator" },
-	// protocol messages are meant for the communication standard and are not used in the Cores/Brokers
-	{ action_message_def::action_t::cmd_protocol_priority, "protocol_priority" },
-	{ action_message_def::action_t::cmd_protocol, "protocol" },
-	{ action_message_def::action_t::cmd_protocol_big, "protocol_big" } };
+  {action_message_def::action_t::cmd_has_operator, "has_operator"},
+  // protocol messages are meant for the communication standard and are not used in the Cores/Brokers
+  {action_message_def::action_t::cmd_protocol_priority, "protocol_priority"},
+  {action_message_def::action_t::cmd_protocol, "protocol"},
+  {action_message_def::action_t::cmd_protocol_big, "protocol_big"}};
 
-constexpr size_t actEnd = sizeof(actionStrings) / sizeof(std::pair<action_message_def::action_t, const char*>);
+constexpr size_t actEnd = sizeof (actionStrings) / sizeof (std::pair<action_message_def::action_t, const char *>);
 
 std::string actionMessageType (action_message_def::action_t action)
 {
-	auto res = std::find_if(actionStrings, actionStrings +actEnd , [action](const auto &pt) {return (pt.first == action); });
+    auto res = std::find_if (actionStrings, actionStrings + actEnd,
+                             [action](const auto &pt) { return (pt.first == action); });
     if (res != actionStrings + actEnd)
     {
-        return std::string(res->second);
+        return std::string (res->second);
     }
-    return std::string(nullStr);
+    return std::string (nullStr);
 }
 
 std::string prettyPrintString (const ActionMessage &command)
