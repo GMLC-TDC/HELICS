@@ -9,6 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "helics/application_api/ValueFederate.h"
+#include "helics/application_api/Publications.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>

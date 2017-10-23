@@ -25,6 +25,7 @@ ValueFederate.h
 ValueFederateManager.h
 asyncFedCallInfo.h
 HelicsPrimaryTypes.h
+queryFunctions.h
 )
 
 set(application_api_sources
@@ -42,6 +43,7 @@ Subscriptions.cpp
 Publications.cpp
 Filters.cpp
 helicsTypes.cpp
+queryFunctions.cpp
 )
 
 list(APPEND application_api_sources ${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp.cpp)

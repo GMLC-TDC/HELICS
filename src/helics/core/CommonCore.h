@@ -192,6 +192,7 @@ protected:
   std::unordered_map<std::string, Handle> publications;	//!< map of all local publications
   std::unordered_map<std::string, Handle> endpoints;	//!< map of all local endpoints
   std::unordered_map<std::string, federate_id_t> federateNames;  //!< map of federate names to id
+  std::atomic<int> queryCounter{ 0 };
   std::map<Handle, std::unique_ptr<FilterCoordinator>> filters; //!< map of all filters
  private:
   mutable std::mutex _mutex; //!< mutex protecting the federate creation and modification
@@ -209,7 +210,7 @@ protected:
   BasicHandleInfo* createBasicHandle(Handle id_, federate_id_t global_federateId, federate_id_t local_federateId, BasicHandleType HandleType, const std::string &key, const std::string &type, const std::string &units, bool required);
   /** add a new handle to the generic structure
   and return a ptr to it the ptr is non owning
-  variation targetted at filters
+  variation targeted at filters
   */
   BasicHandleInfo *createBasicHandle(Handle id_,
 	  federate_id_t global_federateId,
@@ -238,6 +239,8 @@ protected:
   @detsils organize the filter and report and potential warnings and errors
   */
   void organizeFilterOperations();
+
+  std::string federateQuery(Core::federate_id_t id, const std::string &queryStr) const;
 };
 
 

@@ -9,6 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "helics/application_api/ValueFederate.h"
+#include "helics/application_api/Publications.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -21,6 +22,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/program_options.hpp>
 
 #include "PrecHelper.h"
+#include <thread>
 
 class ValueCapture
 {
@@ -29,7 +31,7 @@ class ValueCapture
     helics::subscription_id_t id;
     bool first = false;
     std::string value;
-    ValueCapture (){};
+    ValueCapture() = default;
     ValueCapture (helics::Time t1, helics::subscription_id_t id1, const std::string &val)
         : time (t1), id (id1), value (val){};
 };
@@ -164,6 +166,26 @@ int main (int argc, char *argv[])
         auto id = vFed->registerOptionalSubscription (tname.first, typeString (tname.second));
         subids.emplace (id, tname);
     }
+    if (vm.count("capture") > 0)
+    {
+        auto captures = vm["capture"].as<std::vector<std::string>>();
+        for (const auto &capt : captures)
+        {
+            auto res = vFed->query(capt, "isinit");
+            int cnt = 0;
+            while (res != "true")
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                res = vFed->query(capt, "isinit");
+                ++cnt;
+                if (cnt > 150)
+                {
+                    break;
+                }
+            }
+        }
+    }
+
     std::vector<ValueStats> vStat;
     vStat.reserve (subids.size ());
     for (auto &val : subids)
@@ -298,15 +320,16 @@ void argumentParser (int argc, const char * const *argv, po::variables_map &vm_m
 		("config-file", po::value<std::string> (),"specify a configuration file to use");
 
 
-    config.add_options ()
-		("broker,b", po::value<std::string> (),"address to connect the broker to")
-		("name,n", po::value<std::string> (),"name of the player federate")
-		("core,c",po::value<std::string> (),"name of the core to connect to")
-		("stop",po::value<double>(),"the time to stop recording")
-		("type,t", po::value<std::string>(), "type of the publication to use")
-		("timedelta", po::value<double>(), "the time delta of the federate")
+    config.add_options()
+        ("broker,b", po::value<std::string>(), "address to connect the broker to")
+        ("name,n", po::value<std::string>(), "name of the player federate")
+        ("core,c", po::value<std::string>(), "name of the core to connect to")
+        ("stop", po::value<double>(), "the time to stop recording")
+        ("type,t", po::value<std::string>(), "type of the publication to use")
+        ("timedelta", po::value<double>(), "the time delta of the federate")
+        ("capture", po::value < std::vector<std::string>>(),"capture all the publications of a particular federate capture=\"fed1, fed2\"  supports multiple arguments or a comma separated list")
 		("output,o",po::value<std::string>(),"the output file for recording the data")
-		("coreinit,i", po::value<std::string>(), "the core initializion string")
+		("coreinit,i", po::value<std::string>(), "the core initialization string")
 		("mapfile", po::value<std::string>(), "write progress to a memory mapped file");
 
     hidden.add_options () ("input", po::value<std::string> (), "input file");
@@ -370,11 +393,15 @@ void argumentParser (int argc, const char * const *argv, po::variables_map &vm_m
     }
 
     po::notify (vm_map);
-    // check to make sure we have some input file
+    // check to make sure we have some input file or the capture is specified
     if (vm_map.count ("input") == 0)
     {
-        std::cerr << " no input file specified\n";
-        std::cerr << visible << '\n';
-        return;
+        if (vm_map.count("capture") == 0)
+        {
+            std::cerr << " no input file or captures specified\n";
+            std::cerr << visible << '\n';
+            return;
+        }
+        
     }
 }

@@ -21,6 +21,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 
 /**
@@ -227,7 +228,7 @@ class Federate
     void setPeriod (Time period, Time offset = timeZero);
     /**  set the logging level for the federate
     @ details debug and trace only do anything if they were enabled in the compilation
-    @param loggingLevel (-1: none, 0: error_only, 1: warings, 2: normal, 3: debug, 4: trace)
+    @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
     */
     void setLoggingLevel (int loggingLevel);
 
@@ -238,8 +239,8 @@ class Federate
     a federate, core, or broker
     @param queryStr a string with the query see other documentation for specific properties to query, can be
     defined by the federate
-    @return a string with the value requested.  this is either going to be a single string value or a json
-    structure.  The string "#invalid" is returned if the query was not valid
+    @return a string with the value requested.  this is either going to be a vector of strings value or a json
+    string stored in the first element of the vector.  The string "#invalid" is returned if the query was not valid
     */
     std::string query (const std::string &target, const std::string &queryStr);
 
@@ -248,8 +249,8 @@ class Federate
     the federation and the specific string being queried
     @param queryStr a string with the query see other documentation for specific properties to query, can be
     defined by the federate if the local federate does not recognize the query it sends it on to the federation
-    @return a string with the value requested.  this is either going to be a single string value or a json
-    structure.  The string "#invalid" is returned if the query was not valid
+    @return a string with the value requested.  this is either going to be a vector of strings value or a json
+    string stored in the first element of the vector.  The string "#invalid" is returned if the query was not valid
     */
     std::string query (const std::string &queryStr);
 
@@ -278,8 +279,7 @@ class Federate
     have been returned or not yet
 
     @param queryIndex the int value returned from the queryAsync call
-    @return a string with the value requested.  this is either going to be a single string value or a json
-    structure.
+   @return a string with the value requested.  the format of the string will be either a single string a string vector like "[string1; string2]" or json The string "#invalid" is returned if the query was not valid
     */
     std::string queryFinalize (int queryIndex);
 

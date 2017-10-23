@@ -16,7 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 bool hasIndexCode (const std::string &type_name)
 {
-    if (std::isdigit (type_name.back ()) == 1)
+    if (std::isdigit (type_name.back ()) != 0)
     {
         if (*(type_name.end () - 2) == '_')
         {  // this setup ignores the setup mode

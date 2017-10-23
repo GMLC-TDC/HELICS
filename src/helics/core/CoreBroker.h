@@ -196,7 +196,12 @@ private:
 	void checkFilters();
 	bool FindandNotifyFilterEndpoint(BasicHandleInfo &handleInfo);
 	void FindandNotifyEndpointFilters(BasicHandleInfo &handleInfo);
-
+    /** answer a query or route the message the appropriate location*/
+    void processQuery(const ActionMessage &m);
+    /** generate an answer to a local query*/
+    void processLocalQuery(const ActionMessage &m);
+    /** generate an actual response string to a query*/
+    std::string generateQueryAnswer(const std::string &query) const;
 	/** locate the route to take to a particular federate*/
 	int32_t getRoute(Core::federate_id_t fedid) const;
 	/** locate the route in a previously locked context*/

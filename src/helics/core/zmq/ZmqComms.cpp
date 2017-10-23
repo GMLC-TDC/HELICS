@@ -604,7 +604,7 @@ void ZmqComms::queue_tx_function ()
 
         if (isPriorityCommand (cmd))
         {
-            if ((cmd.dest_id == 0) && (!hasBroker))
+            if ((route_id == 0) && (!hasBroker))
             {
                 // drop the packet
                 continue;

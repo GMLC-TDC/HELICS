@@ -50,6 +50,7 @@ set(INCLUDE_FILES
 	core-exceptions.h
 	TimeCoordinator.h
 	loggingHelper.hpp
+	delayedObjects.hpp
     core.h
     core-types.h
     helics-time.h
