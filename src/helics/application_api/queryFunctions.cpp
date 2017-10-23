@@ -10,6 +10,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "queryFunctions.h"
 
+#include "Federate.h"
+#include <thread>
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4702)
@@ -65,4 +68,25 @@ std::vector<std::string> vectorizeQueryResult(const std::string &queryres)
         res.push_back(queryres);
         return res;
     }
+}
+
+bool waitForInit(helics::Federate *fed, const std::string &fedName)
+{
+    auto res = fed->query(fedName, "isinit");
+    int cnt = 0;
+    while (res != "true")
+    {
+        if (res == "#invalid")
+        {
+            return false;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        res = fed->query(fedName, "isinit");
+        ++cnt;
+        if (cnt > 150)
+        {
+            return false;
+        }
+    }
+    return true;
 }

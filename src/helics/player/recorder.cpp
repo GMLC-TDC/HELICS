@@ -9,7 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "helics/application_api/ValueFederate.h"
-#include "helics/application_api/Publications.hpp"
+#include "helics/application_api/Subscriptions.hpp"
+#include "helics/application_api/queryFunctions.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -20,6 +21,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <stdexcept>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+
+#include <boost/algorithm/string.hpp>
 
 #include "PrecHelper.h"
 #include <thread>
@@ -55,23 +58,13 @@ int main (int argc, char *argv[])
     std::ifstream infile;
     po::variables_map vm;
     argumentParser (argc, argv, vm);
-    valueTypes_t defType = valueTypes_t::stringValue;
-
+  
     std::vector<ValueCapture> points;
     if (vm.count ("input") == 0)
     {
         return 0;
     }
 
-    if (vm.count ("type") > 0)
-    {
-        defType = getType (vm["type"].as<std::string> ());
-        if (defType == valueTypes_t::unknownValue)
-        {
-            std::cerr << vm["type"].as<std::string> () << "is not recognized as a valid type \n";
-            return -5;
-        }
-    }
     if (!filesystem::exists (vm["input"].as<std::string> ()))
     {
         std::cerr << vm["input"].as<std::string> () << "is not a valid input file \n";
@@ -79,7 +72,7 @@ int main (int argc, char *argv[])
     }
     infile.open (vm["input"].as<std::string> ().c_str ());
     std::string str;
-    std::set<std::pair<std::string, valueTypes_t>> tags;
+    std::set<std::string> tags;
 
     while (std::getline (infile, str))
     {
@@ -104,22 +97,23 @@ int main (int argc, char *argv[])
             auto tag = str.substr (0, cloc);
             tag.erase (tag.find_last_not_of (" \t\n\0") + 1);
             tag.erase (0, tag.find_first_not_of (" \t\n\0"));
-            tags.emplace (tag, vtype);
+            tags.emplace (tag);
         }
         else
         {
             auto tag = str;
             tag.erase (tag.find_last_not_of (" \t\n\0") + 1);
             tag.erase (0, tag.find_first_not_of (" \t\n\0"));
-            tags.emplace (str, defType);
+            tags.emplace (str);
         }
     }
     std::cout << tags.size () << " tags processed\n";
 
     infile.close ();
 
-    std::map<helics::subscription_id_t, std::pair<std::string, valueTypes_t>> subids;
+    std::map<helics::subscription_id_t, std::pair<std::string, std::string>> subids;
 
+    std::vector<helics::Subscription> subscriptions;
     std::string name = "recorder";
     if (vm.count ("name") > 0)
     {
@@ -163,25 +157,28 @@ int main (int argc, char *argv[])
     std::string prevTag;
     for (auto &tname : tags)
     {
-        auto id = vFed->registerOptionalSubscription (tname.first, typeString (tname.second));
-        subids.emplace (id, tname);
+        subscriptions.push_back(helics::Subscription(vFed.get(), tname));
     }
+    //capture the all the publications from a particular federate
     if (vm.count("capture") > 0)
     {
         auto captures = vm["capture"].as<std::vector<std::string>>();
         for (const auto &capt : captures)
         {
-            auto res = vFed->query(capt, "isinit");
-            int cnt = 0;
-            while (res != "true")
+            std::vector<std::string> captFeds;
+            boost::split( captFeds,capt, boost::is_any_of(",;"));
+            for (const auto &captFed : captFeds)
             {
-                std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                res = vFed->query(capt, "isinit");
-                ++cnt;
-                if (cnt > 150)
+                auto res = waitForInit(vFed.get(), captFed);
+                if (res)
                 {
-                    break;
+                    auto pubs = vectorizeQueryResult(vFed->query(captFed, "publications"));
+                    for (auto &pub : pubs)
+                    {
+                        subscriptions.push_back(helics::Subscription(vFed.get(), pub));
+                    }
                 }
+               
             }
         }
     }
@@ -207,16 +204,15 @@ int main (int argc, char *argv[])
     vFed->enterExecutionState ();
     helics::Time nextPrintTime = 10.0;
     int ii = 0;
-    for (auto &sub : subids)
+    for (auto &sub : subscriptions)
     {
-        auto sid = sub.first;
-        if (vFed->isUpdated (sid))
+        if (sub.isUpdated())
         {
-            auto val = vFed->getValue<std::string> (sid);
-            vcap.emplace_back (-1.0, sid, val);
+            auto val = sub.getValue<std::string>();
+            vcap.emplace_back(-1.0, sub.getID(), val);
             if (vStat[ii].cnt == 0)
             {
-                vcap.back ().first = true;
+                vcap.back().first = true;
             }
             ++vStat[ii].cnt;
             vStat[ii].lastVal = val;
@@ -242,13 +238,12 @@ int main (int argc, char *argv[])
             if (T < stopTime)
             {
                 ii = 0;
-                for (auto &sub : subids)
+                for (auto &sub : subscriptions)
                 {
-                    auto sid = sub.first;
-                    if (vFed->isUpdated (sid))
+                    if (sub.isUpdated ())
                     {
-                        auto val = vFed->getValue<std::string> (sid);
-                        vcap.emplace_back (T, sid, val);
+                        auto val = sub.getValue<std::string>();
+                        vcap.emplace_back (T, sub.getID(), val);
                         ++vStat[ii].cnt;
                         vStat[ii].lastVal = val;
                         vStat[ii].time = T;
@@ -281,6 +276,10 @@ int main (int argc, char *argv[])
     {
     }
 
+    for (auto &sub : subscriptions)
+    {
+        subids.emplace(sub.getID(), std::make_pair( sub.getKey(),sub.getType()));
+    }
     vFed->finalize ();
 
     std::string outFileName = "out.txt";
@@ -289,13 +288,13 @@ int main (int argc, char *argv[])
         outFileName = vm["output"].as<std::string> ();
     }
     std::ofstream outFile (outFileName);
-    outFile << "#time \ttag\t value\n";
+    outFile << "#time \ttag\t value\t type*\n";
     for (auto &v : vcap)
     {
         if (v.first)
         {
             outFile << static_cast<double> (v.time) << "\t\t" << subids[v.id].first << '\t'
-                    << typeCharacter (subids[v.id].second) << '\t' << v.value << '\n';
+                     << v.value << '\t' << subids[v.id].second<< '\n';
         }
         else
         {
@@ -325,9 +324,8 @@ void argumentParser (int argc, const char * const *argv, po::variables_map &vm_m
         ("name,n", po::value<std::string>(), "name of the player federate")
         ("core,c", po::value<std::string>(), "name of the core to connect to")
         ("stop", po::value<double>(), "the time to stop recording")
-        ("type,t", po::value<std::string>(), "type of the publication to use")
         ("timedelta", po::value<double>(), "the time delta of the federate")
-        ("capture", po::value < std::vector<std::string>>(),"capture all the publications of a particular federate capture=\"fed1, fed2\"  supports multiple arguments or a comma separated list")
+        ("capture", po::value < std::vector<std::string>>(),"capture all the publications of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list")
 		("output,o",po::value<std::string>(),"the output file for recording the data")
 		("coreinit,i", po::value<std::string>(), "the core initialization string")
 		("mapfile", po::value<std::string>(), "write progress to a memory mapped file");
