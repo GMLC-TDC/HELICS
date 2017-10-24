@@ -601,6 +601,9 @@ void runDualFederateTest (const std::string &core_type_str,
     // make sure the value was updated
     fedB->getValue (subid, val);
     BOOST_CHECK_EQUAL (val, testValue2);
+    fedA->finalize();
+    fedB->finalize();
+
 }
 
 template <class X>
@@ -657,6 +660,8 @@ void runDualFederateTestv2 (const std::string &core_type_str,
     // make sure the value was updated
     fedB->getValue (subid, val);
     BOOST_CHECK (val == testValue2);
+    fedA->finalize();
+    fedB->finalize();
 }
 
 template <class X>

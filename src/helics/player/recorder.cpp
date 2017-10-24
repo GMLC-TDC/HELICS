@@ -324,6 +324,7 @@ void argumentParser (int argc, const char * const *argv, po::variables_map &vm_m
         ("name,n", po::value<std::string>(), "name of the player federate")
         ("core,c", po::value<std::string>(), "name of the core to connect to")
         ("stop", po::value<double>(), "the time to stop recording")
+        ("tags",po::value<std::vector<std::string>>(),"tags to record this tag may be specified any number of times")
         ("timedelta", po::value<double>(), "the time delta of the federate")
         ("capture", po::value < std::vector<std::string>>(),"capture all the publications of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list")
 		("output,o",po::value<std::string>(),"the output file for recording the data")

@@ -120,7 +120,7 @@ ENDIF(UNIX)
 include(configGenerator)
 
 IF (VERSION_OPTION)
-	add_compile_options(${VERSION_OPTION})
+	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
 ELSE ()
 set(CMAKE_CXX_STANDARD 14)
 ENDIF ()
@@ -323,6 +323,10 @@ endif (${MPI_C_FOUND})
 
 
 install (TARGETS helics DESTINATION lib)
+
+
+OPTION(BUILD_PLAYER "Build a helics player" ON)
+OPTION(BUILD_RECORDER "Build a helics recorder" ON)
 
 # we aren't ready for this for the whole library yet
 IF(BUILD_SHARED_LIBS)
