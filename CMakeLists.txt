@@ -299,7 +299,7 @@ list(APPEND external_library_list ${Boost_LIBRARIES})
   list(APPEND external_link_directories ${Boost_LIBRARY_DIRS})
   
   
-add_library(helics STATIC
+add_library(helics ${LIB_TYPE}
     $<TARGET_OBJECTS:application_api>
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
@@ -327,10 +327,10 @@ install (TARGETS helics DESTINATION lib)
 # we aren't ready for this for the whole library yet
 IF(BUILD_SHARED_LIBS)
     IF(UNIX)
-        add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fvisibility=hidden>)
+        #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fvisibility=hidden>)
     ELSE(UNIX)
         IF(MINGW)
-           add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fvisibility=hidden>)
+            #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fvisibility=hidden>)
         ENDIF(MINGW)
     ENDIF(UNIX)
 ENDIF(BUILD_SHARED_LIBS)

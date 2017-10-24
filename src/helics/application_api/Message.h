@@ -14,7 +14,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics_includes/string_view.h"
 #include "helics/config.h"
 #include "helics/core/helics-time.h"
-#include "core/core-data.h"
+#include "helics/core/core-data.h"
 #include <memory>
 #include "helicsTypes.hpp"
 
