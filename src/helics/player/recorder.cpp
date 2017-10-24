@@ -139,7 +139,13 @@ int main (int argc, char *argv[])
     fi.coreInitString = "2";
     if (vm.count ("coreinit") > 0)
     {
+        fi.coreInitString.push_back(' ');
         fi.coreInitString = vm["coreinit"].as<std::string> ();
+    }
+    if (vm.count("broker") > 0)
+    {
+        fi.coreInitString += " --broker=";
+        fi.coreInitString += vm["broker"].as<std::string>();
     }
     fi.observer = true;
     if (vm.count ("timedelta") > 0)
@@ -153,6 +159,22 @@ int main (int argc, char *argv[])
         stopTime = vm["stop"].as<double> ();
     }
     auto vFed = std::make_unique<helics::ValueFederate> (fi);
+
+   
+    //get the extra tags from the arguments
+    if (vm.count("tags") > 0)
+    {
+        auto argTags = vm["tags"].as<std::vector<std::string>>();
+        for (const auto &tag : argTags)
+        {
+            std::vector<std::string> taglist;
+            boost::split(taglist, tag, boost::is_any_of(",;"));
+            for (const auto &tagname : taglist)
+            {
+                tags.insert(tagname);
+            }
+        }
+    }
 
     std::string prevTag;
     for (auto &tname : tags)
@@ -320,11 +342,11 @@ void argumentParser (int argc, const char * const *argv, po::variables_map &vm_m
 
 
     config.add_options()
-        ("broker,b", po::value<std::string>(), "address to connect the broker to")
+        ("broker,b", po::value<std::string>(), "address of the broker to connect")
         ("name,n", po::value<std::string>(), "name of the player federate")
-        ("core,c", po::value<std::string>(), "name of the core to connect to")
+        ("core,c", po::value<std::string>(), "type of the core to connect to")
         ("stop", po::value<double>(), "the time to stop recording")
-        ("tags",po::value<std::vector<std::string>>(),"tags to record this tag may be specified any number of times")
+        ("tags",po::value<std::vector<std::string>>(),"tags to record this argument may be specified any number of times")
         ("timedelta", po::value<double>(), "the time delta of the federate")
         ("capture", po::value < std::vector<std::string>>(),"capture all the publications of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list")
 		("output,o",po::value<std::string>(),"the output file for recording the data")
@@ -393,14 +415,10 @@ void argumentParser (int argc, const char * const *argv, po::variables_map &vm_m
 
     po::notify (vm_map);
     // check to make sure we have some input file or the capture is specified
-    if (vm_map.count ("input") == 0)
+    if ((vm_map.count ("input") == 0)&& (vm_map.count("capture") == 0)&& (vm_map.count("tags") == 0))
     {
-        if (vm_map.count("capture") == 0)
-        {
-            std::cerr << " no input file or captures specified\n";
+            std::cerr << " no input file, tags, or captures specified\n";
             std::cerr << visible << '\n';
             return;
-        }
-        
     }
 }

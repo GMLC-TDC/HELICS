@@ -28,6 +28,7 @@ Node_Core-tests.cpp
 testFixtures.cpp
 IPCcore_tests.cpp
 testBlockingQueue.cpp
+testPriorityBlockingQueue.cpp
 test-simple-queue.cpp
 data-block-tests.cpp
 )

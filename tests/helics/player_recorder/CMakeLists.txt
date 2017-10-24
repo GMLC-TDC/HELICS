@@ -30,6 +30,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 target_link_libraries(player-recorder-tests ${external_library_list})
 
 add_test(NAME player-recorder-tests COMMAND player-recorder-tests)
+add_definitions(-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
 
 #-----------------------------------------------------------------------------
 # Setup CTEST environment

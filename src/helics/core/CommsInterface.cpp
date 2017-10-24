@@ -125,13 +125,37 @@ void CommsInterface::disconnect ()
     {
         closeTransmitter ();
     }
+    int cnt = 0;
     while (rx_status != connection_status::terminated)
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
+        ++cnt;
+        if (cnt&31==0) //call this every 32*50 seconds
+        {
+            //try calling closeReceiver again
+            closeReceiver();
+        }
+        if (cnt == 400) //Eventually give up
+        {
+            std::cerr << "unable to terminate connection\n";
+            break;
+        }
     }
+    cnt = 0;
     while (tx_status != connection_status::terminated)
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
+        ++cnt;
+        if (cnt&31==0)
+        {
+            //try calling closeReceiver again
+            closeTransmitter();
+        }
+        if (cnt == 400)
+        {
+            std::cerr << "unable to terminate connection\n";
+            break;
+        }
     }
 }
 

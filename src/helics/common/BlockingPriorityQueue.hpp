@@ -334,7 +334,7 @@ stx::optional<T> BlockingPriorityQueue<T>::try_pop ()
     std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
         if (!priorityQueue.empty())
         {
-            stx::optional<T> val(std::move(priorityQueue.front());
+            stx::optional<T> val(std::move(priorityQueue.front()));
             priorityQueue.pop();
             return val;
         }

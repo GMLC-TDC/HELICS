@@ -65,6 +65,7 @@ protected:
 		errored = 7,
 	};
 	std::atomic<broker_state_t> brokerState{ created }; //!< flag indicating that the structure is past the initialization stage indicating that no more changes can be made to the number of federates or handles
+    bool noAutomaticID = false;
 public:
 	static void displayHelp();
 	BrokerBase() noexcept;

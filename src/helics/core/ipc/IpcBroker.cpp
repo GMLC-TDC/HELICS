@@ -88,7 +88,7 @@ void IpcBroker::InitializeFromArgs (int argc, const char *const *argv)
         {
             fileloc = vm["fileloc"].as<std::string> ();
         }
-
+        noAutomaticID = true;
         CoreBroker::InitializeFromArgs (argc, argv);
         if (getIdentifier ().empty ())
         {
@@ -121,10 +121,12 @@ bool IpcBroker::brokerConnect ()
 
 void IpcBroker::brokerDisconnect ()
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
+    std::unique_lock<std::mutex> lock (dataMutex);
     if (comms)
     {
-        comms->disconnect ();
+        auto comm_ptr = comms.get();
+        lock.unlock(); //we don't want to hold the lock while calling disconnect that could cause deadlock
+        comm_ptr->disconnect ();
     }
 }
 

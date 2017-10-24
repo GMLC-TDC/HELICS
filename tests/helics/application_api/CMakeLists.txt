@@ -14,10 +14,7 @@ set(application_api_test_sources
 test_configuration.h
 value-converter-tests.cpp
 application-api-tests.cpp
-data-block-tests.cpp
 data-view-tests.cpp
-test-simple-queue.cpp
-testBlockingQueue.cpp
 testQueries.cpp
 test-value-federate1.cpp
 test-value-federate2.cpp

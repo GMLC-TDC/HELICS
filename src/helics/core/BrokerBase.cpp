@@ -201,10 +201,14 @@ void BrokerBase::InitializeFromArgs (int argc, const char *const *argv)
     {
         logFile = vm["logfile"].as<std::string> ();
     }
-    if (identifier.empty ())
+    if (!noAutomaticID)
     {
-        identifier = gen_id ();
+        if (identifier.empty())
+        {
+            identifier = gen_id();
+        }
     }
+   
 
     timeCoord = std::make_unique<TimeCoordinator> ();
     timeCoord->setMessageSender ([this](const ActionMessage &msg) { addActionMessage (msg); });

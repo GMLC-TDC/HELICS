@@ -36,6 +36,7 @@ public:
 	int run(const std::string &args) const;
     std::future<int> runAsync(const std::string &args) const;
 	std::string runCaptureOutput(const std::string &args) const;
+    std::future<std::string> runCaptureOutputAsync(const std::string &args) const;
 };
 
 

@@ -45,7 +45,7 @@ const std::regex creg (R"raw((-?\d+(\.\d+)?|\.\d+)\s*([^\s]*)(\s+[cCdDvVsSiIfF]?
 int main (int argc, char *argv[])
 {
     std::ifstream infile;
-    valueTypes_t defType = valueTypes_t::stringValue;
+    helics::helicsType_t defType = helics::helicsType_t::helicsString;
 
     po::variables_map vm;
     argumentParser (argc, argv, vm);
@@ -56,19 +56,19 @@ int main (int argc, char *argv[])
         return 0;
     }
 
-    if (vm.count ("type") > 0)
+    if (vm.count ("datatype") > 0)
     {
-        defType = getType (vm["type"].as<std::string> ());
-        if (defType == valueTypes_t::unknownValue)
+        defType = helics::getTypeFromString(vm["datatype"].as<std::string> ());
+        if (defType == helics::helicsType_t::helicsInvalid)
         {
-            std::cerr << vm["type"].as<std::string> () << "is not recognized as a valid type \n";
+            std::cerr << vm["datatype"].as<std::string> () << " is not recognized as a valid type \n";
             return -3;
         }
     }
 
     if (!filesystem::exists (vm["input"].as<std::string> ()))
     {
-        std::cerr << vm["input"].as<std::string> () << "does not exist \n";
+        std::cerr << vm["input"].as<std::string> () << " does not exist \n";
         return -3;
     }
     infile.open (vm["input"].as<std::string> ().c_str ());
@@ -132,10 +132,10 @@ int main (int argc, char *argv[])
         name = vm["name"].as<std::string> ();
     }
 
-    std::string corename;
+    std::string coretype;
     if (vm.count ("core") > 0)
     {
-        corename = vm["core"].as<std::string> ();
+        coretype = vm["core"].as<std::string> ();
     }
     helics::Time stopTime = helics::Time::maxVal ();
     if (vm.count ("stop") > 0)
@@ -145,17 +145,24 @@ int main (int argc, char *argv[])
     helics::FederateInfo fi (name);
     try
     {
-        fi.coreType = helics::coreTypeFromString (corename);
+        fi.coreType = helics::coreTypeFromString (coretype);
     }
     catch (std::invalid_argument &ia)
     {
-        std::cerr << "Unrecognized core type\n";
+        std::cerr << coretype <<" is not recognized as a valid core type [zmq,ipc,udp,tcp,test,mpi]\n";
         return (-1);
     }
     fi.coreInitString = "1";
     if (vm.count ("coreinit") > 0)
     {
-        fi.coreInitString = vm["coreinit"].as<std::string> ();
+        fi.coreInitString.push_back(' ');
+        fi.coreInitString += vm["coreinit"].as<std::string> ();
+        
+    }
+    if (vm.count("broker") > 0)
+    {
+        fi.coreInitString += " --broker=";
+        fi.coreInitString += vm["broker"].as<std::string>();
     }
     fi.sourceOnly = true;
     if (vm.count ("timedelta") > 0)
@@ -246,8 +253,8 @@ void argumentParser (int argc, const char * const *argv, po::variables_map &vm_m
     config.add_options ()
 		("broker,b", po::value<std::string> (),"address to connect the broker to")
 		("name,n", po::value<std::string> (),"name of the player federate")
-		("type,t",po::value<std::string>(),"type of the publication to use")
-		("core,c",po::value<std::string> (),"name of the core to connect to")
+		("datatype",po::value<std::string>(),"type of the publication data type to use")
+		("core,c",po::value<std::string> (),"type of the core to connect to")
 		("stop", po::value<double>(), "the time to stop the player")
 		("timedelta", po::value<double>(), "the time delta of the federate")
 		("coreinit,i", po::value<std::string>(), "the core initialization string");
