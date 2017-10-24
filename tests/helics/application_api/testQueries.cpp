@@ -25,13 +25,13 @@ BOOST_DATA_TEST_CASE(test_publication_queries, bdata::make(core_types), core_typ
 {
     Setup2FederateTest(core_type);
     // register the publications
-    auto pubid = vFed1->registerGlobalPublication<double>("pub1");
+    vFed1->registerGlobalPublication<double>("pub1");
 
-    auto subid = vFed2->registerRequiredSubscription<double>("pub1");
+    vFed2->registerRequiredSubscription<double>("pub1");
 
-    auto pubid2 = vFed1->registerPublication<double>("pub2");
+    vFed1->registerPublication<double>("pub2");
 
-    auto pubid3 = vFed2->registerPublication<double>("pub3");
+    vFed2->registerPublication<double>("pub3");
     vFed1->setTimeDelta(1.0);
     vFed2->setTimeDelta(1.0);
 
