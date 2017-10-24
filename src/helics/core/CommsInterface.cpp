@@ -130,7 +130,7 @@ void CommsInterface::disconnect ()
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
         ++cnt;
-        if (cnt&31==0) //call this every 32*50 seconds
+        if ((cnt&31)==0) //call this every 32*50 seconds
         {
             //try calling closeReceiver again
             closeReceiver();
@@ -146,7 +146,7 @@ void CommsInterface::disconnect ()
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
         ++cnt;
-        if (cnt&31==0)
+        if ((cnt&31)==0)
         {
             //try calling closeReceiver again
             closeTransmitter();
