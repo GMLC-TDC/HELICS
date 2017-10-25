@@ -23,7 +23,7 @@ and some common methods used cores and brokers
 
 #include "core.h"
 #include "ActionMessage.h"
-#include "helics/common/BlockingQueue3.hpp"
+#include "helics/common/BlockingPriorityQueue.hpp"
 namespace helics
 {
 
@@ -50,7 +50,7 @@ protected:
 	std::atomic<bool> haltOperations{ false };  //!< flag indicating that no further message should be processed
 	std::string logFile; //< the file to log message to
 	std::unique_ptr<TimeCoordinator> timeCoord; //!< object managing the time control
-	BlockingQueue3<ActionMessage> _queue; //!< primary routing queue
+	BlockingPriorityQueue<ActionMessage> _queue; //!< primary routing queue
 										  /** enumeration of the possible core states*/
 	enum broker_state_t :int
 	{
@@ -98,7 +98,7 @@ protected:
 	@param[in] command the command to process
 	@return a action message response to the priority command
 	*/
-	virtual void processPriorityCommand(const ActionMessage &command) = 0;
+	virtual void processPriorityCommand(ActionMessage &&command) = 0;
 	/* process a disconnect signal*/
 	virtual void processDisconnect() = 0;
 

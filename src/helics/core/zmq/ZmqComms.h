@@ -53,7 +53,6 @@ public:
 	void setBrokerPorts(int reqPort, int pushPort=-1);
 	void setPortNumbers(int repPort, int pullPort=-1);
 	void setAutomaticPortStartPort(int startingPort);
-	void setReplyCallback(std::function<ActionMessage(ActionMessage &&)> callback);
 private:
 	int brokerReqPort = -1;
 	int brokerPushPort = -1;
@@ -63,7 +62,6 @@ private:
 	std::set<int> usedPortNumbers;
 	int openPortStart = -1;
 	std::atomic<bool> hasBroker{ false };
-	std::function<ActionMessage(ActionMessage &&)> replyCallback;
 	virtual void queue_rx_function() override;	//!< the functional loop for the receive queue
 	virtual void queue_tx_function() override;  //!< the loop for transmitting data
 	virtual void closeTransmitter() override; //!< function to instruct the transmitter loop to close

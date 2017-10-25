@@ -122,10 +122,6 @@ void ZmqComms::setPortNumbers (int repPort, int pullPort)
 
 void ZmqComms::setAutomaticPortStartPort (int startingPort) { openPortStart = startingPort; }
 
-void ZmqComms::setReplyCallback (std::function<ActionMessage (ActionMessage &&)> callback)
-{
-    replyCallback = std::move (callback);
-}
 
 int ZmqComms::processIncomingMessage (zmq::message_t &msg)
 {
@@ -187,21 +183,11 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
         }
         return 0;
     }
-    if (replyCallback)
-    {
-        auto Mresp = replyCallback (std::move (M));
-        auto str = Mresp.to_string ();
+    ActionCallback (std::move (M));
+    ActionMessage resp (CMD_PRIORITY_ACK);
+    auto str = resp.to_string ();
 
-        sock.send (str.data (), str.size ());
-    }
-    else
-    {
-        ActionCallback (std::move (M));
-        ActionMessage resp (CMD_PRIORITY_ACK);
-        auto str = resp.to_string ();
-
-        sock.send (str.data (), str.size ());
-    }
+    sock.send (str.data (), str.size ());
     return 0;
 }
 

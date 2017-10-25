@@ -94,11 +94,9 @@ private:
 	std::map<Core::federate_id_t, int32_t> broker_table;  //!< map for translating global broker id's to a local index
 	std::map<Core::federate_id_t, int32_t> federate_table; //!< map for translating global federate id's to a local index
 	std::unordered_map<std::string, int32_t> knownExternalEndpoints; //!< external map for all known external endpoints with names and route
-	
+    std::mutex mutex_; //mutex lock for name and identifier
 private:
 
-	mutable std::mutex mutex_;  //!< mutex lock for the federate information that could come in from multiple sources
-	
 	/** function that processes all the messages
 	@param[in] command -- the message to process
 	*/
@@ -108,7 +106,7 @@ private:
 	this mainly deals with some of the registration functions
 	@param[in] command the command to process
 	*/
-	void processPriorityCommand(const ActionMessage &command) override;
+	void processPriorityCommand(ActionMessage &&command) override;
 
 	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
 	/* function to transmit the delayed messages*/

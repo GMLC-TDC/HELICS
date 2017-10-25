@@ -133,7 +133,7 @@ protected:
 
   virtual void processCommand(ActionMessage &&cmd) override final;
   
-  virtual void processPriorityCommand(const ActionMessage &command) override final;
+  virtual void processPriorityCommand(ActionMessage &&command) override final;
 
   virtual void processDisconnect() override final;
   /** transit an ActionMessage to another core or broker

@@ -272,10 +272,7 @@ void BrokerBase::addActionMessage (const ActionMessage &m)
 {
     if (isPriorityCommand (m))
     {
-        if (!haltOperations)
-        {
-            processPriorityCommand (m);
-        }
+        _queue.pushPriority(std::move(m));
     }
     else
     {
@@ -288,10 +285,7 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
 {
     if (isPriorityCommand (m))
     {
-        if (!haltOperations)
-        {
-            processPriorityCommand (m);
-        }
+        _queue.emplacePriority(std::move(m));
     }
     else
     {
@@ -321,7 +315,15 @@ void BrokerBase::queueProcessingLoop ()
         default:
             if (!haltOperations)
             {
-                processCommand (std::move (command));
+                if (isPriorityCommand(command))
+                {
+                    processPriorityCommand(std::move(command));
+                }
+                else
+                {
+                    processCommand(std::move(command));
+                }
+                
             }
         }
     }

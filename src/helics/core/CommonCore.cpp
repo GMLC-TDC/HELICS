@@ -1575,7 +1575,7 @@ std::string CommonCore::query(const std::string &target, const std::string &quer
     return "#invalid";
 }
 
-void CommonCore::processPriorityCommand (const ActionMessage &command)
+void CommonCore::processPriorityCommand (ActionMessage &&command)
 {
     // deal with a few types of message immediately
     LOG_TRACE (
@@ -2042,7 +2042,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     default:
         if (isPriorityCommand (command))
         {  // this is a backup if somehow one of these message got here
-            processPriorityCommand (command);
+            processPriorityCommand (std::move(command));
         }
         break;
     }
