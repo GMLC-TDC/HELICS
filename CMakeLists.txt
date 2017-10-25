@@ -293,11 +293,19 @@ ENDIF(${MPI_C_FOUND})
 mark_as_advanced(CLEAR BOOST_ROOT)
 
 message("Using Boost include files : ${Boost_INCLUDE_DIR}")
-message("Using Boost libraries ${Boost_LIBRARY_DIRS}")
+message("Using Boost libraries in : ${Boost_LIBRARY_DIRS}")
+message("Using Boost libraries : ${Boost_LIBRARIES}")
+foreach(loop_var ${Boost_LIBRARIES})
+    message("Boost_LIBRARIES ${loop_var}")
+    if(${loop_var} MATCHES "unit_test")
+        list(APPEND Boost_LIBRARIES_test ${loop_var})
+    else()
+        list(APPEND Boost_LIBRARIES_core ${loop_var})
+    endif()
+endforeach(loop_var)
 
-list(APPEND external_library_list ${Boost_LIBRARIES})
-  list(APPEND external_link_directories ${Boost_LIBRARY_DIRS})
-  
+list(APPEND external_library_list ${Boost_LIBRARIES_core})
+list(APPEND external_link_directories ${Boost_LIBRARY_DIRS})
   
 add_library(helics STATIC
     $<TARGET_OBJECTS:application_api>
