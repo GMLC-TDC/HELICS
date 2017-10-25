@@ -1,3 +1,6 @@
+import ctypes
+l = ctypes.CDLL('./libhelicsSharedLib.dylib')
+
 import time
 import helics as h
 

@@ -44,7 +44,7 @@ include_directories ("${PROJECT_BINARY_DIR}/libs/include")
 
 # Macros to hide/show cached variables.
 # These two macros can be used to "hide" or "show" in the
-# list of cached variables various variables and/or options 
+# list of cached variables various variables and/or options
 # that depend on other options.
 # Note that once a variable is modified, it will preserve its
 # value (hiding it merely makes it internal)
@@ -157,7 +157,7 @@ endif (HELICS_GENERATE_DOXYGEN_DOC)
 #if (${ZEROMQ_FOUND})
 #   set(HELICS_HAVE_ZEROMQ TRUE)
 #   include_directories ("${ZeroMQ_INCLUDE_DIR}")
-#endif (${ZEROMQ_FOUND})	   
+#endif (${ZEROMQ_FOUND})
 
 # -------------------------------------------------------------
 # Enable ZMQ
@@ -170,7 +170,7 @@ IF (ZMQ_ENABLE)
 
 SHOW_VARIABLE(ZMQ_LIBRARY_PATH PATH
   "path to the zmq libraries" "${ZMQ_LIBRARY_PATH}")
-  
+
 SHOW_VARIABLE(ZMQ_INCLUDE_PATH PATH
   "path to the zmq headers" "${ZMQ_INCLUDE_PATH}")
   set(ZMQ_FIND_QUIETLY ON)
@@ -184,7 +184,7 @@ if (NOT ZMQ_FOUND)
   set(ZMQ_INSTALL_PATH ${PROJECT_BINARY_DIR}/libs)
   find_package(ZMQ)
   ENDIF(AUTOBUILD_ZMQ)
-  
+
 endif(NOT ZMQ_FOUND)
 if (ZMQ_FOUND)
    set(HELICS_HAVE_ZEROMQ TRUE)
@@ -270,12 +270,12 @@ ENDIF()
 ENDIF()
 
  message(STATUS ${boost_paths})
- 
-find_path(BOOST_TEST_PATH 
+
+find_path(BOOST_TEST_PATH
 			NAMES 			boost/version.hpp
 			PATHS		${boost_paths}
 		)
-		
+
 		if (BOOST_TEST_PATH)
 		set(BOOST_ROOT ${BOOST_TEST_PATH})
 		endif(BOOST_TEST_PATH)
@@ -319,7 +319,7 @@ message(STATUS "Using Boost core libraries : ${Boost_LIBRARIES_core}")
 message(STATUS "Using Boost test libraries : ${Boost_LIBRARIES_test}")
 list(APPEND external_library_list ${Boost_LIBRARIES_core})
 list(APPEND external_link_directories ${Boost_LIBRARY_DIRS})
-  
+
 add_library(helics STATIC
     $<TARGET_OBJECTS:application_api>
     $<TARGET_OBJECTS:helics_core>
@@ -371,7 +371,7 @@ configure_file (
   install(DIRECTORY ThirdParty/ DESTINATION include
 	  FILES_MATCHING PATTERN "helics_includes/*.h*")
 #-----------------------------------------------------------------------------
-# CMAKE Subdirectories 
+# CMAKE Subdirectories
 #-----------------------------------------------------------------------------
 
 add_subdirectory (src)
@@ -404,6 +404,6 @@ include(clang-cxx-dev-tools)
 endif(ENABLE_CLANG_TOOLS)
 
 if (BUILD_PYTHON)
-add_subdirectory(python)
+add_subdirectory(swig)
 endif(BUILD_PYTHON)
 
