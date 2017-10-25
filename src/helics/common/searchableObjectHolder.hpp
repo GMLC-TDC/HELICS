@@ -30,13 +30,22 @@ class SearchableObjectHolder
     ~SearchableObjectHolder ()
     {
         std::unique_lock<std::mutex> lock (mapLock);
+        int cntr = 0;
         while (true)
         {
+            
             if (!ObjectMap.empty ())
             {  // wait for the objectMap to be cleared
+                ++cntr;
                 lock.unlock ();
-                std::this_thread::sleep_for (std::chrono::milliseconds (50));
+                std::this_thread::sleep_for (std::chrono::milliseconds (100));
                 lock.lock ();
+                if (cntr > 50)
+                {
+                    //give up after 5 seconds
+                    std::cerr << "object not clearing after global destruction force close\n";
+                    break;
+                }
             }
             else
             {
