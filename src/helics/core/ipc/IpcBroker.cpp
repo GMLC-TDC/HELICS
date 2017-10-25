@@ -40,17 +40,13 @@ using namespace std::string_literals;
 static const argDescriptors extraArgs{{"queueloc"s, "string"s, "the named location of the shared queue"s},
                                       {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
 
-IpcBroker::IpcBroker (bool rootBroker) noexcept : CoreBroker (rootBroker) {}
+IpcBroker::IpcBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
-IpcBroker::IpcBroker (const std::string &broker_name) : CoreBroker (broker_name) {}
+IpcBroker::IpcBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
 IpcBroker::~IpcBroker ()
 {
-    haltOperations = true;
-    std::unique_lock<std::mutex> lock (dataMutex);
-    comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
-    lock.unlock ();
-    joinAllThreads ();
+
 }
 
 void IpcBroker::displayHelp (bool localOnly)
@@ -117,35 +113,6 @@ bool IpcBroker::brokerConnect ()
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     comms->setMessageSize (maxMessageSize, maxMessageCount);
     return comms->connect ();
-}
-
-void IpcBroker::brokerDisconnect ()
-{
-    std::unique_lock<std::mutex> lock (dataMutex);
-    if (comms)
-    {
-        auto comm_ptr = comms.get();
-        lock.unlock(); //we don't want to hold the lock while calling disconnect that could cause deadlock
-        comm_ptr->disconnect ();
-    }
-}
-
-void IpcBroker::transmit (int route_id, const ActionMessage &cmd)
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
-    {
-        comms->transmit (route_id, cmd);
-    }
-}
-
-void IpcBroker::addRoute (int route_id, const std::string &routeInfo)
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
-    {
-        comms->addRoute (route_id, routeInfo);
-    }
 }
 
 std::string IpcBroker::getAddress () const

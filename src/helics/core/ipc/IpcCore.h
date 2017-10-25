@@ -11,13 +11,13 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "core/CommonCore.h"
-
+#include "core/CommsBroker.hpp"
 namespace helics {
 
 class IpcComms;
 
 /** implementation for the core that uses zmq messages to communicate*/
-class IpcCore final: public CommonCore {
+class IpcCore final: CommsBroker<IpcComms,CommonCore> {
 
 public:
 	/** default constructor*/
@@ -26,20 +26,14 @@ public:
   /** destructor*/
   ~IpcCore();
   virtual void InitializeFromArgs (int argc, const char * const *argv) override;
-         
-  virtual void transmit(int route_id, const ActionMessage &cmd) override;
-  virtual void addRoute(int route_id, const std::string &routeInfo) override;
 public:
 	virtual std::string getAddress() const override;
 private:
 	virtual bool brokerConnect() override;
-	virtual void brokerDisconnect() override;
  
 	std::string fileloc; //!< the location of the file queue
 	std::string brokerloc;	//!< the location of the broker	queue
 	std::string brokername;	//!< the name of the broker
-	std::unique_ptr<IpcComms> comms;	//!< object to handle the actual interprocess Connections
-	mutable std::mutex dataMutex;  //mutex protecting the other information in the ipcBroker
 };
 
 

@@ -69,8 +69,12 @@ BOOST_AUTO_TEST_CASE (move_only_tests)
     BOOST_CHECK_EQUAL (**b, 4534.23);
     b = sq.try_pop ();
     BOOST_CHECK_EQUAL (**b, 34.234);
+    e2 = std::make_unique<double>(29.785);
+    sq.pushPriority(std::move(e2));
 
     b = sq.try_pop ();
+    BOOST_CHECK_EQUAL(**b, 29.785);
+    b = sq.try_pop();
     BOOST_CHECK (!(b));
     BOOST_CHECK (sq.empty ());
 }
@@ -97,6 +101,9 @@ BOOST_AUTO_TEST_CASE (ordering_tests)
     {
         sq.push (ii);
     }
+    sq.pushPriority(99);
+    b = sq.try_pop();
+    BOOST_CHECK_EQUAL(*b, 99);
     for (int ii = 7; ii < 20; ++ii)
     {
         b = sq.try_pop ();
@@ -113,8 +120,13 @@ BOOST_AUTO_TEST_CASE (emplace_tests)
     sq.emplace (10, 45.4);
     sq.emplace (11, 34.1);
     sq.emplace (12, 34.2);
+    sq.emplacePriority(14, 19.99);
 
-    auto b = sq.try_pop ();
+    auto b = sq.try_pop();
+    BOOST_CHECK_EQUAL(b->first, 14);
+    BOOST_CHECK_EQUAL(b->second, 19.99);
+
+    b = sq.try_pop ();
     BOOST_CHECK_EQUAL (b->first, 10);
     BOOST_CHECK_EQUAL (b->second, 45.4);
     b = sq.try_pop ();

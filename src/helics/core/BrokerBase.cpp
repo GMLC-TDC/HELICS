@@ -272,7 +272,7 @@ void BrokerBase::addActionMessage (const ActionMessage &m)
 {
     if (isPriorityCommand (m))
     {
-        _queue.pushPriority(std::move(m));
+        _queue.pushPriority(m);
     }
     else
     {

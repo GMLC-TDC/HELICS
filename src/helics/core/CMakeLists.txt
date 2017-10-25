@@ -25,6 +25,7 @@ set(SRC_FILES
 	TimeCoordinator.cpp
 	TimeDependencies.cpp
 	CommsInterface.cpp
+	CommsBroker.cpp
 	argParser.cpp
 )
 
@@ -51,6 +52,8 @@ set(INCLUDE_FILES
 	TimeCoordinator.h
 	loggingHelper.hpp
 	delayedObjects.hpp
+	CommsBroker.hpp
+	CommsBroker_impl.hpp
     core.h
     core-types.h
     helics-time.h
