@@ -31,18 +31,9 @@ subPubObjectTests.cpp
 testFixtures.cpp
 )
 
-set(filter_federate_test_sources
-filter-federate-tests.cpp
-test-filter-federate.cpp
-testFixtures.cpp
-)
 
 add_executable(application-api-tests ${application_api_test_sources} ${application_api_test_headers})
 target_link_libraries(application-api-tests helics)
-
-add_executable(filter-federate-tests ${filter_federate_test_sources} ${application_api_test_headers})
-target_link_libraries(filter-federate-tests helics)
-
 
 link_directories(${external_link_directories})
 
@@ -50,9 +41,8 @@ include_directories( SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 
 target_link_libraries(application-api-tests ${external_library_list})
-target_link_libraries(filter-federate-tests ${external_library_list})
+
 target_link_libraries(application-api-tests ${Boost_LIBRARIES_test})
-target_link_libraries(filter-federate-tests ${Boost_LIBRARIES_test})
 
 ADD_DEFINITIONS(-DHELICS_BROKER_LOCATION="${HELICS_BROKER_LOC}")
 ADD_DEFINITIONS(-DHELICS_INSTALL_LOCATION="${CMAKE_INSTALL_PREFIX}")
