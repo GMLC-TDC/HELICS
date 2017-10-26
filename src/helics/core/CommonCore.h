@@ -45,6 +45,8 @@ public:
 
 	/** default constructor*/
 CommonCore() noexcept;
+/**function mainly to match some other object constructors does the same thing as the default constructor*/
+CommonCore(bool arg) noexcept;
 /** construct from a core name*/
 CommonCore(const std::string &core_name);
 /** virtual destructor*/

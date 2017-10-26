@@ -45,6 +45,8 @@ static DelayedObjects<std::string> ActiveQueries;
 
 CommonCore::CommonCore () noexcept {}
 
+CommonCore::CommonCore(bool) noexcept {}
+
 CommonCore::CommonCore (const std::string &core_name) : BrokerBase (core_name) {}
 
 void CommonCore::initialize (const std::string &initializationString)
@@ -116,11 +118,21 @@ void CommonCore::disconnect ()
         if (brokerState < broker_state_t::terminating)
         {
             brokerState = broker_state_t::terminating;
-            ActionMessage dis (CMD_DISCONNECT);
-            dis.source_id = global_broker_id;
-            transmit (0, dis);
-            addActionMessage (CMD_STOP);
+            if (global_broker_id != 0)
+            {
+                ActionMessage dis(CMD_DISCONNECT);
+                dis.source_id = global_broker_id;
+                transmit(0, dis);
+            }
+            else
+            {
+                ActionMessage dis(CMD_DISCONNECT_NAME);
+                dis.payload = getIdentifier();
+                transmit(0, dis);
+            }
+            addActionMessage(CMD_STOP);
             return;
+            
         }
         brokerDisconnect ();
     }

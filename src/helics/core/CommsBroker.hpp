@@ -19,19 +19,21 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
     class ActionMessage;
+    class CommsInterface;
 
     template <class COMMS, class Broker>
     class CommsBroker :public Broker
     {
-        //TODO:: add some static asserts
+       
     protected:
         std::atomic<int> disconnectionStage{ 0 };  //!< the stage of disconnection
         mutable std::mutex dataMutex;
         std::unique_ptr<COMMS> comms;
         std::atomic<bool> initialized_{ false };  //!< atomic protecting local initialization
     public:
-        using Broker::Broker;
-        CommsBroker(CommsBroker &&cb) noexcept;
+        CommsBroker() noexcept;
+        CommsBroker(bool isRootObject) noexcept;
+        CommsBroker(const std::string &obj_name);
         ~CommsBroker();
     private:
         virtual void brokerDisconnect() override;

@@ -422,6 +422,16 @@ void CoreBroker::processCommand (ActionMessage &&command)
             }
         }
         break;
+    case CMD_DISCONNECT_NAME:
+        if (command.dest_id == 0)
+        {
+            auto brkNum = getBrokerByName(command.payload);
+            if (brkNum >= 0)
+            {
+                _brokers[brkNum]._disconnected = true;
+            }
+        }
+        //FALLTHROUGH
     case CMD_DISCONNECT:
     {
         if (command.dest_id == 0)

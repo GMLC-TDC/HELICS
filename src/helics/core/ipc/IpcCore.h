@@ -16,8 +16,8 @@ namespace helics {
 
 class IpcComms;
 
-/** implementation for the core that uses zmq messages to communicate*/
-class IpcCore final: CommsBroker<IpcComms,CommonCore> {
+/** implementation for the core that uses Interprocess messages to communicate*/
+class IpcCore final: public CommsBroker<IpcComms,CommonCore> {
 
 public:
 	/** default constructor*/

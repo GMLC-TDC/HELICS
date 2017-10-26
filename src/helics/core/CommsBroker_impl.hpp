@@ -14,19 +14,34 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <mutex>
 #include <atomic>
 #include "core/CommsBroker.hpp"
-
+#include <thread>
+#include "core/CommsInterface.h"
+#include "core/BrokerBase.h"
 namespace helics
 {
+
     template <class COMMS, class Broker>
-    CommsBroker<COMMS, Broker>::CommsBroker(CommsBroker &&cb) noexcept:Broker(std::move(cb)),comms(std::move(cb.comms))
+    CommsBroker<COMMS, Broker>::CommsBroker() noexcept
+    {
+        static_assert(std::is_base_of<CommsInterface, COMMS>::value, "COMMS object must be a CommsInterface Object");
+        static_assert(std::is_base_of<BrokerBase, Broker>::value, "Broker must be an object  with a base of BrokerBase");
+    }
+
+    template <class COMMS, class Broker>
+    CommsBroker<COMMS, Broker>::CommsBroker(bool arg) noexcept:Broker(arg)
     {
 
     }
 
     template <class COMMS, class Broker>
+    CommsBroker<COMMS, Broker>::CommsBroker(const std::string &obj_name): Broker(obj_name)
+    {
+
+    }
+    template <class COMMS, class Broker>
     CommsBroker<COMMS,Broker>::~CommsBroker()
     {
-        haltOperations = true;
+        BrokerBase::haltOperations = true;
         std::unique_lock<std::mutex> lock(dataMutex);
         if (comms)
         {
@@ -48,7 +63,7 @@ namespace helics
         }
         comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
         lock.unlock();
-        joinAllThreads();
+        BrokerBase::joinAllThreads();
     }
 
     template <class COMMS, class Broker>

@@ -264,6 +264,7 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   // priority commands
   {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
   {action_message_def::action_t::cmd_disconnect, "disconnect"},
+  {action_message_def::action_t::cmd_disconnect_name, "disconnect by name" },
   {action_message_def::action_t::cmd_fed_ack, "fed_ack"},
 
   {action_message_def::action_t::cmd_broker_ack, "broker_ack"},
