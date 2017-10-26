@@ -27,20 +27,26 @@ link_directories(${external_link_directories})
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
+target_link_libraries(player-recorder-tests helics)
+
 target_link_libraries(player-recorder-tests ${external_library_list})
+
+
+link_directories(${external_link_directories})
+
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
+
+add_test(NAME player-recorder-tests COMMAND player-recorder-tests)
+
 
 target_link_libraries(player-recorder-tests Threads::Threads)
 IF (UNIX AND NOT APPLE)
 target_link_libraries(player-recorder-tests rt)
 ENDIF()
 
-add_test(NAME player-recorder-tests COMMAND player-recorder-tests)
 add_definitions(-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
 
-#-----------------------------------------------------------------------------
-# Setup CTEST environment
-#-----------------------------------------------------------------------------
-include(CTest)
 
 
 add_custom_command(TARGET player-recorder-tests POST_BUILD        # Adds a post-build event to core tests
