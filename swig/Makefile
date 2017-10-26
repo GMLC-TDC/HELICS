@@ -30,6 +30,6 @@ clean-all: clean clean-cpp
 .PHONY: build
 build: clean
 	swig -I../src/helics/shared_api_library -python helics.i
-	gcc -fpic helics_wrap.c $(CPPINCLUDE) -I../src/helics/shared_api_library -shared -lhelics -lhelicsSharedLib -L../../helics_install/lib -L$(LIBDIR1) -L$(LIBDIR2) -W,-rpath -W,$(LIBDIR1) -W,-rpath -W,$(LIBDIR2) -l$(PYLIB) $(LIBS) $(SYSLIBS) -o _helics.so
+	gcc -fpic helics_wrap.c $(CPPINCLUDE) -I../src/helics/shared_api_library -shared -lhelicsSharedLib -L../../helics_install/lib -L$(LIBDIR1) -L$(LIBDIR2) -W,-rpath -W,$(LIBDIR1) -W,-rpath -W,$(LIBDIR2) -l$(PYLIB) $(LIBS) $(SYSLIBS) -o _helics.so
 
 
