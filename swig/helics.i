@@ -1,6 +1,7 @@
 #define __attribute__(x)
 
 %module helics
+
 %{
 #include "api-data.h"
 #include "helics.h"
