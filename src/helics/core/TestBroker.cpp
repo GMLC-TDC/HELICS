@@ -126,7 +126,7 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
     if (brkfnd != brokerRoutes.end ())
     {
         auto tmp = brkfnd->second;
-        lock.unlock();
+        lock.unlock ();
         tmp->addActionMessage (cmd);
         return;
     }
@@ -134,7 +134,7 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
     if (crfnd != coreRoutes.end ())
     {
         auto tmp = crfnd->second;
-        lock.unlock();
+        lock.unlock ();
         tmp->addActionMessage (cmd);
         return;
     }

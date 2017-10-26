@@ -32,15 +32,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <functional>
 #include <boost/program_options.hpp>
 
-#include <boost/format.hpp>
 #include "delayedObjects.hpp"
+#include <boost/format.hpp>
 
 namespace helics
 {
 using federate_id_t = Core::federate_id_t;
 using Handle = Core::Handle;
 
-//file local declarator for active queries
+// file local declarator for active queries
 static DelayedObjects<std::string> ActiveQueries;
 
 CommonCore::CommonCore () noexcept {}
@@ -1373,99 +1373,99 @@ void CommonCore::setFilterOperator (Handle filter, std::shared_ptr<FilterOperato
                 {
                     auto endhandle = fndend->second;
                     cmd.dest_id = handles[endhandle]->fed_id;
-cmd.dest_handle = endhandle;
+                    cmd.dest_handle = endhandle;
                 }
             }
-            addActionMessage(cmd);
+            addActionMessage (cmd);
         }
     }
     else if (brokerState == operating)
     {
         if (FiltI->filterOp)
         {
-            FiltI->filterOp = std::move(callback);
+            FiltI->filterOp = std::move (callback);
         }
         else
         {
-            throw (invalidFunctionCall(
-                " filter operation can not be set in operating mode if it was not previously defined"));
+            throw (invalidFunctionCall (
+              " filter operation can not be set in operating mode if it was not previously defined"));
         }
     }
     else
     {
-        throw (invalidFunctionCall(" filter operation can not be set in current state"));
+        throw (invalidFunctionCall (" filter operation can not be set in current state"));
     }
 }
 
-FilterCoordinator *CommonCore::getFilterCoordinator(Handle id_)
+FilterCoordinator *CommonCore::getFilterCoordinator (Handle id_)
 {
     // only activate the lock if we not in an operating state
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex>(_mutex, std::defer_lock) :
-        std::unique_lock<std::mutex>(_mutex);
-    auto fnd = filters.find(id_);
-    if (fnd == filters.end())
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
+                                             std::unique_lock<std::mutex> (_mutex);
+    auto fnd = filters.find (id_);
+    if (fnd == filters.end ())
     {
-        lock.unlock();
+        lock.unlock ();
         if (brokerState < operating)
         {
             // just make a dummy filterFunction so we have something to return
-            auto ff = std::make_unique<FilterCoordinator>();
-            auto ffp = ff.get();
-            lock.lock();
-            filters.emplace(id_, std::move(ff));
+            auto ff = std::make_unique<FilterCoordinator> ();
+            auto ffp = ff.get ();
+            lock.lock ();
+            filters.emplace (id_, std::move (ff));
             return ffp;
         }
         return nullptr;
     }
-    return fnd->second.get();
+    return fnd->second.get ();
 }
 
-uint64_t CommonCore::receiveFilterCount(federate_id_t federateID)
+uint64_t CommonCore::receiveFilterCount (federate_id_t federateID)
 {
-    auto fed = getFederate(federateID);
+    auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier("federateID is not valid"));
+        throw (invalidIdentifier ("federateID is not valid"));
     }
-    if (fed->getState() != HELICS_EXECUTING)
+    if (fed->getState () != HELICS_EXECUTING)
     {
         return 0;
     }
 
-    return fed->getFilterQueueSize();
+    return fed->getFilterQueueSize ();
 }
 
-std::unique_ptr<Message> CommonCore::receiveAnyFilter(federate_id_t federateID, Handle &filter_id)
+std::unique_ptr<Message> CommonCore::receiveAnyFilter (federate_id_t federateID, Handle &filter_id)
 {
-    auto fed = getFederate(federateID);
+    auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier("federateID is not valid"));
+        throw (invalidIdentifier ("federateID is not valid"));
     }
-    if (fed->getState() != HELICS_EXECUTING)
+    if (fed->getState () != HELICS_EXECUTING)
     {
         filter_id = invalid_Handle;
         return nullptr;
     }
-    return fed->receiveAnyFilter(filter_id);
+    return fed->receiveAnyFilter (filter_id);
 }
 
-void CommonCore::setIdentifier(const std::string &name)
+void CommonCore::setIdentifier (const std::string &name)
 {
     if (brokerState == created)
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        std::lock_guard<std::mutex> lock (_mutex);
         identifier = name;
     }
     else
     {
-        throw (invalidFunctionCall("setIdentifier can only be called before the core is initialized"));
+        throw (invalidFunctionCall ("setIdentifier can only be called before the core is initialized"));
     }
 }
 
-std::string CommonCore::federateQuery(Core::federate_id_t id, const std::string &queryStr) const
+std::string CommonCore::federateQuery (Core::federate_id_t id, const std::string &queryStr) const
 {
-    auto fed = getFederate(id);
+    auto fed = getFederate (id);
     if (fed == nullptr)
     {
         if (queryStr == "exists")
@@ -1480,46 +1480,46 @@ std::string CommonCore::federateQuery(Core::federate_id_t id, const std::string 
     }
     else if (queryStr == "isinit")
     {
-        return (fed->getState() >= helics_federate_state_type::HELICS_INITIALIZING) ? "true" : "false";
+        return (fed->getState () >= helics_federate_state_type::HELICS_INITIALIZING) ? "true" : "false";
     }
     else if (queryStr == "state")
     {
-        return std::to_string(static_cast<int>(fed->getState()));
+        return std::to_string (static_cast<int> (fed->getState ()));
     }
     else if (queryStr == "publications")
     {
         std::string ret;
-        ret.push_back('[');
-        std::unique_lock<std::mutex> lock(_handlemutex);
-        for (auto & hndl : handles)
+        ret.push_back ('[');
+        std::unique_lock<std::mutex> lock (_handlemutex);
+        for (auto &hndl : handles)
         {
             if (!hndl)
             {
                 continue;
             }
-            if ((hndl->local_fed_id == id)&&(hndl->what==BasicHandleType::HANDLE_PUB))
+            if ((hndl->local_fed_id == id) && (hndl->what == BasicHandleType::HANDLE_PUB))
             {
-                ret.append(hndl->key);
-                ret.push_back(';');
+                ret.append (hndl->key);
+                ret.push_back (';');
             }
         }
-        lock.unlock();
-        if (ret.size() > 1)
+        lock.unlock ();
+        if (ret.size () > 1)
         {
-            ret.back() = ']';
+            ret.back () = ']';
         }
         else
         {
-            ret.push_back(']');
+            ret.push_back (']');
         }
         return ret;
     }
     else if (queryStr == "endpoints")
     {
         std::string ret;
-        ret.push_back('[');
-        std::unique_lock<std::mutex> lock(_handlemutex);
-        for (auto & hndl : handles)
+        ret.push_back ('[');
+        std::unique_lock<std::mutex> lock (_handlemutex);
+        for (auto &hndl : handles)
         {
             if (!hndl)
             {
@@ -1527,48 +1527,47 @@ std::string CommonCore::federateQuery(Core::federate_id_t id, const std::string 
             }
             if ((hndl->local_fed_id == id) && (hndl->what == BasicHandleType::HANDLE_END))
             {
-                ret.append(hndl->key);
-                ret.push_back(';');
+                ret.append (hndl->key);
+                ret.push_back (';');
             }
         }
-        lock.unlock();
-        if (ret.size() > 1)
+        lock.unlock ();
+        if (ret.size () > 1)
         {
-            ret.back() = ']';
+            ret.back () = ']';
         }
         else
         {
-            ret.push_back(']');
+            ret.push_back (']');
         }
         return ret;
     }
     return "#invalid";
 }
 
-std::string CommonCore::query(const std::string &target, const std::string &queryStr)
+std::string CommonCore::query (const std::string &target, const std::string &queryStr)
 {
-    if ((target == "core")||(target==getIdentifier()))
+    if ((target == "core") || (target == getIdentifier ()))
     {
-
     }
     else
     {
-        std::lock_guard<std::mutex> lock(_mutex);
-        auto fed = federateNames.find(target);
-        if (fed != federateNames.end())
+        std::lock_guard<std::mutex> lock (_mutex);
+        auto fed = federateNames.find (target);
+        if (fed != federateNames.end ())
         {
-            return federateQuery(fed->second, queryStr);
+            return federateQuery (fed->second, queryStr);
         }
         else
         {
-            ActionMessage query(CMD_QUERY);
+            ActionMessage query (CMD_QUERY);
             query.source_id = global_broker_id;
             query.index = ++queryCounter;
             query.payload = queryStr;
-            query.info().target = target;
-            auto fut = ActiveQueries.getFuture(query.index);
-            transmit(0, query);
-            auto ret = fut.get();
+            query.info ().target = target;
+            auto fut = ActiveQueries.getFuture (query.index);
+            transmit (0, query);
+            auto ret = fut.get ();
             return ret;
         }
     }
@@ -1640,34 +1639,33 @@ void CommonCore::processPriorityCommand (const ActionMessage &command)
     case CMD_QUERY:
     {
         std::string repStr;
-        ActionMessage queryResp(CMD_QUERY_REPLY);
+        ActionMessage queryResp (CMD_QUERY_REPLY);
         queryResp.dest_id = command.source_id;
         queryResp.source_id = command.dest_id;
         queryResp.index = command.index;
-        if (command.info().target == getIdentifier())
+        if (command.info ().target == getIdentifier ())
         {
             queryResp.source_id = global_broker_id;
         }
         else
         {
-            std::lock_guard<std::mutex> lock(_mutex);
-            auto fed = federateNames.find(command.info().target);
-            if (fed != federateNames.end())
+            std::lock_guard<std::mutex> lock (_mutex);
+            auto fed = federateNames.find (command.info ().target);
+            if (fed != federateNames.end ())
             {
-                repStr = federateQuery(fed->second, command.payload);
+                repStr = federateQuery (fed->second, command.payload);
             }
-           
         }
-        
+
         queryResp.payload = repStr;
-       
-        transmit(getRoute(queryResp.dest_id), queryResp);
+
+        transmit (getRoute (queryResp.dest_id), queryResp);
     }
-        break;
+    break;
     case CMD_QUERY_REPLY:
         if (command.dest_id == global_broker_id)
         {
-            ActiveQueries.setDelayedValue(command.index, command.payload);
+            ActiveQueries.setDelayedValue (command.index, command.payload);
         }
         break;
     case CMD_PRIORITY_ACK:

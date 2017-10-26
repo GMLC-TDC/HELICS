@@ -8,8 +8,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/application_api/ValueFederate.h"
 #include "helics/application_api/Publications.hpp"
+#include "helics/application_api/ValueFederate.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -37,7 +37,7 @@ namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
 bool vComp (ValueSetter &v1, ValueSetter &v2) { return (v1.time < v2.time); }
-void argumentParser (int argc, const char * const *argv, po::variables_map &vm_map);
+void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
 void sendPublication (helics::ValueFederate *vFed, ValueSetter &vs);
 
@@ -279,7 +279,7 @@ void sendPublication (helics::ValueFederate *vFed, ValueSetter &vs)
     }
 }
 
-void argumentParser (int argc, const char * const *argv, po::variables_map &vm_map)
+void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map)
 {
     po::options_description cmd_only ("command line only");
     po::options_description config ("configuration");

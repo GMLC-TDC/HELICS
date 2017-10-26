@@ -25,13 +25,13 @@ extern "C" {
 #define HELICS_VECTOR_TYPE 4
 #define HELICS_RAW_TYPE 25
 
-	/** create a subscription 
-	@param fed the federate object in which to create a subscription
-	@param key the identifier matching a publication to get a subscription for
-	@param type a string describing the expected type of the publication may be NULL
-	@param units a string listing the units of the subscription maybe NULL
-	@return an object containing the subscription
-	*/
+/** create a subscription
+@param fed the federate object in which to create a subscription
+@param key the identifier matching a publication to get a subscription for
+@param type a string describing the expected type of the publication may be NULL
+@param units a string listing the units of the subscription maybe NULL
+@return an object containing the subscription
+*/
 HELICS_Export helics_subscription helicsRegisterSubscription (helics_value_federate fed,
                                                               const char *key,
                                                               const char *type,

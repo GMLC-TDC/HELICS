@@ -13,74 +13,72 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #pragma once
 
 #include <future>
-#include <mutex>
 #include <map>
+#include <mutex>
 
 /** class holding a map of delayed object*/
-template<class X>
+template <class X>
 class DelayedObjects
 {
-private:
+  private:
     std::map<int, std::promise<X>> promiseByInteger;
     std::map<std::string, std::promise<X>> promiseByString;
     std::mutex promiseLock;
-public:
-    DelayedObjects() = default;
-    ~DelayedObjects()
+
+  public:
+    DelayedObjects () = default;
+    ~DelayedObjects ()
     {
-        std::lock_guard<std::mutex> lock(promiseLock);
+        std::lock_guard<std::mutex> lock (promiseLock);
         for (auto &obj : promiseByInteger)
         {
-            obj.second.set_value(X());
+            obj.second.set_value (X ());
         }
         for (auto &obj : promiseByString)
         {
-            obj.second.set_value(X());
+            obj.second.set_value (X ());
         }
     }
-    //not moveable or copyable;
-    DelayedObjects(const DelayedObjects &) = delete;
-    DelayedObjects( DelayedObjects &&) = delete;
+    // not moveable or copyable;
+    DelayedObjects (const DelayedObjects &) = delete;
+    DelayedObjects (DelayedObjects &&) = delete;
 
-    void setDelayedValue(int index, const X& val)
+    void setDelayedValue (int index, const X &val)
     {
-        std::lock_guard<std::mutex> lock(promiseLock);
-        auto fnd = promiseByInteger.find(index);
-        if (fnd != promiseByInteger.end())
+        std::lock_guard<std::mutex> lock (promiseLock);
+        auto fnd = promiseByInteger.find (index);
+        if (fnd != promiseByInteger.end ())
         {
-            fnd->second.set_value(val);
-            promiseByInteger.erase(fnd);
-        }
-    
-    }
-    void setDelayedValue(const std::string &name, const X& val)
-    {
-        std::lock_guard<std::mutex> lock(promiseLock);
-        auto fnd = promiseByString.find(name);
-        if (fnd != promiseByString.end())
-        {
-            fnd->second.set_value(val);
-            promiseByString.erase(fnd);
+            fnd->second.set_value (val);
+            promiseByInteger.erase (fnd);
         }
     }
-    std::future<X> getFuture(int index)
+    void setDelayedValue (const std::string &name, const X &val)
     {
-        auto V = std::promise<X>();
-        auto fut = V.get_future();
-        std::lock_guard<std::mutex> lock(promiseLock);
-        promiseByInteger[index] = std::move(V);
+        std::lock_guard<std::mutex> lock (promiseLock);
+        auto fnd = promiseByString.find (name);
+        if (fnd != promiseByString.end ())
+        {
+            fnd->second.set_value (val);
+            promiseByString.erase (fnd);
+        }
+    }
+    std::future<X> getFuture (int index)
+    {
+        auto V = std::promise<X> ();
+        auto fut = V.get_future ();
+        std::lock_guard<std::mutex> lock (promiseLock);
+        promiseByInteger[index] = std::move (V);
         return fut;
     }
-    std::future<X> getFuture(const std::string &name)
+    std::future<X> getFuture (const std::string &name)
     {
-        auto V = std::promise<X>();
-        auto fut = V.get_future();
-        std::lock_guard<std::mutex> lock(promiseLock);
-        promiseByString[name] = std::move(V);
+        auto V = std::promise<X> ();
+        auto fut = V.get_future ();
+        std::lock_guard<std::mutex> lock (promiseLock);
+        promiseByString[name] = std::move (V);
         return fut;
     }
-
 };
-
 
 #endif /* _HELICS_DELAYED_OBJECTS_ */

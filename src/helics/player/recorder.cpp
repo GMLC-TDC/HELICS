@@ -8,8 +8,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/application_api/ValueFederate.h"
 #include "helics/application_api/Publications.hpp"
+#include "helics/application_api/ValueFederate.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -31,7 +31,7 @@ class ValueCapture
     helics::subscription_id_t id;
     bool first = false;
     std::string value;
-    ValueCapture() = default;
+    ValueCapture () = default;
     ValueCapture (helics::Time t1, helics::subscription_id_t id1, const std::string &val)
         : time (t1), id (id1), value (val){};
 };
@@ -48,7 +48,7 @@ class ValueStats
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
-void argumentParser (int argc, const char * const *argv, po::variables_map &vm_map);
+void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
 int main (int argc, char *argv[])
 {
@@ -166,17 +166,17 @@ int main (int argc, char *argv[])
         auto id = vFed->registerOptionalSubscription (tname.first, typeString (tname.second));
         subids.emplace (id, tname);
     }
-    if (vm.count("capture") > 0)
+    if (vm.count ("capture") > 0)
     {
-        auto captures = vm["capture"].as<std::vector<std::string>>();
+        auto captures = vm["capture"].as<std::vector<std::string>> ();
         for (const auto &capt : captures)
         {
-            auto res = vFed->query(capt, "isinit");
+            auto res = vFed->query (capt, "isinit");
             int cnt = 0;
             while (res != "true")
             {
-                std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                res = vFed->query(capt, "isinit");
+                std::this_thread::sleep_for (std::chrono::milliseconds (200));
+                res = vFed->query (capt, "isinit");
                 ++cnt;
                 if (cnt > 150)
                 {
@@ -306,7 +306,7 @@ int main (int argc, char *argv[])
     return 0;
 }
 
-void argumentParser (int argc, const char * const *argv, po::variables_map &vm_map)
+void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map)
 {
     po::options_description cmd_only ("command line only");
     po::options_description config ("configuration");
@@ -396,12 +396,11 @@ void argumentParser (int argc, const char * const *argv, po::variables_map &vm_m
     // check to make sure we have some input file or the capture is specified
     if (vm_map.count ("input") == 0)
     {
-        if (vm_map.count("capture") == 0)
+        if (vm_map.count ("capture") == 0)
         {
             std::cerr << " no input file or captures specified\n";
             std::cerr << visible << '\n';
             return;
         }
-        
     }
 }

@@ -352,10 +352,10 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
     case CMD_REG_ROUTE:
         break;
     case CMD_QUERY:
-        processQuery(command);
+        processQuery (command);
         break;
     case CMD_QUERY_REPLY:
-        transmit(getRoute(command.dest_id), command);
+        transmit (getRoute (command.dest_id), command);
         break;
     default:
         // must not have been a priority command
@@ -1130,7 +1130,7 @@ void CoreBroker::checkSubscriptions ()
     }
 }
 
-std::string CoreBroker::generateQueryAnswer(const std::string &query) const
+std::string CoreBroker::generateQueryAnswer (const std::string &query) const
 {
     if (query == "isinit")
     {
@@ -1139,41 +1139,41 @@ std::string CoreBroker::generateQueryAnswer(const std::string &query) const
     else if (query == "federates")
     {
         std::string ret;
-        ret.push_back('[');
-        std::lock_guard<std::mutex> lock(mutex_);
+        ret.push_back ('[');
+        std::lock_guard<std::mutex> lock (mutex_);
         for (auto &fed : _federates)
         {
-            ret.append(fed.name);
-            ret.push_back(';');
+            ret.append (fed.name);
+            ret.push_back (';');
         }
-        if (ret.size() > 1)
+        if (ret.size () > 1)
         {
-            ret.back() = ']';
+            ret.back () = ']';
         }
         else
         {
-            ret.push_back(']');
+            ret.push_back (']');
         }
-        
+
         return ret;
     }
     else if (query == "brokers")
     {
         std::string ret;
-        ret.push_back('[');
-        std::lock_guard<std::mutex> lock(mutex_);
+        ret.push_back ('[');
+        std::lock_guard<std::mutex> lock (mutex_);
         for (auto &brk : _brokers)
         {
-            ret.append(brk.name);
-            ret.push_back(';');
+            ret.append (brk.name);
+            ret.push_back (';');
         }
-        if (ret.size() > 1)
+        if (ret.size () > 1)
         {
-            ret.back() = ']';
+            ret.back () = ']';
         }
         else
         {
-            ret.push_back(']');
+            ret.push_back (']');
         }
         return ret;
     }
@@ -1183,48 +1183,46 @@ std::string CoreBroker::generateQueryAnswer(const std::string &query) const
     }
 }
 
-void CoreBroker::processLocalQuery(const ActionMessage &m)
+void CoreBroker::processLocalQuery (const ActionMessage &m)
 {
-    ActionMessage queryRep(CMD_QUERY_REPLY);
+    ActionMessage queryRep (CMD_QUERY_REPLY);
     queryRep.dest_id = m.source_id;
     queryRep.source_id = global_broker_id;
     queryRep.index = m.index;
-    queryRep.payload = generateQueryAnswer(m.payload);
-    transmit(getRoute(m.source_id), queryRep);
+    queryRep.payload = generateQueryAnswer (m.payload);
+    transmit (getRoute (m.source_id), queryRep);
 }
 
-void CoreBroker::processQuery(const ActionMessage &m)
+void CoreBroker::processQuery (const ActionMessage &m)
 {
-    if ((m.info().target == getIdentifier())||(m.info().target=="broker"))
+    if ((m.info ().target == getIdentifier ()) || (m.info ().target == "broker"))
     {
-
     }
-    else if ((isRoot()) && ((m.info().target == "root") || (m.info().target == "federation")))
+    else if ((isRoot ()) && ((m.info ().target == "root") || (m.info ().target == "federation")))
     {
-
     }
     else
     {
         int32_t route = 0;
-        auto res=getFedByName(m.info().target);
+        auto res = getFedByName (m.info ().target);
         if (res != -1)
         {
-            std::lock_guard<std::mutex> lock(mutex_);
+            std::lock_guard<std::mutex> lock (mutex_);
             auto &fed = _federates[res];
             route = fed.route_id;
         }
         else
         {
-            res = getBrokerByName(m.info().target);
+            res = getBrokerByName (m.info ().target);
             if (res != -1)
             {
-                std::lock_guard<std::mutex> lock(mutex_);
+                std::lock_guard<std::mutex> lock (mutex_);
                 auto &brk = _brokers[res];
                 route = brk.route_id;
             }
         }
-        
-        transmit(route, m);
+
+        transmit (route, m);
     }
 }
 

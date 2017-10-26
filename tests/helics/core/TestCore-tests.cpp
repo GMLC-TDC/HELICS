@@ -97,8 +97,8 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
     core->timeRequest (id, 200.0);
     valueUpdates = core->getValueUpdates (id);
     BOOST_CHECK (valueUpdates.empty ());
-	core->finalize(id);
-	core->disconnect();
+    core->finalize (id);
+    core->disconnect ();
 }
 
 BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
     std::string str2 (msg->data.to_string ());
     BOOST_CHECK_EQUAL (str1, str2);
     BOOST_CHECK_EQUAL (msg->data.size (), str1.size ());
-	core->disconnect();
+    core->disconnect ();
 }
 
 BOOST_AUTO_TEST_CASE (testcore_messagefilter_source_test)
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_source_test)
     auto msg = core->receive (end2);
     BOOST_CHECK_EQUAL (msg->origsrc, "end1");
     BOOST_CHECK_EQUAL (msg->src, "end_filt");
-	core->disconnect();
+    core->disconnect ();
 }
 
 BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
@@ -259,7 +259,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     BOOST_CHECK_EQUAL (msg->origsrc, "end1");
     auto res = msg->data.to_string ();
     BOOST_CHECK_EQUAL (res.compare (0, 11, "jello world"), 0);
-	core->disconnect();
+    core->disconnect ();
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

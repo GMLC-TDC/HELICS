@@ -242,58 +242,58 @@ helics_core helicsCreateCore (const char *type, const char *name, const char *in
     return reinterpret_cast<helics_core> (core);
 }
 
-helics_core helicsCreateCoreFromArgs(const char *type, const char *name, int argc, const char * const *argv)
+helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, const char *const *argv)
 {
     auto *core = new helics::coreObject;
-    auto ct = helics::coreTypeFromString(type);
-    core->coreptr = helics::CoreFactory::FindOrCreate(ct, name, argc, argv);
+    auto ct = helics::coreTypeFromString (type);
+    core->coreptr = helics::CoreFactory::FindOrCreate (ct, name, argc, argv);
 #if HELICS_HAVE_ZEROMQ > 0
     if (ct == helics::core_type::ZMQ)
     {
         if (!zmqInUse)
         {
-            zmqContextManager::setContextToLeakOnDelete();
+            zmqContextManager::setContextToLeakOnDelete ();
         }
     }
 #endif
     return reinterpret_cast<helics_core> (core);
 }
 
-helics_broker helicsCreateBroker(const char *type, const char *name, const char *initString)
+helics_broker helicsCreateBroker (const char *type, const char *name, const char *initString)
 {
     auto broker = new helics::BrokerObject;
-    auto ct = helics::coreTypeFromString(type);
-    broker->brokerptr = helics::BrokerFactory::create(ct, name, initString);
+    auto ct = helics::coreTypeFromString (type);
+    broker->brokerptr = helics::BrokerFactory::create (ct, name, initString);
 #if HELICS_HAVE_ZEROMQ > 0
     if (ct == helics::core_type::ZMQ)
     {
         if (!zmqInUse)
         {
-            zmqContextManager::setContextToLeakOnDelete();
+            zmqContextManager::setContextToLeakOnDelete ();
         }
     }
 #endif
     return reinterpret_cast<helics_broker> (broker);
 }
 
-helics_broker helicsCreateBrokerFromArgs(const char *type, const char *name, int argc, const char * const *argv)
+helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, const char *const *argv)
 {
     auto *broker = new helics::BrokerObject;
-    auto ct = helics::coreTypeFromString(type);
-    broker->brokerptr = helics::BrokerFactory::create(ct, name, argc, argv);
+    auto ct = helics::coreTypeFromString (type);
+    broker->brokerptr = helics::BrokerFactory::create (ct, name, argc, argv);
 #if HELICS_HAVE_ZEROMQ > 0
     if (ct == helics::core_type::ZMQ)
     {
         if (!zmqInUse)
         {
-            zmqContextManager::setContextToLeakOnDelete();
+            zmqContextManager::setContextToLeakOnDelete ();
         }
     }
 #endif
     return reinterpret_cast<helics_broker> (broker);
 }
 
-int helicsBrokerIsConnected(helics_broker broker)
+int helicsBrokerIsConnected (helics_broker broker)
 {
     if (broker == nullptr)
     {
@@ -302,12 +302,12 @@ int helicsBrokerIsConnected(helics_broker broker)
     auto brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
     if (brokerObj->brokerptr)
     {
-        return (brokerObj->brokerptr->isConnected()) ? 1 : 0;
+        return (brokerObj->brokerptr->isConnected ()) ? 1 : 0;
     }
     return 0;
 }
 
-int helicsCoreIsConnected(helics_core core)
+int helicsCoreIsConnected (helics_core core)
 {
     if (core == nullptr)
     {
@@ -316,16 +316,16 @@ int helicsCoreIsConnected(helics_core core)
     auto coreObj = reinterpret_cast<helics::coreObject *> (core);
     if (coreObj->coreptr)
     {
-        return (coreObj->coreptr->isConnected()) ? 1 : 0;
+        return (coreObj->coreptr->isConnected ()) ? 1 : 0;
     }
     return 0;
 }
 
-void helicsFreeCore(helics_core core) { delete reinterpret_cast<helics::coreObject *> (core); }
+void helicsFreeCore (helics_core core) { delete reinterpret_cast<helics::coreObject *> (core); }
 
-void helicsFreeBroker(helics_broker broker) { delete reinterpret_cast<helics::BrokerObject *> (broker); }
+void helicsFreeBroker (helics_broker broker) { delete reinterpret_cast<helics::BrokerObject *> (broker); }
 
-helics_query helicsCreateQuery(const char *target, const char *query)
+helics_query helicsCreateQuery (const char *target, const char *query)
 {
     auto queryObj = new helics::queryObject;
     queryObj->query = query;
@@ -356,7 +356,7 @@ const char *helicsExecuteQuery (helics_federate fed, helics_query query)
     }
     else
     {
-        queryObj->response = fedObj->query(queryObj->target, queryObj->query);
+        queryObj->response = fedObj->query (queryObj->target, queryObj->query);
     }
 
     return queryObj->response.c_str ();
