@@ -122,7 +122,6 @@ void ZmqComms::setPortNumbers (int repPort, int pullPort)
 
 void ZmqComms::setAutomaticPortStartPort (int startingPort) { openPortStart = startingPort; }
 
-
 int ZmqComms::processIncomingMessage (zmq::message_t &msg)
 {
     if (msg.size () == 5)

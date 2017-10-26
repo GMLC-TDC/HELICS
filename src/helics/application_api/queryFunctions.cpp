@@ -68,9 +68,9 @@ std::vector<std::string> vectorizeQueryResult (const std::string &queryres)
     }
 }
 
-bool waitForInit(helics::Federate *fed, const std::string &fedName)
+bool waitForInit (helics::Federate *fed, const std::string &fedName)
 {
-    auto res = fed->query(fedName, "isinit");
+    auto res = fed->query (fedName, "isinit");
     int cnt = 0;
     while (res != "true")
     {
@@ -78,8 +78,8 @@ bool waitForInit(helics::Federate *fed, const std::string &fedName)
         {
             return false;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
-        res = fed->query(fedName, "isinit");
+        std::this_thread::sleep_for (std::chrono::milliseconds (200));
+        res = fed->query (fedName, "isinit");
         ++cnt;
         if (cnt > 150)
         {

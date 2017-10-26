@@ -39,10 +39,7 @@ static const argDescriptors extraArgs{
 
 ZmqCore::ZmqCore () noexcept {}
 
-ZmqCore::~ZmqCore ()
-{
-
-}
+ZmqCore::~ZmqCore () {}
 
 ZmqCore::ZmqCore (const std::string &core_name) : CommsBroker (core_name) {}
 

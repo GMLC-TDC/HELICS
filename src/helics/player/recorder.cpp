@@ -8,8 +8,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/application_api/ValueFederate.h"
 #include "helics/application_api/Subscriptions.hpp"
+#include "helics/application_api/ValueFederate.h"
 #include "helics/application_api/queryFunctions.h"
 #include <algorithm>
 #include <fstream>
@@ -34,7 +34,7 @@ class ValueCapture
     helics::subscription_id_t id;
     bool first = false;
     std::string value;
-    ValueCapture() = default;
+    ValueCapture () = default;
     ValueCapture (helics::Time t1, helics::subscription_id_t id1, const std::string &val)
         : time (t1), id (id1), value (val){};
 };
@@ -51,14 +51,14 @@ class ValueStats
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
-void argumentParser (int argc, const char * const *argv, po::variables_map &vm_map);
+void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
 int main (int argc, char *argv[])
 {
     std::ifstream infile;
     po::variables_map vm;
     argumentParser (argc, argv, vm);
-  
+
     std::vector<ValueCapture> points;
     if (vm.count ("input") == 0)
     {
@@ -139,13 +139,13 @@ int main (int argc, char *argv[])
     fi.coreInitString = "2";
     if (vm.count ("coreinit") > 0)
     {
-        fi.coreInitString.push_back(' ');
+        fi.coreInitString.push_back (' ');
         fi.coreInitString = vm["coreinit"].as<std::string> ();
     }
-    if (vm.count("broker") > 0)
+    if (vm.count ("broker") > 0)
     {
         fi.coreInitString += " --broker=";
-        fi.coreInitString += vm["broker"].as<std::string>();
+        fi.coreInitString += vm["broker"].as<std::string> ();
     }
     fi.observer = true;
     if (vm.count ("timedelta") > 0)
@@ -160,18 +160,17 @@ int main (int argc, char *argv[])
     }
     auto vFed = std::make_unique<helics::ValueFederate> (fi);
 
-   
-    //get the extra tags from the arguments
-    if (vm.count("tags") > 0)
+    // get the extra tags from the arguments
+    if (vm.count ("tags") > 0)
     {
-        auto argTags = vm["tags"].as<std::vector<std::string>>();
+        auto argTags = vm["tags"].as<std::vector<std::string>> ();
         for (const auto &tag : argTags)
         {
             std::vector<std::string> taglist;
-            boost::split(taglist, tag, boost::is_any_of(",;"));
+            boost::split (taglist, tag, boost::is_any_of (",;"));
             for (const auto &tagname : taglist)
             {
-                tags.insert(tagname);
+                tags.insert (tagname);
             }
         }
     }
@@ -179,28 +178,27 @@ int main (int argc, char *argv[])
     std::string prevTag;
     for (auto &tname : tags)
     {
-        subscriptions.push_back(helics::Subscription(vFed.get(), tname));
+        subscriptions.push_back (helics::Subscription (vFed.get (), tname));
     }
-    //capture the all the publications from a particular federate
-    if (vm.count("capture") > 0)
+    // capture the all the publications from a particular federate
+    if (vm.count ("capture") > 0)
     {
-        auto captures = vm["capture"].as<std::vector<std::string>>();
+        auto captures = vm["capture"].as<std::vector<std::string>> ();
         for (const auto &capt : captures)
         {
             std::vector<std::string> captFeds;
-            boost::split( captFeds,capt, boost::is_any_of(",;"));
+            boost::split (captFeds, capt, boost::is_any_of (",;"));
             for (const auto &captFed : captFeds)
             {
-                auto res = waitForInit(vFed.get(), captFed);
+                auto res = waitForInit (vFed.get (), captFed);
                 if (res)
                 {
-                    auto pubs = vectorizeQueryResult(vFed->query(captFed, "publications"));
+                    auto pubs = vectorizeQueryResult (vFed->query (captFed, "publications"));
                     for (auto &pub : pubs)
                     {
-                        subscriptions.push_back(helics::Subscription(vFed.get(), pub));
+                        subscriptions.push_back (helics::Subscription (vFed.get (), pub));
                     }
                 }
-               
             }
         }
     }
@@ -228,13 +226,13 @@ int main (int argc, char *argv[])
     int ii = 0;
     for (auto &sub : subscriptions)
     {
-        if (sub.isUpdated())
+        if (sub.isUpdated ())
         {
-            auto val = sub.getValue<std::string>();
-            vcap.emplace_back(-1.0, sub.getID(), val);
+            auto val = sub.getValue<std::string> ();
+            vcap.emplace_back (-1.0, sub.getID (), val);
             if (vStat[ii].cnt == 0)
             {
-                vcap.back().first = true;
+                vcap.back ().first = true;
             }
             ++vStat[ii].cnt;
             vStat[ii].lastVal = val;
@@ -264,8 +262,8 @@ int main (int argc, char *argv[])
                 {
                     if (sub.isUpdated ())
                     {
-                        auto val = sub.getValue<std::string>();
-                        vcap.emplace_back (T, sub.getID(), val);
+                        auto val = sub.getValue<std::string> ();
+                        vcap.emplace_back (T, sub.getID (), val);
                         ++vStat[ii].cnt;
                         vStat[ii].lastVal = val;
                         vStat[ii].time = T;
@@ -300,7 +298,7 @@ int main (int argc, char *argv[])
 
     for (auto &sub : subscriptions)
     {
-        subids.emplace(sub.getID(), std::make_pair( sub.getKey(),sub.getType()));
+        subids.emplace (sub.getID (), std::make_pair (sub.getKey (), sub.getType ()));
     }
     vFed->finalize ();
 
@@ -315,8 +313,8 @@ int main (int argc, char *argv[])
     {
         if (v.first)
         {
-            outFile << static_cast<double> (v.time) << "\t\t" << subids[v.id].first << '\t'
-                     << v.value << '\t' << subids[v.id].second<< '\n';
+            outFile << static_cast<double> (v.time) << "\t\t" << subids[v.id].first << '\t' << v.value << '\t'
+                    << subids[v.id].second << '\n';
         }
         else
         {
@@ -327,7 +325,7 @@ int main (int argc, char *argv[])
     return 0;
 }
 
-void argumentParser (int argc, const char * const *argv, po::variables_map &vm_map)
+void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map)
 {
     po::options_description cmd_only ("command line only");
     po::options_description config ("configuration");
@@ -415,10 +413,10 @@ void argumentParser (int argc, const char * const *argv, po::variables_map &vm_m
 
     po::notify (vm_map);
     // check to make sure we have some input file or the capture is specified
-    if ((vm_map.count ("input") == 0)&& (vm_map.count("capture") == 0)&& (vm_map.count("tags") == 0))
+    if ((vm_map.count ("input") == 0) && (vm_map.count ("capture") == 0) && (vm_map.count ("tags") == 0))
     {
-            std::cerr << " no input file, tags, or captures specified\n";
-            std::cerr << visible << '\n';
-            return;
+        std::cerr << " no input file, tags, or captures specified\n";
+        std::cerr << visible << '\n';
+        return;
     }
 }

@@ -203,12 +203,11 @@ void BrokerBase::InitializeFromArgs (int argc, const char *const *argv)
     }
     if (!noAutomaticID)
     {
-        if (identifier.empty())
+        if (identifier.empty ())
         {
-            identifier = gen_id();
+            identifier = gen_id ();
         }
     }
-   
 
     timeCoord = std::make_unique<TimeCoordinator> ();
     timeCoord->setMessageSender ([this](const ActionMessage &msg) { addActionMessage (msg); });
@@ -272,7 +271,7 @@ void BrokerBase::addActionMessage (const ActionMessage &m)
 {
     if (isPriorityCommand (m))
     {
-        _queue.pushPriority(m);
+        _queue.pushPriority (m);
     }
     else
     {
@@ -285,7 +284,7 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
 {
     if (isPriorityCommand (m))
     {
-        _queue.emplacePriority(std::move(m));
+        _queue.emplacePriority (std::move (m));
     }
     else
     {
@@ -315,15 +314,14 @@ void BrokerBase::queueProcessingLoop ()
         default:
             if (!haltOperations)
             {
-                if (isPriorityCommand(command))
+                if (isPriorityCommand (command))
                 {
-                    processPriorityCommand(std::move(command));
+                    processPriorityCommand (std::move (command));
                 }
                 else
                 {
-                    processCommand(std::move(command));
+                    processCommand (std::move (command));
                 }
-                
             }
         }
     }

@@ -43,10 +43,7 @@ IpcCore::IpcCore () noexcept {}
 
 IpcCore::IpcCore (const std::string &core_name) : CommsBroker (core_name) {}
 
-IpcCore::~IpcCore ()
-{
-
-}
+IpcCore::~IpcCore () {}
 
 void IpcCore::InitializeFromArgs (int argc, const char *const *argv)
 {
@@ -96,8 +93,6 @@ bool IpcCore::brokerConnect ()
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     return comms->connect ();
 }
-
-
 
 std::string IpcCore::getAddress () const
 {

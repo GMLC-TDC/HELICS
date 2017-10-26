@@ -9,14 +9,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "config.h"
 #include "core/CommsBroker.hpp"
+#include "config.h"
 #include "core/CommsBroker_impl.hpp"
 
-#include "core/ipc/IpcComms.h"
-#include "core/zmq/ZmqComms.h"
 #include "core/CommonCore.h"
 #include "core/CoreBroker.h"
+#include "core/ipc/IpcComms.h"
+#include "core/zmq/ZmqComms.h"
 
 #if HELICS_HAVE_MPI
 #include "core/mpi/MpiComms.h"
@@ -24,13 +24,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-    template class CommsBroker<IpcComms, CoreBroker>;
-    template class CommsBroker<IpcComms, CommonCore>;
-    template class CommsBroker<ZmqComms, CoreBroker>;
-    template class CommsBroker<ZmqComms, CommonCore>;
+template class CommsBroker<IpcComms, CoreBroker>;
+template class CommsBroker<IpcComms, CommonCore>;
+template class CommsBroker<ZmqComms, CoreBroker>;
+template class CommsBroker<ZmqComms, CommonCore>;
 
 #if HELICS_HAVE_MPI
-    template class CommsBroker<MpiComms, CoreBroker>;
-    template class CommsBroker<MpiComms, CommonCore>;
+template class CommsBroker<MpiComms, CoreBroker>;
+template class CommsBroker<MpiComms, CommonCore>;
 #endif
 }

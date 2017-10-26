@@ -42,10 +42,7 @@ ZmqBroker::ZmqBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 ZmqBroker::ZmqBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
-ZmqBroker::~ZmqBroker ()
-{
-
-}
+ZmqBroker::~ZmqBroker () {}
 
 void ZmqBroker::displayHelp (bool localOnly)
 {
@@ -167,7 +164,6 @@ bool ZmqBroker::brokerConnect ()
     }
     return res;
 }
-
 
 std::string ZmqBroker::getAddress () const
 {

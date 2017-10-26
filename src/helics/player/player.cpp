@@ -39,7 +39,6 @@ namespace filesystem = boost::filesystem;
 bool vComp (ValueSetter &v1, ValueSetter &v2) { return (v1.time < v2.time); }
 void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
-
 const std::regex creg (R"raw((-?\d+(\.\d+)?|\.\d+)\s*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
 
 int main (int argc, char *argv[])
@@ -58,7 +57,7 @@ int main (int argc, char *argv[])
 
     if (vm.count ("datatype") > 0)
     {
-        defType = helics::getTypeFromString(vm["datatype"].as<std::string> ());
+        defType = helics::getTypeFromString (vm["datatype"].as<std::string> ());
         if (defType == helics::helicsType_t::helicsInvalid)
         {
             std::cerr << vm["datatype"].as<std::string> () << " is not recognized as a valid type \n";
@@ -149,20 +148,19 @@ int main (int argc, char *argv[])
     }
     catch (std::invalid_argument &ia)
     {
-        std::cerr << coretype <<" is not recognized as a valid core type [zmq,ipc,udp,tcp,test,mpi]\n";
+        std::cerr << coretype << " is not recognized as a valid core type [zmq,ipc,udp,tcp,test,mpi]\n";
         return (-1);
     }
     fi.coreInitString = "1";
     if (vm.count ("coreinit") > 0)
     {
-        fi.coreInitString.push_back(' ');
+        fi.coreInitString.push_back (' ');
         fi.coreInitString += vm["coreinit"].as<std::string> ();
-        
     }
-    if (vm.count("broker") > 0)
+    if (vm.count ("broker") > 0)
     {
         fi.coreInitString += " --broker=";
-        fi.coreInitString += vm["broker"].as<std::string>();
+        fi.coreInitString += vm["broker"].as<std::string> ();
     }
     fi.sourceOnly = true;
     if (vm.count ("timedelta") > 0)
@@ -178,9 +176,10 @@ int main (int argc, char *argv[])
         {
             continue;  // skip subsequent tags with different types
         }
-        publications.push_back(helics::Publication(helics::GLOBAL,vFed.get(), tname.first, helics::getTypeFromString(tname.second)));
+        publications.push_back (helics::Publication (helics::GLOBAL, vFed.get (), tname.first,
+                                                     helics::getTypeFromString (tname.second)));
         prevTag = tname.first;
-        pubids[tname.first] = static_cast<int>(publications.size()) - 1;
+        pubids[tname.first] = static_cast<int> (publications.size ()) - 1;
     }
     // load up the ids
     for (auto &vs : points)
@@ -196,7 +195,7 @@ int main (int argc, char *argv[])
     std::cout << "entered init State\n";
     while (points[pointIndex].time < helics::timeZero)
     {
-        publications[points[pointIndex].index].publish(points[pointIndex].value);
+        publications[points[pointIndex].index].publish (points[pointIndex].value);
         ++pointIndex;
     }
 
@@ -204,7 +203,7 @@ int main (int argc, char *argv[])
     std::cout << "entered exec State\n";
     while (points[pointIndex].time == helics::timeZero)
     {
-        publications[points[pointIndex].index].publish(points[pointIndex].value);
+        publications[points[pointIndex].index].publish (points[pointIndex].value);
         ++pointIndex;
     }
     helics::Time nextPrintTime = 10.0;
@@ -218,7 +217,7 @@ int main (int argc, char *argv[])
 
         while (points[pointIndex].time <= newTime)
         {
-            publications[points[pointIndex].index].publish(points[pointIndex].value);
+            publications[points[pointIndex].index].publish (points[pointIndex].value);
             ++pointIndex;
             if (pointIndex == static_cast<int> (points.size ()))
             {

@@ -37,10 +37,7 @@ MpiBroker::MpiBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 MpiBroker::MpiBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
-MpiBroker::~MpiBroker ()
-{
- 
-}
+MpiBroker::~MpiBroker () {}
 
 void MpiBroker::InitializeFromArgs (int argc, const char *const *argv)
 {

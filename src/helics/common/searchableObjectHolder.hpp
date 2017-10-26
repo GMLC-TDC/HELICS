@@ -33,7 +33,6 @@ class SearchableObjectHolder
         int cntr = 0;
         while (true)
         {
-            
             if (!ObjectMap.empty ())
             {  // wait for the objectMap to be cleared
                 ++cntr;
@@ -42,7 +41,7 @@ class SearchableObjectHolder
                 lock.lock ();
                 if (cntr > 50)
                 {
-                    //give up after 5 seconds
+                    // give up after 5 seconds
                     std::cerr << "object not clearing after global destruction force close\n";
                     break;
                 }

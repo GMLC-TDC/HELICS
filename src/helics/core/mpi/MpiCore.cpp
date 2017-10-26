@@ -43,10 +43,7 @@ MpiCore::MpiCore () noexcept {}
 
 MpiCore::MpiCore (const std::string &core_name) : CommsBroker (core_name) {}
 
-MpiCore::~MpiCore ()
-{
-
-}
+MpiCore::~MpiCore () {}
 
 void MpiCore::InitializeFromArgs (int argc, const char *const *argv)
 {

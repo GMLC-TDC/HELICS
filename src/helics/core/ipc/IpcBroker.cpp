@@ -44,10 +44,7 @@ IpcBroker::IpcBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 IpcBroker::IpcBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
-IpcBroker::~IpcBroker ()
-{
-
-}
+IpcBroker::~IpcBroker () {}
 
 void IpcBroker::displayHelp (bool localOnly)
 {
