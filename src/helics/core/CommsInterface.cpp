@@ -19,7 +19,7 @@ CommsInterface::CommsInterface (const std::string &localTarget, const std::strin
 /** destructor*/
 CommsInterface::~CommsInterface ()
 {
-	std::lock_guard<std::mutex> syncLock(threadSyncLock);
+    std::lock_guard<std::mutex> syncLock (threadSyncLock);
     if (queue_watcher.joinable ())
     {
         queue_watcher.join ();
@@ -30,10 +30,7 @@ CommsInterface::~CommsInterface ()
     }
 }
 
-void CommsInterface::transmit (int route_id, const ActionMessage &cmd)
-{
-    txQueue.emplace (route_id, cmd);
-}
+void CommsInterface::transmit (int route_id, const ActionMessage &cmd) { txQueue.emplace (route_id, cmd); }
 
 void CommsInterface::addRoute (int route_id, const std::string &routeInfo)
 {
@@ -64,7 +61,7 @@ bool CommsInterface::connect ()
         std::cerr << "no callback specified, the receiver cannot start\n";
         return false;
     }
-	std::lock_guard<std::mutex> syncLock(threadSyncLock);
+    std::lock_guard<std::mutex> syncLock (threadSyncLock);
     if (name.empty ())
     {
         name = localTarget_;

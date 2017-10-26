@@ -17,7 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <typeinfo>
 #include <vector>
 
-#include "core/core-data.h"
+#include "helics/core/core-data.h"
 /** @file
 @details basic type information and control for HELICS
 */

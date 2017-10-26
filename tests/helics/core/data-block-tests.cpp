@@ -98,8 +98,7 @@ BOOST_AUTO_TEST_CASE (data_block_assignment_tests)
     // test move constructor
     db5 = std::move (db4);
     BOOST_CHECK_EQUAL (db5.size (), 400);
-    BOOST_CHECK_PREDICATE( std::not_equal_to<size_t>(), (db4.size())(400) );
-
+    BOOST_CHECK_PREDICATE (std::not_equal_to<size_t> (), (db4.size ()) (400));
 }
 
 BOOST_AUTO_TEST_CASE (data_block_range_for_ops)

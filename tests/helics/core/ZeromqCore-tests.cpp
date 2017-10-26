@@ -58,125 +58,123 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
 }
 
 /** test the request set class with various scenarios*/
-BOOST_AUTO_TEST_CASE(zmqRequestSet_test1)
+BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
 {
-	std::string host = "tcp://127.0.0.1";
-	
-	helics::ZmqRequestSets reqset;
+    std::string host = "tcp://127.0.0.1";
 
-	auto ctx = zmqContextManager::getContextPointer();
-	zmq::socket_t repSocket1(ctx->getContext(), ZMQ_REP);
-	repSocket1.bind("tcp://127.0.0.1:23405");
-	zmq::socket_t repSocket2(ctx->getContext(), ZMQ_REP);
-	repSocket2.bind("tcp://127.0.0.1:23406");
-	zmq::socket_t repSocket3(ctx->getContext(), ZMQ_REP);
-	repSocket3.bind("tcp://127.0.0.1:23407");
+    helics::ZmqRequestSets reqset;
 
-	reqset.addRoutes(1, "tcp://127.0.0.1:23405");
-	reqset.addRoutes(2, "tcp://127.0.0.1:23406");
-	reqset.addRoutes(3, "tcp://127.0.0.1:23407");
+    auto ctx = zmqContextManager::getContextPointer ();
+    zmq::socket_t repSocket1 (ctx->getContext (), ZMQ_REP);
+    repSocket1.bind ("tcp://127.0.0.1:23405");
+    zmq::socket_t repSocket2 (ctx->getContext (), ZMQ_REP);
+    repSocket2.bind ("tcp://127.0.0.1:23406");
+    zmq::socket_t repSocket3 (ctx->getContext (), ZMQ_REP);
+    repSocket3.bind ("tcp://127.0.0.1:23407");
 
-	helics::ActionMessage M(helics::CMD_IGNORE);
-	M.index = 1;
+    reqset.addRoutes (1, "tcp://127.0.0.1:23405");
+    reqset.addRoutes (2, "tcp://127.0.0.1:23406");
+    reqset.addRoutes (3, "tcp://127.0.0.1:23407");
 
-	reqset.transmit(1, M);
-	BOOST_CHECK(reqset.waiting());
+    helics::ActionMessage M (helics::CMD_IGNORE);
+    M.index = 1;
 
-	zmq::message_t msg;
-	repSocket1.recv(&msg);
+    reqset.transmit (1, M);
+    BOOST_CHECK (reqset.waiting ());
 
-	repSocket1.send(msg);
-	//should still be waiting
-	BOOST_CHECK(reqset.waiting());
-	auto msgCnt=reqset.checkForMessages();
-	BOOST_CHECK(!reqset.waiting());
-	BOOST_CHECK_EQUAL(msgCnt, 1);
+    zmq::message_t msg;
+    repSocket1.recv (&msg);
 
-	auto M2 = reqset.getMessage();
+    repSocket1.send (msg);
+    // should still be waiting
+    BOOST_CHECK (reqset.waiting ());
+    auto msgCnt = reqset.checkForMessages ();
+    BOOST_CHECK (!reqset.waiting ());
+    BOOST_CHECK_EQUAL (msgCnt, 1);
 
-	BOOST_CHECK(M2->action() == helics::CMD_IGNORE);
+    auto M2 = reqset.getMessage ();
 
-	//send two messages
-	reqset.transmit(2, M);
-	reqset.transmit(2, M);
-	BOOST_CHECK(reqset.waiting());
+    BOOST_CHECK (M2->action () == helics::CMD_IGNORE);
 
-	repSocket2.recv(&msg);
+    // send two messages
+    reqset.transmit (2, M);
+    reqset.transmit (2, M);
+    BOOST_CHECK (reqset.waiting ());
 
-	repSocket2.send(msg);
-	reqset.checkForMessages();
-	BOOST_CHECK(reqset.waiting());
-	repSocket2.recv(&msg);
+    repSocket2.recv (&msg);
 
-	repSocket2.send(msg);
-	reqset.checkForMessages();
-	BOOST_CHECK(!reqset.waiting());
+    repSocket2.send (msg);
+    reqset.checkForMessages ();
+    BOOST_CHECK (reqset.waiting ());
+    repSocket2.recv (&msg);
 
-	BOOST_CHECK(reqset.hasMessages());
+    repSocket2.send (msg);
+    reqset.checkForMessages ();
+    BOOST_CHECK (!reqset.waiting ());
+
+    BOOST_CHECK (reqset.hasMessages ());
 }
 
 /** test the request set class with various scenarios*/
-BOOST_AUTO_TEST_CASE(zmqRequestSet_test2)
+BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
 {
-	std::string host = "tcp://127.0.0.1";
+    std::string host = "tcp://127.0.0.1";
 
-	helics::ZmqRequestSets reqset;
+    helics::ZmqRequestSets reqset;
 
-	auto ctx = zmqContextManager::getContextPointer();
-	zmq::socket_t repSocket1(ctx->getContext(), ZMQ_REP);
-	repSocket1.bind("tcp://127.0.0.1:23405");
-	zmq::socket_t repSocket2(ctx->getContext(), ZMQ_REP);
-	repSocket2.bind("tcp://127.0.0.1:23406");
-	zmq::socket_t repSocket3(ctx->getContext(), ZMQ_REP);
-	repSocket3.bind("tcp://127.0.0.1:23407");
+    auto ctx = zmqContextManager::getContextPointer ();
+    zmq::socket_t repSocket1 (ctx->getContext (), ZMQ_REP);
+    repSocket1.bind ("tcp://127.0.0.1:23405");
+    zmq::socket_t repSocket2 (ctx->getContext (), ZMQ_REP);
+    repSocket2.bind ("tcp://127.0.0.1:23406");
+    zmq::socket_t repSocket3 (ctx->getContext (), ZMQ_REP);
+    repSocket3.bind ("tcp://127.0.0.1:23407");
 
-	reqset.addRoutes(1, "tcp://127.0.0.1:23405");
-	reqset.addRoutes(2, "tcp://127.0.0.1:23406");
-	reqset.addRoutes(3, "tcp://127.0.0.1:23407");
+    reqset.addRoutes (1, "tcp://127.0.0.1:23405");
+    reqset.addRoutes (2, "tcp://127.0.0.1:23406");
+    reqset.addRoutes (3, "tcp://127.0.0.1:23407");
 
-	helics::ActionMessage M(helics::CMD_IGNORE);
-	M.index = 1;
+    helics::ActionMessage M (helics::CMD_IGNORE);
+    M.index = 1;
 
-	reqset.transmit(1, M);
-	reqset.transmit(2, M);
-	reqset.transmit(3, M);
-	zmq::message_t msg;
-	repSocket1.recv(&msg);
+    reqset.transmit (1, M);
+    reqset.transmit (2, M);
+    reqset.transmit (3, M);
+    zmq::message_t msg;
+    repSocket1.recv (&msg);
 
-	repSocket1.send(msg);
+    repSocket1.send (msg);
 
-	repSocket2.recv(&msg);
+    repSocket2.recv (&msg);
 
-	repSocket2.send(msg);
-	repSocket3.recv(&msg);
+    repSocket2.send (msg);
+    repSocket3.recv (&msg);
 
-	repSocket3.send(msg);
-	//make sure the check receives all messages
-	reqset.checkForMessages();
-	BOOST_CHECK(!reqset.waiting());
-	reqset.transmit(1, M);
-	reqset.transmit(2, M);
-	reqset.transmit(3, M);
-	reqset.transmit(1, M);
-	reqset.transmit(2, M);
-	reqset.transmit(3, M);
-	reqset.transmit(1, M);
-	reqset.transmit(2, M);
-	reqset.transmit(3, M);
+    repSocket3.send (msg);
+    // make sure the check receives all messages
+    reqset.checkForMessages ();
+    BOOST_CHECK (!reqset.waiting ());
+    reqset.transmit (1, M);
+    reqset.transmit (2, M);
+    reqset.transmit (3, M);
+    reqset.transmit (1, M);
+    reqset.transmit (2, M);
+    reqset.transmit (3, M);
+    reqset.transmit (1, M);
+    reqset.transmit (2, M);
+    reqset.transmit (3, M);
 
-	repSocket1.recv(&msg);
+    repSocket1.recv (&msg);
 
-	repSocket1.send(msg);
+    repSocket1.send (msg);
 
-	repSocket2.recv(&msg);
+    repSocket2.recv (&msg);
 
-	repSocket2.send(msg);
-	repSocket3.recv(&msg);
+    repSocket2.send (msg);
+    repSocket3.recv (&msg);
 
-	repSocket3.send(msg);
-	BOOST_CHECK_EQUAL(reqset.checkForMessages(),6);
-
-
+    repSocket3.send (msg);
+    BOOST_CHECK_EQUAL (reqset.checkForMessages (), 6);
 }
 
 BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)

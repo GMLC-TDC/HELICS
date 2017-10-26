@@ -24,48 +24,46 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <boost/algorithm/string.hpp>
 
-
-std::vector<std::string> vectorizeQueryResult(std::string &&queryres)
+std::vector<std::string> vectorizeQueryResult (std::string &&queryres)
 {
-    if (queryres.empty())
+    if (queryres.empty ())
     {
-        return std::vector<std::string>();
+        return std::vector<std::string> ();
     }
-    if (queryres.front() == '[')
+    if (queryres.front () == '[')
     {
         std::vector<std::string> strs;
-        boost::split(strs, queryres, [](char c) { return c == ';'; });
-        strs.front() = strs.front().substr(1); //get rid of the leading '['
-        strs.back().pop_back(); //get rid of the trailing ']';
+        boost::split (strs, queryres, [](char c) { return c == ';'; });
+        strs.front () = strs.front ().substr (1);  // get rid of the leading '['
+        strs.back ().pop_back ();  // get rid of the trailing ']';
         return strs;
     }
     else
     {
-        std::vector < std::string> res;
-        res.push_back(std::move(queryres));
+        std::vector<std::string> res;
+        res.push_back (std::move (queryres));
         return res;
     }
 }
 
-
-std::vector<std::string> vectorizeQueryResult(const std::string &queryres)
+std::vector<std::string> vectorizeQueryResult (const std::string &queryres)
 {
-    if (queryres.empty())
+    if (queryres.empty ())
     {
-        return std::vector<std::string>();
+        return std::vector<std::string> ();
     }
-    if (queryres.front() == '[')
+    if (queryres.front () == '[')
     {
         std::vector<std::string> strs;
-        boost::split(strs, queryres, [](char c) { return c == ';'; });
-        strs.front() = strs.front().substr(1); //get rid of the leading '['
-        strs.back().pop_back(); //get rid of the trailing ']';
+        boost::split (strs, queryres, [](char c) { return c == ';'; });
+        strs.front () = strs.front ().substr (1);  // get rid of the leading '['
+        strs.back ().pop_back ();  // get rid of the trailing ']';
         return strs;
     }
     else
     {
-        std::vector < std::string> res;
-        res.push_back(queryres);
+        std::vector<std::string> res;
+        res.push_back (queryres);
         return res;
     }
 }

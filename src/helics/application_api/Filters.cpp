@@ -127,7 +127,8 @@ double randDouble (random_dists_t dist, double p1, double p2)
       std::random_device{}() +
       static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
 #else
-	//this will leak on thread termination,  older apple clang does not have proper thread_local variables so there really isn't any option
+    // this will leak on thread termination,  older apple clang does not have proper thread_local variables so
+    // there really isn't any option
     static __thread std::mt19937 *genPtr =
       new std::mt19937 (std::random_device{}() +
                         static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));

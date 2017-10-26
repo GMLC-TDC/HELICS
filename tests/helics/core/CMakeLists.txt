@@ -43,6 +43,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 
 target_link_libraries(core-tests ${external_library_list})
+target_link_libraries(core-tests ${Boost_LIBRARIES_test})
 
 add_test(NAME core-tests COMMAND core-tests)
 

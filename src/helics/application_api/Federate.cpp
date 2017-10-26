@@ -62,8 +62,6 @@ int getHelicsVersionMajor () { return HELICS_VERSION_MAJOR; }
 int getHelicsVersionMinor () { return HELICS_VERSION_MINOR; }
 int getHelicsVersionPatch () { return HELICS_VERSION_PATCH; }
 
-
-
 Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
 {
     if (fi.coreName.empty ())
@@ -578,23 +576,23 @@ std::string Federate::query (const std::string &queryStr)
 {
     if (queryStr == "name")
     {
-        return getName();
+        return getName ();
     }
     else if (queryStr == "endpoints")
     {
-        return { "" };
+        return {""};
     }
     else if (queryStr == "publications")
     {
-        return { "" };
+        return {""};
     }
     else if (queryStr == "subscriptions")
     {
-        return { "" };
+        return {""};
     }
     else if (queryStr == "filters")
     {
-        return { "" };
+        return {""};
     }
     return coreObject->query ("federation", queryStr);
 }
@@ -641,7 +639,7 @@ std::string Federate::queryFinalize (int queryIndex)
             return fnd->second.get ();
         }
     }
-    return { "#invalid" };
+    return {"#invalid"};
 }
 
 bool Federate::queryCompleted (int queryIndex) const

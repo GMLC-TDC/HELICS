@@ -27,6 +27,7 @@ add_executable(c_interface_tests ${c_interface_test_sources} ${c_interface_test_
 include_directories( SYSTEM ${Boost_INCLUDE_DIR})
 
 target_link_libraries(c_interface_tests helicsSharedLib ${external_library_list})
+target_link_libraries(c_interface_tests helicsSharedLib ${Boost_LIBRARIES_test})
 
 add_test(NAME c_interface_tests COMMAND c_interface_test)
 

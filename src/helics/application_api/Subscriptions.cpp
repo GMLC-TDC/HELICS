@@ -57,7 +57,7 @@ void Subscription::handleCallback (Time time)
         valueExtract (dv, type, val);
         boost::get<std::function<void(const std::vector<double> &, Time)>> (value_callback) (val, time);
     }
-	break;
+    break;
     case complexVectorLoc:
     {
         std::vector<std::complex<double>> val;
