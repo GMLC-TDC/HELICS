@@ -1,5 +1,3 @@
-import ctypes
-l = ctypes.CDLL('./libhelicsSharedLib.dylib')
 import helics as h
 
 fedinitstring = "--broker=mainbroker --federates=1"
