@@ -37,6 +37,7 @@ set(zmq_sources
 	zmqContextManager.cpp
 	zmqSocketDescriptor.cpp
 	zmqHelper.cpp
+	zmqProxyHub.cpp
 )
 
 if (${ZMQ_FOUND})

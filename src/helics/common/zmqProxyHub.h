@@ -34,7 +34,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 class zmqProxyHub
 {
 public:
-	static std::shared_ptr<zmqProxyHub> getProxy(const std::string &proxyName, const std::string &pairtype="pubsub", const std::string &context = "");
+	static std::shared_ptr<zmqProxyHub> getProxy(const std::string &proxyName, const std::string &pairType="pubsub", const std::string &contextName = "");
 
 	~zmqProxyHub();
 
@@ -73,7 +73,7 @@ private:
 	std::thread proxyThread;	//!< the thread id for the proxy loop
 	std::atomic<bool> proxyRunning{ false };	//!< flag indicating the proxy has been started
 	/** private constructor*/
-	zmqProxyHub(const std::string &reactorName, const std::string &pairtype, const std::string &context);
+	zmqProxyHub(const std::string &proxyName, const std::string &pairtype, const std::string &context);
 	/** loop for the proxy thread*/
 	void proxyLoop();
 };

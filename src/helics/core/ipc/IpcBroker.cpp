@@ -44,16 +44,16 @@ IpcBroker::IpcBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 IpcBroker::IpcBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
-IpcBroker::~IpcBroker () {}
+IpcBroker::~IpcBroker () = default;
 
-void IpcBroker::displayHelp (bool localOnly)
+void IpcBroker::displayHelp (bool local_only)
 {
     std::cout << " Help for Interprocess Broker: \n";
     namespace po = boost::program_options;
     po::variables_map vm;
     const char *const argV[] = {"", "--help"};
     argumentParser (2, argV, vm, extraArgs);
-    if (!localOnly)
+    if (!local_only)
     {
         CoreBroker::displayHelp ();
     }

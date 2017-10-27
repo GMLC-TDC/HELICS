@@ -159,7 +159,7 @@ void zmqReactor::reactorLoop ()
     socketPolls[0].events = ZMQ_POLLIN;
     socketPolls[0].revents = 0;
     reactorLoopRunning = true;
-    while (1)
+    while (true)
     {
         int val = poll (socketPolls);
         if (val > 0)
@@ -167,13 +167,13 @@ void zmqReactor::reactorLoop ()
             // do the callbacks for any socket with a message received
             for (int kk = 1; kk < socketCount; ++kk)
             {
-                if (socketPolls[kk].revents & ZMQ_POLLIN)
+                if ((socketPolls[kk].revents & ZMQ_POLLIN) != 0)
                 {
                     socketCallbacks[kk](multipart_t (sockets[kk]));
                 }
             }
             // deal with any socket updates as triggered by a message on socket 0
-            if (socketPolls[0].revents & ZMQ_POLLIN)
+            if ((socketPolls[0].revents & ZMQ_POLLIN) != 0)
             {
                 sockets[0].recv (&messageCode, sizeof (unsigned int), 0);  // clear the message
                 auto socketop = updates.pop ();
@@ -199,7 +199,7 @@ void zmqReactor::reactorLoop ()
                     case reactorInstruction::newSocket:
                         sockets.push_back (descriptor.makeSocket (contextManager->getContext ()));
                         socketNames.push_back (descriptor.name);
-                        socketCallbacks.push_back (descriptor.callback);
+                        socketCallbacks.emplace_back (descriptor.callback);
                         socketPolls.resize (socketPolls.size () + 1);
                         socketPolls.back ().socket = sockets.back ();
                         socketPolls.back ().fd = 0;

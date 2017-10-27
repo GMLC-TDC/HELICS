@@ -48,7 +48,7 @@ class simpleQueue
     }
     /** constructor with a reservation size
     @param[in] capacity  the initial storage capacity of the queue*/
-    simpleQueue (size_t capacity)
+    explicit simpleQueue (size_t capacity)
     {  // don't need to lock since we aren't out of the constructor yet
         pushElements.reserve (capacity);
         pullElements.reserve (capacity);
@@ -61,7 +61,7 @@ class simpleQueue
     }
 
     /** enable the move assignment not the copy assignment*/
-    simpleQueue &operator= (simpleQueue &&sq)
+    simpleQueue &operator= (simpleQueue &&sq) noexcept
     {
         std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
         std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock

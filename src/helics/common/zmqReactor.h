@@ -33,12 +33,13 @@ class zmqContextManager;
 class zmqReactor
 {
 private:
+    /** enumeration of possible reactor instructions*/
 	enum class reactorInstruction :int
 	{
-		newSocket,
-		close,
-		modify,
-		terminate,
+		newSocket, //!< add a new socket
+		close,  //!< close an existing socket
+		modify, //!<modify an existing socket
+		terminate,  //!< terminate the socket
 	};
 	static std::vector<std::shared_ptr<zmqReactor>> reactors; //!< container for pointers to all the available contexts
 
@@ -53,18 +54,21 @@ private:
 	zmqReactor(const std::string &reactorName, const std::string &context);
 	std::atomic<bool> reactorLoopRunning{ false };
 public:
-	static std::shared_ptr<zmqReactor> getReactorInstance(const std::string &reactorName, const std::string &context="");
+	static std::shared_ptr<zmqReactor> getReactorInstance(const std::string &reactorName, const std::string &contextName="");
 
 
 	~zmqReactor();
 
 	void addSocket(const zmqSocketDescriptor &desc);
 	void modifySocket(const zmqSocketDescriptor &desc);
-	void closeSocket(const std::string &name);
+    /** asyncrhonous call to close a specific socket
+    @param socketName the name of the socket to close
+    */
+	void closeSocket(const std::string &socketName);
 
 	void addSocketBlocking(const zmqSocketDescriptor &desc);
 	void modifySocketBlocking(const zmqSocketDescriptor &desc);
-	void closeSocketBlocking(const std::string &name);
+	void closeSocketBlocking(const std::string &socketName);
 
 	const std::string &getName() const
 	{

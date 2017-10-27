@@ -135,5 +135,5 @@ public:
 	void changeLevels(int cLevel, int fLevel);
 
 };
-}//namespace utilities;
+}//namespace helics
 #endif

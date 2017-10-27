@@ -12,6 +12,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define HELICS_SEARCHABLE_OBJECT_HOLDER_HPP_
 #pragma once
 
+#include <functional>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -27,6 +29,8 @@ class SearchableObjectHolder
 
   public:
     SearchableObjectHolder () = default;
+    SearchableObjectHolder (SearchableObjectHolder &&) noexcept = delete;
+    SearchableObjectHolder &operator= (SearchableObjectHolder &&) noexcept = delete;
     ~SearchableObjectHolder ()
     {
         std::unique_lock<std::mutex> lock (mapLock);

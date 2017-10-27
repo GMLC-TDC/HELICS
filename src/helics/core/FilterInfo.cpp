@@ -28,10 +28,7 @@ std::unique_ptr<Message> FilterInfo::getMessage (Time maxTime)
         message_queue.pop_front ();
         return msg;
     }
-    else
-    {
-        return nullptr;
-    }
+    return nullptr;
 }
 
 Time FilterInfo::firstMessageTime () const
@@ -59,10 +56,14 @@ int32_t FilterInfo::queueSize (Time maxTime) const
     for (auto &msg : message_queue)
     {
         if (msg->time <= maxTime)
+        {
             ++cnt;
+        }
         else
+        {
             break;
+        }
     }
     return cnt;
 }
-}
+}  // namespace helics

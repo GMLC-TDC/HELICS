@@ -23,7 +23,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 using ipc_queue = boost::interprocess::message_queue;
 using ipc_state = boost::interprocess::shared_memory_object;
-namespace ipc = boost::interprocess;
 
 namespace helics
 {

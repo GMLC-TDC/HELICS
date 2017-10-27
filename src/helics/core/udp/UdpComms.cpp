@@ -505,7 +505,7 @@ void ZmqComms::queue_tx_function ()
         ActionMessage cmd;
         if (priority_routes.waiting ())
         {
-            if (priority_routes.checkForMessages () != 0)
+            if (priority_routes.checkForMessages ()!=0)
             {
                 auto M = priority_routes.getMessage ();
                 if (M)
@@ -521,7 +521,7 @@ void ZmqComms::queue_tx_function ()
             }
             else
             {
-                if (priority_routes.checkForMessages (std::chrono::milliseconds (50)) != 0)
+                if (priority_routes.checkForMessages (std::chrono::milliseconds (50))!=0)
                 {
                     auto M = priority_routes.getMessage ();
                     if (M)

@@ -42,12 +42,10 @@ std::shared_ptr<zmqContextManager> zmqContextManager::getContextPointer (const s
     {
         return fnd->second;
     }
-    else
-    {  // can't use make_shared since it is a private constructor
-        auto newContext = std::shared_ptr<zmqContextManager> (new zmqContextManager (contextName));
-        contexts.emplace (contextName, newContext);
-        return newContext;
-    }
+
+    auto newContext = std::shared_ptr<zmqContextManager> (new zmqContextManager (contextName));
+    contexts.emplace (contextName, newContext);
+    return newContext;
     // if it doesn't make a new one with the appropriate name
 }
 

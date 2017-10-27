@@ -42,7 +42,7 @@ ZmqBroker::ZmqBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 ZmqBroker::ZmqBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
-ZmqBroker::~ZmqBroker () = default;
+ZmqBroker::~ZmqBroker() = default;
 
 void ZmqBroker::displayHelp (bool local_only)
 {

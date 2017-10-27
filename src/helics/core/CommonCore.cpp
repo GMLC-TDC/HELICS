@@ -1489,15 +1489,15 @@ std::string CommonCore::federateQuery (Core::federate_id_t id, const std::string
     {
         return "true";
     }
-    else if (queryStr == "isinit")
+    if (queryStr == "isinit")
     {
         return (fed->getState () >= helics_federate_state_type::HELICS_INITIALIZING) ? "true" : "false";
     }
-    else if (queryStr == "state")
+    if (queryStr == "state")
     {
         return std::to_string (static_cast<int> (fed->getState ()));
     }
-    else if (queryStr == "publications")
+    if (queryStr == "publications")
     {
         std::string ret;
         ret.push_back ('[');
@@ -1525,7 +1525,7 @@ std::string CommonCore::federateQuery (Core::federate_id_t id, const std::string
         }
         return ret;
     }
-    else if (queryStr == "endpoints")
+    if (queryStr == "endpoints")
     {
         std::string ret;
         ret.push_back ('[');
@@ -2270,8 +2270,8 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
             auto FiltI = fed->getFilter (cmd.dest_handle);
             if (FiltI->filterOp != nullptr)
             {
-                auto tempMessage = createMessage (std::move (cmd));
                 bool returnToSender = (cmd.action () == CMD_SEND_FOR_FILTER_OPERATION);
+                auto tempMessage = createMessage (std::move (cmd));
                 tempMessage = FiltI->filterOp->process (std::move (tempMessage));
                 cmd = ActionMessage (std::move (tempMessage));
 

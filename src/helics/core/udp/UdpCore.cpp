@@ -8,8 +8,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/core/zmq/ZmqBroker.h"
-#include "helics/common/blocking_queue.h"
+#include "helics/core/zmq/ZmqCore.h"
+
 #include "helics/config.h"
 #include "helics/core/core-data.h"
 #include "helics/core/core.h"
@@ -20,7 +20,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <cassert>
 #include <chrono>
 #include <cstdint>
-#include <cstring>
 #include <fstream>
 #include <sstream>
 
@@ -29,38 +28,25 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 using namespace std::string_literals;
-static const argDescriptors extraArgs{{"local_interface"s, "string"s,
-                                       "the local interface to use for the receive ports"s},
-                                      {"brokerport"s, "int"s, "port number for the broker priority port"s},
-                                      {"brokerpushport"s, "int"s, "port number for the broker primary push port"s},
-                                      {"pullport"s, "int"s, "port number for the primary receive port"s},
-                                      {"repport"s, "int"s, "port number for the priority receive port"s},
-                                      {"port"s, "int"s, "port number for the broker's priority port"s},
-                                      {"portstart"s, "int"s, "starting port for automatic port definitions"s}};
+static const argDescriptors extraArgs{
+  {"local_interface"s, "string"s, "the local interface to use for the receive ports"s},
+  {"brokerport"s, "int"s, "port number for the broker priority port"s},
+  {"brokerpushport"s, "int"s, "port number for the broker primary push port"s},
+  {"pullport"s, "int"s, "port number for the primary receive port"s},
+  {"repport"s, "int"s, "port number for the priority receive port"s},
+  {"port"s, "int"s, "port number for the broker's priority port"s},
+};
 
-ZmqBroker::ZmqBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
+ZmqCore::ZmqCore () noexcept {}
 
-ZmqBroker::ZmqBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
+ZmqCore::~ZmqCore() = default;
 
-ZmqBroker::~ZmqBroker () = default;
+ZmqCore::ZmqCore (const std::string &core_name) : CommsBroker (core_name) {}
 
-void ZmqBroker::displayHelp (bool local_only)
-{
-    std::cout << " Help for Zero MQ Broker: \n";
-    namespace po = boost::program_options;
-    po::variables_map vm;
-    const char *const argV[] = {"", "--help"};
-    argumentParser (2, argV, vm, extraArgs);
-    if (!local_only)
-    {
-        CoreBroker::displayHelp ();
-    }
-}
-
-void ZmqBroker::InitializeFromArgs (int argc, const char *const *argv)
+void ZmqCore::InitializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
-    if (brokerState == broker_state_t::created)
+    if (brokerState == created)
     {
         po::variables_map vm;
         argumentParser (argc, argv, vm, extraArgs);
@@ -68,7 +54,7 @@ void ZmqBroker::InitializeFromArgs (int argc, const char *const *argv)
         if (vm.count ("broker_address") > 0)
         {
             auto addr = vm["broker_address"].as<std::string> ();
-            auto sc = addr.find_first_of (';', 7);  // min address is tcp://* 7 characters
+            auto sc = addr.find_first_of (';', 7);
             if (sc == std::string::npos)
             {
                 auto brkprt = extractInterfaceandPort (addr);
@@ -87,7 +73,7 @@ void ZmqBroker::InitializeFromArgs (int argc, const char *const *argv)
                 }
                 brokerPushPort = brkprt.second;
             }
-            if (brokerAddress == "tcp://*")
+            if ((brokerAddress == "tcp://*") || (brokerAddress == "tcp"))
             {  // the broker address can't use a wild card
                 brokerAddress = "tcp://127.0.0.1";
             }
@@ -97,6 +83,10 @@ void ZmqBroker::InitializeFromArgs (int argc, const char *const *argv)
             auto localprt = extractInterfaceandPort (vm["local_interface"].as<std::string> ());
             localInterface = localprt.first;
             repPortNumber = localprt.second;
+        }
+        else
+        {
+            localInterface = "tcp://127.0.0.1";
         }
         if (vm.count ("port") > 0)
         {
@@ -117,21 +107,25 @@ void ZmqBroker::InitializeFromArgs (int argc, const char *const *argv)
         if (vm.count ("repport") > 0)
         {
             repPortNumber = vm["repport"].as<int> ();
+            if (pullPortNumber < 0)
+            {
+                if (repPortNumber > 0)
+                {
+                    pullPortNumber = repPortNumber + 1;
+                }
+            }
         }
-        if (vm.count ("portstart") > 0)
-        {
-            portStart = vm["portstart"].as<int> ();
-        }
-        CoreBroker::InitializeFromArgs (argc, argv);
+
+        CommonCore::InitializeFromArgs (argc, argv);
     }
 }
 
-bool ZmqBroker::brokerConnect ()
+bool ZmqCore::brokerConnect ()
 {
     std::lock_guard<std::mutex> lock (dataMutex);
-    if (brokerAddress.empty ())
+    if (brokerAddress.empty ())  // cores require a broker
     {
-        setAsRoot ();
+        brokerAddress = "tcp://127.0.0.1";
     }
     comms = std::make_unique<ZmqComms> (localInterface, brokerAddress);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
@@ -145,11 +139,6 @@ bool ZmqBroker::brokerConnect ()
         comms->setBrokerPorts (brokerReqPort, brokerPushPort);
     }
 
-    if (portStart > 0)
-    {
-        comms->setAutomaticPortStartPort (portStart);
-    }
-    // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = comms->connect ();
     if (res)
     {
@@ -165,7 +154,7 @@ bool ZmqBroker::brokerConnect ()
     return res;
 }
 
-std::string ZmqBroker::getAddress () const
+std::string ZmqCore::getAddress () const
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     if (comms)
@@ -174,4 +163,5 @@ std::string ZmqBroker::getAddress () const
     }
     return makePortAddress (localInterface, repPortNumber);
 }
+
 }  // namespace helics

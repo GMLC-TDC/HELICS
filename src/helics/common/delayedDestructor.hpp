@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <algorithm>
 #include <memory>
 #include <mutex>
+#include <thread>
 #include <vector>
 
 /** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
@@ -39,6 +40,9 @@ class DelayedDestructor
             }
         }
     }
+    DelayedDestructor (DelayedDestructor &&) noexcept = delete;
+    DelayedDestructor &operator= (DelayedDestructor &&) noexcept = delete;
+
     size_t destroyObjects ()
     {
         std::lock_guard<std::mutex> lock (destructionLock);
