@@ -8,13 +8,13 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/core/zmq/ZmqCore.h"
+#include "helics/core/udp/UdpCore.h"
 
 #include "helics/config.h"
 #include "helics/core/core-data.h"
 #include "helics/core/core.h"
 #include "helics/core/helics-time.h"
-#include "helics/core/zmq/ZmqComms.h"
+#include "helics/core/udp/UdpComms.h"
 
 #include <algorithm>
 #include <cassert>
@@ -31,19 +31,17 @@ using namespace std::string_literals;
 static const argDescriptors extraArgs{
   {"local_interface"s, "string"s, "the local interface to use for the receive ports"s},
   {"brokerport"s, "int"s, "port number for the broker priority port"s},
-  {"brokerpushport"s, "int"s, "port number for the broker primary push port"s},
-  {"pullport"s, "int"s, "port number for the primary receive port"s},
-  {"repport"s, "int"s, "port number for the priority receive port"s},
+  {"localport"s, "int"s, "port number for the local receive socket"s },
   {"port"s, "int"s, "port number for the broker's priority port"s},
 };
 
-ZmqCore::ZmqCore () noexcept {}
+UdpCore::UdpCore () noexcept {}
 
-ZmqCore::~ZmqCore() = default;
+UdpCore::~UdpCore() = default;
 
-ZmqCore::ZmqCore (const std::string &core_name) : CommsBroker (core_name) {}
+UdpCore::UdpCore (const std::string &core_name) : CommsBroker (core_name) {}
 
-void ZmqCore::InitializeFromArgs (int argc, const char *const *argv)
+void UdpCore::InitializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == created)
@@ -59,102 +57,82 @@ void ZmqCore::InitializeFromArgs (int argc, const char *const *argv)
             {
                 auto brkprt = extractInterfaceandPort (addr);
                 brokerAddress = brkprt.first;
-                brokerReqPort = brkprt.second;
+                brokerPortNumber = brkprt.second;
             }
             else
             {
                 auto brkprt = extractInterfaceandPort (addr.substr (0, sc));
                 brokerAddress = brkprt.first;
-                brokerReqPort = brkprt.second;
+                brokerPortNumber = brkprt.second;
                 brkprt = extractInterfaceandPort (addr.substr (sc + 1));
                 if (brkprt.first != brokerAddress)
                 {
                     // TODO::Print a message?
                 }
-                brokerPushPort = brkprt.second;
             }
-            if ((brokerAddress == "tcp://*") || (brokerAddress == "tcp"))
+            if ((brokerAddress == "udp://*") || (brokerAddress == "udp"))
             {  // the broker address can't use a wild card
-                brokerAddress = "tcp://127.0.0.1";
+                brokerAddress = "udp://127.0.0.1";
             }
         }
         if (vm.count ("local_interface") > 0)
         {
             auto localprt = extractInterfaceandPort (vm["local_interface"].as<std::string> ());
             localInterface = localprt.first;
-            repPortNumber = localprt.second;
+            PortNumber = localprt.second;
         }
         else
         {
             localInterface = "tcp://127.0.0.1";
         }
         if (vm.count ("port") > 0)
-        {
-            brokerReqPort = vm["port"].as<int> ();
+        {PortNumber = vm["port"].as<int> ();
         }
         if (vm.count ("brokerport") > 0)
         {
-            brokerReqPort = vm["brokerport"].as<int> ();
+            brokerPortNumber = vm["brokerport"].as<int> ();
         }
-        if (vm.count ("brokerpushport") > 0)
+        if (vm.count ("localport") > 0)
         {
-            brokerPushPort = vm["brokerpushport"].as<int> ();
+            PortNumber = vm["pullport"].as<int> ();
         }
-        if (vm.count ("pullport") > 0)
-        {
-            pullPortNumber = vm["pullport"].as<int> ();
-        }
-        if (vm.count ("repport") > 0)
-        {
-            repPortNumber = vm["repport"].as<int> ();
-            if (pullPortNumber < 0)
-            {
-                if (repPortNumber > 0)
-                {
-                    pullPortNumber = repPortNumber + 1;
-                }
-            }
-        }
+      
 
         CommonCore::InitializeFromArgs (argc, argv);
     }
 }
 
-bool ZmqCore::brokerConnect ()
+bool UdpCore::brokerConnect ()
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     if (brokerAddress.empty ())  // cores require a broker
     {
-        brokerAddress = "tcp://127.0.0.1";
+        brokerAddress = "127.0.0.1";
     }
-    comms = std::make_unique<ZmqComms> (localInterface, brokerAddress);
+    comms = std::make_unique<UdpComms> (localInterface, brokerAddress);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
-    if ((repPortNumber > 0) || (pullPortNumber > 0))
+    if (PortNumber > 0)
     {
-        comms->setPortNumbers (repPortNumber, pullPortNumber);
+        comms->setPortNumber (PortNumber);
     }
-    if ((brokerReqPort > 0) || (brokerPushPort > 0))
+    if (brokerPortNumber > 0)
     {
-        comms->setBrokerPorts (brokerReqPort, brokerPushPort);
+        comms->setBrokerPort (brokerPortNumber);
     }
 
     auto res = comms->connect ();
     if (res)
     {
-        if (repPortNumber < 0)
+        if (PortNumber < 0)
         {
-            repPortNumber = comms->getRequestPort ();
-        }
-        if (pullPortNumber < 0)
-        {
-            pullPortNumber = comms->getPushPort ();
+            PortNumber = comms->getPort ();
         }
     }
     return res;
 }
 
-std::string ZmqCore::getAddress () const
+std::string UdpCore::getAddress () const
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     if (comms)

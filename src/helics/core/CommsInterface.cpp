@@ -30,11 +30,22 @@ CommsInterface::~CommsInterface ()
     }
 }
 
-void CommsInterface::transmit (int route_id, const ActionMessage &cmd) { txQueue.emplace (route_id, cmd); }
+void CommsInterface::transmit (int route_id, const ActionMessage &cmd) 
+{ 
+    if (isPriorityCommand(cmd))
+    {
+        txQueue.emplacePriority(route_id, cmd);
+    }
+    else
+    {
+        txQueue.emplace(route_id, cmd);
+    }
+   
+}
 
 void CommsInterface::addRoute (int route_id, const std::string &routeInfo)
 {
-    ActionMessage rt (CMD_PROTOCOL);
+    ActionMessage rt (CMD_PROTOCOL_PRIORITY);
     rt.payload = routeInfo;
     rt.index = NEW_ROUTE;
     rt.dest_id = route_id;
