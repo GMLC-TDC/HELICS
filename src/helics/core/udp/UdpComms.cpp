@@ -304,36 +304,16 @@ void UdpComms::queue_tx_function ()
                 case NEW_ROUTE:
                 {
                     auto newroute = cmd.payload;
-                    auto splitPt = newroute.find_first_of (';');
-                    std::string priority_route;
-                    std::string push_route;
-                    if (splitPt != std::string::npos)
-                    {
-                        priority_route = newroute.substr (0, splitPt);
-                        push_route = newroute.substr (splitPt + 1);
-                    }
-                    else
-                    {
-                        push_route = newroute;
-                    }
-                    if (!priority_route.empty ())
-                    {
-                        try
-                        {
-                            priority_routes.addRoutes (cmd.dest_id, priority_route);
-                        }
-                        catch (const zmq::error_t &)
-                        {
-                            // TODO:: do something???
-                        }
-                    }
+                 
                     try
                     {
-                        auto zsock = zmq::socket_t (ctx->getContext (), ZMQ_PUSH);
-                        zsock.connect (push_route);
-                        routes.emplace (cmd.dest_id, std::move (zsock));
+                        udp::resolver::query queryNew(udp::v4(), newroute);
+
+                        udp::endpoint rxEndpoint = *resolver.resolve(queryNew);
+                       
+                        routes.emplace (cmd.dest_id, std::move (rxEndpoint));
                     }
-                    catch (const zmq::error_t &)
+                    catch (std::exception &e)
                     {
                         // TODO:: do something???
                     }
@@ -345,43 +325,30 @@ void UdpComms::queue_tx_function ()
             }
         }
 
-        if (isPriorityCommand (cmd))
-        {
-            if ((route_id == 0) && (!hasBroker))
-            {
-                // drop the packet
-                continue;
-            }
-            auto tx = priority_routes.transmit (route_id, cmd);
-            if (tx)
-            {
-                continue;
-            }
-        }
-        cmd.to_vector (buffer);
+       
         if (route_id == 0)
         {
             if (hasBroker)
             {
-                brokerPushSocket.send (buffer.data (), buffer.size ());
+                transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), broker_endpoint);
             }
         }
         else if (route_id == -1)
         {  // send to rx thread loop
-            controlSocket.send (buffer.data (), buffer.size ());
+            transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rxEndpoint);
         }
         else
         {
             auto rt_find = routes.find (route_id);
             if (rt_find != routes.end ())
             {
-                rt_find->second.send (buffer.data (), buffer.size ());
+                transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rt_find->second);
             }
             else
             {
                 if (hasBroker)
                 {
-                    brokerPushSocket.send (buffer.data (), buffer.size ());
+                    transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), broker_endpoint);
                 }
             }
         }
