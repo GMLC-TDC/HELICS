@@ -52,7 +52,7 @@ void IpcComms::queue_rx_function ()
     while (true)
     {
         ActionMessage cmd = rxQueue.getMessage ();
-        if ((cmd.action () == CMD_PROTOCOL) || (cmd.action () == CMD_PROTOCOL_BIG))
+        if (isProtocolCommand(cmd))
         {
             if (cmd.index == CLOSE_RECEIVER)
             {
@@ -142,7 +142,7 @@ void IpcComms::queue_tx_function ()
         int route_id;
         ActionMessage cmd;
         std::tie (route_id, cmd) = txQueue.pop ();
-        if ((cmd.action () == CMD_PROTOCOL) || (cmd.action () == CMD_PROTOCOL_PRIORITY))
+        if (isProtocolCommand(cmd))
         {
             if (route_id == -1)
             {

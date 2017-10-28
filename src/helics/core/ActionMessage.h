@@ -186,6 +186,7 @@ std::unique_ptr<Message> createMessage (ActionMessage &&cmd);
 
 bool isPriorityCommand (const ActionMessage &command);
 
+bool isProtocolCommand(const ActionMessage &command);
 
 std::string prettyPrintString(const ActionMessage &command);
 

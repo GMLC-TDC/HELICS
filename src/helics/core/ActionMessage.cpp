@@ -258,6 +258,11 @@ bool isPriorityCommand (const ActionMessage &command)
     return (command.action () < action_message_def::action_t::cmd_ignore);
 }
 
+bool isProtocolCommand(const ActionMessage &command)
+{
+    return ((command.action() == CMD_PROTOCOL) || (command.action() == CMD_PROTOCOL_PRIORITY) || (command.action() == CMD_PROTOCOL_BIG));
+}
+
 constexpr char nullStr[] = "unknown";
 
 constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {

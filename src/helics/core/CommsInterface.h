@@ -11,7 +11,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "ActionMessage.h"
-#include "common/BlockingQueue3.hpp"
+#include "common/BlockingPriorityQueue.hpp"
 #include <functional>
 #include <thread>
 #include <atomic>
@@ -70,7 +70,7 @@ protected:
 	int maxMessageSize_ = 16 * 1024; //!< the maximum message size for the queues (if needed)
 	int maxMessageCount_ = 512;  //!< the maximum number of message to buffer (if needed)
 	std::function<void(ActionMessage &&)> ActionCallback; //!< the callback for what to do with a received message
-	BlockingQueue3<std::pair<int, ActionMessage>> txQueue; //!< set of messages waiting to be transmitted
+	BlockingPriorityQueue<std::pair<int, ActionMessage>> txQueue; //!< set of messages waiting to be transmitted
 	// closing the files or connection can take some time so there is a need for interthread communication to not spit out warning messages if it is in the process of disconnecting
 	std::atomic<bool> disconnecting{ false }; //!<flag indicating that the comm system is in the process of disconnecting
 private:

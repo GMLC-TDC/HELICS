@@ -133,7 +133,7 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
         }
     }
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-    if (M.action () == CMD_PROTOCOL)
+    if ((M.action() == CMD_PROTOCOL) || (M.action() == CMD_PROTOCOL_PRIORITY))
     {
         switch (M.index)
         {
@@ -150,7 +150,7 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
 int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
 {
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-    if (M.action () == CMD_PROTOCOL)
+    if ((M.action() == CMD_PROTOCOL) || (M.action() == CMD_PROTOCOL_PRIORITY))
     {
         switch (M.index)
         {
@@ -205,7 +205,7 @@ void ZmqComms::queue_rx_function ()
         zmq::message_t msg;
         controlSocket.recv (&msg);
         ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-        if (M.action () == CMD_PROTOCOL)
+        if ((M.action() == CMD_PROTOCOL) || (M.action() == CMD_PROTOCOL_PRIORITY))
         {
             if (M.index == PORT_DEFINITIONS)
             {
@@ -367,7 +367,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 brokerReq.recv (&msg);
 
                 ActionMessage rxcmd (static_cast<char *> (msg.data ()), msg.size ());
-                if (rxcmd.action () == CMD_PROTOCOL)
+                if ((rxcmd.action() == CMD_PROTOCOL) || (rxcmd.action() == CMD_PROTOCOL_PRIORITY))
                 {
                     if (rxcmd.index == PORT_DEFINITIONS)
                     {
