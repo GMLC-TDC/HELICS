@@ -184,9 +184,15 @@ std::unique_ptr<Message> createMessage (const ActionMessage &cmd);
  */
 std::unique_ptr<Message> createMessage (ActionMessage &&cmd);
 
-bool isPriorityCommand (const ActionMessage &command);
+inline bool isProtocolCommand(const ActionMessage &command)
+{
+    return ((command.action() == CMD_PROTOCOL) || (command.action() == CMD_PROTOCOL_PRIORITY) || (command.action() == CMD_PROTOCOL_BIG));
+}
 
-bool isProtocolCommand(const ActionMessage &command);
+inline bool isPriorityCommand(const ActionMessage &command)
+{
+    return (command.action() < action_message_def::action_t::cmd_ignore);
+}
 
 std::string prettyPrintString(const ActionMessage &command);
 
