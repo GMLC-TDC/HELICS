@@ -83,7 +83,10 @@ private:
 	virtual void closeReceiver() = 0;  //!< function to instruct the receiver loop to close
 };
 
+std::string makePortAddress(const std::string &networkInterface, int portNumber);
 
+std::pair<std::string, int> extractInterfaceandPort(const std::string &address);
+std::pair<std::string, std::string> extractInterfaceandPortString(const std::string &address);
 } // namespace helics
 
 #endif /* _HELICS_COMMS_INTERFACE_ */

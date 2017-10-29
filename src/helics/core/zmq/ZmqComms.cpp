@@ -35,43 +35,6 @@ ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTar
 /** destructor*/
 ZmqComms::~ZmqComms () { disconnect (); }
 
-std::string makePortAddress (const std::string &networkInterface, int portNumber)
-{
-    if (networkInterface.compare (0, 3, "ipc") == 0)
-    {
-        return networkInterface;
-    }
-    if (networkInterface.compare (0, 3, "tcp") == 0)
-    {
-        std::string newAddress = networkInterface;
-        newAddress.push_back (':');
-        newAddress.append (std::to_string (portNumber));
-        return newAddress;
-    }
-    if (networkInterface.compare (0, 5, "inproc") == 0)
-    {
-        return networkInterface;
-    }
-    return networkInterface;
-}
-
-std::pair<std::string, int> extractInterfaceandPort (const std::string &address)
-{
-    std::pair<std::string, int> ret;
-    auto lastColon = address.find_last_of (':');
-    try
-    {
-        auto val = std::stoi (address.substr (lastColon + 1));
-        ret.first = address.substr (0, lastColon);
-        ret.second = val;
-    }
-    catch (const std::invalid_argument &)
-    {
-        ret = std::make_pair (address, -1);
-    }
-    return ret;
-}
-
 void ZmqComms::setBrokerPorts (int reqPort, int pushPort)
 {
     if (rx_status == connection_status::startup)

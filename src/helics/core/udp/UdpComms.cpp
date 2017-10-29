@@ -10,8 +10,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "UdpComms.h"
 #include "helics/core/ActionMessage.h"
+#include "helics/common/AsioServiceManager.h"
 #include <memory>
-#include <boost/asio.hpp>
+#include <boost/asio/ip/udp.hpp>
 
 static const int BEGIN_OPEN_PORT_RANGE = 23964;
 static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24093;
@@ -24,7 +25,6 @@ namespace helics
 using boost::asio::ip::udp;
 UdpComms::UdpComms ()
 {
-    ioserv = std::make_unique<boost::asio::io_service> ();
     promisePort = std::promise<int> ();
     futurePort = promisePort.get_future ();
 }
@@ -36,37 +36,11 @@ UdpComms::UdpComms (const std::string &brokerTarget, const std::string &localTar
     {
         localTarget_ = "localhost";
     }
-    ioserv = std::make_unique<boost::asio::io_service> ();
     promisePort = std::promise<int> ();
     futurePort = promisePort.get_future ();
 }
 /** destructor*/
 UdpComms::~UdpComms () { disconnect (); }
-
-std::string makePortAddress (const std::string &networkInterface, int portNumber)
-{
-    std::string newAddress = networkInterface;
-    newAddress.push_back (':');
-    newAddress.append (std::to_string (portNumber));
-    return newAddress;
-}
-
-std::pair<std::string, int> extractInterfaceandPort (const std::string &address)
-{
-    std::pair<std::string, int> ret;
-    auto lastColon = address.find_last_of (':');
-    try
-    {
-        auto val = std::stoi (address.substr (lastColon + 1));
-        ret.first = address.substr (0, lastColon);
-        ret.second = val;
-    }
-    catch (const std::invalid_argument &)
-    {
-        ret = std::make_pair (address, -1);
-    }
-    return ret;
-}
 
 void UdpComms::setBrokerPort (int brokerPortNumber)
 {
@@ -164,29 +138,31 @@ void UdpComms::queue_rx_function ()
         rx_status = connection_status::error;
         return;
     }
-    udp::socket socket(*ioserv, udp::endpoint(udp::v4(), PortNumber));
-    std::vector<char> data;
+    auto ioserv = AsioServiceManager::getServicePointer();
+    udp::socket socket(ioserv->getBaseService(), udp::endpoint(udp::v4(), PortNumber));
+    std::vector<char> data(10192);
     udp::endpoint remote_endp;
     boost::system::error_code error;
     boost::system::error_code ignored_error;
+    rx_status = connection_status::connected;
     while (true)
     {
-        socket.receive_from(boost::asio::buffer(data), remote_endp, 0, error);
+        auto len=socket.receive_from(boost::asio::buffer(data), remote_endp, 0, error);
         if (error)
         {
             rx_status = connection_status::error;
             return;
         }
-        if (data.size() == 5)
+        if (len == 5)
         {
-            std::string str(data.data(), data.size());
+            std::string str(data.data(), len);
             if (str == "close")
             {
                 disconnecting = true;
                 rx_status = connection_status::terminated;
             }
         }
-        ActionMessage M(data);
+        ActionMessage M(data.data(),len);
         if (isProtocolCommand(M))
         {
            if (M.index == CLOSE_RECEIVER)
@@ -201,7 +177,7 @@ void UdpComms::queue_rx_function ()
             auto reply = generateReplyToIncomingMessage(M);
             if (reply.action() == CMD_PROTOCOL)
             {
-                if (reply.index = DISCONNECT)
+                if (reply.index == DISCONNECT)
                 {
                     disconnecting = true;
                     rx_status = connection_status::terminated;
@@ -227,10 +203,10 @@ void UdpComms::queue_rx_function ()
 void UdpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
-
-    udp::resolver resolver (*ioserv);
+    auto ioserv = AsioServiceManager::getServicePointer();
+    udp::resolver resolver (ioserv->getBaseService());
   
-    udp::socket transmitSocket (*ioserv);
+    udp::socket transmitSocket (ioserv->getBaseService());
     transmitSocket.open (udp::v4 ());
     if (PortNumber >= 0)
     {
@@ -239,6 +215,11 @@ void UdpComms::queue_tx_function ()
     
     std::map<int, udp::endpoint> routes;  // for all the other possible routes
     udp::endpoint broker_endpoint;
+
+    if (!brokerTarget_.empty())
+    {
+        hasBroker = true;
+    }
     if (hasBroker)
     {
         if (brokerPort < 0)
@@ -256,10 +237,10 @@ void UdpComms::queue_tx_function ()
                 ActionMessage m(CMD_PROTOCOL_PRIORITY);
                 m.index = REQUEST_PORTS;
                 transmitSocket.send_to(boost::asio::buffer(m.to_string()), broker_endpoint);
-                std::vector<char> rx;
+                std::vector<char> rx(128);
                 udp::endpoint brk;
-                auto len = transmitSocket.receive_from(boost::asio::buffer(rx), brk);
-                m = ActionMessage(rx);
+                auto len=transmitSocket.receive_from(boost::asio::buffer(rx), brk);
+                m = ActionMessage(rx.data(),len);
                 if (m.action() == CMD_PROTOCOL)
                 {
                     if (m.index == PORT_DEFINITIONS)
@@ -307,9 +288,12 @@ void UdpComms::queue_tx_function ()
                  
                     try
                     {
-                        udp::resolver::query queryNew(udp::v4(), newroute);
+                        std::string interface;
+                        std::string port;
+                        std::tie(interface, port) = extractInterfaceandPortString(newroute);
+                        udp::resolver::query queryNew(udp::v4(), interface,port);
 
-                        udp::endpoint rxEndpoint = *resolver.resolve(queryNew);
+                       rxEndpoint = *resolver.resolve(queryNew);
                        
                         routes.emplace (cmd.dest_id, std::move (rxEndpoint));
                     }
@@ -358,7 +342,8 @@ CLOSE_TX_LOOP:
     routes.clear ();
     if (rx_status == connection_status::connected)
     {
-        transmitSocket.send_to(boost::asio::buffer("close"), rxEndpoint);
+        std::string cls("close");
+        transmitSocket.send_to(boost::asio::buffer(cls), rxEndpoint);
     }
 
 
@@ -383,13 +368,14 @@ void UdpComms::closeReceiver ()
     else if (!disconnecting)
     {
         // try connecting with the receiver socket
-        udp::resolver resolver(*ioserv);
+        udp::resolver resolver(AsioServiceManager::getService());
         udp::resolver::query queryLocal(udp::v4(), localTarget_, std::to_string(PortNumber));
 
         udp::endpoint rxEndpoint = *resolver.resolve(queryLocal);
 
-        udp::socket transmit(*ioserv);
-        transmit.send_to(boost::asio::buffer("close"), rxEndpoint);
+        udp::socket transmit(AsioServiceManager::getService());
+        std::string cls("close");
+        transmit.send_to(boost::asio::buffer(cls), rxEndpoint);
     }
 }
 

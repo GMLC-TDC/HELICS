@@ -137,9 +137,9 @@ std::string UdpCore::getAddress () const
     std::lock_guard<std::mutex> lock (dataMutex);
     if (comms)
     {
-        return comms->getRequestAddress () + ";" + comms->getPushAddress ();
+        return comms->getAddress ();
     }
-    return makePortAddress (localInterface, repPortNumber);
+    return makePortAddress (localInterface, PortNumber);
 }
 
 }  // namespace helics

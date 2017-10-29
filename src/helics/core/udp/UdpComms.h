@@ -60,7 +60,6 @@ public:
 private:
 	int brokerPort = -1;
 	std::atomic<int> PortNumber{ -1 };
-    std::unique_ptr<boost::asio::io_service> ioserv;
 	std::set<int> usedPortNumbers;
 	int openPortStart = -1;
 	std::atomic<bool> hasBroker{ false };
