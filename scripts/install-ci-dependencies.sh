@@ -24,4 +24,9 @@ echo "*** built boost successfully"
 
 if [[ ! -f "cmake-3.4.3-Linux-x86_64/bin/cmake" ]]; then
     wget --no-check-certificate http://cmake.org/files/v3.4/cmake-3.4.3-Linux-x86_64.tar.gz && tar -xzf cmake-3.4.3-Linux-x86_64.tar.gz;
+    export PATH="../cmake-3.4.3-Linux-x86_64/bin:${PATH}"
+else
+    brew install cmake || brew upgrade cmake
 fi
+
+cmake --version
