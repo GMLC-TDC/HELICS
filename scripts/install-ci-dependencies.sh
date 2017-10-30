@@ -34,7 +34,7 @@ elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         echo "*** install cmake"
         wget --no-check-certificate http://cmake.org/files/v3.4/cmake-3.4.3-Darwin-x86_64.tar.gz && tar -xzf cmake-3.4.3-Darwin-x86_64.tar.gz;
     fi
-    export PATH="${PWD}/cmake-3.4.3-Darwin-x86_64/bin:${PATH}"
+    export PATH="${PWD}/cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/bin:${PATH}"
     echo "*** cmake installed ($PATH)"
 fi
 
