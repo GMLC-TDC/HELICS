@@ -11,7 +11,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "helics/core/core.h"
-#include "identifierTypes.hpp"
 #include "helics/common/simpleQueue.hpp"
 #include "Message.h"
 #include <utility> 
