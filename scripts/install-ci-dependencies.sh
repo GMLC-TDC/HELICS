@@ -28,3 +28,5 @@ if [[ ! -f "cmake-3.4.3-Linux-x86_64/bin/cmake" ]]; then
 else
     brew install cmake || brew upgrade cmake
 fi
+
+cmake --version
