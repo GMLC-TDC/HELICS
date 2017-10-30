@@ -140,24 +140,20 @@ double randDouble (random_dists_t dist, double p1, double p2)
     case random_dists_t::constant:
         return p1;
     case random_dists_t::uniform:
-    default:
     {
         std::uniform_real_distribution<double> distribution (p1, p2);
         return distribution (generator);
     }
-    break;
     case random_dists_t::normal:
     {
         std::normal_distribution<double> distribution (p1, p2);
         return distribution (generator);
     }
-    break;
     case random_dists_t::lognormal:
     {
         std::lognormal_distribution<double> distribution (p1, p2);
         return distribution (generator);
     }
-    break;
     case random_dists_t::cauchy:
     {
         std::cauchy_distribution<double> distribution (p1, p2);
@@ -186,6 +182,36 @@ double randDouble (random_dists_t dist, double p1, double p2)
     case random_dists_t::weibull:
     {
         std::weibull_distribution<double> distribution(p1, p2);
+        return distribution(generator);
+    }
+    case random_dists_t::student_t:
+    {
+        std::student_t_distribution<double> distribution(p1);
+        return distribution(generator);
+    }
+    case random_dists_t::geometric:
+    { //integer multiples of some period
+        std::geometric_distribution<int> distribution(p1);
+        return distribution(generator)*p2;  
+    }
+    case random_dists_t::poisson:
+    {//integer multiples of some period
+        std::poisson_distribution<int> distribution(p1);
+        return distribution(generator)*p2;
+    }
+    case random_dists_t::bernoulli:
+    {
+        std::bernoulli_distribution distribution(p1);
+        return distribution(generator)?p2:0.0;
+    }
+    case random_dists_t::binomial:
+    {
+        std::binomial_distribution<int> distribution(static_cast<int>(p1),p2);
+        return static_cast<double>(distribution(generator));
+    }
+    case random_dists_t::gamma:
+    {
+        std::gamma_distribution<double> distribution(p1, p2);
         return distribution(generator);
     }
     break;
@@ -217,7 +243,13 @@ randomDropFilterOperation::randomDropFilterOperation ()
 }
 
 randomDropFilterOperation::~randomDropFilterOperation () {}
-void randomDropFilterOperation::set (const std::string &property, double val) {}
+void randomDropFilterOperation::set (const std::string &property, double val) 
+{
+    if ((property == "dropprob") || (property == "prob"))
+    {
+        dropProb = val;
+    }
+}
 void randomDropFilterOperation::setString (const std::string &property, const std::string &val) {}
 
 std::shared_ptr<MessageOperator> randomDropFilterOperation::getOperator ()

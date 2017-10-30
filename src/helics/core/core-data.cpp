@@ -28,8 +28,8 @@ Time time;
 */
 
 Message::Message (Message &&m) noexcept
-    : time (m.time), data (std::move (m.data)), origsrc (std::move (m.origsrc)), dest (std::move (m.dest)),
-      src (std::move (m.src))
+    : time (m.time), flags(m.flags),data (std::move (m.data)), dest(std::move(m.dest)), src(std::move(m.src)), origsrc (std::move (m.origsrc)),
+       orig_dest(std::move(m.orig_dest))
 
 {
 }
@@ -41,6 +41,8 @@ Message &Message::operator= (Message &&m) noexcept
     dest = std::move (m.dest);
     data = std::move (m.data);
     time = m.time;
+    flags = m.flags;
+    orig_dest = std::move(m.orig_dest);
     return *this;
 }
 
@@ -51,6 +53,8 @@ void Message::swap (Message &m2) noexcept
     dest.swap (m2.dest);
     data.swap (m2.data);
     std::swap (time, m2.time);
+    std::swap(flags, m2.flags);
+    orig_dest.swap(m2.orig_dest);
 }
 
 bool Message::isValid () const noexcept

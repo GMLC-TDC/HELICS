@@ -131,11 +131,12 @@ class Message
 {
   public:
     Time time;  //!< the event time the message is sent
+    std::uint64_t flags;  //!< message flags
     data_block data;  //!< the data packet for the message
-    std::string origsrc;  //!< the orignal source of the message
     std::string dest;  //!< the destination of the message
     std::string src;  //!< the most recent source of the message
-
+    std::string origsrc;  //!< the original source of the message
+    std::string orig_dest; //!< the original destination of a message
   public:
     /** default constructor*/
     Message () noexcept {};
@@ -143,7 +144,7 @@ class Message
     Message (Message &&m) noexcept;
     /** copy constructor*/
     Message (const Message &m) = default;
-    /** move assignement*/
+    /** move assignment*/
     Message &operator= (Message &&m) noexcept;
     /** copy assignment*/
     Message &operator= (const Message &m) = default;

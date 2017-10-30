@@ -413,7 +413,6 @@ class Core
      * Register source filter.
      *
      * May only be invoked in the Initialization state.
-	 @param federateID the identifier for the federate
 	 @param filterName the name of the filter (may be left blank)
 	 @param source the target endpoint for the filter
 	 @param type_in the input type of the filter
@@ -421,8 +420,7 @@ class Core
 	 this is important for ordering in filters with operators
 	 @return the handle for the new filter
      */
-    virtual Handle registerSourceFilter (federate_id_t federateID,
-                                         const std::string &filterName,
+    virtual Handle registerSourceFilter (const std::string &filterName,
                                          const std::string &source,
                                          const std::string &type_in,
 										const std::string &type_out) = 0;
@@ -431,15 +429,13 @@ class Core
 	@details a destination filter will create an additional processing step of messages before they get to a destination endpoint
 	*
 	* May only be invoked in the Initialization state.
-	@param federateID the identifier for the federate
 	@param filterName the name of the filter (may be left blank)
 	@param dest the target endpoint for the filter
 	@param type_in the input type of the filter (may be left blank,  this is for error checking and will produce a warning if it doesn't 
 	match with the input type of the target endpoint
 	@return the handle for the new filter
 	*/
-    virtual Handle registerDestinationFilter (federate_id_t federateID,
-                                              const std::string &filterName,
+    virtual Handle registerDestinationFilter (const std::string &filterName,
                                               const std::string &dest,
                                               const std::string &type_in,
 											  const std::string &type_out) = 0;
@@ -538,19 +534,6 @@ class Core
 	@param[in] callback the function to operate on the message
 	*/
 	virtual void setFilterOperator(Handle filter, std::shared_ptr<FilterOperator> callback) = 0;
-
-	/**
-	* Returns number of messages for all filters.
-	*/
-	virtual uint64_t receiveFilterCount(federate_id_t federateID) = 0;
-
-	/**
-	* Receives a message for any filter.
-	@details this is a non-blocking call and will return nullptr if no messages are available
-	@param federateID the identifier for the federate
-	@param[out] filter_id the filter handle related to the message gets stored here
-	*/
-	virtual std::unique_ptr<Message> receiveAnyFilter(federate_id_t federateID, Handle &filter_id) = 0;
 
 	/** define a logging function to use for logging message and notices from the federation and individual federate
 	@param federateID  the identifier for the individual federate or 0 for the Core logger

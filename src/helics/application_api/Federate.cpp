@@ -655,6 +655,112 @@ bool Federate::queryCompleted (int queryIndex) const
     return false;
 }
 
+
+filter_id_t Federate::registerSourceFilter(const std::string &filterName,
+    const std::string &sourceEndpoint,
+    const std::string &inputType,
+    const std::string &outputType)
+{
+    std::lock_guard<std::mutex> fLock(filterLock);
+    filter_id_t id = static_cast<identifier_type> (filters.size());
+    filters.emplace_back(filterName, sourceEndpoint, inputType, outputType);
+    filters.back().id = id;
+    filters.back().ftype = filter_type::source_filter;
+    filters.back().handle =
+        coreObject->registerSourceFilter(fedID, filterName, sourceEndpoint, inputType, outputType);
+    SourceFilterNames.emplace(filterName, id);
+    if (filterName != sourceEndpoint)
+    {
+        SourceFilterNames.emplace(sourceEndpoint, id);
+    }
+    filterQueues.resize(id.value());
+    handleLookup.emplace(filters.back().handle, id);
+    return id;
+}
+
+filter_id_t Federate::registerDestinationFilter(const std::string &filterName,
+    const std::string &destEndpoint,
+    const std::string &inputType,
+    const std::string &outputType)
+{
+    std::lock_guard<std::mutex> fLock(filterLock);
+    filter_id_t id = static_cast<identifier_type> (filters.size());
+    filters.emplace_back(filterName, destEndpoint, inputType, outputType);
+    filters.back().id = id;
+    filters.back().ftype = filter_type::dest_filter;
+    DestFilterNames.emplace(filterName, id);
+    if (filterName != destEndpoint)
+    {
+        DestFilterNames.emplace(destEndpoint, id);
+    }
+    filters.back().handle =
+        coreObject->registerDestinationFilter(fedID, filterName, destEndpoint, inputType, outputType);
+    handleLookup.emplace(filters.back().handle, id);
+    return id;
+}
+
+std::string Federate::getFilterName(filter_id_t id) const
+{
+    std::lock_guard<std::mutex> fLock(filterLock);
+    return (id.value() < filters.size()) ? (filters[id.value()].name) : nullStr;
+}
+std::string Federate::getFilterEndpoint(filter_id_t id) const
+{
+    std::lock_guard<std::mutex> fLock(filterLock);
+    return (id.value() < filters.size()) ? (filters[id.value()].endpoint) : nullStr;
+}
+
+std::string Federate::getFilterInputType(filter_id_t id) const
+{
+    std::lock_guard<std::mutex> fLock(filterLock);
+    return (id.value() < filters.size()) ? (filters[id.value()].inputType) : nullStr;
+}
+
+std::string Federate::getFilterOutputType(filter_id_t id) const
+{
+    std::lock_guard<std::mutex> fLock(filterLock);
+    return (id.value() < filters.size()) ? (filters[id.value()].outputType) : nullStr;
+}
+
+filter_id_t Federate::getFilterId(const std::string &filterName) const
+{
+    std::lock_guard<std::mutex> fLock(filterLock);
+    auto sub = SourceFilterNames.find(filterName);
+    if (sub != SourceFilterNames.end())
+    {
+        return sub->second;
+    }
+    auto subd = DestFilterNames.find(filterName);
+    if (subd != DestFilterNames.end())
+    {
+        return subd->second;
+    }
+    return invalid_id_value;
+}
+
+filter_id_t Federate::getSourceFilterId(const std::string &endpointName) const
+{
+    std::lock_guard<std::mutex> fLock(filterLock);
+    auto sub = SourceFilterNames.find(endpointName);
+    if (sub != SourceFilterNames.end())
+    {
+        return sub->second;
+    }
+    return invalid_id_value;
+}
+
+filter_id_t Federate::getDestFilterId(const std::string &endpointName) const
+{
+    std::lock_guard<std::mutex> fLock(filterLock);
+    auto sub = DestFilterNames.find(endpointName);
+    if (sub != DestFilterNames.end())
+    {
+        return sub->second;
+    }
+    return invalid_id_value;
+}
+
+
 FederateInfo LoadFederateInfo (const std::string &jsonString)
 {
     FederateInfo fi;

@@ -89,8 +89,8 @@ CommonCore(const std::string &core_name);
 
   virtual const std::vector<Handle> &getValueUpdates (federate_id_t federateID) override final;
   virtual Handle registerEndpoint (federate_id_t federateID, const std::string &name, const std::string &type) override final;
-  virtual Handle registerSourceFilter (federate_id_t federateID, const std::string &filterName, const std::string &source, const std::string &type_in,const std::string &type_out) override final;
-  virtual Handle registerDestinationFilter (federate_id_t federateID, const std::string &filterName, const std::string &dest, const std::string &type_in,const std::string &type_out) override final;
+  virtual Handle registerSourceFilter (const std::string &filterName, const std::string &source, const std::string &type_in,const std::string &type_out) override final;
+  virtual Handle registerDestinationFilter (const std::string &filterName, const std::string &dest, const std::string &type_in,const std::string &type_out) override final;
   virtual void addDependency(federate_id_t federateID, const std::string &federateName) override final;
   virtual void registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) override final;
   virtual void send (Handle sourceHandle, const std::string &destination, const char *data, uint64_t length) override final;
@@ -103,9 +103,6 @@ CommonCore(const std::string &core_name);
   virtual void logMessage(federate_id_t federateID, int logLevel, const std::string &logMessage) override final;
   virtual void setFilterOperator(Handle filter, std::shared_ptr<FilterOperator> callback) override final;
 
-  virtual uint64_t receiveFilterCount(federate_id_t federateID) override final;
-
-  virtual std::unique_ptr<Message> receiveAnyFilter(federate_id_t federateID, Handle &filter_id) override final;
   /** set the local identification for the core*/
   void setIdentifier(const std::string &name);
   /** get the local identifier for the core*/

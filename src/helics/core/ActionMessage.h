@@ -38,6 +38,7 @@ class ActionMessage
         std::string &units;  //!< alias type to target for registration
         std::string orig_source;  //!< the original source
 		std::string &type_out;  //!< alias type_out to orig_source for filter
+        std::string orig_dest;  //!< the original destination of a message
 		/** constructor*/
         AdditionalInfo () noexcept : type (source), units (target),type_out(orig_source){};
 		/** copy constructor*/
@@ -76,10 +77,10 @@ class ActionMessage
     int32_t source_id = 0;  // 8 -- for federate_id or route_id
     int32_t source_handle = 0;  // 12 -- for local handle or local code
     int32_t dest_id = 0;  // 16 fed_id for a targeted message
-    int32_t dest_handle = 0;  // 20 local handle for a targetted message
+    int32_t dest_handle = 0;  // 20 local handle for a targeted message
 	int32_t &index;			//alias to dest_handle 
     bool iterationComplete = false;  // 24 indicator that iteration has been completed
-	bool &processingComplete;  //Alias to iterationComplete indictator that processing has been completed
+	bool &processingComplete;  //Alias to iterationComplete indicator that processing has been completed
     bool required = false;  //!< flag indicating a publication is required
     bool error = false;  //!< flag indicating an error condition associated with the command
     bool flag = false;  //!< general flag for many purposes
