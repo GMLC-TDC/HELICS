@@ -27,7 +27,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         echo "*** install cmake"
         wget --no-check-certificate http://cmake.org/files/v3.4/cmake-3.4.3-Linux-x86_64.tar.gz && tar -xzf cmake-3.4.3-Linux-x86_64.tar.gz;
         export PATH="${PWD}/cmake-3.4.3-Linux-x86_64/bin:${PATH}"
-        echo "*** cmake installed"
+        echo "*** cmake installed ($PATH)"
     fi
 elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     echo "*** install boost"
