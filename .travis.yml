@@ -21,24 +21,12 @@ matrix:
     # so leave this first for the overall build to be faster
     ##########################################################################
 
-    # XCode 8.3
-    - env: COMPILER=clang++ BUILD_TYPE=Debug
+    - env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release"
       os: osx
       osx_image: xcode8.3
       compiler: clang
 
-    - env: COMPILER=clang++ BUILD_TYPE=Release
-      os: osx
-      osx_image: xcode8.3
-      compiler: clang
-
-    # XCode 9.1
-    - env: COMPILER=clang++ BUILD_TYPE=Debug
-      os: osx
-      osx_image: xcode9.1
-      compiler: clang
-
-    - env: COMPILER=clang++ BUILD_TYPE=Release
+    - env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release"
       os: osx
       osx_image: xcode9.1
       compiler: clang
@@ -53,6 +41,7 @@ matrix:
       env: MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6"
       os:
         - linux
+
     - compiler: gcc
       addons:
         apt:
@@ -63,6 +52,7 @@ matrix:
       env: MATRIX_EVAL="COMPILER=g++-4.9 && CC=gcc-4.9 && CXX=g++-4.9"
       os:
         - linux
+
     - compiler: clang
       addons:
         apt:
