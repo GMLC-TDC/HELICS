@@ -96,7 +96,7 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
         }
     }
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-    if ((M.action() == CMD_PROTOCOL) || (M.action() == CMD_PROTOCOL_PRIORITY))
+    if (isProtocolCommand(M))
     {
         switch (M.index)
         {
@@ -113,7 +113,7 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
 int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
 {
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-    if ((M.action() == CMD_PROTOCOL) || (M.action() == CMD_PROTOCOL_PRIORITY))
+    if (isProtocolCommand(M))
     {
         switch (M.index)
         {
@@ -168,7 +168,7 @@ void ZmqComms::queue_rx_function ()
         zmq::message_t msg;
         controlSocket.recv (&msg);
         ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-        if ((M.action() == CMD_PROTOCOL) || (M.action() == CMD_PROTOCOL_PRIORITY))
+        if (isProtocolCommand(M))
         {
             if (M.index == PORT_DEFINITIONS)
             {
@@ -330,7 +330,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 brokerReq.recv (&msg);
 
                 ActionMessage rxcmd (static_cast<char *> (msg.data ()), msg.size ());
-                if ((rxcmd.action() == CMD_PROTOCOL) || (rxcmd.action() == CMD_PROTOCOL_PRIORITY))
+                if (isProtocolCommand(rxcmd))
                 {
                     if (rxcmd.index == PORT_DEFINITIONS)
                     {
@@ -382,7 +382,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 brokerReq.recv (&msg);
 
                 ActionMessage rxcmd (static_cast<char *> (msg.data ()), msg.size ());
-                if (rxcmd.action () == CMD_PROTOCOL)
+                if (isProtocolCommand(rxcmd))
                 {
                     if (rxcmd.index == PORT_DEFINITIONS)
                     {
@@ -500,7 +500,7 @@ void ZmqComms::queue_tx_function ()
             std::tie (route_id, cmd) = txQueue.pop ();
         }
 
-        if (cmd.action () == CMD_PROTOCOL)
+        if (isProtocolCommand(cmd))
         {
             if (route_id == -1)
             {
@@ -527,9 +527,10 @@ void ZmqComms::queue_tx_function ()
                         {
                             priority_routes.addRoutes (cmd.dest_id, priority_route);
                         }
-                        catch (const zmq::error_t &)
+                        catch (const zmq::error_t &e)
                         {
                             // TODO:: do something???
+                            std::cerr << e.what() << '\n';
                         }
                     }
                     try
@@ -557,8 +558,13 @@ void ZmqComms::queue_tx_function ()
                 // drop the packet
                 continue;
             }
-            auto tx = priority_routes.transmit (route_id, cmd);
-            if (tx)
+            else if (route_id == -1)
+            {  // send to rx thread loop
+                cmd.to_vector(buffer);
+                controlSocket.send(buffer.data(), buffer.size());
+                continue;
+            }
+            if (priority_routes.transmit(route_id, cmd))
             {
                 continue;
             }
