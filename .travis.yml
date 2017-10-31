@@ -74,7 +74,7 @@ before_install:
   - eval "${MATRIX_EVAL}"
 
 install:
-  - ./scripts/install-ci-dependencies.sh
+  - source scripts/install-ci-dependencies.sh
 
 script:
   - mkdir build && cd build
