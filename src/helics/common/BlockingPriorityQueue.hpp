@@ -267,6 +267,12 @@ class BlockingPriorityQueue
                 return actval;
             }
             condition.wait (pullLock);  // now wait
+            if (!priorityQueue.empty())
+            {
+                auto actval = std::move(priorityQueue.front());
+                priorityQueue.pop();
+                return actval;
+            }
             if (!pullElements.empty ())  // check for spurious wake-ups
             {
                 auto actval = std::move (pullElements.back ());
@@ -309,6 +315,12 @@ class BlockingPriorityQueue
             }
             condition.wait (pullLock);
             // need to check again to handle spurious wake-up
+            if (!priorityQueue.empty())
+            {
+                auto actval = std::move(priorityQueue.front());
+                priorityQueue.pop();
+                return actval;
+            }
             if (!pullElements.empty ())
             {
                 auto actval = std::move (pullElements.back ());

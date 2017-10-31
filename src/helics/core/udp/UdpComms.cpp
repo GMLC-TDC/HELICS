@@ -175,7 +175,7 @@ void UdpComms::queue_rx_function ()
         if (isPriorityCommand(M))
         {
             auto reply = generateReplyToIncomingMessage(M);
-            if (reply.action() == CMD_PROTOCOL)
+            if (isProtocolCommand(reply))
             {
                 if (reply.index == DISCONNECT)
                 {
@@ -241,7 +241,7 @@ void UdpComms::queue_tx_function ()
                 udp::endpoint brk;
                 auto len=transmitSocket.receive_from(boost::asio::buffer(rx), brk);
                 m = ActionMessage(rx.data(),len);
-                if (m.action() == CMD_PROTOCOL)
+                if (isProtocolCommand(m))
                 {
                     if (m.index == PORT_DEFINITIONS)
                     {
