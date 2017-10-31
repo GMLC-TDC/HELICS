@@ -213,6 +213,7 @@ void UdpComms::queue_tx_function ()
         promisePort.set_value(PortNumber);
     }
     
+    boost::system::error_code error;
     std::map<int, udp::endpoint> routes;  // for all the other possible routes
     udp::endpoint broker_endpoint;
 
@@ -314,25 +315,41 @@ void UdpComms::queue_tx_function ()
         {
             if (hasBroker)
             {
-                transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), broker_endpoint);
+                transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), broker_endpoint,0,error);
+                if (error)
+                {
+                    std::cerr << "transmit failure " << error << '\n';
+                }
             }
         }
         else if (route_id == -1)
         {  // send to rx thread loop
-            transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rxEndpoint);
+            transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rxEndpoint,0,error);
+            if (error)
+            {
+                std::cerr << "transmit failure " << error << '\n';
+            }
         }
         else
         {
             auto rt_find = routes.find (route_id);
             if (rt_find != routes.end ())
             {
-                transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rt_find->second);
+                transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rt_find->second,0,error);
+                if (error)
+                {
+                    std::cerr << "transmit failure " << error << '\n';
+                }
             }
             else
             {
                 if (hasBroker)
                 {
-                    transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), broker_endpoint);
+                    transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), broker_endpoint,0,error);
+                    if (error)
+                    {
+                        std::cerr << "transmit failure " << error << '\n';
+                    }
                 }
             }
         }
@@ -343,7 +360,11 @@ CLOSE_TX_LOOP:
     if (rx_status == connection_status::connected)
     {
         std::string cls("close");
-        transmitSocket.send_to(boost::asio::buffer(cls), rxEndpoint);
+        transmitSocket.send_to(boost::asio::buffer(cls), rxEndpoint,0,error);
+        if (error)
+        {
+            std::cerr << "transmit failure " << error << '\n';
+        }
     }
 
 
@@ -367,15 +388,34 @@ void UdpComms::closeReceiver ()
     }
     else if (!disconnecting)
     {
-        // try connecting with the receiver socket
-        udp::resolver resolver(AsioServiceManager::getService());
-        udp::resolver::query queryLocal(udp::v4(), localTarget_, std::to_string(PortNumber));
+       
 
-        udp::endpoint rxEndpoint = *resolver.resolve(queryLocal);
+        try
+        {
+            auto serv = AsioServiceManager::getServicePointer();
+            if (serv)
+            {
+                // try connecting with the receiver socket
+                udp::resolver resolver(serv->getBaseService());
+                udp::resolver::query queryLocal(udp::v4(), localTarget_, std::to_string(PortNumber));
 
-        udp::socket transmit(AsioServiceManager::getService());
-        std::string cls("close");
-        transmit.send_to(boost::asio::buffer(cls), rxEndpoint);
+                udp::endpoint rxEndpoint = *resolver.resolve(queryLocal);
+
+                udp::socket transmit(serv->getBaseService());
+                std::string cls("close");
+                boost::system::error_code error;
+                transmit.send_to(boost::asio::buffer(cls), rxEndpoint,0,error);
+                if (error)
+                {
+                    std::cerr << "transmit failure on disconnect" << error << '\n';
+                }
+            }
+            
+        }
+        catch (...)
+        {
+            //ignore error here
+       }
     }
 }
 
