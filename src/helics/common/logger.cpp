@@ -185,4 +185,56 @@ void loggerNoThread::flush ()
 }
 
 bool loggerNoThread::isRunning () const { return true; }
-}  // namespace utilities
+
+
+/** a storage system for the available logger objects allowing references by name to the core
+*/
+std::map<std::string, std::shared_ptr<loggerManager>> loggerManager::loggers;
+
+/** we expect operations on core object that modify the map to be rare but we absolutely need them to be thread
+safe so we are going to use a lock that is entirely controlled by this file*/
+static std::mutex loggerLock;
+
+std::shared_ptr<loggerManager> loggerManager::getLoggerManager(const std::string &loggerName)
+{
+    std::lock_guard<std::mutex> loglock(
+        loggerLock);  // just to ensure that nothing funny happens if you try to get a context
+                       // while it is being constructed
+    auto fnd = loggers.find(loggerName);
+    if (fnd != loggers.end())
+    {
+        return fnd->second;
+    }
+
+    auto newLogger= std::shared_ptr<loggerManager>(new loggerManager(loggerName));
+    loggers.emplace(loggerName, newLogger);
+    return newLogger;
+    // if it doesn't make a new one with the appropriate name
+}
+
+std::shared_ptr<logger> loggerManager::getLogger(const std::string &loggerName)
+{
+    return getLoggerManager(loggerName)->loggingControl;
+}
+
+void loggerManager::closeLogger(const std::string &loggerName)
+{
+    std::lock_guard<std::mutex> loglock(loggerLock);
+    auto fnd = loggers.find(loggerName);
+    if (fnd != loggers.end())
+    {
+        loggers.erase(fnd);
+    }
+}
+
+
+loggerManager::~loggerManager()
+{
+  
+}
+
+loggerManager::loggerManager(const std::string &loggerName) : name(loggerName)
+{
+    loggingControl = std::make_shared<logger>();
+}
+}  // namespace helics
