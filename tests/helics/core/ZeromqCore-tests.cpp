@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
     BOOST_CHECK_GT (rxmsg.size (), 32);
 
     helics::ActionMessage rM (static_cast<char *> (rxmsg.data ()), rxmsg.size ());
-    BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_protocol);
+    BOOST_CHECK (helics::isProtocolCommand (rM));
     rM.index = DISCONNECT;
     repSocket.send (rM.to_string ());
     auto connected = confut.get ();

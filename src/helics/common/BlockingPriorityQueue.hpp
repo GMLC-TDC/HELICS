@@ -137,9 +137,9 @@ class BlockingPriorityQueue
             {
                 pushElements.push_back (std::forward<Z> (val));
                 expEmpty = true;
-                if (queueEmptyFlag.compare_exchange_strong(expEmpty, false))
+                if (queueEmptyFlag.compare_exchange_strong (expEmpty, false))
                 {
-                    condition.notify_all();
+                    condition.notify_all ();
                 }
             }
         }
@@ -165,9 +165,9 @@ class BlockingPriorityQueue
             std::unique_lock<std::mutex> pullLock (m_pullLock);
             priorityQueue.push (std::forward<Z> (val));
             expEmpty = true;
-            if (queueEmptyFlag.compare_exchange_strong(expEmpty, false))
+            if (queueEmptyFlag.compare_exchange_strong (expEmpty, false))
             {
-                condition.notify_all();
+                condition.notify_all ();
             }
         }
     }
@@ -206,9 +206,9 @@ class BlockingPriorityQueue
             {
                 pushElements.emplace_back (std::forward<Args> (args)...);
                 expEmpty = true;
-                if (queueEmptyFlag.compare_exchange_strong(expEmpty, false))
+                if (queueEmptyFlag.compare_exchange_strong (expEmpty, false))
                 {
-                    condition.notify_all();
+                    condition.notify_all ();
                 }
             }
         }
@@ -234,9 +234,9 @@ class BlockingPriorityQueue
             std::unique_lock<std::mutex> pullLock (m_pullLock);
             priorityQueue.emplace (std::forward<Args> (args)...);
             expEmpty = true;
-            if (queueEmptyFlag.compare_exchange_strong(expEmpty, false))
+            if (queueEmptyFlag.compare_exchange_strong (expEmpty, false))
             {
-                condition.notify_all();
+                condition.notify_all ();
             }
         }
     }
@@ -287,10 +287,10 @@ class BlockingPriorityQueue
                 return actval;
             }
             condition.wait (pullLock);  // now wait
-            if (!priorityQueue.empty())
+            if (!priorityQueue.empty ())
             {
-                auto actval = std::move(priorityQueue.front());
-                priorityQueue.pop();
+                auto actval = std::move (priorityQueue.front ());
+                priorityQueue.pop ();
                 return actval;
             }
             if (!pullElements.empty ())  // check for spurious wake-ups
@@ -335,10 +335,10 @@ class BlockingPriorityQueue
             }
             condition.wait (pullLock);
             // need to check again to handle spurious wake-up
-            if (!priorityQueue.empty())
+            if (!priorityQueue.empty ())
             {
-                auto actval = std::move(priorityQueue.front());
-                priorityQueue.pop();
+                auto actval = std::move (priorityQueue.front ());
+                priorityQueue.pop ();
                 return actval;
             }
             if (!pullElements.empty ())

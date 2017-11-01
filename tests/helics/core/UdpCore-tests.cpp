@@ -9,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include <boost/test/unit_test.hpp>
 
-#include <boost/asio/ip/udp.hpp>
+#include "helics/common/AsioServiceManager.h"
 #include "helics/core/ActionMessage.h"
 #include "helics/core/BrokerFactory.h"
 #include "helics/core/CoreFactory.h"
@@ -18,46 +18,49 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/udp/UdpBroker.h"
 #include "helics/core/udp/UdpComms.h"
 #include "helics/core/udp/UdpCore.h"
-#include "helics/common/AsioServiceManager.h"
+#include <boost/asio/ip/udp.hpp>
 
 //#include "boost/process.hpp"
 #include <future>
 
 BOOST_AUTO_TEST_SUITE (UDPCore_tests)
 
-using helics::Core;
 using boost::asio::ip::udp;
+using helics::Core;
 
-/*
-BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
+BOOST_AUTO_TEST_CASE (udpComms_broker_test)
 {
     std::atomic<int> counter{0};
-    std::string host = "tcp://127.0.0.1";
-    helics::ZmqComms comm (host, host);
+    std::string host = "localhost";
+    helics::UdpComms comm (host, host);
 
-    auto ctx = zmqContextManager::getContextPointer ();
-    zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
-    repSocket.bind ("tcp://127.0.0.1:23405");
+    auto srv = AsioServiceManager::getServicePointer ();
+
+    udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
 
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
-    comm.setBrokerPorts (23405);
+    comm.setBrokerPort (23901);
     comm.setName ("tests");
     auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
 
-    zmq::message_t rxmsg;
+    std::vector<char> data (1024);
 
-    repSocket.recv (&rxmsg);
+    udp::endpoint remote_endpoint;
+    boost::system::error_code error;
+    auto len = rxSocket.receive_from (boost::asio::buffer (data), remote_endpoint, 0, error);
 
-    BOOST_CHECK_GT (rxmsg.size (), 32);
+    BOOST_CHECK (!error);
+    BOOST_CHECK_GT (len, 32);
 
-    helics::ActionMessage rM (static_cast<char *> (rxmsg.data ()), rxmsg.size ());
-    BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_protocol);
+    helics::ActionMessage rM (data.data (), len);
+    BOOST_CHECK (helics::isProtocolCommand (rM));
     rM.index = DISCONNECT;
-    repSocket.send (rM.to_string ());
+    rxSocket.send_to (boost::asio::buffer (rM.to_string ()), remote_endpoint, 0, error);
+    BOOST_CHECK (!error);
     auto connected = confut.get ();
     BOOST_CHECK (!connected);
 }
-*/
+
 /** test the request set class with various scenarios*/
 /*
 BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
@@ -185,13 +188,13 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
 {
     std::atomic<int> counter{0};
     std::string host = "localhost";
-    helics::UdpComms comm (host,host);
+    helics::UdpComms comm (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
 
-    udp::socket rxSocket(AsioServiceManager::getService(), udp::endpoint(udp::v4(), 23901));
+    udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
 
-    BOOST_CHECK(rxSocket.is_open());
+    BOOST_CHECK (rxSocket.is_open ());
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
     comm.setBrokerPort (23901);
     comm.setPortNumber (23903);
@@ -199,44 +202,40 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
     comm.transmit (0, helics::CMD_IGNORE);
-    
-    std::vector<char> data(1024);
+
+    std::vector<char> data (1024);
 
     udp::endpoint remote_endpoint;
     boost::system::error_code error;
-   auto len=rxSocket.receive_from(boost::asio::buffer(data),
-        remote_endpoint, 0, error);
-
+    auto len = rxSocket.receive_from (boost::asio::buffer (data), remote_endpoint, 0, error);
 
     BOOST_CHECK_GT (len, 32);
-    helics::ActionMessage rM (data.data(),len);
+    helics::ActionMessage rM (data.data (), len);
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     comm.disconnect ();
 }
-
 
 BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
 {
     std::atomic<int> counter{0};
     helics::ActionMessage act;
     std::string host = "localhost";
-    helics::UdpComms comm(host, host);
+    helics::UdpComms comm (host, host);
 
-    auto srv = AsioServiceManager::getServicePointer();
+    auto srv = AsioServiceManager::getServicePointer ();
 
-    udp::resolver resolver(AsioServiceManager::getService());
-    udp::socket rxSocket(AsioServiceManager::getService(), udp::endpoint(udp::v4(), 23901));
+    udp::resolver resolver (AsioServiceManager::getService ());
+    udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
 
-    BOOST_CHECK(rxSocket.is_open());
-    comm.setCallback([&counter, &act](helics::ActionMessage m) {
+    BOOST_CHECK (rxSocket.is_open ());
+    comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
         act = m;
     });
-    comm.setBrokerPort(23901);
-    comm.setPortNumber(23903);
-    comm.setName("tests");
+    comm.setBrokerPort (23901);
+    comm.setPortNumber (23903);
+    comm.setName ("tests");
 
-   
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
         act = m;
@@ -245,23 +244,21 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
 
-    udp::resolver::query queryNew(udp::v4(),"localhost", "23903");
+    udp::resolver::query queryNew (udp::v4 (), "localhost", "23903");
 
-    auto txendpoint = *resolver.resolve(queryNew);
+    auto txendpoint = *resolver.resolve (queryNew);
 
     helics::ActionMessage cmd (helics::CMD_ACK);
     std::string buffer = cmd.to_string ();
-    
-    auto cnt = rxSocket.send_to (boost::asio::buffer(buffer), txendpoint);
+
+    auto cnt = rxSocket.send_to (boost::asio::buffer (buffer), txendpoint);
     BOOST_REQUIRE_EQUAL (cnt, buffer.size ());
-   
 
     std::this_thread::sleep_for (std::chrono::milliseconds (200));
     BOOST_REQUIRE_EQUAL (counter, 1);
     BOOST_CHECK (act.action () == helics::action_message_def::action_t::cmd_ack);
     comm.disconnect ();
 }
-
 
 BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
 {
@@ -274,7 +271,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
     helics::UdpComms comm (host, host);
     helics::UdpComms comm2 (host, "");
 
-    comm.setBrokerPort(23901);
+    comm.setBrokerPort (23901);
     comm.setName ("tests");
     comm2.setName ("test2");
     comm2.setPortNumber (23901);
@@ -310,7 +307,6 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
     comm.disconnect ();
     comm2.disconnect ();
 }
-
 
 BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
 {

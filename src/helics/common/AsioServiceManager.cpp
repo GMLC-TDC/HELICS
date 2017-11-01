@@ -20,7 +20,7 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 
 #include "AsioServiceManager.h"
 
-#include<boost/asio/io_service.hpp>
+#include <boost/asio/io_service.hpp>
 
 #include <map>
 #include <mutex>
@@ -35,8 +35,8 @@ static std::mutex serviceLock;
 
 std::shared_ptr<AsioServiceManager> AsioServiceManager::getServicePointer (const std::string &serviceName)
 {
-    std::lock_guard<std::mutex> serveLock(
-        serviceLock);  // just to ensure that nothing funny happens if you try to get a context
+    std::lock_guard<std::mutex> serveLock (
+      serviceLock);  // just to ensure that nothing funny happens if you try to get a context
                      // while it is being constructed
     auto fnd = services.find (serviceName);
     if (fnd != services.end ())
@@ -44,7 +44,7 @@ std::shared_ptr<AsioServiceManager> AsioServiceManager::getServicePointer (const
         return fnd->second;
     }
 
-    auto newService= std::shared_ptr<AsioServiceManager> (new AsioServiceManager(serviceName));
+    auto newService = std::shared_ptr<AsioServiceManager> (new AsioServiceManager (serviceName));
     services.emplace (serviceName, newService);
     return newService;
     // if it doesn't make a new one with the appropriate name
@@ -74,7 +74,7 @@ void AsioServiceManager::setServiceToLeakOnDelete (const std::string &serviceNam
         fnd->second->leakOnDelete = true;
     }
 }
-AsioServiceManager::~AsioServiceManager()
+AsioServiceManager::~AsioServiceManager ()
 {
     if (leakOnDelete)
     {
@@ -84,7 +84,7 @@ AsioServiceManager::~AsioServiceManager()
     }
 }
 
-AsioServiceManager::AsioServiceManager(const std::string &serviceName) : name (serviceName)
+AsioServiceManager::AsioServiceManager (const std::string &serviceName) : name (serviceName)
 {
     iserv = std::make_unique<boost::asio::io_service> ();
 }

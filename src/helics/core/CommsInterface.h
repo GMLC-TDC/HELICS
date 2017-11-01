@@ -56,10 +56,11 @@ protected:
 	//enumeration of the connection status flags for more immediate feedback from the processing threads
 	enum class connection_status :int
 	{
-		error = -1,	//!< some error occurred on the connection
-		startup = 0, //!< the connection is in startup mode
-		connected = 1,	//!< we are connected
+		
+		startup = -1, //!< the connection is in startup mode
+		connected = 0,	//!< we are connected
 		terminated=2,	//!< the connection has been terminated
+        error = 4,	//!< some error occurred on the connection
 
 	};
 	std::atomic<connection_status> rx_status{ connection_status::startup }; //!< the status of the receiver thread

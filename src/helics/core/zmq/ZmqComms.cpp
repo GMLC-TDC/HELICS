@@ -96,7 +96,7 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
         }
     }
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-    if (isProtocolCommand(M))
+    if (isProtocolCommand (M))
     {
         switch (M.index)
         {
@@ -113,7 +113,7 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
 int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
 {
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-    if (isProtocolCommand(M))
+    if (isProtocolCommand (M))
     {
         switch (M.index)
         {
@@ -168,7 +168,7 @@ void ZmqComms::queue_rx_function ()
         zmq::message_t msg;
         controlSocket.recv (&msg);
         ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-        if (isProtocolCommand(M))
+        if (isProtocolCommand (M))
         {
             if (M.index == PORT_DEFINITIONS)
             {
@@ -330,7 +330,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 brokerReq.recv (&msg);
 
                 ActionMessage rxcmd (static_cast<char *> (msg.data ()), msg.size ());
-                if (isProtocolCommand(rxcmd))
+                if (isProtocolCommand (rxcmd))
                 {
                     if (rxcmd.index == PORT_DEFINITIONS)
                     {
@@ -382,7 +382,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 brokerReq.recv (&msg);
 
                 ActionMessage rxcmd (static_cast<char *> (msg.data ()), msg.size ());
-                if (isProtocolCommand(rxcmd))
+                if (isProtocolCommand (rxcmd))
                 {
                     if (rxcmd.index == PORT_DEFINITIONS)
                     {
@@ -499,8 +499,8 @@ void ZmqComms::queue_tx_function ()
         {
             std::tie (route_id, cmd) = txQueue.pop ();
         }
-
-        if (isProtocolCommand(cmd))
+        bool processed = false;
+        if (isProtocolCommand (cmd))
         {
             if (route_id == -1)
             {
@@ -530,7 +530,7 @@ void ZmqComms::queue_tx_function ()
                         catch (const zmq::error_t &e)
                         {
                             // TODO:: do something???
-                            std::cerr << e.what() << '\n';
+                            std::cerr << e.what () << '\n';
                         }
                     }
                     try
@@ -543,6 +543,7 @@ void ZmqComms::queue_tx_function ()
                     {
                         // TODO:: do something???
                     }
+                    processed = true;
                 }
                 break;
                 case DISCONNECT:
@@ -550,7 +551,10 @@ void ZmqComms::queue_tx_function ()
                 }
             }
         }
-
+        if (processed)
+        {
+            continue;
+        }
         if (isPriorityCommand (cmd))
         {
             if ((route_id == 0) && (!hasBroker))
@@ -560,11 +564,11 @@ void ZmqComms::queue_tx_function ()
             }
             else if (route_id == -1)
             {  // send to rx thread loop
-                cmd.to_vector(buffer);
-                controlSocket.send(buffer.data(), buffer.size());
+                cmd.to_vector (buffer);
+                controlSocket.send (buffer.data (), buffer.size ());
                 continue;
             }
-            if (priority_routes.transmit(route_id, cmd))
+            if (priority_routes.transmit (route_id, cmd))
             {
                 continue;
             }

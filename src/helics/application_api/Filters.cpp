@@ -115,33 +115,33 @@ enum class random_dists_t : int
     student_t
 };
 
-double randDouble(random_dists_t dist, double p1, double p2)
+double randDouble (random_dists_t dist, double p1, double p2)
 {
 #ifndef __apple_build_version__
-    static thread_local std::mt19937 generator(
-        std::random_device{}() +
-        static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id())));
+    static thread_local std::mt19937 generator (
+      std::random_device{}() +
+      static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
 #else
 #if __clang_major__ >= 8
-    static thread_local std::mt19937 generator(
-        std::random_device{}() +
-        static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id())));
+    static thread_local std::mt19937 generator (
+      std::random_device{}() +
+      static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
 #else
     // this will leak on thread termination,  older apple clang does not have proper thread_local variables so
     // there really isn't any option
-  //  static __thread std::mt19937 *genPtr =
+    //  static __thread std::mt19937 *genPtr =
     //    new std::mt19937(std::random_device{}() +
     //        static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id())));
 
     static __thread std::mt19937 *genPtr = nullptr;
     if (genPtr == nullptr)
     {
-        genPtr= new std::mt19937(std::random_device{}() +
-            static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id())));
+        genPtr =
+          new std::mt19937 (std::random_device{}() +
+                            static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
     }
-        
-    auto &generator = *genPtr;
 
+    auto &generator = *genPtr;
 
 #endif
 #endif
