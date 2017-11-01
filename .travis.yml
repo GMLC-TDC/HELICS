@@ -21,14 +21,16 @@ matrix:
     # so leave this first for the overall build to be faster
     ##########################################################################
 
+    # XCode 6.4, OS X 10.10
     - env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release"
       os: osx
-      osx_image: xcode8.3
+      osx_image: xcode6.4
       compiler: clang
 
+    # XCode 7.3, OS X 10.11
     - env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release"
       os: osx
-      osx_image: xcode9.1
+      osx_image: xcode7.3
       compiler: clang
 
     - compiler: gcc
@@ -74,7 +76,7 @@ before_install:
   - eval "${MATRIX_EVAL}"
 
 install:
-  - ./scripts/install-ci-dependencies.sh
+  - source scripts/install-ci-dependencies.sh
 
 script:
   - mkdir build && cd build
