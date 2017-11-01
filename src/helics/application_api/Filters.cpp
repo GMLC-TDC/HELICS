@@ -173,6 +173,31 @@ double randDouble (random_dists_t dist, double p1, double p2)
         std::cauchy_distribution<double> distribution (p1, p2);
         return distribution (generator);
     }
+    case random_dists_t::chi_squared:
+    {
+        std::chi_squared_distribution<double> distribution(p1);
+        return distribution(generator);
+    }
+    case random_dists_t::exponential:
+    {
+        std::exponential_distribution<double> distribution(p1);
+        return distribution(generator);
+    }
+    case random_dists_t::extreme_value:
+    {
+        std::extreme_value_distribution<double> distribution(p1, p2);
+        return distribution(generator);
+    }
+    case random_dists_t::fisher_f:
+    {
+        std::fisher_f_distribution<double> distribution(p1, p2);
+        return distribution(generator);
+    }
+    case random_dists_t::weibull:
+    {
+        std::weibull_distribution<double> distribution(p1, p2);
+        return distribution(generator);
+    }
     break;
     }
 
