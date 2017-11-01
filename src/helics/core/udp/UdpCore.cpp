@@ -70,9 +70,9 @@ void UdpCore::InitializeFromArgs (int argc, const char *const *argv)
                     // TODO::Print a message?
                 }
             }
-            if ((brokerAddress == "udp://*") || (brokerAddress == "udp"))
+            if ((brokerAddress == "*") || (brokerAddress == "udp"))
             {  // the broker address can't use a wild card
-                brokerAddress = "udp://127.0.0.1";
+                brokerAddress = "localhost";
             }
         }
         if (vm.count ("local_interface") > 0)
@@ -83,7 +83,7 @@ void UdpCore::InitializeFromArgs (int argc, const char *const *argv)
         }
         else
         {
-            localInterface = "tcp://127.0.0.1";
+            localInterface = "localhost";
         }
         if (vm.count ("port") > 0)
         {PortNumber = vm["port"].as<int> ();
@@ -107,7 +107,7 @@ bool UdpCore::brokerConnect ()
     std::lock_guard<std::mutex> lock (dataMutex);
     if (brokerAddress.empty ())  // cores require a broker
     {
-        brokerAddress = "127.0.0.1";
+        brokerAddress = "localhost";
     }
     comms = std::make_unique<UdpComms> (localInterface, brokerAddress);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });

@@ -416,7 +416,6 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
     repSocket.send (resp.to_string ());
 
     core->disconnect ();
-    // boost::interprocess::message_queue::remove("testbroker");
 }
 
 /** test case checks default values and makes sure they all mesh together

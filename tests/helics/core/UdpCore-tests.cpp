@@ -393,61 +393,61 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     comm3.disconnect ();
 }
 
-/*
-BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
+BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
 {
     std::string initializationString =
-      "1 --brokerport=23405 --repport=23410 --local_interface=tcp://127.0.0.1 --name=core1";
-    auto core = helics::CoreFactory::create (helics::core_type::ZMQ, initializationString);
+      "1 --brokerport=23901  --port=23950 --local_interface=localhost --name=core1";
+    auto core = helics::CoreFactory::create (helics::core_type::UDP, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
     BOOST_CHECK (core->isInitialized ());
-    auto ctx = zmqContextManager::getContextPointer ();
-    zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
-    repSocket.bind ("tcp://127.0.0.1:23405");
+    auto srv = AsioServiceManager::getServicePointer ();
+    udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
 
-    zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
-    pullSocket.bind ("tcp://127.0.0.1:23406");
+    BOOST_CHECK (rxSocket.is_open ());
+
     bool connected = core->connect ();
     BOOST_REQUIRE (connected);
 
-    zmq::message_t rxmsg;
+    std::vector<char> data (1024);
 
-    repSocket.recv (&rxmsg);
+    udp::endpoint remote_endpoint;
+    boost::system::error_code error;
 
-    BOOST_CHECK_GT (rxmsg.size (), 32);
-    helics::ActionMessage rM (static_cast<char *> (rxmsg.data ()), rxmsg.size ());
+    auto len = rxSocket.receive_from (boost::asio::buffer (data), remote_endpoint, 0, error);
+    BOOST_REQUIRE (!error);
+    BOOST_CHECK_GT (len, 32);
+    helics::ActionMessage rM (data.data (), len);
 
     BOOST_CHECK_EQUAL (rM.name, "core1");
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_reg_broker);
     helics::ActionMessage resp (helics::CMD_PRIORITY_ACK);
-    repSocket.send (resp.to_string ());
-
+    rxSocket.send_to (boost::asio::buffer (resp.to_string ()), remote_endpoint, 0, error);
+    BOOST_CHECK (!error);
     core->disconnect ();
-    // boost::interprocess::message_queue::remove("testbroker");
 }
-*/
+
 /** test case checks default values and makes sure they all mesh together
 also tests the automatic port determination for cores
 */
-/*
-BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
+
+BOOST_AUTO_TEST_CASE (udpCore_core_broker_default_test)
 {
     std::string initializationString = "1";
 
-    auto broker = helics::BrokerFactory::create (helics::core_type::ZMQ, initializationString);
+    auto broker = helics::BrokerFactory::create (helics::core_type::UDP, initializationString);
 
-    auto core = helics::CoreFactory::create (helics::core_type::ZMQ, initializationString);
+    auto core = helics::CoreFactory::create (helics::core_type::UDP, initializationString);
     bool connected = broker->isConnected ();
     BOOST_CHECK (connected);
     connected = core->connect ();
     BOOST_CHECK (connected);
 
-    auto ccore = static_cast<helics::ZmqCore *> (core.get ());
+    auto ccore = static_cast<helics::UdpCore *> (core.get ());
     // this will test the automatic port allocation
-    BOOST_CHECK_EQUAL (ccore->getAddress (), "tcp://127.0.0.1:23500;tcp://127.0.0.1:23501");
+    BOOST_CHECK_EQUAL (ccore->getAddress (), "localhost:23964");
     core->disconnect ();
     broker->disconnect ();
 }
-*/
+
 BOOST_AUTO_TEST_SUITE_END ()

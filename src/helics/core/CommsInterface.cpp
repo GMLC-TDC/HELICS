@@ -200,16 +200,24 @@ std::pair<std::string, int> extractInterfaceandPort (const std::string &address)
 {
     std::pair<std::string, int> ret;
     auto lastColon = address.find_last_of (':');
-    try
-    {
-        auto val = std::stoi (address.substr (lastColon + 1));
-        ret.first = address.substr (0, lastColon);
-        ret.second = val;
-    }
-    catch (const std::invalid_argument &)
+    if (lastColon == std::string::npos)
     {
         ret = std::make_pair (address, -1);
     }
+    else
+    {
+        try
+        {
+            auto val = std::stoi (address.substr (lastColon + 1));
+            ret.first = address.substr (0, lastColon);
+            ret.second = val;
+        }
+        catch (const std::invalid_argument &)
+        {
+            ret = std::make_pair (address, -1);
+        }
+    }
+
     return ret;
 }
 

@@ -248,7 +248,7 @@ void UdpComms::queue_tx_function ()
                 {
                     if (m.index == PORT_DEFINITIONS)
                     {
-                        PortNumber = m.dest_id;
+                        PortNumber = m.source_handle;
                         promisePort.set_value(PortNumber);
                     }
                     else if (m.index == DISCONNECT)

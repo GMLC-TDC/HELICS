@@ -83,9 +83,9 @@ void UdpBroker::InitializeFromArgs (int argc, const char *const *argv)
                     // TODO::Print a message?
                 }
             }
-            if (brokerAddress == "udp://*")
+            if ((brokerAddress == "udp://*")||(brokerAddress=="*"))
             {  // the broker address can't use a wild card
-                brokerAddress = "127.0.0.1";
+                brokerAddress = "localhost";
             }
         }
         if (vm.count ("local_interface") > 0)
