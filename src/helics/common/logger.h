@@ -138,6 +138,17 @@ public:
 
 };
 
+/** class to manage a single thread for all logging*/
+class loggingCore
+{
+private:
+    std::thread loggingThread;	//!< the thread object containing the thread running the actual logger
+    std::vector<std::function<void(const std::string &message)>> functions;
+    std::mutex functionLock;
+    BlockingQueue3<std::pair<int32_t, std::string>> loggingQueue;  //!< the actual queue containing the strings to log
+public:
+   
+};
 
 /** class defining a singleton manager for all logging use*/
 class loggerManager
