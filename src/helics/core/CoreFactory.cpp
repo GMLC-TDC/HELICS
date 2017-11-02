@@ -17,13 +17,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #endif
 
 #if HELICS_HAVE_MPI
-#include "mpi/mpi-core.h"
+#include "mpi/MpiCore.h"
 #endif
 
 #include "TestCore.h"
 #include "common/delayedDestructor.hpp"
 #include "common/searchableObjectHolder.hpp"
 #include "ipc/IpcCore.h"
+#include "udp/UdpCore.h"
 #include <cassert>
 
 namespace helics
@@ -90,7 +91,6 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
     switch (type)
     {
     case core_type::ZMQ:
-    {
 #if HELICS_HAVE_ZEROMQ
         if (name.empty ())
         {
@@ -105,9 +105,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         assert (false);
 #endif
         break;
-    }
     case core_type::MPI:
-    {
 #if HELICS_HAVE_MPI
         if (name.empty ())
         {
@@ -121,9 +119,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         assert (false);
 #endif
         break;
-    }
     case core_type::TEST:
-    {
         if (name.empty ())
         {
             core = std::make_shared<TestCore> ();
@@ -133,7 +129,6 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<TestCore> (name);
         }
         break;
-    }
     case core_type::INTERPROCESS:
     case core_type::IPC:
         if (name.empty ())
@@ -143,6 +138,16 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         else
         {
             core = std::make_shared<IpcCore> (name);
+        }
+        break;
+    case core_type::UDP:
+        if (name.empty ())
+        {
+            core = std::make_shared<UdpCore> ();
+        }
+        else
+        {
+            core = std::make_shared<UdpCore> (name);
         }
         break;
     default:
@@ -280,7 +285,9 @@ bool isAvailable (core_type type)
         available = true;
         break;
     case core_type::TCP:
+        break;
     case core_type::UDP:
+        available = true;
         break;
     default:
         assert (false);

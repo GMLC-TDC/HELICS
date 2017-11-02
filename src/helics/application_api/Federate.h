@@ -33,6 +33,7 @@ namespace helics
 {
 class Core;
 class asyncFedCallInfo;
+class MessageOperator;
 /** data class defining federate properties and information
  */
 class FederateInfo
@@ -42,9 +43,7 @@ class FederateInfo
     bool observer =
       false;  //!< indicator that the federate is an observer and doesn't participate in time advancement
     bool rollback = false;  //!< indicator that the federate has rollback features
-    bool timeAgnostic = false;  //!< indicator that the federate doesn't use time
-    bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must
-                                  //! support rollback if set to true]
+    bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must                         //! support rollback if set to true]
     bool uninterruptible =
       false;  //!< indicator that the time request cannot return something other than the requested time
     bool sourceOnly = false;  //!< indicator that the federate is a source only
@@ -205,7 +204,7 @@ class Federate
     @return the granted time step*/
     iterationTime requestTimeIterativeFinalize ();
 
-    /** set the mimimum time delta for the federate
+    /** set the minimum time delta for the federate
     @param[in] tdelta the minimum time delta to return from a time request function
     */
     void setTimeDelta (Time tdelta);

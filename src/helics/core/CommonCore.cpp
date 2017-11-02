@@ -824,6 +824,16 @@ Handle CommonCore::getPublication (federate_id_t federateID, const std::string &
     return invalid_Handle;
 }
 
+const std::string &CommonCore::getHandleName(Handle handle) const
+{
+    auto handleInfo = getHandleInfo(handle);
+    if (handleInfo != nullptr)
+    {
+        return handleInfo->key;
+    }
+    return nullStr;
+}
+
 const std::string nullStr;
 
 const std::string &CommonCore::getUnits (Handle handle) const
@@ -945,18 +955,13 @@ Handle CommonCore::registerEndpoint (federate_id_t federateID, const std::string
     return id;
 }
 
-Handle CommonCore::registerSourceFilter (federate_id_t federateID,
-                                         const std::string &filterName,
+Handle CommonCore::registerSourceFilter (const std::string &filterName,
                                          const std::string &source,
                                          const std::string &type_in,
                                          const std::string &type_out)
 {
-    auto fed = getFederate (federateID);
-    if (fed == nullptr)
-    {
-        throw (invalidIdentifier ("federateID not valid"));
-    }
-    if (fed->getState () != HELICS_CREATED)
+   
+    if (operating)
     {
         throw (invalidFunctionCall ());
     }
@@ -1001,17 +1006,12 @@ Handle CommonCore::registerSourceFilter (federate_id_t federateID,
     return id;
 }
 
-Handle CommonCore::registerDestinationFilter (federate_id_t federateID,
-                                              const std::string &filterName,
+Handle CommonCore::registerDestinationFilter (const std::string &filterName,
                                               const std::string &dest,
                                               const std::string &type_in,
                                               const std::string &type_out)
 {
-    auto fed = getFederate (federateID);
-    if (fed == nullptr)
-    {
-        throw (invalidIdentifier ("federateID not valid"));
-    }
+
     if (fed->getState () != HELICS_CREATED)
     {
         throw (invalidFunctionCall ());

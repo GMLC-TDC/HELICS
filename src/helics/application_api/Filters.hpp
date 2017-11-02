@@ -81,6 +81,20 @@ class randomDropFilterOperation : public FilterOperations
     virtual std::shared_ptr<MessageOperator> getOperator () override;
 };
 
+/** filter for rerouting a packet to a particular endpoint*/
+class rerouteFilterOperation : public FilterOperations
+{
+private:
+    std::shared_ptr<MessageDestOperator> op; //!<the actual operator
+    std::atomic<std::string> newTarget; //!< the target destination
+public:
+    rerouteFilterOperation();
+    ~rerouteFilterOperation();
+    virtual void set(const std::string &property, double val) override;
+    virtual void setString(const std::string &property, const std::string &val) override;
+    virtual std::shared_ptr<MessageOperator> getOperator() override;
+};
+
 /** class for managing a particular filter*/
 class Filter
 {

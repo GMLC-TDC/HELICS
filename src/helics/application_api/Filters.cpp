@@ -12,6 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "Filters.hpp"
 #include "MessageOperators.h"
 
+#include <map>
 #include <memory>
 #include <random>
 #include <thread>
@@ -37,6 +38,11 @@ static void addOperations (Filter *filt, defined_filter_types type)
     }
     break;
     case randomDrop:
+    {
+        auto op = std::make_shared<randomDropFilterOperation> ();
+        filt->setFilterOperations (std::move (op));
+    }
+    case reroute:
     {
         auto op = std::make_shared<randomDropFilterOperation> ();
         filt->setFilterOperations (std::move (op));
@@ -115,6 +121,14 @@ enum class random_dists_t : int
     student_t
 };
 
+static const std::map<std::string, random_dists_t> distMap{
+  {"constant", constant},           {"uniform", uniform},     {"bernoulli", bernoulli},
+  {"binomial", binomial},           {"geometric", geometric}, {"poisson", poisson},
+  {"exponential", exponential},     {"gamma", gamma},         {"weibull", weibull},
+  {"extreme_value", extreme_value}, {"normal", normal},       {"lognormal", lognormal},
+  {"chi_squared", chi_squared},     {"cauchy", cauchy},       {"fisher_f", fisher_f},
+  {"student_t", student_t}};
+
 double randDouble (random_dists_t dist, double p1, double p2)
 {
 #ifndef __apple_build_version__
@@ -129,10 +143,20 @@ double randDouble (random_dists_t dist, double p1, double p2)
 #else
     // this will leak on thread termination,  older apple clang does not have proper thread_local variables so
     // there really isn't any option
-    static __thread std::mt19937 *genPtr =
-      new std::mt19937 (std::random_device{}() +
-                        static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
+    //  static __thread std::mt19937 *genPtr =
+    //    new std::mt19937(std::random_device{}() +
+    //        static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id())));
+
+    static __thread std::mt19937 *genPtr = nullptr;
+    if (genPtr == nullptr)
+    {
+        genPtr =
+          new std::mt19937 (std::random_device{}() +
+                            static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
+    }
+
     auto &generator = *genPtr;
+
 #endif
 #endif
     switch (dist)
@@ -161,58 +185,58 @@ double randDouble (random_dists_t dist, double p1, double p2)
     }
     case random_dists_t::chi_squared:
     {
-        std::chi_squared_distribution<double> distribution(p1);
-        return distribution(generator);
+        std::chi_squared_distribution<double> distribution (p1);
+        return distribution (generator);
     }
     case random_dists_t::exponential:
     {
-        std::exponential_distribution<double> distribution(p1);
-        return distribution(generator);
+        std::exponential_distribution<double> distribution (p1);
+        return distribution (generator);
     }
     case random_dists_t::extreme_value:
     {
-        std::extreme_value_distribution<double> distribution(p1, p2);
-        return distribution(generator);
+        std::extreme_value_distribution<double> distribution (p1, p2);
+        return distribution (generator);
     }
     case random_dists_t::fisher_f:
     {
-        std::fisher_f_distribution<double> distribution(p1, p2);
-        return distribution(generator);
+        std::fisher_f_distribution<double> distribution (p1, p2);
+        return distribution (generator);
     }
     case random_dists_t::weibull:
     {
-        std::weibull_distribution<double> distribution(p1, p2);
-        return distribution(generator);
+        std::weibull_distribution<double> distribution (p1, p2);
+        return distribution (generator);
     }
     case random_dists_t::student_t:
     {
-        std::student_t_distribution<double> distribution(p1);
-        return distribution(generator);
+        std::student_t_distribution<double> distribution (p1);
+        return distribution (generator);
     }
     case random_dists_t::geometric:
-    { //integer multiples of some period
-        std::geometric_distribution<int> distribution(p1);
-        return distribution(generator)*p2;  
+    {  // integer multiples of some period
+        std::geometric_distribution<int> distribution (p1);
+        return distribution (generator) * p2;
     }
     case random_dists_t::poisson:
-    {//integer multiples of some period
-        std::poisson_distribution<int> distribution(p1);
-        return distribution(generator)*p2;
+    {  // integer multiples of some period
+        std::poisson_distribution<int> distribution (p1);
+        return distribution (generator) * p2;
     }
     case random_dists_t::bernoulli:
     {
-        std::bernoulli_distribution distribution(p1);
-        return distribution(generator)?p2:0.0;
+        std::bernoulli_distribution distribution (p1);
+        return distribution (generator) ? p2 : 0.0;
     }
     case random_dists_t::binomial:
     {
-        std::binomial_distribution<int> distribution(static_cast<int>(p1),p2);
-        return static_cast<double>(distribution(generator));
+        std::binomial_distribution<int> distribution (static_cast<int> (p1), p2);
+        return static_cast<double> (distribution (generator));
     }
     case random_dists_t::gamma:
     {
-        std::gamma_distribution<double> distribution(p1, p2);
-        return distribution(generator);
+        std::gamma_distribution<double> distribution (p1, p2);
+        return distribution (generator);
     }
     break;
     }
@@ -220,16 +244,47 @@ double randDouble (random_dists_t dist, double p1, double p2)
     // return 0.0;
 }
 
+/** class wrapping the distribution generation functions and parameters*/
 class randomDelayGenerator
 {
   public:
-    Time delay;
+    std::atomic<random_dists_t> dist;  //!< the distribution
+    std::atomic<double> param1{0.0};  //!< parameter 1 typically mean or min
+    std::atomic<double> param2{0.0};  //!< parameter 2 typically stddev or max
+
+    double generate () { return randDouble (dist.load (), param1.load (), param2.load ()); }
 };
 
-randomDelayFilterOperation::randomDelayFilterOperation () {}
-randomDelayFilterOperation::~randomDelayFilterOperation () {}
-void randomDelayFilterOperation::set (const std::string &property, double val) {}
-void randomDelayFilterOperation::setString (const std::string &property, const std::string &val) {}
+randomDelayFilterOperation::randomDelayFilterOperation ()
+{
+    rdelayGen = std::make_unique<randomDelayGenerator> ();
+    td = std::make_shared<MessageTimeOperator> (
+      [this](Time messageTime) { return messageTime + rdelayGen->generate (); });
+}
+randomDelayFilterOperation::~randomDelayFilterOperation () = default;
+
+void randomDelayFilterOperation::set (const std::string &property, double val)
+{
+    if ((property == "param1") || (property == "mean") || (property == "min") || (property == "alpha"))
+    {
+        rdelayGen->param1.store (val);
+    }
+    else if ((property == "param2") || (property == "stddev") || (property == "max") || (property == "beta"))
+    {
+        rdelayGen->param2.store (val);
+    }
+}
+void randomDelayFilterOperation::setString (const std::string &property, const std::string &val)
+{
+    if ((property == "dist") || (property == "distribution"))
+    {
+        auto res = distMap.find (val);
+        if (res != distMap.end ())
+        {
+            rdelayGen->dist.store (res->second);
+        }
+    }
+}
 
 std::shared_ptr<MessageOperator> randomDelayFilterOperation::getOperator ()
 {
@@ -239,11 +294,11 @@ std::shared_ptr<MessageOperator> randomDelayFilterOperation::getOperator ()
 randomDropFilterOperation::randomDropFilterOperation ()
 {
     tcond = std::make_shared<MessageConditionalOperator> (
-      [this](const Message *) { return (randDouble (random_dists_t::uniform, 0, 1.0) < dropProb); });
+      [this](const Message *) { return (randDouble (random_dists_t::bernoulli, dropProb, 1.0) > 0.1); });
 }
 
-randomDropFilterOperation::~randomDropFilterOperation () {}
-void randomDropFilterOperation::set (const std::string &property, double val) 
+randomDropFilterOperation::~randomDropFilterOperation () = default;
+void randomDropFilterOperation::set (const std::string &property, double val)
 {
     if ((property == "dropprob") || (property == "prob"))
     {
@@ -256,4 +311,26 @@ std::shared_ptr<MessageOperator> randomDropFilterOperation::getOperator ()
 {
     return std::static_pointer_cast<MessageOperator> (tcond);
 }
+
+rerouteFilterOperation::rerouteFilterOperation ()
+{
+    op = std::make_shared<MessageDestOperator> ([this](const std::string &dest) { return newTarget.load (); });
+}
+rerouteFilterOperation::~rerouteFilterOperation () = default;
+
+void rerouteFilterOperation::set (const std::string &property, double val) {}
+
+void rerouteFilterOperation::setString (const std::string &property, const std::string &val)
+{
+    if (property == "target")
+    {
+        newTarget = val;
+    }
+}
+
+std::shared_ptr<MessageOperator> rerouteFilterOperation::getOperator ()
+{
+    return std::static_pointer_cast<MessageOperator> (op);
+}
+
 }  // namespace helics

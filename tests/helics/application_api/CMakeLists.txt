@@ -41,6 +41,10 @@ target_link_libraries(application-api-tests ${external_library_list})
 
 target_link_libraries(application-api-tests ${Boost_LIBRARIES_test})
 
+IF(MINGW)
+	target_link_libraries(application-api-tests ws2_32)
+ENDIF(MINGW)
+
 ADD_DEFINITIONS(-DHELICS_BROKER_LOCATION="${HELICS_BROKER_LOC}")
 ADD_DEFINITIONS(-DHELICS_INSTALL_LOCATION="${CMAKE_INSTALL_PREFIX}")
 

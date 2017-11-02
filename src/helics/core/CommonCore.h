@@ -82,6 +82,7 @@ CommonCore(const std::string &core_name);
   virtual Handle getSubscription (federate_id_t federateID, const std::string &key) override final;
   virtual Handle registerPublication (federate_id_t federateID, const std::string &key, const std::string &type, const std::string &units) override final;
   virtual Handle getPublication (federate_id_t federateID, const std::string &key) override final;
+  virtual const std::string &getHandleName(Handle handle) const override final;
   virtual const std::string &getUnits (Handle handle) const override final;
   virtual const std::string &getType (Handle handle) const override final;
   virtual void setValue (Handle handle, const char *data, uint64_t len) override final;

@@ -661,21 +661,7 @@ filter_id_t Federate::registerSourceFilter(const std::string &filterName,
     const std::string &inputType,
     const std::string &outputType)
 {
-    std::lock_guard<std::mutex> fLock(filterLock);
-    filter_id_t id = static_cast<identifier_type> (filters.size());
-    filters.emplace_back(filterName, sourceEndpoint, inputType, outputType);
-    filters.back().id = id;
-    filters.back().ftype = filter_type::source_filter;
-    filters.back().handle =
-        coreObject->registerSourceFilter(fedID, filterName, sourceEndpoint, inputType, outputType);
-    SourceFilterNames.emplace(filterName, id);
-    if (filterName != sourceEndpoint)
-    {
-        SourceFilterNames.emplace(sourceEndpoint, id);
-    }
-    filterQueues.resize(id.value());
-    handleLookup.emplace(filters.back().handle, id);
-    return id;
+       return coreObject->registerSourceFilter( filterName, sourceEndpoint, inputType, outputType);
 }
 
 filter_id_t Federate::registerDestinationFilter(const std::string &filterName,
@@ -683,26 +669,12 @@ filter_id_t Federate::registerDestinationFilter(const std::string &filterName,
     const std::string &inputType,
     const std::string &outputType)
 {
-    std::lock_guard<std::mutex> fLock(filterLock);
-    filter_id_t id = static_cast<identifier_type> (filters.size());
-    filters.emplace_back(filterName, destEndpoint, inputType, outputType);
-    filters.back().id = id;
-    filters.back().ftype = filter_type::dest_filter;
-    DestFilterNames.emplace(filterName, id);
-    if (filterName != destEndpoint)
-    {
-        DestFilterNames.emplace(destEndpoint, id);
-    }
-    filters.back().handle =
-        coreObject->registerDestinationFilter(fedID, filterName, destEndpoint, inputType, outputType);
-    handleLookup.emplace(filters.back().handle, id);
-    return id;
+       return coreObject->registerDestinationFilter(filterName, destEndpoint, inputType, outputType);
 }
 
 std::string Federate::getFilterName(filter_id_t id) const
 {
-    std::lock_guard<std::mutex> fLock(filterLock);
-    return (id.value() < filters.size()) ? (filters[id.value()].name) : nullStr;
+    coreObject->get
 }
 std::string Federate::getFilterEndpoint(filter_id_t id) const
 {

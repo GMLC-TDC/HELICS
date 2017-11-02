@@ -1,0 +1,28 @@
+shallow_clone: true
+
+version: 0.3.{build}
+
+image: Visual Studio 2015
+
+platform:
+  - x64
+
+configuration:
+  - Release
+
+install:
+
+before_build:
+  - mkdir build
+  - cd build
+  - cmake .. -G "Visual Studio 14 2015 Win64" -DAUTOBUILD_ZMQ=ON  -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=ON -DBOOST_ROOT="C:\Libraries\boost_1_62_0"
+  - cd ..
+
+build:
+  project: build/HELICS.sln
+  parallel: true
+  verbosity: minimal
+
+after_build:
+
+artifacts:

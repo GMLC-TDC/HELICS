@@ -361,6 +361,11 @@ class Core
     virtual Handle getPublication (federate_id_t federateID, const std::string &key) = 0;
 
     /**
+    * Returns the name or identifier for a specified handle
+    */
+    virtual const std::string &getHandleName(Handle handle) const = 0;
+
+    /**
      * Returns units for specified handle.
      */
     virtual const std::string &getUnits (Handle handle) const= 0;

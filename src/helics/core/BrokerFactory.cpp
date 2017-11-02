@@ -23,6 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/core/TestBroker.h"
 #include "helics/core/ipc/IpcBroker.h"
+#include "helics/core/udp/UdpBroker.h"
 
 #include <cassert>
 
@@ -80,6 +81,7 @@ std::shared_ptr<CoreBroker> makeBroker (core_type type, const std::string &name)
         break;
     }
     case core_type::INTERPROCESS:
+    case core_type::IPC:
         if (name.empty ())
         {
             broker = std::make_shared<IpcBroker> ();
@@ -87,6 +89,16 @@ std::shared_ptr<CoreBroker> makeBroker (core_type type, const std::string &name)
         else
         {
             broker = std::make_shared<IpcBroker> (name);
+        }
+        break;
+    case core_type::UDP:
+        if (name.empty ())
+        {
+            broker = std::make_shared<UdpBroker> ();
+        }
+        else
+        {
+            broker = std::make_shared<UdpBroker> (name);
         }
         break;
     default:
@@ -148,33 +160,27 @@ bool available (core_type type)
     switch (type)
     {
     case core_type::ZMQ:
-    {
 #if HELICS_HAVE_ZEROMQ
         available = true;
 #endif
         break;
-    }
     case core_type::MPI:
-    {
 #if HELICS_HAVE_MPI
         available = true;
 #endif
         break;
-    }
     case core_type::TEST:
-    {
         available = true;
         break;
-    }
     case core_type::INTERPROCESS:
     case core_type::IPC:
-    {
         available = true;
         break;
-    }
     case core_type::TCP:
-    case core_type::UDP:
         available = false;
+        break;
+    case core_type::UDP:
+        available = true;
         break;
     default:
         assert (false);
@@ -242,8 +248,9 @@ void displayHelp (core_type type)
         IpcBroker::displayHelp (true);
         break;
     case core_type::TCP:
-    case core_type::UDP:
         break;
+    case core_type::UDP:
+        UdpBroker::displayHelp (true);
     default:
 #if HELICS_HAVE_ZEROMQ
         ZmqBroker::displayHelp (true);

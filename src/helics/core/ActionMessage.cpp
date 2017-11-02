@@ -253,11 +253,6 @@ std::unique_ptr<Message> createMessage (ActionMessage &&cmd)
     return msg;
 }
 
-bool isPriorityCommand (const ActionMessage &command)
-{
-    return (command.action () < action_message_def::action_t::cmd_ignore);
-}
-
 constexpr char nullStr[] = "unknown";
 
 constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {

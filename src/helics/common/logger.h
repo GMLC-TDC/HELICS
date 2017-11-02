@@ -26,6 +26,8 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 #include <fstream>
 #include <atomic>
 #include <thread>
+#include <memory>
+#include <map>
 
 namespace helics
 {
@@ -133,6 +135,32 @@ public:
 	@param[in] cLevel the level to print to the console
 	@param[in] fLevel the level to print to the file if it is open*/
 	void changeLevels(int cLevel, int fLevel);
+
+};
+
+
+/** class defining a singleton manager for all logging use*/
+class loggerManager
+{
+private:
+    static std::map<std::string, std::shared_ptr<loggerManager>> loggers; //!< container for pointers to all the available contexts
+    std::string name;  //!< context name
+    std::shared_ptr<logger> loggingControl; //!< pointer to the actual logger
+   loggerManager(const std::string &loggingName);
+
+public:
+    static std::shared_ptr<loggerManager> getLoggerManager(const std::string &loggerName = "");
+    static std::shared_ptr<logger> getLogger(const std::string &loggerName = "");
+
+    static void closeLogger(const std::string &loggerName = "");
+   
+    virtual ~loggerManager();
+
+    const std::string &getName() const
+    {
+        return name;
+    }
+
 
 };
 }//namespace helics

@@ -109,6 +109,7 @@ IF(MSVC)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
   add_compile_options(/bigobj)
   add_compile_options(-W4  /EHsc /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484)
+  ADD_DEFINITIONS(-D_WIN32_WINNT=0x0601)
 ENDIF(MSVC)
   ENDIF(MINGW)
 ENDIF(UNIX)
@@ -141,14 +142,6 @@ if(DOXYGEN_FOUND)
 )
 endif(DOXYGEN_FOUND)
 endif (HELICS_GENERATE_DOXYGEN_DOC)
-# -------------------------------------------------------------
-# finding glog
-# -------------------------------------------------------------
-#find_package (glog)
-#if (${GLOG_FOUND})
-#    set(HELICS_HAVE_GLOG TRUE)
-#    include_directories("${GLOG_INCLUDE_DIRS}")
-#endif (${GLOG_FOUND})
 
 # -------------------------------------------------------------
 # finding ZMQ
