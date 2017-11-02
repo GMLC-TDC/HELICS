@@ -16,7 +16,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "Message.h"
 #include "ValueConverter.hpp"
 #include "core/core-data.h"
-#include "identifierTypes.hpp"
 #include <functional>
 
 namespace helics

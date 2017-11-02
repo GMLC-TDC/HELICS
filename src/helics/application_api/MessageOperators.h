@@ -20,21 +20,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-/** class defining a message operator that inherits from the core filterCallback
-@details the intention is to provide an application interface to access various common filter operations
-this class is virtual
-*/
-class MessageOperator :public helics::FilterOperator
-{
-public:
-	/** default constructor*/
-	MessageOperator()=default;
-private:
-	virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override = 0;
-};
 
 /** class defining an message operator that operates purely on the time aspect of a message*/
-class MessageTimeOperator :public MessageOperator
+class MessageTimeOperator :public FilterOperator
 {
 public:
 	/** default constructor*/
@@ -49,7 +37,7 @@ private:
 };
 
 /** class defining an message operator that operates purely on the destination aspect of a message*/
-class MessageDestOperator :public MessageOperator
+class MessageDestOperator :public FilterOperator
 {
 public:
     /** default constructor*/
@@ -64,7 +52,7 @@ private:
 };
 
 /** class defining an message operator that operates purely on the data aspect of a message*/
-class MessageDataOperator :public MessageOperator
+class MessageDataOperator :public FilterOperator
 {
 public:
 	/** default constructor*/
@@ -82,7 +70,7 @@ private:
 @details  the evaluation function used should return true if the message should be allowed through 
 false if it should be dropped
 */
-class MessageConditionalOperator :public MessageOperator
+class MessageConditionalOperator :public FilterOperator
 {
 public:
 	/** default constructor*/
