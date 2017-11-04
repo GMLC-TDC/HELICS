@@ -43,7 +43,7 @@ int main(int argc,char **argv)
   fedinfo = helicsFederateInfoCreate();
   
   /* Set Federate name */
-  status = helicsFederateInfoSetFederateName(fedinfo,"TestA Federate");
+  status = helicsFederateInfoSetFederateName(fedinfo,"Test sender Federate");
 
   /* Set core type from string */
   status = helicsFederateInfoSetCoreTypeFromString(fedinfo,"zmq");

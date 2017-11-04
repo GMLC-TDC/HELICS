@@ -158,7 +158,7 @@ enum class action_t : int32_t
 #define CLOSE_RECEIVER 23425215
 #define NEW_ROUTE 233
 #define DISCONNECT 2523
-
+#define DISCONNECT_ERROR 2623
 //for requesting port definitions on a computer
 #define PORT_DEFINITIONS 1451
 #define QUERY_PORTS 1453

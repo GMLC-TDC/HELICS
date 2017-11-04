@@ -13,6 +13,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "MessageFederate.h"
 #include "MessageFilterFederate.h"
 #include "CombinationFederate.h"
-
+#include "Endpoints.hpp"
+#include "Publications.hpp"
+#include "Subscriptions.hpp"
 	
 #endif /* _TDC_APPLICATION_API */
