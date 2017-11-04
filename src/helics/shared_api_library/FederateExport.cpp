@@ -522,4 +522,21 @@ helics_iterative_time helicsRequestTimeIterativeFinalize (helics_federate fed)
         return itTime;
     }
 }
+
 void helicsFreeFederate (helics_federate fed) { delete reinterpret_cast<helics::FedObject *> (fed); }
+
+helics::FedObject::~FedObject()
+{
+    for (auto sub : subs)
+    {
+        delete sub;
+    }
+    for (auto pub : pubs)
+    {
+        delete pub;
+    }
+    for (auto ept : epts)
+    {
+        delete ept;
+    }
+}

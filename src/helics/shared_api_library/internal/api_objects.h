@@ -52,6 +52,10 @@ namespace helics
 		std::shared_ptr<Core> coreptr;
 	};
 	
+    class SubscriptionObject;
+    class PublicationObject;
+    class EndpointObject;
+    
 	/** object wrapping a federate for the c-api*/
 	class FedObject
 	{
@@ -60,6 +64,11 @@ namespace helics
 		int valid;
 		std::shared_ptr<Federate> fedptr;
 		std::unique_ptr<Message> lastMessage;
+        std::vector<SubscriptionObject *> subs;
+        std::vector<PublicationObject *> pubs;
+        std::vector<EndpointObject *> epts;
+        FedObject() = default;
+        ~FedObject();
 	};
 
 	/** object wrapping a subscription*/
