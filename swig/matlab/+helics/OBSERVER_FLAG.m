@@ -1,0 +1,7 @@
+function v = OBSERVER_FLAG()
+  persistent vInitialized;
+  if isempty(vInitialized)
+    vInitialized = helicsMEX(0, 8);
+  end
+  v = vInitialized;
+end
