@@ -252,6 +252,7 @@ void displayHelp (core_type type)
         break;
     case core_type::UDP:
         UdpBroker::displayHelp (true);
+        break;
     default:
 #if HELICS_HAVE_ZEROMQ
         ZmqBroker::displayHelp (true);
@@ -262,6 +263,7 @@ void displayHelp (core_type type)
         IpcBroker::displayHelp (true);
 
         TestBroker::displayHelp (true);
+        UdpBroker::displayHelp(true);
         break;
     }
 

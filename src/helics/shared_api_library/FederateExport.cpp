@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <iostream>
 
 /** this is a random identifier put in place when the federate gets created*/
 static const int validationIdentifier = 0x2352188;
@@ -118,7 +119,11 @@ std::shared_ptr<helics::MessageFilterFederate> getFilterFedSharedPtr (helics_mes
 
 masterObjectHolder::masterObjectHolder () noexcept {}
 
-masterObjectHolder::~masterObjectHolder () { deleteAll (); }
+masterObjectHolder::~masterObjectHolder ()
+{ 
+    deleteAll ();
+    std::cout << "end of master Object Holder destructor" << std::endl;
+}
 int masterObjectHolder::addBroker (helics::BrokerObject *broker)
 {
     std::lock_guard<std::mutex> lock (ObjectLock);

@@ -23,6 +23,7 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 #include "cppzmq/zmq.hpp"
 #include <map>
 #include <mutex>
+#include <iostream>
 
 /** a storage system for the available core objects allowing references by name to the core
  */
@@ -82,6 +83,7 @@ zmqContextManager::~zmqContextManager ()
         auto val = zcontext.release ();
         (void)(val);
     }
+
 }
 
 zmqContextManager::zmqContextManager (const std::string &contextName) : name (contextName)

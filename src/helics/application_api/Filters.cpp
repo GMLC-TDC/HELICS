@@ -42,6 +42,11 @@ static void addOperations (Filter *filt, defined_filter_types type)
         filt->setFilterOperations (std::move (op));
     }
     break;
+    case redirect:
+    {
+        
+    }
+    break;
     }
 }
 

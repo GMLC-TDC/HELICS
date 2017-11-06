@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     repSocket3.recv (&msg);
 
     repSocket3.send (msg);
-    BOOST_CHECK_EQUAL (reqset.checkForMessages (std::chrono::milliseconds (200)), 6);
+    BOOST_CHECK_EQUAL (reqset.checkForMessages (std::chrono::milliseconds (400)), 6);
 }
 
 BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
