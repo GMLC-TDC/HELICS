@@ -23,27 +23,23 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 
 namespace helics
 {
-    logger::logger()
-    {
-        logCore = loggerManager::getLoggerCore();
-        coreIndex = logCore->addFileProcessor([this](std::string &&message) {logFunction(std::move(message)); });
-    }
-    logger::logger(std::shared_ptr<loggingCore> core):logCore(std::move(core))
-    {
-        coreIndex = logCore->addFileProcessor([this](std::string &&message) {logFunction(std::move(message)); });
-    }
-
-logger::~logger ()
+logger::logger ()
 {
-    logCore->haltOperations(coreIndex);
-
+    logCore = loggerManager::getLoggerCore ();
+    coreIndex = logCore->addFileProcessor ([this](std::string &&message) { logFunction (std::move (message)); });
 }
+logger::logger (std::shared_ptr<loggingCore> core) : logCore (std::move (core))
+{
+    coreIndex = logCore->addFileProcessor ([this](std::string &&message) { logFunction (std::move (message)); });
+}
+
+logger::~logger () { logCore->haltOperations (coreIndex); }
 void logger::openFile (const std::string &file)
 {
-    std::lock_guard<std::mutex> fLock(fileLock);
-    if (outFile.is_open())
+    std::lock_guard<std::mutex> fLock (fileLock);
+    if (outFile.is_open ())
     {
-        outFile.close();
+        outFile.close ();
     }
     outFile.open (file.c_str ());
 }
@@ -52,7 +48,7 @@ void logger::startLogging (int cLevel, int fLevel)
 {
     consoleLevel = cLevel;
     fileLevel = fLevel;
-    halted.store(false);
+    halted.store (false);
 }
 
 void logger::haltLogging ()
@@ -60,7 +56,7 @@ void logger::haltLogging ()
     bool exp = false;
     if (halted.compare_exchange_strong (exp, true))
     {
-        logCore->addMessage(coreIndex,"!!>close");
+        logCore->addMessage (coreIndex, "!!>close");
     }
 }
 void logger::changeLevels (int cLevel, int fLevel)
@@ -73,42 +69,42 @@ void logger::log (int level, std::string logMessage)
 {
     if (!halted)
     {
-        logMessage.push_back((level <= fileLevel) ? '^' : '-');
+        logMessage.push_back ((level <= fileLevel) ? '^' : '-');
         logMessage.push_back ((level <= consoleLevel) ? '$' : '-');
-        
-        logCore->addMessage(coreIndex, std::move(logMessage));
+
+        logCore->addMessage (coreIndex, std::move (logMessage));
     }
 }
 
-void logger::flush () { logCore->addMessage (coreIndex,"!!>flush"); }
-bool logger::isRunning() const { return (!halted); }
+void logger::flush () { logCore->addMessage (coreIndex, "!!>flush"); }
+bool logger::isRunning () const { return (!halted); }
 
-void logger::logFunction(std::string &&message)
+void logger::logFunction (std::string &&message)
 {
-    std::lock_guard<std::mutex> fLock(fileLock);
-        if (message.size () > 3)
+    std::lock_guard<std::mutex> fLock (fileLock);
+    if (message.size () > 3)
+    {
+        if (message.compare (0, 3, "!!>") == 0)
         {
-            if (message.compare(0, 3, "!!>") == 0)
+            if (message.compare (3, 5, "flush") == 0)
             {
-                if (message.compare(3, 5, "flush") == 0)
+                if (outFile.is_open ())
                 {
-                    if (outFile.is_open())
-                    {
-                        outFile.flush();
-                    }
+                    outFile.flush ();
                 }
             }
         }
-       
-        if (outFile.is_open ())
-        {
-            outFile << message << '\n';
-        }
+    }
+
+    if (outFile.is_open ())
+    {
+        outFile << message << '\n';
+    }
 }
 
 loggerNoThread::loggerNoThread () = default;
 
-loggerNoThread::loggerNoThread(std::shared_ptr<loggingCore> /*core*/) {};
+loggerNoThread::loggerNoThread (std::shared_ptr<loggingCore> /*core*/){};
 
 void loggerNoThread::openFile (const std::string &file) { outFile.open (file.c_str ()); }
 void loggerNoThread::startLogging (int cLevel, int fLevel)
@@ -147,117 +143,101 @@ void loggerNoThread::flush ()
     std::cout.flush ();
 }
 
+loggingCore::loggingCore () { loggingThread = std::thread (&loggingCore::processingLoop, this); }
 
-loggingCore::loggingCore()
+loggingCore::~loggingCore ()
 {
-    loggingThread = std::thread(&loggingCore::processingLoop, this);
+    loggingQueue.emplace (-1, "!!>close");
+    loggingThread.join ();
 }
 
-loggingCore::~loggingCore()
-{
-    loggingQueue.emplace(-1, "!!>close");
-    loggingThread.join();
+void loggingCore::addMessage (std::string &&message) { loggingQueue.emplace (-1, std::move (message)); }
 
+void loggingCore::addMessage (const std::string &message) { loggingQueue.emplace (-1, message); }
+
+void loggingCore::addMessage (int index, std::string &&message)
+{
+    loggingQueue.emplace (index, std::move (message));
 }
 
-void loggingCore::addMessage(std::string &&message)
+void loggingCore::addMessage (int index, const std::string &message) { loggingQueue.emplace (index, message); }
+int loggingCore::addFileProcessor (std::function<void(std::string &&message)> newFunction)
 {
-    loggingQueue.emplace(-1, std::move(message));
+    std::lock_guard<std::mutex> fLock (functionLock);
+    functions.push_back (std::move (newFunction));
+    return static_cast<int> (functions.size ()) - 1;
 }
 
-void loggingCore::addMessage(const std::string &message)
+void loggingCore::haltOperations (int loggerIndex)
 {
-    loggingQueue.emplace(-1, message);
-}
-
-void loggingCore::addMessage(int index, std::string &&message)
-{
-    loggingQueue.emplace(index, std::move(message));
-}
-
-void loggingCore::addMessage(int index, const std::string &message)
-{
-    loggingQueue.emplace(index, message);
-}
-int loggingCore::addFileProcessor(std::function<void(std::string &&message)> newFunction)
-{
-    std::lock_guard<std::mutex> fLock(functionLock);
-    functions.push_back(std::move(newFunction));
-    return static_cast<int>(functions.size()) - 1;
-}
-
-void loggingCore::haltOperations(int loggerIndex)
-{
-    std::lock_guard<std::mutex> fLock(functionLock);
-    if (loggerIndex < static_cast<int>(functions.size()))
+    std::lock_guard<std::mutex> fLock (functionLock);
+    if (loggerIndex < static_cast<int> (functions.size ()))
     {
         functions[loggerIndex] = nullptr;
     }
 }
 
 /** update a callback for a particular instance*/
-void loggingCore::updateProcessingFunction(int index, std::function<void(std::string &&message)> newFunction)
+void loggingCore::updateProcessingFunction (int index, std::function<void(std::string &&message)> newFunction)
 {
-    std::lock_guard<std::mutex> fLock(functionLock);
-    if (index< static_cast<int>(functions.size()))
+    std::lock_guard<std::mutex> fLock (functionLock);
+    if (index < static_cast<int> (functions.size ()))
     {
-        functions[index] = std::move(newFunction);
+        functions[index] = std::move (newFunction);
     }
 }
 
-void loggingCore::processingLoop()
+void loggingCore::processingLoop ()
 {
     int index;
     std::string msg;
     while (true)
     {
-        std::tie(index, msg) = loggingQueue.pop();
+        std::tie (index, msg) = loggingQueue.pop ();
 
-        if (msg.size() > 3)
+        if (msg.size () > 3)
         {
-           
-                if (msg.compare(0, 3, "!!>") == 0)
-                {
-                    if (msg.compare(3, 5, "flush") == 0)
-                    { //any flush command we need flush the console, we may also need to flush a particular file
-                        std::cout.flush();
-                        if (index == -1)
-                        {
-                            continue;
-                        }
-                    }
-                    if (msg.compare(3, 5, "close") == 0)
+            if (msg.compare (0, 3, "!!>") == 0)
+            {
+                if (msg.compare (3, 5, "flush") == 0)
+                {  // any flush command we need flush the console, we may also need to flush a particular file
+                    std::cout.flush ();
+                    if (index == -1)
                     {
-                        if (index == -1)
-                        {
-                            break;  // break the loop
-                        }
-                        else
-                        {
-                            msg.push_back('-');
-                            msg.push_back('$');
-                        }
+                        continue;
                     }
                 }
-            
+                if (msg.compare (3, 5, "close") == 0)
+                {
+                    if (index == -1)
+                    {
+                        break;  // break the loop
+                    }
+                    else
+                    {
+                        msg.push_back ('-');
+                        msg.push_back ('$');
+                    }
+                }
+            }
         }
         // if a the callback should be called there will be a 'f' at the end
         bool nosymbol = true;
-        auto f = msg.back();
-        if ((f == '^')||(f=='-'))
+        auto f = msg.back ();
+        if ((f == '^') || (f == '-'))
         {
             nosymbol = false;
-            msg.pop_back();
+            msg.pop_back ();
         }
-        
+
         // if a the console should be written there will be a 'c' at the end
-        auto c = msg.back();
+        auto c = msg.back ();
         if ((c == '$') || (c == '-'))
         {
             nosymbol = false;
-            msg.pop_back();
+            msg.pop_back ();
         }
-        if ((c == '$')||(nosymbol))
+        if ((c == '$') || (nosymbol))
         {
             std::cout << msg << '\n';
         }
@@ -265,17 +245,16 @@ void loggingCore::processingLoop()
         {
             if ((f == '^') || (nosymbol))
             {
-                std::lock_guard<std::mutex> fLock(functionLock);
-                if (index < static_cast<int>(functions.size()))
+                std::lock_guard<std::mutex> fLock (functionLock);
+                if (index < static_cast<int> (functions.size ()))
                 {
                     if (functions[index])
                     {
-                        functions[index](std::move(msg));
+                        functions[index](std::move (msg));
                     }
                 }
             }
         }
-        
     }
 }
 

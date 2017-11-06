@@ -124,16 +124,16 @@ bool CommsInterface::connect ()
 void CommsInterface::setName (const std::string &name_) { name = name_; }
 void CommsInterface::disconnect ()
 {
-    if (rx_status <= connection_status::connected)
+    if (rx_status.load () <= connection_status::connected)
     {
         closeReceiver ();
     }
-    if (tx_status <= connection_status::connected)
+    if (tx_status.load () <= connection_status::connected)
     {
         closeTransmitter ();
     }
     int cnt = 0;
-    while (rx_status <= connection_status::connected)
+    while (rx_status.load () <= connection_status::connected)
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
         ++cnt;
@@ -149,7 +149,7 @@ void CommsInterface::disconnect ()
         }
     }
     cnt = 0;
-    while (tx_status <= connection_status::connected)
+    while (tx_status.load () <= connection_status::connected)
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
         ++cnt;

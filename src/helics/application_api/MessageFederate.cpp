@@ -63,6 +63,12 @@ MessageFederate &MessageFederate::operator= (MessageFederate &&mFed) noexcept
 
 MessageFederate::~MessageFederate () = default;
 
+void MessageFederate::disconnect ()
+{
+    Federate::disconnect ();
+    mfManager->disconnect ();
+}
+
 void MessageFederate::updateTime (Time newTime, Time oldTime) { mfManager->updateTime (newTime, oldTime); }
 
 void MessageFederate::StartupToInitializeStateTransition () { mfManager->StartupToInitializeStateTransition (); }

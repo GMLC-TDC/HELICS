@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
     repSocket1.send (msg);
     // should still be waiting
     BOOST_CHECK (reqset.waiting ());
-    auto msgCnt = reqset.checkForMessages (std::chrono::milliseconds(100));
+    auto msgCnt = reqset.checkForMessages (std::chrono::milliseconds (100));
 
     BOOST_CHECK (!reqset.waiting ());
     BOOST_CHECK_EQUAL (msgCnt, 1);
@@ -105,13 +105,13 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
     repSocket2.recv (&msg);
 
     repSocket2.send (msg);
-    msgCnt=reqset.checkForMessages (std::chrono::milliseconds(100));
+    msgCnt = reqset.checkForMessages (std::chrono::milliseconds (100));
 
     BOOST_CHECK (reqset.waiting ());
     repSocket2.recv (&msg);
 
     repSocket2.send (msg);
-    reqset.checkForMessages (std::chrono::milliseconds(100));
+    reqset.checkForMessages (std::chrono::milliseconds (100));
     BOOST_CHECK (!reqset.waiting ());
 
     BOOST_CHECK (reqset.hasMessages ());
@@ -154,10 +154,10 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
 
     repSocket3.send (msg);
     // make sure the check receives all messages
-    reqset.checkForMessages (std::chrono::milliseconds(100));
-    if (reqset.waiting())
+    reqset.checkForMessages (std::chrono::milliseconds (100));
+    if (reqset.waiting ())
     {
-        reqset.checkForMessages (std::chrono::milliseconds(100));
+        reqset.checkForMessages (std::chrono::milliseconds (100));
     }
     BOOST_CHECK (!reqset.waiting ());
     reqset.transmit (1, M);
@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     repSocket3.recv (&msg);
 
     repSocket3.send (msg);
-    BOOST_CHECK_EQUAL (reqset.checkForMessages (std::chrono::milliseconds(200)), 6);
+    BOOST_CHECK_EQUAL (reqset.checkForMessages (std::chrono::milliseconds (200)), 6);
 }
 
 BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)

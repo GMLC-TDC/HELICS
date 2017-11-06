@@ -353,6 +353,8 @@ bool registerCommonCore (std::shared_ptr<CommonCore> tcore)
 
 size_t cleanUpCores () { return delayedDestroyer.destroyObjects (); }
 
+size_t cleanUpCores (int delay) { return delayedDestroyer.destroyObjects (delay); }
+
 void copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {
     searchableObjects.copyObject (copyFromName, copyToName);

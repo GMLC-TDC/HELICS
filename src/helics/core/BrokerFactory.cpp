@@ -212,6 +212,7 @@ bool registerBroker (std::shared_ptr<CoreBroker> tbroker)
 }
 
 size_t cleanUpBrokers () { return delayedDestroyer.destroyObjects (); }
+size_t cleanUpBrokers (int delay) { return delayedDestroyer.destroyObjects (delay); }
 
 void copyBrokerIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {

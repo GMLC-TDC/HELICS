@@ -30,6 +30,12 @@ CombinationFederate::CombinationFederate (const std::string &jsonString)
 CombinationFederate::CombinationFederate (CombinationFederate &&fed) noexcept = default;
 CombinationFederate::~CombinationFederate () = default;
 
+void CombinationFederate::disconnect ()
+{
+    ValueFederate::disconnect ();
+    MessageFederate::disconnect ();
+}
+
 CombinationFederate &CombinationFederate::operator= (CombinationFederate &&fed) noexcept = default;
 
 void CombinationFederate::updateTime (Time newTime, Time oldTime)

@@ -50,6 +50,12 @@ ValueFederate::ValueFederate (ValueFederate &&fed) noexcept = default;
 
 ValueFederate::~ValueFederate () = default;
 
+void ValueFederate::disconnect ()
+{
+    Federate::disconnect ();
+    vfManager->disconnect ();
+}
+
 ValueFederate &ValueFederate::operator= (ValueFederate &&fed) noexcept
 {
     if (getID () != fed.getID ())

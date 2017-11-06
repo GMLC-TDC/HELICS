@@ -116,6 +116,95 @@ std::shared_ptr<helics::MessageFilterFederate> getFilterFedSharedPtr (helics_mes
     return nullptr;
 }
 
+masterObjectHolder::masterObjectHolder () noexcept {}
+
+masterObjectHolder::~masterObjectHolder () { deleteAll (); }
+int masterObjectHolder::addBroker (helics::BrokerObject *broker)
+{
+    std::lock_guard<std::mutex> lock (ObjectLock);
+    int index = static_cast<int> (brokers.size ());
+    brokers.push_back (broker);
+    return index;
+}
+
+int masterObjectHolder::addCore (helics::CoreObject *core)
+{
+    std::lock_guard<std::mutex> lock (ObjectLock);
+    int index = static_cast<int> (cores.size ());
+    cores.push_back (core);
+    return index;
+}
+
+int masterObjectHolder::addFed (helics::FedObject *fed)
+{
+    std::lock_guard<std::mutex> lock (ObjectLock);
+    int index = static_cast<int> (feds.size ());
+    feds.push_back (fed);
+    return index;
+}
+
+void masterObjectHolder::clearBroker (int index)
+{
+    std::lock_guard<std::mutex> lock (ObjectLock);
+    if (index < static_cast<int> (brokers.size ()))
+    {
+        brokers[index] = nullptr;
+    }
+}
+
+void masterObjectHolder::clearCore (int index)
+{
+    std::lock_guard<std::mutex> lock (ObjectLock);
+    if (index < static_cast<int> (cores.size ()))
+    {
+        cores[index] = nullptr;
+    }
+}
+
+void masterObjectHolder::clearFed (int index)
+{
+    std::lock_guard<std::mutex> lock (ObjectLock);
+    if (index < static_cast<int> (feds.size ()))
+    {
+        feds[index] = nullptr;
+    }
+}
+
+void masterObjectHolder::deleteAll ()
+{
+    std::lock_guard<std::mutex> lock (ObjectLock);
+    for (auto obj : brokers)
+    {
+        if (obj != nullptr)
+        {
+            delete obj;
+        }
+    }
+    for (auto obj : cores)
+    {
+        if (obj != nullptr)
+        {
+            delete obj;
+        }
+    }
+    for (auto obj : feds)
+    {
+        if (obj != nullptr)
+        {
+            delete obj;
+        }
+    }
+    brokers.clear ();
+    feds.clear ();
+    cores.clear ();
+}
+
+static masterObjectHolder mHolder;
+
+masterObjectHolder *getMasterHolder () { return &mHolder; }
+
+void clearAllObjects () { mHolder.deleteAll (); }
+
 /* Creation and destruction of Federates */
 helics_federate helicsCreateValueFederate (const helics_federate_info_t fi)
 {
@@ -124,6 +213,7 @@ helics_federate helicsCreateValueFederate (const helics_federate_info_t fi)
         return nullptr;
     }
     auto *fed = new helics::FedObject;
+    fed->index = getMasterHolder ()->addFed (fed);
     fed->fedptr = std::make_shared<helics::ValueFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
     fed->type = helics::vtype::valueFed;
     fed->valid = validationIdentifier;
@@ -133,6 +223,7 @@ helics_federate helicsCreateValueFederate (const helics_federate_info_t fi)
 helics_federate helicsCreateValueFederateFromFile (const char *file)
 {
     auto *fed = new helics::FedObject;
+    fed->index = getMasterHolder ()->addFed (fed);
     fed->fedptr = std::make_shared<helics::ValueFederate> (file);
     fed->type = helics::vtype::valueFed;
     fed->valid = validationIdentifier;
@@ -147,6 +238,7 @@ helics_federate helicsCreateMessageFederate (const helics_federate_info_t fi)
         return nullptr;
     }
     auto *fed = new helics::FedObject;
+    fed->index = getMasterHolder ()->addFed (fed);
     fed->fedptr = std::make_shared<helics::MessageFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
     fed->type = helics::vtype::messageFed;
     fed->valid = validationIdentifier;
@@ -156,6 +248,7 @@ helics_federate helicsCreateMessageFederate (const helics_federate_info_t fi)
 helics_federate helicsCreateMessageFederateFromFile (const char *file)
 {
     auto *fed = new helics::FedObject;
+    fed->index = getMasterHolder ()->addFed (fed);
     fed->fedptr = std::make_shared<helics::MessageFederate> (file);
     fed->type = helics::vtype::messageFed;
     fed->valid = validationIdentifier;
@@ -166,6 +259,7 @@ helics_federate helicsCreateMessageFederateFromFile (const char *file)
 helics_federate helicsCreateMessageFilterFederate (const helics_federate_info_t fi)
 {
     auto *fed = new helics::FedObject;
+    fed->index = getMasterHolder ()->addFed (fed);
     fed->fedptr = std::make_shared<helics::MessageFilterFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
     fed->type = helics::vtype::filterFed;
     fed->valid = validationIdentifier;
@@ -175,6 +269,7 @@ helics_federate helicsCreateMessageFilterFederate (const helics_federate_info_t 
 helics_federate helicsCreateMessageFilterFederateFromFile (const char *file)
 {
     auto *fed = new helics::FedObject;
+    fed->index = getMasterHolder ()->addFed (fed);
     fed->fedptr = std::make_shared<helics::MessageFilterFederate> (file);
     fed->type = helics::vtype::filterFed;
     fed->valid = validationIdentifier;
@@ -185,6 +280,7 @@ helics_federate helicsCreateMessageFilterFederateFromFile (const char *file)
 helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi)
 {
     auto *fed = new helics::FedObject;
+    fed->index = getMasterHolder ()->addFed (fed);
     fed->fedptr = std::make_shared<helics::CombinationFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
     fed->type = helics::vtype::combinFed;
     fed->valid = validationIdentifier;
@@ -194,6 +290,7 @@ helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi
 helics_federate helicsCreateCombinationFederateFromFile (const char *file)
 {
     auto *fed = new helics::FedObject;
+    fed->index = getMasterHolder ()->addFed (fed);
     fed->fedptr = std::make_shared<helics::CombinationFederate> (file);
     fed->type = helics::vtype::combinFed;
     fed->valid = validationIdentifier;
@@ -520,23 +617,5 @@ helics_iterative_time helicsRequestTimeIterativeFinalize (helics_federate fed)
     catch (helics::InvalidStateTransition &)
     {
         return itTime;
-    }
-}
-
-void helicsFreeFederate (helics_federate fed) { delete reinterpret_cast<helics::FedObject *> (fed); }
-
-helics::FedObject::~FedObject()
-{
-    for (auto sub : subs)
-    {
-        delete sub;
-    }
-    for (auto pub : pubs)
-    {
-        delete pub;
-    }
-    for (auto ept : epts)
-    {
-        delete ept;
     }
 }

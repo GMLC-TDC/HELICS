@@ -64,7 +64,7 @@ void zmqContextManager::closeContext (const std::string &contextName)
     }
 }
 
-void zmqContextManager::setContextToLeakOnDelete (const std::string &contextName)
+bool zmqContextManager::setContextToLeakOnDelete (const std::string &contextName)
 {
     std::lock_guard<std::mutex> conlock (contextLock);
     auto fnd = contexts.find (contextName);
@@ -72,6 +72,7 @@ void zmqContextManager::setContextToLeakOnDelete (const std::string &contextName
     {
         fnd->second->leakOnDelete = true;
     }
+    return false;
 }
 zmqContextManager::~zmqContextManager ()
 {

@@ -31,12 +31,19 @@ class DelayedDestructor
     DelayedDestructor () = default;
     ~DelayedDestructor ()
     {
+        int ii = 0;
         while (!ElementsToBeDestroyed.empty ())
         {
+            ++ii;
             destroyObjects ();
             if (!ElementsToBeDestroyed.empty ())
             {
-                std::this_thread::sleep_for (std::chrono::milliseconds (50));
+                if (ii > 20)
+                {
+                    std::cerr << "error: unable to destroy all objects giving up\n";
+                    break;
+                }
+                std::this_thread::sleep_for (std::chrono::milliseconds (100));
             }
         }
     }
@@ -54,6 +61,36 @@ class DelayedDestructor
         }
         return ElementsToBeDestroyed.size ();
     }
+
+    size_t destroyObjects (int delay)
+    {
+        std::unique_lock<std::mutex> lock (destructionLock);
+        auto delayTime = std::chrono::milliseconds ((delay < 100) ? delay : 50);
+        int delayCount = (delay < 100) ? 1 : (delay / 50);
+
+        if (!ElementsToBeDestroyed.empty ())
+        {
+            auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
+                                       [](const auto &element) { return (element.use_count () <= 1); });
+            ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
+            int cnt = 0;
+            while ((!ElementsToBeDestroyed.empty ()) && (cnt < delayCount))
+            {
+                lock.unlock ();
+                std::this_thread::sleep_for (delayTime);
+                ++cnt;
+                lock.lock ();
+                if (!ElementsToBeDestroyed.empty ())
+                {
+                    loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
+                                          [](const auto &element) { return (element.use_count () <= 1); });
+                    ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
+                }
+            }
+        }
+        return ElementsToBeDestroyed.size ();
+    }
+
     void addObjectsToBeDestroyed (std::shared_ptr<X> &&obj)
     {
         std::lock_guard<std::mutex> lock (destructionLock);

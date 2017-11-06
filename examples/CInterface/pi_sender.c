@@ -95,7 +95,7 @@ int main(int argc,char **argv)
   status = helicsFinalize(vfed);
   printf("PI SENDER: Federate finalized\n");
 
-
+  helicsFreeFederate(vfed);
   while(helicsBrokerIsConnected(broker)) {
 #ifdef _MSC_VER
 	  Sleep(1);
