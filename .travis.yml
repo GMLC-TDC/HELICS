@@ -85,7 +85,7 @@ install:
 
 script:
   - mkdir build && cd build
-  - cmake .. -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=ON -DZMQ_INSTALL_PATH=./dependencies -DBOOST_ROOT=./dependencies
+  - cmake .. -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=ON -DZMQ_INSTALL_PATH=./dependencies/zmq -DBOOST_ROOT=./dependencies/boost
   - make
 #  - ctest --verbose
 
