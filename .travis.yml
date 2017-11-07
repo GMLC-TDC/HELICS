@@ -11,6 +11,10 @@ cache:
     - cmake-3.4.3-Linux-x86_64/bin
     - cmake-3.4.3-Linux-x86_64/plugins
     - cmake-3.4.3-Linux-x86_64/share
+    - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/bin
+    - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/Frameworks
+    - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/MacOS
+    - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/share
 
 matrix:
   include:
