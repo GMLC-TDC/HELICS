@@ -15,6 +15,7 @@ cache:
     - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/Frameworks
     - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/MacOS
     - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/share
+    - dependencies
 
 matrix:
   include:
@@ -84,7 +85,7 @@ install:
 
 script:
   - mkdir build && cd build
-  - cmake .. -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=ON
+  - cmake .. -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=ON -DZMQ_INSTALL_PATH=./dependencies -DBOOST_ROOT=./dependencies
   - make
 #  - ctest --verbose
 
