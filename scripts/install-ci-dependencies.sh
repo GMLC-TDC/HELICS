@@ -20,26 +20,30 @@ elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     echo "*** cmake installed ($PATH)"
 fi
 
-echo "*** build libzmq"
-git clone git://github.com/zeromq/libzmq.git
-(
-    cd libzmq;
-    ./autogen.sh;
-    mkdir build && cd build;
-    cmake .. -DWITH_PERF_TOOL=OFF -DZMQ_BUILD_TESTS=OFF -DENABLE_CPACK=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../../dependencies/zmq
-    make;
-    make install;
-)
-echo "*** built zmq successfully"
+if [[ ! -f "dependencies/zmq" ]]; then
+    echo "*** build libzmq"
+    git clone git://github.com/zeromq/libzmq.git
+    (
+        cd libzmq;
+        ./autogen.sh;
+        mkdir build && cd build;
+        cmake .. -DWITH_PERF_TOOL=OFF -DZMQ_BUILD_TESTS=OFF -DENABLE_CPACK=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../../dependencies/zmq
+        make;
+        make install;
+    )
+    echo "*** built zmq successfully"
+fi
 
-echo "*** build boost"
-wget -O boost_1_61_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz/download && tar xzf boost_1_61_0.tar.gz
-(
-    cd boost_1_61_0/;
-    ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test;
-    ./b2 link=shared threading=multi variant=release > /dev/null;
-    ./b2 install --prefix=../dependencies/boost > /dev/null;
-)
-echo "*** built boost successfully"
+if [[ ! -f "dependencies/boost" ]]; then
+    echo "*** build boost"
+    wget -O boost_1_61_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz/download && tar xzf boost_1_61_0.tar.gz
+    (
+        cd boost_1_61_0/;
+        ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test;
+        ./b2 link=shared threading=multi variant=release > /dev/null;
+        ./b2 install --prefix=../dependencies/boost > /dev/null;
+    )
+    echo "*** built boost successfully"
+fi
 
 sudo ldconfig ${PWD}/dependencies
