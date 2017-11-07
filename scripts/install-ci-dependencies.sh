@@ -38,7 +38,7 @@ wget -O boost_1_61_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.
     cd boost_1_61_0/;
     ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test;
     ./b2 link=shared threading=multi variant=release > /dev/null;
-    ./b2 install --prefix ../dependencies/boost > /dev/null;
+    ./b2 install --prefix=../dependencies/boost > /dev/null;
 )
 echo "*** built boost successfully"
 
