@@ -18,13 +18,12 @@ cache:
     - dependencies
 
 matrix:
+  # On weekdays, the backlog for waiting OS X builds is huge
+  fast_finish: true
+  allow_failures:
+    - os: osx
+    
   include:
-
-    ##########################################################################
-    # Clang on OSX
-    # Travis seems to take longer to start OSX instances,
-    # so leave this first for the overall build to be faster
-    ##########################################################################
 
     # XCode 6.4, OS X 10.10
     - env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release"
@@ -37,6 +36,14 @@ matrix:
       os: osx
       osx_image: xcode7.3
       compiler: clang
+      
+    # Built without errors on my clone from one of the changes made
+    # Possibly local dependencies, or removing Linux-only commands fixed it
+    # XCode 8.3, OS X 10.12
+    #- env: COMPILER=clang++ BUILD_TYPE=Debug
+    #  os: osx
+    #  osx_image: xcode8.3
+    #  compiler: clang
 
     - compiler: gcc
       addons:
