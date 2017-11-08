@@ -46,4 +46,9 @@ if [[ ! -d "dependencies/boost" ]]; then
     echo "*** built boost successfully"
 fi
 
-sudo ldconfig ${PWD}/dependencies
+if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    sudo ldconfig ${PWD}/dependencies
+    export LD_LIBRARY_PATH=${PWD}/dependencies/zmq/lib:${PWD}/dependencies/boost/lib:$LD_LIBRARY_PATH
+elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    export DYLD_FALLBACK_LIBRARY_PATH=${PWD}/dependencies/zmq/lib:${PWD}/dependencies/boost/lib:$LD_LIBRARY_PATH
+fi
