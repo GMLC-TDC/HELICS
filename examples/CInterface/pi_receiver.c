@@ -76,5 +76,6 @@ int main(int argc,char **argv)
   status = helicsFinalize(vfed);
   printf("PI RECEIVER: Federate finalized\n");
   helicsFreeFederate(vfed);
+  helicsCloseLibrary();
   return(0);
 }

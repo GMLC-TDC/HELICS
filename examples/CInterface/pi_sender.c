@@ -98,12 +98,12 @@ int main(int argc,char **argv)
   helicsFreeFederate(vfed);
   while(helicsBrokerIsConnected(broker)) {
 #ifdef _MSC_VER
-	  Sleep(1);
+	  Sleep(100);
 #else
-    usleep(1000); /* Sleep for 1 millisecond */
+    usleep(100000); /* Sleep for 100 millisecond */
 #endif
   }
   printf("PI SENDER: Broker disconnected\n");
-
+  helicsCloseLibrary();
   return(0);
 }

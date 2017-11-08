@@ -1241,6 +1241,10 @@ bool matchingTypes (const std::string &type1, const std::string &type2)
     {
         return true;
     }
+    if ((type1.compare(0,3,"def")==0) || (type2.compare(0, 3, "def") == 0))
+    {
+        return true;
+    }
     if ((type1 == "block") || (type2 == "block"))
     {
         return true;
