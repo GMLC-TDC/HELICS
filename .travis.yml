@@ -32,7 +32,7 @@ matrix:
       compiler: clang
       branches:
         only:
-          add-mac-travis-ci
+          - add-mac-travis-ci
 
     # XCode 7.3, OS X 10.11
     - env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release"
@@ -41,7 +41,7 @@ matrix:
       compiler: clang
       branches:
         only:
-          develop
+          - develop
       
     # Built without errors on my clone from one of the changes made
     # Possibly local dependencies, or removing Linux-only commands fixed it
