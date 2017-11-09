@@ -1577,11 +1577,10 @@ std::string CommonCore::query (const std::string &target, const std::string &que
     }
     else
     {
-        std::lock_guard<std::mutex> lock (_mutex);
-        auto fed = federateNames.find (target);
-        if (fed != federateNames.end ())
+        auto id = getFederateId(target);
+        if (id!=invalid_fed_id)
         {
-            return federateQuery (fed->second, queryStr);
+            return federateQuery (id, queryStr);
         }
         else
         {

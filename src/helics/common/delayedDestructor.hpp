@@ -13,11 +13,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #pragma once
 
 #include <algorithm>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
-
 /** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
  * threading issues*/
 template <class X>
@@ -26,9 +26,14 @@ class DelayedDestructor
   private:
     std::mutex destructionLock;
     std::vector<std::shared_ptr<X>> ElementsToBeDestroyed;
+    std::function<void(std::shared_ptr<X> &ptr)> callBeforeDeleteFunction;
 
   public:
     DelayedDestructor () = default;
+    DelayedDestructor (std::function<void(std::shared_ptr<X> &ptr)> callFirst)
+        : callBeforeDeleteFunction (std::move (callFirst))
+    {
+    }
     ~DelayedDestructor ()
     {
         int ii = 0;
@@ -41,6 +46,7 @@ class DelayedDestructor
                 if (ii > 20)
                 {
                     std::cerr << "error: unable to destroy all objects giving up\n";
+                    destroyObjects();
                     break;
                 }
                 std::this_thread::sleep_for (std::chrono::milliseconds (100));
@@ -57,6 +63,18 @@ class DelayedDestructor
         {
             auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
                                        [](const auto &element) { return (element.use_count () <= 1); });
+            if (callBeforeDeleteFunction)
+            {
+                auto locIt = loc;
+                while (locIt != ElementsToBeDestroyed.end ())
+                {
+                    if (*locIt)
+                    {
+                        callBeforeDeleteFunction (*locIt);
+                    }
+                    ++locIt;
+                }
+            }
             ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
         }
         return ElementsToBeDestroyed.size ();
@@ -68,24 +86,38 @@ class DelayedDestructor
         auto delayTime = std::chrono::milliseconds ((delay < 100) ? delay : 50);
         int delayCount = (delay < 100) ? 1 : (delay / 50);
 
-        if (!ElementsToBeDestroyed.empty ())
+        int cnt = 0;
+        while ((!ElementsToBeDestroyed.empty ()) && (cnt < delayCount))
         {
-            auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
-                                       [](const auto &element) { return (element.use_count () <= 1); });
-            ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
-            int cnt = 0;
-            while ((!ElementsToBeDestroyed.empty ()) && (cnt < delayCount))
+            if (cnt > 0)
             {
                 lock.unlock ();
                 std::this_thread::sleep_for (delayTime);
                 ++cnt;
                 lock.lock ();
-                if (!ElementsToBeDestroyed.empty ())
+            }
+            else
+            {
+                ++cnt;
+            }
+
+            if (!ElementsToBeDestroyed.empty ())
+            {
+                auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
+                                      [](const auto &element) { return (element.use_count () <= 1); });
+                if (callBeforeDeleteFunction)
                 {
-                    loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
-                                          [](const auto &element) { return (element.use_count () <= 1); });
-                    ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
+                    auto locIt = loc;
+                    while (locIt != ElementsToBeDestroyed.end ())
+                    {
+                        if (*locIt)
+                        {
+                            callBeforeDeleteFunction (*locIt);
+                        }
+                        ++locIt;
+                    }
                 }
+                ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
             }
         }
         return ElementsToBeDestroyed.size ();

@@ -189,13 +189,15 @@ bool available (core_type type)
     return available;
 }
 
+/** lambda function to join cores before the destruction happens to avoid potential problematic calls in the loops*/
+static auto destroyerCallFirst = [](auto &broker) {broker->joinAllThreads(); };
 /** so the problem this is addressing is that unregister can potentially cause a destructor to fire
 that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
 can do the unregister operation and destroy itself meaning it is unable to join and thus will call std::terminate
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be without issue*/
 
-static DelayedDestructor<CoreBroker> delayedDestroyer;  //!< the object handling the delayed destruction
+static DelayedDestructor<CoreBroker> delayedDestroyer(destroyerCallFirst);  //!< the object handling the delayed destruction
 
 static SearchableObjectHolder<CoreBroker> searchableObjects;  //!< the object managing the searchable objects
 
