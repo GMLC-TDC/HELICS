@@ -357,7 +357,7 @@ int helicsAsyncOperationCompleted (helics_federate fed)
     return (fedObj->asyncOperationCompleted ()) ? 1 : 0;
 }
 
-helicsStatus helicsEneterInitializationModeFinalize (helics_federate fed)
+helicsStatus helicsEnterInitializationModeFinalize (helics_federate fed)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
