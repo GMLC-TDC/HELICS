@@ -97,7 +97,7 @@ HELICS_Export helicsStatus helicsEnterInitializationModeAsync (helics_federate f
 
 HELICS_Export int helicsAsyncOperationCompleted (helics_federate fed);
 
-HELICS_Export helicsStatus helicsEneterInitializationModeFinalize (helics_federate fed);
+HELICS_Export helicsStatus helicsEnterInitializationModeFinalize (helics_federate fed);
 
 HELICS_Export helicsStatus helicsEnterExecutionMode (helics_federate fed);
 HELICS_Export helicsStatus helicsEnterExecutionModeIterative (helics_federate fed,
