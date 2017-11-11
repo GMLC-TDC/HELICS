@@ -24,7 +24,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 namespace helics
 {
 /**
- * The GMLC TD&C core interface.  Abstract class that is
+ * The HELICS core interface.  Abstract class that is
  * implemented for the specific communication systems (e.g. ZMQ and
  * MPI).
  *
@@ -57,11 +57,10 @@ public:
 	bool observer = false;  //!< flag indicating that the federate is an observer
 	bool uninteruptible =
 		false;  //!< flag indicating that the federate should never return a time other than requested
-	bool time_agnostic = false;  //!< flag indicating that the federate does not participate in time advancement and should be ignored in all timeRequest operations
-	bool source_only = false;   //!< flag indicating that the federate does not receive or do anything with received information.  
-								//4 byte gap
-	bool filter_only = false; //!< flag indicating that the source filter federate is not modifying the destination of a filtered message only time or content
-							  //there is 1 bytes undefined in this structure
+	bool source_only = false;   //!< flag indicating that the federate does not receive or do anything with received information.  											  
+    bool only_transmit_on_change = false; //!< flag indicating that values should only updated if the number has actually changes
+    bool only_update_on_change = false;  //!< flag indicating values should be discarded if they are not changed from previous values
+    //1 byte gap
 	int16_t max_iterations = 3;	//!< the maximum number of iterations allowed for the federate
 							  
 };
@@ -214,7 +213,7 @@ class Core
      *
      * Iterative federates may not invoke this method.
      *
-     * \param next
+     * @param next
      */
     virtual Time timeRequest (federate_id_t federateID, Time next) = 0;
 
@@ -278,7 +277,7 @@ class Core
      * This is useful for federates that are time-stepped and making
      * sub-time-step updates is not meaningful.
      *
-     * \param time
+     * @param time
      */
     virtual void setTimeDelta (federate_id_t federateID, Time time) = 0;
 
@@ -287,8 +286,8 @@ class Core
      *
      * The value is used to determine the interaction amongst various federates as to
      * when a specific federate can influence another
-     * \param federateID  the identifier for the federate
-     * \param timeLookAhead
+     * @param federateID  the identifier for the federate
+     * @param timeLookAhead
      */
     virtual void setLookAhead (federate_id_t federateID, Time timeLookAhead) = 0;
 	/**
@@ -296,8 +295,8 @@ class Core
 	*
 	* The value is used to determine the interaction amongst various federates as to
 	* when a specific federate can influence another
-	* \param federateID  the identifier for the federate
-	* \param timeLookAhead
+	* @param federateID  the identifier for the federate
+	* @param timeLookAhead
 	*/
 	virtual void setPeriod(federate_id_t federateID, Time timePeriod) = 0;
 	/**
@@ -306,8 +305,8 @@ class Core
 	* The value is used as a time shift for calculating the allowable time in a federate
 	the granted time must one of N*period+offset
 	
-	* \param federateID  the identifier for the federate
-	* \param timeOffset the periodic phase shift
+	* @param federateID  the identifier for the federate
+	* @param timeOffset the periodic phase shift
 	*/
 	virtual void setTimeOffset(federate_id_t federateID, Time timeOffset) = 0;
 	/**
@@ -315,16 +314,16 @@ class Core
 	*
 	* The value is used to determine the interaction amongst various federates as to
 	* when a specific federate can influence another
-	* \param federateID  the identifier for the federate
-	* \param timeImpact the length of time it take outside message to propagate into a federate
+	* @param federateID  the identifier for the federate
+	* @param timeImpact the length of time it take outside message to propagate into a federate
 	*/
 	virtual void setImpactWindow(federate_id_t federateID, Time timeImpact) = 0;
 	/** 
 	Set the logging level
 	@details set the logging level for an individual federate
 	set federateID to 0 for the core logging level
-	* \param federateID  the identifier for the federate
-	* \param timeImpact the length of time it take outside message to propagate into a federate
+	* @param federateID  the identifier for the federate
+	* @param timeImpact the length of time it take outside message to propagate into a federate
 	*/
 	virtual void setLoggingLevel(federate_id_t federateID, int loggingLevel) = 0;
     /**

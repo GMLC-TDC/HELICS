@@ -40,12 +40,13 @@ class FederateInfo
     bool observer =
       false;  //!< indicator that the federate is an observer and doesn't participate in time advancement
     bool rollback = false;  //!< indicator that the federate has rollback features
-    bool timeAgnostic = false;  //!< indicator that the federate doesn't use time
     bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must
                                   //! support rollback if set to true]
     bool uninterruptible =
       false;  //!< indicator that the time request cannot return something other than the requested time
     bool sourceOnly = false;  //!< indicator that the federate is a source only
+    bool only_update_on_change = false; //!< indicator that the federate should discards value messages that did not change
+    bool only_transmit_on_change = false;  //!< indicator that the federate should not send values that haven't changed
     int32_t max_iterations = 10;  //!< the maximum number of iteration cycles a federate should execute
     int32_t logLevel =
       1;  //!< the logging level for the federate (-1: none, 0: error, 1:warning,2:normal,3:debug,4:trace)

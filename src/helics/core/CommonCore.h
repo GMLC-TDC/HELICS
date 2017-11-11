@@ -124,6 +124,8 @@ CommonCore(const std::string &core_name);
  virtual bool connect() override final;
  virtual bool isConnected() const override final;
  virtual void disconnect() override final;
+ void unregister();
+ virtual void processDisconnect(bool skipUnregister = false) override final;
 private:
 	/** implementation details of the connection process
 	*/
@@ -131,13 +133,14 @@ private:
 	/** implementation details of the disconnection process
 	*/
 	virtual void brokerDisconnect() = 0;
+    
 protected:
 
   virtual void processCommand(ActionMessage &&cmd) override final;
   
   virtual void processPriorityCommand(ActionMessage &&command) override final;
 
-  virtual void processDisconnect() override final;
+  
   /** transit an ActionMessage to another core or broker
   @param route_id the identifier for the route information to send the message to
   @param[in] cmd the actionMessage to send*/

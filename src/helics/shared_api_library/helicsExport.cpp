@@ -121,8 +121,11 @@ helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int
     case FORWARD_COMPUTE_FLAG:
         hfi->forwardCompute = (value != 0);
         break;
-    case TIME_AGNOSTIC_FLAG:
-        hfi->timeAgnostic = (value != 0);
+    case ONLY_TRANSMIT_ON_CHANGE:
+        hfi->only_transmit_on_change = (value != 0);
+        break;
+    case ONLY_UPDATE_ON_CHANGE:
+        hfi->only_update_on_change = (value != 0);
         break;
     case SOURCE_ONLY_FLAG:
         hfi->sourceOnly = (value != 0);

@@ -295,8 +295,12 @@ bool isAvailable (core_type type)
 
     return available;
 }
-/** lambda function to join cores before the destruction happens to avoid potential problematic calls in the loops*/
-static auto destroyerCallFirst = [](auto &core) {core->joinAllThreads(); };
+/** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
+ * loops*/
+static auto destroyerCallFirst = [](auto &core) {
+    core->processDisconnect (true);
+    core->joinAllThreads ();
+};
 
 /** so the problem this is addressing is that unregister can potentially cause a destructor to fire
 that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
@@ -304,7 +308,8 @@ can do the unregister operation and destroy itself meaning it is unable to join 
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be
 without issue*/
-static DelayedDestructor<CommonCore> delayedDestroyer(destroyerCallFirst);  //!< the object handling the delayed destruction
+static DelayedDestructor<CommonCore>
+  delayedDestroyer (destroyerCallFirst);  //!< the object handling the delayed destruction
 
 static SearchableObjectHolder<CommonCore> searchableObjects;  //!< the object managing the searchable objects
 
@@ -334,7 +339,7 @@ bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &pt
         case core_type::IPC:
             return (dynamic_cast<IpcCore *> (ptr.get ()) != nullptr);
         case core_type::UDP:
-            return (dynamic_cast<UdpCore *> (ptr.get()) != nullptr);
+            return (dynamic_cast<UdpCore *> (ptr.get ()) != nullptr);
         case core_type::TCP:
         default:
             return true;

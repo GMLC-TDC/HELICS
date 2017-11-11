@@ -109,10 +109,12 @@ bool CommonCore::isConnected () const
     return ((currentState == operating) || (currentState == connected));
 }
 
-void CommonCore::processDisconnect () { disconnect (); }
-
-void CommonCore::disconnect ()
-{
+void CommonCore::processDisconnect (bool skipUnregister)
+{ 
+    if (brokerState == broker_state_t::terminated)
+    {
+        return;
+    }
     if (brokerState > broker_state_t::initialized)
     {
         if (brokerState < broker_state_t::terminating)
@@ -120,50 +122,62 @@ void CommonCore::disconnect ()
             brokerState = broker_state_t::terminating;
             if (global_broker_id != 0)
             {
-                ActionMessage dis (CMD_DISCONNECT);
+                ActionMessage dis(CMD_DISCONNECT);
                 dis.source_id = global_broker_id;
-                transmit (0, dis);
+                transmit(0, dis);
             }
             else
             {
-                ActionMessage dis (CMD_DISCONNECT_NAME);
-                dis.payload = getIdentifier ();
-                transmit (0, dis);
+                ActionMessage dis(CMD_DISCONNECT_NAME);
+                dis.payload = getIdentifier();
+                transmit(0, dis);
             }
-            addActionMessage (CMD_STOP);
+            addActionMessage(CMD_STOP);
             return;
         }
-        brokerDisconnect ();
+        brokerDisconnect();
     }
     brokerState = terminated;
+    if (!skipUnregister)
+    {
+        unregister();
+    }
+}
+
+void CommonCore::disconnect ()
+{
+    processDisconnect();
+}
+
+void CommonCore::unregister()
+{
     /*We need to ensure that the destructor is not called immediately upon calling unregister
     otherwise this would be a mess and probably cause segmentation faults so we capture it in a local variable
     that will be destroyed on function exit
     */
-    auto keepCoreAlive = CoreFactory::findCore (identifier);
+    auto keepCoreAlive = CoreFactory::findCore(identifier);
     if (keepCoreAlive)
     {
-        if (keepCoreAlive.get () == this)
+        if (keepCoreAlive.get() == this)
         {
             keepCoreAlive = nullptr;
-            CoreFactory::unregisterCore (identifier);
+            CoreFactory::unregisterCore(identifier);
         }
     }
 
-    if (!prevIdentifier.empty ())
+    if (!prevIdentifier.empty())
     {
-        auto keepCoreAlive2 = CoreFactory::findCore (prevIdentifier);
+        auto keepCoreAlive2 = CoreFactory::findCore(prevIdentifier);
         if (keepCoreAlive2)
         {
-            if (keepCoreAlive2.get () == this)
+            if (keepCoreAlive2.get() == this)
             {
                 keepCoreAlive2 = nullptr;
-                CoreFactory::unregisterCore (prevIdentifier);
+                CoreFactory::unregisterCore(prevIdentifier);
             }
         }
     }
 }
-
 CommonCore::~CommonCore ()
 {
     // make sure everything is synced up so just run the lock

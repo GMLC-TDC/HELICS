@@ -87,8 +87,9 @@ typedef struct message_t
 #define ROLLBACK_FLAG 1
 #define UNINTERRUPTIBLE_FLAG 2
 #define FORWARD_COMPUTE_FLAG 3
-#define TIME_AGNOSTIC_FLAG 4
-#define SOURCE_ONLY_FLAG 5
+#define SOURCE_ONLY_FLAG 4
+#define ONLY_TRANSMIT_ON_CHANGE 5
+#define ONLY_UPDATE_ON_CHANGE 6
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

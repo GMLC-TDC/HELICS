@@ -118,12 +118,15 @@ public:
 	@details should be done after initialization has complete*/
 	bool connect();
 	/** disconnect the broker from any other brokers and communications
-    **if the flag is set it should not do the unregister step of the disconnection, if this is set it is presumed 
-    the unregistration has already happened or it will be taken care of manually
 	*/
-	void disconnect(bool skipUnregister=false);
-	
-	virtual void processDisconnect() override final;
+	void disconnect();
+    /** unregister the broker from the factory find methods*/
+    void unregister();
+    /** disconnect the broker from any other brokers and communications
+    **if the flag is set it should not do the unregister step of the disconnection, if this is set it is presumed
+    the unregistration has already happened or it will be taken care of manually
+    */
+	virtual void processDisconnect(bool skipUnregister = false) override final;
 	/** check if the broker is connected*/
 	bool isConnected() const;
 	/** set the broker to be a root broker

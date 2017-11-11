@@ -38,7 +38,8 @@ CoreFederateInfo generateCoreInfo (const FederateInfo &fi)
     cfi.offset = fi.offset;
     cfi.logLevel = fi.logLevel;
     cfi.uninteruptible = fi.uninterruptible;
-    cfi.time_agnostic = fi.timeAgnostic;
+    cfi.only_transmit_on_change = fi.only_transmit_on_change;
+    cfi.only_update_on_change = fi.only_update_on_change;
     cfi.source_only = fi.sourceOnly;
     cfi.max_iterations = fi.max_iterations;
     return cfi;
@@ -705,9 +706,13 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     {
         fi.rollback = doc["rollback"].asBool ();
     }
-    if (doc.isMember ("timeAgnostic"))
+    if (doc.isMember ("only_update_on_change"))
     {
-        fi.timeAgnostic = doc["timeAgnostic"].asBool ();
+        fi.only_update_on_change = doc["only_update_on_change"].asBool ();
+    }
+    if (doc.isMember("only_transmit_on_change"))
+    {
+        fi.only_transmit_on_change = doc["only_transmit_on_change"].asBool();
     }
     if (doc.isMember ("sourceOnly"))
     {

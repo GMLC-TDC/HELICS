@@ -903,42 +903,50 @@ bool CoreBroker::connect ()
 
 bool CoreBroker::isConnected () const { return ((brokerState == operating) || (brokerState == connected)); }
 
-void CoreBroker::processDisconnect () { disconnect (); }
-
-void CoreBroker::disconnect (bool skipUnregister)
+void CoreBroker::processDisconnect (bool skipUnregister) 
 {
     if (brokerState == broker_state_t::terminated)
     {
         return;
     }
-    LOG_NORMAL (0, getIdentifier (), "||disconnecting");
+    LOG_NORMAL(0, getIdentifier(), "||disconnecting");
     if (brokerState > broker_state_t::initialized)
     {
         brokerState = broker_state_t::terminating;
-        brokerDisconnect ();
+        brokerDisconnect();
     }
     brokerState = broker_state_t::terminated;
-    if (skipUnregister)
+    if (!skipUnregister)
     {
-        return;
+        unregister();
     }
+    
+}
+
+void CoreBroker::unregister()
+{
     /*We need to ensure that the destructor is not called immediately upon calling unregister
     otherwise this would be a mess and probably cause segmentation faults so we capture it in a local variable
     that will be destroyed on function exit
     */
-    auto keepBrokerAlive = BrokerFactory::findBroker (identifier);
+    auto keepBrokerAlive = BrokerFactory::findBroker(identifier);
     if (keepBrokerAlive)
     {
-        BrokerFactory::unregisterBroker (identifier);
+        BrokerFactory::unregisterBroker(identifier);
     }
-    if (!previous_local_broker_identifier.empty ())
+    if (!previous_local_broker_identifier.empty())
     {
-        auto keepBrokerAlive2 = BrokerFactory::findBroker (previous_local_broker_identifier);
+        auto keepBrokerAlive2 = BrokerFactory::findBroker(previous_local_broker_identifier);
         if (keepBrokerAlive2)
         {
-            BrokerFactory::unregisterBroker (previous_local_broker_identifier);
+            BrokerFactory::unregisterBroker(previous_local_broker_identifier);
         }
     }
+}
+
+void CoreBroker::disconnect ()
+{
+    processDisconnect();
 }
 
 bool CoreBroker::FindandNotifySubscriptionPublisher (BasicHandleInfo &handleInfo)

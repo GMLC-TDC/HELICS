@@ -63,7 +63,7 @@ class FederateState
     std::map<std::string, EndpointInfo *> epNames;  //!< translate names to endpoints
     std::map<std::string, FilterInfo *> filterNames;  //!< translate names to filterObjects
 public:
-	std::atomic<bool> init_transmitted{ false }; //!< the init request has been transmitted
+	std::atomic<bool> init_transmitted{ false }; //!< the initialization request has been transmitted
 private:
 	std::vector<std::unique_ptr<SubscriptionInfo>> subscriptions;  //!< storage for all the subscriptions
     std::vector<std::unique_ptr<PublicationInfo>> publications;  //!< storage for all the publications
@@ -74,7 +74,7 @@ private:
   public:
     std::atomic<bool> init_requested{false};  //!< this federate has requested entry to initialization
 	
-    bool iterating = false;  //!< the federate is iterating at a timestep
+    bool iterating = false;  //!< the federate is iterating at a time step
     bool hasEndpoints = false;  //!< the federate has endpoints
 	int logLevel=1;
   private:
