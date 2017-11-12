@@ -97,9 +97,6 @@ HELICS_Export int helicsIsValueUpdated (helics_subscription sub);
 
 HELICS_Export helics_time_t helicsGetLastUpdateTime (helics_subscription sub);
 
-HELICS_Export void helicsClosePublication (helics_publication pub);
-
-HELICS_Export void helicsCloseSubscription (helics_subscription sub);
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif

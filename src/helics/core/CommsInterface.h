@@ -88,6 +88,44 @@ std::string makePortAddress(const std::string &networkInterface, int portNumber)
 
 std::pair<std::string, int> extractInterfaceandPort(const std::string &address);
 std::pair<std::string, std::string> extractInterfaceandPortString(const std::string &address);
+
+template<class X>
+class changeOnDestroy
+{
+private:
+    std::atomic<X> &aref;
+    X fval;
+public:
+    changeOnDestroy(std::atomic<X> &var, X finalValue) :aref(var), fval(std::move(finalValue))
+    {
+
+    }
+    ~changeOnDestroy()
+    {
+        aref.store(fval);
+    }
+
+};
+
+template<class X>
+class conditionalChangeOnDestroy
+{
+private:
+    std::atomic<X> &aref;
+    X fval;
+    X expectedValue;
+public:
+    conditionalChangeOnDestroy(std::atomic<X> &var, X finalValue, X expValue) :aref(var), fval(std::move(finalValue)), expectedValue(std::move(expValue))
+    {
+
+    }
+    ~conditionalChangeOnDestroy()
+    {
+        aref.compare_exchange_strong(expectedValue, fval);
+    }
+
+};
+
 } // namespace helics
 
 #endif /* _HELICS_COMMS_INTERFACE_ */

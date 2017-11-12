@@ -421,6 +421,15 @@ void Federate::finalize ()
     state = op_states::finalize;
 }
 
+void Federate::disconnect ()
+{
+    if (state != op_states::error)
+    {
+        coreObject->finalize (fedID);
+    }
+    coreObject = nullptr;
+}
+
 void Federate::error (int errorcode)
 {
     state = op_states::error;

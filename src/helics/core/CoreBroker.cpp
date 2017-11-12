@@ -905,8 +905,12 @@ bool CoreBroker::isConnected () const { return ((brokerState == operating) || (b
 
 void CoreBroker::processDisconnect () { disconnect (); }
 
-void CoreBroker::disconnect ()
+void CoreBroker::disconnect (bool skipUnregister)
 {
+    if (brokerState == broker_state_t::terminated)
+    {
+        return;
+    }
     LOG_NORMAL (0, getIdentifier (), "||disconnecting");
     if (brokerState > broker_state_t::initialized)
     {
@@ -914,8 +918,12 @@ void CoreBroker::disconnect ()
         brokerDisconnect ();
     }
     brokerState = broker_state_t::terminated;
+    if (skipUnregister)
+    {
+        return;
+    }
     /*We need to ensure that the destructor is not called immediately upon calling unregister
-    otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
+    otherwise this would be a mess and probably cause segmentation faults so we capture it in a local variable
     that will be destroyed on function exit
     */
     auto keepBrokerAlive = BrokerFactory::findBroker (identifier);
@@ -1238,6 +1246,10 @@ bool matchingTypes (const std::string &type1, const std::string &type2)
         return true;
     }
     if ((type1.empty ()) || (type2.empty ()))
+    {
+        return true;
+    }
+    if ((type1.compare(0,3,"def")==0) || (type2.compare(0, 3, "def") == 0))
     {
         return true;
     }

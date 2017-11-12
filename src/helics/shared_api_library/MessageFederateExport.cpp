@@ -17,6 +17,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <mutex>
 #include <vector>
 
+static inline void addEndpoint (helics_message_federate fed, helics::EndpointObject *ept)
+{
+    auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
+    fedObj->epts.push_back (ept);
+}
+
 helics_endpoint helicsRegisterEndpoint (helics_message_federate fed, const char *name, const char *type)
 {
     // now generate a generic subscription
@@ -31,6 +37,7 @@ helics_endpoint helicsRegisterEndpoint (helics_message_federate fed, const char 
         end = new helics::EndpointObject ();
         end->endptr = std::make_unique<helics::Endpoint> (fedObj.get (), name, type);
         end->fedptr = std::move (fedObj);
+        addEndpoint (fed, end);
         return reinterpret_cast<helics_endpoint> (end);
     }
     catch (const helics::InvalidFunctionCall &)
@@ -54,6 +61,7 @@ helics_endpoint helicsRegisterGlobalEndpoint (helics_message_federate fed, const
         end = new helics::EndpointObject ();
         end->endptr = std::make_unique<helics::Endpoint> (helics::GLOBAL, fedObj.get (), name, type);
         end->fedptr = std::move (fedObj);
+        addEndpoint (fed, end);
         return reinterpret_cast<helics_endpoint> (end);
     }
     catch (const helics::InvalidFunctionCall &)
