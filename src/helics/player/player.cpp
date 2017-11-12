@@ -162,7 +162,7 @@ int main (int argc, char *argv[])
         fi.coreInitString += " --broker=";
         fi.coreInitString += vm["broker"].as<std::string> ();
     }
-    fi.sourceOnly = true;
+    fi.source_only = true;
     if (vm.count ("timedelta") > 0)
     {
         fi.timeDelta = vm["timedelta"].as<double> ();

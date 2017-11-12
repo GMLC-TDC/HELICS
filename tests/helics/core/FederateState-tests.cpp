@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     BOOST_CHECK_EQUAL (fs->getInfo ().impactWindow, helics::Time::zeroVal ());
     BOOST_CHECK_EQUAL (fs->getInfo ().period, helics::Time::zeroVal ());
     BOOST_CHECK_EQUAL (fs->getInfo ().observer, false);
-    BOOST_CHECK_EQUAL (fs->getInfo ().uninteruptible, false);
+    BOOST_CHECK_EQUAL (fs->getInfo ().uninterruptible, false);
     BOOST_CHECK_EQUAL (fs->getInfo ().source_only, false);
 
     // Check other default state values

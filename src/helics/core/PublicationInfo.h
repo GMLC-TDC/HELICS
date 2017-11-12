@@ -48,7 +48,9 @@ public:
 	std::string units;	//!< the units of the publication data
 	std::string data;	//!< the most recent publication data
 	bool has_update = false;	//!< indicator that the publication has updates
-	//7 byte gap here
+	
+    /** check the value if it is the same as the most recent data and if changed store it*/
+    bool CheckSetValue(const char *checkData, uint64_t len);
 	
 	
 };

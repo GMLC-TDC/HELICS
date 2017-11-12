@@ -65,6 +65,8 @@ FederateState::FederateState (const std::string &name_, const CoreFederateInfo &
     state = HELICS_CREATED;
     timeCoord = std::make_unique<TimeCoordinator> (info_);
     logLevel = info_.logLevel;
+    only_update_on_change = info_.only_update_on_change;
+    only_transmit_on_change = info_.only_transmit_on_change;
 }
 
 FederateState::~FederateState () = default;
@@ -146,6 +148,8 @@ void FederateState::UpdateFederateInfo (CoreFederateInfo &newInfo)
     }
     std::lock_guard<std::mutex> lock (_mutex);
     logLevel = newInfo.logLevel;
+    only_update_on_change = newInfo.only_update_on_change;
+    only_transmit_on_change = newInfo.only_transmit_on_change;
     timeCoord->setInfo (newInfo);
 }
 
@@ -160,7 +164,7 @@ void FederateState::createSubscription (Core::Handle handle,
 
     std::lock_guard<std::mutex> lock (_mutex);
     subNames.emplace (key, sub.get ());
-
+    sub->only_update_on_change = only_update_on_change;
     // need to sort the vectors so the find works properly
     if (subscriptions.empty () || handle > subscriptions.back ()->id)
     {
@@ -271,7 +275,7 @@ SubscriptionInfo *FederateState::getSubscription (Core::Handle handle_) const
     };
 
     auto fnd = std::lower_bound (subscriptions.begin (), subscriptions.end (), handle_, cmptr);
-    if (fnd->operator-> ()->id == handle_)
+    if ((*fnd)->id == handle_)
     {
         return fnd->get ();
     }
@@ -295,7 +299,7 @@ PublicationInfo *FederateState::getPublication (Core::Handle handle_) const
     };
 
     auto fnd = std::lower_bound (publications.begin (), publications.end (), handle_, cmptr);
-    if (fnd->operator-> ()->id == handle_)
+    if ((*fnd)->id == handle_)
     {
         return fnd->get ();
     }
@@ -356,6 +360,18 @@ FilterInfo *FederateState::getFilter (Core::Handle handle_) const
         return fnd->get ();
     }
     return nullptr;
+}
+
+bool FederateState::checkSetValue(Core::Handle pub_id, const char *data, uint64_t len) const
+{
+    if (!only_transmit_on_change)
+    {
+        return true;
+    }
+    //this function could be called externally in a multi-threaded context
+    std::lock_guard<std::mutex> lock(_mutex); 
+    auto pub = getPublication(pub_id);
+    return pub->CheckSetValue(data, len);
 }
 
 uint64_t FederateState::getQueueSize (Core::Handle handle_) const

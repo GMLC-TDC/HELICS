@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/helics-time.h"
 #include "helics_includes/string_view.h"
 
+#include "helics/core/coreFederateInfo.h"
 #include <atomic>
 #include <string>
 
@@ -33,31 +34,16 @@ class Core;
 class asyncFedCallInfo;
 /** data class defining federate properties and information
  */
-class FederateInfo
+class FederateInfo: public CoreFederateInfo
 {
   public:
     std::string name;  //!< federate name
-    bool observer =
-      false;  //!< indicator that the federate is an observer and doesn't participate in time advancement
+    
     bool rollback = false;  //!< indicator that the federate has rollback features
     bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must
                                   //! support rollback if set to true]
-    bool uninterruptible =
-      false;  //!< indicator that the time request cannot return something other than the requested time
-    bool sourceOnly = false;  //!< indicator that the federate is a source only
-    bool only_update_on_change = false; //!< indicator that the federate should discards value messages that did not change
-    bool only_transmit_on_change = false;  //!< indicator that the federate should not send values that haven't changed
-    int32_t max_iterations = 10;  //!< the maximum number of iteration cycles a federate should execute
-    int32_t logLevel =
-      1;  //!< the logging level for the federate (-1: none, 0: error, 1:warning,2:normal,3:debug,4:trace)
     core_type coreType;  //!< the type of the core
     std::string coreName;  //!< the name of the core
-    Time timeDelta = timeZero;  //!< the minimum time between granted time requests
-    Time lookAhead = timeZero;  //!< the lookahead value
-    Time impactWindow = timeZero;  //!< the impact window
-    Time period = timeZero;  //!< the periodicity of the Federate granted time can only come on integer multipliers
-                             //!< of the period
-    Time offset = timeZero;  //!< the offset to the time period
     std::string coreInitString;  //!< an initialization string for the core API object
 
     /** default constructor*/

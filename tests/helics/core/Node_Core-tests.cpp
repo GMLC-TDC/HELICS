@@ -14,7 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/CoreFactory.h"
 #include "helics/core/core-types.h"
 #include "helics/core/core.h"
-
+#include "helics/core/coreFederateInfo.h"
 #include <atomic>
 #include <cassert>
 #include <iostream>

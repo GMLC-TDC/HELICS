@@ -87,7 +87,7 @@ public:
 	void setLoggerFunction(std::function<void(int, const std::string &, const std::string &)> logFunction);
 
     /* process a disconnect signal*/
-    virtual void processDisconnect(bool unregisterFlag = true) = 0;
+    virtual void processDisconnect(bool skipUnregister = false) = 0;
 private:
 	/** start main broker loop*/
 	void queueProcessingLoop();

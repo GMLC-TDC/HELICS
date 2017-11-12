@@ -905,17 +905,15 @@ bool CoreBroker::isConnected () const { return ((brokerState == operating) || (b
 
 void CoreBroker::processDisconnect (bool skipUnregister) 
 {
-    if (brokerState == broker_state_t::terminated)
-    {
-        return;
-    }
-    LOG_NORMAL(0, getIdentifier(), "||disconnecting");
-    if (brokerState > broker_state_t::initialized)
-    {
-        brokerState = broker_state_t::terminating;
-        brokerDisconnect();
-    }
-    brokerState = broker_state_t::terminated;
+
+        LOG_NORMAL(0, getIdentifier(), "||disconnecting");
+        if (brokerState > broker_state_t::initialized)
+        {
+            brokerState = broker_state_t::terminating;
+            brokerDisconnect();
+        }
+        brokerState = broker_state_t::terminated;
+
     if (!skipUnregister)
     {
         unregister();

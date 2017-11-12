@@ -21,7 +21,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/common/BlockingQueue3.hpp"
 #include "helics/config.h"
 #include "core/core-types.h"
-
+#include "coreFederateInfo.h"
 #include "TimeDependencies.h"
 
 #include <atomic>
@@ -58,6 +58,8 @@ class FederateState
 
   private:
     std::atomic<helics_federate_state_type> state{HELICS_NONE};  //!< the current state of the federate
+    bool only_update_on_change{ false };  //!< flag indicating that values should only be updated on change
+    bool only_transmit_on_change{ false };  //!< flag indicating that values should only be transmitted if different than previous values
     std::map<std::string, SubscriptionInfo *> subNames;  //!< translate names to subscriptions
     std::map<std::string, PublicationInfo *> pubNames;  //!< translate names to publications
     std::map<std::string, EndpointInfo *> epNames;  //!< translate names to endpoints
@@ -65,6 +67,7 @@ class FederateState
 public:
 	std::atomic<bool> init_transmitted{ false }; //!< the initialization request has been transmitted
 private:
+   
 	std::vector<std::unique_ptr<SubscriptionInfo>> subscriptions;  //!< storage for all the subscriptions
     std::vector<std::unique_ptr<PublicationInfo>> publications;  //!< storage for all the publications
     std::vector<std::unique_ptr<EndpointInfo>> endpoints;  //!< storage for all the endpoints
@@ -76,6 +79,7 @@ private:
 	
     bool iterating = false;  //!< the federate is iterating at a time step
     bool hasEndpoints = false;  //!< the federate has endpoints
+    //1 byte free
 	int logLevel=1;
   private:
     BlockingQueue3<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
@@ -249,6 +253,13 @@ private:
     {
         loggerFunction = std::move (logFunction);
     }
+    /** check if a value should be published or not
+    @param pub_id the handle of the publication
+    @param data the raw data to check
+    @param len the length of the data
+    @return true if it should be published, false if not
+    */
+    bool checkSetValue(Core::Handle pub_id, const char *data, uint64_t len) const;
 };
 }
 #endif

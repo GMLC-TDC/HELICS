@@ -13,6 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #pragma once
 
 #include "TimeDependencies.h"
+#include "coreFederateInfo.h"
 #include "ActionMessage.h"
 #include <atomic>
 #include <functional>

@@ -14,6 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/core-exceptions.h"
 #include "helics/core/core-types.h"
 #include "helics/core/core.h"
+#include "helics/core/coreFederateInfo.h"
 
 BOOST_AUTO_TEST_SUITE (TestCore_tests)
 

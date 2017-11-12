@@ -128,7 +128,7 @@ helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int
         hfi->only_update_on_change = (value != 0);
         break;
     case SOURCE_ONLY_FLAG:
-        hfi->sourceOnly = (value != 0);
+        hfi->source_only = (value != 0);
         break;
     default:
         return helicsDiscard;

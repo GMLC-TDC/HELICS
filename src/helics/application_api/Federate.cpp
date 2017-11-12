@@ -27,23 +27,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-CoreFederateInfo generateCoreInfo (const FederateInfo &fi)
-{
-    CoreFederateInfo cfi;
-    cfi.lookAhead = fi.lookAhead;
-    cfi.impactWindow = fi.impactWindow;
-    cfi.observer = fi.observer;
-    cfi.timeDelta = fi.timeDelta;
-    cfi.period = fi.period;
-    cfi.offset = fi.offset;
-    cfi.logLevel = fi.logLevel;
-    cfi.uninteruptible = fi.uninterruptible;
-    cfi.only_transmit_on_change = fi.only_transmit_on_change;
-    cfi.only_update_on_change = fi.only_update_on_change;
-    cfi.source_only = fi.sourceOnly;
-    cfi.max_iterations = fi.max_iterations;
-    return cfi;
-}
 
 std::string getHelicsVersionString ()
 {
@@ -87,7 +70,7 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
     {
         coreObject->connect ();
     }
-    fedID = coreObject->registerFederate (fi.name, generateCoreInfo (fi));
+    fedID = coreObject->registerFederate (fi.name, fi);
     currentTime = coreObject->getCurrentTime (fedID);
 }
 
@@ -120,7 +103,7 @@ Federate::Federate (std::shared_ptr<Core> core, const FederateInfo &fi)
     {
         coreObject->connect ();
     }
-    fedID = coreObject->registerFederate (fi.name, generateCoreInfo (fi));
+    fedID = coreObject->registerFederate (fi.name, fi);
     currentTime = coreObject->getCurrentTime (fedID);
 }
 
@@ -714,9 +697,9 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     {
         fi.only_transmit_on_change = doc["only_transmit_on_change"].asBool();
     }
-    if (doc.isMember ("sourceOnly"))
+    if (doc.isMember ("source_only"))
     {
-        fi.sourceOnly = doc["sourceOnly"].asBool ();
+        fi.source_only = doc["sourc_only"].asBool ();
     }
     if (doc.isMember ("uninterruptible"))
     {

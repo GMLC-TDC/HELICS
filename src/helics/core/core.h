@@ -29,7 +29,7 @@ namespace helics
  * MPI).
  *
  * Multiple federates are allowed.  Due to the collective blocking
- * nature of some calls, like nextTime(), federates need to be in
+ * nature of some calls, like requestTime(), federates may need to be in
  * separate threads in order to function correctly.
  *
  *
@@ -42,28 +42,8 @@ namespace helics
  * Note: Methods should all be pure virtual, leaving syntactical sugar off while iterating API design.
  */
 
-
- /** class defining some required information about the federate*/
-class CoreFederateInfo
-{
-public:
-	Time timeDelta = timeEpsilon;  // the minimum time advance allowed by the federate
-								// federate
-	Time lookAhead = timeZero;  //!< the lookahead value, the window of time between the time request return and the availability of values
-	Time impactWindow = timeZero;  //!< the time it takes values to propagate to the Federate
-	Time period = timeZero; //!< a period value,  all granted times must be on this period
-	Time offset = timeZero;  //!< offset to the time period
-	int logLevel;	//!< the logging level above which not to log to file
-	bool observer = false;  //!< flag indicating that the federate is an observer
-	bool uninteruptible =
-		false;  //!< flag indicating that the federate should never return a time other than requested
-	bool source_only = false;   //!< flag indicating that the federate does not receive or do anything with received information.  											  
-    bool only_transmit_on_change = false; //!< flag indicating that values should only updated if the number has actually changes
-    bool only_update_on_change = false;  //!< flag indicating values should be discarded if they are not changed from previous values
-    //1 byte gap
-	int16_t max_iterations = 3;	//!< the maximum number of iterations allowed for the federate
-							  
-};
+    //for
+    class CoreFederateInfo;
 
 /** the object defining the core interface through an abstract class*/
 class Core

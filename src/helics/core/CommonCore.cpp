@@ -17,7 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "PublicationInfo.h"
 #include "SubscriptionInfo.h"
 #include <boost/filesystem.hpp>
-
+#include "coreFederateInfo.h"
 #include "CoreFactory.h"
 #include "FilterFunctions.h"
 #include "helics/common/logger.h"
@@ -111,10 +111,7 @@ bool CommonCore::isConnected () const
 
 void CommonCore::processDisconnect (bool skipUnregister)
 { 
-    if (brokerState == broker_state_t::terminated)
-    {
-        return;
-    }
+
     if (brokerState > broker_state_t::initialized)
     {
         if (brokerState < broker_state_t::terminating)
@@ -901,15 +898,19 @@ void CommonCore::setValue (Handle handle, const char *data, uint64_t len)
         return;  // if the value is not required do nothing
     }
     auto fed = getFederate (handleInfo->local_fed_id);
-    LOG_DEBUG (0, fed->getIdentifier (),
-               (boost::format ("setting Value for %s size %d") % handleInfo->key % len).str ());
-    ActionMessage mv (CMD_PUB);
-    mv.source_id = handleInfo->fed_id;
-    mv.source_handle = handle;
-    mv.payload = std::string (data, len);
-    mv.actionTime = fed->grantedTime ();
+    if (fed->checkSetValue(handle, data, len))
+    {
+        LOG_DEBUG(0, fed->getIdentifier(),
+            (boost::format("setting Value for %s size %d") % handleInfo->key % len).str());
+        ActionMessage mv(CMD_PUB);
+        mv.source_id = handleInfo->fed_id;
+        mv.source_handle = handle;
+        mv.payload = std::string(data, len);
+        mv.actionTime = fed->grantedTime();
 
-    _queue.push (mv);
+        _queue.push(mv);
+    }
+    
 }
 
 std::shared_ptr<const data_block> CommonCore::getValue (Handle handle)
