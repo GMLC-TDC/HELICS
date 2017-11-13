@@ -20,7 +20,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <chrono>
 #include <thread>
 
-#include "config.h"
+#include "helics/helics-config.h"
 #include <boost/foreach.hpp>
 
 #define LOG_ERROR(message) logMessage (0, "", message);

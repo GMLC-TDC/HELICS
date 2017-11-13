@@ -8,12 +8,13 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
+
 #ifndef _CORE_DATA_TYPES_H_
 #define _CORE_DATA_TYPES_H_
 #pragma once
 
 #include "helics-time.h"
-#include "config.h"
+#include "helics/helics-config.h"
 
 #include <cstdint>
 #include <memory>

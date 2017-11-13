@@ -11,7 +11,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "helics-time.h"
 #include "../common/blocking_queue.h"
-#include "config.h"
+#include "helics/helics-config.h"
 #include "core.h"
 #include "core-data.h"
 
