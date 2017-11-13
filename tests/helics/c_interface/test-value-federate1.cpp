@@ -14,11 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <future>
 
 #include "ctestFixtures.h"
-#include "helics/application_api/Publications.hpp"
-#include "helics/application_api/Subscriptions.hpp"
-#include "helics/application_api/ValueFederate.h"
-#include "helics/core/BrokerFactory.h"
-#include "helics/core/CoreFactory.h"
+
 #include "test_configuration.h"
 
 /** these test cases test out the value federates

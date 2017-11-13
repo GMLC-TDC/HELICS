@@ -20,7 +20,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <mutex>
 #include <vector>
 
-#include "helics/config.h"
+#include "helics/helics-config.h"
 #if HELICS_HAVE_ZEROMQ > 0
 #include "../common/cppzmq/zmq.hpp"
 #include "../common/zmqContextManager.h"

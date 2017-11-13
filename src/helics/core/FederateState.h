@@ -19,7 +19,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "core.h"
 #include "helics-time.h"
 #include "../common/BlockingQueue3.hpp"
-#include "helics/config.h"
+#include "helics/helics-config.h"
 #include "core-types.h"
 #include "coreFederateInfo.h"
 #include "TimeDependencies.h"

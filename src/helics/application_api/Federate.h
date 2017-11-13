@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_FEDERATE_API_
 #pragma once
 
-#include "helics/config.h"
+#include "helics/helics-config.h"
 #include "../core/helics-time.h"
 #include "helics_includes/string_view.h"
 

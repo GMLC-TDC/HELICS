@@ -5,7 +5,7 @@ project (HELICS)
 # HELICS Version number
 #-----------------------------------------------------------------------------
 set (HELICS_VERSION_MAJOR 0)
-set (HELICS_VERSION_MINOR 3)
+set (HELICS_VERSION_MINOR 9)
 set (HELICS_VERSION_PATCH 0)
 
 set (HELICS_DATE "10-16-17")
@@ -115,6 +115,7 @@ ENDIF(UNIX)
 # Get some configuration for C++17 as that becomes available
 # -------------------------------------------------------------
 #message(STATUS ${CMAKE_CXX_FLAGS})
+set(CONFIGURE_TARGET_LOCATION ${PROJECT_BINARY_DIR}/libs/include/helics/)
 include(configGenerator)
 
 IF (VERSION_OPTION)
@@ -254,10 +255,10 @@ message(STATUS "key files ${KEY_LIBRARY_FILES}")
 # Setup configure.h file for accessing configure options
 #-----------------------------------------------------------------------------
 configure_file (
-  "src/helics/config.h.in"
-  "include/helics/config.h"
+  "helics-config.h.in"
+  "${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h"
   )
-  install(FILES ${CMAKE_BINARY_DIR}/include/helics/config.h DESTINATION include/helics)
+  install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/*-config.h DESTINATION include/helics)
 
   install(DIRECTORY ThirdParty/ DESTINATION include
 	  FILES_MATCHING PATTERN "helics_includes/*.h*")

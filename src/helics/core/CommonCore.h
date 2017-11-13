@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_COMMON_CORE_
 #pragma once
 
-#include "helics/config.h"
+#include "helics/helics-config.h"
 #include "helics-time.h"
 #include "../common/simpleQueue.hpp"
 #include "core.h"

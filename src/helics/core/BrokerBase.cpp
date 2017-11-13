@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "BrokerBase.h"
 
 #include "../common/logger.h"
-
+#include "helics/helics-config.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/uuid/uuid.hpp>  // uuid class

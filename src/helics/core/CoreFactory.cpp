@@ -10,7 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "CoreFactory.h"
 #include "core-types.h"
-#include "helics/config.h"
+#include "helics/helics-config.h"
 
 #if HELICS_HAVE_ZEROMQ
 #include "zmq/ZmqCore.h"

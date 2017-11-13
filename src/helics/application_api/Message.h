@@ -12,7 +12,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "helics_includes/string_view.h"
-#include "helics/config.h"
+#include "helics/helics-config.h"
 #include "../core/helics-time.h"
 #include "../core/core-data.h"
 #include <memory>

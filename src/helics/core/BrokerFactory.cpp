@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "BrokerFactory.h"
 #include "../common/delayedDestructor.hpp"
 #include "../common/searchableObjectHolder.hpp"
-#include "helics/config.h"
+#include "helics/helics-config.h"
 #include "core-types.h"
 #if HELICS_HAVE_ZEROMQ
 #include "zmq/ZmqBroker.h"

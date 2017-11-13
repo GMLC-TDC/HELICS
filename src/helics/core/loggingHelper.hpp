@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_LOGGING_HELPER_
 #pragma once
 
-#include "helics/config.h"
+#include "helics/helics-config.h"
 /** @file
 this file is meant to be included in the commonCore.cpp and coreBroker.cpp
 and inherited class files
