@@ -16,8 +16,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test out the value converters
  */
 #include "helics/application_api/ValueConverter.hpp"
-#include "application_api/Publications.hpp"
-#include "application_api/Subscriptions.hpp"
+#include "helics/application_api/Publications.hpp"
+#include "helics/application_api/Subscriptions.hpp"
 
 BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
 

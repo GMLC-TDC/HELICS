@@ -10,8 +10,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_BROKER_FACTORY_
 #pragma once
 
-#include "helics/core/core-types.h"
-#include "helics/core/CoreBroker.h"
+#include "core-types.h"
+#include "CoreBroker.h"
 #include <memory>
 #include <string>
 

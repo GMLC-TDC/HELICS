@@ -23,7 +23,7 @@ and some common methods used cores and brokers
 
 #include "core.h"
 #include "ActionMessage.h"
-#include "helics/common/BlockingPriorityQueue.hpp"
+#include "../common/BlockingPriorityQueue.hpp"
 namespace helics
 {
 

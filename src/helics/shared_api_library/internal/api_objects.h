@@ -12,9 +12,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include <memory>
-#include "shared_api_library/api-data.h"
-#include "application_api/helicsTypes.hpp"
-#include "core/core-data.h"
+#include "../api-data.h"
+#include "../../application_api/helicsTypes.hpp"
+#include "../../core/core-data.h"
 #include <mutex>
 namespace helics
 {

@@ -10,7 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "testFixtures.h"
 
-#include "application_api/queryFunctions.h"
+#include "helics/application_api/queryFunctions.h"
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 

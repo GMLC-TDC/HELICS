@@ -8,13 +8,13 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/core/zmq/ZmqCore.h"
+#include "ZmqCore.h"
 
 #include "helics/config.h"
-#include "helics/core/core-data.h"
-#include "helics/core/core.h"
-#include "helics/core/helics-time.h"
-#include "helics/core/zmq/ZmqComms.h"
+#include "../core-data.h"
+#include "../core.h"
+#include "../helics-time.h"
+#include "ZmqComms.h"
 
 #include <algorithm>
 #include <cassert>
@@ -23,7 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <fstream>
 #include <sstream>
 
-#include "helics/core/argParser.h"
+#include "../argParser.h"
 
 namespace helics
 {

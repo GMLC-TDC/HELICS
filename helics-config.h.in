@@ -1,0 +1,8 @@
+#ifndef HELICS_CONFIG_H
+#define HELICS_CONFIG_H
+#pragma once
+
+#include "compiler-config.h"
+
+
+#endif

@@ -10,14 +10,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "CoreBroker.h"
 #include "BrokerFactory.h"
-#include "common/stringToCmdLine.h"
+#include "../common/stringToCmdLine.h"
 
-#include "helics/core/argParser.h"
+#include "argParser.h"
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 
 #include "TimeCoordinator.h"
-#include "helics/common/logger.h"
+#include "../common/logger.h"
 #include "loggingHelper.hpp"
 #include <fstream>
 

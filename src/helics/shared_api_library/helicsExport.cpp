@@ -8,10 +8,10 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "application_api/application_api.h"
-#include "core/BrokerFactory.h"
-#include "core/CoreFactory.h"
-#include "core/helics-time.h"
+#include "../application_api/application_api.h"
+#include "../core/BrokerFactory.h"
+#include "../core/CoreFactory.h"
+#include "../core/helics-time.h"
 #include "helics.h"
 #include "internal/api_objects.h"
 #include <atomic>
@@ -22,8 +22,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/config.h"
 #if HELICS_HAVE_ZEROMQ > 0
-#include "common/cppzmq/zmq.hpp"
-#include "helics/common/zmqContextManager.h"
+#include "../common/cppzmq/zmq.hpp"
+#include "../common/zmqContextManager.h"
 #endif
 
 static const std::string versionStr (std::to_string (HELICS_VERSION_MAJOR) + "." +

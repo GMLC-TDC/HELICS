@@ -10,7 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "IpcComms.h"
 #include "IpcQueueHelper.h"
-#include "helics/core/ActionMessage.h"
+#include "../ActionMessage.h"
 #include <algorithm>
 #include <cctype>
 #include <memory>

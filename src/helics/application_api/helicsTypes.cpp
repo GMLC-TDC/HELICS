@@ -10,7 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "helicsTypes.hpp"
-#include "application_api/ValueConverter.hpp"
+#include "ValueConverter.hpp"
 #include <map>
 #include <regex>
 #include <boost/algorithm/string/trim.hpp>

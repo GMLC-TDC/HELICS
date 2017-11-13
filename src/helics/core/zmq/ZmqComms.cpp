@@ -10,10 +10,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "ZmqComms.h"
 #include "ZmqRequestSets.h"
-#include "helics/common/zmqContextManager.h"
-#include "helics/common/zmqHelper.h"
-#include "helics/common/zmqSocketDescriptor.h"
-#include "helics/core/ActionMessage.h"
+#include "../../common/zmqContextManager.h"
+#include "../../common/zmqHelper.h"
+#include "../../common/zmqSocketDescriptor.h"
+#include "../ActionMessage.h"
 #include <memory>
 
 static const int BEGIN_OPEN_PORT_RANGE = 23500;

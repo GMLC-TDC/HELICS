@@ -9,21 +9,21 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "BrokerFactory.h"
-#include "helics/common/delayedDestructor.hpp"
-#include "helics/common/searchableObjectHolder.hpp"
+#include "../common/delayedDestructor.hpp"
+#include "../common/searchableObjectHolder.hpp"
 #include "helics/config.h"
-#include "helics/core/core-types.h"
+#include "core-types.h"
 #if HELICS_HAVE_ZEROMQ
-#include "helics/core/zmq/ZmqBroker.h"
+#include "zmq/ZmqBroker.h"
 #endif
 
 #if HELICS_HAVE_MPI
-#include "helics/core/mpi/mpiBroker.h"
+#include "mpi/mpiBroker.h"
 #endif
 
-#include "helics/core/TestBroker.h"
-#include "helics/core/ipc/IpcBroker.h"
-#include "helics/core/udp/UdpBroker.h"
+#include "TestBroker.h"
+#include "ipc/IpcBroker.h"
+#include "udp/UdpBroker.h"
 
 #include <cassert>
 

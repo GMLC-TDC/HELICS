@@ -20,9 +20,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "coreFederateInfo.h"
 #include "CoreFactory.h"
 #include "FilterFunctions.h"
-#include "helics/common/logger.h"
-#include "helics/common/stringToCmdLine.h"
-#include "helics/core/core-exceptions.h"
+#include "../common/logger.h"
+#include "../common/stringToCmdLine.h"
+#include "core-exceptions.h"
 #include "loggingHelper.hpp"
 
 #include <algorithm>

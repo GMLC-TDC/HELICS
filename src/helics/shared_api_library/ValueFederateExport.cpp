@@ -9,12 +9,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "ValueFederate_c.h"
-#include "application_api/Publications.hpp"
-#include "application_api/Subscriptions.hpp"
-#include "application_api/application_api.h"
-#include "application_api/helicsTypes.hpp"
-#include "core/helics-time.h"
-#include "shared_api_library/internal/api_objects.h"
+#include "../application_api/Publications.hpp"
+#include "../application_api/Subscriptions.hpp"
+#include "../application_api/application_api.h"
+#include "../application_api/helicsTypes.hpp"
+#include "../core/helics-time.h"
+#include "internal/api_objects.h"
 #include <map>
 #include <memory>
 #include <mutex>

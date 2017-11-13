@@ -28,14 +28,16 @@ subPubObjectTests.cpp
 testFixtures.cpp
 )
 
+include_directories( SYSTEM ${Boost_INCLUDE_DIR})
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
+include_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_executable(application-api-tests ${application_api_test_sources} ${application_api_test_headers})
 target_link_libraries(application-api-tests helics)
 
 link_directories(${external_link_directories})
 
-include_directories( SYSTEM ${Boost_INCLUDE_DIR})
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
+
 
 target_link_libraries(application-api-tests ${external_library_list})
 

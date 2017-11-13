@@ -21,8 +21,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #endif
 
 #include "TestCore.h"
-#include "common/delayedDestructor.hpp"
-#include "common/searchableObjectHolder.hpp"
+#include "../common/delayedDestructor.hpp"
+#include "../common/searchableObjectHolder.hpp"
 #include "ipc/IpcCore.h"
 #include "udp/UdpCore.h"
 #include <cassert>

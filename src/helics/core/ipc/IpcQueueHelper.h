@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_IPC_QUEUE_HELPER_
 #pragma once
 
-#include "helics/core/ActionMessage.h"
+#include "../ActionMessage.h"
 #include <algorithm>
 #include <cctype>
 #include <helics_includes/optional.h>

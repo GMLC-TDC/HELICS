@@ -1,0 +1,68 @@
+/*
+* LLNS Copyright Start
+ * Copyright (c) 2017, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department
+ * of Energy by Lawrence Livermore National Laboratory in part under
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
+ * Produced at the Lawrence Livermore National Laboratory.
+ * All rights reserved.
+ * For details, see the LICENSE file.
+ * LLNS Copyright End
+ */
+#ifndef CONFIG_UTILITIES_H
+#define CONFIG_UTILITIES_H
+#pragma once
+
+#cmakedefine HAVE_STRING_VIEW
+
+#cmakedefine HAVE_EXP_STRING_VIEW
+
+#cmakedefine HAVE_FILESYSTEM
+
+#cmakedefine HAVE_OPTIONAL
+
+#cmakedefine HAVE_VARIANT
+
+#cmakedefine HAVE_VARIABLE_TEMPLATES
+
+#cmakedefine HAVE_IF_CONSTEXPR
+
+#ifdef HAVE_IF_CONSTEXPR
+#define IF_CONSTEXPR  constexpr
+#else
+#define IF_CONSTEXPR /*disables code*/
+#endif
+
+#cmakedefine HAVE_FALLTHROUGH
+
+#ifdef HAVE_FALLTHROUGH
+#define FALLTHROUGH [[fallthrough]];
+#else
+#define FALLTHROUGH //fallthrough
+#endif
+
+#cmakedefine HAVE_UNUSED
+
+#ifdef HAVE_UNUSED
+#define UNUSED [[unused]]
+#else
+#define UNUSED /*UNUSED*/
+#endif
+
+#cmakedefine HAVE_CLAMP
+
+#cmakedefine HAVE_HYPOT3
+
+#cmakedefine ENABLE_64_BIT_INDEXING
+
+#cmakedefine DISABLE_MULTITHREADING
+
+#cmakedefine KLU_ENABLE
+
+#define HELICS_FMI_MAJOR ${HELICS_FMI_MAJOR}
+#define HELICS_FMI_MINOR ${HELICS_FMI_MINOR}
+#define HELICS_FMI_PATCH ${HELICS_FMI_PATCH}
+#define HELICS_FMI_DATE "${HELICS_FMI_DATE}"
+
+#endif //CONFIG_UTILITIES_H_
+

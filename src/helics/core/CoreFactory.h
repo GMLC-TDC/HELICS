@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_CORE_FACTORY_
 
 
-#include "helics/core/core-types.h"
+#include "core-types.h"
 #include <memory>
 #include <string>
 

@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_TIME_
 
 #include "core-types.h"
-#include "helics/common/timeRepresentation.hpp"
+#include "../common/timeRepresentation.hpp"
 #include <cstdint>
 
 namespace helics

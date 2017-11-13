@@ -10,7 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "ValueFederate.h"
 #include "ValueFederateManager.h"
-#include "core/core.h"
+#include "../core/core.h"
 
 #ifdef _MSC_VER
 #pragma warning(push)

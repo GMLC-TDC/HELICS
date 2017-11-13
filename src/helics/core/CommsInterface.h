@@ -11,7 +11,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "ActionMessage.h"
-#include "common/BlockingPriorityQueue.hpp"
+#include "../common/BlockingPriorityQueue.hpp"
 #include <functional>
 #include <thread>
 #include <atomic>

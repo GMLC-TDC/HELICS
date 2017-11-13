@@ -9,11 +9,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "IpcBroker.h"
-#include "helics/common/blocking_queue.h"
+#include "../../common/blocking_queue.h"
 #include "helics/config.h"
-#include "helics/core/core-data.h"
-#include "helics/core/core.h"
-#include "helics/core/helics-time.h"
+#include "../core-data.h"
+#include "../core.h"
+#include "../helics-time.h"
 
 #include "IpcComms.h"
 
@@ -25,7 +25,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <fstream>
 #include <sstream>
 
-#include "helics/core/argParser.h"
+#include "../argParser.h"
 
 #include <boost/filesystem.hpp>
 

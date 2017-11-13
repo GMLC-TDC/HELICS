@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "BrokerBase.h"
 
-#include "common/logger.h"
+#include "../common/logger.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
