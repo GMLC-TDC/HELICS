@@ -14,7 +14,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics-time.h"
 #include "helics/common/simpleQueue.hpp"
 #include "helics/core/core.h"
-#include "core/ActionMessage.h"
+#include "helics/core/ActionMessage.h"
 #include "BrokerBase.h"
 
 #include <cstdint> 

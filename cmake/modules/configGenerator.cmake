@@ -63,5 +63,5 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 endif()
 
 if (NOT NO_CONFIG_GENERATION)
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/libs/include/config.h)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/libs/include/helics/config.h)
 endif(NOT NO_CONFIG_GENERATION)

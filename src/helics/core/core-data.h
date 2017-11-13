@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #pragma once
 
 #include "helics-time.h"
-#include "helics/config.h"
+#include "config.h"
 
 #include <cstdint>
 #include <memory>
