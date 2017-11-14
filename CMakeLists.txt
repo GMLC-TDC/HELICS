@@ -258,8 +258,8 @@ configure_file (
   "helics-config.h.in"
   "${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h"
   )
-  install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/*-config.h DESTINATION include/helics)
-
+  install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h DESTINATION include/helics)
+  install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/compiler-config.h DESTINATION include/helics)
   install(DIRECTORY ThirdParty/ DESTINATION include
 	  FILES_MATCHING PATTERN "helics_includes/*.h*")
 #-----------------------------------------------------------------------------
