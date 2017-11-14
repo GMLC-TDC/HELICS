@@ -58,7 +58,7 @@ int main(int argc,char ** argv)
   pub = helicsRegisterGlobalPublication(vfed,"testB","double","");
   printf("PI RECEIVER: Publication registered\n");
 
-
+  fflush(NULL);
   /* Enter initialization mode */
   status = helicsEnterInitializationMode(vfed);
   printf("PI RECEIVER: Entered initialization mode\n");
@@ -93,7 +93,11 @@ int main(int argc,char ** argv)
   }
   status = helicsFinalize(vfed);
   printf("PI RECEIVER: Federate finalized\n");
+  fflush(NULL);
   //clean upFederate;
   helicsFreeFederate(vfed);
+  helicsCloseLibrary();
+  printf("PI RECEIVER: Library Closed\n");
+  fflush(NULL);
   return(0);
 }

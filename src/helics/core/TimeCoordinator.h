@@ -30,7 +30,7 @@ private:
 	Time time_minminDe = timeZero;  //!< the minimum  of the minimum dependency event Time
 	Time time_minDe = timeZero;  //!< the minimum event time of the dependencies
 	Time time_allow = Time::minVal();  //!< the current allowable time 
-	Time time_exec = Time::maxVal();  //!< the time of the next targetted execution
+	Time time_exec = Time::maxVal();  //!< the time of the next targeted execution
 	Time time_message = Time::maxVal();	//!< the time of the earliest message event
 	Time time_value = Time::maxVal();	//!< the time of the earliest value event
 
@@ -44,7 +44,7 @@ public:
 	bool iterating=false; //!< indicator that the coordinator should be iterating if need be
 	bool checkingExec = false; //!< flag indicating that the coordinator is trying to enter the exec mode
 	bool executionMode = false;	//!< flag that the coordinator has entered the execution Mode
-	bool hasInitUpdates = false;//!< flag indicating that a value or message was received during init stage
+	bool hasInitUpdates = false;//!< flag indicating that a value or message was received during initialization stage
 private:
 	std::atomic<int32_t> iteration{ 0 };  //!< iteration counter
 public:

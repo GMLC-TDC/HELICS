@@ -39,6 +39,9 @@ target_link_libraries(helicsSharedLib helics)
 link_directories(${external_link_directories})
 target_link_libraries(helicsSharedLib ${external_library_list})
 
+IF(MINGW)
+target_link_libraries(helicsSharedLib ws2_32)
+ENDIF(MINGW)
 
 
 INSTALL(TARGETS helicsSharedLib DESTINATION lib)

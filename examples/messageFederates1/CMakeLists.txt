@@ -6,6 +6,10 @@ include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 
 target_link_libraries(messageFed helics ${external_library_list})
 
+IF(MINGW)
+	target_link_libraries(messageFed ws2_32)
+ENDIF(MINGW)
+
 #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/run.sh
 #               ${CMAKE_CURRENT_BINARY_DIR}/run.sh
 #               COPYONLY)

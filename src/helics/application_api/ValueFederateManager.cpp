@@ -18,6 +18,12 @@ ValueFederateManager::ValueFederateManager (std::shared_ptr<Core> &coreOb, Core:
 }
 ValueFederateManager::~ValueFederateManager () = default;
 
+void ValueFederateManager::disconnect ()
+{
+    // checks for the calls are handled in the MessageFederate itself
+    coreObject = nullptr;
+}
+
 static const std::map<std::string, int> typeSizes = {
   {"char", 2},      {"uchar", 2},     {"block_4", 5},  {"block_8", 9},   {"block_12", 13}, {"block_16", 17},
   {"block_20", 24}, {"block_24", 30}, {"double", 9},   {"float", 5},     {"int32", 5},     {"uint32", 5},

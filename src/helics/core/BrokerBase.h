@@ -109,9 +109,10 @@ protected:
 
 	/** generate a new random id based on a uuid*/
 	void generateNewIdentifier();
+public:
 	/** close all the threads*/
 	void joinAllThreads();
-private:
+
 
 
 

@@ -32,7 +32,6 @@ target_link_libraries(player-recorder-tests helics)
 target_link_libraries(player-recorder-tests ${external_library_list})
 
 target_link_libraries(player-recorder-tests ${Boost_LIBRARIES_test})
-link_directories(${external_link_directories})
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)

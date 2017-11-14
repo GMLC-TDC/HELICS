@@ -192,6 +192,20 @@ FederateState *CommonCore::getFederate (federate_id_t federateID) const
     return nullptr;
 }
 
+FederateState *CommonCore::getFederate(const std::string &federateName) const
+{
+    // only activate the lock if we not in an operating state
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex>(_mutex, std::defer_lock) :
+        std::unique_lock<std::mutex>(_mutex);
+
+    auto fed = federateNames.find(federateName);
+    if (fed != federateNames.end())
+    {
+        return _federates[fed->second].get();
+    }
+    return nullptr;
+}
+
 FederateState *CommonCore::getHandleFederate (Handle id_)
 {
     // only activate the lock if we not in an operating state
@@ -1563,11 +1577,10 @@ std::string CommonCore::query (const std::string &target, const std::string &que
     }
     else
     {
-        std::lock_guard<std::mutex> lock (_mutex);
-        auto fed = federateNames.find (target);
-        if (fed != federateNames.end ())
+        auto id = getFederateId(target);
+        if (id!=invalid_fed_id)
         {
-            return federateQuery (fed->second, queryStr);
+            return federateQuery (id, queryStr);
         }
         else
         {
@@ -1657,15 +1670,12 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         if (command.info ().target == getIdentifier ())
         {
             queryResp.source_id = global_broker_id;
+            repStr = query(command.info().target, command.payload);
         }
         else
         {
-            std::lock_guard<std::mutex> lock (_mutex);
-            auto fed = federateNames.find (command.info ().target);
-            if (fed != federateNames.end ())
-            {
-                repStr = federateQuery (fed->second, command.payload);
-            }
+            auto fedID = getFederateId(command.info().target);
+            repStr = federateQuery (fedID, command.payload);
         }
 
         queryResp.payload = repStr;

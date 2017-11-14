@@ -73,7 +73,7 @@ int main(int argc,char **argv)
   /* Subscribe to PI SENDER's publication */
   sub = helicsRegisterSubscription(vfed,"testB","double","");
   printf("PI SENDER: Subscription registered\n");
-
+  fflush(NULL);
   /* Register the subscription */
 
   /* Enter initialization mode */
@@ -113,12 +113,14 @@ int main(int argc,char **argv)
   helicsFreeFederate(vfed);
   while(helicsBrokerIsConnected(broker)) {
 #ifdef _MSC_VER
-	  Sleep(10);
+	  Sleep(50);
 #else
-    usleep(1000); /* Sleep for 1 millisecond */
+    usleep(50000); /* Sleep for 1 millisecond */
 #endif
   }
   printf("PI SENDER: Broker disconnected\n");
-
+  helicsCloseLibrary();
+  printf("PI SENDER: Library closed\n");
+  fflush(NULL);
   return(0);
 }
