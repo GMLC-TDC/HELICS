@@ -27,8 +27,8 @@ class HeatUnitBlock
   public:
     double ThermalCap = 4.0;  // thermal capacity
     double tRate = 0.05;  // rate of energy transfer per degree
-    int x = 0;
-    int y = 0;
+    int x = 0; //x coordinate
+    int y = 0; //y coordinate
 
     double T = 25.0;  // temperature
     helics::Time deltaTime = 5.0;  // sampling rate
@@ -236,6 +236,7 @@ class observer
 
 BOOST_AUTO_TEST_SUITE (heat_transfer_tests)
 
+#ifndef QUICK_TESTS_ONLY
 BOOST_AUTO_TEST_CASE (linear_tests)
 {
     auto wcore = helics::CoreFactory::FindOrCreate (helics::core_type::TEST, "wallcore", "22");
@@ -264,5 +265,7 @@ BOOST_AUTO_TEST_CASE (linear_tests)
     }
     obs.saveFile ("tempData.csv");
 }
+
+#endif
 
 BOOST_AUTO_TEST_SUITE_END ()

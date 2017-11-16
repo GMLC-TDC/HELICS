@@ -137,16 +137,16 @@ class Federate
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
-    convergence_state enterExecutionState (convergence_state ProcessComplete = convergence_state::complete);
+    iteration_result enterExecutionState (iteration_request iterate = iteration_request::no_iterations);
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
-    void enterExecutionStateAsync (convergence_state ProcessComplete = convergence_state::complete);
+    void enterExecutionStateAsync (iteration_request iterate = iteration_request::no_iterations);
     /** finalize the async call for entering Execution state
     @details call will not block but will return quickly.  The enterInitializationStateFinalize must be called
     before doing other operations
     */
-    convergence_state enterExecutionStateFinalize ();
+    iteration_result enterExecutionStateFinalize ();
     /** terminate the simulation
     @details call is normally non-blocking, but may block if called in the midst of an
     asynchronous call sequence, not core calling commands may be called */
@@ -172,7 +172,7 @@ class Federate
     /** request a time advancement
     @param[in] the next requested time step
     @return the granted time step*/
-    iterationTime requestTimeIterative (Time nextInternalTimeStep, convergence_state iterationComplete);
+    iterationTime requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate);
 
     /** request a time advancement
     @param[in] the next requested time step
@@ -182,7 +182,7 @@ class Federate
     /** request a time advancement
     @param[in] the next requested time step
     @return the granted time step*/
-    void requestTimeIterativeAsync (Time nextInternalTimeStep, convergence_state iterationComplete);
+    void requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate);
 
     /** request a time advancement
     @param[in] the next requested time step

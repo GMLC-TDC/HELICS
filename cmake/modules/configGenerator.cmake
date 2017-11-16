@@ -36,6 +36,11 @@ endif()
 #set(VERSION_OPTION /std:c++latest)
 #endif()
 
+if ( MSVC )
+    set(WERROR_FLAG "/W4")
+else( MSVC )
+set(WERROR_FLAG "-Werror")
+endif ( MSVC )
 
 try_compile(OPTIONAL_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_optional.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
 
@@ -47,11 +52,11 @@ try_compile(EXPERIMENTAL_STRING_VIEW_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRE
 try_compile(CLAMP_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_clamp.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
 try_compile(HYPOT3_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_hypot3.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION} )
 try_compile(IFCONSTEXPR_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_constexpr_if.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION} )
-try_compile(FALLTHROUGH_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_fallthrough.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
+try_compile(FALLTHROUGH_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_fallthrough.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION} ${WERROR_FLAG})
 
 try_compile(VARIABLE_TEMPLATE_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_variable_template.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
 
-try_compile(UNUSED_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_unused.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION} )
+try_compile(UNUSED_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_unused.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION} ${WERROR_FLAG} )
 
 
 #message(STATUS ${RESULT})

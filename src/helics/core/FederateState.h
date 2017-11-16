@@ -182,11 +182,11 @@ private:
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-	convergence_state processQueue ();
+	iteration_state processQueue ();
 	/** process a single message
 	@return a convergence state value with an indicator of return reason and state of convergence
 	*/
-	convergence_state processActionMessage(ActionMessage &m);
+	iteration_state processActionMessage(ActionMessage &m);
 	/** fill event list
 	@param the time of the update
 	*/
@@ -216,24 +216,24 @@ private:
     void setCoreObject (CommonCore *parent);
 	//the next 5 functions are the processing functions that actually process the queue
 	/** process until the federate has verified its membership and assigned a global id number*/
-	convergence_state waitSetup();
+	iteration_result waitSetup();
 	/** process until the init state has been entered or there is a failure*/
-	convergence_state enterInitState();
+	iteration_result enterInitState();
     /** function to call when entering execution state
 	@param converged indicator of whether the fed should iterate if need be or not
     returns either converged or nonconverged depending on whether an iteration is needed
     */
-    convergence_state enterExecutingState (convergence_state converged);
+    iteration_result enterExecutingState (iteration_request converged);
 	/** request a time advancement
 	@param nextTime the time of the requested advancement
 	@param converged set to complete to end dense time step iteration, nonconverged to continue iterating if need be
 	@return an iteration time with two elements the granted time and the convergence state
 	*/
-    iterationTime requestTime (Time nextTime, convergence_state converged);
+    iterationTime requestTime (Time nextTime, iteration_request converged);
 	/** function to process the queue in a generic fashion used to just process messages
 	with no specific end in mind
 	*/
-	convergence_state genericUnspecifiedQueueProcess();
+	iteration_result genericUnspecifiedQueueProcess();
 	/** add an action message to the queue*/
     void addAction (const ActionMessage &action);
 	/** move a message to the queue*/

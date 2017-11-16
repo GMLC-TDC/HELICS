@@ -498,31 +498,31 @@ void FederateState::addAction (ActionMessage &&action)
     }
 }
 
-convergence_state FederateState::waitSetup ()
+iteration_result FederateState::waitSetup ()
 {
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
         auto ret = processQueue ();
         processing = false;
-        return ret;
+        return static_cast<iteration_result>(ret);
     }
 
     while (!processing.compare_exchange_weak (expected, true))
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (20));
     }
-    convergence_state ret;
+    iteration_result ret;
     switch (getState ())
     {
     case HELICS_ERROR:
-        ret = convergence_state::error;
+        ret = iteration_result::error;
         break;
     case HELICS_FINISHED:
-        ret = convergence_state::halted;
+        ret = iteration_result::halted;
         break;
     default:
-        ret = convergence_state::complete;
+        ret = iteration_result::next_step;
         break;
     }
 
@@ -530,100 +530,100 @@ convergence_state FederateState::waitSetup ()
     return ret;
 }
 /** process until the init state has been entered or there is a failure*/
-convergence_state FederateState::enterInitState ()
+iteration_result FederateState::enterInitState ()
 {
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
         auto ret = processQueue ();
         processing = false;
-        if (ret == convergence_state::complete)
+        if (ret == iteration_state::next_step)
         {
             time_granted = initialTime;
         }
-        return ret;
+        return static_cast<iteration_result>(ret);
     }
 
     while (!processing.compare_exchange_weak (expected, true))
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (20));
     }
-    convergence_state ret;
+    iteration_result ret;
     switch (getState ())
     {
     case HELICS_ERROR:
-        ret = convergence_state::error;
+        ret = iteration_result::error;
         break;
     case HELICS_FINISHED:
-        ret = convergence_state::halted;
+        ret = iteration_result::halted;
         break;
     case HELICS_CREATED:
         // not sure this can actually happen
-        ret = convergence_state::nonconverged;
+        ret = iteration_result::iterating;
         break;
     default:  // everything >= HELICS_INITIALIZING
-        ret = convergence_state::complete;
+        ret = iteration_result::next_step;
         break;
     }
     processing = false;
     return ret;
 }
 
-convergence_state FederateState::enterExecutingState (convergence_state converged)
+iteration_result FederateState::enterExecutingState (iteration_request iterate)
 {
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
-        timeCoord->enteringExecMode (converged);
+        timeCoord->enteringExecMode (iterate);
         auto ret = processQueue ();
-        if (ret == convergence_state::complete)
+        if (ret == iteration_state::next_step)
         {
             time_granted = timeZero;
         }
         fillEventVector (time_granted);
         processing = false;
-        return ret;
+        return static_cast<iteration_result>(ret);
     }
 
     while (!processing.compare_exchange_weak (expected, true))
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (20));
     }
-    convergence_state ret;
+    iteration_result ret;
     switch (getState ())
     {
     case HELICS_ERROR:
-        ret = convergence_state::error;
+        ret = iteration_result::error;
         break;
     case HELICS_FINISHED:
-        ret = convergence_state::halted;
+        ret = iteration_result::halted;
         break;
     case HELICS_CREATED:
     case HELICS_INITIALIZING:
     default:
-        ret = convergence_state::nonconverged;
+        ret = iteration_result::iterating;
         break;
     case HELICS_EXECUTING:
-        ret = convergence_state::complete;
+        ret = iteration_result::next_step;
         break;
     }
     processing = false;
     return ret;
 }
 
-iterationTime FederateState::requestTime (Time nextTime, convergence_state converged)
+iterationTime FederateState::requestTime (Time nextTime, iteration_request iterate)
 {
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
         events.clear ();  // clear the event queue
-        timeCoord->timeRequest (nextTime, converged, nextValueTime (), nextMessageTime ());
+        timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
         queue.push (CMD_TIME_CHECK);
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
-        iterating = (ret == convergence_state::nonconverged);
+        iterating = (ret == iteration_state::iterating);
 
-        iterationTime retTime = {time_granted, ret};
+        iterationTime retTime = {time_granted, static_cast<iteration_result>(ret) };
         // now fill the event vector so external systems know what has been updated
         fillEventVector (time_granted);
         processing = false;
@@ -635,14 +635,14 @@ iterationTime FederateState::requestTime (Time nextTime, convergence_state conve
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (20));
     }
-    convergence_state ret = iterating ? convergence_state::nonconverged : convergence_state::complete;
+    iteration_result ret = iterating ? iteration_result::iterating : iteration_result::next_step;
     if (state == HELICS_FINISHED)
     {
-        ret = convergence_state::halted;
+        ret = iteration_result::halted;
     }
     else if (state == HELICS_ERROR)
     {
-        ret = convergence_state::error;
+        ret = iteration_result::error;
     }
     iterationTime retTime = {time_granted, ret};
     processing = false;
@@ -662,7 +662,7 @@ void FederateState::fillEventVector (Time currentTime)
     }
 }
 
-convergence_state FederateState::genericUnspecifiedQueueProcess ()
+iteration_result FederateState::genericUnspecifiedQueueProcess ()
 {
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
@@ -670,7 +670,7 @@ convergence_state FederateState::genericUnspecifiedQueueProcess ()
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
         processing = false;
-        return ret;
+        return static_cast<iteration_result>(ret);
     }
 
     while (!processing.compare_exchange_weak (expected, true))
@@ -678,7 +678,7 @@ convergence_state FederateState::genericUnspecifiedQueueProcess ()
         std::this_thread::sleep_for (std::chrono::milliseconds (20));
     }
     processing = false;
-    return convergence_state::complete;
+    return iteration_result::next_step;
 }
 
 const std::vector<Core::Handle> emptyHandles;
@@ -692,17 +692,17 @@ const std::vector<Core::Handle> &FederateState::getEvents () const
     return emptyHandles;
 }
 
-convergence_state FederateState::processQueue ()
+iteration_state FederateState::processQueue ()
 {
     if (state == HELICS_FINISHED)
     {
-        return convergence_state::halted;
+        return iteration_state::halted;
     }
     if (state == HELICS_ERROR)
     {
-        return convergence_state::error;
+        return iteration_state::error;
     }
-    convergence_state ret_code = convergence_state::continue_processing;
+    auto ret_code = iteration_state::continue_processing;
 
     // process the delay Queue first
     if (!delayQueue.empty ())
@@ -710,13 +710,13 @@ convergence_state FederateState::processQueue ()
         // copy the messages over since they could just be placed on the delay queue again
         decltype (delayQueue) tempQueue;
         std::swap (delayQueue, tempQueue);
-        while ((ret_code == convergence_state::continue_processing) && (!tempQueue.empty ()))
+        while ((ret_code == iteration_state::continue_processing) && (!tempQueue.empty ()))
         {
             auto cmd = tempQueue.front ();
             tempQueue.pop_front ();
             ret_code = processActionMessage (cmd);
         }
-        if (ret_code != convergence_state::continue_processing)
+        if (ret_code != iteration_state::continue_processing)
         {
             if (!tempQueue.empty ())
             {
@@ -731,7 +731,7 @@ convergence_state FederateState::processQueue ()
         }
     }
 
-    while (ret_code == convergence_state::continue_processing)
+    while (ret_code == iteration_state::continue_processing)
     {
         auto cmd = queue.pop ();
         ret_code = processActionMessage (cmd);
@@ -739,7 +739,7 @@ convergence_state FederateState::processQueue ()
     return ret_code;
 }
 
-convergence_state FederateState::processActionMessage (ActionMessage &cmd)
+iteration_state FederateState::processActionMessage (ActionMessage &cmd)
 {
     LOG_TRACE ("processing cmd " + prettyPrintString (cmd.action ()));
     switch (cmd.action ())
@@ -751,7 +751,7 @@ convergence_state FederateState::processActionMessage (ActionMessage &cmd)
         if (state == HELICS_CREATED)
         {
             setState (HELICS_INITIALIZING);
-            return convergence_state::complete;
+            return iteration_state::next_step;
         }
         break;
     case CMD_EXEC_REQUEST:
@@ -760,7 +760,7 @@ convergence_state FederateState::processActionMessage (ActionMessage &cmd)
         {
             break;
         }
-        // FALLTHROUGH
+        FALLTHROUGH
     case CMD_EXEC_CHECK:  // just check the time for entry
     {
         if (state != HELICS_INITIALIZING)
@@ -770,13 +770,13 @@ convergence_state FederateState::processActionMessage (ActionMessage &cmd)
         auto grant = timeCoord->checkExecEntry ();
         switch (grant)
         {
-        case convergence_state::nonconverged:
+        case iteration_state::iterating:
 
             return grant;
-        case convergence_state::complete:
+        case iteration_state::next_step:
             setState (HELICS_EXECUTING);
             return grant;
-        case convergence_state::continue_processing:
+        case iteration_state::continue_processing:
             break;
         default:
             return grant;
@@ -785,15 +785,15 @@ convergence_state FederateState::processActionMessage (ActionMessage &cmd)
     break;
     case CMD_TERMINATE_IMMEDIATELY:
         setState (HELICS_FINISHED);
-        return convergence_state::halted;
+        return iteration_state::halted;
     case CMD_STOP:
         setState (HELICS_FINISHED);
-        return convergence_state::halted;
+        return iteration_state::halted;
     case CMD_DISCONNECT:
         if (cmd.source_id == global_id)
         {
             setState (HELICS_FINISHED);
-            return convergence_state::halted;
+            return iteration_state::halted;
         }
         else
         {
@@ -804,7 +804,7 @@ convergence_state FederateState::processActionMessage (ActionMessage &cmd)
                     break;
                 }
                 auto ret = timeCoord->checkTimeGrant ();
-                if (ret != convergence_state::continue_processing)
+                if (ret != iteration_state::continue_processing)
                 {
                     time_granted = timeCoord->getGrantedTime ();
                     return ret;
@@ -826,7 +826,7 @@ convergence_state FederateState::processActionMessage (ActionMessage &cmd)
             break;
         }
         auto ret = timeCoord->checkTimeGrant ();
-        if (ret != convergence_state::continue_processing)
+        if (ret != iteration_state::continue_processing)
         {
             time_granted = timeCoord->getGrantedTime ();
             return ret;
@@ -872,7 +872,7 @@ convergence_state FederateState::processActionMessage (ActionMessage &cmd)
     break;
     case CMD_ERROR:
         setState (HELICS_ERROR);
-        return convergence_state::error;
+        return iteration_state::error;
     case CMD_REG_PUB:
     {
         auto subI = getSubscription (cmd.dest_handle);
@@ -976,15 +976,15 @@ convergence_state FederateState::processActionMessage (ActionMessage &cmd)
             if (cmd.error)
             {
                 setState (HELICS_ERROR);
-                return convergence_state::error;
+                return iteration_state::error;
             }
             global_id = cmd.dest_id;
             timeCoord->source_id = global_id;
-            return convergence_state::complete;
+            return iteration_state::next_step;
         }
         break;
     }
-    return convergence_state::continue_processing;
+    return iteration_state::continue_processing;
 }
 
 const std::vector<Core::federate_id_t> &FederateState::getDependents () const

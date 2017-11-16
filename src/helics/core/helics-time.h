@@ -37,11 +37,11 @@ struct iterationTime
 {
 public:
 	Time stepTime; //!< the time of the granted step
-	convergence_state state;	//!< the convergence state
+	iteration_result state;	//!< the convergence state
 	/** default constructor*/
 	iterationTime() noexcept {};
 	/** construct from properties*/
-	constexpr iterationTime(Time t, convergence_state convergence) :stepTime(t), state(convergence)
+	constexpr iterationTime(Time t, iteration_result iterate) :stepTime(t), state(iterate)
 	{};
 };
 }

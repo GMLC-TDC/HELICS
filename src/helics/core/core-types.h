@@ -53,19 +53,39 @@ namespace helics
 		UNRECOGNIZED=8,
 		
 	};
+
 /** enumeration of the possible states of convergence*/
-enum class convergence_state :signed char
+enum class iteration_state :signed char
 {
 	error = -5,		//!< indicator that an error has occurred
 	continue_processing = -1, //!< the current loop should continue
-	complete = 0,  //!< indicator that the iterations have completed
-	nonconverged = 1,	//!< indicator that the iterations need to continue
+	next_step = 0,  //!< indicator that the iterations have completed
+	iterating = 2,	//!< indicator that the iterations need to continue
 	halted = 3,	//!< indicator that the simulation has been halted
 
 };
 
-#define CONVERGED helics::convergence_state::complete
-#define NONCONVERGED helics::convergence_state::nonconverged
+/** enumeration of the possible states of convergence*/
+enum class iteration_result :signed char
+{
+	error = -5,		//!< indicator that an error has occurred
+	next_step = 0,  //!< indicator that the iterations have completed
+	iterating = 2,	//!< indicator that the iterations need to continue
+	halted = 3,	//!< indicator that the simulation has been halted
+};
+
+/** enumeration of the possible states of convergence*/
+enum class iteration_request :signed char
+{
+	no_iterations = 0,  //!< indicator that the iterations have completed
+	force_iteration = 1, //!< force an iteration whether it is needed or not
+	iterate_if_needed = 2,	//!< indicator that the iterations need to continue
+};
+
+#define ITERATION_COMPLETE helics::iteration_request::no_iterations
+#define NO_ITERATION helics::iteration_request::no_iterations
+#define FORCE_ITERATION helics::iteration_request::force_iteration
+#define ITERATE_IF_NEEDED helics::iteration_request::iterate_if_needed
 
 /** defining some check modes for dealing with required or optional components*/
 enum class handle_check_mode : char

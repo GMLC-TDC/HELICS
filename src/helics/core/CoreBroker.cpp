@@ -375,12 +375,12 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 {
                     transmit (brk.route_id, m);
                 }
-                timeCoord->enteringExecMode (convergence_state::complete);
+                timeCoord->enteringExecMode (iteration_request::no_iterations);
                 auto res = timeCoord->checkExecEntry ();
-                if (res == convergence_state::complete)
+                if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), convergence_state::complete, Time::maxVal (),
+                    timeCoord->timeRequest (Time::maxVal (), iteration_request::no_iterations, Time::maxVal (),
                                             Time::maxVal ());
                 }
             }
@@ -412,12 +412,12 @@ void CoreBroker::processCommand (ActionMessage &&command)
             transmit (brk.route_id, command);
         }
         {
-            timeCoord->enteringExecMode (convergence_state::complete);
+            timeCoord->enteringExecMode (iteration_request::no_iterations);
             auto res = timeCoord->checkExecEntry ();
-            if (res == convergence_state::complete)
+            if (res == iteration_state::next_step)
             {
                 enteredExecutionMode = true;
-                timeCoord->timeRequest (Time::maxVal (), convergence_state::complete, Time::maxVal (),
+                timeCoord->timeRequest (Time::maxVal (), iteration_request::no_iterations, Time::maxVal (),
                                         Time::maxVal ());
             }
         }
@@ -474,10 +474,10 @@ void CoreBroker::processCommand (ActionMessage &&command)
             if (!enteredExecutionMode)
             {
                 auto res = timeCoord->checkExecEntry ();
-                if (res == convergence_state::complete)
+                if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), convergence_state::complete, Time::maxVal (),
+                    timeCoord->timeRequest (Time::maxVal (), iteration_request::no_iterations, Time::maxVal (),
                                             Time::maxVal ());
                 }
             }

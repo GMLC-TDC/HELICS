@@ -20,130 +20,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/lexical_cast.hpp>
 namespace helics
 {
-void valueExtract (const defV &dv, std::string &val);
 
-void valueExtract (const defV &dv, std::complex<double> &val);
-
-void valueExtract (const defV &dv, std::vector<double> &val);
-
-void valueExtract (const defV &dv, std::vector<std::complex<double>> &val);
-
-void valueExtract (const data_view &dv, helicsType_t baseType, std::string &val);
-
-void valueExtract (const data_view &dv, helicsType_t baseType, std::vector<double> &val);
-
-void valueExtract (const data_view &dv, helicsType_t baseType, std::complex<double> &val);
-
-void valueExtract (const data_view &dv, helicsType_t baseType, std::vector<std::complex<double>> &val);
-
-/** for numeric types*/
-template <class X>
-std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &val)
-{
-    switch (dv.which ())
-    {
-    case doubleLoc:  // double
-        val = static_cast<X> (boost::get<double> (dv));
-        break;
-    case intLoc:  // int64_t
-        val = static_cast<X> (boost::get<int64_t> (dv));
-        break;
-    case stringLoc:  // string
-    default:
-        val = boost::lexical_cast<X> (boost::get<std::string> (dv));
-        break;
-    case complexLoc:  // complex
-        val = static_cast<X> (std::abs (boost::get<std::complex<double>> (dv)));
-        break;
-    case vectorLoc:  // vector
-    {
-        auto &vec = boost::get<std::vector<double>> (dv);
-        if (!vec.empty ())
-        {
-            val = static_cast<X> (vec.front ());
-        }
-        else
-        {
-            val = std::numeric_limits<X>::min ();
-        }
-        break;
-    }
-    case complexVectorLoc:  // complex vector
-    {
-        auto &vec = boost::get<std::vector<std::complex<double>>> (dv);
-        if (!vec.empty ())
-        {
-            val = static_cast<X> (std::abs (vec.front ()));
-        }
-        else
-        {
-            val = std::numeric_limits<X>::min ();
-        }
-        break;
-    }
-    }
-}
-
-/** assume it is some numeric type (int or double)*/
-template <class X>
-std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv, helicsType_t baseType, X &val)
-{
-    switch (baseType)
-    {
-    case helicsType_t::helicsString:
-    {
-        val = static_cast<X> (boost::lexical_cast<double> (dv.string ()));
-        break;
-    }
-    case helicsType_t::helicsDouble:
-    {
-        auto V = ValueConverter<double>::interpret (dv);
-        val = static_cast<X> (V);
-        break;
-    }
-    case helicsType_t::helicsInt:
-    {
-        auto V = ValueConverter<int64_t>::interpret (dv);
-        val = static_cast<X> (V);
-        break;
-    }
-
-    case helicsType_t::helicsVector:
-    {
-        auto V = ValueConverter<std::vector<double>>::interpret (dv);
-        if (!V.empty ())
-        {
-            val = static_cast<X> (V[0]);
-        }
-        else
-        {
-            val = 0.0;
-        }
-        break;
-    }
-    case helicsType_t::helicsComplex:
-    {
-        auto V = ValueConverter<std::complex<double>>::interpret (dv);
-        val = static_cast<X> (std::abs (V));
-        break;
-    }
-    case helicsType_t::helicsComplexVector:
-    {
-        auto V = ValueConverter<std::vector<std::complex<double>>>::interpret (dv);
-        if (!V.empty ())
-        {
-            val = static_cast<X> (std::abs (V.front ()));
-        }
-        else
-        {
-            val = 0.0;
-        }
-        break;
-    }
-    case helicsType_t::helicsInvalid:
-        throw (std::invalid_argument ("unrecognized helics type"));
-    }
-}
 class SubscriptionBase
 {
   protected:
@@ -152,6 +29,7 @@ class SubscriptionBase
     std::string type_;  //!< the requested type of the subscription
     std::string units_;  //!< the defined units of the subscription
     subscription_id_t id;  //!< the id of the federate
+
   public:
     SubscriptionBase () = default;
 
@@ -186,7 +64,7 @@ class SubscriptionBase
     */
     Time getLastUpdate () const { return fed->getLastUpdateTime (id); }
     /** check if the value has subscription has been updated*/
-    bool isUpdated () const { return fed->isUpdated (id); }
+    virtual bool isUpdated () const { return fed->isUpdated (id); }
     subscription_id_t getID () const { return id; }
 
     /** register a callback for an update notification
@@ -206,10 +84,10 @@ class SubscriptionBase
     std::string getType () const { return fed->getPublicationType (id); }
     const std::string &getUnits () const { return units_; }
 };
-// template<class X, typename std::enable_if<helicsType<X>() != helicsType_t::helicsInvalid, bool>::type>
+
 class Subscription : public SubscriptionBase
 {
-  public:
+private:
     boost::variant<std::function<void(const std::string &, Time)>,
                    std::function<void(const double &, Time)>,
                    std::function<void(const int64_t &, Time)>,
@@ -219,7 +97,10 @@ class Subscription : public SubscriptionBase
       value_callback;  //!< callback function for the federate
 
     mutable helicsType_t type = helicsType_t::helicsInvalid;  //!< the underlying type the publication is using
-    defV lastValue;  //!< the last value updated
+	bool changeDetectionEnabled = false;  //!< the change detection is enabled
+	bool hasUpdate = false;  //!< the value has been updated
+	defV lastValue;  //!< the last value updated
+	double delta = -1.0; //!< the minimum difference 
   public:
     Subscription (ValueFederate *valueFed, const std::string &key, const std::string &units = "")
         : SubscriptionBase (valueFed, key, "def", units)
@@ -231,11 +112,13 @@ class Subscription : public SubscriptionBase
     {
     }
 
+	virtual bool isUpdated() const override;
+
     /** store the value in the given variable
     @param[out] out the location to store the value
     */
     template <class X>
-    typename std::enable_if_t<helicsType<X> () != helicsType_t::helicsInvalid, void> getValue (X &out)
+    typename std::enable_if_t<helicsType<X> () != helicsType_t::helicsInvalid> getValue (X &out)
     {
         if (fed->isUpdated (id))
         {
@@ -247,7 +130,22 @@ class Subscription : public SubscriptionBase
             if (type != helicsType_t::helicsInvalid)
             {
                 valueExtract (dv, type, out);
-                lastValue = out;
+				if (changeDetectionEnabled)
+				{
+					if (changeDetected(lastValue, out, delta))
+					{
+						lastValue = out;
+					}
+					else
+					{
+						valueExtract(lastValue, out);
+					}
+				}
+				else
+				{
+					lastValue = out;
+				}
+                
             }
         }
         else
@@ -264,6 +162,23 @@ class Subscription : public SubscriptionBase
         getValue (val);
         return val;
     }
+	/** get the most recent value
+	@return the value*/
+	//template <class X>
+	//typename std::enable_if_t<isConvertableType<X>(), X> getValue()
+	//{
+	//	std::conditional<std::is_integral<X>::value, int64_t, double> gval;
+	//	getValue(gval);
+	//	return static_cast<X>(gval);
+	//}
+	/** get the most recent calculation with the result as a convertable type*/
+	//template <class X>
+	//typename std::enable_if_t<isConvertableType<X>()> getValue(X &out)
+	//{
+	//	std::conditional<std::is_integral<X>::value, int64_t, double> gval;
+	//	getValue(gval);
+	//	out = static_cast<X>(gval);
+	//}
 
     using SubscriptionBase::registerCallback;
     /** register a callback for the update
@@ -287,6 +202,25 @@ class Subscription : public SubscriptionBase
         lastValue = val;
     }
 
+	void setMinimumChange(double deltaV)
+	{
+
+		if (delta < 0.0)
+		{
+
+			changeDetectionEnabled = true;
+		}
+		delta = deltaV;
+		if (delta < 0.0)
+		{
+			changeDetectionEnabled = false;
+		}
+
+	}
+	void enableChangeDetection(bool enabled = true)
+	{
+		changeDetectionEnabled = enabled;
+	}
   private:
     void handleCallback (Time time);
 };
@@ -296,8 +230,12 @@ class Subscription : public SubscriptionBase
 template <class X>
 class SubscriptionT : public SubscriptionBase
 {
+public:
   private:
     std::function<void(X, Time)> value_callback;  //!< callback function for the federate
+	std::function<double(const X &v1, const X &v2)> changeDetectionCallback; //!< callback function for change detection
+	double delta = 0.0; //1< the minimum difference to trigger an update
+	bool changeDetectionEnabled = false; //!< flag indicating if change detection is enabled or not
   public:
     SubscriptionT () = default;
     /**constructor to build a subscription object
@@ -345,7 +283,26 @@ class SubscriptionT : public SubscriptionBase
     @param val the value to set as the default
     */
     void setDefault (const X &val) { fed->setDefaultValue (id, val); }
+	/** set a minimum change value*/
+	void setMinimumChange(double deltaV)
+	{
 
+		if (delta < 0.0)
+		{
+
+			changeDetectionEnabled = true;
+		}
+		delta = deltaV;
+		if (delta < 0.0)
+		{
+			changeDetectionEnabled = false;
+		}
+
+	}
+	void enableChangeDetection(bool enabled = true)
+	{
+		changeDetectionEnabled = enabled;
+	}
   private:
     void handleCallback (Time time)
     {

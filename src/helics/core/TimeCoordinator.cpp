@@ -23,13 +23,13 @@ TimeCoordinator::TimeCoordinator (const CoreFederateInfo &info_) : info (info_)
     }
 }
 
-void TimeCoordinator::enteringExecMode (convergence_state mode)
+void TimeCoordinator::enteringExecMode (iteration_request mode)
 {
     if (executionMode)
     {
         return;
     }
-    iterating = (mode == convergence_state::nonconverged);
+    iterating = (mode != iteration_request::no_iterations);
     checkingExec = true;
     if ((!dependents.empty ()) && (sendMessageFunction))
     {
@@ -41,11 +41,11 @@ void TimeCoordinator::enteringExecMode (convergence_state mode)
 }
 
 void TimeCoordinator::timeRequest (Time nextTime,
-                                   convergence_state converged,
+                                   iteration_request iterate,
                                    Time newValueTime,
                                    Time newMessageTime)
 {
-    iterating = (converged == convergence_state::nonconverged);
+    iterating = (iterate != iteration_request::no_iterations);
     if (nextTime <= time_granted)
     {
         nextTime = time_granted + info.timeDelta;
@@ -200,7 +200,7 @@ bool TimeCoordinator::updateTimeFactors ()
     return update;
 }
 
-convergence_state TimeCoordinator::checkTimeGrant ()
+iteration_state TimeCoordinator::checkTimeGrant ()
 {
     bool update = updateTimeFactors ();
     if ((!iterating) || (time_exec > time_granted))
@@ -218,7 +218,7 @@ convergence_state TimeCoordinator::checkTimeGrant ()
             // printf("%d GRANT allow=%f next=%f, exec=%f, Tdemin=%f\n", source_id,
             // static_cast<double>(time_allow), static_cast<double>(time_next), static_cast<double>(time_exec),
             // static_cast<double>(time_minDe));
-            return convergence_state::complete;
+            return iteration_state::next_step;
         }
     }
     else
@@ -233,7 +233,7 @@ convergence_state TimeCoordinator::checkTimeGrant ()
                 treq.actionTime = time_granted;
                 sendMessageFunction (treq);
             }
-            return convergence_state::nonconverged;
+            return iteration_state::iterating;
         }
         else if (time_allow == time_exec)  // time_allow==time_exec==time_granted
         {
@@ -247,7 +247,7 @@ convergence_state TimeCoordinator::checkTimeGrant ()
                     treq.actionTime = time_granted;
                     sendMessageFunction (treq);
                 }
-                return convergence_state::nonconverged;
+                return iteration_state::iterating;
             }
         }
     }
@@ -265,7 +265,7 @@ convergence_state TimeCoordinator::checkTimeGrant ()
         //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
         // static_cast<double>(time_exec), static_cast<double>(time_minDe));
     }
-    return convergence_state::continue_processing;
+    return iteration_state::continue_processing;
 }
 
 bool TimeCoordinator::isDependency (Core::federate_id_t ofed) const { return dependencies.isDependency (ofed); }
@@ -314,9 +314,9 @@ DependencyInfo *TimeCoordinator::getDependencyInfo (Core::federate_id_t ofed)
     return dependencies.getDependencyInfo (ofed);
 }
 
-convergence_state TimeCoordinator::checkExecEntry ()
+iteration_state TimeCoordinator::checkExecEntry ()
 {
-    convergence_state ret = convergence_state::continue_processing;
+    auto ret = iteration_state::continue_processing;
     if (!dependencies.checkIfReadyForExecEntry (iterating))
     {
         return ret;
@@ -327,24 +327,24 @@ convergence_state TimeCoordinator::checkExecEntry ()
         {
             if (iteration > info.max_iterations)
             {
-                ret = convergence_state::complete;
+                ret = iteration_state::next_step;
             }
             else
             {
-                ret = convergence_state::nonconverged;
+                ret = iteration_state::iterating;
             }
         }
         else
         {
-            ret = convergence_state::complete;  // todo add a check for updates and iteration limit
+            ret = iteration_state::next_step;  // todo add a check for updates and iteration limit
         }
     }
     else
     {
-        ret = convergence_state::complete;
+        ret = iteration_state::next_step;
     }
 
-    if (ret == convergence_state::complete)
+    if (ret == iteration_state::next_step)
     {
         time_granted = timeZero;
         executionMode = true;
@@ -357,7 +357,7 @@ convergence_state TimeCoordinator::checkExecEntry ()
             sendMessageFunction (execgrant);
         }
     }
-    else if (ret == convergence_state::nonconverged)
+    else if (ret == iteration_state::iterating)
     {
         dependencies.ResetIteratingExecRequests ();
         hasInitUpdates = false;

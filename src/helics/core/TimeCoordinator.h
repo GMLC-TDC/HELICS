@@ -124,13 +124,13 @@ public:
 	void removeDependent(Core::federate_id_t fedID);
 
 	/** check if entry to the executing state can be granted*/
-	convergence_state checkExecEntry();
+	iteration_state checkExecEntry();
 	
 
-	void timeRequest(Time nextTime, convergence_state converged, Time newValueTime, Time newMessageTime);
-	void enteringExecMode(convergence_state mode);
+	void timeRequest(Time nextTime, iteration_request iterate, Time newValueTime, Time newMessageTime);
+	void enteringExecMode(iteration_request mode);
 	/** check if it is valid to grant a time*/
-	convergence_state checkTimeGrant();
+	iteration_state checkTimeGrant();
 };
 }
 

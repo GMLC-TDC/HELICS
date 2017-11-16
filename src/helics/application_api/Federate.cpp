@@ -226,19 +226,19 @@ void Federate::enterInitializationStateFinalize ()
     }
 }
 
-convergence_state Federate::enterExecutionState (convergence_state ProcessComplete)
+iteration_result Federate::enterExecutionState (iteration_request iterate)
 {
-    convergence_state res = convergence_state::complete;
+    iteration_result res = iteration_result::next_step;
     switch (state)
     {
     case op_states::startup:
     case op_states::pendingInit:
         enterInitializationState ();
-    // FALLTHROUGH
+    FALLTHROUGH
     case op_states::initialization:
     {
-        res = coreObject->enterExecutingState (fedID, ProcessComplete);
-        if (res == convergence_state::complete)
+        res = coreObject->enterExecutingState (fedID, iterate);
+        if (res == iteration_result::next_step)
         {
             state = op_states::execution;
             InitializeToExecuteStateTransition ();
@@ -267,7 +267,7 @@ convergence_state Federate::enterExecutionState (convergence_state ProcessComple
     return res;
 }
 
-void Federate::enterExecutionStateAsync (convergence_state ProcessComplete)
+void Federate::enterExecutionStateAsync (iteration_request iterate)
 {
     switch (state)
     {
@@ -278,10 +278,10 @@ void Federate::enterExecutionStateAsync (convergence_state ProcessComplete)
             asyncCallInfo = std::make_unique<asyncFedCallInfo> ();
         }
 
-        auto eExecFunc = [this, ProcessComplete]() {
+        auto eExecFunc = [this, iterate]() {
             coreObject->enterInitializingState (fedID);
             StartupToInitializeStateTransition ();
-            return coreObject->enterExecutingState (fedID, ProcessComplete);
+            return coreObject->enterExecutingState (fedID, iterate);
         };
         state = op_states::pendingExec;
         asyncCallInfo->execFuture = std::async (std::launch::async, eExecFunc);
@@ -297,8 +297,8 @@ void Federate::enterExecutionStateAsync (convergence_state ProcessComplete)
             asyncCallInfo = std::make_unique<asyncFedCallInfo> ();
         }
 
-        auto eExecFunc = [this, ProcessComplete]() {
-            return coreObject->enterExecutingState (fedID, ProcessComplete);
+        auto eExecFunc = [this, iterate]() {
+            return coreObject->enterExecutingState (fedID, iterate);
         };
         state = op_states::pendingExec;
         asyncCallInfo->execFuture = std::async (std::launch::async, eExecFunc);
@@ -315,14 +315,14 @@ void Federate::enterExecutionStateAsync (convergence_state ProcessComplete)
     }
 }
 
-convergence_state Federate::enterExecutionStateFinalize ()
+iteration_result Federate::enterExecutionStateFinalize ()
 {
     if (state != op_states::pendingExec)
     {
         throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
     }
     auto res = asyncCallInfo->execFuture.get ();
-    if (convergence_state::complete == res)
+    if (iteration_result::next_step == res)
     {
         state = op_states::execution;
         InitializeToExecuteStateTransition ();
@@ -444,13 +444,13 @@ Time Federate::requestTime (Time nextInternalTimeStep)
     }
 }
 
-iterationTime Federate::requestTimeIterative (Time nextInternalTimeStep, convergence_state iterationComplete)
+iterationTime Federate::requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate)
 {
     if (state == op_states::execution)
     {
-        auto iterationTime = coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterationComplete);
+        auto iterationTime = coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
         Time oldTime = currentTime;
-        if (iterationTime.state == convergence_state::complete)
+        if (iterationTime.state == iteration_result::next_step)
         {
             currentTime = iterationTime.stepTime;
         }
@@ -485,7 +485,7 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 /** request a time advancement
 @param[in] the next requested time step
 @return the granted time step*/
-void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, convergence_state iterationComplete)
+void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
     if (state == op_states::execution)
     {
@@ -495,8 +495,8 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, convergence
         }
         state = op_states::pendingIterativeTime;
         asyncCallInfo->timeRequestIterativeFuture =
-          std::async (std::launch::async, [this, nextInternalTimeStep, iterationComplete]() {
-              return coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterationComplete);
+          std::async (std::launch::async, [this, nextInternalTimeStep, iterate]() {
+              return coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
           });
     }
     else
@@ -534,7 +534,7 @@ iterationTime Federate::requestTimeIterativeFinalize ()
         auto iterativeTime = asyncCallInfo->timeRequestIterativeFuture.get ();
         state = op_states::execution;
         Time oldTime = currentTime;
-        if (iterativeTime.state == convergence_state::complete)
+        if (iterativeTime.state == iteration_result::next_step)
         {
             currentTime = iterativeTime.stepTime;
         }

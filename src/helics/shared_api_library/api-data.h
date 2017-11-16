@@ -45,17 +45,24 @@ typedef void *helics_query;
 
 typedef double helics_time_t;
 
+/** enumeration of the different iteration results*/
 typedef enum {
-    nonconverged,
-    converged,
-    halted,
-    error,
-} convergence_status;
+    no_iteration,
+	force_iteration, //input only
+    iterate_if_needed,
+} iteration_request;
+
+typedef enum {
+	next_step,
+	error, //input only
+	halted,
+	iterating
+} iteration_status;
 
 typedef struct helics_iterative_time
 {
     helics_time_t time;
-    convergence_status status;
+    iteration_status status;
 } helics_iterative_time;
 
 /**

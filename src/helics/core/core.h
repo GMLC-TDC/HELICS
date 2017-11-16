@@ -146,7 +146,7 @@ class Core
      @return nonconverged if the executing state has not been entered and there are updates, complete if the simulation is
      ready to move on to the executing state
      */
-    virtual convergence_state enterExecutingState (federate_id_t federateID, convergence_state converged = convergence_state::complete) = 0;
+    virtual iteration_result enterExecutingState (federate_id_t federateID, iteration_request iterate = NO_ITERATION) = 0;
 
     /**
      * Register a federate.
@@ -211,7 +211,7 @@ class Core
      * grantedTime is the minimum of over all next
      * times in both reiterative and non-reiterative federates.
      *
-     * If a federate determines it cannot converge it should invoke the die() method.
+     * If a federate determines it cannot converge it should invoke the error() method.
      *
      * Federates only participate it in reiterations for times that
      * are evenly divisible by the federates time delta.
@@ -224,7 +224,7 @@ class Core
      * @param localConverged has the local federate converged
 	 @return an iterationTime object with two field stepTime and a bool indicating the iteration has completed
      */
-    virtual iterationTime requestTimeIterative (federate_id_t federateID, Time next, convergence_state localConverged) = 0;
+    virtual iterationTime requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate) = 0;
 
     /**
      * Returns the current reiteration count for the specified federate.

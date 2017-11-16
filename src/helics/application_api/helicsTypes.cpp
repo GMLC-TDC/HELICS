@@ -53,15 +53,7 @@ std::string helicsComplexString (double real, double imag)
     ss << real;
     if (imag != 0.0)
     {
-        if (imag >= 0.0)
-        {
-            ss << '+' << imag;
-        }
-        else
-        {
-            ss << imag;
-        }
-        ss << 'j';
+		ss << ((imag >= 0.0) ? '+' : ' ') << imag << 'j';
     }
     return ss.str ();
 }

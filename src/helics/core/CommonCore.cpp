@@ -292,11 +292,11 @@ void CommonCore::error (federate_id_t federateID, int errorCode)
     m.source_handle = errorCode;
     addActionMessage (m);
     fed->addAction (m);
-    convergence_state ret = convergence_state::complete;
-    while (ret != convergence_state::error)
+    iteration_result ret = iteration_result::next_step;
+    while (ret != iteration_result::error)
     {
         ret = fed->genericUnspecifiedQueueProcess ();
-        if (ret == convergence_state::halted)
+        if (ret == iteration_result::halted)
         {
             break;
         }
@@ -314,11 +314,11 @@ void CommonCore::finalize (federate_id_t federateID)
     bye.source_id = fed->global_id;
 
     fed->addAction (bye);
-    convergence_state ret = convergence_state::complete;
-    while (ret != convergence_state::halted)
+    iteration_result ret = iteration_result::next_step;
+    while (ret != iteration_result::halted)
     {
         ret = fed->genericUnspecifiedQueueProcess ();
-        if (ret == convergence_state::error)
+        if (ret == iteration_result::error)
         {
             break;
         }
@@ -376,7 +376,7 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
         addActionMessage (m);
 
         auto check = fed->enterInitState ();
-        if (check != convergence_state::complete)
+        if (check != iteration_result::next_step)
         {
             fed->init_requested = false;
             throw (functionExecutionFailure ());
@@ -386,7 +386,7 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
     throw (invalidFunctionCall ());
 }
 
-convergence_state CommonCore::enterExecutingState (federate_id_t federateID, convergence_state converged)
+iteration_result CommonCore::enterExecutingState (federate_id_t federateID, iteration_request iterate)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -395,7 +395,7 @@ convergence_state CommonCore::enterExecutingState (federate_id_t federateID, con
     }
     if (HELICS_EXECUTING == fed->getState ())
     {
-        return convergence_state::complete;
+        return iteration_result::next_step;
     }
     if (HELICS_INITIALIZING != fed->getState ())
     {
@@ -405,7 +405,7 @@ convergence_state CommonCore::enterExecutingState (federate_id_t federateID, con
     ActionMessage exec (CMD_EXEC_CHECK);
     fed->addAction (exec);
     // TODO:: check for error conditions?
-    return fed->enterExecutingState (converged);
+    return fed->enterExecutingState (iterate);
 }
 
 federate_id_t CommonCore::registerFederate (const std::string &name, const CoreFederateInfo &info)
@@ -450,7 +450,7 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
 
     // now wait for the federateQueue to get the response
     auto valid = getFederate (id)->waitSetup ();
-    if (valid == convergence_state::complete)
+    if (valid == iteration_result::next_step)
     {
         return id;
     }
@@ -500,44 +500,36 @@ Time CommonCore::timeRequest (federate_id_t federateID, Time next)
     }
     if (HELICS_EXECUTING == fed->getState ())
     {
-        auto ret = fed->requestTime (next, convergence_state::complete);
+        auto ret = fed->requestTime (next, iteration_request::no_iterations);
         return ret.stepTime;
     }
     throw (invalidFunctionCall ());
 }
 
-iterationTime CommonCore::requestTimeIterative (federate_id_t federateID, Time next, convergence_state converged)
+iterationTime CommonCore::requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
         throw (invalidIdentifier ("federateID not valid"));
     }
-    switch (converged)
+   
+    if (HELICS_EXECUTING != fed->getState ())
     {
-    case convergence_state::halted:
-        finalize (federateID);
-        return {fed->grantedTime (), converged};
-    case convergence_state::error:
-        error (federateID);
-        return {fed->grantedTime (), converged};
-    default:
-        if (HELICS_EXECUTING != fed->getState ())
-        {
-            throw (invalidFunctionCall ());
-        }
+        throw (invalidFunctionCall ());
     }
+   
 
     // limit the iterations
-    if (converged != convergence_state::complete)
+    if (iterate == iteration_request::iterate_if_needed)
     {
         if (fed->getCurrentIteration () >= _max_iterations)
         {
-            converged = convergence_state::complete;
+            iterate = iteration_request::no_iterations;
         }
     }
 
-    return fed->requestTime (next, converged);
+    return fed->requestTime (next, iterate);
 }
 
 Time CommonCore::getCurrentTime (federate_id_t federateID) const
