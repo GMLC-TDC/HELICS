@@ -8,11 +8,11 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/helics-config.h"
 #include "Federate.h"
-#include "asyncFedCallInfo.h"
 #include "../core/CoreFactory.h"
 #include "../core/core.h"
+#include "asyncFedCallInfo.h"
+#include "helics/helics-config.h"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4702)
@@ -28,7 +28,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-
 std::string getHelicsVersionString ()
 {
     std::string vstr = std::to_string (HELICS_VERSION_MAJOR);
@@ -36,7 +35,8 @@ std::string getHelicsVersionString ()
     vstr.append (std::to_string (HELICS_VERSION_MINOR));
     vstr.push_back ('.');
     vstr.append (std::to_string (HELICS_VERSION_PATCH));
-    vstr += " (";
+    vstr.push_back (' ');
+    vstr.push_back ('(');
     vstr += HELICS_DATE;
     vstr.push_back (')');
     return vstr;
@@ -234,7 +234,7 @@ iteration_result Federate::enterExecutionState (iteration_request iterate)
     case op_states::startup:
     case op_states::pendingInit:
         enterInitializationState ();
-    FALLTHROUGH
+        FALLTHROUGH
     case op_states::initialization:
     {
         res = coreObject->enterExecutingState (fedID, iterate);
@@ -297,9 +297,7 @@ void Federate::enterExecutionStateAsync (iteration_request iterate)
             asyncCallInfo = std::make_unique<asyncFedCallInfo> ();
         }
 
-        auto eExecFunc = [this, iterate]() {
-            return coreObject->enterExecutingState (fedID, iterate);
-        };
+        auto eExecFunc = [this, iterate]() { return coreObject->enterExecutingState (fedID, iterate); };
         state = op_states::pendingExec;
         asyncCallInfo->execFuture = std::async (std::launch::async, eExecFunc);
     }
@@ -694,9 +692,9 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     {
         fi.only_update_on_change = doc["only_update_on_change"].asBool ();
     }
-    if (doc.isMember("only_transmit_on_change"))
+    if (doc.isMember ("only_transmit_on_change"))
     {
-        fi.only_transmit_on_change = doc["only_transmit_on_change"].asBool();
+        fi.only_transmit_on_change = doc["only_transmit_on_change"].asBool ();
     }
     if (doc.isMember ("source_only"))
     {

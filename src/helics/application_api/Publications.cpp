@@ -18,7 +18,7 @@ void Publication::publish (double val) const
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        if (changeDetected (prevValue, val,delta))
+        if (changeDetected (prevValue, val, delta))
         {
             prevValue = val;
         }
@@ -38,7 +38,7 @@ void Publication::publish (int64_t val) const
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        if (changeDetected (prevValue, val,static_cast<int64_t>(delta)))
+        if (changeDetected (prevValue, val, static_cast<int64_t> (delta)))
         {
             prevValue = val;
         }
@@ -58,7 +58,7 @@ void Publication::publish (const char *val) const
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        if (changeDetected (prevValue, val,delta))
+        if (changeDetected (prevValue, val, delta))
         {
             prevValue = val;
         }
@@ -78,7 +78,7 @@ void Publication::publish (const std::string &val) const
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        if (changeDetected (prevValue, val,delta))
+        if (changeDetected (prevValue, val, delta))
         {
             prevValue = val;
         }
@@ -98,7 +98,7 @@ void Publication::publish (const std::vector<double> &val) const
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        if (changeDetected (prevValue, val,delta))
+        if (changeDetected (prevValue, val, delta))
         {
             prevValue = val;
         }
@@ -119,7 +119,7 @@ void Publication::publish (const std::vector<std::complex<double>> &val) const
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        if (changeDetected (prevValue, val,delta))
+        if (changeDetected (prevValue, val, delta))
         {
             prevValue = val;
         }
@@ -140,7 +140,7 @@ void Publication::publish (const double *vals, int size) const
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        if (changeDetected (prevValue,vals, size,delta))
+        if (changeDetected (prevValue, vals, size, delta))
         {
             prevValue = std::vector<double> (vals, vals + size);
         }
@@ -161,7 +161,7 @@ void Publication::publish (std::complex<double> val) const
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        if (changeDetected (prevValue,val,delta))
+        if (changeDetected (prevValue, val, delta))
         {
             prevValue = val;
         }
@@ -176,7 +176,5 @@ void Publication::publish (std::complex<double> val) const
         fed->publish (id, db);
     }
 }
-
-
 
 }  // namespace helics

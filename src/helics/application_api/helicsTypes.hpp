@@ -290,9 +290,9 @@ constexpr bool isConvertableType<float> ()
 }
 
 template <>
-constexpr bool isConvertableType<long double>()
+constexpr bool isConvertableType<long double> ()
 {
-	return true;
+    return true;
 }
 
 template <>
@@ -324,7 +324,6 @@ constexpr bool isConvertableType<uint64_t> ()
 {
     return true;
 }
-
 
 }  // namespace helics
 #endif

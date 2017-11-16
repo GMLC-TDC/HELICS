@@ -9,8 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "IpcComms.h"
-#include "IpcQueueHelper.h"
 #include "../ActionMessage.h"
+#include "IpcQueueHelper.h"
 #include <algorithm>
 #include <cctype>
 #include <memory>

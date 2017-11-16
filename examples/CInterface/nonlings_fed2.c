@@ -63,13 +63,12 @@ int main(int argc,char **argv)
   fflush(NULL);
   helics_time_t currenttime=0.0;
   helics_iterative_time currenttimeiter;
-  currenttimeiter.status = nonconverged;
+  currenttimeiter.status = iterating;
 
   int           isupdated;
-  convergence_status conv=0;
   double tol=1E-8;
 
-  while((fabs(x-xprv) > tol)||(currenttimeiter.status==nonconverged)) {
+  while((fabs(x-xprv) > tol)||(currenttimeiter.status==iterating)) {
 
     
     xprv = x;
@@ -100,7 +99,7 @@ int main(int argc,char **argv)
     }
     //    isupdated = 0;
     //    while(!isupdated) {
-    currenttimeiter = helicsRequestTimeIterative(vfed, currenttime, conv);
+    currenttimeiter = helicsRequestTimeIterative(vfed, currenttime, iterate_if_needed);
     //      isupdated = helicsIsValueUpdated(sub);
     //    }
     //    currenttime = helicsRequestTime(vfed,currenttime);

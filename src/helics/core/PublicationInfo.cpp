@@ -12,14 +12,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics_includes/string_view.h"
 namespace helics
 {
-    bool PublicationInfo::CheckSetValue(const char *dataToCheck, uint64_t len)
+bool PublicationInfo::CheckSetValue (const char *dataToCheck, uint64_t len)
+{
+    if ((len != data.length ()) || (stx::string_view (data) != stx::string_view (dataToCheck, len)))
     {
-        if ((len != data.length())||(stx::string_view(data)!=stx::string_view(dataToCheck,len)))
-        {
-            data = std::string(dataToCheck, len);
-            return true;
-        }
-        return false;
+        data = std::string (dataToCheck, len);
+        return true;
     }
-    
+    return false;
+}
 }

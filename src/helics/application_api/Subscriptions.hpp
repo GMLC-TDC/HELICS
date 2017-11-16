@@ -20,7 +20,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/lexical_cast.hpp>
 namespace helics
 {
-
 class SubscriptionBase
 {
   protected:
@@ -87,7 +86,7 @@ class SubscriptionBase
 
 class Subscription : public SubscriptionBase
 {
-private:
+  private:
     boost::variant<std::function<void(const std::string &, Time)>,
                    std::function<void(const double &, Time)>,
                    std::function<void(const int64_t &, Time)>,
@@ -97,10 +96,10 @@ private:
       value_callback;  //!< callback function for the federate
 
     mutable helicsType_t type = helicsType_t::helicsInvalid;  //!< the underlying type the publication is using
-	bool changeDetectionEnabled = false;  //!< the change detection is enabled
-	bool hasUpdate = false;  //!< the value has been updated
-	defV lastValue;  //!< the last value updated
-	double delta = -1.0; //!< the minimum difference 
+    bool changeDetectionEnabled = false;  //!< the change detection is enabled
+    bool hasUpdate = false;  //!< the value has been updated
+    defV lastValue;  //!< the last value updated
+    double delta = -1.0;  //!< the minimum difference
   public:
     Subscription (ValueFederate *valueFed, const std::string &key, const std::string &units = "")
         : SubscriptionBase (valueFed, key, "def", units)
@@ -112,7 +111,7 @@ private:
     {
     }
 
-	virtual bool isUpdated() const override;
+    virtual bool isUpdated () const override;
 
     /** store the value in the given variable
     @param[out] out the location to store the value
@@ -130,22 +129,21 @@ private:
             if (type != helicsType_t::helicsInvalid)
             {
                 valueExtract (dv, type, out);
-				if (changeDetectionEnabled)
-				{
-					if (changeDetected(lastValue, out, delta))
-					{
-						lastValue = out;
-					}
-					else
-					{
-						valueExtract(lastValue, out);
-					}
-				}
-				else
-				{
-					lastValue = out;
-				}
-                
+                if (changeDetectionEnabled)
+                {
+                    if (changeDetected (lastValue, out, delta))
+                    {
+                        lastValue = out;
+                    }
+                    else
+                    {
+                        valueExtract (lastValue, out);
+                    }
+                }
+                else
+                {
+                    lastValue = out;
+                }
             }
         }
         else
@@ -162,23 +160,23 @@ private:
         getValue (val);
         return val;
     }
-	/** get the most recent value
-	@return the value*/
-	//template <class X>
-	//typename std::enable_if_t<isConvertableType<X>(), X> getValue()
-	//{
-	//	std::conditional<std::is_integral<X>::value, int64_t, double> gval;
-	//	getValue(gval);
-	//	return static_cast<X>(gval);
-	//}
-	/** get the most recent calculation with the result as a convertable type*/
-	//template <class X>
-	//typename std::enable_if_t<isConvertableType<X>()> getValue(X &out)
-	//{
-	//	std::conditional<std::is_integral<X>::value, int64_t, double> gval;
-	//	getValue(gval);
-	//	out = static_cast<X>(gval);
-	//}
+    /** get the most recent value
+    @return the value*/
+    // template <class X>
+    // typename std::enable_if_t<isConvertableType<X>(), X> getValue()
+    //{
+    //	std::conditional<std::is_integral<X>::value, int64_t, double> gval;
+    //	getValue(gval);
+    //	return static_cast<X>(gval);
+    //}
+    /** get the most recent calculation with the result as a convertable type*/
+    // template <class X>
+    // typename std::enable_if_t<isConvertableType<X>()> getValue(X &out)
+    //{
+    //	std::conditional<std::is_integral<X>::value, int64_t, double> gval;
+    //	getValue(gval);
+    //	out = static_cast<X>(gval);
+    //}
 
     using SubscriptionBase::registerCallback;
     /** register a callback for the update
@@ -202,25 +200,20 @@ private:
         lastValue = val;
     }
 
-	void setMinimumChange(double deltaV)
-	{
+    void setMinimumChange (double deltaV)
+    {
+        if (delta < 0.0)
+        {
+            changeDetectionEnabled = true;
+        }
+        delta = deltaV;
+        if (delta < 0.0)
+        {
+            changeDetectionEnabled = false;
+        }
+    }
+    void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
 
-		if (delta < 0.0)
-		{
-
-			changeDetectionEnabled = true;
-		}
-		delta = deltaV;
-		if (delta < 0.0)
-		{
-			changeDetectionEnabled = false;
-		}
-
-	}
-	void enableChangeDetection(bool enabled = true)
-	{
-		changeDetectionEnabled = enabled;
-	}
   private:
     void handleCallback (Time time);
 };
@@ -230,12 +223,13 @@ private:
 template <class X>
 class SubscriptionT : public SubscriptionBase
 {
-public:
+  public:
   private:
     std::function<void(X, Time)> value_callback;  //!< callback function for the federate
-	std::function<double(const X &v1, const X &v2)> changeDetectionCallback; //!< callback function for change detection
-	double delta = 0.0; //1< the minimum difference to trigger an update
-	bool changeDetectionEnabled = false; //!< flag indicating if change detection is enabled or not
+    std::function<double(const X &v1, const X &v2)>
+      changeDetectionCallback;  //!< callback function for change detection
+    double delta = 0.0;  // 1< the minimum difference to trigger an update
+    bool changeDetectionEnabled = false;  //!< flag indicating if change detection is enabled or not
   public:
     SubscriptionT () = default;
     /**constructor to build a subscription object
@@ -283,26 +277,21 @@ public:
     @param val the value to set as the default
     */
     void setDefault (const X &val) { fed->setDefaultValue (id, val); }
-	/** set a minimum change value*/
-	void setMinimumChange(double deltaV)
-	{
+    /** set a minimum change value*/
+    void setMinimumChange (double deltaV)
+    {
+        if (delta < 0.0)
+        {
+            changeDetectionEnabled = true;
+        }
+        delta = deltaV;
+        if (delta < 0.0)
+        {
+            changeDetectionEnabled = false;
+        }
+    }
+    void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
 
-		if (delta < 0.0)
-		{
-
-			changeDetectionEnabled = true;
-		}
-		delta = deltaV;
-		if (delta < 0.0)
-		{
-			changeDetectionEnabled = false;
-		}
-
-	}
-	void enableChangeDetection(bool enabled = true)
-	{
-		changeDetectionEnabled = enabled;
-	}
   private:
     void handleCallback (Time time)
     {

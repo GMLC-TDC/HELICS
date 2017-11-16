@@ -17,10 +17,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <mutex>
 #include <vector>
 
-helics_source_filter helicsRegisterSourceFilter (helics_message_filter_federate fed,
-                                                 const char *name,
-                                                 const char *inputType,
-                                                 const char *outputType)
+helics_source_filter
+helicsRegisterSourceFilter (helics_message_filter_federate fed, const char *name, const char *inputType, const char *outputType)
 {
     // now generate a generic subscription
     auto fedObj = getFilterFedSharedPtr (fed);
@@ -43,10 +41,8 @@ helics_source_filter helicsRegisterSourceFilter (helics_message_filter_federate 
     return nullptr;
 }
 
-helics_destination_filter helicsRegisterDestinationFilter (helics_message_filter_federate fed,
-                                                           const char *name,
-                                                           const char *inputType,
-                                                           const char *outputType)
+helics_destination_filter
+helicsRegisterDestinationFilter (helics_message_filter_federate fed, const char *name, const char *inputType, const char *outputType)
 {
     // now generate a generic subscription
     auto fedObj = getFilterFedSharedPtr (fed);
@@ -133,12 +129,6 @@ message_t helicsFilterGetMessage (helics_source_filter filter)
     return mess;
 }
 
-void helicsFreeSourceFilter (helics_source_filter filter)
-{
-    delete reinterpret_cast<helics::SourceFilterObject *> (filter);
-}
+void helicsFreeSourceFilter (helics_source_filter filter) { delete reinterpret_cast<helics::SourceFilterObject *> (filter); }
 
-void helicsFreeDestinationFilter (helics_destination_filter filter)
-{
-    delete reinterpret_cast<helics::DestFilterObject *> (filter);
-}
+void helicsFreeDestinationFilter (helics_destination_filter filter) { delete reinterpret_cast<helics::DestFilterObject *> (filter); }

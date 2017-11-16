@@ -126,20 +126,20 @@ void runPubSubTypeTests (const TX &valtx, const RX &valrx)
 }
 
 #ifdef QUICK_TESTS_ONLY
-#define SKIPTEST //
+#define SKIPTEST  //
 #else
 #define SKIPTEST
 #endif
 
 BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests)
 {
-	SKIPTEST runPubSubTypeTests<std::string, std::string> ("test1", "test1");
+    SKIPTEST runPubSubTypeTests<std::string, std::string> ("test1", "test1");
     runPubSubTypeTests<std::string, double> ("3.14159", 3.14159);
     runPubSubTypeTests<double, std::string> (3.14159, std::to_string (3.141590));
-	SKIPTEST runPubSubTypeTests<double, int64_t> (3.14159, 3);
-	SKIPTEST runPubSubTypeTests<int64_t, double> (34, 34.0);
-	SKIPTEST runPubSubTypeTests<int64_t, std::string> (34, "34");
-	SKIPTEST runPubSubTypeTests<std::string, int64_t> ("34.14", 34);
+    SKIPTEST runPubSubTypeTests<double, int64_t> (3.14159, 3);
+    SKIPTEST runPubSubTypeTests<int64_t, double> (34, 34.0);
+    SKIPTEST runPubSubTypeTests<int64_t, std::string> (34, "34");
+    SKIPTEST runPubSubTypeTests<std::string, int64_t> ("34.14", 34);
 }
 
 BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests)
@@ -147,21 +147,21 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests)
     using c = std::complex<double>;
 
     runPubSubTypeTests<c, std::string> (c (12.4, 0.3), helics::helicsComplexString (c (12.4, 0.3)));
-	SKIPTEST runPubSubTypeTests<std::string, c> ("3.14159+2j", c (3.14159, 2));
-	SKIPTEST runPubSubTypeTests<std::string, c> ("3.14159-2j", c (3.14159, -2));
-	SKIPTEST runPubSubTypeTests<std::string, c> ("-3.14159-2j", c (-3.14159, -2));
+    SKIPTEST runPubSubTypeTests<std::string, c> ("3.14159+2j", c (3.14159, 2));
+    SKIPTEST runPubSubTypeTests<std::string, c> ("3.14159-2j", c (3.14159, -2));
+    SKIPTEST runPubSubTypeTests<std::string, c> ("-3.14159-2j", c (-3.14159, -2));
     runPubSubTypeTests<std::string, c> ("-3.14159 - 2i", c (-3.14159, -2));
-	SKIPTEST runPubSubTypeTests<std::string, c> ("-3.14159 + 2i", c (-3.14159, 2));
+    SKIPTEST runPubSubTypeTests<std::string, c> ("-3.14159 + 2i", c (-3.14159, 2));
 
-	SKIPTEST runPubSubTypeTests<std::string, c> ("2i", c (0, 2));
+    SKIPTEST runPubSubTypeTests<std::string, c> ("2i", c (0, 2));
     runPubSubTypeTests<c, double> (c (0, 2), 2.0);
-	SKIPTEST runPubSubTypeTests<c, int64_t> (c (0, 2), 2);
+    SKIPTEST runPubSubTypeTests<c, int64_t> (c (0, 2), 2);
 
-	SKIPTEST runPubSubTypeTests<double, c> (2.0, c (2, 0));
+    SKIPTEST runPubSubTypeTests<double, c> (2.0, c (2, 0));
 
-	SKIPTEST runPubSubTypeTests<int64_t, c> (2, c (2, 0));
-	SKIPTEST runPubSubTypeTests<c, double> (c (3.0, 4.0), 5.0);
-	SKIPTEST runPubSubTypeTests<c, int64_t> (c (3.0, 4.0), 5);
+    SKIPTEST runPubSubTypeTests<int64_t, c> (2, c (2, 0));
+    SKIPTEST runPubSubTypeTests<c, double> (c (3.0, 4.0), 5.0);
+    SKIPTEST runPubSubTypeTests<c, int64_t> (c (3.0, 4.0), 5);
 }
 
 BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests)
@@ -177,28 +177,28 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests)
     runPubSubTypeTests<v, std::string> (tvec2, helics::helicsVectorString (tvec2));
     runPubSubTypeTests<std::string, v> (helics::helicsVectorString (tvec2), tvec2);
 
-	SKIPTEST runPubSubTypeTests<v, std::string> (eVec, helics::helicsVectorString (eVec));
-	SKIPTEST runPubSubTypeTests<std::string, v> (helics::helicsVectorString (eVec), eVec);
+    SKIPTEST runPubSubTypeTests<v, std::string> (eVec, helics::helicsVectorString (eVec));
+    SKIPTEST runPubSubTypeTests<std::string, v> (helics::helicsVectorString (eVec), eVec);
 
-	SKIPTEST runPubSubTypeTests<std::string, v> ("3.14159-2j", v{3.14159, -2});
-	SKIPTEST runPubSubTypeTests<std::string, v> ("-3.14159-2j", v{-3.14159, -2});
-	SKIPTEST runPubSubTypeTests<std::string, v> ("-3.14159", v{-3.14159});
+    SKIPTEST runPubSubTypeTests<std::string, v> ("3.14159-2j", v{3.14159, -2});
+    SKIPTEST runPubSubTypeTests<std::string, v> ("-3.14159-2j", v{-3.14159, -2});
+    SKIPTEST runPubSubTypeTests<std::string, v> ("-3.14159", v{-3.14159});
 
-	SKIPTEST runPubSubTypeTests<std::string, v> ("2i", v{0, 2});
+    SKIPTEST runPubSubTypeTests<std::string, v> ("2i", v{0, 2});
 
-	SKIPTEST runPubSubTypeTests<c, v> (c{3.14159, -2}, v{3.14159, -2});
-	SKIPTEST runPubSubTypeTests<c, v> (c{-3.14159, -2}, v{-3.14159, -2});
-	SKIPTEST runPubSubTypeTests<c, v> (c{-3.14159, 0.0}, v{-3.14159, 0.0});
+    SKIPTEST runPubSubTypeTests<c, v> (c{3.14159, -2}, v{3.14159, -2});
+    SKIPTEST runPubSubTypeTests<c, v> (c{-3.14159, -2}, v{-3.14159, -2});
+    SKIPTEST runPubSubTypeTests<c, v> (c{-3.14159, 0.0}, v{-3.14159, 0.0});
 
-	SKIPTEST runPubSubTypeTests<c, v> (c{0.0, 2}, v{0, 2});
+    SKIPTEST runPubSubTypeTests<c, v> (c{0.0, 2}, v{0, 2});
 
-	SKIPTEST runPubSubTypeTests<v, double> (tvec1, 12.4);
+    SKIPTEST runPubSubTypeTests<v, double> (tvec1, 12.4);
 
-	SKIPTEST runPubSubTypeTests<double, v> (0.34, v{0.34});
+    SKIPTEST runPubSubTypeTests<double, v> (0.34, v{0.34});
 
-	SKIPTEST runPubSubTypeTests<v, int64_t> (tvec1, 12);
+    SKIPTEST runPubSubTypeTests<v, int64_t> (tvec1, 12);
 
-	SKIPTEST runPubSubTypeTests<int64_t, v> (56, v{56});
+    SKIPTEST runPubSubTypeTests<int64_t, v> (56, v{56});
 }
 
 BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
@@ -223,25 +223,25 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
     runPubSubTypeTests<vc, std::string> (eVec, helics::helicsComplexVectorString (eVec));
     runPubSubTypeTests<std::string, vc> (helics::helicsComplexVectorString (eVec), eVec);
 
-	SKIPTEST runPubSubTypeTests<std::string, vc> ("3.14159-2j", vc{c{3.14159, -2}});
-	SKIPTEST runPubSubTypeTests<std::string, vc> ("-3.14159-2j", vc{c{-3.14159, -2}});
-	SKIPTEST runPubSubTypeTests<std::string, vc> ("-3.14159", vc{c{-3.14159}});
+    SKIPTEST runPubSubTypeTests<std::string, vc> ("3.14159-2j", vc{c{3.14159, -2}});
+    SKIPTEST runPubSubTypeTests<std::string, vc> ("-3.14159-2j", vc{c{-3.14159, -2}});
+    SKIPTEST runPubSubTypeTests<std::string, vc> ("-3.14159", vc{c{-3.14159}});
 
-	SKIPTEST runPubSubTypeTests<std::string, vc> ("2i", vc{c{0, 2}});
+    SKIPTEST runPubSubTypeTests<std::string, vc> ("2i", vc{c{0, 2}});
 
-	SKIPTEST runPubSubTypeTests<c, vc> (c{3.14159, -2}, vc{c{3.14159, -2}});
-	SKIPTEST runPubSubTypeTests<c, vc> (c{-3.14159, -2}, vc{c{-3.14159, -2}});
-	SKIPTEST runPubSubTypeTests<c, vc> (c{-3.14159, 0.0}, vc{c{-3.14159, 0.0}});
+    SKIPTEST runPubSubTypeTests<c, vc> (c{3.14159, -2}, vc{c{3.14159, -2}});
+    SKIPTEST runPubSubTypeTests<c, vc> (c{-3.14159, -2}, vc{c{-3.14159, -2}});
+    SKIPTEST runPubSubTypeTests<c, vc> (c{-3.14159, 0.0}, vc{c{-3.14159, 0.0}});
 
-	SKIPTEST runPubSubTypeTests<c, vc> (c{0.0, 2}, vc{c{0, 2}});
+    SKIPTEST runPubSubTypeTests<c, vc> (c{0.0, 2}, vc{c{0, 2}});
 
-	SKIPTEST runPubSubTypeTests<vc, double> (tcvec2, 5.0);
+    SKIPTEST runPubSubTypeTests<vc, double> (tcvec2, 5.0);
 
-	SKIPTEST runPubSubTypeTests<double, vc> (0.34, vc{c{0.34}});
+    SKIPTEST runPubSubTypeTests<double, vc> (0.34, vc{c{0.34}});
 
-	SKIPTEST runPubSubTypeTests<vc, int64_t> (tcvec2, 5);
+    SKIPTEST runPubSubTypeTests<vc, int64_t> (tcvec2, 5);
 
-	SKIPTEST runPubSubTypeTests<int64_t, vc> (56, vc{c{56}});
+    SKIPTEST runPubSubTypeTests<int64_t, vc> (56, vc{c{56}});
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

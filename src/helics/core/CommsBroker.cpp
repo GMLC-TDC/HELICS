@@ -10,8 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "CommsBroker.hpp"
-#include "helics/helics-config.h"
 #include "CommsBroker_impl.hpp"
+#include "helics/helics-config.h"
 
 #include "CommonCore.h"
 #include "CoreBroker.h"

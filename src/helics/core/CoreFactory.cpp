@@ -9,9 +9,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "CoreFactory.h"
+#include "core-exceptions.h"
 #include "core-types.h"
 #include "helics/helics-config.h"
-#include "core-exceptions.h"
 #if HELICS_HAVE_ZEROMQ
 #include "zmq/ZmqCore.h"
 #endif
@@ -20,9 +20,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "mpi/MpiCore.h"
 #endif
 
-#include "TestCore.h"
 #include "../common/delayedDestructor.hpp"
 #include "../common/searchableObjectHolder.hpp"
+#include "TestCore.h"
 #include "ipc/IpcCore.h"
 #include "udp/UdpCore.h"
 #include <cassert>
@@ -102,7 +102,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         }
 
 #else
-		throw(HelicsException("ZMQ core is not available"));
+        throw (HelicsException ("ZMQ core is not available"));
 #endif
         break;
     case core_type::MPI:
@@ -116,7 +116,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<MpiCore> (name);
         }
 #else
-		throw(HelicsException("MPI core is not available"));
+        throw (HelicsException ("MPI core is not available"));
 #endif
         break;
     case core_type::TEST:
@@ -150,10 +150,10 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<UdpCore> (name);
         }
         break;
-	case core_type::TCP:
-		throw(HelicsException("TCP core is not available"));
+    case core_type::TCP:
+        throw (HelicsException ("TCP core is not available"));
     default:
-		throw(HelicsException("unrecognized core type"));
+        throw (HelicsException ("unrecognized core type"));
     }
     return core;
 }
@@ -292,7 +292,7 @@ bool isAvailable (core_type type)
         available = true;
         break;
     default:
-		break;
+        break;
     }
 
     return available;
@@ -351,7 +351,7 @@ bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &pt
 }
 std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
 {
-    return searchableObjects.findObject([type](auto &ptr) { return isJoinableCoreOfType (type, ptr); });
+    return searchableObjects.findObject ([type](auto &ptr) { return isJoinableCoreOfType (type, ptr); });
 }
 
 bool registerCommonCore (std::shared_ptr<CommonCore> tcore)

@@ -44,7 +44,6 @@ static void addOperations (Filter *filt, defined_filter_types type)
     break;
     case redirect:
     {
-        
     }
     break;
     }

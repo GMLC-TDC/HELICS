@@ -19,8 +19,8 @@ the purpose of these objects are to convert a specific type into a data block fo
 
 #include <string>
 
-#include "Message.h"
 #include "../core/core.h"
+#include "Message.h"
 #include <complex>
 #include <type_traits>
 

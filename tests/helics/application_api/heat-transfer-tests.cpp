@@ -27,8 +27,8 @@ class HeatUnitBlock
   public:
     double ThermalCap = 4.0;  // thermal capacity
     double tRate = 0.05;  // rate of energy transfer per degree
-    int x = 0; //x coordinate
-    int y = 0; //y coordinate
+    int x = 0;  // x coordinate
+    int y = 0;  // y coordinate
 
     double T = 25.0;  // temperature
     helics::Time deltaTime = 5.0;  // sampling rate

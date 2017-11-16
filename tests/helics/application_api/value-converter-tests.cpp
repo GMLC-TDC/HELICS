@@ -18,9 +18,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test out the value converters
  */
 #include "helics/application_api/Message.h"
-#include "helics/core/core-data.h"
 #include "helics/application_api/ValueConverter.hpp"
 #include "helics/application_api/ValueConverter_impl.hpp"
+#include "helics/core/core-data.h"
 #include <vector>
 
 BOOST_AUTO_TEST_SUITE (value_converter_tests)

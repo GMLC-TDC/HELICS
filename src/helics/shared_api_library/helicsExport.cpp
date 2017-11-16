@@ -26,8 +26,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../common/zmqContextManager.h"
 #endif
 
-static const std::string versionStr (std::to_string (HELICS_VERSION_MAJOR) + "." +
-                                     std::to_string (HELICS_VERSION_MINOR) + "." +
+static const std::string versionStr (std::to_string (HELICS_VERSION_MAJOR) + "." + std::to_string (HELICS_VERSION_MINOR) + "." +
                                      std::to_string (HELICS_VERSION_PATCH) + " (" + HELICS_DATE + ")");
 
 const char *helicsGetVersion (void) { return versionStr.c_str (); }

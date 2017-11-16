@@ -12,10 +12,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../core/helics-time.h"
 #include "helics.h"
 #include "internal/api_objects.h"
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <vector>
-#include <iostream>
 
 /** this is a random identifier put in place when the federate gets created*/
 static const int validationIdentifier = 0x2352188;
@@ -120,7 +120,7 @@ std::shared_ptr<helics::MessageFilterFederate> getFilterFedSharedPtr (helics_mes
 masterObjectHolder::masterObjectHolder () noexcept {}
 
 masterObjectHolder::~masterObjectHolder ()
-{ 
+{
     deleteAll ();
     std::cout << "end of master Object Holder destructor" << std::endl;
 }
@@ -397,11 +397,11 @@ static helics::iteration_request getIterationRequest (iteration_request iterate)
 {
     switch (iterate)
     {
-	case no_iteration:
-	default:
-		return helics::iteration_request::no_iterations;
-	case force_iteration:
-		return helics::iteration_request::force_iteration;
+    case no_iteration:
+    default:
+        return helics::iteration_request::no_iterations;
+    case force_iteration:
+        return helics::iteration_request::force_iteration;
 
     case iterate_if_needed:
         return helics::iteration_request::iterate_if_needed;
@@ -424,9 +424,7 @@ static iteration_status getIterationStatus (helics::iteration_result iterationSt
     }
 }
 
-helicsStatus helicsEnterExecutionModeIterative (helics_federate fed,
-                                                iteration_request iterate,
-                                                iteration_status *outIterate)
+helicsStatus helicsEnterExecutionModeIterative (helics_federate fed, iteration_request iterate, iteration_status *outIterate)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
@@ -436,7 +434,7 @@ helicsStatus helicsEnterExecutionModeIterative (helics_federate fed,
     try
     {
         auto val = fedObj->enterExecutionState (getIterationRequest (iterate));
-        if (outIterate!= nullptr)
+        if (outIterate != nullptr)
         {
             *outIterate = getIterationStatus (val);
         }
@@ -534,8 +532,7 @@ helics_time_t helicsRequestTime (helics_federate fed, helics_time_t requestTime)
     return static_cast<double> (tm);
 }
 
-helics_iterative_time
-helicsRequestTimeIterative (helics_federate fed, helics_time_t requestTime, iteration_request iterate)
+helics_iterative_time helicsRequestTimeIterative (helics_federate fed, helics_time_t requestTime, iteration_request iterate)
 {
     helics_iterative_time itTime;
     itTime.status = error;
@@ -548,8 +545,7 @@ helicsRequestTimeIterative (helics_federate fed, helics_time_t requestTime, iter
     }
     try
     {
-        auto val = fedObj->requestTimeIterative (helics::Time (requestTime, timeUnits::ns),
-                                                 getIterationRequest (iterate));
+        auto val = fedObj->requestTimeIterative (helics::Time (requestTime, timeUnits::ns), getIterationRequest (iterate));
         itTime.time = val.stepTime.getBaseTimeCode ();
         itTime.status = getIterationStatus (val.state);
         return itTime;
@@ -571,8 +567,7 @@ helicsStatus helicsRequestTimeAsync (helics_federate fed, helics_time_t requestT
     return helicsOK;
 }
 
-helicsStatus
-helicsRequestTimeIterativeAsync (helics_federate fed, helics_time_t requestTime, iteration_request iterate)
+helicsStatus helicsRequestTimeIterativeAsync (helics_federate fed, helics_time_t requestTime, iteration_request iterate)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)

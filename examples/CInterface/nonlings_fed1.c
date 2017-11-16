@@ -73,9 +73,8 @@ int main (int argc, char **argv)
     double x = 0.0, y = 0.0, yprv = 100;
     helics_time_t currenttime = 0.0;
     helics_iterative_time currenttimeiter;
-    currenttimeiter.status = nonconverged;
+    currenttimeiter.status = iterating;
     int isupdated;
-    convergence_status conv = 0;
     double tol = 1E-8;
 
     status = helicsPublishDouble (pub, x);
@@ -84,7 +83,7 @@ int main (int argc, char **argv)
     printf (" Entered execution mode\n");
 
     fflush (NULL);
-    while ((fabs (y - yprv) > tol) || (currenttimeiter.status == nonconverged))
+    while ((fabs (y - yprv) > tol) || (currenttimeiter.status == iterating))
     {
         yprv = y;
         status = helicsGetDouble (sub, &y);
@@ -115,7 +114,7 @@ int main (int argc, char **argv)
 
             //      isupdated = 0;
             //      while(!isupdated) {
-            currenttimeiter = helicsRequestTimeIterative (vfed, currenttime, conv);
+            currenttimeiter = helicsRequestTimeIterative (vfed, currenttime, iterate_if_needed);
             //       	isupdated = helicsIsValueUpdated(sub);
             //      }
             //      currenttime = helicsRequestTime(vfed,currenttime);
@@ -130,7 +129,7 @@ int main (int argc, char **argv)
 #ifdef _MSC_VER
         Sleep (50);
 #else
-        usleep (50000); /* Sleep for 1 millisecond */
+        usleep (50000); /* Sleep for 50 millisecond */
 #endif
     }
     printf ("NLIN1: Broker disconnected\n");

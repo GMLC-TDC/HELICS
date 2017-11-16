@@ -130,7 +130,7 @@ data_view ValueFederateManager::getValue (subscription_id_t id)
     {
         std::lock_guard<std::mutex> sublock (subscription_mutex);
         subs[id.value ()].lastQuery = CurrentTime;
-        subs[id.value()].hasUpdate = false;
+        subs[id.value ()].hasUpdate = false;
         return lastData[id.value ()];
     }
     else

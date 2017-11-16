@@ -10,11 +10,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "ZmqCore.h"
 
-#include "helics/helics-config.h"
 #include "../core-data.h"
 #include "../core.h"
 #include "../helics-time.h"
 #include "ZmqComms.h"
+#include "helics/helics-config.h"
 
 #include <algorithm>
 #include <cassert>

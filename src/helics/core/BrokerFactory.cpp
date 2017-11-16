@@ -11,9 +11,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "BrokerFactory.h"
 #include "../common/delayedDestructor.hpp"
 #include "../common/searchableObjectHolder.hpp"
-#include "helics/helics-config.h"
-#include "core-types.h"
 #include "core-exceptions.h"
+#include "core-types.h"
+#include "helics/helics-config.h"
 #if HELICS_HAVE_ZEROMQ
 #include "zmq/ZmqBroker.h"
 #endif
@@ -49,7 +49,7 @@ std::shared_ptr<CoreBroker> makeBroker (core_type type, const std::string &name)
         }
 
 #else
-		throw(HelicsException("ZMQ broker type is not available"));
+        throw (HelicsException ("ZMQ broker type is not available"));
 #endif
         break;
     }
@@ -65,7 +65,7 @@ std::shared_ptr<CoreBroker> makeBroker (core_type type, const std::string &name)
             broker = std::make_shared<MpiBroker> (name);
         }
 #else
-		throw(HelicsException("mpi broker type is not available"));
+        throw (HelicsException ("mpi broker type is not available"));
 #endif
         break;
     }
@@ -102,10 +102,10 @@ std::shared_ptr<CoreBroker> makeBroker (core_type type, const std::string &name)
             broker = std::make_shared<UdpBroker> (name);
         }
         break;
-	case core_type::TCP:
-		throw(HelicsException("TCP broker type is not available"));
+    case core_type::TCP:
+        throw (HelicsException ("TCP broker type is not available"));
     default:
-		throw(HelicsException("unrecognized broker type"));
+        throw (HelicsException ("unrecognized broker type"));
     }
     return broker;
 }
@@ -114,12 +114,11 @@ namespace BrokerFactory
 {
 std::shared_ptr<CoreBroker> create (core_type type, const std::string &initializationString)
 {
-		auto broker = makeBroker(type, "");
-		broker->Initialize(initializationString);
-		registerBroker(broker);
-		broker->connect();
-		return broker;
-	
+    auto broker = makeBroker (type, "");
+    broker->Initialize (initializationString);
+    registerBroker (broker);
+    broker->connect ();
+    return broker;
 }
 
 std::shared_ptr<CoreBroker>
@@ -187,7 +186,7 @@ bool available (core_type type)
         available = true;
         break;
     default:
-		break;
+        break;
     }
 
     return available;
@@ -196,7 +195,8 @@ bool available (core_type type)
 /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
 static auto destroyerCallFirst = [](auto &broker) {
-    broker->processDisconnect(true); //use true here as it is possible the searchableObjectHolder is deleted already
+    broker->processDisconnect (
+      true);  // use true here as it is possible the searchableObjectHolder is deleted already
     broker->joinAllThreads ();
 };
 /** so the problem this is addressing is that unregister can potentially cause a destructor to fire

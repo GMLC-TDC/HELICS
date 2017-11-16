@@ -69,7 +69,7 @@ enum class iteration_state :signed char
 enum class iteration_result :signed char
 {
 	error = -5,		//!< indicator that an error has occurred
-	next_step = 0,  //!< indicator that the iterations have completed
+	next_step = 0,  //!< indicator that the iterations have completed and the federate has moved to the next step
 	iterating = 2,	//!< indicator that the iterations need to continue
 	halted = 3,	//!< indicator that the simulation has been halted
 };

@@ -103,6 +103,7 @@ private:
 	
     /** a logging function for logging or printing messages*/
     std::function<void(int, const std::string &, const std::string &)> loggerFunction;
+	std::function<std::string(const std::string &)> queryCallback; //!< a callback for additional queries
 	/** find the next Value Event*/
 	Time nextValueTime() const;
 	/** find the next Message Event*/
@@ -253,6 +254,17 @@ private:
     {
         loggerFunction = std::move (logFunction);
     }
+	/** set the query callback function
+	@details function must have signature std::string(const std::string &query)
+	*/
+	void setQueryCallback(std::function<std::string(const std::string &)> queryCallbackFunction)
+	{
+		queryCallback = std::move(queryCallbackFunction);
+	}
+	/** generate the result of a query string
+	@param query a query string
+	@return the resulting string from the query*/
+	std::string processQuery(const std::string &query) const;
     /** check if a value should be published or not
     @param pub_id the handle of the publication
     @param data the raw data to check

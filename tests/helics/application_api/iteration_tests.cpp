@@ -15,9 +15,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 /** these test cases test out the value converters
  */
-#include "helics/application_api/ValueConverter.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
+#include "helics/application_api/ValueConverter.hpp"
 
 BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
 
@@ -142,41 +142,41 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-BOOST_AUTO_TEST_CASE(test2fed_withSubPub)
+BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
 {
-    Setup2FederateTest("test");
+    Setup2FederateTest ("test");
     // register the publications
-    auto pub1 = helics::Publication(helics::GLOBAL, vFed1.get(), "pub1",helics::helicsType_t::helicsDouble);
+    auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helicsType_t::helicsDouble);
 
-    auto sub1 = helics::Subscription( vFed2.get(), "pub1");
-    vFed1->setTimeDelta(1.0);
-    vFed2->setTimeDelta(1.0);
-    vFed1->setPeriod(1.0);
-    vFed2->setPeriod(1.0);
+    auto sub1 = helics::Subscription (vFed2.get (), "pub1");
+    vFed1->setTimeDelta (1.0);
+    vFed2->setTimeDelta (1.0);
+    vFed1->setPeriod (1.0);
+    vFed2->setPeriod (1.0);
 
-    vFed1->enterExecutionStateAsync();
-    vFed2->enterExecutionState();
-    vFed1->enterExecutionStateFinalize();
-    pub1.publish(27.0);
+    vFed1->enterExecutionStateAsync ();
+    vFed2->enterExecutionState ();
+    vFed1->enterExecutionStateFinalize ();
+    pub1.publish (27.0);
 
-    vFed1->requestTimeAsync(1.0);
-    auto comp = vFed2->requestTimeIterative(1.0, helics::iteration_request::iterate_if_needed);
+    vFed1->requestTimeAsync (1.0);
+    auto comp = vFed2->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
 
-    BOOST_CHECK(comp.state == helics::iteration_result::iterating);
-    BOOST_CHECK_EQUAL(comp.stepTime, helics::timeZero);
+    BOOST_CHECK (comp.state == helics::iteration_result::iterating);
+    BOOST_CHECK_EQUAL (comp.stepTime, helics::timeZero);
 
-    BOOST_CHECK(sub1.isUpdated());
-    auto val = sub1.getValue<double>();
-    BOOST_CHECK_EQUAL(val, 27.0);
-    BOOST_CHECK(!sub1.isUpdated());
-    comp = vFed2->requestTimeIterative(1.0, helics::iteration_request::iterate_if_needed);
+    BOOST_CHECK (sub1.isUpdated ());
+    auto val = sub1.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 27.0);
+    BOOST_CHECK (!sub1.isUpdated ());
+    comp = vFed2->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
 
-    BOOST_CHECK(comp.state == helics::iteration_result::next_step);
-    BOOST_CHECK_EQUAL(comp.stepTime, 1.0);
-    BOOST_CHECK(!sub1.isUpdated());
-    double val2 = sub1.getValue<double>();
-    vFed1->requestTimeFinalize();
+    BOOST_CHECK (comp.state == helics::iteration_result::next_step);
+    BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
+    BOOST_CHECK (!sub1.isUpdated ());
+    double val2 = sub1.getValue<double> ();
+    vFed1->requestTimeFinalize ();
 
-    BOOST_CHECK_EQUAL(val2, val);
+    BOOST_CHECK_EQUAL (val2, val);
 }
 BOOST_AUTO_TEST_SUITE_END ()

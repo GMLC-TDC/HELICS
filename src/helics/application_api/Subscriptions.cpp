@@ -69,15 +69,15 @@ void Subscription::handleCallback (Time time)
     }
 }
 
-bool Subscription::isUpdated() const
+bool Subscription::isUpdated () const
 {
-	if (changeDetectionEnabled)
-	{
-		return SubscriptionBase::isUpdated();
-	}
-	else
-	{
-		return SubscriptionBase::isUpdated();
-	}
+    if (changeDetectionEnabled)
+    {
+        return SubscriptionBase::isUpdated ();
+    }
+    else
+    {
+        return SubscriptionBase::isUpdated ();
+    }
 }
 }  // namespace helics

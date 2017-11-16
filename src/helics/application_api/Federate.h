@@ -161,7 +161,7 @@ class Federate
      */
     void error (int errorcode, const std::string &message);
 
-    /** specify a separator to use for naming separation
+    /** specify a separator to use for naming separation between the federate name and the interface name
      */
     void setSeparator (char separator) { separator_ = separator; }
     /** request a time advancement

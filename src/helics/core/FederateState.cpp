@@ -362,16 +362,16 @@ FilterInfo *FederateState::getFilter (Core::Handle handle_) const
     return nullptr;
 }
 
-bool FederateState::checkSetValue(Core::Handle pub_id, const char *data, uint64_t len) const
+bool FederateState::checkSetValue (Core::Handle pub_id, const char *data, uint64_t len) const
 {
     if (!only_transmit_on_change)
     {
         return true;
     }
-    //this function could be called externally in a multi-threaded context
-    std::lock_guard<std::mutex> lock(_mutex); 
-    auto pub = getPublication(pub_id);
-    return pub->CheckSetValue(data, len);
+    // this function could be called externally in a multi-threaded context
+    std::lock_guard<std::mutex> lock (_mutex);
+    auto pub = getPublication (pub_id);
+    return pub->CheckSetValue (data, len);
 }
 
 uint64_t FederateState::getQueueSize (Core::Handle handle_) const
@@ -505,7 +505,7 @@ iteration_result FederateState::waitSetup ()
     {  // only enter this loop once per federate
         auto ret = processQueue ();
         processing = false;
-        return static_cast<iteration_result>(ret);
+        return static_cast<iteration_result> (ret);
     }
 
     while (!processing.compare_exchange_weak (expected, true))
@@ -541,7 +541,7 @@ iteration_result FederateState::enterInitState ()
         {
             time_granted = initialTime;
         }
-        return static_cast<iteration_result>(ret);
+        return static_cast<iteration_result> (ret);
     }
 
     while (!processing.compare_exchange_weak (expected, true))
@@ -582,7 +582,7 @@ iteration_result FederateState::enterExecutingState (iteration_request iterate)
         }
         fillEventVector (time_granted);
         processing = false;
-        return static_cast<iteration_result>(ret);
+        return static_cast<iteration_result> (ret);
     }
 
     while (!processing.compare_exchange_weak (expected, true))
@@ -623,7 +623,7 @@ iterationTime FederateState::requestTime (Time nextTime, iteration_request itera
         time_granted = timeCoord->getGrantedTime ();
         iterating = (ret == iteration_state::iterating);
 
-        iterationTime retTime = {time_granted, static_cast<iteration_result>(ret) };
+        iterationTime retTime = {time_granted, static_cast<iteration_result> (ret)};
         // now fill the event vector so external systems know what has been updated
         fillEventVector (time_granted);
         processing = false;
@@ -670,7 +670,7 @@ iteration_result FederateState::genericUnspecifiedQueueProcess ()
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
         processing = false;
-        return static_cast<iteration_result>(ret);
+        return static_cast<iteration_result> (ret);
     }
 
     while (!processing.compare_exchange_weak (expected, true))
@@ -1045,6 +1045,60 @@ void FederateState::logMessage (int level, const std::string &logMessageSource, 
     if ((loggerFunction) && (level <= logLevel))
     {
         loggerFunction (level, (logMessageSource.empty ()) ? name : logMessageSource, message);
+    }
+}
+
+std::string FederateState::processQuery (const std::string &query) const
+{
+    if (query == "publications")
+    {
+        std::string ret;
+        ret.push_back ('[');
+        std::unique_lock<std::mutex> lock (_mutex);
+        for (auto &pub : publications)
+        {
+            ret.append (pub->key);
+            ret.push_back (';');
+        }
+        lock.unlock ();
+        if (ret.size () > 1)
+        {
+            ret.back () = ']';
+        }
+        else
+        {
+            ret.push_back (']');
+        }
+        return ret;
+    }
+    if (query == "endpoints")
+    {
+        std::string ret;
+        ret.push_back ('[');
+        std::unique_lock<std::mutex> lock (_mutex);
+        for (auto &ept : endpoints)
+        {
+            ret.append (ept->key);
+            ret.push_back (';');
+        }
+        lock.unlock ();
+        if (ret.size () > 1)
+        {
+            ret.back () = ']';
+        }
+        else
+        {
+            ret.push_back (']');
+        }
+        return ret;
+    }
+    if (queryCallback)
+    {
+        return queryCallback (query);
+    }
+    else
+    {
+        return "#invalid";
     }
 }
 }  // namespace helics

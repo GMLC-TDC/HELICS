@@ -117,7 +117,7 @@ CommonCore(const std::string &core_name);
   virtual void setLoggingCallback(federate_id_t federateID, std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
   
   virtual std::string query(const std::string &target, const std::string &queryStr) override;
-
+  virtual void setQueryCallback(federate_id_t federateID, std::function<std::string(const std::string &)> queryFunction) override;
   /** get a string representing the connection info to send data to this object*/
   virtual std::string getAddress() const=0;
 
@@ -248,6 +248,8 @@ protected:
   void organizeFilterOperations();
 
   std::string federateQuery(Core::federate_id_t id, const std::string &queryStr) const;
+
+  
 };
 
 

@@ -100,8 +100,7 @@ helicsStatus helicsSendMessageRaw (helics_endpoint endpoint, const char *dest, c
     return helicsOK;
 }
 
-helicsStatus
-helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time)
+helicsStatus helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time)
 {
     if (endpoint == nullptr)
     {

@@ -549,6 +549,14 @@ class Core
 	so use with caution
 	*/
 	virtual std::string query(const std::string &target, const std::string &queryStr) = 0;
+	/** supply a query callback function
+	@details the intention of the query callback is to allow federates to answer particular requests through the query interface
+	this allows other federates to make requests or queries of other federates in an asynchronous fashion.  
+	@param federateID the indentifier for the federate
+	@param queryFunction  a function object that returns a string as a result of a query in the form of const string ref.  
+	This callback will be called when a federate received a query that cannot be answered that directed at a particular federate
+	*/
+	virtual void setQueryCallback(federate_id_t federateID, std::function<std::string(const std::string &)> queryFunction)=0;
 };
 
 // set at a large negative number but not the largest negative number

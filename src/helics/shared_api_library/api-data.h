@@ -48,15 +48,15 @@ typedef double helics_time_t;
 /** enumeration of the different iteration results*/
 typedef enum {
     no_iteration,
-	force_iteration, //input only
+    force_iteration,  // input only
     iterate_if_needed,
 } iteration_request;
 
 typedef enum {
-	next_step,
-	error, //input only
-	halted,
-	iterating
+    next_step,
+    error,  // input only
+    halted,
+    iterating
 } iteration_status;
 
 typedef struct helics_iterative_time

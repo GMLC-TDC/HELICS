@@ -16,7 +16,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "ValueFederate.h"
 #include "helicsTypes.hpp"
 
-
 namespace helics
 {
 class PublicationBase
@@ -124,27 +123,21 @@ class Publication : public PublicationBase
         // TODO:: figure out units
         publish (val);
     }
-	void setMinimumChange(double deltaV)
-	{
-		
-		if (delta < 0.0)
-		{
-			
-			changeDetectionEnabled = true;
-		}
-		delta = deltaV;
-		if (delta < 0.0)
-		{
-			changeDetectionEnabled = false;
-		}
-		
-	}
-	void enableChangeDetection(bool enabled = true)
-	{
-		changeDetectionEnabled = enabled;
-	}
+    void setMinimumChange (double deltaV)
+    {
+        if (delta < 0.0)
+        {
+            changeDetectionEnabled = true;
+        }
+        delta = deltaV;
+        if (delta < 0.0)
+        {
+            changeDetectionEnabled = false;
+        }
+    }
+    void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
+
   private:
-    
 };
 
 template <class X>
