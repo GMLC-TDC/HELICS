@@ -10,6 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "TimeCoordinator.h"
+#include <boost/format.hpp>
 
 #include <algorithm>
 
@@ -76,7 +77,7 @@ void TimeCoordinator::updateNextExecutionTime ()
     {
         time_exec = (iterating) ? time_granted : (time_granted + info.timeDelta);
     }
-    if (info.period > timeEpsilon)
+    if (((time_exec - time_granted)>0.0)&&(info.period > timeEpsilon))
     {
         auto blk = static_cast<int> (std::ceil ((time_exec - time_granted) / info.period));
         time_exec = time_granted + blk * info.period;
@@ -161,8 +162,8 @@ void TimeCoordinator::updateMessageTime (Time messageUpdateTime)
 bool TimeCoordinator::updateTimeFactors ()
 {
     Time minNext = Time::maxVal ();
-    Time minminDe = Time::maxVal ();
-    Time minDe = Time::maxVal ();
+    Time minminDe = std::min(time_value,time_message);
+    Time minDe = minminDe;
     for (auto &dep : dependencies)
     {
         if (dep.Tnext < minNext)
@@ -266,6 +267,13 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         // static_cast<double>(time_exec), static_cast<double>(time_minDe));
     }
     return iteration_state::continue_processing;
+}
+
+std::string TimeCoordinator::printTimeStatus() const
+{
+    return (boost::format("exec=%f allow=%f, value=%f, message=%f, minDe=%f minminDe=%f") %
+        static_cast<double>(time_exec) % static_cast<double>(time_allow) % static_cast<double>(time_value) %
+        static_cast<double>(time_message) % static_cast<double>(time_minDe) % static_cast<double>(time_minminDe)).str();
 }
 
 bool TimeCoordinator::isDependency (Core::federate_id_t ofed) const { return dependencies.isDependency (ofed); }

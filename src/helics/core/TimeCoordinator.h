@@ -131,6 +131,8 @@ public:
 	void enteringExecMode(iteration_request mode);
 	/** check if it is valid to grant a time*/
 	iteration_state checkTimeGrant();
+    /** generate a string with the current time status*/
+    std::string printTimeStatus() const;
 };
 }
 

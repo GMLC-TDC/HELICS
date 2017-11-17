@@ -51,7 +51,7 @@ int main (int argc, char **argv)
 
     status = helicsFederateInfoSetMaxIterations (fedinfo, 100);
 
-    status = helicsFederateInfoSetLoggingLevel (fedinfo, 5);
+    //status = helicsFederateInfoSetLoggingLevel (fedinfo, 5);
 
     /* Create value federate */
     vfed = helicsCreateValueFederate (fedinfo);

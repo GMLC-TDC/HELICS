@@ -617,6 +617,7 @@ iterationTime FederateState::requestTime (Time nextTime, iteration_request itera
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
         events.clear ();  // clear the event queue
+        LOG_TRACE(timeCoord->printTimeStatus());
         timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
         queue.push (CMD_TIME_CHECK);
         auto ret = processQueue ();
@@ -741,7 +742,7 @@ iteration_state FederateState::processQueue ()
 
 iteration_state FederateState::processActionMessage (ActionMessage &cmd)
 {
-    LOG_TRACE ("processing cmd " + prettyPrintString (cmd.action ()));
+    LOG_TRACE ("processing cmd " + prettyPrintString (cmd));
     switch (cmd.action ())
     {
     case CMD_IGNORE:
@@ -867,6 +868,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             subI->addData (cmd.actionTime + timeCoord->getFedInfo ().impactWindow,
                            std::make_shared<const data_block> (std::move (cmd.payload)));
             timeCoord->updateValueTime (cmd.actionTime);
+            LOG_TRACE(timeCoord->printTimeStatus());
         }
     }
     break;

@@ -194,8 +194,8 @@ BOOST_AUTO_TEST_CASE(test_iteration_counter)
     auto sub2 = helics::Subscription(vFed1.get(), "pub2");
     vFed1->setPeriod(1.0);
     vFed2->setPeriod(1.0);
-    vFed1->setLoggingLevel(5);
-    vFed2->setLoggingLevel(5);
+    //vFed1->setLoggingLevel(5);
+   // vFed2->setLoggingLevel(5);
     vFed1->enterInitializationStateAsync();
     vFed2->enterInitializationState();
     vFed1->enterInitializationStateFinalize();

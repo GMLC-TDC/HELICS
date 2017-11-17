@@ -361,9 +361,22 @@ std::string prettyPrintString (const ActionMessage &command)
             ret.append (std::to_string (command.dest_id));
         }
         break;
+    case CMD_PUB:
+        ret.push_back(':');
+        ret.append((boost::format("From (%d) handle(%d) size %d at %f") % command.source_id %
+            command.dest_handle % command.payload.size() %
+            static_cast<double> (command.actionTime))
+            .str());
+        break;
     case CMD_REG_BROKER:
         ret.push_back (':');
         ret.append (command.name);
+        break;
+    case CMD_TIME_GRANT:
+        ret.push_back(':');
+        ret.append((boost::format("From (%d) Granted Time(%f)") % command.source_id %
+            static_cast<double> (command.actionTime))
+            .str());
         break;
     case CMD_TIME_REQUEST:
         ret.push_back (':');
