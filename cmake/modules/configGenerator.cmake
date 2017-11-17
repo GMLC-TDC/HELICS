@@ -8,34 +8,6 @@
 # For details, see the LICENSE file.
 # LLNS Copyright End
 
-
-
-#check for clang 3.4 and the fact that CMAKE_CXX_STANDARD doesn't work yet for that compiler
-
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.5)
-    set(CMAKE_REQUIRED_FLAGS -std=c++1y)
-	set(VERSION_OPTION -std=c++1y)
-  else ()
-    set(CMAKE_REQUIRED_FLAGS -std=c++1z)
-    set(VERSION_OPTION -std=c++1z)
-  endif()
-elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-  # c++14 becomes default in GCC 6.1
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.1)
-    set(CMAKE_REQUIRED_FLAGS -std=c++1y)
-    set(VERSION_OPTION -std=c++1y)
-  else ()
-    set(CMAKE_REQUIRED_FLAGS -std=c++1z)
-    set(VERSION_OPTION -std=c++1z)
-  endif()
-endif()
-
-#boost libraries don't compile under /std:c++latest flag 1.66 might solve this issue
-#if (MSVC)
-#set(VERSION_OPTION /std:c++latest)
-#endif()
-
 if ( MSVC )
     set(WERROR_FLAG "/W4")
 else( MSVC )
