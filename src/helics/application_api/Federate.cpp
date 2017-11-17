@@ -519,7 +519,7 @@ Time Federate::requestTimeFinalize ()
     }
     else
     {
-        throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
+        throw (InvalidFunctionCall ("cannot call finalize requestTime without first calling requestTimeIterative function"));
     }
 }
 
@@ -541,7 +541,7 @@ iterationTime Federate::requestTimeIterativeFinalize ()
     }
     else
     {
-        throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
+        throw (InvalidFunctionCall ("cannot call finalize requestTimeIterative without first calling requestTimeIterativeAsync function"));
     }
 }
 
@@ -569,22 +569,6 @@ std::string Federate::query (const std::string &queryStr)
     if (queryStr == "name")
     {
         return getName ();
-    }
-    else if (queryStr == "endpoints")
-    {
-        return {""};
-    }
-    else if (queryStr == "publications")
-    {
-        return {""};
-    }
-    else if (queryStr == "subscriptions")
-    {
-        return {""};
-    }
-    else if (queryStr == "filters")
-    {
-        return {""};
     }
     return coreObject->query ("federation", queryStr);
 }

@@ -35,18 +35,14 @@ enum print_level : int
 #define LOG_ERROR(id, ident, message) sendToLogger (id, print_level::error, ident, message);
 #define LOG_WARNING(id, ident, message) sendToLogger (id, print_level::warning, ident, message);
 
-//#define LOGGING_ENABLED
-//#define DEBUG_LOGGING_ENABLED
-//#define TRACE_LOGGING_ENABLED
-
-#ifdef LOGGING_ENABLED
+#ifndef LOGGING_DISABLED
 #define LOG_NORMAL(id, ident, message)                                                                            \
     if (maxLogLevel >= print_level::normal)                                                                       \
     {                                                                                                             \
         sendToLogger (id, print_level::normal, ident, message);                                                   \
     }
 
-#ifdef DEBUG_LOGGING_ENABLED
+#ifndef DEBUG_LOGGING_DISABLED
 #define LOG_DEBUG(id, ident, message)                                                                             \
     if (maxLogLevel >= print_level::debug)                                                                        \
     {                                                                                                             \
@@ -56,7 +52,7 @@ enum print_level : int
 #define LOG_DEBUG(id, ident, message)
 #endif
 
-#ifdef TRACE_LOGGING_ENABLED
+#ifndef TRACE_LOGGING_DISABLED
 #define LOG_TRACE(id, ident, message)                                                                             \
     if (maxLogLevel >= print_level::trace)                                                                        \
     {                                                                                                             \

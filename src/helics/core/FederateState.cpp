@@ -26,14 +26,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define LOG_ERROR(message) logMessage (0, "", message);
 #define LOG_WARNING(message) logMessage (1, "", message);
 
-#ifdef LOGGING_ENABLED
+#ifndef LOGGING_DISABLED
 #define LOG_NORMAL(message)                                                                                       \
     if (logLevel >= 2)                                                                                            \
     {                                                                                                             \
         logMessage (2, "", message);                                                                              \
     }
 
-#ifdef DEBUG_LOGGING_ENABLED
+#ifndef DEBUG_LOGGING_DISABLED
 #define LOG_DEBUG(message)                                                                                        \
     if (logLevel >= 3)                                                                                            \
     {                                                                                                             \
@@ -43,7 +43,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define LOG_DEBUG(message)
 #endif
 
-#ifdef TRACE_LOGGING_ENABLED
+#ifndef TRACE_LOGGING_DISABLED
 #define LOG_TRACE(message)                                                                                        \
     if (logLevel >= 4)                                                                                            \
     {                                                                                                             \
@@ -52,11 +52,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #else
 #define LOG_TRACE(message)
 #endif
-#else
+#else //LOGGING_DISABLED
 #define LOG_NORMAL(message)
 #define LOG_DEBUG(message)
 #define LOG_TRACE(message)
-#endif
+#endif //LOGGING_DISABLED
 
 namespace helics
 {
