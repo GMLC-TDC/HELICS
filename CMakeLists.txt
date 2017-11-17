@@ -111,6 +111,15 @@ ENDIF(MSVC)
   ENDIF(MINGW)
 ENDIF(UNIX)
 
+# -------------------------------------------------------------
+# Check and set latest CXX Standard supported by compiler
+# -------------------------------------------------------------
+include(CheckLatestCXXStandardOption)
+IF (VERSION_OPTION)
+	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+ELSE ()
+set(CMAKE_CXX_STANDARD 14)
+ENDIF ()
 
 # -------------------------------------------------------------
 # add threading support
@@ -124,13 +133,6 @@ find_package(Threads REQUIRED)
 #message(STATUS ${CMAKE_CXX_FLAGS})
 set(CONFIGURE_TARGET_LOCATION ${PROJECT_BINARY_DIR}/libs/include/helics/)
 include(configGenerator)
-
-IF (VERSION_OPTION)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
-ELSE ()
-set(CMAKE_CXX_STANDARD 14)
-ENDIF ()
-
 
 option (HELICS_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
 
