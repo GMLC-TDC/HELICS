@@ -256,6 +256,12 @@ ENDIF(BUILD_SHARED_LIBS)
 FILE(GLOB KEY_LIBRARY_FILES  ${PROJECT_BINARY_DIR}/libs/bin/*)
 message(STATUS "key files ${KEY_LIBRARY_FILES}")
 
+OPTION(DISABLE_LOGGING "disable all normal, debug, and trace logging in HELICS" OFF)
+if (NOT DISABLE_LOGGING)
+OPTION(DISABLE_TRACE_LOGGING "disable trace logging" OFF)
+OPTION(DISABLE_DEBUG_LOGGING "disable debug logging" OFF)
+endif()
+
 #-----------------------------------------------------------------------------
 # Setup configure.h file for accessing configure options
 #-----------------------------------------------------------------------------
