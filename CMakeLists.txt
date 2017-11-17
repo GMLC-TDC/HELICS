@@ -111,6 +111,13 @@ ENDIF(MSVC)
   ENDIF(MINGW)
 ENDIF(UNIX)
 
+
+# -------------------------------------------------------------
+# add threading support
+# -------------------------------------------------------------
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 # -------------------------------------------------------------
 # Get some configuration for C++17 as that becomes available
 # -------------------------------------------------------------
@@ -197,11 +204,7 @@ if (${MPI_C_FOUND})
 endif (${MPI_C_FOUND})
 ENDIF(MPI_ENABLE)
 
-# -------------------------------------------------------------
-# add threading support
-# -------------------------------------------------------------
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
+
 # -------------------------------------------------------------
 # BOOST  find the boost libraries
 # -------------------------------------------------------------

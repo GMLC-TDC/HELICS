@@ -1540,13 +1540,13 @@ std::string CommonCore::query (const std::string &target, const std::string &que
         }
         else
         {
-            ActionMessage query (CMD_QUERY);
-            query.source_id = global_broker_id;
-            query.index = ++queryCounter;
-            query.payload = queryStr;
-            query.info ().target = target;
-            auto fut = ActiveQueries.getFuture (query.index);
-            transmit (0, query);
+            ActionMessage querycmd (CMD_QUERY);
+            querycmd.source_id = global_broker_id;
+            querycmd.index = ++queryCounter;
+            querycmd.payload = queryStr;
+            querycmd.info ().target = target;
+            auto fut = ActiveQueries.getFuture (querycmd.index);
+            transmit (0, querycmd);
             auto ret = fut.get ();
             return ret;
         }
