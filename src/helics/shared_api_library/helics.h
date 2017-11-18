@@ -98,7 +98,11 @@ HELICS_Export helics_value_federate helicsCreateValueFederateFromFile (const cha
 HELICS_Export helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi);
 HELICS_Export helics_federate helicsCreateCombinationFederateFromFile (const char *filename);
 
+/** create a federate info object for specifying federate information when constructing a federate
+@return a helics_federate_info_t object which is a reference to the created object
+*/
 HELICS_Export helics_federate_info_t helicsFederateInfoCreate ();
+/** delete the memory associated with a federate info object*/
 HELICS_Export void helicsFederateInfoFree (const helics_federate_info_t fi);
 
 HELICS_Export helicsStatus helicsFederateInfoSetFederateName (helics_federate_info_t fi, const char *name);

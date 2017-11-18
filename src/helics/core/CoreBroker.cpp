@@ -102,6 +102,73 @@ int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
     return (fnd != federate_table.end ()) ? fnd->second : -1;
 }
 
+
+void CoreBroker::generateQueryResult(const ActionMessage &command)
+{
+    std::string repStr;
+    bool listV = true;
+    if (command.payload == "federates")
+    {
+        repStr.push_back('[');
+        for (const auto &fed : _federates)
+        {
+            repStr.append(fed.name);
+            repStr.push_back(';');
+        }
+    }
+    else if (command.payload == "publications")
+    {
+        repStr.push_back('[');
+        for (const auto &pub : publications)
+        {
+            repStr.append(pub.first);
+            repStr.push_back(';');
+        }
+    }
+    else if (command.payload == "endpoints")
+    {
+        repStr.push_back('[');
+        for (const auto &ept : endpoints)
+        {
+            repStr.append(ept.first);
+            repStr.push_back(';');
+        }
+    }
+    else if (command.payload == "brokers")
+    {
+        repStr.push_back('[');
+        for (const auto &brk : _brokers)
+        {
+            repStr.append(brk.name);
+            repStr.push_back(';');
+        }
+    }
+    else
+    {
+        repStr = "#invalid";
+        listV = false;
+    }
+    if (listV)
+    {
+        if (repStr.size() > 1)
+        {
+            repStr.back() = ']';
+        }
+        else
+        {
+            repStr.push_back(']');
+        }
+    }
+    
+    ActionMessage queryResp(CMD_QUERY_REPLY);
+    queryResp.dest_id = command.source_id;
+    queryResp.source_id = global_broker_id;
+    queryResp.index = command.index;
+    
+    queryResp.payload = repStr;
+    transmit(getRoute(queryResp.dest_id), queryResp);
+}
+
 int32_t CoreBroker::FillRouteInformation (ActionMessage &mess)
 {
     auto &endpointName = mess.info ().target;
@@ -120,6 +187,7 @@ int32_t CoreBroker::FillRouteInformation (ActionMessage &mess)
     }
     return 0;
 }
+
 void CoreBroker::processPriorityCommand (ActionMessage &&command)
 {
     // deal with a few types of message immediately
@@ -1175,9 +1243,11 @@ void CoreBroker::processQuery (const ActionMessage &m)
 {
     if ((m.info ().target == getIdentifier ()) || (m.info ().target == "broker"))
     {
+        generateQueryResult(m);
     }
     else if ((isRoot ()) && ((m.info ().target == "root") || (m.info ().target == "federation")))
     {
+        generateQueryResult(m);
     }
     else
     {

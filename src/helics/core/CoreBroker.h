@@ -74,7 +74,7 @@ protected:
 	bool _hasEndpoints = false; //!< set to true if the broker has endpoints;  
 private:
 	bool _isRoot = false;  //!< set to true if this object is a root broker
-	
+    bool enteredExecutionMode = false; //!< flag indicating that the broker has entered execution mode
 	std::vector<std::pair<Core::federate_id_t, bool>> localBrokersInit; //!< indicator if the local brokers are ready to initialize
 	std::vector<BasicFedInfo> _federates; //!< container for all federates
 	std::vector<BasicHandleInfo> _handles; //!< container for the basic info for all handles
@@ -110,9 +110,11 @@ private:
 	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
 	/* function to transmit the delayed messages*/
 	void transmitDelayedMessages();
-	bool enteredExecutionMode = false; //!< flag indicating that the broker has entered execution mode
+	
 	
 	int32_t FillRouteInformation(ActionMessage &mess);
+    /**generate the results of a query directed at the broker*/
+    void generateQueryResult(const ActionMessage &command);
 public:
 	/** connect the core to its broker
 	@details should be done after initialization has complete*/
