@@ -24,6 +24,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <memory>
 #include <string>
 #include <map>
+#include <thread>
 
 namespace boost
 {
@@ -41,12 +42,29 @@ private:
 	std::string name;  //!< context name
 	std::unique_ptr<boost::asio::io_service> iserv; //!< pointer to the actual context
 	bool leakOnDelete = false; //!< this is done to prevent some warning messages for use in DLL's  
+    bool running = false;
+    std::thread serviceThread;
 	AsioServiceManager(const std::string &contextName);
-	
+    
 public:
+    /** return a pointer to a service manager
+    @details the function will search for an existing service manager for the name
+    if it doesn't find one it will create a new one
+    @param serviceName the name of the service to find or create*/
 	static std::shared_ptr<AsioServiceManager> getServicePointer(const std::string &serviceName="");
-
+    /** return a pointer to a service manager
+    @details the function will search for an existing service manager for the name
+    if it doesn't find one it will return nullptr
+    @param serviceName the name of the service to find
+    */
+    static std::shared_ptr<AsioServiceManager> getExistingServicePointer(const std::string &serviceName = "");
+    /** get the boost io_service associated with the service manager
+    */
 	static boost::asio::io_service &getService(const std::string &serviceName="");
+    /** get the boost io_service associated with the service manager but only if the service exists
+    if it doesn't this will throw and invalid_argument exception
+    */
+    static boost::asio::io_service &getExistingService(const std::string &serviceName = "");
 
 	static void closeService(const std::string &serviceName="");
 	/** tell the service to free the pointer and leak the memory on delete
@@ -54,7 +72,7 @@ public:
 	that happen when the DLL is unlinked bad things can happen, and since in nearly all cases this happens at Shutdown leaking really doesn't matter that much
     and if you don't the service could terminate before some other parts of the program which cause all sorts of odd errors and issues
 	*/
-	static void setServiceToLeakOnDelete(const std::string &contextName = "");
+	static void setServiceToLeakOnDelete(const std::string &serviceName = "");
 	virtual ~AsioServiceManager();
 
 	const std::string &getName() const
@@ -67,6 +85,7 @@ public:
 		return *iserv;
 	}
 
+    static void runServiceLoop( const std::string &serviceName = "");
 
 
 };

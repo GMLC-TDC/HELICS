@@ -24,7 +24,7 @@ namespace helics
         Time impactWindow = timeZero;  //!< the time it takes values to propagate to the Federate
         Time period = timeZero; //!< a period value,  all granted times must be on this period
         Time offset = timeZero;  //!< offset to the time period
-        int logLevel;	//!< the logging level above which not to log to file
+        int logLevel=1;	//!< the logging level above which not to log to file
         bool observer = false;  //!< flag indicating that the federate is an observer
         bool uninterruptible =
             false;  //!< flag indicating that the federate should never return a time other than requested

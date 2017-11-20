@@ -83,6 +83,7 @@ set(INCLUDE_FILES
 	FilterFunctions.h
 	TestBroker.h
 	argParser.h
+	flag-definitions.h
 )
 
 set(IPC_HEADER_FILES

@@ -24,6 +24,7 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 
 #include <map>
 #include <mutex>
+#include <stdexcept>
 
 /** a storage system for the available core objects allowing references by name to the core
  */
@@ -47,12 +48,36 @@ std::shared_ptr<AsioServiceManager> AsioServiceManager::getServicePointer (const
     auto newService = std::shared_ptr<AsioServiceManager> (new AsioServiceManager (serviceName));
     services.emplace (serviceName, newService);
     return newService;
-    // if it doesn't make a new one with the appropriate name
+    // if it doesn't find it make a new one with the appropriate name
+}
+
+std::shared_ptr<AsioServiceManager> AsioServiceManager::getExistingServicePointer(const std::string &serviceName)
+{
+    std::lock_guard<std::mutex> serveLock(
+        serviceLock);  // just to ensure that nothing funny happens if you try to get a context
+                       // while it is being constructed
+    auto fnd = services.find(serviceName);
+    if (fnd != services.end())
+    {
+        return fnd->second;
+    }
+
+    return nullptr;
 }
 
 boost::asio::io_service &AsioServiceManager::getService (const std::string &serviceName)
 {
     return getServicePointer (serviceName)->getBaseService ();
+}
+
+boost::asio::io_service &AsioServiceManager::getExistingService(const std::string &serviceName)
+{
+    auto ptr = getExistingServicePointer(serviceName);
+    if (ptr)
+    {
+        return ptr->getBaseService();
+    }
+    throw(std::invalid_argument("the service name specified was not available"));
 }
 
 void AsioServiceManager::closeService (const std::string &serviceName)
@@ -61,6 +86,12 @@ void AsioServiceManager::closeService (const std::string &serviceName)
     auto fnd = services.find (serviceName);
     if (fnd != services.end ())
     {
+        if (fnd->second->running)
+        {
+            fnd->second->iserv->stop();
+            fnd->second->serviceThread.join();
+        }
+        
         services.erase (fnd);
     }
 }
@@ -87,4 +118,21 @@ AsioServiceManager::~AsioServiceManager ()
 AsioServiceManager::AsioServiceManager (const std::string &serviceName) : name (serviceName)
 {
     iserv = std::make_unique<boost::asio::io_service> ();
+}
+
+void AsioServiceManager::runServiceLoop( const std::string &serviceName)
+{
+    std::lock_guard<std::mutex> servelock(serviceLock);
+    auto fnd = services.find(serviceName);
+    if (fnd != services.end())
+    {
+        auto ptr = fnd->second;
+        if (!ptr->running)
+        {
+            ptr->running = true;
+            ptr->serviceThread = std::thread([ptr]() {ptr->getBaseService().run(); });
+        }
+        
+    }
+    throw(std::invalid_argument("the service name specified was not available"));
 }

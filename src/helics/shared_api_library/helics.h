@@ -46,7 +46,7 @@ HELICS_Export const char *helicsGetVersion ();
 @param type the type of the core to create
 @param name the name of the core , may be a nullptr or empty string to have a name automatically assigned
 @param initString an initialization string to send to the core-the format is similar to command line arguments
-typical options include a broker addess  --broker="XSSAF" or the number of federates or the address
+typical options include a broker address  --broker="XSSAF" or the number of federates or the address
 @return a helics_core object
 */
 HELICS_Export helics_core helicsCreateCore (const char *type, const char *name, const char *initString);
@@ -63,7 +63,7 @@ HELICS_Export helics_core helicsCreateCoreFromArgs (const char *type, const char
 @param type the type of the broker to create
 @param name the name of the broker , may be a nullptr or empty string to have a name automatically assigned
 @param initString an initialization string to send to the core-the format is similar to command line arguments
-typical options include a broker addess  --broker="XSSAF" if this is a subbroker or the number of federates or the address
+typical options include a broker address  --broker="XSSAF" if this is a subbroker or the number of federates or the address
 @return a helics_core object
 */
 HELICS_Export helics_broker helicsCreateBroker (const char *type, const char *name, const char *initString);
@@ -77,18 +77,18 @@ HELICS_Export helics_broker helicsCreateBroker (const char *type, const char *na
 HELICS_Export helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, const char *const *argv);
 
 /** check if a broker is connected
-a connected broker implies is is attached to cores or cores could reach out to communicate
+a connected broker implies is attached to cores or cores could reach out to communicate
 return 0 if not connected , something else if it is connected*/
 HELICS_Export int helicsBrokerIsConnected (helics_broker broker);
 
 /** check if a core is connected
-a connected core implies is is attached to federate or federates could be attached to it
+a connected core implies is attached to federate or federates could be attached to it
 return 0 if not connected , something else if it is connected*/
 HELICS_Export int helicsCoreIsConnected (helics_core core);
 
 /** release the memory associated with a core*/
 HELICS_Export void helicsFreeCore (helics_core core);
-/** release the memory associated wiht a broker*/
+/** release the memory associated with a broker*/
 HELICS_Export void helicsFreeBroker (helics_broker broker);
 
 /* Creation and destruction of Federates */
@@ -129,8 +129,8 @@ this should be the last call before exiting,  */
 HELICS_Export void helicsCloseLibrary ();
 /* initialization, execution, and time requests */
 /** enter the initialization state of a federate
-@details the initialization state allows initial values to be set and received if the iteration is reqeusted on entry to
-the executation state
+@details the initialization state allows initial values to be set and received if the iteration is requested on entry to
+the execution state
 This is a blocking call and will block until the core allows it to proceed
 */
 HELICS_Export helicsStatus helicsEnterInitializationMode (helics_federate fed);

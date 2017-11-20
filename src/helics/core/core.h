@@ -303,7 +303,8 @@ class Core
 	@details set the logging level for an individual federate
 	set federateID to 0 for the core logging level
 	* @param federateID  the identifier for the federate
-	* @param timeImpact the length of time it take outside message to propagate into a federate
+	* @param loggingLevel the level of logging to enable
+    <0-no logging, 0 -error only, 1- warnings, 2-normal, 3-debug, 4-trace
 	*/
 	virtual void setLoggingLevel(federate_id_t federateID, int loggingLevel) = 0;
 

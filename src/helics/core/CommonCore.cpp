@@ -1581,6 +1581,7 @@ std::string CommonCore::query (const std::string &target, const std::string &que
             auto fut = ActiveQueries.getFuture (querycmd.index);
             transmit (0, querycmd);
             auto ret = fut.get ();
+            ActiveQueries.finishedWithValue(querycmd.index);
             return ret;
         }
     }

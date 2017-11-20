@@ -140,14 +140,7 @@ namespace helics
 		case helicsType_t::helicsVector:
 		{
 			auto V = ValueConverter<std::vector<double>>::interpret(dv);
-			if (!V.empty())
-			{
-				val = static_cast<X> (V[0]);
-			}
-			else
-			{
-				val = 0.0;
-			}
+            val = (!V.empty()) ? static_cast<X> (V[0]) : 0.0;
 			break;
 		}
 		case helicsType_t::helicsComplex:
@@ -159,14 +152,7 @@ namespace helics
 		case helicsType_t::helicsComplexVector:
 		{
 			auto V = ValueConverter<std::vector<std::complex<double>>>::interpret(dv);
-			if (!V.empty())
-			{
-				val = static_cast<X> (std::abs(V.front()));
-			}
-			else
-			{
-				val = 0.0;
-			}
+            val = (!V.empty()) ? static_cast<X> (std::abs(V.front())) : 0.0;
 			break;
 		}
 		case helicsType_t::helicsInvalid:
