@@ -75,12 +75,11 @@ protected:
 private:
 	bool _isRoot = false;  //!< set to true if this object is a root broker
 	
-	std::vector<std::pair<Core::federate_id_t, bool>> localBrokersInit; //!< indicator if the local brokers are ready to init
+	std::vector<std::pair<Core::federate_id_t, bool>> localBrokersInit; //!< indicator if the local brokers are ready to initialize
 	std::vector<BasicFedInfo> _federates; //!< container for all federates
 	std::vector<BasicHandleInfo> _handles; //!< container for the basic info for all handles
 	std::vector<BasicBrokerInfo> _brokers;  //!< container for the basic broker info for all subbrokers
 	std::string previous_local_broker_identifier; //!< the previous identifier in case a rename is required
-	
 	std::unordered_map<std::string, int32_t> fedNames;  //!< a map to lookup federates <fed name, local federate index>
 	std::unordered_map<std::string, int32_t> brokerNames;  //!< a map to lookup brokers <broker name, local broker index>
 	std::unordered_map<std::string, int32_t> publications; //!< map of publications;
@@ -94,11 +93,9 @@ private:
 	std::map<Core::federate_id_t, int32_t> broker_table;  //!< map for translating global broker id's to a local index
 	std::map<Core::federate_id_t, int32_t> federate_table; //!< map for translating global federate id's to a local index
 	std::unordered_map<std::string, int32_t> knownExternalEndpoints; //!< external map for all known external endpoints with names and route
-	
+    std::mutex mutex_; //mutex lock for name and identifier
 private:
 
-	mutable std::mutex mutex_;  //!< mutex lock for the federate information that could come in from multiple sources
-	
 	/** function that processes all the messages
 	@param[in] command -- the message to process
 	*/
@@ -108,7 +105,7 @@ private:
 	this mainly deals with some of the registration functions
 	@param[in] command the command to process
 	*/
-	void processPriorityCommand(const ActionMessage &command) override;
+	void processPriorityCommand(ActionMessage &&command) override;
 
 	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
 	/* function to transmit the delayed messages*/
@@ -121,8 +118,10 @@ public:
 	@details should be done after initialization has complete*/
 	bool connect();
 	/** disconnect the broker from any other brokers and communications
+    **if the flag is set it should not do the unregister step of the disconnection, if this is set it is presumed 
+    the unregistration has already happened or it will be taken care of manually
 	*/
-	void disconnect();
+	void disconnect(bool skipUnregister=false);
 	
 	virtual void processDisconnect() override final;
 	/** check if the broker is connected*/

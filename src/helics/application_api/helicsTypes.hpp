@@ -19,7 +19,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/core/core-data.h"
 /** @file
-@details basic type information and control for helicss
+@details basic type information and control for HELICS
 */
 namespace helics
 {

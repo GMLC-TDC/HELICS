@@ -38,27 +38,20 @@ static const argDescriptors extraArgs{{"local_interface"s, "string"s,
                                       {"port"s, "int"s, "port number for the broker's priority port"s},
                                       {"portstart"s, "int"s, "starting port for automatic port definitions"s}};
 
-ZmqBroker::ZmqBroker (bool rootBroker) noexcept : CoreBroker (rootBroker) {}
+ZmqBroker::ZmqBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
-ZmqBroker::ZmqBroker (const std::string &broker_name) : CoreBroker (broker_name) {}
+ZmqBroker::ZmqBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
-ZmqBroker::~ZmqBroker ()
-{
-    haltOperations = true;
-    std::unique_lock<std::mutex> lock (dataLock);
-    comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
-    lock.unlock ();
-    joinAllThreads ();
-}
+ZmqBroker::~ZmqBroker () = default;
 
-void ZmqBroker::displayHelp (bool localOnly)
+void ZmqBroker::displayHelp (bool local_only)
 {
     std::cout << " Help for Zero MQ Broker: \n";
     namespace po = boost::program_options;
     po::variables_map vm;
     const char *const argV[] = {"", "--help"};
     argumentParser (2, argV, vm, extraArgs);
-    if (!localOnly)
+    if (!local_only)
     {
         CoreBroker::displayHelp ();
     }
@@ -135,7 +128,7 @@ void ZmqBroker::InitializeFromArgs (int argc, const char *const *argv)
 
 bool ZmqBroker::brokerConnect ()
 {
-    std::lock_guard<std::mutex> lock (dataLock);
+    std::lock_guard<std::mutex> lock (dataMutex);
     if (brokerAddress.empty ())
     {
         setAsRoot ();
@@ -172,36 +165,9 @@ bool ZmqBroker::brokerConnect ()
     return res;
 }
 
-void ZmqBroker::brokerDisconnect ()
-{
-    std::lock_guard<std::mutex> lock (dataLock);
-    if (comms)
-    {
-        comms->disconnect ();
-    }
-}
-
-void ZmqBroker::transmit (int route_id, const ActionMessage &cmd)
-{
-    std::lock_guard<std::mutex> lock (dataLock);
-    if (comms)
-    {
-        comms->transmit (route_id, cmd);
-    }
-}
-
-void ZmqBroker::addRoute (int route_id, const std::string &routeInfo)
-{
-    std::lock_guard<std::mutex> lock (dataLock);
-    if (comms)
-    {
-        comms->addRoute (route_id, routeInfo);
-    }
-}
-
 std::string ZmqBroker::getAddress () const
 {
-    std::lock_guard<std::mutex> lock (dataLock);
+    std::lock_guard<std::mutex> lock (dataMutex);
     if (comms)
     {
         return comms->getRequestAddress () + ";" + comms->getPushAddress ();

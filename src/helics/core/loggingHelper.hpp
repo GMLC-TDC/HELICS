@@ -27,7 +27,7 @@ enum print_level : int
     no_print = -1,  //!< never print
     error = 0,  //!< only print errors
     warning = 1,  //!< print/log warning and errors
-    normal = 2,  //!< defualt print level
+    normal = 2,  //!< default print level
     debug = 3,  //!< debug level prints
     trace = 4,  //!< trace level printing
 };

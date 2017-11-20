@@ -253,17 +253,13 @@ std::unique_ptr<Message> createMessage (ActionMessage &&cmd)
     return msg;
 }
 
-bool isPriorityCommand (const ActionMessage &command)
-{
-    return (command.action () < action_message_def::action_t::cmd_ignore);
-}
-
 constexpr char nullStr[] = "unknown";
 
 constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
   // priority commands
   {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
   {action_message_def::action_t::cmd_disconnect, "disconnect"},
+  {action_message_def::action_t::cmd_disconnect_name, "disconnect by name"},
   {action_message_def::action_t::cmd_fed_ack, "fed_ack"},
 
   {action_message_def::action_t::cmd_broker_ack, "broker_ack"},
@@ -329,17 +325,18 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_protocol, "protocol"},
   {action_message_def::action_t::cmd_protocol_big, "protocol_big"}};
 
-constexpr size_t actEnd = sizeof (actionStrings) / sizeof (std::pair<action_message_def::action_t, const char *>);
+using actionPair = std::pair<action_message_def::action_t, const char *>;
+constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
 
 std::string actionMessageType (action_message_def::action_t action)
 {
-    auto res = std::find_if (actionStrings, actionStrings + actEnd,
-                             [action](const auto &pt) { return (pt.first == action); });
-    if (res != actionStrings + actEnd)
+    auto pptr = static_cast<const actionPair *> (actionStrings);
+    auto res = std::find_if (pptr, pptr + actEnd, [action](const auto &pt) { return (pt.first == action); });
+    if (res != pptr + actEnd)
     {
         return std::string (res->second);
     }
-    return std::string (nullStr);
+    return std::string (static_cast<const char *> (nullStr));
 }
 
 std::string prettyPrintString (const ActionMessage &command)

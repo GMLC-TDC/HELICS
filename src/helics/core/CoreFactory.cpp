@@ -17,13 +17,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #endif
 
 #if HELICS_HAVE_MPI
-#include "mpi/mpi-core.h"
+#include "mpi/MpiCore.h"
 #endif
 
 #include "TestCore.h"
 #include "common/delayedDestructor.hpp"
 #include "common/searchableObjectHolder.hpp"
 #include "ipc/IpcCore.h"
+#include "udp/UdpCore.h"
 #include <cassert>
 
 namespace helics
@@ -90,7 +91,6 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
     switch (type)
     {
     case core_type::ZMQ:
-    {
 #if HELICS_HAVE_ZEROMQ
         if (name.empty ())
         {
@@ -105,9 +105,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         assert (false);
 #endif
         break;
-    }
     case core_type::MPI:
-    {
 #if HELICS_HAVE_MPI
         if (name.empty ())
         {
@@ -121,9 +119,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         assert (false);
 #endif
         break;
-    }
     case core_type::TEST:
-    {
         if (name.empty ())
         {
             core = std::make_shared<TestCore> ();
@@ -133,7 +129,6 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<TestCore> (name);
         }
         break;
-    }
     case core_type::INTERPROCESS:
     case core_type::IPC:
         if (name.empty ())
@@ -143,6 +138,16 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         else
         {
             core = std::make_shared<IpcCore> (name);
+        }
+        break;
+    case core_type::UDP:
+        if (name.empty ())
+        {
+            core = std::make_shared<UdpCore> ();
+        }
+        else
+        {
+            core = std::make_shared<UdpCore> (name);
         }
         break;
     default:
@@ -280,7 +285,9 @@ bool isAvailable (core_type type)
         available = true;
         break;
     case core_type::TCP:
+        break;
     case core_type::UDP:
+        available = true;
         break;
     default:
         assert (false);
@@ -288,6 +295,8 @@ bool isAvailable (core_type type)
 
     return available;
 }
+/** lambda function to join cores before the destruction happens to avoid potential problematic calls in the loops*/
+static auto destroyerCallFirst = [](auto &core) {core->joinAllThreads(); };
 
 /** so the problem this is addressing is that unregister can potentially cause a destructor to fire
 that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
@@ -295,7 +304,7 @@ can do the unregister operation and destroy itself meaning it is unable to join 
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be
 without issue*/
-static DelayedDestructor<CommonCore> delayedDestroyer;  //!< the object handling the delayed destruction
+static DelayedDestructor<CommonCore> delayedDestroyer(destroyerCallFirst);  //!< the object handling the delayed destruction
 
 static SearchableObjectHolder<CommonCore> searchableObjects;  //!< the object managing the searchable objects
 
@@ -324,8 +333,9 @@ bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &pt
         case core_type::INTERPROCESS:
         case core_type::IPC:
             return (dynamic_cast<IpcCore *> (ptr.get ()) != nullptr);
-        case core_type::TCP:
         case core_type::UDP:
+            return (dynamic_cast<UdpCore *> (ptr.get()) != nullptr);
+        case core_type::TCP:
         default:
             return true;
         }
@@ -345,6 +355,8 @@ bool registerCommonCore (std::shared_ptr<CommonCore> tcore)
 }
 
 size_t cleanUpCores () { return delayedDestroyer.destroyObjects (); }
+
+size_t cleanUpCores (int delay) { return delayedDestroyer.destroyObjects (delay); }
 
 void copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {

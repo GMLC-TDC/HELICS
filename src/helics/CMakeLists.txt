@@ -8,7 +8,9 @@ add_subdirectory(common)
 add_subdirectory(core)
 add_subdirectory(application_api)
 
+IF(BUILD_PLAYER OR BUILD_RECORDER)
 add_subdirectory(player)
+ENDIF()
 
 install(DIRECTORY common DESTINATION include/helics
         FILES_MATCHING PATTERN "*.h*")

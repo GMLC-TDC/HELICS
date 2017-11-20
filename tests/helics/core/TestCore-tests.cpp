@@ -9,6 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include <boost/test/unit_test.hpp>
 
+#include "helics/core/BrokerFactory.h"
 #include "helics/core/CoreFactory.h"
 #include "helics/core/core-exceptions.h"
 #include "helics/core/core-types.h"

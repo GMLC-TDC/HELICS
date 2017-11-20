@@ -27,13 +27,19 @@ MpiCore-tests.cpp
 Node_Core-tests.cpp
 testFixtures.cpp
 IPCcore_tests.cpp
+testBlockingQueue.cpp
+testPriorityBlockingQueue.cpp
+test-simple-queue.cpp
+data-block-tests.cpp
+UdpCore-tests.cpp
 )
 
+link_directories(${external_link_directories})
 
 add_executable(core-tests ${core_test_sources} ${core_test_headers})
 target_link_libraries(core-tests helics)
 
-link_directories(${external_link_directories})
+
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
@@ -41,6 +47,9 @@ include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 target_link_libraries(core-tests ${external_library_list})
 target_link_libraries(core-tests ${Boost_LIBRARIES_test})
 
+IF(MINGW)
+target_link_libraries(core-tests ws2_32)
+ENDIF(MINGW)
 add_test(NAME core-tests COMMAND core-tests)
 
 #-----------------------------------------------------------------------------

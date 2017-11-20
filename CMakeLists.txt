@@ -109,6 +109,7 @@ IF(MSVC)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
   add_compile_options(/bigobj)
   add_compile_options(-W4  /EHsc /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484)
+  ADD_DEFINITIONS(-D_WIN32_WINNT=0x0601)
 ENDIF(MSVC)
   ENDIF(MINGW)
 ENDIF(UNIX)
@@ -120,7 +121,7 @@ ENDIF(UNIX)
 include(configGenerator)
 
 IF (VERSION_OPTION)
-	add_compile_options(${VERSION_OPTION})
+	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
 ELSE ()
 set(CMAKE_CXX_STANDARD 14)
 ENDIF ()
@@ -141,14 +142,6 @@ if(DOXYGEN_FOUND)
 )
 endif(DOXYGEN_FOUND)
 endif (HELICS_GENERATE_DOXYGEN_DOC)
-# -------------------------------------------------------------
-# finding glog
-# -------------------------------------------------------------
-#find_package (glog)
-#if (${GLOG_FOUND})
-#    set(HELICS_HAVE_GLOG TRUE)
-#    include_directories("${GLOG_INCLUDE_DIRS}")
-#endif (${GLOG_FOUND})
 
 # -------------------------------------------------------------
 # finding ZMQ
@@ -283,12 +276,21 @@ ENDIF(MSVC)
 
 SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
 
+# Minimum version of Boost required for building HELICS
+set(BOOST_MINIMUM_VERSION 1.58)
+
 if (${MPI_C_FOUND})
-  #find_package(Boost COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
-  find_package(Boost COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
+  #find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
+  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
 ELSE(${MPI_C_FOUND})
-  find_package(Boost COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
+  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
 ENDIF(${MPI_C_FOUND})
+
+# Minimum version of Boost required for building test suite
+if (Boost_VERSION LESS 106100)
+  set(BUILD_HELICS_TESTS OFF)
+  message(WARNING "Boost version >=1.61 required for building HELICS tests (Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION})")
+endif()
 
 mark_as_advanced(CLEAR BOOST_ROOT)
 
@@ -344,6 +346,10 @@ endif (${MPI_C_FOUND})
 
 
 install (TARGETS helics DESTINATION lib)
+
+
+OPTION(BUILD_PLAYER "Build a helics player" ON)
+OPTION(BUILD_RECORDER "Build a helics recorder" ON)
 
 # we aren't ready for this for the whole library yet
 IF(BUILD_SHARED_LIBS)

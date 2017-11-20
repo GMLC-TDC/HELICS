@@ -163,6 +163,7 @@ enum defined_filter_types
     delay = 1,
     randomDelay = 2,
     randomDrop = 3,
+    redirect = 4,
 };
 
 std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types type,

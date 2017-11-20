@@ -41,16 +41,9 @@ static const argDescriptors extraArgs{
 
 IpcCore::IpcCore () noexcept {}
 
-IpcCore::IpcCore (const std::string &core_name) : CommonCore (core_name) {}
+IpcCore::IpcCore (const std::string &core_name) : CommsBroker (core_name) {}
 
-IpcCore::~IpcCore ()
-{
-    haltOperations = true;
-    std::unique_lock<std::mutex> lock (dataMutex);
-    comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
-    lock.unlock ();
-    joinAllThreads ();
-}
+IpcCore::~IpcCore () = default;
 
 void IpcCore::InitializeFromArgs (int argc, const char *const *argv)
 {
@@ -99,33 +92,6 @@ bool IpcCore::brokerConnect ()
     comms = std::make_unique<IpcComms> (fileloc, brokerloc);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     return comms->connect ();
-}
-
-void IpcCore::brokerDisconnect ()
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
-    {
-        comms->disconnect ();
-    }
-}
-
-void IpcCore::transmit (int route_id, const ActionMessage &cmd)
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
-    {
-        comms->transmit (route_id, cmd);
-    }
-}
-
-void IpcCore::addRoute (int route_id, const std::string &routeInfo)
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
-    {
-        comms->addRoute (route_id, routeInfo);
-    }
 }
 
 std::string IpcCore::getAddress () const

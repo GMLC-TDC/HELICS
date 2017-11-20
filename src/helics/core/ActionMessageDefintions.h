@@ -41,16 +41,17 @@ enum class action_t : int32_t
 
 	cmd_ignore = 0, //!< null command
 	cmd_disconnect=3, //!< disconnect command
-	cmd_init = 5,  //!< request entry to init mode
-	cmd_init_grant = 7,  //!< grant entry to initialization mode
-	cmd_init_not_ready = 8,  //!< retract an init ready command
-	cmd_exec_request =  9,  //!< request an iteration or entry to execution mode
-	cmd_exec_grant = 10,  //!< grant entry to exec mode or iterate
-	cmd_exec_check = 12,  //!< command to run a check on execution entry
+    cmd_disconnect_name=4, //!< disconnect a broker or core by name vs id
+	cmd_init = 10,  //!< request entry to init mode
+	cmd_init_grant = 11,  //!< grant entry to initialization mode
+	cmd_init_not_ready = 12,  //!< retract an init ready command
+	cmd_exec_request =  20,  //!< request an iteration or entry to execution mode
+	cmd_exec_grant = 22,  //!< grant entry to exec mode or iterate
+	cmd_exec_check = 24,  //!< command to run a check on execution entry
 	cmd_ack = 254,  //!< acknowledge command to for various purposes
 
-	cmd_stop = 20,  //!< halt execution
-	cmd_terminate_immediately = 22, //!< immediate halt no-disconnect;
+	cmd_stop = 30,  //!< halt execution
+	cmd_terminate_immediately = 31, //!< immediate halt no-disconnect;
 
 	cmd_time_grant =  35,  //!< grant a time or iteration
 	cmd_time_check =  36,  //!< command to run a check on whether time can be granted
@@ -100,6 +101,7 @@ enum class action_t : int32_t
 #define CMD_REG_BROKER action_message_def::action_t::cmd_reg_broker
 #define CMD_PRIORITY_DISCONNECT action_message_def::action_t::cmd_priority_disconnect
 #define CMD_DISCONNECT action_message_def::action_t::cmd_disconnect
+#define CMD_DISCONNECT_NAME action_message_def::action_t::cmd_disconnect_name
 #define CMD_INIT action_message_def::action_t::cmd_init
 #define CMD_INIT_NOT_READY action_message_def::action_t::cmd_init_not_ready
 #define CMD_INIT_GRANT action_message_def::action_t::cmd_init_grant
@@ -156,7 +158,7 @@ enum class action_t : int32_t
 #define CLOSE_RECEIVER 23425215
 #define NEW_ROUTE 233
 #define DISCONNECT 2523
-
+#define DISCONNECT_ERROR 2623
 //for requesting port definitions on a computer
 #define PORT_DEFINITIONS 1451
 #define QUERY_PORTS 1453

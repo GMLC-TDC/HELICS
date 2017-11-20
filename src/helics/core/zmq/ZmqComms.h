@@ -6,8 +6,8 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#ifndef _HELICS_IPC_COMMS_
-#define _HELICS_IPC_COMMS_
+#ifndef _HELICS_ZMQ_COMMS_
+#define _HELICS_ZMQ_COMMS_
 #pragma once
 
 #include "helics/core/CommsInterface.h"
@@ -53,7 +53,6 @@ public:
 	void setBrokerPorts(int reqPort, int pushPort=-1);
 	void setPortNumbers(int repPort, int pullPort=-1);
 	void setAutomaticPortStartPort(int startingPort);
-	void setReplyCallback(std::function<ActionMessage(ActionMessage &&)> callback);
 private:
 	int brokerReqPort = -1;
 	int brokerPushPort = -1;
@@ -63,7 +62,6 @@ private:
 	std::set<int> usedPortNumbers;
 	int openPortStart = -1;
 	std::atomic<bool> hasBroker{ false };
-	std::function<ActionMessage(ActionMessage &&)> replyCallback;
 	virtual void queue_rx_function() override;	//!< the functional loop for the receive queue
 	virtual void queue_tx_function() override;  //!< the loop for transmitting data
 	virtual void closeTransmitter() override; //!< function to instruct the transmitter loop to close
@@ -73,8 +71,9 @@ private:
 	/** process an incoming message
 	return code for required action 0=NONE, -1 TERMINATE*/
 	int processIncomingMessage(zmq::message_t &msg);
-
-	int replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &rep);
+    /** process an incoming message and send and ack in response
+    return code for required action 0=NONE, -1 TERMINATE*/
+	int replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock);
 
 	int initializeBrokerConnections(zmq::socket_t &controlSocket);
 public:

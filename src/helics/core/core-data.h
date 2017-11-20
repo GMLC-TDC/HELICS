@@ -61,9 +61,9 @@ class data_block
     {
     }
     /** copy assignment operator*/
-    data_block &operator= (const data_block &dt) = default;
+    data_block &operator= (const data_block &db) = default;
     /** move assignment operator*/
-    data_block &operator= (data_block &&dt) noexcept;
+    data_block &operator= (data_block &&db) noexcept;
     /** assign from a string*/
     data_block &operator= (std::string str)
     {

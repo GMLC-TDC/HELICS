@@ -39,16 +39,9 @@ static const argDescriptors extraArgs{
 
 ZmqCore::ZmqCore () noexcept {}
 
-ZmqCore::~ZmqCore ()
-{
-    haltOperations = true;
-    std::unique_lock<std::mutex> lock (dataLock);
-    comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
-    lock.unlock ();
-    joinAllThreads ();
-}
+ZmqCore::~ZmqCore () = default;
 
-ZmqCore::ZmqCore (const std::string &core_name) : CommonCore (core_name) {}
+ZmqCore::ZmqCore (const std::string &core_name) : CommsBroker (core_name) {}
 
 void ZmqCore::InitializeFromArgs (int argc, const char *const *argv)
 {
@@ -129,7 +122,7 @@ void ZmqCore::InitializeFromArgs (int argc, const char *const *argv)
 
 bool ZmqCore::brokerConnect ()
 {
-    std::lock_guard<std::mutex> lock (dataLock);
+    std::lock_guard<std::mutex> lock (dataMutex);
     if (brokerAddress.empty ())  // cores require a broker
     {
         brokerAddress = "tcp://127.0.0.1";
@@ -161,36 +154,9 @@ bool ZmqCore::brokerConnect ()
     return res;
 }
 
-void ZmqCore::brokerDisconnect ()
-{
-    std::lock_guard<std::mutex> lock (dataLock);
-    if (comms)
-    {
-        comms->disconnect ();
-    }
-}
-
-void ZmqCore::transmit (int route_id, const ActionMessage &cmd)
-{
-    std::lock_guard<std::mutex> lock (dataLock);
-    if (comms)
-    {
-        comms->transmit (route_id, cmd);
-    }
-}
-
-void ZmqCore::addRoute (int route_id, const std::string &routeInfo)
-{
-    std::lock_guard<std::mutex> lock (dataLock);
-    if (comms)
-    {
-        comms->addRoute (route_id, routeInfo);
-    }
-}
-
 std::string ZmqCore::getAddress () const
 {
-    std::lock_guard<std::mutex> lock (dataLock);
+    std::lock_guard<std::mutex> lock (dataMutex);
     if (comms)
     {
         return comms->getRequestAddress () + ";" + comms->getPushAddress ();

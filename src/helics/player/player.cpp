@@ -27,8 +27,8 @@ class ValueSetter
 {
   public:
     helics::Time time;
-    helics::publication_id_t id;
-    valueTypes_t type;
+    int index;
+    std::string type;
     std::string pubName;
     std::string value;
 };
@@ -39,14 +39,12 @@ namespace filesystem = boost::filesystem;
 bool vComp (ValueSetter &v1, ValueSetter &v2) { return (v1.time < v2.time); }
 void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
-void sendPublication (helics::ValueFederate *vFed, ValueSetter &vs);
-
 const std::regex creg (R"raw((-?\d+(\.\d+)?|\.\d+)\s*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
 
 int main (int argc, char *argv[])
 {
     std::ifstream infile;
-    valueTypes_t defType = valueTypes_t::stringValue;
+    helics::helicsType_t defType = helics::helicsType_t::helicsString;
 
     po::variables_map vm;
     argumentParser (argc, argv, vm);
@@ -57,19 +55,19 @@ int main (int argc, char *argv[])
         return 0;
     }
 
-    if (vm.count ("type") > 0)
+    if (vm.count ("datatype") > 0)
     {
-        defType = getType (vm["type"].as<std::string> ());
-        if (defType == valueTypes_t::unknownValue)
+        defType = helics::getTypeFromString (vm["datatype"].as<std::string> ());
+        if (defType == helics::helicsType_t::helicsInvalid)
         {
-            std::cerr << vm["type"].as<std::string> () << "is not recognized as a valid type \n";
+            std::cerr << vm["datatype"].as<std::string> () << " is not recognized as a valid type \n";
             return -3;
         }
     }
 
     if (!filesystem::exists (vm["input"].as<std::string> ()))
     {
-        std::cerr << vm["input"].as<std::string> () << "does not exist \n";
+        std::cerr << vm["input"].as<std::string> () << " does not exist \n";
         return -3;
     }
     infile.open (vm["input"].as<std::string> ().c_str ());
@@ -112,23 +110,20 @@ int main (int argc, char *argv[])
         {
             points[icnt].time = helics::Time (std::stod (m[1]));
             points[icnt].pubName = m[3];
-            points[icnt].type = getType (m[4]);
-            if (points[icnt].type == valueTypes_t::unknownValue)
-            {
-                points[icnt].type = defType;
-            }
+            points[icnt].type = m[4];
             points[icnt].value = m[5];
             ++icnt;
         }
     }
     // collapse tags to the reduced list
-    std::set<std::pair<std::string, valueTypes_t>> tags;
+    std::set<std::pair<std::string, std::string>> tags;
     for (auto &vs : points)
     {
         tags.emplace (vs.pubName, vs.type);
     }
 
-    std::map<std::string, std::pair<helics::publication_id_t, valueTypes_t>> pubids;
+    std::vector<helics::Publication> publications;
+    std::map<std::string, int> pubids;
     std::cout << "read file " << points.size () << " points for " << tags.size () << " tags \n";
     std::string name = "player";
     if (vm.count ("name") > 0)
@@ -136,10 +131,10 @@ int main (int argc, char *argv[])
         name = vm["name"].as<std::string> ();
     }
 
-    std::string corename;
+    std::string coretype;
     if (vm.count ("core") > 0)
     {
-        corename = vm["core"].as<std::string> ();
+        coretype = vm["core"].as<std::string> ();
     }
     helics::Time stopTime = helics::Time::maxVal ();
     if (vm.count ("stop") > 0)
@@ -149,17 +144,23 @@ int main (int argc, char *argv[])
     helics::FederateInfo fi (name);
     try
     {
-        fi.coreType = helics::coreTypeFromString (corename);
+        fi.coreType = helics::coreTypeFromString (coretype);
     }
     catch (std::invalid_argument &ia)
     {
-        std::cerr << "Unrecognized core type\n";
+        std::cerr << coretype << " is not recognized as a valid core type [zmq,ipc,udp,tcp,test,mpi]\n";
         return (-1);
     }
     fi.coreInitString = "1";
     if (vm.count ("coreinit") > 0)
     {
-        fi.coreInitString = vm["coreinit"].as<std::string> ();
+        fi.coreInitString.push_back (' ');
+        fi.coreInitString += vm["coreinit"].as<std::string> ();
+    }
+    if (vm.count ("broker") > 0)
+    {
+        fi.coreInitString += " --broker=";
+        fi.coreInitString += vm["broker"].as<std::string> ();
     }
     fi.sourceOnly = true;
     if (vm.count ("timedelta") > 0)
@@ -175,14 +176,15 @@ int main (int argc, char *argv[])
         {
             continue;  // skip subsequent tags with different types
         }
-        auto id = vFed->registerGlobalPublication (tname.first, typeString (tname.second));
-        pubids.emplace (tname.first, std::make_pair (id, tname.second));
+        publications.push_back (helics::Publication (helics::GLOBAL, vFed.get (), tname.first,
+                                                     helics::getTypeFromString (tname.second)));
         prevTag = tname.first;
+        pubids[tname.first] = static_cast<int> (publications.size ()) - 1;
     }
     // load up the ids
     for (auto &vs : points)
     {
-        std::tie (vs.id, vs.type) = pubids[vs.pubName];
+        vs.index = pubids[vs.pubName];
     }
 
     std::sort (points.begin (), points.end (), vComp);
@@ -193,7 +195,7 @@ int main (int argc, char *argv[])
     std::cout << "entered init State\n";
     while (points[pointIndex].time < helics::timeZero)
     {
-        sendPublication (vFed.get (), points[pointIndex]);
+        publications[points[pointIndex].index].publish (points[pointIndex].value);
         ++pointIndex;
     }
 
@@ -201,7 +203,7 @@ int main (int argc, char *argv[])
     std::cout << "entered exec State\n";
     while (points[pointIndex].time == helics::timeZero)
     {
-        sendPublication (vFed.get (), points[pointIndex]);
+        publications[points[pointIndex].index].publish (points[pointIndex].value);
         ++pointIndex;
     }
     helics::Time nextPrintTime = 10.0;
@@ -215,7 +217,7 @@ int main (int argc, char *argv[])
 
         while (points[pointIndex].time <= newTime)
         {
-            sendPublication (vFed.get (), points[pointIndex]);
+            publications[points[pointIndex].index].publish (points[pointIndex].value);
             ++pointIndex;
             if (pointIndex == static_cast<int> (points.size ()))
             {
@@ -233,52 +235,6 @@ int main (int argc, char *argv[])
     return 0;
 }
 
-void sendPublication (helics::ValueFederate *vFed, ValueSetter &vs)
-{
-    switch (vs.type)
-    {
-    case valueTypes_t::stringValue:
-    default:
-        vFed->publish (vs.id, vs.value);
-        break;
-    case valueTypes_t::doubleValue:
-    {
-        try
-        {
-            double val = std::stod (vs.value);
-            vFed->publish (vs.id, val);
-        }
-        catch (std::invalid_argument &)
-        {
-            std::cerr << " unable to convert " << vs.value << " to double";
-        }
-        break;
-    }
-
-    case valueTypes_t::complexValue:
-    {
-        auto cval = helicsGetComplex (vs.value);
-        vFed->publish (vs.id, cval);
-    }
-    break;
-    case valueTypes_t::int64Value:
-    {
-        try
-        {
-            int64_t val = std::stoll (vs.value);
-            vFed->publish (vs.id, val);
-        }
-        catch (std::invalid_argument &)
-        {
-            std::cerr << " unable to convert " << vs.value << " to integer";
-        }
-        break;
-    }
-    case valueTypes_t::vectorValue:
-        break;
-    }
-}
-
 void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map)
 {
     po::options_description cmd_only ("command line only");
@@ -289,18 +245,18 @@ void argumentParser (int argc, const char *const *argv, po::variables_map &vm_ma
     // input boost controls
     cmd_only.add_options () 
 		("help,h", "produce help message")
-		("version,v","helics version number")
+		("version,v","HELICS version number")
 		("config-file", po::value<std::string> (),"specify a configuration file to use");
 
 
     config.add_options ()
 		("broker,b", po::value<std::string> (),"address to connect the broker to")
 		("name,n", po::value<std::string> (),"name of the player federate")
-		("type,t",po::value<std::string>(),"type of the publication to use")
-		("core,c",po::value<std::string> (),"name of the core to connect to")
+		("datatype",po::value<std::string>(),"type of the publication data type to use")
+		("core,c",po::value<std::string> (),"type of the core to connect to")
 		("stop", po::value<double>(), "the time to stop the player")
 		("timedelta", po::value<double>(), "the time delta of the federate")
-		("coreinit,i", po::value<std::string>(), "the core initializion string");
+		("coreinit,i", po::value<std::string>(), "the core initialization string");
 
     // clang-format on
 
