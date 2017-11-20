@@ -162,8 +162,11 @@ class Federate
     convergence_state enterExecutionStateFinalize ();
     /** terminate the simulation
     @details call is normally non-blocking, but may block if called in the midst of an
-    asynchronous call sequence*/
+    asynchronous call sequence, not core calling commands may be called */
     void finalize ();
+
+    /** disconnect a simulation from the core */
+    virtual void disconnect(); 
     /** specify the simulator had an unrecoverable error
      */
     void error (int errorcode);

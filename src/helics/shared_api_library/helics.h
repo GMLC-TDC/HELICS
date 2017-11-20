@@ -89,7 +89,11 @@ HELICS_Export helicsStatus helicsFederateInfoSetMaxIterations (helics_federate_i
 HELICS_Export helicsStatus helicsFederateInfoSetLoggingLevel (helics_federate_info_t fi, int logLevel);
 
 HELICS_Export helicsStatus helicsFinalize (helics_federate fed);
+HELICS_Export void helicsFreeFederate (helics_federate fed);
 
+/** call when done using the helics library,  this function will ensure the threads are closed properly if possible
+this should be the last call before exiting,  */
+HELICS_Export void helicsCloseLibrary ();
 /* initialization, execution, and time requests */
 HELICS_Export helicsStatus helicsEnterInitializationMode (helics_federate fed);
 
@@ -97,7 +101,7 @@ HELICS_Export helicsStatus helicsEnterInitializationModeAsync (helics_federate f
 
 HELICS_Export int helicsAsyncOperationCompleted (helics_federate fed);
 
-HELICS_Export helicsStatus helicsEneterInitializationModeFinalize (helics_federate fed);
+HELICS_Export helicsStatus helicsEnterInitializationModeFinalize (helics_federate fed);
 
 HELICS_Export helicsStatus helicsEnterExecutionMode (helics_federate fed);
 HELICS_Export helicsStatus helicsEnterExecutionModeIterative (helics_federate fed,
@@ -128,7 +132,6 @@ HELICS_Export helics_query helicsCreateQuery (const char *target, const char *qu
 HELICS_Export const char *helicsExecuteQuery (helics_federate fed, helics_query query);
 
 HELICS_Export void helicsFreeQuery (helics_query);
-HELICS_Export void helicsFreeFederate (helics_federate fed);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

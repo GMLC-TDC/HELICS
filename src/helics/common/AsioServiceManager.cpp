@@ -18,75 +18,73 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
  * LLNS Copyright End
  */
 
-#include "zmqContextManager.h"
+#include "AsioServiceManager.h"
 
-#include "cppzmq/zmq.hpp"
+#include <boost/asio/io_service.hpp>
+
 #include <map>
 #include <mutex>
-#include <iostream>
 
 /** a storage system for the available core objects allowing references by name to the core
  */
-std::map<std::string, std::shared_ptr<zmqContextManager>> zmqContextManager::contexts;
+std::map<std::string, std::shared_ptr<AsioServiceManager>> AsioServiceManager::services;
 
 /** we expect operations on core object that modify the map to be rare but we absolutely need them to be thread
 safe so we are going to use a lock that is entirely controlled by this file*/
-static std::mutex contextLock;
+static std::mutex serviceLock;
 
-std::shared_ptr<zmqContextManager> zmqContextManager::getContextPointer (const std::string &contextName)
+std::shared_ptr<AsioServiceManager> AsioServiceManager::getServicePointer (const std::string &serviceName)
 {
-    std::lock_guard<std::mutex> conlock (
-      contextLock);  // just to ensure that nothing funny happens if you try to get a context
+    std::lock_guard<std::mutex> serveLock (
+      serviceLock);  // just to ensure that nothing funny happens if you try to get a context
                      // while it is being constructed
-    auto fnd = contexts.find (contextName);
-    if (fnd != contexts.end ())
+    auto fnd = services.find (serviceName);
+    if (fnd != services.end ())
     {
         return fnd->second;
     }
 
-    auto newContext = std::shared_ptr<zmqContextManager> (new zmqContextManager (contextName));
-    contexts.emplace (contextName, newContext);
-    return newContext;
+    auto newService = std::shared_ptr<AsioServiceManager> (new AsioServiceManager (serviceName));
+    services.emplace (serviceName, newService);
+    return newService;
     // if it doesn't make a new one with the appropriate name
 }
 
-zmq::context_t &zmqContextManager::getContext (const std::string &contextName)
+boost::asio::io_service &AsioServiceManager::getService (const std::string &serviceName)
 {
-    return getContextPointer (contextName)->getBaseContext ();
+    return getServicePointer (serviceName)->getBaseService ();
 }
 
-void zmqContextManager::closeContext (const std::string &contextName)
+void AsioServiceManager::closeService (const std::string &serviceName)
 {
-    std::lock_guard<std::mutex> conlock (contextLock);
-    auto fnd = contexts.find (contextName);
-    if (fnd != contexts.end ())
+    std::lock_guard<std::mutex> servelock (serviceLock);
+    auto fnd = services.find (serviceName);
+    if (fnd != services.end ())
     {
-        contexts.erase (fnd);
+        services.erase (fnd);
     }
 }
 
-bool zmqContextManager::setContextToLeakOnDelete (const std::string &contextName)
+void AsioServiceManager::setServiceToLeakOnDelete (const std::string &serviceName)
 {
-    std::lock_guard<std::mutex> conlock (contextLock);
-    auto fnd = contexts.find (contextName);
-    if (fnd != contexts.end ())
+    std::lock_guard<std::mutex> servelock (serviceLock);
+    auto fnd = services.find (serviceName);
+    if (fnd != services.end ())
     {
         fnd->second->leakOnDelete = true;
     }
-    return false;
 }
-zmqContextManager::~zmqContextManager ()
+AsioServiceManager::~AsioServiceManager ()
 {
     if (leakOnDelete)
     {
         // yes I am purposefully leaking this PHILIP TOP
-        auto val = zcontext.release ();
+        auto val = iserv.release ();
         (void)(val);
     }
-
 }
 
-zmqContextManager::zmqContextManager (const std::string &contextName) : name (contextName)
+AsioServiceManager::AsioServiceManager (const std::string &serviceName) : name (serviceName)
 {
-    zcontext = std::make_unique<zmq::context_t> ();
+    iserv = std::make_unique<boost::asio::io_service> ();
 }

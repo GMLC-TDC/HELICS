@@ -8,90 +8,49 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "ZmqComms.h"
-#include "ZmqRequestSets.h"
-#include "helics/common/zmqContextManager.h"
-#include "helics/common/zmqHelper.h"
-#include "helics/common/zmqSocketDescriptor.h"
+#include "UdpComms.h"
 #include "helics/core/ActionMessage.h"
+#include "helics/common/AsioServiceManager.h"
 #include <memory>
+#include <boost/asio/ip/udp.hpp>
 
-static const int BEGIN_OPEN_PORT_RANGE = 23500;
-static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 23900;
+static const int BEGIN_OPEN_PORT_RANGE = 23964;
+static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24093;
 
-static const int DEFAULT_BROKER_PULL_PORT_NUMBER = 23405;
-static const int DEFAULT_BROKER_REP_PORT_NUMBER = 23404;
+static const int DEFAULT_UDP_BROKER_PORT_NUMBER = 23901;
+
 
 namespace helics
 {
-ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTarget)
+using boost::asio::ip::udp;
+UdpComms::UdpComms ()
+{
+    promisePort = std::promise<int> ();
+    futurePort = promisePort.get_future ();
+}
+
+UdpComms::UdpComms (const std::string &brokerTarget, const std::string &localTarget)
     : CommsInterface (brokerTarget, localTarget)
 {
     if (localTarget_.empty ())
     {
-        localTarget_ = "tcp://127.0.0.1";
+        localTarget_ = "localhost";
     }
+    promisePort = std::promise<int> ();
+    futurePort = promisePort.get_future ();
 }
 /** destructor*/
-ZmqComms::~ZmqComms () { disconnect (); }
+UdpComms::~UdpComms () { disconnect (); }
 
-std::string makePortAddress (const std::string &networkInterface, int portNumber)
-{
-    if (networkInterface.compare (0, 3, "ipc") == 0)
-    {
-        return networkInterface;
-    }
-    if (networkInterface.compare (0, 3, "tcp") == 0)
-    {
-        std::string newAddress = networkInterface;
-        newAddress.push_back (':');
-        newAddress.append (std::to_string (portNumber));
-        return newAddress;
-    }
-    if (networkInterface.compare (0, 5, "inproc") == 0)
-    {
-        return networkInterface;
-    }
-    return networkInterface;
-}
-
-std::pair<std::string, int> extractInterfaceandPort (const std::string &address)
-{
-    std::pair<std::string, int> ret;
-    auto lastColon = address.find_last_of (':');
-    try
-    {
-        auto val = std::stoi (address.substr (lastColon + 1));
-        ret.first = address.substr (0, lastColon);
-        ret.second = val;
-    }
-    catch (const std::invalid_argument &)
-    {
-        ret = std::make_pair (address, -1);
-    }
-    return ret;
-}
-
-void ZmqComms::setBrokerPorts (int reqPort, int pushPort)
+void UdpComms::setBrokerPort (int brokerPortNumber)
 {
     if (rx_status == connection_status::startup)
     {
-        brokerReqPort = reqPort;
-        if (pushPort < 0)
-        {
-            if (brokerPushPort < 0)
-            {
-                brokerPushPort = reqPort + 1;
-            }
-        }
-        else
-        {
-            brokerPushPort = pushPort;
-        }
+        brokerPort = brokerPortNumber;
     }
 }
 
-std::pair<int, int> ZmqComms::findOpenPorts ()
+int UdpComms::findOpenPort ()
 {
     int start = openPortStart;
     if (openPortStart < 0)
@@ -103,37 +62,22 @@ std::pair<int, int> ZmqComms::findOpenPorts ()
         start += 2;
     }
     usedPortNumbers.insert (start);
-    usedPortNumbers.insert (start + 1);
-    return std::make_pair (start, start + 1);
+    return start;
 }
 
-void ZmqComms::setPortNumbers (int repPort, int pullPort)
+void UdpComms::setPortNumber (int localPortNumber)
 {
     if (rx_status == connection_status::startup)
     {
-        repPortNumber = repPort;
-        if (repPort > 0)
-        {
-            auto currentPullPort = pullPortNumber.load ();
-            pullPortNumber = (pullPort > 0) ? pullPort : (currentPullPort < 0) ? repPort + 1 : currentPullPort;
-        }
+        PortNumber = localPortNumber;
     }
 }
 
-void ZmqComms::setAutomaticPortStartPort (int startingPort) { openPortStart = startingPort; }
+void UdpComms::setAutomaticPortStartPort (int startingPort) { openPortStart = startingPort; }
 
-int ZmqComms::processIncomingMessage (zmq::message_t &msg)
+int UdpComms::processIncomingMessage (ActionMessage &M)
 {
-    if (msg.size () == 5)
-    {
-        std::string str (static_cast<char *> (msg.data ()), msg.size ());
-        if (str == "close")
-        {
-            return (-1);
-        }
-    }
-    ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-    if (M.action () == CMD_PROTOCOL)
+    if (isProtocolCommand(M))
     {
         switch (M.index)
         {
@@ -147,10 +91,9 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
     return 0;
 }
 
-int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
+ActionMessage UdpComms::generateReplyToIncomingMessage (ActionMessage &M)
 {
-    ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-    if (M.action () == CMD_PROTOCOL)
+    if (isProtocolCommand(M))
     {
         switch (M.index)
         {
@@ -158,386 +101,192 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
         {
             ActionMessage portReply (CMD_PROTOCOL);
             portReply.index = PORT_DEFINITIONS;
-            portReply.source_id = pullPortNumber;
-            sock.send (portReply.to_string ());
+            portReply.source_id = PortNumber;
+            return portReply;
         }
         break;
         case REQUEST_PORTS:
         {
-            auto openPorts = findOpenPorts ();
+            auto openPort = findOpenPort ();
             ActionMessage portReply (CMD_PROTOCOL);
             portReply.index = PORT_DEFINITIONS;
-            portReply.source_id = pullPortNumber;
-            portReply.source_handle = openPorts.first;
-            portReply.dest_id = openPorts.second;
-            sock.send (portReply.to_string ());
+            portReply.source_id = PortNumber;
+            portReply.source_handle = openPort;
+            return portReply;
         }
         break;
         case CLOSE_RECEIVER:
-            return (-1);
+            return M;
         default:
             M.index = NULL_REPLY;
-            sock.send (M.to_string ());
-            break;
+            return M;
         }
-        return 0;
     }
     ActionCallback (std::move (M));
     ActionMessage resp (CMD_PRIORITY_ACK);
-    auto str = resp.to_string ();
-
-    sock.send (str.data (), str.size ());
-    return 0;
+    return resp;
 }
 
-void ZmqComms::queue_rx_function ()
+void UdpComms::queue_rx_function ()
 {
-    auto ctx = zmqContextManager::getContextPointer ();
-    zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
-
-    zmq::socket_t controlSocket (ctx->getContext (), ZMQ_PAIR);
-    std::string controlsockString = std::string ("inproc://") + name + "_control";
-    controlSocket.bind (controlsockString.c_str ());
-
-    zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
-    while (pullPortNumber == -1)
+    if (PortNumber < 0)
     {
-        zmq::message_t msg;
-        controlSocket.recv (&msg);
-        ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-        if (M.action () == CMD_PROTOCOL)
-        {
-            if (M.index == PORT_DEFINITIONS)
-            {
-                pullPortNumber = M.dest_id;
-                if (repPortNumber < 0)
-                {
-                    repPortNumber = M.source_handle;  // aliased for the protocol message
-                }
-            }
-            else if (M.index == DISCONNECT)
-            {
-                disconnecting = true;
-                rx_status = connection_status::terminated;
-                return;
-            }
-        }
+        PortNumber = futurePort.get();
     }
-    try
+    if (PortNumber < 0)
     {
-        repSocket.bind (makePortAddress (localTarget_, repPortNumber));
+        rx_status = connection_status::error;
+        return;
     }
-    catch (const zmq::error_t &)
-    {
-        std::cerr << "binding error on reply socket sleeping then will try again \n";
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
-        try
-        {
-            repSocket.bind (makePortAddress (localTarget_, repPortNumber));
-        }
-        catch (const zmq::error_t &ze)
-        {
-            pullSocket.close ();
-            disconnecting = true;
-            std::cerr << "zmqError binding rep port " << makePortAddress (localTarget_, repPortNumber)
-                      << ze.what () << '\n';
-            rx_status = connection_status::error;
-            return;
-        }
-    }
-    try
-    {
-        pullSocket.bind (makePortAddress (localTarget_, pullPortNumber));
-    }
-    catch (const zmq::error_t &)
-    {
-        std::cerr << "binding error on pull socket sleeping then will try again \n";
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
-        try
-        {
-            pullSocket.bind (makePortAddress (localTarget_, pullPortNumber));
-        }
-        catch (const zmq::error_t &ze)
-        {
-            disconnecting = true;
-            std::cerr << "zmqError binding pull port " << makePortAddress (localTarget_, pullPortNumber)
-                      << ze.what () << '\n';
-            rx_status = connection_status::error;
-            return;
-        }
-    }
-
-    std::vector<zmq::pollitem_t> poller (3);
-    poller[0].socket = static_cast<void *> (controlSocket);
-    poller[0].events = ZMQ_POLLIN;
-    poller[1].socket = static_cast<void *> (pullSocket);
-    poller[1].events = ZMQ_POLLIN;
-    poller[2].socket = static_cast<void *> (repSocket);
-    poller[2].events = ZMQ_POLLIN;
-    rx_status = connection_status::connected;  // this is a atomic indicator that the rx queue is ready
+    auto ioserv = AsioServiceManager::getServicePointer();
+    udp::socket socket(ioserv->getBaseService(), udp::endpoint(udp::v4(), PortNumber));
+    std::vector<char> data(10192);
+    udp::endpoint remote_endp;
+    boost::system::error_code error;
+    boost::system::error_code ignored_error;
+    rx_status = connection_status::connected;
     while (true)
     {
-        auto rc = zmq::poll (poller);
-        if (rc > 0)
+        auto len=socket.receive_from(boost::asio::buffer(data), remote_endp, 0, error);
+        if (error)
         {
-            zmq::message_t msg;
-            if ((poller[0].revents & ZMQ_POLLIN) != 0)
+            rx_status = connection_status::error;
+            return;
+        }
+        if (len == 5)
+        {
+            std::string str(data.data(), len);
+            if (str == "close")
             {
-                controlSocket.recv (&msg);
-
-                auto status = processIncomingMessage (msg);
-                if (status < 0)
-                {
-                    break;
-                }
-            }
-            if ((poller[1].revents & ZMQ_POLLIN) != 0)
-            {
-                pullSocket.recv (&msg);
-                auto status = processIncomingMessage (msg);
-                if (status < 0)
-                {
-                    break;
-                }
-            }
-            if ((poller[2].revents & ZMQ_POLLIN) != 0)
-            {
-                repSocket.recv (&msg);
-                auto status = replyToIncomingMessage (msg, repSocket);
-                if (status < 0)
-                {
-                    break;
-                }
-                continue;
+                goto CLOSE_RX_LOOP;
             }
         }
-    }
-    disconnecting = true;
-    rx_status = connection_status::terminated;
-}
-
-int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
-{
-    zmq::pollitem_t poller;
-    if (!brokerTarget_.empty ())
-    {
-        auto ctx = zmqContextManager::getContextPointer ();
-        if (brokerReqPort < 0)
+        ActionMessage M(data.data(),len);
+        if (isProtocolCommand(M))
         {
-            brokerReqPort = DEFAULT_BROKER_REP_PORT_NUMBER;
-        }
-        zmq::socket_t brokerReq (ctx->getContext (), ZMQ_REQ);
-        try
-        {
-            brokerReq.connect (makePortAddress (brokerTarget_, brokerReqPort));
-        }
-        catch (zmq::error_t &ze)
-        {
-            std::cerr << "unable to connect with broker:" << ze.what () << '\n';
-            tx_status = connection_status::error;
-            return (-1);
-        }
-
-        hasBroker = true;
-        int cnt = 0;
-        zmq::message_t msg;
-        if (pullPortNumber > 0)
-        {
-            while (brokerPushPort < 0)
+           if (M.index == CLOSE_RECEIVER)
             {
-                ActionMessage getPorts (CMD_PROTOCOL);
-                getPorts.index = QUERY_PORTS;
-                auto str = getPorts.to_string ();
-                brokerReq.send (str);
-                poller.socket = static_cast<void *> (brokerReq);
-                poller.events = ZMQ_POLLIN;
-                auto rc = zmq::poll (&poller, 1, std::chrono::milliseconds (3000));
-                if (rc < 0)
+               goto CLOSE_RX_LOOP;
+            }
+        }
+        if (isPriorityCommand(M))
+        {
+            auto reply = generateReplyToIncomingMessage(M);
+            if (isProtocolCommand(reply))
+            {
+                if (reply.index == DISCONNECT)
                 {
-                    std::cerr << "unable to connect with broker\n";
-                    tx_status = connection_status::error;
-                    return (-1);
-                }
-                if (rc == 0)
-                {
-                    std::cerr << "broker connection timed out\n";
-                    tx_status = connection_status::error;
-                    return (-1);
-                }
-                brokerReq.recv (&msg);
-
-                ActionMessage rxcmd (static_cast<char *> (msg.data ()), msg.size ());
-                if (rxcmd.action () == CMD_PROTOCOL)
-                {
-                    if (rxcmd.index == PORT_DEFINITIONS)
-                    {
-                        if (rxcmd.source_id > 0)
-                        {
-                            brokerPushPort = rxcmd.source_id;
-                        }
-                    }
-                    else if (rxcmd.index == DISCONNECT)
-                    {
-                        controlSocket.send (msg);
-                        tx_status = connection_status::terminated;
-                        return (-3);
-                    }
-                }
-
-                ++cnt;
-                if (cnt > 10)
-                {
-                    // we can't get the broker to respond with port numbers
-                    tx_status = connection_status::error;
-                    return (-1);
+                    goto CLOSE_RX_LOOP;
                 }
             }
+            socket.send_to(boost::asio::buffer(reply.to_string()), remote_endp, 0, ignored_error);
         }
         else
         {
-            while (pullPortNumber == -1)
+            auto res=processIncomingMessage(M);
+            if (res < 0)
             {
-                ActionMessage getPorts (CMD_PROTOCOL);
-                getPorts.index = REQUEST_PORTS;
-                auto str = getPorts.to_string ();
-                brokerReq.send (str);
-                poller.socket = static_cast<void *> (brokerReq);
-                poller.events = ZMQ_POLLIN;
-                auto rc = zmq::poll (&poller, 1, std::chrono::milliseconds (3000));
-                if (rc < 0)
-                {
-                    std::cerr << "unable to connect with broker\n";
-                    tx_status = connection_status::error;
-                    return (-1);
-                }
-                if (rc == 0)
-                {
-                    std::cerr << "broker connection timed out\n";
-                    tx_status = connection_status::error;
-                    return (-1);
-                }
-                brokerReq.recv (&msg);
+                goto CLOSE_RX_LOOP;
+            }
+        }
+        
+    }
+CLOSE_RX_LOOP:
+    disconnecting = true;
+    rx_status = connection_status::terminated;
+    return;
+}
 
-                ActionMessage rxcmd (static_cast<char *> (msg.data ()), msg.size ());
-                if (rxcmd.action () == CMD_PROTOCOL)
+
+void UdpComms::queue_tx_function ()
+{
+    std::vector<char> buffer;
+    auto ioserv = AsioServiceManager::getServicePointer();
+    udp::resolver resolver (ioserv->getBaseService());
+    bool closingRx = false;
+    udp::socket transmitSocket (ioserv->getBaseService());
+    transmitSocket.open (udp::v4 ());
+    if (PortNumber >= 0)
+    {
+        promisePort.set_value(PortNumber);
+    }
+    
+    boost::system::error_code error;
+    std::map<int, udp::endpoint> routes;  // for all the other possible routes
+    udp::endpoint broker_endpoint;
+
+    if (!brokerTarget_.empty())
+    {
+        hasBroker = true;
+    }
+    if (hasBroker)
+    {
+        if (brokerPort < 0)
+        {
+            brokerPort = DEFAULT_UDP_BROKER_PORT_NUMBER;
+        }
+        try
+        {
+            udp::resolver::query query(udp::v4(), brokerTarget_, std::to_string(brokerPort));
+            // Setup the control socket for comms with the receiver
+            broker_endpoint = *resolver.resolve(query);
+
+            if (PortNumber <= 0)
+            {
+                ActionMessage m(CMD_PROTOCOL_PRIORITY);
+                m.index = REQUEST_PORTS;
+                transmitSocket.send_to(boost::asio::buffer(m.to_string()), broker_endpoint, 0, error);
+                if (error)
                 {
-                    if (rxcmd.index == PORT_DEFINITIONS)
+                    std::cerr << "error in initial send to broker " << error.message() << '\n';
+                }
+                std::vector<char> rx(128);
+                udp::endpoint brk;
+                auto len=transmitSocket.receive_from(boost::asio::buffer(rx), brk);
+                m = ActionMessage(rx.data(),len);
+                if (isProtocolCommand(m))
+                {
+                    if (m.index == PORT_DEFINITIONS)
                     {
-                        if (rxcmd.source_id > 0)
-                        {
-                            brokerPushPort = rxcmd.source_id;
-                        }
-                        controlSocket.send (msg);
+                        PortNumber = m.source_handle;
+                        promisePort.set_value(PortNumber);
                     }
-                    else if (rxcmd.index == DISCONNECT)
+                    else if (m.index == DISCONNECT)
                     {
-                        controlSocket.send (msg);
+                        PortNumber = -1;
+                        promisePort.set_value(-1);
                         tx_status = connection_status::terminated;
-                        return (-3);
+                        return;
                     }
-                }
-
-                ++cnt;
-                if (cnt > 10)
-                {
-                    // we can't get the broker to respond with port numbers
-                    tx_status = connection_status::error;
-                    return (-1);
                 }
             }
+        }
+        catch (std::exception &e)
+        {
+            std::cerr << e.what() << std::endl;
         }
     }
     else
     {
-        if ((pullPortNumber == -1) || (repPortNumber == -1))
+        if (PortNumber < 0)
         {
-            if (pullPortNumber == -1)
-            {
-                pullPortNumber = DEFAULT_BROKER_PULL_PORT_NUMBER;
-            }
-
-            if (repPortNumber == -1)
-            {
-                repPortNumber = DEFAULT_BROKER_REP_PORT_NUMBER;
-            }
-            ActionMessage setPorts (CMD_PROTOCOL);
-            setPorts.index = PORT_DEFINITIONS;
-            setPorts.dest_id = pullPortNumber;
-            setPorts.source_handle = repPortNumber;
-            auto str = setPorts.to_string ();
-            controlSocket.send (str);
+            PortNumber = DEFAULT_UDP_BROKER_PORT_NUMBER;
+            promisePort.set_value(PortNumber);
         }
     }
-    return 0;
-}
+    udp::resolver::query queryLocal(udp::v4(), localTarget_, std::to_string(PortNumber));
 
-void ZmqComms::queue_tx_function ()
-{
-    std::vector<char> buffer;
-
-    auto ctx = zmqContextManager::getContextPointer ();
-
-    // Setup the control socket for comms with the receiver
-    zmq::socket_t controlSocket (ctx->getContext (), ZMQ_PAIR);
-
-    std::string controlsockString = std::string ("inproc://") + name + "_control";
-    controlSocket.connect (controlsockString);
-    auto res = initializeBrokerConnections (controlSocket);
-    if (res < 0)
-    {
-        return;
-    }
-
-    zmq::socket_t brokerPushSocket (ctx->getContext (), ZMQ_PUSH);
-    std::map<int, zmq::socket_t> routes;  // for all the other possible routes
-    ZmqRequestSets priority_routes;  //!< object to handle the management of the priority routes
-
-    if (hasBroker)
-    {
-        priority_routes.addRoutes (0, makePortAddress (brokerTarget_, brokerReqPort));
-        brokerPushSocket.connect (makePortAddress (brokerTarget_, brokerPushPort));
-    }
+    udp::endpoint rxEndpoint= *resolver.resolve(queryLocal);
     tx_status = connection_status::connected;
-    zmq::message_t msg;
+    
     while (true)
     {
         int route_id;
         ActionMessage cmd;
-        if (priority_routes.waiting ())
-        {
-            if (priority_routes.checkForMessages ()!=0)
-            {
-                auto M = priority_routes.getMessage ();
-                if (M)
-                {
-                    ActionCallback (std::move (*M));
-                }
-                continue;
-            }
-            auto txm = txQueue.try_pop ();
-            if (txm)
-            {
-                std::tie (route_id, cmd) = *txm;
-            }
-            else
-            {
-                if (priority_routes.checkForMessages (std::chrono::milliseconds (50))!=0)
-                {
-                    auto M = priority_routes.getMessage ();
-                    if (M)
-                    {
-                        ActionCallback (std::move (*M));
-                    }
-                }
-                continue;
-            }
-        }
-        else
-        {
-            std::tie (route_id, cmd) = txQueue.pop ();
-        }
-
-        if (cmd.action () == CMD_PROTOCOL)
+       
+        std::tie (route_id, cmd) = txQueue.pop ();
+        bool processed = false;
+        if (isProtocolCommand(cmd))
         {
             if (route_id == -1)
             {
@@ -546,110 +295,137 @@ void ZmqComms::queue_tx_function ()
                 case NEW_ROUTE:
                 {
                     auto newroute = cmd.payload;
-                    auto splitPt = newroute.find_first_of (';');
-                    std::string priority_route;
-                    std::string push_route;
-                    if (splitPt != std::string::npos)
-                    {
-                        priority_route = newroute.substr (0, splitPt);
-                        push_route = newroute.substr (splitPt + 1);
-                    }
-                    else
-                    {
-                        push_route = newroute;
-                    }
-                    if (!priority_route.empty ())
-                    {
-                        try
-                        {
-                            priority_routes.addRoutes (cmd.dest_id, priority_route);
-                        }
-                        catch (const zmq::error_t &)
-                        {
-                            // TODO:: do something???
-                        }
-                    }
+                 
                     try
                     {
-                        auto zsock = zmq::socket_t (ctx->getContext (), ZMQ_PUSH);
-                        zsock.connect (push_route);
-                        routes.emplace (cmd.dest_id, std::move (zsock));
+                        std::string interface;
+                        std::string port;
+                        std::tie(interface, port) = extractInterfaceandPortString(newroute);
+                        udp::resolver::query queryNew(udp::v4(), interface,port);
+
+                        routes.emplace (cmd.dest_id, *resolver.resolve(queryNew));
                     }
-                    catch (const zmq::error_t &)
+                    catch (std::exception &e)
                     {
                         // TODO:: do something???
                     }
+                    processed = true;
                 }
                 break;
+                case CLOSE_RECEIVER:
+                    transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rxEndpoint, 0, error);
+                    if (error)
+                    {
+                        std::cerr << "transmit failure to receiver " << error.message() << '\n';
+                    }
+                    closingRx = true;
+                    processed = true;
+                    break;
                 case DISCONNECT:
                     goto CLOSE_TX_LOOP;  // break out of loop
                 }
             }
         }
-
-        if (isPriorityCommand (cmd))
+        if (processed)
         {
-            if ((route_id == 0) && (!hasBroker))
-            {
-                // drop the packet
-                continue;
-            }
-            auto tx = priority_routes.transmit (route_id, cmd);
-            if (tx)
-            {
-                continue;
-            }
+            continue;
         }
-        cmd.to_vector (buffer);
+       
         if (route_id == 0)
         {
             if (hasBroker)
             {
-                brokerPushSocket.send (buffer.data (), buffer.size ());
+                transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), broker_endpoint,0,error);
+                if (error)
+                {
+                    std::cerr << "transmit failure to broker " << error.message() << '\n';
+                }
             }
         }
         else if (route_id == -1)
         {  // send to rx thread loop
-            controlSocket.send (buffer.data (), buffer.size ());
+            transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rxEndpoint,0,error);
+            if (error)
+            {
+                std::cerr << "transmit failure to receiver " << error.message() << '\n';
+            }
         }
         else
         {
             auto rt_find = routes.find (route_id);
             if (rt_find != routes.end ())
             {
-                rt_find->second.send (buffer.data (), buffer.size ());
+                transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rt_find->second,0,error);
+                if (error)
+                {
+                    std::cerr << "transmit failure to route to "<<route_id<<" " << error.message() << '\n';
+                }
             }
             else
             {
                 if (hasBroker)
                 {
-                    brokerPushSocket.send (buffer.data (), buffer.size ());
+                    transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), broker_endpoint,0,error);
+                    if (error)
+                    {
+                        std::cerr << "transmit failure to broker " << error.message() << '\n';
+                    }
                 }
             }
         }
     }
 CLOSE_TX_LOOP:
-    brokerPushSocket.close ();
-
+    
     routes.clear ();
     if (rx_status == connection_status::connected)
     {
-        controlSocket.send ("close");
+        if (closingRx)
+        {
+            int cnt = 0;
+            while (rx_status == connection_status::connected)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                ++cnt;
+                if (cnt == 30)
+                {
+                    std::string cls("close");
+                    transmitSocket.send_to(boost::asio::buffer(cls), rxEndpoint, 0, error);
+                    if (error)
+                    {
+                        std::cerr << "transmit failure II to receiver" << error.message() << '\n';
+                    }
+                }
+                if (cnt > 60)
+                {
+                    break;
+                }
+            }
+
+        }
+        else
+        {
+            std::string cls("close");
+            transmitSocket.send_to(boost::asio::buffer(cls), rxEndpoint, 0, error);
+            if (error)
+            {
+                std::cerr << "transmit failure to receiver" << error.message() << '\n';
+            }
+        }
+       
     }
 
-    controlSocket.close ();
 
     tx_status = connection_status::terminated;
 }
 
-void ZmqComms::closeTransmitter ()
+void UdpComms::closeTransmitter ()
 {
     ActionMessage rt (CMD_PROTOCOL);
     rt.index = DISCONNECT;
     transmit (-1, rt);
 }
 
-void ZmqComms::closeReceiver ()
+void UdpComms::closeReceiver ()
 {
     if (tx_status == connection_status::connected)
     {
@@ -659,25 +435,36 @@ void ZmqComms::closeReceiver ()
     }
     else if (!disconnecting)
     {
-        // try connecting with the receivers push socket
-        auto ctx = zmqContextManager::getContextPointer ();
-        zmq::socket_t pushSocket (ctx->getContext (), ZMQ_PUSH);
-        if (localTarget_ == "tcp://*")
-        {
-            pushSocket.connect (makePortAddress ("tcp://127.0.0.1", pullPortNumber));
-        }
-        else
-        {
-            pushSocket.connect (makePortAddress (localTarget_, pullPortNumber));
-        }
+       
 
-        ActionMessage cmd (CMD_PROTOCOL);
-        cmd.index = CLOSE_RECEIVER;
-        pushSocket.send (cmd.to_string ());
+        try
+        {
+            auto serv = AsioServiceManager::getServicePointer();
+            if (serv)
+            {
+                // try connecting with the receiver socket
+                udp::resolver resolver(serv->getBaseService());
+                udp::resolver::query queryLocal(udp::v4(), localTarget_, std::to_string(PortNumber));
+
+                udp::endpoint rxEndpoint = *resolver.resolve(queryLocal);
+
+                udp::socket transmit(serv->getBaseService(),udp::endpoint(udp::v4(),0));
+                std::string cls("close");
+                boost::system::error_code error;
+                transmit.send_to(boost::asio::buffer(cls), rxEndpoint,0,error);
+                if (error)
+                {
+                    std::cerr << "transmit failure on disconnect " << error.message() << '\n';
+                }
+            }
+            
+        }
+        catch (...)
+        {
+            //ignore error here
+       }
     }
 }
 
-std::string ZmqComms::getPushAddress () const { return makePortAddress (localTarget_, pullPortNumber); }
-
-std::string ZmqComms::getRequestAddress () const { return makePortAddress (localTarget_, repPortNumber); }
+std::string UdpComms::getAddress () const { return makePortAddress (localTarget_, PortNumber); }
 }  // namespace helics

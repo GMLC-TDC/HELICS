@@ -61,6 +61,14 @@ or when the clean up function is called this prevents some odd threading issues
 */
 size_t cleanUpBrokers();
 
+/** clean up unused brokers
+@details when brokers are unregistered they get put in a holding area that gets cleaned up when a new broker is registered
+or when the clean up function is called this prevents some odd threading issues
+@param delay the number of milliseconds to wait to ensure stuff is cleaned up
+@return the number of brokers still operating
+*/
+size_t cleanUpBrokers( int delay);
+
 /** make a copy of the broker pointer to allow access to the new name
 */
 void copyBrokerIdentifier(const std::string &copyFromName, const std::string &copyToName);

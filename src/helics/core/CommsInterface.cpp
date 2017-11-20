@@ -30,11 +30,21 @@ CommsInterface::~CommsInterface ()
     }
 }
 
-void CommsInterface::transmit (int route_id, const ActionMessage &cmd) { txQueue.emplace (route_id, cmd); }
+void CommsInterface::transmit (int route_id, const ActionMessage &cmd)
+{
+    if (isPriorityCommand (cmd))
+    {
+        txQueue.emplacePriority (route_id, cmd);
+    }
+    else
+    {
+        txQueue.emplace (route_id, cmd);
+    }
+}
 
 void CommsInterface::addRoute (int route_id, const std::string &routeInfo)
 {
-    ActionMessage rt (CMD_PROTOCOL);
+    ActionMessage rt (CMD_PROTOCOL_PRIORITY);
     rt.payload = routeInfo;
     rt.index = NEW_ROUTE;
     rt.dest_id = route_id;
@@ -114,16 +124,16 @@ bool CommsInterface::connect ()
 void CommsInterface::setName (const std::string &name_) { name = name_; }
 void CommsInterface::disconnect ()
 {
-    if (rx_status == connection_status::connected)
+    if (rx_status.load () <= connection_status::connected)
     {
         closeReceiver ();
     }
-    if (tx_status == connection_status::connected)
+    if (tx_status.load () <= connection_status::connected)
     {
         closeTransmitter ();
     }
     int cnt = 0;
-    while (rx_status != connection_status::terminated)
+    while (rx_status.load () <= connection_status::connected)
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
         ++cnt;
@@ -139,7 +149,7 @@ void CommsInterface::disconnect ()
         }
     }
     cnt = 0;
-    while (tx_status != connection_status::terminated)
+    while (tx_status.load () <= connection_status::connected)
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
         ++cnt;
@@ -177,4 +187,44 @@ bool CommsInterface::isConnected () const
 {
     return ((tx_status == connection_status::connected) && (rx_status == connection_status::connected));
 }
+
+std::string makePortAddress (const std::string &networkInterface, int portNumber)
+{
+    std::string newAddress = networkInterface;
+    newAddress.push_back (':');
+    newAddress.append (std::to_string (portNumber));
+    return newAddress;
+}
+
+std::pair<std::string, int> extractInterfaceandPort (const std::string &address)
+{
+    std::pair<std::string, int> ret;
+    auto lastColon = address.find_last_of (':');
+    if (lastColon == std::string::npos)
+    {
+        ret = std::make_pair (address, -1);
+    }
+    else
+    {
+        try
+        {
+            auto val = std::stoi (address.substr (lastColon + 1));
+            ret.first = address.substr (0, lastColon);
+            ret.second = val;
+        }
+        catch (const std::invalid_argument &)
+        {
+            ret = std::make_pair (address, -1);
+        }
+    }
+
+    return ret;
+}
+
+std::pair<std::string, std::string> extractInterfaceandPortString (const std::string &address)
+{
+    auto lastColon = address.find_last_of (':');
+    return std::make_pair (address.substr (0, lastColon), address.substr (lastColon + 1));
+}
+
 }  // namespace helics

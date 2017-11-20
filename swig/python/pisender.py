@@ -74,6 +74,9 @@ print("PI SENDER: Federate finalized")
 while(h.helicsBrokerIsConnected(broker)):
     time.sleep(1)
 
+h.helicsFreeFederate(vfed)
+h.helicsCloseLibrary()
+
 print("PI SENDER: Broker disconnected")
 
 
