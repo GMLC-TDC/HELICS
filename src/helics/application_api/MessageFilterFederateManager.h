@@ -10,8 +10,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _MESSAGE_FILTER_FEDERATE_MANAGER_
 #pragma once
 
-#include "helics/core/core.h"
-#include "helics/common/simpleQueue.hpp"
+#include "../core/core.h"
+#include "../common/simpleQueue.hpp"
 #include "Message.h"
 #include <utility> 
 #include <cstdint>

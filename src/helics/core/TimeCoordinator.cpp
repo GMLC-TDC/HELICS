@@ -10,7 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "TimeCoordinator.h"
-
+#include <boost/format.hpp>
+#include "flag-definitions.h"
 #include <algorithm>
 
 namespace helics
@@ -23,13 +24,13 @@ TimeCoordinator::TimeCoordinator (const CoreFederateInfo &info_) : info (info_)
     }
 }
 
-void TimeCoordinator::enteringExecMode (convergence_state mode)
+void TimeCoordinator::enteringExecMode (iteration_request mode)
 {
     if (executionMode)
     {
         return;
     }
-    iterating = (mode == convergence_state::nonconverged);
+    iterating = (mode != iteration_request::no_iterations);
     checkingExec = true;
     if ((!dependents.empty ()) && (sendMessageFunction))
     {
@@ -41,11 +42,11 @@ void TimeCoordinator::enteringExecMode (convergence_state mode)
 }
 
 void TimeCoordinator::timeRequest (Time nextTime,
-                                   convergence_state converged,
+                                   iteration_request iterate,
                                    Time newValueTime,
                                    Time newMessageTime)
 {
-    iterating = (converged == convergence_state::nonconverged);
+    iterating = (iterate != iteration_request::no_iterations);
     if (nextTime <= time_granted)
     {
         nextTime = time_granted + info.timeDelta;
@@ -76,7 +77,7 @@ void TimeCoordinator::updateNextExecutionTime ()
     {
         time_exec = (iterating) ? time_granted : (time_granted + info.timeDelta);
     }
-    if (info.period > timeEpsilon)
+    if (((time_exec - time_granted)>0.0)&&(info.period > timeEpsilon))
     {
         auto blk = static_cast<int> (std::ceil ((time_exec - time_granted) / info.period));
         time_exec = time_granted + blk * info.period;
@@ -161,8 +162,8 @@ void TimeCoordinator::updateMessageTime (Time messageUpdateTime)
 bool TimeCoordinator::updateTimeFactors ()
 {
     Time minNext = Time::maxVal ();
-    Time minminDe = Time::maxVal ();
-    Time minDe = Time::maxVal ();
+    Time minminDe = std::min(time_value,time_message);
+    Time minDe = minminDe;
     for (auto &dep : dependencies)
     {
         if (dep.Tnext < minNext)
@@ -200,7 +201,7 @@ bool TimeCoordinator::updateTimeFactors ()
     return update;
 }
 
-convergence_state TimeCoordinator::checkTimeGrant ()
+iteration_state TimeCoordinator::checkTimeGrant ()
 {
     bool update = updateTimeFactors ();
     if ((!iterating) || (time_exec > time_granted))
@@ -218,7 +219,7 @@ convergence_state TimeCoordinator::checkTimeGrant ()
             // printf("%d GRANT allow=%f next=%f, exec=%f, Tdemin=%f\n", source_id,
             // static_cast<double>(time_allow), static_cast<double>(time_next), static_cast<double>(time_exec),
             // static_cast<double>(time_minDe));
-            return convergence_state::complete;
+            return iteration_state::next_step;
         }
     }
     else
@@ -233,7 +234,7 @@ convergence_state TimeCoordinator::checkTimeGrant ()
                 treq.actionTime = time_granted;
                 sendMessageFunction (treq);
             }
-            return convergence_state::nonconverged;
+            return iteration_state::iterating;
         }
         else if (time_allow == time_exec)  // time_allow==time_exec==time_granted
         {
@@ -247,7 +248,7 @@ convergence_state TimeCoordinator::checkTimeGrant ()
                     treq.actionTime = time_granted;
                     sendMessageFunction (treq);
                 }
-                return convergence_state::nonconverged;
+                return iteration_state::iterating;
             }
         }
     }
@@ -265,7 +266,14 @@ convergence_state TimeCoordinator::checkTimeGrant ()
         //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
         // static_cast<double>(time_exec), static_cast<double>(time_minDe));
     }
-    return convergence_state::continue_processing;
+    return iteration_state::continue_processing;
+}
+
+std::string TimeCoordinator::printTimeStatus() const
+{
+    return (boost::format("exec=%f allow=%f, value=%f, message=%f, minDe=%f minminDe=%f") %
+        static_cast<double>(time_exec) % static_cast<double>(time_allow) % static_cast<double>(time_value) %
+        static_cast<double>(time_message) % static_cast<double>(time_minDe) % static_cast<double>(time_minminDe)).str();
 }
 
 bool TimeCoordinator::isDependency (Core::federate_id_t ofed) const { return dependencies.isDependency (ofed); }
@@ -314,9 +322,9 @@ DependencyInfo *TimeCoordinator::getDependencyInfo (Core::federate_id_t ofed)
     return dependencies.getDependencyInfo (ofed);
 }
 
-convergence_state TimeCoordinator::checkExecEntry ()
+iteration_state TimeCoordinator::checkExecEntry ()
 {
-    convergence_state ret = convergence_state::continue_processing;
+    auto ret = iteration_state::continue_processing;
     if (!dependencies.checkIfReadyForExecEntry (iterating))
     {
         return ret;
@@ -327,24 +335,24 @@ convergence_state TimeCoordinator::checkExecEntry ()
         {
             if (iteration > info.max_iterations)
             {
-                ret = convergence_state::complete;
+                ret = iteration_state::next_step;
             }
             else
             {
-                ret = convergence_state::nonconverged;
+                ret = iteration_state::iterating;
             }
         }
         else
         {
-            ret = convergence_state::complete;  // todo add a check for updates and iteration limit
+            ret = iteration_state::next_step;  // todo add a check for updates and iteration limit
         }
     }
     else
     {
-        ret = convergence_state::complete;
+        ret = iteration_state::next_step;
     }
 
-    if (ret == convergence_state::complete)
+    if (ret == iteration_state::next_step)
     {
         time_granted = timeZero;
         executionMode = true;
@@ -357,7 +365,7 @@ convergence_state TimeCoordinator::checkExecEntry ()
             sendMessageFunction (execgrant);
         }
     }
-    else if (ret == convergence_state::nonconverged)
+    else if (ret == iteration_state::iterating)
     {
         dependencies.ResetIteratingExecRequests ();
         hasInitUpdates = false;
@@ -373,4 +381,55 @@ convergence_state TimeCoordinator::checkExecEntry ()
 }
 
 bool TimeCoordinator::processTimeMessage (ActionMessage &cmd) { return dependencies.updateTime (cmd); }
+
+void TimeCoordinator::processConfigUpdateMessage(const ActionMessage &cmd)
+{
+    switch (cmd.index)
+    {
+    case UPDATE_LOOKAHEAD:
+        info.lookAhead = cmd.actionTime;
+        break;
+    case UPDATE_IMPACT_WINDOW:
+        info.impactWindow = cmd.actionTime;
+        break;
+    case UPDATE_MINDELTA:
+        info.timeDelta = cmd.actionTime;
+        if (info.timeDelta <= timeZero)
+        {
+            info.timeDelta = timeEpsilon;
+        }
+        break;
+    case UPDATE_PERIOD:
+        info.period = cmd.actionTime;
+        break;
+    case UPDATE_OFFSET:
+        info.offset = cmd.actionTime;
+        break;
+    case UPDATE_MAX_ITERATION:
+        info.max_iterations = static_cast<int16_t>(cmd.dest_id);
+        break;
+    case UPDATE_LOG_LEVEL:
+        info.logLevel = static_cast<int>(cmd.dest_id);
+        break;
+    case UPDATE_FLAG:
+        switch (cmd.dest_id)
+        {
+        case UNINTERRUPTIBLE_FLAG:
+            info.uninterruptible = cmd.flag;
+            break;
+        case ONLY_TRANSMIT_ON_CHANGE_FLAG:
+            info.only_transmit_on_change = cmd.flag;
+            break;
+        case ONLY_UPDATE_ON_CHANGE_FLAG:
+            info.only_update_on_change = cmd.flag;
+            break;
+        case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
+            info.wait_for_current_time_updates = cmd.flag;
+            break;
+        default:
+            break;
+        }
+    }
+}
+
 }  // namespace helics

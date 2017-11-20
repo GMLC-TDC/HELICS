@@ -9,15 +9,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "CoreBroker.h"
+#include "../common/stringToCmdLine.h"
 #include "BrokerFactory.h"
-#include "common/stringToCmdLine.h"
 
-#include "helics/core/argParser.h"
+#include "argParser.h"
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 
+#include "../common/logger.h"
 #include "TimeCoordinator.h"
-#include "helics/common/logger.h"
 #include "loggingHelper.hpp"
 #include <fstream>
 
@@ -102,6 +102,73 @@ int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
     return (fnd != federate_table.end ()) ? fnd->second : -1;
 }
 
+
+void CoreBroker::generateQueryResult(const ActionMessage &command)
+{
+    std::string repStr;
+    bool listV = true;
+    if (command.payload == "federates")
+    {
+        repStr.push_back('[');
+        for (const auto &fed : _federates)
+        {
+            repStr.append(fed.name);
+            repStr.push_back(';');
+        }
+    }
+    else if (command.payload == "publications")
+    {
+        repStr.push_back('[');
+        for (const auto &pub : publications)
+        {
+            repStr.append(pub.first);
+            repStr.push_back(';');
+        }
+    }
+    else if (command.payload == "endpoints")
+    {
+        repStr.push_back('[');
+        for (const auto &ept : endpoints)
+        {
+            repStr.append(ept.first);
+            repStr.push_back(';');
+        }
+    }
+    else if (command.payload == "brokers")
+    {
+        repStr.push_back('[');
+        for (const auto &brk : _brokers)
+        {
+            repStr.append(brk.name);
+            repStr.push_back(';');
+        }
+    }
+    else
+    {
+        repStr = "#invalid";
+        listV = false;
+    }
+    if (listV)
+    {
+        if (repStr.size() > 1)
+        {
+            repStr.back() = ']';
+        }
+        else
+        {
+            repStr.push_back(']');
+        }
+    }
+    
+    ActionMessage queryResp(CMD_QUERY_REPLY);
+    queryResp.dest_id = command.source_id;
+    queryResp.source_id = global_broker_id;
+    queryResp.index = command.index;
+    
+    queryResp.payload = repStr;
+    transmit(getRoute(queryResp.dest_id), queryResp);
+}
+
 int32_t CoreBroker::FillRouteInformation (ActionMessage &mess)
 {
     auto &endpointName = mess.info ().target;
@@ -120,6 +187,7 @@ int32_t CoreBroker::FillRouteInformation (ActionMessage &mess)
     }
     return 0;
 }
+
 void CoreBroker::processPriorityCommand (ActionMessage &&command)
 {
     // deal with a few types of message immediately
@@ -375,12 +443,12 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 {
                     transmit (brk.route_id, m);
                 }
-                timeCoord->enteringExecMode (convergence_state::complete);
+                timeCoord->enteringExecMode (iteration_request::no_iterations);
                 auto res = timeCoord->checkExecEntry ();
-                if (res == convergence_state::complete)
+                if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), convergence_state::complete, Time::maxVal (),
+                    timeCoord->timeRequest (Time::maxVal (), iteration_request::no_iterations, Time::maxVal (),
                                             Time::maxVal ());
                 }
             }
@@ -412,12 +480,12 @@ void CoreBroker::processCommand (ActionMessage &&command)
             transmit (brk.route_id, command);
         }
         {
-            timeCoord->enteringExecMode (convergence_state::complete);
+            timeCoord->enteringExecMode (iteration_request::no_iterations);
             auto res = timeCoord->checkExecEntry ();
-            if (res == convergence_state::complete)
+            if (res == iteration_state::next_step)
             {
                 enteredExecutionMode = true;
-                timeCoord->timeRequest (Time::maxVal (), convergence_state::complete, Time::maxVal (),
+                timeCoord->timeRequest (Time::maxVal (), iteration_request::no_iterations, Time::maxVal (),
                                         Time::maxVal ());
             }
         }
@@ -474,10 +542,10 @@ void CoreBroker::processCommand (ActionMessage &&command)
             if (!enteredExecutionMode)
             {
                 auto res = timeCoord->checkExecEntry ();
-                if (res == convergence_state::complete)
+                if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), convergence_state::complete, Time::maxVal (),
+                    timeCoord->timeRequest (Time::maxVal (), iteration_request::no_iterations, Time::maxVal (),
                                             Time::maxVal ());
                 }
             }
@@ -903,9 +971,7 @@ bool CoreBroker::connect ()
 
 bool CoreBroker::isConnected () const { return ((brokerState == operating) || (brokerState == connected)); }
 
-void CoreBroker::processDisconnect () { disconnect (); }
-
-void CoreBroker::disconnect ()
+void CoreBroker::processDisconnect (bool skipUnregister)
 {
     LOG_NORMAL (0, getIdentifier (), "||disconnecting");
     if (brokerState > broker_state_t::initialized)
@@ -914,8 +980,17 @@ void CoreBroker::disconnect ()
         brokerDisconnect ();
     }
     brokerState = broker_state_t::terminated;
+
+    if (!skipUnregister)
+    {
+        unregister ();
+    }
+}
+
+void CoreBroker::unregister ()
+{
     /*We need to ensure that the destructor is not called immediately upon calling unregister
-    otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
+    otherwise this would be a mess and probably cause segmentation faults so we capture it in a local variable
     that will be destroyed on function exit
     */
     auto keepBrokerAlive = BrokerFactory::findBroker (identifier);
@@ -932,6 +1007,8 @@ void CoreBroker::disconnect ()
         }
     }
 }
+
+void CoreBroker::disconnect () { processDisconnect (); }
 
 bool CoreBroker::FindandNotifySubscriptionPublisher (BasicHandleInfo &handleInfo)
 {
@@ -1166,9 +1243,11 @@ void CoreBroker::processQuery (const ActionMessage &m)
 {
     if ((m.info ().target == getIdentifier ()) || (m.info ().target == "broker"))
     {
+        generateQueryResult(m);
     }
     else if ((isRoot ()) && ((m.info ().target == "root") || (m.info ().target == "federation")))
     {
+        generateQueryResult(m);
     }
     else
     {
@@ -1238,6 +1317,10 @@ bool matchingTypes (const std::string &type1, const std::string &type2)
         return true;
     }
     if ((type1.empty ()) || (type2.empty ()))
+    {
+        return true;
+    }
+    if ((type1.compare (0, 3, "def") == 0) || (type2.compare (0, 3, "def") == 0))
     {
         return true;
     }

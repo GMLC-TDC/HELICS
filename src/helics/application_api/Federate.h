@@ -11,12 +11,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_FEDERATE_API_
 #pragma once
 
-#include "helics/config.h"
-#include "helics/core/helics-time.h"
+#include "helics/helics-config.h"
+#include "../core/helics-time.h"
 #include "helics_includes/string_view.h"
 
 #include "helicsTypes.hpp"
 
+#include "../core/coreFederateInfo.h"
+#include "../core/flag-definitions.h"
 #include <atomic>
 #include <string>
 
@@ -36,28 +38,16 @@ class asyncFedCallInfo;
 class MessageOperator;
 /** data class defining federate properties and information
  */
-class FederateInfo
+class FederateInfo: public CoreFederateInfo
 {
   public:
     std::string name;  //!< federate name
-    bool observer =
-      false;  //!< indicator that the federate is an observer and doesn't participate in time advancement
+    
     bool rollback = false;  //!< indicator that the federate has rollback features
-    bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must                         //! support rollback if set to true]
-    bool uninterruptible =
-      false;  //!< indicator that the time request cannot return something other than the requested time
-    bool sourceOnly = false;  //!< indicator that the federate is a source only
-    int32_t max_iterations = 10;  //!< the maximum number of iteration cycles a federate should execute
-    int32_t logLevel =
-      1;  //!< the logging level for the federate (-1: none, 0: error, 1:warning,2:normal,3:debug,4:trace)
+    bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must
+                                  //! support rollback if set to true]
     core_type coreType;  //!< the type of the core
     std::string coreName;  //!< the name of the core
-    Time timeDelta = timeZero;  //!< the minimum time between granted time requests
-    Time lookAhead = timeZero;  //!< the lookahead value
-    Time impactWindow = timeZero;  //!< the impact window
-    Time period = timeZero;  //!< the periodicity of the Federate granted time can only come on integer multipliers
-                             //!< of the period
-    Time offset = timeZero;  //!< the offset to the time period
     std::string coreInitString;  //!< an initialization string for the core API object
 
     /** default constructor*/
@@ -69,10 +59,15 @@ class FederateInfo
         : name (std::move (fedname)), coreType (cType){};
 };
 
+
+/** get a string with the helics version info*/
 std::string getHelicsVersionString();
 
+/** get the major version number*/
 int getHelicsVersionMajor();
+/** get the minor version number*/
 int getHelicsVersionMinor();
+/** get the patch version number*/
 int getHelicsVersionPatch();
 
 class Core;
@@ -114,7 +109,7 @@ class Federate
     @param[in] fi  a federate information structure
     */
     Federate (const FederateInfo &fi);
-    /**constructor taking a core and a federate information structure, sore information in fi is ignored
+    /**constructor taking a core and a federate information structure
     @param[in] fi  a federate information structure
     */
     Federate (std::shared_ptr<Core> core, const FederateInfo &fi);
@@ -151,20 +146,23 @@ class Federate
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
-    convergence_state enterExecutionState (convergence_state ProcessComplete = convergence_state::complete);
+    iteration_result enterExecutionState (iteration_request iterate = iteration_request::no_iterations);
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
-    void enterExecutionStateAsync (convergence_state ProcessComplete = convergence_state::complete);
+    void enterExecutionStateAsync (iteration_request iterate = iteration_request::no_iterations);
     /** finalize the async call for entering Execution state
     @details call will not block but will return quickly.  The enterInitializationStateFinalize must be called
     before doing other operations
     */
-    convergence_state enterExecutionStateFinalize ();
+    iteration_result enterExecutionStateFinalize ();
     /** terminate the simulation
     @details call is normally non-blocking, but may block if called in the midst of an
-    asynchronous call sequence*/
+    asynchronous call sequence, not core calling commands may be called */
     void finalize ();
+
+    /** disconnect a simulation from the core */
+    virtual void disconnect(); 
     /** specify the simulator had an unrecoverable error
      */
     void error (int errorcode);
@@ -172,7 +170,7 @@ class Federate
      */
     void error (int errorcode, const std::string &message);
 
-    /** specify a separator to use for naming separation
+    /** specify a separator to use for naming separation between the federate name and the interface name
      */
     void setSeparator (char separator) { separator_ = separator; }
     /** request a time advancement
@@ -183,7 +181,7 @@ class Federate
     /** request a time advancement
     @param[in] the next requested time step
     @return the granted time step*/
-    iterationTime requestTimeIterative (Time nextInternalTimeStep, convergence_state iterationComplete);
+    iterationTime requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate);
 
     /** request a time advancement
     @param[in] the next requested time step
@@ -193,7 +191,7 @@ class Federate
     /** request a time advancement
     @param[in] the next requested time step
     @return the granted time step*/
-    void requestTimeIterativeAsync (Time nextInternalTimeStep, convergence_state iterationComplete);
+    void requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate);
 
     /** request a time advancement
     @param[in] the next requested time step
@@ -227,6 +225,11 @@ class Federate
     @param[in] offset the shift of the period from 0  offset must be < period
     */
     void setPeriod (Time period, Time offset = timeZero);
+    /** set a flag for the federate
+    @param[in] period the length of time between each subsequent grants
+    @param[in] offset the shift of the period from 0  offset must be < period
+    */
+    virtual void setFlag(int flag, bool flagValue = true);
     /**  set the logging level for the federate
     @ details debug and trace only do anything if they were enabled in the compilation
     @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)

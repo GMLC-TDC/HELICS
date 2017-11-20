@@ -5,6 +5,7 @@
 build
 docs
 build*/
+install*/
 .vscode/
 bin/
 

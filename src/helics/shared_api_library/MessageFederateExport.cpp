@@ -8,14 +8,20 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "application_api/Endpoints.hpp"
-#include "application_api/application_api.h"
-#include "core/helics-time.h"
+#include "../application_api/Endpoints.hpp"
+#include "../application_api/application_api.h"
+#include "../core/helics-time.h"
 #include "helics.h"
-#include "shared_api_library/internal/api_objects.h"
+#include "internal/api_objects.h"
 #include <memory>
 #include <mutex>
 #include <vector>
+
+static inline void addEndpoint (helics_message_federate fed, helics::EndpointObject *ept)
+{
+    auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
+    fedObj->epts.push_back (ept);
+}
 
 helics_endpoint helicsRegisterEndpoint (helics_message_federate fed, const char *name, const char *type)
 {
@@ -31,6 +37,7 @@ helics_endpoint helicsRegisterEndpoint (helics_message_federate fed, const char 
         end = new helics::EndpointObject ();
         end->endptr = std::make_unique<helics::Endpoint> (fedObj.get (), name, type);
         end->fedptr = std::move (fedObj);
+        addEndpoint (fed, end);
         return reinterpret_cast<helics_endpoint> (end);
     }
     catch (const helics::InvalidFunctionCall &)
@@ -54,6 +61,7 @@ helics_endpoint helicsRegisterGlobalEndpoint (helics_message_federate fed, const
         end = new helics::EndpointObject ();
         end->endptr = std::make_unique<helics::Endpoint> (helics::GLOBAL, fedObj.get (), name, type);
         end->fedptr = std::move (fedObj);
+        addEndpoint (fed, end);
         return reinterpret_cast<helics_endpoint> (end);
     }
     catch (const helics::InvalidFunctionCall &)
@@ -92,8 +100,7 @@ helicsStatus helicsSendMessageRaw (helics_endpoint endpoint, const char *dest, c
     return helicsOK;
 }
 
-helicsStatus
-helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time)
+helicsStatus helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time)
 {
     if (endpoint == nullptr)
     {

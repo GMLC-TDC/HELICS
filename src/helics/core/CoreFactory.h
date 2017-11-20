@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_CORE_FACTORY_
 
 
-#include "helics/core/core-types.h"
+#include "core-types.h"
 #include <memory>
 #include <string>
 
@@ -72,6 +72,13 @@ namespace CoreFactory {
   @return the number of cores still operating
   */
 size_t cleanUpCores();
+/** clean up unused cores
+@details when Cores are unregistered they get put in a holding area that gets cleaned up when a new Core is registered
+or when the clean up function is called this prevents some odd threading issues
+@param delay the delay time in milliseconds to wait for the cores to finish before destroying
+@return the number of cores still operating
+*/
+size_t cleanUpCores(int delay);
 
   /** make a copy of the broker pointer to allow access to the new name
   */

@@ -9,8 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "UdpComms.h"
-#include "helics/core/ActionMessage.h"
-#include "helics/common/AsioServiceManager.h"
+#include "../ActionMessage.h"
+#include "../../common/AsioServiceManager.h"
 #include <memory>
 #include <boost/asio/ip/udp.hpp>
 

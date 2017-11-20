@@ -24,12 +24,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 /**
- * The GMLC TD&C core interface.  Abstract class that is
+ * The HELICS core interface.  Abstract class that is
  * implemented for the specific communication systems (e.g. ZMQ and
  * MPI).
  *
  * Multiple federates are allowed.  Due to the collective blocking
- * nature of some calls, like nextTime(), federates need to be in
+ * nature of some calls, like requestTime(), federates may need to be in
  * separate threads in order to function correctly.
  *
  *
@@ -42,31 +42,8 @@ namespace helics
  * Note: Methods should all be pure virtual, leaving syntactical sugar off while iterating API design.
  */
 
-/** class defining some required information about the federate*/
-class CoreFederateInfo
-{
-  public:
-    Time timeDelta = timeEpsilon;  // the minimum time advance allowed by the federate
-                                   // federate
-    Time lookAhead = timeZero;  //!< the lookahead value, the window of time between the time request return and
-                                //!< the availability of values
-    Time impactWindow = timeZero;  //!< the time it takes values to propagate to the Federate
-    Time period = timeZero;  //!< a period value,  all granted times must be on this period
-    Time offset = timeZero;  //!< offset to the time period
-    int logLevel;  //!< the logging level above which not to log to file
-    bool observer = false;  //!< flag indicating that the federate is an observer
-    bool uninteruptible =
-      false;  //!< flag indicating that the federate should never return a time other than requested
-    bool time_agnostic = false;  //!< flag indicating that the federate does not participate in time advancement
-                                 //!< and should be ignored in all timeRequest operations
-    bool source_only =
-      false;  //!< flag indicating that the federate does not receive or do anything with received information.
-              // 4 byte gap
-    bool filter_only = false;  //!< flag indicating that the source filter federate is not modifying the
-                               //!< destination of a filtered message only time or content
-                               // there is 1 bytes undefined in this structure
-    int16_t max_iterations = 3;  //!< the maximum number of iterations allowed for the federate
-};
+    //for
+    class CoreFederateInfo;
 
 /** the object defining the core interface through an abstract class*/
 class Core
@@ -170,8 +147,7 @@ class Core
      @return nonconverged if the executing state has not been entered and there are updates, complete if the
      simulation is ready to move on to the executing state
      */
-    virtual convergence_state
-    enterExecutingState (federate_id_t federateID, convergence_state converged = convergence_state::complete) = 0;
+    virtual iteration_result enterExecutingState (federate_id_t federateID, iteration_request iterate = NO_ITERATION) = 0;
 
     /**
      * Register a federate.
@@ -218,7 +194,7 @@ class Core
      *
      * Iterative federates may not invoke this method.
      *
-     * \param next
+     * @param next
      */
     virtual Time timeRequest (federate_id_t federateID, Time next) = 0;
 
@@ -236,7 +212,7 @@ class Core
      * grantedTime is the minimum of over all next
      * times in both reiterative and non-reiterative federates.
      *
-     * If a federate determines it cannot converge it should invoke the die() method.
+     * If a federate determines it cannot converge it should invoke the error() method.
      *
      * Federates only participate it in reiterations for times that
      * are evenly divisible by the federates time delta.
@@ -249,8 +225,7 @@ class Core
      * @param localConverged has the local federate converged
      @return an iterationTime object with two field stepTime and a bool indicating the iteration has completed
      */
-    virtual iterationTime
-    requestTimeIterative (federate_id_t federateID, Time next, convergence_state localConverged) = 0;
+    virtual iterationTime requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate) = 0;
 
     /**
      * Returns the current reiteration count for the specified federate.
@@ -272,7 +247,7 @@ class Core
      * May only be invoked in the initialize state.
      */
 
-    virtual void setMaximumIterations (federate_id_t federateID, uint64_t iterations) = 0;
+    virtual void setMaximumIterations (federate_id_t federateID, int32_t iterations) = 0;
 
     /**
      * Set the minimum time resolution for the specified federate.
@@ -282,7 +257,7 @@ class Core
      * This is useful for federates that are time-stepped and making
      * sub-time-step updates is not meaningful.
      *
-     * \param time
+     * @param time
      */
     virtual void setTimeDelta (federate_id_t federateID, Time time) = 0;
 
@@ -291,8 +266,8 @@ class Core
      *
      * The value is used to determine the interaction amongst various federates as to
      * when a specific federate can influence another
-     * \param federateID  the identifier for the federate
-     * \param timeLookAhead
+     * @param federateID  the identifier for the federate
+     * @param timeLookAhead
      */
     virtual void setLookAhead (federate_id_t federateID, Time timeLookAhead) = 0;
     /**
@@ -300,8 +275,8 @@ class Core
      *
      * The value is used to determine the interaction amongst various federates as to
      * when a specific federate can influence another
-     * \param federateID  the identifier for the federate
-     * \param timeLookAhead
+	* @param federateID  the identifier for the federate
+	* @param timeLookAhead
      */
     virtual void setPeriod (federate_id_t federateID, Time timePeriod) = 0;
     /**
@@ -309,9 +284,9 @@ class Core
     *
     * The value is used as a time shift for calculating the allowable time in a federate
     the granted time must one of N*period+offset
-    
-    * \param federateID  the identifier for the federate
-    * \param timeOffset the periodic phase shift
+    
+	* @param federateID  the identifier for the federate
+	* @param timeOffset the periodic phase shift
     */
     virtual void setTimeOffset (federate_id_t federateID, Time timeOffset) = 0;
     /**
@@ -319,18 +294,27 @@ class Core
      *
      * The value is used to determine the interaction amongst various federates as to
      * when a specific federate can influence another
-     * \param federateID  the identifier for the federate
-     * \param timeImpact the length of time it take outside message to propagate into a federate
+	* @param federateID  the identifier for the federate
+	* @param timeImpact the length of time it take outside message to propagate into a federate
      */
     virtual void setImpactWindow (federate_id_t federateID, Time timeImpact) = 0;
     /**
     Set the logging level
     @details set the logging level for an individual federate
     set federateID to 0 for the core logging level
-    * \param federateID  the identifier for the federate
-    * \param timeImpact the length of time it take outside message to propagate into a federate
+	* @param federateID  the identifier for the federate
+	* @param loggingLevel the level of logging to enable
+    <0-no logging, 0 -error only, 1- warnings, 2-normal, 3-debug, 4-trace
     */
     virtual void setLoggingLevel (federate_id_t federateID, int loggingLevel) = 0;
+
+    /**
+    Set a flag in a a federate
+    * @param federateID  the identifier for the federate
+    * @param flag an index code for the flag to set
+    @param flagValue the value to set the flag to
+    */
+    virtual void setFlag(federate_id_t federateID, int flag, bool flagValue=true) = 0;
     /**
      * Value interface.
      */
@@ -609,6 +593,14 @@ class Core
     query is answered so use with caution
     */
     virtual std::string query (const std::string &target, const std::string &queryStr) = 0;
+	/** supply a query callback function
+	@details the intention of the query callback is to allow federates to answer particular requests through the query interface
+	this allows other federates to make requests or queries of other federates in an asynchronous fashion.  
+	@param federateID the indentifier for the federate
+	@param queryFunction  a function object that returns a string as a result of a query in the form of const string ref.  
+	This callback will be called when a federate received a query that cannot be answered that directed at a particular federate
+	*/
+	virtual void setQueryCallback(federate_id_t federateID, std::function<std::string(const std::string &)> queryFunction)=0;
 };
 
 // set at a large negative number but not the largest negative number

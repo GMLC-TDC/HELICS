@@ -10,8 +10,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_UDP_CORE_
 #pragma once
 
-#include "core/CommonCore.h"
-#include "core/CommsBroker.hpp"
+#include "../CommonCore.h"
+#include "../CommsBroker.hpp"
 
 namespace helics {
 

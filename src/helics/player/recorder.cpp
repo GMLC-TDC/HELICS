@@ -8,9 +8,9 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/application_api/Subscriptions.hpp"
-#include "helics/application_api/ValueFederate.h"
-#include "helics/application_api/queryFunctions.h"
+#include "../application_api/Subscriptions.hpp"
+#include "../application_api/ValueFederate.h"
+#include "../application_api/queryFunctions.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>

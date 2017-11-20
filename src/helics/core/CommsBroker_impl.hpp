@@ -11,9 +11,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #ifndef COMMS_BROKER_IMPL_H_
 #define COMMS_BROKER_IMPL_H_
 #pragma once
-#include "core/BrokerBase.h"
-#include "core/CommsBroker.hpp"
-#include "core/CommsInterface.h"
+#include "BrokerBase.h"
+#include "CommsBroker.hpp"
+#include "CommsInterface.h"
 #include <atomic>
 #include <mutex>
 #include <thread>

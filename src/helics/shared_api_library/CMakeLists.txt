@@ -44,6 +44,6 @@ target_link_libraries(helicsSharedLib ws2_32)
 ENDIF(MINGW)
 
 
-INSTALL(TARGETS helicsSharedLib DESTINATION lib)
+INSTALL(TARGETS helicsSharedLib DESTINATION lib/helics EXPORT helics-targets)
 
 

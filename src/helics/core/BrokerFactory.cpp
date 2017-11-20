@@ -9,21 +9,22 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "BrokerFactory.h"
-#include "helics/common/delayedDestructor.hpp"
-#include "helics/common/searchableObjectHolder.hpp"
-#include "helics/config.h"
-#include "helics/core/core-types.h"
+#include "../common/delayedDestructor.hpp"
+#include "../common/searchableObjectHolder.hpp"
+#include "core-exceptions.h"
+#include "core-types.h"
+#include "helics/helics-config.h"
 #if HELICS_HAVE_ZEROMQ
-#include "helics/core/zmq/ZmqBroker.h"
+#include "zmq/ZmqBroker.h"
 #endif
 
 #if HELICS_HAVE_MPI
-#include "helics/core/mpi/mpiBroker.h"
+#include "mpi/mpiBroker.h"
 #endif
 
-#include "helics/core/TestBroker.h"
-#include "helics/core/ipc/IpcBroker.h"
-#include "helics/core/udp/UdpBroker.h"
+#include "TestBroker.h"
+#include "ipc/IpcBroker.h"
+#include "udp/UdpBroker.h"
 
 #include <cassert>
 
@@ -48,7 +49,7 @@ std::shared_ptr<CoreBroker> makeBroker (core_type type, const std::string &name)
         }
 
 #else
-        assert (false);
+        throw (HelicsException ("ZMQ broker type is not available"));
 #endif
         break;
     }
@@ -64,7 +65,7 @@ std::shared_ptr<CoreBroker> makeBroker (core_type type, const std::string &name)
             broker = std::make_shared<MpiBroker> (name);
         }
 #else
-        assert (false);
+        throw (HelicsException ("mpi broker type is not available"));
 #endif
         break;
     }
@@ -101,8 +102,10 @@ std::shared_ptr<CoreBroker> makeBroker (core_type type, const std::string &name)
             broker = std::make_shared<UdpBroker> (name);
         }
         break;
+    case core_type::TCP:
+        throw (HelicsException ("TCP broker type is not available"));
     default:
-        assert (false);
+        throw (HelicsException ("unrecognized broker type"));
     }
     return broker;
 }
@@ -183,19 +186,27 @@ bool available (core_type type)
         available = true;
         break;
     default:
-        assert (false);
+        break;
     }
 
     return available;
 }
 
+/** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
+ * loops*/
+static auto destroyerCallFirst = [](auto &broker) {
+    broker->processDisconnect (
+      true);  // use true here as it is possible the searchableObjectHolder is deleted already
+    broker->joinAllThreads ();
+};
 /** so the problem this is addressing is that unregister can potentially cause a destructor to fire
 that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
 can do the unregister operation and destroy itself meaning it is unable to join and thus will call std::terminate
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be without issue*/
 
-static DelayedDestructor<CoreBroker> delayedDestroyer;  //!< the object handling the delayed destruction
+static DelayedDestructor<CoreBroker>
+  delayedDestroyer (destroyerCallFirst);  //!< the object handling the delayed destruction
 
 static SearchableObjectHolder<CoreBroker> searchableObjects;  //!< the object managing the searchable objects
 
@@ -212,6 +223,7 @@ bool registerBroker (std::shared_ptr<CoreBroker> tbroker)
 }
 
 size_t cleanUpBrokers () { return delayedDestroyer.destroyObjects (); }
+size_t cleanUpBrokers (int delay) { return delayedDestroyer.destroyObjects (delay); }
 
 void copyBrokerIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {
@@ -251,6 +263,7 @@ void displayHelp (core_type type)
         break;
     case core_type::UDP:
         UdpBroker::displayHelp (true);
+        break;
     default:
 #if HELICS_HAVE_ZEROMQ
         ZmqBroker::displayHelp (true);
@@ -261,6 +274,7 @@ void displayHelp (core_type type)
         IpcBroker::displayHelp (true);
 
         TestBroker::displayHelp (true);
+        UdpBroker::displayHelp (true);
         break;
     }
 

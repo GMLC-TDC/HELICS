@@ -8,12 +8,13 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
+
 #ifndef _CORE_DATA_TYPES_H_
 #define _CORE_DATA_TYPES_H_
 #pragma once
 
 #include "helics-time.h"
-#include "helics/config.h"
+#include "helics/helics-config.h"
 
 #include <cstdint>
 #include <memory>
@@ -93,6 +94,8 @@ class data_block
     bool operator== (const std::string &str) const { return m_data == str; }
     /** less then operator to order the data_blocks if need be*/
     bool operator< (const data_block &db) const { return (m_data < db.m_data); }
+    /** less then operator to order the data_blocks if need be*/
+    bool operator> (const data_block &db) const { return (m_data > db.m_data); }
     /** return a pointer to the data*/
     char *data () { return &(m_data.front ()); }
     /** if the object is const return a const pointer*/
@@ -125,6 +128,11 @@ class data_block
     /** add a character to the data*/
     void push_back (char newchar) { m_data.push_back (newchar); }
 };
+
+inline bool operator!=(const data_block &db1, const data_block &db2)
+{
+    return !(db1 == db2);
+}
 
 /** class containing a message structure*/
 class Message
@@ -169,7 +177,7 @@ class FilterOperator
     virtual ~FilterOperator () = default;
     /** filter the message either modify the message or generate a new one*/
     virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) = 0;
-    /** functionalize the processing
+    /** make the operator work like one
     @details calls the process function*/
     std::unique_ptr<Message> operator() (std::unique_ptr<Message> message)
     {

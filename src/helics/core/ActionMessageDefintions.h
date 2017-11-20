@@ -24,7 +24,7 @@ const int32_t cmd_info_basis = 0x10000000;
 across different compilers*/
 enum class action_t : int32_t
 {
-	//priority commands
+	//priority commands ALL priority commands have a negative code
 	cmd_priority_disconnect = -3,  //!< command to disconnect a broker from a higher level broker
 	cmd_fed_ack = -25,  //!<a reply with the global id or an error if the fed registration failed
 
@@ -67,6 +67,8 @@ enum class action_t : int32_t
 	cmd_remove_dependency =  97,  //!< command to remove a dependency
 	cmd_add_dependent =  98,  //!< command to add a dependent to a federate
 	cmd_remove_dependent =  99,  //!< command to remove a dependent from a federates consideration
+
+    cmd_fed_configure = 205,  //!< command to update the configuration of a federate
 
 	null_info_command = cmd_info_basis - 1, //!< biggest command that doesn't have the info structure
 	priority_null_info_command=-cmd_info_basis-1, //!< the biggest negative priority command
@@ -124,12 +126,14 @@ enum class action_t : int32_t
 #define CMD_ERROR action_message_def::action_t::cmd_error
 #define CMD_REG_PUB action_message_def::action_t::cmd_reg_pub
 #define CMD_NOTIFY_PUB action_message_def::action_t::cmd_notify_pub
+
 #define CMD_REG_SUB action_message_def::action_t::cmd_reg_sub
 #define CMD_NOTIFY_SUB action_message_def::action_t::cmd_notify_sub
 #define CMD_REG_END action_message_def::action_t::cmd_reg_end
 #define CMD_NOTIFY_END action_message_def::action_t::cmd_notify_end
 #define CMD_REG_DST_FILTER action_message_def::action_t::cmd_reg_dst_filter
 #define CMD_NOTIFY_DST_FILTER action_message_def::action_t::cmd_notify_dst_filter
+
 #define CMD_REG_SRC_FILTER action_message_def::action_t::cmd_reg_src_filter
 #define CMD_NOTIFY_SRC_FILTER action_message_def::action_t::cmd_notify_src_filter
 #define CMD_SRC_FILTER_HAS_OPERATOR action_message_def::action_t::cmd_src_filter_has_operator
@@ -146,6 +150,8 @@ enum class action_t : int32_t
 #define CMD_PROTOCOL action_message_def::action_t::cmd_protocol
 #define CMD_PROTOCOL_BIG action_message_def::action_t::cmd_protocol_big
 
+#define CMD_FED_CONFIGURE action_message_def::action_t::cmd_fed_configure
+
 #define CMD_ACK action_message_def::action_t::cmd_ack
 #define CMD_PRIORITY_ACK action_message_def::action_t::cmd_priority_ack
 
@@ -158,7 +164,7 @@ enum class action_t : int32_t
 #define CLOSE_RECEIVER 23425215
 #define NEW_ROUTE 233
 #define DISCONNECT 2523
-
+#define DISCONNECT_ERROR 2623
 //for requesting port definitions on a computer
 #define PORT_DEFINITIONS 1451
 #define QUERY_PORTS 1453
@@ -166,12 +172,26 @@ enum class action_t : int32_t
 #define SET_USED_PORTS 1457
 #define NULL_REPLY 0;
 
+//definitions for FED_CONFIGURE_COMMAND
+#define UPDATE_LOOKAHEAD 0
+#define UPDATE_IMPACT_WINDOW 1
+#define UPDATE_MINDELTA 2
+#define UPDATE_PERIOD 3
+#define UPDATE_OFFSET 4
+#define UPDATE_MAX_ITERATION 5
+#define UPDATE_LOG_LEVEL 6
+#define UPDATE_FLAG 7
+
+/** check if the action has an info structure associated with it*/
 inline bool hasInfo(action_message_def::action_t action)
 {
 	return ((action > action_message_def::action_t::null_info_command) || (action < action_message_def::action_t::priority_null_info_command));
 }
-
-std::string actionMessageType(action_message_def::action_t action);
+/** return the name of the action 
+@param action The action to get the name for
+@return a pointer to string with the name
+*/
+const char *actionMessageType(action_message_def::action_t action);
 
 }  // namespace helics
 #endif  // ACTION_MESSAGE_DEFINITIONS_

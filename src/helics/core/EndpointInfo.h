@@ -9,10 +9,10 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #ifndef _HELICS_ENDPOINTINFO_
 #define _HELICS_ENDPOINTINFO_
 
-#include "helics/config.h"
+#include "helics/helics-config.h"
 #include "helics-time.h"
-#include "helics/common/blocking_queue.h"
-#include "helics/core/core.h"
+#include "../common/blocking_queue.h"
+#include "core.h"
 
 #include <deque>
 #include <mutex>

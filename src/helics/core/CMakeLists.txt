@@ -12,6 +12,7 @@ set(SRC_FILES
 	CommonCore.cpp
 	FederateState.cpp
 	SubscriptionInfo.cpp
+	PublicationInfo.cpp
 	FilterInfo.cpp
 	EndpointInfo.cpp
 	ActionMessage.cpp
@@ -57,6 +58,7 @@ set(INCLUDE_FILES
     CoreFactory.h
 	BrokerFactory.h
 	TimeDependencies.h
+	coreFederateInfo.h
 	core-exceptions.h
 	TimeCoordinator.h
 	loggingHelper.hpp
@@ -81,6 +83,7 @@ set(INCLUDE_FILES
 	FilterFunctions.h
 	TestBroker.h
 	argParser.h
+	flag-definitions.h
 )
 
 set(IPC_HEADER_FILES
