@@ -85,6 +85,7 @@ branches:
 
 
 before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" && "$TRAVIS_BRANCH" != "master" && "$TRAVIS_BRANCH" != "develop" ]]; exit 1 ;fi
   - eval "${MATRIX_EVAL}"
 
 install:
