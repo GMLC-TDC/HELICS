@@ -16,6 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics_includes/string_view.h"
 
 #include "../core/coreFederateInfo.h"
+#include "../core/flag-definitions.h"
 #include <atomic>
 #include <string>
 
@@ -55,10 +56,15 @@ class FederateInfo: public CoreFederateInfo
         : name (std::move (fedname)), coreType (cType){};
 };
 
+
+/** get a string with the helics version info*/
 std::string getHelicsVersionString();
 
+/** get the major version number*/
 int getHelicsVersionMajor();
+/** get the minor version number*/
 int getHelicsVersionMinor();
+/** get the patch version number*/
 int getHelicsVersionPatch();
 
 class Core;
@@ -100,7 +106,7 @@ class Federate
     @param[in] fi  a federate information structure
     */
     Federate (const FederateInfo &fi);
-    /**constructor taking a core and a federate information structure, sore information in fi is ignored
+    /**constructor taking a core and a federate information structure
     @param[in] fi  a federate information structure
     */
     Federate (std::shared_ptr<Core> core, const FederateInfo &fi);
@@ -193,7 +199,7 @@ class Federate
     @return the granted time step*/
     iterationTime requestTimeIterativeFinalize ();
 
-    /** set the mimimum time delta for the federate
+    /** set the minimum time delta for the federate
     @param[in] tdelta the minimum time delta to return from a time request function
     */
     void setTimeDelta (Time tdelta);
@@ -216,6 +222,11 @@ class Federate
     @param[in] offset the shift of the period from 0  offset must be < period
     */
     void setPeriod (Time period, Time offset = timeZero);
+    /** set a flag for the federate
+    @param[in] period the length of time between each subsequent grants
+    @param[in] offset the shift of the period from 0  offset must be < period
+    */
+    virtual void setFlag(int flag, bool flagValue = true);
     /**  set the logging level for the federate
     @ details debug and trace only do anything if they were enabled in the compilation
     @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)

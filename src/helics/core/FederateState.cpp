@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "PublicationInfo.h"
 #include "SubscriptionInfo.h"
 #include "TimeCoordinator.h"
+#include "flag-definitions.h"
 
 #include <algorithm>
 #include <chrono>
@@ -52,11 +53,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #else
 #define LOG_TRACE(message)
 #endif
-#else //LOGGING_DISABLED
+#else  // LOGGING_DISABLED
 #define LOG_NORMAL(message)
 #define LOG_DEBUG(message)
 #define LOG_TRACE(message)
-#endif //LOGGING_DISABLED
+#endif  // LOGGING_DISABLED
 
 namespace helics
 {
@@ -139,18 +140,21 @@ CoreFederateInfo FederateState::getInfo () const
     return timeCoord->getFedInfo ();
 }
 
-void FederateState::UpdateFederateInfo (CoreFederateInfo &newInfo)
+void FederateState::UpdateFederateInfo (const ActionMessage &cmd)
 {
-    // TODO:: change the check into the timeCoord
-    if (newInfo.timeDelta <= timeZero)
+    if (cmd.action () != CMD_FED_CONFIGURE)
     {
-        newInfo.timeDelta = timeEpsilon;
+        return;
     }
-    std::lock_guard<std::mutex> lock (_mutex);
-    logLevel = newInfo.logLevel;
-    only_update_on_change = newInfo.only_update_on_change;
-    only_transmit_on_change = newInfo.only_transmit_on_change;
-    timeCoord->setInfo (newInfo);
+    if (state == HELICS_CREATED)
+    {
+        std::lock_guard<std::mutex> lock (_mutex);
+        processConfigUpdate (cmd);
+    }
+    else
+    {
+        addAction (cmd);
+    }
 }
 
 void FederateState::createSubscription (Core::Handle handle,
@@ -617,7 +621,7 @@ iterationTime FederateState::requestTime (Time nextTime, iteration_request itera
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
         events.clear ();  // clear the event queue
-        LOG_TRACE(timeCoord->printTimeStatus());
+        LOG_TRACE (timeCoord->printTimeStatus ());
         timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
         queue.push (CMD_TIME_CHECK);
         auto ret = processQueue ();
@@ -868,7 +872,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             subI->addData (cmd.actionTime + timeCoord->getFedInfo ().impactWindow,
                            std::make_shared<const data_block> (std::move (cmd.payload)));
             timeCoord->updateValueTime (cmd.actionTime);
-            LOG_TRACE(timeCoord->printTimeStatus());
+            LOG_TRACE (timeCoord->printTimeStatus ());
         }
     }
     break;
@@ -989,6 +993,30 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     return iteration_state::continue_processing;
 }
 
+void FederateState::processConfigUpdate (const ActionMessage &m)
+{
+    timeCoord->processConfigUpdateMessage (m);
+    switch (m.index)
+    {
+    case UPDATE_LOG_LEVEL:
+        logLevel = static_cast<int> (m.dest_id);
+        break;
+    case UPDATE_FLAG:
+        switch (m.dest_id)
+        {
+        case ONLY_TRANSMIT_ON_CHANGE_FLAG:
+            only_transmit_on_change = m.flag;
+            break;
+        case ONLY_UPDATE_ON_CHANGE_FLAG:
+            only_update_on_change = m.flag;
+            break;
+        default:
+            break;
+        }
+    default:
+        break;
+    }
+}
 const std::vector<Core::federate_id_t> &FederateState::getDependents () const
 {
     return timeCoord->getDependents ();

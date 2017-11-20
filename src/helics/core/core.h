@@ -247,7 +247,7 @@ class Core
      */
 
 	
-    virtual void setMaximumIterations (federate_id_t federateID, uint64_t iterations) = 0;
+    virtual void setMaximumIterations (federate_id_t federateID, int32_t iterations) = 0;
 
     /**
      * Set the minimum time resolution for the specified federate.
@@ -306,6 +306,14 @@ class Core
 	* @param timeImpact the length of time it take outside message to propagate into a federate
 	*/
 	virtual void setLoggingLevel(federate_id_t federateID, int loggingLevel) = 0;
+
+    /**
+    Set a flag in a a federate
+    * @param federateID  the identifier for the federate
+    * @param flag an index code for the flag to set
+    @param flagValue the value to set the flag to
+    */
+    virtual void setFlag(federate_id_t federateID, int flag, bool flagValue=true) = 0;
     /**
      * Value interface.
      */

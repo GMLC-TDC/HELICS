@@ -152,14 +152,25 @@ using archiver = cereal::PortableBinaryOutputArchive;
 
 using retriever = cereal::PortableBinaryInputArchive;
 
-void ActionMessage::toByteArray (char *data, size_t buffer_size) const
+int ActionMessage::toByteArray(char *data, size_t buffer_size) const
 {
-    boost::iostreams::basic_array_sink<char> sr (data, buffer_size);
-    boost::iostreams::stream<boost::iostreams::basic_array_sink<char>> s (sr);
+    if ((data == nullptr) || (buffer_size == 0))
+    {
+        return -1;
+    }
+    boost::iostreams::basic_array_sink<char> sr(data, buffer_size);
+    boost::iostreams::stream<boost::iostreams::basic_array_sink<char>> s(sr);
 
-    archiver oa (s);
-
-    save (oa);
+    archiver oa(s);
+    try
+    {
+        save(oa);
+        return static_cast<int>(boost::iostreams::seek(s, 0, std::ios_base::cur));
+    }
+    catch (const std::ios_base::failure &)
+    {
+        return -1;
+   }
 }
 
 std::string ActionMessage::to_string () const
@@ -273,7 +284,7 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_reg_broker, "reg_broker"},
 
   {action_message_def::action_t::cmd_ignore, "ignore"},
-
+  { action_message_def::action_t::cmd_fed_configure, "fed_configure" },
   {action_message_def::action_t::cmd_init, "init"},
   {action_message_def::action_t::cmd_init_grant, "init_grant"},
   {action_message_def::action_t::cmd_init_not_ready, "init_not_ready"},
@@ -328,20 +339,20 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
 using actionPair = std::pair<action_message_def::action_t, const char *>;
 constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
 
-std::string actionMessageType (action_message_def::action_t action)
+const char * actionMessageType (action_message_def::action_t action)
 {
     auto pptr = static_cast<const actionPair *> (actionStrings);
     auto res = std::find_if (pptr, pptr + actEnd, [action](const auto &pt) { return (pt.first == action); });
     if (res != pptr + actEnd)
     {
-        return std::string (res->second);
+        return res->second;
     }
-    return std::string (static_cast<const char *> (nullStr));
+    return static_cast<const char *> (nullStr);
 }
 
 std::string prettyPrintString (const ActionMessage &command)
 {
-    std::string ret = actionMessageType (command.action ());
+    std::string ret(actionMessageType (command.action ()));
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -385,6 +396,8 @@ std::string prettyPrintString (const ActionMessage &command)
                      static_cast<double> (command.info ().Tdemin))
                       .str ());
         break;
+    case CMD_FED_CONFIGURE:
+
     default:
         break;
     }

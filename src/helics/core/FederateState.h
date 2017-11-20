@@ -188,6 +188,8 @@ private:
 	@return a convergence state value with an indicator of return reason and state of convergence
 	*/
 	iteration_state processActionMessage(ActionMessage &m);
+    /** process a message that updates the configuration of the federate for timing*/
+    void processConfigUpdate(const ActionMessage &m);
 	/** fill event list
 	@param the time of the update
 	*/
@@ -197,10 +199,11 @@ private:
 	  /** get the info structure for the federate
 	  */
 	  CoreFederateInfo getInfo() const;
-	/** update the info structure as an atomic operation
+	/** update the info structure 
+    @details public call so it also calls the federate lock before calling private update function
+    the action Message should be CMD_FED_CONFIGURE
 	*/
-    void UpdateFederateInfo (CoreFederateInfo &newInfo);
-
+    void UpdateFederateInfo(const ActionMessage &m);
 	/** get the granted time of a federate*/
     Time grantedTime () const { return time_granted; }
 	/**get a reference to the handles of subscriptions with value updates

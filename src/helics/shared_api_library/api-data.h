@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define HELICS_API_DATA_H_
 
 #include <stdint.h>
-
+#include "../core/flag-definitions.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -89,14 +89,6 @@ typedef struct message_t
     const char *dst;  //!< the final destination
 
 } message_t;
-
-#define OBSERVER_FLAG 0
-#define ROLLBACK_FLAG 1
-#define UNINTERRUPTIBLE_FLAG 2
-#define FORWARD_COMPUTE_FLAG 3
-#define SOURCE_ONLY_FLAG 4
-#define ONLY_TRANSMIT_ON_CHANGE 5
-#define ONLY_UPDATE_ON_CHANGE 6
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

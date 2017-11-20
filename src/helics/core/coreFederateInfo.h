@@ -12,7 +12,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "helics-time.h"
 
-
 namespace helics
 {
     /** class defining some required information about the federate*/

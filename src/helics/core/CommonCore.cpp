@@ -547,17 +547,17 @@ uint64_t CommonCore::getCurrentReiteration (federate_id_t federateID) const
     return fed->getCurrentIteration ();
 }
 
-void CommonCore::setMaximumIterations (federate_id_t federateID, uint64_t iterations)
+void CommonCore::setMaximumIterations (federate_id_t federateID, int32_t iterations)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
         throw (invalidIdentifier ("federateID not valid"));
     }
-
-    auto info = fed->getInfo ();
-    info.max_iterations = iterations;
-    fed->UpdateFederateInfo (info);
+        ActionMessage cmd (CMD_FED_CONFIGURE);
+        cmd.index = UPDATE_MAX_ITERATION;
+        cmd.dest_id = iterations;
+        fed->UpdateFederateInfo(cmd);
 }
 
 void CommonCore::setTimeDelta (federate_id_t federateID, Time time)
@@ -576,9 +576,10 @@ void CommonCore::setTimeDelta (federate_id_t federateID, Time time)
     {
         time = timeEpsilon;
     }
-    auto info = fed->getInfo ();
-    info.timeDelta = time;
-    fed->UpdateFederateInfo (info);
+        ActionMessage cmd (CMD_FED_CONFIGURE);
+        cmd.index = UPDATE_MINDELTA;
+        cmd.actionTime = time;
+        fed->UpdateFederateInfo(cmd);
 }
 
 void CommonCore::setLookAhead (federate_id_t federateID, Time lookAheadTime)
@@ -592,9 +593,10 @@ void CommonCore::setLookAhead (federate_id_t federateID, Time lookAheadTime)
     {
         throw (invalidParameter ());
     }
-    auto info = fed->getInfo ();
-    info.lookAhead = lookAheadTime;
-    fed->UpdateFederateInfo (info);
+        ActionMessage cmd (CMD_FED_CONFIGURE);
+        cmd.index = UPDATE_LOOKAHEAD;
+        cmd.actionTime =lookAheadTime;
+        fed->UpdateFederateInfo(cmd);
 }
 
 void CommonCore::setImpactWindow (federate_id_t federateID, Time impactTime)
@@ -609,9 +611,10 @@ void CommonCore::setImpactWindow (federate_id_t federateID, Time impactTime)
     {
         throw (invalidParameter ());
     }
-    auto info = fed->getInfo ();
-    info.impactWindow = impactTime;
-    fed->UpdateFederateInfo (info);
+        ActionMessage cmd (CMD_FED_CONFIGURE);
+        cmd.index = UPDATE_IMPACT_WINDOW;
+        cmd.actionTime = impactTime;
+        fed->UpdateFederateInfo(cmd);
 }
 
 void CommonCore::setPeriod (federate_id_t federateID, Time timePeriod)
@@ -625,9 +628,10 @@ void CommonCore::setPeriod (federate_id_t federateID, Time timePeriod)
     {
         throw (invalidParameter ());
     }
-    auto info = fed->getInfo ();
-    info.period = timePeriod;
-    fed->UpdateFederateInfo (info);
+        ActionMessage cmd (CMD_FED_CONFIGURE);
+        cmd.index = UPDATE_PERIOD;
+        cmd.actionTime = timePeriod;
+        fed->UpdateFederateInfo(cmd);
 }
 void CommonCore::setTimeOffset (federate_id_t federateID, Time timeOffset)
 {
@@ -636,23 +640,52 @@ void CommonCore::setTimeOffset (federate_id_t federateID, Time timeOffset)
     {
         throw (invalidIdentifier ("federateID not valid"));
     }
-
-    auto info = fed->getInfo ();
-    info.offset = timeOffset;
-    fed->UpdateFederateInfo (info);
+        ActionMessage cmd (CMD_FED_CONFIGURE);
+        cmd.index = UPDATE_OFFSET;
+        cmd.actionTime = timeOffset;
+        fed->UpdateFederateInfo(cmd);
 }
 
 void CommonCore::setLoggingLevel (federate_id_t federateID, int loggingLevel)
 {
+    if (federateID == 0)
+    {
+        std::lock_guard<std::mutex> lock(_mutex);
+        consoleLogLevel = loggingLevel;
+        fileLogLevel = loggingLevel;
+        return;
+    }
+
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
         throw (invalidIdentifier ("federateID not valid"));
     }
+        ActionMessage cmd (CMD_FED_CONFIGURE);
+        cmd.index = UPDATE_LOG_LEVEL;
+        cmd.dest_id = loggingLevel;
+        fed->UpdateFederateInfo(cmd);
+}
 
-    auto info = fed->getInfo ();
-    info.logLevel = loggingLevel;
-    fed->UpdateFederateInfo (info);
+void CommonCore::setFlag(federate_id_t federateID, int flag, bool flagValue)
+{
+    if (federateID == 0)
+    {
+        std::lock_guard<std::mutex> lock(_mutex);
+       
+        return;
+    }
+
+    auto fed = getFederate(federateID);
+    if (fed == nullptr)
+    {
+        throw (invalidIdentifier("federateID not valid"));
+    }
+        ActionMessage cmd(CMD_FED_CONFIGURE);
+        cmd.index = UPDATE_FLAG;
+        cmd.dest_id = flag;
+        cmd.flag = flagValue;
+        fed->UpdateFederateInfo(cmd);
 }
 
 Core::Handle CommonCore::getNewHandle () { return handleCounter++; }

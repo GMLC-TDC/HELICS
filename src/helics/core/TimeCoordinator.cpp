@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "TimeCoordinator.h"
 #include <boost/format.hpp>
-
+#include "flag-definitions.h"
 #include <algorithm>
 
 namespace helics
@@ -381,4 +381,55 @@ iteration_state TimeCoordinator::checkExecEntry ()
 }
 
 bool TimeCoordinator::processTimeMessage (ActionMessage &cmd) { return dependencies.updateTime (cmd); }
+
+void TimeCoordinator::processConfigUpdateMessage(const ActionMessage &cmd)
+{
+    switch (cmd.index)
+    {
+    case UPDATE_LOOKAHEAD:
+        info.lookAhead = cmd.actionTime;
+        break;
+    case UPDATE_IMPACT_WINDOW:
+        info.impactWindow = cmd.actionTime;
+        break;
+    case UPDATE_MINDELTA:
+        info.timeDelta = cmd.actionTime;
+        if (info.timeDelta <= timeZero)
+        {
+            info.timeDelta = timeEpsilon;
+        }
+        break;
+    case UPDATE_PERIOD:
+        info.period = cmd.actionTime;
+        break;
+    case UPDATE_OFFSET:
+        info.offset = cmd.actionTime;
+        break;
+    case UPDATE_MAX_ITERATION:
+        info.max_iterations = static_cast<int16_t>(cmd.dest_id);
+        break;
+    case UPDATE_LOG_LEVEL:
+        info.logLevel = static_cast<int>(cmd.dest_id);
+        break;
+    case UPDATE_FLAG:
+        switch (cmd.dest_id)
+        {
+        case UNINTERRUPTIBLE_FLAG:
+            info.uninterruptible = cmd.flag;
+            break;
+        case ONLY_TRANSMIT_ON_CHANGE_FLAG:
+            info.only_transmit_on_change = cmd.flag;
+            break;
+        case ONLY_UPDATE_ON_CHANGE_FLAG:
+            info.only_update_on_change = cmd.flag;
+            break;
+        case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
+            info.wait_for_current_time_updates = cmd.flag;
+            break;
+        default:
+            break;
+        }
+    }
+}
+
 }  // namespace helics

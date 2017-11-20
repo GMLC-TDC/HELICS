@@ -112,23 +112,23 @@ helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int
     case OBSERVER_FLAG:
         hfi->observer = (value != 0);
         break;
-    case ROLLBACK_FLAG:
-        hfi->rollback = (value != 0);
-        break;
     case UNINTERRUPTIBLE_FLAG:
         hfi->uninterruptible = (value != 0);
         break;
-    case FORWARD_COMPUTE_FLAG:
-        hfi->forwardCompute = (value != 0);
-        break;
-    case ONLY_TRANSMIT_ON_CHANGE:
+    case ONLY_TRANSMIT_ON_CHANGE_FLAG:
         hfi->only_transmit_on_change = (value != 0);
         break;
-    case ONLY_UPDATE_ON_CHANGE:
+    case ONLY_UPDATE_ON_CHANGE_FLAG:
         hfi->only_update_on_change = (value != 0);
         break;
     case SOURCE_ONLY_FLAG:
         hfi->source_only = (value != 0);
+        break;
+    case ROLLBACK_FLAG:
+        hfi->rollback = (value != 0);
+        break;
+    case FORWARD_COMPUTE_FLAG:
+        hfi->forwardCompute = (value != 0);
         break;
     default:
         return helicsDiscard;

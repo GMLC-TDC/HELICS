@@ -373,6 +373,28 @@ void Federate::setPeriod (Time period, Time offset)
 
 void Federate::setLoggingLevel (int loggingLevel) { coreObject->setLoggingLevel (fedID, loggingLevel); }
 
+
+void Federate::setFlag(int flag, bool flagValue)
+{
+    if ((flag > 10) || (flag < 0))
+    {
+        throw(InvalidParameterValue("flag must be between 0 and 10"));
+    }
+    switch (flag)
+    {
+    case ROLLBACK_FLAG:
+        FedInfo.rollback = flagValue;
+        break;
+    case FORWARD_COMPUTE_FLAG:
+        FedInfo.forwardCompute = flagValue;
+        break;
+    default:
+        coreObject->setFlag(fedID, flag, flagValue);
+        break;
+    }
+    
+
+}
 void Federate::finalize ()
 {
     switch (state)
