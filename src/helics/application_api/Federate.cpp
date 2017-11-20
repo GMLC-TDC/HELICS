@@ -25,6 +25,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 namespace helics
 {
@@ -672,13 +673,15 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     }
     else
     {
-        Json_helics::Reader stringReader;
-        bool ok = stringReader.parse (jsonString, doc, false);
-        if (!ok)
-        {
-            // should I throw an error here?
-            return fi;
-        }
+		Json_helics::CharReaderBuilder rbuilder;
+		std::string errs;
+		std::istringstream jstring(jsonString);
+		bool ok = Json_helics::parseFromStream(rbuilder, jstring, &doc, &errs);
+		if (!ok)
+		{
+			// should I throw an error here?
+			return fi;
+		}
     }
 
     if (doc.isMember ("name"))
