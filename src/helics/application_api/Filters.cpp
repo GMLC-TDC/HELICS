@@ -146,6 +146,7 @@ double randDouble (random_dists_t dist, double p1, double p2)
                             static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
     }
 
+
     auto &generator = *genPtr;
 
 #endif
