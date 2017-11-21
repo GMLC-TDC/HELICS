@@ -25,11 +25,11 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     echo "*** built swig successfully {$PATH}"
 
 elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    if [[ ! -f "cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/bin/cmake" ]]; then
+    if [[ ! -f "cmake-3.9.0-Darwin-x86_64/CMake.app/Contents/bin/cmake" ]]; then
         echo "*** install cmake"
-        wget --no-check-certificate http://cmake.org/files/v3.4/cmake-3.4.3-Darwin-x86_64.tar.gz && tar -xzf cmake-3.4.3-Darwin-x86_64.tar.gz;
+        wget --no-check-certificate http://cmake.org/files/v3.9/cmake-3.9.0-Darwin-x86_64.tar.gz && tar -xzf cmake-3.9.0-Darwin-x86_64.tar.gz;
     fi
-    export PATH="${PWD}/cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/bin:${PATH}"
+    export PATH="${PWD}/cmake-3.9.0-Darwin-x86_64/CMake.app/Contents/bin:${PATH}"
     echo "*** cmake installed ($PATH)"
 fi
 
