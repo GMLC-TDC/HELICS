@@ -26,26 +26,26 @@ class FilterInfo
 {
 public:
 	/** constructor from all fields*/
-	FilterInfo(Core::Handle id_,Core::federate_id_t fed_id_,
+	FilterInfo(Core::federate_id_t fed_id_, Core::Handle handle_,
 		const std::string &key_,
 		const std::string &type_,
 		const std::string &target_,
 		bool destFilter_)
-		: id(id_),
-		fed_id(fed_id_),
+		: fed_id(fed_id_), 
+        handle(handle_),
+		
 		key(key_),
 		inputType(type_),
 		dest_filter(destFilter_),
 		filterTarget(target_)
 	{
 	}
-
-	Core::Handle id=invalid_fed_id; //!< id handle of the filter
-	Core::federate_id_t fed_id=invalid_Handle;	//!< id of the core that manages the filter
+    Core::federate_id_t fed_id = invalid_fed_id;	//!< id of the core that manages the filter
+	Core::Handle handle= invalid_Handle; //!< id handle of the filter
+	
 	std::string key;	//!< the identifier of the filter
 	std::string inputType;	//!< the type of data for the filter
     std::string outputType; //!< the outputType of data of the filter
-	bool has_update = false;	//!< indicator that the filter has updates
 	bool dest_filter = false;	//! indicator that the filter is a destination filter
 	// there is a 6 byte gap here
 	std::shared_ptr<FilterOperator> filterOp;	//!< the callback operation of the filter

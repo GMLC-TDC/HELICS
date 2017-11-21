@@ -188,12 +188,12 @@ class ActionMessage
 
 
 
-/** create a new message object that copies all the information from the cmd into newly allocated memory for the
+/** create a new message object that copies all the information from the ActionMessage into newly allocated memory for the
  * message
  */
 std::unique_ptr<Message> createMessage (const ActionMessage &cmd);
 
-/** create a new message object that moves all the information from the cmd into newly allocated memory for the
+/** create a new message object that moves all the information from the ActionMessage into newly allocated memory for the
  * message
  */
 std::unique_ptr<Message> createMessage (ActionMessage &&cmd);

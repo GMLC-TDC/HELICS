@@ -15,32 +15,18 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <vector>
 namespace helics
 {
-/** helper data class to manage filtering
-*/
-class filterData
-{
-public:
-	Core::federate_id_t fed_id=invalid_fed_id; //!< the federate ID of the filter
-	Core::Handle handle=invalid_Handle; //!< the handle of the filter related to FederateID
-	bool hasOperator_flag=false;  //!< a flag indicating that the filter has an operator
-	std::string input_type;	//!< the input_type of the filter
-	std::string output_type;  //!< the output type of the filter
-	filterData() = default;
-	filterData(Core::federate_id_t fid, Core::Handle handle_, const std::string &inputType, const std::string &outputType) : fed_id(fid), handle(handle_), input_type(inputType), output_type(outputType)
-	{};
-};
 
+    class FilterInfo;
 /** class to manage the ordering of filter operations for an endpoint
 */
 class FilterCoordinator
 {
 public:
-	std::vector<filterData> sourceOperators; //!< ordered set of source operators
-	filterData finalSourceFilter;	//!< the final source filter
-	filterData destOperator;	//!< the destination operator handle
+	std::vector<FilterInfo *> sourceFilters; //!< ordered set of source operators
+    FilterInfo *finalSourceFilter=nullptr; //!< the last sourceFilter to trigger
+	FilterInfo *destOperator=nullptr;	//!< the destination operator handle
 
-	std::vector<filterData> allSourceFilters; //!< storage for all the source filters before sorting
-	bool hasSourceOperators=false; //!< indicator that the endpoint has source filter operators	
+	std::vector<FilterInfo *> allSourceFilters; //!< storage for all the source filters before sorting
 	bool hasSourceFilter=false;	//!< indicator that an endpoint has source filters
 	bool hasDestOperator=false;	//!< indicator that an endpoint has a destination filter
 };

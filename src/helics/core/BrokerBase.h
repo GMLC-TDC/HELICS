@@ -35,6 +35,7 @@ class BrokerBase
 {
 protected:
 	std::atomic<Core::federate_id_t> global_broker_id{ 0 };
+    Core::federate_id_t higher_broker_id=0;  //!< the id code of the broker 1 level about this broker
 	int32_t maxLogLevel = 1;  //!< the logging level to use levels >=this will be logged
 	int32_t consoleLogLevel = 1; //!< the logging level for console display
 	int32_t fileLogLevel = 1; //!< the logging level for logging to a file
@@ -66,6 +67,8 @@ protected:
 	};
 	std::atomic<broker_state_t> brokerState{ created }; //!< flag indicating that the structure is past the initialization stage indicating that no more changes can be made to the number of federates or handles
     bool noAutomaticID = false;
+    bool hasEndpoints = false; //!< set to true if the broker has endpoints;  
+    bool enteredExecutionMode = false; //!< flag indicating that the broker has entered execution mode
 public:
 	static void displayHelp();
 	BrokerBase() noexcept;

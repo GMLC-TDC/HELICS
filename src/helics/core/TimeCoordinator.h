@@ -114,7 +114,8 @@ public:
     /** process a message related to configuration
     */
     void processConfigUpdateMessage(const ActionMessage &cmd);
-
+    /** process a dependency update message*/
+    void processDependencyUpdateMessage(const ActionMessage &cmd);
 	/** add a federate dependency
 	@return true if it was actually added, false if the federate was already present
 	*/

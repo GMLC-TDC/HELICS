@@ -86,7 +86,6 @@ enum class action_t : int32_t
 						cmd_notify_sub =  70,  //!< notify of a subscription
 						cmd_reg_src_filter = cmd_info_basis + 80,  //!< register a source filter
 						cmd_notify_src_filter = cmd_info_basis + 82,  //!< notify of a source
-						cmd_src_filter_has_operator =82, //!< notify that a source filter has an operator
 						cmd_reg_end = cmd_info_basis + 90,  //!< register an endpoint
 						cmd_notify_end =  90,  //!< notify of an endpoint
 
@@ -136,7 +135,6 @@ enum class action_t : int32_t
 
 #define CMD_REG_SRC_FILTER action_message_def::action_t::cmd_reg_src_filter
 #define CMD_NOTIFY_SRC_FILTER action_message_def::action_t::cmd_notify_src_filter
-#define CMD_SRC_FILTER_HAS_OPERATOR action_message_def::action_t::cmd_src_filter_has_operator
 
 #define CMD_ADD_DEPENDENCY action_message_def::action_t::cmd_add_dependency
 #define CMD_REMOVE_DEPENDENCY action_message_def::action_t::cmd_remove_dependency

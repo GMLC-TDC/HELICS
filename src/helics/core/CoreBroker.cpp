@@ -701,38 +701,8 @@ void CoreBroker::processCommand (ActionMessage &&command)
 
         break;
     case CMD_ADD_DEPENDENCY:
-        if (command.dest_id != global_broker_id)
-        {
-            auto rt = getRoute (command.dest_id);
-            transmit (rt, command);
-        }
-        else
-        {
-            timeCoord->addDependency (command.source_id);
-        }
-        break;
     case CMD_ADD_DEPENDENT:
-        if (command.dest_id != global_broker_id)
-        {
-            auto rt = getRoute (command.dest_id);
-            transmit (rt, command);
-        }
-        else
-        {
-            timeCoord->addDependent (command.source_id);
-        }
-        break;
     case CMD_REMOVE_DEPENDENT:
-        if (command.dest_id != global_broker_id)
-        {
-            auto rt = getRoute (command.dest_id);
-            transmit (rt, command);
-        }
-        else
-        {
-            timeCoord->removeDependent (command.source_id);
-        }
-        break;
     case CMD_REMOVE_DEPENDENCY:
         if (command.dest_id != global_broker_id)
         {
@@ -741,7 +711,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         else
         {
-            timeCoord->removeDependency (command.source_id);
+            timeCoord->processDependencyUpdateMessage (command);
         }
         break;
     default:
@@ -808,7 +778,6 @@ void CoreBroker::addEndpoint (ActionMessage &m)
                           static_cast<int32_t> (_handles.size () - 1));
     addLocalInfo (_handles.back (), m);
 
-    bool addDep = (!m.processingComplete);
     if (!_isRoot)
     {
         m.processingComplete = true;
@@ -819,21 +788,6 @@ void CoreBroker::addEndpoint (ActionMessage &m)
         FindandNotifyEndpointFilters (_handles.back ());
     }
 
-    if (addDep)
-    {
-        bool added = timeCoord->addDependency (m.source_id);
-        if (added)
-        {
-            ActionMessage add (CMD_ADD_DEPENDENCY);
-            add.source_id = global_broker_id;
-            add.dest_id = m.source_id;
-            auto rt = getRoute (m.source_id);
-            transmit (rt, add);
-            add.setAction (CMD_ADD_DEPENDENT);
-            transmit (rt, add);
-            timeCoord->addDependent (m.source_id);
-        }
-    }
 }
 void CoreBroker::addSourceFilter (ActionMessage &m)
 {

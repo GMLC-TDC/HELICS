@@ -382,6 +382,25 @@ iteration_state TimeCoordinator::checkExecEntry ()
 
 bool TimeCoordinator::processTimeMessage (ActionMessage &cmd) { return dependencies.updateTime (cmd); }
 
+void TimeCoordinator::processDependencyUpdateMessage(const ActionMessage &cmd)
+{
+    switch (cmd.action())
+    {
+    case CMD_ADD_DEPENDENCY:
+        addDependency(cmd.source_id);
+        break;
+    case CMD_REMOVE_DEPENDENCY:
+        removeDependency(cmd.source_id);
+        break;
+    case CMD_ADD_DEPENDENT:
+        addDependent(cmd.source_id);
+        break;
+    case CMD_REMOVE_DEPENDENT:
+        removeDependent(cmd.source_id);
+        break;
+    }
+}
+
 void TimeCoordinator::processConfigUpdateMessage(const ActionMessage &cmd)
 {
     switch (cmd.index)

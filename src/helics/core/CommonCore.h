@@ -190,6 +190,17 @@ private:
 	/** process any filter or route the message*/
 	void processMessageFilter(ActionMessage &cmd);
 	
+    Filter *createSourceFilter(federate_id_t dest, Core::Handle handle,
+        const std::string &key,
+        const std::string &target,
+        const std::string &type);
+
+    Filter *createDestFilter(federate_id_t dest, 
+        Core::Handle handle,
+        const std::string &key,
+        const std::string &target,
+        const std::string &type);
+
 protected:
 	
 	int32_t _global_federation_size = 0;  //!< total size of the federation
@@ -201,11 +212,13 @@ protected:
   std::unordered_map<std::string, Handle> publications;	//!< map of all local publications
   std::unordered_map<std::string, Handle> endpoints;	//!< map of all local endpoints
   std::unordered_map<std::string, federate_id_t> federateNames;  //!< map of federate names to id
+  std::map<std::string, FilterInfo *> filterNames;  //!< translate names to filterObjects
   std::atomic<int> queryCounter{ 0 };
-  std::map<Handle, std::unique_ptr<FilterCoordinator>> filters; //!< map of all filters
+  std::map<Handle, std::unique_ptr<FilterCoordinator>> filterCoord; //!< map of all filters
+  std::vector<std::unique_ptr<FilterInfo>> filters;  //!< storage for all the filters
  private:
   mutable std::mutex _mutex; //!< mutex protecting the federate creation and modification
-  mutable std::mutex _handlemutex; //!< mutex protecting the publications and subscription structures
+  mutable std::mutex _handlemutex; //!< mutex protecting the publications, subscription, endpoint and filter structures
 /** a logging function for logging or printing messages*/
   
 protected:
@@ -243,7 +256,10 @@ protected:
   @param command the message to process
   */
   void processFilterInfo(ActionMessage &command);
-
+  /** get the information on a filter from the keyName*/
+  FilterInfo *getFilter(const std::string &subName) const;
+  /** get the information on a filter from the handle*/
+  FilterInfo *getFilter(Core::Handle handle_) const;
   /** organize filters
   @detsils organize the filter and report and potential warnings and errors
   */
