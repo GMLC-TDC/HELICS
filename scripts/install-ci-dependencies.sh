@@ -5,7 +5,7 @@ if [[ ! -f "dependencies" ]]; then
 fi
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    if [[ ! -f "cmake-3.4.3-Linux-x86_64/bin/cmake" ]]; then
+    if [[ ! -f "cmake-3.9.0-Linux-x86_64/bin/cmake" ]]; then
         echo "*** install cmake"
         wget --no-check-certificate http://cmake.org/files/v3.9/cmake-3.9.0-Linux-x86_64.tar.gz && tar -xzf cmake-3.9.0-Linux-x86_64.tar.gz;
     fi
