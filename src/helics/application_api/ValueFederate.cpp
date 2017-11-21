@@ -9,8 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "ValueFederate.h"
+#include "../core/core.h"
 #include "ValueFederateManager.h"
-#include "core/core.h"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -49,6 +49,12 @@ ValueFederate::ValueFederate (bool /*res*/)
 ValueFederate::ValueFederate (ValueFederate &&fed) noexcept = default;
 
 ValueFederate::~ValueFederate () = default;
+
+void ValueFederate::disconnect ()
+{
+    Federate::disconnect ();
+    vfManager->disconnect ();
+}
 
 ValueFederate &ValueFederate::operator= (ValueFederate &&fed) noexcept
 {

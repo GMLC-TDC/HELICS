@@ -10,14 +10,15 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define IPC_BROKER_H_
 #pragma once
 
-#include "core/CoreBroker.h"
+#include "../CoreBroker.h"
+#include "../CommsBroker.hpp"
 
 namespace helics
 {
 
 class IpcComms;
 
-class IpcBroker :public CoreBroker
+class IpcBroker final:public CommsBroker<IpcComms,CoreBroker>
 {
 public:
 	/** default constructor*/
@@ -29,22 +30,14 @@ public:
 
 	/**destructor*/
 	virtual ~IpcBroker();
-	virtual void transmit(int32_t route, const ActionMessage &command) override;
-
-	virtual void addRoute(int route_id, const std::string &routeInfo) override;
 
 	virtual std::string getAddress() const override;
 private:
 	virtual bool brokerConnect() override;
-	virtual void brokerDisconnect() override;
 private:
-	std::atomic<bool> initialized_{ false };  //!< atomic protecting local initialization
-	
-	std::string fileloc;
-	std::string brokerloc;
-	std::string brokername;
-	std::unique_ptr<IpcComms> comms;
-	mutable std::mutex dataMutex;  //mutex protecting the other information in the ipcBroker
+	std::string fileloc; //!< the name of the file that the shared memory queue is located
+	std::string brokerloc; //!< the name of the shared queue of the broker
+	std::string brokername; //!< the name of the broker
 };
 } //namespace helics
 #endif

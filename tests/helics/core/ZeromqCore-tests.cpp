@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
     BOOST_CHECK_GT (rxmsg.size (), 32);
 
     helics::ActionMessage rM (static_cast<char *> (rxmsg.data ()), rxmsg.size ());
-    BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_protocol);
+    BOOST_CHECK (helics::isProtocolCommand (rM));
     rM.index = DISCONNECT;
     repSocket.send (rM.to_string ());
     auto connected = confut.get ();
@@ -88,7 +88,8 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
     repSocket1.send (msg);
     // should still be waiting
     BOOST_CHECK (reqset.waiting ());
-    auto msgCnt = reqset.checkForMessages ();
+    auto msgCnt = reqset.checkForMessages (std::chrono::milliseconds (100));
+
     BOOST_CHECK (!reqset.waiting ());
     BOOST_CHECK_EQUAL (msgCnt, 1);
 
@@ -104,12 +105,13 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
     repSocket2.recv (&msg);
 
     repSocket2.send (msg);
-    reqset.checkForMessages ();
+    msgCnt = reqset.checkForMessages (std::chrono::milliseconds (100));
+
     BOOST_CHECK (reqset.waiting ());
     repSocket2.recv (&msg);
 
     repSocket2.send (msg);
-    reqset.checkForMessages ();
+    reqset.checkForMessages (std::chrono::milliseconds (100));
     BOOST_CHECK (!reqset.waiting ());
 
     BOOST_CHECK (reqset.hasMessages ());
@@ -152,7 +154,11 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
 
     repSocket3.send (msg);
     // make sure the check receives all messages
-    reqset.checkForMessages ();
+    reqset.checkForMessages (std::chrono::milliseconds (100));
+    if (reqset.waiting ())
+    {
+        reqset.checkForMessages (std::chrono::milliseconds (100));
+    }
     BOOST_CHECK (!reqset.waiting ());
     reqset.transmit (1, M);
     reqset.transmit (2, M);
@@ -174,7 +180,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     repSocket3.recv (&msg);
 
     repSocket3.send (msg);
-    BOOST_CHECK_EQUAL (reqset.checkForMessages (), 6);
+    BOOST_CHECK_EQUAL (reqset.checkForMessages (std::chrono::milliseconds (400)), 6);
 }
 
 BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
@@ -416,7 +422,6 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
     repSocket.send (resp.to_string ());
 
     core->disconnect ();
-    // boost::interprocess::message_queue::remove("testbroker");
 }
 
 /** test case checks default values and makes sure they all mesh together

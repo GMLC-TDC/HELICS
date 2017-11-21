@@ -17,22 +17,20 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test data_block and data_view objects
  */
 
-#include "helics/common/BlockingQueue3.hpp"
-#include "helics/common/blocking_queue.h"
+#include "helics/common/BlockingPriorityQueue.hpp"
 
-BOOST_AUTO_TEST_SUITE (blocking_queue_tests)
+BOOST_AUTO_TEST_SUITE (blocking_priority_queue_tests)
 
 /** test basic operations */
 BOOST_AUTO_TEST_CASE (basic_tests)
 {
-    BlockingQueue3<int> sq;
+    BlockingPriorityQueue<int> sq;
 
     sq.push (45);
     sq.push (54);
 
-    BOOST_CHECK (sq.empty () == false);
+    BOOST_CHECK (!sq.empty ());
 
-    BOOST_CHECK_EQUAL (sq.size (), 2);
     auto b = sq.try_pop ();
     BOOST_CHECK_EQUAL (*b, 45);
     b = sq.try_pop ();
@@ -41,26 +39,40 @@ BOOST_AUTO_TEST_CASE (basic_tests)
     b = sq.try_pop ();
     BOOST_CHECK (!(b));
     BOOST_CHECK (sq.empty ());
+
+    sq.push (45);
+    sq.push (54);
+
+    // check the prioritization is working
+    sq.pushPriority (65);
+
+    b = sq.try_pop ();
+    BOOST_CHECK_EQUAL (*b, 65);
+    b = sq.try_pop ();
+    BOOST_CHECK_EQUAL (*b, 45);
 }
 
 /** test with a move only element*/
 BOOST_AUTO_TEST_CASE (move_only_tests)
 {
-    BlockingQueue3<std::unique_ptr<double>> sq;
+    BlockingPriorityQueue<std::unique_ptr<double>> sq;
 
     sq.push (std::make_unique<double> (4534.23));
 
     auto e2 = std::make_unique<double> (34.234);
     sq.push (std::move (e2));
 
-    BOOST_CHECK (sq.empty () == false);
+    BOOST_CHECK (!sq.empty ());
 
-    BOOST_CHECK_EQUAL (sq.size (), 2);
     auto b = sq.try_pop ();
     BOOST_CHECK_EQUAL (**b, 4534.23);
     b = sq.try_pop ();
     BOOST_CHECK_EQUAL (**b, 34.234);
+    e2 = std::make_unique<double> (29.785);
+    sq.pushPriority (std::move (e2));
 
+    b = sq.try_pop ();
+    BOOST_CHECK_EQUAL (**b, 29.785);
     b = sq.try_pop ();
     BOOST_CHECK (!(b));
     BOOST_CHECK (sq.empty ());
@@ -70,7 +82,7 @@ BOOST_AUTO_TEST_CASE (move_only_tests)
 
 BOOST_AUTO_TEST_CASE (ordering_tests)
 {
-    BlockingQueue3<int> sq;
+    BlockingPriorityQueue<int> sq;
 
     for (int ii = 1; ii < 10; ++ii)
     {
@@ -88,6 +100,9 @@ BOOST_AUTO_TEST_CASE (ordering_tests)
     {
         sq.push (ii);
     }
+    sq.pushPriority (99);
+    b = sq.try_pop ();
+    BOOST_CHECK_EQUAL (*b, 99);
     for (int ii = 7; ii < 20; ++ii)
     {
         b = sq.try_pop ();
@@ -99,14 +114,18 @@ BOOST_AUTO_TEST_CASE (ordering_tests)
 
 BOOST_AUTO_TEST_CASE (emplace_tests)
 {
-    BlockingQueue3<std::pair<int, double>> sq;
+    BlockingPriorityQueue<std::pair<int, double>> sq;
 
     sq.emplace (10, 45.4);
     sq.emplace (11, 34.1);
     sq.emplace (12, 34.2);
+    sq.emplacePriority (14, 19.99);
 
-    BOOST_CHECK_EQUAL (sq.size (), 3);
     auto b = sq.try_pop ();
+    BOOST_CHECK_EQUAL (b->first, 14);
+    BOOST_CHECK_EQUAL (b->second, 19.99);
+
+    b = sq.try_pop ();
     BOOST_CHECK_EQUAL (b->first, 10);
     BOOST_CHECK_EQUAL (b->second, 45.4);
     b = sq.try_pop ();
@@ -114,10 +133,11 @@ BOOST_AUTO_TEST_CASE (emplace_tests)
     BOOST_CHECK_EQUAL (b->second, 34.1);
 }
 
+#ifndef QUICK_TESTS_ONLY
 /** test with single consumer/single producer*/
 BOOST_AUTO_TEST_CASE (multithreaded_tests)
 {
-    BlockingQueue3<int64_t> sq (1010000);
+    BlockingPriorityQueue<int64_t> sq (1010000);
 
     for (int64_t ii = 0; ii < 10'000; ++ii)
     {
@@ -158,7 +178,7 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests)
 /** test with single consumer / single producer */
 BOOST_AUTO_TEST_CASE (pop_tests)
 {
-    BlockingQueue3<int64_t> sq (1010000);
+    BlockingPriorityQueue<int64_t> sq (1010000);
 
     auto prod1 = [&]() {
         for (int64_t ii = 0; ii < 1'000'000; ++ii)
@@ -202,7 +222,7 @@ BOOST_AUTO_TEST_CASE (pop_tests)
 /** test with multiple consumer/single producer*/
 BOOST_AUTO_TEST_CASE (multithreaded_tests2)
 {
-    BlockingQueue3<int64_t> sq (1010000);
+    BlockingPriorityQueue<int64_t> sq (1010000);
 
     for (int64_t ii = 0; ii < 10'000; ++ii)
     {
@@ -247,7 +267,7 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests2)
 /** test with multiple producer/multiple consumer*/
 BOOST_AUTO_TEST_CASE (multithreaded_tests3)
 {
-    BlockingQueue3<int64_t> sq;
+    BlockingPriorityQueue<int64_t> sq;
     sq.reserve (3'010'000);
     for (int64_t ii = 0; ii < 10'000; ++ii)
     {
@@ -296,7 +316,7 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests3)
 /** test with multiple producer/multiple consumer*/
 BOOST_AUTO_TEST_CASE (multithreaded_tests3_pop)
 {
-    BlockingQueue3<int64_t> sq;
+    BlockingPriorityQueue<int64_t> sq;
     sq.reserve (3'010'000);
 
     auto prod1 = [&]() {
@@ -335,10 +355,11 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests3_pop)
     BOOST_CHECK_EQUAL (V1 + V2 + V3, 3'000'000);
 }
 
+#endif
 /** test with multiple producer/multiple consumer*/
 BOOST_AUTO_TEST_CASE (pop_callback_tests)
 {
-    BlockingQueue3<int64_t> sq;
+    BlockingPriorityQueue<int64_t> sq;
     int pushcnt = 0;
     auto prod1 = [&]() {
         sq.push (7);
@@ -361,116 +382,4 @@ BOOST_AUTO_TEST_CASE (pop_callback_tests)
     BOOST_CHECK_EQUAL (pushcnt, 127 + 25);
 }
 
-    //#define PERFORMANCE_TESTS
-
-#ifdef PERFORMANCE_TESTS
-#include <chrono>
-const std::string testString = "this is a test string that is sufficiently long";
-const std::pair<std::string, std::string> pairString{"this is a test string that is sufficiently long", "string2"};
-/** test with multiple producer/multiple consumer*/
-BOOST_AUTO_TEST_CASE (multithreaded_tests_perf)
-{
-    BlockingQueue3<std::pair<std::string, std::string>> sq;
-    int64_t cnt = 5'000'000;
-    sq.reserve (3 * cnt);
-
-    auto prod1 = [&]() {
-        for (int64_t ii = 0; ii < cnt; ++ii)
-        {
-            sq.push (pairString);
-        }
-    };
-
-    auto cons = [&]() {
-        auto res = sq.pop ();
-        int64_t cntr = 0;
-        while (!res.first.empty ())
-        {
-            ++cntr;
-            res = sq.pop ();
-        }
-        return cnt;
-    };
-
-    auto start_t = std::chrono::high_resolution_clock::now ();
-
-    auto ret1 = std::async (std::launch::async, prod1);
-    auto ret2 = std::async (std::launch::async, prod1);
-    auto ret3 = std::async (std::launch::async, prod1);
-
-    auto res1 = std::async (std::launch::async, cons);
-    // auto res2 = std::async(std::launch::async, cons);
-    // auto res3 = std::async(std::launch::async, cons);
-    ret1.wait ();
-    ret2.wait ();
-    ret3.wait ();
-    sq.push (std::make_pair (std::string (), std::string ()));
-    // sq.push(std::make_pair(std::string(), std::string()));
-    // sq.push(std::make_pair(std::string(), std::string()));
-    auto V1 = res1.get ();
-    // auto V2 = res2.get();
-
-    // auto V3 = res3.get();
-
-    auto stop_t = std::chrono::high_resolution_clock::now ();
-    std::chrono::duration<double> time_taken = stop_t - start_t;
-
-    printf ("BlockingQueue3 3 prod 3 cons completed in %f\n", time_taken.count ());
-
-    BOOST_CHECK_EQUAL (V1 /*+ V2 + V3*/, 3 * cnt);
-}
-
-/** test with multiple producer/multiple consumer*/
-BOOST_AUTO_TEST_CASE (multithreaded_tests_perf_bq)
-{
-    helics::BlockingQueue<std::pair<std::string, std::string>> sq;
-    int64_t cnt = 5'000'000;
-    auto prod1 = [&]() {
-        for (int64_t ii = 0; ii < cnt; ++ii)
-        {
-            sq.push (pairString);
-        }
-    };
-
-    auto cons = [&]() {
-        auto res = sq.pop ();
-        int64_t cntr = 0;
-        while (!res.first.empty ())
-        {
-            ++cntr;
-            res = sq.pop ();
-        }
-        return cnt;
-    };
-
-    auto start_t = std::chrono::high_resolution_clock::now ();
-
-    auto ret1 = std::async (std::launch::async, prod1);
-    auto ret2 = std::async (std::launch::async, prod1);
-    auto ret3 = std::async (std::launch::async, prod1);
-
-    auto res1 = std::async (std::launch::async, cons);
-    // auto res2 = std::async(std::launch::async, cons);
-    // auto res3 = std::async(std::launch::async, cons);
-    ret1.wait ();
-    ret2.wait ();
-    ret3.wait ();
-    sq.push (std::make_pair (std::string (), std::string ()));
-    // sq.push(std::make_pair(std::string(), std::string()));
-    // sq.push(std::make_pair(std::string(), std::string()));
-
-    auto V1 = res1.get ();
-    // auto V2 = res2.get();
-    // auto V3 = res3.get();
-
-    auto stop_t = std::chrono::high_resolution_clock::now ();
-
-    std::chrono::duration<double> time_taken = stop_t - start_t;
-
-    printf ("BlockingQueue 3 prod 3 cons completed in %f\n", time_taken.count ());
-
-    BOOST_CHECK_EQUAL (V1 /* + V2 + V3*/, 3 * cnt);
-}
-
-#endif
 BOOST_AUTO_TEST_SUITE_END ()

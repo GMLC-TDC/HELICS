@@ -11,7 +11,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "Message.h"
-#include "helics/core/core.h"
+#include "../core/core.h"
 #include "identifierTypes.hpp"
 #include <utility> 
 #include <cstdint>
@@ -52,6 +52,7 @@ namespace helics
 		Time lastUpdate = Time(0.0); //!< the time the subscription was last updated
 		Time lastQuery = Time(0.0); //!< the time the query was made
 		int callbackIndex = -1;  //!< index for the callback
+        bool hasUpdate = false;  //!< indicator that there was an update
 		subscription_info(const std::string &n_name, const std::string &n_type, const std::string &n_units) :
 			name(n_name), type(n_type), units(n_units)
 		{};
@@ -178,6 +179,8 @@ namespace helics
 		@param[in] callback the function to call
 		*/
 		void registerCallback(const std::vector<subscription_id_t> &ids, std::function<void(subscription_id_t, Time)> callback);
+        /** disconnect from the coreObject*/
+        void disconnect();
 	private:
 		std::unordered_map<std::string, publication_id_t> publicationNames; //!< map of the publication names
 		std::unordered_map<std::string, subscription_id_t> subscriptionNames; //!< map of the subscription names

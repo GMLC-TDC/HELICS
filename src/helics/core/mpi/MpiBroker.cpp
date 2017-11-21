@@ -33,15 +33,11 @@ namespace helics
 using namespace std::string_literals;
 static const argDescriptors extraArgs{{"brokerinit"s, "string"s, "the initialization string for the broker"s}};
 
-MpiBroker::MpiBroker (bool rootBroker) noexcept : CoreBroker (rootBroker) {}
+MpiBroker::MpiBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
-MpiBroker::MpiBroker (const std::string &broker_name) : CoreBroker (broker_name) {}
+MpiBroker::MpiBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
-MpiBroker::~MpiBroker ()
-{
-    haltOperations = true;
-    joinAllThreads ();
-}
+MpiBroker::~MpiBroker () {}
 
 void MpiBroker::InitializeFromArgs (int argc, const char *const *argv)
 {
@@ -72,12 +68,6 @@ bool MpiBroker::brokerConnect ()
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
     return comms->connect ();
 }
-
-void MpiBroker::brokerDisconnect () { comms->disconnect (); }
-
-void MpiBroker::transmit (int route_id, const ActionMessage &cmd) { comms->transmit (route_id, cmd); }
-
-void MpiBroker::addRoute (int route_id, const std::string &routeInfo) { comms->addRoute (route_id, routeInfo); }
 
 std::string MpiBroker::getAddress () const { return ""; }
 }  // namespace helics

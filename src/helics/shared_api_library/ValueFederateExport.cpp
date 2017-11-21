@@ -8,13 +8,13 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
+#include "../application_api/Publications.hpp"
+#include "../application_api/Subscriptions.hpp"
+#include "../application_api/application_api.h"
+#include "../application_api/helicsTypes.hpp"
+#include "../core/helics-time.h"
 #include "ValueFederate_c.h"
-#include "application_api/Publications.hpp"
-#include "application_api/Subscriptions.hpp"
-#include "application_api/application_api.h"
-#include "application_api/helicsTypes.hpp"
-#include "core/helics-time.h"
-#include "shared_api_library/internal/api_objects.h"
+#include "internal/api_objects.h"
 #include <map>
 #include <memory>
 #include <mutex>
@@ -27,9 +27,19 @@ int helicsValueFederateisUpdated (helics_value_federate vfed, helics_subscriptio
     return (int)(valuefed->isUpdated (subobj->id));
 }
 
+static inline void addSubscription (helics_value_federate fed, helics::SubscriptionObject *sub)
+{
+    auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
+    fedObj->subs.push_back (sub);
+}
+
+static inline void addPublication (helics_value_federate fed, helics::PublicationObject *pub)
+{
+    auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
+    fedObj->pubs.push_back (pub);
+}
 /* sub/pub registration */
-helics_subscription
-helicsRegisterSubscription (helics_value_federate fed, const char *key, const char *type, const char *units)
+helics_subscription helicsRegisterSubscription (helics_value_federate fed, const char *key, const char *type, const char *units)
 {
     auto htype = helics::getTypeFromString (type);
     if (htype != helics::helicsType_t::helicsInvalid)
@@ -49,6 +59,7 @@ helicsRegisterSubscription (helics_value_federate fed, const char *key, const ch
         sub->id = fedObj->registerOptionalSubscription (key, type, units);
         sub->rawOnly = true;
         sub->fedptr = std::move (fedObj);
+        addSubscription (fed, sub);
         return reinterpret_cast<helics_subscription> (sub);
     }
     catch (const helics::InvalidFunctionCall &)
@@ -57,8 +68,7 @@ helicsRegisterSubscription (helics_value_federate fed, const char *key, const ch
     }
     return nullptr;
 }
-helics_subscription
-helicsRegisterTypeSubscription (helics_value_federate fed, const char *key, int type, const char *units)
+helics_subscription helicsRegisterTypeSubscription (helics_value_federate fed, const char *key, int type, const char *units)
 {
     if ((type < 0) || (type > HELICS_VECTOR_TYPE))
     {
@@ -80,6 +90,7 @@ helicsRegisterTypeSubscription (helics_value_federate fed, const char *key, int 
         sub = new helics::SubscriptionObject ();
         sub->subptr = std::make_unique<helics::Subscription> (fedObj.get (), key, units);
         sub->fedptr = std::move (fedObj);
+        addSubscription (fed, sub);
         return reinterpret_cast<helics_subscription> (sub);
     }
     catch (const helics::InvalidFunctionCall &)
@@ -89,8 +100,7 @@ helicsRegisterTypeSubscription (helics_value_federate fed, const char *key, int 
     return nullptr;
 }
 
-helics_publication
-helicsRegisterPublication (helics_value_federate fed, const char *key, const char *type, const char *units)
+helics_publication helicsRegisterPublication (helics_value_federate fed, const char *key, const char *type, const char *units)
 {
     auto htype = helics::getTypeFromString (type);
     if (htype != helics::helicsType_t::helicsInvalid)
@@ -110,6 +120,7 @@ helicsRegisterPublication (helics_value_federate fed, const char *key, const cha
         pub->id = fedObj->registerPublication (key, type, units);
         pub->rawOnly = true;
         pub->fedptr = std::move (fedObj);
+        addPublication (fed, pub);
         return reinterpret_cast<helics_publication> (pub);
     }
     catch (const helics::InvalidFunctionCall &)
@@ -118,8 +129,7 @@ helicsRegisterPublication (helics_value_federate fed, const char *key, const cha
     }
     return nullptr;
 }
-helics_publication
-helicsRegisterTypePublication (helics_value_federate fed, const char *key, int type, const char *units)
+helics_publication helicsRegisterTypePublication (helics_value_federate fed, const char *key, int type, const char *units)
 {
     if ((type < 0) || (type > HELICS_VECTOR_TYPE))
     {
@@ -138,9 +148,9 @@ helicsRegisterTypePublication (helics_value_federate fed, const char *key, int t
     try
     {
         pub = new helics::PublicationObject ();
-        pub->pubptr = std::make_unique<helics::Publication> (fedObj.get (), key,
-                                                             static_cast<helics::helicsType_t> (type), units);
+        pub->pubptr = std::make_unique<helics::Publication> (fedObj.get (), key, static_cast<helics::helicsType_t> (type), units);
         pub->fedptr = std::move (fedObj);
+        addPublication (fed, pub);
         return reinterpret_cast<helics_publication> (pub);
     }
     catch (const helics::InvalidFunctionCall &)
@@ -150,8 +160,7 @@ helicsRegisterTypePublication (helics_value_federate fed, const char *key, int t
     return nullptr;
 }
 
-helics_publication
-helicsRegisterGlobalPublication (helics_value_federate fed, const char *key, const char *type, const char *units)
+helics_publication helicsRegisterGlobalPublication (helics_value_federate fed, const char *key, const char *type, const char *units)
 {
     auto htype = helics::getTypeFromString (type);
     if (htype != helics::helicsType_t::helicsInvalid)
@@ -171,6 +180,7 @@ helicsRegisterGlobalPublication (helics_value_federate fed, const char *key, con
         pub->id = fedObj->registerGlobalPublication (key, type, units);
         pub->rawOnly = true;
         pub->fedptr = std::move (fedObj);
+        addPublication (fed, pub);
         return reinterpret_cast<helics_publication> (pub);
     }
     catch (const helics::InvalidFunctionCall &)
@@ -180,8 +190,7 @@ helicsRegisterGlobalPublication (helics_value_federate fed, const char *key, con
     return nullptr;
 }
 
-helics_publication
-helicsRegisterGlobalTypePublication (helics_value_federate fed, const char *key, int type, const char *units)
+helics_publication helicsRegisterGlobalTypePublication (helics_value_federate fed, const char *key, int type, const char *units)
 {
     if ((type < 0) || (type > HELICS_VECTOR_TYPE))
     {
@@ -200,9 +209,10 @@ helicsRegisterGlobalTypePublication (helics_value_federate fed, const char *key,
     try
     {
         pub = new helics::PublicationObject ();
-        pub->pubptr = std::make_unique<helics::Publication> (helics::GLOBAL, fedObj.get (), key,
-                                                             static_cast<helics::helicsType_t> (type), units);
+        pub->pubptr =
+          std::make_unique<helics::Publication> (helics::GLOBAL, fedObj.get (), key, static_cast<helics::helicsType_t> (type), units);
         pub->fedptr = std::move (fedObj);
+        addPublication (fed, pub);
         return reinterpret_cast<helics_publication> (pub);
     }
     catch (const helics::InvalidFunctionCall &)
@@ -674,14 +684,4 @@ helics_time_t helicsGetLastUpdateTime (helics_subscription sub)
     auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
     auto time = subObj->subptr->getLastUpdate ();
     return time.getBaseTimeCode ();
-}
-
-void helicsClosePublication (helics_publication pub)
-{
-    delete reinterpret_cast<helics::PublicationObject *> (pub);
-}
-
-void helicsCloseSubscription (helics_subscription sub)
-{
-    delete reinterpret_cast<helics::SubscriptionObject *> (sub);
 }

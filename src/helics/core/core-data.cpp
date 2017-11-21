@@ -8,7 +8,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "helics/core/core-data.h"
+#include "core-data.h"
 namespace helics
 {
 data_block::data_block (data_block &&db) noexcept : m_data (std::move (db.m_data)) {}

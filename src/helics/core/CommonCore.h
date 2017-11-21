@@ -10,11 +10,11 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_COMMON_CORE_
 #pragma once
 
-#include "helics/config.h"
+#include "helics/helics-config.h"
 #include "helics-time.h"
-#include "helics/common/simpleQueue.hpp"
-#include "helics/core/core.h"
-#include "core/ActionMessage.h"
+#include "../common/simpleQueue.hpp"
+#include "core.h"
+#include "ActionMessage.h"
 #include "BrokerBase.h"
 
 #include <cstdint> 
@@ -45,6 +45,8 @@ public:
 
 	/** default constructor*/
 CommonCore() noexcept;
+/**function mainly to match some other object constructors does the same thing as the default constructor*/
+CommonCore(bool arg) noexcept;
 /** construct from a core name*/
 CommonCore(const std::string &core_name);
 /** virtual destructor*/
@@ -60,22 +62,23 @@ CommonCore(const std::string &core_name);
   virtual void error (federate_id_t federateID, int errorCode=-1) override final;
   virtual void finalize (federate_id_t federateID) override final;
   virtual void enterInitializingState (federate_id_t federateID) override final;
-  virtual convergence_state enterExecutingState(federate_id_t federateID, convergence_state converged = convergence_state::complete) override final;
+  virtual iteration_result enterExecutingState(federate_id_t federateID, iteration_request iterate = NO_ITERATION) override final;
   virtual federate_id_t registerFederate (const std::string &name, const CoreFederateInfo &info) override final;
   virtual const std::string &getFederateName (federate_id_t federateID) const override final;
   virtual federate_id_t getFederateId (const std::string &name) override final;
   virtual int32_t getFederationSize () override final;
   virtual Time timeRequest (federate_id_t federateID, Time next) override final;
-  virtual iterationTime requestTimeIterative (federate_id_t federateID, Time next, convergence_state converged) override final;
+  virtual iterationTime requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate) override final;
   virtual Time getCurrentTime(federate_id_t federateID) const override final;
   virtual uint64_t getCurrentReiteration (federate_id_t federateID) const override final;
-  virtual void setMaximumIterations (federate_id_t federateID, uint64_t iterations) override final;
+  virtual void setMaximumIterations (federate_id_t federateID, int32_t iterations) override final;
   virtual void setTimeDelta (federate_id_t federateID, Time time) override final;
   virtual void setLookAhead(federate_id_t federateID, Time timeLookAhead) override final;
   virtual void setPeriod(federate_id_t federateID, Time timePeriod) override final;
   virtual void setTimeOffset(federate_id_t federateID, Time timeOffset) override final;
   virtual void setImpactWindow(federate_id_t federateID, Time timeImpact) override final;
   virtual void setLoggingLevel(federate_id_t federateID, int loggingLevel) override final;
+  virtual void setFlag(federate_id_t federateID, int flag, bool flagValue = true) override final;
   virtual Handle registerSubscription (federate_id_t federateID, const std::string &key, const std::string &type, const std::string &units, handle_check_mode check_mode) override final;
   virtual Handle getSubscription (federate_id_t federateID, const std::string &key) override final;
   virtual Handle registerPublication (federate_id_t federateID, const std::string &key, const std::string &type, const std::string &units) override final;
@@ -115,13 +118,15 @@ CommonCore(const std::string &core_name);
   virtual void setLoggingCallback(federate_id_t federateID, std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
   
   virtual std::string query(const std::string &target, const std::string &queryStr) override;
-
+  virtual void setQueryCallback(federate_id_t federateID, std::function<std::string(const std::string &)> queryFunction) override;
   /** get a string representing the connection info to send data to this object*/
   virtual std::string getAddress() const=0;
 
  virtual bool connect() override final;
  virtual bool isConnected() const override final;
  virtual void disconnect() override final;
+ void unregister();
+ virtual void processDisconnect(bool skipUnregister = false) override final;
 private:
 	/** implementation details of the connection process
 	*/
@@ -129,13 +134,14 @@ private:
 	/** implementation details of the disconnection process
 	*/
 	virtual void brokerDisconnect() = 0;
+    
 protected:
 
   virtual void processCommand(ActionMessage &&cmd) override final;
   
-  virtual void processPriorityCommand(const ActionMessage &command) override final;
+  virtual void processPriorityCommand(ActionMessage &&command) override final;
 
-  virtual void processDisconnect() override final;
+  
   /** transit an ActionMessage to another core or broker
   @param route_id the identifier for the route information to send the message to
   @param[in] cmd the actionMessage to send*/
@@ -146,6 +152,8 @@ protected:
   virtual void addRoute(int route_id, const std::string &routeInfo) = 0;
   /** get the federate Information from the federateID*/
   FederateState *getFederate(federate_id_t federateID) const;
+  /** get the federate Information from the federateID*/
+  FederateState *getFederate(const std::string &fedName) const;
   /** get the federate Information from a handle
   @param id a handle identifier as generated by the one of the functions*/
   FederateState *getHandleFederate(Handle id_);
@@ -241,6 +249,8 @@ protected:
   void organizeFilterOperations();
 
   std::string federateQuery(Core::federate_id_t id, const std::string &queryStr) const;
+
+  
 };
 
 

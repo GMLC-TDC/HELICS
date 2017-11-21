@@ -41,13 +41,9 @@ static const argDescriptors extraArgs{
 
 MpiCore::MpiCore () noexcept {}
 
-MpiCore::MpiCore (const std::string &core_name) : CommonCore (core_name) {}
+MpiCore::MpiCore (const std::string &core_name) : CommsBroker (core_name) {}
 
-MpiCore::~MpiCore ()
-{
-    haltOperations = true;
-    joinAllThreads ();
-}
+MpiCore::~MpiCore () {}
 
 void MpiCore::InitializeFromArgs (int argc, const char *const *argv)
 {
@@ -96,12 +92,6 @@ bool MpiCore::brokerConnect ()
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     return comms->connect ();
 }
-
-void MpiCore::brokerDisconnect () { comms->disconnect (); }
-
-void MpiCore::transmit (int route_id, const ActionMessage &cmd) { comms->transmit (route_id, cmd); }
-
-void MpiCore::addRoute (int route_id, const std::string &routeInfo) { comms->addRoute (route_id, routeInfo); }
 
 std::string MpiCore::getAddress () const { return fileloc; }
 

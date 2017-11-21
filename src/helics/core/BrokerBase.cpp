@@ -11,8 +11,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "BrokerBase.h"
 
-#include "common/logger.h"
-
+#include "../common/logger.h"
+#include "helics/helics-config.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/uuid/uuid.hpp>  // uuid class
@@ -201,9 +201,12 @@ void BrokerBase::InitializeFromArgs (int argc, const char *const *argv)
     {
         logFile = vm["logfile"].as<std::string> ();
     }
-    if (identifier.empty ())
+    if (!noAutomaticID)
     {
-        identifier = gen_id ();
+        if (identifier.empty ())
+        {
+            identifier = gen_id ();
+        }
     }
 
     timeCoord = std::make_unique<TimeCoordinator> ();
@@ -268,10 +271,7 @@ void BrokerBase::addActionMessage (const ActionMessage &m)
 {
     if (isPriorityCommand (m))
     {
-        if (!haltOperations)
-        {
-            processPriorityCommand (m);
-        }
+        _queue.pushPriority (m);
     }
     else
     {
@@ -284,10 +284,7 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
 {
     if (isPriorityCommand (m))
     {
-        if (!haltOperations)
-        {
-            processPriorityCommand (m);
-        }
+        _queue.emplacePriority (std::move (m));
     }
     else
     {
@@ -317,7 +314,14 @@ void BrokerBase::queueProcessingLoop ()
         default:
             if (!haltOperations)
             {
-                processCommand (std::move (command));
+                if (isPriorityCommand (command))
+                {
+                    processPriorityCommand (std::move (command));
+                }
+                else
+                {
+                    processCommand (std::move (command));
+                }
             }
         }
     }

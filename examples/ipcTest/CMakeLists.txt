@@ -4,6 +4,13 @@ link_directories(${external_link_directories})
 
 include_directories( SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
+include_directories(${PROJECT_SOURCE_DIR}/src)
 
 target_link_libraries(ipcTest1 helics ${external_library_list})
 target_link_libraries(ipcTest2 helics ${external_library_list})
+
+IF(MINGW)
+	target_link_libraries(ipcTest1 ws2_32)
+	target_link_libraries(ipcTest2 ws2_32)
+ENDIF(MINGW)
+

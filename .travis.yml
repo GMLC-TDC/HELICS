@@ -1,4 +1,7 @@
 sudo: required
+
+# Use Linux unless specified otherwise
+os: linux
 dist: trusty
 language: cpp
 
@@ -8,9 +11,40 @@ cache:
     - cmake-3.4.3-Linux-x86_64/bin
     - cmake-3.4.3-Linux-x86_64/plugins
     - cmake-3.4.3-Linux-x86_64/share
+    - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/bin
+    - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/Frameworks
+    - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/MacOS
+    - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/share
+    - dependencies
 
 matrix:
+  # On weekdays, the backlog for waiting OS X builds is huge
+  fast_finish: true
+  allow_failures:
+    - os: osx
+
   include:
+
+    # XCode 6.4, OS X 10.10
+    - env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release"
+      os: osx
+      osx_image: xcode6.4
+      compiler: clang
+
+    # XCode 7.3, OS X 10.11
+    - env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release"
+      os: osx
+      osx_image: xcode7.3
+      compiler: clang
+
+    # Built without errors on my clone from one of the changes made
+    # Possibly local dependencies, or removing Linux-only commands fixed it
+    # XCode 8.3, OS X 10.12
+    #- env: COMPILER=clang++ BUILD_TYPE=Debug
+    #  os: osx
+    #  osx_image: xcode8.3
+    #  compiler: clang
+
     - compiler: gcc
       addons:
         apt:
@@ -21,6 +55,7 @@ matrix:
       env: MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6"
       os:
         - linux
+
     - compiler: gcc
       addons:
         apt:
@@ -31,6 +66,7 @@ matrix:
       env: MATRIX_EVAL="COMPILER=g++-4.9 && CC=gcc-4.9 && CXX=g++-4.9"
       os:
         - linux
+
     - compiler: clang
       addons:
         apt:
@@ -39,7 +75,7 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
-      env: MATRIX_EVAL="COMPILER=clang++-3.6
+      env: MATRIX_EVAL="COMPILER=clang++-3.6 && CC='ccache clang-3.6 -Qunused-arguments -fcolor-diagnostics' && CXX='ccache clang++-3.6 -Qunused-arguments -fcolor-diagnostics'
       os:
         - linux
 
@@ -49,14 +85,15 @@ branches:
 
 
 before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" && "$TRAVIS_BRANCH" != "master" && "$TRAVIS_BRANCH" != "develop" ]]; then exit 1 ;fi
   - eval "${MATRIX_EVAL}"
 
 install:
-  - ./scripts/install-ci-dependencies.sh
+  - source scripts/install-ci-dependencies.sh
 
 script:
   - mkdir build && cd build
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ../cmake-3.4.3-Linux-x86_64/bin/cmake .. -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=ON ;fi
+  - cmake .. -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=ON -DZMQ_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/zmq -DBOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost -DBUILD_PYTHON=ON
   - make
 #  - ctest --verbose
 

@@ -14,10 +14,7 @@ set(application_api_test_sources
 test_configuration.h
 value-converter-tests.cpp
 application-api-tests.cpp
-data-block-tests.cpp
 data-view-tests.cpp
-test-simple-queue.cpp
-testBlockingQueue.cpp
 testQueries.cpp
 test-value-federate1.cpp
 test-value-federate2.cpp
@@ -31,18 +28,24 @@ subPubObjectTests.cpp
 testFixtures.cpp
 )
 
+include_directories( SYSTEM ${Boost_INCLUDE_DIR})
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
+include_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_executable(application-api-tests ${application_api_test_sources} ${application_api_test_headers})
 target_link_libraries(application-api-tests helics)
 
 link_directories(${external_link_directories})
 
-include_directories( SYSTEM ${Boost_INCLUDE_DIR})
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
+
 
 target_link_libraries(application-api-tests ${external_library_list})
 
 target_link_libraries(application-api-tests ${Boost_LIBRARIES_test})
+
+IF(MINGW)
+	target_link_libraries(application-api-tests ws2_32)
+ENDIF(MINGW)
 
 ADD_DEFINITIONS(-DHELICS_BROKER_LOCATION="${HELICS_BROKER_LOC}")
 ADD_DEFINITIONS(-DHELICS_INSTALL_LOCATION="${CMAKE_INSTALL_PREFIX}")

@@ -44,6 +44,7 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     /** move assignment*/
     CombinationFederate &operator= (CombinationFederate &&fed) noexcept;
 
+    virtual void disconnect() override;
   protected:
     virtual void updateTime (Time newTime, Time oldTime) override;
     virtual void StartupToInitializeStateTransition () override;

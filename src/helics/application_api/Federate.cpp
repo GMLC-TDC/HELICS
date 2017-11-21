@@ -9,9 +9,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "Federate.h"
+#include "../core/CoreFactory.h"
+#include "../core/core.h"
 #include "asyncFedCallInfo.h"
-#include "core/CoreFactory.h"
-#include "helics/core/core.h"
+#include "helics/helics-config.h"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4702)
@@ -27,23 +28,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-CoreFederateInfo generateCoreInfo (const FederateInfo &fi)
-{
-    CoreFederateInfo cfi;
-    cfi.lookAhead = fi.lookAhead;
-    cfi.impactWindow = fi.impactWindow;
-    cfi.observer = fi.observer;
-    cfi.timeDelta = fi.timeDelta;
-    cfi.period = fi.period;
-    cfi.offset = fi.offset;
-    cfi.logLevel = fi.logLevel;
-    cfi.uninteruptible = fi.uninterruptible;
-    cfi.time_agnostic = fi.timeAgnostic;
-    cfi.source_only = fi.sourceOnly;
-    cfi.max_iterations = fi.max_iterations;
-    return cfi;
-}
-
 std::string getHelicsVersionString ()
 {
     std::string vstr = std::to_string (HELICS_VERSION_MAJOR);
@@ -51,7 +35,8 @@ std::string getHelicsVersionString ()
     vstr.append (std::to_string (HELICS_VERSION_MINOR));
     vstr.push_back ('.');
     vstr.append (std::to_string (HELICS_VERSION_PATCH));
-    vstr += " (";
+    vstr.push_back (' ');
+    vstr.push_back ('(');
     vstr += HELICS_DATE;
     vstr.push_back (')');
     return vstr;
@@ -86,7 +71,7 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
     {
         coreObject->connect ();
     }
-    fedID = coreObject->registerFederate (fi.name, generateCoreInfo (fi));
+    fedID = coreObject->registerFederate (fi.name, fi);
     currentTime = coreObject->getCurrentTime (fedID);
 }
 
@@ -119,7 +104,7 @@ Federate::Federate (std::shared_ptr<Core> core, const FederateInfo &fi)
     {
         coreObject->connect ();
     }
-    fedID = coreObject->registerFederate (fi.name, generateCoreInfo (fi));
+    fedID = coreObject->registerFederate (fi.name, fi);
     currentTime = coreObject->getCurrentTime (fedID);
 }
 
@@ -241,19 +226,19 @@ void Federate::enterInitializationStateFinalize ()
     }
 }
 
-convergence_state Federate::enterExecutionState (convergence_state ProcessComplete)
+iteration_result Federate::enterExecutionState (iteration_request iterate)
 {
-    convergence_state res = convergence_state::complete;
+    iteration_result res = iteration_result::next_step;
     switch (state)
     {
     case op_states::startup:
     case op_states::pendingInit:
         enterInitializationState ();
-    // FALLTHROUGH
+        FALLTHROUGH
     case op_states::initialization:
     {
-        res = coreObject->enterExecutingState (fedID, ProcessComplete);
-        if (res == convergence_state::complete)
+        res = coreObject->enterExecutingState (fedID, iterate);
+        if (res == iteration_result::next_step)
         {
             state = op_states::execution;
             InitializeToExecuteStateTransition ();
@@ -282,7 +267,7 @@ convergence_state Federate::enterExecutionState (convergence_state ProcessComple
     return res;
 }
 
-void Federate::enterExecutionStateAsync (convergence_state ProcessComplete)
+void Federate::enterExecutionStateAsync (iteration_request iterate)
 {
     switch (state)
     {
@@ -293,10 +278,10 @@ void Federate::enterExecutionStateAsync (convergence_state ProcessComplete)
             asyncCallInfo = std::make_unique<asyncFedCallInfo> ();
         }
 
-        auto eExecFunc = [this, ProcessComplete]() {
+        auto eExecFunc = [this, iterate]() {
             coreObject->enterInitializingState (fedID);
             StartupToInitializeStateTransition ();
-            return coreObject->enterExecutingState (fedID, ProcessComplete);
+            return coreObject->enterExecutingState (fedID, iterate);
         };
         state = op_states::pendingExec;
         asyncCallInfo->execFuture = std::async (std::launch::async, eExecFunc);
@@ -312,9 +297,7 @@ void Federate::enterExecutionStateAsync (convergence_state ProcessComplete)
             asyncCallInfo = std::make_unique<asyncFedCallInfo> ();
         }
 
-        auto eExecFunc = [this, ProcessComplete]() {
-            return coreObject->enterExecutingState (fedID, ProcessComplete);
-        };
+        auto eExecFunc = [this, iterate]() { return coreObject->enterExecutingState (fedID, iterate); };
         state = op_states::pendingExec;
         asyncCallInfo->execFuture = std::async (std::launch::async, eExecFunc);
     }
@@ -330,14 +313,14 @@ void Federate::enterExecutionStateAsync (convergence_state ProcessComplete)
     }
 }
 
-convergence_state Federate::enterExecutionStateFinalize ()
+iteration_result Federate::enterExecutionStateFinalize ()
 {
     if (state != op_states::pendingExec)
     {
         throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
     }
     auto res = asyncCallInfo->execFuture.get ();
-    if (convergence_state::complete == res)
+    if (iteration_result::next_step == res)
     {
         state = op_states::execution;
         InitializeToExecuteStateTransition ();
@@ -390,6 +373,28 @@ void Federate::setPeriod (Time period, Time offset)
 
 void Federate::setLoggingLevel (int loggingLevel) { coreObject->setLoggingLevel (fedID, loggingLevel); }
 
+
+void Federate::setFlag(int flag, bool flagValue)
+{
+    if ((flag > 10) || (flag < 0))
+    {
+        throw(InvalidParameterValue("flag must be between 0 and 10"));
+    }
+    switch (flag)
+    {
+    case ROLLBACK_FLAG:
+        FedInfo.rollback = flagValue;
+        break;
+    case FORWARD_COMPUTE_FLAG:
+        FedInfo.forwardCompute = flagValue;
+        break;
+    default:
+        coreObject->setFlag(fedID, flag, flagValue);
+        break;
+    }
+    
+
+}
 void Federate::finalize ()
 {
     switch (state)
@@ -421,6 +426,15 @@ void Federate::finalize ()
     state = op_states::finalize;
 }
 
+void Federate::disconnect ()
+{
+    if (state != op_states::error)
+    {
+        coreObject->finalize (fedID);
+    }
+    coreObject = nullptr;
+}
+
 void Federate::error (int errorcode)
 {
     state = op_states::error;
@@ -450,13 +464,13 @@ Time Federate::requestTime (Time nextInternalTimeStep)
     }
 }
 
-iterationTime Federate::requestTimeIterative (Time nextInternalTimeStep, convergence_state iterationComplete)
+iterationTime Federate::requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate)
 {
     if (state == op_states::execution)
     {
-        auto iterationTime = coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterationComplete);
+        auto iterationTime = coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
         Time oldTime = currentTime;
-        if (iterationTime.state == convergence_state::complete)
+        if (iterationTime.state == iteration_result::next_step)
         {
             currentTime = iterationTime.stepTime;
         }
@@ -491,7 +505,7 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 /** request a time advancement
 @param[in] the next requested time step
 @return the granted time step*/
-void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, convergence_state iterationComplete)
+void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
     if (state == op_states::execution)
     {
@@ -501,8 +515,8 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, convergence
         }
         state = op_states::pendingIterativeTime;
         asyncCallInfo->timeRequestIterativeFuture =
-          std::async (std::launch::async, [this, nextInternalTimeStep, iterationComplete]() {
-              return coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterationComplete);
+          std::async (std::launch::async, [this, nextInternalTimeStep, iterate]() {
+              return coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
           });
     }
     else
@@ -527,7 +541,7 @@ Time Federate::requestTimeFinalize ()
     }
     else
     {
-        throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
+        throw (InvalidFunctionCall ("cannot call finalize requestTime without first calling requestTimeIterative function"));
     }
 }
 
@@ -540,7 +554,7 @@ iterationTime Federate::requestTimeIterativeFinalize ()
         auto iterativeTime = asyncCallInfo->timeRequestIterativeFuture.get ();
         state = op_states::execution;
         Time oldTime = currentTime;
-        if (iterativeTime.state == convergence_state::complete)
+        if (iterativeTime.state == iteration_result::next_step)
         {
             currentTime = iterativeTime.stepTime;
         }
@@ -549,7 +563,7 @@ iterationTime Federate::requestTimeIterativeFinalize ()
     }
     else
     {
-        throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
+        throw (InvalidFunctionCall ("cannot call finalize requestTimeIterative without first calling requestTimeIterativeAsync function"));
     }
 }
 
@@ -577,22 +591,6 @@ std::string Federate::query (const std::string &queryStr)
     if (queryStr == "name")
     {
         return getName ();
-    }
-    else if (queryStr == "endpoints")
-    {
-        return {""};
-    }
-    else if (queryStr == "publications")
-    {
-        return {""};
-    }
-    else if (queryStr == "subscriptions")
-    {
-        return {""};
-    }
-    else if (queryStr == "filters")
-    {
-        return {""};
     }
     return coreObject->query ("federation", queryStr);
 }
@@ -696,13 +694,17 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     {
         fi.rollback = doc["rollback"].asBool ();
     }
-    if (doc.isMember ("timeAgnostic"))
+    if (doc.isMember ("only_update_on_change"))
     {
-        fi.timeAgnostic = doc["timeAgnostic"].asBool ();
+        fi.only_update_on_change = doc["only_update_on_change"].asBool ();
     }
-    if (doc.isMember ("sourceOnly"))
+    if (doc.isMember ("only_transmit_on_change"))
     {
-        fi.sourceOnly = doc["sourceOnly"].asBool ();
+        fi.only_transmit_on_change = doc["only_transmit_on_change"].asBool ();
+    }
+    if (doc.isMember ("source_only"))
+    {
+        fi.source_only = doc["sourc_only"].asBool ();
     }
     if (doc.isMember ("uninterruptible"))
     {

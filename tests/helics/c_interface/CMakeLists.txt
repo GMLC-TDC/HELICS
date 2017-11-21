@@ -22,9 +22,11 @@ iteration_tests.cpp
 ctestFixtures.cpp
 )
 
+include_directories( SYSTEM ${Boost_INCLUDE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/src/helics/shared_api_library)
+
 add_executable(c_interface_tests ${c_interface_test_sources} ${c_interface_test_headers})
 
-include_directories( SYSTEM ${Boost_INCLUDE_DIR})
 
 target_link_libraries(c_interface_tests helicsSharedLib ${external_library_list})
 target_link_libraries(c_interface_tests helicsSharedLib ${Boost_LIBRARIES_test})

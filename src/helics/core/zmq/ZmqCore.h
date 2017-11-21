@@ -10,13 +10,14 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_ZEROMQ_CORE_
 #pragma once
 
-#include "core/CommonCore.h"
+#include "../CommonCore.h"
+#include "../CommsBroker.hpp"
 
 namespace helics {
 
 class ZmqComms;
 /** implementation for the core that uses zmq messages to communicate*/
-class ZmqCore final: public CommonCore {
+class ZmqCore final: public CommsBroker<ZmqComms,CommonCore> {
 
 public:
 	/** default constructor*/
@@ -25,8 +26,6 @@ public:
   ~ZmqCore();
   virtual void InitializeFromArgs (int argc, const char * const *argv) override;
          
-  virtual void transmit(int route_id, const ActionMessage &cmd) override;
-  virtual void addRoute(int route_id, const std::string &routeInfo) override;
 public:
 	virtual std::string getAddress() const override;
 private:
@@ -39,10 +38,6 @@ private:
 	int brokerPushPort=-1;  //!< the port number to use for the broker regular push port
 
 	virtual bool brokerConnect() override;
-	virtual void brokerDisconnect() override;
-
-	std::unique_ptr<ZmqComms> comms; //!< object controlling the actual comm work
-	mutable std::mutex dataLock;  //mutex protecting the local information
  
 };
 

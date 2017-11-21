@@ -22,8 +22,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (value_federate_tests2, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2"};
-
+#ifdef QUICK_TESTS_ONLY
+const std::string core_types[] = {"test", "test_2", "ipc_2", "zmq", "udp"};
+#else
+const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2", "udp", "udp_2"};
+#endif
 /** test block send and receive*/
 BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_type)
 {

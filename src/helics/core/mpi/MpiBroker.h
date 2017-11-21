@@ -11,13 +11,14 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "core/CoreBroker.h"
+#include "core/CommsBroker.hpp"
 
 namespace helics
 {
 
 class MpiComms;
 
-class MpiBroker :public CoreBroker
+class MpiBroker final :public CommsBroker<MpiComms,CoreBroker>
 {
 public:
 	/** default constructor*/
@@ -28,19 +29,12 @@ public:
 
 	/**destructor*/
 	virtual ~MpiBroker();
-	virtual void transmit(int32_t route, const ActionMessage &command) override;
-
-	virtual void addRoute(int route_id, const std::string &routeInfo) override;
 
 	virtual std::string getAddress() const override;
 private:
 	virtual bool brokerConnect() override;
-	virtual void brokerDisconnect() override;
 
 private:
-	std::atomic<bool> initialized_{ false };  //!< atomic protecting local initialization
-	std::unique_ptr<MpiComms> comms;  //!< pointer to the comms object handling the actions connection
-									  //std::unique_ptr<ZmqConnection> zmqConn;  //!< object containing the ZmqConnection Information for Pimpl 
 };
 }
 #endif
