@@ -11,7 +11,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "Message.h"
-#include "helics/core/core.h"
+#include "../core/core.h"
 #include "identifierTypes.hpp"
 #include <utility> 
 #include <cstdint>
@@ -52,6 +52,7 @@ namespace helics
 		Time lastUpdate = Time(0.0); //!< the time the subscription was last updated
 		Time lastQuery = Time(0.0); //!< the time the query was made
 		int callbackIndex = -1;  //!< index for the callback
+        bool hasUpdate = false;  //!< indicator that there was an update
 		subscription_info(const std::string &n_name, const std::string &n_type, const std::string &n_units) :
 			name(n_name), type(n_type), units(n_units)
 		{};

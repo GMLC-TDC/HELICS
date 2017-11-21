@@ -52,7 +52,7 @@ int main(int argc,char **argv)
   /* Enter initialization mode */
   status = helicsEnterInitializationMode(vfed);
   printf(" Entered initialization mode\n");
-  double y = 1.0, x = 0, xprv = 100;
+  double y = 1.0, x = 0, xprv = 100,yprv=100;
 
   status = helicsPublishDouble(pub, y);
   fflush(NULL);
@@ -63,18 +63,17 @@ int main(int argc,char **argv)
   fflush(NULL);
   helics_time_t currenttime=0.0;
   helics_iterative_time currenttimeiter;
-  currenttimeiter.status = nonconverged;
+  currenttimeiter.status = iterating;
 
   int           isupdated;
-  convergence_status conv=0;
   double tol=1E-8;
+  int helics_iter = 0;
+  while (currenttimeiter.status==iterating)
+  {
 
-  while((fabs(x-xprv) > tol)||(currenttimeiter.status==nonconverged)) {
-
-    
     xprv = x;
     status = helicsGetDouble(sub,&x);
-
+    ++helics_iter;
     double f2,J2;
     int    newt_conv = 0, max_iter=10,iter=0;
 
@@ -94,17 +93,17 @@ int main(int argc,char **argv)
       
       y = y - f2/J2;
     }
-    
-    if(newt_conv) {
-      status = helicsPublishDouble(pub,y);
-    }
-    //    isupdated = 0;
-    //    while(!isupdated) {
-    currenttimeiter = helicsRequestTimeIterative(vfed, currenttime, conv);
-    //      isupdated = helicsIsValueUpdated(sub);
-    //    }
-    //    currenttime = helicsRequestTime(vfed,currenttime);
+    printf("Fed2 iteration %d y=%f, x=%f\n",helics_iter,y,x);
 
+   
+    if ((fabs(y-yprv)>tol)||(helics_iter<5))
+    {
+      status = helicsPublishDouble(pub,y);
+      printf("Fed2: publishing y\n");
+    }
+    fflush(NULL);
+    currenttimeiter = helicsRequestTimeIterative(vfed, currenttime, iterate_if_needed);
+    yprv = y;
   }
 
   status = helicsFinalize(vfed);

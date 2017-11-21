@@ -36,19 +36,13 @@ HELICS_Export helics_subscription helicsRegisterSubscription (helics_value_feder
                                                               const char *key,
                                                               const char *type,
                                                               const char *units);
-HELICS_Export helics_subscription helicsRegisterTypeSubscription (helics_value_federate fed,
-                                                                  const char *key,
-                                                                  int type,
-                                                                  const char *units);
+HELICS_Export helics_subscription helicsRegisterTypeSubscription (helics_value_federate fed, const char *key, int type, const char *units);
 
 HELICS_Export helics_publication helicsRegisterPublication (helics_value_federate fed,
                                                             const char *key,
                                                             const char *type,
                                                             const char *units);
-HELICS_Export helics_publication helicsRegisterTypePublication (helics_value_federate fed,
-                                                                const char *key,
-                                                                int type,
-                                                                const char *units);
+HELICS_Export helics_publication helicsRegisterTypePublication (helics_value_federate fed, const char *key, int type, const char *units);
 
 HELICS_Export helics_publication helicsRegisterGlobalPublication (helics_value_federate fed,
                                                                   const char *key,

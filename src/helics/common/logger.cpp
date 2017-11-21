@@ -69,7 +69,7 @@ void logger::log (int level, std::string logMessage)
 {
     if (!halted)
     {
-        logMessage.push_back ((level <= fileLevel) ? '^' : '-');
+        logMessage.push_back ((level <= fileLevel) ? '^' : '~');
         logMessage.push_back ((level <= consoleLevel) ? '$' : '-');
 
         logCore->addMessage (coreIndex, std::move (logMessage));
@@ -104,7 +104,7 @@ void logger::logFunction (std::string &&message)
 
 loggerNoThread::loggerNoThread () = default;
 
-loggerNoThread::loggerNoThread (std::shared_ptr<loggingCore> /*core*/){};
+loggerNoThread::loggerNoThread (std::shared_ptr<loggingCore> /*core*/){}
 
 void loggerNoThread::openFile (const std::string &file) { outFile.open (file.c_str ()); }
 void loggerNoThread::startLogging (int cLevel, int fLevel)
@@ -215,27 +215,35 @@ void loggingCore::processingLoop ()
                     }
                     else
                     {
-                        msg.push_back ('-');
                         msg.push_back ('$');
                     }
                 }
             }
         }
-        // if a the callback should be called there will be a 'f' at the end
+        // if a the callback should be called there will be a '^' at the end
         bool nosymbol = true;
         auto f = msg.back ();
-        if ((f == '^') || (f == '-'))
+        if ((f == '^') || (f == '~'))
         {
             nosymbol = false;
             msg.pop_back ();
         }
 
-        // if a the console should be written there will be a 'c' at the end
+        // if a the console should be written there will be a '$' at the end
         auto c = msg.back ();
         if ((c == '$') || (c == '-'))
         {
             nosymbol = false;
             msg.pop_back ();
+        }
+        // in case they were written out of order
+        if ((f == '$') || (f == '-'))
+        {
+            f = msg.back();
+            if ((f == '^') || (f == '~'))
+            {
+                msg.pop_back();
+            }
         }
         if ((c == '$') || (nosymbol))
         {

@@ -27,7 +27,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
+#ifdef QUICK_TESTS_ONLY
+const std::string core_types[] = {"test", "test_2", "ipc_2", "zmq", "udp"};
+#else
 const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2", "udp", "udp_2"};
+#endif
 // const std::string core_types[] = {"udp" };
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types), core_type)
@@ -452,6 +456,7 @@ void runFederateTestv2 (const std::string &core_type_str,
     vFed->finalize ();
 }
 
+#ifndef QUICK_TESTS_ONLY
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types, bdata::make (core_types), core_type)
 {
     runFederateTest<double> (core_type, 10.3, 45.3, 22.7);
@@ -495,6 +500,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers, bdata::ma
     runFederateTestObj<std::complex<double>> (core_type, def, v1, v2);
 }
 
+#endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer, bdata::make (core_types), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 2);
@@ -725,6 +731,7 @@ void runDualFederateTestObj (const std::string &core_type_str,
  */
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types, bdata::make (core_types), core_type)
 {
+#ifndef QUICK_TESTS_ONLY
     runDualFederateTest<double> (core_type, 10.3, 45.3, 22.7);
     runDualFederateTest<int> (core_type, 5, 8, 43);
     runDualFederateTest<int> (core_type, -5, 1241515, -43);
@@ -734,6 +741,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types, bdata::make (core_type
     runDualFederateTest<float> (core_type, 10.3f, 45.3f, 22.7f);
     runDualFederateTest<std::string> (core_type, "start", "inside of the functional relationship of helics",
                                       std::string ("I am a string"));
+#endif
     // this one is going to test really ugly strings
     runDualFederateTest<std::string> (core_type, std::string (862634, '\0'),
                                       "inside\n\0 of the \0\n functional\r \brelationship of helics\n",
@@ -753,6 +761,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types, bdata::make (core_type
  */
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj, bdata::make (core_types), core_type)
 {
+#ifndef QUICK_TESTS_ONLY
     runDualFederateTestObj<double> (core_type, 10.3, 45.3, 22.7);
     runDualFederateTestObj<int> (core_type, 5, 8, 43);
     runDualFederateTestObj<int> (core_type, -5, 1241515, -43);
@@ -763,6 +772,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj, bdata::make (core_
     runDualFederateTestObj<std::string> (core_type, "start", "inside of the functional relationship of helics",
                                          std::string ("I am a string"));
     // this one is going to test really ugly strings
+#endif
     runDualFederateTestObj<std::string> (core_type, std::string (862634, '\0'),
                                          "inside\n\0 of the \0\n functional\r \brelationship of helics\n",
                                          std::string (""));

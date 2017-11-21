@@ -159,14 +159,27 @@ class ActionMessage
         }
     }
 
-    /** functions that convert to and from a byte stream*/
-    void toByteArray (char *data, size_t buffer_size) const;
+    // functions that convert to and from a byte stream
+
+    /** convert a command to a raw data bytes
+    @param[out] data pointer to memory to store the command
+    @param[in] buffer_size-- the size of the buffer
+    @return the size of the buffer actually used
+    */
+    int toByteArray (char *data, size_t buffer_size) const;
+    /** convert to a string using a reference*/
     void to_string (std::string &data) const;
+    /** convert to a byte string*/
 	std::string to_string() const;
+    /** covert to a byte vector using a reference*/
 	void to_vector(std::vector<char> &data) const;
+    /** convert a command to a byte vector*/
 	std::vector<char> to_vector() const;
+    /** generate a command from a raw data stream*/
     void fromByteArray (const char *data, size_t buffer_size);
+    /** read a command from a string*/
     void from_string (const std::string &data);
+    /** read a command from a char vector*/
 	void from_vector(const std::vector<char> &data);
 
 };
@@ -184,18 +197,24 @@ std::unique_ptr<Message> createMessage (const ActionMessage &cmd);
  */
 std::unique_ptr<Message> createMessage (ActionMessage &&cmd);
 
+/** check if a command is a protocol command*/
 inline bool isProtocolCommand(const ActionMessage &command)
 {
     return ((command.action() == CMD_PROTOCOL) || (command.action() == CMD_PROTOCOL_PRIORITY) || (command.action() == CMD_PROTOCOL_BIG));
 }
-
+/** check if a command is a priority command*/
 inline bool isPriorityCommand(const ActionMessage &command)
 {
     return (command.action() < action_message_def::action_t::cmd_ignore);
 }
-
+/** generate a human readable string with information about a command
+@param command the command to generate the string for
+@return a string representing information about the command
+*/
 std::string prettyPrintString(const ActionMessage &command);
 
+/** stream operator for a command
+*/
 std::ostream& operator<<(std::ostream& os, const ActionMessage & command);
 
 }  // namespace helics

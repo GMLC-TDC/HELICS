@@ -8,13 +8,13 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/core/udp/UdpCore.h"
+#include "UdpCore.h"
 
-#include "helics/config.h"
-#include "helics/core/core-data.h"
-#include "helics/core/core.h"
-#include "helics/core/helics-time.h"
-#include "helics/core/udp/UdpComms.h"
+#include "helics/helics-config.h"
+#include "../core-data.h"
+#include "../core.h"
+#include "../helics-time.h"
+#include "UdpComms.h"
 
 #include <algorithm>
 #include <cassert>
@@ -23,7 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <fstream>
 #include <sstream>
 
-#include "helics/core/argParser.h"
+#include "../argParser.h"
 
 namespace helics
 {

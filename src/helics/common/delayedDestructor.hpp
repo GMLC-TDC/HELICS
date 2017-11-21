@@ -46,7 +46,7 @@ class DelayedDestructor
                 if (ii > 20)
                 {
                     std::cerr << "error: unable to destroy all objects giving up\n";
-                    destroyObjects();
+                    destroyObjects ();
                     break;
                 }
                 std::this_thread::sleep_for (std::chrono::milliseconds (100));
@@ -104,7 +104,7 @@ class DelayedDestructor
             if (!ElementsToBeDestroyed.empty ())
             {
                 auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
-                                      [](const auto &element) { return (element.use_count () <= 1); });
+                                           [](const auto &element) { return (element.use_count () <= 1); });
                 if (callBeforeDeleteFunction)
                 {
                     auto locIt = loc;

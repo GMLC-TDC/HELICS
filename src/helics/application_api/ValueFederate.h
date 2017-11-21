@@ -15,7 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "Federate.h"
 #include "Message.h"
 #include "ValueConverter.hpp"
-#include "core/core-data.h"
+#include "../core/core-data.h"
 #include "identifierTypes.hpp"
 #include <functional>
 

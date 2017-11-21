@@ -9,11 +9,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "IpcCore.h"
-#include "helics/config.h"
-#include "helics/core/core-data.h"
-#include "helics/core/core-exceptions.h"
-#include "helics/core/core.h"
-#include "helics/core/helics-time.h"
+#include "../core-data.h"
+#include "../core-exceptions.h"
+#include "../core.h"
+#include "../helics-time.h"
+#include "helics/helics-config.h"
 
 #include <algorithm>
 #include <cassert>
@@ -25,7 +25,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "IpcComms.h"
 
-#include "helics/core/argParser.h"
+#include "../argParser.h"
 #include <boost/filesystem.hpp>
 
 namespace helics

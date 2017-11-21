@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_TIME_
 
 #include "core-types.h"
-#include "helics/common/timeRepresentation.hpp"
+#include "../common/timeRepresentation.hpp"
 #include <cstdint>
 
 namespace helics
@@ -37,11 +37,11 @@ struct iterationTime
 {
 public:
 	Time stepTime; //!< the time of the granted step
-	convergence_state state;	//!< the convergence state
+	iteration_result state;	//!< the convergence state
 	/** default constructor*/
 	iterationTime() noexcept {};
 	/** construct from properties*/
-	constexpr iterationTime(Time t, convergence_state convergence) :stepTime(t), state(convergence)
+	constexpr iterationTime(Time t, iteration_result iterate) :stepTime(t), state(iterate)
 	{};
 };
 }

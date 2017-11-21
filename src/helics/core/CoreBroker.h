@@ -20,7 +20,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "BasicHandleInfo.h"
 #include "ActionMessage.h"
-#include "common/simpleQueue.hpp"
+#include "../common/simpleQueue.hpp"
 #include "TimeDependencies.h"
 #include "BrokerBase.h"
 namespace helics
@@ -74,7 +74,7 @@ protected:
 	bool _hasEndpoints = false; //!< set to true if the broker has endpoints;  
 private:
 	bool _isRoot = false;  //!< set to true if this object is a root broker
-	
+    bool enteredExecutionMode = false; //!< flag indicating that the broker has entered execution mode
 	std::vector<std::pair<Core::federate_id_t, bool>> localBrokersInit; //!< indicator if the local brokers are ready to initialize
 	std::vector<BasicFedInfo> _federates; //!< container for all federates
 	std::vector<BasicHandleInfo> _handles; //!< container for the basic info for all handles
@@ -110,20 +110,25 @@ private:
 	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
 	/* function to transmit the delayed messages*/
 	void transmitDelayedMessages();
-	bool enteredExecutionMode = false; //!< flag indicating that the broker has entered execution mode
+	
 	
 	int32_t FillRouteInformation(ActionMessage &mess);
+    /**generate the results of a query directed at the broker*/
+    void generateQueryResult(const ActionMessage &command);
 public:
 	/** connect the core to its broker
 	@details should be done after initialization has complete*/
 	bool connect();
 	/** disconnect the broker from any other brokers and communications
-    **if the flag is set it should not do the unregister step of the disconnection, if this is set it is presumed 
-    the unregistration has already happened or it will be taken care of manually
 	*/
-	void disconnect(bool skipUnregister=false);
-	
-	virtual void processDisconnect() override final;
+	void disconnect();
+    /** unregister the broker from the factory find methods*/
+    void unregister();
+    /** disconnect the broker from any other brokers and communications
+    **if the flag is set it should not do the unregister step of the disconnection, if this is set it is presumed
+    the unregistration has already happened or it will be taken care of manually
+    */
+	virtual void processDisconnect(bool skipUnregister = false) override final;
 	/** check if the broker is connected*/
 	bool isConnected() const;
 	/** set the broker to be a root broker

@@ -10,7 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "helicsTypes.hpp"
-#include "application_api/ValueConverter.hpp"
+#include "ValueConverter.hpp"
 #include <map>
 #include <regex>
 #include <boost/algorithm/string/trim.hpp>
@@ -53,15 +53,7 @@ std::string helicsComplexString (double real, double imag)
     ss << real;
     if (imag != 0.0)
     {
-        if (imag >= 0.0)
-        {
-            ss << '+' << imag;
-        }
-        else
-        {
-            ss << imag;
-        }
-        ss << 'j';
+        ss << ((imag >= 0.0) ? '+' : ' ') << imag << 'j';
     }
     return ss.str ();
 }

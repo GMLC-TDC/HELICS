@@ -9,9 +9,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "CoreFactory.h"
+#include "core-exceptions.h"
 #include "core-types.h"
-#include "helics/config.h"
-
+#include "helics/helics-config.h"
 #if HELICS_HAVE_ZEROMQ
 #include "zmq/ZmqCore.h"
 #endif
@@ -20,9 +20,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "mpi/MpiCore.h"
 #endif
 
+#include "../common/delayedDestructor.hpp"
+#include "../common/searchableObjectHolder.hpp"
 #include "TestCore.h"
-#include "common/delayedDestructor.hpp"
-#include "common/searchableObjectHolder.hpp"
 #include "ipc/IpcCore.h"
 #include "udp/UdpCore.h"
 #include <cassert>
@@ -102,7 +102,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         }
 
 #else
-        assert (false);
+        throw (HelicsException ("ZMQ core is not available"));
 #endif
         break;
     case core_type::MPI:
@@ -116,7 +116,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<MpiCore> (name);
         }
 #else
-        assert (false);
+        throw (HelicsException ("MPI core is not available"));
 #endif
         break;
     case core_type::TEST:
@@ -150,8 +150,10 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<UdpCore> (name);
         }
         break;
+    case core_type::TCP:
+        throw (HelicsException ("TCP core is not available"));
     default:
-        assert (false);
+        throw (HelicsException ("unrecognized core type"));
     }
     return core;
 }
@@ -290,13 +292,17 @@ bool isAvailable (core_type type)
         available = true;
         break;
     default:
-        assert (false);
+        break;
     }
 
     return available;
 }
-/** lambda function to join cores before the destruction happens to avoid potential problematic calls in the loops*/
-static auto destroyerCallFirst = [](auto &core) {core->joinAllThreads(); };
+/** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
+ * loops*/
+static auto destroyerCallFirst = [](auto &core) {
+    core->processDisconnect (true);
+    core->joinAllThreads ();
+};
 
 /** so the problem this is addressing is that unregister can potentially cause a destructor to fire
 that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
@@ -304,7 +310,8 @@ can do the unregister operation and destroy itself meaning it is unable to join 
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be
 without issue*/
-static DelayedDestructor<CommonCore> delayedDestroyer(destroyerCallFirst);  //!< the object handling the delayed destruction
+static DelayedDestructor<CommonCore>
+  delayedDestroyer (destroyerCallFirst);  //!< the object handling the delayed destruction
 
 static SearchableObjectHolder<CommonCore> searchableObjects;  //!< the object managing the searchable objects
 
@@ -334,7 +341,7 @@ bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &pt
         case core_type::IPC:
             return (dynamic_cast<IpcCore *> (ptr.get ()) != nullptr);
         case core_type::UDP:
-            return (dynamic_cast<UdpCore *> (ptr.get()) != nullptr);
+            return (dynamic_cast<UdpCore *> (ptr.get ()) != nullptr);
         case core_type::TCP:
         default:
             return true;

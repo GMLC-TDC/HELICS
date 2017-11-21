@@ -17,7 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <typeinfo>
 #include <vector>
 
-#include "helics/core/core-data.h"
+#include "../core/core-data.h"
 /** @file
 @details basic type information and control for HELICS
 */
@@ -285,6 +285,12 @@ constexpr typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvali
 
 template <>
 constexpr bool isConvertableType<float> ()
+{
+    return true;
+}
+
+template <>
+constexpr bool isConvertableType<long double> ()
 {
     return true;
 }

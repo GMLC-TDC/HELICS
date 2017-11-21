@@ -9,18 +9,18 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "core/CommsBroker.hpp"
-#include "config.h"
-#include "core/CommsBroker_impl.hpp"
+#include "CommsBroker.hpp"
+#include "CommsBroker_impl.hpp"
+#include "helics/helics-config.h"
 
-#include "core/CommonCore.h"
-#include "core/CoreBroker.h"
-#include "core/ipc/IpcComms.h"
-#include "core/udp/UdpComms.h"
-#include "core/zmq/ZmqComms.h"
+#include "CommonCore.h"
+#include "CoreBroker.h"
+#include "ipc/IpcComms.h"
+#include "udp/UdpComms.h"
+#include "zmq/ZmqComms.h"
 
 #if HELICS_HAVE_MPI
-#include "core/mpi/MpiComms.h"
+#include "mpi/MpiComms.h"
 #endif
 
 namespace helics

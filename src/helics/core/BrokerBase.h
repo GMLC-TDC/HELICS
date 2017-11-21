@@ -23,7 +23,7 @@ and some common methods used cores and brokers
 
 #include "core.h"
 #include "ActionMessage.h"
-#include "helics/common/BlockingPriorityQueue.hpp"
+#include "../common/BlockingPriorityQueue.hpp"
 namespace helics
 {
 
@@ -85,6 +85,9 @@ public:
 	void addActionMessage(ActionMessage &&m);
 
 	void setLoggerFunction(std::function<void(int, const std::string &, const std::string &)> logFunction);
+
+    /* process a disconnect signal*/
+    virtual void processDisconnect(bool skipUnregister = false) = 0;
 private:
 	/** start main broker loop*/
 	void queueProcessingLoop();
@@ -99,8 +102,7 @@ protected:
 	@return a action message response to the priority command
 	*/
 	virtual void processPriorityCommand(ActionMessage &&command) = 0;
-	/* process a disconnect signal*/
-	virtual void processDisconnect() = 0;
+
 
 	/** send a Message to the logging system
 	@return true if the message was actually logged

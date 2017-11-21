@@ -9,10 +9,10 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #ifndef _HELICS_FILTERINFO_
 #define _HELICS_FILTERINFO_
 
-#include "helics/config.h"
+#include "helics/helics-config.h"
 #include "helics-time.h"
-#include "helics/common/blocking_queue.h"
-#include "helics/core/core.h"
+#include "../common/blocking_queue.h"
+#include "core.h"
 
 #include <mutex> 
 #include <thread> 
@@ -21,7 +21,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics {
 
-/** data class definining the information about a filter*/
+/** data class defining the information about a filter*/
 class FilterInfo
 {
 public:
@@ -52,7 +52,7 @@ public:
 	std::pair<Core::federate_id_t, Core::Handle> target{ invalid_fed_id,invalid_Handle };	//!< the actual target information for the filter
 private:
 	std::deque<std::unique_ptr<Message>>message_queue; //!< data structure containing the queued messages
-	mutable std::mutex queueLock;	//!< the lock for multithread access to the queue
+	mutable std::mutex queueLock;	//!< the lock for multi-thread access to the queue
 public:
 	/** get the next message in the queue that comes at or before the given time
 	*/

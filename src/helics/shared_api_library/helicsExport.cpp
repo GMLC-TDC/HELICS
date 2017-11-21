@@ -8,10 +8,11 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "application_api/application_api.h"
-#include "core/BrokerFactory.h"
-#include "core/CoreFactory.h"
-#include "core/helics-time.h"
+#include "../application_api/application_api.h"
+#include "../core/BrokerFactory.h"
+#include "../core/CoreFactory.h"
+#include "../core/helics-time.h"
+#include "../common/logger.h"
 #include "helics.h"
 #include "internal/api_objects.h"
 #include <atomic>
@@ -20,14 +21,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <mutex>
 #include <vector>
 
-#include "helics/config.h"
+#include "helics/helics-config.h"
 #if HELICS_HAVE_ZEROMQ > 0
-#include "common/cppzmq/zmq.hpp"
-#include "helics/common/zmqContextManager.h"
+#include "../common/cppzmq/zmq.hpp"
+#include "../common/zmqContextManager.h"
 #endif
 
-static const std::string versionStr (std::to_string (HELICS_VERSION_MAJOR) + "." +
-                                     std::to_string (HELICS_VERSION_MINOR) + "." +
+static const std::string versionStr (std::to_string (HELICS_VERSION_MAJOR) + "." + std::to_string (HELICS_VERSION_MINOR) + "." +
                                      std::to_string (HELICS_VERSION_PATCH) + " (" + HELICS_DATE + ")");
 
 const char *helicsGetVersion (void) { return versionStr.c_str (); }
@@ -112,20 +112,23 @@ helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int
     case OBSERVER_FLAG:
         hfi->observer = (value != 0);
         break;
-    case ROLLBACK_FLAG:
-        hfi->rollback = (value != 0);
-        break;
     case UNINTERRUPTIBLE_FLAG:
         hfi->uninterruptible = (value != 0);
         break;
-    case FORWARD_COMPUTE_FLAG:
-        hfi->forwardCompute = (value != 0);
+    case ONLY_TRANSMIT_ON_CHANGE_FLAG:
+        hfi->only_transmit_on_change = (value != 0);
         break;
-    case TIME_AGNOSTIC_FLAG:
-        hfi->timeAgnostic = (value != 0);
+    case ONLY_UPDATE_ON_CHANGE_FLAG:
+        hfi->only_update_on_change = (value != 0);
         break;
     case SOURCE_ONLY_FLAG:
-        hfi->sourceOnly = (value != 0);
+        hfi->source_only = (value != 0);
+        break;
+    case ROLLBACK_FLAG:
+        hfi->rollback = (value != 0);
+        break;
+    case FORWARD_COMPUTE_FLAG:
+        hfi->forwardCompute = (value != 0);
         break;
     default:
         return helicsDiscard;
@@ -335,6 +338,7 @@ void helicsCloseLibrary ()
     }
 
 #endif
+    helics::loggerManager::closeLogger();
 }
 
 helics_query helicsCreateQuery (const char *target, const char *query)

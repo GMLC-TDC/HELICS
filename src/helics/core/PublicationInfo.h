@@ -9,10 +9,10 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #ifndef _HELICS_SUBSCRIPTION_
 #define _HELICS_SUBSCRIPTION_
 
-#include "helics/config.h"
+#include "helics/helics-config.h"
 #include "helics-time.h"
-#include "helics/common/blocking_queue.h"
-#include "helics/core/core.h"
+#include "../common/blocking_queue.h"
+#include "core.h"
 
 #include <cstdint>
 #include <mutex> 
@@ -48,7 +48,9 @@ public:
 	std::string units;	//!< the units of the publication data
 	std::string data;	//!< the most recent publication data
 	bool has_update = false;	//!< indicator that the publication has updates
-	//7 byte gap here
+	
+    /** check the value if it is the same as the most recent data and if changed store it*/
+    bool CheckSetValue(const char *checkData, uint64_t len);
 	
 	
 };

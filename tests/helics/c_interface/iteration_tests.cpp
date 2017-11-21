@@ -30,15 +30,15 @@ BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
 //    vFed1->enterInitializationState ();
 //    vFed1->publish (pubid, 27.0);
 //
-//    auto comp = vFed1->enterExecutionState (helics::convergence_state::nonconverged);
+//    auto comp = vFed1->enterExecutionState (helics::iteration_result::nonconverged);
 //
-//    BOOST_CHECK (comp == helics::convergence_state::nonconverged);
+//    BOOST_CHECK (comp == helics::iteration_result::nonconverged);
 //    auto val = vFed1->getValue<double> (subid);
 //    BOOST_CHECK_EQUAL (val, 27.0);
 //
-//    comp = vFed1->enterExecutionState (helics::convergence_state::nonconverged);
+//    comp = vFed1->enterExecutionState (helics::iteration_result::nonconverged);
 //
-//    BOOST_CHECK (comp == helics::convergence_state::complete);
+//    BOOST_CHECK (comp == helics::iteration_result::next_step);
 //
 //    double val2 = vFed1->getValue<double> (subid);
 //
@@ -60,15 +60,15 @@ BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
 //    vFed1->enterInitializationStateFinalize ();
 //    vFed1->publish (pubid, 27.0);
 //    vFed1->enterExecutionStateAsync ();
-//    auto comp = vFed2->enterExecutionState (helics::convergence_state::nonconverged);
+//    auto comp = vFed2->enterExecutionState (helics::iteration_result::nonconverged);
 //
-//    BOOST_CHECK (comp == helics::convergence_state::nonconverged);
+//    BOOST_CHECK (comp == helics::iteration_result::nonconverged);
 //    auto val = vFed2->getValue<double> (subid);
 //    BOOST_CHECK_EQUAL (val, 27.0);
 //
-//    comp = vFed2->enterExecutionState (helics::convergence_state::nonconverged);
+//    comp = vFed2->enterExecutionState (helics::iteration_result::nonconverged);
 //
-//    BOOST_CHECK (comp == helics::convergence_state::complete);
+//    BOOST_CHECK (comp == helics::iteration_result::next_step);
 //
 //    double val2 = vFed2->getValue<double> (subid);
 //    vFed1->enterExecutionStateFinalize ();
@@ -88,16 +88,16 @@ BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
 //    vFed1->enterExecutionState ();
 //    vFed1->publish (pubid, 27.0);
 //
-//    auto comp = vFed1->requestTimeIterative (1.0, helics::convergence_state::nonconverged);
+//    auto comp = vFed1->requestTimeIterative (1.0, helics::iteration_result::nonconverged);
 //
-//    BOOST_CHECK (comp.state == helics::convergence_state::nonconverged);
+//    BOOST_CHECK (comp.state == helics::iteration_result::nonconverged);
 //    BOOST_CHECK_EQUAL (comp.stepTime, helics::timeZero);
 //    auto val = vFed1->getValue<double> (subid);
 //    BOOST_CHECK_EQUAL (val, 27.0);
 //
-//    comp = vFed1->requestTimeIterative (1.0, helics::convergence_state::nonconverged);
+//    comp = vFed1->requestTimeIterative (1.0, helics::iteration_result::nonconverged);
 //
-//    BOOST_CHECK (comp.state == helics::convergence_state::complete);
+//    BOOST_CHECK (comp.state == helics::iteration_result::next_step);
 //    BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
 //    double val2 = vFed1->getValue<double> (subid);
 //
@@ -122,16 +122,16 @@ BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
 //    vFed1->publish (pubid, 27.0);
 //
 //    vFed1->requestTimeAsync (1.0);
-//    auto comp = vFed2->requestTimeIterative (1.0, helics::convergence_state::nonconverged);
+//    auto comp = vFed2->requestTimeIterative (1.0, helics::iteration_result::nonconverged);
 //
-//    BOOST_CHECK (comp.state == helics::convergence_state::nonconverged);
+//    BOOST_CHECK (comp.state == helics::iteration_result::nonconverged);
 //    BOOST_CHECK_EQUAL (comp.stepTime, helics::timeZero);
 //    auto val = vFed2->getValue<double> (subid);
 //    BOOST_CHECK_EQUAL (val, 27.0);
 //
-//    comp = vFed2->requestTimeIterative (1.0, helics::convergence_state::nonconverged);
+//    comp = vFed2->requestTimeIterative (1.0, helics::iteration_result::nonconverged);
 //
-//    BOOST_CHECK (comp.state == helics::convergence_state::complete);
+//    BOOST_CHECK (comp.state == helics::iteration_result::next_step);
 //    BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
 //    double val2 = vFed2->getValue<double> (subid);
 //    vFed1->requestTimeFinalize ();

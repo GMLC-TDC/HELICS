@@ -51,7 +51,7 @@ int main (int argc, char **argv)
 
     status = helicsFederateInfoSetMaxIterations (fedinfo, 100);
 
-    status = helicsFederateInfoSetLoggingLevel (fedinfo, 5);
+    //status = helicsFederateInfoSetLoggingLevel (fedinfo, 5);
 
     /* Create value federate */
     vfed = helicsCreateValueFederate (fedinfo);
@@ -70,12 +70,11 @@ int main (int argc, char **argv)
     status = helicsEnterInitializationMode (vfed);
     printf (" Entered initialization mode\n");
 
-    double x = 0.0, y = 0.0, yprv = 100;
+    double x = 0.0, y = 0.0, yprv = 100, xprv=100;
     helics_time_t currenttime = 0.0;
     helics_iterative_time currenttimeiter;
-    currenttimeiter.status = nonconverged;
+    currenttimeiter.status = iterating;
     int isupdated;
-    convergence_status conv = 0;
     double tol = 1E-8;
 
     status = helicsPublishDouble (pub, x);
@@ -84,7 +83,8 @@ int main (int argc, char **argv)
     printf (" Entered execution mode\n");
 
     fflush (NULL);
-    while ((fabs (y - yprv) > tol) || (currenttimeiter.status == nonconverged))
+    int helics_iter = 0;
+    while (currenttimeiter.status == iterating)
     {
         yprv = y;
         status = helicsGetDouble (sub, &y);
@@ -108,18 +108,17 @@ int main (int argc, char **argv)
 
             x = x - f1 / J1;
         }
-
-        if (newt_conv)
+        ++helics_iter;
+        printf("Fed1: iteration %d x=%f, y=%f\n",helics_iter, x, y);
+        
+        if ((fabs(x-xprv)>tol)||(helics_iter<5))
         {
             status = helicsPublishDouble (pub, x);
-
-            //      isupdated = 0;
-            //      while(!isupdated) {
-            currenttimeiter = helicsRequestTimeIterative (vfed, currenttime, conv);
-            //       	isupdated = helicsIsValueUpdated(sub);
-            //      }
-            //      currenttime = helicsRequestTime(vfed,currenttime);
+            printf("Fed1: publishing new x\n");
         }
+        fflush(NULL);
+        currenttimeiter = helicsRequestTimeIterative(vfed, currenttime, iterate_if_needed);
+        xprv = x;
     }
 
     printf ("NLIN1: Federate finalized\n");
@@ -130,7 +129,7 @@ int main (int argc, char **argv)
 #ifdef _MSC_VER
         Sleep (50);
 #else
-        usleep (50000); /* Sleep for 1 millisecond */
+        usleep (50000); /* Sleep for 50 millisecond */
 #endif
     }
     printf ("NLIN1: Broker disconnected\n");
