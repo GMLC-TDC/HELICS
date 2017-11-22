@@ -13,7 +13,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <memory>
 
 #include "helics/application_api/MessageFederate.h"
-#include "helics/application_api/MessageFilterFederate.h"
 #include "helics/application_api/ValueFederate.h"
 #include "helics/core/CoreBroker.h"
 #include "helics/core/CoreFactory.h"

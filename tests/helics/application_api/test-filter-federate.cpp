@@ -10,8 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
-
-#include "helics/application_api/MessageFilterFederate.h"
+#include "helics/application_api/Federate.h"
 #include "helics/application_api/MessageOperators.h"
 #include "testFixtures.h"
 #include "test_configuration.h"

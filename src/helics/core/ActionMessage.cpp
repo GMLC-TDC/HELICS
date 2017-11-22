@@ -326,7 +326,6 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_notify_sub, "notify_sub"},
   {action_message_def::action_t::cmd_reg_src_filter, "reg_src_filter"},
   {action_message_def::action_t::cmd_notify_src_filter, "notify_src_filter"},
-  {action_message_def::action_t::cmd_src_filter_has_operator, "src_filter_has_operator"},
   {action_message_def::action_t::cmd_reg_end, "reg_end"},
   {action_message_def::action_t::cmd_notify_end, "notify_end"},
 

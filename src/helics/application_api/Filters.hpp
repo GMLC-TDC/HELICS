@@ -11,12 +11,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_FILTER_H_
 #pragma once
 
-#include "MessageFilterFederate.h"
+#include "Federate.h"
+#include "libguarded/guarded.hpp"
 
 namespace helics
 {
 class MessageTimeOperator;
 class MessageConditionalOperator;
+class MessageDestOperator;
 
 /** class for managing filter operations*/
 class FilterOperations
@@ -86,7 +88,7 @@ class rerouteFilterOperation : public FilterOperations
 {
 private:
     std::shared_ptr<MessageDestOperator> op; //!<the actual operator
-    std::atomic<std::string> newTarget; //!< the target destination
+    libguarded::guarded <std::string> newTarget; //!< the target destination
 public:
     rerouteFilterOperation();
     ~rerouteFilterOperation();
@@ -108,18 +110,10 @@ class Filter
     virtual ~Filter () = default;
 
     /** set a message operator to process the message*/
-    void setOperator (std::shared_ptr<MessageOperator> mo)
-    {
-        if (fed != nullptr)
-        {
-            fed->registerMessageOperator (id, std::move (mo));
-        }
-    }
-    void setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
-    {
-        filtOp = std::move (filterOps);
-        fed->registerMessageOperator (filtOp->getOperator ());
-    }
+    void setOperator(std::shared_ptr<MessageOperator> mo);
+   
+    void setFilterOperations(std::shared_ptr<FilterOperations> filterOps);
+    
 };
 /** class wrapping a source filter*/
 class SourceFilter : public Filter
@@ -180,12 +174,12 @@ enum defined_filter_types
 };
 
 std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types type,
-                                                            MessageFilterFederate *mFed,
+                                                            Federate *mFed,
                                                             const std::string &target,
                                                             const std::string &name = "");
 
 std::unique_ptr<SourceFilter> make_Source_filter (defined_filter_types type,
-                                                  MessageFilterFederate *mFed,
+                                                  Federate *mFed,
                                                   const std::string &target,
                                                   const std::string &name = "");
 

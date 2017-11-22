@@ -28,28 +28,30 @@ public:
 	/** constructor from all fields*/
 	FilterInfo(Core::federate_id_t fed_id_, Core::Handle handle_,
 		const std::string &key_,
-		const std::string &type_,
-		const std::string &target_,
+        const std::string &target_,
+		const std::string &type_in_,
+        const std::string &type_out_,
 		bool destFilter_)
 		: fed_id(fed_id_), 
         handle(handle_),
-		
 		key(key_),
-		inputType(type_),
-		dest_filter(destFilter_),
-		filterTarget(target_)
+        filterTarget(target_),
+		inputType(type_in_),
+        outputType(type_out_),
+		dest_filter(destFilter_)
 	{
 	}
     Core::federate_id_t fed_id = invalid_fed_id;	//!< id of the core that manages the filter
 	Core::Handle handle= invalid_Handle; //!< id handle of the filter
 	
 	std::string key;	//!< the identifier of the filter
+    std::string filterTarget;	//!< the target endpoint name of the filter
 	std::string inputType;	//!< the type of data for the filter
     std::string outputType; //!< the outputType of data of the filter
 	bool dest_filter = false;	//! indicator that the filter is a destination filter
 	// there is a 6 byte gap here
 	std::shared_ptr<FilterOperator> filterOp;	//!< the callback operation of the filter
-	std::string filterTarget;	//!< the target endpoint name of the filter
+	
 	std::pair<Core::federate_id_t, Core::Handle> target{ invalid_fed_id,invalid_Handle };	//!< the actual target information for the filter
 };
 } // namespace helics

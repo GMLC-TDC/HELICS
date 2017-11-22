@@ -48,15 +48,26 @@ static void addOperations (Filter *filt, defined_filter_types type)
         filt->setFilterOperations (std::move (op));
     }
     break;
-    case redirect:
-    {
-    }
-    break;
     }
 }
 
+
+void Filter::setOperator(std::shared_ptr<MessageOperator> mo)
+{
+    if (fed != nullptr)
+    {
+       
+        fed->registerMessageOperator(id, std::move(mo));
+    }
+}
+void Filter::setFilterOperations(std::shared_ptr<FilterOperations> filterOps)
+{
+    filtOp = std::move(filterOps);
+    fed->registerMessageOperator(filtOp->getOperator());
+}
+
 std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types type,
-                                                            MessageFilterFederate *mFed,
+                                                            Federate *mFed,
                                                             const std::string &target,
                                                             const std::string &name)
 
@@ -67,7 +78,7 @@ std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types
 }
 
 std::unique_ptr<SourceFilter> make_Source_filter (defined_filter_types type,
-                                                  MessageFilterFederate *mFed,
+                                                  Federate *mFed,
                                                   const std::string &target,
                                                   const std::string &name)
 {
@@ -126,12 +137,12 @@ enum class random_dists_t : int
 };
 
 static const std::map<std::string, random_dists_t> distMap{
-  {"constant", constant},           {"uniform", uniform},     {"bernoulli", bernoulli},
-  {"binomial", binomial},           {"geometric", geometric}, {"poisson", poisson},
-  {"exponential", exponential},     {"gamma", gamma},         {"weibull", weibull},
-  {"extreme_value", extreme_value}, {"normal", normal},       {"lognormal", lognormal},
-  {"chi_squared", chi_squared},     {"cauchy", cauchy},       {"fisher_f", fisher_f},
-  {"student_t", student_t}};
+  {"constant", random_dists_t::constant},           {"uniform", random_dists_t::uniform},     {"bernoulli", random_dists_t::bernoulli},
+  {"binomial", random_dists_t::binomial},           {"geometric", random_dists_t::geometric}, {"poisson", random_dists_t::poisson},
+  {"exponential", random_dists_t::exponential},     {"gamma", random_dists_t::gamma},         {"weibull", random_dists_t::weibull},
+  {"extreme_value", random_dists_t::extreme_value}, {"normal", random_dists_t::normal},       {"lognormal", random_dists_t::lognormal},
+  {"chi_squared", random_dists_t::chi_squared},     {"cauchy", random_dists_t::cauchy},       {"fisher_f", random_dists_t::fisher_f},
+  {"student_t", random_dists_t::student_t}};
 
 double randDouble (random_dists_t dist, double p1, double p2)
 {

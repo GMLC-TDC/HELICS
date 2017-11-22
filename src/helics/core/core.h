@@ -368,6 +368,12 @@ class Core
     virtual const std::string &getHandleName (Handle handle) const = 0;
 
     /**
+    * Returns the target of a specified handle
+    @details for publications and subscriptions this is the key
+    for filters this is the target and for endpoints this will return an empty string
+    */
+    virtual const std::string &getTarget(Handle handle) const = 0;
+    /**
      * Returns units for specified handle.
      */
     virtual const std::string &getUnits (Handle handle) const = 0;
@@ -596,7 +602,7 @@ class Core
 	/** supply a query callback function
 	@details the intention of the query callback is to allow federates to answer particular requests through the query interface
 	this allows other federates to make requests or queries of other federates in an asynchronous fashion.  
-	@param federateID the indentifier for the federate
+	@param federateID the identifier for the federate
 	@param queryFunction  a function object that returns a string as a result of a query in the form of const string ref.  
 	This callback will be called when a federate received a query that cannot be answered that directed at a particular federate
 	*/

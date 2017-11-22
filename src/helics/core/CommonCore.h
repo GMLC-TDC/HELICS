@@ -32,6 +32,7 @@ class FederateState;
 class BasicHandleInfo;
 class FilterCoordinator;
 class logger;
+class FilterInfo;
 
 enum BasicHandleType:char;
 
@@ -84,8 +85,10 @@ CommonCore(const std::string &core_name);
   virtual Handle registerPublication (federate_id_t federateID, const std::string &key, const std::string &type, const std::string &units) override final;
   virtual Handle getPublication (federate_id_t federateID, const std::string &key) const override final;
   virtual const std::string &getHandleName(Handle handle) const override final;
+  virtual const std::string &getTarget(Handle handle) const override final;
   virtual const std::string &getUnits (Handle handle) const override final;
   virtual const std::string &getType (Handle handle) const override final;
+  virtual const std::string &getOutputType(Handle handle) const override final;
   virtual void setValue (Handle handle, const char *data, uint64_t len) override final;
   virtual std::shared_ptr<const data_block> getValue (Handle handle) override final;
 
@@ -190,16 +193,18 @@ private:
 	/** process any filter or route the message*/
 	void processMessageFilter(ActionMessage &cmd);
 	
-    Filter *createSourceFilter(federate_id_t dest, Core::Handle handle,
+    FilterInfo *createSourceFilter(federate_id_t dest, Core::Handle handle,
         const std::string &key,
         const std::string &target,
-        const std::string &type);
+        const std::string &type_in,
+        const std::string &type_out);
 
-    Filter *createDestFilter(federate_id_t dest, 
+    FilterInfo *createDestFilter(federate_id_t dest, 
         Core::Handle handle,
         const std::string &key,
         const std::string &target,
-        const std::string &type);
+        const std::string &type_in,
+        const std::string &type_out);
 
 protected:
 	
@@ -227,11 +232,11 @@ protected:
   /** function to deal with a source filters*/
   ActionMessage &processMessage(BasicHandleInfo *hndl, ActionMessage &m);
   /** add a new handle to the generic structure
-  and return a ptr to it, the ptr is non-owning
+  and return a pointer to it, the pointer is non-owning
   */
   BasicHandleInfo* createBasicHandle(Handle id_, federate_id_t global_federateId, federate_id_t local_federateId, BasicHandleType HandleType, const std::string &key, const std::string &type, const std::string &units, bool required);
   /** add a new handle to the generic structure
-  and return a ptr to it the ptr is non owning
+  and return a pointer to it the pointer is non owning
   variation targeted at filters
   */
   BasicHandleInfo *createBasicHandle(Handle id_,

@@ -676,8 +676,7 @@ std::string Federate::getFilterName(filter_id_t id) const
 }
 std::string Federate::getFilterEndpoint(filter_id_t id) const
 {
-    std::lock_guard<std::mutex> fLock(filterLock);
-    return (id.value() < filters.size()) ? (filters[id.value()].endpoint) : nullStr;
+    return coreObject->getTarget(id.value());
 }
 
 std::string Federate::getFilterInputType(filter_id_t id) const

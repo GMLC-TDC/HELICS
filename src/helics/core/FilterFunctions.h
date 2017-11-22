@@ -23,12 +23,11 @@ class FilterCoordinator
 {
 public:
 	std::vector<FilterInfo *> sourceFilters; //!< ordered set of source operators
-    FilterInfo *finalSourceFilter=nullptr; //!< the last sourceFilter to trigger
-	FilterInfo *destOperator=nullptr;	//!< the destination operator handle
+	FilterInfo *destFilter=nullptr;	//!< the destination operator handle
 
 	std::vector<FilterInfo *> allSourceFilters; //!< storage for all the source filters before sorting
 	bool hasSourceFilter=false;	//!< indicator that an endpoint has source filters
-	bool hasDestOperator=false;	//!< indicator that an endpoint has a destination filter
+	bool hasDestFilter=false;	//!< indicator that an endpoint has a destination filter
 };
 }
 
