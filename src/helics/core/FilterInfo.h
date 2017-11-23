@@ -49,7 +49,7 @@ public:
 	std::string inputType;	//!< the type of data for the filter
     std::string outputType; //!< the outputType of data of the filter
 	bool dest_filter = false;	//! indicator that the filter is a destination filter
-	// there is a 6 byte gap here
+	// there is a 7 byte gap here
 	std::shared_ptr<FilterOperator> filterOp;	//!< the callback operation of the filter
 	
 	std::pair<Core::federate_id_t, Core::Handle> target{ invalid_fed_id,invalid_Handle };	//!< the actual target information for the filter

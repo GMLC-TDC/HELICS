@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE (endpointinfo_test)
     BOOST_CHECK_EQUAL (endPI.queueSize (maxT), 4);
     BOOST_CHECK_EQUAL (endPI.firstMessageTime (), minT);
 
-    // Test maxTime parameter for getMessage(), and proper dequeing
+    // Test maxTime parameter for getMessage(), and proper dequeuing
     auto msg = endPI.getMessage (minT);
     BOOST_CHECK_EQUAL (msg->data.to_string (), "minT");
     BOOST_CHECK_EQUAL (endPI.queueSize (minT), 0);
@@ -258,110 +258,15 @@ BOOST_AUTO_TEST_CASE (filterinfo_test)
     msg_time_one_b->origsrc = "bFed";
     msg_time_one_b->time = helics::Time (1);
 
-    helics::FilterInfo filtI (13, 5, "name", "type", "target", true);
-    BOOST_CHECK_EQUAL (filtI.id, 13);
+    helics::FilterInfo filtI (5, 13, "name", "target", "type_in","type_out", true);
+    BOOST_CHECK_EQUAL (filtI.handle, 13);
     BOOST_CHECK_EQUAL (filtI.fed_id, 5);
     BOOST_CHECK (filtI.key.compare ("name") == 0);
-    BOOST_CHECK (filtI.type.compare ("type") == 0);
+    BOOST_CHECK (filtI.inputType.compare ("type_in") == 0);
+    BOOST_CHECK(filtI.outputType.compare("type_out") == 0);
     BOOST_CHECK (filtI.filterTarget.compare ("target") == 0);
     BOOST_CHECK_EQUAL (filtI.dest_filter, true);
-
-    // Check proper return values for empty queue
-    // size 0 for any time given
-    // first message time is the max possible
-    // nullptr for getting a message
-    BOOST_CHECK_EQUAL (filtI.queueSize (minT), 0);
-    BOOST_CHECK_EQUAL (filtI.queueSize (maxT), 0);
-    BOOST_CHECK_EQUAL (filtI.firstMessageTime (), maxT);
-    BOOST_CHECK (filtI.getMessage (minT) == nullptr);
-    BOOST_CHECK (filtI.getMessage (maxT) == nullptr);
-
-    // Add a message at the max time possible
-    filtI.addMessage (std::move (msg_time_max));
-    BOOST_CHECK_EQUAL (filtI.queueSize (minT), 0);
-    BOOST_CHECK_EQUAL (filtI.queueSize (maxT), 1);
-    BOOST_CHECK_EQUAL (filtI.firstMessageTime (), maxT);
-
-    // Add a message at time zero (check if maxTime parameter is working queueSize())
-    filtI.addMessage (std::move (msg_time_zero));
-    BOOST_CHECK_EQUAL (filtI.queueSize (minT), 0);
-    BOOST_CHECK_EQUAL (filtI.queueSize (zeroT), 1);
-    BOOST_CHECK_EQUAL (filtI.queueSize (maxT), 2);
-    BOOST_CHECK_EQUAL (filtI.firstMessageTime (), zeroT);
-
-    // Add a message at the min time possible
-    filtI.addMessage (std::move (msg_time_min));
-    BOOST_CHECK_EQUAL (filtI.queueSize (minT), 1);
-    BOOST_CHECK_EQUAL (filtI.queueSize (zeroT), 2);
-    BOOST_CHECK_EQUAL (filtI.queueSize (1), 2);
-    BOOST_CHECK_EQUAL (filtI.queueSize (maxT), 3);
-    BOOST_CHECK_EQUAL (filtI.firstMessageTime (), minT);
-
-    // Add a message at a time somewhere in between the others
-    filtI.addMessage (std::move (msg_time_one_b));
-    BOOST_CHECK_EQUAL (filtI.queueSize (minT), 1);
-    BOOST_CHECK_EQUAL (filtI.queueSize (zeroT), 2);
-    BOOST_CHECK_EQUAL (filtI.queueSize (1), 3);
-    BOOST_CHECK_EQUAL (filtI.queueSize (maxT), 4);
-    BOOST_CHECK_EQUAL (filtI.firstMessageTime (), minT);
-
-    // Test maxTime parameter for getMessage(), and proper dequeing
-    auto msg = filtI.getMessage (minT);
-    BOOST_CHECK_EQUAL (msg->data.to_string (), "minT");
-    BOOST_CHECK_EQUAL (filtI.queueSize (minT), 0);
-    BOOST_CHECK_EQUAL (filtI.queueSize (maxT), 3);
-    BOOST_CHECK (filtI.getMessage (minT) == nullptr);
-
-    // Message at time 0 should now be the first
-    BOOST_CHECK_EQUAL (filtI.firstMessageTime (), zeroT);
-    msg = filtI.getMessage (zeroT);
-    BOOST_CHECK_EQUAL (msg->data.to_string (), "zeroT");
-    BOOST_CHECK_EQUAL (filtI.queueSize (maxT), 2);
-    BOOST_CHECK (filtI.getMessage (zeroT) == nullptr);
-
-    // Now message at time 1 (bFed) should be the first
-    BOOST_CHECK_EQUAL (filtI.firstMessageTime (), helics::Time (1));
-    BOOST_CHECK_EQUAL (filtI.queueSize (1), 1);
-
-    // Insert another message at time 1 (aFed) to test ordering by original source name
-    filtI.addMessage (std::move (msg_time_one_a));
-    BOOST_CHECK_EQUAL (filtI.firstMessageTime (), helics::Time (1));
-    BOOST_CHECK_EQUAL (filtI.queueSize (1), 2);
-    msg = filtI.getMessage (1);
-    BOOST_CHECK_EQUAL (msg->data.to_string (), "oneAT");
-    BOOST_CHECK_EQUAL (filtI.queueSize (1), 1);
-    msg = filtI.getMessage (1);
-    BOOST_CHECK_EQUAL (msg->data.to_string (), "oneBT");
-    BOOST_CHECK_EQUAL (filtI.queueSize (1), 0);
-    BOOST_CHECK (filtI.getMessage (1) == nullptr);
-
-    // Recreate messages A and B at time 1
-    msg_time_one_a = std::make_unique<helics::Message> ();
-    msg_time_one_a->data = "oneAT";
-    msg_time_one_a->origsrc = "aFed";
-    msg_time_one_a->time = helics::Time (1);
-
-    msg_time_one_b = std::make_unique<helics::Message> ();
-    msg_time_one_b->data = "oneBT";
-    msg_time_one_b->origsrc = "bFed";
-    msg_time_one_b->time = helics::Time (1);
-
-    // Perform the same source name federate test, but reverse order of add messages
-    filtI.addMessage (std::move (msg_time_one_a));
-    filtI.addMessage (std::move (msg_time_one_b));
-    BOOST_CHECK_EQUAL (filtI.queueSize (1), 2);
-    msg = filtI.getMessage (1);
-    BOOST_CHECK_EQUAL (msg->data.to_string (), "oneAT");
-    BOOST_CHECK_EQUAL (filtI.queueSize (1), 1);
-    msg = filtI.getMessage (1);
-    BOOST_CHECK_EQUAL (msg->data.to_string (), "oneBT");
-    BOOST_CHECK_EQUAL (filtI.queueSize (1), 0);
-
-    // Test removing all elements from queue
-    msg = filtI.getMessage (maxT);
-    BOOST_CHECK_EQUAL (msg->data.to_string (), "maxT");
-    BOOST_CHECK_EQUAL (filtI.queueSize (maxT), 0);
-    BOOST_CHECK (filtI.getMessage (maxT) == nullptr);
+  
 }
 
 BOOST_AUTO_TEST_CASE (subscriptioninfo_test)
@@ -388,7 +293,7 @@ BOOST_AUTO_TEST_CASE (subscriptioninfo_test)
     subI.updateTime (helics::timeZero);
     ret_data = subI.getData ();
 
-    // When movement of data is updated (see above), this can be uncommmented and updated
+    // When movement of data is updated (see above), this can be uncommented and updated
     BOOST_CHECK_EQUAL (ret_data->size (), 11);
     BOOST_CHECK (0 == strncmp (ret_data->data (), hello_data->data (), ret_data->size ()));
 

@@ -57,19 +57,6 @@ helics::MessageFederate *getMessageFed (helics_message_federate fed)
     return nullptr;
 }
 
-helics::MessageFilterFederate *getFilterFed (helics_message_filter_federate fed)
-{
-    auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
-    if (fedObj->valid == validationIdentifier)
-    {
-        if (fedObj->type == helics::vtype::filterFed)
-        {
-            return dynamic_cast<helics::MessageFilterFederate *> (fedObj->fedptr.get ());
-        }
-    }
-    return nullptr;
-}
-
 std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
@@ -104,18 +91,7 @@ std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_message_
     }
     return nullptr;
 }
-std::shared_ptr<helics::MessageFilterFederate> getFilterFedSharedPtr (helics_message_filter_federate fed)
-{
-    auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
-    if (fedObj->valid == validationIdentifier)
-    {
-        if (fedObj->type == helics::vtype::filterFed)
-        {
-            return std::dynamic_pointer_cast<helics::MessageFilterFederate> (fedObj->fedptr);
-        }
-    }
-    return nullptr;
-}
+
 
 masterObjectHolder::masterObjectHolder () noexcept {}
 
@@ -260,26 +236,6 @@ helics_federate helicsCreateMessageFederateFromFile (const char *file)
     return reinterpret_cast<void *> (fed);
 }
 
-/* Creation and destruction of Federates */
-helics_federate helicsCreateMessageFilterFederate (const helics_federate_info_t fi)
-{
-    auto *fed = new helics::FedObject;
-    fed->index = getMasterHolder ()->addFed (fed);
-    fed->fedptr = std::make_shared<helics::MessageFilterFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
-    fed->type = helics::vtype::filterFed;
-    fed->valid = validationIdentifier;
-    return reinterpret_cast<void *> (fed);
-}
-
-helics_federate helicsCreateMessageFilterFederateFromFile (const char *file)
-{
-    auto *fed = new helics::FedObject;
-    fed->index = getMasterHolder ()->addFed (fed);
-    fed->fedptr = std::make_shared<helics::MessageFilterFederate> (file);
-    fed->type = helics::vtype::filterFed;
-    fed->valid = validationIdentifier;
-    return reinterpret_cast<void *> (fed);
-}
 
 /* Creation and destruction of Federates */
 helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi)

@@ -17,7 +17,7 @@ helics.h
 api-data.h
 ValueFederate_c.h
 MessageFederate_c.h
-MessageFilterFederate_c.h
+MessageFilters_c.h
 internal/api_objects.h
 )
 
@@ -26,7 +26,7 @@ helicsExport.cpp
 FederateExport.cpp
 ValueFederateExport.cpp
 MessageFederateExport.cpp
-MessageFilterFederateExport.cpp
+MessageFilters.cpp
 
 )
 

@@ -980,7 +980,7 @@ const std::string &CommonCore::getTarget(Handle handle) const
             return nullStr;
         }
     }
-    return nullptr;
+    return nullStr;
 
 }
 void CommonCore::setValue (Handle handle, const char *data, uint64_t len)
