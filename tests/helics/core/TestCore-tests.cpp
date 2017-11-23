@@ -148,56 +148,6 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
     core->disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (testcore_messagefilter_source_test)
-{
-    const char *initializationString = "1";
-    auto core = create (helics::core_type::TEST, initializationString);
-
-    BOOST_REQUIRE (core != nullptr);
-    BOOST_CHECK (core->isInitialized ());
-    core->connect ();
-    BOOST_REQUIRE (core->isConnected ());
-    Core::federate_id_t id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
-
-    Core::Handle end1 = core->registerEndpoint (id, "end1", "type");
-    Core::Handle end2 = core->registerEndpoint (id, "end2", "type");
-    Core::Handle endp = core->registerEndpoint (id, "end_filt", "type");
-
-    Core::Handle srcFilter = core->registerSourceFilter (id, "srcFilter", "end1", "type", "type");
-
-    core->enterInitializingState (id);
-    core->enterExecutingState (id);
-
-    std::string msgData = "hello world";
-    std::string srcFilterName = "sourceFilter";
-    core->send (end1, "end2", msgData.data (), msgData.size ());
-
-    core->timeRequest (id, 50.0);
-
-    // Get message to filter. Update src and send to destination.
-    BOOST_CHECK_EQUAL (core->receiveFilterCount (id), 1u);
-
-    BOOST_CHECK_EQUAL (core->receiveCount (srcFilter), 1u);
-    Core::Handle filter_id;
-    auto msgAny = core->receiveAnyFilter (id, filter_id);
-    BOOST_CHECK_EQUAL (msgAny->origsrc, "end1");
-    BOOST_CHECK_EQUAL (msgAny->src, "end1");
-    msgAny->src = srcFilterName;
-    // use a dummy message to test code the error return
-    BOOST_CHECK_THROW (core->sendMessage (helics::invalid_Handle, std::make_unique<helics::Message> ()),
-                       helics::invalidIdentifier);
-    // we are also testing that the error did not change the message
-    core->sendMessage (endp, std::move (msgAny));
-    core->timeRequest (id, 60.0);
-    // Receive the filtered message
-    BOOST_CHECK_EQUAL (core->receiveCount (end2), 1u);
-    BOOST_CHECK_EQUAL (core->receiveCount (endp), 0);
-    auto msg = core->receive (end2);
-    BOOST_CHECK_EQUAL (msg->origsrc, "end1");
-    BOOST_CHECK_EQUAL (msg->src, "end_filt");
-    core->disconnect ();
-}
-
 BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
 {
     // Create filter operator
@@ -232,8 +182,8 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     Core::Handle end1 = core->registerEndpoint (id, "end1", "type");
     Core::Handle end2 = core->registerEndpoint (id, "end2", "type");
 
-    Core::Handle srcFilter = core->registerSourceFilter (id, "srcFilter", "end1", "type", "type");
-    Core::Handle dstFilter = core->registerDestinationFilter (id, "dstFilter", "end2", "type", "type");
+    Core::Handle srcFilter = core->registerSourceFilter ( "srcFilter", "end1", "type", "type");
+    Core::Handle dstFilter = core->registerDestinationFilter ( "dstFilter", "end2", "type", "type");
 
     auto testSrcFilter = std::make_shared<TestOperator> ("sourceFilter");
     BOOST_CHECK_EQUAL (testSrcFilter->filterName, "sourceFilter");
@@ -252,8 +202,6 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
 
     core->timeRequest (id, 50.0);
 
-    // All filters are using callbacks, there should be none to filter
-    BOOST_CHECK_EQUAL (core->receiveFilterCount (id), 0u);
 
     // Receive the filtered message
     BOOST_CHECK_EQUAL (core->receiveCount (end2), 1u);

@@ -14,15 +14,9 @@
 #define LIBGUARDED_SHARED_GUARDED_HPP
 
 #include <memory>
+#include <type_traits>
 
-#if HAVE_CXX14
 #include <shared_mutex>
-#else
-namespace std
-{
-class shared_timed_mutex;
-}
-#endif
 
 namespace libguarded
 {
@@ -74,6 +68,36 @@ class shared_guarded
     template <class TimePoint>
     shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
 
+    /** generate a copy of the protected object
+    */
+    std::enable_if_t<std::is_copy_constructible<T>::value, T> load() const
+    {
+        m_mutex.lock_shared();
+        T newObj(m_obj);
+        m_mutex.unlock();
+        return newObj;
+    }
+    /** generate a copy of the protected object
+    */
+    std::enable_if_t<std::is_copy_constructible<T>::value, T> operator*() const
+    {
+        return load();
+    }
+
+    /** store an updated value into the object*/
+    template <typename objType>
+    std::enable_if_t<std::is_copy_assignable<T>::value, T> store(objType &&newObj)
+    {
+        std::lock_guard<M> lock(m_mutex);
+        m_obj = std::forward(newObj);
+    }
+
+    /** store an updated value into the object*/
+    template <typename objType>
+    std::enable_if_t<std::is_copy_assignable<T>::value, T> operator=(objType &&newObj)
+    {
+        store(std::forward(newObj));
+    }
   private:
     class deleter
     {

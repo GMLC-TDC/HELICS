@@ -685,21 +685,6 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         addSourceFilter (command);
         break;
-    case CMD_SRC_FILTER_HAS_OPERATOR:
-        if (command.dest_id != 0)
-        {
-            auto rt = getRoute (command.dest_id);
-            transmit (rt, command);
-            break;
-        }
-        {
-            if ((!updateSourceFilterOperator (command)) && (!_isRoot))
-            {
-                transmit (0, command);
-            }
-        }
-
-        break;
     case CMD_ADD_DEPENDENCY:
     case CMD_ADD_DEPENDENT:
     case CMD_REMOVE_DEPENDENT:

@@ -15,6 +15,7 @@
 
 #include <memory>
 #include <mutex>
+#include <type_traits>
 
 namespace libguarded
 {
@@ -100,6 +101,35 @@ class guarded
     template <class TimePoint>
     handle try_lock_until(const TimePoint &timepoint);
 
+    /** generate a copy of the protected object
+    */
+    std::enable_if_t<std::is_copy_constructible<T>::value, T> load()
+    {
+        std::lock_guard<M> lock(m_mutex);
+        return m_obj;
+    }
+    /** generate a copy of the protected object
+    */
+    std::enable_if_t<std::is_copy_constructible<T>::value, T> operator*()
+    {
+        return load();
+    }
+
+    /** store an updated value into the object*/
+    template <typename objType>
+    std::enable_if_t<std::is_copy_assignable<T>::value, T> store(objType &&newObj)
+    {
+        std::lock_guard<M> lock(m_mutex);
+        m_obj = std::forward(newObj);
+    }
+
+    /** store an updated value into the object*/
+    template <typename objType>
+    std::enable_if_t<std::is_copy_assignable<T>::value, T> operator=(objType &&newObj)
+    {
+        store(std::forward(newObj));
+    }
+
   private:
     class deleter
     {
@@ -175,6 +205,7 @@ auto guarded<T, M>::try_lock_until(const TimePoint &tp) -> handle
         return handle(nullptr, deleter(std::move(lock)));
     }
 }
+
 }
 
 #endif

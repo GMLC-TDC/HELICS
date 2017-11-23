@@ -36,7 +36,7 @@ class FilterOperations
     @param val the numerical value of the property
     */
     virtual void setString (const std::string &property, const std::string &val);
-    virtual std::shared_ptr<MessageOperator> getOperator () = 0;
+    virtual std::shared_ptr<FilterOperator> getOperator () = 0;
 };
 
 /**filter for delaying a message in time*/
@@ -49,7 +49,7 @@ class delayFilterOperation : public FilterOperations
   public:
     delayFilterOperation (Time delayTime = timeZero);
     virtual void set (const std::string &property, double val) override;
-    virtual std::shared_ptr<MessageOperator> getOperator () override;
+    virtual std::shared_ptr<FilterOperator> getOperator () override;
 };
 
 class randomDelayGenerator;
@@ -66,7 +66,7 @@ class randomDelayFilterOperation : public FilterOperations
     ~randomDelayFilterOperation ();
     virtual void set (const std::string &property, double val) override;
     virtual void setString (const std::string &property, const std::string &val) override;
-    virtual std::shared_ptr<MessageOperator> getOperator () override;
+    virtual std::shared_ptr<FilterOperator> getOperator () override;
 };
 /** filter for randomly dropping a packet*/
 class randomDropFilterOperation : public FilterOperations
@@ -80,7 +80,7 @@ class randomDropFilterOperation : public FilterOperations
     ~randomDropFilterOperation ();
     virtual void set (const std::string &property, double val) override;
     virtual void setString (const std::string &property, const std::string &val) override;
-    virtual std::shared_ptr<MessageOperator> getOperator () override;
+    virtual std::shared_ptr<FilterOperator> getOperator () override;
 };
 
 /** filter for rerouting a packet to a particular endpoint*/
@@ -94,7 +94,7 @@ public:
     ~rerouteFilterOperation();
     virtual void set(const std::string &property, double val) override;
     virtual void setString(const std::string &property, const std::string &val) override;
-    virtual std::shared_ptr<MessageOperator> getOperator() override;
+    virtual std::shared_ptr<FilterOperator> getOperator() override;
 };
 
 /** class for managing a particular filter*/
@@ -110,7 +110,7 @@ class Filter
     virtual ~Filter () = default;
 
     /** set a message operator to process the message*/
-    void setOperator(std::shared_ptr<MessageOperator> mo);
+    void setOperator(std::shared_ptr<FilterOperator> mo);
    
     void setFilterOperations(std::shared_ptr<FilterOperations> filterOps);
     

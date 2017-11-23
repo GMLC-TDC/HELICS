@@ -52,7 +52,7 @@ static void addOperations (Filter *filt, defined_filter_types type)
 }
 
 
-void Filter::setOperator(std::shared_ptr<MessageOperator> mo)
+void Filter::setOperator(std::shared_ptr<FilterOperator> mo)
 {
     if (fed != nullptr)
     {
@@ -63,7 +63,7 @@ void Filter::setOperator(std::shared_ptr<MessageOperator> mo)
 void Filter::setFilterOperations(std::shared_ptr<FilterOperations> filterOps)
 {
     filtOp = std::move(filterOps);
-    fed->registerMessageOperator(filtOp->getOperator());
+    fed->registerMessageOperator(id,filtOp->getOperator());
 }
 
 std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types type,
@@ -110,9 +110,9 @@ void delayFilterOperation::set (const std::string &property, double val)
     }
 }
 
-std::shared_ptr<MessageOperator> delayFilterOperation::getOperator ()
+std::shared_ptr<FilterOperator> delayFilterOperation::getOperator ()
 {
-    return std::static_pointer_cast<MessageOperator> (td);
+    return std::static_pointer_cast<FilterOperator> (td);
 }
 
 // enumeration of possible random number generator distributions
@@ -302,9 +302,9 @@ void randomDelayFilterOperation::setString (const std::string &property, const s
     }
 }
 
-std::shared_ptr<MessageOperator> randomDelayFilterOperation::getOperator ()
+std::shared_ptr<FilterOperator> randomDelayFilterOperation::getOperator ()
 {
-    return std::static_pointer_cast<MessageOperator> (td);
+    return std::static_pointer_cast<FilterOperator> (td);
 }
 
 randomDropFilterOperation::randomDropFilterOperation ()
@@ -323,9 +323,9 @@ void randomDropFilterOperation::set (const std::string &property, double val)
 }
 void randomDropFilterOperation::setString (const std::string &property, const std::string &val) {}
 
-std::shared_ptr<MessageOperator> randomDropFilterOperation::getOperator ()
+std::shared_ptr<FilterOperator> randomDropFilterOperation::getOperator ()
 {
-    return std::static_pointer_cast<MessageOperator> (tcond);
+    return std::static_pointer_cast<FilterOperator> (tcond);
 }
 
 rerouteFilterOperation::rerouteFilterOperation ()
@@ -344,9 +344,9 @@ void rerouteFilterOperation::setString (const std::string &property, const std::
     }
 }
 
-std::shared_ptr<MessageOperator> rerouteFilterOperation::getOperator ()
+std::shared_ptr<FilterOperator> rerouteFilterOperation::getOperator ()
 {
-    return std::static_pointer_cast<MessageOperator> (op);
+    return std::static_pointer_cast<FilterOperator> (op);
 }
 
 }  // namespace helics
