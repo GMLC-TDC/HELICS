@@ -67,7 +67,7 @@ protected:
 	};
 	std::atomic<broker_state_t> brokerState{ created }; //!< flag indicating that the structure is past the initialization stage indicating that no more changes can be made to the number of federates or handles
     bool noAutomaticID = false;
-    bool hasEndpoints = false; //!< set to true if the broker has endpoints;  
+    bool hasTimeDependency = false; //!< set to true if the broker has Time dependencies  
     bool enteredExecutionMode = false; //!< flag indicating that the broker has entered execution mode
 public:
 	static void displayHelp();

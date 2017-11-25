@@ -192,13 +192,14 @@ private:
 	void routeMessage(const ActionMessage &cmd);
 	/** process any filter or route the message*/
 	void processMessageFilter(ActionMessage &cmd);
-	
+    /** create a source filter */
     FilterInfo *createSourceFilter(federate_id_t dest, Core::Handle handle,
         const std::string &key,
         const std::string &target,
         const std::string &type_in,
         const std::string &type_out);
 
+    /** create a destination filter */
     FilterInfo *createDestFilter(federate_id_t dest, 
         Core::Handle handle,
         const std::string &key,
@@ -206,6 +207,8 @@ private:
         const std::string &type_in,
         const std::string &type_out);
 
+    /** check if we can remove some dependencies*/
+    void checkDependencies();
 protected:
 	
 	int32_t _global_federation_size = 0;  //!< total size of the federation
@@ -264,7 +267,7 @@ protected:
   /** get the information on a filter from the keyName*/
   FilterInfo *getFilter(const std::string &subName) const;
   /** get the information on a filter from the handle*/
-  FilterInfo *getFilter(Core::Handle handle_) const;
+  FilterInfo *getFilter(Core::federate_id_t fed_id, Core::Handle handle_) const;
   /** organize filters
   @detsils organize the filter and report and potential warnings and errors
   */

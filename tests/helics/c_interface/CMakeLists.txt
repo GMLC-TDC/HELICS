@@ -27,8 +27,6 @@ include_directories(${CMAKE_SOURCE_DIR}/src/helics/shared_api_library)
 
 add_executable(c_interface_tests ${c_interface_test_sources} ${c_interface_test_headers})
 
-
-target_link_libraries(c_interface_tests helicsSharedLib ${external_library_list})
 target_link_libraries(c_interface_tests helicsSharedLib ${Boost_LIBRARIES_test})
 
 add_test(NAME c_interface_tests COMMAND c_interface_test)

@@ -51,27 +51,25 @@ std::unique_ptr<Message> MessageDataOperator::process (std::unique_ptr<Message> 
     return message;
 }
 
-
-MessageDestOperator::MessageDestOperator(std::function < std::string (const std::string &) > userDestFunction)
-    : DestUpdateFunction(std::move(userDestFunction))
+MessageDestOperator::MessageDestOperator (std::function<std::string (const std::string &)> userDestFunction)
+    : DestUpdateFunction (std::move (userDestFunction))
 {
 }
 
-void MessageDestOperator::setDestFunction(std::function<std::string(const std::string &)> userDestFunction)
+void MessageDestOperator::setDestFunction (std::function<std::string (const std::string &)> userDestFunction)
 {
-    DestUpdateFunction = std::move(userDestFunction);
+    DestUpdateFunction = std::move (userDestFunction);
 }
 
-std::unique_ptr<Message> MessageDestOperator::process(std::unique_ptr<Message> message)
+std::unique_ptr<Message> MessageDestOperator::process (std::unique_ptr<Message> message)
 {
     if (DestUpdateFunction)
     {
         message->orig_dest = message->dest;
-        message->dest = DestUpdateFunction(message->dest);
+        message->dest = DestUpdateFunction (message->dest);
     }
     return message;
 }
-
 
 MessageConditionalOperator::MessageConditionalOperator (std::function<bool(const Message *)> userConditionFunction)
     : evalFunction (std::move (userConditionFunction))

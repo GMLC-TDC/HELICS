@@ -68,17 +68,17 @@ std::vector<std::string> vectorizeQueryResult (const std::string &queryres)
     }
 }
 
-std::vector<std::string> vectorizeAndSortQueryResult(const std::string &queryres)
+std::vector<std::string> vectorizeAndSortQueryResult (const std::string &queryres)
 {
-    auto vec = vectorizeQueryResult(queryres);
-    std::sort(vec.begin(), vec.end());
+    auto vec = vectorizeQueryResult (queryres);
+    std::sort (vec.begin (), vec.end ());
     return vec;
 }
 
-std::vector<std::string> vectorizeAndSortQueryResult(std::string &&queryres)
+std::vector<std::string> vectorizeAndSortQueryResult (std::string &&queryres)
 {
-    auto vec = vectorizeQueryResult(std::move(queryres));
-    std::sort(vec.begin(), vec.end());
+    auto vec = vectorizeQueryResult (std::move (queryres));
+    std::sort (vec.begin (), vec.end ());
     return vec;
 }
 

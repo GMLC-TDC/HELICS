@@ -180,70 +180,66 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-
-BOOST_AUTO_TEST_CASE(test_iteration_counter)
+BOOST_AUTO_TEST_CASE (test_iteration_counter)
 {
-    Setup2FederateTest("test");
+    Setup2FederateTest ("test");
     // register the publications
-    auto pub1 = helics::Publication(helics::GLOBAL, vFed1.get(), "pub1", helics::helicsType_t::helicsInt);
+    auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helicsType_t::helicsInt);
 
-    auto sub1 = helics::Subscription(vFed2.get(), "pub1");
+    auto sub1 = helics::Subscription (vFed2.get (), "pub1");
 
-    auto pub2 = helics::Publication(helics::GLOBAL, vFed2.get(), "pub2", helics::helicsType_t::helicsInt);
+    auto pub2 = helics::Publication (helics::GLOBAL, vFed2.get (), "pub2", helics::helicsType_t::helicsInt);
 
-    auto sub2 = helics::Subscription(vFed1.get(), "pub2");
-    vFed1->setPeriod(1.0);
-    vFed2->setPeriod(1.0);
-    //vFed1->setLoggingLevel(5);
-   // vFed2->setLoggingLevel(5);
-    vFed1->enterInitializationStateAsync();
-    vFed2->enterInitializationState();
-    vFed1->enterInitializationStateFinalize();
+    auto sub2 = helics::Subscription (vFed1.get (), "pub2");
+    vFed1->setPeriod (1.0);
+    vFed2->setPeriod (1.0);
+    // vFed1->setLoggingLevel(5);
+    // vFed2->setLoggingLevel(5);
+    vFed1->enterInitializationStateAsync ();
+    vFed2->enterInitializationState ();
+    vFed1->enterInitializationStateFinalize ();
     int64_t c1 = 0;
     int64_t c2 = 0;
-    pub1.publish(c1);
-    pub2.publish(c2);
-    vFed1->enterExecutionStateAsync();
-    vFed2->enterExecutionState();
-    vFed1->enterExecutionStateFinalize();
+    pub1.publish (c1);
+    pub2.publish (c2);
+    vFed1->enterExecutionStateAsync ();
+    vFed2->enterExecutionState ();
+    vFed1->enterExecutionStateFinalize ();
     while (c1 <= 10)
     {
-        BOOST_CHECK_EQUAL(sub1.getValue<int64_t>(), c1);
-        BOOST_CHECK_EQUAL(sub2.getValue<int64_t>(), c2);
+        BOOST_CHECK_EQUAL (sub1.getValue<int64_t> (), c1);
+        BOOST_CHECK_EQUAL (sub2.getValue<int64_t> (), c2);
         ++c1;
         ++c2;
         if (c1 <= 10)
         {
-            pub1.publish(c1);
-            pub2.publish(c2);
+            pub1.publish (c1);
+            pub2.publish (c2);
         }
 
-        vFed1->requestTimeIterativeAsync(1.0, helics::iteration_request::iterate_if_needed);
-        auto res = vFed2->requestTimeIterative(1.0, helics::iteration_request::iterate_if_needed);
+        vFed1->requestTimeIterativeAsync (1.0, helics::iteration_request::iterate_if_needed);
+        auto res = vFed2->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
         if (c1 <= 10)
         {
-            BOOST_CHECK(res.state == helics::iteration_result::iterating);
-           BOOST_CHECK_EQUAL(res.stepTime, 0.0);
+            BOOST_CHECK (res.state == helics::iteration_result::iterating);
+            BOOST_CHECK_EQUAL (res.stepTime, 0.0);
         }
         else
         {
-           BOOST_CHECK(res.state == helics::iteration_result::next_step);
-            BOOST_CHECK_EQUAL(res.stepTime, 1.0);
+            BOOST_CHECK (res.state == helics::iteration_result::next_step);
+            BOOST_CHECK_EQUAL (res.stepTime, 1.0);
         }
-        res = vFed1->requestTimeIterativeFinalize();
+        res = vFed1->requestTimeIterativeFinalize ();
         if (c1 <= 10)
         {
-            BOOST_CHECK(res.state == helics::iteration_result::iterating);
-            BOOST_CHECK_EQUAL(res.stepTime, 0.0);
-        } 
+            BOOST_CHECK (res.state == helics::iteration_result::iterating);
+            BOOST_CHECK_EQUAL (res.stepTime, 0.0);
+        }
         else
         {
-            BOOST_CHECK(res.state == helics::iteration_result::next_step);
-            BOOST_CHECK_EQUAL(res.stepTime, 1.0);
+            BOOST_CHECK (res.state == helics::iteration_result::next_step);
+            BOOST_CHECK_EQUAL (res.stepTime, 1.0);
         }
-       
     }
-
-   
 }
 BOOST_AUTO_TEST_SUITE_END ()

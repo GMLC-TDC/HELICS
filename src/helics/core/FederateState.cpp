@@ -219,8 +219,6 @@ void FederateState::createEndpoint (Core::Handle handle, const std::string &key,
     }
 }
 
-
-
 SubscriptionInfo *FederateState::getSubscription (const std::string &subName) const
 {
     auto fnd = subNames.find (subName);
@@ -297,8 +295,6 @@ EndpointInfo *FederateState::getEndpoint (Core::Handle handle_) const
     return nullptr;
 }
 
-
-
 bool FederateState::checkSetValue (Core::Handle pub_id, const char *data, uint64_t len) const
 {
     if (!only_transmit_on_change)
@@ -330,7 +326,6 @@ uint64_t FederateState::getQueueSize () const
     }
     return cnt;
 }
-
 
 std::unique_ptr<Message> FederateState::receive (Core::Handle handle_)
 {
@@ -370,7 +365,6 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::Handle &id)
     id = invalid_Handle;
     return nullptr;
 }
-
 
 void FederateState::addAction (const ActionMessage &action)
 {
@@ -577,7 +571,7 @@ const std::vector<Core::Handle> emptyHandles;
 const std::vector<Core::Handle> &FederateState::getEvents () const
 {
     if (!processing)
-    {  //!< if we are processing this vector is in an unstable state
+    {  //!< if we are processing this vector is in an undefined state
         return events;
     }
     return emptyHandles;

@@ -108,9 +108,13 @@ private:
 	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
 	/* function to transmit the delayed messages*/
 	void transmitDelayedMessages();
+    /**function for routing a message,  it will override the destination id with the specified argument
+    */
+    void routeMessage(ActionMessage &cmd, Core::federate_id_t dest);
+    /** function for routing a message from based on the destination specified in the ActionMessage*/
+    void routeMessage(const ActionMessage &cmd);
 	
-	
-	int32_t FillRouteInformation(ActionMessage &mess);
+	int32_t fillMessageRouteInformation(ActionMessage &mess);
     /**generate the results of a query directed at the broker*/
     void generateQueryResult(const ActionMessage &command);
 public:
@@ -191,10 +195,16 @@ public:
 	virtual std::string getAddress() const = 0;
 
 private:
+    /** check if we can remove some dependencies*/
+    void checkDependencies();
+    /** check subscriptions for completion and mismatches*/
 	void checkSubscriptions();
+    /** find any existing publishers for a subscription*/
 	bool FindandNotifySubscriptionPublisher(BasicHandleInfo &handleInfo);
 	void FindandNotifyPublicationSubscribers(BasicHandleInfo &handleInfo);
+    /** check endpoints for any issues*/
 	void checkEndpoints();
+    /** check filters for any issues*/
 	void checkFilters();
 	bool FindandNotifyFilterEndpoint(BasicHandleInfo &handleInfo);
 	void FindandNotifyEndpointFilters(BasicHandleInfo &handleInfo);
@@ -206,8 +216,6 @@ private:
     std::string generateQueryAnswer(const std::string &query) const;
 	/** locate the route to take to a particular federate*/
 	int32_t getRoute(Core::federate_id_t fedid) const;
-	/** locate the route in a previously locked context*/
-	int32_t getRouteNoLock(Core::federate_id_t fedid) const;
 	int32_t getFedByName(const std::string &fedName) const;
 	int32_t getBrokerByName(const std::string &brokerName) const;
 	int32_t getBrokerById(Core::federate_id_t fedid) const;

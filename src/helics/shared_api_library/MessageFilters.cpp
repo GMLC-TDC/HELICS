@@ -17,8 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <mutex>
 #include <vector>
 
-helics_source_filter
-helicsRegisterSourceFilter (helics_federate fed, const char *name, const char *inputType, const char *outputType)
+helics_source_filter helicsRegisterSourceFilter (helics_federate fed, const char *name, const char *inputType, const char *outputType)
 {
     // now generate a generic subscription
     auto fedObj = getFedSharedPtr (fed);
@@ -64,7 +63,6 @@ helicsRegisterDestinationFilter (helics_federate fed, const char *name, const ch
     }
     return nullptr;
 }
-
 
 void helicsFreeSourceFilter (helics_source_filter filter) { delete reinterpret_cast<helics::SourceFilterObject *> (filter); }
 

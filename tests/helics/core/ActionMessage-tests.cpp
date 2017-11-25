@@ -333,28 +333,27 @@ BOOST_AUTO_TEST_CASE (message_conversion_test)
 }
 
 // check some error handling in the toByteArray function
-BOOST_AUTO_TEST_CASE(check_conversions)
+BOOST_AUTO_TEST_CASE (check_conversions)
 {
-    helics::ActionMessage cmd(helics::CMD_PROTOCOL);
+    helics::ActionMessage cmd (helics::CMD_PROTOCOL);
     cmd.index = 10;
     cmd.payload = "this is a payload test";
 
-    auto cmdStr = cmd.to_string();
-    auto cmdVec = cmd.to_vector();
-    BOOST_CHECK_EQUAL(cmdStr.size(), cmdVec.size());
-    BOOST_CHECK_EQUAL(cmdStr, std::string(cmdVec.data(), cmdVec.size()));
+    auto cmdStr = cmd.to_string ();
+    auto cmdVec = cmd.to_vector ();
+    BOOST_CHECK_EQUAL (cmdStr.size (), cmdVec.size ());
+    BOOST_CHECK_EQUAL (cmdStr, std::string (cmdVec.data (), cmdVec.size ()));
 
-    auto testBuffer1 = std::make_unique<char[]>(cmdStr.size()+20);
-    auto testBuffer2 = std::make_unique<char[]>(cmdStr.size()>>2);  //make a too small buffer
+    auto testBuffer1 = std::make_unique<char[]> (cmdStr.size () + 20);
+    auto testBuffer2 = std::make_unique<char[]> (cmdStr.size () >> 2);  // make a too small buffer
 
-    auto res = cmd.toByteArray(testBuffer1.get(), cmdStr.size() + 20);
-    BOOST_CHECK_EQUAL(res, cmdStr.size());
-    //just check to make sure the same string was written
-    BOOST_CHECK_EQUAL(cmdStr, std::string(testBuffer1.get(), res));
-    //this should return -1
-    res = cmd.toByteArray(testBuffer2.get(), cmdStr.size()>>2);
-    BOOST_CHECK_EQUAL(res, -1);
+    auto res = cmd.toByteArray (testBuffer1.get (), cmdStr.size () + 20);
+    BOOST_CHECK_EQUAL (res, cmdStr.size ());
+    // just check to make sure the same string was written
+    BOOST_CHECK_EQUAL (cmdStr, std::string (testBuffer1.get (), res));
+    // this should return -1
+    res = cmd.toByteArray (testBuffer2.get (), cmdStr.size () >> 2);
+    BOOST_CHECK_EQUAL (res, -1);
 }
-
 
 BOOST_AUTO_TEST_SUITE_END ()

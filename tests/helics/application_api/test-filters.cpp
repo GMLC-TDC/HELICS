@@ -7,19 +7,19 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
 #include "helics/application_api/Federate.h"
 #include "helics/application_api/MessageOperators.h"
 #include "testFixtures.h"
 #include "test_configuration.h"
+#include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/floating_point_comparison.hpp>
 
 #include <future>
 /** these test cases test out the message federates
  */
 
-BOOST_FIXTURE_TEST_SUITE (message_filter_federate_tests, FederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE (message_filter_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 #ifdef QUICK_TESTS_ONLY
@@ -29,7 +29,7 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 #endif
 
 /** test registration of filters*/
-BOOST_DATA_TEST_CASE (message_filter_federate_registration, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 2, broker, helics::timeZero, "filter");
@@ -53,7 +53,6 @@ BOOST_DATA_TEST_CASE (message_filter_federate_registration, bdata::make (core_ty
     fFed->finalize ();
     BOOST_CHECK (fFed->currentState () == helics::Federate::op_states::finalize);
 }
-
 
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
@@ -87,7 +86,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     mFed->requestTimeAsync (1.0);
     fFed->requestTime (1.0);
     mFed->requestTimeFinalize ();
-   
+
     auto res = mFed->hasMessage ();
     BOOST_CHECK (!res);
 

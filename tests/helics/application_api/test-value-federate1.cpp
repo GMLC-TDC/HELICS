@@ -29,12 +29,15 @@ BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture)
 namespace bdata = boost::unit_test::data;
 #ifdef QUICK_TESTS_ONLY
 const std::string core_types[] = {"test", "test_2", "ipc_2", "zmq", "udp"};
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
 #else
 const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2", "udp", "udp_2"};
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
 #endif
+
 // const std::string core_types[] = {"udp" };
 /** test simple creation and destruction*/
-BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -48,7 +51,7 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types),
     BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -79,7 +82,7 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
     BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -110,7 +113,7 @@ BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_t
     BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -146,7 +149,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
 }
 
 BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
-                      bdata::make (core_types),
+                      bdata::make (core_types_single),
                       core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
@@ -193,7 +196,9 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
+                      bdata::make (core_types_single),
+                      core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -243,7 +248,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdat
     BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -279,7 +284,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
     BOOST_CHECK_EQUAL (s, "string2");
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -457,7 +462,7 @@ void runFederateTestv2 (const std::string &core_type_str,
 }
 
 #ifndef QUICK_TESTS_ONLY
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types, bdata::make (core_types_single), core_type)
 {
     runFederateTest<double> (core_type, 10.3, 45.3, 22.7);
     runFederateTest<double> (core_type, 1.0, 0.0, 3.0);
@@ -482,7 +487,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_types, bdata::make (core_ty
     runFederateTest<std::complex<double>> (core_type, def, v1, v2);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers, bdata::make (core_types_single), core_type)
 {
     runFederateTestObj<double> (core_type, 10.3, 45.3, 22.7);
     runFederateTestObj<double> (core_type, 1.0, 0.0, 3.0);

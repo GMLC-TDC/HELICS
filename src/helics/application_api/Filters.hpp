@@ -86,15 +86,15 @@ class randomDropFilterOperation : public FilterOperations
 /** filter for rerouting a packet to a particular endpoint*/
 class rerouteFilterOperation : public FilterOperations
 {
-private:
-    std::shared_ptr<MessageDestOperator> op; //!<the actual operator
-    libguarded::guarded <std::string> newTarget; //!< the target destination
-public:
-    rerouteFilterOperation();
-    ~rerouteFilterOperation();
-    virtual void set(const std::string &property, double val) override;
-    virtual void setString(const std::string &property, const std::string &val) override;
-    virtual std::shared_ptr<FilterOperator> getOperator() override;
+  private:
+    std::shared_ptr<MessageDestOperator> op;  //!< the actual operator
+    libguarded::guarded<std::string> newTarget;  //!< the target destination
+  public:
+    rerouteFilterOperation ();
+    ~rerouteFilterOperation ();
+    virtual void set (const std::string &property, double val) override;
+    virtual void setString (const std::string &property, const std::string &val) override;
+    virtual std::shared_ptr<FilterOperator> getOperator () override;
 };
 
 /** class for managing a particular filter*/
@@ -110,10 +110,9 @@ class Filter
     virtual ~Filter () = default;
 
     /** set a message operator to process the message*/
-    void setOperator(std::shared_ptr<FilterOperator> mo);
-   
-    void setFilterOperations(std::shared_ptr<FilterOperations> filterOps);
-    
+    void setOperator (std::shared_ptr<FilterOperator> mo);
+
+    void setFilterOperations (std::shared_ptr<FilterOperations> filterOps);
 };
 /** class wrapping a source filter*/
 class SourceFilter : public Filter
@@ -137,7 +136,6 @@ class SourceFilter : public Filter
     }
 
     virtual ~SourceFilter () = default;
-
 };
 
 /** class wrapping a destination filter*/
@@ -169,7 +167,7 @@ enum defined_filter_types
     delay = 1,
     randomDelay = 2,
     randomDrop = 3,
-    reroute=4,
+    reroute = 4,
 
 };
 

@@ -27,7 +27,7 @@ struct ValueFederateTestFixture
 
     void StartBroker (const std::string &core_type_name, const std::string &initialization_string);
 
-    std::shared_ptr<helics::CoreBroker> broker;
+    std::vector<std::shared_ptr<helics::CoreBroker>> broker;
     std::shared_ptr<helics::ValueFederate> vFed1;
     std::shared_ptr<helics::ValueFederate> vFed2;
 };
@@ -42,7 +42,7 @@ struct MessageFederateTestFixture
 
     void StartBroker (const std::string &core_type_name, const std::string &initialization_string);
 
-    std::shared_ptr<helics::CoreBroker> broker;
+    std::vector<std::shared_ptr<helics::CoreBroker>> broker;
     std::shared_ptr<helics::MessageFederate> mFed1;
     std::shared_ptr<helics::MessageFederate> mFed2;
 };

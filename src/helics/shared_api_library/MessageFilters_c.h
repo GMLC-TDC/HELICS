@@ -28,7 +28,6 @@ HELICS_Export helics_destination_filter helicsRegisterDestinationFilter (helics_
                                                                          const char *inputType,
                                                                          const char *outputType);
 
-
 HELICS_Export void helicsFreeSourceFilter (helics_source_filter filter);
 
 HELICS_Export void helicsFreeDestinationFilter (helics_destination_filter filter);

@@ -59,7 +59,7 @@ ValueFederateTestFixture::~ValueFederateTestFixture ()
 void ValueFederateTestFixture::StartBroker (const std::string &core_type_name,
                                             const std::string &initialization_string)
 {
-    broker = StartBrokerImp (core_type_name, initialization_string);
+    broker.push_back (StartBrokerImp (core_type_name, initialization_string));
 }
 
 void ValueFederateTestFixture::Setup1FederateTest (std::string core_type_name, helics::Time time_delta)
@@ -75,8 +75,8 @@ void ValueFederateTestFixture::Setup1FederateTest (std::string core_type_name, h
     helics::FederateInfo fi ("test1");
     fi.coreType = helics::coreTypeFromString (core_type_name);
     fi.timeDelta = time_delta;
-    fi.coreInitString =
-      "--broker=" + broker->getIdentifier () + " --broker_address=" + broker->getAddress () + " --federates 1";
+    fi.coreInitString = "--broker=" + broker[0]->getIdentifier () +
+                        " --broker_address=" + broker[0]->getAddress () + " --federates 1";
 
     vFed1 = std::make_shared<helics::ValueFederate> (fi);
 }
@@ -100,8 +100,8 @@ void ValueFederateTestFixture::Setup2FederateTest (std::string core_type_name, h
         helics::FederateInfo fi ("test1");
         fi.coreType = helics::coreTypeFromString (core_type_name);
         fi.timeDelta = time_delta;
-        fi.coreInitString = std::string ("--broker=") + broker->getIdentifier () +
-                            " --broker_address=" + broker->getAddress () + " --federates 2";
+        fi.coreInitString = std::string ("--broker=") + broker[0]->getIdentifier () +
+                            " --broker_address=" + broker[0]->getAddress () + " --federates 2";
 
         vFed1 = std::make_shared<helics::ValueFederate> (fi);
 
@@ -113,8 +113,8 @@ void ValueFederateTestFixture::Setup2FederateTest (std::string core_type_name, h
     {
         StartBroker (core_type_name, "2");
 
-        std::string initString = std::string ("--broker=") + broker->getIdentifier () +
-                                 " --broker_address=" + broker->getAddress () + " --federates 1";
+        std::string initString = std::string ("--broker=") + broker[0]->getIdentifier () +
+                                 " --broker_address=" + broker[0]->getAddress () + " --federates 1";
         auto core_type = helics::coreTypeFromString (core_type_name);
         auto core1 = helics::CoreFactory::create (core_type, initString);
         auto core2 = helics::CoreFactory::create (core_type, initString);
@@ -131,7 +131,9 @@ void ValueFederateTestFixture::Setup2FederateTest (std::string core_type_name, h
         fi.coreName = core2->getIdentifier ();
         vFed2 = std::make_shared<helics::ValueFederate> (fi);
     }
-    break;
+    case 3:
+
+        break;
     }
 }
 
@@ -151,7 +153,7 @@ MessageFederateTestFixture::~MessageFederateTestFixture ()
 void MessageFederateTestFixture::StartBroker (const std::string &core_type_name,
                                               const std::string &initialization_string)
 {
-    broker = StartBrokerImp (core_type_name, initialization_string);
+    broker.push_back (StartBrokerImp (core_type_name, initialization_string));
 }
 
 void MessageFederateTestFixture::Setup1FederateTest (const std::string &core_type_name)
@@ -160,8 +162,8 @@ void MessageFederateTestFixture::Setup1FederateTest (const std::string &core_typ
 
     helics::FederateInfo fi ("test1");
     fi.coreType = helics::coreTypeFromString (core_type_name);
-    fi.coreInitString = std::string ("--broker=") + broker->getIdentifier () +
-                        " --broker_address=" + broker->getAddress () + " --federates 1";
+    fi.coreInitString = std::string ("--broker=") + broker[0]->getIdentifier () +
+                        " --broker_address=" + broker[0]->getAddress () + " --federates 1";
 
     mFed1 = std::make_shared<helics::MessageFederate> (fi);
 }
@@ -172,8 +174,8 @@ void MessageFederateTestFixture::Setup2FederateTest (const std::string &core_typ
 
     helics::FederateInfo fi ("test1");
     fi.coreType = helics::coreTypeFromString (core_type_name);
-    fi.coreInitString = std::string ("--broker=") + broker->getIdentifier () +
-                        " --broker_address=" + broker->getAddress () + " --federates 2";
+    fi.coreInitString = std::string ("--broker=") + broker[0]->getIdentifier () +
+                        " --broker_address=" + broker[0]->getAddress () + " --federates 2";
 
     mFed1 = std::make_shared<helics::MessageFederate> (fi);
 

@@ -1,0 +1,15 @@
+# HELICS cmake module
+# This module sets the following variables in your project::
+#
+#   HELICS_FOUND - true if HELICS found on the system
+#   HELICS_INCLUDE_DIR - the directory containing HELICS headers
+#   HELICS_SHARED_LIBRARY 
+#   HELICS_STATIC_LIBRARY
+
+@PACKAGE_INIT@
+
+set(PN HELICS)
+set_and_check(${PN}_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@")
+set_and_check(${PN}_SHARED_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_shared_file@")
+set_and_check(${PN}_STATIC_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_static_file@")
+check_required_components(${PN})

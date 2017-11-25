@@ -27,11 +27,13 @@ BOOST_FIXTURE_TEST_SUITE (message_federate_tests, FederateTestFixture)
 namespace bdata = boost::unit_test::data;
 #ifdef QUICK_TESTS_ONLY
 const std::string core_types[] = {"test", "test_2", "ipc_2", "zmq", "udp"};
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
 #else
 const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2", "udp", "udp_2"};
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
 #endif
 /** test simple creation and destruction*/
-BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::MessageFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -45,7 +47,7 @@ BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types
     BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::MessageFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -74,7 +76,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
 }
 
 // same as previous test case but using endpoint objects
-BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::MessageFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -100,7 +102,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (
     BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::MessageFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -136,7 +138,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types), c
     BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_DATA_TEST_CASE (message_federate_send_receive_obj, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_federate_send_receive_obj, bdata::make (core_types_single), core_type)
 {
     using namespace helics;
     SetupSingleBrokerTest<helics::MessageFederate> (core_type, 1);

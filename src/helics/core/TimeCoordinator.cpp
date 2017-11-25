@@ -10,9 +10,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "TimeCoordinator.h"
-#include <boost/format.hpp>
 #include "flag-definitions.h"
 #include <algorithm>
+#include <boost/format.hpp>
 
 namespace helics
 {
@@ -77,7 +77,7 @@ void TimeCoordinator::updateNextExecutionTime ()
     {
         time_exec = (iterating) ? time_granted : (time_granted + info.timeDelta);
     }
-    if (((time_exec - time_granted)>0.0)&&(info.period > timeEpsilon))
+    if (((time_exec - time_granted) > 0.0) && (info.period > timeEpsilon))
     {
         auto blk = static_cast<int> (std::ceil ((time_exec - time_granted) / info.period));
         time_exec = time_granted + blk * info.period;
@@ -162,7 +162,7 @@ void TimeCoordinator::updateMessageTime (Time messageUpdateTime)
 bool TimeCoordinator::updateTimeFactors ()
 {
     Time minNext = Time::maxVal ();
-    Time minminDe = std::min(time_value,time_message);
+    Time minminDe = std::min (time_value, time_message);
     Time minDe = minminDe;
     for (auto &dep : dependencies)
     {
@@ -269,11 +269,13 @@ iteration_state TimeCoordinator::checkTimeGrant ()
     return iteration_state::continue_processing;
 }
 
-std::string TimeCoordinator::printTimeStatus() const
+std::string TimeCoordinator::printTimeStatus () const
 {
-    return (boost::format("exec=%f allow=%f, value=%f, message=%f, minDe=%f minminDe=%f") %
-        static_cast<double>(time_exec) % static_cast<double>(time_allow) % static_cast<double>(time_value) %
-        static_cast<double>(time_message) % static_cast<double>(time_minDe) % static_cast<double>(time_minminDe)).str();
+    return (boost::format ("exec=%f allow=%f, value=%f, message=%f, minDe=%f minminDe=%f") %
+            static_cast<double> (time_exec) % static_cast<double> (time_allow) % static_cast<double> (time_value) %
+            static_cast<double> (time_message) % static_cast<double> (time_minDe) %
+            static_cast<double> (time_minminDe))
+      .str ();
 }
 
 bool TimeCoordinator::isDependency (Core::federate_id_t ofed) const { return dependencies.isDependency (ofed); }
@@ -382,26 +384,35 @@ iteration_state TimeCoordinator::checkExecEntry ()
 
 bool TimeCoordinator::processTimeMessage (ActionMessage &cmd) { return dependencies.updateTime (cmd); }
 
-void TimeCoordinator::processDependencyUpdateMessage(const ActionMessage &cmd)
+void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
 {
-    switch (cmd.action())
+    switch (cmd.action ())
     {
     case CMD_ADD_DEPENDENCY:
-        addDependency(cmd.source_id);
+        addDependency (cmd.source_id);
         break;
     case CMD_REMOVE_DEPENDENCY:
-        removeDependency(cmd.source_id);
+        removeDependency (cmd.source_id);
         break;
     case CMD_ADD_DEPENDENT:
-        addDependent(cmd.source_id);
+        addDependent (cmd.source_id);
         break;
     case CMD_REMOVE_DEPENDENT:
-        removeDependent(cmd.source_id);
+        removeDependent (cmd.source_id);
+        break;
+    case CMD_ADD_INTERDEPENDENCY:
+        addDependency (cmd.source_id);
+        addDependent (cmd.source_id);
+        break;
+    case CMD_REMOVE_INTERDEPENDENCY:
+        removeDependency (cmd.source_id);
+        removeDependent (cmd.source_id);
+    default:
         break;
     }
 }
 
-void TimeCoordinator::processConfigUpdateMessage(const ActionMessage &cmd)
+void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd)
 {
     switch (cmd.index)
     {
@@ -425,10 +436,10 @@ void TimeCoordinator::processConfigUpdateMessage(const ActionMessage &cmd)
         info.offset = cmd.actionTime;
         break;
     case UPDATE_MAX_ITERATION:
-        info.max_iterations = static_cast<int16_t>(cmd.dest_id);
+        info.max_iterations = static_cast<int16_t> (cmd.dest_id);
         break;
     case UPDATE_LOG_LEVEL:
-        info.logLevel = static_cast<int>(cmd.dest_id);
+        info.logLevel = static_cast<int> (cmd.dest_id);
         break;
     case UPDATE_FLAG:
         switch (cmd.dest_id)

@@ -94,11 +94,11 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message)
     vFed1->enterExecutionStateAsync ();
     vFed2->enterExecutionState ();
     vFed1->enterExecutionStateFinalize ();
-    vFed2->requestTimeAsync(3.5);
+    vFed2->requestTimeAsync (3.5);
     auto res = vFed1->requestTime (0.32);
     // check that the request is only granted at the appropriate period
     BOOST_CHECK_EQUAL (res, 0.6);
-    ept1.send ("e2","test1");
+    ept1.send ("e2", "test1");
     vFed1->requestTimeAsync (1.85);
     res = vFed2->requestTimeFinalize ();
     BOOST_CHECK_EQUAL (res, 0.9);  // the message should show up at the next available time point
@@ -106,6 +106,7 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message)
     res = vFed1->requestTimeFinalize ();
     BOOST_CHECK_EQUAL (res, 2.4);
     vFed1->finalize ();
-    vFed2->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
+    vFed2
+      ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 BOOST_AUTO_TEST_SUITE_END ()

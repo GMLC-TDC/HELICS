@@ -1,15 +1,11 @@
 add_executable(messageFed messageFed.cpp)
-link_directories(${external_link_directories})
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
-target_link_libraries(messageFed helics ${external_library_list})
+target_link_libraries(messageFed helics-static)
 
-IF(MINGW)
-	target_link_libraries(messageFed ws2_32)
-ENDIF(MINGW)
 
 #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/run.sh
 #               ${CMAKE_CURRENT_BINARY_DIR}/run.sh

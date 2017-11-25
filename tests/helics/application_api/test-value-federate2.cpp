@@ -24,11 +24,13 @@ BOOST_FIXTURE_TEST_SUITE (value_federate_tests2, FederateTestFixture)
 namespace bdata = boost::unit_test::data;
 #ifdef QUICK_TESTS_ONLY
 const std::string core_types[] = {"test", "test_2", "ipc_2", "zmq", "udp"};
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
 #else
 const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2", "udp", "udp_2"};
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
 #endif
 /** test block send and receive*/
-BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -52,7 +54,7 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
 }
 
 /** test the all callback*/
-BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -110,7 +112,7 @@ BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types), core_type)
 }
 
 /** test the callback specification with a vector list*/
-BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -152,7 +154,7 @@ BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types), core
 }
 
 /** test the publish/subscribe to a vectorized array*/
-BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);

@@ -172,7 +172,6 @@ BOOST_AUTO_TEST_CASE (create_endpoint_test)
     BOOST_CHECK (info->key.compare ("last") == 0);
 }
 
-
 BOOST_AUTO_TEST_CASE (basic_processmessage_test)
 {
     using namespace helics;

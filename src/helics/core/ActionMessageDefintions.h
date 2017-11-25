@@ -63,10 +63,12 @@ enum class action_t : int32_t
 
 	cmd_send_route = 75,  //!< command to define a route information
 	cmd_subscriber =  85,  // !< command to send a subscriber
-	cmd_add_dependency = 95,  //!< command to send a federate dependency information
-	cmd_remove_dependency =  97,  //!< command to remove a dependency
-	cmd_add_dependent =  98,  //!< command to add a dependent to a federate
-	cmd_remove_dependent =  99,  //!< command to remove a dependent from a federates consideration
+	cmd_add_dependency = 140,  //!< command to send a federate dependency information
+	cmd_remove_dependency =  141,  //!< command to remove a dependency
+	cmd_add_dependent =  144,  //!< command to add a dependent to a federate
+	cmd_remove_dependent =  145,  //!< command to remove a dependent from a federates consideration
+    cmd_add_interdependency = 148,  //!< command to add a federate as both dependent and a dependency
+    cmd_remove_interdependency = 149,  //!< command to remove a federate as both dependent and a dependency
 
     cmd_fed_configure = 205,  //!< command to update the configuration of a federate
 
@@ -140,6 +142,8 @@ enum class action_t : int32_t
 #define CMD_REMOVE_DEPENDENCY action_message_def::action_t::cmd_remove_dependency
 #define CMD_ADD_DEPENDENT action_message_def::action_t::cmd_add_dependent
 #define CMD_REMOVE_DEPENDENT action_message_def::action_t::cmd_remove_dependent
+#define CMD_ADD_INTERDEPENDENCY action_message_def::action_t::cmd_add_interdependency
+#define CMD_REMOVE_INTERDEPENDENCY action_message_def::action_t::cmd_remove_interdependency
 
 #define CMD_REG_FED action_message_def::action_t::cmd_reg_fed
 #define CMD_BROKER_ACK action_message_def::action_t::cmd_broker_ack

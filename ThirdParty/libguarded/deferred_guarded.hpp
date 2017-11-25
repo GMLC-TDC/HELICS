@@ -20,14 +20,8 @@
 #include <memory>
 #include <vector>
 
-#if HAVE_CXX14
+
 #include <shared_mutex>
-#else
-namespace std
-{
-class shared_timed_mutex;
-}
-#endif
 
 namespace libguarded
 {
@@ -98,6 +92,37 @@ class deferred_guarded
     };
 
     void do_pending_writes() const;
+
+    /** generate a copy of the protected object
+    */
+    std::enable_if_t<std::is_copy_constructible<T>::value, T> load() const
+    {
+        m_mutex.lock_shared();
+        T newObj(m_obj);
+        m_mutex.unlock();
+        return newObj;
+    }
+    /** generate a copy of the protected object
+    */
+    std::enable_if_t<std::is_copy_constructible<T>::value, T> operator*() const
+    {
+        return load();
+    }
+
+    /** store an updated value into the object*/
+    template <typename objType>
+    std::enable_if_t<std::is_copy_assignable<T>::value> store(objType &&newObj)
+    {
+        std::lock_guard<M> lock(m_mutex);
+        m_obj = std::forward<objType>(newObj);
+    }
+
+    /** store an updated value into the object*/
+    template <typename objType>
+    std::enable_if_t<std::is_copy_assignable<T>::value> operator=(objType &&newObj)
+    {
+        store(std::forward<objType>(newObj));
+    }
 
     mutable T m_obj;
     mutable M m_mutex;

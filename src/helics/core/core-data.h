@@ -191,6 +191,9 @@ inline bool isValidIndex (sizeType testSize, const std::vector<dataType> &vec)
 {
     return ((testSize >= sizeType (0)) && (testSize < static_cast<sizeType> (vec.size ())));
 }
+
+bool matchingTypes(const std::string &type1, const std::string &type2);
+
 }  // namespace helics
 
 namespace std
@@ -210,5 +213,6 @@ inline void swap (helics::Message &m1, helics::Message &m2) noexcept
     m1.swap (m2);
 }
 }  // namespace std
+
 
 #endif

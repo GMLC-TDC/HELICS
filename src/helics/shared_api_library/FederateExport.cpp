@@ -92,7 +92,6 @@ std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_message_
     return nullptr;
 }
 
-
 masterObjectHolder::masterObjectHolder () noexcept {}
 
 masterObjectHolder::~masterObjectHolder ()
@@ -235,7 +234,6 @@ helics_federate helicsCreateMessageFederateFromFile (const char *file)
     fed->valid = validationIdentifier;
     return reinterpret_cast<void *> (fed);
 }
-
 
 /* Creation and destruction of Federates */
 helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi)

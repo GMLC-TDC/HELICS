@@ -68,10 +68,10 @@ SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
 
 # Minimum version of Boost required for building HELICS
 set(BOOST_MINIMUM_VERSION 1.58)
-
+set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
 if (${MPI_C_FOUND})
   #find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
-  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
+  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options mpi unit_test_framework filesystem system date_time REQUIRED)
 ELSE(${MPI_C_FOUND})
   find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
 ENDIF(${MPI_C_FOUND})
@@ -109,5 +109,4 @@ endforeach(loop_var)
 
 #message(STATUS "Using Boost core libraries : ${Boost_LIBRARIES_core}")
 #message(STATUS "Using Boost test libraries : ${Boost_LIBRARIES_test}")
-list(APPEND external_library_list ${Boost_LIBRARIES_core})
-list(APPEND external_link_directories ${Boost_LIBRARY_DIRS})
+

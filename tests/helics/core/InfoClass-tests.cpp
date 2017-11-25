@@ -258,15 +258,14 @@ BOOST_AUTO_TEST_CASE (filterinfo_test)
     msg_time_one_b->origsrc = "bFed";
     msg_time_one_b->time = helics::Time (1);
 
-    helics::FilterInfo filtI (5, 13, "name", "target", "type_in","type_out", true);
+    helics::FilterInfo filtI (5, 13, "name", "target", "type_in", "type_out", true);
     BOOST_CHECK_EQUAL (filtI.handle, 13);
     BOOST_CHECK_EQUAL (filtI.fed_id, 5);
     BOOST_CHECK (filtI.key.compare ("name") == 0);
     BOOST_CHECK (filtI.inputType.compare ("type_in") == 0);
-    BOOST_CHECK(filtI.outputType.compare("type_out") == 0);
+    BOOST_CHECK (filtI.outputType.compare ("type_out") == 0);
     BOOST_CHECK (filtI.filterTarget.compare ("target") == 0);
     BOOST_CHECK_EQUAL (filtI.dest_filter, true);
-  
 }
 
 BOOST_AUTO_TEST_CASE (subscriptioninfo_test)

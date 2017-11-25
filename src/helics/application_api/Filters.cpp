@@ -51,19 +51,17 @@ static void addOperations (Filter *filt, defined_filter_types type)
     }
 }
 
-
-void Filter::setOperator(std::shared_ptr<FilterOperator> mo)
+void Filter::setOperator (std::shared_ptr<FilterOperator> mo)
 {
     if (fed != nullptr)
     {
-       
-        fed->registerMessageOperator(id, std::move(mo));
+        fed->registerMessageOperator (id, std::move (mo));
     }
 }
-void Filter::setFilterOperations(std::shared_ptr<FilterOperations> filterOps)
+void Filter::setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
 {
-    filtOp = std::move(filterOps);
-    fed->registerMessageOperator(id,filtOp->getOperator());
+    filtOp = std::move (filterOps);
+    fed->registerMessageOperator (id, filtOp->getOperator ());
 }
 
 std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types type,
@@ -77,10 +75,8 @@ std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types
     return dfilt;
 }
 
-std::unique_ptr<SourceFilter> make_Source_filter (defined_filter_types type,
-                                                  Federate *mFed,
-                                                  const std::string &target,
-                                                  const std::string &name)
+std::unique_ptr<SourceFilter>
+make_Source_filter (defined_filter_types type, Federate *mFed, const std::string &target, const std::string &name)
 {
     auto sfilt = std::make_unique<SourceFilter> (mFed, target, name);
     addOperations (sfilt.get (), type);
@@ -137,12 +133,14 @@ enum class random_dists_t : int
 };
 
 static const std::map<std::string, random_dists_t> distMap{
-  {"constant", random_dists_t::constant},           {"uniform", random_dists_t::uniform},     {"bernoulli", random_dists_t::bernoulli},
-  {"binomial", random_dists_t::binomial},           {"geometric", random_dists_t::geometric}, {"poisson", random_dists_t::poisson},
-  {"exponential", random_dists_t::exponential},     {"gamma", random_dists_t::gamma},         {"weibull", random_dists_t::weibull},
-  {"extreme_value", random_dists_t::extreme_value}, {"normal", random_dists_t::normal},       {"lognormal", random_dists_t::lognormal},
-  {"chi_squared", random_dists_t::chi_squared},     {"cauchy", random_dists_t::cauchy},       {"fisher_f", random_dists_t::fisher_f},
-  {"student_t", random_dists_t::student_t}};
+  {"constant", random_dists_t::constant},       {"uniform", random_dists_t::uniform},
+  {"bernoulli", random_dists_t::bernoulli},     {"binomial", random_dists_t::binomial},
+  {"geometric", random_dists_t::geometric},     {"poisson", random_dists_t::poisson},
+  {"exponential", random_dists_t::exponential}, {"gamma", random_dists_t::gamma},
+  {"weibull", random_dists_t::weibull},         {"extreme_value", random_dists_t::extreme_value},
+  {"normal", random_dists_t::normal},           {"lognormal", random_dists_t::lognormal},
+  {"chi_squared", random_dists_t::chi_squared}, {"cauchy", random_dists_t::cauchy},
+  {"fisher_f", random_dists_t::fisher_f},       {"student_t", random_dists_t::student_t}};
 
 double randDouble (random_dists_t dist, double p1, double p2)
 {
@@ -170,7 +168,6 @@ double randDouble (random_dists_t dist, double p1, double p2)
                             static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
     }
 
-
     auto &generator = *genPtr;
 
 #endif
@@ -178,6 +175,7 @@ double randDouble (random_dists_t dist, double p1, double p2)
     switch (dist)
     {
     case random_dists_t::constant:
+    default:
         return p1;
     case random_dists_t::uniform:
     {

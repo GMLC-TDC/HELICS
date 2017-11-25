@@ -182,8 +182,8 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     Core::Handle end1 = core->registerEndpoint (id, "end1", "type");
     Core::Handle end2 = core->registerEndpoint (id, "end2", "type");
 
-    Core::Handle srcFilter = core->registerSourceFilter ( "srcFilter", "end1", "type", "type");
-    Core::Handle dstFilter = core->registerDestinationFilter ( "dstFilter", "end2", "type", "type");
+    Core::Handle srcFilter = core->registerSourceFilter ("srcFilter", "end1", "type", "type");
+    Core::Handle dstFilter = core->registerDestinationFilter ("dstFilter", "end2", "type", "type");
 
     auto testSrcFilter = std::make_shared<TestOperator> ("sourceFilter");
     BOOST_CHECK_EQUAL (testSrcFilter->filterName, "sourceFilter");
@@ -201,7 +201,6 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     core->send (end1, "end2", msgData.data (), msgData.size () + 1);
 
     core->timeRequest (id, 50.0);
-
 
     // Receive the filtered message
     BOOST_CHECK_EQUAL (core->receiveCount (end2), 1u);
