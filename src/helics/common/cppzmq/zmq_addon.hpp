@@ -1,5 +1,6 @@
 /*
-    Copyright (c) 2016 VOCA AS / Harald Nøkland
+    Copyright (c) 2016-2017 ZeroMQ community
+    Copyright (c) 2016 VOCA AS / Harald NÃ¸kland
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to
@@ -36,7 +37,7 @@ namespace zmq {
 /*
     This class handles multipart messaging. It is the C++ equivalent of zmsg.h,
     which is part of CZMQ (the high-level C binding). Furthermore, it is a major
-    improvement compared to zmsg.hpp, which is part of the examples in the ØMQ
+    improvement compared to zmsg.hpp, which is part of the examples in the Ã˜MQ
     Guide. Unnecessary copying is avoided by using move semantics to efficiently
     add/remove parts.
 */
@@ -64,9 +65,9 @@ public:
     }
 
     // Construct from memory block
-    multipart_t(const void *src, size_t blocksize)
+    multipart_t(const void *src, size_t size)
     {
-        addmem(src, blocksize);
+        addmem(src, size);
     }
 
     // Construct from string
@@ -235,15 +236,15 @@ public:
     }
 
     // Push memory block to front
-    void pushmem(const void *src, size_t blocksize)
+    void pushmem(const void *src, size_t size)
     {
-        m_parts.push_front(message_t(src, blocksize));
+        m_parts.push_front(message_t(src, size));
     }
 
     // Push memory block to back
-    void addmem(const void *src, size_t blocksize)
+    void addmem(const void *src, size_t size)
     {
-        m_parts.push_back(message_t(src, blocksize));
+        m_parts.push_back(message_t(src, size));
     }
 
     // Push string to front
@@ -337,6 +338,24 @@ public:
             return nullptr;
         return &m_parts[index];
     }
+    
+    // Get a string copy of a specific message part
+    std::string peekstr(size_t index) const
+    {
+        std::string string(m_parts[index].data<char>(), m_parts[index].size());
+        return string;
+    }
+
+    // Peek type (fixed-size) from front
+    template<typename T>
+    T peektyp(size_t index) const
+    {
+        static_assert(!std::is_same<T, std::string>::value, "Use peekstr() instead of peektyp<std::string>()");
+        if(sizeof(T) != m_parts[index].size())
+            throw std::runtime_error("Invalid type, size does not match the message size");
+        T type = *m_parts[index].data<T>();
+        return type;
+    }
 
     // Create multipart from type (fixed-size)
     template<typename T>
@@ -363,11 +382,11 @@ public:
         for (size_t i = 0; i < m_parts.size(); i++)
         {
             const unsigned char* data = m_parts[i].data<unsigned char>();
-            size_t partsize = m_parts[i].size();
+            size_t size = m_parts[i].size();
 
             // Dump the message as text or binary
             bool isText = true;
-            for (size_t j = 0; j < partsize; j++)
+            for (size_t j = 0; j < size; j++)
             {
                 if (data[j] < 32 || data[j] > 127)
                 {
@@ -375,13 +394,13 @@ public:
                     break;
                 }
             }
-            ss << "\n[" << std::dec << std::setw(3) << std::setfill('0') << partsize << "] ";
-            if (partsize >= 1000)
+            ss << "\n[" << std::dec << std::setw(3) << std::setfill('0') << size << "] ";
+            if (size >= 1000)
             {
                 ss << "... (to big to print)";
                 continue;
             }
-            for (size_t j = 0; j < partsize; j++)
+            for (size_t j = 0; j < size; j++)
             {
                 if (isText)
                     ss << static_cast<char>(data[j]);

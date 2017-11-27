@@ -47,8 +47,14 @@ namespace cereal
 #endif // RAPIDJSON_ASSERT
 
 // Enable support for parsing of nan, inf, -inf
+#ifndef CEREAL_RAPIDJSON_WRITE_DEFAULT_FLAGS
 #define CEREAL_RAPIDJSON_WRITE_DEFAULT_FLAGS kWriteNanAndInfFlag
+#endif
+
+// Enable support for parsing of nan, inf, -inf
+#ifndef CEREAL_RAPIDJSON_PARSE_DEFAULT_FLAGS
 #define CEREAL_RAPIDJSON_PARSE_DEFAULT_FLAGS kParseFullPrecisionFlag | kParseNanAndInfFlag
+#endif
 
 #include "cereal/external/rapidjson/prettywriter.h"
 #include "cereal/external/rapidjson/ostreamwrapper.h"
@@ -61,6 +67,11 @@ namespace cereal
 #include <stack>
 #include <vector>
 #include <string>
+
+#if defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 7)
+CEREAL_RAPIDJSON_DIAG_PUSH
+CEREAL_RAPIDJSON_DIAG_OFF(implicit-fallthrough)
+#endif
 
 namespace cereal
 {
@@ -752,6 +763,31 @@ namespace cereal
   { }
 
   // ######################################################################
+  //! Prologue for deferred data for JSON archives
+  /*! Do nothing for the defer wrapper */
+  template <class T> inline
+  void prologue( JSONOutputArchive &, DeferredData<T> const & )
+  { }
+
+  //! Prologue for deferred data for JSON archives
+  template <class T> inline
+  void prologue( JSONInputArchive &, DeferredData<T> const & )
+  { }
+
+  // ######################################################################
+  //! Epilogue for deferred for JSON archives
+  /*! NVPs do not start or finish nodes - they just set up the names */
+  template <class T> inline
+  void epilogue( JSONOutputArchive &, DeferredData<T> const & )
+  { }
+
+  //! Epilogue for deferred for JSON archives
+  /*! Do nothing for the defer wrapper */
+  template <class T> inline
+  void epilogue( JSONInputArchive &, DeferredData<T> const & )
+  { }
+
+  // ######################################################################
   //! Prologue for SizeTags for JSON archives
   /*! SizeTags are strictly ignored for JSON, they just indicate
       that the current node should be made into an array */
@@ -977,5 +1013,9 @@ CEREAL_REGISTER_ARCHIVE(cereal::JSONOutputArchive)
 
 // tie input and output archives together
 CEREAL_SETUP_ARCHIVE_TRAITS(cereal::JSONInputArchive, cereal::JSONOutputArchive)
+
+#if defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 7)
+CEREAL_RAPIDJSON_DIAG_POP
+#endif
 
 #endif // CEREAL_ARCHIVES_JSON_HPP_
