@@ -29,6 +29,12 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction)
     }
 }
 
+ActionMessage::ActionMessage(action_message_def::action_t action, int32_t sourceId, int32_t destId) :ActionMessage(action)
+{
+    source_id = sourceId;
+    dest_id = destId;
+}
+
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
     : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
       dest_handle (act.dest_handle), index (dest_handle), iterationComplete (act.iterationComplete),
@@ -319,6 +325,7 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_send_message, "send_message"},
   {action_message_def::action_t::cmd_send_for_filter, "send_for_filter"},
   {action_message_def::action_t::cmd_send_for_filter_op, "send_for_filter_op"},
+  { action_message_def::action_t::cmd_send_for_filter_return, "send_for_filter_return" },
 
   {action_message_def::action_t::cmd_reg_pub, "reg_pub"},
   {action_message_def::action_t::cmd_notify_pub, "notify_pub"},

@@ -582,6 +582,8 @@ void CoreBroker::processCommand (ActionMessage &&command)
         break;
     case CMD_SEND_MESSAGE:
     case CMD_SEND_FOR_FILTER:
+    case CMD_SEND_FOR_FILTER_OPERATION:
+    case CMD_SEND_FOR_FILTER_RETURN:
         if (command.dest_id == 0)
         {
             auto route = fillMessageRouteInformation (command);
@@ -674,9 +676,11 @@ void CoreBroker::processCommand (ActionMessage &&command)
         addSourceFilter (command);
         break;
     case CMD_ADD_DEPENDENCY:
+    case CMD_REMOVE_DEPENDENCY:
     case CMD_ADD_DEPENDENT:
     case CMD_REMOVE_DEPENDENT:
-    case CMD_REMOVE_DEPENDENCY:
+    case CMD_ADD_INTERDEPENDENCY:
+    case CMD_REMOVE_INTERDEPENDENCY:
         if (command.dest_id != global_broker_id)
         {
             routeMessage (command);
@@ -1177,8 +1181,7 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
     }
     else if (query == "federate_map")
     {
-        // TOOD:  create this information
-        return "#invalid";
+        return generateFederateMap();
     }
     else if (query == "dependency_graph")
     {
@@ -1187,14 +1190,72 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
     }
     else if (query == "dependencies")
     {
-        // TOOD:  create this information
-        return "#invalid";
+        Json_helics::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = static_cast<int>(global_broker_id);
+        if (!isRoot())
+        {
+            base["parent"] = static_cast<int>(global_broker_id);
+        }
+        base["dependents"] = Json_helics::arrayValue;
+        int index = 0;
+        for (auto &dep : timeCoord->getDependents())
+        {
+            base["dependents"][index] = dep;
+            ++index;
+        }
+        base["dependencies"] = Json_helics::arrayValue;
+        index = 0;
+        for (auto &dep : timeCoord->getDependencies())
+        {
+            base["dependencies"][index] = dep;
+            ++index;
+        }
+        Json_helics::StreamWriterBuilder builder;
+        builder["commentStyle"] = "None";
+        builder["indentation"] = "   ";  // or whatever you like
+        auto writer(builder.newStreamWriter());
+        std::stringstream sstr;
+        writer->write(base, &sstr);
+        return sstr.str();
     }
     else
     {
         return "#invalid";
     }
 }
+
+std::string CoreBroker::generateFederateMap() const
+{
+    Json_helics::Value base;
+    base["name"] = getIdentifier();
+    base["id"] = static_cast<int>(global_broker_id);
+    if (!isRoot())
+    {
+        base["parent"] = static_cast<int>(global_broker_id);
+    }
+    base["brokers"] = Json_helics::arrayValue;
+  //  int index = 0;
+  //  for (auto &dep : timeCoord->getDependents())
+   // {
+       // base["brokers"][index] = dep;
+   //     ++index;
+  //  }
+    base["cores"] = Json_helics::arrayValue;
+  //  index = 0;
+  //  for (auto &dep : timeCoord->getDependencies())
+  //  {
+      //  base["cores"][index] = dep;
+  //      ++index;
+  //  }
+    Json_helics::StreamWriterBuilder builder;
+    builder["commentStyle"] = "None";
+    builder["indentation"] = "   ";  // or whatever you like
+    auto writer(builder.newStreamWriter());
+    std::stringstream sstr;
+    writer->write(base, &sstr);
+    return sstr.str();
+    }
 
 void CoreBroker::processLocalQuery (const ActionMessage &m)
 {
@@ -1260,16 +1321,11 @@ void CoreBroker::checkDependencies ()
 {
     if (_isRoot)
     {
-        if (timeCoord->getDependents ().size () > 1)
-        {
-            return;
-        }
-        else
-        {  // if there is just one dependency remove it
-            ActionMessage rmdep (CMD_REMOVE_INTERDEPENDENCY);
-
+        if (timeCoord->getDependents ().size () == 1)
+        {// if there is just one dependency remove it
+            ActionMessage rmdep(CMD_REMOVE_INTERDEPENDENCY);
             rmdep.source_id = global_broker_id;
-            routeMessage (rmdep, timeCoord->getDependents ()[0]);
+            routeMessage(rmdep, timeCoord->getDependents()[0]);
         }
     }
     else

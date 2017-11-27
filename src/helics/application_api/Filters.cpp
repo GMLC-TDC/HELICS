@@ -51,17 +51,93 @@ static void addOperations (Filter *filt, defined_filter_types type)
     }
 }
 
-void Filter::setOperator (std::shared_ptr<FilterOperator> mo)
+Filter::Filter(Federate *fed)
 {
     if (fed != nullptr)
     {
-        fed->registerMessageOperator (id, std::move (mo));
+        corePtr = fed->getCorePointer().get();
     }
 }
-void Filter::setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
+
+Filter::Filter(Core *cr):corePtr(cr)
 {
-    filtOp = std::move (filterOps);
-    fed->registerMessageOperator (id, filtOp->getOperator ());
+
+}
+
+void Filter::setOperator (std::shared_ptr<FilterOperator> mo)
+{
+    if (corePtr != nullptr)
+    {
+        corePtr->setFilterOperator (id, std::move (mo));
+    }
+}
+void Filter::setFilterOperations(std::shared_ptr<FilterOperations> filterOps)
+{
+    filtOp = std::move(filterOps);
+    if (corePtr)
+    {
+        corePtr->setFilterOperator(id, filtOp->getOperator());
+    }
+    
+}
+
+
+SourceFilter::SourceFilter(Federate *mFed,
+    const std::string &target,
+    const std::string &name,
+    const std::string &input_type,
+    const std::string &output_type)
+    : Filter(mFed)
+{
+    if (mFed != nullptr)
+    {
+        fid = mFed->registerSourceFilter(name, target, input_type, output_type);
+        id = fid.value();
+    }
+    
+}
+
+SourceFilter::SourceFilter(Core *cr,
+    const std::string &target,
+    const std::string &name,
+    const std::string &input_type,
+    const std::string &output_type)
+    : Filter(cr)
+{
+    if (corePtr != nullptr)
+    {
+        id = corePtr->registerSourceFilter(name, target, input_type, output_type);
+        fid = id;
+    }
+
+}
+
+DestinationFilter::DestinationFilter(Federate *mFed,
+    const std::string &target,
+    const std::string &name,
+    const std::string &input_type,
+    const std::string &output_type)
+    : Filter(mFed)
+{
+    if (mFed != nullptr)
+    {
+        fid = mFed->registerDestinationFilter(name, target, input_type, output_type);
+        id = fid.value();
+    }
+}
+
+DestinationFilter::DestinationFilter(Core *cr,
+    const std::string &target,
+    const std::string &name,
+    const std::string &input_type,
+    const std::string &output_type)
+    : Filter(cr)
+{
+    if (corePtr != nullptr)
+    {
+        id = corePtr->registerDestinationFilter(name, target, input_type, output_type);
+        fid = id;
+    }
 }
 
 std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types type,
@@ -76,10 +152,29 @@ std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types
 }
 
 std::unique_ptr<SourceFilter>
-make_Source_filter (defined_filter_types type, Federate *mFed, const std::string &target, const std::string &name)
+make_Source_filter (defined_filter_types type, Core *cr, const std::string &target, const std::string &name)
 {
-    auto sfilt = std::make_unique<SourceFilter> (mFed, target, name);
+    auto sfilt = std::make_unique<SourceFilter> (cr, target, name);
     addOperations (sfilt.get (), type);
+    return sfilt;
+}
+
+std::unique_ptr<DestinationFilter> make_destination_filter(defined_filter_types type,
+    Core *cr,
+    const std::string &target,
+    const std::string &name)
+
+{
+    auto dfilt = std::make_unique<DestinationFilter>(cr, target, name);
+    addOperations(dfilt.get(), type);
+    return dfilt;
+}
+
+std::unique_ptr<SourceFilter>
+make_Source_filter(defined_filter_types type, Federate *mFed, const std::string &target, const std::string &name)
+{
+    auto sfilt = std::make_unique<SourceFilter>(mFed, target, name);
+    addOperations(sfilt.get(), type);
     return sfilt;
 }
 
@@ -330,15 +425,20 @@ rerouteFilterOperation::rerouteFilterOperation ()
 {
     op = std::make_shared<MessageDestOperator> ([this](const std::string &dest) { return newTarget.load (); });
 }
+
 rerouteFilterOperation::~rerouteFilterOperation () = default;
 
 void rerouteFilterOperation::set (const std::string &property, double val) {}
 
-void rerouteFilterOperation::setString (const std::string &property, const std::string &val)
+void rerouteFilterOperation::setString(const std::string &property, const std::string &val)
 {
     if (property == "target")
     {
         newTarget = val;
+    }
+    else if (property == "filter")
+    {
+
     }
 }
 

@@ -92,8 +92,13 @@ class ActionMessage
   public:
     /** default constructor*/
     ActionMessage () noexcept : index(dest_handle), processingComplete(iterationComplete), name (payload) {};
-    /** construct from an action type*/
+    /** construct from an action type 
+    @details this is an implicit constructor
+    */
     ActionMessage (action_message_def::action_t startingAction);
+    /** construct from action, source and destination id's
+    */
+    ActionMessage(action_message_def::action_t action, int32_t sourceId, int32_t destId);
     /** move constructor*/
     ActionMessage (ActionMessage &&act) noexcept;
     /** build an action message from a message*/

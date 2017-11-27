@@ -431,7 +431,7 @@ iteration_result CommonCore::enterExecutingState (federate_id_t federateID, iter
     }
     if (HELICS_INITIALIZING != fed->getState ())
     {
-        throw (invalidFunctionCall ());
+        throw (invalidFunctionCall ("federate is in invalid state for calling entry to exec mode"));
     }
     // do an exec check on the fed to process previously received messages so it can't get in a deadlocked state
     ActionMessage exec (CMD_EXEC_CHECK);
@@ -535,7 +535,7 @@ Time CommonCore::timeRequest (federate_id_t federateID, Time next)
         auto ret = fed->requestTime (next, iteration_request::no_iterations);
         return ret.stepTime;
     }
-    throw (invalidFunctionCall ());
+    throw (invalidFunctionCall ("time request may only be called in execution state"));
 }
 
 iterationTime CommonCore::requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate)
@@ -548,7 +548,7 @@ iterationTime CommonCore::requestTimeIterative (federate_id_t federateID, Time n
 
     if (HELICS_EXECUTING != fed->getState ())
     {
-        throw (invalidFunctionCall ());
+        throw (invalidFunctionCall ("time request may only be called in execution state"));
     }
 
     // limit the iterations
@@ -627,7 +627,7 @@ void CommonCore::setLookAhead (federate_id_t federateID, Time lookAheadTime)
     }
     if (lookAheadTime < timeZero)
     {
-        throw (invalidParameter ());
+        throw (invalidParameter ("lookahead time must be >=0"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_LOOKAHEAD;
@@ -645,7 +645,7 @@ void CommonCore::setImpactWindow (federate_id_t federateID, Time impactTime)
 
     if (impactTime < timeZero)
     {
-        throw (invalidParameter ());
+        throw (invalidParameter ("impact window must be >=0"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_IMPACT_WINDOW;
@@ -662,7 +662,7 @@ void CommonCore::setPeriod (federate_id_t federateID, Time timePeriod)
     }
     if (timePeriod < timeZero)
     {
-        throw (invalidParameter ());
+        throw (invalidParameter ("period must be greater than 0"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_PERIOD;
@@ -791,7 +791,7 @@ Handle CommonCore::registerSubscription (federate_id_t federateID,
     }
     if (fed->getState () != HELICS_CREATED)
     {
-        throw (invalidFunctionCall ());
+        throw (invalidFunctionCall ("subscriptions must be registered before calling enterInitializationMode"));
     }
     LOG_DEBUG (0, fed->getIdentifier (), (boost::format ("registering SUB %s") % key).str ());
     auto id = getNewHandle ();
@@ -864,7 +864,7 @@ Handle CommonCore::registerPublication (federate_id_t federateID,
     }
     if (fed->getState () != HELICS_CREATED)
     {
-        throw (invalidFunctionCall ());
+        throw (invalidFunctionCall ("publications must be registered before calling enterInitializationMode"));
     }
     LOG_DEBUG (0, fed->getIdentifier (), (boost::format ("registering PUB %s") % key).str ());
     std::unique_lock<std::mutex> lock (_handlemutex);
@@ -1052,7 +1052,7 @@ Handle CommonCore::registerEndpoint (federate_id_t federateID, const std::string
     }
     if (fed->getState () != HELICS_CREATED)
     {
-        throw (invalidFunctionCall ());
+        throw (invalidFunctionCall ("endpoints must be registered before calling enterInitializationMode"));
     }
 
     std::unique_lock<std::mutex> lock (_mutex);
@@ -1101,7 +1101,7 @@ Handle CommonCore::registerSourceFilter (const std::string &filterName,
 {
     if (brokerState == operating)
     {
-        throw (invalidFunctionCall ());
+        throw (invalidFunctionCall ("Core has already entered initialization state"));
     }
     // check to make sure the name isn't already used
     if (!filterName.empty ())
@@ -1112,7 +1112,6 @@ Handle CommonCore::registerSourceFilter (const std::string &filterName,
             throw (invalidIdentifier ("there already exists a filter with this name"));
         }
     }
-
     auto id = getNewHandle ();
     auto filtInfo = createSourceFilter (global_broker_id, id, filterName, source, type_in, type_out);
 
@@ -1178,7 +1177,7 @@ Handle CommonCore::registerDestinationFilter (const std::string &filterName,
 {
     if (brokerState == operating)
     {
-        throw (invalidFunctionCall ());
+        throw (invalidFunctionCall ("Core has already entered initialization state"));
     }
 
     auto id = getNewHandle ();
@@ -1466,6 +1465,7 @@ void CommonCore::queueMessage (ActionMessage &message)
     break;
     case CMD_SEND_FOR_FILTER:
     case CMD_SEND_FOR_FILTER_OPERATION:
+    case CMD_SEND_FOR_FILTER_RETURN:
     {
         addActionMessage (message);
     }
@@ -1680,6 +1680,10 @@ std::string CommonCore::federateQuery (Core::federate_id_t id, const std::string
     if (queryStr == "state")
     {
         return std::to_string (static_cast<int> (fed->getState ()));
+    }
+    if (queryStr == "dependencies")
+    {
+        return nullStr;
     }
 
     return fed->processQuery (queryStr);
@@ -2073,12 +2077,8 @@ void CommonCore::processCommand (ActionMessage &&command)
             if (added)
             {
                 auto fed = getFederate (command.source_id);
-                ActionMessage add (CMD_ADD_DEPENDENCY);
-                add.source_id = global_broker_id;
-                add.dest_id = command.source_id;
+                ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id, command.source_id);
 
-                fed->addAction (add);
-                add.setAction (CMD_ADD_DEPENDENT);
                 fed->addAction (add);
                 timeCoord->addDependent (fed->global_id);
             }
@@ -2088,13 +2088,9 @@ void CommonCore::processCommand (ActionMessage &&command)
                 if (timeCoord->addDependency (higher_broker_id))
                 {
                     hasTimeDependency = true;
-                    ActionMessage add (CMD_ADD_DEPENDENCY);
-                    add.source_id = global_broker_id;
-                    add.dest_id = higher_broker_id;
+                    ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id, higher_broker_id);
+                    transmit (higher_broker_id, add);
 
-                    transmit (higher_broker_id, add);
-                    add.setAction (CMD_ADD_DEPENDENT);
-                    transmit (higher_broker_id, add);
                     timeCoord->addDependent (higher_broker_id);
                 }
             }
@@ -2114,16 +2110,13 @@ void CommonCore::processCommand (ActionMessage &&command)
         {
             if (!hasTimeDependency)
             {
+                hasLocalFilters = true;
                 hasTimeDependency = true;
                 if (timeCoord->addDependency (higher_broker_id))
                 {
-                    ActionMessage add (CMD_ADD_DEPENDENCY);
-                    add.source_id = global_broker_id;
-                    add.dest_id = higher_broker_id;
+                    ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id, higher_broker_id);
+                    transmit (higher_broker_id, add);
 
-                    transmit (higher_broker_id, add);
-                    add.setAction (CMD_ADD_DEPENDENT);
-                    transmit (higher_broker_id, add);
                     timeCoord->addDependent (higher_broker_id);
                 }
             }
@@ -2262,13 +2255,15 @@ void CommonCore::processCommand (ActionMessage &&command)
 
     case CMD_SEND_MESSAGE:
     {
+        // TODO:: PT This isn't the best way of doing this
         auto fnd = endpoints.find (command.info ().target);
         if (fnd != endpoints.end ())
         {  // destination is local
             auto fed = getHandleFederate (fnd->second);
-            fed->addAction (command);
+
             command.dest_id = fed->global_id;
             command.dest_handle = fnd->second;
+            fed->addAction (command);
         }
         else
         {
@@ -2356,8 +2351,8 @@ void CommonCore::processFilterInfo (ActionMessage &command)
 
 void CommonCore::checkDependencies ()
 {
-    // if we have files we need to be a timeCoordinator
-    if (!filters.empty ())
+    // if we have filters we need to be a timeCoordinator
+    if (hasLocalFilters)
     {
         return;
     }
@@ -2400,6 +2395,7 @@ void CommonCore::checkDependencies ()
     ActionMessage adddep (CMD_ADD_INTERDEPENDENCY);
     adddep.source_id = fedid;
     routeMessage (adddep, brkid);
+    routeMessage (adddep, fedid);  // make sure the fed depends on itself in case the broker removes itself later
     adddep.source_id = brkid;
     routeMessage (adddep, fedid);
 }
@@ -2464,9 +2460,9 @@ void CommonCore::organizeFilterOperations ()
 
 void CommonCore::routeMessage (ActionMessage &cmd, federate_id_t dest)
 {
+    cmd.dest_id = dest;
     if ((dest == 0) || (dest == higher_broker_id))
     {
-        cmd.dest_id = 0;
         transmit (0, cmd);
     }
     else if (isLocal (dest))
@@ -2480,7 +2476,6 @@ void CommonCore::routeMessage (ActionMessage &cmd, federate_id_t dest)
     else
     {
         auto route = getRoute (dest);
-        cmd.dest_id = dest;
         transmit (route, cmd);
     }
 }
@@ -2512,7 +2507,7 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
     {
         transmit (0, cmd);
     }
-    else if (isLocal (cmd.dest_id))
+    else if (cmd.dest_id == global_broker_id)
     {
         // deal with local source filters
 

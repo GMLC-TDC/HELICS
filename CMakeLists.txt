@@ -22,7 +22,7 @@ OPTION(BUILD_PYTHON "Build Python extension" OFF)
 
 OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" OFF)
 IF(NOT MSVC)
-OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface" OFF)
+OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface gcc/clang only" OFF)
 ENDIF()
 
 if (BUILD_PYTHON OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
@@ -228,9 +228,17 @@ IF (UNIX AND NOT APPLE)
 target_link_libraries(helics-static rt)
 ENDIF()
 
+IF(MINGW)
+	target_link_libraries(helics-static ws2_32)
+ENDIF(MINGW)
 
 if (${ZMQ_FOUND})
-   target_link_libraries(helics-static ${ZMQ_LIBRARY})
+	if (ZMQ_USE_STATIC_LIBRARY)
+		set(ZMQ_DEPENDENCY ${ZMQ_STATIC_LIBRARY})
+	else()
+		set(ZMQ_DEPENDENCY ${ZMQ_LIBRARY})
+	endif()
+	target_link_libraries(helics-static ${ZMQ_DEPENDENCY})
 else()
    if (ZMQ_ENABLE)
    message(WARNING "ZMQ not found")
@@ -241,9 +249,7 @@ if (${MPI_C_FOUND})
    target_link_libraries(helics-static ${MPI_C_LIBRARIES})
 endif (${MPI_C_FOUND})
 
-IF(MINGW)
-	target_link_libraries(helics-static ws2_32)
-ENDIF(MINGW)
+
 
 link_directories(${Boost_LIBRARY_DIRS})
 
@@ -273,7 +279,7 @@ ENDIF()
 
 IF(BUILD_CXX_SHARED_LIB)
 	if (BUILD_C_SHARED_LIB OR BUILD_PYTHON)
-		warning("Building the CXX shared library and C shared library in the same build is not advisable due to conflicting symbol visibility guidelines")
+		warning("Building the CXX shared library and C shared library in the same build is not advisable due to conflicting symbol visibility guidelines and is unlikely to work very well")
 	endif()
 
 	add_library(helics-shared SHARED helics-static)
@@ -367,6 +373,11 @@ configure_package_config_file(${PROJECT_NAME}Config.cmake.in
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
                                  VERSION ${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}
                                  COMPATIBILITY AnyNewerVersion)
+
+configure_file(${PROJECT_NAME}Import.cmake.in
+                              "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake")
+
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+			   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake
               DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})

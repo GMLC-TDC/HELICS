@@ -23,4 +23,4 @@ if (BUILD_C_SHARED_LIB OR BUILD_PYTHON)
 add_subdirectory(shared_api_library)
 install(DIRECTORY shared_api_library DESTINATION include
         FILES_MATCHING PATTERN "*.h*")
-endif(BUILD_SHARED_LIBS)
+endif()

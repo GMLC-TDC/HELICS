@@ -212,6 +212,7 @@ private:
 protected:
 	
 	int32_t _global_federation_size = 0;  //!< total size of the federation
+    bool hasLocalFilters = false;
 	std::vector<std::unique_ptr<FederateState>> _federates; //!< local federate information
 														  //using pointers to minimize time in a critical section- though this should be timed more in the future
   std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information

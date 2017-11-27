@@ -12,7 +12,6 @@ BlockingPriorityQueue.hpp
 timeRepresentation.hpp
 delayedDestructor.hpp
 searchableObjectHolder.hpp
-blocking_queue.h
 stringToCmdLine.h
 AsioServiceManager.h
 logger.h

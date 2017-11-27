@@ -9,8 +9,8 @@
  * For details, see the LICENSE file.
  * LLNS Copyright End
  */
-#ifndef CONFIG_UTILITIES_H
-#define CONFIG_UTILITIES_H
+#ifndef COMPILER_CONFIG_H
+#define COMPILER_CONFIG_H
 #pragma once
 
 #cmakedefine HAVE_STRING_VIEW
@@ -30,7 +30,7 @@
 #ifdef HAVE_IF_CONSTEXPR
 #define IF_CONSTEXPR  constexpr
 #else
-#define IF_CONSTEXPR /*disables code*/
+#define IF_CONSTEXPR /* disables code */
 #endif
 
 #cmakedefine HAVE_FALLTHROUGH
@@ -38,7 +38,7 @@
 #ifdef HAVE_FALLTHROUGH
 #define FALLTHROUGH [[fallthrough]];
 #else
-#define FALLTHROUGH //fallthrough
+#define FALLTHROUGH /* FALLTHRU */
 #endif
 
 #cmakedefine HAVE_UNUSED
@@ -46,18 +46,12 @@
 #ifdef HAVE_UNUSED
 #define UNUSED [[unused]]
 #else
-#define UNUSED /*UNUSED*/
+#define UNUSED /* UNUSED */
 #endif
 
 #cmakedefine HAVE_CLAMP
 
 #cmakedefine HAVE_HYPOT3
 
-#cmakedefine ENABLE_64_BIT_INDEXING
-
-#cmakedefine DISABLE_MULTITHREADING
-
-#cmakedefine KLU_ENABLE
-
-#endif //CONFIG_UTILITIES_H_
+#endif // COMPILER_CONFIG_H
 

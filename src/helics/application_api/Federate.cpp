@@ -697,12 +697,12 @@ filter_id_t Federate::getDestFilterId (const std::string &filterName) const
     return (id == invalid_Handle) ? invalid_id_value : filter_id_t (id);
 }
 
-void Federate::registerMessageOperator (filter_id_t id, std::shared_ptr<FilterOperator> mo)
+void Federate::setFilterOperator (filter_id_t id, std::shared_ptr<FilterOperator> mo)
 {
     coreObject->setFilterOperator (id.value (), std::move (mo));
 }
 
-void Federate::registerMessageOperator (const std::vector<filter_id_t> &filter_ids,
+void Federate::setFilterOperator (const std::vector<filter_id_t> &filter_ids,
                                         std::shared_ptr<FilterOperator> mo)
 {
     for (auto id : filter_ids)

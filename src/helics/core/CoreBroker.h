@@ -138,7 +138,7 @@ public:
 	void setAsRoot();
 	/** return true if the broker is a root broker
 	*/
-	bool isRoot() {
+	bool isRoot() const {
 		return _isRoot;
 	};
 
@@ -228,6 +228,8 @@ private:
 	void addDestFilter(ActionMessage &m);
 	void addSourceFilter(ActionMessage &m);
 	bool updateSourceFilterOperator(ActionMessage &m);
+    /** generate a json string containing the federate/broker/Core Map*/
+    std::string generateFederateMap() const;
 };
 
 

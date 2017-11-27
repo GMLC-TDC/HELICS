@@ -703,7 +703,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         {
             break;
         }
-        // FALLTHROUGH
+        FALLTHROUGH
     case CMD_TIME_CHECK:
     {
         if (state != HELICS_EXECUTING)
@@ -724,7 +724,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         if (epi != nullptr)
         {
             timeCoord->updateMessageTime (cmd.actionTime);
-            cmd.actionTime += timeCoord->getFedInfo ().impactWindow;
+            cmd.actionTime += timeCoord->getFedInfo().impactWindow;
             epi->addMessage (createMessage (std::move (cmd)));
         }
     }
@@ -782,31 +782,17 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     }
     break;
     case CMD_ADD_DEPENDENCY:
-        if (cmd.dest_id == global_id)
-        {
-            timeCoord->addDependency (cmd.source_id);
-        }
-
-        break;
-    case CMD_ADD_DEPENDENT:
-        if (cmd.dest_id == global_id)
-        {
-            timeCoord->addDependent (cmd.source_id);
-        }
-        break;
     case CMD_REMOVE_DEPENDENCY:
-        if (cmd.dest_id == global_id)
-        {
-            timeCoord->removeDependency (cmd.source_id);
-        }
-        break;
+    case CMD_ADD_DEPENDENT:
     case CMD_REMOVE_DEPENDENT:
+    case CMD_ADD_INTERDEPENDENCY:
+    case CMD_REMOVE_INTERDEPENDENCY:
         if (cmd.dest_id == global_id)
         {
-            timeCoord->removeDependent (cmd.source_id);
+            timeCoord->processDependencyUpdateMessage(cmd);
         }
-        break;
 
+        break;
     case CMD_REG_DST_FILTER:
     case CMD_NOTIFY_DST_FILTER:
     {

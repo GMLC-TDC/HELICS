@@ -26,6 +26,7 @@ namespace bdata = boost::unit_test::data;
 const std::string core_types[] = {"test", "test_2", "ipc_2", "zmq", "udp"};
 #else
 const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2", "udp", "udp_2"};
+//const std::string core_types[] = { "test_2"};
 #endif
 
 /** test registration of filters*/
@@ -73,7 +74,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     BOOST_CHECK (f1.value () != helics::invalid_id_value);
     auto timeOperator = std::make_shared<helics::MessageTimeOperator> ();
     timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
-    fFed->registerMessageOperator (f1, timeOperator);
+    fFed->setFilterOperator (f1, timeOperator);
 
     fFed->enterExecutionStateAsync ();
     mFed->enterExecutionState ();

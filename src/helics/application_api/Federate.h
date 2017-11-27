@@ -370,17 +370,17 @@ class Federate
     The MessageOperator gets called when there is a message to filter, There is no order or state to this
     messages can come in any order.
     @param[in] filter the identifier for the filter to trigger
-    @param[in] mo A shared_ptr to a message operator
+    @param[in] op A shared_ptr to a message operator
     */
-    void registerMessageOperator(filter_id_t filter, std::shared_ptr<FilterOperator> mo);
+    void setFilterOperator(filter_id_t filter, std::shared_ptr<FilterOperator> op);
     /** @brief register a operator for the specified filters
     @details for time_agnostic federates only,  all other settings would trigger an error
     The MessageOperator gets called when there is a message to filter, There is no order or state to this
     message can come in any order.
     @param[in] filters the identifier for the filter to trigger
-    @param[in] mo A shared_ptr to a message operator
+    @param[in] op A shared_ptr to a message operator
     */
-    void registerMessageOperator(const std::vector<filter_id_t> &filters, std::shared_ptr<FilterOperator> mo);
+    void setFilterOperator(const std::vector<filter_id_t> &filters, std::shared_ptr<FilterOperator> op);
   protected:
     /** function to deal with any operations that need to occur on a time update*/
     virtual void updateTime (Time newTime, Time oldTime);

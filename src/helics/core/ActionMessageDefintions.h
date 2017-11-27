@@ -79,7 +79,7 @@ enum class action_t : int32_t
 						cmd_send_message = cmd_info_basis + 20,  //!< send a message
 						cmd_send_for_filter = cmd_info_basis + 30,  //!< send a message to be filtered and forward on to the destination
 						cmd_send_for_filter_op = cmd_info_basis+32, //!< send a message to be filters via a callback operation and return to the source
-						
+						cmd_send_for_filter_return=cmd_info_basis+35, //!< send a message back to its originator after filtering
 						cmd_reg_pub = cmd_info_basis + 50,  //!< register a publication
 						cmd_notify_pub =  50,  //!< notify of a publication
 						cmd_reg_dst_filter = cmd_info_basis + 60,  //!< register a destination filter
@@ -121,6 +121,7 @@ enum class action_t : int32_t
 #define CMD_SEND_MESSAGE action_message_def::action_t::cmd_send_message
 #define CMD_SEND_FOR_FILTER action_message_def::action_t::cmd_send_for_filter
 #define CMD_SEND_FOR_FILTER_OPERATION action_message_def::action_t::cmd_send_for_filter_op
+#define CMD_SEND_FOR_FILTER_RETURN action_message_def::action_t::cmd_send_for_filter_return
 #define CMD_PUB action_message_def::action_t::cmd_pub
 #define CMD_LOG action_message_def::action_t::cmd_log
 #define CMD_WARNING action_message_def::action_t::cmd_warning

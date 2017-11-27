@@ -324,6 +324,16 @@ DependencyInfo *TimeCoordinator::getDependencyInfo (Core::federate_id_t ofed)
     return dependencies.getDependencyInfo (ofed);
 }
 
+std::vector < Core::federate_id_t> TimeCoordinator::getDependencies() const
+{
+    std::vector < Core::federate_id_t> deps;
+    for (auto &dep : dependencies)
+    {
+        deps.push_back(dep.fedID);
+    }
+    return deps;
+}
+
 iteration_state TimeCoordinator::checkExecEntry ()
 {
     auto ret = iteration_state::continue_processing;
@@ -407,6 +417,7 @@ void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
     case CMD_REMOVE_INTERDEPENDENCY:
         removeDependency (cmd.source_id);
         removeDependent (cmd.source_id);
+        break;
     default:
         break;
     }
