@@ -3,13 +3,17 @@
 #
 #   HELICS_FOUND - true if HELICS found on the system
 #   HELICS_INCLUDE_DIR - the directory containing HELICS headers
-#   HELICS_SHARED_LIBRARY 
-#   HELICS_STATIC_LIBRARY
-
+#   HELICS_C_SHARED_LIBRARY - the C shared library
+# 	HELICS_CXX_SHARED_LIBRARY -the C++ shared library
+#   HELICS_STATIC_LIBRARY -the static Library
+# 	HELICS_DEPENDENCIES -- list of dependencies in the helics project
 @PACKAGE_INIT@
 
 set(PN HELICS)
 set_and_check(${PN}_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@")
-set_and_check(${PN}_SHARED_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_shared_file@")
+set_and_check(${PN}_C_SHARED_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_c_shared_file@")
+set_and_check(${PN}_CXX_SHARED_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_cxx_shared_file@")
 set_and_check(${PN}_STATIC_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_static_file@")
+
+set_and_check(${PN}_DEPENDENCIES "@helics_depenencies@")
 check_required_components(${PN})

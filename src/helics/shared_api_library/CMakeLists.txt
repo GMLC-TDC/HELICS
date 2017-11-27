@@ -38,6 +38,10 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 target_link_libraries(helicsSharedLib helics-static)
 
 
-INSTALL(TARGETS helicsSharedLib DESTINATION lib/helics EXPORT helics-targets)
+INSTALL(TARGETS helicsSharedLib EXPORT helics-targets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
 
 

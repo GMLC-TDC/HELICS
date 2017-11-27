@@ -124,11 +124,12 @@ ENDIF(UNIX)
 # -------------------------------------------------------------
 # Check and set latest CXX Standard supported by compiler
 # -------------------------------------------------------------
+OPTION(ENABLE_CXX_17 "set to on to enable C++17 compilation features" OFF)
 include(CheckLatestCXXStandardOption)
 IF (VERSION_OPTION)
 	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
 ELSE ()
-set(CMAKE_CXX_STANDARD 14)
+	set(CMAKE_CXX_STANDARD 14)
 ENDIF ()
 
 # -------------------------------------------------------------
@@ -330,22 +331,50 @@ endif(ENABLE_CLANG_TOOLS)
 
 add_subdirectory(swig)
 
+
+set(HELICS_CMAKECONFIG_INSTALL_DIR "cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
+
 install (TARGETS helics-static EXPORT helics-targets
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
 
+	set(helics_static_file "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}")
+	
 IF(BUILD_CXX_SHARED_LIB)
 install (TARGETS helics-shared EXPORT helics-targets
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
-
-	 set(helics_static_file $<TARGET_FILE_NAME:helics-static>)
+	set(helics_cxx_shared_file "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_SHARED_LIBRARY_SUFFIX}")
+ELSE (BUILD_CXX_SHARED_LIB)
+	set(helics_cxx_shared_file )
 ENDIF(BUILD_CXX_SHARED_LIB)
 
-install (EXPORT helics-targets DESTINATION cmake/helics EXPORT_LINK_INTERFACE_LIBRARIES)
+IF(BUILD_C_SHARED_LIB OR BUILD_PYTHON)
+	set(helics_c_shared_file "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_SHARED_LIBRARY_SUFFIX}")
+ELSE()
+	set(helics_c_shared_file )
+ENDIF()
+
+
+install (EXPORT helics-targets DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
+
+set(helics_dependencies ${Boost_Libraries_Core})
+
+IF (UNIX AND NOT APPLE)
+	list(APPEND helics_dependencies rt)
+ENDIF()
+
+IF(MINGW)
+	list(APPEND helics_dependencies ws2_32)
+ENDIF(MINGW)
+
+if (ZMQ_FOUND)
+	list(APPEND helics_dependencies ${ZMQ_DEPENDENCY})
+endif(ZMQ_FOUND)
+
 
 
 #-----------------------------------------------------------------------------
@@ -360,12 +389,11 @@ configure_file (
   install(DIRECTORY ThirdParty/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 	  FILES_MATCHING PATTERN "helics_includes/*.h*")
 
-set(helics_shared_file $<TARGET_FILE_NAME:helics-shared>)
+
 
 
 include(CMakePackageConfigHelpers)
 
-set(HELICS_CMAKECONFIG_INSTALL_DIR "cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
 
 configure_package_config_file(${PROJECT_NAME}Config.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
