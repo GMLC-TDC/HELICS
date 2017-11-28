@@ -17,12 +17,16 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (query_tests_value, ValueFederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
 #ifdef QUICK_TESTS_ONLY
 const std::string core_types[] = {"test_2", "ipc_2", "zmq", "udp"};
 #else
 const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2", "udp", "udp_2"};
 #endif
 /** test simple creation and destruction*/
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_type)
 {
     Setup2FederateTest (core_type);
@@ -55,6 +59,9 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     BOOST_CHECK_EQUAL (vFed1->query ("test2", "publications"), "[test2/pub3]");
 }
 
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_AUTO_TEST_CASE (test_broker_queries)
 {
     Setup2FederateTest ("test_2");
@@ -68,6 +75,9 @@ BOOST_AUTO_TEST_CASE (test_broker_queries)
     BOOST_CHECK_EQUAL (res, "[test1;test2]");
 }
 
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), core_type)
 {
     Setup2FederateTest (core_type);

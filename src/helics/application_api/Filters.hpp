@@ -13,6 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "Federate.h"
 #include "libguarded/guarded.hpp"
+#include "libguarded/shared_guarded.hpp"
 #include "../core/core.h"
 #include <set>
 
@@ -91,14 +92,16 @@ class rerouteFilterOperation : public FilterOperations
 {
   private:
     std::shared_ptr<MessageDestOperator> op;  //!< the actual operator
-    libguarded::guarded<std::string> newTarget;  //!< the target destination
-    libguarded::guarded<std::set<std::string>> conditions; //!< the original destination must match one of these conditions
+    libguarded::shared_guarded<std::string> newTarget;  //!< the target destination
+    libguarded::shared_guarded<std::set<std::string>> conditions; //!< the original destination must match one of these conditions
   public:
     rerouteFilterOperation ();
     ~rerouteFilterOperation ();
     virtual void set (const std::string &property, double val) override;
     virtual void setString (const std::string &property, const std::string &val) override;
     virtual std::shared_ptr<FilterOperator> getOperator () override;
+private:
+    std::string rerouteOperation(const std::string &dest) const;
 };
 
 /** class for managing a particular filter*/

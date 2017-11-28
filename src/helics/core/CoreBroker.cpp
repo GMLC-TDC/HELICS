@@ -203,7 +203,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         else  // we are initialized already
         {
             ActionMessage badInit (CMD_FED_ACK);
-            badInit.error = true;
+            SET_ACTION_FLAG(badInit, error_flag);
             badInit.source_id = global_broker_id;
             badInit.name = command.name;
             transmit (command.source_id, badInit);  // this isn't correct
@@ -265,7 +265,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         else  // we are initialized already
         {
             ActionMessage badInit (CMD_BROKER_ACK);
-            badInit.error = true;
+            SET_ACTION_FLAG(badInit, error_flag);
             badInit.source_id = global_broker_id;
             badInit.name = command.name;
             transmit (command.source_id, badInit);
@@ -332,7 +332,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     {  // we can't be root if we got one of these
         if (command.name == identifier)
         {
-            if (command.error)
+            if (CHECK_ACTION_FLAG(command,error_flag))
             {
                 // generate an error message
                 return;
@@ -731,14 +731,18 @@ void CoreBroker::addSubscription (ActionMessage &m)
                           static_cast<int32_t> (_handles.size () - 1));
     addLocalInfo (_handles.back (), m);
     subscriptions.emplace (m.name, static_cast<int32_t> (_handles.size () - 1));
-    _handles.back ().processed = m.processingComplete;
-    if (!m.processingComplete)
+    _handles.back().processed = CHECK_ACTION_FLAG(m, processingComplete);
+    if (!CHECK_ACTION_FLAG(m, processingComplete))
     {
         bool proc = FindandNotifySubscriptionPublisher (_handles.back ());
         if (!_isRoot)
         {
-            // just let any higher level brokers know we have found the publisher and let them know
-            m.processingComplete = proc;
+            if (proc)
+            {
+                // just let any higher level brokers know we have found the publisher and let them know
+                SET_ACTION_FLAG(m, processingComplete);
+            }
+           
             transmit (0, m);
         }
     }
@@ -754,7 +758,7 @@ void CoreBroker::addEndpoint (ActionMessage &m)
 
     if (!_isRoot)
     {
-        m.processingComplete = true;
+        SET_ACTION_FLAG(m, processingComplete);
         transmit (0, m);
     }
     else
@@ -772,7 +776,11 @@ void CoreBroker::addSourceFilter (ActionMessage &m)
     bool proc = FindandNotifyFilterEndpoint (_handles.back ());
     if (!_isRoot)
     {
-        m.processingComplete = proc;
+        if (proc)
+        {
+            SET_ACTION_FLAG(m, processingComplete);
+        }
+        
         transmit (0, m);
     }
 }
@@ -809,7 +817,10 @@ void CoreBroker::addDestFilter (ActionMessage &m)
     bool proc = FindandNotifyFilterEndpoint (_handles.back ());
     if (!_isRoot)
     {
-        m.processingComplete = proc;
+        if (proc)
+        {
+            SET_ACTION_FLAG(m, processingComplete);
+        }
         transmit (0, m);
     }
 }
@@ -1098,7 +1109,10 @@ void CoreBroker::FindandNotifyEndpointFilters (BasicHandleInfo &handleInfo)
         m.source_handle = filtInfo.id;
         m.dest_id = handleInfo.fed_id;
         m.dest_handle = handleInfo.id;
-        m.flag = handleInfo.flag;
+        if (handleInfo.flag)
+        {
+            SET_ACTION_FLAG(m, indicator_flag);
+       }
         transmit (getRoute (m.dest_id), m);
 
         // notify the publisher about its subscription

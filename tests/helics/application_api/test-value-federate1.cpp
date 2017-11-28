@@ -27,6 +27,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
 #ifdef QUICK_TESTS_ONLY
 const std::string core_types[] = {"test", "test_2", "ipc_2", "zmq", "udp"};
 const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
@@ -248,6 +249,9 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
 }
 
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
@@ -284,6 +288,9 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_si
     BOOST_CHECK_EQUAL (s, "string2");
 }
 
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
@@ -462,6 +469,10 @@ void runFederateTestv2 (const std::string &core_type_str,
 }
 
 #ifndef QUICK_TESTS_ONLY
+
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(35))
+ #endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types, bdata::make (core_types_single), core_type)
 {
     runFederateTest<double> (core_type, 10.3, 45.3, 22.7);
@@ -487,6 +498,9 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_types, bdata::make (core_ty
     runFederateTest<std::complex<double>> (core_type, def, v1, v2);
 }
 
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(35))
+ #endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers, bdata::make (core_types_single), core_type)
 {
     runFederateTestObj<double> (core_type, 10.3, 45.3, 22.7);
@@ -506,6 +520,9 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers, bdata::ma
 }
 
 #endif
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer, bdata::make (core_types), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 2);
@@ -734,6 +751,9 @@ void runDualFederateTestObj (const std::string &core_type_str,
 }
 /** test case checking that the transfer between two federates works as expected
  */
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(40))
+ #endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types, bdata::make (core_types), core_type)
 {
 #ifndef QUICK_TESTS_ONLY
@@ -764,6 +784,9 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types, bdata::make (core_type
 /** test case checking that the transfer between two federates works as expected with publication and subscription
  * objects
  */
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(40))
+ #endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj, bdata::make (core_types), core_type)
 {
 #ifndef QUICK_TESTS_ONLY
@@ -787,6 +810,9 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj, bdata::make (core_
     runDualFederateTestObj<std::complex<double>> (core_type, def, v1, v2);
 }
 
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(40))
+ #endif
 BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_types), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);

@@ -12,10 +12,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "Filters.hpp"
 #include "MessageOperators.h"
 
+#include <regex>
 #include <map>
 #include <memory>
 #include <random>
 #include <thread>
+#include <iostream>
 
 namespace helics
 {
@@ -414,7 +416,7 @@ void randomDropFilterOperation::set (const std::string &property, double val)
         dropProb = val;
     }
 }
-void randomDropFilterOperation::setString (const std::string &property, const std::string &val) {}
+void randomDropFilterOperation::setString (const std::string &/*property*/, const std::string & /*val*/) {}
 
 std::shared_ptr<FilterOperator> randomDropFilterOperation::getOperator ()
 {
@@ -423,12 +425,12 @@ std::shared_ptr<FilterOperator> randomDropFilterOperation::getOperator ()
 
 rerouteFilterOperation::rerouteFilterOperation ()
 {
-    op = std::make_shared<MessageDestOperator> ([this](const std::string &dest) { return newTarget.load (); });
+    op = std::make_shared<MessageDestOperator> ([this](const std::string &dest) { return rerouteOperation(dest); });
 }
 
 rerouteFilterOperation::~rerouteFilterOperation () = default;
 
-void rerouteFilterOperation::set (const std::string &property, double val) {}
+void rerouteFilterOperation::set (const std::string &/*property*/, double /*val*/) {}
 
 void rerouteFilterOperation::setString(const std::string &property, const std::string &val)
 {
@@ -438,7 +440,18 @@ void rerouteFilterOperation::setString(const std::string &property, const std::s
     }
     else if (property == "filter")
     {
-
+        try
+        {
+            auto test = std::regex(val);
+            auto cond = conditions.lock();
+            cond->insert(val);
+        }
+        catch (const std::regex_error &re)
+        {
+            std::cerr << "filter expression is not a valid Regular expression " << re.what() << std::endl;
+            throw(helics::InvalidParameterValue((std::string("filter expression is not a valid Regular expression ")+re.what()).c_str()));
+        }
+       
     }
 }
 
@@ -447,4 +460,23 @@ std::shared_ptr<FilterOperator> rerouteFilterOperation::getOperator ()
     return std::static_pointer_cast<FilterOperator> (op);
 }
 
+
+std::string rerouteFilterOperation::rerouteOperation(const std::string &dest) const
+{
+    auto cond = conditions.lock_shared();
+    if (cond->empty())
+    {
+        return *newTarget;
+    }
+    for (auto &sr : *cond)
+    {
+        std::regex reg(sr);
+        if (std::regex_match(dest, reg))
+        {
+            return *newTarget;
+        }
+    }
+    return dest;
+
+}
 }  // namespace helics

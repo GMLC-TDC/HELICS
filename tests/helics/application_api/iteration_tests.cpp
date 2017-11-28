@@ -19,9 +19,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueConverter.hpp"
 
+namespace utf = boost::unit_test;
+
 BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
 
 /** just a check that in the simple case we do actually get the time back we requested*/
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_AUTO_TEST_CASE (execution_iteration_test)
 {
     Setup1FederateTest ("test");
@@ -48,6 +53,9 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 {
     Setup2FederateTest ("test");
@@ -79,6 +87,9 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 }
 
 /** just a check that in the simple case we do actually get the time back we requested*/
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_AUTO_TEST_CASE (time_iteration_test)
 {
     Setup1FederateTest ("test");
@@ -107,6 +118,9 @@ BOOST_AUTO_TEST_CASE (time_iteration_test)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
 {
     Setup2FederateTest ("test");
@@ -142,6 +156,9 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
 {
     Setup2FederateTest ("test");
@@ -180,6 +197,9 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_AUTO_TEST_CASE (test_iteration_counter)
 {
     Setup2FederateTest ("test");

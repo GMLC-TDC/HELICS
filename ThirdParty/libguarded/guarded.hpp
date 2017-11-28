@@ -105,7 +105,7 @@ class guarded
     */
     std::enable_if_t<std::is_copy_constructible<T>::value, T> load()
     {
-        std::lock_guard<M> lock(m_mutex);
+        std::lock_guard<M> glock(m_mutex);
         return m_obj;
     }
     /** generate a copy of the protected object
@@ -119,7 +119,7 @@ class guarded
     template <typename objType>
     std::enable_if_t<std::is_copy_assignable<T>::value> store(objType &&newObj)
     {
-        std::lock_guard<M> lock(m_mutex);
+        std::lock_guard<M> glock(m_mutex);
         m_obj = std::forward<objType>(newObj);
     }
 
@@ -164,19 +164,19 @@ guarded<T, M>::guarded(Us &&... data) : m_obj(std::forward<Us>(data)...)
 template <typename T, typename M>
 auto guarded<T, M>::lock() -> handle
 {
-    std::unique_lock<M> lock(m_mutex);
-    return handle(&m_obj, deleter(std::move(lock)));
+    std::unique_lock<M> glock(m_mutex);
+    return handle(&m_obj, deleter(std::move(glock)));
 }
 
 template <typename T, typename M>
 auto guarded<T, M>::try_lock() -> handle
 {
-    std::unique_lock<M> lock(m_mutex, std::try_to_lock);
+    std::unique_lock<M> glock(m_mutex, std::try_to_lock);
 
-    if (lock.owns_lock()) {
-        return handle(&m_obj, deleter(std::move(lock)));
+    if (glock.owns_lock()) {
+        return handle(&m_obj, deleter(std::move(glock)));
     } else {
-        return handle(nullptr, deleter(std::move(lock)));
+        return handle(nullptr, deleter(std::move(glock)));
     }
 }
 
@@ -184,12 +184,12 @@ template <typename T, typename M>
 template <typename Duration>
 auto guarded<T, M>::try_lock_for(const Duration &d) -> handle
 {
-    std::unique_lock<M> lock(m_mutex, d);
+    std::unique_lock<M> glock(m_mutex, d);
 
-    if (lock.owns_lock()) {
-        return handle(&m_obj, deleter(std::move(lock)));
+    if (glock.owns_lock()) {
+        return handle(&m_obj, deleter(std::move(glock)));
     } else {
-        return handle(nullptr, deleter(std::move(lock)));
+        return handle(nullptr, deleter(std::move(glock)));
     }
 }
 
@@ -197,12 +197,12 @@ template <typename T, typename M>
 template <typename TimePoint>
 auto guarded<T, M>::try_lock_until(const TimePoint &tp) -> handle
 {
-    std::unique_lock<M> lock(m_mutex, tp);
+    std::unique_lock<M> glock(m_mutex, tp);
 
-    if (lock.owns_lock()) {
-        return handle(&m_obj, deleter(std::move(lock)));
+    if (glock.owns_lock()) {
+        return handle(&m_obj, deleter(std::move(glock)));
     } else {
-        return handle(nullptr, deleter(std::move(lock)));
+        return handle(nullptr, deleter(std::move(glock)));
     }
 }
 

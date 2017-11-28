@@ -91,8 +91,8 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
     m.info ().source = "this is a long source string to test";
     m.info ().orig_source = "this is a longer alternate source string to test";
     m.info ().target = "this is a target";
-    m.info ().Tdemin = 2342532.2342;
-    m.info ().Te = Time::epsilon ();
+    m.Tdemin = 2342532.2342;
+    m.Te = Time::epsilon ();
 
     std::string data;
     m.to_string (data);
@@ -110,8 +110,8 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
     BOOST_CHECK_EQUAL (m.info ().source, fr.info ().source);
     BOOST_CHECK_EQUAL (m.info ().orig_source, fr.info ().orig_source);
     BOOST_CHECK_EQUAL (m.info ().target, fr.info ().target);
-    BOOST_CHECK (m.info ().Te == fr.info ().Te);
-    BOOST_CHECK (m.info ().Tdemin == fr.info ().Tdemin);
+    BOOST_CHECK (m.Te == fr.Te);
+    BOOST_CHECK (m.Tdemin == fr.Tdemin);
 }
 
 BOOST_AUTO_TEST_CASE (constructor_test)
@@ -123,15 +123,14 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     BOOST_CHECK_EQUAL (cmd.source_handle, 0);
     BOOST_CHECK_EQUAL (cmd.dest_id, 0);
     BOOST_CHECK_EQUAL (cmd.dest_handle, 0);
-    BOOST_CHECK_EQUAL (cmd.iterationComplete, false);
-    BOOST_CHECK_EQUAL (cmd.required, false);
-    BOOST_CHECK_EQUAL (cmd.error, false);
+    BOOST_CHECK_EQUAL(cmd.counter, 0);
+    BOOST_CHECK_EQUAL (cmd.flags, 0);
     BOOST_CHECK_EQUAL (cmd.actionTime, helics::Time::zeroVal ());
     BOOST_CHECK (cmd.payload.empty ());
 
     // Additional info defaults
-    BOOST_CHECK_EQUAL (cmd.info ().Te, helics::timeZero);
-    BOOST_CHECK_EQUAL (cmd.info ().Tdemin, helics::timeZero);
+    BOOST_CHECK_EQUAL (cmd.Te, helics::timeZero);
+    BOOST_CHECK_EQUAL (cmd.Tdemin, helics::timeZero);
     BOOST_CHECK (cmd.info ().source.empty ());
     BOOST_CHECK (cmd.info ().target.empty ());
     BOOST_CHECK (cmd.info ().type.empty ());
@@ -150,14 +149,12 @@ BOOST_AUTO_TEST_CASE (copy_constructor_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    cmd.iterationComplete = true;
-    cmd.required = true;
-    cmd.error = true;
+    cmd.flags = 0x1a2F; //this has no significance
     cmd.actionTime = helics::Time::maxVal ();
     cmd.payload = "hello world";
 
-    cmd.info ().Te = helics::Time::maxVal ();
-    cmd.info ().Tdemin = helics::Time::minVal ();
+    cmd.Te = helics::Time::maxVal ();
+    cmd.Tdemin = helics::Time::minVal ();
     cmd.info ().source = "source";  // type aliased to source
     cmd.info ().target = "target";  // units aliased to target
     cmd.info ().orig_source = "origsrc";
@@ -169,15 +166,13 @@ BOOST_AUTO_TEST_CASE (copy_constructor_test)
     BOOST_CHECK_EQUAL (cmd_copy.source_handle, 2);
     BOOST_CHECK_EQUAL (cmd_copy.dest_id, 3);
     BOOST_CHECK_EQUAL (cmd_copy.dest_handle, 4);
-    BOOST_CHECK_EQUAL (cmd_copy.iterationComplete, true);
-    BOOST_CHECK_EQUAL (cmd_copy.required, true);
-    BOOST_CHECK_EQUAL (cmd_copy.error, true);
+    BOOST_CHECK_EQUAL (cmd_copy.flags, 0x1a2F);
     BOOST_CHECK_EQUAL (cmd_copy.actionTime, helics::Time::maxVal ());
     BOOST_CHECK (cmd_copy.payload.compare ("hello world") == 0);
     BOOST_CHECK (cmd_copy.name.compare ("hello world") == 0);  // aliased to payload
 
-    BOOST_CHECK_EQUAL (cmd_copy.info ().Te, helics::Time::maxVal ());
-    BOOST_CHECK_EQUAL (cmd_copy.info ().Tdemin, helics::Time::minVal ());
+    BOOST_CHECK_EQUAL (cmd_copy.Te, helics::Time::maxVal ());
+    BOOST_CHECK_EQUAL (cmd_copy.Tdemin, helics::Time::minVal ());
     BOOST_CHECK (cmd_copy.info ().source.compare ("source") == 0);
     BOOST_CHECK (cmd_copy.info ().target.compare ("target") == 0);
     BOOST_CHECK (cmd_copy.info ().type.compare ("source") == 0);  // aliased to source
@@ -192,14 +187,14 @@ BOOST_AUTO_TEST_CASE (assignment_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    cmd.iterationComplete = true;
-    cmd.required = true;
-    cmd.error = true;
+    SET_ACTION_FLAG(cmd, iterationRequested);
+    SET_ACTION_FLAG(cmd, pub_required);
+    SET_ACTION_FLAG(cmd, error_flag);
     cmd.actionTime = helics::Time::maxVal ();
     cmd.payload = "hello world";
 
-    cmd.info ().Te = helics::Time::maxVal ();
-    cmd.info ().Tdemin = helics::Time::minVal ();
+    cmd.Te = helics::Time::maxVal ();
+    cmd.Tdemin = helics::Time::minVal ();
     cmd.info ().source = "source";  // type aliased to source
     cmd.info ().target = "target";  // units aliased to target
     cmd.info ().orig_source = "origsrc";
@@ -211,15 +206,15 @@ BOOST_AUTO_TEST_CASE (assignment_test)
     BOOST_CHECK_EQUAL (cmd_assign.source_handle, 2);
     BOOST_CHECK_EQUAL (cmd_assign.dest_id, 3);
     BOOST_CHECK_EQUAL (cmd_assign.dest_handle, 4);
-    BOOST_CHECK_EQUAL (cmd_assign.iterationComplete, true);
-    BOOST_CHECK_EQUAL (cmd_assign.required, true);
-    BOOST_CHECK_EQUAL (cmd_assign.error, true);
+    BOOST_CHECK (CHECK_ACTION_FLAG(cmd_assign,iterationRequested));
+    BOOST_CHECK(CHECK_ACTION_FLAG(cmd_assign, pub_required));
+    BOOST_CHECK(CHECK_ACTION_FLAG(cmd_assign, error_flag));
     BOOST_CHECK_EQUAL (cmd_assign.actionTime, helics::Time::maxVal ());
     BOOST_CHECK (cmd_assign.payload.compare ("hello world") == 0);
     BOOST_CHECK (cmd_assign.name.compare ("hello world") == 0);  // aliased to payload
 
-    BOOST_CHECK_EQUAL (cmd_assign.info ().Te, helics::Time::maxVal ());
-    BOOST_CHECK_EQUAL (cmd_assign.info ().Tdemin, helics::Time::minVal ());
+    BOOST_CHECK_EQUAL (cmd_assign.Te, helics::Time::maxVal ());
+    BOOST_CHECK_EQUAL (cmd_assign.Tdemin, helics::Time::minVal ());
     BOOST_CHECK (cmd_assign.info ().source.compare ("source") == 0);
     BOOST_CHECK (cmd_assign.info ().target.compare ("target") == 0);
     BOOST_CHECK (cmd_assign.info ().type.compare ("source") == 0);  // aliased to source
@@ -260,15 +255,14 @@ BOOST_AUTO_TEST_CASE (conversion_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    cmd.iterationComplete = true;
-    cmd.required = true;
-    cmd.error = true;
-    cmd.flag = false;
+    SET_ACTION_FLAG(cmd, iterationRequested);
+    SET_ACTION_FLAG(cmd, pub_required);
+    SET_ACTION_FLAG(cmd, error_flag);
     cmd.actionTime = 45.7;
     cmd.payload = "hello world";
 
-    cmd.info ().Te = 0.89;
-    cmd.info ().Tdemin = 5.55;
+    cmd.Te = 0.89;
+    cmd.Tdemin = 5.55;
     cmd.info ().source = "source as a very long string test .........";  // type aliased to source
     cmd.info ().target = "target";  // units aliased to target
     cmd.info ().orig_source = "origsrc";
@@ -283,12 +277,9 @@ BOOST_AUTO_TEST_CASE (conversion_test)
     BOOST_CHECK_EQUAL (cmd.source_handle, cmd2.source_handle);
     BOOST_CHECK_EQUAL (cmd.dest_handle, cmd2.dest_handle);
     BOOST_CHECK_EQUAL (cmd.payload, cmd2.payload);
-    BOOST_CHECK_EQUAL (cmd.iterationComplete, cmd2.iterationComplete);
-    BOOST_CHECK_EQUAL (cmd.error, cmd2.error);
-    BOOST_CHECK_EQUAL (cmd.required, cmd2.required);
-    BOOST_CHECK_EQUAL (cmd.flag, cmd2.flag);
-    BOOST_CHECK_EQUAL (cmd.info ().Te, cmd2.info ().Te);
-    BOOST_CHECK_EQUAL (cmd.info ().Tdemin, cmd2.info ().Tdemin);
+    BOOST_CHECK_EQUAL (cmd.flags, cmd2.flags);
+    BOOST_CHECK_EQUAL (cmd.Te, cmd2.Te);
+    BOOST_CHECK_EQUAL (cmd.Tdemin, cmd2.Tdemin);
     BOOST_CHECK_EQUAL (cmd.info ().source, cmd2.info ().source);
     BOOST_CHECK_EQUAL (cmd.info ().target, cmd2.info ().target);
     BOOST_CHECK_EQUAL (cmd.info ().orig_source, cmd2.info ().orig_source);
@@ -301,15 +292,14 @@ BOOST_AUTO_TEST_CASE (message_conversion_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    cmd.iterationComplete = true;
-    cmd.required = true;
-    cmd.error = true;
-    cmd.flag = false;
+    SET_ACTION_FLAG(cmd, iterationRequested);
+    SET_ACTION_FLAG(cmd, pub_required);
+    SET_ACTION_FLAG(cmd, error_flag);
     cmd.actionTime = 45.7;
     cmd.payload = "hello world";
 
-    cmd.info ().Te = 0.89;
-    cmd.info ().Tdemin = 5.55;
+    cmd.Te = 0.89;
+    cmd.Tdemin = 5.55;
     cmd.info ().source = "source as a very long string test .........";  // type aliased to source
     cmd.info ().target = "target";  // units aliased to target
     cmd.info ().orig_source = "origsrc";

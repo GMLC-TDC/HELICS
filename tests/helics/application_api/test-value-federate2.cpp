@@ -22,6 +22,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (value_federate_tests2, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
 #ifdef QUICK_TESTS_ONLY
 const std::string core_types[] = {"test", "test_2", "ipc_2", "zmq", "udp"};
 const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
@@ -30,6 +31,9 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
 #endif
 /** test block send and receive*/
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
@@ -54,6 +58,9 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types_single), 
 }
 
 /** test the all callback*/
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1, 1.0);
@@ -112,6 +119,9 @@ BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_t
 }
 
 /** test the callback specification with a vector list*/
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1, 1.0);
@@ -154,6 +164,9 @@ BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single
 }
 
 /** test the publish/subscribe to a vectorized array*/
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types_single), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
@@ -183,6 +196,9 @@ BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types_single), c
 }
 
 /** test the publish/subscribe to a vectorized array*/
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 2);
