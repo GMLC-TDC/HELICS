@@ -14,21 +14,23 @@ else( MSVC )
 set(WERROR_FLAG "-Werror")
 endif ( MSVC )
 
-try_compile(OPTIONAL_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_optional.cpp )
+set(TEST_CXX_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test_compiler_cxx)
 
-try_compile(VARIANT_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_variant.cpp )
+try_compile(OPTIONAL_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_optional.cpp )
 
-try_compile(STRING_VIEW_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_string_view.cpp )
+try_compile(VARIANT_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_variant.cpp )
 
-try_compile(EXPERIMENTAL_STRING_VIEW_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_experimental_string_view.cpp )
-try_compile(CLAMP_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_clamp.cpp  )
-try_compile(HYPOT3_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_hypot3.cpp  )
-try_compile(IFCONSTEXPR_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_constexpr_if.cpp  )
-try_compile(FALLTHROUGH_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_fallthrough.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG})
+try_compile(STRING_VIEW_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_string_view.cpp )
 
-try_compile(VARIABLE_TEMPLATE_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_variable_template.cpp )
+try_compile(EXPERIMENTAL_STRING_VIEW_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_experimental_string_view.cpp )
+try_compile(CLAMP_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_clamp.cpp  )
+try_compile(HYPOT3_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_hypot3.cpp  )
+try_compile(IFCONSTEXPR_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_constexpr_if.cpp  )
+try_compile(FALLTHROUGH_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_fallthrough.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG})
 
-try_compile(UNUSED_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/test_compiler_cxx/check_unused.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG} )
+try_compile(VARIABLE_TEMPLATE_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_variable_template.cpp )
+
+try_compile(UNUSED_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_unused.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG} )
 
 
 #message(STATUS ${RESULT})
@@ -74,9 +76,9 @@ endif()
 
 if (NOT NO_CONFIG_GENERATION)
 if (CONFIGURE_TARGET_LOCATION)
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/compiler-config.h.in ${CONFIGURE_TARGET_LOCATION}/compiler-config.h)
+CONFIGURE_FILE(${CMAKE_CURRENT_LIST_DIR}/compiler-config.h.in ${CONFIGURE_TARGET_LOCATION}/compiler-config.h)
 else()
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/compiler-config.h.in ${PROJECT_BINARY_DIR}/compiler-config.h)
+CONFIGURE_FILE(${CMAKE_CURRENT_LIST_DIR}/compiler-config.h.in ${PROJECT_BINARY_DIR}/compiler-config.h)
 endif()
 
 endif(NOT NO_CONFIG_GENERATION)

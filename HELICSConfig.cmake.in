@@ -15,5 +15,5 @@ set_and_check(${PN}_C_SHARED_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDI
 set_and_check(${PN}_CXX_SHARED_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_cxx_shared_file@")
 set_and_check(${PN}_STATIC_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_static_file@")
 
-set_and_check(${PN}_DEPENDENCIES "@helics_depenencies@")
+set_and_check(${PN}_DEPENDENCIES "@helics_dependencies@")
 check_required_components(${PN})
