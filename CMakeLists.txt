@@ -164,23 +164,23 @@ if(DOXYGEN_FOUND)
 endif(DOXYGEN_FOUND)
 endif (HELICS_GENERATE_DOXYGEN_DOC)
 
-
+FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 # -------------------------------------------------------------
-# Enable ZMQ
+# Enable ZeroMQ
 # -------------------------------------------------------------
 
-OPTION(ZMQ_ENABLE "Enable ZMQ networking library" ON)
-# If ZMQ library is enabled try to locate it and link against it
+OPTION(ZeroMQ_ENABLE "Enable ZeroMQ networking library" ON)
+# If ZeroMQ library is enabled try to locate it and link against it
 
-IF (ZMQ_ENABLE)
+IF (ZeroMQ_ENABLE)
 
-include(addZMQ)
+include(addZeroMQ)
 
-if (ZMQ_FOUND)
+if (ZeroMQ_FOUND)
    set(HELICS_HAVE_ZEROMQ TRUE)
-   include_directories ("${ZMQ_INCLUDE_DIR}")
- endif(ZMQ_FOUND)
-endif(ZMQ_ENABLE)
+   include_directories ("${ZeroMQ_INCLUDE_DIR}")
+ endif(ZeroMQ_FOUND)
+endif(ZeroMQ_ENABLE)
 
 # -------------------------------------------------------------
 # finding MPI
@@ -216,17 +216,17 @@ IF(MINGW)
 	target_link_libraries(helics-static ws2_32)
 ENDIF(MINGW)
 
-if (${ZMQ_FOUND})
+if (${ZeroMQ_FOUND})
 	if (ZMQ_USE_STATIC_LIBRARY)
-		set(ZMQ_DEPENDENCY ${ZMQ_STATIC_LIBRARY})
+		set(ZeroMQ_DEPENDENCY ${ZeroMQ_STATIC_LIBRARY})
 		ADD_DEFINITIONS(-DZMQ_STATIC)
 	else()
-		set(ZMQ_DEPENDENCY ${ZMQ_LIBRARY})
+		set(ZeroMQ_DEPENDENCY ${ZeroMQ_LIBRARY})
 	endif()
-	target_link_libraries(helics-static ${ZMQ_DEPENDENCY})
+	target_link_libraries(helics-static ${ZeroMQ_DEPENDENCY})
 else()
-   if (ZMQ_ENABLE)
-   message(WARNING "ZMQ not found")
+   if (ZeroMQ_ENABLE)
+   message(WARNING "ZeroMQ not found")
    endif()
 endif ()
 
@@ -360,9 +360,9 @@ IF(MINGW)
 	list(APPEND helics_dependencies ws2_32)
 ENDIF(MINGW)
 
-if (ZMQ_FOUND)
-	list(APPEND helics_dependencies ${ZMQ_DEPENDENCY})
-endif(ZMQ_FOUND)
+if (ZeroMQ_FOUND)
+	list(APPEND helics_dependencies ${ZeroMQ_DEPENDENCY})
+endif(ZeroMQ_FOUND)
 
 
 

@@ -41,10 +41,10 @@ set(zmq_sources
 	zmqProxyHub.cpp
 )
 
-if (${ZMQ_FOUND})
+if (${ZeroMQ_FOUND})
    list(APPEND common_headers ${zmq_headers})
    list(APPEND common_sources ${zmq_sources})
-endif (${ZMQ_FOUND})
+endif (${ZeroMQ_FOUND})
 
 add_library(helics_common OBJECT ${common_sources} ${common_headers})
 set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)
