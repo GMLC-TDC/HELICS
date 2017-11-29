@@ -5,6 +5,7 @@ boost_1_65_1
 boost_1_65_0
 boost_1_64_0
 boost_1_63_0
+boost_1_62_0
 boost_1_61_0
 )
 
@@ -13,6 +14,7 @@ C:
 C:/boost
 C:/local
 C:/boost
+C:/Libraries
 D:
 D:/boost
 D:/local
