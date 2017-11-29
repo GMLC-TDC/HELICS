@@ -720,7 +720,10 @@ void CommonCore::setFlag (federate_id_t federateID, int flag, bool flagValue)
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_FLAG;
     cmd.dest_id = flag;
-    cmd.flag = flagValue;
+    if (flagValue)
+    {
+        SET_ACTION_FLAG(cmd, indicator_flag);
+    }
     fed->UpdateFederateInfo (cmd);
 }
 
@@ -806,7 +809,10 @@ Handle CommonCore::registerSubscription (federate_id_t federateID,
     m.name = key;
     m.info ().type = type;
     m.info ().units = units;
-    m.required = (check_mode == handle_check_mode::required);
+    if (check_mode == handle_check_mode::required)
+    {
+        SET_ACTION_FLAG(m, pub_required);
+   }
 
     std::unique_lock<std::mutex> lock (_handlemutex);
     auto fndpub = publications.find (key);
@@ -815,7 +821,7 @@ Handle CommonCore::registerSubscription (federate_id_t federateID,
         auto pubhandle = fndpub->second;
         auto pubid = handles[pubhandle]->fed_id;
         lock.unlock ();
-        m.processingComplete = true;
+        SET_ACTION_FLAG(m, processingComplete);
         // send to broker and core
         addActionMessage (m);
         // now send the same command to the publication
@@ -1134,7 +1140,7 @@ Handle CommonCore::registerSourceFilter (const std::string &filterName,
         auto endid = handles[endhandle]->fed_id;
         handles[endhandle]->hasSourceFilter = true;
         lock.unlock ();
-        m.processingComplete = true;
+        SET_ACTION_FLAG(m, processingComplete);
         // send to broker and core
         addActionMessage (m);
         // now send the same command to the endpoint
@@ -1206,7 +1212,7 @@ Handle CommonCore::registerDestinationFilter (const std::string &filterName,
         }
         handles[endhandle]->hasDestFilter = true;
         lock.unlock ();
-        m.processingComplete = true;
+        SET_ACTION_FLAG(m, processingComplete);
         // send to broker and core
         addActionMessage (m);
         // now send the same command to the endpoint
@@ -1735,7 +1741,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     case CMD_BROKER_ACK:
         if (command.payload == identifier)
         {
-            if (command.error)
+            if (CHECK_ACTION_FLAG(command,error_flag))
             {
                 LOG_ERROR (0, identifier, "broker responded with error\n");
                 // generate error messages in response to all the delayed messages
@@ -2381,7 +2387,7 @@ void CommonCore::checkDependencies ()
     {
         return;
     }
-    // remove the core from the time dependency chain
+    // remove the core from the time dependency chain since it is just adding to the communication noise in this case
     timeCoord->removeDependency (brkid);
     timeCoord->removeDependency (fedid);
     timeCoord->removeDependent (brkid);

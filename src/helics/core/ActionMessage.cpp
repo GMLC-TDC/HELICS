@@ -21,7 +21,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 ActionMessage::ActionMessage (action_message_def::action_t startingAction)
-    : action_ (startingAction), index (dest_handle), processingComplete (iterationComplete), name (payload)
+    : action_ (startingAction), index (dest_handle), name (payload)
 {
     if (hasInfo (startingAction))
     {
@@ -37,17 +37,16 @@ ActionMessage::ActionMessage(action_message_def::action_t action, int32_t source
 
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
     : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
-      dest_handle (act.dest_handle), index (dest_handle), iterationComplete (act.iterationComplete),
-      processingComplete (iterationComplete), required (act.required), error (act.error), flag (act.flag),
-      actionTime (act.actionTime), payload (std::move (act.payload)), name (payload), info_ (std::move (act.info_))
+      dest_handle (act.dest_handle), index (dest_handle), counter (act.counter),
+      flags (act.flags),
+      actionTime (act.actionTime),Te(act.Te),Tdemin(act.Tdemin), payload (std::move (act.payload)), name (payload), info_ (std::move (act.info_))
 {
 }
 
 ActionMessage::ActionMessage (const ActionMessage &act)
     : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
-      dest_handle (act.dest_handle), index (dest_handle), iterationComplete (act.iterationComplete),
-      processingComplete (iterationComplete), required (act.required), error (act.error), flag (act.flag),
-      actionTime (act.actionTime), payload (act.payload), name (payload)
+      dest_handle (act.dest_handle), index (dest_handle), counter (act.counter),flags (act.flags),
+      actionTime (act.actionTime), Te(act.Te), Tdemin(act.Tdemin), payload (act.payload), name (payload)
 
 {
     if (act.info_)
@@ -57,7 +56,7 @@ ActionMessage::ActionMessage (const ActionMessage &act)
 }
 
 ActionMessage::ActionMessage (std::unique_ptr<Message> message)
-    : action_ (CMD_SEND_MESSAGE), index (dest_handle), processingComplete (iterationComplete),
+    : action_ (CMD_SEND_MESSAGE), index (dest_handle),
       actionTime (message->time), payload (std::move (message->data.m_data)), name (payload)
 {
     info_ = std::make_unique<AdditionalInfo> ();
@@ -81,9 +80,11 @@ ActionMessage &ActionMessage::operator= (const ActionMessage &act)
     source_handle = act.source_handle;
     dest_id = act.dest_id;
     dest_handle = act.dest_handle;
-    iterationComplete = act.iterationComplete;
-    required = act.required;
+    counter = act.counter;
+    flags = act.flags;
     actionTime = act.actionTime;
+    Te = act.Te;
+    Tdemin = act.Tdemin;
     payload = act.payload;
 
     if (act.info_)
@@ -100,9 +101,11 @@ ActionMessage &ActionMessage::operator= (ActionMessage &&act) noexcept
     source_handle = act.source_handle;
     dest_id = act.dest_id;
     dest_handle = act.dest_handle;
-    iterationComplete = act.iterationComplete;
-    required = act.required;
+    counter = act.counter;
+    flags = act.flags;
     actionTime = act.actionTime;
+    Te = act.Te;
+    Tdemin = act.Tdemin;
     payload = std::move (act.payload);
     info_ = std::move (act.info_);
     return *this;
@@ -371,7 +374,7 @@ std::string prettyPrintString (const ActionMessage &command)
         ret.push_back (':');
         ret.append (command.name);
         ret.append ("--");
-        if (command.error)
+        if (CHECK_ACTION_FLAG(command,error_flag))
         {
             ret.append ("error");
         }
@@ -399,8 +402,8 @@ std::string prettyPrintString (const ActionMessage &command)
     case CMD_TIME_REQUEST:
         ret.push_back (':');
         ret.append ((boost::format ("From (%d) Time(%f, %f, %f)") % command.source_id %
-                     static_cast<double> (command.actionTime) % static_cast<double> (command.info ().Te) %
-                     static_cast<double> (command.info ().Tdemin))
+                     static_cast<double> (command.actionTime) % static_cast<double> (command.Te) %
+                     static_cast<double> (command.Tdemin))
                       .str ());
         break;
     case CMD_FED_CONFIGURE:

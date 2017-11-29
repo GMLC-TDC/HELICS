@@ -36,7 +36,10 @@ void TimeCoordinator::enteringExecMode (iteration_request mode)
     {
         ActionMessage execreq (CMD_EXEC_REQUEST);
         execreq.source_id = source_id;
-        execreq.iterationComplete = !iterating;
+        if (iterating)
+        {
+            SET_ACTION_FLAG(execreq, iterationRequested);
+        }
         sendMessageFunction (execreq);
     }
 }
@@ -60,11 +63,14 @@ void TimeCoordinator::timeRequest (Time nextTime,
     if ((!dependents.empty ()) && (sendMessageFunction))
     {
         ActionMessage treq (CMD_TIME_REQUEST);
-        treq.iterationComplete = !iterating;
+        if (iterating)
+        {
+            SET_ACTION_FLAG(treq, iterationRequested);
+        }
         treq.source_id = source_id;
         treq.actionTime = time_next;
-        treq.info ().Te = time_exec + info.lookAhead;
-        treq.info ().Tdemin = time_minDe;
+        treq.Te = time_exec + info.lookAhead;
+        treq.Tdemin = time_minDe;
         sendMessageFunction (treq);
     }
 }
@@ -246,6 +252,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
                     ActionMessage treq (CMD_TIME_GRANT);
                     treq.source_id = source_id;
                     treq.actionTime = time_granted;
+                    SET_ACTION_FLAG(treq, iterationRequested);
                     sendMessageFunction (treq);
                 }
                 return iteration_state::iterating;
@@ -259,8 +266,12 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         ActionMessage upd (CMD_TIME_REQUEST);
         upd.source_id = source_id;
         upd.actionTime = time_next;
-        upd.info ().Te = time_exec;
-        upd.info ().Tdemin = time_minDe;
+        upd.Te = time_exec;
+        upd.Tdemin = time_minDe;
+        if (iterating)
+        {
+            SET_ACTION_FLAG(upd, iterationRequested);
+        }
         sendMessageFunction (upd);
 
         //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
@@ -373,7 +384,6 @@ iteration_state TimeCoordinator::checkExecEntry ()
         {
             ActionMessage execgrant (CMD_EXEC_GRANT);
             execgrant.source_id = source_id;
-            execgrant.iterationComplete = true;
             sendMessageFunction (execgrant);
         }
     }
@@ -385,7 +395,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
         {
             ActionMessage execgrant (CMD_EXEC_GRANT);
             execgrant.source_id = source_id;
-            execgrant.iterationComplete = false;
+            SET_ACTION_FLAG(execgrant, iterationRequested);
             sendMessageFunction (execgrant);
         }
     }
@@ -456,16 +466,16 @@ void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd)
         switch (cmd.dest_id)
         {
         case UNINTERRUPTIBLE_FLAG:
-            info.uninterruptible = cmd.flag;
+            info.uninterruptible = CHECK_ACTION_FLAG(cmd,indicator_flag);
             break;
         case ONLY_TRANSMIT_ON_CHANGE_FLAG:
-            info.only_transmit_on_change = cmd.flag;
+            info.only_transmit_on_change = CHECK_ACTION_FLAG(cmd, indicator_flag);
             break;
         case ONLY_UPDATE_ON_CHANGE_FLAG:
-            info.only_update_on_change = cmd.flag;
+            info.only_update_on_change = CHECK_ACTION_FLAG(cmd, indicator_flag);
             break;
         case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
-            info.wait_for_current_time_updates = cmd.flag;
+            info.wait_for_current_time_updates = CHECK_ACTION_FLAG(cmd, indicator_flag);
             break;
         default:
             break;

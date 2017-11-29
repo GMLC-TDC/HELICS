@@ -74,7 +74,7 @@ class shared_guarded
     {
         m_mutex.lock_shared();
         T newObj(m_obj);
-        m_mutex.unlock();
+        m_mutex.unlock_shared();
         return newObj;
     }
     /** generate a copy of the protected object
@@ -88,7 +88,7 @@ class shared_guarded
     template <typename objType>
     std::enable_if_t<std::is_copy_assignable<T>::value> store(objType &&newObj)
     {
-        std::lock_guard<M> lock(m_mutex);
+        std::lock_guard<M> glock(m_mutex);
         m_obj = std::forward<objType>(newObj);
     }
 

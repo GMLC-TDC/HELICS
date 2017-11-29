@@ -30,8 +30,6 @@ class ActionMessage
     class AdditionalInfo
     {
       public:
-        Time Te = timeZero;  //!< event time
-        Time Tdemin = timeZero;  //!< min dependent event time;
         std::string source;  //!< name of a registration
         std::string &type;  //!< alias source to type for registration
         std::string target;  //!< target or destination
@@ -43,30 +41,23 @@ class ActionMessage
         AdditionalInfo () noexcept : type (source), units (target),type_out(orig_source){};
 		/** copy constructor*/
         AdditionalInfo (const AdditionalInfo &ai)
-            : Te (ai.Te), Tdemin (ai.Tdemin), source (ai.source), type (source), target (ai.target),
-              units (target), orig_source (ai.orig_source), type_out(orig_source) {};
+            : source (ai.source), type (source), target (ai.target),
+              units (target), orig_source (ai.orig_source), type_out(orig_source),orig_dest(ai.orig_dest) {};
 		/** move constructor*/
         AdditionalInfo (AdditionalInfo &&ai) noexcept
-            : Te (ai.Te), Tdemin (ai.Tdemin), source (std::move (ai.source)), type (source),
-              target (std::move (ai.target)), units (target), orig_source (std::move (ai.orig_source)), type_out(orig_source) {};
+            : source (std::move (ai.source)), type (source),
+              target (std::move (ai.target)), units (target), orig_source (std::move (ai.orig_source)), type_out(orig_source),orig_dest(std::move(ai.orig_dest)) {};
         template <class Archive>
         void save (Archive &ar) const
         {
-            auto Tebase = Te.getBaseTimeCode ();
-            auto Tdeminbase = Tdemin.getBaseTimeCode ();
-			ar(Tebase, Tdeminbase);
-			ar(source, target, orig_source);
+			ar(source, target, orig_source,orig_dest);
         }
 
         template <class Archive>
         void load (Archive &ar)
         {
-            decltype (Te.getBaseTimeCode ()) Tebase;
-			decltype (Tdemin.getBaseTimeCode()) Tdeminbase;
-			ar(Tebase, Tdeminbase);
-            Te.setBaseTimeCode (Tebase);
-            Tdemin.setBaseTimeCode (Tdeminbase);
-			ar(source, target, orig_source);
+           
+			ar(source, target, orig_source,orig_dest);
         }
     };
    
@@ -74,24 +65,24 @@ class ActionMessage
   private:
     action_message_def::action_t action_ = CMD_IGNORE;  // 4 -- command
   public:
-    int32_t source_id = 0;  // 8 -- for federate_id or route_id
-    int32_t source_handle = 0;  // 12 -- for local handle or local code
-    int32_t dest_id = 0;  // 16 fed_id for a targeted message
-    int32_t dest_handle = 0;  // 20 local handle for a targeted message
-	int32_t &index;			//alias to dest_handle 
-    bool iterationComplete = false;  // 24 indicator that iteration has been completed
-	bool &processingComplete;  //Alias to iterationComplete indicator that processing has been completed
-    bool required = false;  //!< flag indicating a publication is required
-    bool error = false;  //!< flag indicating an error condition associated with the command
-    bool flag = false;  //!< general flag for many purposes
-    Time actionTime = timeZero;  //!< the time an action took place or will take place	//32
+    int32_t source_id = 0;  //!< 8 -- for federate_id or route_id
+    int32_t source_handle = 0;  //!< 12 -- for local handle or local code
+    int32_t dest_id = 0;  //!< 16 fed_id for a targeted message
+    int32_t dest_handle = 0;  //!< 20 local handle for a targeted message
+	int32_t &index;			//!<alias to dest_handle 
+    uint16_t counter=0; //!< 22 counter for filter tracking
+    uint16_t flags=0; //!<  24 set of messageFlags
+   
+    Time actionTime = timeZero;  //!< 32 the time an action took place or will take place	//32
+    Time Te = timeZero;  //!< 40 event time
+    Time Tdemin = timeZero;  //!< 48 min dependent event time;
     std::string payload;  //!< string containing the data	//64 std::string is 32 bytes on most platforms (except libc++)
     std::string &name;  //!<alias payload to a name reference for registration functions
   private:
     std::unique_ptr<AdditionalInfo> info_;  //!< pointer to an additional info structure with more data if required
   public:
     /** default constructor*/
-    ActionMessage () noexcept : index(dest_handle), processingComplete(iterationComplete), name (payload) {};
+    ActionMessage () noexcept : index(dest_handle), name (payload) {};
     /** construct from an action type 
     @details this is an implicit constructor
     */
@@ -135,10 +126,12 @@ class ActionMessage
     void save (Archive &ar) const
     {
         ar (action_, source_id, source_handle, dest_id, dest_handle);
-        ar (iterationComplete, required, error, flag);
+        ar (counter,flags);
 
         auto btc = actionTime.getBaseTimeCode ();
-        ar (btc, payload);
+        auto Tebase = Te.getBaseTimeCode();
+        auto Tdeminbase = Tdemin.getBaseTimeCode();
+        ar(btc,Tebase,Tdeminbase, payload);
         if (hasInfo(action_))
         {
             ar (info_);
@@ -150,11 +143,17 @@ class ActionMessage
     {
         ar (action_, source_id, source_handle, dest_id, dest_handle);
 
-        ar (iterationComplete, required, error, flag);
+        ar (counter,flags);
 
         decltype (actionTime.getBaseTimeCode ()) btc;
-        ar (btc, payload);
+        decltype (Te.getBaseTimeCode()) Tebase;
+        decltype (Tdemin.getBaseTimeCode()) Tdeminbase;
+
+        ar (btc, Tebase, Tdeminbase, payload);
+
         actionTime.setBaseTimeCode (btc);
+        Te.setBaseTimeCode(Tebase);
+        Tdemin.setBaseTimeCode(Tdeminbase);
         if (hasInfo(action_))
         {
             if (!info_)
@@ -190,6 +189,11 @@ class ActionMessage
 
 };
 
+#define SET_ACTION_FLAG(M,flag) do{M.flags|=(uint16_t(1)<<(flag));}while(false)
+
+#define CHECK_ACTION_FLAG(M,flag) ((M.flags&(uint16_t(1)<<(flag)))!=0)
+
+#define CLEAR_ACTION_FLAG(M,flag) do{M.flags&=~(uint16_t(1)<<(flag));}while(false)
 
 
 

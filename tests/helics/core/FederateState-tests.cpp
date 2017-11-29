@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     cmd.setAction (helics::CMD_FED_ACK);
     cmd.dest_id = 22;
     cmd.name = "fed_name";
-    cmd.error = false;
+    CLEAR_ACTION_FLAG(cmd, error_flag);
     fs_process = std::async (std::launch::async, [&]() { return fs->waitSetup (); });
     fs->addAction (cmd);
     fs_process.wait ();
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     // Test CMD_FED_ACK message with an error
     cmd.setAction (helics::CMD_FED_ACK);
     cmd.dest_id = 23;
-    cmd.error = true;
+    SET_ACTION_FLAG(cmd, error_flag);
     fs_process = std::async (std::launch::async, [&]() { return fs->waitSetup (); });
     fs->addAction (cmd);
     fs_process.wait ();

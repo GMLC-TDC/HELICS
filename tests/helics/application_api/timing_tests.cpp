@@ -20,9 +20,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "testFixtures.h"
 #include "test_configuration.h"
 
-BOOST_FIXTURE_TEST_SUITE (timing_tests, FederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE(timing_tests, FederateTestFixture)
+namespace utf = boost::unit_test;
 
 /** just a check that in the simple case we do actually get the time back we requested*/
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_AUTO_TEST_CASE (simple_timing_test)
 {
     SetupSingleBrokerTest<helics::ValueFederate> ("test", 2);
@@ -50,6 +54,9 @@ BOOST_AUTO_TEST_CASE (simple_timing_test)
     vFed2->finalize ();
 }
 
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_AUTO_TEST_CASE (simple_timing_test2)
 {
     SetupSingleBrokerTest<helics::ValueFederate> ("test", 2);
@@ -80,6 +87,9 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2)
     vFed2->finalize ();
 }
 
+#if ENABLE_TEST_TIMEOUTS>0 
+ BOOST_TEST_DECORATOR (*utf::timeout(5))
+ #endif
 BOOST_AUTO_TEST_CASE (simple_timing_test_message)
 {
     SetupSingleBrokerTest<helics::MessageFederate> ("test", 2);

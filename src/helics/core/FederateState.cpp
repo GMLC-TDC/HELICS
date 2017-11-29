@@ -823,7 +823,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         if (cmd.name == name)
         {
-            if (cmd.error)
+            if (CHECK_ACTION_FLAG(cmd,error_flag))
             {
                 setState (HELICS_ERROR);
                 return iteration_state::error;
@@ -849,10 +849,10 @@ void FederateState::processConfigUpdate (const ActionMessage &m)
         switch (m.dest_id)
         {
         case ONLY_TRANSMIT_ON_CHANGE_FLAG:
-            only_transmit_on_change = m.flag;
+            only_transmit_on_change = CHECK_ACTION_FLAG(m, indicator_flag);
             break;
         case ONLY_UPDATE_ON_CHANGE_FLAG:
-            only_update_on_change = m.flag;
+            only_update_on_change = CHECK_ACTION_FLAG(m, indicator_flag);
             break;
         default:
             break;
