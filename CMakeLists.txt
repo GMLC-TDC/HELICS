@@ -105,6 +105,9 @@ ELSE(UNIX)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
+  #this options produces lots of warning but is useful for checking ever once in a while with Clang GCC warnin notices with this aren't as useful
+  #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
+  
   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
   ELSE(MINGW)
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
@@ -171,28 +174,8 @@ OPTION(ZMQ_ENABLE "Enable ZMQ networking library" ON)
 
 IF (ZMQ_ENABLE)
 
-OPTION(ZMQ_USE_STATIC_LIBRARY
-  "use the ZMQ static library" OFF)
+include(addZMQ)
 
-SHOW_VARIABLE(ZMQ_LIBRARY_PATH PATH
-  "path to the zmq libraries" "${ZMQ_LIBRARY_PATH}")
-
-SHOW_VARIABLE(ZMQ_INCLUDE_PATH PATH
-  "path to the zmq headers" "${ZMQ_INCLUDE_PATH}")
-
-  set(ZMQ_FIND_QUIETLY ON)
-find_package(ZMQ)
-
-if (NOT ZMQ_FOUND)
-  OPTION(AUTOBUILD_ZMQ "enable ZMQ to automatically download and build" OFF)
-  IF (AUTOBUILD_ZMQ)
-  include(buildlibZMQ)
-  build_libzmq()
-  set(ZMQ_INSTALL_PATH ${PROJECT_BINARY_DIR}/libs)
-  find_package(ZMQ)
-  ENDIF(AUTOBUILD_ZMQ)
-
-endif(NOT ZMQ_FOUND)
 if (ZMQ_FOUND)
    set(HELICS_HAVE_ZEROMQ TRUE)
    include_directories ("${ZMQ_INCLUDE_DIR}")
@@ -236,6 +219,7 @@ ENDIF(MINGW)
 if (${ZMQ_FOUND})
 	if (ZMQ_USE_STATIC_LIBRARY)
 		set(ZMQ_DEPENDENCY ${ZMQ_STATIC_LIBRARY})
+		ADD_DEFINITIONS(-DZMQ_STATIC)
 	else()
 		set(ZMQ_DEPENDENCY ${ZMQ_LIBRARY})
 	endif()
