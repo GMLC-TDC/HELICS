@@ -1,7 +1,19 @@
 #!/bin/bash
 
+(
+    cd /tmp/;
+    curl -s -J -O -k -L 'https://sourceforge.net/projects/swig/files/swig/swig-3.0.10/swig-3.0.10.tar.gz/download';
+    tar zxf swig-3.0.10.tar.gz;
+    cd swig-3.0.10;
+    ./configure --prefix $HOME/swig/;
+    make;
+    make install;
+)
+export PATH="$HOME/swig/bin:${PATH}"
+echo "*** built swig successfully {$PATH}"
+
 if [[ ! -f "dependencies" ]]; then
-    mkdir dependencies;
+    mkdir -p dependencies;
 fi
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
@@ -9,10 +21,12 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         echo "*** install cmake"
         wget --no-check-certificate http://cmake.org/files/v3.4/cmake-3.4.3-Linux-x86_64.tar.gz && tar -xzf cmake-3.4.3-Linux-x86_64.tar.gz;
     fi
+
     export PATH="${PWD}/cmake-3.4.3-Linux-x86_64/bin:${PATH}"
     echo "*** cmake installed ($PATH)"
+
 elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    if [[ ! -f "cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/bin/cmake" ]]; then
+    if [[ ! -f "cmake-3.9.0-Darwin-x86_64/CMake.app/Contents/bin/cmake" ]]; then
         echo "*** install cmake"
         wget --no-check-certificate http://cmake.org/files/v3.4/cmake-3.4.3-Darwin-x86_64.tar.gz && tar -xzf cmake-3.4.3-Darwin-x86_64.tar.gz;
     fi
