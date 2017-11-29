@@ -77,7 +77,11 @@ void TimeCoordinator::timeRequest (Time nextTime,
 
 void TimeCoordinator::updateNextExecutionTime ()
 {
-    time_exec = std::min (time_message, time_value) + info.impactWindow;
+    time_exec = std::min(time_message, time_value);
+    if (time_exec < Time::maxVal())
+    {
+       // time_exec += info.impactWindow;
+    }
     time_exec = std::min (time_requested, time_exec);
     if (time_exec <= time_granted)
     {

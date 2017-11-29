@@ -61,20 +61,19 @@ class DelayedDestructor
         std::lock_guard<std::mutex> lock (destructionLock);
         if (!ElementsToBeDestroyed.empty ())
         {
-            auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
-                                       [](const auto &element) { return (element.use_count () <= 1); });
             if (callBeforeDeleteFunction)
             {
-                auto locIt = loc;
-                while (locIt != ElementsToBeDestroyed.end ())
+                for (auto &element : ElementsToBeDestroyed)
                 {
-                    if (*locIt)
+                    if (element.use_count() == 1)
                     {
-                        callBeforeDeleteFunction (*locIt);
+                        callBeforeDeleteFunction(element);
                     }
-                    ++locIt;
                 }
             }
+            //so apparently remove_if can actually destroy shared_ptrs so the call function needs to be before this call
+            auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
+                                       [](const auto &element) { return (element.use_count () <= 1); });
             ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
         }
         return ElementsToBeDestroyed.size ();

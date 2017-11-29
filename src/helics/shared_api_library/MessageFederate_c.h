@@ -30,7 +30,11 @@ HELICS_Export helicsStatus helicsSendMessageRaw (helics_endpoint endpoint, const
 HELICS_Export helicsStatus helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time);
 
 HELICS_Export helicsStatus helicsSendMessage (helics_endpoint endpoint, message_t *message);
-
+/** subscribe an endpoint to a publication
+@param endpoint the endpoint to use
+@param name the name of the publication
+@param type the type of the publication that is expected
+*/
 HELICS_Export helicsStatus helicsSubscribe (helics_endpoint endpoint, const char *name, const char *type);
 /** check if the federate has any outstanding messages*/
 HELICS_Export int helicsFederateHasMessage (helics_message_federate fed);

@@ -1906,6 +1906,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         {
             routeMessage (command);
         }
+        break;
     case CMD_TIME_REQUEST:
     case CMD_TIME_GRANT:
         if (command.source_id == global_broker_id)
