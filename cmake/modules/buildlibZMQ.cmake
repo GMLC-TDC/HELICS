@@ -6,6 +6,7 @@
 ##############################################################################
 # This function is used to force a build on a dependant project at cmake configuration phase.
 # 
+function (build_libzmq)
 
 set(trigger_build_dir ${CMAKE_BINARY_DIR}/autobuild/force_libzmq)
 
