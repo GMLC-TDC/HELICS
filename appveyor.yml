@@ -13,6 +13,7 @@ configuration:
 install:
 
 before_build:
+  - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install swig --yes --limit-output #> $null
   - mkdir build
   - cd build
   - cmake .. -G "Visual Studio 14 2015 Win64" -DAUTOBUILD_ZMQ=ON  -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=ON -DBOOST_ROOT="C:\Libraries\boost_1_62_0"
