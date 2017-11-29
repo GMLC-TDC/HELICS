@@ -326,6 +326,21 @@ helicsStatus helicsPublishVector (helics_publication pub, const double data[], i
     return helicsOK;
 }
 
+int helicsGetValueSize(helics_subscription sub)
+{
+    auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
+    if (subObj->rawOnly)
+    {
+        auto dv = subObj->fedptr->getValueRaw(subObj->id);
+        return static_cast<int>(dv.size());
+    }
+    else
+    {
+        auto str = subObj->subptr->getValue<std::string>();
+        return static_cast<int>(str.size());
+    }
+}
+
 int helicsGetValue (helics_subscription sub, char *data, int maxlen)
 {
     if (sub == nullptr)
@@ -423,6 +438,23 @@ helicsStatus helicsGetComplex (helics_subscription sub, double *real, double *im
         *imag = cval.imag ();
     }
     return helicsOK;
+}
+
+int helicsGetVectorSize(helics_subscription sub)
+{
+    if (sub == nullptr)
+    {
+        return 0;
+    }
+    auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
+    if (subObj->rawOnly)
+    {
+        auto V = subObj->fedptr->getValue<std::vector<double>>(subObj->id);
+        return static_cast<int> (V.size());
+    }
+
+    auto V = subObj->subptr->getValue<std::vector<double>>();
+    return static_cast<int>(V.size());
 }
 
 int helicsGetVector (helics_subscription sub, double data[], int len)

@@ -1339,7 +1339,10 @@ void CoreBroker::checkDependencies ()
         {// if there is just one dependency remove it
             ActionMessage rmdep(CMD_REMOVE_INTERDEPENDENCY);
             rmdep.source_id = global_broker_id;
-            routeMessage(rmdep, timeCoord->getDependents()[0]);
+            auto depid = timeCoord->getDependents()[0];
+            routeMessage(rmdep, depid);
+            timeCoord->removeDependency(depid);
+            timeCoord->removeDependent(depid);
         }
     }
     else

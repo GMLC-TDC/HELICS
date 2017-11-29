@@ -61,11 +61,14 @@ HELICS_Export helicsStatus helicsPublishDouble (helics_publication pub, double v
 HELICS_Export helicsStatus helicsPublishComplex (helics_publication pub, double real, double imag);
 HELICS_Export helicsStatus helicsPublishVector (helics_publication pub, const double data[], int len);
 
-HELICS_Export int helicsGetValue (helics_subscription pub, char *data, int maxlen);
+HELICS_Export int helicsGetValueSize(helics_subscription sub);
+
+HELICS_Export int helicsGetValue (helics_subscription sub, char *data, int maxlen);
 HELICS_Export helicsStatus helicsGetString (helics_subscription sub, char *str, int maxlen);
 HELICS_Export helicsStatus helicsGetInteger (helics_subscription sub, int64_t *val);
 HELICS_Export helicsStatus helicsGetDouble (helics_subscription sub, double *val);
 HELICS_Export helicsStatus helicsGetComplex (helics_subscription sub, double *real, double *imag);
+HELICS_Export int helicsGetVectorSize(helics_subscription sub);
 HELICS_Export int helicsGetVector (helics_subscription sub, double data[], int maxlen);
 
 HELICS_Export helicsStatus helicsSetDefaultValue (helics_subscription sub, const char *data, int len);
