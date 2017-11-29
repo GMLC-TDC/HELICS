@@ -80,7 +80,7 @@ void TimeCoordinator::updateNextExecutionTime ()
     time_exec = std::min(time_message, time_value);
     if (time_exec < Time::maxVal())
     {
-       // time_exec += info.impactWindow;
+       time_exec += info.impactWindow;
     }
     time_exec = std::min (time_requested, time_exec);
     if (time_exec <= time_granted)
@@ -117,7 +117,6 @@ void TimeCoordinator::updateValueTime (Time valueUpdateTime)
         }
         return;
     }
-    valueUpdateTime += info.impactWindow;
     if (valueUpdateTime < time_value)
     {
         if (iterating)
@@ -148,7 +147,6 @@ void TimeCoordinator::updateMessageTime (Time messageUpdateTime)
         }
         return;
     }
-    messageUpdateTime += info.impactWindow;
     if (messageUpdateTime < time_message)
     {
         if (iterating)

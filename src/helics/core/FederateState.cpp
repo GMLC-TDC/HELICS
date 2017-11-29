@@ -724,7 +724,6 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         if (epi != nullptr)
         {
             timeCoord->updateMessageTime (cmd.actionTime);
-            cmd.actionTime += timeCoord->getFedInfo().impactWindow;
             epi->addMessage (createMessage (std::move (cmd)));
         }
     }
@@ -738,8 +737,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         if (cmd.source_id == subI->target.first)
         {
-            subI->addData (cmd.actionTime + timeCoord->getFedInfo ().impactWindow,
-                           std::make_shared<const data_block> (std::move (cmd.payload)));
+            subI->addData (cmd.actionTime,std::make_shared<const data_block> (std::move (cmd.payload)));
             timeCoord->updateValueTime (cmd.actionTime);
             LOG_TRACE (timeCoord->printTimeStatus ());
         }
