@@ -44,6 +44,7 @@ static void addOperations (Filter *filt, defined_filter_types type)
         auto op = std::make_shared<randomDropFilterOperation> ();
         filt->setFilterOperations (std::move (op));
     }
+    break;
     case reroute:
     {
         auto op = std::make_shared<randomDropFilterOperation> ();

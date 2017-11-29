@@ -405,7 +405,8 @@ void Federate::finalize ()
     case op_states::initialization:
         break;
     case op_states::pendingExec:
-        enterInitializationStateFinalize ();
+        enterExecutionStateFinalize ();
+        break;
     case op_states::pendingTime:
         requestTimeFinalize ();
         break;
