@@ -93,7 +93,7 @@ install:
 
 script:
   - mkdir build && cd build
-  - cmake .. -DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DZMQ_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/zmq -DBOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost -DBUILD_PYTHON=ON
+  - cmake .. -DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DZeroMQ_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/zmq -DBOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost -DBUILD_PYTHON=ON
   - make
 #  - ctest --verbose
 
