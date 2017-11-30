@@ -17,16 +17,18 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (query_tests_value, ValueFederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
+#if ENABLE_TEST_TIMEOUTS > 0
 namespace utf = boost::unit_test;
+#endif
 #ifdef QUICK_TESTS_ONLY
 const std::string core_types[] = {"test_2", "ipc_2", "zmq", "udp"};
 #else
 const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2", "udp", "udp_2"};
 #endif
 /** test simple creation and destruction*/
-#if ENABLE_TEST_TIMEOUTS>0 
- BOOST_TEST_DECORATOR (*utf::timeout(5))
- #endif
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (5))
+#endif
 BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_type)
 {
     Setup2FederateTest (core_type);
@@ -57,16 +59,16 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     BOOST_CHECK_EQUAL (vFed1->query ("test2", "isinit"), "true");
 
     BOOST_CHECK_EQUAL (vFed1->query ("test2", "publications"), "[test2/pub3]");
-    vFed1->finalize();
-    vFed2->finalize();
+    vFed1->finalize ();
+    vFed2->finalize ();
 }
 
-#if ENABLE_TEST_TIMEOUTS>0 
- BOOST_TEST_DECORATOR (*utf::timeout(5))
- #endif
-BOOST_DATA_TEST_CASE (test_broker_queries,bdata::make(core_types), core_type)
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (5))
+#endif
+BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
 {
-    Setup2FederateTest ("test_2");
+    Setup2FederateTest (core_type);
     auto core = vFed1->getCorePointer ();
     auto res = core->query ("root", "federates");
     std::string str ("[");
@@ -75,13 +77,13 @@ BOOST_DATA_TEST_CASE (test_broker_queries,bdata::make(core_types), core_type)
     str.append (vFed2->getName ());
     str.push_back (']');
     BOOST_CHECK_EQUAL (res, "[test1;test2]");
-    vFed1->finalize();
-    vFed2->finalize();
+    vFed1->finalize ();
+    vFed2->finalize ();
 }
 
-#if ENABLE_TEST_TIMEOUTS>0 
- BOOST_TEST_DECORATOR (*utf::timeout(5))
- #endif
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (5))
+#endif
 BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), core_type)
 {
     Setup2FederateTest (core_type);
@@ -104,7 +106,7 @@ BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), co
     BOOST_CHECK_EQUAL (rvec[0], "test1/pub1");
     BOOST_CHECK_EQUAL (rvec[1], "test2/pub2");
     BOOST_CHECK_EQUAL (rvec[2], "test2/pub3");
-    vFed1->finalize();
-    vFed2->finalize();
+    vFed1->finalize ();
+    vFed2->finalize ();
 }
 BOOST_AUTO_TEST_SUITE_END ()

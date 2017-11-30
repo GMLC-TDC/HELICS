@@ -737,7 +737,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         if (cmd.source_id == subI->target.first)
         {
-            subI->addData (cmd.actionTime,std::make_shared<const data_block> (std::move (cmd.payload)));
+            subI->addData (cmd.actionTime, std::make_shared<const data_block> (std::move (cmd.payload)));
             timeCoord->updateValueTime (cmd.actionTime);
             LOG_TRACE (timeCoord->printTimeStatus ());
         }
@@ -787,7 +787,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     case CMD_REMOVE_INTERDEPENDENCY:
         if (cmd.dest_id == global_id)
         {
-            timeCoord->processDependencyUpdateMessage(cmd);
+            timeCoord->processDependencyUpdateMessage (cmd);
         }
 
         break;
@@ -821,7 +821,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         if (cmd.name == name)
         {
-            if (CHECK_ACTION_FLAG(cmd,error_flag))
+            if (CHECK_ACTION_FLAG (cmd, error_flag))
             {
                 setState (HELICS_ERROR);
                 return iteration_state::error;
@@ -847,10 +847,10 @@ void FederateState::processConfigUpdate (const ActionMessage &m)
         switch (m.dest_id)
         {
         case ONLY_TRANSMIT_ON_CHANGE_FLAG:
-            only_transmit_on_change = CHECK_ACTION_FLAG(m, indicator_flag);
+            only_transmit_on_change = CHECK_ACTION_FLAG (m, indicator_flag);
             break;
         case ONLY_UPDATE_ON_CHANGE_FLAG:
-            only_update_on_change = CHECK_ACTION_FLAG(m, indicator_flag);
+            only_update_on_change = CHECK_ACTION_FLAG (m, indicator_flag);
             break;
         default:
             break;

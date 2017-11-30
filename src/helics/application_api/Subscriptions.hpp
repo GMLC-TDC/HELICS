@@ -145,6 +145,10 @@ class Subscription : public SubscriptionBase
                     lastValue = out;
                 }
             }
+            else
+            {
+                out = invalidValue<X> ();
+            }
         }
         else
         {
@@ -163,19 +167,19 @@ class Subscription : public SubscriptionBase
     /** get the most recent value
     @return the value*/
     template <class X>
-     typename std::enable_if_t<isConvertableType<X>(), X> getValueAs()
+    typename std::enable_if_t<isConvertableType<X> (), X> getValueAs ()
     {
-    	std::conditional<std::is_integral<X>::value, int64_t, double> gval;
-    	getValue(gval);
-    	return static_cast<X>(gval);
+        std::conditional<std::is_integral<X>::value, int64_t, double> gval;
+        getValue (gval);
+        return static_cast<X> (gval);
     }
     /** get the most recent calculation with the result as a convertible type*/
-     template <class X>
-     typename std::enable_if_t<isConvertableType<X>()> getValueAs(X &out)
+    template <class X>
+    typename std::enable_if_t<isConvertableType<X> ()> getValueAs (X &out)
     {
-    	std::conditional<std::is_integral<X>::value, int64_t, double> gval;
-    	getValue(gval);
-    	out = static_cast<X>(gval);
+        std::conditional<std::is_integral<X>::value, int64_t, double> gval;
+        getValue (gval);
+        out = static_cast<X> (gval);
     }
 
     using SubscriptionBase::registerCallback;

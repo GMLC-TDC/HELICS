@@ -19,14 +19,16 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueConverter.hpp"
 
+#if ENABLE_TEST_TIMEOUTS > 0
 namespace utf = boost::unit_test;
+#endif
 
 BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
 
 /** just a check that in the simple case we do actually get the time back we requested*/
-#if ENABLE_TEST_TIMEOUTS>0 
- BOOST_TEST_DECORATOR (*utf::timeout(5))
- #endif
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (5))
+#endif
 BOOST_AUTO_TEST_CASE (execution_iteration_test)
 {
     Setup1FederateTest ("test");
@@ -48,14 +50,14 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test)
 
     BOOST_CHECK (comp == helics::iteration_result::next_step);
 
-    double val2 = vFed1->getValue<double> (subid);
+    auto val2 = vFed1->getValue<double> (subid);
 
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-#if ENABLE_TEST_TIMEOUTS>0 
- BOOST_TEST_DECORATOR (*utf::timeout(5))
- #endif
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (5))
+#endif
 BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 {
     Setup2FederateTest ("test");
@@ -81,15 +83,15 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 
     BOOST_CHECK (comp == helics::iteration_result::next_step);
 
-    double val2 = vFed2->getValue<double> (subid);
+    auto val2 = vFed2->getValue<double> (subid);
     vFed1->enterExecutionStateFinalize ();
     BOOST_CHECK_EQUAL (val2, val);
 }
 
 /** just a check that in the simple case we do actually get the time back we requested*/
-#if ENABLE_TEST_TIMEOUTS>0 
- BOOST_TEST_DECORATOR (*utf::timeout(5))
- #endif
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (5))
+#endif
 BOOST_AUTO_TEST_CASE (time_iteration_test)
 {
     Setup1FederateTest ("test");
@@ -113,14 +115,14 @@ BOOST_AUTO_TEST_CASE (time_iteration_test)
 
     BOOST_CHECK (comp.state == helics::iteration_result::next_step);
     BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
-    double val2 = vFed1->getValue<double> (subid);
+    auto val2 = vFed1->getValue<double> (subid);
 
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-#if ENABLE_TEST_TIMEOUTS>0 
- BOOST_TEST_DECORATOR (*utf::timeout(5))
- #endif
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (5))
+#endif
 BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
 {
     Setup2FederateTest ("test");
@@ -150,15 +152,15 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
 
     BOOST_CHECK (comp.state == helics::iteration_result::next_step);
     BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
-    double val2 = vFed2->getValue<double> (subid);
+    auto val2 = vFed2->getValue<double> (subid);
     vFed1->requestTimeFinalize ();
 
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-#if ENABLE_TEST_TIMEOUTS>0 
- BOOST_TEST_DECORATOR (*utf::timeout(5))
- #endif
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (5))
+#endif
 BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
 {
     Setup2FederateTest ("test");
@@ -191,15 +193,15 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     BOOST_CHECK (comp.state == helics::iteration_result::next_step);
     BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
     BOOST_CHECK (!sub1.isUpdated ());
-    double val2 = sub1.getValue<double> ();
+    auto val2 = sub1.getValue<double> ();
     vFed1->requestTimeFinalize ();
 
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-#if ENABLE_TEST_TIMEOUTS>0 
- BOOST_TEST_DECORATOR (*utf::timeout(5))
- #endif
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (5))
+#endif
 BOOST_AUTO_TEST_CASE (test_iteration_counter)
 {
     Setup2FederateTest ("test");

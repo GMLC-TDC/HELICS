@@ -203,7 +203,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         else  // we are initialized already
         {
             ActionMessage badInit (CMD_FED_ACK);
-            SET_ACTION_FLAG(badInit, error_flag);
+            SET_ACTION_FLAG (badInit, error_flag);
             badInit.source_id = global_broker_id;
             badInit.name = command.name;
             transmit (command.source_id, badInit);  // this isn't correct
@@ -265,7 +265,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         else  // we are initialized already
         {
             ActionMessage badInit (CMD_BROKER_ACK);
-            SET_ACTION_FLAG(badInit, error_flag);
+            SET_ACTION_FLAG (badInit, error_flag);
             badInit.source_id = global_broker_id;
             badInit.name = command.name;
             transmit (command.source_id, badInit);
@@ -332,7 +332,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     {  // we can't be root if we got one of these
         if (command.name == identifier)
         {
-            if (CHECK_ACTION_FLAG(command,error_flag))
+            if (CHECK_ACTION_FLAG (command, error_flag))
             {
                 // generate an error message
                 return;
@@ -731,8 +731,8 @@ void CoreBroker::addSubscription (ActionMessage &m)
                           static_cast<int32_t> (_handles.size () - 1));
     addLocalInfo (_handles.back (), m);
     subscriptions.emplace (m.name, static_cast<int32_t> (_handles.size () - 1));
-    _handles.back().processed = CHECK_ACTION_FLAG(m, processingComplete);
-    if (!CHECK_ACTION_FLAG(m, processingComplete))
+    _handles.back ().processed = CHECK_ACTION_FLAG (m, processingComplete);
+    if (!CHECK_ACTION_FLAG (m, processingComplete))
     {
         bool proc = FindandNotifySubscriptionPublisher (_handles.back ());
         if (!_isRoot)
@@ -740,9 +740,9 @@ void CoreBroker::addSubscription (ActionMessage &m)
             if (proc)
             {
                 // just let any higher level brokers know we have found the publisher and let them know
-                SET_ACTION_FLAG(m, processingComplete);
+                SET_ACTION_FLAG (m, processingComplete);
             }
-           
+
             transmit (0, m);
         }
     }
@@ -758,7 +758,7 @@ void CoreBroker::addEndpoint (ActionMessage &m)
 
     if (!_isRoot)
     {
-        SET_ACTION_FLAG(m, processingComplete);
+        SET_ACTION_FLAG (m, processingComplete);
         transmit (0, m);
     }
     else
@@ -778,9 +778,9 @@ void CoreBroker::addSourceFilter (ActionMessage &m)
     {
         if (proc)
         {
-            SET_ACTION_FLAG(m, processingComplete);
+            SET_ACTION_FLAG (m, processingComplete);
         }
-        
+
         transmit (0, m);
     }
 }
@@ -819,7 +819,7 @@ void CoreBroker::addDestFilter (ActionMessage &m)
     {
         if (proc)
         {
-            SET_ACTION_FLAG(m, processingComplete);
+            SET_ACTION_FLAG (m, processingComplete);
         }
         transmit (0, m);
     }
@@ -1111,8 +1111,8 @@ void CoreBroker::FindandNotifyEndpointFilters (BasicHandleInfo &handleInfo)
         m.dest_handle = handleInfo.id;
         if (handleInfo.flag)
         {
-            SET_ACTION_FLAG(m, indicator_flag);
-       }
+            SET_ACTION_FLAG (m, indicator_flag);
+        }
         transmit (getRoute (m.dest_id), m);
 
         // notify the publisher about its subscription
@@ -1195,7 +1195,7 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
     }
     else if (query == "federate_map")
     {
-        return generateFederateMap();
+        return generateFederateMap ();
     }
     else if (query == "dependency_graph")
     {
@@ -1205,22 +1205,22 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
     else if (query == "dependencies")
     {
         Json_helics::Value base;
-        base["name"] = getIdentifier();
-        base["id"] = static_cast<int>(global_broker_id);
-        if (!isRoot())
+        base["name"] = getIdentifier ();
+        base["id"] = static_cast<int> (global_broker_id);
+        if (!isRoot ())
         {
-            base["parent"] = static_cast<int>(global_broker_id);
+            base["parent"] = static_cast<int> (global_broker_id);
         }
         base["dependents"] = Json_helics::arrayValue;
         int index = 0;
-        for (auto &dep : timeCoord->getDependents())
+        for (auto &dep : timeCoord->getDependents ())
         {
             base["dependents"][index] = dep;
             ++index;
         }
         base["dependencies"] = Json_helics::arrayValue;
         index = 0;
-        for (auto &dep : timeCoord->getDependencies())
+        for (auto &dep : timeCoord->getDependencies ())
         {
             base["dependencies"][index] = dep;
             ++index;
@@ -1228,10 +1228,10 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
         Json_helics::StreamWriterBuilder builder;
         builder["commentStyle"] = "None";
         builder["indentation"] = "   ";  // or whatever you like
-        auto writer(builder.newStreamWriter());
+        auto writer (builder.newStreamWriter ());
         std::stringstream sstr;
-        writer->write(base, &sstr);
-        return sstr.str();
+        writer->write (base, &sstr);
+        return sstr.str ();
     }
     else
     {
@@ -1239,37 +1239,37 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
     }
 }
 
-std::string CoreBroker::generateFederateMap() const
+std::string CoreBroker::generateFederateMap () const
 {
     Json_helics::Value base;
-    base["name"] = getIdentifier();
-    base["id"] = static_cast<int>(global_broker_id);
-    if (!isRoot())
+    base["name"] = getIdentifier ();
+    base["id"] = static_cast<int> (global_broker_id);
+    if (!isRoot ())
     {
-        base["parent"] = static_cast<int>(global_broker_id);
+        base["parent"] = static_cast<int> (global_broker_id);
     }
     base["brokers"] = Json_helics::arrayValue;
-  //  int index = 0;
-  //  for (auto &dep : timeCoord->getDependents())
-   // {
-       // base["brokers"][index] = dep;
-   //     ++index;
-  //  }
+    //  int index = 0;
+    //  for (auto &dep : timeCoord->getDependents())
+    // {
+    // base["brokers"][index] = dep;
+    //     ++index;
+    //  }
     base["cores"] = Json_helics::arrayValue;
-  //  index = 0;
-  //  for (auto &dep : timeCoord->getDependencies())
-  //  {
-      //  base["cores"][index] = dep;
-  //      ++index;
-  //  }
+    //  index = 0;
+    //  for (auto &dep : timeCoord->getDependencies())
+    //  {
+    //  base["cores"][index] = dep;
+    //      ++index;
+    //  }
     Json_helics::StreamWriterBuilder builder;
     builder["commentStyle"] = "None";
     builder["indentation"] = "   ";  // or whatever you like
-    auto writer(builder.newStreamWriter());
+    auto writer (builder.newStreamWriter ());
     std::stringstream sstr;
-    writer->write(base, &sstr);
-    return sstr.str();
-    }
+    writer->write (base, &sstr);
+    return sstr.str ();
+}
 
 void CoreBroker::processLocalQuery (const ActionMessage &m)
 {
@@ -1336,13 +1336,13 @@ void CoreBroker::checkDependencies ()
     if (_isRoot)
     {
         if (timeCoord->getDependents ().size () == 1)
-        {// if there is just one dependency remove it
-            ActionMessage rmdep(CMD_REMOVE_INTERDEPENDENCY);
+        {  // if there is just one dependency remove it
+            ActionMessage rmdep (CMD_REMOVE_INTERDEPENDENCY);
             rmdep.source_id = global_broker_id;
-            auto depid = timeCoord->getDependents()[0];
-            routeMessage(rmdep, depid);
-            timeCoord->removeDependency(depid);
-            timeCoord->removeDependent(depid);
+            auto depid = timeCoord->getDependents ()[0];
+            routeMessage (rmdep, depid);
+            timeCoord->removeDependency (depid);
+            timeCoord->removeDependent (depid);
         }
     }
     else

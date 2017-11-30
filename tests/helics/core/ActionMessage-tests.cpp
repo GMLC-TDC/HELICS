@@ -14,8 +14,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 BOOST_AUTO_TEST_SUITE (ActionMessage_tests)
 
-using helics::Core;
-
 using namespace helics;
 /*
 int32_t action_ = action_t::cmd_ignore; //4 -- command
@@ -123,7 +121,7 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     BOOST_CHECK_EQUAL (cmd.source_handle, 0);
     BOOST_CHECK_EQUAL (cmd.dest_id, 0);
     BOOST_CHECK_EQUAL (cmd.dest_handle, 0);
-    BOOST_CHECK_EQUAL(cmd.counter, 0);
+    BOOST_CHECK_EQUAL (cmd.counter, 0);
     BOOST_CHECK_EQUAL (cmd.flags, 0);
     BOOST_CHECK_EQUAL (cmd.actionTime, helics::Time::zeroVal ());
     BOOST_CHECK (cmd.payload.empty ());
@@ -149,7 +147,7 @@ BOOST_AUTO_TEST_CASE (copy_constructor_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    cmd.flags = 0x1a2F; //this has no significance
+    cmd.flags = 0x1a2F;  // this has no significance
     cmd.actionTime = helics::Time::maxVal ();
     cmd.payload = "hello world";
 
@@ -168,16 +166,16 @@ BOOST_AUTO_TEST_CASE (copy_constructor_test)
     BOOST_CHECK_EQUAL (cmd_copy.dest_handle, 4);
     BOOST_CHECK_EQUAL (cmd_copy.flags, 0x1a2F);
     BOOST_CHECK_EQUAL (cmd_copy.actionTime, helics::Time::maxVal ());
-    BOOST_CHECK (cmd_copy.payload.compare ("hello world") == 0);
-    BOOST_CHECK (cmd_copy.name.compare ("hello world") == 0);  // aliased to payload
+    BOOST_CHECK_EQUAL (cmd_copy.payload, "hello world");
+    BOOST_CHECK_EQUAL (cmd_copy.name, "hello world");  // aliased to payload
 
     BOOST_CHECK_EQUAL (cmd_copy.Te, helics::Time::maxVal ());
     BOOST_CHECK_EQUAL (cmd_copy.Tdemin, helics::Time::minVal ());
-    BOOST_CHECK (cmd_copy.info ().source.compare ("source") == 0);
-    BOOST_CHECK (cmd_copy.info ().target.compare ("target") == 0);
-    BOOST_CHECK (cmd_copy.info ().type.compare ("source") == 0);  // aliased to source
-    BOOST_CHECK (cmd_copy.info ().units.compare ("target") == 0);  // aliased to target
-    BOOST_CHECK (cmd_copy.info ().orig_source.compare ("origsrc") == 0);
+    BOOST_CHECK_EQUAL (cmd_copy.info ().source, "source");
+    BOOST_CHECK_EQUAL (cmd_copy.info ().target, "target");
+    BOOST_CHECK_EQUAL (cmd_copy.info ().type, "source");  // aliased to source
+    BOOST_CHECK_EQUAL (cmd_copy.info ().units, "target");  // aliased to target
+    BOOST_CHECK_EQUAL (cmd_copy.info ().orig_source, "origsrc");
 }
 
 BOOST_AUTO_TEST_CASE (assignment_test)
@@ -187,9 +185,9 @@ BOOST_AUTO_TEST_CASE (assignment_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    SET_ACTION_FLAG(cmd, iterationRequested);
-    SET_ACTION_FLAG(cmd, pub_required);
-    SET_ACTION_FLAG(cmd, error_flag);
+    SET_ACTION_FLAG (cmd, iterationRequested);
+    SET_ACTION_FLAG (cmd, pub_required);
+    SET_ACTION_FLAG (cmd, error_flag);
     cmd.actionTime = helics::Time::maxVal ();
     cmd.payload = "hello world";
 
@@ -206,20 +204,20 @@ BOOST_AUTO_TEST_CASE (assignment_test)
     BOOST_CHECK_EQUAL (cmd_assign.source_handle, 2);
     BOOST_CHECK_EQUAL (cmd_assign.dest_id, 3);
     BOOST_CHECK_EQUAL (cmd_assign.dest_handle, 4);
-    BOOST_CHECK (CHECK_ACTION_FLAG(cmd_assign,iterationRequested));
-    BOOST_CHECK(CHECK_ACTION_FLAG(cmd_assign, pub_required));
-    BOOST_CHECK(CHECK_ACTION_FLAG(cmd_assign, error_flag));
+    BOOST_CHECK (CHECK_ACTION_FLAG (cmd_assign, iterationRequested));
+    BOOST_CHECK (CHECK_ACTION_FLAG (cmd_assign, pub_required));
+    BOOST_CHECK (CHECK_ACTION_FLAG (cmd_assign, error_flag));
     BOOST_CHECK_EQUAL (cmd_assign.actionTime, helics::Time::maxVal ());
-    BOOST_CHECK (cmd_assign.payload.compare ("hello world") == 0);
-    BOOST_CHECK (cmd_assign.name.compare ("hello world") == 0);  // aliased to payload
+    BOOST_CHECK_EQUAL (cmd_assign.payload, "hello world");
+    BOOST_CHECK_EQUAL (cmd_assign.name, "hello world");  // aliased to payload
 
     BOOST_CHECK_EQUAL (cmd_assign.Te, helics::Time::maxVal ());
     BOOST_CHECK_EQUAL (cmd_assign.Tdemin, helics::Time::minVal ());
-    BOOST_CHECK (cmd_assign.info ().source.compare ("source") == 0);
-    BOOST_CHECK (cmd_assign.info ().target.compare ("target") == 0);
-    BOOST_CHECK (cmd_assign.info ().type.compare ("source") == 0);  // aliased to source
-    BOOST_CHECK (cmd_assign.info ().units.compare ("target") == 0);  // aliased to target
-    BOOST_CHECK (cmd_assign.info ().orig_source.compare ("origsrc") == 0);
+    BOOST_CHECK_EQUAL (cmd_assign.info ().source, "source");
+    BOOST_CHECK_EQUAL (cmd_assign.info ().target, "target");
+    BOOST_CHECK_EQUAL (cmd_assign.info ().type, "source");  // aliased to source
+    BOOST_CHECK_EQUAL (cmd_assign.info ().units, "target");  // aliased to target
+    BOOST_CHECK_EQUAL (cmd_assign.info ().orig_source, "origsrc");
 }
 
 BOOST_AUTO_TEST_CASE (comparison_test)
@@ -255,9 +253,9 @@ BOOST_AUTO_TEST_CASE (conversion_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    SET_ACTION_FLAG(cmd, iterationRequested);
-    SET_ACTION_FLAG(cmd, pub_required);
-    SET_ACTION_FLAG(cmd, error_flag);
+    SET_ACTION_FLAG (cmd, iterationRequested);
+    SET_ACTION_FLAG (cmd, pub_required);
+    SET_ACTION_FLAG (cmd, error_flag);
     cmd.actionTime = 45.7;
     cmd.payload = "hello world";
 
@@ -292,9 +290,9 @@ BOOST_AUTO_TEST_CASE (message_conversion_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    SET_ACTION_FLAG(cmd, iterationRequested);
-    SET_ACTION_FLAG(cmd, pub_required);
-    SET_ACTION_FLAG(cmd, error_flag);
+    SET_ACTION_FLAG (cmd, iterationRequested);
+    SET_ACTION_FLAG (cmd, pub_required);
+    SET_ACTION_FLAG (cmd, error_flag);
     cmd.actionTime = 45.7;
     cmd.payload = "hello world";
 

@@ -65,13 +65,14 @@ class DelayedDestructor
             {
                 for (auto &element : ElementsToBeDestroyed)
                 {
-                    if (element.use_count() == 1)
+                    if (element.use_count () == 1)
                     {
-                        callBeforeDeleteFunction(element);
+                        callBeforeDeleteFunction (element);
                     }
                 }
             }
-            //so apparently remove_if can actually destroy shared_ptrs so the call function needs to be before this call
+            // so apparently remove_if can actually destroy shared_ptrs so the call function needs to be before
+            // this call
             auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
                                        [](const auto &element) { return (element.use_count () <= 1); });
             ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());

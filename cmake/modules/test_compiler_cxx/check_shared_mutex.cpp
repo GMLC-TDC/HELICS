@@ -2,7 +2,7 @@
 
 int main()
 {
-    std::shared_timed_mutex mtx;
+    std::shared_mutex mtx;
     mtx.lock_shared();
     mtx.unlock_shared();
 }

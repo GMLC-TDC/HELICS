@@ -12,12 +12,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "Filters.hpp"
 #include "MessageOperators.h"
 
-#include <regex>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <random>
+#include <regex>
 #include <thread>
-#include <iostream>
 
 namespace helics
 {
@@ -54,18 +54,15 @@ static void addOperations (Filter *filt, defined_filter_types type)
     }
 }
 
-Filter::Filter(Federate *fed)
+Filter::Filter (Federate *fed)
 {
     if (fed != nullptr)
     {
-        corePtr = fed->getCorePointer().get();
+        corePtr = fed->getCorePointer ().get ();
     }
 }
 
-Filter::Filter(Core *cr):corePtr(cr)
-{
-
-}
+Filter::Filter (Core *cr) : corePtr (cr) {}
 
 void Filter::setOperator (std::shared_ptr<FilterOperator> mo)
 {
@@ -74,71 +71,67 @@ void Filter::setOperator (std::shared_ptr<FilterOperator> mo)
         corePtr->setFilterOperator (id, std::move (mo));
     }
 }
-void Filter::setFilterOperations(std::shared_ptr<FilterOperations> filterOps)
+void Filter::setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
 {
-    filtOp = std::move(filterOps);
+    filtOp = std::move (filterOps);
     if (corePtr)
     {
-        corePtr->setFilterOperator(id, filtOp->getOperator());
+        corePtr->setFilterOperator (id, filtOp->getOperator ());
     }
-    
 }
 
-
-SourceFilter::SourceFilter(Federate *mFed,
-    const std::string &target,
-    const std::string &name,
-    const std::string &input_type,
-    const std::string &output_type)
-    : Filter(mFed)
+SourceFilter::SourceFilter (Federate *mFed,
+                            const std::string &target,
+                            const std::string &name,
+                            const std::string &input_type,
+                            const std::string &output_type)
+    : Filter (mFed)
 {
     if (mFed != nullptr)
     {
-        fid = mFed->registerSourceFilter(name, target, input_type, output_type);
-        id = fid.value();
+        fid = mFed->registerSourceFilter (name, target, input_type, output_type);
+        id = fid.value ();
     }
-    
 }
 
-SourceFilter::SourceFilter(Core *cr,
-    const std::string &target,
-    const std::string &name,
-    const std::string &input_type,
-    const std::string &output_type)
-    : Filter(cr)
+SourceFilter::SourceFilter (Core *cr,
+                            const std::string &target,
+                            const std::string &name,
+                            const std::string &input_type,
+                            const std::string &output_type)
+    : Filter (cr)
 {
     if (corePtr != nullptr)
     {
-        id = corePtr->registerSourceFilter(name, target, input_type, output_type);
+        id = corePtr->registerSourceFilter (name, target, input_type, output_type);
         fid = id;
     }
-
 }
 
-DestinationFilter::DestinationFilter(Federate *mFed,
-    const std::string &target,
-    const std::string &name,
-    const std::string &input_type,
-    const std::string &output_type)
-    : Filter(mFed)
+DestinationFilter::DestinationFilter (Federate *mFed,
+                                      const std::string &target,
+                                      const std::string &name,
+                                      const std::string &input_type,
+                                      const std::string &output_type)
+    : Filter (mFed)
 {
     if (mFed != nullptr)
     {
-        fid = mFed->registerDestinationFilter(name, target, input_type, output_type);
-        id = fid.value();
+        fid = mFed->registerDestinationFilter (name, target, input_type, output_type);
+        id = fid.value ();
     }
 }
 
-DestinationFilter::DestinationFilter(Core *cr,
-    const std::string &target,
-    const std::string &name,
-    const std::string &input_type,
-    const std::string &output_type)
-    : Filter(cr)
+DestinationFilter::DestinationFilter (Core *cr,
+                                      const std::string &target,
+                                      const std::string &name,
+                                      const std::string &input_type,
+                                      const std::string &output_type)
+    : Filter (cr)
 {
     if (corePtr != nullptr)
     {
-        id = corePtr->registerDestinationFilter(name, target, input_type, output_type);
+        id = corePtr->registerDestinationFilter (name, target, input_type, output_type);
         fid = id;
     }
 }
@@ -162,22 +155,20 @@ make_Source_filter (defined_filter_types type, Core *cr, const std::string &targ
     return sfilt;
 }
 
-std::unique_ptr<DestinationFilter> make_destination_filter(defined_filter_types type,
-    Core *cr,
-    const std::string &target,
-    const std::string &name)
+std::unique_ptr<DestinationFilter>
+make_destination_filter (defined_filter_types type, Core *cr, const std::string &target, const std::string &name)
 
 {
-    auto dfilt = std::make_unique<DestinationFilter>(cr, target, name);
-    addOperations(dfilt.get(), type);
+    auto dfilt = std::make_unique<DestinationFilter> (cr, target, name);
+    addOperations (dfilt.get (), type);
     return dfilt;
 }
 
 std::unique_ptr<SourceFilter>
-make_Source_filter(defined_filter_types type, Federate *mFed, const std::string &target, const std::string &name)
+make_Source_filter (defined_filter_types type, Federate *mFed, const std::string &target, const std::string &name)
 {
-    auto sfilt = std::make_unique<SourceFilter>(mFed, target, name);
-    addOperations(sfilt.get(), type);
+    auto sfilt = std::make_unique<SourceFilter> (mFed, target, name);
+    addOperations (sfilt.get (), type);
     return sfilt;
 }
 
@@ -417,7 +408,7 @@ void randomDropFilterOperation::set (const std::string &property, double val)
         dropProb = val;
     }
 }
-void randomDropFilterOperation::setString (const std::string &/*property*/, const std::string & /*val*/) {}
+void randomDropFilterOperation::setString (const std::string & /*property*/, const std::string & /*val*/) {}
 
 std::shared_ptr<FilterOperator> randomDropFilterOperation::getOperator ()
 {
@@ -426,14 +417,15 @@ std::shared_ptr<FilterOperator> randomDropFilterOperation::getOperator ()
 
 rerouteFilterOperation::rerouteFilterOperation ()
 {
-    op = std::make_shared<MessageDestOperator> ([this](const std::string &dest) { return rerouteOperation(dest); });
+    op =
+      std::make_shared<MessageDestOperator> ([this](const std::string &dest) { return rerouteOperation (dest); });
 }
 
 rerouteFilterOperation::~rerouteFilterOperation () = default;
 
-void rerouteFilterOperation::set (const std::string &/*property*/, double /*val*/) {}
+void rerouteFilterOperation::set (const std::string & /*property*/, double /*val*/) {}
 
-void rerouteFilterOperation::setString(const std::string &property, const std::string &val)
+void rerouteFilterOperation::setString (const std::string &property, const std::string &val)
 {
     if (property == "target")
     {
@@ -443,16 +435,16 @@ void rerouteFilterOperation::setString(const std::string &property, const std::s
     {
         try
         {
-            auto test = std::regex(val);
-            auto cond = conditions.lock();
-            cond->insert(val);
+            auto test = std::regex (val);
+            auto cond = conditions.lock ();
+            cond->insert (val);
         }
         catch (const std::regex_error &re)
         {
-            std::cerr << "filter expression is not a valid Regular expression " << re.what() << std::endl;
-            throw(helics::InvalidParameterValue((std::string("filter expression is not a valid Regular expression ")+re.what()).c_str()));
+            std::cerr << "filter expression is not a valid Regular expression " << re.what () << std::endl;
+            throw (helics::InvalidParameterValue (
+              (std::string ("filter expression is not a valid Regular expression ") + re.what ()).c_str ()));
         }
-       
     }
 }
 
@@ -461,23 +453,21 @@ std::shared_ptr<FilterOperator> rerouteFilterOperation::getOperator ()
     return std::static_pointer_cast<FilterOperator> (op);
 }
 
-
-std::string rerouteFilterOperation::rerouteOperation(const std::string &dest) const
+std::string rerouteFilterOperation::rerouteOperation (const std::string &dest) const
 {
-    auto cond = conditions.lock_shared();
-    if (cond->empty())
+    auto cond = conditions.lock_shared ();
+    if (cond->empty ())
     {
         return *newTarget;
     }
     for (auto &sr : *cond)
     {
-        std::regex reg(sr);
-        if (std::regex_match(dest, reg))
+        std::regex reg (sr);
+        if (std::regex_match (dest, reg))
         {
             return *newTarget;
         }
     }
     return dest;
-
 }
 }  // namespace helics

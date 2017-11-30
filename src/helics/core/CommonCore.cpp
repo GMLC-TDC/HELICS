@@ -722,7 +722,7 @@ void CommonCore::setFlag (federate_id_t federateID, int flag, bool flagValue)
     cmd.dest_id = flag;
     if (flagValue)
     {
-        SET_ACTION_FLAG(cmd, indicator_flag);
+        SET_ACTION_FLAG (cmd, indicator_flag);
     }
     fed->UpdateFederateInfo (cmd);
 }
@@ -811,8 +811,8 @@ Handle CommonCore::registerSubscription (federate_id_t federateID,
     m.info ().units = units;
     if (check_mode == handle_check_mode::required)
     {
-        SET_ACTION_FLAG(m, pub_required);
-   }
+        SET_ACTION_FLAG (m, pub_required);
+    }
 
     std::unique_lock<std::mutex> lock (_handlemutex);
     auto fndpub = publications.find (key);
@@ -821,7 +821,7 @@ Handle CommonCore::registerSubscription (federate_id_t federateID,
         auto pubhandle = fndpub->second;
         auto pubid = handles[pubhandle]->fed_id;
         lock.unlock ();
-        SET_ACTION_FLAG(m, processingComplete);
+        SET_ACTION_FLAG (m, processingComplete);
         // send to broker and core
         addActionMessage (m);
         // now send the same command to the publication
@@ -1140,7 +1140,7 @@ Handle CommonCore::registerSourceFilter (const std::string &filterName,
         auto endid = handles[endhandle]->fed_id;
         handles[endhandle]->hasSourceFilter = true;
         lock.unlock ();
-        SET_ACTION_FLAG(m, processingComplete);
+        SET_ACTION_FLAG (m, processingComplete);
         // send to broker and core
         addActionMessage (m);
         // now send the same command to the endpoint
@@ -1212,7 +1212,7 @@ Handle CommonCore::registerDestinationFilter (const std::string &filterName,
         }
         handles[endhandle]->hasDestFilter = true;
         lock.unlock ();
-        SET_ACTION_FLAG(m, processingComplete);
+        SET_ACTION_FLAG (m, processingComplete);
         // send to broker and core
         addActionMessage (m);
         // now send the same command to the endpoint
@@ -1741,7 +1741,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     case CMD_BROKER_ACK:
         if (command.payload == identifier)
         {
-            if (CHECK_ACTION_FLAG(command,error_flag))
+            if (CHECK_ACTION_FLAG (command, error_flag))
             {
                 LOG_ERROR (0, identifier, "broker responded with error\n");
                 // generate error messages in response to all the delayed messages
@@ -1848,28 +1848,28 @@ void CommonCore::transmitDelayedMessages ()
     }
 }
 
-void CommonCore::transmitDelayedMessages(federate_id_t source)
+void CommonCore::transmitDelayedMessages (federate_id_t source)
 {
     std::vector<ActionMessage> buffer;
-    auto msg = delayTransmitQueue.pop();
+    auto msg = delayTransmitQueue.pop ();
     while (msg)
     {
         if (msg->source_id == source)
         {
-            routeMessage(*msg);
+            routeMessage (*msg);
         }
         else
         {
-            buffer.push_back(std::move(*msg));
+            buffer.push_back (std::move (*msg));
         }
-        msg = delayTransmitQueue.pop();
+        msg = delayTransmitQueue.pop ();
     }
 
-    if (!buffer.empty())
+    if (!buffer.empty ())
     {
         for (auto &am : buffer)
         {
-            delayTransmitQueue.push(std::move(am));
+            delayTransmitQueue.push (std::move (am));
         }
     }
 }
@@ -1923,27 +1923,26 @@ void CommonCore::processCommand (ActionMessage &&command)
             auto fed = getFederate (command.source_id);
             if (fed == nullptr)
             {
-                LOG_DEBUG(command.source_id, "core", "dropping unrecognized CMD_EXEC_*");
+                LOG_DEBUG (command.source_id, "core", "dropping unrecognized CMD_EXEC_*");
                 return;
             }
             if (ongoingFilterActionCounter[fed->local_id] == 0)
             {
-                auto &dep = fed->getDependents();
+                auto &dep = fed->getDependents ();
                 for (auto &fed_id : dep)
                 {
-                    routeMessage(command, fed_id);
+                    routeMessage (command, fed_id);
                 }
             }
             else
             {
-                auto &dep = fed->getDependents();
+                auto &dep = fed->getDependents ();
                 for (auto &fed_id : dep)
                 {
                     command.dest_id = fed_id;
-                    delayTransmitQueue.push(command);
+                    delayTransmitQueue.push (command);
                 }
             }
-           
         }
         else
         {
@@ -2056,7 +2055,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         {
             routeMessage (command);
         }
-    break;
+        break;
 
     case CMD_LOG:
         if (command.dest_id == global_broker_id)
@@ -2071,7 +2070,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_ERROR:
         if (command.dest_id == global_broker_id)
         {
-            sendToLogger(0, 0, getFederateName(command.source_id), command.payload);
+            sendToLogger (0, 0, getFederateName (command.source_id), command.payload);
         }
         else
         {
@@ -2284,7 +2283,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         broker_state_t exp = initializing;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::operating))
         {  // forward the grant to all federates
-            ongoingFilterActionCounter.resize(_federates.size());
+            ongoingFilterActionCounter.resize (_federates.size ());
             for (auto &fed : _federates)
             {
                 organizeFilterOperations ();
@@ -2430,7 +2429,8 @@ void CommonCore::checkDependencies ()
     {
         return;
     }
-    // remove the core from the time dependency chain since it is just adding to the communication noise in this case
+    // remove the core from the time dependency chain since it is just adding to the communication noise in this
+    // case
     timeCoord->removeDependency (brkid);
     timeCoord->removeDependency (fedid);
     timeCoord->removeDependent (brkid);

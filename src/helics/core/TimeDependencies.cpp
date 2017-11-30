@@ -20,10 +20,11 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
     switch (m.action ())
     {
     case CMD_EXEC_REQUEST:
-        time_state = CHECK_ACTION_FLAG(m,iterationRequested) ? time_state_t::exec_requested_iterative: time_state_t::exec_requested;
+        time_state = CHECK_ACTION_FLAG (m, iterationRequested) ? time_state_t::exec_requested_iterative :
+                                                                 time_state_t::exec_requested;
         break;
     case CMD_EXEC_GRANT:
-        if (!CHECK_ACTION_FLAG(m, iterationRequested))
+        if (!CHECK_ACTION_FLAG (m, iterationRequested))
         {
             time_state = time_state_t::time_granted;
             Tnext = timeZero;
@@ -36,7 +37,8 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         }
         break;
     case CMD_TIME_REQUEST:
-        time_state = CHECK_ACTION_FLAG(m, iterationRequested) ? time_state_t::time_requested_iterative: time_state_t::time_requested;
+        time_state = CHECK_ACTION_FLAG (m, iterationRequested) ? time_state_t::time_requested_iterative :
+                                                                 time_state_t::time_requested;
         Tnext = m.actionTime;
         Te = m.Te;
         Tdemin = m.Tdemin;

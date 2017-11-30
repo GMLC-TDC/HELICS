@@ -36,11 +36,8 @@ auto StartBrokerImp (const std::string &core_type_name, const std::string &initi
         auto core_type = helics::coreTypeFromString (new_type);
         return helics::BrokerFactory::create (core_type, initialization_string);
     }
-    else
-    {
-        auto core_type = helics::coreTypeFromString (core_type_name);
-        return helics::BrokerFactory::create (core_type, initialization_string);
-    }
+    auto core_type = helics::coreTypeFromString (core_type_name);
+    return helics::BrokerFactory::create (core_type, initialization_string);
 }
 
 ValueFederateTestFixture::~ValueFederateTestFixture ()
@@ -209,11 +206,9 @@ auto FederateTestFixture::AddBrokerImp (const std::string &core_type_name,
         auto core_type = helics::coreTypeFromString (new_type);
         return helics::BrokerFactory::create (core_type, initialization_string);
     }
-    else
-    {
-        auto core_type = helics::coreTypeFromString (core_type_name);
-        return helics::BrokerFactory::create (core_type, initialization_string);
-    }
+
+    auto core_type = helics::coreTypeFromString (core_type_name);
+    return helics::BrokerFactory::create (core_type, initialization_string);
 }
 
 FederateTestFixture::~FederateTestFixture ()

@@ -448,10 +448,10 @@ void UdpComms::closeReceiver ()
 
                 udp::endpoint rxEndpoint = *resolver.resolve(queryLocal);
 
-                udp::socket transmit(serv->getBaseService(),udp::endpoint(udp::v4(),0));
+                udp::socket transmitter(serv->getBaseService(),udp::endpoint(udp::v4(),0));
                 std::string cls("close");
                 boost::system::error_code error;
-                transmit.send_to(boost::asio::buffer(cls), rxEndpoint,0,error);
+                transmitter.send_to(boost::asio::buffer(cls), rxEndpoint,0,error);
                 if (error)
                 {
                     std::cerr << "transmit failure on disconnect " << error.message() << '\n';

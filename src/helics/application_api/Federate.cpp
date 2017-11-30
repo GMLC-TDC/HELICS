@@ -704,8 +704,7 @@ void Federate::setFilterOperator (filter_id_t id, std::shared_ptr<FilterOperator
     coreObject->setFilterOperator (id.value (), std::move (mo));
 }
 
-void Federate::setFilterOperator (const std::vector<filter_id_t> &filter_ids,
-                                        std::shared_ptr<FilterOperator> mo)
+void Federate::setFilterOperator (const std::vector<filter_id_t> &filter_ids, std::shared_ptr<FilterOperator> mo)
 {
     for (auto id : filter_ids)
     {
@@ -732,15 +731,15 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     }
     else
     {
-		Json_helics::CharReaderBuilder rbuilder;
-		std::string errs;
-		std::istringstream jstring(jsonString);
-		bool ok = Json_helics::parseFromStream(rbuilder, jstring, &doc, &errs);
-		if (!ok)
-		{
-			// should I throw an error here?
-			return fi;
-		}
+        Json_helics::CharReaderBuilder rbuilder;
+        std::string errs;
+        std::istringstream jstring (jsonString);
+        bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
+        if (!ok)
+        {
+            // should I throw an error here?
+            return fi;
+        }
     }
 
     if (doc.isMember ("name"))

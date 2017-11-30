@@ -24,7 +24,7 @@ static const std::string stringString ("string");
 static const std::string complexString ("complex");
 static const std::string doubleVecString ("double_vector");
 static const std::string complexVecString ("complex_vector");
-static const std::string nullString ("");
+static const std::string nullString;
 
 const std::string &typeNameStringRef (helicsType_t type)
 {
@@ -384,7 +384,7 @@ data_block typeConvert (helicsType_t type, int64_t val)
     }
     case helicsType_t::helicsVector:
     {
-        double v2 = static_cast<double> (val);
+        auto v2 = static_cast<double> (val);
         return ValueConverter<double>::convert (&v2, 1);
     }
     }
@@ -546,10 +546,10 @@ data_block typeConvert (helicsType_t type, const std::vector<std::complex<double
     {
         std::vector<double> DV;
         DV.reserve (val.size () * 2);
-        for (size_t ii = 0; ii < val.size (); ++ii)
+        for (auto &vali: val)
         {
-            DV.push_back (val[ii].real ());
-            DV.push_back (val[ii].imag ());
+            DV.push_back (vali.real ());
+            DV.push_back (vali.imag ());
         }
         return ValueConverter<std::vector<double>>::convert (DV);
     }
