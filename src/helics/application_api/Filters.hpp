@@ -11,11 +11,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_FILTER_H_
 #pragma once
 
-#include "Federate.h"
+#include "MessageFederate.h"
 #include "libguarded/guarded.hpp"
 #include "libguarded/shared_guarded.hpp"
 #include "../core/core.h"
 #include <set>
+#include <mutex>
+#include "helics/helics-config.h"
 
 namespace helics
 {
@@ -92,8 +94,13 @@ class rerouteFilterOperation : public FilterOperations
 {
   private:
     std::shared_ptr<MessageDestOperator> op;  //!< the actual operator
+#ifdef HAVE_SHARED_TIMED_MUTEX
     libguarded::shared_guarded<std::string> newTarget;  //!< the target destination
     libguarded::shared_guarded<std::set<std::string>> conditions; //!< the original destination must match one of these conditions
+#else
+    libguarded::shared_guarded<std::string,std::mutex> newTarget;  //!< the target destination
+    libguarded::shared_guarded<std::set<std::string>,std::mutex> conditions; //!< the original destination must match one of these conditions
+#endif
   public:
     rerouteFilterOperation ();
     ~rerouteFilterOperation ();
@@ -101,6 +108,7 @@ class rerouteFilterOperation : public FilterOperations
     virtual void setString (const std::string &property, const std::string &val) override;
     virtual std::shared_ptr<FilterOperator> getOperator () override;
 private:
+    /** function to execute the rerouting operation*/
     std::string rerouteOperation(const std::string &dest) const;
 };
 
@@ -123,6 +131,7 @@ class Filter
 
     void setFilterOperations (std::shared_ptr<FilterOperations> filterOps);
 };
+
 /** class wrapping a source filter*/
 class SourceFilter : public Filter
 {
@@ -185,9 +194,22 @@ class DestinationFilter : public Filter
     virtual ~DestinationFilter () = default;
 };
 
+/** class used to clone message for delivery to other endpoints*/
+class cloningFilter :public Filter
+{
+public:
+    explicit cloningFilter(Core *cr);
+    explicit cloningFilter(Federate *fed);
+
+    void addSourceEndpoint(const std::string &sourceName);
+    void addDestinationEndpoint(const std::string &destinationName);
+    void addDeliveryEndpoint(const std::string &endpoint);
+};
+
+/** a set of common defined filters*/
 enum defined_filter_types
 {
-    custom = 0,
+    custom = 0,  
     delay = 1,
     randomDelay = 2,
     randomDrop = 3,

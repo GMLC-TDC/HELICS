@@ -74,7 +74,6 @@ class simpleQueue
     simpleQueue (const simpleQueue &) = delete;
     simpleQueue &operator= (const simpleQueue &) = delete;
 
-    // const functions should be thread safe
     /** check whether there are any elements in the queue
     because this is meant for multi threaded applications this may or may not have any meaning
     depending on the number of consumers

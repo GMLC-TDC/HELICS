@@ -37,6 +37,14 @@ target_link_libraries(application-api-tests helics-static)
 
 target_link_libraries(application-api-tests ${Boost_LIBRARIES_test})
 
+#add a bigobj indicator for this project
+IF(MINGW)
+target_compile_options(application-api-tests PRIVATE "-Wa,-mbig-obj")
+ENDIF(MINGW)
+
+if (MSVC)
+target_compile_options(application-api-tests PRIVATE /bigobj)
+endif(MSVC)
 
 ADD_DEFINITIONS(-DHELICS_BROKER_LOCATION="${HELICS_BROKER_LOC}")
 ADD_DEFINITIONS(-DHELICS_INSTALL_LOCATION="${CMAKE_INSTALL_PREFIX}")

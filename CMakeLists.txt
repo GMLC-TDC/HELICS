@@ -117,7 +117,7 @@ ELSE(UNIX)
 IF(MSVC)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
-  add_compile_options(/bigobj /MP)
+  add_compile_options(/MP)
   add_compile_options(-W4  /EHsc /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484)
   ADD_DEFINITIONS(-D_WIN32_WINNT=0x0601)
 ENDIF(MSVC)
@@ -165,6 +165,8 @@ endif(DOXYGEN_FOUND)
 endif (HELICS_GENERATE_DOXYGEN_DOC)
 
 FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
+
+
 # -------------------------------------------------------------
 # Enable ZeroMQ
 # -------------------------------------------------------------
@@ -243,8 +245,32 @@ target_link_libraries(helics-static ${Boost_LIBRARIES_core})
 
 include(GNUInstallDirs)
 
+# -------------------------------------------------------------
+# setting the RPATH
+# -------------------------------------------------------------
+# use, i.e. don't skip the full RPATH for the build tree
+SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+
+# when building, don't use the install RPATH already
+# (but later on when installing)
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
+
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
+# the RPATH to be used when installing, but only if it's not a system directory
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/bin" isSystemDir)
+IF("${isSystemDir}" STREQUAL "-1")
+   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
+ENDIF("${isSystemDir}" STREQUAL "-1")
+
+if (NOT USE_BOOST_STATIC_LIBS)
+list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
+endif()
 
 OPTION(BUILD_PLAYER "Build a helics player" ON)
 OPTION(BUILD_RECORDER "Build a helics recorder" ON)
@@ -270,8 +296,12 @@ IF(BUILD_CXX_SHARED_LIB)
 	add_library(helics-shared SHARED helics-static)
 endif()
 
+if (WIN32)
 FILE(GLOB KEY_LIBRARY_FILES  ${PROJECT_BINARY_DIR}/libs/bin/*)
 message(STATUS "key files ${KEY_LIBRARY_FILES}")
+else()
+set(KEY_LIBRARY_FILES "")
+endif()
 
 OPTION(DISABLE_LOGGING "disable all normal, debug, and trace logging in HELICS" OFF)
 if (NOT DISABLE_LOGGING)

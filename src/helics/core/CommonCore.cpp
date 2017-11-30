@@ -1839,9 +1839,38 @@ void CommonCore::transmitDelayedMessages ()
     auto msg = delayTransmitQueue.pop ();
     while (msg)
     {
-        msg->source_id = global_broker_id;
-        transmit (0, *msg);
+        if (msg->source_id == 0)
+        {
+            msg->source_id = global_broker_id;
+        }
+        routeMessage (*msg);
         msg = delayTransmitQueue.pop ();
+    }
+}
+
+void CommonCore::transmitDelayedMessages(federate_id_t source)
+{
+    std::vector<ActionMessage> buffer;
+    auto msg = delayTransmitQueue.pop();
+    while (msg)
+    {
+        if (msg->source_id == source)
+        {
+            routeMessage(*msg);
+        }
+        else
+        {
+            buffer.push_back(std::move(*msg));
+        }
+        msg = delayTransmitQueue.pop();
+    }
+
+    if (!buffer.empty())
+    {
+        for (auto &am : buffer)
+        {
+            delayTransmitQueue.push(std::move(am));
+        }
     }
 }
 
@@ -1894,13 +1923,27 @@ void CommonCore::processCommand (ActionMessage &&command)
             auto fed = getFederate (command.source_id);
             if (fed == nullptr)
             {
+                LOG_DEBUG(command.source_id, "core", "dropping unrecognized CMD_EXEC_*");
                 return;
             }
-            auto &dep = fed->getDependents ();
-            for (auto &fed_id : dep)
+            if (ongoingFilterActionCounter[fed->local_id] == 0)
             {
-                routeMessage (command, fed_id);
+                auto &dep = fed->getDependents();
+                for (auto &fed_id : dep)
+                {
+                    routeMessage(command, fed_id);
+                }
             }
+            else
+            {
+                auto &dep = fed->getDependents();
+                for (auto &fed_id : dep)
+                {
+                    command.dest_id = fed_id;
+                    delayTransmitQueue.push(command);
+                }
+            }
+           
         }
         else
         {
@@ -1991,7 +2034,6 @@ void CommonCore::processCommand (ActionMessage &&command)
         processMessageFilter (command);
         break;
     case CMD_PUB:
-    {
         // route the message to all the subscribers
         if (command.dest_id == 0)
         {
@@ -2014,7 +2056,6 @@ void CommonCore::processCommand (ActionMessage &&command)
         {
             routeMessage (command);
         }
-    }
     break;
 
     case CMD_LOG:
@@ -2030,6 +2071,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_ERROR:
         if (command.dest_id == global_broker_id)
         {
+            sendToLogger(0, 0, getFederateName(command.source_id), command.payload);
         }
         else
         {
@@ -2231,7 +2273,6 @@ void CommonCore::processCommand (ActionMessage &&command)
                 {  // make sure we only do this once
                     checkDependencies ();
                     command.source_id = global_broker_id;
-
                     transmit (0, command);
                 }
             }
@@ -2243,6 +2284,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         broker_state_t exp = initializing;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::operating))
         {  // forward the grant to all federates
+            ongoingFilterActionCounter.resize(_federates.size());
             for (auto &fed : _federates)
             {
                 organizeFilterOperations ();

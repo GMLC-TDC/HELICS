@@ -87,6 +87,10 @@ public:
 	/** move a action Message into the commandQueue*/
 	void addActionMessage(ActionMessage &&m);
 
+    /** set the logging callback function
+    @param logFunction a function with a signature of void(int level,  const std::string &source,  const std::string &message)
+    the function takes a level indicating the logging level string with the source name and a string with the message
+    */
 	void setLoggerFunction(std::function<void(int, const std::string &, const std::string &)> logFunction);
 
     /* process a disconnect signal*/

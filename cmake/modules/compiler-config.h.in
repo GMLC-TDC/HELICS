@@ -53,5 +53,7 @@
 
 #cmakedefine HAVE_HYPOT3
 
+#cmakedefine HAVE_SHARED_TIMED_MUTEX
+
 #endif // COMPILER_CONFIG_H
 

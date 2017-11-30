@@ -57,12 +57,14 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     BOOST_CHECK_EQUAL (vFed1->query ("test2", "isinit"), "true");
 
     BOOST_CHECK_EQUAL (vFed1->query ("test2", "publications"), "[test2/pub3]");
+    vFed1->finalize();
+    vFed2->finalize();
 }
 
 #if ENABLE_TEST_TIMEOUTS>0 
  BOOST_TEST_DECORATOR (*utf::timeout(5))
  #endif
-BOOST_AUTO_TEST_CASE (test_broker_queries)
+BOOST_DATA_TEST_CASE (test_broker_queries,bdata::make(core_types), core_type)
 {
     Setup2FederateTest ("test_2");
     auto core = vFed1->getCorePointer ();
@@ -73,6 +75,8 @@ BOOST_AUTO_TEST_CASE (test_broker_queries)
     str.append (vFed2->getName ());
     str.push_back (']');
     BOOST_CHECK_EQUAL (res, "[test1;test2]");
+    vFed1->finalize();
+    vFed2->finalize();
 }
 
 #if ENABLE_TEST_TIMEOUTS>0 
@@ -100,5 +104,7 @@ BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), co
     BOOST_CHECK_EQUAL (rvec[0], "test1/pub1");
     BOOST_CHECK_EQUAL (rvec[1], "test2/pub2");
     BOOST_CHECK_EQUAL (rvec[2], "test2/pub3");
+    vFed1->finalize();
+    vFed2->finalize();
 }
 BOOST_AUTO_TEST_SUITE_END ()

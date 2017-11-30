@@ -129,6 +129,7 @@ CommonCore(const std::string &core_name);
  virtual bool connect() override final;
  virtual bool isConnected() const override final;
  virtual void disconnect() override final;
+ /** unregister the core from any process find functions*/
  void unregister();
  virtual void processDisconnect(bool skipUnregister = false) override final;
 private:
@@ -174,7 +175,6 @@ protected:
   /** check if all federates have said good-bye*/
   bool allDisconnected() const;
 
-
   virtual bool sendToLogger(federate_id_t federateID, int logLevel, const std::string &name, const std::string &message) const override;
 private:
 	std::string prevIdentifier;  //!< storage for the case of requiring a renaming
@@ -186,6 +186,11 @@ private:
 
 	/** actually transmit messages that were delayed until the core was actually registered*/
 	void transmitDelayedMessages();
+
+    /** actually transmit messages that were delayed for a particular source
+    @param[*/
+    void transmitDelayedMessages(Core::federate_id_t source);
+
 	/**function for doing the actual routing either to a local fed or up the broker chain*/
 	void routeMessage(ActionMessage &cmd, federate_id_t dest);
 	/** function for routing a message from based on the destination specified in the ActionMessage*/
@@ -213,11 +218,11 @@ protected:
 	
 	int32_t _global_federation_size = 0;  //!< total size of the federation
     bool hasLocalFilters = false;
+    
 	std::vector<std::unique_ptr<FederateState>> _federates; //!< local federate information
-														  //using pointers to minimize time in a critical section- though this should be timed more in the future
+    std::vector<int> ongoingFilterActionCounter;  //!< counter for the number of ongoing filter transactions for a federate													  //using pointers to minimize time in a critical section- though this should be timed more in the future
   std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
   std::atomic<Core::Handle> handleCounter{ 1 };	//!< counter for the handle index
-  
   std::unordered_map<std::string, Handle> publications;	//!< map of all local publications
   std::unordered_map<std::string, Handle> endpoints;	//!< map of all local endpoints
   std::unordered_map<std::string, federate_id_t> federateNames;  //!< map of federate names to id
