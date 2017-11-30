@@ -146,7 +146,7 @@ endif (${MPI_C_FOUND})
 source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
 source_group("udp" FILES ${UDP_SOURCE_FILES} ${UDP_HEADER_FILES})
 source_group("ipc" FILES ${IPC_SOURCE_FILES} ${IPC_HEADER_FILES})
-source_group("tcp" FILEs ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
+source_group("tcp" FILES ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
 
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 

@@ -8,13 +8,13 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "UdpCore.h"
+#include "TcpCore.h"
 
 #include "helics/helics-config.h"
 #include "../core-data.h"
 #include "../core.h"
 #include "../helics-time.h"
-#include "UdpComms.h"
+#include "TcpComms.h"
 
 #include <algorithm>
 #include <cassert>
@@ -35,13 +35,13 @@ static const argDescriptors extraArgs{
   {"port"s, "int"s, "port number for the broker's priority port"s},
 };
 
-UdpCore::UdpCore () noexcept {}
+TcpCore::TcpCore () noexcept {}
 
-UdpCore::~UdpCore() = default;
+TcpCore::~TcpCore() = default;
 
-UdpCore::UdpCore (const std::string &core_name) : CommsBroker (core_name) {}
+TcpCore::TcpCore (const std::string &core_name) : CommsBroker (core_name) {}
 
-void UdpCore::InitializeFromArgs (int argc, const char *const *argv)
+void TcpCore::InitializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == created)
@@ -70,7 +70,7 @@ void UdpCore::InitializeFromArgs (int argc, const char *const *argv)
                     // TODO::Print a message?
                 }
             }
-            if ((brokerAddress == "*") || (brokerAddress == "udp"))
+            if ((brokerAddress == "*") || (brokerAddress == "tcp"))
             {  // the broker address can't use a wild card
                 brokerAddress = "localhost";
             }
@@ -102,14 +102,14 @@ void UdpCore::InitializeFromArgs (int argc, const char *const *argv)
     }
 }
 
-bool UdpCore::brokerConnect ()
+bool TcpCore::brokerConnect ()
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     if (brokerAddress.empty ())  // cores require a broker
     {
         brokerAddress = "localhost";
     }
-    comms = std::make_unique<UdpComms> (localInterface, brokerAddress);
+    comms = std::make_unique<TcpComms> (localInterface, brokerAddress);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
     if (PortNumber > 0)
@@ -132,7 +132,7 @@ bool UdpCore::brokerConnect ()
     return res;
 }
 
-std::string UdpCore::getAddress () const
+std::string TcpCore::getAddress () const
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     if (comms)
