@@ -95,7 +95,7 @@ script:
   - mkdir build && cd build
   - export HELICS_DEPENDENCY_FLAGS="-DZMQ_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/zmq -DBOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost"
   - export HELICS_OPTION_FLAGS="-DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON"
-  - if [[ $COMPILER != "g++-6" ]]; then export HELICS_OPTIONS_FLAGS += "-DQUICK_TESTS_ONLY=ON" ;fi
+  - if [[ $COMPILER != "g++-6" ]]; then export HELICS_OPTIONS_FLAGS+="-DQUICK_TESTS_ONLY=ON" ;fi
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
   - make
   - ctest -I 0,0,0,1,2,4
