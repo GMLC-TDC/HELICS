@@ -98,7 +98,7 @@ script:
   - if [[ $COMPILER != "g++-6" ]]; then export HELICS_OPTIONS_FLAGS+="-DQUICK_TESTS_ONLY=ON" ;fi
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
   - make
-  - ctest -I 0,0,0,1,2,4
+  - ctest --verbose -I 0,0,0,1,2,4
 
 notifications:
     email: false
