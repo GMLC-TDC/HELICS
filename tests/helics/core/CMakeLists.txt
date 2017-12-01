@@ -51,7 +51,7 @@ target_link_libraries(core-tests ${Boost_LIBRARIES_test})
 IF(MINGW)
 target_link_libraries(core-tests ws2_32)
 ENDIF(MINGW)
-add_test(NAME core-tests COMMAND core-tests)
+add_test(NAME core-tests COMMAND core-tests --log_level=warning --report_level=detailed)
 
 #-----------------------------------------------------------------------------
 # Setup CTEST environment
