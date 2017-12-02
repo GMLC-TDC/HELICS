@@ -430,5 +430,10 @@ class InvalidParameterValue : public std::runtime_error
   public:
     InvalidParameterValue (const char *s) noexcept : std::runtime_error (s) {}
 };
+
+/** function to do some housekeeping work
+@details this runs some cleanup routines and tries to close out any residual thread that haven't been shutdown
+yet*/
+void cleanupHelicsLibrary();
 } //namespace helics
 #endif

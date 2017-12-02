@@ -9,7 +9,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "Federate.h"
+#include "../core/BrokerFactory.h"
 #include "../core/CoreFactory.h"
+
 #include "../core/core.h"
 #include "asyncFedCallInfo.h"
 #include "helics/helics-config.h"
@@ -47,6 +49,12 @@ int getHelicsVersionMajor () { return HELICS_VERSION_MAJOR; }
 
 int getHelicsVersionMinor () { return HELICS_VERSION_MINOR; }
 int getHelicsVersionPatch () { return HELICS_VERSION_PATCH; }
+
+void cleanupHelicsLibrary ()
+{
+    BrokerFactory::cleanUpBrokers ();
+    CoreFactory::cleanUpCores ();
+}
 
 Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
 {

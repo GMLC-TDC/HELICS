@@ -124,6 +124,10 @@ ENDIF(MSVC)
   ENDIF(MINGW)
 ENDIF(UNIX)
 
+IF (BUILD_MATLAB OR USE_BOOST_STATIC_LIBS)
+  set(Boost_USE_STATIC_LIBS ON)
+ENDIF ()
+
 # -------------------------------------------------------------
 # Check and set latest CXX Standard supported by compiler
 # -------------------------------------------------------------

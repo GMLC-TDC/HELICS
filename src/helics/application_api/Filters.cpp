@@ -74,22 +74,60 @@ void Filter::setOperator (std::shared_ptr<FilterOperator> mo)
 void Filter::setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
 {
     filtOp = std::move (filterOps);
-    if (corePtr)
+    if (corePtr != nullptr)
     {
         corePtr->setFilterOperator (id, filtOp->getOperator ());
     }
 }
 
-SourceFilter::SourceFilter (Federate *mFed,
+static const std::string nullStr;
+
+const std::string &Filter::getTarget () const
+{
+    if (corePtr != nullptr)
+    {
+        return corePtr->getTarget (id);
+    }
+    return nullStr;
+}
+
+const std::string &Filter::getName () const
+{
+    if (corePtr != nullptr)
+    {
+        return corePtr->getHandleName (id);
+    }
+    return nullStr;
+}
+
+const std::string &Filter::getInputType () const
+{
+    if (corePtr != nullptr)
+    {
+        return corePtr->getType (id);
+    }
+    return nullStr;
+}
+
+const std::string &Filter::getOutputType () const
+{
+    if (corePtr != nullptr)
+    {
+        return corePtr->getOutputType (id);
+    }
+    return nullStr;
+}
+
+SourceFilter::SourceFilter (Federate *fed,
                             const std::string &target,
                             const std::string &name,
                             const std::string &input_type,
                             const std::string &output_type)
-    : Filter (mFed)
+    : Filter (fed)
 {
-    if (mFed != nullptr)
+    if (fed != nullptr)
     {
-        fid = mFed->registerSourceFilter (name, target, input_type, output_type);
+        fid = fed->registerSourceFilter (name, target, input_type, output_type);
         id = fid.value ();
     }
 }
@@ -108,16 +146,16 @@ SourceFilter::SourceFilter (Core *cr,
     }
 }
 
-DestinationFilter::DestinationFilter (Federate *mFed,
+DestinationFilter::DestinationFilter (Federate *fed,
                                       const std::string &target,
                                       const std::string &name,
                                       const std::string &input_type,
                                       const std::string &output_type)
-    : Filter (mFed)
+    : Filter (fed)
 {
-    if (mFed != nullptr)
+    if (fed != nullptr)
     {
-        fid = mFed->registerDestinationFilter (name, target, input_type, output_type);
+        fid = fed->registerDestinationFilter (name, target, input_type, output_type);
         id = fid.value ();
     }
 }
@@ -165,9 +203,9 @@ make_destination_filter (defined_filter_types type, Core *cr, const std::string 
 }
 
 std::unique_ptr<SourceFilter>
-make_Source_filter (defined_filter_types type, Federate *mFed, const std::string &target, const std::string &name)
+make_Source_filter (defined_filter_types type, Federate *fed, const std::string &target, const std::string &name)
 {
-    auto sfilt = std::make_unique<SourceFilter> (mFed, target, name);
+    auto sfilt = std::make_unique<SourceFilter> (fed, target, name);
     addOperations (sfilt.get (), type);
     return sfilt;
 }

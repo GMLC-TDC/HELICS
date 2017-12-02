@@ -31,6 +31,12 @@ class FilterOperations
   public:
     FilterOperations () = default;
     virtual ~FilterOperations () = default;
+    // still figuring out if these functions have a use or not
+    FilterOperations (const FilterOperations &fo) = delete;
+    FilterOperations (FilterOperations &&fo) = delete;
+    FilterOperations &operator= (const FilterOperations &fo) = delete;
+    FilterOperations &operator= (FilterOperations &&fo) = delete;
+
     /** set a property on a filter
     @param property the name of the property of the filter to change
     @param val the numerical value of the property
@@ -52,7 +58,7 @@ class delayFilterOperation : public FilterOperations
     std::shared_ptr<MessageTimeOperator> td;
 
   public:
-    delayFilterOperation (Time delayTime = timeZero);
+    explicit delayFilterOperation (Time delayTime = timeZero);
     virtual void set (const std::string &property, double val) override;
     virtual std::shared_ptr<FilterOperator> getOperator () override;
 };
@@ -125,7 +131,7 @@ class Filter
     std::shared_ptr<FilterOperations> filtOp;  //!< a class running any specific operation of the Filter
   public:
     Filter () = default;
-    explicit Filter (Federate *mfed);
+    explicit Filter (Federate *fed);
     explicit Filter (Core *cr);
     virtual ~Filter () = default;
 
@@ -133,6 +139,17 @@ class Filter
     void setOperator (std::shared_ptr<FilterOperator> mo);
 
     void setFilterOperations (std::shared_ptr<FilterOperations> filterOps);
+    filter_id_t getID () const { return fid; }
+    Core::Handle getCoreHandle () const { return id; }
+
+    /** get the target of the filter*/
+    const std::string &getTarget () const;
+    /** get the name for the filter*/
+    const std::string &getName () const;
+    /** get the specified input type of the filter*/
+    const std::string &getInputType () const;
+    /** get the specified output type of the filter*/
+    const std::string &getOutputType () const;
 };
 
 /** class wrapping a source filter*/
@@ -140,19 +157,19 @@ class SourceFilter : public Filter
 {
   public:
     /**constructor to build an source filter object
-    @param[in] mFed  the Federate to use
+    @param[in] fed  the Federate to use
     @param[in] target the endpoint the filter is targeting
     @param[in] name the name of the filter
     @param[in] input_type the type of data the filter is expecting
     @param[in] output_type the type of data the filter is generating
     */
-    SourceFilter (Federate *mFed,
+    SourceFilter (Federate *fed,
                   const std::string &target,
                   const std::string &name = "",
                   const std::string &input_type = "",
                   const std::string &output_type = "");
     /**constructor to build an source filter object
-    @param[in] mFed  the Federate to use
+    @param[in] fed  the Federate to use
     @param[in] target the endpoint the filter is targeting
     @param[in] name the name of the filter
     @param[in] input_type the type of data the filter is expecting
@@ -171,13 +188,13 @@ class DestinationFilter : public Filter
 {
   public:
     /**constructor to build an destination filter object
-    @param[in] mFed  the MessageFederate to use
+    @param[in] fed  the MessageFederate to use
     @param[in] target the endpoint the filter is targeting
     @param[in] name the name of the filter
     @param[in] input_type the type of data the filter is expecting
     @param[in] output_type the type of data the filter is generating
     */
-    DestinationFilter (Federate *mFed,
+    DestinationFilter (Federate *fed,
                        const std::string &target,
                        const std::string &name = "",
                        const std::string &input_type = "",

@@ -152,7 +152,7 @@ std::string helicsComplexString (std::complex<double> val)
 }
 
 const std::regex creg (
-    R"(([+-]?(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?)\s*([+-]\s*(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?)[ji]*)");
+  R"(([+-]?(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?)\s*([+-]\s*(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?)[ji]*)");
 
 std::complex<double> helicsGetComplex (const std::string &val)
 {

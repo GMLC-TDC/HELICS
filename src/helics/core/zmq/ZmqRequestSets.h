@@ -58,7 +58,8 @@ class ZmqRequestSets
     bool hasMessages () const;
     /** get any messages that have been received*/
     stx::optional<ActionMessage> getMessage ();
-
+    /** close all the sockets*/
+    void close();
   private:
     /** check to send any messages that have been delayed waiting for a previous send*/
     void SendDelayedMessages ();

@@ -546,7 +546,7 @@ data_block typeConvert (helicsType_t type, const std::vector<std::complex<double
     {
         std::vector<double> DV;
         DV.reserve (val.size () * 2);
-        for (auto &vali: val)
+        for (auto &vali : val)
         {
             DV.push_back (vali.real ());
             DV.push_back (vali.imag ());

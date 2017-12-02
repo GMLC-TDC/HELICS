@@ -45,11 +45,18 @@ class DelayedDestructor
             {
                 if (ii > 20)
                 {
-                    std::cerr << "error: unable to destroy all objects giving up\n";
+                    std::cerr << "error: unable to destroy all objects giving up" << std::endl;
                     destroyObjects ();
                     break;
                 }
-                std::this_thread::sleep_for (std::chrono::milliseconds (100));
+                if (ii % 2 == 0)
+                {
+                    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+                }
+                else
+                {
+                    std::this_thread::yield ();
+                }
             }
         }
     }

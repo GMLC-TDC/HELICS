@@ -14,7 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 
-BOOST_FIXTURE_TEST_SUITE (query_tests_value, ValueFederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE (query_tests, ValueFederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 #if ENABLE_TEST_TIMEOUTS > 0
@@ -77,6 +77,9 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     str.append (vFed2->getName ());
     str.push_back (']');
     BOOST_CHECK_EQUAL (res, "[test1;test2]");
+    vFed1->enterInitializationStateAsync ();
+    vFed2->enterInitializationState ();
+    vFed1->enterInitializationStateFinalize ();
     vFed1->finalize ();
     vFed2->finalize ();
 }

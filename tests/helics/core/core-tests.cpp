@@ -14,4 +14,20 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define BOOST_TEST_MODULE core_tests
 #define BOOST_TEST_DETECT_MEMORY_LEAK 0
 
+#include <helics/core/BrokerFactory.h>
+#include <helics/core/CoreFactory.h>
 #include <boost/test/unit_test.hpp>
+
+struct globalTestConfig
+{
+    globalTestConfig () {}
+    ~globalTestConfig ()
+    {
+        helics::CoreFactory::cleanUpCores ();
+        helics::BrokerFactory::cleanUpBrokers ();
+    }
+};
+
+//____________________________________________________________________________//
+
+BOOST_GLOBAL_FIXTURE (globalTestConfig);

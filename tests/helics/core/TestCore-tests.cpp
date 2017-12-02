@@ -101,6 +101,8 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
     BOOST_CHECK (valueUpdates.empty ());
     core->finalize (id);
     core->disconnect ();
+    core = nullptr;
+    helics::CoreFactory::cleanUpCores ();
 }
 
 BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
@@ -146,6 +148,8 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
     BOOST_CHECK_EQUAL (str1, str2);
     BOOST_CHECK_EQUAL (msg->data.size (), str1.size ());
     core->disconnect ();
+    core = nullptr;
+    helics::CoreFactory::cleanUpCores ();
 }
 
 BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
@@ -209,6 +213,8 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     auto res = msg->data.to_string ();
     BOOST_CHECK_EQUAL (res.compare (0, 11, "jello world"), 0);
     core->disconnect ();
+    core = nullptr;
+    helics::CoreFactory::cleanUpCores ();
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
