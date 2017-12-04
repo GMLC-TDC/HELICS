@@ -1883,10 +1883,12 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_IGNORE:
         break;
     case CMD_TICK:
+        std::cerr<<"got tick"<<std::endl;
         if (waitingForServerPingReply)
         {
             // try to reset the connection to the broker
             // brokerReconnect()
+            std::cerr<<"lost connection"<<std::endl;
             LOG_ERROR (global_broker_id, getIdentifier (), "lost connection with server");
         }
         else
