@@ -71,6 +71,7 @@ void IpcComms::queue_rx_function ()
                 ipcbackchannel = 0;
                 return;
             }
+            ipcbackchannel = 0;
             break;
         }
         auto cmdopt = rxQueue.getMessage (2000);
