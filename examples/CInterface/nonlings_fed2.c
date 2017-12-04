@@ -3,7 +3,7 @@
 #include <ValueFederate_c.h>
 #include <math.h>
 
-int main(int argc,char **argv)
+int main()
 {
   helics_federate_info_t fedinfo;
   const char*    helicsversion;

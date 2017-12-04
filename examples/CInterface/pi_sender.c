@@ -12,7 +12,7 @@ static char help[] = " PI SENDER: Simple program to demonstrate the usage of HEL
 #include <unistd.h>
 #endif
 
-int main(int argc,char **argv)
+int main()
 {
   helics_federate_info_t fedinfo;
   const char*    helicsversion;
