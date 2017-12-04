@@ -10,7 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "helicsTypes.hpp"
-#include "application_api/ValueConverter.hpp"
+#include "ValueConverter.hpp"
 #include <map>
 #include <regex>
 #include <boost/algorithm/string/trim.hpp>
@@ -53,15 +53,7 @@ std::string helicsComplexString (double real, double imag)
     ss << real;
     if (imag != 0.0)
     {
-        if (imag >= 0.0)
-        {
-            ss << '+' << imag;
-        }
-        else
-        {
-            ss << imag;
-        }
-        ss << 'j';
+        ss << ((imag >= 0.0) ? '+' : ' ') << imag << 'j';
     }
     return ss.str ();
 }
@@ -81,6 +73,14 @@ static const std::map<std::string, helicsType_t> typeMap{
   {"int", helicsType_t::helicsInt},
   {"int64", helicsType_t::helicsInt},
   {"complex_vector", helicsType_t::helicsComplexVector},
+  {"d", helicsType_t::helicsDouble},
+  {"s", helicsType_t::helicsString},
+  {"f", helicsType_t::helicsDouble},
+  {"v", helicsType_t::helicsVector},
+  {"c", helicsType_t::helicsComplex},
+  {"i", helicsType_t::helicsInt},
+  {"i64", helicsType_t::helicsInt},
+  {"cv", helicsType_t::helicsComplexVector},
 };
 
 helicsType_t getTypeFromString (const std::string &typeName)

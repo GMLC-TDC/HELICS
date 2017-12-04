@@ -59,4 +59,7 @@ while(currenttime <= 0.19):
     prevtime = currenttime
 
 status = h.helicsFinalize(vfed)
+
+h.helicsFreeFederate(vfed)
+h.helicsCloseLibrary()
 print("PI RECEIVER: Federate finalized")

@@ -13,6 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #pragma once
 
 #include "TimeDependencies.h"
+#include "coreFederateInfo.h"
 #include "ActionMessage.h"
 #include <atomic>
 #include <functional>
@@ -30,7 +31,7 @@ private:
 	Time time_minminDe = timeZero;  //!< the minimum  of the minimum dependency event Time
 	Time time_minDe = timeZero;  //!< the minimum event time of the dependencies
 	Time time_allow = Time::minVal();  //!< the current allowable time 
-	Time time_exec = Time::maxVal();  //!< the time of the next targetted execution
+	Time time_exec = Time::maxVal();  //!< the time of the next targeted execution
 	Time time_message = Time::maxVal();	//!< the time of the earliest message event
 	Time time_value = Time::maxVal();	//!< the time of the earliest value event
 
@@ -44,7 +45,7 @@ public:
 	bool iterating=false; //!< indicator that the coordinator should be iterating if need be
 	bool checkingExec = false; //!< flag indicating that the coordinator is trying to enter the exec mode
 	bool executionMode = false;	//!< flag that the coordinator has entered the execution Mode
-	bool hasInitUpdates = false;//!< flag indicating that a value or message was received during init stage
+	bool hasInitUpdates = false;//!< flag indicating that a value or message was received during initialization stage
 private:
 	std::atomic<int32_t> iteration{ 0 };  //!< iteration counter
 public:
@@ -110,6 +111,10 @@ public:
 	*/
 	bool processTimeMessage(ActionMessage &cmd);
 
+    /** process a message related to configuration
+    */
+    void processConfigUpdateMessage(const ActionMessage &cmd);
+
 	/** add a federate dependency
 	@return true if it was actually added, false if the federate was already present
 	*/
@@ -123,13 +128,15 @@ public:
 	void removeDependent(Core::federate_id_t fedID);
 
 	/** check if entry to the executing state can be granted*/
-	convergence_state checkExecEntry();
+	iteration_state checkExecEntry();
 	
 
-	void timeRequest(Time nextTime, convergence_state converged, Time newValueTime, Time newMessageTime);
-	void enteringExecMode(convergence_state mode);
+	void timeRequest(Time nextTime, iteration_request iterate, Time newValueTime, Time newMessageTime);
+	void enteringExecMode(iteration_request mode);
 	/** check if it is valid to grant a time*/
-	convergence_state checkTimeGrant();
+	iteration_state checkTimeGrant();
+    /** generate a string with the current time status*/
+    std::string printTimeStatus() const;
 };
 }
 

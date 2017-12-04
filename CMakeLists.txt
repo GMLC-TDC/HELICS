@@ -5,7 +5,7 @@ project (HELICS)
 # HELICS Version number
 #-----------------------------------------------------------------------------
 set (HELICS_VERSION_MAJOR 0)
-set (HELICS_VERSION_MINOR 3)
+set (HELICS_VERSION_MINOR 9)
 set (HELICS_VERSION_PATCH 0)
 
 set (HELICS_DATE "10-16-17")
@@ -32,10 +32,7 @@ ENDIF(BUILD_SHARED_LIBS)
 #-----------------------------------------------------------------------------
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
-include_directories ("${PROJECT_BINARY_DIR}/include")
-include_directories ("${PROJECT_SOURCE_DIR}/src")
 include_directories ("${PROJECT_SOURCE_DIR}/ThirdParty")
-include_directories ("${PROJECT_SOURCE_DIR}/src/helics")
 include_directories ("${PROJECT_BINARY_DIR}/libs/include")
 
 # -------------------------------------------------------------
@@ -109,22 +106,33 @@ IF(MSVC)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
   add_compile_options(/bigobj)
   add_compile_options(-W4  /EHsc /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484)
+  ADD_DEFINITIONS(-D_WIN32_WINNT=0x0601)
 ENDIF(MSVC)
   ENDIF(MINGW)
 ENDIF(UNIX)
 
 # -------------------------------------------------------------
-# Get some configuration for C++17 as that becomes available
+# Check and set latest CXX Standard supported by compiler
 # -------------------------------------------------------------
-#message(STATUS ${CMAKE_CXX_FLAGS})
-include(configGenerator)
-
+include(CheckLatestCXXStandardOption)
 IF (VERSION_OPTION)
-	add_compile_options(${VERSION_OPTION})
+	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
 ELSE ()
 set(CMAKE_CXX_STANDARD 14)
 ENDIF ()
 
+# -------------------------------------------------------------
+# add threading support
+# -------------------------------------------------------------
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
+# -------------------------------------------------------------
+# Get some configuration for C++17 as that becomes available
+# -------------------------------------------------------------
+#message(STATUS ${CMAKE_CXX_FLAGS})
+set(CONFIGURE_TARGET_LOCATION ${PROJECT_BINARY_DIR}/libs/include/helics/)
+include(configGenerator)
 
 option (HELICS_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
 
@@ -141,14 +149,6 @@ if(DOXYGEN_FOUND)
 )
 endif(DOXYGEN_FOUND)
 endif (HELICS_GENERATE_DOXYGEN_DOC)
-# -------------------------------------------------------------
-# finding glog
-# -------------------------------------------------------------
-#find_package (glog)
-#if (${GLOG_FOUND})
-#    set(HELICS_HAVE_GLOG TRUE)
-#    include_directories("${GLOG_INCLUDE_DIRS}")
-#endif (${GLOG_FOUND})
 
 # -------------------------------------------------------------
 # finding ZMQ
@@ -206,119 +206,11 @@ if (${MPI_C_FOUND})
 endif (${MPI_C_FOUND})
 ENDIF(MPI_ENABLE)
 
-# -------------------------------------------------------------
-# add threading support
-# -------------------------------------------------------------
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
+
 # -------------------------------------------------------------
 # BOOST  find the boost libraries
 # -------------------------------------------------------------
-
-IF (MSVC)
-
-set( boost_paths
-C:/boost_1_65_1
- C:/boost_1_64_0
-C:/boost_1_63_0
-C:/boost_1_61_0
-)
-IF (IS_DIRECTORY C:/boost)
-list(APPEND boost_paths
-C:/boost/boost_1_65_1
- C:/boost/boost_1_64_0
-C:/boost/boost_1_63_0
-C:/boost/boost_1_61_0
-)
-ENDIF()
-
-IF (IS_DIRECTORY C:/local)
-list(APPEND boost_paths
-C:/local/boost_1_65_1
- C:/local/boost_1_64_0
-C:/local/boost_1_63_0
-C:/local/boost_1_61_0
-)
-ENDIF()
-
-
-IF (EXISTS D:/)
-list(APPEND boost_paths
-D:/boost_1_65_1
- D:/boost_1_64_0
-D:/boost_1_63_0
-D:/boost_1_61_0
-)
-IF (IS_DIRECTORY D:/boost)
-list(APPEND boost_paths
-D:/boost/boost_1_65_1
- D:/boost/boost_1_64_0
-D:/boost/boost_1_63_0
-D:/boost/boost_1_61_0
-)
-ENDIF()
-
-IF (IS_DIRECTORY D:/local)
-list(APPEND boost_paths
-D:/local/boost_1_65_1
- D:/local/boost_1_64_0
-D:/local/boost_1_63_0
-D:/local/boost_1_61_0
-)
-ENDIF()
-
-ENDIF()
-
- message(STATUS ${boost_paths})
-
-find_path(BOOST_TEST_PATH
-			NAMES 			boost/version.hpp
-			PATHS		${boost_paths}
-		)
-
-		if (BOOST_TEST_PATH)
-		set(BOOST_ROOT ${BOOST_TEST_PATH})
-		endif(BOOST_TEST_PATH)
-ENDIF(MSVC)
-
-SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
-
-if (${MPI_C_FOUND})
-  #find_package(Boost COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
-  find_package(Boost COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
-ELSE(${MPI_C_FOUND})
-  find_package(Boost COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
-ENDIF(${MPI_C_FOUND})
-
-mark_as_advanced(CLEAR BOOST_ROOT)
-
-message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR}")
-message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS}")
-message(STATUS "Using Boost libraries : ${Boost_LIBRARIES}")
-set(modifier,"")
-foreach(loop_var ${Boost_LIBRARIES})
-	if (${loop_var} MATCHES "debug")
-		list(INSERT modifier 0 ${loop_var})
-	elseif(${loop_var} MATCHES "optimized")
-		list(INSERT modifier 0 ${loop_var})
-	else()
-		message("Boost_LIBRARIES ${loop_var}")
-		if(${loop_var} MATCHES "unit_test")
-			list(APPEND Boost_LIBRARIES_test ${modifier} ${loop_var})
-		else()
-			list(APPEND Boost_LIBRARIES_core ${modifier} ${loop_var})
-		endif()
-		list(LENGTH modifier modifier_size)
-		if (modifier_size GREATER 0)
-		list(REMOVE_AT modifier -1)
-		endif()
-	endif()
-endforeach(loop_var)
-
-message(STATUS "Using Boost core libraries : ${Boost_LIBRARIES_core}")
-message(STATUS "Using Boost test libraries : ${Boost_LIBRARIES_test}")
-list(APPEND external_library_list ${Boost_LIBRARIES_core})
-list(APPEND external_link_directories ${Boost_LIBRARY_DIRS})
+include(addBoost)
 
 add_library(helics STATIC
     $<TARGET_OBJECTS:application_api>
@@ -329,6 +221,7 @@ target_link_libraries(helics Threads::Threads)
 IF (UNIX AND NOT APPLE)
 target_link_libraries(helics rt)
 ENDIF()
+
 
 if (${ZMQ_FOUND})
    target_link_libraries(helics ${ZMQ_LIBRARY})
@@ -343,7 +236,11 @@ if (${MPI_C_FOUND})
 endif (${MPI_C_FOUND})
 
 
-install (TARGETS helics DESTINATION lib)
+install (TARGETS helics DESTINATION lib/helics EXPORT helics-targets)
+install (EXPORT helics-targets DESTINATION lib/helics)
+
+OPTION(BUILD_PLAYER "Build a helics player" ON)
+OPTION(BUILD_RECORDER "Build a helics recorder" ON)
 
 # we aren't ready for this for the whole library yet
 IF(BUILD_SHARED_LIBS)
@@ -359,15 +256,21 @@ ENDIF(BUILD_SHARED_LIBS)
 FILE(GLOB KEY_LIBRARY_FILES  ${PROJECT_BINARY_DIR}/libs/bin/*)
 message(STATUS "key files ${KEY_LIBRARY_FILES}")
 
+OPTION(DISABLE_LOGGING "disable all normal, debug, and trace logging in HELICS" OFF)
+if (NOT DISABLE_LOGGING)
+OPTION(DISABLE_TRACE_LOGGING "disable trace logging" OFF)
+OPTION(DISABLE_DEBUG_LOGGING "disable debug logging" OFF)
+endif()
+
 #-----------------------------------------------------------------------------
 # Setup configure.h file for accessing configure options
 #-----------------------------------------------------------------------------
 configure_file (
-  "src/helics/config.h.in"
-  "include/helics/config.h"
+  "helics-config.h.in"
+  "${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h"
   )
-  install(FILES ${CMAKE_BINARY_DIR}/include/helics/config.h DESTINATION include/helics)
-
+  install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h DESTINATION include/helics)
+  install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/compiler-config.h DESTINATION include/helics)
   install(DIRECTORY ThirdParty/ DESTINATION include
 	  FILES_MATCHING PATTERN "helics_includes/*.h*")
 #-----------------------------------------------------------------------------

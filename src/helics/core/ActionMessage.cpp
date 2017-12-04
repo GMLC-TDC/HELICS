@@ -152,14 +152,25 @@ using archiver = cereal::PortableBinaryOutputArchive;
 
 using retriever = cereal::PortableBinaryInputArchive;
 
-void ActionMessage::toByteArray (char *data, size_t buffer_size) const
+int ActionMessage::toByteArray(char *data, size_t buffer_size) const
 {
-    boost::iostreams::basic_array_sink<char> sr (data, buffer_size);
-    boost::iostreams::stream<boost::iostreams::basic_array_sink<char>> s (sr);
+    if ((data == nullptr) || (buffer_size == 0))
+    {
+        return -1;
+    }
+    boost::iostreams::basic_array_sink<char> sr(data, buffer_size);
+    boost::iostreams::stream<boost::iostreams::basic_array_sink<char>> s(sr);
 
-    archiver oa (s);
-
-    save (oa);
+    archiver oa(s);
+    try
+    {
+        save(oa);
+        return static_cast<int>(boost::iostreams::seek(s, 0, std::ios_base::cur));
+    }
+    catch (const std::ios_base::failure &)
+    {
+        return -1;
+   }
 }
 
 std::string ActionMessage::to_string () const
@@ -253,17 +264,13 @@ std::unique_ptr<Message> createMessage (ActionMessage &&cmd)
     return msg;
 }
 
-bool isPriorityCommand (const ActionMessage &command)
-{
-    return (command.action () < action_message_def::action_t::cmd_ignore);
-}
-
 constexpr char nullStr[] = "unknown";
 
 constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
   // priority commands
   {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
   {action_message_def::action_t::cmd_disconnect, "disconnect"},
+  {action_message_def::action_t::cmd_disconnect_name, "disconnect by name"},
   {action_message_def::action_t::cmd_fed_ack, "fed_ack"},
 
   {action_message_def::action_t::cmd_broker_ack, "broker_ack"},
@@ -277,7 +284,7 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_reg_broker, "reg_broker"},
 
   {action_message_def::action_t::cmd_ignore, "ignore"},
-
+  { action_message_def::action_t::cmd_fed_configure, "fed_configure" },
   {action_message_def::action_t::cmd_init, "init"},
   {action_message_def::action_t::cmd_init_grant, "init_grant"},
   {action_message_def::action_t::cmd_init_not_ready, "init_not_ready"},
@@ -329,22 +336,23 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_protocol, "protocol"},
   {action_message_def::action_t::cmd_protocol_big, "protocol_big"}};
 
-constexpr size_t actEnd = sizeof (actionStrings) / sizeof (std::pair<action_message_def::action_t, const char *>);
+using actionPair = std::pair<action_message_def::action_t, const char *>;
+constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
 
-std::string actionMessageType (action_message_def::action_t action)
+const char * actionMessageType (action_message_def::action_t action)
 {
-    auto res = std::find_if (actionStrings, actionStrings + actEnd,
-                             [action](const auto &pt) { return (pt.first == action); });
-    if (res != actionStrings + actEnd)
+    auto pptr = static_cast<const actionPair *> (actionStrings);
+    auto res = std::find_if (pptr, pptr + actEnd, [action](const auto &pt) { return (pt.first == action); });
+    if (res != pptr + actEnd)
     {
-        return std::string (res->second);
+        return res->second;
     }
-    return std::string (nullStr);
+    return static_cast<const char *> (nullStr);
 }
 
 std::string prettyPrintString (const ActionMessage &command)
 {
-    std::string ret = actionMessageType (command.action ());
+    std::string ret(actionMessageType (command.action ()));
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -364,9 +372,22 @@ std::string prettyPrintString (const ActionMessage &command)
             ret.append (std::to_string (command.dest_id));
         }
         break;
+    case CMD_PUB:
+        ret.push_back(':');
+        ret.append((boost::format("From (%d) handle(%d) size %d at %f") % command.source_id %
+            command.dest_handle % command.payload.size() %
+            static_cast<double> (command.actionTime))
+            .str());
+        break;
     case CMD_REG_BROKER:
         ret.push_back (':');
         ret.append (command.name);
+        break;
+    case CMD_TIME_GRANT:
+        ret.push_back(':');
+        ret.append((boost::format("From (%d) Granted Time(%f)") % command.source_id %
+            static_cast<double> (command.actionTime))
+            .str());
         break;
     case CMD_TIME_REQUEST:
         ret.push_back (':');
@@ -375,6 +396,8 @@ std::string prettyPrintString (const ActionMessage &command)
                      static_cast<double> (command.info ().Tdemin))
                       .str ());
         break;
+    case CMD_FED_CONFIGURE:
+
     default:
         break;
     }

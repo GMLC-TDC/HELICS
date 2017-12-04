@@ -9,15 +9,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "ZmqComms.h"
+#include "../../common/zmqContextManager.h"
+#include "../../common/zmqHelper.h"
+#include "../../common/zmqSocketDescriptor.h"
+#include "../ActionMessage.h"
 #include "ZmqRequestSets.h"
-#include "helics/common/zmqContextManager.h"
-#include "helics/common/zmqHelper.h"
-#include "helics/common/zmqSocketDescriptor.h"
-#include "helics/core/ActionMessage.h"
 #include <memory>
 
 static const int BEGIN_OPEN_PORT_RANGE = 23500;
-static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 23900;
+static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 23757;
 
 static const int DEFAULT_BROKER_PULL_PORT_NUMBER = 23405;
 static const int DEFAULT_BROKER_REP_PORT_NUMBER = 23404;
@@ -34,43 +34,6 @@ ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTar
 }
 /** destructor*/
 ZmqComms::~ZmqComms () { disconnect (); }
-
-std::string makePortAddress (const std::string &networkInterface, int portNumber)
-{
-    if (networkInterface.compare (0, 3, "ipc") == 0)
-    {
-        return networkInterface;
-    }
-    if (networkInterface.compare (0, 3, "tcp") == 0)
-    {
-        std::string newAddress = networkInterface;
-        newAddress.push_back (':');
-        newAddress.append (std::to_string (portNumber));
-        return newAddress;
-    }
-    if (networkInterface.compare (0, 5, "inproc") == 0)
-    {
-        return networkInterface;
-    }
-    return networkInterface;
-}
-
-std::pair<std::string, int> extractInterfaceandPort (const std::string &address)
-{
-    std::pair<std::string, int> ret;
-    auto lastColon = address.find_last_of (':');
-    try
-    {
-        auto val = std::stoi (address.substr (lastColon + 1));
-        ret.first = address.substr (0, lastColon);
-        ret.second = val;
-    }
-    catch (const std::invalid_argument &)
-    {
-        ret = std::make_pair (address, -1);
-    }
-    return ret;
-}
 
 void ZmqComms::setBrokerPorts (int reqPort, int pushPort)
 {
@@ -122,11 +85,6 @@ void ZmqComms::setPortNumbers (int repPort, int pullPort)
 
 void ZmqComms::setAutomaticPortStartPort (int startingPort) { openPortStart = startingPort; }
 
-void ZmqComms::setReplyCallback (std::function<ActionMessage (ActionMessage &&)> callback)
-{
-    replyCallback = std::move (callback);
-}
-
 int ZmqComms::processIncomingMessage (zmq::message_t &msg)
 {
     if (msg.size () == 5)
@@ -138,7 +96,7 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
         }
     }
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-    if (M.action () == CMD_PROTOCOL)
+    if (isProtocolCommand (M))
     {
         switch (M.index)
         {
@@ -155,7 +113,7 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
 int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
 {
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-    if (M.action () == CMD_PROTOCOL)
+    if (isProtocolCommand (M))
     {
         switch (M.index)
         {
@@ -187,40 +145,33 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
         }
         return 0;
     }
-    if (replyCallback)
-    {
-        auto Mresp = replyCallback (std::move (M));
-        auto str = Mresp.to_string ();
+    ActionCallback (std::move (M));
+    ActionMessage resp (CMD_PRIORITY_ACK);
+    auto str = resp.to_string ();
 
-        sock.send (str.data (), str.size ());
-    }
-    else
-    {
-        ActionCallback (std::move (M));
-        ActionMessage resp (CMD_PRIORITY_ACK);
-        auto str = resp.to_string ();
-
-        sock.send (str.data (), str.size ());
-    }
+    sock.send (str.data (), str.size ());
     return 0;
 }
 
 void ZmqComms::queue_rx_function ()
 {
+    conditionalChangeOnDestroy<connection_status> cchange (rx_status, connection_status::error,
+                                                           connection_status::connected);
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
-
+    pullSocket.setsockopt (ZMQ_LINGER, 200);
     zmq::socket_t controlSocket (ctx->getContext (), ZMQ_PAIR);
     std::string controlsockString = std::string ("inproc://") + name + "_control";
     controlSocket.bind (controlsockString.c_str ());
-
+    controlSocket.setsockopt (ZMQ_LINGER, 200);
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
+    repSocket.setsockopt (ZMQ_LINGER, 500);
     while (pullPortNumber == -1)
     {
         zmq::message_t msg;
         controlSocket.recv (&msg);
         ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-        if (M.action () == CMD_PROTOCOL)
+        if (isProtocolCommand (M))
         {
             if (M.index == PORT_DEFINITIONS)
             {
@@ -234,6 +185,12 @@ void ZmqComms::queue_rx_function ()
             {
                 disconnecting = true;
                 rx_status = connection_status::terminated;
+                return;
+            }
+            else if (M.index == DISCONNECT_ERROR)
+            {
+                disconnecting = true;
+                rx_status = connection_status::error;
                 return;
             }
         }
@@ -290,7 +247,7 @@ void ZmqComms::queue_rx_function ()
     poller[2].socket = static_cast<void *> (repSocket);
     poller[2].events = ZMQ_POLLIN;
     rx_status = connection_status::connected;  // this is a atomic indicator that the rx queue is ready
-    while (1)
+    while (true)
     {
         auto rc = zmq::poll (poller);
         if (rc > 0)
@@ -373,7 +330,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                     tx_status = connection_status::error;
                     return (-1);
                 }
-                else if (rc == 0)
+                if (rc == 0)
                 {
                     std::cerr << "broker connection timed out\n";
                     tx_status = connection_status::error;
@@ -382,7 +339,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 brokerReq.recv (&msg);
 
                 ActionMessage rxcmd (static_cast<char *> (msg.data ()), msg.size ());
-                if (rxcmd.action () == CMD_PROTOCOL)
+                if (isProtocolCommand (rxcmd))
                 {
                     if (rxcmd.index == PORT_DEFINITIONS)
                     {
@@ -396,6 +353,12 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                         controlSocket.send (msg);
                         tx_status = connection_status::terminated;
                         return (-3);
+                    }
+                    else if (rxcmd.index == DISCONNECT_ERROR)
+                    {
+                        controlSocket.send (msg);
+                        tx_status = connection_status::error;
+                        return (-4);
                     }
                 }
 
@@ -423,18 +386,23 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 {
                     std::cerr << "unable to connect with broker\n";
                     tx_status = connection_status::error;
-                    return (-1);
                 }
-                else if (rc == 0)
+                if (rc == 0)
                 {
                     std::cerr << "broker connection timed out\n";
                     tx_status = connection_status::error;
+                }
+                if (tx_status == connection_status::error)
+                {
+                    ActionMessage M (CMD_PROTOCOL);
+                    M.index = DISCONNECT_ERROR;
+                    controlSocket.send (msg);
                     return (-1);
                 }
                 brokerReq.recv (&msg);
 
                 ActionMessage rxcmd (static_cast<char *> (msg.data ()), msg.size ());
-                if (rxcmd.action () == CMD_PROTOCOL)
+                if (isProtocolCommand (rxcmd))
                 {
                     if (rxcmd.index == PORT_DEFINITIONS)
                     {
@@ -449,6 +417,12 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                         controlSocket.send (msg);
                         tx_status = connection_status::terminated;
                         return (-3);
+                    }
+                    else if (rxcmd.index == DISCONNECT_ERROR)
+                    {
+                        controlSocket.send (msg);
+                        tx_status = connection_status::error;
+                        return (-4);
                     }
                 }
 
@@ -491,10 +465,11 @@ void ZmqComms::queue_tx_function ()
     std::vector<char> buffer;
 
     auto ctx = zmqContextManager::getContextPointer ();
-
+    conditionalChangeOnDestroy<connection_status> cchange (tx_status, connection_status::error,
+                                                           connection_status::connected);
     // Setup the control socket for comms with the receiver
     zmq::socket_t controlSocket (ctx->getContext (), ZMQ_PAIR);
-
+    controlSocket.setsockopt (ZMQ_LINGER, 200);
     std::string controlsockString = std::string ("inproc://") + name + "_control";
     controlSocket.connect (controlsockString);
     auto res = initializeBrokerConnections (controlSocket);
@@ -504,6 +479,7 @@ void ZmqComms::queue_tx_function ()
     }
 
     zmq::socket_t brokerPushSocket (ctx->getContext (), ZMQ_PUSH);
+    brokerPushSocket.setsockopt (ZMQ_LINGER, 200);
     std::map<int, zmq::socket_t> routes;  // for all the other possible routes
     ZmqRequestSets priority_routes;  //!< object to handle the management of the priority routes
 
@@ -514,13 +490,13 @@ void ZmqComms::queue_tx_function ()
     }
     tx_status = connection_status::connected;
     zmq::message_t msg;
-    while (1)
+    while (true)
     {
         int route_id;
         ActionMessage cmd;
         if (priority_routes.waiting ())
         {
-            if (priority_routes.checkForMessages ())
+            if (priority_routes.checkForMessages () != 0)
             {
                 auto M = priority_routes.getMessage ();
                 if (M)
@@ -536,7 +512,7 @@ void ZmqComms::queue_tx_function ()
             }
             else
             {
-                if (priority_routes.checkForMessages (std::chrono::milliseconds (50)))
+                if (priority_routes.checkForMessages (std::chrono::milliseconds (50)) != 0)
                 {
                     auto M = priority_routes.getMessage ();
                     if (M)
@@ -551,8 +527,8 @@ void ZmqComms::queue_tx_function ()
         {
             std::tie (route_id, cmd) = txQueue.pop ();
         }
-
-        if (cmd.action () == CMD_PROTOCOL)
+        bool processed = false;
+        if (isProtocolCommand (cmd))
         {
             if (route_id == -1)
             {
@@ -579,14 +555,16 @@ void ZmqComms::queue_tx_function ()
                         {
                             priority_routes.addRoutes (cmd.dest_id, priority_route);
                         }
-                        catch (const zmq::error_t &)
+                        catch (const zmq::error_t &e)
                         {
                             // TODO:: do something???
+                            std::cerr << e.what () << '\n';
                         }
                     }
                     try
                     {
                         auto zsock = zmq::socket_t (ctx->getContext (), ZMQ_PUSH);
+                        zsock.setsockopt (ZMQ_LINGER, 100);
                         zsock.connect (push_route);
                         routes.emplace (cmd.dest_id, std::move (zsock));
                     }
@@ -594,6 +572,7 @@ void ZmqComms::queue_tx_function ()
                     {
                         // TODO:: do something???
                     }
+                    processed = true;
                 }
                 break;
                 case DISCONNECT:
@@ -601,7 +580,10 @@ void ZmqComms::queue_tx_function ()
                 }
             }
         }
-
+        if (processed)
+        {
+            continue;
+        }
         if (isPriorityCommand (cmd))
         {
             if ((route_id == 0) && (!hasBroker))
@@ -609,8 +591,13 @@ void ZmqComms::queue_tx_function ()
                 // drop the packet
                 continue;
             }
-            auto tx = priority_routes.transmit (route_id, cmd);
-            if (tx)
+            else if (route_id == -1)
+            {  // send to rx thread loop
+                cmd.to_vector (buffer);
+                controlSocket.send (buffer.data (), buffer.size ());
+                continue;
+            }
+            if (priority_routes.transmit (route_id, cmd))
             {
                 continue;
             }
@@ -677,6 +664,7 @@ void ZmqComms::closeReceiver ()
         // try connecting with the receivers push socket
         auto ctx = zmqContextManager::getContextPointer ();
         zmq::socket_t pushSocket (ctx->getContext (), ZMQ_PUSH);
+        pushSocket.setsockopt (ZMQ_LINGER, 500);
         if (localTarget_ == "tcp://*")
         {
             pushSocket.connect (makePortAddress ("tcp://127.0.0.1", pullPortNumber));

@@ -73,7 +73,7 @@ int ZmqRequestSets::checkForMessages (std::chrono::milliseconds timeout)
     auto rc = zmq::poll (active_routes, timeout);
     if (rc == 0)
     {
-        return false;
+        return 0;
     }
     zmq::message_t msg;
     // scan the active_routes

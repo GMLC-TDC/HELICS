@@ -7,9 +7,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/application_api/Federate.h"
-#include "helics/core/CoreFactory.h"
-#include "helics/core/core.h"
+#include "helics.h"
 #include "test_configuration.h"
 #include <future>
 #include <boost/test/unit_test.hpp>

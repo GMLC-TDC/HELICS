@@ -12,9 +12,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_ZEROMQ_REQUEST_SETS_
 #pragma once
 
-#include "helics/common/cppzmq/zmq.hpp"
-#include "helics/common/zmqContextManager.h"
-#include "helics/core/ActionMessage.h"
+#include "../../common/cppzmq/zmq.hpp"
+#include "../../common/zmqContextManager.h"
+#include "../ActionMessage.h"
 #include "helics_includes/optional.h"
 #include <deque>
 #include <map>

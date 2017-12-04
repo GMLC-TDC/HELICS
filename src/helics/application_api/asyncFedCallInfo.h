@@ -10,7 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #ifndef ASYNC_FED_CALL_INFO_H_
 #define ASYNC_FED_CALL_INFO_H_
 #pragma once
-#include "core/helics-time.h"
+#include "../core/helics-time.h"
 #include <future>
 #include <map>
 #include <string>
@@ -22,7 +22,7 @@ namespace helics
 	{
 	public:
 		std::future<void> initFuture; /**future for the init call*/
-		std::future<helics::convergence_state> execFuture; /** future for the enter execution mode call*/
+		std::future<helics::iteration_result> execFuture; /** future for the enter execution mode call*/
 		std::future<helics::Time> timeRequestFuture; /** future for the timeRequest call*/
 		std::future<helics::iterationTime> timeRequestIterativeFuture; /** future for the time request iterative call*/
 		std::atomic<int> queryCounter{ 0 };  //!< counter for the number of queries

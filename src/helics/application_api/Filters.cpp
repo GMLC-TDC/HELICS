@@ -42,6 +42,10 @@ static void addOperations (Filter *filt, defined_filter_types type)
         filt->setFilterOperations (std::move (op));
     }
     break;
+    case redirect:
+    {
+    }
+    break;
     }
 }
 
@@ -129,10 +133,21 @@ double randDouble (random_dists_t dist, double p1, double p2)
 #else
     // this will leak on thread termination,  older apple clang does not have proper thread_local variables so
     // there really isn't any option
-    static __thread std::mt19937 *genPtr =
-      new std::mt19937 (std::random_device{}() +
-                        static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
+    //  static __thread std::mt19937 *genPtr =
+    //    new std::mt19937(std::random_device{}() +
+    //        static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id())));
+
+    static __thread std::mt19937 *genPtr = nullptr;
+    if (genPtr == nullptr)
+    {
+        genPtr =
+          new std::mt19937 (std::random_device{}() +
+                            static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
+    }
+
+
     auto &generator = *genPtr;
+
 #endif
 #endif
     switch (dist)
@@ -161,6 +176,31 @@ double randDouble (random_dists_t dist, double p1, double p2)
     case random_dists_t::cauchy:
     {
         std::cauchy_distribution<double> distribution (p1, p2);
+        return distribution (generator);
+    }
+    case random_dists_t::chi_squared:
+    {
+        std::chi_squared_distribution<double> distribution (p1);
+        return distribution (generator);
+    }
+    case random_dists_t::exponential:
+    {
+        std::exponential_distribution<double> distribution (p1);
+        return distribution (generator);
+    }
+    case random_dists_t::extreme_value:
+    {
+        std::extreme_value_distribution<double> distribution (p1, p2);
+        return distribution (generator);
+    }
+    case random_dists_t::fisher_f:
+    {
+        std::fisher_f_distribution<double> distribution (p1, p2);
+        return distribution (generator);
+    }
+    case random_dists_t::weibull:
+    {
+        std::weibull_distribution<double> distribution (p1, p2);
         return distribution (generator);
     }
     break;

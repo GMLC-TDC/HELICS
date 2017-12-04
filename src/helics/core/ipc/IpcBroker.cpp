@@ -9,11 +9,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "IpcBroker.h"
-#include "helics/common/blocking_queue.h"
-#include "helics/config.h"
-#include "helics/core/core-data.h"
-#include "helics/core/core.h"
-#include "helics/core/helics-time.h"
+#include "../../common/blocking_queue.h"
+#include "../core-data.h"
+#include "../core.h"
+#include "../helics-time.h"
+#include "helics/helics-config.h"
 
 #include "IpcComms.h"
 
@@ -25,7 +25,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <fstream>
 #include <sstream>
 
-#include "helics/core/argParser.h"
+#include "../argParser.h"
 
 #include <boost/filesystem.hpp>
 
@@ -40,27 +40,20 @@ using namespace std::string_literals;
 static const argDescriptors extraArgs{{"queueloc"s, "string"s, "the named location of the shared queue"s},
                                       {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
 
-IpcBroker::IpcBroker (bool rootBroker) noexcept : CoreBroker (rootBroker) {}
+IpcBroker::IpcBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
-IpcBroker::IpcBroker (const std::string &broker_name) : CoreBroker (broker_name) {}
+IpcBroker::IpcBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
-IpcBroker::~IpcBroker ()
-{
-    haltOperations = true;
-    std::unique_lock<std::mutex> lock (dataMutex);
-    comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
-    lock.unlock ();
-    joinAllThreads ();
-}
+IpcBroker::~IpcBroker () = default;
 
-void IpcBroker::displayHelp (bool localOnly)
+void IpcBroker::displayHelp (bool local_only)
 {
     std::cout << " Help for Interprocess Broker: \n";
     namespace po = boost::program_options;
     po::variables_map vm;
     const char *const argV[] = {"", "--help"};
     argumentParser (2, argV, vm, extraArgs);
-    if (!localOnly)
+    if (!local_only)
     {
         CoreBroker::displayHelp ();
     }
@@ -88,7 +81,7 @@ void IpcBroker::InitializeFromArgs (int argc, const char *const *argv)
         {
             fileloc = vm["fileloc"].as<std::string> ();
         }
-
+        noAutomaticID = true;
         CoreBroker::InitializeFromArgs (argc, argv);
         if (getIdentifier ().empty ())
         {
@@ -117,33 +110,6 @@ bool IpcBroker::brokerConnect ()
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     comms->setMessageSize (maxMessageSize, maxMessageCount);
     return comms->connect ();
-}
-
-void IpcBroker::brokerDisconnect ()
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
-    {
-        comms->disconnect ();
-    }
-}
-
-void IpcBroker::transmit (int route_id, const ActionMessage &cmd)
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
-    {
-        comms->transmit (route_id, cmd);
-    }
-}
-
-void IpcBroker::addRoute (int route_id, const std::string &routeInfo)
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
-    {
-        comms->addRoute (route_id, routeInfo);
-    }
 }
 
 std::string IpcBroker::getAddress () const

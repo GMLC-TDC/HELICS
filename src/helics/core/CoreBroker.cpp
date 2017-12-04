@@ -9,15 +9,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "CoreBroker.h"
+#include "../common/stringToCmdLine.h"
 #include "BrokerFactory.h"
-#include "common/stringToCmdLine.h"
 
-#include "helics/core/argParser.h"
+#include "argParser.h"
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 
+#include "../common/logger.h"
 #include "TimeCoordinator.h"
-#include "helics/common/logger.h"
 #include "loggingHelper.hpp"
 #include <fstream>
 
@@ -58,9 +58,6 @@ void CoreBroker::setIdentifier (const std::string &name)
 int32_t CoreBroker::getRoute (Core::federate_id_t fedid) const
 {
     // only activate the lock if we not in an operating state
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (mutex_);
-
     auto fnd = routing_table.find (fedid);
     return (fnd != routing_table.end ()) ? fnd->second : 0;  // zero is the default route
 }
@@ -73,20 +70,12 @@ int32_t CoreBroker::getRouteNoLock (Core::federate_id_t fedid) const
 
 int32_t CoreBroker::getFedByName (const std::string &fedName) const
 {
-    // only activate the lock if we not in an operating state
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (mutex_);
-
     auto fnd = fedNames.find (fedName);
     return (fnd != fedNames.end ()) ? fnd->second : -1;
 }
 
 int32_t CoreBroker::getBrokerByName (const std::string &brokerName) const
 {
-    // only activate the lock if we not in an operating state
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (mutex_);
-
     auto fnd = brokerNames.find (brokerName);
     return (fnd != brokerNames.end ()) ? fnd->second : -1;
 }
@@ -97,9 +86,6 @@ int32_t CoreBroker::getBrokerById (Core::federate_id_t fedid) const
     {
         return static_cast<int32_t> (fedid - global_broker_id_shift);
     }
-
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (mutex_);
 
     auto fnd = broker_table.find (fedid);
     return (fnd != broker_table.end ()) ? fnd->second : -1;
@@ -112,11 +98,75 @@ int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
         return static_cast<int32_t> (fedid - global_federate_id_shift);
     }
 
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (mutex_);
-
     auto fnd = federate_table.find (fedid);
     return (fnd != federate_table.end ()) ? fnd->second : -1;
+}
+
+
+void CoreBroker::generateQueryResult(const ActionMessage &command)
+{
+    std::string repStr;
+    bool listV = true;
+    if (command.payload == "federates")
+    {
+        repStr.push_back('[');
+        for (const auto &fed : _federates)
+        {
+            repStr.append(fed.name);
+            repStr.push_back(';');
+        }
+    }
+    else if (command.payload == "publications")
+    {
+        repStr.push_back('[');
+        for (const auto &pub : publications)
+        {
+            repStr.append(pub.first);
+            repStr.push_back(';');
+        }
+    }
+    else if (command.payload == "endpoints")
+    {
+        repStr.push_back('[');
+        for (const auto &ept : endpoints)
+        {
+            repStr.append(ept.first);
+            repStr.push_back(';');
+        }
+    }
+    else if (command.payload == "brokers")
+    {
+        repStr.push_back('[');
+        for (const auto &brk : _brokers)
+        {
+            repStr.append(brk.name);
+            repStr.push_back(';');
+        }
+    }
+    else
+    {
+        repStr = "#invalid";
+        listV = false;
+    }
+    if (listV)
+    {
+        if (repStr.size() > 1)
+        {
+            repStr.back() = ']';
+        }
+        else
+        {
+            repStr.push_back(']');
+        }
+    }
+    
+    ActionMessage queryResp(CMD_QUERY_REPLY);
+    queryResp.dest_id = command.source_id;
+    queryResp.source_id = global_broker_id;
+    queryResp.index = command.index;
+    
+    queryResp.payload = repStr;
+    transmit(getRoute(queryResp.dest_id), queryResp);
 }
 
 int32_t CoreBroker::FillRouteInformation (ActionMessage &mess)
@@ -137,7 +187,8 @@ int32_t CoreBroker::FillRouteInformation (ActionMessage &mess)
     }
     return 0;
 }
-void CoreBroker::processPriorityCommand (const ActionMessage &command)
+
+void CoreBroker::processPriorityCommand (ActionMessage &&command)
 {
     // deal with a few types of message immediately
     LOG_TRACE (
@@ -165,14 +216,12 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
             transmit (command.source_id, badInit);  // this isn't correct
             return;
         }
-        std::unique_lock<std::mutex> lock (mutex_);
         _federates.emplace_back (command.name);
         _federates.back ().route_id = getRouteNoLock (command.source_id);
 
         fedNames.emplace (command.name, static_cast<int32_t> (_federates.size () - 1));
         if (!_isRoot)
         {
-            lock.unlock ();  // finished critical section
             if (_gateway)
             {
                 ActionMessage mcopy (CMD_REG_FED);
@@ -202,7 +251,6 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
             auto global_id = _federates.back ().global_id;
             routing_table.emplace (global_id, route_id);
             // don't bother with the federate_table
-            lock.unlock ();
             // transmit the response
             ActionMessage fedReply (CMD_FED_ACK);
             fedReply.source_id = 0;
@@ -230,14 +278,12 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
             transmit (command.source_id, badInit);
             return;
         }
-        std::unique_lock<std::mutex> lock (mutex_);
         _brokers.emplace_back (command.name);
         _brokers.back ().route_id = static_cast<decltype (_brokers.back ().route_id)> (_brokers.size ());
         brokerNames.emplace (command.name, static_cast<int32_t> (_brokers.size () - 1));
         addRoute (_brokers.back ().route_id, command.info ().target);
         if (!_isRoot)
         {
-            lock.unlock ();
             if (_gateway)
             {
                 auto mcopy = command;
@@ -257,8 +303,6 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
             auto route_id = _brokers.back ().route_id;
             routing_table.emplace (global_id, route_id);
             // don't bother with the broker_table for root broker
-            // the protected tables are finished we can now unlock
-            lock.unlock ();
 
             // sending the response message
             ActionMessage brokerReply (CMD_BROKER_ACK);
@@ -274,17 +318,14 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
         auto fed_num = getFedByName (command.name);
         if (fed_num >= 0)
         {
-            std::unique_lock<std::mutex> lock (mutex_);
             _federates[fed_num].global_id = command.dest_id;
             auto route = _federates[fed_num].route_id;
             federate_table.emplace (command.dest_id, fed_num);
-            lock.unlock ();
             transmit (route, command);
         }
         else
         {
             // this means we haven't seen this federate before for some reason
-            std::unique_lock<std::mutex> lock (mutex_);
             _federates.emplace_back (command.name);
             _federates.back ().route_id = getRoute (command.source_id);
             _federates.back ().global_id = command.dest_id;
@@ -312,16 +353,13 @@ void CoreBroker::processPriorityCommand (const ActionMessage &command)
         auto broker_num = getBrokerByName (command.name);
         if (broker_num >= 0)
         {
-            std::unique_lock<std::mutex> lock (mutex_);
             _brokers[broker_num].global_id = command.dest_id;
             auto route = _brokers[broker_num].route_id;
             broker_table.emplace (command.dest_id, broker_num);
-            lock.unlock ();
             transmit (route, command);
         }
         else
         {
-            std::unique_lock<std::mutex> lock (mutex_);
             _brokers.emplace_back (command.name);
             _brokers.back ().route_id = getRoute (command.source_id);
             _brokers.back ().global_id = command.dest_id;
@@ -405,12 +443,12 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 {
                     transmit (brk.route_id, m);
                 }
-                timeCoord->enteringExecMode (convergence_state::complete);
+                timeCoord->enteringExecMode (iteration_request::no_iterations);
                 auto res = timeCoord->checkExecEntry ();
-                if (res == convergence_state::complete)
+                if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), convergence_state::complete, Time::maxVal (),
+                    timeCoord->timeRequest (Time::maxVal (), iteration_request::no_iterations, Time::maxVal (),
                                             Time::maxVal ());
                 }
             }
@@ -431,7 +469,6 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         if (brkNum >= 0)
         {
-            std::lock_guard<std::mutex> lock (mutex_);
             _brokers[brkNum]._initRequested = false;
         }
     }
@@ -443,16 +480,26 @@ void CoreBroker::processCommand (ActionMessage &&command)
             transmit (brk.route_id, command);
         }
         {
-            timeCoord->enteringExecMode (convergence_state::complete);
+            timeCoord->enteringExecMode (iteration_request::no_iterations);
             auto res = timeCoord->checkExecEntry ();
-            if (res == convergence_state::complete)
+            if (res == iteration_state::next_step)
             {
                 enteredExecutionMode = true;
-                timeCoord->timeRequest (Time::maxVal (), convergence_state::complete, Time::maxVal (),
+                timeCoord->timeRequest (Time::maxVal (), iteration_request::no_iterations, Time::maxVal (),
                                         Time::maxVal ());
             }
         }
         break;
+    case CMD_DISCONNECT_NAME:
+        if (command.dest_id == 0)
+        {
+            auto brkNum = getBrokerByName (command.payload);
+            if (brkNum >= 0)
+            {
+                _brokers[brkNum]._disconnected = true;
+            }
+        }
+        // FALLTHROUGH
     case CMD_DISCONNECT:
     {
         if (command.dest_id == 0)
@@ -460,8 +507,6 @@ void CoreBroker::processCommand (ActionMessage &&command)
             auto brkNum = getBrokerById (command.source_id);
             if (brkNum >= 0)
             {
-                auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
-                                                         std::unique_lock<std::mutex> (mutex_);
                 _brokers[brkNum]._disconnected = true;
             }
             if (allDisconnected ())
@@ -497,10 +542,10 @@ void CoreBroker::processCommand (ActionMessage &&command)
             if (!enteredExecutionMode)
             {
                 auto res = timeCoord->checkExecEntry ();
-                if (res == convergence_state::complete)
+                if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), convergence_state::complete, Time::maxVal (),
+                    timeCoord->timeRequest (Time::maxVal (), iteration_request::no_iterations, Time::maxVal (),
                                             Time::maxVal ());
                 }
             }
@@ -701,12 +746,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         break;
     default:
         // check again if it is a priority command and if so process it in that function
-        if (isPriorityCommand (command))
-        {
-            processPriorityCommand (command);
-            break;
-        }
-        else if (command.dest_id != global_broker_id)
+        if (command.dest_id != global_broker_id)
         {
             auto rt = getRoute (command.dest_id);
             transmit (rt, command);
@@ -716,7 +756,6 @@ void CoreBroker::processCommand (ActionMessage &&command)
 
 void CoreBroker::addLocalInfo (BasicHandleInfo &handleInfo, const ActionMessage &m)
 {
-    std::unique_lock<std::mutex> lock (mutex_);
     auto res = global_id_translation.find (m.source_id);
     if (res != global_id_translation.end ())
     {
@@ -932,9 +971,7 @@ bool CoreBroker::connect ()
 
 bool CoreBroker::isConnected () const { return ((brokerState == operating) || (brokerState == connected)); }
 
-void CoreBroker::processDisconnect () { disconnect (); }
-
-void CoreBroker::disconnect ()
+void CoreBroker::processDisconnect (bool skipUnregister)
 {
     LOG_NORMAL (0, getIdentifier (), "||disconnecting");
     if (brokerState > broker_state_t::initialized)
@@ -943,8 +980,17 @@ void CoreBroker::disconnect ()
         brokerDisconnect ();
     }
     brokerState = broker_state_t::terminated;
+
+    if (!skipUnregister)
+    {
+        unregister ();
+    }
+}
+
+void CoreBroker::unregister ()
+{
     /*We need to ensure that the destructor is not called immediately upon calling unregister
-    otherwise this would be a mess and probably cause seg faults so we capture it in a local variable
+    otherwise this would be a mess and probably cause segmentation faults so we capture it in a local variable
     that will be destroyed on function exit
     */
     auto keepBrokerAlive = BrokerFactory::findBroker (identifier);
@@ -961,6 +1007,8 @@ void CoreBroker::disconnect ()
         }
     }
 }
+
+void CoreBroker::disconnect () { processDisconnect (); }
 
 bool CoreBroker::FindandNotifySubscriptionPublisher (BasicHandleInfo &handleInfo)
 {
@@ -1140,7 +1188,6 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
     {
         std::string ret;
         ret.push_back ('[');
-        std::lock_guard<std::mutex> lock (mutex_);
         for (auto &fed : _federates)
         {
             ret.append (fed.name);
@@ -1161,7 +1208,6 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
     {
         std::string ret;
         ret.push_back ('[');
-        std::lock_guard<std::mutex> lock (mutex_);
         for (auto &brk : _brokers)
         {
             ret.append (brk.name);
@@ -1197,9 +1243,11 @@ void CoreBroker::processQuery (const ActionMessage &m)
 {
     if ((m.info ().target == getIdentifier ()) || (m.info ().target == "broker"))
     {
+        generateQueryResult(m);
     }
     else if ((isRoot ()) && ((m.info ().target == "root") || (m.info ().target == "federation")))
     {
+        generateQueryResult(m);
     }
     else
     {
@@ -1207,7 +1255,6 @@ void CoreBroker::processQuery (const ActionMessage &m)
         auto res = getFedByName (m.info ().target);
         if (res != -1)
         {
-            std::lock_guard<std::mutex> lock (mutex_);
             auto &fed = _federates[res];
             route = fed.route_id;
         }
@@ -1216,7 +1263,6 @@ void CoreBroker::processQuery (const ActionMessage &m)
             res = getBrokerByName (m.info ().target);
             if (res != -1)
             {
-                std::lock_guard<std::mutex> lock (mutex_);
                 auto &brk = _brokers[res];
                 route = brk.route_id;
             }
@@ -1246,7 +1292,6 @@ void CoreBroker::checkFilters ()
 
 bool CoreBroker::allInitReady () const
 {
-    std::lock_guard<std::mutex> lock (mutex_);
     // the federate count must be greater than the min size
     if (static_cast<decltype (_min_federates)> (_federates.size ()) < _min_federates)
     {
@@ -1262,9 +1307,6 @@ bool CoreBroker::allInitReady () const
 
 bool CoreBroker::allDisconnected () const
 {
-    // all subBrokers must be disconnected
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (mutex_, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (mutex_);
     return std::all_of (_brokers.begin (), _brokers.end (), [](auto &brk) { return brk._disconnected; });
 }
 
@@ -1275,6 +1317,10 @@ bool matchingTypes (const std::string &type1, const std::string &type2)
         return true;
     }
     if ((type1.empty ()) || (type2.empty ()))
+    {
+        return true;
+    }
+    if ((type1.compare (0, 3, "def") == 0) || (type2.compare (0, 3, "def") == 0))
     {
         return true;
     }

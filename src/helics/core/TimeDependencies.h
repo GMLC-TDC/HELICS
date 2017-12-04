@@ -12,8 +12,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define TIME_DEPENDENCIES_H_
 #pragma once
 
-#include "core/core.h"
-#include "core/helics-time.h"
+#include "core.h"
+#include "helics-time.h"
 
 namespace helics
 {

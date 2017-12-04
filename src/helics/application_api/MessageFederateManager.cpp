@@ -9,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "MessageFederateManager.h"
-#include "helics/core/core.h"
+#include "../core/core.h"
 namespace helics
 {
 MessageFederateManager::MessageFederateManager (std::shared_ptr<Core> coreOb, Core::federate_id_t id)
@@ -18,6 +18,11 @@ MessageFederateManager::MessageFederateManager (std::shared_ptr<Core> coreOb, Co
 }
 MessageFederateManager::~MessageFederateManager () = default;
 
+void MessageFederateManager::disconnect ()
+{
+    // checks for the calls are handled in the MessageFederate itself
+    coreObject = nullptr;
+}
 endpoint_id_t MessageFederateManager::registerEndpoint (const std::string &name, const std::string &type)
 {
     std::lock_guard<std::mutex> eLock (endpointLock);

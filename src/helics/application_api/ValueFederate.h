@@ -15,7 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "Federate.h"
 #include "Message.h"
 #include "ValueConverter.hpp"
-#include "core/core-data.h"
+#include "../core/core-data.h"
 #include "identifierTypes.hpp"
 #include <functional>
 
@@ -343,6 +343,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** get the time of the last update*/
     Time getLastUpdateTime (subscription_id_t sub_id) const;
 
+    virtual void disconnect() override;
   protected:
     virtual void updateTime (Time newTime, Time oldTime) override;
     virtual void StartupToInitializeStateTransition () override;

@@ -21,6 +21,7 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 #include "zmqContextManager.h"
 
 #include "cppzmq/zmq.hpp"
+#include <iostream>
 #include <map>
 #include <mutex>
 
@@ -42,12 +43,10 @@ std::shared_ptr<zmqContextManager> zmqContextManager::getContextPointer (const s
     {
         return fnd->second;
     }
-    else
-    {  // can't use make_shared since it is a private constructor
-        auto newContext = std::shared_ptr<zmqContextManager> (new zmqContextManager (contextName));
-        contexts.emplace (contextName, newContext);
-        return newContext;
-    }
+
+    auto newContext = std::shared_ptr<zmqContextManager> (new zmqContextManager (contextName));
+    contexts.emplace (contextName, newContext);
+    return newContext;
     // if it doesn't make a new one with the appropriate name
 }
 
@@ -66,7 +65,7 @@ void zmqContextManager::closeContext (const std::string &contextName)
     }
 }
 
-void zmqContextManager::setContextToLeakOnDelete (const std::string &contextName)
+bool zmqContextManager::setContextToLeakOnDelete (const std::string &contextName)
 {
     std::lock_guard<std::mutex> conlock (contextLock);
     auto fnd = contexts.find (contextName);
@@ -74,6 +73,7 @@ void zmqContextManager::setContextToLeakOnDelete (const std::string &contextName
     {
         fnd->second->leakOnDelete = true;
     }
+    return false;
 }
 zmqContextManager::~zmqContextManager ()
 {

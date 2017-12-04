@@ -1,9 +1,9 @@
-#include "helics/config.h"
+#include "helics/helics-config.h"
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
-#include "helics/core/BrokerFactory.h"
-#include "helics/core/CoreBroker.h"
+#include "BrokerFactory.h"
+#include "CoreBroker.h"
 
 #include <iostream>
 #include <fstream>

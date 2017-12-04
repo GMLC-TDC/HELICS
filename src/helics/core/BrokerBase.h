@@ -23,7 +23,7 @@ and some common methods used cores and brokers
 
 #include "core.h"
 #include "ActionMessage.h"
-#include "helics/common/BlockingQueue3.hpp"
+#include "../common/BlockingPriorityQueue.hpp"
 namespace helics
 {
 
@@ -50,7 +50,7 @@ protected:
 	std::atomic<bool> haltOperations{ false };  //!< flag indicating that no further message should be processed
 	std::string logFile; //< the file to log message to
 	std::unique_ptr<TimeCoordinator> timeCoord; //!< object managing the time control
-	BlockingQueue3<ActionMessage> _queue; //!< primary routing queue
+	BlockingPriorityQueue<ActionMessage> _queue; //!< primary routing queue
 										  /** enumeration of the possible core states*/
 	enum broker_state_t :int
 	{
@@ -65,6 +65,7 @@ protected:
 		errored = 7,
 	};
 	std::atomic<broker_state_t> brokerState{ created }; //!< flag indicating that the structure is past the initialization stage indicating that no more changes can be made to the number of federates or handles
+    bool noAutomaticID = false;
 public:
 	static void displayHelp();
 	BrokerBase() noexcept;
@@ -84,6 +85,9 @@ public:
 	void addActionMessage(ActionMessage &&m);
 
 	void setLoggerFunction(std::function<void(int, const std::string &, const std::string &)> logFunction);
+
+    /* process a disconnect signal*/
+    virtual void processDisconnect(bool skipUnregister = false) = 0;
 private:
 	/** start main broker loop*/
 	void queueProcessingLoop();
@@ -97,9 +101,8 @@ protected:
 	@param[in] command the command to process
 	@return a action message response to the priority command
 	*/
-	virtual void processPriorityCommand(const ActionMessage &command) = 0;
-	/* process a disconnect signal*/
-	virtual void processDisconnect() = 0;
+	virtual void processPriorityCommand(ActionMessage &&command) = 0;
+
 
 	/** send a Message to the logging system
 	@return true if the message was actually logged
@@ -108,9 +111,10 @@ protected:
 
 	/** generate a new random id based on a uuid*/
 	void generateNewIdentifier();
+public:
 	/** close all the threads*/
 	void joinAllThreads();
-private:
+
 
 
 

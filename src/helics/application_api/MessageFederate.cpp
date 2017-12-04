@@ -9,8 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "MessageFederate.h"
+#include "../core/core.h"
 #include "MessageFederateManager.h"
-#include "core/core.h"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4702)
@@ -62,6 +62,12 @@ MessageFederate &MessageFederate::operator= (MessageFederate &&mFed) noexcept
 }
 
 MessageFederate::~MessageFederate () = default;
+
+void MessageFederate::disconnect ()
+{
+    Federate::disconnect ();
+    mfManager->disconnect ();
+}
 
 void MessageFederate::updateTime (Time newTime, Time oldTime) { mfManager->updateTime (newTime, oldTime); }
 

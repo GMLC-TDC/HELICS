@@ -9,9 +9,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include <boost/test/unit_test.hpp>
 
-#include "helics/config.h"
 #include "helics/core/CommonCore.h"
 #include "helics/core/CoreFactory.h"
+#include "helics/helics-config.h"
 
 BOOST_AUTO_TEST_SUITE (CoreFactory_tests)
 
@@ -84,7 +84,17 @@ BOOST_AUTO_TEST_CASE (tcpCore_test)
 
 BOOST_AUTO_TEST_CASE (udpCore_test)
 {
-    BOOST_CHECK_EQUAL (helics::CoreFactory::isAvailable (helics::core_type::UDP), false);
+    BOOST_CHECK_EQUAL (helics::CoreFactory::isAvailable (helics::core_type::UDP), true);
+
+    auto core = helics::CoreFactory::create (helics::core_type::UDP, "");
+    BOOST_REQUIRE (core != nullptr);
+    helics::CoreFactory::unregisterCore (core->getIdentifier ());
+    core = nullptr;
+
+    auto core2 = helics::CoreFactory::create (helics::core_type::UDP, "");
+    BOOST_REQUIRE (core2 != nullptr);
+    helics::CoreFactory::unregisterCore (core2->getIdentifier ());
+    core2 = nullptr;
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

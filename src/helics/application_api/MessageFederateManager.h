@@ -13,8 +13,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #pragma once
 
 #include "Message.h"
-#include "helics/common/simpleQueue.hpp"
-#include "helics/core/core.h"
+#include "../common/simpleQueue.hpp"
+#include "../core/core.h"
 #include "identifierTypes.hpp"
 #include <cstdint>
 #include <functional>
@@ -132,6 +132,8 @@ class MessageFederateManager
     void
     registerCallback (const std::vector<endpoint_id_t> &ids, std::function<void(endpoint_id_t, Time)> callback);
 
+    /**disconnect from the coreObject*/
+    void disconnect();
   private:
     std::unordered_map<std::string, endpoint_id_t>
       endpointNames;  //!< container to translate names to endpoint id's
