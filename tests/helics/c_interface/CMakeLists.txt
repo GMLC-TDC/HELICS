@@ -29,7 +29,7 @@ add_executable(c_interface_tests ${c_interface_test_sources} ${c_interface_test_
 
 target_link_libraries(c_interface_tests helicsSharedLib ${Boost_LIBRARIES_test})
 
-add_test(NAME c_interface_tests COMMAND c_interface_test --log_level=warning --report_level=detailed)
+add_test(NAME c_interface_tests COMMAND c_interface_tests --log_level=warning --report_level=detailed)
 
 #-----------------------------------------------------------------------------
 # Setup CTEST environment
