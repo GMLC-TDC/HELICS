@@ -12,8 +12,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "Filters.hpp"
 #include "MessageOperators.h"
 
+#include <iostream>
+#include <map>
 #include <memory>
 #include <random>
+#include <regex>
 #include <thread>
 
 namespace helics
@@ -42,15 +45,137 @@ static void addOperations (Filter *filt, defined_filter_types type)
         filt->setFilterOperations (std::move (op));
     }
     break;
-    case redirect:
+    case reroute:
     {
+        auto op = std::make_shared<randomDropFilterOperation> ();
+        filt->setFilterOperations (std::move (op));
     }
     break;
     }
 }
 
+Filter::Filter (Federate *fed)
+{
+    if (fed != nullptr)
+    {
+        corePtr = fed->getCorePointer ().get ();
+    }
+}
+
+Filter::Filter (Core *cr) : corePtr (cr) {}
+
+void Filter::setOperator (std::shared_ptr<FilterOperator> mo)
+{
+    if (corePtr != nullptr)
+    {
+        corePtr->setFilterOperator (id, std::move (mo));
+    }
+}
+void Filter::setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
+{
+    filtOp = std::move (filterOps);
+    if (corePtr != nullptr)
+    {
+        corePtr->setFilterOperator (id, filtOp->getOperator ());
+    }
+}
+
+static const std::string nullStr;
+
+const std::string &Filter::getTarget () const
+{
+    if (corePtr != nullptr)
+    {
+        return corePtr->getTarget (id);
+    }
+    return nullStr;
+}
+
+const std::string &Filter::getName () const
+{
+    if (corePtr != nullptr)
+    {
+        return corePtr->getHandleName (id);
+    }
+    return nullStr;
+}
+
+const std::string &Filter::getInputType () const
+{
+    if (corePtr != nullptr)
+    {
+        return corePtr->getType (id);
+    }
+    return nullStr;
+}
+
+const std::string &Filter::getOutputType () const
+{
+    if (corePtr != nullptr)
+    {
+        return corePtr->getOutputType (id);
+    }
+    return nullStr;
+}
+
+SourceFilter::SourceFilter (Federate *fed,
+                            const std::string &target,
+                            const std::string &name,
+                            const std::string &input_type,
+                            const std::string &output_type)
+    : Filter (fed)
+{
+    if (fed != nullptr)
+    {
+        fid = fed->registerSourceFilter (name, target, input_type, output_type);
+        id = fid.value ();
+    }
+}
+
+SourceFilter::SourceFilter (Core *cr,
+                            const std::string &target,
+                            const std::string &name,
+                            const std::string &input_type,
+                            const std::string &output_type)
+    : Filter (cr)
+{
+    if (corePtr != nullptr)
+    {
+        id = corePtr->registerSourceFilter (name, target, input_type, output_type);
+        fid = id;
+    }
+}
+
+DestinationFilter::DestinationFilter (Federate *fed,
+                                      const std::string &target,
+                                      const std::string &name,
+                                      const std::string &input_type,
+                                      const std::string &output_type)
+    : Filter (fed)
+{
+    if (fed != nullptr)
+    {
+        fid = fed->registerDestinationFilter (name, target, input_type, output_type);
+        id = fid.value ();
+    }
+}
+
+DestinationFilter::DestinationFilter (Core *cr,
+                                      const std::string &target,
+                                      const std::string &name,
+                                      const std::string &input_type,
+                                      const std::string &output_type)
+    : Filter (cr)
+{
+    if (corePtr != nullptr)
+    {
+        id = corePtr->registerDestinationFilter (name, target, input_type, output_type);
+        fid = id;
+    }
+}
+
 std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types type,
-                                                            MessageFilterFederate *mFed,
+                                                            Federate *mFed,
                                                             const std::string &target,
                                                             const std::string &name)
 
@@ -60,12 +185,27 @@ std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types
     return dfilt;
 }
 
-std::unique_ptr<SourceFilter> make_Source_filter (defined_filter_types type,
-                                                  MessageFilterFederate *mFed,
-                                                  const std::string &target,
-                                                  const std::string &name)
+std::unique_ptr<SourceFilter>
+make_Source_filter (defined_filter_types type, Core *cr, const std::string &target, const std::string &name)
 {
-    auto sfilt = std::make_unique<SourceFilter> (mFed, target, name);
+    auto sfilt = std::make_unique<SourceFilter> (cr, target, name);
+    addOperations (sfilt.get (), type);
+    return sfilt;
+}
+
+std::unique_ptr<DestinationFilter>
+make_destination_filter (defined_filter_types type, Core *cr, const std::string &target, const std::string &name)
+
+{
+    auto dfilt = std::make_unique<DestinationFilter> (cr, target, name);
+    addOperations (dfilt.get (), type);
+    return dfilt;
+}
+
+std::unique_ptr<SourceFilter>
+make_Source_filter (defined_filter_types type, Federate *fed, const std::string &target, const std::string &name)
+{
+    auto sfilt = std::make_unique<SourceFilter> (fed, target, name);
     addOperations (sfilt.get (), type);
     return sfilt;
 }
@@ -93,9 +233,9 @@ void delayFilterOperation::set (const std::string &property, double val)
     }
 }
 
-std::shared_ptr<MessageOperator> delayFilterOperation::getOperator ()
+std::shared_ptr<FilterOperator> delayFilterOperation::getOperator ()
 {
-    return std::static_pointer_cast<MessageOperator> (td);
+    return std::static_pointer_cast<FilterOperator> (td);
 }
 
 // enumeration of possible random number generator distributions
@@ -118,6 +258,16 @@ enum class random_dists_t : int
     fisher_f,
     student_t
 };
+
+static const std::map<std::string, random_dists_t> distMap{
+  {"constant", random_dists_t::constant},       {"uniform", random_dists_t::uniform},
+  {"bernoulli", random_dists_t::bernoulli},     {"binomial", random_dists_t::binomial},
+  {"geometric", random_dists_t::geometric},     {"poisson", random_dists_t::poisson},
+  {"exponential", random_dists_t::exponential}, {"gamma", random_dists_t::gamma},
+  {"weibull", random_dists_t::weibull},         {"extreme_value", random_dists_t::extreme_value},
+  {"normal", random_dists_t::normal},           {"lognormal", random_dists_t::lognormal},
+  {"chi_squared", random_dists_t::chi_squared}, {"cauchy", random_dists_t::cauchy},
+  {"fisher_f", random_dists_t::fisher_f},       {"student_t", random_dists_t::student_t}};
 
 double randDouble (random_dists_t dist, double p1, double p2)
 {
@@ -145,7 +295,6 @@ double randDouble (random_dists_t dist, double p1, double p2)
                             static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
     }
 
-
     auto &generator = *genPtr;
 
 #endif
@@ -153,26 +302,23 @@ double randDouble (random_dists_t dist, double p1, double p2)
     switch (dist)
     {
     case random_dists_t::constant:
+    default:
         return p1;
     case random_dists_t::uniform:
-    default:
     {
         std::uniform_real_distribution<double> distribution (p1, p2);
         return distribution (generator);
     }
-    break;
     case random_dists_t::normal:
     {
         std::normal_distribution<double> distribution (p1, p2);
         return distribution (generator);
     }
-    break;
     case random_dists_t::lognormal:
     {
         std::lognormal_distribution<double> distribution (p1, p2);
         return distribution (generator);
     }
-    break;
     case random_dists_t::cauchy:
     {
         std::cauchy_distribution<double> distribution (p1, p2);
@@ -203,40 +349,163 @@ double randDouble (random_dists_t dist, double p1, double p2)
         std::weibull_distribution<double> distribution (p1, p2);
         return distribution (generator);
     }
+    case random_dists_t::student_t:
+    {
+        std::student_t_distribution<double> distribution (p1);
+        return distribution (generator);
+    }
+    case random_dists_t::geometric:
+    {  // integer multiples of some period
+        std::geometric_distribution<int> distribution (p1);
+        return distribution (generator) * p2;
+    }
+    case random_dists_t::poisson:
+    {  // integer multiples of some period
+        std::poisson_distribution<int> distribution (p1);
+        return distribution (generator) * p2;
+    }
+    case random_dists_t::bernoulli:
+    {
+        std::bernoulli_distribution distribution (p1);
+        return distribution (generator) ? p2 : 0.0;
+    }
+    case random_dists_t::binomial:
+    {
+        std::binomial_distribution<int> distribution (static_cast<int> (p1), p2);
+        return static_cast<double> (distribution (generator));
+    }
+    case random_dists_t::gamma:
+    {
+        std::gamma_distribution<double> distribution (p1, p2);
+        return distribution (generator);
+    }
     break;
     }
 
     // return 0.0;
 }
 
+/** class wrapping the distribution generation functions and parameters*/
 class randomDelayGenerator
 {
   public:
-    Time delay;
+    std::atomic<random_dists_t> dist;  //!< the distribution
+    std::atomic<double> param1{0.0};  //!< parameter 1 typically mean or min
+    std::atomic<double> param2{0.0};  //!< parameter 2 typically stddev or max
+
+    double generate () { return randDouble (dist.load (), param1.load (), param2.load ()); }
 };
 
-randomDelayFilterOperation::randomDelayFilterOperation () {}
-randomDelayFilterOperation::~randomDelayFilterOperation () {}
-void randomDelayFilterOperation::set (const std::string &property, double val) {}
-void randomDelayFilterOperation::setString (const std::string &property, const std::string &val) {}
-
-std::shared_ptr<MessageOperator> randomDelayFilterOperation::getOperator ()
+randomDelayFilterOperation::randomDelayFilterOperation ()
 {
-    return std::static_pointer_cast<MessageOperator> (td);
+    rdelayGen = std::make_unique<randomDelayGenerator> ();
+    td = std::make_shared<MessageTimeOperator> (
+      [this](Time messageTime) { return messageTime + rdelayGen->generate (); });
+}
+randomDelayFilterOperation::~randomDelayFilterOperation () = default;
+
+void randomDelayFilterOperation::set (const std::string &property, double val)
+{
+    if ((property == "param1") || (property == "mean") || (property == "min") || (property == "alpha"))
+    {
+        rdelayGen->param1.store (val);
+    }
+    else if ((property == "param2") || (property == "stddev") || (property == "max") || (property == "beta"))
+    {
+        rdelayGen->param2.store (val);
+    }
+}
+void randomDelayFilterOperation::setString (const std::string &property, const std::string &val)
+{
+    if ((property == "dist") || (property == "distribution"))
+    {
+        auto res = distMap.find (val);
+        if (res != distMap.end ())
+        {
+            rdelayGen->dist.store (res->second);
+        }
+    }
+}
+
+std::shared_ptr<FilterOperator> randomDelayFilterOperation::getOperator ()
+{
+    return std::static_pointer_cast<FilterOperator> (td);
 }
 
 randomDropFilterOperation::randomDropFilterOperation ()
 {
     tcond = std::make_shared<MessageConditionalOperator> (
-      [this](const Message *) { return (randDouble (random_dists_t::uniform, 0, 1.0) < dropProb); });
+      [this](const Message *) { return (randDouble (random_dists_t::bernoulli, dropProb, 1.0) > 0.1); });
 }
 
-randomDropFilterOperation::~randomDropFilterOperation () {}
-void randomDropFilterOperation::set (const std::string &property, double val) {}
-void randomDropFilterOperation::setString (const std::string &property, const std::string &val) {}
-
-std::shared_ptr<MessageOperator> randomDropFilterOperation::getOperator ()
+randomDropFilterOperation::~randomDropFilterOperation () = default;
+void randomDropFilterOperation::set (const std::string &property, double val)
 {
-    return std::static_pointer_cast<MessageOperator> (tcond);
+    if ((property == "dropprob") || (property == "prob"))
+    {
+        dropProb = val;
+    }
+}
+void randomDropFilterOperation::setString (const std::string & /*property*/, const std::string & /*val*/) {}
+
+std::shared_ptr<FilterOperator> randomDropFilterOperation::getOperator ()
+{
+    return std::static_pointer_cast<FilterOperator> (tcond);
+}
+
+rerouteFilterOperation::rerouteFilterOperation ()
+{
+    op =
+      std::make_shared<MessageDestOperator> ([this](const std::string &dest) { return rerouteOperation (dest); });
+}
+
+rerouteFilterOperation::~rerouteFilterOperation () = default;
+
+void rerouteFilterOperation::set (const std::string & /*property*/, double /*val*/) {}
+
+void rerouteFilterOperation::setString (const std::string &property, const std::string &val)
+{
+    if (property == "target")
+    {
+        newTarget = val;
+    }
+    else if (property == "filter")
+    {
+        try
+        {
+            auto test = std::regex (val);
+            auto cond = conditions.lock ();
+            cond->insert (val);
+        }
+        catch (const std::regex_error &re)
+        {
+            std::cerr << "filter expression is not a valid Regular expression " << re.what () << std::endl;
+            throw (helics::InvalidParameterValue (
+              (std::string ("filter expression is not a valid Regular expression ") + re.what ()).c_str ()));
+        }
+    }
+}
+
+std::shared_ptr<FilterOperator> rerouteFilterOperation::getOperator ()
+{
+    return std::static_pointer_cast<FilterOperator> (op);
+}
+
+std::string rerouteFilterOperation::rerouteOperation (const std::string &dest) const
+{
+    auto cond = conditions.lock_shared ();
+    if (cond->empty ())
+    {
+        return *newTarget;
+    }
+    for (auto &sr : *cond)
+    {
+        std::regex reg (sr);
+        if (std::regex_match (dest, reg))
+        {
+            return *newTarget;
+        }
+    }
+    return dest;
 }
 }  // namespace helics

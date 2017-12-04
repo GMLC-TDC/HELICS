@@ -16,8 +16,6 @@ helicsTypes.hpp
 Message.h
 MessageFederate.h
 MessageFederateManager.h
-MessageFilterFederate.h
-MessageFilterFederateManager.h
 MessageOperators.h
 ValueConverter.hpp
 ValueConverter_impl.hpp
@@ -33,8 +31,6 @@ CombinationFederate.cpp
 Federate.cpp
 MessageFederate.cpp
 MessageFederateManager.cpp
-MessageFilterFederate.cpp
-MessageFilterFederateManager.cpp
 MessageOperators.cpp
 ValueFederate.cpp
 ValueConverter.cpp
@@ -46,8 +42,6 @@ Filters.cpp
 helicsTypes.cpp
 queryFunctions.cpp
 )
-
-list(APPEND application_api_sources ${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp.cpp)
 
 add_library(application_api OBJECT ${application_api_sources} ${application_api_headers})
 

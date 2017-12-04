@@ -195,11 +195,17 @@ private:
    loggerManager(const std::string &loggingName);
 
 public:
+    /** get a pointer to a logging manager so it cannot go out of scope*/
     static std::shared_ptr<loggerManager> getLoggerManager(const std::string &loggerName = "");
+    /** get a pointer to a logging core*/
     static std::shared_ptr<loggingCore> getLoggerCore(const std::string &loggerName = "");
-
+    /** close the named logger
+    @details prevents the logger from being retrieved through this class
+    but does not necessarily destroy the logger*/
     static void closeLogger(const std::string &loggerName = "");
-   
+   /** sends a message to the default logger*/
+    static void logMessage(const std::string &message);
+
     virtual ~loggerManager();
 
     const std::string &getName() const

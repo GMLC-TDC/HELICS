@@ -1,58 +1,37 @@
 IF (MSVC)
 
-set( boost_paths
-C:/boost_1_65_1
- C:/boost_1_64_0
-C:/boost_1_63_0
-C:/boost_1_61_0
+set (boost_versions
+boost_1_65_1
+boost_1_65_0
+boost_1_64_0
+boost_1_63_0
+boost_1_62_0
+boost_1_61_0
 )
-IF (IS_DIRECTORY C:/boost)
-list(APPEND boost_paths
-C:/boost/boost_1_65_1
- C:/boost/boost_1_64_0
-C:/boost/boost_1_63_0
-C:/boost/boost_1_61_0
+
+set(poss_prefixes
+C:
+C:/boost
+C:/local
+C:/boost
+C:/Libraries
+D:
+D:/boost
+D:/local
+D:/boost
 )
-ENDIF()
 
-IF (IS_DIRECTORY C:/local)
-list(APPEND boost_paths
-C:/local/boost_1_65_1
- C:/local/boost_1_64_0
-C:/local/boost_1_63_0
-C:/local/boost_1_61_0
-)
-ENDIF()
+# create an empty list
+list(APPEND boost_paths "")
 
+foreach( dir ${poss_prefixes})
+	foreach( boostver ${boost_versions})
+		IF (IS_DIRECTORY ${dir}/${boostver})
+			list(APPEND boost_paths ${dir}/${boostver})
+		ENDIF()
+	endforeach()
+endforeach()
 
-IF (EXISTS D:/)
-list(APPEND boost_paths
-D:/boost_1_65_1
- D:/boost_1_64_0
-D:/boost_1_63_0
-D:/boost_1_61_0
-)
-IF (IS_DIRECTORY D:/boost)
-list(APPEND boost_paths
-D:/boost/boost_1_65_1
- D:/boost/boost_1_64_0
-D:/boost/boost_1_63_0
-D:/boost/boost_1_61_0
-)
-ENDIF()
-
-IF (IS_DIRECTORY D:/local)
-list(APPEND boost_paths
-D:/local/boost_1_65_1
- D:/local/boost_1_64_0
-D:/local/boost_1_63_0
-D:/local/boost_1_61_0
-)
-ENDIF()
-
-ENDIF()
-
- message(STATUS ${boost_paths})
 
 find_path(BOOST_TEST_PATH
 			NAMES 			boost/version.hpp
@@ -68,10 +47,10 @@ SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
 
 # Minimum version of Boost required for building HELICS
 set(BOOST_MINIMUM_VERSION 1.58)
-
+set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
 if (${MPI_C_FOUND})
   #find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
-  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
+  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options mpi unit_test_framework filesystem system date_time REQUIRED)
 ELSE(${MPI_C_FOUND})
   find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
 ENDIF(${MPI_C_FOUND})
@@ -109,5 +88,4 @@ endforeach(loop_var)
 
 #message(STATUS "Using Boost core libraries : ${Boost_LIBRARIES_core}")
 #message(STATUS "Using Boost test libraries : ${Boost_LIBRARIES_test}")
-list(APPEND external_library_list ${Boost_LIBRARIES_core})
-list(APPEND external_link_directories ${Boost_LIBRARY_DIRS})
+

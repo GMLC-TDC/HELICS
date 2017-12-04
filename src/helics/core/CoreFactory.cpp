@@ -356,9 +356,13 @@ std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
 
 bool registerCommonCore (std::shared_ptr<CommonCore> tcore)
 {
+    auto res = searchableObjects.addObject (tcore->getIdentifier (), tcore);
     cleanUpCores ();
-    delayedDestroyer.addObjectsToBeDestroyed (tcore);
-    return searchableObjects.addObject (tcore->getIdentifier (), tcore);
+    if (res)
+    {
+        delayedDestroyer.addObjectsToBeDestroyed (tcore);
+    }
+    return res;
 }
 
 size_t cleanUpCores () { return delayedDestroyer.destroyObjects (); }

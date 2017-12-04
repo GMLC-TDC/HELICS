@@ -26,17 +26,18 @@ public:
 	TestBroker(std::shared_ptr<TestBroker> nbroker);
 	virtual ~TestBroker();
 	virtual void InitializeFromArgs(int argc, const char * const *argv) override;
-
+protected:
 	virtual void transmit(int32_t route, const ActionMessage &command) override;
 
 	virtual void addRoute(int route_id, const std::string &routeInfo) override;
-
+public:
 	virtual std::string getAddress() const override;
-
+    /** static method to display the help message*/
+    static void displayHelp(bool localOnly = false);
+protected:
 	virtual bool brokerConnect() override;
 	virtual void brokerDisconnect() override;
-	/** static method to display the help message*/
-	static void displayHelp(bool localOnly=false);
+	
 private:
 	std::string brokerName;  //!< the name of the higher level broker to connect to
 	std::string brokerInitString;  //!< the initialization string for the higher level broker

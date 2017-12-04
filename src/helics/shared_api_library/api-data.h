@@ -12,8 +12,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #ifndef HELICS_API_DATA_H_
 #define HELICS_API_DATA_H_
 
-#include <stdint.h>
 #include "../core/flag-definitions.h"
+#include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

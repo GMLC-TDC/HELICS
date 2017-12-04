@@ -13,7 +13,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <memory>
 
 #include "helics/application_api/MessageFederate.h"
-#include "helics/application_api/MessageFilterFederate.h"
 #include "helics/application_api/ValueFederate.h"
 #include "helics/core/CoreBroker.h"
 #include "helics/core/CoreFactory.h"
@@ -28,7 +27,7 @@ struct ValueFederateTestFixture
 
     void StartBroker (const std::string &core_type_name, const std::string &initialization_string);
 
-    std::shared_ptr<helics::CoreBroker> broker;
+    std::vector<std::shared_ptr<helics::CoreBroker>> broker;
     std::shared_ptr<helics::ValueFederate> vFed1;
     std::shared_ptr<helics::ValueFederate> vFed2;
 };
@@ -43,7 +42,7 @@ struct MessageFederateTestFixture
 
     void StartBroker (const std::string &core_type_name, const std::string &initialization_string);
 
-    std::shared_ptr<helics::CoreBroker> broker;
+    std::vector<std::shared_ptr<helics::CoreBroker>> broker;
     std::shared_ptr<helics::MessageFederate> mFed1;
     std::shared_ptr<helics::MessageFederate> mFed2;
 };

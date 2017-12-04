@@ -104,7 +104,7 @@ void logger::logFunction (std::string &&message)
 
 loggerNoThread::loggerNoThread () = default;
 
-loggerNoThread::loggerNoThread (std::shared_ptr<loggingCore> /*core*/){}
+loggerNoThread::loggerNoThread (std::shared_ptr<loggingCore> /*core*/) {}
 
 void loggerNoThread::openFile (const std::string &file) { outFile.open (file.c_str ()); }
 void loggerNoThread::startLogging (int cLevel, int fLevel)
@@ -239,10 +239,10 @@ void loggingCore::processingLoop ()
         // in case they were written out of order
         if ((f == '$') || (f == '-'))
         {
-            f = msg.back();
+            f = msg.back ();
             if ((f == '^') || (f == '~'))
             {
-                msg.pop_back();
+                msg.pop_back ();
             }
         }
         if ((c == '$') || (nosymbol))
@@ -308,7 +308,23 @@ void loggerManager::closeLogger (const std::string &loggerName)
     }
 }
 
-loggerManager::~loggerManager () {}
+void loggerManager::logMessage (const std::string &message)
+{
+    std::lock_guard<std::mutex> loglock (loggerLock);
+    auto fnd = loggers.find ("");
+    if (fnd != loggers.end ())
+    {
+        if (fnd->second->loggingControl)
+        {
+            fnd->second->loggingControl->addMessage (message);
+            return;
+        }
+    }
+    // if there is no default logger just dump it to the console
+    std::cout << message << std::endl;
+}
+
+loggerManager::~loggerManager () = default;
 
 loggerManager::loggerManager (const std::string &loggerName) : name (loggerName)
 {

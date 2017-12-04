@@ -93,6 +93,7 @@ bool CommsInterface::connect ()
     }
     if (rx_status != connection_status::connected)
     {
+        // std::cerr << "receiver connection failure" << std::endl;
         if (tx_status == connection_status::connected)
         {
             if (queue_transmitter.joinable ())
@@ -107,6 +108,7 @@ bool CommsInterface::connect ()
 
     if (tx_status != connection_status::connected)
     {
+        std::cerr << "transmitter connection failure" << std::endl;
         if (rx_status == connection_status::connected)
         {
             if (queue_watcher.joinable ())

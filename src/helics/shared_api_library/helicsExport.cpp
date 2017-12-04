@@ -9,10 +9,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "../application_api/application_api.h"
+#include "../common/logger.h"
 #include "../core/BrokerFactory.h"
 #include "../core/CoreFactory.h"
 #include "../core/helics-time.h"
-#include "../common/logger.h"
 #include "helics.h"
 #include "internal/api_objects.h"
 #include <atomic>
@@ -338,7 +338,7 @@ void helicsCloseLibrary ()
     }
 
 #endif
-    helics::loggerManager::closeLogger();
+    helics::loggerManager::closeLogger ();
 }
 
 helics_query helicsCreateQuery (const char *target, const char *query)

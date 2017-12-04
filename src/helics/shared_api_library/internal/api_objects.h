@@ -23,7 +23,6 @@ namespace helics
 	class CoreBroker;
 	class ValueFederate;
 	class MessageFederate;
-	class MessageFilterFederate;
 	class Subscription;
 	class Publication;
 	class Endpoint;
@@ -109,7 +108,7 @@ namespace helics
 	{
 	public:
 		std::unique_ptr<SourceFilter> filtptr;
-		std::shared_ptr<MessageFilterFederate> fedptr;
+		std::shared_ptr<Federate> fedptr;
 		std::unique_ptr<Message> lastMessage;
 	};
 	/** object wrapping a destination Filter*/
@@ -117,7 +116,7 @@ namespace helics
 	{
 	public:
 		std::unique_ptr<DestinationFilter> filtptr;
-		std::shared_ptr<MessageFilterFederate> fedptr;
+		std::shared_ptr<Federate> fedptr;
 	};
 
 	class queryObject
@@ -133,13 +132,12 @@ namespace helics
 helics::Federate *getFed(helics_federate fed);
 helics::ValueFederate *getValueFed(helics_value_federate fed);
 helics::MessageFederate *getMessageFed(helics_message_federate fed);
-helics::MessageFilterFederate *getFilterFed(helics_message_filter_federate fed);
 
 std::shared_ptr<helics::Federate> getFedSharedPtr(helics_federate fed);
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(helics_value_federate fed);
 std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(helics_message_federate fed);
-std::shared_ptr<helics::MessageFilterFederate> getFilterFedSharedPtr(helics_message_filter_federate fed);
 
+/** class for containing all the objects associated with a federate*/
 class masterObjectHolder
 {
 private:

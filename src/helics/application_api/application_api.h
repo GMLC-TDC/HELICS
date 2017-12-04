@@ -11,8 +11,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "ValueFederate.h"
 #include "MessageFederate.h"
-#include "MessageFilterFederate.h"
 #include "CombinationFederate.h"
+#include "Filters.hpp"
 #include "Endpoints.hpp"
 #include "Publications.hpp"
 #include "Subscriptions.hpp"

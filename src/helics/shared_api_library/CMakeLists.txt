@@ -17,7 +17,7 @@ helics.h
 api-data.h
 ValueFederate_c.h
 MessageFederate_c.h
-MessageFilterFederate_c.h
+MessageFilters_c.h
 internal/api_objects.h
 )
 
@@ -26,7 +26,7 @@ helicsExport.cpp
 FederateExport.cpp
 ValueFederateExport.cpp
 MessageFederateExport.cpp
-MessageFilterFederateExport.cpp
+MessageFilters.cpp
 
 )
 
@@ -35,15 +35,13 @@ add_library(helicsSharedLib SHARED ${helicsShared_sources} ${helicsShared_header
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
-target_link_libraries(helicsSharedLib helics)
-link_directories(${external_link_directories})
-target_link_libraries(helicsSharedLib ${external_library_list})
-
-IF(MINGW)
-target_link_libraries(helicsSharedLib ws2_32)
-ENDIF(MINGW)
+target_link_libraries(helicsSharedLib helics-static)
 
 
-INSTALL(TARGETS helicsSharedLib DESTINATION lib/helics EXPORT helics-targets)
+INSTALL(TARGETS helicsSharedLib EXPORT helics-targets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
 
 

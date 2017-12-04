@@ -26,6 +26,8 @@ public:
 	~IpcComms();
 
 private:
+    std::atomic<bool> disconnect_rx{ false };
+
 	virtual void queue_rx_function() override;	//!< the functional loop for the receive queue
 	virtual void queue_tx_function() override;  //!< the loop for transmitting data
 	virtual void closeTransmitter() override; //!< function to instruct the transmitter loop to close

@@ -9,7 +9,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "Federate.h"
+#include "../core/BrokerFactory.h"
 #include "../core/CoreFactory.h"
+
 #include "../core/core.h"
 #include "asyncFedCallInfo.h"
 #include "helics/helics-config.h"
@@ -25,6 +27,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 namespace helics
 {
@@ -46,6 +49,12 @@ int getHelicsVersionMajor () { return HELICS_VERSION_MAJOR; }
 
 int getHelicsVersionMinor () { return HELICS_VERSION_MINOR; }
 int getHelicsVersionPatch () { return HELICS_VERSION_PATCH; }
+
+void cleanupHelicsLibrary ()
+{
+    BrokerFactory::cleanUpBrokers ();
+    CoreFactory::cleanUpCores ();
+}
 
 Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
 {
@@ -373,12 +382,11 @@ void Federate::setPeriod (Time period, Time offset)
 
 void Federate::setLoggingLevel (int loggingLevel) { coreObject->setLoggingLevel (fedID, loggingLevel); }
 
-
-void Federate::setFlag(int flag, bool flagValue)
+void Federate::setFlag (int flag, bool flagValue)
 {
     if ((flag > 10) || (flag < 0))
     {
-        throw(InvalidParameterValue("flag must be between 0 and 10"));
+        throw (InvalidParameterValue ("flag must be between 0 and 10"));
     }
     switch (flag)
     {
@@ -389,11 +397,9 @@ void Federate::setFlag(int flag, bool flagValue)
         FedInfo.forwardCompute = flagValue;
         break;
     default:
-        coreObject->setFlag(fedID, flag, flagValue);
+        coreObject->setFlag (fedID, flag, flagValue);
         break;
     }
-    
-
 }
 void Federate::finalize ()
 {
@@ -407,7 +413,8 @@ void Federate::finalize ()
     case op_states::initialization:
         break;
     case op_states::pendingExec:
-        enterInitializationStateFinalize ();
+        enterExecutionStateFinalize ();
+        break;
     case op_states::pendingTime:
         requestTimeFinalize ();
         break;
@@ -541,7 +548,8 @@ Time Federate::requestTimeFinalize ()
     }
     else
     {
-        throw (InvalidFunctionCall ("cannot call finalize requestTime without first calling requestTimeIterative function"));
+        throw (InvalidFunctionCall (
+          "cannot call finalize requestTime without first calling requestTimeIterative function"));
     }
 }
 
@@ -563,7 +571,8 @@ iterationTime Federate::requestTimeIterativeFinalize ()
     }
     else
     {
-        throw (InvalidFunctionCall ("cannot call finalize requestTimeIterative without first calling requestTimeIterativeAsync function"));
+        throw (InvalidFunctionCall (
+          "cannot call finalize requestTimeIterative without first calling requestTimeIterativeAsync function"));
     }
 }
 
@@ -653,6 +662,64 @@ bool Federate::queryCompleted (int queryIndex) const
     return false;
 }
 
+filter_id_t Federate::registerSourceFilter (const std::string &filterName,
+                                            const std::string &sourceEndpoint,
+                                            const std::string &inputType,
+                                            const std::string &outputType)
+{
+    return coreObject->registerSourceFilter (filterName, sourceEndpoint, inputType, outputType);
+}
+
+filter_id_t Federate::registerDestinationFilter (const std::string &filterName,
+                                                 const std::string &destEndpoint,
+                                                 const std::string &inputType,
+                                                 const std::string &outputType)
+{
+    return coreObject->registerDestinationFilter (filterName, destEndpoint, inputType, outputType);
+}
+
+std::string Federate::getFilterName (filter_id_t id) const { return coreObject->getHandleName (id.value ()); }
+std::string Federate::getFilterEndpoint (filter_id_t id) const { return coreObject->getTarget (id.value ()); }
+
+std::string Federate::getFilterInputType (filter_id_t id) const { return coreObject->getType (id.value ()); }
+
+std::string Federate::getFilterOutputType (filter_id_t id) const { return coreObject->getType (id.value ()); }
+
+filter_id_t Federate::getFilterId (const std::string &filterName) const
+{
+    auto id = coreObject->getSourceFilter (filterName);
+    if (id == invalid_Handle)
+    {
+        id = coreObject->getDestinationFilter (filterName);
+    }
+    return (id == invalid_Handle) ? invalid_id_value : filter_id_t (id);
+}
+
+filter_id_t Federate::getSourceFilterId (const std::string &filterName) const
+{
+    auto id = coreObject->getSourceFilter (filterName);
+    return (id == invalid_Handle) ? invalid_id_value : filter_id_t (id);
+}
+
+filter_id_t Federate::getDestFilterId (const std::string &filterName) const
+{
+    auto id = coreObject->getDestinationFilter (filterName);
+    return (id == invalid_Handle) ? invalid_id_value : filter_id_t (id);
+}
+
+void Federate::setFilterOperator (filter_id_t id, std::shared_ptr<FilterOperator> mo)
+{
+    coreObject->setFilterOperator (id.value (), std::move (mo));
+}
+
+void Federate::setFilterOperator (const std::vector<filter_id_t> &filter_ids, std::shared_ptr<FilterOperator> mo)
+{
+    for (auto id : filter_ids)
+    {
+        coreObject->setFilterOperator (id.value (), mo);
+    }
+}
+
 FederateInfo LoadFederateInfo (const std::string &jsonString)
 {
     FederateInfo fi;
@@ -672,8 +739,10 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     }
     else
     {
-        Json_helics::Reader stringReader;
-        bool ok = stringReader.parse (jsonString, doc, false);
+        Json_helics::CharReaderBuilder rbuilder;
+        std::string errs;
+        std::istringstream jstring (jsonString);
+        bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
         if (!ok)
         {
             // should I throw an error here?

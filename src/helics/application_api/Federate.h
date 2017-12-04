@@ -15,6 +15,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../core/helics-time.h"
 #include "helics_includes/string_view.h"
 
+#include "helicsTypes.hpp"
+
 #include "../core/coreFederateInfo.h"
 #include "../core/flag-definitions.h"
 #include <atomic>
@@ -33,6 +35,7 @@ namespace helics
 {
 class Core;
 class asyncFedCallInfo;
+class MessageOperator;
 /** data class defining federate properties and information
  */
 class FederateInfo: public CoreFederateInfo
@@ -289,6 +292,95 @@ class Federate
     */
     bool queryCompleted (int queryIndex) const;
 
+    /** define a filter interface on a source
+    @details a source filter will be sent any packets that come from a particular source
+    if multiple filters are defined on the same source, they will be placed in some order defined by the core
+    @param[in] the name of the endpoint
+    @param[in] the inputType which the source filter can receive
+    */
+    filter_id_t registerSourceFilter(const std::string &filterName,
+        const std::string &sourceEndpoint,
+        const std::string &inputType = "",
+        const std::string &outputType = "");
+    /** define a filter interface for a destination
+    @details a destination filter will be sent any packets that are going to a particular destination
+    multiple filters are not allowed to specify the same destination
+    @param[in] the name of the destination endpoint
+    @param[in] the inputType which the destination filter can receive
+    */
+    filter_id_t registerDestinationFilter(const std::string &filterName,
+        const std::string &destEndpoint,
+        const std::string &inputType = "",
+        const std::string &outputType = "");
+    /** define a filter interface on a source
+    @details a source filter will be sent any packets that come from a particular source
+    if multiple filters are defined on the same source, they will be placed in some order defined by the core
+    @param[in] the name of the endpoint
+    @param[in] the inputType which the source filter can receive
+    */
+    filter_id_t registerSourceFilter(const std::string &sourceEndpoint)
+    {
+        return registerSourceFilter("", sourceEndpoint, "", "");
+    }
+    /** define a filter interface for a destination
+    @details a destination filter will be sent any packets that are going to a particular destination
+    multiple filters are not allowed to specify the same destination
+    @param[in] the name of the destination endpoint
+    @param[in] the inputType which the destination filter can receive
+    */
+    filter_id_t registerDestinationFilter(const std::string &destEndpoint)
+    {
+        return registerDestinationFilter("", destEndpoint, "", "");
+    }
+    /** get the name of a filter
+    @param[in] id the filter to query
+    @return empty string if an invalid id is passed*/
+    std::string getFilterName(filter_id_t id) const;
+
+    /** get the name of the endpoint that a filter is associated with
+    @param[in] id the filter to query
+    @return empty string if an invalid id is passed*/
+    std::string getFilterEndpoint(filter_id_t id) const;
+
+    /** get the input type of a filter from its id
+    @param[in] id the endpoint to query
+    @return empty string if an invalid id is passed*/
+    std::string getFilterInputType(filter_id_t id) const;
+
+    /** get the output type of a filter from its id
+    @param[in] id the endpoint to query
+    @return empty string if an invalid id is passed*/
+    std::string getFilterOutputType(filter_id_t id) const;
+    /** get the id of a source filter from the name of the endpoint
+    @param[in] filterName the name of the filter
+    @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
+    filter_id_t getFilterId(const std::string &filterName) const;
+    /** get the id of a source filter from the name of the filter
+    @param[in] filterName the publication id
+    @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
+    filter_id_t getSourceFilterId(const std::string &filterName) const;
+
+    /** get the id of a destination filter from the name of the endpoint
+    @param[in] filterName the publication id
+    @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
+    filter_id_t getDestFilterId(const std::string &filterName) const;
+
+    /** @brief register a operator for the specified filter
+    @details for time_agnostic federates only,  all other settings would trigger an error
+    The MessageOperator gets called when there is a message to filter, There is no order or state to this
+    messages can come in any order.
+    @param[in] filter the identifier for the filter to trigger
+    @param[in] op A shared_ptr to a message operator
+    */
+    void setFilterOperator(filter_id_t filter, std::shared_ptr<FilterOperator> op);
+    /** @brief register a operator for the specified filters
+    @details for time_agnostic federates only,  all other settings would trigger an error
+    The MessageOperator gets called when there is a message to filter, There is no order or state to this
+    message can come in any order.
+    @param[in] filters the identifier for the filter to trigger
+    @param[in] op A shared_ptr to a message operator
+    */
+    void setFilterOperator(const std::vector<filter_id_t> &filters, std::shared_ptr<FilterOperator> op);
   protected:
     /** function to deal with any operations that need to occur on a time update*/
     virtual void updateTime (Time newTime, Time oldTime);
@@ -338,5 +430,10 @@ class InvalidParameterValue : public std::runtime_error
   public:
     InvalidParameterValue (const char *s) noexcept : std::runtime_error (s) {}
 };
+
+/** function to do some housekeeping work
+@details this runs some cleanup routines and tries to close out any residual thread that haven't been shutdown
+yet*/
+void cleanupHelicsLibrary();
 } //namespace helics
 #endif

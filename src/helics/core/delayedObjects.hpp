@@ -52,7 +52,7 @@ class DelayedObjects
         if (fnd != promiseByInteger.end ())
         {
             fnd->second.set_value (val);
-            usedPromiseByInteger[index] = std::move(fnd->second);
+            usedPromiseByInteger[index] = std::move (fnd->second);
             promiseByInteger.erase (fnd);
         }
     }
@@ -63,7 +63,7 @@ class DelayedObjects
         if (fnd != promiseByString.end ())
         {
             fnd->second.set_value (val);
-            usedPromiseByString[name] = std::move(fnd->second);
+            usedPromiseByString[name] = std::move (fnd->second);
             promiseByString.erase (fnd);
         }
     }
@@ -84,23 +84,23 @@ class DelayedObjects
         return fut;
     }
 
-    void finishedWithValue(int index)
+    void finishedWithValue (int index)
     {
-        std::lock_guard<std::mutex> lock(promiseLock);
-        auto fnd = usedPromiseByInteger.find(index);
-        if (fnd != usedPromiseByInteger.end())
+        std::lock_guard<std::mutex> lock (promiseLock);
+        auto fnd = usedPromiseByInteger.find (index);
+        if (fnd != usedPromiseByInteger.end ())
         {
-            usedPromiseByInteger.erase(fnd);
+            usedPromiseByInteger.erase (fnd);
         }
     }
 
-    void finishedWithValue(const std::string &name)
+    void finishedWithValue (const std::string &name)
     {
-        std::lock_guard<std::mutex> lock(promiseLock);
-        auto fnd = usedPromiseByString.find(name);
-        if (fnd != usedPromiseByString.end())
+        std::lock_guard<std::mutex> lock (promiseLock);
+        auto fnd = usedPromiseByString.find (name);
+        if (fnd != usedPromiseByString.end ())
         {
-            usedPromiseByString.erase(fnd);
+            usedPromiseByString.erase (fnd);
         }
     }
 };

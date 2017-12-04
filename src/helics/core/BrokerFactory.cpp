@@ -217,9 +217,14 @@ std::shared_ptr<CoreBroker> findBroker (const std::string &brokerName)
 
 bool registerBroker (std::shared_ptr<CoreBroker> tbroker)
 {
+    auto res = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
     cleanUpBrokers ();
-    delayedDestroyer.addObjectsToBeDestroyed (tbroker);
-    return searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
+    if (res)
+    {
+        delayedDestroyer.addObjectsToBeDestroyed (tbroker);
+    }
+
+    return res;
 }
 
 size_t cleanUpBrokers () { return delayedDestroyer.destroyObjects (); }

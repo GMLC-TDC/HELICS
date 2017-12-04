@@ -10,9 +10,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "TimeCoordinator.h"
-#include <boost/format.hpp>
 #include "flag-definitions.h"
 #include <algorithm>
+#include <boost/format.hpp>
 
 namespace helics
 {
@@ -36,7 +36,10 @@ void TimeCoordinator::enteringExecMode (iteration_request mode)
     {
         ActionMessage execreq (CMD_EXEC_REQUEST);
         execreq.source_id = source_id;
-        execreq.iterationComplete = !iterating;
+        if (iterating)
+        {
+            SET_ACTION_FLAG (execreq, iterationRequested);
+        }
         sendMessageFunction (execreq);
     }
 }
@@ -60,24 +63,31 @@ void TimeCoordinator::timeRequest (Time nextTime,
     if ((!dependents.empty ()) && (sendMessageFunction))
     {
         ActionMessage treq (CMD_TIME_REQUEST);
-        treq.iterationComplete = !iterating;
+        if (iterating)
+        {
+            SET_ACTION_FLAG (treq, iterationRequested);
+        }
         treq.source_id = source_id;
         treq.actionTime = time_next;
-        treq.info ().Te = time_exec + info.lookAhead;
-        treq.info ().Tdemin = time_minDe;
+        treq.Te = time_exec + info.lookAhead;
+        treq.Tdemin = time_minDe;
         sendMessageFunction (treq);
     }
 }
 
 void TimeCoordinator::updateNextExecutionTime ()
 {
-    time_exec = std::min (time_message, time_value) + info.impactWindow;
+    time_exec = std::min (time_message, time_value);
+    if (time_exec < Time::maxVal ())
+    {
+        time_exec += info.impactWindow;
+    }
     time_exec = std::min (time_requested, time_exec);
     if (time_exec <= time_granted)
     {
         time_exec = (iterating) ? time_granted : (time_granted + info.timeDelta);
     }
-    if (((time_exec - time_granted)>0.0)&&(info.period > timeEpsilon))
+    if (((time_exec - time_granted) > 0.0) && (info.period > timeEpsilon))
     {
         auto blk = static_cast<int> (std::ceil ((time_exec - time_granted) / info.period));
         time_exec = time_granted + blk * info.period;
@@ -107,7 +117,6 @@ void TimeCoordinator::updateValueTime (Time valueUpdateTime)
         }
         return;
     }
-    valueUpdateTime += info.impactWindow;
     if (valueUpdateTime < time_value)
     {
         if (iterating)
@@ -138,7 +147,6 @@ void TimeCoordinator::updateMessageTime (Time messageUpdateTime)
         }
         return;
     }
-    messageUpdateTime += info.impactWindow;
     if (messageUpdateTime < time_message)
     {
         if (iterating)
@@ -162,7 +170,7 @@ void TimeCoordinator::updateMessageTime (Time messageUpdateTime)
 bool TimeCoordinator::updateTimeFactors ()
 {
     Time minNext = Time::maxVal ();
-    Time minminDe = std::min(time_value,time_message);
+    Time minminDe = std::min (time_value, time_message);
     Time minDe = minminDe;
     for (auto &dep : dependencies)
     {
@@ -246,6 +254,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
                     ActionMessage treq (CMD_TIME_GRANT);
                     treq.source_id = source_id;
                     treq.actionTime = time_granted;
+                    SET_ACTION_FLAG (treq, iterationRequested);
                     sendMessageFunction (treq);
                 }
                 return iteration_state::iterating;
@@ -259,8 +268,12 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         ActionMessage upd (CMD_TIME_REQUEST);
         upd.source_id = source_id;
         upd.actionTime = time_next;
-        upd.info ().Te = time_exec;
-        upd.info ().Tdemin = time_minDe;
+        upd.Te = time_exec;
+        upd.Tdemin = time_minDe;
+        if (iterating)
+        {
+            SET_ACTION_FLAG (upd, iterationRequested);
+        }
         sendMessageFunction (upd);
 
         //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
@@ -269,11 +282,13 @@ iteration_state TimeCoordinator::checkTimeGrant ()
     return iteration_state::continue_processing;
 }
 
-std::string TimeCoordinator::printTimeStatus() const
+std::string TimeCoordinator::printTimeStatus () const
 {
-    return (boost::format("exec=%f allow=%f, value=%f, message=%f, minDe=%f minminDe=%f") %
-        static_cast<double>(time_exec) % static_cast<double>(time_allow) % static_cast<double>(time_value) %
-        static_cast<double>(time_message) % static_cast<double>(time_minDe) % static_cast<double>(time_minminDe)).str();
+    return (boost::format ("exec=%f allow=%f, value=%f, message=%f, minDe=%f minminDe=%f") %
+            static_cast<double> (time_exec) % static_cast<double> (time_allow) % static_cast<double> (time_value) %
+            static_cast<double> (time_message) % static_cast<double> (time_minDe) %
+            static_cast<double> (time_minminDe))
+      .str ();
 }
 
 bool TimeCoordinator::isDependency (Core::federate_id_t ofed) const { return dependencies.isDependency (ofed); }
@@ -322,6 +337,16 @@ DependencyInfo *TimeCoordinator::getDependencyInfo (Core::federate_id_t ofed)
     return dependencies.getDependencyInfo (ofed);
 }
 
+std::vector<Core::federate_id_t> TimeCoordinator::getDependencies () const
+{
+    std::vector<Core::federate_id_t> deps;
+    for (auto &dep : dependencies)
+    {
+        deps.push_back (dep.fedID);
+    }
+    return deps;
+}
+
 iteration_state TimeCoordinator::checkExecEntry ()
 {
     auto ret = iteration_state::continue_processing;
@@ -361,7 +386,6 @@ iteration_state TimeCoordinator::checkExecEntry ()
         {
             ActionMessage execgrant (CMD_EXEC_GRANT);
             execgrant.source_id = source_id;
-            execgrant.iterationComplete = true;
             sendMessageFunction (execgrant);
         }
     }
@@ -373,7 +397,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
         {
             ActionMessage execgrant (CMD_EXEC_GRANT);
             execgrant.source_id = source_id;
-            execgrant.iterationComplete = false;
+            SET_ACTION_FLAG (execgrant, iterationRequested);
             sendMessageFunction (execgrant);
         }
     }
@@ -382,7 +406,36 @@ iteration_state TimeCoordinator::checkExecEntry ()
 
 bool TimeCoordinator::processTimeMessage (ActionMessage &cmd) { return dependencies.updateTime (cmd); }
 
-void TimeCoordinator::processConfigUpdateMessage(const ActionMessage &cmd)
+void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
+{
+    switch (cmd.action ())
+    {
+    case CMD_ADD_DEPENDENCY:
+        addDependency (cmd.source_id);
+        break;
+    case CMD_REMOVE_DEPENDENCY:
+        removeDependency (cmd.source_id);
+        break;
+    case CMD_ADD_DEPENDENT:
+        addDependent (cmd.source_id);
+        break;
+    case CMD_REMOVE_DEPENDENT:
+        removeDependent (cmd.source_id);
+        break;
+    case CMD_ADD_INTERDEPENDENCY:
+        addDependency (cmd.source_id);
+        addDependent (cmd.source_id);
+        break;
+    case CMD_REMOVE_INTERDEPENDENCY:
+        removeDependency (cmd.source_id);
+        removeDependent (cmd.source_id);
+        break;
+    default:
+        break;
+    }
+}
+
+void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd)
 {
     switch (cmd.index)
     {
@@ -406,25 +459,25 @@ void TimeCoordinator::processConfigUpdateMessage(const ActionMessage &cmd)
         info.offset = cmd.actionTime;
         break;
     case UPDATE_MAX_ITERATION:
-        info.max_iterations = static_cast<int16_t>(cmd.dest_id);
+        info.max_iterations = static_cast<int16_t> (cmd.dest_id);
         break;
     case UPDATE_LOG_LEVEL:
-        info.logLevel = static_cast<int>(cmd.dest_id);
+        info.logLevel = static_cast<int> (cmd.dest_id);
         break;
     case UPDATE_FLAG:
         switch (cmd.dest_id)
         {
         case UNINTERRUPTIBLE_FLAG:
-            info.uninterruptible = cmd.flag;
+            info.uninterruptible = CHECK_ACTION_FLAG (cmd, indicator_flag);
             break;
         case ONLY_TRANSMIT_ON_CHANGE_FLAG:
-            info.only_transmit_on_change = cmd.flag;
+            info.only_transmit_on_change = CHECK_ACTION_FLAG (cmd, indicator_flag);
             break;
         case ONLY_UPDATE_ON_CHANGE_FLAG:
-            info.only_update_on_change = cmd.flag;
+            info.only_update_on_change = CHECK_ACTION_FLAG (cmd, indicator_flag);
             break;
         case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
-            info.wait_for_current_time_updates = cmd.flag;
+            info.wait_for_current_time_updates = CHECK_ACTION_FLAG (cmd, indicator_flag);
             break;
         default:
             break;

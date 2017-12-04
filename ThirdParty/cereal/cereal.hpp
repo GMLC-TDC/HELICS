@@ -32,6 +32,7 @@
 #include <type_traits>
 #include <string>
 #include <memory>
+#include <functional>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -95,6 +96,16 @@ namespace cereal
   SizeTag<T> make_size_tag( T && sz )
   {
     return {std::forward<T>(sz)};
+  }
+
+  // ######################################################################
+  //! Marks data for deferred serialization
+  /*! @relates DeferredData
+      @ingroup Utility */
+  template <class T> inline
+  DeferredData<T> defer( T && value )
+  {
+    return {std::forward<T>(value)};
   }
 
   // ######################################################################
@@ -338,6 +349,12 @@ namespace cereal
           return id->second;
       }
 
+      void serializeDeferments()
+      {
+        for( auto & deferment : itsDeferments )
+          deferment();
+      }
+
     private:
       //! Serializes data after calling prologue, then calls epilogue
       template <class T> inline
@@ -376,6 +393,17 @@ namespace cereal
       ArchiveType & processImpl(base_class<T> const & b)
       {
         self->processImpl( *b.base_ptr );
+        return *self;
+      }
+
+      std::vector<std::function<void(void)>> itsDeferments;
+
+      template <class T> inline
+      ArchiveType & processImpl(DeferredData<T> const & d)
+      {
+        std::function<void(void)> deferment( [=](){ self->process( d.value ); } );
+        itsDeferments.emplace_back( std::move(deferment) );
+
         return *self;
       }
 
@@ -721,6 +749,12 @@ namespace cereal
         itsPolymorphicTypeMap.insert( {stripped_id, name} );
       }
 
+      void serializeDeferments()
+      {
+        for( auto & deferment : itsDeferments )
+          deferment();
+      }
+
     private:
       //! Serializes data after calling prologue, then calls epilogue
       template <class T> inline
@@ -759,6 +793,17 @@ namespace cereal
       ArchiveType & processImpl(base_class<T> & b)
       {
         self->processImpl( *b.base_ptr );
+        return *self;
+      }
+
+      std::vector<std::function<void(void)>> itsDeferments;
+
+      template <class T> inline
+      ArchiveType & processImpl(DeferredData<T> const & d)
+      {
+        std::function<void(void)> deferment( [=](){ self->process( d.value ); } );
+        itsDeferments.emplace_back( std::move(deferment) );
+
         return *self;
       }
 

@@ -51,15 +51,24 @@ void IpcComms::queue_rx_function ()
     bool operating = false;
     while (true)
     {
-        ActionMessage cmd = rxQueue.getMessage ();
-        if (isProtocolCommand (cmd))
+        auto cmdopt = rxQueue.getMessage (5000);
+        if (!cmdopt)
         {
-            if (cmd.index == CLOSE_RECEIVER)
+            if (disconnect_rx)
             {
                 disconnecting = true;
                 break;
             }
-            if (cmd.index == SET_TO_OPERATING)
+            continue;
+        }
+        if (isProtocolCommand (*cmdopt))
+        {
+            if (cmdopt->index == CLOSE_RECEIVER)
+            {
+                disconnecting = true;
+                break;
+            }
+            if (cmdopt->index == SET_TO_OPERATING)
             {
                 if (!operating)
                 {
@@ -69,7 +78,7 @@ void IpcComms::queue_rx_function ()
             }
             continue;
         }
-        if (cmd.action () == CMD_INIT_GRANT)
+        if (cmdopt->action () == CMD_INIT_GRANT)
         {
             if (!operating)
             {
@@ -77,10 +86,16 @@ void IpcComms::queue_rx_function ()
                 operating = true;
             }
         }
-        ActionCallback (std::move (cmd));
+        ActionCallback (std::move (*cmdopt));
     }
-
-    rxQueue.changeState (queue_state_t::closing);
+    try
+    {
+        rxQueue.changeState (queue_state_t::closing);
+    }
+    catch (boost::interprocess::interprocess_exception const &ipe)
+    {
+        std::cerr << "error changing states" << std::endl;
+    }
     rx_status = connection_status::terminated;
 }
 
@@ -237,7 +252,8 @@ void IpcComms::closeReceiver ()
         {
             if (!disconnecting)
             {
-                std::cerr << "unable to send close message\n";
+                disconnect_rx = true;
+                std::cerr << "unable to send close message::" << ipe.what () << std::endl;
             }
         }
     }

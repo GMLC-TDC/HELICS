@@ -8,7 +8,7 @@ set (HELICS_VERSION_MAJOR 0)
 set (HELICS_VERSION_MINOR 9)
 set (HELICS_VERSION_PATCH 0)
 
-set (HELICS_DATE "10-16-17")
+set (HELICS_DATE "11-30-17")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -20,12 +20,20 @@ OPTION(BUILD_HELICS_EXAMPLES "Enable the test Executables to be built" OFF)
 
 OPTION(BUILD_PYTHON "Build Python extension" OFF)
 
-OPTION(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
-SET(LIB_TYPE STATIC)
-IF(BUILD_SHARED_LIBS)
-    SET(LIB_TYPE SHARED)
+OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" OFF)
+IF(NOT MSVC)
+OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface gcc/clang only" OFF)
+ENDIF()
+
+if (BUILD_PYTHON OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
+set(BUILD_SHARED_LIBS ON)
+else()
+OPTION(USE_POSITION_INDEPENDENT_CODE "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library" OFF)
+endif()
+
+IF(BUILD_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
     SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
-ENDIF(BUILD_SHARED_LIBS)
+ENDIF()
 
 #-----------------------------------------------------------------------------
 # General project wide configuration
@@ -87,6 +95,7 @@ IF(UNIX)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
+   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
 ELSE(UNIX)
   IF(MINGW)
  add_compile_options(-Wall -pedantic)
@@ -96,29 +105,38 @@ ELSE(UNIX)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
+  #this options produces lots of warning but is useful for checking ever once in a while with Clang GCC warnin notices with this aren't as useful
+  #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
+  
+  option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
   ELSE(MINGW)
-  set(Boost_USE_STATIC_LIBS ON)
+   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
 # -------------------------------------------------------------
 # Extra definitions for visual studio
 # -------------------------------------------------------------
 IF(MSVC)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
-  add_compile_options(/bigobj)
+  add_compile_options(/MP)
   add_compile_options(-W4  /EHsc /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484)
   ADD_DEFINITIONS(-D_WIN32_WINNT=0x0601)
 ENDIF(MSVC)
   ENDIF(MINGW)
 ENDIF(UNIX)
 
+IF (BUILD_MATLAB OR USE_BOOST_STATIC_LIBS)
+  set(Boost_USE_STATIC_LIBS ON)
+ENDIF ()
+
 # -------------------------------------------------------------
 # Check and set latest CXX Standard supported by compiler
 # -------------------------------------------------------------
+OPTION(ENABLE_CXX_17 "set to on to enable C++17 compilation features" OFF)
 include(CheckLatestCXXStandardOption)
 IF (VERSION_OPTION)
 	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
 ELSE ()
-set(CMAKE_CXX_STANDARD 14)
+	set(CMAKE_CXX_STANDARD 14)
 ENDIF ()
 
 # -------------------------------------------------------------
@@ -150,47 +168,25 @@ if(DOXYGEN_FOUND)
 endif(DOXYGEN_FOUND)
 endif (HELICS_GENERATE_DOXYGEN_DOC)
 
-# -------------------------------------------------------------
-# finding ZMQ
-# -------------------------------------------------------------
-#find_package (ZeroMQ)
-#if (${ZEROMQ_FOUND})
-#   set(HELICS_HAVE_ZEROMQ TRUE)
-#   include_directories ("${ZeroMQ_INCLUDE_DIR}")
-#endif (${ZEROMQ_FOUND})
+FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
+
 
 # -------------------------------------------------------------
-# Enable ZMQ
+# Enable ZeroMQ
 # -------------------------------------------------------------
 
-OPTION(ZMQ_ENABLE "Enable ZMQ networking library" ON)
-# If ZMQ library is enabled try to locate it and link against it
+OPTION(ZeroMQ_ENABLE "Enable ZeroMQ networking library" ON)
+# If ZeroMQ library is enabled try to locate it and link against it
 
-IF (ZMQ_ENABLE)
+IF (ZeroMQ_ENABLE)
 
-SHOW_VARIABLE(ZMQ_LIBRARY_PATH PATH
-  "path to the zmq libraries" "${ZMQ_LIBRARY_PATH}")
+include(addZeroMQ)
 
-SHOW_VARIABLE(ZMQ_INCLUDE_PATH PATH
-  "path to the zmq headers" "${ZMQ_INCLUDE_PATH}")
-  set(ZMQ_FIND_QUIETLY ON)
-find_package(ZMQ)
-
-if (NOT ZMQ_FOUND)
-  OPTION(AUTOBUILD_ZMQ "enable ZMQ to automatically download and build" OFF)
-  IF (AUTOBUILD_ZMQ)
-  include(buildlibZMQ)
-  build_libzmq()
-  set(ZMQ_INSTALL_PATH ${PROJECT_BINARY_DIR}/libs)
-  find_package(ZMQ)
-  ENDIF(AUTOBUILD_ZMQ)
-
-endif(NOT ZMQ_FOUND)
-if (ZMQ_FOUND)
+if (ZeroMQ_FOUND)
    set(HELICS_HAVE_ZEROMQ TRUE)
-   include_directories ("${ZMQ_INCLUDE_DIR}")
- endif(ZMQ_FOUND)
-endif(ZMQ_ENABLE)
+   include_directories ("${ZeroMQ_INCLUDE_DIR}")
+ endif(ZeroMQ_FOUND)
+endif(ZeroMQ_ENABLE)
 
 # -------------------------------------------------------------
 # finding MPI
@@ -212,49 +208,104 @@ ENDIF(MPI_ENABLE)
 # -------------------------------------------------------------
 include(addBoost)
 
-add_library(helics STATIC
+add_library(helics-static STATIC
     $<TARGET_OBJECTS:application_api>
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
-target_link_libraries(helics Threads::Threads)
+target_link_libraries(helics-static Threads::Threads)
 IF (UNIX AND NOT APPLE)
-target_link_libraries(helics rt)
+target_link_libraries(helics-static rt)
 ENDIF()
 
+IF(MINGW)
+	target_link_libraries(helics-static ws2_32)
+ENDIF(MINGW)
 
-if (${ZMQ_FOUND})
-   target_link_libraries(helics ${ZMQ_LIBRARY})
+if (${ZeroMQ_FOUND})
+	if (ZMQ_USE_STATIC_LIBRARY)
+		set(ZeroMQ_DEPENDENCY ${ZeroMQ_STATIC_LIBRARY})
+		ADD_DEFINITIONS(-DZMQ_STATIC)
+	else()
+		set(ZeroMQ_DEPENDENCY ${ZeroMQ_LIBRARY})
+	endif()
+	target_link_libraries(helics-static ${ZeroMQ_DEPENDENCY})
 else()
-   if (ZMQ_ENABLE)
-   message(WARNING "ZMQ not found")
+   if (ZeroMQ_ENABLE)
+   message(WARNING "ZeroMQ not found")
    endif()
 endif ()
 
 if (${MPI_C_FOUND})
-   target_link_libraries(helics ${MPI_C_LIBRARIES})
+   target_link_libraries(helics-static ${MPI_C_LIBRARIES})
 endif (${MPI_C_FOUND})
 
 
-install (TARGETS helics DESTINATION lib/helics EXPORT helics-targets)
-install (EXPORT helics-targets DESTINATION lib/helics)
+
+link_directories(${Boost_LIBRARY_DIRS})
+
+target_link_libraries(helics-static ${Boost_LIBRARIES_core})
+
+
+include(GNUInstallDirs)
+
+# -------------------------------------------------------------
+# setting the RPATH
+# -------------------------------------------------------------
+# use, i.e. don't skip the full RPATH for the build tree
+SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+
+# when building, don't use the install RPATH already
+# (but later on when installing)
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
+
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+
+# the RPATH to be used when installing, but only if it's not a system directory
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/bin" isSystemDir)
+IF("${isSystemDir}" STREQUAL "-1")
+   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
+ENDIF("${isSystemDir}" STREQUAL "-1")
+
+if (NOT USE_BOOST_STATIC_LIBS)
+list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
+endif()
 
 OPTION(BUILD_PLAYER "Build a helics player" ON)
 OPTION(BUILD_RECORDER "Build a helics recorder" ON)
 
 # we aren't ready for this for the whole library yet
-IF(BUILD_SHARED_LIBS)
+IF(BUILD_SHARED_LIBS AND NOT BUILD_CXX_SHARED_LIB)
     IF(UNIX)
         add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fvisibility=hidden>)
+		add_compile_options($<$<COMPILE_LANGUAGE:C>:-fvisibility=hidden>)
     ELSE(UNIX)
         IF(MINGW)
             add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fvisibility=hidden>)
+			add_compile_options($<$<COMPILE_LANGUAGE:C>:-fvisibility=hidden>)
         ENDIF(MINGW)
     ENDIF(UNIX)
-ENDIF(BUILD_SHARED_LIBS)
+ENDIF()
 
+IF(BUILD_CXX_SHARED_LIB)
+	if (BUILD_C_SHARED_LIB OR BUILD_PYTHON)
+		warning("Building the CXX shared library and C shared library in the same build is not advisable due to conflicting symbol visibility guidelines and is unlikely to work very well")
+	endif()
+
+	add_library(helics-shared SHARED helics-static)
+endif()
+
+if (WIN32)
 FILE(GLOB KEY_LIBRARY_FILES  ${PROJECT_BINARY_DIR}/libs/bin/*)
 message(STATUS "key files ${KEY_LIBRARY_FILES}")
+else()
+set(KEY_LIBRARY_FILES "")
+endif()
 
 OPTION(DISABLE_LOGGING "disable all normal, debug, and trace logging in HELICS" OFF)
 if (NOT DISABLE_LOGGING)
@@ -262,17 +313,7 @@ OPTION(DISABLE_TRACE_LOGGING "disable trace logging" OFF)
 OPTION(DISABLE_DEBUG_LOGGING "disable debug logging" OFF)
 endif()
 
-#-----------------------------------------------------------------------------
-# Setup configure.h file for accessing configure options
-#-----------------------------------------------------------------------------
-configure_file (
-  "helics-config.h.in"
-  "${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h"
-  )
-  install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h DESTINATION include/helics)
-  install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/compiler-config.h DESTINATION include/helics)
-  install(DIRECTORY ThirdParty/ DESTINATION include
-	  FILES_MATCHING PATTERN "helics_includes/*.h*")
+
 #-----------------------------------------------------------------------------
 # CMAKE Subdirectories
 #-----------------------------------------------------------------------------
@@ -280,6 +321,11 @@ configure_file (
 add_subdirectory (src)
 
 if (BUILD_HELICS_TESTS)
+if (MSVC)
+SET(ENABLE_TEST_TIMEOUTS OFF)
+ELSE(MSVC)
+OPTION(ENABLE_TEST_TIMEOUTS "Enable timeouts on test" ON)
+ENDIF(MSVC)
 add_subdirectory (tests)
 
 
@@ -291,7 +337,7 @@ include (CTest)
 endif(BUILD_HELICS_TESTS)
 
 if (BUILD_HELICS_EXAMPLES)
-add_subdirectory (examples)
+add_subdirectory (examples)  
 
 endif(BUILD_HELICS_EXAMPLES)
 
@@ -308,3 +354,81 @@ endif(ENABLE_CLANG_TOOLS)
 
 add_subdirectory(swig)
 
+
+set(HELICS_CMAKECONFIG_INSTALL_DIR "cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
+
+install (TARGETS helics-static EXPORT helics-targets
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
+
+	set(helics_static_file "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}")
+	
+IF(BUILD_CXX_SHARED_LIB)
+install (TARGETS helics-shared EXPORT helics-targets
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
+	set(helics_cxx_shared_file "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_SHARED_LIBRARY_SUFFIX}")
+ELSE (BUILD_CXX_SHARED_LIB)
+	set(helics_cxx_shared_file )
+ENDIF(BUILD_CXX_SHARED_LIB)
+
+IF(BUILD_C_SHARED_LIB OR BUILD_PYTHON)
+	set(helics_c_shared_file "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_SHARED_LIBRARY_SUFFIX}")
+ELSE()
+	set(helics_c_shared_file )
+ENDIF()
+
+
+install (EXPORT helics-targets DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
+
+set(helics_dependencies ${Boost_Libraries_Core})
+
+IF (UNIX AND NOT APPLE)
+	list(APPEND helics_dependencies rt)
+ENDIF()
+
+IF(MINGW)
+	list(APPEND helics_dependencies ws2_32)
+ENDIF(MINGW)
+
+if (ZeroMQ_FOUND)
+	list(APPEND helics_dependencies ${ZeroMQ_DEPENDENCY})
+endif(ZeroMQ_FOUND)
+
+
+
+#-----------------------------------------------------------------------------
+# Setup configure.h file for accessing configure options
+#-----------------------------------------------------------------------------
+configure_file (
+  "helics-config.h.in"
+  "${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h"
+  )
+  install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
+  install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/compiler-config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
+  install(DIRECTORY ThirdParty/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+	  FILES_MATCHING PATTERN "helics_includes/*.h*")
+
+
+
+
+include(CMakePackageConfigHelpers)
+
+
+configure_package_config_file(${PROJECT_NAME}Config.cmake.in
+                              "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+                              INSTALL_DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+                                 VERSION ${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}
+                                 COMPATIBILITY AnyNewerVersion)
+
+configure_file(${PROJECT_NAME}Import.cmake.in
+                              "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake")
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+			   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake
+              DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})

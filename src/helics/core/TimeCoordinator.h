@@ -75,7 +75,8 @@ public:
 	{
 		return time_granted;
 	}
-
+    std::vector < Core::federate_id_t> getDependencies() const;
+    /** get a reference to the dependents vector*/
 	const std::vector<Core::federate_id_t> &getDependents() const { return dependents; }
 	/** get the current iteration counter for an iterative call
 	@details this will work properly even when a federate is processing
@@ -114,7 +115,8 @@ public:
     /** process a message related to configuration
     */
     void processConfigUpdateMessage(const ActionMessage &cmd);
-
+    /** process a dependency update message*/
+    void processDependencyUpdateMessage(const ActionMessage &cmd);
 	/** add a federate dependency
 	@return true if it was actually added, false if the federate was already present
 	*/
