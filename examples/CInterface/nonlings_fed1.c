@@ -7,7 +7,7 @@
 #include <unistd.h>
 #endif
 
-int main (int argc, char **argv)
+int main ()
 {
     helics_federate_info_t fedinfo;
     const char *helicsversion;

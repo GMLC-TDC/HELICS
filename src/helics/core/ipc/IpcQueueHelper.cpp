@@ -34,6 +34,15 @@ ownedQueue::~ownedQueue ()
 
 bool ownedQueue::connect (const std::string &connection, int maxMessages, int maxSize)
 {
+    //remove the old queue if are connecting again
+    if (rqueue)
+    {
+        ipc_queue::remove(connectionName.c_str());
+    }
+    if (queue_state)
+    {
+        ipc_state::remove(stateName.c_str());
+    }
     connectionNameOrig = connection;
     connectionName = stringTranslateToCppName (connection);
     stateName = connectionName + "_state";
