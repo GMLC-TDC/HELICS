@@ -9,6 +9,11 @@
     make;
     make install;
 )
+
+if [[ "$TRAVIS_OS_NAME" == "osx" && "TRAVIS_XCODE_VERSION" == "64" ]]; then
+    brew install swig
+fi
+
 export PATH="$HOME/swig/bin:${PATH}"
 echo "*** built swig successfully {$PATH}"
 

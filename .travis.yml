@@ -86,7 +86,6 @@ branches:
 
 before_install:
   - eval "${MATRIX_EVAL}"
-  - if [[ "$TRAVIS_OS_NAME" == "osx" && "$TRAVIS_XCODE_VERSION" == "64"]]; then brew install swig; fi
 
 install:
   - source scripts/install-ci-dependencies.sh
