@@ -31,6 +31,7 @@ ownedQueue::~ownedQueue ()
         ipc_state::remove (stateName.c_str ());
     }
 }
+
 bool ownedQueue::connect (const std::string &connection, int maxMessages, int maxSize)
 {
     connectionNameOrig = connection;
@@ -109,7 +110,7 @@ stx::optional<ActionMessage> ownedQueue::getMessage (int timeout)
 {
     if (!connected)
     {
-        return {};
+        return stx::nullopt;
     }
     size_t rx_size = 0;
     unsigned int priority;
@@ -123,7 +124,7 @@ stx::optional<ActionMessage> ownedQueue::getMessage (int timeout)
             bool res = rqueue->timed_receive (buffer.data (), mxSize, rx_size, priority, abs_time);
             if (!res)
             {
-                return {};
+                return stx::nullopt;
             }
         }
         else if (timeout <= 0)
@@ -131,7 +132,7 @@ stx::optional<ActionMessage> ownedQueue::getMessage (int timeout)
             bool res = rqueue->try_receive (buffer.data (), mxSize, rx_size, priority);
             if (!res)
             {
-                return {};
+                return stx::nullopt;
             }
         }
 

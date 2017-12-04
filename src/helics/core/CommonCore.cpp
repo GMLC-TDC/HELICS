@@ -1882,6 +1882,40 @@ void CommonCore::processCommand (ActionMessage &&command)
     {
     case CMD_IGNORE:
         break;
+    case CMD_TICK:
+        if (waitingForServerPingReply)
+        {
+            // try to reset the connection to the broker
+            // brokerReconnect()
+            LOG_ERROR (global_broker_id, getIdentifier (), "lost connection with server");
+        }
+        else
+        {
+            // if (allFedWaiting())
+            //{
+            ActionMessage png (CMD_PING);
+            png.source_id = global_broker_id;
+            png.dest_id = higher_broker_id;
+            transmit (0, png);
+            waitingForServerPingReply=true;
+            //}
+        }
+        break;
+    case CMD_PING:
+        if (command.dest_id == global_broker_id)
+        {
+            ActionMessage pngrep (CMD_PING_REPLY);
+            pngrep.dest_id = command.source_id;
+            pngrep.source_id = global_broker_id;
+            routeMessage (pngrep);
+        }
+        break;
+    case CMD_PING_REPLY:
+        if (command.dest_id == global_broker_id)
+        {
+            waitingForServerPingReply = false;
+        }
+        break;
     case CMD_STOP:
         if (isConnected ())
         {

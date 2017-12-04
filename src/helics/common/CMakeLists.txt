@@ -46,6 +46,8 @@ if (${ZeroMQ_FOUND})
    list(APPEND common_sources ${zmq_sources})
 endif (${ZeroMQ_FOUND})
 
+list(APPEND common_sources ${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp.cpp)
+
 add_library(helics_common OBJECT ${common_sources} ${common_headers})
 set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)
 

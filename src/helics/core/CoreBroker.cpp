@@ -416,6 +416,50 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_IGNORE:
     case CMD_PROTOCOL:
         break;
+    case CMD_TICK:
+        if (!_isRoot)
+        {
+            if (waitingForServerPingReply)
+            {
+                // try to reset the connection to the broker
+                // brokerReconnect()
+            }
+            else
+            {
+                // if (allFedWaiting())
+                //{
+                ActionMessage png (CMD_PING);
+                png.source_id = global_broker_id;
+                png.dest_id = higher_broker_id;
+                transmit (0, png);
+                waitingForServerPingReply = true;
+                //}
+            }
+        }
+        break;
+    case CMD_PING:
+        if (command.dest_id == global_broker_id)
+        {
+            ActionMessage pngrep (CMD_PING_REPLY);
+            pngrep.dest_id = command.source_id;
+            pngrep.source_id = global_broker_id;
+            routeMessage (pngrep);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+        break;
+    case CMD_PING_REPLY:
+        if (command.dest_id == global_broker_id)
+        {
+            waitingForServerPingReply = false;
+        }
+        else
+        {
+            routeMessage (command);
+        }
+        break;
     case CMD_INIT:
     {
         auto brkNum = getBrokerById (command.source_id);

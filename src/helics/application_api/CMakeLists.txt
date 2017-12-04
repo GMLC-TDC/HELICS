@@ -43,8 +43,6 @@ helicsTypes.cpp
 queryFunctions.cpp
 )
 
-list(APPEND application_api_sources ${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp.cpp)
-
 add_library(application_api OBJECT ${application_api_sources} ${application_api_headers})
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})

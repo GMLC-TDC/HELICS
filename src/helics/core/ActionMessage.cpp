@@ -294,6 +294,9 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_reg_broker, "reg_broker"},
 
   {action_message_def::action_t::cmd_ignore, "ignore"},
+  {action_message_def::action_t::cmd_tick, "tick"},
+  {action_message_def::action_t::cmd_ping, "ping"},
+  {action_message_def::action_t::cmd_ping_reply, "ping reply"},
   {action_message_def::action_t::cmd_fed_configure, "fed_configure"},
   {action_message_def::action_t::cmd_init, "init"},
   {action_message_def::action_t::cmd_init_grant, "init_grant"},

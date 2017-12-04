@@ -51,8 +51,12 @@ enum class action_t : int32_t
     cmd_reg_broker = -cmd_info_basis - 40,  //!< for a broker to connect with a higher level broker
 
     cmd_ignore = 0,  //!< null command
+    cmd_tick = 1,  //!< command for a timer tick
     cmd_disconnect = 3,  //!< disconnect command
     cmd_disconnect_name = 4,  //!< disconnect a broker or core by name vs id
+    cmd_ping = 6, //!< request for an echo response
+    cmd_ping_reply=7, //!< response to a ping request
+
     cmd_init = 10,  //!< request entry to init mode
     cmd_init_grant = 11,  //!< grant entry to initialization mode
     cmd_init_not_ready = 12,  //!< retract an init ready command
@@ -108,19 +112,23 @@ enum class action_t : int32_t
     cmd_notify_end = 90,  //!< notify of an endpoint
 
     cmd_has_operator = 92,  //!< notify that a filter has an operator
-    cmd_protocol_priority = -60000,  //!< priority cmd used by protocol stacks and ignored by core
-    cmd_protocol = 60000,  //!< cmd used in the protocol stacks and ignored by the core
-    cmd_protocol_big = cmd_info_basis + 60000  //!< cmd used in the protocol stacks with the additional info
+    cmd_protocol_priority = -60000,  //!< priority command used by protocol stacks and ignored by core
+    cmd_protocol = 60000,  //!< command used in the protocol stacks and ignored by the core
+    cmd_protocol_big = cmd_info_basis + 60000  //!< command used in the protocol stacks with the additional info
 
 };
 
 }  // namespace action_message_def
 
 #define CMD_IGNORE action_message_def::action_t::cmd_ignore
+#define CMD_TICK action_message_def::action_t::cmd_tick
 #define CMD_REG_BROKER action_message_def::action_t::cmd_reg_broker
 #define CMD_PRIORITY_DISCONNECT action_message_def::action_t::cmd_priority_disconnect
 #define CMD_DISCONNECT action_message_def::action_t::cmd_disconnect
 #define CMD_DISCONNECT_NAME action_message_def::action_t::cmd_disconnect_name
+#define CMD_PING action_message_def::action_t::cmd_ping
+#define CMD_PING_REPLY action_message_def::action_t::cmd_ping_reply
+
 #define CMD_INIT action_message_def::action_t::cmd_init
 #define CMD_INIT_NOT_READY action_message_def::action_t::cmd_init_not_ready
 #define CMD_INIT_GRANT action_message_def::action_t::cmd_init_grant
