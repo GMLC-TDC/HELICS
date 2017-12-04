@@ -165,6 +165,10 @@ void IpcComms::queue_tx_function ()
         ipcbackchannel = IPC_BACKCHANNEL_TRY_RESET;
         while (ipcbackchannel != 0)
         {
+            if (rx_status != connection_status::connected)
+            {
+                break;
+            }
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         if (rx_status == connection_status::connected)
