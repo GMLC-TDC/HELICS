@@ -98,7 +98,13 @@ script:
   - if [[ $COMPILER != "g++-6" ]]; then export HELICS_OPTIONS_FLAGS+="-DQUICK_TESTS_ONLY=ON" ;fi
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
   - make
-  - ctest --verbose --timeout 120 -I 0,0,0,1,2,4
+  # For controlling which tests get run:
+  # ctest -I <start>,<end>,<stride>,<list of test numbers>
+  # 1 = core tests
+  # 2 = application api tests
+  # 3 = c interface tests
+  # 4 = player/recorder tests
+  - ctest --verbose --timeout 120 -I 0,0,0,1,2
 
 notifications:
     email: false
