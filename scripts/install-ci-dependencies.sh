@@ -1,17 +1,18 @@
 #!/bin/bash
 
-(
-    cd /tmp/;
-    curl -s -J -O -k -L 'https://sourceforge.net/projects/swig/files/swig/swig-3.0.10/swig-3.0.10.tar.gz/download';
-    tar zxf swig-3.0.10.tar.gz;
-    cd swig-3.0.10;
-    ./configure --prefix $HOME/swig/;
-    make;
-    make install;
-)
 
-if [[ "$TRAVIS_OS_NAME" == "osx" && "TRAVIS_XCODE_VERSION" == "64" ]]; then
+if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew install swig
+else
+    (
+        cd /tmp/;
+        curl -s -J -O -k -L 'https://sourceforge.net/projects/swig/files/swig/swig-3.0.10/swig-3.0.10.tar.gz/download';
+        tar zxf swig-3.0.10.tar.gz;
+        cd swig-3.0.10;
+        ./configure --prefix $HOME/swig/;
+        make;
+        make install;
+    )
 fi
 
 export PATH="$HOME/swig/bin:${PATH}"
