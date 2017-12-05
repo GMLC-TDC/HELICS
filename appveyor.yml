@@ -26,7 +26,9 @@ build:
 after_build:
 
 test_script:
-  - cd $env:APPVEYOR_BUILD_FOLDER/build
+  - dir
+  - pwd
+  - cd build
   # For controlling which tests get run:
   # ctest -I <start>,<end>,<stride>,<list of test numbers>
   # 1 = core tests
