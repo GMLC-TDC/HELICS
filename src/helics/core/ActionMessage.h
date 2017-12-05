@@ -217,6 +217,12 @@ inline bool isPriorityCommand(const ActionMessage &command)
 {
     return (command.action() < action_message_def::action_t::cmd_ignore);
 }
+
+/** check if a command is a priority command*/
+inline bool isValidCommand(const ActionMessage &command)
+{
+    return (command.action() != action_message_def::action_t::cmd_invalid);
+}
 /** generate a human readable string with information about a command
 @param command the command to generate the string for
 @return a string representing information about the command

@@ -53,14 +53,14 @@ namespace CoreFactory {
   /** locate a registered Core by name
   @param name the name of the core to find
   @return a shared_ptr to the testCore*/
-  std::shared_ptr<CommonCore> findCore(const std::string &name);
+  std::shared_ptr<Core> findCore(const std::string &name);
 
   /** register a testCore so it can be found by others
   @details also cleans up any leftover bCoresrokers that were previously unregistered this can be controlled by calling cleanUpBrokers
   earlier if desired
   @param tcore a pointer to a testCore object that should be found globally
   @return true if the registration was successful false otherwise*/
-  bool registerCommonCore(std::shared_ptr<CommonCore> tcore);
+  bool registerCore(std::shared_ptr<Core> tcore);
 
   /** remove a Core from the registry
   @param name the name of the Core to unregister

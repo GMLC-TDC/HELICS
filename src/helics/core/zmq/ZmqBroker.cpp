@@ -57,7 +57,7 @@ void ZmqBroker::displayHelp (bool local_only)
     }
 }
 
-void ZmqBroker::InitializeFromArgs (int argc, const char *const *argv)
+void ZmqBroker::initializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == broker_state_t::created)
@@ -122,7 +122,7 @@ void ZmqBroker::InitializeFromArgs (int argc, const char *const *argv)
         {
             portStart = vm["portstart"].as<int> ();
         }
-        CoreBroker::InitializeFromArgs (argc, argv);
+        CoreBroker::initializeFromArgs (argc, argv);
     }
 }
 

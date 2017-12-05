@@ -243,7 +243,14 @@ void ActionMessage::fromByteArray (const char *data, size_t buffer_size)
     boost::iostreams::basic_array_source<char> device (data, buffer_size);
     boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
     retriever ia (s);
-    load (ia);
+    try
+    {
+        load (ia);
+    }
+    catch (const cereal::Exception &ce)
+    {
+        action_ = CMD_INVALID;
+    }
 }
 
 void ActionMessage::from_string (const std::string &data) { fromByteArray (data.data (), data.size ()); }

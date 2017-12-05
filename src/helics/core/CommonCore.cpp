@@ -56,16 +56,17 @@ void CommonCore::initialize (const std::string &initializationString)
          created))  // don't do the compare exchange here since we do that in the initialize fromArgs
     {  // and we can tolerate a spurious call
         stringToCmdLine cmdline (initializationString);
-        InitializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
+        initializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
     }
 }
 
-void CommonCore::InitializeFromArgs (int argc, const char *const *argv)
+void CommonCore::initializeFromArgs (int argc, const char *const *argv)
 {
     broker_state_t exp = created;
     if (brokerState.compare_exchange_strong (exp, broker_state_t::initialized))
     {
-        BrokerBase::InitializeFromArgs (argc, argv);
+        // initialize the brokerbase
+        initializeFromCmdArgs (argc, argv);
     }
 }
 
@@ -1883,12 +1884,12 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_IGNORE:
         break;
     case CMD_TICK:
-        std::cerr<<"got tick"<<std::endl;
+        std::cerr << "got tick" << std::endl;
         if (waitingForServerPingReply)
         {
             // try to reset the connection to the broker
             // brokerReconnect()
-            std::cerr<<"lost connection"<<std::endl;
+            std::cerr << "lost connection" << std::endl;
             LOG_ERROR (global_broker_id, getIdentifier (), "lost connection with server");
         }
         else
@@ -1899,7 +1900,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             png.source_id = global_broker_id;
             png.dest_id = higher_broker_id;
             transmit (0, png);
-            waitingForServerPingReply=true;
+            waitingForServerPingReply = true;
             //}
         }
         break;

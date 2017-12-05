@@ -25,7 +25,7 @@ public:
 	UdpBroker(bool rootBroker = false) noexcept;
 	UdpBroker(const std::string &broker_name);
 
-	void InitializeFromArgs(int argc, const char * const *argv) override;
+	void initializeFromArgs(int argc, const char * const *argv) override;
 
 	/**destructor*/
 	virtual ~UdpBroker();

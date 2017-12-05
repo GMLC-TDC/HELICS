@@ -162,6 +162,11 @@ void UdpComms::queue_rx_function ()
             }
         }
         ActionMessage M(data.data(),len);
+        if (!isValidCommand(M))
+        {
+            std::cerr << "invalid command received udp" << std::endl;
+            continue;
+        }
         if (isProtocolCommand(M))
         {
            if (M.index == CLOSE_RECEIVER)

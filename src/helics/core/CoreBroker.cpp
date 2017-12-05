@@ -873,16 +873,16 @@ CoreBroker::CoreBroker (bool setAsRootBroker) noexcept : _isRoot (setAsRootBroke
 
 CoreBroker::CoreBroker (const std::string &broker_name) : BrokerBase (broker_name) {}
 
-void CoreBroker::Initialize (const std::string &initializationString)
+void CoreBroker::initialize (const std::string &initializationString)
 {
     if (brokerState == broker_state_t::created)
     {
         stringToCmdLine cmdline (initializationString);
-        InitializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
+        initializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
     }
 }
 
-void CoreBroker::InitializeFromArgs (int argc, const char *const *argv)
+void CoreBroker::initializeFromArgs (int argc, const char *const *argv)
 {
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong (exp, broker_state_t::initialized))
@@ -891,7 +891,8 @@ void CoreBroker::InitializeFromArgs (int argc, const char *const *argv)
 
         po::variables_map vm;
         argumentParser (argc, argv, vm, extraArgs);
-        BrokerBase::InitializeFromArgs (argc, argv);
+        // Initialize the brokerBase component
+        initializeFromCmdArgs (argc, argv);
 
         if (vm.count ("root") > 0)
         {
