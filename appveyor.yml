@@ -25,4 +25,14 @@ build:
 
 after_build:
 
+test_script:
+  # For controlling which tests get run:
+  # ctest -I <start>,<end>,<stride>,<list of test numbers>
+  # 1 = core tests
+  # 2 = application api tests
+  # 3 = c interface tests
+  # 4 = player/recorder tests
+  - ctest --verbose --timeout 120 -I 0,0,0,1
+  - ctest --verbose --timeout 240 -I 0,0,0,2
+
 artifacts:
