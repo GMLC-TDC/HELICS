@@ -51,23 +51,23 @@ void IpcComms::queue_rx_function ()
     bool operating = false;
     while (true)
     {
-        auto bc = ipcbackchannel.load();
-        
+        auto bc = ipcbackchannel.load ();
+
         switch (bc)
         {
         case IPC_BACKCHANNEL_DISCONNECT:
             ipcbackchannel = 0;
             goto DISCONNECT_RX_QUEUE;
         case IPC_BACKCHANNEL_TRY_RESET:
-            connected = rxQueue.connect(localTarget_, maxMessageCount_, maxMessageSize_);
+            connected = rxQueue.connect (localTarget_, maxMessageCount_, maxMessageSize_);
             if (!connected)
             {
                 disconnecting = true;
-                ActionMessage err(CMD_ERROR);
-                err.payload = rxQueue.getError();
-                ActionCallback(std::move(err));
+                ActionMessage err (CMD_ERROR);
+                err.payload = rxQueue.getError ();
+                ActionCallback (std::move (err));
                 rx_status = connection_status::error;  // the connection has failed
-                rxQueue.changeState(queue_state_t::closing);
+                rxQueue.changeState (queue_state_t::closing);
                 ipcbackchannel = 0;
                 return;
             }
@@ -170,17 +170,17 @@ void IpcComms::queue_tx_function ()
             {
                 break;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for (std::chrono::milliseconds (100));
         }
         if (rx_status == connection_status::connected)
         {
-            conn = rxQueue.connect(localTarget_, false, 0);
+            conn = rxQueue.connect (localTarget_, false, 0);
         }
         if (!conn)
         {
-            ActionMessage err(CMD_ERROR);
-            err.payload = std::string("Unable to open receiver connection ->") + brokerQueue.getError();
-            ActionCallback(std::move(err));
+            ActionMessage err (CMD_ERROR);
+            err.payload = std::string ("Unable to open receiver connection ->") + brokerQueue.getError ();
+            ActionCallback (std::move (err));
             tx_status = connection_status::error;
             return;
         }
@@ -288,8 +288,8 @@ void IpcComms::closeReceiver ()
         {
             if (!disconnecting)
             {
-                ipcbackchannel.store(IPC_BACKCHANNEL_DISCONNECT);
-              //  std::cerr << "unable to send close message::" << ipe.what () << std::endl;
+                ipcbackchannel.store (IPC_BACKCHANNEL_DISCONNECT);
+                //  std::cerr << "unable to send close message::" << ipe.what () << std::endl;
             }
         }
     }

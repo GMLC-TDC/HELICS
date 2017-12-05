@@ -21,13 +21,15 @@ namespace helics
 class ActionMessage;
 class CommsInterface;
 
-template <class COMMS, class Broker>
-class CommsBroker : public Broker
+/** helper class defining some common functionality for brokers and cores that use different
+communication methods*/
+template <class COMMS, class BrokerT>
+class CommsBroker : public BrokerT
 {
   protected:
     std::atomic<int> disconnectionStage{0};  //!< the stage of disconnection
-    mutable std::mutex dataMutex;
-    std::unique_ptr<COMMS> comms;
+    mutable std::mutex dataMutex;  //!< mutex protecting comms data
+    std::unique_ptr<COMMS> comms;  //!< the actual comms object
     std::atomic<bool> initialized_{false};  //!< atomic protecting local initialization
   public:
     CommsBroker () noexcept;

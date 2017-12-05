@@ -84,7 +84,7 @@ public:
 	@param[in] argc the number of arguments
 	@param[in] argv char pointers to the arguments
 	*/
-	virtual void InitializeFromArgs(int argc, const char * const *argv);
+	virtual void initializeFromCmdArgs(int argc, const char * const *argv);
 
 	/** add an action Message to the process queue*/
 	void addActionMessage(const ActionMessage &m);

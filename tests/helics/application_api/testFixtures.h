@@ -14,7 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/application_api/MessageFederate.h"
 #include "helics/application_api/ValueFederate.h"
-#include "helics/core/CoreBroker.h"
+#include "helics/core/BrokerFactory.h"
 #include "helics/core/CoreFactory.h"
 
 struct ValueFederateTestFixture
@@ -27,7 +27,7 @@ struct ValueFederateTestFixture
 
     void StartBroker (const std::string &core_type_name, const std::string &initialization_string);
 
-    std::vector<std::shared_ptr<helics::CoreBroker>> broker;
+    std::vector<std::shared_ptr<helics::Broker>> broker;
     std::shared_ptr<helics::ValueFederate> vFed1;
     std::shared_ptr<helics::ValueFederate> vFed2;
 };
@@ -42,7 +42,7 @@ struct MessageFederateTestFixture
 
     void StartBroker (const std::string &core_type_name, const std::string &initialization_string);
 
-    std::vector<std::shared_ptr<helics::CoreBroker>> broker;
+    std::vector<std::shared_ptr<helics::Broker>> broker;
     std::shared_ptr<helics::MessageFederate> mFed1;
     std::shared_ptr<helics::MessageFederate> mFed2;
 };
@@ -52,8 +52,8 @@ struct FederateTestFixture
     FederateTestFixture () = default;
     ~FederateTestFixture ();
 
-    std::shared_ptr<helics::CoreBroker> AddBroker (const std::string &core_type_name, int count);
-    std::shared_ptr<helics::CoreBroker>
+    std::shared_ptr<helics::Broker> AddBroker (const std::string &core_type_name, int count);
+    std::shared_ptr<helics::Broker>
     AddBroker (const std::string &core_type_name, const std::string &initialization_string);
 
     template <class FedType>
@@ -69,7 +69,7 @@ struct FederateTestFixture
     template <class FedType>
     std::vector<std::shared_ptr<FedType>> AddFederates (std::string core_type_name,
                                                         int count,
-                                                        std::shared_ptr<helics::CoreBroker> broker,
+                                                        std::shared_ptr<helics::Broker> broker,
                                                         helics::Time time_delta = helics::timeZero,
                                                         std::string name_prefix = "fed")
     {
@@ -135,7 +135,7 @@ struct FederateTestFixture
         return std::dynamic_pointer_cast<FedType> (federates[index]);
     }
 
-    std::vector<std::shared_ptr<helics::CoreBroker>> brokers;
+    std::vector<std::shared_ptr<helics::Broker>> brokers;
     std::vector<std::shared_ptr<helics::Federate>> federates;
 
   private:

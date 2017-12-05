@@ -57,7 +57,7 @@ CommonCore(const std::string &core_name);
   @param[in] argc the number of arguments
   @param[in] argv char pointers to the arguments
   */
-  virtual void InitializeFromArgs(int argc, const char * const *argv) override;
+  virtual void initializeFromArgs(int argc, const char * const *argv) override;
   virtual bool isInitialized () const override final;
   virtual bool isJoinable() const override final; 
   virtual void error (federate_id_t federateID, int errorCode=-1) override final;

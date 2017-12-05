@@ -161,7 +161,7 @@ void BrokerBase::joinAllThreads ()
     }
 }
 
-void BrokerBase::InitializeFromArgs (int argc, const char *const *argv)
+void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
 

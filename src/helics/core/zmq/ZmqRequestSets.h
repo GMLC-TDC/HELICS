@@ -31,6 +31,7 @@ class waitingResponse
     bool waiting = false;	//!< whether the response is waiting
     ActionMessage txmsg;	//!< the most recently sent message
 };
+
 /** class for dealing with the priority message paths from a ZMQ comm object
 @details it manages a set of routes to different priority queues and handles the responses
 THIS CLASS IS NOT THREAD SAFE- ZMQ sockets cannot be transferred between threads without special care so it would

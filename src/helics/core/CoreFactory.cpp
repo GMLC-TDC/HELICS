@@ -164,11 +164,8 @@ std::shared_ptr<Core> create (core_type type, const std::string &initializationS
 {
     auto core = makeCore (type, "");
     core->initialize (initializationString);
-    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
-    if (ccore)
-    {
-        registerCommonCore (ccore);
-    }
+    registerCore (core);
+
     return core;
 }
 
@@ -176,37 +173,25 @@ std::shared_ptr<Core> create (core_type type, const std::string &core_name, std:
 {
     auto core = makeCore (type, core_name);
     core->initialize (initializationString);
-    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
-    if (ccore)
-    {
-        registerCommonCore (ccore);
-    }
+    registerCore (core);
+
     return core;
 }
 
 std::shared_ptr<Core> create (core_type type, int argc, const char *const *argv)
 {
     auto core = makeCore (type, "");
-
-    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
-    if (ccore)
-    {
-        ccore->InitializeFromArgs (argc, argv);
-        registerCommonCore (ccore);
-    }
+    core->initializeFromArgs (argc, argv);
+    registerCore (core);
     return core;
 }
 
 std::shared_ptr<Core> create (core_type type, const std::string &core_name, int argc, const char *const *argv)
 {
     auto core = makeCore (type, core_name);
+    core->initializeFromArgs (argc, argv);
+    registerCore (core);
 
-    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
-    if (ccore)
-    {
-        ccore->InitializeFromArgs (argc, argv);
-        registerCommonCore (ccore);
-    }
     return core;
 }
 
@@ -220,19 +205,17 @@ FindOrCreate (core_type type, const std::string &core_name, const std::string &i
     }
     core = makeCore (type, core_name);
     core->initialize (initializationString);
-    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
-    if (ccore)
+
+    bool success = registerCore (core);
+    if (!success)
     {
-        bool success = registerCommonCore (ccore);
-        if (!success)
+        core = findCore (core_name);
+        if (core)
         {
-            core = findCore (core_name);
-            if (core)
-            {
-                return core;
-            }
+            return core;
         }
     }
+
     return core;
 }
 
@@ -246,20 +229,17 @@ FindOrCreate (core_type type, const std::string &core_name, int argc, const char
     }
     core = makeCore (type, core_name);
 
-    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
-    if (ccore)
+    core->initializeFromArgs (argc, argv);
+    bool success = registerCore (core);
+    if (!success)
     {
-        ccore->InitializeFromArgs (argc, argv);
-        bool success = registerCommonCore (ccore);
-        if (!success)
+        core = findCore (core_name);
+        if (core)
         {
-            core = findCore (core_name);
-            if (core)
-            {
-                return core;
-            }
+            return core;
         }
     }
+
     return core;
 }
 
@@ -315,7 +295,7 @@ static DelayedDestructor<CommonCore>
 
 static SearchableObjectHolder<CommonCore> searchableObjects;  //!< the object managing the searchable objects
 
-std::shared_ptr<CommonCore> findCore (const std::string &name) { return searchableObjects.findObject (name); }
+std::shared_ptr<Core> findCore (const std::string &name) { return searchableObjects.findObject (name); }
 
 bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &ptr)
 {
@@ -349,14 +329,20 @@ bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &pt
     }
     return false;
 }
+
 std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
 {
     return searchableObjects.findObject ([type](auto &ptr) { return isJoinableCoreOfType (type, ptr); });
 }
 
-bool registerCommonCore (std::shared_ptr<CommonCore> tcore)
+bool registerCore (std::shared_ptr<Core> core)
 {
-    auto res = searchableObjects.addObject (tcore->getIdentifier (), tcore);
+    bool res = false;
+    auto tcore = std::dynamic_pointer_cast<CommonCore> (core);
+    if (tcore)
+    {
+        res = searchableObjects.addObject (tcore->getIdentifier (), tcore);
+    }
     cleanUpCores ();
     if (res)
     {

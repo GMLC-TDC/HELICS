@@ -115,6 +115,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
     BOOST_CHECK (!reqset.waiting ());
 
     BOOST_CHECK (reqset.hasMessages ());
+    reqset.close ();
 }
 
 /** test the request set class with various scenarios*/
@@ -184,6 +185,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     repSocket1.close ();
     repSocket2.close ();
     repSocket3.close ();
+    reqset.close ();
 }
 
 BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
@@ -214,6 +216,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
     helics::ActionMessage rM (static_cast<char *> (rxmsg.data ()), rxmsg.size ());
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     comm.disconnect ();
+    repSocket.close ();
 }
 
 BOOST_AUTO_TEST_CASE (zmqComms_rx_test)

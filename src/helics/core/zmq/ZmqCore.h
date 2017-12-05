@@ -24,7 +24,7 @@ public:
   ZmqCore() noexcept;
   ZmqCore(const std::string &core_name);
   ~ZmqCore();
-  virtual void InitializeFromArgs (int argc, const char * const *argv) override;
+  virtual void initializeFromArgs (int argc, const char * const *argv) override;
          
 public:
 	virtual std::string getAddress() const override;

@@ -227,12 +227,12 @@ FederateTestFixture::~FederateTestFixture ()
     }
 }
 
-std::shared_ptr<helics::CoreBroker> FederateTestFixture::AddBroker (const std::string &core_type_name, int count)
+std::shared_ptr<helics::Broker> FederateTestFixture::AddBroker (const std::string &core_type_name, int count)
 {
     return AddBroker (core_type_name, std::to_string (count));
 }
 
-std::shared_ptr<helics::CoreBroker>
+std::shared_ptr<helics::Broker>
 FederateTestFixture::AddBroker (const std::string &core_type_name, const std::string &initialization_string)
 {
     auto broker = StartBrokerImp (core_type_name, initialization_string);

@@ -23,6 +23,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "../common/simpleQueue.hpp"
 #include "TimeDependencies.h"
 #include "BrokerBase.h"
+#include "broker.h"
+
 namespace helics
 {
 /** class defining the common information for a federate*/
@@ -67,7 +69,7 @@ constexpr Core::federate_id_t global_broker_id_shift = 0x7000'0000;
 Basically acts as a router for information,  deals with stuff internally if it can and sends higher up if it can't
 or does something else if it is the root of the tree
 */
-class CoreBroker : public BrokerBase
+class CoreBroker : public Broker, public BrokerBase
 {
 protected:
 	bool _gateway = false;  //!< set to true if this broker should act as a gateway.
@@ -120,10 +122,10 @@ private:
 public:
 	/** connect the core to its broker
 	@details should be done after initialization has complete*/
-	bool connect();
+	virtual bool connect() override final;
 	/** disconnect the broker from any other brokers and communications
 	*/
-	void disconnect();
+	virtual void disconnect() override final;
     /** unregister the broker from the factory find methods*/
     void unregister();
     /** disconnect the broker from any other brokers and communications
@@ -132,13 +134,13 @@ public:
     */
 	virtual void processDisconnect(bool skipUnregister = false) override final;
 	/** check if the broker is connected*/
-	bool isConnected() const;
+	virtual bool isConnected() const override final;
 	/** set the broker to be a root broker
 	@details only valid before the initialization function is called*/
-	void setAsRoot();
+	virtual void setAsRoot() override final;
 	/** return true if the broker is a root broker
 	*/
-	bool isRoot() const {
+	virtual bool isRoot() const override final{
 		return _isRoot;
 	};
 
@@ -174,10 +176,10 @@ public:
 	/** destructor*/
 	virtual ~CoreBroker();
 	/** start up the broker with an initialization string containing commands and parameters*/
-	void Initialize(const std::string &initializationString);
+	virtual void initialize(const std::string &initializationString) override final;
 	/** initialize from command line arguments
 	*/
-	virtual void InitializeFromArgs(int argc, const char * const *argv) override;
+	virtual void initializeFromArgs(int argc, const char * const *argv) override;
 
 	/** check if all the local federates are ready to be initialized
 	@return true if everyone is ready, false otherwise
@@ -187,12 +189,10 @@ public:
 	/** set the local identification string for the broker*/
 	void setIdentifier(const std::string &name);
 	/** get the local identification for the broker*/
-	const std::string &getIdentifier() const
+    virtual const std::string &getIdentifier() const override final
 	{
 		return identifier;
 	}
-
-	virtual std::string getAddress() const = 0;
 
 private:
     /** check if we can remove some dependencies*/

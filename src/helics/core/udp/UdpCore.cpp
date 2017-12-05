@@ -41,7 +41,7 @@ UdpCore::~UdpCore() = default;
 
 UdpCore::UdpCore (const std::string &core_name) : CommsBroker (core_name) {}
 
-void UdpCore::InitializeFromArgs (int argc, const char *const *argv)
+void UdpCore::initializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == created)
@@ -98,7 +98,7 @@ void UdpCore::InitializeFromArgs (int argc, const char *const *argv)
         }
       
 
-        CommonCore::InitializeFromArgs (argc, argv);
+        CommonCore::initializeFromArgs (argc, argv);
     }
 }
 

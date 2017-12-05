@@ -14,10 +14,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <algorithm>
 #include <functional>
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
+
 /** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
  * threading issues*/
 template <class X>

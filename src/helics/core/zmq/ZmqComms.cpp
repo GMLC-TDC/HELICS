@@ -96,6 +96,11 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
         }
     }
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
+    if (!isValidCommand (M))
+    {
+        std::cerr << "invalid command received" << std::endl;
+        return 0;
+    }
     if (isProtocolCommand (M))
     {
         switch (M.index)
@@ -171,6 +176,7 @@ void ZmqComms::queue_rx_function ()
         zmq::message_t msg;
         controlSocket.recv (&msg);
         ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
+
         if (isProtocolCommand (M))
         {
             if (M.index == PORT_DEFINITIONS)

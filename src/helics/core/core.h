@@ -73,10 +73,15 @@ class Core
      *
      * Should be invoked a single time to initialize the co-simulation core.
      *
-     * Invoked by the CoreFactory, users should call directly.
      */
     virtual void initialize (const std::string &initializationString) = 0;
-
+    /**
+    * Initialize the core from command line arguments.
+    *
+    * Should be invoked a single time to initialize the co-simulation core.
+    *
+    */
+    virtual void initializeFromArgs(int argc, const char * const *argv) = 0;
     /**
      * Returns true if the core has been initialized.
      */
