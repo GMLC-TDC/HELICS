@@ -495,9 +495,18 @@ const std::string &CommonCore::getFederateName (federate_id_t federateID) const
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid for federateName"));
+        throw (invalidIdentifier ("federateID not valid (federateName)"));
     }
     return fed->getIdentifier ();
+}
+
+static const std::string unknownString("#unknown");
+
+const std::string &CommonCore::getFederateNameNoThrow(federate_id_t federateID) const noexcept
+{
+    auto fed = getFederate(federateID);
+    return (fed == nullptr) ? unknownString : fed->getIdentifier();
+
 }
 
 federate_id_t CommonCore::getFederateId (const std::string &name)
@@ -2098,7 +2107,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_LOG:
         if (command.dest_id == global_broker_id)
         {
-            sendToLogger (0, command.index, getFederateName (command.source_id), command.payload);
+            sendToLogger (0, command.index, getFederateNameNoThrow (command.source_id), command.payload);
         }
         else
         {
@@ -2108,7 +2117,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_ERROR:
         if (command.dest_id == global_broker_id)
         {
-            sendToLogger (0, 0, getFederateName (command.source_id), command.payload);
+            sendToLogger (0, 0, getFederateNameNoThrow (command.source_id), command.payload);
         }
         else
         {
