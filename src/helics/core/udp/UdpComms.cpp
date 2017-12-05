@@ -140,13 +140,13 @@ void UdpComms::queue_rx_function ()
     }
     auto ioserv = AsioServiceManager::getServicePointer();
     udp::socket socket(ioserv->getBaseService());
+    socket.open(udp::v4());
     int cntr = 0;
     while (true)
     {
 
         try
         {
-            socket.open(udp::v4());
             socket.bind(udp::endpoint(udp::v4(), PortNumber));
             break;
         }
@@ -160,6 +160,7 @@ void UdpComms::queue_rx_function ()
             if (cntr > 40)
             {
                 std::cerr << "Unable to bind socket " << error.what() << std::endl;
+                socket.close();
                 rx_status = connection_status::error;
                 return;
             }
