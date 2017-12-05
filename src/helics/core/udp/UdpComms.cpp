@@ -139,7 +139,34 @@ void UdpComms::queue_rx_function ()
         return;
     }
     auto ioserv = AsioServiceManager::getServicePointer();
-    udp::socket socket(ioserv->getBaseService(), udp::endpoint(udp::v4(), PortNumber));
+    udp::socket socket(ioserv->getBaseService());
+    int cntr = 0;
+    while (true)
+    {
+
+        try
+        {
+            socket.open(udp::v4());
+            socket.bind(udp::endpoint(udp::v4(), PortNumber));
+            break;
+        }
+        catch (const boost::system::system_error &error)
+        {
+            if (cntr == 1)
+            {
+                std::cerr << "bind error on UDP socket " << error.what() << std::endl;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            if (cntr > 40)
+            {
+                std::cerr << "Unable to bind socket " << error.what() << std::endl;
+                rx_status = connection_status::error;
+                return;
+            }
+            ++cntr;
+        }
+    }
+    
     std::vector<char> data(10192);
     udp::endpoint remote_endp;
     boost::system::error_code error;

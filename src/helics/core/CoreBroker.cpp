@@ -78,11 +78,12 @@ int32_t CoreBroker::getBrokerById (Core::federate_id_t fedid) const
 {
     if (_isRoot)
     {
-        return static_cast<int32_t> (fedid - global_broker_id_shift);
+        auto brkNum =static_cast<int32_t> (fedid - global_broker_id_shift);
+        return (brkNum < static_cast<int32_t>(_brokers.size())) ? brkNum : (-1);
     }
 
     auto fnd = broker_table.find (fedid);
-    return (fnd != broker_table.end ()) ? fnd->second : -1;
+    return (fnd != broker_table.end ()) ? fnd->second : (-1);
 }
 
 int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const

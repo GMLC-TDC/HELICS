@@ -1700,6 +1700,7 @@ std::string CommonCore::query (const std::string &target, const std::string &que
 {
     if ((target == "core") || (target == getIdentifier ()))
     {
+
     }
     else
     {
