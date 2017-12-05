@@ -318,7 +318,7 @@ void CommonCore::error (federate_id_t federateID, int errorCode)
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid error"));
     }
     ActionMessage m (CMD_ERROR);
     m.source_id = fed->global_id;
@@ -341,7 +341,7 @@ void CommonCore::finalize (federate_id_t federateID)
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid finalize"));
     }
     ActionMessage bye (CMD_DISCONNECT);
     bye.source_id = fed->global_id;
@@ -389,7 +389,7 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid  Enter Enit"));
     }
     switch (fed->getState ())
     {
@@ -424,7 +424,7 @@ iteration_result CommonCore::enterExecutingState (federate_id_t federateID, iter
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid Enter Exec"));
     }
     if (HELICS_EXECUTING == fed->getState ())
     {
@@ -495,7 +495,7 @@ const std::string &CommonCore::getFederateName (federate_id_t federateID) const
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid for federateName"));
     }
     return fed->getIdentifier ();
 }
@@ -529,7 +529,7 @@ Time CommonCore::timeRequest (federate_id_t federateID, Time next)
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid timeRequest"));
     }
     if (HELICS_EXECUTING == fed->getState ())
     {
@@ -544,7 +544,7 @@ iterationTime CommonCore::requestTimeIterative (federate_id_t federateID, Time n
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid timeRequestIterative"));
     }
 
     if (HELICS_EXECUTING != fed->getState ())
@@ -569,7 +569,7 @@ Time CommonCore::getCurrentTime (federate_id_t federateID) const
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw invalidIdentifier ("federateID not valid");
+        throw invalidIdentifier ("federateID not valid getCurrentTime");
     }
     return fed->grantedTime ();
 }
@@ -579,7 +579,7 @@ uint64_t CommonCore::getCurrentReiteration (federate_id_t federateID) const
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw invalidIdentifier ("federateID not valid");
+        throw invalidIdentifier ("federateID not valid getCurrentReiteration");
     }
     return fed->getCurrentIteration ();
 }
@@ -589,7 +589,7 @@ void CommonCore::setMaximumIterations (federate_id_t federateID, int32_t iterati
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid getMaximumIterations"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_MAX_ITERATION;
@@ -602,7 +602,7 @@ void CommonCore::setTimeDelta (federate_id_t federateID, Time time)
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid (setTimeDelta)"));
     }
     if (time < timeZero)
     {
@@ -624,7 +624,7 @@ void CommonCore::setLookAhead (federate_id_t federateID, Time lookAheadTime)
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid (setLookAhead)"));
     }
     if (lookAheadTime < timeZero)
     {
@@ -641,7 +641,7 @@ void CommonCore::setImpactWindow (federate_id_t federateID, Time impactTime)
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid (SetImpactWindow)"));
     }
 
     if (impactTime < timeZero)
@@ -659,7 +659,7 @@ void CommonCore::setPeriod (federate_id_t federateID, Time timePeriod)
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid (setPeriod)"));
     }
     if (timePeriod < timeZero)
     {
@@ -675,7 +675,7 @@ void CommonCore::setTimeOffset (federate_id_t federateID, Time timeOffset)
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid (setTimeOffset)"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_OFFSET;
@@ -696,7 +696,7 @@ void CommonCore::setLoggingLevel (federate_id_t federateID, int loggingLevel)
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid (setLoggingLevel)"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_LOG_LEVEL;
@@ -716,7 +716,7 @@ void CommonCore::setFlag (federate_id_t federateID, int flag, bool flagValue)
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid (setFlag)"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_FLAG;
@@ -791,7 +791,7 @@ Handle CommonCore::registerSubscription (federate_id_t federateID,
 
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid (registerSubscription)"));
     }
     if (fed->getState () != HELICS_CREATED)
     {
@@ -867,7 +867,7 @@ Handle CommonCore::registerPublication (federate_id_t federateID,
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid (getSubscription)"));
     }
     if (fed->getState () != HELICS_CREATED)
     {
@@ -999,7 +999,7 @@ void CommonCore::setValue (Handle handle, const char *data, uint64_t len)
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
     {
-        throw (invalidIdentifier ("Handle not valid"));
+        throw (invalidIdentifier ("Handle not valid (setValue)"));
     }
     if (handleInfo->what != HANDLE_PUB)
     {
@@ -1030,7 +1030,7 @@ std::shared_ptr<const data_block> CommonCore::getValue (Handle handle)
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
     {
-        throw (invalidIdentifier ("Handle is invalid"));
+        throw (invalidIdentifier ("Handle is invalid (getValue)"));
     }
     if (handleInfo->what != HANDLE_SUB)
     {
@@ -1045,7 +1045,7 @@ const std::vector<Handle> &CommonCore::getValueUpdates (federate_id_t federateID
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid (getValueUpdates)"));
     }
     return fed->getEvents ();
 }
@@ -1055,7 +1055,7 @@ Handle CommonCore::registerEndpoint (federate_id_t federateID, const std::string
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid"));
+        throw (invalidIdentifier ("federateID not valid (registerEndpoint)"));
     }
     if (fed->getState () != HELICS_CREATED)
     {
@@ -1512,7 +1512,7 @@ std::unique_ptr<Message> CommonCore::receiveAny (federate_id_t federateID, Handl
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("FederateID is not valid"));
+        throw (invalidIdentifier ("FederateID is not valid (receiveAny)"));
     }
     if (fed->getState () != HELICS_EXECUTING)
     {
@@ -1527,7 +1527,7 @@ uint64_t CommonCore::receiveCountAny (federate_id_t federateID)
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("FederateID is not valid"));
+        throw (invalidIdentifier ("FederateID is not valid (receiveCountAny)"));
     }
     if (fed->getState () != HELICS_EXECUTING)
     {
@@ -1542,7 +1542,7 @@ void CommonCore::logMessage (federate_id_t federateID, int logLevel, const std::
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("FederateID is not valid"));
+        throw (invalidIdentifier ("FederateID is not valid (logMessage)"));
     }
     ActionMessage m (CMD_LOG);
 
@@ -1584,7 +1584,7 @@ void CommonCore::setLoggingCallback (
         auto fed = getFederate (federateID);
         if (fed == nullptr)
         {
-            throw (invalidIdentifier ("Invalid FederateID"));
+            throw (invalidIdentifier ("FederateID is not valid (setLoggingCallback)"));
         }
         fed->setLogger (std::move (logFunction));
     }
@@ -1661,7 +1661,7 @@ void CommonCore::setQueryCallback (federate_id_t federateID,
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("FederateID is invalid"));
+        throw (invalidIdentifier ("FederateID is invalid (setQueryCallback)"));
     }
 }
 
