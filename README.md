@@ -1,4 +1,4 @@
-# HELICS-SRC [![Build Status](https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=master)](https://travis-ci.org/GMLC-TDC/HELICS-src) [![Build status](https://ci.appveyor.com/api/projects/status/re4ximd0eaalfvia?svg=true)](https://ci.appveyor.com/project/nightlark/helics-src) [![Gitter chat](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)](https://gitter.im/GMLC-TDC/HELICS-src)
+# HELICS-SRC [![Build Status](https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=master)](https://travis-ci.org/GMLC-TDC/HELICS-src) [![Build status](https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/develop?svg=true)](https://ci.appveyor.com/project/nightlark/helics-src/branch/develop) [![Gitter chat](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)](https://gitter.im/GMLC-TDC/HELICS-src)
 
 
 <img src="/images/HELICS_Logo.png" width="400">
