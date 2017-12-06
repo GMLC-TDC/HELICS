@@ -14,5 +14,6 @@ if (BUILD_PYTHON)
 endif(BUILD_PYTHON)
 
 if(BUILD_MATLAB)
-   add_subdirectory(matlab)
+    FIND_PACKAGE(MATLAB REQUIRED)
+    add_subdirectory(matlab)
 endif(BUILD_MATLAB)
