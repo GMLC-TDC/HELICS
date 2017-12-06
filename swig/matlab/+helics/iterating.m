@@ -1,7 +1,7 @@
-function v = HELICS_COMPLEX_TYPE()
+function v = iterating()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 14);
+    vInitialized = helicsMEX(0, 10);
   end
   v = vInitialized;
 end
