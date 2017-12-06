@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
     core->connect ();
     BOOST_REQUIRE (core->isConnected ());
     Core::federate_id_t id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
-
+    
     BOOST_CHECK_EQUAL (core->getFederateName (id), "sim1");
     BOOST_CHECK_EQUAL (core->getFederateId ("sim1"), id);
 

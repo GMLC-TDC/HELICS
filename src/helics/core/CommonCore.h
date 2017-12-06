@@ -118,14 +118,14 @@ CommonCore(const std::string &core_name);
   {
 	  return identifier;
   }
-
+  const std::string &getFederateNameNoThrow(federate_id_t federateID)const noexcept;
   virtual void setLoggingCallback(federate_id_t federateID, std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
   
   virtual std::string query(const std::string &target, const std::string &queryStr) override;
   virtual void setQueryCallback(federate_id_t federateID, std::function<std::string(const std::string &)> queryFunction) override;
   /** get a string representing the connection info to send data to this object*/
   virtual std::string getAddress() const=0;
-
+  
  virtual bool connect() override final;
  virtual bool isConnected() const override final;
  virtual void disconnect() override final;

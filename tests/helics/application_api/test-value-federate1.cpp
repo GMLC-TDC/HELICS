@@ -376,6 +376,7 @@ void runFederateTest (const std::string &core_type_str,
     BOOST_CHECK_EQUAL (val, testValue2);
 
     vFed->finalize ();
+    BOOST_CHECK(vFed->currentState() == helics::Federate::op_states::finalize);
 }
 
 template <class X>
