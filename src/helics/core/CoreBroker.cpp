@@ -78,8 +78,8 @@ int32_t CoreBroker::getBrokerById (Core::federate_id_t fedid) const
 {
     if (_isRoot)
     {
-        auto brkNum =static_cast<int32_t> (fedid - global_broker_id_shift);
-        return (brkNum < static_cast<int32_t>(_brokers.size())) ? brkNum : (-1);
+        auto brkNum = static_cast<int32_t> (fedid - global_broker_id_shift);
+        return (brkNum < static_cast<int32_t> (_brokers.size ())) ? brkNum : (-1);
     }
 
     auto fnd = broker_table.find (fedid);
@@ -1200,7 +1200,7 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
     {
         return (brokerState >= broker_state_t::operating) ? "true" : "false";
     }
-    else if (query == "federates")
+    if (query == "federates")
     {
         std::string ret;
         ret.push_back ('[');
@@ -1220,7 +1220,7 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
 
         return ret;
     }
-    else if (query == "brokers")
+    if (query == "brokers")
     {
         std::string ret;
         ret.push_back ('[');
@@ -1239,16 +1239,16 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
         }
         return ret;
     }
-    else if (query == "federate_map")
+    if (query == "federate_map")
     {
         return generateFederateMap ();
     }
-    else if (query == "dependency_graph")
+    if (query == "dependency_graph")
     {
         // TOOD:  create this information
         return "#invalid";
     }
-    else if (query == "dependencies")
+    if (query == "dependencies")
     {
         Json_helics::Value base;
         base["name"] = getIdentifier ();
@@ -1279,10 +1279,7 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
         writer->write (base, &sstr);
         return sstr.str ();
     }
-    else
-    {
-        return "#invalid";
-    }
+    return "#invalid";
 }
 
 std::string CoreBroker::generateFederateMap () const

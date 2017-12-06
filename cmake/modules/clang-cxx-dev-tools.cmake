@@ -29,7 +29,7 @@ file(GLOB
 	 
 file(GLOB
      ALL_CORE_LIB_FILES
-      src/helics/core/*.[ch]pp src/helics/core/zmq/*.[ch]pp src/helics/core/ipc/*.[ch]pp src/helics/core/mpi/*.[ch]pp
+      src/helics/core/*.[ch]pp src/helics/core/zmq/*.[ch]pp src/helics/core/ipc/*.[ch]pp src/helics/core/mpi/*.[ch]pp src/helics/core/udp/*.[ch]pp
      )
 	 
 file(GLOB
@@ -137,6 +137,15 @@ if(CLANG_TIDY)
     clang-tidy-core
     COMMAND ${CLANG_TIDY}
     ${ALL_CORE_FILES}
+   -config='' 
+   --
+    -std=c++14
+    ${INCLUDES}
+    )
+	add_custom_target(clang-tidy-ccore
+		COMMAND ${CLANG_TIDY}
+    ${PROJECT_SOURCE_DIR}/src/helics/core/CommonCore.cpp
+	${PROJECT_SOURCE_DIR}/src/helics/core/CoreBroker.cpp
    -config='' 
    --
     -std=c++14

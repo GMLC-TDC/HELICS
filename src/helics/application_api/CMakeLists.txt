@@ -48,6 +48,7 @@ queryFunctions.cpp
 
 add_library(application_api OBJECT ${application_api_sources} ${public_application_api_headers} ${private_application_api_headers})
 
+install(FILES ${public_application_api_headers} DESTINATION include/helics/)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
 link_directories(${external_link_directories})

@@ -53,4 +53,3 @@ set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
-install (FILES ${common_headers} DESTINATION include/helics/common)
