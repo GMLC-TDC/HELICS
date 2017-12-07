@@ -11,15 +11,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define HELICS_CPP98_COMBINATION_FEDERATE_HPP_
 #pragma once
 
-#include "MessageFederate.h"
-#include "ValueFederate.h"
+#include "MessageFederate.hpp"
+#include "ValueFederate.hpp"
 
 namespace helics
 {
 class CombinationFederate : public ValueFederate, public MessageFederate
 {
   public:
-    CombinationFederate (const FederateInfo &fi)
+    CombinationFederate (FederateInfo &fi)
     {
         fed = helicsCreateCombinationFederate (fi.getInfo());
     }

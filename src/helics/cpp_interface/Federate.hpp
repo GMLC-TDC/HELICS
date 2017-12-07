@@ -14,6 +14,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "shared_api_library/helics.h"
 
 #include <string>
+#include <vector>
+#include <complex>
+#include <stdexcept>
 
 // defines for setFlag values in core/flag-definitions.h
 // enum for core_type:int in core/core-types.h
@@ -28,7 +31,7 @@ class FederateInfo
         fi = helicsFederateInfoCreate ();
     }
 
-    FederateInfo (std::string fedname) : name (fedname)
+    FederateInfo (std::string fedname)
     {
         fi = helicsFederateInfoCreate ();
         helicsFederateInfoSetFederateName (fi, fedname.c_str());
@@ -38,7 +41,7 @@ class FederateInfo
     {
         fi = helicsFederateInfoCreate ();
         helicsFederateInfoSetFederateName (fi, fedname.c_str());
-        helicsFederateInfoSetCoreType (fi, coretype.c_str());
+        helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str());
     }
 
     ~FederateInfo ()
@@ -119,9 +122,32 @@ class FederateInfo
     helics_federate_info_t fi;
 };
 
+/** defining an exception class for state transition errors*/
+class InvalidStateTransition : public std::runtime_error
+{
+  public:
+    InvalidStateTransition (const char *s) noexcept : std::runtime_error (s) {}
+};
+
+/** defining an exception class for invalid function calls*/
+class InvalidFunctionCall : public std::runtime_error
+{
+  public:
+    InvalidFunctionCall (const char *s) noexcept : std::runtime_error (s) {}
+};
+/** defining an exception class for invalid parameter values*/
+class InvalidParameterValue : public std::runtime_error
+{
+  public:
+    InvalidParameterValue (const char *s) noexcept : std::runtime_error (s) {}
+};
+
 class Federate
 {
   public:
+    // Default constructor, not meant to be used
+    Federate () {};
+
     virtual ~Federate ()
     {
         helicsFreeFederate (fed);
@@ -157,10 +183,10 @@ class Federate
         }
     }
 
-    iteration_status enterExecutionState (iteration_request iterate = iteration_request::no_iterations)
+    iteration_status enterExecutionState (iteration_request iterate = iteration_request::no_iteration)
     {
         iteration_status out_iterate = iteration_status::next_step;
-        if (iterate == iteration_request::no_iterations)
+        if (iterate == iteration_request::no_iteration)
         {
             helicsEnterExecutionMode (fed);
         }
@@ -171,9 +197,9 @@ class Federate
         return out_iterate;
     }
 
-    void enterExecutionStateAsync (iteration_request iterate = iteration_request::no_iterations)
+    void enterExecutionStateAsync (iteration_request iterate = iteration_request::no_iteration)
     {
-        if (iterate == iteration_request::no_iterations)
+        if (iterate == iteration_request::no_iteration)
         {
             helicsEnterExecutionModeAsync (fed);
             exec_async_iterate = false;
@@ -204,27 +230,27 @@ class Federate
         helicsFinalize (fed);
     }
 
-    helics_time_t requestTime (helics_time_t requestTime)
+    helics_time_t requestTime (helics_time_t time)
     {
-        return helicsRequestTime (fed, requestTime);
+        return helicsRequestTime (fed, time);
     }
 
-    helics_iterative_time requestTimeIterative (helics_time_t requestTime, iteration_request iterate)
+    helics_iterative_time requestTimeIterative (helics_time_t time, iteration_request iterate)
     {
-        return helicsRequestTimeIterative (fed, requestTime, iterate);
+        return helicsRequestTimeIterative (fed, time, iterate);
     }
 
-    void requestTimeAsync (helics_time_t requestTime)
+    void requestTimeAsync (helics_time_t time)
     {
-        if (helicsOK != helicsRequestTimeAsync (fed, requestTime))
+        if (helicsOK != helicsRequestTimeAsync (fed, time))
         {
             throw (InvalidFunctionCall ("cannot call request time in present state"));
         }
     }
 
-    void requestTimeIterativeAsync (helics_time_t requestTime, iteration_request iterate)
+    void requestTimeIterativeAsync (helics_time_t time, iteration_request iterate)
     {
-        helicsRequestTimeIterativeAsync (fed, requestTime, iterate);
+        helicsRequestTimeIterativeAsync (fed, time, iterate);
     }
 
     helics_time_t requestTimeFinalize ()
@@ -234,7 +260,7 @@ class Federate
 
     helics_iterative_time requestTimeIterativeFinalize ()
     {
-        helicsRequestTimeIterativeFinalize (fed);
+        return helicsRequestTimeIterativeFinalize (fed);
     }
 
     /** make a query of the core
@@ -250,9 +276,9 @@ class Federate
     std::string query (const std::string &target, const std::string &queryStr)
     {
         // returns helics_query
-        helics_query query = helicsCreateQuery (target.c_str(), queryStr.c_str());
-        std::string result (helicsExecuteQuery(fed, query));
-        helicsFreeQuery (query);
+        helics_query q = helicsCreateQuery (target.c_str(), queryStr.c_str());
+        std::string result (helicsExecuteQuery(fed, q));
+        helicsFreeQuery (q);
         return result;
     }
 
@@ -261,24 +287,5 @@ class Federate
     bool exec_async_iterate;
 };
 
-/** defining an exception class for state transition errors*/
-class InvalidStateTransition : public std::runtime_error
-{
-  public:
-    InvalidStateTransition (const char *s) noexcept : std::runtime_error (s) {}
-};
-
-/** defining an exception class for invalid function calls*/
-class InvalidFunctionCall : public std::runtime_error
-{
-  public:
-    InvalidFunctionCall (const char *s) noexcept : std::runtime_error (s) {}
-};
-/** defining an exception class for invalid parameter values*/
-class InvalidParameterValue : public std::runtime_error
-{
-  public:
-    InvalidParameterValue (const char *s) noexcept : std::runtime_error (s) {}
-};
 } //namespace helics
 #endif

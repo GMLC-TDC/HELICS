@@ -12,14 +12,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define HELICS_CPP98_MESSAGE_FILTER_FEDERATE_HPP_
 #pragma once
 
-#include "MessageFilterFederate_c.h"
+#include "shared_api_library/MessageFilterFederate_c.h"
+#include "MessageFederate.hpp"
 
 namespace helics
 {
 class MessageFilterFederate : public virtual MessageFederate
 {
   public:
-    MessageFilterFederate (const FederateInfo &fi)
+    MessageFilterFederate (FederateInfo &fi)
     {
         fed = helicsCreateMessageFilterFederate (fi.getInfo());
     }
@@ -31,12 +32,12 @@ class MessageFilterFederate : public virtual MessageFederate
 
     virtual ~MessageFilterFederate ()
     {
-        for (int i = 0; i < source_filters.size(); i++)
+        for (unsigned int i = 0; i < source_filters.size(); i++)
         {
             helicsFreeSourceFilter (source_filters[i]);
         }
 
-        for (int i = 0; i < destination_filters.size(); i++)
+        for (unsigned int i = 0; i < destination_filters.size(); i++)
         {
             helicsFreeDestinationFilter (destination_filters[i]);
         }
@@ -47,7 +48,9 @@ class MessageFilterFederate : public virtual MessageFederate
                                       const std::string &inputType = "",
                                       const std::string &outputType = "")
     {
-        helics_source_filter filter = helicsRegisterSourceFilter (fed, filterName.c_str(), sourceEndpoint.c_str(), inputType.c_str(), outputType.c_str());
+        // C api might be missing an argument?
+        helics_source_filter filter = helicsRegisterSourceFilter (fed, filterName.c_str(), inputType.c_str(), outputType.c_str());
+        //helics_source_filter filter = helicsRegisterSourceFilter (fed, filterName.c_str(), sourceEndpoint.c_str(), inputType.c_str(), outputType.c_str());
         source_filters.push_back(filter);
         return filter;
     }
@@ -57,7 +60,9 @@ class MessageFilterFederate : public virtual MessageFederate
                                            const std::string &inputType = "",
                                            const std::string &outputType = "")
     {
-        helics_destination_filter filter = helicsRegisterDestinationFilter (fed, filterName.c_str(), destEndpoint.c_str(), inputType.c_str(), outputType.c_str());
+        // C api might be missing an argument?
+        helics_destination_filter filter = helicsRegisterDestinationFilter (fed, filterName.c_str(), inputType.c_str(), outputType.c_str());
+        //helics_destination_filter filter = helicsRegisterDestinationFilter (fed, filterName.c_str(), destEndpoint.c_str(), inputType.c_str(), outputType.c_str());
         destination_filters.push_back(filter);
         return filter;
     }
@@ -82,7 +87,7 @@ class MessageFilterFederate : public virtual MessageFederate
   private:
     std::vector<helics_source_filter> source_filters;
     std::vector<helics_destination_filter> destination_filters;
-    std::atomic<int> filterCount{0};
+    int filterCount = 0;
 };
 } //namespace helics
 #endif

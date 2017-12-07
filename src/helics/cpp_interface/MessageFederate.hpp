@@ -13,14 +13,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define HELICS_CPP98_MESSAGE_FEDERATE_HPP_
 #pragma once
 
-#include "MessageFederate_c.h"
+#include "shared_api_library/MessageFederate_c.h"
+#include "Federate.hpp"
 
 namespace helics
 {
 class MessageFederate : public virtual Federate
 {
   public:
-    MessageFederate (const FederateInfo &fi)
+    MessageFederate (FederateInfo &fi)
     {
         fed = helicsCreateMessageFederate (fi.getInfo ());
     }
@@ -29,7 +30,10 @@ class MessageFederate : public virtual Federate
     {
         fed = helicsCreateMessageFederateFromFile (jsonString.c_str());
     }
-
+   
+    // Default constructor, not meant to be used
+    MessageFederate () {}
+    
     virtual ~MessageFederate ()
     {
     }
@@ -105,10 +109,10 @@ class MessageFederate : public virtual Federate
         helicsSendEventRaw (source, dest.c_str(), data, len, time);
     }
 
-    void sendMessage (helics_endpoint source, const message_t &message)
+    void sendMessage (helics_endpoint source, message_t &message)
     {
         // returns helicsStatus
-        helicsSendMessage (source, &message)
+        helicsSendMessage (source, &message);
     }
 
     std::string getEndpointName (helics_endpoint ep) const
@@ -119,7 +123,7 @@ class MessageFederate : public virtual Federate
         return result;
     }
 
-    std::string getEndpointType (helics_endpoint ep);
+    std::string getEndpointType (helics_endpoint ep)
     {
         char str[255];
         helicsGetEndpointType (ep, &str[0], sizeof(str));

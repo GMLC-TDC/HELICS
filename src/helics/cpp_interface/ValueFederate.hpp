@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define HELICS_CPP98_VALUE_FEDERATE_HPP_
 #pragma once
 
-#include "ValueFederate_c.h"
+#include "shared_api_library/ValueFederate_c.h"
 #include "Federate.hpp"
 
 // TODO: Update to use methods in c interface for getting length of data pointed to that can be gotten (all the ones taking a max len argument) - function may not exist yet
@@ -31,9 +31,9 @@ enum PubSubTypes
 class ValueFederate : public virtual Federate
 {
   public:
-      friend class helics::FederateInfo;
+    friend class helics::FederateInfo;
 
-    ValueFederate (const FederateInfo &fi)
+    ValueFederate (FederateInfo &fi)
     {
         fed = helicsCreateValueFederate (fi.getInfo());
     }
@@ -42,6 +42,9 @@ class ValueFederate : public virtual Federate
     {
         fed = helicsCreateValueFederateFromFile (jsonString.c_str());
     }
+
+    // Default constructor, not meant to be used
+    ValueFederate () {}
 
     virtual ~ValueFederate ()
     {
@@ -122,10 +125,11 @@ class ValueFederate : public virtual Federate
     registerSubscriptionIndexed (const std::string &name,
                                          int index1,
                                          int index2,
+                                         int type,
                                          const std::string &units = "")
     {
         std::string indexed_name = name + '_' + std::to_string (index1) + '_' + std::to_string (index2);
-        return registerTypeSubscription (indexed_name, type, units)
+        return registerTypeSubscription (indexed_name, type, units);
     }
 
     // TODO: figure out how this maps to using helics_subscriptions instead of id's
@@ -135,7 +139,7 @@ class ValueFederate : public virtual Federate
     @param[in] the subscription identifier
     @param[in] shortcutName the name of the shortcut
     */
-    void addSubscriptionShortcut (helics_subscription_t subid, const std::string &shortcutName) {}
+    void addSubscriptionShortcut (helics_subscription subid, const std::string &shortcutName) {}
 
     /** Methods to set default values for subscriptions **/
     void setDefaultValue (helics_subscription sub, const char *data, int len)
@@ -147,7 +151,7 @@ class ValueFederate : public virtual Federate
     void setDefaultValue (helics_subscription sub, const std::string &str)
     {
         // returns helicsStatus
-        helicsSetDefaultValueString (sub, str.c_str());
+        helicsSetDefaultString (sub, str.c_str());
     }
 
     void setDefaultValue (helics_subscription sub, int64_t val)
@@ -171,8 +175,8 @@ class ValueFederate : public virtual Federate
     void setDefaultValue (helics_subscription sub, const std::vector<double> &data)
     {
         // c++98 doesn't guarantee vector data will be contiguous
-        double *arr = malloc(data.size() * sizeof(double));
-        for (int i = 0; i < data.size(), i++)
+        double *arr = (double*) malloc(data.size() * sizeof(double));
+        for (unsigned int i = 0; i < data.size(); i++)
         {
             arr[i] = data[i];
         }
@@ -214,11 +218,11 @@ class ValueFederate : public virtual Federate
         double real;
         double imag;
         helicsGetComplex (sub, &real, &imag);
-        std::complex<double result (real, imag);
+        std::complex<double> result (real, imag);
         return result;
     }
 
-    int getVector (helics_subscription sub, double *data, maxlen)
+    int getVector (helics_subscription sub, double *data, int maxlen)
     {
         return helicsGetVector (sub, data, maxlen);
     }
@@ -251,15 +255,15 @@ class ValueFederate : public virtual Federate
     void publish (helics_publication pub, std::complex<double> cmplx)
     {
         // returns helicsStatus
-        helicsPublishComplex (pub, cmplx.real(), cmplx.image());
+        helicsPublishComplex (pub, cmplx.real(), cmplx.imag());
     }
 
     void publish (helics_publication pub, std::vector<double> data)
     {
         // c++98 doesn't guarantee vector data will be contiguous
         // might make sense to have a pre-allocated array (that can grow) set aside for reuse
-        double *arr = malloc(data.size() * sizeof(double));
-        for (int i = 0; i < data.size(), i++)
+        double *arr = (double*) malloc(data.size() * sizeof(double));
+        for (unsigned int i = 0; i < data.size(); i++)
         {
             arr[i] = data[i];
         }
@@ -282,7 +286,7 @@ class ValueFederate : public virtual Federate
 
     // TODO: use c api to implement this method... callbacks too?
     /** Get a list of all subscriptions with updates since the last call **/
-    std::vector<helics_subscription_t> queryUpdates () {}
+    std::vector<helics_subscription> queryUpdates () { return std::vector<helics_subscription>(); }
     // call helicsIsValueUpdated for each sub
 
     std::string getSubscriptionName (helics_subscription sub) const
