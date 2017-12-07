@@ -23,4 +23,6 @@ if (BUILD_SHARED_LIBS)
 add_subdirectory(shared_api_library)
 install(DIRECTORY shared_api_library DESTINATION include
         FILES_MATCHING PATTERN "*.h*")
+install(DIRECTORY cpp_interface DESTINATION include
+        FILES_MATCHING PATTERN "*.h*")
 endif(BUILD_SHARED_LIBS)

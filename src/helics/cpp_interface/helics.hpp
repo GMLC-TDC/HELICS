@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_CPP98_API_
 #pragma once
 
-#include "helics.h"
+#include "shared_api_library/helics.h"
 #include <string>
 
 
