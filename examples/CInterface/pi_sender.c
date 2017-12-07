@@ -1,6 +1,6 @@
 static char help[] = " PI SENDER: Simple program to demonstrate the usage of HELICS C Interface.\n\
             This example creates a ZMQ broker and a value federate.\n\
-            The value federate creates a global pulications and publishes\n\
+            The value federate creates a global publications and publishes\n\
             t*pi for 20 time-steps with a time-step of 0.01 seconds.\n\n";
 
 

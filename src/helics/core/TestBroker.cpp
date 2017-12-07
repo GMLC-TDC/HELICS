@@ -118,6 +118,10 @@ void TestBroker::brokerDisconnect ()
 
 void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
 {
+    if (brokerState >= broker_state_t::terminating)
+    {
+        return;  //no message sent in terminating or higher state
+    }
     // only activate the lock if we not in an operating state
     std::unique_lock<std::mutex> lock (routeMutex);
 

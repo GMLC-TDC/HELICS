@@ -184,7 +184,6 @@ void AsioServiceManager::haltServiceLoop (const std::string &serviceName)
 
 void serviceRunLoop(std::shared_ptr<AsioServiceManager> ptr)
 {
-    std::cout << "starting service loop" << std::endl;
     try
     {
         ptr->iserv->run();
@@ -194,5 +193,4 @@ void serviceRunLoop(std::shared_ptr<AsioServiceManager> ptr)
         std::cout << "caught error in service loop" << std::endl;
     }
     ptr->running = false;
-    std::cout << "exiting service loop" << std::endl;
 }

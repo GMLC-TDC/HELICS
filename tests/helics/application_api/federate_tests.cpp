@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(federate_timeout_test)
     brk->connect();
     helics::FederateInfo fi("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
-    fi.coreInitString = "1 --broker=b1";
+    fi.coreInitString = "1 --broker=b1 -tick=1000 --timeout=4000";
 
     auto Fed = std::make_shared<helics::Federate>(fi);
 

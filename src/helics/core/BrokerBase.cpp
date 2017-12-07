@@ -205,6 +205,14 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     {
         logFile = vm["logfile"].as<std::string> ();
     }
+    if (vm.count("timeout") > 0)
+    {
+        timeout = vm["timeout"].as<int>();
+    }
+    if (vm.count("tick") > 0)
+    {
+        tickTimer = vm["tick"].as<int>();
+    }
     if (!noAutomaticID)
     {
         if (identifier.empty ())
@@ -322,7 +330,6 @@ void BrokerBase::queueProcessingLoop ()
         switch (command.action ())
         {
         case CMD_TICK:
-            std::cout << "got tick " << messagesSinceLastTick << std::endl;
             if (messagesSinceLastTick == 0)
             {
                 processCommand (std::move (command));
