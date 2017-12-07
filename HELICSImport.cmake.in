@@ -1,29 +1,6 @@
 #file to import the helics target and all the needed dependencies
-import(helics-targets.cmake)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-
-target_link_libraries(helics-static Threads::Threads)
-IF (UNIX AND NOT APPLE)
-target_link_libraries(helics-static rt)
-ENDIF()
-
-IF(MINGW)
-	target_link_libraries(helics-static ws2_32)
-ENDIF(MINGW)
-
-set(HELICS_USE_ZMQ @ZMQ_FOUND@)
-if (HELICS_USE_ZMQ)
-	target_link_libraries(helics-static @ZMQ_DEPENDENCY@)
-endif(HELICS_USE_ZMQ)
-
-link_directories(@Boost_LIBRARY_DIRS@)
-
-target_link_libraries(helics-static @Boost_LIBRARIES_core@)
-
-set(HELICS_USE_MPI @MPI_C_FOUND@)
-if (HELICS_USE_MPI)
-	target_link_libraries(helics-static @MPI_C_LIBRARIES@)
-endif(HELICS_USE_MPI)
-	
+include(${CMAKE_CURRENT_LIST_DIR}/helics-targets.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/HELICSConfig.cmake)

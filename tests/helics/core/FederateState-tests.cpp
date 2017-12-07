@@ -72,28 +72,28 @@ BOOST_AUTO_TEST_CASE (create_subscription_test)
     BOOST_CHECK_EQUAL (info->id, 0);
 
     info = fs->getSubscription (0);
-    BOOST_CHECK (info->key.compare ("first!") == 0);
+    BOOST_CHECK_EQUAL(info->key, "first!");
 
     // Check second subscription
     info = fs->getSubscription ("second");
     BOOST_CHECK_EQUAL (info->id, 1);
 
     info = fs->getSubscription (1);
-    BOOST_CHECK (info->key.compare ("second") == 0);
+    BOOST_CHECK_EQUAL (info->key,"second");
 
     // Check the out of order subscription
     info = fs->getSubscription ("cut-in-line");
     BOOST_CHECK_EQUAL (info->id, 2);
 
     info = fs->getSubscription (2);
-    BOOST_CHECK (info->key.compare ("cut-in-line") == 0);
+    BOOST_CHECK_EQUAL (info->key,"cut-in-line");
 
     // Check the displaced (last) subscription
     info = fs->getSubscription ("last");
     BOOST_CHECK_EQUAL (info->id, 3);
 
     info = fs->getSubscription (3);
-    BOOST_CHECK (info->key.compare ("last") == 0);
+    BOOST_CHECK_EQUAL (info->key,"last");
 }
 
 BOOST_AUTO_TEST_CASE (create_publication_test)
@@ -110,28 +110,28 @@ BOOST_AUTO_TEST_CASE (create_publication_test)
     BOOST_CHECK_EQUAL (info->id, 0);
 
     info = fs->getPublication (0);
-    BOOST_CHECK (info->key.compare ("first!") == 0);
+    BOOST_CHECK_EQUAL (info->key,"first!");
 
     // Check second publication
     info = fs->getPublication ("second");
     BOOST_CHECK_EQUAL (info->id, 1);
 
     info = fs->getPublication (1);
-    BOOST_CHECK (info->key.compare ("second") == 0);
+    BOOST_CHECK_EQUAL (info->key,"second");
 
     // Check the out of order publication
     info = fs->getPublication ("cut-in-line");
     BOOST_CHECK_EQUAL (info->id, 2);
 
     info = fs->getPublication (2);
-    BOOST_CHECK (info->key.compare ("cut-in-line") == 0);
+    BOOST_CHECK_EQUAL (info->key,"cut-in-line");
 
     // Check the displaced (last) publication
     info = fs->getPublication ("last");
     BOOST_CHECK_EQUAL (info->id, 3);
 
     info = fs->getPublication (3);
-    BOOST_CHECK (info->key.compare ("last") == 0);
+    BOOST_CHECK_EQUAL (info->key,"last");
 }
 
 BOOST_AUTO_TEST_CASE (create_endpoint_test)
@@ -148,28 +148,28 @@ BOOST_AUTO_TEST_CASE (create_endpoint_test)
     BOOST_CHECK_EQUAL (info->id, 0);
 
     info = fs->getEndpoint (0);
-    BOOST_CHECK (info->key.compare ("first!") == 0);
+    BOOST_CHECK_EQUAL (info->key,"first!");
 
     // Check second endpoint
     info = fs->getEndpoint ("second");
     BOOST_CHECK_EQUAL (info->id, 1);
 
     info = fs->getEndpoint (1);
-    BOOST_CHECK (info->key.compare ("second") == 0);
+    BOOST_CHECK_EQUAL (info->key,"second");
 
     // Check the out of order endpoint
     info = fs->getEndpoint ("cut-in-line");
     BOOST_CHECK_EQUAL (info->id, 2);
 
     info = fs->getEndpoint (2);
-    BOOST_CHECK (info->key.compare ("cut-in-line") == 0);
+    BOOST_CHECK_EQUAL (info->key,"cut-in-line");
 
     // Check the displaced (last) endpoint
     info = fs->getEndpoint ("last");
     BOOST_CHECK_EQUAL (info->id, 3);
 
     info = fs->getEndpoint (3);
-    BOOST_CHECK (info->key.compare ("last") == 0);
+    BOOST_CHECK_EQUAL (info->key,"last");
 }
 
 BOOST_AUTO_TEST_CASE (basic_processmessage_test)

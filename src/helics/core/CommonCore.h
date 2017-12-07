@@ -74,10 +74,10 @@ CommonCore(const std::string &core_name);
   virtual uint64_t getCurrentReiteration (federate_id_t federateID) const override final;
   virtual void setMaximumIterations (federate_id_t federateID, int32_t iterations) override final;
   virtual void setTimeDelta (federate_id_t federateID, Time time) override final;
-  virtual void setLookAhead(federate_id_t federateID, Time timeLookAhead) override final;
+  virtual void setLookAhead(federate_id_t federateID, Time lookAheadTime) override final;
   virtual void setPeriod(federate_id_t federateID, Time timePeriod) override final;
   virtual void setTimeOffset(federate_id_t federateID, Time timeOffset) override final;
-  virtual void setImpactWindow(federate_id_t federateID, Time timeImpact) override final;
+  virtual void setImpactWindow(federate_id_t federateID, Time impactTime) override final;
   virtual void setLoggingLevel(federate_id_t federateID, int loggingLevel) override final;
   virtual void setFlag(federate_id_t federateID, int flag, bool flagValue = true) override final;
   virtual Handle registerSubscription (federate_id_t federateID, const std::string &key, const std::string &type, const std::string &units, handle_check_mode check_mode) override final;
@@ -271,15 +271,15 @@ protected:
   */
   void processFilterInfo(ActionMessage &command);
   /** get the information on a filter from the keyName*/
-  FilterInfo *getFilter(const std::string &subName) const;
+  FilterInfo *getFilter(const std::string &filterName) const;
   /** get the information on a filter from the handle*/
-  FilterInfo *getFilter(Core::federate_id_t fed_id, Core::Handle handle_) const;
+  FilterInfo *getFilter(Core::federate_id_t federateID, Core::Handle handle_) const;
   /** organize filters
   @detsils organize the filter and report and potential warnings and errors
   */
   void organizeFilterOperations();
 
-  std::string federateQuery(Core::federate_id_t id, const std::string &queryStr) const;
+  std::string federateQuery(Core::federate_id_t federateID, const std::string &queryStr) const;
 
   
 };
