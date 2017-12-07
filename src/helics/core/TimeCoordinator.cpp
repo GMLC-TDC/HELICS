@@ -10,7 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "TimeCoordinator.h"
-#include "flag-definitions.h"
+#include "../flag-definitions.h"
 #include <algorithm>
 #include <boost/format.hpp>
 

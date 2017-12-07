@@ -14,7 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "PublicationInfo.h"
 #include "SubscriptionInfo.h"
 #include "TimeCoordinator.h"
-#include "flag-definitions.h"
+#include "../flag-definitions.h"
 
 #include <algorithm>
 #include <chrono>

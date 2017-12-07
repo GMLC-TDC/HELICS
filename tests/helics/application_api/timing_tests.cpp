@@ -15,8 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 /** these test cases test out the value converters
  */
-#include "helics/application_api/ValueConverter.hpp"
-#include "helics/application_api/application_api.h"
+#include "helics/helics.hpp"
 #include "testFixtures.h"
 #include "test_configuration.h"
 

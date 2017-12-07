@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helicsTypes.hpp"
 
 #include "../core/coreFederateInfo.h"
-#include "../core/flag-definitions.h"
+#include "../flag-definitions.h"
 #include <atomic>
 #include <string>
 

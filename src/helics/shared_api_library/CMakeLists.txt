@@ -42,6 +42,6 @@ INSTALL(TARGETS helicsSharedLib EXPORT helics-targets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 	
-INSTALL(FILES ${helicsShared_headers} DESTINATION include/helics)
+INSTALL(FILES ${helicsShared_headers} DESTINATION include/helics/shared_api_library)
 
 

@@ -64,11 +64,12 @@ broker.h
 CoreFactory.h
 BrokerFactory.h
 core-exceptions.h
+core-types.h
 core-data.h
 helics-time.h
 coreFederateInfo.h
 core-exceptions.h
-flag-definitions.h
+../flag-definitions.h
 )
 
 set(INCLUDE_FILES
@@ -156,7 +157,7 @@ source_group("ipc" FILES ${IPC_SOURCE_FILES} ${IPC_HEADER_FILES})
 
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 
-install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION include/helics)
+install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION include/helics/core)
 
 OPTION(BUILD_BROKER "Build a helics Broker" ON)
 if (BUILD_BROKER)
