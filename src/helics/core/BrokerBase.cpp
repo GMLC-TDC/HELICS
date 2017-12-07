@@ -299,14 +299,12 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
 
 void timerTickHandler (BrokerBase *bbase, const boost::system::error_code &error)
 {
-    if (!error)
+    if (error != boost::asio::error::operation_aborted)
     {
         bbase->addActionMessage (CMD_TICK);
     }
-    else
-    {
-    }
 }
+
 void BrokerBase::queueProcessingLoop ()
 {
     auto serv = AsioServiceManager::getServicePointer ();
@@ -314,7 +312,7 @@ void BrokerBase::queueProcessingLoop ()
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
 
     auto timerCallback = [this](const boost::system::error_code &ec) { timerTickHandler (this, ec); };
-    ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::seconds (tickTimer));
+    ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
     ticktimer.async_wait (timerCallback);
     int messagesSinceLastTick = 0;
 
@@ -324,13 +322,14 @@ void BrokerBase::queueProcessingLoop ()
         switch (command.action ())
         {
         case CMD_TICK:
+            std::cout << "got tick " << messagesSinceLastTick << std::endl;
             if (messagesSinceLastTick == 0)
             {
-                messagesSinceLastTick = 0;
                 processCommand (std::move (command));
             }
+            messagesSinceLastTick = 0;
             // reschedule the timer
-            ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::seconds (tickTimer));
+            ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
             ticktimer.async_wait (timerCallback);
             break;
         case CMD_IGNORE:
