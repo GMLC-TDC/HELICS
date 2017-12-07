@@ -52,7 +52,10 @@ protected:
 										   /** a logging function for logging or printing messages*/
 	std::function<void(int, const std::string &, const std::string &)> loggerFunction;
 	std::atomic<bool> haltOperations{ false };  //!< flag indicating that no further message should be processed
-	std::string logFile; //< the file to log message to
+private:
+    std::atomic<bool> mainLoopIsRunning{ false }; //!< flag indicating that the main processing loop is running
+protected:
+    std::string logFile; //< the file to log message to
 	std::unique_ptr<TimeCoordinator> timeCoord; //!< object managing the time control
 	BlockingPriorityQueue<ActionMessage> _queue; //!< primary routing queue
 										  /** enumeration of the possible core states*/
@@ -99,6 +102,11 @@ public:
 
     /* process a disconnect signal*/
     virtual void processDisconnect(bool skipUnregister = false) = 0;
+
+    bool isRunning() const
+    {
+        return mainLoopIsRunning.load();
+    }
 private:
 	/** start main broker loop*/
 	void queueProcessingLoop();

@@ -150,7 +150,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     vFed1->finalize ();
 
     BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
-    helics::cleanupHelicsLibrary();
+    helics::cleanupHelicsLibrary ();
 }
 
 BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
@@ -199,7 +199,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     vFed1->finalize ();
 
     BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
-    helics::cleanupHelicsLibrary();
+    helics::cleanupHelicsLibrary ();
 }
 
 BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
@@ -378,7 +378,7 @@ void runFederateTest (const std::string &core_type_str,
     BOOST_CHECK_EQUAL (val, testValue2);
 
     vFed->finalize ();
-    BOOST_CHECK(vFed->currentState() == helics::Federate::op_states::finalize);
+    BOOST_CHECK (vFed->currentState () == helics::Federate::op_states::finalize);
 }
 
 template <class X>

@@ -94,4 +94,4 @@ bool matchingTypes (const std::string &type1, const std::string &type2)
 
     return false;
 }
-}
+}  // namespace helics

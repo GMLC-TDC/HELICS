@@ -91,18 +91,16 @@ bool TestBroker::brokerConnect ()
             setAsRoot ();
             return true;
         }
+
+        auto broker = BrokerFactory::findBroker (brokerName);
+        if (broker)
+        {
+            tbroker = std::static_pointer_cast<helics::CoreBroker> (broker);
+        }
         else
         {
-            auto broker = BrokerFactory::findBroker (brokerName);
-            if (broker)
-            {
-                tbroker = std::static_pointer_cast<helics::CoreBroker> (broker);
-            }
-            else
-            {
-                tbroker = std::static_pointer_cast<helics::CoreBroker> (
-                  BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
-            }
+            tbroker = std::static_pointer_cast<helics::CoreBroker> (
+              BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
         }
     }
 
@@ -120,7 +118,7 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
 {
     if (brokerState >= broker_state_t::terminating)
     {
-        return;  //no message sent in terminating or higher state
+        return;  // no message sent in terminating or higher state
     }
     // only activate the lock if we not in an operating state
     std::unique_lock<std::mutex> lock (routeMutex);

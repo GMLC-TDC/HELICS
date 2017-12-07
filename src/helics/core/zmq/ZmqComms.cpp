@@ -175,11 +175,11 @@ void ZmqComms::queue_rx_function ()
     {
         zmq::message_t msg;
         controlSocket.recv (&msg);
-        if (msg.size() < 10)
+        if (msg.size () < 10)
         {
             continue;
         }
-        ActionMessage M(static_cast<char *> (msg.data()), msg.size());
+        ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
 
         if (isProtocolCommand (M))
         {
@@ -601,7 +601,7 @@ void ZmqComms::queue_tx_function ()
                 // drop the packet
                 continue;
             }
-            else if (route_id == -1)
+            if (route_id == -1)
             {  // send to rx thread loop
                 cmd.to_vector (buffer);
                 controlSocket.send (buffer.data (), buffer.size ());

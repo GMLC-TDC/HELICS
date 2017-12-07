@@ -16,7 +16,7 @@ namespace helics
 class FederateState;
 class CoreBroker;
 class CommonCore;
-} //namespace helics
+}  // namespace helics
 
 struct federateStateTestFixture
 {

@@ -48,7 +48,7 @@ public:
 	void setCallback(std::function<void(ActionMessage &&)> callback);
 	/** set the max message size and max Queue size 
 	*/
-	void setMessageSize(int maxMessageSize, int maxQueueSize);
+	void setMessageSize(int maxMessageSize, int maxMessageCount);
 	/** check if the commInterface is connected
 	*/
 	bool isConnected() const;

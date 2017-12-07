@@ -63,8 +63,8 @@ static void argumentParser (int argc, const char *const *argv, boost::program_op
         ("consoleloglevel", po::value<int>(), "the level at which message get sent to the console")
         ("minbroker", po::value<int>(), "the minimum number of core/brokers that need to be connected (ignored in cores)")
         ("identifier", po::value<std::string>(), "name of the core/broker")
-        ("tick", po::value<int>(), "number of seconds per tick counter if there is no broker communication for 2 ticks then secondary actions are taken")
-        ("timeout", po::value<int>(), "seconds to wait for a broker connection");
+        ("tick", po::value<int>(), "number of milliseconds per tick counter if there is no broker communication for 2 ticks then secondary actions are taken")
+        ("timeout", po::value<int>(), "milliseconds to wait for a broker connection");
 
 
 	hidden.add_options() ("min", po::value<int>(), "minimum number of federates");
@@ -205,13 +205,13 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     {
         logFile = vm["logfile"].as<std::string> ();
     }
-    if (vm.count("timeout") > 0)
+    if (vm.count ("timeout") > 0)
     {
-        timeout = vm["timeout"].as<int>();
+        timeout = vm["timeout"].as<int> ();
     }
-    if (vm.count("tick") > 0)
+    if (vm.count ("tick") > 0)
     {
-        tickTimer = vm["tick"].as<int>();
+        tickTimer = vm["tick"].as<int> ();
     }
     if (!noAutomaticID)
     {
@@ -311,10 +311,17 @@ void timerTickHandler (BrokerBase *bbase, const boost::system::error_code &error
     {
         bbase->addActionMessage (CMD_TICK);
     }
+    else if (bbase->isRunning())
+    {
+        ActionMessage M(CMD_TICK);
+        SET_ACTION_FLAG(M, error_flag);
+        bbase->addActionMessage(M);
+    }
 }
 
 void BrokerBase::queueProcessingLoop ()
 {
+    mainLoopIsRunning.store(true);
     auto serv = AsioServiceManager::getServicePointer ();
     AsioServiceManager::runServiceLoop ();
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
@@ -330,9 +337,16 @@ void BrokerBase::queueProcessingLoop ()
         switch (command.action ())
         {
         case CMD_TICK:
+         
             if (messagesSinceLastTick == 0)
             {
+             //   std::cout << "sending tick " << std::endl;
                 processCommand (std::move (command));
+            }
+            if (CHECK_ACTION_FLAG(command, error_flag))
+            {
+                AsioServiceManager::haltServiceLoop();
+                AsioServiceManager::runServiceLoop();
             }
             messagesSinceLastTick = 0;
             // reschedule the timer
@@ -344,6 +358,7 @@ void BrokerBase::queueProcessingLoop ()
         case CMD_TERMINATE_IMMEDIATELY:
             ticktimer.cancel ();
             AsioServiceManager::haltServiceLoop ();
+            mainLoopIsRunning.store(false);
             return;  // immediate return
         case CMD_STOP:
             ticktimer.cancel ();
@@ -351,6 +366,7 @@ void BrokerBase::queueProcessingLoop ()
             if (!haltOperations)
             {
                 processCommand (std::move (command));
+                mainLoopIsRunning.store(false);
                 return processDisconnect ();
             }
 

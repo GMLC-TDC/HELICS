@@ -58,9 +58,9 @@ namespace CoreFactory {
   /** register a testCore so it can be found by others
   @details also cleans up any leftover bCoresrokers that were previously unregistered this can be controlled by calling cleanUpBrokers
   earlier if desired
-  @param tcore a pointer to a testCore object that should be found globally
+  @param core a pointer to a testCore object that should be found globally
   @return true if the registration was successful false otherwise*/
-  bool registerCore(std::shared_ptr<Core> tcore);
+  bool registerCore(std::shared_ptr<Core> core);
 
   /** remove a Core from the registry
   @param name the name of the Core to unregister

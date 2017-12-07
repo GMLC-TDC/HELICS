@@ -57,27 +57,27 @@ core_type coreTypeFromString (const std::string &type)
     {
         return core_type::DEFAULT;
     }
-    else if ((type.compare (0, 3, "mpi") == 0) || (type == "MPI"))
+    if ((type.compare (0, 3, "mpi") == 0) || (type == "MPI"))
     {
         return core_type::MPI;
     }
-    else if ((type == "0mq") || (type.compare (0, 3, "zmq") == 0) || (type == "zeromq") || (type == "ZMQ"))
+    if ((type == "0mq") || (type.compare (0, 3, "zmq") == 0) || (type == "zeromq") || (type == "ZMQ"))
     {
         return core_type::ZMQ;
     }
-    else if ((type == "interprocess") || (type.compare (0, 3, "ipc") == 0))
+    if ((type == "interprocess") || (type.compare (0, 3, "ipc") == 0))
     {
         return core_type::INTERPROCESS;
     }
-    else if ((type.compare (0, 4, "test") == 0) || (type == "test1") || (type == "local"))
+    if ((type.compare (0, 4, "test") == 0) || (type == "test1") || (type == "local"))
     {
         return core_type::TEST;
     }
-    else if ((type.compare (0, 3, "tcp") == 0) || (type == "TCP"))
+    if ((type.compare (0, 3, "tcp") == 0) || (type == "TCP"))
     {
         return core_type::TCP;
     }
-    else if ((type.compare (0, 3, "udp") == 0) || (type == "UDP"))
+    if ((type.compare (0, 3, "udp") == 0) || (type == "UDP"))
     {
         return core_type::UDP;
     }
@@ -338,7 +338,7 @@ std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
 bool registerCore (std::shared_ptr<Core> core)
 {
     bool res = false;
-    auto tcore = std::dynamic_pointer_cast<CommonCore> (core);
+    auto tcore = std::dynamic_pointer_cast<CommonCore> (std::move (core));
     if (tcore)
     {
         res = searchableObjects.addObject (tcore->getIdentifier (), tcore);

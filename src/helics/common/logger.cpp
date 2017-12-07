@@ -104,7 +104,7 @@ void logger::logFunction (std::string &&message)
 
 loggerNoThread::loggerNoThread () = default;
 
-loggerNoThread::loggerNoThread (std::shared_ptr<loggingCore> /*core*/) {}
+loggerNoThread::loggerNoThread (const std::shared_ptr<loggingCore> & /*core*/) {}
 
 void loggerNoThread::openFile (const std::string &file) { outFile.open (file.c_str ()); }
 void loggerNoThread::startLogging (int cLevel, int fLevel)
@@ -213,10 +213,7 @@ void loggingCore::processingLoop ()
                     {
                         break;  // break the loop
                     }
-                    else
-                    {
-                        msg.push_back ('$');
-                    }
+                    msg.push_back ('$');
                 }
             }
         }

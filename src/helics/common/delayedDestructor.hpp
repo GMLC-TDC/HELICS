@@ -32,7 +32,7 @@ class DelayedDestructor
 
   public:
     DelayedDestructor () = default;
-    DelayedDestructor (std::function<void(std::shared_ptr<X> &ptr)> callFirst)
+    explicit DelayedDestructor (std::function<void(std::shared_ptr<X> &ptr)> callFirst)
         : callBeforeDeleteFunction (std::move (callFirst))
     {
     }

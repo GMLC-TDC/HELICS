@@ -217,7 +217,7 @@ std::shared_ptr<Broker> findBroker (const std::string &brokerName)
 bool registerBroker (std::shared_ptr<Broker> broker)
 {
     bool res = false;
-    auto tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
+    auto tbroker = std::dynamic_pointer_cast<CoreBroker> (std::move (broker));
     if (tbroker)
     {
         res = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);

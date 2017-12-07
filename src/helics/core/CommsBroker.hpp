@@ -33,8 +33,8 @@ class CommsBroker : public BrokerT
     std::atomic<bool> initialized_{false};  //!< atomic protecting local initialization
   public:
     CommsBroker () noexcept;
-    CommsBroker (bool isRootObject) noexcept;
-    CommsBroker (const std::string &obj_name);
+    explicit CommsBroker (bool arg) noexcept;
+    explicit CommsBroker (const std::string &obj_name);
     ~CommsBroker ();
 
   private:
@@ -45,5 +45,5 @@ class CommsBroker : public BrokerT
 
     virtual void addRoute (int route_id, const std::string &routeInfo) override;
 };
-}
+}  // namespace helics
 #endif

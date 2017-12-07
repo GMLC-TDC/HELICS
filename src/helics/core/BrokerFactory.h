@@ -47,9 +47,9 @@ std::shared_ptr<Broker> findBroker(const std::string &brokerName);
 /** register a coreBroker so it can be found by others
 @details also cleans up any leftover brokers that were previously unregistered this can be controlled by calling cleanUpBrokers
 earlier if desired
-@param tbroker a pointer to a Broker object that should be able to be found globally
+@param broker a pointer to a Broker object that should be able to be found globally
 @return true if the registration was successful false otherwise*/
-bool registerBroker(std::shared_ptr<Broker> tbroker);
+bool registerBroker(std::shared_ptr<Broker> broker);
 /** remove a broker from the registry
 @param name the name of the broker to unregister
 */

@@ -147,7 +147,7 @@ public:
 	/** default constructor*/
 	loggerNoThread();
     /**this does nothing with the argument since it is not threaded here to match the API of logger*/
-    loggerNoThread(std::shared_ptr<loggingCore> core);
+    loggerNoThread(const std::shared_ptr<loggingCore> &core);
 	/** open a file to write the log messages
 	@param[in] file the name of the file to write messages to*/
 	void openFile(const std::string &file);

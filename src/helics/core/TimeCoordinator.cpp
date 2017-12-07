@@ -244,7 +244,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
             }
             return iteration_state::iterating;
         }
-        else if (time_allow == time_exec)  // time_allow==time_exec==time_granted
+        if (time_allow == time_exec)  // time_allow==time_exec==time_granted
         {
             if (dependencies.checkIfReadyForTimeGrant (true, time_exec))
             {

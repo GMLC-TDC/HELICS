@@ -10,11 +10,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "FederateState.h"
 
+#include "../flag-definitions.h"
 #include "EndpointInfo.h"
 #include "PublicationInfo.h"
 #include "SubscriptionInfo.h"
 #include "TimeCoordinator.h"
-#include "../flag-definitions.h"
 
 #include <algorithm>
 #include <chrono>
@@ -968,9 +968,6 @@ std::string FederateState::processQuery (const std::string &query) const
     {
         return queryCallback (query);
     }
-    else
-    {
-        return "#invalid";
-    }
+    return "#invalid";
 }
 }  // namespace helics

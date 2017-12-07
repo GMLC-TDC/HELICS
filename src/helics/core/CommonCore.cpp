@@ -1710,16 +1710,16 @@ std::string CommonCore::query (const std::string &target, const std::string &que
         {
             return federateQuery (id, queryStr);
         }
-            ActionMessage querycmd (CMD_QUERY);
-            querycmd.source_id = global_broker_id;
-            querycmd.index = ++queryCounter;
-            querycmd.payload = queryStr;
-            querycmd.info ().target = target;
-            auto fut = ActiveQueries.getFuture (querycmd.index);
-            transmit (0, querycmd);
-            auto ret = fut.get ();
-            ActiveQueries.finishedWithValue (querycmd.index);
-            return ret;
+        ActionMessage querycmd (CMD_QUERY);
+        querycmd.source_id = global_broker_id;
+        querycmd.index = ++queryCounter;
+        querycmd.payload = queryStr;
+        querycmd.info ().target = target;
+        auto fut = ActiveQueries.getFuture (querycmd.index);
+        transmit (0, querycmd);
+        auto ret = fut.get ();
+        ActiveQueries.finishedWithValue (querycmd.index);
+        return ret;
     }
     return "#invalid";
 }
@@ -1888,7 +1888,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             // try to reset the connection to the broker
             // brokerReconnect()
             LOG_ERROR (global_broker_id, getIdentifier (), "lost connection with server");
-            disconnect();
+            disconnect ();
         }
         else
         {

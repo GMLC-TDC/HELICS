@@ -90,7 +90,7 @@ bool TimeDependencies::addDependency (Core::federate_id_t id)
 {
     if (dependencies.empty ())
     {
-        dependencies.push_back (id);
+        dependencies.emplace_back (id);
         return true;
     }
     auto dep = std::lower_bound (dependencies.begin (), dependencies.end (), id, dependencyCompare);

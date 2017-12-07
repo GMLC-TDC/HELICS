@@ -24,12 +24,12 @@ federateStateTestFixture::federateStateTestFixture ()
     fs = std::unique_ptr<helics::FederateState> (new helics::FederateState ("fed_name", info));
 }
 
-federateStateTestFixture::~federateStateTestFixture() = default;
+federateStateTestFixture::~federateStateTestFixture () = default;
 
-coreBrokerTestFixture::coreBrokerTestFixture() = default;
+coreBrokerTestFixture::coreBrokerTestFixture () = default;
 
-coreBrokerTestFixture::~coreBrokerTestFixture() = default;
+coreBrokerTestFixture::~coreBrokerTestFixture () = default;
 
-commonCoreTestFixture::commonCoreTestFixture() = default;
+commonCoreTestFixture::commonCoreTestFixture () = default;
 
-commonCoreTestFixture::~commonCoreTestFixture() = default;
+commonCoreTestFixture::~commonCoreTestFixture () = default;
