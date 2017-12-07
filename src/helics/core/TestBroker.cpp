@@ -107,6 +107,18 @@ bool TestBroker::brokerConnect ()
     return static_cast<bool> (tbroker);
 }
 
+bool TestBroker::tryReconnect()
+{
+    
+    if (isRoot())
+    {
+        return true;
+    }
+    auto broker = BrokerFactory::findBroker(brokerName);
+    tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
+    return static_cast<bool> (tbroker);
+}
+
 void TestBroker::brokerDisconnect ()
 {
     brokerState = broker_state_t::terminating;

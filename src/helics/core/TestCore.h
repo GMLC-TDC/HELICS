@@ -43,6 +43,7 @@ private:
 	//these should only be called by the CommonCore code
 	virtual bool brokerConnect() override;
 	virtual void brokerDisconnect() override;
+    virtual bool tryReconnect() override;
 private:
 	  std::atomic<bool> initialized_{ false };  //!< atomic protecting local initialization
     std::shared_ptr<CoreBroker> tbroker;  //!<the parent broker;

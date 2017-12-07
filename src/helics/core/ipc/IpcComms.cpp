@@ -256,12 +256,6 @@ DISCONNECT_TX_QUEUE:
     tx_status = connection_status::terminated;
 }
 
-void IpcComms::closeTransmitter ()
-{
-    ActionMessage rt (CMD_PROTOCOL);
-    rt.index = DISCONNECT;
-    transmit (-1, rt);
-}
 
 void IpcComms::closeReceiver ()
 {
@@ -294,4 +288,5 @@ void IpcComms::closeReceiver ()
         }
     }
 }
+
 }  // namespace helics

@@ -39,7 +39,7 @@ class CommsBroker : public BrokerT
 
   private:
     virtual void brokerDisconnect () override;
-
+    virtual bool tryReconnect() override;
   public:
     virtual void transmit (int route_id, const ActionMessage &cmd) override;
 

@@ -41,6 +41,9 @@ public:
 	/** disconnected the comms interface
 	*/
 	void disconnect();
+
+    /** try reconnected from a mismatched or disconnection*/
+    bool reconnect();
 	/** set the name of the communicator*/
 	void setName(const std::string &name);
 	/** set the callback for processing the messages
@@ -59,6 +62,7 @@ protected:
 		
 		startup = -1, //!< the connection is in startup mode
 		connected = 0,	//!< we are connected
+        reconnecting=1, //!< we are trying reconnect
 		terminated=2,	//!< the connection has been terminated
         error = 4,	//!< some error occurred on the connection
 
@@ -80,8 +84,10 @@ private:
 	std::mutex threadSyncLock; //!< lock to handle thread operations
 	virtual void queue_rx_function()=0;	//!< the functional loop for the receive queue
 	virtual void queue_tx_function()=0;  //!< the loop for transmitting data
-	virtual void closeTransmitter() = 0; //!< function to instruct the transmitter loop to close
+	virtual void closeTransmitter(); //!< function to instruct the transmitter loop to close
 	virtual void closeReceiver() = 0;  //!< function to instruct the receiver loop to close
+    virtual void reconnectTransmitter(); //!< function to reconnect the transmitter
+    virtual void reconnectReceiver();  //!< function to reconnect the receiver
 };
 
 std::string makePortAddress(const std::string &networkInterface, int portNumber);

@@ -443,12 +443,6 @@ CLOSE_TX_LOOP:
     tx_status = connection_status::terminated;
 }
 
-void UdpComms::closeTransmitter ()
-{
-    ActionMessage rt (CMD_PROTOCOL);
-    rt.index = DISCONNECT;
-    transmit (-1, rt);
-}
 
 void UdpComms::closeReceiver ()
 {

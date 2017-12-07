@@ -319,6 +319,11 @@ void timerTickHandler (BrokerBase *bbase, const boost::system::error_code &error
     }
 }
 
+bool BrokerBase::tryReconnect()
+{
+    return false;
+}
+
 void BrokerBase::queueProcessingLoop ()
 {
     mainLoopIsRunning.store(true);

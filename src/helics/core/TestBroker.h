@@ -37,7 +37,7 @@ public:
 protected:
 	virtual bool brokerConnect() override;
 	virtual void brokerDisconnect() override;
-	
+    virtual bool tryReconnect() override;
 private:
 	std::string brokerName;  //!< the name of the higher level broker to connect to
 	std::string brokerInitString;  //!< the initialization string for the higher level broker

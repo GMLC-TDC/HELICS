@@ -107,6 +107,9 @@ public:
     {
         return mainLoopIsRunning.load();
     }
+    /** in the case of connection failure with a broker this function will try a reconnect procedure
+    */
+    virtual bool tryReconnect() = 0;
 private:
 	/** start main broker loop*/
 	void queueProcessingLoop();

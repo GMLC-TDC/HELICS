@@ -107,6 +107,9 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
         {
         case CLOSE_RECEIVER:
             return (-1);
+        case RECONNECT_RECEIVER:
+            rx_status = connection_status::connected;
+            break;
         default:
             break;
         }
@@ -544,6 +547,9 @@ void ZmqComms::queue_tx_function ()
             {
                 switch (cmd.index)
                 {
+                case RECONNECT:
+                    tx_status = connection_status::connected;
+                    break;
                 case NEW_ROUTE:
                 {
                     auto newroute = cmd.payload;
@@ -654,13 +660,6 @@ CLOSE_TX_LOOP:
     tx_status = connection_status::terminated;
 }
 
-void ZmqComms::closeTransmitter ()
-{
-    ActionMessage rt (CMD_PROTOCOL);
-    rt.index = DISCONNECT;
-    transmit (-1, rt);
-}
-
 void ZmqComms::closeReceiver ()
 {
     if (tx_status == connection_status::connected)
@@ -689,6 +688,9 @@ void ZmqComms::closeReceiver ()
         pushSocket.send (cmd.to_string ());
     }
 }
+
+
+
 
 std::string ZmqComms::getPushAddress () const { return makePortAddress (localTarget_, pullPortNumber); }
 
