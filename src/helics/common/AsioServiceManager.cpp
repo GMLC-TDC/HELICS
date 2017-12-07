@@ -23,6 +23,7 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 #include <map>
 #include <mutex>
 #include <stdexcept>
+#include <iostream>
 
 /** a storage system for the available core objects allowing references by name to the core
  */
@@ -88,7 +89,7 @@ void AsioServiceManager::closeService (const std::string &serviceName)
         {
             fnd->second->nullwork.reset ();
             fnd->second->iserv->stop ();
-            fnd->second->serviceThread.join ();
+            fnd->second->loopRet.get();
         }
 
         services.erase (fnd);
@@ -110,7 +111,7 @@ AsioServiceManager::~AsioServiceManager ()
     {
         nullwork.reset ();
         iserv->stop ();
-        serviceThread.join ();
+        loopRet.get();
     }
     if (leakOnDelete)
     {
@@ -138,16 +139,16 @@ void AsioServiceManager::runServiceLoop (const std::string &serviceName)
         {
             ptr->nullwork = std::make_unique<boost::asio::io_service::work> (ptr->getBaseService ());
             ptr->running = true;
-            ptr->serviceThread = std::thread ([ptr]() { ptr->getBaseService ().run (); });
+            ptr->loopRet = std::async (std::launch::async, [ptr]() { serviceRunLoop(ptr); });
         }
         else
         {
             if (ptr->getBaseService ().stopped ())
             {
-                ptr->serviceThread.join ();
+                ptr->loopRet.get();
                 ptr->nullwork = std::make_unique<boost::asio::io_service::work> (ptr->getBaseService ());
                 ptr->running = true;
-                ptr->serviceThread = std::thread ([ptr]() { ptr->getBaseService ().run (); });
+                ptr->loopRet = std::async(std::launch::async, [ptr]() { serviceRunLoop(ptr); });
             }
         }
         return;
@@ -171,9 +172,27 @@ void AsioServiceManager::haltServiceLoop (const std::string &serviceName)
             if (ptr->runCounter <= 0)
             {
                 ptr->nullwork.reset ();
+                ptr->iserv->stop();
+                ptr->loopRet.get();
+               
             }
         }
         return;
     }
     throw (std::invalid_argument ("the service name specified was not available"));
+}
+
+void serviceRunLoop(std::shared_ptr<AsioServiceManager> ptr)
+{
+    std::cout << "starting service loop" << std::endl;
+    try
+    {
+        ptr->iserv->run();
+    }
+    catch (...)
+    {
+        std::cout << "caught error in service loop" << std::endl;
+    }
+    ptr->running = false;
+    std::cout << "exiting service loop" << std::endl;
 }

@@ -175,7 +175,11 @@ void ZmqComms::queue_rx_function ()
     {
         zmq::message_t msg;
         controlSocket.recv (&msg);
-        ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
+        if (msg.size() < 10)
+        {
+            continue;
+        }
+        ActionMessage M(static_cast<char *> (msg.data()), msg.size());
 
         if (isProtocolCommand (M))
         {

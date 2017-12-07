@@ -25,7 +25,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <atomic>
 #include <string>
 #include <map>
-#include <thread>
+#include <future>
 
 #include <boost/asio/io_service.hpp>
 
@@ -34,13 +34,13 @@ class AsioServiceManager
 {
 private:
 	static std::map<std::string, std::shared_ptr<AsioServiceManager>> services; //!< container for pointers to all the available contexts
-	std::string name;  //!< context name
+	std::string name;  //!< service name
 	std::unique_ptr<boost::asio::io_service> iserv; //!< pointer to the actual context
     std::unique_ptr<boost::asio::io_service::work> nullwork; //!< pointer to an object used to keep a service running
     bool leakOnDelete = false; //!< this is done to prevent some warning messages for use in DLL's  
     std::atomic<bool> running{ false };
     int runCounter = 0;  //!< counter for the number of times the runServiceLoop has been called
-    std::thread serviceThread;
+    std::future<void> loopRet;
 	AsioServiceManager(const std::string &contextName);
     
 public:
@@ -97,7 +97,9 @@ public:
     */
     static void haltServiceLoop(const std::string &serviceName = "");
 
-
+    friend void serviceRunLoop(std::shared_ptr<AsioServiceManager> ptr);
 };
+
+void serviceRunLoop(std::shared_ptr<AsioServiceManager> ptr);
 
 #endif

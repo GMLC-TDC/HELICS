@@ -210,9 +210,17 @@ std::pair<std::string, int> extractInterfaceandPort (const std::string &address)
     {
         try
         {
-            auto val = std::stoi (address.substr (lastColon + 1));
-            ret.first = address.substr (0, lastColon);
-            ret.second = val;
+            if (address[lastColon + 1] != '/')
+            {
+                auto val = std::stoi(address.substr(lastColon + 1));
+                ret.first = address.substr(0, lastColon);
+                ret.second = val;
+            }
+            else
+            {
+                ret = std::make_pair(address, -1);
+            }
+           
         }
         catch (const std::invalid_argument &)
         {

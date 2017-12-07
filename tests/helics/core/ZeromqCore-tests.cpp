@@ -57,6 +57,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
     BOOST_CHECK (!connected);
 }
 
+
 /** test the request set class with various scenarios*/
 BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
 {
@@ -450,5 +451,8 @@ BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
     BOOST_CHECK_EQUAL (ccore->getAddress (), "tcp://127.0.0.1:23500;tcp://127.0.0.1:23501");
     core->disconnect ();
     broker->disconnect ();
+    helics::CoreFactory::cleanUpCores();
+    helics::BrokerFactory::cleanUpBrokers();
 }
+
 BOOST_AUTO_TEST_SUITE_END ()

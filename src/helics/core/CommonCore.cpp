@@ -1890,6 +1890,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             // brokerReconnect()
             std::cerr << "lost connection" << std::endl;
             LOG_ERROR (global_broker_id, getIdentifier (), "lost connection with server");
+            disconnect();
         }
         else
         {
