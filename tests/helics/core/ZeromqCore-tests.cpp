@@ -186,15 +186,20 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
 
     repSocket3.send (msg);
     auto res = reqset.checkForMessages(std::chrono::milliseconds(400));
-    if (reqset.waiting())
+    if (res!=6)
     {
-       res = reqset.checkForMessages(std::chrono::milliseconds(400));
+       auto res2 = reqset.checkForMessages(std::chrono::milliseconds(400));
+       if ((res + res2 == 6)||(res2==6))
+       {
+           res = 6;
+       }
     }
     BOOST_CHECK_EQUAL (res, 6);
     repSocket1.close ();
     repSocket2.close ();
     repSocket3.close ();
     reqset.close ();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
    
 }
 
@@ -213,7 +218,9 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
     }
     catch(const zmq::error_t &ze)
     {
-        std::cerr << "error repbind " << ze.what() << std::endl;
+        std::cerr << "error repbind (broker test transmit) " << ze.what() << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        BOOST_FAIL("Unable to bind Socket");
     }
     repSocket.setsockopt(ZMQ_LINGER, 100);
     zmq::socket_t pullSocket(ctx->getContext(), ZMQ_PULL);
@@ -223,7 +230,10 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
     }
     catch (const zmq::error_t &ze)
     {
-        std::cerr << "error pullbind " << ze.what() << std::endl;
+        std::cerr << "error pullbind (broker test transmit)" << ze.what() << std::endl;
+        repSocket.close();
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        BOOST_FAIL("Unable to bind Socket");
     }
     
     pullSocket.setsockopt(ZMQ_LINGER, 100);
@@ -256,10 +266,30 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
 
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
-    repSocket.bind ("tcp://127.0.0.1:23405");
+    try
+    {
+
+        repSocket.bind("tcp://127.0.0.1:23405");
+    }
+    catch (const zmq::error_t &ze)
+    {
+        std::cerr << "error repbind (zmqComms_rx_test) " << ze.what() << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        BOOST_FAIL("Unable to bind Socket");
+    }
     repSocket.setsockopt(ZMQ_LINGER, 100);
-    zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
-    pullSocket.bind ("tcp://127.0.0.1:23406");
+    zmq::socket_t pullSocket(ctx->getContext(), ZMQ_PULL);
+    try
+    {
+        pullSocket.bind("tcp://127.0.0.1:23406");
+    }
+    catch (const zmq::error_t &ze)
+    {
+        std::cerr << "error pullbind (zmqComms_rx_test)" << ze.what() << std::endl;
+        repSocket.close();
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        BOOST_FAIL("Unable to bind Socket");
+    }
     pullSocket.setsockopt(ZMQ_LINGER, 100);
     comm.setBrokerPorts (23405, 23406);
     comm.setPortNumbers (23407, 23408);
@@ -441,10 +471,30 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
     BOOST_CHECK (core->isInitialized ());
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
-    repSocket.bind ("tcp://127.0.0.1:23405");
+    try
+    {
+
+        repSocket.bind("tcp://127.0.0.1:23405");
+    }
+    catch (const zmq::error_t &ze)
+    {
+        std::cerr << "error repbind (zmqCore_initialization_test) " << ze.what() << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        BOOST_FAIL("Unable to bind Socket");
+    }
     repSocket.setsockopt(ZMQ_LINGER, 100);
-    zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
-    pullSocket.bind ("tcp://127.0.0.1:23406");
+    zmq::socket_t pullSocket(ctx->getContext(), ZMQ_PULL);
+    try
+    {
+        pullSocket.bind("tcp://127.0.0.1:23406");
+    }
+    catch (const zmq::error_t &ze)
+    {
+        std::cerr << "error pullbind (zmqCore_initialization_test)" << ze.what() << std::endl;
+        repSocket.close();
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        BOOST_FAIL("Unable to bind Socket");
+    }
     pullSocket.setsockopt(ZMQ_LINGER, 100);
     bool connected = core->connect ();
     BOOST_REQUIRE (connected);
@@ -466,6 +516,7 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
     core->disconnect ();
     core = nullptr;
     helics::CoreFactory::cleanUpCores(200);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
 }
 
