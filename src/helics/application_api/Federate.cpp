@@ -512,26 +512,26 @@ iterationTime Federate::requestTimeIterative (Time nextInternalTimeStep, iterati
 {
     if (state == op_states::execution)
     {
-        auto iterationTime = coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
+        auto iterativeTime = coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
         Time oldTime = currentTime;
-        switch (iterationTime.state)
+        switch (iterativeTime.state)
         {
         case iteration_result::next_step:
-            currentTime = iterationTime.stepTime;
+            currentTime = iterativeTime.stepTime;
             FALLTHROUGH
         case iteration_result::iterating:
             updateTime(currentTime, oldTime);
             break;
         case iteration_result::halted:
-            currentTime = iterationTime.stepTime;
+            currentTime = iterativeTime.stepTime;
             updateTime(currentTime, oldTime);
-            state == op_states::finalize;
+            state = op_states::finalize;
             break;
         case iteration_result::error:
-            state == op_states::error;
+            state = op_states::error;
             break;
         }
-        return iterationTime;
+        return iterativeTime;
     }
     else
     {
@@ -611,11 +611,23 @@ iterationTime Federate::requestTimeIterativeFinalize ()
         auto iterativeTime = asyncCallInfo->timeRequestIterativeFuture.get ();
         state = op_states::execution;
         Time oldTime = currentTime;
-        if (iterativeTime.state == iteration_result::next_step)
+        switch (iterativeTime.state)
         {
+        case iteration_result::next_step:
             currentTime = iterativeTime.stepTime;
+            FALLTHROUGH
+        case iteration_result::iterating:
+            updateTime(currentTime, oldTime);
+            break;
+        case iteration_result::halted:
+            currentTime = iterativeTime.stepTime;
+            updateTime(currentTime, oldTime);
+            state = op_states::finalize;
+            break;
+        case iteration_result::error:
+            state = op_states::error;
+            break;
         }
-        updateTime (currentTime, oldTime);
         return iterativeTime;
     }
     else
