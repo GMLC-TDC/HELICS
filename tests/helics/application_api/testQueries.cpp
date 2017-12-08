@@ -59,6 +59,7 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     BOOST_CHECK_EQUAL (vFed1->query ("test2", "isinit"), "true");
 
     BOOST_CHECK_EQUAL (vFed1->query ("test2", "publications"), "[test2/pub3]");
+    core = nullptr;
     vFed1->finalize ();
     vFed2->finalize ();
 }
@@ -80,6 +81,7 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     vFed1->enterInitializationStateAsync ();
     vFed2->enterInitializationState ();
     vFed1->enterInitializationStateFinalize ();
+    core = nullptr;
     vFed1->finalize ();
     vFed2->finalize ();
 }
