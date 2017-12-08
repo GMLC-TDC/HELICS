@@ -19,6 +19,7 @@ endif(BUILD_HELICS_TESTS)
 OPTION(BUILD_HELICS_EXAMPLES "Enable the test Executables to be built" OFF)
 
 OPTION(BUILD_PYTHON "Build Python extension" OFF)
+OPTION(BUILD_MATLAB "Build MATLAB extension" OFF)
 
 OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" OFF)
 IF(NOT MSVC)
