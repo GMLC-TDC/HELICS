@@ -32,6 +32,7 @@ else()
 OPTION(USE_POSITION_INDEPENDENT_CODE "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library" OFF)
 endif()
 
+OPTION(BUILD_JAVA "Build Java extension" OFF)
 if (BUILD_PYTHON OR BUILD_C_SHARED_LIB)
 set(BUILT_C_SHARED_LIB ON)
 endif()
