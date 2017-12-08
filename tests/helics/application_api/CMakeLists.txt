@@ -57,10 +57,7 @@ ADD_DEFINITIONS(-DHELICS_INSTALL_LOCATION="${CMAKE_INSTALL_PREFIX}")
 
 add_test(NAME application-api-tests COMMAND application-api-tests --log_level=success --report_level=detailed)
 
-#-----------------------------------------------------------------------------
-# Setup CTEST environment
-#-----------------------------------------------------------------------------
-include(CTest)
+
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET application-api-tests POST_BUILD        # Adds a post-build event to api tests

@@ -31,11 +31,6 @@ target_link_libraries(c_interface_tests helicsSharedLib ${Boost_LIBRARIES_test})
 
 add_test(NAME c_interface_tests COMMAND c_interface_tests --log_level=warning --report_level=detailed)
 
-#-----------------------------------------------------------------------------
-# Setup CTEST environment
-#-----------------------------------------------------------------------------
-include(CTest)
-
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET c_interface_tests POST_BUILD        # Adds a post-build event to api tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."

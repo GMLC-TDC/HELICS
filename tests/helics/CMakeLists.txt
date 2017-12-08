@@ -1,4 +1,5 @@
 
+
 OPTION(QUICK_TESTS_ONLY "set to build only the quick tests and turn off many of the longer tests" OFF)
 
 if (QUICK_TESTS_ONLY)
