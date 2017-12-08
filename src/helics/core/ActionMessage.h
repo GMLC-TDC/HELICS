@@ -208,18 +208,18 @@ std::unique_ptr<Message> createMessage (const ActionMessage &cmd);
 std::unique_ptr<Message> createMessage (ActionMessage &&cmd);
 
 /** check if a command is a protocol command*/
-inline bool isProtocolCommand(const ActionMessage &command)
+inline bool isProtocolCommand(const ActionMessage &command) noexcept
 {
     return ((command.action() == CMD_PROTOCOL) || (command.action() == CMD_PROTOCOL_PRIORITY) || (command.action() == CMD_PROTOCOL_BIG));
 }
 /** check if a command is a priority command*/
-inline bool isPriorityCommand(const ActionMessage &command)
+inline bool isPriorityCommand(const ActionMessage &command) noexcept
 {
     return (command.action() < action_message_def::action_t::cmd_ignore);
 }
 
 /** check if a command is a priority command*/
-inline bool isValidCommand(const ActionMessage &command)
+inline bool isValidCommand(const ActionMessage &command) noexcept
 {
     return (command.action() != action_message_def::action_t::cmd_invalid);
 }

@@ -82,6 +82,11 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
         coreObject->connect ();
     }
     fedID = coreObject->registerFederate (fi.name, fi);
+    if (fedID == helics::invalid_fed_id)
+    {
+        state = op_states::error;
+        return;
+    }
     currentTime = coreObject->getCurrentTime (fedID);
 }
 
@@ -115,6 +120,11 @@ Federate::Federate (std::shared_ptr<Core> core, const FederateInfo &fi)
         coreObject->connect ();
     }
     fedID = coreObject->registerFederate (fi.name, fi);
+    if (fedID == helics::invalid_fed_id)
+    {
+        state = op_states::error;
+        return;
+    }
     currentTime = coreObject->getCurrentTime (fedID);
 }
 
@@ -248,15 +258,22 @@ iteration_result Federate::enterExecutionState (iteration_request iterate)
     case op_states::initialization:
     {
         res = coreObject->enterExecutingState (fedID, iterate);
-        if (res == iteration_result::next_step)
+        switch (res)
         {
+        case iteration_result::next_step:
             state = op_states::execution;
-            InitializeToExecuteStateTransition ();
-        }
-        else
-        {
+            InitializeToExecuteStateTransition();
+            break;
+        case iteration_result::iterating:
             state = op_states::initialization;
-            updateTime (getCurrentTime (), getCurrentTime ());
+            updateTime(getCurrentTime(), getCurrentTime());
+            break;
+        case iteration_result::error:
+            state = op_states::error;
+            break;
+        case iteration_result::halted:
+            state = op_states::finalize;
+            break;
         }
         break;
     }
@@ -268,7 +285,7 @@ iteration_result Federate::enterExecutionState (iteration_request iterate)
     case op_states::pendingTime:
         requestTimeFinalize ();
         break;
-    case op_states::pendingIterativeTime:  // since this isn't gauranteed to progress it shouldn't be called in
+    case op_states::pendingIterativeTime:  // since this isn't guaranteed to progress it shouldn't be called in
                                            // this fashion
     default:
         throw (InvalidStateTransition ("cannot transition from current state to execution state"));
@@ -330,16 +347,24 @@ iteration_result Federate::enterExecutionStateFinalize ()
         throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
     }
     auto res = asyncCallInfo->execFuture.get ();
-    if (iteration_result::next_step == res)
+    switch (res)
     {
+    case iteration_result::next_step:
         state = op_states::execution;
-        InitializeToExecuteStateTransition ();
-    }
-    else
-    {
+        InitializeToExecuteStateTransition();
+        break;
+    case iteration_result::iterating:
         state = op_states::initialization;
-        updateTime (getCurrentTime (), getCurrentTime ());
+        updateTime(getCurrentTime(), getCurrentTime());
+        break;
+    case iteration_result::error:
+        state = op_states::error;
+        break;
+    case iteration_result::halted:
+        state = op_states::finalize;
+        break;
     }
+    
     return res;
 }
 
@@ -489,11 +514,23 @@ iterationTime Federate::requestTimeIterative (Time nextInternalTimeStep, iterati
     {
         auto iterationTime = coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
         Time oldTime = currentTime;
-        if (iterationTime.state == iteration_result::next_step)
+        switch (iterationTime.state)
         {
+        case iteration_result::next_step:
             currentTime = iterationTime.stepTime;
+            FALLTHROUGH
+        case iteration_result::iterating:
+            updateTime(currentTime, oldTime);
+            break;
+        case iteration_result::halted:
+            currentTime = iterationTime.stepTime;
+            updateTime(currentTime, oldTime);
+            state == op_states::finalize;
+            break;
+        case iteration_result::error:
+            state == op_states::error;
+            break;
         }
-        updateTime (currentTime, oldTime);
         return iterationTime;
     }
     else

@@ -309,7 +309,15 @@ void timerTickHandler (BrokerBase *bbase, const boost::system::error_code &error
 {
     if (error != boost::asio::error::operation_aborted)
     {
-        bbase->addActionMessage (CMD_TICK);
+        try
+        {
+            bbase->addActionMessage(CMD_TICK);
+        }
+        catch (std::exception &e)
+        {
+            std::cout << "exception caught from addActionMessage" << std::endl;
+        }
+        
     }
     else if (bbase->isRunning())
     {

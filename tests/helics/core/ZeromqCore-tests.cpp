@@ -133,6 +133,10 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     zmq::socket_t repSocket3 (ctx->getContext (), ZMQ_REP);
     repSocket3.bind ("tcp://127.0.0.1:23407");
 
+    repSocket1.setsockopt(ZMQ_LINGER, 100);
+    repSocket2.setsockopt(ZMQ_LINGER, 100);
+    repSocket3.setsockopt(ZMQ_LINGER, 100);
+
     reqset.addRoutes (1, "tcp://127.0.0.1:23405");
     reqset.addRoutes (2, "tcp://127.0.0.1:23406");
     reqset.addRoutes (3, "tcp://127.0.0.1:23407");
@@ -186,6 +190,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     repSocket2.close ();
     repSocket3.close ();
     reqset.close ();
+   
 }
 
 BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
@@ -197,10 +202,10 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
     repSocket.bind ("tcp://127.0.0.1:23405");
-
+    repSocket.setsockopt(ZMQ_LINGER, 100);
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
     pullSocket.bind ("tcp://127.0.0.1:23406");
-
+    pullSocket.setsockopt(ZMQ_LINGER, 100);
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
     comm.setBrokerPorts (23405);
     comm.setPortNumbers (23407);
@@ -217,6 +222,8 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     comm.disconnect ();
     repSocket.close ();
+    pullSocket.close();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
 BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
@@ -229,10 +236,10 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
     repSocket.bind ("tcp://127.0.0.1:23405");
-
+    repSocket.setsockopt(ZMQ_LINGER, 100);
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
     pullSocket.bind ("tcp://127.0.0.1:23406");
-
+    pullSocket.setsockopt(ZMQ_LINGER, 100);
     comm.setBrokerPorts (23405, 23406);
     comm.setPortNumbers (23407, 23408);
     comm.setName ("tests");
@@ -263,6 +270,9 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
     BOOST_REQUIRE_EQUAL (counter, 1);
     BOOST_CHECK (act.action () == helics::action_message_def::action_t::cmd_ack);
     comm.disconnect ();
+    repSocket.close();
+    pullSocket.close();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
 BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
