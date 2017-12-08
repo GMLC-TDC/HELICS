@@ -15,7 +15,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "Federate.h"
 #include "Message.h"
-#include "identifierTypes.hpp"
 #include <functional>
 #include <vector>
 

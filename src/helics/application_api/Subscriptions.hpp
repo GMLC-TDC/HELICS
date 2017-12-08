@@ -20,6 +20,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/lexical_cast.hpp>
 namespace helics
 {
+    /** base class for a subscription object*/
 class SubscriptionBase
 {
   protected:
@@ -81,9 +82,13 @@ class SubscriptionBase
     const std::string &getName () const { return key_; }
     /** get the key for the subscription*/
     std::string getType () const { return fed->getPublicationType (id); }
+    /** get the units associated with a subscription*/
     const std::string &getUnits () const { return units_; }
 };
 
+/** primary subscription object class
+@details can convert between the helics primary base class types
+*/
 class Subscription : public SubscriptionBase
 {
   private:
@@ -97,7 +102,7 @@ class Subscription : public SubscriptionBase
 
     mutable helicsType_t type = helicsType_t::helicsInvalid;  //!< the underlying type the publication is using
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
-    bool hasUpdate = false;  //!< the value has been updated
+    //bool hasUpdate = false;  //!< the value has been updated
     defV lastValue;  //!< the last value updated
     double delta = -1.0;  //!< the minimum difference
   public:
@@ -110,7 +115,7 @@ class Subscription : public SubscriptionBase
         : SubscriptionBase (required, valueFed, key, "def", units)
     {
     }
-
+    /** check if the value has been updated*/
     virtual bool isUpdated () const override;
 
     /** store the value in the given variable
@@ -145,6 +150,10 @@ class Subscription : public SubscriptionBase
                     lastValue = out;
                 }
             }
+            else
+            {
+                out = invalidValue<X> ();
+            }
         }
         else
         {
@@ -162,21 +171,21 @@ class Subscription : public SubscriptionBase
     }
     /** get the most recent value
     @return the value*/
-    // template <class X>
-    // typename std::enable_if_t<isConvertableType<X>(), X> getValue()
-    //{
-    //	std::conditional<std::is_integral<X>::value, int64_t, double> gval;
-    //	getValue(gval);
-    //	return static_cast<X>(gval);
-    //}
-    /** get the most recent calculation with the result as a convertable type*/
-    // template <class X>
-    // typename std::enable_if_t<isConvertableType<X>()> getValue(X &out)
-    //{
-    //	std::conditional<std::is_integral<X>::value, int64_t, double> gval;
-    //	getValue(gval);
-    //	out = static_cast<X>(gval);
-    //}
+    template <class X>
+    typename std::enable_if_t<isConvertableType<X> (), X> getValueAs ()
+    {
+        std::conditional<std::is_integral<X>::value, int64_t, double> gval;
+        getValue (gval);
+        return static_cast<X> (gval);
+    }
+    /** get the most recent calculation with the result as a convertible type*/
+    template <class X>
+    typename std::enable_if_t<isConvertableType<X> ()> getValueAs (X &out)
+    {
+        std::conditional<std::is_integral<X>::value, int64_t, double> gval;
+        getValue (gval);
+        out = static_cast<X> (gval);
+    }
 
     using SubscriptionBase::registerCallback;
     /** register a callback for the update
@@ -194,12 +203,17 @@ class Subscription : public SubscriptionBase
         });
     }
 
+    /** set the default value to use before any update has been published
+    */
     template <class X>
     typename std::enable_if_t<helicsType<X> () != helicsType_t::helicsInvalid, void> setDefault (const X &val)
     {
         lastValue = val;
     }
 
+    /** set the minimum delta for change detection 
+    @param detltaV a double with the change in a value in order to register a different value
+    */
     void setMinimumChange (double deltaV)
     {
         if (delta < 0.0)
@@ -212,6 +226,9 @@ class Subscription : public SubscriptionBase
             changeDetectionEnabled = false;
         }
     }
+    /** enable change detection 
+    @param enabled (optional) set to false to disable change detection true(default) to enable it 
+    */
     void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
 
   private:

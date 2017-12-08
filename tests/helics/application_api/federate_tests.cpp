@@ -8,8 +8,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "helics/application_api/Federate.h"
+#include "helics/core/BrokerFactory.h"
 #include "helics/core/CoreFactory.h"
 #include "helics/core/core.h"
+#include "helics/core/core-exceptions.h"
 #include "test_configuration.h"
 #include <future>
 #include <boost/test/unit_test.hpp>
@@ -63,6 +65,39 @@ BOOST_AUTO_TEST_CASE (federate_time_step_tests)
     res = Fed->requestTime (3.0);
     BOOST_CHECK_EQUAL (res, 3.0);
 }
+
+#ifndef QUICK_TESTS_ONLY
+BOOST_AUTO_TEST_CASE (federate_timeout_test)
+{
+    auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "b1", "1");
+    brk->connect ();
+    helics::FederateInfo fi ("test1");
+    fi.coreType = CORE_TYPE_TO_TEST;
+    fi.coreInitString = "1 --broker=b1 --tick=1000 --timeout=3000";
+
+    auto Fed = std::make_shared<helics::Federate> (fi);
+
+    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::startup);
+    Fed->enterInitializationState ();
+    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::initialization);
+    Fed->enterExecutionState ();
+    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::execution);
+
+    auto res = Fed->requestTime (1.0);
+    BOOST_CHECK_EQUAL (res, 1.0);
+    res = Fed->requestTime (2.0);
+    BOOST_CHECK_EQUAL (res, 2.0);
+
+    res = Fed->requestTime (3.0);
+    BOOST_CHECK_EQUAL (res, 3.0);
+    brk->disconnect ();
+    std::this_thread::sleep_for (std::chrono::seconds (5));
+    auto cptr = Fed->getCorePointer ();
+    BOOST_CHECK (!cptr->isConnected ());
+    BOOST_CHECK_THROW(res = Fed->requestTime(4.0), helics::functionExecutionFailure);
+    BOOST_CHECK(Fed->currentState() == helics::Federate::op_states::error);
+}
+#endif
 
 BOOST_AUTO_TEST_CASE (federate_multiple_federates)
 {

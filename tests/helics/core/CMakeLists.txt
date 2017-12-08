@@ -34,30 +34,17 @@ data-block-tests.cpp
 UdpCore-tests.cpp
 )
 
-link_directories(${external_link_directories})
-
 add_executable(core-tests ${core_test_sources} ${core_test_headers})
-target_link_libraries(core-tests helics)
-
-
+target_link_libraries(core-tests helics-static)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
-target_link_libraries(core-tests ${external_library_list})
+
 target_link_libraries(core-tests ${Boost_LIBRARIES_test})
 
-IF(MINGW)
-target_link_libraries(core-tests ws2_32)
-ENDIF(MINGW)
-add_test(NAME core-tests COMMAND core-tests)
-
-#-----------------------------------------------------------------------------
-# Setup CTEST environment
-#-----------------------------------------------------------------------------
-include(CTest)
-
+add_test(NAME core-tests COMMAND core-tests --log_level=warning --report_level=detailed)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET core-tests POST_BUILD        # Adds a post-build event to core tests

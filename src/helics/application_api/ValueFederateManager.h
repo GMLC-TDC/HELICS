@@ -12,7 +12,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "Message.h"
 #include "../core/core.h"
-#include "identifierTypes.hpp"
+#include "helicsTypes.hpp"
 #include <utility> 
 #include <cstdint>
 #include <memory>

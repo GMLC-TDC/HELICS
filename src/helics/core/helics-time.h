@@ -39,9 +39,9 @@ public:
 	Time stepTime; //!< the time of the granted step
 	iteration_result state;	//!< the convergence state
 	/** default constructor*/
-	iterationTime() noexcept {};
+    iterationTime()=default;
 	/** construct from properties*/
-	constexpr iterationTime(Time t, iteration_result iterate) :stepTime(t), state(iterate)
+	constexpr iterationTime(Time t, iteration_result iterate) noexcept:stepTime(t), state(iterate)
 	{};
 };
 }

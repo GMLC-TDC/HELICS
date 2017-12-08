@@ -52,20 +52,16 @@ bool SubscriptionInfo::updateTime (Time newTime)
             data_queue.erase (data_queue.begin (), currentValue);
             return true;
         }
-        else
+
+        if (*current_data != *(last->second))
         {
-            if (*current_data != *(last->second))
-            {
-                current_data = std::move (last->second);
-                data_queue.erase (data_queue.begin (), currentValue);
-                return true;
-            }
-            else
-            {
-                data_queue.erase (data_queue.begin (), currentValue);
-                return false;
-            }
+            current_data = std::move (last->second);
+            data_queue.erase (data_queue.begin (), currentValue);
+            return true;
         }
+
+        data_queue.erase (data_queue.begin (), currentValue);
+        return false;
     }
     return false;
 }

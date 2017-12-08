@@ -8,19 +8,13 @@ add_subdirectory(common)
 add_subdirectory(core)
 add_subdirectory(application_api)
 
+install(FILES flag-definitions.h helics.hpp DESTINATION include/helics)
+
 IF(BUILD_PLAYER OR BUILD_RECORDER)
 add_subdirectory(player)
 ENDIF()
 
-install(DIRECTORY common DESTINATION include/helics
-        FILES_MATCHING PATTERN "*.h*")
-install(DIRECTORY core DESTINATION include/helics
-        FILES_MATCHING PATTERN "*.h*")
-install(DIRECTORY application_api DESTINATION include/helics
-        FILES_MATCHING PATTERN "*.h*")
-
-if (BUILD_SHARED_LIBS)
+if (BUILD_C_SHARED_LIB OR BUILD_PYTHON)
 add_subdirectory(shared_api_library)
-install(DIRECTORY shared_api_library DESTINATION include
-        FILES_MATCHING PATTERN "*.h*")
-endif(BUILD_SHARED_LIBS)
+install(FILES chelics.h DESTINATION include/helics)
+endif()

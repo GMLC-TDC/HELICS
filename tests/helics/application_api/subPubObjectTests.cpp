@@ -22,7 +22,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <future>
 
 BOOST_AUTO_TEST_SUITE (subPubObject_tests)
+#if ENABLE_TEST_TIMEOUTS > 0
+namespace utf = boost::unit_test;
+#endif
 
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (5))
+#endif
 BOOST_AUTO_TEST_CASE (subscriptionTObject_tests)
 {
     helics::FederateInfo fi ("test1");
@@ -61,6 +67,9 @@ BOOST_AUTO_TEST_CASE (subscriptionTObject_tests)
     vFed->finalize ();
 }
 
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (5))
+#endif
 BOOST_AUTO_TEST_CASE (subscriptionObject_tests)
 {
     helics::FederateInfo fi ("test1");
@@ -131,6 +140,9 @@ void runPubSubTypeTests (const TX &valtx, const RX &valrx)
 #define SKIPTEST
 #endif
 
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (35))
+#endif
 BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests)
 {
     SKIPTEST runPubSubTypeTests<std::string, std::string> ("test1", "test1");
@@ -142,6 +154,9 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests)
     SKIPTEST runPubSubTypeTests<std::string, int64_t> ("34.14", 34);
 }
 
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (35))
+#endif
 BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests)
 {
     using c = std::complex<double>;
@@ -164,6 +179,9 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests)
     SKIPTEST runPubSubTypeTests<c, int64_t> (c (3.0, 4.0), 5);
 }
 
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (45))
+#endif
 BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests)
 {
     using v = std::vector<double>;
@@ -201,6 +219,9 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests)
     SKIPTEST runPubSubTypeTests<int64_t, v> (56, v{56});
 }
 
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (35))
+#endif
 BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
 {
     using v = std::vector<double>;

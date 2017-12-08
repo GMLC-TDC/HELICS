@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "MessageFederate.h"
 #include "ValueFederate.h"
-#include "identifierTypes.hpp"
+#include "helicsTypes.hpp"
 
 namespace helics
 {

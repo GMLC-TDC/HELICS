@@ -45,7 +45,7 @@ IpcCore::IpcCore (const std::string &core_name) : CommsBroker (core_name) {}
 
 IpcCore::~IpcCore () = default;
 
-void IpcCore::InitializeFromArgs (int argc, const char *const *argv)
+void IpcCore::initializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == created)
@@ -68,7 +68,7 @@ void IpcCore::InitializeFromArgs (int argc, const char *const *argv)
             fileloc = vm["fileloc"].as<std::string> ();
         }
 
-        CommonCore::InitializeFromArgs (argc, argv);
+        CommonCore::initializeFromArgs (argc, argv);
     }
 }
 

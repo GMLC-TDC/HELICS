@@ -1,5 +1,5 @@
 
-int main(int argc, char *argv[])
+int main(int argc, char * /*argv*/[])
 {
     int count = 0;
     switch (argc)

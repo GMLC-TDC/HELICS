@@ -32,7 +32,7 @@ class TestCore final: public CommonCore
     /** destructor*/
     virtual ~TestCore ();  // the destructor is defined so the definition of TestBroker does not need to be
                            // available in the header
-    virtual void InitializeFromArgs (int argc, const char * const *argv) override;
+    virtual void initializeFromArgs (int argc, const char * const *argv) override;
 
   protected:
     virtual void transmit (int route_id, const ActionMessage &cmd) override;
@@ -43,6 +43,7 @@ private:
 	//these should only be called by the CommonCore code
 	virtual bool brokerConnect() override;
 	virtual void brokerDisconnect() override;
+    virtual bool tryReconnect() override;
 private:
 	  std::atomic<bool> initialized_{ false };  //!< atomic protecting local initialization
     std::shared_ptr<CoreBroker> tbroker;  //!<the parent broker;

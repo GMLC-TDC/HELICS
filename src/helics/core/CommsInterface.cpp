@@ -93,6 +93,7 @@ bool CommsInterface::connect ()
     }
     if (rx_status != connection_status::connected)
     {
+        // std::cerr << "receiver connection failure" << std::endl;
         if (tx_status == connection_status::connected)
         {
             if (queue_transmitter.joinable ())
@@ -107,6 +108,7 @@ bool CommsInterface::connect ()
 
     if (tx_status != connection_status::connected)
     {
+        std::cerr << "transmitter connection failure" << std::endl;
         if (rx_status == connection_status::connected)
         {
             if (queue_watcher.joinable ())
@@ -166,6 +168,38 @@ void CommsInterface::disconnect ()
     }
 }
 
+bool CommsInterface::reconnect()
+{
+    rx_status = connection_status::reconnecting;
+    tx_status = connection_status::reconnecting;
+    reconnectReceiver();
+    reconnectTransmitter();
+    int cnt = 0;
+    while (rx_status.load() == connection_status::reconnecting)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        ++cnt;
+        if (cnt == 400)  // Eventually give up
+        {
+            std::cerr << "unable to terminate connection\n";
+            break;
+        }
+    }
+    cnt = 0;
+    while (tx_status.load() == connection_status::reconnecting)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        ++cnt;
+        if (cnt == 400)
+        {
+            std::cerr << "unable to terminate connection\n";
+            break;
+        }
+    }
+    
+    return ((rx_status.load() == connection_status::connected) && (tx_status.load() == connection_status::connected));
+}
+
 void CommsInterface::setCallback (std::function<void(ActionMessage &&)> callback)
 {
     ActionCallback = std::move (callback);
@@ -188,6 +222,28 @@ bool CommsInterface::isConnected () const
     return ((tx_status == connection_status::connected) && (rx_status == connection_status::connected));
 }
 
+void CommsInterface::closeTransmitter()
+{
+    ActionMessage rt(CMD_PROTOCOL);
+    rt.index = DISCONNECT;
+    transmit(-1, rt);
+}
+
+
+void CommsInterface::reconnectTransmitter()
+{
+    ActionMessage rt(CMD_PROTOCOL);
+    rt.index = RECONNECT;
+    transmit(-1, rt);
+}
+
+void CommsInterface::reconnectReceiver()
+{
+    ActionMessage cmd(CMD_PROTOCOL);
+    cmd.index = RECONNECT_RECEIVER;
+    transmit(-1, cmd);
+}
+
 std::string makePortAddress (const std::string &networkInterface, int portNumber)
 {
     std::string newAddress = networkInterface;
@@ -208,9 +264,16 @@ std::pair<std::string, int> extractInterfaceandPort (const std::string &address)
     {
         try
         {
-            auto val = std::stoi (address.substr (lastColon + 1));
-            ret.first = address.substr (0, lastColon);
-            ret.second = val;
+            if (address[lastColon + 1] != '/')
+            {
+                auto val = std::stoi (address.substr (lastColon + 1));
+                ret.first = address.substr (0, lastColon);
+                ret.second = val;
+            }
+            else
+            {
+                ret = std::make_pair (address, -1);
+            }
         }
         catch (const std::invalid_argument &)
         {

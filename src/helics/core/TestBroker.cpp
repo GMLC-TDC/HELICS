@@ -49,7 +49,7 @@ void TestBroker::displayHelp (bool localOnly)
     }
 }
 
-void TestBroker::InitializeFromArgs (int argc, const char *const *argv)
+void TestBroker::initializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == broker_state_t::created)
@@ -73,7 +73,7 @@ void TestBroker::InitializeFromArgs (int argc, const char *const *argv)
         {
             brokerInitString = vm["brokerinit"].as<std::string> ();
         }
-        CoreBroker::InitializeFromArgs (argc, argv);
+        CoreBroker::initializeFromArgs (argc, argv);
     };
 }
 
@@ -91,16 +91,31 @@ bool TestBroker::brokerConnect ()
             setAsRoot ();
             return true;
         }
+
+        auto broker = BrokerFactory::findBroker (brokerName);
+        if (broker)
+        {
+            tbroker = std::static_pointer_cast<helics::CoreBroker> (broker);
+        }
         else
         {
-            tbroker = BrokerFactory::findBroker (brokerName);
-            if (!tbroker)
-            {
-                tbroker = BrokerFactory::create (core_type::TEST, brokerName, brokerInitString);
-            }
+            tbroker = std::static_pointer_cast<helics::CoreBroker> (
+              BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
         }
     }
 
+    return static_cast<bool> (tbroker);
+}
+
+bool TestBroker::tryReconnect()
+{
+    
+    if (isRoot())
+    {
+        return true;
+    }
+    auto broker = BrokerFactory::findBroker(brokerName);
+    tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
     return static_cast<bool> (tbroker);
 }
 
@@ -113,6 +128,10 @@ void TestBroker::brokerDisconnect ()
 
 void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
 {
+    if (brokerState >= broker_state_t::terminating)
+    {
+        return;  // no message sent in terminating or higher state
+    }
     // only activate the lock if we not in an operating state
     std::unique_lock<std::mutex> lock (routeMutex);
 
@@ -148,17 +167,26 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
 void TestBroker::addRoute (int route_id, const std::string &routeInfo)
 {
     auto brk = BrokerFactory::findBroker (routeInfo);
+
     if (brk)
     {
-        std::lock_guard<std::mutex> lock (routeMutex);
-        brokerRoutes.emplace (route_id, std::move (brk));
+        auto cbrk = std::dynamic_pointer_cast<CoreBroker> (brk);
+        if (cbrk)
+        {
+            std::lock_guard<std::mutex> lock (routeMutex);
+            brokerRoutes.emplace (route_id, std::move (cbrk));
+        }
         return;
     }
-    auto tcore = CoreFactory::findCore (routeInfo);
-    if (tcore)
+    auto core = CoreFactory::findCore (routeInfo);
+    if (core)
     {
-        std::lock_guard<std::mutex> lock (routeMutex);
-        coreRoutes.emplace (route_id, std::move (tcore));
+        auto tcore = std::dynamic_pointer_cast<CommonCore> (core);
+        if (tcore)
+        {
+            std::lock_guard<std::mutex> lock (routeMutex);
+            coreRoutes.emplace (route_id, std::move (tcore));
+        }
         return;
     }
     // the route will default to the central route

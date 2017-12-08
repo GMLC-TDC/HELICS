@@ -31,8 +31,18 @@ ownedQueue::~ownedQueue ()
         ipc_state::remove (stateName.c_str ());
     }
 }
+
 bool ownedQueue::connect (const std::string &connection, int maxMessages, int maxSize)
 {
+    // remove the old queue if are connecting again
+    if (rqueue)
+    {
+        ipc_queue::remove (connectionName.c_str ());
+    }
+    if (queue_state)
+    {
+        ipc_state::remove (stateName.c_str ());
+    }
     connectionNameOrig = connection;
     connectionName = stringTranslateToCppName (connection);
     stateName = connectionName + "_state";
@@ -101,6 +111,11 @@ ActionMessage ownedQueue::getMessage ()
             continue;
         }
         ActionMessage cmd (buffer.data (), rx_size);
+        if (!isValidCommand (cmd))
+        {
+            std::cerr << "invalid command received ipc" << std::endl;
+            continue;
+        }
         return cmd;
     }
 }
@@ -109,7 +124,7 @@ stx::optional<ActionMessage> ownedQueue::getMessage (int timeout)
 {
     if (!connected)
     {
-        return {};
+        return stx::nullopt;
     }
     size_t rx_size = 0;
     unsigned int priority;
@@ -123,7 +138,7 @@ stx::optional<ActionMessage> ownedQueue::getMessage (int timeout)
             bool res = rqueue->timed_receive (buffer.data (), mxSize, rx_size, priority, abs_time);
             if (!res)
             {
-                return {};
+                return stx::nullopt;
             }
         }
         else if (timeout <= 0)
@@ -131,7 +146,7 @@ stx::optional<ActionMessage> ownedQueue::getMessage (int timeout)
             bool res = rqueue->try_receive (buffer.data (), mxSize, rx_size, priority);
             if (!res)
             {
-                return {};
+                return stx::nullopt;
             }
         }
 
@@ -140,6 +155,11 @@ stx::optional<ActionMessage> ownedQueue::getMessage (int timeout)
             continue;
         }
         ActionMessage cmd (buffer.data (), rx_size);
+        if (!isValidCommand (cmd))
+        {
+            std::cerr << "invalid command received ipc" << std::endl;
+            continue;
+        }
         return cmd;
     }
 }

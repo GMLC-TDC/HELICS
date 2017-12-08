@@ -1,7 +1,7 @@
 static char help[] = "Example to demonstrate the usage of HELICS C Interface with two federates.\n\
             This example implements a loose-coupling protocol to exchange values between two federates. \n\
             Here, a ZMQ broker is created and a value federate. The value federate can both.\n\
-            publish and subcribe. This federate publishes a value and waits for the value \n\
+            publish and subscribe. This federate publishes a value and waits for the value \n\
             published by the other federate. Once the value has arrived, it publishes its next value \n\n";
 
 #include <stdio.h>
@@ -12,7 +12,7 @@ static char help[] = "Example to demonstrate the usage of HELICS C Interface wit
 #include <unistd.h>
 #endif
 
-int main(int argc,char **argv)
+int main()
 {
   helics_federate_info_t fedinfo;
   const char*    helicsversion;
