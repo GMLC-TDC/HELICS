@@ -115,7 +115,11 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
     BOOST_CHECK (!reqset.waiting ());
 
     BOOST_CHECK (reqset.hasMessages ());
-    reqset.close ();
+    repSocket1.close();
+    repSocket2.close();
+    repSocket3.close();
+    reqset.close();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
 /** test the request set class with various scenarios*/
