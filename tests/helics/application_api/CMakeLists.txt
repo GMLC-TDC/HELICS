@@ -15,18 +15,23 @@ test_configuration.h
 value-converter-tests.cpp
 application-api-tests.cpp
 data-view-tests.cpp
-testQueries.cpp
 test-value-federate1.cpp
 test-value-federate2.cpp
 test-message-federate.cpp
 test-filters.cpp
 federate_tests.cpp
-heat-transfer-tests.cpp
 timing_tests.cpp
 iteration_tests.cpp
 subPubObjectTests.cpp
 testFixtures.cpp
 )
+
+IF (NOT QUICK_TESTS_ONLY)
+list(APPEND application_api_test_sources 
+testQueries.cpp
+heat-transfer-tests.cpp
+)
+ENDIF(NOT QUICK_TESTS_ONLY)
 
 include_directories( SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
