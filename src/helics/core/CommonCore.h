@@ -281,7 +281,8 @@ protected:
 
   std::string federateQuery(Core::federate_id_t federateID, const std::string &queryStr) const;
 
-  
+  /** send an error code to all the federates*/
+  void sendErrorToFederates(int error_code);
 };
 
 

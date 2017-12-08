@@ -198,9 +198,13 @@ void serviceRunLoop (std::shared_ptr<AsioServiceManager> ptr)
     {
         ptr->iserv->run ();
     }
+    catch (const std::exception &e)
+    {
+        std::cerr << "std::exception in service loop " << e.what() << std::endl;
+    }
     catch (...)
     {
-        std::cout << "caught error in service loop" << std::endl;
+        std::cout << "caught other error in service loop" << std::endl;
     }
    // std::cout << "service loop stopped\n";
     ptr->running = false;

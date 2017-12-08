@@ -11,6 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/BrokerFactory.h"
 #include "helics/core/CoreFactory.h"
 #include "helics/core/core.h"
+#include "helics/core/core-exceptions.h"
 #include "test_configuration.h"
 #include <future>
 #include <boost/test/unit_test.hpp>
@@ -90,9 +91,11 @@ BOOST_AUTO_TEST_CASE (federate_timeout_test)
     res = Fed->requestTime (3.0);
     BOOST_CHECK_EQUAL (res, 3.0);
     brk->disconnect ();
-    std::this_thread::sleep_for (std::chrono::seconds (10));
+    std::this_thread::sleep_for (std::chrono::seconds (5));
     auto cptr = Fed->getCorePointer ();
     BOOST_CHECK (!cptr->isConnected ());
+    BOOST_CHECK_THROW(res = Fed->requestTime(4.0), helics::functionExecutionFailure);
+    BOOST_CHECK(Fed->currentState() == helics::Federate::op_states::error);
 }
 #endif
 

@@ -11,6 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "Federate.h"
 #include "../core/BrokerFactory.h"
 #include "../core/CoreFactory.h"
+#include "../core/core-exceptions.h"
 
 #include "../core/core.h"
 #include "asyncFedCallInfo.h"
@@ -424,9 +425,10 @@ void Federate::finalize ()
         requestTimeIterativeFinalize ();  // I don't care about the return any more
         break;
     case op_states::finalize:
+    case op_states::error:
         return;
         // do nothing
-    default:  // basically only error state
+    default: 
         throw (InvalidFunctionCall ("cannot call finalize in present state"));
     }
     coreObject->finalize (fedID);
@@ -459,11 +461,21 @@ Time Federate::requestTime (Time nextInternalTimeStep)
 {
     if (state == op_states::execution)
     {
-        auto newTime = coreObject->timeRequest (fedID, nextInternalTimeStep);
-        Time oldTime = currentTime;
-        currentTime = newTime;
-        updateTime (newTime, oldTime);
-        return newTime;
+        try
+        {
+            auto newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
+            Time oldTime = currentTime;
+            currentTime = newTime;
+            updateTime(newTime, oldTime);
+            return newTime;
+        }
+        catch (functionExecutionFailure &fee)
+        {
+            state = op_states::error;
+            throw;
+        }
+        
+        
     }
     else
     {

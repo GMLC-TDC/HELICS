@@ -542,7 +542,11 @@ Time CommonCore::timeRequest (federate_id_t federateID, Time next)
     if (HELICS_EXECUTING == fed->getState ())
     {
         auto ret = fed->requestTime (next, iteration_request::no_iterations);
-        return ret.stepTime;
+        if (ret.state!=iteration_result::error)
+        {
+            return ret.stepTime;
+        }
+        throw(functionExecutionFailure("federate has an error"));
     }
     throw (invalidFunctionCall ("time request may only be called in execution state"));
 }
@@ -1848,6 +1852,17 @@ void CommonCore::transmitDelayedMessages ()
     }
 }
 
+
+void CommonCore::sendErrorToFederates(int error_code)
+{
+    ActionMessage errorCom(CMD_ERROR);
+    errorCom.index = error_code;
+    for (auto &fed : _federates)
+    {
+        routeMessage(errorCom, fed->global_id);
+    }
+}
+
 void CommonCore::transmitDelayedMessages (federate_id_t source)
 {
     std::vector<ActionMessage> buffer;
@@ -1888,6 +1903,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             // try to reset the connection to the broker
             // brokerReconnect()
             LOG_ERROR (global_broker_id, getIdentifier (), "lost connection with server");
+            sendErrorToFederates(-5);
             disconnect ();
         }
         else

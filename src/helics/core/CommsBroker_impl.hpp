@@ -95,6 +95,7 @@ bool CommsBroker<COMMS, BrokerT>::tryReconnect()
         lock.unlock();  // we don't want to hold the lock while calling reconnect that could cause deadlock
         return comm_ptr->reconnect();
     }
+    return false;
 }
 
 template <class COMMS, class BrokerT>
