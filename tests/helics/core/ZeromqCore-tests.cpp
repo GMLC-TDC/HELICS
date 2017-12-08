@@ -437,9 +437,10 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
     repSocket.bind ("tcp://127.0.0.1:23405");
-
+    repSocket.setsockopt(ZMQ_LINGER, 100);
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
     pullSocket.bind ("tcp://127.0.0.1:23406");
+    pullSocket.setsockopt(ZMQ_LINGER, 100);
     bool connected = core->connect ();
     BOOST_REQUIRE (connected);
 
@@ -455,6 +456,8 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
     helics::ActionMessage resp (helics::CMD_PRIORITY_ACK);
     repSocket.send (resp.to_string ());
 
+    repSocket.close();
+    pullSocket.close();
     core->disconnect ();
     core = nullptr;
     helics::CoreFactory::cleanUpCores(200);
