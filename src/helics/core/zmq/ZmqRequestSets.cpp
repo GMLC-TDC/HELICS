@@ -167,7 +167,7 @@ stx::optional<ActionMessage> ZmqRequestSets::getMessage ()
         Responses.pop_front ();
         return resp;
     }
-    return {};
+    return stx::nullopt;
 }
 
 /*

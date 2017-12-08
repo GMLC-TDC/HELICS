@@ -185,7 +185,12 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     repSocket3.recv (&msg);
 
     repSocket3.send (msg);
-    BOOST_CHECK_EQUAL (reqset.checkForMessages (std::chrono::milliseconds (400)), 6);
+    auto res = reqset.checkForMessages(std::chrono::milliseconds(400));
+    if (reqset.waiting())
+    {
+       res = reqset.checkForMessages(std::chrono::milliseconds(400));
+    }
+    BOOST_CHECK_EQUAL (res, 6);
     repSocket1.close ();
     repSocket2.close ();
     repSocket3.close ();
