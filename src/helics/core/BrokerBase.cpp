@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/uuid/uuid.hpp>  // uuid class
 #include <boost/uuid/uuid_generators.hpp>  // generators
 #include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
-
+#include <libguarded/guarded.hpp>
 #include "../common/AsioServiceManager.h"
 #include "TimeCoordinator.h"
 #include <iostream>
@@ -305,25 +305,30 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
     }
 }
 
-void timerTickHandler (BrokerBase *bbase, const boost::system::error_code &error)
+using activeProtector = std::shared_ptr<libguarded::guarded<bool>>;
+void timerTickHandler (BrokerBase *bbase, activeProtector active, const boost::system::error_code &error)
 {
-    if (error != boost::asio::error::operation_aborted)
+    auto p = active->lock();
+    if (*p)
     {
-        try
+        if (error != boost::asio::error::operation_aborted)
         {
-            bbase->addActionMessage(CMD_TICK);
+            try
+            {
+                bbase->addActionMessage(CMD_TICK);
+            }
+            catch (std::exception &e)
+            {
+                std::cout << "exception caught from addActionMessage" << std::endl;
+            }
+
         }
-        catch (std::exception &e)
+        else
         {
-            std::cout << "exception caught from addActionMessage" << std::endl;
+            ActionMessage M(CMD_TICK);
+            SET_ACTION_FLAG(M, error_flag);
+            bbase->addActionMessage(M);
         }
-        
-    }
-    else if (bbase->isRunning())
-    {
-        ActionMessage M(CMD_TICK);
-        SET_ACTION_FLAG(M, error_flag);
-        bbase->addActionMessage(M);
     }
 }
 
@@ -338,8 +343,9 @@ void BrokerBase::queueProcessingLoop ()
     auto serv = AsioServiceManager::getServicePointer ();
     AsioServiceManager::runServiceLoop ();
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
+    auto active = std::make_shared<libguarded::guarded<bool>>(true);
 
-    auto timerCallback = [this](const boost::system::error_code &ec) { timerTickHandler (this, ec); };
+    auto timerCallback = [this,active](const boost::system::error_code &ec) { timerTickHandler (this,active, ec); };
     ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
     ticktimer.async_wait (timerCallback);
     int messagesSinceLastTick = 0;
@@ -372,6 +378,7 @@ void BrokerBase::queueProcessingLoop ()
             ticktimer.cancel ();
             AsioServiceManager::haltServiceLoop ();
             mainLoopIsRunning.store(false);
+            active->store(false);
             return;  // immediate return
         case CMD_STOP:
             ticktimer.cancel ();
@@ -380,6 +387,7 @@ void BrokerBase::queueProcessingLoop ()
             {
                 processCommand (std::move (command));
                 mainLoopIsRunning.store(false);
+                active->store(false);
                 return processDisconnect ();
             }
 

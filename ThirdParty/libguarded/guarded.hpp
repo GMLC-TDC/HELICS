@@ -140,7 +140,7 @@ class guarded
         {
         }
 
-        void operator()(T *ptr)
+        void operator()(T * /*ptr*/)
         {
             if (m_lock.owns_lock()) {
                 m_lock.unlock();

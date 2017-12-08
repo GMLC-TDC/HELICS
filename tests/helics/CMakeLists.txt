@@ -15,3 +15,7 @@ endif()
 if(BUILD_PLAYER OR BUILD_RECORDER)
     add_subdirectory(player_recorder)
 endif()
+
+if (TRAVIS_TESTS_ENABLE)
+	add_subdirectory(travis_tests)
+endif()

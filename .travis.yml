@@ -93,10 +93,9 @@ install:
 script:
   - mkdir build && cd build
   - export HELICS_DEPENDENCY_FLAGS="-DZeroMQ_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/zmq -DBOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost"
-  - export HELICS_OPTION_FLAGS="-DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON"
-  - if [[ $COMPILER != "g++-6" ]]; then export HELICS_OPTIONS_FLAGS+="-DQUICK_TESTS_ONLY=ON" ;fi
+  - export HELICS_OPTION_FLAGS="-DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON -DTRAVIS_TESTS_ENABLE=ON"
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
-  - make
+  - make -j2
   # For controlling which tests get run:
   # ctest -I <start>,<end>,<stride>,<list of test numbers>
   # 1 = core tests
@@ -104,7 +103,7 @@ script:
   # 3 = c interface tests
   # 4 = player/recorder tests
   # - ctest --verbose --timeout 120 -I 0,0,0,1
-  # - ctest --verbose --timeout 480 -I 0,0,0,2
+   - ctest --verbose --timeout 120 -I 0,0,0,5
 
 notifications:
     email: false
