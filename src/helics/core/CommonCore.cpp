@@ -1905,6 +1905,9 @@ void CommonCore::processCommand (ActionMessage &&command)
             LOG_ERROR (global_broker_id, getIdentifier (), "lost connection with server");
             sendErrorToFederates(-5);
             disconnect ();
+            brokerState = broker_state_t::errored;
+            addActionMessage(CMD_STOP);
+            
         }
         else
         {

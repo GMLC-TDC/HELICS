@@ -200,11 +200,27 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
     helics::ZmqComms comm (host, host);
 
     auto ctx = zmqContextManager::getContextPointer ();
-    zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
-    repSocket.bind ("tcp://127.0.0.1:23405");
+    zmq::socket_t repSocket(ctx->getContext(), ZMQ_REP);
+    try
+    {
+        
+        repSocket.bind("tcp://127.0.0.1:23405");
+    }
+    catch(const zmq::error_t &ze)
+    {
+        std::cerr << "error repbind " << ze.what() << std::endl;
+    }
     repSocket.setsockopt(ZMQ_LINGER, 100);
-    zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
-    pullSocket.bind ("tcp://127.0.0.1:23406");
+    zmq::socket_t pullSocket(ctx->getContext(), ZMQ_PULL);
+    try
+    {
+        pullSocket.bind("tcp://127.0.0.1:23406");
+    }
+    catch (const zmq::error_t &ze)
+    {
+        std::cerr << "error pullbind " << ze.what() << std::endl;
+    }
+    
     pullSocket.setsockopt(ZMQ_LINGER, 100);
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
     comm.setBrokerPorts (23405);
