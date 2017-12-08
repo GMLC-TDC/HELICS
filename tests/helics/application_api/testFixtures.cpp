@@ -46,11 +46,17 @@ ValueFederateTestFixture::~ValueFederateTestFixture ()
     {
         vFed1->finalize ();
     }
-
+    vFed1 = nullptr;
     if (vFed2)
     {
         vFed2->finalize ();
     }
+    vFed2 = nullptr;
+    for (auto &brk : broker)
+    {
+        brk->disconnect();
+    }
+    broker.clear();
     helics::cleanupHelicsLibrary();
 }
 
@@ -141,11 +147,17 @@ MessageFederateTestFixture::~MessageFederateTestFixture ()
     {
         mFed1->finalize ();
     }
-
+    mFed1 = nullptr;
     if (mFed2)
     {
         mFed2->finalize ();
     }
+    mFed2 = nullptr;
+    for (auto &brk : broker)
+    {
+        brk->disconnect();
+    }
+    broker.clear();
     helics::cleanupHelicsLibrary();
 }
 
@@ -222,11 +234,12 @@ FederateTestFixture::~FederateTestFixture ()
             fed->finalize ();
         }
     }
-
+    federates.clear();
     for (auto &broker : brokers)
     {
         broker->disconnect ();
     }
+    brokers.clear();
     helics::cleanupHelicsLibrary();
 }
 

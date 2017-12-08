@@ -104,7 +104,7 @@ script:
   # 3 = c interface tests
   # 4 = player/recorder tests
   - ctest --verbose --timeout 120 -I 0,0,0,1
-  - ctest --verbose --timeout 240 -I 0,0,0,2
+  - ctest --verbose --timeout 480 -I 0,0,0,2
 
 notifications:
     email: false
