@@ -337,6 +337,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
 
     comm.disconnect ();
     comm2.disconnect ();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
 BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
@@ -422,6 +423,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     comm.disconnect ();
     comm2.disconnect ();
     comm3.disconnect ();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
 BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
@@ -454,6 +456,9 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
     repSocket.send (resp.to_string ());
 
     core->disconnect ();
+    core = nullptr;
+    helics::CoreFactory::cleanUpCores(200);
+
 }
 
 /** test case checks default values and makes sure they all mesh together
@@ -476,8 +481,8 @@ BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
     BOOST_CHECK_EQUAL (ccore->getAddress (), "tcp://127.0.0.1:23500;tcp://127.0.0.1:23501");
     core->disconnect ();
     broker->disconnect ();
-    helics::CoreFactory::cleanUpCores ();
-    helics::BrokerFactory::cleanUpBrokers ();
+    helics::CoreFactory::cleanUpCores (200);
+    helics::BrokerFactory::cleanUpBrokers (200);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

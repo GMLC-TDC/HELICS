@@ -53,8 +53,8 @@ int getHelicsVersionPatch () { return HELICS_VERSION_PATCH; }
 
 void cleanupHelicsLibrary ()
 {
-    BrokerFactory::cleanUpBrokers ();
-    CoreFactory::cleanUpCores ();
+    BrokerFactory::cleanUpBrokers (200);
+    CoreFactory::cleanUpCores (200);
 }
 
 Federate::Federate (const FederateInfo &fi) : FedInfo (fi)

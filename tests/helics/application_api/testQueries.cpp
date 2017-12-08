@@ -62,6 +62,7 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     core = nullptr;
     vFed1->finalize ();
     vFed2->finalize ();
+    helics::cleanupHelicsLibrary();
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
@@ -84,6 +85,7 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     core = nullptr;
     vFed1->finalize ();
     vFed2->finalize ();
+    helics::cleanupHelicsLibrary();
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
