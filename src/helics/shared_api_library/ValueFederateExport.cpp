@@ -8,11 +8,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "../application_api/Publications.hpp"
-#include "../application_api/Subscriptions.hpp"
-#include "../application_api/application_api.h"
-#include "../application_api/helicsTypes.hpp"
-#include "../core/helics-time.h"
+#include "../helics.hpp"
 #include "ValueFederate_c.h"
 #include "internal/api_objects.h"
 #include <map>
@@ -24,7 +20,7 @@ int helicsValueFederateisUpdated (helics_value_federate vfed, helics_subscriptio
 {
     helics::SubscriptionObject *subobj = reinterpret_cast<helics::SubscriptionObject *> (sub);
     helics::ValueFederate *valuefed = reinterpret_cast<helics::ValueFederate *> (vfed);
-    return (int)(valuefed->isUpdated (subobj->id));
+    return static_cast<int> (valuefed->isUpdated (subobj->id));
 }
 
 static inline void addSubscription (helics_value_federate fed, helics::SubscriptionObject *sub)
@@ -326,6 +322,19 @@ helicsStatus helicsPublishVector (helics_publication pub, const double data[], i
     return helicsOK;
 }
 
+int helicsGetValueSize (helics_subscription sub)
+{
+    auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
+    if (subObj->rawOnly)
+    {
+        auto dv = subObj->fedptr->getValueRaw (subObj->id);
+        return static_cast<int> (dv.size ());
+    }
+
+    auto str = subObj->subptr->getValue<std::string> ();
+    return static_cast<int> (str.size ());
+}
+
 int helicsGetValue (helics_subscription sub, char *data, int maxlen)
 {
     if (sub == nullptr)
@@ -344,17 +353,15 @@ int helicsGetValue (helics_subscription sub, char *data, int maxlen)
         memcpy (data, dv.data (), maxlen);
         return maxlen;
     }
-    else
+
+    auto str = subObj->subptr->getValue<std::string> ();
+    if (maxlen > static_cast<int> (str.size ()))
     {
-        auto str = subObj->subptr->getValue<std::string> ();
-        if (maxlen > static_cast<int> (str.size ()))
-        {
-            strcpy (data, str.c_str ());
-            return static_cast<int> (str.size ());
-        }
-        memcpy (data, str.data (), maxlen);
-        return maxlen;
+        strcpy (data, str.c_str ());
+        return static_cast<int> (str.size ());
     }
+    memcpy (data, str.data (), maxlen);
+    return maxlen;
 }
 
 helicsStatus helicsGetString (helics_subscription sub, char *str, int maxlen)
@@ -425,7 +432,7 @@ helicsStatus helicsGetComplex (helics_subscription sub, double *real, double *im
     return helicsOK;
 }
 
-int helicsGetVector (helics_subscription sub, double data[], int len)
+int helicsGetVectorSize (helics_subscription sub)
 {
     if (sub == nullptr)
     {
@@ -435,13 +442,30 @@ int helicsGetVector (helics_subscription sub, double data[], int len)
     if (subObj->rawOnly)
     {
         auto V = subObj->fedptr->getValue<std::vector<double>> (subObj->id);
-        std::copy (V.data (), V.data () + std::min (static_cast<int> (V.size ()), len), data);
-        return std::min (static_cast<int> (V.size ()), len);
+        return static_cast<int> (V.size ());
     }
 
     auto V = subObj->subptr->getValue<std::vector<double>> ();
-    std::copy (V.data (), V.data () + std::min (static_cast<int> (V.size ()), len), data);
-    return std::min (static_cast<int> (V.size ()), len);
+    return static_cast<int> (V.size ());
+}
+
+int helicsGetVector (helics_subscription sub, double data[], int maxlen)
+{
+    if (sub == nullptr)
+    {
+        return 0;
+    }
+    auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
+    if (subObj->rawOnly)
+    {
+        auto V = subObj->fedptr->getValue<std::vector<double>> (subObj->id);
+        std::copy (V.data (), V.data () + std::min (static_cast<int> (V.size ()), maxlen), data);
+        return std::min (static_cast<int> (V.size ()), maxlen);
+    }
+
+    auto V = subObj->subptr->getValue<std::vector<double>> ();
+    std::copy (V.data (), V.data () + std::min (static_cast<int> (V.size ()), maxlen), data);
+    return std::min (static_cast<int> (V.size ()), maxlen);
 }
 
 helicsStatus helicsSetDefaultValue (helics_subscription sub, const char *data, int len)

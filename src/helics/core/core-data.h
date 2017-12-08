@@ -42,9 +42,9 @@ class data_block
     /** size and data */
     data_block (size_t blockSize, char init) : m_data (blockSize, init){};
     /** copy constructor */
-    data_block (const data_block &dt) = default;
+    data_block (const data_block &db) = default;
     /** move constructor */
-    data_block (data_block &&dt) noexcept;
+    data_block (data_block &&db) noexcept;
     /** construct from char * */
     data_block (const char *s) : m_data (s){};
     /** construct from string */
@@ -139,11 +139,12 @@ class Message
 {
   public:
     Time time;  //!< the event time the message is sent
+    std::uint64_t flags;  //!< message flags
     data_block data;  //!< the data packet for the message
-    std::string origsrc;  //!< the original source of the message
     std::string dest;  //!< the destination of the message
     std::string src;  //!< the most recent source of the message
-
+    std::string origsrc;  //!< the original source of the message
+    std::string orig_dest; //!< the original destination of a message
   public:
     /** default constructor*/
     Message () noexcept {};
@@ -190,6 +191,9 @@ inline bool isValidIndex (sizeType testSize, const std::vector<dataType> &vec)
 {
     return ((testSize >= sizeType (0)) && (testSize < static_cast<sizeType> (vec.size ())));
 }
+
+bool matchingTypes(const std::string &type1, const std::string &type2);
+
 }  // namespace helics
 
 namespace std
@@ -209,5 +213,6 @@ inline void swap (helics::Message &m1, helics::Message &m2) noexcept
     m1.swap (m2);
 }
 }  // namespace std
+
 
 #endif

@@ -19,7 +19,16 @@ ZmqRequestSets::ZmqRequestSets () { ctx = zmqContextManager::getContextPointer (
 void ZmqRequestSets::addRoutes (int routeNumber, const std::string &routeInfo)
 {
     auto zsock = std::make_unique<zmq::socket_t> (ctx->getContext (), ZMQ_REQ);
-    zsock->connect (routeInfo);
+    try
+    {
+        zsock->connect (routeInfo);
+    }
+    catch (const zmq::error_t &ze)
+    {
+        std::cerr << "error connecting to " << routeInfo << " " << ze.what () << std::endl;
+        return;
+    }
+    zsock->setsockopt (ZMQ_LINGER, 200);
     auto fnd = routes_waiting.find (routeNumber);
     if (fnd != routes_waiting.end ())
     {
@@ -138,6 +147,18 @@ void ZmqRequestSets::SendDelayedMessages ()
     }
 }
 
+void ZmqRequestSets::close ()
+{
+    waiting_messages.clear ();
+    for (auto &rt : routes)
+    {
+        rt.second->close ();
+    }
+    routes.clear ();
+    routes_waiting.clear ();
+    active_routes.clear ();
+}
+
 stx::optional<ActionMessage> ZmqRequestSets::getMessage ()
 {
     if (!Responses.empty ())
@@ -146,7 +167,7 @@ stx::optional<ActionMessage> ZmqRequestSets::getMessage ()
         Responses.pop_front ();
         return resp;
     }
-    return {};
+    return stx::nullopt;
 }
 
 /*

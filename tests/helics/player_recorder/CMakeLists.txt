@@ -23,26 +23,20 @@ exeTestHelper.h
 
 add_executable(player-recorder-tests ${recplayer_test_sources})
 
-link_directories(${external_link_directories})
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
-target_link_libraries(player-recorder-tests helics)
-
-target_link_libraries(player-recorder-tests ${external_library_list})
+target_link_libraries(player-recorder-tests helics-static)
 
 target_link_libraries(player-recorder-tests ${Boost_LIBRARIES_test})
+
+
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 
-add_test(NAME player-recorder-tests COMMAND player-recorder-tests)
+add_test(NAME player-recorder-tests COMMAND player-recorder-tests --log_level=warning --report_level=detailed)
 
-
-target_link_libraries(player-recorder-tests Threads::Threads)
-IF (UNIX AND NOT APPLE)
-target_link_libraries(player-recorder-tests rt)
-ENDIF()
 
 add_definitions(-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
 
@@ -52,16 +46,16 @@ add_custom_command(TARGET player-recorder-tests POST_BUILD        # Adds a post-
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "$<TARGET_FILE:helics_player>"      # <--this is in-file
         "$<TARGET_FILE_DIR:player-recorder-tests>/")                 # <--this is out-file path
-		
+
 add_custom_command(TARGET player-recorder-tests POST_BUILD        # Adds a post-build event to core tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "$<TARGET_FILE:helics_recorder>"      # <--this is in-file
         "$<TARGET_FILE_DIR:player-recorder-tests>/")                 # <--this is out-file path
-		
+
 add_custom_command(TARGET player-recorder-tests POST_BUILD        # Adds a post-build event to core tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "$<TARGET_FILE:helics_broker>"      # <--this is in-file
-        "$<TARGET_FILE_DIR:player-recorder-tests>/")    
+        "$<TARGET_FILE_DIR:player-recorder-tests>/")
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET player-recorder-tests POST_BUILD        # Adds a post-build event to core tests

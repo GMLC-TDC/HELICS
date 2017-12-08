@@ -7,7 +7,7 @@ static char help[] = "Example to demonstrate the usage of HELICS C Interface wit
 #include <ValueFederate_c.h>
 #include <math.h>
 
-int main(int argc,char ** argv)
+int main()
 {
   helics_federate_info_t fedinfo;
   const char*    helicsversion;

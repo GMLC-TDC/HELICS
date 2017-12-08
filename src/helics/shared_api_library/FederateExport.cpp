@@ -8,8 +8,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "../application_api/application_api.h"
-#include "../core/helics-time.h"
+#include "../helics.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"
 #include <iostream>
@@ -57,19 +56,6 @@ helics::MessageFederate *getMessageFed (helics_message_federate fed)
     return nullptr;
 }
 
-helics::MessageFilterFederate *getFilterFed (helics_message_filter_federate fed)
-{
-    auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
-    if (fedObj->valid == validationIdentifier)
-    {
-        if (fedObj->type == helics::vtype::filterFed)
-        {
-            return dynamic_cast<helics::MessageFilterFederate *> (fedObj->fedptr.get ());
-        }
-    }
-    return nullptr;
-}
-
 std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
@@ -104,18 +90,6 @@ std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_message_
     }
     return nullptr;
 }
-std::shared_ptr<helics::MessageFilterFederate> getFilterFedSharedPtr (helics_message_filter_federate fed)
-{
-    auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
-    if (fedObj->valid == validationIdentifier)
-    {
-        if (fedObj->type == helics::vtype::filterFed)
-        {
-            return std::dynamic_pointer_cast<helics::MessageFilterFederate> (fedObj->fedptr);
-        }
-    }
-    return nullptr;
-}
 
 masterObjectHolder::masterObjectHolder () noexcept {}
 
@@ -127,7 +101,7 @@ masterObjectHolder::~masterObjectHolder ()
 int masterObjectHolder::addBroker (helics::BrokerObject *broker)
 {
     std::lock_guard<std::mutex> lock (ObjectLock);
-    int index = static_cast<int> (brokers.size ());
+    auto index = static_cast<int> (brokers.size ());
     brokers.push_back (broker);
     return index;
 }
@@ -135,7 +109,7 @@ int masterObjectHolder::addBroker (helics::BrokerObject *broker)
 int masterObjectHolder::addCore (helics::CoreObject *core)
 {
     std::lock_guard<std::mutex> lock (ObjectLock);
-    int index = static_cast<int> (cores.size ());
+    auto index = static_cast<int> (cores.size ());
     cores.push_back (core);
     return index;
 }
@@ -143,7 +117,7 @@ int masterObjectHolder::addCore (helics::CoreObject *core)
 int masterObjectHolder::addFed (helics::FedObject *fed)
 {
     std::lock_guard<std::mutex> lock (ObjectLock);
-    int index = static_cast<int> (feds.size ());
+    auto index = static_cast<int> (feds.size ());
     feds.push_back (fed);
     return index;
 }
@@ -180,24 +154,15 @@ void masterObjectHolder::deleteAll ()
     std::lock_guard<std::mutex> lock (ObjectLock);
     for (auto obj : brokers)
     {
-        if (obj != nullptr)
-        {
-            delete obj;
-        }
+        delete obj;
     }
     for (auto obj : cores)
     {
-        if (obj != nullptr)
-        {
-            delete obj;
-        }
+        delete obj;
     }
     for (auto obj : feds)
     {
-        if (obj != nullptr)
-        {
-            delete obj;
-        }
+        delete obj;
     }
     brokers.clear ();
     feds.clear ();
@@ -256,27 +221,6 @@ helics_federate helicsCreateMessageFederateFromFile (const char *file)
     fed->index = getMasterHolder ()->addFed (fed);
     fed->fedptr = std::make_shared<helics::MessageFederate> (file);
     fed->type = helics::vtype::messageFed;
-    fed->valid = validationIdentifier;
-    return reinterpret_cast<void *> (fed);
-}
-
-/* Creation and destruction of Federates */
-helics_federate helicsCreateMessageFilterFederate (const helics_federate_info_t fi)
-{
-    auto *fed = new helics::FedObject;
-    fed->index = getMasterHolder ()->addFed (fed);
-    fed->fedptr = std::make_shared<helics::MessageFilterFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
-    fed->type = helics::vtype::filterFed;
-    fed->valid = validationIdentifier;
-    return reinterpret_cast<void *> (fed);
-}
-
-helics_federate helicsCreateMessageFilterFederateFromFile (const char *file)
-{
-    auto *fed = new helics::FedObject;
-    fed->index = getMasterHolder ()->addFed (fed);
-    fed->fedptr = std::make_shared<helics::MessageFilterFederate> (file);
-    fed->type = helics::vtype::filterFed;
     fed->valid = validationIdentifier;
     return reinterpret_cast<void *> (fed);
 }

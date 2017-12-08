@@ -59,7 +59,7 @@ class PublicationBase
     publication_id_t getID () const { return id; }
 
     /** get the key for the subscription*/
-    const std::string getKey () const { return fed->getPublicationName (id); }
+    std::string getKey () const { return fed->getPublicationName (id); }
     /** get the key for the subscription*/
     const std::string &getName () const { return key_; }
     /** get the key for the subscription*/

@@ -36,4 +36,4 @@ template class CommsBroker<UdpComms, CommonCore>;
 template class CommsBroker<MpiComms, CoreBroker>;
 template class CommsBroker<MpiComms, CommonCore>;
 #endif
-}
+}  // namespace helics
