@@ -8,7 +8,7 @@ set (HELICS_VERSION_MAJOR 0)
 set (HELICS_VERSION_MINOR 9)
 set (HELICS_VERSION_PATCH 0)
 
-set (HELICS_DATE "11-30-17")
+set (HELICS_DATE "12-08-17")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing

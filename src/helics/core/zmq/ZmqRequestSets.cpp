@@ -21,11 +21,11 @@ void ZmqRequestSets::addRoutes (int routeNumber, const std::string &routeInfo)
     auto zsock = std::make_unique<zmq::socket_t> (ctx->getContext (), ZMQ_REQ);
     try
     {
-        zsock->connect(routeInfo);
+        zsock->connect (routeInfo);
     }
     catch (const zmq::error_t &ze)
     {
-        std::cerr << "error connecting to " << routeInfo << " " << ze.what() << std::endl;
+        std::cerr << "error connecting to " << routeInfo << " " << ze.what () << std::endl;
         return;
     }
     zsock->setsockopt (ZMQ_LINGER, 200);

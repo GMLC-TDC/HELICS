@@ -443,7 +443,6 @@ CLOSE_TX_LOOP:
     tx_status = connection_status::terminated;
 }
 
-
 void UdpComms::closeReceiver ()
 {
     if (tx_status == connection_status::connected)

@@ -22,8 +22,7 @@ BOOST_FIXTURE_TEST_SUITE (message_filter_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
-const std::string core_types[] = { "test","ipc","zmq","udp","test_2", "ipc_2", "zmq_2", "udp_2" };
-
+const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
 
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation

@@ -11,19 +11,19 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "BrokerBase.h"
 
+#include "../common/AsioServiceManager.h"
 #include "../common/logger.h"
+#include "TimeCoordinator.h"
 #include "helics/helics-config.h"
+#include <iostream>
+#include <libguarded/guarded.hpp>
+#include <boost/asio/steady_timer.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/uuid/uuid.hpp>  // uuid class
 #include <boost/uuid/uuid_generators.hpp>  // generators
 #include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
-#include <libguarded/guarded.hpp>
-#include "../common/AsioServiceManager.h"
-#include "TimeCoordinator.h"
-#include <iostream>
-#include <boost/asio/steady_timer.hpp>
-#include <boost/filesystem.hpp>
 
 static inline std::string gen_id ()
 {
@@ -308,44 +308,42 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
 using activeProtector = std::shared_ptr<libguarded::guarded<bool>>;
 void timerTickHandler (BrokerBase *bbase, activeProtector active, const boost::system::error_code &error)
 {
-    auto p = active->lock();
+    auto p = active->lock ();
     if (*p)
     {
         if (error != boost::asio::error::operation_aborted)
         {
             try
             {
-                bbase->addActionMessage(CMD_TICK);
+                bbase->addActionMessage (CMD_TICK);
             }
             catch (std::exception &e)
             {
                 std::cout << "exception caught from addActionMessage" << std::endl;
             }
-
         }
         else
         {
-            ActionMessage M(CMD_TICK);
-            SET_ACTION_FLAG(M, error_flag);
-            bbase->addActionMessage(M);
+            ActionMessage M (CMD_TICK);
+            SET_ACTION_FLAG (M, error_flag);
+            bbase->addActionMessage (M);
         }
     }
 }
 
-bool BrokerBase::tryReconnect()
-{
-    return false;
-}
+bool BrokerBase::tryReconnect () { return false; }
 
 void BrokerBase::queueProcessingLoop ()
 {
-    mainLoopIsRunning.store(true);
+    mainLoopIsRunning.store (true);
     auto serv = AsioServiceManager::getServicePointer ();
     AsioServiceManager::runServiceLoop ();
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
-    auto active = std::make_shared<libguarded::guarded<bool>>(true);
+    auto active = std::make_shared<libguarded::guarded<bool>> (true);
 
-    auto timerCallback = [this,active](const boost::system::error_code &ec) { timerTickHandler (this,active, ec); };
+    auto timerCallback = [this, active](const boost::system::error_code &ec) {
+        timerTickHandler (this, active, ec);
+    };
     ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
     ticktimer.async_wait (timerCallback);
     int messagesSinceLastTick = 0;
@@ -356,16 +354,16 @@ void BrokerBase::queueProcessingLoop ()
         switch (command.action ())
         {
         case CMD_TICK:
-         
+
             if (messagesSinceLastTick == 0)
             {
-             //   std::cout << "sending tick " << std::endl;
+                //   std::cout << "sending tick " << std::endl;
                 processCommand (std::move (command));
             }
-            if (CHECK_ACTION_FLAG(command, error_flag))
+            if (CHECK_ACTION_FLAG (command, error_flag))
             {
-                AsioServiceManager::haltServiceLoop();
-                AsioServiceManager::runServiceLoop();
+                AsioServiceManager::haltServiceLoop ();
+                AsioServiceManager::runServiceLoop ();
             }
             messagesSinceLastTick = 0;
             // reschedule the timer
@@ -377,8 +375,8 @@ void BrokerBase::queueProcessingLoop ()
         case CMD_TERMINATE_IMMEDIATELY:
             ticktimer.cancel ();
             AsioServiceManager::haltServiceLoop ();
-            mainLoopIsRunning.store(false);
-            active->store(false);
+            mainLoopIsRunning.store (false);
+            active->store (false);
             return;  // immediate return
         case CMD_STOP:
             ticktimer.cancel ();
@@ -386,8 +384,8 @@ void BrokerBase::queueProcessingLoop ()
             if (!haltOperations)
             {
                 processCommand (std::move (command));
-                mainLoopIsRunning.store(false);
-                active->store(false);
+                mainLoopIsRunning.store (false);
+                active->store (false);
                 return processDisconnect ();
             }
 

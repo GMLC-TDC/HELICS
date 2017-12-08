@@ -172,11 +172,11 @@ void ZmqComms::queue_rx_function ()
     std::string controlsockString = std::string ("inproc://") + name + "_control";
     try
     {
-        controlSocket.bind(controlsockString.c_str());
+        controlSocket.bind (controlsockString.c_str ());
     }
     catch (const zmq::error_t &)
     {
-        std::cerr << "binding error on internal comms socket"<<std::endl;
+        std::cerr << "binding error on internal comms socket" << std::endl;
         rx_status = connection_status::error;
         return;
     }
@@ -697,9 +697,6 @@ void ZmqComms::closeReceiver ()
         pushSocket.send (cmd.to_string ());
     }
 }
-
-
-
 
 std::string ZmqComms::getPushAddress () const { return makePortAddress (localTarget_, pullPortNumber); }
 

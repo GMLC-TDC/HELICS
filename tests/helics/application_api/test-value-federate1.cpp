@@ -379,7 +379,7 @@ void runFederateTest (const std::string &core_type_str,
 
     vFed->finalize ();
     BOOST_CHECK (vFed->currentState () == helics::Federate::op_states::finalize);
-    helics::cleanupHelicsLibrary();
+    helics::cleanupHelicsLibrary ();
 }
 
 template <class X>
@@ -473,7 +473,7 @@ void runFederateTestv2 (const std::string &core_type_str,
     vFed->getValue (subid, val);
     BOOST_CHECK (val == testValue2);
     vFed->finalize ();
-    helics::cleanupHelicsLibrary();
+    helics::cleanupHelicsLibrary ();
 }
 
 #ifndef QUICK_TESTS_ONLY
@@ -639,7 +639,7 @@ void runDualFederateTest (const std::string &core_type_str,
     BOOST_CHECK_EQUAL (val, testValue2);
     fedA->finalize ();
     fedB->finalize ();
-    helics::cleanupHelicsLibrary();
+    helics::cleanupHelicsLibrary ();
 }
 
 template <class X>
@@ -698,7 +698,7 @@ void runDualFederateTestv2 (const std::string &core_type_str,
     BOOST_CHECK (val == testValue2);
     fedA->finalize ();
     fedB->finalize ();
-    helics::cleanupHelicsLibrary();
+    helics::cleanupHelicsLibrary ();
 }
 
 template <class X>
@@ -758,9 +758,9 @@ void runDualFederateTestObj (const std::string &core_type_str,
     // make sure the value was updated
     fedB->getValue (subid.getID (), val);
     BOOST_CHECK_EQUAL (val, testValue2);
-    fedA->finalize();
-    fedB->finalize();
-    helics::cleanupHelicsLibrary();
+    fedA->finalize ();
+    fedB->finalize ();
+    helics::cleanupHelicsLibrary ();
 }
 /** test case checking that the transfer between two federates works as expected
  */

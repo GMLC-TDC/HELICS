@@ -59,9 +59,9 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
     BOOST_CHECK (!error);
     auto connected = confut.get ();
     BOOST_CHECK (!connected);
-    rxSocket.close();
-    comm.disconnect();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    rxSocket.close ();
+    comm.disconnect ();
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
 
 /** test the request set class with various scenarios*/
@@ -215,9 +215,9 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
     BOOST_CHECK_GT (len, 32);
     helics::ActionMessage rM (data.data (), len);
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
-    rxSocket.close();
-    comm.disconnect();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    rxSocket.close ();
+    comm.disconnect ();
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
 
 BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
@@ -262,9 +262,9 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
     std::this_thread::sleep_for (std::chrono::milliseconds (200));
     BOOST_REQUIRE_EQUAL (counter, 1);
     BOOST_CHECK (act.action () == helics::action_message_def::action_t::cmd_ack);
-    rxSocket.close();
-    comm.disconnect();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    rxSocket.close ();
+    comm.disconnect ();
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
 
 BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
 
     comm.disconnect ();
     comm2.disconnect ();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
 
 BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
@@ -399,7 +399,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     comm.disconnect ();
     comm2.disconnect ();
     comm3.disconnect ();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
 
 BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
@@ -435,7 +435,7 @@ BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
     BOOST_CHECK (!error);
     core->disconnect ();
     core = nullptr;
-    helics::CoreFactory::cleanUpCores(100);
+    helics::CoreFactory::cleanUpCores (100);
 }
 
 /** test case checks default values and makes sure they all mesh together
@@ -461,8 +461,8 @@ BOOST_AUTO_TEST_CASE (udpCore_core_broker_default_test)
     broker->disconnect ();
     core = nullptr;
     broker = nullptr;
-    helics::CoreFactory::cleanUpCores(100);
-    helics::BrokerFactory::cleanUpBrokers(100);
+    helics::CoreFactory::cleanUpCores (100);
+    helics::BrokerFactory::cleanUpBrokers (100);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

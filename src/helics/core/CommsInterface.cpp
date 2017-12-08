@@ -168,16 +168,16 @@ void CommsInterface::disconnect ()
     }
 }
 
-bool CommsInterface::reconnect()
+bool CommsInterface::reconnect ()
 {
     rx_status = connection_status::reconnecting;
     tx_status = connection_status::reconnecting;
-    reconnectReceiver();
-    reconnectTransmitter();
+    reconnectReceiver ();
+    reconnectTransmitter ();
     int cnt = 0;
-    while (rx_status.load() == connection_status::reconnecting)
+    while (rx_status.load () == connection_status::reconnecting)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for (std::chrono::milliseconds (50));
         ++cnt;
         if (cnt == 400)  // Eventually give up
         {
@@ -186,9 +186,9 @@ bool CommsInterface::reconnect()
         }
     }
     cnt = 0;
-    while (tx_status.load() == connection_status::reconnecting)
+    while (tx_status.load () == connection_status::reconnecting)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for (std::chrono::milliseconds (50));
         ++cnt;
         if (cnt == 400)
         {
@@ -196,8 +196,9 @@ bool CommsInterface::reconnect()
             break;
         }
     }
-    
-    return ((rx_status.load() == connection_status::connected) && (tx_status.load() == connection_status::connected));
+
+    return ((rx_status.load () == connection_status::connected) &&
+            (tx_status.load () == connection_status::connected));
 }
 
 void CommsInterface::setCallback (std::function<void(ActionMessage &&)> callback)
@@ -222,26 +223,25 @@ bool CommsInterface::isConnected () const
     return ((tx_status == connection_status::connected) && (rx_status == connection_status::connected));
 }
 
-void CommsInterface::closeTransmitter()
+void CommsInterface::closeTransmitter ()
 {
-    ActionMessage rt(CMD_PROTOCOL);
+    ActionMessage rt (CMD_PROTOCOL);
     rt.index = DISCONNECT;
-    transmit(-1, rt);
+    transmit (-1, rt);
 }
 
-
-void CommsInterface::reconnectTransmitter()
+void CommsInterface::reconnectTransmitter ()
 {
-    ActionMessage rt(CMD_PROTOCOL);
+    ActionMessage rt (CMD_PROTOCOL);
     rt.index = RECONNECT;
-    transmit(-1, rt);
+    transmit (-1, rt);
 }
 
-void CommsInterface::reconnectReceiver()
+void CommsInterface::reconnectReceiver ()
 {
-    ActionMessage cmd(CMD_PROTOCOL);
+    ActionMessage cmd (CMD_PROTOCOL);
     cmd.index = RECONNECT_RECEIVER;
-    transmit(-1, cmd);
+    transmit (-1, cmd);
 }
 
 std::string makePortAddress (const std::string &networkInterface, int portNumber)

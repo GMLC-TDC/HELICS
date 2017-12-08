@@ -54,10 +54,10 @@ ValueFederateTestFixture::~ValueFederateTestFixture ()
     vFed2 = nullptr;
     for (auto &brk : broker)
     {
-        brk->disconnect();
+        brk->disconnect ();
     }
-    broker.clear();
-    helics::cleanupHelicsLibrary();
+    broker.clear ();
+    helics::cleanupHelicsLibrary ();
 }
 
 void ValueFederateTestFixture::StartBroker (const std::string &core_type_name,
@@ -155,10 +155,10 @@ MessageFederateTestFixture::~MessageFederateTestFixture ()
     mFed2 = nullptr;
     for (auto &brk : broker)
     {
-        brk->disconnect();
+        brk->disconnect ();
     }
-    broker.clear();
-    helics::cleanupHelicsLibrary();
+    broker.clear ();
+    helics::cleanupHelicsLibrary ();
 }
 
 void MessageFederateTestFixture::StartBroker (const std::string &core_type_name,
@@ -234,13 +234,13 @@ FederateTestFixture::~FederateTestFixture ()
             fed->finalize ();
         }
     }
-    federates.clear();
+    federates.clear ();
     for (auto &broker : brokers)
     {
         broker->disconnect ();
     }
-    brokers.clear();
-    helics::cleanupHelicsLibrary();
+    brokers.clear ();
+    helics::cleanupHelicsLibrary ();
 }
 
 std::shared_ptr<helics::Broker> FederateTestFixture::AddBroker (const std::string &core_type_name, int count)

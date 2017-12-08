@@ -262,11 +262,11 @@ iteration_result Federate::enterExecutionState (iteration_request iterate)
         {
         case iteration_result::next_step:
             state = op_states::execution;
-            InitializeToExecuteStateTransition();
+            InitializeToExecuteStateTransition ();
             break;
         case iteration_result::iterating:
             state = op_states::initialization;
-            updateTime(getCurrentTime(), getCurrentTime());
+            updateTime (getCurrentTime (), getCurrentTime ());
             break;
         case iteration_result::error:
             state = op_states::error;
@@ -351,11 +351,11 @@ iteration_result Federate::enterExecutionStateFinalize ()
     {
     case iteration_result::next_step:
         state = op_states::execution;
-        InitializeToExecuteStateTransition();
+        InitializeToExecuteStateTransition ();
         break;
     case iteration_result::iterating:
         state = op_states::initialization;
-        updateTime(getCurrentTime(), getCurrentTime());
+        updateTime (getCurrentTime (), getCurrentTime ());
         break;
     case iteration_result::error:
         state = op_states::error;
@@ -364,7 +364,7 @@ iteration_result Federate::enterExecutionStateFinalize ()
         state = op_states::finalize;
         break;
     }
-    
+
     return res;
 }
 
@@ -453,7 +453,7 @@ void Federate::finalize ()
     case op_states::error:
         return;
         // do nothing
-    default: 
+    default:
         throw (InvalidFunctionCall ("cannot call finalize in present state"));
     }
     coreObject->finalize (fedID);
@@ -488,10 +488,10 @@ Time Federate::requestTime (Time nextInternalTimeStep)
     {
         try
         {
-            auto newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
+            auto newTime = coreObject->timeRequest (fedID, nextInternalTimeStep);
             Time oldTime = currentTime;
             currentTime = newTime;
-            updateTime(newTime, oldTime);
+            updateTime (newTime, oldTime);
             return newTime;
         }
         catch (functionExecutionFailure &fee)
@@ -499,8 +499,6 @@ Time Federate::requestTime (Time nextInternalTimeStep)
             state = op_states::error;
             throw;
         }
-        
-        
     }
     else
     {
@@ -520,11 +518,11 @@ iterationTime Federate::requestTimeIterative (Time nextInternalTimeStep, iterati
             currentTime = iterativeTime.stepTime;
             FALLTHROUGH
         case iteration_result::iterating:
-            updateTime(currentTime, oldTime);
+            updateTime (currentTime, oldTime);
             break;
         case iteration_result::halted:
             currentTime = iterativeTime.stepTime;
-            updateTime(currentTime, oldTime);
+            updateTime (currentTime, oldTime);
             state = op_states::finalize;
             break;
         case iteration_result::error:
@@ -617,11 +615,11 @@ iterationTime Federate::requestTimeIterativeFinalize ()
             currentTime = iterativeTime.stepTime;
             FALLTHROUGH
         case iteration_result::iterating:
-            updateTime(currentTime, oldTime);
+            updateTime (currentTime, oldTime);
             break;
         case iteration_result::halted:
             currentTime = iterativeTime.stepTime;
-            updateTime(currentTime, oldTime);
+            updateTime (currentTime, oldTime);
             state = op_states::finalize;
             break;
         case iteration_result::error:

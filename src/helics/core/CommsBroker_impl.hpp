@@ -86,14 +86,14 @@ void CommsBroker<COMMS, BrokerT>::brokerDisconnect ()
 }
 
 template <class COMMS, class BrokerT>
-bool CommsBroker<COMMS, BrokerT>::tryReconnect()
+bool CommsBroker<COMMS, BrokerT>::tryReconnect ()
 {
-    std::unique_lock<std::mutex> lock(dataMutex);
+    std::unique_lock<std::mutex> lock (dataMutex);
     if (comms)
     {
-        auto comm_ptr = comms.get();
-        lock.unlock();  // we don't want to hold the lock while calling reconnect that could cause deadlock
-        return comm_ptr->reconnect();
+        auto comm_ptr = comms.get ();
+        lock.unlock ();  // we don't want to hold the lock while calling reconnect that could cause deadlock
+        return comm_ptr->reconnect ();
     }
     return false;
 }

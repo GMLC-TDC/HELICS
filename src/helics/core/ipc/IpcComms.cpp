@@ -256,7 +256,6 @@ DISCONNECT_TX_QUEUE:
     tx_status = connection_status::terminated;
 }
 
-
 void IpcComms::closeReceiver ()
 {
     if ((rx_status == connection_status::error) || (rx_status == connection_status::terminated))

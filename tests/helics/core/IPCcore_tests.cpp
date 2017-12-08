@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE (ipccomms_broker_test)
     helics::ActionMessage rM = mq.getMessage ();
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     comm.disconnect ();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
 
 BOOST_AUTO_TEST_CASE (ipccomms_rx_test)
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE (ipccomms_rx_test)
     BOOST_REQUIRE_EQUAL (counter, 1);
     BOOST_CHECK (act.action () == helics::action_message_def::action_t::cmd_ack);
     comm.disconnect ();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
 
 BOOST_AUTO_TEST_CASE (ipcComm_transmit_through)
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_through)
 
     comm.disconnect ();
     comm2.disconnect ();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
 
 BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     comm.disconnect ();
     comm2.disconnect ();
     comm3.disconnect ();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
 
 BOOST_AUTO_TEST_CASE (ipccore_initialization_test)
@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE (ipccore_initialization_test)
     core->disconnect ();
     core = nullptr;
     boost::interprocess::message_queue::remove ("testbroker");
-    helics::CoreFactory::cleanUpCores(100);
+    helics::CoreFactory::cleanUpCores (100);
 }
 
 /** test case checks default values and makes sure they all mesh together
@@ -249,8 +249,8 @@ BOOST_AUTO_TEST_CASE (ipcCore_core_broker_default_test)
     broker->disconnect ();
     core = nullptr;
     broker = nullptr;
-    helics::CoreFactory::cleanUpCores(100);
-    helics::BrokerFactory::cleanUpBrokers(100);
+    helics::CoreFactory::cleanUpCores (100);
+    helics::BrokerFactory::cleanUpBrokers (100);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

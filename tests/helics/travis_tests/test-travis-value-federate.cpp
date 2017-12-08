@@ -29,13 +29,9 @@ BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture)
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
+const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
 
-const std::string core_types[] = {"test","ipc","zmq","udp","test_2", "ipc_2", "zmq_2", "udp_2"};
-
-
-BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
-                      bdata::make (core_types),
-                      core_type)
+BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdata::make (core_types), core_type)
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -84,7 +80,6 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
 
     BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
 }
-
 
 BOOST_TEST_DECORATOR (*utf::timeout (5))
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (core_types), core_type)

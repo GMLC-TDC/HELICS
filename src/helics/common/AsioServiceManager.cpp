@@ -83,7 +83,7 @@ void AsioServiceManager::closeService (const std::string &serviceName)
 {
     std::lock_guard<std::mutex> servelock (serviceLock);
     auto fnd = services.find (serviceName);
-//    std::cout << "closing service manager\n";
+    //    std::cout << "closing service manager\n";
     if (fnd != services.end ())
     {
         if (fnd->second->running)
@@ -108,7 +108,7 @@ void AsioServiceManager::setServiceToLeakOnDelete (const std::string &serviceNam
 }
 AsioServiceManager::~AsioServiceManager ()
 {
-  //  std::cout << "deleting service manager\n";
+    //  std::cout << "deleting service manager\n";
     if (running)
     {
         nullwork.reset ();
@@ -139,7 +139,7 @@ void AsioServiceManager::runServiceLoop (const std::string &serviceName)
         ++ptr->runCounter;
         if (!ptr->running)
         {
-           // std::cout << "run Service loop " << ptr->runCounter << "\n";
+            // std::cout << "run Service loop " << ptr->runCounter << "\n";
             ptr->nullwork = std::make_unique<boost::asio::io_service::work> (ptr->getBaseService ());
             ptr->running = true;
             ptr->loopRet = std::async (std::launch::async, [ptr]() { serviceRunLoop (ptr); });
@@ -148,7 +148,7 @@ void AsioServiceManager::runServiceLoop (const std::string &serviceName)
         {
             if (ptr->getBaseService ().stopped ())
             {
-               // std::cout << "run Service loop already stopped" << ptr->runCounter << "\n";
+                // std::cout << "run Service loop already stopped" << ptr->runCounter << "\n";
                 ptr->loopRet.get ();
                 ptr->nullwork = std::make_unique<boost::asio::io_service::work> (ptr->getBaseService ());
                 ptr->running = true;
@@ -169,18 +169,18 @@ void AsioServiceManager::haltServiceLoop (const std::string &serviceName)
         auto ptr = fnd->second;
         if (ptr->running)
         {
-            //std::cout << "service loop halted "<<ptr->runCounter<<"\n";
+            // std::cout << "service loop halted "<<ptr->runCounter<<"\n";
             if (ptr->runCounter > 0)
             {
                 --ptr->runCounter;
             }
             if (ptr->runCounter <= 0)
             {
-            //    std::cout << "calling halt on service loop \n";
+                //    std::cout << "calling halt on service loop \n";
                 ptr->nullwork.reset ();
                 ptr->iserv->stop ();
                 ptr->loopRet.get ();
-                ptr->iserv->reset(); //prepare for future runs
+                ptr->iserv->reset ();  // prepare for future runs
             }
         }
         else
@@ -200,12 +200,12 @@ void serviceRunLoop (std::shared_ptr<AsioServiceManager> ptr)
     }
     catch (const std::exception &e)
     {
-        std::cerr << "std::exception in service loop " << e.what() << std::endl;
+        std::cerr << "std::exception in service loop " << e.what () << std::endl;
     }
     catch (...)
     {
         std::cout << "caught other error in service loop" << std::endl;
     }
-   // std::cout << "service loop stopped\n";
+    // std::cout << "service loop stopped\n";
     ptr->running = false;
 }

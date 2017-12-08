@@ -20,7 +20,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/lexical_cast.hpp>
 namespace helics
 {
-    /** base class for a subscription object*/
+/** base class for a subscription object*/
 class SubscriptionBase
 {
   protected:
@@ -102,7 +102,7 @@ class Subscription : public SubscriptionBase
 
     mutable helicsType_t type = helicsType_t::helicsInvalid;  //!< the underlying type the publication is using
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
-    //bool hasUpdate = false;  //!< the value has been updated
+    // bool hasUpdate = false;  //!< the value has been updated
     defV lastValue;  //!< the last value updated
     double delta = -1.0;  //!< the minimum difference
   public:
@@ -204,14 +204,14 @@ class Subscription : public SubscriptionBase
     }
 
     /** set the default value to use before any update has been published
-    */
+     */
     template <class X>
     typename std::enable_if_t<helicsType<X> () != helicsType_t::helicsInvalid, void> setDefault (const X &val)
     {
         lastValue = val;
     }
 
-    /** set the minimum delta for change detection 
+    /** set the minimum delta for change detection
     @param detltaV a double with the change in a value in order to register a different value
     */
     void setMinimumChange (double deltaV)
@@ -226,8 +226,8 @@ class Subscription : public SubscriptionBase
             changeDetectionEnabled = false;
         }
     }
-    /** enable change detection 
-    @param enabled (optional) set to false to disable change detection true(default) to enable it 
+    /** enable change detection
+    @param enabled (optional) set to false to disable change detection true(default) to enable it
     */
     void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
 
