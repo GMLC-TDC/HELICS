@@ -220,6 +220,9 @@ int main (int argc, char *argv[])
     std::vector<ValueCapture> vcap;
 
     vcap.reserve (100000);
+    std::cout << "entering init State\n";
+	vFed->enterInitializationState ();
+	std::cout << "entered init State\n";
     std::cout << "entering execution mode\n";
     vFed->enterExecutionState ();
     helics::Time nextPrintTime = 10.0;

@@ -7,7 +7,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics.h"
+//#include "helics.h"
+#include "helics/shared_api_library/helics.h"
 #include "test_configuration.h"
 #include <future>
 #include <boost/test/unit_test.hpp>
@@ -17,27 +18,27 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 BOOST_AUTO_TEST_SUITE (federate_tests)
 
-// BOOST_AUTO_TEST_CASE (federate_initialize_tests)
-//{
-//    helics::FederateInfo fi ("test1");
-//    fi.coreType = CORE_TYPE_TO_TEST;
-//    fi.coreInitString = "1";
-//
-//    auto Fed = std::make_shared<helics::Federate> (fi);
-//
-//    auto core = Fed->getCorePointer ();
-//    BOOST_REQUIRE ((core));
-//
-//    auto name = std::string (core->getFederateName (Fed->getID ()));
-//
-//    BOOST_CHECK_EQUAL (name, Fed->getName ());
-//    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::startup);
-//    Fed->enterInitializationState ();
-//    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::initialization);
-//    Fed->enterExecutionState ();
-//    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::execution);
-//    Fed = nullptr;  // force the destructor
-//}
+ BOOST_AUTO_TEST_CASE (federate_initialize_tests)
+{
+    helics::FederateInfo fi ("test1");
+    fi.coreType = CORE_TYPE_TO_TEST;
+    fi.coreInitString = "1";
+
+    auto Fed = std::make_shared<helics::Federate> (fi);
+
+    auto core = Fed->getCorePointer ();
+    BOOST_REQUIRE ((core));
+
+    auto name = std::string (core->getFederateName (Fed->getID ()));
+
+    BOOST_CHECK_EQUAL (name, Fed->getName ());
+    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::startup);
+    Fed->enterInitializationState ();
+    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::initialization);
+    Fed->enterExecutionState ();
+    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::execution);
+    Fed = nullptr;  // force the destructor
+}
 //
 // BOOST_AUTO_TEST_CASE (federate_time_step_tests)
 //{
