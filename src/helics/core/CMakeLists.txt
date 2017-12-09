@@ -12,20 +12,25 @@ set(SRC_FILES
 	CommonCore.cpp
 	FederateState.cpp
 	SubscriptionInfo.cpp
+	PublicationInfo.cpp
 	FilterInfo.cpp
 	EndpointInfo.cpp
 	ActionMessage.cpp
 	CoreBroker.cpp
 	TestBroker.cpp
 	core-data.cpp
+	TimeCoordinator.cpp
+	TimeDependencies.cpp
+	CommsInterface.cpp
+	CommsBroker.cpp
+	argParser.cpp
+)
+
+set (IPC_SOURCE_FILES
 	ipc/IpcCore.cpp
 	ipc/IpcBroker.cpp
 	ipc/IpcComms.cpp
 	ipc/IpcQueueHelper.cpp
-	TimeCoordinator.cpp
-	TimeDependencies.cpp
-	CommsInterface.cpp
-	argParser.cpp
 )
 
 set (MPI_SOURCE_FILES
@@ -41,29 +46,45 @@ set (ZMQ_SOURCE_FILES
 	zmq/ZmqRequestSets.cpp
 )
 
+set (UDP_SOURCE_FILES
+	udp/UdpCore.cpp
+	udp/UdpBroker.cpp
+	udp/UdpComms.cpp
+)
+
+set (TCP_SOURCE_FILES
+	tcp/TcpCore.cpp
+	tcp/TcpBroker.cpp
+	tcp/TcpComms.cpp
+)
+
+set (PUBLIC_INCLUDE_FILES
+core.h
+broker.h
+CoreFactory.h
+BrokerFactory.h
+core-exceptions.h
+core-types.h
+core-data.h
+helics-time.h
+coreFederateInfo.h
+core-exceptions.h
+../flag-definitions.h
+)
+
 set(INCLUDE_FILES
-    core-data.h
 	BrokerBase.h
-    CoreFactory.h
-	BrokerFactory.h
 	TimeDependencies.h
-	core-exceptions.h
 	TimeCoordinator.h
 	loggingHelper.hpp
 	delayedObjects.hpp
-    core.h
-    core-types.h
-    helics-time.h
+	CommsBroker.hpp
+	CommsBroker_impl.hpp
     TestCore.h
 	CoreBroker.h
 	ActionMessageDefintions.h
 	ActionMessage.h
 	CommonCore.h
-	ipc/IpcCore.h
-	ipc/IpcBroker.h
-	ipc/IpcComms.h
-	ipc/IpcQueueHelper.h
-    
 	CommsInterface.h
 	FederateState.h
 	SubscriptionInfo.h
@@ -74,6 +95,15 @@ set(INCLUDE_FILES
 	FilterFunctions.h
 	TestBroker.h
 	argParser.h
+)
+
+
+
+set(IPC_HEADER_FILES
+	ipc/IpcCore.h
+	ipc/IpcBroker.h
+	ipc/IpcComms.h
+	ipc/IpcQueueHelper.h
 )
 
 set(ZMQ_HEADER_FILES
@@ -89,10 +119,25 @@ set(MPI_HEADER_FILES
 	mpi/MpiComms.h
 	)
 
-if (${ZMQ_FOUND})
+set(UDP_HEADER_FILES
+	udp/UdpCore.h
+	udp/UdpBroker.h
+	udp/UdpComms.h
+	)
+
+set(TCP_HEADER_FILES
+	tcp/TcpCore.h
+	tcp/TcpBroker.h
+	tcp/TcpComms.h
+	)
+
+	list(APPEND SRC_FILES ${UDP_SOURCE_FILES} ${IPC_SOURCE_FILES} )
+	list(APPEND INCLUDE_FILES ${UDP_HEADER_FILES} ${IPC_HEADER_FILES} )
+
+if (${ZeroMQ_FOUND})
    list(APPEND SRC_FILES ${ZMQ_SOURCE_FILES})
    list(APPEND INCLUDE_FILES ${ZMQ_HEADER_FILES})
-endif (${ZMQ_FOUND})
+endif (${ZeroMQ_FOUND})
 
 if (${MPI_C_FOUND})
    list(APPEND SRC_FILES ${MPI_SOURCE_FILES})
@@ -100,18 +145,27 @@ if (${MPI_C_FOUND})
 endif (${MPI_C_FOUND})
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES})
+add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
+if (${MPI_C_FOUND})
+source_group("mpi" FILES ${MPI_SOURCE_FILES} ${MPI_HEADER_FILES})
+endif (${MPI_C_FOUND})
+source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
+source_group("udp" FILES ${UDP_SOURCE_FILES} ${UDP_HEADER_FILES})
+source_group("ipc" FILES ${IPC_SOURCE_FILES} ${IPC_HEADER_FILES})
+#source_group("tcp" FILEs ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
 
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 
+install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION include/helics/core)
+
 OPTION(BUILD_BROKER "Build a helics Broker" ON)
 if (BUILD_BROKER)
-link_directories(${external_link_directories})
 add_executable(helics_broker helics-broker.cc)
-   target_link_libraries(helics_broker helics)
-   target_link_libraries(helics_broker ${external_library_list})
+   target_link_libraries(helics_broker helics-static)
    
+
+
    set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "build folder location of the broker")
    #message(STATUS "bloc ${CMAKE_CURRENT_BINARY_DIR}")
    INSTALL(TARGETS helics_broker DESTINATION bin)

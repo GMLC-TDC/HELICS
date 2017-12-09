@@ -1,6 +1,6 @@
 static char help[] = " PI SENDER: Simple program to demonstrate the usage of HELICS C Interface.\n\
             This example creates a ZMQ broker and a value federate.\n\
-            The value federate creates a global pulications and publishes\n\
+            The value federate creates a global publications and publishes\n\
             t*pi for 20 time-steps with a time-step of 0.01 seconds.\n\n";
 
 
@@ -12,7 +12,7 @@ static char help[] = " PI SENDER: Simple program to demonstrate the usage of HEL
 #include <unistd.h>
 #endif
 
-int main(int argc,char **argv)
+int main()
 {
   helics_federate_info_t fedinfo;
   const char*    helicsversion;
@@ -43,7 +43,7 @@ int main(int argc,char **argv)
   fedinfo = helicsFederateInfoCreate();
   
   /* Set Federate name */
-  status = helicsFederateInfoSetFederateName(fedinfo,"TestA Federate");
+  status = helicsFederateInfoSetFederateName(fedinfo,"Test sender Federate");
 
   /* Set core type from string */
   status = helicsFederateInfoSetCoreTypeFromString(fedinfo,"zmq");
@@ -95,15 +95,15 @@ int main(int argc,char **argv)
   status = helicsFinalize(vfed);
   printf("PI SENDER: Federate finalized\n");
 
-
+  helicsFreeFederate(vfed);
   while(helicsBrokerIsConnected(broker)) {
 #ifdef _MSC_VER
-	  Sleep(1);
+	  Sleep(100);
 #else
-    usleep(1000); /* Sleep for 1 millisecond */
+    usleep(100000); /* Sleep for 100 millisecond */
 #endif
   }
   printf("PI SENDER: Broker disconnected\n");
-
+  helicsCloseLibrary();
   return(0);
 }

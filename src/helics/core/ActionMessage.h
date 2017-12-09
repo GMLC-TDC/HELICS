@@ -30,42 +30,34 @@ class ActionMessage
     class AdditionalInfo
     {
       public:
-        Time Te = timeZero;  //!< event time
-        Time Tdemin = timeZero;  //!< min dependent event time;
         std::string source;  //!< name of a registration
         std::string &type;  //!< alias source to type for registration
         std::string target;  //!< target or destination
         std::string &units;  //!< alias type to target for registration
         std::string orig_source;  //!< the original source
 		std::string &type_out;  //!< alias type_out to orig_source for filter
+        std::string orig_dest;  //!< the original destination of a message
 		/** constructor*/
         AdditionalInfo () noexcept : type (source), units (target),type_out(orig_source){};
 		/** copy constructor*/
         AdditionalInfo (const AdditionalInfo &ai)
-            : Te (ai.Te), Tdemin (ai.Tdemin), source (ai.source), type (source), target (ai.target),
-              units (target), orig_source (ai.orig_source), type_out(orig_source) {};
+            : source (ai.source), type (source), target (ai.target),
+              units (target), orig_source (ai.orig_source), type_out(orig_source),orig_dest(ai.orig_dest) {};
 		/** move constructor*/
         AdditionalInfo (AdditionalInfo &&ai) noexcept
-            : Te (ai.Te), Tdemin (ai.Tdemin), source (std::move (ai.source)), type (source),
-              target (std::move (ai.target)), units (target), orig_source (std::move (ai.orig_source)), type_out(orig_source) {};
+            : source (std::move (ai.source)), type (source),
+              target (std::move (ai.target)), units (target), orig_source (std::move (ai.orig_source)), type_out(orig_source),orig_dest(std::move(ai.orig_dest)) {};
         template <class Archive>
         void save (Archive &ar) const
         {
-            auto Tebase = Te.getBaseTimeCode ();
-            auto Tdeminbase = Tdemin.getBaseTimeCode ();
-			ar(Tebase, Tdeminbase);
-			ar(source, target, orig_source);
+			ar(source, target, orig_source,orig_dest);
         }
 
         template <class Archive>
         void load (Archive &ar)
         {
-            decltype (Te.getBaseTimeCode ()) Tebase;
-			decltype (Tdemin.getBaseTimeCode()) Tdeminbase;
-			ar(Tebase, Tdeminbase);
-            Te.setBaseTimeCode (Tebase);
-            Tdemin.setBaseTimeCode (Tdeminbase);
-			ar(source, target, orig_source);
+           
+			ar(source, target, orig_source,orig_dest);
         }
     };
    
@@ -73,26 +65,31 @@ class ActionMessage
   private:
     action_message_def::action_t action_ = CMD_IGNORE;  // 4 -- command
   public:
-    int32_t source_id = 0;  // 8 -- for federate_id or route_id
-    int32_t source_handle = 0;  // 12 -- for local handle or local code
-    int32_t dest_id = 0;  // 16 fed_id for a targeted message
-    int32_t dest_handle = 0;  // 20 local handle for a targetted message
-	int32_t &index;			//alias to dest_handle 
-    bool iterationComplete = false;  // 24 indicator that iteration has been completed
-	bool &processingComplete;  //Alias to iterationComplete indictator that processing has been completed
-    bool required = false;  //!< flag indicating a publication is required
-    bool error = false;  //!< flag indicating an error condition associated with the command
-    bool flag = false;  //!< general flag for many purposes
-    Time actionTime = timeZero;  //!< the time an action took place or will take place	//32
+    int32_t source_id = 0;  //!< 8 -- for federate_id or route_id
+    int32_t source_handle = 0;  //!< 12 -- for local handle or local code
+    int32_t dest_id = 0;  //!< 16 fed_id for a targeted message
+    int32_t dest_handle = 0;  //!< 20 local handle for a targeted message
+	int32_t &index;			//!<alias to dest_handle 
+    uint16_t counter=0; //!< 22 counter for filter tracking
+    uint16_t flags=0; //!<  24 set of messageFlags
+   
+    Time actionTime = timeZero;  //!< 32 the time an action took place or will take place	//32
+    Time Te = timeZero;  //!< 40 event time
+    Time Tdemin = timeZero;  //!< 48 min dependent event time;
     std::string payload;  //!< string containing the data	//64 std::string is 32 bytes on most platforms (except libc++)
     std::string &name;  //!<alias payload to a name reference for registration functions
   private:
     std::unique_ptr<AdditionalInfo> info_;  //!< pointer to an additional info structure with more data if required
   public:
     /** default constructor*/
-    ActionMessage () noexcept : index(dest_handle), processingComplete(iterationComplete), name (payload) {};
-    /** construct from an action type*/
+    ActionMessage () noexcept : index(dest_handle), name (payload) {};
+    /** construct from an action type 
+    @details this is an implicit constructor
+    */
     ActionMessage (action_message_def::action_t startingAction);
+    /** construct from action, source and destination id's
+    */
+    ActionMessage(action_message_def::action_t action, int32_t sourceId, int32_t destId);
     /** move constructor*/
     ActionMessage (ActionMessage &&act) noexcept;
     /** build an action message from a message*/
@@ -129,10 +126,12 @@ class ActionMessage
     void save (Archive &ar) const
     {
         ar (action_, source_id, source_handle, dest_id, dest_handle);
-        ar (iterationComplete, required, error, flag);
+        ar (counter,flags);
 
         auto btc = actionTime.getBaseTimeCode ();
-        ar (btc, payload);
+        auto Tebase = Te.getBaseTimeCode();
+        auto Tdeminbase = Tdemin.getBaseTimeCode();
+        ar(btc,Tebase,Tdeminbase, payload);
         if (hasInfo(action_))
         {
             ar (info_);
@@ -144,11 +143,17 @@ class ActionMessage
     {
         ar (action_, source_id, source_handle, dest_id, dest_handle);
 
-        ar (iterationComplete, required, error, flag);
+        ar (counter,flags);
 
         decltype (actionTime.getBaseTimeCode ()) btc;
-        ar (btc, payload);
+        decltype (Te.getBaseTimeCode()) Tebase;
+        decltype (Tdemin.getBaseTimeCode()) Tdeminbase;
+
+        ar (btc, Tebase, Tdeminbase, payload);
+
         actionTime.setBaseTimeCode (btc);
+        Te.setBaseTimeCode(Tebase);
+        Tdemin.setBaseTimeCode(Tdeminbase);
         if (hasInfo(action_))
         {
             if (!info_)
@@ -159,36 +164,73 @@ class ActionMessage
         }
     }
 
-    /** functions that convert to and from a byte stream*/
-    void toByteArray (char *data, size_t buffer_size) const;
+    // functions that convert to and from a byte stream
+
+    /** convert a command to a raw data bytes
+    @param[out] data pointer to memory to store the command
+    @param[in] buffer_size-- the size of the buffer
+    @return the size of the buffer actually used
+    */
+    int toByteArray (char *data, size_t buffer_size) const;
+    /** convert to a string using a reference*/
     void to_string (std::string &data) const;
+    /** convert to a byte string*/
 	std::string to_string() const;
+    /** covert to a byte vector using a reference*/
 	void to_vector(std::vector<char> &data) const;
+    /** convert a command to a byte vector*/
 	std::vector<char> to_vector() const;
+    /** generate a command from a raw data stream*/
     void fromByteArray (const char *data, size_t buffer_size);
+    /** read a command from a string*/
     void from_string (const std::string &data);
+    /** read a command from a char vector*/
 	void from_vector(const std::vector<char> &data);
 
 };
 
+#define SET_ACTION_FLAG(M,flag) do{M.flags|=(uint16_t(1)<<(flag));}while(false)
+
+#define CHECK_ACTION_FLAG(M,flag) ((M.flags&(uint16_t(1)<<(flag)))!=0)
+
+#define CLEAR_ACTION_FLAG(M,flag) do{M.flags&=~(uint16_t(1)<<(flag));}while(false)
 
 
 
-/** create a new message object that copies all the information from the cmd into newly allocated memory for the
+/** create a new message object that copies all the information from the ActionMessage into newly allocated memory for the
  * message
  */
 std::unique_ptr<Message> createMessage (const ActionMessage &cmd);
 
-/** create a new message object that moves all the information from the cmd into newly allocated memory for the
+/** create a new message object that moves all the information from the ActionMessage into newly allocated memory for the
  * message
  */
 std::unique_ptr<Message> createMessage (ActionMessage &&cmd);
 
-bool isPriorityCommand (const ActionMessage &command);
+/** check if a command is a protocol command*/
+inline bool isProtocolCommand(const ActionMessage &command) noexcept
+{
+    return ((command.action() == CMD_PROTOCOL) || (command.action() == CMD_PROTOCOL_PRIORITY) || (command.action() == CMD_PROTOCOL_BIG));
+}
+/** check if a command is a priority command*/
+inline bool isPriorityCommand(const ActionMessage &command) noexcept
+{
+    return (command.action() < action_message_def::action_t::cmd_ignore);
+}
 
-
+/** check if a command is a priority command*/
+inline bool isValidCommand(const ActionMessage &command) noexcept
+{
+    return (command.action() != action_message_def::action_t::cmd_invalid);
+}
+/** generate a human readable string with information about a command
+@param command the command to generate the string for
+@return a string representing information about the command
+*/
 std::string prettyPrintString(const ActionMessage &command);
 
+/** stream operator for a command
+*/
 std::ostream& operator<<(std::ostream& os, const ActionMessage & command);
 
 }  // namespace helics

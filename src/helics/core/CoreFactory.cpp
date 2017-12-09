@@ -9,21 +9,22 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "CoreFactory.h"
+#include "core-exceptions.h"
 #include "core-types.h"
-#include "helics/config.h"
-
+#include "helics/helics-config.h"
 #if HELICS_HAVE_ZEROMQ
 #include "zmq/ZmqCore.h"
 #endif
 
 #if HELICS_HAVE_MPI
-#include "mpi/mpi-core.h"
+#include "mpi/MpiCore.h"
 #endif
 
+#include "../common/delayedDestructor.hpp"
+#include "../common/searchableObjectHolder.hpp"
 #include "TestCore.h"
-#include "common/delayedDestructor.hpp"
-#include "common/searchableObjectHolder.hpp"
 #include "ipc/IpcCore.h"
+#include "udp/UdpCore.h"
 #include <cassert>
 
 namespace helics
@@ -56,27 +57,27 @@ core_type coreTypeFromString (const std::string &type)
     {
         return core_type::DEFAULT;
     }
-    else if ((type.compare (0, 3, "mpi") == 0) || (type == "MPI"))
+    if ((type.compare (0, 3, "mpi") == 0) || (type == "MPI"))
     {
         return core_type::MPI;
     }
-    else if ((type == "0mq") || (type.compare (0, 3, "zmq") == 0) || (type == "zeromq") || (type == "ZMQ"))
+    if ((type == "0mq") || (type.compare (0, 3, "zmq") == 0) || (type == "zeromq") || (type == "ZMQ"))
     {
         return core_type::ZMQ;
     }
-    else if ((type == "interprocess") || (type.compare (0, 3, "ipc") == 0))
+    if ((type == "interprocess") || (type.compare (0, 3, "ipc") == 0))
     {
         return core_type::INTERPROCESS;
     }
-    else if ((type.compare (0, 4, "test") == 0) || (type == "test1") || (type == "local"))
+    if ((type.compare (0, 4, "test") == 0) || (type == "test1") || (type == "local"))
     {
         return core_type::TEST;
     }
-    else if ((type.compare (0, 3, "tcp") == 0) || (type == "TCP"))
+    if ((type.compare (0, 3, "tcp") == 0) || (type == "TCP"))
     {
         return core_type::TCP;
     }
-    else if ((type.compare (0, 3, "udp") == 0) || (type == "UDP"))
+    if ((type.compare (0, 3, "udp") == 0) || (type == "UDP"))
     {
         return core_type::UDP;
     }
@@ -90,7 +91,6 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
     switch (type)
     {
     case core_type::ZMQ:
-    {
 #if HELICS_HAVE_ZEROMQ
         if (name.empty ())
         {
@@ -102,12 +102,10 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         }
 
 #else
-        assert (false);
+        throw (HelicsException ("ZMQ core is not available"));
 #endif
         break;
-    }
     case core_type::MPI:
-    {
 #if HELICS_HAVE_MPI
         if (name.empty ())
         {
@@ -118,12 +116,10 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<MpiCore> (name);
         }
 #else
-        assert (false);
+        throw (HelicsException ("MPI core is not available"));
 #endif
         break;
-    }
     case core_type::TEST:
-    {
         if (name.empty ())
         {
             core = std::make_shared<TestCore> ();
@@ -133,7 +129,6 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<TestCore> (name);
         }
         break;
-    }
     case core_type::INTERPROCESS:
     case core_type::IPC:
         if (name.empty ())
@@ -145,8 +140,20 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<IpcCore> (name);
         }
         break;
+    case core_type::UDP:
+        if (name.empty ())
+        {
+            core = std::make_shared<UdpCore> ();
+        }
+        else
+        {
+            core = std::make_shared<UdpCore> (name);
+        }
+        break;
+    case core_type::TCP:
+        throw (HelicsException ("TCP core is not available"));
     default:
-        assert (false);
+        throw (HelicsException ("unrecognized core type"));
     }
     return core;
 }
@@ -157,11 +164,8 @@ std::shared_ptr<Core> create (core_type type, const std::string &initializationS
 {
     auto core = makeCore (type, "");
     core->initialize (initializationString);
-    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
-    if (ccore)
-    {
-        registerCommonCore (ccore);
-    }
+    registerCore (core);
+
     return core;
 }
 
@@ -169,37 +173,25 @@ std::shared_ptr<Core> create (core_type type, const std::string &core_name, std:
 {
     auto core = makeCore (type, core_name);
     core->initialize (initializationString);
-    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
-    if (ccore)
-    {
-        registerCommonCore (ccore);
-    }
+    registerCore (core);
+
     return core;
 }
 
 std::shared_ptr<Core> create (core_type type, int argc, const char *const *argv)
 {
     auto core = makeCore (type, "");
-
-    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
-    if (ccore)
-    {
-        ccore->InitializeFromArgs (argc, argv);
-        registerCommonCore (ccore);
-    }
+    core->initializeFromArgs (argc, argv);
+    registerCore (core);
     return core;
 }
 
 std::shared_ptr<Core> create (core_type type, const std::string &core_name, int argc, const char *const *argv)
 {
     auto core = makeCore (type, core_name);
+    core->initializeFromArgs (argc, argv);
+    registerCore (core);
 
-    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
-    if (ccore)
-    {
-        ccore->InitializeFromArgs (argc, argv);
-        registerCommonCore (ccore);
-    }
     return core;
 }
 
@@ -213,19 +205,17 @@ FindOrCreate (core_type type, const std::string &core_name, const std::string &i
     }
     core = makeCore (type, core_name);
     core->initialize (initializationString);
-    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
-    if (ccore)
+
+    bool success = registerCore (core);
+    if (!success)
     {
-        bool success = registerCommonCore (ccore);
-        if (!success)
+        core = findCore (core_name);
+        if (core)
         {
-            core = findCore (core_name);
-            if (core)
-            {
-                return core;
-            }
+            return core;
         }
     }
+
     return core;
 }
 
@@ -239,20 +229,17 @@ FindOrCreate (core_type type, const std::string &core_name, int argc, const char
     }
     core = makeCore (type, core_name);
 
-    auto ccore = std::dynamic_pointer_cast<CommonCore> (core);
-    if (ccore)
+    core->initializeFromArgs (argc, argv);
+    bool success = registerCore (core);
+    if (!success)
     {
-        ccore->InitializeFromArgs (argc, argv);
-        bool success = registerCommonCore (ccore);
-        if (!success)
+        core = findCore (core_name);
+        if (core)
         {
-            core = findCore (core_name);
-            if (core)
-            {
-                return core;
-            }
+            return core;
         }
     }
+
     return core;
 }
 
@@ -280,14 +267,22 @@ bool isAvailable (core_type type)
         available = true;
         break;
     case core_type::TCP:
+        break;
     case core_type::UDP:
+        available = true;
         break;
     default:
-        assert (false);
+        break;
     }
 
     return available;
 }
+/** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
+ * loops*/
+static auto destroyerCallFirst = [](auto &core) {
+    core->processDisconnect (true);
+    core->joinAllThreads ();
+};
 
 /** so the problem this is addressing is that unregister can potentially cause a destructor to fire
 that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
@@ -295,11 +290,12 @@ can do the unregister operation and destroy itself meaning it is unable to join 
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be
 without issue*/
-static DelayedDestructor<CommonCore> delayedDestroyer;  //!< the object handling the delayed destruction
+static DelayedDestructor<CommonCore>
+  delayedDestroyer (destroyerCallFirst);  //!< the object handling the delayed destruction
 
 static SearchableObjectHolder<CommonCore> searchableObjects;  //!< the object managing the searchable objects
 
-std::shared_ptr<CommonCore> findCore (const std::string &name) { return searchableObjects.findObject (name); }
+std::shared_ptr<Core> findCore (const std::string &name) { return searchableObjects.findObject (name); }
 
 bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &ptr)
 {
@@ -324,27 +320,40 @@ bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &pt
         case core_type::INTERPROCESS:
         case core_type::IPC:
             return (dynamic_cast<IpcCore *> (ptr.get ()) != nullptr);
-        case core_type::TCP:
         case core_type::UDP:
+            return (dynamic_cast<UdpCore *> (ptr.get ()) != nullptr);
+        case core_type::TCP:
         default:
             return true;
         }
     }
     return false;
 }
+
 std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
 {
     return searchableObjects.findObject ([type](auto &ptr) { return isJoinableCoreOfType (type, ptr); });
 }
 
-bool registerCommonCore (std::shared_ptr<CommonCore> tcore)
+bool registerCore (std::shared_ptr<Core> core)
 {
+    bool res = false;
+    auto tcore = std::dynamic_pointer_cast<CommonCore> (std::move (core));
+    if (tcore)
+    {
+        res = searchableObjects.addObject (tcore->getIdentifier (), tcore);
+    }
     cleanUpCores ();
-    delayedDestroyer.addObjectsToBeDestroyed (tcore);
-    return searchableObjects.addObject (tcore->getIdentifier (), tcore);
+    if (res)
+    {
+        delayedDestroyer.addObjectsToBeDestroyed (tcore);
+    }
+    return res;
 }
 
 size_t cleanUpCores () { return delayedDestroyer.destroyObjects (); }
+
+size_t cleanUpCores (int delay) { return delayedDestroyer.destroyObjects (delay); }
 
 void copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {

@@ -12,9 +12,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define HELICS_SEARCHABLE_OBJECT_HOLDER_HPP_
 #pragma once
 
+#include <functional>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <thread>
 
 /** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
  * threading issues*/
@@ -27,16 +30,34 @@ class SearchableObjectHolder
 
   public:
     SearchableObjectHolder () = default;
+    SearchableObjectHolder (SearchableObjectHolder &&) noexcept = delete;
+    SearchableObjectHolder &operator= (SearchableObjectHolder &&) noexcept = delete;
     ~SearchableObjectHolder ()
     {
         std::unique_lock<std::mutex> lock (mapLock);
+        int cntr = 0;
         while (true)
         {
             if (!ObjectMap.empty ())
             {  // wait for the objectMap to be cleared
+                ++cntr;
                 lock.unlock ();
-                std::this_thread::sleep_for (std::chrono::milliseconds (50));
+                if (cntr % 2 == 0)
+                {
+                    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+                }
+                else
+                {
+                    std::this_thread::yield ();
+                }
+
                 lock.lock ();
+                if (cntr > 50)
+                {
+                    // give up after 5 seconds
+                    std::cerr << "object not clearing after global destruction force close\n";
+                    break;
+                }
             }
             else
             {

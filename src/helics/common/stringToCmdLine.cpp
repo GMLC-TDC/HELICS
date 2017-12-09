@@ -21,7 +21,7 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 
 #include "stringToCmdLine.h"
 
-std::vector<std::string> splitlineQuotes (const std::string &string);
+std::vector<std::string> splitlineQuotes (const std::string &line);
 
 std::string removeQuotes (const std::string &str);
 

@@ -8,60 +8,89 @@
 # For details, see the LICENSE file.
 # LLNS Copyright End
 
+if ( MSVC )
+    set(WERROR_FLAG "/W4 /WX")
+else( MSVC )
+set(WERROR_FLAG "-Werror")
+endif ( MSVC )
 
+set(TEST_CXX_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test_compiler_cxx)
 
-#check for clang 3.4 and the fact that CMAKE_CXX_STANDARD doesn't work yet for that compiler
+try_compile(OPTIONAL_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_optional.cpp )
 
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
-  set(HAVE_VARIABLE_TEMPLATES ON)
-  set(HAVE_EXP_STRING_VIEW ON)
-  set(HAVE_EXP_OPTIONAL ON)
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.5)
-	set(VERSION_OPTION -std=c++1y)
-  endif()
-  #clang doesn't work with C++17 if GCC is installed so we need to disable this for the time being 
-  #if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.9)
-#	set(HAVE_CLAMP ON)
-#	set(HAVE_HYPOT3 ON)
-#	set(HAVE_CONSTEXPR_IF ON)
-#	set(VERSION_OPTION -std=c++1z)
- # endif()
- # if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.0)
-#	set(HAVE_VARIANT ON)
-#	set(HAVE_STRING_VIEW ON)
-#	set(HAVE_CONSTEXPR_IF ON)
-#	set(HAVE_FALLTHROUGH ON)
-#	set(HAVE_OPTIONAL ON)
-#	set(HAVE_UNUSED ON)
-#	message(STATUS "gt 4.0 ${CMAKE_CXX_COMPILER_VERSION}")
-#  endif()
-elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-  set(HAVE_EXP_STRING_VIEW ON)
-  set(HAVE_EXP_OPTIONAL ON)
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.0)
-	set(HAVE_VARIABLE_TEMPLATES ON)
-  endif()
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
-	set(HAVE_VARIANT ON)
-	#set(HAVE_STRING_VIEW ON)
-	set(HAVE_CONSTEXPR_IF ON)
-	set(HAVE_FALLTHROUGH ON)
-	set(HAVE_UNUSED ON)
-	set(HAVE_CLAMP ON)
-	set(HAVE_HYPOT3 ON)
-	set(HAVE_OPTIONAL ON)
-	set(VERSION_OPTION -std=c++1z)
-  endif()
-elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-#intel doesn't really have anything beyond the minimum
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 17.0)
-  
-  endif()
-elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
-  message(STATUS "win_comp_version ${CMAKE_CXX_COMPILER_VERSION}")
-  set(HAVE_VARIABLE_TEMPLATES ON)
+try_compile(VARIANT_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_variant.cpp )
+
+try_compile(STRING_VIEW_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_string_view.cpp )
+
+try_compile(EXPERIMENTAL_STRING_VIEW_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_experimental_string_view.cpp )
+#try_compile(CLAMP_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_clamp.cpp  )
+#try_compile(HYPOT3_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_hypot3.cpp  )
+try_compile(IFCONSTEXPR_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_constexpr_if.cpp  )
+try_compile(FALLTHROUGH_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_fallthrough.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG})
+
+try_compile(VARIABLE_TEMPLATE_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_variable_template.cpp )
+
+try_compile(UNUSED_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_unused.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG} )
+
+try_compile(SHARED_TIMED_MUTEX_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_shared_timed_mutex.cpp)
+
+try_compile(SHARED_MUTEX_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_shared_mutex.cpp)
+#message(STATUS ${RESULT})
+if (OPTIONAL_AVAILABLE)
+set(HAVE_OPTIONAL 1)
 endif()
 
+if (EXPERIMENTAL_STRING_VIEW_AVAILABLE)
+set(HAVE_EXPERIMENTAL_STRING_VIEW 1)
+endif()
+
+if (VARIANT_AVAILABLE)
+set(HAVE_VARIANT 1)
+endif()
+
+if (STRING_VIEW_AVAILABLE)
+set(HAVE_STRING_VIEW 1)
+endif()
+
+if (CLAMP_AVAILABLE)
+set(HAVE_CLAMP 1)
+endif()
+
+if (HYPOT3_AVAILABLE)
+set(HAVE_HYPOT3 1)
+endif()
+
+if (IFCONSTEXPR_AVAILABLE)
+set(HAVE_IF_CONSTEXPR 1)
+endif()
+
+if (FALLTHROUGH_AVAILABLE)
+set(HAVE_FALLTHROUGH 1)
+endif()
+
+if (VARIABLE_TEMPLATE_AVAILABLE)
+set(HAVE_VARIABLE_TEMPLATE 1)
+endif()
+
+if (UNUSED_AVAILABLE)
+set(HAVE_UNUSED 1)
+endif()
+
+if (SHARED_TIMED_MUTEX_AVAILABLE)
+set(HAVE_SHARED_TIMED_MUTEX 1)
+endif()
+
+if (SHARED_MUTEX_AVAILABLE)
+set(HAVE_SHARED_MUTEX 1)
+endif()
+
+
+
 if (NOT NO_CONFIG_GENERATION)
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/libs/include/config.h)
+if (CONFIGURE_TARGET_LOCATION)
+CONFIGURE_FILE(${CMAKE_CURRENT_LIST_DIR}/compiler-config.h.in ${CONFIGURE_TARGET_LOCATION}/compiler-config.h)
+else()
+CONFIGURE_FILE(${CMAKE_CURRENT_LIST_DIR}/compiler-config.h.in ${PROJECT_BINARY_DIR}/compiler-config.h)
+endif()
+
 endif(NOT NO_CONFIG_GENERATION)

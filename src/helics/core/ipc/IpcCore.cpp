@@ -9,11 +9,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "IpcCore.h"
-#include "helics/config.h"
-#include "helics/core/core-data.h"
-#include "helics/core/core-exceptions.h"
-#include "helics/core/core.h"
-#include "helics/core/helics-time.h"
+#include "../core-data.h"
+#include "../core-exceptions.h"
+#include "../core.h"
+#include "../helics-time.h"
+#include "helics/helics-config.h"
 
 #include <algorithm>
 #include <cassert>
@@ -25,7 +25,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "IpcComms.h"
 
-#include "helics/core/argParser.h"
+#include "../argParser.h"
 #include <boost/filesystem.hpp>
 
 namespace helics
@@ -41,18 +41,11 @@ static const argDescriptors extraArgs{
 
 IpcCore::IpcCore () noexcept {}
 
-IpcCore::IpcCore (const std::string &core_name) : CommonCore (core_name) {}
+IpcCore::IpcCore (const std::string &core_name) : CommsBroker (core_name) {}
 
-IpcCore::~IpcCore ()
-{
-    haltOperations = true;
-    std::unique_lock<std::mutex> lock (dataMutex);
-    comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
-    lock.unlock ();
-    joinAllThreads ();
-}
+IpcCore::~IpcCore () = default;
 
-void IpcCore::InitializeFromArgs (int argc, const char *const *argv)
+void IpcCore::initializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == created)
@@ -75,7 +68,7 @@ void IpcCore::InitializeFromArgs (int argc, const char *const *argv)
             fileloc = vm["fileloc"].as<std::string> ();
         }
 
-        CommonCore::InitializeFromArgs (argc, argv);
+        CommonCore::initializeFromArgs (argc, argv);
     }
 }
 
@@ -99,33 +92,6 @@ bool IpcCore::brokerConnect ()
     comms = std::make_unique<IpcComms> (fileloc, brokerloc);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     return comms->connect ();
-}
-
-void IpcCore::brokerDisconnect ()
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
-    {
-        comms->disconnect ();
-    }
-}
-
-void IpcCore::transmit (int route_id, const ActionMessage &cmd)
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
-    {
-        comms->transmit (route_id, cmd);
-    }
-}
-
-void IpcCore::addRoute (int route_id, const std::string &routeInfo)
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
-    {
-        comms->addRoute (route_id, routeInfo);
-    }
 }
 
 std::string IpcCore::getAddress () const

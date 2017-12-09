@@ -12,9 +12,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_ZEROMQ_REQUEST_SETS_
 #pragma once
 
-#include "helics/common/cppzmq/zmq.hpp"
-#include "helics/common/zmqContextManager.h"
-#include "helics/core/ActionMessage.h"
+#include "../../common/cppzmq/zmq.hpp"
+#include "../../common/zmqContextManager.h"
+#include "../ActionMessage.h"
 #include "helics_includes/optional.h"
 #include <deque>
 #include <map>
@@ -31,6 +31,7 @@ class waitingResponse
     bool waiting = false;	//!< whether the response is waiting
     ActionMessage txmsg;	//!< the most recently sent message
 };
+
 /** class for dealing with the priority message paths from a ZMQ comm object
 @details it manages a set of routes to different priority queues and handles the responses
 THIS CLASS IS NOT THREAD SAFE- ZMQ sockets cannot be transferred between threads without special care so it would
@@ -58,7 +59,8 @@ class ZmqRequestSets
     bool hasMessages () const;
     /** get any messages that have been received*/
     stx::optional<ActionMessage> getMessage ();
-
+    /** close all the sockets*/
+    void close();
   private:
     /** check to send any messages that have been delayed waiting for a previous send*/
     void SendDelayedMessages ();

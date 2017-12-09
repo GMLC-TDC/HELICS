@@ -21,7 +21,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 ActionMessage::ActionMessage (action_message_def::action_t startingAction)
-    : action_ (startingAction), index (dest_handle), processingComplete (iterationComplete), name (payload)
+    : action_ (startingAction), index (dest_handle), name (payload)
 {
     if (hasInfo (startingAction))
     {
@@ -29,19 +29,25 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction)
     }
 }
 
+ActionMessage::ActionMessage (action_message_def::action_t action, int32_t sourceId, int32_t destId)
+    : ActionMessage (action)
+{
+    source_id = sourceId;
+    dest_id = destId;
+}
+
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
     : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
-      dest_handle (act.dest_handle), index (dest_handle), iterationComplete (act.iterationComplete),
-      processingComplete (iterationComplete), required (act.required), error (act.error), flag (act.flag),
-      actionTime (act.actionTime), payload (std::move (act.payload)), name (payload), info_ (std::move (act.info_))
+      dest_handle (act.dest_handle), index (dest_handle), counter (act.counter), flags (act.flags),
+      actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin), payload (std::move (act.payload)),
+      name (payload), info_ (std::move (act.info_))
 {
 }
 
 ActionMessage::ActionMessage (const ActionMessage &act)
     : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
-      dest_handle (act.dest_handle), index (dest_handle), iterationComplete (act.iterationComplete),
-      processingComplete (iterationComplete), required (act.required), error (act.error), flag (act.flag),
-      actionTime (act.actionTime), payload (act.payload), name (payload)
+      dest_handle (act.dest_handle), index (dest_handle), counter (act.counter), flags (act.flags),
+      actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin), payload (act.payload), name (payload)
 
 {
     if (act.info_)
@@ -51,8 +57,8 @@ ActionMessage::ActionMessage (const ActionMessage &act)
 }
 
 ActionMessage::ActionMessage (std::unique_ptr<Message> message)
-    : action_ (CMD_SEND_MESSAGE), index (dest_handle), processingComplete (iterationComplete),
-      actionTime (message->time), payload (std::move (message->data.m_data)), name (payload)
+    : action_ (CMD_SEND_MESSAGE), index (dest_handle), actionTime (message->time),
+      payload (std::move (message->data.m_data)), name (payload)
 {
     info_ = std::make_unique<AdditionalInfo> ();
     info_->source = std::move (message->src);
@@ -75,9 +81,11 @@ ActionMessage &ActionMessage::operator= (const ActionMessage &act)
     source_handle = act.source_handle;
     dest_id = act.dest_id;
     dest_handle = act.dest_handle;
-    iterationComplete = act.iterationComplete;
-    required = act.required;
+    counter = act.counter;
+    flags = act.flags;
     actionTime = act.actionTime;
+    Te = act.Te;
+    Tdemin = act.Tdemin;
     payload = act.payload;
 
     if (act.info_)
@@ -94,9 +102,11 @@ ActionMessage &ActionMessage::operator= (ActionMessage &&act) noexcept
     source_handle = act.source_handle;
     dest_id = act.dest_id;
     dest_handle = act.dest_handle;
-    iterationComplete = act.iterationComplete;
-    required = act.required;
+    counter = act.counter;
+    flags = act.flags;
     actionTime = act.actionTime;
+    Te = act.Te;
+    Tdemin = act.Tdemin;
     payload = std::move (act.payload);
     info_ = std::move (act.info_);
     return *this;
@@ -152,14 +162,25 @@ using archiver = cereal::PortableBinaryOutputArchive;
 
 using retriever = cereal::PortableBinaryInputArchive;
 
-void ActionMessage::toByteArray (char *data, size_t buffer_size) const
+int ActionMessage::toByteArray (char *data, size_t buffer_size) const
 {
+    if ((data == nullptr) || (buffer_size == 0))
+    {
+        return -1;
+    }
     boost::iostreams::basic_array_sink<char> sr (data, buffer_size);
     boost::iostreams::stream<boost::iostreams::basic_array_sink<char>> s (sr);
 
     archiver oa (s);
-
-    save (oa);
+    try
+    {
+        save (oa);
+        return static_cast<int> (boost::iostreams::seek (s, 0, std::ios_base::cur));
+    }
+    catch (const std::ios_base::failure &)
+    {
+        return -1;
+    }
 }
 
 std::string ActionMessage::to_string () const
@@ -222,7 +243,14 @@ void ActionMessage::fromByteArray (const char *data, size_t buffer_size)
     boost::iostreams::basic_array_source<char> device (data, buffer_size);
     boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
     retriever ia (s);
-    load (ia);
+    try
+    {
+        load (ia);
+    }
+    catch (const cereal::Exception &ce)
+    {
+        action_ = CMD_INVALID;
+    }
 }
 
 void ActionMessage::from_string (const std::string &data) { fromByteArray (data.data (), data.size ()); }
@@ -253,17 +281,13 @@ std::unique_ptr<Message> createMessage (ActionMessage &&cmd)
     return msg;
 }
 
-bool isPriorityCommand (const ActionMessage &command)
-{
-    return (command.action () < action_message_def::action_t::cmd_ignore);
-}
-
 constexpr char nullStr[] = "unknown";
 
 constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
   // priority commands
   {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
   {action_message_def::action_t::cmd_disconnect, "disconnect"},
+  {action_message_def::action_t::cmd_disconnect_name, "disconnect by name"},
   {action_message_def::action_t::cmd_fed_ack, "fed_ack"},
 
   {action_message_def::action_t::cmd_broker_ack, "broker_ack"},
@@ -277,7 +301,10 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_reg_broker, "reg_broker"},
 
   {action_message_def::action_t::cmd_ignore, "ignore"},
-
+  {action_message_def::action_t::cmd_tick, "tick"},
+  {action_message_def::action_t::cmd_ping, "ping"},
+  {action_message_def::action_t::cmd_ping_reply, "ping reply"},
+  {action_message_def::action_t::cmd_fed_configure, "fed_configure"},
   {action_message_def::action_t::cmd_init, "init"},
   {action_message_def::action_t::cmd_init_grant, "init_grant"},
   {action_message_def::action_t::cmd_init_not_ready, "init_not_ready"},
@@ -303,6 +330,8 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_remove_dependency, "remove_dependency"},
   {action_message_def::action_t::cmd_add_dependent, "add_dependent"},
   {action_message_def::action_t::cmd_remove_dependent, "remove_dependent"},
+  {action_message_def::action_t::cmd_add_interdependency, "add_interdependency"},
+  {action_message_def::action_t::cmd_remove_interdependency, "remove_interdependency"},
 
   {action_message_def::action_t::null_info_command, "null_info"},
   {action_message_def::action_t::priority_null_info_command, "priority_null_info"},
@@ -310,6 +339,7 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_send_message, "send_message"},
   {action_message_def::action_t::cmd_send_for_filter, "send_for_filter"},
   {action_message_def::action_t::cmd_send_for_filter_op, "send_for_filter_op"},
+  {action_message_def::action_t::cmd_send_for_filter_return, "send_for_filter_return"},
 
   {action_message_def::action_t::cmd_reg_pub, "reg_pub"},
   {action_message_def::action_t::cmd_notify_pub, "notify_pub"},
@@ -319,7 +349,6 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_notify_sub, "notify_sub"},
   {action_message_def::action_t::cmd_reg_src_filter, "reg_src_filter"},
   {action_message_def::action_t::cmd_notify_src_filter, "notify_src_filter"},
-  {action_message_def::action_t::cmd_src_filter_has_operator, "src_filter_has_operator"},
   {action_message_def::action_t::cmd_reg_end, "reg_end"},
   {action_message_def::action_t::cmd_notify_end, "notify_end"},
 
@@ -329,22 +358,23 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_protocol, "protocol"},
   {action_message_def::action_t::cmd_protocol_big, "protocol_big"}};
 
-constexpr size_t actEnd = sizeof (actionStrings) / sizeof (std::pair<action_message_def::action_t, const char *>);
+using actionPair = std::pair<action_message_def::action_t, const char *>;
+constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
 
-std::string actionMessageType (action_message_def::action_t action)
+const char *actionMessageType (action_message_def::action_t action)
 {
-    auto res = std::find_if (actionStrings, actionStrings + actEnd,
-                             [action](const auto &pt) { return (pt.first == action); });
-    if (res != actionStrings + actEnd)
+    auto pptr = static_cast<const actionPair *> (actionStrings);
+    auto res = std::find_if (pptr, pptr + actEnd, [action](const auto &pt) { return (pt.first == action); });
+    if (res != pptr + actEnd)
     {
-        return std::string (res->second);
+        return res->second;
     }
-    return std::string (nullStr);
+    return static_cast<const char *> (nullStr);
 }
 
 std::string prettyPrintString (const ActionMessage &command)
 {
-    std::string ret = actionMessageType (command.action ());
+    std::string ret (actionMessageType (command.action ()));
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -355,7 +385,7 @@ std::string prettyPrintString (const ActionMessage &command)
         ret.push_back (':');
         ret.append (command.name);
         ret.append ("--");
-        if (command.error)
+        if (CHECK_ACTION_FLAG (command, error_flag))
         {
             ret.append ("error");
         }
@@ -364,17 +394,31 @@ std::string prettyPrintString (const ActionMessage &command)
             ret.append (std::to_string (command.dest_id));
         }
         break;
+    case CMD_PUB:
+        ret.push_back (':');
+        ret.append ((boost::format ("From (%d) handle(%d) size %d at %f") % command.source_id %
+                     command.dest_handle % command.payload.size () % static_cast<double> (command.actionTime))
+                      .str ());
+        break;
     case CMD_REG_BROKER:
         ret.push_back (':');
         ret.append (command.name);
         break;
+    case CMD_TIME_GRANT:
+        ret.push_back (':');
+        ret.append ((boost::format ("From (%d) Granted Time(%f)") % command.source_id %
+                     static_cast<double> (command.actionTime))
+                      .str ());
+        break;
     case CMD_TIME_REQUEST:
         ret.push_back (':');
         ret.append ((boost::format ("From (%d) Time(%f, %f, %f)") % command.source_id %
-                     static_cast<double> (command.actionTime) % static_cast<double> (command.info ().Te) %
-                     static_cast<double> (command.info ().Tdemin))
+                     static_cast<double> (command.actionTime) % static_cast<double> (command.Te) %
+                     static_cast<double> (command.Tdemin))
                       .str ());
         break;
+    case CMD_FED_CONFIGURE:
+
     default:
         break;
     }

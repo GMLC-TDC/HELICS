@@ -49,8 +49,9 @@ public:
 	/** tell the context to free the pointer and leak the memory on delete
 	@details You may ask why, well in windows systems when operating in a DLL if this context is closed after certain other operations
 	that happen when the DLL is unlinked bad things can happen, and since in nearly all cases this happens at Shutdown leaking really doesn't matter that much
-	*/
-	static void setContextToLeakOnDelete(const std::string &contextName = "");
+	@return true if the context was found and the flag set, false otherwise
+    */
+	static bool setContextToLeakOnDelete(const std::string &contextName = "");
 	virtual ~zmqContextManager();
 
 	const std::string &getName() const

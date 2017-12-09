@@ -7,7 +7,7 @@ static char help[] = "Example to demonstrate the usage of HELICS C Interface wit
 #include <ValueFederate_c.h>
 #include <math.h>
 
-int main(int argc,char **argv)
+int main()
 {
   helics_federate_info_t fedinfo;
   const char*    helicsversion;
@@ -28,7 +28,7 @@ int main(int argc,char **argv)
   fedinfo = helicsFederateInfoCreate();
   
   /* Set Federate name */
-  status = helicsFederateInfoSetFederateName(fedinfo,"TestB Federate");
+  status = helicsFederateInfoSetFederateName(fedinfo,"Test receiver Federate");
 
   /* Set core type from string */
   status = helicsFederateInfoSetCoreTypeFromString(fedinfo,"zmq");
@@ -58,7 +58,7 @@ int main(int argc,char **argv)
   pub = helicsRegisterGlobalPublication(vfed,"testB","double","");
   printf("PI RECEIVER: Publication registered\n");
 
-
+  fflush(NULL);
   /* Enter initialization mode */
   status = helicsEnterInitializationMode(vfed);
   printf("PI RECEIVER: Entered initialization mode\n");
@@ -93,6 +93,11 @@ int main(int argc,char **argv)
   }
   status = helicsFinalize(vfed);
   printf("PI RECEIVER: Federate finalized\n");
-
+  fflush(NULL);
+  //clean upFederate;
+  helicsFreeFederate(vfed);
+  helicsCloseLibrary();
+  printf("PI RECEIVER: Library Closed\n");
+  fflush(NULL);
   return(0);
 }

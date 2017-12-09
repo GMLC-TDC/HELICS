@@ -8,29 +8,27 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "application_api/application_api.h"
-#include "core/BrokerFactory.h"
-#include "core/CoreFactory.h"
-#include "core/helics-time.h"
+#include "../common/logger.h"
+#include "../core/BrokerFactory.h"
+#include "../core/CoreFactory.h"
+#include "../helics.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"
 #include <atomic>
+#include <future>
 #include <memory>
 #include <mutex>
 #include <vector>
 
-#include "helics/config.h"
+#include "helics/helics-config.h"
 #if HELICS_HAVE_ZEROMQ > 0
-#include "helics/common/zmqContextManager.h"
+#include "../common/cppzmq/zmq.hpp"
+#include "../common/zmqContextManager.h"
 #endif
 
-static const std::string versionStr (std::to_string (HELICS_VERSION_MAJOR) + "." +
-                                     std::to_string (HELICS_VERSION_MINOR) + "." +
+static const std::string versionStr (std::to_string (HELICS_VERSION_MAJOR) + "." + std::to_string (HELICS_VERSION_MINOR) + "." +
                                      std::to_string (HELICS_VERSION_PATCH) + " (" + HELICS_DATE + ")");
 
-#if HELICS_HAVE_ZEROMQ > 0
-static std::atomic<bool> zmqInUse{false};
-#endif
 const char *helicsGetVersion (void) { return versionStr.c_str (); }
 
 helics_federate_info_t helicsFederateInfoCreate ()
@@ -80,15 +78,6 @@ helicsStatus helicsFederateInfoSetCoreType (helics_federate_info_t fi, int coret
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->coreType = static_cast<helics::core_type> (coretype);
-#if HELICS_HAVE_ZEROMQ > 0
-    if (hfi->coreType == helics::core_type::ZMQ)
-    {
-        if (!zmqInUse)
-        {
-            zmqContextManager::setContextToLeakOnDelete ();
-        }
-    }
-#endif
     return helicsOK;
 }
 
@@ -102,15 +91,6 @@ helicsStatus helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi,
     try
     {
         hfi->coreType = helics::coreTypeFromString (coretype);
-#if HELICS_HAVE_ZEROMQ > 0
-        if (hfi->coreType == helics::core_type::ZMQ)
-        {
-            if (!zmqInUse)
-            {
-                zmqContextManager::setContextToLeakOnDelete ();
-            }
-        }
-#endif
     }
     catch (const std::invalid_argument &ie)
     {
@@ -118,6 +98,7 @@ helicsStatus helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi,
     }
     return helicsOK;
 }
+
 helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int value)
 {
     if (fi == nullptr)
@@ -130,20 +111,23 @@ helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int
     case OBSERVER_FLAG:
         hfi->observer = (value != 0);
         break;
-    case ROLLBACK_FLAG:
-        hfi->rollback = (value != 0);
-        break;
     case UNINTERRUPTIBLE_FLAG:
         hfi->uninterruptible = (value != 0);
         break;
-    case FORWARD_COMPUTE_FLAG:
-        hfi->forwardCompute = (value != 0);
+    case ONLY_TRANSMIT_ON_CHANGE_FLAG:
+        hfi->only_transmit_on_change = (value != 0);
         break;
-    case TIME_AGNOSTIC_FLAG:
-        hfi->timeAgnostic = (value != 0);
+    case ONLY_UPDATE_ON_CHANGE_FLAG:
+        hfi->only_update_on_change = (value != 0);
         break;
     case SOURCE_ONLY_FLAG:
-        hfi->sourceOnly = (value != 0);
+        hfi->source_only = (value != 0);
+        break;
+    case ROLLBACK_FLAG:
+        hfi->rollback = (value != 0);
+        break;
+    case FORWARD_COMPUTE_FLAG:
+        hfi->forwardCompute = (value != 0);
         break;
     default:
         return helicsDiscard;
@@ -227,69 +211,37 @@ helicsStatus helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int 
 
 helics_core helicsCreateCore (const char *type, const char *name, const char *initString)
 {
-    auto *core = new helics::coreObject;
+    auto *core = new helics::CoreObject;
+    core->index = getMasterHolder ()->addCore (core);
     auto ct = helics::coreTypeFromString (type);
     core->coreptr = helics::CoreFactory::FindOrCreate (ct, name, initString);
-#if HELICS_HAVE_ZEROMQ > 0
-    if (ct == helics::core_type::ZMQ)
-    {
-        if (!zmqInUse)
-        {
-            zmqContextManager::setContextToLeakOnDelete ();
-        }
-    }
-#endif
     return reinterpret_cast<helics_core> (core);
 }
 
 helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, const char *const *argv)
 {
-    auto *core = new helics::coreObject;
+    auto *core = new helics::CoreObject;
+    core->index = getMasterHolder ()->addCore (core);
     auto ct = helics::coreTypeFromString (type);
     core->coreptr = helics::CoreFactory::FindOrCreate (ct, name, argc, argv);
-#if HELICS_HAVE_ZEROMQ > 0
-    if (ct == helics::core_type::ZMQ)
-    {
-        if (!zmqInUse)
-        {
-            zmqContextManager::setContextToLeakOnDelete ();
-        }
-    }
-#endif
     return reinterpret_cast<helics_core> (core);
 }
 
 helics_broker helicsCreateBroker (const char *type, const char *name, const char *initString)
 {
     auto broker = new helics::BrokerObject;
+    broker->index = getMasterHolder ()->addBroker (broker);
     auto ct = helics::coreTypeFromString (type);
     broker->brokerptr = helics::BrokerFactory::create (ct, name, initString);
-#if HELICS_HAVE_ZEROMQ > 0
-    if (ct == helics::core_type::ZMQ)
-    {
-        if (!zmqInUse)
-        {
-            zmqContextManager::setContextToLeakOnDelete ();
-        }
-    }
-#endif
     return reinterpret_cast<helics_broker> (broker);
 }
 
 helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, const char *const *argv)
 {
     auto *broker = new helics::BrokerObject;
+    broker->index = getMasterHolder ()->addBroker (broker);
     auto ct = helics::coreTypeFromString (type);
     broker->brokerptr = helics::BrokerFactory::create (ct, name, argc, argv);
-#if HELICS_HAVE_ZEROMQ > 0
-    if (ct == helics::core_type::ZMQ)
-    {
-        if (!zmqInUse)
-        {
-            zmqContextManager::setContextToLeakOnDelete ();
-        }
-    }
-#endif
     return reinterpret_cast<helics_broker> (broker);
 }
 
@@ -313,7 +265,7 @@ int helicsCoreIsConnected (helics_core core)
     {
         return 0;
     }
-    auto coreObj = reinterpret_cast<helics::coreObject *> (core);
+    auto coreObj = reinterpret_cast<helics::CoreObject *> (core);
     if (coreObj->coreptr)
     {
         return (coreObj->coreptr->isConnected ()) ? 1 : 0;
@@ -321,9 +273,72 @@ int helicsCoreIsConnected (helics_core core)
     return 0;
 }
 
-void helicsFreeCore (helics_core core) { delete reinterpret_cast<helics::coreObject *> (core); }
+void helicsFreeCore (helics_core core)
+{
+    auto *coreObj = reinterpret_cast<helics::CoreObject *> (core);
+    if (coreObj != nullptr)
+    {
+        getMasterHolder ()->clearCore (coreObj->index);
+        delete coreObj;
+    }
+    helics::CoreFactory::cleanUpCores ();
+}
 
-void helicsFreeBroker (helics_broker broker) { delete reinterpret_cast<helics::BrokerObject *> (broker); }
+void helicsFreeBroker (helics_broker broker)
+{
+    auto *brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
+    if (brokerObj != nullptr)
+    {
+        getMasterHolder ()->clearBroker (brokerObj->index);
+        delete brokerObj;
+    }
+    helics::BrokerFactory::cleanUpBrokers ();
+}
+
+void helicsFreeFederate (helics_federate fed)
+{
+    auto *fedObj = reinterpret_cast<helics::FedObject *> (fed);
+    if (fedObj != nullptr)
+    {
+        getMasterHolder ()->clearFed (fedObj->index);
+        delete fedObj;
+    }
+
+    helics::CoreFactory::cleanUpCores ();
+}
+
+helics::FedObject::~FedObject ()
+{
+    for (auto sub : subs)
+    {
+        delete sub;
+    }
+    for (auto pub : pubs)
+    {
+        delete pub;
+    }
+    for (auto ept : epts)
+    {
+        delete ept;
+    }
+    fedptr = nullptr;
+}
+
+void helicsCloseLibrary ()
+{
+    clearAllObjects ();
+    auto ret = std::async (std::launch::async, []() { helics::CoreFactory::cleanUpCores (2000); });
+    helics::BrokerFactory::cleanUpBrokers (2000);
+    ret.get ();
+#if HELICS_HAVE_ZEROMQ > 0
+    if (zmqContextManager::setContextToLeakOnDelete ())
+    {
+        zmqContextManager::getContext ().close ();
+    }
+
+#endif
+    helics::loggerManager::closeLogger ();
+}
 
 helics_query helicsCreateQuery (const char *target, const char *query)
 {

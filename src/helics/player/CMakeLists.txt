@@ -23,20 +23,17 @@ set(RECORDER_INCLUDE_FILES
 
 )
 
-OPTION(BUILD_PLAYER "Build a helics player" ON)
-
 if (BUILD_PLAYER)
 add_executable(helics_player ${PLAYER_SRC_FILES} ${PLAYER_INCLUDE_FILES})
-target_link_libraries(helics_player helics)
-target_link_libraries(helics_player ${external_library_list})
+target_link_libraries(helics_player helics-static)
+
 endif()
 
-OPTION(BUILD_RECORDER "Build a helics recorder" ON)
 
 if (BUILD_RECORDER)
 add_executable(helics_recorder ${RECORDER_SRC_FILES} ${RECORDER_INCLUDE_FILES})
-target_link_libraries(helics_recorder helics)
-target_link_libraries(helics_recorder ${external_library_list})
+target_link_libraries(helics_recorder helics-static)
+
 endif()
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})

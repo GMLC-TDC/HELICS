@@ -31,15 +31,13 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     BOOST_CHECK_EQUAL (fs->getInfo ().impactWindow, helics::Time::zeroVal ());
     BOOST_CHECK_EQUAL (fs->getInfo ().period, helics::Time::zeroVal ());
     BOOST_CHECK_EQUAL (fs->getInfo ().observer, false);
-    BOOST_CHECK_EQUAL (fs->getInfo ().uninteruptible, false);
-    BOOST_CHECK_EQUAL (fs->getInfo ().time_agnostic, false);
+    BOOST_CHECK_EQUAL (fs->getInfo ().uninterruptible, false);
     BOOST_CHECK_EQUAL (fs->getInfo ().source_only, false);
-    BOOST_CHECK_EQUAL (fs->getInfo ().filter_only, false);
 
     // Check other default state values
     BOOST_CHECK_EQUAL (fs->getQueueSize (), 0);
     BOOST_CHECK_EQUAL (fs->getEvents ().size (), 0);
-    BOOST_CHECK_EQUAL (fs->getFilterQueueSize (), 0);
+
     // BOOST_CHECK_EQUAL(fs->message_queue.size(), 0);
     // BOOST_CHECK_EQUAL(fs->dependencies.size(), 0);
     BOOST_CHECK_EQUAL (fs->getDependents ().size (), 0);
@@ -74,28 +72,28 @@ BOOST_AUTO_TEST_CASE (create_subscription_test)
     BOOST_CHECK_EQUAL (info->id, 0);
 
     info = fs->getSubscription (0);
-    BOOST_CHECK (info->key.compare ("first!") == 0);
+    BOOST_CHECK_EQUAL (info->key, "first!");
 
     // Check second subscription
     info = fs->getSubscription ("second");
     BOOST_CHECK_EQUAL (info->id, 1);
 
     info = fs->getSubscription (1);
-    BOOST_CHECK (info->key.compare ("second") == 0);
+    BOOST_CHECK_EQUAL (info->key, "second");
 
     // Check the out of order subscription
     info = fs->getSubscription ("cut-in-line");
     BOOST_CHECK_EQUAL (info->id, 2);
 
     info = fs->getSubscription (2);
-    BOOST_CHECK (info->key.compare ("cut-in-line") == 0);
+    BOOST_CHECK_EQUAL (info->key, "cut-in-line");
 
     // Check the displaced (last) subscription
     info = fs->getSubscription ("last");
     BOOST_CHECK_EQUAL (info->id, 3);
 
     info = fs->getSubscription (3);
-    BOOST_CHECK (info->key.compare ("last") == 0);
+    BOOST_CHECK_EQUAL (info->key, "last");
 }
 
 BOOST_AUTO_TEST_CASE (create_publication_test)
@@ -112,28 +110,28 @@ BOOST_AUTO_TEST_CASE (create_publication_test)
     BOOST_CHECK_EQUAL (info->id, 0);
 
     info = fs->getPublication (0);
-    BOOST_CHECK (info->key.compare ("first!") == 0);
+    BOOST_CHECK_EQUAL (info->key, "first!");
 
     // Check second publication
     info = fs->getPublication ("second");
     BOOST_CHECK_EQUAL (info->id, 1);
 
     info = fs->getPublication (1);
-    BOOST_CHECK (info->key.compare ("second") == 0);
+    BOOST_CHECK_EQUAL (info->key, "second");
 
     // Check the out of order publication
     info = fs->getPublication ("cut-in-line");
     BOOST_CHECK_EQUAL (info->id, 2);
 
     info = fs->getPublication (2);
-    BOOST_CHECK (info->key.compare ("cut-in-line") == 0);
+    BOOST_CHECK_EQUAL (info->key, "cut-in-line");
 
     // Check the displaced (last) publication
     info = fs->getPublication ("last");
     BOOST_CHECK_EQUAL (info->id, 3);
 
     info = fs->getPublication (3);
-    BOOST_CHECK (info->key.compare ("last") == 0);
+    BOOST_CHECK_EQUAL (info->key, "last");
 }
 
 BOOST_AUTO_TEST_CASE (create_endpoint_test)
@@ -150,104 +148,28 @@ BOOST_AUTO_TEST_CASE (create_endpoint_test)
     BOOST_CHECK_EQUAL (info->id, 0);
 
     info = fs->getEndpoint (0);
-    BOOST_CHECK (info->key.compare ("first!") == 0);
+    BOOST_CHECK_EQUAL (info->key, "first!");
 
     // Check second endpoint
     info = fs->getEndpoint ("second");
     BOOST_CHECK_EQUAL (info->id, 1);
 
     info = fs->getEndpoint (1);
-    BOOST_CHECK (info->key.compare ("second") == 0);
+    BOOST_CHECK_EQUAL (info->key, "second");
 
     // Check the out of order endpoint
     info = fs->getEndpoint ("cut-in-line");
     BOOST_CHECK_EQUAL (info->id, 2);
 
     info = fs->getEndpoint (2);
-    BOOST_CHECK (info->key.compare ("cut-in-line") == 0);
+    BOOST_CHECK_EQUAL (info->key, "cut-in-line");
 
     // Check the displaced (last) endpoint
     info = fs->getEndpoint ("last");
     BOOST_CHECK_EQUAL (info->id, 3);
 
     info = fs->getEndpoint (3);
-    BOOST_CHECK (info->key.compare ("last") == 0);
-}
-
-BOOST_AUTO_TEST_CASE (create_sourcefilter_test)
-{
-    fs->createSourceFilter (0, "first!", "target", "type");
-    fs->createSourceFilter (1, "second", "target", "type");
-    fs->createSourceFilter (3, "last", "target", "type");
-    fs->createSourceFilter (2, "cut-in-line", "target", "type");
-
-    helics::FilterInfo *info;
-
-    // Check first filter
-    info = fs->getFilter ("first!");
-    BOOST_CHECK_EQUAL (info->id, 0);
-
-    info = fs->getFilter (0);
-    BOOST_CHECK (info->key.compare ("first!") == 0);
-
-    // Check second filter
-    info = fs->getFilter ("second");
-    BOOST_CHECK_EQUAL (info->id, 1);
-
-    info = fs->getFilter (1);
-    BOOST_CHECK (info->key.compare ("second") == 0);
-
-    // Check the out of order filter
-    info = fs->getFilter ("cut-in-line");
-    BOOST_CHECK_EQUAL (info->id, 2);
-
-    info = fs->getFilter (2);
-    BOOST_CHECK (info->key.compare ("cut-in-line") == 0);
-
-    // Check the displaced (last) filter
-    info = fs->getFilter ("last");
-    BOOST_CHECK_EQUAL (info->id, 3);
-
-    info = fs->getFilter (3);
-    BOOST_CHECK (info->key.compare ("last") == 0);
-}
-
-BOOST_AUTO_TEST_CASE (create_destfilter_test)
-{
-    fs->createDestFilter (0, "first!", "target", "type");
-    fs->createDestFilter (1, "second", "target", "type");
-    fs->createDestFilter (3, "last", "target", "type");
-    fs->createDestFilter (2, "cut-in-line", "target", "type");
-
-    helics::FilterInfo *info;
-
-    // Check first filter
-    info = fs->getFilter ("first!");
-    BOOST_CHECK_EQUAL (info->id, 0);
-
-    info = fs->getFilter (0);
-    BOOST_CHECK (info->key.compare ("first!") == 0);
-
-    // Check second filter
-    info = fs->getFilter ("second");
-    BOOST_CHECK_EQUAL (info->id, 1);
-
-    info = fs->getFilter (1);
-    BOOST_CHECK (info->key.compare ("second") == 0);
-
-    // Check the out of order filter
-    info = fs->getFilter ("cut-in-line");
-    BOOST_CHECK_EQUAL (info->id, 2);
-
-    info = fs->getFilter (2);
-    BOOST_CHECK (info->key.compare ("cut-in-line") == 0);
-
-    // Check the displaced (last) filter
-    info = fs->getFilter ("last");
-    BOOST_CHECK_EQUAL (info->id, 3);
-
-    info = fs->getFilter (3);
-    BOOST_CHECK (info->key.compare ("last") == 0);
+    BOOST_CHECK_EQUAL (info->key, "last");
 }
 
 BOOST_AUTO_TEST_CASE (basic_processmessage_test)
@@ -255,25 +177,25 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     using namespace helics;
     ActionMessage cmd;
 
-    // Test returning when the init state is entered
+    // Test returning when the initialization state is entered
     cmd.setAction (helics::CMD_INIT_GRANT);
     auto fs_process = std::async (std::launch::async, [&]() { return fs->enterInitState (); });
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_CREATED);
     fs->addAction (cmd);
     fs_process.wait ();
-    BOOST_CHECK (fs_process.get () == convergence_state::complete);
+    BOOST_CHECK (fs_process.get () == iteration_result::next_step);
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_INITIALIZING);
 
     // Test returning when the finished state is entered
     cmd.setAction (helics::CMD_STOP);
-    auto fs_process2 =
-      std::async (std::launch::async, [&]() { return fs->enterExecutingState (convergence_state::complete); });
+    auto fs_process2 = std::async (std::launch::async,
+                                   [&]() { return fs->enterExecutingState (iteration_request::no_iterations); });
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_INITIALIZING);
     fs->addAction (cmd);
     fs->global_id = 0;  // if it doesn't match the id in the command, this will hang
     fs_process2.wait ();
     fs->global_id = helics::invalid_fed_id;
-    BOOST_CHECK (fs_process2.get () == convergence_state::halted);
+    BOOST_CHECK (fs_process2.get () == iteration_result::halted);
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_FINISHED);
 
     // Return to created state
@@ -283,21 +205,21 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     cmd.setAction (helics::CMD_FED_ACK);
     cmd.dest_id = 22;
     cmd.name = "fed_name";
-    cmd.error = false;
+    CLEAR_ACTION_FLAG (cmd, error_flag);
     fs_process = std::async (std::launch::async, [&]() { return fs->waitSetup (); });
     fs->addAction (cmd);
     fs_process.wait ();
-    BOOST_CHECK (fs_process.get () == convergence_state::complete);
+    BOOST_CHECK (fs_process.get () == iteration_result::next_step);
     BOOST_CHECK_EQUAL (fs->global_id, 22);
 
     // Test CMD_FED_ACK message with an error
     cmd.setAction (helics::CMD_FED_ACK);
     cmd.dest_id = 23;
-    cmd.error = true;
+    SET_ACTION_FLAG (cmd, error_flag);
     fs_process = std::async (std::launch::async, [&]() { return fs->waitSetup (); });
     fs->addAction (cmd);
     fs_process.wait ();
-    BOOST_CHECK (fs_process.get () == convergence_state::error);
+    BOOST_CHECK (fs_process.get () == iteration_result::error);
     BOOST_CHECK_EQUAL (fs->global_id, 22);
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_ERROR);
 
@@ -306,12 +228,12 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
 
     // Test returning when an error occurs
     cmd.setAction (helics::CMD_ERROR);
-    fs_process2 =
-      std::async (std::launch::async, [&]() { return fs->enterExecutingState (convergence_state::complete); });
+    fs_process2 = std::async (std::launch::async,
+                              [&]() { return fs->enterExecutingState (iteration_request::no_iterations); });
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_INITIALIZING);
     fs->addAction (cmd);
     fs_process2.wait ();
-    BOOST_CHECK (fs_process2.get () == convergence_state::error);
+    BOOST_CHECK (fs_process2.get () == iteration_result::error);
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_ERROR);
 
     fs->reset ();

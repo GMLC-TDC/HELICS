@@ -9,8 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "MessageFederate.h"
+#include "../core/core.h"
 #include "MessageFederateManager.h"
-#include "core/core.h"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4702)
@@ -63,6 +63,12 @@ MessageFederate &MessageFederate::operator= (MessageFederate &&mFed) noexcept
 
 MessageFederate::~MessageFederate () = default;
 
+void MessageFederate::disconnect ()
+{
+    Federate::disconnect ();
+    mfManager->disconnect ();
+}
+
 void MessageFederate::updateTime (Time newTime, Time oldTime) { mfManager->updateTime (newTime, oldTime); }
 
 void MessageFederate::StartupToInitializeStateTransition () { mfManager->StartupToInitializeStateTransition (); }
@@ -108,8 +114,10 @@ void MessageFederate::registerInterfaces (const std::string &jsonString)
     }
     else
     {
-        Json_helics::Reader stringReader;
-        bool ok = stringReader.parse (jsonString, doc, false);
+        Json_helics::CharReaderBuilder rbuilder;
+        std::string errs;
+        std::istringstream jstring (jsonString);
+        bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
         if (!ok)
         {
             // should I throw an error here?

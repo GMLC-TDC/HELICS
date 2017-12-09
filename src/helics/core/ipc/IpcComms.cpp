@@ -9,8 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "IpcComms.h"
+#include "../ActionMessage.h"
 #include "IpcQueueHelper.h"
-#include "helics/core/ActionMessage.h"
 #include <algorithm>
 #include <cctype>
 #include <memory>
@@ -23,7 +23,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 using ipc_queue = boost::interprocess::message_queue;
 using ipc_state = boost::interprocess::shared_memory_object;
-namespace ipc = boost::interprocess;
 
 namespace helics
 {
@@ -52,15 +51,42 @@ void IpcComms::queue_rx_function ()
     bool operating = false;
     while (true)
     {
-        ActionMessage cmd = rxQueue.getMessage ();
-        if ((cmd.action () == CMD_PROTOCOL) || (cmd.action () == CMD_PROTOCOL_BIG))
+        auto bc = ipcbackchannel.load ();
+
+        switch (bc)
         {
-            if (cmd.index == CLOSE_RECEIVER)
+        case IPC_BACKCHANNEL_DISCONNECT:
+            ipcbackchannel = 0;
+            goto DISCONNECT_RX_QUEUE;
+        case IPC_BACKCHANNEL_TRY_RESET:
+            connected = rxQueue.connect (localTarget_, maxMessageCount_, maxMessageSize_);
+            if (!connected)
+            {
+                disconnecting = true;
+                ActionMessage err (CMD_ERROR);
+                err.payload = rxQueue.getError ();
+                ActionCallback (std::move (err));
+                rx_status = connection_status::error;  // the connection has failed
+                rxQueue.changeState (queue_state_t::closing);
+                ipcbackchannel = 0;
+                return;
+            }
+            ipcbackchannel = 0;
+            break;
+        }
+        auto cmdopt = rxQueue.getMessage (2000);
+        if (!cmdopt)
+        {
+            continue;
+        }
+        if (isProtocolCommand (*cmdopt))
+        {
+            if (cmdopt->index == CLOSE_RECEIVER)
             {
                 disconnecting = true;
                 break;
             }
-            if (cmd.index == SET_TO_OPERATING)
+            if (cmdopt->index == SET_TO_OPERATING)
             {
                 if (!operating)
                 {
@@ -70,7 +96,7 @@ void IpcComms::queue_rx_function ()
             }
             continue;
         }
-        if (cmd.action () == CMD_INIT_GRANT)
+        if (cmdopt->action () == CMD_INIT_GRANT)
         {
             if (!operating)
             {
@@ -78,10 +104,17 @@ void IpcComms::queue_rx_function ()
                 operating = true;
             }
         }
-        ActionCallback (std::move (cmd));
+        ActionCallback (std::move (*cmdopt));
     }
-
-    rxQueue.changeState (queue_state_t::closing);
+DISCONNECT_RX_QUEUE:
+    try
+    {
+        rxQueue.changeState (queue_state_t::closing);
+    }
+    catch (boost::interprocess::interprocess_exception const &ipe)
+    {
+        std::cerr << "error changing states" << std::endl;
+    }
     rx_status = connection_status::terminated;
 }
 
@@ -129,11 +162,28 @@ void IpcComms::queue_tx_function ()
     bool conn = rxQueue.connect (localTarget_, false, 0);
     if (!conn)
     {
-        ActionMessage err (CMD_ERROR);
-        err.payload = std::string ("Unable to open receiver connection ->") + brokerQueue.getError ();
-        ActionCallback (std::move (err));
-        tx_status = connection_status::error;
-        return;
+        /** lets try a reset of the receiver*/
+        ipcbackchannel = IPC_BACKCHANNEL_TRY_RESET;
+        while (ipcbackchannel != 0)
+        {
+            if (rx_status != connection_status::connected)
+            {
+                break;
+            }
+            std::this_thread::sleep_for (std::chrono::milliseconds (100));
+        }
+        if (rx_status == connection_status::connected)
+        {
+            conn = rxQueue.connect (localTarget_, false, 0);
+        }
+        if (!conn)
+        {
+            ActionMessage err (CMD_ERROR);
+            err.payload = std::string ("Unable to open receiver connection ->") + brokerQueue.getError ();
+            ActionCallback (std::move (err));
+            tx_status = connection_status::error;
+            return;
+        }
     }
 
     tx_status = connection_status::connected;
@@ -143,7 +193,7 @@ void IpcComms::queue_tx_function ()
         int route_id;
         ActionMessage cmd;
         std::tie (route_id, cmd) = txQueue.pop ();
-        if ((cmd.action () == CMD_PROTOCOL) || (cmd.action () == CMD_PROTOCOL_PRIORITY))
+        if (isProtocolCommand (cmd))
         {
             if (route_id == -1)
             {
@@ -206,13 +256,6 @@ DISCONNECT_TX_QUEUE:
     tx_status = connection_status::terminated;
 }
 
-void IpcComms::closeTransmitter ()
-{
-    ActionMessage rt (CMD_PROTOCOL);
-    rt.index = DISCONNECT;
-    transmit (-1, rt);
-}
-
 void IpcComms::closeReceiver ()
 {
     if ((rx_status == connection_status::error) || (rx_status == connection_status::terminated))
@@ -238,9 +281,11 @@ void IpcComms::closeReceiver ()
         {
             if (!disconnecting)
             {
-                std::cerr << "unable to send close message\n";
+                ipcbackchannel.store (IPC_BACKCHANNEL_DISCONNECT);
+                //  std::cerr << "unable to send close message::" << ipe.what () << std::endl;
             }
         }
     }
 }
+
 }  // namespace helics

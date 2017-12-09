@@ -10,7 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "helicsTypes.hpp"
-#include "application_api/ValueConverter.hpp"
+#include "ValueConverter.hpp"
 #include <map>
 #include <regex>
 #include <boost/algorithm/string/trim.hpp>
@@ -24,7 +24,7 @@ static const std::string stringString ("string");
 static const std::string complexString ("complex");
 static const std::string doubleVecString ("double_vector");
 static const std::string complexVecString ("complex_vector");
-static const std::string nullString ("");
+static const std::string nullString;
 
 const std::string &typeNameStringRef (helicsType_t type)
 {
@@ -53,15 +53,7 @@ std::string helicsComplexString (double real, double imag)
     ss << real;
     if (imag != 0.0)
     {
-        if (imag >= 0.0)
-        {
-            ss << '+' << imag;
-        }
-        else
-        {
-            ss << imag;
-        }
-        ss << 'j';
+        ss << ((imag >= 0.0) ? '+' : ' ') << imag << 'j';
     }
     return ss.str ();
 }
@@ -81,6 +73,14 @@ static const std::map<std::string, helicsType_t> typeMap{
   {"int", helicsType_t::helicsInt},
   {"int64", helicsType_t::helicsInt},
   {"complex_vector", helicsType_t::helicsComplexVector},
+  {"d", helicsType_t::helicsDouble},
+  {"s", helicsType_t::helicsString},
+  {"f", helicsType_t::helicsDouble},
+  {"v", helicsType_t::helicsVector},
+  {"c", helicsType_t::helicsComplex},
+  {"i", helicsType_t::helicsInt},
+  {"i64", helicsType_t::helicsInt},
+  {"cv", helicsType_t::helicsComplexVector},
 };
 
 helicsType_t getTypeFromString (const std::string &typeName)
@@ -384,7 +384,7 @@ data_block typeConvert (helicsType_t type, int64_t val)
     }
     case helicsType_t::helicsVector:
     {
-        double v2 = static_cast<double> (val);
+        auto v2 = static_cast<double> (val);
         return ValueConverter<double>::convert (&v2, 1);
     }
     }
@@ -546,10 +546,10 @@ data_block typeConvert (helicsType_t type, const std::vector<std::complex<double
     {
         std::vector<double> DV;
         DV.reserve (val.size () * 2);
-        for (size_t ii = 0; ii < val.size (); ++ii)
+        for (auto &vali : val)
         {
-            DV.push_back (val[ii].real ());
-            DV.push_back (val[ii].imag ());
+            DV.push_back (vali.real ());
+            DV.push_back (vali.imag ());
         }
         return ValueConverter<std::vector<double>>::convert (DV);
     }

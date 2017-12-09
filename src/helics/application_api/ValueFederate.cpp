@@ -9,8 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "ValueFederate.h"
+#include "../core/core.h"
 #include "ValueFederateManager.h"
-#include "core/core.h"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -49,6 +49,12 @@ ValueFederate::ValueFederate (bool /*res*/)
 ValueFederate::ValueFederate (ValueFederate &&fed) noexcept = default;
 
 ValueFederate::~ValueFederate () = default;
+
+void ValueFederate::disconnect ()
+{
+    Federate::disconnect ();
+    vfManager->disconnect ();
+}
 
 ValueFederate &ValueFederate::operator= (ValueFederate &&fed) noexcept
 {
@@ -134,8 +140,10 @@ void ValueFederate::registerInterfaces (const std::string &jsonString)
     }
     else
     {
-        Json_helics::Reader stringReader;
-        bool ok = stringReader.parse (jsonString, doc, false);
+        Json_helics::CharReaderBuilder rbuilder;
+        std::string errs;
+        std::istringstream jstring (jsonString);
+        bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
         if (!ok)
         {
             // should I throw an error here?

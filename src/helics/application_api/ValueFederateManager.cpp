@@ -18,6 +18,12 @@ ValueFederateManager::ValueFederateManager (std::shared_ptr<Core> &coreOb, Core:
 }
 ValueFederateManager::~ValueFederateManager () = default;
 
+void ValueFederateManager::disconnect ()
+{
+    // checks for the calls are handled in the MessageFederate itself
+    coreObject = nullptr;
+}
+
 static const std::map<std::string, int> typeSizes = {
   {"char", 2},      {"uchar", 2},     {"block_4", 5},  {"block_8", 9},   {"block_12", 13}, {"block_16", 17},
   {"block_20", 24}, {"block_24", 30}, {"double", 9},   {"float", 5},     {"int32", 5},     {"uint32", 5},
@@ -124,6 +130,7 @@ data_view ValueFederateManager::getValue (subscription_id_t id)
     {
         std::lock_guard<std::mutex> sublock (subscription_mutex);
         subs[id.value ()].lastQuery = CurrentTime;
+        subs[id.value ()].hasUpdate = false;
         return lastData[id.value ()];
     }
     else
@@ -162,7 +169,7 @@ bool ValueFederateManager::queryUpdate (subscription_id_t sub_id) const
     if (sub_id.value () < subs.size ())
     {
         std::lock_guard<std::mutex> sublock (subscription_mutex);
-        return subs[sub_id.value ()].lastQuery < subs[sub_id.value ()].lastUpdate;
+        return subs[sub_id.value ()].hasUpdate;
     }
     return false;
 }
@@ -195,6 +202,7 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             // move the data into the container
             lastData[subIndex] = std::move (data);
             subs[subIndex].lastUpdate = CurrentTime;
+            subs[subIndex].hasUpdate = true;
             if (subs[subIndex].callbackIndex >= 0)
             {
                 // first copy the callback in case it gets changed via another operation
@@ -235,7 +243,7 @@ std::vector<subscription_id_t> ValueFederateManager::queryUpdates ()
     std::lock_guard<std::mutex> sublock (subscription_mutex);
     for (auto &sub : subs)
     {
-        if (sub.lastUpdate > sub.lastQuery)
+        if (sub.hasUpdate)
         {
             updates.push_back (sub.id);
         }

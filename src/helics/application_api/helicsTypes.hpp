@@ -13,13 +13,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #pragma once
 #include <complex>
 #include <cstdint>
+#include <limits>
 #include <string>
 #include <typeinfo>
 #include <vector>
 
-#include "helics/core/core-data.h"
+#include "../core/core-data.h"
 /** @file
-@details basic type information and control for helicss
+@details basic type information and control for HELICS
 */
 namespace helics
 {
@@ -290,6 +291,12 @@ constexpr bool isConvertableType<float> ()
 }
 
 template <>
+constexpr bool isConvertableType<long double> ()
+{
+    return true;
+}
+
+template <>
 constexpr bool isConvertableType<int> ()
 {
     return true;
@@ -317,6 +324,31 @@ template <>
 constexpr bool isConvertableType<uint64_t> ()
 {
     return true;
+}
+
+/** generate an invalid value for the various types*/
+template <class X>
+X invalidValue ()
+{
+    return X ();
+}
+
+template <>
+constexpr double invalidValue<double> ()
+{
+    return -1e48;
+}
+
+template <>
+constexpr uint64_t invalidValue<uint64_t> ()
+{
+    return std::numeric_limits<uint64_t>::max ();
+}
+
+template <>
+constexpr std::complex<double> invalidValue<std::complex<double>> ()
+{
+    return std::complex<double> (-1e48, 0.0);
 }
 
 }  // namespace helics

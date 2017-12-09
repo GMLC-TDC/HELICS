@@ -11,10 +11,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_FEDERATE_API_
 #pragma once
 
-#include "helics/config.h"
-#include "helics/core/helics-time.h"
+#include "helics/helics-config.h"
+#include "../core/helics-time.h"
 #include "helics_includes/string_view.h"
 
+#include "helicsTypes.hpp"
+
+#include "../core/coreFederateInfo.h"
+#include "../flag-definitions.h"
 #include <atomic>
 #include <string>
 
@@ -31,32 +35,19 @@ namespace helics
 {
 class Core;
 class asyncFedCallInfo;
+class MessageOperator;
 /** data class defining federate properties and information
  */
-class FederateInfo
+class FederateInfo: public CoreFederateInfo
 {
   public:
     std::string name;  //!< federate name
-    bool observer =
-      false;  //!< indicator that the federate is an observer and doesn't participate in time advancement
+    
     bool rollback = false;  //!< indicator that the federate has rollback features
-    bool timeAgnostic = false;  //!< indicator that the federate doesn't use time
     bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must
                                   //! support rollback if set to true]
-    bool uninterruptible =
-      false;  //!< indicator that the time request cannot return something other than the requested time
-    bool sourceOnly = false;  //!< indicator that the federate is a source only
-    int32_t max_iterations = 10;  //!< the maximum number of iteration cycles a federate should execute
-    int32_t logLevel =
-      1;  //!< the logging level for the federate (-1: none, 0: error, 1:warning,2:normal,3:debug,4:trace)
     core_type coreType;  //!< the type of the core
     std::string coreName;  //!< the name of the core
-    Time timeDelta = timeZero;  //!< the minimum time between granted time requests
-    Time lookAhead = timeZero;  //!< the lookahead value
-    Time impactWindow = timeZero;  //!< the impact window
-    Time period = timeZero;  //!< the periodicity of the Federate granted time can only come on integer multipliers
-                             //!< of the period
-    Time offset = timeZero;  //!< the offset to the time period
     std::string coreInitString;  //!< an initialization string for the core API object
 
     /** default constructor*/
@@ -68,10 +59,15 @@ class FederateInfo
         : name (std::move (fedname)), coreType (cType){};
 };
 
+
+/** get a string with the helics version info*/
 std::string getHelicsVersionString();
 
+/** get the major version number*/
 int getHelicsVersionMajor();
+/** get the minor version number*/
 int getHelicsVersionMinor();
+/** get the patch version number*/
 int getHelicsVersionPatch();
 
 class Core;
@@ -113,7 +109,7 @@ class Federate
     @param[in] fi  a federate information structure
     */
     Federate (const FederateInfo &fi);
-    /**constructor taking a core and a federate information structure, sore information in fi is ignored
+    /**constructor taking a core and a federate information structure
     @param[in] fi  a federate information structure
     */
     Federate (std::shared_ptr<Core> core, const FederateInfo &fi);
@@ -150,20 +146,23 @@ class Federate
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
-    convergence_state enterExecutionState (convergence_state ProcessComplete = convergence_state::complete);
+    iteration_result enterExecutionState (iteration_request iterate = iteration_request::no_iterations);
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
-    void enterExecutionStateAsync (convergence_state ProcessComplete = convergence_state::complete);
+    void enterExecutionStateAsync (iteration_request iterate = iteration_request::no_iterations);
     /** finalize the async call for entering Execution state
     @details call will not block but will return quickly.  The enterInitializationStateFinalize must be called
     before doing other operations
     */
-    convergence_state enterExecutionStateFinalize ();
+    iteration_result enterExecutionStateFinalize ();
     /** terminate the simulation
     @details call is normally non-blocking, but may block if called in the midst of an
-    asynchronous call sequence*/
+    asynchronous call sequence, not core calling commands may be called */
     void finalize ();
+
+    /** disconnect a simulation from the core */
+    virtual void disconnect(); 
     /** specify the simulator had an unrecoverable error
      */
     void error (int errorcode);
@@ -171,7 +170,7 @@ class Federate
      */
     void error (int errorcode, const std::string &message);
 
-    /** specify a separator to use for naming separation
+    /** specify a separator to use for naming separation between the federate name and the interface name
      */
     void setSeparator (char separator) { separator_ = separator; }
     /** request a time advancement
@@ -182,7 +181,7 @@ class Federate
     /** request a time advancement
     @param[in] the next requested time step
     @return the granted time step*/
-    iterationTime requestTimeIterative (Time nextInternalTimeStep, convergence_state iterationComplete);
+    iterationTime requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate);
 
     /** request a time advancement
     @param[in] the next requested time step
@@ -192,7 +191,7 @@ class Federate
     /** request a time advancement
     @param[in] the next requested time step
     @return the granted time step*/
-    void requestTimeIterativeAsync (Time nextInternalTimeStep, convergence_state iterationComplete);
+    void requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate);
 
     /** request a time advancement
     @param[in] the next requested time step
@@ -203,7 +202,7 @@ class Federate
     @return the granted time step*/
     iterationTime requestTimeIterativeFinalize ();
 
-    /** set the mimimum time delta for the federate
+    /** set the minimum time delta for the federate
     @param[in] tdelta the minimum time delta to return from a time request function
     */
     void setTimeDelta (Time tdelta);
@@ -226,6 +225,11 @@ class Federate
     @param[in] offset the shift of the period from 0  offset must be < period
     */
     void setPeriod (Time period, Time offset = timeZero);
+    /** set a flag for the federate
+    @param[in] period the length of time between each subsequent grants
+    @param[in] offset the shift of the period from 0  offset must be < period
+    */
+    virtual void setFlag(int flag, bool flagValue = true);
     /**  set the logging level for the federate
     @ details debug and trace only do anything if they were enabled in the compilation
     @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
@@ -288,6 +292,95 @@ class Federate
     */
     bool queryCompleted (int queryIndex) const;
 
+    /** define a filter interface on a source
+    @details a source filter will be sent any packets that come from a particular source
+    if multiple filters are defined on the same source, they will be placed in some order defined by the core
+    @param[in] the name of the endpoint
+    @param[in] the inputType which the source filter can receive
+    */
+    filter_id_t registerSourceFilter(const std::string &filterName,
+        const std::string &sourceEndpoint,
+        const std::string &inputType = "",
+        const std::string &outputType = "");
+    /** define a filter interface for a destination
+    @details a destination filter will be sent any packets that are going to a particular destination
+    multiple filters are not allowed to specify the same destination
+    @param[in] the name of the destination endpoint
+    @param[in] the inputType which the destination filter can receive
+    */
+    filter_id_t registerDestinationFilter(const std::string &filterName,
+        const std::string &destEndpoint,
+        const std::string &inputType = "",
+        const std::string &outputType = "");
+    /** define a filter interface on a source
+    @details a source filter will be sent any packets that come from a particular source
+    if multiple filters are defined on the same source, they will be placed in some order defined by the core
+    @param[in] the name of the endpoint
+    @param[in] the inputType which the source filter can receive
+    */
+    filter_id_t registerSourceFilter(const std::string &sourceEndpoint)
+    {
+        return registerSourceFilter("", sourceEndpoint, "", "");
+    }
+    /** define a filter interface for a destination
+    @details a destination filter will be sent any packets that are going to a particular destination
+    multiple filters are not allowed to specify the same destination
+    @param[in] the name of the destination endpoint
+    @param[in] the inputType which the destination filter can receive
+    */
+    filter_id_t registerDestinationFilter(const std::string &destEndpoint)
+    {
+        return registerDestinationFilter("", destEndpoint, "", "");
+    }
+    /** get the name of a filter
+    @param[in] id the filter to query
+    @return empty string if an invalid id is passed*/
+    std::string getFilterName(filter_id_t id) const;
+
+    /** get the name of the endpoint that a filter is associated with
+    @param[in] id the filter to query
+    @return empty string if an invalid id is passed*/
+    std::string getFilterEndpoint(filter_id_t id) const;
+
+    /** get the input type of a filter from its id
+    @param[in] id the endpoint to query
+    @return empty string if an invalid id is passed*/
+    std::string getFilterInputType(filter_id_t id) const;
+
+    /** get the output type of a filter from its id
+    @param[in] id the endpoint to query
+    @return empty string if an invalid id is passed*/
+    std::string getFilterOutputType(filter_id_t id) const;
+    /** get the id of a source filter from the name of the endpoint
+    @param[in] filterName the name of the filter
+    @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
+    filter_id_t getFilterId(const std::string &filterName) const;
+    /** get the id of a source filter from the name of the filter
+    @param[in] filterName the publication id
+    @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
+    filter_id_t getSourceFilterId(const std::string &filterName) const;
+
+    /** get the id of a destination filter from the name of the endpoint
+    @param[in] filterName the publication id
+    @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
+    filter_id_t getDestFilterId(const std::string &filterName) const;
+
+    /** @brief register a operator for the specified filter
+    @details for time_agnostic federates only,  all other settings would trigger an error
+    The MessageOperator gets called when there is a message to filter, There is no order or state to this
+    messages can come in any order.
+    @param[in] filter the identifier for the filter to trigger
+    @param[in] op A shared_ptr to a message operator
+    */
+    void setFilterOperator(filter_id_t filter, std::shared_ptr<FilterOperator> op);
+    /** @brief register a operator for the specified filters
+    @details for time_agnostic federates only,  all other settings would trigger an error
+    The MessageOperator gets called when there is a message to filter, There is no order or state to this
+    message can come in any order.
+    @param[in] filters the identifier for the filter to trigger
+    @param[in] op A shared_ptr to a message operator
+    */
+    void setFilterOperator(const std::vector<filter_id_t> &filters, std::shared_ptr<FilterOperator> op);
   protected:
     /** function to deal with any operations that need to occur on a time update*/
     virtual void updateTime (Time newTime, Time oldTime);
@@ -337,5 +430,10 @@ class InvalidParameterValue : public std::runtime_error
   public:
     InvalidParameterValue (const char *s) noexcept : std::runtime_error (s) {}
 };
+
+/** function to do some housekeeping work
+@details this runs some cleanup routines and tries to close out any residual thread that haven't been shutdown
+yet*/
+void cleanupHelicsLibrary();
 } //namespace helics
 #endif

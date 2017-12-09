@@ -12,8 +12,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #ifndef HELICS_API_DATA_H_
 #define HELICS_API_DATA_H_
 
+#include "../flag-definitions.h"
 #include <stdint.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -45,17 +45,24 @@ typedef void *helics_query;
 
 typedef double helics_time_t;
 
+/** enumeration of the different iteration results*/
 typedef enum {
-    nonconverged,
-    converged,
+    no_iteration,
+    force_iteration,  // input only
+    iterate_if_needed,
+} iteration_request;
+
+typedef enum {
+    next_step,
+    error,  // input only
     halted,
-    error,
-} convergence_status;
+    iterating
+} iteration_status;
 
 typedef struct helics_iterative_time
 {
     helics_time_t time;
-    convergence_status status;
+    iteration_status status;
 } helics_iterative_time;
 
 /**
@@ -82,13 +89,6 @@ typedef struct message_t
     const char *dst;  //!< the final destination
 
 } message_t;
-
-#define OBSERVER_FLAG 0
-#define ROLLBACK_FLAG 1
-#define UNINTERRUPTIBLE_FLAG 2
-#define FORWARD_COMPUTE_FLAG 3
-#define TIME_AGNOSTIC_FLAG 4
-#define SOURCE_ONLY_FLAG 5
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

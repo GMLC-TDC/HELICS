@@ -1,0 +1,6 @@
+#file to import the helics target and all the needed dependencies
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+include(${CMAKE_CURRENT_LIST_DIR}/helics-targets.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/HELICSConfig.cmake)

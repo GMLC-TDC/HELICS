@@ -1,7 +1,7 @@
 static char help[] = "Example to demonstrate the usage of HELICS C Interface with two federates.\n\
             This example implements a loose-coupling protocol to exchange values between two federates. \n\
             Here, a ZMQ broker is created and a value federate. The value federate can both.\n\
-            publish and subcribe. This federate publishes a value and waits for the value \n\
+            publish and subscribe. This federate publishes a value and waits for the value \n\
             published by the other federate. Once the value has arrived, it publishes its next value \n\n";
 
 #include <stdio.h>
@@ -12,7 +12,7 @@ static char help[] = "Example to demonstrate the usage of HELICS C Interface wit
 #include <unistd.h>
 #endif
 
-int main(int argc,char **argv)
+int main()
 {
   helics_federate_info_t fedinfo;
   const char*    helicsversion;
@@ -73,7 +73,7 @@ int main(int argc,char **argv)
   /* Subscribe to PI SENDER's publication */
   sub = helicsRegisterSubscription(vfed,"testB","double","");
   printf("PI SENDER: Subscription registered\n");
-
+  fflush(NULL);
   /* Register the subscription */
 
   /* Enter initialization mode */
@@ -110,15 +110,17 @@ int main(int argc,char **argv)
   status = helicsFinalize(vfed);
   printf("PI SENDER: Federate finalized\n");
 
-
+  helicsFreeFederate(vfed);
   while(helicsBrokerIsConnected(broker)) {
 #ifdef _MSC_VER
-	  Sleep(10);
+	  Sleep(50);
 #else
-    usleep(1000); /* Sleep for 1 millisecond */
+    usleep(50000); /* Sleep for 1 millisecond */
 #endif
   }
   printf("PI SENDER: Broker disconnected\n");
-
+  helicsCloseLibrary();
+  printf("PI SENDER: Library closed\n");
+  fflush(NULL);
   return(0);
 }

@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "MessageFederate.h"
 #include "ValueFederate.h"
-#include "identifierTypes.hpp"
+#include "helicsTypes.hpp"
 
 namespace helics
 {
@@ -44,6 +44,7 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     /** move assignment*/
     CombinationFederate &operator= (CombinationFederate &&fed) noexcept;
 
+    virtual void disconnect() override;
   protected:
     virtual void updateTime (Time newTime, Time oldTime) override;
     virtual void StartupToInitializeStateTransition () override;

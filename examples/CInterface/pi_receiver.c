@@ -5,7 +5,7 @@ static char help[] = " PI RECEIVER: Simple program to demonstrate the usage of H
 #include <stdio.h>
 #include <ValueFederate_c.h>
 
-int main(int argc,char **argv)
+int main()
 {
   helics_federate_info_t fedinfo;
   const char*    helicsversion;
@@ -75,6 +75,7 @@ int main(int argc,char **argv)
   }
   status = helicsFinalize(vfed);
   printf("PI RECEIVER: Federate finalized\n");
-
+  helicsFreeFederate(vfed);
+  helicsCloseLibrary();
   return(0);
 }

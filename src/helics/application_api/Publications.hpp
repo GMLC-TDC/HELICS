@@ -15,7 +15,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "HelicsPrimaryTypes.h"
 #include "ValueFederate.h"
 #include "helicsTypes.hpp"
-#include "boost/lexical_cast.hpp"
 
 namespace helics
 {
@@ -60,7 +59,7 @@ class PublicationBase
     publication_id_t getID () const { return id; }
 
     /** get the key for the subscription*/
-    const std::string getKey () const { return fed->getPublicationName (id); }
+    std::string getKey () const { return fed->getPublicationName (id); }
     /** get the key for the subscription*/
     const std::string &getName () const { return key_; }
     /** get the key for the subscription*/
@@ -124,15 +123,21 @@ class Publication : public PublicationBase
         // TODO:: figure out units
         publish (val);
     }
+    void setMinimumChange (double deltaV)
+    {
+        if (delta < 0.0)
+        {
+            changeDetectionEnabled = true;
+        }
+        delta = deltaV;
+        if (delta < 0.0)
+        {
+            changeDetectionEnabled = false;
+        }
+    }
+    void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
 
   private:
-    bool changeDetected (const std::string &val) const;
-    bool changeDetected (const std::vector<double> &val) const;
-    bool changeDetected (const std::vector<std::complex<double>> &val) const;
-    bool changeDetected (const double *vals, size_t size) const;
-    bool changeDetected (const std::complex<double> &val) const;
-    bool changeDetected (double val) const;
-    bool changeDetected (int64_t val) const;
 };
 
 template <class X>

@@ -8,12 +8,13 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
+
 #ifndef _CORE_DATA_TYPES_H_
 #define _CORE_DATA_TYPES_H_
 #pragma once
 
 #include "helics-time.h"
-#include "helics/config.h"
+#include "helics/helics-config.h"
 
 #include <cstdint>
 #include <memory>
@@ -41,9 +42,9 @@ class data_block
     /** size and data */
     data_block (size_t blockSize, char init) : m_data (blockSize, init){};
     /** copy constructor */
-    data_block (const data_block &dt) = default;
+    data_block (const data_block &db) = default;
     /** move constructor */
-    data_block (data_block &&dt) noexcept;
+    data_block (data_block &&db) noexcept;
     /** construct from char * */
     data_block (const char *s) : m_data (s){};
     /** construct from string */
@@ -61,9 +62,9 @@ class data_block
     {
     }
     /** copy assignment operator*/
-    data_block &operator= (const data_block &dt) = default;
+    data_block &operator= (const data_block &db) = default;
     /** move assignment operator*/
-    data_block &operator= (data_block &&dt) noexcept;
+    data_block &operator= (data_block &&db) noexcept;
     /** assign from a string*/
     data_block &operator= (std::string str)
     {
@@ -93,6 +94,8 @@ class data_block
     bool operator== (const std::string &str) const { return m_data == str; }
     /** less then operator to order the data_blocks if need be*/
     bool operator< (const data_block &db) const { return (m_data < db.m_data); }
+    /** less then operator to order the data_blocks if need be*/
+    bool operator> (const data_block &db) const { return (m_data > db.m_data); }
     /** return a pointer to the data*/
     char *data () { return &(m_data.front ()); }
     /** if the object is const return a const pointer*/
@@ -126,16 +129,22 @@ class data_block
     void push_back (char newchar) { m_data.push_back (newchar); }
 };
 
+inline bool operator!=(const data_block &db1, const data_block &db2)
+{
+    return !(db1 == db2);
+}
+
 /** class containing a message structure*/
 class Message
 {
   public:
     Time time;  //!< the event time the message is sent
+    std::uint64_t flags;  //!< message flags
     data_block data;  //!< the data packet for the message
-    std::string origsrc;  //!< the orignal source of the message
     std::string dest;  //!< the destination of the message
     std::string src;  //!< the most recent source of the message
-
+    std::string origsrc;  //!< the original source of the message
+    std::string orig_dest; //!< the original destination of a message
   public:
     /** default constructor*/
     Message () noexcept {};
@@ -143,7 +152,7 @@ class Message
     Message (Message &&m) noexcept;
     /** copy constructor*/
     Message (const Message &m) = default;
-    /** move assignement*/
+    /** move assignment*/
     Message &operator= (Message &&m) noexcept;
     /** copy assignment*/
     Message &operator= (const Message &m) = default;
@@ -168,7 +177,7 @@ class FilterOperator
     virtual ~FilterOperator () = default;
     /** filter the message either modify the message or generate a new one*/
     virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) = 0;
-    /** functionalize the processing
+    /** make the operator work like one
     @details calls the process function*/
     std::unique_ptr<Message> operator() (std::unique_ptr<Message> message)
     {
@@ -182,6 +191,9 @@ inline bool isValidIndex (sizeType testSize, const std::vector<dataType> &vec)
 {
     return ((testSize >= sizeType (0)) && (testSize < static_cast<sizeType> (vec.size ())));
 }
+
+bool matchingTypes(const std::string &type1, const std::string &type2);
+
 }  // namespace helics
 
 namespace std
@@ -201,5 +213,6 @@ inline void swap (helics::Message &m1, helics::Message &m2) noexcept
     m1.swap (m2);
 }
 }  // namespace std
+
 
 #endif

@@ -43,10 +43,10 @@ static auto msgSorter = [](const auto &m1, const auto &m2) {
     return (m1->time != m2->time) ? (m1->time < m2->time) : (m1->origsrc < m2->origsrc);
 };
 
-void EndpointInfo::addMessage (std::unique_ptr<Message> m)
+void EndpointInfo::addMessage (std::unique_ptr<Message> message)
 {
     std::lock_guard<std::mutex> lock (queueLock);
-    message_queue.push_back (std::move (m));
+    message_queue.push_back (std::move (message));
     std::stable_sort (message_queue.begin (), message_queue.end (), msgSorter);
 }
 
@@ -67,4 +67,4 @@ int32_t EndpointInfo::queueSize (Time maxTime) const
     }
     return cnt;
 }
-}
+}  // namespace helics

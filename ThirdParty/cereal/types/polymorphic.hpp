@@ -170,12 +170,14 @@
   namespace detail {                                    \
     void dynamic_init_dummy_##LibName();                \
   } /* end detail */                                    \
+  } /* end cereal */                                      \
   namespace {                                           \
-    void dynamic_init_##LibName()                       \
-    {                                                   \
+    struct dynamic_init_##LibName {                       \
+      dynamic_init_##LibName() {                          \
       ::cereal::detail::dynamic_init_dummy_##LibName(); \
     }                                                   \
-  } } /* end namespaces */
+    } dynamic_init_instance_##LibName;                    \
+  } /* end anonymous namespace */
 
 namespace cereal
 {

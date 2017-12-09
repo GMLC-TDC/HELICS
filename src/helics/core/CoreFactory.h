@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_CORE_FACTORY_
 
 
-#include "helics/core/core-types.h"
+#include "core-types.h"
 #include <memory>
 #include <string>
 
@@ -53,14 +53,14 @@ namespace CoreFactory {
   /** locate a registered Core by name
   @param name the name of the core to find
   @return a shared_ptr to the testCore*/
-  std::shared_ptr<CommonCore> findCore(const std::string &name);
+  std::shared_ptr<Core> findCore(const std::string &name);
 
   /** register a testCore so it can be found by others
   @details also cleans up any leftover bCoresrokers that were previously unregistered this can be controlled by calling cleanUpBrokers
   earlier if desired
-  @param tcore a pointer to a testCore object that should be found globally
+  @param core a pointer to a testCore object that should be found globally
   @return true if the registration was successful false otherwise*/
-  bool registerCommonCore(std::shared_ptr<CommonCore> tcore);
+  bool registerCore(std::shared_ptr<Core> core);
 
   /** remove a Core from the registry
   @param name the name of the Core to unregister
@@ -72,6 +72,13 @@ namespace CoreFactory {
   @return the number of cores still operating
   */
 size_t cleanUpCores();
+/** clean up unused cores
+@details when Cores are unregistered they get put in a holding area that gets cleaned up when a new Core is registered
+or when the clean up function is called this prevents some odd threading issues
+@param delay the delay time in milliseconds to wait for the cores to finish before destroying
+@return the number of cores still operating
+*/
+size_t cleanUpCores(int delay);
 
   /** make a copy of the broker pointer to allow access to the new name
   */
