@@ -21,7 +21,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 using helics::operator"" _t ;
 helics::Time tend = 3600.0_t;  // simulation end time
 
+#if ENABLE_TEST_TIMEOUTS > 0
 namespace utf = boost::unit_test;
+#endif
 
 /** class implementing a single heat transfer block*/
 class HeatUnitBlock
@@ -86,13 +88,13 @@ class HeatUnitBlock
         auto cTime = 0.0_t;
         while (cTime < tend)
         {
-            double T0 = vFed->getValue<double> (sub[0]);
+            auto T0 = vFed->getValue<double> (sub[0]);
 
             double Etransfer = (T0 - T) * tRate * deltaTime;
 
             for (int ii = 1; ii < 3; ++ii)
             {
-                double TT = vFed->getValue<double> (sub[ii]);
+                auto TT = vFed->getValue<double> (sub[ii]);
                 if (TT > -500)
                 {
                     Etransfer += (TT - T) * tRate * deltaTime;
@@ -183,7 +185,7 @@ class observer
     std::string subName;
     int index = 0;
     int m_count = 20;
-    bool initialized;
+    bool initialized = false;
 
   public:
     observer (std::string name, int count) : subName (std::move (name)), m_count (count) {}
@@ -239,9 +241,9 @@ class observer
 BOOST_AUTO_TEST_SUITE (heat_transfer_tests)
 
 #ifndef QUICK_TESTS_ONLY
-#if ENABLE_TEST_TIMEOUTS>0 
- BOOST_TEST_DECORATOR (*utf::timeout(30))
- #endif
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR (*utf::timeout (30))
+#endif
 BOOST_AUTO_TEST_CASE (linear_tests)
 {
     auto wcore = helics::CoreFactory::FindOrCreate (helics::core_type::TEST, "wallcore", "22");

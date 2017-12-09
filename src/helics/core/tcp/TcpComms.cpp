@@ -8,28 +8,28 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "TcpComms.h"
+#include "UdpComms.h"
 #include "../ActionMessage.h"
 #include "../../common/AsioServiceManager.h"
 #include <memory>
-#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/ip/udp.hpp>
 
-static const int BEGIN_OPEN_PORT_RANGE = 24228;
-static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24357;
+static const int BEGIN_OPEN_PORT_RANGE = 23964;
+static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24093;
 
-static const int DEFAULT_UDP_BROKER_PORT_NUMBER = 24160;
+static const int DEFAULT_UDP_BROKER_PORT_NUMBER = 23901;
 
 
 namespace helics
 {
-using boost::asio::ip::tcp;
-TcpComms::TcpComms ()
+using boost::asio::ip::udp;
+UdpComms::UdpComms ()
 {
     promisePort = std::promise<int> ();
     futurePort = promisePort.get_future ();
 }
 
-TcpComms::TcpComms (const std::string &brokerTarget, const std::string &localTarget)
+UdpComms::UdpComms (const std::string &brokerTarget, const std::string &localTarget)
     : CommsInterface (brokerTarget, localTarget)
 {
     if (localTarget_.empty ())
@@ -40,9 +40,9 @@ TcpComms::TcpComms (const std::string &brokerTarget, const std::string &localTar
     futurePort = promisePort.get_future ();
 }
 /** destructor*/
-TcpComms::~TcpComms () { disconnect (); }
+UdpComms::~UdpComms () { disconnect (); }
 
-void TcpComms::setBrokerPort (int brokerPortNumber)
+void UdpComms::setBrokerPort (int brokerPortNumber)
 {
     if (rx_status == connection_status::startup)
     {
@@ -50,7 +50,7 @@ void TcpComms::setBrokerPort (int brokerPortNumber)
     }
 }
 
-int TcpComms::findOpenPort ()
+int UdpComms::findOpenPort ()
 {
     int start = openPortStart;
     if (openPortStart < 0)
@@ -65,7 +65,7 @@ int TcpComms::findOpenPort ()
     return start;
 }
 
-void TcpComms::setPortNumber (int localPortNumber)
+void UdpComms::setPortNumber (int localPortNumber)
 {
     if (rx_status == connection_status::startup)
     {
@@ -73,9 +73,9 @@ void TcpComms::setPortNumber (int localPortNumber)
     }
 }
 
-void TcpComms::setAutomaticPortStartPort (int startingPort) { openPortStart = startingPort; }
+void UdpComms::setAutomaticPortStartPort (int startingPort) { openPortStart = startingPort; }
 
-int TcpComms::processIncomingMessage (ActionMessage &M)
+int UdpComms::processIncomingMessage (ActionMessage &M)
 {
     if (isProtocolCommand(M))
     {
@@ -91,7 +91,7 @@ int TcpComms::processIncomingMessage (ActionMessage &M)
     return 0;
 }
 
-ActionMessage TcpComms::generateReplyToIncomingMessage (ActionMessage &M)
+ActionMessage UdpComms::generateReplyToIncomingMessage (ActionMessage &M)
 {
     if (isProtocolCommand(M))
     {
@@ -127,7 +127,7 @@ ActionMessage TcpComms::generateReplyToIncomingMessage (ActionMessage &M)
     return resp;
 }
 
-void TcpComms::queue_rx_function ()
+void UdpComms::queue_rx_function ()
 {
     if (PortNumber < 0)
     {
@@ -198,7 +198,7 @@ CLOSE_RX_LOOP:
 }
 
 
-void TcpComms::queue_tx_function ()
+void UdpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
     auto ioserv = AsioServiceManager::getServicePointer();
@@ -418,14 +418,14 @@ CLOSE_TX_LOOP:
     tx_status = connection_status::terminated;
 }
 
-void TcpComms::closeTransmitter ()
+void UdpComms::closeTransmitter ()
 {
     ActionMessage rt (CMD_PROTOCOL);
     rt.index = DISCONNECT;
     transmit (-1, rt);
 }
 
-void TcpComms::closeReceiver ()
+void UdpComms::closeReceiver ()
 {
     if (tx_status == connection_status::connected)
     {
@@ -466,5 +466,5 @@ void TcpComms::closeReceiver ()
     }
 }
 
-std::string TcpComms::getAddress () const { return makePortAddress (localTarget_, PortNumber); }
+std::string UdpComms::getAddress () const { return makePortAddress (localTarget_, PortNumber); }
 }  // namespace helics

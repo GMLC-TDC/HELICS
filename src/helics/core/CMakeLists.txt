@@ -58,22 +58,28 @@ set (TCP_SOURCE_FILES
 	tcp/TcpComms.cpp
 )
 
+set (PUBLIC_INCLUDE_FILES
+core.h
+broker.h
+CoreFactory.h
+BrokerFactory.h
+core-exceptions.h
+core-types.h
+core-data.h
+helics-time.h
+coreFederateInfo.h
+core-exceptions.h
+../flag-definitions.h
+)
+
 set(INCLUDE_FILES
-    core-data.h
 	BrokerBase.h
-    CoreFactory.h
-	BrokerFactory.h
 	TimeDependencies.h
-	coreFederateInfo.h
-	core-exceptions.h
 	TimeCoordinator.h
 	loggingHelper.hpp
 	delayedObjects.hpp
 	CommsBroker.hpp
 	CommsBroker_impl.hpp
-    core.h
-    core-types.h
-    helics-time.h
     TestCore.h
 	CoreBroker.h
 	ActionMessageDefintions.h
@@ -89,8 +95,9 @@ set(INCLUDE_FILES
 	FilterFunctions.h
 	TestBroker.h
 	argParser.h
-	flag-definitions.h
 )
+
+
 
 set(IPC_HEADER_FILES
 	ipc/IpcCore.h
@@ -124,8 +131,8 @@ set(TCP_HEADER_FILES
 	tcp/TcpComms.h
 	)
 
-	list(APPEND SRC_FILES ${UDP_SOURCE_FILES} ${IPC_SOURCE_FILES} ${TCP_SOURCE_FILES})
-	list(APPEND INCLUDE_FILES ${UDP_HEADER_FILES} ${IPC_HEADER_FILES} ${TCP_HEADER_FILES})
+	list(APPEND SRC_FILES ${UDP_SOURCE_FILES} ${IPC_SOURCE_FILES} )
+	list(APPEND INCLUDE_FILES ${UDP_HEADER_FILES} ${IPC_HEADER_FILES} )
 
 if (${ZeroMQ_FOUND})
    list(APPEND SRC_FILES ${ZMQ_SOURCE_FILES})
@@ -138,7 +145,7 @@ if (${MPI_C_FOUND})
 endif (${MPI_C_FOUND})
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES})
+add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
 if (${MPI_C_FOUND})
 source_group("mpi" FILES ${MPI_SOURCE_FILES} ${MPI_HEADER_FILES})
@@ -146,9 +153,11 @@ endif (${MPI_C_FOUND})
 source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
 source_group("udp" FILES ${UDP_SOURCE_FILES} ${UDP_HEADER_FILES})
 source_group("ipc" FILES ${IPC_SOURCE_FILES} ${IPC_HEADER_FILES})
-source_group("tcp" FILES ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
+#source_group("tcp" FILEs ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
 
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
+
+install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION include/helics/core)
 
 OPTION(BUILD_BROKER "Build a helics Broker" ON)
 if (BUILD_BROKER)

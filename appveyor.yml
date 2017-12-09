@@ -13,9 +13,10 @@ configuration:
 install:
 
 before_build:
+  - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install swig --yes --limit-output #> $null
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 14 2015 Win64" -DAUTOBUILD_ZMQ=ON -DBUILD_RELEASE_ONLY=ON -DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON
+  - cmake .. -G "Visual Studio 14 2015 Win64" -DAUTOBUILD_ZMQ=ON -DBUILD_RELEASE_ONLY=ON -DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DQUICK_TESTS_ONLY=ON
   - cd ..
 
 build:
@@ -24,5 +25,16 @@ build:
   verbosity: minimal
 
 after_build:
+
+test_script:
+  - cd build
+  # For controlling which tests get run:
+  # ctest -I <start>,<end>,<stride>,<list of test numbers>
+  # 1 = core tests
+  # 2 = application api tests
+  # 3 = c interface tests
+  # 4 = player/recorder tests
+  - ctest -C Release --verbose --timeout 120 -I 0,0,0,1
+  - ctest -C Release --verbose --timeout 240 -I 0,0,0,2
 
 artifacts:

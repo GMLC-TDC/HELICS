@@ -9,7 +9,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "Federate.h"
+#include "../core/BrokerFactory.h"
 #include "../core/CoreFactory.h"
+#include "../core/core-exceptions.h"
+
 #include "../core/core.h"
 #include "asyncFedCallInfo.h"
 #include "helics/helics-config.h"
@@ -48,6 +51,12 @@ int getHelicsVersionMajor () { return HELICS_VERSION_MAJOR; }
 int getHelicsVersionMinor () { return HELICS_VERSION_MINOR; }
 int getHelicsVersionPatch () { return HELICS_VERSION_PATCH; }
 
+void cleanupHelicsLibrary ()
+{
+    BrokerFactory::cleanUpBrokers (200);
+    CoreFactory::cleanUpCores (200);
+}
+
 Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
 {
     if (fi.coreName.empty ())
@@ -73,6 +82,11 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
         coreObject->connect ();
     }
     fedID = coreObject->registerFederate (fi.name, fi);
+    if (fedID == helics::invalid_fed_id)
+    {
+        state = op_states::error;
+        return;
+    }
     currentTime = coreObject->getCurrentTime (fedID);
 }
 
@@ -106,6 +120,11 @@ Federate::Federate (std::shared_ptr<Core> core, const FederateInfo &fi)
         coreObject->connect ();
     }
     fedID = coreObject->registerFederate (fi.name, fi);
+    if (fedID == helics::invalid_fed_id)
+    {
+        state = op_states::error;
+        return;
+    }
     currentTime = coreObject->getCurrentTime (fedID);
 }
 
@@ -239,15 +258,22 @@ iteration_result Federate::enterExecutionState (iteration_request iterate)
     case op_states::initialization:
     {
         res = coreObject->enterExecutingState (fedID, iterate);
-        if (res == iteration_result::next_step)
+        switch (res)
         {
+        case iteration_result::next_step:
             state = op_states::execution;
             InitializeToExecuteStateTransition ();
-        }
-        else
-        {
+            break;
+        case iteration_result::iterating:
             state = op_states::initialization;
             updateTime (getCurrentTime (), getCurrentTime ());
+            break;
+        case iteration_result::error:
+            state = op_states::error;
+            break;
+        case iteration_result::halted:
+            state = op_states::finalize;
+            break;
         }
         break;
     }
@@ -259,7 +285,7 @@ iteration_result Federate::enterExecutionState (iteration_request iterate)
     case op_states::pendingTime:
         requestTimeFinalize ();
         break;
-    case op_states::pendingIterativeTime:  // since this isn't gauranteed to progress it shouldn't be called in
+    case op_states::pendingIterativeTime:  // since this isn't guaranteed to progress it shouldn't be called in
                                            // this fashion
     default:
         throw (InvalidStateTransition ("cannot transition from current state to execution state"));
@@ -321,16 +347,24 @@ iteration_result Federate::enterExecutionStateFinalize ()
         throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
     }
     auto res = asyncCallInfo->execFuture.get ();
-    if (iteration_result::next_step == res)
+    switch (res)
     {
+    case iteration_result::next_step:
         state = op_states::execution;
         InitializeToExecuteStateTransition ();
-    }
-    else
-    {
+        break;
+    case iteration_result::iterating:
         state = op_states::initialization;
         updateTime (getCurrentTime (), getCurrentTime ());
+        break;
+    case iteration_result::error:
+        state = op_states::error;
+        break;
+    case iteration_result::halted:
+        state = op_states::finalize;
+        break;
     }
+
     return res;
 }
 
@@ -416,9 +450,10 @@ void Federate::finalize ()
         requestTimeIterativeFinalize ();  // I don't care about the return any more
         break;
     case op_states::finalize:
+    case op_states::error:
         return;
         // do nothing
-    default:  // basically only error state
+    default:
         throw (InvalidFunctionCall ("cannot call finalize in present state"));
     }
     coreObject->finalize (fedID);
@@ -451,11 +486,19 @@ Time Federate::requestTime (Time nextInternalTimeStep)
 {
     if (state == op_states::execution)
     {
-        auto newTime = coreObject->timeRequest (fedID, nextInternalTimeStep);
-        Time oldTime = currentTime;
-        currentTime = newTime;
-        updateTime (newTime, oldTime);
-        return newTime;
+        try
+        {
+            auto newTime = coreObject->timeRequest (fedID, nextInternalTimeStep);
+            Time oldTime = currentTime;
+            currentTime = newTime;
+            updateTime (newTime, oldTime);
+            return newTime;
+        }
+        catch (functionExecutionFailure &fee)
+        {
+            state = op_states::error;
+            throw;
+        }
     }
     else
     {
@@ -467,14 +510,26 @@ iterationTime Federate::requestTimeIterative (Time nextInternalTimeStep, iterati
 {
     if (state == op_states::execution)
     {
-        auto iterationTime = coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
+        auto iterativeTime = coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
         Time oldTime = currentTime;
-        if (iterationTime.state == iteration_result::next_step)
+        switch (iterativeTime.state)
         {
-            currentTime = iterationTime.stepTime;
+        case iteration_result::next_step:
+            currentTime = iterativeTime.stepTime;
+            FALLTHROUGH
+        case iteration_result::iterating:
+            updateTime (currentTime, oldTime);
+            break;
+        case iteration_result::halted:
+            currentTime = iterativeTime.stepTime;
+            updateTime (currentTime, oldTime);
+            state = op_states::finalize;
+            break;
+        case iteration_result::error:
+            state = op_states::error;
+            break;
         }
-        updateTime (currentTime, oldTime);
-        return iterationTime;
+        return iterativeTime;
     }
     else
     {
@@ -554,11 +609,23 @@ iterationTime Federate::requestTimeIterativeFinalize ()
         auto iterativeTime = asyncCallInfo->timeRequestIterativeFuture.get ();
         state = op_states::execution;
         Time oldTime = currentTime;
-        if (iterativeTime.state == iteration_result::next_step)
+        switch (iterativeTime.state)
         {
+        case iteration_result::next_step:
             currentTime = iterativeTime.stepTime;
+            FALLTHROUGH
+        case iteration_result::iterating:
+            updateTime (currentTime, oldTime);
+            break;
+        case iteration_result::halted:
+            currentTime = iterativeTime.stepTime;
+            updateTime (currentTime, oldTime);
+            state = op_states::finalize;
+            break;
+        case iteration_result::error:
+            state = op_states::error;
+            break;
         }
-        updateTime (currentTime, oldTime);
         return iterativeTime;
     }
     else
@@ -704,8 +771,7 @@ void Federate::setFilterOperator (filter_id_t id, std::shared_ptr<FilterOperator
     coreObject->setFilterOperator (id.value (), std::move (mo));
 }
 
-void Federate::setFilterOperator (const std::vector<filter_id_t> &filter_ids,
-                                        std::shared_ptr<FilterOperator> mo)
+void Federate::setFilterOperator (const std::vector<filter_id_t> &filter_ids, std::shared_ptr<FilterOperator> mo)
 {
     for (auto id : filter_ids)
     {
@@ -732,15 +798,15 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     }
     else
     {
-		Json_helics::CharReaderBuilder rbuilder;
-		std::string errs;
-		std::istringstream jstring(jsonString);
-		bool ok = Json_helics::parseFromStream(rbuilder, jstring, &doc, &errs);
-		if (!ok)
-		{
-			// should I throw an error here?
-			return fi;
-		}
+        Json_helics::CharReaderBuilder rbuilder;
+        std::string errs;
+        std::istringstream jstring (jsonString);
+        bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
+        if (!ok)
+        {
+            // should I throw an error here?
+            return fi;
+        }
     }
 
     if (doc.isMember ("name"))

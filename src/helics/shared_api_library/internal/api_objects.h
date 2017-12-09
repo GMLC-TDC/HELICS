@@ -20,7 +20,7 @@ namespace helics
 {
 	class Core;
 	class Federate;
-	class CoreBroker;
+	class Broker;
 	class ValueFederate;
 	class MessageFederate;
 	class Subscription;
@@ -42,7 +42,7 @@ namespace helics
 	class BrokerObject
 	{
 	public:
-		std::shared_ptr<CoreBroker> brokerptr;
+		std::shared_ptr<Broker> brokerptr;
         int index;
 	};
 

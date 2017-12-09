@@ -11,17 +11,19 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "BrokerBase.h"
 
+#include "../common/AsioServiceManager.h"
 #include "../common/logger.h"
+#include "TimeCoordinator.h"
 #include "helics/helics-config.h"
+#include <iostream>
+#include <libguarded/guarded.hpp>
+#include <boost/asio/steady_timer.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/uuid/uuid.hpp>  // uuid class
 #include <boost/uuid/uuid_generators.hpp>  // generators
 #include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
-
-#include "TimeCoordinator.h"
-#include <iostream>
-#include <boost/filesystem.hpp>
 
 static inline std::string gen_id ()
 {
@@ -50,17 +52,19 @@ static void argumentParser (int argc, const char *const *argv, boost::program_op
 		("config-file", po::value<std::string>(), "specify a configuration file to use");
 
 
-	config.add_options()
-		("name,n", po::value<std::string>(), "name of the broker/core")
-		("federates", po::value<int>(), "the minimum number of federates that will be connecting")
-		("minfed", po::value<int>(), "the minimum number of federates that will be connecting")
-		("maxiter", po::value<int>(), "maximum number of iterations")
-		("logfile", po::value<std::string>(), "the file to log message to")
-		("loglevel", po::value<int>(), "the level which to log the higher this is set to the more gets logs (-1) for no logging")
-		("fileloglevel", po::value<int>(), "the level at which messages get sent to the file")
-		("consoleloglevel", po::value<int>(), "the level at which message get sent to the console")
-		("minbroker", po::value<int>(), "the minimum number of core/brokers that need to be connected (ignored in cores)")
-		("identifier", po::value<std::string>(), "name of the core/broker");
+    config.add_options()
+        ("name,n", po::value<std::string>(), "name of the broker/core")
+        ("federates", po::value<int>(), "the minimum number of federates that will be connecting")
+        ("minfed", po::value<int>(), "the minimum number of federates that will be connecting")
+        ("maxiter", po::value<int>(), "maximum number of iterations")
+        ("logfile", po::value<std::string>(), "the file to log message to")
+        ("loglevel", po::value<int>(), "the level which to log the higher this is set to the more gets logs (-1) for no logging")
+        ("fileloglevel", po::value<int>(), "the level at which messages get sent to the file")
+        ("consoleloglevel", po::value<int>(), "the level at which message get sent to the console")
+        ("minbroker", po::value<int>(), "the minimum number of core/brokers that need to be connected (ignored in cores)")
+        ("identifier", po::value<std::string>(), "name of the core/broker")
+        ("tick", po::value<int>(), "number of milliseconds per tick counter if there is no broker communication for 2 ticks then secondary actions are taken")
+        ("timeout", po::value<int>(), "milliseconds to wait for a broker connection");
 
 
 	hidden.add_options() ("min", po::value<int>(), "minimum number of federates");
@@ -157,7 +161,7 @@ void BrokerBase::joinAllThreads ()
     }
 }
 
-void BrokerBase::InitializeFromArgs (int argc, const char *const *argv)
+void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
 
@@ -200,6 +204,14 @@ void BrokerBase::InitializeFromArgs (int argc, const char *const *argv)
     if (vm.count ("logfile") > 0)
     {
         logFile = vm["logfile"].as<std::string> ();
+    }
+    if (vm.count ("timeout") > 0)
+    {
+        timeout = vm["timeout"].as<int> ();
+    }
+    if (vm.count ("tick") > 0)
+    {
+        tickTimer = vm["tick"].as<int> ();
     }
     if (!noAutomaticID)
     {
@@ -293,27 +305,95 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
     }
 }
 
+using activeProtector = std::shared_ptr<libguarded::guarded<bool>>;
+void timerTickHandler (BrokerBase *bbase, activeProtector active, const boost::system::error_code &error)
+{
+    auto p = active->lock ();
+    if (*p)
+    {
+        if (error != boost::asio::error::operation_aborted)
+        {
+            try
+            {
+                bbase->addActionMessage (CMD_TICK);
+            }
+            catch (std::exception &e)
+            {
+                std::cout << "exception caught from addActionMessage" << std::endl;
+            }
+        }
+        else
+        {
+            ActionMessage M (CMD_TICK);
+            SET_ACTION_FLAG (M, error_flag);
+            bbase->addActionMessage (M);
+        }
+    }
+}
+
+bool BrokerBase::tryReconnect () { return false; }
+
 void BrokerBase::queueProcessingLoop ()
 {
+    mainLoopIsRunning.store (true);
+    auto serv = AsioServiceManager::getServicePointer ();
+    AsioServiceManager::runServiceLoop ();
+    boost::asio::steady_timer ticktimer (serv->getBaseService ());
+    auto active = std::make_shared<libguarded::guarded<bool>> (true);
+
+    auto timerCallback = [this, active](const boost::system::error_code &ec) {
+        timerTickHandler (this, active, ec);
+    };
+    ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
+    ticktimer.async_wait (timerCallback);
+    int messagesSinceLastTick = 0;
+
     while (true)
     {
         auto command = _queue.pop ();
         switch (command.action ())
         {
+        case CMD_TICK:
+
+            if (messagesSinceLastTick == 0)
+            {
+                //   std::cout << "sending tick " << std::endl;
+                processCommand (std::move (command));
+            }
+            if (CHECK_ACTION_FLAG (command, error_flag))
+            {
+                AsioServiceManager::haltServiceLoop ();
+                AsioServiceManager::runServiceLoop ();
+            }
+            messagesSinceLastTick = 0;
+            // reschedule the timer
+            ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
+            ticktimer.async_wait (timerCallback);
+            break;
         case CMD_IGNORE:
             break;
         case CMD_TERMINATE_IMMEDIATELY:
+            ticktimer.cancel ();
+            AsioServiceManager::haltServiceLoop ();
+            mainLoopIsRunning.store (false);
+            active->store (false);
             return;  // immediate return
         case CMD_STOP:
+            ticktimer.cancel ();
+            AsioServiceManager::haltServiceLoop ();
             if (!haltOperations)
             {
                 processCommand (std::move (command));
+                mainLoopIsRunning.store (false);
+                active->store (false);
                 return processDisconnect ();
             }
+
             return;
         default:
             if (!haltOperations)
             {
+                ++messagesSinceLastTick;
                 if (isPriorityCommand (command))
                 {
                     processPriorityCommand (std::move (command));

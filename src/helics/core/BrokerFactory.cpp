@@ -30,9 +30,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-std::shared_ptr<CoreBroker> makeBroker (core_type type, const std::string &name)
+std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 {
-    std::shared_ptr<CoreBroker> broker;
+    std::shared_ptr<Broker> broker;
 
     switch (type)
     {
@@ -112,20 +112,20 @@ std::shared_ptr<CoreBroker> makeBroker (core_type type, const std::string &name)
 
 namespace BrokerFactory
 {
-std::shared_ptr<CoreBroker> create (core_type type, const std::string &initializationString)
+std::shared_ptr<Broker> create (core_type type, const std::string &initializationString)
 {
     auto broker = makeBroker (type, "");
-    broker->Initialize (initializationString);
+    broker->initialize (initializationString);
     registerBroker (broker);
     broker->connect ();
     return broker;
 }
 
-std::shared_ptr<CoreBroker>
+std::shared_ptr<Broker>
 create (core_type type, const std::string &broker_name, const std::string &initializationString)
 {
     auto broker = makeBroker (type, broker_name);
-    broker->Initialize (initializationString);
+    broker->initialize (initializationString);
     bool reg = registerBroker (broker);
     if (!reg)
     {
@@ -135,20 +135,19 @@ create (core_type type, const std::string &broker_name, const std::string &initi
     return broker;
 }
 
-std::shared_ptr<CoreBroker> create (core_type type, int argc, const char *const *argv)
+std::shared_ptr<Broker> create (core_type type, int argc, const char *const *argv)
 {
     auto broker = makeBroker (type, "");
-    broker->InitializeFromArgs (argc, argv);
+    broker->initializeFromArgs (argc, argv);
     registerBroker (broker);
     broker->connect ();
     return broker;
 }
 
-std::shared_ptr<CoreBroker>
-create (core_type type, const std::string &broker_name, int argc, const char *const *argv)
+std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, int argc, const char *const *argv)
 {
     auto broker = makeBroker (type, broker_name);
-    broker->InitializeFromArgs (argc, argv);
+    broker->initializeFromArgs (argc, argv);
     bool reg = registerBroker (broker);
     if (!reg)
     {
@@ -210,20 +209,25 @@ static DelayedDestructor<CoreBroker>
 
 static SearchableObjectHolder<CoreBroker> searchableObjects;  //!< the object managing the searchable objects
 
-std::shared_ptr<CoreBroker> findBroker (const std::string &brokerName)
+std::shared_ptr<Broker> findBroker (const std::string &brokerName)
 {
     return searchableObjects.findObject (brokerName);
 }
 
-bool registerBroker (std::shared_ptr<CoreBroker> tbroker)
+bool registerBroker (std::shared_ptr<Broker> broker)
 {
-    auto res = searchableObjects.addObject(tbroker->getIdentifier(), tbroker);
+    bool res = false;
+    auto tbroker = std::dynamic_pointer_cast<CoreBroker> (std::move (broker));
+    if (tbroker)
+    {
+        res = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
+    }
     cleanUpBrokers ();
     if (res)
     {
-        delayedDestroyer.addObjectsToBeDestroyed(tbroker);
+        delayedDestroyer.addObjectsToBeDestroyed (tbroker);
     }
-    
+
     return res;
 }
 

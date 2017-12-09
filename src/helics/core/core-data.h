@@ -42,9 +42,9 @@ class data_block
     /** size and data */
     data_block (size_t blockSize, char init) : m_data (blockSize, init){};
     /** copy constructor */
-    data_block (const data_block &dt) = default;
+    data_block (const data_block &db) = default;
     /** move constructor */
-    data_block (data_block &&dt) noexcept;
+    data_block (data_block &&db) noexcept;
     /** construct from char * */
     data_block (const char *s) : m_data (s){};
     /** construct from string */

@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helicsTypes.hpp"
 
 #include "../core/coreFederateInfo.h"
-#include "../core/flag-definitions.h"
+#include "../flag-definitions.h"
 #include <atomic>
 #include <string>
 
@@ -430,5 +430,10 @@ class InvalidParameterValue : public std::runtime_error
   public:
     InvalidParameterValue (const char *s) noexcept : std::runtime_error (s) {}
 };
+
+/** function to do some housekeeping work
+@details this runs some cleanup routines and tries to close out any residual thread that haven't been shutdown
+yet*/
+void cleanupHelicsLibrary();
 } //namespace helics
 #endif

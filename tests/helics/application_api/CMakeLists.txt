@@ -15,18 +15,24 @@ test_configuration.h
 value-converter-tests.cpp
 application-api-tests.cpp
 data-view-tests.cpp
-testQueries.cpp
 test-value-federate1.cpp
 test-value-federate2.cpp
 test-message-federate.cpp
 test-filters.cpp
 federate_tests.cpp
-heat-transfer-tests.cpp
 timing_tests.cpp
 iteration_tests.cpp
 subPubObjectTests.cpp
 testFixtures.cpp
 )
+
+IF (NOT QUICK_TESTS_ONLY)
+list(APPEND application_api_test_sources 
+testQueries.cpp
+heat-transfer-tests.cpp
+)
+ENDIF(NOT QUICK_TESTS_ONLY)
+
 
 include_directories( SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
@@ -49,12 +55,9 @@ endif(MSVC)
 ADD_DEFINITIONS(-DHELICS_BROKER_LOCATION="${HELICS_BROKER_LOC}")
 ADD_DEFINITIONS(-DHELICS_INSTALL_LOCATION="${CMAKE_INSTALL_PREFIX}")
 
-add_test(NAME application-api-tests COMMAND application-api-tests)
+add_test(NAME application-api-tests COMMAND application-api-tests --log_level=success --report_level=detailed)
 
-#-----------------------------------------------------------------------------
-# Setup CTEST environment
-#-----------------------------------------------------------------------------
-include(CTest)
+
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET application-api-tests POST_BUILD        # Adds a post-build event to api tests

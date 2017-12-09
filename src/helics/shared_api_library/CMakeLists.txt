@@ -18,7 +18,6 @@ api-data.h
 ValueFederate_c.h
 MessageFederate_c.h
 MessageFilters_c.h
-internal/api_objects.h
 )
 
 set(helicsShared_sources
@@ -27,7 +26,7 @@ FederateExport.cpp
 ValueFederateExport.cpp
 MessageFederateExport.cpp
 MessageFilters.cpp
-
+internal/api_objects.h
 )
 
 
@@ -41,7 +40,8 @@ target_link_libraries(helicsSharedLib helics-static)
 INSTALL(TARGETS helicsSharedLib EXPORT helics-targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+	
+INSTALL(FILES ${helicsShared_headers} DESTINATION include/helics/shared_api_library)
 
 

@@ -19,25 +19,25 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <thread>
 namespace helics
 {
-template <class COMMS, class Broker>
-CommsBroker<COMMS, Broker>::CommsBroker () noexcept
+template <class COMMS, class BrokerT>
+CommsBroker<COMMS, BrokerT>::CommsBroker () noexcept
 {
     static_assert (std::is_base_of<CommsInterface, COMMS>::value, "COMMS object must be a CommsInterface Object");
-    static_assert (std::is_base_of<BrokerBase, Broker>::value,
+    static_assert (std::is_base_of<BrokerBase, BrokerT>::value,
                    "Broker must be an object  with a base of BrokerBase");
 }
 
-template <class COMMS, class Broker>
-CommsBroker<COMMS, Broker>::CommsBroker (bool arg) noexcept : Broker (arg)
+template <class COMMS, class BrokerT>
+CommsBroker<COMMS, BrokerT>::CommsBroker (bool arg) noexcept : BrokerT (arg)
 {
 }
 
-template <class COMMS, class Broker>
-CommsBroker<COMMS, Broker>::CommsBroker (const std::string &obj_name) : Broker (obj_name)
+template <class COMMS, class BrokerT>
+CommsBroker<COMMS, BrokerT>::CommsBroker (const std::string &obj_name) : BrokerT (obj_name)
 {
 }
-template <class COMMS, class Broker>
-CommsBroker<COMMS, Broker>::~CommsBroker ()
+template <class COMMS, class BrokerT>
+CommsBroker<COMMS, BrokerT>::~CommsBroker ()
 {
     BrokerBase::haltOperations = true;
     std::unique_lock<std::mutex> lock (dataMutex);
@@ -64,8 +64,8 @@ CommsBroker<COMMS, Broker>::~CommsBroker ()
     BrokerBase::joinAllThreads ();
 }
 
-template <class COMMS, class Broker>
-void CommsBroker<COMMS, Broker>::brokerDisconnect ()
+template <class COMMS, class BrokerT>
+void CommsBroker<COMMS, BrokerT>::brokerDisconnect ()
 {
     std::unique_lock<std::mutex> lock (dataMutex);
     if (comms)
@@ -85,8 +85,21 @@ void CommsBroker<COMMS, Broker>::brokerDisconnect ()
     }
 }
 
-template <class COMMS, class Broker>
-void CommsBroker<COMMS, Broker>::transmit (int route_id, const ActionMessage &cmd)
+template <class COMMS, class BrokerT>
+bool CommsBroker<COMMS, BrokerT>::tryReconnect ()
+{
+    std::unique_lock<std::mutex> lock (dataMutex);
+    if (comms)
+    {
+        auto comm_ptr = comms.get ();
+        lock.unlock ();  // we don't want to hold the lock while calling reconnect that could cause deadlock
+        return comm_ptr->reconnect ();
+    }
+    return false;
+}
+
+template <class COMMS, class BrokerT>
+void CommsBroker<COMMS, BrokerT>::transmit (int route_id, const ActionMessage &cmd)
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     if (comms)
@@ -95,8 +108,8 @@ void CommsBroker<COMMS, Broker>::transmit (int route_id, const ActionMessage &cm
     }
 }
 
-template <class COMMS, class Broker>
-void CommsBroker<COMMS, Broker>::addRoute (int route_id, const std::string &routeInfo)
+template <class COMMS, class BrokerT>
+void CommsBroker<COMMS, BrokerT>::addRoute (int route_id, const std::string &routeInfo)
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     if (comms)

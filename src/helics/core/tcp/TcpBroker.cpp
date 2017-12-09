@@ -8,13 +8,13 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "TcpBroker.h"
+#include "UdpBroker.h"
 #include "../../common/blocking_queue.h"
 #include "helics/helics-config.h"
 #include "../core-data.h"
 #include "../core.h"
 #include "../helics-time.h"
-#include "TcpComms.h"
+#include "UdpComms.h"
 
 #include <algorithm>
 #include <cassert>
@@ -36,13 +36,13 @@ static const argDescriptors extraArgs{{"local_interface"s, "string"s,
                                       {"port"s, "int"s, "port number for the broker's port"s},
                                       {"portstart"s, "int"s, "starting port for automatic port definitions"s}};
 
-TcpBroker::TcpBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
+UdpBroker::UdpBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
-TcpBroker::TcpBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
+UdpBroker::UdpBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
-TcpBroker::~TcpBroker() = default;
+UdpBroker::~UdpBroker() = default;
 
-void TcpBroker::displayHelp (bool local_only)
+void UdpBroker::displayHelp (bool local_only)
 {
     std::cout << " Help for Zero MQ Broker: \n";
     namespace po = boost::program_options;
@@ -55,7 +55,7 @@ void TcpBroker::displayHelp (bool local_only)
     }
 }
 
-void TcpBroker::InitializeFromArgs (int argc, const char *const *argv)
+void UdpBroker::InitializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == broker_state_t::created)
@@ -114,14 +114,14 @@ void TcpBroker::InitializeFromArgs (int argc, const char *const *argv)
     }
 }
 
-bool TcpBroker::brokerConnect ()
+bool UdpBroker::brokerConnect ()
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     if (brokerAddress.empty ())
     {
         setAsRoot ();
     }
-    comms = std::make_unique<TcpComms> (localInterface, brokerAddress);
+    comms = std::make_unique<UdpComms> (localInterface, brokerAddress);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
     if (PortNumber > 0)
@@ -146,7 +146,7 @@ bool TcpBroker::brokerConnect ()
     return res;
 }
 
-std::string TcpBroker::getAddress () const
+std::string UdpBroker::getAddress () const
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     if (comms)

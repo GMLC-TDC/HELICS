@@ -29,7 +29,8 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction)
     }
 }
 
-ActionMessage::ActionMessage(action_message_def::action_t action, int32_t sourceId, int32_t destId) :ActionMessage(action)
+ActionMessage::ActionMessage (action_message_def::action_t action, int32_t sourceId, int32_t destId)
+    : ActionMessage (action)
 {
     source_id = sourceId;
     dest_id = destId;
@@ -37,16 +38,16 @@ ActionMessage::ActionMessage(action_message_def::action_t action, int32_t source
 
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
     : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
-      dest_handle (act.dest_handle), index (dest_handle), counter (act.counter),
-      flags (act.flags),
-      actionTime (act.actionTime),Te(act.Te),Tdemin(act.Tdemin), payload (std::move (act.payload)), name (payload), info_ (std::move (act.info_))
+      dest_handle (act.dest_handle), index (dest_handle), counter (act.counter), flags (act.flags),
+      actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin), payload (std::move (act.payload)),
+      name (payload), info_ (std::move (act.info_))
 {
 }
 
 ActionMessage::ActionMessage (const ActionMessage &act)
     : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
-      dest_handle (act.dest_handle), index (dest_handle), counter (act.counter),flags (act.flags),
-      actionTime (act.actionTime), Te(act.Te), Tdemin(act.Tdemin), payload (act.payload), name (payload)
+      dest_handle (act.dest_handle), index (dest_handle), counter (act.counter), flags (act.flags),
+      actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin), payload (act.payload), name (payload)
 
 {
     if (act.info_)
@@ -56,8 +57,8 @@ ActionMessage::ActionMessage (const ActionMessage &act)
 }
 
 ActionMessage::ActionMessage (std::unique_ptr<Message> message)
-    : action_ (CMD_SEND_MESSAGE), index (dest_handle),
-      actionTime (message->time), payload (std::move (message->data.m_data)), name (payload)
+    : action_ (CMD_SEND_MESSAGE), index (dest_handle), actionTime (message->time),
+      payload (std::move (message->data.m_data)), name (payload)
 {
     info_ = std::make_unique<AdditionalInfo> ();
     info_->source = std::move (message->src);
@@ -242,7 +243,14 @@ void ActionMessage::fromByteArray (const char *data, size_t buffer_size)
     boost::iostreams::basic_array_source<char> device (data, buffer_size);
     boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
     retriever ia (s);
-    load (ia);
+    try
+    {
+        load (ia);
+    }
+    catch (const cereal::Exception &ce)
+    {
+        action_ = CMD_INVALID;
+    }
 }
 
 void ActionMessage::from_string (const std::string &data) { fromByteArray (data.data (), data.size ()); }
@@ -293,6 +301,9 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_reg_broker, "reg_broker"},
 
   {action_message_def::action_t::cmd_ignore, "ignore"},
+  {action_message_def::action_t::cmd_tick, "tick"},
+  {action_message_def::action_t::cmd_ping, "ping"},
+  {action_message_def::action_t::cmd_ping_reply, "ping reply"},
   {action_message_def::action_t::cmd_fed_configure, "fed_configure"},
   {action_message_def::action_t::cmd_init, "init"},
   {action_message_def::action_t::cmd_init_grant, "init_grant"},
@@ -328,7 +339,7 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_send_message, "send_message"},
   {action_message_def::action_t::cmd_send_for_filter, "send_for_filter"},
   {action_message_def::action_t::cmd_send_for_filter_op, "send_for_filter_op"},
-  { action_message_def::action_t::cmd_send_for_filter_return, "send_for_filter_return" },
+  {action_message_def::action_t::cmd_send_for_filter_return, "send_for_filter_return"},
 
   {action_message_def::action_t::cmd_reg_pub, "reg_pub"},
   {action_message_def::action_t::cmd_notify_pub, "notify_pub"},
@@ -374,7 +385,7 @@ std::string prettyPrintString (const ActionMessage &command)
         ret.push_back (':');
         ret.append (command.name);
         ret.append ("--");
-        if (CHECK_ACTION_FLAG(command,error_flag))
+        if (CHECK_ACTION_FLAG (command, error_flag))
         {
             ret.append ("error");
         }

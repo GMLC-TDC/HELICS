@@ -29,12 +29,7 @@ add_executable(c_interface_tests ${c_interface_test_sources} ${c_interface_test_
 
 target_link_libraries(c_interface_tests helicsSharedLib ${Boost_LIBRARIES_test})
 
-add_test(NAME c_interface_tests COMMAND c_interface_test)
-
-#-----------------------------------------------------------------------------
-# Setup CTEST environment
-#-----------------------------------------------------------------------------
-include(CTest)
+add_test(NAME c_interface_tests COMMAND c_interface_tests --log_level=warning --report_level=detailed)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET c_interface_tests POST_BUILD        # Adds a post-build event to api tests

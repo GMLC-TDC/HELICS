@@ -124,22 +124,22 @@ private:
 
     SubscriptionInfo *getSubscription (const std::string &subName) const;
     SubscriptionInfo *getSubscription (Core::Handle handle_) const;
-    PublicationInfo *getPublication (const std::string &subName) const;
+    PublicationInfo *getPublication (const std::string &pubName) const;
     PublicationInfo *getPublication (Core::Handle handle_) const;
-    EndpointInfo *getEndpoint (const std::string &subName) const;
+    EndpointInfo *getEndpoint (const std::string &endpointName) const;
     EndpointInfo *getEndpoint (Core::Handle handle_) const;
 
 
-    void createSubscription (Core::Handle id_,
+    void createSubscription (Core::Handle handle,
                              const std::string &key,
                              const std::string &type,
                              const std::string &units,
                              handle_check_mode check_mode);
-    void createPublication (Core::Handle id_,
+    void createPublication (Core::Handle handle,
                             const std::string &key,
                             const std::string &type,
                             const std::string &units);
-    void createEndpoint (Core::Handle id_, const std::string &key, const std::string &type);
+    void createEndpoint (Core::Handle handle, const std::string &key, const std::string &type);
 
 	/** get the size of a message queue for a specific endpoint or filter handle*/
     uint64_t getQueueSize (Core::Handle id) const;
@@ -172,7 +172,7 @@ private:
 	/** process a single message
 	@return a convergence state value with an indicator of return reason and state of convergence
 	*/
-	iteration_state processActionMessage(ActionMessage &m);
+	iteration_state processActionMessage(ActionMessage &cmd);
     /** process a message that updates the configuration of the federate for timing*/
     void processConfigUpdate(const ActionMessage &m);
 	/** fill event list
@@ -192,7 +192,7 @@ private:
     @details public call so it also calls the federate lock before calling private update function
     the action Message should be CMD_FED_CONFIGURE
 	*/
-    void UpdateFederateInfo(const ActionMessage &m);
+    void UpdateFederateInfo(const ActionMessage &cmd);
 	/** get the granted time of a federate*/
     Time grantedTime () const { return time_granted; }
 	/**get a reference to the handles of subscriptions with value updates
@@ -213,13 +213,13 @@ private:
 	@param converged indicator of whether the fed should iterate if need be or not
     returns either converged or nonconverged depending on whether an iteration is needed
     */
-    iteration_result enterExecutingState (iteration_request converged);
+    iteration_result enterExecutingState (iteration_request iterate);
 	/** request a time advancement
 	@param nextTime the time of the requested advancement
 	@param converged set to complete to end dense time step iteration, nonconverged to continue iterating if need be
 	@return an iteration time with two elements the granted time and the convergence state
 	*/
-    iterationTime requestTime (Time nextTime, iteration_request converged);
+    iterationTime requestTime (Time nextTime, iteration_request iterate);
 	/** function to process the queue in a generic fashion used to just process messages
 	with no specific end in mind
 	*/

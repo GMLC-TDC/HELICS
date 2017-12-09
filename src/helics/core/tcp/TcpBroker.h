@@ -6,8 +6,8 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#ifndef TCP_BROKER_H_
-#define TCP_BROKER_H_
+#ifndef UDP_BROKER_H_
+#define UDP_BROKER_H_
 #pragma once
 
 #include "../CoreBroker.h"
@@ -16,19 +16,19 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 namespace helics
 {
 
-class TcpComms;
+class UdpComms;
 
-class TcpBroker final:public CommsBroker<TcpComms,CoreBroker>
+class UdpBroker final:public CommsBroker<UdpComms,CoreBroker>
 {
 public:
 	/** default constructor*/
-	TcpBroker(bool rootBroker = false) noexcept;
-	TcpBroker(const std::string &broker_name);
+	UdpBroker(bool rootBroker = false) noexcept;
+	UdpBroker(const std::string &broker_name);
 
 	void InitializeFromArgs(int argc, const char * const *argv) override;
 
 	/**destructor*/
-	virtual ~TcpBroker();
+	virtual ~UdpBroker();
 
 	virtual std::string getAddress() const override;
 	static void displayHelp(bool local_only = false);

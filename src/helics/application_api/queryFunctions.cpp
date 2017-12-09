@@ -38,12 +38,9 @@ std::vector<std::string> vectorizeQueryResult (std::string &&queryres)
         strs.back ().pop_back ();  // get rid of the trailing ']';
         return strs;
     }
-    else
-    {
-        std::vector<std::string> res;
-        res.push_back (std::move (queryres));
-        return res;
-    }
+    std::vector<std::string> res;
+    res.push_back (std::move (queryres));
+    return res;
 }
 
 std::vector<std::string> vectorizeQueryResult (const std::string &queryres)
@@ -60,12 +57,9 @@ std::vector<std::string> vectorizeQueryResult (const std::string &queryres)
         strs.back ().pop_back ();  // get rid of the trailing ']';
         return strs;
     }
-    else
-    {
-        std::vector<std::string> res;
-        res.push_back (queryres);
-        return res;
-    }
+    std::vector<std::string> res;
+    res.push_back (queryres);
+    return res;
 }
 
 std::vector<std::string> vectorizeAndSortQueryResult (const std::string &queryres)

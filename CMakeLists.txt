@@ -8,7 +8,7 @@ set (HELICS_VERSION_MAJOR 0)
 set (HELICS_VERSION_MINOR 9)
 set (HELICS_VERSION_PATCH 0)
 
-set (HELICS_DATE "11-30-17")
+set (HELICS_DATE "12-08-17")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -19,6 +19,7 @@ endif(BUILD_HELICS_TESTS)
 OPTION(BUILD_HELICS_EXAMPLES "Enable the test Executables to be built" OFF)
 
 OPTION(BUILD_PYTHON "Build Python extension" OFF)
+OPTION(BUILD_MATLAB "Build MATLAB extension" OFF)
 
 OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" OFF)
 IF(NOT MSVC)
@@ -29,6 +30,11 @@ if (BUILD_PYTHON OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
 set(BUILD_SHARED_LIBS ON)
 else()
 OPTION(USE_POSITION_INDEPENDENT_CODE "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library" OFF)
+endif()
+
+OPTION(BUILD_JAVA "Build Java extension" OFF)
+if (BUILD_PYTHON OR BUILD_C_SHARED_LIB)
+set(BUILT_C_SHARED_LIB ON)
 endif()
 
 IF(BUILD_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
@@ -118,11 +124,15 @@ IF(MSVC)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
   add_compile_options(/MP)
-  add_compile_options(-W4  /EHsc /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484)
+  add_compile_options(-W4  /EHsc /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484 /wd4702 /wd4996)
   ADD_DEFINITIONS(-D_WIN32_WINNT=0x0601)
 ENDIF(MSVC)
   ENDIF(MINGW)
 ENDIF(UNIX)
+
+IF (BUILD_MATLAB OR USE_BOOST_STATIC_LIBS)
+  set(Boost_USE_STATIC_LIBS ON)
+ENDIF ()
 
 # -------------------------------------------------------------
 # Check and set latest CXX Standard supported by compiler
@@ -355,8 +365,7 @@ set(HELICS_CMAKECONFIG_INSTALL_DIR "cmake/${PROJECT_NAME}" CACHE STRING "install
 
 install (TARGETS helics-static EXPORT helics-targets
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 	set(helics_static_file "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}")
 	
@@ -364,8 +373,7 @@ IF(BUILD_CXX_SHARED_LIB)
 install (TARGETS helics-shared EXPORT helics-targets
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 	set(helics_cxx_shared_file "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_SHARED_LIBRARY_SUFFIX}")
 ELSE (BUILD_CXX_SHARED_LIB)
 	set(helics_cxx_shared_file )
@@ -380,7 +388,7 @@ ENDIF()
 
 install (EXPORT helics-targets DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
 
-set(helics_dependencies ${Boost_Libraries_Core})
+set(helics_dependencies ${Boost_LIBRARIES_core})
 
 IF (UNIX AND NOT APPLE)
 	list(APPEND helics_dependencies rt)
@@ -405,9 +413,10 @@ configure_file (
   )
   install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
   install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/compiler-config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
-  install(DIRECTORY ThirdParty/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-	  FILES_MATCHING PATTERN "helics_includes/*.h*")
+  install(DIRECTORY ThirdParty/cereal DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
+install(DIRECTORY ThirdParty/helics_includes DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY ThirdParty/libguarded DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 
 
@@ -422,7 +431,7 @@ write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Conf
                                  COMPATIBILITY AnyNewerVersion)
 
 configure_file(${PROJECT_NAME}Import.cmake.in
-                              "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake")
+                              "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake" @ONLY)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake

@@ -14,10 +14,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <algorithm>
 #include <functional>
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
+
 /** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
  * threading issues*/
 template <class X>
@@ -30,7 +32,7 @@ class DelayedDestructor
 
   public:
     DelayedDestructor () = default;
-    DelayedDestructor (std::function<void(std::shared_ptr<X> &ptr)> callFirst)
+    explicit DelayedDestructor (std::function<void(std::shared_ptr<X> &ptr)> callFirst)
         : callBeforeDeleteFunction (std::move (callFirst))
     {
     }
@@ -45,11 +47,18 @@ class DelayedDestructor
             {
                 if (ii > 20)
                 {
-                    std::cerr << "error: unable to destroy all objects giving up\n";
+                    std::cerr << "error: unable to destroy all objects giving up" << std::endl;
                     destroyObjects ();
                     break;
                 }
-                std::this_thread::sleep_for (std::chrono::milliseconds (100));
+                if (ii % 2 == 0)
+                {
+                    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+                }
+                else
+                {
+                    std::this_thread::yield ();
+                }
             }
         }
     }
@@ -65,13 +74,14 @@ class DelayedDestructor
             {
                 for (auto &element : ElementsToBeDestroyed)
                 {
-                    if (element.use_count() == 1)
+                    if (element.use_count () == 1)
                     {
-                        callBeforeDeleteFunction(element);
+                        callBeforeDeleteFunction (element);
                     }
                 }
             }
-            //so apparently remove_if can actually destroy shared_ptrs so the call function needs to be before this call
+            // so apparently remove_if can actually destroy shared_ptrs so the call function needs to be before
+            // this call
             auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
                                        [](const auto &element) { return (element.use_count () <= 1); });
             ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());

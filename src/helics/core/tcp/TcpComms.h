@@ -16,7 +16,13 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <string>
 #include <future>
 
-
+namespace boost
+{
+    namespace asio
+    {
+        class io_service;
+    }
+}
 
 namespace helics {
 
@@ -39,14 +45,14 @@ or the interface doesn't use port numbers
 std::pair<std::string, int> extractInterfaceandPort(const std::string &address);
 
 /** implementation for the communication interface that uses ZMQ messages to communicate*/
-class TcpComms final:public CommsInterface {
+class UdpComms final:public CommsInterface {
 
 public:
 	/** default constructor*/
-	TcpComms();
-	TcpComms(const std::string &brokerTarget, const std::string &localTarget);
+	UdpComms();
+	UdpComms(const std::string &brokerTarget, const std::string &localTarget);
 	/** destructor*/
-	~TcpComms();
+	~UdpComms();
 	/** set the port numbers for the local ports*/
 	void setBrokerPort(int brokerPortNumber);
 	void setPortNumber(int localPortNumber);

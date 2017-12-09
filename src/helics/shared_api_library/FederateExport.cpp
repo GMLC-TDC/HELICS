@@ -8,8 +8,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "../application_api/application_api.h"
-#include "../core/helics-time.h"
+#include "../helics.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"
 #include <iostream>
@@ -102,7 +101,7 @@ masterObjectHolder::~masterObjectHolder ()
 int masterObjectHolder::addBroker (helics::BrokerObject *broker)
 {
     std::lock_guard<std::mutex> lock (ObjectLock);
-    int index = static_cast<int> (brokers.size ());
+    auto index = static_cast<int> (brokers.size ());
     brokers.push_back (broker);
     return index;
 }
@@ -110,7 +109,7 @@ int masterObjectHolder::addBroker (helics::BrokerObject *broker)
 int masterObjectHolder::addCore (helics::CoreObject *core)
 {
     std::lock_guard<std::mutex> lock (ObjectLock);
-    int index = static_cast<int> (cores.size ());
+    auto index = static_cast<int> (cores.size ());
     cores.push_back (core);
     return index;
 }
@@ -118,7 +117,7 @@ int masterObjectHolder::addCore (helics::CoreObject *core)
 int masterObjectHolder::addFed (helics::FedObject *fed)
 {
     std::lock_guard<std::mutex> lock (ObjectLock);
-    int index = static_cast<int> (feds.size ());
+    auto index = static_cast<int> (feds.size ());
     feds.push_back (fed);
     return index;
 }
@@ -155,24 +154,15 @@ void masterObjectHolder::deleteAll ()
     std::lock_guard<std::mutex> lock (ObjectLock);
     for (auto obj : brokers)
     {
-        if (obj != nullptr)
-        {
-            delete obj;
-        }
+        delete obj;
     }
     for (auto obj : cores)
     {
-        if (obj != nullptr)
-        {
-            delete obj;
-        }
+        delete obj;
     }
     for (auto obj : feds)
     {
-        if (obj != nullptr)
-        {
-            delete obj;
-        }
+        delete obj;
     }
     brokers.clear ();
     feds.clear ();

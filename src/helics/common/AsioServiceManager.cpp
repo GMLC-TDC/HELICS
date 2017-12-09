@@ -20,8 +20,7 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 
 #include "AsioServiceManager.h"
 
-#include <boost/asio/io_service.hpp>
-
+#include <iostream>
 #include <map>
 #include <mutex>
 #include <stdexcept>
@@ -84,12 +83,14 @@ void AsioServiceManager::closeService (const std::string &serviceName)
 {
     std::lock_guard<std::mutex> servelock (serviceLock);
     auto fnd = services.find (serviceName);
+    //    std::cout << "closing service manager\n";
     if (fnd != services.end ())
     {
         if (fnd->second->running)
         {
+            fnd->second->nullwork.reset ();
             fnd->second->iserv->stop ();
-            fnd->second->serviceThread.join ();
+            fnd->second->loopRet.get ();
         }
 
         services.erase (fnd);
@@ -107,9 +108,17 @@ void AsioServiceManager::setServiceToLeakOnDelete (const std::string &serviceNam
 }
 AsioServiceManager::~AsioServiceManager ()
 {
+    //  std::cout << "deleting service manager\n";
+    if (running)
+    {
+        nullwork.reset ();
+        iserv->stop ();
+        loopRet.get ();
+    }
     if (leakOnDelete)
     {
         // yes I am purposefully leaking this PHILIP TOP
+        // this capability is needed for some operations on particular OS's with the shared library operations
         auto val = iserv.release ();
         (void)(val);
     }
@@ -127,11 +136,76 @@ void AsioServiceManager::runServiceLoop (const std::string &serviceName)
     if (fnd != services.end ())
     {
         auto ptr = fnd->second;
+        ++ptr->runCounter;
         if (!ptr->running)
         {
+            // std::cout << "run Service loop " << ptr->runCounter << "\n";
+            ptr->nullwork = std::make_unique<boost::asio::io_service::work> (ptr->getBaseService ());
             ptr->running = true;
-            ptr->serviceThread = std::thread ([ptr]() { ptr->getBaseService ().run (); });
+            ptr->loopRet = std::async (std::launch::async, [ptr]() { serviceRunLoop (ptr); });
         }
+        else
+        {
+            if (ptr->getBaseService ().stopped ())
+            {
+                // std::cout << "run Service loop already stopped" << ptr->runCounter << "\n";
+                ptr->loopRet.get ();
+                ptr->nullwork = std::make_unique<boost::asio::io_service::work> (ptr->getBaseService ());
+                ptr->running = true;
+                ptr->loopRet = std::async (std::launch::async, [ptr]() { serviceRunLoop (ptr); });
+            }
+        }
+        return;
     }
     throw (std::invalid_argument ("the service name specified was not available"));
+}
+
+void AsioServiceManager::haltServiceLoop (const std::string &serviceName)
+{
+    std::lock_guard<std::mutex> servelock (serviceLock);
+    auto fnd = services.find (serviceName);
+    if (fnd != services.end ())
+    {
+        auto ptr = fnd->second;
+        if (ptr->running)
+        {
+            // std::cout << "service loop halted "<<ptr->runCounter<<"\n";
+            if (ptr->runCounter > 0)
+            {
+                --ptr->runCounter;
+            }
+            if (ptr->runCounter <= 0)
+            {
+                //    std::cout << "calling halt on service loop \n";
+                ptr->nullwork.reset ();
+                ptr->iserv->stop ();
+                ptr->loopRet.get ();
+                ptr->iserv->reset ();  // prepare for future runs
+            }
+        }
+        else
+        {
+            ptr->runCounter = 0;
+        }
+        return;
+    }
+    throw (std::invalid_argument ("the service name specified was not available"));
+}
+
+void serviceRunLoop (std::shared_ptr<AsioServiceManager> ptr)
+{
+    try
+    {
+        ptr->iserv->run ();
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "std::exception in service loop " << e.what () << std::endl;
+    }
+    catch (...)
+    {
+        std::cout << "caught other error in service loop" << std::endl;
+    }
+    // std::cout << "service loop stopped\n";
+    ptr->running = false;
 }

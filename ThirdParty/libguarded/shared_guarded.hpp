@@ -10,6 +10,18 @@
 *
 ***********************************************************************/
 
+/*
+
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was modified by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+additions include load store operations and overloads for std::mutex and std::timed_mutex
+*/
+
 #ifndef LIBGUARDED_SHARED_GUARDED_HPP
 #define LIBGUARDED_SHARED_GUARDED_HPP
 
@@ -437,7 +449,7 @@ private:
     public:
         using pointer = T *;
 
-        deleter(std::mutex & mutex) : m_deleter_mutex(mutex)
+        deleter(std::timed_mutex & mutex) : m_deleter_mutex(mutex)
         {
         }
 
