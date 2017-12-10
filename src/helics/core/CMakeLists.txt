@@ -56,6 +56,7 @@ set (TCP_SOURCE_FILES
 	tcp/TcpCore.cpp
 	tcp/TcpBroker.cpp
 	tcp/TcpComms.cpp
+	tcp/TcpHelperClasses.cpp
 )
 
 set (PUBLIC_INCLUDE_FILES
@@ -129,10 +130,11 @@ set(TCP_HEADER_FILES
 	tcp/TcpCore.h
 	tcp/TcpBroker.h
 	tcp/TcpComms.h
+	tcp/TcpHelperClasses.h
 	)
 
-	list(APPEND SRC_FILES ${UDP_SOURCE_FILES} ${IPC_SOURCE_FILES} )
-	list(APPEND INCLUDE_FILES ${UDP_HEADER_FILES} ${IPC_HEADER_FILES} )
+	list(APPEND SRC_FILES ${UDP_SOURCE_FILES} ${IPC_SOURCE_FILES} ${TCP_SOURCE_FILES})
+	list(APPEND INCLUDE_FILES ${UDP_HEADER_FILES} ${IPC_HEADER_FILES} ${TCP_HEADER_FILES} )
 
 if (${ZeroMQ_FOUND})
    list(APPEND SRC_FILES ${ZMQ_SOURCE_FILES})
@@ -153,7 +155,7 @@ endif (${MPI_C_FOUND})
 source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
 source_group("udp" FILES ${UDP_SOURCE_FILES} ${UDP_HEADER_FILES})
 source_group("ipc" FILES ${IPC_SOURCE_FILES} ${IPC_HEADER_FILES})
-#source_group("tcp" FILEs ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
+source_group("tcp" FILES ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
 
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 

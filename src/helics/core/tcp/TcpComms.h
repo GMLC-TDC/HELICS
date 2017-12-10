@@ -6,15 +6,15 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#ifndef _HELICS_UDP_COMMS_
-#define _HELICS_UDP_COMMS_
+#ifndef _HELICS_TCP_COMMS_
+#define _HELICS_TCP_COMMS_
 #pragma once
 
 #include "../CommsInterface.h"
+#include "../../common/BlockingQueue3.hpp"
 #include <atomic>
 #include <set>
 #include <string>
-#include <future>
 
 namespace boost
 {
@@ -44,15 +44,15 @@ or the interface doesn't use port numbers
 */
 std::pair<std::string, int> extractInterfaceandPort(const std::string &address);
 
-/** implementation for the communication interface that uses ZMQ messages to communicate*/
-class UdpComms final:public CommsInterface {
+/** implementation for the communication interface that uses TCP messages to communicate*/
+class TcpComms final:public CommsInterface {
 
 public:
 	/** default constructor*/
-	UdpComms();
-	UdpComms(const std::string &brokerTarget, const std::string &localTarget);
+	TcpComms();
+	TcpComms(const std::string &brokerTarget, const std::string &localTarget);
 	/** destructor*/
-	~UdpComms();
+	~TcpComms();
 	/** set the port numbers for the local ports*/
 	void setBrokerPort(int brokerPortNumber);
 	void setPortNumber(int localPortNumber);
@@ -74,8 +74,7 @@ private:
 	int processIncomingMessage(ActionMessage &cmd);
     ActionMessage generateReplyToIncomingMessage(ActionMessage &cmd);
     //promise and future for communicating port number from tx_thread to rx_thread
-    std::promise<int> promisePort;
-    std::future<int> futurePort;
+    BlockingQueue3<ActionMessage> rxMessageQueue;
 public:
 	/** get the port number of the comms object to push message to*/
 	int getPort() const { return PortNumber; };

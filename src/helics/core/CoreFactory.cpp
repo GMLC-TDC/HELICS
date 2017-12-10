@@ -25,6 +25,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "TestCore.h"
 #include "ipc/IpcCore.h"
 #include "udp/UdpCore.h"
+#include "tcp/TcpCore.h"
 #include <cassert>
 
 namespace helics
@@ -151,7 +152,15 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         }
         break;
     case core_type::TCP:
-        throw (HelicsException ("TCP core is not available"));
+        if (name.empty())
+        {
+            core = std::make_shared<TcpCore>();
+        }
+        else
+        {
+            core = std::make_shared<TcpCore>(name);
+        }
+        break;
     default:
         throw (HelicsException ("unrecognized core type"));
     }
@@ -266,9 +275,8 @@ bool isAvailable (core_type type)
     case core_type::IPC:
         available = true;
         break;
-    case core_type::TCP:
-        break;
     case core_type::UDP:
+    case core_type::TCP:
         available = true;
         break;
     default:

@@ -32,6 +32,7 @@ testPriorityBlockingQueue.cpp
 test-simple-queue.cpp
 data-block-tests.cpp
 UdpCore-tests.cpp
+TcpCore-tests.cpp
 )
 
 add_executable(core-tests ${core_test_sources} ${core_test_headers})
