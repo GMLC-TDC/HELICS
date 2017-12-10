@@ -141,7 +141,9 @@ void TcpComms::queue_rx_function ()
                 break;
             case CLOSE_RECEIVER:
             case DISCONNECT:
-                goto CLOSE_RX_LOOP;
+                disconnecting = true;
+                rx_status = connection_status::terminated;
+                return;
 
             }
         }
@@ -163,13 +165,14 @@ void TcpComms::queue_rx_function ()
             {
             case CLOSE_RECEIVER:
             case DISCONNECT:
-                goto CLOSE_RX_LOOP;
+                disconnecting = true;
+                rx_status = connection_status::terminated;
+                return;
 
             }
         }
     }
 
-CLOSE_RX_LOOP:
     disconnecting = true;
     rx_status = connection_status::terminated;
     return;
@@ -227,15 +230,10 @@ void TcpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
     auto ioserv = AsioServiceManager::getServicePointer();
-    tcp::resolver resolver (ioserv->getBaseService());
-    bool closingRx = false;
-    tcp::socket transmitSocket (ioserv->getBaseService());
-    transmitSocket.open (tcp::v4 ());
+    tcp_connection::pointer brokerConnection;
   
     boost::system::error_code error;
-    std::map<int, tcp::endpoint> routes;  // for all the other possible routes
-    tcp::endpoint broker_endpoint;
-
+    std::map<int, tcp_connection::pointer> routes;  // for all the other possible routes
     if (!brokerTarget_.empty())
     {
         hasBroker = true;
@@ -248,34 +246,33 @@ void TcpComms::queue_tx_function ()
         }
         try
         {
-            tcp::resolver::query query(tcp::v4(), brokerTarget_, std::to_string(brokerPort));
-            // Setup the control socket for comms with the receiver
-            broker_endpoint = *resolver.resolve(query);
+            brokerConnection = tcp_connection::create(ioserv->getBaseService(), brokerTarget_, std::to_string(brokerPort), maxMessageSize_);
+           
 
             if (PortNumber <= 0)
             {
                 ActionMessage m(CMD_PROTOCOL_PRIORITY);
                 m.index = REQUEST_PORTS;
-                transmitSocket.send_to(boost::asio::buffer(m.to_string()), broker_endpoint, 0, error);
+                brokerConnection->send(m.to_string());
+             
                 if (error)
                 {
                     std::cerr << "error in initial send to broker " << error.message() << '\n';
                 }
                 std::vector<char> rx(128);
                 tcp::endpoint brk;
-                auto len=transmitSocket.receive_from(boost::asio::buffer(rx), brk);
+                auto len=brokerConnection->receive(rx.data(),128);
                 m = ActionMessage(rx.data(),len);
                 if (isProtocolCommand(m))
                 {
                     if (m.index == PORT_DEFINITIONS)
                     {
-                        PortNumber = m.source_handle;
-                        promisePort.set_value(PortNumber);
+                        rxMessageQueue.push(m);
                     }
                     else if (m.index == DISCONNECT)
                     {
                         PortNumber = -1;
-                        promisePort.set_value(-1);
+                        rxMessageQueue.push(m);
                         tx_status = connection_status::terminated;
                         return;
                     }
@@ -291,13 +288,13 @@ void TcpComms::queue_tx_function ()
     {
         if (PortNumber < 0)
         {
-            PortNumber = DEFAULT_Tcp_BROKER_PORT_NUMBER;
-            promisePort.set_value(PortNumber);
+            PortNumber = DEFAULT_TCP_BROKER_PORT_NUMBER;
+            ActionMessage m(CMD_PROTOCOL);
+            m.index = PORT_DEFINITIONS;
+            m.source_handle = PortNumber;
+            rxMessageQueue.push(m);
         }
     }
-    tcp::resolver::query queryLocal(tcp::v4(), localTarget_, std::to_string(PortNumber));
-
-    tcp::endpoint rxEndpoint= *resolver.resolve(queryLocal);
     tx_status = connection_status::connected;
     
     while (true)
@@ -322,9 +319,9 @@ void TcpComms::queue_tx_function ()
                         std::string interface;
                         std::string port;
                         std::tie(interface, port) = extractInterfaceandPortString(newroute);
-                        tcp::resolver::query queryNew(tcp::v4(), interface,port);
+                        auto new_connect = tcp_connection::create(ioserv->getBaseService(), interface, port);
 
-                        routes.emplace (cmd.dest_id, *resolver.resolve(queryNew));
+                        routes.emplace (cmd.dest_id, std::move(new_connect));
                     }
                     catch (std::exception &e)
                     {
@@ -334,12 +331,7 @@ void TcpComms::queue_tx_function ()
                 }
                 break;
                 case CLOSE_RECEIVER:
-                    transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rxEndpoint, 0, error);
-                    if (error)
-                    {
-                        std::cerr << "transmit failure to receiver " << error.message() << '\n';
-                    }
-                    closingRx = true;
+                    rxMessageQueue.push(cmd);
                     processed = true;
                     break;
                 case DISCONNECT:
@@ -356,7 +348,8 @@ void TcpComms::queue_tx_function ()
         {
             if (hasBroker)
             {
-                transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), broker_endpoint,0,error);
+                brokerConnection->send(cmd.to_string());
+                
                 if (error)
                 {
                     std::cerr << "transmit failure to broker " << error.message() << '\n';
@@ -365,32 +358,20 @@ void TcpComms::queue_tx_function ()
         }
         else if (route_id == -1)
         {  // send to rx thread loop
-            transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rxEndpoint,0,error);
-            if (error)
-            {
-                std::cerr << "transmit failure to receiver " << error.message() << '\n';
-            }
+            rxMessageQueue.push(cmd);
         }
         else
         {
             auto rt_find = routes.find (route_id);
             if (rt_find != routes.end ())
             {
-                transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rt_find->second,0,error);
-                if (error)
-                {
-                    std::cerr << "transmit failure to route to "<<route_id<<" " << error.message() << '\n';
-                }
+                rt_find->second->send(cmd.to_string());
             }
             else
             {
                 if (hasBroker)
                 {
-                    transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), broker_endpoint,0,error);
-                    if (error)
-                    {
-                        std::cerr << "transmit failure to broker " << error.message() << '\n';
-                    }
+                    brokerConnection->send(cmd.to_string());
                 }
             }
         }
@@ -400,91 +381,16 @@ CLOSE_TX_LOOP:
     routes.clear ();
     if (rx_status == connection_status::connected)
     {
-        if (closingRx)
-        {
-            int cnt = 0;
-            while (rx_status == connection_status::connected)
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                ++cnt;
-                if (cnt == 30)
-                {
-                    std::string cls("close");
-                    transmitSocket.send_to(boost::asio::buffer(cls), rxEndpoint, 0, error);
-                    if (error)
-                    {
-                        std::cerr << "transmit failure II to receiver" << error.message() << '\n';
-                    }
-                }
-                if (cnt > 60)
-                {
-                    break;
-                }
-            }
-
-        }
-        else
-        {
-            std::string cls("close");
-            transmitSocket.send_to(boost::asio::buffer(cls), rxEndpoint, 0, error);
-            if (error)
-            {
-                std::cerr << "transmit failure to receiver" << error.message() << '\n';
-            }
-        }
-       
+        closeReceiver();
     }
-
-
     tx_status = connection_status::terminated;
-}
-
-void TcpComms::closeTransmitter ()
-{
-    ActionMessage rt (CMD_PROTOCOL);
-    rt.index = DISCONNECT;
-    transmit (-1, rt);
 }
 
 void TcpComms::closeReceiver ()
 {
-    if (tx_status == connection_status::connected)
-    {
-        ActionMessage cmd (CMD_PROTOCOL);
-        cmd.index = CLOSE_RECEIVER;
-        transmit (-1, cmd);
-    }
-    else if (!disconnecting)
-    {
-       
-
-        try
-        {
-            auto serv = AsioServiceManager::getServicePointer();
-            if (serv)
-            {
-                // try connecting with the receiver socket
-                tcp::resolver resolver(serv->getBaseService());
-                tcp::resolver::query queryLocal(tcp::v4(), localTarget_, std::to_string(PortNumber));
-
-                tcp::endpoint rxEndpoint = *resolver.resolve(queryLocal);
-
-                tcp::socket transmit(serv->getBaseService(),tcp::endpoint(tcp::v4(),0));
-                std::string cls("close");
-                boost::system::error_code error;
-                transmit.send_to(boost::asio::buffer(cls), rxEndpoint,0,error);
-                if (error)
-                {
-                    std::cerr << "transmit failure on disconnect " << error.message() << '\n';
-                }
-            }
-            
-        }
-        catch (...)
-        {
-            //ignore error here
-       }
-    }
+    ActionMessage cmd (CMD_PROTOCOL);
+    cmd.index = CLOSE_RECEIVER;
+    rxMessageQueue.push(cmd);
 }
 
 std::string TcpComms::getAddress () const { return makePortAddress (localTarget_, PortNumber); }

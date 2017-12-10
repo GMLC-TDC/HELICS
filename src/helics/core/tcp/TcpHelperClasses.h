@@ -53,7 +53,7 @@ public:
         errorCall = std::move(errorFunc);
     }
 private:
-    tcp_rx_connection(boost::asio::io_service& io_service, int bufferSize)
+    tcp_rx_connection(boost::asio::io_service& io_service, size_t bufferSize)
         : socket_(io_service), data(bufferSize)
     {
     }
@@ -75,7 +75,7 @@ class tcp_connection
 public:
     typedef std::shared_ptr<tcp_connection> pointer;
 
-    static pointer create(boost::asio::io_service& io_service, const std::string &connection, size_t bufferSize = 10192);
+    static pointer create(boost::asio::io_service& io_service, const std::string &connection, const std::string &port, size_t bufferSize = 10192);
 
     boost::asio::ip::tcp::socket& socket()
     {
@@ -83,7 +83,7 @@ public:
     }
     void start_receive()
     {
-        socket_.async_receive(boost::asio::buffer(data), [this](const boost::system::error_code&error, std::size_t bytes_transferred)
+        socket_.async_receive(boost::asio::buffer(data), [this](const boost::system::error_code &error, std::size_t bytes_transferred)
         {
             handle_read(error, bytes_transferred);
         });
@@ -96,8 +96,25 @@ public:
     {
         socket_.close();
     }
+    /** send raw data
+    @throws boost::system::system_error on failure*/
+    void send(const void *buffer, size_t dataLength);
+    /** send a string
+    @throws boost::system::system_error on failure*/
+    void send(const std::string &dataString);
+    /** do a blocking receive on the socket
+    @throw boost::system::system_error on failure
+    @return the number of bytes received
+    */
+    size_t receive(void *buffer, size_t maxDataSize);
+
+    template<class Process>
+    void send_async(const void *buffer, size_t dataLength, Process &callback)
+    {
+        socket_.async_send(boost::asio::const_buffer(buffer, dataLength), callback);
+    }
 private:
-    tcp_connection(boost::asio::io_service& io_service, const std::string &connection, size_t bufferSize);
+    tcp_connection(boost::asio::io_service& io_service, const std::string &connection, const std::string &port, size_t bufferSize);
 
     void handle_read(const boost::system::error_code &error,
         size_t bytes_transferred)
