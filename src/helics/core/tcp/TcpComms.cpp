@@ -155,7 +155,8 @@ void TcpComms::queue_rx_function ()
     }
     auto ioserv = AsioServiceManager::getServicePointer();
     tcp_server server(ioserv->getBaseService(),PortNumber,maxMessageSize_);
-
+    ioserv->runServiceLoop();
+    server.start_accept();
     while (true)
     {
         auto message = rxMessageQueue.pop();
@@ -166,6 +167,7 @@ void TcpComms::queue_rx_function ()
             case CLOSE_RECEIVER:
             case DISCONNECT:
                 disconnecting = true;
+                ioserv->haltServiceLoop();
                 rx_status = connection_status::terminated;
                 return;
 
@@ -174,6 +176,7 @@ void TcpComms::queue_rx_function ()
     }
 
     disconnecting = true;
+    ioserv->haltServiceLoop();
     rx_status = connection_status::terminated;
     return;
 }

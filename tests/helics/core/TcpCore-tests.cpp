@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/Tcp/TcpBroker.h"
 #include "helics/core/Tcp/TcpComms.h"
 #include "helics/core/Tcp/TcpCore.h"
-#include <boost/asio/ip/tcp.hpp>
+#include "helics/core/tcp/TcpHelperClasses.h"
 
 //#include "boost/process.hpp"
 #include <future>
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_SUITE (TcpCore_tests)
 using boost::asio::ip::tcp;
 using helics::Core;
 
-/*
+
 BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
 {
     std::atomic<int> counter{0};
@@ -37,35 +37,36 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
 
     auto srv = AsioServiceManager::getServicePointer ();
 
-    udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
-
+    tcp_server server(srv->getBaseService(), 24160);
+    srv->runServiceLoop();
+    std::vector<char> data(1024);
+    server.start_accept();
+    
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
-    comm.setBrokerPort (23901);
+    comm.setBrokerPort (24160);
     comm.setName ("tests");
     auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
 
-    std::vector<char> data (1024);
+   
 
-    udp::endpoint remote_endpoint;
-    boost::system::error_code error;
-    auto len = rxSocket.receive_from (boost::asio::buffer (data), remote_endpoint, 0, error);
+   /*
+    BOOST_CHECK_GT (sz, 32);
 
-    BOOST_CHECK (!error);
-    BOOST_CHECK_GT (len, 32);
-
-    helics::ActionMessage rM (data.data (), len);
+    helics::ActionMessage rM (data.data (), sz);
     BOOST_CHECK (helics::isProtocolCommand (rM));
     rM.index = DISCONNECT;
-    rxSocket.send_to (boost::asio::buffer (rM.to_string ()), remote_endpoint, 0, error);
-    BOOST_CHECK (!error);
+    connection->send (rM.to_string ());
+  
     auto connected = confut.get ();
     BOOST_CHECK (!connected);
-    rxSocket.close ();
+    connection->close ();
     comm.disconnect ();
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    */
+    srv->haltServiceLoop();
 }
 
-*/
+
 
 /*
 BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
