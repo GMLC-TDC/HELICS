@@ -5,8 +5,8 @@ static char help[] = "Example to demonstrate the usage of HELICS C Interface wit
             published by the other federate. Once the value has arrived, it publishes its next value \n\n";
 
 #include <stdio.h>
-#include <ValueFederate.hpp>
-#include <helics.hpp> // getHelicsVersionString
+#include <cpp98/ValueFederate.hpp>
+#include <cpp98/helics.hpp> // getHelicsVersionString
 #ifdef _MSC_VER
 #include <windows.h>
 #else

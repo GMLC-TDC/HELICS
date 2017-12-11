@@ -6,7 +6,7 @@
 ##############################################################################
 
 include_directories ("${PROJECT_SOURCE_DIR}/src/helics")
-include_directories ("${PROJECT_SOURCE_DIR}/src/helics/cpp_interface")
+include_directories ("${PROJECT_SOURCE_DIR}/src/helics/cpp98")
 
 add_executable(pi_sender_cpp pi_sender.cpp)
 add_executable(pi_receiver_cpp pi_receiver.cpp)
@@ -25,6 +25,15 @@ add_executable(nonlings_fed2_cpp nonlings_fed2.cpp)
 
 target_link_libraries(nonlings_fed1_cpp helicsSharedLib )
 target_link_libraries(nonlings_fed2_cpp helicsSharedLib )
+
+target_compile_options(pi_sender_cpp PRIVATE -std=c++98 -pedantic)
+target_compile_options(pi_receiver_cpp PRIVATE -std=c++98 -pedantic)
+
+target_compile_options(pi_sender2_cpp PRIVATE -std=c++98 -pedantic)
+target_compile_options(pi_receiver2_cpp PRIVATE -std=c++98 -pedantic)
+
+target_compile_options(nonlings_fed1_cpp PRIVATE -std=c++98 -pedantic)
+target_compile_options(nonlings_fed2_cpp PRIVATE -std=c++98 -pedantic)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET pi_sender_cpp POST_BUILD        # Adds a post-build event to api tests

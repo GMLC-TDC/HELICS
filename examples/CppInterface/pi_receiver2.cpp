@@ -4,8 +4,8 @@ static char help[] = "Example to demonstrate the usage of HELICS C Interface wit
             This federate can only publish a value once it receives value from the other federate.\n\n";
 
 #include <stdio.h>
-#include <ValueFederate.hpp>
-#include <helics.hpp> // getHelicsVersionString
+#include <cpp98/ValueFederate.hpp>
+#include <cpp98/helics.hpp> // getHelicsVersionString
 #include <math.h>
 
 int main(int argc,char ** argv)

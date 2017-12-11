@@ -126,20 +126,20 @@ class FederateInfo
 class InvalidStateTransition : public std::runtime_error
 {
   public:
-    InvalidStateTransition (const char *s) noexcept : std::runtime_error (s) {}
+    InvalidStateTransition (const char *s) : std::runtime_error (s) {}
 };
 
 /** defining an exception class for invalid function calls*/
 class InvalidFunctionCall : public std::runtime_error
 {
   public:
-    InvalidFunctionCall (const char *s) noexcept : std::runtime_error (s) {}
+    InvalidFunctionCall (const char *s) : std::runtime_error (s) {}
 };
 /** defining an exception class for invalid parameter values*/
 class InvalidParameterValue : public std::runtime_error
 {
   public:
-    InvalidParameterValue (const char *s) noexcept : std::runtime_error (s) {}
+    InvalidParameterValue (const char *s) : std::runtime_error (s) {}
 };
 
 class Federate
@@ -183,10 +183,10 @@ class Federate
         }
     }
 
-    iteration_status enterExecutionState (iteration_request iterate = iteration_request::no_iteration)
+    iteration_status enterExecutionState (iteration_request iterate = no_iteration)
     {
-        iteration_status out_iterate = iteration_status::next_step;
-        if (iterate == iteration_request::no_iteration)
+        iteration_status out_iterate = next_step;
+        if (iterate == no_iteration)
         {
             helicsEnterExecutionMode (fed);
         }
@@ -197,9 +197,9 @@ class Federate
         return out_iterate;
     }
 
-    void enterExecutionStateAsync (iteration_request iterate = iteration_request::no_iteration)
+    void enterExecutionStateAsync (iteration_request iterate = no_iteration)
     {
-        if (iterate == iteration_request::no_iteration)
+        if (iterate == no_iteration)
         {
             helicsEnterExecutionModeAsync (fed);
             exec_async_iterate = false;
@@ -213,7 +213,7 @@ class Federate
 
     iteration_status enterExecutionStateFinalize ()
     {
-        iteration_status out_iterate = iteration_status::next_step;
+        iteration_status out_iterate = next_step;
         if (exec_async_iterate)
         {
             helicsEnterExecutionModeIterativeFinalize (fed, &out_iterate);

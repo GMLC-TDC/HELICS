@@ -12,8 +12,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define HELICS_CPP98_VALUE_FEDERATE_HPP_
 #pragma once
 
-#include "shared_api_library/ValueFederate_c.h"
+#include "helics.hpp"
 #include "Federate.hpp"
+
+#include <sstream>
 
 // TODO: Update to use methods in c interface for getting length of data pointed to that can be gotten (all the ones taking a max len argument) - function may not exist yet
 
@@ -86,14 +88,14 @@ class ValueFederate : public virtual Federate
     helics_publication
     registerPublicationIndexed (const std::string &name, int index1, int type, const std::string &units = "")
     {
-        std::string indexed_name = name + '_' + std::to_string (index1);
+        std::string indexed_name = name + '_' + toStr (index1);
         return registerGlobalTypePublication (indexed_name, type, units);
     }
 
     helics_publication
     registerPublicationIndexed (const std::string &name, int index1, int index2,int type, const std::string &units = "")
     {
-        std::string indexed_name = name + '_' + std::to_string (index1) + '_' + std::to_string (index2);
+        std::string indexed_name = name + '_' + toStr (index1) + '_' + toStr (index2);
         return registerGlobalTypePublication (indexed_name, type, units);
     }
 
@@ -117,7 +119,7 @@ class ValueFederate : public virtual Federate
     helics_subscription
     registerSubscriptionIndexed (const std::string &name, int index1, int type, const std::string &units = "")
     {
-        std::string indexed_name = name + '_' + std::to_string (index1);
+        std::string indexed_name = name + '_' + toStr (index1);
         return registerTypeSubscription (indexed_name, type, units);
     }
 
@@ -128,7 +130,7 @@ class ValueFederate : public virtual Federate
                                          int type,
                                          const std::string &units = "")
     {
-        std::string indexed_name = name + '_' + std::to_string (index1) + '_' + std::to_string (index2);
+        std::string indexed_name = name + '_' + toStr (index1) + '_' + toStr (index2);
         return registerTypeSubscription (indexed_name, type, units);
     }
 
@@ -341,6 +343,13 @@ class ValueFederate : public virtual Federate
     std::vector<helics_subscription> subs;
     std::vector<helics_publication> pubs;
 
+    // Utility function for converting numbers to string
+    template <typename T> std::string toStr (T num)
+    {
+        std::ostringstream ss;
+        ss << num;
+        return ss.str();
+    }
 };
 } //namespace helics
 #endif

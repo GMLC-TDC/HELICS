@@ -1,5 +1,5 @@
-#include <ValueFederate.hpp>
-#include <helics.hpp> // getHelicsVersionString
+#include <cpp98/ValueFederate.hpp>
+#include <cpp98/helics.hpp> // getHelicsVersionString
 #include <math.h>
 #include <stdio.h>
 #ifdef _MSC_VER

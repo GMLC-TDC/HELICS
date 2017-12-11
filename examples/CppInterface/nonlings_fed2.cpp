@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <math.h>
-#include <ValueFederate.hpp>
-#include <helics.hpp> // getHelicsVersionString
-#include <math.h>
+#include <cpp98/ValueFederate.hpp>
+#include <cpp98/helics.hpp> // getHelicsVersionString
 
 int main(int argc,char **argv)
 {
