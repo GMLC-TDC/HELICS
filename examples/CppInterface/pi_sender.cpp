@@ -6,6 +6,7 @@ static char help[] = " PI SENDER: Simple program to demonstrate the usage of HEL
 
 #include <stdio.h>
 #include <cpp98/ValueFederate.hpp>
+#include <cpp98/Broker.hpp>
 #include <cpp98/helics.hpp> // getHelicsVersionString
 #ifdef _MSC_VER
 #include <windows.h>
@@ -15,10 +16,8 @@ static char help[] = " PI SENDER: Simple program to demonstrate the usage of HEL
 
 int main(int argc,char **argv)
 {
-  helics_broker  broker;
-  const char*    initstring="2 --name=mainbroker";
-  const char*    fedinitstring="--broker=mainbroker --federates=1";
-  int            isconnected;
+  std::string    initstring="2 --name=mainbroker";
+  std::string    fedinitstring="--broker=mainbroker --federates=1";
   double         deltat=0.01;
   helics_publication pub;
 
@@ -28,11 +27,9 @@ int main(int argc,char **argv)
   printf("%s",help);
 
   /* Create broker */
-  broker = helicsCreateBroker("zmq","",initstring);
+  helics::Broker broker("zmq","",initstring);
 
-  isconnected = helicsBrokerIsConnected(broker);
-
-  if(isconnected) {
+  if(broker.isConnected()) {
     printf("PI SENDER: Broker created and connected\n");
   }
 
@@ -90,7 +87,7 @@ int main(int argc,char **argv)
   // destructor must be called before call to helicsCloseLibrary(), or segfault
   delete vfed;
 
-  while(helicsBrokerIsConnected(broker)) {
+  while(broker.isConnected()) {
 #ifdef _MSC_VER
 	  Sleep(100);
 #else

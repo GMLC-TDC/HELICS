@@ -6,6 +6,7 @@ static char help[] = "Example to demonstrate the usage of HELICS C Interface wit
 
 #include <stdio.h>
 #include <cpp98/ValueFederate.hpp>
+#include <cpp98/Broker.hpp>
 #include <cpp98/helics.hpp> // getHelicsVersionString
 #ifdef _MSC_VER
 #include <windows.h>
@@ -15,10 +16,8 @@ static char help[] = "Example to demonstrate the usage of HELICS C Interface wit
 
 int main(int argc,char **argv)
 {
-  helics_broker  broker;
-  const char*    initstring="2 --name=mainbroker";
-  const char*    fedinitstring="--broker=mainbroker --federates=1";
-  int            isconnected;
+  std::string    initstring="2 --name=mainbroker";
+  std::string    fedinitstring="--broker=mainbroker --federates=1";
   double         deltat=0.01;
   helics_publication pub;
   helics_subscription sub;
@@ -29,11 +28,9 @@ int main(int argc,char **argv)
   printf("%s",help);
 
   /* Create broker */
-  broker = helicsCreateBroker("zmq","",initstring);
+  helics::Broker broker("zmq","",initstring);
 
-  isconnected = helicsBrokerIsConnected(broker);
-
-  if(isconnected) {
+  if(broker.isConnected()) {
     printf("PI SENDER: Broker created and connected\n");
   }
   
@@ -104,7 +101,7 @@ int main(int argc,char **argv)
 
   // Destructor must be called before closing the library
   delete vfed;
-  while(helicsBrokerIsConnected(broker)) {
+  while(broker.isConnected()) {
 #ifdef _MSC_VER
 	  Sleep(50);
 #else
