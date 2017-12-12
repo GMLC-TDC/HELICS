@@ -228,11 +228,30 @@ void TcpComms::queue_rx_function ()
 
 */
 
+void TcpComms::txReceive (const char *data, int data_size, const std::string &errorMessage)
+{
+    if (errorMessage.empty())
+    {
+        ActionMessage m(data, data_size);
+        if (isProtocolCommand(m))
+        {
+            if (m.index == PORT_DEFINITIONS)
+            {
+                rxMessageQueue.push(m);
+            }
+            else if (m.index == DISCONNECT)
+            {
+                txQueue.emplace(-1,m);
+            }
+        }
+    }
+}
 
 void TcpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
     auto ioserv = AsioServiceManager::getServicePointer();
+    ioserv->runServiceLoop();
     tcp_connection::pointer brokerConnection;
   
     boost::system::error_code error;
@@ -250,32 +269,79 @@ void TcpComms::queue_tx_function ()
         try
         {
             brokerConnection = tcp_connection::create(ioserv->getBaseService(), brokerTarget_, std::to_string(brokerPort), maxMessageSize_);
-           
+            int cumsleep = 0;
+            while (!brokerConnection->isConnected())
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                cumsleep += 100;
+                if (cumsleep >= connectionTimeout)
+                {
+                    ioserv->haltServiceLoop();
+                    std::cerr << "initial connection to broker timed out\n" << std::endl;
+                    tx_status = connection_status::terminated;
+                    return;
+                }
+            }
 
             if (PortNumber <= 0)
             {
                 ActionMessage m(CMD_PROTOCOL_PRIORITY);
                 m.index = REQUEST_PORTS;
-                brokerConnection->send(m.to_string());
-             
-                if (error)
+                try
                 {
-                    std::cerr << "error in initial send to broker " << error.message() << '\n';
+                    brokerConnection->send(m.to_string());
+                }
+                catch (const boost::system::system_error &error)
+                {
+                    std::cerr << "error in initial send to broker " << error.what() << '\n';
+                    ioserv->haltServiceLoop();
+                    tx_status = connection_status::terminated;
+                    return;
                 }
                 std::vector<char> rx(128);
                 tcp::endpoint brk;
-                auto len=brokerConnection->receive(rx.data(),128);
-                m = ActionMessage(rx.data(),len);
-                if (isProtocolCommand(m))
+                brokerConnection->async_receive(rx.data(), 128, [this, rx](const boost::system::error_code& error, auto bytes) {
+                    if (error != boost::asio::error::operation_aborted)
+                    {
+                        if (!error)
+                        {
+                            txReceive(rx.data(), bytes, std::string());
+                        }
+                        else
+                        {
+                            txReceive(rx.data(), bytes, error.message());
+                        }
+                    } 
+                });
+                cumsleep = 0;
+                while (PortNumber < 0)
                 {
-                    if (m.index == PORT_DEFINITIONS)
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    auto mess = txQueue.try_pop();
+                    if (mess)
                     {
-                        rxMessageQueue.push(m);
+                        if (isProtocolCommand(mess->second))
+                        {
+                            if (mess->second.index == PORT_DEFINITIONS)
+                            {
+                                rxMessageQueue.push(mess->second);
+                            }
+                            else if (mess->second.index == DISCONNECT)
+                            {
+                                brokerConnection->cancel();
+                                ioserv->haltServiceLoop();
+                                tx_status = connection_status::terminated;
+                                return;
+                            }
+                        }
                     }
-                    else if (m.index == DISCONNECT)
+                    cumsleep += 100;
+                    if (cumsleep >= connectionTimeout)
                     {
-                        PortNumber = -1;
-                        rxMessageQueue.push(m);
+                        
+                        ioserv->haltServiceLoop();
+                        brokerConnection->cancel();
+                        std::cerr << "port number query to broker timed out\n" << std::endl;
                         tx_status = connection_status::terminated;
                         return;
                     }
@@ -386,6 +452,7 @@ CLOSE_TX_LOOP:
     {
         closeReceiver();
     }
+    ioserv->haltServiceLoop();
     tx_status = connection_status::terminated;
 }
 

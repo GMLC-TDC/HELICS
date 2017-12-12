@@ -15,9 +15,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/CoreFactory.h"
 #include "helics/core/core-types.h"
 #include "helics/core/core.h"
-#include "helics/core/Tcp/TcpBroker.h"
-#include "helics/core/Tcp/TcpComms.h"
-#include "helics/core/Tcp/TcpCore.h"
+#include "helics/core/tcp/TcpBroker.h"
+#include "helics/core/tcp/TcpComms.h"
+#include "helics/core/tcp/TcpCore.h"
 #include "helics/core/tcp/TcpHelperClasses.h"
 
 //#include "boost/process.hpp"
@@ -40,6 +40,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     tcp_server server(srv->getBaseService(), 24160);
     srv->runServiceLoop();
     std::vector<char> data(1024);
+    server.setDataCall([&counter](const char *, size_t) {++counter; });
     server.start_accept();
     
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
@@ -48,21 +49,20 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
 
    
-
-   /*
-    BOOST_CHECK_GT (sz, 32);
-
-    helics::ActionMessage rM (data.data (), sz);
-    BOOST_CHECK (helics::isProtocolCommand (rM));
-    rM.index = DISCONNECT;
-    connection->send (rM.to_string ());
-  
-    auto connected = confut.get ();
-    BOOST_CHECK (!connected);
-    connection->close ();
-    comm.disconnect ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
-    */
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    int cnt = 0;
+    while (counter != 1)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        ++cnt;
+        if (cnt > 30)
+        {
+            break;
+        }
+    }
+    BOOST_CHECK_EQUAL(counter, 1);
+    server.haltServer();
+    comm.disconnect();
     srv->haltServiceLoop();
 }
 

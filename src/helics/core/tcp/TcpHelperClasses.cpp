@@ -37,16 +37,13 @@ void tcp_rx_connection::handle_read(const boost::system::error_code &error,
                 return;
             }
         }
-        else
+        else if ((error != boost::asio::error::eof)&&(error!=boost::asio::error::operation_aborted))
         {
             std::cerr << "receive error " << error.message() << std::endl;
             return;
         }
     }
-    socket_.async_receive(boost::asio::buffer(data), [this](const boost::system::error_code& error, std::size_t bytes_transferred)
-    {
-        handle_read(error, bytes_transferred);
-    });
+    start();
 }
 
 
@@ -61,9 +58,17 @@ tcp_connection::tcp_connection(boost::asio::io_service& io_service, const std::s
     tcp::resolver resolver(io_service);
     tcp::resolver::query query(tcp::v4(),connection,port);
     tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-    socket_.connect(*endpoint_iterator);
+    socket_.async_connect(*endpoint_iterator, [this](const boost::system::error_code &error) {connect_handler(error); });
 }
 
+
+void tcp_connection::connect_handler(const boost::system::error_code &error)
+{
+    if (!error)
+    {
+        connected.store(true);
+    }
+}
 void tcp_connection::send(const void *buffer, size_t dataLength)
 {
     socket_.send(boost::asio::buffer(buffer, dataLength));
@@ -83,10 +88,10 @@ void tcp_server::start_accept()
 {
     tcp_rx_connection::pointer new_connection =
         tcp_rx_connection::create(acceptor_.get_io_service(), bufferSize);
-
-    acceptor_.async_accept(new_connection->socket(), [this, new_connection = std::move(new_connection)](const boost::system::error_code& error)
+    
+    acceptor_.async_accept(new_connection->socket(), [this, new_connection](const boost::system::error_code& error)
     {
-        handle_accept(std::move(new_connection), error);
+        handle_accept(new_connection, error);
     });
 }
 
@@ -99,5 +104,19 @@ void tcp_server::handle_accept(tcp_rx_connection::pointer new_connection,
         new_connection->setErrorCall(errorCall);
         new_connection->start();
         start_accept();
+        connections.push_back(new_connection);
+    }
+    else if (error!= boost::asio::error::operation_aborted)
+    {
+        std::cerr << " error in accept::" << error.message() << std::endl;
+    }
+}
+
+void tcp_server::haltServer()
+{
+    acceptor_.cancel();
+    for (auto &conn : connections)
+    {
+        conn->stop();
     }
 }

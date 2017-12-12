@@ -81,14 +81,7 @@ public:
     {
         return socket_;
     }
-    void start_receive()
-    {
-        socket_.async_receive(boost::asio::buffer(data), [this](const boost::system::error_code &error, std::size_t bytes_transferred)
-        {
-            handle_read(error, bytes_transferred);
-        });
-    }
-    void stop()
+    void cancel()
     {
         socket_.cancel();
     }
@@ -108,29 +101,46 @@ public:
     */
     size_t receive(void *buffer, size_t maxDataSize);
 
+    /**perform an asynchronous send operation
+    @param buffer the data to send
+    @param dataLength the length of the data
+    @param callback a callback function of the form void handler(
+  const boost::system::error_code& error, // Result of operation.
+  std::size_t bytes_transferred           // Number of bytes received.
+); 
+*/
     template<class Process>
     void send_async(const void *buffer, size_t dataLength, Process &callback)
     {
-        socket_.async_send(boost::asio::const_buffer(buffer, dataLength), callback);
+        socket_.async_send(boost::asio::buffer(buffer, dataLength), callback);
+    }
+
+    /**perform an asynchronous receive operation
+    @param buffer the data to send
+    @param dataLength the length of the data
+    @param callback a callback function of the form void handler(
+    const boost::system::error_code& error, // Result of operation.
+    std::size_t bytes_transferred           // Number of bytes received.
+    );
+    */
+    template<class Process>
+    void async_receive(void *buffer, size_t dataLength, Process &callback)
+    {
+        socket_.async_receive(boost::asio::buffer(buffer, dataLength), callback);
+    }
+
+    bool isConnected() const
+    {
+        return connected.load();
     }
 private:
     tcp_connection(boost::asio::io_service& io_service, const std::string &connection, const std::string &port, size_t bufferSize);
 
-    void handle_read(const boost::system::error_code &error,
-        size_t bytes_transferred)
-    {
-        if (!error)
-        {
-            socket_.async_receive(boost::asio::buffer(data), [this](const boost::system::error_code&error, std::size_t bytes_transferred)
-            {
-                handle_read(error, bytes_transferred);
-            });
-        }
-
-    }
-
     boost::asio::ip::tcp::socket socket_;
+    std::atomic<bool> connected{ false };  //!< flag indicating connectivity
     std::vector<char> data;
+
+    void connect_handler(const boost::system::error_code &error);
 
 };
 
@@ -145,10 +155,7 @@ public:
 
     }
      
-    void haltServer()
-    {
-        acceptor_.cancel();
-    }
+    void haltServer();
 
     void start_accept();
 
@@ -166,8 +173,10 @@ private:
         const boost::system::error_code& error);
 
     boost::asio::ip::tcp::acceptor acceptor_;
+    
     size_t bufferSize;
     std::function<void(const char *data, size_t datasize)> dataCall;
     std::function<bool(const boost::system::error_code& error)> errorCall;
+    std::vector<std::shared_ptr<tcp_rx_connection>> connections;
 };
 #endif /* _HELICS_TCP_HELPER_CLASSES_*/
