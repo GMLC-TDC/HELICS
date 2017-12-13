@@ -19,6 +19,9 @@ help:
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
+doxygen:
+	cd ../; doxygen .
+
 github: html
 	-git branch -D gh-pages
 	-git push origin --delete gh-pages

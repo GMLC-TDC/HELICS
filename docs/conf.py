@@ -21,7 +21,6 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -36,7 +35,14 @@ extensions = [
     'sphinx.ext.githubpages',
     'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
+    'breathe',
 ]
+
+breathe_projects = {
+    "helics": "../",
+}
+
+breathe_default_project = "helics"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
