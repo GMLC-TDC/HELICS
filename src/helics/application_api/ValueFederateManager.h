@@ -181,6 +181,11 @@ namespace helics
 		void registerCallback(const std::vector<subscription_id_t> &ids, std::function<void(subscription_id_t, Time)> callback);
         /** disconnect from the coreObject*/
         void disconnect();
+
+        /** get a count of the number publications registered*/
+        int publicationCount() const;
+        /** get a count of the number subscriptions registered*/
+        int subscriptionCount() const;
 	private:
 		std::unordered_map<std::string, publication_id_t> publicationNames; //!< map of the publication names
 		std::unordered_map<std::string, subscription_id_t> subscriptionNames; //!< map of the subscription names

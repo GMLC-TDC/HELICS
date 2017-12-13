@@ -427,6 +427,10 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     void registerSubscriptionNotificationCallback (const std::vector<subscription_id_t> &ids,
                                                    std::function<void(subscription_id_t, Time)> callback);
 
+    /** get a count of the number publications registered*/
+    int publicationCount() const;
+    /** get a count of the number subscriptions registered*/
+    int subscriptionCount() const;
   private:
     /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
     std::unique_ptr<ValueFederateManager> vfManager;

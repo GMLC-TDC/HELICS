@@ -58,6 +58,8 @@ class SubscriptionBase
             id = fed->registerOptionalSubscription (key_, type_, units_);
         }
     }
+
+    SubscriptionBase(ValueFederate *valueFed, int subIndex);
     virtual ~SubscriptionBase () = default;
     /** get the time of the last update
     @return the time of the last update
@@ -114,6 +116,14 @@ class Subscription : public SubscriptionBase
     Subscription (bool required, ValueFederate *valueFed, const std::string &key, const std::string &units = "")
         : SubscriptionBase (required, valueFed, key, "def", units)
     {
+    }
+    /** generate a subscription object from a preexisting subscription
+    @param valueFed a pointer to the appropriate value Federate
+    @param subIndex the index of the subscription
+    */
+    Subscription(ValueFederate *valueFed, int subIndex) : SubscriptionBase(valueFed, subIndex)
+    {
+
     }
     /** check if the value has been updated*/
     virtual bool isUpdated () const override;

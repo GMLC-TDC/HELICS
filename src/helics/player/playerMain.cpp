@@ -151,7 +151,22 @@ int main (int argc, char *argv[])
         std::cerr << coretype << " is not recognized as a valid core type [zmq,ipc,udp,tcp,test,mpi]\n";
         return (-1);
     }
-    
+    fi.coreInitString = "1";
+    if (vm.count ("coreinit") > 0)
+    {
+        fi.coreInitString.push_back (' ');
+        fi.coreInitString += vm["coreinit"].as<std::string> ();
+    }
+    if (vm.count ("broker") > 0)
+    {
+        fi.coreInitString += " --broker=";
+        fi.coreInitString += vm["broker"].as<std::string> ();
+    }
+    fi.source_only = true;
+    if (vm.count ("timedelta") > 0)
+    {
+        fi.timeDelta = vm["timedelta"].as<double> ();
+    }
     auto vFed = std::make_unique<helics::ValueFederate> (fi);
 
     std::string prevTag;
@@ -235,8 +250,13 @@ void argumentParser (int argc, const char *const *argv, po::variables_map &vm_ma
 
 
     config.add_options ()
+		("broker,b", po::value<std::string> (),"address to connect the broker to")
+		("name,n", po::value<std::string> (),"name of the player federate")
 		("datatype",po::value<std::string>(),"type of the publication data type to use")
-		("stop", po::value<double>(), "the time to stop the player");
+		("core,c",po::value<std::string> (),"type of the core to connect to")
+		("stop", po::value<double>(), "the time to stop the player")
+		("timedelta", po::value<double>(), "the time delta of the federate")
+		("coreinit,i", po::value<std::string>(), "the core initialization string");
 
     // clang-format on
 

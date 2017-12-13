@@ -318,6 +318,20 @@ std::string ValueFederateManager::getPublicationType (publication_id_t pub_id) c
     return (pub_id.value () < pubs.size ()) ? pubs[pub_id.value ()].type : nullStr;
 }
 
+
+/** get a count of the number publications registered*/
+int ValueFederateManager::publicationCount() const
+{
+    std::lock_guard<std::mutex> publock(publication_mutex);
+    return static_cast<int>(pubs.size());
+}
+/** get a count of the number subscriptions registered*/
+int ValueFederateManager::subscriptionCount() const
+{
+    std::lock_guard<std::mutex> sublock(subscription_mutex);
+    return  static_cast<int>(subs.size());
+}
+
 void ValueFederateManager::registerCallback (std::function<void(subscription_id_t, Time)> callback)
 {
     std::lock_guard<std::mutex> sublock (subscription_mutex);

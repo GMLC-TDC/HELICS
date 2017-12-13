@@ -9,7 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "../application_api/Publications.hpp"
-#include "../application_api/ValueFederate.h"
+#include "../application_api/CombinationFederate.h"
+#include "../application_api/Endpoints.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -40,6 +41,46 @@ bool vComp (ValueSetter &v1, ValueSetter &v2) { return (v1.time < v2.time); }
 void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
 const std::regex creg (R"raw((-?\d+(\.\d+)?|\.\d+)\s*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
+namespace helics
+{
+    class player
+    {
+    public:
+        player(FederateInfo &fi);
+        player(int argc, char *argv[]);
+
+       player(const FederateInfo &fi);
+        /**constructor taking a federate information structure and using the given core
+        @param core a pointer to core object which the federate can join
+        @param[in] fi  a federate information structure
+        */
+        player(std::shared_ptr<Core> core, const FederateInfo &fi);
+        /**constructor taking a file with the required information
+        @param[in] file a file defining the federate information
+        */
+        player(const std::string &jsonString);
+
+        /** move construction*/
+        player(player &&fed) noexcept;
+
+        /** move assignment*/
+        player &operator= (player &&fed) noexcept;
+        ~player();
+
+        /*run the player*/
+        void run();
+
+        void run(helics::Time stopTime);
+    protected:
+        std::shared_ptr<CombinationFederate> fed;
+        std::vector<ValueSetter> points;
+        std::set<std::pair<std::string, std::string>> tags;
+        std::vector<Publication> publications;
+        std::vector<Endpoint> endpoints;
+        std::map<std::string, int> pubids;
+        std::map<std::string, int> eptids;
+    };
+}
 
 int main (int argc, char *argv[])
 {
@@ -151,7 +192,22 @@ int main (int argc, char *argv[])
         std::cerr << coretype << " is not recognized as a valid core type [zmq,ipc,udp,tcp,test,mpi]\n";
         return (-1);
     }
-    
+    fi.coreInitString = "1";
+    if (vm.count ("coreinit") > 0)
+    {
+        fi.coreInitString.push_back (' ');
+        fi.coreInitString += vm["coreinit"].as<std::string> ();
+    }
+    if (vm.count ("broker") > 0)
+    {
+        fi.coreInitString += " --broker=";
+        fi.coreInitString += vm["broker"].as<std::string> ();
+    }
+    fi.source_only = true;
+    if (vm.count ("timedelta") > 0)
+    {
+        fi.timeDelta = vm["timedelta"].as<double> ();
+    }
     auto vFed = std::make_unique<helics::ValueFederate> (fi);
 
     std::string prevTag;
@@ -235,8 +291,13 @@ void argumentParser (int argc, const char *const *argv, po::variables_map &vm_ma
 
 
     config.add_options ()
+		("broker,b", po::value<std::string> (),"address to connect the broker to")
+		("name,n", po::value<std::string> (),"name of the player federate")
 		("datatype",po::value<std::string>(),"type of the publication data type to use")
-		("stop", po::value<double>(), "the time to stop the player");
+		("core,c",po::value<std::string> (),"type of the core to connect to")
+		("stop", po::value<double>(), "the time to stop the player")
+		("timedelta", po::value<double>(), "the time delta of the federate")
+		("coreinit,i", po::value<std::string>(), "the core initialization string");
 
     // clang-format on
 

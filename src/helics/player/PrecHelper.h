@@ -10,29 +10,17 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define PREC_HELPER_H_
 
 #include <string>
-#include <complex>
+#include "../application_api/helicsTypes.hpp"
 
-enum class valueTypes_t
+namespace helics
 {
-	stringValue,
-	doubleValue,
-	int64Value,
-	complexValue,
-	vectorValue,
-	unknownValue,
-};
+    class FederateInfo;
+}
 
-valueTypes_t getType(const std::string &typeString);
+void loadFederateInfo(const helics::FederateInfo &fi, int argc, const char * const *argv);
 
-std::string typeString(valueTypes_t type);
+helics::helicsType_t getType(const std::string &typeString);
 
-char typeCharacter(valueTypes_t type);
-
-std::string helicsComplexString(double real, double imag);
-
-std::string helicsComplexString(std::complex<double> val);
-std::complex<double> helicsGetComplex(const std::string &val);
-
-
+char typeCharacter(helics::helicsType_t type);
 
 #endif

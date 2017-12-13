@@ -4,35 +4,30 @@
 
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 ##############################################################################
-set(PLAYER_SRC_FILES
-    player.cpp
-	PrecHelper.cpp
+set(player_recorder_library_headers
+	player.h
+	recorder.h
 	PrecHelper.h
-)
-set(PLAYER_INCLUDE_FILES
+	)
 
-)
-
-
-set(RECORDER_SRC_FILES
-    recorder.cpp
+set(player_recorder_library_files
+	player.cpp
+	recorder.cpp
 	PrecHelper.cpp
-	PrecHelper.h
 )
-set(RECORDER_INCLUDE_FILES
 
-)
+add_library(player_rec-static STATIC ${player_recorder_library_files} ${player_recorder_library_headers})
 
 if (BUILD_PLAYER)
-add_executable(helics_player ${PLAYER_SRC_FILES} ${PLAYER_INCLUDE_FILES})
-target_link_libraries(helics_player helics-static)
+add_executable(helics_player playerMain.cpp)
+target_link_libraries(helics_player player_rec-static helics-static)
 
 endif()
 
 
 if (BUILD_RECORDER)
-add_executable(helics_recorder ${RECORDER_SRC_FILES} ${RECORDER_INCLUDE_FILES})
-target_link_libraries(helics_recorder helics-static)
+add_executable(helics_recorder recorderMain.cpp)
+target_link_libraries(helics_recorder player_rec-static helics-static)
 
 endif()
 

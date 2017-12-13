@@ -13,6 +13,21 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
+
+    SubscriptionBase::SubscriptionBase(ValueFederate *valueFed, int subIndex) :fed(valueFed)
+    {
+        auto cnt = fed->subscriptionCount();
+        if ((subIndex >= cnt)&&(cnt>=0))
+        {
+            throw(helics::InvalidParameterValue("no subscription with the specified index"));
+        }
+        id = static_cast<subscription_id_t>(subIndex);
+        key_ = fed->getSubscriptionName(id);
+        
+        type_ = fed->getSubscriptionType(id);
+        units_ = fed->getSubscriptionUnits(id);
+    }
+
 void Subscription::handleCallback (Time time)
 {
     auto dv = fed->getValueRaw (id);

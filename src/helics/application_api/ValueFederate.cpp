@@ -314,4 +314,16 @@ void ValueFederate::registerSubscriptionNotificationCallback (
 {
     vfManager->registerCallback (ids, callback);
 }
+
+
+/** get a count of the number publications registered*/
+int ValueFederate::publicationCount() const
+{
+    return vfManager->publicationCount();
+}
+/** get a count of the number subscriptions registered*/
+int ValueFederate::subscriptionCount() const
+{
+    return vfManager->subscriptionCount();
+}
 }  // namespace helics

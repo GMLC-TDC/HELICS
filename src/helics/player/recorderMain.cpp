@@ -21,7 +21,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <stdexcept>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
+
 #include <boost/algorithm/string.hpp>
 
 #include "PrecHelper.h"
@@ -115,7 +115,49 @@ int main (int argc, char *argv[])
 
     std::vector<helics::Subscription> subscriptions;
     std::string name = "recorder";
-   
+    if (vm.count ("name") > 0)
+    {
+        name = vm["name"].as<std::string> ();
+    }
+
+    std::string corename;
+    if (vm.count ("core") > 0)
+    {
+        corename = vm["core"].as<std::string> ();
+    }
+
+    helics::FederateInfo fi (name);
+    try
+    {
+        fi.coreType = helics::coreTypeFromString (corename);
+    }
+    catch (std::invalid_argument &ia)
+    {
+        std::cerr << "Unrecognized core type\n";
+        return (-1);
+    }
+    fi.coreInitString = "2";
+    if (vm.count ("coreinit") > 0)
+    {
+        fi.coreInitString.push_back (' ');
+        fi.coreInitString = vm["coreinit"].as<std::string> ();
+    }
+    if (vm.count ("broker") > 0)
+    {
+        fi.coreInitString += " --broker=";
+        fi.coreInitString += vm["broker"].as<std::string> ();
+    }
+    fi.observer = true;
+    if (vm.count ("timedelta") > 0)
+    {
+        fi.timeDelta = vm["timedelta"].as<double> ();
+    }
+
+    helics::Time stopTime = helics::Time::maxVal ();
+    if (vm.count ("stop") > 0)
+    {
+        stopTime = vm["stop"].as<double> ();
+    }
     auto vFed = std::make_unique<helics::ValueFederate> (fi);
 
     // get the extra tags from the arguments
@@ -298,10 +340,15 @@ void argumentParser (int argc, const char *const *argv, po::variables_map &vm_ma
 
 
     config.add_options()
+        ("broker,b", po::value<std::string>(), "address of the broker to connect")
+        ("name,n", po::value<std::string>(), "name of the player federate")
+        ("core,c", po::value<std::string>(), "type of the core to connect to")
         ("stop", po::value<double>(), "the time to stop recording")
         ("tags",po::value<std::vector<std::string>>(),"tags to record this argument may be specified any number of times")
+        ("timedelta", po::value<double>(), "the time delta of the federate")
         ("capture", po::value < std::vector<std::string>>(),"capture all the publications of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list")
 		("output,o",po::value<std::string>(),"the output file for recording the data")
+		("coreinit,i", po::value<std::string>(), "the core initialization string")
 		("mapfile", po::value<std::string>(), "write progress to a memory mapped file");
 
     hidden.add_options () ("input", po::value<std::string> (), "input file");

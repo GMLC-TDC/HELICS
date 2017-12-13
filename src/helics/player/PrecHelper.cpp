@@ -25,8 +25,18 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <complex>
 #include <regex>
 #include <sstream>
+#include <iostream>
 
-valueTypes_t getType (const std::string &typeString)
+#include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
+
+#include "../application_api/Federate.h"
+
+using namespace helics;
+namespace po = boost::program_options;
+namespace filesystem = boost::filesystem;
+
+helicsType_t getType (const std::string &typeString)
 {
     auto tstr = typeString;
     // trim the string
@@ -34,7 +44,7 @@ valueTypes_t getType (const std::string &typeString)
     tstr.erase (0, tstr.find_first_not_of (" \t\n\0"));
     if (tstr.empty ())
     {
-        return valueTypes_t::unknownValue;
+        return helicsType_t::helicsInvalid;
     }
     if (tstr.size () == 1)
     {
@@ -42,173 +52,194 @@ valueTypes_t getType (const std::string &typeString)
         {
         case 's':
         case 'S':
-            return valueTypes_t::stringValue;
+            return helicsType_t::helicsString;
         case 'd':
         case 'D':
         case 'f':
         case 'F':
-            return valueTypes_t::doubleValue;
+            return helicsType_t::helicsDouble;
         case 'i':
         case 'I':
-            return valueTypes_t::int64Value;
+            return helicsType_t::helicsInt;
         case 'c':
         case 'C':
-            return valueTypes_t::complexValue;
+            return helicsType_t::helicsComplex;
         case 'v':
         case 'V':
-            return valueTypes_t::vectorValue;
+            return helicsType_t::helicsVector;
         default:
-            return valueTypes_t::unknownValue;
+            return helicsType_t::helicsInvalid;
         }
     }
 
     std::transform (tstr.begin (), tstr.end (), tstr.begin (), ::tolower);
 
-    if (tstr == "string")
-    {
-        return valueTypes_t::stringValue;
-    }
-    if ((tstr == "double") || (tstr == "float"))
-    {
-        return valueTypes_t::doubleValue;
-    }
-    if ((tstr == "int") || (tstr == "int64") || (tstr == "integer"))
-    {
-        return valueTypes_t::int64Value;
-    }
-    if (tstr == "vector")
-    {
-        return valueTypes_t::vectorValue;
-    }
-    if ((tstr == "complex") || (tstr == "pair"))
-    {
-        return valueTypes_t::complexValue;
-    }
-    return valueTypes_t::unknownValue;
+    return getTypeFromString(tstr);
+   
 }
 
-std::string typeString (valueTypes_t type)
+
+char typeCharacter (helicsType_t type)
 {
     switch (type)
     {
-    case valueTypes_t::stringValue:
-        return "string";
-    case valueTypes_t::doubleValue:
-        return "double";
-    case valueTypes_t::int64Value:
-        return "integer";
-    case valueTypes_t::complexValue:
-        return "complex";
-    case valueTypes_t::vectorValue:
-        return "vector_double";
-    case valueTypes_t::unknownValue:
-    default:
-        return "unknown";
-    }
-}
-
-char typeCharacter (valueTypes_t type)
-{
-    switch (type)
-    {
-    case valueTypes_t::stringValue:
+    case helicsType_t::helicsString:
         return 's';
-    case valueTypes_t::doubleValue:
+    case helicsType_t::helicsDouble:
         return 'd';
-    case valueTypes_t::int64Value:
+    case helicsType_t::helicsInt:
         return 'i';
-    case valueTypes_t::complexValue:
+    case helicsType_t::helicsComplex:
         return 'c';
-    case valueTypes_t::vectorValue:
+    case helicsType_t::helicsVector:
         return 'v';
-    case valueTypes_t::unknownValue:
+    case helicsType_t::helicsInvalid:
     default:
         return 'u';
     }
 }
-std::string helicsComplexString (double real, double imag)
+
+
+
+
+void argumentParser(int argc, const char *const *argv, po::variables_map &vm_map)
 {
-    std::stringstream ss;
-    ss << real;
-    if (imag != 0)
+    po::options_description cmd_only("command line only");
+    po::options_description config("configuration");
+    po::options_description hidden("hidden");
+
+    // clang-format off
+    // input boost controls
+    cmd_only.add_options()
+        ("help,h", "produce help message")
+        ("version,v", "helics version number")
+        ("config-file", po::value<std::string>(), "specify a configuration file to use");
+
+
+    config.add_options()
+        ("broker,b", po::value<std::string>(), "address of the broker to connect")
+        ("name,n", po::value<std::string>(), "name of the player federate")
+        ("core,c", po::value<std::string>(), "type of the core to connect to")
+        ("stop", po::value<double>(), "the time to stop recording")
+        ("offset",po::value<double>(),"the offset of the time steps")
+        ("period",po::value<double>(),"the period of the federate")
+        ("timedelta", po::value<double>(), "the time delta of the federate")
+        ("coreinit,i", po::value<std::string>(), "the core initialization string");
+
+
+    hidden.add_options() ("input", po::value<std::string>(), "input file");
+    // clang-format on
+
+    po::options_description cmd_line("command line options");
+    po::options_description config_file("configuration file options");
+    po::options_description visible("allowed options");
+
+    cmd_line.add(cmd_only).add(config).add(hidden);
+    config_file.add(config).add(hidden);
+    visible.add(cmd_only).add(config);
+
+    po::variables_map cmd_vm;
+    try
     {
-        if (imag >= 0.0)
+        po::store(po::command_line_parser(argc, argv).options(cmd_line).run(), cmd_vm);
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << e.what() << std::endl;
+        throw (e);
+    }
+
+    po::notify(cmd_vm);
+
+    // objects/pointers/variables/constants
+
+    // program options control
+    if (cmd_vm.count("help") > 0)
+    {
+        std::cout << visible << '\n';
+        return;
+    }
+
+    if (cmd_vm.count("version") > 0)
+    {
+        std::cout << helics::getHelicsVersionString() << '\n';
+        return;
+    }
+
+    po::store(po::command_line_parser(argc, argv).options(cmd_line).run(), vm_map);
+
+    if (cmd_vm.count("config-file") > 0)
+    {
+        std::string config_file_name = cmd_vm["config-file"].as<std::string>();
+        if (!filesystem::exists(config_file_name))
         {
-            ss << '+' << imag;
+            std::cerr << "config file " << config_file_name << " does not exist\n";
+            throw (std::invalid_argument("unknown config file"));
         }
         else
         {
-            ss << imag;
+            std::ifstream fstr(config_file_name.c_str());
+            po::store(po::parse_config_file(fstr, config_file), vm_map);
+            fstr.close();
         }
-        ss << 'j';
     }
 
-    return ss.str ();
+    po::notify(vm_map);
+    
 }
 
-std::string helicsComplexString (std::complex<double> val)
-{
-    return helicsComplexString (val.real (), val.imag ());
-}
 
-const std::regex creg (
-  R"(([+-]?(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?)\s*([+-]\s*(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?)[ji]*)");
-
-std::complex<double> helicsGetComplex (const std::string &val)
+void loadFederateInfo(helics::FederateInfo &fi, int argc, const char * const *argv)
 {
-    if (val.empty ())
+    po::variables_map vm;
+    argumentParser(argc, argv, vm);
+    std::string name;
+    if (vm.count("name") > 0)
     {
-        return std::complex<double> (-1e49, -1e49);
+        fi.name = vm["name"].as<std::string>();
     }
-    std::smatch m;
-    double re = 0.0;
-    double im = 0.0;
-    std::regex_search (val, m, creg);
-    if (m.size () == 9)
+    std::string corename;
+    if (vm.count("core") > 0)
     {
-        try
-        {
-            re = std::stod (m[1]);
-        }
-        catch (std::invalid_argument &)
-        {
-            re = 1e-49;
-        }
-        try
-        {
-            im = std::stod (m[5]);
-        }
-        catch (std::invalid_argument &)
-        {
-            im = 1e-49;
-        }
+        fi.coreName = vm["core"].as<std::string>();
     }
-    else
+
+    
+    try
     {
-        if ((val.back () == 'j') || (val.back () == 'i'))
-        {
-            try
-            {
-                im = std::stod (val.substr (0, val.size () - 1));
-            }
-            catch (std::invalid_argument &)
-            {
-                im = 1e-49;
-            }
-        }
-        else
-        {
-            try
-            {
-                re = std::stod (val);
-            }
-            catch (std::invalid_argument &)
-            {
-                re = 1e-49;
-            }
-        }
+        fi.coreType = helics::coreTypeFromString(corename);
     }
-    return std::complex<double> (re, im);
+    catch (std::invalid_argument &ia)
+    {
+        std::cerr << "Unrecognized core type\n";
+        return (-1);
+    }
+    fi.coreInitString = "2";
+    if (vm.count("coreinit") > 0)
+    {
+        fi.coreInitString.push_back(' ');
+        fi.coreInitString = vm["coreinit"].as<std::string>();
+    }
+    if (vm.count("broker") > 0)
+    {
+        fi.coreInitString += " --broker=";
+        fi.coreInitString += vm["broker"].as<std::string>();
+    }
+
+    if (vm.count("timedelta") > 0)
+    {
+        fi.timeDelta = vm["timedelta"].as<double>();
+    }
+
+    if (vm.count("period") > 0)
+    {
+        fi.period = vm["period"].as<double>();
+    }
+
+    if (vm.count("offset") > 0)
+    {
+        fi.offset = vm["offset"].as<double>();
+    }
 }
 
 std::vector<std::string> splitline (const std::string &line, const std::string &delimiters, bool compression)
