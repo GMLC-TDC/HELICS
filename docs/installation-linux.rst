@@ -1,5 +1,5 @@
 Ubuntu Installation
-=================
+===================
 
 Requirements
 ------------
