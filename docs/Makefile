@@ -23,10 +23,12 @@ help:
 doxygen:
 	cd ../; mkdir -p build; cd build; cmake -DCMAKE_INSTALL_PREFIX=./install/helics_install -DHELICS_GENERATE_DOXYGEN_DOC=ON ../; make doc;
 
-github: doxygen html
+github: html
 	-git branch -D gh-pages
 	-git push origin --delete gh-pages
 	ghp-import -n -b gh-pages -m "Update documentation" ./_build/html
 	git checkout gh-pages
 	git push --set-upstream origin gh-pages
 	git checkout ${BRANCH}
+
+all: doxygen github
