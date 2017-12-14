@@ -12,6 +12,8 @@ Introduction
 
 .. image:: https://badges.gitter.im/GMLC-TDC/HELICS-src.png
 
+.. image:: https://img.shields.io/badge/docs-ready-blue.svg
+
 This is the documentation for Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS) framework.
 
 
