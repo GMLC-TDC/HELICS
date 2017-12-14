@@ -47,6 +47,24 @@ struct MessageFederateTestFixture
     std::shared_ptr<helics::MessageFederate> mFed2;
 };
 
+#ifdef QUICK_TESTS_ONLY
+#ifndef DISABLE_TCP_CORE
+const std::string core_types[] = { "test", "ipc_2","test_2", "zmq", "udp" };
+const std::string core_types_single[] = { "test", "ipc", "zmq", "udp" };
+#else
+const std::string core_types[] = { "test", "ipc_2","test_2", "zmq", "udp" };
+const std::string core_types_single[] = { "test", "ipc", "zmq", "udp" };
+#endif
+#else
+#ifndef DISABLE_TCP_CORE
+const std::string core_types[] = { "test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2" };
+const std::string core_types_single[] = { "test", "ipc", "zmq", "udp" };
+#else
+const std::string core_types[] = { "test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2" };
+const std::string core_types_single[] = { "test", "ipc", "zmq", "udp" };
+#endif
+#endif
+
 struct FederateTestFixture
 {
     FederateTestFixture () = default;

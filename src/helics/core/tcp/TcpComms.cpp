@@ -125,7 +125,23 @@ ActionMessage TcpComms::generateReplyToIncomingMessage (ActionMessage &M)
 }
 
 
-
+void TcpComms::dataReceive(const char *data, size_t bytes_received)
+{
+    ActionMessage m(data, bytes_received);
+    if (isPriorityCommand(m))
+    {
+        auto rep=generateReplyToIncomingMessage(m);
+    }
+    else if (isProtocolCommand(m))
+    {
+        rxMessageQueue.push(m);
+        return;
+    }
+    else
+    {
+        ActionCallback(std::move(m));
+    }
+}
 
 void TcpComms::queue_rx_function ()
 {
@@ -162,6 +178,8 @@ void TcpComms::queue_rx_function ()
         rx_status = connection_status::terminated; 
     };
     ioserv->runServiceLoop();
+    server.setDataCall([this](const char *data, size_t datasize) {dataReceive(data, datasize); });
+    
     server.start_accept();
     rx_status = connection_status::connected;
     while (true)

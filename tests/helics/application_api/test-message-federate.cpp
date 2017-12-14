@@ -29,13 +29,6 @@ namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 #endif
 
-#ifdef QUICK_TESTS_ONLY
-const std::string core_types[] = {"test", "test_2", "ipc_2", "zmq", "udp"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
-#else
-const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2", "udp", "udp_2"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
-#endif
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)
 {

@@ -77,6 +77,10 @@ private:
     BlockingQueue3<ActionMessage> rxMessageQueue;
 
     void txReceive(const char *data, size_t bytes_received, const std::string &errorMessage);
+   /** callback function for receiving data asynchronously from the socket*/
+    void dataReceive(const char *data, size_t bytes_received);
+
+  //  bool errorHandle()
 public:
 	/** get the port number of the comms object to push message to*/
 	int getPort() const { return PortNumber; };

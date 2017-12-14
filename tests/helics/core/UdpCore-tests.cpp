@@ -118,10 +118,6 @@ BOOST_AUTO_TEST_CASE (udpComms_rx_test)
     comm.setPortNumber (23903);
     comm.setName ("tests");
 
-    comm.setCallback ([&counter, &act](helics::ActionMessage m) {
-        ++counter;
-        act = m;
-    });
 
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
