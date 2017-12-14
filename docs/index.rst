@@ -21,6 +21,6 @@ This is the documentation for Hierarchical Engine for Large-scale Infrastructure
    :maxdepth: 1
 
    installation
-   basic_usage
-   api_reference
-   developer_guide
+   basic-usage
+   api-reference
+   developer-guide

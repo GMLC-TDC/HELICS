@@ -1,9 +1,9 @@
 
 Mac Installation
-----------------
+================
 
 Requirements
-============
+------------
 
 * C++11 compiler (C++14 preferred).
 * CMake 3.4 or newer
@@ -13,7 +13,7 @@ Requirements
 * [for future versions] OpenMPI v8 or newer (if MPI support is needed)
 
 Setup
-=====
+-----
 
 To set up your environment:
 
@@ -56,7 +56,7 @@ Getting and building from source:
 
 
 Testing
-=======
+-------
 
 A quick test is to double check the versions of the HELICS player and recorder:
 
