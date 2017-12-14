@@ -35,28 +35,29 @@ Getting and building from source:
 
 3. Run "make".
 
-   ```bash
-   git clone https://github.com/GMLC-TDC/HELICS-src
-   cd HELICS-src
-   mkdir build
-   cd build
-   cmake ../
-   ccmake . # optional, to change install path or other configuration settings
-   make
-   make install
-   ```
+..code-block:: bash
+
+    git clone https://github.com/GMLC-TDC/HELICS-src
+    cd HELICS-src
+    mkdir build
+    cd build
+    cmake ../
+    ccmake . # optional, to change install path or other configuration settings
+    make
+    make install
+
 
 Testing
 =======
 
 A quick test is to double check the versions of the HELICS player and recorder:
 
-```bash
-cd /path/to/helics_install/bin
+..code-block:: bash
 
-$ helics_player --version
-0.1
+    cd /path/to/helics_install/bin
 
-$ helics_recorder --version
-0.1
-```
+    $ helics_player --version
+    0.1
+
+    $ helics_recorder --version
+    0.1
