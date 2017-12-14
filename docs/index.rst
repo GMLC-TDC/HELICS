@@ -16,24 +16,9 @@ This is the documentation for Hierarchical Engine for Large-scale Infrastructure
 
 
 .. toctree::
-   :caption: INSTALLATION
    :maxdepth: 1
 
    installation
-
-.. toctree::
-   :caption: USAGE
-   :maxdepth: 2
-
    basic_usage
-
-.. toctree::
-   :caption: API REFERENCE
-   :maxdepth: 2
-
    api_reference
-
-.. toctree::
-   :caption: DEVELOPER ZONE
-
    releasing

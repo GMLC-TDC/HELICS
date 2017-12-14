@@ -6,7 +6,7 @@ From source with cmake
 
 You can install ``helics`` from source with cmake. On Unix platforms, from the source directory:
 
-.. code::
+.. code-block:: bash
 
     mkdir build
     cd build
@@ -15,7 +15,7 @@ You can install ``helics`` from source with cmake. On Unix platforms, from the s
 
 On Windows platforms, from the source directory:
 
-.. code::
+.. code-block:: bash
 
     mkdir build
     cd build
