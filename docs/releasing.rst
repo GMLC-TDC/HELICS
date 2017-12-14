@@ -1,5 +1,5 @@
 
-Developing helics
+Developer Guide
 =================
 
 Submitting a Pull Request
