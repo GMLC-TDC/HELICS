@@ -7,6 +7,9 @@ build*/
 install*/
 .vscode/
 bin/
+docs/html
+docs/xml
+docs/latex
 
 #=============================================================================
 # Generic ignores

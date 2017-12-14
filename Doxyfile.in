@@ -25,17 +25,17 @@ DOXYFILE_ENCODING      = UTF-8
 # The PROJECT_NAME tag is a single word (or a sequence of words surrounded
 # by quotes) that should identify the project.
 
-PROJECT_NAME           = Helics
+PROJECT_NAME           = helics
 
-# The PROJECT_NUMBER tag can be used to enter a project or revision number. 
-# This could be handy for archiving the generated documentation or 
+# The PROJECT_NUMBER tag can be used to enter a project or revision number.
+# This could be handy for archiving the generated documentation or
 # if some version control system is used.
 
 PROJECT_NUMBER         = @HELICS_VERSION_MAJOR@.@HELICS_VERSION_MINOR@
 
-# The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) 
-# base path where the generated documentation will be put. 
-# If a relative path is entered, it will be relative to the location 
+# The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute)
+# base path where the generated documentation will be put.
+# If a relative path is entered, it will be relative to the location
 # where doxygen was started. If left blank the current directory will be used.
 
 OUTPUT_DIRECTORY       = "@DOXYGEN_OUTPUT_DIR@"
@@ -1142,7 +1142,7 @@ MAN_LINKS              = NO
 # generate an XML file that captures the structure of
 # the code including all documentation.
 
-GENERATE_XML           = NO
+GENERATE_XML           = YES
 
 # The XML_OUTPUT tag is used to specify where the XML pages will be put.
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
@@ -1520,3 +1520,6 @@ GENERATE_LEGEND        = YES
 # the various graphs.
 
 DOT_CLEANUP            = YES
+
+
+
