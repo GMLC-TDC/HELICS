@@ -225,7 +225,7 @@ target_link_libraries(helics-static rt)
 ENDIF()
 
 IF(MINGW)
-	target_link_libraries(helics-static ws2_32)
+	target_link_libraries(helics-static wsock32 ws2_32)
 ENDIF(MINGW)
 
 if (${ZeroMQ_FOUND})
@@ -395,7 +395,7 @@ IF (UNIX AND NOT APPLE)
 ENDIF()
 
 IF(MINGW)
-	list(APPEND helics_dependencies ws2_32)
+	list(APPEND helics_dependencies wsock32 ws2_32)
 ENDIF(MINGW)
 
 if (ZeroMQ_FOUND)

@@ -76,7 +76,7 @@ private:
     //promise and future for communicating port number from tx_thread to rx_thread
     BlockingQueue3<ActionMessage> rxMessageQueue;
 
-    void txReceive(const char *data, int size_t, const std::string &errorMessage);
+    void txReceive(const char *data, size_t bytes_received, const std::string &errorMessage);
 public:
 	/** get the port number of the comms object to push message to*/
 	int getPort() const { return PortNumber; };

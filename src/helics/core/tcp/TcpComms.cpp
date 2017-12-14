@@ -155,8 +155,15 @@ void TcpComms::queue_rx_function ()
     }
     auto ioserv = AsioServiceManager::getServicePointer();
     tcp_server server(ioserv->getBaseService(),PortNumber,maxMessageSize_);
+    //lambda for the disconnection procedure
+    auto disconnectFunction=[this, &ioserv](){ 
+        disconnecting = true;
+        ioserv->haltServiceLoop();
+        rx_status = connection_status::terminated; 
+    };
     ioserv->runServiceLoop();
     server.start_accept();
+    rx_status = connection_status::connected;
     while (true)
     {
         auto message = rxMessageQueue.pop();
@@ -166,18 +173,14 @@ void TcpComms::queue_rx_function ()
             {
             case CLOSE_RECEIVER:
             case DISCONNECT:
-                disconnecting = true;
-                ioserv->haltServiceLoop();
-                rx_status = connection_status::terminated;
+                disconnectFunction();
                 return;
 
             }
         }
     }
 
-    disconnecting = true;
-    ioserv->haltServiceLoop();
-    rx_status = connection_status::terminated;
+    disconnectFunction();
     return;
 }
 /*
@@ -228,11 +231,11 @@ void TcpComms::queue_rx_function ()
 
 */
 
-void TcpComms::txReceive (const char *data, int data_size, const std::string &errorMessage)
+void TcpComms::txReceive (const char *data, size_t bytes_received, const std::string &errorMessage)
 {
     if (errorMessage.empty())
     {
-        ActionMessage m(data, data_size);
+        ActionMessage m(data, bytes_received);
         if (isProtocolCommand(m))
         {
             if (m.index == PORT_DEFINITIONS)
@@ -254,7 +257,6 @@ void TcpComms::queue_tx_function ()
     ioserv->runServiceLoop();
     tcp_connection::pointer brokerConnection;
   
-    boost::system::error_code error;
     std::map<int, tcp_connection::pointer> routes;  // for all the other possible routes
     if (!brokerTarget_.empty())
     {
@@ -300,7 +302,7 @@ void TcpComms::queue_tx_function ()
                 }
                 std::vector<char> rx(128);
                 tcp::endpoint brk;
-                brokerConnection->async_receive(rx.data(), 128, [this, rx](const boost::system::error_code& error, auto bytes) {
+                brokerConnection->async_receive(rx.data(), 128, [this, rx](const boost::system::error_code& error, size_t bytes) {
                     if (error != boost::asio::error::operation_aborted)
                     {
                         if (!error)
@@ -419,9 +421,9 @@ void TcpComms::queue_tx_function ()
             {
                 brokerConnection->send(cmd.to_string());
                 
-                if (error)
+               // if (error)
                 {
-                    std::cerr << "transmit failure to broker " << error.message() << '\n';
+               //     std::cerr << "transmit failure to broker " << error.message() << '\n';
                 }
             }
         }

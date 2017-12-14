@@ -89,7 +89,7 @@ class ActionMessage
     ActionMessage (action_message_def::action_t startingAction);
     /** construct from action, source and destination id's
     */
-    ActionMessage(action_message_def::action_t action, int32_t sourceId, int32_t destId);
+    ActionMessage(action_message_def::action_t startingAction, int32_t sourceId, int32_t destId);
     /** move constructor*/
     ActionMessage (ActionMessage &&act) noexcept;
     /** build an action message from a message*/

@@ -46,6 +46,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
     comm.setBrokerPort (24160);
     comm.setName ("tests");
+    comm.setTimeout(1000);
     auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
 
    
@@ -61,48 +62,57 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
         }
     }
     BOOST_CHECK_EQUAL(counter, 1);
+
+
     server.haltServer();
     comm.disconnect();
     srv->haltServiceLoop();
 }
 
-
-
-/*
 BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
 {
     std::atomic<int> counter{0};
+    std::atomic<size_t> len{ 0 };
     std::string host = "localhost";
-    helics::UdpComms comm (host, host);
+    helics::TcpComms comm (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
+    tcp_server server(srv->getBaseService(), 24160);
+    srv->runServiceLoop();
+    std::vector<char> data(1024);
+    server.setDataCall([&data, &counter,&len](const char *data_rec, size_t data_Size) {std::copy(data_rec, data_rec + data_Size, data.begin()); len = data_Size; ++counter; });
+    server.start_accept();
 
-    udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
-
-    BOOST_CHECK (rxSocket.is_open ());
-    comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
-    comm.setBrokerPort (23901);
-    comm.setPortNumber (23903);
+    comm.setCallback([](helics::ActionMessage m) { });
+    comm.setBrokerPort (24160);
+    comm.setPortNumber (24180);
     comm.setName ("tests");
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
     comm.transmit (0, helics::CMD_IGNORE);
 
-    std::vector<char> data (1024);
-
-    udp::endpoint remote_endpoint;
     boost::system::error_code error;
-    auto len = rxSocket.receive_from (boost::asio::buffer (data), remote_endpoint, 0, error);
+    int cnt = 0;
+    while (counter != 1)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        ++cnt;
+        if (cnt > 30)
+        {
+            break;
+        }
+    }
+    BOOST_CHECK_EQUAL(counter, 1);
 
     BOOST_CHECK_GT (len, 32);
     helics::ActionMessage rM (data.data (), len);
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
-    rxSocket.close ();
+    server.haltServer();
     comm.disconnect ();
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
 
-*/
+
 /*
 BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
 {

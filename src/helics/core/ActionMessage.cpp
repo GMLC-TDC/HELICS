@@ -29,8 +29,8 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction)
     }
 }
 
-ActionMessage::ActionMessage (action_message_def::action_t action, int32_t sourceId, int32_t destId)
-    : ActionMessage (action)
+ActionMessage::ActionMessage (action_message_def::action_t startingAction, int32_t sourceId, int32_t destId)
+    : ActionMessage (startingAction)
 {
     source_id = sourceId;
     dest_id = destId;

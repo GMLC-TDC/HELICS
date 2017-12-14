@@ -65,9 +65,9 @@ public:
     }
 
     // Construct from memory block
-    multipart_t(const void *src, size_t size)
+    multipart_t(const void *src, size_t message_size)
     {
-        addmem(src, size);
+        addmem(src, message_size);
     }
 
     // Construct from string
@@ -236,15 +236,15 @@ public:
     }
 
     // Push memory block to front
-    void pushmem(const void *src, size_t size)
+    void pushmem(const void *src, size_t mem_size)
     {
-        m_parts.push_front(message_t(src, size));
+        m_parts.push_front(message_t(src, mem_size));
     }
 
     // Push memory block to back
-    void addmem(const void *src, size_t size)
+    void addmem(const void *src, size_t mem_size)
     {
-        m_parts.push_back(message_t(src, size));
+        m_parts.push_back(message_t(src, mem_size));
     }
 
     // Push string to front
@@ -382,11 +382,11 @@ public:
         for (size_t i = 0; i < m_parts.size(); i++)
         {
             const unsigned char* data = m_parts[i].data<unsigned char>();
-            size_t size = m_parts[i].size();
+            size_t numparts = m_parts[i].size();
 
             // Dump the message as text or binary
             bool isText = true;
-            for (size_t j = 0; j < size; j++)
+            for (size_t j = 0; j < numparts; j++)
             {
                 if (data[j] < 32 || data[j] > 127)
                 {
@@ -394,13 +394,13 @@ public:
                     break;
                 }
             }
-            ss << "\n[" << std::dec << std::setw(3) << std::setfill('0') << size << "] ";
-            if (size >= 1000)
+            ss << "\n[" << std::dec << std::setw(3) << std::setfill('0') << numparts << "] ";
+            if (numparts >= 1000)
             {
                 ss << "... (to big to print)";
                 continue;
             }
-            for (size_t j = 0; j < size; j++)
+            for (size_t j = 0; j < numparts; j++)
             {
                 if (isText)
                     ss << static_cast<char>(data[j]);

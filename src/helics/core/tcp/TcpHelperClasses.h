@@ -109,8 +109,8 @@ public:
   std::size_t bytes_transferred           // Number of bytes received.
 ); 
 */
-    template<class Process>
-    void send_async(const void *buffer, size_t dataLength, Process &callback)
+    template<typename Process>
+    void send_async(const void *buffer, size_t dataLength, Process callback)
     {
         socket_.async_send(boost::asio::buffer(buffer, dataLength), callback);
     }
@@ -123,8 +123,8 @@ public:
     std::size_t bytes_transferred           // Number of bytes received.
     );
     */
-    template<class Process>
-    void async_receive(void *buffer, size_t dataLength, Process &callback)
+    template<typename Process>
+    void async_receive(void *buffer, size_t dataLength, Process callback)
     {
         socket_.async_receive(boost::asio::buffer(buffer, dataLength), callback);
     }

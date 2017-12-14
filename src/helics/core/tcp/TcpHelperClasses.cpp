@@ -14,9 +14,9 @@ using boost::asio::ip::tcp;
 
 void tcp_rx_connection::start()
 {
-    socket_.async_receive(boost::asio::buffer(data), [this](const boost::system::error_code&error, std::size_t bytes_transferred)
+    socket_.async_receive(boost::asio::buffer(data), [connection = shared_from_this()](const boost::system::error_code&error, std::size_t bytes_transferred)
     {
-        handle_read(error, bytes_transferred);
+        connection->handle_read(error, bytes_transferred);
     });
 }
 
@@ -26,7 +26,6 @@ void tcp_rx_connection::handle_read(const boost::system::error_code &error,
     if (!error)
     {
         dataCall(data.data(), bytes_transferred);
-
     }
     else
     {
