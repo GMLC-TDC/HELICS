@@ -7,6 +7,7 @@ SPHINXBUILD   = python -msphinx
 SPHINXPROJ    = HELICS-src
 SOURCEDIR     = .
 BUILDDIR      = _build
+BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 
 # Put it first so that "make" without argument is like "make help".
 help:
@@ -23,8 +24,6 @@ doxygen:
 	cd ../; mkdir -p build; cd build; cmake -DCMAKE_INSTALL_PREFIX=./install/helics_install -DHELICS_GENERATE_DOXYGEN_DOC=ON ../; make doc;
 
 github: html
-	$(eval BRANCH_NAME := "$(git symbolic-ref HEAD 2>/dev/null)")
-	$(eval BRANCH_NAME := ${BRANCH_NAME##refs/heads/})
 	-git branch -D gh-pages
 	-git push origin --delete gh-pages
 	ghp-import -n -b gh-pages -m "Update documentation" ./_build/html
