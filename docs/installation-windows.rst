@@ -17,9 +17,9 @@ Setup
 To set up your environment:
 
     1. Install Microsoft Visual C++ 2015 or newer
-    2. Install [Boost](http://www.boost.org/doc/libs/1_64_0/more/getting_started/windows.html) 1.58 or newer. For CMake to detect it automatically either extract Boost to the root of your drive, or set the BOOST_ROOT environment variable to the install location.
-    3. *Optional* Install [ZeroMQ](http://zeromq.org/build:_start) if you need ZeroMQ support and need a copy in a global system location. We recommend skipping this step and running cmake with the `AUTOBUILD_ZMQ=ON` option to automatically set up a project-only copy of ZeroMQ later on. The ZeroMQ Windows installer is **very** outdated and will not work with new versions of Visual Studio.
-    4. *Optional* Install [MS-MPI](https://msdn.microsoft.com/en-us/library/bb524831(v=vs.85).aspx) if you need MPI support.
+    2. Install `Boost <http://www.boost.org/doc/libs/1_64_0/more/getting_started/windows.html`_ 1.58 or newer. For CMake to detect it automatically either extract Boost to the root of your drive, or set the BOOST_ROOT environment variable to the install location.
+    3. *Optional* Install `ZeroMQ <http://zeromq.org/build:_start>`_ if you need ZeroMQ support and need a copy in a global system location. We recommend skipping this step and running cmake with the ``AUTOBUILD_ZMQ=ON`` option to automatically set up a project-only copy of ZeroMQ later on. The ZeroMQ Windows installer is **very** outdated and will not work with new versions of Visual Studio.
+    4. *Optional* Install `MS-MPI <https://msdn.microsoft.com/en-us/library/bb524831(v=vs.85).aspx>`_ if you need MPI support.
     5. Open a Visual Studio Command Prompt, and go to your working directory.
     6. Make sure *cmake* and *git* are available in the Command Prompt. If they aren't, add them to the system PATH variable.
 
@@ -42,14 +42,14 @@ Getting and building from source:
         cd build
 
 
-    4. Run cmake. It should automatically detect where MPI is installed if the system path variables are set up correctly, otherwise you will have to set the cmake path manually. Optionally, you can use the option `-DAUTOBUILD_ZMQ=ON` to have cmake attempt to automatically download, build, and configure paths for a project-only copy of ZeroMQ.
+    4. Run cmake. It should automatically detect where MPI is installed if the system path variables are set up correctly, otherwise you will have to set the cmake path manually. Optionally, you can use the option ``-DAUTOBUILD_ZMQ=ON`` to have cmake attempt to automatically download, build, and configure paths for a project-only copy of ZeroMQ.
 
     .. code-block:: bash
 
         cmake ..
 
 
-    If you need cmake to use a generator other than the default (ex: selecting between a 32-bit or 64-bit project), the -G option can be used to specify one of the generators listed by cmake --help. For Visual Studio 2017, the generator name would be `Visual Studio 15 2017 [arch]`, where [arch] is optional and can be either Win64 for a 64-bit project, or left out to generate a 32-bit project. To avoid problems when building later, this should match the version of the Boost libraries you are using.
+    If you need cmake to use a generator other than the default (ex: selecting between a 32-bit or 64-bit project), the -G option can be used to specify one of the generators listed by cmake --help. For Visual Studio 2017, the generator name would be ``Visual Studio 15 2017 [arch]``, where [arch] is optional and can be either Win64 for a 64-bit project, or left out to generate a 32-bit project. To avoid problems when building later, this should match the version of the Boost libraries you are using.
 
     If you installed boost into the root of the C or D drives with the default name (or the BOOST_ROOT environment variable has been set), cmake should automatically detect their location. Otherwise the location will need to be manually given to cmake.
 
