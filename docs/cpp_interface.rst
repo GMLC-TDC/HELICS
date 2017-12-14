@@ -1,4 +1,4 @@
-cpp_interface
+CPP Interface
 =============
 
 .. doxygenclass:: helics::ValueFederate

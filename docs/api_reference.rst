@@ -1,9 +1,6 @@
 API reference
 =============
 
-Containers
-----------
-
 .. toctree::
    :maxdepth: 2
 
