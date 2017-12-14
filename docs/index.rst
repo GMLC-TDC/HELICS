@@ -23,4 +23,4 @@ This is the documentation for Hierarchical Engine for Large-scale Infrastructure
    installation
    basic_usage
    api_reference
-   releasing
+   developer_guide
