@@ -113,6 +113,7 @@ class Publication : public PublicationBase
     void publish (const std::vector<std::complex<double>> &val) const;
     void publish (const double *vals, int size) const;
     void publish (std::complex<double> val) const;
+    void publish (const defV &val) const;
     /** secondary publish function to allow unit conversion before publication
     @param[in] val the value to publish
     @param[in] units  the units association with the publication

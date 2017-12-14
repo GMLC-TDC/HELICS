@@ -222,11 +222,12 @@ void helicsGetComplexVector (const std::string &val, std::vector<std::complex<do
 
 data_block typeConvert (helicsType_t type, double val);
 data_block typeConvert (helicsType_t type, int64_t val);
+data_block typeConvert (helicsType_t type, const char *val);
 data_block typeConvert (helicsType_t type, const std::string &val);
 data_block typeConvert (helicsType_t type, const std::vector<double> &val);
 data_block typeConvert (helicsType_t type, const double *vals, size_t size);
 data_block typeConvert (helicsType_t type, const std::vector<std::complex<double>> &val);
-data_block typeConvert (helicsType_t type, std::complex<double> &val);
+data_block typeConvert (helicsType_t type, const std::complex<double> &val);
 
 /** template class for generating a known name of a type*/
 template <class X>
