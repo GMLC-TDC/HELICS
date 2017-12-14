@@ -28,20 +28,20 @@ To set up your environment:
 
 Getting and building from source:
 
-1. Use `git clone` to to check out a copy of HELICS.
-2. Create a build folder. Run cmake and give it the path that HELICS was checked out into.
-3. Run "make".
+    1. Use `git clone` to to check out a copy of HELICS.
+    2. Create a build folder. Run cmake and give it the path that HELICS was checked out into.
+    3. Run "make".
 
-.. code-block:: bash
+    .. code-block:: bash
 
-    git clone https://github.com/GMLC-TDC/HELICS-src
-    cd HELICS-src
-    mkdir build
-    cd build
-    cmake ../
-    ccmake . # optional, to change install path or other configuration settings
-    make
-    make install
+        git clone https://github.com/GMLC-TDC/HELICS-src
+        cd HELICS-src
+        mkdir build
+        cd build
+        cmake ../
+        ccmake . # optional, to change install path or other configuration settings
+        make
+        make install
 
 
 Testing
