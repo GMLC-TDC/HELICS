@@ -33,6 +33,7 @@ Getting and building from source:
 3. Run "make".
 
 .. code-block:: bash
+
     git clone https://github.com/GMLC-TDC/HELICS-src
     cd HELICS-src
     mkdir build

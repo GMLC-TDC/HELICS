@@ -35,7 +35,7 @@ Getting and building from source:
 
 3. Run "make".
 
-..code-block:: bash
+.. code-block:: bash
 
     git clone https://github.com/GMLC-TDC/HELICS-src
     cd HELICS-src
@@ -52,7 +52,7 @@ Testing
 
 A quick test is to double check the versions of the HELICS player and recorder:
 
-..code-block:: bash
+.. code-block:: bash
 
     cd /path/to/helics_install/bin
 

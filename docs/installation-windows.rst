@@ -30,7 +30,8 @@ Getting and building from source:
     2. Open a command prompt. Use git clone to check out a copy of HELICS.
 
     ..code-block:: bash
-       git clone https://github.com/GMLC-TDC/HELICS-src.git
+
+        git clone https://github.com/GMLC-TDC/HELICS-src.git
 
     3. Go to the checkedout HELICS project folder (the default folder name is HELICS-src). Create a build folder and open the build folder. Alternatively, cmake-gui can be used.
 
@@ -43,6 +44,7 @@ Getting and building from source:
     4. Run cmake. It should automatically detect where MPI is installed if the system path variables are set up correctly, otherwise you will have to set the cmake path manually. Optionally, you can use the option `-DAUTOBUILD_ZMQ=ON` to have cmake attempt to automatically download, build, and configure paths for a project-only copy of ZeroMQ.
 
     ..code-block:: bash
+
         cmake ..
 
 
