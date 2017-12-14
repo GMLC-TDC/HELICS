@@ -22,3 +22,11 @@ On Windows platforms, from the source directory:
     cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=/path/to/prefix ..
     nmake
     nmake install
+
+
+.. toctree::
+   :maxdepth: 1
+
+   installation-windows
+   installation-mac
+   installation-linux
