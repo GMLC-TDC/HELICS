@@ -18,17 +18,22 @@ Setup
 To set up your environment:
 
     1. (if needed) Install git on your system for easy access to the HELICS source. Download from `git-scm <https://git-scm.com/downloads>`_. This installs the command line which is described here. GUI's interfaces such as `SourceTree <https://www.sourcetreeapp.com/>`_ are another option.
+
     2. (if desired) Many required libraries are easiest installed using the `homebrew <https://brew.sh/>`_ package manager. These directions assume this approach, so unless you prefer to track these libraries and dependencies down yourself, install it if you don't have it yet.
-    3. (if needed) Setup a command-line compile environment:
-         1. Install a C++11 compiler (C++14 preferred). e.g. `clang` from the Xcode command line tools. These can be installed from the command line in Terminal by typing `xcode-select --install` and following the on-screen prompts.
-         2. Install cmake with `brew install cmake`. Alternately, a DMG file is available for cmake from their `website <https://cmake.org/download/>`_
+
+    3. (if needed) Setup a command-line compile environment
+
+         a) Install a C++11 compiler (C++14 preferred). e.g. `clang` from the Xcode command line tools. These can be installed from the command line in Terminal by typing `xcode-select --install` and following the on-screen prompts.
+         b) Install cmake with `brew install cmake`. Alternately, a DMG file is available for cmake from their `website <https://cmake.org/download/>`_.
+
     4. Install most dependencies using homebrew.
+
         .. code-block:: bash
 
             brew install boost
             brew install zmq
 
-    5. Make sure *cmake* and *git* are available in the Command Prompt with `which cmake` and`which git` If they aren't, add them to the system PATH variable.
+    5. Make sure *cmake* and *git* are available in the Command Prompt with ``which cmake`` and ``which git`` If they aren't, add them to the system PATH variable.
 
 Getting and building from source:
 

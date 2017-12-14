@@ -17,19 +17,25 @@ Setup
 
 To set up your environment:
 
-   1. Install dependencies using apt-get.
-      1. sudo apt-get install libboost-dev
-      2. sudo apt-get install libboost-program-options-dev
-      3. sudo apt-get install libboost-test-dev
-      4. sudo apt-get install libboost-filesystem-dev
-      5. sudo apt-get install libboost-date-time-dev
-      6. sudo apt-get install libzmq5-dev
-   2. Make sure *cmake* and *git* are available in the Command Prompt. If they aren't, add them to the system PATH variable.
+    1. Install dependencies using apt-get.
+
+    .. code-block:: bash
+
+        sudo apt-get install libboost-dev
+        sudo apt-get install libboost-program-options-dev
+        sudo apt-get install libboost-test-dev
+        sudo apt-get install libboost-filesystem-dev
+        sudo apt-get install libboost-date-time-dev
+        sudo apt-get install libzmq5-dev
+
+    2. Make sure *cmake* and *git* are available in the Command Prompt. If they aren't, add them to the system PATH variable.
 
 Getting and building from source:
 
     1. Use `git clone` to to check out a copy of HELICS.
+
     2. Create a build folder. Run cmake and give it the path that HELICS was checked out into.
+
     3. Run "make".
 
     .. code-block:: bash
