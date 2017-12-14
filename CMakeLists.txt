@@ -113,7 +113,7 @@ ELSE(UNIX)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
   #this options produces lots of warning but is useful for checking ever once in a while with Clang GCC warnin notices with this aren't as useful
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
-  
+
   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
   ELSE(MINGW)
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
@@ -164,11 +164,11 @@ IF (HELICS_GENERATE_DOXYGEN_DOC)
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
 
-	SHOW_VARIABLE(DOXYGEN_OUTPUT_DIR PATH "location to put Doxygen docs" "${CMAKE_CURRENT_SOURCE_DIR}/docs")
+  SHOW_VARIABLE(DOXYGEN_OUTPUT_DIR PATH "location to put Doxygen docs" "${CMAKE_CURRENT_SOURCE_DIR}/docs")
+  MESSAGE(STATUS "Location to put Doxygen docs is " ${DOXYGEN_OUTPUT_DIR})
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-	add_custom_target(doc
-	${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docs}
+	add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docs
 	COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 endif(DOXYGEN_FOUND)
@@ -263,7 +263,7 @@ SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
 # when building, don't use the install RPATH already
 # (but later on when installing)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
 
@@ -343,7 +343,7 @@ include (CTest)
 endif(BUILD_HELICS_TESTS)
 
 if (BUILD_HELICS_EXAMPLES)
-add_subdirectory (examples)  
+add_subdirectory (examples)
 
 endif(BUILD_HELICS_EXAMPLES)
 
@@ -368,7 +368,7 @@ install (TARGETS helics-static EXPORT helics-targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 	set(helics_static_file "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}")
-	
+
 IF(BUILD_CXX_SHARED_LIB)
 install (TARGETS helics-shared EXPORT helics-targets
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

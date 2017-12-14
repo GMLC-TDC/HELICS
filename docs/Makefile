@@ -20,7 +20,7 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 doxygen:
-	cd ../; doxygen .
+	cd ../; mkdir -p build; cd build; cmake -DCMAKE_INSTALL_PREFIX=./install/helics_install -DHELICS_GENERATE_DOXYGEN_DOC=ON ../; make doc;
 
 github: html
 	-git branch -D gh-pages
