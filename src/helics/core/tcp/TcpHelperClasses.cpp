@@ -25,13 +25,24 @@ void tcp_rx_connection::handle_read(const boost::system::error_code &error,
 {
     if (!error)
     {
-        dataCall(data.data(), bytes_transferred);
+        auto resp=dataCall(index, data.data(), bytes_transferred);
+        if (!resp.empty())
+        {
+            try
+            {
+                socket_.send(boost::asio::buffer(resp));
+            }
+            catch (boost::system::system_error &se)
+            {
+                std::cerr << "receive reply send error " << se.what() << std::endl;
+            }
+        }
     }
     else
     {
         if (errorCall)
         {
-            if (!errorCall(error))
+            if (!errorCall(index, error))
             {
                 return;
             }
@@ -45,6 +56,17 @@ void tcp_rx_connection::handle_read(const boost::system::error_code &error,
     start();
 }
 
+void tcp_rx_connection::close()
+{
+    stop();
+    boost::system::error_code ec;
+    socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
+    if (ec)
+    {
+        std::cerr << "error occurred sending shutdown" << std::endl;
+    }
+    socket_.close();
+}
 
 tcp_connection::pointer tcp_connection::create(boost::asio::io_service& io_service, const std::string &connection, const std::string &port, size_t bufferSize)
 {
@@ -83,11 +105,30 @@ size_t tcp_connection::receive(void *buffer, size_t maxDataLength)
     return socket_.receive(boost::asio::buffer(buffer, maxDataLength));
 }
 
-void tcp_server::start_accept()
+
+void tcp_connection::close()
 {
+    cancel();
+    boost::system::error_code ec;
+    socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
+    if (ec)
+    {
+        std::cerr << "error occurred sending shutdown" << std::endl;
+    }
+    socket_.close();
+}
+
+void tcp_server::start()
+{
+    if (!connections.empty())
+    {
+        for (auto &conn : connections)
+        {
+            conn->start();
+        }
+    }
     tcp_rx_connection::pointer new_connection =
         tcp_rx_connection::create(acceptor_.get_io_service(), bufferSize);
-    
     acceptor_.async_accept(new_connection->socket(), [this, new_connection](const boost::system::error_code& error)
     {
         handle_accept(new_connection, error);
@@ -101,9 +142,12 @@ void tcp_server::handle_accept(tcp_rx_connection::pointer new_connection,
     {
         new_connection->setDataCall(dataCall);
         new_connection->setErrorCall(errorCall);
+        new_connection->index = static_cast<int>(connections.size());
+        //the previous 3 calls have to be made before this call since they could be used immediately
         new_connection->start();
-        start_accept();
-        connections.push_back(new_connection);
+        connections.push_back(std::move(new_connection));
+        start();
+        
     }
     else if (error!= boost::asio::error::operation_aborted)
     {
@@ -111,11 +155,17 @@ void tcp_server::handle_accept(tcp_rx_connection::pointer new_connection,
     }
 }
 
-void tcp_server::haltServer()
+void tcp_server::stop()
 {
     acceptor_.cancel();
     for (auto &conn : connections)
     {
         conn->stop();
     }
+}
+
+void tcp_server::close()
+{
+    acceptor_.cancel();
+    connections.clear();
 }

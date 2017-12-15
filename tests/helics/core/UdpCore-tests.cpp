@@ -28,6 +28,9 @@ BOOST_AUTO_TEST_SUITE (UDPCore_tests)
 using boost::asio::ip::udp;
 using helics::Core;
 
+
+#define UDP_BROKER_PORT 23901
+#define UDP_SECONDARY_PORT 23905
 BOOST_AUTO_TEST_CASE (udpComms_broker_test)
 {
     std::atomic<int> counter{0};
@@ -39,7 +42,7 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
     udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
 
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
-    comm.setBrokerPort (23901);
+    comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setName ("tests");
     auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
 
@@ -76,8 +79,8 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
 
     BOOST_CHECK (rxSocket.is_open ());
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
-    comm.setBrokerPort (23901);
-    comm.setPortNumber (23903);
+    comm.setBrokerPort (UDP_BROKER_PORT);
+    comm.setPortNumber (UDP_SECONDARY_PORT);
     comm.setName ("tests");
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
@@ -114,7 +117,7 @@ BOOST_AUTO_TEST_CASE (udpComms_rx_test)
         ++counter;
         act = m;
     });
-    comm.setBrokerPort (23901);
+    comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setPortNumber (23903);
     comm.setName ("tests");
 
@@ -151,11 +154,11 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_through)
     helics::UdpComms comm (host, host);
     helics::UdpComms comm2 (host, "");
 
-    comm.setBrokerPort (23901);
+    comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setName ("tests");
     comm2.setName ("test2");
-    comm2.setPortNumber (23901);
-    comm.setPortNumber (23908);
+    comm2.setPortNumber (UDP_BROKER_PORT);
+    comm.setPortNumber (UDP_SECONDARY_PORT);
 
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
@@ -200,14 +203,14 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_add_route)
     helics::UdpComms comm2 (host, "");
     helics::UdpComms comm3 (host, host);
 
-    comm.setBrokerPort (23901);
+    comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setName ("tests");
     comm2.setName ("broker");
     comm3.setName ("test3");
-    comm3.setBrokerPort (23901);
+    comm3.setBrokerPort (UDP_BROKER_PORT);
 
-    comm2.setPortNumber (23901);
-    comm.setPortNumber (23905);
+    comm2.setPortNumber (UDP_BROKER_PORT);
+    comm.setPortNumber (UDP_SECONDARY_PORT);
     comm3.setPortNumber (23920);
 
     helics::ActionMessage act;

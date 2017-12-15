@@ -18,7 +18,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "ipc/IpcComms.h"
 #include "udp/UdpComms.h"
 #include "zmq/ZmqComms.h"
+
+#ifndef DISABLE_TCP_CORE
 #include "tcp/TcpComms.h"
+#endif
 
 #if HELICS_HAVE_MPI
 #include "mpi/MpiComms.h"
@@ -32,8 +35,12 @@ template class CommsBroker<ZmqComms, CoreBroker>;
 template class CommsBroker<ZmqComms, CommonCore>;
 template class CommsBroker<UdpComms, CoreBroker>;
 template class CommsBroker<UdpComms, CommonCore>;
+
+#ifndef DISABLE_TCP_CORE
 template class CommsBroker<TcpComms, CommonCore>;
 template class CommsBroker<TcpComms, CoreBroker>;
+#endif
+
 #if HELICS_HAVE_MPI
 template class CommsBroker<MpiComms, CoreBroker>;
 template class CommsBroker<MpiComms, CommonCore>;

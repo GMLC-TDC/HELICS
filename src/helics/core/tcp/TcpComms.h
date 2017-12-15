@@ -77,8 +77,13 @@ private:
     BlockingQueue3<ActionMessage> rxMessageQueue;
 
     void txReceive(const char *data, size_t bytes_received, const std::string &errorMessage);
-   /** callback function for receiving data asynchronously from the socket*/
-    void dataReceive(const char *data, size_t bytes_received);
+   /** callback function for receiving data asynchronously from the socket
+   @param index the index of connection in the server
+   data the pointer to the data
+   bytes_received the length of the received data
+   @return a string with the response(this is raw data contained in a string, empty string if no data
+   */
+    std::string dataReceive(int index, const char *data, size_t bytes_received);
 
   //  bool errorHandle()
 public:

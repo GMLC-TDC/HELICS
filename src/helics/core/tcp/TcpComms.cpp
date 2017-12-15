@@ -125,22 +125,23 @@ ActionMessage TcpComms::generateReplyToIncomingMessage (ActionMessage &M)
 }
 
 
-void TcpComms::dataReceive(const char *data, size_t bytes_received)
+std::string TcpComms::dataReceive(int /*index*/, const char *data, size_t bytes_received)
 {
     ActionMessage m(data, bytes_received);
     if (isPriorityCommand(m))
     {
         auto rep=generateReplyToIncomingMessage(m);
+        return rep.to_string();
     }
     else if (isProtocolCommand(m))
     {
         rxMessageQueue.push(m);
-        return;
     }
     else
     {
         ActionCallback(std::move(m));
     }
+    return {};
 }
 
 void TcpComms::queue_rx_function ()
@@ -178,9 +179,9 @@ void TcpComms::queue_rx_function ()
         rx_status = connection_status::terminated; 
     };
     ioserv->runServiceLoop();
-    server.setDataCall([this](const char *data, size_t datasize) {dataReceive(data, datasize); });
+    server.setDataCall([this](int index, const char *data, size_t datasize) {return dataReceive(index, data, datasize); });
     
-    server.start_accept();
+    server.start();
     rx_status = connection_status::connected;
     while (true)
     {
@@ -318,9 +319,9 @@ void TcpComms::queue_tx_function ()
                     tx_status = connection_status::terminated;
                     return;
                 }
-                std::vector<char> rx(128);
+                std::vector<char> rx(512);
                 tcp::endpoint brk;
-                brokerConnection->async_receive(rx.data(), 128, [this, rx](const boost::system::error_code& error, size_t bytes) {
+                brokerConnection->async_receive(rx.data(), 128, [this, &rx](const boost::system::error_code& error, size_t bytes) {
                     if (error != boost::asio::error::operation_aborted)
                     {
                         if (!error)

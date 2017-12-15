@@ -8,7 +8,7 @@
 
 #cmakedefine01 HELICS_HAVE_ZEROMQ
 
-#cmakedefine01 DISABLE_TCP_CORE
+#cmakedefine DISABLE_TCP_CORE
 
 #cmakedefine DISABLE_LOGGING
 #cmakedefine DISABLE_TRACE_LOGGING
