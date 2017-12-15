@@ -8,7 +8,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 //#include "helics.h"
-#include "helics/shared_api_library/helics.h"
+#include "../chelics.h"
 #include "test_configuration.h"
 #include <future>
 #include <boost/test/unit_test.hpp>

@@ -14,19 +14,18 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <string>
 #include <vector>
 
-#include "helics/shared_api_library/helics.h"
-#include "helics/shared_api_library/MessageFederate_c.h"
-#include "helics/shared_api_library/MessageFilterFederate_c.h"
-#include "helics/shared_api_library/ValueFederate_c.h"
+#include "helics.h"
+#include "MessageFederate_c.h"
+#include "ValueFederate_c.h"
 //#include "helics/core/CoreFactory.h"
 //#include "helics/application_api/MessageFederate.h"
 //#include "helics/application_api/MessageFilterFederate.h"
 //#include "helics/application_api/ValueFederate.h"
 
 typedef enum {
-    valueFederate;
-    combinationFederate;
-    messageFederate;
+    valueFederate,
+    combinationFederate,
+    messageFederate,
 }helicsFederateType;
 
 struct ValueFederateTestFixture
