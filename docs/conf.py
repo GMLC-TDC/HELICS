@@ -158,7 +158,7 @@ latex_elements = {
 latex_documents = [
     (
         master_doc, 'HELICS-src.tex', 'HELICS-src Documentation',
-        'Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Bryan Palmintier, Jason Fuller',
+        'Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller',
         'manual'
     ),
 ]
