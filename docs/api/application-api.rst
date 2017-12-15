@@ -1,5 +1,11 @@
-CPP Application API
-===================
+Application API
+===============
+
+Federate
+--------
+
+.. doxygenfile:: Federate.h
+   :project: helics
 
 Message Federate
 ----------------
@@ -17,4 +23,30 @@ Combination Federate
 --------------------
 
 .. doxygenfile:: CombinationFederate.h
+   :project: helics
+
+Publications
+------------
+
+.. doxygenfile:: Publications.hpp
+   :project: helics
+
+
+Subscriptions
+-------------
+
+.. doxygenfile:: Subscriptions.hpp
+   :project: helics
+
+
+Endpoints
+---------
+
+.. doxygenfile:: Endpoints.hpp
+   :project: helics
+
+Filters
+-------
+
+.. doxygenfile:: Filters.hpp
    :project: helics
