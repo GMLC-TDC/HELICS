@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Introduction
-============
+HELICS documentation
+====================
 
 .. image:: https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=master
 
