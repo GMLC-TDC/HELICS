@@ -8,6 +8,7 @@ Introduction
     types-of-federates
     pubsub-vs-message
     filters
+    interfaces
     basic-usage
 
 

@@ -1,22 +1,6 @@
+Contributing
+============
 
-Developer Guide
-=================
-
-Generating Documentation
-------------------------
-
-You will need the following Python packages.
-
-.. code-block:: bash
-
-    pip install recommonmark
-    pip install sphinx
-    pip install ghp-import
-    pip install breathe
-
-You will also need doxygen.
-
-You can then type ``make html`` to create the documentation locally.
 
 Submitting a Pull Request
 -------------------------
@@ -33,5 +17,4 @@ Opening an Issue
 
 - Use the github issue tracker for submitting bugs or feature requests.
 - Discuss on the gitter channel to chat with developers
-
 
