@@ -10,12 +10,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "FederateState.h"
 
+#include "../flag-definitions.h"
 #include "EndpointInfo.h"
-#include "FilterInfo.h"
 #include "PublicationInfo.h"
 #include "SubscriptionInfo.h"
 #include "TimeCoordinator.h"
-#include "flag-definitions.h"
 
 #include <algorithm>
 #include <chrono>
@@ -220,48 +219,6 @@ void FederateState::createEndpoint (Core::Handle handle, const std::string &key,
     }
 }
 
-void FederateState::createSourceFilter (Core::Handle handle,
-                                        const std::string &key,
-                                        const std::string &target,
-                                        const std::string &type)
-{
-    auto filt = std::make_unique<FilterInfo> (handle, global_id, key, target, type, false);
-
-    std::lock_guard<std::mutex> lock (_mutex);
-    filterNames.emplace (key, filt.get ());
-
-    if (filters.empty () || handle > filters.back ()->id)
-    {
-        filters.push_back (std::move (filt));
-    }
-    else
-    {
-        filters.push_back (std::move (filt));
-        std::sort (filters.begin (), filters.end (), compareFunc);
-    }
-}
-
-void FederateState::createDestFilter (Core::Handle handle,
-                                      const std::string &key,
-                                      const std::string &target,
-                                      const std::string &type)
-{
-    auto filt = std::make_unique<FilterInfo> (handle, global_id, key, target, type, true);
-
-    std::lock_guard<std::mutex> lock (_mutex);
-    filterNames.emplace (key, filt.get ());
-
-    if (filters.empty () || handle > filters.back ()->id)
-    {
-        filters.push_back (std::move (filt));
-    }
-    else
-    {
-        filters.push_back (std::move (filt));
-        std::sort (filters.begin (), filters.end (), compareFunc);
-    }
-}
-
 SubscriptionInfo *FederateState::getSubscription (const std::string &subName) const
 {
     auto fnd = subNames.find (subName);
@@ -338,34 +295,6 @@ EndpointInfo *FederateState::getEndpoint (Core::Handle handle_) const
     return nullptr;
 }
 
-FilterInfo *FederateState::getFilter (const std::string &filterName) const
-{
-    auto fnd = filterNames.find (filterName);
-    if (fnd != filterNames.end ())
-    {
-        return fnd->second;
-    }
-    return nullptr;
-}
-
-FilterInfo *FederateState::getFilter (Core::Handle handle_) const
-{
-    static auto cmptr = [](const std::unique_ptr<FilterInfo> &ptrA, Core::Handle handle) {
-        return (ptrA->id < handle);
-    };
-
-    auto fnd = std::lower_bound (filters.begin (), filters.end (), handle_, cmptr);
-    if (fnd == filters.end ())
-    {
-        return nullptr;
-    }
-    if (fnd->operator-> ()->id == handle_)
-    {
-        return fnd->get ();
-    }
-    return nullptr;
-}
-
 bool FederateState::checkSetValue (Core::Handle pub_id, const char *data, uint64_t len) const
 {
     if (!only_transmit_on_change)
@@ -385,11 +314,6 @@ uint64_t FederateState::getQueueSize (Core::Handle handle_) const
     {
         return epI->queueSize (time_granted);
     }
-    auto fI = getFilter (handle_);
-    if (fI != nullptr)
-    {
-        return fI->queueSize (time_granted);
-    }
     return 0;
 }
 
@@ -403,27 +327,12 @@ uint64_t FederateState::getQueueSize () const
     return cnt;
 }
 
-uint64_t FederateState::getFilterQueueSize () const
-{
-    uint64_t cnt = 0;
-    for (auto &filt : filters)
-    {
-        cnt += filt->queueSize (time_granted);
-    }
-    return cnt;
-}
-
 std::unique_ptr<Message> FederateState::receive (Core::Handle handle_)
 {
     auto epI = getEndpoint (handle_);
     if (epI != nullptr)
     {
         return epI->getMessage (time_granted);
-    }
-    auto fI = getFilter (handle_);
-    if (fI != nullptr)
-    {
-        return fI->getMessage (time_granted);
     }
     return nullptr;
 }
@@ -451,35 +360,6 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::Handle &id)
     {
         auto result = endpointI->getMessage (time_granted);
         id = endpointI->id;
-        return result;
-    }
-    id = invalid_Handle;
-    return nullptr;
-}
-
-std::unique_ptr<Message> FederateState::receiveAnyFilter (Core::Handle &id)
-{
-    Time earliest_time = Time::maxVal ();
-    FilterInfo *filterI = nullptr;
-    // Find the end point with the earliest message time
-    for (auto &filt : filters)
-    {
-        auto t = filt->firstMessageTime ();
-        if (t < earliest_time)
-        {
-            earliest_time = t;
-            filterI = filt.get ();
-        }
-    }
-    if (filterI == nullptr)
-    {
-        return nullptr;
-    }
-    // Return the message found and remove from the queue
-    if (earliest_time <= time_granted)
-    {
-        auto result = filterI->getMessage (time_granted);
-        id = filterI->id;
         return result;
     }
     id = invalid_Handle;
@@ -691,7 +571,7 @@ const std::vector<Core::Handle> emptyHandles;
 const std::vector<Core::Handle> &FederateState::getEvents () const
 {
     if (!processing)
-    {  //!< if we are processing this vector is in an unstable state
+    {  //!< if we are processing this vector is in an undefined state
         return events;
     }
     return emptyHandles;
@@ -823,7 +703,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         {
             break;
         }
-        // FALLTHROUGH
+        FALLTHROUGH
     case CMD_TIME_CHECK:
     {
         if (state != HELICS_EXECUTING)
@@ -844,19 +724,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         if (epi != nullptr)
         {
             timeCoord->updateMessageTime (cmd.actionTime);
-            cmd.actionTime += timeCoord->getFedInfo ().impactWindow;
             epi->addMessage (createMessage (std::move (cmd)));
-        }
-    }
-    break;
-    case CMD_SEND_FOR_FILTER:
-    {
-        // this should only be non time_agnostic filters
-        auto fI = getFilter (cmd.dest_handle);
-        if (fI != nullptr)
-        {
-            timeCoord->updateMessageTime (cmd.actionTime);
-            fI->addMessage (createMessage (std::move (cmd)));
         }
     }
     break;
@@ -869,8 +737,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         if (cmd.source_id == subI->target.first)
         {
-            subI->addData (cmd.actionTime + timeCoord->getFedInfo ().impactWindow,
-                           std::make_shared<const data_block> (std::move (cmd.payload)));
+            subI->addData (cmd.actionTime, std::make_shared<const data_block> (std::move (cmd.payload)));
             timeCoord->updateValueTime (cmd.actionTime);
             LOG_TRACE (timeCoord->printTimeStatus ());
         }
@@ -912,43 +779,18 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
     }
     break;
-    case CMD_REG_END:
-    case CMD_NOTIFY_END:
-    {
-        auto filtI = getFilter (cmd.dest_handle);
-        if (filtI != nullptr)
-        {
-            filtI->target = {cmd.source_id, cmd.source_handle};
-            addDependency (cmd.source_id);
-        }
-    }
-    break;
     case CMD_ADD_DEPENDENCY:
-        if (cmd.dest_id == global_id)
-        {
-            timeCoord->addDependency (cmd.source_id);
-        }
-
-        break;
-    case CMD_ADD_DEPENDENT:
-        if (cmd.dest_id == global_id)
-        {
-            timeCoord->addDependent (cmd.source_id);
-        }
-        break;
     case CMD_REMOVE_DEPENDENCY:
-        if (cmd.dest_id == global_id)
-        {
-            timeCoord->removeDependency (cmd.source_id);
-        }
-        break;
+    case CMD_ADD_DEPENDENT:
     case CMD_REMOVE_DEPENDENT:
+    case CMD_ADD_INTERDEPENDENCY:
+    case CMD_REMOVE_INTERDEPENDENCY:
         if (cmd.dest_id == global_id)
         {
-            timeCoord->removeDependent (cmd.source_id);
+            timeCoord->processDependencyUpdateMessage (cmd);
         }
-        break;
 
+        break;
     case CMD_REG_DST_FILTER:
     case CMD_NOTIFY_DST_FILTER:
     {
@@ -979,7 +821,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         if (cmd.name == name)
         {
-            if (cmd.error)
+            if (CHECK_ACTION_FLAG (cmd, error_flag))
             {
                 setState (HELICS_ERROR);
                 return iteration_state::error;
@@ -1005,10 +847,10 @@ void FederateState::processConfigUpdate (const ActionMessage &m)
         switch (m.dest_id)
         {
         case ONLY_TRANSMIT_ON_CHANGE_FLAG:
-            only_transmit_on_change = m.flag;
+            only_transmit_on_change = CHECK_ACTION_FLAG (m, indicator_flag);
             break;
         case ONLY_UPDATE_ON_CHANGE_FLAG:
-            only_update_on_change = m.flag;
+            only_update_on_change = CHECK_ACTION_FLAG (m, indicator_flag);
             break;
         default:
             break;
@@ -1126,9 +968,6 @@ std::string FederateState::processQuery (const std::string &query) const
     {
         return queryCallback (query);
     }
-    else
-    {
-        return "#invalid";
-    }
+    return "#invalid";
 }
 }  // namespace helics

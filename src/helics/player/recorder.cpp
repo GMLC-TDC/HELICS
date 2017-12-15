@@ -120,7 +120,7 @@ int main (int argc, char *argv[])
         name = vm["name"].as<std::string> ();
     }
 
-    std::string corename = "";
+    std::string corename;
     if (vm.count ("core") > 0)
     {
         corename = vm["core"].as<std::string> ();
@@ -196,7 +196,7 @@ int main (int argc, char *argv[])
                     auto pubs = vectorizeQueryResult (vFed->query (captFed, "publications"));
                     for (auto &pub : pubs)
                     {
-                        subscriptions.push_back (helics::Subscription (vFed.get (), pub));
+                        subscriptions.emplace_back (vFed.get (), pub);
                     }
                 }
             }
@@ -207,7 +207,7 @@ int main (int argc, char *argv[])
     vStat.reserve (subids.size ());
     for (auto &val : subids)
     {
-        vStat.push_back (ValueStats ());
+        vStat.emplace_back (ValueStats ());
         vStat.back ().key = val.second.first;
     }
 

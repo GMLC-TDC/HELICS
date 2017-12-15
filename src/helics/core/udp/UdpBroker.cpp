@@ -10,11 +10,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "UdpBroker.h"
 #include "../../common/blocking_queue.h"
-#include "helics/helics-config.h"
 #include "../core-data.h"
 #include "../core.h"
 #include "../helics-time.h"
 #include "UdpComms.h"
+#include "helics/helics-config.h"
 
 #include <algorithm>
 #include <cassert>
@@ -40,7 +40,7 @@ UdpBroker::UdpBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 UdpBroker::UdpBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
-UdpBroker::~UdpBroker() = default;
+UdpBroker::~UdpBroker () = default;
 
 void UdpBroker::displayHelp (bool local_only)
 {
@@ -55,7 +55,7 @@ void UdpBroker::displayHelp (bool local_only)
     }
 }
 
-void UdpBroker::InitializeFromArgs (int argc, const char *const *argv)
+void UdpBroker::initializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == broker_state_t::created)
@@ -83,7 +83,7 @@ void UdpBroker::InitializeFromArgs (int argc, const char *const *argv)
                     // TODO::Print a message?
                 }
             }
-            if ((brokerAddress == "udp://*")||(brokerAddress=="*"))
+            if ((brokerAddress == "udp://*") || (brokerAddress == "*"))
             {  // the broker address can't use a wild card
                 brokerAddress = "localhost";
             }
@@ -110,7 +110,7 @@ void UdpBroker::InitializeFromArgs (int argc, const char *const *argv)
         {
             portStart = vm["portstart"].as<int> ();
         }
-        CoreBroker::InitializeFromArgs (argc, argv);
+        CoreBroker::initializeFromArgs (argc, argv);
     }
 }
 
@@ -128,7 +128,7 @@ bool UdpBroker::brokerConnect ()
     {
         comms->setPortNumber (PortNumber);
     }
-   
+
     if (portStart > 0)
     {
         comms->setAutomaticPortStartPort (portStart);
@@ -141,7 +141,6 @@ bool UdpBroker::brokerConnect ()
         {
             PortNumber = comms->getPort ();
         }
-       
     }
     return res;
 }

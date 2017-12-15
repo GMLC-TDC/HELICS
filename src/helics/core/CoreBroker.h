@@ -23,6 +23,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "../common/simpleQueue.hpp"
 #include "TimeDependencies.h"
 #include "BrokerBase.h"
+#include "broker.h"
+
 namespace helics
 {
 /** class defining the common information for a federate*/
@@ -67,14 +69,12 @@ constexpr Core::federate_id_t global_broker_id_shift = 0x7000'0000;
 Basically acts as a router for information,  deals with stuff internally if it can and sends higher up if it can't
 or does something else if it is the root of the tree
 */
-class CoreBroker : public BrokerBase
+class CoreBroker : public Broker, public BrokerBase
 {
 protected:
 	bool _gateway = false;  //!< set to true if this broker should act as a gateway.
-	bool _hasEndpoints = false; //!< set to true if the broker has endpoints;  
 private:
 	bool _isRoot = false;  //!< set to true if this object is a root broker
-    bool enteredExecutionMode = false; //!< flag indicating that the broker has entered execution mode
 	std::vector<std::pair<Core::federate_id_t, bool>> localBrokersInit; //!< indicator if the local brokers are ready to initialize
 	std::vector<BasicFedInfo> _federates; //!< container for all federates
 	std::vector<BasicHandleInfo> _handles; //!< container for the basic info for all handles
@@ -110,18 +110,22 @@ private:
 	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
 	/* function to transmit the delayed messages*/
 	void transmitDelayedMessages();
+    /**function for routing a message,  it will override the destination id with the specified argument
+    */
+    void routeMessage(ActionMessage &cmd, Core::federate_id_t dest);
+    /** function for routing a message from based on the destination specified in the ActionMessage*/
+    void routeMessage(const ActionMessage &cmd);
 	
-	
-	int32_t FillRouteInformation(ActionMessage &mess);
+	int32_t fillMessageRouteInformation(ActionMessage &mess);
     /**generate the results of a query directed at the broker*/
     void generateQueryResult(const ActionMessage &command);
 public:
 	/** connect the core to its broker
 	@details should be done after initialization has complete*/
-	bool connect();
+	virtual bool connect() override final;
 	/** disconnect the broker from any other brokers and communications
 	*/
-	void disconnect();
+	virtual void disconnect() override final;
     /** unregister the broker from the factory find methods*/
     void unregister();
     /** disconnect the broker from any other brokers and communications
@@ -130,13 +134,13 @@ public:
     */
 	virtual void processDisconnect(bool skipUnregister = false) override final;
 	/** check if the broker is connected*/
-	bool isConnected() const;
+	virtual bool isConnected() const override final;
 	/** set the broker to be a root broker
 	@details only valid before the initialization function is called*/
-	void setAsRoot();
+	virtual void setAsRoot() override final;
 	/** return true if the broker is a root broker
 	*/
-	bool isRoot() {
+	virtual bool isRoot() const override final{
 		return _isRoot;
 	};
 
@@ -172,10 +176,10 @@ public:
 	/** destructor*/
 	virtual ~CoreBroker();
 	/** start up the broker with an initialization string containing commands and parameters*/
-	void Initialize(const std::string &initializationString);
+	virtual void initialize(const std::string &initializationString) override final;
 	/** initialize from command line arguments
 	*/
-	virtual void InitializeFromArgs(int argc, const char * const *argv) override;
+	virtual void initializeFromArgs(int argc, const char * const *argv) override;
 
 	/** check if all the local federates are ready to be initialized
 	@return true if everyone is ready, false otherwise
@@ -185,18 +189,22 @@ public:
 	/** set the local identification string for the broker*/
 	void setIdentifier(const std::string &name);
 	/** get the local identification for the broker*/
-	const std::string &getIdentifier() const
+    virtual const std::string &getIdentifier() const override final
 	{
 		return identifier;
 	}
 
-	virtual std::string getAddress() const = 0;
-
 private:
+    /** check if we can remove some dependencies*/
+    void checkDependencies();
+    /** check subscriptions for completion and mismatches*/
 	void checkSubscriptions();
+    /** find any existing publishers for a subscription*/
 	bool FindandNotifySubscriptionPublisher(BasicHandleInfo &handleInfo);
 	void FindandNotifyPublicationSubscribers(BasicHandleInfo &handleInfo);
+    /** check endpoints for any issues*/
 	void checkEndpoints();
+    /** check filters for any issues*/
 	void checkFilters();
 	bool FindandNotifyFilterEndpoint(BasicHandleInfo &handleInfo);
 	void FindandNotifyEndpointFilters(BasicHandleInfo &handleInfo);
@@ -208,8 +216,6 @@ private:
     std::string generateQueryAnswer(const std::string &query) const;
 	/** locate the route to take to a particular federate*/
 	int32_t getRoute(Core::federate_id_t fedid) const;
-	/** locate the route in a previously locked context*/
-	int32_t getRouteNoLock(Core::federate_id_t fedid) const;
 	int32_t getFedByName(const std::string &fedName) const;
 	int32_t getBrokerByName(const std::string &brokerName) const;
 	int32_t getBrokerById(Core::federate_id_t fedid) const;
@@ -222,6 +228,8 @@ private:
 	void addDestFilter(ActionMessage &m);
 	void addSourceFilter(ActionMessage &m);
 	bool updateSourceFilterOperator(ActionMessage &m);
+    /** generate a json string containing the federate/broker/Core Map*/
+    std::string generateFederateMap() const;
 };
 
 

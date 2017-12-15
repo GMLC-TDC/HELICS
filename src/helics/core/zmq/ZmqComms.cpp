@@ -96,12 +96,20 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
         }
     }
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
+    if (!isValidCommand (M))
+    {
+        std::cerr << "invalid command received" << std::endl;
+        return 0;
+    }
     if (isProtocolCommand (M))
     {
         switch (M.index)
         {
         case CLOSE_RECEIVER:
             return (-1);
+        case RECONNECT_RECEIVER:
+            rx_status = connection_status::connected;
+            break;
         default:
             break;
         }
@@ -162,7 +170,16 @@ void ZmqComms::queue_rx_function ()
     pullSocket.setsockopt (ZMQ_LINGER, 200);
     zmq::socket_t controlSocket (ctx->getContext (), ZMQ_PAIR);
     std::string controlsockString = std::string ("inproc://") + name + "_control";
-    controlSocket.bind (controlsockString.c_str ());
+    try
+    {
+        controlSocket.bind (controlsockString.c_str ());
+    }
+    catch (const zmq::error_t &)
+    {
+        std::cerr << "binding error on internal comms socket" << std::endl;
+        rx_status = connection_status::error;
+        return;
+    }
     controlSocket.setsockopt (ZMQ_LINGER, 200);
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
     repSocket.setsockopt (ZMQ_LINGER, 500);
@@ -170,7 +187,12 @@ void ZmqComms::queue_rx_function ()
     {
         zmq::message_t msg;
         controlSocket.recv (&msg);
+        if (msg.size () < 10)
+        {
+            continue;
+        }
         ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
+
         if (isProtocolCommand (M))
         {
             if (M.index == PORT_DEFINITIONS)
@@ -384,12 +406,12 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 auto rc = zmq::poll (&poller, 1, std::chrono::milliseconds (3000));
                 if (rc < 0)
                 {
-                    std::cerr << "unable to connect with broker\n";
+                    std::cerr << "unable to connect with broker (2)\n";
                     tx_status = connection_status::error;
                 }
                 if (rc == 0)
                 {
-                    std::cerr << "broker connection timed out\n";
+                    std::cerr << "broker connection timed out (2)\n";
                     tx_status = connection_status::error;
                 }
                 if (tx_status == connection_status::error)
@@ -534,6 +556,9 @@ void ZmqComms::queue_tx_function ()
             {
                 switch (cmd.index)
                 {
+                case RECONNECT:
+                    tx_status = connection_status::connected;
+                    break;
                 case NEW_ROUTE:
                 {
                     auto newroute = cmd.payload;
@@ -591,7 +616,7 @@ void ZmqComms::queue_tx_function ()
                 // drop the packet
                 continue;
             }
-            else if (route_id == -1)
+            if (route_id == -1)
             {  // send to rx thread loop
                 cmd.to_vector (buffer);
                 controlSocket.send (buffer.data (), buffer.size ());
@@ -642,13 +667,6 @@ CLOSE_TX_LOOP:
     controlSocket.close ();
 
     tx_status = connection_status::terminated;
-}
-
-void ZmqComms::closeTransmitter ()
-{
-    ActionMessage rt (CMD_PROTOCOL);
-    rt.index = DISCONNECT;
-    transmit (-1, rt);
 }
 
 void ZmqComms::closeReceiver ()

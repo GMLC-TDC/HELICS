@@ -26,15 +26,18 @@ public:
 	~IpcComms();
 
 private:
+    std::atomic<int> ipcbackchannel{0}; //!< a back channel message system if the primary is not working
+
 	virtual void queue_rx_function() override;	//!< the functional loop for the receive queue
 	virtual void queue_tx_function() override;  //!< the loop for transmitting data
-	virtual void closeTransmitter() override; //!< function to instruct the transmitter loop to close
 	virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
 	
 private:
 	
 };
 
+#define IPC_BACKCHANNEL_TRY_RESET 2
+#define IPC_BACKCHANNEL_DISCONNECT 4
 
 } // namespace helics
 

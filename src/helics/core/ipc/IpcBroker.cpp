@@ -59,7 +59,7 @@ void IpcBroker::displayHelp (bool local_only)
     }
 }
 
-void IpcBroker::InitializeFromArgs (int argc, const char *const *argv)
+void IpcBroker::initializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == broker_state_t::created)
@@ -82,7 +82,7 @@ void IpcBroker::InitializeFromArgs (int argc, const char *const *argv)
             fileloc = vm["fileloc"].as<std::string> ();
         }
         noAutomaticID = true;
-        CoreBroker::InitializeFromArgs (argc, argv);
+        CoreBroker::initializeFromArgs (argc, argv);
         if (getIdentifier ().empty ())
         {
             setIdentifier ("_ipc_broker");

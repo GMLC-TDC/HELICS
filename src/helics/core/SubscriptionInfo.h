@@ -56,7 +56,7 @@ public:
 	/** get the current data*/
 	std::shared_ptr<const data_block> getData();
 	/** add a data block into the queue*/
-	void addData(Time updateTime, std::shared_ptr<const data_block> data);
+	void addData(Time valueTime, std::shared_ptr<const data_block> data);
 
 	/** update current status to new time
 	@param newTime the time to move the subscription to

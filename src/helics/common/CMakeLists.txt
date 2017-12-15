@@ -12,7 +12,6 @@ BlockingPriorityQueue.hpp
 timeRepresentation.hpp
 delayedDestructor.hpp
 searchableObjectHolder.hpp
-blocking_queue.h
 stringToCmdLine.h
 AsioServiceManager.h
 logger.h
@@ -42,14 +41,21 @@ set(zmq_sources
 	zmqProxyHub.cpp
 )
 
-if (${ZMQ_FOUND})
+set (helics_public_common
+timeRepresentation.hpp
+)
+
+if (${ZeroMQ_FOUND})
    list(APPEND common_headers ${zmq_headers})
    list(APPEND common_sources ${zmq_sources})
-endif (${ZMQ_FOUND})
+endif (${ZeroMQ_FOUND})
+
+list(APPEND common_sources ${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp.cpp)
 
 add_library(helics_common OBJECT ${common_sources} ${common_headers})
 set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
-install (FILES ${common_headers} DESTINATION include/helics/common)
+install(FILES ${helics_public_common} DESTINATION include/helics/common)
+

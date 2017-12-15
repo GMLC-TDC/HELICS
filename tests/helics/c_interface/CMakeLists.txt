@@ -27,16 +27,9 @@ include_directories(${CMAKE_SOURCE_DIR}/src/helics/shared_api_library)
 
 add_executable(c_interface_tests ${c_interface_test_sources} ${c_interface_test_headers})
 
-
-target_link_libraries(c_interface_tests helicsSharedLib ${external_library_list})
 target_link_libraries(c_interface_tests helicsSharedLib ${Boost_LIBRARIES_test})
 
-add_test(NAME c_interface_tests COMMAND c_interface_tests)
-
-#-----------------------------------------------------------------------------
-# Setup CTEST environment
-#-----------------------------------------------------------------------------
-include(CTest)
+add_test(NAME c_interface_tests COMMAND c_interface_tests --log_level=warning --report_level=detailed)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET c_interface_tests POST_BUILD        # Adds a post-build event to api tests
@@ -45,7 +38,7 @@ add_custom_command(TARGET c_interface_tests POST_BUILD        # Adds a post-buil
         "$<TARGET_FILE_DIR:c_interface_tests>/")                 # <--this is out-file path
 endforeach(keyfile)
 
-if(BUILD_SHARED_LIBS)
+if(BUILD_C_SHARED_LIB)
     add_custom_command(TARGET c_interface_tests POST_BUILD        # Adds a post-build event to api tests
         COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
             "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file

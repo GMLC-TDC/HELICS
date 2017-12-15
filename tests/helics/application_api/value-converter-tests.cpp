@@ -23,6 +23,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/core-data.h"
 #include <vector>
 
+using namespace std::string_literals;
+
 BOOST_AUTO_TEST_SUITE (value_converter_tests)
 
 template <class X>
@@ -83,7 +85,7 @@ BOOST_AUTO_TEST_CASE (converter_tests)
     compd v2{-34e5, 0.345};
     converterTests (v1, v2, sizeof (compd) + 1, sizeof (compd) + 1, "complex");
     std::string testValue1 = "this is a string test";
-    std::string test2 = "";
+    std::string test2;
     converterTests (testValue1, test2, testValue1.size (), test2.size (), "string");
     // test a vector
     using vecd = std::vector<double>;
@@ -145,9 +147,9 @@ BOOST_AUTO_TEST_CASE (vector_string_converter_tests)
     converter.interpret (dv, val2);
     BOOST_CHECK (val2 == testValue1);
 
-    vecstr test2{"test string 1", "*SDFSDF*"
-                                  "JJ\nSSFSDsdkjflsdjflsdkfjlskdbnowhfoihfoai\0shfoaishfoasifhaofsihaoifhaosifhaos"
-                                  "fihaosfihaosfihaohoaihsfiohoh"};
+    vecstr test2{
+      "test string 1",
+      "*SDFSDF*JJ\nSSFSDsdkjflsdjflsdkfjlskdbnowhfoihfoai\0shfoaishfoasifhaofsihaoifhaosifhaosfihaosfihaosfihaohoaihsfiohoh"s};
     helics::data_block db;
 
     converter.convert (test2, db);
@@ -163,9 +165,8 @@ BOOST_AUTO_TEST_CASE (test_block_vectors)
 
     vecblock vb (4);
     vb[0] = helics::data_block (437, '<');
-    vb[1] = "*SDFSDF*"
-            "JJ\nSSFSDsdkjflsdjflsdkfjlskdbnowhfoihfoaishfoai\0shfoasifhaofsihaoifhaosifhaosfihaosfihaosfihaohoaih"
-            "sfiohoh";
+    vb[1] =
+      "*SDFSDF*JJ\nSSFSDsdkjflsdjflsdkfjlskdbnowhfoihfoaishfoai\0shfoasifhaofsihaoifhaosifhaosfihaosfihaosfihaohoaihsfiohoh"s;
     vb[2] = helics::ValueConverter<double>::convert (3.1415);
     vb[3] = helics::ValueConverter<int>::convert (9999);
 

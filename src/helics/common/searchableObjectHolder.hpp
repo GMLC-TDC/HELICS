@@ -17,6 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <map>
 #include <memory>
 #include <mutex>
+#include <thread>
 
 /** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
  * threading issues*/
@@ -41,7 +42,15 @@ class SearchableObjectHolder
             {  // wait for the objectMap to be cleared
                 ++cntr;
                 lock.unlock ();
-                std::this_thread::sleep_for (std::chrono::milliseconds (100));
+                if (cntr % 2 == 0)
+                {
+                    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+                }
+                else
+                {
+                    std::this_thread::yield ();
+                }
+
                 lock.lock ();
                 if (cntr > 50)
                 {

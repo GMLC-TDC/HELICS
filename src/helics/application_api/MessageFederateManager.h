@@ -15,7 +15,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "Message.h"
 #include "../common/simpleQueue.hpp"
 #include "../core/core.h"
-#include "identifierTypes.hpp"
 #include <cstdint>
 #include <functional>
 #include <map>

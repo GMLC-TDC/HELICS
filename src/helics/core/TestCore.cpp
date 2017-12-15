@@ -29,7 +29,7 @@ using namespace std::string_literals;
 static const argDescriptors extraArgs{{"brokername"s, "string"s, "identifier for the broker-same as broker"s},
                                       {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
 
-void TestCore::InitializeFromArgs (int argc, const char *const *argv)
+void TestCore::initializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     bool exp = false;
@@ -58,7 +58,7 @@ void TestCore::InitializeFromArgs (int argc, const char *const *argv)
     }
     if (brokerState == created)
     {
-        CommonCore::InitializeFromArgs (argc, argv);
+        CommonCore::initializeFromArgs (argc, argv);
     }
 }
 
@@ -67,16 +67,25 @@ bool TestCore::brokerConnect ()
     std::lock_guard<std::mutex> lock (routeMutex);
     if (!tbroker)
     {
-        tbroker = BrokerFactory::findBroker (brokerName);
+        auto broker = BrokerFactory::findBroker (brokerName);
+        tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
         if (!tbroker)
         {
-            tbroker = BrokerFactory::create (core_type::TEST, brokerName, brokerInitString);
+            tbroker = std::static_pointer_cast<CoreBroker> (
+              BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
         }
     }
     if (tbroker)
     {
         tbroker->connect ();
     }
+    return static_cast<bool> (tbroker);
+}
+
+bool TestCore::tryReconnect ()
+{
+    auto broker = BrokerFactory::findBroker (brokerName);
+    tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
     return static_cast<bool> (tbroker);
 }
 
@@ -131,15 +140,23 @@ void TestCore::addRoute (int route_id, const std::string &routeInfo)
     auto brk = BrokerFactory::findBroker (routeInfo);
     if (brk)
     {
-        std::lock_guard<std::mutex> lock (routeMutex);
-        brokerRoutes.emplace (route_id, std::move (brk));
+        auto cbrk = std::dynamic_pointer_cast<CoreBroker> (brk);
+        if (cbrk)
+        {
+            std::lock_guard<std::mutex> lock (routeMutex);
+            brokerRoutes.emplace (route_id, std::move (cbrk));
+        }
         return;
     }
-    auto tcore = CoreFactory::findCore (routeInfo);
-    if (tcore)
+    auto core = CoreFactory::findCore (routeInfo);
+    if (core)
     {
-        std::lock_guard<std::mutex> lock (routeMutex);
-        coreRoutes.emplace (route_id, std::move (tcore));
+        auto tcore = std::dynamic_pointer_cast<CommonCore> (core);
+        if (tcore)
+        {
+            std::lock_guard<std::mutex> lock (routeMutex);
+            coreRoutes.emplace (route_id, std::move (tcore));
+        }
         return;
     }
     // the route will default to the central route

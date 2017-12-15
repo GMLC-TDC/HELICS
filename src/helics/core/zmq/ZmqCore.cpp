@@ -43,7 +43,7 @@ ZmqCore::~ZmqCore () = default;
 
 ZmqCore::ZmqCore (const std::string &core_name) : CommsBroker (core_name) {}
 
-void ZmqCore::InitializeFromArgs (int argc, const char *const *argv)
+void ZmqCore::initializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == created)
@@ -116,7 +116,7 @@ void ZmqCore::InitializeFromArgs (int argc, const char *const *argv)
             }
         }
 
-        CommonCore::InitializeFromArgs (argc, argv);
+        CommonCore::initializeFromArgs (argc, argv);
     }
 }
 
