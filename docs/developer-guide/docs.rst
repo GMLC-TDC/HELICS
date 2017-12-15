@@ -12,4 +12,4 @@ You will need the following Python packages.
 
 You will also need doxygen.
 
-You can then type ``make html`` to create the documentation locally.
+You can then type ``make doxygen html`` to create the documentation locally.
