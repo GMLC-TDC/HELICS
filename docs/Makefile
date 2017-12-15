@@ -23,7 +23,10 @@ help:
 doxygen:
 	cd ../; mkdir -p build; cd build; cmake -DCMAKE_INSTALL_PREFIX=./install/helics_install -DHELICS_GENERATE_DOXYGEN_DOC=ON ../; make doc;
 
-github: html
+sphinxdoxygen:
+	cp -r html ./_build/html/doxygen
+
+github: html sphinxdoxygen
 	-git branch -D gh-pages
 	-git push origin --delete gh-pages
 	ghp-import -n -b gh-pages -m "Update documentation" ./_build/html
