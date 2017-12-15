@@ -1,6 +1,11 @@
 CPP Interface
 =============
 
-.. doxygenclass:: helics::ValueFederate
+.. doxygenfile:: MessageFederate.h
    :project: helics
-   :members:
+
+.. doxygenfile:: ValueFederate.h
+   :project: helics
+
+.. doxygenfile:: CombinationFederate.h
+   :project: helics
