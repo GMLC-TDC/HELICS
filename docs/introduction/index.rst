@@ -1,0 +1,11 @@
+Terminology
+===========
+
+.. toctree::
+
+    terminology
+    types-of-federates
+    pubsub-vs-message
+
+
+
