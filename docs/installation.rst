@@ -1,11 +1,7 @@
 Installation
 ============
 
-From source with cmake
-----------------------
-
 You can install ``helics`` from source with cmake. You can find platform specific instructions below.
-
 
 .. toctree::
    :maxdepth: 1
