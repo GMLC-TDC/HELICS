@@ -1,5 +1,5 @@
-Terminology
-===========
+Introduction
+============
 
 .. toctree::
 
