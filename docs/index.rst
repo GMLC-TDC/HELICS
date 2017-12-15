@@ -20,7 +20,7 @@ This is the documentation for Hierarchical Engine for Large-scale Infrastructure
 .. toctree::
    :maxdepth: 1
 
-   installation
+   installation/index
    introduction/index
    api-reference
    developer-guide
