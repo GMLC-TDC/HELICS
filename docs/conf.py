@@ -112,6 +112,9 @@ html_theme_options = {'navigation_depth': 4, 'collapse_navigation': False}
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+html_logo = "https://github.com/GMLC-TDC/HELICS-src/blob/master/images/HELICS_Logo.png"
+html_favicon = html_logo
+
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
 #
