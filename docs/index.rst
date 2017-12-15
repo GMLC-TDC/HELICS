@@ -22,5 +22,5 @@ This is the documentation for Hierarchical Engine for Large-scale Infrastructure
 
    installation/index
    introduction/index
-   api-reference
+   api-reference/index
    developer-guide/index

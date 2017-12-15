@@ -1,5 +1,5 @@
-CPP Interface
-=============
+CPP Application API
+===================
 
 .. doxygenfile:: MessageFederate.h
    :project: helics
