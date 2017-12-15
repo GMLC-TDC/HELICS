@@ -19,7 +19,13 @@ Federation
 
 .. image:: ../img/federation.png
 
+Example with delay
+------------------
+
 .. image:: ../img/filter-delay.png
+
+Example with communication system
+---------------------------------
 
 .. image:: ../img/filter-comm-system.png
 
