@@ -37,23 +37,26 @@ void tcp_rx_connection::handle_read(const boost::system::error_code &error,
                 std::cerr << "receive reply send error " << se.what() << std::endl;
             }
         }
+        start();
     }
     else
     {
         if (errorCall)
         {
-            if (!errorCall(index, error))
+            if (errorCall(index, error)) 
             {
-                return;
+                start();
             }
         }
         else if ((error != boost::asio::error::eof)&&(error!=boost::asio::error::operation_aborted))
         {
-            std::cerr << "receive error " << error.message() << std::endl;
-            return;
+            if (error != boost::asio::error::connection_reset)
+            {
+                std::cerr << "receive error " << error.message() << std::endl;
+            }
         }
     }
-    start();
+    
 }
 
 void tcp_rx_connection::close()
@@ -92,12 +95,14 @@ void tcp_connection::connect_handler(const boost::system::error_code &error)
 }
 void tcp_connection::send(const void *buffer, size_t dataLength)
 {
-    socket_.send(boost::asio::buffer(buffer, dataLength));
+    auto sz=socket_.send(boost::asio::buffer(buffer, dataLength));
+    assert(sz == dataLength);
 }
 
 void tcp_connection::send(const std::string &dataString)
 {
-    socket_.send(boost::asio::buffer(dataString));
+    auto sz=socket_.send(boost::asio::buffer(dataString));
+    assert(sz == dataString.size());
 }
 
 size_t tcp_connection::receive(void *buffer, size_t maxDataLength)
