@@ -52,7 +52,7 @@ Naming Conventions
 
 5) All C++ functions and types should be contained in the helics namespace with subnamespaces used as appropriate
 
-..code-block:: cpp
+.. code-block:: cpp
 
     namespace helics
     {
@@ -61,13 +61,13 @@ Naming Conventions
 
 6) C interface functions should begin with helicsXXXX
 
-..code-block:: c
+.. code-block:: c
 
     int helicsBrokerIsConnected (helics_broker broker);
 
 7) C interface function should be of the format helics{Class}{Action} or helics{Action} if no class is appropriate
 
-..code-block:: c
+.. code-block:: c
 
     int helicsBrokerIsConnected (helics_broker broker);
 
