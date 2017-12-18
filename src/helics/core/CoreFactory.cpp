@@ -311,7 +311,7 @@ bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &pt
 #endif
         case core_type::MPI:
 #if HELICS_HAVE_MPI
-            return (dynamic_cast<MPICore *> (ptr.get ()) != nullptr);
+            return (dynamic_cast<MpiCore *> (ptr.get ()) != nullptr);
 #else
             break;
 #endif

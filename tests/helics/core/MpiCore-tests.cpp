@@ -12,7 +12,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/unit_test.hpp>
 
 #if HELICS_HAVE_MPI
-BOOST_FIXTURE_TEST_SUITE (MpiCore_tests, mpiCoreTestFixture)
+BOOST_AUTO_TEST_SUITE (MpiCore_tests)
+//BOOST_FIXTURE_TEST_SUITE (MpiCore_tests, mpiCoreTestFixture)
 
 BOOST_AUTO_TEST_CASE (init_test) {}
 

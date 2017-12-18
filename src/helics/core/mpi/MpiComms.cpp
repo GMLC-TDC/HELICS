@@ -9,7 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "MpiComms.h"
-#include "helics/core/ActionMessage.h"
+#include "../ActionMessage.h"
+#include <mpi.h>
 #include <memory>
 
 namespace helics
@@ -22,6 +23,8 @@ MpiComms::MpiComms (const std::string &brokerTarget, const std::string &localTar
 MpiComms::~MpiComms () = default;
 
 void MpiComms::queue_rx_function () {}
+
+void MpiComms::queue_tx_function () {}
 
 void MpiComms::closeTransmitter ()
 {

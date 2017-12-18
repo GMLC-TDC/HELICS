@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE (MpiCore_test)
     BOOST_CHECK_EQUAL (helics::CoreFactory::isAvailable (helics::core_type::MPI), haveMpi);
 
 #if HELICS_HAVE_MPI
-    auto core = helics::CoreFactory::create (HELICS_MPI, "");
+    auto core = helics::CoreFactory::create (helics::core_type::MPI, "");
     BOOST_REQUIRE (core != nullptr);
     helics::CoreFactory::unregisterCore (core->getIdentifier ());
     core = nullptr;

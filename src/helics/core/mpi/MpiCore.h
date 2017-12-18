@@ -10,8 +10,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_MPI_CORE_
 #pragma once
 
-#include "core/CommonCore.h"
-#include "core/CommsBroker.hpp"
+#include "../CommonCore.h"
+#include "../CommsBroker.hpp"
 
 namespace helics {
 
@@ -26,7 +26,7 @@ public:
 	MpiCore(const std::string &core_name);
 	/** destructor*/
 	~MpiCore();
-	virtual void InitializeFromArgs(int argc, const char * const *argv) override;
+	virtual void initializeFromArgs(int argc, const char * const *argv) override;
 
 public:
 	virtual std::string getAddress() const override;

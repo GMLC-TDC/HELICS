@@ -9,11 +9,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "MpiCore.h"
-#include "helics/config.h"
-#include "helics/core/core-data.h"
-#include "helics/core/core-exceptions.h"
-#include "helics/core/core.h"
-#include "helics/core/helics-time.h"
+#include "helics/helics-config.h"
+#include "../core-data.h"
+#include "../core-exceptions.h"
+#include "../core.h"
+#include "../helics-time.h"
 
 #include <algorithm>
 #include <cassert>
@@ -25,7 +25,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "MpiComms.h"
 
-#include "helics/core/argParser.h"
+#include "../argParser.h"
 #include <boost/filesystem.hpp>
 
 namespace helics
@@ -45,7 +45,7 @@ MpiCore::MpiCore (const std::string &core_name) : CommsBroker (core_name) {}
 
 MpiCore::~MpiCore () {}
 
-void MpiCore::InitializeFromArgs (int argc, const char *const *argv)
+void MpiCore::initializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == created)
@@ -68,7 +68,7 @@ void MpiCore::InitializeFromArgs (int argc, const char *const *argv)
             fileloc = vm["fileloc"].as<std::string> ();
         }
 
-        CommonCore::InitializeFromArgs (argc, argv);
+        CommonCore::initializeFromArgs (argc, argv);
     }
 }
 

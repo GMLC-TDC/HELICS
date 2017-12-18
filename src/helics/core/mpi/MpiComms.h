@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_MPI_COMMS_
 #pragma once
 
-#include "helics/core/CommsInterface.h"
+#include "../CommsInterface.h"
 #include <atomic>
 
 namespace helics {
@@ -34,5 +34,5 @@ private:
 
 } // namespace helics
 
-#endif /* _HELICS_IPC_COMMS_ */
+#endif /* _HELICS_MPI_COMMS_ */
 

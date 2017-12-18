@@ -10,11 +10,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "MpiBroker.h"
 #include "MpiComms.h"
-#include "helics/common/blocking_queue.h"
-#include "helics/config.h"
-#include "helics/core/core-data.h"
-#include "helics/core/core.h"
-#include "helics/core/helics-time.h"
+#include "../../common/blocking_queue.h"
+#include "helics/helics-config.h"
+#include "../core-data.h"
+#include "../core.h"
+#include "../helics-time.h"
 
 #include <algorithm>
 #include <cassert>
@@ -24,7 +24,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <fstream>
 #include <sstream>
 
-#include "helics/core/argParser.h"
+#include "../argParser.h"
 
 static const std::string DEFAULT_BROKER = "tcp://localhost:5555";
 
@@ -39,7 +39,19 @@ MpiBroker::MpiBroker (const std::string &broker_name) : CommsBroker (broker_name
 
 MpiBroker::~MpiBroker () {}
 
-void MpiBroker::InitializeFromArgs (int argc, const char *const *argv)
+void MpiBroker::displayHelp (bool local_only)
+{
+    std::cout << " Help for MPI Broker: \n";
+    namespace po = boost::program_options;
+    po::variables_map vm;
+    const char *const argV[] = {"", "--help"};
+    argumentParser (2, argV, vm, extraArgs);
+    if (!local_only)
+    {
+        CoreBroker::displayHelp ();
+    }
+}
+void MpiBroker::initializeFromArgs (int argc, const char *const *argv)
 {
     namespace po = boost::program_options;
     if (brokerState == broker_state_t::created)
@@ -57,7 +69,7 @@ void MpiBroker::InitializeFromArgs (int argc, const char *const *argv)
         {
             // tbroker->Initialize(vm["brokerinit"].as<std::string>());
         }
-        CoreBroker::InitializeFromArgs (argc, argv);
+        CoreBroker::initializeFromArgs (argc, argv);
     }
 }
 

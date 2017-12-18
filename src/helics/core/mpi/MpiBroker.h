@@ -10,8 +10,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define MPI_BROKER_H_
 #pragma once
 
-#include "core/CoreBroker.h"
-#include "core/CommsBroker.hpp"
+#include "../CoreBroker.h"
+#include "../CommsBroker.hpp"
 
 namespace helics
 {
@@ -25,12 +25,13 @@ public:
 	MpiBroker(bool isRoot_ = false) noexcept;
 	MpiBroker(const std::string &broker_name);
 
-	void InitializeFromArgs(int argc, const char * const *argv) override;
+	void initializeFromArgs(int argc, const char * const *argv) override;
 
 	/**destructor*/
 	virtual ~MpiBroker();
 
 	virtual std::string getAddress() const override;
+	static void displayHelp(bool local_only = false);
 private:
 	virtual bool brokerConnect() override;
 
