@@ -9,6 +9,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "TcpHelperClasses.h"
 #include <iostream>
+#include <thread>
 
 using boost::asio::ip::tcp;
 
@@ -92,6 +93,10 @@ void tcp_connection::connect_handler(const boost::system::error_code &error)
     {
         connected.store(true);
     }
+    else
+    {
+        std::cerr << "connection error " << error.message() << ": code =" << error.value() << '\n';
+    }
 }
 void tcp_connection::send(const void *buffer, size_t dataLength)
 {
@@ -110,6 +115,20 @@ size_t tcp_connection::receive(void *buffer, size_t maxDataLength)
     return socket_.receive(boost::asio::buffer(buffer, maxDataLength));
 }
 
+int tcp_connection::waitUntilConnected(int timeOut)
+{
+    int cnt = 0;
+    while (!isConnected())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        cnt += 50;
+        if (cnt > timeOut)
+        {
+            return (-1);
+        }
+    }
+    return 0;
+}
 
 void tcp_connection::close()
 {

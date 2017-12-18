@@ -20,6 +20,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/tcp/TcpCore.h"
 #include "helics/core/tcp/TcpHelperClasses.h"
 
+#include <numeric>
+
 //#include "boost/process.hpp"
 #include <future>
 
@@ -30,6 +32,83 @@ using helics::Core;
 
 #define TCP_BROKER_PORT 24160
 #define TCP_SECONDARY_PORT 24180
+BOOST_AUTO_TEST_CASE(test_tcpServerConnections1)
+{
+    std::atomic<int> counter{ 0 };
+    std::string host = "localhost";
+
+    auto srv = AsioServiceManager::getServicePointer();
+    tcp_server server(srv->getBaseService(), TCP_BROKER_PORT);
+    srv->runServiceLoop();
+    std::vector<char> data(1024);
+    auto dataCheck = [&counter](int index, const char *data, size_t datasize) 
+    {
+        ++counter; 
+        BOOST_CHECK_EQUAL(datasize, 20); 
+        for (int ii = 1; ii < 20; ++ii)
+        {
+            BOOST_CHECK_EQUAL(ii + data[0], data[ii]);
+        }
+        return std::string(); 
+    };
+
+    server.setDataCall(dataCheck);
+    server.start();
+
+    auto conn1 = tcp_connection::create(srv->getBaseService(), host, "24160", 1024);
+    auto conn2 = tcp_connection::create(srv->getBaseService(), host, "24160", 1024);
+    auto conn3 = tcp_connection::create(srv->getBaseService(), host, "24160", 1024);
+    auto conn4 = tcp_connection::create(srv->getBaseService(), host, "24160", 1024);
+
+    auto res=conn1->waitUntilConnected(1000);
+    BOOST_CHECK_EQUAL(res, 0);
+    res = conn2->waitUntilConnected(1000);
+    BOOST_CHECK_EQUAL(res, 0);
+    res = conn3->waitUntilConnected(1000);
+    BOOST_CHECK_EQUAL(res, 0);
+    res = conn4->waitUntilConnected(1000);
+    BOOST_CHECK_EQUAL(res, 0);
+
+    auto transmitFunc = [](tcp_connection::pointer obj)
+    {
+        std::vector<char> data(20);
+        for (char ii = 0; ii < 50; ++ii)
+        {
+            std::iota(data.begin(), data.end(), ii);
+            obj->send(data.data(), 20);
+        }
+    };
+
+    auto thr1 = std::thread(transmitFunc, conn1);
+    auto thr2 = std::thread(transmitFunc, conn2);
+    auto thr3 = std::thread(transmitFunc, conn3);
+    auto thr4 = std::thread(transmitFunc, conn4);
+
+    thr1.join();
+    thr2.join();
+    thr3.join();
+    thr4.join();
+    int cnt = 0;
+    while (counter < 200)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        ++cnt;
+        if (cnt > 20)
+        {
+            break;
+        }
+    }
+    BOOST_CHECK_EQUAL(counter, 200);
+    conn1->close();
+    conn2->close();
+    conn3->close();
+    conn4->close();
+    server.close();
+    
+    srv->haltServiceLoop();
+}
+
+
 BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
 {
     std::atomic<int> counter{0};
@@ -141,17 +220,9 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
 
-    auto txconn=tcp_connection::create(srv->getBaseService(), host, "24180", 1024);
-    int cnt = 0;
-    while (!txconn->isConnected())
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        ++cnt;
-        if (cnt > 20)
-        {
-            break;
-        }
-    }
+    auto txconn=tcp_connection::create(srv->getBaseService(), host, "24160", 1024);
+    auto res=txconn->waitUntilConnected(1000);
+    BOOST_REQUIRE_EQUAL(res, 0);
 
     BOOST_REQUIRE(txconn->isConnected());
 
