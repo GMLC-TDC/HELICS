@@ -217,6 +217,10 @@ helics_federate helicsCreateMessageFederate (const helics_federate_info_t fi)
 
 helics_federate helicsCreateMessageFederateFromFile (const char *file)
 {
+    if (file == nullptr)
+    {
+        return nullptr;
+    }
     auto *fed = new helics::FedObject;
     fed->index = getMasterHolder ()->addFed (fed);
     fed->fedptr = std::make_shared<helics::MessageFederate> (file);
@@ -238,6 +242,10 @@ helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi
 
 helics_federate helicsCreateCombinationFederateFromFile (const char *file)
 {
+    if (file == nullptr)
+    {
+        return nullptr;
+    }
     auto *fed = new helics::FedObject;
     fed->index = getMasterHolder ()->addFed (fed);
     fed->fedptr = std::make_shared<helics::CombinationFederate> (file);

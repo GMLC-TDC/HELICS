@@ -34,15 +34,31 @@ static inline void addPublication (helics_value_federate fed, helics::Publicatio
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     fedObj->pubs.push_back (pub);
 }
+
+const std::string nullStr;
+
 /* sub/pub registration */
 helics_subscription helicsRegisterSubscription (helics_value_federate fed, const char *key, const char *type, const char *units)
 {
-    auto htype = helics::getTypeFromString (type);
+    if ((type == nullptr) || (std::string(type).empty()))
+    {  //empty type should default to a regular subscription
+        auto fedObj = getValueFedSharedPtr(fed);
+        if (!fedObj)
+        {
+            return nullptr;
+        }
+        auto *sub = new helics::SubscriptionObject();
+        sub->subptr = std::make_unique<helics::Subscription>(fedObj.get(), key, (units == nullptr) ? nullStr : std::string(units));
+        sub->fedptr = std::move(fedObj);
+        addSubscription(fed, sub);
+        return reinterpret_cast<helics_subscription> (sub);
+    }
+    auto htype = helics::getTypeFromString(type);
     if (htype != helics::helicsType_t::helicsInvalid)
     {
         return helicsRegisterTypeSubscription (fed, key, static_cast<int> (htype), units);
     }
-    // now generate a generic subscription
+    // now generate a generic subscription if we have an unrecognized type
     auto fedObj = getValueFedSharedPtr (fed);
     if (!fedObj)
     {
@@ -52,7 +68,7 @@ helics_subscription helicsRegisterSubscription (helics_value_federate fed, const
     try
     {
         sub = new helics::SubscriptionObject ();
-        sub->id = fedObj->registerOptionalSubscription (key, type, units);
+        sub->id = fedObj->registerOptionalSubscription (key, type, (units==nullptr)?nullStr:std::string(units));
         sub->rawOnly = true;
         sub->fedptr = std::move (fedObj);
         addSubscription (fed, sub);
@@ -84,7 +100,7 @@ helics_subscription helicsRegisterTypeSubscription (helics_value_federate fed, c
     try
     {
         sub = new helics::SubscriptionObject ();
-        sub->subptr = std::make_unique<helics::Subscription> (fedObj.get (), key, units);
+        sub->subptr = std::make_unique<helics::Subscription> (fedObj.get (), key, (units == nullptr) ? nullStr : std::string(units));
         sub->fedptr = std::move (fedObj);
         addSubscription (fed, sub);
         return reinterpret_cast<helics_subscription> (sub);
@@ -98,7 +114,7 @@ helics_subscription helicsRegisterTypeSubscription (helics_value_federate fed, c
 
 helics_publication helicsRegisterPublication (helics_value_federate fed, const char *key, const char *type, const char *units)
 {
-    auto htype = helics::getTypeFromString (type);
+    auto htype = (type != nullptr) ? helics::getTypeFromString(type) : helics::helicsType_t::helicsInvalid;
     if (htype != helics::helicsType_t::helicsInvalid)
     {
         return helicsRegisterTypePublication (fed, key, static_cast<int> (htype), units);
@@ -113,7 +129,7 @@ helics_publication helicsRegisterPublication (helics_value_federate fed, const c
     try
     {
         pub = new helics::PublicationObject ();
-        pub->id = fedObj->registerPublication (key, type, units);
+        pub->id = fedObj->registerPublication (key, type, (units == nullptr) ? nullStr : std::string(units));
         pub->rawOnly = true;
         pub->fedptr = std::move (fedObj);
         addPublication (fed, pub);
@@ -144,7 +160,7 @@ helics_publication helicsRegisterTypePublication (helics_value_federate fed, con
     try
     {
         pub = new helics::PublicationObject ();
-        pub->pubptr = std::make_unique<helics::Publication> (fedObj.get (), key, static_cast<helics::helicsType_t> (type), units);
+        pub->pubptr = std::make_unique<helics::Publication> (fedObj.get (), key, static_cast<helics::helicsType_t> (type), (units == nullptr) ? nullStr : std::string(units));
         pub->fedptr = std::move (fedObj);
         addPublication (fed, pub);
         return reinterpret_cast<helics_publication> (pub);
@@ -158,7 +174,7 @@ helics_publication helicsRegisterTypePublication (helics_value_federate fed, con
 
 helics_publication helicsRegisterGlobalPublication (helics_value_federate fed, const char *key, const char *type, const char *units)
 {
-    auto htype = helics::getTypeFromString (type);
+    auto htype = (type != nullptr) ? helics::getTypeFromString(type) : helics::helicsType_t::helicsInvalid;
     if (htype != helics::helicsType_t::helicsInvalid)
     {
         return helicsRegisterGlobalTypePublication (fed, key, static_cast<int> (htype), units);
@@ -173,7 +189,7 @@ helics_publication helicsRegisterGlobalPublication (helics_value_federate fed, c
     try
     {
         pub = new helics::PublicationObject ();
-        pub->id = fedObj->registerGlobalPublication (key, type, units);
+        pub->id = fedObj->registerGlobalPublication (key, type, (units == nullptr) ? nullStr : std::string(units));
         pub->rawOnly = true;
         pub->fedptr = std::move (fedObj);
         addPublication (fed, pub);
@@ -246,11 +262,11 @@ helicsStatus helicsPublishString (helics_publication pub, const char *str)
     auto pubObj = reinterpret_cast<helics::PublicationObject *> (pub);
     if (pubObj->rawOnly)
     {
-        pubObj->fedptr->publish (pubObj->id, str);
+        pubObj->fedptr->publish (pubObj->id, (str!=nullptr)?str:"");
     }
     else
     {
-        pubObj->pubptr->publish (str);
+        pubObj->pubptr->publish ((str != nullptr) ? str : "");
     }
     return helicsOK;
 }
@@ -345,6 +361,10 @@ int helicsGetValue (helics_subscription sub, char *data, int maxlen)
     {
         return -1;
     }
+    if (data == nullptr)
+    {
+        return -2;
+    }
     auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
     if (subObj->rawOnly)
     {
@@ -386,6 +406,10 @@ helicsStatus helicsGetInteger (helics_subscription sub, int64_t *val)
     {
         return helicsError;
     }
+    if (val == nullptr)
+    {
+        return helicsError;
+    }
     auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
     if (subObj->rawOnly)
     {
@@ -403,6 +427,10 @@ helicsStatus helicsGetDouble (helics_subscription sub, double *val)
     {
         return helicsError;
     }
+    if (val == nullptr)
+    {
+        return helicsError;
+    }
     auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
     if (subObj->rawOnly)
     {
@@ -417,6 +445,10 @@ helicsStatus helicsGetDouble (helics_subscription sub, double *val)
 helicsStatus helicsGetComplex (helics_subscription sub, double *real, double *imag)
 {
     if (sub == nullptr)
+    {
+        return helicsError;
+    }
+    if ((real == nullptr)||(imag==nullptr))
     {
         return helicsError;
     }
@@ -478,6 +510,10 @@ helicsStatus helicsSetDefaultValue (helics_subscription sub, const char *data, i
     {
         return helicsError;
     }
+    if (data == nullptr)
+    {
+        return helicsError;
+    }
     auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
 
     subObj->fedptr->setDefaultValue (subObj->id, helics::data_view (data, len));
@@ -493,7 +529,7 @@ helicsStatus helicsSetDefaultString (helics_subscription sub, const char *str)
     auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
     if (subObj->rawOnly)
     {
-        subObj->fedptr->setDefaultValue (subObj->id, helics::data_view (str));
+        subObj->fedptr->setDefaultValue (subObj->id, helics::data_view ((str==nullptr)?str:""));
     }
     else
     {
@@ -554,27 +590,42 @@ helicsStatus helicsSetDefaultComplex (helics_subscription sub, double real, doub
     return helicsOK;
 }
 
-helicsStatus helicsSetDefaultVector (helics_subscription sub, const double *data, int len)
+helicsStatus helicsSetDefaultVector(helics_subscription sub, const double *data, int len)
 {
     if (sub == nullptr)
     {
         return helicsError;
     }
     auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
-    if (subObj->rawOnly)
+    if (data == nullptr)
     {
-        subObj->fedptr->setDefaultValue (subObj->id, std::vector<double> (data, data + len));
+        if (subObj->rawOnly)
+        {
+            subObj->fedptr->setDefaultValue(subObj->id, std::vector<double>{});
+        }
+        else
+        {
+            subObj->subptr->setDefault(std::vector<double>{});
+        }
     }
     else
     {
-        subObj->subptr->setDefault (std::vector<double> (data, data + len));
+        if (subObj->rawOnly)
+        {
+            subObj->fedptr->setDefaultValue(subObj->id, std::vector<double>(data, data + len));
+        }
+        else
+        {
+            subObj->subptr->setDefault(std::vector<double>(data, data + len));
+        }
     }
+    
     return helicsOK;
 }
 
 helicsStatus helicsGetSubscriptionType (helics_subscription sub, char *str, int maxlen)
 {
-    if (sub == nullptr)
+    if ((sub == nullptr)||(str==nullptr))
     {
         return helicsError;
     }
@@ -602,7 +653,7 @@ helicsStatus helicsGetSubscriptionType (helics_subscription sub, char *str, int 
 
 helicsStatus helicsGetPublicationType (helics_publication pub, char *str, int maxlen)
 {
-    if (pub == nullptr)
+    if ((pub == nullptr) || (str == nullptr))
     {
         return helicsError;
     }
@@ -630,7 +681,7 @@ helicsStatus helicsGetPublicationType (helics_publication pub, char *str, int ma
 
 helicsStatus helicsGetSubscriptionKey (helics_subscription sub, char *str, int maxlen)
 {
-    if (sub == nullptr)
+    if ((sub == nullptr) || (str == nullptr))
     {
         return helicsError;
     }
@@ -658,7 +709,7 @@ helicsStatus helicsGetSubscriptionKey (helics_subscription sub, char *str, int m
 
 helicsStatus helicsGetPublicationKey (helics_publication pub, char *str, int maxlen)
 {
-    if (pub == nullptr)
+    if ((pub == nullptr) || (str == nullptr))
     {
         return helicsError;
     }
@@ -686,7 +737,7 @@ helicsStatus helicsGetPublicationKey (helics_publication pub, char *str, int max
 
 helicsStatus helicsGetSubscriptionUnits (helics_subscription sub, char *str, int maxlen)
 {
-    if (sub == nullptr)
+    if ((sub == nullptr) || (str == nullptr))
     {
         return helicsError;
     }
@@ -714,7 +765,7 @@ helicsStatus helicsGetSubscriptionUnits (helics_subscription sub, char *str, int
 
 helicsStatus helicsGetPublicationUnits (helics_publication pub, char *str, int maxlen)
 {
-    if (pub == nullptr)
+    if ((pub == nullptr) || (str == nullptr))
     {
         return helicsError;
     }

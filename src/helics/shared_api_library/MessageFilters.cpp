@@ -15,6 +15,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <mutex>
 #include <vector>
 
+static const std::string nullstr;
+
 helics_source_filter helicsRegisterSourceFilter (helics_federate fed, const char *name, const char *inputType, const char *outputType)
 {
     // now generate a generic subscription
@@ -27,7 +29,9 @@ helics_source_filter helicsRegisterSourceFilter (helics_federate fed, const char
     try
     {
         filt = new helics::SourceFilterObject ();
-        filt->filtptr = std::make_unique<helics::SourceFilter> (fedObj.get (), name, inputType, outputType);
+        filt->filtptr =
+          std::make_unique<helics::SourceFilter> (fedObj.get (), (name!=nullptr)?std::string(name): nullstr, (inputType != nullptr) ? std::string (inputType) : nullstr,
+                                                  (outputType != nullptr) ? std::string (outputType) : nullstr);
         filt->fedptr = std::move (fedObj);
         return reinterpret_cast<helics_source_filter> (filt);
     }
@@ -51,7 +55,9 @@ helicsRegisterDestinationFilter (helics_federate fed, const char *name, const ch
     try
     {
         filt = new helics::DestFilterObject ();
-        filt->filtptr = std::make_unique<helics::DestinationFilter> (fedObj.get (), name, inputType, outputType);
+        filt->filtptr = std::make_unique<helics::DestinationFilter> (fedObj.get (), (name != nullptr) ? std::string(name) : nullstr,
+                                                                     (inputType != nullptr) ? std::string (inputType) : nullstr,
+                                                                     (outputType != nullptr) ? std::string (outputType) : nullstr);
         filt->fedptr = std::move (fedObj);
         return reinterpret_cast<helics_destination_filter> (filt);
     }

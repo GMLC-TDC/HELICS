@@ -21,6 +21,7 @@ static inline void addEndpoint (helics_message_federate fed, helics::EndpointObj
     fedObj->epts.push_back (ept);
 }
 
+static const std::string nullStr;
 helics_endpoint helicsRegisterEndpoint (helics_message_federate fed, const char *name, const char *type)
 {
     // now generate a generic subscription
@@ -33,7 +34,8 @@ helics_endpoint helicsRegisterEndpoint (helics_message_federate fed, const char 
     try
     {
         end = new helics::EndpointObject ();
-        end->endptr = std::make_unique<helics::Endpoint> (fedObj.get (), name, type);
+        end->endptr = std::make_unique<helics::Endpoint> (fedObj.get (), (name != nullptr) ? std::string (name) : nullStr,
+                                                          (type == nullptr) ? nullStr : std::string (type));
         end->fedptr = std::move (fedObj);
         addEndpoint (fed, end);
         return reinterpret_cast<helics_endpoint> (end);
@@ -57,7 +59,8 @@ helics_endpoint helicsRegisterGlobalEndpoint (helics_message_federate fed, const
     try
     {
         end = new helics::EndpointObject ();
-        end->endptr = std::make_unique<helics::Endpoint> (helics::GLOBAL, fedObj.get (), name, type);
+        end->endptr = std::make_unique<helics::Endpoint> (helics::GLOBAL, fedObj.get (), (name != nullptr) ? std::string (name) : nullStr,
+                                                          (type == nullptr) ? nullStr : std::string (type));
         end->fedptr = std::move (fedObj);
         addEndpoint (fed, end);
         return reinterpret_cast<helics_endpoint> (end);
@@ -87,7 +90,7 @@ helicsStatus helicsSendMessageRaw (helics_endpoint endpoint, const char *dest, c
         return helicsError;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    if (dest == nullptr)
+    if ((dest == nullptr) || (std::string (dest).empty ()))
     {
         endObj->endptr->send (data, len);
     }
@@ -105,7 +108,7 @@ helicsStatus helicsSendEventRaw (helics_endpoint endpoint, const char *dest, con
         return helicsError;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    if (dest == nullptr)
+    if ((dest == nullptr) || (std::string (dest).empty ()))
     {
         endObj->endptr->send (data, len, time);
     }
@@ -140,7 +143,7 @@ helicsStatus helicsSendMessage (helics_endpoint endpoint, message_t *message)
     return helicsOK;
 }
 
-helicsStatus helicsSubscribe (helics_endpoint endpoint, const char *name, const char *type)
+helicsStatus helicsSubscribe (helics_endpoint endpoint, const char *key, const char *type)
 {
     if (endpoint == nullptr)
     {
@@ -148,7 +151,7 @@ helicsStatus helicsSubscribe (helics_endpoint endpoint, const char *name, const 
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
 
-    endObj->endptr->subscribe (name, type);
+    endObj->endptr->subscribe (key, (type == nullptr) ? nullStr : std::string (type));
     return helicsOK;
 }
 
@@ -250,7 +253,7 @@ message_t helicsFederateGetMessage (helics_message_federate fed)
 
 helicsStatus helicsGetEndpointType (helics_endpoint endpoint, char *str, int maxlen)
 {
-    if (endpoint == nullptr)
+    if ((endpoint == nullptr) || (str == nullptr))
     {
         return helicsError;
     }
@@ -270,7 +273,7 @@ helicsStatus helicsGetEndpointType (helics_endpoint endpoint, char *str, int max
 
 helicsStatus helicsGetEndpointName (helics_endpoint endpoint, char *str, int maxlen)
 {
-    if (endpoint == nullptr)
+    if ((endpoint == nullptr) || (str == nullptr))
     {
         return helicsError;
     }
