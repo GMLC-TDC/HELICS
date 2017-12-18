@@ -14,7 +14,7 @@ IF(BUILD_PLAYER OR BUILD_RECORDER)
 add_subdirectory(player)
 ENDIF()
 
-if (BUILD_C_SHARED_LIB OR BUILD_PYTHON)
+if (BUILD_C_SHARED_LIB OR BUILD_PYTHON OR BUILD_MATLAB OR BUILD_JAVA)
 add_subdirectory(shared_api_library)
 install(FILES chelics.h DESTINATION include/helics)
 endif()

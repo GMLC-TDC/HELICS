@@ -83,6 +83,10 @@ static const std::map<std::string, helicsType_t> typeMap{
   {"i", helicsType_t::helicsInt},
   {"i64", helicsType_t::helicsInt},
   {"cv", helicsType_t::helicsComplexVector},
+  {"default",helicsType_t::helicsAny},
+  {"def",helicsType_t::helicsAny},
+  {"any",helicsType_t::helicsAny},
+  {"all",helicsType_t::helicsAny}
 };
 
 helicsType_t getTypeFromString (const std::string &typeName)

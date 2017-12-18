@@ -34,8 +34,13 @@ endif()
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 
+
+INSTALL(TARGETS player_rec-static EXPORT helics-targets
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+	
 if (BUILD_PLAYER)
-INSTALL(TARGETS helics_player DESTINATION bin)
+INSTALL(TARGETS helics_player DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET helics_player POST_BUILD        # Adds a post-build event to core tests
@@ -47,7 +52,7 @@ endforeach(keyfile)
 endif()
 
 if (BUILD_RECORDER)
-INSTALL(TARGETS helics_recorder DESTINATION bin)
+INSTALL(TARGETS helics_recorder DESTINATION ${CMAKE_INSTALL_BINDIR})
 if (NOT BUILD_PLAYER)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET helics_recorder POST_BUILD        # Adds a post-build event to core tests

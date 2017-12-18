@@ -197,6 +197,7 @@ enum class helicsType_t : int
     helicsVector = 4,
     helicsComplexVector = 5,
     helicsInvalid = 23425,
+    helicsAny=247652,
 };
 
 /** sometime we just need a ref to a string for the basic types*/

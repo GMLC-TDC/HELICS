@@ -26,264 +26,306 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "PrecHelper.h"
 #include <thread>
-
-class ValueCapture
-{
-  public:
-    helics::Time time;
-    helics::subscription_id_t id;
-    bool first = false;
-    std::string value;
-    ValueCapture () = default;
-    ValueCapture (helics::Time t1, helics::subscription_id_t id1, const std::string &val)
-        : time (t1), id (id1), value (val){};
-};
-
-class ValueStats
-{
-  public:
-    helics::Time time = helics::Time::minVal ();
-    std::string lastVal;
-    std::string key;
-    int cnt = 0;
-};
+#include "recorder.h"
 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
-void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
+static void recorderArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
-int main (int argc, char *argv[])
+namespace helics
 {
-    std::ifstream infile;
-    po::variables_map vm;
-    argumentParser (argc, argv, vm);
-
-    std::vector<ValueCapture> points;
-    if (vm.count ("input") == 0)
+    recorder::recorder(FederateInfo &fi) : fed(std::make_shared<CombinationFederate>(fi))
     {
-        return 0;
+
     }
 
-    if (!filesystem::exists (vm["input"].as<std::string> ()))
+    recorder::recorder(int argc, char *argv[])
     {
-        std::cerr << vm["input"].as<std::string> () << "is not a valid input file \n";
-        return -3;
-    }
-    infile.open (vm["input"].as<std::string> ().c_str ());
-    std::string str;
-    std::set<std::string> tags;
+        FederateInfo fi("player");
+        loadFederateInfo(fi, argc, argv);
+        fed = std::make_shared<CombinationFederate>(fi);
 
-    while (std::getline (infile, str))
+        boost::program_options::variables_map vm_map;
+        recorderArgumentParser(argc, argv, vm_map);
+        loadArguments(vm_map);
+    }
+
+
+    recorder::recorder(std::shared_ptr<Core> core, const FederateInfo &fi) :fed(std::make_shared<CombinationFederate>(std::move(core), fi))
     {
-        if (str.empty ())
+
+    }
+
+    recorder::recorder(const std::string &jsonString) :fed(std::make_shared<CombinationFederate>(jsonString))
+    {
+        //TODO:: PT load the information to record from a json string
+    }
+
+  
+    recorder::~recorder()
+    {
+        saveFile(outFileName);
+    }
+
+    int recorder::loadFile(const std::string &filename)
+    {
+        std::ifstream infile(filename);
+        std::string str;
+        while (std::getline(infile, str))
         {
-            continue;
-        }
-        auto fc = str.find_first_not_of (" \t\n\r\0");
-        if ((fc == std::string::npos) || (str[fc] == '#'))
-        {
-            continue;
-        }
-        auto cloc = str.find_last_of (',');
-        if (cloc != std::string::npos)
-        {
-            auto vtype = getType (str.substr (cloc + 1, std::string::npos));
-            if (vtype == valueTypes_t::unknownValue)
+            if (str.empty())
             {
-                std::cerr << "unrecognized type " << str.substr (cloc + 1, std::string::npos) << "\n";
-                return -4;
+                continue;
             }
-            auto tag = str.substr (0, cloc);
-            tag.erase (tag.find_last_not_of (" \t\n\0") + 1);
-            tag.erase (0, tag.find_first_not_of (" \t\n\0"));
-            tags.emplace (tag);
-        }
-        else
-        {
-            auto tag = str;
-            tag.erase (tag.find_last_not_of (" \t\n\0") + 1);
-            tag.erase (0, tag.find_first_not_of (" \t\n\0"));
-            tags.emplace (str);
-        }
-    }
-    std::cout << tags.size () << " tags processed\n";
-
-    infile.close ();
-
-    std::map<helics::subscription_id_t, std::pair<std::string, std::string>> subids;
-
-    std::vector<helics::Subscription> subscriptions;
-    std::string name = "recorder";
-   
-    auto vFed = std::make_unique<helics::ValueFederate> (fi);
-
-    // get the extra tags from the arguments
-    if (vm.count ("tags") > 0)
-    {
-        auto argTags = vm["tags"].as<std::vector<std::string>> ();
-        for (const auto &tag : argTags)
-        {
-            std::vector<std::string> taglist;
-            boost::split (taglist, tag, boost::is_any_of (",;"));
-            for (const auto &tagname : taglist)
+            auto fc = str.find_first_not_of(" \t\n\r\0");
+            if ((fc == std::string::npos) || (str[fc] == '#'))
             {
-                tags.insert (tagname);
+                continue;
             }
-        }
-    }
-
-    std::string prevTag;
-    for (auto &tname : tags)
-    {
-        subscriptions.push_back (helics::Subscription (vFed.get (), tname));
-    }
-    // capture the all the publications from a particular federate
-    if (vm.count ("capture") > 0)
-    {
-        auto captures = vm["capture"].as<std::vector<std::string>> ();
-        for (const auto &capt : captures)
-        {
-            std::vector<std::string> captFeds;
-            boost::split (captFeds, capt, boost::is_any_of (",;"));
-            for (const auto &captFed : captFeds)
+            auto cloc = str.find_last_of(',');
+            if (cloc != std::string::npos)
             {
-                auto res = waitForInit (vFed.get (), captFed);
-                if (res)
+                auto vtype = getType(str.substr(cloc + 1, std::string::npos));
+                if (vtype == helics::helicsType_t::helicsInvalid)
                 {
-                    auto pubs = vectorizeQueryResult (vFed->query (captFed, "publications"));
-                    for (auto &pub : pubs)
-                    {
-                        subscriptions.emplace_back (vFed.get (), pub);
-                    }
+                    std::cerr << "unrecognized type " << str.substr(cloc + 1, std::string::npos) << "\n";
+                    return -4;
                 }
-            }
-        }
-    }
-
-    std::vector<ValueStats> vStat;
-    vStat.reserve (subids.size ());
-    for (auto &val : subids)
-    {
-        vStat.emplace_back (ValueStats ());
-        vStat.back ().key = val.second.first;
-    }
-
-    std::string mapfile;
-    if (vm.count ("mapfile") > 0)
-    {
-        mapfile = vm["mapfile"].as<std::string> ();
-    }
-
-    std::vector<ValueCapture> vcap;
-
-    vcap.reserve (100000);
-    std::cout << "entering execution mode\n";
-    vFed->enterExecutionState ();
-    helics::Time nextPrintTime = 10.0;
-    int ii = 0;
-    for (auto &sub : subscriptions)
-    {
-        if (sub.isUpdated ())
-        {
-            auto val = sub.getValue<std::string> ();
-            vcap.emplace_back (-1.0, sub.getID (), val);
-            if (vStat[ii].cnt == 0)
-            {
-                vcap.back ().first = true;
-            }
-            ++vStat[ii].cnt;
-            vStat[ii].lastVal = val;
-            vStat[ii].time = -1.0;
-        }
-        ++ii;
-    }
-    if (!mapfile.empty ())
-    {
-        std::ofstream out (mapfile);
-        for (auto &stat : vStat)
-        {
-            out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t' << stat.lastVal
-                << '\n';
-        }
-        out.flush ();
-    }
-    try
-    {
-        while (true)
-        {
-            auto T = vFed->requestTime (stopTime);
-            if (T < stopTime)
-            {
-                ii = 0;
-                for (auto &sub : subscriptions)
-                {
-                    if (sub.isUpdated ())
-                    {
-                        auto val = sub.getValue<std::string> ();
-                        vcap.emplace_back (T, sub.getID (), val);
-                        ++vStat[ii].cnt;
-                        vStat[ii].lastVal = val;
-                        vStat[ii].time = T;
-                    }
-                    ++ii;
-                }
-                if (!mapfile.empty ())
-                {
-                    std::ofstream out (mapfile);
-                    for (auto &stat : vStat)
-                    {
-                        out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t'
-                            << stat.lastVal << '\n';
-                    }
-                    out.flush ();
-                }
+                auto tag = str.substr(0, cloc);
+                tag.erase(tag.find_last_not_of(" \t\n\0") + 1);
+                tag.erase(0, tag.find_first_not_of(" \t\n\0"));
+                tags.emplace(tag);
             }
             else
             {
-                break;
+                auto tag = str;
+                tag.erase(tag.find_last_not_of(" \t\n\0") + 1);
+                tag.erase(0, tag.find_first_not_of(" \t\n\0"));
+                tags.emplace(str);
             }
-            if (T >= nextPrintTime)
+        }
+        std::cout << tags.size() << " tags processed\n";
+
+        infile.close();
+        return 0;
+    }
+
+    /*run the player*/
+    void recorder::run()
+    {
+
+    }
+    /** run the player until the specified time*/
+    void recorder::run(helics::Time stopTime)
+    {
+        std::vector<ValueStats> vStat;
+
+        vStat.reserve(subids.size());
+        for (auto &val : subids)
+        {
+            vStat.emplace_back(ValueStats());
+            vStat.back().key = val.second.first;
+        }
+        points.reserve(100000);
+        std::cout << "entering execution mode\n";
+        fed->enterExecutionState();
+        helics::Time nextPrintTime = 10.0;
+        int ii = 0;
+        for (auto &sub : subscriptions)
+        {
+            if (sub.isUpdated())
             {
-                std::cout << "processed for time " << static_cast<double> (T) << "\n";
-                nextPrintTime += 10.0;
+                auto val = sub.getValue<std::string>();
+                points.emplace_back(-1.0, sub.getID(), val);
+                if (vStat[ii].cnt == 0)
+                {
+                   points.back().first = true;
+                }
+                ++vStat[ii].cnt;
+                vStat[ii].lastVal = val;
+                vStat[ii].time = -1.0;
+            }
+            ++ii;
+        }
+        if (!mapfile.empty())
+        {
+            std::ofstream out(mapfile);
+            for (auto &stat : vStat)
+            {
+                out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t' << stat.lastVal
+                    << '\n';
+            }
+            out.flush();
+        }
+
+        try
+        {
+            while (true)
+            {
+                auto T = fed->requestTime(stopTime);
+                if (T < stopTime)
+                {
+                    ii = 0;
+                    for (auto &sub : subscriptions)
+                    {
+                        if (sub.isUpdated())
+                        {
+                            auto val = sub.getValue<std::string>();
+                            points.emplace_back(T, sub.getID(), val);
+                            ++vStat[ii].cnt;
+                            vStat[ii].lastVal = val;
+                            vStat[ii].time = T;
+                        }
+                        ++ii;
+                    }
+                    if (!mapfile.empty())
+                    {
+                        std::ofstream out(mapfile);
+                        for (auto &stat : vStat)
+                        {
+                            out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t'
+                                << stat.lastVal << '\n';
+                        }
+                        out.flush();
+                    }
+                }
+                else
+                {
+                    break;
+                }
+                if (T >= nextPrintTime)
+                {
+                    std::cout << "processed for time " << static_cast<double> (T) << "\n";
+                    nextPrintTime += 10.0;
+                }
+            }
+        }
+        catch (...)
+        {
+        }
+
+        for (auto &sub : subscriptions)
+        {
+            subids.emplace(sub.getID(), std::make_pair(sub.getKey(), sub.getType()));
+        }
+        fed->finalize();
+        
+    }
+    /** add a subscription to capture*/
+    void recorder::addSubscription(const std::string &key)
+    {
+
+    }
+    /** add an endpoint*/
+    void recorder::addEndpoint(const std::string &endpoint)
+    {
+
+    }
+    
+    void recorder::addSourceEndpointClone(const std::string &sourceEndpoint)
+    {
+
+    }
+    
+    void recorder::addDestEndpointClone(const std::string &destEndpoint)
+    {
+
+    }
+
+    /** save the data to a file*/
+    void recorder::saveFile(const std::string &filename)
+    {
+        std::ofstream outFile(filename.empty()?outFileName:filename);
+        outFile << "#time \ttag\t value\t type*\n";
+        for (auto &v : points)
+        {
+            if (v.first)
+            {
+                outFile << static_cast<double> (v.time) << "\t\t" << subids[v.id].first << '\t' << v.value << '\t'
+                    << subids[v.id].second << '\n';
+            }
+            else
+            {
+                outFile << static_cast<double> (v.time) << "\t\t" << subids[v.id].first << '\t' << v.value << '\n';
             }
         }
     }
-    catch (...)
-    {
-    }
 
-    for (auto &sub : subscriptions)
+    int recorder::loadArguments(boost::program_options::variables_map &vm_map)
     {
-        subids.emplace (sub.getID (), std::make_pair (sub.getKey (), sub.getType ()));
-    }
-    vFed->finalize ();
-
-    std::string outFileName = "out.txt";
-    if (vm.count ("output") > 0)
-    {
-        outFileName = vm["output"].as<std::string> ();
-    }
-    std::ofstream outFile (outFileName);
-    outFile << "#time \ttag\t value\t type*\n";
-    for (auto &v : vcap)
-    {
-        if (v.first)
+        if (vm_map.count("input") == 0)
         {
-            outFile << static_cast<double> (v.time) << "\t\t" << subids[v.id].first << '\t' << v.value << '\t'
-                    << subids[v.id].second << '\n';
+            return -1;
         }
-        else
-        {
-            outFile << static_cast<double> (v.time) << "\t\t" << subids[v.id].first << '\t' << v.value << '\n';
-        }
-    }
 
-    return 0;
+        if (!filesystem::exists(vm_map["input"].as<std::string>()))
+        {
+            std::cerr << vm_map["input"].as<std::string>() << "is not a valid input file \n";
+            return -3;
+        }
+        loadFile(vm_map["input"].as<std::string>());
+
+        // get the extra tags from the arguments
+        if (vm_map.count("tags") > 0)
+        {
+            auto argTags = vm_map["tags"].as<std::vector<std::string>>();
+            for (const auto &tag : argTags)
+            {
+                std::vector<std::string> taglist;
+                boost::split(taglist, tag, boost::is_any_of(",;"));
+                for (const auto &tagname : taglist)
+                {
+                    tags.insert(tagname);
+                }
+            }
+        }
+
+        std::string prevTag;
+        for (auto &tname : tags)
+        {
+            subscriptions.push_back(helics::Subscription(fed.get(), tname));
+        }
+        // capture the all the publications from a particular federate
+        if (vm_map.count("capture") > 0)
+        {
+            auto captures = vm_map["capture"].as<std::vector<std::string>>();
+            for (const auto &capt : captures)
+            {
+                std::vector<std::string> captFeds;
+                boost::split(captFeds, capt, boost::is_any_of(",;"));
+                for (const auto &captFed : captFeds)
+                {
+                    auto res = waitForInit(fed.get(), captFed);
+                    if (res)
+                    {
+                        auto pubs = vectorizeQueryResult(fed->query(captFed, "publications"));
+                        for (auto &pub : pubs)
+                        {
+                            subscriptions.emplace_back(fed.get(), pub);
+                        }
+                    }
+                }
+            }
+        }
+        if (vm_map.count("mapfile") > 0)
+        {
+            mapfile = vm_map["mapfile"].as<std::string>();
+        }
+
+        outFileName = "out.txt";
+        if (vm_map.count("output") > 0)
+        {
+            outFileName = vm_map["output"].as<std::string>();
+        }
+
+        return 0;
+    }
+    
 }
 
-void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map)
+
+void recorderArgumentParser(int argc, const char *const *argv, po::variables_map &vm_map)
 {
     po::options_description cmd_only ("command line only");
     po::options_description config ("configuration");

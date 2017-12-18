@@ -17,7 +17,7 @@ namespace helics
     class FederateInfo;
 }
 
-void loadFederateInfo(const helics::FederateInfo &fi, int argc, const char * const *argv);
+void loadFederateInfo(helics::FederateInfo &fi, int argc, const char * const *argv);
 
 helics::helicsType_t getType(const std::string &typeString);
 

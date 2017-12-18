@@ -120,6 +120,7 @@ namespace helics
 		switch (baseType)
 		{
 		case helicsType_t::helicsString:
+        case helicsType_t::helicsAny:
 		{
 			val = static_cast<X> (boost::lexical_cast<double> (dv.string()));
 			break;

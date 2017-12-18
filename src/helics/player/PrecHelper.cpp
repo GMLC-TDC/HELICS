@@ -50,6 +50,9 @@ helicsType_t getType (const std::string &typeString)
     {
         switch (tstr[0])
         {
+        case 'a':
+        case 'A':
+            return helicsType_t::helicsAny;
         case 's':
         case 'S':
             return helicsType_t::helicsString;
@@ -93,6 +96,8 @@ char typeCharacter (helicsType_t type)
         return 'c';
     case helicsType_t::helicsVector:
         return 'v';
+    case helicsType_t::helicsAny:
+        return 'a';
     case helicsType_t::helicsInvalid:
     default:
         return 'u';
@@ -204,16 +209,8 @@ void loadFederateInfo(helics::FederateInfo &fi, int argc, const char * const *ar
         fi.coreName = vm["core"].as<std::string>();
     }
 
-    
-    try
-    {
-        fi.coreType = helics::coreTypeFromString(corename);
-    }
-    catch (std::invalid_argument &ia)
-    {
-        std::cerr << "Unrecognized core type\n";
-        return (-1);
-    }
+    fi.coreType = helics::coreTypeFromString(corename);
+   
     fi.coreInitString = "2";
     if (vm.count("coreinit") > 0)
     {

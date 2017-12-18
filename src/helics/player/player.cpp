@@ -27,9 +27,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
-void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
+static void playerArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
-const std::regex creg (R"raw((-?\d+(\.\d+)?|\.\d+)\s*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
+static const std::regex creg (R"raw((-?\d+(\.\d+)?|\.\d+)\s*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
 
 /*
 std::shared_ptr<CombinationFederate> fed;
@@ -44,11 +44,19 @@ std::map<std::string, int> eptids;
 namespace helics
 {
 
+    static inline bool vComp(ValueSetter &v1, ValueSetter &v2) { return (v1.time < v2.time); }
+
+
+
     player::player(int argc, char *argv[])
     {
         FederateInfo fi("player");
         loadFederateInfo(fi, argc, argv);
         fed = std::make_shared<CombinationFederate>(fi);
+
+        boost::program_options::variables_map vm_map;
+        playerArgumentParser(argc, argv,vm_map);
+        loadArguments(vm_map);
     }
 
     player::player(const FederateInfo &fi) : fed(std::make_shared<CombinationFederate>(fi))
@@ -121,7 +129,6 @@ namespace helics
             }
         }
         // collapse tags to the reduced list
-        std::set<std::pair<std::string, std::string>> tags;
         for (auto &vs : points)
         {
             tags.emplace(vs.pubName, vs.type);
@@ -195,7 +202,7 @@ namespace helics
         fed->finalize();
     }
 
-    void player::run(Time stopTime)
+    void player::run(Time stopTime_input)
     {
 
     }
@@ -237,11 +244,12 @@ namespace helics
         {
             stopTime = vm_map["stop"].as<double>();
         }
+        return 0;
     }
 
 } //namespace helics
 
-void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map)
+void playerArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map)
 {
     po::options_description cmd_only ("command line only");
     po::options_description config ("configuration");

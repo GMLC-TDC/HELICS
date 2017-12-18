@@ -8,6 +8,10 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
+
+#ifndef HELICS_PLAYER_HPP
+#define HELICS_PLAYER_HPP
+
 #include "../application_api/Publications.hpp"
 #include "../application_api/CombinationFederate.h"
 #include "../application_api/Endpoints.hpp"
@@ -44,9 +48,7 @@ namespace helics
         defV value;
     };
 
-    bool vComp(ValueSetter &v1, ValueSetter &v2) { return (v1.time < v2.time); }
 
-    
     /** class implementing a player object, which is capable of reading a file and generating interfaces
     and sending signals at the appropriate times
     @details  the player class is not threadsafe,  don't try to use it from multiple threads that will result in undefined behavior
@@ -83,10 +85,20 @@ namespace helics
         /*run the player*/
         void run();
 
-        void run(Time stopTime);
+        void run(Time stopTime_input);
 
-        void addPublication( const std::string &key, helicsType_t type, const std::string &units);
+        /** add a publication to a player
+        @param key the key of the publication to add
+        @param type the type of the publication
+        @param units the units associated with the publication
+        */
+        void addPublication( const std::string &key, helicsType_t type, const std::string &units="");
         
+        /** add a data point to publish through a player
+        @param pubTime the time of the publication
+        @param key the key for the publication
+        @param val the value to publish
+        */
         template<class valType>
         void addPoint(Time pubTime, const std::string &key, const valType &val)
         {
@@ -110,3 +122,4 @@ namespace helics
     };
 }
 
+#endif // HELICS_PLAYER_HPP
