@@ -41,11 +41,11 @@ public:
 
     void close();
 
-    void setDataCall(std::function<std::string(int index, const char *data, size_t datasize)> dataFunc)
+    void setDataCall(std::function<size_t (tcp_rx_connection::pointer,const char *, size_t)> dataFunc)
     {
         dataCall = std::move(dataFunc);
     }
-    void setErrorCall(std::function<bool(int index, const boost::system::error_code& error)> errorFunc)
+    void setErrorCall(std::function<bool(int, const boost::system::error_code&)> errorFunc)
     {
         errorCall = std::move(errorFunc);
     }
@@ -62,8 +62,8 @@ private:
 
     boost::asio::ip::tcp::socket socket_;
     std::vector<char> data;
-    std::function<std::string(int index, const char *data, size_t datasize)> dataCall;
-    std::function<bool(int index, const boost::system::error_code& error)> errorCall;
+    std::function<size_t (tcp_rx_connection::pointer, const char *, size_t)> dataCall;
+    std::function<bool(int index, const boost::system::error_code&)> errorCall;
 };
 
 
@@ -158,11 +158,11 @@ public:
 
     void close();
 
-    void setDataCall(std::function<std::string(int index, const char *data, size_t datasize)> dataFunc)
+    void setDataCall(std::function<size_t(tcp_rx_connection::pointer, const char *, size_t)> dataFunc)
     {
         dataCall = std::move(dataFunc);
     }
-    void setErrorCall(std::function<bool(int index, const boost::system::error_code& error)> errorFunc)
+    void setErrorCall(std::function<bool(int, const boost::system::error_code&)> errorFunc)
     {
         errorCall = std::move(errorFunc);
     }
@@ -174,7 +174,7 @@ private:
     boost::asio::ip::tcp::acceptor acceptor_;
     
     size_t bufferSize;
-    std::function<std::string(int index, const char *data, size_t datasize)> dataCall;
+    std::function<size_t(tcp_rx_connection::pointer, const char *, size_t)> dataCall;
     std::function<bool(int index, const boost::system::error_code& error)> errorCall;
     std::vector<std::shared_ptr<tcp_rx_connection>> connections;
 };

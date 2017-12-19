@@ -125,23 +125,30 @@ ActionMessage TcpComms::generateReplyToIncomingMessage (ActionMessage &M)
 }
 
 
-std::string TcpComms::dataReceive(int /*index*/, const char *data, size_t bytes_received)
+size_t TcpComms::dataReceive(tcp_rx_connection::pointer connection, const char *data, size_t bytes_received)
 {
-    ActionMessage m(data, bytes_received);
-    if (isPriorityCommand(m))
+    ActionMessage m;
+    size_t used_total = 0;
+    while (used_total < bytes_received)
     {
-        auto rep=generateReplyToIncomingMessage(m);
-        return rep.to_string();
+        int used = m.depacketize(data, bytes_received);
+        ActionMessage m(data, bytes_received);
+        if (isPriorityCommand(m))
+        {
+            auto rep = generateReplyToIncomingMessage(m);
+            return rep.to_string();
+        }
+        else if (isProtocolCommand(m))
+        {
+            rxMessageQueue.push(m);
+        }
+        else
+        {
+            ActionCallback(std::move(m));
+        }
     }
-    else if (isProtocolCommand(m))
-    {
-        rxMessageQueue.push(m);
-    }
-    else
-    {
-        ActionCallback(std::move(m));
-    }
-    return {};
+    
+    return used_total;
 }
 
 void TcpComms::queue_rx_function ()
@@ -310,7 +317,7 @@ void TcpComms::queue_tx_function ()
                 m.index = REQUEST_PORTS;
                 try
                 {
-                    brokerConnection->send(m.to_string());
+                    brokerConnection->send(m.packetize());
                 }
                 catch (const boost::system::system_error &error)
                 {
@@ -438,7 +445,7 @@ void TcpComms::queue_tx_function ()
         {
             if (hasBroker)
             {
-                brokerConnection->send(cmd.to_string());
+                brokerConnection->send(cmd.packetize());
                 
                // if (error)
                 {
@@ -455,13 +462,13 @@ void TcpComms::queue_tx_function ()
             auto rt_find = routes.find (route_id);
             if (rt_find != routes.end ())
             {
-                rt_find->second->send(cmd.to_string());
+                rt_find->second->send(cmd.packetize());
             }
             else
             {
                 if (hasBroker)
                 {
-                    brokerConnection->send(cmd.to_string());
+                    brokerConnection->send(cmd.packetize());
                 }
             }
         }

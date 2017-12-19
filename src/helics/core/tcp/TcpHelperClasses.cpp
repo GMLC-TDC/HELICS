@@ -25,8 +25,8 @@ void tcp_rx_connection::handle_read(const boost::system::error_code &error,
 {
     if (!error)
     {
-        auto resp=dataCall(index, data.data(), bytes_transferred);
-        if (!resp.empty())
+        auto used=dataCall(shared_from_this(), data.data(), bytes_transferred);
+        if (used<bytes_transferred)
         {
             try
             {
