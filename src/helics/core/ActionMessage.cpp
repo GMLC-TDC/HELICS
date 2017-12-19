@@ -298,7 +298,7 @@ size_t ActionMessage::depacketize(const char *data, size_t buffer_size)
     {
         return 0;
     }
-    int32_t message_size = static_cast<unsigned char>(data[1]);
+    size_t message_size = static_cast<unsigned char>(data[1]);
     message_size <<= 8;
     message_size+= static_cast<unsigned char>(data[2]);
     message_size <<= 8;

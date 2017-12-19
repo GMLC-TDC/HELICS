@@ -120,19 +120,21 @@ ActionMessage TcpComms::generateReplyToIncomingMessage (ActionMessage &M)
     return resp;
 }
 
-size_t TcpComms::dataReceive(tcp_rx_connection::pointer connection, const char *data, size_t bytes_received)
+size_t TcpComms::dataReceive(std::shared_ptr<tcp_rx_connection> connection, const char *data, size_t bytes_received)
 {
     ActionMessage m;
     size_t used_total = 0;
     while (used_total < bytes_received)
     {
-        int used = m.depacketize(data, bytes_received);
-        ActionMessage m(data, bytes_received);
-
+        auto used = m.depacketize(data, bytes_received);
+        if (used == 0)
+        {
+            break;
+        }
         if (isPriorityCommand(m))
         {
             auto rep = generateReplyToIncomingMessage(m);
-            return rep.to_string();
+            connection->send(rep.packetize());
         }
         else if (isProtocolCommand(m))
         {
@@ -141,19 +143,29 @@ size_t TcpComms::dataReceive(tcp_rx_connection::pointer connection, const char *
         else
         {
             ActionCallback(std::move(m));
-        ActionCallback (std::move (m));
+        }
+        used_total += used;
+        if (used_total < bytes_received)
+        {
+            std::cout << "double message" << std::endl;
         }
     }
     
     return used_total;
 }
 
-bool TcpComms::commErrorHandler (int index, const boost::system::error_code &error)
+bool TcpComms::commErrorHandler (std::shared_ptr<tcp_rx_connection> connection, const boost::system::error_code &error)
 {
     if (rx_status == connection_status::connected)
     {
-        std::cerr << "error message while connected " << error.message () << "code " << error.value ()
-                  << std::endl;
+        if ((error != boost::asio::error::eof) && (error != boost::asio::error::operation_aborted))
+        {
+            if (error != boost::asio::error::connection_reset)
+            {
+                std::cerr << "error message while connected " << error.message() << "code " << error.value()
+                    << std::endl;
+            }
+        }
     }
     return false;
 }
@@ -194,9 +206,9 @@ void TcpComms::queue_rx_function ()
     };
     ioserv->runServiceLoop();
     server.setDataCall (
-      [this](int index, const char *data, size_t datasize) { return dataReceive (index, data, datasize); });
+      [this](tcp_rx_connection::pointer connection, const char *data, size_t datasize) { return dataReceive (connection, data, datasize); });
     server.setErrorCall (
-      [this](int index, const boost::system::error_code &error) { return commErrorHandler (index, error); });
+      [this](tcp_rx_connection::pointer connection, const boost::system::error_code &error) { return commErrorHandler (connection, error); });
     server.start();
     rx_status = connection_status::connected;
     while (true)
@@ -217,54 +229,6 @@ void TcpComms::queue_rx_function ()
     disconnectFunction();
     return;
 }
-/*
-        auto len=socket.receive_from(boost::asio::buffer(data), remote_endp, 0, error);
-        if (error)
-        {
-            rx_status = connection_status::error;
-            return;
-        }
-        if (len == 5)
-        {
-            std::string str(data.data(), len);
-            if (str == "close")
-            {
-                goto CLOSE_RX_LOOP;
-            }
-        }
-        ActionMessage M(data.data(),len);
-        if (isProtocolCommand(M))
-        {
-           if (M.index == CLOSE_RECEIVER)
-            {
-               goto CLOSE_RX_LOOP;
-            }
-        }
-        if (isPriorityCommand(M))
-        {
-            auto reply = generateReplyToIncomingMessage(M);
-            if (isProtocolCommand(reply))
-            {
-                if (reply.index == DISCONNECT)
-                {
-                    goto CLOSE_RX_LOOP;
-                }
-            }
-            socket.send_to(boost::asio::buffer(reply.to_string()), remote_endp, 0, ignored_error);
-        }
-        else
-        {
-            auto res=processIncomingMessage(M);
-            if (res < 0)
-            {
-                goto CLOSE_RX_LOOP;
-            }
-        }
-        
-
-    }
-
-*/
 
 void TcpComms::txReceive (const char *data, size_t bytes_received, const std::string &errorMessage)
 {

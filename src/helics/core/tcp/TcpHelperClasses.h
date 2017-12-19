@@ -45,11 +45,18 @@ public:
     {
         dataCall = std::move(dataFunc);
     }
-    void setErrorCall(std::function<bool(int, const boost::system::error_code&)> errorFunc)
+    void setErrorCall(std::function<bool(tcp_rx_connection::pointer, const boost::system::error_code&)> errorFunc)
     {
         errorCall = std::move(errorFunc);
     }
-    
+
+    /** send raw data
+    @throws boost::system::system_error on failure*/
+    void send(const void *buffer, size_t dataLength);
+    /** send a string
+    @throws boost::system::system_error on failure*/
+    void send(const std::string &dataString);
+
     int index = 0;
 private:
     tcp_rx_connection(boost::asio::io_service& io_service, size_t bufferSize)
@@ -62,8 +69,9 @@ private:
 
     boost::asio::ip::tcp::socket socket_;
     std::vector<char> data;
+    size_t residBufferSize = 0;
     std::function<size_t (tcp_rx_connection::pointer, const char *, size_t)> dataCall;
-    std::function<bool(int index, const boost::system::error_code&)> errorCall;
+    std::function<bool(tcp_rx_connection::pointer, const boost::system::error_code&)> errorCall;
 };
 
 
@@ -167,7 +175,7 @@ public:
     {
         dataCall = std::move(dataFunc);
     }
-    void setErrorCall(std::function<bool(int, const boost::system::error_code&)> errorFunc)
+    void setErrorCall(std::function<bool(tcp_rx_connection::pointer, const boost::system::error_code&)> errorFunc)
     {
         errorCall = std::move(errorFunc);
     }
@@ -180,7 +188,7 @@ private:
     
     size_t bufferSize;
     std::function<size_t(tcp_rx_connection::pointer, const char *, size_t)> dataCall;
-    std::function<bool(int index, const boost::system::error_code& error)> errorCall;
+    std::function<bool(tcp_rx_connection::pointer, const boost::system::error_code& error)> errorCall;
     std::vector<std::shared_ptr<tcp_rx_connection>> connections;
 };
 #endif /* _HELICS_TCP_HELPER_CLASSES_*/

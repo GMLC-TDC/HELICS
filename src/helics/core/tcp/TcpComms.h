@@ -29,6 +29,8 @@ namespace boost
     }
 }
 
+class tcp_rx_connection;
+
 namespace helics {
 
 /** generate a string with a full address based on an interface string and port number
@@ -48,6 +50,8 @@ or the interface doesn't use port numbers
 @return a pair with a string and int with the interface name and port number
 */
 std::pair<std::string, int> extractInterfaceandPort(const std::string &address);
+
+
 
 /** implementation for the communication interface that uses TCP messages to communicate*/
 class TcpComms final:public CommsInterface {
@@ -83,14 +87,14 @@ private:
 
     void txReceive(const char *data, size_t bytes_received, const std::string &errorMessage);
    /** callback function for receiving data asynchronously from the socket
-   @param index the index of connection in the server
-   data the pointer to the data
-   bytes_received the length of the received data
-   @return a string with the response(this is raw data contained in a string, empty string if no data
+   @param connection pointer to the connection
+   @param data the pointer to the data
+   @param bytes_received the length of the received data
+   @return a the number of bytes used by the function
    */
-    std::string dataReceive(int index, const char *data, size_t bytes_received);
+    size_t dataReceive(std::shared_ptr<tcp_rx_connection> connection, const char *data, size_t bytes_received);
 
-    bool commErrorHandler(int index, const boost::system::error_code& error);
+    bool commErrorHandler(std::shared_ptr<tcp_rx_connection> connection, const boost::system::error_code& error);
   //  bool errorHandle()
 public:
 	/** get the port number of the comms object to push message to*/
