@@ -190,6 +190,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
 
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
+    
     mFed1->setTimeDelta (1.0);
     mFed2->setTimeDelta (1.0);
 
@@ -305,6 +306,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
 
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
+   // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setTimeDelta (1.0);
     mFed2->setTimeDelta (1.0);
 

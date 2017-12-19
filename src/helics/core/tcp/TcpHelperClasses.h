@@ -125,11 +125,16 @@ public:
     {
         socket_.async_receive(boost::asio::buffer(buffer, dataLength), callback);
     }
-
+    /** check if the socket has finished the connection process*/
     bool isConnected() const
     {
         return connected.load();
     }
+    /** wait until the socket has finished the connection process
+    @param timeOut the number of ms to wait for the connection process to finish (-1) for no limit
+    @return 0 if connected, -1 if the timeout was reached, -2 if error
+    */
+    int waitUntilConnected(int timeOut);
 private:
     tcp_connection(boost::asio::io_service& io_service, const std::string &connection, const std::string &port, size_t bufferSize);
 

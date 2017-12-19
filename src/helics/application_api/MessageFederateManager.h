@@ -39,10 +39,14 @@ struct endpoint_info
         : name (std::move (n_name)), type (std::move (n_type)){};
 };
 
-/** class handling the implementation details of a value Federate*/
+/** class handling the implementation details of a value Federate
+@details the functions will parallel those in message Federate and contain the actual implementation details
+*/
 class MessageFederateManager
 {
   public:
+      /** construct from a pointer to a core and a specified federate id
+      */
     MessageFederateManager (std::shared_ptr<Core> coreOb, Core::federate_id_t id);
     ~MessageFederateManager ();
     /** register an endpoint

@@ -619,6 +619,7 @@ iteration_state FederateState::processQueue ()
     while (ret_code == iteration_state::continue_processing)
     {
         auto cmd = queue.pop ();
+        messLog.push_back(cmd);
         ret_code = processActionMessage (cmd);
     }
     return ret_code;

@@ -22,6 +22,11 @@ namespace boost
     {
         class io_service;
     }
+
+    namespace system
+    {
+        class error_code;
+    }
 }
 
 namespace helics {
@@ -85,6 +90,7 @@ private:
    */
     std::string dataReceive(int index, const char *data, size_t bytes_received);
 
+    bool commErrorHandler(int index, const boost::system::error_code& error);
   //  bool errorHandle()
 public:
 	/** get the port number of the comms object to push message to*/

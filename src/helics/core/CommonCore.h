@@ -195,6 +195,12 @@ private:
 	void routeMessage(ActionMessage &cmd, federate_id_t dest);
 	/** function for routing a message from based on the destination specified in the ActionMessage*/
 	void routeMessage(const ActionMessage &command);
+
+    /**function for doing the actual routing either to a local fed or up the broker chain*/
+    void routeMessage(ActionMessage &&cmd, federate_id_t dest);
+    /** function for routing a message from based on the destination specified in the ActionMessage*/
+    void routeMessage(ActionMessage &&command);
+
 	/** process any filter or route the message*/
 	void processMessageFilter(ActionMessage &command);
     /** create a source filter */

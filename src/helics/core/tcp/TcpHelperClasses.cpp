@@ -9,6 +9,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "TcpHelperClasses.h"
 #include <iostream>
+#include <thread>
 
 using boost::asio::ip::tcp;
 
@@ -37,23 +38,26 @@ void tcp_rx_connection::handle_read(const boost::system::error_code &error,
                 std::cerr << "receive reply send error " << se.what() << std::endl;
             }
         }
+        start();
     }
     else
     {
         if (errorCall)
         {
-            if (!errorCall(index, error))
+            if (errorCall(index, error)) 
             {
-                return;
+                start();
             }
         }
         else if ((error != boost::asio::error::eof)&&(error!=boost::asio::error::operation_aborted))
         {
-            std::cerr << "receive error " << error.message() << std::endl;
-            return;
+            if (error != boost::asio::error::connection_reset)
+            {
+                std::cerr << "receive error " << error.message() << std::endl;
+            }
         }
     }
-    start();
+    
 }
 
 void tcp_rx_connection::close()
@@ -89,15 +93,21 @@ void tcp_connection::connect_handler(const boost::system::error_code &error)
     {
         connected.store(true);
     }
+    else
+    {
+        std::cerr << "connection error " << error.message() << ": code =" << error.value() << '\n';
+    }
 }
 void tcp_connection::send(const void *buffer, size_t dataLength)
 {
-    socket_.send(boost::asio::buffer(buffer, dataLength));
+    auto sz=socket_.send(boost::asio::buffer(buffer, dataLength));
+    assert(sz == dataLength);
 }
 
 void tcp_connection::send(const std::string &dataString)
 {
-    socket_.send(boost::asio::buffer(dataString));
+    auto sz=socket_.send(boost::asio::buffer(dataString));
+    assert(sz == dataString.size());
 }
 
 size_t tcp_connection::receive(void *buffer, size_t maxDataLength)
@@ -105,6 +115,20 @@ size_t tcp_connection::receive(void *buffer, size_t maxDataLength)
     return socket_.receive(boost::asio::buffer(buffer, maxDataLength));
 }
 
+int tcp_connection::waitUntilConnected(int timeOut)
+{
+    int cnt = 0;
+    while (!isConnected())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        cnt += 50;
+        if (cnt > timeOut)
+        {
+            return (-1);
+        }
+    }
+    return 0;
+}
 
 void tcp_connection::close()
 {

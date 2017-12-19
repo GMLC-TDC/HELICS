@@ -80,19 +80,18 @@ in a single thread allowing for asynchronous logging
 */
 class logger
 {
-
 private:
-    std::atomic<bool> halted{ true };
+    std::atomic<bool> halted{ true }; //!< indicator that the logger was halted
     std::mutex fileLock;  //!< mutex to protect the file itself
 	std::ofstream outFile;	//!< the stream to write the log messages
     std::shared_ptr<loggingCore> logCore; //!< pointer to the core operation
     int coreIndex = -1; //!< index into the core
-public:
 	std::atomic<int> consoleLevel{ 100 };	//!< level below which we need to print to the console
 	std::atomic<int> fileLevel{ 100 };	//!< level below which we need to print to a file
 public:
 	/** default constructor*/
     logger();
+    /** construct and link to the specified logging Core*/
     logger(std::shared_ptr<loggingCore> core);
 	/**destructor*/
 	~logger();

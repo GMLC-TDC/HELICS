@@ -80,6 +80,7 @@ private:
     bool hasEndpoints = false;  //!< the federate has endpoints
     //1 byte free
 	int logLevel=1;
+    std::vector<ActionMessage> messLog;
   private:
     BlockingQueue3<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
 

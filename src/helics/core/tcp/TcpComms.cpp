@@ -9,24 +9,20 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "TcpComms.h"
-#include "../ActionMessage.h"
 #include "../../common/AsioServiceManager.h"
-#include <memory>
+#include "../ActionMessage.h"
 #include "TcpHelperClasses.h"
+#include <memory>
 
 static const int BEGIN_OPEN_PORT_RANGE = 24228;
 static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24357;
 
 static const int DEFAULT_TCP_BROKER_PORT_NUMBER = 24160;
 
-
 namespace helics
 {
 using boost::asio::ip::tcp;
-TcpComms::TcpComms ()
-{
-
-}
+TcpComms::TcpComms () {}
 
 TcpComms::TcpComms (const std::string &brokerTarget, const std::string &localTarget)
     : CommsInterface (brokerTarget, localTarget)
@@ -124,7 +120,6 @@ ActionMessage TcpComms::generateReplyToIncomingMessage (ActionMessage &M)
     return resp;
 }
 
-
 size_t TcpComms::dataReceive(tcp_rx_connection::pointer connection, const char *data, size_t bytes_received)
 {
     ActionMessage m;
@@ -133,6 +128,7 @@ size_t TcpComms::dataReceive(tcp_rx_connection::pointer connection, const char *
     {
         int used = m.depacketize(data, bytes_received);
         ActionMessage m(data, bytes_received);
+
         if (isPriorityCommand(m))
         {
             auto rep = generateReplyToIncomingMessage(m);
@@ -145,10 +141,21 @@ size_t TcpComms::dataReceive(tcp_rx_connection::pointer connection, const char *
         else
         {
             ActionCallback(std::move(m));
+        ActionCallback (std::move (m));
         }
     }
     
     return used_total;
+}
+
+bool TcpComms::commErrorHandler (int index, const boost::system::error_code &error)
+{
+    if (rx_status == connection_status::connected)
+    {
+        std::cerr << "error message while connected " << error.message () << "code " << error.value ()
+                  << std::endl;
+    }
+    return false;
 }
 
 void TcpComms::queue_rx_function ()
@@ -168,7 +175,6 @@ void TcpComms::queue_rx_function ()
                 disconnecting = true;
                 rx_status = connection_status::terminated;
                 return;
-
             }
         }
     }
@@ -180,14 +186,17 @@ void TcpComms::queue_rx_function ()
     auto ioserv = AsioServiceManager::getServicePointer();
     tcp_server server(ioserv->getBaseService(),PortNumber,maxMessageSize_);
     //lambda for the disconnection procedure
-    auto disconnectFunction=[this, &ioserv](){ 
+    auto disconnectFunction = [this, &server, &ioserv]() {
         disconnecting = true;
+        server.close ();
         ioserv->haltServiceLoop();
         rx_status = connection_status::terminated; 
     };
     ioserv->runServiceLoop();
-    server.setDataCall([this](int index, const char *data, size_t datasize) {return dataReceive(index, data, datasize); });
-    
+    server.setDataCall (
+      [this](int index, const char *data, size_t datasize) { return dataReceive (index, data, datasize); });
+    server.setErrorCall (
+      [this](int index, const boost::system::error_code &error) { return commErrorHandler (index, error); });
     server.start();
     rx_status = connection_status::connected;
     while (true)
@@ -201,7 +210,6 @@ void TcpComms::queue_rx_function ()
             case DISCONNECT:
                 disconnectFunction();
                 return;
-
             }
         }
     }
@@ -253,6 +261,7 @@ void TcpComms::queue_rx_function ()
             }
         }
         
+
     }
 
 */
@@ -296,7 +305,8 @@ void TcpComms::queue_tx_function ()
         }
         try
         {
-            brokerConnection = tcp_connection::create(ioserv->getBaseService(), brokerTarget_, std::to_string(brokerPort), maxMessageSize_);
+            brokerConnection = tcp_connection::create (ioserv->getBaseService (), brokerTarget_,
+                                                       std::to_string (brokerPort), maxMessageSize_);
             int cumsleep = 0;
             while (!brokerConnection->isConnected())
             {
@@ -328,7 +338,9 @@ void TcpComms::queue_tx_function ()
                 }
                 std::vector<char> rx(512);
                 tcp::endpoint brk;
-                brokerConnection->async_receive(rx.data(), 128, [this, &rx](const boost::system::error_code& error, size_t bytes) {
+                brokerConnection->async_receive (rx.data (), 128,
+                                                 [this, &rx](const boost::system::error_code &error,
+                                                             size_t bytes) {
                     if (error != boost::asio::error::operation_aborted)
                     {
                         if (!error)
@@ -366,7 +378,6 @@ void TcpComms::queue_tx_function ()
                     cumsleep += 100;
                     if (cumsleep >= connectionTimeout)
                     {
-                        
                         ioserv->haltServiceLoop();
                         brokerConnection->cancel();
                         std::cerr << "port number query to broker timed out\n" << std::endl;
@@ -474,7 +485,10 @@ void TcpComms::queue_tx_function ()
         }
     }
 CLOSE_TX_LOOP:
-    
+    for (auto &rt : routes)
+    {
+        rt.second->close ();
+    }
     routes.clear ();
     if (rx_status == connection_status::connected)
     {
