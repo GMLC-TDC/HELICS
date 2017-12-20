@@ -10,11 +10,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "TcpCore.h"
 
-#include "helics/helics-config.h"
 #include "../core-data.h"
 #include "../core.h"
 #include "../helics-time.h"
 #include "TcpComms.h"
+#include "helics/helics-config.h"
 
 #include <algorithm>
 #include <cassert>
@@ -31,13 +31,13 @@ using namespace std::string_literals;
 static const argDescriptors extraArgs{
   {"local_interface"s, "string"s, "the local interface to use for the receive ports"s},
   {"brokerport"s, "int"s, "port number for the broker priority port"s},
-  {"localport"s, "int"s, "port number for the local receive socket"s },
+  {"localport"s, "int"s, "port number for the local receive socket"s},
   {"port"s, "int"s, "port number for the broker's priority port"s},
 };
 
 TcpCore::TcpCore () noexcept {}
 
-TcpCore::~TcpCore() = default;
+TcpCore::~TcpCore () = default;
 
 TcpCore::TcpCore (const std::string &core_name) : CommsBroker (core_name) {}
 
@@ -86,7 +86,8 @@ void TcpCore::initializeFromArgs (int argc, const char *const *argv)
             localInterface = "localhost";
         }
         if (vm.count ("port") > 0)
-        {PortNumber = vm["port"].as<int> ();
+        {
+            PortNumber = vm["port"].as<int> ();
         }
         if (vm.count ("brokerport") > 0)
         {
@@ -96,7 +97,6 @@ void TcpCore::initializeFromArgs (int argc, const char *const *argv)
         {
             PortNumber = vm["pullport"].as<int> ();
         }
-      
 
         CommonCore::initializeFromArgs (argc, argv);
     }

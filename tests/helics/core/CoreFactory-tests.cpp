@@ -24,30 +24,23 @@ BOOST_AUTO_TEST_CASE (ZmqCore_test)
     BOOST_REQUIRE (core != nullptr);
     helics::CoreFactory::unregisterCore (core->getIdentifier ());
     core = nullptr;
-
 }
-#else // HELICS_HAVE_ZEROMQ
-BOOST_AUTO_TEST_CASE(ZmqCore_test)
-{
-    BOOST_CHECK_EQUAL(helics::isAvailable(helics::core_type::ZMQ), false);
-}
+#else  // HELICS_HAVE_ZEROMQ
+BOOST_AUTO_TEST_CASE (ZmqCore_test) { BOOST_CHECK_EQUAL (helics::isAvailable (helics::core_type::ZMQ), false); }
 #endif  // HELICS_HAVE_ZEROMQ
 
 #if HELICS_HAVE_MPI
 
 BOOST_AUTO_TEST_CASE (MpiCore_test)
 {
-    BOOST_CHECK_EQUAL(helics::isAvailable(helics::core_type::MPI), true);
+    BOOST_CHECK_EQUAL (helics::isAvailable (helics::core_type::MPI), true);
     auto core = helics::CoreFactory::create (helics::core_type::MPI, "");
     BOOST_REQUIRE (core != nullptr);
     helics::CoreFactory::unregisterCore (core->getIdentifier ());
     core = nullptr;
 }
 #else
-BOOST_AUTO_TEST_CASE(MpiCore_test)
-{
-    BOOST_CHECK_EQUAL(helics::isAvailable(helics::core_type::MPI), false);
-}
+BOOST_AUTO_TEST_CASE (MpiCore_test) { BOOST_CHECK_EQUAL (helics::isAvailable (helics::core_type::MPI), false); }
 #endif  // HELICS_HAVE_MPI
 
 BOOST_AUTO_TEST_CASE (TestCore_test)
@@ -79,23 +72,20 @@ BOOST_AUTO_TEST_CASE (InterprocessCore_test)
 #ifndef DISABLE_TCP_CORE
 BOOST_AUTO_TEST_CASE (tcpCore_test)
 {
-    BOOST_CHECK_EQUAL(helics::isAvailable(helics::core_type::TCP), true);
+    BOOST_CHECK_EQUAL (helics::isAvailable (helics::core_type::TCP), true);
 
-    auto core = helics::CoreFactory::create(helics::core_type::TCP, "");
-    BOOST_REQUIRE(core != nullptr);
-    helics::CoreFactory::unregisterCore(core->getIdentifier());
+    auto core = helics::CoreFactory::create (helics::core_type::TCP, "");
+    BOOST_REQUIRE (core != nullptr);
+    helics::CoreFactory::unregisterCore (core->getIdentifier ());
     core = nullptr;
 
-    auto core2 = helics::CoreFactory::create(helics::core_type::TCP, "");
-    BOOST_REQUIRE(core2 != nullptr);
-    helics::CoreFactory::unregisterCore(core2->getIdentifier());
+    auto core2 = helics::CoreFactory::create (helics::core_type::TCP, "");
+    BOOST_REQUIRE (core2 != nullptr);
+    helics::CoreFactory::unregisterCore (core2->getIdentifier ());
     core2 = nullptr;
 }
 #else
-BOOST_AUTO_TEST_CASE(tcpCore_test)
-{
-    BOOST_CHECK_EQUAL(helics::isAvailable(helics::core_type::TCP), false);
-}
+BOOST_AUTO_TEST_CASE (tcpCore_test) { BOOST_CHECK_EQUAL (helics::isAvailable (helics::core_type::TCP), false); }
 #endif
 
 BOOST_AUTO_TEST_CASE (udpCore_test)

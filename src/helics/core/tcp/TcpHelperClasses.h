@@ -69,9 +69,10 @@ private:
 
     boost::asio::ip::tcp::socket socket_;
     std::vector<char> data;
-    size_t residBufferSize = 0;
+    std::atomic<size_t> residBufferSize{ 0 };
     std::function<size_t (tcp_rx_connection::pointer, const char *, size_t)> dataCall;
     std::function<bool(tcp_rx_connection::pointer, const boost::system::error_code&)> errorCall;
+    std::atomic<bool> receiving{ false };
 };
 
 
@@ -133,6 +134,29 @@ public:
     {
         socket_.async_receive(boost::asio::buffer(buffer, dataLength), callback);
     }
+
+    /**perform an asynchronous receive operation
+    @param buffer the data to send
+    @param dataLength the length of the data
+    @param callback a callback function of the form void handler(
+    const boost::system::error_code& error, // Result of operation.
+    std::size_t bytes_transferred           // Number of bytes received.
+    );
+    */
+    void async_receive(std::function<void(tcp_connection::pointer, const char *, size_t, const boost::system::error_code &error)> callback)
+    {
+        socket_.async_receive(boost::asio::buffer(data, data.size()),
+            [connection = shared_from_this(),callback](const boost::system::error_code &error,
+                size_t bytes_transferred) {
+            connection->handle_read(bytes_transferred, error, callback);
+        });
+    }
+private:
+    void handle_read(size_t message_size, const boost::system::error_code &error, std::function<void(tcp_connection::pointer, const char *, size_t, const boost::system::error_code &error)> callback)
+    {
+        callback(shared_from_this(), data.data(), message_size, error);
+    }
+public:
     /** check if the socket has finished the connection process*/
     bool isConnected() const
     {

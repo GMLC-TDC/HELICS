@@ -10,11 +10,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "TcpBroker.h"
 #include "../../common/blocking_queue.h"
-#include "helics/helics-config.h"
 #include "../core-data.h"
 #include "../core.h"
 #include "../helics-time.h"
 #include "TcpComms.h"
+#include "helics/helics-config.h"
 
 #include <algorithm>
 #include <cassert>
@@ -40,7 +40,7 @@ TcpBroker::TcpBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 TcpBroker::TcpBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
-TcpBroker::~TcpBroker() = default;
+TcpBroker::~TcpBroker () = default;
 
 void TcpBroker::displayHelp (bool local_only)
 {
@@ -83,7 +83,7 @@ void TcpBroker::initializeFromArgs (int argc, const char *const *argv)
                     // TODO::Print a message?
                 }
             }
-            if ((brokerAddress == "tcp://*")||(brokerAddress=="*"))
+            if ((brokerAddress == "tcp://*") || (brokerAddress == "*"))
             {  // the broker address can't use a wild card
                 brokerAddress = "localhost";
             }
@@ -128,7 +128,7 @@ bool TcpBroker::brokerConnect ()
     {
         comms->setPortNumber (PortNumber);
     }
-   
+
     if (portStart > 0)
     {
         comms->setAutomaticPortStartPort (portStart);
@@ -141,7 +141,6 @@ bool TcpBroker::brokerConnect ()
         {
             PortNumber = comms->getPort ();
         }
-       
     }
     return res;
 }

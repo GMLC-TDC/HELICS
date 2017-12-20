@@ -30,6 +30,7 @@ namespace boost
 }
 
 class tcp_rx_connection;
+class tcp_connection;
 
 namespace helics {
 
@@ -86,6 +87,8 @@ private:
     BlockingQueue3<ActionMessage> rxMessageQueue;
 
     void txReceive(const char *data, size_t bytes_received, const std::string &errorMessage);
+
+    void txPriorityReceive(std::shared_ptr<tcp_connection> connection, const char *data, size_t bytes_received, const boost::system::error_code &error);
    /** callback function for receiving data asynchronously from the socket
    @param connection pointer to the connection
    @param data the pointer to the data

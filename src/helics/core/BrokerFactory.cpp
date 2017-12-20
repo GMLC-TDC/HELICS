@@ -108,16 +108,16 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
         break;
     case core_type::TCP:
 #ifndef DISABLE_TCP_CORE
-        if (name.empty())
+        if (name.empty ())
         {
-            broker = std::make_shared<TcpBroker>();
+            broker = std::make_shared<TcpBroker> ();
         }
         else
         {
-            broker = std::make_shared<TcpBroker>(name);
+            broker = std::make_shared<TcpBroker> (name);
         }
 #else
-        throw (HelicsException("tcp broker type is not available"));
+        throw (HelicsException ("tcp broker type is not available"));
 #endif
         break;
     default:

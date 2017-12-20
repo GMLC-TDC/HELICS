@@ -40,7 +40,6 @@ auto StartBrokerImp (const std::string &core_type_name, const std::string &initi
     return helics::BrokerFactory::create (core_type, initialization_string);
 }
 
-
 ValueFederateTestFixture::~ValueFederateTestFixture ()
 {
     if (vFed1)
@@ -200,14 +199,14 @@ std::shared_ptr<helics::Broker>
 FederateTestFixture::AddBroker (const std::string &core_type_name, const std::string &initialization_string)
 {
     std::shared_ptr<helics::Broker> broker;
-    if (extraBrokerArgs.empty())
+    if (extraBrokerArgs.empty ())
     {
-        broker = StartBrokerImp(core_type_name, initialization_string);
+        broker = StartBrokerImp (core_type_name, initialization_string);
     }
     else
     {
-        broker = StartBrokerImp(core_type_name, initialization_string +" "+extraBrokerArgs);
+        broker = StartBrokerImp (core_type_name, initialization_string + " " + extraBrokerArgs);
     }
-    brokers.push_back(broker);
+    brokers.push_back (broker);
     return broker;
 }

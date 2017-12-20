@@ -28,7 +28,6 @@ BOOST_AUTO_TEST_SUITE (UDPCore_tests)
 using boost::asio::ip::udp;
 using helics::Core;
 
-
 #define UDP_BROKER_PORT 23901
 #define UDP_SECONDARY_PORT 23905
 BOOST_AUTO_TEST_CASE (udpComms_broker_test)
@@ -120,7 +119,6 @@ BOOST_AUTO_TEST_CASE (udpComms_rx_test)
     comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setPortNumber (23903);
     comm.setName ("tests");
-
 
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);

@@ -37,16 +37,16 @@ enum log_level : int
 
 #ifndef LOGGING_DISABLED
 #define LOG_NORMAL(id, ident, message)                                                                            \
-    if (maxLogLevel >= log_level::normal)                                                                       \
+    if (maxLogLevel >= log_level::normal)                                                                         \
     {                                                                                                             \
-        sendToLogger (id, log_level::normal, ident, message);                                                   \
+        sendToLogger (id, log_level::normal, ident, message);                                                     \
     }
 
 #ifndef DEBUG_LOGGING_DISABLED
 #define LOG_DEBUG(id, ident, message)                                                                             \
-    if (maxLogLevel >= log_level::debug)                                                                        \
+    if (maxLogLevel >= log_level::debug)                                                                          \
     {                                                                                                             \
-        sendToLogger (id, log_level::debug, ident, message);                                                    \
+        sendToLogger (id, log_level::debug, ident, message);                                                      \
     }
 #else
 #define LOG_DEBUG(id, ident, message)
@@ -54,9 +54,9 @@ enum log_level : int
 
 #ifndef TRACE_LOGGING_DISABLED
 #define LOG_TRACE(id, ident, message)                                                                             \
-    if (maxLogLevel >= log_level::trace)                                                                        \
+    if (maxLogLevel >= log_level::trace)                                                                          \
     {                                                                                                             \
-        sendToLogger (id, log_level::debug, ident, message);                                                    \
+        sendToLogger (id, log_level::debug, ident, message);                                                      \
     }
 #else
 #define LOG_TRACE(id, ident, message)

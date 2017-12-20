@@ -32,7 +32,6 @@ namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 #endif
 
-
 // const std::string core_types[] = {"udp" };
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_single), core_type)

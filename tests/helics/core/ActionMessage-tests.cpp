@@ -345,42 +345,42 @@ BOOST_AUTO_TEST_CASE (check_conversions)
 }
 
 // check some error handling in the toByteArray function
-BOOST_AUTO_TEST_CASE(check_packetization)
+BOOST_AUTO_TEST_CASE (check_packetization)
 {
-    helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
+    helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
     cmd.source_id = 1;
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    SET_ACTION_FLAG(cmd, iterationRequested);
-    SET_ACTION_FLAG(cmd, pub_required);
-    SET_ACTION_FLAG(cmd, error_flag);
+    SET_ACTION_FLAG (cmd, iterationRequested);
+    SET_ACTION_FLAG (cmd, pub_required);
+    SET_ACTION_FLAG (cmd, error_flag);
     cmd.actionTime = 45.7;
     cmd.payload = "hello world";
 
     cmd.Te = 0.89;
     cmd.Tdemin = 5.55;
-    cmd.info().source = "source as a very long string test .........";  // type aliased to source
-    cmd.info().target = "target";  // units aliased to target
-    cmd.info().orig_source = "origsrc";
+    cmd.info ().source = "source as a very long string test .........";  // type aliased to source
+    cmd.info ().target = "target";  // units aliased to target
+    cmd.info ().orig_source = "origsrc";
 
-    auto cmdString = cmd.packetize();
+    auto cmdString = cmd.packetize ();
 
     helics::ActionMessage cmd2;
-    auto res=cmd2.depacketize(cmdString.data(), cmdString.size());
-    BOOST_CHECK(cmd.action() == cmd2.action());
-    BOOST_CHECK_EQUAL(cmd.actionTime, cmd2.actionTime);
-    BOOST_CHECK_EQUAL(cmd.source_id, cmd2.source_id);
-    BOOST_CHECK_EQUAL(cmd.dest_id, cmd2.dest_id);
-    BOOST_CHECK_EQUAL(cmd.source_handle, cmd2.source_handle);
-    BOOST_CHECK_EQUAL(cmd.dest_handle, cmd2.dest_handle);
-    BOOST_CHECK_EQUAL(cmd.payload, cmd2.payload);
-    BOOST_CHECK_EQUAL(cmd.flags, cmd2.flags);
-    BOOST_CHECK_EQUAL(cmd.Te, cmd2.Te);
-    BOOST_CHECK_EQUAL(cmd.Tdemin, cmd2.Tdemin);
-    BOOST_CHECK_EQUAL(cmd.info().source, cmd2.info().source);
-    BOOST_CHECK_EQUAL(cmd.info().target, cmd2.info().target);
-    BOOST_CHECK_EQUAL(cmd.info().orig_source, cmd2.info().orig_source);
+    auto res = cmd2.depacketize (cmdString.data (), cmdString.size ());
+    BOOST_CHECK (cmd.action () == cmd2.action ());
+    BOOST_CHECK_EQUAL (cmd.actionTime, cmd2.actionTime);
+    BOOST_CHECK_EQUAL (cmd.source_id, cmd2.source_id);
+    BOOST_CHECK_EQUAL (cmd.dest_id, cmd2.dest_id);
+    BOOST_CHECK_EQUAL (cmd.source_handle, cmd2.source_handle);
+    BOOST_CHECK_EQUAL (cmd.dest_handle, cmd2.dest_handle);
+    BOOST_CHECK_EQUAL (cmd.payload, cmd2.payload);
+    BOOST_CHECK_EQUAL (cmd.flags, cmd2.flags);
+    BOOST_CHECK_EQUAL (cmd.Te, cmd2.Te);
+    BOOST_CHECK_EQUAL (cmd.Tdemin, cmd2.Tdemin);
+    BOOST_CHECK_EQUAL (cmd.info ().source, cmd2.info ().source);
+    BOOST_CHECK_EQUAL (cmd.info ().target, cmd2.info ().target);
+    BOOST_CHECK_EQUAL (cmd.info ().orig_source, cmd2.info ().orig_source);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

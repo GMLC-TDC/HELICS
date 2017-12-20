@@ -19,12 +19,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <libguarded/guarded.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/uuid/uuid.hpp>  // uuid class
 #include <boost/uuid/uuid_generators.hpp>  // generators
 #include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
-#include <boost/format.hpp>
 
 static inline std::string gen_id ()
 {
@@ -195,7 +195,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
         identifier = vm["name"].as<std::string> ();
     }
 
-    if (vm.count("dumplog") > 0)
+    if (vm.count ("dumplog") > 0)
     {
         dumplog = true;
     }
@@ -285,23 +285,20 @@ void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &,
     }
 }
 
-void BrokerBase::setLogLevel(int32_t level)
-{
-    setLogLevels(level, level);
-}
+void BrokerBase::setLogLevel (int32_t level) { setLogLevels (level, level); }
 
 /** set the logging levels
 @param consoleLevel the logging level for the console display
 @param fileLevel the logging level for the log file
 */
-void BrokerBase::setLogLevels(int32_t consoleLevel, int32_t fileLevel)
+void BrokerBase::setLogLevels (int32_t consoleLevel, int32_t fileLevel)
 {
     consoleLogLevel = consoleLevel;
     fileLogLevel = fileLevel;
-    maxLogLevel = std::max(consoleLogLevel, fileLogLevel);
+    maxLogLevel = std::max (consoleLogLevel, fileLogLevel);
     if (loggingObj)
     {
-        loggingObj->changeLevels(consoleLogLevel, fileLogLevel);
+        loggingObj->changeLevels (consoleLogLevel, fileLogLevel);
     }
 }
 
@@ -374,20 +371,24 @@ void BrokerBase::queueProcessingLoop ()
     ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
     ticktimer.async_wait (timerCallback);
     int messagesSinceLastTick = 0;
-    auto logDump = [&, this]() {if (dumplog)
-    {
-        for (auto &act : dumpMessages)
+    auto logDump = [&, this]() {
+        if (dumplog)
         {
-            sendToLogger(0, -10, identifier,
-                (boost::format("|| dl cmd:%s from %d to %d") % prettyPrintString(act) % act.source_id % act.dest_id).str());
+            for (auto &act : dumpMessages)
+            {
+                sendToLogger (0, -10, identifier,
+                              (boost::format ("|| dl cmd:%s from %d to %d") % prettyPrintString (act) %
+                               act.source_id % act.dest_id)
+                                .str ());
+            }
         }
-    }};
+    };
     while (true)
     {
         auto command = _queue.pop ();
         if (dumplog)
         {
-            dumpMessages.push_back(command);
+            dumpMessages.push_back (command);
         }
         switch (command.action ())
         {
@@ -415,7 +416,7 @@ void BrokerBase::queueProcessingLoop ()
             AsioServiceManager::haltServiceLoop ();
             mainLoopIsRunning.store (false);
             active->store (false);
-            logDump();
+            logDump ();
             return;  // immediate return
         case CMD_STOP:
             ticktimer.cancel ();
@@ -425,7 +426,7 @@ void BrokerBase::queueProcessingLoop ()
                 processCommand (std::move (command));
                 mainLoopIsRunning.store (false);
                 active->store (false);
-                logDump();
+                logDump ();
                 return processDisconnect ();
             }
 

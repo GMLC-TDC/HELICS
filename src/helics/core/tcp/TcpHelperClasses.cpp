@@ -17,37 +17,51 @@ using boost::asio::ip::tcp;
 
 void tcp_rx_connection::start ()
 {
-    socket_.async_receive (boost::asio::buffer (data.data () + residBufferSize, data.size () - residBufferSize),
-                           [connection = shared_from_this ()](const boost::system::error_code &error,
-                                                              std::size_t bytes_transferred) {
-                               connection->handle_read (error, bytes_transferred);
-                           });
+    bool exp = false;
+    if (receiving.compare_exchange_strong (exp, true))
+    {
+        socket_.async_receive (boost::asio::buffer (data.data () + residBufferSize,
+                                                    data.size () - residBufferSize),
+                               [connection = shared_from_this ()](const boost::system::error_code &error,
+                                                                  size_t bytes_transferred) {
+                                   connection->handle_read (error, bytes_transferred);
+                               });
+    }
 }
 
 void tcp_rx_connection::handle_read (const boost::system::error_code &error, size_t bytes_transferred)
 {
     if (!error)
     {
-        auto used = dataCall (shared_from_this (), data.data (), bytes_transferred+residBufferSize);
-        if (used < (bytes_transferred+residBufferSize))
+        auto used = dataCall (shared_from_this (), data.data (), bytes_transferred + residBufferSize);
+        if (used < (bytes_transferred + residBufferSize))
         {
-            std::copy(data.data() + used, data.data() + bytes_transferred+residBufferSize, data.data());
-            residBufferSize = bytes_transferred+residBufferSize - used;
+            if (used > 0)
+            {
+                std::copy (data.data () + used, data.data () + bytes_transferred + residBufferSize, data.data ());
+            }
+            residBufferSize = bytes_transferred + residBufferSize - used;
         }
         else
         {
             residBufferSize = 0;
+            data.assign (data.size (), 0);
         }
+        receiving = false;
         start ();
     }
     else
     {
         if (bytes_transferred > 0)
         {
-            auto used = dataCall(shared_from_this(), data.data(), bytes_transferred + residBufferSize);
+            auto used = dataCall (shared_from_this (), data.data (), bytes_transferred + residBufferSize);
             if (used < (bytes_transferred + residBufferSize))
             {
-                std::copy(data.data() + used, data.data() + bytes_transferred + residBufferSize, data.data());
+                if (used > 0)
+                {
+                    std::copy (data.data () + used, data.data () + bytes_transferred + residBufferSize,
+                               data.data ());
+                }
                 residBufferSize = bytes_transferred + residBufferSize - used;
             }
             else
@@ -55,9 +69,10 @@ void tcp_rx_connection::handle_read (const boost::system::error_code &error, siz
                 residBufferSize = 0;
             }
         }
+        receiving = false;
         if (errorCall)
         {
-            if (errorCall (shared_from_this(), error))
+            if (errorCall (shared_from_this (), error))
             {
                 start ();
             }
@@ -72,17 +87,16 @@ void tcp_rx_connection::handle_read (const boost::system::error_code &error, siz
     }
 }
 
-
-void tcp_rx_connection::send(const void *buffer, size_t dataLength)
+void tcp_rx_connection::send (const void *buffer, size_t dataLength)
 {
-    auto sz = socket_.send(boost::asio::buffer(buffer, dataLength));
-    assert(sz == dataLength);
+    auto sz = socket_.send (boost::asio::buffer (buffer, dataLength));
+    assert (sz == dataLength);
 }
 
-void tcp_rx_connection::send(const std::string &dataString)
+void tcp_rx_connection::send (const std::string &dataString)
 {
-    auto sz = socket_.send(boost::asio::buffer(dataString));
-    assert(sz == dataString.size());
+    auto sz = socket_.send (boost::asio::buffer (dataString));
+    assert (sz == dataString.size ());
 }
 
 void tcp_rx_connection::close ()

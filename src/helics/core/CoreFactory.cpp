@@ -34,7 +34,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-
 std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 {
     std::shared_ptr<Core> core;
@@ -103,16 +102,16 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         break;
     case core_type::TCP:
 #ifndef DISABLE_TCP_CORE
-        if (name.empty())
+        if (name.empty ())
         {
-            core = std::make_shared<TcpCore>();
+            core = std::make_shared<TcpCore> ();
         }
         else
         {
-            core = std::make_shared<TcpCore>(name);
+            core = std::make_shared<TcpCore> (name);
         }
 #else
-        throw (HelicsException("TCP core is not available"));
+        throw (HelicsException ("TCP core is not available"));
 #endif
         break;
     default:
@@ -205,7 +204,6 @@ FindOrCreate (core_type type, const std::string &core_name, int argc, const char
 
     return core;
 }
-
 
 /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/

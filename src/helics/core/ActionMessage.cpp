@@ -201,26 +201,26 @@ constexpr auto LEADING_CHAR = '\xF3';
 constexpr auto TAIL_CHAR1 = '\xFA';
 constexpr auto TAIL_CHAR2 = '\xFC';
 
-std::string ActionMessage::packetize() const
+std::string ActionMessage::packetize () const
 {
     std::string data;
-    data.push_back(LEADING_CHAR);
-    data.resize(4);
-    boost::iostreams::back_insert_device<std::string> inserter(data);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s(inserter);
-    archiver oa(s);
+    data.push_back (LEADING_CHAR);
+    data.resize (4);
+    boost::iostreams::back_insert_device<std::string> inserter (data);
+    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
+    archiver oa (s);
 
-    save(oa);
+    save (oa);
 
     // don't forget to flush the stream to finish writing into the buffer
-    s.flush();
-    //now generate a length header
-    int32_t sz = static_cast<int>(data.size());
-    data[1] = static_cast<char>(((sz >> 16) & 0xFF));
-    data[2] = static_cast<char>(((sz >> 8) & 0xFF));
-    data[3] = static_cast<char>(sz & 0xFF);
-    data.push_back(TAIL_CHAR1);
-    data.push_back(TAIL_CHAR2);
+    s.flush ();
+    // now generate a length header
+    int32_t sz = static_cast<int> (data.size ());
+    data[1] = static_cast<char> (((sz >> 16) & 0xFF));
+    data[2] = static_cast<char> (((sz >> 8) & 0xFF));
+    data[3] = static_cast<char> (sz & 0xFF);
+    data.push_back (TAIL_CHAR1);
+    data.push_back (TAIL_CHAR2);
     return data;
 }
 
@@ -269,7 +269,7 @@ void ActionMessage::fromByteArray (const char *data, size_t buffer_size)
 {
     if (data[0] == LEADING_CHAR)
     {
-        auto res = depacketize(data, buffer_size);
+        auto res = depacketize (data, buffer_size);
         if (res > 0)
         {
             return;
@@ -288,7 +288,7 @@ void ActionMessage::fromByteArray (const char *data, size_t buffer_size)
     }
 }
 
-size_t ActionMessage::depacketize(const char *data, size_t buffer_size)
+size_t ActionMessage::depacketize (const char *data, size_t buffer_size)
 {
     if (data[0] != LEADING_CHAR)
     {
@@ -298,11 +298,11 @@ size_t ActionMessage::depacketize(const char *data, size_t buffer_size)
     {
         return 0;
     }
-    size_t message_size = static_cast<unsigned char>(data[1]);
+    size_t message_size = static_cast<unsigned char> (data[1]);
     message_size <<= 8;
-    message_size+= static_cast<unsigned char>(data[2]);
+    message_size += static_cast<unsigned char> (data[2]);
     message_size <<= 8;
-    message_size+= static_cast<unsigned char>(data[3]);
+    message_size += static_cast<unsigned char> (data[3]);
     if (buffer_size < message_size + 2)
     {
         return 0;
@@ -315,12 +315,12 @@ size_t ActionMessage::depacketize(const char *data, size_t buffer_size)
     {
         return 0;
     }
-    boost::iostreams::basic_array_source<char> device(data+4, message_size);
-    boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s(device);
-    retriever ia(s);
+    boost::iostreams::basic_array_source<char> device (data + 4, message_size);
+    boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
+    retriever ia (s);
     try
     {
-        load(ia);
+        load (ia);
         return message_size + 2;
     }
     catch (const cereal::Exception &ce)

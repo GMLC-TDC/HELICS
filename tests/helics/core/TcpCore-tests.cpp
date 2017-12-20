@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
 BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
 {
     std::atomic<int> ServerCounter{0};
-    std::atomic<int> CommCounter{ 0 };
+    std::atomic<int> CommCounter{0};
     std::atomic<size_t> len{0};
     helics::ActionMessage act;
     std::string host = "localhost";
@@ -216,17 +216,18 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     tcp_server server (srv->getBaseService (), TCP_BROKER_PORT);
     srv->runServiceLoop ();
     std::vector<char> data (1024);
-    server.setDataCall ([&data, &ServerCounter, &len](tcp_rx_connection::pointer, const char *data_rec, size_t data_Size) {
-        std::copy (data_rec, data_rec + data_Size, data.begin ());
-        len = data_Size;
-        ++ServerCounter;
-        return data_Size;
-    });
+    server.setDataCall (
+      [&data, &ServerCounter, &len](tcp_rx_connection::pointer, const char *data_rec, size_t data_Size) {
+          std::copy (data_rec, data_rec + data_Size, data.begin ());
+          len = data_Size;
+          ++ServerCounter;
+          return data_Size;
+      });
     server.start ();
 
-    comm.setCallback ([&CommCounter, &act,&actguard](helics::ActionMessage m) {
+    comm.setCallback ([&CommCounter, &act, &actguard](helics::ActionMessage m) {
         ++CommCounter;
-        std::lock_guard<std::mutex> lock(actguard);
+        std::lock_guard<std::mutex> lock (actguard);
         act = m;
     });
     comm.setBrokerPort (TCP_BROKER_PORT);
@@ -249,7 +250,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
 
     std::this_thread::sleep_for (std::chrono::milliseconds (200));
     BOOST_CHECK_EQUAL (CommCounter, 1);
-    std::lock_guard<std::mutex> lock(actguard);
+    std::lock_guard<std::mutex> lock (actguard);
     BOOST_CHECK (act.action () == helics::action_message_def::action_t::cmd_ack);
     txconn->close ();
     comm.disconnect ();
@@ -406,12 +407,13 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
     srv->runServiceLoop ();
     std::vector<char> data (1024);
     std::atomic<size_t> len{0};
-    server.setDataCall ([&data, &counter, &len](tcp_rx_connection::pointer, const char *data_rec, size_t data_Size) {
-        std::copy (data_rec, data_rec + data_Size, data.begin ());
-        len = data_Size;
-        ++counter;
-        return data_Size;
-    });
+    server.setDataCall (
+      [&data, &counter, &len](tcp_rx_connection::pointer, const char *data_rec, size_t data_Size) {
+          std::copy (data_rec, data_rec + data_Size, data.begin ());
+          len = data_Size;
+          ++counter;
+          return data_Size;
+      });
     server.start ();
 
     bool connected = core->connect ();

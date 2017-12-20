@@ -121,7 +121,7 @@ enum class action_t : int32_t
 }  // namespace action_message_def
 
 #define CMD_IGNORE action_message_def::action_t::cmd_ignore
-#define CMD_INVALID action_message_def::action_t::cmd_invalid;
+#define CMD_INVALID action_message_def::action_t::cmd_invalid
 #define CMD_TICK action_message_def::action_t::cmd_tick
 #define CMD_REG_BROKER action_message_def::action_t::cmd_reg_broker
 #define CMD_PRIORITY_DISCONNECT action_message_def::action_t::cmd_priority_disconnect

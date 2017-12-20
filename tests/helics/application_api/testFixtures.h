@@ -34,24 +34,22 @@ struct ValueFederateTestFixture
     std::string extraBrokerArgs;
 };
 
-
 #ifdef QUICK_TESTS_ONLY
 #ifndef DISABLE_TCP_CORE
-const std::string core_types[] = { "test", "ipc_2","test_2", "zmq", "udp" };
-const std::string core_types_single[] = { "test", "ipc", "zmq", "udp" };
+const std::string core_types[] = {"test", "ipc_2", "tcp", "test_2", "zmq", "udp"};
+const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp"};
 #else
-const std::string core_types[] = { "test", "ipc_2","test_2", "zmq", "udp" };
-const std::string core_types_single[] = { "test", "ipc", "zmq", "udp" };
+const std::string core_types[] = {"test", "ipc_2", "test_2", "zmq", "udp"};
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
 #endif
 #else
 #ifndef DISABLE_TCP_CORE
-//const std::string core_types[] = { "test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2" };
-//const std::string core_types_single[] = { "test", "ipc", "zmq", "udp" };
-const std::string core_types[] = { "tcp" };
-const std::string core_types_single[] = { "tcp" };
+const std::string core_types[] = {"test",   "ipc",   "zmq",   "udp",   "tcp",
+                                  "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
+const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp"};
 #else
-const std::string core_types[] = { "test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2" };
-const std::string core_types_single[] = { "test", "ipc", "zmq", "udp" };
+const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
 #endif
 #endif
 
@@ -92,10 +90,10 @@ struct FederateTestFixture
         std::string initString =
           std::string ("--broker=") + broker->getIdentifier () + " --broker_address=" + broker->getAddress ();
 
-        if (!extraCoreArgs.empty())
+        if (!extraCoreArgs.empty ())
         {
-            initString.push_back(' ');
-            initString.append(extraCoreArgs);
+            initString.push_back (' ');
+            initString.append (extraCoreArgs);
         }
 
         helics::FederateInfo fi ("", helics::coreTypeFromString (core_type_name));
@@ -112,7 +110,7 @@ struct FederateTestFixture
         default:
         {
             fi.coreInitString = initString + " --federates " + std::to_string (count);
-          
+
             for (int ii = 0; ii < count; ++ii)
             {
                 fi.name = name_prefix + std::to_string (ii);
@@ -153,11 +151,11 @@ struct FederateTestFixture
     std::vector<std::shared_ptr<helics::Federate>> federates;
     std::string extraCoreArgs;
     std::string extraBrokerArgs;
+
   private:
     bool hasIndexCode (const std::string &type_name);
     int getIndexCode (const std::string &type_name);
     auto AddBrokerImp (const std::string &core_type_name, const std::string &initialization_string);
-   
 };
 
 #endif

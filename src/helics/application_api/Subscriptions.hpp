@@ -59,8 +59,8 @@ class SubscriptionBase
         }
     }
     virtual ~SubscriptionBase () = default;
-    SubscriptionBase(SubscriptionBase &&base) = default;
-    SubscriptionBase &operator=(SubscriptionBase &&base) = default;
+    SubscriptionBase (SubscriptionBase &&base) = default;
+    SubscriptionBase &operator= (SubscriptionBase &&base) = default;
     /** get the time of the last update
     @return the time of the last update
     */
@@ -108,7 +108,7 @@ class Subscription : public SubscriptionBase
     defV lastValue;  //!< the last value updated
     double delta = -1.0;  //!< the minimum difference
   public:
-    Subscription() = default;
+    Subscription () = default;
     Subscription (ValueFederate *valueFed, const std::string &key, const std::string &units = "")
         : SubscriptionBase (valueFed, key, "def", units)
     {

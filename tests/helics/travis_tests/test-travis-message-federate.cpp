@@ -26,8 +26,6 @@ BOOST_FIXTURE_TEST_SUITE (message_federate_tests, FederateTestFixture)
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
-
 BOOST_TEST_DECORATOR (*utf::timeout (5))
 BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types), core_type)
 {
