@@ -24,6 +24,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "PrecHelper.h"
 
 
+
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
@@ -71,7 +72,13 @@ namespace helics
 
     player::player(const std::string &jsonString):fed(std::make_shared<CombinationFederate>(jsonString))
     {
-        //TODO:: load the subscriptions defined in the json string, the run a load file operation
+        auto pubCount = fed->subscriptionCount();
+        for (int ii = 0; ii < pubCount; ++ii)
+        {
+            publications.emplace_back(fed.get, ii);
+            pubids[publications.back().getName()] = static_cast<int>(publications.size() - 1);
+
+        }
     }
 
     player::~player()

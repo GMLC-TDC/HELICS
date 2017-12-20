@@ -112,7 +112,7 @@ namespace helics
     private:
         std::shared_ptr<CombinationFederate> fed; //!< the federate created for the player
         std::vector<ValueSetter> points;    //!< the points to generate into the federation
-        std::set<std::pair<std::string, std::string>> tags;    //!< sets of tags 
+        std::set<std::pair<std::string, std::string>> tags;    //!< sets of tags <key, type> 
         std::vector<Publication> publications;  //!< the actual publication objects
         std::vector<Endpoint> endpoints;    //!< the actual endpoint objects
         std::map<std::string, int> pubids;  //!< publication id map
