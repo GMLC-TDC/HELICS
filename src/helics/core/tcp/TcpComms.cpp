@@ -167,7 +167,14 @@ TcpComms::dataReceive (std::shared_ptr<tcp_rx_connection> connection, const char
         if (isPriorityCommand (m))
         {
             auto rep = generateReplyToIncomingMessage (m);
-            connection->send (rep.packetize ());
+            try
+            {
+                connection->send(rep.packetize());
+            }
+            catch(const boost::system::system_error &se)
+            {
+                
+           }
         }
         else if (isProtocolCommand (m))
         {
@@ -230,13 +237,7 @@ void TcpComms::queue_rx_function ()
     }
     auto ioserv = AsioServiceManager::getServicePointer ();
     tcp_server server (ioserv->getBaseService (), PortNumber, maxMessageSize_);
-    // lambda for the disconnection procedure
-    auto disconnectFunction = [this, &server, &ioserv]() {
-        disconnecting = true;
-        server.close ();
-        ioserv->haltServiceLoop ();
-        rx_status = connection_status::terminated;
-    };
+
     ioserv->runServiceLoop ();
     server.setDataCall ([this](tcp_rx_connection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
@@ -246,7 +247,8 @@ void TcpComms::queue_rx_function ()
     });
     server.start ();
     rx_status = connection_status::connected;
-    while (true)
+    bool loopRunning = true;
+    while (loopRunning)
     {
         auto message = rxMessageQueue.pop ();
         if (isProtocolCommand (message))
@@ -255,14 +257,16 @@ void TcpComms::queue_rx_function ()
             {
             case CLOSE_RECEIVER:
             case DISCONNECT:
-                disconnectFunction ();
-                return;
+                loopRunning = false;
+                break;
             }
         }
     }
 
-    disconnectFunction ();
-    return;
+    disconnecting = true;
+    server.close();
+    ioserv->haltServiceLoop();
+    rx_status = connection_status::terminated;
 }
 
 void TcpComms::txReceive (const char *data, size_t bytes_received, const std::string &errorMessage)

@@ -363,11 +363,12 @@ BOOST_AUTO_TEST_CASE (check_packetization)
     cmd.info ().source = "source as a very long string test .........";  // type aliased to source
     cmd.info ().target = "target";  // units aliased to target
     cmd.info ().orig_source = "origsrc";
-
+    auto cmdStringNormal = cmd.to_string();
     auto cmdString = cmd.packetize ();
-
+    BOOST_CHECK_GE(cmdStringNormal.size() + 6, cmdString.size());
     helics::ActionMessage cmd2;
     auto res = cmd2.depacketize (cmdString.data (), cmdString.size ());
+    BOOST_CHECK_EQUAL(res, cmdString.size());
     BOOST_CHECK (cmd.action () == cmd2.action ());
     BOOST_CHECK_EQUAL (cmd.actionTime, cmd2.actionTime);
     BOOST_CHECK_EQUAL (cmd.source_id, cmd2.source_id);
