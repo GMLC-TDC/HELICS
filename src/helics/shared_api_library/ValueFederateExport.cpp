@@ -129,7 +129,7 @@ helics_publication helicsRegisterPublication (helics_value_federate fed, const c
     try
     {
         pub = new helics::PublicationObject ();
-        pub->id = fedObj->registerPublication (key, type, (units == nullptr) ? nullStr : std::string(units));
+        pub->id = fedObj->registerPublication (key, (type==nullptr)?nullStr:std::string(type), (units == nullptr) ? nullStr : std::string(units));
         pub->rawOnly = true;
         pub->fedptr = std::move (fedObj);
         addPublication (fed, pub);
@@ -189,7 +189,7 @@ helics_publication helicsRegisterGlobalPublication (helics_value_federate fed, c
     try
     {
         pub = new helics::PublicationObject ();
-        pub->id = fedObj->registerGlobalPublication (key, type, (units == nullptr) ? nullStr : std::string(units));
+        pub->id = fedObj->registerGlobalPublication (key, (type == nullptr) ? nullStr : std::string(type), (units == nullptr) ? nullStr : std::string(units));
         pub->rawOnly = true;
         pub->fedptr = std::move (fedObj);
         addPublication (fed, pub);
