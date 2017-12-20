@@ -45,6 +45,8 @@ class Endpoint
     {
         id = (locality == GLOBAL) ? fed->registerGlobalEndpoint (name, type) : fed->registerEndpoint (name, type);
     }
+
+    Endpoint(MessageFederate *mFed, int endpointIndex);
     /** send a data block and length
     @param[in] dest string name of the destination
     @param[in] data pointer to data location

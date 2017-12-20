@@ -10,6 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "Filters.hpp"
+#include "FilterOperations.h"
 #include "MessageOperators.h"
 
 #include <iostream>
@@ -21,7 +22,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-static void addOperations (Filter *filt, defined_filter_types type)
+
+void addOperations (Filter *filt, defined_filter_types type)
 {
     switch (type)
     {

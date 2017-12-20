@@ -86,7 +86,7 @@ uint64_t MessageFederateManager::receiveCount (endpoint_id_t id) const
 }
 /**
 * Returns the number of pending receives for the specified destination endpoint.
-@details this function is not preferred in multithreaded contexts due to the required locking
+@details this function is not preferred in multi-threaded contexts due to the required locking
 prefer to just use getMessage until it returns an invalid Message.
 */
 uint64_t MessageFederateManager::receiveCount () const
@@ -273,6 +273,12 @@ std::string MessageFederateManager::getEndpointType (endpoint_id_t id) const
 {
     std::lock_guard<std::mutex> eLock (endpointLock);
     return (id.value () < local_endpoints.size ()) ? local_endpoints[id.value ()].type : nullStr;
+}
+
+int  MessageFederateManager::getEndpointCount() const
+{
+    std::lock_guard<std::mutex> eLock(endpointLock);
+    return static_cast<int>(local_endpoints.size());
 }
 
 void MessageFederateManager::registerCallback (std::function<void(endpoint_id_t, Time)> callback)

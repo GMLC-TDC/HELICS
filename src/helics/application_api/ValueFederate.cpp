@@ -317,13 +317,13 @@ void ValueFederate::registerSubscriptionNotificationCallback (
 
 
 /** get a count of the number publications registered*/
-int ValueFederate::publicationCount() const
+int ValueFederate::getPublicationCount() const
 {
-    return vfManager->publicationCount();
+    return vfManager->getPublicationCount();
 }
 /** get a count of the number subscriptions registered*/
-int ValueFederate::subscriptionCount() const
+int ValueFederate::getSubscriptionCount() const
 {
-    return vfManager->subscriptionCount();
+    return vfManager->getSubscriptionCount();
 }
 }  // namespace helics

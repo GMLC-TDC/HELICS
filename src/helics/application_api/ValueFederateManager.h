@@ -183,9 +183,9 @@ namespace helics
         void disconnect();
 
         /** get a count of the number publications registered*/
-        int publicationCount() const;
+        int getPublicationCount() const;
         /** get a count of the number subscriptions registered*/
-        int subscriptionCount() const;
+        int getSubscriptionCount() const;
 	private:
 		std::unordered_map<std::string, publication_id_t> publicationNames; //!< map of the publication names
 		std::unordered_map<std::string, subscription_id_t> subscriptionNames; //!< map of the subscription names

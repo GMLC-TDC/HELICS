@@ -22,6 +22,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/program_options.hpp>
 
 #include "PrecHelper.h"
+#include "json.hpp"
 
 
 
@@ -72,11 +73,22 @@ namespace helics
 
     player::player(const std::string &jsonString):fed(std::make_shared<CombinationFederate>(jsonString))
     {
-        auto pubCount = fed->subscriptionCount();
+        if (jsonString.size() < 200)
+        {
+            masterFileName = jsonString;
+        }
+        auto pubCount = fed->getSubscriptionCount();
         for (int ii = 0; ii < pubCount; ++ii)
         {
-            publications.emplace_back(fed.get, ii);
+            publications.emplace_back(fed.get(), ii);
             pubids[publications.back().getName()] = static_cast<int>(publications.size() - 1);
+
+        }
+        auto eptCount = fed->getEndpointCount();
+        for (int ii = 0; ii < eptCount; ++ii)
+        {
+            endpoints.emplace_back(fed.get(), ii);
+            eptids[endpoints.back().getName()] = static_cast<int>(endpoints.size() - 1);
 
         }
     }

@@ -109,6 +109,10 @@ namespace helics
         }
     private:
         int loadArguments(boost::program_options::variables_map &vm_map);
+        /** load from a jsonString 
+        @param either a json filename or a string containing json
+        */
+        void loadJsonFile(const std::string &jsonString);
     private:
         std::shared_ptr<CombinationFederate> fed; //!< the federate created for the player
         std::vector<ValueSetter> points;    //!< the points to generate into the federation
@@ -119,6 +123,7 @@ namespace helics
         std::map<std::string, int> eptids;  //!< endpoint id maps
         helics::helicsType_t defType = helics::helicsType_t::helicsString; //!< the default data type unless otherwise specified
         Time stopTime = Time::maxVal(); //!< the time the player should stop
+        std::string masterFileName; //!< the name of the master file used to do the construction
     };
 }
 

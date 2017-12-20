@@ -102,7 +102,7 @@ class MessageFederateManager
     void updateTime (Time newTime, Time oldTime);
     /** transition from Startup To the Initialize State*/
     void StartupToInitializeStateTransition ();
-    /** transition from initialize to executation State*/
+    /** transition from initialize to execution State*/
     void InitializeToExecuteStateTransition ();
 
     /** get the name of an endpoint from its id
@@ -128,7 +128,7 @@ class MessageFederateManager
     @param[in] callback the function to call
     */
     void registerCallback (endpoint_id_t id, std::function<void(endpoint_id_t, Time)> callback);
-    /** register a callback function to call when one of the specfied endpoint ids receives a message
+    /** register a callback function to call when one of the specified endpoint ids receives a message
     @param[in] ids  the set of ids to register the callback for
     @param[in] callback the function to call
     */
@@ -137,6 +137,8 @@ class MessageFederateManager
 
     /**disconnect from the coreObject*/
     void disconnect();
+    /**get the number of registered endpoints*/
+    int getEndpointCount() const;
   private:
     std::unordered_map<std::string, endpoint_id_t>
       endpointNames;  //!< container to translate names to endpoint id's

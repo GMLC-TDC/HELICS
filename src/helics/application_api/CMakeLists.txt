@@ -41,6 +41,7 @@ helicsPrimaryTypes.cpp
 Subscriptions.cpp
 Publications.cpp
 Filters.cpp
+Endpoints.cpp
 helicsTypes.cpp
 queryFunctions.cpp
 )

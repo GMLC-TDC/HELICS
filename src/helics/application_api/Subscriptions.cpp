@@ -16,8 +16,8 @@ namespace helics
 
     SubscriptionBase::SubscriptionBase(ValueFederate *valueFed, int subIndex) :fed(valueFed)
     {
-        auto cnt = fed->subscriptionCount();
-        if ((subIndex >= cnt)&&(cnt>=0))
+        auto cnt = fed->getSubscriptionCount();
+        if ((subIndex >= cnt)||(cnt<0))
         {
             throw(helics::InvalidParameterValue("no subscription with the specified index"));
         }

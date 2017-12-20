@@ -423,7 +423,6 @@ configure_file (
   install(DIRECTORY ThirdParty/cereal DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(DIRECTORY ThirdParty/helics_includes DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(DIRECTORY ThirdParty/libguarded DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 
 

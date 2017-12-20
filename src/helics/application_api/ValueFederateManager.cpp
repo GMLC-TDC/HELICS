@@ -320,13 +320,13 @@ std::string ValueFederateManager::getPublicationType (publication_id_t pub_id) c
 
 
 /** get a count of the number publications registered*/
-int ValueFederateManager::publicationCount() const
+int ValueFederateManager::getPublicationCount() const
 {
     std::lock_guard<std::mutex> publock(publication_mutex);
     return static_cast<int>(pubs.size());
 }
 /** get a count of the number subscriptions registered*/
-int ValueFederateManager::subscriptionCount() const
+int ValueFederateManager::getSubscriptionCount() const
 {
     std::lock_guard<std::mutex> sublock(subscription_mutex);
     return  static_cast<int>(subs.size());
