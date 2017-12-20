@@ -106,9 +106,9 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
 
 	vFed = helicsCreateValueFederate(fi);
 
-	pubid = helicsRegisterPublication(vFed, "pub1", "", "");
+	pubid = helicsRegisterPublication(vFed, "pub1", nullptr, nullptr);
 
-	pubid2 = helicsRegisterGlobalPublication(vFed, "pub2", "", "");
+	pubid2 = helicsRegisterGlobalPublication(vFed, "pub2", nullptr, nullptr);
 
 	pubid3 = helicsRegisterPublication(vFed, "pub3", "double", "V");
 
