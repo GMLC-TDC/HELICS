@@ -342,7 +342,7 @@ BOOST_AUTO_TEST_CASE (check_conversions)
     // this should return -1
     res = cmd.toByteArray (testBuffer2.get (), cmdStr.size () >> 2);
     BOOST_CHECK_EQUAL (res, -1);
-}
+} 
 
 // check some error handling in the toByteArray function
 BOOST_AUTO_TEST_CASE (check_packetization)

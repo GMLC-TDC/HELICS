@@ -66,10 +66,11 @@ private:
 
     void handle_read(const boost::system::error_code &error,
         size_t bytes_transferred);
-
+    std::atomic<size_t> residBufferSize{ 0 };
     boost::asio::ip::tcp::socket socket_;
     std::vector<char> data;
-    std::atomic<size_t> residBufferSize{ 0 };
+   
+    std::atomic<bool> disconnected{ false };
     std::function<size_t (tcp_rx_connection::pointer, const char *, size_t)> dataCall;
     std::function<bool(tcp_rx_connection::pointer, const boost::system::error_code&)> errorCall;
     std::atomic<bool> receiving{ false };

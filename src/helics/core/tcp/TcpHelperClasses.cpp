@@ -31,6 +31,10 @@ void tcp_rx_connection::start ()
 
 void tcp_rx_connection::handle_read (const boost::system::error_code &error, size_t bytes_transferred)
 {
+    if (disconnected)
+    {
+        return;
+    }
     if (!error)
     {
         auto used = dataCall (shared_from_this (), data.data (), bytes_transferred + residBufferSize);
@@ -102,6 +106,7 @@ void tcp_rx_connection::send (const std::string &dataString)
 void tcp_rx_connection::close ()
 {
     stop ();
+    disconnected = true;
     boost::system::error_code ec;
     socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_send, ec);
     if (ec)
@@ -233,6 +238,10 @@ void tcp_server::stop ()
 
 void tcp_server::close ()
 {
-    acceptor_.cancel ();
+    acceptor_.cancel();
+    for (auto &conn : connections)
+    {
+        conn->close();
+    }
     connections.clear ();
 }

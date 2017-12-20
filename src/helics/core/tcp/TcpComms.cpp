@@ -175,7 +175,10 @@ TcpComms::dataReceive (std::shared_ptr<tcp_rx_connection> connection, const char
         }
         else
         {
-            ActionCallback (std::move (m));
+            if (ActionCallback)
+            {
+                ActionCallback(std::move(m));
+            }
         }
         used_total += used;
     }
@@ -453,15 +456,26 @@ void TcpComms::queue_tx_function ()
         {
             if (hasBroker)
             {
-                brokerConnection->send (cmd.packetize ());
-                if (isPriorityCommand (cmd))
+                try
                 {
-                    brokerConnection->async_receive ([this](std::shared_ptr<tcp_connection> connection,
-                                                            const char *data, size_t bytes_received,
-                                                            const boost::system::error_code &error) {
-                        txPriorityReceive (connection, data, bytes_received, error);
-                    });
+                    brokerConnection->send(cmd.packetize());
+                    if (isPriorityCommand(cmd))
+                    {
+                        brokerConnection->async_receive([this](std::shared_ptr<tcp_connection> connection,
+                            const char *data, size_t bytes_received,
+                            const boost::system::error_code &error) {
+                            txPriorityReceive(connection, data, bytes_received, error);
+                        });
+                    }
                 }
+                catch (const boost::system::system_error &se)
+                {
+                    if (se.code() != boost::asio::error::connection_aborted)
+                    {
+                        std::cerr << se.what() << '\n';
+                   }
+                }
+                
                 // if (error)
                 {
                     //     std::cerr << "transmit failure to broker " << error.message() << '\n';
@@ -478,28 +492,48 @@ void TcpComms::queue_tx_function ()
             auto rt_find = routes.find (route_id);
             if (rt_find != routes.end ())
             {
-                rt_find->second->send (cmd.packetize ());
-                if (isPriorityCommand (cmd))
+                try
                 {
-                    rt_find->second->async_receive ([this](std::shared_ptr<tcp_connection> connection,
-                                                           const char *data, size_t bytes_received,
-                                                           const boost::system::error_code &error) {
-                        txPriorityReceive (connection, data, bytes_received, error);
-                    });
+                    rt_find->second->send(cmd.packetize());
+                    if (isPriorityCommand(cmd))
+                    {
+                        rt_find->second->async_receive([this](std::shared_ptr<tcp_connection> connection,
+                            const char *data, size_t bytes_received,
+                            const boost::system::error_code &error) {
+                            txPriorityReceive(connection, data, bytes_received, error);
+                        });
+                    }
+                }
+                catch (const boost::system::system_error &se)
+                {
+                    if (se.code() != boost::asio::error::connection_aborted)
+                    {
+                        std::cerr << se.what() << '\n';
+                    }
                 }
             }
             else
             {
                 if (hasBroker)
                 {
-                    brokerConnection->send (cmd.packetize ());
-                    if (isPriorityCommand (cmd))
+                    try
                     {
-                        brokerConnection->async_receive ([this](std::shared_ptr<tcp_connection> connection,
-                                                                const char *data, size_t bytes_received,
-                                                                const boost::system::error_code &error) {
-                            txPriorityReceive (connection, data, bytes_received, error);
-                        });
+                        brokerConnection->send(cmd.packetize());
+                        if (isPriorityCommand(cmd))
+                        {
+                            brokerConnection->async_receive([this](std::shared_ptr<tcp_connection> connection,
+                                const char *data, size_t bytes_received,
+                                const boost::system::error_code &error) {
+                                txPriorityReceive(connection, data, bytes_received, error);
+                            });
+                        }
+                    }
+                    catch (const  boost::system::system_error &se)
+                    {
+                        if (se.code() != boost::asio::error::connection_aborted)
+                        {
+                            std::cerr << se.what() << '\n';
+                        }
                     }
                 }
                 else
