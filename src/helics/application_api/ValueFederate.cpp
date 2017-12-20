@@ -73,7 +73,8 @@ ValueFederate::registerPublication (const std::string &name, const std::string &
     {
         throw (InvalidFunctionCall ("cannot call register publication after entering initialization mode"));
     }
-    return vfManager->registerPublication (getName () + separator_ + name, type, units);
+    return vfManager->registerPublication(getName() + separator_ + name, type, units);
+    
 }
 
 publication_id_t ValueFederate::registerGlobalPublication (const std::string &name,
