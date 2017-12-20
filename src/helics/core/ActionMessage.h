@@ -89,7 +89,7 @@ class ActionMessage
     ActionMessage (action_message_def::action_t startingAction);
     /** construct from action, source and destination id's
     */
-    ActionMessage(action_message_def::action_t action, int32_t sourceId, int32_t destId);
+    ActionMessage(action_message_def::action_t startingAction, int32_t sourceId, int32_t destId);
     /** move constructor*/
     ActionMessage (ActionMessage &&act) noexcept;
     /** build an action message from a message*/
@@ -176,12 +176,19 @@ class ActionMessage
     void to_string (std::string &data) const;
     /** convert to a byte string*/
 	std::string to_string() const;
+    /** packettize the message with a simple header and tail sequence
+    */
+    std::string packetize() const;
     /** covert to a byte vector using a reference*/
 	void to_vector(std::vector<char> &data) const;
     /** convert a command to a byte vector*/
 	std::vector<char> to_vector() const;
     /** generate a command from a raw data stream*/
     void fromByteArray (const char *data, size_t buffer_size);
+    /** load a command from a packetized stream 
+    @return the number of bytes used
+    */
+    size_t depacketize(const char *data, size_t buffer_size);
     /** read a command from a string*/
     void from_string (const std::string &data);
     /** read a command from a char vector*/

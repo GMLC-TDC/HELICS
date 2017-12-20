@@ -29,13 +29,6 @@ namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 #endif
 
-#ifdef QUICK_TESTS_ONLY
-const std::string core_types[] = {"test", "test_2", "ipc_2", "zmq", "udp"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
-#else
-const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2", "udp", "udp_2"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
-#endif
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)
 {
@@ -197,6 +190,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
 
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
+
     mFed1->setTimeDelta (1.0);
     mFed2->setTimeDelta (1.0);
 
@@ -312,6 +306,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
 
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
+    // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setTimeDelta (1.0);
     mFed2->setTimeDelta (1.0);
 
@@ -497,11 +492,6 @@ BOOST_TEST_DECORATOR (*utf::timeout (20))
 #endif
 BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 {
-    if (core_type.compare (0, 4, "test") != 0)
-    {
-        // TODO:: modify the pingpongFed so it works with the other core types
-        return;
-    }
     AddBroker (core_type, "3");
 
     auto ctype = helics::coreTypeFromString (core_type);

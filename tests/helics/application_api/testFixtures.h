@@ -30,22 +30,28 @@ struct ValueFederateTestFixture
     std::vector<std::shared_ptr<helics::Broker>> broker;
     std::shared_ptr<helics::ValueFederate> vFed1;
     std::shared_ptr<helics::ValueFederate> vFed2;
+    std::string extraCoreArgs;
+    std::string extraBrokerArgs;
 };
 
-struct MessageFederateTestFixture
-{
-    MessageFederateTestFixture () = default;
-    ~MessageFederateTestFixture ();
-
-    void Setup1FederateTest (const std::string &core_type_name);
-    void Setup2FederateTest (const std::string &core_type_name);
-
-    void StartBroker (const std::string &core_type_name, const std::string &initialization_string);
-
-    std::vector<std::shared_ptr<helics::Broker>> broker;
-    std::shared_ptr<helics::MessageFederate> mFed1;
-    std::shared_ptr<helics::MessageFederate> mFed2;
-};
+#ifdef QUICK_TESTS_ONLY
+#ifndef DISABLE_TCP_CORE
+const std::string core_types[] = {"test", "ipc_2", "tcp", "test_2", "zmq", "udp"};
+const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp"};
+#else
+const std::string core_types[] = {"test", "ipc_2", "test_2", "zmq", "udp"};
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
+#endif
+#else
+#ifndef DISABLE_TCP_CORE
+const std::string core_types[] = {"test",   "ipc",   "zmq",   "udp",   "tcp",
+                                  "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
+const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp"};
+#else
+const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
+#endif
+#endif
 
 struct FederateTestFixture
 {
@@ -83,6 +89,12 @@ struct FederateTestFixture
 
         std::string initString =
           std::string ("--broker=") + broker->getIdentifier () + " --broker_address=" + broker->getAddress ();
+
+        if (!extraCoreArgs.empty ())
+        {
+            initString.push_back (' ');
+            initString.append (extraCoreArgs);
+        }
 
         helics::FederateInfo fi ("", helics::coreTypeFromString (core_type_name));
         fi.timeDelta = time_delta;
@@ -137,6 +149,8 @@ struct FederateTestFixture
 
     std::vector<std::shared_ptr<helics::Broker>> brokers;
     std::vector<std::shared_ptr<helics::Federate>> federates;
+    std::string extraCoreArgs;
+    std::string extraBrokerArgs;
 
   private:
     bool hasIndexCode (const std::string &type_name);

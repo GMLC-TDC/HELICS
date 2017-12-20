@@ -18,6 +18,7 @@ set(SRC_FILES
 	ActionMessage.cpp
 	CoreBroker.cpp
 	TestBroker.cpp
+	core-types.cpp
 	core-data.cpp
 	TimeCoordinator.cpp
 	TimeDependencies.cpp
@@ -56,6 +57,7 @@ set (TCP_SOURCE_FILES
 	tcp/TcpCore.cpp
 	tcp/TcpBroker.cpp
 	tcp/TcpComms.cpp
+	tcp/TcpHelperClasses.cpp
 )
 
 set (PUBLIC_INCLUDE_FILES
@@ -129,10 +131,17 @@ set(TCP_HEADER_FILES
 	tcp/TcpCore.h
 	tcp/TcpBroker.h
 	tcp/TcpComms.h
+	tcp/TcpHelperClasses.h
 	)
 
-	list(APPEND SRC_FILES ${UDP_SOURCE_FILES} ${IPC_SOURCE_FILES} )
-	list(APPEND INCLUDE_FILES ${UDP_HEADER_FILES} ${IPC_HEADER_FILES} )
+	list(APPEND SRC_FILES ${UDP_SOURCE_FILES} ${IPC_SOURCE_FILES})
+	list(APPEND INCLUDE_FILES ${UDP_HEADER_FILES} ${IPC_HEADER_FILES})
+
+	if (NOT DISABLE_TCP_CORE)
+		list(APPEND SRC_FILES ${TCP_SOURCE_FILES})
+		list(APPEND INCLUDE_FILES ${TCP_HEADER_FILES} )
+	endif()
+	
 
 if (${ZeroMQ_FOUND})
    list(APPEND SRC_FILES ${ZMQ_SOURCE_FILES})
@@ -153,7 +162,10 @@ endif (${MPI_C_FOUND})
 source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
 source_group("udp" FILES ${UDP_SOURCE_FILES} ${UDP_HEADER_FILES})
 source_group("ipc" FILES ${IPC_SOURCE_FILES} ${IPC_HEADER_FILES})
-#source_group("tcp" FILEs ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
+
+if (NOT DISABLE_TCP_CORE)
+   source_group("tcp" FILES ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
+endif()
 
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 
@@ -164,8 +176,6 @@ if (BUILD_BROKER)
 add_executable(helics_broker helics-broker.cc)
    target_link_libraries(helics_broker helics-static)
    
-
-
    set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "build folder location of the broker")
    #message(STATUS "bloc ${CMAKE_CURRENT_BINARY_DIR}")
    INSTALL(TARGETS helics_broker DESTINATION bin)

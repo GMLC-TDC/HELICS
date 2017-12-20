@@ -700,8 +700,7 @@ void CommonCore::setLoggingLevel (federate_id_t federateID, int loggingLevel)
     if (federateID == 0)
     {
         std::lock_guard<std::mutex> lock (_mutex);
-        consoleLogLevel = loggingLevel;
-        fileLogLevel = loggingLevel;
+        setLogLevel (loggingLevel);
         return;
     }
 
@@ -2593,6 +2592,49 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
         if (fed != nullptr)
         {
             fed->addAction (cmd);
+        }
+    }
+    else
+    {
+        auto route = getRoute (cmd.dest_id);
+        transmit (route, cmd);
+    }
+}
+
+void CommonCore::routeMessage (ActionMessage &&cmd, federate_id_t dest)
+{
+    cmd.dest_id = dest;
+    if ((dest == 0) || (dest == higher_broker_id))
+    {
+        transmit (0, cmd);
+    }
+    else if (isLocal (dest))
+    {
+        auto fed = getFederate (dest);
+        if (fed != nullptr)
+        {
+            fed->addAction (std::move (cmd));
+        }
+    }
+    else
+    {
+        auto route = getRoute (dest);
+        transmit (route, cmd);
+    }
+}
+
+void CommonCore::routeMessage (ActionMessage &&cmd)
+{
+    if ((cmd.dest_id == 0) || (cmd.dest_id == higher_broker_id))
+    {
+        transmit (0, cmd);
+    }
+    else if (isLocal (cmd.dest_id))
+    {
+        auto fed = getFederate (cmd.dest_id);
+        if (fed != nullptr)
+        {
+            fed->addAction (std::move (cmd));
         }
     }
     else

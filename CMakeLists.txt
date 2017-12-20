@@ -225,7 +225,14 @@ target_link_libraries(helics-static rt)
 ENDIF()
 
 IF(MINGW)
-	target_link_libraries(helics-static ws2_32)
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		set(DISABLE_TCP_CORE TRUE)
+		message(status, "disabling TCP core |${DISABLE_TCP_CORE}|")
+		target_link_libraries(helics-static ws2_32)
+	else()
+		target_link_libraries(helics-static wsock32 ws2_32)
+	endif()
+	
 ENDIF(MINGW)
 
 if (${ZeroMQ_FOUND})
@@ -395,7 +402,7 @@ IF (UNIX AND NOT APPLE)
 ENDIF()
 
 IF(MINGW)
-	list(APPEND helics_dependencies ws2_32)
+	list(APPEND helics_dependencies wsock32 ws2_32)
 ENDIF(MINGW)
 
 if (ZeroMQ_FOUND)
