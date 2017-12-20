@@ -297,6 +297,84 @@ int helicsCoreIsConnected (helics_core core)
     return 0;
 }
 
+
+helicsStatus helicsBrokerGetIdentifier(helics_broker broker, char *identifier, int maxlen)
+{
+    if (broker == nullptr)
+    {
+        return helicsError;
+    }
+    auto brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
+    if (brokerObj->brokerptr)
+    {
+        auto &ident = brokerObj->brokerptr->getIdentifier();
+        if (static_cast<int> (ident.size()) > maxlen)
+        {
+            strncpy(identifier, ident.c_str(), maxlen);
+            identifier[maxlen - 1] = 0;
+        }
+        else
+        {
+            strcpy(identifier, ident.c_str());
+        }
+        return helicsOK;
+    }
+    return helicsError;
+}
+
+
+helicsStatus helicsCoreGetIdentifier(helics_core core, char *identifier, int maxlen)
+{
+    if (core == nullptr)
+    {
+        return helicsError;
+    }
+    auto coreObj = reinterpret_cast<helics::CoreObject *> (core);
+    if (coreObj->coreptr)
+    {
+        auto &ident = coreObj->coreptr->getIdentifier();
+        if (static_cast<int> (ident.size()) > maxlen)
+        {
+            strncpy(identifier, ident.c_str(), maxlen);
+            identifier[maxlen - 1] = 0;
+        }
+        else
+        {
+            strcpy(identifier, ident.c_str());
+        }
+        return helicsOK;
+    }
+    return helicsError;
+}
+
+
+helicsStatus helicsBrokerGetAddress(helics_broker broker, char *address, int maxlen)
+{
+    if (broker == nullptr)
+    {
+        return helicsError;
+    }
+    auto brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
+    if (brokerObj->brokerptr)
+    {
+        auto ident = brokerObj->brokerptr->getAddress();
+        if (static_cast<int> (ident.size()) > maxlen)
+        {
+            strncpy(address, ident.c_str(), maxlen);
+            address[maxlen - 1] = 0;
+        }
+        else
+        {
+            strcpy(address, ident.c_str());
+        }
+        return helicsOK;
+    }
+    return helicsError;
+}
+
+
+
+
 void helicsFreeCore (helics_core core)
 {
     auto *coreObj = reinterpret_cast<helics::CoreObject *> (core);

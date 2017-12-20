@@ -86,6 +86,30 @@ a connected core implies is attached to federate or federates could be attached 
 return 0 if not connected , something else if it is connected*/
 HELICS_Export int helicsCoreIsConnected (helics_core core);
 
+/** get an identifier for the broker
+@param broker the broker to query
+@param[out] identifier storage space to place the identifier string
+@param maxlen the maximum space available in identifier
+@return a helicsStatus enumeration indicating any error condition
+*/
+HELICS_Export helicsStatus helicsBrokerGetIdentifier(helics_broker broker, char *identifier, int maxlen);
+
+/** get an identifier for the core
+@param core the core to query
+@param[out] identifier storage space to place the identifier string
+@param maxlen the maximum space available in identifier
+@return a helicsStatus enumeration indicating any error condition
+*/
+HELICS_Export helicsStatus helicsCoreGetIdentifier(helics_core core, char *identifier, int maxlen);
+
+/** get the network address associated with a broker
+@param broker the broker to query
+@param[out] identifier storage space to place the identifier string
+@param maxlen the maximum space available in identifier
+@return a helicsStatus enumeration indicating any error condition
+*/
+HELICS_Export helicsStatus helicsBrokerGetAddress(helics_broker broker, char *address, int maxlen);
+
 /** release the memory associated with a core*/
 HELICS_Export void helicsFreeCore (helics_core core);
 /** release the memory associated with a broker*/
