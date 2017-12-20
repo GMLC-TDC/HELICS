@@ -16,12 +16,12 @@ if (BUILD_HELICS_TESTS)
 enable_testing ()
 endif(BUILD_HELICS_TESTS)
 
-OPTION(BUILD_HELICS_EXAMPLES "Enable the test Executables to be built" OFF)
+OPTION(BUILD_HELICS_EXAMPLES "Enable the test Executables to be built" ON)
 
 OPTION(BUILD_PYTHON "Build Python extension" OFF)
 OPTION(BUILD_MATLAB "Build MATLAB extension" OFF)
 
-OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" OFF)
+OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" ON)
 IF(NOT MSVC)
 OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface gcc/clang only" OFF)
 ENDIF()

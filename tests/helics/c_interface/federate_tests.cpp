@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 BOOST_AUTO_TEST_SUITE (federate_tests)
 
- BOOST_AUTO_TEST_CASE (federate_initialize_tests)
+ /*BOOST_AUTO_TEST_CASE (federate_initialize_tests)
 {
     helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_SUITE (federate_tests)
     Fed->enterExecutionState ();
     BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::execution);
     Fed = nullptr;  // force the destructor
-}
+}*/
 //
 // BOOST_AUTO_TEST_CASE (federate_time_step_tests)
 //{

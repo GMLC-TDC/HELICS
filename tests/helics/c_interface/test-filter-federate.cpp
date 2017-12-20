@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test out the message federates
  */
 
-BOOST_FIXTURE_TEST_SUITE (message_filter_federate_tests, FederateTestFixture)
+//BOOST_FIXTURE_TEST_SUITE (message_filter_federate_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2"};
@@ -178,4 +178,4 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //    BOOST_CHECK (fFed->currentState () == helics::Federate::op_states::finalize);
 //}
 
-BOOST_AUTO_TEST_SUITE_END ()
+//BOOST_AUTO_TEST_SUITE_END ()

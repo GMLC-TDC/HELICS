@@ -17,10 +17,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics.h"
 #include "MessageFederate_c.h"
 #include "ValueFederate_c.h"
-//#include "helics/core/CoreFactory.h"
-//#include "helics/application_api/MessageFederate.h"
-//#include "helics/application_api/MessageFilterFederate.h"
-//#include "helics/application_api/ValueFederate.h"
+#include "../core/CoreFactory.h"
+#include "../application_api/MessageFederate.h"
+//#include "../application_api/MessageFilterFederate.h"
+#include "../application_api/ValueFederate.h"
+#include "../core/CoreBroker.h"
+#include "../core/BrokerFactory.h"
 
 typedef enum {
     valueFederate,
@@ -67,17 +69,17 @@ struct FederateTestFixture
     helics_broker AddBroker(const std::string &core_type_name, const std::string &initialization_string);
 
     template<typename FedType>
-    void SetupSingleBrokerTest(std::string core_type_name, int count, helics_time_t time_delta =
-    0.0, std::string name_prefix = "fed", helicsFederateType fedType)
+    void SetupSingleBrokerTest(std::string core_type_name, int count, helicsFederateType fedType, helics_time_t time_delta =
+    0.0, std::string name_prefix = "fed")
     {
         auto broker = AddBroker(core_type_name, count);
-        AddFederates<FedType>(core_type_name, count, broker, time_delta, name_prefix, fedType);
+        AddFederates<FedType>(core_type_name, count, broker, fedType, time_delta, name_prefix);
     }
 
     template<typename FedType>
     std::vector<FedType> AddFederates(std::string core_type_name, int count,
-    helics_broker broker, helics_time_t time_delta = 0.0, std::string
-    name_prefix = "fed", helicsFederateType fedType)
+    helics_broker broker, helicsFederateType fedType, helics_time_t time_delta = 0.0, std::string
+    name_prefix = "fed")
     {
         bool hasIndex = hasIndexCode(core_type_name);
         int setup = (hasIndex) ? getIndexCode(core_type_name) : 1;
@@ -175,5 +177,4 @@ struct FederateTestFixture
     	int getIndexCode(const std::string &type_name);
     	auto AddBrokerImp(const std::string &core_type_name, const std::string &initialization_string);
 };
-
 #endif
