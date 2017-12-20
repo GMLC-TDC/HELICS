@@ -110,6 +110,22 @@ HELICS_Export helicsStatus helicsCoreGetIdentifier(helics_core core, char *ident
 */
 HELICS_Export helicsStatus helicsBrokerGetAddress(helics_broker broker, char *address, int maxlen);
 
+/** get an identifier for the core
+@param core the core to query
+@param[out] identifier storage space to place the identifier string
+@param maxlen the maximum space available in identifier
+@return a helicsStatus enumeration indicating any error condition
+*/
+HELICS_Export helicsStatus helicsCoreDisconnect(helics_core core);
+
+/** get the network address associated with a broker
+@param broker the broker to query
+@param[out] identifier storage space to place the identifier string
+@param maxlen the maximum space available in identifier
+@return a helicsStatus enumeration indicating any error condition
+*/
+HELICS_Export helicsStatus helicsBrokerDisconnect(helics_broker broker);
+
 /** release the memory associated with a core*/
 HELICS_Export void helicsFreeCore (helics_core core);
 /** release the memory associated with a broker*/
@@ -179,6 +195,11 @@ HELICS_Export helicsStatus helicsEnterExecutionModeIterativeAsync (helics_federa
 
 HELICS_Export helicsStatus helicsEnterExecutionModeFinalize (helics_federate fed);
 HELICS_Export helicsStatus helicsEnterExecutionModeIterativeFinalize (helics_federate fed, iteration_status *outIterate);
+/** get the core object associated with a federate
+@param fed a federate object
+@return a core object, nullptr if invalid
+*/
+HELICS_Export helics_core helicsGetCoreObject(helics_federate fed);
 
 HELICS_Export helics_time_t helicsRequestTime (helics_federate fed, helics_time_t requestTime);
 HELICS_Export helics_iterative_time helicsRequestTimeIterative (helics_federate fed, helics_time_t requestTime, iteration_request iterate);
@@ -188,6 +209,20 @@ HELICS_Export helicsStatus helicsRequestTimeIterativeAsync (helics_federate fed,
 HELICS_Export helics_time_t helicsRequestTimeFinalize (helics_federate fed);
 HELICS_Export helics_iterative_time helicsRequestTimeIterativeFinalize (helics_federate fed);
 
+/** get the name of the federate 
+@param fed the federate object to query
+@param[out] str memory buffer to store the result
+@param maxlen the maximum size of the buffer
+@return helicsStatus object indicating success or error
+*/
+HELICS_Export helicsStatus helicsFederateGetName(helics_federate fed, char *str, int maxlen);
+
+/** get the current time of the federate
+@param fed the federate object to query
+@param[out] time storage location for the time variable
+@return helicsStatus object indicating success or error
+*/
+HELICS_Export helicsStatus helicsFederateGetCurrentTime(helics_federate fed, helics_time_t *time);
 /** create a query object
 @details a query object consists of a target and query string
 */
@@ -197,6 +232,7 @@ HELICS_Export helics_query helicsCreateQuery (const char *target, const char *qu
 @param query the query object to use in the query
 */
 HELICS_Export const char *helicsExecuteQuery (helics_federate fed, helics_query query);
+
 /** free the memory associated with a query object*/
 HELICS_Export void helicsFreeQuery (helics_query);
 
