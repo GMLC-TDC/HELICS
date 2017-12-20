@@ -42,8 +42,8 @@ namespace helics
 
     recorder::recorder(int argc, char *argv[])
     {
-        FederateInfo fi("player");
-        loadFederateInfo(fi, argc, argv);
+        FederateInfo fi("recorder");
+        fi.loadInfoFromArgs( argc, argv);
         fed = std::make_shared<CombinationFederate>(fi);
 
         boost::program_options::variables_map vm_map;

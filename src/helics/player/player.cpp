@@ -53,7 +53,7 @@ namespace helics
     player::player(int argc, char *argv[])
     {
         FederateInfo fi("player");
-        loadFederateInfo(fi, argc, argv);
+        fi.loadInfoFromArgs(argc, argv);
         fed = std::make_shared<CombinationFederate>(fi);
 
         boost::program_options::variables_map vm_map;

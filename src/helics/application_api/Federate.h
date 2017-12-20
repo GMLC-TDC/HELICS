@@ -45,7 +45,7 @@ class FederateInfo: public CoreFederateInfo
     
     bool rollback = false;  //!< indicator that the federate has rollback features
     bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must
-                                  //! support rollback if set to true]
+                                  //! support rollback at least in a limited sense if set to true]
     core_type coreType;  //!< the type of the core
     std::string coreName;  //!< the name of the core
     std::string coreInitString;  //!< an initialization string for the core API object
@@ -57,6 +57,16 @@ class FederateInfo: public CoreFederateInfo
     /** construct from the name and type*/
     FederateInfo (std::string fedname, core_type cType)
         : name (std::move (fedname)), coreType (cType){};
+    /** load a federateInfo object from command line arguments
+    @param argc the number of arguments
+    @param argv an array of char * pointers to the arguments
+    */
+    FederateInfo(int argc, const char * const *argv);
+    /** load a federateInfo object from command line arguments
+    @param argc the number of arguments
+    @param argv an array of char * pointers to the arguments
+    */
+    void loadInfoFromArgs(int argc, const char * const *argv);
 };
 
 

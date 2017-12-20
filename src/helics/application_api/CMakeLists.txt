@@ -44,6 +44,7 @@ Filters.cpp
 Endpoints.cpp
 helicsTypes.cpp
 queryFunctions.cpp
+FederateInfo.cpp
 )
 
 add_library(application_api OBJECT ${application_api_sources} ${public_application_api_headers} ${private_application_api_headers})
