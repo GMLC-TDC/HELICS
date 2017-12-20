@@ -374,6 +374,36 @@ helicsStatus helicsBrokerGetAddress(helics_broker broker, char *address, int max
 
 
 
+helicsStatus helicsCoreDisconnect(helics_core core)
+{
+    if (core == nullptr)
+    {
+        return helicsError;
+    }
+    auto coreObj = reinterpret_cast<helics::CoreObject *> (core);
+    if (coreObj->coreptr)
+    {
+        coreObj->coreptr->disconnect();
+        return helicsOK;
+    }
+    return helicsError;
+}
+
+
+helicsStatus helicsBrokerDisconnect(helics_broker broker)
+{
+    if (broker == nullptr)
+    {
+        return helicsError;
+    }
+    auto brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
+    if (brokerObj->brokerptr)
+    {
+        brokerObj->brokerptr->disconnect();
+        return helicsOK;
+    }
+    return helicsError;
+}
 
 void helicsFreeCore (helics_core core)
 {
