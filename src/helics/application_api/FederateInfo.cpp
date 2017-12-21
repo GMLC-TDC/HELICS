@@ -32,18 +32,21 @@ namespace helics
     {
         po::variables_map vm;
         argumentParser(argc, argv, vm);
-        std::string name;
         if (vm.count("name") > 0)
         {
             name = vm["name"].as<std::string>();
         }
-        std::string corename;
+        if (vm.count("corename") > 0)
+        {
+            coreName = vm["corename"].as<std::string>();
+        }
+        std::string coretypename;
         if (vm.count("core") > 0)
         {
-            coreName = vm["core"].as<std::string>();
+            coretypename = vm["core"].as<std::string>();
         }
 
-        coreType = helics::coreTypeFromString(corename);
+        coreType = helics::coreTypeFromString(coretypename);
 
         coreInitString = "1";
         if (vm.count("coreinit") > 0)
@@ -92,12 +95,13 @@ namespace helics
         config.add_options()
             ("broker,b", po::value<std::string>(), "address of the broker to connect")
             ("name,n", po::value<std::string>(), "name of the player federate")
+            ("corename", po::value<std::string>(), "the name of the core to create or find")
             ("core,c", po::value<std::string>(), "type of the core to connect to")
-            ("stop", po::value<double>(), "the time to stop recording")
             ("offset", po::value<double>(), "the offset of the time steps")
             ("period", po::value<double>(), "the period of the federate")
             ("timedelta", po::value<double>(), "the time delta of the federate")
-            ("coreinit,i", po::value<std::string>(), "the core initialization string");
+            ("coreinit,i", po::value<std::string>(), "the core initialization string")
+            ("flags,f", po::value<std::vector<std::string>>(), "named flag for the federate");
 
 
         hidden.add_options() ("input", po::value<std::string>(), "input file");

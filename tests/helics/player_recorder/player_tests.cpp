@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <cstdio>
 
 #include "exeTestHelper.h"
-#include "helics/player/Player.h"
+#include "helics/player/player.h"
 #include "helics/application_api/Subscriptions.hpp"
 #include <future>
 
