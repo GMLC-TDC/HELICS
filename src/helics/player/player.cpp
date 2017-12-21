@@ -147,12 +147,22 @@ namespace helics
                 ++icnt;
             }
         }
+        
+       
+    }
+
+    void player::sortTags()
+    {
         // collapse tags to the reduced list
         for (auto &vs : points)
         {
             tags.emplace(vs.pubName, vs.type);
         }
+    }
 
+    /** helper function to generate the publications*/
+    void player::generatePublications()
+    {
         std::string prevTag;
         for (auto &tname : tags)
         {
@@ -160,11 +170,22 @@ namespace helics
             {
                 continue;  // skip subsequent tags with different types
             }
+            prevTag = tname.first;
+            //skip already existing publications
+            if (pubids.find(tname.first) != pubids.end())
+            {
+                continue;
+            }
             publications.push_back(helics::Publication(helics::GLOBAL, fed.get(), tname.first,
                 helics::getTypeFromString(tname.second)));
-            prevTag = tname.first;
             pubids[tname.first] = static_cast<int> (publications.size()) - 1;
         }
+    }
+
+    void player::cleanUpPointList()
+    {
+        std::sort(points.begin(), points.end(), vComp);
+
         // load up the ids
         for (auto &vs : points)
         {
@@ -175,12 +196,14 @@ namespace helics
     /*run the player*/
     void player::run()
     {
-        std::sort(points.begin(), points.end(), vComp);
+        sortTags();
+        generatePublications();
+        cleanUpPointList();
 
         int pointIndex = 0;
-        std::cout << "entering init State\n";
+        //std::cout << "entering init State\n";
         fed->enterInitializationState();
-        std::cout << "entered init State\n";
+        //std::cout << "entered init State\n";
         while (points[pointIndex].time < helics::timeZero)
         {
             publications[points[pointIndex].index].publish(points[pointIndex].value);
@@ -188,7 +211,7 @@ namespace helics
         }
 
         fed->enterExecutionState();
-        std::cout << "entered exec State\n";
+       // std::cout << "entered exec State\n";
         while (points[pointIndex].time == helics::timeZero)
         {
             publications[points[pointIndex].index].publish(points[pointIndex].value);
@@ -229,6 +252,7 @@ namespace helics
     void player::addPublication(const std::string &key, helicsType_t type, const std::string &units)
     {
         publications.push_back(Publication(GLOBAL, fed.get(), key, type, units));
+        pubids[key] = static_cast<int> (publications.size()) - 1;
     }
 
     int player::loadArguments(boost::program_options::variables_map &vm_map)

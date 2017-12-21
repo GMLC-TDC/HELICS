@@ -113,6 +113,12 @@ namespace helics
         @param either a json filename or a string containing json
         */
         void loadJsonFile(const std::string &jsonString);
+        /** helper function to sort through the tags*/
+        void sortTags();
+        /** helper function to generate the publications*/
+        void generatePublications();
+        /** helper function to sort the points and link them to publications*/
+        void cleanUpPointList();
     private:
         std::shared_ptr<CombinationFederate> fed; //!< the federate created for the player
         std::vector<ValueSetter> points;    //!< the points to generate into the federation

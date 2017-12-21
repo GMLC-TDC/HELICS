@@ -26,7 +26,7 @@ add_executable(player-recorder-tests ${recplayer_test_sources})
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
-target_link_libraries(player-recorder-tests helics-static)
+target_link_libraries(player-recorder-tests player_rec-static helics-static)
 
 target_link_libraries(player-recorder-tests ${Boost_LIBRARIES_test})
 
@@ -34,6 +34,7 @@ target_link_libraries(player-recorder-tests ${Boost_LIBRARIES_test})
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
+include_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_test(NAME player-recorder-tests COMMAND player-recorder-tests --log_level=warning --report_level=detailed)
 

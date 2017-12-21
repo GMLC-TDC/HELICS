@@ -193,6 +193,14 @@ bool TimeDependencies::checkIfReadyForTimeGrant (bool iterating, Time desiredGra
             {
                 return false;
             }
+            if (dep.Tnext == desiredGrantTime)
+            {
+                if (dep.time_state == DependencyInfo::time_state_t::time_granted)
+                {
+                    return false;
+                }
+                
+            }
         }
     }
     return true;
