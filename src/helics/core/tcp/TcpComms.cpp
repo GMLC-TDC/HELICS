@@ -472,7 +472,7 @@ void TcpComms::queue_tx_function ()
                 {
                     if (se.code() != boost::asio::error::connection_aborted)
                     {
-                        std::cerr << se.what() << '\n';
+                        std::cerr << "broker send0"<<se.what() << '\n';
                    }
                 }
                 
@@ -508,7 +508,7 @@ void TcpComms::queue_tx_function ()
                 {
                     if (se.code() != boost::asio::error::connection_aborted)
                     {
-                        std::cerr << se.what() << '\n';
+                        std::cerr << "rt send "<<route_id<<"::"<<se.what() << '\n';
                     }
                 }
             }
@@ -532,7 +532,7 @@ void TcpComms::queue_tx_function ()
                     {
                         if (se.code() != boost::asio::error::connection_aborted)
                         {
-                            std::cerr << se.what() << '\n';
+                            std::cerr <<"broker send"<<route_id<<" ::"<< se.what() << '\n';
                         }
                     }
                 }
