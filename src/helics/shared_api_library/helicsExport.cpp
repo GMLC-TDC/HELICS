@@ -39,6 +39,18 @@ helics_federate_info_t helicsFederateInfoCreate ()
 
 void helicsFederateInfoFree (helics_federate_info_t fi) { delete reinterpret_cast<helics::FederateInfo *> (fi); }
 
+
+helicsStatus helicsFederateInfoLoadFromArgs(helics_federate_info_t fi, int argc, const char * const *argv)
+{
+    if (fi == nullptr)
+    {
+        return helicsDiscard;
+    }
+    auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
+    hfi->loadInfoFromArgs(argc, argv);
+    return helicsOK;
+}
+
 helicsStatus helicsFederateInfoSetFederateName (helics_federate_info_t fi, const char *name)
 {
     if (fi == nullptr)
@@ -49,6 +61,7 @@ helicsStatus helicsFederateInfoSetFederateName (helics_federate_info_t fi, const
     hfi->name = name;
     return helicsOK;
 }
+
 helicsStatus helicsFederateInfoSetCoreName (helics_federate_info_t fi, const char *corename)
 {
     if (fi == nullptr)
@@ -59,6 +72,7 @@ helicsStatus helicsFederateInfoSetCoreName (helics_federate_info_t fi, const cha
     hfi->coreName = corename;
     return helicsOK;
 }
+
 helicsStatus helicsFederateInfoSetCoreInitString (helics_federate_info_t fi, const char *coreinit)
 {
     if (fi == nullptr)

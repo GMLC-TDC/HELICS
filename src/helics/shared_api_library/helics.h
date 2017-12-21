@@ -102,6 +102,15 @@ HELICS_Export helics_federate helicsCreateCombinationFederateFromFile (const cha
 @return a helics_federate_info_t object which is a reference to the created object
 */
 HELICS_Export helics_federate_info_t helicsFederateInfoCreate ();
+
+/**load a federate info from command line arguments
+@param fi a federateInfo object
+@param argc the number of command line arguments
+@param argv an array of strings from the command line
+@return a helicsStatus enumeration indicating success or any potential errors
+*/
+HELICS_Export helicsStatus helicsFederateInfoLoadFromArgs(helics_federate_info_t fi, int argc, const char * const *argv);
+
 /** delete the memory associated with a federate info object*/
 HELICS_Export void helicsFederateInfoFree (helics_federate_info_t fi);
 
