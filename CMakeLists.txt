@@ -41,9 +41,17 @@ IF(BUILD_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
     SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
 ENDIF()
 
+
+
+
 #-----------------------------------------------------------------------------
 # General project wide configuration
 #-----------------------------------------------------------------------------
+
+if (NOT CMAKE_DEBUG_POSTFIX)
+	set(CMAKE_DEBUG_POSTFIX d)
+endif()
+
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 include_directories ("${PROJECT_SOURCE_DIR}/ThirdParty")
