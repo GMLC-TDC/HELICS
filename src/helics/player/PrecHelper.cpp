@@ -99,13 +99,3 @@ char typeCharacter (helicsType_t type)
     }
 }
 
-
-
-
-std::vector<std::string> splitline (const std::string &line, const std::string &delimiters, bool compression)
-{
-    std::vector<std::string> strVec;
-    auto comp = (compression) ? boost::token_compress_on : boost::token_compress_off;
-    boost::algorithm::split (strVec, line, boost::is_any_of (delimiters), comp);
-    return strVec;
-}

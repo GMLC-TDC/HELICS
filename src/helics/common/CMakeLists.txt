@@ -15,12 +15,19 @@ searchableObjectHolder.hpp
 stringToCmdLine.h
 AsioServiceManager.h
 logger.h
+stringOps.h
+charMapper.h
+generic_string_ops.hpp
+base64.h
 )
 
 set(common_sources
 stringToCmdLine.cpp
 AsioServiceManager.cpp
 logger.cpp
+stringOps.cpp
+charMapper.cpp
+base64.cpp
 )
 
 set(zmq_headers

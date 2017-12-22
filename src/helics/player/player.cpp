@@ -15,7 +15,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <iostream>
 #include <map>
 #include <memory>
-#include <regex>
 #include <set>
 #include <stdexcept>
 #include <boost/filesystem.hpp>
@@ -24,14 +23,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "PrecHelper.h"
 #include "json.hpp"
 
-
+#include "../common/stringOps.h"
 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
 static void playerArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
-static const std::regex creg (R"raw((-?\d+(\.\d+)?|\.\d+)[\s,]*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
+//static const std::regex creg (R"raw((-?\d+(\.\d+)?|\.\d+)[\s,]*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
 
 /*
 std::shared_ptr<CombinationFederate> fed;
@@ -105,10 +104,6 @@ namespace helics
         {
             loadJsonFile(filename);
         }
-        else if ((ext == ".xml") || (ext == ".XML"))
-        {
-            loadXMLFile(filename);
-        }
         else
         {
             loadTextFile(filename);
@@ -119,6 +114,7 @@ namespace helics
 
     void player::loadTextFile(const std::string &filename)
     {
+        using namespace stringOps;
         std::ifstream infile(filename);
         std::string str;
 
@@ -137,14 +133,16 @@ namespace helics
             }
             ++lcnt;
         }
-        points.resize(lcnt);
+        int icnt = static_cast<int>(points.size());
+        points.resize(points.size()+lcnt);
         // now start over and actual do the loading
         infile.close();
         infile.open(filename);
-        int icnt = 0;
-        std::smatch m;
+        
+        int lcount=0;
         while (std::getline(infile, str))
         {
+            ++lcount;
             if (str.empty())
             {
                 continue;
@@ -154,13 +152,38 @@ namespace helics
             {
                 continue;
             }
-            std::regex_search(str, m, creg);
-            if (m.size() == 6)
+            /* time key type value units*/
+            auto blk = splitlineBracket(str, ",\t ",default_bracket_chars,delimiter_compression::on);
+            
+            if (blk.size() == 3)
             {
-                points[icnt].time = helics::Time(std::stod(m[1]));
-                points[icnt].pubName = m[3];
-                points[icnt].type = m[4];
-                points[icnt].value = m[5];
+                try
+                {
+                    points[icnt].time = helics::Time(std::stod(trim(blk[0])));
+                }
+                catch (const std::invalid_argument &ia)
+                {
+                    std::cerr << "ill formed time on line " << lcount << '\n';
+                    continue;
+                }
+                points[icnt].pubName = blk[1];
+                points[icnt].value = blk[2];
+                ++icnt;
+            }
+            else if (blk.size() == 4)
+            {
+                try
+                {
+                    points[icnt].time = helics::Time(std::stod(trim(blk[0])));
+                }
+                catch (const std::invalid_argument &ia)
+                {
+                    std::cerr << "ill formed time on line " << lcount << '\n';
+                    continue;
+                }
+                points[icnt].pubName = blk[1];
+                points[icnt].type = blk[2];
+                points[icnt].value = blk[3];
                 ++icnt;
             }
         }
@@ -168,34 +191,143 @@ namespace helics
 
     void player::loadJsonFile(const std::string &jsonFile)
     {
+        using json=nlohmann::json;
+        json JF;
+        try
+        {
+            if (jsonFile.size() > 200)
+            {
+                JF.parse(jsonFile);
+            }
+            else
+            {
+                std::ifstream file(jsonFile);
+                if (!file.is_open())
+                {
+                    JF.parse(jsonFile);
+                }
+                else
+                {
+                    file >> JF;
+                }
+            }
+        }
+catch (const json::exception &je)
+{
+    std::cerr << je.what() << '\n';
+    return;
+}
+
+
+auto pointArray = JF["points"];
+if (pointArray.is_array())
+{
+    points.reserve(points.size() + pointArray.size());
+    for (const auto &pointElement : pointArray)
+    {
+        Time ptime;
+        if (pointElement.count("time") > 0)
+        {
+            ptime = pointElement["time"].get<double>();
+        }
+        else if (pointElement.count("t") > 0)
+        {
+            ptime = pointElement["t"].get<double>();
+        }
+        else
+        {
+            std::cout << "time not specified\n";
+            continue;
+        }
+        defV val;
+        if (pointElement.count("value") > 0)
+        {
+            auto M = pointElement["value"];
+            if (M.is_number_integer())
+            {
+                val = M.get<int64_t>();
+            }
+            else if (M.is_number_float())
+            {
+                val = M.get<double>();
+            }
+            else
+            {
+                val = M.get < std::string>();
+            }
+
+        }
+        else if (pointElement.count("v") > 0)
+        {
+            auto M = pointElement["v"];
+            if (M.is_number_integer())
+            {
+                val = M.get<int64_t>();
+            }
+            else if (M.is_number_float())
+            {
+                val = M.get<double>();
+            }
+            else
+            {
+                val = M.get < std::string>();
+            }
+        }
+        std::string type;
+        if (pointElement.count("type") > 0)
+        {
+            type = pointElement["type"].get<std::string>();
+        }
+        std::string key;
+        if (pointElement.count("key") > 0)
+        {
+            key = pointElement["key"].get<std::string>();
+        }
+        else
+        {
+            std::cout << "key not specified\n";
+            continue;
+        }
+        points.resize(points.size() + 1);
+        points.back().time = ptime;
+        points.back().pubName = key;
+        points.back().value = val;
+        if (!type.empty())
+        {
+            points.back().type = type;
+        }
 
     }
-
-    void player::loadXMLFile(const std::string &xmlfile)
-    {
+}
 
     }
 
     void player::sortTags()
     {
+        std::sort(points.begin(), points.end(), vComp);
         // collapse tags to the reduced list
         for (auto &vs : points)
         {
-            tags.emplace(vs.pubName, vs.type);
+            auto fnd = tags.find(vs.pubName);
+            if (fnd != tags.end())
+            {
+                if (fnd->second.empty())
+                {
+                    tags[vs.pubName] = vs.type;
+                }
+            }
+            else
+            {
+                tags.emplace(vs.pubName, vs.type);
+            }
         }
     }
 
     /** helper function to generate the publications*/
     void player::generatePublications()
     {
-        std::string prevTag;
         for (auto &tname : tags)
         {
-            if (tname.first == prevTag)
-            {
-                continue;  // skip subsequent tags with different types
-            }
-            prevTag = tname.first;
             //skip already existing publications
             if (pubids.find(tname.first) != pubids.end())
             {
@@ -209,7 +341,7 @@ namespace helics
 
     void player::cleanUpPointList()
     {
-        std::sort(points.begin(), points.end(), vComp);
+        
 
         // load up the ids
         for (auto &vs : points)
@@ -218,17 +350,29 @@ namespace helics
         }
     }
 
+    void player::initialize()
+    {
+        auto state=fed->currentState();
+       if (state== Federate::op_states::startup)
+        {
+            sortTags();
+            generatePublications();
+            cleanUpPointList();
+            fed->enterInitializationState();
+        }
+    }
+
     /*run the player*/
     void player::run()
     {
-        sortTags();
-        generatePublications();
-        cleanUpPointList();
+        auto state = fed->currentState();
+        if (state == Federate::op_states::startup)
+        {
+            initialize();
+        }
 
         int pointIndex = 0;
-        //std::cout << "entering init State\n";
-        fed->enterInitializationState();
-        //std::cout << "entered init State\n";
+       
         while (points[pointIndex].time < helics::timeZero)
         {
             publications[points[pointIndex].index].publish(points[pointIndex].value);
@@ -271,7 +415,11 @@ namespace helics
 
     void player::run(Time stopTime_input)
     {
-
+        auto state = fed->currentState();
+        if (state == Federate::op_states::startup)
+        {
+            initialize();
+        }
     }
 
     void player::addPublication(const std::string &key, helicsType_t type, const std::string &units)

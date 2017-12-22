@@ -214,7 +214,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
     bool update = updateTimeFactors ();
     if ((!iterating) || (time_exec > time_granted))
     {
-        if (time_allow >= time_exec)
+        if (time_allow > time_exec)
         {
             time_granted = time_exec;
             if ((!dependents.empty ()) && (sendMessageFunction))
@@ -228,6 +228,37 @@ iteration_state TimeCoordinator::checkTimeGrant ()
             // static_cast<double>(time_allow), static_cast<double>(time_next), static_cast<double>(time_exec),
             // static_cast<double>(time_minDe));
             return iteration_state::next_step;
+        }
+        if (time_allow == time_exec)
+        {
+            if (time_requested <= time_exec)
+            {
+                time_granted = time_exec;
+                if ((!dependents.empty()) && (sendMessageFunction))
+                {
+                    ActionMessage treq(CMD_TIME_GRANT);
+                    treq.source_id = source_id;
+                    treq.actionTime = time_granted;
+                    sendMessageFunction(treq);
+                }
+                // printf("%d GRANT allow=%f next=%f, exec=%f, Tdemin=%f\n", source_id,
+                // static_cast<double>(time_allow), static_cast<double>(time_next), static_cast<double>(time_exec),
+                // static_cast<double>(time_minDe));
+                return iteration_state::next_step;
+            }
+            if (dependencies.checkIfReadyForTimeGrant(false, time_exec))
+            {
+                time_granted = time_exec;
+                if ((!dependents.empty()) && (sendMessageFunction))
+                {
+                    ActionMessage treq(CMD_TIME_GRANT);
+                    treq.source_id = source_id;
+                    treq.actionTime = time_granted;
+                    SET_ACTION_FLAG(treq, iterationRequested);
+                    sendMessageFunction(treq);
+                }
+                return iteration_state::next_step;
+            }
         }
     }
     else
@@ -246,6 +277,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         }
         if (time_allow == time_exec)  // time_allow==time_exec==time_granted
         {
+           
             if (dependencies.checkIfReadyForTimeGrant (true, time_exec))
             {
                 dependencies.ResetIteratingTimeRequests (time_exec);

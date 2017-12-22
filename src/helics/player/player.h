@@ -90,6 +90,12 @@ namespace helics
         /** load a file containing publication information
         @param filename the file containing the configuration and player data  accepted format are json, xml, and a player format which is tab delimited or comma delimited*/
         void loadFile(const std::string &filename);
+        /** initialize the player federate
+        @details generate all the publications and organize the points, the final publication count will be available after this time
+        and the player will enter the initialization mode, which means it will not be possible to add more publications
+        calling run will automatically do this if necessary
+        */
+        void initialize();
         /*run the player*/
         void run();
 
@@ -131,14 +137,24 @@ namespace helics
             points.back().pubName = key;
             points.back().value = val;
         }
+        /** get the number of points loaded*/
+       auto pointCount() const
+        {
+            return points.size();
+        }
+       /** get the number of publications */
+        auto publicationCount() const
+        {
+            return publications.size();
+        }
     private:
         int loadArguments(boost::program_options::variables_map &vm_map);
         /** load from a jsonString 
         @param either a json filename or a string containing json
         */
         void loadJsonFile(const std::string &jsonString);
+        /** load a text file*/
         void loadTextFile(const std::string &textFile);
-        void loadXMLFile(const std::string &xmlFile);
         /** helper function to sort through the tags*/
         void sortTags();
         /** helper function to generate the publications*/
@@ -148,7 +164,7 @@ namespace helics
     private:
         std::shared_ptr<CombinationFederate> fed; //!< the federate created for the player
         std::vector<ValueSetter> points;    //!< the points to generate into the federation
-        std::set<std::pair<std::string, std::string>> tags;    //!< sets of tags <key, type> 
+        std::map<std::string, std::string> tags;    //!< map of the key and type strings
         std::vector<Publication> publications;  //!< the actual publication objects
         std::vector<Endpoint> endpoints;    //!< the actual endpoint objects
         std::map<std::string, int> pubids;  //!< publication id map
