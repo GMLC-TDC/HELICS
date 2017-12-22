@@ -28,7 +28,7 @@ target_link_libraries(travis-tests helics-static)
 
 target_link_libraries(travis-tests ${Boost_LIBRARIES_test})
 
-add_test(NAME travis-tests COMMAND travis-tests --log_level=success --report_level=detailed)
+add_test(NAME travis-tests COMMAND travis-tests --log_level=warning --report_level=short)
 
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)

@@ -54,7 +54,7 @@ endif(MSVC)
 ADD_DEFINITIONS(-DHELICS_BROKER_LOCATION="${HELICS_BROKER_LOC}")
 ADD_DEFINITIONS(-DHELICS_INSTALL_LOCATION="${CMAKE_INSTALL_PREFIX}")
 
-add_test(NAME application-api-tests COMMAND application-api-tests --log_level=success --report_level=detailed)
+add_test(NAME application-api-tests COMMAND application-api-tests --log_level=warning --report_level=short)
 
 
 

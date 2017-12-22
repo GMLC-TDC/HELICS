@@ -365,31 +365,41 @@ if (pointArray.is_array())
     /*run the player*/
     void player::run()
     {
+        run(stopTime);
+        fed->finalize();
+    }
+
+    void player::run(Time stopTime_input)
+    {
         auto state = fed->currentState();
         if (state == Federate::op_states::startup)
         {
             initialize();
         }
-
         int pointIndex = 0;
-       
-        while (points[pointIndex].time < helics::timeZero)
+        if (state != Federate::op_states::execution)
         {
-            publications[points[pointIndex].index].publish(points[pointIndex].value);
-            ++pointIndex;
+            while (points[pointIndex].time < helics::timeZero)
+            {
+                publications[points[pointIndex].index].publish(points[pointIndex].value);
+                ++pointIndex;
+            }
+
+            fed->enterExecutionState();
+        }
+        else
+        {
+            auto ctime = fed->getCurrentTime();
+            while (points[pointIndex].time <= ctime)
+            {
+                ++pointIndex;
+            }
         }
 
-        fed->enterExecutionState();
-       // std::cout << "entered exec State\n";
-        while (points[pointIndex].time == helics::timeZero)
-        {
-            publications[points[pointIndex].index].publish(points[pointIndex].value);
-            ++pointIndex;
-        }
         helics::Time nextPrintTime = 10.0;
         while (pointIndex < static_cast<int> (points.size()))
         {
-            if (points[pointIndex].time > stopTime)
+            if (points[pointIndex].time > stopTime_input)
             {
                 break;
             }
@@ -409,16 +419,6 @@ if (pointArray.is_array())
                 std::cout << "processed time " << static_cast<double> (newTime) << "\n";
                 nextPrintTime += 10.0;
             }
-        }
-        fed->finalize();
-    }
-
-    void player::run(Time stopTime_input)
-    {
-        auto state = fed->currentState();
-        if (state == Federate::op_states::startup)
-        {
-            initialize();
         }
     }
 

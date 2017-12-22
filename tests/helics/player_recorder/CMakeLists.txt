@@ -36,7 +36,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
-add_test(NAME player-recorder-tests COMMAND player-recorder-tests --log_level=warning --report_level=detailed)
+add_test(NAME player-recorder-tests COMMAND player-recorder-tests --log_level=warning --report_level=short)
 
 
 add_definitions(-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
