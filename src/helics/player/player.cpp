@@ -31,7 +31,7 @@ namespace filesystem = boost::filesystem;
 
 static void playerArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
-static const std::regex creg (R"raw((-?\d+(\.\d+)?|\.\d+)\s*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
+static const std::regex creg (R"raw((-?\d+(\.\d+)?|\.\d+)[\s,]*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
 
 /*
 std::shared_ptr<CombinationFederate> fed;
@@ -100,9 +100,26 @@ namespace helics
 
     void player::loadFile(const std::string &filename)
     {
-        std::ifstream infile(filename);
-
+        auto ext = filesystem::path(filename).extension().string();
+        if ((ext==".json")||(ext==".JSON"))
+        {
+            loadJsonFile(filename);
+        }
+        else if ((ext == ".xml") || (ext == ".XML"))
+        {
+            loadXMLFile(filename);
+        }
+        else
+        {
+            loadTextFile(filename);
+        }
         
+       
+    }
+
+    void player::loadTextFile(const std::string &filename)
+    {
+        std::ifstream infile(filename);
         std::string str;
 
         int lcnt = 0;
@@ -147,8 +164,16 @@ namespace helics
                 ++icnt;
             }
         }
-        
-       
+    }
+
+    void player::loadJsonFile(const std::string &jsonFile)
+    {
+
+    }
+
+    void player::loadXMLFile(const std::string &xmlfile)
+    {
+
     }
 
     void player::sortTags()

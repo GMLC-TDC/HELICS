@@ -56,9 +56,16 @@ namespace helics
     class player
     {
     public:
+        /** default constructor*/
         player() = default;
+        /** construct from command line arguments
+        @param argc the number of arguments
+        @param argv the strings in the input
+        */
         player(int argc, char *argv[]);
-
+        /** construct from a federate info object
+        @param fi a pointer info object containing information on the desired federate configuration
+        */
        player(const FederateInfo &fi);
         /**constructor taking a federate information structure and using the given core
         @param core a pointer to core object which the federate can join
@@ -66,7 +73,7 @@ namespace helics
         */
         player(std::shared_ptr<Core> core, const FederateInfo &fi);
         /**constructor taking a file with the required information
-        @param[in] file a file defining the federate information
+        @param[in] jsonString file or json string defining the federate information and other configuration
         */
         player(const std::string &jsonString);
 
@@ -80,11 +87,15 @@ namespace helics
         player &operator= (const player &fed) = delete;
         ~player();
 
-        /** load a file containing publication information*/
+        /** load a file containing publication information
+        @param filename the file containing the configuration and player data  accepted format are json, xml, and a player format which is tab delimited or comma delimited*/
         void loadFile(const std::string &filename);
         /*run the player*/
         void run();
 
+        /** run the player until the specified time
+        @param stopTime_input the desired stop time
+        */
         void run(Time stopTime_input);
 
         /** add a publication to a player
@@ -93,6 +104,19 @@ namespace helics
         @param units the units associated with the publication
         */
         void addPublication( const std::string &key, helicsType_t type, const std::string &units="");
+
+        /** add a publication to a player
+        @param key the key of the publication to add
+        @param type the type of the publication
+        @param units the units associated with the publication
+        */
+        template <class valType>
+        typename std::enable_if_t<helicsType<valType>() != helicsType_t::helicsInvalid> 
+            addPublication(const std::string &key, const std::string &units = "")
+        {
+            publications.push_back(Publication(GLOBAL, fed.get(), key, helicsType<valType>(), units));
+            pubids[key] = static_cast<int> (publications.size()) - 1;
+        }
         
         /** add a data point to publish through a player
         @param pubTime the time of the publication
@@ -113,6 +137,8 @@ namespace helics
         @param either a json filename or a string containing json
         */
         void loadJsonFile(const std::string &jsonString);
+        void loadTextFile(const std::string &textFile);
+        void loadXMLFile(const std::string &xmlFile);
         /** helper function to sort through the tags*/
         void sortTags();
         /** helper function to generate the publications*/

@@ -67,12 +67,12 @@ BOOST_AUTO_TEST_CASE(simple_player_test2)
     fi.coreInitString = "2";
     helics::player play1(fi);
     fi.name = "block1";
-    play1.addPublication("pub1", helics::helicsType_t::helicsDouble);
+    play1.addPublication<double>("pub1");
     play1.addPoint(1.0, "pub1", 0.5);
     play1.addPoint(2.0, "pub1", 0.7);
     play1.addPoint(3.0, "pub1", 0.8);
 
-    play1.addPublication("pub2", helics::helicsType_t::helicsDouble);
+    play1.addPublication<double>("pub2");
     play1.addPoint(1.0, "pub2", 0.4);
     play1.addPoint(2.0, "pub2", 0.6);
     play1.addPoint(3.0, "pub2", 0.9);

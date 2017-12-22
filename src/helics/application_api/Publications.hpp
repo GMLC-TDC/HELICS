@@ -153,14 +153,14 @@ class Publication : public PublicationBase
 };
 
 template <class X>
-typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, std::unique_ptr<Publication>>::type
+typename std::enable_if_t<helicsType<X> () != helicsType_t::helicsInvalid, std::unique_ptr<Publication>>
 make_publication (ValueFederate *valueFed, const std::string &name, const std::string &units = "")
 {
     return std::make_unique<Publication> (valueFed, helicsType<X> (), name, units);
 }
 
 template <class X>
-typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, std::unique_ptr<Publication>>::type
+typename std::enable_if_t<helicsType<X> () != helicsType_t::helicsInvalid, std::unique_ptr<Publication>>
 make_publication (interface_visibility locality,
                   ValueFederate *valueFed,
                   const std::string &name,
