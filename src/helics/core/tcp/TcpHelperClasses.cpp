@@ -150,12 +150,20 @@ void tcp_connection::connect_handler (const boost::system::error_code &error)
 }
 void tcp_connection::send (const void *buffer, size_t dataLength)
 {
+    if (!isConnected())
+    {
+        waitUntilConnected(200);
+    }
     auto sz = socket_.send (boost::asio::buffer (buffer, dataLength));
     assert (sz == dataLength);
 }
 
 void tcp_connection::send (const std::string &dataString)
 {
+    if (!isConnected())
+    {
+        waitUntilConnected(200);
+    }
     auto sz = socket_.send (boost::asio::buffer (dataString));
     assert (sz == dataString.size ());
 }
