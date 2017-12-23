@@ -34,9 +34,10 @@ ValueFederate::ValueFederate (std::shared_ptr<Core> core, const FederateInfo &fi
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject, getID ());
 }
-ValueFederate::ValueFederate (const std::string &file) : Federate (file)
+ValueFederate::ValueFederate (const std::string &jsonString) : Federate (jsonString)
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject, getID ());
+    registerInterfaces(jsonString);
 }
 
 ValueFederate::ValueFederate () = default;
@@ -156,6 +157,11 @@ void ValueFederate::registerInterfaces (const std::string &jsonString)
         for (const auto &pub : pubs)
         {
             auto name = pub["name"].asString ();
+            auto id = vfManager->getPublicationId(name);
+            if (id != invalid_id_value)
+            {
+                continue;
+            }
             auto type = (pub.isMember ("type")) ? pub["type"].asString () : "";
             auto units = (pub.isMember ("units")) ? pub["units"].asString () : "";
             bool global = (pub.isMember ("global")) ? !(pub["global"].asBool ()) : false;
@@ -175,6 +181,11 @@ void ValueFederate::registerInterfaces (const std::string &jsonString)
         for (const auto &sub : subs)
         {
             auto name = sub["name"].asString ();
+            auto id = vfManager->getSubscriptionId(name);
+            if (id != invalid_id_value)
+            {
+                continue;
+            }
             auto units = (sub.isMember ("units")) ? sub["units"].asString () : "";
             auto type = (sub.isMember ("type")) ? sub["type"].asString () : "";
             bool required = (sub.isMember ("optional")) ? !(sub["optional"].asBool ()) : false;
@@ -182,7 +193,6 @@ void ValueFederate::registerInterfaces (const std::string &jsonString)
             {
                 required = sub["required"].asBool ();
             }
-            subscription_id_t id;
             if (required)
             {
                 id = registerRequiredSubscription (name, type, units);

@@ -76,20 +76,7 @@ namespace helics
         {
             masterFileName = jsonString;
         }
-        auto pubCount = fed->getSubscriptionCount();
-        for (int ii = 0; ii < pubCount; ++ii)
-        {
-            publications.emplace_back(fed.get(), ii);
-            pubids[publications.back().getName()] = static_cast<int>(publications.size() - 1);
-
-        }
-        auto eptCount = fed->getEndpointCount();
-        for (int ii = 0; ii < eptCount; ++ii)
-        {
-            endpoints.emplace_back(fed.get(), ii);
-            eptids[endpoints.back().getName()] = static_cast<int>(endpoints.size() - 1);
-
-        }
+        loadJsonFile(jsonString);
     }
 
     player::~player()
@@ -191,6 +178,23 @@ namespace helics
 
     void player::loadJsonFile(const std::string &jsonFile)
     {
+        fed->registerInterfaces(jsonFile);
+
+        auto pubCount = fed->getSubscriptionCount();
+        for (int ii = 0; ii < pubCount; ++ii)
+        {
+            publications.emplace_back(fed.get(), ii);
+            pubids[publications.back().getName()] = static_cast<int>(publications.size() - 1);
+
+        }
+        auto eptCount = fed->getEndpointCount();
+        for (int ii = 0; ii < eptCount; ++ii)
+        {
+            endpoints.emplace_back(fed.get(), ii);
+            eptids[endpoints.back().getName()] = static_cast<int>(endpoints.size() - 1);
+
+        }
+
         using json=nlohmann::json;
         json JF;
         try

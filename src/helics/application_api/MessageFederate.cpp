@@ -33,9 +33,10 @@ MessageFederate::MessageFederate (std::shared_ptr<Core> core, const FederateInfo
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
 }
-MessageFederate::MessageFederate (const std::string &file) : Federate (file)
+MessageFederate::MessageFederate (const std::string &jsonString) : Federate (jsonString)
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
+    registerInterfaces(jsonString);
 }
 
 MessageFederate::MessageFederate ()

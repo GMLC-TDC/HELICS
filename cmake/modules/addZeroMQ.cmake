@@ -12,6 +12,7 @@ SHOW_VARIABLE(ZeroMQ_INCLUDE_PATH PATH
 set(ZeroMQ_FIND_QUIETLY ON)
 if (EXISTS ${PROJECT_BINARY_DIR}/libs/cmake/ZeroMQ/ZeroMQConfig.cmake)
 	include(${PROJECT_BINARY_DIR}/libs/cmake/ZeroMQ/ZeroMQConfig.cmake)
+	message(STATUS "loading zmq cmake")
 	set(ZeroMQ_FOUND 1)
 else()
 	if (ZMQ_USE_STATIC_LIBRARY)

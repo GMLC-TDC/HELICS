@@ -1,0 +1,44 @@
+{
+"publications":[
+{
+"name":"pub1", "type":"double"
+},
+{
+"name":"pub2","type":"double"
+}]
+	"points": [{
+			"key": "pub1",
+			"value": 0.3,
+			"time": -1
+		}, {
+
+			"key": "pub2",
+			"value": 0.4,
+			"time": 1.0
+		}, {
+			"key": "pub1",
+			"value": 0.5,
+			"time": 1.0
+		},
+		{
+			"key": "pub1",
+			"value": 0.8,
+			"time": 3.0
+		},
+		{
+			"key": "pub1",
+			"value": 0.7,
+			"time": 2.0
+		},
+		{
+			"key": "pub2",
+			"value": 0.6,
+			"time": 2.0
+		},
+		{
+			"key": "pub2",
+			"value": 0.9,
+			"time": 3.0
+		}
+	]
+}
