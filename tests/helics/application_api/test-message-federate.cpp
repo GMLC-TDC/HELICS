@@ -569,9 +569,17 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_ty
 
     BOOST_CHECK_EQUAL (f1time.get (), 1.0);
     auto M1 = mFed1->getMessage (epid);
-    BOOST_REQUIRE_EQUAL (M1->data.size (), data2.size ());
-
-    BOOST_CHECK_EQUAL (M1->data[245], data2[245]);
+    BOOST_CHECK(M1);
+    if (M1)
+    {
+        BOOST_CHECK_EQUAL(M1->data.size(), data2.size());
+        if (M1.data.size() > 245)
+        {
+            BOOST_CHECK_EQUAL(M1->data[245], data2[245]);
+        }
+        
+    }
+    
 
     BOOST_CHECK (mFed1->hasMessage () == false);
     mFed1->finalize ();

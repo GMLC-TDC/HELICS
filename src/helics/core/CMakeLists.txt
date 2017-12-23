@@ -8,7 +8,6 @@ set(SRC_FILES
     CoreFactory.cpp
 	BrokerFactory.cpp
 	BrokerBase.cpp
-    TestCore.cpp
 	CommonCore.cpp
 	FederateState.cpp
 	SubscriptionInfo.cpp
@@ -17,7 +16,6 @@ set(SRC_FILES
 	EndpointInfo.cpp
 	ActionMessage.cpp
 	CoreBroker.cpp
-	TestBroker.cpp
 	core-types.cpp
 	core-data.cpp
 	TimeCoordinator.cpp
@@ -25,6 +23,11 @@ set(SRC_FILES
 	CommsInterface.cpp
 	CommsBroker.cpp
 	argParser.cpp
+)
+
+set(TESTCORE_SOURCE_FILES
+	TestBroker.cpp
+	TestCore.cpp
 )
 
 set (IPC_SOURCE_FILES
@@ -82,7 +85,6 @@ set(INCLUDE_FILES
 	delayedObjects.hpp
 	CommsBroker.hpp
 	CommsBroker_impl.hpp
-    TestCore.h
 	CoreBroker.h
 	ActionMessageDefintions.h
 	ActionMessage.h
@@ -95,11 +97,13 @@ set(INCLUDE_FILES
 	FilterInfo.h
 	BasicHandleInfo.h
 	FilterFunctions.h
-	TestBroker.h
 	argParser.h
 )
 
-
+set(TESTCORE_HEADER_FILES
+ TestCore.h
+ TestBroker.h
+)
 
 set(IPC_HEADER_FILES
 	ipc/IpcCore.h
@@ -134,8 +138,8 @@ set(TCP_HEADER_FILES
 	tcp/TcpHelperClasses.h
 	)
 
-	list(APPEND SRC_FILES ${UDP_SOURCE_FILES} ${IPC_SOURCE_FILES})
-	list(APPEND INCLUDE_FILES ${UDP_HEADER_FILES} ${IPC_HEADER_FILES})
+	list(APPEND SRC_FILES ${TESTCORE_SOURCE_FILES} ${UDP_SOURCE_FILES} ${IPC_SOURCE_FILES})
+	list(APPEND INCLUDE_FILES ${TESTCORE_HEADER_FILES} ${UDP_HEADER_FILES} ${IPC_HEADER_FILES})
 
 	if (NOT DISABLE_TCP_CORE)
 		list(APPEND SRC_FILES ${TCP_SOURCE_FILES})
@@ -162,6 +166,7 @@ endif (${MPI_C_FOUND})
 source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
 source_group("udp" FILES ${UDP_SOURCE_FILES} ${UDP_HEADER_FILES})
 source_group("ipc" FILES ${IPC_SOURCE_FILES} ${IPC_HEADER_FILES})
+source_group("test" FILES ${TESTCORE_SOURCE_FILES} ${TESTCORE_HEADER_FILES})
 
 if (NOT DISABLE_TCP_CORE)
    source_group("tcp" FILES ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})

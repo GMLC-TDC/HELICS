@@ -225,6 +225,12 @@ inline bool isPriorityCommand(const ActionMessage &command) noexcept
     return (command.action() < action_message_def::action_t::cmd_ignore);
 }
 
+/** check if a command is a disconnect command*/
+inline bool isDisconnectCommand(const ActionMessage &command) noexcept
+{
+    return ((command.action() == CMD_DISCONNECT) || (command.action() == CMD_PRIORITY_DISCONNECT) || (command.action() == CMD_TERMINATE_IMMEDIATELY));
+}
+
 /** check if a command is a priority command*/
 inline bool isValidCommand(const ActionMessage &command) noexcept
 {
