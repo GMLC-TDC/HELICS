@@ -569,7 +569,7 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_ty
     if (M1)
     {
         BOOST_CHECK_EQUAL(M1->data.size(), data2.size());
-        if (M1.data.size() > 245)
+        if (M1->data.size() > 245)
         {
             BOOST_CHECK_EQUAL(M1->data[245], data2[245]);
         }
