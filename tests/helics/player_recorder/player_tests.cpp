@@ -210,6 +210,40 @@ BOOST_AUTO_TEST_CASE(simple_player_testjson)
     fut.get();
 
 }
+
+
+BOOST_AUTO_TEST_CASE(player_test_message)
+{
+    helics::FederateInfo fi("player1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core2";
+    fi.coreInitString = "2";
+    helics::player play1(fi);
+    fi.name = "block1";
+
+    helics::MessageFederate mfed(fi);
+    helics::Endpoint e1(helics::GLOBAL, &mfed, "dest");
+
+    play1.addMessage(1.0, "src", "dest", "this is a message");
+    auto fut = std::async(std::launch::async, [&play1]() {play1.run(); });
+    mfed.enterExecutionState();
+
+
+    auto retTime = mfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 1.0);
+    auto mess = e1.getMessage();
+    BOOST_CHECK(mess);
+    if (mess)
+    {
+        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->dest, "dest");
+        BOOST_CHECK_EQUAL(mess->data.to_string(), "this is a message");
+    }
+    
+    mfed.finalize();
+    fut.get();
+
+}
 /*
 BOOST_AUTO_TEST_CASE (simple_player_test)
 {

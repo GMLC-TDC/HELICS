@@ -30,7 +30,8 @@ namespace filesystem = boost::filesystem;
 
 static void playerArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
-//static const std::regex creg (R"raw((-?\d+(\.\d+)?|\.\d+)[\s,]*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
+// static const std::regex creg
+// (R"raw((-?\d+(\.\d+)?|\.\d+)[\s,]*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
 
 /*
 std::shared_ptr<CombinationFederate> fed;
@@ -44,430 +45,579 @@ std::map<std::string, int> eptids;
 
 namespace helics
 {
+static inline bool vComp (const ValueSetter &v1, const ValueSetter &v2) { return (v1.time < v2.time); }
+static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { return (m1.sendTime < m2.sendTime); }
 
-    static inline bool vComp(ValueSetter &v1, ValueSetter &v2) { return (v1.time < v2.time); }
+player::player (int argc, char *argv[])
+{
+    FederateInfo fi ("player");
+    fi.loadInfoFromArgs (argc, argv);
+    fed = std::make_shared<CombinationFederate> (fi);
+    fed->setFlag(SOURCE_ONLY_FLAG);
+    boost::program_options::variables_map vm_map;
+    playerArgumentParser (argc, argv, vm_map);
+    loadArguments (vm_map);
+}
 
+player::player (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi)) 
+{
+    fed->setFlag(SOURCE_ONLY_FLAG);
+}
 
+player::player (std::shared_ptr<Core> core, const FederateInfo &fi)
+    : fed (std::make_shared<CombinationFederate> (std::move (core), fi))
+{
+    fed->setFlag(SOURCE_ONLY_FLAG);
+}
 
-    player::player(int argc, char *argv[])
+player::player (const std::string &jsonString) : fed (std::make_shared<CombinationFederate> (jsonString))
+{
+    fed->setFlag(SOURCE_ONLY_FLAG);
+    if (jsonString.size () < 200)
     {
-        FederateInfo fi("player");
-        fi.loadInfoFromArgs(argc, argv);
-        fed = std::make_shared<CombinationFederate>(fi);
-
-        boost::program_options::variables_map vm_map;
-        playerArgumentParser(argc, argv,vm_map);
-        loadArguments(vm_map);
+        masterFileName = jsonString;
     }
+    loadJsonFile (jsonString);
+}
 
-    player::player(const FederateInfo &fi) : fed(std::make_shared<CombinationFederate>(fi))
+player::~player() = default;
+
+void player::addMessage (Time sendTime,
+                         const std::string &src,
+                         const std::string &dest,
+                         const std::string &payload)
+{
+    messages.resize (messages.size () + 1);
+    messages.back ().sendTime = sendTime;
+    messages.back ().mess.data = payload;
+    messages.back ().mess.src = src;
+    messages.back ().mess.dest = dest;
+    messages.back ().mess.time = sendTime;
+}
+
+void player::addMessage (Time sendTime,
+                         Time actionTime,
+                         const std::string &src,
+                         const std::string &dest,
+                         const std::string &payload)
+{
+    messages.resize (messages.size () + 1);
+    messages.back ().sendTime = sendTime;
+    messages.back ().mess.data = payload;
+    messages.back ().mess.src = src;
+    messages.back ().mess.dest = dest;
+    messages.back ().mess.time = actionTime;
+}
+
+void player::loadFile (const std::string &filename)
+{
+    auto ext = filesystem::path (filename).extension ().string ();
+    if ((ext == ".json") || (ext == ".JSON"))
     {
-
+        loadJsonFile (filename);
     }
-   
-    player::player(std::shared_ptr<Core> core, const FederateInfo &fi):fed(std::make_shared<CombinationFederate>(std::move(core),fi))
+    else
     {
-
+        loadTextFile (filename);
     }
+}
 
-    player::player(const std::string &jsonString):fed(std::make_shared<CombinationFederate>(jsonString))
+void player::loadTextFile (const std::string &filename)
+{
+    using namespace stringOps;
+    std::ifstream infile (filename);
+    std::string str;
+
+    int lcnt = 0;
+    // count the lines
+    while (std::getline (infile, str))
     {
-        if (jsonString.size() < 200)
+        if (str.empty ())
         {
-            masterFileName = jsonString;
+            continue;
         }
-        loadJsonFile(jsonString);
-    }
-
-    player::~player()
-    {
-
-    }
-
-    void player::loadFile(const std::string &filename)
-    {
-        auto ext = filesystem::path(filename).extension().string();
-        if ((ext==".json")||(ext==".JSON"))
+        auto fc = str.find_first_not_of (" \t\n\r\0");
+        if ((fc == std::string::npos) || (str[fc] == '#'))
         {
-            loadJsonFile(filename);
+            continue;
+        }
+        ++lcnt;
+    }
+    int icnt = static_cast<int> (points.size ());
+    points.resize (points.size () + lcnt);
+    // now start over and actual do the loading
+    infile.close ();
+    infile.open (filename);
+
+    int lcount = 0;
+    while (std::getline (infile, str))
+    {
+        ++lcount;
+        if (str.empty ())
+        {
+            continue;
+        }
+        auto fc = str.find_first_not_of (" \t\n\r\0");
+        if ((fc == std::string::npos) || (str[fc] == '#'))
+        {
+            continue;
+        }
+        /* time key type value units*/
+        auto blk = splitlineBracket (str, ",\t ", default_bracket_chars, delimiter_compression::on);
+
+        if (blk.size () == 3)
+        {
+            try
+            {
+                points[icnt].time = helics::Time (std::stod (trim (blk[0])));
+            }
+            catch (const std::invalid_argument &ia)
+            {
+                std::cerr << "ill formed time on line " << lcount << '\n';
+                continue;
+            }
+            points[icnt].pubName = blk[1];
+            points[icnt].value = blk[2];
+            ++icnt;
+        }
+        else if (blk.size () == 4)
+        {
+            try
+            {
+                points[icnt].time = helics::Time (std::stod (trim (blk[0])));
+            }
+            catch (const std::invalid_argument &ia)
+            {
+                std::cerr << "ill formed time on line " << lcount << '\n';
+                continue;
+            }
+            points[icnt].pubName = blk[1];
+            points[icnt].type = blk[2];
+            points[icnt].value = blk[3];
+            ++icnt;
+        }
+    }
+}
+
+void player::loadJsonFile (const std::string &jsonFile)
+{
+    fed->registerInterfaces (jsonFile);
+
+    auto pubCount = fed->getSubscriptionCount ();
+    for (int ii = 0; ii < pubCount; ++ii)
+    {
+        publications.emplace_back (fed.get (), ii);
+        pubids[publications.back ().getName ()] = static_cast<int> (publications.size () - 1);
+    }
+    auto eptCount = fed->getEndpointCount ();
+    for (int ii = 0; ii < eptCount; ++ii)
+    {
+        endpoints.emplace_back (fed.get (), ii);
+        eptids[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
+    }
+
+    using json = nlohmann::json;
+    json JF;
+    try
+    {
+        if (jsonFile.size () > 200)
+        {
+            JF.parse (jsonFile);
         }
         else
         {
-            loadTextFile(filename);
-        }
-        
-       
-    }
-
-    void player::loadTextFile(const std::string &filename)
-    {
-        using namespace stringOps;
-        std::ifstream infile(filename);
-        std::string str;
-
-        int lcnt = 0;
-        // count the lines
-        while (std::getline(infile, str))
-        {
-            if (str.empty())
+            std::ifstream file (jsonFile);
+            if (!file.is_open ())
             {
-                continue;
-            }
-            auto fc = str.find_first_not_of(" \t\n\r\0");
-            if ((fc == std::string::npos) || (str[fc] == '#'))
-            {
-                continue;
-            }
-            ++lcnt;
-        }
-        int icnt = static_cast<int>(points.size());
-        points.resize(points.size()+lcnt);
-        // now start over and actual do the loading
-        infile.close();
-        infile.open(filename);
-        
-        int lcount=0;
-        while (std::getline(infile, str))
-        {
-            ++lcount;
-            if (str.empty())
-            {
-                continue;
-            }
-            auto fc = str.find_first_not_of(" \t\n\r\0");
-            if ((fc == std::string::npos) || (str[fc] == '#'))
-            {
-                continue;
-            }
-            /* time key type value units*/
-            auto blk = splitlineBracket(str, ",\t ",default_bracket_chars,delimiter_compression::on);
-            
-            if (blk.size() == 3)
-            {
-                try
-                {
-                    points[icnt].time = helics::Time(std::stod(trim(blk[0])));
-                }
-                catch (const std::invalid_argument &ia)
-                {
-                    std::cerr << "ill formed time on line " << lcount << '\n';
-                    continue;
-                }
-                points[icnt].pubName = blk[1];
-                points[icnt].value = blk[2];
-                ++icnt;
-            }
-            else if (blk.size() == 4)
-            {
-                try
-                {
-                    points[icnt].time = helics::Time(std::stod(trim(blk[0])));
-                }
-                catch (const std::invalid_argument &ia)
-                {
-                    std::cerr << "ill formed time on line " << lcount << '\n';
-                    continue;
-                }
-                points[icnt].pubName = blk[1];
-                points[icnt].type = blk[2];
-                points[icnt].value = blk[3];
-                ++icnt;
-            }
-        }
-    }
-
-    void player::loadJsonFile(const std::string &jsonFile)
-    {
-        fed->registerInterfaces(jsonFile);
-
-        auto pubCount = fed->getSubscriptionCount();
-        for (int ii = 0; ii < pubCount; ++ii)
-        {
-            publications.emplace_back(fed.get(), ii);
-            pubids[publications.back().getName()] = static_cast<int>(publications.size() - 1);
-
-        }
-        auto eptCount = fed->getEndpointCount();
-        for (int ii = 0; ii < eptCount; ++ii)
-        {
-            endpoints.emplace_back(fed.get(), ii);
-            eptids[endpoints.back().getName()] = static_cast<int>(endpoints.size() - 1);
-
-        }
-
-        using json=nlohmann::json;
-        json JF;
-        try
-        {
-            if (jsonFile.size() > 200)
-            {
-                JF.parse(jsonFile);
+                JF.parse (jsonFile);
             }
             else
             {
-                std::ifstream file(jsonFile);
-                if (!file.is_open())
+                file >> JF;
+            }
+        }
+    }
+    catch (const json::exception &je)
+    {
+        std::cerr << je.what () << '\n';
+        return;
+    }
+
+    auto pointArray = JF["points"];
+    if (pointArray.is_array ())
+    {
+        points.reserve (points.size () + pointArray.size ());
+        for (const auto &pointElement : pointArray)
+        {
+            Time ptime;
+            if (pointElement.count ("time") > 0)
+            {
+                ptime = pointElement["time"].get<double> ();
+            }
+            else if (pointElement.count ("t") > 0)
+            {
+                ptime = pointElement["t"].get<double> ();
+            }
+            else
+            {
+                std::cout << "time not specified\n";
+                continue;
+            }
+            defV val;
+            if (pointElement.count ("value") > 0)
+            {
+                auto M = pointElement["value"];
+                if (M.is_number_integer ())
                 {
-                    JF.parse(jsonFile);
+                    val = M.get<int64_t> ();
+                }
+                else if (M.is_number_float ())
+                {
+                    val = M.get<double> ();
                 }
                 else
                 {
-                    file >> JF;
+                    val = M.get<std::string> ();
                 }
             }
-        }
-catch (const json::exception &je)
-{
-    std::cerr << je.what() << '\n';
-    return;
-}
-
-
-auto pointArray = JF["points"];
-if (pointArray.is_array())
-{
-    points.reserve(points.size() + pointArray.size());
-    for (const auto &pointElement : pointArray)
-    {
-        Time ptime;
-        if (pointElement.count("time") > 0)
-        {
-            ptime = pointElement["time"].get<double>();
-        }
-        else if (pointElement.count("t") > 0)
-        {
-            ptime = pointElement["t"].get<double>();
-        }
-        else
-        {
-            std::cout << "time not specified\n";
-            continue;
-        }
-        defV val;
-        if (pointElement.count("value") > 0)
-        {
-            auto M = pointElement["value"];
-            if (M.is_number_integer())
+            else if (pointElement.count ("v") > 0)
             {
-                val = M.get<int64_t>();
-            }
-            else if (M.is_number_float())
-            {
-                val = M.get<double>();
-            }
-            else
-            {
-                val = M.get < std::string>();
-            }
-
-        }
-        else if (pointElement.count("v") > 0)
-        {
-            auto M = pointElement["v"];
-            if (M.is_number_integer())
-            {
-                val = M.get<int64_t>();
-            }
-            else if (M.is_number_float())
-            {
-                val = M.get<double>();
-            }
-            else
-            {
-                val = M.get < std::string>();
-            }
-        }
-        std::string type;
-        if (pointElement.count("type") > 0)
-        {
-            type = pointElement["type"].get<std::string>();
-        }
-        std::string key;
-        if (pointElement.count("key") > 0)
-        {
-            key = pointElement["key"].get<std::string>();
-        }
-        else
-        {
-            std::cout << "key not specified\n";
-            continue;
-        }
-        points.resize(points.size() + 1);
-        points.back().time = ptime;
-        points.back().pubName = key;
-        points.back().value = val;
-        if (!type.empty())
-        {
-            points.back().type = type;
-        }
-
-    }
-}
-
-    }
-
-    void player::sortTags()
-    {
-        std::sort(points.begin(), points.end(), vComp);
-        // collapse tags to the reduced list
-        for (auto &vs : points)
-        {
-            auto fnd = tags.find(vs.pubName);
-            if (fnd != tags.end())
-            {
-                if (fnd->second.empty())
+                auto M = pointElement["v"];
+                if (M.is_number_integer ())
                 {
-                    tags[vs.pubName] = vs.type;
+                    val = M.get<int64_t> ();
                 }
+                else if (M.is_number_float ())
+                {
+                    val = M.get<double> ();
+                }
+                else
+                {
+                    val = M.get<std::string> ();
+                }
+            }
+            std::string type;
+            if (pointElement.count ("type") > 0)
+            {
+                type = pointElement["type"].get<std::string> ();
+            }
+            std::string key;
+            if (pointElement.count ("key") > 0)
+            {
+                key = pointElement["key"].get<std::string> ();
             }
             else
             {
-                tags.emplace(vs.pubName, vs.type);
-            }
-        }
-    }
-
-    /** helper function to generate the publications*/
-    void player::generatePublications()
-    {
-        for (auto &tname : tags)
-        {
-            //skip already existing publications
-            if (pubids.find(tname.first) != pubids.end())
-            {
+                std::cout << "key not specified\n";
                 continue;
             }
-            publications.push_back(helics::Publication(helics::GLOBAL, fed.get(), tname.first,
-                helics::getTypeFromString(tname.second)));
-            pubids[tname.first] = static_cast<int> (publications.size()) - 1;
+            points.resize (points.size () + 1);
+            points.back ().time = ptime;
+            points.back ().pubName = key;
+            points.back ().value = val;
+            if (!type.empty ())
+            {
+                points.back ().type = type;
+            }
         }
     }
+}
 
-    void player::cleanUpPointList()
+void player::sortTags ()
+{
+    std::sort (points.begin (), points.end (), vComp);
+    std::sort(messages.begin(), messages.end(), mComp);
+    // collapse tags to the reduced list
+    for (auto &vs : points)
     {
-        
-
-        // load up the ids
-        for (auto &vs : points)
+        auto fnd = tags.find (vs.pubName);
+        if (fnd != tags.end ())
         {
-            vs.index = pubids[vs.pubName];
+            if (fnd->second.empty ())
+            {
+                tags[vs.pubName] = vs.type;
+            }
         }
-    }
-
-    void player::initialize()
-    {
-        auto state=fed->currentState();
-       if (state== Federate::op_states::startup)
+        else
         {
-            sortTags();
-            generatePublications();
-            cleanUpPointList();
-            fed->enterInitializationState();
+            tags.emplace (vs.pubName, vs.type);
         }
     }
 
-    /*run the player*/
-    void player::run()
+    for (auto &ms : messages)
     {
-        run(stopTime);
-        fed->finalize();
+        epts.emplace(ms.mess.src);
     }
+}
 
-    void player::run(Time stopTime_input)
+/** helper function to generate the publications*/
+void player::generatePublications ()
+{
+    for (auto &tname : tags)
     {
-        auto state = fed->currentState();
-        if (state == Federate::op_states::startup)
+        // skip already existing publications
+        if (pubids.find (tname.first) != pubids.end ())
         {
-            initialize();
+            continue;
         }
-        int pointIndex = 0;
-        if (state != Federate::op_states::execution)
+        publications.push_back (
+          helics::Publication (helics::GLOBAL, fed.get (), tname.first, helics::getTypeFromString (tname.second)));
+        pubids[tname.first] = static_cast<int> (publications.size ()) - 1;
+    }
+}
+
+/** helper function to generate the publications*/
+void player::generateEndpoints()
+{
+    for (auto &ename : epts)
+    {
+        // skip already existing publications
+        if (eptids.find(ename) != eptids.end())
+        {
+            continue;
+        }
+        endpoints.push_back(Endpoint(GLOBAL, fed.get(), ename));
+        eptids[ename] = static_cast<int> (endpoints.size()) - 1;
+    }
+}
+
+void player::cleanUpPointList ()
+{
+    // load up the indexes
+    for (auto &vs : points)
+    {
+        vs.index = pubids[vs.pubName];
+    }
+    /** load the indices for the message*/
+    for (auto &ms : messages)
+    {
+        ms.index = eptids[ms.mess.src];
+    }
+}
+
+void player::initialize ()
+{
+    auto state = fed->currentState ();
+    if (state == Federate::op_states::startup)
+    {
+        sortTags ();
+        generatePublications ();
+        generateEndpoints();
+        cleanUpPointList ();
+        fed->enterInitializationState ();
+    }
+}
+
+/*run the player*/
+void player::run ()
+{
+    run (stopTime);
+    fed->finalize ();
+}
+
+void player::run (Time stopTime_input)
+{
+    auto state = fed->currentState ();
+    if (state == Federate::op_states::startup)
+    {
+        initialize ();
+    }
+    if (state != Federate::op_states::execution)
+    {
+        //send stuff before timeZero
+        if (!points.empty())
         {
             while (points[pointIndex].time < helics::timeZero)
             {
                 publications[points[pointIndex].index].publish(points[pointIndex].value);
                 ++pointIndex;
-            }
-
-            fed->enterExecutionState();
-        }
-        else
-        {
-            auto ctime = fed->getCurrentTime();
-            while (points[pointIndex].time <= ctime)
-            {
-                ++pointIndex;
-            }
-        }
-
-        helics::Time nextPrintTime = 10.0;
-        while (pointIndex < static_cast<int> (points.size()))
-        {
-            if (points[pointIndex].time > stopTime_input)
-            {
-                break;
-            }
-            auto newTime = fed->requestTime(points[pointIndex].time);
-
-            while (points[pointIndex].time <= newTime)
-            {
-                publications[points[pointIndex].index].publish(points[pointIndex].value);
-                ++pointIndex;
-                if (pointIndex == static_cast<int> (points.size()))
+                if (pointIndex >= points.size())
                 {
                     break;
                 }
             }
-            if (newTime >= nextPrintTime)
+        }
+        if (!messages.empty())
+        {
+            while (messages[messageIndex].sendTime < helics::timeZero)
             {
-                std::cout << "processed time " << static_cast<double> (newTime) << "\n";
-                nextPrintTime += 10.0;
+                endpoints[messages[messageIndex].index].send(messages[messageIndex].mess);
+                ++messageIndex;
+                if (messageIndex >= messages.size())
+                {
+                    break;
+                }
+            }
+        }
+
+        fed->enterExecutionState ();
+        //send the stuff at timeZero
+        if (!points.empty())
+        {
+            while (points[pointIndex].time == helics::timeZero)
+            {
+                publications[points[pointIndex].index].publish(points[pointIndex].value);
+                ++pointIndex;
+                if (pointIndex >= points.size())
+                {
+                    break;
+                }
+            }
+        }
+        if (!messages.empty())
+        {
+            while (messages[messageIndex].sendTime == helics::timeZero)
+            {
+                endpoints[messages[messageIndex].index].send(messages[messageIndex].mess);
+                ++messageIndex;
+                if (messageIndex >= messages.size())
+                {
+                    break;
+                }
+            }
+        }
+    }
+    else
+    {
+        auto ctime = fed->getCurrentTime ();
+        if (pointIndex<points.size())
+        {
+            while (points[pointIndex].time <= ctime)
+            {
+                ++pointIndex;
+                if (pointIndex >= points.size())
+                {
+                    break;
+                }
+            }
+        }
+        if (messageIndex<messages.size())
+        {
+            while (messages[messageIndex].sendTime <= ctime)
+            {
+                ++messageIndex;
+                if (messageIndex >= messages.size())
+                {
+                    break;
+                }
             }
         }
     }
 
-    void player::addPublication(const std::string &key, helicsType_t type, const std::string &units)
+    helics::Time nextPrintTime = 10.0;
+    bool moreToSend = true;
+    Time nextSendTime = timeZero;
+    while (moreToSend)
     {
-        publications.push_back(Publication(GLOBAL, fed.get(), key, type, units));
-        pubids[key] = static_cast<int> (publications.size()) - 1;
-    }
-
-    int player::loadArguments(boost::program_options::variables_map &vm_map)
-    {
-        if (vm_map.count("input") == 0)
+        nextSendTime = Time::maxVal();
+        if (pointIndex < points.size())
         {
-            return (-1);
+            nextSendTime = std::min(nextSendTime, points[pointIndex].time);
         }
-
-        if (vm_map.count("datatype") > 0)
+        if (messageIndex < messages.size())
         {
-            defType = helics::getTypeFromString(vm_map["datatype"].as<std::string>());
-            if (defType == helics::helicsType_t::helicsInvalid)
+            nextSendTime = std::min(nextSendTime, messages[messageIndex].sendTime);
+        }
+        if (nextSendTime > stopTime_input)
+        {
+            break;
+        }
+        if (nextSendTime == Time::maxVal())
+        {
+            moreToSend = false;
+            continue;
+        }
+        auto newTime = fed->requestTime (nextSendTime);
+        if (pointIndex < points.size())
+        {
+            while (points[pointIndex].time <= newTime)
             {
-                std::cerr << vm_map["datatype"].as<std::string>() << " is not recognized as a valid type \n";
-                return -3;
+                publications[points[pointIndex].index].publish(points[pointIndex].value);
+                ++pointIndex;
+                if (pointIndex >= points.size())
+                {
+                    break;
+                }
             }
         }
-
-        if (!filesystem::exists(vm_map["input"].as<std::string>()))
+        if (messageIndex < messages.size())
         {
-            std::cerr << vm_map["input"].as<std::string>() << " does not exist \n";
+            while (messages[messageIndex].sendTime <= newTime)
+            {
+                endpoints[messages[messageIndex].index].send(messages[messageIndex].mess);
+                ++messageIndex;
+                if (messageIndex >= messages.size())
+                {
+                    break;
+                }
+            }
+        }
+        if (newTime >= nextPrintTime)
+        {
+            std::cout << "processed time " << static_cast<double> (newTime) << "\n";
+            nextPrintTime += 10.0;
+        }
+    }
+}
+
+void player::addPublication (const std::string &key, helicsType_t type, const std::string &units)
+{
+    // skip already existing publications
+    if (pubids.find (key) != pubids.end ())
+    {
+        std::cerr << "publication already exists\n";
+    }
+    publications.push_back (Publication (GLOBAL, fed.get (), key, type, units));
+    pubids[key] = static_cast<int> (publications.size ()) - 1;
+}
+
+void player::addEndpoint (const std::string &endpointName, const std::string &endpointType)
+{
+    // skip already existing publications
+    if (eptids.find (endpointName) != eptids.end ())
+    {
+        std::cerr << "Endpoint already exists\n";
+    }
+    endpoints.push_back (Endpoint (GLOBAL, fed.get (), endpointName, endpointType));
+    eptids[endpointName] = static_cast<int> (endpoints.size ()) - 1;
+}
+
+
+int player::loadArguments (boost::program_options::variables_map &vm_map)
+{
+    if (vm_map.count ("input") == 0)
+    {
+        return (-1);
+    }
+
+    if (vm_map.count ("datatype") > 0)
+    {
+        defType = helics::getTypeFromString (vm_map["datatype"].as<std::string> ());
+        if (defType == helics::helicsType_t::helicsInvalid)
+        {
+            std::cerr << vm_map["datatype"].as<std::string> () << " is not recognized as a valid type \n";
             return -3;
         }
-        loadFile(vm_map["input"].as<std::string>());
-
-      
-        std::cout << "read file " << points.size() << " points for " << tags.size() << " tags \n";
-       
-        stopTime = Time::maxVal();
-        if (vm_map.count("stop") > 0)
-        {
-            stopTime = vm_map["stop"].as<double>();
-        }
-        return 0;
     }
 
-} //namespace helics
+    if (!filesystem::exists (vm_map["input"].as<std::string> ()))
+    {
+        std::cerr << vm_map["input"].as<std::string> () << " does not exist \n";
+        return -3;
+    }
+    loadFile (vm_map["input"].as<std::string> ());
+
+    std::cout << "read file " << points.size () << " points for " << tags.size () << " tags \n";
+
+    stopTime = Time::maxVal ();
+    if (vm_map.count ("stop") > 0)
+    {
+        stopTime = vm_map["stop"].as<double> ();
+    }
+    return 0;
+}
+
+}  // namespace helics
 
 void playerArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map)
 {
@@ -557,4 +707,3 @@ void playerArgumentParser (int argc, const char *const *argv, po::variables_map 
         return;
     }
 }
-

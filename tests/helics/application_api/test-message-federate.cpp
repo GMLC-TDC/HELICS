@@ -492,8 +492,12 @@ BOOST_TEST_DECORATOR (*utf::timeout (20))
 #endif
 BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 {
+    if (core_type != "test")
+    {
+        return;
+    }
     AddBroker (core_type, "3");
-
+    
     auto ctype = helics::coreTypeFromString (core_type);
     pingpongFed p1 ("fedA", 0.5, ctype);
     pingpongFed p2 ("fedB", 0.5, ctype);

@@ -48,10 +48,17 @@ namespace helics
         defV value;
     };
 
+    class MessageHolder
+    {
+    public:
+        Time sendTime;
+        int index;
+        Message mess;
+    };
 
     /** class implementing a player object, which is capable of reading a file and generating interfaces
     and sending signals at the appropriate times
-    @details  the player class is not threadsafe,  don't try to use it from multiple threads that will result in undefined behavior
+    @details  the player class is not threadsafe,  don't try to use it from multiple threads without external protection, that will result in undefined behavior
     */
     class player
     {
@@ -124,6 +131,11 @@ namespace helics
             pubids[key] = static_cast<int> (publications.size()) - 1;
         }
         
+        /** add an endpoint to the player
+        @param endpointName the name of the endpoint
+        @param endpointType the named type of the endpoint
+        */
+        void addEndpoint(const std::string &endpointName, const std::string &endpointType = "");
         /** add a data point to publish through a player
         @param pubTime the time of the publication
         @param key the key for the publication
@@ -137,15 +149,42 @@ namespace helics
             points.back().pubName = key;
             points.back().value = val;
         }
+        /** add a message to a player queue
+        @param pubTime  the time the message should be sent
+        @param src the source endpoint of the message
+        @param dest the destination endpoint of the message
+        @param payload the payload of the message
+        */
+        void addMessage(Time sendTime, const std::string &src, const std::string &dest, const std::string &payload);
+
+        /** add an event for a specific time to a player queue
+        @param sendTime  the time the message should be sent
+        @param actionTime  the eventTime listed for the message
+        @param src the source endpoint of the message
+        @param dest the destination endpoint of the message
+        @param payload the payload of the message
+        */
+        void addMessage(Time sendTime, Time actionTime, const std::string &src, const std::string &dest, const std::string &payload);
+
         /** get the number of points loaded*/
        auto pointCount() const
         {
             return points.size();
         }
+       /** get the number of messages loaded*/
+       auto messageCount() const
+       {
+           return messages.size();
+       }
        /** get the number of publications */
         auto publicationCount() const
         {
             return publications.size();
+        }
+        /** get the number of endpoints*/
+        auto endpointCount() const
+        {
+            return endpoints.size();
         }
     private:
         int loadArguments(boost::program_options::variables_map &vm_map);
@@ -159,12 +198,17 @@ namespace helics
         void sortTags();
         /** helper function to generate the publications*/
         void generatePublications();
+        /** helper function to generate the used Endpoints*/
+        void generateEndpoints();
         /** helper function to sort the points and link them to publications*/
         void cleanUpPointList();
+
     private:
         std::shared_ptr<CombinationFederate> fed; //!< the federate created for the player
         std::vector<ValueSetter> points;    //!< the points to generate into the federation
+        std::vector<MessageHolder> messages; //!< list of message to hold
         std::map<std::string, std::string> tags;    //!< map of the key and type strings
+        std::set<std::string> epts;  //!< set of the used endpoints
         std::vector<Publication> publications;  //!< the actual publication objects
         std::vector<Endpoint> endpoints;    //!< the actual endpoint objects
         std::map<std::string, int> pubids;  //!< publication id map
@@ -172,6 +216,8 @@ namespace helics
         helics::helicsType_t defType = helics::helicsType_t::helicsString; //!< the default data type unless otherwise specified
         Time stopTime = Time::maxVal(); //!< the time the player should stop
         std::string masterFileName; //!< the name of the master file used to do the construction
+        size_t pointIndex = 0; //!< the current point index
+        size_t messageIndex = 0; //!< the current message index
     };
 }
 

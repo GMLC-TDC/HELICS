@@ -2047,7 +2047,19 @@ void CommonCore::processCommand (ActionMessage &&command)
             auto &dep = fed->getDependents ();
             for (auto &fed_id : dep)
             {
-                routeMessage (command, fed_id);
+                if (fed_id == global_broker_id)
+                { //if the destination is the core just process it here
+                    command.dest_id = global_broker_id;
+                    if (timeCoord->processTimeMessage(command))
+                    {
+                        timeCoord->checkTimeGrant();
+                    }
+                }
+                else
+                {
+                    routeMessage(command, fed_id);
+                }
+                
             }
             if (allDisconnected ())
             {
@@ -2056,6 +2068,13 @@ void CommonCore::processCommand (ActionMessage &&command)
                 dis.source_id = global_broker_id;
                 transmit (0, dis);
                 addActionMessage (CMD_STOP);
+            }
+        }
+        else if (command.dest_id == global_broker_id)
+        {
+            if (timeCoord->processTimeMessage(command))
+            {
+                timeCoord->checkTimeGrant();
             }
         }
         else
