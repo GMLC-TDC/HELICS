@@ -69,6 +69,9 @@ class FederateInfo: public CoreFederateInfo
     void loadInfoFromArgs(int argc, const char * const *argv);
 };
 
+/** generate a FederateInfo object from a json file
+*/
+FederateInfo LoadFederateInfo(const std::string &jsonString);
 
 /** get a string with the helics version info*/
 std::string getHelicsVersionString();
@@ -417,9 +420,6 @@ class Federate
     /** get a pointer to the core object used by the federate*/
     std::shared_ptr<Core> getCorePointer () { return coreObject; }
 };
-/** generate a FederateInfo object from a json file
- */
-FederateInfo LoadFederateInfo (const std::string &jsonString);
 
 /** defining an exception class for state transition errors*/
 class InvalidStateTransition : public std::runtime_error

@@ -84,12 +84,12 @@ std::string base64_encode (unsigned char const *bytes_to_encode, int32_t in_len)
     return ret;
 }
 
-std::vector<unsigned char> base64_decode (std::string const &encoded_string)
+std::vector<unsigned char> base64_decode (std::string const &encoded_string, size_t offset)
 {
     auto in_len = encoded_string.size ();
     int i = 0;
     int j = 0;
-    int in_ = 0;
+    int in_ = static_cast<int>(offset);
     unsigned char char_array_4[4], char_array_3[3];
     std::vector<unsigned char> ret;
     ret.reserve (in_len);
@@ -139,5 +139,134 @@ std::vector<unsigned char> base64_decode (std::string const &encoded_string)
     }
 
     return ret;
+}
+
+std::string base64_decode_to_string(std::string const &encoded_string, size_t offset)
+{
+    auto in_len = encoded_string.size();
+    int i = 0;
+    int j = 0;
+    int in_ = static_cast<int>(offset);
+    unsigned char char_array_4[4], char_array_3[3];
+    std::string ret;
+    ret.reserve(in_len);
+
+    while (((in_len--) != 0u) && (encoded_string[in_] != '=') && is_base64(encoded_string[in_]))
+    {
+        char_array_4[i++] = encoded_string[in_];
+        in_++;
+        if (i == 4)
+        {
+            char_array_4[0] = b64Map[char_array_4[0]];
+            char_array_4[1] = b64Map[char_array_4[1]];
+            char_array_4[2] = b64Map[char_array_4[2]];
+            char_array_4[3] = b64Map[char_array_4[3]];
+
+            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+
+            ret.push_back(char_array_3[0]);
+            ret.push_back(char_array_3[1]);
+            ret.push_back(char_array_3[2]);
+
+            i = 0;
+        }
+    }
+
+    if (i > 0)
+    {
+        for (j = i; j < 4; j++)
+        {
+            char_array_4[j] = 0;
+        }
+        char_array_4[0] = b64Map[char_array_4[0]];
+        char_array_4[1] = b64Map[char_array_4[1]];
+        char_array_4[2] = b64Map[char_array_4[2]];
+        char_array_4[3] = b64Map[char_array_4[3]];
+
+        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+        char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+
+        for (j = 0; (j < i - 1); j++)
+        {
+            ret.push_back(char_array_3[j]);
+        }
+    }
+
+    return ret;
+}
+
+/** decode a string to the specified memory location*/
+size_t base64_decode(std::string const& encoded_string, void *data, size_t max_size)
+{
+    auto in_len = encoded_string.size();
+    int i = 0;
+    int j = 0;
+    int in_ = 0;
+    unsigned char char_array_4[4], char_array_3[3];
+    unsigned char *outData = reinterpret_cast<unsigned char *>(data);
+    size_t dataIndex = 0;
+    while (((in_len--) != 0u) && (encoded_string[in_] != '=') && is_base64(encoded_string[in_]))
+    {
+        char_array_4[i++] = encoded_string[in_];
+        in_++;
+        if (i == 4)
+        {
+            char_array_4[0] = b64Map[char_array_4[0]];
+            char_array_4[1] = b64Map[char_array_4[1]];
+            char_array_4[2] = b64Map[char_array_4[2]];
+            char_array_4[3] = b64Map[char_array_4[3]];
+
+            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+            if (dataIndex + 2 < max_size)
+            {
+                outData[dataIndex++] = char_array_3[0];
+                outData[dataIndex++] = char_array_3[1];
+                outData[dataIndex++] = char_array_3[2];
+            }
+            else if (dataIndex + 1 < max_size)
+            {
+                outData[dataIndex++] = char_array_3[0];
+                outData[dataIndex++] = char_array_3[1];
+                return dataIndex;
+            }
+            else if (dataIndex < max_size)
+            {
+                outData[dataIndex++] = char_array_3[0];
+                return dataIndex;
+            }
+
+            i = 0;
+        }
+    }
+
+    if (i > 0)
+    {
+        for (j = i; j < 4; j++)
+        {
+            char_array_4[j] = 0;
+        }
+        char_array_4[0] = b64Map[char_array_4[0]];
+        char_array_4[1] = b64Map[char_array_4[1]];
+        char_array_4[2] = b64Map[char_array_4[2]];
+        char_array_4[3] = b64Map[char_array_4[3]];
+
+        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+        char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+
+        for (j = 0; (j < i - 1); j++)
+        {
+            if (dataIndex < max_size)
+            {
+                outData[dataIndex++] = char_array_3[j];
+            }
+        }
+    }
+    return dataIndex;
 }
 }  // namespace utilities

@@ -202,6 +202,8 @@ namespace helics
         void generateEndpoints();
         /** helper function to sort the points and link them to publications*/
         void cleanUpPointList();
+        /** function to decode data strings for messages*/
+        std::string decode(std::string &&stringToDecode);
 
     private:
         std::shared_ptr<CombinationFederate> fed; //!< the federate created for the player

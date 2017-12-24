@@ -244,6 +244,177 @@ BOOST_AUTO_TEST_CASE(player_test_message)
     fut.get();
 
 }
+
+BOOST_AUTO_TEST_CASE(player_test_message2)
+{
+    helics::FederateInfo fi("player1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core2";
+    fi.coreInitString = "2";
+    helics::player play1(fi);
+    fi.name = "block1";
+
+    helics::MessageFederate mfed(fi);
+    helics::Endpoint e1(helics::GLOBAL, &mfed, "dest");
+
+    play1.addMessage(1.0, "src", "dest", "this is a test message");
+    play1.addMessage(2.0, "src", "dest", "this is test message2");
+
+    play1.addMessage(3.0, "src", "dest", "this is message 3");
+    auto fut = std::async(std::launch::async, [&play1]() {play1.run(); });
+    mfed.enterExecutionState();
+
+
+    auto retTime = mfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 1.0);
+    auto mess = e1.getMessage();
+    BOOST_CHECK(mess);
+    if (mess)
+    {
+        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->dest, "dest");
+        BOOST_CHECK_EQUAL(mess->data.to_string(), "this is a test message");
+    }
+
+    retTime = mfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 2.0);
+    mess = e1.getMessage();
+    BOOST_CHECK(mess);
+    if (mess)
+    {
+        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->dest, "dest");
+        BOOST_CHECK_EQUAL(mess->data.to_string(), "this is test message2");
+    }
+
+    retTime = mfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 3.0);
+    mess = e1.getMessage();
+    BOOST_CHECK(mess);
+    if (mess)
+    {
+        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->dest, "dest");
+        BOOST_CHECK_EQUAL(mess->data.to_string(), "this is message 3");
+    }
+    mfed.finalize();
+    fut.get();
+
+}
+
+
+BOOST_AUTO_TEST_CASE(player_test_message3)
+{
+    helics::FederateInfo fi("player1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core2";
+    fi.coreInitString = "2";
+    helics::player play1(fi);
+    fi.name = "block1";
+
+    helics::MessageFederate mfed(fi);
+    helics::Endpoint e1(helics::GLOBAL, &mfed, "dest");
+
+    play1.addMessage(1.0, "src", "dest", "this is a test message");
+    play1.addMessage(1.0, 2.0, "src", "dest", "this is test message2");
+
+    play1.addMessage(2.0, 3.0, "src", "dest", "this is message 3");
+    auto fut = std::async(std::launch::async, [&play1]() {play1.run(); });
+    mfed.enterExecutionState();
+
+
+    auto retTime = mfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 1.0);
+    auto mess = e1.getMessage();
+    BOOST_CHECK(mess);
+    if (mess)
+    {
+        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->dest, "dest");
+        BOOST_CHECK_EQUAL(mess->data.to_string(), "this is a test message");
+    }
+
+    retTime = mfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 2.0);
+    mess = e1.getMessage();
+    BOOST_CHECK(mess);
+    if (mess)
+    {
+        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->dest, "dest");
+        BOOST_CHECK_EQUAL(mess->data.to_string(), "this is test message2");
+    }
+
+    retTime = mfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 3.0);
+    mess = e1.getMessage();
+    BOOST_CHECK(mess);
+    if (mess)
+    {
+        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->dest, "dest");
+        BOOST_CHECK_EQUAL(mess->data.to_string(), "this is message 3");
+    }
+    mfed.finalize();
+    fut.get();
+
+}
+
+const std::vector<std::string> simple_message_files
+{ "example_message1.player","example_message2.player", "example_message3.json" };
+
+BOOST_DATA_TEST_CASE(simple_message_player_test_files, boost::unit_test::data::make(simple_message_files), file)
+{
+    helics::FederateInfo fi("player1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core2";
+    fi.coreInitString = "2";
+    helics::player play1(fi);
+    fi.name = "block1"; 
+
+    helics::MessageFederate mfed(fi);
+    helics::Endpoint e1(helics::GLOBAL, &mfed, "dest");
+    play1.loadFile(std::string(TEST_DIR) + "/test_files/" + file);
+    auto fut = std::async(std::launch::async, [&play1]() {play1.run(); });
+    mfed.enterExecutionState();
+
+
+    auto retTime = mfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 1.0);
+    auto mess = e1.getMessage();
+    BOOST_CHECK(mess);
+    if (mess)
+    {
+        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->dest, "dest");
+        BOOST_CHECK_EQUAL(mess->data.to_string(), "this is a test message");
+    }
+
+    retTime = mfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 2.0);
+    mess = e1.getMessage();
+    BOOST_CHECK(mess);
+    if (mess)
+    {
+        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->dest, "dest");
+        BOOST_CHECK_EQUAL(mess->data.to_string(), "this is test message2");
+    }
+
+    retTime = mfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 3.0);
+    mess = e1.getMessage();
+    BOOST_CHECK(mess);
+    if (mess)
+    {
+        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->dest, "dest");
+        BOOST_CHECK_EQUAL(mess->data.to_string(), "this is message 3");
+    }
+    mfed.finalize();
+    fut.get();
+}
+
 /*
 BOOST_AUTO_TEST_CASE (simple_player_test)
 {

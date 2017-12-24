@@ -877,36 +877,101 @@ void runDualFederateTestObj (const std::string &core_type_str,
     fedB->finalize ();
     helics::cleanupHelicsLibrary ();
 }
+
+#ifndef QUICK_TESTS_ONLY
 /** test case checking that the transfer between two federates works as expected
  */
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (40))
+BOOST_TEST_DECORATOR (*utf::timeout (10))
 #endif
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types1, bdata::make (core_types), core_type)
 {
-#ifndef QUICK_TESTS_ONLY
     runDualFederateTest<double> (core_type, 10.3, 45.3, 22.7);
-    runDualFederateTest<int> (core_type, 5, 8, 43);
-    runDualFederateTest<int> (core_type, -5, 1241515, -43);
-    runDualFederateTest<char> (core_type, 'c', '\0', '\n');
+}
 
-    runDualFederateTest<uint64_t> (core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
-    runDualFederateTest<float> (core_type, 10.3f, 45.3f, 22.7f);
-    runDualFederateTest<std::string> (core_type, "start", "inside of the functional relationship of helics",
-                                      std::string ("I am a string"));
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR(*utf::timeout(10))
 #endif
+BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types2, bdata::make(core_types), core_type)
+{
+    runDualFederateTest<int>(core_type, 5, 8, 43);
+}
+
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR(*utf::timeout(10))
+#endif
+BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types3, bdata::make(core_types), core_type)
+{
+    runDualFederateTest<int>(core_type, -5, 1241515, -43);
+}
+
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR(*utf::timeout(10))
+#endif
+BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types4, bdata::make(core_types), core_type)
+{
+    runDualFederateTest<char>(core_type, 'c', '\0', '\n');
+}
+
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR(*utf::timeout(10))
+#endif
+BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types5, bdata::make(core_types), core_type)
+{
+    runDualFederateTest<uint64_t>(core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
+}
+
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR(*utf::timeout(10))
+#endif
+BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types6, bdata::make(core_types), core_type)
+{
+    runDualFederateTest<float>(core_type, 10.3f, 45.3f, 22.7f);
+}
+
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR(*utf::timeout(10))
+#endif
+BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types7, bdata::make(core_types), core_type)
+{
+    runDualFederateTest<std::string>(core_type, "start", "inside of the functional relationship of helics",
+        std::string("I am a string"));
+
+}
+
+#endif /*ifndef QUICK_TEST_ONLY*/
+
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR(*utf::timeout(10))
+#endif
+BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types8, bdata::make(core_types), core_type)
+{
     // this one is going to test really ugly strings
-    runDualFederateTest<std::string> (core_type, std::string (86263, '\0'),
-                                      "inside\n\0 of the \0\n functional\r \brelationship of helics\n"s,
-                                      std::string (""));
-    std::vector<double> defVec = {34.3, 24.2};
-    std::vector<double> v1Vec = {12.4, 14.7, 16.34, 18.17};
-    std::vector<double> v2Vec = {9.9999, 8.8888, 7.7777};
-    runDualFederateTestv2<std::vector<double>> (core_type, defVec, v1Vec, v2Vec);
-    std::complex<double> def = {54.23233, 0.7};
-    std::complex<double> v1 = std::polar (10.0, 0.43);
-    std::complex<double> v2 = {-3e45, 1e-23};
-    runDualFederateTest<std::complex<double>> (core_type, def, v1, v2);
+    runDualFederateTest<std::string>(core_type, std::string(86263, '\0'),
+        "inside\n\0 of the \0\n functional\r \brelationship of helics\n"s,
+        std::string(""));
+}
+
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR(*utf::timeout(10))
+#endif
+BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types9, bdata::make(core_types), core_type)
+{
+    std::vector<double> defVec = { 34.3, 24.2 };
+    std::vector<double> v1Vec = { 12.4, 14.7, 16.34, 18.17 };
+    std::vector<double> v2Vec = { 9.9999, 8.8888, 7.7777 };
+    runDualFederateTestv2<std::vector<double>>(core_type, defVec, v1Vec, v2Vec);
+}
+
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR(*utf::timeout(5))
+#endif
+BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types10, bdata::make(core_types), core_type)
+{
+    std::complex<double> def = { 54.23233, 0.7 };
+    std::complex<double> v1 = std::polar(10.0, 0.43);
+    std::complex<double> v2 = { -3e45, 1e-23 };
+    runDualFederateTest<std::complex<double>>(core_type, def, v1, v2);
 }
 
 /** test case checking that the transfer between two federates works as expected with publication and subscription

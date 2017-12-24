@@ -23,6 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "PrecHelper.h"
 #include "json.hpp"
 
+#include "../common/base64.h"
 #include "../common/stringOps.h"
 
 namespace po = boost::program_options;
@@ -53,26 +54,26 @@ player::player (int argc, char *argv[])
     FederateInfo fi ("player");
     fi.loadInfoFromArgs (argc, argv);
     fed = std::make_shared<CombinationFederate> (fi);
-    fed->setFlag(SOURCE_ONLY_FLAG);
+    fed->setFlag (SOURCE_ONLY_FLAG);
     boost::program_options::variables_map vm_map;
     playerArgumentParser (argc, argv, vm_map);
     loadArguments (vm_map);
 }
 
-player::player (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi)) 
+player::player (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
 {
-    fed->setFlag(SOURCE_ONLY_FLAG);
+    fed->setFlag (SOURCE_ONLY_FLAG);
 }
 
 player::player (std::shared_ptr<Core> core, const FederateInfo &fi)
     : fed (std::make_shared<CombinationFederate> (std::move (core), fi))
 {
-    fed->setFlag(SOURCE_ONLY_FLAG);
+    fed->setFlag (SOURCE_ONLY_FLAG);
 }
 
 player::player (const std::string &jsonString) : fed (std::make_shared<CombinationFederate> (jsonString))
 {
-    fed->setFlag(SOURCE_ONLY_FLAG);
+    fed->setFlag (SOURCE_ONLY_FLAG);
     if (jsonString.size () < 200)
     {
         masterFileName = jsonString;
@@ -80,7 +81,7 @@ player::player (const std::string &jsonString) : fed (std::make_shared<Combinati
     loadJsonFile (jsonString);
 }
 
-player::~player() = default;
+player::~player () = default;
 
 void player::addMessage (Time sendTime,
                          const std::string &src,
@@ -128,7 +129,8 @@ void player::loadTextFile (const std::string &filename)
     std::ifstream infile (filename);
     std::string str;
 
-    int lcnt = 0;
+    int mcnt = 0;
+    int pcnt = 0;
     // count the lines
     while (std::getline (infile, str))
     {
@@ -141,10 +143,19 @@ void player::loadTextFile (const std::string &filename)
         {
             continue;
         }
-        ++lcnt;
+        if ((str[fc] == 'm') || (str[fc] == 'M'))
+        {
+            ++mcnt;
+        }
+        else
+        {
+            ++pcnt;
+        }
     }
-    int icnt = static_cast<int> (points.size ());
-    points.resize (points.size () + lcnt);
+    int pIndex = static_cast<int> (points.size ());
+    points.resize (points.size () + pcnt);
+    int mIndex = static_cast<int> (messages.size ());
+    messages.resize (messages.size () + mcnt);
     // now start over and actual do the loading
     infile.close ();
     infile.open (filename);
@@ -152,7 +163,6 @@ void player::loadTextFile (const std::string &filename)
     int lcount = 0;
     while (std::getline (infile, str))
     {
-        ++lcount;
         if (str.empty ())
         {
             continue;
@@ -165,36 +175,93 @@ void player::loadTextFile (const std::string &filename)
         /* time key type value units*/
         auto blk = splitlineBracket (str, ",\t ", default_bracket_chars, delimiter_compression::on);
 
-        if (blk.size () == 3)
+        trimString (blk[0]);
+        if ((blk[0].front () == 'm') || (blk[0].front () == 'M'))
         {
-            try
+            // deal with messages
+            switch (blk.size ())
             {
-                points[icnt].time = helics::Time (std::stod (trim (blk[0])));
+            case 5:
+                try
+                {
+                    messages[mIndex].sendTime = helics::Time (std::stod (blk[1]));
+                }
+                catch (const std::invalid_argument &ia)
+                {
+                    std::cerr << "ill formed time on line " << lcount << '\n';
+                    continue;
+                }
+                messages[mIndex].mess.src = blk[2];
+                messages[mIndex].mess.dest = blk[3];
+                messages[mIndex].mess.time = messages[mIndex].sendTime;
+                messages[mIndex].mess.data = decode (std::move (blk[4]));
+                break;
+            case 6:
+                try
+                {
+                    messages[mIndex].sendTime = helics::Time (std::stod (blk[1]));
+                }
+                catch (const std::invalid_argument &ia)
+                {
+                    std::cerr << "ill formed time on line " << lcount << '\n';
+                    continue;
+                }
+                messages[mIndex].mess.src = blk[3];
+                messages[mIndex].mess.dest = blk[4];
+                try
+                {
+                    messages[mIndex].mess.time = helics::Time (std::stod (blk[2]));
+                }
+                catch (const std::invalid_argument &ia)
+                {
+                    std::cerr << "ill formed message time on line " << lcount << '\n';
+                    continue;
+                }
+                messages[mIndex].mess.data = decode (std::move (blk[5]));
+                break;
+            default:
+                std::cerr << "unknown message format line " << lcount << '\n';
+                break;
             }
-            catch (const std::invalid_argument &ia)
-            {
-                std::cerr << "ill formed time on line " << lcount << '\n';
-                continue;
-            }
-            points[icnt].pubName = blk[1];
-            points[icnt].value = blk[2];
-            ++icnt;
+            ++mIndex;
         }
-        else if (blk.size () == 4)
+        else
         {
-            try
+            if (blk.size () == 3)
             {
-                points[icnt].time = helics::Time (std::stod (trim (blk[0])));
+                try
+                {
+                    points[pIndex].time = helics::Time (std::stod (blk[0]));
+                }
+                catch (const std::invalid_argument &ia)
+                {
+                    std::cerr << "ill formed time on line " << lcount << '\n';
+                    continue;
+                }
+                points[pIndex].pubName = blk[1];
+                points[pIndex].value = blk[2];
+                ++pIndex;
             }
-            catch (const std::invalid_argument &ia)
+            else if (blk.size () == 4)
             {
-                std::cerr << "ill formed time on line " << lcount << '\n';
-                continue;
+                try
+                {
+                    points[pIndex].time = helics::Time (std::stod (trim (blk[0])));
+                }
+                catch (const std::invalid_argument &ia)
+                {
+                    std::cerr << "ill formed time on line " << lcount << '\n';
+                    continue;
+                }
+                points[pIndex].pubName = blk[1];
+                points[pIndex].type = blk[2];
+                points[pIndex].value = blk[3];
+                ++pIndex;
             }
-            points[icnt].pubName = blk[1];
-            points[icnt].type = blk[2];
-            points[icnt].value = blk[3];
-            ++icnt;
+            else
+            {
+                std::cerr << "unknown publish format line " << lcount << '\n';
+            }
         }
     }
 }
@@ -321,12 +388,125 @@ void player::loadJsonFile (const std::string &jsonFile)
             }
         }
     }
+
+    auto messageArray = JF["messages"];
+    if (messageArray.is_array())
+    {
+       messages.reserve(messages.size() + messageArray.size());
+        for (const auto &messageElement : messageArray)
+        {
+            Time ptime;
+            if (messageElement.count("time") > 0)
+            {
+                ptime = messageElement["time"].get<double>();
+            }
+            else if (messageElement.count("t") > 0)
+            {
+                ptime = messageElement["t"].get<double>();
+            }
+            else
+            {
+                std::cout << "time not specified\n";
+                continue;
+            }
+            std::string src;
+            if (messageElement.count("src") > 0)
+            {
+                src = messageElement["src"].get<std::string>();
+            }
+            if (messageElement.count("source") > 0)
+            {
+                src = messageElement["source"].get<std::string>();
+            }
+            std::string dest;
+            if (messageElement.count("dest") > 0)
+            {
+                dest = messageElement["dest"].get<std::string>();
+            }
+            if (messageElement.count("destination") > 0)
+            {
+                dest = messageElement["destination"].get<std::string>();
+            }
+            Time sendTime = ptime;
+            std::string type;
+            if (messageElement.count("sendtime") > 0)
+            {
+                ptime = messageElement["sendtime"].get<double>();
+            }
+            
+            messages.resize(messages.size() + 1);
+            messages.back().sendTime = sendTime;
+            messages.back().mess.src = src;
+            messages.back().mess.dest = dest;
+            messages.back().mess.time = ptime;
+            if (messageElement.count("data") > 0)
+            {
+                if (messageElement.count("encoding") > 0)
+                {
+                    if (messageElement["encoding"] == "base64")
+                    {
+                        messages.back().mess.data = decode(messageElement["data"].get<std::string>());
+                    }
+                    else
+                    {
+                        messages.back().mess.data = messageElement["data"].get<std::string>();
+                    }
+                }
+                else
+                {
+                    messages.back().mess.data = messageElement["data"].get<std::string>();
+                }
+            }
+            else if (messageElement.count("message") > 0)
+            {
+                if (messageElement.count("encoding") > 0)
+                {
+                    if (messageElement["encoding"] == "base64")
+                    {
+                        messages.back().mess.data = decode(messageElement["message"].get<std::string>());
+                    }
+                    else
+                    {
+                        messages.back().mess.data = messageElement["message"].get<std::string>();
+                    }
+                }
+                else
+                {
+                    messages.back().mess.data = messageElement["message"].get<std::string>();
+                }
+            }
+           
+        }
+    }
+}
+
+std::string player::decode (std::string &&stringToDecode)
+{
+    if ((stringToDecode.compare (1, 3, "64[") == 0) && (stringToDecode.back () == '['))
+    {
+        stringToDecode.pop_back ();
+        return utilities::base64_decode_to_string (stringToDecode, 4);
+    }
+    if ((stringToDecode.compare (4, 3, "64[") == 0) && (stringToDecode.back () == '['))
+    {  // to allow for base64[ or BASE64[
+        stringToDecode.pop_back ();
+        return utilities::base64_decode_to_string (stringToDecode, 7);
+    }
+
+    if (!stringToDecode.empty ())
+    {
+        if ((stringToDecode.front () == '"') || (stringToDecode.front () == '\''))
+        {
+            return stringOps::removeQuotes (stringToDecode);
+        }
+    }
+    return std::move (stringToDecode);
 }
 
 void player::sortTags ()
 {
     std::sort (points.begin (), points.end (), vComp);
-    std::sort(messages.begin(), messages.end(), mComp);
+    std::sort (messages.begin (), messages.end (), mComp);
     // collapse tags to the reduced list
     for (auto &vs : points)
     {
@@ -346,7 +526,7 @@ void player::sortTags ()
 
     for (auto &ms : messages)
     {
-        epts.emplace(ms.mess.src);
+        epts.emplace (ms.mess.src);
     }
 }
 
@@ -367,17 +547,17 @@ void player::generatePublications ()
 }
 
 /** helper function to generate the publications*/
-void player::generateEndpoints()
+void player::generateEndpoints ()
 {
     for (auto &ename : epts)
     {
         // skip already existing publications
-        if (eptids.find(ename) != eptids.end())
+        if (eptids.find (ename) != eptids.end ())
         {
             continue;
         }
-        endpoints.push_back(Endpoint(GLOBAL, fed.get(), ename));
-        eptids[ename] = static_cast<int> (endpoints.size()) - 1;
+        endpoints.push_back (Endpoint (GLOBAL, fed.get (), ename));
+        eptids[ename] = static_cast<int> (endpoints.size ()) - 1;
     }
 }
 
@@ -402,7 +582,7 @@ void player::initialize ()
     {
         sortTags ();
         generatePublications ();
-        generateEndpoints();
+        generateEndpoints ();
         cleanUpPointList ();
         fed->enterInitializationState ();
     }
@@ -424,26 +604,26 @@ void player::run (Time stopTime_input)
     }
     if (state != Federate::op_states::execution)
     {
-        //send stuff before timeZero
-        if (!points.empty())
+        // send stuff before timeZero
+        if (!points.empty ())
         {
             while (points[pointIndex].time < helics::timeZero)
             {
-                publications[points[pointIndex].index].publish(points[pointIndex].value);
+                publications[points[pointIndex].index].publish (points[pointIndex].value);
                 ++pointIndex;
-                if (pointIndex >= points.size())
+                if (pointIndex >= points.size ())
                 {
                     break;
                 }
             }
         }
-        if (!messages.empty())
+        if (!messages.empty ())
         {
             while (messages[messageIndex].sendTime < helics::timeZero)
             {
-                endpoints[messages[messageIndex].index].send(messages[messageIndex].mess);
+                endpoints[messages[messageIndex].index].send (messages[messageIndex].mess);
                 ++messageIndex;
-                if (messageIndex >= messages.size())
+                if (messageIndex >= messages.size ())
                 {
                     break;
                 }
@@ -451,26 +631,26 @@ void player::run (Time stopTime_input)
         }
 
         fed->enterExecutionState ();
-        //send the stuff at timeZero
-        if (!points.empty())
+        // send the stuff at timeZero
+        if (!points.empty ())
         {
             while (points[pointIndex].time == helics::timeZero)
             {
-                publications[points[pointIndex].index].publish(points[pointIndex].value);
+                publications[points[pointIndex].index].publish (points[pointIndex].value);
                 ++pointIndex;
-                if (pointIndex >= points.size())
+                if (pointIndex >= points.size ())
                 {
                     break;
                 }
             }
         }
-        if (!messages.empty())
+        if (!messages.empty ())
         {
             while (messages[messageIndex].sendTime == helics::timeZero)
             {
-                endpoints[messages[messageIndex].index].send(messages[messageIndex].mess);
+                endpoints[messages[messageIndex].index].send (messages[messageIndex].mess);
                 ++messageIndex;
-                if (messageIndex >= messages.size())
+                if (messageIndex >= messages.size ())
                 {
                     break;
                 }
@@ -480,23 +660,23 @@ void player::run (Time stopTime_input)
     else
     {
         auto ctime = fed->getCurrentTime ();
-        if (pointIndex<points.size())
+        if (pointIndex < points.size ())
         {
             while (points[pointIndex].time <= ctime)
             {
                 ++pointIndex;
-                if (pointIndex >= points.size())
+                if (pointIndex >= points.size ())
                 {
                     break;
                 }
             }
         }
-        if (messageIndex<messages.size())
+        if (messageIndex < messages.size ())
         {
             while (messages[messageIndex].sendTime <= ctime)
             {
                 ++messageIndex;
-                if (messageIndex >= messages.size())
+                if (messageIndex >= messages.size ())
                 {
                     break;
                 }
@@ -509,44 +689,44 @@ void player::run (Time stopTime_input)
     Time nextSendTime = timeZero;
     while (moreToSend)
     {
-        nextSendTime = Time::maxVal();
-        if (pointIndex < points.size())
+        nextSendTime = Time::maxVal ();
+        if (pointIndex < points.size ())
         {
-            nextSendTime = std::min(nextSendTime, points[pointIndex].time);
+            nextSendTime = std::min (nextSendTime, points[pointIndex].time);
         }
-        if (messageIndex < messages.size())
+        if (messageIndex < messages.size ())
         {
-            nextSendTime = std::min(nextSendTime, messages[messageIndex].sendTime);
+            nextSendTime = std::min (nextSendTime, messages[messageIndex].sendTime);
         }
         if (nextSendTime > stopTime_input)
         {
             break;
         }
-        if (nextSendTime == Time::maxVal())
+        if (nextSendTime == Time::maxVal ())
         {
             moreToSend = false;
             continue;
         }
         auto newTime = fed->requestTime (nextSendTime);
-        if (pointIndex < points.size())
+        if (pointIndex < points.size ())
         {
             while (points[pointIndex].time <= newTime)
             {
-                publications[points[pointIndex].index].publish(points[pointIndex].value);
+                publications[points[pointIndex].index].publish (points[pointIndex].value);
                 ++pointIndex;
-                if (pointIndex >= points.size())
+                if (pointIndex >= points.size ())
                 {
                     break;
                 }
             }
         }
-        if (messageIndex < messages.size())
+        if (messageIndex < messages.size ())
         {
             while (messages[messageIndex].sendTime <= newTime)
             {
-                endpoints[messages[messageIndex].index].send(messages[messageIndex].mess);
+                endpoints[messages[messageIndex].index].send (messages[messageIndex].mess);
                 ++messageIndex;
-                if (messageIndex >= messages.size())
+                if (messageIndex >= messages.size ())
                 {
                     break;
                 }
@@ -581,7 +761,6 @@ void player::addEndpoint (const std::string &endpointName, const std::string &en
     endpoints.push_back (Endpoint (GLOBAL, fed.get (), endpointName, endpointType));
     eptids[endpointName] = static_cast<int> (endpoints.size ()) - 1;
 }
-
 
 int player::loadArguments (boost::program_options::variables_map &vm_map)
 {

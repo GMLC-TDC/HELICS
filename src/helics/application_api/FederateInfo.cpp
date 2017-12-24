@@ -15,6 +15,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/filesystem.hpp>
 #include <iostream>
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4702)
+#include "json/json.h"
+#pragma warning(pop)
+#else
+#include "json/json.h"
+#endif
+
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
@@ -74,8 +83,161 @@ namespace helics
         {
             offset = vm["offset"].as<double>();
         }
+        if (vm.count("max_iterations")>0)
+        {
+            max_iterations = static_cast<int16_t> (vm["maxiterations"].as<int>());
+        }
     }
 
+
+
+    FederateInfo LoadFederateInfo(const std::string &jsonString)
+    {
+        FederateInfo fi;
+        std::ifstream file(jsonString);
+        Json_helics::Value doc;
+
+        if (file.is_open())
+        {
+            Json_helics::CharReaderBuilder rbuilder;
+            std::string errs;
+            bool ok = Json_helics::parseFromStream(rbuilder, file, &doc, &errs);
+            if (!ok)
+            {
+                // should I throw an error here?
+                return fi;
+            }
+        }
+        else
+        {
+            Json_helics::CharReaderBuilder rbuilder;
+            std::string errs;
+            std::istringstream jstring(jsonString);
+            bool ok = Json_helics::parseFromStream(rbuilder, jstring, &doc, &errs);
+            if (!ok)
+            {
+                // should I throw an error here?
+                return fi;
+            }
+        }
+
+        if (doc.isMember("name"))
+        {
+            fi.name = doc["name"].asString();
+        }
+
+        if (doc.isMember("observer"))
+        {
+            fi.observer = doc["observer"].asBool();
+        }
+        if (doc.isMember("rollback"))
+        {
+            fi.rollback = doc["rollback"].asBool();
+        }
+        if (doc.isMember("only_update_on_change"))
+        {
+            fi.only_update_on_change = doc["only_update_on_change"].asBool();
+        }
+        if (doc.isMember("only_transmit_on_change"))
+        {
+            fi.only_transmit_on_change = doc["only_transmit_on_change"].asBool();
+        }
+        if (doc.isMember("source_only"))
+        {
+            fi.source_only = doc["sourc_only"].asBool();
+        }
+        if (doc.isMember("uninterruptible"))
+        {
+            fi.uninterruptible = doc["uninterruptible"].asBool();
+        }
+        if (doc.isMember("interruptible"))  // can use either flag
+        {
+            fi.uninterruptible = !doc["uninterruptible"].asBool();
+        }
+        if (doc.isMember("forwardCompute"))
+        {
+            fi.forwardCompute = doc["forwardCompute"].asBool();
+        }
+        if (doc.isMember("coreType"))
+        {
+            try
+            {
+                fi.coreType = coreTypeFromString(doc["coreType"].asString());
+            }
+            catch (const std::invalid_argument &ia)
+            {
+                std::cerr << "Unrecognized core type\n";
+            }
+        }
+        if (doc.isMember("coreName"))
+        {
+            fi.coreName = doc["coreName"].asString();
+        }
+        if (doc.isMember("coreInit"))
+        {
+            fi.coreInitString = doc["coreInit"].asString();
+        }
+        if (doc.isMember("maxiterations"))
+        {
+            fi.max_iterations = static_cast<int16_t> (doc["maxiterations"].asInt());
+        }
+        if (doc.isMember("period"))
+        {
+            if (doc["period"].isObject())
+            {
+            }
+            else
+            {
+                fi.timeDelta = doc["period"].asDouble();
+            }
+        }
+
+        if (doc.isMember("offset"))
+        {
+            if (doc["offset"].isObject())
+            {
+            }
+            else
+            {
+                fi.offset = doc["offset"].asDouble();
+            }
+        }
+
+        if (doc.isMember("timeDelta"))
+        {
+            if (doc["timeDelta"].isObject())
+            {
+            }
+            else
+            {
+                fi.timeDelta = doc["timeDelta"].asDouble();
+            }
+        }
+
+        if (doc.isMember("lookAhead"))
+        {
+            if (doc["lookAhead"].isObject())
+            {
+                // TODO:: something about units yet
+            }
+            else
+            {
+                fi.lookAhead = doc["lookAhead"].asDouble();
+            }
+        }
+        if (doc.isMember("impactWindow"))
+        {
+            if (doc["impactWindow"].isObject())
+            {
+                // TOOD:: something about units yet
+            }
+            else
+            {
+                fi.impactWindow = doc["impactWindow"].asDouble();
+            }
+        }
+        return fi;
+    }
 } //namespace helics
 
     void argumentParser(int argc, const char *const *argv, po::variables_map &vm_map)
