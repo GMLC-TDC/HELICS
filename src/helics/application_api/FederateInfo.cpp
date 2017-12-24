@@ -28,7 +28,7 @@ namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
 
-void argumentParser(int argc, const char *const *argv, po::variables_map &vm_map);
+static void argumentParser(int argc, const char *const *argv, po::variables_map &vm_map);
 
 namespace helics
 {
