@@ -27,6 +27,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "PrecHelper.h"
 #include <thread>
 #include "recorder.h"
+#include "json.hpp"
 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
@@ -37,15 +38,16 @@ namespace helics
 {
     recorder::recorder(FederateInfo &fi) : fed(std::make_shared<CombinationFederate>(fi))
     {
-
+        fed->setFlag(OBSERVER_FLAG);
     }
 
     recorder::recorder(int argc, char *argv[])
     {
         FederateInfo fi("recorder");
+        
         fi.loadInfoFromArgs( argc, argv);
         fed = std::make_shared<CombinationFederate>(fi);
-
+        fed->setFlag(OBSERVER_FLAG);
         boost::program_options::variables_map vm_map;
         recorderArgumentParser(argc, argv, vm_map);
         loadArguments(vm_map);
@@ -54,12 +56,13 @@ namespace helics
 
     recorder::recorder(std::shared_ptr<Core> core, const FederateInfo &fi) :fed(std::make_shared<CombinationFederate>(std::move(core), fi))
     {
-
+        fed->setFlag(OBSERVER_FLAG);
     }
 
     recorder::recorder(const std::string &jsonString) :fed(std::make_shared<CombinationFederate>(jsonString))
     {
-        //TODO:: PT load the information to record from a json string
+        fed->setFlag(OBSERVER_FLAG);
+        loadJsonFile(jsonString);
     }
 
   
@@ -70,7 +73,69 @@ namespace helics
 
     int recorder::loadFile(const std::string &filename)
     {
-        std::ifstream infile(filename);
+        auto ext = filesystem::path(filename).extension().string();
+        if ((ext == ".json") || (ext == ".JSON"))
+        {
+            return loadJsonFile(filename);
+        }
+        else
+        {
+            return loadTextFile(filename);
+        }
+    }
+
+
+    int recorder::loadJsonFile(const std::string &jsonString)
+    {
+        fed->registerInterfaces(jsonString);
+
+        auto pubCount = fed->getSubscriptionCount();
+        for (int ii = 0; ii < pubCount; ++ii)
+        {
+            subscriptions.emplace_back(fed.get(), ii);
+            subids.emplace(subscriptions.back().getID(), static_cast<int>(subscriptions.size())-1);
+            subkeys.emplace(subscriptions.back().getName(), static_cast<int>(subscriptions.size()) - 1);
+        }
+        auto eptCount = fed->getEndpointCount();
+        for (int ii = 0; ii < eptCount; ++ii)
+        {
+            endpoints.emplace_back(fed.get(), ii);
+            eptNames[endpoints.back().getName()] = static_cast<int> (endpoints.size() - 1);
+            eptids.emplace(endpoints.back().getID(), static_cast<int> (endpoints.size() - 1));
+        }
+
+        using json = nlohmann::json;
+        json JF;
+        try
+        {
+            if (jsonString.size() > 200)
+            {
+                JF.parse(jsonString);
+            }
+            else
+            {
+                std::ifstream file(jsonString);
+                if (!file.is_open())
+                {
+                    JF.parse(jsonString);
+                }
+                else
+                {
+                    file >> JF;
+                }
+            }
+        }
+        catch (const json::exception &je)
+        {
+            std::cerr << je.what() << '\n';
+            return (-1);
+        }
+        return 0;
+    }
+
+   int recorder::loadTextFile(const std::string &textFile)
+    {
+        std::ifstream infile(textFile);
         std::string str;
         while (std::getline(infile, str))
         {
@@ -111,13 +176,37 @@ namespace helics
         return 0;
     }
 
-    /*run the player*/
-    void recorder::run()
+    void recorder::writeJsonFile(const std::string &filename)
     {
 
     }
+
+    void recorder::writeTextFile( const std::string &filename)
+    {
+        std::ofstream outFile(filename.empty() ? outFileName : filename);
+        outFile << "#time \ttag\t value\t type*\n";
+        for (auto &v : points)
+        {
+            if (v.first)
+            {
+          //      outFile << static_cast<double> (v.time) << "\t\t" << subids[v.id].first << '\t' << v.value << '\t'
+            //        << subids[v.id].second << '\n';
+            }
+            else
+            {
+          //      outFile << static_cast<double> (v.time) << "\t\t" << subids[v.id].first << '\t' << v.value << '\n';
+            }
+        }
+    }
+
+    /*run the player*/
+    void recorder::run()
+    {
+        run(autoStopTime);
+        fed->finalize();
+    }
     /** run the player until the specified time*/
-    void recorder::run(helics::Time stopTime)
+    void recorder::run(Time runToTime)
     {
         std::vector<ValueStats> vStat;
 
@@ -125,7 +214,7 @@ namespace helics
         for (auto &val : subids)
         {
             vStat.emplace_back(ValueStats());
-            vStat.back().key = val.second.first;
+       //     vStat.back().key = val.second.first;
         }
         points.reserve(100000);
         std::cout << "entering execution mode\n";
@@ -137,7 +226,7 @@ namespace helics
             if (sub.isUpdated())
             {
                 auto val = sub.getValue<std::string>();
-                points.emplace_back(-1.0, sub.getID(), val);
+                points.emplace_back(-1.0, 1, val);
                 if (vStat[ii].cnt == 0)
                 {
                    points.back().first = true;
@@ -163,8 +252,8 @@ namespace helics
         {
             while (true)
             {
-                auto T = fed->requestTime(stopTime);
-                if (T < stopTime)
+                auto T = fed->requestTime(runToTime);
+                if (T < runToTime)
                 {
                     ii = 0;
                     for (auto &sub : subscriptions)
@@ -172,7 +261,7 @@ namespace helics
                         if (sub.isUpdated())
                         {
                             auto val = sub.getValue<std::string>();
-                            points.emplace_back(T, sub.getID(), val);
+                            points.emplace_back(T, 1, val);
                             ++vStat[ii].cnt;
                             vStat[ii].lastVal = val;
                             vStat[ii].time = T;
@@ -207,7 +296,7 @@ namespace helics
 
         for (auto &sub : subscriptions)
         {
-            subids.emplace(sub.getID(), std::make_pair(sub.getKey(), sub.getType()));
+            subids.emplace(sub.getID(), 1);
         }
         fed->finalize();
         
@@ -215,12 +304,26 @@ namespace helics
     /** add a subscription to capture*/
     void recorder::addSubscription(const std::string &key)
     {
-
+        if (subkeys.find(key) == subkeys.end())
+        {
+            subscriptions.push_back(helics::Subscription(fed.get(), key));
+            auto index = static_cast<int>(subscriptions.size());
+            auto id = subscriptions.back().getID();
+            subids.emplace(id, index);
+            subkeys.emplace(key, index);
+        }
     }
     /** add an endpoint*/
     void recorder::addEndpoint(const std::string &endpoint)
     {
-
+        if (eptNames.find(endpoint) == eptNames.end())
+        {
+            endpoints.push_back(helics::Endpoint(fed.get(), endpoint));
+            auto index = static_cast<int>(endpoints.size());
+            auto id = endpoints.back().getID();
+            eptids.emplace(id, index);
+            eptNames.emplace(endpoint, index);
+        }
     }
     
     void recorder::addSourceEndpointClone(const std::string &sourceEndpoint)
@@ -236,19 +339,14 @@ namespace helics
     /** save the data to a file*/
     void recorder::saveFile(const std::string &filename)
     {
-        std::ofstream outFile(filename.empty()?outFileName:filename);
-        outFile << "#time \ttag\t value\t type*\n";
-        for (auto &v : points)
+        auto ext = filesystem::path(filename).extension().string();
+        if ((ext == ".json") || (ext == ".JSON"))
         {
-            if (v.first)
-            {
-                outFile << static_cast<double> (v.time) << "\t\t" << subids[v.id].first << '\t' << v.value << '\t'
-                    << subids[v.id].second << '\n';
-            }
-            else
-            {
-                outFile << static_cast<double> (v.time) << "\t\t" << subids[v.id].first << '\t' << v.value << '\n';
-            }
+            loadJsonFile(filename);
+        }
+        else
+        {
+            loadTextFile(filename);
         }
     }
 

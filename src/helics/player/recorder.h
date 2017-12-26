@@ -31,19 +31,20 @@ namespace boost
 
 namespace helics
 {
-
+    /** helper class for capturing data points*/
     class ValueCapture
     {
     public:
         helics::Time time;
-        helics::subscription_id_t id;
+        int index=-1;
         bool first = false;
         std::string value;
         ValueCapture() = default;
-        ValueCapture(helics::Time t1, helics::subscription_id_t id1, const std::string &val)
-            : time(t1), id(id1), value(val) {};
+        ValueCapture(helics::Time t1, int id1, const std::string &val)
+            : time(t1), index(id1), value(val) {};
     };
 
+    /** helper class for displaying statistics*/
     class ValueStats
     {
     public:
@@ -53,6 +54,7 @@ namespace helics
         int cnt = 0;
     };
 
+    /** class designed to capture data points from a set of subscriptions or endpoints*/
     class recorder
     {
     public:
@@ -90,7 +92,7 @@ namespace helics
         /*run the player*/
         void run();
         /** run the player until the specified time*/
-        void run(helics::Time stopTime);
+        void run(Time stopTime);
         /** add a subscription to capture*/
         void addSubscription(const std::string &key);
         /** add an endpoint*/
@@ -102,18 +104,42 @@ namespace helics
 
         /** save the data to a file*/
         void saveFile(const std::string &filename);
+        /** get the number of captured points*/
+        auto pointCount() const
+        {
+            return points.size();
+        }
+        /** get the number of captured messages*/
+        auto messageCount() const
+        {
+            return messages.size();
+        }
     private:
         int loadArguments(boost::program_options::variables_map &vm_map);
+        /** load from a jsonString
+        @param either a json filename or a string containing json
+        */
+        int loadJsonFile(const std::string &jsonString);
+        /** load a text file*/
+        int loadTextFile(const std::string &textFile);
+        /** helper function to write the date to a json file*/
+        void writeJsonFile(const std::string &filename);
+        /** helper function to write the date to a text file*/
+        void writeTextFile(const std::string &filename);
     protected:
         std::shared_ptr<CombinationFederate> fed;
         std::vector<ValueCapture> points;
         std::set<std::string> tags;
         std::vector<Subscription> subscriptions;
         std::vector<Endpoint> endpoints;
-        std::map<helics::subscription_id_t, std::pair<std::string, std::string>> subids;
-        std::map<std::string, int> eptids;
+        std::vector<std::unique_ptr<Message>> messages;
+        std::map<helics::subscription_id_t, int> subids;
+        std::map<std::string, int> subkeys;
+        std::map<helics::endpoint_id_t, int> eptids;
+        std::map<std::string, int> eptNames;
         std::string mapfile;
         std::string outFileName;
+        Time autoStopTime = Time::maxVal();
     };
 
 } //namespace helics

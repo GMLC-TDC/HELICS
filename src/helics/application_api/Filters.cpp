@@ -188,7 +188,7 @@ std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types
 }
 
 std::unique_ptr<SourceFilter>
-make_Source_filter (defined_filter_types type, Core *cr, const std::string &target, const std::string &name)
+make_source_filter (defined_filter_types type, Core *cr, const std::string &target, const std::string &name)
 {
     auto sfilt = std::make_unique<SourceFilter> (cr, target, name);
     addOperations (sfilt.get (), type);
@@ -205,7 +205,7 @@ make_destination_filter (defined_filter_types type, Core *cr, const std::string 
 }
 
 std::unique_ptr<SourceFilter>
-make_Source_filter (defined_filter_types type, Federate *fed, const std::string &target, const std::string &name)
+make_source_filter (defined_filter_types type, Federate *fed, const std::string &target, const std::string &name)
 {
     auto sfilt = std::make_unique<SourceFilter> (fed, target, name);
     addOperations (sfilt.get (), type);

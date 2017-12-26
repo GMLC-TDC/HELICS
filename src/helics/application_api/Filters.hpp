@@ -164,7 +164,7 @@ std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
 */
-std::unique_ptr<SourceFilter> make_Source_filter (defined_filter_types type,
+std::unique_ptr<SourceFilter> make_source_filter (defined_filter_types type,
                                                   Federate *fed,
                                                   const std::string &target,
                                                   const std::string &name = "");
@@ -189,7 +189,7 @@ std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
 */
 std::unique_ptr<SourceFilter>
-make_Source_filter (defined_filter_types type, Core *cr, const std::string &target, const std::string &name = "");
+make_source_filter (defined_filter_types type, Core *cr, const std::string &target, const std::string &name = "");
 
 }  // namespace helics
 #endif
