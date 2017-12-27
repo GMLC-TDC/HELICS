@@ -254,6 +254,20 @@ helics_federate helicsCreateCombinationFederateFromFile (const char *file)
     return reinterpret_cast<void *> (fed);
 }
 
+
+helics_core helicsGetCoreObject(helics_federate fed)
+{
+    auto fedObj = getFed(fed);
+    if (fedObj == nullptr)
+    {
+        return nullptr;
+    }
+    auto *core = new helics::CoreObject;
+    core->index = getMasterHolder()->addCore(core);
+    core->coreptr = fedObj->getCorePointer();
+    return reinterpret_cast<helics_core> (core);
+}
+
 helicsStatus helicsFinalize (helics_federate fed)
 {
     auto fedObj = getFed (fed);
@@ -546,6 +560,43 @@ helics_time_t helicsRequestTimeFinalize (helics_federate fed)
     auto tm = fedObj->requestTimeFinalize ();
     return static_cast<double> (tm);
 }
+
+helicsStatus helicsFederateGetName(helics_federate fed, char *str, int maxlen)
+{
+    auto fedObj = getFed(fed);
+    if (fedObj == nullptr)
+    {
+        return helicsError;
+    }
+    auto &ident = fedObj->getName();
+    if (static_cast<int> (ident.size()) > maxlen)
+    {
+        strncpy(str, ident.c_str(), maxlen);
+        str[maxlen - 1] = 0;
+    }
+    else
+    {
+        strcpy(str, ident.c_str());
+    }
+    return helicsOK;
+}
+
+/** get the current time of the federate
+@param fed the federate object to query
+@param[out] time storage location for the time variable
+@return helicsStatus object indicating success or error
+*/
+helicsStatus helicsFederateGetCurrentTime(helics_federate fed, helics_time_t *time)
+{
+    auto fedObj = getFed(fed);
+    if (fedObj == nullptr)
+    {
+        return helicsError;
+    }
+    *time = static_cast<double>(fedObj->getCurrentTime());
+    return helicsOK;
+}
+
 helics_iterative_time helicsRequestTimeIterativeFinalize (helics_federate fed)
 {
     helics_iterative_time itTime;
