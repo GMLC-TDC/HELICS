@@ -114,7 +114,23 @@ namespace helics
         {
             return messages.size();
         }
+        /** get a string with the value of point index
+        @param index the number of the point to retrieve
+        @return a pair with the tag as the first element and the value as the second
+        */
+        std::pair<std::string,std::string> getValue(int index) const;
+        /** get a message 
+        @details makes a copy of a message and returns it in a unique ptr
+        @param index the number of the message to retrieve
+        */
+        std::unique_ptr<Message> getMessage(int index) const;
+
+        /** finalize the federate*/
+        void finalize();
+
     private:
+        /** load arguments through a variable map created through command line arguments
+        */
         int loadArguments(boost::program_options::variables_map &vm_map);
         /** load from a jsonString
         @param either a json filename or a string containing json
@@ -127,19 +143,19 @@ namespace helics
         /** helper function to write the date to a text file*/
         void writeTextFile(const std::string &filename);
     protected:
-        std::shared_ptr<CombinationFederate> fed;
-        std::vector<ValueCapture> points;
-        std::set<std::string> tags;
-        std::vector<Subscription> subscriptions;
-        std::vector<Endpoint> endpoints;
-        std::vector<std::unique_ptr<Message>> messages;
-        std::map<helics::subscription_id_t, int> subids;
+        std::shared_ptr<CombinationFederate> fed; //!< the federate 
+        std::vector<ValueCapture> points;   //!< lists of points that were captured
+        std::set<std::string> tags; //!< a set of tags to generate points from
+        std::vector<Subscription> subscriptions;    //!< the actual subscription objects
+        std::vector<Endpoint> endpoints;    //!< the actual endpoint objects
+        std::vector<std::unique_ptr<Message>> messages; //!< list of messages
+        std::map<helics::subscription_id_t, int> subids; //!< map of the subscription ids
         std::map<std::string, int> subkeys;
         std::map<helics::endpoint_id_t, int> eptids;
         std::map<std::string, int> eptNames;
-        std::string mapfile;
-        std::string outFileName;
-        Time autoStopTime = Time::maxVal();
+        std::string mapfile;    //!< file name for the online file updator
+        std::string outFileName;    //!< the final output file
+        Time autoStopTime = Time::maxVal(); //!< the stop time
     };
 
 } //namespace helics

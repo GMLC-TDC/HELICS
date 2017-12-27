@@ -16,13 +16,28 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <set>
 #include <string>
 
+
+#if (BOOST_VERSION_LEVEL >=2)
+namespace boost
+{
+    namespace asio
+    {
+        class io_context;
+        using io_service = io_context;
+    }
+}
+#else
 namespace boost
 {
     namespace asio
     {
         class io_service;
     }
+}
+#endif
 
+namespace boost
+{
     namespace system
     {
         class error_code;

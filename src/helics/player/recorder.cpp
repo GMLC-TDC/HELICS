@@ -261,7 +261,7 @@ namespace helics
                         if (sub.isUpdated())
                         {
                             auto val = sub.getValue<std::string>();
-                            points.emplace_back(T, 1, val);
+                            points.emplace_back(T, subids[sub.getID()], val);
                             ++vStat[ii].cnt;
                             vStat[ii].lastVal = val;
                             vStat[ii].time = T;
@@ -307,7 +307,7 @@ namespace helics
         if (subkeys.find(key) == subkeys.end())
         {
             subscriptions.push_back(helics::Subscription(fed.get(), key));
-            auto index = static_cast<int>(subscriptions.size());
+            auto index = static_cast<int>(subscriptions.size())-1;
             auto id = subscriptions.back().getID();
             subids.emplace(id, index);
             subkeys.emplace(key, index);
@@ -319,7 +319,7 @@ namespace helics
         if (eptNames.find(endpoint) == eptNames.end())
         {
             endpoints.push_back(helics::Endpoint(fed.get(), endpoint));
-            auto index = static_cast<int>(endpoints.size());
+            auto index = static_cast<int>(endpoints.size())-1;
             auto id = endpoints.back().getID();
             eptids.emplace(id, index);
             eptNames.emplace(endpoint, index);
@@ -336,6 +336,30 @@ namespace helics
 
     }
 
+
+    std::pair<std::string, std::string> recorder::getValue(int index) const
+    {
+        if (isValidIndex(index, points))
+        {
+            return { subscriptions[points[index].index].getKey(),points[index].value };
+        }
+        return { std::string(),std::string() };
+    }
+    
+    std::unique_ptr<Message> recorder::getMessage(int index) const
+    {
+        if (isValidIndex(index, messages))
+        {
+            return std::make_unique<Message>(*messages[index]);
+        }
+        return nullptr;
+    }
+
+
+    void recorder::finalize()
+    {
+        fed->finalize();
+    }
     /** save the data to a file*/
     void recorder::saveFile(const std::string &filename)
     {
