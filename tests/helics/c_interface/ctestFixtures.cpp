@@ -49,14 +49,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
     if (vFed1)
     {
         //vFed1->finalize ();
-        rv = helicsFinalize(vFed1);
+        rv = helicsFederateFinalize(vFed1);
         helicsFreeFederate(vFed1);
     }
 
     if (vFed2)
     {
         //vFed2->finalize ();
-        rv = helicsFinalize(vFed2);
+        rv = helicsFederateFinalize(vFed2);
         helicsFreeFederate(vFed2);
     }
 }
@@ -167,14 +167,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
     if (mFed1)
     {
         //mFed1->finalize ();
-        rv = helicsFinalize(mFed1);
+        rv = helicsFederateFinalize(mFed1);
         helicsFreeFederate(mFed1);
     }
 
     if (mFed2)
     {
         //mFed2->finalize ();
-        rv = helicsFinalize(mFed1);
+        rv = helicsFederateFinalize(mFed1);
         helicsFreeFederate(mFed1);
     }
 }
@@ -267,11 +267,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
     helicsStatus rv = helicsOK;
 	for (auto &fed : federates)
     {
-        //if (fed && fed->currentState () != helics::Federate::op_states::finalize)
+        //if (fed && fed->getCurrentState () != helics::Federate::op_states::finalize)
 		if (fed && helicsEnterExecutionMode(fed) != rv)
         {
             //fed->finalize ();
-            rv = helicsFinalize(fed);
+            rv = helicsFederateFinalize(fed);
             helicsFreeFederate(fed);
         }
     }

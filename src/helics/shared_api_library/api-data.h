@@ -48,16 +48,29 @@ typedef double helics_time_t;
 /** enumeration of the different iteration results*/
 typedef enum {
     no_iteration,
-    force_iteration,  // input only
+    force_iteration, 
     iterate_if_needed,
 } iteration_request;
 
 typedef enum {
     next_step,
-    error,  // input only
-    halted,
+    iteration_error,
+    iteration_halted,
     iterating
 } iteration_status;
+
+typedef enum {
+    helics_startup = 0,  //!< when created the federate is in startup state
+    helics_initialization,  //!< entered after the enterInitializationState call has returned
+    helics_execution,  //!< entered after the enterExectuationState call has returned
+    helics_finalize,  //!< the federate has finished executing normally final values may be retrieved
+    helics_error,  //!< error state no core communication is possible but values can be retrieved
+            // the following states are for asynchronous operations
+            helics_pending_init,  //!< indicator that the federate is pending entry to initialization state
+            helics_pending_exec,  //!< state pending EnterExecution State
+            helics_pending_time,  //!< state that the federate is pending a timeRequest
+            helics_pending_iterative_time,  //!< state that the federate is pending an iterative time request
+} federate_state;
 
 typedef struct helics_iterative_time
 {
@@ -84,9 +97,10 @@ typedef struct message_t
     helics_time_t time;  //!< message time
     const char *data;  //!< message data
     int64_t length;  //!< message length
-    const char *origsrc;  //!< original source
     const char *src;  //!< the most recent source
     const char *dst;  //!< the final destination
+    const char *origsrc;  //!< original source
+    const char *origdest; //!< the orginal destination of the message
 
 } message_t;
 

@@ -107,7 +107,7 @@ int main()
     printf("PI SENDER: Received value = %4.3f at time %3.2f from PI RECEIVER\n",value,currenttime);
   }
 
-  status = helicsFinalize(vfed);
+  status = helicsFederateFinalize(vfed);
   printf("PI SENDER: Federate finalized\n");
 
   helicsFreeFederate(vfed);

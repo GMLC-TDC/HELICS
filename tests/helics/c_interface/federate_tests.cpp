@@ -32,11 +32,11 @@ BOOST_AUTO_TEST_SUITE (federate_tests)
     auto name = std::string (core->getFederateName (Fed->getID ()));
 
     BOOST_CHECK_EQUAL (name, Fed->getName ());
-    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::startup);
+    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::startup);
     Fed->enterInitializationState ();
-    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::initialization);
+    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::initialization);
     Fed->enterExecutionState ();
-    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::execution);
     Fed = nullptr;  // force the destructor
 }*/
 //
@@ -48,11 +48,11 @@ BOOST_AUTO_TEST_SUITE (federate_tests)
 //
 //    auto Fed = std::make_shared<helics::Federate> (fi);
 //
-//    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::startup);
+//    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::startup);
 //    Fed->enterInitializationState ();
-//    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::initialization);
+//    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::initialization);
 //    Fed->enterExecutionState ();
-//    BOOST_CHECK (Fed->currentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::execution);
 //
 //    auto res = Fed->requestTime (1.0);
 //    BOOST_CHECK_EQUAL (res, 1.0);
@@ -75,8 +75,8 @@ BOOST_AUTO_TEST_SUITE (federate_tests)
 //    fi.name = "fed2";
 //    auto Fed2 = std::make_shared<helics::Federate> (fi);
 //
-//    BOOST_CHECK (Fed1->currentState () == helics::Federate::op_states::startup);
-//    BOOST_CHECK (Fed2->currentState () == helics::Federate::op_states::startup);
+//    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::op_states::startup);
+//    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::op_states::startup);
 //
 //    BOOST_CHECK_NE (Fed1->getID (), Fed2->getID ());
 //
@@ -84,14 +84,14 @@ BOOST_AUTO_TEST_SUITE (federate_tests)
 //    Fed2->enterInitializationState ();
 //
 //    f1finish.wait ();
-//    BOOST_CHECK (Fed1->currentState () == helics::Federate::op_states::initialization);
-//    BOOST_CHECK (Fed2->currentState () == helics::Federate::op_states::initialization);
+//    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::op_states::initialization);
+//    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::op_states::initialization);
 //
 //    f1finish = std::async (std::launch::async, [&]() { Fed1->enterExecutionState (); });
 //    Fed2->enterExecutionState ();
 //    f1finish.wait ();
-//    BOOST_CHECK (Fed1->currentState () == helics::Federate::op_states::execution);
-//    BOOST_CHECK (Fed2->currentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::op_states::execution);
 //
 //    auto f1step = std::async (std::launch::async, [&]() { return Fed1->requestTime (1.0); });
 //    auto f2step = Fed2->requestTime (1.0);
@@ -129,21 +129,21 @@ BOOST_AUTO_TEST_SUITE (federate_tests)
 //
 //    auto Fed2 = std::make_shared<helics::Federate> (fi);
 //
-//    BOOST_CHECK (Fed1->currentState () == helics::Federate::op_states::startup);
-//    BOOST_CHECK (Fed2->currentState () == helics::Federate::op_states::startup);
+//    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::op_states::startup);
+//    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::op_states::startup);
 //
 //    auto f1finish = std::async (std::launch::async, [&]() { Fed1->enterInitializationState (); });
 //    Fed2->enterInitializationState ();
 //
 //    f1finish.wait ();
-//    BOOST_CHECK (Fed1->currentState () == helics::Federate::op_states::initialization);
-//    BOOST_CHECK (Fed2->currentState () == helics::Federate::op_states::initialization);
+//    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::op_states::initialization);
+//    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::op_states::initialization);
 //
 //    f1finish = std::async (std::launch::async, [&]() { Fed1->enterExecutionState (); });
 //    Fed2->enterExecutionState ();
 //    f1finish.wait ();
-//    BOOST_CHECK (Fed1->currentState () == helics::Federate::op_states::execution);
-//    BOOST_CHECK (Fed2->currentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::op_states::execution);
 //
 //    auto f1step = std::async (std::launch::async, [&]() { return Fed1->requestTime (1.0); });
 //    auto f2step = Fed2->requestTime (1.0);
@@ -178,8 +178,8 @@ BOOST_AUTO_TEST_SUITE (federate_tests)
 //    fi.name = "fed2";
 //    auto Fed2 = std::make_shared<helics::Federate> (fi);
 //
-//    BOOST_CHECK (Fed1->currentState () == helics::Federate::op_states::startup);
-//    BOOST_CHECK (Fed2->currentState () == helics::Federate::op_states::startup);
+//    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::op_states::startup);
+//    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::op_states::startup);
 //
 //    BOOST_CHECK_NE (Fed1->getID (), Fed2->getID ());
 //
@@ -188,19 +188,19 @@ BOOST_AUTO_TEST_SUITE (federate_tests)
 //
 //    Fed1->enterInitializationStateFinalize ();
 //
-//    BOOST_CHECK (Fed1->currentState () == helics::Federate::op_states::initialization);
-//    BOOST_CHECK (Fed2->currentState () == helics::Federate::op_states::initialization);
+//    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::op_states::initialization);
+//    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::op_states::initialization);
 //
 //    Fed1->enterExecutionStateAsync ();
 //    Fed2->enterExecutionState ();
-//    Fed1->enterExecutionStateFinalize ();
-//    BOOST_CHECK (Fed1->currentState () == helics::Federate::op_states::execution);
-//    BOOST_CHECK (Fed2->currentState () == helics::Federate::op_states::execution);
+//    Fed1->enterExecutionStateComplete();
+//    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::op_states::execution);
 //
 //    Fed1->requestTimeAsync (1.0);
 //    auto f2step = Fed2->requestTime (1.0);
 //
-//    auto f1stepVal = Fed1->requestTimeFinalize ();
+//    auto f1stepVal = Fed1->requestTimeComplete ();
 //    BOOST_CHECK_EQUAL (f2step, 1.0);
 //    BOOST_CHECK_EQUAL (f1stepVal, 1.0);
 //
@@ -209,12 +209,12 @@ BOOST_AUTO_TEST_SUITE (federate_tests)
 //    Fed1->requestTimeAsync (3.0);
 //    f2step = Fed2->requestTime (3.0);
 //
-//    f1stepVal = Fed1->requestTimeFinalize ();
+//    f1stepVal = Fed1->requestTimeComplete ();
 //    BOOST_CHECK_EQUAL (f2step, 3.0);
 //    BOOST_CHECK_EQUAL (f1stepVal, 3.0);
 //
 //    BOOST_CHECK_THROW (Fed1->enterInitializationState (), helics::InvalidStateTransition);
-//    BOOST_CHECK_THROW (Fed1->requestTimeFinalize (), helics::InvalidFunctionCall);
+//    BOOST_CHECK_THROW (Fed1->requestTimeComplete (), helics::InvalidFunctionCall);
 //    Fed1->finalize ();
 //    Fed2->finalize ();
 //}

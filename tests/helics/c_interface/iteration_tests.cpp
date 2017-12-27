@@ -71,7 +71,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    BOOST_CHECK (comp == helics::iteration_result::next_step);
 //
 //    double val2 = vFed2->getValue<double> (subid);
-//    vFed1->enterExecutionStateFinalize ();
+//    vFed1->enterExecutionStateComplete();
 //    BOOST_CHECK_EQUAL (val2, val);
 //}
 //
@@ -118,7 +118,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //
 //    vFed1->enterExecutionStateAsync ();
 //    vFed2->enterExecutionState ();
-//    vFed1->enterExecutionStateFinalize ();
+//    vFed1->enterExecutionStateComplete();
 //    vFed1->publish (pubid, 27.0);
 //
 //    vFed1->requestTimeAsync (1.0);
@@ -134,7 +134,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    BOOST_CHECK (comp.state == helics::iteration_result::next_step);
 //    BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
 //    double val2 = vFed2->getValue<double> (subid);
-//    vFed1->requestTimeFinalize ();
+//    vFed1->requestTimeComplete ();
 //
 //    BOOST_CHECK_EQUAL (val2, val);
 //}

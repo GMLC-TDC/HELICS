@@ -160,7 +160,7 @@ HELICS_Export helicsStatus helicsFederateInfoSetMaxIterations (helics_federate_i
 HELICS_Export helicsStatus helicsFederateInfoSetLoggingLevel (helics_federate_info_t fi, int logLevel);
 /** finalize the federate this halts all communication in the federate and disconnects it from the core
  */
-HELICS_Export helicsStatus helicsFinalize (helics_federate fed);
+HELICS_Export helicsStatus helicsFederateFinalize (helics_federate fed);
 /** release the memory associated withe a federate*/
 HELICS_Export void helicsFreeFederate (helics_federate fed);
 
@@ -179,10 +179,11 @@ the function helicsEnterInitializationModeFinalize must be called to finish the 
 */
 HELICS_Export helicsStatus helicsEnterInitializationModeAsync (helics_federate fed);
 /** check if the current Asynchronous operation has completed*/
-HELICS_Export int helicsAsyncOperationCompleted (helics_federate fed);
+HELICS_Export int helicsisAsyncOperationCompleted (helics_federate fed);
 
 /** finalize the entry to initialize mode that was initiated with @heliceEnterInitializationModeAsync*/
-HELICS_Export helicsStatus helicsEnterInitializationModeFinalize (helics_federate fed);
+HELICS_Export helicsStatus helicsEnterInitializationModeComplete (helics_federate fed);
+
 
 /** request that the federate enter the initialization mode
 @details this call is blocking until granted entry by the core object for an asynchronous alternative call
@@ -193,8 +194,14 @@ HELICS_Export helicsStatus helicsEnterExecutionModeIterative (helics_federate fe
 HELICS_Export helicsStatus helicsEnterExecutionModeAsync (helics_federate fed);
 HELICS_Export helicsStatus helicsEnterExecutionModeIterativeAsync (helics_federate fed, iteration_request iterate);
 
-HELICS_Export helicsStatus helicsEnterExecutionModeFinalize (helics_federate fed);
-HELICS_Export helicsStatus helicsEnterExecutionModeIterativeFinalize (helics_federate fed, iteration_status *outIterate);
+HELICS_Export helicsStatus helicsEnterExecutionModeComplete (helics_federate fed);
+HELICS_Export helicsStatus helicsEnterExecutionModeIterativeComplete (helics_federate fed, iteration_status *outIterate);
+
+/** get the current state of a federate
+@param fed the fed to query
+@param[out] state the resulting state if helicsStatus return helicsOK*/
+HELICS_Export helicsStatus helicsFederateGetState(helics_federate fed, federate_state *state);
+
 /** get the core object associated with a federate
 @param fed a federate object
 @return a core object, nullptr if invalid
@@ -206,8 +213,8 @@ HELICS_Export helics_iterative_time helicsRequestTimeIterative (helics_federate 
 
 HELICS_Export helicsStatus helicsRequestTimeAsync (helics_federate fed, helics_time_t requestTime);
 HELICS_Export helicsStatus helicsRequestTimeIterativeAsync (helics_federate fed, helics_time_t requestTime, iteration_request iterate);
-HELICS_Export helics_time_t helicsRequestTimeFinalize (helics_federate fed);
-HELICS_Export helics_iterative_time helicsRequestTimeIterativeFinalize (helics_federate fed);
+HELICS_Export helics_time_t helicsRequestTimeComplete (helics_federate fed);
+HELICS_Export helics_iterative_time helicsRequestTimeIterativeComplete (helics_federate fed);
 
 /** get the name of the federate 
 @param fed the federate object to query
@@ -216,6 +223,42 @@ HELICS_Export helics_iterative_time helicsRequestTimeIterativeFinalize (helics_f
 @return helicsStatus object indicating success or error
 */
 HELICS_Export helicsStatus helicsFederateGetName(helics_federate fed, char *str, int maxlen);
+
+
+/** set the minimum time delta for the federate
+@param[in] tdelta the minimum time delta to return from a time request function
+*/
+HELICS_Export helicsStatus helicsFederateSetTimeDelta(helics_federate fed, helics_time_t time);
+/** set the look ahead time
+@details the look ahead is the propagation time for messages/event to propagate from the Federate
+the federate
+@param[in] lookAhead the look ahead time
+*/
+HELICS_Export helicsStatus helicsFederateSetLookAhead(helics_federate fed, helics_time_t lookAhead);
+
+/** set the impact Window time
+@details the impact window is the time window around the time request in which other federates cannot affect
+the federate
+@param[in] lookAhead the look ahead time
+*/
+HELICS_Export helicsStatus helicsFederateSetImpactWindow(helics_federate fed, helics_time_t window);
+/** set the period and offset of the federate
+@details the federate will on grant time on N*period+offset interval
+@param[in] period the length of time between each subsequent grants
+@param[in] offset the shift of the period from 0  offset must be < period
+*/
+HELICS_Export helicsStatus helicsFederateSetPeriod(helics_federate fed, helics_time_t period, helics_time_t offset);
+/** set a flag for the federate
+@param fed the federate to alter a flag for
+@param flag the flag to change
+@param flagValue the new value of the flag 0 for false !=0 for true
+*/
+HELICS_Export helicsStatus helicsFederateSetFlag(helics_federate fed, int flag, int flagValue);
+/**  set the logging level for the federate
+@ details debug and trace only do anything if they were enabled in the compilation
+@param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
+*/
+HELICS_Export helicsStatus helicsFederateSetLoggingLevel(helics_federate fed, int loggingLevel);
 
 /** get the current time of the federate
 @param fed the federate object to query

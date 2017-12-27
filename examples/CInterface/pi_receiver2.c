@@ -91,7 +91,7 @@ int main()
     printf("PI RECEIVER: Sending value %3.2f*pi = %4.3f at time %3.2f to PI SENDER\n",currenttime,value,currenttime);
     status = helicsPublishDouble(pub,value); /* Note: The sender will receive this at currenttime+deltat */
   }
-  status = helicsFinalize(vfed);
+  status = helicsFederateFinalize(vfed);
   printf("PI RECEIVER: Federate finalized\n");
   fflush(NULL);
   //clean upFederate;

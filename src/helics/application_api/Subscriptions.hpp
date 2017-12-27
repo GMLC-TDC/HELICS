@@ -81,7 +81,7 @@ class SubscriptionBase
     /** get the key for the subscription*/
     const std::string &getName () const { return key_; }
     /** get the key for the subscription*/
-    std::string getType () const { return fed->getPublicationType (id); }
+    std::string getType () const {return fed->getPublicationType (id); }
     /** get the units associated with a subscription*/
     const std::string &getUnits () const { return units_; }
 };
@@ -113,6 +113,16 @@ class Subscription : public SubscriptionBase
 
     Subscription (bool required, ValueFederate *valueFed, const std::string &key, const std::string &units = "")
         : SubscriptionBase (required, valueFed, key, "def", units)
+    {
+    }
+
+    Subscription(ValueFederate *valueFed, const std::string &key, helicsType_t defType, const std::string &units = "")
+        : SubscriptionBase(valueFed, key, typeNameStringRef(defType), units)
+    {
+    }
+
+    Subscription(bool required, ValueFederate *valueFed, const std::string &key, helicsType_t defType, const std::string &units = "")
+        : SubscriptionBase(required, valueFed, key, typeNameStringRef(defType), units)
     {
     }
     /** check if the value has been updated*/
@@ -230,7 +240,6 @@ class Subscription : public SubscriptionBase
     @param enabled (optional) set to false to disable change detection true(default) to enable it
     */
     void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
-
   private:
     void handleCallback (Time time);
 };

@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE (simple_timing_test)
     auto sub = helics::Subscription (vFed2.get (), "pub1");
     vFed1->enterExecutionStateAsync ();
     vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateFinalize ();
+    vFed1->enterExecutionStateComplete();
     pub->publish (0.27);
     auto res = vFed1->requestTime (2.0);
     BOOST_CHECK_EQUAL (res, 2.0);
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2)
     auto sub = helics::Subscription (vFed2.get (), "pub1");
     vFed1->enterExecutionStateAsync ();
     vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateFinalize ();
+    vFed1->enterExecutionStateComplete();
 
     auto res = vFed1->requestTime (0.32);
     // check that the request is only granted at the appropriate period
@@ -104,17 +104,17 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message)
     auto ept2 = helics::Endpoint (helics::GLOBAL, vFed2.get (), "e2");
     vFed1->enterExecutionStateAsync ();
     vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateFinalize ();
+    vFed1->enterExecutionStateComplete();
     vFed2->requestTimeAsync (3.5);
     auto res = vFed1->requestTime (0.32);
     // check that the request is only granted at the appropriate period
     BOOST_CHECK_EQUAL (res, 0.6);
     ept1.send ("e2", "test1");
     vFed1->requestTimeAsync (1.85);
-    res = vFed2->requestTimeFinalize ();
+    res = vFed2->requestTimeComplete ();
     BOOST_CHECK_EQUAL (res, 0.9);  // the message should show up at the next available time point
     vFed2->requestTimeAsync (2.0);
-    res = vFed1->requestTimeFinalize ();
+    res = vFed1->requestTimeComplete ();
     BOOST_CHECK_EQUAL (res, 2.4);
     vFed1->finalize ();
     vFed2
@@ -138,20 +138,20 @@ BOOST_AUTO_TEST_CASE (timing_with_impact_window)
     auto ept2 = helics::Endpoint (helics::GLOBAL, vFed2.get (), "e2");
     vFed1->enterExecutionStateAsync ();
     vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateFinalize ();
+    vFed1->enterExecutionStateComplete();
     vFed2->requestTimeAsync (2.0);
     auto res = vFed1->requestTime (1.0);
     // check that the request is only granted at the appropriate period
     BOOST_CHECK_EQUAL (res, 1.0);
     ept1.send ("e2", "test1");
     vFed1->requestTimeAsync (1.9);
-    res = vFed2->requestTimeFinalize ();
+    res = vFed2->requestTimeComplete ();
     BOOST_CHECK_EQUAL (
       res, 1.1);  // the message should show up at the next available time point after the impact window
     vFed2->requestTimeAsync (2.0);
-    res = vFed1->requestTimeFinalize ();
+    res = vFed1->requestTimeComplete ();
     BOOST_CHECK_EQUAL (res, 1.9);
-    res = vFed2->requestTimeFinalize ();
+    res = vFed2->requestTimeComplete ();
     BOOST_CHECK_EQUAL (res, 2.0);
     vFed1->finalize ();
     vFed2

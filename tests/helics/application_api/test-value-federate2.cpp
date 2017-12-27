@@ -215,17 +215,17 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     vFed2->setTimeDelta (1.0);
 
     vFed1->enterExecutionStateAsync ();
-    BOOST_CHECK (!vFed1->asyncOperationCompleted ());
+    BOOST_CHECK (!vFed1->isAsyncOperationCompleted ());
     vFed2->enterExecutionStateAsync ();
-    vFed1->enterExecutionStateFinalize ();
-    vFed2->enterExecutionStateFinalize ();
+    vFed1->enterExecutionStateComplete ();
+    vFed2->enterExecutionStateComplete ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
     vFed1->requestTimeAsync (1.0);
     vFed2->requestTimeAsync (1.0);
 
-    auto f1time = vFed1->requestTimeFinalize ();
-    auto gtime = vFed2->requestTimeFinalize ();
+    auto f1time = vFed1->requestTimeComplete ();
+    auto gtime = vFed2->requestTimeComplete ();
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
     BOOST_CHECK_EQUAL (f1time, 1.0);
@@ -243,8 +243,8 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     // advance time
     vFed1->requestTimeAsync (2.0);
     vFed2->requestTimeAsync (2.0);
-    f1time = vFed1->requestTimeFinalize ();
-    gtime = vFed2->requestTimeFinalize ();
+    f1time = vFed1->requestTimeComplete ();
+    gtime = vFed2->requestTimeComplete ();
 
     BOOST_CHECK_EQUAL (gtime, 2.0);
     BOOST_CHECK_EQUAL (f1time, 2.0);

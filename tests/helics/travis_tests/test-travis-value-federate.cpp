@@ -51,7 +51,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdat
     // enter execution
     vFed1->enterExecutionState ();
 
-    BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
     // check subscriptions
     const auto &sv = subid1.getName ();
     const auto &sv2 = subid2.getName ();
@@ -78,7 +78,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdat
     BOOST_CHECK_EQUAL (pubid3.getUnits (), "V");
     vFed1->finalize ();
 
-    BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
 BOOST_TEST_DECORATOR (*utf::timeout (5))

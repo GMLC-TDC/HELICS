@@ -25,6 +25,7 @@ extern "C" {
 #define HELICS_VECTOR_TYPE 4
 #define HELICS_RAW_TYPE 25
 
+
 /** create a subscription
 @param fed the federate object in which to create a subscription
 @param key the identifier matching a publication to get a subscription for
@@ -36,7 +37,39 @@ HELICS_Export helics_subscription helicsRegisterSubscription (helics_value_feder
                                                               const char *key,
                                                               const char *type,
                                                               const char *units);
+
+/** create a subscription of a specific known type
+@param fed the federate object in which to create a subscription
+@param key the identifier matching a publication to get a subscription for
+@param type a known type identifier  HELICS_STRING_TYPE, HELICS_INT_TYPE, HELICS_DOUBLE_TYPE, HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE
+@param units a string listing the units of the subscription maybe NULL
+@return an object containing the subscription
+*/
 HELICS_Export helics_subscription helicsRegisterTypeSubscription (helics_value_federate fed, const char *key, int type, const char *units);
+
+/** create a subscription that is specifically stated to be optional
+@details optional implies that there may or may not be matching publication elsewhere in the federation
+@param fed the federate object in which to create a subscription
+@param key the identifier matching a publication to get a subscription for
+@param type a string describing the expected type of the publication may be NULL
+@param units a string listing the units of the subscription maybe NULL
+@return an object containing the subscription
+*/
+HELICS_Export helics_subscription helicsRegisterOptionalSubscription(helics_value_federate fed,
+    const char *key,
+    const char *type,
+    const char *units);
+
+/** create a subscription of a specific known type that is specifically stated to be optional
+@details optional implies that there may or may not be matching publication elsewhere in the federation
+@param fed the federate object in which to create a subscription
+@param key the identifier matching a publication to get a subscription for
+@param type a known type identifier HELICS_STRING_TYPE, HELICS_INT_TYPE, HELICS_DOUBLE_TYPE, HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE
+@param units a string listing the units of the subscription maybe NULL
+@return an object containing the subscription
+*/
+HELICS_Export helics_subscription helicsRegisterOptionalTypeSubscription(helics_value_federate fed, const char *key, int type, const char *units);
+
 
 HELICS_Export helics_publication helicsRegisterPublication (helics_value_federate fed,
                                                             const char *key,

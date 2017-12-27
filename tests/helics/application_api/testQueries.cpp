@@ -45,7 +45,7 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
 
     vFed1->enterInitializationStateAsync ();
     vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateFinalize ();
+    vFed1->enterInitializationStateComplete ();
 
     auto core = vFed1->getCorePointer ();
     auto res = core->query ("test1", "publications");
@@ -81,7 +81,7 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     BOOST_CHECK_EQUAL (res, "[test1;test2]");
     vFed1->enterInitializationStateAsync ();
     vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateFinalize ();
+    vFed1->enterInitializationStateComplete ();
     core = nullptr;
     vFed1->finalize ();
     vFed2->finalize ();
@@ -103,7 +103,7 @@ BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), co
 
     vFed1->enterInitializationStateAsync ();
     vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateFinalize ();
+    vFed1->enterInitializationStateComplete ();
 
     auto res = vFed1->query ("federation", "publications");
 
