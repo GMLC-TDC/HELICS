@@ -120,7 +120,7 @@ namespace helics
         */
         std::pair<std::string,std::string> getValue(int index) const;
         /** get a message 
-        @details makes a copy of a message and returns it in a unique ptr
+        @details makes a copy of a message and returns it in a unique_ptr
         @param index the number of the message to retrieve
         */
         std::unique_ptr<Message> getMessage(int index) const;
@@ -133,27 +133,31 @@ namespace helics
         */
         int loadArguments(boost::program_options::variables_map &vm_map);
         /** load from a jsonString
-        @param either a json filename or a string containing json
+        @param either a JSON filename or a string containing JSON
         */
         int loadJsonFile(const std::string &jsonString);
         /** load a text file*/
         int loadTextFile(const std::string &textFile);
-        /** helper function to write the date to a json file*/
+        /** helper function to write the date to a JSON file*/
         void writeJsonFile(const std::string &filename);
         /** helper function to write the date to a text file*/
         void writeTextFile(const std::string &filename);
+
+        void initialize();
+        void generateInterfaces();
+        void captureForCurrentTime(Time currentTime);
     protected:
         std::shared_ptr<CombinationFederate> fed; //!< the federate 
         std::vector<ValueCapture> points;   //!< lists of points that were captured
-        std::set<std::string> tags; //!< a set of tags to generate points from
         std::vector<Subscription> subscriptions;    //!< the actual subscription objects
         std::vector<Endpoint> endpoints;    //!< the actual endpoint objects
         std::vector<std::unique_ptr<Message>> messages; //!< list of messages
         std::map<helics::subscription_id_t, int> subids; //!< map of the subscription ids
-        std::map<std::string, int> subkeys;
-        std::map<helics::endpoint_id_t, int> eptids;
-        std::map<std::string, int> eptNames;
-        std::string mapfile;    //!< file name for the online file updator
+        std::map<std::string, int> subkeys;  //!< translate subscription names to an index
+        std::map<helics::endpoint_id_t, int> eptids; //translate subscription id to index
+        std::map<std::string, int> eptNames;    //!< translate endpoint name to index
+        std::vector<ValueStats> vStat; //!< storage for statistics capture
+        std::string mapfile;    //!< file name for the on-line file updater
         std::string outFileName;    //!< the final output file
         Time autoStopTime = Time::maxVal(); //!< the stop time
     };

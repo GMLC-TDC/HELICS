@@ -22,7 +22,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/algorithm/string.hpp>
+#include "../common/stringOps.h"
 
 #include "PrecHelper.h"
 #include <thread>
@@ -160,17 +160,17 @@ namespace helics
                 auto tag = str.substr(0, cloc);
                 tag.erase(tag.find_last_not_of(" \t\n\0") + 1);
                 tag.erase(0, tag.find_first_not_of(" \t\n\0"));
-                tags.emplace(tag);
+                subkeys.emplace(tag,-1);
             }
             else
             {
                 auto tag = str;
                 tag.erase(tag.find_last_not_of(" \t\n\0") + 1);
                 tag.erase(0, tag.find_first_not_of(" \t\n\0"));
-                tags.emplace(str);
+                subkeys.emplace(tag, -1);
             }
         }
-        std::cout << tags.size() << " tags processed\n";
+        std::cout << subkeys.size() << " tags processed\n";
 
         infile.close();
         return 0;
@@ -178,7 +178,41 @@ namespace helics
 
     void recorder::writeJsonFile(const std::string &filename)
     {
+        using json = nlohmann::json;
+        json JF;
+        if (!points.empty())
+        {
+            JF["points"] = json::array();
+            for (auto &v : points)
+            {
+                json point;
+                point["key"] = subscriptions[v.index].getKey();
+                point["value"] = v.value;
+                point["time"] = static_cast<double>(v.time);
 
+                if (v.first)
+                {
+                    point["type"] = subscriptions[v.index].getType();
+                }
+                JF["points"].push_back(point);
+            }
+        }
+        
+        if (!messages.empty())
+        {
+            JF["messages"] = json::array();
+            for (auto &mess : messages)
+            {
+                json message;
+                message["time"] = static_cast<double>(mess->time);
+                message["src"] = mess->src;
+                message["dest"] = mess->dest;
+                message["message"] = mess->data.to_string();
+            }
+        }
+      
+        std::ofstream o("filename");
+        o << std::setw(4) << JF << std::endl;
     }
 
     void recorder::writeTextFile( const std::string &filename)
@@ -189,12 +223,76 @@ namespace helics
         {
             if (v.first)
             {
-          //      outFile << static_cast<double> (v.time) << "\t\t" << subids[v.id].first << '\t' << v.value << '\t'
-            //        << subids[v.id].second << '\n';
+               outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getKey() << '\t' << v.value << '\t'
+                    << subscriptions[v.index].getType() << '\n';
             }
             else
             {
-          //      outFile << static_cast<double> (v.time) << "\t\t" << subids[v.id].first << '\t' << v.value << '\n';
+                outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getKey() << '\t' << v.value << '\n';
+            }
+        }
+    }
+
+    void recorder::initialize()
+    {
+        generateInterfaces();
+
+        vStat.reserve(subkeys.size());
+        for (auto &val : subkeys)
+        {
+            vStat.emplace_back(ValueStats());
+            vStat.back().key = val.first;
+        }
+
+        fed->enterInitializationState();
+        captureForCurrentTime(-1.0);
+
+        std::cout << "entering execution mode\n";
+        fed->enterExecutionState();
+        captureForCurrentTime(0.0);
+    }
+    void recorder::generateInterfaces()
+    {
+        for (auto &tag : subkeys)
+        {
+            if (tag.second == -1)
+            {
+                addSubscription(tag.first);
+            }
+        }
+        for (auto &ept : eptNames)
+        {
+            if (ept.second == -1)
+            {
+                addEndpoint(ept.first);
+            }
+        }
+    }
+
+    void recorder::captureForCurrentTime(Time currentTime)
+    {
+        for (auto &sub : subscriptions)
+        {
+            if (sub.isUpdated())
+            {
+                auto val = sub.getValue<std::string>();
+                int ii = subids[sub.getID()];
+                points.emplace_back(currentTime, ii, val);
+                if (vStat[ii].cnt == 0)
+                {
+                    points.back().first = true;
+                }
+                ++vStat[ii].cnt;
+                vStat[ii].lastVal = val;
+                vStat[ii].time = -1.0;
+            }
+        }
+
+        for (auto &ept : endpoints)
+        {
+            while (ept.hasMessage())
+            {
+                messages.push_back(ept.getMessage());
             }
         }
     }
@@ -208,35 +306,7 @@ namespace helics
     /** run the player until the specified time*/
     void recorder::run(Time runToTime)
     {
-        std::vector<ValueStats> vStat;
-
-        vStat.reserve(subids.size());
-        for (auto &val : subids)
-        {
-            vStat.emplace_back(ValueStats());
-       //     vStat.back().key = val.second.first;
-        }
-        points.reserve(100000);
-        std::cout << "entering execution mode\n";
-        fed->enterExecutionState();
-        helics::Time nextPrintTime = 10.0;
-        int ii = 0;
-        for (auto &sub : subscriptions)
-        {
-            if (sub.isUpdated())
-            {
-                auto val = sub.getValue<std::string>();
-                points.emplace_back(-1.0, 1, val);
-                if (vStat[ii].cnt == 0)
-                {
-                   points.back().first = true;
-                }
-                ++vStat[ii].cnt;
-                vStat[ii].lastVal = val;
-                vStat[ii].time = -1.0;
-            }
-            ++ii;
-        }
+        initialize();
         if (!mapfile.empty())
         {
             std::ofstream out(mapfile);
@@ -247,7 +317,7 @@ namespace helics
             }
             out.flush();
         }
-
+        Time nextPrintTime = 10.0;
         try
         {
             while (true)
@@ -255,19 +325,7 @@ namespace helics
                 auto T = fed->requestTime(runToTime);
                 if (T < runToTime)
                 {
-                    ii = 0;
-                    for (auto &sub : subscriptions)
-                    {
-                        if (sub.isUpdated())
-                        {
-                            auto val = sub.getValue<std::string>();
-                            points.emplace_back(T, subids[sub.getID()], val);
-                            ++vStat[ii].cnt;
-                            vStat[ii].lastVal = val;
-                            vStat[ii].time = T;
-                        }
-                        ++ii;
-                    }
+                    captureForCurrentTime(T);
                     if (!mapfile.empty())
                     {
                         std::ofstream out(mapfile);
@@ -293,36 +351,32 @@ namespace helics
         catch (...)
         {
         }
-
-        for (auto &sub : subscriptions)
-        {
-            subids.emplace(sub.getID(), 1);
-        }
-        fed->finalize();
         
     }
     /** add a subscription to capture*/
     void recorder::addSubscription(const std::string &key)
     {
-        if (subkeys.find(key) == subkeys.end())
+        auto res = subkeys.find(key);
+        if ((res == subkeys.end())||(res->second==-1))
         {
             subscriptions.push_back(helics::Subscription(fed.get(), key));
             auto index = static_cast<int>(subscriptions.size())-1;
             auto id = subscriptions.back().getID();
-            subids.emplace(id, index);
-            subkeys.emplace(key, index);
+            subids[id]= index; //this is a new element
+            subkeys[key]=index; //this is a potential replacement
         }
     }
     /** add an endpoint*/
     void recorder::addEndpoint(const std::string &endpoint)
     {
-        if (eptNames.find(endpoint) == eptNames.end())
+        auto res = eptNames.find(endpoint);
+        if ((res == eptNames.end()) || (res->second == -1))
         {
             endpoints.push_back(helics::Endpoint(fed.get(), endpoint));
             auto index = static_cast<int>(endpoints.size())-1;
             auto id = endpoints.back().getID();
-            eptids.emplace(id, index);
-            eptNames.emplace(endpoint, index);
+            eptids.emplace(id, index); //this is a new element
+            eptNames[endpoint]= index; //this is a potential replacement
         }
     }
     
@@ -394,37 +448,44 @@ namespace helics
             auto argTags = vm_map["tags"].as<std::vector<std::string>>();
             for (const auto &tag : argTags)
             {
-                std::vector<std::string> taglist;
-                boost::split(taglist, tag, boost::is_any_of(",;"));
+                auto taglist = stringOps::splitlineQuotes(tag);
                 for (const auto &tagname : taglist)
                 {
-                    tags.insert(tagname);
+                    subkeys.emplace(stringOps::removeQuotes(tagname),-1);
+                }
+            }
+        }
+        // get the extra tags from the arguments
+        if (vm_map.count("endpoints") > 0)
+        {
+            auto argEpt = vm_map["endpoints"].as<std::vector<std::string>>();
+            for (const auto &ept : argEpt)
+            {
+                auto eptlist = stringOps::splitlineQuotes(ept);
+                for (const auto &eptname : eptlist)
+                {
+                    eptNames.emplace(stringOps::removeQuotes(eptname), -1);
                 }
             }
         }
 
-        std::string prevTag;
-        for (auto &tname : tags)
-        {
-            subscriptions.push_back(helics::Subscription(fed.get(), tname));
-        }
         // capture the all the publications from a particular federate
         if (vm_map.count("capture") > 0)
         {
             auto captures = vm_map["capture"].as<std::vector<std::string>>();
             for (const auto &capt : captures)
             {
-                std::vector<std::string> captFeds;
-                boost::split(captFeds, capt, boost::is_any_of(",;"));
-                for (const auto &captFed : captFeds)
+                auto captFeds = stringOps::splitlineQuotes(capt);
+                for (auto &captFed : captFeds)
                 {
-                    auto res = waitForInit(fed.get(), captFed);
+                    auto actCapt = stringOps::removeQuotes(captFed);
+                    auto res = waitForInit(fed.get(), actCapt);
                     if (res)
                     {
                         auto pubs = vectorizeQueryResult(fed->query(captFed, "publications"));
                         for (auto &pub : pubs)
                         {
-                            subscriptions.emplace_back(fed.get(), pub);
+                            addSubscription(pub);
                         }
                     }
                 }
@@ -463,7 +524,10 @@ void recorderArgumentParser(int argc, const char *const *argv, po::variables_map
 
     config.add_options()
         ("stop", po::value<double>(), "the time to stop recording")
-        ("tags",po::value<std::vector<std::string>>(),"tags to record this argument may be specified any number of times")
+        ("tags",po::value<std::vector<std::string>>(),"tags to record, this argument may be specified any number of times")
+        ("endpoints",po::value<std::vector<std::string>>(),"endpoints to capture, this argument may be specified multiple time")
+        ("sourcefilter", po::value<std::vector<std::string>>(), "existing endpoints to capture generated packets from, this argument may be specified multiple time")
+        ("destfilter", po::value<std::vector<std::string>>(), "existing endpoints to capture all packets with the specified endpoint as a destination, this argument may be specified multiple time")
         ("capture", po::value < std::vector<std::string>>(),"capture all the publications of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list")
 		("output,o",po::value<std::string>(),"the output file for recording the data")
 		("mapfile", po::value<std::string>(), "write progress to a memory mapped file");
