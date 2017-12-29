@@ -58,7 +58,7 @@ namespace helics
 
     /** class implementing a player object, which is capable of reading a file and generating interfaces
     and sending signals at the appropriate times
-    @details  the player class is not threadsafe,  don't try to use it from multiple threads without external protection, that will result in undefined behavior
+    @details  the player class is not thread-safe,  don't try to use it from multiple threads without external protection, that will result in undefined behavior
     */
     class player
     {
@@ -80,7 +80,7 @@ namespace helics
         */
         player(std::shared_ptr<Core> core, const FederateInfo &fi);
         /**constructor taking a file with the required information
-        @param[in] jsonString file or json string defining the federate information and other configuration
+        @param[in] jsonString file or JSON string defining the federate information and other configuration
         */
         player(const std::string &jsonString);
 
@@ -95,7 +95,7 @@ namespace helics
         ~player();
 
         /** load a file containing publication information
-        @param filename the file containing the configuration and player data  accepted format are json, xml, and a player format which is tab delimited or comma delimited*/
+        @param filename the file containing the configuration and player data  accepted format are JSON, xml, and a player format which is tab delimited or comma delimited*/
         void loadFile(const std::string &filename);
         /** initialize the player federate
         @details generate all the publications and organize the points, the final publication count will be available after this time

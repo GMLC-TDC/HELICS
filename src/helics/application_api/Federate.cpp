@@ -740,23 +740,23 @@ std::string Federate::getFilterOutputType (filter_id_t id) const { return coreOb
 filter_id_t Federate::getFilterId (const std::string &filterName) const
 {
     auto id = coreObject->getSourceFilter (filterName);
-    if (id == invalid_Handle)
+    if (id == invalid_handle)
     {
         id = coreObject->getDestinationFilter (filterName);
     }
-    return (id == invalid_Handle) ? invalid_id_value : filter_id_t (id);
+    return (id == invalid_handle) ? invalid_id_value : filter_id_t (id);
 }
 
 filter_id_t Federate::getSourceFilterId (const std::string &filterName) const
 {
     auto id = coreObject->getSourceFilter (filterName);
-    return (id == invalid_Handle) ? invalid_id_value : filter_id_t (id);
+    return (id == invalid_handle) ? invalid_id_value : filter_id_t (id);
 }
 
 filter_id_t Federate::getDestFilterId (const std::string &filterName) const
 {
     auto id = coreObject->getDestinationFilter (filterName);
-    return (id == invalid_Handle) ? invalid_id_value : filter_id_t (id);
+    return (id == invalid_handle) ? invalid_id_value : filter_id_t (id);
 }
 
 void Federate::setFilterOperator (filter_id_t id, std::shared_ptr<FilterOperator> mo)

@@ -101,9 +101,9 @@ class Core
      */
     virtual void disconnect () = 0;
 
-    /** check if the core is joinable i.e. it is accepting new federates
+    /** check if the core is ready to accept new federates
      */
-    virtual bool isJoinable () const = 0;
+    virtual bool isOpenToNewFederates () const = 0;
     /** get and identifier string for the core
      */
     virtual const std::string &getIdentifier () const = 0;
@@ -228,7 +228,7 @@ class Core
      *@param federateID the identifier for the federate to process
      * @param next the requested time
      * @param localConverged has the local federate converged
-     @return an iterationTime object with two field stepTime and a bool indicating the iteration has completed
+     @return an iterationTime object with two field stepTime and a enumeration indicating the state of the iteration
      */
     virtual iterationTime requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate) = 0;
 
@@ -402,14 +402,15 @@ class Core
     /**
      * Publish specified data to the specified key.
      *
-     * Data ownership is retained by the federate.
+     * @param handle a handle to a publication to use for the value
+     @param[in] data the raw data to send
+     @param len the size of the data
      */
     virtual void setValue (Handle handle, const char *data, uint64_t len) = 0;
 
     /**
-     * Return data for the specified handle.
+     * Return the data for the specified handle.
      *
-     * Returned pointer is valid until dereference() is invoked.
      */
     virtual std::shared_ptr<const data_block> getValue (Handle handle) = 0;
 
@@ -616,7 +617,8 @@ class Core
 
 // set at a large negative number but not the largest negative number
 constexpr Core::federate_id_t invalid_fed_id = -2'000'000'000;
-constexpr Core::Handle invalid_Handle = -2'000'000'000;
+constexpr Core::Handle invalid_handle = -2'000'000'000;
+constexpr Core::Handle direct_send_handle = -1'745'234; //!< this special handle can be used to directly send a message in a core
 
 }  // namespace helics
 

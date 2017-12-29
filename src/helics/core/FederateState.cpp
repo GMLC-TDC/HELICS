@@ -362,7 +362,7 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::Handle &id)
         id = endpointI->id;
         return result;
     }
-    id = invalid_Handle;
+    id = invalid_handle;
     return nullptr;
 }
 

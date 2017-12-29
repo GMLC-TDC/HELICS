@@ -19,6 +19,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <random>
 #include <regex>
 #include <thread>
+#include <algorithm>
 
 namespace helics
 {
@@ -320,5 +321,63 @@ std::string rerouteFilterOperation::rerouteOperation (const std::string &dest) c
         }
     }
     return dest;
+}
+
+
+cloneFilterOperation::cloneFilterOperation(Core *core):coreptr(core)
+{
+    op =
+        std::make_shared<CloneOperator>([this](const Message *mess) { sendMessage(mess); });
+}
+
+cloneFilterOperation::~cloneFilterOperation() = default;
+
+
+void cloneFilterOperation::set(const std::string &property, double val)
+{
+
+}
+
+void cloneFilterOperation::setString(const std::string &property, const std::string &val)
+{
+    if (property == "delivery")
+    {
+        deliveryAddresses = std::vector<std::string>{ val };
+    }
+    else if (property == "add delivery")
+    {
+        auto lock = deliveryAddresses.lock();
+        auto fnd = std::find(lock->cbegin(), lock->cend(), val);
+        if (fnd == lock->cend())
+        {
+            lock->push_back(val);
+        }
+    }
+    else if (property == "remove delivery")
+    {
+        auto lock = deliveryAddresses.lock();
+        auto fnd = std::find(lock->cbegin(), lock->cend(), val);
+        if (fnd != lock->cend())
+        {
+            lock->erase(fnd);
+        }
+    }
+}
+
+std::shared_ptr<FilterOperator> cloneFilterOperation::getOperator()
+{
+    return std::static_pointer_cast<FilterOperator> (op);
+}
+
+void cloneFilterOperation::sendMessage(const Message *mess)
+{
+    auto lock = deliveryAddresses.lock_shared();
+    for (auto &add : *lock)
+    {
+        auto m = std::make_unique<Message>(*mess);
+        m->orig_dest = m->dest;
+        m->dest = add;
+        coreptr->sendMessage(direct_send_handle, std::move(m));
+    }
 }
 }  // namespace helics

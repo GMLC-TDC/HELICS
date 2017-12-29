@@ -24,7 +24,7 @@ namespace helics
     class MessageTimeOperator;
     class MessageConditionalOperator;
     class MessageDestOperator;
-
+    class CloneOperator;
     /** class for managing filter operations*/
     class FilterOperations
     {
@@ -119,6 +119,32 @@ namespace helics
     private:
         /** function to execute the rerouting operation*/
         std::string rerouteOperation(const std::string &dest) const;
+    };
+
+    /** filter for rerouting a packet to a particular endpoint*/
+    class cloneFilterOperation : public FilterOperations
+    {
+    private:
+        Core *coreptr; //!< pointer to a core object
+        std::shared_ptr<CloneOperator> op;  //!< the actual operator
+#ifdef HAVE_SHARED_TIMED_MUTEX
+        libguarded::shared_guarded<std::vector<std::string>>
+            deliveryAddresses;  //!< the original destination must match one of these conditions
+#else
+        libguarded::shared_guarded<std::vector<std::string>>
+            deliveryAddresses;  //!< the original destination must match one of these conditions
+#endif
+    public:
+        /** this operation needs a pointer to a core to operate*/
+        explicit cloneFilterOperation(Core *core);
+
+        ~cloneFilterOperation();
+        virtual void set(const std::string &property, double val) override;
+        virtual void setString(const std::string &property, const std::string &val) override;
+        virtual std::shared_ptr<FilterOperator> getOperator() override;
+
+    private:
+        void sendMessage(const Message *mess);
     };
 
 } //namespace helics

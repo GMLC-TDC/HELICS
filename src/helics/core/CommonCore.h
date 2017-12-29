@@ -59,7 +59,7 @@ CommonCore(const std::string &core_name);
   */
   virtual void initializeFromArgs(int argc, const char * const *argv) override;
   virtual bool isInitialized () const override final;
-  virtual bool isJoinable() const override final; 
+  virtual bool isOpenToNewFederates() const override final;
   virtual void error (federate_id_t federateID, int errorCode=-1) override final;
   virtual void finalize (federate_id_t federateID) override final;
   virtual void enterInitializingState (federate_id_t federateID) override final;
@@ -224,9 +224,9 @@ protected:
 	
 	int32_t _global_federation_size = 0;  //!< total size of the federation
     bool hasLocalFilters = false;
-    
+    std::atomic<int16_t> delayInitCounter{ 0 }; //!< counter for the number of times the entry to init Mode was explicitly delayed
 	std::vector<std::unique_ptr<FederateState>> _federates; //!< local federate information
-    std::vector<int> ongoingFilterActionCounter;  //!< counter for the number of ongoing filter transactions for a federate													  //using pointers to minimize time in a critical section- though this should be timed more in the future
+    std::vector<int> ongoingFilterActionCounter;  //!< counter for the number of ongoing filter transactions for a federate
   std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
   std::atomic<Core::Handle> handleCounter{ 1 };	//!< counter for the handle index
   std::unordered_map<std::string, Handle> publications;	//!< map of all local publications

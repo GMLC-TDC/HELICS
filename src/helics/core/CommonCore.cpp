@@ -24,6 +24,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "core-exceptions.h"
 #include "coreFederateInfo.h"
 #include "loggingHelper.hpp"
+#include "../flag-definitions.h"
 #include <boost/filesystem.hpp>
 
 #include <algorithm>
@@ -312,7 +313,7 @@ int32_t CommonCore::getRoute (Core::federate_id_t global_id) const
 
 bool CommonCore::isInitialized () const { return (brokerState >= initialized); }
 
-bool CommonCore::isJoinable () const { return ((brokerState != created) && (brokerState < operating)); }
+bool CommonCore::isOpenToNewFederates() const { return ((brokerState != created) && (brokerState < operating)); }
 void CommonCore::error (federate_id_t federateID, int errorCode)
 {
     auto fed = getFederate (federateID);
@@ -361,6 +362,10 @@ void CommonCore::finalize (federate_id_t federateID)
 
 bool CommonCore::allInitReady () const
 {
+    if (delayInitCounter > 0)
+    {
+        return false;
+    }
     std::lock_guard<std::mutex> lock (_mutex);
     // the federate count must be greater than the min size
     if (static_cast<decltype (_min_federates)> (_federates.size ()) < _min_federates)
@@ -719,8 +724,28 @@ void CommonCore::setFlag (federate_id_t federateID, int flag, bool flagValue)
 {
     if (federateID == 0)
     {
-        std::lock_guard<std::mutex> lock (_mutex);
-
+        if (flag == DELAY_INIT_ENTRY)
+        {
+            if (flagValue)
+            {
+                ++delayInitCounter;
+            }
+            else
+            {
+                ActionMessage cmd(CMD_CORE_CONFIGURE);
+                cmd.index = UPDATE_FLAG;
+                cmd.dest_id = ENABLE_INIT_ENTRY;
+                addActionMessage(cmd);
+            }
+            
+        }
+        else if (flag == ENABLE_INIT_ENTRY)
+        {
+            ActionMessage cmd(CMD_CORE_CONFIGURE);
+            cmd.index = UPDATE_FLAG;
+            cmd.dest_id = ENABLE_INIT_ENTRY;
+            addActionMessage(cmd);
+        }
         return;
     }
 
@@ -867,7 +892,7 @@ Handle CommonCore::getSubscription (federate_id_t federateID, const std::string 
     {
         return fed->getSubscription (key)->id;
     }
-    return invalid_Handle;
+    return invalid_handle;
 }
 
 Handle CommonCore::registerPublication (federate_id_t federateID,
@@ -920,7 +945,7 @@ Handle CommonCore::getPublication (federate_id_t federateID, const std::string &
             return pub->id;
         }
     }
-    return invalid_Handle;
+    return invalid_handle;
 }
 
 const std::string nullStr;
@@ -1109,7 +1134,7 @@ Handle CommonCore::getEndpoint (federate_id_t federateID, const std::string &nam
             return ept->id;
         }
     }
-    return invalid_Handle;
+    return invalid_handle;
 }
 
 Handle CommonCore::registerSourceFilter (const std::string &filterName,
@@ -1125,7 +1150,7 @@ Handle CommonCore::registerSourceFilter (const std::string &filterName,
     if (!filterName.empty ())
     {
         auto handle = getSourceFilter (filterName);
-        if (handle != invalid_Handle)
+        if (handle != invalid_handle)
         {
             throw (invalidIdentifier ("there already exists a filter with this name"));
         }
@@ -1178,11 +1203,11 @@ Handle CommonCore::getSourceFilter (const std::string &name) const
     {
         if (fnd->second->dest_filter)
         {
-            return invalid_Handle;
+            return invalid_handle;
         }
         return fnd->second->handle;
     }
-    return invalid_Handle;
+    return invalid_handle;
 }
 
 Handle CommonCore::registerDestinationFilter (const std::string &filterName,
@@ -1249,9 +1274,9 @@ Handle CommonCore::getDestinationFilter (const std::string &name) const
         {
             return fnd->second->handle;
         }
-        return invalid_Handle;
+        return invalid_handle;
     }
-    return invalid_Handle;
+    return invalid_handle;
 }
 
 FilterInfo *CommonCore::createSourceFilter (federate_id_t dest,
@@ -1385,6 +1410,15 @@ void CommonCore::sendEvent (Time time,
 
 void CommonCore::sendMessage (Handle sourceHandle, std::unique_ptr<Message> message)
 {
+    if (sourceHandle == direct_send_handle)
+    {
+        ActionMessage m(std::move(message));
+        m.source_id = global_broker_id;
+        m.source_handle = sourceHandle;
+
+        queueMessage(m);
+        return;
+    }
     auto hndl = getHandleInfo (sourceHandle);
     if (hndl == nullptr)
     {
@@ -1395,12 +1429,9 @@ void CommonCore::sendMessage (Handle sourceHandle, std::unique_ptr<Message> mess
         throw (invalidIdentifier ("handle does not point to an endpoint"));
     }
     ActionMessage m (std::move (message));
-    if (hndl != nullptr)
-    {
-        m.info ().source = hndl->key;
-        m.source_handle = hndl->id;
-        m.source_id = hndl->fed_id;
-    }
+  
+    m.info ().source = hndl->key;
+    m.source_id = hndl->fed_id;
     m.source_handle = sourceHandle;
 
     queueMessage (processMessage (hndl, m));
@@ -1521,7 +1552,7 @@ std::unique_ptr<Message> CommonCore::receiveAny (federate_id_t federateID, Handl
     }
     if (fed->getState () != HELICS_EXECUTING)
     {
-        endpoint_id = invalid_Handle;
+        endpoint_id = invalid_handle;
         return nullptr;
     }
     return fed->receiveAny (endpoint_id);
@@ -2329,6 +2360,32 @@ void CommonCore::processCommand (ActionMessage &&command)
         processFilterInfo (command);
     }
     break;
+    case CMD_CORE_CONFIGURE:
+        if (command.index == UPDATE_FLAG)
+        {
+            if (command.dest_id == ENABLE_INIT_ENTRY)
+            {
+                if (delayInitCounter <=1)
+                {
+                    delayInitCounter = 0;
+                    if (allInitReady())
+                    {
+                        broker_state_t exp = connected;
+                        if (brokerState.compare_exchange_strong(exp, broker_state_t::initializing))
+                        {  // make sure we only do this once
+                            checkDependencies();
+                            command.source_id = global_broker_id;
+                            transmit(0, command);
+                        }
+                    }
+                }
+                else
+                {
+                    --delayInitCounter;
+                }
+            }
+        }
+        break;
     case CMD_INIT:
     {
         auto fed = getFederate (command.source_id);

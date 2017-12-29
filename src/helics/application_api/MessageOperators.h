@@ -78,10 +78,29 @@ public:
 	/** set the function to modify the data of the message in the constructor*/
 	MessageConditionalOperator(std::function<bool(const Message *)> userConditionalFunction);
 	/** set the function to modify the data of the message*/
-	void setConditionFunction(std::function<bool(const Message *)> userDataFunction);
+	void setConditionFunction(std::function<bool(const Message *)> userConditionalFunction);
 private:
 	std::function<bool(const Message *)> evalFunction; //!< the function actually doing the processing
 	virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
+};
+
+
+/** class defining an message operator that either passes the message or not
+@details  the evaluation function used should return true if the message should be allowed through
+false if it should be dropped
+*/
+class CloneOperator :public FilterOperator
+{
+public:
+    /** default constructor*/
+    CloneOperator() = default;
+    /** set the function to modify the data of the message in the constructor*/
+    CloneOperator(std::function<void(const Message *)> userCloneFunction);
+    /** set the function to modify the data of the message*/
+    void setCloneFunction(std::function<void(const Message *)> userCloneFunction);
+private:
+    std::function<void(const Message *)> evalFunction; //!< the function actually doing the processing
+    virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
 };
 
 } //namespace helics

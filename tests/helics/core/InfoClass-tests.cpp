@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
 {
     // All default values
     helics::BasicHandleInfo defHnd;
-    BOOST_CHECK_EQUAL (defHnd.id, helics::invalid_Handle);
+    BOOST_CHECK_EQUAL (defHnd.id, helics::invalid_handle);
     BOOST_CHECK_EQUAL (defHnd.fed_id, helics::invalid_fed_id);
     BOOST_CHECK_EQUAL (defHnd.local_fed_id, helics::invalid_fed_id);
     BOOST_CHECK_EQUAL (defHnd.what, helics::HANDLE_UNKNOWN);

@@ -42,7 +42,7 @@ public:
 	{
 	}
     Core::federate_id_t fed_id = invalid_fed_id;	//!< id of the core that manages the filter
-	Core::Handle handle= invalid_Handle; //!< id handle of the filter
+	Core::Handle handle= invalid_handle; //!< id handle of the filter
 	
 	std::string key;	//!< the identifier of the filter
     std::string filterTarget;	//!< the target endpoint name of the filter
@@ -52,7 +52,7 @@ public:
 	// there is a 7 byte gap here
 	std::shared_ptr<FilterOperator> filterOp;	//!< the callback operation of the filter
 	
-	std::pair<Core::federate_id_t, Core::Handle> target{ invalid_fed_id,invalid_Handle };	//!< the actual target information for the filter
+	std::pair<Core::federate_id_t, Core::Handle> target{ invalid_fed_id,invalid_handle };	//!< the actual target information for the filter
 };
 } // namespace helics
 

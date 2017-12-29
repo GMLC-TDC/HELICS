@@ -93,4 +93,23 @@ std::unique_ptr<Message> MessageConditionalOperator::process (std::unique_ptr<Me
     }
     return message;
 }
+
+CloneOperator::CloneOperator(std::function<void(const Message *)> userCloneFunction)
+    : evalFunction(std::move(userCloneFunction))
+{
+}
+
+void CloneOperator::setCloneFunction(std::function<void(const Message *)> userCloneFunction)
+{
+    evalFunction = std::move(userCloneFunction);
+}
+
+std::unique_ptr<Message> CloneOperator::process(std::unique_ptr<Message> message)
+{
+    if (evalFunction)
+    {
+        evalFunction(message.get());
+    }
+    return message;
+}
 }  // namespace helics
