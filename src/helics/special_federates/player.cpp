@@ -588,6 +588,35 @@ void player::initialize ()
     }
 }
 
+
+void player::sendInformation(Time sendTime)
+{
+    if (!points.empty())
+    {
+        while (points[pointIndex].time <= sendTime)
+        {
+            publications[points[pointIndex].index].publish(points[pointIndex].value);
+            ++pointIndex;
+            if (pointIndex >= points.size())
+            {
+                break;
+            }
+        }
+    }
+    if (!messages.empty())
+    {
+        while (messages[messageIndex].sendTime <=sendTime)
+        {
+            endpoints[messages[messageIndex].index].send(messages[messageIndex].mess);
+            ++messageIndex;
+            if (messageIndex >= messages.size())
+            {
+                break;
+            }
+        }
+    }
+}
+
 /*run the player*/
 void player::run ()
 {
@@ -602,60 +631,14 @@ void player::run (Time stopTime_input)
     {
         initialize ();
     }
-    if (state != Federate::op_states::execution)
+    if (state < Federate::op_states::execution)
     {
-        // send stuff before timeZero
-        if (!points.empty ())
-        {
-            while (points[pointIndex].time < helics::timeZero)
-            {
-                publications[points[pointIndex].index].publish (points[pointIndex].value);
-                ++pointIndex;
-                if (pointIndex >= points.size ())
-                {
-                    break;
-                }
-            }
-        }
-        if (!messages.empty ())
-        {
-            while (messages[messageIndex].sendTime < helics::timeZero)
-            {
-                endpoints[messages[messageIndex].index].send (messages[messageIndex].mess);
-                ++messageIndex;
-                if (messageIndex >= messages.size ())
-                {
-                    break;
-                }
-            }
-        }
+        sendInformation(-Time::epsilon());
 
         fed->enterExecutionState ();
         // send the stuff at timeZero
-        if (!points.empty ())
-        {
-            while (points[pointIndex].time == helics::timeZero)
-            {
-                publications[points[pointIndex].index].publish (points[pointIndex].value);
-                ++pointIndex;
-                if (pointIndex >= points.size ())
-                {
-                    break;
-                }
-            }
-        }
-        if (!messages.empty ())
-        {
-            while (messages[messageIndex].sendTime == helics::timeZero)
-            {
-                endpoints[messages[messageIndex].index].send (messages[messageIndex].mess);
-                ++messageIndex;
-                if (messageIndex >= messages.size ())
-                {
-                    break;
-                }
-            }
-        }
+        sendInformation(timeZero);
+        
     }
     else
     {
@@ -708,30 +691,8 @@ void player::run (Time stopTime_input)
             continue;
         }
         auto newTime = fed->requestTime (nextSendTime);
-        if (pointIndex < points.size ())
-        {
-            while (points[pointIndex].time <= newTime)
-            {
-                publications[points[pointIndex].index].publish (points[pointIndex].value);
-                ++pointIndex;
-                if (pointIndex >= points.size ())
-                {
-                    break;
-                }
-            }
-        }
-        if (messageIndex < messages.size ())
-        {
-            while (messages[messageIndex].sendTime <= newTime)
-            {
-                endpoints[messages[messageIndex].index].send (messages[messageIndex].mess);
-                ++messageIndex;
-                if (messageIndex >= messages.size ())
-                {
-                    break;
-                }
-            }
-        }
+        sendInformation(newTime);
+        
         if (newTime >= nextPrintTime)
         {
             std::cout << "processed time " << static_cast<double> (newTime) << "\n";

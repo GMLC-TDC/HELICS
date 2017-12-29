@@ -448,6 +448,14 @@ class timeRepresentation
         return trep;
     }
 
+    timeRepresentation operator-() const noexcept
+    {
+        timeRepresentation trep;
+        trep.timecode_ = -timecode_;
+        DOUBLETIMEEXT(trep)
+        return trep;
+    }
+
     timeRepresentation operator- (const timeRepresentation &other) const noexcept
     {
         timeRepresentation trep;

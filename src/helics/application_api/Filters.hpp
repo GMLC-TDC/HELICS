@@ -143,6 +143,8 @@ class cloningFilter : public Filter
     void addSourceEndpoint (const std::string &sourceName);
     void addDestinationEndpoint (const std::string &destinationName);
     void addDeliveryEndpoint (const std::string &endpoint);
+private:
+
 };
 
 
