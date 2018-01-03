@@ -132,11 +132,49 @@ HELICS_Export void helicsFreeCore (helics_core core);
 HELICS_Export void helicsFreeBroker (helics_broker broker);
 
 /* Creation and destruction of Federates */
+/** create a value federate from a federate info object
+@details helics_value_federate objects can be used in all functions that take a helics_value_federate or helics_federate object as an argument
+@param fi the federate info object that contains details on the federate
+@return an opaque value federate object
+*/
 HELICS_Export helics_value_federate helicsCreateValueFederate (const helics_federate_info_t fi);
-HELICS_Export helics_value_federate helicsCreateValueFederateFromFile (const char *filename);
 
-HELICS_Export helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi);
-HELICS_Export helics_federate helicsCreateCombinationFederateFromFile (const char *filename);
+/** create a value federate from a json file or json string
+@details helics_value_federate objects can be used in all functions that take a helics_value_federate or helics_federate object as an argument
+@param json  a json file or a json string that contains setup and configuration information
+@return an opaque value federate object
+*/
+HELICS_Export helics_value_federate helicsCreateValueFederateFromJson (const char *json);
+
+
+
+/** create a message federate from a federate info object
+@details helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an argument
+@param fi the federate info object that contains details on the federate
+@return an opaque message federate object
+*/
+HELICS_Export helics_message_federate helicsCreateMessageFederate(const helics_federate_info_t fi);
+
+/** create a message federate from a json file or json string
+@details helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an argument
+@param json  a json file or a json string that contains setup and configuration information
+@return an opaque message federate object
+*/
+HELICS_Export helics_message_federate helicsCreateMessageFederateFromJson(const char *json);
+
+/** create a combination federate from a federate info object
+@details combination federates are both value federates and message federates, objects can be used in all functions that take a helics_value_federate, helics_message_federate or helics_federate object as an argument
+@param fi the federate info object that contains details on the federate
+@return an opaque value federate object
+*/
+HELICS_Export helics_federate helicsCreateCombinationFederate(const helics_federate_info_t fi);
+
+/** create a combination federate from a json file or json string
+@details combination federates are both value federates and message federates, objects can be used in all functions that take a helics_value_federate, helics_message_federate or helics_federate object as an argument
+@param json  a json file or a json string that contains setup and configuration information
+@return an opaque combination federate object
+*/
+HELICS_Export helics_federate helicsCreateCombinationFederateFromJson(const char *json);
 
 /** create a federate info object for specifying federate information when constructing a federate
 @return a helics_federate_info_t object which is a reference to the created object
@@ -145,7 +183,18 @@ HELICS_Export helics_federate_info_t helicsFederateInfoCreate ();
 /** delete the memory associated with a federate info object*/
 HELICS_Export void helicsFederateInfoFree (helics_federate_info_t fi);
 
+/** set the federate name in the Federate Info structure
+@param fi the federate info object to alter
+@param name the new identifier for the federate
+@return a helicsStatus enumeration helicsOK on success 
+*/
 HELICS_Export helicsStatus helicsFederateInfoSetFederateName (helics_federate_info_t fi, const char *name);
+
+/** set the name of the core to link to for a federate
+@param fi the federate info object to alter
+@param corename the identifier for a core to link to
+@return a helicsStatus enumeration helicsOK on success
+*/
 HELICS_Export helicsStatus helicsFederateInfoSetCoreName (helics_federate_info_t fi, const char *corename);
 HELICS_Export helicsStatus helicsFederateInfoSetCoreInitString (helics_federate_info_t fi, const char *coreInit);
 HELICS_Export helicsStatus helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi, const char *coretype);

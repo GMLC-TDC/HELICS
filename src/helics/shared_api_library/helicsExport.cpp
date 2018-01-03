@@ -45,7 +45,7 @@ helicsStatus helicsFederateInfoSetFederateName (helics_federate_info_t fi, const
 {
     if (fi == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->name = (name != nullptr) ? std::string(name) : nullstr;
@@ -55,17 +55,10 @@ helicsStatus helicsFederateInfoSetCoreName(helics_federate_info_t fi, const char
 {
     if (fi == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    if (corename != nullptr)
-    {
-        hfi->coreName = corename;
-    }
-    else
-    {
-        hfi->coreName = std::string();
-    }
+	hfi->coreName= (corename != nullptr) ? std::string(corename) : nullstr;
     
     return helicsOK;
 }
@@ -73,17 +66,10 @@ helicsStatus helicsFederateInfoSetCoreInitString (helics_federate_info_t fi, con
 {
     if (fi == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    if (coreinit != nullptr)
-    {
-        hfi->coreInitString = coreinit;
-    }
-    else
-    {
-        hfi->coreInitString = std::string();
-    }
+	hfi->coreInitString= (coreinit != nullptr) ? std::string(coreinit) : nullstr;
     return helicsOK;
 }
 
@@ -91,7 +77,7 @@ helicsStatus helicsFederateInfoSetCoreType (helics_federate_info_t fi, int coret
 {
     if (fi == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->coreType = static_cast<helics::core_type> (coretype);
@@ -102,7 +88,7 @@ helicsStatus helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi,
 {
     if (fi == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     try
@@ -127,7 +113,7 @@ helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int
 {
     if (fi == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     switch (flag)
@@ -153,8 +139,11 @@ helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int
     case FORWARD_COMPUTE_FLAG:
         hfi->forwardCompute = (value != 0);
         break;
+	case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
+		hfi->wait_for_current_time_updates = (value != 0);
+		break;
     default:
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     return helicsOK;
 }
@@ -162,7 +151,7 @@ helicsStatus helicsFederateInfoSetLookahead (helics_federate_info_t fi, helics_t
 {
     if (fi == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->lookAhead = lookahead;
@@ -173,7 +162,7 @@ helicsStatus helicsFederateInfoSetTimeDelta (helics_federate_info_t fi, helics_t
 {
     if (fi == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->timeDelta = timeDelta;
@@ -184,7 +173,7 @@ helicsStatus helicsFederateInfoSetImpactWindow (helics_federate_info_t fi, helic
 {
     if (fi == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->impactWindow = impactWindow;
@@ -194,7 +183,7 @@ helicsStatus helicsFederateInfoSetTimeOffset (helics_federate_info_t fi, helics_
 {
     if (fi == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->offset = timeOffset;
@@ -204,9 +193,13 @@ helicsStatus helicsFederateInfoSetPeriod (helics_federate_info_t fi, helics_time
 {
     if (fi == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
+	if (period < 0)
+	{
+		return helicsDiscard;
+	}
     hfi->period = period;
     return helicsOK;
 }
@@ -215,7 +208,7 @@ helicsStatus helicsFederateInfoSetLoggingLevel (helics_federate_info_t fi, int l
 {
     if (fi == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->logLevel = logLevel;
@@ -226,7 +219,7 @@ helicsStatus helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int 
 {
     if (fi == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->max_iterations = max_iterations;

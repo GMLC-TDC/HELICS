@@ -179,23 +179,26 @@ void clearAllObjects () { mHolder.deleteAll (); }
 /* Creation and destruction of Federates */
 helics_federate helicsCreateValueFederate (const helics_federate_info_t fi)
 {
-    if (fi == nullptr)
-    {
-        return nullptr;
-    }
     auto *fed = new helics::FedObject;
     fed->index = getMasterHolder ()->addFed (fed);
-    fed->fedptr = std::make_shared<helics::ValueFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
+	if (fi == nullptr)
+	{
+		fed->fedptr = std::make_shared<helics::ValueFederate>(helics::FederateInfo());
+	}
+	else
+	{
+		fed->fedptr = std::make_shared<helics::ValueFederate>(*reinterpret_cast<helics::FederateInfo *> (fi));
+	}
     fed->type = helics::vtype::valueFed;
     fed->valid = validationIdentifier;
     return reinterpret_cast<void *> (fed);
 }
 
-helics_federate helicsCreateValueFederateFromFile (const char *file)
+helics_federate helicsCreateValueFederateFromJson (const char *json)
 {
     auto *fed = new helics::FedObject;
     fed->index = getMasterHolder ()->addFed (fed);
-    fed->fedptr = std::make_shared<helics::ValueFederate> (file);
+    fed->fedptr = std::make_shared<helics::ValueFederate> ((json != nullptr) ? std::string(json) : std::string());
     fed->type = helics::vtype::valueFed;
     fed->valid = validationIdentifier;
     return reinterpret_cast<void *> (fed);
@@ -204,27 +207,27 @@ helics_federate helicsCreateValueFederateFromFile (const char *file)
 /* Creation and destruction of Federates */
 helics_federate helicsCreateMessageFederate (const helics_federate_info_t fi)
 {
-    if (fi == nullptr)
-    {
-        return nullptr;
-    }
+    
     auto *fed = new helics::FedObject;
     fed->index = getMasterHolder ()->addFed (fed);
-    fed->fedptr = std::make_shared<helics::MessageFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
+	if (fi == nullptr)
+	{
+		fed->fedptr = std::make_shared<helics::MessageFederate>(helics::FederateInfo());
+	}
+	else
+	{
+		fed->fedptr = std::make_shared<helics::MessageFederate>(*reinterpret_cast<helics::FederateInfo *> (fi));
+	}
     fed->type = helics::vtype::messageFed;
     fed->valid = validationIdentifier;
     return reinterpret_cast<void *> (fed);
 }
 
-helics_federate helicsCreateMessageFederateFromFile (const char *file)
+helics_federate helicsCreateMessageFederateFromJson (const char *json)
 {
-    if (file == nullptr)
-    {
-        return nullptr;
-    }
     auto *fed = new helics::FedObject;
     fed->index = getMasterHolder ()->addFed (fed);
-    fed->fedptr = std::make_shared<helics::MessageFederate> (file);
+    fed->fedptr = std::make_shared<helics::MessageFederate> ((json!=nullptr)?std::string(json):std::string());
     fed->type = helics::vtype::messageFed;
     fed->valid = validationIdentifier;
     return reinterpret_cast<void *> (fed);
@@ -235,21 +238,24 @@ helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi
 {
     auto *fed = new helics::FedObject;
     fed->index = getMasterHolder ()->addFed (fed);
-    fed->fedptr = std::make_shared<helics::CombinationFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
+	if (fi == nullptr)
+	{
+		fed->fedptr = std::make_shared<helics::CombinationFederate>(helics::FederateInfo());
+	}
+	else
+	{
+		fed->fedptr = std::make_shared<helics::CombinationFederate>(*reinterpret_cast<helics::FederateInfo *> (fi));
+	}
     fed->type = helics::vtype::combinFed;
     fed->valid = validationIdentifier;
     return reinterpret_cast<void *> (fed);
 }
 
-helics_federate helicsCreateCombinationFederateFromFile (const char *file)
+helics_federate helicsCreateCombinationFederateFromJson(const char *json)
 {
-    if (file == nullptr)
-    {
-        return nullptr;
-    }
     auto *fed = new helics::FedObject;
     fed->index = getMasterHolder ()->addFed (fed);
-    fed->fedptr = std::make_shared<helics::CombinationFederate> (file);
+    fed->fedptr = std::make_shared<helics::CombinationFederate> ((json != nullptr) ? std::string(json) : std::string());
     fed->type = helics::vtype::combinFed;
     fed->valid = validationIdentifier;
     return reinterpret_cast<void *> (fed);
