@@ -131,7 +131,7 @@ namespace helics
         libguarded::shared_guarded<std::vector<std::string>>
             deliveryAddresses;  //!< the original destination must match one of these conditions
 #else
-        libguarded::shared_guarded<std::vector<std::string>>
+        libguarded::shared_guarded<std::vector<std::string>, std::mutex>
             deliveryAddresses;  //!< the original destination must match one of these conditions
 #endif
     public:
@@ -144,9 +144,11 @@ namespace helics
         virtual std::shared_ptr<FilterOperator> getOperator() override;
 
     private:
-        void sendMessage(const Message *mess);
+        /** run the send message function which copies the message and forwards to all destinations
+        @param mess a message to clone*/
+        void sendMessage(const Message *mess) const;
     };
 
 } //namespace helics
 
-#endif /**/
+#endif /*_HELICS_FILTEROPERATIONS_H_*/

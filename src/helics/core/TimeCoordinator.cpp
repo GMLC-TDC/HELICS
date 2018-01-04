@@ -436,7 +436,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
     return ret;
 }
 
-bool TimeCoordinator::processTimeMessage (ActionMessage &cmd) { return dependencies.updateTime (cmd); }
+bool TimeCoordinator::processTimeMessage (const ActionMessage &cmd) { return dependencies.updateTime (cmd); }
 
 void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
 {
@@ -467,7 +467,7 @@ void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
     }
 }
 
-void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd)
+void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd, bool initMode)
 {
     switch (cmd.index)
     {
@@ -510,6 +510,18 @@ void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd)
             break;
         case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
             info.wait_for_current_time_updates = CHECK_ACTION_FLAG (cmd, indicator_flag);
+            break;
+        case SOURCE_ONLY_FLAG:
+            if (initMode)
+            {
+                info.source_only = CHECK_ACTION_FLAG(cmd, indicator_flag);
+            }
+            break;
+        case OBSERVER_FLAG:
+            if (initMode)
+            {
+                info.observer = CHECK_ACTION_FLAG(cmd, indicator_flag);
+            }
             break;
         default:
             break;

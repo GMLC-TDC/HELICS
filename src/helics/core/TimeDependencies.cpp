@@ -12,6 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "TimeDependencies.h"
 #include "ActionMessage.h"
 #include <algorithm>
+#include <cassert>
 
 namespace helics
 {
@@ -39,18 +40,24 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
     case CMD_TIME_REQUEST:
         time_state = CHECK_ACTION_FLAG (m, iterationRequested) ? time_state_t::time_requested_iterative :
                                                                  time_state_t::time_requested;
+     //   printf("%d Request from %d time %f, te=%f, Tdemin=%f\n", fedID, m.source_id, static_cast<double>(m.actionTime), static_cast<double>(m.Te), static_cast<double>(m.Tdemin));
+     //   assert(m.actionTime >= Tnext);
         Tnext = m.actionTime;
         Te = m.Te;
         Tdemin = m.Tdemin;
         break;
     case CMD_TIME_GRANT:
         time_state = time_state_t::time_granted;
+    //    printf("%d Grant from %d time %f\n", fedID, m.source_id, static_cast<double>(m.actionTime));
+     //   assert(m.actionTime >= Tnext);
         Tnext = m.actionTime;
         Te = Tnext;
         Tdemin = Tnext;
         break;
     case CMD_DISCONNECT:
+    case CMD_PRIORITY_DISCONNECT:
         time_state = time_state_t::time_granted;
+     //   printf("%d disconnect from %d\n", fedID, m.source_id);
         Tnext = Time::maxVal ();
         Te = Time::maxVal ();
         Tdemin = Time::maxVal ();

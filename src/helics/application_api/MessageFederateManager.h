@@ -23,6 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include "libguarded/guarded.hpp"
 
 namespace helics
 {
@@ -153,8 +154,7 @@ class MessageFederateManager
     Core::federate_id_t fedID;  //!< storage for the federate ID
     mutable std::mutex endpointLock;  //!< lock for protecting the endpoint list
     std::vector<simpleQueue<std::unique_ptr<Message>>> messageQueues;  //!< the storage for the message queues
-    std::vector<unsigned int> messageOrder;  //!< maintaining a list of the ordered messages
-    std::mutex morderMutex;  //!< mutex to protect the global ordered list
+    libguarded::guarded<std::vector<unsigned int>> messageOrder;  //!< maintaining a list of the ordered messages
     int allCallbackIndex = -1;  //!< index of the all callback function
     bool hasSubscriptions = false;  //!< indicator that the message filter subscribes to data values
   private:  // private functions

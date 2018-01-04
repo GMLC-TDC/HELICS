@@ -63,23 +63,29 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
     else
     {
         coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, fi.coreInitString);
+        if (!coreObject->isOpenToNewFederates())
+        {
+            coreObject = nullptr;
+            CoreFactory::cleanUpCores(200);
+            coreObject = CoreFactory::FindOrCreate(fi.coreType, fi.coreName, fi.coreInitString);
+            if (!coreObject->isOpenToNewFederates())
+            {
+                throw(registrationFailure("Unable to connect to specified core: core is not open to new Federates"));
+            }
+        }
     }
     if (!coreObject)
     {
-        state = op_states::error;
-        return;
+        throw(registrationFailure("Unable to connect to specified core: unable to create specified core"));
     }
     /** make sure the core is connected */
     if (!coreObject->isConnected ())
     {
         coreObject->connect ();
     }
+    //this call will throw an error on failure
     fedID = coreObject->registerFederate (fi.name, fi);
-    if (fedID == helics::invalid_fed_id)
-    {
-        state = op_states::error;
-        return;
-    }
+   
     currentTime = coreObject->getCurrentTime (fedID);
 }
 

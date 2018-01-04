@@ -102,8 +102,37 @@ BOOST_AUTO_TEST_CASE(simple_recorder_test2)
     auto m2 = rec1.getMessage(4);
     BOOST_CHECK(!m2);
 
+}
 
 
+BOOST_AUTO_TEST_CASE(recorder_test_message)
+{
+    helics::FederateInfo fi("rec1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core2";
+    fi.coreInitString = "2";
+    helics::recorder rec1(fi);
+    fi.name = "block1";
+
+    helics::MessageFederate mfed(fi);
+    helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
+
+    rec1.addEndpoint("src1");
+
+    auto fut = std::async(std::launch::async, [&rec1]() {rec1.run(5.0); });
+    mfed.enterExecutionState();
+
+
+    auto retTime = mfed.requestTime(1.0);
+    e1.send("src1", "this is a test message");
+    BOOST_CHECK_EQUAL(retTime, 1.0);
+    retTime = mfed.requestTime(2.0);
+    e1.send("src1", "this is a test message2");
+    BOOST_CHECK_EQUAL(retTime, 2.0);
+
+    mfed.finalize();
+    fut.get();
+    BOOST_CHECK_EQUAL(rec1.messageCount(), 2);
 
 }
 

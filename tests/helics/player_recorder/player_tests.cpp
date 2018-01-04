@@ -319,6 +319,7 @@ BOOST_AUTO_TEST_CASE(player_test_message3)
     play1.addMessage(1.0, 2.0, "src", "dest", "this is test message2");
 
     play1.addMessage(2.0, 3.0, "src", "dest", "this is message 3");
+    mfed.getCorePointer()->setLoggingLevel(helics::invalid_fed_id, 5);
     auto fut = std::async(std::launch::async, [&play1]() {play1.run(); });
     mfed.enterExecutionState();
 

@@ -211,7 +211,7 @@ namespace helics
             }
         }
       
-        std::ofstream o("filename");
+        std::ofstream o(filename);
         o << std::setw(4) << JF << std::endl;
     }
 
@@ -372,7 +372,7 @@ namespace helics
         auto res = eptNames.find(endpoint);
         if ((res == eptNames.end()) || (res->second == -1))
         {
-            endpoints.push_back(helics::Endpoint(fed.get(), endpoint));
+            endpoints.push_back(helics::Endpoint(GLOBAL,fed.get(), endpoint));
             auto index = static_cast<int>(endpoints.size())-1;
             auto id = endpoints.back().getID();
             eptids.emplace(id, index); //this is a new element

@@ -1380,12 +1380,39 @@ void CoreBroker::checkDependencies ()
     {
         if (timeCoord->getDependents ().size () == 1)
         {  // if there is just one dependency remove it
-            ActionMessage rmdep (CMD_REMOVE_INTERDEPENDENCY);
-            rmdep.source_id = global_broker_id;
-            auto depid = timeCoord->getDependents ()[0];
-            routeMessage (rmdep, depid);
-            timeCoord->removeDependency (depid);
-            timeCoord->removeDependent (depid);
+            auto depid = timeCoord->getDependents()[0];
+            auto dependencies = timeCoord->getDependencies();
+            if (dependencies.size() == 1)
+            {
+                if (dependencies.front() != depid)
+                {
+                    ActionMessage adddep(CMD_ADD_DEPENDENT);
+                   adddep.source_id = depid;
+                   ActionMessage rmdep(CMD_REMOVE_DEPENDENT); 
+                   rmdep.source_id = global_broker_id;
+                   routeMessage(adddep, dependencies.front());
+                    routeMessage(rmdep, dependencies.front());
+
+                    adddep.setAction(CMD_ADD_DEPENDENCY);
+                    adddep.source_id = dependencies.front();
+                    rmdep.setAction(CMD_REMOVE_DEPENDENCY);
+                    routeMessage(adddep, depid);
+                    routeMessage(rmdep, depid);
+
+                    timeCoord->removeDependency(dependencies.front());
+                    timeCoord->removeDependent(depid);
+                }
+                else
+                {
+                    ActionMessage rmdep(CMD_REMOVE_INTERDEPENDENCY);
+                    rmdep.source_id = global_broker_id;
+
+                    routeMessage(rmdep, depid);
+                    timeCoord->removeDependency(depid);
+                    timeCoord->removeDependent(depid);
+                }
+            }
+           
         }
     }
     else

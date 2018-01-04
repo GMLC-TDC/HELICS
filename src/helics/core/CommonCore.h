@@ -220,6 +220,9 @@ private:
 
     /** check if we can remove some dependencies*/
     void checkDependencies();
+
+    /** handle command with the core itself as a destination at the core*/
+    void processCommandsForCore(const ActionMessage &cmd);
 protected:
 	
 	int32_t _global_federation_size = 0;  //!< total size of the federation

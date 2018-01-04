@@ -838,7 +838,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
 
 void FederateState::processConfigUpdate (const ActionMessage &m)
 {
-    timeCoord->processConfigUpdateMessage (m);
+    timeCoord->processConfigUpdateMessage (m, (getState()== HELICS_CREATED));
     switch (m.index)
     {
     case UPDATE_LOG_LEVEL:

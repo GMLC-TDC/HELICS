@@ -327,19 +327,19 @@ void MessageFederateManager::registerCallback (const std::vector<endpoint_id_t> 
 
 void MessageFederateManager::removeOrderedMessage (unsigned int index)
 {
-    std::lock_guard<std::mutex> mLock (morderMutex);
-    if (index == messageOrder.back ())
+    auto handle=messageOrder.lock();
+    if (index == handle->back ())
     {
-        messageOrder.pop_back ();
+       handle->pop_back ();
     }
     else
     {
-        auto term = messageOrder.rend ();
-        for (auto ri = messageOrder.rbegin () + 1; ri != term; ++ri)
+        auto term = handle->rend ();
+        for (auto ri = handle->rbegin () + 1; ri != term; ++ri)
         {
             if (*ri == index)
             {
-                messageOrder.erase (ri.base ());
+               handle->erase (ri.base ());
                 break;
             }
         }

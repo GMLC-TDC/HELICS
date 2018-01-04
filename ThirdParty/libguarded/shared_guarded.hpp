@@ -62,6 +62,7 @@ class shared_guarded
 
     // exclusive access
     handle lock();
+    shared_handle lock() const;
     handle try_lock();
 
     template <class Duration>
@@ -169,6 +170,13 @@ auto shared_guarded<T, M>::lock() -> handle
 }
 
 template <typename T, typename M>
+auto shared_guarded<T, M>::lock() const -> shared_handle
+{
+    m_mutex.lock_shared();
+    return shared_handle(&m_obj, shared_deleter(m_mutex));
+}
+
+template <typename T, typename M>
 auto shared_guarded<T, M>::try_lock() -> handle
 {
     if (m_mutex.try_lock()) {
@@ -256,6 +264,7 @@ public:
 
     // exclusive access
     handle lock();
+    shared_handle lock() const;
     handle try_lock();
 
     // shared access, note "shared" in method names
@@ -347,6 +356,13 @@ auto shared_guarded<T, std::mutex>::lock() -> handle
 {
     m_mutex.lock();
     return handle(&m_obj, deleter(m_mutex));
+}
+
+template <typename T>
+auto shared_guarded<T, std::mutex>::lock() const -> shared_handle
+{
+    m_mutex.lock();
+    return shared_handle(&m_obj, shared_deleter(m_mutex));
 }
 
 template <typename T>

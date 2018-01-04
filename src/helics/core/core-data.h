@@ -139,7 +139,7 @@ class Message
 {
   public:
     Time time;  //!< the event time the message is sent
-    std::uint64_t flags;  //!< message flags
+    std::uint16_t flags;  //!< message flags
     data_block data;  //!< the data packet for the message
     std::string dest;  //!< the destination of the message
     std::string src;  //!< the most recent source of the message

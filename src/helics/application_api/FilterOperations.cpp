@@ -333,7 +333,7 @@ cloneFilterOperation::cloneFilterOperation(Core *core):coreptr(core)
 cloneFilterOperation::~cloneFilterOperation() = default;
 
 
-void cloneFilterOperation::set(const std::string &property, double val)
+void cloneFilterOperation::set(const std::string & /*property*/, double /*val*/)
 {
 
 }
@@ -369,7 +369,7 @@ std::shared_ptr<FilterOperator> cloneFilterOperation::getOperator()
     return std::static_pointer_cast<FilterOperator> (op);
 }
 
-void cloneFilterOperation::sendMessage(const Message *mess)
+void cloneFilterOperation::sendMessage(const Message *mess) const
 {
     auto lock = deliveryAddresses.lock_shared();
     for (auto &add : *lock)

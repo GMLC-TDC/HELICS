@@ -403,7 +403,7 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
     case HELICS_INITIALIZING:
         return;
     default:
-        throw (invalidFunctionCall ());
+        throw (invalidFunctionCall ("May only enter initializing state from created state"));
     }
 
     bool exp = false;
@@ -421,7 +421,7 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
         }
         return;
     }
-    throw (invalidFunctionCall ());
+    throw (invalidFunctionCall ("federate already has requested entry to initializing State"));
 }
 
 iteration_result CommonCore::enterExecutingState (federate_id_t federateID, iteration_request iterate)
@@ -450,11 +450,11 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
 {
     if (brokerState == created)
     {
-        throw (invalidFunctionCall ("Core has not been initialized yet"));
+        throw (registrationFailure ("Core has not been initialized yet"));
     }
     if (brokerState >= operating)
     {
-        throw (invalidFunctionCall ("Core has already moved to operating state"));
+        throw (registrationFailure("Core has already moved to operating state"));
     }
     auto fed = std::make_unique<FederateState> (name, info);
     // setting up the logger
@@ -702,7 +702,7 @@ void CommonCore::setTimeOffset (federate_id_t federateID, Time timeOffset)
 
 void CommonCore::setLoggingLevel (federate_id_t federateID, int loggingLevel)
 {
-    if (federateID == 0)
+    if (federateID == invalid_fed_id)
     {
         std::lock_guard<std::mutex> lock (_mutex);
         setLogLevel (loggingLevel);
@@ -722,7 +722,7 @@ void CommonCore::setLoggingLevel (federate_id_t federateID, int loggingLevel)
 
 void CommonCore::setFlag (federate_id_t federateID, int flag, bool flagValue)
 {
-    if (federateID == 0)
+    if (federateID == invalid_fed_id)
     {
         if (flag == DELAY_INIT_ENTRY)
         {
@@ -2013,7 +2013,7 @@ void CommonCore::processCommand (ActionMessage &&command)
                 auto &dep = fed->getDependents ();
                 for (auto &fed_id : dep)
                 {
-                    routeMessage (command, fed_id);
+                     routeMessage(command, fed_id);
                 }
             }
             else
@@ -2038,13 +2038,6 @@ void CommonCore::processCommand (ActionMessage &&command)
             for (auto dep : timeCoord->getDependents ())
             {
                 routeMessage (command, dep);
-            }
-        }
-        else if (command.dest_id == global_broker_id)
-        {
-            if (timeCoord->processTimeMessage (command))
-            {
-                timeCoord->checkTimeGrant ();
             }
         }
         else if (command.dest_id == 0)
@@ -2078,19 +2071,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             auto &dep = fed->getDependents ();
             for (auto &fed_id : dep)
             {
-                if (fed_id == global_broker_id)
-                { //if the destination is the core just process it here
-                    command.dest_id = global_broker_id;
-                    if (timeCoord->processTimeMessage(command))
-                    {
-                        timeCoord->checkTimeGrant();
-                    }
-                }
-                else
-                {
-                    routeMessage(command, fed_id);
-                }
-                
+                routeMessage(command, fed_id);
             }
             if (allDisconnected ())
             {
@@ -2099,13 +2080,6 @@ void CommonCore::processCommand (ActionMessage &&command)
                 dis.source_id = global_broker_id;
                 transmit (0, dis);
                 addActionMessage (CMD_STOP);
-            }
-        }
-        else if (command.dest_id == global_broker_id)
-        {
-            if (timeCoord->processTimeMessage(command))
-            {
-                timeCoord->checkTimeGrant();
             }
         }
         else
@@ -2120,14 +2094,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_REMOVE_DEPENDENT:
     case CMD_ADD_INTERDEPENDENCY:
     case CMD_REMOVE_INTERDEPENDENCY:
-        if (command.dest_id != global_broker_id)
-        {
-            routeMessage (command);
-        }
-        else
-        {
-            timeCoord->processDependencyUpdateMessage (command);
-        }
+        routeMessage (command);
         break;
     case CMD_SEND_FOR_FILTER:
     case CMD_SEND_FOR_FILTER_OPERATION:
@@ -2526,6 +2493,36 @@ void CommonCore::processFilterInfo (ActionMessage &command)
 
 void CommonCore::checkDependencies ()
 {
+    std::unique_lock < std::mutex> lock(_mutex);
+    bool isobs = false;
+    bool issource = false;
+    for (auto &fed : _federates)
+    {
+        if (fed->hasEndpoints)
+        {
+            if (fed->getInfo().observer)
+            {
+                timeCoord->removeDependency(fed->global_id);
+                ActionMessage rmdep(CMD_REMOVE_DEPENDENT);
+
+                rmdep.source_id = global_broker_id;
+                rmdep.dest_id = fed->global_id;
+                fed->addAction(rmdep);
+                isobs = true;
+            }
+            else if (fed->getInfo().source_only)
+            {
+                timeCoord->removeDependent(fed->global_id);
+                ActionMessage rmdep(CMD_REMOVE_DEPENDENCY);
+
+                rmdep.source_id = global_broker_id;
+                rmdep.dest_id = fed->global_id;
+                fed->addAction(rmdep);
+                issource = true;
+            }
+        }
+    }
+    lock.unlock();
     // if we have filters we need to be a timeCoordinator
     if (hasLocalFilters)
     {
@@ -2536,7 +2533,10 @@ void CommonCore::checkDependencies ()
     {
         return;
     }
-
+    if (timeCoord->getDependencies().size() > 2)
+    {
+        return;
+    }
     auto fedid = invalid_fed_id;
     auto brkid = invalid_fed_id;
     int localcnt = 0;
@@ -2552,9 +2552,27 @@ void CommonCore::checkDependencies ()
             brkid = dep;
         }
     }
-    if (localcnt != 1)
+    if (localcnt > 1)
     {
         return;
+    }
+    //check to make sure the dependencies match
+    for (auto &dep : timeCoord->getDependencies())
+    {
+        if (isLocal(dep))
+        {
+            if (dep != fedid)
+            {
+                return;
+            }
+        }
+        else
+        {
+            if (brkid != dep)
+            {
+                return;
+            }
+        }
     }
     // remove the core from the time dependency chain since it is just adding to the communication noise in this
     // case
@@ -2568,12 +2586,34 @@ void CommonCore::checkDependencies ()
     rmdep.source_id = global_broker_id;
     routeMessage (rmdep, brkid);
     routeMessage (rmdep, fedid);
-    ActionMessage adddep (CMD_ADD_INTERDEPENDENCY);
-    adddep.source_id = fedid;
-    routeMessage (adddep, brkid);
-    routeMessage (adddep, fedid);  // make sure the fed depends on itself in case the broker removes itself later
-    adddep.source_id = brkid;
-    routeMessage (adddep, fedid);
+    if (isobs)
+    {
+        ActionMessage adddep(CMD_ADD_DEPENDENT);
+        adddep.source_id = fedid;
+        routeMessage(adddep, brkid);
+        adddep.setAction(CMD_ADD_DEPENDENCY);
+        adddep.source_id = brkid;
+        routeMessage(adddep, fedid);
+    }
+    else if (issource)
+    {
+        ActionMessage adddep(CMD_ADD_DEPENDENCY);
+        adddep.source_id = fedid;
+        routeMessage(adddep, brkid);
+        adddep.setAction(CMD_ADD_DEPENDENT);
+        adddep.source_id = brkid;
+        routeMessage(adddep, fedid);
+    }
+    else
+    {
+        ActionMessage adddep(CMD_ADD_INTERDEPENDENCY);
+        adddep.source_id = fedid;
+        routeMessage(adddep, brkid);
+        routeMessage(adddep, fedid);  // make sure the fed depends on itself in case the broker removes itself later
+        adddep.source_id = brkid;
+        routeMessage(adddep, fedid);
+    }
+  
 }
 
 void CommonCore::organizeFilterOperations ()
@@ -2634,12 +2674,36 @@ void CommonCore::organizeFilterOperations ()
     }
 }
 
+
+void CommonCore::processCommandsForCore(const ActionMessage &cmd)
+{
+    if (isTimingMessage(cmd))
+    {
+        if (timeCoord->processTimeMessage(cmd))
+        {
+            timeCoord->checkTimeGrant();
+        }
+    }
+    else if (isDependencyMessage(cmd))
+    {
+        timeCoord->processDependencyUpdateMessage(cmd);
+    }
+    else
+    {
+        LOG_WARNING(global_broker_id, "core", "dropping message:" + prettyPrintString(cmd));
+    }
+}
+
 void CommonCore::routeMessage (ActionMessage &cmd, federate_id_t dest)
 {
     cmd.dest_id = dest;
     if ((dest == 0) || (dest == higher_broker_id))
     {
         transmit (0, cmd);
+    }
+    else if (dest == global_broker_id)
+    {
+        processCommandsForCore(cmd);
     }
     else if (isLocal (dest))
     {
@@ -2661,6 +2725,10 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
     if ((cmd.dest_id == 0) || (cmd.dest_id == higher_broker_id))
     {
         transmit (0, cmd);
+    }
+    else if (cmd.dest_id == global_broker_id)
+    {
+        processCommandsForCore(cmd);
     }
     else if (isLocal (cmd.dest_id))
     {
@@ -2684,6 +2752,10 @@ void CommonCore::routeMessage (ActionMessage &&cmd, federate_id_t dest)
     {
         transmit (0, cmd);
     }
+    else if (cmd.dest_id == global_broker_id)
+    {
+        processCommandsForCore(cmd);
+    }
     else if (isLocal (dest))
     {
         auto fed = getFederate (dest);
@@ -2704,6 +2776,10 @@ void CommonCore::routeMessage (ActionMessage &&cmd)
     if ((cmd.dest_id == 0) || (cmd.dest_id == higher_broker_id))
     {
         transmit (0, cmd);
+    }
+    else if (cmd.dest_id == global_broker_id)
+    {
+        processCommandsForCore(cmd);
     }
     else if (isLocal (cmd.dest_id))
     {
