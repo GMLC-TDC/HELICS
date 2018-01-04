@@ -301,6 +301,8 @@ class timeRepresentation
         : timecode_ (Tconv::maxVal ()), dtime_ (1e49){};
     constexpr explicit timeRepresentation (std::integral_constant<int, 2> /*unused*/) noexcept
         : timecode_ (Tconv::epsilon ()), dtime_ (1e-9){};
+    constexpr timeRepresentation(std::integral_constant<int, 4> /*unused*/, baseType initBaseVal, double initDoubleTime) noexcept
+        : timecode_(initBaseVal), dtime_(initDoubleTime) {};
 #else
     constexpr explicit timeRepresentation (std::integral_constant<int, 0> /*unused*/) noexcept
         : timecode_ (Tconv::zeroVal ()){};
@@ -310,6 +312,8 @@ class timeRepresentation
         : timecode_ (Tconv::maxVal ()){};
     constexpr explicit timeRepresentation (std::integral_constant<int, 2> /*unused*/) noexcept
         : timecode_ (Tconv::epsilon ()){};
+    constexpr timeRepresentation(std::integral_constant<int, 4> /*unused*/, baseType initBaseVal) noexcept
+        : timecode_(initBaseVal) {};
 #endif
 
   public:
@@ -447,16 +451,17 @@ class timeRepresentation
         DOUBLETIMEEXT (trep)
         return trep;
     }
-
+#ifdef _DEBUG
     constexpr timeRepresentation operator-() const noexcept
     {
-        timeRepresentation trep(*this);
-        trep.timecode_ = -timecode_;
-#ifdef _DEBUG
-        trep.dtime_ = -trep.dtime_;
-#endif
-        return trep;
+        return timeRepresentation(std::integral_constant<int, 4>(), -timecode_, -dtime_);
     }
+#else
+    constexpr timeRepresentation operator-() const noexcept
+    {
+        return timeRepresentation(std::integral_constant<int, 4>(), -timecode_);
+    }
+#endif
 
     timeRepresentation operator- (const timeRepresentation &other) const noexcept
     {
