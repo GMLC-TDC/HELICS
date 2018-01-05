@@ -227,23 +227,35 @@ HELICS_Export helicsStatus helicsEnterInitializationMode (helics_federate fed);
 the function helicsEnterInitializationModeFinalize must be called to finish the operation
 */
 HELICS_Export helicsStatus helicsEnterInitializationModeAsync (helics_federate fed);
-/** check if the current Asynchronous operation has completed*/
-HELICS_Export int helicsisAsyncOperationCompleted (helics_federate fed);
+/** check if the current Asynchronous operation has completed
+@param fed the federate to operatate on
+@return 0 if not completed, 1 if completed*/
+HELICS_Export int helicsIsAsyncOperationCompleted (helics_federate fed);
 
 /** finalize the entry to initialize mode that was initiated with @heliceEnterInitializationModeAsync*/
 HELICS_Export helicsStatus helicsEnterInitializationModeComplete (helics_federate fed);
 
 
-/** request that the federate enter the initialization mode
+/** request that the federate enter the Execution mode
 @details this call is blocking until granted entry by the core object for an asynchronous alternative call
-@helicsEnterExecutionModeAsync*/
+/ref helicsEnterExecutionModeAsync*/
 HELICS_Export helicsStatus helicsEnterExecutionMode (helics_federate fed);
-HELICS_Export helicsStatus helicsEnterExecutionModeIterative (helics_federate fed, iteration_request iterate, iteration_status *outIterate);
 
-HELICS_Export helicsStatus helicsEnterExecutionModeAsync (helics_federate fed);
+/** request that the federate enter the Execution mode
+@details this call is non-blocking and will return immediately call /ref helicsEnterExecutionModeComplete to finish the call sequence
+/ref 
+*/
+HELICS_Export helicsStatus helicsEnterExecutionModeAsync(helics_federate fed);
+
+/** complete the call to /ref EnterExecutionModeAsync
+@param fed the federate object to complete the call
+*/
+HELICS_Export helicsStatus helicsEnterExecutionModeComplete(helics_federate fed);
+
+HELICS_Export helicsStatus helicsEnterExecutionModeIterative (helics_federate fed, iteration_request iterate, iteration_status *outIterate);
 HELICS_Export helicsStatus helicsEnterExecutionModeIterativeAsync (helics_federate fed, iteration_request iterate);
 
-HELICS_Export helicsStatus helicsEnterExecutionModeComplete (helics_federate fed);
+
 HELICS_Export helicsStatus helicsEnterExecutionModeIterativeComplete (helics_federate fed, iteration_status *outIterate);
 
 /** get the current state of a federate
@@ -319,11 +331,37 @@ HELICS_Export helicsStatus helicsFederateGetCurrentTime(helics_federate fed, hel
 @details a query object consists of a target and query string
 */
 HELICS_Export helics_query helicsCreateQuery (const char *target, const char *query);
+
 /** Execute a query
+@details the call will block until the query finishes which may require communication or other delays
 @param fed a federate to send the query through
 @param query the query object to use in the query
+@return a pointer to a string.  the string will remain valid until the query is freed or executed again
+the return will be nullptr if fed or query is an invalid object
 */
 HELICS_Export const char *helicsExecuteQuery (helics_federate fed, helics_query query);
+
+/** Execute a query in a non-blocking call
+@param fed a federate to send the query through
+@param query the query object to use in the query
+@return a pointer to a string.  the string will remain valid until the query is freed or executed again
+the return will be nullptr if fed or query is an invalid object
+*/
+HELICS_Export helicsStatus helicsExecuteQueryAsync(helics_federate fed, helics_query query);
+
+/** complete the return from a query called with /ref helicsExecuteQueryAsync
+@details the function will block until the query completes /ref isQueryComplete can be called to determine if a query has completed or not
+@param query the query object to 
+@return a pointer to a string.  the string will remain valid until the query is freed or executed again
+the return will be nullptr if fed or query is an invalid object
+*/
+HELICS_Export const char *helicsExecuteQueryComplete(helics_query query);
+
+/** check if an async query has completed
+@return will return true if an async query has complete or a regular query call was made with a result
+and false if an async query has not completed or is invalid
+*/
+HELICS_Export int isQueryCompleted(helics_query query);
 
 /** free the memory associated with a query object*/
 HELICS_Export void helicsFreeQuery (helics_query);

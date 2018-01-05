@@ -35,6 +35,7 @@ enum class identifiers : char
     subscription,
     filter,
     endpoint,
+    query,
 
 };
 
@@ -94,6 +95,7 @@ using publication_id_t = identifier_id_t<identifier_type, identifiers::publicati
 using subscription_id_t = identifier_id_t<identifier_type, identifiers::subscription, invalid_id_value>;
 using endpoint_id_t = identifier_id_t<identifier_type, identifiers::endpoint, invalid_id_value>;
 using filter_id_t = identifier_id_t<identifier_type, identifiers::filter, invalid_id_value>;
+using query_id_t = identifier_id_t<identifier_type, identifiers::query, invalid_id_value>;
 
 /** template class for generating a known name of a type*/
 template <class X>

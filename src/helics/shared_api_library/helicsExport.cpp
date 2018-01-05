@@ -502,4 +502,73 @@ const char *helicsExecuteQuery (helics_federate fed, helics_query query)
     return queryObj->response.c_str ();
 }
 
+
+helicsStatus helicsExecuteQueryAsync(helics_federate fed, helics_query query)
+{
+    if (fed == nullptr)
+    {
+        return helicsInvalidObject;
+    }
+    if (query == nullptr)
+    {
+        return helicsInvalidObject;
+    }
+    auto fedObj = getFedSharedPtr(fed);
+    if (fedObj == nullptr)
+    {
+        return helicsInvalidObject;
+    }
+
+    auto queryObj = reinterpret_cast<helics::queryObject *> (query);
+    if (queryObj->target.empty())
+    {
+        queryObj->asyncIndexCode=fedObj->queryAsync(queryObj->query);
+        
+    }
+    else
+    {
+        queryObj->asyncIndexCode = fedObj->queryAsync(queryObj->target,queryObj->query);
+    }
+    queryObj->activeAsync = true;
+    queryObj->activeFed = fedObj;
+    return helicsOK;
+}
+
+const char *helicsExecuteQueryComplete(helics_query query)
+{
+
+    if (query == nullptr)
+    {
+        return nullptr;
+    }
+   
+    auto queryObj = reinterpret_cast<helics::queryObject *> (query);
+    if (queryObj->asyncIndexCode != helics::invalid_id_value)
+    {
+        queryObj->response = queryObj->activeFed->queryComplete(queryObj->asyncIndexCode);
+   }
+    queryObj->activeAsync = false;
+    queryObj->activeFed = nullptr;
+    queryObj->asyncIndexCode = helics::invalid_id_value;
+    return queryObj->response.c_str();
+}
+
+
+HELICS_Export int isQueryCompleted(helics_query query)
+{
+
+    if (query == nullptr)
+    {
+        return 0;
+    }
+
+    auto queryObj = reinterpret_cast<helics::queryObject *> (query);
+    if (queryObj->asyncIndexCode != helics::invalid_id_value)
+    {
+        auto res = queryObj->activeFed->isQueryCompleted(queryObj->asyncIndexCode);
+        return (res) ? 1 : 0;
+    }
+    return 0;
+}
+
 void helicsFreeQuery (helics_query query) { delete reinterpret_cast<helics::queryObject *> (query); }
