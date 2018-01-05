@@ -133,7 +133,17 @@ void MessageFederate::registerInterfaces (const std::string &jsonString)
             auto ept = (*eptIt);
             auto name = ept["name"].asString ();
             auto type = (ept.isMember ("type")) ? ept["type"].asString () : "";
-            auto epid = registerEndpoint (name, type);
+            bool global = (ept.isMember("global")) ?(ept["global"].asBool()) : false;
+            endpoint_id_t epid;
+            if (global)
+            {
+                epid = registerGlobalEndpoint(name, type);
+            }
+            else
+            {
+                epid = registerEndpoint(name, type);
+            }
+            
             // retrieve the known paths
             if (ept.isMember ("knownPaths"))
             {

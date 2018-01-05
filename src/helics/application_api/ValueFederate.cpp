@@ -165,7 +165,7 @@ void ValueFederate::registerInterfaces (const std::string &jsonString)
             }
             auto type = (pub.isMember("type")) ? pub["type"].asString() : std ::string();
             auto units = (pub.isMember ("units")) ? pub["units"].asString () : std::string();
-            bool global = (pub.isMember ("global")) ? !(pub["global"].asBool ()) : false;
+            bool global = (pub.isMember ("global")) ? (pub["global"].asBool ()) : false;
             if (global)
             {
                 registerGlobalPublication (key, type, units);
