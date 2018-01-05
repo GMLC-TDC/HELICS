@@ -280,7 +280,7 @@ namespace helics
         po::variables_map cmd_vm;
         try
         {
-            po::store(po::command_line_parser(argc, argv).options(cmd_line).run(), cmd_vm);
+            po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().run(), cmd_vm);
         }
         catch (std::exception &e)
         {
@@ -305,7 +305,7 @@ namespace helics
             return;
         }
 
-        po::store(po::command_line_parser(argc, argv).options(cmd_line).run(), vm_map);
+        po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().run(), vm_map);
 
         if (cmd_vm.count("config-file") > 0)
         {

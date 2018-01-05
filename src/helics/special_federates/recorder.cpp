@@ -547,7 +547,7 @@ void recorderArgumentParser(int argc, const char *const *argv, po::variables_map
     po::variables_map cmd_vm;
     try
     {
-        po::store (po::command_line_parser (argc, argv).options (cmd_line).positional (p).run (), cmd_vm);
+        po::store (po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered().positional (p).run (), cmd_vm);
     }
     catch (std::exception &e)
     {
@@ -572,7 +572,7 @@ void recorderArgumentParser(int argc, const char *const *argv, po::variables_map
         return;
     }
 
-    po::store (po::command_line_parser (argc, argv).options (cmd_line).positional (p).run (), vm_map);
+    po::store (po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered().positional (p).run (), vm_map);
 
     if (cmd_vm.count ("config-file") > 0)
     {
