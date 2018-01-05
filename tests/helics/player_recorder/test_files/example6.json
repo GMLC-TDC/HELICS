@@ -1,7 +1,7 @@
 {
 "publications":[
 {
-"name":"pub1", "type":"double"
+"key":"pub1", "type":"double"
 },
 {
 "name":"pub2","type":"double"

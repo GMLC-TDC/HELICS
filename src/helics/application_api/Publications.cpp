@@ -21,7 +21,7 @@ PublicationBase::PublicationBase(ValueFederate *valueFed, int pubIndex) :fed(val
             throw(helics::InvalidParameterValue("no subscription with the specified index"));
         }
         id = static_cast<publication_id_t>(pubIndex);
-        key_ = fed->getPublicationName(id);
+        key_ = fed->getPublicationKey(id);
 
         type_ = fed->getPublicationType(id);
         units_ = fed->getPublicationUnits(id);

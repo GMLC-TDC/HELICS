@@ -136,5 +136,65 @@ BOOST_AUTO_TEST_CASE(recorder_test_message)
 
 }
 
+const std::vector<std::string> simple_files
+{ "example1.recorder",  "example2.record" , "example3rec.json" };
+
+BOOST_DATA_TEST_CASE(simple_recorder_test_files, boost::unit_test::data::make(simple_files), file)
+{
+    helics::FederateInfo fi("rec1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core1";
+    fi.coreInitString = "2";
+    helics::recorder rec1(fi);
+
+    rec1.loadFile(std::string(TEST_DIR) + "/test_files/"+file);
+    fi.name = "block1";
+
+    helics::ValueFederate vfed(fi);
+    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::helicsType_t::helicsDouble);
+    helics::Publication pub2(helics::GLOBAL, &vfed, "pub2", helics::helicsType_t::helicsDouble);
+    auto fut = std::async(std::launch::async, [&rec1]() {rec1.run(4); });
+    vfed.enterExecutionState();
+    auto retTime = vfed.requestTime(1);
+    BOOST_CHECK_EQUAL(retTime, 1.0);
+    pub1.publish(3.4);
+
+    retTime = vfed.requestTime(1.5);
+    BOOST_CHECK_EQUAL(retTime, 1.5);
+    pub2.publish(5.7);
+
+    retTime = vfed.requestTime(2.0);
+    BOOST_CHECK_EQUAL(retTime, 2.0);
+    pub1.publish(4.7);
+
+    retTime = vfed.requestTime(3.0);
+    BOOST_CHECK_EQUAL(retTime, 3.0);
+    pub2.publish("3.9");
+
+    retTime = vfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 5.0);
+
+    vfed.finalize();
+    fut.get();
+    rec1.finalize();
+    BOOST_CHECK_EQUAL(rec1.pointCount(), 4);
+    auto v1 = rec1.getValue(0);
+    BOOST_CHECK_EQUAL(v1.first, "pub1");
+    BOOST_CHECK_EQUAL(v1.second, std::to_string(3.4));
+    v1 = rec1.getValue(1);
+    BOOST_CHECK_EQUAL(v1.first, "pub2");
+    BOOST_CHECK_EQUAL(v1.second, std::to_string(5.7));
+
+    v1 = rec1.getValue(2);
+    BOOST_CHECK_EQUAL(v1.first, "pub1");
+    BOOST_CHECK_EQUAL(v1.second, std::to_string(4.7));
+
+    v1 = rec1.getValue(3);
+    BOOST_CHECK_EQUAL(v1.first, "pub2");
+    BOOST_CHECK_EQUAL(v1.second, std::to_string(3.9));
+
+    
+
+}
 
 BOOST_AUTO_TEST_SUITE_END ()

@@ -310,14 +310,14 @@ std::string rerouteFilterOperation::rerouteOperation (const std::string &dest) c
     auto cond = conditions.lock_shared ();
     if (cond->empty ())
     {
-        return *newTarget;
+        return newTarget.load();
     }
     for (auto &sr : *cond)
     {
         std::regex reg (sr);
         if (std::regex_match (dest, reg))
         {
-            return *newTarget;
+            return newTarget.load();
         }
     }
     return dest;

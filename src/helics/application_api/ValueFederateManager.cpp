@@ -36,46 +36,46 @@ int getTypeSize (const std::string type)
     return (ret == typeSizes.end ()) ? (-1) : ret->second;
 }
 
-publication_id_t ValueFederateManager::registerPublication (const std::string &name,
+publication_id_t ValueFederateManager::registerPublication (const std::string &key,
                                                             const std::string &type,
                                                             const std::string &units)
 {
     auto sz = getTypeSize (type);
     std::lock_guard<std::mutex> publock (publication_mutex);
     publication_id_t id = static_cast<identifier_type> (pubs.size ());
-    pubs.emplace_back (name, type, units);
+    pubs.emplace_back (key, type, units);
     pubs.back ().id = id;
     pubs.back ().size = sz;
-    publicationNames.emplace (name, id);
-    pubs.back ().coreID = coreObject->registerPublication (fedID, name, type, units);
+    publicationKeys.emplace (key, id);
+    pubs.back ().coreID = coreObject->registerPublication (fedID, key, type, units);
     return id;
 }
 
-subscription_id_t ValueFederateManager::registerRequiredSubscription (const std::string &name,
+subscription_id_t ValueFederateManager::registerRequiredSubscription (const std::string &key,
                                                                       const std::string &type,
                                                                       const std::string &units)
 {
     std::lock_guard<std::mutex> sublock (subscription_mutex);
     subscription_id_t id = static_cast<identifier_type> (subs.size ());
-    subs.emplace_back (name, type, units);
+    subs.emplace_back (key, type, units);
     subs.back ().id = id;
-    subscriptionNames.emplace (name, id);
-    subs.back ().coreID = coreObject->registerSubscription (fedID, name, type, units, handle_check_mode::required);
+    subscriptionKeys.emplace (key, id);
+    subs.back ().coreID = coreObject->registerSubscription (fedID, key, type, units, handle_check_mode::required);
     handleLookup.emplace (subs.back ().coreID, id);
     lastData.resize (id.value () + 1);
     return id;
 }
 
-subscription_id_t ValueFederateManager::registerOptionalSubscription (const std::string &name,
+subscription_id_t ValueFederateManager::registerOptionalSubscription (const std::string &key,
                                                                       const std::string &type,
                                                                       const std::string &units)
 {
     std::lock_guard<std::mutex> sublock (subscription_mutex);
     subscription_id_t id = static_cast<identifier_type> (subs.size ());
-    subs.emplace_back (name, type, units);
+    subs.emplace_back (key, type, units);
     subs.back ().id = id;
-    subscriptionNames.emplace (name, id);
-    subs.back ().coreID = coreObject->registerSubscription (fedID, name, type, units, handle_check_mode::optional);
+    subscriptionKeys.emplace (key, id);
+    subs.back ().coreID = coreObject->registerSubscription (fedID, key, type, units, handle_check_mode::optional);
     handleLookup.emplace (subs.back ().coreID, id);
     lastData.resize (id.value () + 1);
     return id;
@@ -86,7 +86,7 @@ void ValueFederateManager::addSubscriptionShortcut (subscription_id_t subid, con
     if (subid.value () < subs.size ())
     {
         std::lock_guard<std::mutex> sublock (subscription_mutex);
-        subscriptionNames.emplace (shortcutName, subid);
+        subscriptionKeys.emplace (shortcutName, subid);
     }
     else
     {
@@ -253,34 +253,34 @@ std::vector<subscription_id_t> ValueFederateManager::queryUpdates ()
 
 static const std::string nullStr;
 
-std::string ValueFederateManager::getSubscriptionName (subscription_id_t sub_id) const
+std::string ValueFederateManager::getSubscriptionKey (subscription_id_t sub_id) const
 {
     std::lock_guard<std::mutex> sublock (subscription_mutex);
     return (sub_id.value () < subs.size ()) ? subs[sub_id.value ()].name : nullStr;
 }
 
-subscription_id_t ValueFederateManager::getSubscriptionId (const std::string &name) const
+subscription_id_t ValueFederateManager::getSubscriptionId (const std::string &key) const
 {
     std::lock_guard<std::mutex> sublock (subscription_mutex);
-    auto sub = subscriptionNames.find (name);
-    if (sub != subscriptionNames.end ())
+    auto sub = subscriptionKeys.find (key);
+    if (sub != subscriptionKeys.end ())
     {
         return sub->second;
     }
     return invalid_id_value;
 }
 
-std::string ValueFederateManager::getPublicationName (publication_id_t pub_id) const
+std::string ValueFederateManager::getPublicationKey (publication_id_t pub_id) const
 {
     std::lock_guard<std::mutex> publock (publication_mutex);
     return (pub_id.value () < pubs.size ()) ? pubs[pub_id.value ()].name : nullStr;
 }
 
-publication_id_t ValueFederateManager::getPublicationId (const std::string &name) const
+publication_id_t ValueFederateManager::getPublicationId (const std::string &key) const
 {
     std::lock_guard<std::mutex> publock (publication_mutex);
-    auto pub = publicationNames.find (name);
-    if (pub != publicationNames.end ())
+    auto pub = publicationKeys.find (key);
+    if (pub != publicationKeys.end ())
     {
         return pub->second;
     }

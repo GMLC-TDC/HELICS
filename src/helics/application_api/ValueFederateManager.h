@@ -66,17 +66,17 @@ namespace helics
 		ValueFederateManager(std::shared_ptr<Core> &coreOb, Core::federate_id_t id);
 		~ValueFederateManager();
 
-		publication_id_t registerPublication(const std::string &name, const std::string &type, const std::string &units);
+		publication_id_t registerPublication(const std::string &key, const std::string &type, const std::string &units);
 		/** register a subscription
 		@details call is only valid in startup mode
 		*/
-		subscription_id_t registerRequiredSubscription(const std::string &name, const std::string &type, const std::string &units);
+		subscription_id_t registerRequiredSubscription(const std::string &key, const std::string &type, const std::string &units);
 
 
 		/** register a subscription
 		@details call is only valid in startup mode
 		*/
-		subscription_id_t registerOptionalSubscription(const std::string &name, const std::string &type, const std::string &units);
+		subscription_id_t registerOptionalSubscription(const std::string &key, const std::string &type, const std::string &units);
 	
 		/** add a shortcut for locating a subscription
 		@details primarily for use in looking up an id from a different location
@@ -123,21 +123,21 @@ namespace helics
 		*/
 		std::vector<subscription_id_t>  queryUpdates();
 
-		/** get the name of a subscription from its id
+		/** get the key of a subscription from its id
 		@return empty string if an invalid id is passed*/
-		std::string getSubscriptionName(subscription_id_t) const;
+		std::string getSubscriptionKey(subscription_id_t id) const;
 		/** get the id of a subscription
 		@return ivalid_subscription_id if name is not a recognized*/
 		subscription_id_t getSubscriptionId(const std::string &name) const;
 
-		/** get the name of a publication from its id
+		/** get the key of a publication from its id
 		@return empty string if an invalid id is passed*/
-		std::string getPublicationName(publication_id_t) const;
+		std::string getPublicationKey(publication_id_t id) const;
 
 		/** get the id of a registered publication from its id
 		@param[in] name the publication id
 		@return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
-		publication_id_t getPublicationId(const std::string &name) const;
+		publication_id_t getPublicationId(const std::string &key) const;
 
 		/** get the units of a subscriptions from its id
 		@param[in] id the subscription id to query
@@ -187,8 +187,8 @@ namespace helics
         /** get a count of the number subscriptions registered*/
         int getSubscriptionCount() const;
 	private:
-		std::unordered_map<std::string, publication_id_t> publicationNames; //!< map of the publication names
-		std::unordered_map<std::string, subscription_id_t> subscriptionNames; //!< map of the subscription names
+		std::unordered_map<std::string, publication_id_t> publicationKeys; //!< map of the publication keys
+		std::unordered_map<std::string, subscription_id_t> subscriptionKeys; //!< map of the subscription keys
 		std::map<Core::Handle, subscription_id_t> handleLookup;  //!< a map to translate the Handles to subscription_id_t
 		std::vector<subscription_info> subs;	//!< all the subscription info
 		std::vector<publication_info> pubs;	//!< all the publication info

@@ -22,7 +22,7 @@ namespace helics
             throw(helics::InvalidParameterValue("no subscription with the specified index"));
         }
         id = static_cast<subscription_id_t>(subIndex);
-        key_ = fed->getSubscriptionName(id);
+        key_ = fed->getSubscriptionKey(id);
         
         type_ = fed->getSubscriptionType(id);
         units_ = fed->getSubscriptionUnits(id);

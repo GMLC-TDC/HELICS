@@ -10,6 +10,17 @@
 *
 ***********************************************************************/
 
+/*
+
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was modified by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+additions include load store operations and operator= functions
+*/
 #ifndef LIBGUARDED_GUARDED_HPP
 #define LIBGUARDED_GUARDED_HPP
 
@@ -108,17 +119,11 @@ class guarded
         std::lock_guard<M> glock(m_mutex);
         return m_obj;
     }
-    /** generate a copy of the protected object
-    */
-    std::enable_if_t<std::is_copy_constructible<T>::value, T> operator*()
-    {
-        return load();
-    }
 
     /** store an updated value into the object*/
     template <typename objType>
     std::enable_if_t<std::is_copy_assignable<T>::value> store(objType &&newObj)
-    {
+    { //uses a forwarding reference
         std::lock_guard<M> glock(m_mutex);
         m_obj = std::forward<objType>(newObj);
     }
@@ -126,7 +131,7 @@ class guarded
     /** store an updated value into the object*/
     template <typename objType>
     std::enable_if_t<std::is_copy_assignable<T>::value> operator=(objType &&newObj)
-    {
+    { //uses a forwarding reference
         store(std::forward<objType>(newObj));
     }
 

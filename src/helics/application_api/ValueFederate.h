@@ -56,64 +56,64 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     ValueFederate &operator= (ValueFederate &&fed) noexcept;
     /** register a publication
     @details call is only valid in startup mode
-    @param[in] name the name of the publication
+    @param[in] key the name of the publication
     @param[in] type a string defining the type of the publication
     @param[in] units a string defining the units of the publication [optional]
     @return a publication id object for use as an identifier
     */
     publication_id_t
-    registerPublication (const std::string &name, const std::string &type, const std::string &units = "");
+    registerPublication (const std::string &key, const std::string &type, const std::string &units = "");
     /** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
-    @param[in] name the name of the publication
+    @param[in] key the name of the publication
     @param[in] units  the optional units of the publication
     @return an identifier for use with this publication
     */
     template <typename X>
-    publication_id_t registerPublication (const std::string &name, const std::string &units = "")
+    publication_id_t registerPublication (const std::string &key, const std::string &units = "")
     {
-        return registerPublication (name, ValueConverter<X>::type (), units);
+        return registerPublication (key, ValueConverter<X>::type (), units);
     }
 
     /** register a publication
     @details call is only valid in startup mode
-    @param[in] name the name of the publication
+    @param[in] key the name of the publication
     @param[in] type a string defining the type of the publication
     @param[in] units a string defining the units of the publication [optional]
     @return a publication id object for use as an identifier
     */
     publication_id_t
-    registerGlobalPublication (const std::string &name, const std::string &type, const std::string &units = "");
+    registerGlobalPublication (const std::string &key, const std::string &type, const std::string &units = "");
     /** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
-    @param[in] name the name of the publication
+    @param[in] key the name of the publication
     @param[in] units  the optional units of the publication
     @return an identifier for use with this publication
     */
     template <typename X>
-    publication_id_t registerGlobalPublication (const std::string &name, const std::string &units = "")
+    publication_id_t registerGlobalPublication (const std::string &key, const std::string &units = "")
     {
-        return registerGlobalPublication (name, ValueConverter<X>::type (), units);
+        return registerGlobalPublication (key, ValueConverter<X>::type (), units);
     }
 
     /** register a publication as part of an indexed structure
     @details call is only valid in startup mode by default prepends the name with the federate name
     the name is registered as a global structure with the index appended
-    @param[in] name the name of the publication
+    @param[in] key the name of the publication
     @param[in] index1 an index associated with the publication
     @param[in] units  the optional units of the publication
     @return an identifier for use with this publication
     */
     template <typename X>
     publication_id_t
-    registerPublicationIndexed (const std::string &name, int index1, const std::string &units = "")
+    registerPublicationIndexed (const std::string &key, int index1, const std::string &units = "")
     {
-        return registerGlobalPublication<X> (name + '_' + std::to_string (index1), units);
+        return registerGlobalPublication<X> (key + '_' + std::to_string (index1), units);
     }
     /** register a publication as part of a 2 dimensional indexed structure
     @details call is only valid in startup mode by default prepends the name with the federate name
     the name is registered as a global structure with the indices appended
-    @param[in] name the name of the publication
+    @param[in] key the name of the publication
     @param[in] index1 an index associated with the publication
     @param[in] index2 a second index
     @param[in] units  the optional units of the publication
@@ -121,20 +121,20 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     */
     template <typename X>
     publication_id_t
-    registerPublicationIndexed (const std::string &name, int index1, int index2, const std::string &units = "")
+    registerPublicationIndexed (const std::string &key, int index1, int index2, const std::string &units = "")
     {
-        return registerGlobalPublication<X> (name + '_' + std::to_string (index1) + '_' + std::to_string (index2),
+        return registerGlobalPublication<X> (key + '_' + std::to_string (index1) + '_' + std::to_string (index2),
                                              units);
     }
 
     /** register a subscription
     @details call is only valid in startup mode register a subscription with name type and units
-    @param[in] name the name of the publication to subscribe to
+    @param[in] key the name of the publication to subscribe to
     @param[in] type a string descibing the type of the publication
     @param[in] units a string describing the units on the publication
     */
     subscription_id_t
-    registerRequiredSubscription (const std::string &name, const std::string &type, const std::string &units = "");
+    registerRequiredSubscription (const std::string &key, const std::string &type, const std::string &units = "");
     /** register a subscription
     @details call is only valid in startup mode
     */
@@ -146,80 +146,80 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 
     /** register a required subscription
     @details call is only valid in startup mode, register an optional subscription for a 1D array of values
-    @param[in] name the name of the subscription
+    @param[in] key the name of the subscription
     @param[in] index1 the index into a 1 dimensional array of values
     @param[in] units the optional units on the subscription
     */
     template <typename X>
     subscription_id_t
-    registerRequiredSubscriptionIndexed (const std::string &name, int index1, const std::string &units = "")
+    registerRequiredSubscriptionIndexed (const std::string &key, int index1, const std::string &units = "")
     {
-        return registerRequiredSubscription<X> (name + '_' + std::to_string (index1), units);
+        return registerRequiredSubscription<X> (key + '_' + std::to_string (index1), units);
     }
 
     /** register a required subscription for a 2-D array of values
     @details call is only valid in startup mode
-    @param[in] name the name of the subscription
+    @param[in] key the name of the subscription
     @param[in] index1 the first index of a 2-D value structure
     @param[in] index2 the 2nd index of a 2-D value structure
     @param[in] units the optional units on the subscription
     */
     template <typename X>
-    subscription_id_t registerRequiredSubscriptionIndexed (const std::string &name,
+    subscription_id_t registerRequiredSubscriptionIndexed (const std::string &key,
                                                            int index1,
                                                            int index2,
                                                            const std::string &units = "")
     {
-        return registerRequiredSubscription<X> (name + '_' + std::to_string (index1) + '_' +
+        return registerRequiredSubscription<X> (key + '_' + std::to_string (index1) + '_' +
                                                   std::to_string (index2),
                                                 units);
     }
     /** register a subscription
     @details call is only valid in startup mode
-    @param[in] name the name of the publication to subscribe to
+    @param[in] key the name of the publication to subscribe to
     @param[in] type the type of the subscription
     @param[in] units the units associated with the desired output
     */
     subscription_id_t
-    registerOptionalSubscription (const std::string &name, const std::string &type, const std::string &units = "");
+    registerOptionalSubscription (const std::string &key, const std::string &type, const std::string &units = "");
     /** register a subscription
     @details call is only valid in startup mode
-    @param[in] name the name of the subscription
+    @param[in] key the name of the subscription
     @param[in] units the optional units on the subscription
     */
     template <typename X>
-    subscription_id_t registerOptionalSubscription (const std::string &name, const std::string &units = "")
+    subscription_id_t registerOptionalSubscription (const std::string &key, const std::string &units = "")
     {
-        return registerOptionalSubscription (name, ValueConverter<X>::type (), units);
+        return registerOptionalSubscription (key, ValueConverter<X>::type (), units);
     }
 
     /** register an optional subscription
     @details call is only valid in startup mode, register an optional subscription for a 1D array of values
-    @param[in] name the name of the subscription
+    @param[in] key the name of the subscription
     @param[in] index1 the index into a 1 dimensional array of values
     @param[in] units the optional units on the subscription
     */
     template <typename X>
     subscription_id_t
-    registerOptionalSubscriptionIndexed (const std::string &name, int index1, const std::string &units = "")
+    registerOptionalSubscriptionIndexed (const std::string &key, int index1, const std::string &units = "")
     {
-        return registerOptionalSubscription<X> (name + '_' + std::to_string (index1), units);
+        return registerOptionalSubscription<X> (key + '_' + std::to_string (index1), units);
     }
 
     /** register an optional subscription for a 2-D array of values
     @details call is only valid in startup mode
-    @param[in] name the name of the subscription
+    @param[in] key the name of the subscription
     @param[in] index1 the first index of a 2-D value structure
     @param[in] index2 the 2nd index of a 2-D value structure
     @param[in] units the optional units on the subscription
     */
     template <typename X>
-    subscription_id_t registerOptionalSubscriptionIndexed (const std::string &name,
+    subscription_id_t registerOptionalSubscriptionIndexed (const std::string &key,
                                                            int index1,
                                                            int index2,
                                                            const std::string &units = "")
     {
-        return registerOptionalSubscription<X> (name + '_' + std::to_string (index1) + '_' +
+        return registerOptionalSubscription<X> (key + '_' + std::to_string (index1) + '_' +
                                                   std::to_string (index2),
                                                 units);
     }
@@ -354,35 +354,35 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     */
     std::vector<subscription_id_t> queryUpdates ();
 
-    /** get the name of a subscription from its id
+    /** get the key or the string identifier of a subscription from its id
     @return empty string if an invalid id is passed*/
-    std::string getSubscriptionName (subscription_id_t) const;
+    std::string getSubscriptionKey (subscription_id_t) const;
     /** get the id of a subscription
     @return ivalid_subscription_id if name is not a recognized*/
-    subscription_id_t getSubscriptionId (const std::string &name) const;
+    subscription_id_t getSubscriptionId (const std::string &key) const;
     /** get the id of a subscription from a vector of subscriptions
     @return ivalid_subscription_id if name is not a recognized*/
-    subscription_id_t getSubscriptionId (const std::string &name, int index1) const;
+    subscription_id_t getSubscriptionId (const std::string &key, int index1) const;
     /** get the id of a subscription from a 2-d vector of subscriptions
     @return ivalid_subscription_id if name is not a recognized*/
-    subscription_id_t getSubscriptionId (const std::string &name, int index1, int index2) const;
+    subscription_id_t getSubscriptionId (const std::string &key, int index1, int index2) const;
     /** get the name of a publication from its id
     @return empty string if an invalid id is passed*/
-    std::string getPublicationName (publication_id_t) const;
+    std::string getPublicationKey (publication_id_t) const;
 
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
-    publication_id_t getPublicationId (const std::string &name) const;
+    publication_id_t getPublicationId (const std::string &key) const;
 
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
-    publication_id_t getPublicationId (const std::string &name, int index1) const;
+    publication_id_t getPublicationId (const std::string &key, int index1) const;
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
-    publication_id_t getPublicationId (const std::string &name, int index1, int index2) const;
+    publication_id_t getPublicationId (const std::string &key, int index1, int index2) const;
 
     /** get the units of a subscriptions from its id
     @param[in] id the subscription id to query

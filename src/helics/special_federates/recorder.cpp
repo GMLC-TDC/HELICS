@@ -135,6 +135,8 @@ namespace helics
 
    int recorder::loadTextFile(const std::string &textFile)
     {
+       using namespace stringOps;
+
         std::ifstream infile(textFile);
         std::string str;
         while (std::getline(infile, str))
@@ -148,30 +150,27 @@ namespace helics
             {
                 continue;
             }
-            auto cloc = str.find_last_of(',');
-            if (cloc != std::string::npos)
+            auto blk = splitlineQuotes(str, ",\t ", default_quote_chars, delimiter_compression::on);
+
+            switch (blk.size())
             {
-                auto vtype = getType(str.substr(cloc + 1, std::string::npos));
-                if (vtype == helics::helicsType_t::helicsInvalid)
+            case 1:
+                addSubscription(removeQuotes(blk[0]));
+                break;
+            case 2:
+                if ((blk[0] == "subscription") || (blk[0] == "s") || (blk[0] == "sub"))
                 {
-                    std::cerr << "unrecognized type " << str.substr(cloc + 1, std::string::npos) << "\n";
-                    return -4;
+                    addSubscription(removeQuotes(blk[1]));
                 }
-                auto tag = str.substr(0, cloc);
-                tag.erase(tag.find_last_not_of(" \t\n\0") + 1);
-                tag.erase(0, tag.find_first_not_of(" \t\n\0"));
-                subkeys.emplace(tag,-1);
-            }
-            else
-            {
-                auto tag = str;
-                tag.erase(tag.find_last_not_of(" \t\n\0") + 1);
-                tag.erase(0, tag.find_first_not_of(" \t\n\0"));
-                subkeys.emplace(tag, -1);
+                else if ((blk[0] == "endpoint") || (blk[0] == "ept") || (blk[0] == "e"))
+                {
+                    addEndpoint(removeQuotes(blk[1]));
+                }
+                break;
+            default:
+                break;
             }
         }
-        std::cout << subkeys.size() << " tags processed\n";
-
         infile.close();
         return 0;
     }
@@ -247,7 +246,6 @@ namespace helics
         fed->enterInitializationState();
         captureForCurrentTime(-1.0);
 
-        std::cout << "entering execution mode\n";
         fed->enterExecutionState();
         captureForCurrentTime(0.0);
     }
