@@ -60,7 +60,13 @@ ENDIF(${MPI_C_FOUND})
 if (Boost_VERSION LESS 106100)
   set(BUILD_HELICS_TESTS OFF)
   message(WARNING "Boost version >=1.61 required for building HELICS tests (Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION})")
-endif()
+  set(BOOST_VERSION_LEVEL 0)
+elseif (Boost_VERSION GREATER 106599)
+	#in 1.166 there were some changes to asio and inclusion of beast that will enable other components
+	set(BOOST_VERSION_LEVEL 2)
+else()
+	set(BOOST_VERSION_LEVEL 1)
+ENDIF()
 
 mark_as_advanced(CLEAR BOOST_ROOT)
 
