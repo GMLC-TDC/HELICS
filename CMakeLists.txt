@@ -303,7 +303,25 @@ IF(BUILD_CXX_SHARED_LIB)
 		warning("Building the CXX shared library and C shared library in the same build is not advisable due to conflicting symbol visibility guidelines and is unlikely to work very well")
 	endif()
 
-	add_library(helics-shared SHARED helics-static)
+	add_library(helics-shared SHARED src/empty.cpp)
+	target_link_libraries(helics-shared helics-static)
+	if (WIN32)
+		IF(MINGW)
+			set_target_properties(helics-shared PROPERTIES
+			LINK_FLAGS "-Wl,--whole-archive")
+		ELSE(MINGW)
+			set_target_properties(helics-shared PROPERTIES
+			LINK_FLAGS "/WHOLEARCHIVE")
+		endif()
+		
+	elseif (APPLE)
+		set_target_properties(helics-shared PROPERTIES
+        LINK_FLAGS "-Wl,-all_load")
+	else ()
+		set_target_properties(helics-shared PROPERTIES
+        LINK_FLAGS "-Wl,--whole-archive")
+	endif ()
+	
 endif()
 
 if (WIN32)
