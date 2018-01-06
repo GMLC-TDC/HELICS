@@ -621,7 +621,7 @@ void player::sendInformation(Time sendTime)
 void player::run ()
 {
     run (stopTime);
-    fed->finalize ();
+    fed->disconnect();
 }
 
 void player::run (Time stopTime_input)
@@ -746,8 +746,6 @@ int player::loadArguments (boost::program_options::variables_map &vm_map)
         return -3;
     }
     loadFile (vm_map["input"].as<std::string> ());
-
-    std::cout << "read file " << points.size () << " points for " << tags.size () << " tags \n";
 
     stopTime = Time::maxVal ();
     if (vm_map.count ("stop") > 0)

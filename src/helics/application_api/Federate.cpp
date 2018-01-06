@@ -463,7 +463,10 @@ void Federate::disconnect ()
 {
     if (state != op_states::error)
     {
-        coreObject->finalize (fedID);
+        if (coreObject)
+        {
+            coreObject->finalize(fedID);
+        }  
     }
     coreObject = nullptr;
 }

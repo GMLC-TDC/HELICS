@@ -298,8 +298,8 @@ namespace helics
     /*run the player*/
     void recorder::run()
     {
-        run(autoStopTime);
-        fed->finalize();
+            run(autoStopTime);
+            fed->finalize();
     }
     /** run the player until the specified time*/
     void recorder::run(Time runToTime)

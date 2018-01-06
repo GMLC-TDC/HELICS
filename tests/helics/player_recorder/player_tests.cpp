@@ -15,6 +15,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "exeTestHelper.h"
 #include "helics/special_federates/player.h"
 #include "helics/application_api/Subscriptions.hpp"
+#include "helics/core/brokerFactory.h"
+#include "helics/common/stringToCmdLine.h"
 #include <future>
 
 BOOST_AUTO_TEST_SUITE (player_tests)
@@ -165,22 +167,80 @@ BOOST_DATA_TEST_CASE(simple_player_test_files, boost::unit_test::data::make(simp
 
 }
 
-/*
-BOOST_DATA_TEST_CASE(simple_player_test_files_external, boost::unit_test::data::make(simple_files), file)
+
+
+BOOST_DATA_TEST_CASE(simple_player_test_files_cmdline, boost::unit_test::data::make(simple_files), file)
+{
+
+    auto brk = helics::BrokerFactory::create(helics::core_type::IPC, "ipc_broker", "2");
+        brk->connect();
+std::string exampleFile = std::string(TEST_DIR) + "/test_files/"+file;
+
+stringToCmdLine cmdArg("--name=player --broker=ipc_broker --core=ipc " + exampleFile);
+
+
+helics::player play1(cmdArg.getArgCount(),cmdArg.getArgV());
+
+helics::FederateInfo fi("obj");
+fi.coreType = helics::core_type::IPC;
+fi.coreInitString = "1 --broker=ipc_broker";
+
+helics::ValueFederate vfed(fi);
+helics::Subscription sub1(&vfed, "pub1");
+helics::Subscription sub2(&vfed, "pub2");
+auto fut = std::async(std::launch::async, [&play1]() {play1.run(); });
+vfed.enterExecutionState();
+auto val = sub1.getValue<double>();
+BOOST_CHECK_EQUAL(val, 0.3);
+
+auto retTime = vfed.requestTime(5);
+BOOST_CHECK_EQUAL(retTime, 1.0);
+val = sub1.getValue<double>();
+BOOST_CHECK_EQUAL(val, 0.5);
+val = sub2.getValue<double>();
+BOOST_CHECK_CLOSE(val, 0.4, 0.000001);
+
+retTime = vfed.requestTime(5);
+BOOST_CHECK_EQUAL(retTime, 2.0);
+val = sub1.getValue<double>();
+BOOST_CHECK_EQUAL(val, 0.7);
+val = sub2.getValue<double>();
+BOOST_CHECK_EQUAL(val, 0.6);
+
+retTime = vfed.requestTime(5);
+BOOST_CHECK_EQUAL(retTime, 3.0);
+val = sub1.getValue<double>();
+BOOST_CHECK_EQUAL(val, 0.8);
+val = sub2.getValue<double>();
+BOOST_CHECK_EQUAL(val, 0.9);
+
+
+retTime = vfed.requestTime(5);
+BOOST_CHECK_EQUAL(retTime, 5.0);
+vfed.finalize();
+fut.get();
+brk = nullptr;
+
+}
+
+
+
+
+BOOST_DATA_TEST_CASE(simple_player_test_files_ext, boost::unit_test::data::make(simple_files), file)
 {
 
     exeTestRunner playerExe("", "helics_player");
 
    exeTestRunner brokerExe("", "helics_broker");
 
-    auto res = brokerExe.runAsync("2 --type=ipc --name=ipc_broker");
+    auto res = brokerExe.runAsync("2 --type=zmq --name=zmq_broker");
     std::string exampleFile = std::string(TEST_DIR) + "/test_files/"+file;
-    auto res2 = playerExe.runCaptureOutputAsync("--name=player --broker=ipc_broker --core=ipc " + exampleFile);
+    auto res2 = playerExe.runCaptureOutputAsync("--name=player --core=zmq " + exampleFile);
 
 
-    helics::FederateInfo fi("player1");
-    fi.coreType = helics::core_type::IPC;
-    fi.coreInitString = "1 --broker=ipc_broker";
+    helics::FederateInfo fi("fed");
+    fi.coreType = helics::core_type::ZMQ;
+    fi.coreInitString = "1";
 
     helics::ValueFederate vfed(fi);
     helics::Subscription sub1(&vfed, "pub1");
@@ -218,7 +278,7 @@ BOOST_DATA_TEST_CASE(simple_player_test_files_external, boost::unit_test::data::
 
 }
 
-*/
+
 BOOST_AUTO_TEST_CASE(simple_player_testjson)
 {
     helics::FederateInfo fi("player1");

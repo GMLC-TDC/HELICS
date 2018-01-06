@@ -18,19 +18,21 @@ int main (int argc, char *argv[])
     {
         helics::player player(argc, argv);
         player.run();
-        return 0;
     }
     catch (const std::invalid_argument &ia)
     {
         std::cerr << ia.what() << std::endl;
+        helics::cleanupHelicsLibrary();
         return (-2);
     }
     catch (const helics::HelicsException &he)
     {
         std::cerr << he.what() << std::endl;
+        helics::cleanupHelicsLibrary();
         return (-4);
     }
 
-    
+    helics::cleanupHelicsLibrary();
+    return 0;
    
 }

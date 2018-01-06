@@ -20,19 +20,21 @@ int main(int argc, char *argv[])
     {
         helics::recorder recorder(argc, argv);
         recorder.run();
-        return 0;
     }
     catch (const std::invalid_argument &ia)
     {
         std::cerr << ia.what() << std::endl;
+        helics::cleanupHelicsLibrary();
         return (-2);
     }
     catch (const helics::HelicsException &he)
     {
         std::cerr << he.what() << std::endl;
+        helics::cleanupHelicsLibrary();
         return (-4);
     }
 
-
+    helics::cleanupHelicsLibrary();
+    return 0;
 
 }
