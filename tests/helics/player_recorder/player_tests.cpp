@@ -15,7 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "exeTestHelper.h"
 #include "helics/special_federates/player.h"
 #include "helics/application_api/Subscriptions.hpp"
-#include "helics/core/brokerFactory.h"
+#include "helics/core/BrokerFactory.h"
 #include "helics/common/stringToCmdLine.h"
 #include <future>
 
@@ -349,7 +349,7 @@ BOOST_AUTO_TEST_CASE(player_test_message)
     BOOST_CHECK(mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->source, "src");
         BOOST_CHECK_EQUAL(mess->dest, "dest");
         BOOST_CHECK_EQUAL(mess->data.to_string(), "this is a message");
     }
@@ -385,7 +385,7 @@ BOOST_AUTO_TEST_CASE(player_test_message2)
     BOOST_CHECK(mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->source, "src");
         BOOST_CHECK_EQUAL(mess->dest, "dest");
         BOOST_CHECK_EQUAL(mess->data.to_string(), "this is a test message");
     }
@@ -396,7 +396,7 @@ BOOST_AUTO_TEST_CASE(player_test_message2)
     BOOST_CHECK(mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->source, "src");
         BOOST_CHECK_EQUAL(mess->dest, "dest");
         BOOST_CHECK_EQUAL(mess->data.to_string(), "this is test message2");
     }
@@ -407,7 +407,7 @@ BOOST_AUTO_TEST_CASE(player_test_message2)
     BOOST_CHECK(mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->source, "src");
         BOOST_CHECK_EQUAL(mess->dest, "dest");
         BOOST_CHECK_EQUAL(mess->data.to_string(), "this is message 3");
     }
@@ -444,7 +444,7 @@ BOOST_AUTO_TEST_CASE(player_test_message3)
     BOOST_CHECK(mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->source, "src");
         BOOST_CHECK_EQUAL(mess->dest, "dest");
         BOOST_CHECK_EQUAL(mess->data.to_string(), "this is a test message");
     }
@@ -455,7 +455,7 @@ BOOST_AUTO_TEST_CASE(player_test_message3)
     BOOST_CHECK(mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->source, "src");
         BOOST_CHECK_EQUAL(mess->dest, "dest");
         BOOST_CHECK_EQUAL(mess->data.to_string(), "this is test message2");
     }
@@ -466,7 +466,7 @@ BOOST_AUTO_TEST_CASE(player_test_message3)
     BOOST_CHECK(mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->source, "src");
         BOOST_CHECK_EQUAL(mess->dest, "dest");
         BOOST_CHECK_EQUAL(mess->data.to_string(), "this is message 3");
     }
@@ -500,7 +500,7 @@ BOOST_DATA_TEST_CASE(simple_message_player_test_files, boost::unit_test::data::m
     BOOST_CHECK(mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->source, "src");
         BOOST_CHECK_EQUAL(mess->dest, "dest");
         BOOST_CHECK_EQUAL(mess->data.to_string(), "this is a test message");
     }
@@ -511,7 +511,7 @@ BOOST_DATA_TEST_CASE(simple_message_player_test_files, boost::unit_test::data::m
     BOOST_CHECK(mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->source, "src");
         BOOST_CHECK_EQUAL(mess->dest, "dest");
         BOOST_CHECK_EQUAL(mess->data.to_string(), "this is test message2");
     }
@@ -522,7 +522,7 @@ BOOST_DATA_TEST_CASE(simple_message_player_test_files, boost::unit_test::data::m
     BOOST_CHECK(mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL(mess->src, "src");
+        BOOST_CHECK_EQUAL(mess->source, "src");
         BOOST_CHECK_EQUAL(mess->dest, "dest");
         BOOST_CHECK_EQUAL(mess->data.to_string(), "this is message 3");
     }

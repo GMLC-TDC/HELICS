@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
 
         std::unique_ptr<helics::Message> process (std::unique_ptr<helics::Message> msg) override
         {
-            msg->src = filterName;
+            msg->source = filterName;
 
             if (msg->data.size () > 0)
             {
@@ -209,7 +209,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     // Receive the filtered message
     BOOST_CHECK_EQUAL (core->receiveCount (end2), 1u);
     auto msg = core->receive (end2);
-    BOOST_CHECK_EQUAL (msg->origsrc, "end1");
+    BOOST_CHECK_EQUAL (msg->original_source, "end1");
     auto res = msg->data.to_string ();
     BOOST_CHECK_EQUAL (res.compare (0, 11, "jello world"), 0);
     core->disconnect ();

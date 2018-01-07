@@ -91,7 +91,7 @@ void player::addMessage (Time sendTime,
     messages.resize (messages.size () + 1);
     messages.back ().sendTime = sendTime;
     messages.back ().mess.data = payload;
-    messages.back ().mess.src = src;
+    messages.back ().mess.source = src;
     messages.back ().mess.dest = dest;
     messages.back ().mess.time = sendTime;
 }
@@ -105,7 +105,7 @@ void player::addMessage (Time sendTime,
     messages.resize (messages.size () + 1);
     messages.back ().sendTime = sendTime;
     messages.back ().mess.data = payload;
-    messages.back ().mess.src = src;
+    messages.back ().mess.source = src;
     messages.back ().mess.dest = dest;
     messages.back ().mess.time = actionTime;
 }
@@ -191,7 +191,7 @@ void player::loadTextFile (const std::string &filename)
                     std::cerr << "ill formed time on line " << lcount << '\n';
                     continue;
                 }
-                messages[mIndex].mess.src = blk[2];
+                messages[mIndex].mess.source = blk[2];
                 messages[mIndex].mess.dest = blk[3];
                 messages[mIndex].mess.time = messages[mIndex].sendTime;
                 messages[mIndex].mess.data = decode (std::move (blk[4]));
@@ -206,7 +206,7 @@ void player::loadTextFile (const std::string &filename)
                     std::cerr << "ill formed time on line " << lcount << '\n';
                     continue;
                 }
-                messages[mIndex].mess.src = blk[3];
+                messages[mIndex].mess.source = blk[3];
                 messages[mIndex].mess.dest = blk[4];
                 try
                 {
@@ -310,6 +310,36 @@ void player::loadJsonFile (const std::string &jsonFile)
         return;
     }
 
+    if (JF.find("player")!=JF.end())
+    {
+        auto playerConfig = JF["player"];
+        if (playerConfig.find("stop") != playerConfig.end())
+        {
+            stopTime = playerConfig["stop"].get<double>();
+        }
+        if (playerConfig.find("local") != playerConfig.end())
+        {
+            useLocal = playerConfig["local"].get<bool>();
+        }
+        if (playerConfig.find("separator") != playerConfig.end())
+        {
+            fed->setSeparator(playerConfig["separator"].get<char>());
+        }
+        if (playerConfig.find("file") != playerConfig.end())
+        {
+            if (playerConfig["file"].is_array())
+            {
+                for (const auto &fname : playerConfig["file"])
+                {
+                    loadFile(fname);
+                }
+            }
+            else
+            {
+                loadFile(playerConfig["file"]);
+            }
+        }
+    }
     auto pointArray = JF["points"];
     if (pointArray.is_array ())
     {
@@ -436,7 +466,7 @@ void player::loadJsonFile (const std::string &jsonFile)
             
             messages.resize(messages.size() + 1);
             messages.back().sendTime = sendTime;
-            messages.back().mess.src = src;
+            messages.back().mess.source = src;
             messages.back().mess.dest = dest;
             messages.back().mess.time = ptime;
             if (messageElement.count("data") > 0)
@@ -526,7 +556,7 @@ void player::sortTags ()
 
     for (auto &ms : messages)
     {
-        epts.emplace (ms.mess.src);
+        epts.emplace (ms.mess.source);
     }
 }
 
@@ -535,14 +565,10 @@ void player::generatePublications ()
 {
     for (auto &tname : tags)
     {
-        // skip already existing publications
-        if (pubids.find (tname.first) != pubids.end ())
+        if (pubids.find(tname.first) == pubids.end())
         {
-            continue;
+            addPublication(tname.first, helics::getTypeFromString(tname.second));
         }
-        publications.push_back (
-          helics::Publication (helics::GLOBAL, fed.get (), tname.first, helics::getTypeFromString (tname.second)));
-        pubids[tname.first] = static_cast<int> (publications.size ()) - 1;
     }
 }
 
@@ -551,13 +577,10 @@ void player::generateEndpoints ()
 {
     for (auto &ename : epts)
     {
-        // skip already existing publications
-        if (eptids.find (ename) != eptids.end ())
+        if (eptids.find(ename) == eptids.end())
         {
-            continue;
+            addEndpoint(ename);
         }
-        endpoints.push_back (Endpoint (GLOBAL, fed.get (), ename));
-        eptids[ename] = static_cast<int> (endpoints.size ()) - 1;
     }
 }
 
@@ -571,7 +594,7 @@ void player::cleanUpPointList ()
     /** load the indices for the message*/
     for (auto &ms : messages)
     {
-        ms.index = eptids[ms.mess.src];
+        ms.index = eptids[ms.mess.source];
     }
 }
 
@@ -701,51 +724,98 @@ void player::run (Time stopTime_input)
     }
 }
 
-void player::addPublication (const std::string &key, helicsType_t type, const std::string &units)
+void player::addPublication(const std::string &key, helicsType_t type, const std::string &units)
 {
     // skip already existing publications
-    if (pubids.find (key) != pubids.end ())
+    if (pubids.find(key) != pubids.end())
     {
         std::cerr << "publication already exists\n";
     }
-    publications.push_back (Publication (GLOBAL, fed.get (), key, type, units));
+    if (!useLocal)
+    {
+        publications.push_back(Publication(GLOBAL, fed.get(), key, type, units));
+    }
+    else
+    {
+        auto kp = key.find_first_of("./");
+        if (kp == std::string::npos)
+        {
+            publications.push_back(Publication(fed.get(), key, type, units));
+        }
+        else
+        {
+            publications.push_back(Publication(GLOBAL, fed.get(), key, type, units));
+        }
+    }
     pubids[key] = static_cast<int> (publications.size ()) - 1;
 }
 
-void player::addEndpoint (const std::string &endpointName, const std::string &endpointType)
+void player::addEndpoint(const std::string &endpointName, const std::string &endpointType)
 {
     // skip already existing publications
-    if (eptids.find (endpointName) != eptids.end ())
+    if (eptids.find(endpointName) != eptids.end())
     {
         std::cerr << "Endpoint already exists\n";
     }
-    endpoints.push_back (Endpoint (GLOBAL, fed.get (), endpointName, endpointType));
+    if (!useLocal)
+    {
+        endpoints.push_back(Endpoint(GLOBAL, fed.get(), endpointName, endpointType));
+    }
+    else
+    {
+        auto kp = endpointName.find_first_of("./");
+        if (kp == std::string::npos)
+        {
+            endpoints.push_back(Endpoint(fed.get(), endpointName, endpointType));
+        }
+        else
+        {
+            endpoints.push_back(Endpoint(GLOBAL, fed.get(), endpointName, endpointType));
+        }
+    }
     eptids[endpointName] = static_cast<int> (endpoints.size ()) - 1;
 }
 
-int player::loadArguments (boost::program_options::variables_map &vm_map)
+int player::loadArguments(boost::program_options::variables_map &vm_map)
 {
-    if (vm_map.count ("input") == 0)
-    {
-        return (-1);
-    }
 
-    if (vm_map.count ("datatype") > 0)
+    if (vm_map.count("datatype") > 0)
     {
-        defType = helics::getTypeFromString (vm_map["datatype"].as<std::string> ());
+        defType = helics::getTypeFromString(vm_map["datatype"].as<std::string>());
         if (defType == helics::helicsType_t::helicsInvalid)
         {
-            std::cerr << vm_map["datatype"].as<std::string> () << " is not recognized as a valid type \n";
+            std::cerr << vm_map["datatype"].as<std::string>() << " is not recognized as a valid type \n";
             return -3;
         }
     }
-
-    if (!filesystem::exists (vm_map["input"].as<std::string> ()))
+    if (vm_map.count("local"))
     {
-        std::cerr << vm_map["input"].as<std::string> () << " does not exist \n";
-        return -3;
+        useLocal = true;
     }
-    loadFile (vm_map["input"].as<std::string> ());
+    if (vm_map.count("separator"))
+    {
+        fed->setSeparator(vm_map["separator"].as<char>());
+    }
+    std::string file;
+    if (vm_map.count("input") == 0)
+    {
+        if (!fileLoaded)
+        {
+            if (filesystem::exists("helics.json"))
+            {
+                file = "helics.json";
+            }
+        }
+    }
+    if (filesystem::exists (vm_map["input"].as<std::string> ()))
+    {
+        file = vm_map["input"].as<std::string>();
+    }
+    if (!file.empty())
+    {
+        loadFile(file);
+    }
+   
 
     stopTime = Time::maxVal ();
     if (vm_map.count ("stop") > 0)
@@ -773,7 +843,10 @@ void playerArgumentParser (int argc, const char *const *argv, po::variables_map 
 
     config.add_options ()
 		("datatype",po::value<std::string>(),"type of the publication data type to use")
+        ("local","specify otherwise unspecified endpoints and publications as local( i.e.the keys will be prepended with the player name")
+        ("separator",po::value<char>(),"specify the separator for local publications and endpoints")
 		("stop", po::value<double>(), "the time to stop the player");
+
 
     // clang-format on
 

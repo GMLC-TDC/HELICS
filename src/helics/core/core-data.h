@@ -142,9 +142,9 @@ class Message
     std::uint16_t flags;  //!< message flags
     data_block data;  //!< the data packet for the message
     std::string dest;  //!< the destination of the message
-    std::string src;  //!< the most recent source of the message
-    std::string origsrc;  //!< the original source of the message
-    std::string orig_dest; //!< the original destination of a message
+    std::string source;  //!< the most recent source of the message
+    std::string original_source;  //!< the original source of the message
+    std::string original_dest; //!< the original destination of a message
   public:
     /** default constructor*/
     Message () noexcept {};
@@ -182,6 +182,19 @@ class FilterOperator
     std::unique_ptr<Message> operator() (std::unique_ptr<Message> message)
     {
         return process (std::move (message));
+    }
+};
+
+/** special filter operator defining no operation the original message is simply returned
+*/
+class nullFilterOperator final :public FilterOperator
+{
+public:
+    /**default constructor*/
+    nullFilterOperator() = default;
+    virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override
+    {
+        return message;
     }
 };
 

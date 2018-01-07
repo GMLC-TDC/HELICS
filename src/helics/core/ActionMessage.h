@@ -36,28 +36,28 @@ class ActionMessage
         std::string &units;  //!< alias type to target for registration
         std::string orig_source;  //!< the original source
 		std::string &type_out;  //!< alias type_out to orig_source for filter
-        std::string orig_dest;  //!< the original destination of a message
+        std::string original_dest;  //!< the original destination of a message
 		/** constructor*/
         AdditionalInfo () noexcept : type (source), units (target),type_out(orig_source){};
 		/** copy constructor*/
         AdditionalInfo (const AdditionalInfo &ai)
             : source (ai.source), type (source), target (ai.target),
-              units (target), orig_source (ai.orig_source), type_out(orig_source),orig_dest(ai.orig_dest) {};
+              units (target), orig_source (ai.orig_source), type_out(orig_source),original_dest(ai.original_dest) {};
 		/** move constructor*/
         AdditionalInfo (AdditionalInfo &&ai) noexcept
             : source (std::move (ai.source)), type (source),
-              target (std::move (ai.target)), units (target), orig_source (std::move (ai.orig_source)), type_out(orig_source),orig_dest(std::move(ai.orig_dest)) {};
+              target (std::move (ai.target)), units (target), orig_source (std::move (ai.orig_source)), type_out(orig_source),original_dest(std::move(ai.original_dest)) {};
         template <class Archive>
         void save (Archive &ar) const
         {
-			ar(source, target, orig_source,orig_dest);
+			ar(source, target, orig_source,original_dest);
         }
 
         template <class Archive>
         void load (Archive &ar)
         {
            
-			ar(source, target, orig_source,orig_dest);
+			ar(source, target, orig_source,original_dest);
         }
     };
    

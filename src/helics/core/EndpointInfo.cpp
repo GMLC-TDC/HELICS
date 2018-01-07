@@ -40,7 +40,7 @@ Time EndpointInfo::firstMessageTime () const
 // this is the function which determines message order
 static auto msgSorter = [](const auto &m1, const auto &m2) {
     // first by time
-    return (m1->time != m2->time) ? (m1->time < m2->time) : (m1->origsrc < m2->origsrc);
+    return (m1->time != m2->time) ? (m1->time < m2->time) : (m1->original_source < m2->original_source);
 };
 
 void EndpointInfo::addMessage (std::unique_ptr<Message> message)

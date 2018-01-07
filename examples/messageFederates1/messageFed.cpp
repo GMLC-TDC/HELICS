@@ -78,7 +78,7 @@ int main (int argc, char *argv[])
 		while (mFed->hasMessage(id))
 		{
 			auto nmessage = mFed->getMessage(id);
-			std::cout << "received message from " << nmessage->src << " at " << static_cast<double>(nmessage->time) << " ::" << nmessage->data.to_string() << '\n';
+			std::cout << "received message from " << nmessage->source << " at " << static_cast<double>(nmessage->time) << " ::" << nmessage->data.to_string() << '\n';
 		}
         
     }

@@ -78,12 +78,20 @@ void Filter::setOperator (std::shared_ptr<FilterOperator> mo)
         corePtr->setFilterOperator (id, std::move (mo));
     }
 }
+
 void Filter::setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
 {
     filtOp = std::move (filterOps);
     if (corePtr != nullptr)
     {
-        corePtr->setFilterOperator (id, filtOp->getOperator ());
+        if (filtOp)
+        {
+            corePtr->setFilterOperator(id, filtOp->getOperator());
+        }
+        else
+        {
+            corePtr->setFilterOperator(id, nullptr);
+        }
     }
 }
 
@@ -201,12 +209,12 @@ DestinationFilter::DestinationFilter (Core *cr,
 
 cloningFilter::cloningFilter(Core *cr) :Filter(cr)
 {
-
+    filtOp= std::make_shared<cloneFilterOperation>(cr);
 }
 
 cloningFilter::cloningFilter(Federate *fed) : Filter(fed)
 {
-
+    filtOp = std::make_shared<cloneFilterOperation>(fed->getCorePointer().get());
 }
 
 void cloningFilter::addSourceEndpoint(const std::string &sourceName)
@@ -230,6 +238,37 @@ void cloningFilter::addDeliveryEndpoint(const std::string &endpoint)
     Filter::setString("add delivery", endpoint);
 }
 
+
+void cloningFilter::removeSourceEndpoint(const std::string &sourceName)
+{
+    for (size_t ii=0;ii<sourceEndpoints.size();++ii)
+    {
+        if (sourceEndpoints[ii] == sourceName)
+        {
+            corePtr->setFilterOperator(sourceFilters[ii].value(), nullptr);
+        }
+    }
+   
+}
+
+void cloningFilter::removeDestinationEndpoint(const std::string &destinationName)
+{
+    for (size_t ii = 0; ii<destEndpoints.size(); ++ii)
+    {
+        if (destEndpoints[ii] == destinationName)
+        {
+            corePtr->setFilterOperator(destFilters[ii].value(), nullptr);
+        }
+    }
+    
+}
+
+void cloningFilter::removeDeliveryEndpoint(const std::string &endpoint)
+{
+    Filter::setString("remove delivery", endpoint);
+}
+
+
 void cloningFilter::setString(const std::string &property, const std::string &val)
 {
     if (property == "source")
@@ -239,6 +278,14 @@ void cloningFilter::setString(const std::string &property, const std::string &va
     else if ((property == "dest") || (property == "destination"))
     {
         addDestinationEndpoint(val);
+    }
+    else if ((property == "remove destination") || (property == "remove dest"))
+    {
+        removeDestinationEndpoint(val);
+    }
+    else if (property == "remove source")
+    {
+        removeSourceEndpoint(val);
     }
     else
     {

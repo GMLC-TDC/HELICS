@@ -336,9 +336,9 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //    BOOST_CHECK_EQUAL (M3->data.size (), data3.size ());
 //    BOOST_CHECK_EQUAL (M4->data.size (), data4.size ());
 //
-//    BOOST_CHECK_EQUAL (M4->src, "fed0/ep1");
+//    BOOST_CHECK_EQUAL (M4->source, "fed0/ep1");
 //    BOOST_CHECK_EQUAL (M4->dest, "ep2");
-//    BOOST_CHECK_EQUAL (M4->origsrc, "fed0/ep1");
+//    BOOST_CHECK_EQUAL (M4->original_source, "fed0/ep1");
 //    BOOST_CHECK_EQUAL (M4->time, 0.0);
 //    mFed1->finalize ();
 //    mFed2->finalize ();
@@ -402,13 +402,13 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //            if (messString == "ping")
 //            {
 //#ifdef ENABLE_OUTPUT
-//                std::cout << name << " :receive ping from " << std::string (mess->src) << " at time "
+//                std::cout << name << " :receive ping from " << std::string (mess->source) << " at time "
 //                          << static_cast<double> (currentTime) << '\n';
 //#endif
 //                mess->data = "pong";
-//                mess->dest = mess->src;
-//                mess->src = name;
-//                mess->origsrc = mess->src;
+//                mess->dest = mess->source;
+//                mess->source = name;
+//                mess->original_source = mess->source;
 //                mess->time = currentTime;
 //                mFed->sendMessage (ep, std::move (mess));
 //                pings++;
@@ -417,7 +417,7 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //            {
 //                pongs++;
 //#ifdef ENABLE_OUTPUT
-//                std::cout << name << " :receive pong from " << std::string (mess->src) << " at time "
+//                std::cout << name << " :receive pong from " << std::string (mess->source) << " at time "
 //                          << static_cast<double> (currentTime) << '\n';
 //#endif
 //            }

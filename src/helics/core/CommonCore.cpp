@@ -1628,6 +1628,7 @@ void CommonCore::setLoggingCallback (
 
 void CommonCore::setFilterOperator (Handle filter, std::shared_ptr<FilterOperator> callback)
 {
+    static std::shared_ptr<FilterOperator> nullFilt = std::make_shared<nullFilterOperator>();
     auto hndl = getHandleInfo (filter);
     if (hndl == nullptr)
     {
@@ -1642,12 +1643,28 @@ void CommonCore::setFilterOperator (Handle filter, std::shared_ptr<FilterOperato
 
     if (brokerState < operating)
     {
-        FiltI->filterOp = std::move (callback);
+        if (callback)
+        {
+            FiltI->filterOp = std::move(callback);
+        }
+        else
+        {
+            FiltI->filterOp = nullFilt;
+        }
+
+        
     }
     else if (brokerState == operating)
     {
         // TODO:: This is not thread safe yet
-        FiltI->filterOp = std::move (callback);
+        if (callback)
+        {
+            FiltI->filterOp = std::move(callback);
+        }
+        else
+        {
+            FiltI->filterOp = nullFilt;
+        }
     }
     else
     {

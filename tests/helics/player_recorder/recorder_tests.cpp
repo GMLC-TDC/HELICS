@@ -15,6 +15,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "exeTestHelper.h"
 #include "helics/special_federates/recorder.h"
 #include "helics/application_api/Publications.hpp"
+#include "helics/core/BrokerFactory.h"
+#include "helics/common/stringToCmdLine.h"
 #include <future>
 
 BOOST_AUTO_TEST_SUITE (recorder_tests)
@@ -236,6 +238,77 @@ BOOST_DATA_TEST_CASE(simple_recorder_test_message_files, boost::unit_test::data:
     pub1.publish(4.7);
     
     
+    retTime = cfed.requestTime(3.0);
+    BOOST_CHECK_EQUAL(retTime, 3.0);
+    pub2.publish("3.9");
+
+    retTime = cfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 5.0);
+
+    cfed.finalize();
+    fut.get();
+    rec1.finalize();
+    BOOST_CHECK_EQUAL(rec1.pointCount(), 4);
+    BOOST_CHECK_EQUAL(rec1.messageCount(), 2);
+
+    auto v1 = rec1.getValue(0);
+    BOOST_CHECK_EQUAL(v1.first, "pub1");
+    BOOST_CHECK_EQUAL(v1.second, std::to_string(3.4));
+    v1 = rec1.getValue(1);
+    BOOST_CHECK_EQUAL(v1.first, "pub2");
+    BOOST_CHECK_EQUAL(v1.second, std::to_string(5.7));
+
+    v1 = rec1.getValue(2);
+    BOOST_CHECK_EQUAL(v1.first, "pub1");
+    BOOST_CHECK_EQUAL(v1.second, std::to_string(4.7));
+
+    v1 = rec1.getValue(3);
+    BOOST_CHECK_EQUAL(v1.first, "pub2");
+    BOOST_CHECK_EQUAL(v1.second, std::to_string(3.9));
+
+    auto m = rec1.getMessage(1);
+    BOOST_CHECK_EQUAL(m->data.to_string(), "this is a test message2");
+}
+
+BOOST_DATA_TEST_CASE(simple_recorder_test_message_files_cmd, boost::unit_test::data::make(simple_message_files), file)
+{
+
+    auto brk = helics::BrokerFactory::create(helics::core_type::IPC, "ipc_broker", "2");
+    brk->connect();
+    std::string exampleFile = std::string(TEST_DIR) + "/test_files/" + file;
+
+    stringToCmdLine cmdArg("--name=rec --broker=ipc_broker --core=ipc " + exampleFile);
+
+
+    helics::recorder rec1(cmdArg.getArgCount(), cmdArg.getArgV());
+
+    helics::FederateInfo fi("obj");
+    fi.coreType = helics::core_type::IPC;
+    fi.coreInitString = "1 --broker=ipc_broker";
+
+
+    helics::CombinationFederate cfed(fi);
+    helics::Publication pub1(helics::GLOBAL, &cfed, "pub1", helics::helicsType_t::helicsDouble);
+    helics::Publication pub2(helics::GLOBAL, &cfed, "pub2", helics::helicsType_t::helicsDouble);
+    helics::Endpoint e1(helics::GLOBAL, &cfed, "d1");
+
+    auto fut = std::async(std::launch::async, [&rec1]() {rec1.run(5); });
+    cfed.enterExecutionState();
+    auto retTime = cfed.requestTime(1);
+    BOOST_CHECK_EQUAL(retTime, 1.0);
+    pub1.publish(3.4);
+    e1.send("src1", "this is a test message");
+
+    retTime = cfed.requestTime(1.5);
+    BOOST_CHECK_EQUAL(retTime, 1.5);
+    pub2.publish(5.7);
+
+    retTime = cfed.requestTime(2.0);
+    BOOST_CHECK_EQUAL(retTime, 2.0);
+    e1.send("src1", "this is a test message2");
+    pub1.publish(4.7);
+
+
     retTime = cfed.requestTime(3.0);
     BOOST_CHECK_EQUAL(retTime, 3.0);
     pub2.publish("3.9");

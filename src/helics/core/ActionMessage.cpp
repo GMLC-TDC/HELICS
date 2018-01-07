@@ -61,8 +61,9 @@ ActionMessage::ActionMessage (std::unique_ptr<Message> message)
       payload (std::move (message->data.m_data)), name (payload)
 {
     info_ = std::make_unique<AdditionalInfo> ();
-    info_->source = std::move (message->src);
-    info_->orig_source = std::move (message->origsrc);
+    info_->source = std::move (message->source);
+    info_->orig_source = std::move (message->original_source);
+    info_->original_dest = std::move(message->original_dest);
     info_->target = std::move (message->dest);
 }
 
@@ -121,8 +122,9 @@ void ActionMessage::moveInfo (std::unique_ptr<Message> message)
     {
         info_ = std::make_unique<AdditionalInfo> ();
     }
-    info_->source = std::move (message->src);
-    info_->orig_source = std::move (message->origsrc);
+    info_->source = std::move (message->source);
+    info_->orig_source = std::move (message->original_source);
+    info_->original_dest = std::move(message->original_dest);
     info_->target = std::move (message->dest);
 }
 
@@ -337,11 +339,12 @@ void ActionMessage::from_vector (const std::vector<char> &data) { fromByteArray 
 std::unique_ptr<Message> createMessage (const ActionMessage &cmd)
 {
     auto msg = std::make_unique<Message> ();
-    msg->origsrc = cmd.info ().orig_source;
+    msg->original_source = cmd.info ().orig_source;
+    msg->original_dest = cmd.info().original_dest;
     msg->dest = cmd.info ().target;
     msg->data = cmd.payload;
     msg->time = cmd.actionTime;
-    msg->src = cmd.info ().source;
+    msg->source = cmd.info ().source;
 
     return msg;
 }
@@ -349,11 +352,12 @@ std::unique_ptr<Message> createMessage (const ActionMessage &cmd)
 std::unique_ptr<Message> createMessage (ActionMessage &&cmd)
 {
     auto msg = std::make_unique<Message> ();
-    msg->origsrc = std::move (cmd.info ().orig_source);
+    msg->original_source = std::move (cmd.info ().orig_source);
+    msg->original_dest = std::move(cmd.info().original_dest); 
     msg->dest = std::move (cmd.info ().target);
     msg->data = std::move (cmd.payload);
     msg->time = cmd.actionTime;
-    msg->src = std::move (cmd.info ().source);
+    msg->source = std::move (cmd.info ().source);
 
     return msg;
 }

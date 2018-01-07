@@ -216,10 +216,10 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             if (sfnd != subHandleLookup.end ())
             {
                 auto mv = std::make_unique<Message> ();
-                mv->src = sfnd->second.second;
+                mv->source = sfnd->second.second;
                 auto localEndpointIndex = sfnd->second.first.value ();
                 mv->dest = local_endpoints[localEndpointIndex].name;
-                mv->origsrc = mv->src;
+                mv->original_source = mv->source;
                 // get the data value
                 auto data = coreObject->getValue (handle);
 

@@ -151,16 +151,26 @@ class cloningFilter : public Filter
     explicit cloningFilter (Core *cr);
     explicit cloningFilter (Federate *fed);
 
+    /** add a sourceEndpoint to the list of endpoint to clone*/
     void addSourceEndpoint (const std::string &sourceName);
+    /** add a destination endpoint to the list of endpoints to clone*/
     void addDestinationEndpoint (const std::string &destinationName);
+    /** add a delivery address this is the name of an endpoint to deliver the message to*/
     void addDeliveryEndpoint (const std::string &endpoint);
+
+    /** remove a sourceEndpoint to the list of endpoint to clone*/
+    void removeSourceEndpoint(const std::string &sourceName);
+    /** remove a destination endpoint to the list of endpoints to clone*/
+    void removeDestinationEndpoint(const std::string &destinationName);
+    /** remove a delivery address this is the name of an endpoint to deliver the message to*/
+    void removeDeliveryEndpoint(const std::string &endpoint);
 
     virtual void setString(const std::string &property, const std::string &val) override;
 private:
-    std::vector<filter_id_t> sourceFilters;
-    std::vector<filter_id_t> destFilters;
-    std::vector<std::string> sourceEndpoints;
-    std::vector<std::string> destEndpoints;
+    std::vector<filter_id_t> sourceFilters; //!< the set of source filters to control
+    std::vector<filter_id_t> destFilters;   //!< the set of dest Filters contained in the filter
+    std::vector<std::string> sourceEndpoints;   //!< the names of the source endpoints
+    std::vector<std::string> destEndpoints; //!< the names of the destination endpoints
 };
 
 

@@ -65,7 +65,7 @@ std::unique_ptr<Message> MessageDestOperator::process (std::unique_ptr<Message> 
 {
     if (DestUpdateFunction)
     {
-        message->orig_dest = message->dest;
+        message->original_dest = message->dest;
         message->dest = DestUpdateFunction (message->dest);
     }
     return message;

@@ -127,7 +127,15 @@ namespace helics
         typename std::enable_if_t<helicsType<valType>() != helicsType_t::helicsInvalid> 
             addPublication(const std::string &key, const std::string &units = "")
         {
-            publications.push_back(Publication(GLOBAL, fed.get(), key, helicsType<valType>(), units));
+            if (!useLocal)
+            {
+                publications.push_back(Publication(GLOBAL, fed.get(), key, helicsType<valType>(), units));
+            }
+            else
+            {
+                publications.push_back(Publication(fed.get(), key, helicsType<valType>(), units));
+            }
+            
             pubids[key] = static_cast<int> (publications.size()) - 1;
         }
         
@@ -222,6 +230,8 @@ namespace helics
         std::string masterFileName; //!< the name of the master file used to do the construction
         size_t pointIndex = 0; //!< the current point index
         size_t messageIndex = 0; //!< the current message index
+        bool useLocal = false;
+        bool fileLoaded = false;
     };
 }
 

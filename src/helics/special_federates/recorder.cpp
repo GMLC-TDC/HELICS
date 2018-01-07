@@ -204,7 +204,7 @@ namespace helics
             {
                 json message;
                 message["time"] = static_cast<double>(mess->time);
-                message["src"] = mess->src;
+                message["src"] = mess->source;
                 message["dest"] = mess->dest;
                 message["message"] = mess->data.to_string();
             }

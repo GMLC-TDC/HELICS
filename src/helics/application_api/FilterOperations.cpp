@@ -375,7 +375,7 @@ void cloneFilterOperation::sendMessage(const Message *mess) const
     for (auto &add : *lock)
     {
         auto m = std::make_unique<Message>(*mess);
-        m->orig_dest = m->dest;
+        m->original_dest = m->dest;
         m->dest = add;
         coreptr->sendMessage(direct_send_handle, std::move(m));
     }
