@@ -42,6 +42,9 @@ namespace helics
         */
         virtual bool isRoot() const = 0;
 
+        /** check if the broker is ready to accept new federates or cores
+        */
+        virtual bool isOpenToNewFederates() const = 0;
         /** start up the broker with an initialization string containing commands and parameters*/
         virtual void initialize(const std::string &initializationString) = 0;
         /** initialize from command line arguments

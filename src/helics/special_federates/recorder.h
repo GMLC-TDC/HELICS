@@ -54,6 +54,8 @@ namespace helics
         int cnt = 0;
     };
 
+    class CloningFilter;
+
     /** class designed to capture data points from a set of subscriptions or endpoints*/
     class recorder
     {
@@ -148,9 +150,11 @@ namespace helics
         void captureForCurrentTime(Time currentTime);
     protected:
         std::shared_ptr<CombinationFederate> fed; //!< the federate 
+        std::unique_ptr<CloningFilter> cFilt; //!< a pointer to a clone filter
         std::vector<ValueCapture> points;   //!< lists of points that were captured
         std::vector<Subscription> subscriptions;    //!< the actual subscription objects
         std::vector<Endpoint> endpoints;    //!< the actual endpoint objects
+        std::unique_ptr<Endpoint> cloneEndpoint; //!< the endpoint for cloned message delivery
         std::vector<std::unique_ptr<Message>> messages; //!< list of messages
         std::map<helics::subscription_id_t, int> subids; //!< map of the subscription ids
         std::map<std::string, int> subkeys;  //!< translate subscription names to an index

@@ -82,6 +82,7 @@ protected:
     friend void addOperations(Filter *filt, defined_filter_types type, Core *cptr);
 };
 
+#define EMPTY_STRING std::string()
 /** class wrapping a source filter*/
 class SourceFilter : public Filter
 {
@@ -95,9 +96,9 @@ class SourceFilter : public Filter
     */
     SourceFilter (Federate *fed,
                   const std::string &target,
-                  const std::string &name = "",
-                  const std::string &input_type = "",
-                  const std::string &output_type = "");
+                  const std::string &name = EMPTY_STRING,
+                  const std::string &input_type = EMPTY_STRING,
+                  const std::string &output_type = EMPTY_STRING);
     /**constructor to build an source filter object
     @param[in] fed  the Federate to use
     @param[in] target the endpoint the filter is targeting
@@ -107,9 +108,9 @@ class SourceFilter : public Filter
     */
     SourceFilter (Core *cr,
                   const std::string &target,
-                  const std::string &name = "",
-                  const std::string &input_type = "",
-                  const std::string &output_type = "");
+                  const std::string &name = EMPTY_STRING,
+                  const std::string &input_type = EMPTY_STRING,
+                  const std::string &output_type = EMPTY_STRING);
     virtual ~SourceFilter () = default;
 };
 
@@ -126,9 +127,9 @@ class DestinationFilter : public Filter
     */
     DestinationFilter (Federate *fed,
                        const std::string &target,
-                       const std::string &name = "",
-                       const std::string &input_type = "",
-                       const std::string &output_type = "");
+                       const std::string &name = EMPTY_STRING,
+                       const std::string &input_type = EMPTY_STRING,
+                       const std::string &output_type = EMPTY_STRING);
     /**constructor to build an destination filter object
     @param[in] cr  the Core to register the filter with
     @param[in] target the endpoint the filter is targeting
@@ -138,18 +139,22 @@ class DestinationFilter : public Filter
     */
     DestinationFilter (Core *cr,
                        const std::string &target,
-                       const std::string &name = "",
-                       const std::string &input_type = "",
-                       const std::string &output_type = "");
+                       const std::string &name = EMPTY_STRING,
+                       const std::string &input_type = EMPTY_STRING,
+                       const std::string &output_type = EMPTY_STRING);
     virtual ~DestinationFilter () = default;
 };
 
 /** class used to clone message for delivery to other endpoints*/
-class cloningFilter : public Filter
+class CloningFilter : public Filter
 {
   public:
-    explicit cloningFilter (Core *cr);
-    explicit cloningFilter (Federate *fed);
+      /** construct from a core object 
+      */
+    explicit CloningFilter (Core *cr);
+    /** construct from a Federate
+    */
+    explicit CloningFilter (Federate *fed);
 
     /** add a sourceEndpoint to the list of endpoint to clone*/
     void addSourceEndpoint (const std::string &sourceName);
@@ -168,7 +173,7 @@ class cloningFilter : public Filter
     virtual void setString(const std::string &property, const std::string &val) override;
 private:
     std::vector<filter_id_t> sourceFilters; //!< the set of source filters to control
-    std::vector<filter_id_t> destFilters;   //!< the set of dest Filters contained in the filter
+    std::vector<filter_id_t> destFilters;   //!< the set of destination Filters contained in the filter
     std::vector<std::string> sourceEndpoints;   //!< the names of the source endpoints
     std::vector<std::string> destEndpoints; //!< the names of the destination endpoints
 };
@@ -184,7 +189,7 @@ private:
 std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types type,
                                                             Federate *fed,
                                                             const std::string &target,
-                                                            const std::string &name = "");
+                                                            const std::string &name = EMPTY_STRING);
 /** create a source filter
 @param type the type of filter to create
 @param fed the federate to create the filter through
@@ -195,7 +200,7 @@ std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types
 std::unique_ptr<SourceFilter> make_source_filter (defined_filter_types type,
                                                   Federate *fed,
                                                   const std::string &target,
-                                                  const std::string &name = "");
+                                                  const std::string &name = EMPTY_STRING);
 
 /** create a destination filter
 @param type the type of filter to create
@@ -207,7 +212,7 @@ std::unique_ptr<SourceFilter> make_source_filter (defined_filter_types type,
 std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types type,
                                                             Core *cr,
                                                             const std::string &target,
-                                                            const std::string &name = "");
+                                                            const std::string &name = EMPTY_STRING);
 
 /** create a source filter
 @param type the type of filter to create
@@ -217,7 +222,7 @@ std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
 */
 std::unique_ptr<SourceFilter>
-make_source_filter (defined_filter_types type, Core *cr, const std::string &target, const std::string &name = "");
+make_source_filter (defined_filter_types type, Core *cr, const std::string &target, const std::string &name = EMPTY_STRING);
 
 }  // namespace helics
 #endif

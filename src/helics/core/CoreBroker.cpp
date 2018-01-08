@@ -182,6 +182,9 @@ int32_t CoreBroker::fillMessageRouteInformation (ActionMessage &mess)
     return 0;
 }
 
+
+bool CoreBroker::isOpenToNewFederates() const { return ((brokerState != created) && (brokerState < operating)); }
+
 void CoreBroker::processPriorityCommand (ActionMessage &&command)
 {
     // deal with a few types of message immediately

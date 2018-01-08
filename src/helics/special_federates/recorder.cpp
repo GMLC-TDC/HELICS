@@ -11,6 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../application_api/Subscriptions.hpp"
 #include "../application_api/ValueFederate.h"
 #include "../application_api/queryFunctions.h"
+#include "../application_api/Filters.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -124,6 +125,44 @@ namespace helics
                     file >> JF;
                 }
             }
+            auto sourceClone = JF["sourceclone"];
+            if (sourceClone.is_array())
+            {
+                for (const std::string &sc : sourceClone)
+                {
+                    addSourceEndpointClone(sc);
+                }
+            }
+            else if (sourceClone.is_string())
+            {
+                addSourceEndpointClone(sourceClone);
+            }
+            auto destClone = JF["destclone"];
+            if (destClone.is_array())
+            {
+                for (const std::string &dc : destClone)
+                {
+                    addDestEndpointClone(dc);
+                }
+            }
+            else if(destClone.is_string())
+            {
+                addDestEndpointClone(destClone);
+            }
+            auto clones = JF["clone"];
+            if (clones.is_array())
+            {
+                for (const std::string &clone : clones)
+                {
+                    addSourceEndpointClone(clone);
+                    addDestEndpointClone(clone);
+                }
+            }
+            else if (clones.is_string())
+            {
+                addSourceEndpointClone(clones);
+                addDestEndpointClone(clones);
+            }
         }
         catch (const json::exception &je)
         {
@@ -165,6 +204,19 @@ namespace helics
                 else if ((blk[0] == "endpoint") || (blk[0] == "ept") || (blk[0] == "e"))
                 {
                     addEndpoint(removeQuotes(blk[1]));
+                }
+                else if ((blk[0] == "sourceclone") || (blk[0] == "source"))
+                {
+                    addSourceEndpointClone(removeQuotes(blk[1]));
+                }
+                else if ((blk[0] == "destclone") || (blk[0] == "dest") ||(blk[0]=="destination"))
+                {
+                    addDestEndpointClone(removeQuotes(blk[1]));
+                }
+                else if (blk[0] == "clone")
+                {
+                    addSourceEndpointClone(removeQuotes(blk[1]));
+                    addDestEndpointClone(removeQuotes(blk[1]));
                 }
                 break;
             default:
@@ -293,6 +345,14 @@ namespace helics
                 messages.push_back(ept.getMessage());
             }
         }
+        //get the clone endpoints
+        if (cloneEndpoint)
+        {
+            while (cloneEndpoint->hasMessage())
+            {
+                messages.push_back(cloneEndpoint->getMessage());
+            }
+        }
     }
 
     /*run the player*/
@@ -380,12 +440,24 @@ namespace helics
     
     void recorder::addSourceEndpointClone(const std::string &sourceEndpoint)
     {
-
+        if (!cFilt)
+        {
+            cFilt = std::make_unique<CloningFilter>(fed.get());
+            cloneEndpoint = std::make_unique<Endpoint>(fed.get(), "cloneE");
+            cFilt->addDeliveryEndpoint(cloneEndpoint->getName());
+        }
+        cFilt->addSourceEndpoint(sourceEndpoint);
     }
     
     void recorder::addDestEndpointClone(const std::string &destEndpoint)
     {
-
+        if (!cFilt)
+        {
+            cFilt = std::make_unique<CloningFilter>(fed.get());
+            cloneEndpoint = std::make_unique<Endpoint>(fed.get(), "cloneE");
+            cFilt->addDeliveryEndpoint(cloneEndpoint->getName());
+        }
+        cFilt->addDestinationEndpoint(destEndpoint);
     }
 
 
@@ -489,6 +561,34 @@ namespace helics
                 }
             }
         }
+
+        if (vm_map.count("clone")>0)
+        {
+            auto clones = vm_map["clone"].as<std::vector<std::string>>();
+            for (const auto &clone : clones)
+            {
+                addDestEndpointClone(clone);
+                addSourceEndpointClone(clone);
+            }
+        }
+
+        if (vm_map.count("sourceclone")>0)
+        {
+            auto clones = vm_map["sourceclone"].as<std::vector<std::string>>();
+            for (const auto &clone : clones)
+            {
+                addSourceEndpointClone(clone);
+            }
+        }
+
+        if (vm_map.count("destclone")>0)
+        {
+            auto clones = vm_map["destclone"].as<std::vector<std::string>>();
+            for (const auto &clone : clones)
+            {
+                addDestEndpointClone(clone);
+            }
+        }
         if (vm_map.count("mapfile") > 0)
         {
             mapfile = vm_map["mapfile"].as<std::string>();
@@ -524,8 +624,9 @@ void recorderArgumentParser(int argc, const char *const *argv, po::variables_map
         ("stop", po::value<double>(), "the time to stop recording")
         ("tags",po::value<std::vector<std::string>>(),"tags to record, this argument may be specified any number of times")
         ("endpoints",po::value<std::vector<std::string>>(),"endpoints to capture, this argument may be specified multiple time")
-        ("sourcefilter", po::value<std::vector<std::string>>(), "existing endpoints to capture generated packets from, this argument may be specified multiple time")
-        ("destfilter", po::value<std::vector<std::string>>(), "existing endpoints to capture all packets with the specified endpoint as a destination, this argument may be specified multiple time")
+        ("sourceclone", po::value<std::vector<std::string>>(), "existing endpoints to capture generated packets from, this argument may be specified multiple time")
+        ("destclone", po::value<std::vector<std::string>>(), "existing endpoints to capture all packets with the specified endpoint as a destination, this argument may be specified multiple time")
+        ("clone", po::value<std::vector<std::string>>(), "existing endpoints to clone all packets to and from")
         ("capture", po::value < std::vector<std::string>>(),"capture all the publications of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list")
 		("output,o",po::value<std::string>(),"the output file for recording the data")
 		("mapfile", po::value<std::string>(), "write progress to a memory mapped file");

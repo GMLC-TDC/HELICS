@@ -207,17 +207,17 @@ DestinationFilter::DestinationFilter (Core *cr,
 }
 
 
-cloningFilter::cloningFilter(Core *cr) :Filter(cr)
+CloningFilter::CloningFilter(Core *cr) :Filter(cr)
 {
     filtOp= std::make_shared<cloneFilterOperation>(cr);
 }
 
-cloningFilter::cloningFilter(Federate *fed) : Filter(fed)
+CloningFilter::CloningFilter(Federate *fed) : Filter(fed)
 {
     filtOp = std::make_shared<cloneFilterOperation>(fed->getCorePointer().get());
 }
 
-void cloningFilter::addSourceEndpoint(const std::string &sourceName)
+void CloningFilter::addSourceEndpoint(const std::string &sourceName)
 {
     auto filtid=corePtr->registerSourceFilter(getName(),sourceName,std::string(),std::string());
     sourceFilters.push_back(filtid);
@@ -225,7 +225,7 @@ void cloningFilter::addSourceEndpoint(const std::string &sourceName)
     corePtr->setFilterOperator(filtid, filtOp->getOperator());
 }
 
-void cloningFilter::addDestinationEndpoint(const std::string &destinationName)
+void CloningFilter::addDestinationEndpoint(const std::string &destinationName)
 {
     auto filtid = corePtr->registerDestinationFilter(getName(), destinationName, std::string(), std::string());
     destFilters.push_back(filtid);
@@ -233,13 +233,13 @@ void cloningFilter::addDestinationEndpoint(const std::string &destinationName)
     corePtr->setFilterOperator(filtid, filtOp->getOperator());
 }
 
-void cloningFilter::addDeliveryEndpoint(const std::string &endpoint)
+void CloningFilter::addDeliveryEndpoint(const std::string &endpoint)
 {
     Filter::setString("add delivery", endpoint);
 }
 
 
-void cloningFilter::removeSourceEndpoint(const std::string &sourceName)
+void CloningFilter::removeSourceEndpoint(const std::string &sourceName)
 {
     for (size_t ii=0;ii<sourceEndpoints.size();++ii)
     {
@@ -251,7 +251,7 @@ void cloningFilter::removeSourceEndpoint(const std::string &sourceName)
    
 }
 
-void cloningFilter::removeDestinationEndpoint(const std::string &destinationName)
+void CloningFilter::removeDestinationEndpoint(const std::string &destinationName)
 {
     for (size_t ii = 0; ii<destEndpoints.size(); ++ii)
     {
@@ -263,13 +263,13 @@ void cloningFilter::removeDestinationEndpoint(const std::string &destinationName
     
 }
 
-void cloningFilter::removeDeliveryEndpoint(const std::string &endpoint)
+void CloningFilter::removeDeliveryEndpoint(const std::string &endpoint)
 {
     Filter::setString("remove delivery", endpoint);
 }
 
 
-void cloningFilter::setString(const std::string &property, const std::string &val)
+void CloningFilter::setString(const std::string &property, const std::string &val)
 {
     if (property == "source")
     {
