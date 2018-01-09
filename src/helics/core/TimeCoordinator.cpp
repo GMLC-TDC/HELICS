@@ -99,6 +99,12 @@ void TimeCoordinator::updateNextPossibleEventTime ()
     if (!iterating)
     {
         time_next = time_granted + info.timeDelta + info.lookAhead;
+        //the next time must fall on a period boundary
+        if (info.period > timeEpsilon)
+        {
+            auto blk = static_cast<int> (std::ceil((time_next - time_granted) / info.period));
+            time_next = time_granted + blk * info.period;
+        }
     }
     else
     {

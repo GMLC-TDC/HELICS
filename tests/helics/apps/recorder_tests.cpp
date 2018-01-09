@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <cstdio>
 
 #include "exeTestHelper.h"
-#include "helics/special_federates/recorder.h"
+#include "helics/apps/recorder.h"
 #include "helics/application_api/Publications.hpp"
 #include "helics/core/BrokerFactory.h"
 #include "helics/common/stringToCmdLine.h"
@@ -438,5 +438,113 @@ BOOST_AUTO_TEST_CASE(recorder_test_srcendpoint_clone)
 
     auto m = rec1.getMessage(0);
     BOOST_CHECK_EQUAL(m->data.to_string(), "this is a test message");
+}
+
+
+BOOST_AUTO_TEST_CASE(recorder_test_endpoint_clone)
+{
+    helics::FederateInfo fi("rec1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core2";
+    fi.coreInitString = "3";
+    helics::recorder rec1(fi);
+    fi.period = 1.0;
+    fi.name = "block1";
+
+    helics::MessageFederate mfed(fi);
+
+    fi.name = "block2";
+
+    helics::MessageFederate mfed2(fi);
+    helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
+    helics::Endpoint e2(helics::GLOBAL, &mfed2, "d2");
+
+    rec1.addDestEndpointClone("d1");
+    rec1.addSourceEndpointClone("d1");
+
+    auto fut = std::async(std::launch::async, [&rec1]() {rec1.run(5.0); });
+    mfed2.enterExecutionStateAsync();
+    mfed.enterExecutionState();
+    mfed2.enterExecutionStateFinalize();
+
+    mfed2.requestTimeAsync(1.0);
+    auto retTime = mfed.requestTime(1.0);
+    mfed2.requestTimeFinalize();
+
+    e1.send("d2", "this is a test message");
+    BOOST_CHECK_EQUAL(retTime, 1.0);
+
+    e2.send("d1", "this is a test message2");
+
+    mfed2.requestTimeAsync(2.0);
+    retTime = mfed.requestTime(2.0);
+    BOOST_CHECK_EQUAL(retTime, 2.0);
+    mfed2.requestTimeFinalize();
+
+    mfed.finalize();
+    mfed2.finalize();
+    fut.get();
+    BOOST_CHECK_EQUAL(rec1.messageCount(), 2);
+
+    auto m = rec1.getMessage(0);
+    BOOST_CHECK_EQUAL(m->data.to_string(), "this is a test message");
+}
+
+
+const std::vector<std::string> simple_clone_test_files
+{ "clone_example1.txt", "clone_example2.txt","clone_example3.txt", "clone_example4.txt",
+"clone_example5.txt", "clone_example6.txt","clone_example7.json", "clone_example8.JSON" };
+
+BOOST_DATA_TEST_CASE(simple_clone_test_file, boost::unit_test::data::make(simple_clone_test_files), file)
+{
+    helics::FederateInfo fi("rec1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core2";
+    fi.coreInitString = "3";
+    helics::recorder rec1(fi);
+    fi.period = 1.0;
+    fi.name = "block1";
+
+    helics::MessageFederate mfed(fi);
+
+    fi.name = "block2";
+
+    helics::MessageFederate mfed2(fi);
+    helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
+    helics::Endpoint e2(helics::GLOBAL, &mfed2, "d2");
+
+    rec1.loadFile(std::string(TEST_DIR) + "/test_files/" + file);
+
+    auto fut = std::async(std::launch::async, [&rec1]() {rec1.run(5.0); });
+    mfed2.enterExecutionStateAsync();
+    mfed.enterExecutionState();
+    mfed2.enterExecutionStateFinalize();
+
+    mfed2.requestTimeAsync(1.0);
+    auto retTime = mfed.requestTime(1.0);
+    mfed2.requestTimeFinalize();
+
+    e1.send("d2", "this is a test message");
+    BOOST_CHECK_EQUAL(retTime, 1.0);
+
+    e2.send("d1", "this is a test message2");
+
+    mfed2.requestTimeAsync(2.0);
+    retTime = mfed.requestTime(2.0);
+    BOOST_CHECK_EQUAL(retTime, 2.0);
+    mfed2.requestTimeFinalize();
+
+    mfed.finalize();
+    mfed2.finalize();
+    fut.get();
+    BOOST_CHECK_EQUAL(rec1.messageCount(), 2);
+
+    auto m = rec1.getMessage(0);
+    BOOST_CHECK(m);
+    if (m)
+    {
+        BOOST_CHECK_EQUAL(m->data.to_string(), "this is a test message");
+    }
+    
 }
 BOOST_AUTO_TEST_SUITE_END ()

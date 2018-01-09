@@ -4,7 +4,7 @@
 
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 ##############################################################################
-set(special-federates_library_headers
+set(helics_apps_library_headers
 	player.h
 	recorder.h
 	PrecHelper.h
@@ -12,7 +12,7 @@ set(special-federates_library_headers
 	source.h
 	)
 
-set(special-federates_library_files
+set(helics_apps_library_files
 	player.cpp
 	recorder.cpp
 	PrecHelper.cpp
@@ -20,18 +20,18 @@ set(special-federates_library_files
 	source.cpp
 )
 
-add_library(special-federates-static STATIC ${special-federates_library_files} ${special-federates_library_headers})
+add_library(helics_apps-static STATIC ${helics_apps_library_files} ${helics_apps_library_headers})
 
 if (BUILD_PLAYER)
 add_executable(helics_player playerMain.cpp)
-target_link_libraries(helics_player special-federates-static helics-static)
+target_link_libraries(helics_player helics_apps-static helics-static)
 
 endif()
 
 
 if (BUILD_RECORDER)
 add_executable(helics_recorder recorderMain.cpp)
-target_link_libraries(helics_recorder special-federates-static helics-static)
+target_link_libraries(helics_recorder helics_apps-static helics-static)
 
 endif()
 
@@ -39,7 +39,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 
 
-INSTALL(TARGETS special-federates-static EXPORT helics-targets
+INSTALL(TARGETS helics_apps-static EXPORT helics-targets
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 	

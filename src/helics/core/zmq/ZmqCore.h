@@ -22,7 +22,9 @@ class ZmqCore final: public CommsBroker<ZmqComms,CommonCore> {
 public:
 	/** default constructor*/
   ZmqCore() noexcept;
+  /** construct from with a core name*/
   ZmqCore(const std::string &core_name);
+  /** destructor*/
   ~ZmqCore();
   virtual void initializeFromArgs (int argc, const char * const *argv) override;
          

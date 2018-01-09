@@ -10,8 +10,8 @@ add_subdirectory(application_api)
 
 install(FILES flag-definitions.h helics.hpp DESTINATION include/helics)
 
-IF(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_SPECIAL)
-add_subdirectory(special_federates)
+IF(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_APPS)
+add_subdirectory(apps)
 ENDIF()
 
 if (BUILD_C_SHARED_LIB OR BUILD_PYTHON OR BUILD_MATLAB OR BUILD_JAVA)

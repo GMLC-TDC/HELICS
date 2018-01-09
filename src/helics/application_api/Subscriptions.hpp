@@ -131,7 +131,7 @@ class Subscription : public SubscriptionBase
     /** check if the value has been updated*/
     virtual bool isUpdated () const override;
 
-    /** store the value in the given variable
+    /** get the latest value for the subscription
     @param[out] out the location to store the value
     */
     template <class X>

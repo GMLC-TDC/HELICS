@@ -13,8 +13,8 @@ if (BUILD_C_SHARED_LIB)
     add_subdirectory(c_interface)
 endif()
 
-if(BUILD_PLAYER OR BUILD_RECORDER)
-    add_subdirectory(player_recorder)
+if(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_APPS)
+    add_subdirectory(apps)
 endif()
 
 if (TRAVIS_TESTS_ENABLE)

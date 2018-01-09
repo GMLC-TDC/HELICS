@@ -1,0 +1,4 @@
+#test for clone interface
+
+sourceclone d1
+sourceclone d2

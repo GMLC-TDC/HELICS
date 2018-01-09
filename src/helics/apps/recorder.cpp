@@ -178,8 +178,10 @@ namespace helics
 
         std::ifstream infile(textFile);
         std::string str;
+        int lc = 0;
         while (std::getline(infile, str))
         {
+            ++lc;
             if (str.empty())
             {
                 continue;
@@ -205,7 +207,7 @@ namespace helics
                 {
                     addEndpoint(removeQuotes(blk[1]));
                 }
-                else if ((blk[0] == "sourceclone") || (blk[0] == "source"))
+                else if ((blk[0] == "sourceclone") || (blk[0] == "source")||(blk[0]=="src"))
                 {
                     addSourceEndpointClone(removeQuotes(blk[1]));
                 }
@@ -217,6 +219,31 @@ namespace helics
                 {
                     addSourceEndpointClone(removeQuotes(blk[1]));
                     addDestEndpointClone(removeQuotes(blk[1]));
+                }
+                else
+                {
+                    std::cerr << "Unable to process line " << lc <<':'<< str << '\n';
+                }
+                break;
+            case 3:
+                if (blk[0] == "clone")
+                {
+                    if ((blk[1] == "source")||(blk[1]=="src"))
+                    {
+                        addSourceEndpointClone(removeQuotes(blk[2]));
+                    }
+                    else if ((blk[1] == "dest") || (blk[1] == "destination"))
+                    {
+                        addDestEndpointClone(removeQuotes(blk[2]));
+                    }
+                    else
+                    {
+                        std::cerr << "Unable to process line " << lc <<':'<< str << '\n';
+                    }
+                }
+                else
+                {
+                    std::cerr << "Unable to process line " << lc << ':' << str << '\n';
                 }
                 break;
             default:
