@@ -106,7 +106,7 @@ int main()
     yprv = y;
   }
 
-  status = helicsFinalize(vfed);
+  status = helicsFederateFinalize(vfed);
   printf("NLIN2: Federate finalized\n");
   fflush(NULL);
   //clean upFederate;

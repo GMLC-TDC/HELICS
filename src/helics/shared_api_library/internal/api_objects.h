@@ -28,13 +28,13 @@ namespace helics
 	class Endpoint;
 	class SourceFilter;
 	class DestinationFilter;
+    class CloningFilter;
 
 	enum class vtype:int
 	{
 		genericFed,
 		valueFed,
 		messageFed,
-		filterFed,
 		combinFed,
 	};
 
@@ -109,8 +109,8 @@ namespace helics
 	public:
 		std::unique_ptr<SourceFilter> filtptr;
 		std::shared_ptr<Federate> fedptr;
-		std::unique_ptr<Message> lastMessage;
 	};
+
 	/** object wrapping a destination Filter*/
 	class DestFilterObject
 	{
@@ -119,13 +119,24 @@ namespace helics
 		std::shared_ptr<Federate> fedptr;
 	};
 
+    /** object wrapping a destination Filter*/
+    class CloneFilterObject
+    {
+    public:
+        std::unique_ptr<CloningFilter> filtptr;
+        std::shared_ptr<Federate> fedptr;
+    };
+
+    /** object representing a query*/
 	class queryObject
 	{
 	public:
-		std::string target;
-		std::string query;
-		std::string response;
-
+		std::string target; //!< the target of the query
+		std::string query; //!< the actual query itself
+		std::string response;   //!< the response to the query
+        query_id_t asyncIndexCode=invalid_id_value;  //!< the index to use for the queryComplete call
+        bool activeAsync = false;
+        std::shared_ptr<Federate> activeFed; //!< pointer to the fed with the active Query
 	};
 }
 
@@ -137,7 +148,7 @@ std::shared_ptr<helics::Federate> getFedSharedPtr(helics_federate fed);
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(helics_value_federate fed);
 std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(helics_message_federate fed);
 
-/** class for containing all the objects associated with a federate*/
+/** class for containing all the objects associated with a federation*/
 class masterObjectHolder
 {
 private:

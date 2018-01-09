@@ -68,7 +68,7 @@ helics_subscription helicsRegisterSubscription (helics_value_federate fed, const
     try
     {
         sub = new helics::SubscriptionObject ();
-        sub->id = fedObj->registerOptionalSubscription (key, type, (units==nullptr)?nullStr:std::string(units));
+        sub->id = fedObj->registerRequiredSubscription (key, type, (units==nullptr)?nullStr:std::string(units));
         sub->rawOnly = true;
         sub->fedptr = std::move (fedObj);
         addSubscription (fed, sub);
@@ -100,7 +100,7 @@ helics_subscription helicsRegisterTypeSubscription (helics_value_federate fed, c
     try
     {
         sub = new helics::SubscriptionObject ();
-        sub->subptr = std::make_unique<helics::Subscription> (fedObj.get (), key, (units == nullptr) ? nullStr : std::string(units));
+        sub->subptr = std::make_unique<helics::Subscription> (fedObj.get (), key, static_cast<helics::helicsType_t>(type), (units == nullptr) ? nullStr : std::string(units));
         sub->fedptr = std::move (fedObj);
         addSubscription (fed, sub);
         return reinterpret_cast<helics_subscription> (sub);
@@ -111,6 +111,83 @@ helics_subscription helicsRegisterTypeSubscription (helics_value_federate fed, c
     }
     return nullptr;
 }
+
+/* sub/pub registration */
+helics_subscription helicsRegisterOptionalSubscription(helics_value_federate fed, const char *key, const char *type, const char *units)
+{
+    if ((type == nullptr) || (std::string(type).empty()))
+    {  //empty type should default to a regular subscription
+        auto fedObj = getValueFedSharedPtr(fed);
+        if (!fedObj)
+        {
+            return nullptr;
+        }
+        auto *sub = new helics::SubscriptionObject();
+        sub->subptr = std::make_unique<helics::Subscription>(false, fedObj.get(), key, (units == nullptr) ? nullStr : std::string(units));
+        sub->fedptr = std::move(fedObj);
+        addSubscription(fed, sub);
+        return reinterpret_cast<helics_subscription> (sub);
+    }
+    auto htype = helics::getTypeFromString(type);
+    if (htype != helics::helicsType_t::helicsInvalid)
+    {
+        return helicsRegisterOptionalTypeSubscription(fed, key, static_cast<int> (htype), units);
+    }
+    // now generate a generic subscription if we have an unrecognized type
+    auto fedObj = getValueFedSharedPtr(fed);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    helics::SubscriptionObject *sub = nullptr;
+    try
+    {
+        sub = new helics::SubscriptionObject();
+        sub->id = fedObj->registerOptionalSubscription(key, type, (units == nullptr) ? nullStr : std::string(units));
+        sub->rawOnly = true;
+        sub->fedptr = std::move(fedObj);
+        addSubscription(fed, sub);
+        return reinterpret_cast<helics_subscription> (sub);
+    }
+    catch (const helics::InvalidFunctionCall &)
+    {
+        delete sub;
+    }
+    return nullptr;
+}
+
+helics_subscription helicsRegisterOptionalTypeSubscription(helics_value_federate fed, const char *key, int type, const char *units)
+{
+    if ((type < 0) || (type > HELICS_VECTOR_TYPE))
+    {
+        if (type == HELICS_RAW_TYPE)
+        {
+            return helicsRegisterOptionalSubscription(fed, key, "", units);
+        }
+        return nullptr;
+    }
+    auto fedObj = getValueFedSharedPtr(fed);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+
+    helics::SubscriptionObject *sub = nullptr;
+    try
+    {
+        sub = new helics::SubscriptionObject();
+        sub->subptr = std::make_unique<helics::Subscription>(false,fedObj.get(), key, static_cast<helics::helicsType_t>(type), (units == nullptr) ? nullStr : std::string(units));
+        sub->fedptr = std::move(fedObj);
+        addSubscription(fed, sub);
+        return reinterpret_cast<helics_subscription> (sub);
+    }
+    catch (const helics::InvalidFunctionCall &)
+    {
+        delete sub;
+    }
+    return nullptr;
+}
+
 
 helics_publication helicsRegisterPublication (helics_value_federate fed, const char *key, const char *type, const char *units)
 {

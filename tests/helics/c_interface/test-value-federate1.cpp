@@ -64,17 +64,17 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types),
 
 	BOOST_CHECK(status == helicsOK);
 
-	// BOOST_CHECK(vFed1->currentState() == helics::Federate::op_states::execution);
+	// BOOST_CHECK(vFed1->getCurrentState() == helics::Federate::op_states::execution);
 
-	status = helicsFinalize(vFed);
+	status = helicsFederateFinalize(vFed);
 
 	//vFed1->finalize();
 
 	BOOST_CHECK(status == helicsOK);
 
-	//BOOST_CHECK(vFed1->currentState() == helics::Federate::op_states::finalize);
+	//BOOST_CHECK(vFed1->getCurrentState() == helics::Federate::op_states::finalize);
 
-	status = helicsFinalize(vFed);
+	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
 	helicsCloseLibrary();
@@ -151,11 +151,11 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
 	BOOST_CHECK (vFed1->getPublicationId ("pub2") == pubid2);
 	BOOST_CHECK (vFed1->getPublicationId ("fed0/pub1") == pubid);*/
 
-	status = helicsFinalize(vFed);
+	status = helicsFederateFinalize(vFed);
 
 	BOOST_CHECK(status == helicsOK);
 
-	status = helicsFinalize(vFed);
+	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
 	helicsCloseLibrary();
@@ -208,7 +208,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
 	BOOST_CHECK(status == helicsOK);
     //vFed1->enterExecutionState ();
 
-    // BOOST_CHECK (vFed->currentState () == helics::Federate::op_states::execution);
+    // BOOST_CHECK (vFed->getCurrentState () == helics::Federate::op_states::execution);
 
 	status = helicsGetSubscriptionKey(subid,subname,100);
 	status = helicsGetSubscriptionKey(subid2, subname2, 100);
@@ -239,13 +239,13 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
 
     //BOOST_CHECK (vFed1->getSubscriptionId ("Shortcut") == subid); //not relevant for C-API as subscription shortcuts and IDs are relevant for C++ API only
 
-	status = helicsFinalize(vFed);
+	status = helicsFederateFinalize(vFed);
 
 	BOOST_CHECK(status == helicsOK);
     //vFed1->finalize ();
 
-    //BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
-	status = helicsFinalize(vFed);
+    //BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
+	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
 	helicsCloseLibrary();
@@ -319,10 +319,10 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 	status = helicsGetPublicationUnits(pubid3, pubunit3, 100);
 	BOOST_CHECK_EQUAL(pubunit3, "V");
 
-	status = helicsFinalize(vFed);
+	status = helicsFederateFinalize(vFed);
 	BOOST_CHECK(status == helicsOK);
 
-	status = helicsFinalize(vFed);
+	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
 	helicsCloseLibrary();
@@ -352,7 +352,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     // enter execution
     //vFed1->enterExecutionState ();
 
-    //BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::execution);
+    //BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
     // check subscriptions
     //auto sv = vFed1->getSubscriptionName (subid);
     //auto sv2 = vFed1->getSubscriptionName (subid2);
@@ -377,7 +377,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     //BOOST_CHECK_EQUAL (vFed1->getPublicationUnits (pubid3), "V");
     //vFed1->finalize ();
 
-    //BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
+    //BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
 
 }
 
@@ -446,10 +446,10 @@ BOOST_DATA_TEST_CASE(value_federate_subscriber_and_publisher_registration,
 	status = helicsGetPublicationUnits(pubid3, pubunit3, 100);
 	BOOST_CHECK_EQUAL(pubunit3, "V");
 
-	status = helicsFinalize(vFed);
+	status = helicsFederateFinalize(vFed);
 	BOOST_CHECK(status == helicsOK);
 
-	status = helicsFinalize(vFed);
+	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
 	helicsCloseLibrary();
@@ -481,7 +481,7 @@ BOOST_DATA_TEST_CASE(value_federate_subscriber_and_publisher_registration,
     // enter execution
     //vFed1->enterExecutionState();
 
-    //BOOST_CHECK(vFed1->currentState() == helics::Federate::op_states::execution);
+    //BOOST_CHECK(vFed1->getCurrentState() == helics::Federate::op_states::execution);
     // check subscriptions
     //auto sv = subid1.getName();
     //auto sv2 = subid2.getName();
@@ -508,7 +508,7 @@ BOOST_DATA_TEST_CASE(value_federate_subscriber_and_publisher_registration,
     //BOOST_CHECK_EQUAL(pubid3.getUnits(), "V");
     //vFed1->finalize();
 
-    //BOOST_CHECK(vFed1->currentState() == helics::Federate::op_states::finalize);
+    //BOOST_CHECK(vFed1->getCurrentState() == helics::Federate::op_states::finalize);
 }
 
 
@@ -565,7 +565,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
 	retValue = helicsGetValue(subid, s, 100);
 	BOOST_CHECK_EQUAL(s, "string2");
 
-	status = helicsFinalize(vFed);
+	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
 	helicsCloseLibrary();
@@ -663,7 +663,7 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer_publisher, bdata::make(core_
 	retValue = helicsGetValue(subid, s, 100);
 	BOOST_CHECK_EQUAL(s, "string2");
 
-	status = helicsFinalize(vFed);
+	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
 	helicsCloseLibrary();

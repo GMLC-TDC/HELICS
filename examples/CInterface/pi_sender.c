@@ -92,7 +92,7 @@ int main()
     currenttime = helicsRequestTime(vfed,currenttime);
   }
 
-  status = helicsFinalize(vfed);
+  status = helicsFederateFinalize(vfed);
   printf("PI SENDER: Federate finalized\n");
 
   helicsFreeFederate(vfed);

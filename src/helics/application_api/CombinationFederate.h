@@ -24,7 +24,7 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     /** default constructor*/
     CombinationFederate ();
     /**constructor taking a federate information structure and using the default core
-    @param[in] fi  a federate information structure
+    @param fi  a federate information structure
     */
     CombinationFederate (const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core

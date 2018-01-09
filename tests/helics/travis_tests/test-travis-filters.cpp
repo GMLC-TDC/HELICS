@@ -48,22 +48,22 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
 
     fFed->enterExecutionStateAsync ();
     mFed->enterExecutionState ();
-    fFed->enterExecutionStateFinalize ();
+    fFed->enterExecutionStateComplete();
 
-    BOOST_CHECK (fFed->currentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
     mFed->requestTimeAsync (1.0);
     fFed->requestTime (1.0);
-    mFed->requestTimeFinalize ();
+    mFed->requestTimeComplete ();
 
     auto res = mFed->hasMessage ();
     BOOST_CHECK (!res);
 
     mFed->requestTimeAsync (2.0);
     fFed->requestTime (2.0);
-    mFed->requestTimeFinalize ();
+    mFed->requestTimeComplete ();
     BOOST_REQUIRE (!mFed->hasMessage (p2));
 
     fFed->requestTimeAsync (3.0);
@@ -79,10 +79,10 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     BOOST_CHECK_EQUAL (m2->time, 2.5);
 
     mFed->requestTime (3.0);
-    fFed->requestTimeFinalize ();
+    fFed->requestTimeComplete ();
     mFed->finalize ();
     fFed->finalize ();
-    BOOST_CHECK (fFed->currentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
 /** test two filter operators
@@ -110,22 +110,22 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
 
     fFed->enterExecutionStateAsync ();
     mFed->enterExecutionState ();
-    fFed->enterExecutionStateFinalize ();
+    fFed->enterExecutionStateComplete();
 
-    BOOST_CHECK (fFed->currentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
     mFed->requestTimeAsync (1.0);
     fFed->requestTime (1.0);
-    mFed->requestTimeFinalize ();
+    mFed->requestTimeComplete ();
 
     auto res = mFed->hasMessage ();
     BOOST_CHECK (!res);
     mFed->sendMessage (p2, "port1", data);
     mFed->requestTimeAsync (2.0);
     fFed->requestTime (2.0);
-    mFed->requestTimeFinalize ();
+    mFed->requestTimeComplete ();
     BOOST_REQUIRE (!mFed->hasMessage (p2));
 
     mFed->requestTime (3.0);
@@ -144,7 +144,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     BOOST_CHECK (mFed->hasMessage (p1));
     mFed->finalize ();
     fFed->finalize ();
-    BOOST_CHECK (fFed->currentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

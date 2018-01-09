@@ -86,10 +86,10 @@ class Federate
         finalize,  //!< the federate has finished executing normally final values may be retrieved
         error,  //!< error state no core communication is possible but values can be retrieved
         // the following states are for asynchronous operations
-        pendingInit,  //!< indicator that the federate is pending entry to initialization state
-        pendingExec,  //!< state pending EnterExecution State
-        pendingTime,  //!< state that the federate is pending a timeRequest
-        pendingIterativeTime,  //!< state that the federate is pending an iterative time request
+        pending_init,  //!< indicator that the federate is pending entry to initialization state
+        pending_exec,  //!< state pending EnterExecution State
+        pending_time,  //!< state that the federate is pending a timeRequest
+        pending_iterative_time,  //!< state that the federate is pending an iterative time request
     };
 
   protected:
@@ -139,10 +139,10 @@ class Federate
     /** called after one of the async calls and will indicate true if an async operation has completed
     @details only call from the same thread as the one that called the initial async call and will return false
     if called when no aysnc operation is in flight*/
-    bool asyncOperationCompleted () const;
+    bool isAsyncOperationCompleted () const;
     /** second part of the async process for entering initializationState call after a call to
     enterInitializationStateAsync if call any other time it will throw an invalidFunctionCall exception*/
-    void enterInitializationStateFinalize ();
+    void enterInitializationStateComplete ();
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
@@ -151,17 +151,17 @@ class Federate
     @details call will block until all federates have entered this mode
     */
     void enterExecutionStateAsync (iteration_request iterate = iteration_request::no_iterations);
-    /** finalize the async call for entering Execution state
+    /** complete the async call for entering Execution state
     @details call will not block but will return quickly.  The enterInitializationStateFinalize must be called
     before doing other operations
     */
-    iteration_result enterExecutionStateFinalize ();
+    iteration_result enterExecutionStateComplete ();
     /** terminate the simulation
     @details call is normally non-blocking, but may block if called in the midst of an
-    asynchronous call sequence, not core calling commands may be called */
+    asynchronous call sequence, no core calling commands may be called after completion of this function */
     void finalize ();
 
-    /** disconnect a simulation from the core */
+    /** disconnect a simulation from the core (will also call finalize before disconnecting if necessary)*/
     virtual void disconnect(); 
     /** specify the simulator had an unrecoverable error
      */
@@ -196,11 +196,11 @@ class Federate
     /** request a time advancement
     @param[in] the next requested time step
     @return the granted time step*/
-    Time requestTimeFinalize ();
+    Time requestTimeComplete ();
 
     /** finalize the time advancement request
     @return the granted time step*/
-    iterationTime requestTimeIterativeFinalize ();
+    iterationTime requestTimeIterativeComplete ();
 
     /** set the minimum time delta for the federate
     @param[in] tdelta the minimum time delta to return from a time request function
@@ -265,18 +265,18 @@ class Federate
     a federate, core, or broker
     @param queryStr a string with the query see other documentation for specific properties to query, can be
     defined by the federate
-    @return an integer used to get the results of the query in the future
+    @return a query_id_t to use for returning the result
     */
-    int queryAsync (const std::string &target, const std::string &queryStr);
+    query_id_t queryAsync (const std::string &target, const std::string &queryStr);
 
     /** make a query of the core in an async fashion
     @details this call is blocking until the value is returned which make take some time depending on the size of
     the federation and the specific string being queried
     @param queryStr a string with the query see other documentation for specific properties to query, can be
     defined by the federate
-    @return an integer used to get the results of the query in the future
+    @return a query_id_t used to get the results of the query in the future
     */
-    int queryAsync (const std::string &queryStr);
+    query_id_t queryAsync (const std::string &queryStr);
 
     /** get the results of an async query
     @details the call will block until the results are returned inquiry of queryCompleted() to check if the results
@@ -285,12 +285,12 @@ class Federate
     @param queryIndex the int value returned from the queryAsync call
    @return a string with the value requested.  the format of the string will be either a single string a string vector like "[string1; string2]" or json The string "#invalid" is returned if the query was not valid
     */
-    std::string queryFinalize (int queryIndex);
+    std::string queryComplete (query_id_t queryIndex);
 
     /** check if an asynchronous query call has been completed
     @return true if the results are ready for @queryFinalize
     */
-    bool queryCompleted (int queryIndex) const;
+    bool isQueryCompleted (query_id_t queryIndex) const;
 
     /** define a filter interface on a source
     @details a source filter will be sent any packets that come from a particular source
@@ -398,7 +398,7 @@ class Federate
     /** get the underlying federateID for the core*/
     unsigned int getID () const noexcept { return fedID; }
     /** get the current state of the federate*/
-    op_states currentState () const { return state; }
+    op_states getCurrentState () const { return state; }
     /** get the current Time
     @details the most recent granted time of the federate*/
     Time getCurrentTime () const { return currentTime; }

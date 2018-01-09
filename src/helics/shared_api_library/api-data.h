@@ -18,51 +18,83 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 extern "C" {
 #endif
 
-/* Type definitions */
+/** enumeration of return values from the C interface functions 
+*/
 typedef enum {
-    helicsOK,
-    helicsDiscard,
-    helicsWarning,
-    helicsError,
+	helicsInvalidObject,  //!< indicator that the object used was not a valid object
+    helicsOK,	//!< the function executed successfully
+    helicsDiscard,	//<! the input was discarded for some reason
+    helicsWarning,	//!< the function issued a warning of some kind
+    helicsError,	//!< the function produced an error
 } helicsStatus;
 
+/** opaque object representing a subscription*/
 typedef void *helics_subscription;
+/** opaque object representing a publication*/
 typedef void *helics_publication;
+/** opaque object representing an endpoint*/
 typedef void *helics_endpoint;
+/** opaque object representing a source filter*/
 typedef void *helics_source_filter;
+/** opaque object representing a destination filter*/
 typedef void *helics_destination_filter;
+/** opaque object representing a cloning filter*/
+/** opaque object representing a core */
 typedef void *helics_core;
+/** opaque object representing a broker*/
 typedef void *helics_broker;
 
+/** opaque object representing a federate*/
 typedef void *helics_federate;
+/** opaque object representing a value federate
+@details this is a specialization of a \ref helics_federate */
 typedef void *helics_value_federate;
+/** opaque object representing a message federate
+@details this is a specialization of a \ref helics_federate */
 typedef void *helics_message_federate;
-typedef void *helics_message_filter_federate;
-typedef void *helics_combo_federate;
 
+/** opaque object representing a filter info object structure*/
 typedef void *helics_federate_info_t;
+/** opauque object representing a query*/
 typedef void *helics_query;
 
+/** time definition used in the C interface to helics*/
 typedef double helics_time_t;
 
 /** enumeration of the different iteration results*/
 typedef enum {
-    no_iteration,
-    force_iteration,  // input only
-    iterate_if_needed,
+    no_iteration, //!< no iteraton is requested
+    force_iteration,	//!< force iteration return when able
+    iterate_if_needed,	//!< only return an iteration if necessary
 } iteration_request;
 
+/** enumeration of possible return values from an iterative time request*/
 typedef enum {
-    next_step,
-    error,  // input only
-    halted,
-    iterating
+    next_step,  //!< the iterations have progressed to the next time
+    iteration_error,	//!< there was an error
+    iteration_halted,	//!< the federation has halted
+    iterating	//!< the federate is iterating at current time
 } iteration_status;
 
+/** enumeration of possible federate states*/
+typedef enum {
+    helics_startup = 0,  //!< when created the federate is in startup state
+    helics_initialization,  //!< entered after the enterInitializationState call has returned
+    helics_execution,  //!< entered after the enterExectuationState call has returned
+    helics_finalize,  //!< the federate has finished executing normally final values may be retrieved
+    helics_error,  //!< error state no core communication is possible but values can be retrieved
+            // the following states are for asynchronous operations
+            helics_pending_init,  //!< indicator that the federate is pending entry to initialization state
+            helics_pending_exec,  //!< state pending EnterExecution State
+            helics_pending_time,  //!< state that the federate is pending a timeRequest
+            helics_pending_iterative_time,  //!< state that the federate is pending an iterative time request
+} federate_state;
+
+/** return structure from an iterative time request*/
 typedef struct helics_iterative_time
 {
-    helics_time_t time;
-    iteration_status status;
+    helics_time_t time; //!< the current federate time
+    iteration_status status;	//!< the status of the iterations
 } helics_iterative_time;
 
 /**
@@ -72,8 +104,8 @@ typedef struct helics_iterative_time
  */
 typedef struct data_t
 {
-    char *data;
-    int64_t length;
+    char *data;  //!< pointer to the data
+    int64_t length;	//!< the size of the data
 } data_t;
 
 /**
@@ -84,9 +116,10 @@ typedef struct message_t
     helics_time_t time;  //!< message time
     const char *data;  //!< message data
     int64_t length;  //!< message length
-    const char *origsrc;  //!< original source
     const char *src;  //!< the most recent source
     const char *dst;  //!< the final destination
+    const char *origsrc;  //!< original source
+    const char *origdest; //!< the orginal destination of the message
 
 } message_t;
 

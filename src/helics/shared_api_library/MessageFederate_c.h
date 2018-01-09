@@ -16,8 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 extern "C" {
 #endif
 
-HELICS_Export helics_message_federate helicsCreateMessageFederate (const helics_federate_info_t fi);
-HELICS_Export helics_message_federate helicsCreateMessageFederateFromFile (const char *fileName);
+
 // MESSAGE FEDERATE calls
 
 HELICS_Export helics_endpoint helicsRegisterEndpoint (helics_message_federate fed, const char *name, const char *type);
