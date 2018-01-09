@@ -999,21 +999,9 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer_integer2, bdata::make(core_t
 	char datatype[20] = "integer";
 	runFederateTestInteger(core_type.c_str(), -5, 1241515, -43, datatype);
 }
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_short, bdata::make(core_types), core_type)
-{
-	char datatype[20] = "short";
-	runFederateTestInteger(core_type.c_str(), -5, 23023, -43, datatype);
-}
-
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_unit, bdata::make(core_types), core_type)
-{
-	char datatype[20] = "unit_64_t";
-	runFederateTestInteger(core_type.c_str(), 234252315, 0xFFF1'2345'7124'1412, 23521513412, datatype);
-}
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_float, bdata::make(core_types), core_type)
+/*
+BOOST_DATA_TEST_CASE(value_federate_single_transfer, bdata::make(core_types), core_type)
 {   
-	char datatype[20] = "float";
-	runFederateTestDouble(core_type.c_str(), 10.3f, 45.3f, 22.7f,datatype);
 	//runFederateTest<double> (core_type, 10.3, 45.3, 22.7);
 	//runFederateTest<double> (core_type, 1.0, 0.0, 3.0);
 	//runFederateTest<int> (core_type, 5, 8, 43);
