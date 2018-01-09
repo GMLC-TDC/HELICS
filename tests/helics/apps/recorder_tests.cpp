@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(recorder_test_message)
 }
 
 const std::vector<std::string> simple_files
-{ "example1.recorder",  "example2.record" , "example3rec.json" };
+{ "example1.recorder",  "example2.record" , "example3rec.json","example4rec.json","exampleCapture.txt","exampleCapture.json" };
 
 BOOST_DATA_TEST_CASE(simple_recorder_test_files, boost::unit_test::data::make(simple_files), file)
 {
@@ -547,4 +547,6 @@ BOOST_DATA_TEST_CASE(simple_clone_test_file, boost::unit_test::data::make(simple
     }
     
 }
+
+
 BOOST_AUTO_TEST_SUITE_END ()

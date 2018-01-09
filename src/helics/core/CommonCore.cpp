@@ -1723,19 +1723,19 @@ std::string CommonCore::federateQuery (Core::federate_id_t federateID, const std
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        if (queryStr == "exists")
+        if ((queryStr == "exists")||(queryStr == "exist"))
         {
             return "false";
         }
         return "#invalid";
     }
-    if (queryStr == "exists")
+    if ((queryStr == "exists") || (queryStr == "exist"))
     {
         return "true";
     }
     if (queryStr == "isinit")
     {
-        return (fed->getState () >= helics_federate_state_type::HELICS_INITIALIZING) ? "true" : "false";
+        return (fed->init_transmitted.load()) ? "true" : "false";
     }
     if (queryStr == "state")
     {
@@ -1753,6 +1753,27 @@ std::string CommonCore::query (const std::string &target, const std::string &que
 {
     if ((target == "core") || (target == getIdentifier ()))
     {
+        //TODO:: move to a coreQuery Function
+        if (queryStr == "federates")
+        {
+
+        }
+        else if (queryStr == "publications")
+        {
+
+        }
+        else if (queryStr == "endpoints")
+        {
+
+        }
+        else if (queryStr == "dependencies")
+        {
+
+        }
+        else if (queryStr == "isinit")
+        {
+            return (allInitReady()) ? "true" : "false";
+        }
     }
     else
     {

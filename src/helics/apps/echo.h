@@ -34,8 +34,8 @@ namespace boost
 namespace helics
 {
     
-    /** class implementing a echo object, which will generate endpoint interfaces and send a data message back to the source at the same time as it was received
-    @details  the player class is not threadsafe,  don't try to use it from multiple threads without external protection, that will result in undefined behavior
+    /** class implementing a echo object, which will generate endpoint interfaces and send a data message back to the source at the with a specified delay
+    @details  the echo class is not threadsafe,  don't try to use it from multiple threads without external protection, that will result in undefined behavior
     */
     class echo
     {
@@ -113,6 +113,7 @@ namespace helics
     private:
         std::shared_ptr<MessageFederate> fed; //!< the federate created for the player
         std::vector<Endpoint> endpoints;    //!< the actual endpoint objects
+        Time delayTime = timeZero;  //!< respond to each message with the specified delay
         Time stopTime = Time::maxVal(); //!< the time the player should stop
         size_t echoCounter = 0; //!< the current message index
     };

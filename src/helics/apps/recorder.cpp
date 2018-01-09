@@ -125,6 +125,18 @@ namespace helics
                     file >> JF;
                 }
             }
+            auto tags = JF["tag"];
+            if (tags.is_array())
+            {
+                for (const std::string &tag : tags)
+                {
+                    addSubscription(tag);
+                }
+            }
+            else if (tags.is_string())
+            {
+                addSubscription(tags);
+            }
             auto sourceClone = JF["sourceclone"];
             if (sourceClone.is_array())
             {
@@ -163,6 +175,18 @@ namespace helics
                 addSourceEndpointClone(clones);
                 addDestEndpointClone(clones);
             }
+            auto captures = JF["capture"];
+            if (captures.is_array())
+            {
+                for (const std::string &capture : captures)
+                {
+                    addCapture(capture);
+                }
+            }
+            else if (captures.is_string())
+            {
+                addCapture(captures);
+            }
         }
         catch (const json::exception &je)
         {
@@ -199,7 +223,7 @@ namespace helics
                 addSubscription(removeQuotes(blk[0]));
                 break;
             case 2:
-                if ((blk[0] == "subscription") || (blk[0] == "s") || (blk[0] == "sub"))
+                if ((blk[0] == "subscription") || (blk[0] == "s") || (blk[0] == "sub")||(blk[0]=="tag"))
                 {
                     addSubscription(removeQuotes(blk[1]));
                 }
@@ -214,6 +238,10 @@ namespace helics
                 else if ((blk[0] == "destclone") || (blk[0] == "dest") ||(blk[0]=="destination"))
                 {
                     addDestEndpointClone(removeQuotes(blk[1]));
+                }
+                else if (blk[0] == "capture")
+                {
+                    addCapture(removeQuotes(blk[1]));
                 }
                 else if (blk[0] == "clone")
                 {
@@ -284,8 +312,16 @@ namespace helics
                 json message;
                 message["time"] = static_cast<double>(mess->time);
                 message["src"] = mess->source;
-                message["dest"] = mess->dest;
-                message["message"] = mess->data.to_string();
+                if (mess->dest.compare(mess->dest.size()-6, 6, "cloneE") == 0)
+                {
+                    message["dest"] = mess->original_dest;
+                }
+                else
+                {
+                    message["dest"] = mess->dest;
+                    message["orig_dest"] = mess->original_dest;
+                }
+                message["message"] = encode(mess->data.to_string());
             }
         }
       
@@ -344,6 +380,24 @@ namespace helics
                 addEndpoint(ept.first);
             }
         }
+        loadCaptureInterfaces();
+    }
+
+    void recorder::loadCaptureInterfaces()
+    {
+        for (auto &capt : captureInterfaces)
+        {
+            auto res = waitForInit(fed.get(), capt);
+            if (res)
+            {
+                auto pubs = vectorizeQueryResult(fed->query(capt, "publications"));
+                for (auto &pub : pubs)
+                {
+                    addSubscription(pub);
+                }
+            }
+        }
+        
     }
 
     void recorder::captureForCurrentTime(Time currentTime)
@@ -380,6 +434,12 @@ namespace helics
                 messages.push_back(cloneEndpoint->getMessage());
             }
         }
+    }
+
+
+    std::string recorder::encode(const std::string &str2encode)
+    {
+        return str2encode;
     }
 
     /*run the player*/
@@ -438,7 +498,7 @@ namespace helics
         }
         
     }
-    /** add a subscription to capture*/
+    /** add a subscription to record*/
     void recorder::addSubscription(const std::string &key)
     {
         auto res = subkeys.find(key);
@@ -487,6 +547,10 @@ namespace helics
         cFilt->addDestinationEndpoint(destEndpoint);
     }
 
+    void recorder::addCapture(const std::string &captureDesc)
+    {
+        captureInterfaces.push_back(captureDesc);
+    }
 
     std::pair<std::string, std::string> recorder::getValue(int index) const
     {
@@ -576,15 +640,7 @@ namespace helics
                 for (auto &captFed : captFeds)
                 {
                     auto actCapt = stringOps::removeQuotes(captFed);
-                    auto res = waitForInit(fed.get(), actCapt);
-                    if (res)
-                    {
-                        auto pubs = vectorizeQueryResult(fed->query(captFed, "publications"));
-                        for (auto &pub : pubs)
-                        {
-                            addSubscription(pub);
-                        }
-                    }
+                    captureInterfaces.push_back(actCapt);
                 }
             }
         }

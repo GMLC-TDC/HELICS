@@ -103,7 +103,10 @@ namespace helics
         void addSourceEndpointClone(const std::string &sourceEndpoint);
         /** copy all messages that are going to a specific endpoint*/
         void addDestEndpointClone(const std::string &destEndpoint);
-
+        /** add a capture interface
+        @param captureDesc describes a federate to capture all the interfaces for
+        */
+        void addCapture(const std::string &captureDesc);
         /** save the data to a file*/
         void saveFile(const std::string &filename);
         /** get the number of captured points*/
@@ -148,6 +151,9 @@ namespace helics
         void initialize();
         void generateInterfaces();
         void captureForCurrentTime(Time currentTime);
+        void loadCaptureInterfaces();
+        /** encode the string in base64 if needed otherwise just return the string*/
+        std::string encode(const std::string &str2encode);
     protected:
         std::shared_ptr<CombinationFederate> fed; //!< the federate 
         std::unique_ptr<CloningFilter> cFilt; //!< a pointer to a clone filter
@@ -161,6 +167,7 @@ namespace helics
         std::map<helics::endpoint_id_t, int> eptids; //translate subscription id to index
         std::map<std::string, int> eptNames;    //!< translate endpoint name to index
         std::vector<ValueStats> vStat; //!< storage for statistics capture
+        std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
         std::string mapfile;    //!< file name for the on-line file updater
         std::string outFileName;    //!< the final output file
         Time autoStopTime = Time::maxVal(); //!< the stop time

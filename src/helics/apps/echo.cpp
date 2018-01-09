@@ -189,6 +189,7 @@ void echoArgumentParser (int argc, const char *const *argv, po::variables_map &v
 
 
     config.add_options ()
+        ("delay", po::value<double>(),"the delay with which the echo app echos message")
 		("stop", po::value<double>(), "the time to stop the echo");
 
     // clang-format on
@@ -209,7 +210,7 @@ void echoArgumentParser (int argc, const char *const *argv, po::variables_map &v
     po::variables_map cmd_vm;
     try
     {
-        po::store (po::command_line_parser (argc, argv).options (cmd_line).positional (p).run (), cmd_vm);
+        po::store (po::command_line_parser (argc, argv).options (cmd_line).positional (p).allow_unregistered().run (), cmd_vm);
     }
     catch (std::exception &e)
     {
@@ -234,7 +235,7 @@ void echoArgumentParser (int argc, const char *const *argv, po::variables_map &v
         return;
     }
 
-    po::store (po::command_line_parser (argc, argv).options (cmd_line).positional (p).run (), vm_map);
+    po::store (po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered().positional (p).run (), vm_map);
 
     if (cmd_vm.count ("config-file") > 0)
     {
@@ -253,11 +254,5 @@ void echoArgumentParser (int argc, const char *const *argv, po::variables_map &v
     }
 
     po::notify (vm_map);
-    // check to make sure we have some input file
-    if (vm_map.count ("input") == 0)
-    {
-        std::cout << " no input file specified\n";
-        std::cout << visible << '\n';
-        return;
-    }
+
 }
