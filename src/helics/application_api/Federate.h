@@ -219,19 +219,21 @@ class Federate
     @param[in] tdelta the minimum time delta to return from a time request function
     */
     void setTimeDelta (Time tdelta);
-    /** set the look ahead time
+    /** set the look ahead time or output delay
     @details the look ahead is the propagation time for messages/event to propagate from the Federate
-    the federate
-    @param[in] lookAhead the look ahead time
+    to the outside federation
+    @param[in] outputDelay the value of the time delay (must be >=0)
+    @throws invalid_value when using a time <0
     */
-    void setLookAhead (Time lookAhead);
+    void setOutputDelay (Time outputDelay);
 
     /** set the impact Window time
     @details the impact window is the time window around the time request in which other federates cannot affect
     the federate
-    @param[in] lookAhead the look ahead time
+    @param[in] inputDelay the look ahead time
+    @throws invalid_value when using a time <0
     */
-    void setImpactWindow (Time window);
+    void setInputDelay (Time inputDelay);
     /** set the period and offset of the federate
     @details the federate will on grant time on N*period+offset interval
     @param[in] period the length of time between each subsequent grants

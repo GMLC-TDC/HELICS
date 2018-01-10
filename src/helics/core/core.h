@@ -267,21 +267,21 @@ class Core
     virtual void setTimeDelta (federate_id_t federateID, Time time) = 0;
 
     /**
-     * Set the lookahead time for the specified federate.
+     * Set the outputDelay time for the specified federate.
      *
      * The value is used to determine the interaction amongst various federates as to
      * when a specific federate can influence another
      * @param federateID  the identifier for the federate
-     * @param timeLookAhead
+     * @param timeoutputDelay
      */
-    virtual void setLookAhead (federate_id_t federateID, Time timeLookAhead) = 0;
+    virtual void setOutputDelay (federate_id_t federateID, Time timeoutputDelay) = 0;
     /**
      * Set the period for a specified federate.
      *
      * The value is used to determine the interaction amongst various federates as to
      * when a specific federate can influence another
 	* @param federateID  the identifier for the federate
-	* @param timeLookAhead
+	* @param timeoutputDelay
      */
     virtual void setPeriod (federate_id_t federateID, Time timePeriod) = 0;
     /**
@@ -295,14 +295,14 @@ class Core
     */
     virtual void setTimeOffset (federate_id_t federateID, Time timeOffset) = 0;
     /**
-     * Set the ImpactWindow time.
+     * Set the inputDelay time.
      *
      * The value is used to determine the interaction amongst various federates as to
      * when a specific federate can influence another
 	* @param federateID  the identifier for the federate
 	* @param timeImpact the length of time it take outside message to propagate into a federate
      */
-    virtual void setImpactWindow (federate_id_t federateID, Time timeImpact) = 0;
+    virtual void setInputDelay (federate_id_t federateID, Time timeImpact) = 0;
     /**
     Set the logging level
     @details set the logging level for an individual federate

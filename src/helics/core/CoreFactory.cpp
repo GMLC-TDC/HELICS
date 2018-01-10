@@ -37,6 +37,14 @@ namespace helics
 std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 {
     std::shared_ptr<Core> core;
+    if (type == core_type::DEFAULT)
+    {
+#if HELICS_HAVE_ZEROMQ
+        type = core_type::ZMQ;
+#else
+        type = core_type::UDP;
+#endif
+    }
 
     switch (type)
     {

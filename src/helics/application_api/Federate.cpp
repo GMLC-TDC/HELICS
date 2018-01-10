@@ -376,22 +376,22 @@ void Federate::setTimeDelta (Time tdelta)
     coreObject->setTimeDelta (fedID, tdelta);
 }
 
-void Federate::setLookAhead (Time lookAhead)
+void Federate::setOutputDelay (Time outputDelay)
 {
-    if (lookAhead < timeZero)
+    if (outputDelay < timeZero)
     {
-        throw (InvalidParameterValue ("lookahead must be >=0"));
+        throw (InvalidParameterValue ("outputDelay must be >=0"));
     }
-    coreObject->setLookAhead (fedID, lookAhead);
+    coreObject->setOutputDelay (fedID, outputDelay);
 }
 
-void Federate::setImpactWindow (Time window)
+void Federate::setInputDelay (Time window)
 {
     if (window < timeZero)
     {
         throw (InvalidParameterValue ("Impact Window must be >=0"));
     }
-    coreObject->setImpactWindow (fedID, window);
+    coreObject->setInputDelay (fedID, window);
 }
 
 void Federate::setPeriod (Time period, Time offset)

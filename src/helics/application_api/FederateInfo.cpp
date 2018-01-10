@@ -73,6 +73,15 @@ namespace helics
         {
             timeDelta = vm["timedelta"].as<double>();
         }
+        if (vm.count("inputdelay") > 0)
+        {
+            timeDelta = vm["inputdelay"].as<double>();
+        }
+
+        if (vm.count("outputdelay") > 0)
+        {
+            timeDelta = vm["outputdelay"].as<double>();
+        }
 
         if (vm.count("period") > 0)
         {
@@ -83,9 +92,49 @@ namespace helics
         {
             offset = vm["offset"].as<double>();
         }
-        if (vm.count("max_iterations")>0)
+        if (vm.count("maxiterations")>0)
         {
-            max_iterations = static_cast<int16_t> (vm["maxiterations"].as<int>());
+            maxIterations = static_cast<int16_t> (vm["maxiterations"].as<int>());
+        }
+
+        if (vm.count("flags") > 0)
+        {
+            auto vflag = vm["flags"].as<std::vector<std::string>>();
+            for (auto flag : vflag)
+            {
+                if (flag=="observer")
+                {
+                    observer = true;
+                }
+                else if (flag == "rollback")
+                {
+                    rollback =true;
+                }
+                else if (flag == "only_update_on_change")
+                {
+                    only_update_on_change = true;
+                }
+                else if (flag == "only_transmit_on_change")
+                {
+                    only_transmit_on_change = true;
+                }
+                else if (flag == "source_only")
+                {
+                    source_only = true;
+                }
+                else if (flag == "uninterruptible")
+                {
+                    uninterruptible = true;
+                }
+                else if (flag == "interruptible")  // can use either flag
+                {
+                    uninterruptible = false;
+                }
+                else
+                {
+                    std::cerr << "unrecognized flag " << flag << std::endl;
+                }
+            }
         }
     }
 
@@ -104,7 +153,7 @@ namespace helics
             bool ok = Json_helics::parseFromStream(rbuilder, file, &doc, &errs);
             if (!ok)
             {
-                // should I throw an error here?
+                std::cerr << errs << std::endl;
                 return fi;
             }
         }
@@ -116,7 +165,7 @@ namespace helics
             bool ok = Json_helics::parseFromStream(rbuilder, jstring, &doc, &errs);
             if (!ok)
             {
-                // should I throw an error here?
+                std::cerr << errs << std::endl;
                 return fi;
             }
         }
@@ -175,11 +224,11 @@ namespace helics
         }
         if (doc.isMember("coreInit"))
         {
-            fi.coreInitString = doc["core_init"].asString();
+            fi.coreInitString = doc["coreInit"].asString();
         }
         if (doc.isMember("maxIterations"))
         {
-            fi.max_iterations = static_cast<int16_t> (doc["maxIterations"].asInt());
+            fi.maxIterations = static_cast<int16_t> (doc["maxIterations"].asInt());
         }
         if (doc.isMember("period"))
         {
@@ -214,26 +263,26 @@ namespace helics
             }
         }
 
-        if (doc.isMember("lookAhead"))
+        if (doc.isMember("outputDelay"))
         {
-            if (doc["lookAhead"].isObject())
+            if (doc["outputDelay"].isObject())
             {
                 // TODO:: something about units yet
             }
             else
             {
-                fi.lookAhead = doc["lookAhead"].asDouble();
+                fi.outputDelay = doc["outputDelay"].asDouble();
             }
         }
-        if (doc.isMember("impactWindow"))
+        if (doc.isMember("inputDelay"))
         {
-            if (doc["impactWindow"].isObject())
+            if (doc["inputDelay"].isObject())
             {
                 // TOOD:: something about units yet
             }
             else
             {
-                fi.impactWindow = doc["impactWindow"].asDouble();
+                fi.inputDelay = doc["inputDelay"].asDouble();
             }
         }
         return fi;
@@ -263,6 +312,8 @@ namespace helics
             ("period", po::value<double>(), "the period of the federate")
             ("timedelta", po::value<double>(), "the time delta of the federate")
             ("coreinit,i", po::value<std::string>(), "the core initialization string")
+            ("inputdelay", po::value<double>(), "the time delta of the federate")
+            ("outputdelay", po::value<double>(), "the time delta of the federate")
             ("flags,f", po::value<std::vector<std::string>>(), "named flag for the federate");
 
 

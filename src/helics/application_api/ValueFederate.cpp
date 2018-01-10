@@ -189,7 +189,7 @@ void ValueFederate::registerInterfaces (const std::string &jsonString)
             }
             auto units = (sub.isMember ("units")) ? sub["units"].asString () : "";
             auto type = (sub.isMember ("type")) ? sub["type"].asString () : "";
-            bool required = (sub.isMember ("optional")) ? !(sub["optional"].asBool ()) : false;
+            bool required = (sub.isMember ("optional")) ? !(sub["optional"].asBool ()) : true;
             if (sub.isMember ("required"))
             {
                 required = sub["required"].asBool ();

@@ -205,7 +205,7 @@ enum class action_t : int32_t
 #define NULL_REPLY 0;
 
 // definitions for FED_CONFIGURE_COMMAND
-#define UPDATE_LOOKAHEAD 0
+#define UPDATE_outputDelay 0
 #define UPDATE_IMPACT_WINDOW 1
 #define UPDATE_MINDELTA 2
 #define UPDATE_PERIOD 3

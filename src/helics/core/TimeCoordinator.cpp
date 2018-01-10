@@ -69,7 +69,7 @@ void TimeCoordinator::timeRequest (Time nextTime,
         }
         treq.source_id = source_id;
         treq.actionTime = time_next;
-        treq.Te = time_exec + info.lookAhead;
+        treq.Te = time_exec + info.outputDelay;
         treq.Tdemin = time_minDe;
         sendMessageFunction (treq);
     }
@@ -80,7 +80,7 @@ void TimeCoordinator::updateNextExecutionTime ()
     time_exec = std::min (time_message, time_value);
     if (time_exec < Time::maxVal ())
     {
-        time_exec += info.impactWindow;
+        time_exec += info.inputDelay;
     }
     time_exec = std::min (time_requested, time_exec);
     if (time_exec <= time_granted)
@@ -98,7 +98,7 @@ void TimeCoordinator::updateNextPossibleEventTime ()
 {
     if (!iterating)
     {
-        time_next = time_granted + info.timeDelta + info.lookAhead;
+        time_next = time_granted + info.timeDelta + info.outputDelay;
         //the next time must fall on a period boundary
         if (info.period > timeEpsilon)
         {
@@ -108,9 +108,9 @@ void TimeCoordinator::updateNextPossibleEventTime ()
     }
     else
     {
-        time_next = time_granted + info.lookAhead;
+        time_next = time_granted + info.outputDelay;
     }
-    time_next = std::max (time_next, time_minminDe + info.impactWindow + info.lookAhead);
+    time_next = std::max (time_next, time_minminDe + info.inputDelay + info.outputDelay);
     time_next = std::min (time_next, time_exec);
 }
 void TimeCoordinator::updateValueTime (Time valueUpdateTime)
@@ -210,7 +210,7 @@ bool TimeCoordinator::updateTimeFactors ()
         update = true;
         time_minDe = minDe;
     }
-    time_allow = info.impactWindow + minNext;
+    time_allow = info.inputDelay + minNext;
     updateNextExecutionTime ();
     return update;
 }
@@ -396,7 +396,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
     {
         if (hasInitUpdates)
         {
-            if (iteration > info.max_iterations)
+            if (iteration > info.maxIterations)
             {
                 ret = iteration_state::next_step;
             }
@@ -477,11 +477,11 @@ void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd, bool
 {
     switch (cmd.index)
     {
-    case UPDATE_LOOKAHEAD:
-        info.lookAhead = cmd.actionTime;
+    case UPDATE_outputDelay:
+        info.outputDelay = cmd.actionTime;
         break;
     case UPDATE_IMPACT_WINDOW:
-        info.impactWindow = cmd.actionTime;
+        info.inputDelay = cmd.actionTime;
         break;
     case UPDATE_MINDELTA:
         info.timeDelta = cmd.actionTime;
@@ -497,7 +497,7 @@ void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd, bool
         info.offset = cmd.actionTime;
         break;
     case UPDATE_MAX_ITERATION:
-        info.max_iterations = static_cast<int16_t> (cmd.dest_id);
+        info.maxIterations = static_cast<int16_t> (cmd.dest_id);
         break;
     case UPDATE_LOG_LEVEL:
         info.logLevel = static_cast<int> (cmd.dest_id);

@@ -148,14 +148,14 @@ helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int
     }
     return helicsOK;
 }
-helicsStatus helicsFederateInfoSetLookahead (helics_federate_info_t fi, helics_time_t lookahead)
+helicsStatus helicsFederateInfoSetoutputDelay (helics_federate_info_t fi, helics_time_t outputDelay)
 {
     if (fi == nullptr)
     {
         return helicsDiscard;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->lookAhead = lookahead;
+    hfi->outputDelay = outputDelay;
     return helicsOK;
 }
 
@@ -170,14 +170,14 @@ helicsStatus helicsFederateInfoSetTimeDelta (helics_federate_info_t fi, helics_t
     return helicsOK;
 }
 
-helicsStatus helicsFederateInfoSetImpactWindow (helics_federate_info_t fi, helics_time_t impactWindow)
+helicsStatus helicsFederateInfoSetinputDelay (helics_federate_info_t fi, helics_time_t inputDelay)
 {
     if (fi == nullptr)
     {
         return helicsDiscard;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->impactWindow = impactWindow;
+    hfi->inputDelay = inputDelay;
     return helicsOK;
 }
 helicsStatus helicsFederateInfoSetTimeOffset (helics_federate_info_t fi, helics_time_t timeOffset)
@@ -212,14 +212,14 @@ helicsStatus helicsFederateInfoSetLoggingLevel (helics_federate_info_t fi, int l
     return helicsOK;
 }
 
-helicsStatus helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int max_iterations)
+helicsStatus helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int maxIterations)
 {
     if (fi == nullptr)
     {
         return helicsDiscard;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->max_iterations = max_iterations;
+    hfi->maxIterations = maxIterations;
     return helicsOK;
 }
 

@@ -572,7 +572,7 @@ iterationTime CommonCore::requestTimeIterative (federate_id_t federateID, Time n
     // limit the iterations
     if (iterate == iteration_request::iterate_if_needed)
     {
-        if (fed->getCurrentIteration () >= _max_iterations)
+        if (fed->getCurrentIteration () >= _maxIterations)
         {
             iterate = iteration_request::no_iterations;
         }
@@ -636,29 +636,29 @@ void CommonCore::setTimeDelta (federate_id_t federateID, Time time)
     fed->UpdateFederateInfo (cmd);
 }
 
-void CommonCore::setLookAhead (federate_id_t federateID, Time lookAheadTime)
+void CommonCore::setOutputDelay (federate_id_t federateID, Time outputDelayTime)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid (setLookAhead)"));
+        throw (invalidIdentifier ("federateID not valid (setOutputDelay)"));
     }
-    if (lookAheadTime < timeZero)
+    if (outputDelayTime < timeZero)
     {
-        throw (invalidParameter ("lookahead time must be >=0"));
+        throw (invalidParameter ("outputDelay time must be >=0"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_LOOKAHEAD;
-    cmd.actionTime = lookAheadTime;
+    cmd.index = UPDATE_outputDelay;
+    cmd.actionTime = outputDelayTime;
     fed->UpdateFederateInfo (cmd);
 }
 
-void CommonCore::setImpactWindow (federate_id_t federateID, Time impactTime)
+void CommonCore::setInputDelay (federate_id_t federateID, Time impactTime)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
-        throw (invalidIdentifier ("federateID not valid (SetImpactWindow)"));
+        throw (invalidIdentifier ("federateID not valid (SetinputDelay)"));
     }
 
     if (impactTime < timeZero)
