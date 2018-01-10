@@ -34,6 +34,10 @@ data-block-tests.cpp
 UdpCore-tests.cpp
 )
 
+if (NOT DISABLE_TCP_CORE)
+list(APPEND core_test_sources TcpCore-tests.cpp)
+endif()
+
 add_executable(core-tests ${core_test_sources} ${core_test_headers})
 target_link_libraries(core-tests helics-static)
 

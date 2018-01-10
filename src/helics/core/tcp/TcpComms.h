@@ -33,6 +33,11 @@ namespace boost
     {
         class io_service;
     }
+
+    namespace system
+    {
+        class error_code;
+    }
 }
 #endif
 
@@ -43,6 +48,9 @@ namespace boost
         class error_code;
     }
 }
+
+class tcp_rx_connection;
+class tcp_connection;
 
 class tcp_rx_connection;
 class tcp_connection;
