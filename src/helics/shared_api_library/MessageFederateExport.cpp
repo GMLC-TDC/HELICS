@@ -129,13 +129,13 @@ helicsStatus helicsSendMessage (helics_endpoint endpoint, message_t *message)
 
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     // TODO this isn't correct yet (need to translate to a Message_view if origSrc is not this name
-    if (message->dst == nullptr)
+    if (message->dest == nullptr)
     {
         endObj->endptr->send (message->data, message->length, message->time);
     }
     else
     {
-        endObj->endptr->send (message->dst, message->data, message->length, message->time);
+        endObj->endptr->send (message->dest, message->data, message->length, message->time);
     }
     return helicsOK;
 }
@@ -200,9 +200,9 @@ static message_t emptyMessage ()
     empty.time = 0;
     empty.data = nullptr;
     empty.length = 0;
-    empty.dst = nullptr;
-    empty.origsrc = nullptr;
-    empty.src = nullptr;
+    empty.dest = nullptr;
+    empty.original_source = nullptr;
+    empty.source = nullptr;
     return empty;
 }
 
@@ -217,10 +217,10 @@ message_t helicsEndpointGetMessage (helics_endpoint endpoint)
     endObj->lastMessage = endObj->endptr->getMessage ();
     message_t mess{};
     mess.data = endObj->lastMessage->data.data ();
-    mess.dst = endObj->lastMessage->dest.c_str ();
+    mess.dest = endObj->lastMessage->dest.c_str ();
     mess.length = endObj->lastMessage->data.size ();
-    mess.origsrc = endObj->lastMessage->origsrc.c_str ();
-    mess.src = endObj->lastMessage->src.c_str ();
+    mess.original_source = endObj->lastMessage->original_source.c_str ();
+    mess.source = endObj->lastMessage->source.c_str ();
     mess.time = endObj->lastMessage->time.getBaseTimeCode ();
     return mess;
 }
@@ -240,10 +240,10 @@ message_t helicsFederateGetMessage (helics_message_federate fed)
     fedObj->lastMessage = mFed->getMessage ();
     message_t mess{};
     mess.data = fedObj->lastMessage->data.data ();
-    mess.dst = fedObj->lastMessage->dest.c_str ();
+    mess.dest = fedObj->lastMessage->dest.c_str ();
     mess.length = fedObj->lastMessage->data.size ();
-    mess.origsrc = fedObj->lastMessage->origsrc.c_str ();
-    mess.src = fedObj->lastMessage->src.c_str ();
+    mess.original_source = fedObj->lastMessage->original_source.c_str ();
+    mess.source = fedObj->lastMessage->source.c_str ();
     mess.time = fedObj->lastMessage->time.getBaseTimeCode ();
     return mess;
 }

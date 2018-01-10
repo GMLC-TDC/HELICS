@@ -36,28 +36,28 @@ class ActionMessage
         std::string &units;  //!< alias type to target for registration
         std::string orig_source;  //!< the original source
 		std::string &type_out;  //!< alias type_out to orig_source for filter
-        std::string orig_dest;  //!< the original destination of a message
+        std::string original_dest;  //!< the original destination of a message
 		/** constructor*/
         AdditionalInfo () noexcept : type (source), units (target),type_out(orig_source){};
 		/** copy constructor*/
         AdditionalInfo (const AdditionalInfo &ai)
             : source (ai.source), type (source), target (ai.target),
-              units (target), orig_source (ai.orig_source), type_out(orig_source),orig_dest(ai.orig_dest) {};
+              units (target), orig_source (ai.orig_source), type_out(orig_source),original_dest(ai.original_dest) {};
 		/** move constructor*/
         AdditionalInfo (AdditionalInfo &&ai) noexcept
             : source (std::move (ai.source)), type (source),
-              target (std::move (ai.target)), units (target), orig_source (std::move (ai.orig_source)), type_out(orig_source),orig_dest(std::move(ai.orig_dest)) {};
+              target (std::move (ai.target)), units (target), orig_source (std::move (ai.orig_source)), type_out(orig_source),original_dest(std::move(ai.original_dest)) {};
         template <class Archive>
         void save (Archive &ar) const
         {
-			ar(source, target, orig_source,orig_dest);
+			ar(source, target, orig_source,original_dest);
         }
 
         template <class Archive>
         void load (Archive &ar)
         {
            
-			ar(source, target, orig_source,orig_dest);
+			ar(source, target, orig_source,original_dest);
         }
     };
    
@@ -185,7 +185,7 @@ class ActionMessage
 	std::vector<char> to_vector() const;
     /** generate a command from a raw data stream*/
     void fromByteArray (const char *data, size_t buffer_size);
-    /** load a command from a packetized stream 
+    /** load a command from a packetized stream /ref packetize
     @return the number of bytes used
     */
     size_t depacketize(const char *data, size_t buffer_size);
@@ -223,6 +223,38 @@ inline bool isProtocolCommand(const ActionMessage &command) noexcept
 inline bool isPriorityCommand(const ActionMessage &command) noexcept
 {
     return (command.action() < action_message_def::action_t::cmd_ignore);
+}
+
+inline bool isTimingMessage(const ActionMessage &command) noexcept
+{
+    switch (command.action())
+    {
+        case CMD_DISCONNECT:
+        case CMD_TIME_GRANT:
+        case CMD_TIME_REQUEST:
+        case CMD_EXEC_GRANT:
+        case CMD_EXEC_REQUEST:
+        case CMD_PRIORITY_DISCONNECT:
+            return true;
+        default:
+            return false;
+    }
+}
+
+inline bool isDependencyMessage(const ActionMessage &command) noexcept
+{
+    switch (command.action())
+    {
+    case CMD_ADD_DEPENDENCY:
+    case CMD_REMOVE_DEPENDENCY:
+    case CMD_ADD_DEPENDENT:
+    case CMD_REMOVE_DEPENDENT:
+    case CMD_ADD_INTERDEPENDENCY:
+    case CMD_REMOVE_INTERDEPENDENCY: 
+        return true;
+    default:
+        return false;
+    }
 }
 
 /** check if a command is a disconnect command*/

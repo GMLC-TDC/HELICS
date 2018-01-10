@@ -34,7 +34,7 @@ class DependencyInfo
     };
     Core::federate_id_t fedID = invalid_fed_id;  //!< identifier for the dependency
     time_state_t time_state = time_state_t::initialized;  //!< the current state of the dependency
-    Time Tnext = timeZero;  //!<next possible message or value
+    Time Tnext = negEpsilon;  //!<next possible message or value
     Time Te = timeZero;  //!< the next currently scheduled event
     Time Tdemin = timeZero;  //!< min dependency event time
     /** default constructor*/

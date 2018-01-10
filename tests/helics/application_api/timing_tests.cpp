@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE (timing_with_impact_window)
 
     vFed1->setPeriod (0.1);
     vFed2->setPeriod (0.1);
-    vFed2->setImpactWindow (0.1);
+    vFed2->setInputDelay (0.1);
 
     auto ept1 = helics::Endpoint (helics::GLOBAL, vFed1.get (), "e1");
     auto ept2 = helics::Endpoint (helics::GLOBAL, vFed2.get (), "e2");

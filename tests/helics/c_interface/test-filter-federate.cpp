@@ -108,8 +108,8 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //    mFed->requestTimeFinalize ();
 //    BOOST_REQUIRE (mFed->hasMessage (p2));
 //    auto m2 = mFed->getMessage (p2);
-//    BOOST_CHECK_EQUAL (m2->src, "filter0/fout");
-//    BOOST_CHECK_EQUAL (m2->origsrc, "port1");
+//    BOOST_CHECK_EQUAL (m2->source, "filter0/fout");
+//    BOOST_CHECK_EQUAL (m2->original_source, "port1");
 //    BOOST_CHECK_EQUAL (m2->dest, "port2");
 //    BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
 //    mFed->finalize ();
@@ -166,8 +166,8 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //    BOOST_REQUIRE (mFed->hasMessage (p2));
 //
 //    auto m2 = mFed->getMessage (p2);
-//    BOOST_CHECK_EQUAL (m2->src, "port1");
-//    BOOST_CHECK_EQUAL (m2->origsrc, "port1");
+//    BOOST_CHECK_EQUAL (m2->source, "port1");
+//    BOOST_CHECK_EQUAL (m2->original_source, "port1");
 //    BOOST_CHECK_EQUAL (m2->dest, "port2");
 //    BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
 //    BOOST_CHECK_EQUAL (m2->time, 2.5);

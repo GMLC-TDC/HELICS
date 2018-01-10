@@ -4,43 +4,51 @@
 
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 ##############################################################################
-set(PLAYER_SRC_FILES
-    player.cpp
-	PrecHelper.cpp
+set(helics_apps_library_headers
+	player.h
+	recorder.h
 	PrecHelper.h
-)
-set(PLAYER_INCLUDE_FILES
+	echo.h
+	source.h
+	)
 
-)
-
-
-set(RECORDER_SRC_FILES
-    recorder.cpp
+set(helics_apps_library_files
+	player.cpp
+	recorder.cpp
 	PrecHelper.cpp
-	PrecHelper.h
+	echo.cpp
+	source.cpp
 )
-set(RECORDER_INCLUDE_FILES
 
-)
+add_library(helics_apps-static STATIC ${helics_apps_library_files} ${helics_apps_library_headers})
 
 if (BUILD_PLAYER)
-add_executable(helics_player ${PLAYER_SRC_FILES} ${PLAYER_INCLUDE_FILES})
-target_link_libraries(helics_player helics-static)
+add_executable(helics_player playerMain.cpp)
+target_link_libraries(helics_player helics_apps-static helics-static)
 
 endif()
 
 
 if (BUILD_RECORDER)
-add_executable(helics_recorder ${RECORDER_SRC_FILES} ${RECORDER_INCLUDE_FILES})
-target_link_libraries(helics_recorder helics-static)
+add_executable(helics_recorder recorderMain.cpp)
+target_link_libraries(helics_recorder helics_apps-static helics-static)
+endif()
 
+IF(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_APPS)
+add_executable(helics_app appMain.cpp)
+target_link_libraries(helics_app helics_apps-static helics-static)
 endif()
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 
+
+INSTALL(TARGETS helics_apps-static EXPORT helics-targets
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+	
 if (BUILD_PLAYER)
-INSTALL(TARGETS helics_player DESTINATION bin)
+INSTALL(TARGETS helics_player DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET helics_player POST_BUILD        # Adds a post-build event to core tests
@@ -52,13 +60,25 @@ endforeach(keyfile)
 endif()
 
 if (BUILD_RECORDER)
-INSTALL(TARGETS helics_recorder DESTINATION bin)
+INSTALL(TARGETS helics_recorder DESTINATION ${CMAKE_INSTALL_BINDIR})
 if (NOT BUILD_PLAYER)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET helics_recorder POST_BUILD        # Adds a post-build event to core tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:helics_recorder>/")                 # <--this is out-file path
+endforeach(keyfile)
+endif()
+endif()
+
+if (BUILD_APPS)
+INSTALL(TARGETS helics_app DESTINATION ${CMAKE_INSTALL_BINDIR})
+if (NOT BUILD_PLAYER AND NOT BUILD_RECORDER)
+foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
+add_custom_command(TARGET helics_app POST_BUILD        # Adds a post-build event to core tests
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        "${keyfile}"      # <--this is in-file
+        "$<TARGET_FILE_DIR:helics_app>/")                 # <--this is out-file path
 endforeach(keyfile)
 endif()
 endif()

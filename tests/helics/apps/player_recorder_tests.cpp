@@ -19,7 +19,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 struct globalTestConfig
 {
-    globalTestConfig () {}
+    globalTestConfig() = default;
     ~globalTestConfig () { helics::cleanupHelicsLibrary (); }
 };
 

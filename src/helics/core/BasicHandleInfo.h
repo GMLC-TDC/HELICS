@@ -58,7 +58,7 @@ class BasicHandleInfo
 
 	}
 
-    Core::Handle id=invalid_Handle;  //!< the identification number for the handle
+    Core::Handle id=invalid_handle;  //!< the identification number for the handle
     Core::federate_id_t fed_id=invalid_fed_id; //!< the global federate id for the creator of the handle
 	Core::federate_id_t local_fed_id=invalid_fed_id;	//!< the local federate id of the handle
 	BasicHandleType what=HANDLE_UNKNOWN;	//!< the type of the handle

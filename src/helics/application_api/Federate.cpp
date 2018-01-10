@@ -16,14 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../core/core.h"
 #include "asyncFedCallInfo.h"
 #include "helics/helics-config.h"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4702)
-#include "json/json.h"
-#pragma warning(pop)
-#else
-#include "json/json.h"
-#endif
+
 
 #include <cassert>
 #include <fstream>
@@ -70,23 +63,29 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
     else
     {
         coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, fi.coreInitString);
+        if (!coreObject->isOpenToNewFederates())
+        {
+            coreObject = nullptr;
+            CoreFactory::cleanUpCores(200);
+            coreObject = CoreFactory::FindOrCreate(fi.coreType, fi.coreName, fi.coreInitString);
+            if (!coreObject->isOpenToNewFederates())
+            {
+                throw(registrationFailure("Unable to connect to specified core: core is not open to new Federates"));
+            }
+        }
     }
     if (!coreObject)
     {
-        state = op_states::error;
-        return;
+        throw(registrationFailure("Unable to connect to specified core: unable to create specified core"));
     }
     /** make sure the core is connected */
     if (!coreObject->isConnected ())
     {
         coreObject->connect ();
     }
+    //this call will throw an error on failure
     fedID = coreObject->registerFederate (fi.name, fi);
-    if (fedID == helics::invalid_fed_id)
-    {
-        state = op_states::error;
-        return;
-    }
+   
     currentTime = coreObject->getCurrentTime (fedID);
 }
 
@@ -316,7 +315,7 @@ void Federate::enterExecutionStateAsync (iteration_request iterate)
     break;
     case op_states::pendingInit:
         enterInitializationStateFinalize ();
-        // FALLTHROUGH
+        FALLTHROUGH
     case op_states::initialization:
     {
         if (!asyncCallInfo)
@@ -377,22 +376,22 @@ void Federate::setTimeDelta (Time tdelta)
     coreObject->setTimeDelta (fedID, tdelta);
 }
 
-void Federate::setLookAhead (Time lookAhead)
+void Federate::setOutputDelay (Time outputDelay)
 {
-    if (lookAhead < timeZero)
+    if (outputDelay < timeZero)
     {
-        throw (InvalidParameterValue ("lookahead must be >=0"));
+        throw (InvalidParameterValue ("outputDelay must be >=0"));
     }
-    coreObject->setLookAhead (fedID, lookAhead);
+    coreObject->setOutputDelay (fedID, outputDelay);
 }
 
-void Federate::setImpactWindow (Time window)
+void Federate::setInputDelay (Time window)
 {
     if (window < timeZero)
     {
-        throw (InvalidParameterValue ("Impact Window must be >=0"));
+        throw (InvalidParameterValue ("Input Delay must be >=0"));
     }
-    coreObject->setImpactWindow (fedID, window);
+    coreObject->setInputDelay (fedID, window);
 }
 
 void Federate::setPeriod (Time period, Time offset)
@@ -464,7 +463,10 @@ void Federate::disconnect ()
 {
     if (state != op_states::error)
     {
-        coreObject->finalize (fedID);
+        if (coreObject)
+        {
+            coreObject->finalize(fedID);
+        }  
     }
     coreObject = nullptr;
 }
@@ -747,23 +749,23 @@ std::string Federate::getFilterOutputType (filter_id_t id) const { return coreOb
 filter_id_t Federate::getFilterId (const std::string &filterName) const
 {
     auto id = coreObject->getSourceFilter (filterName);
-    if (id == invalid_Handle)
+    if (id == invalid_handle)
     {
         id = coreObject->getDestinationFilter (filterName);
     }
-    return (id == invalid_Handle) ? invalid_id_value : filter_id_t (id);
+    return (id == invalid_handle) ? invalid_id_value : filter_id_t (id);
 }
 
 filter_id_t Federate::getSourceFilterId (const std::string &filterName) const
 {
     auto id = coreObject->getSourceFilter (filterName);
-    return (id == invalid_Handle) ? invalid_id_value : filter_id_t (id);
+    return (id == invalid_handle) ? invalid_id_value : filter_id_t (id);
 }
 
 filter_id_t Federate::getDestFilterId (const std::string &filterName) const
 {
     auto id = coreObject->getDestinationFilter (filterName);
-    return (id == invalid_Handle) ? invalid_id_value : filter_id_t (id);
+    return (id == invalid_handle) ? invalid_id_value : filter_id_t (id);
 }
 
 void Federate::setFilterOperator (filter_id_t id, std::shared_ptr<FilterOperator> mo)
@@ -779,140 +781,4 @@ void Federate::setFilterOperator (const std::vector<filter_id_t> &filter_ids, st
     }
 }
 
-FederateInfo LoadFederateInfo (const std::string &jsonString)
-{
-    FederateInfo fi;
-    std::ifstream file (jsonString);
-    Json_helics::Value doc;
-
-    if (file.is_open ())
-    {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        bool ok = Json_helics::parseFromStream (rbuilder, file, &doc, &errs);
-        if (!ok)
-        {
-            // should I throw an error here?
-            return fi;
-        }
-    }
-    else
-    {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        std::istringstream jstring (jsonString);
-        bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
-        if (!ok)
-        {
-            // should I throw an error here?
-            return fi;
-        }
-    }
-
-    if (doc.isMember ("name"))
-    {
-        fi.name = doc["name"].asString ();
-    }
-
-    if (doc.isMember ("observer"))
-    {
-        fi.observer = doc["observer"].asBool ();
-    }
-    if (doc.isMember ("rollback"))
-    {
-        fi.rollback = doc["rollback"].asBool ();
-    }
-    if (doc.isMember ("only_update_on_change"))
-    {
-        fi.only_update_on_change = doc["only_update_on_change"].asBool ();
-    }
-    if (doc.isMember ("only_transmit_on_change"))
-    {
-        fi.only_transmit_on_change = doc["only_transmit_on_change"].asBool ();
-    }
-    if (doc.isMember ("source_only"))
-    {
-        fi.source_only = doc["sourc_only"].asBool ();
-    }
-    if (doc.isMember ("uninterruptible"))
-    {
-        fi.uninterruptible = doc["uninterruptible"].asBool ();
-    }
-    if (doc.isMember ("interruptible"))  // can use either flag
-    {
-        fi.uninterruptible = !doc["uninterruptible"].asBool ();
-    }
-    if (doc.isMember ("forwardCompute"))
-    {
-        fi.forwardCompute = doc["forwardCompute"].asBool ();
-    }
-    if (doc.isMember ("coreType"))
-    {
-        try
-        {
-            fi.coreType = coreTypeFromString (doc["coreType"].asString ());
-        }
-        catch (const std::invalid_argument &ia)
-        {
-            std::cerr << "Unrecognized core type\n";
-        }
-    }
-    if (doc.isMember ("coreName"))
-    {
-        fi.coreName = doc["coreName"].asString ();
-    }
-    if (doc.isMember ("coreInit"))
-    {
-        fi.coreInitString = doc["coreInit"].asString ();
-    }
-    if (doc.isMember ("maxiterations"))
-    {
-        fi.max_iterations = static_cast<int16_t> (doc["maxiterations"].asInt ());
-    }
-    if (doc.isMember ("period"))
-    {
-        if (doc["period"].isObject ())
-        {
-        }
-        else
-        {
-            fi.timeDelta = doc["period"].asDouble ();
-        }
-    }
-
-    if (doc.isMember ("timeDelta"))
-    {
-        if (doc["timeDelta"].isObject ())
-        {
-        }
-        else
-        {
-            fi.timeDelta = doc["timeDelta"].asDouble ();
-        }
-    }
-
-    if (doc.isMember ("lookAhead"))
-    {
-        if (doc["lookAhead"].isObject ())
-        {
-            // TODO:: something about units yet
-        }
-        else
-        {
-            fi.lookAhead = doc["lookAhead"].asDouble ();
-        }
-    }
-    if (doc.isMember ("impactWindow"))
-    {
-        if (doc["impactWindow"].isObject ())
-        {
-            // TOOD:: something about units yet
-        }
-        else
-        {
-            fi.impactWindow = doc["impactWindow"].asDouble ();
-        }
-    }
-    return fi;
-}
 }  // namespace helics

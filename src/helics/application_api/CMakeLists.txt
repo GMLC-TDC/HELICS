@@ -26,6 +26,7 @@ set(private_application_api_headers
 MessageFederateManager.h
 ValueFederateManager.h
 asyncFedCallInfo.h
+FilterOperations.h
 )
 
 set(application_api_sources
@@ -41,8 +42,11 @@ helicsPrimaryTypes.cpp
 Subscriptions.cpp
 Publications.cpp
 Filters.cpp
+FilterOperations.cpp
+Endpoints.cpp
 helicsTypes.cpp
 queryFunctions.cpp
+FederateInfo.cpp
 )
 
 add_library(application_api OBJECT ${application_api_sources} ${public_application_api_headers} ${private_application_api_headers})

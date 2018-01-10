@@ -144,6 +144,8 @@ public:
 		return _isRoot;
 	};
 
+    virtual bool isOpenToNewFederates() const override;
+    /** display the help for command line arguments on the broker*/
 	static void displayHelp();
 private:
 	/** implementation details of the connection process

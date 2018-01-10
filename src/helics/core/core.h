@@ -101,9 +101,9 @@ class Core
      */
     virtual void disconnect () = 0;
 
-    /** check if the core is joinable i.e. it is accepting new federates
+    /** check if the core is ready to accept new federates
      */
-    virtual bool isJoinable () const = 0;
+    virtual bool isOpenToNewFederates () const = 0;
     /** get and identifier string for the core
      */
     virtual const std::string &getIdentifier () const = 0;
@@ -228,7 +228,7 @@ class Core
      *@param federateID the identifier for the federate to process
      * @param next the requested time
      * @param localConverged has the local federate converged
-     @return an iterationTime object with two field stepTime and a bool indicating the iteration has completed
+     @return an iterationTime object with two field stepTime and a enumeration indicating the state of the iteration
      */
     virtual iterationTime requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate) = 0;
 
@@ -267,21 +267,21 @@ class Core
     virtual void setTimeDelta (federate_id_t federateID, Time time) = 0;
 
     /**
-     * Set the lookahead time for the specified federate.
+     * Set the outputDelay time for the specified federate.
      *
      * The value is used to determine the interaction amongst various federates as to
      * when a specific federate can influence another
      * @param federateID  the identifier for the federate
-     * @param timeLookAhead
+     * @param timeoutputDelay
      */
-    virtual void setLookAhead (federate_id_t federateID, Time timeLookAhead) = 0;
+    virtual void setOutputDelay (federate_id_t federateID, Time timeoutputDelay) = 0;
     /**
      * Set the period for a specified federate.
      *
      * The value is used to determine the interaction amongst various federates as to
      * when a specific federate can influence another
 	* @param federateID  the identifier for the federate
-	* @param timeLookAhead
+	* @param timeoutputDelay
      */
     virtual void setPeriod (federate_id_t federateID, Time timePeriod) = 0;
     /**
@@ -295,14 +295,14 @@ class Core
     */
     virtual void setTimeOffset (federate_id_t federateID, Time timeOffset) = 0;
     /**
-     * Set the ImpactWindow time.
+     * Set the inputDelay time.
      *
      * The value is used to determine the interaction amongst various federates as to
      * when a specific federate can influence another
 	* @param federateID  the identifier for the federate
 	* @param timeImpact the length of time it take outside message to propagate into a federate
      */
-    virtual void setImpactWindow (federate_id_t federateID, Time timeImpact) = 0;
+    virtual void setInputDelay (federate_id_t federateID, Time timeImpact) = 0;
     /**
     Set the logging level
     @details set the logging level for an individual federate
@@ -402,14 +402,15 @@ class Core
     /**
      * Publish specified data to the specified key.
      *
-     * Data ownership is retained by the federate.
+     * @param handle a handle to a publication to use for the value
+     @param[in] data the raw data to send
+     @param len the size of the data
      */
     virtual void setValue (Handle handle, const char *data, uint64_t len) = 0;
 
     /**
-     * Return data for the specified handle.
+     * Return the data for the specified handle.
      *
-     * Returned pointer is valid until dereference() is invoked.
      */
     virtual std::shared_ptr<const data_block> getValue (Handle handle) = 0;
 
@@ -616,7 +617,8 @@ class Core
 
 // set at a large negative number but not the largest negative number
 constexpr Core::federate_id_t invalid_fed_id = -2'000'000'000;
-constexpr Core::Handle invalid_Handle = -2'000'000'000;
+constexpr Core::Handle invalid_handle = -2'000'000'000;
+constexpr Core::Handle direct_send_handle = -1'745'234; //!< this special handle can be used to directly send a message in a core
 
 }  // namespace helics
 

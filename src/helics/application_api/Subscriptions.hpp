@@ -58,6 +58,8 @@ class SubscriptionBase
             id = fed->registerOptionalSubscription (key_, type_, units_);
         }
     }
+
+    SubscriptionBase(ValueFederate *valueFed, int subIndex);
     virtual ~SubscriptionBase () = default;
     SubscriptionBase (SubscriptionBase &&base) = default;
     SubscriptionBase &operator= (SubscriptionBase &&base) = default;
@@ -118,10 +120,18 @@ class Subscription : public SubscriptionBase
         : SubscriptionBase (required, valueFed, key, "def", units)
     {
     }
+    /** generate a subscription object from a preexisting subscription
+    @param valueFed a pointer to the appropriate value Federate
+    @param subIndex the index of the subscription
+    */
+    Subscription(ValueFederate *valueFed, int subIndex) : SubscriptionBase(valueFed, subIndex)
+    {
+
+    }
     /** check if the value has been updated*/
     virtual bool isUpdated () const override;
 
-    /** store the value in the given variable
+    /** get the latest value for the subscription
     @param[out] out the location to store the value
     */
     template <class X>

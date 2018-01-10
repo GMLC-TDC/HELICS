@@ -1,0 +1,19 @@
+{
+	"messages": [{
+			"source": "src",
+			"dest": "dest",
+			"time": 1.0,
+			"data":"this is a test message"
+		}, {
+			"source": "src",
+			"dest": "dest",
+			"time": 2.0,
+			"data":"this is test message2"
+		}, {
+			"source": "src",
+			"dest": "dest",
+			"time": 3.0,
+			"data":"this is message 3"
+		}
+	]
+}
