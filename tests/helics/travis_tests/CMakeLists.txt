@@ -30,6 +30,8 @@ target_link_libraries(travis-tests ${Boost_LIBRARIES_test})
 
 add_test(NAME travis-tests COMMAND travis-tests --log_level=success --report_level=detailed)
 
+set_target_properties (travis-tests PROPERTIES FOLDER tests)
+
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET travis-tests POST_BUILD        # Adds a post-build event to api tests

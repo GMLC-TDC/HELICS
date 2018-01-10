@@ -42,7 +42,7 @@ class ValueFederate : public virtual Federate
 
     ValueFederate (const std::string &jsonString)
     {
-        fed = helicsCreateValueFederateFromFile (jsonString.c_str());
+        fed = helicsCreateValueFederateFromJson (jsonString.c_str());
     }
 
     // Default constructor, not meant to be used
@@ -176,14 +176,14 @@ class ValueFederate : public virtual Federate
 
     void setDefaultValue (helics_subscription sub, const std::vector<double> &data)
     {
-        // c++98 doesn't guarantee vector data will be contiguous
+        // c++98 doesn't guarantee vector data will be contiguous --are there any reasonable implementations where it is not otherwise this should not do a copy?
         double *arr = (double*) malloc(data.size() * sizeof(double));
         for (unsigned int i = 0; i < data.size(); i++)
         {
             arr[i] = data[i];
         }
         // returns helicsStatus
-        helicsSetDefaultVector (sub, arr, data.size() * sizeof(double));
+        helicsSetDefaultVector (sub, arr, static_cast<int>(data.size() * sizeof(double)));
         free (arr);
     }
 

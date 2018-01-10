@@ -228,36 +228,69 @@ helicsStatus helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int 
 
 helics_core helicsCreateCore (const char *type, const char *name, const char *initString)
 {
+
+    helics::core_type ct;
+    try
+    {
+        ct = (type != nullptr) ? helics::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    }
+    catch (const std::invalid_argument &ie)
+    {
+        return nullptr;
+    }
     auto *core = new helics::CoreObject;
-    core->index = getMasterHolder ()->addCore (core);
-    auto ct = (type != nullptr) ? helics::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    core->index = getMasterHolder()->addCore(core);
     core->coreptr = helics::CoreFactory::FindOrCreate (ct, (name!=nullptr)?std::string(name):nullstr, (initString!=nullptr)?std::string(initString):nullstr);
     return reinterpret_cast<helics_core> (core);
 }
 
 helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, const char *const *argv)
 {
+    helics::core_type ct;
+    try
+    {
+        ct = (type != nullptr) ? helics::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    }
+    catch (const std::invalid_argument &ie)
+    {
+        return nullptr;
+    }
     auto *core = new helics::CoreObject;
     core->index = getMasterHolder ()->addCore (core);
-    auto ct = (type != nullptr)?helics::coreTypeFromString (type) : helics::core_type::DEFAULT;
     core->coreptr = helics::CoreFactory::FindOrCreate (ct, (name != nullptr) ? std::string(name) : nullstr, argc, argv);
     return reinterpret_cast<helics_core> (core);
 }
 
 helics_broker helicsCreateBroker (const char *type, const char *name, const char *initString)
 {
+    helics::core_type ct;
+    try
+    {
+        ct = (type != nullptr) ? helics::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    }
+    catch (const std::invalid_argument &ie)
+    {
+        return nullptr;
+    }
     auto broker = new helics::BrokerObject;
     broker->index = getMasterHolder ()->addBroker (broker);
-    auto ct = (type != nullptr) ? helics::coreTypeFromString(type) : helics::core_type::DEFAULT;
     broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string(name) : nullstr, (initString != nullptr) ? std::string(initString) : nullstr);
     return reinterpret_cast<helics_broker> (broker);
 }
 
 helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, const char *const *argv)
 {
+    helics::core_type ct;
+    try
+    {
+        ct = (type != nullptr) ? helics::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    }
+    catch (const std::invalid_argument &ie)
+    {
+        return nullptr;
+    }
     auto *broker = new helics::BrokerObject;
     broker->index = getMasterHolder ()->addBroker (broker);
-    auto ct = (type != nullptr) ? helics::coreTypeFromString(type) : helics::core_type::DEFAULT;
     broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string(name) : nullstr, argc, argv);
     return reinterpret_cast<helics_broker> (broker);
 }

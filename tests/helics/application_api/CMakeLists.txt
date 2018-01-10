@@ -43,6 +43,8 @@ target_link_libraries(application-api-tests helics-static)
 
 target_link_libraries(application-api-tests ${Boost_LIBRARIES_test})
 
+set_target_properties (application-api-tests PROPERTIES FOLDER tests)
+
 #add a bigobj indicator for this project
 IF(MINGW)
 target_compile_options(application-api-tests PRIVATE "-Wa,-mbig-obj")

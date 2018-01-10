@@ -26,7 +26,7 @@ class CombinationFederate : public ValueFederate, public MessageFederate
 
     CombinationFederate (const std::string &jsonString)
     {
-        fed = helicsCreateCombinationFederateFromFile (jsonString.c_str());
+        fed = helicsCreateCombinationFederateFromJson (jsonString.c_str());
     }
 };
 } //namespace helics

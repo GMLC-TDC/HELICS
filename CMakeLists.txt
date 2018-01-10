@@ -16,6 +16,8 @@ if (BUILD_HELICS_TESTS)
 enable_testing ()
 endif(BUILD_HELICS_TESTS)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 OPTION(BUILD_HELICS_EXAMPLES "Enable the test Executables to be built" ON)
 
 OPTION(BUILD_PYTHON "Build Python extension" OFF)

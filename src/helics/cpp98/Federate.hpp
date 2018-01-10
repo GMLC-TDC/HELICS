@@ -169,15 +169,15 @@ class Federate
         }
     }
 
-    bool asyncOperationCompleted () const
+    bool isAsyncOperationCompleted () const
     {
         // returns int, 1 = true, 0 = false
-        return helicsAsyncOperationCompleted (fed) > 0;
+        return helicsIsAsyncOperationCompleted (fed) > 0;
     }
 
-    void enterInitializationStateFinalize ()
+    void enterInitializationStateComplete ()
     {
-        if (helicsOK != helicsEnterInitializationModeFinalize (fed))
+        if (helicsOK != helicsEnterInitializationModeComplete (fed))
         {
             throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
         }
@@ -211,23 +211,23 @@ class Federate
         }
     }
 
-    iteration_status enterExecutionStateFinalize ()
+    iteration_status enterExecutionStateComplete ()
     {
         iteration_status out_iterate = next_step;
         if (exec_async_iterate)
         {
-            helicsEnterExecutionModeIterativeFinalize (fed, &out_iterate);
+            helicsEnterExecutionModeIterativeComplete (fed, &out_iterate);
         }
         else
         {
-            helicsEnterExecutionModeFinalize (fed);
+            helicsEnterExecutionModeComplete (fed);
         }
         return out_iterate;
     }
 
     void finalize ()
     {
-        helicsFinalize (fed);
+        helicsFederateFinalize (fed);
     }
 
     helics_time_t requestTime (helics_time_t time)
@@ -253,14 +253,14 @@ class Federate
         helicsRequestTimeIterativeAsync (fed, time, iterate);
     }
 
-    helics_time_t requestTimeFinalize ()
+    helics_time_t requestTimeComplete ()
     {
-        return helicsRequestTimeFinalize (fed);
+        return helicsRequestTimeComplete (fed);
     }
 
     helics_iterative_time requestTimeIterativeFinalize ()
     {
-        return helicsRequestTimeIterativeFinalize (fed);
+        return helicsRequestTimeIterativeComplete (fed);
     }
 
     /** make a query of the core

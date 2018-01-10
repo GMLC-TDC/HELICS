@@ -26,6 +26,7 @@ add_executable(nonlings_fed2_cpp nonlings_fed2.cpp)
 target_link_libraries(nonlings_fed1_cpp helicsSharedLib )
 target_link_libraries(nonlings_fed2_cpp helicsSharedLib )
 
+if (!MSVC)
 target_compile_options(pi_sender_cpp PRIVATE -std=c++98 -pedantic)
 target_compile_options(pi_receiver_cpp PRIVATE -std=c++98 -pedantic)
 
@@ -34,6 +35,25 @@ target_compile_options(pi_receiver2_cpp PRIVATE -std=c++98 -pedantic)
 
 target_compile_options(nonlings_fed1_cpp PRIVATE -std=c++98 -pedantic)
 target_compile_options(nonlings_fed2_cpp PRIVATE -std=c++98 -pedantic)
+endif()
+
+set_target_properties (pi_sender_cpp PROPERTIES
+    FOLDER examples)
+
+set_target_properties (pi_sender2_cpp PROPERTIES
+    FOLDER examples)
+	
+set_target_properties (pi_receiver_cpp PROPERTIES
+    FOLDER examples)
+
+set_target_properties (pi_receiver2_cpp PROPERTIES
+    FOLDER examples)
+
+set_target_properties (nonlings_fed1_cpp PROPERTIES
+    FOLDER examples)
+
+set_target_properties (nonlings_fed2_cpp PROPERTIES
+    FOLDER examples)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET pi_sender_cpp POST_BUILD        # Adds a post-build event to api tests

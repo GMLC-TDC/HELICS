@@ -28,7 +28,7 @@ class MessageFederate : public virtual Federate
 
     MessageFederate (const std::string &jsonString)
     {
-        fed = helicsCreateMessageFederateFromFile (jsonString.c_str());
+        fed = helicsCreateMessageFederateFromJson (jsonString.c_str());
     }
    
     // Default constructor, not meant to be used

@@ -23,6 +23,8 @@ exeTestHelper.h
 
 add_executable(player-recorder-tests ${recplayer_test_sources})
 
+set_target_properties (player-recorder-tests PROPERTIES FOLDER tests)
+
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
