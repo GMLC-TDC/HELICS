@@ -93,25 +93,33 @@ IF(UNIX)
   set(Boost_NO_BOOST_CMAKE ON)
 
   set(Boost_USE_MULTITHREADED      OFF)   # Needed if MT libraries not built
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wall>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-pedantic>)
+  add_compile_options(-Wall -pedantic)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wextra>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wshadow>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-aliasing>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
+  #this options produces lots of warning but is useful for checking ever once in a while with Clang, GCC warning notices with this aren't as useful
+  #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
+  
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
+  option (USE_LIBCXX "Use LibC++ vs as opposed to the default" OFF)
+  IF(USE_LIBCXX)
+      add_compile_options(-stdlib=libc++)
+      link_libraries("-stdlib=libc++")
+     ENDIF(USE_LIBCXX)
 ELSE(UNIX)
   IF(MINGW)
- add_compile_options(-Wall -pedantic)
+  add_compile_options(-Wall -pedantic)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wextra>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wshadow>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-pedantic>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-aliasing>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
-  #this options produces lots of warning but is useful for checking ever once in a while with Clang GCC warnin notices with this aren't as useful
+  #this options produces lots of warning but is useful for checking ever once in a while with Clang, GCC warning notices with this aren't as useful
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
   
   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
