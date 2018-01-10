@@ -14,6 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../../common/zmqSocketDescriptor.h"
 #include "../ActionMessage.h"
 #include "ZmqRequestSets.h"
+//#include <csignal>
 #include <memory>
 
 static const int BEGIN_OPEN_PORT_RANGE = 23500;
@@ -163,6 +164,9 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
 
 void ZmqComms::queue_rx_function ()
 {
+
+  //  std::signal(SIGTERM, [](int) {std::signal(SIGTERM, SIG_DFL); raise(SIGTERM); });
+    
     conditionalChangeOnDestroy<connection_status> cchange (rx_status, connection_status::error,
                                                            connection_status::connected);
     auto ctx = zmqContextManager::getContextPointer ();

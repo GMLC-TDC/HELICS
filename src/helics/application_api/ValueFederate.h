@@ -62,7 +62,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return a publication id object for use as an identifier
     */
     publication_id_t
-    registerPublication (const std::string &key, const std::string &type, const std::string &units = "");
+    registerPublication (const std::string &key, const std::string &type, const std::string &units = std::string());
     /** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
     @param[in] key the name of the publication
@@ -70,7 +70,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return an identifier for use with this publication
     */
     template <typename X>
-    publication_id_t registerPublication (const std::string &key, const std::string &units = "")
+    publication_id_t registerPublication (const std::string &key, const std::string &units = std::string())
     {
         return registerPublication (key, ValueConverter<X>::type (), units);
     }
@@ -83,7 +83,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return a publication id object for use as an identifier
     */
     publication_id_t
-    registerGlobalPublication (const std::string &key, const std::string &type, const std::string &units = "");
+    registerGlobalPublication (const std::string &key, const std::string &type, const std::string &units = std::string());
     /** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
     @param[in] key the name of the publication
@@ -91,7 +91,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return an identifier for use with this publication
     */
     template <typename X>
-    publication_id_t registerGlobalPublication (const std::string &key, const std::string &units = "")
+    publication_id_t registerGlobalPublication (const std::string &key, const std::string &units = std::string())
     {
         return registerGlobalPublication (key, ValueConverter<X>::type (), units);
     }
@@ -106,7 +106,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     */
     template <typename X>
     publication_id_t
-    registerPublicationIndexed (const std::string &key, int index1, const std::string &units = "")
+    registerPublicationIndexed (const std::string &key, int index1, const std::string &units = std::string())
     {
         return registerGlobalPublication<X> (key + '_' + std::to_string (index1), units);
     }
@@ -121,7 +121,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     */
     template <typename X>
     publication_id_t
-    registerPublicationIndexed (const std::string &key, int index1, int index2, const std::string &units = "")
+    registerPublicationIndexed (const std::string &key, int index1, int index2, const std::string &units = std::string())
     {
         return registerGlobalPublication<X> (key + '_' + std::to_string (index1) + '_' + std::to_string (index2),
                                              units);
@@ -130,16 +130,16 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** register a subscription
     @details call is only valid in startup mode register a subscription with name type and units
     @param[in] key the name of the publication to subscribe to
-    @param[in] type a string descibing the type of the publication
+    @param[in] type a string describing the type of the publication
     @param[in] units a string describing the units on the publication
     */
     subscription_id_t
-    registerRequiredSubscription (const std::string &key, const std::string &type, const std::string &units = "");
+    registerRequiredSubscription (const std::string &key, const std::string &type, const std::string &units = std::string());
     /** register a subscription
     @details call is only valid in startup mode
     */
     template <typename X>
-    subscription_id_t registerRequiredSubscription (const std::string &name, const std::string &units = "")
+    subscription_id_t registerRequiredSubscription (const std::string &name, const std::string &units = std::string())
     {
         return registerRequiredSubscription (name, ValueConverter<X>::type (), units);
     }
@@ -152,7 +152,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     */
     template <typename X>
     subscription_id_t
-    registerRequiredSubscriptionIndexed (const std::string &key, int index1, const std::string &units = "")
+    registerRequiredSubscriptionIndexed (const std::string &key, int index1, const std::string &units = std::string())
     {
         return registerRequiredSubscription<X> (key + '_' + std::to_string (index1), units);
     }
@@ -168,7 +168,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     subscription_id_t registerRequiredSubscriptionIndexed (const std::string &key,
                                                            int index1,
                                                            int index2,
-                                                           const std::string &units = "")
+                                                           const std::string &units = std::string())
     {
         return registerRequiredSubscription<X> (key + '_' + std::to_string (index1) + '_' +
                                                   std::to_string (index2),
@@ -181,14 +181,14 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] units the units associated with the desired output
     */
     subscription_id_t
-    registerOptionalSubscription (const std::string &key, const std::string &type, const std::string &units = "");
+    registerOptionalSubscription (const std::string &key, const std::string &type, const std::string &units = std::string());
     /** register a subscription
     @details call is only valid in startup mode
     @param[in] key the name of the subscription
     @param[in] units the optional units on the subscription
     */
     template <typename X>
-    subscription_id_t registerOptionalSubscription (const std::string &key, const std::string &units = "")
+    subscription_id_t registerOptionalSubscription (const std::string &key, const std::string &units = std::string())
     {
         return registerOptionalSubscription (key, ValueConverter<X>::type (), units);
     }
@@ -201,7 +201,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     */
     template <typename X>
     subscription_id_t
-    registerOptionalSubscriptionIndexed (const std::string &key, int index1, const std::string &units = "")
+    registerOptionalSubscriptionIndexed (const std::string &key, int index1, const std::string &units = std::string())
     {
         return registerOptionalSubscription<X> (key + '_' + std::to_string (index1), units);
     }
@@ -217,7 +217,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     subscription_id_t registerOptionalSubscriptionIndexed (const std::string &key,
                                                            int index1,
                                                            int index2,
-                                                           const std::string &units = "")
+                                                           const std::string &units = std::string())
     {
         return registerOptionalSubscription<X> (key + '_' + std::to_string (index1) + '_' +
                                                   std::to_string (index2),
@@ -319,10 +319,10 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** publish data
     @param[in] id the publication identifier
     @param[in] data a const char pointer to raw data
-    @param[in] len the length of the data
+    @param[in] data_size the length of the data
     @throw invalid_argument if the publication id is invalid
     */
-    void publish (publication_id_t id, const char *data, size_t len) { publish (id, data_view{data, len}); }
+    void publish (publication_id_t id, const char *data, size_t data_size) { publish (id, data_view{data, data_size}); }
 
     /** publish a value
     @tparam X the type of the value to publish
@@ -435,5 +435,85 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
     std::unique_ptr<ValueFederateManager> vfManager;
 };
+
+/** publish directly from the publication key name
+@details this is a convenience function to publish directly from the publication key
+@param fed a shared_ptr to a value federate
+@param pubKey  the name of the publication
+@tparam pargs any combination of arguments that go into the other publish commands
+*/
+template<class ...Us> 
+void publish(std::shared_ptr<ValueFederate> &fed, const std::string &pubKey, Us... pargs)
+{
+    fed->publish(fed->getPublicationId(pubKey), pargs...);
+}
+
+/** publish directly from the publication key name
+@details this is a convenience function to publish directly from the publication key
+this function should not be used as the primary means of publications as it does involve an additional map find
+operation vs the member publish calls
+@param fed a reference to a valueFederate
+@param pubKey  the name of the publication
+@tparam pargs any combination of arguments that go into the other publish commands
+*/
+template<class ...Us>
+void publish(ValueFederate &fed, const std::string &pubKey, Us... pargs)
+{
+    fed.publish(fed.getPublicationId(pubKey), pargs...);
+}
+
+/** get a value directly from the subscription key name
+@details this is a convenience function to get a value directly from the subscription key name
+this function should not be used as the primary means of retrieving value as it does involve an additional map find
+operation vs the member getValue calls
+@param fed a shared pointer to a valueFederate
+@param key  the name of the publication
+*/
+template<class X>
+X getValue(std::shared_ptr<ValueFederate> &fed, const std::string &Key)
+{
+    return fed->getValue<X>(fed->getSubscriptionId(Key));
+}
+
+/** get a value directly from the subscription key name
+@details this is a convenience function to get a value directly from the subscription key name
+this function should not be used as the primary means of retrieving value as it does involve an additional map find
+operation vs the member getValue calls
+@param fed a shared pointer to a valueFederate
+@param key  the name of the publication
+@param obj the obj to store the retrieved value
+*/
+template<class X>
+void getValue(std::shared_ptr<ValueFederate> &fed, const std::string &Key, X &obj)
+{
+    return fed->getValue<X>(fed->getSubscriptionId(Key));
+}
+
+/** get a value directly from the subscription key name
+@details this is a convenience function to get a value directly from the subscription key name
+this function should not be used as the primary means of retrieving value as it does involve an additional map find
+operation vs the member getValue calls
+@param fed a reference to a valueFederate
+@param key  the name of the publication
+*/
+template<class X>
+X getValue(ValueFederate &fed, const std::string &Key)
+{
+    return fed.getValue<X>(fed.getSubscriptionId(Key));
+}
+
+/** get a value directly from the subscription key name
+@details this is a convenience function to get a value directly from the subscription key name
+this function should not be used as the primary means of retrieving value as it does involve an additional map find
+operation vs the member getValue calls
+@param fed a reference to a valueFederate
+@param key  the name of the publication
+@param obj the obj to store the retrieved value
+*/
+template<class X>
+void getValue(ValueFederate &fed, const std::string &Key, X &obj)
+{
+    return fed.getValue<X>(fed.getSubscriptionId(Key));
+}
 } //namespace helics
 #endif

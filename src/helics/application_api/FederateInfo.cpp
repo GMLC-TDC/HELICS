@@ -154,9 +154,9 @@ namespace helics
         {
             fi.uninterruptible = !doc["uninterruptible"].asBool();
         }
-        if (doc.isMember("forwardCompute"))
+        if (doc.isMember("forward_compute"))
         {
-            fi.forwardCompute = doc["forwardCompute"].asBool();
+            fi.forwardCompute = doc["forward_compute"].asBool();
         }
         if (doc.isMember("coreType"))
         {
@@ -175,11 +175,11 @@ namespace helics
         }
         if (doc.isMember("coreInit"))
         {
-            fi.coreInitString = doc["coreInit"].asString();
+            fi.coreInitString = doc["core_init"].asString();
         }
-        if (doc.isMember("maxiterations"))
+        if (doc.isMember("maxIterations"))
         {
-            fi.max_iterations = static_cast<int16_t> (doc["maxiterations"].asInt());
+            fi.max_iterations = static_cast<int16_t> (doc["maxIterations"].asInt());
         }
         if (doc.isMember("period"))
         {
