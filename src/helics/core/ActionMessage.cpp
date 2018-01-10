@@ -29,8 +29,8 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction)
     }
 }
 
-ActionMessage::ActionMessage (action_message_def::action_t action, int32_t sourceId, int32_t destId)
-    : ActionMessage (action)
+ActionMessage::ActionMessage (action_message_def::action_t startingAction, int32_t sourceId, int32_t destId)
+    : ActionMessage (startingAction)
 {
     source_id = sourceId;
     dest_id = destId;
@@ -197,6 +197,33 @@ std::string ActionMessage::to_string () const
     return data;
 }
 
+constexpr auto LEADING_CHAR = '\xF3';
+constexpr auto TAIL_CHAR1 = '\xFA';
+constexpr auto TAIL_CHAR2 = '\xFC';
+
+std::string ActionMessage::packetize () const
+{
+    std::string data;
+    data.push_back (LEADING_CHAR);
+    data.resize (4);
+    boost::iostreams::back_insert_device<std::string> inserter (data);
+    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
+    archiver oa (s);
+
+    save (oa);
+
+    // don't forget to flush the stream to finish writing into the buffer
+    s.flush ();
+    // now generate a length header
+    int32_t sz = static_cast<int> (data.size ());
+    data[1] = static_cast<char> (((sz >> 16) & 0xFF));
+    data[2] = static_cast<char> (((sz >> 8) & 0xFF));
+    data[3] = static_cast<char> (sz & 0xFF);
+    data.push_back (TAIL_CHAR1);
+    data.push_back (TAIL_CHAR2);
+    return data;
+}
+
 std::vector<char> ActionMessage::to_vector () const
 {
     std::vector<char> data;
@@ -240,6 +267,14 @@ void ActionMessage::to_string (std::string &data) const
 
 void ActionMessage::fromByteArray (const char *data, size_t buffer_size)
 {
+    if (data[0] == LEADING_CHAR)
+    {
+        auto res = depacketize (data, buffer_size);
+        if (res > 0)
+        {
+            return;
+        }
+    }
     boost::iostreams::basic_array_source<char> device (data, buffer_size);
     boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
     retriever ia (s);
@@ -250,6 +285,48 @@ void ActionMessage::fromByteArray (const char *data, size_t buffer_size)
     catch (const cereal::Exception &ce)
     {
         action_ = CMD_INVALID;
+    }
+}
+
+size_t ActionMessage::depacketize (const char *data, size_t buffer_size)
+{
+    if (data[0] != LEADING_CHAR)
+    {
+        return 0;
+    }
+    if (buffer_size < 6)
+    {
+        return 0;
+    }
+    size_t message_size = static_cast<unsigned char> (data[1]);
+    message_size <<= 8;
+    message_size += static_cast<unsigned char> (data[2]);
+    message_size <<= 8;
+    message_size += static_cast<unsigned char> (data[3]);
+    if (buffer_size < message_size + 2)
+    {
+        return 0;
+    }
+    if (data[message_size] != TAIL_CHAR1)
+    {
+        return 0;
+    }
+    if (data[message_size + 1] != TAIL_CHAR2)
+    {
+        return 0;
+    }
+    boost::iostreams::basic_array_source<char> device (data + 4, message_size);
+    boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
+    retriever ia (s);
+    try
+    {
+        load (ia);
+        return message_size + 2;
+    }
+    catch (const cereal::Exception &ce)
+    {
+        action_ = CMD_INVALID;
+        return 0;
     }
 }
 
