@@ -25,12 +25,6 @@ namespace bdata = boost::unit_test::data;
 #if ENABLE_TEST_TIMEOUTS > 0
 namespace utf = boost::unit_test;
 #endif
-#ifdef QUICK_TESTS_ONLY
-const std::string core_types[] = {"test", "test_2", "ipc_2", "zmq", "udp"};
-#else
-const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2", "udp", "udp_2"};
-// const std::string core_types[] = { "test_2"};
-#endif
 
 /** test registration of filters*/
 #if ENABLE_TEST_TIMEOUTS > 0

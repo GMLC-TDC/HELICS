@@ -26,6 +26,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "ipc/IpcBroker.h"
 #include "udp/UdpBroker.h"
 
+#ifndef DISABLE_TCP_CORE
+#include "tcp/TcpBroker.h"
+#endif
+
 #include <cassert>
 
 namespace helics
@@ -103,7 +107,19 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
         }
         break;
     case core_type::TCP:
-        throw (HelicsException ("TCP broker type is not available"));
+#ifndef DISABLE_TCP_CORE
+        if (name.empty ())
+        {
+            broker = std::make_shared<TcpBroker> ();
+        }
+        else
+        {
+            broker = std::make_shared<TcpBroker> (name);
+        }
+#else
+        throw (HelicsException ("tcp broker type is not available"));
+#endif
+        break;
     default:
         throw (HelicsException ("unrecognized broker type"));
     }
@@ -179,7 +195,7 @@ bool available (core_type type)
         available = true;
         break;
     case core_type::TCP:
-        available = false;
+        available = true;
         break;
     case core_type::UDP:
         available = true;

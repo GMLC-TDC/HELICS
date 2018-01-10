@@ -134,15 +134,6 @@ class ValueFederate : public virtual Federate
         return registerTypeSubscription (indexed_name, type, units);
     }
 
-    // TODO: figure out how this maps to using helics_subscriptions instead of id's
-    /** add a shortcut for locating a subscription
-    @details primarily for use in looking up an id from a different location
-    creates a local shortcut for referring to a subscription which may have a long actual name
-    @param[in] the subscription identifier
-    @param[in] shortcutName the name of the shortcut
-    */
-    void addSubscriptionShortcut (helics_subscription subid, const std::string &shortcutName) {}
-
     /** Methods to set default values for subscriptions **/
     void setDefaultValue (helics_subscription sub, const char *data, int len)
     {

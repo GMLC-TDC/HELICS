@@ -11,7 +11,6 @@ testFixtures.h
 )
 
 set(application_api_test_sources
-test_configuration.h
 value-converter-tests.cpp
 application-api-tests.cpp
 data-view-tests.cpp

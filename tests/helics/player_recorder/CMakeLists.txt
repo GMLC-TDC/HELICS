@@ -43,21 +43,26 @@ add_test(NAME player-recorder-tests COMMAND player-recorder-tests --log_level=wa
 add_definitions(-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
 
 
-
+if (BUILD_PLAYER)
 add_custom_command(TARGET player-recorder-tests POST_BUILD        # Adds a post-build event to core tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "$<TARGET_FILE:helics_player>"      # <--this is in-file
         "$<TARGET_FILE_DIR:player-recorder-tests>/")                 # <--this is out-file path
+endif()
 
+if (BUILD_RECORDER)
 add_custom_command(TARGET player-recorder-tests POST_BUILD        # Adds a post-build event to core tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "$<TARGET_FILE:helics_recorder>"      # <--this is in-file
         "$<TARGET_FILE_DIR:player-recorder-tests>/")                 # <--this is out-file path
+endif()
 
+if (BUILD_BROKER)
 add_custom_command(TARGET player-recorder-tests POST_BUILD        # Adds a post-build event to core tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "$<TARGET_FILE:helics_broker>"      # <--this is in-file
         "$<TARGET_FILE_DIR:player-recorder-tests>/")
+endif()
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET player-recorder-tests POST_BUILD        # Adds a post-build event to core tests
