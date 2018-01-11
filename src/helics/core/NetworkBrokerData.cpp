@@ -30,7 +30,7 @@ void NetworkBrokerData::displayHelp ()
     argumentParser (2, argV, vm, extraArgs);
 }
 
-void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv)
+void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, const std::string &localAddress)
 {
     namespace po = boost::program_options;
     po::variables_map vm;
@@ -56,10 +56,7 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv)
                 // TODO::Print a message?
             }
         }
-        if ((brokerAddress == "tcp://*") || (brokerAddress == "*") || (brokerAddress == "tcp"))
-        {  // the broker address can't use a wild card
-            brokerAddress = "localhost";
-        }
+        checkAndUpdateBrokerAddress(localAddress);
     }
     else if (vm.count ("broker") > 0)
     {
@@ -81,11 +78,9 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv)
                 // TODO::Print a message?
             }
         }
-        if ((brokerAddress == "tcp://*") || (brokerAddress == "*") || (brokerAddress == "tcp"))
-        {  // the broker address can't use a wild card
-            brokerAddress = "localhost";
-        }
+        checkAndUpdateBrokerAddress(localAddress);
     }
+   
     if (vm.count ("interface") > 0)
     {
         auto localprt = extractInterfaceandPort (vm["interface"].as<std::string> ());
@@ -109,7 +104,7 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv)
         portStart = vm["portstart"].as<int> ();
     }
 
-    // check the port ambiguity
+    // check for port ambiguity
     if ((!brokerAddress.empty ()) && (brokerPort == -1))
     {
         if ((localInterface.empty ()) && (portNumber != -1))
@@ -119,6 +114,40 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv)
     }
 }
 
+void NetworkBrokerData::checkAndUpdateBrokerAddress(const std::string &localAddress)
+{
+    switch (allowedType)
+    {
+    case interface_type::tcp:
+        if ((brokerAddress == "tcp://*") || (brokerAddress == "*") || (brokerAddress == "tcp"))
+        {  // the broker address can't use a wild card
+            brokerAddress = localAddress;
+        }
+        break;
+    case interface_type::udp:
+        if ((brokerAddress == "udp://*") || (brokerAddress == "*") || (brokerAddress == "udp"))
+        {  // the broker address can't use a wild card
+            brokerAddress = localAddress;
+        }
+        break;
+    case interface_type::both:
+        if ((brokerAddress == "udp://*")|| (brokerAddress == "udp"))
+        {  // the broker address can't use a wild card
+            brokerAddress = std::string("udp://")+ localAddress;
+        }
+        else if ((brokerAddress == "tcp://*") || (brokerAddress == "tcp"))
+        {  // the broker address can't use a wild card
+            brokerAddress = std::string("tcp://") + localAddress;
+        }
+        else if (brokerAddress == "*")
+        {
+            brokerAddress = localAddress;
+        }
+        break;
+    }
+    
+    
+}
 std::string makePortAddress (const std::string &networkInterface, int portNumber)
 {
     std::string newAddress = networkInterface;

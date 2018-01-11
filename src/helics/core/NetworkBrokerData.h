@@ -36,12 +36,14 @@ namespace helics
         NetworkBrokerData() = default;
         /** constructor from the allowed type*/
         explicit NetworkBrokerData(interface_type type) :allowedType(type) {};
-        void initializeFromArgs(int argc, const char *const *argv);
+        void initializeFromArgs(int argc, const char *const *argv, const std::string &localAddress);
         static void displayHelp();
         void setInterfaceType(interface_type type) {
             allowedType = type;
         }
     private:
+        /** do some checking on the brokerAddress*/
+        void checkAndUpdateBrokerAddress(const std::string &localAddress);
         interface_type allowedType = interface_type::both;
     };
 

@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
     repSocket.bind ("tcp://127.0.0.1:23405");
 
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
-    comm.setBrokerPorts (23405);
+    comm.setBrokerPort (23405);
     comm.setName ("tests");
     auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
 
@@ -240,8 +240,8 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
 
     pullSocket.setsockopt (ZMQ_LINGER, 100);
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
-    comm.setBrokerPorts (23405);
-    comm.setPortNumbers (23407);
+    comm.setBrokerPort (23405);
+    comm.setPortNumber (23407);
     comm.setName ("tests");
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
@@ -292,8 +292,8 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
         BOOST_FAIL ("Unable to bind Socket");
     }
     pullSocket.setsockopt (ZMQ_LINGER, 100);
-    comm.setBrokerPorts (23405, 23406);
-    comm.setPortNumbers (23407, 23408);
+    comm.setBrokerPort (23405);
+    comm.setPortNumber (23407);
     comm.setName ("tests");
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
@@ -338,11 +338,11 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
     helics::ZmqComms comm (host, host);
     helics::ZmqComms comm2 (host, "");
 
-    comm.setBrokerPorts (23405, 23406);
+    comm.setBrokerPort (23405);
     comm.setName ("tests");
     comm2.setName ("test2");
-    comm2.setPortNumbers (23405, 23406);
-    comm.setPortNumbers (23407, 23408);
+    comm2.setPortNumber (23405);
+    comm.setPortNumber (23407);
 
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
@@ -387,15 +387,15 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     helics::ZmqComms comm2 (host, "");
     helics::ZmqComms comm3 (host, host);
 
-    comm.setBrokerPorts (23405, 23406);
+    comm.setBrokerPort (23405);
     comm.setName ("tests");
     comm2.setName ("broker");
     comm3.setName ("test3");
-    comm3.setBrokerPorts (23405, 23406);
+    comm3.setBrokerPort (23405);
 
-    comm2.setPortNumbers (23405, 23406);
-    comm.setPortNumbers (23407, 23408);
-    comm3.setPortNumbers (23409, 23410);
+    comm2.setPortNumber (23405);
+    comm.setPortNumber (23407);
+    comm3.setPortNumber (23409);
 
     helics::ActionMessage act;
     helics::ActionMessage act2;

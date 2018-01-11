@@ -9,11 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "TcpCore.h"
-
-#include "../core-data.h"
-#include "../helics-time.h"
 #include "TcpComms.h"
-#include "helics/helics-config.h"
 
 
 namespace helics
@@ -30,7 +26,7 @@ void TcpCore::initializeFromArgs (int argc, const char *const *argv)
     
     if (brokerState == created)
     {
-        netInfo.initializeFromArgs(argc, argv);
+        netInfo.initializeFromArgs(argc, argv,"localhost");
 
         CommonCore::initializeFromArgs (argc, argv);
     }

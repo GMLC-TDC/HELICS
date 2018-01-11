@@ -37,7 +37,7 @@ ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTar
         }
         else
         {
-            localTarget_ = "tcp://*";
+            localTarget_ = "tcp://127.0.0.1"; //TODO this is not correct yet, but I need other functionality to fix it
         }
         
     }
@@ -45,22 +45,12 @@ ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTar
 /** destructor*/
 ZmqComms::~ZmqComms () { disconnect (); }
 
-void ZmqComms::setBrokerPorts (int reqPort, int pushPort)
+void ZmqComms::setBrokerPort (int brokerPort)
 {
     if (rx_status == connection_status::startup)
     {
-        brokerReqPort = reqPort;
-        if (pushPort < 0)
-        {
-            if (brokerPushPort < 0)
-            {
-                brokerPushPort = reqPort + 1;
-            }
-        }
-        else
-        {
-            brokerPushPort = pushPort;
-        }
+        brokerReqPort = brokerPort;
+        brokerPushPort = brokerReqPort + 1;
     }
 }
 
@@ -80,16 +70,12 @@ std::pair<int, int> ZmqComms::findOpenPorts ()
     return std::make_pair (start, start + 1);
 }
 
-void ZmqComms::setPortNumbers (int repPort, int pullPort)
+void ZmqComms::setPortNumber (int portNumber)
 {
     if (rx_status == connection_status::startup)
     {
-        repPortNumber = repPort;
-        if (repPort > 0)
-        {
-            auto currentPullPort = pullPortNumber.load ();
-            pullPortNumber = (pullPort > 0) ? pullPort : (currentPullPort < 0) ? repPort + 1 : currentPullPort;
-        }
+        repPortNumber = portNumber;
+        pullPortNumber = portNumber + 1;
     }
 }
 
@@ -584,41 +570,30 @@ void ZmqComms::queue_tx_function ()
                     break;
                 case NEW_ROUTE:
                 {
-                    auto newroute = cmd.payload;
-                    auto splitPt = newroute.find_first_of (';');
-                    std::string priority_route;
-                    std::string push_route;
-                    if (splitPt != std::string::npos)
-                    {
-                        priority_route = newroute.substr (0, splitPt);
-                        push_route = newroute.substr (splitPt + 1);
-                    }
-                    else
-                    {
-                        push_route = newroute;
-                    }
-                    if (!priority_route.empty ())
-                    {
                         try
                         {
-                            priority_routes.addRoutes (cmd.dest_id, priority_route);
+                            priority_routes.addRoutes (cmd.dest_id, cmd.payload);
                         }
                         catch (const zmq::error_t &e)
                         {
                             // TODO:: do something???
                             std::cerr << e.what () << '\n';
                         }
-                    }
+
                     try
                     {
+                        auto iap = extractInterfaceandPort(cmd.payload);
+
                         auto zsock = zmq::socket_t (ctx->getContext (), ZMQ_PUSH);
                         zsock.setsockopt (ZMQ_LINGER, 100);
-                        zsock.connect (push_route);
+                        zsock.connect (makePortAddress(iap.first,iap.second+1));
                         routes.emplace (cmd.dest_id, std::move (zsock));
                     }
-                    catch (const zmq::error_t &)
+                    catch (const zmq::error_t &e)
                     {
                         // TODO:: do something???
+                        std::cerr << e.what() << '\n';
+
                     }
                     processed = true;
                 }
@@ -721,7 +696,27 @@ void ZmqComms::closeReceiver ()
     }
 }
 
-std::string ZmqComms::getPushAddress () const { return makePortAddress (localTarget_, pullPortNumber); }
+std::string ZmqComms::getAddress() const
+{
+    if ((localTarget_ == "tcp://*") || (localTarget_ == "tcp://0.0.0.0"))
+    {
+        return makePortAddress("tcp://127.0.0.1", repPortNumber);
+    }
+    else
+    {
+        return makePortAddress(localTarget_, repPortNumber);
+    }
+}
 
-std::string ZmqComms::getRequestAddress () const { return makePortAddress (localTarget_, repPortNumber); }
+std::string ZmqComms::getPushAddress() const
+{
+    if ((localTarget_ == "tcp://*")||(localTarget_=="tcp://0.0.0.0"))
+    {
+        return makePortAddress("tcp://127.0.0.1", pullPortNumber);
+    }
+    else
+    {
+        return makePortAddress(localTarget_, pullPortNumber);
+    }
+}
 }  // namespace helics

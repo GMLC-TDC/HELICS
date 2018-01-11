@@ -50,8 +50,8 @@ public:
 	/** destructor*/
 	~ZmqComms();
 	/** set the port numbers for the local ports*/
-	void setBrokerPorts(int reqPort, int pushPort=-1);
-	void setPortNumbers(int repPort, int pullPort=-1);
+	void setBrokerPort(int brokerPort);
+	void setPortNumber(int portNumber);
 	void setAutomaticPortStartPort(int startingPort);
 private:
 	int brokerReqPort = -1;
@@ -76,13 +76,11 @@ private:
 
 	int initializeBrokerConnections(zmq::socket_t &controlSocket);
 public:
-	/** get the port number of the comms object to send requests to*/
-	int getRequestPort() const { return repPortNumber; };
-	/** get the port number of the comms object to push message to*/
-	int getPushPort() const { return pullPortNumber; };
+    /** get the port number of the comms object to push message to*/
+    int getPort() const { return repPortNumber; };
 
-	std::string getPushAddress() const;
-	std::string getRequestAddress() const;
+	std::string getAddress() const;
+    std::string getPushAddress() const;
 };
 
 

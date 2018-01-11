@@ -12,7 +12,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "../CommonCore.h"
 #include "../CommsBroker.hpp"
-
+#include "../NetworkBrokerData.h"
 namespace helics {
 
 class ZmqComms;
@@ -32,12 +32,7 @@ public:
 	virtual std::string getAddress() const override;
 private:
 	
-	std::string brokerAddress;	//!< the protocol string for the broker location
-	std::string localInterface; //!< the interface to use for the local receive ports
-	int repPortNumber=-1;	//!< the port number for the reply port
-	int pullPortNumber=-1;	//!< the port number for the pull port
-	int brokerReqPort=-1;  //!< the port number to use for the broker priority request port
-	int brokerPushPort=-1;  //!< the port number to use for the broker regular push port
+    NetworkBrokerData netInfo{ NetworkBrokerData::interface_type::tcp }; //!< container for the network connection information
 
 	virtual bool brokerConnect() override;
  

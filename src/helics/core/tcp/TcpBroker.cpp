@@ -9,10 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "TcpBroker.h"
-#include "../core-data.h"
 #include "TcpComms.h"
-#include "helics/helics-config.h"
-
 
 namespace helics
 {
@@ -26,7 +23,7 @@ TcpBroker::~TcpBroker () = default;
 
 void TcpBroker::displayHelp (bool local_only)
 {
-    std::cout << " Help for Zero MQ Broker: \n";
+    std::cout << " Help for TCP Broker: \n";
 
     NetworkBrokerData::displayHelp();
     if (!local_only)
@@ -39,7 +36,7 @@ void TcpBroker::initializeFromArgs (int argc, const char *const *argv)
 {
     if (brokerState == broker_state_t::created)
     {
-        netInfo.initializeFromArgs(argc, argv);
+        netInfo.initializeFromArgs(argc, argv, "localhost");
         CoreBroker::initializeFromArgs (argc, argv);
     }
 }
