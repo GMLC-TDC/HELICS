@@ -33,6 +33,19 @@ TcpComms::TcpComms (const std::string &brokerTarget, const std::string &localTar
         localTarget_ = "localhost";
     }
 }
+
+TcpComms::TcpComms(const NetworkBrokerData &netInfo) :CommsInterface(netInfo),brokerPort(netInfo.brokerPort),PortNumber(netInfo.portNumber)
+{
+    if (localTarget_.empty())
+    {
+        localTarget_ = "localhost";
+    }
+    if (netInfo.portStart > 0)
+    {
+        openPortStart = netInfo.portStart;
+    }
+}
+
 /** destructor*/
 TcpComms::~TcpComms () { disconnect (); }
 

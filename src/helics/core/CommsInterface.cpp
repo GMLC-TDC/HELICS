@@ -9,11 +9,17 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "CommsInterface.h"
+#include "NetworkBrokerData.h"
 
 namespace helics
 {
 CommsInterface::CommsInterface (const std::string &localTarget, const std::string &brokerTarget)
     : localTarget_ (localTarget), brokerTarget_ (brokerTarget)
+{
+}
+
+CommsInterface::CommsInterface(const NetworkBrokerData &netInfo)
+    : localTarget_(netInfo.localInterface), brokerTarget_(netInfo.brokerAddress)
 {
 }
 /** destructor*/

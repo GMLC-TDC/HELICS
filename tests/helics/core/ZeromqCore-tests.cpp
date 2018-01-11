@@ -436,7 +436,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     BOOST_REQUIRE_EQUAL (counter2, 2);
     BOOST_CHECK (act2.action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm2.addRoute (3, comm3.getPushAddress ());
+    comm2.addRoute (3, comm3.getAddress ());
 
     comm2.transmit (3, helics::CMD_ACK);
 
@@ -448,7 +448,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     BOOST_REQUIRE_EQUAL (counter3, 1);
     BOOST_CHECK (act3.action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm2.addRoute (4, comm.getPushAddress ());
+    comm2.addRoute (4, comm.getAddress ());
 
     comm2.transmit (4, helics::CMD_ACK);
 
@@ -465,7 +465,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
 BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
 {
     std::string initializationString =
-      "1 --brokerport=23405 --repport=23410 --local_interface=tcp://127.0.0.1 --name=core1";
+      "1 --brokerport=23405 --port=23410 --local_interface=tcp://127.0.0.1 --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
@@ -536,7 +536,7 @@ BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
 
     auto ccore = static_cast<helics::ZmqCore *> (core.get ());
     // this will test the automatic port allocation
-    BOOST_CHECK_EQUAL (ccore->getAddress (), "tcp://127.0.0.1:23500;tcp://127.0.0.1:23501");
+    BOOST_CHECK_EQUAL (ccore->getAddress (), "tcp://127.0.0.1:23500");
     core->disconnect ();
     broker->disconnect ();
     helics::CoreFactory::cleanUpCores (200);

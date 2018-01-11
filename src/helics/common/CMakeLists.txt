@@ -19,6 +19,7 @@ stringOps.h
 charMapper.h
 generic_string_ops.hpp
 base64.h
+ArgParser.h
 )
 
 set(common_sources
@@ -28,6 +29,7 @@ logger.cpp
 stringOps.cpp
 charMapper.cpp
 base64.cpp
+ArgParser.cpp
 )
 
 set(zmq_headers

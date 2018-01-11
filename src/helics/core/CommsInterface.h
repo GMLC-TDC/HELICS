@@ -18,6 +18,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics {
 
+    class NetworkBrokerData;
+
 /** implementation of a generic communications interface
 */
 class CommsInterface {
@@ -25,7 +27,13 @@ class CommsInterface {
 public:
 	/** default constructor*/
 	CommsInterface() = default;
+    /** construct from a localTarget and brokerTarget
+    @param localTarget the interface or specification that should be set to receive incoming connections
+    @param brokerTarget the target of the broker Interface to link to
+    */
 	CommsInterface(const std::string &localTarget, const std::string &brokerTarget);
+    /** construct from a NetworkBrokerData structure*/
+    CommsInterface(const NetworkBrokerData &netInfo);
 	/** destructor*/
 	virtual ~CommsInterface();
 	/** transmit a message along a particular route
@@ -80,12 +88,12 @@ protected:
 	std::string localTarget_; //!< the identifier for the receive address
 	std::string brokerTarget_;	//!< the identifier for the broker address
 	std::atomic<connection_status> tx_status{ connection_status::startup }; //!< the status of the transmitter thread
-    int connectionTimeout = 4000; //timeout for the initial connection to a broker for erroring
+    int connectionTimeout = 4000; //timeout for the initial connection to a broker
     int maxMessageSize_ = 16 * 1024; //!< the maximum message size for the queues (if needed)
 	int maxMessageCount_ = 512;  //!< the maximum number of message to buffer (if needed)
 	std::function<void(ActionMessage &&)> ActionCallback; //!< the callback for what to do with a received message
 	BlockingPriorityQueue<std::pair<int, ActionMessage>> txQueue; //!< set of messages waiting to be transmitted
-	// closing the files or connection can take some time so there is a need for interthread communication to not spit out warning messages if it is in the process of disconnecting
+	// closing the files or connection can take some time so there is a need for inter-thread communication to not spit out warning messages if it is in the process of disconnecting
 	std::atomic<bool> disconnecting{ false }; //!<flag indicating that the comm system is in the process of disconnecting
 private:
 	std::thread queue_transmitter; //!< single thread for sending data

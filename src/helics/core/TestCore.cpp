@@ -14,7 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "BrokerFactory.h"
 #include "CoreBroker.h"
 #include "CoreFactory.h"
-#include "argParser.h"
+#include "../common/argParser.h"
 #include <fstream>
 
 namespace helics
@@ -27,6 +27,8 @@ TestCore::TestCore (const std::string &core_name) : CommonCore (core_name) {}
 TestCore::TestCore (std::shared_ptr<CoreBroker> nbroker) : tbroker (std::move (nbroker)) {}
 using namespace std::string_literals;
 static const argDescriptors extraArgs{{"brokername"s, "string"s, "identifier for the broker-same as broker"s},
+{ "broker,b"s,"string"s,"identifier for the broker"s },
+{ "broker_address","string"s,"location of the broker i.e network address" },
                                       {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
 
 void TestCore::initializeFromArgs (int argc, const char *const *argv)

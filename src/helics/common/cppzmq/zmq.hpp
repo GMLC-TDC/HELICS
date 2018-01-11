@@ -586,13 +586,6 @@ namespace zmq
             return optval;
         }
 
-        template<> std::string getsockopt(int option_) const
-        {
-            char buffer[256];
-            size_t optlen = 256;
-            getsockopt(option_, buffer, &optlen);
-            return std::string(buffer);
-        }
 
         inline void bind(std::string const& addr)
         {
@@ -725,6 +718,15 @@ namespace zmq
         socket_t (const socket_t&) ZMQ_DELETED_FUNCTION;
         void operator = (const socket_t&) ZMQ_DELETED_FUNCTION;
     };
+
+
+    template<> inline std::string socket_t::getsockopt(int option_) const
+    {
+        size_t optlen = 256;
+        std::string ret(optlen,'\0');
+        getsockopt(option_, &ret[0], &optlen);
+        return ret;
+    }
 
     class monitor_t
     {

@@ -14,6 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../../common/zmqSocketDescriptor.h"
 #include "../ActionMessage.h"
 #include "ZmqRequestSets.h"
+#include "../NetworkBrokerData.h"
 //#include <boost/asio.hpp>
 //#include <csignal>
 #include <memory>
@@ -31,7 +32,7 @@ ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTar
 {
     if (localTarget_.empty ())
     {
-        if ((brokerTarget == "tcp://127.0.0.1")||(brokerTarget=="tcp://localhost"))
+        if ((brokerTarget_ == "tcp://127.0.0.1")||(brokerTarget_=="tcp://localhost"))
         {
             localTarget_ = "tcp://127.0.0.1";
         }
@@ -40,6 +41,36 @@ ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTar
             localTarget_ = "tcp://127.0.0.1"; //TODO this is not correct yet, but I need other functionality to fix it
         }
         
+    }
+}
+
+ZmqComms::ZmqComms(const NetworkBrokerData &netInfo) :CommsInterface(netInfo)
+{
+    if (localTarget_.empty())
+    {
+        if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost"))
+        {
+            localTarget_ = "tcp://127.0.0.1";
+        }
+        else
+        {
+            localTarget_ = "tcp://127.0.0.1"; //TODO this is not correct yet, but I need other functionality to fix it
+        }
+
+    }
+    if (netInfo.brokerPort > 0)
+    {
+        brokerReqPort = netInfo.brokerPort;
+        brokerPushPort = brokerReqPort + 1;
+    }
+    if (netInfo.portNumber > 0)
+    {
+        repPortNumber = netInfo.portNumber;
+        pullPortNumber = repPortNumber + 1;
+    }
+    if (netInfo.portStart > 0)
+    {
+        openPortStart = netInfo.portStart;
     }
 }
 /** destructor*/
@@ -219,16 +250,7 @@ void ZmqComms::queue_rx_function ()
     try
     {
         repSocket.bind (makePortAddress (localTarget_, repPortNumber));
-        /*
-        boost::asio::io_service io_service;
-
-        boost::asio::ip::tcp::resolver resolver(io_service);
-        boost::asio::ip::tcp::resolver::query query(boost::asio::ip::tcp::v4(), boost::asio::ip::host_name(), "");
-        boost::asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
-        boost::asio::ip::tcp::endpoint endpoint = *it;
-
-        std::cout << endpoint.address().to_string() << '\n';
-        */
+      
     }
     catch (const zmq::error_t &)
     {

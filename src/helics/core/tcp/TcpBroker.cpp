@@ -48,18 +48,10 @@ bool TcpBroker::brokerConnect ()
     {
         setAsRoot ();
     }
-    comms = std::make_unique<TcpComms> (netInfo.localInterface, netInfo.brokerAddress);
+    comms = std::make_unique<TcpComms> (netInfo);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
-    if (netInfo.portNumber > 0)
-    {
-        comms->setPortNumber (netInfo.portNumber);
-    }
-
-    if (netInfo.portStart > 0)
-    {
-        comms->setAutomaticPortStartPort (netInfo.portStart);
-    }
+   
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = comms->connect ();
     if (res)

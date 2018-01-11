@@ -101,9 +101,10 @@ class shared_guarded
 
     /** store an updated value into the object*/
     template <typename objType>
-    std::enable_if_t<std::is_copy_assignable<T>::value> operator=(objType &&newObj)
+    std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
     {
-        store(std::forward<objType>(newObj));
+        std::lock_guard<M> glock(m_mutex);
+        m_obj = std::forward<objType>(newObj);
     }
   private:
     class deleter
@@ -273,12 +274,6 @@ public:
         T newObj(m_obj);
         return newObj;
     }
-    /** generate a copy of the protected object
-    */
-    std::enable_if_t<std::is_copy_constructible<T>::value, T> operator*() const
-    {
-        return load();
-    }
 
     /** store an updated value into the object*/
     template <typename objType>
@@ -290,9 +285,10 @@ public:
 
     /** store an updated value into the object*/
     template <typename objType>
-    std::enable_if_t<std::is_copy_assignable<T>::value> operator=(objType &&newObj)
+    std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
     {
-        store(std::forward<objType>(newObj));
+        std::lock_guard<std::mutex> glock(m_mutex);
+        m_obj = std::forward<objType>(newObj);
     }
 private:
     class deleter
@@ -432,12 +428,6 @@ public:
         T newObj(m_obj);
         return newObj;
     }
-    /** generate a copy of the protected object
-    */
-    std::enable_if_t<std::is_copy_constructible<T>::value, T> operator*() const
-    {
-        return load();
-    }
 
     /** store an updated value into the object*/
     template <typename objType>
@@ -449,9 +439,10 @@ public:
 
     /** store an updated value into the object*/
     template <typename objType>
-    std::enable_if_t<std::is_copy_assignable<T>::value> operator=(objType &&newObj)
+    std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
     {
-        store(std::forward<objType>(newObj));
+        std::lock_guard<std::timed_mutex> glock(m_mutex);
+        m_obj = std::forward<objType>(newObj);
     }
 private:
     class deleter

@@ -32,7 +32,11 @@ endif()
 if (BUILD_RECORDER)
 add_executable(helics_recorder recorderMain.cpp)
 target_link_libraries(helics_recorder helics_apps-static helics-static)
+endif()
 
+IF(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_APPS)
+add_executable(helics_app appMain.cpp)
+target_link_libraries(helics_app helics_apps-static helics-static)
 endif()
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
@@ -63,6 +67,18 @@ add_custom_command(TARGET helics_recorder POST_BUILD        # Adds a post-build 
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:helics_recorder>/")                 # <--this is out-file path
+endforeach(keyfile)
+endif()
+endif()
+
+if (BUILD_APPS)
+INSTALL(TARGETS helics_app DESTINATION ${CMAKE_INSTALL_BINDIR})
+if (NOT BUILD_PLAYER AND NOT BUILD_RECORDER)
+foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
+add_custom_command(TARGET helics_app POST_BUILD        # Adds a post-build event to core tests
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        "${keyfile}"      # <--this is in-file
+        "$<TARGET_FILE_DIR:helics_app>/")                 # <--this is out-file path
 endforeach(keyfile)
 endif()
 endif()

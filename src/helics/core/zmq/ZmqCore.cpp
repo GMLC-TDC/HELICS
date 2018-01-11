@@ -38,17 +38,10 @@ bool ZmqCore::brokerConnect ()
     {
         netInfo.brokerAddress = "tcp://127.0.0.1";
     }
-    comms = std::make_unique<ZmqComms> (netInfo.localInterface, netInfo.brokerAddress);
+    comms = std::make_unique<ZmqComms> (netInfo);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
-    if (netInfo.portNumber > 0)
-    {
-        comms->setPortNumber(netInfo.portNumber);
-    }
-    if (netInfo.brokerPort > 0)
-    {
-        comms->setBrokerPort(netInfo.brokerPort);
-    }
+    
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = comms->connect();
     if (res)

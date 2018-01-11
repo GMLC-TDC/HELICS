@@ -130,7 +130,7 @@ class guarded
 
     /** store an updated value into the object*/
     template <typename objType>
-    std::enable_if_t<std::is_copy_assignable<T>::value> operator=(objType &&newObj)
+    std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
     { //uses a forwarding reference
         store(std::forward<objType>(newObj));
     }

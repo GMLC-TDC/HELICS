@@ -123,6 +123,27 @@ void player::loadFile (const std::string &filename)
     }
 }
 
+
+helics::Time player::extractTime(const std::string &str, int lineNumber) const
+{
+    try
+    {
+        if (timeMultiplier == 1e-9) //ns
+        {
+            return helics::Time(std::stoll(str), timeUnits::ns);
+        }
+        else
+        {
+            return helics::Time(std::stod(str));
+        }
+    }
+    catch (const std::invalid_argument &ia)
+    {
+        std::cerr << "ill formed time on line " << lineNumber << '\n';
+        return helics::Time::minVal();
+    }
+}
+
 void player::loadTextFile (const std::string &filename)
 {
     using namespace stringOps;
@@ -170,6 +191,44 @@ void player::loadTextFile (const std::string &filename)
         auto fc = str.find_first_not_of (" \t\n\r\0");
         if ((fc == std::string::npos) || (str[fc] == '#'))
         {
+            if (str[fc + 1] == '!')
+            {
+                /*  //allow configuration inside the regular text file 
+                if (playerConfig.find("stop") != playerConfig.end())
+                {
+                    stopTime = playerConfig["stop"].get<double>();
+                }
+                if (playerConfig.find("local") != playerConfig.end())
+                {
+                    useLocal = playerConfig["local"].get<bool>();
+                }
+                if (playerConfig.find("separator") != playerConfig.end())
+                {
+                    fed->setSeparator(playerConfig["separator"].get<char>());
+                }
+                if (playerConfig.find("timeunits") != playerConfig.end())
+                {
+                    if (playerConfig["timeunits"] == "ns")
+                    {
+                        timeMultiplier = 1e-9;
+                    }
+                }
+                if (playerConfig.find("file") != playerConfig.end())
+                {
+                    if (playerConfig["file"].is_array())
+                    {
+                        for (const auto &fname : playerConfig["file"])
+                        {
+                            loadFile(fname);
+                        }
+                    }
+                    else
+                    {
+                        loadFile(playerConfig["file"]);
+                    }
+                }
+                */
+            }
             continue;
         }
         /* time key type value units*/
@@ -182,39 +241,26 @@ void player::loadTextFile (const std::string &filename)
             switch (blk.size ())
             {
             case 5:
-                try
+                if ((messages[mIndex].sendTime = extractTime(blk[1],lcount))==Time::minVal())
                 {
-                    messages[mIndex].sendTime = helics::Time (std::stod (blk[1]));
-                }
-                catch (const std::invalid_argument &ia)
-                {
-                    std::cerr << "ill formed time on line " << lcount << '\n';
                     continue;
                 }
+               
                 messages[mIndex].mess.source = blk[2];
                 messages[mIndex].mess.dest = blk[3];
                 messages[mIndex].mess.time = messages[mIndex].sendTime;
                 messages[mIndex].mess.data = decode (std::move (blk[4]));
                 break;
             case 6:
-                try
+                if ((messages[mIndex].sendTime = extractTime(blk[1], lcount)) == Time::minVal())
                 {
-                    messages[mIndex].sendTime = helics::Time (std::stod (blk[1]));
-                }
-                catch (const std::invalid_argument &ia)
-                {
-                    std::cerr << "ill formed time on line " << lcount << '\n';
                     continue;
                 }
+               
                 messages[mIndex].mess.source = blk[3];
                 messages[mIndex].mess.dest = blk[4];
-                try
+                if ((messages[mIndex].mess.time = extractTime(blk[2], lcount)) == Time::minVal())
                 {
-                    messages[mIndex].mess.time = helics::Time (std::stod (blk[2]));
-                }
-                catch (const std::invalid_argument &ia)
-                {
-                    std::cerr << "ill formed message time on line " << lcount << '\n';
                     continue;
                 }
                 messages[mIndex].mess.data = decode (std::move (blk[5]));
@@ -229,28 +275,19 @@ void player::loadTextFile (const std::string &filename)
         {
             if (blk.size () == 3)
             {
-                try
+                if ((points[pIndex].time = extractTime(blk[0], lcount)) == Time::minVal())
                 {
-                    points[pIndex].time = helics::Time (std::stod (blk[0]));
-                }
-                catch (const std::invalid_argument &ia)
-                {
-                    std::cerr << "ill formed time on line " << lcount << '\n';
                     continue;
                 }
+                
                 points[pIndex].pubName = blk[1];
                 points[pIndex].value = blk[2];
                 ++pIndex;
             }
             else if (blk.size () == 4)
             {
-                try
+                if ((points[pIndex].time = extractTime(trim(blk[0]), lcount)) == Time::minVal())
                 {
-                    points[pIndex].time = helics::Time (std::stod (trim (blk[0])));
-                }
-                catch (const std::invalid_argument &ia)
-                {
-                    std::cerr << "ill formed time on line " << lcount << '\n';
                     continue;
                 }
                 points[pIndex].pubName = blk[1];
@@ -325,6 +362,13 @@ void player::loadJsonFile (const std::string &jsonFile)
         {
             fed->setSeparator(playerConfig["separator"].get<char>());
         }
+        if (playerConfig.find("timeunits") != playerConfig.end())
+        {
+            if (playerConfig["timeunits"] == "ns")
+            {
+                timeMultiplier = 1e-9;
+            }
+        }
         if (playerConfig.find("file") != playerConfig.end())
         {
             if (playerConfig["file"].is_array())
@@ -349,11 +393,26 @@ void player::loadJsonFile (const std::string &jsonFile)
             Time ptime;
             if (pointElement.count ("time") > 0)
             {
-                ptime = pointElement["time"].get<double> ();
+                if (timeMultiplier == 1e-9)
+                {
+                    ptime = helics::Time(pointElement["time"].get<int64_t>(), timeUnits::ns);
+                }
+                else
+                {
+                    ptime = pointElement["time"].get<double>();
+                }
+                
             }
             else if (pointElement.count ("t") > 0)
             {
-                ptime = pointElement["t"].get<double> ();
+                if (timeMultiplier == 1e-9)
+                {
+                    ptime = helics::Time(pointElement["t"].get<int64_t>(), timeUnits::ns);
+                }
+                else
+                {
+                    ptime = pointElement["t"].get<double>();
+                }
             }
             else
             {
@@ -428,11 +487,25 @@ void player::loadJsonFile (const std::string &jsonFile)
             Time ptime;
             if (messageElement.count("time") > 0)
             {
-                ptime = messageElement["time"].get<double>();
+                if (timeMultiplier == 1e-9)
+                {
+                    ptime = helics::Time(messageElement["time"].get<int64_t>(), timeUnits::ns);
+                }
+                else
+                {
+                    ptime = messageElement["time"].get<double>();
+                }
             }
             else if (messageElement.count("t") > 0)
             {
-                ptime = messageElement["t"].get<double>();
+                if (timeMultiplier == 1e-9)
+                {
+                    ptime = helics::Time(messageElement["t"].get<int64_t>(), timeUnits::ns);
+                }
+                else
+                {
+                    ptime = messageElement["t"].get<double>();
+                }
             }
             else
             {
@@ -461,7 +534,14 @@ void player::loadJsonFile (const std::string &jsonFile)
             std::string type;
             if (messageElement.count("sendtime") > 0)
             {
-                ptime = messageElement["sendtime"].get<double>();
+                if (timeMultiplier == 1e-9)
+                {
+                    ptime = helics::Time(messageElement["sendtime"].get<int64_t>(), timeUnits::ns);
+                }
+                else
+                {
+                    ptime = messageElement["sendtime"].get<double>();
+                }
             }
             
             messages.resize(messages.size() + 1);
@@ -796,6 +876,13 @@ int player::loadArguments(boost::program_options::variables_map &vm_map)
     {
         fed->setSeparator(vm_map["separator"].as<char>());
     }
+    if (vm_map.count("timeunits"))
+    {
+        if (vm_map["timeunits"].as<std::string>() == "ns")
+        {
+            timeMultiplier = 1e-9;
+        }
+    }
     std::string file;
     if (vm_map.count("input") == 0)
     {
@@ -845,6 +932,7 @@ void playerArgumentParser (int argc, const char *const *argv, po::variables_map 
 		("datatype",po::value<std::string>(),"type of the publication data type to use")
         ("local","specify otherwise unspecified endpoints and publications as local( i.e.the keys will be prepended with the player name")
         ("separator",po::value<char>(),"specify the separator for local publications and endpoints")
+        ("timeunits",po::value<std::string>(),"the units on the timestamp used in file based input")
 		("stop", po::value<double>(), "the time to stop the player");
 
 

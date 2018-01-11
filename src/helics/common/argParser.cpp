@@ -29,13 +29,8 @@ void argumentParser (int argc,
     // clang-format off
 	// input boost controls
 	cmd_only.add_options()
-		("help,h", "produce help message")
+		("help,?", "produce help message")
 		("config-file", po::value<std::string>(), "specify a configuration file to use");
-
-
-	config.add_options()
-		("broker,b", po::value<std::string>(), "identifier for the broker")
-		("broker_address",po::value<std::string>(),"location of the broker address");
 
 	for (auto &addArg : additionalArgs)
 	{

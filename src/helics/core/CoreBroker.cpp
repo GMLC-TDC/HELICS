@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../common/stringToCmdLine.h"
 #include "BrokerFactory.h"
 
-#include "argParser.h"
+#include "../common/argParser.h"
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 

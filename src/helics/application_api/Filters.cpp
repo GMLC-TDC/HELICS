@@ -52,6 +52,7 @@ void addOperations (Filter *filt, defined_filter_types type, Core *cptr)
         auto op = std::make_shared<randomDropFilterOperation> ();
         filt->setFilterOperations (std::move (op));
     }
+    break;
     case clone:
     {
         auto op = std::make_shared<cloneFilterOperation>(cptr);

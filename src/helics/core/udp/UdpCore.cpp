@@ -37,17 +37,10 @@ bool UdpCore::brokerConnect ()
     {
         netInfo.brokerAddress = "localhost";
     }
-    comms = std::make_unique<UdpComms> (netInfo.localInterface, netInfo.brokerAddress);
+    comms = std::make_unique<UdpComms> (netInfo);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
-    if (netInfo.portNumber > 0)
-    {
-        comms->setPortNumber (netInfo.portNumber);
-    }
-    if (netInfo.brokerPort > 0)
-    {
-        comms->setBrokerPort (netInfo.brokerPort);
-    }
+   
 
     auto res = comms->connect ();
     if (res)

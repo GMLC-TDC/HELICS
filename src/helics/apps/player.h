@@ -215,6 +215,11 @@ namespace helics
         /** send all points and messages up to the specified time*/
         void sendInformation(Time sendTime);
 
+        /** extract a time from the string based on player parameters
+        @param str the string containing the time 
+        @param lineNumber the lineNumber of the file which is used in case of invalid specification
+        */
+        helics::Time extractTime(const std::string &str, int lineNumber=0) const;
     private:
         std::shared_ptr<CombinationFederate> fed; //!< the federate created for the player
         std::vector<ValueSetter> points;    //!< the points to generate into the federation
@@ -230,6 +235,7 @@ namespace helics
         std::string masterFileName; //!< the name of the master file used to do the construction
         size_t pointIndex = 0; //!< the current point index
         size_t messageIndex = 0; //!< the current message index
+        double timeMultiplier = 1.0; //!< specify the time multiplier for different time specifications
         bool useLocal = false;
         bool fileLoaded = false;
     };

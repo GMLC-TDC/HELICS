@@ -22,24 +22,6 @@ class socket_t;
 }
 namespace helics {
 
-/** generate a string with a full address based on an interface string and port number
-@details,  how things get merged depend on what interface is used some use port number some do not
-
-@param[in] interface a string with an interface description i.e tcp://127.0.0.1 
-@param portNumber the number of the port to use
-@return a string with the merged address
-*/
-std::string makePortAddress(const std::string &networkInterface, int portNumber);
-
-/** extract a port number and interface string from an address number
-@details,  if there is no port number it default to -1 this is true if none was listed
-or the interface doesn't use port numbers
-
-@param[in] address a string with an network location description i.e tcp://127.0.0.1:34
-@return a pair with a string and int with the interface name and port number
-*/
-std::pair<std::string, int> extractInterfaceandPort(const std::string &address);
-
 /** implementation for the communication interface that uses ZMQ messages to communicate*/
 class ZmqComms final:public CommsInterface {
 
@@ -47,6 +29,7 @@ public:
 	/** default constructor*/
 	ZmqComms() = default;
 	ZmqComms(const std::string &brokerTarget, const std::string &localTarget);
+    ZmqComms(const NetworkBrokerData &netInfo);
 	/** destructor*/
 	~ZmqComms();
 	/** set the port numbers for the local ports*/

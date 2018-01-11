@@ -10,14 +10,22 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "NetworkBrokerData.h"
-#include "argParser.h"
+#include "../common/argParser.h"
+
+#include <boost/asio/ip/host_name.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/io_service.hpp>
 
 using namespace std::string_literals;
 
 namespace helics
 {
+
+
 static const argDescriptors extraArgs{{"interface"s, "string"s,
                                        "the local interface to use for the receive ports"s},
+                                       {"broker,b"s,"string"s,"identifier for the broker"s},
+                                       {"broker_address","string"s,"location of the broker i.e network address"},
                                       {"brokerport"s, "int"s, "port number for the broker priority port"s},
                                       {"localport"s, "int"s, "port number for the local receive port"s},
                                       {"port"s, "int"s, "port number for the broker's port"s},
@@ -192,6 +200,32 @@ std::pair<std::string, std::string> extractInterfaceandPortString (const std::st
 {
     auto lastColon = address.find_last_of (':');
     return std::make_pair (address.substr (0, lastColon), address.substr (lastColon + 1));
+}
+
+
+std::string getLocalExternalAddressV4()
+{
+    boost::asio::io_service io_service;
+
+    boost::asio::ip::tcp::resolver resolver(io_service);
+    boost::asio::ip::tcp::resolver::query query(boost::asio::ip::tcp::v4(), boost::asio::ip::host_name(), "");
+    boost::asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+    boost::asio::ip::tcp::endpoint endpoint = *it;
+
+    return endpoint.address().to_string();
+}
+
+
+std::string getLocalExternalAddressV4(const std::string & /*server*/)
+{
+    boost::asio::io_service io_service;
+
+    boost::asio::ip::tcp::resolver resolver(io_service);
+    boost::asio::ip::tcp::resolver::query query(boost::asio::ip::tcp::v4(), boost::asio::ip::host_name(), "");
+    boost::asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+    boost::asio::ip::tcp::endpoint endpoint = *it;
+
+    return endpoint.address().to_string();
 }
 
 }  // namespace helics

@@ -95,9 +95,10 @@ class ordered_guarded
 
     /** store an updated value into the object*/
     template <typename objType>
-    std::enable_if_t<std::is_copy_assignable<T>::value> operator=(objType &&newObj)
+    std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
     {
-        store(std::forward<objType>(newObj));
+        std::lock_guard<M> lock(m_mutex);
+        m_obj = std::forward<objType>(newObj);
     }
   private:
     class shared_deleter
