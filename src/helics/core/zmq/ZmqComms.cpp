@@ -14,6 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../../common/zmqSocketDescriptor.h"
 #include "../ActionMessage.h"
 #include "ZmqRequestSets.h"
+//#include <boost/asio.hpp>
 //#include <csignal>
 #include <memory>
 
@@ -30,7 +31,15 @@ ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTar
 {
     if (localTarget_.empty ())
     {
-        localTarget_ = "tcp://127.0.0.1";
+        if ((brokerTarget == "tcp://127.0.0.1")||(brokerTarget=="tcp://localhost"))
+        {
+            localTarget_ = "tcp://127.0.0.1";
+        }
+        else
+        {
+            localTarget_ = "tcp://*";
+        }
+        
     }
 }
 /** destructor*/
@@ -224,6 +233,16 @@ void ZmqComms::queue_rx_function ()
     try
     {
         repSocket.bind (makePortAddress (localTarget_, repPortNumber));
+        /*
+        boost::asio::io_service io_service;
+
+        boost::asio::ip::tcp::resolver resolver(io_service);
+        boost::asio::ip::tcp::resolver::query query(boost::asio::ip::tcp::v4(), boost::asio::ip::host_name(), "");
+        boost::asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+        boost::asio::ip::tcp::endpoint endpoint = *it;
+
+        std::cout << endpoint.address().to_string() << '\n';
+        */
     }
     catch (const zmq::error_t &)
     {

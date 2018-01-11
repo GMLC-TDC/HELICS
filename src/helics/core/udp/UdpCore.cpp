@@ -29,7 +29,7 @@ namespace helics
 {
 using namespace std::string_literals;
 static const argDescriptors extraArgs{
-  {"local_interface"s, "string"s, "the local interface to use for the receive ports"s},
+  {"interface"s, "string"s, "the local interface to use for the receive ports"s},
   {"brokerport"s, "int"s, "port number for the broker priority port"s},
   {"localport"s, "int"s, "port number for the local receive socket"s},
   {"port"s, "int"s, "port number for the broker's priority port"s},
@@ -70,14 +70,40 @@ void UdpCore::initializeFromArgs (int argc, const char *const *argv)
                     // TODO::Print a message?
                 }
             }
-            if ((brokerAddress == "*") || (brokerAddress == "udp"))
+            if ((brokerAddress == "*") || (brokerAddress == "udp")||(brokerAddress=="udp://*"))
             {  // the broker address can't use a wild card
                 brokerAddress = "localhost";
             }
         }
-        if (vm.count ("local_interface") > 0)
+        else if (vm.count("broker") > 0)
         {
-            auto localprt = extractInterfaceandPort (vm["local_interface"].as<std::string> ());
+            auto addr = vm["broker"].as<std::string>();
+            auto sc = addr.find_first_of(';', 7);
+            if (sc == std::string::npos)
+            {
+                auto brkprt = extractInterfaceandPort(addr);
+                brokerAddress = brkprt.first;
+                brokerPortNumber = brkprt.second;
+            }
+            else
+            {
+                auto brkprt = extractInterfaceandPort(addr.substr(0, sc));
+                brokerAddress = brkprt.first;
+                brokerPortNumber = brkprt.second;
+                brkprt = extractInterfaceandPort(addr.substr(sc + 1));
+                if (brkprt.first != brokerAddress)
+                {
+                    // TODO::Print a message?
+                }
+            }
+            if ((brokerAddress == "*") || (brokerAddress == "udp") || (brokerAddress == "udp://*"))
+            {  // the broker address can't use a wild card
+                brokerAddress = "localhost";
+            }
+        }
+        if (vm.count ("interface") > 0)
+        {
+            auto localprt = extractInterfaceandPort (vm["interface"].as<std::string> ());
             localInterface = localprt.first;
             PortNumber = localprt.second;
         }

@@ -99,10 +99,6 @@ private:
     virtual void reconnectReceiver();  //!< function to reconnect the receiver
 };
 
-std::string makePortAddress(const std::string &networkInterface, int portNumber);
-
-std::pair<std::string, int> extractInterfaceandPort(const std::string &address);
-std::pair<std::string, std::string> extractInterfaceandPortString(const std::string &address);
 
 template<class X>
 class changeOnDestroy

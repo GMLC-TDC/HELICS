@@ -33,6 +33,11 @@ namespace boost
     {
         class io_service;
     }
+
+    namespace system
+    {
+        class error_code;
+    }
 }
 #endif
 

@@ -12,6 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.h"
 #include "TcpHelperClasses.h"
+#include "../NetworkBrokerData.h"
 #include <memory>
 
 static const int BEGIN_OPEN_PORT_RANGE = 24228;

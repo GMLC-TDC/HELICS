@@ -13,6 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../ActionMessage.h"
 #include <memory>
 #include <boost/asio/ip/udp.hpp>
+#include "../NetworkBrokerData.h"
 
 static const int BEGIN_OPEN_PORT_RANGE = 23964;
 static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24093;

@@ -586,6 +586,14 @@ namespace zmq
             return optval;
         }
 
+        template<> std::string getsockopt(int option_) const
+        {
+            char buffer[256];
+            size_t optlen = 256;
+            getsockopt(option_, buffer, &optlen);
+            return std::string(buffer);
+        }
+
         inline void bind(std::string const& addr)
         {
             bind(addr.c_str());

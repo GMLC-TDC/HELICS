@@ -29,7 +29,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 using namespace std::string_literals;
-static const argDescriptors extraArgs{{"local_interface"s, "string"s,
+static const argDescriptors extraArgs{{"interface"s, "string"s,
                                        "the local interface to use for the receive ports"s},
                                       {"brokerport"s, "int"s, "port number for the broker priority port"s},
                                       {"localport"s, "int"s, "port number for the local receive port"s},
@@ -66,7 +66,7 @@ void UdpBroker::initializeFromArgs (int argc, const char *const *argv)
         if (vm.count ("broker_address") > 0)
         {
             auto addr = vm["broker_address"].as<std::string> ();
-            auto sc = addr.find_first_of (';', 7);  // min address is tcp://* 7 characters
+            auto sc = addr.find_first_of (';', 1); 
             if (sc == std::string::npos)
             {
                 auto brkprt = extractInterfaceandPort (addr);
@@ -83,14 +83,39 @@ void UdpBroker::initializeFromArgs (int argc, const char *const *argv)
                     // TODO::Print a message?
                 }
             }
-            if ((brokerAddress == "udp://*") || (brokerAddress == "*"))
+            if ((brokerAddress == "udp://*") || (brokerAddress == "*")||(brokerAddress=="udp"))
             {  // the broker address can't use a wild card
                 brokerAddress = "localhost";
             }
         }
-        if (vm.count ("local_interface") > 0)
+        else if (vm.count("broker") > 0)
         {
-            auto localprt = extractInterfaceandPort (vm["local_interface"].as<std::string> ());
+            auto addr = vm["broker"].as<std::string>();
+            auto sc = addr.find_first_of(';', 1);  
+            if (sc == std::string::npos)
+            {
+                auto brkprt = extractInterfaceandPort(addr);
+                brokerAddress = brkprt.first;
+            }
+            else
+            {
+                auto brkprt = extractInterfaceandPort(addr.substr(0, sc));
+                brokerAddress = brkprt.first;
+                brokerPort = brkprt.second;
+                brkprt = extractInterfaceandPort(addr.substr(sc + 1));
+                if (brkprt.first != brokerAddress)
+                {
+                    // TODO::Print a message?
+                }
+            }
+            if ((brokerAddress == "udp://*") || (brokerAddress == "*") || (brokerAddress == "udp"))
+            {  // the broker address can't use a wild card
+                brokerAddress = "localhost";
+            }
+        }
+        if (vm.count ("interface") > 0)
+        {
+            auto localprt = extractInterfaceandPort (vm["interface"].as<std::string> ());
             localInterface = localprt.first;
             PortNumber = localprt.second;
         }

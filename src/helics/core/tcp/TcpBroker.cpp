@@ -9,32 +9,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "TcpBroker.h"
-#include "../../common/blocking_queue.h"
 #include "../core-data.h"
-#include "../core.h"
-#include "../helics-time.h"
 #include "TcpComms.h"
 #include "helics/helics-config.h"
 
-#include <algorithm>
-#include <cassert>
-#include <chrono>
-#include <cstdint>
-#include <cstring>
-#include <fstream>
-#include <sstream>
-
-#include "../argParser.h"
 
 namespace helics
 {
-using namespace std::string_literals;
-static const argDescriptors extraArgs{{"local_interface"s, "string"s,
-                                       "the local interface to use for the receive ports"s},
-                                      {"brokerport"s, "int"s, "port number for the broker priority port"s},
-                                      {"localport"s, "int"s, "port number for the local receive port"s},
-                                      {"port"s, "int"s, "port number for the broker's port"s},
-                                      {"portstart"s, "int"s, "starting port for automatic port definitions"s}};
+
 
 TcpBroker::TcpBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
@@ -45,10 +27,8 @@ TcpBroker::~TcpBroker () = default;
 void TcpBroker::displayHelp (bool local_only)
 {
     std::cout << " Help for Zero MQ Broker: \n";
-    namespace po = boost::program_options;
-    po::variables_map vm;
-    const char *const argV[] = {"", "--help"};
-    argumentParser (2, argV, vm, extraArgs);
+
+    NetworkBrokerData::displayHelp();
     if (!local_only)
     {
         CoreBroker::displayHelp ();
@@ -57,59 +37,9 @@ void TcpBroker::displayHelp (bool local_only)
 
 void TcpBroker::initializeFromArgs (int argc, const char *const *argv)
 {
-    namespace po = boost::program_options;
     if (brokerState == broker_state_t::created)
     {
-        po::variables_map vm;
-        argumentParser (argc, argv, vm, extraArgs);
-
-        if (vm.count ("broker_address") > 0)
-        {
-            auto addr = vm["broker_address"].as<std::string> ();
-            auto sc = addr.find_first_of (';', 7);  // min address is tcp://* 7 characters
-            if (sc == std::string::npos)
-            {
-                auto brkprt = extractInterfaceandPort (addr);
-                brokerAddress = brkprt.first;
-            }
-            else
-            {
-                auto brkprt = extractInterfaceandPort (addr.substr (0, sc));
-                brokerAddress = brkprt.first;
-                brokerPort = brkprt.second;
-                brkprt = extractInterfaceandPort (addr.substr (sc + 1));
-                if (brkprt.first != brokerAddress)
-                {
-                    // TODO::Print a message?
-                }
-            }
-            if ((brokerAddress == "tcp://*") || (brokerAddress == "*"))
-            {  // the broker address can't use a wild card
-                brokerAddress = "localhost";
-            }
-        }
-        if (vm.count ("local_interface") > 0)
-        {
-            auto localprt = extractInterfaceandPort (vm["local_interface"].as<std::string> ());
-            localInterface = localprt.first;
-            PortNumber = localprt.second;
-        }
-        if (vm.count ("port") > 0)
-        {
-            brokerPort = vm["port"].as<int> ();
-        }
-        if (vm.count ("brokerport") > 0)
-        {
-            brokerPort = vm["brokerport"].as<int> ();
-        }
-        if (vm.count ("localport") > 0)
-        {
-            PortNumber = vm["pullport"].as<int> ();
-        }
-        if (vm.count ("portstart") > 0)
-        {
-            portStart = vm["portstart"].as<int> ();
-        }
+        netInfo.initializeFromArgs(argc, argv);
         CoreBroker::initializeFromArgs (argc, argv);
     }
 }
@@ -117,29 +47,29 @@ void TcpBroker::initializeFromArgs (int argc, const char *const *argv)
 bool TcpBroker::brokerConnect ()
 {
     std::lock_guard<std::mutex> lock (dataMutex);
-    if (brokerAddress.empty ())
+    if (netInfo.brokerAddress.empty ())
     {
         setAsRoot ();
     }
-    comms = std::make_unique<TcpComms> (localInterface, brokerAddress);
+    comms = std::make_unique<TcpComms> (netInfo.localInterface, netInfo.brokerAddress);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
-    if (PortNumber > 0)
+    if (netInfo.portNumber > 0)
     {
-        comms->setPortNumber (PortNumber);
+        comms->setPortNumber (netInfo.portNumber);
     }
 
-    if (portStart > 0)
+    if (netInfo.portStart > 0)
     {
-        comms->setAutomaticPortStartPort (portStart);
+        comms->setAutomaticPortStartPort (netInfo.portStart);
     }
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = comms->connect ();
     if (res)
     {
-        if (PortNumber < 0)
+        if (netInfo.portNumber < 0)
         {
-            PortNumber = comms->getPort ();
+            netInfo.portNumber = comms->getPort ();
         }
     }
     return res;
@@ -152,6 +82,6 @@ std::string TcpBroker::getAddress () const
     {
         return comms->getAddress ();
     }
-    return makePortAddress (localInterface, PortNumber);
+    return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
 }  // namespace helics
