@@ -11,7 +11,6 @@ testFixtures.h
 )
 
 set(application_api_test_sources
-test_configuration.h
 value-converter-tests.cpp
 application-api-tests.cpp
 data-view-tests.cpp
@@ -42,6 +41,8 @@ add_executable(application-api-tests ${application_api_test_sources} ${applicati
 target_link_libraries(application-api-tests helics-static)
 
 target_link_libraries(application-api-tests ${Boost_LIBRARIES_test})
+
+set_target_properties (application-api-tests PROPERTIES FOLDER tests)
 
 #add a bigobj indicator for this project
 IF(MINGW)

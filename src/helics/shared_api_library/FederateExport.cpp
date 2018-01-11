@@ -48,8 +48,7 @@ helics::MessageFederate *getMessageFed (helics_message_federate fed)
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj->valid == validationIdentifier)
     {
-        if ((fedObj->type == helics::vtype::messageFed) || (fedObj->type == helics::vtype::combinFed) ||
-            (fedObj->type == helics::vtype::filterFed))
+        if ((fedObj->type == helics::vtype::messageFed) || (fedObj->type == helics::vtype::combinFed))
         {
             return dynamic_cast<helics::MessageFederate *> (fedObj->fedptr.get ());
         }
@@ -83,8 +82,7 @@ std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_message_
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj->valid == validationIdentifier)
     {
-        if ((fedObj->type == helics::vtype::messageFed) || (fedObj->type == helics::vtype::combinFed) ||
-            (fedObj->type == helics::vtype::filterFed))
+        if ((fedObj->type == helics::vtype::messageFed) || (fedObj->type == helics::vtype::combinFed))
         {
             return std::dynamic_pointer_cast<helics::MessageFederate> (fedObj->fedptr);
         }
@@ -280,7 +278,7 @@ helicsStatus helicsFederateFinalize (helics_federate fed)
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     fedObj->finalize ();
 
@@ -307,7 +305,7 @@ helicsStatus helicsEnterInitializationModeAsync (helics_federate fed)
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     try
     {
@@ -320,7 +318,7 @@ helicsStatus helicsEnterInitializationModeAsync (helics_federate fed)
     }
 }
 
-int helicsisAsyncOperationCompleted (helics_federate fed)
+int helicsIsAsyncOperationCompleted (helics_federate fed)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
@@ -335,7 +333,7 @@ helicsStatus helicsEnterInitializationModeComplete (helics_federate fed)
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     try
     {
@@ -584,9 +582,13 @@ static const std::map<helics::Federate::op_states, federate_state> stateEnumConv
 helicsStatus helicsFederateGetState(helics_federate fed, federate_state *state)
 {
     auto fedObj = getFed(fed);
-    if ((fedObj == nullptr)||(state==nullptr))
+    if (fedObj == nullptr)
     {
         return helicsInvalidObject;
+    }
+    if (state == nullptr)
+    {
+        return helicsDiscard;
     }
     auto FedState = fedObj->getCurrentState();
     *state = stateEnumConversions.at(FedState);

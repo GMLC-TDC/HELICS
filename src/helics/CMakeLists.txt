@@ -16,5 +16,7 @@ ENDIF()
 
 if (BUILD_C_SHARED_LIB OR BUILD_PYTHON)
 add_subdirectory(shared_api_library)
+install(DIRECTORY cpp98 DESTINATION include/cpp98
+        FILES_MATCHING PATTERN "*.h*")
 install(FILES chelics.h DESTINATION include/helics)
 endif()

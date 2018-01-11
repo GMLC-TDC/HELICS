@@ -178,7 +178,7 @@ bool TimeCoordinator::updateTimeFactors ()
         {
             minNext = dep.Tnext;
         }
-        if (dep.Tdemin < minDe)
+        if ((dep.Tdemin < minDe) && (dep.Tdemin >= dep.Tnext))
         {
             minminDe = dep.Tdemin;
         }

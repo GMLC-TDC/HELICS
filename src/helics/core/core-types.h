@@ -94,12 +94,20 @@ enum class handle_check_mode : char
 	optional = 1,	//!< indicator that the publication or endpoint is optional
 };
 
+/**generate a string based on the core type*/
+std::string helicsTypeString(core_type type);
+
 /** generate a core type value from a std::string
 @param a string describing the desired core type
 @return a value of the helics_core_type enumeration
 @throws invalid_argument if the string is not recognized
 */
-core_type coreTypeFromString(const std::string &type);
+core_type coreTypeFromString(std::string type);
+
+/**
+* Returns true if core/broker type specified is available in current compilation.
+*/
+bool isAvailable(core_type type);
 
 }
 

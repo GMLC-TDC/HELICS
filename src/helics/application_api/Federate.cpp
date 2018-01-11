@@ -665,7 +665,7 @@ std::string Federate::query (const std::string &target, const std::string &query
     return coreObject->query (target, queryStr);
 }
 
-int Federate::queryAsync (const std::string &target, const std::string &queryStr)
+query_id_t Federate::queryAsync (const std::string &target, const std::string &queryStr)
 {
     if (!asyncCallInfo)
     {
@@ -679,7 +679,7 @@ int Federate::queryAsync (const std::string &target, const std::string &queryStr
     return cnt;
 }
 
-int Federate::queryAsync (const std::string &queryStr)
+query_id_t Federate::queryAsync (const std::string &queryStr)
 {
     if (!asyncCallInfo)
     {
@@ -692,11 +692,11 @@ int Federate::queryAsync (const std::string &queryStr)
     return cnt;
 }
 
-std::string Federate::queryComplete (int queryIndex)
+std::string Federate::queryComplete (query_id_t queryIndex)
 {
     if (asyncCallInfo)
     {
-        auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex);
+        auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value());
         if (fnd != asyncCallInfo->inFlightQueries.end ())
         {
             return fnd->second.get ();
@@ -705,11 +705,11 @@ std::string Federate::queryComplete (int queryIndex)
     return {"#invalid"};
 }
 
-bool Federate::queryCompleted (int queryIndex) const
+bool Federate::isQueryCompleted (query_id_t queryIndex) const
 {
     if (asyncCallInfo)
     {
-        auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex);
+        auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value());
         if (fnd != asyncCallInfo->inFlightQueries.end ())
         {
             return (fnd->second.wait_for (std::chrono::seconds (0)) == std::future_status::ready);

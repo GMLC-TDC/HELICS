@@ -29,13 +29,6 @@ namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 #endif
 
-#ifdef QUICK_TESTS_ONLY
-const std::string core_types[] = {"test", "test_2", "ipc_2", "zmq", "udp"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
-#else
-const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2", "udp", "udp_2"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
-#endif
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)
 {
@@ -197,6 +190,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
 
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
+
     mFed1->setTimeDelta (1.0);
     mFed2->setTimeDelta (1.0);
 
@@ -312,6 +306,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
 
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
+    // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setTimeDelta (1.0);
     mFed2->setTimeDelta (1.0);
 
@@ -497,11 +492,6 @@ BOOST_TEST_DECORATOR (*utf::timeout (20))
 #endif
 BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 {
-    if (core_type.compare (0, 4, "test") != 0)
-    {
-        // TODO:: modify the pingpongFed so it works with the other core types
-        return;
-    }
     AddBroker (core_type, "3");
 
     auto ctype = helics::coreTypeFromString (core_type);
@@ -575,9 +565,17 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_ty
 
     BOOST_CHECK_EQUAL (f1time.get (), 1.0);
     auto M1 = mFed1->getMessage (epid);
-    BOOST_REQUIRE_EQUAL (M1->data.size (), data2.size ());
-
-    BOOST_CHECK_EQUAL (M1->data[245], data2[245]);
+    BOOST_CHECK(M1);
+    if (M1)
+    {
+        BOOST_CHECK_EQUAL(M1->data.size(), data2.size());
+        if (M1->data.size() > 245)
+        {
+            BOOST_CHECK_EQUAL(M1->data[245], data2[245]);
+        }
+        
+    }
+    
 
     BOOST_CHECK (mFed1->hasMessage () == false);
     mFed1->finalize ();

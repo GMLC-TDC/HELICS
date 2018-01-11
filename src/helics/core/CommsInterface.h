@@ -55,6 +55,14 @@ public:
 	/** check if the commInterface is connected
 	*/
 	bool isConnected() const;
+
+    /** set the timeout for the initial broker connection
+    @param timeout the value is in milliseconds
+    */
+    void setTimeout(int timeout)
+    {
+        connectionTimeout = timeout;
+    }
 protected:
 	//enumeration of the connection status flags for more immediate feedback from the processing threads
 	enum class connection_status :int
@@ -72,7 +80,8 @@ protected:
 	std::string localTarget_; //!< the identifier for the receive address
 	std::string brokerTarget_;	//!< the identifier for the broker address
 	std::atomic<connection_status> tx_status{ connection_status::startup }; //!< the status of the transmitter thread
-	int maxMessageSize_ = 16 * 1024; //!< the maximum message size for the queues (if needed)
+    int connectionTimeout = 4000; //timeout for the initial connection to a broker for erroring
+    int maxMessageSize_ = 16 * 1024; //!< the maximum message size for the queues (if needed)
 	int maxMessageCount_ = 512;  //!< the maximum number of message to buffer (if needed)
 	std::function<void(ActionMessage &&)> ActionCallback; //!< the callback for what to do with a received message
 	BlockingPriorityQueue<std::pair<int, ActionMessage>> txQueue; //!< set of messages waiting to be transmitted

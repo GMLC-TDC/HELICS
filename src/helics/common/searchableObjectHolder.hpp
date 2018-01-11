@@ -42,20 +42,19 @@ class SearchableObjectHolder
             {  // wait for the objectMap to be cleared
                 ++cntr;
                 lock.unlock ();
-                if (cntr % 2 == 0)
+                //don't leave things locked while sleeping or yeilding
+                if (cntr % 2 != 0)
                 {
-                    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+                    std::this_thread::yield();
                 }
                 else
                 {
-                    std::this_thread::yield ();
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 }
 
                 lock.lock ();
-                if (cntr > 50)
+                if (cntr > 6)
                 {
-                    // give up after 5 seconds
-                    std::cerr << "object not clearing after global destruction force close\n";
                     break;
                 }
             }
