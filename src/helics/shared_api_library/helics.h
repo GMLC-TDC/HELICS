@@ -165,7 +165,7 @@ HELICS_Export helics_message_federate helicsCreateMessageFederateFromJson(const 
 /** create a combination federate from a federate info object
 @details combination federates are both value federates and message federates, objects can be used in all functions that take a helics_value_federate, helics_message_federate or helics_federate object as an argument
 @param fi the federate info object that contains details on the federate
-@return an opaque value federate object
+@return an opaque value federate object nullptr if the object creation failed
 */
 HELICS_Export helics_federate helicsCreateCombinationFederate(const helics_federate_info_t fi);
 
@@ -193,10 +193,21 @@ HELICS_Export helicsStatus helicsFederateInfoSetFederateName (helics_federate_in
 /** set the name of the core to link to for a federate
 @param fi the federate info object to alter
 @param corename the identifier for a core to link to
-@return a helicsStatus enumeration helicsOK on success
+@return a helicsStatus enumeration helicsOK on success helicsInvalidReference if fi is not a valid reference
 */
 HELICS_Export helicsStatus helicsFederateInfoSetCoreName (helics_federate_info_t fi, const char *corename);
+/** set the initialization string for the core usually in the form of command line arguments
+@param fi the federate info object to alter
+@param coreInit a string with the core initialization strings
+@return a helicsStatus enumeration helicsOK on success helicsInvalidReference if fi is not a valid reference
+*/
+
 HELICS_Export helicsStatus helicsFederateInfoSetCoreInitString (helics_federate_info_t fi, const char *coreInit);
+/** set the core type from a string
+@param fi the federate info object to alter
+@param coretype a string naming a core type
+@return a helicsStatus enumeration helicsOK on success helicsInvalidReference if fi is not a valid reference helicsDiscard if the string is not recognized
+*/
 HELICS_Export helicsStatus helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi, const char *coretype);
 HELICS_Export helicsStatus helicsFederateInfoSetCoreType (helics_federate_info_t fi, int coretype);
 HELICS_Export helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int value);
@@ -234,9 +245,12 @@ HELICS_Export int helicsisAsyncOperationCompleted (helics_federate fed);
 HELICS_Export helicsStatus helicsEnterInitializationModeComplete (helics_federate fed);
 
 
-/** request that the federate enter the initialization mode
+/** request that the federate enter the Execution mode
 @details this call is blocking until granted entry by the core object for an asynchronous alternative call
-@helicsEnterExecutionModeAsync*/
+@helicsEnterExecutionModeAsync
+@param fed a federate to change modes
+@return a helicsStatus enumeration helicsError if something went wrong helicsInvalidReference if fed is invalid
+*/
 HELICS_Export helicsStatus helicsEnterExecutionMode (helics_federate fed);
 HELICS_Export helicsStatus helicsEnterExecutionModeIterative (helics_federate fed, iteration_request iterate, iteration_status *outIterate);
 

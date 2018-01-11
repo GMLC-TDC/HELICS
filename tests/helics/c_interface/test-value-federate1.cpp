@@ -520,7 +520,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
 	helics_federate vFed;
 	helics_publication pubid;
 	helics_subscription subid;
-	helics_time_t stime = 1.0;
+	//helics_time_t stime = 1.0;
 	helics_time_t gtime;
 	int retValue;
 	char s[100] = "n2";
@@ -621,7 +621,7 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer_publisher, bdata::make(core_
 	helics_federate vFed;
 	helics_publication pubid;
 	helics_subscription subid;
-	helics_time_t stime = 1.0;
+//	helics_time_t stime = 1.0;
 	helics_time_t gtime;
 	int retValue;
 	char s[100] = "n2";

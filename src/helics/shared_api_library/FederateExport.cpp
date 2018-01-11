@@ -353,7 +353,7 @@ helicsStatus helicsEnterExecutionMode (helics_federate fed)
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     try
     {
@@ -402,7 +402,7 @@ helicsStatus helicsEnterExecutionModeIterative (helics_federate fed, iteration_r
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     try
     {
@@ -424,7 +424,7 @@ helicsStatus helicsEnterExecutionModeAsync (helics_federate fed)
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     try
     {
@@ -442,7 +442,7 @@ helicsStatus helicsEnterExecutionModeIterativeAsync (helics_federate fed, iterat
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     try
     {
@@ -460,7 +460,7 @@ helicsStatus helicsEnterExecutionModeComplete (helics_federate fed)
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     try
     {
@@ -477,7 +477,7 @@ helicsStatus helicsEnterExecutionModeIterativeComplete(helics_federate fed, iter
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     try
     {
@@ -534,7 +534,7 @@ helicsStatus helicsRequestTimeAsync (helics_federate fed, helics_time_t requestT
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     fedObj->requestTimeAsync (requestTime);
     return helicsOK;
@@ -545,7 +545,7 @@ helicsStatus helicsRequestTimeIterativeAsync (helics_federate fed, helics_time_t
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
     {
-        return helicsDiscard;
+        return helicsInvalidObject;
     }
     try
     {
@@ -586,7 +586,7 @@ helicsStatus helicsFederateGetState(helics_federate fed, federate_state *state)
     auto fedObj = getFed(fed);
     if ((fedObj == nullptr)||(state==nullptr))
     {
-        return helicsError;
+        return helicsInvalidObject;
     }
     auto FedState = fedObj->getCurrentState();
     *state = stateEnumConversions.at(FedState);
@@ -599,7 +599,7 @@ helicsStatus helicsFederateGetName(helics_federate fed, char *str, int maxlen)
     auto fedObj = getFed(fed);
     if (fedObj == nullptr)
     {
-        return helicsError;
+        return helicsInvalidObject;
     }
     auto &ident = fedObj->getName();
     if (static_cast<int> (ident.size()) > maxlen)
@@ -619,7 +619,7 @@ helicsStatus helicsFederateGetName(helics_federate fed, char *str, int maxlen)
      auto fedObj = getFed(fed);
      if (fedObj == nullptr)
      {
-         return helicsError;
+         return helicsInvalidObject;
      }
      fedObj->setTimeDelta(time);
      return helicsOK;
@@ -630,7 +630,7 @@ helicsStatus helicsFederateSetLookAhead(helics_federate fed, helics_time_t lookA
     auto fedObj = getFed(fed);
     if (fedObj == nullptr)
     {
-        return helicsError;
+        return helicsInvalidObject;
     }
     fedObj->setLookAhead(lookAhead);
     return helicsOK;
@@ -641,7 +641,7 @@ helicsStatus helicsFederateSetLookAhead(helics_federate fed, helics_time_t lookA
      auto fedObj = getFed(fed);
      if (fedObj == nullptr)
      {
-         return helicsError;
+         return helicsInvalidObject;
      }
      fedObj->setImpactWindow(window);
      return helicsOK;
@@ -651,7 +651,7 @@ helicsStatus helicsFederateSetLookAhead(helics_federate fed, helics_time_t lookA
      auto fedObj = getFed(fed);
      if (fedObj == nullptr)
      {
-         return helicsError;
+         return helicsInvalidObject;
      }
      fedObj->setPeriod(period, offset);
      return helicsOK;
@@ -661,7 +661,7 @@ helicsStatus helicsFederateSetLookAhead(helics_federate fed, helics_time_t lookA
      auto fedObj = getFed(fed);
      if (fedObj == nullptr)
      {
-         return helicsError;
+         return helicsInvalidObject;
      }
      fedObj->setFlag(flag, (flagValue != 0));
      return helicsOK;
@@ -672,7 +672,7 @@ helicsStatus helicsFederateSetLoggingLevel(helics_federate fed, int loggingLevel
     auto fedObj = getFed(fed);
     if (fedObj == nullptr)
     {
-        return helicsError;
+        return helicsInvalidObject;
     }
     fedObj->setLoggingLevel(loggingLevel);
     return helicsOK;
@@ -688,7 +688,7 @@ helicsStatus helicsFederateGetCurrentTime(helics_federate fed, helics_time_t *ti
     auto fedObj = getFed(fed);
     if (fedObj == nullptr)
     {
-        return helicsError;
+        return helicsInvalidObject;
     }
     *time = static_cast<double>(fedObj->getCurrentTime());
     return helicsOK;
