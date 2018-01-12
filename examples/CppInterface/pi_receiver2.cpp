@@ -8,7 +8,7 @@ static char help[] = "Example to demonstrate the usage of HELICS C Interface wit
 #include <cpp98/helics.hpp> // getHelicsVersionString
 #include <math.h>
 
-int main(int argc,char ** argv)
+int main(int /*argc*/,char ** /*argv*/)
 {
   std::string    fedinitstring="--broker=mainbroker --federates=1";
   double         deltat=0.01;

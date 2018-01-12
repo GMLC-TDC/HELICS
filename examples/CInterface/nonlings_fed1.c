@@ -11,7 +11,7 @@ int main ()
 {
     helics_federate_info_t fedinfo;
     const char *helicsversion;
-    helicsStatus status;
+    helics_status status;
     helics_broker broker;
     const char *initstring = "2 --name=mainbroker";
     const char *fedinitstring = "--broker=mainbroker --federates=1";
@@ -74,7 +74,7 @@ int main ()
     helics_time_t currenttime = 0.0;
     helics_iterative_time currenttimeiter;
     currenttimeiter.status = iterating;
-    int isupdated;
+   // int isupdated;
     double tol = 1E-8;
 
     status = helicsPublishDouble (pub, x);

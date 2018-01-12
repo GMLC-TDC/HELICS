@@ -16,7 +16,7 @@ int main()
 {
   helics_federate_info_t fedinfo;
   const char*    helicsversion;
-  helicsStatus   status;
+  helics_status   status;
   helics_broker  broker;
   const char*    initstring="2 --name=mainbroker";
   const char*    fedinitstring="--broker=mainbroker --federates=1";
@@ -88,7 +88,7 @@ int main()
   //double this_time = 0.0;
   double pi = 22.0/7.0,value;
   helics_time_t currenttime=0.0;
-  int           numsteps=20,isupdated;
+  int  isupdated;
 
   while(currenttime < 0.2) {
     value = currenttime*pi;

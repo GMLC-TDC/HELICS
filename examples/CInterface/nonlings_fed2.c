@@ -7,7 +7,7 @@ int main()
 {
   helics_federate_info_t fedinfo;
   const char*    helicsversion;
-  helicsStatus   status;
+  helics_status   status;
   const char*    fedinitstring="--broker=mainbroker --federates=1";
   double         deltat=0.01;
   helics_value_federate vfed;
@@ -65,7 +65,7 @@ int main()
   helics_iterative_time currenttimeiter;
   currenttimeiter.status = iterating;
 
-  int           isupdated;
+ // int           isupdated;
   double tol=1E-8;
   int helics_iter = 0;
   while (currenttimeiter.status==iterating)

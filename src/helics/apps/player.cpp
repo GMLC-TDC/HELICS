@@ -685,7 +685,7 @@ void player::cleanUpPointList ()
 
 void player::initialize ()
 {
-    auto state = fed->currentState ();
+    auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
     {
         sortTags ();
@@ -739,7 +739,7 @@ void player::run ()
 
 void player::run (Time stopTime_input)
 {
-    auto state = fed->currentState ();
+    auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
     {
         initialize ();

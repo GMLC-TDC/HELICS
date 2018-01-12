@@ -25,18 +25,20 @@ add_library(helics_apps-static STATIC ${helics_apps_library_files} ${helics_apps
 if (BUILD_PLAYER)
 add_executable(helics_player playerMain.cpp)
 target_link_libraries(helics_player helics_apps-static helics-static)
-
+set_target_properties (helics_player PROPERTIES FOLDER apps)
 endif()
 
 
 if (BUILD_RECORDER)
 add_executable(helics_recorder recorderMain.cpp)
 target_link_libraries(helics_recorder helics_apps-static helics-static)
+set_target_properties (helics_recorder PROPERTIES FOLDER apps)
 endif()
 
 IF(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_APPS)
 add_executable(helics_app appMain.cpp)
 target_link_libraries(helics_app helics_apps-static helics-static)
+set_target_properties (helics_app PROPERTIES FOLDER apps)
 endif()
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})

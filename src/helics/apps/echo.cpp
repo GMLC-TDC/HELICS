@@ -83,7 +83,7 @@ void echo::loadFile (const std::string &filename)
 
 void echo::initialize ()
 {
-    auto state = fed->currentState ();
+    auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
     {
         fed->enterInitializationState ();
@@ -100,7 +100,7 @@ void echo::run ()
 
 void echo::run (Time stopTime_input)
 {
-    auto state = fed->currentState ();
+    auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
     {
         initialize ();
@@ -114,7 +114,7 @@ void echo::run (Time stopTime_input)
     }
     else
     {
-        auto ctime = fed->getCurrentTime ();
+        //auto ctime = fed->getCurrentTime ();
        
     }
 

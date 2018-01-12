@@ -14,7 +14,7 @@ static char help[] = "Example to demonstrate the usage of HELICS C Interface wit
 #include <unistd.h>
 #endif
 
-int main(int argc,char **argv)
+int main(int /*argc*/,char ** /*argv*/)
 {
   std::string    initstring="2 --name=mainbroker";
   std::string    fedinitstring="--broker=mainbroker --federates=1";
@@ -77,7 +77,7 @@ int main(int argc,char **argv)
   //double this_time = 0.0;
   double pi = 22.0/7.0,value;
   helics_time_t currenttime=0.0;
-  int           numsteps=20,isupdated;
+  int isupdated;
 
   while(currenttime < 0.2) {
     value = currenttime*pi;

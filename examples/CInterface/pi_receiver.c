@@ -9,7 +9,7 @@ int main()
 {
   helics_federate_info_t fedinfo;
   const char*    helicsversion;
-  helicsStatus   status;
+  helics_status   status;
   const char*    fedinitstring="--broker=mainbroker --federates=1";
   double         deltat=0.01;
   helics_value_federate vfed;

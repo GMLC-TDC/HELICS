@@ -76,12 +76,12 @@ void source::loadFile (const std::string &jsonFile)
 {
     fed->registerInterfaces (jsonFile);
 
-    auto pubCount = fed->getSubscriptionCount ();
-  //  for (int ii = 0; ii < pubCount; ++ii)
+  //  auto pubCount = fed->getSubscriptionCount ();
+  // for (int ii = 0; ii < pubCount; ++ii)
   //  {
-  //      publications.emplace_back (fed.get (), ii);
-  //      pubids[publications.back ().getName ()] = static_cast<int> (publications.size () - 1);
-  //  }
+   //     publications.emplace_back (fed.get (), ii);
+   //    pubids[publications.back ().getName ()] = static_cast<int> (publications.size () - 1);
+  // }
   //  auto eptCount = fed->getEndpointCount ();
   //  for (int ii = 0; ii < eptCount; ++ii)
   //  {
@@ -130,7 +130,7 @@ void source::run ()
 
 void source::run (Time stopTime_input)
 {
-    auto state = fed->currentState ();
+    auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
     {
         initialize ();
@@ -148,7 +148,7 @@ void source::run (Time stopTime_input)
     }
     else
     {
-        auto ctime = fed->getCurrentTime ();
+//        auto ctime = fed->getCurrentTime ();
       
         
     }
@@ -179,7 +179,7 @@ void source::run (Time stopTime_input)
     }
 }
 
-void source::addSource(const std::string &key, helicsType_t type, const std::string &units)
+void source::addSource(const std::string & /*key*/, helicsType_t /*type*/, const std::string &/*units*/)
 {
     // skip already existing publications
  //   if (pubids.find (key) != pubids.end ())

@@ -79,9 +79,9 @@ class FederateInfo
         helicsFederateInfoSetFlag (fi, flag, value);
     }
 
-    void setLookahead (helics_time_t lookahead)
+    void setOutputDelay (helics_time_t outputDelay)
     {
-        helicsFederateInfoSetLookahead (fi, lookahead);
+        helicsFederateInfoSetOutputDelay (fi, outputDelay);
     }
 
     void setTimeDelta (helics_time_t timeDelta)
@@ -89,9 +89,9 @@ class FederateInfo
         helicsFederateInfoSetTimeDelta (fi, timeDelta);
     }
 
-    void setImpactWindow (helics_time_t impactWindow)
+    void setInputDelay (helics_time_t inputDelay)
     {
-        helicsFederateInfoSetImpactWindow (fi, impactWindow);
+        helicsFederateInfoSetInputDelay (fi, inputDelay);
     }
 
     void setTimeOffset (helics_time_t timeOffset)
@@ -155,7 +155,7 @@ class Federate
 
     void enterInitializationState ()
     {
-        if (helicsOK != helicsEnterInitializationMode (fed))
+        if (helics_ok != helicsEnterInitializationMode (fed))
         {
             throw (InvalidStateTransition ("cannot transition from current state to initialization state"));
         }
@@ -163,7 +163,7 @@ class Federate
 
     void enterInitializationStateAsync ()
     {
-        if (helicsOK != helicsEnterInitializationModeAsync (fed))
+        if (helics_ok != helicsEnterInitializationModeAsync (fed))
         {
             throw (InvalidStateTransition ("cannot transition from current state to initialization state"));
         }
@@ -177,7 +177,7 @@ class Federate
 
     void enterInitializationStateComplete ()
     {
-        if (helicsOK != helicsEnterInitializationModeComplete (fed))
+        if (helics_ok != helicsEnterInitializationModeComplete (fed))
         {
             throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
         }
@@ -242,7 +242,7 @@ class Federate
 
     void requestTimeAsync (helics_time_t time)
     {
-        if (helicsOK != helicsRequestTimeAsync (fed, time))
+        if (helics_ok != helicsRequestTimeAsync (fed, time))
         {
             throw (InvalidFunctionCall ("cannot call request time in present state"));
         }

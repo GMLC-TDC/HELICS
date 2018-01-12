@@ -9,7 +9,7 @@
 #include <unistd.h>
 #endif
 
-int main (int argc, char **argv)
+int main (int /*argc*/, char ** /*argv*/)
 {
     std::string initstring = "2 --name=mainbroker";
     std::string fedinitstring = "--broker=mainbroker --federates=1";
@@ -62,7 +62,7 @@ int main (int argc, char **argv)
     helics_time_t currenttime = 0.0;
     helics_iterative_time currenttimeiter;
     currenttimeiter.status = iterating;
-    int isupdated;
+   // int isupdated;
     double tol = 1E-8;
 
     vfed->publish (pub, x);

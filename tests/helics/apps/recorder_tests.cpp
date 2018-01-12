@@ -366,11 +366,11 @@ BOOST_AUTO_TEST_CASE(recorder_test_destendpoint_clone)
     auto fut = std::async(std::launch::async, [&rec1]() {rec1.run(5.0); });
     mfed2.enterExecutionStateAsync();
     mfed.enterExecutionState();
-    mfed2.enterExecutionStateFinalize();
+    mfed2.enterExecutionStateComplete();
 
     mfed2.requestTimeAsync(1.0);
     auto retTime = mfed.requestTime(1.0);
-    mfed2.requestTimeFinalize();
+    mfed2.requestTimeComplete();
 
     e1.send("d2", "this is a test message");
     BOOST_CHECK_EQUAL(retTime, 1.0);
@@ -380,7 +380,7 @@ BOOST_AUTO_TEST_CASE(recorder_test_destendpoint_clone)
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
     BOOST_CHECK_EQUAL(retTime, 2.0);
-    mfed2.requestTimeFinalize();
+    mfed2.requestTimeComplete();
 
     mfed.finalize();
     mfed2.finalize();
@@ -416,11 +416,11 @@ BOOST_AUTO_TEST_CASE(recorder_test_srcendpoint_clone)
     auto fut = std::async(std::launch::async, [&rec1]() {rec1.run(5.0); });
     mfed2.enterExecutionStateAsync();
     mfed.enterExecutionState();
-    mfed2.enterExecutionStateFinalize();
+    mfed2.enterExecutionStateComplete();
 
     mfed2.requestTimeAsync(1.0);
     auto retTime = mfed.requestTime(1.0);
-    mfed2.requestTimeFinalize();
+    mfed2.requestTimeComplete();
 
     e1.send("d2", "this is a test message");
     BOOST_CHECK_EQUAL(retTime, 1.0);
@@ -430,7 +430,7 @@ BOOST_AUTO_TEST_CASE(recorder_test_srcendpoint_clone)
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
     BOOST_CHECK_EQUAL(retTime, 2.0);
-    mfed2.requestTimeFinalize();
+    mfed2.requestTimeComplete();
 
     mfed.finalize();
     mfed2.finalize();
@@ -466,11 +466,11 @@ BOOST_AUTO_TEST_CASE(recorder_test_endpoint_clone)
     auto fut = std::async(std::launch::async, [&rec1]() {rec1.run(5.0); });
     mfed2.enterExecutionStateAsync();
     mfed.enterExecutionState();
-    mfed2.enterExecutionStateFinalize();
+    mfed2.enterExecutionStateComplete();
 
     mfed2.requestTimeAsync(1.0);
     auto retTime = mfed.requestTime(1.0);
-    mfed2.requestTimeFinalize();
+    mfed2.requestTimeComplete();
 
     e1.send("d2", "this is a test message");
     BOOST_CHECK_EQUAL(retTime, 1.0);
@@ -480,7 +480,7 @@ BOOST_AUTO_TEST_CASE(recorder_test_endpoint_clone)
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
     BOOST_CHECK_EQUAL(retTime, 2.0);
-    mfed2.requestTimeFinalize();
+    mfed2.requestTimeComplete();
 
     mfed.finalize();
     mfed2.finalize();
@@ -519,11 +519,11 @@ BOOST_DATA_TEST_CASE(simple_clone_test_file, boost::unit_test::data::make(simple
     auto fut = std::async(std::launch::async, [&rec1]() {rec1.run(5.0); });
     mfed2.enterExecutionStateAsync();
     mfed.enterExecutionState();
-    mfed2.enterExecutionStateFinalize();
+    mfed2.enterExecutionStateComplete();
 
     mfed2.requestTimeAsync(1.0);
     auto retTime = mfed.requestTime(1.0);
-    mfed2.requestTimeFinalize();
+    mfed2.requestTimeComplete();
 
     e1.send("d2", "this is a test message");
     BOOST_CHECK_EQUAL(retTime, 1.0);
@@ -533,7 +533,7 @@ BOOST_DATA_TEST_CASE(simple_clone_test_file, boost::unit_test::data::make(simple
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
     BOOST_CHECK_EQUAL(retTime, 2.0);
-    mfed2.requestTimeFinalize();
+    mfed2.requestTimeComplete();
 
     mfed.finalize();
     mfed2.finalize();
@@ -574,11 +574,11 @@ BOOST_AUTO_TEST_CASE(recorder_test_saveFile1)
     auto fut = std::async(std::launch::async, [&rec1]() {rec1.run(5.0); });
     mfed2.enterExecutionStateAsync();
     mfed.enterExecutionState();
-    mfed2.enterExecutionStateFinalize();
+    mfed2.enterExecutionStateComplete();
 
     mfed2.requestTimeAsync(1.0);
     auto retTime = mfed.requestTime(1.0);
-    mfed2.requestTimeFinalize();
+    mfed2.requestTimeComplete();
 
     e1.send("d2", "this is a test message");
     BOOST_CHECK_EQUAL(retTime, 1.0);
@@ -588,7 +588,7 @@ BOOST_AUTO_TEST_CASE(recorder_test_saveFile1)
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
     BOOST_CHECK_EQUAL(retTime, 2.0);
-    mfed2.requestTimeFinalize();
+    mfed2.requestTimeComplete();
 
     mfed.finalize();
     mfed2.finalize();
@@ -683,12 +683,12 @@ BOOST_AUTO_TEST_CASE(recorder_test_saveFile3)
     auto fut = std::async(std::launch::async, [&rec1]() {rec1.run(5.0); });
     mfed2.enterExecutionStateAsync();
     mfed.enterExecutionState();
-    mfed2.enterExecutionStateFinalize();
+    mfed2.enterExecutionStateComplete();
     pub1.publish(3.4);
 
     mfed2.requestTimeAsync(1.0);
     auto retTime = mfed.requestTime(1.0);
-    mfed2.requestTimeFinalize();
+    mfed2.requestTimeComplete();
 
     e1.send("d2", "this is a test message");
     pub1.publish(4.7);
@@ -700,7 +700,7 @@ BOOST_AUTO_TEST_CASE(recorder_test_saveFile3)
     retTime = mfed.requestTime(2.0);
     BOOST_CHECK_EQUAL(retTime, 2.0);
     
-    mfed2.requestTimeFinalize();
+    mfed2.requestTimeComplete();
     pub1.publish(4.7);
 
     mfed.finalize();

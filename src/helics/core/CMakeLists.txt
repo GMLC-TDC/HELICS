@@ -12,7 +12,7 @@ set(SRC_FILES
 	FederateState.cpp
 	SubscriptionInfo.cpp
 	PublicationInfo.cpp
-	FilterInfo.cpp
+	#FilterInfo.cpp
 	EndpointInfo.cpp
 	ActionMessage.cpp
 	CoreBroker.cpp
@@ -180,7 +180,7 @@ OPTION(BUILD_BROKER "Build a helics Broker" ON)
 if (BUILD_BROKER)
 add_executable(helics_broker helics-broker.cc)
    target_link_libraries(helics_broker helics-static)
-   
+   set_target_properties (helics_broker PROPERTIES FOLDER apps)
    set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "build folder location of the broker")
    #message(STATUS "bloc ${CMAKE_CURRENT_BINARY_DIR}")
    INSTALL(TARGETS helics_broker DESTINATION bin)

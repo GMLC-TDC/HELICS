@@ -137,31 +137,31 @@ class ValueFederate : public virtual Federate
     /** Methods to set default values for subscriptions **/
     void setDefaultValue (helics_subscription sub, const char *data, int len)
     {
-        // returns helicsStatus
+        // returns helics_status
         helicsSetDefaultValue (sub, data, len);
     }
 
     void setDefaultValue (helics_subscription sub, const std::string &str)
     {
-        // returns helicsStatus
+        // returns helics_status
         helicsSetDefaultString (sub, str.c_str());
     }
 
     void setDefaultValue (helics_subscription sub, int64_t val)
     {
-        // returns helicsStatus
+        // returns helics_status
         helicsSetDefaultInteger (sub, val);
     }
 
     void setDefaultValue (helics_subscription sub, double val)
     {
-        // returns helicsStatus
+        // returns helics_status
         helicsSetDefaultDouble (sub, val);
     }
 
     void setDefaultValue (helics_subscription sub, const std::complex<double> &cmplx)
     {
-        // returns helicsStatus
+        // returns helics_status
         helicsSetDefaultComplex(sub, cmplx.real(), cmplx.imag());
     }
 
@@ -173,7 +173,7 @@ class ValueFederate : public virtual Federate
         {
             arr[i] = data[i];
         }
-        // returns helicsStatus
+        // returns helics_status
         helicsSetDefaultVector (sub, arr, static_cast<int>(data.size() * sizeof(double)));
         free (arr);
     }
@@ -223,31 +223,31 @@ class ValueFederate : public virtual Federate
     /** Methods to publish values **/
     void publish (helics_publication pub, const char *data, int len)
     {
-        // returns helicsStatus
+        // returns helics_status
         helicsPublish (pub, data, len);
     }
 
     void publish (helics_publication pub, std::string str)
     {
-        // returns helicsStatus
+        // returns helics_status
         helicsPublishString (pub, str.c_str());
     }
 
     void publish (helics_publication pub, int64_t val)
     {
-        // returns helicsStatus
+        // returns helics_status
         helicsPublishInteger (pub, val);
     }
 
     void publish (helics_publication pub, double val)
     {
-        // returns helicsStatus
+        // returns helics_status
         helicsPublishDouble (pub, val);
     }
 
     void publish (helics_publication pub, std::complex<double> cmplx)
     {
-        // returns helicsStatus
+        // returns helics_status
         helicsPublishComplex (pub, cmplx.real(), cmplx.imag());
     }
 
@@ -260,8 +260,8 @@ class ValueFederate : public virtual Federate
         {
             arr[i] = data[i];
         }
-        // returns helicsStatus
-        helicsPublishVector (pub, arr, data.size() * sizeof(double));
+        // returns helics_status
+        helicsPublishVector (pub, arr, static_cast<int>(data.size() * sizeof(double)));
         free (arr);
     }
 

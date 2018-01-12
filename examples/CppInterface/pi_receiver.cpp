@@ -6,7 +6,7 @@ static char help[] = " PI RECEIVER: Simple program to demonstrate the usage of H
 #include <cpp98/ValueFederate.hpp>
 #include <cpp98/helics.hpp>
 
-int main(int argc,char **argv)
+int main(int /*argc*/,char ** /*argv*/)
 {
   std::string    fedinitstring="--broker=mainbroker --federates=1";
   double         deltat=0.01;

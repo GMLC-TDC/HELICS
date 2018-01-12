@@ -23,18 +23,18 @@ HELICS_Export helics_endpoint helicsRegisterEndpoint (helics_message_federate fe
 
 HELICS_Export helics_endpoint helicsRegisterGlobalEndpoint (helics_message_federate fed, const char *name, const char *type);
 
-HELICS_Export helicsStatus helicsSetDefaultDestination (helics_endpoint endpoint, const char *dest);
-HELICS_Export helicsStatus helicsSendMessageRaw (helics_endpoint endpoint, const char *dest, const char *data, int len);
+HELICS_Export helics_status helicsSetDefaultDestination (helics_endpoint endpoint, const char *dest);
+HELICS_Export helics_status helicsSendMessageRaw (helics_endpoint endpoint, const char *dest, const char *data, int len);
 
-HELICS_Export helicsStatus helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time);
+HELICS_Export helics_status helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time);
 
-HELICS_Export helicsStatus helicsSendMessage (helics_endpoint endpoint, message_t *message);
+HELICS_Export helics_status helicsSendMessage (helics_endpoint endpoint, message_t *message);
 /** subscribe an endpoint to a publication
 @param endpoint the endpoint to use
 @param key the name of the publication
 @param type the type of the publication that is expected (nullptr or "" for DON'T CARE)
 */
-HELICS_Export helicsStatus helicsSubscribe (helics_endpoint endpoint, const char *key, const char *type);
+HELICS_Export helics_status helicsSubscribe (helics_endpoint endpoint, const char *key, const char *type);
 /** check if the federate has any outstanding messages*/
 HELICS_Export int helicsFederateHasMessage (helics_message_federate fed);
 /* check if a given endpoint has any unread messages*/
@@ -64,7 +64,7 @@ HELICS_Export message_t helicsFederateGetMessage (helics_message_federate fed);
 @param[in] maxlen the maximum string length that can be stored in str
 @return a status variable
 */
-HELICS_Export helicsStatus helicsGetEndpointType (helics_endpoint endpoint, char *str, int maxlen);
+HELICS_Export helics_status helicsGetEndpointType (helics_endpoint endpoint, char *str, int maxlen);
 
 /** get the name of an endpoint
 @param endpoint  the endpoint object in question
@@ -72,7 +72,7 @@ HELICS_Export helicsStatus helicsGetEndpointType (helics_endpoint endpoint, char
 @param[in] maxlen the maximum string length that can be stored in str
 @return a status variable
 */
-HELICS_Export helicsStatus helicsGetEndpointName (helics_endpoint endpoint, char *str, int maxlen);
+HELICS_Export helics_status helicsGetEndpointName (helics_endpoint endpoint, char *str, int maxlen);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

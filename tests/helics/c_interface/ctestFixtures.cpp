@@ -9,8 +9,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "ctestFixtures.h"
 #include <boost/test/unit_test.hpp>
-#include "../core/CoreBroker.h"
-#include "../core/BrokerFactory.h"
+#include "helics.h"
+#include "ValueFederate_c.h"
+#include "MessageFederate_c.h"
 #include <cctype>
 
  bool hasIndexCode (const std::string &type_name)
@@ -45,7 +46,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
  ValueFederateTestFixture::~ValueFederateTestFixture ()
 {
-    helicsStatus rv = helicsOK;
+    helics_status rv = helics_ok;
     if (vFed1)
     {
         //vFed1->finalize ();
@@ -69,7 +70,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
  void ValueFederateTestFixture::Setup1FederateTest (std::string core_type_name, helics_time_t time_delta)
 {
-	helicsStatus rv = helicsOK;
+	helics_status rv = helics_ok;
     if (hasIndexCode (core_type_name))
     {
         core_type_name.pop_back ();
@@ -81,8 +82,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
     rv = helicsFederateInfoSetFederateName(fi, std::string("test1").c_str());
     rv = helicsFederateInfoSetCoreTypeFromString(fi, core_type_name.c_str());
     rv = helicsFederateInfoSetTimeDelta(fi, time_delta);
-    //std::string coreInitString = "--broker=" + broker->getIdentifier() + " --broker_address=" + broker->getAddress () + " --federates 1"; 
-	std::string coreInitString=" --federates 1";
+    char buffer[512];
+    helicsBrokerGetIdentifier(broker, buffer, 512);
+    std::string coreInitString = std::string("--broker=") + std::string(buffer) + " --broker_address=";
+    helicsBrokerGetAddress(broker, buffer, 512);
+    coreInitString += std::string(buffer) + " --federates 1";
+
 	rv = helicsFederateInfoSetCoreInitString(fi, coreInitString.c_str());
     //helics::FederateInfo fi ("test1");
     //fi.coreType = helics::coreTypeFromString (core_type_name);
@@ -95,7 +100,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
  void ValueFederateTestFixture::Setup2FederateTest (std::string core_type_name, helics_time_t time_delta)
 {
-	helicsStatus rv = helicsOK;
+	helics_status rv = helics_ok;
 	bool hasIndex = hasIndexCode (core_type_name);
     int setup = (hasIndex) ? getIndexCode (core_type_name) : 1;
     if (hasIndex)
@@ -113,9 +118,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
         rv = helicsFederateInfoSetFederateName(fi, std::string("test1").c_str());
         rv = helicsFederateInfoSetCoreTypeFromString(fi, core_type_name.c_str());
         rv = helicsFederateInfoSetTimeDelta(fi, time_delta);
-        //std::string coreInitString = "--broker=" + broker->getIdentifier () + " --broker_address=" + broker->getAddress () + " --federates 2";
-		std::string coreInitString = " --federates 2";
-        rv = helicsFederateInfoSetCoreInitString(fi, coreInitString.c_str());
+
+        char buffer[512];
+        helicsBrokerGetIdentifier(broker, buffer, 512);
+        std::string coreInitString = std::string("--broker=") + std::string(buffer) + " --broker_address=";
+        helicsBrokerGetAddress(broker, buffer, 512);
+        coreInitString += std::string(buffer) + " --federates 2";
+
+        helicsFederateInfoSetCoreInitString(fi, coreInitString.c_str());
         //helics::FederateInfo fi ("test1");
         //fi.coreType = helics::coreTypeFromString (core_type_name);
         //fi.timeDelta = time_delta;
@@ -124,7 +134,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
         vFed1 = helicsCreateValueFederate(fi);
 
-        rv = helicsFederateInfoSetFederateName(fi, std::string("test1").c_str());
+        helicsFederateInfoSetFederateName(fi, std::string("test1").c_str());
         //fi.name = "test2";
         vFed2 = helicsCreateValueFederate(fi);
     }
@@ -133,26 +143,33 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
     {
         StartBroker (core_type_name, "2");
 
-        /*std::string initString = std::string ("--broker=") + broker->getIdentifier () +
-                                 " --broker_address=" + broker->getAddress () + " --federates 1";*/
-	    std::string initString = "--federates 1";
+        char buffer[512];
+        helicsBrokerGetIdentifier(broker, buffer, 512);
+        std::string initString = std::string("--broker=") + std::string(buffer) + " --broker_address=";
+        helicsBrokerGetAddress(broker, buffer, 512);
+        initString += std::string(buffer) + " --federates 1";
+
         //auto core_type = helics::coreTypeFromString (core_type_name);
-        auto core1 = helicsCreateCore (core_type_name.c_str(), std::string("").c_str(), initString.c_str());
-        auto core2 = helicsCreateCore (core_type_name.c_str(), std::string("").c_str(), initString.c_str());
+        auto core1 = helicsCreateCore (core_type_name.c_str(), "", initString.c_str());
+        auto core2 = helicsCreateCore (core_type_name.c_str(), "", initString.c_str());
 
         helics_federate_info_t fi = helicsFederateInfoCreate();
-        rv = helicsFederateInfoSetFederateName(fi, std::string("test1").c_str());
-        rv = helicsFederateInfoSetCoreTypeFromString(fi, core_type_name.c_str());
-        rv = helicsFederateInfoSetTimeDelta(fi, time_delta);
+        helicsFederateInfoSetFederateName(fi, "test1");
+        helicsFederateInfoSetCoreTypeFromString(fi, core_type_name.c_str());
+        helicsFederateInfoSetTimeDelta(fi, time_delta);
         //helics::FederateInfo fi ("test1");
 
+        helicsCoreGetIdentifier(core1, buffer, 512);
+        helicsFederateInfoSetCoreName(fi,buffer);
         //fi.coreName = core1->getIdentifier ();
         //fi.coreType = helics::coreTypeFromString (core_type_name);
         //fi.timeDelta = time_delta;
 
         vFed1 = helicsCreateValueFederate(fi);
 
-        rv = helicsFederateInfoSetFederateName(fi, std::string("test2").c_str());
+        helicsFederateInfoSetFederateName(fi, "test2");
+        helicsCoreGetIdentifier(core2, buffer, 512);
+        helicsFederateInfoSetCoreName(fi, buffer);
         //fi.name = "test2";
         //fi.coreName = core2->getIdentifier ();
         vFed2 = helicsCreateValueFederate(fi);
@@ -161,73 +178,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
     }
 }
 
- MessageFederateTestFixture::~MessageFederateTestFixture ()
-{
-	helicsStatus rv = helicsOK;
-    if (mFed1)
-    {
-        //mFed1->finalize ();
-        rv = helicsFederateFinalize(mFed1);
-        helicsFreeFederate(mFed1);
-    }
-
-    if (mFed2)
-    {
-        //mFed2->finalize ();
-        rv = helicsFederateFinalize(mFed1);
-        helicsFreeFederate(mFed1);
-    }
-}
-
- void MessageFederateTestFixture::StartBroker (const std::string &core_type_name,
-                                              const std::string &initialization_string)
-{
-    broker = StartBrokerImp (core_type_name, initialization_string);
-}
-
- void MessageFederateTestFixture::Setup1FederateTest (const std::string &core_type_name)
-{
-	helicsStatus rv = helicsOK;
-    StartBroker (core_type_name, "1");
-    helics_federate_info_t fi = helicsFederateInfoCreate();
-    rv = helicsFederateInfoSetFederateName(fi, std::string("test1").c_str());
-    rv = helicsFederateInfoSetCoreTypeFromString(fi, core_type_name.c_str());
-    //std::string coreInitString = "--broker=" + broker->getIdentifier () + " --broker_address=" + broker->getAddress () + " --federates 1";
-	std::string coreInitString = " --federates 1";
-	rv = helicsFederateInfoSetCoreInitString(fi, coreInitString.c_str());
-    //helics::FederateInfo fi ("test1");
-    //fi.coreType = helics::coreTypeFromString (core_type_name);
-    //fi.coreInitString = std::string ("--broker=") + broker->getIdentifier () +
-    //                    " --broker_address=" + broker->getAddress () + " --federates 1";
-
-    //mFed1 = std::make_shared<helics_message_federate> (fi);
-	mFed1 = reinterpret_cast<helics_message_federate *>(fi);
-}
-
- void MessageFederateTestFixture::Setup2FederateTest (const std::string &core_type_name)
-{
-	helicsStatus rv = helicsOK;
-    StartBroker (core_type_name, "2");
-
-    helics_federate_info_t fi = helicsFederateInfoCreate();
-	rv = helicsFederateInfoSetFederateName(fi, std::string("test1").c_str());
-	rv = helicsFederateInfoSetCoreTypeFromString(fi, core_type_name.c_str());
-	//std::string coreInitString = "--broker=" + broker->getIdentifier () + " --broker_address=" + broker->getAddress () + " --federates 2";
-	std::string coreInitString = " --federates 2";
-	rv = helicsFederateInfoSetCoreInitString(fi, coreInitString.c_str());
-    //helics::FederateInfo fi ("test1");
-    //fi.coreType = helics::coreTypeFromString (core_type_name);
-    //fi.coreInitString = std::string ("--broker=") + broker->getIdentifier () +
-    //                    " --broker_address=" + broker->getAddress () + " --federates 2";
-
-    //mFed1 = std::make_shared<helics_message_federate> (fi);
-	mFed1 = reinterpret_cast<helics_message_federate *>(fi);
-
-    rv = helicsFederateInfoSetFederateName(fi, std::string("test2").c_str());
-    //fi.name = "test2";
-    //mFed2 = std::make_shared<helics_message_federate> (fi);
-	mFed2 = reinterpret_cast<helics_message_federate *>(fi);
-}
 
  bool FederateTestFixture::hasIndexCode (const std::string &type_name)
 {
@@ -253,18 +203,18 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
         //auto core_type = helics::coreTypeFromString (new_type);
-        return helicsCreateBroker(new_type.c_str(), std::string("").c_str(), initialization_string.c_str());
+        return helicsCreateBroker(new_type.c_str(), "", initialization_string.c_str());
     }
     else
     {
         //auto core_type = helics::coreTypeFromString (core_type_name);
-        return helicsCreateBroker(core_type_name.c_str(), std::string("").c_str(), initialization_string.c_str());
+        return helicsCreateBroker(core_type_name.c_str(), "", initialization_string.c_str());
     }
 }
 
  FederateTestFixture::~FederateTestFixture ()
 {
-    helicsStatus rv = helicsOK;
+    helics_status rv = helics_ok;
 	for (auto &fed : federates)
     {
         //if (fed && fed->getCurrentState () != helics::Federate::op_states::finalize)

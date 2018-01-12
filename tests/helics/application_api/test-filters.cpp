@@ -207,18 +207,18 @@ BOOST_AUTO_TEST_CASE(message_clone_test)
     sFed->enterExecutionStateAsync();
     dcFed->enterExecutionStateAsync();
     dFed->enterExecutionState();
-    sFed->enterExecutionStateFinalize();
-    dcFed->enterExecutionStateFinalize();
+    sFed->enterExecutionStateComplete();
+    dcFed->enterExecutionStateComplete();
 
-    BOOST_CHECK(sFed->currentState() == helics::Federate::op_states::execution);
+    BOOST_CHECK(sFed->getCurrentState() == helics::Federate::op_states::execution);
     helics::data_block data(500, 'a');
     sFed->sendMessage(p1, "dest", data);
 
     sFed->requestTimeAsync(1.0);
     dcFed->requestTimeAsync(1.0);
     dFed->requestTime(1.0);
-    sFed->requestTimeFinalize();
-    dcFed->requestTimeFinalize();
+    sFed->requestTimeComplete();
+    dcFed->requestTimeComplete();
 
     auto res = dFed->hasMessage();
     BOOST_CHECK(res);
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE(message_clone_test)
     sFed->finalize();
     dFed->finalize();
     dcFed->finalize();
-    BOOST_CHECK(sFed->currentState() == helics::Federate::op_states::finalize);
+    BOOST_CHECK(sFed->getCurrentState() == helics::Federate::op_states::finalize);
 }
 
 
@@ -279,11 +279,11 @@ BOOST_AUTO_TEST_CASE(message_multi_clone_test)
     sFed2->enterExecutionStateAsync();
     dcFed->enterExecutionStateAsync();
     dFed->enterExecutionState();
-    sFed->enterExecutionStateFinalize();
-    sFed2->enterExecutionStateFinalize();
-    dcFed->enterExecutionStateFinalize();
+    sFed->enterExecutionStateComplete();
+    sFed2->enterExecutionStateComplete();
+    dcFed->enterExecutionStateComplete();
 
-    BOOST_CHECK(sFed->currentState() == helics::Federate::op_states::execution);
+    BOOST_CHECK(sFed->getCurrentState() == helics::Federate::op_states::execution);
     helics::data_block data(500, 'a');
     helics::data_block data2(400, 'b');
     sFed->sendMessage(p1, "dest", data);
@@ -292,9 +292,9 @@ BOOST_AUTO_TEST_CASE(message_multi_clone_test)
     sFed2->requestTimeAsync(1.0);
     dcFed->requestTimeAsync(1.0);
     dFed->requestTime(1.0);
-    sFed->requestTimeFinalize();
-    sFed2->requestTimeFinalize();
-    dcFed->requestTimeFinalize();
+    sFed->requestTimeComplete();
+    sFed2->requestTimeComplete();
+    dcFed->requestTimeComplete();
 
     auto mcnt = dFed->receiveCount(p3);
     BOOST_CHECK_EQUAL(mcnt, 2);
@@ -353,6 +353,6 @@ BOOST_AUTO_TEST_CASE(message_multi_clone_test)
     sFed2->finalize();
     dFed->finalize();
     dcFed->finalize();
-    BOOST_CHECK(sFed->currentState() == helics::Federate::op_states::finalize);
+    BOOST_CHECK(sFed->getCurrentState() == helics::Federate::op_states::finalize);
 }
 BOOST_AUTO_TEST_SUITE_END ()

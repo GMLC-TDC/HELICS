@@ -3,7 +3,7 @@
 #include <cpp98/ValueFederate.hpp>
 #include <cpp98/helics.hpp> // getHelicsVersionString
 
-int main(int argc,char **argv)
+int main(int /*argc*/,char ** /*argv*/)
 {
   std::string    fedinitstring="--broker=mainbroker --federates=1";
   double         deltat=0.01;
@@ -57,7 +57,7 @@ int main(int argc,char **argv)
   helics_iterative_time currenttimeiter;
   currenttimeiter.status = iterating;
 
-  int           isupdated;
+ // int           isupdated;
   double tol=1E-8;
   int helics_iter = 0;
   while (currenttimeiter.status==iterating)

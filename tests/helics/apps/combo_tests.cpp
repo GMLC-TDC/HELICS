@@ -52,12 +52,12 @@ BOOST_AUTO_TEST_CASE(save_load_file1)
     auto fut = std::async(std::launch::async, [&rec1]() {rec1.run(5.0); });
     mfed2.enterExecutionStateAsync();
     mfed.enterExecutionState();
-    mfed2.enterExecutionStateFinalize();
+    mfed2.enterExecutionStateComplete();
     pub1.publish(3.4);
 
     mfed2.requestTimeAsync(1.0);
     auto retTime = mfed.requestTime(1.0);
-    mfed2.requestTimeFinalize();
+    mfed2.requestTimeComplete();
 
     e1.send("d2", "this is a test message");
     pub1.publish(4.7);
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(save_load_file1)
     retTime = mfed.requestTime(2.0);
     BOOST_CHECK_EQUAL(retTime, 2.0);
 
-    mfed2.requestTimeFinalize();
+    mfed2.requestTimeComplete();
     pub1.publish(4.7);
 
     mfed.finalize();

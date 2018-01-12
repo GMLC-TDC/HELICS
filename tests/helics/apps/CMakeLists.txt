@@ -24,7 +24,7 @@ exeTestHelper.h
 
 add_executable(helics_apps-tests ${helics_apps_test_sources})
 
-set_target_properties (player-recorder-tests PROPERTIES FOLDER tests)
+set_target_properties (helics_apps-tests PROPERTIES FOLDER tests)
 
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})

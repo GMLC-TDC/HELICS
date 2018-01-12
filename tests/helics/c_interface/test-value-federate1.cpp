@@ -33,7 +33,7 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 
 BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types), core_type)
 {
-	helicsStatus status;
+	helics_status status;
 	helics_federate_info_t fi;
 	helics_broker broker;
 	helics_federate vFed;
@@ -62,7 +62,7 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types),
 
 	//vFed1->enterExecutionState();
 
-	BOOST_CHECK(status == helicsOK);
+	BOOST_CHECK(status == helics_ok);
 
 	// BOOST_CHECK(vFed1->getCurrentState() == helics::Federate::op_states::execution);
 
@@ -70,7 +70,7 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types),
 
 	//vFed1->finalize();
 
-	BOOST_CHECK(status == helicsOK);
+	BOOST_CHECK(status == helics_ok);
 
 	//BOOST_CHECK(vFed1->getCurrentState() == helics::Federate::op_states::finalize);
 
@@ -78,10 +78,6 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types),
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
 	helicsCloseLibrary();
-	broker = nullptr;
-	vFed = nullptr;
-	fi = nullptr;
-	delete broker, vFed, fi;
 
 	//helicsFreeBroker(broker);
 
@@ -96,7 +92,7 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
 {
 	//SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1); // can be used when fixtures are enabled
 
-	helicsStatus status;
+	helics_status status;
 	helics_federate_info_t fi;
 	helics_broker broker;
 	helics_federate vFed;
@@ -123,7 +119,7 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
 
 	status = helicsEnterExecutionMode(vFed);
 
-	BOOST_CHECK(status == helicsOK);
+	BOOST_CHECK(status == helics_ok);
 
 	/* This section is commented out as  helicsGetPublicationKey is not working without publication type and units*/
 	status = helicsGetPublicationKey(pubid, pubname, 100); //the equivalent of getPublicationName is helicsGetPublicationKey in the C-API 
@@ -153,19 +149,14 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
 
 	status = helicsFederateFinalize(vFed);
 
-	BOOST_CHECK(status == helicsOK);
+	BOOST_CHECK(status == helics_ok);
 
 	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
+    helicsFreeBroker(broker);
 	helicsCloseLibrary();
-	broker = nullptr;
-	vFed = nullptr;
-	fi = nullptr;
-	pubid = nullptr;
-	pubid2 = nullptr;
-	pubid3 = nullptr;
-	delete broker, vFed, fi,pubid,pubid2,pubid3;
+	
 	//helicsFreeBroker(broker);
 
 	//helicsFederateInfoFree(fi);
@@ -178,7 +169,7 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
 
 BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (core_types), core_type)
 {
-	helicsStatus status;
+	helics_status status;
 	helics_federate_info_t fi;
 	helics_broker broker;
 	helics_federate vFed;
@@ -205,7 +196,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
 
 	status = helicsEnterExecutionMode(vFed);
 
-	BOOST_CHECK(status == helicsOK);
+	BOOST_CHECK(status == helics_ok);
     //vFed1->enterExecutionState ();
 
     // BOOST_CHECK (vFed->getCurrentState () == helics::Federate::op_states::execution);
@@ -241,28 +232,23 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
 
 	status = helicsFederateFinalize(vFed);
 
-	BOOST_CHECK(status == helicsOK);
+	BOOST_CHECK(status == helics_ok);
     //vFed1->finalize ();
 
     //BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
 	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
+    helicsFreeBroker(broker);
 	helicsCloseLibrary();
-	broker = nullptr;
-	vFed = nullptr;
-	fi = nullptr;
-	subid = nullptr;
-	subid2 = nullptr;
-	subid3 = nullptr;
-	delete broker, vFed, fi, subid, subid2, subid3;
+
 } 
 
 BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
                       bdata::make (core_types),
                       core_type)
 {
-	helicsStatus status;
+	helics_status status;
 	helics_federate_info_t fi;
 	helics_broker broker;
 	helics_federate vFed;
@@ -288,7 +274,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 	subid3 = helicsRegisterSubscription(vFed, "sub3", "double", "V");
 
 	status = helicsEnterExecutionMode(vFed);
-	BOOST_CHECK(status == helicsOK);
+	BOOST_CHECK(status == helics_ok);
 
 	status = helicsGetSubscriptionKey(subid, subname, 100);
 	status = helicsGetSubscriptionKey(subid2, subname2, 100);
@@ -320,22 +306,14 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 	BOOST_CHECK_EQUAL(pubunit3, "V");
 
 	status = helicsFederateFinalize(vFed);
-	BOOST_CHECK(status == helicsOK);
+	BOOST_CHECK(status == helics_ok);
 
 	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
+    helicsFreeBroker(broker);
 	helicsCloseLibrary();
-	broker = nullptr;
-	vFed = nullptr;
-	fi = nullptr;
-	subid = nullptr;
-	subid2 = nullptr;
-	subid3 = nullptr;
-	pubid = nullptr;
-	pubid2 = nullptr;
-	pubid3 = nullptr;
-	delete broker, fi, vFed, subid, subid2, subid3, pubid, pubid2, pubid3;
+
 	//SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
     //auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
@@ -386,7 +364,7 @@ BOOST_DATA_TEST_CASE(value_federate_subscriber_and_publisher_registration,
     bdata::make(core_types),
     core_type)
 {
-	helicsStatus status;
+	helics_status status;
 	helics_federate_info_t fi;
 	helics_broker broker;
 	helics_federate vFed;
@@ -414,7 +392,7 @@ BOOST_DATA_TEST_CASE(value_federate_subscriber_and_publisher_registration,
 
 	// enter execution
 	status = helicsEnterExecutionMode(vFed);
-	BOOST_CHECK(status == helicsOK);
+	BOOST_CHECK(status == helics_ok);
 
 	// check subscriptions
 	status = helicsGetSubscriptionKey(subid, subname, 100);
@@ -447,22 +425,14 @@ BOOST_DATA_TEST_CASE(value_federate_subscriber_and_publisher_registration,
 	BOOST_CHECK_EQUAL(pubunit3, "V");
 
 	status = helicsFederateFinalize(vFed);
-	BOOST_CHECK(status == helicsOK);
+	BOOST_CHECK(status == helics_ok);
 
 	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
+    helicsFreeBroker(broker);
 	helicsCloseLibrary();
-	broker = nullptr;
-	vFed = nullptr;
-	fi = nullptr;
-	subid = nullptr;
-	subid2 = nullptr;
-	subid3 = nullptr;
-	pubid = nullptr;
-	pubid2 = nullptr;
-	pubid3 = nullptr;
-	delete broker, fi, vFed, subid, subid2, subid3, pubid, pubid2, pubid3;
+
 	//SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1);
     //auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
@@ -514,7 +484,7 @@ BOOST_DATA_TEST_CASE(value_federate_subscriber_and_publisher_registration,
 
 BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), core_type)
 {
-	helicsStatus status;
+	helics_status status;
 	helics_federate_info_t fi;
 	helics_broker broker;
 	helics_federate vFed;
@@ -568,13 +538,9 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
 	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
+    helicsFreeBroker(broker);
 	helicsCloseLibrary();
-	broker = nullptr;
-	vFed = nullptr;
-	fi = nullptr;
-	subid = nullptr;
-	pubid = nullptr;
-	delete broker, fi, vFed, subid, pubid;
+
 	std::cout << "value_federate_single_transfer - core_type:" << core_type << "\n";
 	// publish string1 at time=0.0;
 
@@ -615,7 +581,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
 
 BOOST_DATA_TEST_CASE(value_federate_single_transfer_publisher, bdata::make(core_types), core_type)
 {
-	helicsStatus status;
+	helics_status status;
 	helics_federate_info_t fi;
 	helics_broker broker;
 	helics_federate vFed;
@@ -666,13 +632,9 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer_publisher, bdata::make(core_
 	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
+    helicsFreeBroker(broker);
 	helicsCloseLibrary();
-	broker = nullptr;
-	vFed = nullptr;
-	fi = nullptr;
-	subid = nullptr;
-	pubid = nullptr;
-	delete broker, fi, vFed, subid, pubid;
+
 
 	std::cout << "value_federate_single_transfer_publisher - core_type:" << core_type << "\n";
 	//SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1);
