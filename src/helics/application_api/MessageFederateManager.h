@@ -23,6 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include "libguarded/guarded.hpp"
 
 namespace helics
 {
@@ -102,7 +103,7 @@ class MessageFederateManager
     void updateTime (Time newTime, Time oldTime);
     /** transition from Startup To the Initialize State*/
     void StartupToInitializeStateTransition ();
-    /** transition from initialize to executation State*/
+    /** transition from initialize to execution State*/
     void InitializeToExecuteStateTransition ();
 
     /** get the name of an endpoint from its id
@@ -128,7 +129,7 @@ class MessageFederateManager
     @param[in] callback the function to call
     */
     void registerCallback (endpoint_id_t id, std::function<void(endpoint_id_t, Time)> callback);
-    /** register a callback function to call when one of the specfied endpoint ids receives a message
+    /** register a callback function to call when one of the specified endpoint ids receives a message
     @param[in] ids  the set of ids to register the callback for
     @param[in] callback the function to call
     */
@@ -137,6 +138,8 @@ class MessageFederateManager
 
     /**disconnect from the coreObject*/
     void disconnect();
+    /**get the number of registered endpoints*/
+    int getEndpointCount() const;
   private:
     std::unordered_map<std::string, endpoint_id_t>
       endpointNames;  //!< container to translate names to endpoint id's
@@ -151,8 +154,7 @@ class MessageFederateManager
     Core::federate_id_t fedID;  //!< storage for the federate ID
     mutable std::mutex endpointLock;  //!< lock for protecting the endpoint list
     std::vector<simpleQueue<std::unique_ptr<Message>>> messageQueues;  //!< the storage for the message queues
-    std::vector<unsigned int> messageOrder;  //!< maintaining a list of the ordered messages
-    std::mutex morderMutex;  //!< mutex to protect the global ordered list
+    libguarded::guarded<std::vector<unsigned int>> messageOrder;  //!< maintaining a list of the ordered messages
     int allCallbackIndex = -1;  //!< index of the all callback function
     bool hasSubscriptions = false;  //!< indicator that the message filter subscribes to data values
   private:  // private functions

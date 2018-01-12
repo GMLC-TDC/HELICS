@@ -356,9 +356,9 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     BOOST_CHECK_EQUAL (M3->data.size (), data3.size ());
     BOOST_CHECK_EQUAL (M4->data.size (), data4.size ());
 
-    BOOST_CHECK_EQUAL (M4->src, "fed0/ep1");
+    BOOST_CHECK_EQUAL (M4->source, "fed0/ep1");
     BOOST_CHECK_EQUAL (M4->dest, "ep2");
-    BOOST_CHECK_EQUAL (M4->origsrc, "fed0/ep1");
+    BOOST_CHECK_EQUAL (M4->original_source, "fed0/ep1");
     BOOST_CHECK_EQUAL (M4->time, 0.0);
     mFed1->finalize ();
     mFed2->finalize ();
@@ -422,13 +422,13 @@ class pingpongFed
             if (messString == "ping")
             {
 #ifdef ENABLE_OUTPUT
-                std::cout << name << " :receive ping from " << std::string (mess->src) << " at time "
+                std::cout << name << " :receive ping from " << std::string (mess->source) << " at time "
                           << static_cast<double> (currentTime) << '\n';
 #endif
                 mess->data = "pong";
-                mess->dest = mess->src;
-                mess->src = name;
-                mess->origsrc = mess->src;
+                mess->dest = mess->source;
+                mess->source = name;
+                mess->original_source = mess->source;
                 mess->time = currentTime;
                 mFed->sendMessage (ep, std::move (mess));
                 pings++;
@@ -437,7 +437,7 @@ class pingpongFed
             {
                 pongs++;
 #ifdef ENABLE_OUTPUT
-                std::cout << name << " :receive pong from " << std::string (mess->src) << " at time "
+                std::cout << name << " :receive pong from " << std::string (mess->source) << " at time "
                           << static_cast<double> (currentTime) << '\n';
 #endif
             }
@@ -492,8 +492,12 @@ BOOST_TEST_DECORATOR (*utf::timeout (20))
 #endif
 BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 {
+    if (core_type != "test")
+    {
+        return;
+    }
     AddBroker (core_type, "3");
-
+    
     auto ctype = helics::coreTypeFromString (core_type);
     pingpongFed p1 ("fedA", 0.5, ctype);
     pingpongFed p2 ("fedB", 0.5, ctype);

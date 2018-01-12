@@ -12,6 +12,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include "../CoreBroker.h"
 #include "../CommsBroker.hpp"
+#include "../NetworkBrokerData.h"
 
 namespace helics
 {
@@ -35,11 +36,7 @@ public:
 private:
 	virtual bool brokerConnect() override;
 	
-	std::string brokerAddress;	//!< the ip address or domain name of the broker
-	std::string localInterface; //!< the interface to use for the local receive ports
-	int PortNumber=-1;	//!< the port number for the reply port
-	int brokerPort=-1;  //!< the port number to use for the broker priority request port
-	int portStart = -1;  //!< the starting port for automatic port definitions
+    NetworkBrokerData netInfo{ NetworkBrokerData::interface_type::tcp };  //!< structure containing the networking information
 
 };
 }

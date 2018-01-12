@@ -20,8 +20,8 @@ namespace helics
     public:
         Time timeDelta = timeEpsilon;  // the minimum time advance allowed by the federate
                                        // federate
-        Time lookAhead = timeZero;  //!< the lookahead value, the window of time between the time request return and the availability of values
-        Time impactWindow = timeZero;  //!< the time it takes values to propagate to the Federate
+        Time outputDelay = timeZero;  //!< the outputDelay value, the amount of time values take to propage to be available to external federates
+        Time inputDelay = timeZero;  //!< the time it takes values and messages to propagate to be accessible to the Federate
         Time period = timeZero; //!< a period value,  all granted times must be on this period
         Time offset = timeZero;  //!< offset to the time period
         int logLevel=1;	//!< the logging level above which not to log to file
@@ -32,7 +32,7 @@ namespace helics
         bool only_transmit_on_change = false; //!< flag indicating that values should only updated if the number has actually changes
         bool only_update_on_change = false;  //!< flag indicating values should be discarded if they are not changed from previous values
         bool wait_for_current_time_updates = false; //!< flag indicating that the federate should only grant when no more messages can be received at the current time
-        int16_t max_iterations = 3;	//!< the maximum number of iterations allowed for the federate
+        int16_t maxIterations = 3;	//!< the maximum number of iterations allowed for the federate
 
     };
 

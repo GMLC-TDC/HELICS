@@ -62,6 +62,7 @@ public:
 	/** default constructor*/
 	UdpComms();
 	UdpComms(const std::string &brokerTarget, const std::string &localTarget);
+    UdpComms(const NetworkBrokerData &netInfo);
 	/** destructor*/
 	~UdpComms();
 	/** set the port numbers for the local ports*/

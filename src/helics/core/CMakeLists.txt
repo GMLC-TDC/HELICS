@@ -22,7 +22,7 @@ set(SRC_FILES
 	TimeDependencies.cpp
 	CommsInterface.cpp
 	CommsBroker.cpp
-	argParser.cpp
+	NetworkBrokerData.cpp
 )
 
 set(TESTCORE_SOURCE_FILES
@@ -97,7 +97,7 @@ set(INCLUDE_FILES
 	FilterInfo.h
 	BasicHandleInfo.h
 	FilterFunctions.h
-	argParser.h
+	NetworkBrokerData.h
 )
 
 set(TESTCORE_HEADER_FILES

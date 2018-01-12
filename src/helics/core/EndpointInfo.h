@@ -15,8 +15,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "core.h"
 
 #include <deque>
-#include <mutex>
-
+#include "libguarded/shared_guarded.hpp"
 namespace helics {
 
 /** data class containing the information about an endpoint*/
@@ -39,8 +38,11 @@ public:
 	std::string key; //!< name of the endpoint
 	std::string type;	//!< type of the endpoint
 private:
-	std::deque<std::unique_ptr<Message>>message_queue;  //!< storage for the messages
-	mutable std::mutex queueLock;	//!< the lock for multithread access to the queue
+#ifdef HAVE_SHARED_TIMED_MUTEX
+	libguarded::shared_guarded<std::deque<std::unique_ptr<Message>>> message_queue;  //!< storage for the messages
+#else
+    libguarded::shared_guarded<std::deque<std::unique_ptr<Message>>,std::mutex> message_queue;  //!< storage for the messages
+#endif
 public:
 	bool hasFilter = false; //!< indicator that the message has a filter
 	/** get the next message up to the specified time*/

@@ -271,9 +271,9 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     BOOST_CHECK_EQUAL (M3->data.size (), data3.size ());
     BOOST_CHECK_EQUAL (M4->data.size (), data4.size ());
 
-    BOOST_CHECK_EQUAL (M4->src, "fed0/ep1");
+    BOOST_CHECK_EQUAL (M4->source, "fed0/ep1");
     BOOST_CHECK_EQUAL (M4->dest, "ep2");
-    BOOST_CHECK_EQUAL (M4->origsrc, "fed0/ep1");
+    BOOST_CHECK_EQUAL (M4->original_source, "fed0/ep1");
     BOOST_CHECK_EQUAL (M4->time, 0.0);
     mFed1->finalize ();
     mFed2->finalize ();

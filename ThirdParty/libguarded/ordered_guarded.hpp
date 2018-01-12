@@ -10,6 +10,18 @@
 *
 ***********************************************************************/
 
+/*
+
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was modified by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+additions include load store operations
+*/
+
 #ifndef LIBGUARDED_ORDERED_GUARDED_HPP
 #define LIBGUARDED_ORDERED_GUARDED_HPP
 
@@ -72,12 +84,6 @@ class ordered_guarded
         m_mutex.unlock();
         return newObj;
     }
-    /** generate a copy of the protected object
-    */
-    std::enable_if_t<std::is_copy_constructible<T>::value, T> operator*() const
-    {
-        return load();
-    }
 
     /** store an updated value into the object*/
     template <typename objType>
@@ -89,9 +95,10 @@ class ordered_guarded
 
     /** store an updated value into the object*/
     template <typename objType>
-    std::enable_if_t<std::is_copy_assignable<T>::value> operator=(objType &&newObj)
+    std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
     {
-        store(std::forward<objType>(newObj));
+        std::lock_guard<M> lock(m_mutex);
+        m_obj = std::forward<objType>(newObj);
     }
   private:
     class shared_deleter

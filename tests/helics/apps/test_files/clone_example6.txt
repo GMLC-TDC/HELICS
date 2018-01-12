@@ -1,0 +1,3 @@
+#test for clone interface
+source d1
+clone destination d1

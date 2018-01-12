@@ -116,9 +116,9 @@ typedef struct message_t
     helics_time_t time;  //!< message time
     const char *data;  //!< message data
     int64_t length;  //!< message length
-    const char *src;  //!< the most recent source
-    const char *dst;  //!< the final destination
-    const char *origsrc;  //!< original source
+    const char *original_source;  //!< original source
+    const char *source;  //!< the most recent source
+    const char *dest;  //!< the final destination
     const char *origdest; //!< the orginal destination of the message
 
 } message_t;
