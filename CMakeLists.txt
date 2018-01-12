@@ -52,7 +52,7 @@ if (NOT CMAKE_DEBUG_POSTFIX)
 	set(CMAKE_DEBUG_POSTFIX d)
 endif()
 
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/config/cmake/")
 
 include_directories ("${PROJECT_SOURCE_DIR}/ThirdParty")
 include_directories ("${PROJECT_BINARY_DIR}/libs/include")
@@ -181,7 +181,7 @@ find_package(Doxygen)
 if(DOXYGEN_FOUND)
 
 	SHOW_VARIABLE(DOXYGEN_OUTPUT_DIR PATH "location to put Doxygen docs" "${CMAKE_CURRENT_SOURCE_DIR}/docs")
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 	add_custom_target(doc
 	${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docs}
@@ -457,7 +457,7 @@ endif(ZeroMQ_FOUND)
 # Setup configure.h file for accessing configure options
 #-----------------------------------------------------------------------------
 configure_file (
-  "helics-config.h.in"
+  "config/helics-config.h.in"
   "${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h"
   )
   install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
@@ -471,14 +471,14 @@ install(DIRECTORY ThirdParty/helics_includes DESTINATION ${CMAKE_INSTALL_INCLUDE
 include(CMakePackageConfigHelpers)
 
 
-configure_package_config_file(${PROJECT_NAME}Config.cmake.in
+configure_package_config_file(config/${PROJECT_NAME}Config.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
                               INSTALL_DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
                                  VERSION ${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}
                                  COMPATIBILITY AnyNewerVersion)
 
-configure_file(${PROJECT_NAME}Import.cmake.in
+configure_file(config/${PROJECT_NAME}Import.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake" @ONLY)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
