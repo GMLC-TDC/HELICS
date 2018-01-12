@@ -37,12 +37,12 @@ class BrokerBase
 protected:
 	std::atomic<Core::federate_id_t> global_broker_id{ 0 };
     Core::federate_id_t higher_broker_id=0;  //!< the id code of the broker 1 level about this broker
-	int32_t maxLogLevel = 1;  //!< the logging level to use levels >=this will be logged
+    std::atomic<int32_t> maxLogLevel{ 1 };  //!< the logging level to use levels >=this will be logged
 	int32_t consoleLogLevel = 1; //!< the logging level for console display
 	int32_t fileLogLevel = 1; //!< the logging level for logging to a file
 	int32_t _min_federates=1;  //!< the minimum number of federates that must connect before entering init mode
 	int32_t _min_brokers=0;  //!< the minimum number of brokers that must connect before entering init mode
-	int32_t _max_iterations=10000; //!< the maximum number of iterative loops that are allowed
+	int32_t _maxIterations=10000; //!< the maximum number of iterative loops that are allowed
     int32_t tickTimer = 4000; //!< counter for the length of a keep alive tick in milliseconds
     int32_t timeout = 30000;  //!< timeout to wait to establish a broker connection before giving up in milliseconds
     std::string identifier;  //!< an identifier for the broker
@@ -54,6 +54,7 @@ protected:
 	std::atomic<bool> haltOperations{ false };  //!< flag indicating that no further message should be processed
 private:
     std::atomic<bool> mainLoopIsRunning{ false }; //!< flag indicating that the main processing loop is running
+    bool dumplog = false;
 protected:
     std::string logFile; //< the file to log message to
 	std::unique_ptr<TimeCoordinator> timeCoord; //!< object managing the time control
@@ -100,21 +101,28 @@ public:
     */
 	void setLoggerFunction(std::function<void(int, const std::string &, const std::string &)> logFunction);
 
-    /* process a disconnect signal*/
+    /** process a disconnect signal*/
     virtual void processDisconnect(bool skipUnregister = false) = 0;
-
+    /** check if the main processing loop of a broker is running*/
     bool isRunning() const
     {
         return mainLoopIsRunning.load();
     }
-    /** in the case of connection failure with a broker this function will try a reconnect procedure
+    /** set the logging level */
+    void setLogLevel(int32_t level);
+    /** set the logging levels 
+    @param consoleLevel the logging level for the console display
+    @param fileLevel the logging level for the log file
     */
-    virtual bool tryReconnect() = 0;
+    void setLogLevels(int32_t consoleLevel, int32_t fileLevel);
 private:
 	/** start main broker loop*/
 	void queueProcessingLoop();
    
 protected:
+    /** in the case of connection failure with a broker this function will try a reconnect procedure
+    */
+    virtual bool tryReconnect() = 0;
 	/** process a single command action
 	@details cmd may be modified by this function*/
 	virtual void processCommand(ActionMessage &&cmd) = 0;

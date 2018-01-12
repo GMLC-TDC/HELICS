@@ -86,6 +86,7 @@ enum class action_t : int32_t
     cmd_remove_interdependency = 149,  //!< command to remove a federate as both dependent and a dependency
 
     cmd_fed_configure = 205,  //!< command to update the configuration of a federate
+    cmd_core_configure = 207, //!< command to update the configuration of a core
 
     null_info_command = cmd_info_basis - 1,  //!< biggest command that doesn't have the info structure
     priority_null_info_command =
@@ -121,7 +122,7 @@ enum class action_t : int32_t
 }  // namespace action_message_def
 
 #define CMD_IGNORE action_message_def::action_t::cmd_ignore
-#define CMD_INVALID action_message_def::action_t::cmd_invalid;
+#define CMD_INVALID action_message_def::action_t::cmd_invalid
 #define CMD_TICK action_message_def::action_t::cmd_tick
 #define CMD_REG_BROKER action_message_def::action_t::cmd_reg_broker
 #define CMD_PRIORITY_DISCONNECT action_message_def::action_t::cmd_priority_disconnect
@@ -179,6 +180,7 @@ enum class action_t : int32_t
 #define CMD_PROTOCOL_BIG action_message_def::action_t::cmd_protocol_big
 
 #define CMD_FED_CONFIGURE action_message_def::action_t::cmd_fed_configure
+#define CMD_CORE_CONFIGURE action_message_def::action_t::cmd_core_configure
 
 #define CMD_ACK action_message_def::action_t::cmd_ack
 #define CMD_PRIORITY_ACK action_message_def::action_t::cmd_priority_ack
@@ -203,7 +205,7 @@ enum class action_t : int32_t
 #define NULL_REPLY 0;
 
 // definitions for FED_CONFIGURE_COMMAND
-#define UPDATE_LOOKAHEAD 0
+#define UPDATE_outputDelay 0
 #define UPDATE_IMPACT_WINDOW 1
 #define UPDATE_MINDELTA 2
 #define UPDATE_PERIOD 3

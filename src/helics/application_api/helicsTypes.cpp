@@ -70,8 +70,10 @@ static const std::map<std::string, helicsType_t> typeMap{
   {"vector", helicsType_t::helicsVector},
   {"double_vector", helicsType_t::helicsVector},
   {"complex", helicsType_t::helicsComplex},
+  { "pair", helicsType_t::helicsComplex },
   {"int", helicsType_t::helicsInt},
   {"int64", helicsType_t::helicsInt},
+  {"integer",helicsType_t::helicsInt },
   {"complex_vector", helicsType_t::helicsComplexVector},
   {"d", helicsType_t::helicsDouble},
   {"s", helicsType_t::helicsString},
@@ -81,6 +83,10 @@ static const std::map<std::string, helicsType_t> typeMap{
   {"i", helicsType_t::helicsInt},
   {"i64", helicsType_t::helicsInt},
   {"cv", helicsType_t::helicsComplexVector},
+  {"default",helicsType_t::helicsAny},
+  {"def",helicsType_t::helicsAny},
+  {"any",helicsType_t::helicsAny},
+  {"all",helicsType_t::helicsAny}
 };
 
 helicsType_t getTypeFromString (const std::string &typeName)
@@ -390,6 +396,26 @@ data_block typeConvert (helicsType_t type, int64_t val)
     }
 }
 
+data_block typeConvert(helicsType_t type, const char *val)
+{
+    switch (type)
+    {
+    case helicsType_t::helicsDouble:
+        return ValueConverter<double>::convert(boost::lexical_cast<double> (val));
+    case helicsType_t::helicsInt:
+        return ValueConverter<int64_t>::convert(boost::lexical_cast<int64_t> (val));
+    case helicsType_t::helicsComplex:
+        return ValueConverter<std::complex<double>>::convert(helicsGetComplex(val));
+    case helicsType_t::helicsString:
+    default:
+        return data_block(val);
+    case helicsType_t::helicsComplexVector:
+        return ValueConverter<std::vector<std::complex<double>>>::convert(helicsGetComplexVector(val));
+    case helicsType_t::helicsVector:
+        return ValueConverter<std::vector<double>>::convert(helicsGetVector(val));
+    }
+}
+
 data_block typeConvert (helicsType_t type, const std::string &val)
 {
     switch (type)
@@ -555,7 +581,7 @@ data_block typeConvert (helicsType_t type, const std::vector<std::complex<double
     }
     }
 }
-data_block typeConvert (helicsType_t type, std::complex<double> &val)
+data_block typeConvert (helicsType_t type, const std::complex<double> &val)
 {
     switch (type)
     {

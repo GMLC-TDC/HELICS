@@ -24,4 +24,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define ROLLBACK_FLAG 8
 #define FORWARD_COMPUTE_FLAG 9
 
+/** used to delay a core from entering init mode even if it would otherwise be ready*/
+#define DELAY_INIT_ENTRY 45  
+/** used to clear the DELAY_INIT_ENTRY flag in cores*/
+#define ENABLE_INIT_ENTRY 47
+
 #endif

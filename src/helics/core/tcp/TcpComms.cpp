@@ -8,41 +8,48 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "UdpComms.h"
-#include "../ActionMessage.h"
+#include "TcpComms.h"
 #include "../../common/AsioServiceManager.h"
+#include "../ActionMessage.h"
+#include "TcpHelperClasses.h"
+#include "../NetworkBrokerData.h"
 #include <memory>
-#include <boost/asio/ip/udp.hpp>
 
-static const int BEGIN_OPEN_PORT_RANGE = 23964;
-static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24093;
+static const int BEGIN_OPEN_PORT_RANGE = 24228;
+static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24357;
 
-static const int DEFAULT_UDP_BROKER_PORT_NUMBER = 23901;
-
+static const int DEFAULT_TCP_BROKER_PORT_NUMBER = 24160;
 
 namespace helics
 {
-using boost::asio::ip::udp;
-UdpComms::UdpComms ()
-{
-    promisePort = std::promise<int> ();
-    futurePort = promisePort.get_future ();
-}
+using boost::asio::ip::tcp;
+TcpComms::TcpComms () {}
 
-UdpComms::UdpComms (const std::string &brokerTarget, const std::string &localTarget)
+TcpComms::TcpComms (const std::string &brokerTarget, const std::string &localTarget)
     : CommsInterface (brokerTarget, localTarget)
 {
     if (localTarget_.empty ())
     {
         localTarget_ = "localhost";
     }
-    promisePort = std::promise<int> ();
-    futurePort = promisePort.get_future ();
 }
-/** destructor*/
-UdpComms::~UdpComms () { disconnect (); }
 
-void UdpComms::setBrokerPort (int brokerPortNumber)
+TcpComms::TcpComms(const NetworkBrokerData &netInfo) :CommsInterface(netInfo),brokerPort(netInfo.brokerPort),PortNumber(netInfo.portNumber)
+{
+    if (localTarget_.empty())
+    {
+        localTarget_ = "localhost";
+    }
+    if (netInfo.portStart > 0)
+    {
+        openPortStart = netInfo.portStart;
+    }
+}
+
+/** destructor*/
+TcpComms::~TcpComms () { disconnect (); }
+
+void TcpComms::setBrokerPort (int brokerPortNumber)
 {
     if (rx_status == connection_status::startup)
     {
@@ -50,7 +57,7 @@ void UdpComms::setBrokerPort (int brokerPortNumber)
     }
 }
 
-int UdpComms::findOpenPort ()
+int TcpComms::findOpenPort ()
 {
     int start = openPortStart;
     if (openPortStart < 0)
@@ -65,7 +72,7 @@ int UdpComms::findOpenPort ()
     return start;
 }
 
-void UdpComms::setPortNumber (int localPortNumber)
+void TcpComms::setPortNumber (int localPortNumber)
 {
     if (rx_status == connection_status::startup)
     {
@@ -73,11 +80,11 @@ void UdpComms::setPortNumber (int localPortNumber)
     }
 }
 
-void UdpComms::setAutomaticPortStartPort (int startingPort) { openPortStart = startingPort; }
+void TcpComms::setAutomaticPortStartPort (int startingPort) { openPortStart = startingPort; }
 
-int UdpComms::processIncomingMessage (ActionMessage &M)
+int TcpComms::processIncomingMessage (ActionMessage &M)
 {
-    if (isProtocolCommand(M))
+    if (isProtocolCommand (M))
     {
         switch (M.index)
         {
@@ -91,9 +98,9 @@ int UdpComms::processIncomingMessage (ActionMessage &M)
     return 0;
 }
 
-ActionMessage UdpComms::generateReplyToIncomingMessage (ActionMessage &M)
+ActionMessage TcpComms::generateReplyToIncomingMessage (ActionMessage &M)
 {
-    if (isProtocolCommand(M))
+    if (isProtocolCommand (M))
     {
         switch (M.index)
         {
@@ -127,95 +134,183 @@ ActionMessage UdpComms::generateReplyToIncomingMessage (ActionMessage &M)
     return resp;
 }
 
-void UdpComms::queue_rx_function ()
+void TcpComms::txPriorityReceive (std::shared_ptr<tcp_connection> connection,
+                                  const char *data,
+                                  size_t bytes_received,
+                                  const boost::system::error_code &error)
 {
-    if (PortNumber < 0)
+    if (error)
     {
-        PortNumber = futurePort.get();
+        return;
+    }
+    ActionMessage m;
+    auto used = m.depacketize (data, bytes_received);
+    if (used > 0)
+    {
+        if (m.action () == CMD_INVALID)
+        {
+            return;
+        }
+        if (m.action () == CMD_PRIORITY_ACK)
+        {
+            return;
+        }
+        if (isProtocolCommand (m))
+        {
+            txQueue.emplace (-1, m);
+        }
+        else
+        {
+            ActionCallback (std::move (m));
+        }
+    }
+}
+
+size_t
+TcpComms::dataReceive (std::shared_ptr<tcp_rx_connection> connection, const char *data, size_t bytes_received)
+{
+    ActionMessage m;
+    size_t used_total = 0;
+    while (used_total < bytes_received)
+    {
+        auto used = m.depacketize (data + used_total, bytes_received - used_total);
+        if (used == 0)
+        {
+            break;
+        }
+        if (isPriorityCommand (m))
+        {
+            auto rep = generateReplyToIncomingMessage (m);
+            try
+            {
+                connection->send(rep.packetize());
+            }
+            catch(const boost::system::system_error &se)
+            {
+                
+           }
+        }
+        else if (isProtocolCommand (m))
+        {
+            rxMessageQueue.push (m);
+        }
+        else
+        {
+            if (ActionCallback)
+            {
+                ActionCallback(std::move(m));
+            }
+        }
+        used_total += used;
+    }
+
+    return used_total;
+}
+
+bool TcpComms::commErrorHandler (std::shared_ptr<tcp_rx_connection> connection,
+                                 const boost::system::error_code &error)
+{
+    if (rx_status == connection_status::connected)
+    {
+        if ((error != boost::asio::error::eof) && (error != boost::asio::error::operation_aborted))
+        {
+            if (error != boost::asio::error::connection_reset)
+            {
+                std::cerr << "error message while connected " << error.message () << "code " << error.value ()
+                          << std::endl;
+            }
+        }
+    }
+    return false;
+}
+
+void TcpComms::queue_rx_function ()
+{
+    while (PortNumber < 0)
+    {
+        auto message = rxMessageQueue.pop ();
+        if (isProtocolCommand (message))
+        {
+            switch (message.index)
+            {
+            case PORT_DEFINITIONS:
+                PortNumber = message.source_handle;
+                break;
+            case CLOSE_RECEIVER:
+            case DISCONNECT:
+                disconnecting = true;
+                rx_status = connection_status::terminated;
+                return;
+            }
+        }
     }
     if (PortNumber < 0)
     {
         rx_status = connection_status::error;
         return;
     }
-    auto ioserv = AsioServiceManager::getServicePointer();
-    udp::socket socket(ioserv->getBaseService(), udp::endpoint(udp::v4(), PortNumber));
-    std::vector<char> data(10192);
-    udp::endpoint remote_endp;
-    boost::system::error_code error;
-    boost::system::error_code ignored_error;
+    auto ioserv = AsioServiceManager::getServicePointer ();
+    tcp_server server (ioserv->getBaseService (), PortNumber, maxMessageSize_);
+
+    ioserv->runServiceLoop ();
+    server.setDataCall ([this](tcp_rx_connection::pointer connection, const char *data, size_t datasize) {
+        return dataReceive (connection, data, datasize);
+    });
+    server.setErrorCall ([this](tcp_rx_connection::pointer connection, const boost::system::error_code &error) {
+        return commErrorHandler (connection, error);
+    });
+    server.start ();
     rx_status = connection_status::connected;
-    while (true)
+    bool loopRunning = true;
+    while (loopRunning)
     {
-        auto len=socket.receive_from(boost::asio::buffer(data), remote_endp, 0, error);
-        if (error)
+        auto message = rxMessageQueue.pop ();
+        if (isProtocolCommand (message))
         {
-            rx_status = connection_status::error;
-            return;
-        }
-        if (len == 5)
-        {
-            std::string str(data.data(), len);
-            if (str == "close")
+            switch (message.index)
             {
-                goto CLOSE_RX_LOOP;
+            case CLOSE_RECEIVER:
+            case DISCONNECT:
+                loopRunning = false;
+                break;
             }
         }
-        ActionMessage M(data.data(),len);
-        if (isProtocolCommand(M))
-        {
-           if (M.index == CLOSE_RECEIVER)
-            {
-               goto CLOSE_RX_LOOP;
-            }
-        }
-        if (isPriorityCommand(M))
-        {
-            auto reply = generateReplyToIncomingMessage(M);
-            if (isProtocolCommand(reply))
-            {
-                if (reply.index == DISCONNECT)
-                {
-                    goto CLOSE_RX_LOOP;
-                }
-            }
-            socket.send_to(boost::asio::buffer(reply.to_string()), remote_endp, 0, ignored_error);
-        }
-        else
-        {
-            auto res=processIncomingMessage(M);
-            if (res < 0)
-            {
-                goto CLOSE_RX_LOOP;
-            }
-        }
-        
     }
-CLOSE_RX_LOOP:
+
     disconnecting = true;
+    server.close();
+    ioserv->haltServiceLoop();
     rx_status = connection_status::terminated;
-    return;
 }
 
+void TcpComms::txReceive (const char *data, size_t bytes_received, const std::string &errorMessage)
+{
+    if (errorMessage.empty ())
+    {
+        ActionMessage m (data, bytes_received);
+        if (isProtocolCommand (m))
+        {
+            if (m.index == PORT_DEFINITIONS)
+            {
+                rxMessageQueue.push (m);
+            }
+            else if (m.index == DISCONNECT)
+            {
+                txQueue.emplace (-1, m);
+            }
+        }
+    }
+}
 
-void UdpComms::queue_tx_function ()
+void TcpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
-    auto ioserv = AsioServiceManager::getServicePointer();
-    udp::resolver resolver (ioserv->getBaseService());
-    bool closingRx = false;
-    udp::socket transmitSocket (ioserv->getBaseService());
-    transmitSocket.open (udp::v4 ());
-    if (PortNumber >= 0)
-    {
-        promisePort.set_value(PortNumber);
-    }
-    
-    boost::system::error_code error;
-    std::map<int, udp::endpoint> routes;  // for all the other possible routes
-    udp::endpoint broker_endpoint;
+    auto ioserv = AsioServiceManager::getServicePointer ();
+    ioserv->runServiceLoop ();
+    tcp_connection::pointer brokerConnection;
 
-    if (!brokerTarget_.empty())
+    std::map<int, tcp_connection::pointer> routes;  // for all the other possible routes
+    if (!brokerTarget_.empty ())
     {
         hasBroker = true;
     }
@@ -223,38 +318,86 @@ void UdpComms::queue_tx_function ()
     {
         if (brokerPort < 0)
         {
-            brokerPort = DEFAULT_UDP_BROKER_PORT_NUMBER;
+            brokerPort = DEFAULT_TCP_BROKER_PORT_NUMBER;
         }
         try
         {
-            udp::resolver::query query(udp::v4(), brokerTarget_, std::to_string(brokerPort));
-            // Setup the control socket for comms with the receiver
-            broker_endpoint = *resolver.resolve(query);
+            brokerConnection = tcp_connection::create (ioserv->getBaseService (), brokerTarget_,
+                                                       std::to_string (brokerPort), maxMessageSize_);
+            int cumsleep = 0;
+            while (!brokerConnection->isConnected ())
+            {
+                std::this_thread::sleep_for (std::chrono::milliseconds (100));
+                cumsleep += 100;
+                if (cumsleep >= connectionTimeout)
+                {
+                    ioserv->haltServiceLoop ();
+                    std::cerr << "initial connection to broker timed out\n" << std::endl;
+                    tx_status = connection_status::terminated;
+                    return;
+                }
+            }
 
             if (PortNumber <= 0)
             {
-                ActionMessage m(CMD_PROTOCOL_PRIORITY);
+                ActionMessage m (CMD_PROTOCOL_PRIORITY);
                 m.index = REQUEST_PORTS;
-                transmitSocket.send_to(boost::asio::buffer(m.to_string()), broker_endpoint, 0, error);
-                if (error)
+                try
                 {
-                    std::cerr << "error in initial send to broker " << error.message() << '\n';
+                    brokerConnection->send (m.packetize ());
                 }
-                std::vector<char> rx(128);
-                udp::endpoint brk;
-                auto len=transmitSocket.receive_from(boost::asio::buffer(rx), brk);
-                m = ActionMessage(rx.data(),len);
-                if (isProtocolCommand(m))
+                catch (const boost::system::system_error &error)
                 {
-                    if (m.index == PORT_DEFINITIONS)
+                    std::cerr << "error in initial send to broker " << error.what () << '\n';
+                    ioserv->haltServiceLoop ();
+                    tx_status = connection_status::terminated;
+                    return;
+                }
+                std::vector<char> rx (512);
+                tcp::endpoint brk;
+                brokerConnection->async_receive (rx.data (), 128,
+                                                 [this, &rx](const boost::system::error_code &error,
+                                                             size_t bytes) {
+                                                     if (error != boost::asio::error::operation_aborted)
+                                                     {
+                                                         if (!error)
+                                                         {
+                                                             txReceive (rx.data (), bytes, std::string ());
+                                                         }
+                                                         else
+                                                         {
+                                                             txReceive (rx.data (), bytes, error.message ());
+                                                         }
+                                                     }
+                                                 });
+                cumsleep = 0;
+                while (PortNumber < 0)
+                {
+                    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+                    auto mess = txQueue.try_pop ();
+                    if (mess)
                     {
-                        PortNumber = m.source_handle;
-                        promisePort.set_value(PortNumber);
+                        if (isProtocolCommand (mess->second))
+                        {
+                            if (mess->second.index == PORT_DEFINITIONS)
+                            {
+                                rxMessageQueue.push (mess->second);
+                            }
+                            else if (mess->second.index == DISCONNECT)
+                            {
+                                brokerConnection->cancel ();
+                                ioserv->haltServiceLoop ();
+                                tx_status = connection_status::terminated;
+                                return;
+                            }
+                        }
                     }
-                    else if (m.index == DISCONNECT)
+                    cumsleep += 100;
+                    if (cumsleep >= connectionTimeout)
                     {
-                        PortNumber = -1;
-                        promisePort.set_value(-1);
+                        ioserv->haltServiceLoop ();
+                        brokerConnection->cancel ();
+                        std::cerr << "port number query to broker timed out\n" << std::endl;
                         tx_status = connection_status::terminated;
                         return;
                     }
@@ -263,30 +406,31 @@ void UdpComms::queue_tx_function ()
         }
         catch (std::exception &e)
         {
-            std::cerr << e.what() << std::endl;
+            std::cerr << e.what () << std::endl;
         }
     }
     else
     {
         if (PortNumber < 0)
         {
-            PortNumber = DEFAULT_UDP_BROKER_PORT_NUMBER;
-            promisePort.set_value(PortNumber);
+            PortNumber = DEFAULT_TCP_BROKER_PORT_NUMBER;
+            ActionMessage m (CMD_PROTOCOL);
+            m.index = PORT_DEFINITIONS;
+            m.source_handle = PortNumber;
+            rxMessageQueue.push (m);
         }
     }
-    udp::resolver::query queryLocal(udp::v4(), localTarget_, std::to_string(PortNumber));
-
-    udp::endpoint rxEndpoint= *resolver.resolve(queryLocal);
     tx_status = connection_status::connected;
-    
+
+    //  std::vector<ActionMessage> txlist;
     while (true)
     {
         int route_id;
         ActionMessage cmd;
-       
+
         std::tie (route_id, cmd) = txQueue.pop ();
         bool processed = false;
-        if (isProtocolCommand(cmd))
+        if (isProtocolCommand (cmd))
         {
             if (route_id == -1)
             {
@@ -295,15 +439,15 @@ void UdpComms::queue_tx_function ()
                 case NEW_ROUTE:
                 {
                     auto newroute = cmd.payload;
-                 
+
                     try
                     {
                         std::string interface;
                         std::string port;
-                        std::tie(interface, port) = extractInterfaceandPortString(newroute);
-                        udp::resolver::query queryNew(udp::v4(), interface,port);
+                        std::tie (interface, port) = extractInterfaceandPortString (newroute);
+                        auto new_connect = tcp_connection::create (ioserv->getBaseService (), interface, port);
 
-                        routes.emplace (cmd.dest_id, *resolver.resolve(queryNew));
+                        routes.emplace (cmd.dest_id, std::move (new_connect));
                     }
                     catch (std::exception &e)
                     {
@@ -313,12 +457,7 @@ void UdpComms::queue_tx_function ()
                 }
                 break;
                 case CLOSE_RECEIVER:
-                    transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rxEndpoint, 0, error);
-                    if (error)
-                    {
-                        std::cerr << "transmit failure to receiver " << error.message() << '\n';
-                    }
-                    closingRx = true;
+                    rxMessageQueue.push (cmd);
                     processed = true;
                     break;
                 case DISCONNECT:
@@ -330,141 +469,128 @@ void UdpComms::queue_tx_function ()
         {
             continue;
         }
-       
+
         if (route_id == 0)
         {
             if (hasBroker)
             {
-                transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), broker_endpoint,0,error);
-                if (error)
+                try
                 {
-                    std::cerr << "transmit failure to broker " << error.message() << '\n';
+                    brokerConnection->send(cmd.packetize());
+                    if (isPriorityCommand(cmd))
+                    {
+                        brokerConnection->async_receive([this](std::shared_ptr<tcp_connection> connection,
+                            const char *data, size_t bytes_received,
+                            const boost::system::error_code &error) {
+                            txPriorityReceive(connection, data, bytes_received, error);
+                        });
+                    }
+                }
+                catch (const boost::system::system_error &se)
+                {
+                    if (se.code() != boost::asio::error::connection_aborted)
+                    {
+                        if (!isDisconnectCommand(cmd))
+                        {
+                            std::cerr << "broker send0 " << se.what() << '\n';
+                        }
+                       
+                   }
+                }
+                
+                // if (error)
+                {
+                    //     std::cerr << "transmit failure to broker " << error.message() << '\n';
                 }
             }
         }
         else if (route_id == -1)
         {  // send to rx thread loop
-            transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rxEndpoint,0,error);
-            if (error)
-            {
-                std::cerr << "transmit failure to receiver " << error.message() << '\n';
-            }
+            rxMessageQueue.push (cmd);
         }
         else
         {
+            //  txlist.push_back(cmd);
             auto rt_find = routes.find (route_id);
             if (rt_find != routes.end ())
             {
-                transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), rt_find->second,0,error);
-                if (error)
+                try
                 {
-                    std::cerr << "transmit failure to route to "<<route_id<<" " << error.message() << '\n';
+                    rt_find->second->send(cmd.packetize());
+                    if (isPriorityCommand(cmd))
+                    {
+                        rt_find->second->async_receive([this](std::shared_ptr<tcp_connection> connection,
+                            const char *data, size_t bytes_received,
+                            const boost::system::error_code &error) {
+                            txPriorityReceive(connection, data, bytes_received, error);
+                        });
+                    }
+                }
+                catch (const boost::system::system_error &se)
+                {
+                    if (se.code() != boost::asio::error::connection_aborted)
+                    {
+                        if (!isDisconnectCommand(cmd))
+                        {
+                            std::cerr << "rt send " << route_id << "::" << se.what() << '\n';
+                        }
+                    }
                 }
             }
             else
             {
                 if (hasBroker)
                 {
-                    transmitSocket.send_to(boost::asio::buffer(cmd.to_string()), broker_endpoint,0,error);
-                    if (error)
+                    try
                     {
-                        std::cerr << "transmit failure to broker " << error.message() << '\n';
+                        brokerConnection->send(cmd.packetize());
+                        if (isPriorityCommand(cmd))
+                        {
+                            brokerConnection->async_receive([this](std::shared_ptr<tcp_connection> connection,
+                                const char *data, size_t bytes_received,
+                                const boost::system::error_code &error) {
+                                txPriorityReceive(connection, data, bytes_received, error);
+                            });
+                        }
                     }
+                    catch (const  boost::system::system_error &se)
+                    {
+                        if (se.code() != boost::asio::error::connection_aborted)
+                        {
+                            if (!isDisconnectCommand(cmd))
+                            {
+                                std::cerr << "broker send" << route_id << " ::" << se.what() << '\n';
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    assert (false);
                 }
             }
         }
     }
 CLOSE_TX_LOOP:
-    
+    for (auto &rt : routes)
+    {
+        rt.second->close ();
+    }
     routes.clear ();
     if (rx_status == connection_status::connected)
     {
-        if (closingRx)
-        {
-            int cnt = 0;
-            while (rx_status == connection_status::connected)
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                ++cnt;
-                if (cnt == 30)
-                {
-                    std::string cls("close");
-                    transmitSocket.send_to(boost::asio::buffer(cls), rxEndpoint, 0, error);
-                    if (error)
-                    {
-                        std::cerr << "transmit failure II to receiver" << error.message() << '\n';
-                    }
-                }
-                if (cnt > 60)
-                {
-                    break;
-                }
-            }
-
-        }
-        else
-        {
-            std::string cls("close");
-            transmitSocket.send_to(boost::asio::buffer(cls), rxEndpoint, 0, error);
-            if (error)
-            {
-                std::cerr << "transmit failure to receiver" << error.message() << '\n';
-            }
-        }
-       
+        closeReceiver ();
     }
-
-
+    ioserv->haltServiceLoop ();
     tx_status = connection_status::terminated;
 }
 
-void UdpComms::closeTransmitter ()
+void TcpComms::closeReceiver ()
 {
-    ActionMessage rt (CMD_PROTOCOL);
-    rt.index = DISCONNECT;
-    transmit (-1, rt);
+    ActionMessage cmd (CMD_PROTOCOL);
+    cmd.index = CLOSE_RECEIVER;
+    rxMessageQueue.push (cmd);
 }
 
-void UdpComms::closeReceiver ()
-{
-    if (tx_status == connection_status::connected)
-    {
-        ActionMessage cmd (CMD_PROTOCOL);
-        cmd.index = CLOSE_RECEIVER;
-        transmit (-1, cmd);
-    }
-    else if (!disconnecting)
-    {
-       
-
-        try
-        {
-            auto serv = AsioServiceManager::getServicePointer();
-            if (serv)
-            {
-                // try connecting with the receiver socket
-                udp::resolver resolver(serv->getBaseService());
-                udp::resolver::query queryLocal(udp::v4(), localTarget_, std::to_string(PortNumber));
-
-                udp::endpoint rxEndpoint = *resolver.resolve(queryLocal);
-
-                udp::socket transmit(serv->getBaseService(),udp::endpoint(udp::v4(),0));
-                std::string cls("close");
-                boost::system::error_code error;
-                transmit.send_to(boost::asio::buffer(cls), rxEndpoint,0,error);
-                if (error)
-                {
-                    std::cerr << "transmit failure on disconnect " << error.message() << '\n';
-                }
-            }
-            
-        }
-        catch (...)
-        {
-            //ignore error here
-       }
-    }
-}
-
-std::string UdpComms::getAddress () const { return makePortAddress (localTarget_, PortNumber); }
+std::string TcpComms::getAddress () const { return makePortAddress (localTarget_, PortNumber); }
 }  // namespace helics

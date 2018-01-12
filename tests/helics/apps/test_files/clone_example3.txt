@@ -1,0 +1,4 @@
+#test for clone interface
+
+clone dest d1
+clone dest d2

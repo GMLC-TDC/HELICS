@@ -18,11 +18,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test out the message federates
  */
 
-BOOST_FIXTURE_TEST_SUITE (message_filter_tests, FederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE (filter_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
-const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
 
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
@@ -72,8 +71,8 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     BOOST_REQUIRE (mFed->hasMessage (p2));
 
     auto m2 = mFed->getMessage (p2);
-    BOOST_CHECK_EQUAL (m2->src, "port1");
-    BOOST_CHECK_EQUAL (m2->origsrc, "port1");
+    BOOST_CHECK_EQUAL (m2->source, "port1");
+    BOOST_CHECK_EQUAL (m2->original_source, "port1");
     BOOST_CHECK_EQUAL (m2->dest, "port2");
     BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
     BOOST_CHECK_EQUAL (m2->time, 2.5);
@@ -115,7 +114,9 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     BOOST_CHECK (fFed->currentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
-
+    //this shouldn't be necessary but it seems there is a time dependency bug that shows up intermittently, this is not the test to find that bug
+    
+    std::this_thread::yield();
     mFed->requestTimeAsync (1.0);
     fFed->requestTime (1.0);
     mFed->requestTimeFinalize ();
@@ -127,14 +128,14 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     fFed->requestTime (2.0);
     mFed->requestTimeFinalize ();
     BOOST_REQUIRE (!mFed->hasMessage (p2));
-
+    std::this_thread::yield();
     mFed->requestTime (3.0);
 
     BOOST_REQUIRE (mFed->hasMessage (p2));
 
     auto m2 = mFed->getMessage (p2);
-    BOOST_CHECK_EQUAL (m2->src, "port1");
-    BOOST_CHECK_EQUAL (m2->origsrc, "port1");
+    BOOST_CHECK_EQUAL (m2->source, "port1");
+    BOOST_CHECK_EQUAL (m2->original_source, "port1");
     BOOST_CHECK_EQUAL (m2->dest, "port2");
     BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
     BOOST_CHECK_EQUAL (m2->time, 2.5);

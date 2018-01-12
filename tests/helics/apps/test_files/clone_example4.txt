@@ -1,0 +1,4 @@
+#test for clone interface
+
+destination d1
+destination d2

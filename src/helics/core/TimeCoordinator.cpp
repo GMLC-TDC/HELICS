@@ -69,7 +69,7 @@ void TimeCoordinator::timeRequest (Time nextTime,
         }
         treq.source_id = source_id;
         treq.actionTime = time_next;
-        treq.Te = time_exec + info.lookAhead;
+        treq.Te = time_exec + info.outputDelay;
         treq.Tdemin = time_minDe;
         sendMessageFunction (treq);
     }
@@ -80,7 +80,7 @@ void TimeCoordinator::updateNextExecutionTime ()
     time_exec = std::min (time_message, time_value);
     if (time_exec < Time::maxVal ())
     {
-        time_exec += info.impactWindow;
+        time_exec += info.inputDelay;
     }
     time_exec = std::min (time_requested, time_exec);
     if (time_exec <= time_granted)
@@ -98,13 +98,19 @@ void TimeCoordinator::updateNextPossibleEventTime ()
 {
     if (!iterating)
     {
-        time_next = time_granted + info.timeDelta + info.lookAhead;
+        time_next = time_granted + info.timeDelta + info.outputDelay;
+        //the next time must fall on a period boundary
+        if (info.period > timeEpsilon)
+        {
+            auto blk = static_cast<int> (std::ceil((time_next - time_granted) / info.period));
+            time_next = time_granted + blk * info.period;
+        }
     }
     else
     {
-        time_next = time_granted + info.lookAhead;
+        time_next = time_granted + info.outputDelay;
     }
-    time_next = std::max (time_next, time_minminDe + info.impactWindow + info.lookAhead);
+    time_next = std::max (time_next, time_minminDe + info.inputDelay + info.outputDelay);
     time_next = std::min (time_next, time_exec);
 }
 void TimeCoordinator::updateValueTime (Time valueUpdateTime)
@@ -178,7 +184,7 @@ bool TimeCoordinator::updateTimeFactors ()
         {
             minNext = dep.Tnext;
         }
-        if (dep.Tdemin < minDe)
+        if ((dep.Tdemin < minDe) && (dep.Tdemin >= dep.Tnext))
         {
             minminDe = dep.Tdemin;
         }
@@ -204,7 +210,7 @@ bool TimeCoordinator::updateTimeFactors ()
         update = true;
         time_minDe = minDe;
     }
-    time_allow = info.impactWindow + minNext;
+    time_allow = info.inputDelay + minNext;
     updateNextExecutionTime ();
     return update;
 }
@@ -214,7 +220,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
     bool update = updateTimeFactors ();
     if ((!iterating) || (time_exec > time_granted))
     {
-        if (time_allow >= time_exec)
+        if (time_allow > time_exec)
         {
             time_granted = time_exec;
             if ((!dependents.empty ()) && (sendMessageFunction))
@@ -228,6 +234,37 @@ iteration_state TimeCoordinator::checkTimeGrant ()
             // static_cast<double>(time_allow), static_cast<double>(time_next), static_cast<double>(time_exec),
             // static_cast<double>(time_minDe));
             return iteration_state::next_step;
+        }
+        if (time_allow == time_exec)
+        {
+            if (time_requested <= time_exec)
+            {
+                time_granted = time_exec;
+                if ((!dependents.empty()) && (sendMessageFunction))
+                {
+                    ActionMessage treq(CMD_TIME_GRANT);
+                    treq.source_id = source_id;
+                    treq.actionTime = time_granted;
+                    sendMessageFunction(treq);
+                }
+                // printf("%d GRANT allow=%f next=%f, exec=%f, Tdemin=%f\n", source_id,
+                // static_cast<double>(time_allow), static_cast<double>(time_next), static_cast<double>(time_exec),
+                // static_cast<double>(time_minDe));
+                return iteration_state::next_step;
+            }
+            if (dependencies.checkIfReadyForTimeGrant(false, time_exec))
+            {
+                time_granted = time_exec;
+                if ((!dependents.empty()) && (sendMessageFunction))
+                {
+                    ActionMessage treq(CMD_TIME_GRANT);
+                    treq.source_id = source_id;
+                    treq.actionTime = time_granted;
+                    SET_ACTION_FLAG(treq, iterationRequested);
+                    sendMessageFunction(treq);
+                }
+                return iteration_state::next_step;
+            }
         }
     }
     else
@@ -246,6 +283,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         }
         if (time_allow == time_exec)  // time_allow==time_exec==time_granted
         {
+           
             if (dependencies.checkIfReadyForTimeGrant (true, time_exec))
             {
                 dependencies.ResetIteratingTimeRequests (time_exec);
@@ -358,7 +396,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
     {
         if (hasInitUpdates)
         {
-            if (iteration > info.max_iterations)
+            if (iteration > info.maxIterations)
             {
                 ret = iteration_state::next_step;
             }
@@ -404,7 +442,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
     return ret;
 }
 
-bool TimeCoordinator::processTimeMessage (ActionMessage &cmd) { return dependencies.updateTime (cmd); }
+bool TimeCoordinator::processTimeMessage (const ActionMessage &cmd) { return dependencies.updateTime (cmd); }
 
 void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
 {
@@ -435,15 +473,15 @@ void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
     }
 }
 
-void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd)
+void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd, bool initMode)
 {
     switch (cmd.index)
     {
-    case UPDATE_LOOKAHEAD:
-        info.lookAhead = cmd.actionTime;
+    case UPDATE_outputDelay:
+        info.outputDelay = cmd.actionTime;
         break;
     case UPDATE_IMPACT_WINDOW:
-        info.impactWindow = cmd.actionTime;
+        info.inputDelay = cmd.actionTime;
         break;
     case UPDATE_MINDELTA:
         info.timeDelta = cmd.actionTime;
@@ -459,7 +497,7 @@ void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd)
         info.offset = cmd.actionTime;
         break;
     case UPDATE_MAX_ITERATION:
-        info.max_iterations = static_cast<int16_t> (cmd.dest_id);
+        info.maxIterations = static_cast<int16_t> (cmd.dest_id);
         break;
     case UPDATE_LOG_LEVEL:
         info.logLevel = static_cast<int> (cmd.dest_id);
@@ -478,6 +516,18 @@ void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd)
             break;
         case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
             info.wait_for_current_time_updates = CHECK_ACTION_FLAG (cmd, indicator_flag);
+            break;
+        case SOURCE_ONLY_FLAG:
+            if (initMode)
+            {
+                info.source_only = CHECK_ACTION_FLAG(cmd, indicator_flag);
+            }
+            break;
+        case OBSERVER_FLAG:
+            if (initMode)
+            {
+                info.observer = CHECK_ACTION_FLAG(cmd, indicator_flag);
+            }
             break;
         default:
             break;

@@ -11,7 +11,6 @@ testFixtures.h
 )
 
 set(application_api_test_sources
-test_configuration.h
 value-converter-tests.cpp
 application-api-tests.cpp
 data-view-tests.cpp
@@ -52,10 +51,12 @@ if (MSVC)
 target_compile_options(application-api-tests PRIVATE /bigobj)
 endif(MSVC)
 
-ADD_DEFINITIONS(-DHELICS_BROKER_LOCATION="${HELICS_BROKER_LOC}")
-ADD_DEFINITIONS(-DHELICS_INSTALL_LOCATION="${CMAKE_INSTALL_PREFIX}")
+target_compile_definitions(application-api-tests PRIVATE "-DHELICS_BROKER_LOCATION=\"${HELICS_BROKER_LOC}\"")
+target_compile_definitions(application-api-tests PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\"")
 
-add_test(NAME application-api-tests COMMAND application-api-tests --log_level=success --report_level=detailed)
+target_compile_definitions(application-api-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
+
+add_test(NAME application-api-tests COMMAND application-api-tests --log_level=warning --report_level=short)
 
 
 

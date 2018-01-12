@@ -362,7 +362,7 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::Handle &id)
         id = endpointI->id;
         return result;
     }
-    id = invalid_Handle;
+    id = invalid_handle;
     return nullptr;
 }
 
@@ -619,6 +619,7 @@ iteration_state FederateState::processQueue ()
     while (ret_code == iteration_state::continue_processing)
     {
         auto cmd = queue.pop ();
+        //    messLog.push_back(cmd);
         ret_code = processActionMessage (cmd);
     }
     return ret_code;
@@ -837,7 +838,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
 
 void FederateState::processConfigUpdate (const ActionMessage &m)
 {
-    timeCoord->processConfigUpdateMessage (m);
+    timeCoord->processConfigUpdateMessage (m, (getState()== HELICS_CREATED));
     switch (m.index)
     {
     case UPDATE_LOG_LEVEL:

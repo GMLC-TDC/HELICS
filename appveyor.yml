@@ -1,6 +1,6 @@
 shallow_clone: true
 
-version: 0.3.{build}
+version: 0.9.{build}
 
 image: Visual Studio 2015
 
@@ -36,5 +36,6 @@ test_script:
   # 4 = player/recorder tests
   - ctest -C Release --verbose --timeout 120 -I 0,0,0,1
   - ctest -C Release --verbose --timeout 240 -I 0,0,0,2
+  - ctest -C Release --verbose --timeout 90 -I 0,0,0,4
 
 artifacts:

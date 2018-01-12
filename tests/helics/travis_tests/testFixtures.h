@@ -17,35 +17,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/BrokerFactory.h"
 #include "helics/core/CoreFactory.h"
 
-struct ValueFederateTestFixture
-{
-    ValueFederateTestFixture () = default;
-    ~ValueFederateTestFixture ();
-
-    void Setup1FederateTest (std::string core_type_name, helics::Time time_delta = helics::timeZero);
-    void Setup2FederateTest (std::string core_type_name, helics::Time time_delta = helics::timeZero);
-
-    void StartBroker (const std::string &core_type_name, const std::string &initialization_string);
-
-    std::vector<std::shared_ptr<helics::Broker>> broker;
-    std::shared_ptr<helics::ValueFederate> vFed1;
-    std::shared_ptr<helics::ValueFederate> vFed2;
-};
-
-struct MessageFederateTestFixture
-{
-    MessageFederateTestFixture () = default;
-    ~MessageFederateTestFixture ();
-
-    void Setup1FederateTest (const std::string &core_type_name);
-    void Setup2FederateTest (const std::string &core_type_name);
-
-    void StartBroker (const std::string &core_type_name, const std::string &initialization_string);
-
-    std::vector<std::shared_ptr<helics::Broker>> broker;
-    std::shared_ptr<helics::MessageFederate> mFed1;
-    std::shared_ptr<helics::MessageFederate> mFed2;
-};
+#ifndef DISABLE_TCP_CORE
+const std::string core_types[] = {"test",   "ipc",   "tcp",   "zmq",   "udp",
+                                  "test_2", "ipc_2", "tcp_2", "zmq_2", "udp_2"};
+#else
+const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
+#endif
 
 struct FederateTestFixture
 {

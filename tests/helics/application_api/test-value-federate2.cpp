@@ -25,13 +25,7 @@ namespace bdata = boost::unit_test::data;
 #if ENABLE_TEST_TIMEOUTS > 0
 namespace utf = boost::unit_test;
 #endif
-#ifdef QUICK_TESTS_ONLY
-const std::string core_types[] = {"test", "test_2", "ipc_2", "zmq", "udp"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
-#else
-const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2", "udp", "udp_2"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
-#endif
+
 /** test block send and receive*/
 #if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
@@ -273,4 +267,13 @@ BOOST_AUTO_TEST_CASE (test_move_calls)
     BOOST_CHECK_NE (vFed.getName (), "test1");
 }
 
+BOOST_AUTO_TEST_CASE(test_file_load)
+{
+    helics::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
+
+    BOOST_CHECK_EQUAL(vFed.getName(), "fedName");
+
+    BOOST_CHECK_EQUAL(vFed.getSubscriptionCount(), 2);
+    BOOST_CHECK_EQUAL(vFed.getPublicationCount(), 2);
+}
 BOOST_AUTO_TEST_SUITE_END ()

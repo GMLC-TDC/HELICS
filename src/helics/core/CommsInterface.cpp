@@ -9,11 +9,17 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "CommsInterface.h"
+#include "NetworkBrokerData.h"
 
 namespace helics
 {
 CommsInterface::CommsInterface (const std::string &localTarget, const std::string &brokerTarget)
     : localTarget_ (localTarget), brokerTarget_ (brokerTarget)
+{
+}
+
+CommsInterface::CommsInterface(const NetworkBrokerData &netInfo)
+    : localTarget_(netInfo.localInterface), brokerTarget_(netInfo.brokerAddress)
 {
 }
 /** destructor*/
@@ -244,50 +250,6 @@ void CommsInterface::reconnectReceiver ()
     transmit (-1, cmd);
 }
 
-std::string makePortAddress (const std::string &networkInterface, int portNumber)
-{
-    std::string newAddress = networkInterface;
-    newAddress.push_back (':');
-    newAddress.append (std::to_string (portNumber));
-    return newAddress;
-}
 
-std::pair<std::string, int> extractInterfaceandPort (const std::string &address)
-{
-    std::pair<std::string, int> ret;
-    auto lastColon = address.find_last_of (':');
-    if (lastColon == std::string::npos)
-    {
-        ret = std::make_pair (address, -1);
-    }
-    else
-    {
-        try
-        {
-            if (address[lastColon + 1] != '/')
-            {
-                auto val = std::stoi (address.substr (lastColon + 1));
-                ret.first = address.substr (0, lastColon);
-                ret.second = val;
-            }
-            else
-            {
-                ret = std::make_pair (address, -1);
-            }
-        }
-        catch (const std::invalid_argument &)
-        {
-            ret = std::make_pair (address, -1);
-        }
-    }
-
-    return ret;
-}
-
-std::pair<std::string, std::string> extractInterfaceandPortString (const std::string &address)
-{
-    auto lastColon = address.find_last_of (':');
-    return std::make_pair (address.substr (0, lastColon), address.substr (lastColon + 1));
-}
 
 }  // namespace helics

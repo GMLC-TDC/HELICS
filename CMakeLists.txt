@@ -41,9 +41,17 @@ IF(BUILD_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
     SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
 ENDIF()
 
+
+
+
 #-----------------------------------------------------------------------------
 # General project wide configuration
 #-----------------------------------------------------------------------------
+
+if (NOT CMAKE_DEBUG_POSTFIX)
+	set(CMAKE_DEBUG_POSTFIX d)
+endif()
+
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 include_directories ("${PROJECT_SOURCE_DIR}/ThirdParty")
@@ -93,25 +101,33 @@ IF(UNIX)
   set(Boost_NO_BOOST_CMAKE ON)
 
   set(Boost_USE_MULTITHREADED      OFF)   # Needed if MT libraries not built
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wall>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-pedantic>)
+  add_compile_options(-Wall -pedantic)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wextra>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wshadow>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-aliasing>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
+  #this options produces lots of warning but is useful for checking ever once in a while with Clang, GCC warning notices with this aren't as useful
+  #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
+  
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
+  option (USE_LIBCXX "Use LibC++ vs as opposed to the default" OFF)
+  IF(USE_LIBCXX)
+      add_compile_options(-stdlib=libc++)
+      link_libraries("-stdlib=libc++")
+     ENDIF(USE_LIBCXX)
 ELSE(UNIX)
   IF(MINGW)
- add_compile_options(-Wall -pedantic)
+  add_compile_options(-Wall -pedantic)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wextra>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wshadow>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-pedantic>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-aliasing>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
-  #this options produces lots of warning but is useful for checking ever once in a while with Clang GCC warnin notices with this aren't as useful
+  #this options produces lots of warning but is useful for checking ever once in a while with Clang, GCC warning notices with this aren't as useful
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
 
   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
@@ -224,7 +240,21 @@ target_link_libraries(helics-static rt)
 ENDIF()
 
 IF(MINGW)
-	target_link_libraries(helics-static ws2_32)
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	if (BOOST_VERSION_LEVEL GREATER 1)
+	#set(DISABLE_TCP_CORE TRUE)
+		set(DISABLE_TCP_CORE FALSE)
+		target_link_libraries(helics-static wsock32 ws2_32)
+	else()
+		set(DISABLE_TCP_CORE TRUE)
+		message(status, "disabling TCP core |${DISABLE_TCP_CORE}|")
+		target_link_libraries(helics-static ws2_32)
+	endif()
+		
+	else()
+		target_link_libraries(helics-static wsock32 ws2_32)
+	endif()
+	
 ENDIF(MINGW)
 
 if (${ZeroMQ_FOUND})
@@ -234,6 +264,7 @@ if (${ZeroMQ_FOUND})
 	else()
 		set(ZeroMQ_DEPENDENCY ${ZeroMQ_LIBRARY})
 	endif()
+	message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
 	target_link_libraries(helics-static ${ZeroMQ_DEPENDENCY})
 else()
    if (ZeroMQ_ENABLE)
@@ -412,7 +443,7 @@ IF (UNIX AND NOT APPLE)
 ENDIF()
 
 IF(MINGW)
-	list(APPEND helics_dependencies ws2_32)
+	list(APPEND helics_dependencies wsock32 ws2_32)
 ENDIF(MINGW)
 
 if (ZeroMQ_FOUND)
@@ -433,7 +464,6 @@ configure_file (
   install(DIRECTORY ThirdParty/cereal DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(DIRECTORY ThirdParty/helics_includes DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(DIRECTORY ThirdParty/libguarded DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 
 

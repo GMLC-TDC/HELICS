@@ -13,6 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../ActionMessage.h"
 #include <memory>
 #include <boost/asio/ip/udp.hpp>
+#include "../NetworkBrokerData.h"
 
 static const int BEGIN_OPEN_PORT_RANGE = 23964;
 static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24093;
@@ -37,6 +38,20 @@ UdpComms::UdpComms (const std::string &brokerTarget, const std::string &localTar
     }
     promisePort = std::promise<int> ();
     futurePort = promisePort.get_future ();
+}
+
+UdpComms::UdpComms(const NetworkBrokerData &netInfo) :CommsInterface(netInfo), brokerPort(netInfo.brokerPort), PortNumber(netInfo.portNumber)
+{
+    if (localTarget_.empty())
+    {
+        localTarget_ = "localhost";
+    }
+    if (netInfo.portStart > 0)
+    {
+        openPortStart = netInfo.portStart;
+    }
+    promisePort = std::promise<int>();
+    futurePort = promisePort.get_future();
 }
 /** destructor*/
 UdpComms::~UdpComms () { disconnect (); }
