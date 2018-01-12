@@ -33,7 +33,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
-static void recorderArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
+static int recorderArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
 namespace helics
 {
@@ -44,13 +44,19 @@ namespace helics
 
     recorder::recorder(int argc, char *argv[])
     {
+        boost::program_options::variables_map vm_map;
+        int res = recorderArgumentParser(argc, argv, vm_map);
+        if (res != 0)
+        {
+            deactivated = true;
+            return;
+        }
         FederateInfo fi("recorder");
         
         fi.loadInfoFromArgs( argc, argv);
         fed = std::make_shared<CombinationFederate>(fi);
         fed->setFlag(OBSERVER_FLAG);
-        boost::program_options::variables_map vm_map;
-        recorderArgumentParser(argc, argv, vm_map);
+        
         loadArguments(vm_map);
     }
 
@@ -213,7 +219,7 @@ namespace helics
             auto fc = str.find_first_not_of(" \t\n\r\0");
             if ((fc == std::string::npos) || (str[fc] == '#'))
             {
-                continue;
+continue;
             }
             auto blk = splitlineQuotes(str, ",\t ", default_quote_chars, delimiter_compression::on);
 
@@ -223,7 +229,7 @@ namespace helics
                 addSubscription(removeQuotes(blk[0]));
                 break;
             case 2:
-                if ((blk[0] == "subscription") || (blk[0] == "s") || (blk[0] == "sub")||(blk[0]=="tag"))
+                if ((blk[0] == "subscription") || (blk[0] == "s") || (blk[0] == "sub") || (blk[0] == "tag"))
                 {
                     addSubscription(removeQuotes(blk[1]));
                 }
@@ -231,11 +237,11 @@ namespace helics
                 {
                     addEndpoint(removeQuotes(blk[1]));
                 }
-                else if ((blk[0] == "sourceclone") || (blk[0] == "source")||(blk[0]=="src"))
+                else if ((blk[0] == "sourceclone") || (blk[0] == "source") || (blk[0] == "src"))
                 {
                     addSourceEndpointClone(removeQuotes(blk[1]));
                 }
-                else if ((blk[0] == "destclone") || (blk[0] == "dest") ||(blk[0]=="destination"))
+                else if ((blk[0] == "destclone") || (blk[0] == "dest") || (blk[0] == "destination"))
                 {
                     addDestEndpointClone(removeQuotes(blk[1]));
                 }
@@ -250,13 +256,13 @@ namespace helics
                 }
                 else
                 {
-                    std::cerr << "Unable to process line " << lc <<':'<< str << '\n';
+                    std::cerr << "Unable to process line " << lc << ':' << str << '\n';
                 }
                 break;
             case 3:
                 if (blk[0] == "clone")
                 {
-                    if ((blk[1] == "source")||(blk[1]=="src"))
+                    if ((blk[1] == "source") || (blk[1] == "src"))
                     {
                         addSourceEndpointClone(removeQuotes(blk[2]));
                     }
@@ -266,7 +272,7 @@ namespace helics
                     }
                     else
                     {
-                        std::cerr << "Unable to process line " << lc <<':'<< str << '\n';
+                        std::cerr << "Unable to process line " << lc << ':' << str << '\n';
                     }
                 }
                 else
@@ -303,7 +309,7 @@ namespace helics
                 JF["points"].push_back(point);
             }
         }
-        
+
         if (!messages.empty())
         {
             JF["messages"] = json::array();
@@ -312,16 +318,21 @@ namespace helics
                 json message;
                 message["time"] = static_cast<double>(mess->time);
                 message["src"] = mess->source;
-                if (mess->dest.compare(mess->dest.size()-6, 6, "cloneE") == 0)
+                if ((!mess->original_source.empty()) && (mess->original_source != mess->source))
                 {
-                    message["dest"] = mess->original_dest;
+                    message["original_source"] = mess->original_source;
                 }
-                else
+                if ((mess->dest.size()<7) || (mess->dest.compare(mess->dest.size() - 6, 6, "cloneE") != 0))
                 {
                     message["dest"] = mess->dest;
                     message["orig_dest"] = mess->original_dest;
                 }
+                else
+                {
+                    message["dest"] = mess->original_dest;
+                }
                 message["message"] = encode(mess->data.to_string());
+                JF["messages"].push_back(message);
             }
         }
       
@@ -332,7 +343,10 @@ namespace helics
     void recorder::writeTextFile( const std::string &filename)
     {
         std::ofstream outFile(filename.empty() ? outFileName : filename);
-        outFile << "#time \ttag\t value\t type*\n";
+        if (!points.empty())
+        {
+            outFile << "#time \ttag\t value\t type*\n";
+        }
         for (auto &v : points)
         {
             if (v.first)
@@ -344,6 +358,24 @@ namespace helics
             {
                 outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getKey() << '\t' << v.value << '\n';
             }
+        }
+        if (!messages.empty())
+        {
+            outFile << "# m\t time \tsource\t dest\t message\n";
+        }
+        for (auto &m : messages)
+        {
+            outFile << "m\t" << static_cast<double> (m->time) << '\t' << m->source << '\t';
+            if ((m->dest.size()<7)||(m->dest.compare(m->dest.size() - 6, 6, "cloneE") != 0))
+            {
+                outFile << m->dest;
+               
+            }
+            else
+            {
+                outFile << m->original_dest;
+            }
+            outFile << "\t\"" << encode(m->data.to_string())<<"\"\n";
         }
     }
 
@@ -364,6 +396,12 @@ namespace helics
         fed->enterExecutionState();
         captureForCurrentTime(0.0);
     }
+
+    void recorder::finalize()
+    {
+        fed->finalize();
+    }
+
     void recorder::generateInterfaces()
     {
         for (auto &tag : subkeys)
@@ -570,22 +608,17 @@ namespace helics
         return nullptr;
     }
 
-
-    void recorder::finalize()
-    {
-        fed->finalize();
-    }
     /** save the data to a file*/
     void recorder::saveFile(const std::string &filename)
     {
         auto ext = filesystem::path(filename).extension().string();
         if ((ext == ".json") || (ext == ".JSON"))
         {
-            loadJsonFile(filename);
+            writeJsonFile(filename);
         }
         else
         {
-            loadTextFile(filename);
+            writeTextFile(filename);
         }
     }
 
@@ -689,7 +722,7 @@ namespace helics
 }
 
 
-void recorderArgumentParser(int argc, const char *const *argv, po::variables_map &vm_map)
+int recorderArgumentParser(int argc, const char *const *argv, po::variables_map &vm_map)
 {
     po::options_description cmd_only ("command line only");
     po::options_description config ("configuration");
@@ -698,7 +731,7 @@ void recorderArgumentParser(int argc, const char *const *argv, po::variables_map
     // clang-format off
     // input boost controls
     cmd_only.add_options () 
-		("help,h", "produce help message")
+		("help,?", "produce help message")
 		("version,v","helics version number")
 		("config-file", po::value<std::string> (),"specify a configuration file to use");
 
@@ -747,13 +780,13 @@ void recorderArgumentParser(int argc, const char *const *argv, po::variables_map
     if (cmd_vm.count ("help") > 0)
     {
         std::cout << visible << '\n';
-        return;
+        return (-1);
     }
 
     if (cmd_vm.count ("version") > 0)
     {
         std::cout << helics::getHelicsVersionString () << '\n';
-        return;
+        return (-1);
     }
 
     po::store (po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered().positional (p).run (), vm_map);
@@ -775,11 +808,6 @@ void recorderArgumentParser(int argc, const char *const *argv, po::variables_map
     }
 
     po::notify (vm_map);
-    // check to make sure we have some input file or the capture is specified
-    if ((vm_map.count ("input") == 0) && (vm_map.count ("capture") == 0) && (vm_map.count ("tags") == 0))
-    {
-        std::cerr << " no input file, tags, or captures specified\n";
-        std::cerr << visible << '\n';
-        return;
-    }
+    return 0;
+
 }

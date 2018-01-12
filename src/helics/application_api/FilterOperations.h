@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "libguarded/guarded.hpp"
 #include "libguarded/shared_guarded.hpp"
+#include "libguarded/atomic_guarded.hpp"
 #include <mutex>
 #include <set>
 #include <atomic>
@@ -100,12 +101,12 @@ namespace helics
     {
     private:
         std::shared_ptr<MessageDestOperator> op;  //!< the actual operator
+        libguarded::atomic_guarded<std::string> newTarget;  //!< the target destination
 #ifdef HAVE_SHARED_TIMED_MUTEX
-        libguarded::shared_guarded<std::string> newTarget;  //!< the target destination
+        
         libguarded::shared_guarded<std::set<std::string>>
             conditions;  //!< the original destination must match one of these conditions
 #else
-        libguarded::shared_guarded<std::string, std::mutex> newTarget;  //!< the target destination
         libguarded::shared_guarded<std::set<std::string>, std::mutex>
             conditions;  //!< the original destination must match one of these conditions
 #endif

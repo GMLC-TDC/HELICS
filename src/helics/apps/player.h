@@ -194,6 +194,14 @@ namespace helics
         {
             return endpoints.size();
         }
+        /** finalize the player federate*/
+        void finalize(); 
+
+        /** check if the player is ready to run*/
+        bool isActive() const
+        {
+            return !deactivated;
+        }
     private:
         int loadArguments(boost::program_options::variables_map &vm_map);
         /** load from a jsonString 
@@ -238,6 +246,7 @@ namespace helics
         double timeMultiplier = 1.0; //!< specify the time multiplier for different time specifications
         bool useLocal = false;
         bool fileLoaded = false;
+        bool deactivated = false;
     };
 }
 

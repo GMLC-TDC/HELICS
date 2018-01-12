@@ -17,7 +17,11 @@ int main (int argc, char *argv[])
     try
     {
         helics::player player(argc, argv);
-        player.run();
+        if (player.isActive())
+        {
+            player.run();
+        }
+       
     }
     catch (const std::invalid_argument &ia)
     {

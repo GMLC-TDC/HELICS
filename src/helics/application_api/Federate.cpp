@@ -315,7 +315,7 @@ void Federate::enterExecutionStateAsync (iteration_request iterate)
     break;
     case op_states::pendingInit:
         enterInitializationStateFinalize ();
-        // FALLTHROUGH
+        FALLTHROUGH
     case op_states::initialization:
     {
         if (!asyncCallInfo)
@@ -389,7 +389,7 @@ void Federate::setInputDelay (Time window)
 {
     if (window < timeZero)
     {
-        throw (InvalidParameterValue ("Impact Window must be >=0"));
+        throw (InvalidParameterValue ("Input Delay must be >=0"));
     }
     coreObject->setInputDelay (fedID, window);
 }

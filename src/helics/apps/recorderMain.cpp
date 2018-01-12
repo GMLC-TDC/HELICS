@@ -19,7 +19,11 @@ int main(int argc, char *argv[])
     try
     {
         helics::recorder recorder(argc, argv);
-        recorder.run();
+        if (recorder.isActive())
+        {
+            recorder.run();
+        }
+        
     }
     catch (const std::invalid_argument &ia)
     {

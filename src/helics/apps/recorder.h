@@ -133,6 +133,11 @@ namespace helics
         /** finalize the federate*/
         void finalize();
 
+        /** check if the recorder is ready to run*/
+        bool isActive() const
+        {
+            return !deactivated;
+        }
     private:
         /** load arguments through a variable map created through command line arguments
         */
@@ -171,6 +176,7 @@ namespace helics
         std::string mapfile;    //!< file name for the on-line file updater
         std::string outFileName;    //!< the final output file
         Time autoStopTime = Time::maxVal(); //!< the stop time
+        bool deactivated = false;
     };
 
 } //namespace helics

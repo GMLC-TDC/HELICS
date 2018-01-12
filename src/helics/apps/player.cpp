@@ -29,7 +29,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
-static void playerArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
+static int playerArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
 // static const std::regex creg
 // (R"raw((-?\d+(\.\d+)?|\.\d+)[\s,]*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
@@ -51,13 +51,18 @@ static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { re
 
 player::player (int argc, char *argv[])
 {
+    boost::program_options::variables_map vm_map;
+    auto res = playerArgumentParser(argc, argv, vm_map);
+    if (res != 0)
+    {
+        deactivated = true;
+    }
     FederateInfo fi ("player");
     fi.loadInfoFromArgs (argc, argv);
     fed = std::make_shared<CombinationFederate> (fi);
     fed->setFlag (SOURCE_ONLY_FLAG);
-    boost::program_options::variables_map vm_map;
-    playerArgumentParser (argc, argv, vm_map);
-    loadArguments (vm_map);
+    loadArguments(vm_map);
+   
 }
 
 player::player (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
@@ -692,6 +697,11 @@ void player::initialize ()
 }
 
 
+void player::finalize()
+{
+    fed->finalize();
+}
+
 void player::sendInformation(Time sendTime)
 {
     if (!points.empty())
@@ -914,7 +924,7 @@ int player::loadArguments(boost::program_options::variables_map &vm_map)
 
 }  // namespace helics
 
-void playerArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map)
+int playerArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map)
 {
     po::options_description cmd_only ("command line only");
     po::options_description config ("configuration");
@@ -923,7 +933,7 @@ void playerArgumentParser (int argc, const char *const *argv, po::variables_map 
     // clang-format off
     // input boost controls
     cmd_only.add_options () 
-		("help,h", "produce help message")
+		("help,?", "produce help message")
 		("version,v","HELICS version number")
 		("config-file", po::value<std::string> (),"specify a configuration file to use");
 
@@ -969,14 +979,14 @@ void playerArgumentParser (int argc, const char *const *argv, po::variables_map 
     // program options control
     if (cmd_vm.count ("help") > 0)
     {
-        std::cout << visible << '\n';
-        return;
+        std::cout << visible <<'\n';
+        return (-1);
     }
 
     if (cmd_vm.count ("version") > 0)
     {
         std::cout << helics::getHelicsVersionString () << '\n';
-        return;
+        return (-1);
     }
 
     po::store (po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered().positional (p).run (), vm_map);
@@ -998,11 +1008,6 @@ void playerArgumentParser (int argc, const char *const *argv, po::variables_map 
     }
 
     po::notify (vm_map);
-    // check to make sure we have some input file
-    if (vm_map.count ("input") == 0)
-    {
-        std::cout << " no input file specified\n";
-        std::cout << visible << '\n';
-        return;
-    }
+    return 0;
+
 }
