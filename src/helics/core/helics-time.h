@@ -26,6 +26,7 @@ using Time = timeRepresentation<count_time<9>>;
 
 constexpr Time timeZero = Time::zeroVal();
 constexpr Time timeEpsilon = Time::epsilon();
+constexpr Time negEpsilon = -Time::epsilon();
 
 constexpr Time operator "" _t(long double val)
 {

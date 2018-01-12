@@ -37,6 +37,14 @@ namespace helics
 std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 {
     std::shared_ptr<Core> core;
+    if (type == core_type::DEFAULT)
+    {
+#if HELICS_HAVE_ZEROMQ
+        type = core_type::ZMQ;
+#else
+        type = core_type::UDP;
+#endif
+    }
 
     switch (type)
     {
@@ -227,7 +235,7 @@ std::shared_ptr<Core> findCore (const std::string &name) { return searchableObje
 
 bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &ptr)
 {
-    if (ptr->isJoinable ())
+    if (ptr->isOpenToNewFederates())
     {
         switch (type)
         {
@@ -251,6 +259,9 @@ bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &pt
         case core_type::UDP:
             return (dynamic_cast<UdpCore *> (ptr.get ()) != nullptr);
         case core_type::TCP:
+#ifndef DISABLE_TCP_CORE
+            return (dynamic_cast<TcpCore *> (ptr.get()) != nullptr);
+#endif
         default:
             return true;
         }

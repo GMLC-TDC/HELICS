@@ -187,7 +187,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     }
     if (vm.count ("maxiter") > 0)
     {
-        _max_iterations = vm["maxiter"].as<int> ();
+        _maxIterations = vm["maxiter"].as<int> ();
     }
 
     if (vm.count ("name") > 0)

@@ -39,18 +39,18 @@ enum helics_time_unit
 
 namespace helics
 {
-
+    /** the type of the cores that are available */
 	enum class core_type:int
 	{
-		DEFAULT=0,
-		ZMQ=1,
-		MPI=2,
-		TEST=3,
-		INTERPROCESS=4,
-		IPC=5,
-		TCP=6,
-		UDP=7,
-		UNRECOGNIZED=8,
+		DEFAULT=0,  //!< pick a core type depending on compile configuration usually either ZMQ if available or UDP
+		ZMQ=1,  //!< use the Zero MQ networking protocol 
+		MPI=2,  //!< use MPI for operation on a parallel cluster
+		TEST=3, //!< use the Test core if all federates are in the same process
+		INTERPROCESS=4, //!< interprocess uses memory mapped files to transfer data (for use when all federates are on the same machine
+		IPC=5,  //!< same as INTERPROCESS
+		TCP=6,  //!< use a generic TCP protocol message stream to send messages
+		UDP=7,  //!< use UDP packets to send the data 
+		UNRECOGNIZED=8, //!< unknown
 		
 	};
 

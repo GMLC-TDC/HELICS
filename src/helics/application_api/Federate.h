@@ -45,7 +45,7 @@ class FederateInfo: public CoreFederateInfo
     
     bool rollback = false;  //!< indicator that the federate has rollback features
     bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must
-                                  //! support rollback if set to true]
+                                  //! support rollback at least in a limited sense if set to true]
     core_type coreType;  //!< the type of the core
     std::string coreName;  //!< the name of the core
     std::string coreInitString;  //!< an initialization string for the core API object
@@ -57,8 +57,21 @@ class FederateInfo: public CoreFederateInfo
     /** construct from the name and type*/
     FederateInfo (std::string fedname, core_type cType)
         : name (std::move (fedname)), coreType (cType){};
+    /** load a federateInfo object from command line arguments
+    @param argc the number of arguments
+    @param argv an array of char * pointers to the arguments
+    */
+    FederateInfo(int argc, const char * const *argv);
+    /** load a federateInfo object from command line arguments
+    @param argc the number of arguments
+    @param argv an array of char * pointers to the arguments
+    */
+    void loadInfoFromArgs(int argc, const char * const *argv);
 };
 
+/** generate a FederateInfo object from a json file
+*/
+FederateInfo LoadFederateInfo(const std::string &jsonString);
 
 /** get a string with the helics version info*/
 std::string getHelicsVersionString();
@@ -206,19 +219,21 @@ class Federate
     @param[in] tdelta the minimum time delta to return from a time request function
     */
     void setTimeDelta (Time tdelta);
-    /** set the look ahead time
+    /** set the look ahead time or output delay
     @details the look ahead is the propagation time for messages/event to propagate from the Federate
-    the federate
-    @param[in] lookAhead the look ahead time
+    to the outside federation
+    @param[in] outputDelay the value of the time delay (must be >=0)
+    @throws invalid_value when using a time <0
     */
-    void setLookAhead (Time lookAhead);
+    void setOutputDelay (Time outputDelay);
 
     /** set the impact Window time
     @details the impact window is the time window around the time request in which other federates cannot affect
     the federate
-    @param[in] lookAhead the look ahead time
+    @param[in] inputDelay the look ahead time
+    @throws invalid_value when using a time <0
     */
-    void setImpactWindow (Time window);
+    void setInputDelay (Time inputDelay);
     /** set the period and offset of the federate
     @details the federate will on grant time on N*period+offset interval
     @param[in] period the length of time between each subsequent grants
@@ -407,9 +422,6 @@ class Federate
     /** get a pointer to the core object used by the federate*/
     std::shared_ptr<Core> getCorePointer () { return coreObject; }
 };
-/** generate a FederateInfo object from a json file
- */
-FederateInfo LoadFederateInfo (const std::string &jsonString);
 
 /** defining an exception class for state transition errors*/
 class InvalidStateTransition : public std::runtime_error

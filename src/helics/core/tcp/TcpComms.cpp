@@ -12,6 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.h"
 #include "TcpHelperClasses.h"
+#include "../NetworkBrokerData.h"
 #include <memory>
 
 static const int BEGIN_OPEN_PORT_RANGE = 24228;
@@ -32,6 +33,19 @@ TcpComms::TcpComms (const std::string &brokerTarget, const std::string &localTar
         localTarget_ = "localhost";
     }
 }
+
+TcpComms::TcpComms(const NetworkBrokerData &netInfo) :CommsInterface(netInfo),brokerPort(netInfo.brokerPort),PortNumber(netInfo.portNumber)
+{
+    if (localTarget_.empty())
+    {
+        localTarget_ = "localhost";
+    }
+    if (netInfo.portStart > 0)
+    {
+        openPortStart = netInfo.portStart;
+    }
+}
+
 /** destructor*/
 TcpComms::~TcpComms () { disconnect (); }
 

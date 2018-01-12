@@ -62,6 +62,7 @@ class shared_guarded
 
     // exclusive access
     handle lock();
+    shared_handle lock() const;
     handle try_lock();
 
     template <class Duration>
@@ -89,12 +90,6 @@ class shared_guarded
         m_mutex.unlock_shared();
         return newObj;
     }
-    /** generate a copy of the protected object
-    */
-    std::enable_if_t<std::is_copy_constructible<T>::value, T> operator*() const
-    {
-        return load();
-    }
 
     /** store an updated value into the object*/
     template <typename objType>
@@ -106,9 +101,10 @@ class shared_guarded
 
     /** store an updated value into the object*/
     template <typename objType>
-    std::enable_if_t<std::is_copy_assignable<T>::value> operator=(objType &&newObj)
+    std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
     {
-        store(std::forward<objType>(newObj));
+        std::lock_guard<M> glock(m_mutex);
+        m_obj = std::forward<objType>(newObj);
     }
   private:
     class deleter
@@ -166,6 +162,13 @@ auto shared_guarded<T, M>::lock() -> handle
 {
     m_mutex.lock();
     return handle(&m_obj, deleter(m_mutex));
+}
+
+template <typename T, typename M>
+auto shared_guarded<T, M>::lock() const -> shared_handle
+{
+    m_mutex.lock_shared();
+    return shared_handle(&m_obj, shared_deleter(m_mutex));
 }
 
 template <typename T, typename M>
@@ -256,6 +259,7 @@ public:
 
     // exclusive access
     handle lock();
+    shared_handle lock() const;
     handle try_lock();
 
     // shared access, note "shared" in method names
@@ -270,12 +274,6 @@ public:
         T newObj(m_obj);
         return newObj;
     }
-    /** generate a copy of the protected object
-    */
-    std::enable_if_t<std::is_copy_constructible<T>::value, T> operator*() const
-    {
-        return load();
-    }
 
     /** store an updated value into the object*/
     template <typename objType>
@@ -287,9 +285,10 @@ public:
 
     /** store an updated value into the object*/
     template <typename objType>
-    std::enable_if_t<std::is_copy_assignable<T>::value> operator=(objType &&newObj)
+    std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
     {
-        store(std::forward<objType>(newObj));
+        std::lock_guard<std::mutex> glock(m_mutex);
+        m_obj = std::forward<objType>(newObj);
     }
 private:
     class deleter
@@ -347,6 +346,13 @@ auto shared_guarded<T, std::mutex>::lock() -> handle
 {
     m_mutex.lock();
     return handle(&m_obj, deleter(m_mutex));
+}
+
+template <typename T>
+auto shared_guarded<T, std::mutex>::lock() const -> shared_handle
+{
+    m_mutex.lock();
+    return shared_handle(&m_obj, shared_deleter(m_mutex));
 }
 
 template <typename T>
@@ -422,12 +428,6 @@ public:
         T newObj(m_obj);
         return newObj;
     }
-    /** generate a copy of the protected object
-    */
-    std::enable_if_t<std::is_copy_constructible<T>::value, T> operator*() const
-    {
-        return load();
-    }
 
     /** store an updated value into the object*/
     template <typename objType>
@@ -439,9 +439,10 @@ public:
 
     /** store an updated value into the object*/
     template <typename objType>
-    std::enable_if_t<std::is_copy_assignable<T>::value> operator=(objType &&newObj)
+    std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
     {
-        store(std::forward<objType>(newObj));
+        std::lock_guard<std::timed_mutex> glock(m_mutex);
+        m_obj = std::forward<objType>(newObj);
     }
 private:
     class deleter

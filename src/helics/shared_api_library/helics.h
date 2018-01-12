@@ -102,6 +102,15 @@ HELICS_Export helics_federate helicsCreateCombinationFederateFromFile (const cha
 @return a helics_federate_info_t object which is a reference to the created object
 */
 HELICS_Export helics_federate_info_t helicsFederateInfoCreate ();
+
+/**load a federate info from command line arguments
+@param fi a federateInfo object
+@param argc the number of command line arguments
+@param argv an array of strings from the command line
+@return a helicsStatus enumeration indicating success or any potential errors
+*/
+HELICS_Export helicsStatus helicsFederateInfoLoadFromArgs(helics_federate_info_t fi, int argc, const char * const *argv);
+
 /** delete the memory associated with a federate info object*/
 HELICS_Export void helicsFederateInfoFree (helics_federate_info_t fi);
 
@@ -111,12 +120,12 @@ HELICS_Export helicsStatus helicsFederateInfoSetCoreInitString (helics_federate_
 HELICS_Export helicsStatus helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi, const char *coretype);
 HELICS_Export helicsStatus helicsFederateInfoSetCoreType (helics_federate_info_t fi, int coretype);
 HELICS_Export helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int value);
-HELICS_Export helicsStatus helicsFederateInfoSetLookahead (helics_federate_info_t fi, helics_time_t lookahead);
+HELICS_Export helicsStatus helicsFederateInfoSetoutputDelay (helics_federate_info_t fi, helics_time_t outputDelay);
 HELICS_Export helicsStatus helicsFederateInfoSetTimeDelta (helics_federate_info_t fi, helics_time_t timeDelta);
-HELICS_Export helicsStatus helicsFederateInfoSetImpactWindow (helics_federate_info_t fi, helics_time_t impactWindow);
+HELICS_Export helicsStatus helicsFederateInfoSetinputDelay (helics_federate_info_t fi, helics_time_t inputDelay);
 HELICS_Export helicsStatus helicsFederateInfoSetTimeOffset (helics_federate_info_t fi, helics_time_t timeOffset);
 HELICS_Export helicsStatus helicsFederateInfoSetPeriod (helics_federate_info_t fi, helics_time_t period);
-HELICS_Export helicsStatus helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int max_iterations);
+HELICS_Export helicsStatus helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int maxIterations);
 HELICS_Export helicsStatus helicsFederateInfoSetLoggingLevel (helics_federate_info_t fi, int logLevel);
 /** finalize the federate this halts all communication in the federate and disconnects it from the core
  */

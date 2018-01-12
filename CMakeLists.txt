@@ -234,9 +234,16 @@ ENDIF()
 
 IF(MINGW)
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	if (BOOST_VERSION_LEVEL GREATER 1)
+	#set(DISABLE_TCP_CORE TRUE)
+		set(DISABLE_TCP_CORE FALSE)
+		target_link_libraries(helics-static wsock32 ws2_32)
+	else()
 		set(DISABLE_TCP_CORE TRUE)
 		message(status, "disabling TCP core |${DISABLE_TCP_CORE}|")
 		target_link_libraries(helics-static ws2_32)
+	endif()
+		
 	else()
 		target_link_libraries(helics-static wsock32 ws2_32)
 	endif()
@@ -450,7 +457,6 @@ configure_file (
   install(DIRECTORY ThirdParty/cereal DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(DIRECTORY ThirdParty/helics_includes DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(DIRECTORY ThirdParty/libguarded DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 
 

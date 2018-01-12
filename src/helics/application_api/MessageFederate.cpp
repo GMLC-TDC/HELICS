@@ -33,9 +33,10 @@ MessageFederate::MessageFederate (std::shared_ptr<Core> core, const FederateInfo
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
 }
-MessageFederate::MessageFederate (const std::string &file) : Federate (file)
+MessageFederate::MessageFederate (const std::string &jsonString) : Federate (jsonString)
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
+    registerInterfaces(jsonString);
 }
 
 MessageFederate::MessageFederate ()
@@ -132,7 +133,17 @@ void MessageFederate::registerInterfaces (const std::string &jsonString)
             auto ept = (*eptIt);
             auto name = ept["name"].asString ();
             auto type = (ept.isMember ("type")) ? ept["type"].asString () : "";
-            auto epid = registerEndpoint (name, type);
+            bool global = (ept.isMember("global")) ?(ept["global"].asBool()) : false;
+            endpoint_id_t epid;
+            if (global)
+            {
+                epid = registerGlobalEndpoint(name, type);
+            }
+            else
+            {
+                epid = registerEndpoint(name, type);
+            }
+            
             // retrieve the known paths
             if (ept.isMember ("knownPaths"))
             {
@@ -321,4 +332,11 @@ void MessageFederate::registerEndpointCallback (const std::vector<endpoint_id_t>
 {
     mfManager->registerCallback (ep, func);
 }
+
+/** get a count of the number endpoints registered*/
+int MessageFederate::getEndpointCount() const
+{
+    return mfManager->getEndpointCount();
+}
+
 }  // namespace helics

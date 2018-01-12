@@ -54,11 +54,11 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
 
     BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::execution);
 
-    auto sv = vFed1->getPublicationName (pubid);
-    auto sv2 = vFed1->getPublicationName (pubid2);
+    auto sv = vFed1->getPublicationKey (pubid);
+    auto sv2 = vFed1->getPublicationKey (pubid2);
     BOOST_CHECK_EQUAL (sv, "fed0/pub1");
     BOOST_CHECK_EQUAL (sv2, "pub2");
-    auto pub3name = vFed1->getPublicationName (pubid3);
+    auto pub3name = vFed1->getPublicationKey (pubid3);
     BOOST_CHECK_EQUAL (pub3name, "fed0/pub3");
 
     BOOST_CHECK_EQUAL (vFed1->getPublicationType (pubid3), "double");
@@ -116,11 +116,11 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
 
     // BOOST_CHECK (vFed->currentState () == helics::Federate::op_states::execution);
 
-    auto sv = vFed1->getSubscriptionName (subid);
-    auto sv2 = vFed1->getSubscriptionName (subid2);
+    auto sv = vFed1->getSubscriptionKey (subid);
+    auto sv2 = vFed1->getSubscriptionKey (subid2);
     BOOST_CHECK_EQUAL (sv, "sub1");
     BOOST_CHECK_EQUAL (sv2, "sub2");
-    auto sub3name = vFed1->getSubscriptionName (subid3);
+    auto sub3name = vFed1->getSubscriptionKey (subid3);
 
     vFed1->addSubscriptionShortcut (subid, "Shortcut");
     BOOST_CHECK_EQUAL (sub3name, "sub3");
@@ -160,11 +160,11 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 
     BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::execution);
     // check subscriptions
-    auto sv = vFed1->getSubscriptionName (subid);
-    auto sv2 = vFed1->getSubscriptionName (subid2);
+    auto sv = vFed1->getSubscriptionKey (subid);
+    auto sv2 = vFed1->getSubscriptionKey (subid2);
     BOOST_CHECK_EQUAL (sv, "sub1");
     BOOST_CHECK_EQUAL (sv2, "sub2");
-    auto sub3name = vFed1->getSubscriptionName (subid3);
+    auto sub3name = vFed1->getSubscriptionKey (subid3);
     BOOST_CHECK_EQUAL (sub3name, "sub3");
 
     BOOST_CHECK_EQUAL (vFed1->getSubscriptionType (subid3), "double");
@@ -172,11 +172,11 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 
     // check publications
 
-    sv = vFed1->getPublicationName (pubid);
-    sv2 = vFed1->getPublicationName (pubid2);
+    sv = vFed1->getPublicationKey (pubid);
+    sv2 = vFed1->getPublicationKey (pubid2);
     BOOST_CHECK_EQUAL (sv, "fed0/pub1");
     BOOST_CHECK_EQUAL (sv2, "pub2");
-    auto pub3name = vFed1->getPublicationName (pubid3);
+    auto pub3name = vFed1->getPublicationKey (pubid3);
     BOOST_CHECK_EQUAL (pub3name, "fed0/pub3");
 
     BOOST_CHECK_EQUAL (vFed1->getPublicationType (pubid3), "double");

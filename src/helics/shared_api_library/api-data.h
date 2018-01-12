@@ -84,9 +84,9 @@ typedef struct message_t
     helics_time_t time;  //!< message time
     const char *data;  //!< message data
     int64_t length;  //!< message length
-    const char *origsrc;  //!< original source
-    const char *src;  //!< the most recent source
-    const char *dst;  //!< the final destination
+    const char *original_source;  //!< original source
+    const char *source;  //!< the most recent source
+    const char *dest;  //!< the final destination
 
 } message_t;
 

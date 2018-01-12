@@ -119,10 +119,23 @@ namespace helics
 	{
 		switch (baseType)
 		{
+        case helicsType_t::helicsAny:
+        {
+            try
+            {
+                val = static_cast<X> (std::stod(dv.string()));
+            }
+            catch (const std::invalid_argument &ble)
+            { //well lets try a direct conversion
+                auto V = ValueConverter<double>::interpret(dv);
+                val = static_cast<X> (V);
+            }
+            break;
+        }
 		case helicsType_t::helicsString:
 		{
-			val = static_cast<X> (boost::lexical_cast<double> (dv.string()));
-			break;
+            val = static_cast<X> (boost::lexical_cast<double> (dv.string()));
+            break;
 		}
 		case helicsType_t::helicsDouble:
 		{

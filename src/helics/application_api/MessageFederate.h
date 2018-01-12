@@ -193,6 +193,9 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
                                    std::function<void(endpoint_id_t, Time)> callback);
 
     virtual void disconnect() override;
+
+    /**get the number of registered endpoints*/
+    int getEndpointCount() const;
   private:
     /** @brief PIMPL design pattern with the implementation details for the MessageFederate*/
     std::unique_ptr<MessageFederateManager> mfManager;

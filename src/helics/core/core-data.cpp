@@ -22,47 +22,40 @@ data_block &data_block::operator= (data_block &&db) noexcept
     return *this;
 }
 
-/*
-std::string origsrc;
-std::string src;
-std::string dest;
-data_block data;
-Time time;
-*/
 
 Message::Message (Message &&m) noexcept
     : time (m.time), flags (m.flags), data (std::move (m.data)), dest (std::move (m.dest)),
-      src (std::move (m.src)), origsrc (std::move (m.origsrc)), orig_dest (std::move (m.orig_dest))
+      source (std::move (m.source)), original_source (std::move (m.original_source)), original_dest (std::move (m.original_dest))
 
 {
 }
 
 Message &Message::operator= (Message &&m) noexcept
 {
-    origsrc = std::move (m.origsrc);
-    src = std::move (m.src);
+    original_source = std::move (m.original_source);
+    source = std::move (m.source);
     dest = std::move (m.dest);
     data = std::move (m.data);
     time = m.time;
     flags = m.flags;
-    orig_dest = std::move (m.orig_dest);
+    original_dest = std::move (m.original_dest);
     return *this;
 }
 
 void Message::swap (Message &m2) noexcept
 {
-    origsrc.swap (m2.origsrc);
-    src.swap (m2.src);
+    original_source.swap (m2.original_source);
+    source.swap (m2.source);
     dest.swap (m2.dest);
     data.swap (m2.data);
     std::swap (time, m2.time);
     std::swap (flags, m2.flags);
-    orig_dest.swap (m2.orig_dest);
+    original_dest.swap (m2.original_dest);
 }
 
 bool Message::isValid () const noexcept
 {
-    return (!data.empty ()) ? true : ((!src.empty ()) ? true : (!dest.empty ()));
+    return (!data.empty ()) ? true : ((!source.empty ()) ? true : (!dest.empty ()));
 }
 
 static const std::set<std::string> global_match_strings{"any", "all", "data", "string", "block"};

@@ -38,10 +38,18 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 {
     std::shared_ptr<Broker> broker;
 
+    if (type == core_type::DEFAULT)
+    {
+#if HELICS_HAVE_ZEROMQ
+        type = core_type::ZMQ;
+#else
+        type = core_type::UDP;
+#endif
+    }
+
     switch (type)
     {
     case core_type::ZMQ:
-    {
 #if HELICS_HAVE_ZEROMQ
         if (name.empty ())
         {
@@ -56,9 +64,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
         throw (HelicsException ("ZMQ broker type is not available"));
 #endif
         break;
-    }
     case core_type::MPI:
-    {
 #if HELICS_HAVE_MPI
         if (name.empty ())
         {
@@ -72,9 +78,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
         throw (HelicsException ("mpi broker type is not available"));
 #endif
         break;
-    }
     case core_type::TEST:
-    {
         if (name.empty ())
         {
             broker = std::make_shared<TestBroker> ();
@@ -84,7 +88,6 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
             broker = std::make_shared<TestBroker> (name);
         }
         break;
-    }
     case core_type::INTERPROCESS:
     case core_type::IPC:
         if (name.empty ())
