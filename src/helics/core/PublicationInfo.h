@@ -40,12 +40,12 @@ public:
 	{
 	}
 
-	Core::Handle id;  //!< the handle id 
-	Core::federate_id_t fed_id;	//!< the identifier for the containing federate
+	const Core::Handle id;  //!< the handle id 
+	const Core::federate_id_t fed_id;	//!< the identifier for the containing federate
 	std::vector<std::pair<Core::federate_id_t, Core::Handle>> subscribers; //!< container for all the subscribers of a publication
-	std::string key;	//!< the key identifier for the publication
-	std::string type;	//!< the type of the publication data
-	std::string units;	//!< the units of the publication data
+	const std::string key;	//!< the key identifier for the publication
+	const std::string type;	//!< the type of the publication data
+	const std::string units;	//!< the units of the publication data
 	std::string data;	//!< the most recent publication data
 	bool has_update = false;	//!< indicator that the publication has updates
 	

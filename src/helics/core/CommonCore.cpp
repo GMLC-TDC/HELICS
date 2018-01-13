@@ -1286,14 +1286,13 @@ FilterInfo *CommonCore::createSourceFilter (federate_id_t dest,
                                             const std::string &type_in,
                                             const std::string &type_out)
 {
-    auto filt = std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle, key, target,
+
+    auto filt = std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle,
+                        (!key.empty())?key:(std::string("sFilter_")+ std::to_string(handle)), target,
                                               type_in, type_out, false);
 
     auto retTarget = filt.get ();
-    if (key.empty ())
-    {
-        retTarget->key = "sFilter_" + std::to_string (handle);
-    }
+
     std::lock_guard<std::mutex> lock (_handlemutex);
     if (retTarget->fed_id == global_broker_id)
     {
@@ -1319,13 +1318,11 @@ FilterInfo *CommonCore::createDestFilter (federate_id_t dest,
                                           const std::string &type_in,
                                           const std::string &type_out)
 {
-    auto filt = std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle, key, target,
+    auto filt = std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle, 
+        (!key.empty())?key:(std::string("dFilter_")+ std::to_string(handle)), target,
                                               type_in, type_out, true);
     auto retTarget = filt.get ();
-    if (key.empty ())
-    {
-        retTarget->key = "dFilter_" + std::to_string (handle);
-    }
+
     std::lock_guard<std::mutex> lock (_mutex);
     if (retTarget->fed_id == global_broker_id)
     {

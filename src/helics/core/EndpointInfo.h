@@ -33,10 +33,10 @@ public:
 	{
 	}
 
-	Core::Handle id;	//!< identifier for the endpoint
-	Core::federate_id_t fed_id; //!< local federate id
-	std::string key; //!< name of the endpoint
-	std::string type;	//!< type of the endpoint
+	const Core::Handle id;	//!< identifier for the endpoint
+	const Core::federate_id_t fed_id; //!< local federate id
+	const std::string key; //!< name of the endpoint
+	const std::string type;	//!< type of the endpoint
 private:
 #ifdef HAVE_SHARED_TIMED_MUTEX
 	libguarded::shared_guarded<std::deque<std::unique_ptr<Message>>> message_queue;  //!< storage for the messages

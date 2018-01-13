@@ -41,14 +41,14 @@ public:
 		dest_filter(destFilter_)
 	{
 	}
-    Core::federate_id_t fed_id = invalid_fed_id;	//!< id of the core that manages the filter
-	Core::Handle handle= invalid_handle; //!< id handle of the filter
+    const Core::federate_id_t fed_id;	//!< id of the core that manages the filter
+	const Core::Handle handle; //!< id handle of the filter
 	
-	std::string key;	//!< the identifier of the filter
-    std::string filterTarget;	//!< the target endpoint name of the filter
-	std::string inputType;	//!< the type of data for the filter
-    std::string outputType; //!< the outputType of data of the filter
-	bool dest_filter = false;	//! indicator that the filter is a destination filter
+	const std::string key;	//!< the identifier of the filter
+    const std::string filterTarget;	//!< the target endpoint name of the filter
+	const std::string inputType;	//!< the type of data for the filter
+    const std::string outputType; //!< the outputType of data of the filter
+	const bool dest_filter = false;	//! indicator that the filter is a destination filter
 	// there is a 7 byte gap here
 	std::shared_ptr<FilterOperator> filterOp;	//!< the callback operation of the filter
 	

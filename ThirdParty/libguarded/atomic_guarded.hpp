@@ -40,7 +40,7 @@ namespace libguarded
    This class will use std::mutex for the internal locking mechanism.
 
 */
-template <typename T>
+template <typename T, typename M = std::mutex>
 class atomic_guarded
 {
   
@@ -63,7 +63,7 @@ class atomic_guarded
     */
     T load() const
     {
-        std::lock_guard<std::mutex> glock(m_mutex);
+        std::lock_guard<M> glock(m_mutex);
         return m_obj;
     }
 
@@ -71,7 +71,7 @@ class atomic_guarded
     template <typename objType>
     void store(objType &&newObj)
     { //uses a forwarding reference
-        std::lock_guard<std::mutex> glock(m_mutex);
+        std::lock_guard<M> glock(m_mutex);
         m_obj = std::forward<objType>(newObj);
     }
 
@@ -79,28 +79,45 @@ class atomic_guarded
     template <typename objType>
     void operator=(objType &&newObj)
     { //uses a forwarding reference
-        std::lock_guard<std::mutex> glock(m_mutex);
+        std::lock_guard<M> glock(m_mutex);
         m_obj = std::forward<objType>(newObj);
     }
 
     /** cast operator so the class can work like T newT=Obj*/
     operator T() const 
     { 
-        std::lock_guard<std::mutex> glock(m_mutex);
+        std::lock_guard<M> glock(m_mutex);
         return m_obj;
     }
 
     /** exchange the current object and replace it with the specified object*/
     T exchange(T newValue)
     {
-        std::lock_guard<std::mutex> glock(m_mutex);
+        std::lock_guard<M> glock(m_mutex);
         std::swap(newValue, m_obj);
         return newValue;
+    }
+
+    /** do a compare and exchage operation 
+    if the object is equal to the expected value it is replaced with desired
+    and true is returned otherwise expected will contain the current value and false is returned
+    */
+    template <typename objType>
+    bool compare_exchange(T &expected, objType &&desired)
+    {
+        std::lock_guard<M> glock(m_mutex);
+        if (m_obj == expected)
+        {
+            m_obj = std::forward<objType>(desired);
+            return true;
+        }
+        expected = m_obj;
+        return false;
     }
   private:
     
     T m_obj;
-    mutable std::mutex m_mutex;
+    mutable M m_mutex;
 };
 
 }
