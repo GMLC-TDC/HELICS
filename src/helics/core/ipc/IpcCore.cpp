@@ -31,7 +31,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 using namespace std::string_literals;
-static const argDescriptors extraArgs{
+static const ArgDescriptors extraArgs{
   {"queueloc"s, "string"s, "the file location of the shared queue"s},
   { "broker,b"s,"string"s,"identifier for the broker"s },
   { "broker_address","string"s,"location of the broker i.e network address" },

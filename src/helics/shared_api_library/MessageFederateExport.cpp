@@ -72,7 +72,7 @@ helics_endpoint helicsFederateRegisterGlobalEndpoint (helics_federate fed, const
     return nullptr;
 }
 
-helics_status helicsSetDefaultDestination (helics_endpoint endpoint, const char *dest)
+helics_status helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *dest)
 {
     if (endpoint == nullptr)
     {
@@ -83,7 +83,7 @@ helics_status helicsSetDefaultDestination (helics_endpoint endpoint, const char 
     return helics_ok;
 }
 
-helics_status helicsSendMessageRaw (helics_endpoint endpoint, const char *dest, const char *data, int len)
+helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const char *data, int len)
 {
     if (endpoint == nullptr)
     {
@@ -101,7 +101,7 @@ helics_status helicsSendMessageRaw (helics_endpoint endpoint, const char *dest, 
     return helics_ok;
 }
 
-helics_status helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time)
+helics_status helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time)
 {
     if (endpoint == nullptr)
     {
@@ -119,7 +119,7 @@ helics_status helicsSendEventRaw (helics_endpoint endpoint, const char *dest, co
     return helics_ok;
 }
 
-helics_status helicsSendMessage (helics_endpoint endpoint, message_t *message)
+helics_status helicsEndpointSendMessage (helics_endpoint endpoint, message_t *message)
 {
     if (message == nullptr)
     {
@@ -143,7 +143,7 @@ helics_status helicsSendMessage (helics_endpoint endpoint, message_t *message)
     return helics_ok;
 }
 
-helics_status helicsSubscribe (helics_endpoint endpoint, const char *key, const char *type)
+helics_status helicsEndpointSubscribe (helics_endpoint endpoint, const char *key, const char *type)
 {
     if (endpoint == nullptr)
     {
@@ -251,7 +251,7 @@ message_t helicsFederateGetMessage (helics_federate fed)
     return mess;
 }
 
-helics_status helicsGetEndpointType (helics_endpoint endpoint, char *str, int maxlen)
+helics_status helicsEndpointGetType (helics_endpoint endpoint, char *str, int maxlen)
 {
     if ((endpoint == nullptr) || (str == nullptr))
     {
@@ -271,7 +271,7 @@ helics_status helicsGetEndpointType (helics_endpoint endpoint, char *str, int ma
     return helics_ok;
 }
 
-helics_status helicsGetEndpointName (helics_endpoint endpoint, char *str, int maxlen)
+helics_status helicsEndpointGetName (helics_endpoint endpoint, char *str, int maxlen)
 {
     if ((endpoint == nullptr) || (str == nullptr))
     {

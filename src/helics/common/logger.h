@@ -40,7 +40,7 @@ namespace helics
         std::thread loggingThread;	//!< the thread object containing the thread running the actual logger
         std::vector<std::function<void(std::string &&message)>> functions; //!< container for the functions
         std::mutex functionLock;    //!< lock for updating the functions
-        BlockingQueue3<std::pair<int32_t, std::string>> loggingQueue;  //!< the actual queue containing the strings to log
+        BlockingQueue<std::pair<int32_t, std::string>> loggingQueue;  //!< the actual queue containing the strings to log
     public:
         /** default constructor*/
         loggingCore();

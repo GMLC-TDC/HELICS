@@ -82,7 +82,7 @@ private:
 	int logLevel=1;
  //   std::vector<ActionMessage> messLog;
   private:
-    BlockingQueue3<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
+    BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
 
 
     std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time

@@ -42,14 +42,14 @@ class SearchableObjectHolder
             {  // wait for the objectMap to be cleared
                 ++cntr;
                 lock.unlock ();
-                //don't leave things locked while sleeping or yeilding
+                // don't leave things locked while sleeping or yielding
                 if (cntr % 2 != 0)
                 {
-                    std::this_thread::yield();
+                    std::this_thread::yield ();
                 }
                 else
                 {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    std::this_thread::sleep_for (std::chrono::milliseconds (100));
                 }
 
                 lock.lock ();

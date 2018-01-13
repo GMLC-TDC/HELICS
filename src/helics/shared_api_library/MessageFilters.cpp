@@ -68,6 +68,60 @@ helicsFederateRegisterDestinationFilter (helics_federate fed, const char *name, 
     return nullptr;
 }
 
-void helicsFreeSourceFilter (helics_source_filter filter) { delete reinterpret_cast<helics::SourceFilterObject *> (filter); }
 
-void helicsFreeDestinationFilter (helics_destination_filter filter) { delete reinterpret_cast<helics::DestFilterObject *> (filter); }
+helics_source_filter helicsCoreRegisterSourceFilter(helics_core cr, const char *name, const char *inputType, const char *outputType)
+{
+    // now generate a generic subscription
+    auto fedObj = getFedSharedPtr(fed);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    helics::SourceFilterObject *filt = nullptr;
+    try
+    {
+        filt = new helics::SourceFilterObject();
+        filt->filtptr =
+            std::make_unique<helics::SourceFilter>(fedObj.get(), (name != nullptr) ? std::string(name) : nullstr, (inputType != nullptr) ? std::string(inputType) : nullstr,
+            (outputType != nullptr) ? std::string(outputType) : nullstr);
+        filt->fedptr = std::move(fedObj);
+        return reinterpret_cast<helics_source_filter> (filt);
+    }
+    catch (const helics::InvalidFunctionCall &)
+    {
+        delete filt;
+    }
+    return nullptr;
+}
+
+helics_destination_filter
+helicsCoreRegisterDestinationFilter(helics_federate fed, const char *name, const char *inputType, const char *outputType)
+{
+    // now generate a generic subscription
+    auto fedObj = getFedSharedPtr(fed);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    helics::DestFilterObject *filt = nullptr;
+    try
+    {
+        filt = new helics::DestFilterObject();
+        filt->filtptr = std::make_unique<helics::DestinationFilter>(fedObj.get(), (name != nullptr) ? std::string(name) : nullstr,
+            (inputType != nullptr) ? std::string(inputType) : nullstr,
+            (outputType != nullptr) ? std::string(outputType) : nullstr);
+        filt->fedptr = std::move(fedObj);
+        return reinterpret_cast<helics_destination_filter> (filt);
+    }
+    catch (const helics::InvalidFunctionCall &)
+    {
+        delete filt;
+    }
+    return nullptr;
+}
+
+void helicsSourceFilterFree (helics_source_filter filter) { delete reinterpret_cast<helics::SourceFilterObject *> (filter); }
+
+void helicsDestinationFilterFree (helics_destination_filter filter) { delete reinterpret_cast<helics::DestFilterObject *> (filter); }
+
+void helicsCloningFilterFree(helics_cloning_filter filter) { delete reinterpret_cast<helics::CloningFilterObject *> (filter); }

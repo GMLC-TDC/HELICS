@@ -7,7 +7,7 @@
 
 set(common_headers
 simpleQueue.hpp
-BlockingQueue3.hpp
+BlockingQueue.hpp
 BlockingPriorityQueue.hpp
 timeRepresentation.hpp
 delayedDestructor.hpp
@@ -20,6 +20,9 @@ charMapper.h
 generic_string_ops.hpp
 base64.h
 argParser.h
+MappedVector.hpp
+MappedPointerVector.hpp
+
 )
 
 set(common_sources

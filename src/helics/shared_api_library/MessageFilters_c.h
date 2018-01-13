@@ -28,9 +28,27 @@ HELICS_Export helics_destination_filter helicsFederateRegisterDestinationFilter 
                                                                          const char *inputType,
                                                                          const char *outputType);
 
-HELICS_Export void helicsFreeSourceFilter (helics_source_filter filter);
+HELICS_Export helics_cloning_filter helicsFederateRegisterCloningFilter(helics_federate fed,
+const char *deliveryEndpoint);
 
-HELICS_Export void helicsFreeDestinationFilter (helics_destination_filter filter);
+HELICS_Export helics_source_filter helicsCoreRegisterSourceFilter(helics_core fed,
+    const char *name,
+    const char *inputType,
+    const char *outputType);
+
+HELICS_Export helics_destination_filter helicsCoreRegisterDestinationFilter(helics_core fed,
+    const char *name,
+    const char *inputType,
+    const char *outputType);
+
+HELICS_Export helics_cloning_filter helicsCoreRegisterCloningFilter(helics_core fed,
+    const char *deliveryEndpoint);
+
+HELICS_Export void helicsSourceFilterFree (helics_source_filter filter);
+
+HELICS_Export void helicsDestinationFilterFree (helics_destination_filter filter);
+
+HELICS_Export void helicsCloningFilterFree(helics_cloning_filter filter);
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif

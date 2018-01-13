@@ -19,7 +19,7 @@ namespace helics
 void argumentParser (int argc,
                      const char *const *argv,
                      boost::program_options::variables_map &vm_map,
-                     const argDescriptors &additionalArgs)
+                     const ArgDescriptors &additionalArgs)
 {
     namespace po = boost::program_options;
     po::options_description cmd_only ("command line only");

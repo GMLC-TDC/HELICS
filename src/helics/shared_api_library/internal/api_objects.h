@@ -110,6 +110,7 @@ namespace helics
 	public:
 		std::unique_ptr<SourceFilter> filtptr;
 		std::shared_ptr<Federate> fedptr;
+        std::shared_ptr<Core> corePtr;
 	};
 
 	/** object wrapping a destination Filter*/
@@ -118,14 +119,16 @@ namespace helics
 	public:
 		std::unique_ptr<DestinationFilter> filtptr;
 		std::shared_ptr<Federate> fedptr;
+        std::shared_ptr<Core> corePtr;
 	};
 
-    /** object wrapping a destination Filter*/
-    class CloneFilterObject
+    /** object wrapping a cloning Filter*/
+    class CloningFilterObject
     {
     public:
         std::unique_ptr<CloningFilter> filtptr;
         std::shared_ptr<Federate> fedptr;
+        std::shared_ptr<Core> corePtr;
     };
 
     /** object representing a query*/

@@ -29,7 +29,7 @@ will check performance at a later time
 operations require a swap, however in high contention the two locks will reduce contention in most cases.
 */
 template <typename T>
-class BlockingQueue3
+class BlockingQueue
 {
   private:
     mutable std::mutex m_pushLock;  //!< lock for operations on the pushElements vector
@@ -41,8 +41,8 @@ class BlockingQueue3
     std::condition_variable condition;  //!< condition variable for notification of new data
   public:
     /** default constructor*/
-    BlockingQueue3 () = default;
-    ~BlockingQueue3 ()
+    BlockingQueue () = default;
+    ~BlockingQueue ()
     {
         // these locks are primarily for memory synchronization multiple access in the destructor would be a bad
         // thing
@@ -56,20 +56,20 @@ class BlockingQueue3
     so the actual reserve is 2x the capacity numbers in two different vectors
     @param capacity the initial reserve capacity for the arrays
     */
-    explicit BlockingQueue3 (size_t capacity)
+    explicit BlockingQueue (size_t capacity)
     {  // don't need to lock since we aren't out of the constructor yet
         pushElements.reserve (capacity);
         pullElements.reserve (capacity);
     }
     /** enable the move constructor not the copy constructor*/
-    BlockingQueue3 (BlockingQueue3 &&bq) noexcept
+    BlockingQueue (BlockingQueue &&bq) noexcept
         : pushElements (std::move (bq.pushElements)), pullElements (std::move (bq.pullElements))
     {
         queueEmptyFlag = pullElements.empty ();
     }
 
     /** enable the move assignment not the copy assignment*/
-    BlockingQueue3 &operator= (BlockingQueue3 &&sq) noexcept
+    BlockingQueue &operator= (BlockingQueue &&sq) noexcept
     {
         std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
         std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
@@ -79,8 +79,8 @@ class BlockingQueue3
         return *this;
     }
     /** DISABLE_COPY_AND_ASSIGN */
-    BlockingQueue3 (const BlockingQueue3 &) = delete;
-    BlockingQueue3 &operator= (const BlockingQueue3 &) = delete;
+    BlockingQueue (const BlockingQueue &) = delete;
+    BlockingQueue &operator= (const BlockingQueue &) = delete;
 
     /** clear the queue*/
     void clear ()
@@ -277,7 +277,7 @@ depending on the number of consumers
 };
 
 template <typename T>
-stx::optional<T> BlockingQueue3<T>::try_pop ()
+stx::optional<T> BlockingQueue<T>::try_pop ()
 {
     std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
     if (pullElements.empty ())
@@ -331,7 +331,7 @@ stx::optional<T> BlockingQueue3<T>::try_pop ()
 }
 
 template <typename T>
-size_t BlockingQueue3<T>::size () const
+size_t BlockingQueue<T>::size () const
 {
     std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
     std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
@@ -339,7 +339,7 @@ size_t BlockingQueue3<T>::size () const
 }
 
 template <typename T>
-bool BlockingQueue3<T>::empty () const
+bool BlockingQueue<T>::empty () const
 {
     return queueEmptyFlag;
 }

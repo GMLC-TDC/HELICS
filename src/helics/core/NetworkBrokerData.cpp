@@ -22,7 +22,7 @@ namespace helics
 {
 
 
-static const argDescriptors extraArgs{{"interface"s, "string"s,
+static const ArgDescriptors extraArgs{{"interface"s, "string"s,
                                        "the local interface to use for the receive ports"s},
                                        {"broker,b"s,"string"s,"identifier for the broker"s},
                                        {"broker_address","string"s,"location of the broker i.e network address"},

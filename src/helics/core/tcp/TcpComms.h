@@ -81,7 +81,7 @@ private:
 	int processIncomingMessage(ActionMessage &cmd);
     ActionMessage generateReplyToIncomingMessage(ActionMessage &cmd);
     //promise and future for communicating port number from tx_thread to rx_thread
-    BlockingQueue3<ActionMessage> rxMessageQueue;
+    BlockingQueue<ActionMessage> rxMessageQueue;
 
     void txReceive(const char *data, size_t bytes_received, const std::string &errorMessage);
 

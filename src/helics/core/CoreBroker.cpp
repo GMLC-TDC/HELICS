@@ -26,7 +26,7 @@ namespace helics
 {
 using namespace std::string_literals;
 
-static const argDescriptors extraArgs{
+static const ArgDescriptors extraArgs{
   {"root"s, ""s, "specify whether the broker is a root"s},
 };
 
