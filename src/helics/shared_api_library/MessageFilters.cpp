@@ -17,7 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 static const std::string nullstr;
 
-helics_source_filter helicsRegisterSourceFilter (helics_federate fed, const char *name, const char *inputType, const char *outputType)
+helics_source_filter helicsFederateRegisterSourceFilter (helics_federate fed, const char *name, const char *inputType, const char *outputType)
 {
     // now generate a generic subscription
     auto fedObj = getFedSharedPtr (fed);
@@ -43,7 +43,7 @@ helics_source_filter helicsRegisterSourceFilter (helics_federate fed, const char
 }
 
 helics_destination_filter
-helicsRegisterDestinationFilter (helics_federate fed, const char *name, const char *inputType, const char *outputType)
+helicsFederateRegisterDestinationFilter (helics_federate fed, const char *name, const char *inputType, const char *outputType)
 {
     // now generate a generic subscription
     auto fedObj = getFedSharedPtr (fed);

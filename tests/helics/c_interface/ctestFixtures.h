@@ -35,8 +35,8 @@ struct ValueFederateTestFixture
     void StartBroker(const std::string &core_type_name, const std::string &initialization_string);
 
     helics_broker broker;
-    helics_value_federate vFed1;
-    helics_value_federate vFed2;
+    helics_federate vFed1;
+    helics_federate vFed2;
 };
 
 

@@ -308,32 +308,32 @@ helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, in
     return reinterpret_cast<helics_broker> (broker);
 }
 
-int helicsBrokerIsConnected (helics_broker broker)
+helics_bool_t helicsBrokerIsConnected (helics_broker broker)
 {
     if (broker == nullptr)
     {
-        return 0;
+        return helics_false;
     }
     auto brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
     if (brokerObj->brokerptr)
     {
-        return (brokerObj->brokerptr->isConnected ()) ? 1 : 0;
+        return (brokerObj->brokerptr->isConnected ()) ? helics_true : helics_false;
     }
-    return 0;
+    return helics_false;
 }
 
 int helicsCoreIsConnected (helics_core core)
 {
     if (core == nullptr)
     {
-        return 0;
+        return helics_false;
     }
     auto coreObj = reinterpret_cast<helics::CoreObject *> (core);
     if (coreObj->coreptr)
     {
-        return (coreObj->coreptr->isConnected ()) ? 1 : 0;
+        return (coreObj->coreptr->isConnected ()) ? helics_true : helics_false;
     }
-    return 0;
+    return helics_false;
 }
 
 
@@ -341,7 +341,7 @@ helics_status helicsBrokerGetIdentifier(helics_broker broker, char *identifier, 
 {
     if (broker == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
     }
     auto brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
     if (brokerObj->brokerptr)
@@ -358,7 +358,7 @@ helics_status helicsBrokerGetIdentifier(helics_broker broker, char *identifier, 
         }
         return helics_ok;
     }
-    return helics_error;
+    return helics_invalid_object;
 }
 
 
@@ -444,7 +444,7 @@ helics_status helicsBrokerDisconnect(helics_broker broker)
     return helics_error;
 }
 
-void helicsFreeCore (helics_core core)
+void helicsCoreFree (helics_core core)
 {
     auto *coreObj = reinterpret_cast<helics::CoreObject *> (core);
     if (coreObj != nullptr)
@@ -455,7 +455,7 @@ void helicsFreeCore (helics_core core)
     helics::CoreFactory::cleanUpCores ();
 }
 
-void helicsFreeBroker (helics_broker broker)
+void helicsBrokerFree (helics_broker broker)
 {
     auto *brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
     if (brokerObj != nullptr)
@@ -466,7 +466,7 @@ void helicsFreeBroker (helics_broker broker)
     helics::BrokerFactory::cleanUpBrokers ();
 }
 
-void helicsFreeFederate (helics_federate fed)
+void helicsFederateFree (helics_federate fed)
 {
     auto *fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj != nullptr)
@@ -519,7 +519,7 @@ helics_query helicsCreateQuery (const char *target, const char *query)
     return reinterpret_cast<void *> (queryObj);
 }
 
-const char *helicsExecuteQuery (helics_federate fed, helics_query query)
+const char *helicsQueryExecute (helics_query query,helics_federate fed )
 {
     if (fed == nullptr)
     {
@@ -549,7 +549,7 @@ const char *helicsExecuteQuery (helics_federate fed, helics_query query)
 }
 
 
-helics_status helicsExecuteQueryAsync(helics_federate fed, helics_query query)
+helics_status helicsQueryExecuteAsync(helics_query query,helics_federate fed )
 {
     if (fed == nullptr)
     {
@@ -580,7 +580,7 @@ helics_status helicsExecuteQueryAsync(helics_federate fed, helics_query query)
     return helics_ok;
 }
 
-const char *helicsExecuteQueryComplete(helics_query query)
+const char *helicsQueryExecuteComplete(helics_query query)
 {
 
     if (query == nullptr)
@@ -600,21 +600,21 @@ const char *helicsExecuteQueryComplete(helics_query query)
 }
 
 
-HELICS_Export int isQueryCompleted(helics_query query)
+HELICS_Export helics_bool_t helicsQueryIsCompleted(helics_query query)
 {
 
     if (query == nullptr)
     {
-        return 0;
+        return helics_false;
     }
 
     auto queryObj = reinterpret_cast<helics::queryObject *> (query);
     if (queryObj->asyncIndexCode != helics::invalid_id_value)
     {
         auto res = queryObj->activeFed->isQueryCompleted(queryObj->asyncIndexCode);
-        return (res) ? 1 : 0;
+        return (res) ? helics_true : helics_false;
     }
-    return 0;
+    return helics_false;
 }
 
-void helicsFreeQuery (helics_query query) { delete reinterpret_cast<helics::queryObject *> (query); }
+void helicsQueryFree (helics_query query) { delete reinterpret_cast<helics::queryObject *> (query); }

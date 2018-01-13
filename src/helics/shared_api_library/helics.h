@@ -127,24 +127,24 @@ HELICS_Export helics_status helicsCoreDisconnect(helics_core core);
 HELICS_Export helics_status helicsBrokerDisconnect(helics_broker broker);
 
 /** release the memory associated with a core*/
-HELICS_Export void helicsFreeCore (helics_core core);
+HELICS_Export void helicsCoreFree (helics_core core);
 /** release the memory associated with a broker*/
-HELICS_Export void helicsFreeBroker (helics_broker broker);
+HELICS_Export void helicsBrokerFree (helics_broker broker);
 
 /* Creation and destruction of Federates */
 /** create a value federate from a federate info object
-@details helics_value_federate objects can be used in all functions that take a helics_value_federate or helics_federate object as an argument
+@details helics_federate objects can be used in all functions that take a helics_federate or helics_federate object as an argument
 @param fi the federate info object that contains details on the federate
 @return an opaque value federate object
 */
-HELICS_Export helics_value_federate helicsCreateValueFederate (const helics_federate_info_t fi);
+HELICS_Export helics_federate helicsCreateValueFederate (const helics_federate_info_t fi);
 
-/** create a value federate from a json file or json string
-@details helics_value_federate objects can be used in all functions that take a helics_value_federate or helics_federate object as an argument
-@param json  a json file or a json string that contains setup and configuration information
+/** create a value federate from a JSON file or JSON string
+@details helics_federate objects can be used in all functions that take a helics_federate or helics_federate object as an argument
+@param JSON  a JSON file or a JSON string that contains setup and configuration information
 @return an opaque value federate object
 */
-HELICS_Export helics_value_federate helicsCreateValueFederateFromJson (const char *json);
+HELICS_Export helics_federate helicsCreateValueFederateFromJson (const char *json);
 
 
 
@@ -153,25 +153,25 @@ HELICS_Export helics_value_federate helicsCreateValueFederateFromJson (const cha
 @param fi the federate info object that contains details on the federate
 @return an opaque message federate object
 */
-HELICS_Export helics_message_federate helicsCreateMessageFederate(const helics_federate_info_t fi);
+HELICS_Export helics_federate helicsCreateMessageFederate(const helics_federate_info_t fi);
 
-/** create a message federate from a json file or json string
+/** create a message federate from a JSON file or JSON string
 @details helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an argument
-@param json  a json file or a json string that contains setup and configuration information
+@param JSON  a JSON file or a JSON string that contains setup and configuration information
 @return an opaque message federate object
 */
-HELICS_Export helics_message_federate helicsCreateMessageFederateFromJson(const char *json);
+HELICS_Export helics_federate helicsCreateMessageFederateFromJson(const char *json);
 
 /** create a combination federate from a federate info object
-@details combination federates are both value federates and message federates, objects can be used in all functions that take a helics_value_federate, helics_message_federate or helics_federate object as an argument
+@details combination federates are both value federates and message federates, objects can be used in all functions that take a helics_federate, helics_message_federate or helics_federate object as an argument
 @param fi the federate info object that contains details on the federate
 @return an opaque value federate object nullptr if the object creation failed
 */
 HELICS_Export helics_federate helicsCreateCombinationFederate(const helics_federate_info_t fi);
 
-/** create a combination federate from a json file or json string
-@details combination federates are both value federates and message federates, objects can be used in all functions that take a helics_value_federate, helics_message_federate or helics_federate object as an argument
-@param json  a json file or a json string that contains setup and configuration information
+/** create a combination federate from a JSON file or JSON string
+@details combination federates are both value federates and message federates, objects can be used in all functions that take a helics_federate, helics_message_federate or helics_federate object as an argument
+@param JSON  a JSON file or a JSON string that contains setup and configuration information
 @return an opaque combination federate object
 */
 HELICS_Export helics_federate helicsCreateCombinationFederateFromJson(const char *json);
@@ -219,7 +219,7 @@ HELICS_Export helics_status helicsFederateInfoSetCoreInitString (helics_federate
 */
 HELICS_Export helics_status helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi, const char *coretype);
 HELICS_Export helics_status helicsFederateInfoSetCoreType (helics_federate_info_t fi, int coretype);
-HELICS_Export helics_status helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int value);
+HELICS_Export helics_status helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, helics_bool_t value);
 HELICS_Export helics_status helicsFederateInfoSetOutputDelay (helics_federate_info_t fi, helics_time_t outputDelay);
 HELICS_Export helics_status helicsFederateInfoSetTimeDelta (helics_federate_info_t fi, helics_time_t timeDelta);
 HELICS_Export helics_status helicsFederateInfoSetInputDelay (helics_federate_info_t fi, helics_time_t inputDelay);
@@ -231,7 +231,7 @@ HELICS_Export helics_status helicsFederateInfoSetLoggingLevel (helics_federate_i
  */
 HELICS_Export helics_status helicsFederateFinalize (helics_federate fed);
 /** release the memory associated withe a federate*/
-HELICS_Export void helicsFreeFederate (helics_federate fed);
+HELICS_Export void helicsFederateFree (helics_federate fed);
 
 /** call when done using the helics library,  this function will ensure the threads are closed properly if possible
 this should be the last call before exiting,  */
@@ -242,44 +242,44 @@ HELICS_Export void helicsCloseLibrary ();
 the execution state
 This is a blocking call and will block until the core allows it to proceed
 */
-HELICS_Export helics_status helicsEnterInitializationMode (helics_federate fed);
-/** non blocking alternative to @helicsEnterInitializationMode
-the function helicsEnterInitializationModeFinalize must be called to finish the operation
+HELICS_Export helics_status helicsFederateEnterInitializationMode (helics_federate fed);
+/** non blocking alternative to @helicsFederateEnterInitializationMode
+the function helicsFederateEnterInitializationModeFinalize must be called to finish the operation
 */
-HELICS_Export helics_status helicsEnterInitializationModeAsync (helics_federate fed);
+HELICS_Export helics_status helicsFederateEnterInitializationModeAsync (helics_federate fed);
 /** check if the current Asynchronous operation has completed
-@param fed the federate to operatate on
+@param fed the federate to operate on
 @return 0 if not completed, 1 if completed*/
-HELICS_Export int helicsIsAsyncOperationCompleted (helics_federate fed);
+HELICS_Export helics_bool_t helicsFederateIsAsyncOperationCompleted (helics_federate fed);
 
 /** finalize the entry to initialize mode that was initiated with @heliceEnterInitializationModeAsync*/
-HELICS_Export helics_status helicsEnterInitializationModeComplete (helics_federate fed);
+HELICS_Export helics_status helicsFederateEnterInitializationModeComplete (helics_federate fed);
 
 
 /** request that the federate enter the Execution mode
 @details this call is blocking until granted entry by the core object for an asynchronous alternative call
-/ref helicsEnterExecutionModeAsync
+/ref helicsFederateEnterExecutionModeAsync
 @param fed a federate to change modes
 @return a helics_status enumeration helics_error if something went wrong helicsInvalidReference if fed is invalid
 */
-HELICS_Export helics_status helicsEnterExecutionMode (helics_federate fed);
+HELICS_Export helics_status helicsFederateEnterExecutionMode (helics_federate fed);
 
 /** request that the federate enter the Execution mode
-@details this call is non-blocking and will return immediately call /ref helicsEnterExecutionModeComplete to finish the call sequence
+@details this call is non-blocking and will return immediately call /ref helicsFederateEnterExecutionModeComplete to finish the call sequence
 /ref 
 */
-HELICS_Export helics_status helicsEnterExecutionModeAsync(helics_federate fed);
+HELICS_Export helics_status helicsFederateEnterExecutionModeAsync(helics_federate fed);
 
 /** complete the call to /ref EnterExecutionModeAsync
 @param fed the federate object to complete the call
 */
-HELICS_Export helics_status helicsEnterExecutionModeComplete(helics_federate fed);
+HELICS_Export helics_status helicsFederateEnterExecutionModeComplete(helics_federate fed);
 
-HELICS_Export helics_status helicsEnterExecutionModeIterative (helics_federate fed, iteration_request iterate, iteration_status *outIterate);
-HELICS_Export helics_status helicsEnterExecutionModeIterativeAsync (helics_federate fed, iteration_request iterate);
+HELICS_Export helics_status helicsFederateEnterExecutionModeIterative (helics_federate fed, iteration_request iterate, iteration_status *outIterate);
+HELICS_Export helics_status helicsFederateEnterExecutionModeIterativeAsync (helics_federate fed, iteration_request iterate);
 
 
-HELICS_Export helics_status helicsEnterExecutionModeIterativeComplete (helics_federate fed, iteration_status *outIterate);
+HELICS_Export helics_status helicsFederateEnterExecutionModeIterativeComplete (helics_federate fed, iteration_status *outIterate);
 
 /** get the current state of a federate
 @param fed the fed to query
@@ -290,15 +290,33 @@ HELICS_Export helics_status helicsFederateGetState(helics_federate fed, federate
 @param fed a federate object
 @return a core object, nullptr if invalid
 */
-HELICS_Export helics_core helicsGetCoreObject(helics_federate fed);
+HELICS_Export helics_core helicsFederateGetCoreObject(helics_federate fed);
+/** request the next time for federate execution
+@param fed the federate to make the request of 
+@param requestTime the next requested time
+@param[out]  timeOut the time granted to the federate
+@return a helics_status if the return value is equal to helics_ok the timeOut will contain the new granted time, otherwise timeOut is invalid*/
+HELICS_Export helics_status helicsFederateRequestTime (helics_federate fed, helics_time_t requestTime, helics_time_t *timeOut);
 
-HELICS_Export helics_time_t helicsRequestTime (helics_federate fed, helics_time_t requestTime);
-HELICS_Export helics_iterative_time helicsRequestTimeIterative (helics_federate fed, helics_time_t requestTime, iteration_request iterate);
+/** request an iterative time
+@details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and iteration request
+and return a time and iteration status
+@param fed the federate to make the request of
+@param requestTime the next desired time
+@param iterate the requested iteration mode
+@param[out] timeOut the granted time
+@param[out] outIterate  the iteration specification of the result
+@return a helics_status object with a return code of the result
+*/
+HELICS_Export helics_status helicsFederateRequestTimeIterative (helics_federate fed, helics_time_t requestTime, iteration_request iterate, helics_time_t *timeOut, iteration_status *outIterate);
 
-HELICS_Export helics_status helicsRequestTimeAsync (helics_federate fed, helics_time_t requestTime);
-HELICS_Export helics_status helicsRequestTimeIterativeAsync (helics_federate fed, helics_time_t requestTime, iteration_request iterate);
-HELICS_Export helics_time_t helicsRequestTimeComplete (helics_federate fed);
-HELICS_Export helics_iterative_time helicsRequestTimeIterativeComplete (helics_federate fed);
+HELICS_Export helics_status helicsFederateRequestTimeAsync (helics_federate fed, helics_time_t requestTime);
+
+HELICS_Export helics_status helicsFederateRequestTimeComplete (helics_federate fed);
+
+HELICS_Export helics_status helicsFederateRequestTimeIterativeAsync(helics_federate fed, helics_time_t requestTime, iteration_request iterate);
+
+HELICS_Export helics_status helicsFederateRequestTimeIterativeComplete (helics_federate fed, helics_time_t *timeOut, iteration_status *outIterate);
 
 /** get the name of the federate 
 @param fed the federate object to query
@@ -318,14 +336,14 @@ HELICS_Export helics_status helicsFederateSetTimeDelta(helics_federate fed, heli
 the federate
 @param[in] lookAhead the look ahead time
 */
-HELICS_Export helics_status helicsFederateSetLookAhead(helics_federate fed, helics_time_t lookAhead);
+HELICS_Export helics_status helicsFederateSetOutputDelay(helics_federate fed, helics_time_t outputDelay);
 
 /** set the impact Window time
 @details the impact window is the time window around the time request in which other federates cannot affect
 the federate
 @param[in] lookAhead the look ahead time
 */
-HELICS_Export helics_status helicsFederateSetImpactWindow(helics_federate fed, helics_time_t window);
+HELICS_Export helics_status helicsFederateSetInputDelay(helics_federate fed, helics_time_t inputDelay);
 /** set the period and offset of the federate
 @details the federate will on grant time on N*period+offset interval
 @param[in] period the length of time between each subsequent grants
@@ -337,7 +355,7 @@ HELICS_Export helics_status helicsFederateSetPeriod(helics_federate fed, helics_
 @param flag the flag to change
 @param flagValue the new value of the flag 0 for false !=0 for true
 */
-HELICS_Export helics_status helicsFederateSetFlag(helics_federate fed, int flag, int flagValue);
+HELICS_Export helics_status helicsFederateSetFlag(helics_federate fed, int flag, helics_bool_t flagValue);
 /**  set the logging level for the federate
 @ details debug and trace only do anything if they were enabled in the compilation
 @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
@@ -357,37 +375,36 @@ HELICS_Export helics_query helicsCreateQuery (const char *target, const char *qu
 
 /** Execute a query
 @details the call will block until the query finishes which may require communication or other delays
-@param fed a federate to send the query through
 @param query the query object to use in the query
+@param fed a federate to send the query through
 @return a pointer to a string.  the string will remain valid until the query is freed or executed again
 the return will be nullptr if fed or query is an invalid object
 */
-HELICS_Export const char *helicsExecuteQuery (helics_federate fed, helics_query query);
+HELICS_Export const char *helicsQueryExecute (helics_query query,helics_federate fed);
 
 /** Execute a query in a non-blocking call
-@param fed a federate to send the query through
 @param query the query object to use in the query
-@return a pointer to a string.  the string will remain valid until the query is freed or executed again
-the return will be nullptr if fed or query is an invalid object
+@param fed a federate to send the query through
+@return a helics status enumeration with the result of the query specification
 */
-HELICS_Export helics_status helicsExecuteQueryAsync(helics_federate fed, helics_query query);
+HELICS_Export helics_status helicsQueryExecuteAsync(helics_query query,helics_federate fed);
 
 /** complete the return from a query called with /ref helicsExecuteQueryAsync
 @details the function will block until the query completes /ref isQueryComplete can be called to determine if a query has completed or not
 @param query the query object to 
 @return a pointer to a string.  the string will remain valid until the query is freed or executed again
-the return will be nullptr if fed or query is an invalid object
+the return will be nullptr if query is an invalid object
 */
-HELICS_Export const char *helicsExecuteQueryComplete(helics_query query);
+HELICS_Export const char *helicsQueryExecuteComplete(helics_query query);
 
-/** check if an async query has completed
-@return will return true if an async query has complete or a regular query call was made with a result
+/** check if an asynchronously executed query has completed
+@return will return helics_true if an async query has complete or a regular query call was made with a result
 and false if an async query has not completed or is invalid
 */
-HELICS_Export int isQueryCompleted(helics_query query);
+HELICS_Export helics_bool_t helicsQueryIsCompleted(helics_query query);
 
 /** free the memory associated with a query object*/
-HELICS_Export void helicsFreeQuery (helics_query);
+HELICS_Export void helicsQueryFree (helics_query);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

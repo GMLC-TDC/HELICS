@@ -14,7 +14,7 @@ int main()
   helics_status   status;
   const char*    fedinitstring="--broker=mainbroker --federates=1";
   double         deltat=0.01;
-  helics_value_federate vfed;
+  helics_federate vfed;
   helics_subscription sub;
   helics_publication  pub;
 
@@ -51,16 +51,16 @@ int main()
   printf("PI RECEIVER: Value federate created\n");
 
   /* Subscribe to PI SENDER's publication */
-  sub = helicsRegisterSubscription(vfed,"testA","double","");
+  sub = helicsFederateRegisterSubscription(vfed,"testA","double","");
   printf("PI RECEIVER: Subscription registered\n");
 
   /* Register the publication */
-  pub = helicsRegisterGlobalPublication(vfed,"testB","double","");
+  pub = helicsFederateRegisterGlobalPublication(vfed,"testB","double","");
   printf("PI RECEIVER: Publication registered\n");
 
   fflush(NULL);
   /* Enter initialization mode */
-  if ((status = helicsEnterInitializationMode(vfed)) == helics_ok)
+  if ((status = helicsFederateEnterInitializationMode(vfed)) == helics_ok)
   {
       printf("PI RECEIVER: Entered initialization mode\n");
   }
@@ -71,7 +71,7 @@ int main()
 
 
   /* Enter execution mode */
-  if ((status = helicsEnterExecutionMode(vfed)) == helics_ok)
+  if ((status = helicsFederateEnterExecutionMode(vfed)) == helics_ok)
   {
       printf("PI RECEIVER: Entered execution mode\n");
   }
@@ -85,26 +85,26 @@ int main()
     
     isupdated = 0;
     while(!isupdated) {
-      currenttime = helicsRequestTime(vfed,currenttime);
-      isupdated = helicsIsValueUpdated(sub);
+      helicsFederateRequestTime(vfed,currenttime, &currenttime);
+      isupdated = helicsSubscriptionIsUpdated(sub);
 	  if (currenttime > 0.21)
 	  {
 		  break;
 	  }
     }
-    helicsGetDouble(sub,&value); /* Note: The sender sent this value at currenttime-deltat */
+    helicsSubscriptionGetDouble(sub,&value); /* Note: The sender sent this value at currenttime-deltat */
     printf("PI RECEIVER: Received value = %4.3f at time %3.2f from PI SENDER\n",value,currenttime);
 
     value = currenttime*pi;
 
     printf("PI RECEIVER: Sending value %3.2f*pi = %4.3f at time %3.2f to PI SENDER\n",currenttime,value,currenttime);
-    helicsPublishDouble(pub,value); /* Note: The sender will receive this at currenttime+deltat */
+    helicsPublicationPublishDouble(pub,value); /* Note: The sender will receive this at currenttime+deltat */
   }
   helicsFederateFinalize(vfed);
   printf("PI RECEIVER: Federate finalized\n");
   fflush(NULL);
   //clean upFederate;
-  helicsFreeFederate(vfed);
+  helicsFederateFree(vfed);
   helicsCloseLibrary();
   printf("PI RECEIVER: Library Closed\n");
   fflush(NULL);

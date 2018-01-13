@@ -50,14 +50,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
     {
         //vFed1->finalize ();
         helicsFederateFinalize(vFed1);
-        helicsFreeFederate(vFed1);
+        helicsFederateFree(vFed1);
     }
 
     if (vFed2)
     {
         //vFed2->finalize ();
         helicsFederateFinalize(vFed2);
-        helicsFreeFederate(vFed2);
+        helicsFederateFree(vFed2);
     }
 }
 
@@ -215,18 +215,18 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 	for (auto &fed : federates)
     {
         //if (fed && fed->getCurrentState () != helics::Federate::op_states::finalize)
-		if (fed && helicsEnterExecutionMode(fed) != rv)
+		if (fed && helicsFederateEnterExecutionMode(fed) != rv)
         {
             //fed->finalize ();
             rv = helicsFederateFinalize(fed);
-            helicsFreeFederate(fed);
+            helicsFederateFree(fed);
         }
     }
 
     for (auto &broker : brokers)
     {
         //broker->disconnect ();
-        helicsFreeBroker(broker);
+        helicsBrokerFree(broker);
     }
 }
 

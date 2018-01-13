@@ -56,7 +56,7 @@ class ValueFederate : public virtual Federate
     helics_publication
     registerPublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
-        helics_publication pub = helicsRegisterPublication (fed, name.c_str(), type.c_str(), units.c_str());
+        helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type.c_str(), units.c_str());
         pubs.push_back(pub);
         return pub;
     }
@@ -64,7 +64,7 @@ class ValueFederate : public virtual Federate
     helics_publication
     registerTypePublication (const std::string &name, int type, const std::string &units = "")
     {
-        helics_publication pub = helicsRegisterTypePublication (fed, name.c_str(), type, units.c_str());
+        helics_publication pub = helicsFederateRegisterTypePublication (fed, name.c_str(), type, units.c_str());
         pubs.push_back(pub);
         return pub;
     }
@@ -72,7 +72,7 @@ class ValueFederate : public virtual Federate
     helics_publication
     registerGlobalPublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
-        helics_publication pub = helicsRegisterGlobalPublication (fed, name.c_str(), type.c_str(), units.c_str());
+        helics_publication pub = helicsFederateRegisterGlobalPublication (fed, name.c_str(), type.c_str(), units.c_str());
         pubs.push_back(pub);
         return pub;
     }
@@ -80,7 +80,7 @@ class ValueFederate : public virtual Federate
     helics_publication
     registerGlobalTypePublication (const std::string &name, int type, const std::string &units = "")
     {
-        helics_publication pub = helicsRegisterGlobalTypePublication (fed, name.c_str(), type, units.c_str());
+        helics_publication pub = helicsFederateRegisterGlobalTypePublication (fed, name.c_str(), type, units.c_str());
         pubs.push_back(pub);
         return pub;
     }
@@ -103,7 +103,7 @@ class ValueFederate : public virtual Federate
     helics_subscription
     registerSubscription (const std::string &name, const std::string &type, const std::string &units = "")
     {
-        helics_subscription sub = helicsRegisterSubscription (fed, name.c_str(), type.c_str(), units.c_str());
+        helics_subscription sub = helicsFederateRegisterSubscription (fed, name.c_str(), type.c_str(), units.c_str());
         subs.push_back(sub);
         return sub;
     }
@@ -111,7 +111,7 @@ class ValueFederate : public virtual Federate
     helics_subscription
     registerTypeSubscription (const std::string &name, int type, const std::string &units = "")
     {
-        helics_subscription sub = helicsRegisterTypeSubscription (fed, name.c_str(), type, units.c_str());
+        helics_subscription sub = helicsFederateRegisterTypeSubscription (fed, name.c_str(), type, units.c_str());
         subs.push_back(sub);
         return sub;
     }
@@ -138,31 +138,31 @@ class ValueFederate : public virtual Federate
     void setDefaultValue (helics_subscription sub, const char *data, int len)
     {
         // returns helics_status
-        helicsSetDefaultValue (sub, data, len);
+        helicsSubscriptionSetDefault (sub, data, len);
     }
 
     void setDefaultValue (helics_subscription sub, const std::string &str)
     {
         // returns helics_status
-        helicsSetDefaultString (sub, str.c_str());
+        helicsSubscriptionSetDefaultString (sub, str.c_str());
     }
 
     void setDefaultValue (helics_subscription sub, int64_t val)
     {
         // returns helics_status
-        helicsSetDefaultInteger (sub, val);
+        helicsSubscriptionSetDefaultInteger (sub, val);
     }
 
     void setDefaultValue (helics_subscription sub, double val)
     {
         // returns helics_status
-        helicsSetDefaultDouble (sub, val);
+        helicsSubscriptionSetDefaultDouble (sub, val);
     }
 
     void setDefaultValue (helics_subscription sub, const std::complex<double> &cmplx)
     {
         // returns helics_status
-        helicsSetDefaultComplex(sub, cmplx.real(), cmplx.imag());
+        helicsSubscriptionSetDefaultComplex(sub, cmplx.real(), cmplx.imag());
     }
 
     void setDefaultValue (helics_subscription sub, const std::vector<double> &data)
@@ -174,20 +174,20 @@ class ValueFederate : public virtual Federate
             arr[i] = data[i];
         }
         // returns helics_status
-        helicsSetDefaultVector (sub, arr, static_cast<int>(data.size() * sizeof(double)));
+        helicsSubscriptionSetDefaultVector (sub, arr, static_cast<int>(data.size() * sizeof(double)));
         free (arr);
     }
 
     /** Methods to get subscription values **/
     int getValue (helics_subscription sub, char *data, int maxlen)
     {
-        return helicsGetValue (sub, data, maxlen);
+        return helicsSubscriptionGetValue (sub, data, maxlen);
     }
 
     std::string getString (helics_subscription sub)
     {
         char str[255];
-        helicsGetString (sub, &str[0], sizeof(str));
+        helicsSubscriptionGetString (sub, &str[0], sizeof(str));
         std::string result (str);
         return result;
     }
@@ -195,14 +195,14 @@ class ValueFederate : public virtual Federate
     int64_t getInteger (helics_subscription sub)
     {
         int64_t val;
-        helicsGetInteger (sub, &val);
+        helicsSubscriptionGetInteger (sub, &val);
         return val;
     }
 
     double getDouble (helics_subscription sub)
     {
         double val;
-        helicsGetDouble (sub, &val);
+        helicsSubscriptionGetDouble (sub, &val);
         return val;
     }
 
@@ -210,45 +210,45 @@ class ValueFederate : public virtual Federate
     {
         double real;
         double imag;
-        helicsGetComplex (sub, &real, &imag);
+        helicsSubscriptionGetComplex (sub, &real, &imag);
         std::complex<double> result (real, imag);
         return result;
     }
 
     int getVector (helics_subscription sub, double *data, int maxlen)
     {
-        return helicsGetVector (sub, data, maxlen);
+        return helicsSubscriptionGetVector (sub, data, maxlen);
     }
 
     /** Methods to publish values **/
     void publish (helics_publication pub, const char *data, int len)
     {
         // returns helics_status
-        helicsPublish (pub, data, len);
+        helicsPublicationPublish (pub, data, len);
     }
 
     void publish (helics_publication pub, std::string str)
     {
         // returns helics_status
-        helicsPublishString (pub, str.c_str());
+        helicsPublicationPublishString (pub, str.c_str());
     }
 
     void publish (helics_publication pub, int64_t val)
     {
         // returns helics_status
-        helicsPublishInteger (pub, val);
+        helicsPublicationPublishInteger (pub, val);
     }
 
     void publish (helics_publication pub, double val)
     {
         // returns helics_status
-        helicsPublishDouble (pub, val);
+        helicsPublicationPublishDouble (pub, val);
     }
 
     void publish (helics_publication pub, std::complex<double> cmplx)
     {
         // returns helics_status
-        helicsPublishComplex (pub, cmplx.real(), cmplx.imag());
+        helicsPublicationPublishComplex (pub, cmplx.real(), cmplx.imag());
     }
 
     void publish (helics_publication pub, std::vector<double> data)
@@ -261,31 +261,31 @@ class ValueFederate : public virtual Federate
             arr[i] = data[i];
         }
         // returns helics_status
-        helicsPublishVector (pub, arr, static_cast<int>(data.size() * sizeof(double)));
+        helicsPublicationPublishVector (pub, arr, static_cast<int>(data.size() * sizeof(double)));
         free (arr);
     }
 
     /** Check if a subscription is updated **/
     bool isUpdated (helics_subscription sub) const
     {
-        return helicsIsValueUpdated (sub) > 0;
+        return helicsSubscriptionIsUpdated (sub) > 0;
     }
 
     /** Get the last time a subscription was updated **/
     helics_time_t getLastUpdateTime (helics_subscription sub) const
     {
-        return helicsGetLastUpdateTime (sub);
+        return helicsSubscriptionLastUpdateTime (sub);
     }
 
     // TODO: use c api to implement this method... callbacks too?
     /** Get a list of all subscriptions with updates since the last call **/
     std::vector<helics_subscription> queryUpdates () { return std::vector<helics_subscription>(); }
-    // call helicsIsValueUpdated for each sub
+    // call helicsSubscriptionIsUpdated for each sub
 
     std::string getSubscriptionName (helics_subscription sub) const
     {
         char str[255];
-        helicsGetSubscriptionKey (sub, &str[0], sizeof(str));
+        helicsSubscriptionGetKey (sub, &str[0], sizeof(str));
         std::string result (str);
         return result;
     }
@@ -293,7 +293,7 @@ class ValueFederate : public virtual Federate
     std::string getPublicationName (helics_publication pub) const
     {
         char str[255];
-        helicsGetPublicationKey (pub, &str[0], sizeof(str));
+        helicsPublicationGetKey (pub, &str[0], sizeof(str));
         std::string result (str);
         return result;
     }
@@ -301,7 +301,7 @@ class ValueFederate : public virtual Federate
     std::string getSubscriptionUnits (helics_subscription sub) const
     {
         char str[255];
-        helicsGetSubscriptionUnits (sub, &str[0], sizeof(str));
+        helicsSubscriptionGetUnits (sub, &str[0], sizeof(str));
         std::string result (str);
         return result;
     }
@@ -309,7 +309,7 @@ class ValueFederate : public virtual Federate
     std::string getPublicationUnits (helics_publication pub) const
     {
         char str[255];
-        helicsGetPublicationUnits (pub, &str[0], sizeof(str));
+        helicsPublicationGetUnits (pub, &str[0], sizeof(str));
         std::string result (str);
         return result;
     }
@@ -317,7 +317,7 @@ class ValueFederate : public virtual Federate
     std::string getSubscriptionType (helics_subscription sub) const
     {
         char str[255];
-        helicsGetSubscriptionType (sub, &str[0], sizeof(str));
+        helicsSubscriptionGetType (sub, &str[0], sizeof(str));
         std::string result (str);
         return result;
     }
@@ -325,7 +325,7 @@ class ValueFederate : public virtual Federate
     std::string getPublicationType (helics_publication pub) const
     {
         char str[255];
-        helicsGetPublicationType (pub, &str[0], sizeof(str));
+        helicsPublicationGetType (pub, &str[0], sizeof(str));
         std::string result (str);
         return result;
     }

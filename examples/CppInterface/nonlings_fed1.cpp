@@ -60,7 +60,7 @@ int main (int /*argc*/, char ** /*argv*/)
 
     double x = 0.0, y = 0.0, /*yprv = 100,*/ xprv=100;
     helics_time_t currenttime = 0.0;
-    helics_iterative_time currenttimeiter;
+    helics_iteration_status currenttimeiter;
     currenttimeiter.status = iterating;
    // int isupdated;
     double tol = 1E-8;

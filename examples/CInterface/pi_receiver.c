@@ -12,7 +12,7 @@ int main()
   helics_status   status;
   const char*    fedinitstring="--broker=mainbroker --federates=1";
   double         deltat=0.01;
-  helics_value_federate vfed;
+  helics_federate vfed;
   helics_subscription sub;
 
 
@@ -48,11 +48,11 @@ int main()
   printf("PI RECEIVER: Value federate created\n");
 
   /* Subscribe to PI SENDER's publication */
-  sub = helicsRegisterSubscription(vfed,"testA","double","");
+  sub = helicsFederateRegisterSubscription(vfed,"testA","double","");
   printf("PI RECEIVER: Subscription registered\n");
 
   /* Enter initialization mode */
-  if ((status = helicsEnterInitializationMode(vfed)) == helics_ok)
+  if ((status = helicsFederateEnterInitializationMode(vfed)) == helics_ok)
   {
       printf("PI RECEIVER: Entered initialization mode\n");
   }
@@ -63,7 +63,7 @@ int main()
   
 
   /* Enter execution mode */
-  if ((status = helicsEnterExecutionMode(vfed)) == helics_ok)
+  if ((status = helicsFederateEnterExecutionMode(vfed)) == helics_ok)
   {
       printf("PI RECEIVER: Entered execution mode\n");
   }
@@ -74,18 +74,18 @@ int main()
   int isupdated=0; 
 
   while(currenttime < 0.20) {
-    currenttime = helicsRequestTime(vfed,currenttime);
+    currenttime = helicsFederateRequestTime(vfed,currenttime);
 
-    isupdated = helicsIsValueUpdated(sub);
+    isupdated = helicsSubscriptionIsUpdated(sub);
     if(isupdated) {
       /* NOTE: The value sent by sender at time t is received by receiver at time t+deltat */
-       helicsGetDouble(sub,&value);
+       helicsSubscriptionGetDouble(sub,&value);
       printf("PI RECEIVER: Received value = %4.3f at time %3.2f from PI SENDER\n",value,currenttime);
     }
   }
   helicsFederateFinalize(vfed);
   printf("PI RECEIVER: Federate finalized\n");
-  helicsFreeFederate(vfed);
+  helicsFederateFree(vfed);
   helicsCloseLibrary();
   return(0);
 }

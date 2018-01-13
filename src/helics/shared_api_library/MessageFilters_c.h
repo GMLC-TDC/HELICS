@@ -18,12 +18,12 @@ extern "C" {
 
 // MESSAGE FEDERATE calls
 
-HELICS_Export helics_source_filter helicsRegisterSourceFilter (helics_federate fed,
+HELICS_Export helics_source_filter helicsFederateRegisterSourceFilter (helics_federate fed,
                                                                const char *name,
                                                                const char *inputType,
                                                                const char *outputType);
 
-HELICS_Export helics_destination_filter helicsRegisterDestinationFilter (helics_federate fed,
+HELICS_Export helics_destination_filter helicsFederateRegisterDestinationFilter (helics_federate fed,
                                                                          const char *name,
                                                                          const char *inputType,
                                                                          const char *outputType);

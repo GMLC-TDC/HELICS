@@ -10,7 +10,7 @@ int main()
   helics_status   status;
   const char*    fedinitstring="--broker=mainbroker --federates=1";
   double         deltat=0.01;
-  helics_value_federate vfed;
+  helics_federate vfed;
   helics_subscription sub;
   helics_publication  pub;
 
@@ -41,27 +41,27 @@ int main()
   vfed = helicsCreateValueFederate(fedinfo);
   printf(" Value federate created\n");
 
-  sub = helicsRegisterSubscription(vfed,"testA","double","");
+  sub = helicsFederateRegisterSubscription(vfed,"testA","double","");
   printf(" Subscription registered\n");
 
   /* Register the publication */
-  pub = helicsRegisterGlobalPublication(vfed,"testB","double","");
+  pub = helicsFederateRegisterGlobalPublication(vfed,"testB","double","");
   printf(" Publication registered\n");
 
 
   /* Enter initialization mode */
-  status = helicsEnterInitializationMode(vfed);
+  status = helicsFederateEnterInitializationMode(vfed);
   printf(" Entered initialization mode\n");
   double y = 1.0, x = 0, /*xprv = 100,*/ yprv=100;
 
-  status = helicsPublishDouble(pub, y);
+  status = helicsPublicationPublishDouble(pub, y);
   if (status != helics_ok)
   {
       printf("Error sending publication\n");
   }
   fflush(NULL);
   /* Enter execution mode */
-   helicsEnterExecutionMode(vfed);
+   helicsFederateEnterExecutionMode(vfed);
   printf(" Entered execution mode\n");
 
   fflush(NULL);
@@ -76,7 +76,7 @@ int main()
   {
 
    // xprv = x;
-     helicsGetDouble(sub,&x);
+     helicsSubscriptionGetDouble(sub,&x);
     ++helics_iter;
     double f2,J2;
     int    newt_conv = 0, max_iter=10,iter=0;
@@ -102,11 +102,11 @@ int main()
    
     if ((fabs(y-yprv)>tol)||(helics_iter<5))
     {
-      helicsPublishDouble(pub,y);
+      helicsPublicationPublishDouble(pub,y);
       printf("Fed2: publishing y\n");
     }
     fflush(NULL);
-    currenttimeiter = helicsRequestTimeIterative(vfed, currenttime, iterate_if_needed);
+    currenttimeiter = helicsFederateRequestTimeIterative(vfed, currenttime, iterate_if_needed);
     yprv = y;
   }
 
@@ -114,7 +114,7 @@ int main()
   printf("NLIN2: Federate finalized\n");
   fflush(NULL);
   //clean upFederate;
-  helicsFreeFederate(vfed);
+  helicsFederateFree(vfed);
   helicsCloseLibrary();
   printf("NLIN2: Library Closed\n");
   fflush(NULL);

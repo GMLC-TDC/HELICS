@@ -22,7 +22,7 @@ int main()
   const char*    fedinitstring="--broker=mainbroker --federates=1";
   int            isconnected;
   double         deltat=0.01;
-  helics_value_federate vfed;
+  helics_federate vfed;
   helics_publication pub;
 
   helicsversion = helicsGetVersion();
@@ -66,15 +66,15 @@ int main()
   printf("PI SENDER: Value federate created\n");
 
   /* Register the publication */
-  pub = helicsRegisterGlobalPublication(vfed,"testA","double","");
+  pub = helicsFederateRegisterGlobalPublication(vfed,"testA","double","");
   printf("PI SENDER: Publication registered\n");
 
   /* Enter initialization mode */
-   helicsEnterInitializationMode(vfed);
+   helicsFederateEnterInitializationMode(vfed);
   printf("PI SENDER: Entered initialization mode\n");
 
   /* Enter execution mode */
-   helicsEnterExecutionMode(vfed);
+   helicsFederateEnterExecutionMode(vfed);
   printf("PI SENDER: Entered execution mode\n");
 
   /* This federate will be publishing deltat*pi for numsteps steps */
@@ -87,15 +87,15 @@ int main()
     val = currenttime*value;
 
     printf("PI SENDER: Sending value %3.2fpi = %4.3f at time %3.2f to PI RECEIVER\n",deltat*i,val,currenttime);
-    helicsPublishDouble(pub,val);
+    helicsPublicationPublishDouble(pub,val);
 
-    currenttime = helicsRequestTime(vfed,currenttime);
+    currenttime = helicsFederateRequestTime(vfed,currenttime);
   }
 
   helicsFederateFinalize(vfed);
   printf("PI SENDER: Federate finalized\n");
 
-  helicsFreeFederate(vfed);
+  helicsFederateFree(vfed);
   while(helicsBrokerIsConnected(broker)) {
 #ifdef _MSC_VER
 	  Sleep(100);
@@ -104,7 +104,7 @@ int main()
 #endif
   }
   printf("PI SENDER: Broker disconnected\n");
-  helicsFreeBroker(broker);
+  helicsBrokerFree(broker);
   helicsCloseLibrary();
   return(0);
 }

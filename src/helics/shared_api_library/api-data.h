@@ -21,10 +21,13 @@ extern "C" {
 /** enumeration of return values from the C interface functions
  */
 typedef enum {
+    
+    helics_ok=0,  /*!< the function executed successfully */
     helics_invalid_object, /*!< indicator that the object used was not a valid object */
-    helics_ok,  /*!< the function executed successfully */
-    helics_discard,  /*!< the input was discarded for some reason */
+    helics_discard,  /*!< the input was discarded and not used for some reason */
+    helics_terminated, /*!< the federate has terminated and the call cannot be completed*/
     helics_warning,  /*!< the function issued a warning of some kind */
+    helics_invalid_state_transition, /*!< error issued when an invalid state transition occurred */
     helics_error  /*!< the function produced an error */
 } helics_status;
 
@@ -47,12 +50,6 @@ typedef void *helics_broker;
 
 /** opaque object representing a federate*/
 typedef void *helics_federate;
-/** opaque object representing a value federate
-@details this is a specialization of a \ref helics_federate */
-typedef void *helics_value_federate;
-/** opaque object representing a message federate
-@details this is a specialization of a \ref helics_federate */
-typedef void *helics_message_federate;
 
 /** opaque object representing a filter info object structure*/
 typedef void *helics_federate_info_t;
@@ -61,6 +58,12 @@ typedef void *helics_query;
 
 /** time definition used in the C interface to helics*/
 typedef double helics_time_t;
+
+/** defining a bool type for use in the helics interface*/
+typedef int helics_bool_t;
+
+#define helics_true (1)
+#define helics_false (0)
 
 /** enumeration of the different iteration results*/
 typedef enum {
@@ -91,12 +94,6 @@ typedef enum {
     helics_pending_iterative_time_state  /*!< state that the federate is pending an iterative time request */
 } federate_state;
 
-/** return structure from an iterative time request*/
-typedef struct helics_iterative_time
-{
-    helics_time_t time;  /*!< the current federate time */
-    iteration_status status;  /*!< the status of the iterations */
-} helics_iterative_time;
 
 /**
  * Data to be communicated.

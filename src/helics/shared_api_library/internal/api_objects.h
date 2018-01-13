@@ -30,6 +30,7 @@ namespace helics
 	class DestinationFilter;
     class CloningFilter;
 
+    /** type code embedded in the objects so the library knows how to cast them appropriately*/
 	enum class vtype:int
 	{
 		genericFed,
@@ -141,11 +142,11 @@ namespace helics
 }
 
 helics::Federate *getFed(helics_federate fed);
-helics::ValueFederate *getValueFed(helics_value_federate fed);
+helics::ValueFederate *getValueFed(helics_federate fed);
 helics::MessageFederate *getMessageFed(helics_message_federate fed);
 
 std::shared_ptr<helics::Federate> getFedSharedPtr(helics_federate fed);
-std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(helics_value_federate fed);
+std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(helics_federate fed);
 std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(helics_message_federate fed);
 
 /** class for containing all the objects associated with a federation*/

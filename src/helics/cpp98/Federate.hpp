@@ -155,7 +155,7 @@ class Federate
 
     void enterInitializationState ()
     {
-        if (helics_ok != helicsEnterInitializationMode (fed))
+        if (helics_ok != helicsFederateEnterInitializationMode (fed))
         {
             throw (InvalidStateTransition ("cannot transition from current state to initialization state"));
         }
@@ -163,7 +163,7 @@ class Federate
 
     void enterInitializationStateAsync ()
     {
-        if (helics_ok != helicsEnterInitializationModeAsync (fed))
+        if (helics_ok != helicsFederateEnterInitializationModeAsync (fed))
         {
             throw (InvalidStateTransition ("cannot transition from current state to initialization state"));
         }
@@ -172,12 +172,12 @@ class Federate
     bool isAsyncOperationCompleted () const
     {
         // returns int, 1 = true, 0 = false
-        return helicsIsAsyncOperationCompleted (fed) > 0;
+        return helicsFederateIsAsyncOperationCompleted (fed) > 0;
     }
 
     void enterInitializationStateComplete ()
     {
-        if (helics_ok != helicsEnterInitializationModeComplete (fed))
+        if (helics_ok != helicsFederateEnterInitializationModeComplete (fed))
         {
             throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
         }
@@ -188,11 +188,11 @@ class Federate
         iteration_status out_iterate = next_step;
         if (iterate == no_iteration)
         {
-            helicsEnterExecutionMode (fed);
+            helicsFederateEnterExecutionMode (fed);
         }
         else
         {
-            helicsEnterExecutionModeIterative (fed, iterate, &out_iterate);
+            helicsFederateEnterExecutionModeIterative (fed, iterate, &out_iterate);
         }
         return out_iterate;
     }
@@ -201,12 +201,12 @@ class Federate
     {
         if (iterate == no_iteration)
         {
-            helicsEnterExecutionModeAsync (fed);
+            helicsFederateEnterExecutionModeAsync (fed);
             exec_async_iterate = false;
         }
         else
         {
-            helicsEnterExecutionModeIterativeAsync (fed, iterate);
+            helicsFederateEnterExecutionModeIterativeAsync (fed, iterate);
             exec_async_iterate = true;
         }
     }
@@ -216,11 +216,11 @@ class Federate
         iteration_status out_iterate = next_step;
         if (exec_async_iterate)
         {
-            helicsEnterExecutionModeIterativeComplete (fed, &out_iterate);
+            helicsFederateEnterExecutionModeIterativeComplete (fed, &out_iterate);
         }
         else
         {
-            helicsEnterExecutionModeComplete (fed);
+            helicsFederateEnterExecutionModeComplete (fed);
         }
         return out_iterate;
     }
@@ -237,12 +237,12 @@ class Federate
 
     helics_iterative_time requestTimeIterative (helics_time_t time, iteration_request iterate)
     {
-        return helicsRequestTimeIterative (fed, time, iterate);
+        return helicsFederateRequestTimeIterative (fed, time, iterate);
     }
 
     void requestTimeAsync (helics_time_t time)
     {
-        if (helics_ok != helicsRequestTimeAsync (fed, time))
+        if (helics_ok != helicsFederateRequestTimeAsync (fed, time))
         {
             throw (InvalidFunctionCall ("cannot call request time in present state"));
         }
@@ -250,17 +250,17 @@ class Federate
 
     void requestTimeIterativeAsync (helics_time_t time, iteration_request iterate)
     {
-        helicsRequestTimeIterativeAsync (fed, time, iterate);
+        helicsFederateRequestTimeIterativeAsync (fed, time, iterate);
     }
 
     helics_time_t requestTimeComplete ()
     {
-        return helicsRequestTimeComplete (fed);
+        return helicsFederateRequestTimeComplete (fed);
     }
 
     helics_iterative_time requestTimeIterativeFinalize ()
     {
-        return helicsRequestTimeIterativeComplete (fed);
+        return helicsFederateRequestTimeIterativeComplete (fed);
     }
 
     /** make a query of the core
@@ -277,8 +277,8 @@ class Federate
     {
         // returns helics_query
         helics_query q = helicsCreateQuery (target.c_str(), queryStr.c_str());
-        std::string result (helicsExecuteQuery(fed, q));
-        helicsFreeQuery (q);
+        std::string result (helicsQueryExecute(q,fed));
+        helicsQueryFree(q);
         return result;
     }
 

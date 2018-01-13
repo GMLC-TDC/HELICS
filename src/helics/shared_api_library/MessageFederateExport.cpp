@@ -15,14 +15,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <mutex>
 #include <vector>
 
-static inline void addEndpoint (helics_message_federate fed, helics::EndpointObject *ept)
+static inline void addEndpoint (helics_federate fed, helics::EndpointObject *ept)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     fedObj->epts.push_back (ept);
 }
 
 static const std::string nullStr;
-helics_endpoint helicsRegisterEndpoint (helics_message_federate fed, const char *name, const char *type)
+helics_endpoint helicsFederateRegisterEndpoint (helics_federate fed, const char *name, const char *type)
 {
     // now generate a generic subscription
     auto fedObj = getMessageFedSharedPtr (fed);
@@ -47,7 +47,7 @@ helics_endpoint helicsRegisterEndpoint (helics_message_federate fed, const char 
     return nullptr;
 }
 
-helics_endpoint helicsRegisterGlobalEndpoint (helics_message_federate fed, const char *name, const char *type)
+helics_endpoint helicsFederateRegisterGlobalEndpoint (helics_federate fed, const char *name, const char *type)
 {
     // now generate a generic subscription
     auto fedObj = getMessageFedSharedPtr (fed);
@@ -155,7 +155,7 @@ helics_status helicsSubscribe (helics_endpoint endpoint, const char *key, const 
     return helics_ok;
 }
 
-int helicsFederateHasMessage (helics_message_federate fed)
+int helicsFederateHasMessage (helics_federate fed)
 {
     if (fed == nullptr)
     {
@@ -176,7 +176,7 @@ int helicsEndpointHasMessage (helics_endpoint endpoint)
     return (endObj->endptr->hasMessage ()) ? 1 : 0;
 }
 
-int helicsFederateReceiveCount (helics_message_federate fed)
+int helicsFederateReceiveCount (helics_federate fed)
 {
     if (fed == nullptr)
     {
@@ -228,7 +228,7 @@ message_t helicsEndpointGetMessage (helics_endpoint endpoint)
     return mess;
 }
 
-message_t helicsFederateGetMessage (helics_message_federate fed)
+message_t helicsFederateGetMessage (helics_federate fed)
 {
     if (fed == nullptr)
     {

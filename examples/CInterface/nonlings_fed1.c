@@ -17,7 +17,7 @@ int main ()
     const char *fedinitstring = "--broker=mainbroker --federates=1";
     int isconnected;
     double deltat = 0.01;
-    helics_value_federate vfed;
+    helics_federate vfed;
     helics_publication pub;
     helics_subscription sub;
 
@@ -58,16 +58,16 @@ int main ()
     printf (" Value federate created\n");
 
     /* Register the publication */
-    pub = helicsRegisterGlobalPublication (vfed, "testA", "double", "");
+    pub = helicsFederateRegisterGlobalPublication (vfed, "testA", "double", "");
     printf (" Publication registered\n");
 
-    sub = helicsRegisterSubscription (vfed, "testB", "double", "");
+    sub = helicsFederateRegisterSubscription (vfed, "testB", "double", "");
     printf (" Subscription registered\n");
 
     /* Register the subscription */
 
     /* Enter initialization mode */
-    status = helicsEnterInitializationMode (vfed);
+    status = helicsFederateEnterInitializationMode (vfed);
     if (status == helics_ok)
     {
         printf(" Entered initialization mode\n");
@@ -84,9 +84,9 @@ int main ()
    // int isupdated;
     double tol = 1E-8;
 
-    helicsPublishDouble (pub, x);
+    helicsPublicationPublishDouble (pub, x);
     /* Enter execution mode */
-    status = helicsEnterExecutionMode (vfed);
+    status = helicsFederateEnterExecutionMode (vfed);
     if (status == helics_ok)
     {
         printf(" Entered execution mode\n");
@@ -102,7 +102,7 @@ int main ()
     while (currenttimeiter.status == iterating)
     {
        // yprv = y;
-         helicsGetDouble (sub, &y);
+         helicsSubscriptionGetDouble (sub, &y);
         double f1, J1;
         int newt_conv = 0, max_iter = 10, iter = 0;
         /* Solve the equation using Newton */
@@ -128,17 +128,17 @@ int main ()
         
         if ((fabs(x-xprv)>tol)||(helics_iter<5))
         {
-            helicsPublishDouble (pub, x);
+            helicsPublicationPublishDouble (pub, x);
             printf("Fed1: publishing new x\n");
         }
         fflush(NULL);
-        currenttimeiter = helicsRequestTimeIterative(vfed, currenttime, iterate_if_needed);
+        currenttimeiter = helicsFederateRequestTimeIterative(vfed, currenttime, iterate_if_needed);
         xprv = x;
     }
 
     printf ("NLIN1: Federate finalized\n");
     fflush (NULL);
-    helicsFreeFederate (vfed);
+    helicsFederateFree (vfed);
     while (helicsBrokerIsConnected (broker))
     {
 #ifdef _MSC_VER
@@ -147,7 +147,7 @@ int main ()
         usleep (50000); /* Sleep for 50 millisecond */
 #endif
     }
-    helicsFreeBroker(broker);
+    helicsBrokerFree(broker);
     printf ("NLIN1: Broker disconnected\n");
     helicsCloseLibrary ();
     printf ("NLIN1: Library closed\n");
