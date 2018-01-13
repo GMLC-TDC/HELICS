@@ -58,7 +58,7 @@ int main (int /*argc*/, char ** /*argv*/)
     vfed->enterInitializationState (); // can throw helics::InvalidStateTransition exception
     printf (" Entered initialization state\n");
 
-    double x = 0.0, y = 0.0, yprv = 100, xprv=100;
+    double x = 0.0, y = 0.0, /*yprv = 100,*/ xprv=100;
     helics_time_t currenttime = 0.0;
     helics_iterative_time currenttimeiter;
     currenttimeiter.status = iterating;
@@ -74,7 +74,7 @@ int main (int /*argc*/, char ** /*argv*/)
     int helics_iter = 0;
     while (currenttimeiter.status == iterating)
     {
-        yprv = y;
+    //    yprv = y;
         y = vfed->getDouble (sub);
         double f1, J1;
         int newt_conv = 0, max_iter = 10, iter = 0;

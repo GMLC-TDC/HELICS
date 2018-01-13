@@ -39,17 +39,17 @@ int main ()
     fedinfo = helicsFederateInfoCreate ();
 
     /* Set Federate name */
-    status = helicsFederateInfoSetFederateName (fedinfo, "TestA Federate");
+     helicsFederateInfoSetFederateName (fedinfo, "TestA Federate");
 
     /* Set core type from string */
-    status = helicsFederateInfoSetCoreTypeFromString (fedinfo, "zmq");
+     helicsFederateInfoSetCoreTypeFromString (fedinfo, "zmq");
 
     /* Federate init string */
-    status = helicsFederateInfoSetCoreInitString (fedinfo, fedinitstring);
+     helicsFederateInfoSetCoreInitString (fedinfo, fedinitstring);
 
-    status = helicsFederateInfoSetTimeDelta (fedinfo, deltat);
+     helicsFederateInfoSetTimeDelta (fedinfo, deltat);
 
-    status = helicsFederateInfoSetMaxIterations (fedinfo, 100);
+    helicsFederateInfoSetMaxIterations (fedinfo, 100);
 
     //status = helicsFederateInfoSetLoggingLevel (fedinfo, 5);
 
@@ -68,26 +68,41 @@ int main ()
 
     /* Enter initialization mode */
     status = helicsEnterInitializationMode (vfed);
-    printf (" Entered initialization mode\n");
+    if (status == helics_ok)
+    {
+        printf(" Entered initialization mode\n");
+    }
+    else
+    {
+        return (-3);
+    }
 
-    double x = 0.0, y = 0.0, yprv = 100, xprv=100;
+    double x = 0.0, y = 0.0, /*yprv = 100,*/ xprv=100;
     helics_time_t currenttime = 0.0;
     helics_iterative_time currenttimeiter;
     currenttimeiter.status = iterating;
    // int isupdated;
     double tol = 1E-8;
 
-    status = helicsPublishDouble (pub, x);
+    helicsPublishDouble (pub, x);
     /* Enter execution mode */
     status = helicsEnterExecutionMode (vfed);
-    printf (" Entered execution mode\n");
+    if (status == helics_ok)
+    {
+        printf(" Entered execution mode\n");
+    }
+    else
+    {
+        return (-3);
+    }
+    
 
     fflush (NULL);
     int helics_iter = 0;
     while (currenttimeiter.status == iterating)
     {
-        yprv = y;
-        status = helicsGetDouble (sub, &y);
+       // yprv = y;
+         helicsGetDouble (sub, &y);
         double f1, J1;
         int newt_conv = 0, max_iter = 10, iter = 0;
         /* Solve the equation using Newton */
@@ -113,7 +128,7 @@ int main ()
         
         if ((fabs(x-xprv)>tol)||(helics_iter<5))
         {
-            status = helicsPublishDouble (pub, x);
+            helicsPublishDouble (pub, x);
             printf("Fed1: publishing new x\n");
         }
         fflush(NULL);
@@ -132,6 +147,7 @@ int main ()
         usleep (50000); /* Sleep for 50 millisecond */
 #endif
     }
+    helicsFreeBroker(broker);
     printf ("NLIN1: Broker disconnected\n");
     helicsCloseLibrary ();
     printf ("NLIN1: Library closed\n");

@@ -46,18 +46,17 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
  ValueFederateTestFixture::~ValueFederateTestFixture ()
 {
-    helics_status rv = helics_ok;
     if (vFed1)
     {
         //vFed1->finalize ();
-        rv = helicsFederateFinalize(vFed1);
+        helicsFederateFinalize(vFed1);
         helicsFreeFederate(vFed1);
     }
 
     if (vFed2)
     {
         //vFed2->finalize ();
-        rv = helicsFederateFinalize(vFed2);
+        helicsFederateFinalize(vFed2);
         helicsFreeFederate(vFed2);
     }
 }
@@ -70,7 +69,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
  void ValueFederateTestFixture::Setup1FederateTest (std::string core_type_name, helics_time_t time_delta)
 {
-	helics_status rv = helics_ok;
     if (hasIndexCode (core_type_name))
     {
         core_type_name.pop_back ();
@@ -79,16 +77,16 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
     StartBroker (core_type_name, "1");
     helics_federate_info_t fi = helicsFederateInfoCreate();
-    rv = helicsFederateInfoSetFederateName(fi, std::string("test1").c_str());
-    rv = helicsFederateInfoSetCoreTypeFromString(fi, core_type_name.c_str());
-    rv = helicsFederateInfoSetTimeDelta(fi, time_delta);
+    helicsFederateInfoSetFederateName(fi, std::string("test1").c_str());
+    helicsFederateInfoSetCoreTypeFromString(fi, core_type_name.c_str());
+    helicsFederateInfoSetTimeDelta(fi, time_delta);
     char buffer[512];
     helicsBrokerGetIdentifier(broker, buffer, 512);
     std::string coreInitString = std::string("--broker=") + std::string(buffer) + " --broker_address=";
     helicsBrokerGetAddress(broker, buffer, 512);
     coreInitString += std::string(buffer) + " --federates 1";
 
-	rv = helicsFederateInfoSetCoreInitString(fi, coreInitString.c_str());
+	helicsFederateInfoSetCoreInitString(fi, coreInitString.c_str());
     //helics::FederateInfo fi ("test1");
     //fi.coreType = helics::coreTypeFromString (core_type_name);
     //fi.timeDelta = time_delta;
@@ -100,7 +98,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
  void ValueFederateTestFixture::Setup2FederateTest (std::string core_type_name, helics_time_t time_delta)
 {
-	helics_status rv = helics_ok;
 	bool hasIndex = hasIndexCode (core_type_name);
     int setup = (hasIndex) ? getIndexCode (core_type_name) : 1;
     if (hasIndex)
@@ -115,9 +112,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
     {
         StartBroker (core_type_name, "2");
         helics_federate_info_t fi = helicsFederateInfoCreate();
-        rv = helicsFederateInfoSetFederateName(fi, std::string("test1").c_str());
-        rv = helicsFederateInfoSetCoreTypeFromString(fi, core_type_name.c_str());
-        rv = helicsFederateInfoSetTimeDelta(fi, time_delta);
+        helicsFederateInfoSetFederateName(fi, std::string("test1").c_str());
+        helicsFederateInfoSetCoreTypeFromString(fi, core_type_name.c_str());
+        helicsFederateInfoSetTimeDelta(fi, time_delta);
 
         char buffer[512];
         helicsBrokerGetIdentifier(broker, buffer, 512);

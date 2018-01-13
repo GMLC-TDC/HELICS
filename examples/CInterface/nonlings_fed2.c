@@ -23,19 +23,19 @@ int main()
   fedinfo = helicsFederateInfoCreate();
   
   /* Set Federate name */
-  status = helicsFederateInfoSetFederateName(fedinfo,"TestB Federate");
+  helicsFederateInfoSetFederateName(fedinfo,"TestB Federate");
 
   /* Set core type from string */
-  status = helicsFederateInfoSetCoreTypeFromString(fedinfo,"zmq");
+  helicsFederateInfoSetCoreTypeFromString(fedinfo,"zmq");
 
   /* Federate init string */
-  status = helicsFederateInfoSetCoreInitString(fedinfo,fedinitstring);
+  helicsFederateInfoSetCoreInitString(fedinfo,fedinitstring);
 
-  status = helicsFederateInfoSetTimeDelta(fedinfo,deltat);
+  helicsFederateInfoSetTimeDelta(fedinfo,deltat);
 
-  status = helicsFederateInfoSetMaxIterations(fedinfo,100);
+  helicsFederateInfoSetMaxIterations(fedinfo,100);
 
-  status = helicsFederateInfoSetLoggingLevel(fedinfo,1);
+   helicsFederateInfoSetLoggingLevel(fedinfo,1);
 
   /* Create value federate */
   vfed = helicsCreateValueFederate(fedinfo);
@@ -52,12 +52,16 @@ int main()
   /* Enter initialization mode */
   status = helicsEnterInitializationMode(vfed);
   printf(" Entered initialization mode\n");
-  double y = 1.0, x = 0, xprv = 100,yprv=100;
+  double y = 1.0, x = 0, /*xprv = 100,*/ yprv=100;
 
   status = helicsPublishDouble(pub, y);
+  if (status != helics_ok)
+  {
+      printf("Error sending publication\n");
+  }
   fflush(NULL);
   /* Enter execution mode */
-  status = helicsEnterExecutionMode(vfed);
+   helicsEnterExecutionMode(vfed);
   printf(" Entered execution mode\n");
 
   fflush(NULL);
@@ -71,8 +75,8 @@ int main()
   while (currenttimeiter.status==iterating)
   {
 
-    xprv = x;
-    status = helicsGetDouble(sub,&x);
+   // xprv = x;
+     helicsGetDouble(sub,&x);
     ++helics_iter;
     double f2,J2;
     int    newt_conv = 0, max_iter=10,iter=0;
@@ -98,7 +102,7 @@ int main()
    
     if ((fabs(y-yprv)>tol)||(helics_iter<5))
     {
-      status = helicsPublishDouble(pub,y);
+      helicsPublishDouble(pub,y);
       printf("Fed2: publishing y\n");
     }
     fflush(NULL);
@@ -106,7 +110,7 @@ int main()
     yprv = y;
   }
 
-  status = helicsFederateFinalize(vfed);
+  helicsFederateFinalize(vfed);
   printf("NLIN2: Federate finalized\n");
   fflush(NULL);
   //clean upFederate;

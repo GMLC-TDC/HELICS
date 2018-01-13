@@ -44,13 +44,13 @@ int main()
   fedinfo = helicsFederateInfoCreate();
   
   /* Set Federate name */
-  status = helicsFederateInfoSetFederateName(fedinfo,"TestA Federate");
+  helicsFederateInfoSetFederateName(fedinfo,"TestA Federate");
 
   /* Set core type from string */
-  status = helicsFederateInfoSetCoreTypeFromString(fedinfo,"zmq");
+ helicsFederateInfoSetCoreTypeFromString(fedinfo,"zmq");
 
   /* Federate init string */
-  status = helicsFederateInfoSetCoreInitString(fedinfo,fedinitstring);
+   helicsFederateInfoSetCoreInitString(fedinfo,fedinitstring);
 
   /* Set the message interval (timedelta) for federate. Note that
      HELICS minimum message time interval is 1 ns and by default
@@ -58,9 +58,9 @@ int main()
      setTimedelta routine is a multiplier for the default timedelta.
   */
   /* Set one second message interval */
-  status = helicsFederateInfoSetTimeDelta(fedinfo,deltat);
+  helicsFederateInfoSetTimeDelta(fedinfo,deltat);
 
-  status = helicsFederateInfoSetLoggingLevel(fedinfo,1);
+  helicsFederateInfoSetLoggingLevel(fedinfo,1);
 
   /* Create value federate */
   vfed = helicsCreateValueFederate(fedinfo);
@@ -77,11 +77,11 @@ int main()
   /* Register the subscription */
 
   /* Enter initialization mode */
-  status = helicsEnterInitializationMode(vfed);
+  helicsEnterInitializationMode(vfed);
   printf("PI SENDER: Entered initialization mode\n");
 
   /* Enter execution mode */
-  status = helicsEnterExecutionMode(vfed);
+ helicsEnterExecutionMode(vfed);
   printf("PI SENDER: Entered execution mode\n");
 
   /* This federate will be publishing deltat*pi for numsteps steps */
@@ -94,7 +94,7 @@ int main()
     value = currenttime*pi;
 
     printf("PI SENDER: Sending value %3.2f*pi = %4.3f at time %3.2f to PI RECEIVER\n",currenttime,value,currenttime);
-    status = helicsPublishDouble(pub,value); /* Note: the receiver will get this at currenttime+deltat */
+     helicsPublishDouble(pub,value); /* Note: the receiver will get this at currenttime+deltat */
 
     isupdated = 0;
     while(!isupdated) {
@@ -103,11 +103,11 @@ int main()
     }
      
     /* NOTE: The value sent by sender at time t is received by receiver at time t+deltat */
-    status = helicsGetDouble(sub,&value); /* Note: The receiver sent this at currenttime-deltat */
+    helicsGetDouble(sub,&value); /* Note: The receiver sent this at currenttime-deltat */
     printf("PI SENDER: Received value = %4.3f at time %3.2f from PI RECEIVER\n",value,currenttime);
   }
 
-  status = helicsFederateFinalize(vfed);
+   helicsFederateFinalize(vfed);
   printf("PI SENDER: Federate finalized\n");
 
   helicsFreeFederate(vfed);
@@ -118,6 +118,7 @@ int main()
     usleep(50000); /* Sleep for 1 millisecond */
 #endif
   }
+  helicsFreeBroker(broker);
   printf("PI SENDER: Broker disconnected\n");
   helicsCloseLibrary();
   printf("PI SENDER: Library closed\n");

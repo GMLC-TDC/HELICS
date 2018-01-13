@@ -27,7 +27,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_AUTO_TEST_SUITE(value_federate_tests)
 
 namespace bdata = boost::unit_test::data;
-const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2"};
+const std::string core_types[] = {"test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2"};
 
 /** test simple creation and destruction*/
 
@@ -49,7 +49,7 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types),
 	fi = helicsFederateInfoCreate();
 
 	status = helicsFederateInfoSetCoreTypeFromString(fi, core_type.c_str());
-
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	// helicsCreateValueFederate returns a void pointer of the value federate.
 	vFed = helicsCreateValueFederate(fi);
 
@@ -62,7 +62,7 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types),
 
 	//vFed1->enterExecutionState();
 
-	BOOST_CHECK(status == helics_ok);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 
 	// BOOST_CHECK(vFed1->getCurrentState() == helics::Federate::op_states::execution);
 
@@ -70,13 +70,14 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types),
 
 	//vFed1->finalize();
 
-	BOOST_CHECK(status == helics_ok);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 
 	//BOOST_CHECK(vFed1->getCurrentState() == helics::Federate::op_states::finalize);
 
 	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
+    helicsFreeBroker(broker);
 	helicsCloseLibrary();
 
 	//helicsFreeBroker(broker);
@@ -106,9 +107,9 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
 	fi = helicsFederateInfoCreate();
 
 	status = helicsFederateInfoSetFederateName(fi, "fed0");
-
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status = helicsFederateInfoSetCoreTypeFromString(fi, core_type.c_str());
-
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	vFed = helicsCreateValueFederate(fi);
 
 	pubid = helicsRegisterPublication(vFed, "pub1", nullptr, nullptr);
@@ -118,28 +119,27 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
 	pubid3 = helicsRegisterPublication(vFed, "pub3", "double", "V");
 
 	status = helicsEnterExecutionMode(vFed);
-
-	BOOST_CHECK(status == helics_ok);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 
 	/* This section is commented out as  helicsGetPublicationKey is not working without publication type and units*/
 	status = helicsGetPublicationKey(pubid, pubname, 100); //the equivalent of getPublicationName is helicsGetPublicationKey in the C-API 
 
 	status = helicsGetPublicationKey(pubid2, pubname2, 100);
-
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	BOOST_CHECK_EQUAL (pubname, "fed0/pub1");
 
 	BOOST_CHECK_EQUAL (pubname2, "pub2");
 
 	status = helicsGetPublicationKey(pubid3, pubname3, 100);
-
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	BOOST_CHECK_EQUAL(pubname3, "fed0/pub3");
 
 	status = helicsGetPublicationType(pubid3, pubtype, 100); // in this function the publication type is returned in the char * argument of the function. The return type is just to check that the function execution was successful
-
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	BOOST_CHECK_EQUAL(pubtype, "double");
 
 	status = helicsGetPublicationUnits(pubid3, pubunit3, 100);
-
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	BOOST_CHECK_EQUAL(pubunit3, "V");
 
 	/*// getting publication id when using the C-API does not make sense, so these tests, which are valid in the C++ API, are being commented
@@ -149,9 +149,8 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
 
 	status = helicsFederateFinalize(vFed);
 
-	BOOST_CHECK(status == helics_ok);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 
-	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
     helicsFreeBroker(broker);
@@ -180,7 +179,9 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
 	broker = helicsCreateBroker(core_type.c_str(), nullptr, "--federates=1");
 	fi = helicsFederateInfoCreate();
 	status = helicsFederateInfoSetFederateName(fi, "fed0");
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status = helicsFederateInfoSetCoreTypeFromString(fi, core_type.c_str());
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	vFed = helicsCreateValueFederate(fi);
 	
 	//SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
@@ -196,13 +197,15 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
 
 	status = helicsEnterExecutionMode(vFed);
 
-	BOOST_CHECK(status == helics_ok);
+    BOOST_CHECK_EQUAL(status, helics_ok);
     //vFed1->enterExecutionState ();
 
     // BOOST_CHECK (vFed->getCurrentState () == helics::Federate::op_states::execution);
 
 	status = helicsGetSubscriptionKey(subid,subname,100);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status = helicsGetSubscriptionKey(subid2, subname2, 100);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	//auto sv = vFed1->getSubscriptionName(subid);
     //auto sv2 = vFed1->getSubscriptionName (subid2);
 	BOOST_CHECK_EQUAL(subname, "sub1");
@@ -210,6 +213,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     //BOOST_CHECK_EQUAL (sv, "sub1");
     //BOOST_CHECK_EQUAL (sv2, "sub2");
 	status = helicsGetSubscriptionKey(subid3, subname3, 100);
+    BOOST_CHECK_EQUAL(status, helics_ok);
     //auto sub3name = vFed1->getSubscriptionName (subid3);
 
     //vFed1->addSubscriptionShortcut (subid, "Shortcut"); //appears to be relevant for C++ API only 
@@ -217,10 +221,12 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
 	//BOOST_CHECK_EQUAL (sub3name, "sub3");
 
 	status = helicsGetSubscriptionType(subid3, subtype3, 100);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	BOOST_CHECK_EQUAL(subtype3, "double");
     //BOOST_CHECK_EQUAL (vFed1->getSubscriptionType (subid3), "double");
 
 	status = helicsGetSubscriptionUnits(subid3, subunit3, 100);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	BOOST_CHECK_EQUAL(subunit3, "V");
     //BOOST_CHECK_EQUAL (vFed1->getSubscriptionUnits (subid3), "V");
 
@@ -232,7 +238,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
 
 	status = helicsFederateFinalize(vFed);
 
-	BOOST_CHECK(status == helics_ok);
+    BOOST_CHECK_EQUAL(status, helics_ok);
     //vFed1->finalize ();
 
     //BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
@@ -261,7 +267,9 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 	broker = helicsCreateBroker(core_type.c_str(), nullptr, "--federates=1");
 	fi = helicsFederateInfoCreate();
 	status = helicsFederateInfoSetFederateName(fi, "fed0");
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status = helicsFederateInfoSetCoreTypeFromString(fi, core_type.c_str());
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	vFed = helicsCreateValueFederate(fi);
 
 	pubid = helicsRegisterPublication(vFed, "pub1", "", "");
@@ -273,42 +281,41 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 	subid2 = helicsRegisterSubscription(vFed, "sub2", "int", "");
 	subid3 = helicsRegisterSubscription(vFed, "sub3", "double", "V");
 
-	status = helicsEnterExecutionMode(vFed);
+	helicsEnterExecutionMode(vFed);
 	BOOST_CHECK(status == helics_ok);
 
-	status = helicsGetSubscriptionKey(subid, subname, 100);
-	status = helicsGetSubscriptionKey(subid2, subname2, 100);
+	helicsGetSubscriptionKey(subid, subname, 100);
+	helicsGetSubscriptionKey(subid2, subname2, 100);
 	BOOST_CHECK_EQUAL(subname, "sub1");
 	BOOST_CHECK_EQUAL(subname2, "sub2");
 
-	status = helicsGetSubscriptionKey(subid3, subname3, 100);
+	 helicsGetSubscriptionKey(subid3, subname3, 100);
 	BOOST_CHECK_EQUAL(subname3, "sub3");
 
-	status = helicsGetSubscriptionType(subid3, subtype3, 100);
+	 helicsGetSubscriptionType(subid3, subtype3, 100);
 	BOOST_CHECK_EQUAL(subtype3, "double");
 
-	status = helicsGetSubscriptionUnits(subid3, subunit3, 100);
+	helicsGetSubscriptionUnits(subid3, subunit3, 100);
 	BOOST_CHECK_EQUAL(subunit3, "V");
 
-	status = helicsGetPublicationKey(pubid, pubname, 100); //the equivalent of getPublicationName is helicsGetPublicationKey in the C-API 
-	status = helicsGetPublicationKey(pubid2, pubname2, 100);
+	helicsGetPublicationKey(pubid, pubname, 100); //the equivalent of getPublicationName is helicsGetPublicationKey in the C-API 
+	helicsGetPublicationKey(pubid2, pubname2, 100);
 
 	BOOST_CHECK_EQUAL(pubname, "fed0/pub1");
 	BOOST_CHECK_EQUAL(pubname2, "pub2");
 
-	status = helicsGetPublicationKey(pubid3, pubname3, 100);
+	 helicsGetPublicationKey(pubid3, pubname3, 100);
 	BOOST_CHECK_EQUAL(pubname3, "fed0/pub3");
 
-	status = helicsGetPublicationType(pubid3, pubtype, 100); // in this function the publication type is returned in the char * argument of the function. The return type is just to check that the function execution was successful
+	helicsGetPublicationType(pubid3, pubtype, 100); // in this function the publication type is returned in the char * argument of the function. The return type is just to check that the function execution was successful
 	BOOST_CHECK_EQUAL(pubtype, "double");
 
-	status = helicsGetPublicationUnits(pubid3, pubunit3, 100);
+	helicsGetPublicationUnits(pubid3, pubunit3, 100);
 	BOOST_CHECK_EQUAL(pubunit3, "V");
 
 	status = helicsFederateFinalize(vFed);
-	BOOST_CHECK(status == helics_ok);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 
-	status = helicsFederateFinalize(vFed);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
     helicsFreeBroker(broker);
@@ -377,7 +384,9 @@ BOOST_DATA_TEST_CASE(value_federate_subscriber_and_publisher_registration,
 	broker = helicsCreateBroker(core_type.c_str(), nullptr, "--federates=1");
 	fi = helicsFederateInfoCreate();
 	status = helicsFederateInfoSetFederateName(fi, "fed0");
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status = helicsFederateInfoSetCoreTypeFromString(fi, core_type.c_str());
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	vFed = helicsCreateValueFederate(fi);
 
 	// register the publications
@@ -392,11 +401,13 @@ BOOST_DATA_TEST_CASE(value_federate_subscriber_and_publisher_registration,
 
 	// enter execution
 	status = helicsEnterExecutionMode(vFed);
-	BOOST_CHECK(status == helics_ok);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 
 	// check subscriptions
 	status = helicsGetSubscriptionKey(subid, subname, 100);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status = helicsGetSubscriptionKey(subid2, subname2, 100);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	BOOST_CHECK_EQUAL(subname, "sub1");
 	BOOST_CHECK_EQUAL(subname2, "sub2");
 	status = helicsGetSubscriptionKey(subid3, subname3, 100);
@@ -404,30 +415,39 @@ BOOST_DATA_TEST_CASE(value_federate_subscriber_and_publisher_registration,
 
 	status = helicsGetSubscriptionType(subid, subtype, 100);
 	BOOST_CHECK_EQUAL(subtype, "def");
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status = helicsGetSubscriptionType(subid2, subtype2, 100);
 	BOOST_CHECK_EQUAL(subtype2, "int32");
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status = helicsGetSubscriptionType(subid3, subtype3, 100);
 	BOOST_CHECK_EQUAL(subtype3, "def");
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status = helicsGetSubscriptionUnits(subid3, subunit3, 100);
 	BOOST_CHECK_EQUAL(subunit3, "V");
+    BOOST_CHECK_EQUAL(status, helics_ok);
 
 	// check publications
-	status = helicsGetPublicationKey(pubid, pubname, 100); //the equivalent of getPublicationName is helicsGetPublicationKey in the C-API 
+	helicsGetPublicationKey(pubid, pubname, 100); 
 	status = helicsGetPublicationKey(pubid2, pubname2, 100);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	BOOST_CHECK_EQUAL(pubname, "fed0/pub1");
 	BOOST_CHECK_EQUAL(pubname2, "pub2");
 	status = helicsGetPublicationKey(pubid3, pubname3, 100);
 	BOOST_CHECK_EQUAL(pubname3, "fed0/pub3");
+    BOOST_CHECK_EQUAL(status, helics_ok);
 
 	status = helicsGetPublicationType(pubid3, pubtype, 100); // in this function the publication type is returned in the char * argument of the function. The return type is just to check that the function execution was successful
 	BOOST_CHECK_EQUAL(pubtype, "double");
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status = helicsGetPublicationUnits(pubid3, pubunit3, 100);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	BOOST_CHECK_EQUAL(pubunit3, "V");
 
 	status = helicsFederateFinalize(vFed);
-	BOOST_CHECK(status == helics_ok);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 
 	status = helicsFederateFinalize(vFed);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
     helicsFreeBroker(broker);
@@ -492,14 +512,17 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
 	helics_subscription subid;
 	//helics_time_t stime = 1.0;
 	helics_time_t gtime;
-	int retValue;
+    int retValue;
 	char s[100] = "n2";
 	
 	broker = helicsCreateBroker(core_type.c_str(), nullptr, "--federates=1");
 	fi = helicsFederateInfoCreate();
 	status = helicsFederateInfoSetFederateName(fi, "fed0");
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status = helicsFederateInfoSetCoreTypeFromString(fi, core_type.c_str());
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status = helicsFederateInfoSetTimeDelta(fi, 1.0);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	vFed = helicsCreateValueFederate(fi);
 
 	// register the publications
@@ -508,13 +531,15 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
 
 
 	status = helicsEnterExecutionMode(vFed);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status= helicsPublishString(pubid, "string1");
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	gtime = helicsRequestTime(vFed,1.0);
 	BOOST_CHECK_EQUAL(gtime, 1.0);
 
 	// get the value
-	retValue = helicsGetString(subid, s, 100);
-
+	status = helicsGetString(subid, s, 100);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	// make sure the string is what we expect
 	BOOST_CHECK_EQUAL(s, "string1");
 
@@ -533,9 +558,11 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
 
 	// make sure the string is what we expect
 	retValue = helicsGetValue(subid, s, 100);
+    BOOST_CHECK_EQUAL(retValue, 7);
 	BOOST_CHECK_EQUAL(s, "string2");
 
 	status = helicsFederateFinalize(vFed);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	helicsFederateInfoFree(fi);
 	helicsFreeFederate(vFed);
     helicsFreeBroker(broker);
@@ -589,14 +616,17 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer_publisher, bdata::make(core_
 	helics_subscription subid;
 //	helics_time_t stime = 1.0;
 	helics_time_t gtime;
-	int retValue;
 	char s[100] = "n2";
+    int retValue;
 
 	broker = helicsCreateBroker(core_type.c_str(), nullptr, "--federates=1");
 	fi = helicsFederateInfoCreate();
 	status = helicsFederateInfoSetFederateName(fi, "fed0");
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status = helicsFederateInfoSetCoreTypeFromString(fi, core_type.c_str());
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	status = helicsFederateInfoSetTimeDelta(fi, 1.0);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	vFed = helicsCreateValueFederate(fi);
 
 	// register the publications
@@ -607,20 +637,23 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer_publisher, bdata::make(core_
 
 	// publish string1 at time=0.0;
 	status = helicsPublishString(pubid, "string1");
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	gtime = helicsRequestTime(vFed, 1.0);
 	BOOST_CHECK_EQUAL(gtime, 1.0);
 
 	// get the value
-	retValue = helicsGetString(subid, s, 100);
-
+	status = helicsGetString(subid, s, 100);
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	// make sure the string is what we expect
 	BOOST_CHECK_EQUAL(s, "string1");
 
 	// publish a second string
 	status = helicsPublishString(pubid, "string2");
+    BOOST_CHECK_EQUAL(status, helics_ok);
 	// make sure the value is still what we expect
 	retValue = helicsGetValue(subid, s, 100);
 	BOOST_CHECK_EQUAL(s, "string1");
+    BOOST_CHECK_EQUAL(retValue, 7);
 
 	// advance time
 	gtime = helicsRequestTime(vFed, 2.0);
