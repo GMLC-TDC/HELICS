@@ -63,7 +63,7 @@ int main()
   
 
   /* Enter execution mode */
-  if ((status = status = helicsEnterExecutionMode(vfed)) == helics_ok)
+  if ((status = helicsEnterExecutionMode(vfed)) == helics_ok)
   {
       printf("PI RECEIVER: Entered execution mode\n");
   }
