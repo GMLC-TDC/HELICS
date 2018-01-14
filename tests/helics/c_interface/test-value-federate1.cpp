@@ -771,7 +771,7 @@ void runFederateTestDouble (const char * core, double defaultValue,double testVa
 	status = helicsGetDouble(subid, val);
 	BOOST_CHECK_EQUAL(*val, testValue2);
 
-	status = helicsFinalize(vFed);
+	status = helicsFederateFinalize(vFed);
 
 	std::cout << "value_federate_single_transfer_types - datatype:" <<datatype << " core_type "<< core << "\n";
 	helicsFederateInfoFree(fi);
@@ -878,7 +878,7 @@ void runFederateTestInteger(const char * core, int defaultValue, int testValue1,
 	status = helicsGetInteger(subid, val);
 	BOOST_CHECK_EQUAL(*val, testValue2);
 
-	status = helicsFinalize(vFed);
+	status = helicsFederateFinalize(vFed);
 
 	std::cout << "value_federate_single_transfer_types - datatype:" << datatype << " core_type " << core << "\n";
 	helicsFederateInfoFree(fi);
