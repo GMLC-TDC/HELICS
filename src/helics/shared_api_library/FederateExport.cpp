@@ -17,7 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <vector>
 #include <map>
 
-/** this is a random identifier put in place when the federate gets created*/
+/** this is a random identifier put in place when the federate or core or broker gets created*/
 static const int validationIdentifier = 0x2352188;
 
 helics::Federate *getFed (helics_federate fed)
@@ -56,6 +56,7 @@ helics::MessageFederate *getMessageFed (helics_federate fed)
     return nullptr;
 }
 
+
 std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
@@ -65,6 +66,7 @@ std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed)
     }
     return nullptr;
 }
+
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
@@ -77,6 +79,7 @@ std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed
     }
     return nullptr;
 }
+
 std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate fed)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
@@ -90,14 +93,14 @@ std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate
     return nullptr;
 }
 
-masterObjectHolder::masterObjectHolder () noexcept {}
+MasterObjectHolder::MasterObjectHolder () noexcept {}
 
-masterObjectHolder::~masterObjectHolder ()
+MasterObjectHolder::~MasterObjectHolder ()
 {
     deleteAll ();
     std::cout << "end of master Object Holder destructor" << std::endl;
 }
-int masterObjectHolder::addBroker (helics::BrokerObject *broker)
+int MasterObjectHolder::addBroker (helics::BrokerObject *broker)
 {
     std::lock_guard<std::mutex> lock (ObjectLock);
     auto index = static_cast<int> (brokers.size ());
@@ -105,7 +108,7 @@ int masterObjectHolder::addBroker (helics::BrokerObject *broker)
     return index;
 }
 
-int masterObjectHolder::addCore (helics::CoreObject *core)
+int MasterObjectHolder::addCore (helics::CoreObject *core)
 {
     std::lock_guard<std::mutex> lock (ObjectLock);
     auto index = static_cast<int> (cores.size ());
@@ -113,7 +116,7 @@ int masterObjectHolder::addCore (helics::CoreObject *core)
     return index;
 }
 
-int masterObjectHolder::addFed (helics::FedObject *fed)
+int MasterObjectHolder::addFed (helics::FedObject *fed)
 {
     std::lock_guard<std::mutex> lock (ObjectLock);
     auto index = static_cast<int> (feds.size ());
@@ -121,7 +124,7 @@ int masterObjectHolder::addFed (helics::FedObject *fed)
     return index;
 }
 
-void masterObjectHolder::clearBroker (int index)
+void MasterObjectHolder::clearBroker (int index)
 {
     std::lock_guard<std::mutex> lock (ObjectLock);
     if (index < static_cast<int> (brokers.size ()))
@@ -130,7 +133,7 @@ void masterObjectHolder::clearBroker (int index)
     }
 }
 
-void masterObjectHolder::clearCore (int index)
+void MasterObjectHolder::clearCore (int index)
 {
     std::lock_guard<std::mutex> lock (ObjectLock);
     if (index < static_cast<int> (cores.size ()))
@@ -139,7 +142,7 @@ void masterObjectHolder::clearCore (int index)
     }
 }
 
-void masterObjectHolder::clearFed (int index)
+void MasterObjectHolder::clearFed (int index)
 {
     std::lock_guard<std::mutex> lock (ObjectLock);
     if (index < static_cast<int> (feds.size ()))
@@ -148,7 +151,7 @@ void masterObjectHolder::clearFed (int index)
     }
 }
 
-void masterObjectHolder::deleteAll ()
+void MasterObjectHolder::deleteAll ()
 {
     std::lock_guard<std::mutex> lock (ObjectLock);
     for (auto obj : brokers)
@@ -168,9 +171,9 @@ void masterObjectHolder::deleteAll ()
     cores.clear ();
 }
 
-static masterObjectHolder mHolder;
+static MasterObjectHolder mHolder;
 
-masterObjectHolder *getMasterHolder () { return &mHolder; }
+MasterObjectHolder *getMasterHolder () { return &mHolder; }
 
 void clearAllObjects () { mHolder.deleteAll (); }
 
@@ -269,6 +272,7 @@ helics_core helicsFederateGetCoreObject(helics_federate fed)
     }
     auto *core = new helics::CoreObject;
     core->index = getMasterHolder()->addCore(core);
+    core->valid = validationIdentifier;
     core->coreptr = fedObj->getCorePointer();
     return reinterpret_cast<helics_core> (core);
 }
@@ -364,22 +368,22 @@ helics_status helicsFederateEnterExecutionMode (helics_federate fed)
     }
 }
 
-static helics::iteration_request getIterationRequest (iteration_request iterate)
+static helics::helics_iteration_request getIterationRequest (helics_iteration_request iterate)
 {
     switch (iterate)
     {
     case no_iteration:
     default:
-        return helics::iteration_request::no_iterations;
+        return helics::helics_iteration_request::no_iterations;
     case force_iteration:
-        return helics::iteration_request::force_iteration;
+        return helics::helics_iteration_request::force_iteration;
 
     case iterate_if_needed:
-        return helics::iteration_request::iterate_if_needed;
+        return helics::helics_iteration_request::iterate_if_needed;
     }
 }
 
-static iteration_status getIterationStatus (helics::iteration_result iterationState)
+static helics_iteration_status getIterationStatus (helics::iteration_result iterationState)
 {
     switch (iterationState)
     {
@@ -395,7 +399,7 @@ static iteration_status getIterationStatus (helics::iteration_result iterationSt
     }
 }
 
-helics_status helicsFederateEnterExecutionModeIterative (helics_federate fed, iteration_request iterate, iteration_status *outIterate)
+helics_status helicsFederateEnterExecutionModeIterative (helics_federate fed, helics_iteration_request iterate, helics_iteration_status *outIterate)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
@@ -435,7 +439,7 @@ helics_status helicsFederateEnterExecutionModeAsync (helics_federate fed)
     }
 }
 
-helics_status helicsFederateEnterExecutionModeIterativeAsync (helics_federate fed, iteration_request iterate)
+helics_status helicsFederateEnterExecutionModeIterativeAsync (helics_federate fed, helics_iteration_request iterate)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
@@ -470,7 +474,7 @@ helics_status helicsFederateEnterExecutionModeComplete (helics_federate fed)
         return helics_error;
     }
 }
-helics_status helicsFederateEnterExecutionModeIterativeComplete(helics_federate fed, iteration_status *outConverged)
+helics_status helicsFederateEnterExecutionModeIterativeComplete(helics_federate fed, helics_iteration_status *outConverged)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
@@ -503,7 +507,7 @@ helics_status helicsFederateRequestTime (helics_federate fed, helics_time_t requ
     return helics_ok;
 }
 
-helics_status helicsFederateRequestTimeIterative (helics_federate fed, helics_time_t requestTime, iteration_request iterate, helics_time_t *timeOut, iteration_status *outIteration)
+helics_status helicsFederateRequestTimeIterative (helics_federate fed, helics_time_t requestTime, helics_iteration_request iterate, helics_time_t *timeOut, helics_iteration_status *outIteration)
 {
 
     auto fedObj = getFed (fed);
@@ -518,7 +522,7 @@ helics_status helicsFederateRequestTimeIterative (helics_federate fed, helics_ti
             return helics_error;
         }
        *outIteration = getIterationStatus (val.state);
-       *timeOut = static_cast<double>(val.stepTime);
+       *timeOut = static_cast<double>(val.grantedTime);
        return helics_ok;
 
 }
@@ -534,7 +538,7 @@ helics_status helicsFederateRequestTimeAsync (helics_federate fed, helics_time_t
     return helics_ok;
 }
 
-helics_status helicsFederateRequestTimeIterativeAsync (helics_federate fed, helics_time_t requestTime, iteration_request iterate)
+helics_status helicsFederateRequestTimeIterativeAsync (helics_federate fed, helics_time_t requestTime, helics_iteration_request iterate)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
@@ -696,7 +700,7 @@ helics_status helicsFederateGetCurrentTime(helics_federate fed, helics_time_t *t
     return helics_ok;
 }
 
-helics_status helicsFederateRequestTimeIterativeComplete (helics_federate fed, helics_time_t *timeOut, iteration_status *outIteration)
+helics_status helicsFederateRequestTimeIterativeComplete (helics_federate fed, helics_time_t *timeOut, helics_iteration_status *outIteration)
 {
    
     auto fedObj = getFed (fed);
@@ -711,6 +715,6 @@ helics_status helicsFederateRequestTimeIterativeComplete (helics_federate fed, h
         return helics_error;
     }
     *outIteration = getIterationStatus(val.state);
-    *timeOut = static_cast<double>(val.stepTime);
+    *timeOut = static_cast<double>(val.grantedTime);
     return helics_ok;
 }

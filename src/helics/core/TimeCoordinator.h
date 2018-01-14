@@ -135,8 +135,8 @@ public:
 	iteration_state checkExecEntry();
 	
 
-	void timeRequest(Time nextTime, iteration_request iterate, Time newValueTime, Time newMessageTime);
-	void enteringExecMode(iteration_request mode);
+	void timeRequest(Time nextTime, helics_iteration_request iterate, Time newValueTime, Time newMessageTime);
+	void enteringExecMode(helics_iteration_request mode);
 	/** check if it is valid to grant a time*/
 	iteration_state checkTimeGrant();
     /** generate a string with the current time status*/

@@ -142,6 +142,15 @@ class InvalidParameterValue : public std::runtime_error
     InvalidParameterValue (const char *s) : std::runtime_error (s) {}
 };
 
+
+typedef struct 
+{
+public:
+    helics_time_t grantedTime; //!< the time of the granted step
+    helics_iteration_status status;	//!< the convergence state
+                            /** default constructor*/
+}helics_iteration_time;
+
 class Federate
 {
   public:
@@ -150,7 +159,7 @@ class Federate
 
     virtual ~Federate ()
     {
-        helicsFreeFederate (fed);
+        helicsFederateFree (fed);
     }
 
     void enterInitializationState ()
@@ -183,9 +192,9 @@ class Federate
         }
     }
 
-    iteration_status enterExecutionState (iteration_request iterate = no_iteration)
+    helics_iteration_status enterExecutionState (helics_iteration_request iterate = no_iteration)
     {
-        iteration_status out_iterate = next_step;
+        helics_iteration_status out_iterate = next_step;
         if (iterate == no_iteration)
         {
             helicsFederateEnterExecutionMode (fed);
@@ -197,7 +206,7 @@ class Federate
         return out_iterate;
     }
 
-    void enterExecutionStateAsync (iteration_request iterate = no_iteration)
+    void enterExecutionStateAsync (helics_iteration_request iterate = no_iteration)
     {
         if (iterate == no_iteration)
         {
@@ -211,9 +220,9 @@ class Federate
         }
     }
 
-    iteration_status enterExecutionStateComplete ()
+    helics_iteration_status enterExecutionStateComplete ()
     {
-        iteration_status out_iterate = next_step;
+        helics_iteration_status out_iterate = next_step;
         if (exec_async_iterate)
         {
             helicsFederateEnterExecutionModeIterativeComplete (fed, &out_iterate);
@@ -232,12 +241,16 @@ class Federate
 
     helics_time_t requestTime (helics_time_t time)
     {
-        return helicsRequestTime (fed, time);
+        helics_time_t grantedTime;
+        helicsFederateRequestTime (fed, time,&grantedTime);
+        return grantedTime;
     }
 
-    helics_iterative_time requestTimeIterative (helics_time_t time, iteration_request iterate)
+    helics_iteration_time requestTimeIterative (helics_time_t time, helics_iteration_request iterate)
     {
-        return helicsFederateRequestTimeIterative (fed, time, iterate);
+        helics_iteration_time itTime;
+        helicsFederateRequestTimeIterative (fed, time, iterate,&(itTime.grantedTime),&(itTime.status));
+        return itTime;
     }
 
     void requestTimeAsync (helics_time_t time)
@@ -248,7 +261,7 @@ class Federate
         }
     }
 
-    void requestTimeIterativeAsync (helics_time_t time, iteration_request iterate)
+    void requestTimeIterativeAsync (helics_time_t time, helics_iteration_request iterate)
     {
         helicsFederateRequestTimeIterativeAsync (fed, time, iterate);
     }
@@ -258,9 +271,11 @@ class Federate
         return helicsFederateRequestTimeComplete (fed);
     }
 
-    helics_iterative_time requestTimeIterativeFinalize ()
+    helics_iteration_time requestTimeIterativeComplete ()
     {
-        return helicsFederateRequestTimeIterativeComplete (fed);
+        helics_iteration_time itTime;
+        helicsFederateRequestTimeIterativeComplete(fed, &(itTime.grantedTime), &(itTime.status));
+        return itTime;
     }
 
     /** make a query of the core

@@ -11,7 +11,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "../CommsInterface.h"
-#include "../../common/BlockingQueue3.hpp"
+#include "../../common/BlockingQueue.hpp"
 #include <atomic>
 #include <set>
 #include <string>

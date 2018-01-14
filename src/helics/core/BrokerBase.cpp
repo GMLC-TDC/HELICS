@@ -230,7 +230,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     timeCoord = std::make_unique<TimeCoordinator> ();
     timeCoord->setMessageSender ([this](const ActionMessage &msg) { addActionMessage (msg); });
 
-    loggingObj = std::make_unique<logger> ();
+    loggingObj = std::make_unique<Logger> ();
     if (!logFile.empty ())
     {
         loggingObj->openFile (logFile);

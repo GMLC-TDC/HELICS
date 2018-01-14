@@ -153,7 +153,7 @@ class MessageFederateManager
     std::shared_ptr<Core> coreObject;  //!< the pointer to the actual core
     Core::federate_id_t fedID;  //!< storage for the federate ID
     mutable std::mutex endpointLock;  //!< lock for protecting the endpoint list
-    std::vector<simpleQueue<std::unique_ptr<Message>>> messageQueues;  //!< the storage for the message queues
+    std::vector<SimpleQueue<std::unique_ptr<Message>>> messageQueues;  //!< the storage for the message queues
     libguarded::guarded<std::vector<unsigned int>> messageOrder;  //!< maintaining a list of the ordered messages
     int allCallbackIndex = -1;  //!< index of the all callback function
     bool hasSubscriptions = false;  //!< indicator that the message filter subscribes to data values

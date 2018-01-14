@@ -486,12 +486,12 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 {
                     transmit (brk.route_id, m);
                 }
-                timeCoord->enteringExecMode (iteration_request::no_iterations);
+                timeCoord->enteringExecMode (helics_iteration_request::no_iterations);
                 auto res = timeCoord->checkExecEntry ();
                 if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), iteration_request::no_iterations, Time::maxVal (),
+                    timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations, Time::maxVal (),
                                             Time::maxVal ());
                 }
             }
@@ -523,12 +523,12 @@ void CoreBroker::processCommand (ActionMessage &&command)
             transmit (brk.route_id, command);
         }
         {
-            timeCoord->enteringExecMode (iteration_request::no_iterations);
+            timeCoord->enteringExecMode (helics_iteration_request::no_iterations);
             auto res = timeCoord->checkExecEntry ();
             if (res == iteration_state::next_step)
             {
                 enteredExecutionMode = true;
-                timeCoord->timeRequest (Time::maxVal (), iteration_request::no_iterations, Time::maxVal (),
+                timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations, Time::maxVal (),
                                         Time::maxVal ());
             }
         }
@@ -588,7 +588,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), iteration_request::no_iterations, Time::maxVal (),
+                    timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations, Time::maxVal (),
                                             Time::maxVal ());
                 }
             }
@@ -881,7 +881,7 @@ void CoreBroker::initialize (const std::string &initializationString)
 {
     if (brokerState == broker_state_t::created)
     {
-        stringToCmdLine cmdline (initializationString);
+        StringToCmdLine cmdline (initializationString);
         initializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
     }
 }

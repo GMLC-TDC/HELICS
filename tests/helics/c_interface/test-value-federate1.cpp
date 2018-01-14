@@ -534,7 +534,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
     BOOST_CHECK_EQUAL(status, helics_ok);
 	status= helicsPublicationPublishString(pubid, "string1");
     BOOST_CHECK_EQUAL(status, helics_ok);
-	gtime = helicsFederateRequestTime(vFed,1.0);
+	helicsFederateRequestTime(vFed,1.0,&gtime);
 	BOOST_CHECK_EQUAL(gtime, 1.0);
 
 	// get the value
@@ -551,7 +551,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
 	BOOST_CHECK_EQUAL(s, "string1");
 
 	// advance time
-	gtime = helicsFederateRequestTime(vFed, 2.0);
+	helicsFederateRequestTime(vFed, 2.0,&gtime);
 
 	// make sure the value was updated
 	BOOST_CHECK_EQUAL(gtime, 2.0);
@@ -638,7 +638,7 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer_publisher, bdata::make(core_
 	// publish string1 at time=0.0;
 	status = helicsPublicationPublishString(pubid, "string1");
     BOOST_CHECK_EQUAL(status, helics_ok);
-	gtime = helicsFederateRequestTime(vFed, 1.0);
+	helicsFederateRequestTime(vFed, 1.0,&gtime);
 	BOOST_CHECK_EQUAL(gtime, 1.0);
 
 	// get the value
@@ -656,7 +656,7 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer_publisher, bdata::make(core_
     BOOST_CHECK_EQUAL(retValue, 7);
 
 	// advance time
-	gtime = helicsFederateRequestTime(vFed, 2.0);
+	helicsFederateRequestTime(vFed, 2.0,&gtime);
 	// make sure the value was updated
 	BOOST_CHECK_EQUAL(gtime, 2.0);
 	retValue = helicsSubscriptionGetValue(subid, s, 100);

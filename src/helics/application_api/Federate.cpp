@@ -245,7 +245,7 @@ void Federate::enterInitializationStateComplete ()
     }
 }
 
-iteration_result Federate::enterExecutionState (iteration_request iterate)
+iteration_result Federate::enterExecutionState (helics_iteration_request iterate)
 {
     iteration_result res = iteration_result::next_step;
     switch (state)
@@ -293,7 +293,7 @@ iteration_result Federate::enterExecutionState (iteration_request iterate)
     return res;
 }
 
-void Federate::enterExecutionStateAsync (iteration_request iterate)
+void Federate::enterExecutionStateAsync (helics_iteration_request iterate)
 {
     switch (state)
     {
@@ -505,7 +505,7 @@ Time Federate::requestTime (Time nextInternalTimeStep)
     }
 }
 
-iterationTime Federate::requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate)
+iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, helics_iteration_request iterate)
 {
     if (state == op_states::execution)
     {
@@ -514,13 +514,13 @@ iterationTime Federate::requestTimeIterative (Time nextInternalTimeStep, iterati
         switch (iterativeTime.state)
         {
         case iteration_result::next_step:
-            currentTime = iterativeTime.stepTime;
+            currentTime = iterativeTime.grantedTime;
             FALLTHROUGH
         case iteration_result::iterating:
             updateTime (currentTime, oldTime);
             break;
         case iteration_result::halted:
-            currentTime = iterativeTime.stepTime;
+            currentTime = iterativeTime.grantedTime;
             updateTime (currentTime, oldTime);
             state = op_states::finalize;
             break;
@@ -558,7 +558,7 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 /** request a time advancement
 @param[in] the next requested time step
 @return the granted time step*/
-void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
+void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, helics_iteration_request iterate)
 {
     if (state == op_states::execution)
     {
@@ -601,7 +601,7 @@ Time Federate::requestTimeComplete ()
 
 /** finalize the time advancement request
 @return the granted time step*/
-iterationTime Federate::requestTimeIterativeComplete ()
+iteration_time Federate::requestTimeIterativeComplete ()
 {
     if (state == op_states::pending_iterative_time)
     {
@@ -611,13 +611,13 @@ iterationTime Federate::requestTimeIterativeComplete ()
         switch (iterativeTime.state)
         {
         case iteration_result::next_step:
-            currentTime = iterativeTime.stepTime;
+            currentTime = iterativeTime.grantedTime;
             FALLTHROUGH
         case iteration_result::iterating:
             updateTime (currentTime, oldTime);
             break;
         case iteration_result::halted:
-            currentTime = iterativeTime.stepTime;
+            currentTime = iterativeTime.grantedTime;
             updateTime (currentTime, oldTime);
             state = op_states::finalize;
             break;

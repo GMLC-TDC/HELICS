@@ -55,7 +55,7 @@ public:
 };
 
 class TimeCoordinator;
-class logger;
+class Logger;
 /** a shift in the global federate id numbers to allow discrimination between local ids and global ones
 this value allows 65535 federates to be available in each core 
 1,878,982,656 allowable federates in the system and
@@ -107,7 +107,7 @@ private:
 	*/
 	void processPriorityCommand(ActionMessage &&command) override;
 
-	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
+	SimpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
 	/* function to transmit the delayed messages*/
 	void transmitDelayedMessages();
     /**function for routing a message,  it will override the destination id with the specified argument

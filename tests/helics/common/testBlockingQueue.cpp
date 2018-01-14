@@ -17,7 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test data_block and data_view objects
  */
 
-#include "helics/common/BlockingQueue3.hpp"
+#include "helics/common/BlockingQueue.hpp"
 #include "helics/common/blocking_queue.h"
 
 BOOST_AUTO_TEST_SUITE (blocking_queue_tests)

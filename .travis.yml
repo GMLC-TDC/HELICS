@@ -98,13 +98,14 @@ script:
   - make -j2
   # For controlling which tests get run:
   # ctest -I <start>,<end>,<stride>,<list of test numbers>
-  # 1 = core tests
-  # 2 = application api tests
-  # 3 = c interface tests
-  # 4 = helics-apps tests
-  # 5 = travis-tests
+  # 1 = common_tests
+  # 2 = core tests
+  # 3 = application api tests
+  # 4 = c interface tests
+  # 5 = helics-apps tests
+  # 6 = travis-tests
   # - ctest --verbose --timeout 120 -I 0,0,0,1
-  - ctest --verbose --timeout 120 -I 0,0,0,5
+  - ctest --verbose --timeout 120 -I 0,0,0,6
 
 notifications:
     email: false

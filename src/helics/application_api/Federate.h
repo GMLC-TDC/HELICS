@@ -159,11 +159,11 @@ class Federate
 	/** enter the normal execution mode
 	@details call will block until all federates have entered this mode
 	*/
-	iteration_result enterExecutionState (iteration_request iterate = iteration_request::no_iterations);
+	iteration_result enterExecutionState (helics_iteration_request iterate = helics_iteration_request::no_iterations);
 	/** enter the normal execution mode
 	@details call will block until all federates have entered this mode
 	*/
-	void enterExecutionStateAsync (iteration_request iterate = iteration_request::no_iterations);
+	void enterExecutionStateAsync (helics_iteration_request iterate = helics_iteration_request::no_iterations);
 	/** complete the async call for entering Execution state
 	@details call will not block but will return quickly.  The enterInitializationStateFinalize must be called
 	before doing other operations
@@ -197,7 +197,7 @@ class Federate
 	/** request a time advancement
 	@param[in] the next requested time step
 	@return the granted time step*/
-	iterationTime requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate);
+	iteration_time requestTimeIterative (Time nextInternalTimeStep, helics_iteration_request iterate);
 
 	/** request a time advancement
 	@param[in] the next requested time step
@@ -208,7 +208,7 @@ class Federate
 	@param[in] the next requested time step
 	@param iterate a requested iteration level (none, require, optional)
 	@return the granted time step*/
-	void requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate);
+	void requestTimeIterativeAsync (Time nextInternalTimeStep, helics_iteration_request iterate);
 
 	/** request a time advancement
 	@param[in] the next requested time step
@@ -216,8 +216,8 @@ class Federate
 	Time requestTimeComplete ();
 
 	/** finalize the time advancement request
-	@return the granted time step in an iterationTime structure which contains a time and iteration result*/
-	iterationTime requestTimeIterativeComplete ();
+	@return the granted time step in an iteration_time structure which contains a time and iteration result*/
+	iteration_time requestTimeIterativeComplete ();
 
 	/** set the minimum time delta for the federate
 	@param[in] tdelta the minimum time delta to return from a time request function

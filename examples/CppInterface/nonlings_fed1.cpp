@@ -60,9 +60,9 @@ int main (int /*argc*/, char ** /*argv*/)
 
     double x = 0.0, y = 0.0, /*yprv = 100,*/ xprv=100;
     helics_time_t currenttime = 0.0;
-    helics_iteration_status currenttimeiter;
+    helics::helics_iteration_time currenttimeiter;
     currenttimeiter.status = iterating;
-   // int isupdated;
+   // int isUpdated;
     double tol = 1E-8;
 
     vfed->publish (pub, x);

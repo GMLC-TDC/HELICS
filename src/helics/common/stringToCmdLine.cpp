@@ -14,14 +14,14 @@
 #include "stringToCmdLine.h"
 #include "stringOps.h"
 
-stringToCmdLine::stringToCmdLine(const std::string &cmdString)
+StringToCmdLine::StringToCmdLine(const std::string &cmdString)
 {
 	load(cmdString);
 }
 
 static std::string nullstr;
 
-void stringToCmdLine::load (const std::string &cmdString)
+void StringToCmdLine::load (const std::string &cmdString)
 {
 	stringCap = stringOps::splitlineQuotes(cmdString, " \t\n\r", stringOps::default_quote_chars, stringOps::delimiter_compression::on);
 

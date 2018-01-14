@@ -176,7 +176,7 @@ BOOST_DATA_TEST_CASE(simple_player_test_files_cmdline, boost::unit_test::data::m
         brk->connect();
 std::string exampleFile = std::string(TEST_DIR) + "/test_files/"+file;
 
-stringToCmdLine cmdArg("--name=player --broker=ipc_broker --core=ipc " + exampleFile);
+StringToCmdLine cmdArg("--name=player --broker=ipc_broker --core=ipc " + exampleFile);
 
 
 helics::player play1(cmdArg.getArgCount(),cmdArg.getArgV());

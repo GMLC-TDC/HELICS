@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     // Test returning when the finished state is entered
     cmd.setAction (helics::CMD_STOP);
     auto fs_process2 = std::async (std::launch::async,
-                                   [&]() { return fs->enterExecutingState (iteration_request::no_iterations); });
+                                   [&]() { return fs->enterExecutingState (helics_iteration_request::no_iterations); });
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_INITIALIZING);
     fs->addAction (cmd);
     fs->global_id = 0;  // if it doesn't match the id in the command, this will hang
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     // Test returning when an error occurs
     cmd.setAction (helics::CMD_ERROR);
     fs_process2 = std::async (std::launch::async,
-                              [&]() { return fs->enterExecutingState (iteration_request::no_iterations); });
+                              [&]() { return fs->enterExecutingState (helics_iteration_request::no_iterations); });
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_INITIALIZING);
     fs->addAction (cmd);
     fs_process2.wait ();

@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "core-data.h"
 #include "core.h"
 #include "helics-time.h"
-#include "../common/BlockingQueue3.hpp"
+#include "../common/BlockingQueue.hpp"
 #include "helics/helics-config.h"
 #include "core-types.h"
 #include "coreFederateInfo.h"
@@ -214,13 +214,13 @@ private:
 	@param converged indicator of whether the fed should iterate if need be or not
     returns either converged or nonconverged depending on whether an iteration is needed
     */
-    iteration_result enterExecutingState (iteration_request iterate);
+    iteration_result enterExecutingState (helics_iteration_request iterate);
 	/** request a time advancement
 	@param nextTime the time of the requested advancement
 	@param converged set to complete to end dense time step iteration, nonconverged to continue iterating if need be
 	@return an iteration time with two elements the granted time and the convergence state
 	*/
-    iterationTime requestTime (Time nextTime, iteration_request iterate);
+    iteration_time requestTime (Time nextTime, helics_iteration_request iterate);
 	/** function to process the queue in a generic fashion used to just process messages
 	with no specific end in mind
 	*/
@@ -230,7 +230,7 @@ private:
 	/** move a message to the queue*/
 	void addAction(ActionMessage &&action);
 
-	/** log a message to the federate logger
+	/** log a message to the federate Logger
 	@param level the logging level of the message
 	@param logMessageSource- the name of the object that sent the message
 	@param message the message to log

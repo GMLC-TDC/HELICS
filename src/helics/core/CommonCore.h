@@ -31,7 +31,7 @@ class FederateState;
 
 class BasicHandleInfo;
 class FilterCoordinator;
-class logger;
+class Logger;
 class FilterInfo;
 
 enum BasicHandleType:char;
@@ -63,13 +63,13 @@ CommonCore(const std::string &core_name);
   virtual void error (federate_id_t federateID, int errorCode=-1) override final;
   virtual void finalize (federate_id_t federateID) override final;
   virtual void enterInitializingState (federate_id_t federateID) override final;
-  virtual iteration_result enterExecutingState(federate_id_t federateID, iteration_request iterate = NO_ITERATION) override final;
+  virtual iteration_result enterExecutingState(federate_id_t federateID, helics_iteration_request iterate = NO_ITERATION) override final;
   virtual federate_id_t registerFederate (const std::string &name, const CoreFederateInfo &info) override final;
   virtual const std::string &getFederateName (federate_id_t federateID) const override final;
   virtual federate_id_t getFederateId (const std::string &name) override final;
   virtual int32_t getFederationSize () override final;
   virtual Time timeRequest (federate_id_t federateID, Time next) override final;
-  virtual iterationTime requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate) override final;
+  virtual iteration_time requestTimeIterative (federate_id_t federateID, Time next, helics_iteration_request iterate) override final;
   virtual Time getCurrentTime(federate_id_t federateID) const override final;
   virtual uint64_t getCurrentReiteration (federate_id_t federateID) const override final;
   virtual void setMaximumIterations (federate_id_t federateID, int32_t iterations) override final;
@@ -181,7 +181,7 @@ private:
 	
 	std::map<Core::federate_id_t, Core::federate_id_t> global_id_translation; //!< map to translate global ids to local ones
 	std::map<Core::federate_id_t, int32_t> routing_table;  //!< map for external routes  <global federate id, route id>
-	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delays for a certain time
+	SimpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delays for a certain time
 	std::unordered_map<std::string, int32_t> knownExternalEndpoints; //!< external map for all known external endpoints with names and route
 
 	/** actually transmit messages that were delayed until the core was actually registered*/

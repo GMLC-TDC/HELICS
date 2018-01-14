@@ -59,7 +59,7 @@ typedef void *helics_query;
 /** time definition used in the C interface to helics*/
 typedef double helics_time_t;
 
-/** defining a bool type for use in the helics interface*/
+/** defining a boolean type for use in the helics interface*/
 typedef int helics_bool_t;
 
 #define helics_true (1)
@@ -70,7 +70,7 @@ typedef enum {
     no_iteration,  /*!< no iteration is requested */
     force_iteration,  /*!< force iteration return when able */
     iterate_if_needed  /*!< only return an iteration if necessary */
-} iteration_request;
+} helics_iteration_request;
 
 /** enumeration of possible return values from an iterative time request*/
 typedef enum {
@@ -78,7 +78,7 @@ typedef enum {
     iteration_error,  /*!< there was an error */
     iteration_halted,  /*!< the federation has halted */
     iterating  /*!< the federate is iterating at current time */
-} iteration_status;
+} helics_iteration_status;
 
 /** enumeration of possible federate states*/
 typedef enum {

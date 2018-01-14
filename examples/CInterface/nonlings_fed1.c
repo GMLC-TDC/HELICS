@@ -79,8 +79,8 @@ int main ()
 
     double x = 0.0, y = 0.0, /*yprv = 100,*/ xprv=100;
     helics_time_t currenttime = 0.0;
-    helics_iterative_time currenttimeiter;
-    currenttimeiter.status = iterating;
+    helics_iteration_status currenttimeiter;
+    currenttimeiter = iterating;
    // int isupdated;
     double tol = 1E-8;
 
@@ -99,7 +99,7 @@ int main ()
 
     fflush (NULL);
     int helics_iter = 0;
-    while (currenttimeiter.status == iterating)
+    while (currenttimeiter == iterating)
     {
        // yprv = y;
          helicsSubscriptionGetDouble (sub, &y);
@@ -132,7 +132,7 @@ int main ()
             printf("Fed1: publishing new x\n");
         }
         fflush(NULL);
-        currenttimeiter = helicsFederateRequestTimeIterative(vfed, currenttime, iterate_if_needed);
+         helicsFederateRequestTimeIterative(vfed, currenttime, iterate_if_needed,&currenttime,&currenttimeiter);
         xprv = x;
     }
 

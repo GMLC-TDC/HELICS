@@ -56,7 +56,7 @@ void CommonCore::initialize (const std::string &initializationString)
     if ((brokerState ==
          created))  // don't do the compare exchange here since we do that in the initialize fromArgs
     {  // and we can tolerate a spurious call
-        stringToCmdLine cmdline (initializationString);
+        StringToCmdLine cmdline (initializationString);
         initializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
     }
 }
@@ -424,7 +424,7 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
     throw (invalidFunctionCall ("federate already has requested entry to initializing State"));
 }
 
-iteration_result CommonCore::enterExecutingState (federate_id_t federateID, iteration_request iterate)
+iteration_result CommonCore::enterExecutingState (federate_id_t federateID, helics_iteration_request iterate)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -457,9 +457,9 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
         throw (registrationFailure("Core has already moved to operating state"));
     }
     auto fed = std::make_unique<FederateState> (name, info);
-    // setting up the logger
+    // setting up the Logger
     // auto ptr = fed.get();
-    // if we are using the logger, log all messages coming from the federates so they can control the level*/
+    // if we are using the Logger, log all messages coming from the federates so they can control the level*/
     fed->setLogger ([this](int /*level*/, const std::string &ident, const std::string &message) {
         sendToLogger (0, -2, ident, message);
     });
@@ -546,17 +546,17 @@ Time CommonCore::timeRequest (federate_id_t federateID, Time next)
     }
     if (HELICS_EXECUTING == fed->getState ())
     {
-        auto ret = fed->requestTime (next, iteration_request::no_iterations);
+        auto ret = fed->requestTime (next, helics_iteration_request::no_iterations);
         if (ret.state != iteration_result::error)
         {
-            return ret.stepTime;
+            return ret.grantedTime;
         }
         throw (functionExecutionFailure ("federate has an error"));
     }
     throw (invalidFunctionCall ("time request may only be called in execution state"));
 }
 
-iterationTime CommonCore::requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate)
+iteration_time CommonCore::requestTimeIterative (federate_id_t federateID, Time next, helics_iteration_request iterate)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -570,11 +570,11 @@ iterationTime CommonCore::requestTimeIterative (federate_id_t federateID, Time n
     }
 
     // limit the iterations
-    if (iterate == iteration_request::iterate_if_needed)
+    if (iterate == helics_iteration_request::iterate_if_needed)
     {
         if (fed->getCurrentIteration () >= _maxIterations)
         {
-            iterate = iteration_request::no_iterations;
+            iterate = helics_iteration_request::no_iterations;
         }
     }
 
@@ -2025,7 +2025,7 @@ void CommonCore::processCommand (ActionMessage &&command)
                 if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), iteration_request::no_iterations, Time::maxVal (),
+                    timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations, Time::maxVal (),
                                             Time::maxVal ());
                 }
             }
@@ -2421,12 +2421,12 @@ void CommonCore::processCommand (ActionMessage &&command)
                 organizeFilterOperations ();
                 fed->addAction (command);
             }
-            timeCoord->enteringExecMode (iteration_request::no_iterations);
+            timeCoord->enteringExecMode (helics_iteration_request::no_iterations);
             auto res = timeCoord->checkExecEntry ();
             if (res == iteration_state::next_step)
             {
                 enteredExecutionMode = true;
-                timeCoord->timeRequest (Time::maxVal (), iteration_request::no_iterations, Time::maxVal (),
+                timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations, Time::maxVal (),
                                         Time::maxVal ());
             }
         }

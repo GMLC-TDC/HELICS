@@ -98,7 +98,7 @@ int main()
 
     isupdated = 0;
     while(!isupdated) {
-      currenttime = helicsFederateRequestTime(vfed,currenttime);
+      helicsFederateRequestTime(vfed,currenttime, &currenttime);
       isupdated = helicsSubscriptionIsUpdated(sub);
     }
      

@@ -40,13 +40,13 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test)
     vFed1->enterInitializationState ();
     vFed1->publish (pubid, 27.0);
 
-    auto comp = vFed1->enterExecutionState (helics::iteration_request::iterate_if_needed);
+    auto comp = vFed1->enterExecutionState (helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::iterating);
     auto val = vFed1->getValue<double> (subid);
     BOOST_CHECK_EQUAL (val, 27.0);
 
-    comp = vFed1->enterExecutionState (helics::iteration_request::iterate_if_needed);
+    comp = vFed1->enterExecutionState (helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::next_step);
 
@@ -73,13 +73,13 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
     vFed1->enterInitializationStateComplete ();
     vFed1->publish (pubid, 27.0);
     vFed1->enterExecutionStateAsync ();
-    auto comp = vFed2->enterExecutionState (helics::iteration_request::iterate_if_needed);
+    auto comp = vFed2->enterExecutionState (helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::iterating);
     auto val = vFed2->getValue<double> (subid);
     BOOST_CHECK_EQUAL (val, 27.0);
 
-    comp = vFed2->enterExecutionState (helics::iteration_request::iterate_if_needed);
+    comp = vFed2->enterExecutionState (helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::next_step);
 
@@ -104,17 +104,17 @@ BOOST_AUTO_TEST_CASE (time_iteration_test)
     vFed1->enterExecutionState ();
     vFed1->publish (pubid, 27.0);
 
-    auto comp = vFed1->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
+    auto comp = vFed1->requestTimeIterative (1.0, helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp.state == helics::iteration_result::iterating);
-    BOOST_CHECK_EQUAL (comp.stepTime, helics::timeZero);
+    BOOST_CHECK_EQUAL (comp.grantedTime, helics::timeZero);
     auto val = vFed1->getValue<double> (subid);
     BOOST_CHECK_EQUAL (val, 27.0);
 
-    comp = vFed1->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
+    comp = vFed1->requestTimeIterative (1.0, helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp.state == helics::iteration_result::next_step);
-    BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
+    BOOST_CHECK_EQUAL (comp.grantedTime, 1.0);
     auto val2 = vFed1->getValue<double> (subid);
 
     BOOST_CHECK_EQUAL (val2, val);
@@ -141,17 +141,17 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
     vFed1->publish (pubid, 27.0);
 
     vFed1->requestTimeAsync (1.0);
-    auto comp = vFed2->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
+    auto comp = vFed2->requestTimeIterative (1.0, helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp.state == helics::iteration_result::iterating);
-    BOOST_CHECK_EQUAL (comp.stepTime, helics::timeZero);
+    BOOST_CHECK_EQUAL (comp.grantedTime, helics::timeZero);
     auto val = vFed2->getValue<double> (subid);
     BOOST_CHECK_EQUAL (val, 27.0);
 
-    comp = vFed2->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
+    comp = vFed2->requestTimeIterative (1.0, helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp.state == helics::iteration_result::next_step);
-    BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
+    BOOST_CHECK_EQUAL (comp.grantedTime, 1.0);
     auto val2 = vFed2->getValue<double> (subid);
     vFed1->requestTimeComplete ();
 
@@ -179,19 +179,19 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     pub1.publish (27.0);
 
     vFed1->requestTimeAsync (1.0);
-    auto comp = vFed2->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
+    auto comp = vFed2->requestTimeIterative (1.0, helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp.state == helics::iteration_result::iterating);
-    BOOST_CHECK_EQUAL (comp.stepTime, helics::timeZero);
+    BOOST_CHECK_EQUAL (comp.grantedTime, helics::timeZero);
 
     BOOST_CHECK (sub1.isUpdated ());
     auto val = sub1.getValue<double> ();
     BOOST_CHECK_EQUAL (val, 27.0);
     BOOST_CHECK (!sub1.isUpdated ());
-    comp = vFed2->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
+    comp = vFed2->requestTimeIterative (1.0, helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp.state == helics::iteration_result::next_step);
-    BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
+    BOOST_CHECK_EQUAL (comp.grantedTime, 1.0);
     BOOST_CHECK (!sub1.isUpdated ());
     auto val2 = sub1.getValue<double> ();
     vFed1->requestTimeComplete ();
@@ -239,28 +239,28 @@ BOOST_AUTO_TEST_CASE (test_iteration_counter)
             pub2.publish (c2);
         }
 
-        vFed1->requestTimeIterativeAsync (1.0, helics::iteration_request::iterate_if_needed);
-        auto res = vFed2->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
+        vFed1->requestTimeIterativeAsync (1.0, helics::helics_iteration_request::iterate_if_needed);
+        auto res = vFed2->requestTimeIterative (1.0, helics::helics_iteration_request::iterate_if_needed);
         if (c1 <= 10)
         {
             BOOST_CHECK (res.state == helics::iteration_result::iterating);
-            BOOST_CHECK_EQUAL (res.stepTime, 0.0);
+            BOOST_CHECK_EQUAL (res.grantedTime, 0.0);
         }
         else
         {
             BOOST_CHECK (res.state == helics::iteration_result::next_step);
-            BOOST_CHECK_EQUAL (res.stepTime, 1.0);
+            BOOST_CHECK_EQUAL (res.grantedTime, 1.0);
         }
         res = vFed1->requestTimeIterativeComplete ();
         if (c1 <= 10)
         {
             BOOST_CHECK (res.state == helics::iteration_result::iterating);
-            BOOST_CHECK_EQUAL (res.stepTime, 0.0);
+            BOOST_CHECK_EQUAL (res.grantedTime, 0.0);
         }
         else
         {
             BOOST_CHECK (res.state == helics::iteration_result::next_step);
-            BOOST_CHECK_EQUAL (res.stepTime, 1.0);
+            BOOST_CHECK_EQUAL (res.grantedTime, 1.0);
         }
     }
 }

@@ -36,7 +36,7 @@ class Broker
 
     virtual ~Broker ()
     {
-        helicsFreeBroker (broker);
+        helicsBrokerFree (broker);
     }
 
     bool isConnected ()

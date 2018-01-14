@@ -13,15 +13,15 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <string>
 
 
-
+/** enumeration of the possible federate states*/
 enum helics_federate_state_type
 {
-	HELICS_CREATED,
-	HELICS_INITIALIZING,
-	HELICS_EXECUTING,
-	HELICS_ERROR,
-	HELICS_FINISHED,
-	HELICS_NONE,
+	HELICS_CREATED,  /*!> state upon creation, all registration calls are allowed*/
+	HELICS_INITIALIZING,    //!< the federation has entered initialization state and initial values can be published
+	HELICS_EXECUTING,   //!< the federation has entered execution state and it now advancing in time
+	HELICS_ERROR,   //!< the federation has encountered an error
+	HELICS_FINISHED,    //!< the federation has finished its execution
+	HELICS_NONE,    //!< unknown state
 };
 
 enum helics_time_unit
@@ -65,7 +65,7 @@ enum class iteration_state :signed char
 
 };
 
-/** enumeration of the possible states of convergence*/
+/** enumeration of the possible states of iteration*/
 enum class iteration_result :signed char
 {
 	error = -5,		//!< indicator that an error has occurred
@@ -74,18 +74,18 @@ enum class iteration_result :signed char
 	halted = 3,	//!< indicator that the simulation has been halted
 };
 
-/** enumeration of the possible states of convergence*/
-enum class iteration_request :signed char
+/** enumeration of the possible iteration requests by a federate*/
+enum class helics_iteration_request :signed char
 {
 	no_iterations = 0,  //!< indicator that the iterations have completed
 	force_iteration = 1, //!< force an iteration whether it is needed or not
 	iterate_if_needed = 2,	//!< indicator that the iterations need to continue
 };
 
-#define ITERATION_COMPLETE helics::iteration_request::no_iterations
-#define NO_ITERATION helics::iteration_request::no_iterations
-#define FORCE_ITERATION helics::iteration_request::force_iteration
-#define ITERATE_IF_NEEDED helics::iteration_request::iterate_if_needed
+#define ITERATION_COMPLETE helics::helics_iteration_request::no_iterations
+#define NO_ITERATION helics::helics_iteration_request::no_iterations
+#define FORCE_ITERATION helics::helics_iteration_request::force_iteration
+#define ITERATE_IF_NEEDED helics::helics_iteration_request::iterate_if_needed
 
 /** defining some check modes for dealing with required or optional components*/
 enum class handle_check_mode : char
@@ -107,7 +107,7 @@ core_type coreTypeFromString(std::string type);
 /**
 * Returns true if core/broker type specified is available in current compilation.
 */
-bool isAvailable(core_type type);
+bool isCoreTypeAvailable(core_type type) noexcept;
 
 }
 

@@ -71,9 +71,8 @@ helicsFederateRegisterDestinationFilter (helics_federate fed, const char *name, 
 
 helics_source_filter helicsCoreRegisterSourceFilter(helics_core cr, const char *name, const char *inputType, const char *outputType)
 {
-    // now generate a generic subscription
-    auto fedObj = getFedSharedPtr(fed);
-    if (!fedObj)
+    auto core = getCoreSharedPtr(cr);
+    if (!core)
     {
         return nullptr;
     }
@@ -82,9 +81,9 @@ helics_source_filter helicsCoreRegisterSourceFilter(helics_core cr, const char *
     {
         filt = new helics::SourceFilterObject();
         filt->filtptr =
-            std::make_unique<helics::SourceFilter>(fedObj.get(), (name != nullptr) ? std::string(name) : nullstr, (inputType != nullptr) ? std::string(inputType) : nullstr,
+            std::make_unique<helics::SourceFilter>(core.get(), (name != nullptr) ? std::string(name) : nullstr, (inputType != nullptr) ? std::string(inputType) : nullstr,
             (outputType != nullptr) ? std::string(outputType) : nullstr);
-        filt->fedptr = std::move(fedObj);
+        filt->corePtr = std::move(core);
         return reinterpret_cast<helics_source_filter> (filt);
     }
     catch (const helics::InvalidFunctionCall &)
@@ -95,11 +94,10 @@ helics_source_filter helicsCoreRegisterSourceFilter(helics_core cr, const char *
 }
 
 helics_destination_filter
-helicsCoreRegisterDestinationFilter(helics_federate fed, const char *name, const char *inputType, const char *outputType)
+helicsCoreRegisterDestinationFilter(helics_core cr, const char *name, const char *inputType, const char *outputType)
 {
-    // now generate a generic subscription
-    auto fedObj = getFedSharedPtr(fed);
-    if (!fedObj)
+    auto core = getCoreSharedPtr(cr);
+    if (!core)
     {
         return nullptr;
     }
@@ -107,11 +105,70 @@ helicsCoreRegisterDestinationFilter(helics_federate fed, const char *name, const
     try
     {
         filt = new helics::DestFilterObject();
-        filt->filtptr = std::make_unique<helics::DestinationFilter>(fedObj.get(), (name != nullptr) ? std::string(name) : nullstr,
+        filt->filtptr = std::make_unique<helics::DestinationFilter>(core.get(), (name != nullptr) ? std::string(name) : nullstr,
             (inputType != nullptr) ? std::string(inputType) : nullstr,
             (outputType != nullptr) ? std::string(outputType) : nullstr);
-        filt->fedptr = std::move(fedObj);
+        filt->corePtr = std::move(core);
         return reinterpret_cast<helics_destination_filter> (filt);
+    }
+    catch (const helics::InvalidFunctionCall &)
+    {
+        delete filt;
+    }
+    return nullptr;
+}
+
+
+helics_cloning_filter
+helicsFederateRegisterCloningFilter(helics_federate fed, const char *deliveryEndpoint)
+{
+    auto fedObj = getFedSharedPtr(fed);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+
+    helics::CloningFilterObject *filt = nullptr;
+    try
+    {
+        filt = new helics::CloningFilterObject();
+        filt->filtptr = std::make_unique<helics::CloningFilter>(fedObj.get());
+        if (deliveryEndpoint != nullptr)
+        {
+            filt->filtptr->addDeliveryEndpoint(deliveryEndpoint);
+        }
+
+        filt->fedptr = std::move(fedObj);
+        return reinterpret_cast<helics_cloning_filter> (filt);
+    }
+    catch (const helics::InvalidFunctionCall &)
+    {
+        delete filt;
+    }
+    return nullptr;
+}
+
+helics_cloning_filter
+helicsCoreRegisterCloningFilter(helics_core cr, const char *deliveryEndpoint)
+{
+
+    auto core = getCoreSharedPtr(cr);
+    if (!core)
+    {
+        return nullptr;
+    }
+    helics::CloningFilterObject *filt = nullptr;
+    try
+    {
+        filt = new helics::CloningFilterObject();
+        filt->filtptr = std::make_unique<helics::CloningFilter>(core.get());
+        if (deliveryEndpoint != nullptr)
+        {
+            filt->filtptr->addDeliveryEndpoint(deliveryEndpoint);
+        }
+
+        filt->corePtr = std::move(core);
+        return reinterpret_cast<helics_cloning_filter> (filt);
     }
     catch (const helics::InvalidFunctionCall &)
     {

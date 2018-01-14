@@ -152,7 +152,7 @@ class Core
      @return nonconverged if the executing state has not been entered and there are updates, complete if the
      simulation is ready to move on to the executing state
      */
-    virtual iteration_result enterExecutingState (federate_id_t federateID, iteration_request iterate = NO_ITERATION) = 0;
+    virtual iteration_result enterExecutingState (federate_id_t federateID, helics_iteration_request iterate = NO_ITERATION) = 0;
 
     /**
      * Register a federate.
@@ -228,9 +228,9 @@ class Core
      *@param federateID the identifier for the federate to process
      * @param next the requested time
      * @param localConverged has the local federate converged
-     @return an iterationTime object with two field stepTime and a enumeration indicating the state of the iteration
+     @return an iteration_time object with two field grantedTime and a enumeration indicating the state of the iteration
      */
-    virtual iterationTime requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate) = 0;
+    virtual iteration_time requestTimeIterative (federate_id_t federateID, Time next, helics_iteration_request iterate) = 0;
 
     /**
      * Returns the current reiteration count for the specified federate.
@@ -586,7 +586,7 @@ class Core
 
     /** define a logging function to use for logging message and notices from the federation and individual
     federate
-    @param federateID  the identifier for the individual federate or 0 for the Core logger
+    @param federateID  the identifier for the individual federate or 0 for the Core Logger
     @param logFunction the callback function for doing something with a log message
     it takes 3 inputs an integer for logLevel 0-4+  0 -error, 1- warning 2-status, 3-debug 44trace
     A string indicating the source of the message and another string with the actual message

@@ -28,7 +28,7 @@ and some common methods used cores and brokers
 namespace helics
 {
 
-class logger;
+class Logger;
 class TimeCoordinator;
 /** base class for broker like objects
 */
@@ -47,7 +47,7 @@ protected:
     int32_t timeout = 30000;  //!< timeout to wait to establish a broker connection before giving up in milliseconds
     std::string identifier;  //!< an identifier for the broker
 
-	std::unique_ptr<logger> loggingObj;  //!< default logging object to use if the logging callback is not specified
+	std::unique_ptr<Logger> loggingObj;  //!< default logging object to use if the logging callback is not specified
 	std::thread _queue_processing_thread;  //!< thread for running the broker
 										   /** a logging function for logging or printing messages*/
 	std::function<void(int, const std::string &, const std::string &)> loggerFunction;

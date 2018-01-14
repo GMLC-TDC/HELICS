@@ -89,7 +89,7 @@ int main()
     printf("PI SENDER: Sending value %3.2fpi = %4.3f at time %3.2f to PI RECEIVER\n",deltat*i,val,currenttime);
     helicsPublicationPublishDouble(pub,val);
 
-    currenttime = helicsFederateRequestTime(vfed,currenttime);
+    helicsFederateRequestTime(vfed,currenttime, &currenttime);
   }
 
   helicsFederateFinalize(vfed);

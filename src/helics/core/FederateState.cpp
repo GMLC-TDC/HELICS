@@ -453,7 +453,7 @@ iteration_result FederateState::enterInitState ()
     return ret;
 }
 
-iteration_result FederateState::enterExecutingState (iteration_request iterate)
+iteration_result FederateState::enterExecutingState (helics_iteration_request iterate)
 {
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
@@ -495,7 +495,7 @@ iteration_result FederateState::enterExecutingState (iteration_request iterate)
     return ret;
 }
 
-iterationTime FederateState::requestTime (Time nextTime, iteration_request iterate)
+iteration_time FederateState::requestTime (Time nextTime, helics_iteration_request iterate)
 {
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
@@ -508,7 +508,7 @@ iterationTime FederateState::requestTime (Time nextTime, iteration_request itera
         time_granted = timeCoord->getGrantedTime ();
         iterating = (ret == iteration_state::iterating);
 
-        iterationTime retTime = {time_granted, static_cast<iteration_result> (ret)};
+        iteration_time retTime = {time_granted, static_cast<iteration_result> (ret)};
         // now fill the event vector so external systems know what has been updated
         fillEventVector (time_granted);
         processing = false;
@@ -529,7 +529,7 @@ iterationTime FederateState::requestTime (Time nextTime, iteration_request itera
     {
         ret = iteration_result::error;
     }
-    iterationTime retTime = {time_granted, ret};
+    iteration_time retTime = {time_granted, ret};
     processing = false;
     return retTime;
 }

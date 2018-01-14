@@ -54,7 +54,7 @@ int main(int /*argc*/,char ** /*argv*/)
 
   fflush(NULL);
   helics_time_t currenttime=0.0;
-  helics_iterative_time currenttimeiter;
+  helics::helics_iteration_time currenttimeiter;
   currenttimeiter.status = iterating;
 
  // int           isupdated;

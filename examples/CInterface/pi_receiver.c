@@ -74,7 +74,7 @@ int main()
   int isupdated=0; 
 
   while(currenttime < 0.20) {
-    currenttime = helicsFederateRequestTime(vfed,currenttime);
+    helicsFederateRequestTime(vfed,currenttime,&currenttime);
 
     isupdated = helicsSubscriptionIsUpdated(sub);
     if(isupdated) {

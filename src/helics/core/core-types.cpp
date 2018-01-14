@@ -86,10 +86,10 @@ core_type coreTypeFromString (std::string type)
     {
         return core_type::MPI;
     }
-    throw (std::invalid_argument ("unrecognized core type"));
+    return core_type::UNRECOGNIZED;
 }
 
-bool isAvailable (core_type type)
+bool isCoreTypeAvailable (core_type type) noexcept
 {
     bool available = false;
 
@@ -121,6 +121,9 @@ bool isAvailable (core_type type)
 #else
         available = true;
 #endif
+        break;
+    case core_type::DEFAULT: //default should always be available
+        available = true;
         break;
     default:
         break;

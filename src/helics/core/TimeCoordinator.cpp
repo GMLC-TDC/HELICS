@@ -24,13 +24,13 @@ TimeCoordinator::TimeCoordinator (const CoreFederateInfo &info_) : info (info_)
     }
 }
 
-void TimeCoordinator::enteringExecMode (iteration_request mode)
+void TimeCoordinator::enteringExecMode (helics_iteration_request mode)
 {
     if (executionMode)
     {
         return;
     }
-    iterating = (mode != iteration_request::no_iterations);
+    iterating = (mode != helics_iteration_request::no_iterations);
     checkingExec = true;
     if ((!dependents.empty ()) && (sendMessageFunction))
     {
@@ -45,11 +45,11 @@ void TimeCoordinator::enteringExecMode (iteration_request mode)
 }
 
 void TimeCoordinator::timeRequest (Time nextTime,
-                                   iteration_request iterate,
+                                   helics_iteration_request iterate,
                                    Time newValueTime,
                                    Time newMessageTime)
 {
-    iterating = (iterate != iteration_request::no_iterations);
+    iterating = (iterate != helics_iteration_request::no_iterations);
     if (nextTime <= time_granted)
     {
         nextTime = time_granted + info.timeDelta;

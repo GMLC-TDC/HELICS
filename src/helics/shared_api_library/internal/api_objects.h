@@ -45,6 +45,7 @@ namespace helics
 	public:
 		std::shared_ptr<Broker> brokerptr;
         int index;
+        int valid;
 	};
 
 	/** object wrapping a core for the c-api*/
@@ -53,6 +54,7 @@ namespace helics
 	public:
 		std::shared_ptr<Core> coreptr;
         int index;
+        int valid;
 	};
 	
     
@@ -146,14 +148,16 @@ namespace helics
 
 helics::Federate *getFed(helics_federate fed);
 helics::ValueFederate *getValueFed(helics_federate fed);
-helics::MessageFederate *getMessageFed(helics_message_federate fed);
+helics::MessageFederate *getMessageFed(helics_federate fed);
+helics::Core *getCore(helics_core core);
 
 std::shared_ptr<helics::Federate> getFedSharedPtr(helics_federate fed);
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(helics_federate fed);
-std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(helics_message_federate fed);
+std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(helics_federate fed);
+std::shared_ptr<helics::Core> getCoreSharedPtr(helics_core core);
 
 /** class for containing all the objects associated with a federation*/
-class masterObjectHolder
+class MasterObjectHolder
 {
 private:
     std::mutex ObjectLock;
@@ -161,8 +165,8 @@ private:
     std::vector<helics::CoreObject *> cores;
     std::vector<helics::FedObject *> feds;
 public:
-    masterObjectHolder() noexcept;
-    ~masterObjectHolder();
+    MasterObjectHolder() noexcept;
+    ~MasterObjectHolder();
     int addBroker(helics::BrokerObject * broker);
     int addCore(helics::CoreObject *core);
     int addFed(helics::FedObject *fed);
@@ -172,7 +176,7 @@ public:
     void deleteAll();
 };
 
-masterObjectHolder *getMasterHolder();
+MasterObjectHolder *getMasterHolder();
 void clearAllObjects();
 
 #endif

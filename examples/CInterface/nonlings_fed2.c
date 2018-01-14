@@ -66,13 +66,13 @@ int main()
 
   fflush(NULL);
   helics_time_t currenttime=0.0;
-  helics_iterative_time currenttimeiter;
-  currenttimeiter.status = iterating;
+  helics_iteration_status currenttimeiter;
+  currenttimeiter = iterating;
 
  // int           isupdated;
   double tol=1E-8;
   int helics_iter = 0;
-  while (currenttimeiter.status==iterating)
+  while (currenttimeiter==iterating)
   {
 
    // xprv = x;
@@ -106,7 +106,7 @@ int main()
       printf("Fed2: publishing y\n");
     }
     fflush(NULL);
-    currenttimeiter = helicsFederateRequestTimeIterative(vfed, currenttime, iterate_if_needed);
+    helicsFederateRequestTimeIterative(vfed, currenttime, iterate_if_needed,&currenttime,&currenttimeiter);
     yprv = y;
   }
 

@@ -42,6 +42,11 @@ Common Functions
 
 HELICS_Export const char *helicsGetVersion ();
 
+/**
+* Returns true if core/broker type specified is available in current compilation.
+*/
+HELICS_Export helics_bool_t helicsIsCoreTypeAvailable(const char *type);
+
 /** create a core object
 @param type the type of the core to create
 @param name the name of the core , may be a nullptr or empty string to have a name automatically assigned
@@ -275,11 +280,11 @@ HELICS_Export helics_status helicsFederateEnterExecutionModeAsync(helics_federat
 */
 HELICS_Export helics_status helicsFederateEnterExecutionModeComplete(helics_federate fed);
 
-HELICS_Export helics_status helicsFederateEnterExecutionModeIterative (helics_federate fed, iteration_request iterate, iteration_status *outIterate);
-HELICS_Export helics_status helicsFederateEnterExecutionModeIterativeAsync (helics_federate fed, iteration_request iterate);
+HELICS_Export helics_status helicsFederateEnterExecutionModeIterative (helics_federate fed, helics_iteration_request iterate, helics_iteration_status *outIterate);
+HELICS_Export helics_status helicsFederateEnterExecutionModeIterativeAsync (helics_federate fed, helics_iteration_request iterate);
 
 
-HELICS_Export helics_status helicsFederateEnterExecutionModeIterativeComplete (helics_federate fed, iteration_status *outIterate);
+HELICS_Export helics_status helicsFederateEnterExecutionModeIterativeComplete (helics_federate fed, helics_iteration_status *outIterate);
 
 /** get the current state of a federate
 @param fed the fed to query
@@ -308,15 +313,15 @@ and return a time and iteration status
 @param[out] outIterate  the iteration specification of the result
 @return a helics_status object with a return code of the result
 */
-HELICS_Export helics_status helicsFederateRequestTimeIterative (helics_federate fed, helics_time_t requestTime, iteration_request iterate, helics_time_t *timeOut, iteration_status *outIterate);
+HELICS_Export helics_status helicsFederateRequestTimeIterative (helics_federate fed, helics_time_t requestTime, helics_iteration_request iterate, helics_time_t *timeOut, helics_iteration_status *outIterate);
 
 HELICS_Export helics_status helicsFederateRequestTimeAsync (helics_federate fed, helics_time_t requestTime);
 
 HELICS_Export helics_status helicsFederateRequestTimeComplete (helics_federate fed);
 
-HELICS_Export helics_status helicsFederateRequestTimeIterativeAsync(helics_federate fed, helics_time_t requestTime, iteration_request iterate);
+HELICS_Export helics_status helicsFederateRequestTimeIterativeAsync(helics_federate fed, helics_time_t requestTime, helics_iteration_request iterate);
 
-HELICS_Export helics_status helicsFederateRequestTimeIterativeComplete (helics_federate fed, helics_time_t *timeOut, iteration_status *outIterate);
+HELICS_Export helics_status helicsFederateRequestTimeIterativeComplete (helics_federate fed, helics_time_t *timeOut, helics_iteration_status *outIterate);
 
 /** get the name of the federate 
 @param fed the federate object to query
