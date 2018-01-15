@@ -21,11 +21,12 @@ namespace helics
  * Class represents time in the core.
  */
 
-using Time = timeRepresentation<count_time<9>>;
+using Time = TimeRepresentation<count_time<9>>;
 
 
 constexpr Time timeZero = Time::zeroVal();
 constexpr Time timeEpsilon = Time::epsilon();
+constexpr Time negEpsilon = -Time::epsilon();
 
 constexpr Time operator "" _t(long double val)
 {
@@ -33,15 +34,15 @@ constexpr Time operator "" _t(long double val)
 }
 
 /** simple struct with the time and completion marker for iterations or dense time steps*/
-struct iterationTime
+struct iteration_time
 {
 public:
-	Time stepTime; //!< the time of the granted step
+	Time grantedTime; //!< the time of the granted step
 	iteration_result state;	//!< the convergence state
 	/** default constructor*/
-    iterationTime()=default;
+    iteration_time()=default;
 	/** construct from properties*/
-	constexpr iterationTime(Time t, iteration_result iterate) noexcept:stepTime(t), state(iterate)
+	constexpr iteration_time(Time t, iteration_result iterate) noexcept:grantedTime(t), state(iterate)
 	{};
 };
 }

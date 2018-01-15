@@ -31,6 +31,21 @@ static const std::string versionStr (std::to_string (HELICS_VERSION_MAJOR) + "."
 
 const char *helicsGetVersion (void) { return versionStr.c_str (); }
 
+
+helics_bool_t helicsIsCoreTypeAvailable(const char *type)
+{
+    if (type == nullptr)
+    {
+        return helics_false;
+    }
+    auto coreType = helics::coreTypeFromString(type);
+    return (helics::isCoreTypeAvailable(coreType)) ? helics_true : helics_false;
+}
+
+/** this is a random identifier put in place when the federate or core or broker gets created*/
+static const int coreValidationIdentifier = 0x378424EC;
+static const int brokerValidationIdentifier=0xA3467D20;
+
 helics_federate_info_t helicsFederateInfoCreate ()
 {
     auto *fi = new helics::FederateInfo;
@@ -41,54 +56,67 @@ void helicsFederateInfoFree (helics_federate_info_t fi) { delete reinterpret_cas
 
 static const std::string nullstr;
 
-helicsStatus helicsFederateInfoSetFederateName (helics_federate_info_t fi, const char *name)
+
+helics_status helicsFederateInfoLoadFromArgs(helics_federate_info_t fi, int argc, const char * const *argv)
 {
     if (fi == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_discard;
+    }
+    auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
+    hfi->loadInfoFromArgs(argc, argv);
+    return helics_ok;
+}
+
+helics_status helicsFederateInfoSetFederateName (helics_federate_info_t fi, const char *name)
+{
+    if (fi == nullptr)
+    {
+        return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->name = (name != nullptr) ? std::string(name) : nullstr;
-    return helicsOK;
+    return helics_ok;
 }
-helicsStatus helicsFederateInfoSetCoreName(helics_federate_info_t fi, const char *corename)
+helics_status helicsFederateInfoSetCoreName(helics_federate_info_t fi, const char *corename)
 {
     if (fi == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
 	hfi->coreName= (corename != nullptr) ? std::string(corename) : nullstr;
     
-    return helicsOK;
+    return helics_ok;
 }
-helicsStatus helicsFederateInfoSetCoreInitString (helics_federate_info_t fi, const char *coreinit)
+
+helics_status helicsFederateInfoSetCoreInitString (helics_federate_info_t fi, const char *coreinit)
 {
     if (fi == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
 	hfi->coreInitString= (coreinit != nullptr) ? std::string(coreinit) : nullstr;
-    return helicsOK;
+    return helics_ok;
 }
 
-helicsStatus helicsFederateInfoSetCoreType (helics_federate_info_t fi, int coretype)
+helics_status helicsFederateInfoSetCoreType (helics_federate_info_t fi, int coretype)
 {
     if (fi == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->coreType = static_cast<helics::core_type> (coretype);
-    return helicsOK;
+    return helics_ok;
 }
 
-helicsStatus helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi, const char *coretype)
+helics_status helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi, const char *coretype)
 {
     if (fi == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     try
@@ -104,16 +132,16 @@ helicsStatus helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi,
     }
     catch (const std::invalid_argument &ie)
     {
-        return helicsError;
+        return helics_error;
     }
-    return helicsOK;
+    return helics_ok;
 }
 
-helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int value)
+helics_status helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, helics_bool_t value)
 {
     if (fi == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     switch (flag)
@@ -143,164 +171,244 @@ helicsStatus helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, int
 		hfi->wait_for_current_time_updates = (value != 0);
 		break;
     default:
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
-    return helicsOK;
+    return helics_ok;
 }
-helicsStatus helicsFederateInfoSetLookahead (helics_federate_info_t fi, helics_time_t lookahead)
+helics_status helicsFederateInfoSetOutputDelay (helics_federate_info_t fi, helics_time_t outputDelay)
 {
     if (fi == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->lookAhead = lookahead;
-    return helicsOK;
+    hfi->outputDelay = outputDelay;
+    return helics_ok;
 }
 
-helicsStatus helicsFederateInfoSetTimeDelta (helics_federate_info_t fi, helics_time_t timeDelta)
+helics_status helicsFederateInfoSetTimeDelta (helics_federate_info_t fi, helics_time_t timeDelta)
 {
     if (fi == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->timeDelta = timeDelta;
-    return helicsOK;
+    return helics_ok;
 }
 
-helicsStatus helicsFederateInfoSetImpactWindow (helics_federate_info_t fi, helics_time_t impactWindow)
+helics_status helicsFederateInfoSetInputDelay (helics_federate_info_t fi, helics_time_t inputDelay)
 {
     if (fi == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->impactWindow = impactWindow;
-    return helicsOK;
+    hfi->inputDelay = inputDelay;
+    return helics_ok;
 }
-helicsStatus helicsFederateInfoSetTimeOffset (helics_federate_info_t fi, helics_time_t timeOffset)
+helics_status helicsFederateInfoSetTimeOffset (helics_federate_info_t fi, helics_time_t timeOffset)
 {
     if (fi == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->offset = timeOffset;
-    return helicsOK;
+    return helics_ok;
 }
-helicsStatus helicsFederateInfoSetPeriod (helics_federate_info_t fi, helics_time_t period)
+helics_status helicsFederateInfoSetPeriod (helics_federate_info_t fi, helics_time_t period)
 {
     if (fi == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
 	if (period < 0)
 	{
-		return helicsDiscard;
+		return helics_discard;
 	}
     hfi->period = period;
-    return helicsOK;
+    return helics_ok;
 }
 
-helicsStatus helicsFederateInfoSetLoggingLevel (helics_federate_info_t fi, int logLevel)
+helics_status helicsFederateInfoSetLoggingLevel (helics_federate_info_t fi, int logLevel)
 {
     if (fi == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->logLevel = logLevel;
-    return helicsOK;
+    return helics_ok;
 }
 
-helicsStatus helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int max_iterations)
+helics_status helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int maxIterations)
 {
     if (fi == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->max_iterations = max_iterations;
-    return helicsOK;
+    hfi->maxIterations = maxIterations;
+    return helics_ok;
+}
+
+
+helics::Core *getCore(helics_core core)
+{
+    auto CoreObj = reinterpret_cast<helics::CoreObject *> (core);
+    if (CoreObj->valid == coreValidationIdentifier)
+    {
+        return CoreObj->coreptr.get();
+    }
+    return nullptr;
+}
+
+std::shared_ptr<helics::Core> getCoreSharedPtr(helics_core core)
+{
+    auto CoreObj = reinterpret_cast<helics::CoreObject *> (core);
+    if (CoreObj->valid == coreValidationIdentifier)
+    {
+        return CoreObj->coreptr;
+    }
+    return nullptr;
+}
+
+helics::Broker *getBroker(helics_broker broker)
+{
+    auto BrokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
+    if (BrokerObj->valid == brokerValidationIdentifier)
+    {
+        return BrokerObj->brokerptr.get();
+    }
+    return nullptr;
+}
+
+std::shared_ptr<helics::Broker> getBrokerSharedPtr(helics_broker broker)
+{
+    auto BrokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
+    if (BrokerObj->valid == brokerValidationIdentifier)
+    {
+        return BrokerObj->brokerptr;
+    }
+    return nullptr;
 }
 
 helics_core helicsCreateCore (const char *type, const char *name, const char *initString)
 {
+
+    helics::core_type ct;
+    try
+    {
+        ct = (type != nullptr) ? helics::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    }
+    catch (const std::invalid_argument &ie)
+    {
+        return nullptr;
+    }
     auto *core = new helics::CoreObject;
-    core->index = getMasterHolder ()->addCore (core);
-    auto ct = (type != nullptr) ? helics::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    core->index = getMasterHolder()->addCore(core);
+    core->valid = coreValidationIdentifier;
     core->coreptr = helics::CoreFactory::FindOrCreate (ct, (name!=nullptr)?std::string(name):nullstr, (initString!=nullptr)?std::string(initString):nullstr);
     return reinterpret_cast<helics_core> (core);
 }
 
 helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, const char *const *argv)
 {
+    helics::core_type ct;
+    try
+    {
+        ct = (type != nullptr) ? helics::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    }
+    catch (const std::invalid_argument &ie)
+    {
+        return nullptr;
+    }
     auto *core = new helics::CoreObject;
     core->index = getMasterHolder ()->addCore (core);
-    auto ct = (type != nullptr)?helics::coreTypeFromString (type) : helics::core_type::DEFAULT;
+    core->valid = coreValidationIdentifier;
     core->coreptr = helics::CoreFactory::FindOrCreate (ct, (name != nullptr) ? std::string(name) : nullstr, argc, argv);
     return reinterpret_cast<helics_core> (core);
 }
 
 helics_broker helicsCreateBroker (const char *type, const char *name, const char *initString)
 {
+    helics::core_type ct;
+    try
+    {
+        ct = (type != nullptr) ? helics::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    }
+    catch (const std::invalid_argument &ie)
+    {
+        return nullptr;
+    }
     auto broker = new helics::BrokerObject;
     broker->index = getMasterHolder ()->addBroker (broker);
-    auto ct = (type != nullptr) ? helics::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    broker->valid = brokerValidationIdentifier;
     broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string(name) : nullstr, (initString != nullptr) ? std::string(initString) : nullstr);
     return reinterpret_cast<helics_broker> (broker);
 }
 
 helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, const char *const *argv)
 {
+    helics::core_type ct;
+    try
+    {
+        ct = (type != nullptr) ? helics::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    }
+    catch (const std::invalid_argument &ie)
+    {
+        return nullptr;
+    }
     auto *broker = new helics::BrokerObject;
     broker->index = getMasterHolder ()->addBroker (broker);
-    auto ct = (type != nullptr) ? helics::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    broker->valid = brokerValidationIdentifier;
     broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string(name) : nullstr, argc, argv);
     return reinterpret_cast<helics_broker> (broker);
 }
 
-int helicsBrokerIsConnected (helics_broker broker)
+helics_bool_t helicsBrokerIsConnected (helics_broker broker)
 {
     if (broker == nullptr)
     {
-        return 0;
+        return helics_false;
     }
-    auto brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
-    if (brokerObj->brokerptr)
+    auto brk = getBroker(broker);
+    if (brk == nullptr)
     {
-        return (brokerObj->brokerptr->isConnected ()) ? 1 : 0;
+        return helics_false;
     }
-    return 0;
+    return (brk->isConnected ()) ? helics_true : helics_false;
 }
 
-int helicsCoreIsConnected (helics_core core)
+helics_bool_t helicsCoreIsConnected (helics_core core)
 {
     if (core == nullptr)
     {
-        return 0;
+        return helics_false;
     }
-    auto coreObj = reinterpret_cast<helics::CoreObject *> (core);
-    if (coreObj->coreptr)
+    auto cr = getCore(core);
+    if (cr == nullptr)
     {
-        return (coreObj->coreptr->isConnected ()) ? 1 : 0;
+        return helics_false;
     }
-    return 0;
+     return (cr->isConnected ()) ? helics_true : helics_false;
 }
 
 
-helicsStatus helicsBrokerGetIdentifier(helics_broker broker, char *identifier, int maxlen)
+helics_status helicsBrokerGetIdentifier(helics_broker broker, char *identifier, int maxlen)
 {
     if (broker == nullptr)
     {
-        return helicsError;
+        return helics_invalid_object;
     }
-    auto brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
-    if (brokerObj->brokerptr)
+    auto brk = getBroker(broker);
+    if (brk == nullptr)
     {
-        auto &ident = brokerObj->brokerptr->getIdentifier();
+        return helics_invalid_object;
+    }
+    auto &ident = brk->getIdentifier();
         if (static_cast<int> (ident.size()) > maxlen)
         {
             strncpy(identifier, ident.c_str(), maxlen);
@@ -310,22 +418,24 @@ helicsStatus helicsBrokerGetIdentifier(helics_broker broker, char *identifier, i
         {
             strcpy(identifier, ident.c_str());
         }
-        return helicsOK;
-    }
-    return helicsError;
+        return helics_ok;
+    
 }
 
 
-helicsStatus helicsCoreGetIdentifier(helics_core core, char *identifier, int maxlen)
+helics_status helicsCoreGetIdentifier(helics_core core, char *identifier, int maxlen)
 {
     if (core == nullptr)
     {
-        return helicsError;
+        return helics_invalid_object;
     }
-    auto coreObj = reinterpret_cast<helics::CoreObject *> (core);
-    if (coreObj->coreptr)
+    auto cr= getCore(core);
+    if (cr == nullptr)
     {
-        auto &ident = coreObj->coreptr->getIdentifier();
+        return helics_invalid_object;
+    }
+    auto &ident = cr->getIdentifier();
+    
         if (static_cast<int> (ident.size()) > maxlen)
         {
             strncpy(identifier, ident.c_str(), maxlen);
@@ -335,22 +445,23 @@ helicsStatus helicsCoreGetIdentifier(helics_core core, char *identifier, int max
         {
             strcpy(identifier, ident.c_str());
         }
-        return helicsOK;
-    }
-    return helicsError;
+        return helics_ok;
+ 
 }
 
 
-helicsStatus helicsBrokerGetAddress(helics_broker broker, char *address, int maxlen)
+helics_status helicsBrokerGetAddress(helics_broker broker, char *address, int maxlen)
 {
     if (broker == nullptr)
     {
-        return helicsError;
+        return helics_invalid_object;
     }
-    auto brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
-    if (brokerObj->brokerptr)
+    auto brk = getBroker(broker);
+    if (brk == nullptr)
     {
-        auto ident = brokerObj->brokerptr->getAddress();
+        return helics_invalid_object;
+    }
+    auto ident = brk->getAddress();
         if (static_cast<int> (ident.size()) > maxlen)
         {
             strncpy(address, ident.c_str(), maxlen);
@@ -360,45 +471,46 @@ helicsStatus helicsBrokerGetAddress(helics_broker broker, char *address, int max
         {
             strcpy(address, ident.c_str());
         }
-        return helicsOK;
-    }
-    return helicsError;
+        return helics_ok;
+
 }
 
 
 
-helicsStatus helicsCoreDisconnect(helics_core core)
+helics_status helicsCoreDisconnect(helics_core core)
 {
     if (core == nullptr)
     {
-        return helicsError;
+        return helics_invalid_object;
     }
-    auto coreObj = reinterpret_cast<helics::CoreObject *> (core);
-    if (coreObj->coreptr)
+    auto cr = getCore(core);
+    if (cr == nullptr)
     {
-        coreObj->coreptr->disconnect();
-        return helicsOK;
+        return helics_invalid_object;
     }
-    return helicsError;
+
+    cr->disconnect();
+    return helics_ok;
 }
 
 
-helicsStatus helicsBrokerDisconnect(helics_broker broker)
+helics_status helicsBrokerDisconnect(helics_broker broker)
 {
     if (broker == nullptr)
     {
-        return helicsError;
+        return helics_error;
     }
-    auto brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
-    if (brokerObj->brokerptr)
+    auto brk = getBroker(broker);
+    if (brk == nullptr)
     {
-        brokerObj->brokerptr->disconnect();
-        return helicsOK;
+        return helics_invalid_object;
     }
-    return helicsError;
+   brk->disconnect();
+   return helics_ok;
+
 }
 
-void helicsFreeCore (helics_core core)
+void helicsCoreFree (helics_core core)
 {
     auto *coreObj = reinterpret_cast<helics::CoreObject *> (core);
     if (coreObj != nullptr)
@@ -409,7 +521,7 @@ void helicsFreeCore (helics_core core)
     helics::CoreFactory::cleanUpCores ();
 }
 
-void helicsFreeBroker (helics_broker broker)
+void helicsBrokerFree (helics_broker broker)
 {
     auto *brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
     if (brokerObj != nullptr)
@@ -420,7 +532,7 @@ void helicsFreeBroker (helics_broker broker)
     helics::BrokerFactory::cleanUpBrokers ();
 }
 
-void helicsFreeFederate (helics_federate fed)
+void helicsFederateFree (helics_federate fed)
 {
     auto *fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj != nullptr)
@@ -462,7 +574,7 @@ void helicsCloseLibrary ()
     }
 
 #endif
-    helics::loggerManager::closeLogger ();
+    helics::LoggerManager::closeLogger ();
 }
 
 helics_query helicsCreateQuery (const char *target, const char *query)
@@ -473,7 +585,7 @@ helics_query helicsCreateQuery (const char *target, const char *query)
     return reinterpret_cast<void *> (queryObj);
 }
 
-const char *helicsExecuteQuery (helics_federate fed, helics_query query)
+const char *helicsQueryExecute (helics_query query,helics_federate fed )
 {
     if (fed == nullptr)
     {
@@ -503,20 +615,20 @@ const char *helicsExecuteQuery (helics_federate fed, helics_query query)
 }
 
 
-helicsStatus helicsExecuteQueryAsync(helics_federate fed, helics_query query)
+helics_status helicsQueryExecuteAsync(helics_query query,helics_federate fed )
 {
     if (fed == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
     if (query == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
     auto fedObj = getFedSharedPtr(fed);
     if (fedObj == nullptr)
     {
-        return helicsInvalidObject;
+        return helics_invalid_object;
     }
 
     auto queryObj = reinterpret_cast<helics::queryObject *> (query);
@@ -531,10 +643,10 @@ helicsStatus helicsExecuteQueryAsync(helics_federate fed, helics_query query)
     }
     queryObj->activeAsync = true;
     queryObj->activeFed = fedObj;
-    return helicsOK;
+    return helics_ok;
 }
 
-const char *helicsExecuteQueryComplete(helics_query query)
+const char *helicsQueryExecuteComplete(helics_query query)
 {
 
     if (query == nullptr)
@@ -554,21 +666,21 @@ const char *helicsExecuteQueryComplete(helics_query query)
 }
 
 
-HELICS_Export int isQueryCompleted(helics_query query)
+HELICS_Export helics_bool_t helicsQueryIsCompleted(helics_query query)
 {
 
     if (query == nullptr)
     {
-        return 0;
+        return helics_false;
     }
 
     auto queryObj = reinterpret_cast<helics::queryObject *> (query);
     if (queryObj->asyncIndexCode != helics::invalid_id_value)
     {
         auto res = queryObj->activeFed->isQueryCompleted(queryObj->asyncIndexCode);
-        return (res) ? 1 : 0;
+        return (res) ? helics_true : helics_false;
     }
-    return 0;
+    return helics_false;
 }
 
-void helicsFreeQuery (helics_query query) { delete reinterpret_cast<helics::queryObject *> (query); }
+void helicsQueryFree (helics_query query) { delete reinterpret_cast<helics::queryObject *> (query); }

@@ -30,6 +30,7 @@ namespace helics
 	class DestinationFilter;
     class CloningFilter;
 
+    /** type code embedded in the objects so the library knows how to cast them appropriately*/
 	enum class vtype:int
 	{
 		genericFed,
@@ -44,6 +45,7 @@ namespace helics
 	public:
 		std::shared_ptr<Broker> brokerptr;
         int index;
+        int valid;
 	};
 
 	/** object wrapping a core for the c-api*/
@@ -52,6 +54,7 @@ namespace helics
 	public:
 		std::shared_ptr<Core> coreptr;
         int index;
+        int valid;
 	};
 	
     
@@ -109,6 +112,7 @@ namespace helics
 	public:
 		std::unique_ptr<SourceFilter> filtptr;
 		std::shared_ptr<Federate> fedptr;
+        std::shared_ptr<Core> corePtr;
 	};
 
 	/** object wrapping a destination Filter*/
@@ -117,14 +121,16 @@ namespace helics
 	public:
 		std::unique_ptr<DestinationFilter> filtptr;
 		std::shared_ptr<Federate> fedptr;
+        std::shared_ptr<Core> corePtr;
 	};
 
-    /** object wrapping a destination Filter*/
-    class CloneFilterObject
+    /** object wrapping a cloning Filter*/
+    class CloningFilterObject
     {
     public:
         std::unique_ptr<CloningFilter> filtptr;
         std::shared_ptr<Federate> fedptr;
+        std::shared_ptr<Core> corePtr;
     };
 
     /** object representing a query*/
@@ -141,15 +147,17 @@ namespace helics
 }
 
 helics::Federate *getFed(helics_federate fed);
-helics::ValueFederate *getValueFed(helics_value_federate fed);
-helics::MessageFederate *getMessageFed(helics_message_federate fed);
+helics::ValueFederate *getValueFed(helics_federate fed);
+helics::MessageFederate *getMessageFed(helics_federate fed);
+helics::Core *getCore(helics_core core);
 
 std::shared_ptr<helics::Federate> getFedSharedPtr(helics_federate fed);
-std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(helics_value_federate fed);
-std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(helics_message_federate fed);
+std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(helics_federate fed);
+std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(helics_federate fed);
+std::shared_ptr<helics::Core> getCoreSharedPtr(helics_core core);
 
 /** class for containing all the objects associated with a federation*/
-class masterObjectHolder
+class MasterObjectHolder
 {
 private:
     std::mutex ObjectLock;
@@ -157,8 +165,8 @@ private:
     std::vector<helics::CoreObject *> cores;
     std::vector<helics::FedObject *> feds;
 public:
-    masterObjectHolder() noexcept;
-    ~masterObjectHolder();
+    MasterObjectHolder() noexcept;
+    ~MasterObjectHolder();
     int addBroker(helics::BrokerObject * broker);
     int addCore(helics::CoreObject *core);
     int addFed(helics::FedObject *fed);
@@ -168,7 +176,7 @@ public:
     void deleteAll();
 };
 
-masterObjectHolder *getMasterHolder();
+MasterObjectHolder *getMasterHolder();
 void clearAllObjects();
 
 #endif

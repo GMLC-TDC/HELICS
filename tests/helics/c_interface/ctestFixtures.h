@@ -17,12 +17,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics.h"
 #include "MessageFederate_c.h"
 #include "ValueFederate_c.h"
-#include "../core/CoreFactory.h"
-#include "../application_api/MessageFederate.h"
-//#include "../application_api/MessageFilterFederate.h"
-#include "../application_api/ValueFederate.h"
-#include "../core/CoreBroker.h"
-#include "../core/BrokerFactory.h"
 
 typedef enum {
     valueFederate,
@@ -41,24 +35,10 @@ struct ValueFederateTestFixture
     void StartBroker(const std::string &core_type_name, const std::string &initialization_string);
 
     helics_broker broker;
-    helics_value_federate vFed1;
-    helics_value_federate vFed2;
+    helics_federate vFed1;
+    helics_federate vFed2;
 };
 
-struct MessageFederateTestFixture
-{
-    MessageFederateTestFixture () = default;
-    ~MessageFederateTestFixture();
-
-    void Setup1FederateTest(const std::string &core_type_name);
-    void Setup2FederateTest(const std::string &core_type_name);
-
-    void StartBroker(const std::string &core_type_name, const std::string &initialization_string);
-
-    helics_broker broker;
-    helics_message_federate mFed1;
-    helics_message_federate mFed2;
-};
 
 struct FederateTestFixture
 {
@@ -89,11 +69,14 @@ struct FederateTestFixture
             core_type_name.pop_back();
         }
 
-    	std::string initString = std::string("--broker=") + broker->getIdentifier() + " --broker_address=" +
-    			broker->getAddress();
+        char buffer[512];
+        helicsBrokerGetIdentifier(broker, buffer, 512);
+        std::string initString = std::string("--broker=") + std::string(buffer) + " --broker_address=";
+        helicsBrokerGetAddress(broker, buffer, 512);
+        initString += std::string(buffer);
     	helics_federate_info_t fi = helicsFederateInfoCreate();
-    	helicsStatus rv = helicsOK;
-    	rv = helicsFederateInfoSetFederateName(fi, std::string("").c_str());
+    	helics_status rv = helics_ok;
+    	rv = helicsFederateInfoSetFederateName(fi, nullptr);
     	rv = helicsFederateInfoSetCoreTypeFromString(fi, core_type_name.c_str());
     	rv = helicsFederateInfoSetTimeDelta(fi, time_delta);
         //helics::FederateInfo fi("", helics::coreTypeFromString(core_type_name));
@@ -117,14 +100,13 @@ struct FederateTestFixture
                 std::string fedName = name_prefix + std::to_string(ii);
                 rv = helicsFederateInfoSetFederateName(fi, fedName.c_str());
             	//fi.name = name_prefix + std::to_string(ii);
+                FedType fed;
                 if(fedType == valueFederate) {
-                    auto fed = helicsCreateValueFederate(fi);
+                   fed = helicsCreateValueFederate(fi);
                 } else if (fedType == combinationFederate) {
-                    auto fed = helicsCreateCombinationFederate(fi);
-               // } else if (fedType == messageFederate) {
-                   // auto fed = helicsCreateMessageFederate(fi);
-               // } else if (fedType == messageFilterFederate) {
-                    //auto fed = helicsCreateMessageFilterFederate(fi);
+                    fed = helicsCreateCombinationFederate(fi);
+                } else if (fedType == messageFederate) {
+                   fed = helicsCreateMessageFederate(fi);
                 }
                 federates[ii+offset] = fed;
                 federates_added.push_back(fed);
@@ -134,24 +116,24 @@ struct FederateTestFixture
         case 2:
         { //each federate has its own core
             //auto core_type = helics::coreTypeFromString(core_type_name);
-
             for (int ii = 0; ii < count; ++ii)
             {
             	std::string coreInitString = initString+ " --federates 1";
             	std::string fedInfoName = name_prefix + std::to_string(ii);
-                auto core = helicsCreateCore(core_type_name.c_str(), std::string("").c_str(), coreInitString.c_str());
-                rv = helicsFederateInfoSetFederateName(fi, fedInfoName.c_str());
-                fi.coreName = core->getIdentifier();
+                auto core = helicsCreateCore(core_type_name.c_str(), "", coreInitString.c_str());
+                helicsFederateInfoSetFederateName(fi, fedInfoName.c_str());
+
+                helicsCoreGetIdentifier(core, buffer, 512);
+                helicsFederateInfoSetCoreName(fi, buffer);
+                //fi.coreName = core->getIdentifier();
                 //fi.name = name_prefix + std::to_string(ii);
-                auto fed = FedType (fi);
+                FedType fed;
                 if(fedType == valueFederate) {
-                    auto fed = helicsCreateValueFederate(fi);
+                    fed = helicsCreateValueFederate(fi);
                 } else if (fedType == combinationFederate) {
-                    auto fed = helicsCreateCombinationFederate(fi);
-               // } else if (fedType == messageFederate) {
-                   // auto fed = helicsCreateMessageFederate(fi);
-               // } else if (fedType == messageFilterFederate) {
-                    //auto fed = helicsCreateMessageFilterFederate(fi);
+                    fed = helicsCreateCombinationFederate(fi);
+                } else if (fedType == messageFederate) {
+                   fed = helicsCreateMessageFederate(fi);
                 }
                 federates[ii+offset] = fed;
                 federates_added.push_back(fed);

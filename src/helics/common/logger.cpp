@@ -23,18 +23,18 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 
 namespace helics
 {
-logger::logger ()
+Logger::Logger ()
 {
-    logCore = loggerManager::getLoggerCore ();
+    logCore = LoggerManager::getLoggerCore ();
     coreIndex = logCore->addFileProcessor ([this](std::string &&message) { logFunction (std::move (message)); });
 }
-logger::logger (std::shared_ptr<loggingCore> core) : logCore (std::move (core))
+Logger::Logger (std::shared_ptr<LoggingCore> core) : logCore (std::move (core))
 {
     coreIndex = logCore->addFileProcessor ([this](std::string &&message) { logFunction (std::move (message)); });
 }
 
-logger::~logger () { logCore->haltOperations (coreIndex); }
-void logger::openFile (const std::string &file)
+Logger::~Logger () { logCore->haltOperations (coreIndex); }
+void Logger::openFile (const std::string &file)
 {
     std::lock_guard<std::mutex> fLock (fileLock);
     if (outFile.is_open ())
@@ -44,14 +44,14 @@ void logger::openFile (const std::string &file)
     outFile.open (file.c_str ());
 }
 
-void logger::startLogging (int cLevel, int fLevel)
+void Logger::startLogging (int cLevel, int fLevel)
 {
     consoleLevel = cLevel;
     fileLevel = fLevel;
     halted.store (false);
 }
 
-void logger::haltLogging ()
+void Logger::haltLogging ()
 {
     bool exp = false;
     if (halted.compare_exchange_strong (exp, true))
@@ -59,13 +59,13 @@ void logger::haltLogging ()
         logCore->addMessage (coreIndex, "!!>close");
     }
 }
-void logger::changeLevels (int cLevel, int fLevel)
+void Logger::changeLevels (int cLevel, int fLevel)
 {
     consoleLevel = cLevel;
     fileLevel = fLevel;
 }
 
-void logger::log (int level, std::string logMessage)
+void Logger::log (int level, std::string logMessage)
 {
     if (!halted)
     {
@@ -76,10 +76,10 @@ void logger::log (int level, std::string logMessage)
     }
 }
 
-void logger::flush () { logCore->addMessage (coreIndex, "!!>flush"); }
-bool logger::isRunning () const { return (!halted); }
+void Logger::flush () { logCore->addMessage (coreIndex, "!!>flush"); }
+bool Logger::isRunning () const { return (!halted); }
 
-void logger::logFunction (std::string &&message)
+void Logger::logFunction (std::string &&message)
 {
     std::lock_guard<std::mutex> fLock (fileLock);
     if (message.size () > 3)
@@ -102,24 +102,24 @@ void logger::logFunction (std::string &&message)
     }
 }
 
-loggerNoThread::loggerNoThread () = default;
+LoggerNoThread::LoggerNoThread () = default;
 
-loggerNoThread::loggerNoThread (const std::shared_ptr<loggingCore> & /*core*/) {}
+LoggerNoThread::LoggerNoThread (const std::shared_ptr<LoggingCore> & /*core*/) {}
 
-void loggerNoThread::openFile (const std::string &file) { outFile.open (file.c_str ()); }
-void loggerNoThread::startLogging (int cLevel, int fLevel)
+void LoggerNoThread::openFile (const std::string &file) { outFile.open (file.c_str ()); }
+void LoggerNoThread::startLogging (int cLevel, int fLevel)
 {
     consoleLevel = cLevel;
     fileLevel = fLevel;
 }
 
-void loggerNoThread::changeLevels (int cLevel, int fLevel)
+void LoggerNoThread::changeLevels (int cLevel, int fLevel)
 {
     consoleLevel = cLevel;
     fileLevel = fLevel;
 }
 
-void loggerNoThread::log (int level, const std::string &logMessage)
+void LoggerNoThread::log (int level, const std::string &logMessage)
 {
     if (level < consoleLevel)
     {
@@ -134,7 +134,7 @@ void loggerNoThread::log (int level, const std::string &logMessage)
     }
 }
 
-void loggerNoThread::flush ()
+void LoggerNoThread::flush ()
 {
     if (outFile.is_open ())
     {
@@ -143,32 +143,32 @@ void loggerNoThread::flush ()
     std::cout.flush ();
 }
 
-loggingCore::loggingCore () { loggingThread = std::thread (&loggingCore::processingLoop, this); }
+LoggingCore::LoggingCore () { loggingThread = std::thread (&LoggingCore::processingLoop, this); }
 
-loggingCore::~loggingCore ()
+LoggingCore::~LoggingCore ()
 {
     loggingQueue.emplace (-1, "!!>close");
     loggingThread.join ();
 }
 
-void loggingCore::addMessage (std::string &&message) { loggingQueue.emplace (-1, std::move (message)); }
+void LoggingCore::addMessage (std::string &&message) { loggingQueue.emplace (-1, std::move (message)); }
 
-void loggingCore::addMessage (const std::string &message) { loggingQueue.emplace (-1, message); }
+void LoggingCore::addMessage (const std::string &message) { loggingQueue.emplace (-1, message); }
 
-void loggingCore::addMessage (int index, std::string &&message)
+void LoggingCore::addMessage (int index, std::string &&message)
 {
     loggingQueue.emplace (index, std::move (message));
 }
 
-void loggingCore::addMessage (int index, const std::string &message) { loggingQueue.emplace (index, message); }
-int loggingCore::addFileProcessor (std::function<void(std::string &&message)> newFunction)
+void LoggingCore::addMessage (int index, const std::string &message) { loggingQueue.emplace (index, message); }
+int LoggingCore::addFileProcessor (std::function<void(std::string &&message)> newFunction)
 {
     std::lock_guard<std::mutex> fLock (functionLock);
     functions.push_back (std::move (newFunction));
     return static_cast<int> (functions.size ()) - 1;
 }
 
-void loggingCore::haltOperations (int loggerIndex)
+void LoggingCore::haltOperations (int loggerIndex)
 {
     std::lock_guard<std::mutex> fLock (functionLock);
     if (loggerIndex < static_cast<int> (functions.size ()))
@@ -178,7 +178,7 @@ void loggingCore::haltOperations (int loggerIndex)
 }
 
 /** update a callback for a particular instance*/
-void loggingCore::updateProcessingFunction (int index, std::function<void(std::string &&message)> newFunction)
+void LoggingCore::updateProcessingFunction (int index, std::function<void(std::string &&message)> newFunction)
 {
     std::lock_guard<std::mutex> fLock (functionLock);
     if (index < static_cast<int> (functions.size ()))
@@ -187,7 +187,7 @@ void loggingCore::updateProcessingFunction (int index, std::function<void(std::s
     }
 }
 
-void loggingCore::processingLoop ()
+void LoggingCore::processingLoop ()
 {
     int index;
     std::string msg;
@@ -263,17 +263,17 @@ void loggingCore::processingLoop ()
     }
 }
 
-bool loggerNoThread::isRunning () const { return true; }
+bool LoggerNoThread::isRunning () const { return true; }
 
-/** a storage system for the available logger objects allowing references by name to the core
+/** a storage system for the available Logger objects allowing references by name to the core
  */
-std::map<std::string, std::shared_ptr<loggerManager>> loggerManager::loggers;
+std::map<std::string, std::shared_ptr<LoggerManager>> LoggerManager::loggers;
 
 /** we expect operations on core object that modify the map to be rare but we absolutely need them to be thread
 safe so we are going to use a lock that is entirely controlled by this file*/
 static std::mutex loggerLock;
 
-std::shared_ptr<loggerManager> loggerManager::getLoggerManager (const std::string &loggerName)
+std::shared_ptr<LoggerManager> LoggerManager::getLoggerManager (const std::string &loggerName)
 {
     std::lock_guard<std::mutex> loglock (
       loggerLock);  // just to ensure that nothing funny happens if you try to get a context
@@ -284,18 +284,18 @@ std::shared_ptr<loggerManager> loggerManager::getLoggerManager (const std::strin
         return fnd->second;
     }
 
-    auto newLogger = std::shared_ptr<loggerManager> (new loggerManager (loggerName));
+    auto newLogger = std::shared_ptr<LoggerManager> (new LoggerManager (loggerName));
     loggers.emplace (loggerName, newLogger);
     return newLogger;
     // if it doesn't make a new one with the appropriate name
 }
 
-std::shared_ptr<loggingCore> loggerManager::getLoggerCore (const std::string &loggerName)
+std::shared_ptr<LoggingCore> LoggerManager::getLoggerCore (const std::string &loggerName)
 {
     return getLoggerManager (loggerName)->loggingControl;
 }
 
-void loggerManager::closeLogger (const std::string &loggerName)
+void LoggerManager::closeLogger (const std::string &loggerName)
 {
     std::lock_guard<std::mutex> loglock (loggerLock);
     auto fnd = loggers.find (loggerName);
@@ -305,7 +305,7 @@ void loggerManager::closeLogger (const std::string &loggerName)
     }
 }
 
-void loggerManager::logMessage (const std::string &message)
+void LoggerManager::logMessage (const std::string &message)
 {
     std::lock_guard<std::mutex> loglock (loggerLock);
     auto fnd = loggers.find ("");
@@ -317,14 +317,14 @@ void loggerManager::logMessage (const std::string &message)
             return;
         }
     }
-    // if there is no default logger just dump it to the console
+    // if there is no default Logger just dump it to the console
     std::cout << message << std::endl;
 }
 
-loggerManager::~loggerManager () = default;
+LoggerManager::~LoggerManager () = default;
 
-loggerManager::loggerManager (const std::string &loggerName) : name (loggerName)
+LoggerManager::LoggerManager (const std::string &loggerName) : name (loggerName)
 {
-    loggingControl = std::make_shared<loggingCore> ();
+    loggingControl = std::make_shared<LoggingCore> ();
 }
 }  // namespace helics

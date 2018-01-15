@@ -29,13 +29,6 @@ namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 #endif
 
-#ifdef QUICK_TESTS_ONLY
-const std::string core_types[] = {"test", "test_2", "ipc_2", "zmq", "udp"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
-#else
-const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2", "udp", "udp_2"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
-#endif
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)
 {
@@ -197,6 +190,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
 
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
+
     mFed1->setTimeDelta (1.0);
     mFed2->setTimeDelta (1.0);
 
@@ -312,6 +306,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
 
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
+    // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setTimeDelta (1.0);
     mFed2->setTimeDelta (1.0);
 
@@ -361,9 +356,9 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     BOOST_CHECK_EQUAL (M3->data.size (), data3.size ());
     BOOST_CHECK_EQUAL (M4->data.size (), data4.size ());
 
-    BOOST_CHECK_EQUAL (M4->src, "fed0/ep1");
+    BOOST_CHECK_EQUAL (M4->source, "fed0/ep1");
     BOOST_CHECK_EQUAL (M4->dest, "ep2");
-    BOOST_CHECK_EQUAL (M4->origsrc, "fed0/ep1");
+    BOOST_CHECK_EQUAL (M4->original_source, "fed0/ep1");
     BOOST_CHECK_EQUAL (M4->time, 0.0);
     mFed1->finalize ();
     mFed2->finalize ();
@@ -427,13 +422,13 @@ class pingpongFed
             if (messString == "ping")
             {
 #ifdef ENABLE_OUTPUT
-                std::cout << name << " :receive ping from " << std::string (mess->src) << " at time "
+                std::cout << name << " :receive ping from " << std::string (mess->source) << " at time "
                           << static_cast<double> (currentTime) << '\n';
 #endif
                 mess->data = "pong";
-                mess->dest = mess->src;
-                mess->src = name;
-                mess->origsrc = mess->src;
+                mess->dest = mess->source;
+                mess->source = name;
+                mess->original_source = mess->source;
                 mess->time = currentTime;
                 mFed->sendMessage (ep, std::move (mess));
                 pings++;
@@ -442,7 +437,7 @@ class pingpongFed
             {
                 pongs++;
 #ifdef ENABLE_OUTPUT
-                std::cout << name << " :receive pong from " << std::string (mess->src) << " at time "
+                std::cout << name << " :receive pong from " << std::string (mess->source) << " at time "
                           << static_cast<double> (currentTime) << '\n';
 #endif
             }
@@ -497,13 +492,12 @@ BOOST_TEST_DECORATOR (*utf::timeout (20))
 #endif
 BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 {
-    if (core_type.compare (0, 4, "test") != 0)
+    if (core_type != "test")
     {
-        // TODO:: modify the pingpongFed so it works with the other core types
         return;
     }
     AddBroker (core_type, "3");
-
+    
     auto ctype = helics::coreTypeFromString (core_type);
     pingpongFed p1 ("fedA", 0.5, ctype);
     pingpongFed p2 ("fedB", 0.5, ctype);
@@ -575,9 +569,17 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_ty
 
     BOOST_CHECK_EQUAL (f1time.get (), 1.0);
     auto M1 = mFed1->getMessage (epid);
-    BOOST_REQUIRE_EQUAL (M1->data.size (), data2.size ());
-
-    BOOST_CHECK_EQUAL (M1->data[245], data2[245]);
+    BOOST_CHECK(M1);
+    if (M1)
+    {
+        BOOST_CHECK_EQUAL(M1->data.size(), data2.size());
+        if (M1->data.size() > 245)
+        {
+            BOOST_CHECK_EQUAL(M1->data[245], data2[245]);
+        }
+        
+    }
+    
 
     BOOST_CHECK (mFed1->hasMessage () == false);
     mFed1->finalize ();

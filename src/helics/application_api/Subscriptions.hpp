@@ -58,7 +58,11 @@ class SubscriptionBase
             id = fed->registerOptionalSubscription (key_, type_, units_);
         }
     }
+
+    SubscriptionBase(ValueFederate *valueFed, int subIndex);
     virtual ~SubscriptionBase () = default;
+    SubscriptionBase (SubscriptionBase &&base) = default;
+    SubscriptionBase &operator= (SubscriptionBase &&base) = default;
     /** get the time of the last update
     @return the time of the last update
     */
@@ -106,6 +110,7 @@ class Subscription : public SubscriptionBase
     defV lastValue;  //!< the last value updated
     double delta = -1.0;  //!< the minimum difference
   public:
+    Subscription () = default;
     Subscription (ValueFederate *valueFed, const std::string &key, const std::string &units = "")
         : SubscriptionBase (valueFed, key, "def", units)
     {
@@ -125,10 +130,18 @@ class Subscription : public SubscriptionBase
         : SubscriptionBase(required, valueFed, key, typeNameStringRef(defType), units)
     {
     }
+    /** generate a subscription object from a preexisting subscription
+    @param valueFed a pointer to the appropriate value Federate
+    @param subIndex the index of the subscription
+    */
+    Subscription(ValueFederate *valueFed, int subIndex) : SubscriptionBase(valueFed, subIndex)
+    {
+
+    }
     /** check if the value has been updated*/
     virtual bool isUpdated () const override;
 
-    /** store the value in the given variable
+    /** get the latest value for the subscription
     @param[out] out the location to store the value
     */
     template <class X>

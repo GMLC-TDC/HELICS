@@ -58,10 +58,10 @@ class BasicHandleInfo
 
 	}
 
-    Core::Handle id=invalid_Handle;  //!< the identification number for the handle
-    Core::federate_id_t fed_id=invalid_fed_id; //!< the global federate id for the creator of the handle
+    const Core::Handle id=invalid_handle;  //!< the identification number for the handle
+    const Core::federate_id_t fed_id=invalid_fed_id; //!< the global federate id for the creator of the handle
 	Core::federate_id_t local_fed_id=invalid_fed_id;	//!< the local federate id of the handle
-	BasicHandleType what=HANDLE_UNKNOWN;	//!< the type of the handle
+	const BasicHandleType what=HANDLE_UNKNOWN;	//!< the type of the handle
     bool flag=false;	//!< indicator flag
 	bool processed = false;	//!< indicator if the handle has been processed (subscription or endpoint found)
 	bool mapped = false;
@@ -69,12 +69,12 @@ class BasicHandleInfo
 	bool hasDestFilter = false;	//!< indicator that an endpoint has a destination filter
 	bool used = false;			//!< indicator that the publication or filter is used
 	//5 byte hole here
-    std::string key;	//!< the name of the handle
-    std::string type;	//!< the type of data used by the handle
-    std::string units;	//!< the units associated with the handle
-	std::string target;	//!< the target of the handle mapped onto units since they will not be used together
-	std::string &type_in; //!< the input type of a filter
-	std::string &type_out; //!< the output type of a filter
+    const std::string key;	//!< the name of the handle
+    const std::string type;	//!< the type of data used by the handle
+    const std::string units;	//!< the units associated with the handle
+	const std::string target;	//!< the target of the handle mapped onto units since they will not be used together
+	const std::string &type_in; //!< the input type of a filter
+	const std::string &type_out; //!< the output type of a filter
 };
 }
 #endif

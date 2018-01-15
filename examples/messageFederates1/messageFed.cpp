@@ -16,14 +16,16 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <memory>
 #include <regex>
 #include <set>
+#include <thread>
 #include <stdexcept>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+#include "helics/core/BrokerFactory.h"
 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
-bool argumentParser (int argc, const char * const *argv, po::variables_map &vm_map);
+static bool argumentParser (int argc, const char * const *argv, po::variables_map &vm_map);
 
 
 int main (int argc, char *argv[])
@@ -33,36 +35,24 @@ int main (int argc, char *argv[])
         return 0;
     }
 
-    std::string name = "fed";
-    if (vm.count ("name") > 0)
-    {
-        name = vm["name"].as<std::string> ();
-    }
-    std::string corename = "zmq";
-    if (vm.count ("core") > 0)
-    {
-        corename = vm["core"].as<std::string> ();
-    }
 	std::string targetfederate = "fed";
 	if (vm.count("target") > 0)
 	{
 		targetfederate = vm["target"].as<std::string>();
 	}
-	std::string target = targetfederate + "/endpoint";
-    helics::FederateInfo fi (name);
-    try
+    std::string target = targetfederate + "/endpoint";
+    helics::FederateInfo fi("fed");
+    fi.loadInfoFromArgs(argc, argv);
+    fi.logLevel = 5;
+    std::shared_ptr<helics::Broker> brk;
+    if (vm.count("startbroker") > 0)
     {
-        fi.coreType = helics::coreTypeFromString (corename);
+        brk = helics::BrokerFactory::create(fi.coreType, vm["startbroker"].as<std::string>());
     }
-    catch (std::invalid_argument &ia)
-    {
-        std::cerr << "Unrecognized core type\n";
-        return (-1);
-    }
-    fi.coreInitString = "";
-	fi.logLevel = 5;
+	
     auto mFed = std::make_unique<helics::MessageFederate> (fi);
-	std::cout << " registering endpoint for " << mFed->getName()<<'\n';
+    auto name = mFed->getName();
+	std::cout << " registering endpoint for " << name<<'\n';
     auto id = mFed->registerEndpoint("endpoint", "");
 
     std::cout << "entering init State\n";
@@ -78,12 +68,19 @@ int main (int argc, char *argv[])
 		while (mFed->hasMessage(id))
 		{
 			auto nmessage = mFed->getMessage(id);
-			std::cout << "received message from " << nmessage->src << " at " << static_cast<double>(nmessage->time) << " ::" << nmessage->data.to_string() << '\n';
+			std::cout << "received message from " << nmessage->source << " at " << static_cast<double>(nmessage->time) << " ::" << nmessage->data.to_string() << '\n';
 		}
         
     }
     mFed->finalize ();
-
+    if (brk)
+    {
+        while (brk->isConnected())
+        {
+            std::this_thread::yield();
+        }
+        brk = nullptr;
+    }
     return 0;
 }
 
@@ -93,18 +90,17 @@ bool argumentParser (int argc, const char * const *argv, po::variables_map &vm_m
 
     // clang-format off
     // input boost controls
-    opt.add_options () 
-		("help,h", "produce help message")
-		("name,n", po::value<std::string> (),"name of the federate")
-		("target,t",po::value<std::string>(),"name of the target federate")
-		("core,c",po::value<std::string> (),"name of the core to connect to");
+    opt.add_options()
+        ("help,h", "produce help message")
+        ("startbroker", po::value<std::string>(),"start a broker with the specified arguments")
+        ("target,t", po::value<std::string>(), "name of the target federate");
 
     // clang-format on
 
     po::variables_map cmd_vm;
     try
     {
-        po::store (po::command_line_parser (argc, argv).options (opt).run (), cmd_vm);
+        po::store (po::command_line_parser (argc, argv).options (opt).allow_unregistered().run (), cmd_vm);
     }
     catch (std::exception &e)
     {
@@ -129,7 +125,7 @@ bool argumentParser (int argc, const char * const *argv, po::variables_map &vm_m
         return true;
     }
 
-    po::store (po::command_line_parser (argc, argv).options (opt).run (), vm_map);
+    po::store (po::command_line_parser (argc, argv).options (opt).allow_unregistered().run (), vm_map);
 
     po::notify (vm_map);
 

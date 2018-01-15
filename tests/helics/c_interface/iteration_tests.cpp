@@ -91,14 +91,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    auto comp = vFed1->requestTimeIterative (1.0, helics::iteration_result::nonconverged);
 //
 //    BOOST_CHECK (comp.state == helics::iteration_result::nonconverged);
-//    BOOST_CHECK_EQUAL (comp.stepTime, helics::timeZero);
+//    BOOST_CHECK_EQUAL (comp.grantedTime, helics::timeZero);
 //    auto val = vFed1->getValue<double> (subid);
 //    BOOST_CHECK_EQUAL (val, 27.0);
 //
 //    comp = vFed1->requestTimeIterative (1.0, helics::iteration_result::nonconverged);
 //
 //    BOOST_CHECK (comp.state == helics::iteration_result::next_step);
-//    BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
+//    BOOST_CHECK_EQUAL (comp.grantedTime, 1.0);
 //    double val2 = vFed1->getValue<double> (subid);
 //
 //    BOOST_CHECK_EQUAL (val2, val);
@@ -125,14 +125,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //    auto comp = vFed2->requestTimeIterative (1.0, helics::iteration_result::nonconverged);
 //
 //    BOOST_CHECK (comp.state == helics::iteration_result::nonconverged);
-//    BOOST_CHECK_EQUAL (comp.stepTime, helics::timeZero);
+//    BOOST_CHECK_EQUAL (comp.grantedTime, helics::timeZero);
 //    auto val = vFed2->getValue<double> (subid);
 //    BOOST_CHECK_EQUAL (val, 27.0);
 //
 //    comp = vFed2->requestTimeIterative (1.0, helics::iteration_result::nonconverged);
 //
 //    BOOST_CHECK (comp.state == helics::iteration_result::next_step);
-//    BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
+//    BOOST_CHECK_EQUAL (comp.grantedTime, 1.0);
 //    double val2 = vFed2->getValue<double> (subid);
 //    vFed1->requestTimeComplete ();
 //

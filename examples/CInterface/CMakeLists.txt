@@ -25,6 +25,25 @@ add_executable(nonlings_fed2 nonlings_fed2.c)
 target_link_libraries(nonlings_fed1 helicsSharedLib )
 target_link_libraries(nonlings_fed2 helicsSharedLib )
 
+set_target_properties (pi_sender PROPERTIES
+    FOLDER examples)
+
+set_target_properties (pi_sender2 PROPERTIES
+    FOLDER examples)
+	
+set_target_properties (pi_receiver PROPERTIES
+    FOLDER examples)
+
+set_target_properties (pi_receiver2 PROPERTIES
+    FOLDER examples)
+
+set_target_properties (nonlings_fed1 PROPERTIES
+    FOLDER examples)
+
+set_target_properties (nonlings_fed2 PROPERTIES
+    FOLDER examples)
+
+
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET pi_sender POST_BUILD        # Adds a post-build event to api tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."

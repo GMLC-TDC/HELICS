@@ -16,6 +16,8 @@ if (BUILD_HELICS_TESTS)
 enable_testing ()
 endif(BUILD_HELICS_TESTS)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 OPTION(BUILD_HELICS_EXAMPLES "Enable the test Executables to be built" ON)
 
 OPTION(BUILD_PYTHON "Build Python extension" OFF)
@@ -41,9 +43,17 @@ IF(BUILD_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
     SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
 ENDIF()
 
+
+
+
 #-----------------------------------------------------------------------------
 # General project wide configuration
 #-----------------------------------------------------------------------------
+
+if (NOT CMAKE_DEBUG_POSTFIX)
+	set(CMAKE_DEBUG_POSTFIX d)
+endif()
+
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 include_directories ("${PROJECT_SOURCE_DIR}/ThirdParty")
@@ -219,13 +229,27 @@ add_library(helics-static STATIC
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
-target_link_libraries(helics-static Threads::Threads)
+target_link_libraries(helics-static Threads::Threads) 
 IF (UNIX AND NOT APPLE)
 target_link_libraries(helics-static rt)
 ENDIF()
 
 IF(MINGW)
-	target_link_libraries(helics-static ws2_32)
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	if (BOOST_VERSION_LEVEL GREATER 1)
+	#set(DISABLE_TCP_CORE TRUE)
+		set(DISABLE_TCP_CORE FALSE)
+		target_link_libraries(helics-static wsock32 ws2_32)
+	else()
+		set(DISABLE_TCP_CORE TRUE)
+		message(status, "disabling TCP core |${DISABLE_TCP_CORE}|")
+		target_link_libraries(helics-static ws2_32)
+	endif()
+		
+	else()
+		target_link_libraries(helics-static wsock32 ws2_32)
+	endif()
+	
 ENDIF(MINGW)
 
 if (${ZeroMQ_FOUND})
@@ -235,6 +259,7 @@ if (${ZeroMQ_FOUND})
 	else()
 		set(ZeroMQ_DEPENDENCY ${ZeroMQ_LIBRARY})
 	endif()
+	message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
 	target_link_libraries(helics-static ${ZeroMQ_DEPENDENCY})
 else()
    if (ZeroMQ_ENABLE)
@@ -303,7 +328,25 @@ IF(BUILD_CXX_SHARED_LIB)
 		warning("Building the CXX shared library and C shared library in the same build is not advisable due to conflicting symbol visibility guidelines and is unlikely to work very well")
 	endif()
 
-	add_library(helics-shared SHARED helics-static)
+	add_library(helics-shared SHARED src/empty.cpp)
+	target_link_libraries(helics-shared helics-static)
+	if (WIN32)
+		IF(MINGW)
+			set_target_properties(helics-shared PROPERTIES
+			LINK_FLAGS "-Wl,--whole-archive")
+		ELSE(MINGW)
+			set_target_properties(helics-shared PROPERTIES
+			LINK_FLAGS "/WHOLEARCHIVE")
+		endif()
+		
+	elseif (APPLE)
+		set_target_properties(helics-shared PROPERTIES
+        LINK_FLAGS "-Wl,-all_load")
+	else ()
+		set_target_properties(helics-shared PROPERTIES
+        LINK_FLAGS "-Wl,--whole-archive")
+	endif ()
+	
 endif()
 
 if (WIN32)
@@ -395,7 +438,7 @@ IF (UNIX AND NOT APPLE)
 ENDIF()
 
 IF(MINGW)
-	list(APPEND helics_dependencies ws2_32)
+	list(APPEND helics_dependencies wsock32 ws2_32)
 ENDIF(MINGW)
 
 if (ZeroMQ_FOUND)
@@ -416,7 +459,6 @@ configure_file (
   install(DIRECTORY ThirdParty/cereal DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(DIRECTORY ThirdParty/helics_includes DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(DIRECTORY ThirdParty/libguarded DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 
 

@@ -18,15 +18,15 @@ namespace helics
 {
 std::unique_ptr<Message> EndpointInfo::getMessage (Time maxTime)
 {
-    std::lock_guard<std::mutex> lock (queueLock);
-    if (message_queue.empty ())
+    auto handle = message_queue.lock();
+    if (handle->empty ())
     {
         return nullptr;
     }
-    if (message_queue.front ()->time <= maxTime)
+    if (handle->front ()->time <= maxTime)
     {
-        auto msg = std::move (message_queue.front ());
-        message_queue.pop_front ();
+        auto msg = std::move (handle->front ());
+        handle->pop_front ();
         return msg;
     }
     return nullptr;
@@ -34,27 +34,27 @@ std::unique_ptr<Message> EndpointInfo::getMessage (Time maxTime)
 
 Time EndpointInfo::firstMessageTime () const
 {
-    std::lock_guard<std::mutex> lock (queueLock);
-    return (message_queue.empty ()) ? Time::maxVal () : message_queue.front ()->time;
+    auto handle = message_queue.lock_shared();
+    return (handle->empty ()) ? Time::maxVal () : handle->front ()->time;
 }
 // this is the function which determines message order
 static auto msgSorter = [](const auto &m1, const auto &m2) {
     // first by time
-    return (m1->time != m2->time) ? (m1->time < m2->time) : (m1->origsrc < m2->origsrc);
+    return (m1->time != m2->time) ? (m1->time < m2->time) : (m1->original_source < m2->original_source);
 };
 
 void EndpointInfo::addMessage (std::unique_ptr<Message> message)
 {
-    std::lock_guard<std::mutex> lock (queueLock);
-    message_queue.push_back (std::move (message));
-    std::stable_sort (message_queue.begin (), message_queue.end (), msgSorter);
+    auto handle = message_queue.lock();
+    handle->push_back (std::move (message));
+    std::stable_sort (handle->begin (), handle->end (), msgSorter);
 }
 
 int32_t EndpointInfo::queueSize (Time maxTime) const
 {
-    std::lock_guard<std::mutex> lock (queueLock);
+    auto handle = message_queue.lock_shared();
     int32_t cnt = 0;
-    for (auto &msg : message_queue)
+    for (auto &msg : *handle)
     {
         if (msg->time <= maxTime)
         {

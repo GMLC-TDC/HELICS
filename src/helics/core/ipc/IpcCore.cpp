@@ -25,14 +25,16 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "IpcComms.h"
 
-#include "../argParser.h"
+#include "../../common/argParser.h"
 #include <boost/filesystem.hpp>
 
 namespace helics
 {
 using namespace std::string_literals;
-static const argDescriptors extraArgs{
+static const ArgDescriptors extraArgs{
   {"queueloc"s, "string"s, "the file location of the shared queue"s},
+  { "broker,b"s,"string"s,"identifier for the broker"s },
+  { "broker_address","string"s,"location of the broker i.e network address" },
   {"broker_auto_start"s, "", "automatically start the broker"s},
   {"broker_init"s, "string"s,
    "the init string to pass to the broker upon startup-will only be used if the autostart is activated"s},

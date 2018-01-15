@@ -25,7 +25,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <fstream>
 #include <sstream>
 
-#include "../argParser.h"
+#include "../../common/argParser.h"
 
 #include <boost/filesystem.hpp>
 
@@ -37,7 +37,9 @@ constexpr size_t maxMessageCount = 256;
 namespace helics
 {
 using namespace std::string_literals;
-static const argDescriptors extraArgs{{"queueloc"s, "string"s, "the named location of the shared queue"s},
+static const ArgDescriptors extraArgs{{"queueloc"s, "string"s, "the named location of the shared queue"s},
+{ "broker,b"s,"string"s,"identifier for the broker"s },
+{ "broker_address","string"s,"location of the broker i.e network address" },
                                       {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
 
 IpcBroker::IpcBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}

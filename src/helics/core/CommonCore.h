@@ -31,7 +31,7 @@ class FederateState;
 
 class BasicHandleInfo;
 class FilterCoordinator;
-class logger;
+class Logger;
 class FilterInfo;
 
 enum BasicHandleType:char;
@@ -59,25 +59,25 @@ CommonCore(const std::string &core_name);
   */
   virtual void initializeFromArgs(int argc, const char * const *argv) override;
   virtual bool isInitialized () const override final;
-  virtual bool isJoinable() const override final; 
+  virtual bool isOpenToNewFederates() const override final;
   virtual void error (federate_id_t federateID, int errorCode=-1) override final;
   virtual void finalize (federate_id_t federateID) override final;
   virtual void enterInitializingState (federate_id_t federateID) override final;
-  virtual iteration_result enterExecutingState(federate_id_t federateID, iteration_request iterate = NO_ITERATION) override final;
+  virtual iteration_result enterExecutingState(federate_id_t federateID, helics_iteration_request iterate = NO_ITERATION) override final;
   virtual federate_id_t registerFederate (const std::string &name, const CoreFederateInfo &info) override final;
   virtual const std::string &getFederateName (federate_id_t federateID) const override final;
   virtual federate_id_t getFederateId (const std::string &name) override final;
   virtual int32_t getFederationSize () override final;
   virtual Time timeRequest (federate_id_t federateID, Time next) override final;
-  virtual iterationTime requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate) override final;
+  virtual iteration_time requestTimeIterative (federate_id_t federateID, Time next, helics_iteration_request iterate) override final;
   virtual Time getCurrentTime(federate_id_t federateID) const override final;
   virtual uint64_t getCurrentReiteration (federate_id_t federateID) const override final;
   virtual void setMaximumIterations (federate_id_t federateID, int32_t iterations) override final;
   virtual void setTimeDelta (federate_id_t federateID, Time time) override final;
-  virtual void setLookAhead(federate_id_t federateID, Time lookAheadTime) override final;
+  virtual void setOutputDelay(federate_id_t federateID, Time outputDelayTime) override final;
   virtual void setPeriod(federate_id_t federateID, Time timePeriod) override final;
   virtual void setTimeOffset(federate_id_t federateID, Time timeOffset) override final;
-  virtual void setImpactWindow(federate_id_t federateID, Time impactTime) override final;
+  virtual void setInputDelay(federate_id_t federateID, Time impactTime) override final;
   virtual void setLoggingLevel(federate_id_t federateID, int loggingLevel) override final;
   virtual void setFlag(federate_id_t federateID, int flag, bool flagValue = true) override final;
   virtual Handle registerSubscription (federate_id_t federateID, const std::string &key, const std::string &type, const std::string &units, handle_check_mode check_mode) override final;
@@ -181,7 +181,7 @@ private:
 	
 	std::map<Core::federate_id_t, Core::federate_id_t> global_id_translation; //!< map to translate global ids to local ones
 	std::map<Core::federate_id_t, int32_t> routing_table;  //!< map for external routes  <global federate id, route id>
-	simpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delays for a certain time
+	SimpleQueue<ActionMessage> delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delays for a certain time
 	std::unordered_map<std::string, int32_t> knownExternalEndpoints; //!< external map for all known external endpoints with names and route
 
 	/** actually transmit messages that were delayed until the core was actually registered*/
@@ -195,6 +195,12 @@ private:
 	void routeMessage(ActionMessage &cmd, federate_id_t dest);
 	/** function for routing a message from based on the destination specified in the ActionMessage*/
 	void routeMessage(const ActionMessage &command);
+
+    /**function for doing the actual routing either to a local fed or up the broker chain*/
+    void routeMessage(ActionMessage &&cmd, federate_id_t dest);
+    /** function for routing a message from based on the destination specified in the ActionMessage*/
+    void routeMessage(ActionMessage &&command);
+
 	/** process any filter or route the message*/
 	void processMessageFilter(ActionMessage &command);
     /** create a source filter */
@@ -214,13 +220,16 @@ private:
 
     /** check if we can remove some dependencies*/
     void checkDependencies();
+
+    /** handle command with the core itself as a destination at the core*/
+    void processCommandsForCore(const ActionMessage &cmd);
 protected:
 	
 	int32_t _global_federation_size = 0;  //!< total size of the federation
     bool hasLocalFilters = false;
-    
+    std::atomic<int16_t> delayInitCounter{ 0 }; //!< counter for the number of times the entry to init Mode was explicitly delayed
 	std::vector<std::unique_ptr<FederateState>> _federates; //!< local federate information
-    std::vector<int> ongoingFilterActionCounter;  //!< counter for the number of ongoing filter transactions for a federate													  //using pointers to minimize time in a critical section- though this should be timed more in the future
+    std::vector<int> ongoingFilterActionCounter;  //!< counter for the number of ongoing filter transactions for a federate
   std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
   std::atomic<Core::Handle> handleCounter{ 1 };	//!< counter for the handle index
   std::unordered_map<std::string, Handle> publications;	//!< map of all local publications

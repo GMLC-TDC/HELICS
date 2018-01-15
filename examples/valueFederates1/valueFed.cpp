@@ -23,7 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
-bool argumentParser (int argc, const char * const *argv, po::variables_map &vm_map);
+static bool argumentParser (int argc, const char * const *argv, po::variables_map &vm_map);
 
 
 int main (int argc, const char * const *argv)
@@ -33,27 +33,8 @@ int main (int argc, const char * const *argv)
         return 0;
     }
 
-    std::string name = "fed";
-    if (vm.count ("name") > 0)
-    {
-        name = vm["name"].as<std::string> ();
-    }
-    std::string corename = "zmq";
-    if (vm.count ("core") > 0)
-    {
-        corename = vm["core"].as<std::string> ();
-    }
-    helics::FederateInfo fi (name);
-    try
-    {
-        fi.coreType = helics::coreTypeFromString (corename);
-    }
-    catch (std::invalid_argument &ia)
-    {
-        std::cerr << "Unrecognized core type\n";
-        return (-1);
-    }
-    fi.coreInitString = "";
+    helics::FederateInfo fi ("fed");
+    fi.loadInfoFromArgs(argc, argv);
 	fi.logLevel = 5;
     auto vFed = std::make_unique<helics::ValueFederate> (fi);
 
@@ -80,10 +61,9 @@ bool argumentParser (int argc, const char * const *argv, po::variables_map &vm_m
 
     // clang-format off
     // input boost controls
-    opt.add_options () 
-		("help,h", "produce help message")
-		("name,n", po::value<std::string> (),"name of the federate")
-		("core,c",po::value<std::string> (),"name of the core to connect to");
+    opt.add_options()
+        ("help,h", "produce help message")
+        ("version", "produce a version string");
 
     // clang-format on
 

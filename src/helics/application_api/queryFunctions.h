@@ -42,6 +42,16 @@ std::vector<std::string> vectorizeAndSortQueryResult(const std::string &queryres
 @details this is useful for querying information and being reasonably certain the federate is done adding to its interface
 @param[in] fed  a pointer to the federate
 @param[in] fedName the name of the federate we are querying
+@return true if the federate is now trying to enter initialization false if the timeout was reached
 */
-bool waitForInit(helics::Federate *fed, const std::string &fedName);
+bool waitForInit(helics::Federate *fed, const std::string &fedName, int timeout=10000 /*time in ms*/);
+
+/** helper function to wait for a particular federate to be created
+@details this is useful if some reason we need to make sure a federate is created before proceeding
+@param[in] fed  a pointer to the federate
+@param[in] fedName the name of the federate we are querying
+@param[in] timeout the amount of time in ms to wait before returning false
+@return true if the federate exists, false if the timeout occurred
+*/
+bool waitForFed(helics::Federate *fed, const std::string &fedName, int timeout = 10000 /*time in ms*/);
 #endif /*_HELICS_QUERY_FUNCTIONS_H_*/

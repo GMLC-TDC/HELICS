@@ -29,6 +29,8 @@ add_executable(c_interface_tests ${c_interface_test_sources} ${c_interface_test_
 
 target_link_libraries(c_interface_tests helicsSharedLib ${Boost_LIBRARIES_test})
 
+set_target_properties (c_interface_tests PROPERTIES FOLDER tests)
+
 add_test(NAME c_interface_tests COMMAND c_interface_tests --log_level=warning --report_level=detailed)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)

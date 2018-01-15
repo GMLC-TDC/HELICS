@@ -15,7 +15,18 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <set>
 #include <string>
 #include <future>
+#include "helics/helics-config.h"
 
+#if (BOOST_VERSION_LEVEL >=2)
+namespace boost
+{
+    namespace asio
+    {
+        class io_context;
+        using io_service = io_context;
+    }
+}
+#else
 namespace boost
 {
     namespace asio
@@ -23,7 +34,7 @@ namespace boost
         class io_service;
     }
 }
-
+#endif
 namespace helics {
 
 /** generate a string with a full address based on an interface string and port number
@@ -51,6 +62,7 @@ public:
 	/** default constructor*/
 	UdpComms();
 	UdpComms(const std::string &brokerTarget, const std::string &localTarget);
+    UdpComms(const NetworkBrokerData &netInfo);
 	/** destructor*/
 	~UdpComms();
 	/** set the port numbers for the local ports*/
