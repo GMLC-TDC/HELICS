@@ -427,7 +427,7 @@ BOOST_DATA_TEST_CASE(value_federate_subscriber_and_publisher_registration,
 	status = helicsGetSubscriptionType(subid, subtype, 100);
 	BOOST_CHECK_EQUAL(subtype, "def");
 	status = helicsGetSubscriptionType(subid2, subtype2, 100);
-	BOOST_CHECK_EQUAL(subtype2, "int32");
+	BOOST_CHECK_EQUAL(subtype2, "int64"); //c interface only has int64 for integer datatypes
 	status = helicsGetSubscriptionType(subid3, subtype3, 100);
 	BOOST_CHECK_EQUAL(subtype3, "def");
 	status = helicsGetSubscriptionUnits(subid3, subunit3, 100);
@@ -525,7 +525,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
 	int retValue;
 	char s[100] = "n2";
 	
-	broker = helicsCreateBroker(core_type.c_str(), "", "--federates=1");
+	broker = helicsCreateBroker(core_type.c_str(), nullptr, "--federates=1");
 	fi = helicsFederateInfoCreate();
 	status = helicsFederateInfoSetFederateName(fi, "fed0");
 	status = helicsFederateInfoSetCoreTypeFromString(fi, core_type.c_str());
@@ -892,6 +892,79 @@ void runFederateTestInteger(const char * core, int defaultValue, int testValue1,
 	delete broker, fi, vFed, subid, pubid;
 }
 
+void runFederateTestString(const char * core, const char * defaultValue, const char * testValue1, const char * testValue2 , const char * datatype)
+{
+	helicsStatus status;
+	helics_federate_info_t fi;
+	helics_broker broker;
+	helics_federate vFed;
+	helics_publication pubid;
+	helics_subscription subid;
+	helics_time_t gtime;
+	char str[100] = "";
+	int len = 100;
+
+	broker = helicsCreateBroker(core, "", "--federates=1");
+	fi = helicsFederateInfoCreate();
+	status = helicsFederateInfoSetFederateName(fi, "fed0");
+	status = helicsFederateInfoSetCoreTypeFromString(fi, core);
+	status = helicsFederateInfoSetTimeDelta(fi, 1.0);
+	vFed = helicsCreateValueFederate(fi);
+
+	//FederateTestFixture fixture;
+
+	//fixture.SetupSingleBrokerTest<helics::ValueFederate> (core_type_str, 1);
+	//auto vFed = fixture.GetFederateAs<helics::ValueFederate> (0);
+
+	// register the publications
+	pubid = helicsRegisterGlobalPublication(vFed, "pub1", "string", "");
+	subid = helicsRegisterSubscription(vFed, "pub1", "string", "");
+	status = helicsSetDefaultString(subid,defaultValue);
+	status = helicsEnterExecutionMode(vFed);
+
+	// publish string1 at time=0.0;
+	status = helicsPublishString(pubid, testValue1);
+	status = helicsGetString(subid, str, len);
+	BOOST_CHECK_EQUAL(str, defaultValue);
+
+	gtime = helicsRequestTime(vFed, 1.0);
+	BOOST_CHECK_EQUAL(gtime, 1.0);
+
+	// get the value
+	status = helicsGetString(subid,str,len);
+
+	// make sure the string is what we expect
+	BOOST_CHECK_EQUAL(str, testValue1);
+
+	// publish a second string
+	status = helicsPublishString(pubid, testValue2);
+
+	// make sure the value is still what we expect
+	status = helicsGetString(subid, str,len);
+	BOOST_CHECK_EQUAL(str, testValue1);
+
+	// advance time
+	gtime = helicsRequestTime(vFed, 2.0);
+	// make sure the value was updated
+	BOOST_CHECK_EQUAL(gtime, 2.0);
+
+	status = helicsGetString(subid, str,len);
+	BOOST_CHECK_EQUAL(str, testValue2);
+
+	status = helicsFederateFinalize(vFed);
+
+	std::cout << "value_federate_single_transfer_types - datatype:" << datatype << " core_type " << core << "\n";
+	helicsFederateInfoFree(fi);
+	helicsFreeFederate(vFed);
+	helicsCloseLibrary();
+	broker = nullptr;
+	vFed = nullptr;
+	fi = nullptr;
+	subid = nullptr;
+	pubid = nullptr;
+	delete broker, fi, vFed, subid, pubid;
+}
+
 /*
 template <class X>
 void runFederateTestObj(const std::string &core_type_str,
@@ -999,6 +1072,12 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer_integer2, bdata::make(core_t
 	char datatype[20] = "integer";
 	runFederateTestInteger(core_type.c_str(), -5, 1241515, -43, datatype);
 }
+
+BOOST_DATA_TEST_CASE(value_federate_single_transfer_string, bdata::make(core_types), core_type)
+{
+	char datatype[20] = "string";
+	runFederateTestString(core_type.c_str(), "start", "inside of the functional relationship of helics", "I am a string",datatype);
+}
 /*
 BOOST_DATA_TEST_CASE(value_federate_single_transfer, bdata::make(core_types), core_type)
 {   
@@ -1009,7 +1088,9 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer, bdata::make(core_types), co
 	//runFederateTest<short> (core_type, -5, 23023, -43);
 	//runFederateTest<uint64_t> (core_type, 234252315,0xFFF1'2345'7124'1412, 23521513412);
  //   runFederateTest<float> (core_type, 10.3f, 45.3f, 22.7f);
- //   runFederateTest<std::string> (core_type, "start", "inside of the functional relationship of helics",std::string ("I am a string")); runFederateTestv2<std::vector<double>> (core_type, {34.3, 24.2}, {12.4,14.7, 16.34, 18.17}, {9.9999, 8.8888, 7.7777}); std::vector<std::string> sv1{"hip", "hop"};
+ //   runFederateTest<std::string> (core_type, "start", "inside of the functional relationship of helics",std::string ("I am a string"));
+ //   runFederateTestv2<std::vector<double>> (core_type, {34.3, 24.2}, {12.4,14.7, 16.34, 18.17}, {9.9999, 8.8888, 7.7777});
+ //   std::vector<std::string> sv1{"hip", "hop"};
  //   std::vector<std::string> sv2{"this is the first string\n", "this is the second string",
  //                                "this is the third\0"                                 " string"};
  //   std::vector<std::string> sv3{"string1", "String2", "string3", "string4", "string5", "string6", "string8"};
