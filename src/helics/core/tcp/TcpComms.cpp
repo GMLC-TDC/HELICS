@@ -11,8 +11,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "TcpComms.h"
 #include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.h"
-#include "TcpHelperClasses.h"
 #include "../NetworkBrokerData.h"
+#include "TcpHelperClasses.h"
 #include <memory>
 
 static const int BEGIN_OPEN_PORT_RANGE = 24228;
@@ -34,9 +34,10 @@ TcpComms::TcpComms (const std::string &brokerTarget, const std::string &localTar
     }
 }
 
-TcpComms::TcpComms(const NetworkBrokerData &netInfo) :CommsInterface(netInfo),brokerPort(netInfo.brokerPort),PortNumber(netInfo.portNumber)
+TcpComms::TcpComms (const NetworkBrokerData &netInfo)
+    : CommsInterface (netInfo), brokerPort (netInfo.brokerPort), PortNumber (netInfo.portNumber)
 {
-    if (localTarget_.empty())
+    if (localTarget_.empty ())
     {
         localTarget_ = "localhost";
     }
@@ -183,12 +184,11 @@ TcpComms::dataReceive (std::shared_ptr<tcp_rx_connection> connection, const char
             auto rep = generateReplyToIncomingMessage (m);
             try
             {
-                connection->send(rep.packetize());
+                connection->send (rep.packetize ());
             }
-            catch(const boost::system::system_error &se)
+            catch (const boost::system::system_error &se)
             {
-                
-           }
+            }
         }
         else if (isProtocolCommand (m))
         {
@@ -198,7 +198,7 @@ TcpComms::dataReceive (std::shared_ptr<tcp_rx_connection> connection, const char
         {
             if (ActionCallback)
             {
-                ActionCallback(std::move(m));
+                ActionCallback (std::move (m));
             }
         }
         used_total += used;
@@ -278,8 +278,8 @@ void TcpComms::queue_rx_function ()
     }
 
     disconnecting = true;
-    server.close();
-    ioserv->haltServiceLoop();
+    server.close ();
+    ioserv->haltServiceLoop ();
     rx_status = connection_status::terminated;
 }
 
@@ -476,28 +476,27 @@ void TcpComms::queue_tx_function ()
             {
                 try
                 {
-                    brokerConnection->send(cmd.packetize());
-                    if (isPriorityCommand(cmd))
+                    brokerConnection->send (cmd.packetize ());
+                    if (isPriorityCommand (cmd))
                     {
-                        brokerConnection->async_receive([this](std::shared_ptr<tcp_connection> connection,
-                            const char *data, size_t bytes_received,
-                            const boost::system::error_code &error) {
-                            txPriorityReceive(connection, data, bytes_received, error);
+                        brokerConnection->async_receive ([this](std::shared_ptr<tcp_connection> connection,
+                                                                const char *data, size_t bytes_received,
+                                                                const boost::system::error_code &error) {
+                            txPriorityReceive (connection, data, bytes_received, error);
                         });
                     }
                 }
                 catch (const boost::system::system_error &se)
                 {
-                    if (se.code() != boost::asio::error::connection_aborted)
+                    if (se.code () != boost::asio::error::connection_aborted)
                     {
-                        if (!isDisconnectCommand(cmd))
+                        if (!isDisconnectCommand (cmd))
                         {
-                            std::cerr << "broker send0 " << se.what() << '\n';
+                            std::cerr << "broker send0 " << se.what () << '\n';
                         }
-                       
-                   }
+                    }
                 }
-                
+
                 // if (error)
                 {
                     //     std::cerr << "transmit failure to broker " << error.message() << '\n';
@@ -516,23 +515,23 @@ void TcpComms::queue_tx_function ()
             {
                 try
                 {
-                    rt_find->second->send(cmd.packetize());
-                    if (isPriorityCommand(cmd))
+                    rt_find->second->send (cmd.packetize ());
+                    if (isPriorityCommand (cmd))
                     {
-                        rt_find->second->async_receive([this](std::shared_ptr<tcp_connection> connection,
-                            const char *data, size_t bytes_received,
-                            const boost::system::error_code &error) {
-                            txPriorityReceive(connection, data, bytes_received, error);
+                        rt_find->second->async_receive ([this](std::shared_ptr<tcp_connection> connection,
+                                                               const char *data, size_t bytes_received,
+                                                               const boost::system::error_code &error) {
+                            txPriorityReceive (connection, data, bytes_received, error);
                         });
                     }
                 }
                 catch (const boost::system::system_error &se)
                 {
-                    if (se.code() != boost::asio::error::connection_aborted)
+                    if (se.code () != boost::asio::error::connection_aborted)
                     {
-                        if (!isDisconnectCommand(cmd))
+                        if (!isDisconnectCommand (cmd))
                         {
-                            std::cerr << "rt send " << route_id << "::" << se.what() << '\n';
+                            std::cerr << "rt send " << route_id << "::" << se.what () << '\n';
                         }
                     }
                 }
@@ -543,23 +542,23 @@ void TcpComms::queue_tx_function ()
                 {
                     try
                     {
-                        brokerConnection->send(cmd.packetize());
-                        if (isPriorityCommand(cmd))
+                        brokerConnection->send (cmd.packetize ());
+                        if (isPriorityCommand (cmd))
                         {
-                            brokerConnection->async_receive([this](std::shared_ptr<tcp_connection> connection,
-                                const char *data, size_t bytes_received,
-                                const boost::system::error_code &error) {
-                                txPriorityReceive(connection, data, bytes_received, error);
+                            brokerConnection->async_receive ([this](std::shared_ptr<tcp_connection> connection,
+                                                                    const char *data, size_t bytes_received,
+                                                                    const boost::system::error_code &error) {
+                                txPriorityReceive (connection, data, bytes_received, error);
                             });
                         }
                     }
-                    catch (const  boost::system::system_error &se)
+                    catch (const boost::system::system_error &se)
                     {
-                        if (se.code() != boost::asio::error::connection_aborted)
+                        if (se.code () != boost::asio::error::connection_aborted)
                         {
-                            if (!isDisconnectCommand(cmd))
+                            if (!isDisconnectCommand (cmd))
                             {
-                                std::cerr << "broker send" << route_id << " ::" << se.what() << '\n';
+                                std::cerr << "broker send" << route_id << " ::" << se.what () << '\n';
                             }
                         }
                     }

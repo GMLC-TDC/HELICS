@@ -18,7 +18,7 @@ namespace helics
 {
 std::unique_ptr<Message> EndpointInfo::getMessage (Time maxTime)
 {
-    auto handle = message_queue.lock();
+    auto handle = message_queue.lock ();
     if (handle->empty ())
     {
         return nullptr;
@@ -34,7 +34,7 @@ std::unique_ptr<Message> EndpointInfo::getMessage (Time maxTime)
 
 Time EndpointInfo::firstMessageTime () const
 {
-    auto handle = message_queue.lock_shared();
+    auto handle = message_queue.lock_shared ();
     return (handle->empty ()) ? Time::maxVal () : handle->front ()->time;
 }
 // this is the function which determines message order
@@ -45,14 +45,14 @@ static auto msgSorter = [](const auto &m1, const auto &m2) {
 
 void EndpointInfo::addMessage (std::unique_ptr<Message> message)
 {
-    auto handle = message_queue.lock();
+    auto handle = message_queue.lock ();
     handle->push_back (std::move (message));
     std::stable_sort (handle->begin (), handle->end (), msgSorter);
 }
 
 int32_t EndpointInfo::queueSize (Time maxTime) const
 {
-    auto handle = message_queue.lock_shared();
+    auto handle = message_queue.lock_shared ();
     int32_t cnt = 0;
     for (auto &msg : *handle)
     {

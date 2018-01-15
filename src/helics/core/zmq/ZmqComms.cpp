@@ -13,8 +13,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../../common/zmqHelper.h"
 #include "../../common/zmqSocketDescriptor.h"
 #include "../ActionMessage.h"
-#include "ZmqRequestSets.h"
 #include "../NetworkBrokerData.h"
+#include "ZmqRequestSets.h"
 //#include <boost/asio.hpp>
 //#include <csignal>
 #include <memory>
@@ -32,21 +32,21 @@ ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTar
 {
     if (localTarget_.empty ())
     {
-        if ((brokerTarget_ == "tcp://127.0.0.1")||(brokerTarget_=="tcp://localhost"))
+        if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost"))
         {
             localTarget_ = "tcp://127.0.0.1";
         }
         else
         {
-            localTarget_ = "tcp://127.0.0.1"; //TODO this is not correct yet, but I need other functionality to fix it
+            localTarget_ =
+              "tcp://127.0.0.1";  // TODO this is not correct yet, but I need other functionality to fix it
         }
-        
     }
 }
 
-ZmqComms::ZmqComms(const NetworkBrokerData &netInfo) :CommsInterface(netInfo)
+ZmqComms::ZmqComms (const NetworkBrokerData &netInfo) : CommsInterface (netInfo)
 {
-    if (localTarget_.empty())
+    if (localTarget_.empty ())
     {
         if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost"))
         {
@@ -54,9 +54,9 @@ ZmqComms::ZmqComms(const NetworkBrokerData &netInfo) :CommsInterface(netInfo)
         }
         else
         {
-            localTarget_ = "tcp://127.0.0.1"; //TODO this is not correct yet, but I need other functionality to fix it
+            localTarget_ =
+              "tcp://127.0.0.1";  // TODO this is not correct yet, but I need other functionality to fix it
         }
-
     }
     if (netInfo.brokerPort > 0)
     {
@@ -190,9 +190,8 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
 
 void ZmqComms::queue_rx_function ()
 {
+    //  std::signal(SIGTERM, [](int) {std::signal(SIGTERM, SIG_DFL); raise(SIGTERM); });
 
-  //  std::signal(SIGTERM, [](int) {std::signal(SIGTERM, SIG_DFL); raise(SIGTERM); });
-    
     conditionalChangeOnDestroy<connection_status> cchange (rx_status, connection_status::error,
                                                            connection_status::connected);
     auto ctx = zmqContextManager::getContextPointer ();
@@ -250,7 +249,6 @@ void ZmqComms::queue_rx_function ()
     try
     {
         repSocket.bind (makePortAddress (localTarget_, repPortNumber));
-      
     }
     catch (const zmq::error_t &)
     {
@@ -592,30 +590,29 @@ void ZmqComms::queue_tx_function ()
                     break;
                 case NEW_ROUTE:
                 {
-                        try
-                        {
-                            priority_routes.addRoutes (cmd.dest_id, cmd.payload);
-                        }
-                        catch (const zmq::error_t &e)
-                        {
-                            // TODO:: do something???
-                            std::cerr << e.what () << '\n';
-                        }
+                    try
+                    {
+                        priority_routes.addRoutes (cmd.dest_id, cmd.payload);
+                    }
+                    catch (const zmq::error_t &e)
+                    {
+                        // TODO:: do something???
+                        std::cerr << e.what () << '\n';
+                    }
 
                     try
                     {
-                        auto iap = extractInterfaceandPort(cmd.payload);
+                        auto iap = extractInterfaceandPort (cmd.payload);
 
                         auto zsock = zmq::socket_t (ctx->getContext (), ZMQ_PUSH);
                         zsock.setsockopt (ZMQ_LINGER, 100);
-                        zsock.connect (makePortAddress(iap.first,iap.second+1));
+                        zsock.connect (makePortAddress (iap.first, iap.second + 1));
                         routes.emplace (cmd.dest_id, std::move (zsock));
                     }
                     catch (const zmq::error_t &e)
                     {
                         // TODO:: do something???
-                        std::cerr << e.what() << '\n';
-
+                        std::cerr << e.what () << '\n';
                     }
                     processed = true;
                 }
@@ -718,27 +715,27 @@ void ZmqComms::closeReceiver ()
     }
 }
 
-std::string ZmqComms::getAddress() const
+std::string ZmqComms::getAddress () const
 {
     if ((localTarget_ == "tcp://*") || (localTarget_ == "tcp://0.0.0.0"))
     {
-        return makePortAddress("tcp://127.0.0.1", repPortNumber);
+        return makePortAddress ("tcp://127.0.0.1", repPortNumber);
     }
     else
     {
-        return makePortAddress(localTarget_, repPortNumber);
+        return makePortAddress (localTarget_, repPortNumber);
     }
 }
 
-std::string ZmqComms::getPushAddress() const
+std::string ZmqComms::getPushAddress () const
 {
-    if ((localTarget_ == "tcp://*")||(localTarget_=="tcp://0.0.0.0"))
+    if ((localTarget_ == "tcp://*") || (localTarget_ == "tcp://0.0.0.0"))
     {
-        return makePortAddress("tcp://127.0.0.1", pullPortNumber);
+        return makePortAddress ("tcp://127.0.0.1", pullPortNumber);
     }
     else
     {
-        return makePortAddress(localTarget_, pullPortNumber);
+        return makePortAddress (localTarget_, pullPortNumber);
     }
 }
 }  // namespace helics

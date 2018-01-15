@@ -235,7 +235,7 @@ private:
 };
 
 
-inline uint64_t makeGlobalHandleIdentifier(Core::federate_id_t fed_id, Core::Handle handle)
+inline uint64_t makeGlobalHandleIdentifier(Core::federate_id_t fed_id, Core::handle_id_t handle)
 {
 	return (static_cast<uint64_t>(fed_id) << 32) + static_cast<uint64_t>(handle);
 }

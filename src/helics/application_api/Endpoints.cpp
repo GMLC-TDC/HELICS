@@ -10,16 +10,17 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "Endpoints.hpp"
+#include "../core/core-exceptions.h"
 
 namespace helics
 {
-    Endpoint::Endpoint(MessageFederate *mFed, int endpointIndex) :fed(mFed)
+Endpoint::Endpoint (MessageFederate *mFed, int endpointIndex) : fed (mFed)
+{
+    auto cnt = fed->getEndpointCount ();
+    if ((endpointIndex >= cnt) || (cnt < 0))
     {
-        auto cnt = fed->getEndpointCount();
-        if ((endpointIndex >= cnt) || (cnt < 0))
-        {
-            throw(helics::InvalidParameterValue("no subscription with the specified index"));
-        }
-        id = static_cast<endpoint_id_t>(endpointIndex);
+        throw (helics::InvalidParameter ("no subscription with the specified index"));
     }
-} //namespace helics
+    id = static_cast<endpoint_id_t> (endpointIndex);
+}
+}  // namespace helics

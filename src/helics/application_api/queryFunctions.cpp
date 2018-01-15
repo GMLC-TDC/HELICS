@@ -97,14 +97,14 @@ bool waitForInit (helics::Federate *fed, const std::string &fedName, int timeout
     return true;
 }
 
-bool waitForFed(helics::Federate *fed, const std::string &fedName, int timeout)
+bool waitForFed (helics::Federate *fed, const std::string &fedName, int timeout)
 {
-    auto res = fed->query(fedName, "exists");
+    auto res = fed->query (fedName, "exists");
     int waitTime = 0;
     while (res != "true")
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
-        res = fed->query(fedName, "exists");
+        std::this_thread::sleep_for (std::chrono::milliseconds (200));
+        res = fed->query (fedName, "exists");
         waitTime += 200;
         if (waitTime >= timeout)
         {

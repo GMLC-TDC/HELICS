@@ -32,7 +32,7 @@ class CommsBroker : public BrokerT
     std::unique_ptr<COMMS> comms;  //!< the actual comms object
     std::atomic<bool> initialized_{false};  //!< atomic protecting local initialization
   public:
-      /** default constructor*/
+    /** default constructor*/
     CommsBroker () noexcept;
     /** create from a single argument*/
     explicit CommsBroker (bool arg) noexcept;

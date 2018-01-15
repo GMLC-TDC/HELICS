@@ -105,7 +105,7 @@ namespace helics
         @param type the type of the publication
         @param units the units associated with the publication
         */
-        void addSource( const std::string &key, helicsType_t type, const std::string &units="");
+        void addSource( const std::string &key, helics_type_t type, const std::string &units="");
 
     private:
         int loadArguments(boost::program_options::variables_map &vm_map);

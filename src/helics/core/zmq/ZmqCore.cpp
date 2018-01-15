@@ -11,11 +11,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "ZmqCore.h"
 #include "ZmqComms.h"
 
-
 namespace helics
 {
-
-
 ZmqCore::ZmqCore () noexcept {}
 
 ZmqCore::~ZmqCore () = default;
@@ -26,7 +23,7 @@ void ZmqCore::initializeFromArgs (int argc, const char *const *argv)
 {
     if (brokerState == created)
     {
-        netInfo.initializeFromArgs(argc, argv, "tcp://127.0.0.1");
+        netInfo.initializeFromArgs (argc, argv, "tcp://127.0.0.1");
         CommonCore::initializeFromArgs (argc, argv);
     }
 }
@@ -41,35 +38,34 @@ bool ZmqCore::brokerConnect ()
     comms = std::make_unique<ZmqComms> (netInfo);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
-    
+
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
-    auto res = comms->connect();
+    auto res = comms->connect ();
     if (res)
     {
         if (netInfo.portNumber < 0)
         {
-            netInfo.portNumber = comms->getPort();
+            netInfo.portNumber = comms->getPort ();
         }
     }
     return res;
 }
 
-std::string ZmqCore::getAddress() const
+std::string ZmqCore::getAddress () const
 {
-    std::lock_guard<std::mutex> lock(dataMutex);
+    std::lock_guard<std::mutex> lock (dataMutex);
     if (comms)
     {
-        return comms->getAddress();
+        return comms->getAddress ();
     }
     if (netInfo.localInterface == "tcp://*")
     {
-        return makePortAddress("tcp://127.0.0.1", netInfo.portNumber);
+        return makePortAddress ("tcp://127.0.0.1", netInfo.portNumber);
     }
     else
     {
-        return makePortAddress(netInfo.localInterface, netInfo.portNumber);
+        return makePortAddress (netInfo.localInterface, netInfo.portNumber);
     }
-
 }
 
 }  // namespace helics

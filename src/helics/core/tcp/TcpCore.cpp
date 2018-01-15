@@ -11,10 +11,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "TcpCore.h"
 #include "TcpComms.h"
 
-
 namespace helics
 {
-
 TcpCore::TcpCore () noexcept {}
 
 TcpCore::~TcpCore () = default;
@@ -23,10 +21,9 @@ TcpCore::TcpCore (const std::string &core_name) : CommsBroker (core_name) {}
 
 void TcpCore::initializeFromArgs (int argc, const char *const *argv)
 {
-    
     if (brokerState == created)
     {
-        netInfo.initializeFromArgs(argc, argv,"localhost");
+        netInfo.initializeFromArgs (argc, argv, "localhost");
 
         CommonCore::initializeFromArgs (argc, argv);
     }

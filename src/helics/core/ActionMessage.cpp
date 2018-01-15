@@ -63,7 +63,7 @@ ActionMessage::ActionMessage (std::unique_ptr<Message> message)
     info_ = std::make_unique<AdditionalInfo> ();
     info_->source = std::move (message->source);
     info_->orig_source = std::move (message->original_source);
-    info_->original_dest = std::move(message->original_dest);
+    info_->original_dest = std::move (message->original_dest);
     info_->target = std::move (message->dest);
 }
 
@@ -124,7 +124,7 @@ void ActionMessage::moveInfo (std::unique_ptr<Message> message)
     }
     info_->source = std::move (message->source);
     info_->orig_source = std::move (message->original_source);
-    info_->original_dest = std::move(message->original_dest);
+    info_->original_dest = std::move (message->original_dest);
     info_->target = std::move (message->dest);
 }
 
@@ -340,7 +340,7 @@ std::unique_ptr<Message> createMessage (const ActionMessage &cmd)
 {
     auto msg = std::make_unique<Message> ();
     msg->original_source = cmd.info ().orig_source;
-    msg->original_dest = cmd.info().original_dest;
+    msg->original_dest = cmd.info ().original_dest;
     msg->dest = cmd.info ().target;
     msg->data = cmd.payload;
     msg->time = cmd.actionTime;
@@ -353,7 +353,7 @@ std::unique_ptr<Message> createMessage (ActionMessage &&cmd)
 {
     auto msg = std::make_unique<Message> ();
     msg->original_source = std::move (cmd.info ().orig_source);
-    msg->original_dest = std::move(cmd.info().original_dest); 
+    msg->original_dest = std::move (cmd.info ().original_dest);
     msg->dest = std::move (cmd.info ().target);
     msg->data = std::move (cmd.payload);
     msg->time = cmd.actionTime;

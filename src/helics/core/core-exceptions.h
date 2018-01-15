@@ -30,57 +30,57 @@ public:
 };
 
 /** exception class indicating that a function has failed for some reason*/
-class functionExecutionFailure : public HelicsException
+class FunctionExecutionFailure : public HelicsException
 {
 public:
-	functionExecutionFailure(const std::string &message="HELICS execution failure") :HelicsException(message) {};
+	FunctionExecutionFailure(const std::string &message="HELICS execution failure") :HelicsException(message) {};
 };
 
 /** exception for an invalid identification Handle*/
-class invalidIdentifier : public HelicsException
+class InvalidIdentifier : public HelicsException
 {
 public:
-	invalidIdentifier(const std::string &message = "invalid identifier") :HelicsException(message) {};
+	InvalidIdentifier(const std::string &message = "invalid identifier") :HelicsException(message) {};
 
 };
 
 /** exception when one or more of the parameters in the function call were invalid*/
-class invalidParameter : public HelicsException
+class InvalidParameter : public HelicsException
 {
 public:
-	invalidParameter(const std::string &message = "invalid parameter") :HelicsException(message) {};
+	InvalidParameter(const std::string &message = "invalid parameter") :HelicsException(message) {};
 
 };
 
 /** exception thrown when a function call was made at an inappropriate time*/
-class invalidFunctionCall : public HelicsException
+class InvalidFunctionCall : public HelicsException
 {
 public:
-	invalidFunctionCall(const std::string &message = "invalid function call") :HelicsException(message) {};
+	InvalidFunctionCall(const std::string &message = "invalid function call") :HelicsException(message) {};
 
 };
 
 /** exception indicating that the registration of an object has failed*/
-class connectionFailure : public HelicsException
+class ConnectionFailure : public HelicsException
 {
 public:
-	connectionFailure(const std::string &message = "failed to connect") :HelicsException(message) {};
+	ConnectionFailure(const std::string &message = "failed to connect") :HelicsException(message) {};
 
 };
 
 /** exception indicating that the registration of an object has failed*/
-class registrationFailure : public HelicsException
+class RegistrationFailure : public HelicsException
 {
 public:
-	registrationFailure(const std::string &message = "registration failure") :HelicsException(message) {};
+	RegistrationFailure(const std::string &message = "registration failure") :HelicsException(message) {};
 
 };
 
 /** severe exception indicating HELICS has terminated*/
-class helicsTerminated : public HelicsException
+class HelicsTerminated : public HelicsException
 {
 public:
-	helicsTerminated(const std::string &message = "HELICS termination") :HelicsException(message) {};
+	HelicsTerminated(const std::string &message = "HELICS termination") :HelicsException(message) {};
 
 };
 }

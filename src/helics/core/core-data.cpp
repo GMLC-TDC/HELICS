@@ -22,10 +22,10 @@ data_block &data_block::operator= (data_block &&db) noexcept
     return *this;
 }
 
-
 Message::Message (Message &&m) noexcept
     : time (m.time), flags (m.flags), data (std::move (m.data)), dest (std::move (m.dest)),
-      source (std::move (m.source)), original_source (std::move (m.original_source)), original_dest (std::move (m.original_dest))
+      source (std::move (m.source)), original_source (std::move (m.original_source)),
+      original_dest (std::move (m.original_dest))
 
 {
 }

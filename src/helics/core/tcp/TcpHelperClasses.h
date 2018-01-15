@@ -94,7 +94,8 @@ public:
     {
         socket_.cancel();
     }
-    /** close the socket connection*/
+    /** close the socket connection
+    @param*/
     void close();
     /** send raw data
     @throws boost::system::system_error on failure*/

@@ -26,9 +26,9 @@ namespace helics
 	class Subscription;
 	class Publication;
 	class Endpoint;
-	class SourceFilter;
-	class DestinationFilter;
-    class CloningFilter;
+	class Filter;
+
+    class FilterObject;
 
     /** type code embedded in the objects so the library knows how to cast them appropriately*/
 	enum class vtype:int
@@ -53,8 +53,11 @@ namespace helics
 	{
 	public:
 		std::shared_ptr<Core> coreptr;
+        std::vector<FilterObject *> filters; //!< list of filters created directly through the core
         int index;
         int valid;
+        CoreObject() = default;
+        ~CoreObject();
 	};
 	
     
@@ -63,7 +66,8 @@ namespace helics
     class SubscriptionObject;
     class PublicationObject;
     class EndpointObject;
-    
+   
+
 	/** object wrapping a federate for the c-api*/
 	class FedObject
 	{
@@ -76,6 +80,7 @@ namespace helics
         std::vector<SubscriptionObject *> subs;
         std::vector<PublicationObject *> pubs;
         std::vector<EndpointObject *> epts;
+        std::vector<FilterObject *> filters;
         FedObject() = default;
         ~FedObject();
 	};
@@ -106,32 +111,24 @@ namespace helics
 		std::shared_ptr<MessageFederate> fedptr;
 		std::unique_ptr<Message> lastMessage;
 	};
-	/** object wrapping a source filter*/
-	class SourceFilterObject
-	{
-	public:
-		std::unique_ptr<SourceFilter> filtptr;
-		std::shared_ptr<Federate> fedptr;
-        std::shared_ptr<Core> corePtr;
-	};
 
-	/** object wrapping a destination Filter*/
-	class DestFilterObject
-	{
-	public:
-		std::unique_ptr<DestinationFilter> filtptr;
-		std::shared_ptr<Federate> fedptr;
-        std::shared_ptr<Core> corePtr;
-	};
-
-    /** object wrapping a cloning Filter*/
-    class CloningFilterObject
+    enum class ftype
     {
-    public:
-        std::unique_ptr<CloningFilter> filtptr;
-        std::shared_ptr<Federate> fedptr;
-        std::shared_ptr<Core> corePtr;
+        source,
+        dest,
+        clone,
     };
+
+	/** object wrapping a source filter*/
+	class FilterObject
+	{
+	public:
+        ftype type;
+        int valid;
+		std::unique_ptr<Filter> filtptr;
+		std::shared_ptr<Federate> fedptr;
+        std::shared_ptr<Core> corePtr;
+	};
 
     /** object representing a query*/
 	class queryObject

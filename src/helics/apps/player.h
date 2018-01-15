@@ -116,7 +116,7 @@ namespace helics
         @param type the type of the publication
         @param units the units associated with the publication
         */
-        void addPublication( const std::string &key, helicsType_t type, const std::string &units="");
+        void addPublication( const std::string &key, helics_type_t type, const std::string &units="");
 
         /** add a publication to a player
         @param key the key of the publication to add
@@ -124,7 +124,7 @@ namespace helics
         @param units the units associated with the publication
         */
         template <class valType>
-        typename std::enable_if_t<helicsType<valType>() != helicsType_t::helicsInvalid> 
+        typename std::enable_if_t<helicsType<valType>() != helics_type_t::helicsInvalid> 
             addPublication(const std::string &key, const std::string &units = "")
         {
             if (!useLocal)
@@ -238,7 +238,7 @@ namespace helics
         std::vector<Endpoint> endpoints;    //!< the actual endpoint objects
         std::map<std::string, int> pubids;  //!< publication id map
         std::map<std::string, int> eptids;  //!< endpoint id maps
-        helics::helicsType_t defType = helics::helicsType_t::helicsString; //!< the default data type unless otherwise specified
+        helics::helics_type_t defType = helics::helics_type_t::helicsString; //!< the default data type unless otherwise specified
         Time stopTime = Time::maxVal(); //!< the time the player should stop
         std::string masterFileName; //!< the name of the master file used to do the construction
         size_t pointIndex = 0; //!< the current point index

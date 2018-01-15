@@ -16,7 +16,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 extern "C" {
 #endif
 
-
 // MESSAGE FEDERATE calls
 
 HELICS_Export helics_endpoint helicsFederateRegisterEndpoint (helics_federate fed, const char *name, const char *type);
@@ -26,7 +25,8 @@ HELICS_Export helics_endpoint helicsFederateRegisterGlobalEndpoint (helics_feder
 HELICS_Export helics_status helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *dest);
 HELICS_Export helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const char *data, int len);
 
-HELICS_Export helics_status helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time);
+HELICS_Export helics_status
+helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time);
 
 HELICS_Export helics_status helicsEndpointSendMessage (helics_endpoint endpoint, message_t *message);
 /** subscribe an endpoint to a publication

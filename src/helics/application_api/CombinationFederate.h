@@ -47,8 +47,8 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     virtual void disconnect() override;
   protected:
     virtual void updateTime (Time newTime, Time oldTime) override;
-    virtual void StartupToInitializeStateTransition () override;
-    virtual void InitializeToExecuteStateTransition () override;
+    virtual void startupToInitializeStateTransition () override;
+    virtual void initializeToExecuteStateTransition () override;
 
   public:
     virtual void registerInterfaces (const std::string &jsonString) override;

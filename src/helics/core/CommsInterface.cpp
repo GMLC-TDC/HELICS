@@ -18,8 +18,8 @@ CommsInterface::CommsInterface (const std::string &localTarget, const std::strin
 {
 }
 
-CommsInterface::CommsInterface(const NetworkBrokerData &netInfo)
-    : localTarget_(netInfo.localInterface), brokerTarget_(netInfo.brokerAddress)
+CommsInterface::CommsInterface (const NetworkBrokerData &netInfo)
+    : localTarget_ (netInfo.localInterface), brokerTarget_ (netInfo.brokerAddress)
 {
 }
 /** destructor*/
@@ -249,7 +249,5 @@ void CommsInterface::reconnectReceiver ()
     cmd.index = RECONNECT_RECEIVER;
     transmit (-1, cmd);
 }
-
-
 
 }  // namespace helics

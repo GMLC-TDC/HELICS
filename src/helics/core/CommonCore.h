@@ -80,36 +80,36 @@ CommonCore(const std::string &core_name);
   virtual void setInputDelay(federate_id_t federateID, Time impactTime) override final;
   virtual void setLoggingLevel(federate_id_t federateID, int loggingLevel) override final;
   virtual void setFlag(federate_id_t federateID, int flag, bool flagValue = true) override final;
-  virtual Handle registerSubscription (federate_id_t federateID, const std::string &key, const std::string &type, const std::string &units, handle_check_mode check_mode) override final;
-  virtual Handle getSubscription (federate_id_t federateID, const std::string &key) const override final;
-  virtual Handle registerPublication (federate_id_t federateID, const std::string &key, const std::string &type, const std::string &units) override final;
-  virtual Handle getPublication (federate_id_t federateID, const std::string &key) const override final;
-  virtual const std::string &getHandleName(Handle handle) const override final;
-  virtual const std::string &getTarget(Handle handle) const override final;
-  virtual const std::string &getUnits (Handle handle) const override final;
-  virtual const std::string &getType (Handle handle) const override final;
-  virtual const std::string &getOutputType(Handle handle) const override final;
-  virtual void setValue (Handle handle, const char *data, uint64_t len) override final;
-  virtual std::shared_ptr<const data_block> getValue (Handle handle) override final;
+  virtual handle_id_t registerSubscription (federate_id_t federateID, const std::string &key, const std::string &type, const std::string &units, handle_check_mode check_mode) override final;
+  virtual handle_id_t getSubscription (federate_id_t federateID, const std::string &key) const override final;
+  virtual handle_id_t registerPublication (federate_id_t federateID, const std::string &key, const std::string &type, const std::string &units) override final;
+  virtual handle_id_t getPublication (federate_id_t federateID, const std::string &key) const override final;
+  virtual const std::string &getHandleName(handle_id_t handle) const override final;
+  virtual const std::string &getTarget(handle_id_t handle) const override final;
+  virtual const std::string &getUnits (handle_id_t handle) const override final;
+  virtual const std::string &getType (handle_id_t handle) const override final;
+  virtual const std::string &getOutputType(handle_id_t handle) const override final;
+  virtual void setValue (handle_id_t handle, const char *data, uint64_t len) override final;
+  virtual std::shared_ptr<const data_block> getValue (handle_id_t handle) override final;
 
-  virtual const std::vector<Handle> &getValueUpdates (federate_id_t federateID) override final;
-  virtual Handle registerEndpoint (federate_id_t federateID, const std::string &name, const std::string &type) override final;
-  virtual Handle getEndpoint(federate_id_t federateID, const std::string &name) const override final;
-  virtual Handle registerSourceFilter (const std::string &filterName, const std::string &source, const std::string &type_in,const std::string &type_out) override final;
-  virtual Handle registerDestinationFilter (const std::string &filterName, const std::string &dest, const std::string &type_in,const std::string &type_out) override final;
-  virtual Handle getSourceFilter(const std::string &name) const override final;
-  virtual Handle getDestinationFilter(const std::string &name) const override final;
+  virtual const std::vector<handle_id_t> &getValueUpdates (federate_id_t federateID) override final;
+  virtual handle_id_t registerEndpoint (federate_id_t federateID, const std::string &name, const std::string &type) override final;
+  virtual handle_id_t getEndpoint(federate_id_t federateID, const std::string &name) const override final;
+  virtual handle_id_t registerSourceFilter (const std::string &filterName, const std::string &source, const std::string &type_in,const std::string &type_out) override final;
+  virtual handle_id_t registerDestinationFilter (const std::string &filterName, const std::string &dest, const std::string &type_in,const std::string &type_out) override final;
+  virtual handle_id_t getSourceFilter(const std::string &name) const override final;
+  virtual handle_id_t getDestinationFilter(const std::string &name) const override final;
   virtual void addDependency(federate_id_t federateID, const std::string &federateName) override final;
   virtual void registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) override final;
-  virtual void send (Handle sourceHandle, const std::string &destination, const char *data, uint64_t length) override final;
-  virtual void sendEvent (Time time, Handle sourceHandle, const std::string &destination, const char *data, uint64_t length) override final;
-  virtual void sendMessage (Handle sourceHandle, std::unique_ptr<Message> message) override final;
-  virtual uint64_t receiveCount (Handle destination) override final;
-  virtual std::unique_ptr<Message> receive (Handle destination) override final;
-  virtual std::unique_ptr<Message> receiveAny (federate_id_t federateID, Handle &endpoint_id) override final;
+  virtual void send (handle_id_t sourceHandle, const std::string &destination, const char *data, uint64_t length) override final;
+  virtual void sendEvent (Time time, handle_id_t sourceHandle, const std::string &destination, const char *data, uint64_t length) override final;
+  virtual void sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message> message) override final;
+  virtual uint64_t receiveCount (handle_id_t destination) override final;
+  virtual std::unique_ptr<Message> receive (handle_id_t destination) override final;
+  virtual std::unique_ptr<Message> receiveAny (federate_id_t federateID, handle_id_t &endpoint_id) override final;
   virtual uint64_t receiveCountAny (federate_id_t federateID) override final;
   virtual void logMessage(federate_id_t federateID, int logLevel, const std::string &logMessage) override final;
-  virtual void setFilterOperator(Handle filter, std::shared_ptr<FilterOperator> callback) override final;
+  virtual void setFilterOperator(handle_id_t filter, std::shared_ptr<FilterOperator> callback) override final;
 
   /** set the local identification for the core*/
   void setIdentifier(const std::string &name);
@@ -161,15 +161,15 @@ protected:
   FederateState *getFederate(const std::string &federateName) const;
   /** get the federate Information from a handle
   @param id a handle identifier as generated by the one of the functions*/
-  FederateState *getHandleFederate(Handle id_);
+  FederateState *getHandleFederate(handle_id_t id_);
   /** generate a new Handle*/
-  Core::Handle getNewHandle();
+  Core::handle_id_t getNewHandle();
   /** get the basic handle information*/
-  BasicHandleInfo *getHandleInfo(Handle id_) const;
+  BasicHandleInfo *getHandleInfo(handle_id_t id_) const;
   /** get a localEndpoint from the name*/
   BasicHandleInfo *getLocalEndpoint(const std::string &name);
   /** get a filtering function object*/
-  FilterCoordinator *getFilterCoordinator(Handle id_);
+  FilterCoordinator *getFilterCoordinator(handle_id_t id_);
   /** check if all federates managed by the core are ready to enter initialization state*/
   bool allInitReady() const;
   /** check if all federates have said good-bye*/
@@ -204,7 +204,7 @@ private:
 	/** process any filter or route the message*/
 	void processMessageFilter(ActionMessage &command);
     /** create a source filter */
-    FilterInfo *createSourceFilter(federate_id_t dest, Core::Handle handle,
+    FilterInfo *createSourceFilter(federate_id_t dest, Core::handle_id_t handle,
         const std::string &key,
         const std::string &target,
         const std::string &type_in,
@@ -212,7 +212,7 @@ private:
 
     /** create a destination filter */
     FilterInfo *createDestFilter(federate_id_t dest, 
-        Core::Handle handle,
+        Core::handle_id_t handle,
         const std::string &key,
         const std::string &target,
         const std::string &type_in,
@@ -231,13 +231,13 @@ protected:
 	std::vector<std::unique_ptr<FederateState>> _federates; //!< local federate information
     std::vector<int> ongoingFilterActionCounter;  //!< counter for the number of ongoing filter transactions for a federate
   std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
-  std::atomic<Core::Handle> handleCounter{ 1 };	//!< counter for the handle index
-  std::unordered_map<std::string, Handle> publications;	//!< map of all local publications
-  std::unordered_map<std::string, Handle> endpoints;	//!< map of all local endpoints
+  std::atomic<Core::handle_id_t> handleCounter{ 1 };	//!< counter for the handle index
+  std::unordered_map<std::string, handle_id_t> publications;	//!< map of all local publications
+  std::unordered_map<std::string, handle_id_t> endpoints;	//!< map of all local endpoints
   std::unordered_map<std::string, federate_id_t> federateNames;  //!< map of federate names to id
   std::map<std::string, FilterInfo *> filterNames;  //!< translate names to filterObjects
   std::atomic<int> queryCounter{ 0 };
-  std::map<Handle, std::unique_ptr<FilterCoordinator>> filterCoord; //!< map of all filters
+  std::map<handle_id_t, std::unique_ptr<FilterCoordinator>> filterCoord; //!< map of all filters
   std::vector<std::unique_ptr<FilterInfo>> filters;  //!< storage for all the filters
  private:
   mutable std::mutex _mutex; //!< mutex protecting the federate creation and modification
@@ -252,12 +252,12 @@ protected:
   /** add a new handle to the generic structure
   and return a pointer to it, the pointer is non-owning
   */
-  BasicHandleInfo* createBasicHandle(Handle id_, federate_id_t global_federateId, federate_id_t local_federateId, BasicHandleType HandleType, const std::string &key, const std::string &type, const std::string &units, bool required);
+  BasicHandleInfo* createBasicHandle(handle_id_t id_, federate_id_t global_federateId, federate_id_t local_federateId, BasicHandleType HandleType, const std::string &key, const std::string &type, const std::string &units, bool required);
   /** add a new handle to the generic structure
   and return a pointer to it the pointer is non owning
   variation targeted at filters
   */
-  BasicHandleInfo *createBasicHandle(Handle id_,
+  BasicHandleInfo *createBasicHandle(handle_id_t id_,
 	  federate_id_t global_federateId,
 	  federate_id_t local_federateId,
 	  BasicHandleType HandleType,
@@ -282,7 +282,7 @@ protected:
   /** get the information on a filter from the keyName*/
   FilterInfo *getFilter(const std::string &filterName) const;
   /** get the information on a filter from the handle*/
-  FilterInfo *getFilter(Core::federate_id_t federateID, Core::Handle handle_) const;
+  FilterInfo *getFilter(Core::federate_id_t federateID, Core::handle_id_t handle_) const;
   /** organize filters
   @detsils organize the filter and report and potential warnings and errors
   */

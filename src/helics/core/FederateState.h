@@ -88,8 +88,8 @@ private:
     std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time
 
    
-    std::vector<Core::Handle> events;  //!< list of value events to process
-    std::map<Core::Handle, std::vector<std::unique_ptr<Message>>> message_queue;  // structure of message queues
+    std::vector<Core::handle_id_t> events;  //!< list of value events to process
+    std::map<Core::handle_id_t, std::vector<std::unique_ptr<Message>>> message_queue;  // structure of message queues
 	Time time_granted = startupTime;  //!< the most recent granted time;
     mutable std::mutex _mutex;  //!< the mutex protecting the fed state
    
@@ -124,26 +124,26 @@ private:
     helics_federate_state_type getState () const;
 
     SubscriptionInfo *getSubscription (const std::string &subName) const;
-    SubscriptionInfo *getSubscription (Core::Handle handle_) const;
+    SubscriptionInfo *getSubscription (Core::handle_id_t handle_) const;
     PublicationInfo *getPublication (const std::string &pubName) const;
-    PublicationInfo *getPublication (Core::Handle handle_) const;
+    PublicationInfo *getPublication (Core::handle_id_t handle_) const;
     EndpointInfo *getEndpoint (const std::string &endpointName) const;
-    EndpointInfo *getEndpoint (Core::Handle handle_) const;
+    EndpointInfo *getEndpoint (Core::handle_id_t handle_) const;
 
 
-    void createSubscription (Core::Handle handle,
+    void createSubscription (Core::handle_id_t handle,
                              const std::string &key,
                              const std::string &type,
                              const std::string &units,
                              handle_check_mode check_mode);
-    void createPublication (Core::Handle handle,
+    void createPublication (Core::handle_id_t handle,
                             const std::string &key,
                             const std::string &type,
                             const std::string &units);
-    void createEndpoint (Core::Handle handle, const std::string &key, const std::string &type);
+    void createEndpoint (Core::handle_id_t handle, const std::string &key, const std::string &type);
 
 	/** get the size of a message queue for a specific endpoint or filter handle*/
-    uint64_t getQueueSize (Core::Handle id) const;
+    uint64_t getQueueSize (Core::handle_id_t id) const;
 	/** get the sum of all message queue sizes i.e. the total number of messages available in all endpoints*/
     uint64_t getQueueSize () const;
 	/** get the current iteration counter for an iterative call
@@ -153,10 +153,10 @@ private:
     /** get the next available message for an endpoint
 	@param id the handle of an endpoint or filter
 	@return a pointer to a message -the ownership of the message is transfered to the caller*/
-    std::unique_ptr<Message> receive (Core::Handle id);
+    std::unique_ptr<Message> receive (Core::handle_id_t id);
     /** get any message ready for reception
     @param[out] id the endpoint related to the message*/
-    std::unique_ptr<Message> receiveAny (Core::Handle &id);
+    std::unique_ptr<Message> receiveAny (Core::handle_id_t &id);
 	/** set the CommonCore object that is managing this Federate*/
 	void setParent(CommonCore *coreObject);
 	
@@ -198,7 +198,7 @@ private:
     Time grantedTime () const { return time_granted; }
 	/**get a reference to the handles of subscriptions with value updates
 	*/
-	const std::vector<Core::Handle> &getEvents() const;
+	const std::vector<Core::handle_id_t> &getEvents() const;
 	/** get a reference to the global ids of dependent federates
 	*/
 	const std::vector<Core::federate_id_t> &getDependents() const;
@@ -261,7 +261,7 @@ private:
     @param len the length of the data
     @return true if it should be published, false if not
     */
-    bool checkSetValue(Core::Handle pub_id, const char *data, uint64_t len) const;
+    bool checkSetValue(Core::handle_id_t pub_id, const char *data, uint64_t len) const;
 };
 }
 #endif

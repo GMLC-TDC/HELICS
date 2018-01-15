@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 	/** helper class for Federate info that holds the futures for async calls*/
-	class asyncFedCallInfo
+	class AsyncFedCallInfo
 	{
 	public:
 		std::future<void> initFuture; /**future for the init call*/

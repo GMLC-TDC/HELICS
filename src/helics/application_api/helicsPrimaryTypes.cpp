@@ -268,80 +268,80 @@ void valueExtract (const defV &dv, std::vector<std::complex<double>> &val)
     }
 }
 
-void valueExtract (const data_view &dv, helicsType_t baseType, std::string &val)
+void valueExtract (const data_view &dv, helics_type_t baseType, std::string &val)
 {
     switch (baseType)
     {
-    case helicsType_t::helicsDouble:
+    case helics_type_t::helicsDouble:
     {
         auto V = ValueConverter<double>::interpret (dv);
         val = std::to_string (V);
         break;
     }
-    case helicsType_t::helicsInt:
+    case helics_type_t::helicsInt:
     {
         auto V = ValueConverter<int64_t>::interpret (dv);
         val = std::to_string (V);
         break;
     }
-    case helicsType_t::helicsString:
+    case helics_type_t::helicsString:
     {
         val = dv.string ();
         break;
     }
-    case helicsType_t::helicsVector:
+    case helics_type_t::helicsVector:
     {
         val = helicsVectorString (ValueConverter<std::vector<double>>::interpret (dv));
         break;
     }
-    case helicsType_t::helicsComplex:
+    case helics_type_t::helicsComplex:
     {
         val = helicsComplexString (ValueConverter<std::complex<double>>::interpret (dv));
         break;
     }
-    case helicsType_t::helicsComplexVector:
+    case helics_type_t::helicsComplexVector:
     {
         val = helicsComplexVectorString (ValueConverter<std::vector<std::complex<double>>>::interpret (dv));
     }
-    case helicsType_t::helicsInvalid:
+    case helics_type_t::helicsInvalid:
     default:
         break;
     }
 }
 
-void valueExtract (const data_view &dv, helicsType_t baseType, std::vector<double> &val)
+void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<double> &val)
 {
     val.resize (0);
     switch (baseType)
     {
-    case helicsType_t::helicsDouble:
+    case helics_type_t::helicsDouble:
     {
         val.push_back (ValueConverter<double>::interpret (dv));
         break;
     }
-    case helicsType_t::helicsInt:
+    case helics_type_t::helicsInt:
     {
         val.push_back (static_cast<double> (ValueConverter<int64_t>::interpret (dv)));
         break;
     }
-    case helicsType_t::helicsString:
+    case helics_type_t::helicsString:
     {
         helicsGetVector (dv.string (), val);
         break;
     }
-    case helicsType_t::helicsVector:
+    case helics_type_t::helicsVector:
     {
         ValueConverter<std::vector<double>>::interpret (dv, val);
         break;
     }
-    case helicsType_t::helicsComplex:
+    case helics_type_t::helicsComplex:
     {
         auto cval = ValueConverter<std::complex<double>>::interpret (dv);
         val.push_back (cval.real ());
         val.push_back (cval.imag ());
         break;
     }
-    case helicsType_t::helicsComplexVector:
+    case helics_type_t::helicsComplexVector:
     {
         auto cv = ValueConverter<std::vector<std::complex<double>>>::interpret (dv);
         val.reserve (2 * cv.size ());
@@ -352,33 +352,33 @@ void valueExtract (const data_view &dv, helicsType_t baseType, std::vector<doubl
         }
         break;
     }
-    case helicsType_t::helicsInvalid:
+    case helics_type_t::helicsInvalid:
     default:
         break;
     }
 }
 
-void valueExtract (const data_view &dv, helicsType_t baseType, std::vector<std::complex<double>> &val)
+void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<std::complex<double>> &val)
 {
     val.resize (0);
     switch (baseType)
     {
-    case helicsType_t::helicsDouble:
+    case helics_type_t::helicsDouble:
     {
         val.emplace_back (ValueConverter<double>::interpret (dv), 0.0);
         break;
     }
-    case helicsType_t::helicsInt:
+    case helics_type_t::helicsInt:
     {
         val.emplace_back (static_cast<double> (ValueConverter<int64_t>::interpret (dv)), 0.0);
         break;
     }
-    case helicsType_t::helicsString:
+    case helics_type_t::helicsString:
     {
         helicsGetComplexVector (dv.string (), val);
         break;
     }
-    case helicsType_t::helicsVector:
+    case helics_type_t::helicsVector:
     {
         auto V = ValueConverter<std::vector<double>>::interpret (dv);
         for (size_t ii = 0; ii < V.size () - 1; ii += 2)
@@ -387,43 +387,43 @@ void valueExtract (const data_view &dv, helicsType_t baseType, std::vector<std::
         }
         break;
     }
-    case helicsType_t::helicsComplexVector:
+    case helics_type_t::helicsComplexVector:
     {
         ValueConverter<std::vector<std::complex<double>>>::interpret (dv, val);
         break;
     }
-    case helicsType_t::helicsComplex:
+    case helics_type_t::helicsComplex:
     {
         auto cval = ValueConverter<std::complex<double>>::interpret (dv);
         val.push_back (cval);
         break;
     }
-    case helicsType_t::helicsInvalid:
+    case helics_type_t::helicsInvalid:
     default:
         break;
     }
 }
 
-void valueExtract (const data_view &dv, helicsType_t baseType, std::complex<double> &val)
+void valueExtract (const data_view &dv, helics_type_t baseType, std::complex<double> &val)
 {
     switch (baseType)
     {
-    case helicsType_t::helicsDouble:
+    case helics_type_t::helicsDouble:
     {
         val = std::complex<double> (ValueConverter<double>::interpret (dv), 0.0);
         break;
     }
-    case helicsType_t::helicsInt:
+    case helics_type_t::helicsInt:
     {
         val = std::complex<double> (static_cast<double> (ValueConverter<int64_t>::interpret (dv)), 0.0);
         break;
     }
-    case helicsType_t::helicsString:
+    case helics_type_t::helicsString:
     {
         val = helicsGetComplex (dv.string ());
         break;
     }
-    case helicsType_t::helicsVector:
+    case helics_type_t::helicsVector:
     {
         auto vec = ValueConverter<std::vector<double>>::interpret (dv);
         if (vec.size () == 1)
@@ -436,12 +436,12 @@ void valueExtract (const data_view &dv, helicsType_t baseType, std::complex<doub
         }
         break;
     }
-    case helicsType_t::helicsComplex:
+    case helics_type_t::helicsComplex:
     {
         val = ValueConverter<std::complex<double>>::interpret (dv);
         break;
     }
-    case helicsType_t::helicsInvalid:
+    case helics_type_t::helicsInvalid:
     default:
         break;
     }

@@ -267,13 +267,13 @@ BOOST_AUTO_TEST_CASE (test_move_calls)
     BOOST_CHECK_NE (vFed.getName (), "test1");
 }
 
-BOOST_AUTO_TEST_CASE(test_file_load)
+BOOST_AUTO_TEST_CASE (test_file_load)
 {
-    helics::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
+    helics::ValueFederate vFed (std::string (TEST_DIR) + "/test_files/example_value_fed.json");
 
-    BOOST_CHECK_EQUAL(vFed.getName(), "fedName");
+    BOOST_CHECK_EQUAL (vFed.getName (), "fedName");
 
-    BOOST_CHECK_EQUAL(vFed.getSubscriptionCount(), 2);
-    BOOST_CHECK_EQUAL(vFed.getPublicationCount(), 2);
+    BOOST_CHECK_EQUAL (vFed.getSubscriptionCount (), 2);
+    BOOST_CHECK_EQUAL (vFed.getPublicationCount (), 2);
 }
 BOOST_AUTO_TEST_SUITE_END ()

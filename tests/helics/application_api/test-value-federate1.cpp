@@ -295,7 +295,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications
-    helics::Publication pubid (helics::GLOBAL, vFed1.get (), "pub1", helics::helicsType_t::helicsString);
+    helics::Publication pubid (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsString);
 
     helics::Subscription subid (vFed1.get (), "pub1");
     vFed1->setTimeDelta (1.0);
@@ -480,94 +480,93 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_types1, bdata::make (core_t
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(35))
+BOOST_TEST_DECORATOR (*utf::timeout (35))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types2, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types2, bdata::make (core_types_single), core_type)
 {
-    runFederateTest<double>(core_type, 1.0, 0.0, 3.0);
+    runFederateTest<double> (core_type, 1.0, 0.0, 3.0);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(35))
+BOOST_TEST_DECORATOR (*utf::timeout (35))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types3, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types3, bdata::make (core_types_single), core_type)
 {
-    runFederateTest<int>(core_type, 5, 8, 43);
+    runFederateTest<int> (core_type, 5, 8, 43);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(35))
+BOOST_TEST_DECORATOR (*utf::timeout (35))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types4, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types4, bdata::make (core_types_single), core_type)
 {
-    runFederateTest<int>(core_type, -5, 1241515, -43);
+    runFederateTest<int> (core_type, -5, 1241515, -43);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(35))
+BOOST_TEST_DECORATOR (*utf::timeout (35))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types5, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types5, bdata::make (core_types_single), core_type)
 {
-    runFederateTest<int16_t>(core_type, -5, 23023, -43);
+    runFederateTest<int16_t> (core_type, -5, 23023, -43);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(35))
+BOOST_TEST_DECORATOR (*utf::timeout (35))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types6, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types6, bdata::make (core_types_single), core_type)
 {
-    runFederateTest<uint64_t>(core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
+    runFederateTest<uint64_t> (core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(35))
+BOOST_TEST_DECORATOR (*utf::timeout (35))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types7, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types7, bdata::make (core_types_single), core_type)
 {
-    runFederateTest<float>(core_type, 10.3f, 45.3f, 22.7f);
+    runFederateTest<float> (core_type, 10.3f, 45.3f, 22.7f);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(35))
+BOOST_TEST_DECORATOR (*utf::timeout (35))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types8, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types8, bdata::make (core_types_single), core_type)
 {
-    runFederateTest<std::string>(core_type, "start", "inside of the functional relationship of helics",
-        std::string("I am a string"));
+    runFederateTest<std::string> (core_type, "start", "inside of the functional relationship of helics",
+                                  std::string ("I am a string"));
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(35))
+BOOST_TEST_DECORATOR (*utf::timeout (35))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types9, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types9, bdata::make (core_types_single), core_type)
 {
-    runFederateTestv2<std::vector<double>>(core_type, { 34.3, 24.2 }, { 12.4, 14.7, 16.34, 18.17 },
-    { 9.9999, 8.8888, 7.7777 });
+    runFederateTestv2<std::vector<double>> (core_type, {34.3, 24.2}, {12.4, 14.7, 16.34, 18.17},
+                                            {9.9999, 8.8888, 7.7777});
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(35))
+BOOST_TEST_DECORATOR (*utf::timeout (35))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types10, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types10, bdata::make (core_types_single), core_type)
 {
-    std::vector<std::string> sv1{ "hip", "hop" };
-    std::vector<std::string> sv2{ "this is the first string\n", "this is the second string",
-        "this is the third\0"s
-        " string" };
-    std::vector<std::string> sv3{ "string1", "String2", "string3", "string4", "string5", "string6", "string8" };
-    runFederateTestv2(core_type, sv1, sv2, sv3);
-
+    std::vector<std::string> sv1{"hip", "hop"};
+    std::vector<std::string> sv2{"this is the first string\n", "this is the second string",
+                                 "this is the third\0"s
+                                 " string"};
+    std::vector<std::string> sv3{"string1", "String2", "string3", "string4", "string5", "string6", "string8"};
+    runFederateTestv2 (core_type, sv1, sv2, sv3);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(35))
+BOOST_TEST_DECORATOR (*utf::timeout (35))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types11, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types11, bdata::make (core_types_single), core_type)
 {
-    std::complex<double> def = { 54.23233, 0.7 };
-    std::complex<double> v1 = std::polar(10.0, 0.43);
-    std::complex<double> v2 = { -3e45, 1e-23 };
-    runFederateTest<std::complex<double>>(core_type, def, v1, v2);
+    std::complex<double> def = {54.23233, 0.7};
+    std::complex<double> v1 = std::polar (10.0, 0.43);
+    std::complex<double> v2 = {-3e45, 1e-23};
+    runFederateTest<std::complex<double>> (core_type, def, v1, v2);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
@@ -578,68 +577,64 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers1, bdata::m
     runFederateTestObj<double> (core_type, 10.3, 45.3, 22.7);
 }
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types_publishers2, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers2, bdata::make (core_types_single), core_type)
 {
-    runFederateTestObj<double>(core_type, 1.0, 0.0, 3.0);
+    runFederateTestObj<double> (core_type, 1.0, 0.0, 3.0);
 }
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types_publishers3, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers3, bdata::make (core_types_single), core_type)
 {
-    runFederateTestObj<int>(core_type, 5, 8, 43);
+    runFederateTestObj<int> (core_type, 5, 8, 43);
 }
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types_publishers4, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers4, bdata::make (core_types_single), core_type)
 {
-    runFederateTestObj<int>(core_type, -5, 1241515, -43);
+    runFederateTestObj<int> (core_type, -5, 1241515, -43);
 }
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types_publishers5, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers5, bdata::make (core_types_single), core_type)
 {
-    runFederateTestObj<int16_t>(core_type, -5, 23023, -43);
-   
+    runFederateTestObj<int16_t> (core_type, -5, 23023, -43);
 }
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types_publishers6, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers6, bdata::make (core_types_single), core_type)
 {
-   
-    runFederateTestObj<uint64_t>(core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
-   
+    runFederateTestObj<uint64_t> (core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
 }
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types_publishers7, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers7, bdata::make (core_types_single), core_type)
 {
-    runFederateTestObj<float>(core_type, 10.3f, 45.3f, 22.7f);
+    runFederateTestObj<float> (core_type, 10.3f, 45.3f, 22.7f);
 }
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types_publishers8, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers8, bdata::make (core_types_single), core_type)
 {
-    
-    runFederateTestObj<std::string>(core_type, "start", "inside of the functional relationship of helics",
-        std::string("I am a string"));
+    runFederateTestObj<std::string> (core_type, "start", "inside of the functional relationship of helics",
+                                     std::string ("I am a string"));
 }
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_single_transfer_types_publishers9, bdata::make(core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers9, bdata::make (core_types_single), core_type)
 {
-    std::complex<double> def = { 54.23233, 0.7 };
-    std::complex<double> v1 = std::polar(10.0, 0.43);
-    std::complex<double> v2 = { -3e45, 1e-23 };
-    runFederateTestObj<std::complex<double>>(core_type, def, v1, v2);
+    std::complex<double> def = {54.23233, 0.7};
+    std::complex<double> v1 = std::polar (10.0, 0.43);
+    std::complex<double> v2 = {-3e45, 1e-23};
+    runFederateTestObj<std::complex<double>> (core_type, def, v1, v2);
 }
 
 #endif
@@ -890,88 +885,87 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types1, bdata::make (core_typ
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(10))
+BOOST_TEST_DECORATOR (*utf::timeout (10))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types2, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types2, bdata::make (core_types), core_type)
 {
-    runDualFederateTest<int>(core_type, 5, 8, 43);
+    runDualFederateTest<int> (core_type, 5, 8, 43);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(10))
+BOOST_TEST_DECORATOR (*utf::timeout (10))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types3, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types3, bdata::make (core_types), core_type)
 {
-    runDualFederateTest<int>(core_type, -5, 1241515, -43);
+    runDualFederateTest<int> (core_type, -5, 1241515, -43);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(10))
+BOOST_TEST_DECORATOR (*utf::timeout (10))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types4, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types4, bdata::make (core_types), core_type)
 {
-    runDualFederateTest<char>(core_type, 'c', '\0', '\n');
+    runDualFederateTest<char> (core_type, 'c', '\0', '\n');
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(10))
+BOOST_TEST_DECORATOR (*utf::timeout (10))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types5, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types5, bdata::make (core_types), core_type)
 {
-    runDualFederateTest<uint64_t>(core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
+    runDualFederateTest<uint64_t> (core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(10))
+BOOST_TEST_DECORATOR (*utf::timeout (10))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types6, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types6, bdata::make (core_types), core_type)
 {
-    runDualFederateTest<float>(core_type, 10.3f, 45.3f, 22.7f);
+    runDualFederateTest<float> (core_type, 10.3f, 45.3f, 22.7f);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(10))
+BOOST_TEST_DECORATOR (*utf::timeout (10))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types7, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types7, bdata::make (core_types), core_type)
 {
-    runDualFederateTest<std::string>(core_type, "start", "inside of the functional relationship of helics",
-        std::string("I am a string"));
-
+    runDualFederateTest<std::string> (core_type, "start", "inside of the functional relationship of helics",
+                                      std::string ("I am a string"));
 }
 
 #endif /*ifndef QUICK_TEST_ONLY*/
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(10))
+BOOST_TEST_DECORATOR (*utf::timeout (10))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types8, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types8, bdata::make (core_types), core_type)
 {
     // this one is going to test really ugly strings
-    runDualFederateTest<std::string>(core_type, std::string(86263, '\0'),
-        "inside\n\0 of the \0\n functional\r \brelationship of helics\n"s,
-        std::string(""));
+    runDualFederateTest<std::string> (core_type, std::string (86263, '\0'),
+                                      "inside\n\0 of the \0\n functional\r \brelationship of helics\n"s,
+                                      std::string (""));
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(10))
+BOOST_TEST_DECORATOR (*utf::timeout (10))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types9, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types9, bdata::make (core_types), core_type)
 {
-    std::vector<double> defVec = { 34.3, 24.2 };
-    std::vector<double> v1Vec = { 12.4, 14.7, 16.34, 18.17 };
-    std::vector<double> v2Vec = { 9.9999, 8.8888, 7.7777 };
-    runDualFederateTestv2<std::vector<double>>(core_type, defVec, v1Vec, v2Vec);
+    std::vector<double> defVec = {34.3, 24.2};
+    std::vector<double> v1Vec = {12.4, 14.7, 16.34, 18.17};
+    std::vector<double> v2Vec = {9.9999, 8.8888, 7.7777};
+    runDualFederateTestv2<std::vector<double>> (core_type, defVec, v1Vec, v2Vec);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types10, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types10, bdata::make (core_types), core_type)
 {
-    std::complex<double> def = { 54.23233, 0.7 };
-    std::complex<double> v1 = std::polar(10.0, 0.43);
-    std::complex<double> v2 = { -3e45, 1e-23 };
-    runDualFederateTest<std::complex<double>>(core_type, def, v1, v2);
+    std::complex<double> def = {54.23233, 0.7};
+    std::complex<double> v1 = std::polar (10.0, 0.43);
+    std::complex<double> v2 = {-3e45, 1e-23};
+    runDualFederateTest<std::complex<double>> (core_type, def, v1, v2);
 }
 
 #ifndef QUICK_TESTS_ONLY
@@ -987,80 +981,77 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj1, bdata::make (core
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(6))
+BOOST_TEST_DECORATOR (*utf::timeout (6))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types_obj2, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj2, bdata::make (core_types), core_type)
 {
-    runDualFederateTestObj<int>(core_type, 5, 8, 43);
+    runDualFederateTestObj<int> (core_type, 5, 8, 43);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(6))
+BOOST_TEST_DECORATOR (*utf::timeout (6))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types_obj3, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj3, bdata::make (core_types), core_type)
 {
-    runDualFederateTestObj<int>(core_type, -5, 1241515, -43);
+    runDualFederateTestObj<int> (core_type, -5, 1241515, -43);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(6))
+BOOST_TEST_DECORATOR (*utf::timeout (6))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types_obj4, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj4, bdata::make (core_types), core_type)
 {
-    runDualFederateTestObj<char>(core_type, 'c', '\0', '\n');
+    runDualFederateTestObj<char> (core_type, 'c', '\0', '\n');
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(6))
+BOOST_TEST_DECORATOR (*utf::timeout (6))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types_obj5, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj5, bdata::make (core_types), core_type)
 {
-    runDualFederateTestObj<uint64_t>(core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
+    runDualFederateTestObj<uint64_t> (core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(6))
+BOOST_TEST_DECORATOR (*utf::timeout (6))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types_obj6, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj6, bdata::make (core_types), core_type)
 {
-    runDualFederateTestObj<float>(core_type, 10.3f, 45.3f, 22.7f);
+    runDualFederateTestObj<float> (core_type, 10.3f, 45.3f, 22.7f);
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(6))
+BOOST_TEST_DECORATOR (*utf::timeout (6))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types_obj7, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj7, bdata::make (core_types), core_type)
 {
-    runDualFederateTestObj<std::string>(core_type, "start", "inside of the functional relationship of helics",
-        std::string("I am a string"));
+    runDualFederateTestObj<std::string> (core_type, "start", "inside of the functional relationship of helics",
+                                         std::string ("I am a string"));
     // this one is going to test really ugly strings
-
 }
 
 #endif /** ifndef QUICK_TESTS_ONLY*/
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(6))
+BOOST_TEST_DECORATOR (*utf::timeout (6))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types_obj8, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj8, bdata::make (core_types), core_type)
 {
-    runDualFederateTestObj<std::string>(core_type, std::string(86263, '\0'),
-        "inside\n\0 of the \0\n functional\r \brelationship of helics\n"s,
-        std::string(""));
-
+    runDualFederateTestObj<std::string> (core_type, std::string (86263, '\0'),
+                                         "inside\n\0 of the \0\n functional\r \brelationship of helics\n"s,
+                                         std::string (""));
 }
 
 #if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(6))
+BOOST_TEST_DECORATOR (*utf::timeout (6))
 #endif
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types_obj9, bdata::make(core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj9, bdata::make (core_types), core_type)
 {
-    std::complex<double> def = { 54.23233, 0.7 };
-    std::complex<double> v1 = std::polar(10.0, 0.43);
-    std::complex<double> v2 = { -3e45, 1e-23 };
-    runDualFederateTestObj<std::complex<double>>(core_type, def, v1, v2);
+    std::complex<double> def = {54.23233, 0.7};
+    std::complex<double> v1 = std::polar (10.0, 0.43);
+    std::complex<double> v2 = {-3e45, 1e-23};
+    runDualFederateTestObj<std::complex<double>> (core_type, def, v1, v2);
 }
-
 
 #if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (40))
