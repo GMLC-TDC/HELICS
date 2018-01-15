@@ -345,8 +345,8 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     virtual void disconnect() override;
   protected:
     virtual void updateTime (Time newTime, Time oldTime) override;
-    virtual void StartupToInitializeStateTransition () override;
-    virtual void InitializeToExecuteStateTransition () override;
+    virtual void startupToInitializeStateTransition () override;
+    virtual void initializeToExecuteStateTransition () override;
 
   public:
     /** get a list of all the values that have been updated since the last call

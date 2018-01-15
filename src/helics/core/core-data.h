@@ -187,11 +187,11 @@ class FilterOperator
 
 /** special filter operator defining no operation the original message is simply returned
 */
-class nullFilterOperator final :public FilterOperator
+class NullFilterOperator final :public FilterOperator
 {
 public:
     /**default constructor*/
-    nullFilterOperator() = default;
+    NullFilterOperator() = default;
     virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override
     {
         return message;

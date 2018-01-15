@@ -86,7 +86,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications
-    helics::Publication pubid (helics::GLOBAL, vFed1.get (), "pub1", helics::helicsType_t::helicsString);
+    helics::Publication pubid (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsString);
 
     helics::Subscription subid (vFed1.get (), "pub1");
     vFed1->setTimeDelta (1.0);

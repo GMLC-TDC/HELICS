@@ -16,7 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test out the value converters
  */
 
-//BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
+// BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 // BOOST_AUTO_TEST_CASE (execution_iteration_test)
@@ -138,4 +138,4 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //
 //    BOOST_CHECK_EQUAL (val2, val);
 //}
-//BOOST_AUTO_TEST_SUITE_END ()
+// BOOST_AUTO_TEST_SUITE_END ()

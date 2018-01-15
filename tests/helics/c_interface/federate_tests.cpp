@@ -18,26 +18,26 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 BOOST_AUTO_TEST_SUITE (federate_tests)
 
- /*BOOST_AUTO_TEST_CASE (federate_initialize_tests)
+/*BOOST_AUTO_TEST_CASE (federate_initialize_tests)
 {
-    helics::FederateInfo fi ("test1");
-    fi.coreType = CORE_TYPE_TO_TEST;
-    fi.coreInitString = "1";
+   helics::FederateInfo fi ("test1");
+   fi.coreType = CORE_TYPE_TO_TEST;
+   fi.coreInitString = "1";
 
-    auto Fed = std::make_shared<helics::Federate> (fi);
+   auto Fed = std::make_shared<helics::Federate> (fi);
 
-    auto core = Fed->getCorePointer ();
-    BOOST_REQUIRE ((core));
+   auto core = Fed->getCorePointer ();
+   BOOST_REQUIRE ((core));
 
-    auto name = std::string (core->getFederateName (Fed->getID ()));
+   auto name = std::string (core->getFederateName (Fed->getID ()));
 
-    BOOST_CHECK_EQUAL (name, Fed->getName ());
-    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::startup);
-    Fed->enterInitializationState ();
-    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::initialization);
-    Fed->enterExecutionState ();
-    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::execution);
-    Fed = nullptr;  // force the destructor
+   BOOST_CHECK_EQUAL (name, Fed->getName ());
+   BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::startup);
+   Fed->enterInitializationState ();
+   BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::initialization);
+   Fed->enterExecutionState ();
+   BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::execution);
+   Fed = nullptr;  // force the destructor
 }*/
 //
 // BOOST_AUTO_TEST_CASE (federate_time_step_tests)

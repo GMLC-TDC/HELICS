@@ -10,22 +10,23 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "Publications.hpp"
+#include "../core/core-exceptions.h"
 
 namespace helics
 {
-PublicationBase::PublicationBase(ValueFederate *valueFed, int pubIndex) :fed(valueFed)
+PublicationBase::PublicationBase (ValueFederate *valueFed, int pubIndex) : fed (valueFed)
+{
+    auto cnt = fed->getPublicationCount ();
+    if ((pubIndex >= cnt) || (cnt < 0))
     {
-        auto cnt = fed->getPublicationCount();
-        if ((pubIndex >= cnt) || (cnt < 0))
-        {
-            throw(helics::InvalidParameterValue("no subscription with the specified index"));
-        }
-        id = static_cast<publication_id_t>(pubIndex);
-        key_ = fed->getPublicationKey(id);
-
-        type_ = fed->getPublicationType(id);
-        units_ = fed->getPublicationUnits(id);
+        throw (helics::InvalidParameter ("no subscription with the specified index"));
     }
+    id = static_cast<publication_id_t> (pubIndex);
+    key_ = fed->getPublicationKey (id);
+
+    type_ = fed->getPublicationType (id);
+    units_ = fed->getPublicationUnits (id);
+}
 
 void Publication::publish (double val) const
 {
@@ -191,32 +192,32 @@ void Publication::publish (std::complex<double> val) const
     }
 }
 
-data_block typeConvert(helicsType_t type, const defV &val)
+data_block typeConvert (helics_type_t type, const defV &val)
 {
-    switch (val.which())
+    switch (val.which ())
     {
     case doubleLoc:  // double
-        return typeConvert(type, boost::get<double>(val));
+        return typeConvert (type, boost::get<double> (val));
     case intLoc:  // int64_t
-        return typeConvert(type, boost::get<int64_t>(val));
+        return typeConvert (type, boost::get<int64_t> (val));
     case stringLoc:  // string
     default:
-        return typeConvert(type, boost::get<std::string>(val));
+        return typeConvert (type, boost::get<std::string> (val));
     case complexLoc:  // complex
-        return typeConvert(type,boost::get<std::complex<double>>(val));
+        return typeConvert (type, boost::get<std::complex<double>> (val));
     case vectorLoc:  // vector
-        return typeConvert(type, boost::get<std::vector<double>>(val));
+        return typeConvert (type, boost::get<std::vector<double>> (val));
     case complexVectorLoc:  // complex
-        return typeConvert(type, boost::get<std::vector<std::complex<double>>>(val));
+        return typeConvert (type, boost::get<std::vector<std::complex<double>>> (val));
     }
 }
 
-void Publication::publish(const defV &val) const
+void Publication::publish (const defV &val) const
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        if (prevValue!=val)
+        if (prevValue != val)
         {
             prevValue = val;
         }
@@ -227,8 +228,8 @@ void Publication::publish(const defV &val) const
     }
     if (doPublish)
     {
-        auto db = typeConvert(pubType, val);
-        fed->publish(id, db);
+        auto db = typeConvert (pubType, val);
+        fed->publish (id, db);
     }
 }
 }  // namespace helics

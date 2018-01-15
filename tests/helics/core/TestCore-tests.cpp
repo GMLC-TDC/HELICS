@@ -54,13 +54,13 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 
     core->setTimeDelta (id, 1.0);
 
-    Core::Handle sub1 =
+    Core::handle_id_t sub1 =
       core->registerSubscription (id, "sim1_pub", "type", "units", helics::handle_check_mode::optional);
     BOOST_CHECK_EQUAL (core->getSubscription (id, "sim1_pub"), sub1);
     BOOST_CHECK_EQUAL (core->getType (sub1), "type");
     BOOST_CHECK_EQUAL (core->getUnits (sub1), "units");
 
-    Core::Handle pub1 = core->registerPublication (id, "sim1_pub", "type", "units");
+    Core::handle_id_t pub1 = core->registerPublication (id, "sim1_pub", "type", "units");
     BOOST_CHECK_EQUAL (core->getPublication (id, "sim1_pub"), pub1);
     BOOST_CHECK_EQUAL (core->getType (pub1), "type");
     BOOST_CHECK_EQUAL (core->getUnits (pub1), "units");
@@ -123,10 +123,10 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
 
     core->setTimeDelta (id, 1.0);
 
-    Core::Handle end1 = core->registerEndpoint (id, "end1", "type");
+    Core::handle_id_t end1 = core->registerEndpoint (id, "end1", "type");
     BOOST_CHECK_EQUAL (core->getType (end1), "type");
 
-    Core::Handle end2 = core->registerEndpoint (id, "end2", "type");
+    Core::handle_id_t end2 = core->registerEndpoint (id, "end2", "type");
     BOOST_CHECK_EQUAL (core->getType (end2), "type");
 
     core->enterInitializingState (id);
@@ -183,11 +183,11 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     BOOST_REQUIRE (core->isConnected ());
     Core::federate_id_t id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
 
-    Core::Handle end1 = core->registerEndpoint (id, "end1", "type");
-    Core::Handle end2 = core->registerEndpoint (id, "end2", "type");
+    Core::handle_id_t end1 = core->registerEndpoint (id, "end1", "type");
+    Core::handle_id_t end2 = core->registerEndpoint (id, "end2", "type");
 
-    Core::Handle srcFilter = core->registerSourceFilter ("srcFilter", "end1", "type", "type");
-    Core::Handle dstFilter = core->registerDestinationFilter ("dstFilter", "end2", "type", "type");
+    Core::handle_id_t srcFilter = core->registerSourceFilter ("srcFilter", "end1", "type", "type");
+    Core::handle_id_t dstFilter = core->registerDestinationFilter ("dstFilter", "end2", "type", "type");
 
     auto testSrcFilter = std::make_shared<TestOperator> ("sourceFilter");
     BOOST_CHECK_EQUAL (testSrcFilter->filterName, "sourceFilter");

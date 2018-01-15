@@ -52,14 +52,14 @@ namespace helics
     };
 
     /**filter for delaying a message in time*/
-    class delayFilterOperation : public FilterOperations
+    class DelayFilterOperation : public FilterOperations
     {
     private:
         std::atomic<Time> delay{ timeZero };
         std::shared_ptr<MessageTimeOperator> td;
 
     public:
-        explicit delayFilterOperation(Time delayTime = timeZero);
+        explicit DelayFilterOperation(Time delayTime = timeZero);
         virtual void set(const std::string &property, double val) override;
         virtual std::shared_ptr<FilterOperator> getOperator() override;
     };
@@ -67,37 +67,37 @@ namespace helics
     class randomDelayGenerator;
 
     /** filter for generating a random delay time for a message*/
-    class randomDelayFilterOperation : public FilterOperations
+    class RandomDelayFilterOperation : public FilterOperations
     {
     private:
         std::shared_ptr<MessageTimeOperator> td;
         std::unique_ptr<randomDelayGenerator> rdelayGen;
 
     public:
-        randomDelayFilterOperation();
-        ~randomDelayFilterOperation();
+        RandomDelayFilterOperation();
+        ~RandomDelayFilterOperation();
         virtual void set(const std::string &property, double val) override;
         virtual void setString(const std::string &property, const std::string &val) override;
         virtual std::shared_ptr<FilterOperator> getOperator() override;
     };
 
     /** filter for randomly dropping a packet*/
-    class randomDropFilterOperation : public FilterOperations
+    class RandomDropFilterOperation : public FilterOperations
     {
     private:
         std::atomic<double> dropProb{ 0.0 };
         std::shared_ptr<MessageConditionalOperator> tcond;
 
     public:
-        randomDropFilterOperation();
-        ~randomDropFilterOperation();
+        RandomDropFilterOperation();
+        ~RandomDropFilterOperation();
         virtual void set(const std::string &property, double val) override;
         virtual void setString(const std::string &property, const std::string &val) override;
         virtual std::shared_ptr<FilterOperator> getOperator() override;
     };
 
     /** filter for rerouting a packet to a particular endpoint*/
-    class rerouteFilterOperation : public FilterOperations
+    class RerouteFilterOperation : public FilterOperations
     {
     private:
         std::shared_ptr<MessageDestOperator> op;  //!< the actual operator
@@ -111,8 +111,8 @@ namespace helics
             conditions;  //!< the original destination must match one of these conditions
 #endif
     public:
-        rerouteFilterOperation();
-        ~rerouteFilterOperation();
+        RerouteFilterOperation();
+        ~RerouteFilterOperation();
         virtual void set(const std::string &property, double val) override;
         virtual void setString(const std::string &property, const std::string &val) override;
         virtual std::shared_ptr<FilterOperator> getOperator() override;
@@ -123,7 +123,7 @@ namespace helics
     };
 
     /** filter for rerouting a packet to a particular endpoint*/
-    class cloneFilterOperation : public FilterOperations
+    class CloneFilterOperation : public FilterOperations
     {
     private:
         Core *coreptr; //!< pointer to a core object
@@ -137,9 +137,9 @@ namespace helics
 #endif
     public:
         /** this operation needs a pointer to a core to operate*/
-        explicit cloneFilterOperation(Core *core);
+        explicit CloneFilterOperation(Core *core);
 
-        ~cloneFilterOperation();
+        ~CloneFilterOperation();
         virtual void set(const std::string &property, double val) override;
         virtual void setString(const std::string &property, const std::string &val) override;
         virtual std::shared_ptr<FilterOperator> getOperator() override;

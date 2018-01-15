@@ -32,7 +32,7 @@ namespace helics
 		std::string name; //!< publication name
 		std::string type; //!< publication type
 		std::string units; //!< publication units
-		Core::Handle coreID; //!< Handle from the core
+		Core::handle_id_t coreID; //!< Handle from the core
 		publication_id_t id=0; //!< the id used as the identifier
 		int size = -1;  //!< required size of a publication
 		bool forward=true; 
@@ -47,7 +47,7 @@ namespace helics
 		std::string type; //!< subscription type
 		std::string units; //!< subscription units
 		std::string pubtype; //!< the listed type of the corresponding publication
-		Core::Handle coreID; //!< Handle from the core
+		Core::handle_id_t coreID; //!< Handle from the core
 		subscription_id_t id=0;  //!< the id used as the identifier
 		Time lastUpdate = Time(0.0); //!< the time the subscription was last updated
 		Time lastQuery = Time(0.0); //!< the time the query was made
@@ -113,9 +113,9 @@ namespace helics
 		*/
 		void updateTime(Time newTime, Time oldTime);
 		/** transition from Startup To the Initialize State*/
-		void StartupToInitializeStateTransition();
+		void startupToInitializeStateTransition();
 		/** transition from initialize to execution State*/
-		void InitializeToExecuteStateTransition();
+		void initializeToExecuteStateTransition();
 
 		
 		/** get a list of all the values that have been updated since the last call
@@ -189,7 +189,7 @@ namespace helics
 	private:
 		std::unordered_map<std::string, publication_id_t> publicationKeys; //!< map of the publication keys
 		std::unordered_map<std::string, subscription_id_t> subscriptionKeys; //!< map of the subscription keys
-		std::map<Core::Handle, subscription_id_t> handleLookup;  //!< a map to translate the Handles to subscription_id_t
+		std::map<Core::handle_id_t, subscription_id_t> handleLookup;  //!< a map to translate the Handles to subscription_id_t
 		std::vector<subscription_info> subs;	//!< all the subscription info
 		std::vector<publication_info> pubs;	//!< all the publication info
 		std::vector<std::function<void(subscription_id_t,Time)>> callbacks;	//!< the all callback function
@@ -202,7 +202,7 @@ namespace helics
 		mutable std::mutex subscription_mutex; //!< mutex protecting the subscription information
 		mutable std::mutex publication_mutex; //!< mutex protecting the publication information
 	private:
-		void getUpdateFromCore(Core::Handle handle);
+		void getUpdateFromCore(Core::handle_id_t handle);
 	};
 
 } //namespace helics

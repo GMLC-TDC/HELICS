@@ -89,7 +89,7 @@ std::vector<unsigned char> base64_decode (std::string const &encoded_string, siz
     auto in_len = encoded_string.size ();
     int i = 0;
     int j = 0;
-    int in_ = static_cast<int>(offset);
+    int in_ = static_cast<int> (offset);
     unsigned char char_array_4[4], char_array_3[3];
     std::vector<unsigned char> ret;
     ret.reserve (in_len);
@@ -141,17 +141,17 @@ std::vector<unsigned char> base64_decode (std::string const &encoded_string, siz
     return ret;
 }
 
-std::string base64_decode_to_string(std::string const &encoded_string, size_t offset)
+std::string base64_decode_to_string (std::string const &encoded_string, size_t offset)
 {
-    auto in_len = encoded_string.size();
+    auto in_len = encoded_string.size ();
     int i = 0;
     int j = 0;
-    int in_ = static_cast<int>(offset);
+    int in_ = static_cast<int> (offset);
     unsigned char char_array_4[4], char_array_3[3];
     std::string ret;
-    ret.reserve(in_len);
+    ret.reserve (in_len);
 
-    while (((in_len--) != 0u) && (encoded_string[in_] != '=') && is_base64(encoded_string[in_]))
+    while (((in_len--) != 0u) && (encoded_string[in_] != '=') && is_base64 (encoded_string[in_]))
     {
         char_array_4[i++] = encoded_string[in_];
         in_++;
@@ -166,9 +166,9 @@ std::string base64_decode_to_string(std::string const &encoded_string, size_t of
             char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
             char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
-            ret.push_back(char_array_3[0]);
-            ret.push_back(char_array_3[1]);
-            ret.push_back(char_array_3[2]);
+            ret.push_back (char_array_3[0]);
+            ret.push_back (char_array_3[1]);
+            ret.push_back (char_array_3[2]);
 
             i = 0;
         }
@@ -191,7 +191,7 @@ std::string base64_decode_to_string(std::string const &encoded_string, size_t of
 
         for (j = 0; (j < i - 1); j++)
         {
-            ret.push_back(char_array_3[j]);
+            ret.push_back (char_array_3[j]);
         }
     }
 
@@ -199,16 +199,16 @@ std::string base64_decode_to_string(std::string const &encoded_string, size_t of
 }
 
 /** decode a string to the specified memory location*/
-size_t base64_decode(std::string const& encoded_string, void *data, size_t max_size)
+size_t base64_decode (std::string const &encoded_string, void *data, size_t max_size)
 {
-    auto in_len = encoded_string.size();
+    auto in_len = encoded_string.size ();
     int i = 0;
     int j = 0;
     int in_ = 0;
     unsigned char char_array_4[4], char_array_3[3];
-    unsigned char *outData = reinterpret_cast<unsigned char *>(data);
+    unsigned char *outData = reinterpret_cast<unsigned char *> (data);
     size_t dataIndex = 0;
-    while (((in_len--) != 0u) && (encoded_string[in_] != '=') && is_base64(encoded_string[in_]))
+    while (((in_len--) != 0u) && (encoded_string[in_] != '=') && is_base64 (encoded_string[in_]))
     {
         char_array_4[i++] = encoded_string[in_];
         in_++;

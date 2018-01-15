@@ -188,8 +188,9 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
 
     // Test returning when the finished state is entered
     cmd.setAction (helics::CMD_STOP);
-    auto fs_process2 = std::async (std::launch::async,
-                                   [&]() { return fs->enterExecutingState (helics_iteration_request::no_iterations); });
+    auto fs_process2 = std::async (std::launch::async, [&]() {
+        return fs->enterExecutingState (helics_iteration_request::no_iterations);
+    });
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_INITIALIZING);
     fs->addAction (cmd);
     fs->global_id = 0;  // if it doesn't match the id in the command, this will hang
@@ -284,12 +285,12 @@ DependencyInfo(Core::federate_id_t id) :fedID(id) {};
 */
 
 /*
-    uint64_t getQueueSize(Core::Handle id) const;
+    uint64_t getQueueSize(Core::handle_id_t id) const;
     uint64_t getQueueSize() const;
     uint64_t getFilterQueueSize() const;
-    message_t *receive(Core::Handle id);
-    std::pair<Core::Handle, message_t*> receive();
-    std::pair<Core::Handle, message_t*> receiveForFilter();
+    message_t *receive(Core::handle_id_t id);
+    std::pair<Core::handle_id_t, message_t*> receive();
+    std::pair<Core::handle_id_t, message_t*> receiveForFilter();
     bool processQueue();
     void generateKnownDependencies();
     void addDependency(Core::federate_id_t);

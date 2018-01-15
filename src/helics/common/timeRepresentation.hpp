@@ -159,7 +159,7 @@ constexpr double fac10f[16]{1.0,
 template <int N, typename base = std::int64_t>
 class count_time
 {
-private:
+  private:
     static_assert (N < 16, "N must be less than 16");
     static_assert (N >= 0, "N must be greater than or equal to 0");
     static_assert (std::is_signed<base>::value, "base type must be signed");
@@ -247,11 +247,12 @@ template <typename base = double>
 class double_time
 {
     static_assert (std::is_floating_point<base>::value, "base type must be floating point");
+
   public:
     using baseType = base;
     static constexpr baseType convert (double t) noexcept { return t; }
 
-    static constexpr double toDouble (baseType val) noexcept { return static_cast<double>(val); }
+    static constexpr double toDouble (baseType val) noexcept { return static_cast<double> (val); }
     static constexpr baseType maxVal () noexcept { return (std::numeric_limits<base>::max); }
     static constexpr baseType minVal () noexcept { return (std::numeric_limits<base>::min); }
     static constexpr baseType zeroVal () noexcept { return 0.0; }
@@ -304,8 +305,10 @@ class TimeRepresentation
         : timecode_ (Tconv::maxVal ()), dtime_ (1e49){};
     constexpr explicit TimeRepresentation (std::integral_constant<int, 2> /*unused*/) noexcept
         : timecode_ (Tconv::epsilon ()), dtime_ (1e-9){};
-    constexpr TimeRepresentation(std::integral_constant<int, 4> /*unused*/, baseType initBaseVal, double initDoubleTime) noexcept
-        : timecode_(initBaseVal), dtime_(initDoubleTime) {};
+    constexpr TimeRepresentation (std::integral_constant<int, 4> /*unused*/,
+                                  baseType initBaseVal,
+                                  double initDoubleTime) noexcept
+        : timecode_ (initBaseVal), dtime_ (initDoubleTime){};
 #else
     constexpr explicit TimeRepresentation (std::integral_constant<int, 0> /*unused*/) noexcept
         : timecode_ (Tconv::zeroVal ()){};
@@ -315,8 +318,8 @@ class TimeRepresentation
         : timecode_ (Tconv::maxVal ()){};
     constexpr explicit TimeRepresentation (std::integral_constant<int, 2> /*unused*/) noexcept
         : timecode_ (Tconv::epsilon ()){};
-    constexpr TimeRepresentation(std::integral_constant<int, 4> /*unused*/, baseType initBaseVal) noexcept
-        : timecode_(initBaseVal) {};
+    constexpr TimeRepresentation (std::integral_constant<int, 4> /*unused*/, baseType initBaseVal) noexcept
+        : timecode_ (initBaseVal){};
 #endif
 
   public:
@@ -455,14 +458,14 @@ class TimeRepresentation
         return trep;
     }
 #ifdef _DEBUG
-    constexpr TimeRepresentation operator-() const noexcept
+    constexpr TimeRepresentation operator- () const noexcept
     {
-        return TimeRepresentation(std::integral_constant<int, 4>(), -timecode_, -dtime_);
+        return TimeRepresentation (std::integral_constant<int, 4> (), -timecode_, -dtime_);
     }
 #else
-    constexpr TimeRepresentation operator-() const noexcept
+    constexpr TimeRepresentation operator- () const noexcept
     {
-        return TimeRepresentation(std::integral_constant<int, 4>(), -timecode_);
+        return TimeRepresentation (std::integral_constant<int, 4> (), -timecode_);
     }
 #endif
 

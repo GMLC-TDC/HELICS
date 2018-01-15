@@ -33,7 +33,7 @@ class BasicHandleInfo
 	  BasicHandleInfo() noexcept : type_in(type), type_out(units)
 	  {};
 	  /** construct from the data*/
-    BasicHandleInfo (Core::Handle id_,
+    BasicHandleInfo (Core::handle_id_t id_,
                      Core::federate_id_t fed_id_,
                      BasicHandleType what_,
                      const std::string &key_,
@@ -45,7 +45,7 @@ class BasicHandleInfo
 
     }
 	/** construct from the data for filters*/
-	BasicHandleInfo(Core::Handle id_,
+	BasicHandleInfo(Core::handle_id_t id_,
 		Core::federate_id_t fed_id_,
 		BasicHandleType what_,
 		const std::string &key_,
@@ -58,7 +58,7 @@ class BasicHandleInfo
 
 	}
 
-    const Core::Handle id=invalid_handle;  //!< the identification number for the handle
+    const Core::handle_id_t id=invalid_handle;  //!< the identification number for the handle
     const Core::federate_id_t fed_id=invalid_fed_id; //!< the global federate id for the creator of the handle
 	Core::federate_id_t local_fed_id=invalid_fed_id;	//!< the local federate id of the handle
 	const BasicHandleType what=HANDLE_UNKNOWN;	//!< the type of the handle

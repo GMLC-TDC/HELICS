@@ -30,7 +30,7 @@ namespace helics
 	using defV = boost::variant< double, int64_t, std::string, std::complex<double>, std::vector<double>,std::vector<std::complex<double>>>;
 
 	/**enumeration of the order inside the variant so the Which function returns match the enumeration*/
-	enum typeLocation
+	enum type_location
 	{
 		
 		doubleLoc = 0,
@@ -57,13 +57,13 @@ namespace helics
 
 	void valueExtract(const defV &dv, std::vector<std::complex<double>> &val);
 
-	void valueExtract(const data_view &dv, helicsType_t baseType, std::string &val);
+	void valueExtract(const data_view &dv, helics_type_t baseType, std::string &val);
 
-	void valueExtract(const data_view &dv, helicsType_t baseType, std::vector<double> &val);
+	void valueExtract(const data_view &dv, helics_type_t baseType, std::vector<double> &val);
 
-	void valueExtract(const data_view &dv, helicsType_t baseType, std::complex<double> &val);
+	void valueExtract(const data_view &dv, helics_type_t baseType, std::complex<double> &val);
 
-	void valueExtract(const data_view &dv, helicsType_t baseType, std::vector<std::complex<double>> &val);
+	void valueExtract(const data_view &dv, helics_type_t baseType, std::vector<std::complex<double>> &val);
 
 	/** for numeric types*/
 	template <class X>
@@ -115,11 +115,11 @@ namespace helics
 
 	/** assume it is some numeric type (int or double)*/
 	template <class X>
-	std::enable_if_t<std::is_arithmetic<X>::value> valueExtract(const data_view &dv, helicsType_t baseType, X &val)
+	std::enable_if_t<std::is_arithmetic<X>::value> valueExtract(const data_view &dv, helics_type_t baseType, X &val)
 	{
 		switch (baseType)
 		{
-        case helicsType_t::helicsAny:
+        case helics_type_t::helicsAny:
         {
             try
             {
@@ -132,43 +132,43 @@ namespace helics
             }
             break;
         }
-		case helicsType_t::helicsString:
+		case helics_type_t::helicsString:
 		{
             val = static_cast<X> (boost::lexical_cast<double> (dv.string()));
             break;
 		}
-		case helicsType_t::helicsDouble:
+		case helics_type_t::helicsDouble:
 		{
 			auto V = ValueConverter<double>::interpret(dv);
 			val = static_cast<X> (V);
 			break;
 		}
-		case helicsType_t::helicsInt:
+		case helics_type_t::helicsInt:
 		{
 			auto V = ValueConverter<int64_t>::interpret(dv);
 			val = static_cast<X> (V);
 			break;
 		}
 
-		case helicsType_t::helicsVector:
+		case helics_type_t::helicsVector:
 		{
 			auto V = ValueConverter<std::vector<double>>::interpret(dv);
             val = (!V.empty()) ? static_cast<X> (V[0]) : 0.0;
 			break;
 		}
-		case helicsType_t::helicsComplex:
+		case helics_type_t::helicsComplex:
 		{
 			auto V = ValueConverter<std::complex<double>>::interpret(dv);
 			val = static_cast<X> (std::abs(V));
 			break;
 		}
-		case helicsType_t::helicsComplexVector:
+		case helics_type_t::helicsComplexVector:
 		{
 			auto V = ValueConverter<std::vector<std::complex<double>>>::interpret(dv);
             val = (!V.empty()) ? static_cast<X> (std::abs(V.front())) : 0.0;
 			break;
 		}
-		case helicsType_t::helicsInvalid:
+		case helics_type_t::helicsInvalid:
 			throw (std::invalid_argument("unrecognized helics type"));
 		}
 	}

@@ -34,7 +34,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 class Core;
-class asyncFedCallInfo;
+class AsyncFedCallInfo;
 class MessageOperator;
 /** data class defining federate properties and information
  */
@@ -116,7 +116,7 @@ class Federate
 	Time currentTime;  //!< the current simulation time
 	FederateInfo FedInfo;  //!< the information structure that contains the data on the federate
   private:
-	std::unique_ptr<asyncFedCallInfo> asyncCallInfo;  //!< pointer to a class defining the async call information
+	std::unique_ptr<AsyncFedCallInfo> asyncCallInfo;  //!< pointer to a class defining the async call information
   public:
 	/**constructor taking a federate information structure
 	@param[in] fi  a federate information structure
@@ -154,7 +154,7 @@ class Federate
 	if called when no aysnc operation is in flight*/
 	bool isAsyncOperationCompleted () const;
 	/** second part of the async process for entering initializationState call after a call to
-	enterInitializationStateAsync if call any other time it will throw an invalidFunctionCall exception*/
+	enterInitializationStateAsync if call any other time it will throw an InvalidFunctionCall exception*/
 	void enterInitializationStateComplete ();
 	/** enter the normal execution mode
 	@details call will block until all federates have entered this mode
@@ -404,9 +404,9 @@ class Federate
 	/** function to deal with any operations that need to occur on a time update*/
 	virtual void updateTime (Time newTime, Time oldTime);
 	/** function to deal with any operations that need to occur on the transition from startup to initialize*/
-	virtual void StartupToInitializeStateTransition ();
+	virtual void startupToInitializeStateTransition ();
 	/** function to deal with any operations that need to occur on the transition from startup to initialize*/
-	virtual void InitializeToExecuteStateTransition ();
+	virtual void initializeToExecuteStateTransition ();
 
   public:
 	/** register a set of interfaces defined in a file
@@ -425,26 +425,6 @@ class Federate
 	const std::string &getName () const { return FedInfo.name; }
 	/** get a pointer to the core object used by the federate*/
 	std::shared_ptr<Core> getCorePointer () { return coreObject; }
-};
-
-/** defining an exception class for state transition errors*/
-class InvalidStateTransition : public std::runtime_error
-{
-  public:
-	InvalidStateTransition (const char *s) noexcept : std::runtime_error (s) {}
-};
-
-/** defining an exception class for invalid function calls*/
-class InvalidFunctionCall : public std::runtime_error
-{
-  public:
-	InvalidFunctionCall (const char *s) noexcept : std::runtime_error (s) {}
-};
-/** defining an exception class for invalid parameter values*/
-class InvalidParameterValue : public std::runtime_error
-{
-  public:
-	InvalidParameterValue (const char *s) noexcept : std::runtime_error (s) {}
 };
 
 /** function to do some housekeeping work

@@ -62,7 +62,7 @@ class Core
     /**
      * HandleID uniquely identifies a handle.
      */
-    using Handle = int32_t;
+    using handle_id_t = int32_t;
 
     /**
      * Simulator control.
@@ -335,7 +335,7 @@ class Core
      * @param[in] check_mode  if set to required the core will error if the subscription does not have a
      * corresponding publication when converting to init mode
      */
-    virtual Handle registerSubscription (federate_id_t federateID,
+    virtual handle_id_t registerSubscription (federate_id_t federateID,
                                          const std::string &key,
                                          const std::string &(type),
                                          const std::string &units,
@@ -344,7 +344,7 @@ class Core
     @param federateID the identifier for the federate
     @key the tag of the subscription
     @return a handle to identify the subscription*/
-    virtual Handle getSubscription (federate_id_t federateID, const std::string &key) const = 0;
+    virtual handle_id_t getSubscription (federate_id_t federateID, const std::string &key) const = 0;
 
     /**
      * Register a publication.
@@ -356,7 +356,7 @@ class Core
      @param units the units associated with the publication
      @return a handle to identify the publication
      */
-    virtual Handle registerPublication (federate_id_t federateID,
+    virtual handle_id_t registerPublication (federate_id_t federateID,
                                         const std::string &key,
                                         const std::string &type,
                                         const std::string &units) = 0;
@@ -365,23 +365,23 @@ class Core
     @param federateID the identifier for the federate
     @key the name of the publication
      @return a handle to identify the publication*/
-    virtual Handle getPublication (federate_id_t federateID, const std::string &key) const = 0;
+    virtual handle_id_t getPublication (federate_id_t federateID, const std::string &key) const = 0;
 
     /**
      * Returns the name or identifier for a specified handle
      */
-    virtual const std::string &getHandleName (Handle handle) const = 0;
+    virtual const std::string &getHandleName (handle_id_t handle) const = 0;
 
     /**
     * Returns the target of a specified handle
     @details for publications and subscriptions this is the key
     for filters this is the target and for endpoints this will return an empty string
     */
-    virtual const std::string &getTarget(Handle handle) const = 0;
+    virtual const std::string &getTarget(handle_id_t handle) const = 0;
     /**
      * Returns units for specified handle.
      */
-    virtual const std::string &getUnits (Handle handle) const = 0;
+    virtual const std::string &getUnits (handle_id_t handle) const = 0;
 
     /**
      * Returns type for specified handle.
@@ -389,7 +389,7 @@ class Core
      for subscriptions this is the type of the publication(if available)
      @param handle the handle from the publication, subscription, endpoint or filter
      */
-    virtual const std::string &getType (Handle handle) const = 0;
+    virtual const std::string &getType (handle_id_t handle) const = 0;
 
     /**
     * Returns output type for specified handle.
@@ -397,7 +397,7 @@ class Core
     for endpoints and publications this is the same as getType();
     @param handle the handle from the publication, subscription, endpoint or filter
     */
-    virtual const std::string &getOutputType (Handle handle) const = 0;
+    virtual const std::string &getOutputType (handle_id_t handle) const = 0;
 
     /**
      * Publish specified data to the specified key.
@@ -406,13 +406,13 @@ class Core
      @param[in] data the raw data to send
      @param len the size of the data
      */
-    virtual void setValue (Handle handle, const char *data, uint64_t len) = 0;
+    virtual void setValue (handle_id_t handle, const char *data, uint64_t len) = 0;
 
     /**
      * Return the data for the specified handle.
      *
      */
-    virtual std::shared_ptr<const data_block> getValue (Handle handle) = 0;
+    virtual std::shared_ptr<const data_block> getValue (handle_id_t handle) = 0;
 
     /**
      * Returns vector of subscription handles that received an update during the last
@@ -420,7 +420,7 @@ class Core
      *@param federateID the identification code of the federate to query
      @return a reference to the location of an array of handles that have been updated
      */
-    virtual const std::vector<Handle> &getValueUpdates (federate_id_t federateID) = 0;
+    virtual const std::vector<handle_id_t> &getValueUpdates (federate_id_t federateID) = 0;
 
     /**
      * Message interface.
@@ -432,14 +432,14 @@ class Core
      *
      * May only be invoked in the Initialization state.
      */
-    virtual Handle
+    virtual handle_id_t
     registerEndpoint (federate_id_t federateID, const std::string &name, const std::string &type) = 0;
 
     /** get a endpoint Handle from its name or target(this may not be unique so it will only find the first one)
     @param federateID the identifier for the federate
     @param name the name of the endpoint
     @return a handle to identify the endpoint*/
-    virtual Handle getEndpoint (federate_id_t federateID, const std::string &name) const = 0;
+    virtual handle_id_t getEndpoint (federate_id_t federateID, const std::string &name) const = 0;
 
     /**
      * Register source filter.
@@ -452,7 +452,7 @@ class Core
      this is important for ordering in filters with operators
      @return the handle for the new filter
      */
-    virtual Handle registerSourceFilter (const std::string &filterName,
+    virtual handle_id_t registerSourceFilter (const std::string &filterName,
                                          const std::string &source,
                                          const std::string &type_in,
                                          const std::string &type_out) = 0;
@@ -468,7 +468,7 @@ class Core
     warning if it doesn't match with the input type of the target endpoint
     @return the handle for the new filter
     */
-    virtual Handle registerDestinationFilter (const std::string &filterName,
+    virtual handle_id_t registerDestinationFilter (const std::string &filterName,
                                               const std::string &dest,
                                               const std::string &type_in,
                                               const std::string &type_out) = 0;
@@ -477,13 +477,13 @@ class Core
     one)
     @param name the name of the filter or its target
     @return a handle to identify the filter*/
-    virtual Handle getSourceFilter (const std::string &name) const = 0;
+    virtual handle_id_t getSourceFilter (const std::string &name) const = 0;
 
     /** get a destination filter Handle from its name or target(this may not be unique so it will only find the
     first one)
     @param name the name of the filter or its target
     @return a handle to identify the filter*/
-    virtual Handle getDestinationFilter (const std::string &name) const = 0;
+    virtual handle_id_t getDestinationFilter (const std::string &name) const = 0;
 
     /**
     * add a time dependency between federates
@@ -515,7 +515,7 @@ class Core
      * communication network.  This enables simulations to be run with/without
      * a communications model present.
      */
-    virtual void send (Handle sourceHandle, const std::string &destination, const char *data, uint64_t length) = 0;
+    virtual void send (handle_id_t sourceHandle, const std::string &destination, const char *data, uint64_t length) = 0;
 
     /**
      * Send data from source to destination with explicit expected delivery time.
@@ -534,7 +534,7 @@ class Core
      @param length the record length of the event
      */
     virtual void sendEvent (Time time,
-                            Handle sourceHandle,
+                            handle_id_t sourceHandle,
                             const std::string &destination,
                             const char *data,
                             uint64_t length) = 0;
@@ -545,18 +545,18 @@ class Core
      * Continues sending the message to the next filter or to final destination.
      *
      */
-    virtual void sendMessage (Handle sourceHandle, std::unique_ptr<Message> message) = 0;
+    virtual void sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message> message) = 0;
 
     /**
      * Returns the number of pending receives for the specified destination endpoint or filter.
      */
-    virtual uint64_t receiveCount (Handle destination) = 0;
+    virtual uint64_t receiveCount (handle_id_t destination) = 0;
 
     /**
      * Returns the next buffered message the specified destination endpoint or filter.
      @details this is a non-blocking call and will return a nullptr if no message are available
      */
-    virtual std::unique_ptr<Message> receive (Handle destination) = 0;
+    virtual std::unique_ptr<Message> receive (handle_id_t destination) = 0;
 
     /**
      * Receives a message for any destination.
@@ -564,7 +564,7 @@ class Core
      @param federateID the identifier for the federate
      @param[out] endpoint_id the endpoint handle related to the message gets stored here
      */
-    virtual std::unique_ptr<Message> receiveAny (federate_id_t federateID, Handle &enpoint_id) = 0;
+    virtual std::unique_ptr<Message> receiveAny (federate_id_t federateID, handle_id_t &enpoint_id) = 0;
 
     /**
      * Returns number of messages for all destinations.
@@ -582,7 +582,7 @@ class Core
     @param[in] filter  the handle of the filter
     @param[in] operator pointer to the operator class executing the filter
     */
-    virtual void setFilterOperator (Handle filter, std::shared_ptr<FilterOperator> callback) = 0;
+    virtual void setFilterOperator (handle_id_t filter, std::shared_ptr<FilterOperator> callback) = 0;
 
     /** define a logging function to use for logging message and notices from the federation and individual
     federate
@@ -617,8 +617,8 @@ class Core
 
 // set at a large negative number but not the largest negative number
 constexpr Core::federate_id_t invalid_fed_id = -2'000'000'000;
-constexpr Core::Handle invalid_handle = -2'000'000'000;
-constexpr Core::Handle direct_send_handle = -1'745'234; //!< this special handle can be used to directly send a message in a core
+constexpr Core::handle_id_t invalid_handle = -2'000'000'000;
+constexpr Core::handle_id_t direct_send_handle = -1'745'234; //!< this special handle can be used to directly send a message in a core
 
 }  // namespace helics
 

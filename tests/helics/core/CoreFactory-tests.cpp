@@ -26,7 +26,10 @@ BOOST_AUTO_TEST_CASE (ZmqCore_test)
     core = nullptr;
 }
 #else  // HELICS_HAVE_ZEROMQ
-BOOST_AUTO_TEST_CASE (ZmqCore_test) { BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::ZMQ), false); }
+BOOST_AUTO_TEST_CASE (ZmqCore_test)
+{
+    BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::ZMQ), false);
+}
 #endif  // HELICS_HAVE_ZEROMQ
 
 #if HELICS_HAVE_MPI
@@ -40,7 +43,10 @@ BOOST_AUTO_TEST_CASE (MpiCore_test)
     core = nullptr;
 }
 #else
-BOOST_AUTO_TEST_CASE (MpiCore_test) { BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::MPI), false); }
+BOOST_AUTO_TEST_CASE (MpiCore_test)
+{
+    BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::MPI), false);
+}
 #endif  // HELICS_HAVE_MPI
 
 BOOST_AUTO_TEST_CASE (TestCore_test)
@@ -85,7 +91,10 @@ BOOST_AUTO_TEST_CASE (tcpCore_test)
     core2 = nullptr;
 }
 #else
-BOOST_AUTO_TEST_CASE (tcpCore_test) { BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::TCP), false); }
+BOOST_AUTO_TEST_CASE (tcpCore_test)
+{
+    BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::TCP), false);
+}
 #endif
 
 BOOST_AUTO_TEST_CASE (udpCore_test)

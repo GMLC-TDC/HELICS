@@ -156,7 +156,7 @@ void FederateState::UpdateFederateInfo (const ActionMessage &cmd)
     }
 }
 
-void FederateState::createSubscription (Core::Handle handle,
+void FederateState::createSubscription (Core::handle_id_t handle,
                                         const std::string &key,
                                         const std::string &type,
                                         const std::string &units,
@@ -179,7 +179,7 @@ void FederateState::createSubscription (Core::Handle handle,
         std::sort (subscriptions.begin (), subscriptions.end (), compareFunc);
     }
 }
-void FederateState::createPublication (Core::Handle handle,
+void FederateState::createPublication (Core::handle_id_t handle,
                                        const std::string &key,
                                        const std::string &type,
                                        const std::string &units)
@@ -201,7 +201,7 @@ void FederateState::createPublication (Core::Handle handle,
     }
 }
 
-void FederateState::createEndpoint (Core::Handle handle, const std::string &key, const std::string &type)
+void FederateState::createEndpoint (Core::handle_id_t handle, const std::string &key, const std::string &type)
 {
     auto ep = std::make_unique<EndpointInfo> (handle, global_id, key, type);
 
@@ -229,9 +229,9 @@ SubscriptionInfo *FederateState::getSubscription (const std::string &subName) co
     return nullptr;
 }
 
-SubscriptionInfo *FederateState::getSubscription (Core::Handle handle_) const
+SubscriptionInfo *FederateState::getSubscription (Core::handle_id_t handle_) const
 {
-    static auto cmptr = [](const std::unique_ptr<SubscriptionInfo> &ptrA, Core::Handle handle) {
+    static auto cmptr = [](const std::unique_ptr<SubscriptionInfo> &ptrA, Core::handle_id_t handle) {
         return (ptrA->id < handle);
     };
 
@@ -253,9 +253,9 @@ PublicationInfo *FederateState::getPublication (const std::string &pubName) cons
     return nullptr;
 }
 
-PublicationInfo *FederateState::getPublication (Core::Handle handle_) const
+PublicationInfo *FederateState::getPublication (Core::handle_id_t handle_) const
 {
-    static auto cmptr = [](const std::unique_ptr<PublicationInfo> &ptrA, Core::Handle handle) {
+    static auto cmptr = [](const std::unique_ptr<PublicationInfo> &ptrA, Core::handle_id_t handle) {
         return (ptrA->id < handle);
     };
 
@@ -277,9 +277,9 @@ EndpointInfo *FederateState::getEndpoint (const std::string &endpointName) const
     return nullptr;
 }
 
-EndpointInfo *FederateState::getEndpoint (Core::Handle handle_) const
+EndpointInfo *FederateState::getEndpoint (Core::handle_id_t handle_) const
 {
-    static auto cmptr = [](const std::unique_ptr<EndpointInfo> &ptrA, Core::Handle handle) {
+    static auto cmptr = [](const std::unique_ptr<EndpointInfo> &ptrA, Core::handle_id_t handle) {
         return (ptrA->id < handle);
     };
 
@@ -295,7 +295,7 @@ EndpointInfo *FederateState::getEndpoint (Core::Handle handle_) const
     return nullptr;
 }
 
-bool FederateState::checkSetValue (Core::Handle pub_id, const char *data, uint64_t len) const
+bool FederateState::checkSetValue (Core::handle_id_t pub_id, const char *data, uint64_t len) const
 {
     if (!only_transmit_on_change)
     {
@@ -307,7 +307,7 @@ bool FederateState::checkSetValue (Core::Handle pub_id, const char *data, uint64
     return pub->CheckSetValue (data, len);
 }
 
-uint64_t FederateState::getQueueSize (Core::Handle handle_) const
+uint64_t FederateState::getQueueSize (Core::handle_id_t handle_) const
 {
     auto epI = getEndpoint (handle_);
     if (epI != nullptr)
@@ -327,7 +327,7 @@ uint64_t FederateState::getQueueSize () const
     return cnt;
 }
 
-std::unique_ptr<Message> FederateState::receive (Core::Handle handle_)
+std::unique_ptr<Message> FederateState::receive (Core::handle_id_t handle_)
 {
     auto epI = getEndpoint (handle_);
     if (epI != nullptr)
@@ -337,7 +337,7 @@ std::unique_ptr<Message> FederateState::receive (Core::Handle handle_)
     return nullptr;
 }
 
-std::unique_ptr<Message> FederateState::receiveAny (Core::Handle &id)
+std::unique_ptr<Message> FederateState::receiveAny (Core::handle_id_t &id)
 {
     Time earliest_time = Time::maxVal ();
     EndpointInfo *endpointI = nullptr;
@@ -566,9 +566,9 @@ iteration_result FederateState::genericUnspecifiedQueueProcess ()
     return iteration_result::next_step;
 }
 
-const std::vector<Core::Handle> emptyHandles;
+const std::vector<Core::handle_id_t> emptyHandles;
 
-const std::vector<Core::Handle> &FederateState::getEvents () const
+const std::vector<Core::handle_id_t> &FederateState::getEvents () const
 {
     if (!processing)
     {  //!< if we are processing this vector is in an undefined state
@@ -838,7 +838,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
 
 void FederateState::processConfigUpdate (const ActionMessage &m)
 {
-    timeCoord->processConfigUpdateMessage (m, (getState()== HELICS_CREATED));
+    timeCoord->processConfigUpdateMessage (m, (getState () == HELICS_CREATED));
     switch (m.index)
     {
     case UPDATE_LOG_LEVEL:

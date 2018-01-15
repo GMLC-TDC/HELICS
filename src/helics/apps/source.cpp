@@ -179,7 +179,7 @@ void source::run (Time stopTime_input)
     }
 }
 
-void source::addSource(const std::string & /*key*/, helicsType_t /*type*/, const std::string &/*units*/)
+void source::addSource(const std::string & /*key*/, helics_type_t /*type*/, const std::string &/*units*/)
 {
     // skip already existing publications
  //   if (pubids.find (key) != pubids.end ())

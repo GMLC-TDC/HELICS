@@ -29,7 +29,7 @@ class SubscriptionInfo
 {
   public:
 	  /** constructor with all the information*/
-    SubscriptionInfo (Core::Handle id_,
+    SubscriptionInfo (Core::handle_id_t id_,
                       Core::federate_id_t fed_id_,
                       const std::string &key_,
                       const std::string &type_,
@@ -39,7 +39,7 @@ class SubscriptionInfo
     {
     }
 
-    Core::Handle id;	//!< identifier for the handle
+    Core::handle_id_t id;	//!< identifier for the handle
     Core::federate_id_t fed_id;	//!< the federate that created the handle
     std::string key;	//!< the identifier for the subscription
     std::string type;	//! the type of data for the subscription
@@ -49,7 +49,7 @@ class SubscriptionInfo
     bool has_target = false;	//!< flag indicating that a target publication was found
     bool only_update_on_change = false;  //!< flag indicating that the data should only be updated on change
 	std::shared_ptr<const data_block> current_data;	//!< the most recent published data
-	std::pair<Core::federate_id_t, Core::Handle> target;	//!< the publication information
+	std::pair<Core::federate_id_t, Core::handle_id_t> target;	//!< the publication information
 private:
 	std::vector<std::pair<Time, std::shared_ptr<const data_block>>> data_queue; //!< queue of the data
 public:

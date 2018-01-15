@@ -34,7 +34,7 @@ struct endpoint_info
     std::string name;
     std::string type;
     endpoint_id_t id = invalid_id_value;
-    Core::Handle handle;
+    Core::handle_id_t handle;
     int callbackIndex = -1;
     endpoint_info (std::string n_name, std::string n_type)
         : name (std::move (n_name)), type (std::move (n_type)){};
@@ -102,9 +102,9 @@ class MessageFederateManager
     */
     void updateTime (Time newTime, Time oldTime);
     /** transition from Startup To the Initialize State*/
-    void StartupToInitializeStateTransition ();
+    void startupToInitializeStateTransition ();
     /** transition from initialize to execution State*/
-    void InitializeToExecuteStateTransition ();
+    void initializeToExecuteStateTransition ();
 
     /** get the name of an endpoint from its id
     @param[in] id the endpoint to query
@@ -147,8 +147,8 @@ class MessageFederateManager
     std::vector<endpoint_info> local_endpoints;  //!< storage for the local endpoint information
     std::vector<std::function<void(endpoint_id_t, Time)>> callbacks;  //!< vector of callbacks
 
-    std::map<Core::Handle, endpoint_id_t> handleLookup;  //!< map to lookup endpoints from core handles
-    std::map<Core::Handle, std::pair<endpoint_id_t, std::string>> subHandleLookup;  //!< map for subscriptions
+    std::map<Core::handle_id_t, endpoint_id_t> handleLookup;  //!< map to lookup endpoints from core handles
+    std::map<Core::handle_id_t, std::pair<endpoint_id_t, std::string>> subHandleLookup;  //!< map for subscriptions
     Time CurrentTime;  //!< the current simulation time
     std::shared_ptr<Core> coreObject;  //!< the pointer to the actual core
     Core::federate_id_t fedID;  //!< storage for the federate ID

@@ -17,38 +17,49 @@ extern "C" {
 #endif
 
 // MESSAGE FEDERATE calls
+/** create a source Filter on the specified federate
+@details filters can be created through a federate or a core , linking through a federate allows
+a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
+@param fed the fed to register through
+@param name the name of the filter (can be nullptr)
+@param inputType the input type of the filter,  used for ordering (can be nullptr)
+@param outputType the output type of the filter,  used for ordering (can be nullptr)
+@return a helics_source_filter object
+*/
+HELICS_Export helics_filter helicsFederateRegisterSourceFilter (helics_federate fed,
+                                                                helics_filter_type_t type,
+                                                                const char *target,
+                                                                const char *name);
 
-HELICS_Export helics_source_filter helicsFederateRegisterSourceFilter (helics_federate fed,
-                                                               const char *name,
-                                                               const char *inputType,
-                                                               const char *outputType);
+HELICS_Export helics_filter helicsFederateRegisterDestinationFilter (helics_federate fed,
+                                                                     helics_filter_type_t type,
+                                                                     const char *target,
+                                                                     const char *name);
 
-HELICS_Export helics_destination_filter helicsFederateRegisterDestinationFilter (helics_federate fed,
-                                                                         const char *name,
-                                                                         const char *inputType,
-                                                                         const char *outputType);
+HELICS_Export helics_filter helicsFederateRegisterCloningFilter (helics_federate fed, const char *deliveryEndpoint);
 
-HELICS_Export helics_cloning_filter helicsFederateRegisterCloningFilter(helics_federate fed,
-const char *deliveryEndpoint);
+HELICS_Export helics_filter helicsCoreRegisterSourceFilter (helics_core core,
+                                                            helics_filter_type_t type,
+                                                            const char *target,
+                                                            const char *name);
 
-HELICS_Export helics_source_filter helicsCoreRegisterSourceFilter(helics_core fed,
-    const char *name,
-    const char *inputType,
-    const char *outputType);
+HELICS_Export helics_filter helicsCoreRegisterDestinationFilter (helics_core core,
+                                                                 helics_filter_type_t type,
+                                                                 const char *target,
+                                                                 const char *name);
 
-HELICS_Export helics_destination_filter helicsCoreRegisterDestinationFilter(helics_core fed,
-    const char *name,
-    const char *inputType,
-    const char *outputType);
+HELICS_Export helics_filter helicsCoreRegisterCloningFilter (helics_core fed, const char *deliveryEndpoint);
 
-HELICS_Export helics_cloning_filter helicsCoreRegisterCloningFilter(helics_core fed,
-    const char *deliveryEndpoint);
+/** get the target of the filter*/
+HELICS_Export helics_status helicsFilterGetTarget (helics_filter filt, char *str, int maxlen);
 
-HELICS_Export void helicsSourceFilterFree (helics_source_filter filter);
+/** get the name of the filter*/
+HELICS_Export helics_status helicsFilterGetName (helics_filter filt, char *str, int maxlen);
 
-HELICS_Export void helicsDestinationFilterFree (helics_destination_filter filter);
+HELICS_Export helics_status helicsFilterSet (helics_filter filt, const char *property, double val);
 
-HELICS_Export void helicsCloningFilterFree(helics_cloning_filter filter);
+HELICS_Export helics_status setString (helics_filter filt, const char *property, const char *val);
+
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif

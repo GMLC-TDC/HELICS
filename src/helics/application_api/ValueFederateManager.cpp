@@ -110,7 +110,7 @@ void ValueFederateManager::setDefaultValue (subscription_id_t id, data_view bloc
 }
 
 /** we have a new message from the core*/
-void ValueFederateManager::getUpdateFromCore (Core::Handle updatedHandle)
+void ValueFederateManager::getUpdateFromCore (Core::handle_id_t updatedHandle)
 {
     auto data = coreObject->getValue (updatedHandle);
 
@@ -225,7 +225,7 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     }
 }
 
-void ValueFederateManager::StartupToInitializeStateTransition ()
+void ValueFederateManager::startupToInitializeStateTransition ()
 {
     lastData.resize (subs.size ());
     // get the actual publication types
@@ -235,7 +235,7 @@ void ValueFederateManager::StartupToInitializeStateTransition ()
     }
 }
 
-void ValueFederateManager::InitializeToExecuteStateTransition () { updateTime (0.0, 0.0); }
+void ValueFederateManager::initializeToExecuteStateTransition () { updateTime (0.0, 0.0); }
 
 std::vector<subscription_id_t> ValueFederateManager::queryUpdates ()
 {
@@ -318,18 +318,17 @@ std::string ValueFederateManager::getPublicationType (publication_id_t pub_id) c
     return (pub_id.value () < pubs.size ()) ? pubs[pub_id.value ()].type : nullStr;
 }
 
-
 /** get a count of the number publications registered*/
-int ValueFederateManager::getPublicationCount() const
+int ValueFederateManager::getPublicationCount () const
 {
-    std::lock_guard<std::mutex> publock(publication_mutex);
-    return static_cast<int>(pubs.size());
+    std::lock_guard<std::mutex> publock (publication_mutex);
+    return static_cast<int> (pubs.size ());
 }
 /** get a count of the number subscriptions registered*/
-int ValueFederateManager::getSubscriptionCount() const
+int ValueFederateManager::getSubscriptionCount () const
 {
-    std::lock_guard<std::mutex> sublock(subscription_mutex);
-    return  static_cast<int>(subs.size());
+    std::lock_guard<std::mutex> sublock (subscription_mutex);
+    return static_cast<int> (subs.size ());
 }
 
 void ValueFederateManager::registerCallback (std::function<void(subscription_id_t, Time)> callback)

@@ -181,7 +181,9 @@ class ValueFederate : public virtual Federate
     /** Methods to get subscription values **/
     int getValue (helics_subscription sub, char *data, int maxlen)
     {
-        return helicsSubscriptionGetValue (sub, data, maxlen);
+        int actualSize;
+       helicsSubscriptionGetValue (sub, data, maxlen,&actualSize);
+       return actualSize;
     }
 
     std::string getString (helics_subscription sub)
@@ -217,7 +219,9 @@ class ValueFederate : public virtual Federate
 
     int getVector (helics_subscription sub, double *data, int maxlen)
     {
-        return helicsSubscriptionGetVector (sub, data, maxlen);
+        int actualSize;
+        helicsSubscriptionGetVector (sub, data, maxlen,&actualSize);
+        return actualSize;
     }
 
     /** Methods to publish values **/

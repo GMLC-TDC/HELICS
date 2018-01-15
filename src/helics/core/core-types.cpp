@@ -122,7 +122,7 @@ bool isCoreTypeAvailable (core_type type) noexcept
         available = true;
 #endif
         break;
-    case core_type::DEFAULT: //default should always be available
+    case core_type::DEFAULT:  // default should always be available
         available = true;
         break;
     default:

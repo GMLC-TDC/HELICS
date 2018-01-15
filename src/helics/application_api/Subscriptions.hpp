@@ -59,7 +59,7 @@ class SubscriptionBase
         }
     }
 
-    SubscriptionBase(ValueFederate *valueFed, int subIndex);
+    SubscriptionBase (ValueFederate *valueFed, int subIndex);
     virtual ~SubscriptionBase () = default;
     SubscriptionBase (SubscriptionBase &&base) = default;
     SubscriptionBase &operator= (SubscriptionBase &&base) = default;
@@ -85,7 +85,7 @@ class SubscriptionBase
     /** get the key for the subscription*/
     const std::string &getName () const { return key_; }
     /** get the key for the subscription*/
-    std::string getType () const {return fed->getPublicationType (id); }
+    std::string getType () const { return fed->getPublicationType (id); }
     /** get the units associated with a subscription*/
     const std::string &getUnits () const { return units_; }
 };
@@ -104,7 +104,7 @@ class Subscription : public SubscriptionBase
                    std::function<void(const std::vector<std::complex<double>> &, Time)>>
       value_callback;  //!< callback function for the federate
 
-    mutable helicsType_t type = helicsType_t::helicsInvalid;  //!< the underlying type the publication is using
+    mutable helics_type_t type = helics_type_t::helicsInvalid;  //!< the underlying type the publication is using
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
     // bool hasUpdate = false;  //!< the value has been updated
     defV lastValue;  //!< the last value updated
@@ -121,23 +121,27 @@ class Subscription : public SubscriptionBase
     {
     }
 
-    Subscription(ValueFederate *valueFed, const std::string &key, helicsType_t defType, const std::string &units = "")
-        : SubscriptionBase(valueFed, key, typeNameStringRef(defType), units)
+    Subscription (ValueFederate *valueFed,
+                  const std::string &key,
+                  helics_type_t defType,
+                  const std::string &units = "")
+        : SubscriptionBase (valueFed, key, typeNameStringRef (defType), units)
     {
     }
 
-    Subscription(bool required, ValueFederate *valueFed, const std::string &key, helicsType_t defType, const std::string &units = "")
-        : SubscriptionBase(required, valueFed, key, typeNameStringRef(defType), units)
+    Subscription (bool required,
+                  ValueFederate *valueFed,
+                  const std::string &key,
+                  helics_type_t defType,
+                  const std::string &units = "")
+        : SubscriptionBase (required, valueFed, key, typeNameStringRef (defType), units)
     {
     }
     /** generate a subscription object from a preexisting subscription
     @param valueFed a pointer to the appropriate value Federate
     @param subIndex the index of the subscription
     */
-    Subscription(ValueFederate *valueFed, int subIndex) : SubscriptionBase(valueFed, subIndex)
-    {
-
-    }
+    Subscription (ValueFederate *valueFed, int subIndex) : SubscriptionBase (valueFed, subIndex) {}
     /** check if the value has been updated*/
     virtual bool isUpdated () const override;
 
@@ -145,16 +149,16 @@ class Subscription : public SubscriptionBase
     @param[out] out the location to store the value
     */
     template <class X>
-    typename std::enable_if_t<helicsType<X> () != helicsType_t::helicsInvalid> getValue (X &out)
+    typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsInvalid> getValue (X &out)
     {
         if (fed->isUpdated (id))
         {
             auto dv = fed->getValueRaw (id);
-            if (type == helicsType_t::helicsInvalid)
+            if (type == helics_type_t::helicsInvalid)
             {
                 type = getTypeFromString (fed->getPublicationType (id));
             }
-            if (type != helicsType_t::helicsInvalid)
+            if (type != helics_type_t::helicsInvalid)
             {
                 valueExtract (dv, type, out);
                 if (changeDetectionEnabled)
@@ -186,7 +190,7 @@ class Subscription : public SubscriptionBase
     /** get the most recent value
     @return the value*/
     template <class X>
-    typename std::enable_if_t<helicsType<X> () != helicsType_t::helicsInvalid, X> getValue ()
+    typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsInvalid, X> getValue ()
     {
         X val;
         getValue (val);
@@ -217,7 +221,7 @@ class Subscription : public SubscriptionBase
     val is the new value and time is the time the value was updated
     */
     template <class X>
-    typename std::enable_if_t<helicsType<X> () != helicsType_t::helicsInvalid, void>
+    typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsInvalid, void>
     registerCallback (std::function<void(const X &, Time)> callback)
     {
         value_callback = callback;
@@ -229,7 +233,7 @@ class Subscription : public SubscriptionBase
     /** set the default value to use before any update has been published
      */
     template <class X>
-    typename std::enable_if_t<helicsType<X> () != helicsType_t::helicsInvalid, void> setDefault (const X &val)
+    typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsInvalid, void> setDefault (const X &val)
     {
         lastValue = val;
     }
@@ -253,6 +257,7 @@ class Subscription : public SubscriptionBase
     @param enabled (optional) set to false to disable change detection true(default) to enable it
     */
     void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
+
   private:
     void handleCallback (Time time);
 };

@@ -38,8 +38,8 @@ namespace helics
 {
 using namespace std::string_literals;
 static const ArgDescriptors extraArgs{{"queueloc"s, "string"s, "the named location of the shared queue"s},
-{ "broker,b"s,"string"s,"identifier for the broker"s },
-{ "broker_address","string"s,"location of the broker i.e network address" },
+                                      {"broker,b"s, "string"s, "identifier for the broker"s},
+                                      {"broker_address", "string"s, "location of the broker i.e network address"},
                                       {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
 
 IpcBroker::IpcBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}

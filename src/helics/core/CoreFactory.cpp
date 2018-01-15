@@ -235,7 +235,7 @@ std::shared_ptr<Core> findCore (const std::string &name) { return searchableObje
 
 bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &ptr)
 {
-    if (ptr->isOpenToNewFederates())
+    if (ptr->isOpenToNewFederates ())
     {
         switch (type)
         {
@@ -260,7 +260,7 @@ bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &pt
             return (dynamic_cast<UdpCore *> (ptr.get ()) != nullptr);
         case core_type::TCP:
 #ifndef DISABLE_TCP_CORE
-            return (dynamic_cast<TcpCore *> (ptr.get()) != nullptr);
+            return (dynamic_cast<TcpCore *> (ptr.get ()) != nullptr);
 #endif
         default:
             return true;

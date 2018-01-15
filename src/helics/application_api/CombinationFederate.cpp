@@ -25,8 +25,8 @@ CombinationFederate::CombinationFederate (std::shared_ptr<Core> core, const Fede
 CombinationFederate::CombinationFederate (const std::string &jsonString)
     : Federate (jsonString), ValueFederate (true), MessageFederate (true)
 {
-    ValueFederate::registerInterfaces(jsonString);
-    MessageFederate::registerInterfaces(jsonString);
+    ValueFederate::registerInterfaces (jsonString);
+    MessageFederate::registerInterfaces (jsonString);
 }
 
 CombinationFederate::CombinationFederate (CombinationFederate &&fed) noexcept = default;
@@ -46,16 +46,16 @@ void CombinationFederate::updateTime (Time newTime, Time oldTime)
     MessageFederate::updateTime (newTime, oldTime);
 }
 
-void CombinationFederate::StartupToInitializeStateTransition ()
+void CombinationFederate::startupToInitializeStateTransition ()
 {
-    ValueFederate::StartupToInitializeStateTransition ();
-    MessageFederate::StartupToInitializeStateTransition ();
+    ValueFederate::startupToInitializeStateTransition ();
+    MessageFederate::startupToInitializeStateTransition ();
 }
 
-void CombinationFederate::InitializeToExecuteStateTransition ()
+void CombinationFederate::initializeToExecuteStateTransition ()
 {
-    ValueFederate::InitializeToExecuteStateTransition ();
-    MessageFederate::InitializeToExecuteStateTransition ();
+    ValueFederate::initializeToExecuteStateTransition ();
+    MessageFederate::initializeToExecuteStateTransition ();
 }
 
 void CombinationFederate::registerInterfaces (const std::string &jsonString)

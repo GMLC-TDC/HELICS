@@ -52,8 +52,8 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     MessageFederate &operator= (MessageFederate &&mFed) noexcept;
 
   protected:
-    virtual void StartupToInitializeStateTransition () override;
-    virtual void InitializeToExecuteStateTransition () override;
+    virtual void startupToInitializeStateTransition () override;
+    virtual void initializeToExecuteStateTransition () override;
     virtual void updateTime (Time newTime, Time oldTime) override;
 
   public:

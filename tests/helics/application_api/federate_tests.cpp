@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE (federate_timeout_test)
     std::this_thread::sleep_for (std::chrono::seconds (5));
     auto cptr = Fed->getCorePointer ();
     BOOST_CHECK (!cptr->isConnected ());
-    BOOST_CHECK_THROW (res = Fed->requestTime (4.0), helics::functionExecutionFailure);
+    BOOST_CHECK_THROW (res = Fed->requestTime (4.0), helics::FunctionExecutionFailure);
     BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::error);
 }
 #endif
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates)
     BOOST_CHECK_EQUAL (f2step, 3.0);
     BOOST_CHECK_EQUAL (f1stepVal, 3.0);
 
-    BOOST_CHECK_THROW (Fed1->enterInitializationState (), helics::InvalidStateTransition);
+    BOOST_CHECK_THROW (Fed1->enterInitializationState (), helics::InvalidFunctionCall);
     Fed1->finalize ();
     Fed2->finalize ();
 }
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_multi_cores)
     BOOST_CHECK_EQUAL (f2step, 3.0);
     BOOST_CHECK_EQUAL (f1stepVal, 3.0);
 
-    BOOST_CHECK_THROW (Fed1->enterInitializationState (), helics::InvalidStateTransition);
+    BOOST_CHECK_THROW (Fed1->enterInitializationState (), helics::InvalidFunctionCall);
     Fed1->finalize ();
     Fed2->finalize ();
 }
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls)
 
     Fed1->enterExecutionStateAsync ();
     Fed2->enterExecutionState ();
-    Fed1->enterExecutionStateComplete();
+    Fed1->enterExecutionStateComplete ();
     BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::op_states::execution);
     BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::op_states::execution);
 
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls)
     BOOST_CHECK_EQUAL (f2step, 3.0);
     BOOST_CHECK_EQUAL (f1stepVal, 3.0);
 
-    BOOST_CHECK_THROW (Fed1->enterInitializationState (), helics::InvalidStateTransition);
+    BOOST_CHECK_THROW (Fed1->enterInitializationState (), helics::InvalidFunctionCall);
     BOOST_CHECK_THROW (Fed1->requestTimeComplete (), helics::InvalidFunctionCall);
     Fed1->finalize ();
     Fed2->finalize ();

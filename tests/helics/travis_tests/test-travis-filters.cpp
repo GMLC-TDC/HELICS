@@ -47,7 +47,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
 
     fFed->enterExecutionStateAsync ();
     mFed->enterExecutionState ();
-    fFed->enterExecutionStateComplete();
+    fFed->enterExecutionStateComplete ();
 
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
@@ -109,14 +109,15 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
 
     fFed->enterExecutionStateAsync ();
     mFed->enterExecutionState ();
-    fFed->enterExecutionStateComplete();
+    fFed->enterExecutionStateComplete ();
 
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
-    //this shouldn't be necessary but it seems there is a time dependency bug that shows up intermittently, this is not the test to find that bug
-    
-    std::this_thread::yield();
+    // this shouldn't be necessary but it seems there is a time dependency bug that shows up intermittently, this
+    // is not the test to find that bug
+
+    std::this_thread::yield ();
     mFed->requestTimeAsync (1.0);
     fFed->requestTime (1.0);
     mFed->requestTimeComplete ();
@@ -128,7 +129,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     fFed->requestTime (2.0);
     mFed->requestTimeComplete ();
     BOOST_REQUIRE (!mFed->hasMessage (p2));
-    std::this_thread::yield();
+    std::this_thread::yield ();
     mFed->requestTime (3.0);
 
     BOOST_REQUIRE (mFed->hasMessage (p2));

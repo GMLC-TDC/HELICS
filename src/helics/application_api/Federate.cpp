@@ -17,7 +17,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "asyncFedCallInfo.h"
 #include "helics/helics-config.h"
 
-
 #include <cassert>
 #include <fstream>
 #include <iostream>
@@ -63,29 +62,30 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
     else
     {
         coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, fi.coreInitString);
-        if (!coreObject->isOpenToNewFederates())
+        if (!coreObject->isOpenToNewFederates ())
         {
             coreObject = nullptr;
-            CoreFactory::cleanUpCores(200);
-            coreObject = CoreFactory::FindOrCreate(fi.coreType, fi.coreName, fi.coreInitString);
-            if (!coreObject->isOpenToNewFederates())
+            CoreFactory::cleanUpCores (200);
+            coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, fi.coreInitString);
+            if (!coreObject->isOpenToNewFederates ())
             {
-                throw(registrationFailure("Unable to connect to specified core: core is not open to new Federates"));
-    }
+                throw (
+                  RegistrationFailure ("Unable to connect to specified core: core is not open to new Federates"));
+            }
         }
     }
     if (!coreObject)
     {
-        throw(registrationFailure("Unable to connect to specified core: unable to create specified core"));
+        throw (RegistrationFailure ("Unable to connect to specified core: unable to create specified core"));
     }
     /** make sure the core is connected */
     if (!coreObject->isConnected ())
     {
         coreObject->connect ();
     }
-    //this call will throw an error on failure
+    // this call will throw an error on failure
     fedID = coreObject->registerFederate (fi.name, fi);
-   
+
     currentTime = coreObject->getCurrentTime (fedID);
 }
 
@@ -178,7 +178,7 @@ void Federate::enterInitializationState ()
         coreObject->enterInitializingState (fedID);
         state = op_states::initialization;
         currentTime = coreObject->getCurrentTime (fedID);
-        StartupToInitializeStateTransition ();
+        startupToInitializeStateTransition ();
     }
     else if (state == op_states::pending_init)
     {
@@ -186,7 +186,7 @@ void Federate::enterInitializationState ()
     }
     else if (state != op_states::initialization)  // if we are already in initialization do nothing
     {
-        throw (InvalidStateTransition ("cannot transition from current state to initialization state"));
+        throw (InvalidFunctionCall("cannot transition from current state to initialization state"));
     }
 }
 
@@ -196,7 +196,7 @@ void Federate::enterInitializationStateAsync ()
     {
         if (!asyncCallInfo)
         {
-            asyncCallInfo = std::make_unique<asyncFedCallInfo> ();
+            asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
         }
         state = op_states::pending_init;
         asyncCallInfo->initFuture =
@@ -208,7 +208,7 @@ void Federate::enterInitializationStateAsync ()
     }
     else if (state != op_states::initialization)  // if we are already in initialization do nothing
     {
-        throw (InvalidStateTransition ("cannot transition from current state to initialization state"));
+        throw (InvalidFunctionCall ("cannot transition from current state to initialization state"));
     }
 }
 
@@ -237,7 +237,7 @@ void Federate::enterInitializationStateComplete ()
         asyncCallInfo->initFuture.get ();
         state = op_states::initialization;
         currentTime = coreObject->getCurrentTime (fedID);
-        StartupToInitializeStateTransition ();
+        startupToInitializeStateTransition ();
     }
     else
     {
@@ -261,7 +261,7 @@ iteration_result Federate::enterExecutionState (helics_iteration_request iterate
         {
         case iteration_result::next_step:
             state = op_states::execution;
-            InitializeToExecuteStateTransition ();
+            initializeToExecuteStateTransition ();
             break;
         case iteration_result::iterating:
             state = op_states::initialization;
@@ -282,12 +282,12 @@ iteration_result Federate::enterExecutionState (helics_iteration_request iterate
         // already in this state --> do nothing
         break;
     case op_states::pending_time:
-        requestTimeComplete();
+        requestTimeComplete ();
         break;
     case op_states::pending_iterative_time:  // since this isn't guaranteed to progress it shouldn't be called in
-                                           // this fashion
+                                             // this fashion
     default:
-        throw (InvalidStateTransition ("cannot transition from current state to execution state"));
+        throw (InvalidFunctionCall("cannot transition from current state to execution state"));
         break;
     }
     return res;
@@ -301,12 +301,12 @@ void Federate::enterExecutionStateAsync (helics_iteration_request iterate)
     {
         if (!asyncCallInfo)
         {
-            asyncCallInfo = std::make_unique<asyncFedCallInfo> ();
+            asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
         }
 
         auto eExecFunc = [this, iterate]() {
             coreObject->enterInitializingState (fedID);
-            StartupToInitializeStateTransition ();
+            startupToInitializeStateTransition ();
             return coreObject->enterExecutingState (fedID, iterate);
         };
         state = op_states::pending_exec;
@@ -320,7 +320,7 @@ void Federate::enterExecutionStateAsync (helics_iteration_request iterate)
     {
         if (!asyncCallInfo)
         {
-            asyncCallInfo = std::make_unique<asyncFedCallInfo> ();
+            asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
         }
 
         auto eExecFunc = [this, iterate]() { return coreObject->enterExecutingState (fedID, iterate); };
@@ -334,7 +334,7 @@ void Federate::enterExecutionStateAsync (helics_iteration_request iterate)
         // already in this state --> do nothing
         break;
     default:
-        throw (InvalidStateTransition ("cannot transition from current state to execution state"));
+        throw (InvalidFunctionCall ("cannot transition from current state to execution state"));
         break;
     }
 }
@@ -350,7 +350,7 @@ iteration_result Federate::enterExecutionStateComplete ()
     {
     case iteration_result::next_step:
         state = op_states::execution;
-        InitializeToExecuteStateTransition ();
+        initializeToExecuteStateTransition ();
         break;
     case iteration_result::iterating:
         state = op_states::initialization;
@@ -371,7 +371,7 @@ void Federate::setTimeDelta (Time tdelta)
 {
     if (tdelta < timeZero)
     {
-        throw (InvalidParameterValue ("timeDelta must be >=0"));
+        throw (InvalidParameter ("timeDelta must be >=0"));
     }
     coreObject->setTimeDelta (fedID, tdelta);
 }
@@ -380,7 +380,7 @@ void Federate::setOutputDelay (Time outputDelay)
 {
     if (outputDelay < timeZero)
     {
-        throw (InvalidParameterValue ("outputDelay must be >=0"));
+        throw (InvalidParameter ("outputDelay must be >=0"));
     }
     coreObject->setOutputDelay (fedID, outputDelay);
 }
@@ -389,7 +389,7 @@ void Federate::setInputDelay (Time window)
 {
     if (window < timeZero)
     {
-        throw (InvalidParameterValue ("Input Delay must be >=0"));
+        throw (InvalidParameter ("Input Delay must be >=0"));
     }
     coreObject->setInputDelay (fedID, window);
 }
@@ -398,7 +398,7 @@ void Federate::setPeriod (Time period, Time offset)
 {
     if (period < timeZero)
     {
-        throw (InvalidParameterValue ("period must be >=0"));
+        throw (InvalidParameter ("period must be >=0"));
     }
 
     coreObject->setPeriod (fedID, period);
@@ -411,7 +411,7 @@ void Federate::setFlag (int flag, bool flagValue)
 {
     if ((flag > 10) || (flag < 0))
     {
-        throw (InvalidParameterValue ("flag must be between 0 and 10"));
+        throw (InvalidParameter ("flag must be between 0 and 10"));
     }
     switch (flag)
     {
@@ -461,10 +461,10 @@ void Federate::finalize ()
 
 void Federate::disconnect ()
 {
-        if (coreObject)
-        {
-            coreObject->finalize(fedID);
-        }  
+    if (coreObject)
+    {
+        coreObject->finalize (fedID);
+    }
     coreObject = nullptr;
 }
 
@@ -493,7 +493,7 @@ Time Federate::requestTime (Time nextInternalTimeStep)
             updateTime (newTime, oldTime);
             return newTime;
         }
-        catch (functionExecutionFailure &fee)
+        catch (FunctionExecutionFailure &fee)
         {
             state = op_states::error;
             throw;
@@ -542,7 +542,7 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
     {
         if (!asyncCallInfo)
         {
-            asyncCallInfo = std::make_unique<asyncFedCallInfo> ();
+            asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
         }
         state = op_states::pending_time;
         asyncCallInfo->timeRequestFuture = std::async (std::launch::async, [this, nextInternalTimeStep]() {
@@ -564,7 +564,7 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, helics_iter
     {
         if (!asyncCallInfo)
         {
-            asyncCallInfo = std::make_unique<asyncFedCallInfo> ();
+            asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
         }
         state = op_states::pending_iterative_time;
         asyncCallInfo->timeRequestIterativeFuture =
@@ -639,11 +639,11 @@ void Federate::updateTime (Time /*newTime*/, Time /*oldTime*/)
     // child classes would likely implement this
 }
 
-void Federate::StartupToInitializeStateTransition ()
+void Federate::startupToInitializeStateTransition ()
 {
     // child classes may do something with this
 }
-void Federate::InitializeToExecuteStateTransition ()
+void Federate::initializeToExecuteStateTransition ()
 {
     // child classes may do something with this
 }
@@ -671,7 +671,7 @@ query_id_t Federate::queryAsync (const std::string &target, const std::string &q
 {
     if (!asyncCallInfo)
     {
-        asyncCallInfo = std::make_unique<asyncFedCallInfo> ();
+        asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
     }
     int cnt = asyncCallInfo->queryCounter++;
 
@@ -685,7 +685,7 @@ query_id_t Federate::queryAsync (const std::string &queryStr)
 {
     if (!asyncCallInfo)
     {
-        asyncCallInfo = std::make_unique<asyncFedCallInfo> ();
+        asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
     }
     int cnt = asyncCallInfo->queryCounter++;
 
@@ -698,7 +698,7 @@ std::string Federate::queryComplete (query_id_t queryIndex)
 {
     if (asyncCallInfo)
     {
-        auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value());
+        auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value ());
         if (fnd != asyncCallInfo->inFlightQueries.end ())
         {
             return fnd->second.get ();
@@ -711,7 +711,7 @@ bool Federate::isQueryCompleted (query_id_t queryIndex) const
 {
     if (asyncCallInfo)
     {
-        auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value());
+        auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value ());
         if (fnd != asyncCallInfo->inFlightQueries.end ())
         {
             return (fnd->second.wait_for (std::chrono::seconds (0)) == std::future_status::ready);

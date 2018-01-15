@@ -13,7 +13,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-
 UdpCore::UdpCore () noexcept {}
 
 UdpCore::~UdpCore () = default;
@@ -22,10 +21,9 @@ UdpCore::UdpCore (const std::string &core_name) : CommsBroker (core_name) {}
 
 void UdpCore::initializeFromArgs (int argc, const char *const *argv)
 {
-    
     if (brokerState == created)
     {
-        netInfo.initializeFromArgs(argc, argv, "localhost");
+        netInfo.initializeFromArgs (argc, argv, "localhost");
         CommonCore::initializeFromArgs (argc, argv);
     }
 }
@@ -40,7 +38,6 @@ bool UdpCore::brokerConnect ()
     comms = std::make_unique<UdpComms> (netInfo);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
-   
 
     auto res = comms->connect ();
     if (res)

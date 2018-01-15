@@ -26,21 +26,21 @@ static const std::string doubleVecString ("double_vector");
 static const std::string complexVecString ("complex_vector");
 static const std::string nullString;
 
-const std::string &typeNameStringRef (helicsType_t type)
+const std::string &typeNameStringRef (helics_type_t type)
 {
     switch (type)
     {
-    case helicsType_t::helicsDouble:
+    case helics_type_t::helicsDouble:
         return doubleString;
-    case helicsType_t::helicsInt:
+    case helics_type_t::helicsInt:
         return intString;
-    case helicsType_t::helicsString:
+    case helics_type_t::helicsString:
         return stringString;
-    case helicsType_t::helicsComplex:
+    case helics_type_t::helicsComplex:
         return complexString;
-    case helicsType_t::helicsVector:
+    case helics_type_t::helicsVector:
         return doubleVecString;
-    case helicsType_t::helicsComplexVector:
+    case helics_type_t::helicsComplexVector:
         return complexVecString;
     default:
         return nullString;
@@ -63,38 +63,36 @@ std::string helicsComplexString (std::complex<double> val)
     return helicsComplexString (val.real (), val.imag ());
 }
 
-static const std::map<std::string, helicsType_t> typeMap{
-  {"double", helicsType_t::helicsDouble},
-  {"string", helicsType_t::helicsString},
-  {"float", helicsType_t::helicsDouble},
-  {"vector", helicsType_t::helicsVector},
-  {"double_vector", helicsType_t::helicsVector},
-  {"complex", helicsType_t::helicsComplex},
-  { "pair", helicsType_t::helicsComplex },
-  {"int", helicsType_t::helicsInt},
-  {"int64", helicsType_t::helicsInt},
-  {"integer",helicsType_t::helicsInt },
-  {"complex_vector", helicsType_t::helicsComplexVector},
-  {"d", helicsType_t::helicsDouble},
-  {"s", helicsType_t::helicsString},
-  {"f", helicsType_t::helicsDouble},
-  {"v", helicsType_t::helicsVector},
-  {"c", helicsType_t::helicsComplex},
-  {"i", helicsType_t::helicsInt},
-  {"i64", helicsType_t::helicsInt},
-  {"cv", helicsType_t::helicsComplexVector},
-  {"default",helicsType_t::helicsAny},
-  {"def",helicsType_t::helicsAny},
-  {"any",helicsType_t::helicsAny},
-  {"all",helicsType_t::helicsAny}
-};
+static const std::map<std::string, helics_type_t> typeMap{{"double", helics_type_t::helicsDouble},
+                                                         {"string", helics_type_t::helicsString},
+                                                         {"float", helics_type_t::helicsDouble},
+                                                         {"vector", helics_type_t::helicsVector},
+                                                         {"double_vector", helics_type_t::helicsVector},
+                                                         {"complex", helics_type_t::helicsComplex},
+                                                         {"pair", helics_type_t::helicsComplex},
+                                                         {"int", helics_type_t::helicsInt},
+                                                         {"int64", helics_type_t::helicsInt},
+                                                         {"integer", helics_type_t::helicsInt},
+                                                         {"complex_vector", helics_type_t::helicsComplexVector},
+                                                         {"d", helics_type_t::helicsDouble},
+                                                         {"s", helics_type_t::helicsString},
+                                                         {"f", helics_type_t::helicsDouble},
+                                                         {"v", helics_type_t::helicsVector},
+                                                         {"c", helics_type_t::helicsComplex},
+                                                         {"i", helics_type_t::helicsInt},
+                                                         {"i64", helics_type_t::helicsInt},
+                                                         {"cv", helics_type_t::helicsComplexVector},
+                                                         {"default", helics_type_t::helicsAny},
+                                                         {"def", helics_type_t::helicsAny},
+                                                         {"any", helics_type_t::helicsAny},
+                                                         {"all", helics_type_t::helicsAny}};
 
-helicsType_t getTypeFromString (const std::string &typeName)
+helics_type_t getTypeFromString (const std::string &typeName)
 {
     auto res = typeMap.find (typeName);
     if (res == typeMap.end ())
     {
-        return helicsType_t::helicsInvalid;
+        return helics_type_t::helicsInvalid;
     }
     return res->second;
 }
@@ -348,47 +346,47 @@ void helicsGetComplexVector (const std::string &val, std::vector<std::complex<do
     return;
 }
 
-data_block typeConvert (helicsType_t type, double val)
+data_block typeConvert (helics_type_t type, double val)
 {
     switch (type)
     {
-    case helicsType_t::helicsDouble:
+    case helics_type_t::helicsDouble:
     default:
         return ValueConverter<double>::convert (val);
-    case helicsType_t::helicsInt:
+    case helics_type_t::helicsInt:
         return ValueConverter<int64_t>::convert (static_cast<int64_t> (val));
-    case helicsType_t::helicsComplex:
+    case helics_type_t::helicsComplex:
         return ValueConverter<std::complex<double>>::convert (std::complex<double> (val, 0.0));
-    case helicsType_t::helicsString:
+    case helics_type_t::helicsString:
         return std::to_string (val);
-    case helicsType_t::helicsComplexVector:
+    case helics_type_t::helicsComplexVector:
     {
         std::complex<double> v2 (val, 0.0);
         return ValueConverter<std::complex<double>>::convert (&v2, 1);
     }
-    case helicsType_t::helicsVector:
+    case helics_type_t::helicsVector:
         return ValueConverter<double>::convert (&val, 1);
     }
 }
-data_block typeConvert (helicsType_t type, int64_t val)
+data_block typeConvert (helics_type_t type, int64_t val)
 {
     switch (type)
     {
-    case helicsType_t::helicsDouble:
+    case helics_type_t::helicsDouble:
         return ValueConverter<double>::convert (static_cast<double> (val));
-    case helicsType_t::helicsInt:
+    case helics_type_t::helicsInt:
     default:
         return ValueConverter<int64_t>::convert (val);
-    case helicsType_t::helicsComplex:
+    case helics_type_t::helicsComplex:
         return ValueConverter<std::complex<double>>::convert (std::complex<double> (val, 0.0));
-    case helicsType_t::helicsString:
+    case helics_type_t::helicsString:
         return std::to_string (val);
-    case helicsType_t::helicsComplexVector:
+    case helics_type_t::helicsComplexVector:
     {
         std::complex<double> v2 (static_cast<double> (val), 0.0);
         return ValueConverter<std::complex<double>>::convert (&v2, 1);
     }
-    case helicsType_t::helicsVector:
+    case helics_type_t::helicsVector:
     {
         auto v2 = static_cast<double> (val);
         return ValueConverter<double>::convert (&v2, 1);
@@ -396,63 +394,63 @@ data_block typeConvert (helicsType_t type, int64_t val)
     }
 }
 
-data_block typeConvert(helicsType_t type, const char *val)
+data_block typeConvert (helics_type_t type, const char *val)
 {
     switch (type)
     {
-    case helicsType_t::helicsDouble:
-        return ValueConverter<double>::convert(boost::lexical_cast<double> (val));
-    case helicsType_t::helicsInt:
-        return ValueConverter<int64_t>::convert(boost::lexical_cast<int64_t> (val));
-    case helicsType_t::helicsComplex:
-        return ValueConverter<std::complex<double>>::convert(helicsGetComplex(val));
-    case helicsType_t::helicsString:
-    default:
-        return data_block(val);
-    case helicsType_t::helicsComplexVector:
-        return ValueConverter<std::vector<std::complex<double>>>::convert(helicsGetComplexVector(val));
-    case helicsType_t::helicsVector:
-        return ValueConverter<std::vector<double>>::convert(helicsGetVector(val));
-    }
-}
-
-data_block typeConvert (helicsType_t type, const std::string &val)
-{
-    switch (type)
-    {
-    case helicsType_t::helicsDouble:
+    case helics_type_t::helicsDouble:
         return ValueConverter<double>::convert (boost::lexical_cast<double> (val));
-    case helicsType_t::helicsInt:
+    case helics_type_t::helicsInt:
         return ValueConverter<int64_t>::convert (boost::lexical_cast<int64_t> (val));
-    case helicsType_t::helicsComplex:
+    case helics_type_t::helicsComplex:
         return ValueConverter<std::complex<double>>::convert (helicsGetComplex (val));
-    case helicsType_t::helicsString:
+    case helics_type_t::helicsString:
     default:
-        return val;
-    case helicsType_t::helicsComplexVector:
+        return data_block (val);
+    case helics_type_t::helicsComplexVector:
         return ValueConverter<std::vector<std::complex<double>>>::convert (helicsGetComplexVector (val));
-    case helicsType_t::helicsVector:
+    case helics_type_t::helicsVector:
         return ValueConverter<std::vector<double>>::convert (helicsGetVector (val));
     }
 }
-data_block typeConvert (helicsType_t type, const std::vector<double> &val)
+
+data_block typeConvert (helics_type_t type, const std::string &val)
 {
     switch (type)
     {
-    case helicsType_t::helicsDouble:
+    case helics_type_t::helicsDouble:
+        return ValueConverter<double>::convert (boost::lexical_cast<double> (val));
+    case helics_type_t::helicsInt:
+        return ValueConverter<int64_t>::convert (boost::lexical_cast<int64_t> (val));
+    case helics_type_t::helicsComplex:
+        return ValueConverter<std::complex<double>>::convert (helicsGetComplex (val));
+    case helics_type_t::helicsString:
+    default:
+        return val;
+    case helics_type_t::helicsComplexVector:
+        return ValueConverter<std::vector<std::complex<double>>>::convert (helicsGetComplexVector (val));
+    case helics_type_t::helicsVector:
+        return ValueConverter<std::vector<double>>::convert (helicsGetVector (val));
+    }
+}
+data_block typeConvert (helics_type_t type, const std::vector<double> &val)
+{
+    switch (type)
+    {
+    case helics_type_t::helicsDouble:
         if (val.empty ())
         {
             return ValueConverter<double>::convert (0.0);
         }
         return ValueConverter<double>::convert (val[0]);
 
-    case helicsType_t::helicsInt:
+    case helics_type_t::helicsInt:
         if (val.empty ())
         {
             return ValueConverter<int64_t>::convert (0);
         }
         return ValueConverter<int64_t>::convert (static_cast<int64_t> (val[0]));
-    case helicsType_t::helicsComplex:
+    case helics_type_t::helicsComplex:
     {
         std::complex<double> V (0.0, 0.0);
         if (val.size () >= 2)
@@ -465,9 +463,9 @@ data_block typeConvert (helicsType_t type, const std::vector<double> &val)
         }
         return ValueConverter<std::complex<double>>::convert (V);
     }
-    case helicsType_t::helicsString:
+    case helics_type_t::helicsString:
         return helicsVectorString (val);
-    case helicsType_t::helicsComplexVector:
+    case helics_type_t::helicsComplexVector:
     {
         std::vector<std::complex<double>> CD;
         CD.reserve (val.size () / 2);
@@ -478,30 +476,30 @@ data_block typeConvert (helicsType_t type, const std::vector<double> &val)
         return ValueConverter<std::vector<std::complex<double>>>::convert (CD);
     }
     break;
-    case helicsType_t::helicsVector:
+    case helics_type_t::helicsVector:
     default:
         return ValueConverter<std::vector<double>>::convert (val);
     }
 }
 
-data_block typeConvert (helicsType_t type, const double *vals, size_t size)
+data_block typeConvert (helics_type_t type, const double *vals, size_t size)
 {
     switch (type)
     {
-    case helicsType_t::helicsDouble:
+    case helics_type_t::helicsDouble:
         if ((size == 0) || (vals == nullptr))
         {
             return ValueConverter<double>::convert (0.0);
         }
         return ValueConverter<double>::convert (vals[0]);
 
-    case helicsType_t::helicsInt:
+    case helics_type_t::helicsInt:
         if ((size == 0) || (vals == nullptr))
         {
             return ValueConverter<int64_t>::convert (0);
         }
         return ValueConverter<int64_t>::convert (static_cast<int64_t> (vals[0]));
-    case helicsType_t::helicsComplex:
+    case helics_type_t::helicsComplex:
     {
         std::complex<double> V (0.0, 0.0);
         if (size >= 2)
@@ -514,14 +512,14 @@ data_block typeConvert (helicsType_t type, const double *vals, size_t size)
         }
         return ValueConverter<std::complex<double>>::convert (V);
     }
-    case helicsType_t::helicsString:
+    case helics_type_t::helicsString:
 
         if ((size == 0) || (vals == nullptr))
         {
             return helicsVectorString (std::vector<double> ());  // generate an empty vector string
         }
         return helicsVectorString (vals, size);
-    case helicsType_t::helicsComplexVector:
+    case helics_type_t::helicsComplexVector:
     {
         std::vector<std::complex<double>> CD;
         CD.reserve (size / 2);
@@ -532,30 +530,30 @@ data_block typeConvert (helicsType_t type, const double *vals, size_t size)
         return ValueConverter<std::vector<std::complex<double>>>::convert (CD);
     }
     break;
-    case helicsType_t::helicsVector:
+    case helics_type_t::helicsVector:
     default:
         return ValueConverter<double>::convert (vals, size);
     }
 }
 
-data_block typeConvert (helicsType_t type, const std::vector<std::complex<double>> &val)
+data_block typeConvert (helics_type_t type, const std::vector<std::complex<double>> &val)
 {
     switch (type)
     {
-    case helicsType_t::helicsDouble:
+    case helics_type_t::helicsDouble:
         if (val.empty ())
         {
             return ValueConverter<double>::convert (0.0);
         }
         return ValueConverter<double>::convert (std::abs (val[0]));
 
-    case helicsType_t::helicsInt:
+    case helics_type_t::helicsInt:
         if (val.empty ())
         {
             return ValueConverter<int64_t>::convert (0.0);
         }
         return ValueConverter<int64_t>::convert (std::abs (val[0]));
-    case helicsType_t::helicsComplex:
+    case helics_type_t::helicsComplex:
     {
         if (val.empty ())
         {
@@ -563,12 +561,12 @@ data_block typeConvert (helicsType_t type, const std::vector<std::complex<double
         }
         return ValueConverter<std::complex<double>>::convert (val[0]);
     }
-    case helicsType_t::helicsString:
+    case helics_type_t::helicsString:
         return helicsComplexVectorString (val);
-    case helicsType_t::helicsComplexVector:
+    case helics_type_t::helicsComplexVector:
     default:
         return ValueConverter<std::vector<std::complex<double>>>::convert (val);
-    case helicsType_t::helicsVector:
+    case helics_type_t::helicsVector:
     {
         std::vector<double> DV;
         DV.reserve (val.size () * 2);
@@ -581,22 +579,22 @@ data_block typeConvert (helicsType_t type, const std::vector<std::complex<double
     }
     }
 }
-data_block typeConvert (helicsType_t type, const std::complex<double> &val)
+data_block typeConvert (helics_type_t type, const std::complex<double> &val)
 {
     switch (type)
     {
-    case helicsType_t::helicsDouble:
+    case helics_type_t::helicsDouble:
         return ValueConverter<double>::convert (std::abs (val));
-    case helicsType_t::helicsInt:
+    case helics_type_t::helicsInt:
         return ValueConverter<double>::convert (static_cast<int64_t> (std::abs (val)));
-    case helicsType_t::helicsComplex:
+    case helics_type_t::helicsComplex:
     default:
         return ValueConverter<std::complex<double>>::convert (val);
-    case helicsType_t::helicsString:
+    case helics_type_t::helicsString:
         return helicsComplexString (val);
-    case helicsType_t::helicsComplexVector:
+    case helics_type_t::helicsComplexVector:
         return ValueConverter<std::complex<double>>::convert (&val, 1);
-    case helicsType_t::helicsVector:
+    case helics_type_t::helicsVector:
     {
         std::vector<double> V{val.real (), val.imag ()};
         return ValueConverter<std::vector<double>>::convert (V);
