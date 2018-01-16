@@ -93,7 +93,7 @@ typedef enum {
 } federate_state;
 
 /** enumeration of the predefined filter types*/
-enum helics_filter_type_t
+typedef enum
 {
     helics_custom_filter = 0,
     helics_delay_filter = 1,
@@ -102,7 +102,7 @@ enum helics_filter_type_t
     helics_reroute_filter = 4,
     helics_clone_filter = 5,
 
-};
+}helics_filter_type_t;
 
 /**
  * Data to be communicated.

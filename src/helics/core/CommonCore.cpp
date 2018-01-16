@@ -34,7 +34,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <functional>
 #include <boost/program_options.hpp>
 
-#include "delayedObjects.hpp"
+#include "DelayedObjects.hpp"
 #include <boost/format.hpp>
 
 namespace helics
