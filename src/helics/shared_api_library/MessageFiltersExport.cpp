@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -328,6 +328,7 @@ helics_status helicsFilterAddDestinationTarget (helics_filter filt, const char *
     try
     {
         cfilt->addDestinationTarget (dest);
+        return helics_ok;
     }
     catch (const helics::InvalidFunctionCall &ifc)
     {
@@ -349,6 +350,7 @@ helics_status helicsFilterAddSourceTarget (helics_filter filt, const char *src)
     try
     {
         cfilt->addSourceTarget (src);
+        return helics_ok;
     }
     catch (const helics::InvalidFunctionCall &ifc)
     {
@@ -368,6 +370,7 @@ helics_status helicsFilterAddDeliveryEndpoint (helics_filter filt, const char *d
         return helics_invalid_argument;
     }
     cfilt->addDeliveryEndpoint (delivery);
+    return helics_ok;
 }
 
 helics_status helicsFilterRemoveDestinationTarget (helics_filter filt, const char *dest)
@@ -382,6 +385,7 @@ helics_status helicsFilterRemoveDestinationTarget (helics_filter filt, const cha
         return helics_invalid_argument;
     }
     cfilt->removeDestinationTarget (dest);
+    return helics_ok;
 }
 
 helics_status helicsFilterRemoveSourceTarget (helics_filter filt, const char *source)
@@ -396,6 +400,7 @@ helics_status helicsFilterRemoveSourceTarget (helics_filter filt, const char *so
         return helics_invalid_argument;
     }
     cfilt->removeSourceTarget (source);
+    return helics_ok;
 }
 
 helics_status helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char *delivery)
@@ -410,4 +415,5 @@ helics_status helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char
         return helics_invalid_argument;
     }
     cfilt->removeDeliveryEndpoint (delivery);
+    return helics_ok;
 }
