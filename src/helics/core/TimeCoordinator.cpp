@@ -285,7 +285,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         {
             if (dependencies.checkIfReadyForTimeGrant (true, time_exec))
             {
-                dependencies.ResetIteratingTimeRequests (time_exec);
+                dependencies.resetIteratingTimeRequests (time_exec);
                 if ((!dependents.empty ()) && (sendMessageFunction))
                 {
                     ActionMessage treq (CMD_TIME_GRANT);
@@ -428,7 +428,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
     }
     else if (ret == iteration_state::iterating)
     {
-        dependencies.ResetIteratingExecRequests ();
+        dependencies.resetIteratingExecRequests ();
         hasInitUpdates = false;
         if (sendMessageFunction)
         {

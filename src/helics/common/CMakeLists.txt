@@ -22,6 +22,7 @@ base64.h
 argParser.h
 MappedVector.hpp
 MappedPointerVector.hpp
+DualMappedVector.hpp
 
 )
 

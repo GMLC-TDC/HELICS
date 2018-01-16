@@ -33,7 +33,20 @@ class MappedVector
         }
     }
 
-    auto find (const searchType &searchValue)
+    auto find(const searchType &searchValue)
+    {
+        auto fnd = lookup.find(searchValue);
+        if (fnd != lookup.end())
+        {
+            return dataStorage_.begin() + fnd.second();
+        }
+        else
+        {
+            return dataStorage_.end();
+        }
+    }
+
+    auto find (const searchType &searchValue) const
     {
         auto fnd = lookup.find (searchValue);
         if (fnd != lookup.end ())

@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 class ActionMessage;
-/** data class containing information about interfederate dependencies*/
+/** data class containing information about inter-federate dependencies*/
 class DependencyInfo
 {
   public:
@@ -80,8 +80,8 @@ class TimeDependencies
 
     bool checkIfReadyForExecEntry (bool iterating) const;
     bool checkIfReadyForTimeGrant (bool iterating, Time desiredGrantTime) const;
-    void ResetIteratingExecRequests ();
-    void ResetIteratingTimeRequests (Time requestTime);
+    void resetIteratingExecRequests ();
+    void resetIteratingTimeRequests (Time requestTime);
 };
 }
 #endif  // DEPENDENCY_INFO_H_

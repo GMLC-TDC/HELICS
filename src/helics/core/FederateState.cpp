@@ -139,7 +139,7 @@ CoreFederateInfo FederateState::getInfo () const
     return timeCoord->getFedInfo ();
 }
 
-void FederateState::UpdateFederateInfo (const ActionMessage &cmd)
+void FederateState::updateFederateInfo (const ActionMessage &cmd)
 {
     if (cmd.action () != CMD_FED_CONFIGURE)
     {

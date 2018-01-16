@@ -193,7 +193,7 @@ private:
     @details public call so it also calls the federate lock before calling private update function
     the action Message should be CMD_FED_CONFIGURE
 	*/
-    void UpdateFederateInfo(const ActionMessage &cmd);
+    void updateFederateInfo(const ActionMessage &cmd);
 	/** get the granted time of a federate*/
     Time grantedTime () const { return time_granted; }
 	/**get a reference to the handles of subscriptions with value updates

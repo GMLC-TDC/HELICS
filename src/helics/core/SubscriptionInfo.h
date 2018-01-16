@@ -39,12 +39,12 @@ class SubscriptionInfo
     {
     }
 
-    Core::handle_id_t id;	//!< identifier for the handle
-    Core::federate_id_t fed_id;	//!< the federate that created the handle
-    std::string key;	//!< the identifier for the subscription
-    std::string type;	//! the type of data for the subscription
+    const Core::handle_id_t id;	//!< identifier for the handle
+    const Core::federate_id_t fed_id;	//!< the federate that created the handle
+    const std::string key;	//!< the identifier for the subscription
+    const std::string type;	//! the type of data for the subscription
 	std::string pubType; //!< the type of data that its matching publication uses
-    std::string units;	//!< the units of the subscription
+    const std::string units;	//!< the units of the subscription
     bool required;	//!< flag indicating that the subscription requires a matching publication
     bool has_target = false;	//!< flag indicating that a target publication was found
     bool only_update_on_change = false;  //!< flag indicating that the data should only be updated on change

@@ -12,6 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "Federate.h"
 
 #include <iostream>
+#include <fstream>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 

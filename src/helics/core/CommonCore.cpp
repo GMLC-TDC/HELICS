@@ -612,7 +612,7 @@ void CommonCore::setMaximumIterations (federate_id_t federateID, int32_t iterati
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_MAX_ITERATION;
     cmd.dest_id = iterations;
-    fed->UpdateFederateInfo (cmd);
+    fed->updateFederateInfo (cmd);
 }
 
 void CommonCore::setTimeDelta (federate_id_t federateID, Time time)
@@ -634,7 +634,7 @@ void CommonCore::setTimeDelta (federate_id_t federateID, Time time)
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_MINDELTA;
     cmd.actionTime = time;
-    fed->UpdateFederateInfo (cmd);
+    fed->updateFederateInfo (cmd);
 }
 
 void CommonCore::setOutputDelay (federate_id_t federateID, Time outputDelayTime)
@@ -651,7 +651,7 @@ void CommonCore::setOutputDelay (federate_id_t federateID, Time outputDelayTime)
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_outputDelay;
     cmd.actionTime = outputDelayTime;
-    fed->UpdateFederateInfo (cmd);
+    fed->updateFederateInfo (cmd);
 }
 
 void CommonCore::setInputDelay (federate_id_t federateID, Time impactTime)
@@ -669,7 +669,7 @@ void CommonCore::setInputDelay (federate_id_t federateID, Time impactTime)
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_IMPACT_WINDOW;
     cmd.actionTime = impactTime;
-    fed->UpdateFederateInfo (cmd);
+    fed->updateFederateInfo (cmd);
 }
 
 void CommonCore::setPeriod (federate_id_t federateID, Time timePeriod)
@@ -686,7 +686,7 @@ void CommonCore::setPeriod (federate_id_t federateID, Time timePeriod)
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_PERIOD;
     cmd.actionTime = timePeriod;
-    fed->UpdateFederateInfo (cmd);
+    fed->updateFederateInfo (cmd);
 }
 void CommonCore::setTimeOffset (federate_id_t federateID, Time timeOffset)
 {
@@ -698,7 +698,7 @@ void CommonCore::setTimeOffset (federate_id_t federateID, Time timeOffset)
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_OFFSET;
     cmd.actionTime = timeOffset;
-    fed->UpdateFederateInfo (cmd);
+    fed->updateFederateInfo (cmd);
 }
 
 void CommonCore::setLoggingLevel (federate_id_t federateID, int loggingLevel)
@@ -718,7 +718,7 @@ void CommonCore::setLoggingLevel (federate_id_t federateID, int loggingLevel)
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_LOG_LEVEL;
     cmd.dest_id = loggingLevel;
-    fed->UpdateFederateInfo (cmd);
+    fed->updateFederateInfo (cmd);
 }
 
 void CommonCore::setFlag (federate_id_t federateID, int flag, bool flagValue)
@@ -761,7 +761,7 @@ void CommonCore::setFlag (federate_id_t federateID, int flag, bool flagValue)
     {
         SET_ACTION_FLAG (cmd, indicator_flag);
     }
-    fed->UpdateFederateInfo (cmd);
+    fed->updateFederateInfo (cmd);
 }
 
 Core::handle_id_t CommonCore::getNewHandle () { return handleCounter++; }
@@ -818,10 +818,10 @@ BasicHandleInfo *CommonCore::createBasicHandle (handle_id_t id_,
 }
 
 handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
-                                         const std::string &key,
-                                         const std::string &type,
-                                         const std::string &units,
-                                         handle_check_mode check_mode)
+                                              const std::string &key,
+                                              const std::string &type,
+                                              const std::string &units,
+                                              handle_check_mode check_mode)
 {
     auto fed = getFederate (federateID);
 
@@ -896,9 +896,9 @@ handle_id_t CommonCore::getSubscription (federate_id_t federateID, const std::st
 }
 
 handle_id_t CommonCore::registerPublication (federate_id_t federateID,
-                                        const std::string &key,
-                                        const std::string &type,
-                                        const std::string &units)
+                                             const std::string &key,
+                                             const std::string &type,
+                                             const std::string &units)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -1086,7 +1086,8 @@ const std::vector<handle_id_t> &CommonCore::getValueUpdates (federate_id_t feder
     return fed->getEvents ();
 }
 
-handle_id_t CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name, const std::string &type)
+handle_id_t
+CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name, const std::string &type)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -1138,9 +1139,9 @@ handle_id_t CommonCore::getEndpoint (federate_id_t federateID, const std::string
 }
 
 handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
-                                         const std::string &source,
-                                         const std::string &type_in,
-                                         const std::string &type_out)
+                                              const std::string &source,
+                                              const std::string &type_in,
+                                              const std::string &type_out)
 {
     if (brokerState == operating)
     {
@@ -1211,9 +1212,9 @@ handle_id_t CommonCore::getSourceFilter (const std::string &name) const
 }
 
 handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName,
-                                              const std::string &dest,
-                                              const std::string &type_in,
-                                              const std::string &type_out)
+                                                   const std::string &dest,
+                                                   const std::string &type_in,
+                                                   const std::string &type_out)
 {
     if (brokerState == operating)
     {
@@ -1286,14 +1287,13 @@ FilterInfo *CommonCore::createSourceFilter (federate_id_t dest,
                                             const std::string &type_in,
                                             const std::string &type_out)
 {
-    auto filt = std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle, key, target,
-                                              type_in, type_out, false);
-
+    auto filt =
+      std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle,
+                                    (!key.empty ()) ? std::string (key) :
+                                                      (std::string ("sFilter_") + std::to_string (handle)),
+                                    target, type_in, type_out, false);
     auto retTarget = filt.get ();
-    if (key.empty ())
-    {
-        retTarget->key = "sFilter_" + std::to_string (handle);
-    }
+
     std::lock_guard<std::mutex> lock (_handlemutex);
     if (retTarget->fed_id == global_broker_id)
     {
@@ -1319,13 +1319,12 @@ FilterInfo *CommonCore::createDestFilter (federate_id_t dest,
                                           const std::string &type_in,
                                           const std::string &type_out)
 {
-    auto filt = std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle, key, target,
-                                              type_in, type_out, true);
+    auto filt =
+      std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle,
+                                    (!key.empty ()) ? (key) : (std::string ("dFilter_") + std::to_string (handle)),
+                                    target, type_in, type_out, true);
     auto retTarget = filt.get ();
-    if (key.empty ())
-    {
-        retTarget->key = "dFilter_" + std::to_string (handle);
-    }
+
     std::lock_guard<std::mutex> lock (_mutex);
     if (retTarget->fed_id == global_broker_id)
     {

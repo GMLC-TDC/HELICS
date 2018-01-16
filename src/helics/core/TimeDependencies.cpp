@@ -166,7 +166,7 @@ bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const
     return true;
 }
 
-void TimeDependencies::ResetIteratingExecRequests ()
+void TimeDependencies::resetIteratingExecRequests ()
 {
     for (auto &dep : dependencies)
     {
@@ -213,7 +213,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant (bool iterating, Time desiredGra
     return true;
 }
 
-void TimeDependencies::ResetIteratingTimeRequests (helics::Time requestTime)
+void TimeDependencies::resetIteratingTimeRequests (helics::Time requestTime)
 {
     for (auto &dep : dependencies)
     {
