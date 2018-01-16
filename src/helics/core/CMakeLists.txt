@@ -72,7 +72,7 @@ core-exceptions.hpp
 core-types.hpp
 core-data.hpp
 helics-time.hpp
-coreFederateInfo.hpp
+CoreFederateInfo.hpp
 
 ../flag-definitions.h
 )

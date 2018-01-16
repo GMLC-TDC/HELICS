@@ -268,7 +268,9 @@ class Federate
 
     helics_time_t requestTimeComplete ()
     {
-        return helicsFederateRequestTimeComplete (fed);
+        helics_time_t newTime;
+        helicsFederateRequestTimeComplete (fed,&newTime);
+        return newTime;
     }
 
     helics_iteration_time requestTimeIterativeComplete ()

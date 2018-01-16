@@ -325,7 +325,7 @@ HELICS_Export helics_status helicsFederateRequestTimeIterative (helics_federate 
 
 HELICS_Export helics_status helicsFederateRequestTimeAsync (helics_federate fed, helics_time_t requestTime);
 
-HELICS_Export helics_status helicsFederateRequestTimeComplete (helics_federate fed);
+HELICS_Export helics_status helicsFederateRequestTimeComplete (helics_federate fed, helics_time_t *timeOut);
 
 HELICS_Export helics_status helicsFederateRequestTimeIterativeAsync (helics_federate fed,
                                                                      helics_time_t requestTime,

@@ -769,7 +769,7 @@ void runFederateTestVectorD(const char * core, const double defaultValue[], cons
 	// publish string1 at time=0.0;
  	status = helicsPublicationPublishVector(pubid, testValue1, len1);
     int actualLen;
-	status = helicsSubscriptionGetVector(subid, val, len,&actualLen);
+	status = helicsSubscriptionGetVector(subid, val, 100,&actualLen);
     BOOST_CHECK_EQUAL(status, helics_ok);
     BOOST_CHECK_EQUAL(actualLen, len);
 	for (int i=0;i<len;i++)
@@ -784,7 +784,7 @@ void runFederateTestVectorD(const char * core, const double defaultValue[], cons
 
 	// get the value
 	
-	status = helicsSubscriptionGetVector(subid, val, len1,&actualLen);
+	status = helicsSubscriptionGetVector(subid, val, 100,&actualLen);
     BOOST_CHECK_EQUAL(status, helics_ok);
     BOOST_CHECK_EQUAL(actualLen, len1);
 	// make sure the string is what we expect
@@ -798,7 +798,7 @@ void runFederateTestVectorD(const char * core, const double defaultValue[], cons
 	status = helicsPublicationPublishVector(pubid, testValue2,len2);
 
 	// make sure the value is still what we expect
-	status = helicsSubscriptionGetVector(subid, val, len1,&actualLen);
+	status = helicsSubscriptionGetVector(subid, val, 100,&actualLen);
     BOOST_CHECK_EQUAL(actualLen, len1);
     BOOST_CHECK_EQUAL(status, helics_ok);
 	for (int i=0; i<len1; i++)
@@ -812,7 +812,7 @@ void runFederateTestVectorD(const char * core, const double defaultValue[], cons
 	// make sure the value was updated
 	BOOST_CHECK_EQUAL(gtime, 2.0);
 
-	status = helicsSubscriptionGetVector(subid, val, len2,&actualLen);
+	status = helicsSubscriptionGetVector(subid, val, 100,&actualLen);
     BOOST_CHECK_EQUAL(status, helics_ok);
     BOOST_CHECK_EQUAL(actualLen, len2);
 	for (int i=0; i<len2; i++)

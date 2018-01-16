@@ -16,7 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 extern "C" {
 #endif
 
-// MESSAGE FEDERATE calls
+
 /** create a source Filter on the specified federate
 @details filters can be created through a federate or a core , linking through a federate allows
 a few extra features of name matching to function on the federate interface but otherwise equivalent behavior

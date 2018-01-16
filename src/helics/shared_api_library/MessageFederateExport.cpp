@@ -12,6 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../core/core-exceptions.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"
+#include "MessageFederate.h"
 #include <memory>
 #include <mutex>
 #include <vector>
@@ -187,7 +188,7 @@ int helicsFederateReceiveCount (helics_federate fed)
     return mFed->receiveCount ();
 }
 
-uint64_t helicsEndpointReceiveCount (helics_endpoint endpoint)
+int helicsEndpointReceiveCount (helics_endpoint endpoint)
 {
     if (endpoint == nullptr)
     {
