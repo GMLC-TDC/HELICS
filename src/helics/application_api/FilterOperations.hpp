@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_FILTEROPERATIONS_H_
 #pragma once
 
-#include "../core/core.h"
+#include "../core/Core.hpp"
 
 #include "libguarded/guarded.hpp"
 #include "libguarded/shared_guarded.hpp"

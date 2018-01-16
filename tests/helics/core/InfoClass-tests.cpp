@@ -10,10 +10,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "testFixtures.h"
 #include <boost/test/unit_test.hpp>
 
-#include "helics/core/BasicHandleInfo.h"
-#include "helics/core/EndpointInfo.h"
-#include "helics/core/FilterInfo.h"
-#include "helics/core/SubscriptionInfo.h"
+#include "helics/core/BasicHandleInfo.hpp"
+#include "helics/core/EndpointInfo.hpp"
+#include "helics/core/FilterInfo.hpp"
+#include "helics/core/SubscriptionInfo.hpp"
 
 BOOST_AUTO_TEST_SUITE (InfoClass_tests)
 

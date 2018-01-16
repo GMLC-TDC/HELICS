@@ -18,12 +18,12 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <unordered_map>
 #include <functional>
 
-#include "BasicHandleInfo.h"
-#include "ActionMessage.h"
+#include "BasicHandleInfo.hpp"
+#include "ActionMessage.hpp"
 #include "../common/simpleQueue.hpp"
-#include "TimeDependencies.h"
-#include "BrokerBase.h"
-#include "broker.h"
+#include "TimeDependencies.hpp"
+#include "BrokerBase.hpp"
+#include "broker.hpp"
 
 namespace helics
 {

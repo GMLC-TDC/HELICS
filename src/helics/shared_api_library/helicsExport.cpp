@@ -9,8 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "../common/logger.h"
-#include "../core/BrokerFactory.h"
-#include "../core/CoreFactory.h"
+#include "../core/BrokerFactory.hpp"
+#include "../core/CoreFactory.hpp"
 #include "../helics.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"

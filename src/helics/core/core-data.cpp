@@ -8,7 +8,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "core-data.h"
+#include "core-data.hpp"
 
 #include <set>
 

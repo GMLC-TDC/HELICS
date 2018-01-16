@@ -9,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "NetworkBrokerData.h"
+#include "NetworkBrokerData.hpp"
 #include "../common/argParser.h"
 
 #include <boost/asio/io_service.hpp>

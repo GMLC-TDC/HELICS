@@ -9,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "MessageFederateManager.hpp"
-#include "../core/core.h"
+#include "../core/Core.hpp"
 namespace helics
 {
 MessageFederateManager::MessageFederateManager (std::shared_ptr<Core> coreOb, Core::federate_id_t id)

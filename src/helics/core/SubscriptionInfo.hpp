@@ -9,11 +9,11 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #ifndef _HELICS_SUBSCRIPTIONINFO_
 #define _HELICS_SUBSCRIPTIONINFO_
 
-#include "helics-time.h"
+#include "helics-time.hpp"
 #include "../common/blocking_queue.h"
 #include "helics/helics-config.h"
-#include "core.h"
-#include "core-data.h"
+#include "Core.hpp"
+#include "core-data.hpp"
 
 #include <cstdint>
 #include <map>

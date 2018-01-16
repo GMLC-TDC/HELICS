@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define BASIC_HANDLE_INFO_H_
 #pragma once
 
-#include "core.h"
+#include "Core.hpp"
 
 namespace helics
 {

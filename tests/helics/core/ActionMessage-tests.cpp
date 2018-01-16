@@ -9,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include <boost/test/unit_test.hpp>
 
-#include "helics/core/ActionMessage.h"
+#include "helics/core/ActionMessage.hpp"
 #include <cstdio>
 
 BOOST_AUTO_TEST_SUITE (ActionMessage_tests)

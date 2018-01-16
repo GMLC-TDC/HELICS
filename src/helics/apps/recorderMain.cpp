@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 
 #include "recorder.h"
-#include "../core/core-exceptions.h"
+#include "../core/core-exceptions.hpp"
 #include <iostream>
 
 int main(int argc, char *argv[])

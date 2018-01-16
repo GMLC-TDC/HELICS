@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_COMMS_INTERFACE_
 #pragma once
 
-#include "ActionMessage.h"
+#include "ActionMessage.hpp"
 #include "../common/BlockingPriorityQueue.hpp"
 #include <functional>
 #include <thread>

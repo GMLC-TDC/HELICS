@@ -11,11 +11,11 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "helics/helics-config.h"
-#include "helics-time.h"
+#include "helics-time.hpp"
 #include "../common/simpleQueue.hpp"
-#include "core.h"
-#include "ActionMessage.h"
-#include "BrokerBase.h"
+#include "Core.hpp"
+#include "ActionMessage.hpp"
+#include "BrokerBase.hpp"
 
 #include <cstdint> 
 #include <thread> 

@@ -12,12 +12,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #pragma once
 
 #include "helics/helics-config.h"
-#include "../core/helics-time.h"
+#include "../core/helics-time.hpp"
 #include "helics_includes/string_view.h"
 
 #include "helicsTypes.hpp"
 
-#include "../core/coreFederateInfo.h"
+#include "../core/CoreFederateInfo.hpp"
 #include "../flag-definitions.h"
 #include <atomic>
 #include <string>

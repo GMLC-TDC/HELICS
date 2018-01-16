@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define IPC_BROKER_H_
 #pragma once
 
-#include "../CoreBroker.h"
+#include "../CoreBroker.hpp"
 #include "../CommsBroker.hpp"
 
 namespace helics

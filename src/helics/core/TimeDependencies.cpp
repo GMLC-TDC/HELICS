@@ -9,8 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "TimeDependencies.h"
-#include "ActionMessage.h"
+#include "TimeDependencies.hpp"
+#include "ActionMessage.hpp"
 #include <algorithm>
 #include <cassert>
 

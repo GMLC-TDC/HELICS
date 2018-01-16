@@ -9,8 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "MessageFederate.hpp"
-#include "../core/core.h"
-#include "../core/core-exceptions.h"
+#include "../core/Core.hpp"
+#include "../core/core-exceptions.hpp"
 #include "MessageFederateManager.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)

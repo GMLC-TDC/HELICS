@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define HELICS_CORE_FEDERATE_INFO_
 #pragma once
 
-#include "helics-time.h"
+#include "helics-time.hpp"
 
 namespace helics
 {

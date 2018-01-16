@@ -13,16 +13,16 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #pragma once
 
 
-#include "ActionMessage.h"
-#include "CommonCore.h"
-#include "core-data.h"
-#include "core.h"
-#include "helics-time.h"
+#include "ActionMessage.hpp"
+#include "CommonCore.hpp"
+#include "core-data.hpp"
+#include "Core.hpp"
+#include "helics-time.hpp"
 #include "../common/BlockingQueue.hpp"
 #include "helics/helics-config.h"
-#include "core-types.h"
-#include "coreFederateInfo.h"
-#include "TimeDependencies.h"
+#include "core-types.hpp"
+#include "CoreFederateInfo.hpp"
+#include "TimeDependencies.hpp"
 
 #include <atomic>
 #include <map>

@@ -10,11 +10,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/unit_test.hpp>
 
 #include "helics/common/AsioServiceManager.h"
-#include "helics/core/ActionMessage.h"
-#include "helics/core/BrokerFactory.h"
-#include "helics/core/CoreFactory.h"
-#include "helics/core/core-types.h"
-#include "helics/core/core.h"
+#include "helics/core/ActionMessage.hpp"
+#include "helics/core/BrokerFactory.hpp"
+#include "helics/core/CoreFactory.hpp"
+#include "helics/core/core-types.hpp"
+#include "helics/core/Core.hpp"
 #include "helics/core/udp/UdpBroker.h"
 #include "helics/core/udp/UdpComms.h"
 #include "helics/core/udp/UdpCore.h"

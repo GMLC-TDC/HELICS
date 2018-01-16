@@ -20,7 +20,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <stdexcept>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
-#include "helics/core/BrokerFactory.h"
+#include "helics/core/BrokerFactory.hpp"
 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;

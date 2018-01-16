@@ -19,7 +19,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/apps/player.h"
 #include "helics/apps/recorder.h"
 #include "helics/common/stringToCmdLine.h"
-#include "helics/core/BrokerFactory.h"
+#include "helics/core/BrokerFactory.hpp"
 #include <future>
 
 BOOST_AUTO_TEST_SUITE (combo_tests)

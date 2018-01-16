@@ -12,11 +12,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <future>
 
-#include "helics/core/EndpointInfo.h"
-#include "helics/core/FederateState.h"
-#include "helics/core/FilterInfo.h"
-#include "helics/core/PublicationInfo.h"
-#include "helics/core/SubscriptionInfo.h"
+#include "helics/core/EndpointInfo.hpp"
+#include "helics/core/FederateState.hpp"
+#include "helics/core/FilterInfo.hpp"
+#include "helics/core/PublicationInfo.hpp"
+#include "helics/core/SubscriptionInfo.hpp"
 
 BOOST_FIXTURE_TEST_SUITE (FederateState_tests, federateStateTestFixture)
 

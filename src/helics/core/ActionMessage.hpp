@@ -12,9 +12,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define ACTION_MESSAGE_H_
 #pragma once
 
-#include "core-types.h"
-#include "core.h"
-#include "ActionMessageDefintions.h"
+#include "core-types.hpp"
+#include "Core.hpp"
+#include "ActionMessageDefintions.hpp"
 #include <cereal/types/memory.hpp>
 #include <memory>
 #include <string>

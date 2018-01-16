@@ -15,7 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** the purpose of these objects are to convert a specific type into a data block for use in the core algorithms
  */
 
-#include "../core/core-data.h"
+#include "../core/core-data.hpp"
 #include "Message.hpp"
 #include <algorithm>
 #include <cassert>

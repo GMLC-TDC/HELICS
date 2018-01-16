@@ -8,16 +8,16 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "CoreBroker.h"
+#include "CoreBroker.hpp"
 #include "../common/stringToCmdLine.h"
-#include "BrokerFactory.h"
+#include "BrokerFactory.hpp"
 
 #include "../common/argParser.h"
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 
 #include "../common/logger.h"
-#include "TimeCoordinator.h"
+#include "TimeCoordinator.hpp"
 #include "loggingHelper.hpp"
 #include <fstream>
 #include <json/json.h>

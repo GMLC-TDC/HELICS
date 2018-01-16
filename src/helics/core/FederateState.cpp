@@ -8,13 +8,13 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "FederateState.h"
+#include "FederateState.hpp"
 
 #include "../flag-definitions.h"
-#include "EndpointInfo.h"
-#include "PublicationInfo.h"
-#include "SubscriptionInfo.h"
-#include "TimeCoordinator.h"
+#include "EndpointInfo.hpp"
+#include "PublicationInfo.hpp"
+#include "SubscriptionInfo.hpp"
+#include "TimeCoordinator.hpp"
 
 #include <algorithm>
 #include <chrono>

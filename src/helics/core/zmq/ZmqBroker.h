@@ -10,9 +10,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define ZMQ_BROKER_H_
 #pragma once
 
-#include "../CoreBroker.h"
+#include "../CoreBroker.hpp"
 #include "../CommsBroker.hpp"
-#include "../NetworkBrokerData.h"
+#include "../NetworkBrokerData.hpp"
 
 namespace helics
 {

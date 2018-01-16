@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #ifndef _HELICS_CORE_FACTORY_
 #define _HELICS_CORE_FACTORY_
 
-#include "core-types.h"
+#include "core-types.hpp"
 #include <memory>
 #include <string>
 

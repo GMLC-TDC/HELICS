@@ -8,8 +8,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "EndpointInfo.h"
-//#include "core/core-data.h"
+#include "EndpointInfo.hpp"
+//#include "core/core-data.hpp"
 
 #include <algorithm>
 #include <cstring>

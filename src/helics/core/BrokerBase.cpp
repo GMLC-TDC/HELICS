@@ -9,11 +9,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "BrokerBase.h"
+#include "BrokerBase.hpp"
 
 #include "../common/AsioServiceManager.h"
 #include "../common/logger.h"
-#include "TimeCoordinator.h"
+#include "TimeCoordinator.hpp"
 #include "helics/helics-config.h"
 #include <iostream>
 #include <libguarded/guarded.hpp>

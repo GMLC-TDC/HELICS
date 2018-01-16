@@ -21,8 +21,8 @@ and some common methods used cores and brokers
 #include <thread>
 #include <atomic>
 #include <chrono>
-#include "core.h"
-#include "ActionMessage.h"
+#include "Core.hpp"
+#include "ActionMessage.hpp"
 #include "../common/BlockingPriorityQueue.hpp"
 
 namespace helics

@@ -10,8 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "player.h"
 #include "recorder.h"
-#include "../core/BrokerFactory.h"
-#include "../core/core-exceptions.h"
+#include "../core/BrokerFactory.hpp"
+#include "../core/core-exceptions.hpp"
 #include <iostream>
 
 void showHelp()

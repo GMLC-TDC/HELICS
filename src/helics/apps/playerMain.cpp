@@ -9,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "player.h"
-#include "../core/core-exceptions.h"
+#include "../core/core-exceptions.hpp"
 #include <iostream>
 
 int main (int argc, char *argv[])

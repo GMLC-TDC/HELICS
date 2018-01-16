@@ -12,8 +12,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../../common/zmqContextManager.h"
 #include "../../common/zmqHelper.h"
 #include "../../common/zmqSocketDescriptor.h"
-#include "../ActionMessage.h"
-#include "../NetworkBrokerData.h"
+#include "../ActionMessage.hpp"
+#include "../NetworkBrokerData.hpp"
 #include "ZmqRequestSets.h"
 //#include <boost/asio.hpp>
 //#include <csignal>

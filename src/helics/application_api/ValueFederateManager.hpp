@@ -11,7 +11,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "Message.hpp"
-#include "../core/core.h"
+#include "../core/Core.hpp"
 #include "helicsTypes.hpp"
 #include <utility> 
 #include <cstdint>

@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_FILTER_H_
 #pragma once
 
-#include "../core/core.h"
+#include "../core/Core.hpp"
 #include "Federate.hpp"
 #include "helics/helics-config.h"
 

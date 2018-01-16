@@ -9,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "../helics.hpp"
-#include "../core/core-exceptions.h"
+#include "../core/core-exceptions.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"
 #include <iostream>

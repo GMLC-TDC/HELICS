@@ -10,9 +10,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "IpcBroker.h"
 #include "../../common/blocking_queue.h"
-#include "../core-data.h"
-#include "../core.h"
-#include "../helics-time.h"
+#include "../core-data.hpp"
+#include "../Core.hpp"
+#include "../helics-time.hpp"
 #include "helics/helics-config.h"
 
 #include "IpcComms.h"

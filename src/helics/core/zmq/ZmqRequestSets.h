@@ -14,7 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "../../common/cppzmq/zmq.hpp"
 #include "../../common/zmqContextManager.h"
-#include "../ActionMessage.h"
+#include "../ActionMessage.hpp"
 #include "helics_includes/optional.h"
 #include <deque>
 #include <map>

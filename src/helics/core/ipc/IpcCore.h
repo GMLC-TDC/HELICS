@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_IPC_CORE_
 #pragma once
 
-#include "../CommonCore.h"
+#include "../CommonCore.hpp"
 #include "../CommsBroker.hpp"
 namespace helics {
 

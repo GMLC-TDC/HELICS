@@ -20,7 +20,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/application_api/Message.hpp"
 #include "helics/application_api/ValueConverter.hpp"
 #include "helics/application_api/ValueConverter_impl.hpp"
-#include "helics/core/core-data.h"
+#include "helics/core/core-data.hpp"
 #include <vector>
 
 using namespace std::string_literals;

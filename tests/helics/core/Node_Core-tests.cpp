@@ -11,10 +11,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/unit_test.hpp>
 
 #include "helics/common/barrier.hpp"
-#include "helics/core/CoreFactory.h"
-#include "helics/core/core-types.h"
-#include "helics/core/core.h"
-#include "helics/core/coreFederateInfo.h"
+#include "helics/core/CoreFactory.hpp"
+#include "helics/core/core-types.hpp"
+#include "helics/core/Core.hpp"
+#include "helics/core/CoreFederateInfo.hpp"
 #include <atomic>
 #include <cassert>
 #include <iostream>

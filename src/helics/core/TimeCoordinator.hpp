@@ -12,9 +12,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define TIME_COORDINATOR_H_
 #pragma once
 
-#include "TimeDependencies.h"
-#include "coreFederateInfo.h"
-#include "ActionMessage.h"
+#include "TimeDependencies.hpp"
+#include "CoreFederateInfo.hpp"
+#include "ActionMessage.hpp"
 #include <atomic>
 #include <functional>
 

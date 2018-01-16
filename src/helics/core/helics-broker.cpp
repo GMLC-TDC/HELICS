@@ -2,8 +2,8 @@
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
-#include "BrokerFactory.h"
-#include "CoreBroker.h"
+#include "BrokerFactory.hpp"
+#include "CoreBroker.hpp"
 
 #include <iostream>
 #include <fstream>

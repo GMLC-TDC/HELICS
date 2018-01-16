@@ -8,8 +8,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "CommsInterface.h"
-#include "NetworkBrokerData.h"
+#include "CommsInterface.hpp"
+#include "NetworkBrokerData.hpp"
 
 namespace helics
 {

@@ -10,8 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "TcpComms.h"
 #include "../../common/AsioServiceManager.h"
-#include "../ActionMessage.h"
-#include "../NetworkBrokerData.h"
+#include "../ActionMessage.hpp"
+#include "../NetworkBrokerData.hpp"
 #include "TcpHelperClasses.h"
 #include <memory>
 

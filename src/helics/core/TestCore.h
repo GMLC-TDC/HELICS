@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #ifndef _HELICS_TEST_CORE_
 #define _HELICS_TEST_CORE_
 
-#include "CommonCore.h"
+#include "CommonCore.hpp"
 //#include "test-broker.h"
 
 

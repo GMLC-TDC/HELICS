@@ -11,10 +11,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "TestCore.h"
 #include "../common/argParser.h"
-#include "ActionMessage.h"
-#include "BrokerFactory.h"
-#include "CoreBroker.h"
-#include "CoreFactory.h"
+#include "ActionMessage.hpp"
+#include "BrokerFactory.hpp"
+#include "CoreBroker.hpp"
+#include "CoreFactory.hpp"
 #include <fstream>
 
 namespace helics

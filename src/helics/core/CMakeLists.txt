@@ -64,40 +64,40 @@ set (TCP_SOURCE_FILES
 )
 
 set (PUBLIC_INCLUDE_FILES
-core.h
-broker.h
-CoreFactory.h
-BrokerFactory.h
-core-exceptions.h
-core-types.h
-core-data.h
-helics-time.h
-coreFederateInfo.h
-core-exceptions.h
+Core.hpp
+Broker.hpp
+CoreFactory.hpp
+BrokerFactory.hpp
+core-exceptions.hpp
+core-types.hpp
+core-data.hpp
+helics-time.hpp
+coreFederateInfo.hpp
+
 ../flag-definitions.h
 )
 
 set(INCLUDE_FILES
-	BrokerBase.h
-	TimeDependencies.h
-	TimeCoordinator.h
+	BrokerBase.hpp
+	TimeDependencies.hpp
+	TimeCoordinator.hpp
 	loggingHelper.hpp
-	delayedObjects.hpp
+	DelayedObjects.hpp
 	CommsBroker.hpp
 	CommsBroker_impl.hpp
-	CoreBroker.h
-	ActionMessageDefintions.h
-	ActionMessage.h
-	CommonCore.h
-	CommsInterface.h
-	FederateState.h
-	SubscriptionInfo.h
-	PublicationInfo.h
-	EndpointInfo.h
-	FilterInfo.h
-	BasicHandleInfo.h
-	FilterFunctions.h
-	NetworkBrokerData.h
+	CoreBroker.hpp
+	ActionMessageDefintions.hpp
+	ActionMessage.hpp
+	CommonCore.hpp
+	CommsInterface.hpp
+	FederateState.hpp
+	SubscriptionInfo.hpp
+	PublicationInfo.hpp
+	EndpointInfo.hpp
+	FilterInfo.hpp
+	BasicHandleInfo.hpp
+	FilterFunctions.hpp
+	NetworkBrokerData.hpp
 )
 
 set(TESTCORE_HEADER_FILES
@@ -178,7 +178,7 @@ install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION include/helics/core)
 
 OPTION(BUILD_BROKER "Build a helics Broker" ON)
 if (BUILD_BROKER)
-add_executable(helics_broker helics-broker.cc)
+add_executable(helics_broker helics-broker.cpp)
    target_link_libraries(helics_broker helics-static)
    set_target_properties (helics_broker PROPERTIES FOLDER apps)
    set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "build folder location of the broker")

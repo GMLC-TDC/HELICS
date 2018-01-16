@@ -9,8 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "TestBroker.h"
-#include "BrokerFactory.h"
-#include "CoreFactory.h"
+#include "BrokerFactory.hpp"
+#include "CoreFactory.hpp"
 #include "TestCore.h"
 
 #include "../common/argParser.h"

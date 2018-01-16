@@ -10,7 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "Subscriptions.hpp"
-#include "../core/core-exceptions.h"
+#include "../core/core-exceptions.hpp"
 
 namespace helics
 {

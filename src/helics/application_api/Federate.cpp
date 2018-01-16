@@ -9,11 +9,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "Federate.hpp"
-#include "../core/BrokerFactory.h"
-#include "../core/CoreFactory.h"
-#include "../core/core-exceptions.h"
+#include "../core/BrokerFactory.hpp"
+#include "../core/CoreFactory.hpp"
+#include "../core/core-exceptions.hpp"
 
-#include "../core/core.h"
+#include "../core/Core.hpp"
 #include "AsyncFedCallInfo.hpp"
 #include "helics/helics-config.h"
 

@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_TCP_COMMS_
 #pragma once
 
-#include "../CommsInterface.h"
+#include "../CommsInterface.hpp"
 #include "../../common/BlockingQueue.hpp"
 #include <atomic>
 #include <set>

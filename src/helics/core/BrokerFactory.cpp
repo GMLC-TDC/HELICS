@@ -8,11 +8,11 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "BrokerFactory.h"
+#include "BrokerFactory.hpp"
 #include "../common/delayedDestructor.hpp"
 #include "../common/searchableObjectHolder.hpp"
-#include "core-exceptions.h"
-#include "core-types.h"
+#include "core-exceptions.hpp"
+#include "core-types.hpp"
 #include "helics/helics-config.h"
 #if HELICS_HAVE_ZEROMQ
 #include "zmq/ZmqBroker.h"

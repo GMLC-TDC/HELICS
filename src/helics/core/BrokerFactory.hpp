@@ -12,8 +12,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_BROKER_FACTORY_
 #pragma once
 
-#include "broker.h"
-#include "core-types.h"
+#include "Broker.hpp"
+#include "core-types.hpp"
 #include <memory>
 #include <string>
 

@@ -8,7 +8,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "../core/core-exceptions.h"
+#include "../core/core-exceptions.hpp"
 #include "../helics.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"

@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
-#include "helics/core/CoreFactory.h"
+#include "helics/core/CoreFactory.hpp"
 
 #include "test_configuration.h"
 #include <fstream>

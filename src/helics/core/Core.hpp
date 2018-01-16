@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_CORE_
 #pragma once
 
-#include "core-data.h"
+#include "core-data.hpp"
 #include <functional>
 #include <memory>
 #include <string>

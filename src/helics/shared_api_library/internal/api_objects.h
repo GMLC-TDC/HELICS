@@ -14,7 +14,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <memory>
 #include "../api-data.h"
 #include "../../application_api/helicsTypes.hpp"
-#include "../../core/core-data.h"
+#include "../../core/core-data.hpp"
 #include <mutex>
 namespace helics
 {

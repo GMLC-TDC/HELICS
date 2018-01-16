@@ -10,8 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "testFixtures.h"
 #include <boost/test/unit_test.hpp>
 
-#include "helics/core/BrokerFactory.h"
-#include "helics/core/CoreFactory.h"
+#include "helics/core/BrokerFactory.hpp"
+#include "helics/core/CoreFactory.hpp"
 #include <cctype>
 
 bool hasIndexCode (const std::string &type_name)

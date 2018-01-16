@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _CORE_DATA_TYPES_H_
 #pragma once
 
-#include "helics-time.h"
+#include "helics-time.hpp"
 #include "helics/helics-config.h"
 
 #include <cstdint>

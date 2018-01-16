@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define FILTER_FUNCTIONS_H_
 #pragma once
 
-#include "core.h"
+#include "Core.hpp"
 
 #include <vector>
 namespace helics

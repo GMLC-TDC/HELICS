@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "FilterOperations.hpp"
 #include "Filters.hpp"
 #include "MessageOperators.hpp"
-#include "../core/core-exceptions.h"
+#include "../core/core-exceptions.hpp"
 
 #include <algorithm>
 #include <iostream>

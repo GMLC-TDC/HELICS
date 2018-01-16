@@ -8,7 +8,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "ActionMessage.h"
+#include "ActionMessage.hpp"
 #include <cereal/archives/portable_binary.hpp>
 #include <complex>
 //#include <cereal/archives/binary.hpp>
