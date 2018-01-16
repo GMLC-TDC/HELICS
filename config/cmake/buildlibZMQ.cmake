@@ -18,6 +18,18 @@ set(trigger_build_dir ${CMAKE_BINARY_DIR}/autobuild/force_libzmq)
 	escape_string(c_compiler_string ${CMAKE_C_COMPILER})
 	escape_string(linker_string ${CMAKE_LINKER})
 	
+	set(extra_cxx_flagss "")
+	if (UNIX)
+	if (USE_LIBCXX)
+		set(extra_cxx_flags "${extra_cxx_flags} -stdlib=libc++")
+	endif(USE_LIBCXX)
+	else(UNIX)
+	endif()
+	
+	if (VERSION_OPTION)
+		set(extra_cxx_flags "${extra_cxx_flags} ${VERSION_OPTION}")
+	endif()
+	
     #mktemp dir in build tree
     file(MAKE_DIRECTORY ${trigger_build_dir} ${trigger_build_dir}/build)
 
@@ -37,6 +49,7 @@ ExternalProject_Add(libzmq
         -DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}/libs
         -DCMAKE_BUILD_TYPE=\$\{CMAKE_BUILD_TYPE\}
 		-DZMQ_BUILD_TESTS=OFF
+		-DCMAKE_CXX_FLAGS=\"${extra_cxx_flags}\"
 		-DENABLE_CPACK=OFF
 		-DLIBZMQ_PEDANTIC=OFF
         -DCMAKE_CXX_COMPILER=${cxx_compiler_string}
