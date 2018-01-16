@@ -11,6 +11,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #pragma once
 #include <stdexcept>
+#include <string>
+
 namespace helics
 {
 /** base exception class for helics*/

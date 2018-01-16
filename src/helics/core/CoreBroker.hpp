@@ -23,7 +23,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "../common/simpleQueue.hpp"
 #include "TimeDependencies.hpp"
 #include "BrokerBase.hpp"
-#include "broker.hpp"
+#include "Broker.hpp"
 
 namespace helics
 {
