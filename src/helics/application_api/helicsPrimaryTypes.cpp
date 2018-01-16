@@ -9,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "HelicsPrimaryTypes.h"
+#include "HelicsPrimaryTypes.hpp"
 #include "ValueConverter.hpp"
 
 namespace helics

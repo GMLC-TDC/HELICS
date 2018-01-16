@@ -18,10 +18,10 @@ int main(int argc, char *argv[])
 {
     try
     {
-        helics::recorder recorder(argc, argv);
-        if (recorder.isActive())
+        helics::Recorder Recorder(argc, argv);
+        if (Recorder.isActive())
         {
-            recorder.run();
+            Recorder.run();
         }
         
     }

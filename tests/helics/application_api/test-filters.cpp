@@ -7,9 +7,9 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/application_api/Federate.h"
+#include "helics/application_api/Federate.hpp"
 #include "helics/application_api/Filters.hpp"
-#include "helics/application_api/MessageOperators.h"
+#include "helics/application_api/MessageOperators.hpp"
 #include "testFixtures.h"
 #include "test_configuration.h"
 #include <boost/test/unit_test.hpp>
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     auto p3 = dcFed->registerGlobalEndpoint ("cm");
 
     helics::CloningFilter cFilt (dcFed.get ());
-    cFilt.addSourceEndpoint ("src");
+    cFilt.addSourceTarget ("src");
     cFilt.addDeliveryEndpoint ("cm");
 
     sFed->enterExecutionStateAsync ();
@@ -270,8 +270,8 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     auto p4 = dcFed->registerGlobalEndpoint ("cm");
 
     helics::CloningFilter cFilt (dcFed.get ());
-    cFilt.addSourceEndpoint ("src");
-    cFilt.addSourceEndpoint ("src2");
+    cFilt.addSourceTarget("src");
+    cFilt.addSourceTarget ("src2");
     cFilt.addDeliveryEndpoint ("cm");
 
     sFed->enterExecutionStateAsync ();

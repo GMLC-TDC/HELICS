@@ -10,7 +10,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _VALUE_FEDERATE_MANAGER_H_
 #pragma once
 
-#include "Message.h"
+#include "Message.hpp"
 #include "../core/core.h"
 #include "helicsTypes.hpp"
 #include <utility> 

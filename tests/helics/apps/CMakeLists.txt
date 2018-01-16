@@ -39,7 +39,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
-add_test(NAME helics_apps-tests COMMAND helics_apps-tests --log_level=warning --report_level=short)
+add_test(NAME helics_apps-tests COMMAND helics_apps-tests --log_level=test_suite --report_level=short)
 
 
 target_compile_definitions(helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")

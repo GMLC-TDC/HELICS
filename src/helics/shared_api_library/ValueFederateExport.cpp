@@ -10,19 +10,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "../helics.hpp"
 #include "../core/core-exceptions.h"
-#include "ValueFederate_c.h"
+#include "ValueFederate.h"
 #include "internal/api_objects.h"
 #include <map>
 #include <memory>
 #include <mutex>
 #include <vector>
 
-int helicsValueFederateisUpdated (helics_federate vfed, helics_subscription sub)
-{
-    helics::SubscriptionObject *subobj = reinterpret_cast<helics::SubscriptionObject *> (sub);
-    helics::ValueFederate *valuefed = reinterpret_cast<helics::ValueFederate *> (vfed);
-    return static_cast<int> (valuefed->isUpdated (subobj->id));
-}
 
 static inline void addSubscription (helics_federate fed, helics::SubscriptionObject *sub)
 {

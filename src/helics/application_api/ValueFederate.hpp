@@ -12,8 +12,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _VALUE_FEDERATE_H_
 #pragma once
 
-#include "Federate.h"
-#include "Message.h"
+#include "Federate.hpp"
+#include "Message.hpp"
 #include "ValueConverter.hpp"
 #include "../core/core-data.h"
 #include <functional>

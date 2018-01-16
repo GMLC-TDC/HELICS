@@ -12,8 +12,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_SUBSCRIPTION_H_
 #pragma once
 
-#include "HelicsPrimaryTypes.h"
-#include "ValueFederate.h"
+#include "HelicsPrimaryTypes.hpp"
+#include "ValueFederate.hpp"
 #include "helicsTypes.hpp"
 #include <algorithm>
 #include <array>

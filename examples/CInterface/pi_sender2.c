@@ -1,3 +1,13 @@
+/*
+
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+*/
 static char help[] = "Example to demonstrate the usage of HELICS C Interface with two federates.\n\
             This example implements a loose-coupling protocol to exchange values between two federates. \n\
             Here, a ZMQ broker is created and a value federate. The value federate can both.\n\
@@ -5,7 +15,7 @@ static char help[] = "Example to demonstrate the usage of HELICS C Interface wit
             published by the other federate. Once the value has arrived, it publishes its next value \n\n";
 
 #include <stdio.h>
-#include <ValueFederate_c.h>
+#include <ValueFederate.h>
 #ifdef _MSC_VER
 #include <windows.h>
 #else

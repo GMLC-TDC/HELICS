@@ -20,7 +20,7 @@ the purpose of these objects are to convert a specific type into a data block fo
 #include <string>
 
 #include "../core/core.h"
-#include "Message.h"
+#include "Message.hpp"
 #include <complex>
 #include <type_traits>
 

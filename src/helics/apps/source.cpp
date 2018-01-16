@@ -39,7 +39,7 @@ static void sourceArgumentParser (int argc, const char *const *argv, po::variabl
 namespace helics
 {
 
-source::source (int argc, char *argv[])
+Source::Source (int argc, char *argv[])
 {
     FederateInfo fi ("source");
     fi.loadInfoFromArgs (argc, argv);
@@ -50,29 +50,29 @@ source::source (int argc, char *argv[])
     loadArguments (vm_map);
 }
 
-source::source (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
+Source::Source (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
 {
     fed->setFlag (SOURCE_ONLY_FLAG);
 }
 
-source::source (std::shared_ptr<Core> core, const FederateInfo &fi)
+Source::Source (std::shared_ptr<Core> core, const FederateInfo &fi)
     : fed (std::make_shared<CombinationFederate> (std::move (core), fi))
 {
     fed->setFlag (SOURCE_ONLY_FLAG);
 }
 
-source::source (const std::string &jsonString) : fed (std::make_shared<CombinationFederate> (jsonString))
+Source::Source (const std::string &jsonString) : fed (std::make_shared<CombinationFederate> (jsonString))
 {
     fed->setFlag (SOURCE_ONLY_FLAG);
 
     loadJsonFile (jsonString);
 }
 
-source::~source () = default;
+Source::~Source () = default;
 
 
 
-void source::loadFile (const std::string &jsonFile)
+void Source::loadFile (const std::string &jsonFile)
 {
     fed->registerInterfaces (jsonFile);
 
@@ -122,13 +122,13 @@ void source::loadFile (const std::string &jsonFile)
 
 
 /*run the source*/
-void source::run ()
+void Source::run ()
 {
     run (stopTime);
     fed->finalize ();
 }
 
-void source::run (Time stopTime_input)
+void Source::run (Time stopTime_input)
 {
     auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
@@ -179,7 +179,7 @@ void source::run (Time stopTime_input)
     }
 }
 
-void source::addSource(const std::string & /*key*/, helics_type_t /*type*/, const std::string &/*units*/)
+void Source::addSource(const std::string & /*key*/, helics_type_t /*type*/, const std::string &/*units*/)
 {
     // skip already existing publications
  //   if (pubids.find (key) != pubids.end ())
@@ -191,7 +191,7 @@ void source::addSource(const std::string & /*key*/, helics_type_t /*type*/, cons
 }
 
 
-int source::loadArguments (boost::program_options::variables_map &vm_map)
+int Source::loadArguments (boost::program_options::variables_map &vm_map)
 {
     if (vm_map.count ("input") == 0)
     {

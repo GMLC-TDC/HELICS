@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE (save_load_file1)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core2";
     fi.coreInitString = "3";
-    helics::recorder rec1 (fi);
+    helics::Recorder rec1 (fi);
     fi.period = 1.0;
     fi.name = "block1";
 
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE (check_created_files1, *boost::unit_test::depends_on ("comb
     fi.coreInitString = "1";
     fi.period = 1.0;
 
-    helics::player play1 (fi);
+    helics::Player play1 (fi);
     auto filename = boost::filesystem::temp_directory_path () / "savefile.txt";
     play1.loadFile (filename.string ());
 
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("comb
     fi.coreInitString = "1";
     fi.period = 1.0;
 
-    helics::player play1 (fi);
+    helics::Player play1 (fi);
     auto filename = boost::filesystem::temp_directory_path () / "savefile.json";
     play1.loadFile (filename.string ());
 

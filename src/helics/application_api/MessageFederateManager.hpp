@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _MESSAGE_FEDERATE_MANAGER_
 #pragma once
 
-#include "Message.h"
+#include "Message.hpp"
 #include "../common/simpleQueue.hpp"
 #include "../core/core.h"
 #include <cstdint>

@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_ENDPOINT_H_
 #pragma once
 
-#include "MessageFederate.h"
+#include "MessageFederate.hpp"
 namespace helics
 {
 /** class to manage an endpoint */

@@ -16,7 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
  */
 
 #include "../core/core-data.h"
-#include "Message.h"
+#include "Message.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cereal/archives/portable_binary.hpp>

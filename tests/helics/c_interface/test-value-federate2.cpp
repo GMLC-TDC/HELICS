@@ -11,8 +11,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
-//#include "helics/application_api/Message.h"
-//#include "helics/application_api/ValueFederate.h"
+//#include "helics/application_api/Message.hpp"
+//#include "helics/application_api/ValueFederate.hpp"
 #include "ctestFixtures.h"
 #include "test_configuration.h"
 #include <future>

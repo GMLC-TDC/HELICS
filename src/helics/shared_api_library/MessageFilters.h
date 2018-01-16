@@ -60,6 +60,15 @@ HELICS_Export helics_status helicsFilterSet (helics_filter filt, const char *pro
 
 HELICS_Export helics_status setString (helics_filter filt, const char *property, const char *val);
 
+/* the following operations only work with cloning filters*/
+
+HELICS_Export helics_status helicsFilterAddDestinationTarget(helics_filter filt, const char *dest);
+HELICS_Export helics_status helicsFilterAddSourceTarget(helics_filter filt, const char *dest);
+HELICS_Export helics_status helicsFilterAddDeliveryEndpoint(helics_filter filt, const char *dest);
+
+HELICS_Export helics_status helicsFilterRemoveDestinationTarget(helics_filter filt, const char *dest);
+HELICS_Export helics_status helicsFilterRemoveSourceTarget(helics_filter filt, const char *dest);
+HELICS_Export helics_status helicsFilterRemoveDeliveryEndpoint(helics_filter filt, const char *dest);
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif

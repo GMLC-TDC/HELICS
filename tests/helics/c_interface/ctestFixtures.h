@@ -14,8 +14,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <string>
 #include <vector>
 
-#include "MessageFederate_c.h"
-#include "ValueFederate_c.h"
+#include "MessageFederate.h"
+#include "ValueFederate.h"
 #include "helics.h"
 
 typedef enum {

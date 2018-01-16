@@ -5,28 +5,28 @@
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 ##############################################################################
 set(public_application_api_headers
-CombinationFederate.h
+CombinationFederate.hpp
 Publications.hpp
 Subscriptions.hpp
 Endpoints.hpp
 Filters.hpp
-Federate.h
+Federate.hpp
 helicsTypes.hpp
-Message.h
-MessageFederate.h
-MessageOperators.h
+Message.hpp
+MessageFederate.hpp
+MessageOperators.hpp
 ValueConverter.hpp
 ValueConverter_impl.hpp
-ValueFederate.h
-HelicsPrimaryTypes.h
-queryFunctions.h
+ValueFederate.hpp
+HelicsPrimaryTypes.hpp
+queryFunctions.hpp
 )
 
 set(private_application_api_headers
-MessageFederateManager.h
-ValueFederateManager.h
-asyncFedCallInfo.h
-FilterOperations.h
+MessageFederateManager.hpp
+ValueFederateManager.hpp
+AsyncFedCallInfo.hpp
+FilterOperations.hpp
 )
 
 set(application_api_sources

@@ -16,10 +16,10 @@ int main (int argc, char *argv[])
 { 
     try
     {
-        helics::player player(argc, argv);
-        if (player.isActive())
+        helics::Player Player(argc, argv);
+        if (Player.isActive())
         {
-            player.run();
+            Player.run();
         }
        
     }

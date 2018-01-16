@@ -1,3 +1,13 @@
+/*
+
+Copyright (C) 2017, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+*/
 static char help[] = " PI SENDER: Simple program to demonstrate the usage of HELICS C Interface.\n\
             This example creates a ZMQ broker and a value federate.\n\
             The value federate creates a global publications and publishes\n\
@@ -5,7 +15,7 @@ static char help[] = " PI SENDER: Simple program to demonstrate the usage of HEL
 
 
 #include <stdio.h>
-#include <ValueFederate_c.h>
+#include <ValueFederate.h>
 #ifdef _MSC_VER
 #include <windows.h>
 #else

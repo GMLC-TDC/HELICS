@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #pragma once
 
 #include "../core/core.h"
-#include "Federate.h"
+#include "Federate.hpp"
 #include "helics/helics-config.h"
 
 namespace helics
@@ -155,16 +155,16 @@ class CloningFilter : public Filter
     explicit CloningFilter (Federate *fed);
 
     /** add a sourceEndpoint to the list of endpoint to clone*/
-    void addSourceEndpoint (const std::string &sourceName);
+    void addSourceTarget (const std::string &sourceName);
     /** add a destination endpoint to the list of endpoints to clone*/
-    void addDestinationEndpoint (const std::string &destinationName);
+    void addDestinationTarget(const std::string &destinationName);
     /** add a delivery address this is the name of an endpoint to deliver the message to*/
     void addDeliveryEndpoint (const std::string &endpoint);
 
     /** remove a sourceEndpoint to the list of endpoint to clone*/
-    void removeSourceEndpoint (const std::string &sourceName);
+    void removeSourceTarget (const std::string &sourceName);
     /** remove a destination endpoint to the list of endpoints to clone*/
-    void removeDestinationEndpoint (const std::string &destinationName);
+    void removeDestinationTarget (const std::string &destinationName);
     /** remove a delivery address this is the name of an endpoint to deliver the message to*/
     void removeDeliveryEndpoint (const std::string &endpoint);
 

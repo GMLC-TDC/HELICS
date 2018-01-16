@@ -54,7 +54,7 @@ enum class action_t : int32_t
     cmd_tick = 1,  //!< command for a timer tick
     cmd_disconnect = 3,  //!< disconnect command
     cmd_disconnect_name = 4,  //!< disconnect a broker or core by name vs id
-    cmd_ping = 6, //!< request for an echo response
+    cmd_ping = 6, //!< request for an Echo response
     cmd_ping_reply=7, //!< response to a ping request
 
     cmd_init = 10,  //!< request entry to init mode

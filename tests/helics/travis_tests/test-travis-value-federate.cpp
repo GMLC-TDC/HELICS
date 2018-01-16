@@ -15,7 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
-#include "helics/application_api/ValueFederate.h"
+#include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/BrokerFactory.h"
 #include "helics/core/CoreFactory.h"
 #include "testFixtures.h"

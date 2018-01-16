@@ -8,8 +8,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "../helics.hpp"
 #include "../core/core-exceptions.h"
+#include "../helics.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"
 #include <memory>
@@ -228,6 +228,24 @@ static helics::Filter *getFilter (helics_filter filt)
     return fObj->filtptr.get ();
 }
 
+static helics::CloningFilter *getCloningFilter (helics_filter filt)
+{
+    if (filt == nullptr)
+    {
+        return nullptr;
+    }
+    auto fObj = reinterpret_cast<helics::FilterObject *> (filt);
+    if (fObj->valid != filterValidationIdentifier)
+    {
+        return nullptr;
+    }
+    if (fObj->type != helics::ftype::clone)
+    {
+        return nullptr;
+    }
+    return dynamic_cast<helics::CloningFilter *> (fObj->filtptr.get ());
+}
+
 /** get the target of the filter*/
 helics_status helicsFilterGetTarget (helics_filter filt, char *str, int maxlen)
 {
@@ -294,4 +312,102 @@ helics_status setString (helics_filter filt, const char *property, const char *v
     }
     filter->setString (property, val);
     return helics_ok;
+}
+
+helics_status helicsFilterAddDestinationTarget (helics_filter filt, const char *dest)
+{
+    auto cfilt = getCloningFilter (filt);
+    if (cfilt == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    if (dest == nullptr)
+    {
+        return helics_invalid_argument;
+    }
+    try
+    {
+        cfilt->addDestinationTarget (dest);
+    }
+    catch (const helics::InvalidFunctionCall &ifc)
+    {
+        return helics_invalid_function_call;
+    }
+}
+
+helics_status helicsFilterAddSourceTarget (helics_filter filt, const char *src)
+{
+    auto cfilt = getCloningFilter (filt);
+    if (cfilt == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    if (src == nullptr)
+    {
+        return helics_invalid_argument;
+    }
+    try
+    {
+        cfilt->addSourceTarget (src);
+    }
+    catch (const helics::InvalidFunctionCall &ifc)
+    {
+        return helics_invalid_function_call;
+    }
+}
+
+helics_status helicsFilterAddDeliveryEndpoint (helics_filter filt, const char *delivery)
+{
+    auto cfilt = getCloningFilter (filt);
+    if (cfilt == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    if (delivery == nullptr)
+    {
+        return helics_invalid_argument;
+    }
+    cfilt->addDeliveryEndpoint (delivery);
+}
+
+helics_status helicsFilterRemoveDestinationTarget (helics_filter filt, const char *dest)
+{
+    auto cfilt = getCloningFilter (filt);
+    if (cfilt == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    if (dest == nullptr)
+    {
+        return helics_invalid_argument;
+    }
+    cfilt->removeDestinationTarget (dest);
+}
+
+helics_status helicsFilterRemoveSourceTarget (helics_filter filt, const char *source)
+{
+    auto cfilt = getCloningFilter (filt);
+    if (cfilt == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    if (source == nullptr)
+    {
+        return helics_invalid_argument;
+    }
+    cfilt->removeSourceTarget (source);
+}
+
+helics_status helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char *delivery)
+{
+    auto cfilt = getCloningFilter (filt);
+    if (cfilt == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    if (delivery == nullptr)
+    {
+        return helics_invalid_argument;
+    }
+    cfilt->removeDeliveryEndpoint (delivery);
 }

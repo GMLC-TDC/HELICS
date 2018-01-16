@@ -8,9 +8,9 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "queryFunctions.h"
+#include "queryFunctions.hpp"
 
-#include "Federate.h"
+#include "Federate.hpp"
 #include <thread>
 
 #ifdef _MSC_VER

@@ -8,8 +8,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "ctestFixtures.h"
-#include "MessageFederate_c.h"
-#include "ValueFederate_c.h"
+#include "MessageFederate.h"
+#include "ValueFederate.h"
 #include "helics.h"
 #include <cctype>
 #include <boost/test/unit_test.hpp>

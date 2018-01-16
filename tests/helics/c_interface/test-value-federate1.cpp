@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "test_configuration.h"
 
-#include <ValueFederate_c.h>
+#include <ValueFederate.h>
 
 /** these test cases test out the value federates
  */
@@ -1317,7 +1317,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdat
     BOOST_CHECK_EQUAL (subtype, "def");
     BOOST_CHECK_EQUAL (status, helics_ok);
     status = helicsSubscriptionGetType (subid2, subtype2, 100);
-    BOOST_CHECK_EQUAL (subtype2, "int32");
+    BOOST_CHECK_EQUAL (subtype2, "int64");
     BOOST_CHECK_EQUAL (status, helics_ok);
     status = helicsSubscriptionGetType (subid3, subtype3, 100);
     BOOST_CHECK_EQUAL (subtype3, "def");

@@ -9,9 +9,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "FilterOperations.h"
+#include "FilterOperations.hpp"
 #include "Filters.hpp"
-#include "MessageOperators.h"
+#include "MessageOperators.hpp"
 #include "../core/core-exceptions.h"
 
 #include <algorithm>

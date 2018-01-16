@@ -13,8 +13,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_MESSAGE_FEDERATE_API_
 #pragma once
 
-#include "Federate.h"
-#include "Message.h"
+#include "Federate.hpp"
+#include "Message.hpp"
 #include <functional>
 #include <vector>
 

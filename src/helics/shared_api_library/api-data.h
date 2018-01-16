@@ -29,6 +29,7 @@ typedef enum {
     helics_terminated, /*!< the federate has terminated and the call cannot be completed*/
     helics_warning, /*!< the function issued a warning of some kind */
     helics_invalid_state_transition, /*!< error issued when an invalid state transition occurred */
+    helics_invalid_function_call, /*!< the call made was invalid in the present state of the calling object*/
     helics_error /*!< the function produced an error */
 } helics_status;
 

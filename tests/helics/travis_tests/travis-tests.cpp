@@ -9,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 //#include <iostream>
-#include <helics/application_api/Federate.h>
+#include <helics/application_api/Federate.hpp>
 
 #ifndef _MSC_VER
 #define BOOST_TEST_DYN_LINK

@@ -12,7 +12,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include <functional>
 
-#include "Message.h"
+#include "Message.hpp"
 #include "../core/core-data.h"
 /** @file
 @brief define helper classes to scope filter operations

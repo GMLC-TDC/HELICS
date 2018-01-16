@@ -8,10 +8,10 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "ValueFederate.h"
+#include "ValueFederate.hpp"
 #include "../core/core.h"
 #include "../core/core-exceptions.h"
-#include "ValueFederateManager.h"
+#include "ValueFederateManager.hpp"
 
 #ifdef _MSC_VER
 #pragma warning(push)

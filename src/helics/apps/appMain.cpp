@@ -39,13 +39,13 @@ int main (int argc, char *argv[])
     {
         if (arg1 == "player")
         {
-            helics::player player(argc, argv);
-            player.run();
+            helics::Player Player(argc, argv);
+            Player.run();
         }
         else if (arg1 == "recorder")
         {
-            helics::recorder recorder(argc, argv);
-            recorder.run();
+            helics::Recorder Recorder(argc, argv);
+            Recorder.run();
         }
         else if ((arg1 == "--version")||(arg1=="-v"))
         {

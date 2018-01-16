@@ -14,7 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define BOOST_TEST_MODULE player_recorder_tests
 #define BOOST_TEST_DETECT_MEMORY_LEAK 0
 
-#include "../../../src/helics/application_api/Federate.h"
+#include "../../../src/helics/application_api/Federate.hpp"
 #include <boost/test/unit_test.hpp>
 
 struct globalTestConfig

@@ -27,7 +27,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <sstream>
 
 
-#include "../application_api/Federate.h"
+#include "../application_api/Federate.hpp"
 
 using namespace helics;
 

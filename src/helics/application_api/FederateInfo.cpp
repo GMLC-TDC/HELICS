@@ -9,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "Federate.h"
+#include "Federate.hpp"
 
 #include <iostream>
 #include <fstream>

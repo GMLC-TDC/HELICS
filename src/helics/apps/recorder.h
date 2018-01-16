@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define HELICS_RECORDER_HPP
 
 #include "../application_api/Subscriptions.hpp"
-#include "../application_api/CombinationFederate.h"
+#include "../application_api/CombinationFederate.hpp"
 #include "../application_api/Endpoints.hpp"
 #include <map>
 #include <memory>
@@ -57,33 +57,33 @@ namespace helics
     class CloningFilter;
 
     /** class designed to capture data points from a set of subscriptions or endpoints*/
-    class recorder
+    class Recorder
     {
     public:
         /** construct from a FederateInfo structure*/
-        recorder(FederateInfo &fi);
+        Recorder(FederateInfo &fi);
         /** construct from command line arguments*/
-        recorder(int argc, char *argv[]);
+        Recorder(int argc, char *argv[]);
 
         /**constructor taking a federate information structure and using the given core
         @param core a pointer to core object which the federate can join
         @param[in] fi  a federate information structure
         */
-        recorder(std::shared_ptr<Core> core, const FederateInfo &fi);
+        Recorder(std::shared_ptr<Core> core, const FederateInfo &fi);
         /**constructor taking a file with the required information
         @param[in] file a file defining the federate information
         */
-        recorder(const std::string &jsonString);
+        Recorder(const std::string &jsonString);
         /** move construction*/
-        recorder(recorder &&other_player) = default;
+        Recorder(Recorder &&other_player) = default;
         /** don't allow the copy constructor*/
-        recorder(const recorder &other_player) = delete;
+        Recorder(const Recorder &other_player) = delete;
         /** move assignment*/
-        recorder &operator= (recorder &&fed) = default;
+        Recorder &operator= (Recorder &&fed) = default;
         /** don't allow the copy assignment,  the default would fail anyway since federates are not copyable either*/
-        recorder &operator= (const recorder &fed) = delete;
+        Recorder &operator= (const Recorder &fed) = delete;
         /** destructor*/
-        ~recorder();
+        ~Recorder();
 
         /** load a file containing subscription information
         @param filename the name of the file to load (.txt, .json, or .xml
@@ -91,9 +91,9 @@ namespace helics
         */
         int loadFile(const std::string &filename);
 
-        /*run the player*/
+        /*run the Player*/
         void run();
-        /** run the player until the specified time*/
+        /** run the Player until the specified time*/
         void run(Time stopTime);
         /** add a subscription to capture*/
         void addSubscription(const std::string &key);
@@ -133,7 +133,7 @@ namespace helics
         /** finalize the federate*/
         void finalize();
 
-        /** check if the recorder is ready to run*/
+        /** check if the Recorder is ready to run*/
         bool isActive() const
         {
             return !deactivated;

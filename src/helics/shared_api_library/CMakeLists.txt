@@ -15,9 +15,9 @@ ENDIF(UNIX)
 set(helicsShared_headers
 helics.h
 api-data.h
-ValueFederate_c.h
-MessageFederate_c.h
-MessageFilters_c.h
+ValueFederate.h
+MessageFederate.h
+MessageFilters.h
 )
 
 set(helicsShared_sources
@@ -25,7 +25,7 @@ helicsExport.cpp
 FederateExport.cpp
 ValueFederateExport.cpp
 MessageFederateExport.cpp
-MessageFilters.cpp
+MessageFiltersExport.cpp
 internal/api_objects.h
 )
 

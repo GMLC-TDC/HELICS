@@ -10,8 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "Filters.hpp"
-#include "FilterOperations.h"
-#include "MessageOperators.h"
+#include "FilterOperations.hpp"
+#include "MessageOperators.hpp"
 
 #include <iostream>
 #include <map>
@@ -213,7 +213,7 @@ CloningFilter::CloningFilter (Federate *fed) : Filter (fed)
     filtOp = std::make_shared<CloneFilterOperation> (fed->getCorePointer ().get ());
 }
 
-void CloningFilter::addSourceEndpoint (const std::string &sourceName)
+void CloningFilter::addSourceTarget (const std::string &sourceName)
 {
     auto filtid = corePtr->registerSourceFilter (getName (), sourceName, std::string (), std::string ());
     sourceFilters.push_back (filtid);
@@ -221,7 +221,7 @@ void CloningFilter::addSourceEndpoint (const std::string &sourceName)
     corePtr->setFilterOperator (filtid, filtOp->getOperator ());
 }
 
-void CloningFilter::addDestinationEndpoint (const std::string &destinationName)
+void CloningFilter::addDestinationTarget (const std::string &destinationName)
 {
     auto filtid = corePtr->registerDestinationFilter (getName (), destinationName, std::string (), std::string ());
     destFilters.push_back (filtid);
@@ -234,7 +234,7 @@ void CloningFilter::addDeliveryEndpoint (const std::string &endpoint)
     Filter::setString ("add delivery", endpoint);
 }
 
-void CloningFilter::removeSourceEndpoint (const std::string &sourceName)
+void CloningFilter::removeSourceTarget (const std::string &sourceName)
 {
     for (size_t ii = 0; ii < sourceEndpoints.size (); ++ii)
     {
@@ -245,7 +245,7 @@ void CloningFilter::removeSourceEndpoint (const std::string &sourceName)
     }
 }
 
-void CloningFilter::removeDestinationEndpoint (const std::string &destinationName)
+void CloningFilter::removeDestinationTarget (const std::string &destinationName)
 {
     for (size_t ii = 0; ii < destEndpoints.size (); ++ii)
     {
@@ -265,19 +265,19 @@ void CloningFilter::setString (const std::string &property, const std::string &v
 {
     if (property == "source")
     {
-        addSourceEndpoint (val);
+        addSourceTarget (val);
     }
     else if ((property == "dest") || (property == "destination"))
     {
-        addDestinationEndpoint (val);
+        addDestinationTarget (val);
     }
     else if ((property == "remove destination") || (property == "remove dest"))
     {
-        removeDestinationEndpoint (val);
+        removeDestinationTarget (val);
     }
     else if (property == "remove source")
     {
-        removeSourceEndpoint (val);
+        removeSourceTarget (val);
     }
     else
     {
