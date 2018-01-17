@@ -1,6 +1,6 @@
 /*
    base64.cpp and base64.h
-   Copyright (C) 2004-2008 René Nyffenegger
+   Copyright (C) 2004-2008 RenÃ© Nyffenegger
    This source code is provided 'as-is', without any express or implied
    warranty. In no event will the author be held liable for any damages
    arising from the use of this software.
@@ -14,7 +14,7 @@
    2. Altered source versions must be plainly marked as such, and must not be
       misrepresented as being the original source code.
    3. This notice may not be removed or altered from any source distribution.
-   René Nyffenegger rene.nyffenegger@adp-gmbh.ch
+   RenÃ© Nyffenegger rene.nyffenegger@adp-gmbh.ch
 
    modified by Philip Top LLNL 2017:  added charMapper objects instead of find and C++ based overloads
 */
