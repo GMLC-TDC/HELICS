@@ -9,6 +9,7 @@ You will need the following Python packages.
     pip install sphinx
     pip install ghp-import
     pip install breathe
+    pip install sphinx_rtd_theme
 
 You will also need doxygen.
 
