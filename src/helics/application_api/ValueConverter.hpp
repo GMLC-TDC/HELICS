@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -19,8 +19,8 @@ the purpose of these objects are to convert a specific type into a data block fo
 
 #include <string>
 
-#include "../core/core.h"
-#include "Message.h"
+#include "../core/Core.hpp"
+#include "Message.hpp"
 #include <complex>
 #include <type_traits>
 

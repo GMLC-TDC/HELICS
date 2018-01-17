@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -17,10 +17,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 /** these test cases test out the value converters
  */
-#include "helics/application_api/Message.h"
+#include "helics/application_api/Message.hpp"
 #include "helics/application_api/ValueConverter.hpp"
 #include "helics/application_api/ValueConverter_impl.hpp"
-#include "helics/core/core-data.h"
+#include "helics/core/core-data.hpp"
 #include <vector>
 
 using namespace std::string_literals;

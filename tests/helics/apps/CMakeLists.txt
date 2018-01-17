@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright (C) 2017, Battelle Memorial Institute
+#Copyright (C) 2017-2018, Battelle Memorial Institute
 #All rights reserved.
 
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
@@ -24,6 +24,8 @@ exeTestHelper.h
 
 add_executable(helics_apps-tests ${helics_apps_test_sources})
 
+set_target_properties (helics_apps-tests PROPERTIES FOLDER tests)
+
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
@@ -37,7 +39,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
-add_test(NAME helics_apps-tests COMMAND helics_apps-tests --log_level=warning --report_level=short)
+add_test(NAME helics_apps-tests COMMAND helics_apps-tests --log_level=test_suite --report_level=short)
 
 
 target_compile_definitions(helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")

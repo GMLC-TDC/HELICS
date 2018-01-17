@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -8,7 +8,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/application_api/ValueFederate.h"
+#include "helics/application_api/ValueFederate.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>

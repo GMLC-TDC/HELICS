@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -10,8 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "Filters.hpp"
-#include "FilterOperations.h"
-#include "MessageOperators.h"
+#include "FilterOperations.hpp"
+#include "MessageOperators.hpp"
 
 #include <iostream>
 #include <map>
@@ -22,41 +22,41 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-
 void addOperations (Filter *filt, defined_filter_types type, Core *cptr)
 {
     switch (type)
     {
-    case custom:
+    case defined_filter_types::custom:
+    default:
         break;
-    case randomDelay:
+    case defined_filter_types::randomDelay:
     {
-        auto op = std::make_shared<randomDelayFilterOperation> ();
+        auto op = std::make_shared<RandomDelayFilterOperation> ();
         filt->setFilterOperations (std::move (op));
     }
     break;
-    case delay:
+    case defined_filter_types::delay:
     {
-        auto op = std::make_shared<delayFilterOperation> ();
+        auto op = std::make_shared<DelayFilterOperation> ();
         filt->setFilterOperations (std::move (op));
     }
     break;
-    case randomDrop:
+    case defined_filter_types::randomDrop:
     {
-        auto op = std::make_shared<randomDropFilterOperation> ();
+        auto op = std::make_shared<RandomDropFilterOperation> ();
         filt->setFilterOperations (std::move (op));
     }
     break;
-    case reroute:
+    case defined_filter_types::reroute:
     {
-        auto op = std::make_shared<randomDropFilterOperation> ();
+        auto op = std::make_shared<RandomDropFilterOperation> ();
         filt->setFilterOperations (std::move (op));
     }
     break;
-    case clone:
+    case defined_filter_types::clone:
     {
-        auto op = std::make_shared<cloneFilterOperation>(cptr);
-        filt->setFilterOperations(std::move(op));
+        auto op = std::make_shared<CloneFilterOperation> (cptr);
+        filt->setFilterOperations (std::move (op));
     }
     break;
     }
@@ -87,11 +87,11 @@ void Filter::setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
     {
         if (filtOp)
         {
-            corePtr->setFilterOperator(id, filtOp->getOperator());
+            corePtr->setFilterOperator (id, filtOp->getOperator ());
         }
         else
         {
-            corePtr->setFilterOperator(id, nullptr);
+            corePtr->setFilterOperator (id, nullptr);
         }
     }
 }
@@ -134,22 +134,21 @@ const std::string &Filter::getOutputType () const
     return nullStr;
 }
 
-void Filter::set(const std::string &property, double val)
+void Filter::set (const std::string &property, double val)
 {
     if (filtOp)
     {
-        filtOp->set(property, val);
+        filtOp->set (property, val);
     }
 }
 
-void Filter::setString(const std::string &property, const std::string &val)
+void Filter::setString (const std::string &property, const std::string &val)
 {
     if (filtOp)
     {
-        filtOp->setString(property, val);
+        filtOp->setString (property, val);
     }
 }
-
 
 SourceFilter::SourceFilter (Federate *fed,
                             const std::string &target,
@@ -207,90 +206,82 @@ DestinationFilter::DestinationFilter (Core *cr,
     }
 }
 
+CloningFilter::CloningFilter (Core *cr) : Filter (cr) { filtOp = std::make_shared<CloneFilterOperation> (cr); }
 
-CloningFilter::CloningFilter(Core *cr) :Filter(cr)
+CloningFilter::CloningFilter (Federate *fed) : Filter (fed)
 {
-    filtOp= std::make_shared<cloneFilterOperation>(cr);
+    filtOp = std::make_shared<CloneFilterOperation> (fed->getCorePointer ().get ());
 }
 
-CloningFilter::CloningFilter(Federate *fed) : Filter(fed)
+void CloningFilter::addSourceTarget (const std::string &sourceName)
 {
-    filtOp = std::make_shared<cloneFilterOperation>(fed->getCorePointer().get());
+    auto filtid = corePtr->registerSourceFilter (getName (), sourceName, std::string (), std::string ());
+    sourceFilters.push_back (filtid);
+    sourceEndpoints.push_back (sourceName);
+    corePtr->setFilterOperator (filtid, filtOp->getOperator ());
 }
 
-void CloningFilter::addSourceEndpoint(const std::string &sourceName)
+void CloningFilter::addDestinationTarget (const std::string &destinationName)
 {
-    auto filtid=corePtr->registerSourceFilter(getName(),sourceName,std::string(),std::string());
-    sourceFilters.push_back(filtid);
-    sourceEndpoints.push_back(sourceName);
-    corePtr->setFilterOperator(filtid, filtOp->getOperator());
+    auto filtid = corePtr->registerDestinationFilter (getName (), destinationName, std::string (), std::string ());
+    destFilters.push_back (filtid);
+    destEndpoints.push_back (destinationName);
+    corePtr->setFilterOperator (filtid, filtOp->getOperator ());
 }
 
-void CloningFilter::addDestinationEndpoint(const std::string &destinationName)
+void CloningFilter::addDeliveryEndpoint (const std::string &endpoint)
 {
-    auto filtid = corePtr->registerDestinationFilter(getName(), destinationName, std::string(), std::string());
-    destFilters.push_back(filtid);
-    destEndpoints.push_back(destinationName);
-    corePtr->setFilterOperator(filtid, filtOp->getOperator());
+    Filter::setString ("add delivery", endpoint);
 }
 
-void CloningFilter::addDeliveryEndpoint(const std::string &endpoint)
+void CloningFilter::removeSourceTarget (const std::string &sourceName)
 {
-    Filter::setString("add delivery", endpoint);
-}
-
-
-void CloningFilter::removeSourceEndpoint(const std::string &sourceName)
-{
-    for (size_t ii=0;ii<sourceEndpoints.size();++ii)
+    for (size_t ii = 0; ii < sourceEndpoints.size (); ++ii)
     {
         if (sourceEndpoints[ii] == sourceName)
         {
-            corePtr->setFilterOperator(sourceFilters[ii].value(), nullptr);
+            corePtr->setFilterOperator (sourceFilters[ii].value (), nullptr);
         }
     }
-   
 }
 
-void CloningFilter::removeDestinationEndpoint(const std::string &destinationName)
+void CloningFilter::removeDestinationTarget (const std::string &destinationName)
 {
-    for (size_t ii = 0; ii<destEndpoints.size(); ++ii)
+    for (size_t ii = 0; ii < destEndpoints.size (); ++ii)
     {
         if (destEndpoints[ii] == destinationName)
         {
-            corePtr->setFilterOperator(destFilters[ii].value(), nullptr);
+            corePtr->setFilterOperator (destFilters[ii].value (), nullptr);
         }
     }
-    
 }
 
-void CloningFilter::removeDeliveryEndpoint(const std::string &endpoint)
+void CloningFilter::removeDeliveryEndpoint (const std::string &endpoint)
 {
-    Filter::setString("remove delivery", endpoint);
+    Filter::setString ("remove delivery", endpoint);
 }
 
-
-void CloningFilter::setString(const std::string &property, const std::string &val)
+void CloningFilter::setString (const std::string &property, const std::string &val)
 {
     if (property == "source")
     {
-        addSourceEndpoint(val);
+        addSourceTarget (val);
     }
     else if ((property == "dest") || (property == "destination"))
     {
-        addDestinationEndpoint(val);
+        addDestinationTarget (val);
     }
     else if ((property == "remove destination") || (property == "remove dest"))
     {
-        removeDestinationEndpoint(val);
+        removeDestinationTarget (val);
     }
     else if (property == "remove source")
     {
-        removeSourceEndpoint(val);
+        removeSourceTarget (val);
     }
     else
     {
-        Filter::setString(property, val);
+        Filter::setString (property, val);
     }
 }
 
@@ -300,36 +291,35 @@ std::unique_ptr<DestinationFilter> make_destination_filter (defined_filter_types
                                                             const std::string &name)
 
 {
-    if (type == clone)
+    if (type == defined_filter_types::clone)
     {
-        auto dfilt = std::make_unique<DestinationFilter>(mFed, target, name);
-        addOperations(dfilt.get(), type,mFed->getCorePointer().get());
-        dfilt->setString("delivery", name);
+        auto dfilt = std::make_unique<DestinationFilter> (mFed, target, name);
+        addOperations (dfilt.get (), type, mFed->getCorePointer ().get ());
+        dfilt->setString ("delivery", name);
         return dfilt;
     }
     else
     {
-        auto dfilt = std::make_unique<DestinationFilter>(mFed, target, name);
-        addOperations(dfilt.get(), type,nullptr);
+        auto dfilt = std::make_unique<DestinationFilter> (mFed, target, name);
+        addOperations (dfilt.get (), type, nullptr);
         return dfilt;
     }
-   
 }
 
 std::unique_ptr<SourceFilter>
 make_source_filter (defined_filter_types type, Core *cr, const std::string &target, const std::string &name)
 {
-    if (type == clone)
+    if (type == defined_filter_types::clone)
     {
-        auto dfilt = std::make_unique<SourceFilter>(cr, target, name);
-        addOperations(dfilt.get(), type, cr);
-        dfilt->setString("delivery", name);
+        auto dfilt = std::make_unique<SourceFilter> (cr, target, name);
+        addOperations (dfilt.get (), type, cr);
+        dfilt->setString ("delivery", name);
         return dfilt;
     }
     else
     {
-        auto sfilt = std::make_unique<SourceFilter>(cr, target, name);
-        addOperations(sfilt.get(), type,cr);
+        auto sfilt = std::make_unique<SourceFilter> (cr, target, name);
+        addOperations (sfilt.get (), type, cr);
         return sfilt;
     }
 }
@@ -338,17 +328,17 @@ std::unique_ptr<DestinationFilter>
 make_destination_filter (defined_filter_types type, Core *cr, const std::string &target, const std::string &name)
 
 {
-    if (type == clone)
+    if (type == defined_filter_types::clone)
     {
-        auto dfilt = std::make_unique<DestinationFilter>(cr, target, name);
-        addOperations(dfilt.get(), type, cr);
-        dfilt->setString("delivery", name);
+        auto dfilt = std::make_unique<DestinationFilter> (cr, target, name);
+        addOperations (dfilt.get (), type, cr);
+        dfilt->setString ("delivery", name);
         return dfilt;
     }
     else
     {
-        auto dfilt = std::make_unique<DestinationFilter>(cr, target, name);
-        addOperations(dfilt.get(), type,cr);
+        auto dfilt = std::make_unique<DestinationFilter> (cr, target, name);
+        addOperations (dfilt.get (), type, cr);
         return dfilt;
     }
 }
@@ -356,17 +346,17 @@ make_destination_filter (defined_filter_types type, Core *cr, const std::string 
 std::unique_ptr<SourceFilter>
 make_source_filter (defined_filter_types type, Federate *fed, const std::string &target, const std::string &name)
 {
-    if (type == clone)
+    if (type == defined_filter_types::clone)
     {
-        auto dfilt = std::make_unique<SourceFilter>(fed, target, name);
-        addOperations(dfilt.get(), type, fed->getCorePointer().get());
-        dfilt->setString("delivery", name);
+        auto dfilt = std::make_unique<SourceFilter> (fed, target, name);
+        addOperations (dfilt.get (), type, fed->getCorePointer ().get ());
+        dfilt->setString ("delivery", name);
         return dfilt;
     }
     else
     {
-        auto sfilt = std::make_unique<SourceFilter>(fed, target, name);
-        addOperations(sfilt.get(), type,nullptr);
+        auto sfilt = std::make_unique<SourceFilter> (fed, target, name);
+        addOperations (sfilt.get (), type, nullptr);
         return sfilt;
     }
 }

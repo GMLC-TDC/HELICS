@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_IPC_QUEUE_HELPER_
 #pragma once
 
-#include "../ActionMessage.h"
+#include "../ActionMessage.hpp"
 #include <algorithm>
 #include <cctype>
 #include <helics_includes/optional.h>

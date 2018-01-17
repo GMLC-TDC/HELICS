@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -40,13 +40,13 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test)
     vFed1->enterInitializationState ();
     vFed1->publish (pubid, 27.0);
 
-    auto comp = vFed1->enterExecutionState (helics::iteration_request::iterate_if_needed);
+    auto comp = vFed1->enterExecutionState (helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::iterating);
     auto val = vFed1->getValue<double> (subid);
     BOOST_CHECK_EQUAL (val, 27.0);
 
-    comp = vFed1->enterExecutionState (helics::iteration_request::iterate_if_needed);
+    comp = vFed1->enterExecutionState (helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::next_step);
 
@@ -70,21 +70,21 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 
     vFed1->enterInitializationStateAsync ();
     vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateFinalize ();
+    vFed1->enterInitializationStateComplete ();
     vFed1->publish (pubid, 27.0);
     vFed1->enterExecutionStateAsync ();
-    auto comp = vFed2->enterExecutionState (helics::iteration_request::iterate_if_needed);
+    auto comp = vFed2->enterExecutionState (helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::iterating);
     auto val = vFed2->getValue<double> (subid);
     BOOST_CHECK_EQUAL (val, 27.0);
 
-    comp = vFed2->enterExecutionState (helics::iteration_request::iterate_if_needed);
+    comp = vFed2->enterExecutionState (helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::next_step);
 
     auto val2 = vFed2->getValue<double> (subid);
-    vFed1->enterExecutionStateFinalize ();
+    vFed1->enterExecutionStateComplete ();
     BOOST_CHECK_EQUAL (val2, val);
 }
 
@@ -104,17 +104,17 @@ BOOST_AUTO_TEST_CASE (time_iteration_test)
     vFed1->enterExecutionState ();
     vFed1->publish (pubid, 27.0);
 
-    auto comp = vFed1->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
+    auto comp = vFed1->requestTimeIterative (1.0, helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp.state == helics::iteration_result::iterating);
-    BOOST_CHECK_EQUAL (comp.stepTime, helics::timeZero);
+    BOOST_CHECK_EQUAL (comp.grantedTime, helics::timeZero);
     auto val = vFed1->getValue<double> (subid);
     BOOST_CHECK_EQUAL (val, 27.0);
 
-    comp = vFed1->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
+    comp = vFed1->requestTimeIterative (1.0, helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp.state == helics::iteration_result::next_step);
-    BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
+    BOOST_CHECK_EQUAL (comp.grantedTime, 1.0);
     auto val2 = vFed1->getValue<double> (subid);
 
     BOOST_CHECK_EQUAL (val2, val);
@@ -137,23 +137,23 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
 
     vFed1->enterExecutionStateAsync ();
     vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateFinalize ();
+    vFed1->enterExecutionStateComplete ();
     vFed1->publish (pubid, 27.0);
 
     vFed1->requestTimeAsync (1.0);
-    auto comp = vFed2->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
+    auto comp = vFed2->requestTimeIterative (1.0, helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp.state == helics::iteration_result::iterating);
-    BOOST_CHECK_EQUAL (comp.stepTime, helics::timeZero);
+    BOOST_CHECK_EQUAL (comp.grantedTime, helics::timeZero);
     auto val = vFed2->getValue<double> (subid);
     BOOST_CHECK_EQUAL (val, 27.0);
 
-    comp = vFed2->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
+    comp = vFed2->requestTimeIterative (1.0, helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp.state == helics::iteration_result::next_step);
-    BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
+    BOOST_CHECK_EQUAL (comp.grantedTime, 1.0);
     auto val2 = vFed2->getValue<double> (subid);
-    vFed1->requestTimeFinalize ();
+    vFed1->requestTimeComplete ();
 
     BOOST_CHECK_EQUAL (val2, val);
 }
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
 {
     Setup2FederateTest ("test");
     // register the publications
-    auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helicsType_t::helicsDouble);
+    auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsDouble);
 
     auto sub1 = helics::Subscription (vFed2.get (), "pub1");
     vFed1->setTimeDelta (1.0);
@@ -175,26 +175,26 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
 
     vFed1->enterExecutionStateAsync ();
     vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateFinalize ();
+    vFed1->enterExecutionStateComplete ();
     pub1.publish (27.0);
 
     vFed1->requestTimeAsync (1.0);
-    auto comp = vFed2->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
+    auto comp = vFed2->requestTimeIterative (1.0, helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp.state == helics::iteration_result::iterating);
-    BOOST_CHECK_EQUAL (comp.stepTime, helics::timeZero);
+    BOOST_CHECK_EQUAL (comp.grantedTime, helics::timeZero);
 
     BOOST_CHECK (sub1.isUpdated ());
     auto val = sub1.getValue<double> ();
     BOOST_CHECK_EQUAL (val, 27.0);
     BOOST_CHECK (!sub1.isUpdated ());
-    comp = vFed2->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
+    comp = vFed2->requestTimeIterative (1.0, helics::helics_iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp.state == helics::iteration_result::next_step);
-    BOOST_CHECK_EQUAL (comp.stepTime, 1.0);
+    BOOST_CHECK_EQUAL (comp.grantedTime, 1.0);
     BOOST_CHECK (!sub1.isUpdated ());
     auto val2 = sub1.getValue<double> ();
-    vFed1->requestTimeFinalize ();
+    vFed1->requestTimeComplete ();
 
     BOOST_CHECK_EQUAL (val2, val);
 }
@@ -206,11 +206,11 @@ BOOST_AUTO_TEST_CASE (test_iteration_counter)
 {
     Setup2FederateTest ("test");
     // register the publications
-    auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helicsType_t::helicsInt);
+    auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsInt);
 
     auto sub1 = helics::Subscription (vFed2.get (), "pub1");
 
-    auto pub2 = helics::Publication (helics::GLOBAL, vFed2.get (), "pub2", helics::helicsType_t::helicsInt);
+    auto pub2 = helics::Publication (helics::GLOBAL, vFed2.get (), "pub2", helics::helics_type_t::helicsInt);
 
     auto sub2 = helics::Subscription (vFed1.get (), "pub2");
     vFed1->setPeriod (1.0);
@@ -219,14 +219,14 @@ BOOST_AUTO_TEST_CASE (test_iteration_counter)
     // vFed2->setLoggingLevel(5);
     vFed1->enterInitializationStateAsync ();
     vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateFinalize ();
+    vFed1->enterInitializationStateComplete ();
     int64_t c1 = 0;
     int64_t c2 = 0;
     pub1.publish (c1);
     pub2.publish (c2);
     vFed1->enterExecutionStateAsync ();
     vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateFinalize ();
+    vFed1->enterExecutionStateComplete ();
     while (c1 <= 10)
     {
         BOOST_CHECK_EQUAL (sub1.getValue<int64_t> (), c1);
@@ -239,28 +239,28 @@ BOOST_AUTO_TEST_CASE (test_iteration_counter)
             pub2.publish (c2);
         }
 
-        vFed1->requestTimeIterativeAsync (1.0, helics::iteration_request::iterate_if_needed);
-        auto res = vFed2->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
+        vFed1->requestTimeIterativeAsync (1.0, helics::helics_iteration_request::iterate_if_needed);
+        auto res = vFed2->requestTimeIterative (1.0, helics::helics_iteration_request::iterate_if_needed);
         if (c1 <= 10)
         {
             BOOST_CHECK (res.state == helics::iteration_result::iterating);
-            BOOST_CHECK_EQUAL (res.stepTime, 0.0);
+            BOOST_CHECK_EQUAL (res.grantedTime, 0.0);
         }
         else
         {
             BOOST_CHECK (res.state == helics::iteration_result::next_step);
-            BOOST_CHECK_EQUAL (res.stepTime, 1.0);
+            BOOST_CHECK_EQUAL (res.grantedTime, 1.0);
         }
-        res = vFed1->requestTimeIterativeFinalize ();
+        res = vFed1->requestTimeIterativeComplete ();
         if (c1 <= 10)
         {
             BOOST_CHECK (res.state == helics::iteration_result::iterating);
-            BOOST_CHECK_EQUAL (res.stepTime, 0.0);
+            BOOST_CHECK_EQUAL (res.grantedTime, 0.0);
         }
         else
         {
             BOOST_CHECK (res.state == helics::iteration_result::next_step);
-            BOOST_CHECK_EQUAL (res.stepTime, 1.0);
+            BOOST_CHECK_EQUAL (res.grantedTime, 1.0);
         }
     }
 }

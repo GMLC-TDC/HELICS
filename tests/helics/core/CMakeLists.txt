@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright (C) 2017, Battelle Memorial Institute
+#Copyright (C) 2017-2018, Battelle Memorial Institute
 #All rights reserved.
 
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
@@ -27,9 +27,6 @@ MpiCore-tests.cpp
 Node_Core-tests.cpp
 testFixtures.cpp
 IPCcore_tests.cpp
-testBlockingQueue.cpp
-testPriorityBlockingQueue.cpp
-test-simple-queue.cpp
 data-block-tests.cpp
 UdpCore-tests.cpp
 )
@@ -49,6 +46,7 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(core-tests ${Boost_LIBRARIES_test})
 
 add_test(NAME core-tests COMMAND core-tests --log_level=warning --report_level=short)
+set_target_properties (core-tests PROPERTIES FOLDER tests)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET core-tests POST_BUILD        # Adds a post-build event to core tests

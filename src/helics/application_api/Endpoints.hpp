@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_ENDPOINT_H_
 #pragma once
 
-#include "MessageFederate.h"
+#include "MessageFederate.hpp"
 namespace helics
 {
 /** class to manage an endpoint */
@@ -46,7 +46,7 @@ class Endpoint
         id = (locality == GLOBAL) ? fed->registerGlobalEndpoint (name, type) : fed->registerEndpoint (name, type);
     }
 
-    Endpoint(MessageFederate *mFed, int endpointIndex);
+    Endpoint (MessageFederate *mFed, int endpointIndex);
     /** send a data block and length
     @param[in] dest string name of the destination
     @param[in] data pointer to data location
@@ -99,7 +99,10 @@ class Endpoint
     @param[in] data pointer to data location
     @param[in] data_size the length of the data
     */
-    void send (const char *data, size_t data_size) const { fed->sendMessage (id, targetDest, data_view (data, data_size)); }
+    void send (const char *data, size_t data_size) const
+    {
+        fed->sendMessage (id, targetDest, data_view (data, data_size));
+    }
     /** send a data_view to the target destination
     @details a data view can convert from many different formats so this function should
     be catching many of the common use cases
@@ -117,7 +120,7 @@ class Endpoint
     @details this is to send a pre-built message
     @param[in] mess a reference to an actual message object
     */
-    void send(Message &mess) const { fed->sendMessage(id, mess); }
+    void send (Message &mess) const { fed->sendMessage (id, mess); }
     /** get an available message if there is no message the returned object is empty*/
     auto getMessage () const { return fed->getMessage (id); }
     /** check if there is a message available*/

@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -9,19 +9,22 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "../helics.hpp"
+#include "../core/core-exceptions.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"
+#include "MessageFederate.h"
 #include <memory>
 #include <mutex>
 #include <vector>
 
-static inline void addEndpoint (helics_message_federate fed, helics::EndpointObject *ept)
+static inline void addEndpoint (helics_federate fed, helics::EndpointObject *ept)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     fedObj->epts.push_back (ept);
 }
 
-helics_endpoint helicsRegisterEndpoint (helics_message_federate fed, const char *name, const char *type)
+static const std::string nullStr;
+helics_endpoint helicsFederateRegisterEndpoint (helics_federate fed, const char *name, const char *type)
 {
     // now generate a generic subscription
     auto fedObj = getMessageFedSharedPtr (fed);
@@ -33,7 +36,8 @@ helics_endpoint helicsRegisterEndpoint (helics_message_federate fed, const char 
     try
     {
         end = new helics::EndpointObject ();
-        end->endptr = std::make_unique<helics::Endpoint> (fedObj.get (), name, type);
+        end->endptr = std::make_unique<helics::Endpoint> (fedObj.get (), (name != nullptr) ? std::string (name) : nullStr,
+                                                          (type == nullptr) ? nullStr : std::string (type));
         end->fedptr = std::move (fedObj);
         addEndpoint (fed, end);
         return reinterpret_cast<helics_endpoint> (end);
@@ -45,7 +49,7 @@ helics_endpoint helicsRegisterEndpoint (helics_message_federate fed, const char 
     return nullptr;
 }
 
-helics_endpoint helicsRegisterGlobalEndpoint (helics_message_federate fed, const char *name, const char *type)
+helics_endpoint helicsFederateRegisterGlobalEndpoint (helics_federate fed, const char *name, const char *type)
 {
     // now generate a generic subscription
     auto fedObj = getMessageFedSharedPtr (fed);
@@ -57,7 +61,8 @@ helics_endpoint helicsRegisterGlobalEndpoint (helics_message_federate fed, const
     try
     {
         end = new helics::EndpointObject ();
-        end->endptr = std::make_unique<helics::Endpoint> (helics::GLOBAL, fedObj.get (), name, type);
+        end->endptr = std::make_unique<helics::Endpoint> (helics::GLOBAL, fedObj.get (), (name != nullptr) ? std::string (name) : nullStr,
+                                                          (type == nullptr) ? nullStr : std::string (type));
         end->fedptr = std::move (fedObj);
         addEndpoint (fed, end);
         return reinterpret_cast<helics_endpoint> (end);
@@ -69,25 +74,25 @@ helics_endpoint helicsRegisterGlobalEndpoint (helics_message_federate fed, const
     return nullptr;
 }
 
-helicsStatus helicsSetDefaultDestination (helics_endpoint endpoint, const char *dest)
+helics_status helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *dest)
 {
     if (endpoint == nullptr)
     {
-        return helicsError;
+        return helics_error;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     endObj->endptr->setTargetDestination (dest);
-    return helicsOK;
+    return helics_ok;
 }
 
-helicsStatus helicsSendMessageRaw (helics_endpoint endpoint, const char *dest, const char *data, int len)
+helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const char *data, int len)
 {
     if (endpoint == nullptr)
     {
-        return helicsError;
+        return helics_error;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    if (dest == nullptr)
+    if ((dest == nullptr) || (std::string (dest).empty ()))
     {
         endObj->endptr->send (data, len);
     }
@@ -95,17 +100,17 @@ helicsStatus helicsSendMessageRaw (helics_endpoint endpoint, const char *dest, c
     {
         endObj->endptr->send (dest, data, len);
     }
-    return helicsOK;
+    return helics_ok;
 }
 
-helicsStatus helicsSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time)
+helics_status helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time)
 {
     if (endpoint == nullptr)
     {
-        return helicsError;
+        return helics_error;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    if (dest == nullptr)
+    if ((dest == nullptr) || (std::string (dest).empty ()))
     {
         endObj->endptr->send (data, len, time);
     }
@@ -113,18 +118,18 @@ helicsStatus helicsSendEventRaw (helics_endpoint endpoint, const char *dest, con
     {
         endObj->endptr->send (dest, data, len, time);
     }
-    return helicsOK;
+    return helics_ok;
 }
 
-helicsStatus helicsSendMessage (helics_endpoint endpoint, message_t *message)
+helics_status helicsEndpointSendMessage (helics_endpoint endpoint, message_t *message)
 {
     if (message == nullptr)
     {
-        return helicsDiscard;
+        return helics_discard;
     }
     if (endpoint == nullptr)
     {
-        return helicsError;
+        return helics_error;
     }
 
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
@@ -137,22 +142,22 @@ helicsStatus helicsSendMessage (helics_endpoint endpoint, message_t *message)
     {
         endObj->endptr->send (message->dest, message->data, message->length, message->time);
     }
-    return helicsOK;
+    return helics_ok;
 }
 
-helicsStatus helicsSubscribe (helics_endpoint endpoint, const char *name, const char *type)
+helics_status helicsEndpointSubscribe (helics_endpoint endpoint, const char *key, const char *type)
 {
     if (endpoint == nullptr)
     {
-        return helicsError;
+        return helics_error;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
 
-    endObj->endptr->subscribe (name, type);
-    return helicsOK;
+    endObj->endptr->subscribe (key, (type == nullptr) ? nullStr : std::string (type));
+    return helics_ok;
 }
 
-int helicsFederateHasMessage (helics_message_federate fed)
+int helicsFederateHasMessage (helics_federate fed)
 {
     if (fed == nullptr)
     {
@@ -173,7 +178,7 @@ int helicsEndpointHasMessage (helics_endpoint endpoint)
     return (endObj->endptr->hasMessage ()) ? 1 : 0;
 }
 
-int helicsFederateReceiveCount (helics_message_federate fed)
+int helicsFederateReceiveCount (helics_federate fed)
 {
     if (fed == nullptr)
     {
@@ -183,7 +188,7 @@ int helicsFederateReceiveCount (helics_message_federate fed)
     return mFed->receiveCount ();
 }
 
-uint64_t helicsEndpointReceiveCount (helics_endpoint endpoint)
+int helicsEndpointReceiveCount (helics_endpoint endpoint)
 {
     if (endpoint == nullptr)
     {
@@ -225,7 +230,7 @@ message_t helicsEndpointGetMessage (helics_endpoint endpoint)
     return mess;
 }
 
-message_t helicsFederateGetMessage (helics_message_federate fed)
+message_t helicsFederateGetMessage (helics_federate fed)
 {
     if (fed == nullptr)
     {
@@ -248,11 +253,11 @@ message_t helicsFederateGetMessage (helics_message_federate fed)
     return mess;
 }
 
-helicsStatus helicsGetEndpointType (helics_endpoint endpoint, char *str, int maxlen)
+helics_status helicsEndpointGetType (helics_endpoint endpoint, char *str, int maxlen)
 {
-    if (endpoint == nullptr)
+    if ((endpoint == nullptr) || (str == nullptr))
     {
-        return helicsError;
+        return helics_error;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     auto type = endObj->endptr->getType ();
@@ -265,14 +270,14 @@ helicsStatus helicsGetEndpointType (helics_endpoint endpoint, char *str, int max
     {
         strcpy (str, type.c_str ());
     }
-    return helicsOK;
+    return helics_ok;
 }
 
-helicsStatus helicsGetEndpointName (helics_endpoint endpoint, char *str, int maxlen)
+helics_status helicsEndpointGetName (helics_endpoint endpoint, char *str, int maxlen)
 {
-    if (endpoint == nullptr)
+    if ((endpoint == nullptr) || (str == nullptr))
     {
-        return helicsError;
+        return helics_error;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     auto type = endObj->endptr->getName ();
@@ -285,5 +290,5 @@ helicsStatus helicsGetEndpointName (helics_endpoint endpoint, char *str, int max
     {
         strcpy (str, type.c_str ());
     }
-    return helicsOK;
+    return helics_ok;
 }

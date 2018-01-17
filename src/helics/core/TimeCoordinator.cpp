@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -9,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "TimeCoordinator.h"
+#include "TimeCoordinator.hpp"
 #include "../flag-definitions.h"
 #include <algorithm>
 #include <boost/format.hpp>
@@ -24,13 +24,13 @@ TimeCoordinator::TimeCoordinator (const CoreFederateInfo &info_) : info (info_)
     }
 }
 
-void TimeCoordinator::enteringExecMode (iteration_request mode)
+void TimeCoordinator::enteringExecMode (helics_iteration_request mode)
 {
     if (executionMode)
     {
         return;
     }
-    iterating = (mode != iteration_request::no_iterations);
+    iterating = (mode != helics_iteration_request::no_iterations);
     checkingExec = true;
     if ((!dependents.empty ()) && (sendMessageFunction))
     {
@@ -45,11 +45,11 @@ void TimeCoordinator::enteringExecMode (iteration_request mode)
 }
 
 void TimeCoordinator::timeRequest (Time nextTime,
-                                   iteration_request iterate,
+                                   helics_iteration_request iterate,
                                    Time newValueTime,
                                    Time newMessageTime)
 {
-    iterating = (iterate != iteration_request::no_iterations);
+    iterating = (iterate != helics_iteration_request::no_iterations);
     if (nextTime <= time_granted)
     {
         nextTime = time_granted + info.timeDelta;
@@ -99,10 +99,10 @@ void TimeCoordinator::updateNextPossibleEventTime ()
     if (!iterating)
     {
         time_next = time_granted + info.timeDelta + info.outputDelay;
-        //the next time must fall on a period boundary
+        // the next time must fall on a period boundary
         if (info.period > timeEpsilon)
         {
-            auto blk = static_cast<int> (std::ceil((time_next - time_granted) / info.period));
+            auto blk = static_cast<int> (std::ceil ((time_next - time_granted) / info.period));
             time_next = time_granted + blk * info.period;
         }
     }
@@ -240,28 +240,28 @@ iteration_state TimeCoordinator::checkTimeGrant ()
             if (time_requested <= time_exec)
             {
                 time_granted = time_exec;
-                if ((!dependents.empty()) && (sendMessageFunction))
+                if ((!dependents.empty ()) && (sendMessageFunction))
                 {
-                    ActionMessage treq(CMD_TIME_GRANT);
+                    ActionMessage treq (CMD_TIME_GRANT);
                     treq.source_id = source_id;
                     treq.actionTime = time_granted;
-                    sendMessageFunction(treq);
+                    sendMessageFunction (treq);
                 }
                 // printf("%d GRANT allow=%f next=%f, exec=%f, Tdemin=%f\n", source_id,
                 // static_cast<double>(time_allow), static_cast<double>(time_next), static_cast<double>(time_exec),
                 // static_cast<double>(time_minDe));
                 return iteration_state::next_step;
             }
-            if (dependencies.checkIfReadyForTimeGrant(false, time_exec))
+            if (dependencies.checkIfReadyForTimeGrant (false, time_exec))
             {
                 time_granted = time_exec;
-                if ((!dependents.empty()) && (sendMessageFunction))
+                if ((!dependents.empty ()) && (sendMessageFunction))
                 {
-                    ActionMessage treq(CMD_TIME_GRANT);
+                    ActionMessage treq (CMD_TIME_GRANT);
                     treq.source_id = source_id;
                     treq.actionTime = time_granted;
-                    SET_ACTION_FLAG(treq, iterationRequested);
-                    sendMessageFunction(treq);
+                    SET_ACTION_FLAG (treq, iterationRequested);
+                    sendMessageFunction (treq);
                 }
                 return iteration_state::next_step;
             }
@@ -283,10 +283,9 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         }
         if (time_allow == time_exec)  // time_allow==time_exec==time_granted
         {
-           
             if (dependencies.checkIfReadyForTimeGrant (true, time_exec))
             {
-                dependencies.ResetIteratingTimeRequests (time_exec);
+                dependencies.resetIteratingTimeRequests (time_exec);
                 if ((!dependents.empty ()) && (sendMessageFunction))
                 {
                     ActionMessage treq (CMD_TIME_GRANT);
@@ -429,7 +428,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
     }
     else if (ret == iteration_state::iterating)
     {
-        dependencies.ResetIteratingExecRequests ();
+        dependencies.resetIteratingExecRequests ();
         hasInitUpdates = false;
         if (sendMessageFunction)
         {
@@ -520,13 +519,13 @@ void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd, bool
         case SOURCE_ONLY_FLAG:
             if (initMode)
             {
-                info.source_only = CHECK_ACTION_FLAG(cmd, indicator_flag);
+                info.source_only = CHECK_ACTION_FLAG (cmd, indicator_flag);
             }
             break;
         case OBSERVER_FLAG:
             if (initMode)
             {
-                info.observer = CHECK_ACTION_FLAG(cmd, indicator_flag);
+                info.observer = CHECK_ACTION_FLAG (cmd, indicator_flag);
             }
             break;
         default:

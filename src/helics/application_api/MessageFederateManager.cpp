@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -8,8 +8,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "MessageFederateManager.h"
-#include "../core/core.h"
+#include "MessageFederateManager.hpp"
+#include "../core/Core.hpp"
 namespace helics
 {
 MessageFederateManager::MessageFederateManager (std::shared_ptr<Core> coreOb, Core::federate_id_t id)
@@ -175,7 +175,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     auto epCount = coreObject->receiveCountAny (fedID);
     // lock the data updates
     std::unique_lock<std::mutex> eplock (endpointLock);
-    Core::Handle endpoint_id;
+    Core::handle_id_t endpoint_id;
     for (size_t ii = 0; ii < epCount; ++ii)
     {
         auto message = coreObject->receiveAny (fedID, endpoint_id);
@@ -247,12 +247,12 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     }
 }
 
-void MessageFederateManager::StartupToInitializeStateTransition ()
+void MessageFederateManager::startupToInitializeStateTransition ()
 {
     messageQueues.resize (local_endpoints.size ());
 }
 
-void MessageFederateManager::InitializeToExecuteStateTransition () {}
+void MessageFederateManager::initializeToExecuteStateTransition () {}
 
 static const std::string nullStr;
 
@@ -275,10 +275,10 @@ std::string MessageFederateManager::getEndpointType (endpoint_id_t id) const
     return (id.value () < local_endpoints.size ()) ? local_endpoints[id.value ()].type : nullStr;
 }
 
-int  MessageFederateManager::getEndpointCount() const
+int MessageFederateManager::getEndpointCount () const
 {
-    std::lock_guard<std::mutex> eLock(endpointLock);
-    return static_cast<int>(local_endpoints.size());
+    std::lock_guard<std::mutex> eLock (endpointLock);
+    return static_cast<int> (local_endpoints.size ());
 }
 
 void MessageFederateManager::registerCallback (std::function<void(endpoint_id_t, Time)> callback)
@@ -327,10 +327,10 @@ void MessageFederateManager::registerCallback (const std::vector<endpoint_id_t> 
 
 void MessageFederateManager::removeOrderedMessage (unsigned int index)
 {
-    auto handle=messageOrder.lock();
+    auto handle = messageOrder.lock ();
     if (index == handle->back ())
     {
-       handle->pop_back ();
+        handle->pop_back ();
     }
     else
     {
@@ -339,7 +339,7 @@ void MessageFederateManager::removeOrderedMessage (unsigned int index)
         {
             if (*ri == index)
             {
-               handle->erase (ri.base ());
+                handle->erase (ri.base ());
                 break;
             }
         }

@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -95,12 +95,14 @@ void tcp_rx_connection::send (const void *buffer, size_t dataLength)
 {
     auto sz = socket_.send (boost::asio::buffer (buffer, dataLength));
     assert (sz == dataLength);
+    (void)(sz);
 }
 
 void tcp_rx_connection::send (const std::string &dataString)
 {
     auto sz = socket_.send (boost::asio::buffer (dataString));
     assert (sz == dataString.size ());
+    (void)(sz);
 }
 
 void tcp_rx_connection::close ()
@@ -150,22 +152,24 @@ void tcp_connection::connect_handler (const boost::system::error_code &error)
 }
 void tcp_connection::send (const void *buffer, size_t dataLength)
 {
-    if (!isConnected())
+    if (!isConnected ())
     {
-        waitUntilConnected(200);
+        waitUntilConnected (200);
     }
     auto sz = socket_.send (boost::asio::buffer (buffer, dataLength));
     assert (sz == dataLength);
+    ((void)(sz));
 }
 
 void tcp_connection::send (const std::string &dataString)
 {
-    if (!isConnected())
+    if (!isConnected ())
     {
-        waitUntilConnected(200);
+        waitUntilConnected (200);
     }
     auto sz = socket_.send (boost::asio::buffer (dataString));
     assert (sz == dataString.size ());
+    ((void)(sz));
 }
 
 size_t tcp_connection::receive (void *buffer, size_t maxDataLength)
@@ -195,7 +199,10 @@ void tcp_connection::close ()
     socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_send, ec);
     if (ec)
     {
-        std::cerr << "error occurred sending shutdown" << std::endl;
+        // I don't know what to do with this, in practice this message is mostly spurious
+        // but is seems I should do something with it, I just don't know what
+        // std::cerr << "error occurred sending shutdown" << std::endl;
+        ((void)(ec));
     }
     socket_.close ();
 }
@@ -246,10 +253,10 @@ void tcp_server::stop ()
 
 void tcp_server::close ()
 {
-    acceptor_.cancel();
+    acceptor_.cancel ();
     for (auto &conn : connections)
     {
-        conn->close();
+        conn->close ();
     }
     connections.clear ();
 }

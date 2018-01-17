@@ -1,7 +1,7 @@
 #ifndef TOM_COMMON_HPP__
 #define TOM_COMMON_HPP__
 
-#include <helics/application_api/ValueFederate.h>
+#include <helics/application_api/ValueFederate.hpp>
 
 template <typename T>
 struct ValuePacket

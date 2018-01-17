@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright (C) 2017, Battelle Memorial Institute
+#Copyright (C) 2017-2018, Battelle Memorial Institute
 #All rights reserved.
 
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
@@ -15,9 +15,9 @@ ENDIF(UNIX)
 set(helicsShared_headers
 helics.h
 api-data.h
-ValueFederate_c.h
-MessageFederate_c.h
-MessageFilters_c.h
+ValueFederate.h
+MessageFederate.h
+MessageFilters.h
 )
 
 set(helicsShared_sources
@@ -25,7 +25,7 @@ helicsExport.cpp
 FederateExport.cpp
 ValueFederateExport.cpp
 MessageFederateExport.cpp
-MessageFilters.cpp
+MessageFiltersExport.cpp
 internal/api_objects.h
 )
 
