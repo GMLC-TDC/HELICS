@@ -14,8 +14,10 @@ HELICS documentation
 
 .. image:: https://img.shields.io/badge/docs-ready-blue.svg
 
-This is the documentation for Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS) framework.
+This is the documentation for Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS) framework. 
+There is also doxygen_ generated documentation available for developers.
 
+.. _doxygen: /doxygen/
 
 .. toctree::
    :maxdepth: 1
