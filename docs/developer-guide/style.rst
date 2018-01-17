@@ -30,7 +30,9 @@ Naming Conventions
 
         publication_id_t registerGlobalPublication (const std::string &name, const std::string &type, const std::string &units = "");
 
-4) All fundamental types and enumerations should be underscore separated words in lower case
+        Exceptions:  functions that match standard library functions e.g. to_string()
+
+4) All fundamental types and enumerations should be underscore separated words in lower case.  Fundamental types are those for which normal usage does not involve calling any methods or are simple aliases for other fundamental types
 
 .. code-block:: cpp
 
@@ -50,6 +52,8 @@ Naming Conventions
     typedef void *helics_core;
     typedef void *helics_broker;
 
+    typedef int helics_bool_t;
+
 5) All C++ functions and types should be contained in the helics namespace with subnamespaces used as appropriate
 
 .. code-block:: cpp
@@ -63,7 +67,7 @@ Naming Conventions
 
 .. code-block:: c
 
-    int helicsBrokerIsConnected (helics_broker broker);
+    helics_bool_t helicsBrokerIsConnected (helics_broker broker);
 
 7) C interface function should be of the format helics{Class}{Action} or helics{Action} if no class is appropriate
 

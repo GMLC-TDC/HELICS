@@ -5,4 +5,3 @@ API Reference
    :maxdepth: 2
 
    application-api
-

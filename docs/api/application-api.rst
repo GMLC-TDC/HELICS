@@ -4,25 +4,26 @@ Application API
 Federate
 --------
 
-.. doxygenfile:: Federate.h
+.. doxygenfile:: Federate.hpp
+   :project: helics
+
+
+Value Federate
+--------------
+
+.. doxygenfile:: ValueFederate.hpp
    :project: helics
 
 Message Federate
 ----------------
 
-.. doxygenfile:: MessageFederate.h
-   :project: helics
-
-Value Federate
---------------
-
-.. doxygenfile:: ValueFederate.h
+.. doxygenfile:: MessageFederate.hpp
    :project: helics
 
 Combination Federate
 --------------------
 
-.. doxygenfile:: CombinationFederate.h
+.. doxygenfile:: CombinationFederate.hpp
    :project: helics
 
 Publications

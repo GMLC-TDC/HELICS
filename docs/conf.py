@@ -62,7 +62,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'HELICS-src'
-copyright = '2017, Battelle Memorial Institute. All rights reserved.'
+copyright = '2017-2018, Battelle Memorial Institute. All rights reserved.'
 author = 'Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller'
 
 # The version info for the project you're documenting, acts as replacement for
