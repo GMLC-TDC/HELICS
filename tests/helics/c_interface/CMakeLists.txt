@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright (C) 2017, Battelle Memorial Institute
+#Copyright (C) 2017-2018, Battelle Memorial Institute
 #All rights reserved.
 
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
@@ -28,6 +28,8 @@ include_directories(${CMAKE_SOURCE_DIR}/src/helics/shared_api_library)
 add_executable(c_interface_tests ${c_interface_test_sources} ${c_interface_test_headers})
 
 target_link_libraries(c_interface_tests helicsSharedLib ${Boost_LIBRARIES_test})
+
+set_target_properties (c_interface_tests PROPERTIES FOLDER tests)
 
 add_test(NAME c_interface_tests COMMAND c_interface_tests --log_level=warning --report_level=detailed)
 

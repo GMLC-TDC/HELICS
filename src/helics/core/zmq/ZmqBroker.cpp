@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -13,7 +13,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-
 ZmqBroker::ZmqBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 ZmqBroker::ZmqBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
@@ -23,7 +22,7 @@ ZmqBroker::~ZmqBroker () = default;
 void ZmqBroker::displayHelp (bool local_only)
 {
     std::cout << " Help for Zero MQ Broker: \n";
-    NetworkBrokerData::displayHelp();
+    NetworkBrokerData::displayHelp ();
     if (!local_only)
     {
         CoreBroker::displayHelp ();
@@ -34,7 +33,7 @@ void ZmqBroker::initializeFromArgs (int argc, const char *const *argv)
 {
     if (brokerState == broker_state_t::created)
     {
-        netInfo.initializeFromArgs(argc, argv, "tcp://127.0.0.1");
+        netInfo.initializeFromArgs (argc, argv, "tcp://127.0.0.1");
         CoreBroker::initializeFromArgs (argc, argv);
     }
 }
@@ -49,7 +48,7 @@ bool ZmqBroker::brokerConnect ()
     comms = std::make_unique<ZmqComms> (netInfo);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
-    
+
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = comms->connect ();
     if (res)
@@ -71,12 +70,11 @@ std::string ZmqBroker::getAddress () const
     }
     if (netInfo.localInterface == "tcp://*")
     {
-        return makePortAddress("tcp://127.0.0.1", netInfo.portNumber);
+        return makePortAddress ("tcp://127.0.0.1", netInfo.portNumber);
     }
     else
     {
-        return makePortAddress(netInfo.localInterface, netInfo.portNumber);
+        return makePortAddress (netInfo.localInterface, netInfo.portNumber);
     }
-    
 }
 }  // namespace helics

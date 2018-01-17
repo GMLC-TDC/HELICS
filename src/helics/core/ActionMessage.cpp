@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -8,7 +8,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "ActionMessage.h"
+#include "ActionMessage.hpp"
 #include <cereal/archives/portable_binary.hpp>
 #include <complex>
 //#include <cereal/archives/binary.hpp>
@@ -63,7 +63,7 @@ ActionMessage::ActionMessage (std::unique_ptr<Message> message)
     info_ = std::make_unique<AdditionalInfo> ();
     info_->source = std::move (message->source);
     info_->orig_source = std::move (message->original_source);
-    info_->original_dest = std::move(message->original_dest);
+    info_->original_dest = std::move (message->original_dest);
     info_->target = std::move (message->dest);
 }
 
@@ -124,7 +124,7 @@ void ActionMessage::moveInfo (std::unique_ptr<Message> message)
     }
     info_->source = std::move (message->source);
     info_->orig_source = std::move (message->original_source);
-    info_->original_dest = std::move(message->original_dest);
+    info_->original_dest = std::move (message->original_dest);
     info_->target = std::move (message->dest);
 }
 
@@ -340,7 +340,7 @@ std::unique_ptr<Message> createMessage (const ActionMessage &cmd)
 {
     auto msg = std::make_unique<Message> ();
     msg->original_source = cmd.info ().orig_source;
-    msg->original_dest = cmd.info().original_dest;
+    msg->original_dest = cmd.info ().original_dest;
     msg->dest = cmd.info ().target;
     msg->data = cmd.payload;
     msg->time = cmd.actionTime;
@@ -353,7 +353,7 @@ std::unique_ptr<Message> createMessage (ActionMessage &&cmd)
 {
     auto msg = std::make_unique<Message> ();
     msg->original_source = std::move (cmd.info ().orig_source);
-    msg->original_dest = std::move(cmd.info().original_dest); 
+    msg->original_dest = std::move (cmd.info ().original_dest);
     msg->dest = std::move (cmd.info ().target);
     msg->data = std::move (cmd.payload);
     msg->time = cmd.actionTime;

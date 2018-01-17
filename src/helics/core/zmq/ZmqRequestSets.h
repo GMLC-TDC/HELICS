@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -14,7 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "../../common/cppzmq/zmq.hpp"
 #include "../../common/zmqContextManager.h"
-#include "../ActionMessage.h"
+#include "../ActionMessage.hpp"
 #include "helics_includes/optional.h"
 #include <deque>
 #include <map>

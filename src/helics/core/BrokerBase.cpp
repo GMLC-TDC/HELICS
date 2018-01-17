@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -9,11 +9,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "BrokerBase.h"
+#include "BrokerBase.hpp"
 
 #include "../common/AsioServiceManager.h"
 #include "../common/logger.h"
-#include "TimeCoordinator.h"
+#include "TimeCoordinator.hpp"
 #include "helics/helics-config.h"
 #include <iostream>
 #include <libguarded/guarded.hpp>
@@ -230,7 +230,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     timeCoord = std::make_unique<TimeCoordinator> ();
     timeCoord->setMessageSender ([this](const ActionMessage &msg) { addActionMessage (msg); });
 
-    loggingObj = std::make_unique<logger> ();
+    loggingObj = std::make_unique<Logger> ();
     if (!logFile.empty ())
     {
         loggingObj->openFile (logFile);

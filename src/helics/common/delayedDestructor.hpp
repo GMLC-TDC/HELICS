@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -45,9 +45,8 @@ class DelayedDestructor
             destroyObjects ();
             if (!ElementsToBeDestroyed.empty ())
             {
-                if (ii > 20)
+                if (ii > 4)
                 {
-                    std::cerr << "error: unable to destroy all objects giving up" << std::endl;
                     destroyObjects ();
                     break;
                 }
@@ -80,8 +79,8 @@ class DelayedDestructor
                     }
                 }
             }
-            // so apparently remove_if can actually destroy shared_ptrs so the call function needs to be before
-            // this call
+            // so apparently remove_if can actually call the destructor for shared_ptrs so the call function needs
+            // to be before this call
             auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
                                        [](const auto &element) { return (element.use_count () <= 1); });
             ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());

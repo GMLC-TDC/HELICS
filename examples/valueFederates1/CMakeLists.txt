@@ -6,6 +6,9 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 target_link_libraries(valueFed helics-static)
 
+set_target_properties (valueFed PROPERTIES
+    FOLDER examples
+)
 			   
 add_custom_command(TARGET valueFed POST_BUILD        # Adds a post-build event to api tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."

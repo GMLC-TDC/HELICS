@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was modified by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
@@ -23,11 +23,11 @@ This software was modified by Pacific Northwest National Laboratory, operated by
 #include <vector>
 
 /** class used to convert a string into command line arguments*/
-class stringToCmdLine
+class StringToCmdLine
 {
 public:
 	/** construct from a string*/
-	stringToCmdLine(const std::string &cmdString);
+	StringToCmdLine(const std::string &cmdString);
 	/** load a string 
 	@param cmdString a single string containing command line arguments
 	*/

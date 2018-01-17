@@ -1,5 +1,5 @@
 /*
-* LLNS Copyright Start
+ * LLNS Copyright Start
  * Copyright (c) 2017, Lawrence Livermore National Security
  * This work was performed under the auspices of the U.S. Department
  * of Energy by Lawrence Livermore National Laboratory in part under
@@ -36,8 +36,8 @@
 std::string convertToLowerCase (const std::string &input)
 {
     std::string out;
-	out.reserve(input.size());
-	std::transform(input.begin(), input.end(), std::back_inserter(out), ::tolower);
+    out.reserve (input.size ());
+    std::transform (input.begin (), input.end (), std::back_inserter (out), ::tolower);
     return out;
 }
 
@@ -139,7 +139,7 @@ void trim (stringVector &input, const std::string &whitespace)
 static const std::string digits ("0123456789");
 int trailingStringInt (const std::string &input, std::string &output, int defNum)
 {
-    if ((input.empty())||(isdigit (input.back ()) == 0))
+    if ((input.empty ()) || (isdigit (input.back ()) == 0))
     {
         output = input;
         return defNum;
@@ -330,7 +330,7 @@ int findCloseStringMatch (const stringVector &testStrings,
                         return kk;
                     }
                     auto nstr = removeChar (lct, '_');
-                  if (lcis==nstr)
+                    if (lcis == nstr)
                     {
                         return kk;
                     }
@@ -346,9 +346,11 @@ std::string removeChars (const std::string &source, const std::string &remchars)
 {
     std::string result;
     result.reserve (source.length ());
-	std::remove_copy_if(source.begin(), source.end(), std::back_inserter(result), [remchars](char in) {return (std::find(remchars.begin(), remchars.end(), in) != remchars.end()); });
-	return result;
-	/*
+    std::remove_copy_if (source.begin (), source.end (), std::back_inserter (result), [remchars](char in) {
+        return (std::find (remchars.begin (), remchars.end (), in) != remchars.end ());
+    });
+    return result;
+    /*
     for (auto sc : source)
     {
         bool foundany = false;
@@ -366,14 +368,14 @@ std::string removeChars (const std::string &source, const std::string &remchars)
         }
     }
     return result;
-	*/
+    */
 }
 
 std::string removeChar (const std::string &source, char remchar)
 {
     std::string result;
     result.reserve (source.length ());
-	std::remove_copy(source.begin(), source.end(),std::back_inserter(result), remchar);
+    std::remove_copy (source.begin (), source.end (), std::back_inserter (result), remchar);
     return result;
 }
 
@@ -385,7 +387,7 @@ std::string characterReplace (const std::string &source, char key, std::string r
     {
         if (sc == key)
         {
-			result += repStr;
+            result += repStr;
         }
         else
         {

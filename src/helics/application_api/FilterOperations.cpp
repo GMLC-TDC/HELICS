@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -9,25 +9,25 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
+#include "FilterOperations.hpp"
 #include "Filters.hpp"
-#include "FilterOperations.h"
-#include "MessageOperators.h"
+#include "MessageOperators.hpp"
+#include "../core/core-exceptions.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <random>
 #include <regex>
 #include <thread>
-#include <algorithm>
 
 namespace helics
 {
-
 void FilterOperations::set (const std::string & /*property*/, double /*val*/) {}
 void FilterOperations::setString (const std::string & /*property*/, const std::string & /*val*/) {}
 
-delayFilterOperation::delayFilterOperation (Time delayTime) : delay (delayTime)
+DelayFilterOperation::DelayFilterOperation (Time delayTime) : delay (delayTime)
 {
     if (delayTime < timeZero)
     {
@@ -36,7 +36,7 @@ delayFilterOperation::delayFilterOperation (Time delayTime) : delay (delayTime)
     td = std::make_shared<MessageTimeOperator> ([this](Time messageTime) { return messageTime + delay; });
 }
 
-void delayFilterOperation::set (const std::string &property, double val)
+void DelayFilterOperation::set (const std::string &property, double val)
 {
     if (property == "delay")
     {
@@ -47,7 +47,7 @@ void delayFilterOperation::set (const std::string &property, double val)
     }
 }
 
-std::shared_ptr<FilterOperator> delayFilterOperation::getOperator ()
+std::shared_ptr<FilterOperator> DelayFilterOperation::getOperator ()
 {
     return std::static_pointer_cast<FilterOperator> (td);
 }
@@ -210,15 +210,15 @@ class randomDelayGenerator
     double generate () { return randDouble (dist.load (), param1.load (), param2.load ()); }
 };
 
-randomDelayFilterOperation::randomDelayFilterOperation ()
+RandomDelayFilterOperation::RandomDelayFilterOperation ()
 {
     rdelayGen = std::make_unique<randomDelayGenerator> ();
     td = std::make_shared<MessageTimeOperator> (
       [this](Time messageTime) { return messageTime + rdelayGen->generate (); });
 }
-randomDelayFilterOperation::~randomDelayFilterOperation () = default;
+RandomDelayFilterOperation::~RandomDelayFilterOperation () = default;
 
-void randomDelayFilterOperation::set (const std::string &property, double val)
+void RandomDelayFilterOperation::set (const std::string &property, double val)
 {
     if ((property == "param1") || (property == "mean") || (property == "min") || (property == "alpha"))
     {
@@ -229,7 +229,7 @@ void randomDelayFilterOperation::set (const std::string &property, double val)
         rdelayGen->param2.store (val);
     }
 }
-void randomDelayFilterOperation::setString (const std::string &property, const std::string &val)
+void RandomDelayFilterOperation::setString (const std::string &property, const std::string &val)
 {
     if ((property == "dist") || (property == "distribution"))
     {
@@ -241,43 +241,43 @@ void randomDelayFilterOperation::setString (const std::string &property, const s
     }
 }
 
-std::shared_ptr<FilterOperator> randomDelayFilterOperation::getOperator ()
+std::shared_ptr<FilterOperator> RandomDelayFilterOperation::getOperator ()
 {
     return std::static_pointer_cast<FilterOperator> (td);
 }
 
-randomDropFilterOperation::randomDropFilterOperation ()
+RandomDropFilterOperation::RandomDropFilterOperation ()
 {
     tcond = std::make_shared<MessageConditionalOperator> (
       [this](const Message *) { return (randDouble (random_dists_t::bernoulli, dropProb, 1.0) > 0.1); });
 }
 
-randomDropFilterOperation::~randomDropFilterOperation () = default;
-void randomDropFilterOperation::set (const std::string &property, double val)
+RandomDropFilterOperation::~RandomDropFilterOperation () = default;
+void RandomDropFilterOperation::set (const std::string &property, double val)
 {
     if ((property == "dropprob") || (property == "prob"))
     {
         dropProb = val;
     }
 }
-void randomDropFilterOperation::setString (const std::string & /*property*/, const std::string & /*val*/) {}
+void RandomDropFilterOperation::setString (const std::string & /*property*/, const std::string & /*val*/) {}
 
-std::shared_ptr<FilterOperator> randomDropFilterOperation::getOperator ()
+std::shared_ptr<FilterOperator> RandomDropFilterOperation::getOperator ()
 {
     return std::static_pointer_cast<FilterOperator> (tcond);
 }
 
-rerouteFilterOperation::rerouteFilterOperation ()
+RerouteFilterOperation::RerouteFilterOperation ()
 {
     op =
       std::make_shared<MessageDestOperator> ([this](const std::string &dest) { return rerouteOperation (dest); });
 }
 
-rerouteFilterOperation::~rerouteFilterOperation () = default;
+RerouteFilterOperation::~RerouteFilterOperation () = default;
 
-void rerouteFilterOperation::set (const std::string & /*property*/, double /*val*/) {}
+void RerouteFilterOperation::set (const std::string & /*property*/, double /*val*/) {}
 
-void rerouteFilterOperation::setString (const std::string &property, const std::string &val)
+void RerouteFilterOperation::setString (const std::string &property, const std::string &val)
 {
     if (property == "target")
     {
@@ -294,90 +294,84 @@ void rerouteFilterOperation::setString (const std::string &property, const std::
         catch (const std::regex_error &re)
         {
             std::cerr << "filter expression is not a valid Regular expression " << re.what () << std::endl;
-            throw (helics::InvalidParameterValue (
+            throw (helics::InvalidParameter (
               (std::string ("filter expression is not a valid Regular expression ") + re.what ()).c_str ()));
         }
     }
 }
 
-std::shared_ptr<FilterOperator> rerouteFilterOperation::getOperator ()
+std::shared_ptr<FilterOperator> RerouteFilterOperation::getOperator ()
 {
     return std::static_pointer_cast<FilterOperator> (op);
 }
 
-std::string rerouteFilterOperation::rerouteOperation (const std::string &dest) const
+std::string RerouteFilterOperation::rerouteOperation (const std::string &dest) const
 {
     auto cond = conditions.lock_shared ();
     if (cond->empty ())
     {
-        return newTarget.load();
+        return newTarget.load ();
     }
     for (auto &sr : *cond)
     {
         std::regex reg (sr);
         if (std::regex_match (dest, reg))
         {
-            return newTarget.load();
+            return newTarget.load ();
         }
     }
     return dest;
 }
 
-
-cloneFilterOperation::cloneFilterOperation(Core *core):coreptr(core)
+CloneFilterOperation::CloneFilterOperation (Core *core) : coreptr (core)
 {
-    op =
-        std::make_shared<CloneOperator>([this](const Message *mess) { sendMessage(mess); });
+    op = std::make_shared<CloneOperator> ([this](const Message *mess) { sendMessage (mess); });
 }
 
-cloneFilterOperation::~cloneFilterOperation() = default;
+CloneFilterOperation::~CloneFilterOperation () = default;
 
+void CloneFilterOperation::set (const std::string & /*property*/, double /*val*/) {}
 
-void cloneFilterOperation::set(const std::string & /*property*/, double /*val*/)
-{
-
-}
-
-void cloneFilterOperation::setString(const std::string &property, const std::string &val)
+void CloneFilterOperation::setString (const std::string &property, const std::string &val)
 {
     if (property == "delivery")
     {
-        deliveryAddresses = std::vector<std::string>{ val };
+        deliveryAddresses = std::vector<std::string>{val};
     }
     else if (property == "add delivery")
     {
-        auto lock = deliveryAddresses.lock();
-        auto fnd = std::find(lock->cbegin(), lock->cend(), val);
-        if (fnd == lock->cend())
+        auto lock = deliveryAddresses.lock ();
+        auto fnd = std::find (lock->cbegin (), lock->cend (), val);
+        if (fnd == lock->cend ())
         {
-            lock->push_back(val);
+            lock->push_back (val);
         }
     }
     else if (property == "remove delivery")
     {
-        auto lock = deliveryAddresses.lock();
-        auto fnd = std::find(lock->cbegin(), lock->cend(), val);
-        if (fnd != lock->cend())
+        auto lock = deliveryAddresses.lock ();
+        auto fnd = std::find (lock->cbegin (), lock->cend (), val);
+        if (fnd != lock->cend ())
         {
-            lock->erase(fnd);
+            lock->erase (fnd);
         }
     }
 }
 
-std::shared_ptr<FilterOperator> cloneFilterOperation::getOperator()
+std::shared_ptr<FilterOperator> CloneFilterOperation::getOperator ()
 {
     return std::static_pointer_cast<FilterOperator> (op);
 }
 
-void cloneFilterOperation::sendMessage(const Message *mess) const
+void CloneFilterOperation::sendMessage (const Message *mess) const
 {
-    auto lock = deliveryAddresses.lock_shared();
+    auto lock = deliveryAddresses.lock_shared ();
     for (auto &add : *lock)
     {
-        auto m = std::make_unique<Message>(*mess);
+        auto m = std::make_unique<Message> (*mess);
         m->original_dest = m->dest;
         m->dest = add;
-        coreptr->sendMessage(direct_send_handle, std::move(m));
+        coreptr->sendMessage (direct_send_handle, std::move (m));
     }
 }
 }  // namespace helics

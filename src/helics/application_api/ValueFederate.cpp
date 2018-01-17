@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -8,9 +8,10 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "ValueFederate.h"
-#include "../core/core.h"
-#include "ValueFederateManager.h"
+#include "ValueFederate.hpp"
+#include "../core/Core.hpp"
+#include "../core/core-exceptions.hpp"
+#include "ValueFederateManager.hpp"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -37,7 +38,7 @@ ValueFederate::ValueFederate (std::shared_ptr<Core> core, const FederateInfo &fi
 ValueFederate::ValueFederate (const std::string &jsonString) : Federate (jsonString)
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject, getID ());
-    registerInterfaces(jsonString);
+    registerInterfaces (jsonString);
 }
 
 ValueFederate::ValueFederate () = default;
@@ -156,15 +157,17 @@ void ValueFederate::registerInterfaces (const std::string &jsonString)
         auto pubs = doc["publications"];
         for (const auto &pub : pubs)
         {
-            auto key = (pub.isMember("key")) ? pub["key"].asString() : ((pub.isMember("name")) ? pub["name"].asString() : std::string());
-            
-            auto id = vfManager->getPublicationId(key);
+            auto key = (pub.isMember ("key")) ?
+                         pub["key"].asString () :
+                         ((pub.isMember ("name")) ? pub["name"].asString () : std::string ());
+
+            auto id = vfManager->getPublicationId (key);
             if (id != invalid_id_value)
             {
                 continue;
             }
-            auto type = (pub.isMember("type")) ? pub["type"].asString() : std ::string();
-            auto units = (pub.isMember ("units")) ? pub["units"].asString () : std::string();
+            auto type = (pub.isMember ("type")) ? pub["type"].asString () : std ::string ();
+            auto units = (pub.isMember ("units")) ? pub["units"].asString () : std::string ();
             bool global = (pub.isMember ("global")) ? (pub["global"].asBool ()) : false;
             if (global)
             {
@@ -181,8 +184,10 @@ void ValueFederate::registerInterfaces (const std::string &jsonString)
         auto subs = doc["subscriptions"];
         for (const auto &sub : subs)
         {
-            auto key = (sub.isMember("key")) ? sub["key"].asString() : ((sub.isMember("name")) ? sub["name"].asString() : std::string());
-            auto id = vfManager->getSubscriptionId(key);
+            auto key = (sub.isMember ("key")) ?
+                         sub["key"].asString () :
+                         ((sub.isMember ("name")) ? sub["name"].asString () : std::string ());
+            auto id = vfManager->getSubscriptionId (key);
             if (id != invalid_id_value)
             {
                 continue;
@@ -233,8 +238,8 @@ Time ValueFederate::getLastUpdateTime (subscription_id_t sub_id) const
 
 void ValueFederate::updateTime (Time newTime, Time oldTime) { vfManager->updateTime (newTime, oldTime); }
 
-void ValueFederate::StartupToInitializeStateTransition () { vfManager->StartupToInitializeStateTransition (); }
-void ValueFederate::InitializeToExecuteStateTransition () { vfManager->InitializeToExecuteStateTransition (); }
+void ValueFederate::startupToInitializeStateTransition () { vfManager->startupToInitializeStateTransition (); }
+void ValueFederate::initializeToExecuteStateTransition () { vfManager->initializeToExecuteStateTransition (); }
 
 std::vector<subscription_id_t> ValueFederate::queryUpdates () { return vfManager->queryUpdates (); }
 
@@ -326,15 +331,8 @@ void ValueFederate::registerSubscriptionNotificationCallback (
     vfManager->registerCallback (ids, callback);
 }
 
-
 /** get a count of the number publications registered*/
-int ValueFederate::getPublicationCount() const
-{
-    return vfManager->getPublicationCount();
-}
+int ValueFederate::getPublicationCount () const { return vfManager->getPublicationCount (); }
 /** get a count of the number subscriptions registered*/
-int ValueFederate::getSubscriptionCount() const
-{
-    return vfManager->getSubscriptionCount();
-}
+int ValueFederate::getSubscriptionCount () const { return vfManager->getSubscriptionCount (); }
 }  // namespace helics

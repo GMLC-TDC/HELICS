@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -21,7 +21,7 @@ void ZmqRequestSets::addRoutes (int routeNumber, const std::string &routeInfo)
     auto zsock = std::make_unique<zmq::socket_t> (ctx->getContext (), ZMQ_REQ);
     try
     {
-        zsock->connect (routeInfo); 
+        zsock->connect (routeInfo);
     }
     catch (const zmq::error_t &ze)
     {

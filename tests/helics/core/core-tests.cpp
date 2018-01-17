@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -14,8 +14,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define BOOST_TEST_MODULE core_tests
 #define BOOST_TEST_DETECT_MEMORY_LEAK 0
 
-#include <helics/core/BrokerFactory.h>
-#include <helics/core/CoreFactory.h>
+#include <helics/core/BrokerFactory.hpp>
+#include <helics/core/CoreFactory.hpp>
 #include <boost/test/unit_test.hpp>
 
 struct globalTestConfig

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -10,13 +10,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "testFixtures.h"
 #include <boost/test/unit_test.hpp>
 
-#include "helics/core/CommonCore.h"
-#include "helics/core/CoreBroker.h"
-#include "helics/core/EndpointInfo.h"
-#include "helics/core/FederateState.h"
-#include "helics/core/FilterInfo.h"
-#include "helics/core/PublicationInfo.h"
-#include "helics/core/SubscriptionInfo.h"
+#include "helics/core/CommonCore.hpp"
+#include "helics/core/CoreBroker.hpp"
+#include "helics/core/EndpointInfo.hpp"
+#include "helics/core/FederateState.hpp"
+#include "helics/core/FilterInfo.hpp"
+#include "helics/core/PublicationInfo.hpp"
+#include "helics/core/SubscriptionInfo.hpp"
 
 federateStateTestFixture::federateStateTestFixture ()
 {

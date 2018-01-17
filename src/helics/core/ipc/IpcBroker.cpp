@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -10,9 +10,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "IpcBroker.h"
 #include "../../common/blocking_queue.h"
-#include "../core-data.h"
-#include "../core.h"
-#include "../helics-time.h"
+#include "../core-data.hpp"
+#include "../Core.hpp"
+#include "../helics-time.hpp"
 #include "helics/helics-config.h"
 
 #include "IpcComms.h"
@@ -37,9 +37,9 @@ constexpr size_t maxMessageCount = 256;
 namespace helics
 {
 using namespace std::string_literals;
-static const argDescriptors extraArgs{{"queueloc"s, "string"s, "the named location of the shared queue"s},
-{ "broker,b"s,"string"s,"identifier for the broker"s },
-{ "broker_address","string"s,"location of the broker i.e network address" },
+static const ArgDescriptors extraArgs{{"queueloc"s, "string"s, "the named location of the shared queue"s},
+                                      {"broker,b"s, "string"s, "identifier for the broker"s},
+                                      {"broker_address", "string"s, "location of the broker i.e network address"},
                                       {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
 
 IpcBroker::IpcBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}

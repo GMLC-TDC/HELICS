@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -39,7 +39,7 @@ static void echoArgumentParser (int argc, const char *const *argv, po::variables
 namespace helics
 {
 
-echo::echo (int argc, char *argv[])
+Echo::Echo (int argc, char *argv[])
 {
     FederateInfo fi ("echo");
     fi.loadInfoFromArgs (argc, argv);
@@ -49,25 +49,25 @@ echo::echo (int argc, char *argv[])
     loadArguments (vm_map);
 }
 
-echo::echo (const FederateInfo &fi) : fed (std::make_shared<MessageFederate> (fi))
+Echo::Echo (const FederateInfo &fi) : fed (std::make_shared<MessageFederate> (fi))
 {
 
 }
 
-echo::echo (std::shared_ptr<Core> core, const FederateInfo &fi)
+Echo::Echo (std::shared_ptr<Core> core, const FederateInfo &fi)
     : fed (std::make_shared<MessageFederate> (std::move (core), fi))
 {
 
 }
 
-echo::echo (const std::string &jsonString) : fed (std::make_shared<MessageFederate> (jsonString))
+Echo::Echo (const std::string &jsonString) : fed (std::make_shared<MessageFederate> (jsonString))
 {
     loadFile (jsonString);
 }
 
-echo::~echo () = default;
+Echo::~Echo () = default;
 
-void echo::loadFile (const std::string &filename)
+void Echo::loadFile (const std::string &filename)
 {
 
     fed->registerInterfaces (filename);
@@ -81,9 +81,9 @@ void echo::loadFile (const std::string &filename)
 }
 
 
-void echo::initialize ()
+void Echo::initialize ()
 {
-    auto state = fed->currentState ();
+    auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
     {
         fed->enterInitializationState ();
@@ -91,16 +91,16 @@ void echo::initialize ()
 }
 
 
-/*run the echo*/
-void echo::run ()
+/*run the Echo*/
+void Echo::run ()
 {
     run (stopTime);
     fed->finalize ();
 }
 
-void echo::run (Time stopTime_input)
+void Echo::run (Time stopTime_input)
 {
-    auto state = fed->currentState ();
+    auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
     {
         initialize ();
@@ -114,7 +114,7 @@ void echo::run (Time stopTime_input)
     }
     else
     {
-        auto ctime = fed->getCurrentTime ();
+        //auto ctime = fed->getCurrentTime ();
        
     }
 
@@ -145,12 +145,12 @@ void echo::run (Time stopTime_input)
 }
 
 
-void echo::addEndpoint (const std::string &endpointName, const std::string &endpointType)
+void Echo::addEndpoint (const std::string &endpointName, const std::string &endpointType)
 {
     endpoints.push_back (Endpoint (GLOBAL, fed.get (), endpointName, endpointType));
 }
 
-int echo::loadArguments (boost::program_options::variables_map &vm_map)
+int Echo::loadArguments (boost::program_options::variables_map &vm_map)
 {
     if (vm_map.count ("input") == 0)
     {

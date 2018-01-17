@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright (C) 2017, Battelle Memorial Institute
+#Copyright (C) 2017-2018, Battelle Memorial Institute
 #All rights reserved.
 
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
@@ -24,6 +24,25 @@ add_executable(nonlings_fed2 nonlings_fed2.c)
 
 target_link_libraries(nonlings_fed1 helicsSharedLib )
 target_link_libraries(nonlings_fed2 helicsSharedLib )
+
+set_target_properties (pi_sender PROPERTIES
+    FOLDER examples)
+
+set_target_properties (pi_sender2 PROPERTIES
+    FOLDER examples)
+	
+set_target_properties (pi_receiver PROPERTIES
+    FOLDER examples)
+
+set_target_properties (pi_receiver2 PROPERTIES
+    FOLDER examples)
+
+set_target_properties (nonlings_fed1 PROPERTIES
+    FOLDER examples)
+
+set_target_properties (nonlings_fed2 PROPERTIES
+    FOLDER examples)
+
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET pi_sender POST_BUILD        # Adds a post-build event to api tests

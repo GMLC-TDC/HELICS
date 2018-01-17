@@ -5,9 +5,10 @@ OPTION(QUICK_TESTS_ONLY "set to build only the quick tests and turn off many of 
 if (QUICK_TESTS_ONLY)
 add_definitions(-DQUICK_TESTS_ONLY)
 endif()
+add_subdirectory(common)
+
 add_subdirectory (core)
 add_subdirectory(application_api)
-
 
 if (BUILD_C_SHARED_LIB)
     add_subdirectory(c_interface)

@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -26,7 +26,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 and reverses it so it can pop from the back
 @tparam X the base class of the queue*/
 template <class X>
-class simpleQueue
+class SimpleQueue
 {
   private:
     mutable std::mutex m_pushLock;  //!< lock for operations on the pushElements vector
@@ -36,8 +36,8 @@ class simpleQueue
     std::atomic<bool> queueEmptyFlag{true};  //!< flag indicating the queue is Empty
   public:
     /** default constructor */
-    simpleQueue () = default;
-    ~simpleQueue ()
+    SimpleQueue () = default;
+    ~SimpleQueue ()
     {
         // these locks are primarily for memory synchronization multiple access in the destructor would be a bad
         // thing
@@ -48,20 +48,20 @@ class simpleQueue
     }
     /** constructor with a reservation size
     @param[in] capacity  the initial storage capacity of the queue*/
-    explicit simpleQueue (size_t capacity)
+    explicit SimpleQueue (size_t capacity)
     {  // don't need to lock since we aren't out of the constructor yet
         pushElements.reserve (capacity);
         pullElements.reserve (capacity);
     }
     /** enable the move constructor not the copy constructor*/
-    simpleQueue (simpleQueue &&sq) noexcept
+    SimpleQueue (SimpleQueue &&sq) noexcept
         : pushElements (std::move (sq.pushElements)), pullElements (std::move (sq.pullElements))
     {
         queueEmptyFlag = pullElements.empty ();
     }
 
     /** enable the move assignment not the copy assignment*/
-    simpleQueue &operator= (simpleQueue &&sq) noexcept
+    SimpleQueue &operator= (SimpleQueue &&sq) noexcept
     {
         std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
         std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
@@ -71,8 +71,8 @@ class simpleQueue
         return *this;
     }
     /** DISABLE_COPY_AND_ASSIGN */
-    simpleQueue (const simpleQueue &) = delete;
-    simpleQueue &operator= (const simpleQueue &) = delete;
+    SimpleQueue (const SimpleQueue &) = delete;
+    SimpleQueue &operator= (const SimpleQueue &) = delete;
 
     /** check whether there are any elements in the queue
     because this is meant for multi threaded applications this may or may not have any meaning

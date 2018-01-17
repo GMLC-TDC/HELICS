@@ -16,14 +16,16 @@ if (BUILD_HELICS_TESTS)
 enable_testing ()
 endif(BUILD_HELICS_TESTS)
 
-OPTION(BUILD_HELICS_EXAMPLES "Enable the test Executables to be built" OFF)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+OPTION(BUILD_HELICS_EXAMPLES "Enable the test Executables to be built" ON)
 
 OPTION(BUILD_PYTHON "Build Python extension" OFF)
 OPTION(GENERATE_PYTHON "Generate Python extension" ON)
 
 OPTION(BUILD_MATLAB "Build MATLAB extension" OFF)
 
-OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" OFF)
+OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" ON)
 IF(NOT MSVC)
 OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface gcc/clang only" OFF)
 ENDIF()
@@ -142,7 +144,8 @@ IF(MSVC)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
   add_compile_options(/MP)
-  add_compile_options(-W4  /EHsc /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484 /wd4702 /wd4996)
+  add_compile_options(-W4  /EHsc /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484 /wd4702 /wd4996 )
+  add_compile_options(/sdl)
   ADD_DEFINITIONS(-D_WIN32_WINNT=0x0601)
 ENDIF(MSVC)
   ENDIF(MINGW)
@@ -237,7 +240,7 @@ add_library(helics-static STATIC
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
-target_link_libraries(helics-static Threads::Threads)
+target_link_libraries(helics-static Threads::Threads) 
 IF (UNIX AND NOT APPLE)
 target_link_libraries(helics-static rt)
 ENDIF()

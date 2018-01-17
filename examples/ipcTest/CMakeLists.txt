@@ -9,3 +9,10 @@ target_link_libraries(ipcTest1 helics-static)
 target_link_libraries(ipcTest2 helics-static)
 
 
+set_target_properties (ipcTest1 PROPERTIES
+    FOLDER examples
+)
+
+set_target_properties (ipcTest2 PROPERTIES
+    FOLDER examples
+)

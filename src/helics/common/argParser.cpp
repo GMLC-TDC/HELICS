@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -19,7 +19,7 @@ namespace helics
 void argumentParser (int argc,
                      const char *const *argv,
                      boost::program_options::variables_map &vm_map,
-                     const argDescriptors &additionalArgs)
+                     const ArgDescriptors &additionalArgs)
 {
     namespace po = boost::program_options;
     po::options_description cmd_only ("command line only");

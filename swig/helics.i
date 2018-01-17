@@ -5,14 +5,18 @@
 %{
 #include "api-data.h"
 #include "helics.h"
-#include "ValueFederate_c.h"
+#include "ValueFederate.h"
+#include "MessageFederate.h"
+#include "MessageFilters.h"
 %}
 
 %apply double *OUTPUT {double*};
 
 %include "api-data.h"
 %include "helics.h"
-%include "ValueFederate_c.h"
+%include "ValueFederate.h"
+%include "MessageFederate.h"
+%include "MessageFilters.h"
 
 
 

@@ -6,7 +6,9 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 target_link_libraries(messageFed helics-static)
 
-
+set_target_properties (messageFed PROPERTIES
+    FOLDER examples
+)
 #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/run.sh
 #               ${CMAKE_CURRENT_BINARY_DIR}/run.sh
 #               COPYONLY)

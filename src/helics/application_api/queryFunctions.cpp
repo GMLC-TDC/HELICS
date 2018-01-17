@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -8,9 +8,9 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "queryFunctions.h"
+#include "queryFunctions.hpp"
 
-#include "Federate.h"
+#include "Federate.hpp"
 #include <thread>
 
 #ifdef _MSC_VER
@@ -97,14 +97,14 @@ bool waitForInit (helics::Federate *fed, const std::string &fedName, int timeout
     return true;
 }
 
-bool waitForFed(helics::Federate *fed, const std::string &fedName, int timeout)
+bool waitForFed (helics::Federate *fed, const std::string &fedName, int timeout)
 {
-    auto res = fed->query(fedName, "exists");
+    auto res = fed->query (fedName, "exists");
     int waitTime = 0;
     while (res != "true")
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
-        res = fed->query(fedName, "exists");
+        std::this_thread::sleep_for (std::chrono::milliseconds (200));
+        res = fed->query (fedName, "exists");
         waitTime += 200;
         if (waitTime >= timeout)
         {

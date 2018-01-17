@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -11,17 +11,17 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 
 #include "recorder.h"
-#include "../core/core-exceptions.h"
+#include "../core/core-exceptions.hpp"
 #include <iostream>
 
 int main(int argc, char *argv[])
 {
     try
     {
-        helics::recorder recorder(argc, argv);
-        if (recorder.isActive())
+        helics::Recorder Recorder(argc, argv);
+        if (Recorder.isActive())
         {
-            recorder.run();
+            Recorder.run();
         }
         
     }

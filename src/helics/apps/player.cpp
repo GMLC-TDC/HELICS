@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -49,7 +49,7 @@ namespace helics
 static inline bool vComp (const ValueSetter &v1, const ValueSetter &v2) { return (v1.time < v2.time); }
 static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { return (m1.sendTime < m2.sendTime); }
 
-player::player (int argc, char *argv[])
+Player::Player (int argc, char *argv[])
 {
     boost::program_options::variables_map vm_map;
     auto res = playerArgumentParser(argc, argv, vm_map);
@@ -65,18 +65,18 @@ player::player (int argc, char *argv[])
    
 }
 
-player::player (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
+Player::Player (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
 {
     fed->setFlag (SOURCE_ONLY_FLAG);
 }
 
-player::player (std::shared_ptr<Core> core, const FederateInfo &fi)
+Player::Player (std::shared_ptr<Core> core, const FederateInfo &fi)
     : fed (std::make_shared<CombinationFederate> (std::move (core), fi))
 {
     fed->setFlag (SOURCE_ONLY_FLAG);
 }
 
-player::player (const std::string &jsonString) : fed (std::make_shared<CombinationFederate> (jsonString))
+Player::Player (const std::string &jsonString) : fed (std::make_shared<CombinationFederate> (jsonString))
 {
     fed->setFlag (SOURCE_ONLY_FLAG);
     if (jsonString.size () < 200)
@@ -86,9 +86,9 @@ player::player (const std::string &jsonString) : fed (std::make_shared<Combinati
     loadJsonFile (jsonString);
 }
 
-player::~player () = default;
+Player::~Player () = default;
 
-void player::addMessage (Time sendTime,
+void Player::addMessage (Time sendTime,
                          const std::string &src,
                          const std::string &dest,
                          const std::string &payload)
@@ -101,7 +101,7 @@ void player::addMessage (Time sendTime,
     messages.back ().mess.time = sendTime;
 }
 
-void player::addMessage (Time sendTime,
+void Player::addMessage (Time sendTime,
                          Time actionTime,
                          const std::string &src,
                          const std::string &dest,
@@ -115,7 +115,7 @@ void player::addMessage (Time sendTime,
     messages.back ().mess.time = actionTime;
 }
 
-void player::loadFile (const std::string &filename)
+void Player::loadFile (const std::string &filename)
 {
     auto ext = filesystem::path (filename).extension ().string ();
     if ((ext == ".json") || (ext == ".JSON"))
@@ -129,7 +129,7 @@ void player::loadFile (const std::string &filename)
 }
 
 
-helics::Time player::extractTime(const std::string &str, int lineNumber) const
+helics::Time Player::extractTime(const std::string &str, int lineNumber) const
 {
     try
     {
@@ -149,7 +149,7 @@ helics::Time player::extractTime(const std::string &str, int lineNumber) const
     }
 }
 
-void player::loadTextFile (const std::string &filename)
+void Player::loadTextFile (const std::string &filename)
 {
     using namespace stringOps;
     std::ifstream infile (filename);
@@ -308,7 +308,7 @@ void player::loadTextFile (const std::string &filename)
     }
 }
 
-void player::loadJsonFile (const std::string &jsonFile)
+void Player::loadJsonFile (const std::string &jsonFile)
 {
     fed->registerInterfaces (jsonFile);
 
@@ -595,7 +595,7 @@ void player::loadJsonFile (const std::string &jsonFile)
     }
 }
 
-std::string player::decode (std::string &&stringToDecode)
+std::string Player::decode (std::string &&stringToDecode)
 {
     if ((stringToDecode.compare (1, 3, "64[") == 0) && (stringToDecode.back () == '['))
     {
@@ -618,7 +618,7 @@ std::string player::decode (std::string &&stringToDecode)
     return std::move (stringToDecode);
 }
 
-void player::sortTags ()
+void Player::sortTags ()
 {
     std::sort (points.begin (), points.end (), vComp);
     std::sort (messages.begin (), messages.end (), mComp);
@@ -646,7 +646,7 @@ void player::sortTags ()
 }
 
 /** helper function to generate the publications*/
-void player::generatePublications ()
+void Player::generatePublications ()
 {
     for (auto &tname : tags)
     {
@@ -658,7 +658,7 @@ void player::generatePublications ()
 }
 
 /** helper function to generate the publications*/
-void player::generateEndpoints ()
+void Player::generateEndpoints ()
 {
     for (auto &ename : epts)
     {
@@ -669,7 +669,7 @@ void player::generateEndpoints ()
     }
 }
 
-void player::cleanUpPointList ()
+void Player::cleanUpPointList ()
 {
     // load up the indexes
     for (auto &vs : points)
@@ -683,9 +683,9 @@ void player::cleanUpPointList ()
     }
 }
 
-void player::initialize ()
+void Player::initialize ()
 {
-    auto state = fed->currentState ();
+    auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
     {
         sortTags ();
@@ -697,12 +697,12 @@ void player::initialize ()
 }
 
 
-void player::finalize()
+void Player::finalize()
 {
     fed->finalize();
 }
 
-void player::sendInformation(Time sendTime)
+void Player::sendInformation(Time sendTime)
 {
     if (!points.empty())
     {
@@ -730,16 +730,16 @@ void player::sendInformation(Time sendTime)
     }
 }
 
-/*run the player*/
-void player::run ()
+/*run the Player*/
+void Player::run ()
 {
     run (stopTime);
     fed->disconnect();
 }
 
-void player::run (Time stopTime_input)
+void Player::run (Time stopTime_input)
 {
-    auto state = fed->currentState ();
+    auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
     {
         initialize ();
@@ -814,7 +814,7 @@ void player::run (Time stopTime_input)
     }
 }
 
-void player::addPublication(const std::string &key, helicsType_t type, const std::string &units)
+void Player::addPublication(const std::string &key, helics_type_t type, const std::string &units)
 {
     // skip already existing publications
     if (pubids.find(key) != pubids.end())
@@ -840,7 +840,7 @@ void player::addPublication(const std::string &key, helicsType_t type, const std
     pubids[key] = static_cast<int> (publications.size ()) - 1;
 }
 
-void player::addEndpoint(const std::string &endpointName, const std::string &endpointType)
+void Player::addEndpoint(const std::string &endpointName, const std::string &endpointType)
 {
     // skip already existing publications
     if (eptids.find(endpointName) != eptids.end())
@@ -866,13 +866,13 @@ void player::addEndpoint(const std::string &endpointName, const std::string &end
     eptids[endpointName] = static_cast<int> (endpoints.size ()) - 1;
 }
 
-int player::loadArguments(boost::program_options::variables_map &vm_map)
+int Player::loadArguments(boost::program_options::variables_map &vm_map)
 {
 
     if (vm_map.count("datatype") > 0)
     {
         defType = helics::getTypeFromString(vm_map["datatype"].as<std::string>());
-        if (defType == helics::helicsType_t::helicsInvalid)
+        if (defType == helics::helics_type_t::helicsInvalid)
         {
             std::cerr << vm_map["datatype"].as<std::string>() << " is not recognized as a valid type \n";
             return -3;
