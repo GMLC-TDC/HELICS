@@ -9,9 +9,11 @@
  * ----------------------------------------------------------------------------- */
 
 
-#ifndef SWIGTCL
-#define SWIGTCL
+#ifndef SWIGPYTHON
+#define SWIGPYTHON
 #endif
+
+#define SWIG_PYTHON_DIRECTOR_NO_VTABLE
 
 /* -----------------------------------------------------------------------------
  *  This section contains generic SWIG labels for method/variable
@@ -138,12 +140,14 @@
 #endif
 
 
-#include <stdio.h>
-#include <tcl.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <ctype.h>
+#if defined(_DEBUG) && defined(SWIG_PYTHON_INTERPRETER_NO_DEBUG)
+/* Use debug wrappers with the Python release dll */
+# undef _DEBUG
+# include <Python.h>
+# define _DEBUG
+#else
+# include <Python.h>
+#endif
 
 /* -----------------------------------------------------------------------------
  * swigrun.swg
@@ -735,86 +739,364 @@ SWIG_UnpackDataName(const char *c, void *ptr, size_t sz, const char *name) {
 
 
 
+/* Compatibility macros for Python 3 */
+#if PY_VERSION_HEX >= 0x03000000
+
+#define PyClass_Check(obj) PyObject_IsInstance(obj, (PyObject *)&PyType_Type)
+#define PyInt_Check(x) PyLong_Check(x)
+#define PyInt_AsLong(x) PyLong_AsLong(x)
+#define PyInt_FromLong(x) PyLong_FromLong(x)
+#define PyInt_FromSize_t(x) PyLong_FromSize_t(x)
+#define PyString_Check(name) PyBytes_Check(name)
+#define PyString_FromString(x) PyUnicode_FromString(x)
+#define PyString_Format(fmt, args)  PyUnicode_Format(fmt, args)
+#define PyString_AsString(str) PyBytes_AsString(str)
+#define PyString_Size(str) PyBytes_Size(str)	
+#define PyString_InternFromString(key) PyUnicode_InternFromString(key)
+#define Py_TPFLAGS_HAVE_CLASS Py_TPFLAGS_BASETYPE
+#define PyString_AS_STRING(x) PyUnicode_AS_STRING(x)
+#define _PyLong_FromSsize_t(x) PyLong_FromSsize_t(x)
+
+#endif
+
+#ifndef Py_TYPE
+#  define Py_TYPE(op) ((op)->ob_type)
+#endif
+
+/* SWIG APIs for compatibility of both Python 2 & 3 */
+
+#if PY_VERSION_HEX >= 0x03000000
+#  define SWIG_Python_str_FromFormat PyUnicode_FromFormat
+#else
+#  define SWIG_Python_str_FromFormat PyString_FromFormat
+#endif
+
+
+/* Warning: This function will allocate a new string in Python 3,
+ * so please call SWIG_Python_str_DelForPy3(x) to free the space.
+ */
+SWIGINTERN char*
+SWIG_Python_str_AsChar(PyObject *str)
+{
+#if PY_VERSION_HEX >= 0x03000000
+  char *cstr;
+  char *newstr;
+  Py_ssize_t len;
+  str = PyUnicode_AsUTF8String(str);
+  PyBytes_AsStringAndSize(str, &cstr, &len);
+  newstr = (char *) malloc(len+1);
+  memcpy(newstr, cstr, len+1);
+  Py_XDECREF(str);
+  return newstr;
+#else
+  return PyString_AsString(str);
+#endif
+}
+
+#if PY_VERSION_HEX >= 0x03000000
+#  define SWIG_Python_str_DelForPy3(x) free( (void*) (x) )
+#else
+#  define SWIG_Python_str_DelForPy3(x) 
+#endif
+
+
+SWIGINTERN PyObject*
+SWIG_Python_str_FromChar(const char *c)
+{
+#if PY_VERSION_HEX >= 0x03000000
+  return PyUnicode_FromString(c); 
+#else
+  return PyString_FromString(c);
+#endif
+}
+
+/* Add PyOS_snprintf for old Pythons */
+#if PY_VERSION_HEX < 0x02020000
+# if defined(_MSC_VER) || defined(__BORLANDC__) || defined(_WATCOM)
+#  define PyOS_snprintf _snprintf
+# else
+#  define PyOS_snprintf snprintf
+# endif
+#endif
+
+/* A crude PyString_FromFormat implementation for old Pythons */
+#if PY_VERSION_HEX < 0x02020000
+
+#ifndef SWIG_PYBUFFER_SIZE
+# define SWIG_PYBUFFER_SIZE 1024
+#endif
+
+static PyObject *
+PyString_FromFormat(const char *fmt, ...) {
+  va_list ap;
+  char buf[SWIG_PYBUFFER_SIZE * 2];
+  int res;
+  va_start(ap, fmt);
+  res = vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return (res < 0 || res >= (int)sizeof(buf)) ? 0 : PyString_FromString(buf);
+}
+#endif
+
+#ifndef PyObject_DEL
+# define PyObject_DEL PyObject_Del
+#endif
+
+/* A crude PyExc_StopIteration exception for old Pythons */
+#if PY_VERSION_HEX < 0x02020000
+# ifndef PyExc_StopIteration
+#  define PyExc_StopIteration PyExc_RuntimeError
+# endif
+# ifndef PyObject_GenericGetAttr
+#  define PyObject_GenericGetAttr 0
+# endif
+#endif
+
+/* Py_NotImplemented is defined in 2.1 and up. */
+#if PY_VERSION_HEX < 0x02010000
+# ifndef Py_NotImplemented
+#  define Py_NotImplemented PyExc_RuntimeError
+# endif
+#endif
+
+/* A crude PyString_AsStringAndSize implementation for old Pythons */
+#if PY_VERSION_HEX < 0x02010000
+# ifndef PyString_AsStringAndSize
+#  define PyString_AsStringAndSize(obj, s, len) {*s = PyString_AsString(obj); *len = *s ? strlen(*s) : 0;}
+# endif
+#endif
+
+/* PySequence_Size for old Pythons */
+#if PY_VERSION_HEX < 0x02000000
+# ifndef PySequence_Size
+#  define PySequence_Size PySequence_Length
+# endif
+#endif
+
+/* PyBool_FromLong for old Pythons */
+#if PY_VERSION_HEX < 0x02030000
+static
+PyObject *PyBool_FromLong(long ok)
+{
+  PyObject *result = ok ? Py_True : Py_False;
+  Py_INCREF(result);
+  return result;
+}
+#endif
+
+/* Py_ssize_t for old Pythons */
+/* This code is as recommended by: */
+/* http://www.python.org/dev/peps/pep-0353/#conversion-guidelines */
+#if PY_VERSION_HEX < 0x02050000 && !defined(PY_SSIZE_T_MIN)
+typedef int Py_ssize_t;
+# define PY_SSIZE_T_MAX INT_MAX
+# define PY_SSIZE_T_MIN INT_MIN
+typedef inquiry lenfunc;
+typedef intargfunc ssizeargfunc;
+typedef intintargfunc ssizessizeargfunc;
+typedef intobjargproc ssizeobjargproc;
+typedef intintobjargproc ssizessizeobjargproc;
+typedef getreadbufferproc readbufferproc;
+typedef getwritebufferproc writebufferproc;
+typedef getsegcountproc segcountproc;
+typedef getcharbufferproc charbufferproc;
+static long PyNumber_AsSsize_t (PyObject *x, void *SWIGUNUSEDPARM(exc))
+{
+  long result = 0;
+  PyObject *i = PyNumber_Int(x);
+  if (i) {
+    result = PyInt_AsLong(i);
+    Py_DECREF(i);
+  }
+  return result;
+}
+#endif
+
+#if PY_VERSION_HEX < 0x02050000
+#define PyInt_FromSize_t(x) PyInt_FromLong((long)x)
+#endif
+
+#if PY_VERSION_HEX < 0x02040000
+#define Py_VISIT(op)				\
+  do { 						\
+    if (op) {					\
+      int vret = visit((op), arg);		\
+      if (vret)					\
+        return vret;				\
+    }						\
+  } while (0)
+#endif
+
+#if PY_VERSION_HEX < 0x02030000
+typedef struct {
+  PyTypeObject type;
+  PyNumberMethods as_number;
+  PyMappingMethods as_mapping;
+  PySequenceMethods as_sequence;
+  PyBufferProcs as_buffer;
+  PyObject *name, *slots;
+} PyHeapTypeObject;
+#endif
+
+#if PY_VERSION_HEX < 0x02030000
+typedef destructor freefunc;
+#endif
+
+#if ((PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION > 6) || \
+     (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION > 0) || \
+     (PY_MAJOR_VERSION > 3))
+# define SWIGPY_USE_CAPSULE
+# define SWIGPY_CAPSULE_NAME ((char*)"swig_runtime_data" SWIG_RUNTIME_VERSION ".type_pointer_capsule" SWIG_TYPE_TABLE_NAME)
+#endif
+
+#if PY_VERSION_HEX < 0x03020000
+#define PyDescr_TYPE(x) (((PyDescrObject *)(x))->d_type)
+#define PyDescr_NAME(x) (((PyDescrObject *)(x))->d_name)
+#define Py_hash_t long
+#endif
+
 /* -----------------------------------------------------------------------------
  * error manipulation
  * ----------------------------------------------------------------------------- */
 
-SWIGINTERN const char*
-SWIG_Tcl_ErrorType(int code) {
-  const char* type = 0;
+SWIGRUNTIME PyObject*
+SWIG_Python_ErrorType(int code) {
+  PyObject* type = 0;
   switch(code) {
   case SWIG_MemoryError:
-    type = "MemoryError";
+    type = PyExc_MemoryError;
     break;
   case SWIG_IOError:
-    type = "IOError";
+    type = PyExc_IOError;
     break;
   case SWIG_RuntimeError:
-    type = "RuntimeError";
+    type = PyExc_RuntimeError;
     break;
   case SWIG_IndexError:
-    type = "IndexError";
+    type = PyExc_IndexError;
     break;
   case SWIG_TypeError:
-    type = "TypeError";
+    type = PyExc_TypeError;
     break;
   case SWIG_DivisionByZero:
-    type = "ZeroDivisionError";
+    type = PyExc_ZeroDivisionError;
     break;
   case SWIG_OverflowError:
-    type = "OverflowError";
+    type = PyExc_OverflowError;
     break;
   case SWIG_SyntaxError:
-    type = "SyntaxError";
+    type = PyExc_SyntaxError;
     break;
   case SWIG_ValueError:
-    type = "ValueError";
+    type = PyExc_ValueError;
     break;
   case SWIG_SystemError:
-    type = "SystemError";
+    type = PyExc_SystemError;
     break;
   case SWIG_AttributeError:
-    type = "AttributeError";
+    type = PyExc_AttributeError;
     break;
   default:
-    type = "RuntimeError";
+    type = PyExc_RuntimeError;
   }
   return type;
 }
 
 
-SWIGINTERN void
-SWIG_Tcl_SetErrorObj(Tcl_Interp *interp, const char *ctype, Tcl_Obj *obj)
+SWIGRUNTIME void
+SWIG_Python_AddErrorMsg(const char* mesg)
 {
-  Tcl_ResetResult(interp);
-  Tcl_SetObjResult(interp, obj);
-  Tcl_SetErrorCode(interp, "SWIG", ctype, NULL);
+  PyObject *type = 0;
+  PyObject *value = 0;
+  PyObject *traceback = 0;
+
+  if (PyErr_Occurred()) PyErr_Fetch(&type, &value, &traceback);
+  if (value) {
+    char *tmp;
+    PyObject *old_str = PyObject_Str(value);
+    PyErr_Clear();
+    Py_XINCREF(type);
+
+    PyErr_Format(type, "%s %s", tmp = SWIG_Python_str_AsChar(old_str), mesg);
+    SWIG_Python_str_DelForPy3(tmp);
+    Py_DECREF(old_str);
+    Py_DECREF(value);
+  } else {
+    PyErr_SetString(PyExc_RuntimeError, mesg);
+  }
 }
 
-SWIGINTERN void
-SWIG_Tcl_SetErrorMsg(Tcl_Interp *interp, const char *ctype, const char *mesg)
-{
-  Tcl_ResetResult(interp);
-  Tcl_SetErrorCode(interp, "SWIG", ctype, NULL);
-  Tcl_AppendResult(interp, ctype, " ", mesg, NULL);
-  /*
-  Tcl_AddErrorInfo(interp, ctype);
-  Tcl_AddErrorInfo(interp, " ");
-  Tcl_AddErrorInfo(interp, mesg);
-  */
-}
-
-SWIGINTERNINLINE void
-SWIG_Tcl_AddErrorMsg(Tcl_Interp *interp, const char* mesg)
-{
-  Tcl_AddErrorInfo(interp, mesg);
-}
-
-
+#if defined(SWIG_PYTHON_NO_THREADS)
+#  if defined(SWIG_PYTHON_THREADS)
+#    undef SWIG_PYTHON_THREADS
+#  endif
+#endif
+#if defined(SWIG_PYTHON_THREADS) /* Threading support is enabled */
+#  if !defined(SWIG_PYTHON_USE_GIL) && !defined(SWIG_PYTHON_NO_USE_GIL)
+#    if (PY_VERSION_HEX >= 0x02030000) /* For 2.3 or later, use the PyGILState calls */
+#      define SWIG_PYTHON_USE_GIL
+#    endif
+#  endif
+#  if defined(SWIG_PYTHON_USE_GIL) /* Use PyGILState threads calls */
+#    ifndef SWIG_PYTHON_INITIALIZE_THREADS
+#     define SWIG_PYTHON_INITIALIZE_THREADS  PyEval_InitThreads() 
+#    endif
+#    ifdef __cplusplus /* C++ code */
+       class SWIG_Python_Thread_Block {
+         bool status;
+         PyGILState_STATE state;
+       public:
+         void end() { if (status) { PyGILState_Release(state); status = false;} }
+         SWIG_Python_Thread_Block() : status(true), state(PyGILState_Ensure()) {}
+         ~SWIG_Python_Thread_Block() { end(); }
+       };
+       class SWIG_Python_Thread_Allow {
+         bool status;
+         PyThreadState *save;
+       public:
+         void end() { if (status) { PyEval_RestoreThread(save); status = false; }}
+         SWIG_Python_Thread_Allow() : status(true), save(PyEval_SaveThread()) {}
+         ~SWIG_Python_Thread_Allow() { end(); }
+       };
+#      define SWIG_PYTHON_THREAD_BEGIN_BLOCK   SWIG_Python_Thread_Block _swig_thread_block
+#      define SWIG_PYTHON_THREAD_END_BLOCK     _swig_thread_block.end()
+#      define SWIG_PYTHON_THREAD_BEGIN_ALLOW   SWIG_Python_Thread_Allow _swig_thread_allow
+#      define SWIG_PYTHON_THREAD_END_ALLOW     _swig_thread_allow.end()
+#    else /* C code */
+#      define SWIG_PYTHON_THREAD_BEGIN_BLOCK   PyGILState_STATE _swig_thread_block = PyGILState_Ensure()
+#      define SWIG_PYTHON_THREAD_END_BLOCK     PyGILState_Release(_swig_thread_block)
+#      define SWIG_PYTHON_THREAD_BEGIN_ALLOW   PyThreadState *_swig_thread_allow = PyEval_SaveThread()
+#      define SWIG_PYTHON_THREAD_END_ALLOW     PyEval_RestoreThread(_swig_thread_allow)
+#    endif
+#  else /* Old thread way, not implemented, user must provide it */
+#    if !defined(SWIG_PYTHON_INITIALIZE_THREADS)
+#      define SWIG_PYTHON_INITIALIZE_THREADS
+#    endif
+#    if !defined(SWIG_PYTHON_THREAD_BEGIN_BLOCK)
+#      define SWIG_PYTHON_THREAD_BEGIN_BLOCK
+#    endif
+#    if !defined(SWIG_PYTHON_THREAD_END_BLOCK)
+#      define SWIG_PYTHON_THREAD_END_BLOCK
+#    endif
+#    if !defined(SWIG_PYTHON_THREAD_BEGIN_ALLOW)
+#      define SWIG_PYTHON_THREAD_BEGIN_ALLOW
+#    endif
+#    if !defined(SWIG_PYTHON_THREAD_END_ALLOW)
+#      define SWIG_PYTHON_THREAD_END_ALLOW
+#    endif
+#  endif
+#else /* No thread support */
+#  define SWIG_PYTHON_INITIALIZE_THREADS
+#  define SWIG_PYTHON_THREAD_BEGIN_BLOCK
+#  define SWIG_PYTHON_THREAD_END_BLOCK
+#  define SWIG_PYTHON_THREAD_BEGIN_ALLOW
+#  define SWIG_PYTHON_THREAD_END_ALLOW
+#endif
 
 /* -----------------------------------------------------------------------------
- * SWIG API. Portion that goes into the runtime
+ * Python API portion that goes into the runtime
  * ----------------------------------------------------------------------------- */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -824,789 +1106,1864 @@ extern "C" {
  * ----------------------------------------------------------------------------- */
 
 /* Constant Types */
-#define SWIG_TCL_POINTER 4
-#define SWIG_TCL_BINARY  5
+#define SWIG_PY_POINTER 4
+#define SWIG_PY_BINARY  5
 
 /* Constant information structure */
 typedef struct swig_const_info {
-    int type;
-    char *name;
-    long lvalue;
-    double dvalue;
-    void   *pvalue;
-    swig_type_info **ptype;
+  int type;
+  char *name;
+  long lvalue;
+  double dvalue;
+  void   *pvalue;
+  swig_type_info **ptype;
 } swig_const_info;
 
-typedef int   (*swig_wrapper)(ClientData, Tcl_Interp *, int, Tcl_Obj *CONST []);
-typedef int   (*swig_wrapper_func)(ClientData, Tcl_Interp *, int, Tcl_Obj *CONST []);
-typedef char *(*swig_variable_func)(ClientData, Tcl_Interp *, char *, char *, int);
-typedef void  (*swig_delete_func)(ClientData);
 
-typedef struct swig_method {
-  const char     *name;
-  swig_wrapper   method;
-} swig_method;
-
-typedef struct swig_attribute {
-  const char     *name;
-  swig_wrapper   getmethod;
-  swig_wrapper   setmethod;
-} swig_attribute;
-
-typedef struct swig_class {
-  const char         *name;
-  swig_type_info   **type;
-  swig_wrapper       constructor;
-  void              (*destructor)(void *);
-  swig_method        *methods;
-  swig_attribute     *attributes;
-  struct swig_class **bases;
-  const char              **base_names;
-  swig_module_info   *module;
-  Tcl_HashTable       hashtable;
-} swig_class;
-
-typedef struct swig_instance {
-  Tcl_Obj       *thisptr;
-  void          *thisvalue;
-  swig_class   *classptr;
-  int            destroy;
-  Tcl_Command    cmdtok;
-} swig_instance;
-
-/* Structure for command table */
-typedef struct {
-  const char *name;
-  int       (*wrapper)(ClientData, Tcl_Interp *, int, Tcl_Obj *CONST []);
-  ClientData  clientdata;
-} swig_command_info;
-
-/* Structure for variable linking table */
-typedef struct {
-  const char *name;
-  void *addr;
-  char * (*get)(ClientData, Tcl_Interp *, char *, char *, int);
-  char * (*set)(ClientData, Tcl_Interp *, char *, char *, int);
-} swig_var_info;
-
-
-/* -----------------------------------------------------------------------------*
- *  Install a constant object 
- * -----------------------------------------------------------------------------*/
-
-static Tcl_HashTable   swigconstTable;
-static int             swigconstTableinit = 0;
-
-SWIGINTERN void
-SWIG_Tcl_SetConstantObj(Tcl_Interp *interp, const char* name, Tcl_Obj *obj) {
-  int newobj;
-  Tcl_ObjSetVar2(interp,Tcl_NewStringObj(name,-1), NULL, obj, TCL_GLOBAL_ONLY);
-  Tcl_SetHashValue(Tcl_CreateHashEntry(&swigconstTable, name, &newobj), (ClientData) obj);
+/* -----------------------------------------------------------------------------
+ * Wrapper of PyInstanceMethod_New() used in Python 3
+ * It is exported to the generated module, used for -fastproxy
+ * ----------------------------------------------------------------------------- */
+#if PY_VERSION_HEX >= 0x03000000
+SWIGRUNTIME PyObject* SWIG_PyInstanceMethod_New(PyObject *SWIGUNUSEDPARM(self), PyObject *func)
+{
+  return PyInstanceMethod_New(func);
 }
-
-SWIGINTERN Tcl_Obj *
-SWIG_Tcl_GetConstantObj(const char *key) {
-  Tcl_HashEntry *entryPtr;
-  if (!swigconstTableinit) return 0;
-  entryPtr = Tcl_FindHashEntry(&swigconstTable, key);
-  if (entryPtr) {
-    return (Tcl_Obj *) Tcl_GetHashValue(entryPtr);
-  }
-  return 0;
+#else
+SWIGRUNTIME PyObject* SWIG_PyInstanceMethod_New(PyObject *SWIGUNUSEDPARM(self), PyObject *SWIGUNUSEDPARM(func))
+{
+  return NULL;
 }
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
 
-
 /* -----------------------------------------------------------------------------
- * tclrun.swg
+ * pyrun.swg
  *
- * This file contains the runtime support for Tcl modules and includes
- * code for managing global variables and pointer type checking.
+ * This file contains the runtime support for Python modules
+ * and includes code for managing global variables and pointer
+ * type checking.
+ *
  * ----------------------------------------------------------------------------- */
 
 /* Common SWIG API */
 
 /* for raw pointers */
-#define SWIG_ConvertPtr(oc, ptr, ty, flags)             SWIG_Tcl_ConvertPtr(interp, oc, ptr, ty, flags)
-#define SWIG_NewPointerObj(ptr, type, flags)            SWIG_Tcl_NewPointerObj(ptr, type, flags)
+#define SWIG_Python_ConvertPtr(obj, pptr, type, flags)  SWIG_Python_ConvertPtrAndOwn(obj, pptr, type, flags, 0)
+#define SWIG_ConvertPtr(obj, pptr, type, flags)         SWIG_Python_ConvertPtr(obj, pptr, type, flags)
+#define SWIG_ConvertPtrAndOwn(obj,pptr,type,flags,own)  SWIG_Python_ConvertPtrAndOwn(obj, pptr, type, flags, own)
+
+#ifdef SWIGPYTHON_BUILTIN
+#define SWIG_NewPointerObj(ptr, type, flags)            SWIG_Python_NewPointerObj(self, ptr, type, flags)
+#else
+#define SWIG_NewPointerObj(ptr, type, flags)            SWIG_Python_NewPointerObj(NULL, ptr, type, flags)
+#endif
+
+#define SWIG_InternalNewPointerObj(ptr, type, flags)	SWIG_Python_NewPointerObj(NULL, ptr, type, flags)
+
+#define SWIG_CheckImplicit(ty)                          SWIG_Python_CheckImplicit(ty) 
+#define SWIG_AcquirePtr(ptr, src)                       SWIG_Python_AcquirePtr(ptr, src)
+#define swig_owntype                                    int
 
 /* for raw packed data */
-#define SWIG_ConvertPacked(obj, ptr, sz, ty)            SWIG_Tcl_ConvertPacked(interp, obj, ptr, sz, ty)
-#define SWIG_NewPackedObj(ptr, sz, type)                SWIG_Tcl_NewPackedObj(ptr, sz, type)
+#define SWIG_ConvertPacked(obj, ptr, sz, ty)            SWIG_Python_ConvertPacked(obj, ptr, sz, ty)
+#define SWIG_NewPackedObj(ptr, sz, type)                SWIG_Python_NewPackedObj(ptr, sz, type)
 
 /* for class or struct pointers */
-#define SWIG_ConvertInstance(obj, pptr, type, flags)    SWIG_Tcl_ConvertPtr(interp, obj, pptr, type, flags)
-#define SWIG_NewInstanceObj(thisvalue, type, flags)     SWIG_Tcl_NewInstanceObj(interp, thisvalue, type, flags)
+#define SWIG_ConvertInstance(obj, pptr, type, flags)    SWIG_ConvertPtr(obj, pptr, type, flags)
+#define SWIG_NewInstanceObj(ptr, type, flags)           SWIG_NewPointerObj(ptr, type, flags)
 
 /* for C or C++ function pointers */
-#define SWIG_ConvertFunctionPtr(obj, pptr, type)        SWIG_Tcl_ConvertPtr(interp, obj, pptr, type, 0)
-#define SWIG_NewFunctionPtrObj(ptr, type)               SWIG_Tcl_NewPointerObj(ptr, type, 0)
+#define SWIG_ConvertFunctionPtr(obj, pptr, type)        SWIG_Python_ConvertFunctionPtr(obj, pptr, type)
+#define SWIG_NewFunctionPtrObj(ptr, type)               SWIG_Python_NewPointerObj(NULL, ptr, type, 0)
 
 /* for C++ member pointers, ie, member methods */
-#define SWIG_ConvertMember(obj, ptr, sz, ty)            SWIG_Tcl_ConvertPacked(interp,obj, ptr, sz, ty)
-#define SWIG_NewMemberObj(ptr, sz, type)                SWIG_Tcl_NewPackedObj(ptr, sz, type)
+#define SWIG_ConvertMember(obj, ptr, sz, ty)            SWIG_Python_ConvertPacked(obj, ptr, sz, ty)
+#define SWIG_NewMemberObj(ptr, sz, type)                SWIG_Python_NewPackedObj(ptr, sz, type)
 
 
 /* Runtime API */
 
-#define SWIG_GetModule(clientdata)                      SWIG_Tcl_GetModule((Tcl_Interp *) (clientdata))	     
-#define SWIG_SetModule(clientdata, pointer)          	SWIG_Tcl_SetModule((Tcl_Interp *) (clientdata), pointer)
+#define SWIG_GetModule(clientdata)                      SWIG_Python_GetModule(clientdata)
+#define SWIG_SetModule(clientdata, pointer)             SWIG_Python_SetModule(pointer)
+#define SWIG_NewClientData(obj)                         SwigPyClientData_New(obj)
 
+#define SWIG_SetErrorObj                                SWIG_Python_SetErrorObj                            
+#define SWIG_SetErrorMsg                        	SWIG_Python_SetErrorMsg				   
+#define SWIG_ErrorType(code)                    	SWIG_Python_ErrorType(code)                        
+#define SWIG_Error(code, msg)            		SWIG_Python_SetErrorMsg(SWIG_ErrorType(code), msg) 
+#define SWIG_fail                        		goto fail					   
+
+
+/* Runtime API implementation */
 
 /* Error manipulation */
 
-#define SWIG_ErrorType(code)                            SWIG_Tcl_ErrorType(code)                                      
-#define SWIG_Error(code, msg)            		SWIG_Tcl_SetErrorMsg(interp, SWIG_Tcl_ErrorType(code), msg)
-#define SWIG_fail                        		goto fail						    
+SWIGINTERN void 
+SWIG_Python_SetErrorObj(PyObject *errtype, PyObject *obj) {
+  SWIG_PYTHON_THREAD_BEGIN_BLOCK; 
+  PyErr_SetObject(errtype, obj);
+  Py_DECREF(obj);
+  SWIG_PYTHON_THREAD_END_BLOCK;
+}
 
+SWIGINTERN void 
+SWIG_Python_SetErrorMsg(PyObject *errtype, const char *msg) {
+  SWIG_PYTHON_THREAD_BEGIN_BLOCK;
+  PyErr_SetString(errtype, msg);
+  SWIG_PYTHON_THREAD_END_BLOCK;
+}
 
-/* Tcl-specific SWIG API */
+#define SWIG_Python_Raise(obj, type, desc)  SWIG_Python_SetErrorObj(SWIG_Python_ExceptionType(desc), obj)
 
-#define SWIG_Acquire(ptr)                               SWIG_Tcl_Acquire(ptr)                                     
-#define SWIG_MethodCommand                           	SWIG_Tcl_MethodCommand				       
-#define SWIG_Disown(ptr)                             	SWIG_Tcl_Disown(ptr)				       
-#define SWIG_ConvertPtrFromString(c, ptr, ty, flags) 	SWIG_Tcl_ConvertPtrFromString(interp, c, ptr, ty, flags)  
-#define SWIG_MakePtr(c, ptr, ty, flags)              	SWIG_Tcl_MakePtr(c, ptr, ty, flags)		       
-#define SWIG_PointerTypeFromString(c)                	SWIG_Tcl_PointerTypeFromString(c)			       
-#define SWIG_GetArgs                                 	SWIG_Tcl_GetArgs					       
-#define SWIG_GetConstantObj(key)                     	SWIG_Tcl_GetConstantObj(key)			       
-#define SWIG_ObjectConstructor                       	SWIG_Tcl_ObjectConstructor				       
-#define SWIG_Thisown(ptr)                            	SWIG_Tcl_Thisown(ptr)				       
-#define SWIG_ObjectDelete                            	SWIG_Tcl_ObjectDelete				       
+/* Set a constant value */
 
+#if defined(SWIGPYTHON_BUILTIN)
 
-#define SWIG_TCL_DECL_ARGS_2(arg1, arg2)                (Tcl_Interp *interp SWIGUNUSED, arg1, arg2)
-#define SWIG_TCL_CALL_ARGS_2(arg1, arg2)                (interp, arg1, arg2)
-/* -----------------------------------------------------------------------------
- * pointers/data manipulation
- * ----------------------------------------------------------------------------- */
+SWIGINTERN void
+SwigPyBuiltin_AddPublicSymbol(PyObject *seq, const char *key) {
+  PyObject *s = PyString_InternFromString(key);
+  PyList_Append(seq, s);
+  Py_DECREF(s);
+}
 
-/* For backward compatibility only */
-#define SWIG_POINTER_EXCEPTION  0
-#define SWIG_GetConstant        SWIG_GetConstantObj
-#define SWIG_Tcl_GetConstant    SWIG_Tcl_GetConstantObj
-
-#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 5
-#define SWIG_TCL_HASHTABLE_INIT {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+SWIGINTERN void
+SWIG_Python_SetConstant(PyObject *d, PyObject *public_interface, const char *name, PyObject *obj) {   
+#if PY_VERSION_HEX < 0x02030000
+  PyDict_SetItemString(d, (char *)name, obj);
 #else
-#define SWIG_TCL_HASHTABLE_INIT {0}
+  PyDict_SetItemString(d, name, obj);
+#endif
+  Py_DECREF(obj);
+  if (public_interface)
+    SwigPyBuiltin_AddPublicSymbol(public_interface, name);
+}
+
+#else
+
+SWIGINTERN void
+SWIG_Python_SetConstant(PyObject *d, const char *name, PyObject *obj) {   
+#if PY_VERSION_HEX < 0x02030000
+  PyDict_SetItemString(d, (char *)name, obj);
+#else
+  PyDict_SetItemString(d, name, obj);
+#endif
+  Py_DECREF(obj);                            
+}
+
 #endif
 
-#include "assert.h"
+/* Append a value to the result obj */
+
+SWIGINTERN PyObject*
+SWIG_Python_AppendOutput(PyObject* result, PyObject* obj) {
+#if !defined(SWIG_PYTHON_OUTPUT_TUPLE)
+  if (!result) {
+    result = obj;
+  } else if (result == Py_None) {
+    Py_DECREF(result);
+    result = obj;
+  } else {
+    if (!PyList_Check(result)) {
+      PyObject *o2 = result;
+      result = PyList_New(1);
+      PyList_SetItem(result, 0, o2);
+    }
+    PyList_Append(result,obj);
+    Py_DECREF(obj);
+  }
+  return result;
+#else
+  PyObject*   o2;
+  PyObject*   o3;
+  if (!result) {
+    result = obj;
+  } else if (result == Py_None) {
+    Py_DECREF(result);
+    result = obj;
+  } else {
+    if (!PyTuple_Check(result)) {
+      o2 = result;
+      result = PyTuple_New(1);
+      PyTuple_SET_ITEM(result, 0, o2);
+    }
+    o3 = PyTuple_New(1);
+    PyTuple_SET_ITEM(o3, 0, obj);
+    o2 = result;
+    result = PySequence_Concat(o2, o3);
+    Py_DECREF(o2);
+    Py_DECREF(o3);
+  }
+  return result;
+#endif
+}
+
+/* Unpack the argument tuple */
+
+SWIGINTERN Py_ssize_t
+SWIG_Python_UnpackTuple(PyObject *args, const char *name, Py_ssize_t min, Py_ssize_t max, PyObject **objs)
+{
+  if (!args) {
+    if (!min && !max) {
+      return 1;
+    } else {
+      PyErr_Format(PyExc_TypeError, "%s expected %s%d arguments, got none", 
+		   name, (min == max ? "" : "at least "), (int)min);
+      return 0;
+    }
+  }  
+  if (!PyTuple_Check(args)) {
+    if (min <= 1 && max >= 1) {
+      Py_ssize_t i;
+      objs[0] = args;
+      for (i = 1; i < max; ++i) {
+	objs[i] = 0;
+      }
+      return 2;
+    }
+    PyErr_SetString(PyExc_SystemError, "UnpackTuple() argument list is not a tuple");
+    return 0;
+  } else {
+    Py_ssize_t l = PyTuple_GET_SIZE(args);
+    if (l < min) {
+      PyErr_Format(PyExc_TypeError, "%s expected %s%d arguments, got %d", 
+		   name, (min == max ? "" : "at least "), (int)min, (int)l);
+      return 0;
+    } else if (l > max) {
+      PyErr_Format(PyExc_TypeError, "%s expected %s%d arguments, got %d", 
+		   name, (min == max ? "" : "at most "), (int)max, (int)l);
+      return 0;
+    } else {
+      Py_ssize_t i;
+      for (i = 0; i < l; ++i) {
+	objs[i] = PyTuple_GET_ITEM(args, i);
+      }
+      for (; l < max; ++l) {
+	objs[l] = 0;
+      }
+      return i + 1;
+    }    
+  }
+}
+
+/* A functor is a function object with one single object argument */
+#if PY_VERSION_HEX >= 0x02020000
+#define SWIG_Python_CallFunctor(functor, obj)	        PyObject_CallFunctionObjArgs(functor, obj, NULL);
+#else
+#define SWIG_Python_CallFunctor(functor, obj)	        PyObject_CallFunction(functor, "O", obj);
+#endif
+
+/*
+  Helper for static pointer initialization for both C and C++ code, for example
+  static PyObject *SWIG_STATIC_POINTER(MyVar) = NewSomething(...);
+*/
+#ifdef __cplusplus
+#define SWIG_STATIC_POINTER(var)  var
+#else
+#define SWIG_STATIC_POINTER(var)  var = 0; if (!var) var
+#endif
+
+/* -----------------------------------------------------------------------------
+ * Pointer declarations
+ * ----------------------------------------------------------------------------- */
+
+/* Flags for new pointer objects */
+#define SWIG_POINTER_NOSHADOW       (SWIG_POINTER_OWN      << 1)
+#define SWIG_POINTER_NEW            (SWIG_POINTER_NOSHADOW | SWIG_POINTER_OWN)
+
+#define SWIG_POINTER_IMPLICIT_CONV  (SWIG_POINTER_DISOWN   << 1)
+
+#define SWIG_BUILTIN_TP_INIT	    (SWIG_POINTER_OWN << 2)
+#define SWIG_BUILTIN_INIT	    (SWIG_BUILTIN_TP_INIT | SWIG_POINTER_OWN)
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Object support */
+/*  How to access Py_None */
+#if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)
+#  ifndef SWIG_PYTHON_NO_BUILD_NONE
+#    ifndef SWIG_PYTHON_BUILD_NONE
+#      define SWIG_PYTHON_BUILD_NONE
+#    endif
+#  endif
+#endif
 
-SWIGRUNTIME Tcl_HashTable*
-SWIG_Tcl_ObjectTable(void) {
-  static Tcl_HashTable  swigobjectTable;
-  static int            swigobjectTableinit = 0;
-  if (!swigobjectTableinit) {
-    Tcl_InitHashTable(&swigobjectTable, TCL_ONE_WORD_KEYS);
-    swigobjectTableinit = 1;
-  }
-  return &swigobjectTable;
+#ifdef SWIG_PYTHON_BUILD_NONE
+#  ifdef Py_None
+#   undef Py_None
+#   define Py_None SWIG_Py_None()
+#  endif
+SWIGRUNTIMEINLINE PyObject * 
+_SWIG_Py_None(void)
+{
+  PyObject *none = Py_BuildValue((char*)"");
+  Py_DECREF(none);
+  return none;
+}
+SWIGRUNTIME PyObject * 
+SWIG_Py_None(void)
+{
+  static PyObject *SWIG_STATIC_POINTER(none) = _SWIG_Py_None();
+  return none;
+}
+#endif
+
+/* The python void return value */
+
+SWIGRUNTIMEINLINE PyObject * 
+SWIG_Py_Void(void)
+{
+  PyObject *none = Py_None;
+  Py_INCREF(none);
+  return none;
 }
 
-/* Acquire ownership of a pointer */
+/* SwigPyClientData */
+
+typedef struct {
+  PyObject *klass;
+  PyObject *newraw;
+  PyObject *newargs;
+  PyObject *destroy;
+  int delargs;
+  int implicitconv;
+  PyTypeObject *pytype;
+} SwigPyClientData;
+
+SWIGRUNTIMEINLINE int 
+SWIG_Python_CheckImplicit(swig_type_info *ty)
+{
+  SwigPyClientData *data = (SwigPyClientData *)ty->clientdata;
+  return data ? data->implicitconv : 0;
+}
+
+SWIGRUNTIMEINLINE PyObject *
+SWIG_Python_ExceptionType(swig_type_info *desc) {
+  SwigPyClientData *data = desc ? (SwigPyClientData *) desc->clientdata : 0;
+  PyObject *klass = data ? data->klass : 0;
+  return (klass ? klass : PyExc_RuntimeError);
+}
+
+
+SWIGRUNTIME SwigPyClientData * 
+SwigPyClientData_New(PyObject* obj)
+{
+  if (!obj) {
+    return 0;
+  } else {
+    SwigPyClientData *data = (SwigPyClientData *)malloc(sizeof(SwigPyClientData));
+    /* the klass element */
+    data->klass = obj;
+    Py_INCREF(data->klass);
+    /* the newraw method and newargs arguments used to create a new raw instance */
+    if (PyClass_Check(obj)) {
+      data->newraw = 0;
+      data->newargs = obj;
+      Py_INCREF(obj);
+    } else {
+#if (PY_VERSION_HEX < 0x02020000)
+      data->newraw = 0;
+#else
+      data->newraw = PyObject_GetAttrString(data->klass, (char *)"__new__");
+#endif
+      if (data->newraw) {
+	Py_INCREF(data->newraw);
+	data->newargs = PyTuple_New(1);
+	PyTuple_SetItem(data->newargs, 0, obj);
+      } else {
+	data->newargs = obj;
+      }
+      Py_INCREF(data->newargs);
+    }
+    /* the destroy method, aka as the C++ delete method */
+    data->destroy = PyObject_GetAttrString(data->klass, (char *)"__swig_destroy__");
+    if (PyErr_Occurred()) {
+      PyErr_Clear();
+      data->destroy = 0;
+    }
+    if (data->destroy) {
+      int flags;
+      Py_INCREF(data->destroy);
+      flags = PyCFunction_GET_FLAGS(data->destroy);
+#ifdef METH_O
+      data->delargs = !(flags & (METH_O));
+#else
+      data->delargs = 0;
+#endif
+    } else {
+      data->delargs = 0;
+    }
+    data->implicitconv = 0;
+    data->pytype = 0;
+    return data;
+  }
+}
+
+SWIGRUNTIME void 
+SwigPyClientData_Del(SwigPyClientData *data) {
+  Py_XDECREF(data->newraw);
+  Py_XDECREF(data->newargs);
+  Py_XDECREF(data->destroy);
+}
+
+/* =============== SwigPyObject =====================*/
+
+typedef struct {
+  PyObject_HEAD
+  void *ptr;
+  swig_type_info *ty;
+  int own;
+  PyObject *next;
+#ifdef SWIGPYTHON_BUILTIN
+  PyObject *dict;
+#endif
+} SwigPyObject;
+
+
+#ifdef SWIGPYTHON_BUILTIN
+
+SWIGRUNTIME PyObject *
+SwigPyObject_get___dict__(PyObject *v, PyObject *SWIGUNUSEDPARM(args))
+{
+  SwigPyObject *sobj = (SwigPyObject *)v;
+
+  if (!sobj->dict)
+    sobj->dict = PyDict_New();
+
+  Py_INCREF(sobj->dict);
+  return sobj->dict;
+}
+
+#endif
+
+SWIGRUNTIME PyObject *
+SwigPyObject_long(SwigPyObject *v)
+{
+  return PyLong_FromVoidPtr(v->ptr);
+}
+
+SWIGRUNTIME PyObject *
+SwigPyObject_format(const char* fmt, SwigPyObject *v)
+{
+  PyObject *res = NULL;
+  PyObject *args = PyTuple_New(1);
+  if (args) {
+    if (PyTuple_SetItem(args, 0, SwigPyObject_long(v)) == 0) {
+      PyObject *ofmt = SWIG_Python_str_FromChar(fmt);
+      if (ofmt) {
+#if PY_VERSION_HEX >= 0x03000000
+	res = PyUnicode_Format(ofmt,args);
+#else
+	res = PyString_Format(ofmt,args);
+#endif
+	Py_DECREF(ofmt);
+      }
+      Py_DECREF(args);
+    }
+  }
+  return res;
+}
+
+SWIGRUNTIME PyObject *
+SwigPyObject_oct(SwigPyObject *v)
+{
+  return SwigPyObject_format("%o",v);
+}
+
+SWIGRUNTIME PyObject *
+SwigPyObject_hex(SwigPyObject *v)
+{
+  return SwigPyObject_format("%x",v);
+}
+
+SWIGRUNTIME PyObject *
+#ifdef METH_NOARGS
+SwigPyObject_repr(SwigPyObject *v)
+#else
+SwigPyObject_repr(SwigPyObject *v, PyObject *args)
+#endif
+{
+  const char *name = SWIG_TypePrettyName(v->ty);
+  PyObject *repr = SWIG_Python_str_FromFormat("<Swig Object of type '%s' at %p>", (name ? name : "unknown"), (void *)v);
+  if (v->next) {
+# ifdef METH_NOARGS
+    PyObject *nrep = SwigPyObject_repr((SwigPyObject *)v->next);
+# else
+    PyObject *nrep = SwigPyObject_repr((SwigPyObject *)v->next, args);
+# endif
+# if PY_VERSION_HEX >= 0x03000000
+    PyObject *joined = PyUnicode_Concat(repr, nrep);
+    Py_DecRef(repr);
+    Py_DecRef(nrep);
+    repr = joined;
+# else
+    PyString_ConcatAndDel(&repr,nrep);
+# endif
+  }
+  return repr;  
+}
+
+SWIGRUNTIME int
+SwigPyObject_compare(SwigPyObject *v, SwigPyObject *w)
+{
+  void *i = v->ptr;
+  void *j = w->ptr;
+  return (i < j) ? -1 : ((i > j) ? 1 : 0);
+}
+
+/* Added for Python 3.x, would it also be useful for Python 2.x? */
+SWIGRUNTIME PyObject*
+SwigPyObject_richcompare(SwigPyObject *v, SwigPyObject *w, int op)
+{
+  PyObject* res;
+  if( op != Py_EQ && op != Py_NE ) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+  res = PyBool_FromLong( (SwigPyObject_compare(v, w)==0) == (op == Py_EQ) ? 1 : 0);
+  return res;  
+}
+
+
+SWIGRUNTIME PyTypeObject* SwigPyObject_TypeOnce(void);
+
+#ifdef SWIGPYTHON_BUILTIN
+static swig_type_info *SwigPyObject_stype = 0;
+SWIGRUNTIME PyTypeObject*
+SwigPyObject_type(void) {
+    SwigPyClientData *cd;
+    assert(SwigPyObject_stype);
+    cd = (SwigPyClientData*) SwigPyObject_stype->clientdata;
+    assert(cd);
+    assert(cd->pytype);
+    return cd->pytype;
+}
+#else
+SWIGRUNTIME PyTypeObject*
+SwigPyObject_type(void) {
+  static PyTypeObject *SWIG_STATIC_POINTER(type) = SwigPyObject_TypeOnce();
+  return type;
+}
+#endif
+
+SWIGRUNTIMEINLINE int
+SwigPyObject_Check(PyObject *op) {
+#ifdef SWIGPYTHON_BUILTIN
+  PyTypeObject *target_tp = SwigPyObject_type();
+  if (PyType_IsSubtype(op->ob_type, target_tp))
+    return 1;
+  return (strcmp(op->ob_type->tp_name, "SwigPyObject") == 0);
+#else
+  return (Py_TYPE(op) == SwigPyObject_type())
+    || (strcmp(Py_TYPE(op)->tp_name,"SwigPyObject") == 0);
+#endif
+}
+
+SWIGRUNTIME PyObject *
+SwigPyObject_New(void *ptr, swig_type_info *ty, int own);
+
 SWIGRUNTIME void
-SWIG_Tcl_Acquire(void *ptr) {
-  int newobj;
-  Tcl_CreateHashEntry(SWIG_Tcl_ObjectTable(), (char *) ptr, &newobj);
+SwigPyObject_dealloc(PyObject *v)
+{
+  SwigPyObject *sobj = (SwigPyObject *) v;
+  PyObject *next = sobj->next;
+  if (sobj->own == SWIG_POINTER_OWN) {
+    swig_type_info *ty = sobj->ty;
+    SwigPyClientData *data = ty ? (SwigPyClientData *) ty->clientdata : 0;
+    PyObject *destroy = data ? data->destroy : 0;
+    if (destroy) {
+      /* destroy is always a VARARGS method */
+      PyObject *res;
+
+      /* PyObject_CallFunction() has the potential to silently drop
+         the active active exception.  In cases of unnamed temporary
+         variable or where we just finished iterating over a generator
+         StopIteration will be active right now, and this needs to
+         remain true upon return from SwigPyObject_dealloc.  So save
+         and restore. */
+      
+      PyObject *val = NULL, *type = NULL, *tb = NULL;
+      PyErr_Fetch(&val, &type, &tb);
+
+      if (data->delargs) {
+        /* we need to create a temporary object to carry the destroy operation */
+        PyObject *tmp = SwigPyObject_New(sobj->ptr, ty, 0);
+        res = SWIG_Python_CallFunctor(destroy, tmp);
+        Py_DECREF(tmp);
+      } else {
+        PyCFunction meth = PyCFunction_GET_FUNCTION(destroy);
+        PyObject *mself = PyCFunction_GET_SELF(destroy);
+        res = ((*meth)(mself, v));
+      }
+      if (!res)
+        PyErr_WriteUnraisable(destroy);
+
+      PyErr_Restore(val, type, tb);
+
+      Py_XDECREF(res);
+    } 
+#if !defined(SWIG_PYTHON_SILENT_MEMLEAK)
+    else {
+      const char *name = SWIG_TypePrettyName(ty);
+      printf("swig/python detected a memory leak of type '%s', no destructor found.\n", (name ? name : "unknown"));
+    }
+#endif
+  } 
+  Py_XDECREF(next);
+  PyObject_DEL(v);
 }
 
-SWIGRUNTIME int
-SWIG_Tcl_Thisown(void *ptr) {
-  if (Tcl_FindHashEntry(SWIG_Tcl_ObjectTable(), (char *) ptr)) {
-    return 1;
+SWIGRUNTIME PyObject* 
+SwigPyObject_append(PyObject* v, PyObject* next)
+{
+  SwigPyObject *sobj = (SwigPyObject *) v;
+#ifndef METH_O
+  PyObject *tmp = 0;
+  if (!PyArg_ParseTuple(next,(char *)"O:append", &tmp)) return NULL;
+  next = tmp;
+#endif
+  if (!SwigPyObject_Check(next)) {
+    PyErr_SetString(PyExc_TypeError, "Attempt to append a non SwigPyObject");
+    return NULL;
   }
-  return 0;
+  sobj->next = next;
+  Py_INCREF(next);
+  return SWIG_Py_Void();
 }
 
-/* Disown a pointer.  Returns 1 if we owned it to begin with */
+SWIGRUNTIME PyObject* 
+#ifdef METH_NOARGS
+SwigPyObject_next(PyObject* v)
+#else
+SwigPyObject_next(PyObject* v, PyObject *SWIGUNUSEDPARM(args))
+#endif
+{
+  SwigPyObject *sobj = (SwigPyObject *) v;
+  if (sobj->next) {    
+    Py_INCREF(sobj->next);
+    return sobj->next;
+  } else {
+    return SWIG_Py_Void();
+  }
+}
+
+SWIGINTERN PyObject*
+#ifdef METH_NOARGS
+SwigPyObject_disown(PyObject *v)
+#else
+SwigPyObject_disown(PyObject* v, PyObject *SWIGUNUSEDPARM(args))
+#endif
+{
+  SwigPyObject *sobj = (SwigPyObject *)v;
+  sobj->own = 0;
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject*
+#ifdef METH_NOARGS
+SwigPyObject_acquire(PyObject *v)
+#else
+SwigPyObject_acquire(PyObject* v, PyObject *SWIGUNUSEDPARM(args))
+#endif
+{
+  SwigPyObject *sobj = (SwigPyObject *)v;
+  sobj->own = SWIG_POINTER_OWN;
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject*
+SwigPyObject_own(PyObject *v, PyObject *args)
+{
+  PyObject *val = 0;
+#if (PY_VERSION_HEX < 0x02020000)
+  if (!PyArg_ParseTuple(args,(char *)"|O:own",&val))
+#elif (PY_VERSION_HEX < 0x02050000)
+  if (!PyArg_UnpackTuple(args, (char *)"own", 0, 1, &val)) 
+#else
+  if (!PyArg_UnpackTuple(args, "own", 0, 1, &val)) 
+#endif
+    {
+      return NULL;
+    } 
+  else
+    {
+      SwigPyObject *sobj = (SwigPyObject *)v;
+      PyObject *obj = PyBool_FromLong(sobj->own);
+      if (val) {
+#ifdef METH_NOARGS
+	if (PyObject_IsTrue(val)) {
+	  SwigPyObject_acquire(v);
+	} else {
+	  SwigPyObject_disown(v);
+	}
+#else
+	if (PyObject_IsTrue(val)) {
+	  SwigPyObject_acquire(v,args);
+	} else {
+	  SwigPyObject_disown(v,args);
+	}
+#endif
+      } 
+      return obj;
+    }
+}
+
+#ifdef METH_O
+static PyMethodDef
+swigobject_methods[] = {
+  {(char *)"disown",  (PyCFunction)SwigPyObject_disown,  METH_NOARGS,  (char *)"releases ownership of the pointer"},
+  {(char *)"acquire", (PyCFunction)SwigPyObject_acquire, METH_NOARGS,  (char *)"acquires ownership of the pointer"},
+  {(char *)"own",     (PyCFunction)SwigPyObject_own,     METH_VARARGS, (char *)"returns/sets ownership of the pointer"},
+  {(char *)"append",  (PyCFunction)SwigPyObject_append,  METH_O,       (char *)"appends another 'this' object"},
+  {(char *)"next",    (PyCFunction)SwigPyObject_next,    METH_NOARGS,  (char *)"returns the next 'this' object"},
+  {(char *)"__repr__",(PyCFunction)SwigPyObject_repr,    METH_NOARGS,  (char *)"returns object representation"},
+  {0, 0, 0, 0}  
+};
+#else
+static PyMethodDef
+swigobject_methods[] = {
+  {(char *)"disown",  (PyCFunction)SwigPyObject_disown,  METH_VARARGS,  (char *)"releases ownership of the pointer"},
+  {(char *)"acquire", (PyCFunction)SwigPyObject_acquire, METH_VARARGS,  (char *)"acquires ownership of the pointer"},
+  {(char *)"own",     (PyCFunction)SwigPyObject_own,     METH_VARARGS,  (char *)"returns/sets ownership of the pointer"},
+  {(char *)"append",  (PyCFunction)SwigPyObject_append,  METH_VARARGS,  (char *)"appends another 'this' object"},
+  {(char *)"next",    (PyCFunction)SwigPyObject_next,    METH_VARARGS,  (char *)"returns the next 'this' object"},
+  {(char *)"__repr__",(PyCFunction)SwigPyObject_repr,   METH_VARARGS,  (char *)"returns object representation"},
+  {0, 0, 0, 0}  
+};
+#endif
+
+#if PY_VERSION_HEX < 0x02020000
+SWIGINTERN PyObject *
+SwigPyObject_getattr(SwigPyObject *sobj,char *name)
+{
+  return Py_FindMethod(swigobject_methods, (PyObject *)sobj, name);
+}
+#endif
+
+SWIGRUNTIME PyTypeObject*
+SwigPyObject_TypeOnce(void) {
+  static char swigobject_doc[] = "Swig object carries a C/C++ instance pointer";
+
+  static PyNumberMethods SwigPyObject_as_number = {
+    (binaryfunc)0, /*nb_add*/
+    (binaryfunc)0, /*nb_subtract*/
+    (binaryfunc)0, /*nb_multiply*/
+    /* nb_divide removed in Python 3 */
+#if PY_VERSION_HEX < 0x03000000
+    (binaryfunc)0, /*nb_divide*/
+#endif
+    (binaryfunc)0, /*nb_remainder*/
+    (binaryfunc)0, /*nb_divmod*/
+    (ternaryfunc)0,/*nb_power*/
+    (unaryfunc)0,  /*nb_negative*/
+    (unaryfunc)0,  /*nb_positive*/
+    (unaryfunc)0,  /*nb_absolute*/
+    (inquiry)0,    /*nb_nonzero*/
+    0,		   /*nb_invert*/
+    0,		   /*nb_lshift*/
+    0,		   /*nb_rshift*/
+    0,		   /*nb_and*/
+    0,		   /*nb_xor*/
+    0,		   /*nb_or*/
+#if PY_VERSION_HEX < 0x03000000
+    0,   /*nb_coerce*/
+#endif
+    (unaryfunc)SwigPyObject_long, /*nb_int*/
+#if PY_VERSION_HEX < 0x03000000
+    (unaryfunc)SwigPyObject_long, /*nb_long*/
+#else
+    0, /*nb_reserved*/
+#endif
+    (unaryfunc)0,                 /*nb_float*/
+#if PY_VERSION_HEX < 0x03000000
+    (unaryfunc)SwigPyObject_oct,  /*nb_oct*/
+    (unaryfunc)SwigPyObject_hex,  /*nb_hex*/
+#endif
+#if PY_VERSION_HEX >= 0x03050000 /* 3.5 */
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 /* nb_inplace_add -> nb_inplace_matrix_multiply */
+#elif PY_VERSION_HEX >= 0x03000000 /* 3.0 */
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 /* nb_inplace_add -> nb_index, nb_inplace_divide removed */
+#elif PY_VERSION_HEX >= 0x02050000 /* 2.5.0 */
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 /* nb_inplace_add -> nb_index */
+#elif PY_VERSION_HEX >= 0x02020000 /* 2.2.0 */
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 /* nb_inplace_add -> nb_inplace_true_divide */
+#elif PY_VERSION_HEX >= 0x02000000 /* 2.0.0 */
+    0,0,0,0,0,0,0,0,0,0,0 /* nb_inplace_add -> nb_inplace_or */
+#endif
+  };
+
+  static PyTypeObject swigpyobject_type;
+  static int type_init = 0;
+  if (!type_init) {
+    const PyTypeObject tmp = {
+#if PY_VERSION_HEX >= 0x03000000
+      PyVarObject_HEAD_INIT(NULL, 0)
+#else
+      PyObject_HEAD_INIT(NULL)
+      0,                                    /* ob_size */
+#endif
+      (char *)"SwigPyObject",               /* tp_name */
+      sizeof(SwigPyObject),                 /* tp_basicsize */
+      0,                                    /* tp_itemsize */
+      (destructor)SwigPyObject_dealloc,     /* tp_dealloc */
+      0,                                    /* tp_print */
+#if PY_VERSION_HEX < 0x02020000
+      (getattrfunc)SwigPyObject_getattr,    /* tp_getattr */
+#else
+      (getattrfunc)0,                       /* tp_getattr */
+#endif
+      (setattrfunc)0,                       /* tp_setattr */
+#if PY_VERSION_HEX >= 0x03000000
+      0, /* tp_reserved in 3.0.1, tp_compare in 3.0.0 but not used */
+#else
+      (cmpfunc)SwigPyObject_compare,        /* tp_compare */
+#endif
+      (reprfunc)SwigPyObject_repr,          /* tp_repr */
+      &SwigPyObject_as_number,              /* tp_as_number */
+      0,                                    /* tp_as_sequence */
+      0,                                    /* tp_as_mapping */
+      (hashfunc)0,                          /* tp_hash */
+      (ternaryfunc)0,                       /* tp_call */
+      0,                                    /* tp_str */
+      PyObject_GenericGetAttr,              /* tp_getattro */
+      0,                                    /* tp_setattro */
+      0,                                    /* tp_as_buffer */
+      Py_TPFLAGS_DEFAULT,                   /* tp_flags */
+      swigobject_doc,                       /* tp_doc */
+      0,                                    /* tp_traverse */
+      0,                                    /* tp_clear */
+      (richcmpfunc)SwigPyObject_richcompare,/* tp_richcompare */
+      0,                                    /* tp_weaklistoffset */
+#if PY_VERSION_HEX >= 0x02020000
+      0,                                    /* tp_iter */
+      0,                                    /* tp_iternext */
+      swigobject_methods,                   /* tp_methods */
+      0,                                    /* tp_members */
+      0,                                    /* tp_getset */
+      0,                                    /* tp_base */
+      0,                                    /* tp_dict */
+      0,                                    /* tp_descr_get */
+      0,                                    /* tp_descr_set */
+      0,                                    /* tp_dictoffset */
+      0,                                    /* tp_init */
+      0,                                    /* tp_alloc */
+      0,                                    /* tp_new */
+      0,                                    /* tp_free */
+      0,                                    /* tp_is_gc */
+      0,                                    /* tp_bases */
+      0,                                    /* tp_mro */
+      0,                                    /* tp_cache */
+      0,                                    /* tp_subclasses */
+      0,                                    /* tp_weaklist */
+#endif
+#if PY_VERSION_HEX >= 0x02030000
+      0,                                    /* tp_del */
+#endif
+#if PY_VERSION_HEX >= 0x02060000
+      0,                                    /* tp_version_tag */
+#endif
+#if PY_VERSION_HEX >= 0x03040000
+      0,                                    /* tp_finalize */
+#endif
+#ifdef COUNT_ALLOCS
+      0,                                    /* tp_allocs */
+      0,                                    /* tp_frees */
+      0,                                    /* tp_maxalloc */
+#if PY_VERSION_HEX >= 0x02050000
+      0,                                    /* tp_prev */
+#endif
+      0                                     /* tp_next */
+#endif
+    };
+    swigpyobject_type = tmp;
+    type_init = 1;
+#if PY_VERSION_HEX < 0x02020000
+    swigpyobject_type.ob_type = &PyType_Type;
+#else
+    if (PyType_Ready(&swigpyobject_type) < 0)
+      return NULL;
+#endif
+  }
+  return &swigpyobject_type;
+}
+
+SWIGRUNTIME PyObject *
+SwigPyObject_New(void *ptr, swig_type_info *ty, int own)
+{
+  SwigPyObject *sobj = PyObject_NEW(SwigPyObject, SwigPyObject_type());
+  if (sobj) {
+    sobj->ptr  = ptr;
+    sobj->ty   = ty;
+    sobj->own  = own;
+    sobj->next = 0;
+  }
+  return (PyObject *)sobj;
+}
+
+/* -----------------------------------------------------------------------------
+ * Implements a simple Swig Packed type, and use it instead of string
+ * ----------------------------------------------------------------------------- */
+
+typedef struct {
+  PyObject_HEAD
+  void *pack;
+  swig_type_info *ty;
+  size_t size;
+} SwigPyPacked;
+
 SWIGRUNTIME int
-SWIG_Tcl_Disown(void *ptr) {
-  Tcl_HashEntry *entryPtr = Tcl_FindHashEntry(SWIG_Tcl_ObjectTable(), (char *) ptr);
-  if (entryPtr) {
-    Tcl_DeleteHashEntry(entryPtr);
-    return 1;
+SwigPyPacked_print(SwigPyPacked *v, FILE *fp, int SWIGUNUSEDPARM(flags))
+{
+  char result[SWIG_BUFFER_SIZE];
+  fputs("<Swig Packed ", fp); 
+  if (SWIG_PackDataName(result, v->pack, v->size, 0, sizeof(result))) {
+    fputs("at ", fp); 
+    fputs(result, fp); 
+  }
+  fputs(v->ty->name,fp); 
+  fputs(">", fp);
+  return 0; 
+}
+  
+SWIGRUNTIME PyObject *
+SwigPyPacked_repr(SwigPyPacked *v)
+{
+  char result[SWIG_BUFFER_SIZE];
+  if (SWIG_PackDataName(result, v->pack, v->size, 0, sizeof(result))) {
+    return SWIG_Python_str_FromFormat("<Swig Packed at %s%s>", result, v->ty->name);
+  } else {
+    return SWIG_Python_str_FromFormat("<Swig Packed %s>", v->ty->name);
+  }  
+}
+
+SWIGRUNTIME PyObject *
+SwigPyPacked_str(SwigPyPacked *v)
+{
+  char result[SWIG_BUFFER_SIZE];
+  if (SWIG_PackDataName(result, v->pack, v->size, 0, sizeof(result))){
+    return SWIG_Python_str_FromFormat("%s%s", result, v->ty->name);
+  } else {
+    return SWIG_Python_str_FromChar(v->ty->name);
+  }  
+}
+
+SWIGRUNTIME int
+SwigPyPacked_compare(SwigPyPacked *v, SwigPyPacked *w)
+{
+  size_t i = v->size;
+  size_t j = w->size;
+  int s = (i < j) ? -1 : ((i > j) ? 1 : 0);
+  return s ? s : strncmp((char *)v->pack, (char *)w->pack, 2*v->size);
+}
+
+SWIGRUNTIME PyTypeObject* SwigPyPacked_TypeOnce(void);
+
+SWIGRUNTIME PyTypeObject*
+SwigPyPacked_type(void) {
+  static PyTypeObject *SWIG_STATIC_POINTER(type) = SwigPyPacked_TypeOnce();
+  return type;
+}
+
+SWIGRUNTIMEINLINE int
+SwigPyPacked_Check(PyObject *op) {
+  return ((op)->ob_type == SwigPyPacked_TypeOnce()) 
+    || (strcmp((op)->ob_type->tp_name,"SwigPyPacked") == 0);
+}
+
+SWIGRUNTIME void
+SwigPyPacked_dealloc(PyObject *v)
+{
+  if (SwigPyPacked_Check(v)) {
+    SwigPyPacked *sobj = (SwigPyPacked *) v;
+    free(sobj->pack);
+  }
+  PyObject_DEL(v);
+}
+
+SWIGRUNTIME PyTypeObject*
+SwigPyPacked_TypeOnce(void) {
+  static char swigpacked_doc[] = "Swig object carries a C/C++ instance pointer";
+  static PyTypeObject swigpypacked_type;
+  static int type_init = 0;
+  if (!type_init) {
+    const PyTypeObject tmp = {
+#if PY_VERSION_HEX>=0x03000000
+      PyVarObject_HEAD_INIT(NULL, 0)
+#else
+      PyObject_HEAD_INIT(NULL)
+      0,                                    /* ob_size */
+#endif
+      (char *)"SwigPyPacked",               /* tp_name */
+      sizeof(SwigPyPacked),                 /* tp_basicsize */
+      0,                                    /* tp_itemsize */
+      (destructor)SwigPyPacked_dealloc,     /* tp_dealloc */
+      (printfunc)SwigPyPacked_print,        /* tp_print */
+      (getattrfunc)0,                       /* tp_getattr */
+      (setattrfunc)0,                       /* tp_setattr */
+#if PY_VERSION_HEX>=0x03000000
+      0, /* tp_reserved in 3.0.1 */
+#else
+      (cmpfunc)SwigPyPacked_compare,        /* tp_compare */
+#endif
+      (reprfunc)SwigPyPacked_repr,          /* tp_repr */
+      0,                                    /* tp_as_number */
+      0,                                    /* tp_as_sequence */
+      0,                                    /* tp_as_mapping */
+      (hashfunc)0,                          /* tp_hash */
+      (ternaryfunc)0,                       /* tp_call */
+      (reprfunc)SwigPyPacked_str,           /* tp_str */
+      PyObject_GenericGetAttr,              /* tp_getattro */
+      0,                                    /* tp_setattro */
+      0,                                    /* tp_as_buffer */
+      Py_TPFLAGS_DEFAULT,                   /* tp_flags */
+      swigpacked_doc,                       /* tp_doc */
+      0,                                    /* tp_traverse */
+      0,                                    /* tp_clear */
+      0,                                    /* tp_richcompare */
+      0,                                    /* tp_weaklistoffset */
+#if PY_VERSION_HEX >= 0x02020000
+      0,                                    /* tp_iter */
+      0,                                    /* tp_iternext */
+      0,                                    /* tp_methods */
+      0,                                    /* tp_members */
+      0,                                    /* tp_getset */
+      0,                                    /* tp_base */
+      0,                                    /* tp_dict */
+      0,                                    /* tp_descr_get */
+      0,                                    /* tp_descr_set */
+      0,                                    /* tp_dictoffset */
+      0,                                    /* tp_init */
+      0,                                    /* tp_alloc */
+      0,                                    /* tp_new */
+      0,                                    /* tp_free */
+      0,                                    /* tp_is_gc */
+      0,                                    /* tp_bases */
+      0,                                    /* tp_mro */
+      0,                                    /* tp_cache */
+      0,                                    /* tp_subclasses */
+      0,                                    /* tp_weaklist */
+#endif
+#if PY_VERSION_HEX >= 0x02030000
+      0,                                    /* tp_del */
+#endif
+#if PY_VERSION_HEX >= 0x02060000
+      0,                                    /* tp_version_tag */
+#endif
+#if PY_VERSION_HEX >= 0x03040000
+      0,                                    /* tp_finalize */
+#endif
+#ifdef COUNT_ALLOCS
+      0,                                    /* tp_allocs */
+      0,                                    /* tp_frees */
+      0,                                    /* tp_maxalloc */
+#if PY_VERSION_HEX >= 0x02050000
+      0,                                    /* tp_prev */
+#endif
+      0                                     /* tp_next */
+#endif
+    };
+    swigpypacked_type = tmp;
+    type_init = 1;
+#if PY_VERSION_HEX < 0x02020000
+    swigpypacked_type.ob_type = &PyType_Type;
+#else
+    if (PyType_Ready(&swigpypacked_type) < 0)
+      return NULL;
+#endif
+  }
+  return &swigpypacked_type;
+}
+
+SWIGRUNTIME PyObject *
+SwigPyPacked_New(void *ptr, size_t size, swig_type_info *ty)
+{
+  SwigPyPacked *sobj = PyObject_NEW(SwigPyPacked, SwigPyPacked_type());
+  if (sobj) {
+    void *pack = malloc(size);
+    if (pack) {
+      memcpy(pack, ptr, size);
+      sobj->pack = pack;
+      sobj->ty   = ty;
+      sobj->size = size;
+    } else {
+      PyObject_DEL((PyObject *) sobj);
+      sobj = 0;
+    }
+  }
+  return (PyObject *) sobj;
+}
+
+SWIGRUNTIME swig_type_info *
+SwigPyPacked_UnpackData(PyObject *obj, void *ptr, size_t size)
+{
+  if (SwigPyPacked_Check(obj)) {
+    SwigPyPacked *sobj = (SwigPyPacked *)obj;
+    if (sobj->size != size) return 0;
+    memcpy(ptr, sobj->pack, size);
+    return sobj->ty;
+  } else {
+    return 0;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+ * pointers/data manipulation
+ * ----------------------------------------------------------------------------- */
+
+SWIGRUNTIMEINLINE PyObject *
+_SWIG_This(void)
+{
+    return SWIG_Python_str_FromChar("this");
+}
+
+static PyObject *swig_this = NULL;
+
+SWIGRUNTIME PyObject *
+SWIG_This(void)
+{
+  if (swig_this == NULL)
+    swig_this = _SWIG_This();
+  return swig_this;
+}
+
+/* #define SWIG_PYTHON_SLOW_GETSET_THIS */
+
+/* TODO: I don't know how to implement the fast getset in Python 3 right now */
+#if PY_VERSION_HEX>=0x03000000
+#define SWIG_PYTHON_SLOW_GETSET_THIS 
+#endif
+
+SWIGRUNTIME SwigPyObject *
+SWIG_Python_GetSwigThis(PyObject *pyobj) 
+{
+  PyObject *obj;
+
+  if (SwigPyObject_Check(pyobj))
+    return (SwigPyObject *) pyobj;
+
+#ifdef SWIGPYTHON_BUILTIN
+  (void)obj;
+# ifdef PyWeakref_CheckProxy
+  if (PyWeakref_CheckProxy(pyobj)) {
+    pyobj = PyWeakref_GET_OBJECT(pyobj);
+    if (pyobj && SwigPyObject_Check(pyobj))
+      return (SwigPyObject*) pyobj;
+  }
+# endif
+  return NULL;
+#else
+
+  obj = 0;
+
+#if (!defined(SWIG_PYTHON_SLOW_GETSET_THIS) && (PY_VERSION_HEX >= 0x02030000))
+  if (PyInstance_Check(pyobj)) {
+    obj = _PyInstance_Lookup(pyobj, SWIG_This());      
+  } else {
+    PyObject **dictptr = _PyObject_GetDictPtr(pyobj);
+    if (dictptr != NULL) {
+      PyObject *dict = *dictptr;
+      obj = dict ? PyDict_GetItem(dict, SWIG_This()) : 0;
+    } else {
+#ifdef PyWeakref_CheckProxy
+      if (PyWeakref_CheckProxy(pyobj)) {
+	PyObject *wobj = PyWeakref_GET_OBJECT(pyobj);
+	return wobj ? SWIG_Python_GetSwigThis(wobj) : 0;
+      }
+#endif
+      obj = PyObject_GetAttr(pyobj,SWIG_This());
+      if (obj) {
+	Py_DECREF(obj);
+      } else {
+	if (PyErr_Occurred()) PyErr_Clear();
+	return 0;
+      }
+    }
+  }
+#else
+  obj = PyObject_GetAttr(pyobj,SWIG_This());
+  if (obj) {
+    Py_DECREF(obj);
+  } else {
+    if (PyErr_Occurred()) PyErr_Clear();
+    return 0;
+  }
+#endif
+  if (obj && !SwigPyObject_Check(obj)) {
+    /* a PyObject is called 'this', try to get the 'real this'
+       SwigPyObject from it */ 
+    return SWIG_Python_GetSwigThis(obj);
+  }
+  return (SwigPyObject *)obj;
+#endif
+}
+
+/* Acquire a pointer value */
+
+SWIGRUNTIME int
+SWIG_Python_AcquirePtr(PyObject *obj, int own) {
+  if (own == SWIG_POINTER_OWN) {
+    SwigPyObject *sobj = SWIG_Python_GetSwigThis(obj);
+    if (sobj) {
+      int oldown = sobj->own;
+      sobj->own = own;
+      return oldown;
+    }
   }
   return 0;
 }
 
 /* Convert a pointer value */
+
 SWIGRUNTIME int
-SWIG_Tcl_ConvertPtrFromString(Tcl_Interp *interp, const char *c, void **ptr, swig_type_info *ty, int flags) {
-  swig_cast_info *tc;
-  /* Pointer values must start with leading underscore */
-  while (*c != '_') {
-    *ptr = (void *) 0;
-    if (strcmp(c,"NULL") == 0) return SWIG_OK;
+SWIG_Python_ConvertPtrAndOwn(PyObject *obj, void **ptr, swig_type_info *ty, int flags, int *own) {
+  int res;
+  SwigPyObject *sobj;
+  int implicit_conv = (flags & SWIG_POINTER_IMPLICIT_CONV) != 0;
 
-    /* Empty string: not a pointer */
-    if (*c == 0) return SWIG_ERROR; 
+  if (!obj)
+    return SWIG_ERROR;
+  if (obj == Py_None && !implicit_conv) {
+    if (ptr)
+      *ptr = 0;
+    return SWIG_OK;
+  }
 
-    /* Hmmm. It could be an object name. */
+  res = SWIG_ERROR;
 
-    /* Check if this is a command at all. Prevents <c> cget -this         */
-    /* from being called when c is not a command, firing the unknown proc */
-    if (Tcl_VarEval(interp,"info commands ", c, (char *) NULL) == TCL_OK) {
-      Tcl_Obj *result = Tcl_GetObjResult(interp);
-      if (*(Tcl_GetStringFromObj(result, NULL)) == 0) {
-        /* It's not a command, so it can't be a pointer */
-        Tcl_ResetResult(interp);
+  sobj = SWIG_Python_GetSwigThis(obj);
+  if (own)
+    *own = 0;
+  while (sobj) {
+    void *vptr = sobj->ptr;
+    if (ty) {
+      swig_type_info *to = sobj->ty;
+      if (to == ty) {
+        /* no type cast needed */
+        if (ptr) *ptr = vptr;
+        break;
+      } else {
+        swig_cast_info *tc = SWIG_TypeCheck(to->name,ty);
+        if (!tc) {
+          sobj = (SwigPyObject *)sobj->next;
+        } else {
+          if (ptr) {
+            int newmemory = 0;
+            *ptr = SWIG_TypeCast(tc,vptr,&newmemory);
+            if (newmemory == SWIG_CAST_NEW_MEMORY) {
+              assert(own); /* badly formed typemap which will lead to a memory leak - it must set and use own to delete *ptr */
+              if (own)
+                *own = *own | SWIG_CAST_NEW_MEMORY;
+            }
+          }
+          break;
+        }
+      }
+    } else {
+      if (ptr) *ptr = vptr;
+      break;
+    }
+  }
+  if (sobj) {
+    if (own)
+      *own = *own | sobj->own;
+    if (flags & SWIG_POINTER_DISOWN) {
+      sobj->own = 0;
+    }
+    res = SWIG_OK;
+  } else {
+    if (implicit_conv) {
+      SwigPyClientData *data = ty ? (SwigPyClientData *) ty->clientdata : 0;
+      if (data && !data->implicitconv) {
+        PyObject *klass = data->klass;
+        if (klass) {
+          PyObject *impconv;
+          data->implicitconv = 1; /* avoid recursion and call 'explicit' constructors*/
+          impconv = SWIG_Python_CallFunctor(klass, obj);
+          data->implicitconv = 0;
+          if (PyErr_Occurred()) {
+            PyErr_Clear();
+            impconv = 0;
+          }
+          if (impconv) {
+            SwigPyObject *iobj = SWIG_Python_GetSwigThis(impconv);
+            if (iobj) {
+              void *vptr;
+              res = SWIG_Python_ConvertPtrAndOwn((PyObject*)iobj, &vptr, ty, 0, 0);
+              if (SWIG_IsOK(res)) {
+                if (ptr) {
+                  *ptr = vptr;
+                  /* transfer the ownership to 'ptr' */
+                  iobj->own = 0;
+                  res = SWIG_AddCast(res);
+                  res = SWIG_AddNewMask(res);
+                } else {
+                  res = SWIG_AddCast(res);		    
+                }
+              }
+            }
+            Py_DECREF(impconv);
+          }
+        }
+      }
+    }
+    if (!SWIG_IsOK(res) && obj == Py_None) {
+      if (ptr)
+        *ptr = 0;
+      if (PyErr_Occurred())
+        PyErr_Clear();
+      res = SWIG_OK;
+    }
+  }
+  return res;
+}
+
+/* Convert a function ptr value */
+
+SWIGRUNTIME int
+SWIG_Python_ConvertFunctionPtr(PyObject *obj, void **ptr, swig_type_info *ty) {
+  if (!PyCFunction_Check(obj)) {
+    return SWIG_ConvertPtr(obj, ptr, ty, 0);
+  } else {
+    void *vptr = 0;
+    
+    /* here we get the method pointer for callbacks */
+    const char *doc = (((PyCFunctionObject *)obj) -> m_ml -> ml_doc);
+    const char *desc = doc ? strstr(doc, "swig_ptr: ") : 0;
+    if (desc)
+      desc = ty ? SWIG_UnpackVoidPtr(desc + 10, &vptr, ty->name) : 0;
+    if (!desc) 
+      return SWIG_ERROR;
+    if (ty) {
+      swig_cast_info *tc = SWIG_TypeCheck(desc,ty);
+      if (tc) {
+        int newmemory = 0;
+        *ptr = SWIG_TypeCast(tc,vptr,&newmemory);
+        assert(!newmemory); /* newmemory handling not yet implemented */
+      } else {
         return SWIG_ERROR;
       }
     } else {
-      /* This will only fail if the argument is multiple words. */
-      /* Multiple words are also not commands.                  */
-      Tcl_ResetResult(interp);
-      return SWIG_ERROR;
+      *ptr = vptr;
     }
-
-    /* Check if this is really a SWIG pointer */
-    if (Tcl_VarEval(interp,c," cget -this", (char *) NULL) != TCL_OK) {
-      Tcl_ResetResult(interp);
-      return SWIG_ERROR;
-    }
-
-    c = Tcl_GetStringFromObj(Tcl_GetObjResult(interp), NULL);
+    return SWIG_OK;
   }
-
-  c++;
-  c = SWIG_UnpackData(c,ptr,sizeof(void *));
-  if (ty) {
-    tc = c ? SWIG_TypeCheck(c,ty) : 0;
-    if (!tc) {
-      return SWIG_ERROR;
-    }
-    if (flags & SWIG_POINTER_DISOWN) {
-      SWIG_Disown((void *) *ptr);
-    }
-    {
-      int newmemory = 0;
-      *ptr = SWIG_TypeCast(tc,(void *) *ptr,&newmemory);
-      assert(!newmemory); /* newmemory handling not yet implemented */
-    }
-  }
-  return SWIG_OK;
-}
-
-/* Convert a pointer value */
-SWIGRUNTIMEINLINE int
-SWIG_Tcl_ConvertPtr(Tcl_Interp *interp, Tcl_Obj *oc, void **ptr, swig_type_info *ty, int flags) {
-  return SWIG_Tcl_ConvertPtrFromString(interp, Tcl_GetStringFromObj(oc,NULL), ptr, ty, flags);
-}
-
-/* Convert a pointer value */
-SWIGRUNTIME char *
-SWIG_Tcl_PointerTypeFromString(char *c) {
-  char d;
-  /* Pointer values must start with leading underscore. NULL has no type */
-  if (*c != '_') {
-    return 0;
-  }
-  c++;
-  /* Extract hex value from pointer */
-  while ((d = *c)) {
-    if (!(((d >= '0') && (d <= '9')) || ((d >= 'a') && (d <= 'f')))) break;
-    c++;
-  }
-  return c;
 }
 
 /* Convert a packed value value */
-SWIGRUNTIME int
-SWIG_Tcl_ConvertPacked(Tcl_Interp *SWIGUNUSEDPARM(interp) , Tcl_Obj *obj, void *ptr, int sz, swig_type_info *ty) {
-  swig_cast_info *tc;
-  const char  *c;
 
-  if (!obj) goto type_error;
-  c = Tcl_GetStringFromObj(obj,NULL);
-  /* Pointer values must start with leading underscore */
-  if (*c != '_') goto type_error;
-  c++;
-  c = SWIG_UnpackData(c,ptr,sz);
+SWIGRUNTIME int
+SWIG_Python_ConvertPacked(PyObject *obj, void *ptr, size_t sz, swig_type_info *ty) {
+  swig_type_info *to = SwigPyPacked_UnpackData(obj, ptr, sz);
+  if (!to) return SWIG_ERROR;
   if (ty) {
-    tc = SWIG_TypeCheck(c,ty);
-    if (!tc) goto type_error;
+    if (to != ty) {
+      /* check type cast? */
+      swig_cast_info *tc = SWIG_TypeCheck(to->name,ty);
+      if (!tc) return SWIG_ERROR;
+    }
   }
   return SWIG_OK;
+}  
 
- type_error:
+/* -----------------------------------------------------------------------------
+ * Create a new pointer object
+ * ----------------------------------------------------------------------------- */
 
-  return SWIG_ERROR;
+/*
+  Create a new instance object, without calling __init__, and set the
+  'this' attribute.
+*/
+
+SWIGRUNTIME PyObject* 
+SWIG_Python_NewShadowInstance(SwigPyClientData *data, PyObject *swig_this)
+{
+#if (PY_VERSION_HEX >= 0x02020000)
+  PyObject *inst = 0;
+  PyObject *newraw = data->newraw;
+  if (newraw) {
+    inst = PyObject_Call(newraw, data->newargs, NULL);
+    if (inst) {
+#if !defined(SWIG_PYTHON_SLOW_GETSET_THIS)
+      PyObject **dictptr = _PyObject_GetDictPtr(inst);
+      if (dictptr != NULL) {
+	PyObject *dict = *dictptr;
+	if (dict == NULL) {
+	  dict = PyDict_New();
+	  *dictptr = dict;
+	  PyDict_SetItem(dict, SWIG_This(), swig_this);
+	}
+      }
+#else
+      PyObject *key = SWIG_This();
+      PyObject_SetAttr(inst, key, swig_this);
+#endif
+    }
+  } else {
+#if PY_VERSION_HEX >= 0x03000000
+    inst = ((PyTypeObject*) data->newargs)->tp_new((PyTypeObject*) data->newargs, Py_None, Py_None);
+    if (inst) {
+      PyObject_SetAttr(inst, SWIG_This(), swig_this);
+      Py_TYPE(inst)->tp_flags &= ~Py_TPFLAGS_VALID_VERSION_TAG;
+    }
+#else
+    PyObject *dict = PyDict_New();
+    if (dict) {
+      PyDict_SetItem(dict, SWIG_This(), swig_this);
+      inst = PyInstance_NewRaw(data->newargs, dict);
+      Py_DECREF(dict);
+    }
+#endif
+  }
+  return inst;
+#else
+#if (PY_VERSION_HEX >= 0x02010000)
+  PyObject *inst = 0;
+  PyObject *dict = PyDict_New();
+  if (dict) {
+    PyDict_SetItem(dict, SWIG_This(), swig_this);
+    inst = PyInstance_NewRaw(data->newargs, dict);
+    Py_DECREF(dict);
+  }
+  return (PyObject *) inst;
+#else
+  PyInstanceObject *inst = PyObject_NEW(PyInstanceObject, &PyInstance_Type);
+  if (inst == NULL) {
+    return NULL;
+  }
+  inst->in_class = (PyClassObject *)data->newargs;
+  Py_INCREF(inst->in_class);
+  inst->in_dict = PyDict_New();
+  if (inst->in_dict == NULL) {
+    Py_DECREF(inst);
+    return NULL;
+  }
+#ifdef Py_TPFLAGS_HAVE_WEAKREFS
+  inst->in_weakreflist = NULL;
+#endif
+#ifdef Py_TPFLAGS_GC
+  PyObject_GC_Init(inst);
+#endif
+  PyDict_SetItem(inst->in_dict, SWIG_This(), swig_this);
+  return (PyObject *) inst;
+#endif
+#endif
 }
 
-
-/* Take a pointer and convert it to a string */
 SWIGRUNTIME void
-SWIG_Tcl_MakePtr(char *c, void *ptr, swig_type_info *ty, int SWIGUNUSEDPARM(flags)) {
-  if (ptr) {
-    *(c++) = '_';
-    c = SWIG_PackData(c,&ptr,sizeof(void *));
-    strcpy(c,ty->name);
+SWIG_Python_SetSwigThis(PyObject *inst, PyObject *swig_this)
+{
+ PyObject *dict;
+#if (PY_VERSION_HEX >= 0x02020000) && !defined(SWIG_PYTHON_SLOW_GETSET_THIS)
+ PyObject **dictptr = _PyObject_GetDictPtr(inst);
+ if (dictptr != NULL) {
+   dict = *dictptr;
+   if (dict == NULL) {
+     dict = PyDict_New();
+     *dictptr = dict;
+   }
+   PyDict_SetItem(dict, SWIG_This(), swig_this);
+   return;
+ }
+#endif
+ dict = PyObject_GetAttrString(inst, (char*)"__dict__");
+ PyDict_SetItem(dict, SWIG_This(), swig_this);
+ Py_DECREF(dict);
+} 
+
+
+SWIGINTERN PyObject *
+SWIG_Python_InitShadowInstance(PyObject *args) {
+  PyObject *obj[2];
+  if (!SWIG_Python_UnpackTuple(args, "swiginit", 2, 2, obj)) {
+    return NULL;
   } else {
-    strcpy(c,"NULL");
+    SwigPyObject *sthis = SWIG_Python_GetSwigThis(obj[0]);
+    if (sthis) {
+      SwigPyObject_append((PyObject*) sthis, obj[1]);
+    } else {
+      SWIG_Python_SetSwigThis(obj[0], obj[1]);
+    }
+    return SWIG_Py_Void();
   }
 }
 
 /* Create a new pointer object */
-SWIGRUNTIMEINLINE Tcl_Obj *
-SWIG_Tcl_NewPointerObj(void *ptr, swig_type_info *type, int flags) {
-  Tcl_Obj *robj;
-  char result[SWIG_BUFFER_SIZE];
-  SWIG_MakePtr(result,ptr,type,flags);
-  robj = Tcl_NewStringObj(result,-1);
+
+SWIGRUNTIME PyObject *
+SWIG_Python_NewPointerObj(PyObject *self, void *ptr, swig_type_info *type, int flags) {
+  SwigPyClientData *clientdata;
+  PyObject * robj;
+  int own;
+
+  if (!ptr)
+    return SWIG_Py_Void();
+
+  clientdata = type ? (SwigPyClientData *)(type->clientdata) : 0;
+  own = (flags & SWIG_POINTER_OWN) ? SWIG_POINTER_OWN : 0;
+  if (clientdata && clientdata->pytype) {
+    SwigPyObject *newobj;
+    if (flags & SWIG_BUILTIN_TP_INIT) {
+      newobj = (SwigPyObject*) self;
+      if (newobj->ptr) {
+        PyObject *next_self = clientdata->pytype->tp_alloc(clientdata->pytype, 0);
+        while (newobj->next)
+	  newobj = (SwigPyObject *) newobj->next;
+        newobj->next = next_self;
+        newobj = (SwigPyObject *)next_self;
+#ifdef SWIGPYTHON_BUILTIN
+        newobj->dict = 0;
+#endif
+      }
+    } else {
+      newobj = PyObject_New(SwigPyObject, clientdata->pytype);
+#ifdef SWIGPYTHON_BUILTIN
+      newobj->dict = 0;
+#endif
+    }
+    if (newobj) {
+      newobj->ptr = ptr;
+      newobj->ty = type;
+      newobj->own = own;
+      newobj->next = 0;
+      return (PyObject*) newobj;
+    }
+    return SWIG_Py_Void();
+  }
+
+  assert(!(flags & SWIG_BUILTIN_TP_INIT));
+
+  robj = SwigPyObject_New(ptr, type, own);
+  if (robj && clientdata && !(flags & SWIG_POINTER_NOSHADOW)) {
+    PyObject *inst = SWIG_Python_NewShadowInstance(clientdata, robj);
+    Py_DECREF(robj);
+    robj = inst;
+  }
   return robj;
 }
 
-SWIGRUNTIME Tcl_Obj *
-SWIG_Tcl_NewPackedObj(void *ptr, int sz, swig_type_info *type) {
-  char result[1024];
-  char *r = result;
-  if ((2*sz + 1 + strlen(type->name)) > 1000) return 0;
-  *(r++) = '_';
-  r = SWIG_PackData(r,ptr,sz);
-  strcpy(r,type->name);
-  return Tcl_NewStringObj(result,-1);
+/* Create a new packed object */
+
+SWIGRUNTIMEINLINE PyObject *
+SWIG_Python_NewPackedObj(void *ptr, size_t sz, swig_type_info *type) {
+  return ptr ? SwigPyPacked_New((void *) ptr, sz, type) : SWIG_Py_Void();
 }
 
 /* -----------------------------------------------------------------------------*
  *  Get type list 
  * -----------------------------------------------------------------------------*/
 
-SWIGRUNTIME swig_module_info * 
-SWIG_Tcl_GetModule(Tcl_Interp *interp) {
-  const char *data;
-  swig_module_info *ret = 0;
+#ifdef SWIG_LINK_RUNTIME
+void *SWIG_ReturnGlobalTypeList(void *);
+#endif
+
+SWIGRUNTIME swig_module_info *
+SWIG_Python_GetModule(void *SWIGUNUSEDPARM(clientdata)) {
+  static void *type_pointer = (void *)0;
+  /* first check if module already created */
+  if (!type_pointer) {
+#ifdef SWIG_LINK_RUNTIME
+    type_pointer = SWIG_ReturnGlobalTypeList((void *)0);
+#else
+# ifdef SWIGPY_USE_CAPSULE
+    type_pointer = PyCapsule_Import(SWIGPY_CAPSULE_NAME, 0);
+# else
+    type_pointer = PyCObject_Import((char*)"swig_runtime_data" SWIG_RUNTIME_VERSION,
+				    (char*)"type_pointer" SWIG_TYPE_TABLE_NAME);
+# endif
+    if (PyErr_Occurred()) {
+      PyErr_Clear();
+      type_pointer = (void *)0;
+    }
+#endif
+  }
+  return (swig_module_info *) type_pointer;
+}
+
+#if PY_MAJOR_VERSION < 2
+/* PyModule_AddObject function was introduced in Python 2.0.  The following function
+   is copied out of Python/modsupport.c in python version 2.3.4 */
+SWIGINTERN int
+PyModule_AddObject(PyObject *m, char *name, PyObject *o)
+{
+  PyObject *dict;
+  if (!PyModule_Check(m)) {
+    PyErr_SetString(PyExc_TypeError, "PyModule_AddObject() needs module as first arg");
+    return SWIG_ERROR;
+  }
+  if (!o) {
+    PyErr_SetString(PyExc_TypeError, "PyModule_AddObject() needs non-NULL value");
+    return SWIG_ERROR;
+  }
   
-  /* first check if pointer already created */
-  data = Tcl_GetVar(interp, (char *)"swig_runtime_data_type_pointer" SWIG_RUNTIME_VERSION SWIG_TYPE_TABLE_NAME, TCL_GLOBAL_ONLY);
-  if (data) {
-    SWIG_UnpackData(data, &ret, sizeof(swig_type_info **));
+  dict = PyModule_GetDict(m);
+  if (dict == NULL) {
+    /* Internal error -- modules must have a dict! */
+    PyErr_Format(PyExc_SystemError, "module '%s' has no __dict__",
+		 PyModule_GetName(m));
+    return SWIG_ERROR;
   }
+  if (PyDict_SetItemString(dict, name, o))
+    return SWIG_ERROR;
+  Py_DECREF(o);
+  return SWIG_OK;
+}
+#endif
 
-  return ret;
+SWIGRUNTIME void
+#ifdef SWIGPY_USE_CAPSULE
+SWIG_Python_DestroyModule(PyObject *obj)
+#else
+SWIG_Python_DestroyModule(void *vptr)
+#endif
+{
+#ifdef SWIGPY_USE_CAPSULE
+  swig_module_info *swig_module = (swig_module_info *) PyCapsule_GetPointer(obj, SWIGPY_CAPSULE_NAME);
+#else
+  swig_module_info *swig_module = (swig_module_info *) vptr;
+#endif
+  swig_type_info **types = swig_module->types;
+  size_t i;
+  for (i =0; i < swig_module->size; ++i) {
+    swig_type_info *ty = types[i];
+    if (ty->owndata) {
+      SwigPyClientData *data = (SwigPyClientData *) ty->clientdata;
+      if (data) SwigPyClientData_Del(data);
+    }
+  }
+  Py_DECREF(SWIG_This());
+  swig_this = NULL;
 }
 
 SWIGRUNTIME void
-SWIG_Tcl_SetModule(Tcl_Interp *interp, swig_module_info *module) {
-  char buf[SWIG_BUFFER_SIZE];
-  char *data;
-
-  /* create a new pointer */
-  data = SWIG_PackData(buf, &module, sizeof(swig_type_info **));
-  *data = 0;
-  Tcl_SetVar(interp, (char *)"swig_runtime_data_type_pointer" SWIG_RUNTIME_VERSION SWIG_TYPE_TABLE_NAME, buf, TCL_GLOBAL_ONLY);
-}
-
-/* -----------------------------------------------------------------------------*
- *  Object auxiliaries
- * -----------------------------------------------------------------------------*/
-
-
-SWIGRUNTIME void
-SWIG_Tcl_ObjectDelete(ClientData clientData) {
-  swig_instance *si = (swig_instance *) clientData;
-  if (!si) return;
-  if (si->destroy && SWIG_Disown(si->thisvalue)) {
-    if (si->classptr->destructor) {
-      (si->classptr->destructor)(si->thisvalue);
-    }
-  }
-  Tcl_DecrRefCount(si->thisptr);
-  free(si);
-}
-
-/* Function to invoke object methods given an instance */
-SWIGRUNTIME int
-SWIG_Tcl_MethodCommand(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST _objv[]) {
-  char *method,   *attrname;
-  swig_instance   *inst = (swig_instance *) clientData;
-  swig_method     *meth;
-  swig_attribute  *attr;
-  Tcl_Obj         *oldarg;
-  Tcl_Obj         **objv;
-  int              rcode;
-  swig_class      *cls;
-  swig_class      *cls_stack[64];
-  int              cls_stack_bi[64];
-  int              cls_stack_top = 0;
-  int              numconf = 2;
-  int              bi;
-
-  objv = (Tcl_Obj **) _objv;
-  if (objc < 2) {
-    Tcl_SetResult(interp, (char *) "wrong # args.", TCL_STATIC);
-    return TCL_ERROR;
-  }
-  method = Tcl_GetStringFromObj(objv[1],NULL);
-  if (strcmp(method,"-acquire") == 0) {
-    inst->destroy = 1;
-    SWIG_Acquire(inst->thisvalue);
-    return TCL_OK;
-  }
-  if (strcmp(method,"-disown") == 0) {
-    if (inst->destroy) {
-      SWIG_Disown(inst->thisvalue);
-    }
-    inst->destroy = 0;
-    return TCL_OK;
-  }
-  if (strcmp(method,"-delete") == 0) {
-    Tcl_DeleteCommandFromToken(interp,inst->cmdtok);
-    return TCL_OK;
-  }
-  cls_stack[cls_stack_top] = inst->classptr;
-  cls_stack_bi[cls_stack_top] = -1;
-  while (1) {
-    Tcl_HashEntry* hashentry;
-    bi = cls_stack_bi[cls_stack_top];
-    cls = cls_stack[cls_stack_top];
-    if (bi != -1) {
-      if (!cls->bases[bi] && cls->base_names[bi]) {
-        /* lookup and cache the base class */
-	swig_type_info *info = SWIG_TypeQueryModule(cls->module, cls->module, cls->base_names[bi]);
-	if (info) cls->bases[bi] = (swig_class *) info->clientdata;
-      }
-      cls = cls->bases[bi];
-      if (cls) {
-        cls_stack_bi[cls_stack_top]++;
-        cls_stack_top++;
-        cls_stack[cls_stack_top] = cls;
-        cls_stack_bi[cls_stack_top] = -1;
-        continue;
-      }
-    }
-    if (!cls) {
-      cls_stack_top--;
-      if (cls_stack_top < 0) break;
-      else continue;
-    }
-    cls_stack_bi[cls_stack_top]++;
-
-    hashentry = Tcl_FindHashEntry(&(cls->hashtable), method);
-    if (hashentry) {
-        ClientData cd = Tcl_GetHashValue(hashentry);
-        swig_wrapper method_wrapper = (swig_wrapper)cd;
-        oldarg = objv[1];
-        objv[1] = inst->thisptr;
-        Tcl_IncrRefCount(inst->thisptr);
-        rcode = (method_wrapper)(clientData,interp,objc,objv);
-        objv[1] = oldarg;
-        Tcl_DecrRefCount(inst->thisptr);
-        return rcode;
-    }
-    /* Check class methods for a match */
-    if (strcmp(method,"cget") == 0) {
-      if (objc < 3) {
-        Tcl_SetResult(interp, (char *) "wrong # args.", TCL_STATIC);
-        return TCL_ERROR;
-      }
-      attrname = Tcl_GetStringFromObj(objv[2],NULL);
-      attr = cls->attributes;
-      while (attr && attr->name) {
-        if ((strcmp(attr->name, attrname) == 0) && (attr->getmethod)) {
-          oldarg = objv[1];
-          objv[1] = inst->thisptr;
-          Tcl_IncrRefCount(inst->thisptr);
-          rcode = (*attr->getmethod)(clientData,interp,2, objv);
-          objv[1] = oldarg;
-          Tcl_DecrRefCount(inst->thisptr);
-          return rcode;
-        }
-        attr++;
-      }
-      if (strcmp(attrname, "-this") == 0) {
-        Tcl_SetObjResult(interp, Tcl_DuplicateObj(inst->thisptr));
-        return TCL_OK;
-      }
-      if (strcmp(attrname, "-thisown") == 0) {
-        if (SWIG_Thisown(inst->thisvalue)) {
-          Tcl_SetResult(interp,(char*)"1",TCL_STATIC);
-        } else {
-          Tcl_SetResult(interp,(char*)"0",TCL_STATIC);
-        }
-        return TCL_OK;
-      }
-    } else if (strcmp(method, "configure") == 0) {
-      int i;
-      if (objc < 4) {
-        Tcl_SetResult(interp, (char *) "wrong # args.", TCL_STATIC);
-        return TCL_ERROR;
-      }
-      i = 2;
-      while (i < objc) {
-        attrname = Tcl_GetStringFromObj(objv[i],NULL);
-        attr = cls->attributes;
-        while (attr && attr->name) {
-          if ((strcmp(attr->name, attrname) == 0) && (attr->setmethod)) {
-            oldarg = objv[i];
-            objv[i] = inst->thisptr;
-            Tcl_IncrRefCount(inst->thisptr);
-            rcode = (*attr->setmethod)(clientData,interp,3, &objv[i-1]);
-            objv[i] = oldarg;
-            Tcl_DecrRefCount(inst->thisptr);
-            if (rcode != TCL_OK) return rcode;
-            numconf += 2;
-          }
-          attr++;
-        }
-        i+=2;
-      }
-    }
-  }
-  if (strcmp(method,"configure") == 0) {
-    if (numconf >= objc) {
-      return TCL_OK;
-    } else {
-      Tcl_SetResult(interp,(char *) "Invalid attribute name.", TCL_STATIC);
-      return TCL_ERROR;
-    }
-  }
-  if (strcmp(method,"cget") == 0) {
-    Tcl_SetResult(interp,(char *) "Invalid attribute name.", TCL_STATIC);
-    return TCL_ERROR;
-  }
-  Tcl_SetResult(interp, (char *) "Invalid method. Must be one of: configure cget -acquire -disown -delete", TCL_STATIC);
-  cls = inst->classptr;
-  bi = 0;
-  while (cls) {
-    meth = cls->methods;
-    while (meth && meth->name) {
-      char *cr = (char *) Tcl_GetStringResult(interp);
-      size_t meth_len = strlen(meth->name);
-      char* where = strchr(cr,':');
-      while(where) {
-        where = strstr(where, meth->name);
-        if(where) {
-          if(where[-1] == ' ' && (where[meth_len] == ' ' || where[meth_len]==0)) {
-            break;
-          } else {
-            where++;
-          }
-        }
-      }
-
-      if (!where)
-        Tcl_AppendElement(interp, (char *) meth->name);
-      meth++;
-    }
-    cls = inst->classptr->bases[bi++];
-  }
-  return TCL_ERROR;
-}
-
-/* This function takes the current result and turns it into an object command */
-SWIGRUNTIME Tcl_Obj *
-SWIG_Tcl_NewInstanceObj(Tcl_Interp *interp, void *thisvalue, swig_type_info *type, int flags) {
-  Tcl_Obj *robj = SWIG_NewPointerObj(thisvalue, type,0);
-  /* Check to see if this pointer belongs to a class or not */
-  if (thisvalue && (type->clientdata) && (interp)) {
-    Tcl_CmdInfo    ci;
-    char          *name;
-    name = Tcl_GetStringFromObj(robj,NULL);
-    if (!Tcl_GetCommandInfo(interp,name, &ci) || (flags)) {
-      swig_instance *newinst = (swig_instance *) malloc(sizeof(swig_instance));
-      newinst->thisptr = Tcl_DuplicateObj(robj);
-      Tcl_IncrRefCount(newinst->thisptr);
-      newinst->thisvalue = thisvalue;
-      newinst->classptr = (swig_class *) type->clientdata;
-      newinst->destroy = flags;
-      newinst->cmdtok = Tcl_CreateObjCommand(interp, Tcl_GetStringFromObj(robj,NULL), (swig_wrapper_func) SWIG_MethodCommand, (ClientData) newinst, (swig_delete_func) SWIG_ObjectDelete);
-      if (flags) {
-        SWIG_Acquire(thisvalue);
-      }
-    }
-  }
-  return robj;
-}
-
-/* Function to create objects */
-SWIGRUNTIME int
-SWIG_Tcl_ObjectConstructor(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  Tcl_Obj          *newObj = 0;
-  void             *thisvalue = 0;
-  swig_instance   *newinst = 0;
-  swig_class      *classptr = (swig_class *) clientData;
-  swig_wrapper     cons = 0;
-  char             *name = 0;
-  int               firstarg = 0;
-  int               thisarg = 0;
-  int               destroy = 1;
-
-  if (!classptr) {
-    Tcl_SetResult(interp, (char *) "swig: internal runtime error. No class object defined.", TCL_STATIC);
-    return TCL_ERROR;
-  }
-  cons = classptr->constructor;
-  if (objc > 1) {
-    char *s = Tcl_GetStringFromObj(objv[1],NULL);
-    if (strcmp(s,"-this") == 0) {
-      thisarg = 2;
-      cons = 0;
-    } else if (strcmp(s,"-args") == 0) {
-      firstarg = 1;
-    } else if (objc == 2) {
-      firstarg = 1;
-      name = s;
-    } else if (objc >= 3) {
-      char *s1;
-      name = s;
-      s1 = Tcl_GetStringFromObj(objv[2],NULL);
-      if (strcmp(s1,"-this") == 0) {
-	thisarg = 3;
-	cons = 0;
-      } else {
-	firstarg = 1;
-      }
-    }
-  }
-  if (cons) {
-    int result;
-    result = (*cons)(0, interp, objc-firstarg, &objv[firstarg]);
-    if (result != TCL_OK) {
-      return result;
-    }
-    newObj = Tcl_DuplicateObj(Tcl_GetObjResult(interp));
-    if (!name) name = Tcl_GetStringFromObj(newObj,NULL);
-  } else if (thisarg > 0) {
-    if (thisarg < objc) {
-      destroy = 0;
-      newObj = Tcl_DuplicateObj(objv[thisarg]);
-      if (!name) name = Tcl_GetStringFromObj(newObj,NULL);
-    } else {
-      Tcl_SetResult(interp, (char *) "wrong # args.", TCL_STATIC);
-      return TCL_ERROR;
-    }
+SWIG_Python_SetModule(swig_module_info *swig_module) {
+#if PY_VERSION_HEX >= 0x03000000
+ /* Add a dummy module object into sys.modules */
+  PyObject *module = PyImport_AddModule((char*)"swig_runtime_data" SWIG_RUNTIME_VERSION);
+#else
+  static PyMethodDef swig_empty_runtime_method_table[] = { {NULL, NULL, 0, NULL} }; /* Sentinel */
+  PyObject *module = Py_InitModule((char*)"swig_runtime_data" SWIG_RUNTIME_VERSION, swig_empty_runtime_method_table);
+#endif
+#ifdef SWIGPY_USE_CAPSULE
+  PyObject *pointer = PyCapsule_New((void *) swig_module, SWIGPY_CAPSULE_NAME, SWIG_Python_DestroyModule);
+  if (pointer && module) {
+    PyModule_AddObject(module, (char*)"type_pointer_capsule" SWIG_TYPE_TABLE_NAME, pointer);
   } else {
-    Tcl_SetResult(interp, (char *) "No constructor available.", TCL_STATIC);
-    return TCL_ERROR;
+    Py_XDECREF(pointer);
   }
-  if (SWIG_Tcl_ConvertPtr(interp,newObj, (void **) &thisvalue, *(classptr->type), 0) != SWIG_OK) {
-    Tcl_DecrRefCount(newObj);
-    return TCL_ERROR;
+#else
+  PyObject *pointer = PyCObject_FromVoidPtr((void *) swig_module, SWIG_Python_DestroyModule);
+  if (pointer && module) {
+    PyModule_AddObject(module, (char*)"type_pointer" SWIG_TYPE_TABLE_NAME, pointer);
+  } else {
+    Py_XDECREF(pointer);
   }
-  newinst = (swig_instance *) malloc(sizeof(swig_instance));
-  newinst->thisptr = newObj;
-  Tcl_IncrRefCount(newObj);
-  newinst->thisvalue = thisvalue;
-  newinst->classptr = classptr;
-  newinst->destroy = destroy;
-  if (destroy) {
-    SWIG_Acquire(thisvalue);
-  }
-  newinst->cmdtok = Tcl_CreateObjCommand(interp,name, (swig_wrapper) SWIG_MethodCommand, (ClientData) newinst, (swig_delete_func) SWIG_ObjectDelete);
-  return TCL_OK;
+#endif
 }
 
-/* -----------------------------------------------------------------------------*
- *   Get arguments 
- * -----------------------------------------------------------------------------*/
+/* The python cached type query */
+SWIGRUNTIME PyObject *
+SWIG_Python_TypeCache(void) {
+  static PyObject *SWIG_STATIC_POINTER(cache) = PyDict_New();
+  return cache;
+}
+
+SWIGRUNTIME swig_type_info *
+SWIG_Python_TypeQuery(const char *type)
+{
+  PyObject *cache = SWIG_Python_TypeCache();
+  PyObject *key = SWIG_Python_str_FromChar(type); 
+  PyObject *obj = PyDict_GetItem(cache, key);
+  swig_type_info *descriptor;
+  if (obj) {
+#ifdef SWIGPY_USE_CAPSULE
+    descriptor = (swig_type_info *) PyCapsule_GetPointer(obj, NULL);
+#else
+    descriptor = (swig_type_info *) PyCObject_AsVoidPtr(obj);
+#endif
+  } else {
+    swig_module_info *swig_module = SWIG_GetModule(0);
+    descriptor = SWIG_TypeQueryModule(swig_module, swig_module, type);
+    if (descriptor) {
+#ifdef SWIGPY_USE_CAPSULE
+      obj = PyCapsule_New((void*) descriptor, NULL, NULL);
+#else
+      obj = PyCObject_FromVoidPtr(descriptor, NULL);
+#endif
+      PyDict_SetItem(cache, key, obj);
+      Py_DECREF(obj);
+    }
+  }
+  Py_DECREF(key);
+  return descriptor;
+}
+
+/* 
+   For backward compatibility only
+*/
+#define SWIG_POINTER_EXCEPTION  0
+#define SWIG_arg_fail(arg)      SWIG_Python_ArgFail(arg)
+#define SWIG_MustGetPtr(p, type, argnum, flags)  SWIG_Python_MustGetPtr(p, type, argnum, flags)
+
 SWIGRUNTIME int
-SWIG_Tcl_GetArgs(Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], const char *fmt, ...) {
-  int        argno = 0, opt = 0;
-  long       tempi;
-  double     tempd;
-  const char *c;
-  va_list    ap;
-  void      *vptr;
-  Tcl_Obj   *obj = 0;
-  swig_type_info *ty;
-
-  va_start(ap,fmt);
-  for (c = fmt; (*c && (*c != ':') && (*c != ';')); c++,argno++) {
-    if (*c == '|') {
-      opt = 1;
-      c++;
-    }
-    if (argno >= (objc-1)) {
-      if (!opt) {
-        Tcl_SetResult(interp, (char *) "Wrong number of arguments ", TCL_STATIC);
-        goto argerror;
+SWIG_Python_AddErrMesg(const char* mesg, int infront)
+{  
+  if (PyErr_Occurred()) {
+    PyObject *type = 0;
+    PyObject *value = 0;
+    PyObject *traceback = 0;
+    PyErr_Fetch(&type, &value, &traceback);
+    if (value) {
+      char *tmp;
+      PyObject *old_str = PyObject_Str(value);
+      Py_XINCREF(type);
+      PyErr_Clear();
+      if (infront) {
+	PyErr_Format(type, "%s %s", mesg, tmp = SWIG_Python_str_AsChar(old_str));
       } else {
-        va_end(ap);
-        return TCL_OK;
+	PyErr_Format(type, "%s %s", tmp = SWIG_Python_str_AsChar(old_str), mesg);
       }
+      SWIG_Python_str_DelForPy3(tmp);
+      Py_DECREF(old_str);
     }
-
-    vptr = va_arg(ap,void *);
-    if (vptr) {
-      if (isupper(*c)) {
-        obj = SWIG_Tcl_GetConstantObj(Tcl_GetStringFromObj(objv[argno+1],0));
-        if (!obj) obj = objv[argno+1];
-      } else {
-        obj = objv[argno+1];
-      }
-      switch(*c) {
-      case 'i': case 'I':
-      case 'l': case 'L':
-      case 'h': case 'H':
-      case 'b': case 'B':
-        if (Tcl_GetLongFromObj(interp,obj,&tempi) != TCL_OK) goto argerror;
-        if ((*c == 'i') || (*c == 'I')) *((int *)vptr) = (int)tempi;
-        else if ((*c == 'l') || (*c == 'L')) *((long *)vptr) = (long)tempi;
-        else if ((*c == 'h') || (*c == 'H')) *((short*)vptr) = (short)tempi;
-        else if ((*c == 'b') || (*c == 'B')) *((unsigned char *)vptr) = (unsigned char)tempi;
-        break;
-      case 'f': case 'F':
-      case 'd': case 'D':
-        if (Tcl_GetDoubleFromObj(interp,obj,&tempd) != TCL_OK) goto argerror;
-        if ((*c == 'f') || (*c == 'F')) *((float *) vptr) = (float)tempd;
-        else if ((*c == 'd') || (*c == 'D')) *((double*) vptr) = tempd;
-        break;
-      case 's': case 'S':
-        if (*(c+1) == '#') {
-          int *vlptr = (int *) va_arg(ap, void *);
-          *((char **) vptr) = Tcl_GetStringFromObj(obj, vlptr);
-          c++;
-        } else {
-          *((char **)vptr) = Tcl_GetStringFromObj(obj,NULL);
-        }
-        break;
-      case 'c': case 'C':
-        *((char *)vptr) = *(Tcl_GetStringFromObj(obj,NULL));
-        break;
-      case 'p': case 'P':
-        ty = (swig_type_info *) va_arg(ap, void *);
-        if (SWIG_Tcl_ConvertPtr(interp, obj, (void **) vptr, ty, 0) != SWIG_OK) goto argerror;
-        break;
-      case 'o': case 'O':
-        *((Tcl_Obj **)vptr) = objv[argno+1];
-        break;
-      default:
-        break;
-      }
-    }
-  }
-
-  if ((*c != ';') && ((objc-1) > argno)) {
-    Tcl_SetResult(interp, (char *) "Wrong # args.", TCL_STATIC);
-    goto argerror;
-  }
-  va_end(ap);
-  return TCL_OK;
-
- argerror:
-  {
-    char temp[32];
-    sprintf(temp,"%d", argno+1);
-    c = strchr(fmt,':');
-    if (!c) c = strchr(fmt,';');
-    if (!c) c = (char *)"";
-    Tcl_AppendResult(interp,c," argument ", temp, NULL);
-    va_end(ap);
-    return TCL_ERROR;
+    return 1;
+  } else {
+    return 0;
   }
 }
+  
+SWIGRUNTIME int
+SWIG_Python_ArgFail(int argnum)
+{
+  if (PyErr_Occurred()) {
+    /* add information about failing argument */
+    char mesg[256];
+    PyOS_snprintf(mesg, sizeof(mesg), "argument number %d:", argnum);
+    return SWIG_Python_AddErrMesg(mesg, 1);
+  } else {
+    return 0;
+  }
+}
+
+SWIGRUNTIMEINLINE const char *
+SwigPyObject_GetDesc(PyObject *self)
+{
+  SwigPyObject *v = (SwigPyObject *)self;
+  swig_type_info *ty = v ? v->ty : 0;
+  return ty ? ty->str : "";
+}
+
+SWIGRUNTIME void
+SWIG_Python_TypeError(const char *type, PyObject *obj)
+{
+  if (type) {
+#if defined(SWIG_COBJECT_TYPES)
+    if (obj && SwigPyObject_Check(obj)) {
+      const char *otype = (const char *) SwigPyObject_GetDesc(obj);
+      if (otype) {
+	PyErr_Format(PyExc_TypeError, "a '%s' is expected, 'SwigPyObject(%s)' is received",
+		     type, otype);
+	return;
+      }
+    } else 
+#endif      
+    {
+      const char *otype = (obj ? obj->ob_type->tp_name : 0); 
+      if (otype) {
+	PyObject *str = PyObject_Str(obj);
+	const char *cstr = str ? SWIG_Python_str_AsChar(str) : 0;
+	if (cstr) {
+	  PyErr_Format(PyExc_TypeError, "a '%s' is expected, '%s(%s)' is received",
+		       type, otype, cstr);
+          SWIG_Python_str_DelForPy3(cstr);
+	} else {
+	  PyErr_Format(PyExc_TypeError, "a '%s' is expected, '%s' is received",
+		       type, otype);
+	}
+	Py_XDECREF(str);
+	return;
+      }
+    }   
+    PyErr_Format(PyExc_TypeError, "a '%s' is expected", type);
+  } else {
+    PyErr_Format(PyExc_TypeError, "unexpected type is received");
+  }
+}
+
+
+/* Convert a pointer value, signal an exception on a type mismatch */
+SWIGRUNTIME void *
+SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int SWIGUNUSEDPARM(argnum), int flags) {
+  void *result;
+  if (SWIG_Python_ConvertPtr(obj, &result, ty, flags) == -1) {
+    PyErr_Clear();
+#if SWIG_POINTER_EXCEPTION
+    if (flags) {
+      SWIG_Python_TypeError(SWIG_TypePrettyName(ty), obj);
+      SWIG_Python_ArgFail(argnum);
+    }
+#endif
+  }
+  return result;
+}
+
+#ifdef SWIGPYTHON_BUILTIN
+SWIGRUNTIME int
+SWIG_Python_NonDynamicSetAttr(PyObject *obj, PyObject *name, PyObject *value) {
+  PyTypeObject *tp = obj->ob_type;
+  PyObject *descr;
+  PyObject *encoded_name;
+  descrsetfunc f;
+  int res = -1;
+
+# ifdef Py_USING_UNICODE
+  if (PyString_Check(name)) {
+    name = PyUnicode_Decode(PyString_AsString(name), PyString_Size(name), NULL, NULL);
+    if (!name)
+      return -1;
+  } else if (!PyUnicode_Check(name))
+# else
+  if (!PyString_Check(name))
+# endif
+  {
+    PyErr_Format(PyExc_TypeError, "attribute name must be string, not '%.200s'", name->ob_type->tp_name);
+    return -1;
+  } else {
+    Py_INCREF(name);
+  }
+
+  if (!tp->tp_dict) {
+    if (PyType_Ready(tp) < 0)
+      goto done;
+  }
+
+  descr = _PyType_Lookup(tp, name);
+  f = NULL;
+  if (descr != NULL)
+    f = descr->ob_type->tp_descr_set;
+  if (!f) {
+    if (PyString_Check(name)) {
+      encoded_name = name;
+      Py_INCREF(name);
+    } else {
+      encoded_name = PyUnicode_AsUTF8String(name);
+    }
+    PyErr_Format(PyExc_AttributeError, "'%.100s' object has no attribute '%.200s'", tp->tp_name, PyString_AsString(encoded_name));
+    Py_DECREF(encoded_name);
+  } else {
+    res = f(descr, obj, value);
+  }
+  
+  done:
+  Py_DECREF(name);
+  return res;
+}
+#endif
+
 
 #ifdef __cplusplus
 }
@@ -1625,25 +2982,40 @@ SWIG_Tcl_GetArgs(Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], const char
 #define SWIGTYPE_p_char swig_types[0]
 #define SWIGTYPE_p_data_t swig_types[1]
 #define SWIGTYPE_p_double swig_types[2]
-#define SWIGTYPE_p_helicsStatus swig_types[3]
-#define SWIGTYPE_p_helics_iterative_time swig_types[4]
-#define SWIGTYPE_p_int64_t swig_types[5]
-#define SWIGTYPE_p_iteration_request swig_types[6]
-#define SWIGTYPE_p_iteration_status swig_types[7]
-#define SWIGTYPE_p_message_t swig_types[8]
-#define SWIGTYPE_p_p_char swig_types[9]
-#define SWIGTYPE_p_void swig_types[10]
-static swig_type_info *swig_types[12];
-static swig_module_info swig_module = {swig_types, 11, 0, 0, 0, 0};
+#define SWIGTYPE_p_federate_state swig_types[3]
+#define SWIGTYPE_p_helics_filter_type_t swig_types[4]
+#define SWIGTYPE_p_helics_iteration_request swig_types[5]
+#define SWIGTYPE_p_helics_iteration_status swig_types[6]
+#define SWIGTYPE_p_helics_status swig_types[7]
+#define SWIGTYPE_p_int swig_types[8]
+#define SWIGTYPE_p_int64_t swig_types[9]
+#define SWIGTYPE_p_message_t swig_types[10]
+#define SWIGTYPE_p_p_char swig_types[11]
+#define SWIGTYPE_p_void swig_types[12]
+static swig_type_info *swig_types[14];
+static swig_module_info swig_module = {swig_types, 13, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
 /* -------- TYPES TABLE (END) -------- */
 
-#define SWIG_init    Helics_Init
-#define SWIG_name    "helics"
-#define SWIG_prefix  ""
-#define SWIG_version "0.0"
+#if (PY_VERSION_HEX <= 0x02000000)
+# if !defined(SWIG_PYTHON_CLASSIC)
+#  error "This python version requires swig to be run with the '-classic' option"
+# endif
+#endif
+
+/*-----------------------------------------------
+              @(target):= _helics.so
+  ------------------------------------------------*/
+#if PY_VERSION_HEX >= 0x03000000
+#  define SWIG_init    PyInit__helics
+
+#else
+#  define SWIG_init    init_helics
+
+#endif
+#define SWIG_name    "_helics"
 
 #define SWIGVERSION 0x030012 
 #define SWIG_VERSION SWIGVERSION
@@ -1653,31 +3025,232 @@ static swig_module_info swig_module = {swig_types, 11, 0, 0, 0, 0};
 #define SWIG_as_voidptrptr(a) ((void)SWIG_as_voidptr(*a),(void**)(a)) 
 
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-#ifdef MAC_TCL
-#pragma export on
-#endif
-SWIGEXPORT int SWIG_init(Tcl_Interp *);
-#ifdef MAC_TCL
-#pragma export off
-#endif
-#ifdef __cplusplus
-}
-#endif
-
-/* Compatibility version for TCL stubs */
-#ifndef SWIG_TCL_STUBS_VERSION
-#define SWIG_TCL_STUBS_VERSION "8.1"
-#endif
-
-
-
 #include "api-data.h"
 #include "helics.h"
-#include "ValueFederate_c.h"
+#include "ValueFederate.h"
+#include "MessageFederate.h"
+#include "MessageFilters.h"
+
+
+SWIGINTERNINLINE PyObject*
+  SWIG_From_int  (int value)
+{
+  return PyInt_FromLong((long) value);
+}
+
+
+SWIGINTERN swig_type_info*
+SWIG_pchar_descriptor(void)
+{
+  static int init = 0;
+  static swig_type_info* info = 0;
+  if (!init) {
+    info = SWIG_TypeQuery("_p_char");
+    init = 1;
+  }
+  return info;
+}
+
+
+SWIGINTERN int
+SWIG_AsCharPtrAndSize(PyObject *obj, char** cptr, size_t* psize, int *alloc)
+{
+#if PY_VERSION_HEX>=0x03000000
+#if defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
+  if (PyBytes_Check(obj))
+#else
+  if (PyUnicode_Check(obj))
+#endif
+#else  
+  if (PyString_Check(obj))
+#endif
+  {
+    char *cstr; Py_ssize_t len;
+#if PY_VERSION_HEX>=0x03000000
+#if !defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
+    if (!alloc && cptr) {
+        /* We can't allow converting without allocation, since the internal
+           representation of string in Python 3 is UCS-2/UCS-4 but we require
+           a UTF-8 representation.
+           TODO(bhy) More detailed explanation */
+        return SWIG_RuntimeError;
+    }
+    obj = PyUnicode_AsUTF8String(obj);
+    if(alloc) *alloc = SWIG_NEWOBJ;
+#endif
+    PyBytes_AsStringAndSize(obj, &cstr, &len);
+#else
+    PyString_AsStringAndSize(obj, &cstr, &len);
+#endif
+    if (cptr) {
+      if (alloc) {
+	/* 
+	   In python the user should not be able to modify the inner
+	   string representation. To warranty that, if you define
+	   SWIG_PYTHON_SAFE_CSTRINGS, a new/copy of the python string
+	   buffer is always returned.
+
+	   The default behavior is just to return the pointer value,
+	   so, be careful.
+	*/ 
+#if defined(SWIG_PYTHON_SAFE_CSTRINGS)
+	if (*alloc != SWIG_OLDOBJ) 
+#else
+	if (*alloc == SWIG_NEWOBJ) 
+#endif
+	{
+	  *cptr = (char *)memcpy(malloc((len + 1)*sizeof(char)), cstr, sizeof(char)*(len + 1));
+	  *alloc = SWIG_NEWOBJ;
+	} else {
+	  *cptr = cstr;
+	  *alloc = SWIG_OLDOBJ;
+	}
+      } else {
+#if PY_VERSION_HEX>=0x03000000
+#if defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
+	*cptr = PyBytes_AsString(obj);
+#else
+	assert(0); /* Should never reach here with Unicode strings in Python 3 */
+#endif
+#else
+	*cptr = SWIG_Python_str_AsChar(obj);
+#endif
+      }
+    }
+    if (psize) *psize = len + 1;
+#if PY_VERSION_HEX>=0x03000000 && !defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
+    Py_XDECREF(obj);
+#endif
+    return SWIG_OK;
+  } else {
+#if defined(SWIG_PYTHON_2_UNICODE)
+#if defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
+#error "Cannot use both SWIG_PYTHON_2_UNICODE and SWIG_PYTHON_STRICT_BYTE_CHAR at once"
+#endif
+#if PY_VERSION_HEX<0x03000000
+    if (PyUnicode_Check(obj)) {
+      char *cstr; Py_ssize_t len;
+      if (!alloc && cptr) {
+        return SWIG_RuntimeError;
+      }
+      obj = PyUnicode_AsUTF8String(obj);
+      if (PyString_AsStringAndSize(obj, &cstr, &len) != -1) {
+        if (cptr) {
+          if (alloc) *alloc = SWIG_NEWOBJ;
+          *cptr = (char *)memcpy(malloc((len + 1)*sizeof(char)), cstr, sizeof(char)*(len + 1));
+        }
+        if (psize) *psize = len + 1;
+
+        Py_XDECREF(obj);
+        return SWIG_OK;
+      } else {
+        Py_XDECREF(obj);
+      }
+    }
+#endif
+#endif
+
+    swig_type_info* pchar_descriptor = SWIG_pchar_descriptor();
+    if (pchar_descriptor) {
+      void* vptr = 0;
+      if (SWIG_ConvertPtr(obj, &vptr, pchar_descriptor, 0) == SWIG_OK) {
+	if (cptr) *cptr = (char *) vptr;
+	if (psize) *psize = vptr ? (strlen((char *)vptr) + 1) : 0;
+	if (alloc) *alloc = SWIG_OLDOBJ;
+	return SWIG_OK;
+      }
+    }
+  }
+  return SWIG_TypeError;
+}
+
+
+
+
+
+SWIGINTERNINLINE PyObject *
+SWIG_FromCharPtrAndSize(const char* carray, size_t size)
+{
+  if (carray) {
+    if (size > INT_MAX) {
+      swig_type_info* pchar_descriptor = SWIG_pchar_descriptor();
+      return pchar_descriptor ? 
+	SWIG_InternalNewPointerObj((char *)(carray), pchar_descriptor, 0) : SWIG_Py_Void();
+    } else {
+#if PY_VERSION_HEX >= 0x03000000
+#if defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
+      return PyBytes_FromStringAndSize(carray, (Py_ssize_t)(size));
+#else
+#if PY_VERSION_HEX >= 0x03010000
+      return PyUnicode_DecodeUTF8(carray, (Py_ssize_t)(size), "surrogateescape");
+#else
+      return PyUnicode_FromStringAndSize(carray, (Py_ssize_t)(size));
+#endif
+#endif
+#else
+      return PyString_FromStringAndSize(carray, (Py_ssize_t)(size));
+#endif
+    }
+  } else {
+    return SWIG_Py_Void();
+  }
+}
+
+
+SWIGINTERNINLINE PyObject * 
+SWIG_FromCharPtr(const char *cptr)
+{ 
+  return SWIG_FromCharPtrAndSize(cptr, (cptr ? strlen(cptr) : 0));
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_double (PyObject *obj, double *val)
+{
+  int res = SWIG_TypeError;
+  if (PyFloat_Check(obj)) {
+    if (val) *val = PyFloat_AsDouble(obj);
+    return SWIG_OK;
+#if PY_VERSION_HEX < 0x03000000
+  } else if (PyInt_Check(obj)) {
+    if (val) *val = (double) PyInt_AsLong(obj);
+    return SWIG_OK;
+#endif
+  } else if (PyLong_Check(obj)) {
+    double v = PyLong_AsDouble(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      PyErr_Clear();
+    }
+  }
+#ifdef SWIG_PYTHON_CAST_MODE
+  {
+    int dispatch = 0;
+    double d = PyFloat_AsDouble(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = d;
+      return SWIG_AddCast(SWIG_OK);
+    } else {
+      PyErr_Clear();
+    }
+    if (!dispatch) {
+      long v = PyLong_AsLong(obj);
+      if (!PyErr_Occurred()) {
+	if (val) *val = v;
+	return SWIG_AddCast(SWIG_AddCast(SWIG_OK));
+      } else {
+	PyErr_Clear();
+      }
+    }
+  }
+#endif
+  return res;
+}
+
+
+  #define SWIG_From_double   PyFloat_FromDouble 
 
 
 #include <limits.h>
@@ -1690,56 +3263,90 @@ SWIGEXPORT int SWIG_init(Tcl_Interp *);
 #endif
 
 
-SWIGINTERNINLINE Tcl_Obj* 
-SWIG_From_long  (long value)
-{
-  if (((long) INT_MIN <= value) && (value <= (long) INT_MAX)) {
-    return Tcl_NewIntObj((int)(value));
-  } else {
-    return Tcl_NewLongObj(value);
+#include <float.h>
+
+
+#include <math.h>
+
+
+SWIGINTERNINLINE int
+SWIG_CanCastAsInteger(double *d, double min, double max) {
+  double x = *d;
+  if ((min <= x && x <= max)) {
+   double fx = floor(x);
+   double cx = ceil(x);
+   double rd =  ((x - fx) < 0.5) ? fx : cx; /* simple rint */
+   if ((errno == EDOM) || (errno == ERANGE)) {
+     errno = 0;
+   } else {
+     double summ, reps, diff;
+     if (rd < x) {
+       diff = x - rd;
+     } else if (rd > x) {
+       diff = rd - x;
+     } else {
+       return 1;
+     }
+     summ = rd + x;
+     reps = diff/summ;
+     if (reps < 8*DBL_EPSILON) {
+       *d = rd;
+       return 1;
+     }
+   }
   }
-}
-
-
-SWIGINTERNINLINE Tcl_Obj *
-SWIG_From_int  (int value)
-{    
-  return SWIG_From_long  (value);
+  return 0;
 }
 
 
 SWIGINTERN int
-SWIG_AsVal_double SWIG_TCL_DECL_ARGS_2(Tcl_Obj *obj, double *val)
+SWIG_AsVal_long (PyObject *obj, long* val)
 {
-  double v;
-  if (Tcl_GetDoubleFromObj(0, obj, &v) == TCL_OK) {
-    if (val) *val = v;
+#if PY_VERSION_HEX < 0x03000000
+  if (PyInt_Check(obj)) {
+    if (val) *val = PyInt_AsLong(obj);
     return SWIG_OK;
+  } else
+#endif
+  if (PyLong_Check(obj)) {
+    long v = PyLong_AsLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      PyErr_Clear();
+      return SWIG_OverflowError;
+    }
   }
+#ifdef SWIG_PYTHON_CAST_MODE
+  {
+    int dispatch = 0;
+    long v = PyInt_AsLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_AddCast(SWIG_OK);
+    } else {
+      PyErr_Clear();
+    }
+    if (!dispatch) {
+      double d;
+      int res = SWIG_AddCast(SWIG_AsVal_double (obj,&d));
+      if (SWIG_IsOK(res) && SWIG_CanCastAsInteger(&d, LONG_MIN, LONG_MAX)) {
+	if (val) *val = (long)(d);
+	return res;
+      }
+    }
+  }
+#endif
   return SWIG_TypeError;
 }
 
 
-  #define SWIG_From_double   Tcl_NewDoubleObj 
-
-
 SWIGINTERN int
-SWIG_AsVal_long SWIG_TCL_DECL_ARGS_2(Tcl_Obj *obj, long* val)
+SWIG_AsVal_int (PyObject * obj, int *val)
 {
   long v;
-  if (Tcl_GetLongFromObj(0,obj, &v) == TCL_OK) {
-    if (val) *val = (long) v;
-    return SWIG_OK;
-  }
-  return SWIG_TypeError;
-}
-
-
-SWIGINTERN int
-SWIG_AsVal_int SWIG_TCL_DECL_ARGS_2(Tcl_Obj * obj, int *val)
-{
-  long v;
-  int res = SWIG_AsVal_long SWIG_TCL_CALL_ARGS_2(obj, &v);
+  int res = SWIG_AsVal_long (obj, &v);
   if (SWIG_IsOK(res)) {
     if ((v < INT_MIN || v > INT_MAX)) {
       return SWIG_OverflowError;
@@ -1750,189 +3357,11 @@ SWIG_AsVal_int SWIG_TCL_DECL_ARGS_2(Tcl_Obj * obj, int *val)
   return res;
 }
 
-
-SWIGINTERN int
-SWIG_AsCharPtrAndSize(Tcl_Obj *obj, char** cptr, size_t* psize, int *alloc)
-{ 
-  int len = 0;
-  char *cstr = Tcl_GetStringFromObj(obj, &len);
-  if (cstr) {
-    if (cptr)  *cptr = cstr;
-    if (psize) *psize = len + 1;
-    if (alloc) *alloc = SWIG_OLDOBJ;
-    return SWIG_OK;
-  }
-  return SWIG_TypeError;
-}
-
-
-
-
-
-SWIGINTERNINLINE Tcl_Obj *
-SWIG_FromCharPtrAndSize(const char* carray, size_t size)
-{
-  return (size < INT_MAX) ? Tcl_NewStringObj(carray, (int)(size)) : NULL;
-}
-
-
-SWIGINTERNINLINE Tcl_Obj * 
-SWIG_FromCharPtr(const char *cptr)
-{ 
-  return SWIG_FromCharPtrAndSize(cptr, (cptr ? strlen(cptr) : 0));
-}
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-SWIGINTERN int
-_wrap_helics_iterative_time_time_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  struct helics_iterative_time *arg1 = (struct helics_iterative_time *) 0 ;
-  helics_time_t arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helics_iterative_time_time_set self time ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_helics_iterative_time, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_iterative_time_time_set" "', argument " "1"" of type '" "struct helics_iterative_time *""'"); 
-  }
-  arg1 = (struct helics_iterative_time *)(argp1);
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helics_iterative_time_time_set" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = (helics_time_t)(val2);
-  if (arg1) (arg1)->time = arg2;
-  
-  return TCL_OK;
-fail:
-  return TCL_ERROR;
-}
-
-
-SWIGINTERN int
-_wrap_helics_iterative_time_time_get(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  struct helics_iterative_time *arg1 = (struct helics_iterative_time *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  helics_time_t result;
-  
-  if (SWIG_GetArgs(interp, objc, objv,"o:helics_iterative_time_time_get self ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_helics_iterative_time, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_iterative_time_time_get" "', argument " "1"" of type '" "struct helics_iterative_time *""'"); 
-  }
-  arg1 = (struct helics_iterative_time *)(argp1);
-  result = (helics_time_t) ((arg1)->time);
-  Tcl_SetObjResult(interp,SWIG_From_double((double)(result)));
-  return TCL_OK;
-fail:
-  return TCL_ERROR;
-}
-
-
-SWIGINTERN int
-_wrap_helics_iterative_time_status_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  struct helics_iterative_time *arg1 = (struct helics_iterative_time *) 0 ;
-  iteration_status arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helics_iterative_time_status_set self status ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_helics_iterative_time, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_iterative_time_status_set" "', argument " "1"" of type '" "struct helics_iterative_time *""'"); 
-  }
-  arg1 = (struct helics_iterative_time *)(argp1);
-  ecode2 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helics_iterative_time_status_set" "', argument " "2"" of type '" "iteration_status""'");
-  } 
-  arg2 = (iteration_status)(val2);
-  if (arg1) (arg1)->status = arg2;
-  
-  return TCL_OK;
-fail:
-  return TCL_ERROR;
-}
-
-
-SWIGINTERN int
-_wrap_helics_iterative_time_status_get(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  struct helics_iterative_time *arg1 = (struct helics_iterative_time *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  iteration_status result;
-  
-  if (SWIG_GetArgs(interp, objc, objv,"o:helics_iterative_time_status_get self ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_helics_iterative_time, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_iterative_time_status_get" "', argument " "1"" of type '" "struct helics_iterative_time *""'"); 
-  }
-  arg1 = (struct helics_iterative_time *)(argp1);
-  result = (iteration_status) ((arg1)->status);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
-fail:
-  return TCL_ERROR;
-}
-
-
-SWIGINTERN int
-_wrap_new_helics_iterative_time(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  struct helics_iterative_time *result = 0 ;
-  
-  if (SWIG_GetArgs(interp, objc, objv,":new_helics_iterative_time ") == TCL_ERROR) SWIG_fail;
-  result = (struct helics_iterative_time *)calloc(1, sizeof(struct helics_iterative_time));
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_helics_iterative_time,0));
-  return TCL_OK;
-fail:
-  return TCL_ERROR;
-}
-
-
-SWIGINTERN int
-_wrap_delete_helics_iterative_time(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  struct helics_iterative_time *arg1 = (struct helics_iterative_time *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  
-  if (SWIG_GetArgs(interp, objc, objv,"o:delete_helics_iterative_time self ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_helics_iterative_time, SWIG_POINTER_DISOWN |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_helics_iterative_time" "', argument " "1"" of type '" "struct helics_iterative_time *""'"); 
-  }
-  arg1 = (struct helics_iterative_time *)(argp1);
-  free((char *) arg1);
-  
-  return TCL_OK;
-fail:
-  return TCL_ERROR;
-}
-
-
-SWIGINTERN void swig_delete_helics_iterative_time(void *obj) {
-struct helics_iterative_time *arg1 = (struct helics_iterative_time *) obj;
-free((char *) arg1);
-}
-static swig_method swig_helics_iterative_time_methods[] = {
-    {0,0}
-};
-static swig_attribute swig_helics_iterative_time_attributes[] = {
-    { "-time",_wrap_helics_iterative_time_time_get, _wrap_helics_iterative_time_time_set},
-    { "-status",_wrap_helics_iterative_time_status_get, _wrap_helics_iterative_time_status_set},
-    {0,0,0}
-};
-static swig_class *swig_helics_iterative_time_bases[] = {0};
-static const char * swig_helics_iterative_time_base_names[] = {0};
-static swig_class _wrap_class_helics_iterative_time = { "helics_iterative_time", &SWIGTYPE_p_helics_iterative_time,_wrap_new_helics_iterative_time, swig_delete_helics_iterative_time, swig_helics_iterative_time_methods, swig_helics_iterative_time_attributes, swig_helics_iterative_time_bases,swig_helics_iterative_time_base_names, &swig_module, SWIG_TCL_HASHTABLE_INIT };
-SWIGINTERN int
-_wrap_data_t_data_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_data_t_data_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct data_t *arg1 = (struct data_t *) 0 ;
   char *arg2 = (char *) 0 ;
   void *argp1 = 0 ;
@@ -1940,14 +3369,16 @@ _wrap_data_t_data_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int 
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:data_t_data_set self data ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_data_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"OO:data_t_data_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_data_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_data_set" "', argument " "1"" of type '" "struct data_t *""'"); 
   }
   arg1 = (struct data_t *)(argp1);
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "data_t_data_set" "', argument " "2"" of type '" "char *""'");
   }
@@ -1959,53 +3390,56 @@ _wrap_data_t_data_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int 
   } else {
     arg1->data = 0;
   }
-  
+  resultobj = SWIG_Py_Void();
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_data_t_data_get(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_data_t_data_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct data_t *arg1 = (struct data_t *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   char *result = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:data_t_data_get self ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_data_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"O:data_t_data_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_data_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_data_get" "', argument " "1"" of type '" "struct data_t *""'"); 
   }
   arg1 = (struct data_t *)(argp1);
   result = (char *) ((arg1)->data);
-  Tcl_SetObjResult(interp,SWIG_FromCharPtr((const char *)result));
-  return TCL_OK;
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_data_t_length_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_data_t_length_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct data_t *arg1 = (struct data_t *) 0 ;
   int64_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 ;
   int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:data_t_length_set self length ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_data_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"OO:data_t_length_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_data_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_length_set" "', argument " "1"" of type '" "struct data_t *""'"); 
   }
   arg1 = (struct data_t *)(argp1);
   {
-    res2 = SWIG_ConvertPtr(objv[2], &argp2, SWIGTYPE_p_int64_t,  0 );
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_int64_t,  0 );
     if (!SWIG_IsOK(res2)) {
       SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "data_t_length_set" "', argument " "2"" of type '" "int64_t""'"); 
     }  
@@ -2016,133 +3450,130 @@ _wrap_data_t_length_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, in
     }
   }
   if (arg1) (arg1)->length = arg2;
-  
-  return TCL_OK;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_data_t_length_get(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_data_t_length_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct data_t *arg1 = (struct data_t *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   int64_t result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:data_t_length_get self ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_data_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"O:data_t_length_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_data_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_length_get" "', argument " "1"" of type '" "struct data_t *""'"); 
   }
   arg1 = (struct data_t *)(argp1);
   result =  ((arg1)->length);
-  Tcl_SetObjResult(interp,SWIG_NewInstanceObj((int64_t *)memcpy((int64_t *)calloc(1,sizeof(int64_t)),&result,sizeof(int64_t)), SWIGTYPE_p_int64_t, SWIG_POINTER_OWN | 0 ));
-  return TCL_OK;
+  resultobj = SWIG_NewPointerObj((int64_t *)memcpy((int64_t *)calloc(1,sizeof(int64_t)),&result,sizeof(int64_t)), SWIGTYPE_p_int64_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_new_data_t(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_new_data_t(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct data_t *result = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,":new_data_t ") == TCL_ERROR) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)":new_data_t")) SWIG_fail;
   result = (struct data_t *)calloc(1, sizeof(struct data_t));
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_data_t,0));
-  return TCL_OK;
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_data_t, SWIG_POINTER_NEW |  0 );
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_delete_data_t(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_delete_data_t(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct data_t *arg1 = (struct data_t *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:delete_data_t self ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_data_t, SWIG_POINTER_DISOWN |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"O:delete_data_t",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_data_t, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_data_t" "', argument " "1"" of type '" "struct data_t *""'"); 
   }
   arg1 = (struct data_t *)(argp1);
   free((char *) arg1);
-  
-  return TCL_OK;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN void swig_delete_data_t(void *obj) {
-struct data_t *arg1 = (struct data_t *) obj;
-free((char *) arg1);
+SWIGINTERN PyObject *data_t_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_ParseTuple(args,(char *)"O:swigregister", &obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_data_t, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
 }
-static swig_method swig_data_t_methods[] = {
-    {0,0}
-};
-static swig_attribute swig_data_t_attributes[] = {
-    { "-data",_wrap_data_t_data_get, _wrap_data_t_data_set},
-    { "-length",_wrap_data_t_length_get, _wrap_data_t_length_set},
-    {0,0,0}
-};
-static swig_class *swig_data_t_bases[] = {0};
-static const char * swig_data_t_base_names[] = {0};
-static swig_class _wrap_class_data_t = { "data_t", &SWIGTYPE_p_data_t,_wrap_new_data_t, swig_delete_data_t, swig_data_t_methods, swig_data_t_attributes, swig_data_t_bases,swig_data_t_base_names, &swig_module, SWIG_TCL_HASHTABLE_INIT };
-SWIGINTERN int
-_wrap_message_t_time_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+
+SWIGINTERN PyObject *_wrap_message_t_time_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct message_t *arg1 = (struct message_t *) 0 ;
   helics_time_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   double val2 ;
   int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:message_t_time_set self time ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"OO:message_t_time_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_time_set" "', argument " "1"" of type '" "struct message_t *""'"); 
   }
   arg1 = (struct message_t *)(argp1);
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "message_t_time_set" "', argument " "2"" of type '" "helics_time_t""'");
   } 
   arg2 = (helics_time_t)(val2);
   if (arg1) (arg1)->time = arg2;
-  
-  return TCL_OK;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_message_t_time_get(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_message_t_time_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct message_t *arg1 = (struct message_t *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   helics_time_t result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:message_t_time_get self ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"O:message_t_time_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_time_get" "', argument " "1"" of type '" "struct message_t *""'"); 
   }
   arg1 = (struct message_t *)(argp1);
   result = (helics_time_t) ((arg1)->time);
-  Tcl_SetObjResult(interp,SWIG_From_double((double)(result)));
-  return TCL_OK;
+  resultobj = SWIG_From_double((double)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_message_t_data_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_message_t_data_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct message_t *arg1 = (struct message_t *) 0 ;
   char *arg2 = (char *) 0 ;
   void *argp1 = 0 ;
@@ -2150,14 +3581,16 @@ _wrap_message_t_data_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, i
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:message_t_data_set self data ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"OO:message_t_data_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_data_set" "', argument " "1"" of type '" "struct message_t *""'"); 
   }
   arg1 = (struct message_t *)(argp1);
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "message_t_data_set" "', argument " "2"" of type '" "char const *""'");
   }
@@ -2168,53 +3601,56 @@ _wrap_message_t_data_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, i
   } else {
     arg1->data = 0;
   }
-  
+  resultobj = SWIG_Py_Void();
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_message_t_data_get(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_message_t_data_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct message_t *arg1 = (struct message_t *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   char *result = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:message_t_data_get self ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"O:message_t_data_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_data_get" "', argument " "1"" of type '" "struct message_t *""'"); 
   }
   arg1 = (struct message_t *)(argp1);
   result = (char *) ((arg1)->data);
-  Tcl_SetObjResult(interp,SWIG_FromCharPtr((const char *)result));
-  return TCL_OK;
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_message_t_length_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_message_t_length_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct message_t *arg1 = (struct message_t *) 0 ;
   int64_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 ;
   int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:message_t_length_set self length ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"OO:message_t_length_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_length_set" "', argument " "1"" of type '" "struct message_t *""'"); 
   }
   arg1 = (struct message_t *)(argp1);
   {
-    res2 = SWIG_ConvertPtr(objv[2], &argp2, SWIGTYPE_p_int64_t,  0 );
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_int64_t,  0 );
     if (!SWIG_IsOK(res2)) {
       SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "message_t_length_set" "', argument " "2"" of type '" "int64_t""'"); 
     }  
@@ -2225,36 +3661,37 @@ _wrap_message_t_length_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp,
     }
   }
   if (arg1) (arg1)->length = arg2;
-  
-  return TCL_OK;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_message_t_length_get(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_message_t_length_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct message_t *arg1 = (struct message_t *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   int64_t result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:message_t_length_get self ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"O:message_t_length_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_length_get" "', argument " "1"" of type '" "struct message_t *""'"); 
   }
   arg1 = (struct message_t *)(argp1);
   result =  ((arg1)->length);
-  Tcl_SetObjResult(interp,SWIG_NewInstanceObj((int64_t *)memcpy((int64_t *)calloc(1,sizeof(int64_t)),&result,sizeof(int64_t)), SWIGTYPE_p_int64_t, SWIG_POINTER_OWN | 0 ));
-  return TCL_OK;
+  resultobj = SWIG_NewPointerObj((int64_t *)memcpy((int64_t *)calloc(1,sizeof(int64_t)),&result,sizeof(int64_t)), SWIGTYPE_p_int64_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_message_t_original_source_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_message_t_original_source_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct message_t *arg1 = (struct message_t *) 0 ;
   char *arg2 = (char *) 0 ;
   void *argp1 = 0 ;
@@ -2262,14 +3699,16 @@ _wrap_message_t_original_source_set(ClientData clientData SWIGUNUSED, Tcl_Interp
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:message_t_original_source_set self original_source ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"OO:message_t_original_source_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_original_source_set" "', argument " "1"" of type '" "struct message_t *""'"); 
   }
   arg1 = (struct message_t *)(argp1);
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "message_t_original_source_set" "', argument " "2"" of type '" "char const *""'");
   }
@@ -2280,38 +3719,39 @@ _wrap_message_t_original_source_set(ClientData clientData SWIGUNUSED, Tcl_Interp
   } else {
     arg1->original_source = 0;
   }
-  
+  resultobj = SWIG_Py_Void();
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_message_t_original_source_get(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_message_t_original_source_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct message_t *arg1 = (struct message_t *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   char *result = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:message_t_original_source_get self ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"O:message_t_original_source_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_original_source_get" "', argument " "1"" of type '" "struct message_t *""'"); 
   }
   arg1 = (struct message_t *)(argp1);
   result = (char *) ((arg1)->original_source);
-  Tcl_SetObjResult(interp,SWIG_FromCharPtr((const char *)result));
-  return TCL_OK;
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_message_t_source_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_message_t_source_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct message_t *arg1 = (struct message_t *) 0 ;
   char *arg2 = (char *) 0 ;
   void *argp1 = 0 ;
@@ -2319,14 +3759,16 @@ _wrap_message_t_source_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp,
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:message_t_source_set self source ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"OO:message_t_source_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_source_set" "', argument " "1"" of type '" "struct message_t *""'"); 
   }
   arg1 = (struct message_t *)(argp1);
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "message_t_source_set" "', argument " "2"" of type '" "char const *""'");
   }
@@ -2337,38 +3779,39 @@ _wrap_message_t_source_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp,
   } else {
     arg1->source = 0;
   }
-  
+  resultobj = SWIG_Py_Void();
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_message_t_source_get(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_message_t_source_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct message_t *arg1 = (struct message_t *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   char *result = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:message_t_source_get self ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"O:message_t_source_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_source_get" "', argument " "1"" of type '" "struct message_t *""'"); 
   }
   arg1 = (struct message_t *)(argp1);
   result = (char *) ((arg1)->source);
-  Tcl_SetObjResult(interp,SWIG_FromCharPtr((const char *)result));
-  return TCL_OK;
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_message_t_dest_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_message_t_dest_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct message_t *arg1 = (struct message_t *) 0 ;
   char *arg2 = (char *) 0 ;
   void *argp1 = 0 ;
@@ -2376,14 +3819,16 @@ _wrap_message_t_dest_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, i
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:message_t_dest_set self dest ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"OO:message_t_dest_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_dest_set" "', argument " "1"" of type '" "struct message_t *""'"); 
   }
   arg1 = (struct message_t *)(argp1);
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "message_t_dest_set" "', argument " "2"" of type '" "char const *""'");
   }
@@ -2394,103 +3839,178 @@ _wrap_message_t_dest_set(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, i
   } else {
     arg1->dest = 0;
   }
-  
+  resultobj = SWIG_Py_Void();
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_message_t_dest_get(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_message_t_dest_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct message_t *arg1 = (struct message_t *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   char *result = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:message_t_dest_get self ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"O:message_t_dest_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_dest_get" "', argument " "1"" of type '" "struct message_t *""'"); 
   }
   arg1 = (struct message_t *)(argp1);
   result = (char *) ((arg1)->dest);
-  Tcl_SetObjResult(interp,SWIG_FromCharPtr((const char *)result));
-  return TCL_OK;
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_new_message_t(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  struct message_t *result = 0 ;
+SWIGINTERN PyObject *_wrap_message_t_original_dest_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  struct message_t *arg1 = (struct message_t *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,":new_message_t ") == TCL_ERROR) SWIG_fail;
-  result = (struct message_t *)calloc(1, sizeof(struct message_t));
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_message_t,0));
-  return TCL_OK;
+  if (!PyArg_ParseTuple(args,(char *)"OO:message_t_original_dest_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_original_dest_set" "', argument " "1"" of type '" "struct message_t *""'"); 
+  }
+  arg1 = (struct message_t *)(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "message_t_original_dest_set" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  if (arg2) {
+    size_t size = strlen((const char *)((const char *)(arg2))) + 1;
+    arg1->original_dest = (char const *)(char *)memcpy(malloc((size)*sizeof(char)), arg2, sizeof(char)*(size));
+  } else {
+    arg1->original_dest = 0;
+  }
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_delete_message_t(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_message_t_original_dest_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   struct message_t *arg1 = (struct message_t *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:delete_message_t self ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1], &argp1,SWIGTYPE_p_message_t, SWIG_POINTER_DISOWN |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"O:message_t_original_dest_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_original_dest_get" "', argument " "1"" of type '" "struct message_t *""'"); 
+  }
+  arg1 = (struct message_t *)(argp1);
+  result = (char *) ((arg1)->original_dest);
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_message_t(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  struct message_t *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)":new_message_t")) SWIG_fail;
+  result = (struct message_t *)calloc(1, sizeof(struct message_t));
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_message_t, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_message_t(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  struct message_t *arg1 = (struct message_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:delete_message_t",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_message_t, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_message_t" "', argument " "1"" of type '" "struct message_t *""'"); 
   }
   arg1 = (struct message_t *)(argp1);
   free((char *) arg1);
-  
-  return TCL_OK;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN void swig_delete_message_t(void *obj) {
-struct message_t *arg1 = (struct message_t *) obj;
-free((char *) arg1);
+SWIGINTERN PyObject *message_t_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_ParseTuple(args,(char *)"O:swigregister", &obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_message_t, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
 }
-static swig_method swig_message_t_methods[] = {
-    {0,0}
-};
-static swig_attribute swig_message_t_attributes[] = {
-    { "-time",_wrap_message_t_time_get, _wrap_message_t_time_set},
-    { "-data",_wrap_message_t_data_get, _wrap_message_t_data_set},
-    { "-length",_wrap_message_t_length_get, _wrap_message_t_length_set},
-    { "-original_source",_wrap_message_t_original_source_get, _wrap_message_t_original_source_set},
-    { "-source",_wrap_message_t_source_get, _wrap_message_t_source_set},
-    { "-dest",_wrap_message_t_dest_get, _wrap_message_t_dest_set},
-    {0,0,0}
-};
-static swig_class *swig_message_t_bases[] = {0};
-static const char * swig_message_t_base_names[] = {0};
-static swig_class _wrap_class_message_t = { "message_t", &SWIGTYPE_p_message_t,_wrap_new_message_t, swig_delete_message_t, swig_message_t_methods, swig_message_t_attributes, swig_message_t_bases,swig_message_t_base_names, &swig_module, SWIG_TCL_HASHTABLE_INIT };
-SWIGINTERN int
-_wrap_helicsGetVersion(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+
+SWIGINTERN PyObject *_wrap_helicsGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   char *result = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,":helicsGetVersion ") == TCL_ERROR) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)":helicsGetVersion")) SWIG_fail;
   result = (char *)helicsGetVersion();
-  Tcl_SetObjResult(interp,SWIG_FromCharPtr((const char *)result));
-  return TCL_OK;
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsCreateCore(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsIsCoreTypeAvailable(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  char *arg1 = (char *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  PyObject * obj0 = 0 ;
+  helics_bool_t result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsIsCoreTypeAvailable",&obj0)) SWIG_fail;
+  res1 = SWIG_AsCharPtrAndSize(obj0, &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsIsCoreTypeAvailable" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = (char *)(buf1);
+  result = (helics_bool_t)helicsIsCoreTypeAvailable((char const *)arg1);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return resultobj;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsCreateCore(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
@@ -2503,40 +4023,43 @@ _wrap_helicsCreateCore(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
   helics_core result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsCreateCore type name initString ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_AsCharPtrAndSize(objv[1], &buf1, NULL, &alloc1);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsCreateCore",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_AsCharPtrAndSize(obj0, &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateCore" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = (char *)(buf1);
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateCore" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  res3 = SWIG_AsCharPtrAndSize(objv[3], &buf3, NULL, &alloc3);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
   if (!SWIG_IsOK(res3)) {
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCreateCore" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = (char *)(buf3);
   result = (helics_core)helicsCreateCore((char const *)arg1,(char const *)arg2,(char const *)arg3);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsCreateCoreFromArgs(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsCreateCoreFromArgs(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
@@ -2551,43 +4074,47 @@ _wrap_helicsCreateCoreFromArgs(ClientData clientData SWIGUNUSED, Tcl_Interp *int
   int ecode3 = 0 ;
   void *argp4 = 0 ;
   int res4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
   helics_core result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oooo:helicsCreateCoreFromArgs type name argc argv ",(void *)0,(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_AsCharPtrAndSize(objv[1], &buf1, NULL, &alloc1);
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsCreateCoreFromArgs",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_AsCharPtrAndSize(obj0, &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateCoreFromArgs" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = (char *)(buf1);
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateCoreFromArgs" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsCreateCoreFromArgs" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  res4 = SWIG_ConvertPtr(objv[4], &argp4,SWIGTYPE_p_p_char, 0 |  0 );
+  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_p_char, 0 |  0 );
   if (!SWIG_IsOK(res4)) {
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsCreateCoreFromArgs" "', argument " "4"" of type '" "char const *const *""'"); 
   }
   arg4 = (char **)(argp4);
   result = (helics_core)helicsCreateCoreFromArgs((char const *)arg1,(char const *)arg2,arg3,(char const *const *)arg4);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsCreateBroker(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsCreateBroker(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
@@ -2600,40 +4127,43 @@ _wrap_helicsCreateBroker(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, i
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
   helics_broker result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsCreateBroker type name initString ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_AsCharPtrAndSize(objv[1], &buf1, NULL, &alloc1);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsCreateBroker",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_AsCharPtrAndSize(obj0, &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateBroker" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = (char *)(buf1);
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateBroker" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  res3 = SWIG_AsCharPtrAndSize(objv[3], &buf3, NULL, &alloc3);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
   if (!SWIG_IsOK(res3)) {
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCreateBroker" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = (char *)(buf3);
   result = (helics_broker)helicsCreateBroker((char const *)arg1,(char const *)arg2,(char const *)arg3);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsCreateBrokerFromArgs(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsCreateBrokerFromArgs(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
@@ -2648,216 +4178,436 @@ _wrap_helicsCreateBrokerFromArgs(ClientData clientData SWIGUNUSED, Tcl_Interp *i
   int ecode3 = 0 ;
   void *argp4 = 0 ;
   int res4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
   helics_broker result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oooo:helicsCreateBrokerFromArgs type name argc argv ",(void *)0,(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_AsCharPtrAndSize(objv[1], &buf1, NULL, &alloc1);
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsCreateBrokerFromArgs",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_AsCharPtrAndSize(obj0, &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateBrokerFromArgs" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = (char *)(buf1);
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateBrokerFromArgs" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsCreateBrokerFromArgs" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  res4 = SWIG_ConvertPtr(objv[4], &argp4,SWIGTYPE_p_p_char, 0 |  0 );
+  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_p_char, 0 |  0 );
   if (!SWIG_IsOK(res4)) {
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsCreateBrokerFromArgs" "', argument " "4"" of type '" "char const *const *""'"); 
   }
   arg4 = (char **)(argp4);
   result = (helics_broker)helicsCreateBrokerFromArgs((char const *)arg1,(char const *)arg2,arg3,(char const *const *)arg4);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsBrokerIsConnected(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsBrokerIsConnected(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_broker arg1 = (helics_broker) 0 ;
   int res1 ;
+  PyObject * obj0 = 0 ;
   int result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsBrokerIsConnected broker ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsBrokerIsConnected",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerIsConnected" "', argument " "1"" of type '" "helics_broker""'"); 
   }
   result = (int)helicsBrokerIsConnected(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsCoreIsConnected(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsCoreIsConnected(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_core arg1 = (helics_core) 0 ;
   int res1 ;
+  PyObject * obj0 = 0 ;
   int result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsCoreIsConnected core ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsCoreIsConnected",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreIsConnected" "', argument " "1"" of type '" "helics_core""'"); 
   }
   result = (int)helicsCoreIsConnected(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFreeCore(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsBrokerGetIdentifier(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_broker arg1 = (helics_broker) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsBrokerGetIdentifier",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerGetIdentifier" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsBrokerGetIdentifier" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = (char *)(buf2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsBrokerGetIdentifier" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (helics_status)helicsBrokerGetIdentifier(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsCoreGetIdentifier(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_core arg1 = (helics_core) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsCoreGetIdentifier",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreGetIdentifier" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCoreGetIdentifier" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = (char *)(buf2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsCoreGetIdentifier" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (helics_status)helicsCoreGetIdentifier(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsBrokerGetAddress(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_broker arg1 = (helics_broker) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsBrokerGetAddress",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerGetAddress" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsBrokerGetAddress" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = (char *)(buf2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsBrokerGetAddress" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (helics_status)helicsBrokerGetAddress(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsCoreDisconnect(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_core arg1 = (helics_core) 0 ;
   int res1 ;
+  PyObject * obj0 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsFreeCore core ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsCoreDisconnect",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFreeCore" "', argument " "1"" of type '" "helics_core""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreDisconnect" "', argument " "1"" of type '" "helics_core""'"); 
   }
-  helicsFreeCore(arg1);
-  
-  return TCL_OK;
+  result = (helics_status)helicsCoreDisconnect(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFreeBroker(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsBrokerDisconnect(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_broker arg1 = (helics_broker) 0 ;
   int res1 ;
+  PyObject * obj0 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsFreeBroker broker ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsBrokerDisconnect",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFreeBroker" "', argument " "1"" of type '" "helics_broker""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerDisconnect" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  helicsFreeBroker(arg1);
-  
-  return TCL_OK;
+  result = (helics_status)helicsBrokerDisconnect(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsCreateValueFederate(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsCoreFree(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_core arg1 = (helics_core) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsCoreFree",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreFree" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  helicsCoreFree(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsBrokerFree(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_broker arg1 = (helics_broker) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsBrokerFree",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerFree" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  helicsBrokerFree(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsCreateValueFederate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) (helics_federate_info_t)0 ;
   int res1 ;
-  helics_value_federate result;
+  PyObject * obj0 = 0 ;
+  helics_federate result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsCreateValueFederate fi ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsCreateValueFederate",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateValueFederate" "', argument " "1"" of type '" "helics_federate_info_t const""'"); 
   }
-  result = (helics_value_federate)helicsCreateValueFederate(arg1);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
-  return TCL_OK;
+  result = (helics_federate)helicsCreateValueFederate(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsCreateValueFederateFromFile(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsCreateValueFederateFromJson(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
-  helics_value_federate result;
+  PyObject * obj0 = 0 ;
+  helics_federate result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsCreateValueFederateFromFile filename ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_AsCharPtrAndSize(objv[1], &buf1, NULL, &alloc1);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsCreateValueFederateFromJson",&obj0)) SWIG_fail;
+  res1 = SWIG_AsCharPtrAndSize(obj0, &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateValueFederateFromFile" "', argument " "1"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateValueFederateFromJson" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = (char *)(buf1);
-  result = (helics_value_federate)helicsCreateValueFederateFromFile((char const *)arg1);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
+  result = (helics_federate)helicsCreateValueFederateFromJson((char const *)arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsCreateCombinationFederate(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsCreateMessageFederate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) (helics_federate_info_t)0 ;
   int res1 ;
+  PyObject * obj0 = 0 ;
   helics_federate result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsCreateCombinationFederate fi ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsCreateMessageFederate",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateMessageFederate" "', argument " "1"" of type '" "helics_federate_info_t const""'"); 
+  }
+  result = (helics_federate)helicsCreateMessageFederate(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsCreateMessageFederateFromJson(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  char *arg1 = (char *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  PyObject * obj0 = 0 ;
+  helics_federate result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsCreateMessageFederateFromJson",&obj0)) SWIG_fail;
+  res1 = SWIG_AsCharPtrAndSize(obj0, &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateMessageFederateFromJson" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = (char *)(buf1);
+  result = (helics_federate)helicsCreateMessageFederateFromJson((char const *)arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return resultobj;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsCreateCombinationFederate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate_info_t arg1 = (helics_federate_info_t) (helics_federate_info_t)0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  helics_federate result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsCreateCombinationFederate",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateCombinationFederate" "', argument " "1"" of type '" "helics_federate_info_t const""'"); 
   }
   result = (helics_federate)helicsCreateCombinationFederate(arg1);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
-  return TCL_OK;
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsCreateCombinationFederateFromFile(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsCreateCombinationFederateFromJson(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
+  PyObject * obj0 = 0 ;
   helics_federate result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsCreateCombinationFederateFromFile filename ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_AsCharPtrAndSize(objv[1], &buf1, NULL, &alloc1);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsCreateCombinationFederateFromJson",&obj0)) SWIG_fail;
+  res1 = SWIG_AsCharPtrAndSize(obj0, &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateCombinationFederateFromFile" "', argument " "1"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateCombinationFederateFromJson" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = (char *)(buf1);
-  result = (helics_federate)helicsCreateCombinationFederateFromFile((char const *)arg1);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
+  result = (helics_federate)helicsCreateCombinationFederateFromJson((char const *)arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoCreate(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoCreate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t result;
   
-  if (SWIG_GetArgs(interp, objc, objv,":helicsFederateInfoCreate ") == TCL_ERROR) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)":helicsFederateInfoCreate")) SWIG_fail;
   result = (helics_federate_info_t)helicsFederateInfoCreate();
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
-  return TCL_OK;
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoLoadFromArgs(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoLoadFromArgs(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   int arg2 ;
   char **arg3 = (char **) 0 ;
@@ -2866,854 +4616,1284 @@ _wrap_helicsFederateInfoLoadFromArgs(ClientData clientData SWIGUNUSED, Tcl_Inter
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsFederateInfoLoadFromArgs fi argc argv ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsFederateInfoLoadFromArgs",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoLoadFromArgs" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
-  ecode2 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoLoadFromArgs" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = (int)(val2);
-  res3 = SWIG_ConvertPtr(objv[3], &argp3,SWIGTYPE_p_p_char, 0 |  0 );
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_p_char, 0 |  0 );
   if (!SWIG_IsOK(res3)) {
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateInfoLoadFromArgs" "', argument " "3"" of type '" "char const *const *""'"); 
   }
   arg3 = (char **)(argp3);
-  result = (helicsStatus)helicsFederateInfoLoadFromArgs(arg1,arg2,(char const *const *)arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateInfoLoadFromArgs(arg1,arg2,(char const *const *)arg3);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoFree(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoFree(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   int res1 ;
+  PyObject * obj0 = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsFederateInfoFree fi ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateInfoFree",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoFree" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
   helicsFederateInfoFree(arg1);
-  
-  return TCL_OK;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoSetFederateName(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetFederateName(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   char *arg2 = (char *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsFederateInfoSetFederateName fi name ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetFederateName",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetFederateName" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetFederateName" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  result = (helicsStatus)helicsFederateInfoSetFederateName(arg1,(char const *)arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsFederateInfoSetFederateName(arg1,(char const *)arg2);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoSetCoreName(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetCoreName(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   char *arg2 = (char *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsFederateInfoSetCoreName fi corename ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetCoreName",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreName" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetCoreName" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  result = (helicsStatus)helicsFederateInfoSetCoreName(arg1,(char const *)arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsFederateInfoSetCoreName(arg1,(char const *)arg2);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoSetCoreInitString(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetCoreInitString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   char *arg2 = (char *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsFederateInfoSetCoreInitString fi coreInit ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetCoreInitString",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreInitString" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetCoreInitString" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  result = (helicsStatus)helicsFederateInfoSetCoreInitString(arg1,(char const *)arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsFederateInfoSetCoreInitString(arg1,(char const *)arg2);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoSetCoreTypeFromString(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetCoreTypeFromString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   char *arg2 = (char *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsFederateInfoSetCoreTypeFromString fi coretype ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetCoreTypeFromString",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreTypeFromString" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetCoreTypeFromString" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  result = (helicsStatus)helicsFederateInfoSetCoreTypeFromString(arg1,(char const *)arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsFederateInfoSetCoreTypeFromString(arg1,(char const *)arg2);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoSetCoreType(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetCoreType(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   int arg2 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsFederateInfoSetCoreType fi coretype ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetCoreType",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreType" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
-  ecode2 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetCoreType" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = (int)(val2);
-  result = (helicsStatus)helicsFederateInfoSetCoreType(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateInfoSetCoreType(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoSetFlag(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetFlag(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   int arg2 ;
-  int arg3 ;
+  helics_bool_t arg3 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsFederateInfoSetFlag fi flag value ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsFederateInfoSetFlag",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetFlag" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
-  ecode2 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetFlag" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = (int)(val2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateInfoSetFlag" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateInfoSetFlag" "', argument " "3"" of type '" "helics_bool_t""'");
   } 
-  arg3 = (int)(val3);
-  result = (helicsStatus)helicsFederateInfoSetFlag(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  arg3 = (helics_bool_t)(val3);
+  result = (helics_status)helicsFederateInfoSetFlag(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoSetoutputDelay(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetOutputDelay(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   helics_time_t arg2 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsFederateInfoSetoutputDelay fi outputDelay ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetOutputDelay",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetoutputDelay" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetOutputDelay" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetoutputDelay" "', argument " "2"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetOutputDelay" "', argument " "2"" of type '" "helics_time_t""'");
   } 
   arg2 = (helics_time_t)(val2);
-  result = (helicsStatus)helicsFederateInfoSetoutputDelay(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateInfoSetOutputDelay(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoSetTimeDelta(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetTimeDelta(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   helics_time_t arg2 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsFederateInfoSetTimeDelta fi timeDelta ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetTimeDelta",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetTimeDelta" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetTimeDelta" "', argument " "2"" of type '" "helics_time_t""'");
   } 
   arg2 = (helics_time_t)(val2);
-  result = (helicsStatus)helicsFederateInfoSetTimeDelta(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateInfoSetTimeDelta(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoSetinputDelay(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetInputDelay(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   helics_time_t arg2 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsFederateInfoSetinputDelay fi inputDelay ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetInputDelay",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetinputDelay" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetInputDelay" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetinputDelay" "', argument " "2"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetInputDelay" "', argument " "2"" of type '" "helics_time_t""'");
   } 
   arg2 = (helics_time_t)(val2);
-  result = (helicsStatus)helicsFederateInfoSetinputDelay(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateInfoSetInputDelay(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoSetTimeOffset(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetTimeOffset(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   helics_time_t arg2 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsFederateInfoSetTimeOffset fi timeOffset ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetTimeOffset",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetTimeOffset" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetTimeOffset" "', argument " "2"" of type '" "helics_time_t""'");
   } 
   arg2 = (helics_time_t)(val2);
-  result = (helicsStatus)helicsFederateInfoSetTimeOffset(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateInfoSetTimeOffset(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoSetPeriod(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetPeriod(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   helics_time_t arg2 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsFederateInfoSetPeriod fi period ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetPeriod",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetPeriod" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetPeriod" "', argument " "2"" of type '" "helics_time_t""'");
   } 
   arg2 = (helics_time_t)(val2);
-  result = (helicsStatus)helicsFederateInfoSetPeriod(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateInfoSetPeriod(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoSetMaxIterations(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetMaxIterations(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   int arg2 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsFederateInfoSetMaxIterations fi maxIterations ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetMaxIterations",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetMaxIterations" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
-  ecode2 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetMaxIterations" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = (int)(val2);
-  result = (helicsStatus)helicsFederateInfoSetMaxIterations(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateInfoSetMaxIterations(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFederateInfoSetLoggingLevel(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetLoggingLevel(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   int arg2 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsFederateInfoSetLoggingLevel fi logLevel ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetLoggingLevel",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetLoggingLevel" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
-  ecode2 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetLoggingLevel" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = (int)(val2);
-  result = (helicsStatus)helicsFederateInfoSetLoggingLevel(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateInfoSetLoggingLevel(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFinalize(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateFinalize(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsFinalize fed ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateFinalize",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFinalize" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateFinalize" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helicsStatus)helicsFinalize(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateFinalize(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFreeFederate(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateFree(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
+  PyObject * obj0 = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsFreeFederate fed ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateFree",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFreeFederate" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateFree" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  helicsFreeFederate(arg1);
-  
-  return TCL_OK;
+  helicsFederateFree(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsCloseLibrary(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  if (SWIG_GetArgs(interp, objc, objv,":helicsCloseLibrary ") == TCL_ERROR) SWIG_fail;
+SWIGINTERN PyObject *_wrap_helicsCloseLibrary(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  
+  if (!PyArg_ParseTuple(args,(char *)":helicsCloseLibrary")) SWIG_fail;
   helicsCloseLibrary();
-  
-  return TCL_OK;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsEnterInitializationMode(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateEnterInitializationMode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsEnterInitializationMode fed ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateEnterInitializationMode",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEnterInitializationMode" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializationMode" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helicsStatus)helicsEnterInitializationMode(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateEnterInitializationMode(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsEnterInitializationModeAsync(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateEnterInitializationModeAsync(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsEnterInitializationModeAsync fed ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateEnterInitializationModeAsync",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEnterInitializationModeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializationModeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helicsStatus)helicsEnterInitializationModeAsync(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateEnterInitializationModeAsync(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsAsyncOperationCompleted(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateIsAsyncOperationCompleted(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
-  int result;
+  PyObject * obj0 = 0 ;
+  helics_bool_t result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsAsyncOperationCompleted fed ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateIsAsyncOperationCompleted",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsAsyncOperationCompleted" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateIsAsyncOperationCompleted" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (int)helicsAsyncOperationCompleted(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_bool_t)helicsFederateIsAsyncOperationCompleted(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsEnterInitializationModeFinalize(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateEnterInitializationModeComplete(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsEnterInitializationModeFinalize fed ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateEnterInitializationModeComplete",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEnterInitializationModeFinalize" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializationModeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helicsStatus)helicsEnterInitializationModeFinalize(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateEnterInitializationModeComplete(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsEnterExecutionMode(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateEnterExecutionMode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsEnterExecutionMode fed ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateEnterExecutionMode",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEnterExecutionMode" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionMode" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helicsStatus)helicsEnterExecutionMode(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateEnterExecutionMode(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsEnterExecutionModeIterative(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateEnterExecutionModeAsync(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
-  iteration_request arg2 ;
-  iteration_status *arg3 = (iteration_status *) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateEnterExecutionModeAsync",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  result = (helics_status)helicsFederateEnterExecutionModeAsync(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateEnterExecutionModeComplete(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateEnterExecutionModeComplete",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  result = (helics_status)helicsFederateEnterExecutionModeComplete(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateEnterExecutionModeIterative(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_iteration_request arg2 ;
+  helics_iteration_status *arg3 = (helics_iteration_status *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsEnterExecutionModeIterative fed iterate outIterate ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsFederateEnterExecutionModeIterative",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEnterExecutionModeIterative" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeIterative" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  ecode2 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsEnterExecutionModeIterative" "', argument " "2"" of type '" "iteration_request""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateEnterExecutionModeIterative" "', argument " "2"" of type '" "helics_iteration_request""'");
   } 
-  arg2 = (iteration_request)(val2);
-  res3 = SWIG_ConvertPtr(objv[3], &argp3,SWIGTYPE_p_iteration_status, 0 |  0 );
+  arg2 = (helics_iteration_request)(val2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_helics_iteration_status, 0 |  0 );
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEnterExecutionModeIterative" "', argument " "3"" of type '" "iteration_status *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateEnterExecutionModeIterative" "', argument " "3"" of type '" "helics_iteration_status *""'"); 
   }
-  arg3 = (iteration_status *)(argp3);
-  result = (helicsStatus)helicsEnterExecutionModeIterative(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  arg3 = (helics_iteration_status *)(argp3);
+  result = (helics_status)helicsFederateEnterExecutionModeIterative(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsEnterExecutionModeAsync(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateEnterExecutionModeIterativeAsync(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
-  int res1 ;
-  helicsStatus result;
-  
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsEnterExecutionModeAsync fed ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEnterExecutionModeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  result = (helicsStatus)helicsEnterExecutionModeAsync(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
-fail:
-  return TCL_ERROR;
-}
-
-
-SWIGINTERN int
-_wrap_helicsEnterExecutionModeIterativeAsync(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  iteration_request arg2 ;
+  helics_iteration_request arg2 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsEnterExecutionModeIterativeAsync fed iterate ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateEnterExecutionModeIterativeAsync",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEnterExecutionModeIterativeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeIterativeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  ecode2 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsEnterExecutionModeIterativeAsync" "', argument " "2"" of type '" "iteration_request""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateEnterExecutionModeIterativeAsync" "', argument " "2"" of type '" "helics_iteration_request""'");
   } 
-  arg2 = (iteration_request)(val2);
-  result = (helicsStatus)helicsEnterExecutionModeIterativeAsync(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  arg2 = (helics_iteration_request)(val2);
+  result = (helics_status)helicsFederateEnterExecutionModeIterativeAsync(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsEnterExecutionModeFinalize(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateEnterExecutionModeIterativeComplete(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
-  int res1 ;
-  helicsStatus result;
-  
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsEnterExecutionModeFinalize fed ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEnterExecutionModeFinalize" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  result = (helicsStatus)helicsEnterExecutionModeFinalize(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
-fail:
-  return TCL_ERROR;
-}
-
-
-SWIGINTERN int
-_wrap_helicsEnterExecutionModeIterativeFinalize(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  iteration_status *arg2 = (iteration_status *) 0 ;
+  helics_iteration_status *arg2 = (helics_iteration_status *) 0 ;
   int res1 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsEnterExecutionModeIterativeFinalize fed outIterate ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateEnterExecutionModeIterativeComplete",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEnterExecutionModeIterativeFinalize" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeIterativeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  res2 = SWIG_ConvertPtr(objv[2], &argp2,SWIGTYPE_p_iteration_status, 0 |  0 );
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_helics_iteration_status, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEnterExecutionModeIterativeFinalize" "', argument " "2"" of type '" "iteration_status *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateEnterExecutionModeIterativeComplete" "', argument " "2"" of type '" "helics_iteration_status *""'"); 
   }
-  arg2 = (iteration_status *)(argp2);
-  result = (helicsStatus)helicsEnterExecutionModeIterativeFinalize(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  arg2 = (helics_iteration_status *)(argp2);
+  result = (helics_status)helicsFederateEnterExecutionModeIterativeComplete(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsRequestTime(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateGetState(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  federate_state *arg2 = (federate_state *) 0 ;
+  int res1 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateGetState",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetState" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_federate_state, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateGetState" "', argument " "2"" of type '" "federate_state *""'"); 
+  }
+  arg2 = (federate_state *)(argp2);
+  result = (helics_status)helicsFederateGetState(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateGetCoreObject(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  helics_core result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateGetCoreObject",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetCoreObject" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  result = (helics_core)helicsFederateGetCoreObject(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateRequestTime(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
   helics_time_t arg2 ;
+  helics_time_t *arg3 = (helics_time_t *) 0 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
-  helics_time_t result;
+  helics_time_t temp3 ;
+  int res3 = SWIG_TMPOBJ ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsRequestTime fed requestTime ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  arg3 = &temp3;
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateRequestTime",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsRequestTime" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRequestTime" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsRequestTime" "', argument " "2"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTime" "', argument " "2"" of type '" "helics_time_t""'");
   } 
   arg2 = (helics_time_t)(val2);
-  result = (helics_time_t)helicsRequestTime(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_double((double)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateRequestTime(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (SWIG_IsTmpObj(res3)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_double((*arg3)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_double, new_flags));
+  }
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsRequestTimeIterative(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateRequestTimeIterative(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
   helics_time_t arg2 ;
-  iteration_request arg3 ;
+  helics_iteration_request arg3 ;
+  helics_time_t *arg4 = (helics_time_t *) 0 ;
+  helics_iteration_status *arg5 = (helics_iteration_status *) 0 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  helics_iterative_time result;
+  helics_time_t temp4 ;
+  int res4 = SWIG_TMPOBJ ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsRequestTimeIterative fed requestTime iterate ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  arg4 = &temp4;
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsFederateRequestTimeIterative",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsRequestTimeIterative" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRequestTimeIterative" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsRequestTimeIterative" "', argument " "2"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTimeIterative" "', argument " "2"" of type '" "helics_time_t""'");
   } 
   arg2 = (helics_time_t)(val2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsRequestTimeIterative" "', argument " "3"" of type '" "iteration_request""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRequestTimeIterative" "', argument " "3"" of type '" "helics_iteration_request""'");
   } 
-  arg3 = (iteration_request)(val3);
-  result = helicsRequestTimeIterative(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_NewInstanceObj((helics_iterative_time *)memcpy((helics_iterative_time *)calloc(1,sizeof(helics_iterative_time)),&result,sizeof(helics_iterative_time)), SWIGTYPE_p_helics_iterative_time, SWIG_POINTER_OWN | 0 ));
-  return TCL_OK;
+  arg3 = (helics_iteration_request)(val3);
+  res5 = SWIG_ConvertPtr(obj3, &argp5,SWIGTYPE_p_helics_iteration_status, 0 |  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "helicsFederateRequestTimeIterative" "', argument " "5"" of type '" "helics_iteration_status *""'"); 
+  }
+  arg5 = (helics_iteration_status *)(argp5);
+  result = (helics_status)helicsFederateRequestTimeIterative(arg1,arg2,arg3,arg4,arg5);
+  resultobj = SWIG_From_int((int)(result));
+  if (SWIG_IsTmpObj(res4)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_double((*arg4)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_double, new_flags));
+  }
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsRequestTimeAsync(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateRequestTimeAsync(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
   helics_time_t arg2 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsRequestTimeAsync fed requestTime ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateRequestTimeAsync",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsRequestTimeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRequestTimeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsRequestTimeAsync" "', argument " "2"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTimeAsync" "', argument " "2"" of type '" "helics_time_t""'");
   } 
   arg2 = (helics_time_t)(val2);
-  result = (helicsStatus)helicsRequestTimeAsync(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsFederateRequestTimeAsync(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsRequestTimeIterativeAsync(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateRequestTimeComplete(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_time_t *arg2 = (helics_time_t *) 0 ;
+  int res1 ;
+  helics_time_t temp2 ;
+  int res2 = SWIG_TMPOBJ ;
+  PyObject * obj0 = 0 ;
+  helics_status result;
+  
+  arg2 = &temp2;
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateRequestTimeComplete",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRequestTimeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  result = (helics_status)helicsFederateRequestTimeComplete(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  if (SWIG_IsTmpObj(res2)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_double((*arg2)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateRequestTimeIterativeAsync(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
   helics_time_t arg2 ;
-  iteration_request arg3 ;
+  helics_iteration_request arg3 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsRequestTimeIterativeAsync fed requestTime iterate ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsFederateRequestTimeIterativeAsync",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsRequestTimeIterativeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRequestTimeIterativeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsRequestTimeIterativeAsync" "', argument " "2"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTimeIterativeAsync" "', argument " "2"" of type '" "helics_time_t""'");
   } 
   arg2 = (helics_time_t)(val2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsRequestTimeIterativeAsync" "', argument " "3"" of type '" "iteration_request""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRequestTimeIterativeAsync" "', argument " "3"" of type '" "helics_iteration_request""'");
   } 
-  arg3 = (iteration_request)(val3);
-  result = (helicsStatus)helicsRequestTimeIterativeAsync(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  arg3 = (helics_iteration_request)(val3);
+  result = (helics_status)helicsFederateRequestTimeIterativeAsync(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsRequestTimeFinalize(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateRequestTimeIterativeComplete(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_time_t *arg2 = (helics_time_t *) 0 ;
+  helics_iteration_status *arg3 = (helics_iteration_status *) 0 ;
   int res1 ;
-  helics_time_t result;
+  helics_time_t temp2 ;
+  int res2 = SWIG_TMPOBJ ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsRequestTimeFinalize fed ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  arg2 = &temp2;
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateRequestTimeIterativeComplete",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsRequestTimeFinalize" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRequestTimeIterativeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_time_t)helicsRequestTimeFinalize(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_double((double)(result)));
-  return TCL_OK;
+  res3 = SWIG_ConvertPtr(obj1, &argp3,SWIGTYPE_p_helics_iteration_status, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRequestTimeIterativeComplete" "', argument " "3"" of type '" "helics_iteration_status *""'"); 
+  }
+  arg3 = (helics_iteration_status *)(argp3);
+  result = (helics_status)helicsFederateRequestTimeIterativeComplete(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (SWIG_IsTmpObj(res2)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_double((*arg2)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
+  }
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsRequestTimeIterativeFinalize(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateGetName(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
   int res1 ;
-  helics_iterative_time result;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsRequestTimeIterativeFinalize fed ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsFederateGetName",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsRequestTimeIterativeFinalize" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetName" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = helicsRequestTimeIterativeFinalize(arg1);
-  Tcl_SetObjResult(interp,SWIG_NewInstanceObj((helics_iterative_time *)memcpy((helics_iterative_time *)calloc(1,sizeof(helics_iterative_time)),&result,sizeof(helics_iterative_time)), SWIGTYPE_p_helics_iterative_time, SWIG_POINTER_OWN | 0 ));
-  return TCL_OK;
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateGetName" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = (char *)(buf2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateGetName" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (helics_status)helicsFederateGetName(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsCreateQuery(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateSetTimeDelta(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_time_t arg2 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateSetTimeDelta",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetTimeDelta" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetTimeDelta" "', argument " "2"" of type '" "helics_time_t""'");
+  } 
+  arg2 = (helics_time_t)(val2);
+  result = (helics_status)helicsFederateSetTimeDelta(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateSetOutputDelay(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_time_t arg2 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateSetOutputDelay",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetOutputDelay" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetOutputDelay" "', argument " "2"" of type '" "helics_time_t""'");
+  } 
+  arg2 = (helics_time_t)(val2);
+  result = (helics_status)helicsFederateSetOutputDelay(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateSetInputDelay(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_time_t arg2 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateSetInputDelay",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetInputDelay" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetInputDelay" "', argument " "2"" of type '" "helics_time_t""'");
+  } 
+  arg2 = (helics_time_t)(val2);
+  result = (helics_status)helicsFederateSetInputDelay(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateSetPeriod(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_time_t arg2 ;
+  helics_time_t arg3 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  double val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsFederateSetPeriod",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetPeriod" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetPeriod" "', argument " "2"" of type '" "helics_time_t""'");
+  } 
+  arg2 = (helics_time_t)(val2);
+  ecode3 = SWIG_AsVal_double(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetPeriod" "', argument " "3"" of type '" "helics_time_t""'");
+  } 
+  arg3 = (helics_time_t)(val3);
+  result = (helics_status)helicsFederateSetPeriod(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateSetFlag(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  helics_bool_t arg3 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsFederateSetFlag",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetFlag" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetFlag" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetFlag" "', argument " "3"" of type '" "helics_bool_t""'");
+  } 
+  arg3 = (helics_bool_t)(val3);
+  result = (helics_status)helicsFederateSetFlag(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateSetLoggingLevel(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateSetLoggingLevel",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetLoggingLevel" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetLoggingLevel" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  result = (helics_status)helicsFederateSetLoggingLevel(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateGetCurrentTime(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_time_t *arg2 = (helics_time_t *) 0 ;
+  int res1 ;
+  helics_time_t temp2 ;
+  int res2 = SWIG_TMPOBJ ;
+  PyObject * obj0 = 0 ;
+  helics_status result;
+  
+  arg2 = &temp2;
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateGetCurrentTime",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetCurrentTime" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  result = (helics_status)helicsFederateGetCurrentTime(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  if (SWIG_IsTmpObj(res2)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_double((*arg2)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsCreateQuery(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   int res1 ;
@@ -3722,77 +5902,149 @@ _wrap_helicsCreateQuery(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, in
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   helics_query result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsCreateQuery target query ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_AsCharPtrAndSize(objv[1], &buf1, NULL, &alloc1);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsCreateQuery",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_AsCharPtrAndSize(obj0, &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateQuery" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = (char *)(buf1);
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateQuery" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
   result = (helics_query)helicsCreateQuery((char const *)arg1,(char const *)arg2);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsExecuteQuery(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  helics_query arg2 = (helics_query) 0 ;
+SWIGINTERN PyObject *_wrap_helicsQueryExecute(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_query arg1 = (helics_query) 0 ;
+  helics_federate arg2 = (helics_federate) 0 ;
   int res1 ;
   int res2 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   char *result = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsExecuteQuery fed query ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsQueryExecute",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsExecuteQuery" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsQueryExecute" "', argument " "1"" of type '" "helics_query""'"); 
   }
-  res2 = SWIG_ConvertPtr(objv[2],SWIG_as_voidptrptr(&arg2), 0, 0);
+  res2 = SWIG_ConvertPtr(obj1,SWIG_as_voidptrptr(&arg2), 0, 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsExecuteQuery" "', argument " "2"" of type '" "helics_query""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsQueryExecute" "', argument " "2"" of type '" "helics_federate""'"); 
   }
-  result = (char *)helicsExecuteQuery(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_FromCharPtr((const char *)result));
-  return TCL_OK;
+  result = (char *)helicsQueryExecute(arg1,arg2);
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsFreeQuery(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsQueryExecuteAsync(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_query arg1 = (helics_query) 0 ;
+  helics_federate arg2 = (helics_federate) 0 ;
+  int res1 ;
+  int res2 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsQueryExecuteAsync",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsQueryExecuteAsync" "', argument " "1"" of type '" "helics_query""'"); 
+  }
+  res2 = SWIG_ConvertPtr(obj1,SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsQueryExecuteAsync" "', argument " "2"" of type '" "helics_federate""'"); 
+  }
+  result = (helics_status)helicsQueryExecuteAsync(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsQueryExecuteComplete(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_query arg1 = (helics_query) 0 ;
   int res1 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsFreeQuery helics_query ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsQueryExecuteComplete",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFreeQuery" "', argument " "1"" of type '" "helics_query""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsQueryExecuteComplete" "', argument " "1"" of type '" "helics_query""'"); 
   }
-  helicsFreeQuery(arg1);
-  
-  return TCL_OK;
+  result = (char *)helicsQueryExecuteComplete(arg1);
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsRegisterSubscription(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  helics_value_federate arg1 = (helics_value_federate) 0 ;
+SWIGINTERN PyObject *_wrap_helicsQueryIsCompleted(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_query arg1 = (helics_query) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  helics_bool_t result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsQueryIsCompleted",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsQueryIsCompleted" "', argument " "1"" of type '" "helics_query""'"); 
+  }
+  result = (helics_bool_t)helicsQueryIsCompleted(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsQueryFree(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_query arg1 = (helics_query) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsQueryFree",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsQueryFree" "', argument " "1"" of type '" "helics_query""'"); 
+  }
+  helicsQueryFree(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateRegisterSubscription(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
   char *arg4 = (char *) 0 ;
@@ -3806,45 +6058,49 @@ _wrap_helicsRegisterSubscription(ClientData clientData SWIGUNUSED, Tcl_Interp *i
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
   helics_subscription result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oooo:helicsRegisterSubscription fed key type units ",(void *)0,(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsFederateRegisterSubscription",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsRegisterSubscription" "', argument " "1"" of type '" "helics_value_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterSubscription" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsRegisterSubscription" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterSubscription" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  res3 = SWIG_AsCharPtrAndSize(objv[3], &buf3, NULL, &alloc3);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsRegisterSubscription" "', argument " "3"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterSubscription" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = (char *)(buf3);
-  res4 = SWIG_AsCharPtrAndSize(objv[4], &buf4, NULL, &alloc4);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
   if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsRegisterSubscription" "', argument " "4"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterSubscription" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = (char *)(buf4);
-  result = (helics_subscription)helicsRegisterSubscription(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
+  result = (helics_subscription)helicsFederateRegisterSubscription(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
   if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
   if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsRegisterTypeSubscription(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  helics_value_federate arg1 = (helics_value_federate) 0 ;
+SWIGINTERN PyObject *_wrap_helicsFederateRegisterTypeSubscription(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
   char *arg4 = (char *) 0 ;
@@ -3857,43 +6113,47 @@ _wrap_helicsRegisterTypeSubscription(ClientData clientData SWIGUNUSED, Tcl_Inter
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
   helics_subscription result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oooo:helicsRegisterTypeSubscription fed key type units ",(void *)0,(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsFederateRegisterTypeSubscription",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsRegisterTypeSubscription" "', argument " "1"" of type '" "helics_value_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterTypeSubscription" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsRegisterTypeSubscription" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterTypeSubscription" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsRegisterTypeSubscription" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterTypeSubscription" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  res4 = SWIG_AsCharPtrAndSize(objv[4], &buf4, NULL, &alloc4);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
   if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsRegisterTypeSubscription" "', argument " "4"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterTypeSubscription" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = (char *)(buf4);
-  result = (helics_subscription)helicsRegisterTypeSubscription(arg1,(char const *)arg2,arg3,(char const *)arg4);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
+  result = (helics_subscription)helicsFederateRegisterTypeSubscription(arg1,(char const *)arg2,arg3,(char const *)arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsRegisterPublication(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  helics_value_federate arg1 = (helics_value_federate) 0 ;
+SWIGINTERN PyObject *_wrap_helicsFederateRegisterOptionalSubscription(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
   char *arg4 = (char *) 0 ;
@@ -3907,45 +6167,49 @@ _wrap_helicsRegisterPublication(ClientData clientData SWIGUNUSED, Tcl_Interp *in
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
-  helics_publication result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  helics_subscription result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oooo:helicsRegisterPublication fed key type units ",(void *)0,(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsFederateRegisterOptionalSubscription",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsRegisterPublication" "', argument " "1"" of type '" "helics_value_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterOptionalSubscription" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsRegisterPublication" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterOptionalSubscription" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  res3 = SWIG_AsCharPtrAndSize(objv[3], &buf3, NULL, &alloc3);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsRegisterPublication" "', argument " "3"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterOptionalSubscription" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = (char *)(buf3);
-  res4 = SWIG_AsCharPtrAndSize(objv[4], &buf4, NULL, &alloc4);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
   if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsRegisterPublication" "', argument " "4"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterOptionalSubscription" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = (char *)(buf4);
-  result = (helics_publication)helicsRegisterPublication(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
+  result = (helics_subscription)helicsFederateRegisterOptionalSubscription(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
   if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
   if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsRegisterTypePublication(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  helics_value_federate arg1 = (helics_value_federate) 0 ;
+SWIGINTERN PyObject *_wrap_helicsFederateRegisterOptionalTypeSubscription(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
   char *arg4 = (char *) 0 ;
@@ -3958,43 +6222,47 @@ _wrap_helicsRegisterTypePublication(ClientData clientData SWIGUNUSED, Tcl_Interp
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
-  helics_publication result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  helics_subscription result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oooo:helicsRegisterTypePublication fed key type units ",(void *)0,(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsFederateRegisterOptionalTypeSubscription",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsRegisterTypePublication" "', argument " "1"" of type '" "helics_value_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterOptionalTypeSubscription" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsRegisterTypePublication" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterOptionalTypeSubscription" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsRegisterTypePublication" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterOptionalTypeSubscription" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  res4 = SWIG_AsCharPtrAndSize(objv[4], &buf4, NULL, &alloc4);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
   if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsRegisterTypePublication" "', argument " "4"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterOptionalTypeSubscription" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = (char *)(buf4);
-  result = (helics_publication)helicsRegisterTypePublication(arg1,(char const *)arg2,arg3,(char const *)arg4);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
+  result = (helics_subscription)helicsFederateRegisterOptionalTypeSubscription(arg1,(char const *)arg2,arg3,(char const *)arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsRegisterGlobalPublication(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  helics_value_federate arg1 = (helics_value_federate) 0 ;
+SWIGINTERN PyObject *_wrap_helicsFederateRegisterPublication(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
   char *arg4 = (char *) 0 ;
@@ -4008,45 +6276,49 @@ _wrap_helicsRegisterGlobalPublication(ClientData clientData SWIGUNUSED, Tcl_Inte
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
   helics_publication result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oooo:helicsRegisterGlobalPublication fed key type units ",(void *)0,(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsFederateRegisterPublication",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsRegisterGlobalPublication" "', argument " "1"" of type '" "helics_value_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterPublication" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsRegisterGlobalPublication" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterPublication" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  res3 = SWIG_AsCharPtrAndSize(objv[3], &buf3, NULL, &alloc3);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsRegisterGlobalPublication" "', argument " "3"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterPublication" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = (char *)(buf3);
-  res4 = SWIG_AsCharPtrAndSize(objv[4], &buf4, NULL, &alloc4);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
   if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsRegisterGlobalPublication" "', argument " "4"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterPublication" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = (char *)(buf4);
-  result = (helics_publication)helicsRegisterGlobalPublication(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
+  result = (helics_publication)helicsFederateRegisterPublication(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
   if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
   if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsRegisterGlobalTypePublication(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  helics_value_federate arg1 = (helics_value_federate) 0 ;
+SWIGINTERN PyObject *_wrap_helicsFederateRegisterTypePublication(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
   char *arg4 = (char *) 0 ;
@@ -4059,42 +6331,155 @@ _wrap_helicsRegisterGlobalTypePublication(ClientData clientData SWIGUNUSED, Tcl_
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
   helics_publication result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oooo:helicsRegisterGlobalTypePublication fed key type units ",(void *)0,(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsFederateRegisterTypePublication",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsRegisterGlobalTypePublication" "', argument " "1"" of type '" "helics_value_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterTypePublication" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsRegisterGlobalTypePublication" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterTypePublication" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsRegisterGlobalTypePublication" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterTypePublication" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  res4 = SWIG_AsCharPtrAndSize(objv[4], &buf4, NULL, &alloc4);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
   if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsRegisterGlobalTypePublication" "', argument " "4"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterTypePublication" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = (char *)(buf4);
-  result = (helics_publication)helicsRegisterGlobalTypePublication(arg1,(char const *)arg2,arg3,(char const *)arg4);
-  Tcl_SetObjResult(interp, SWIG_NewInstanceObj( SWIG_as_voidptr(result), SWIGTYPE_p_void,0));
+  result = (helics_publication)helicsFederateRegisterTypePublication(arg1,(char const *)arg2,arg3,(char const *)arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsPublish(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsFederateRegisterGlobalPublication(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  char *arg4 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  helics_publication result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsFederateRegisterGlobalPublication",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterGlobalPublication" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterGlobalPublication" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterGlobalPublication" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = (char *)(buf3);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterGlobalPublication" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = (char *)(buf4);
+  result = (helics_publication)helicsFederateRegisterGlobalPublication(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateRegisterGlobalTypePublication(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  char *arg4 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  helics_publication result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsFederateRegisterGlobalTypePublication",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterGlobalTypePublication" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterGlobalTypePublication" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterGlobalTypePublication" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterGlobalTypePublication" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = (char *)(buf4);
+  result = (helics_publication)helicsFederateRegisterGlobalTypePublication(arg1,(char const *)arg2,arg3,(char const *)arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsPublicationPublish(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_publication arg1 = (helics_publication) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
@@ -4104,125 +6489,134 @@ _wrap_helicsPublish(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int ob
   int alloc2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsPublish pub data len ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsPublicationPublish",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublish" "', argument " "1"" of type '" "helics_publication""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublish" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublish" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationPublish" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublish" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationPublish" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  result = (helicsStatus)helicsPublish(arg1,(char const *)arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsPublicationPublish(arg1,(char const *)arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsPublishString(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsPublicationPublishString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_publication arg1 = (helics_publication) 0 ;
   char *arg2 = (char *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsPublishString pub str ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsPublicationPublishString",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublishString" "', argument " "1"" of type '" "helics_publication""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishString" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublishString" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationPublishString" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  result = (helicsStatus)helicsPublishString(arg1,(char const *)arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsPublicationPublishString(arg1,(char const *)arg2);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsPublishInteger(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsPublicationPublishInteger(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_publication arg1 = (helics_publication) 0 ;
   int64_t arg2 ;
   int res1 ;
   void *argp2 ;
   int res2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsPublishInteger pub val ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsPublicationPublishInteger",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublishInteger" "', argument " "1"" of type '" "helics_publication""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishInteger" "', argument " "1"" of type '" "helics_publication""'"); 
   }
   {
-    res2 = SWIG_ConvertPtr(objv[2], &argp2, SWIGTYPE_p_int64_t,  0 );
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_int64_t,  0 );
     if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublishInteger" "', argument " "2"" of type '" "int64_t""'"); 
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationPublishInteger" "', argument " "2"" of type '" "int64_t""'"); 
     }  
     if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsPublishInteger" "', argument " "2"" of type '" "int64_t""'");
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsPublicationPublishInteger" "', argument " "2"" of type '" "int64_t""'");
     } else {
       arg2 = *((int64_t *)(argp2));
     }
   }
-  result = (helicsStatus)helicsPublishInteger(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsPublicationPublishInteger(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsPublishDouble(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsPublicationPublishDouble(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_publication arg1 = (helics_publication) 0 ;
   double arg2 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsPublishDouble pub val ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsPublicationPublishDouble",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublishDouble" "', argument " "1"" of type '" "helics_publication""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishDouble" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublishDouble" "', argument " "2"" of type '" "double""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishDouble" "', argument " "2"" of type '" "double""'");
   } 
   arg2 = (double)(val2);
-  result = (helicsStatus)helicsPublishDouble(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsPublicationPublishDouble(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsPublishComplex(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsPublicationPublishComplex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_publication arg1 = (helics_publication) 0 ;
   double arg2 ;
   double arg3 ;
@@ -4231,33 +6625,36 @@ _wrap_helicsPublishComplex(ClientData clientData SWIGUNUSED, Tcl_Interp *interp,
   int ecode2 = 0 ;
   double val3 ;
   int ecode3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsPublishComplex pub real imag ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsPublicationPublishComplex",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublishComplex" "', argument " "1"" of type '" "helics_publication""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishComplex" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublishComplex" "', argument " "2"" of type '" "double""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishComplex" "', argument " "2"" of type '" "double""'");
   } 
   arg2 = (double)(val2);
-  ecode3 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_double(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublishComplex" "', argument " "3"" of type '" "double""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationPublishComplex" "', argument " "3"" of type '" "double""'");
   } 
   arg3 = (double)(val3);
-  result = (helicsStatus)helicsPublishComplex(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsPublicationPublishComplex(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsPublishVector(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsPublicationPublishVector(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_publication arg1 = (helics_publication) 0 ;
   double *arg2 ;
   int arg3 ;
@@ -4266,52 +6663,106 @@ _wrap_helicsPublishVector(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, 
   int res2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsPublishVector pub data len ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsPublicationPublishVector",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublishVector" "', argument " "1"" of type '" "helics_publication""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishVector" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  res2 = SWIG_ConvertPtr(objv[2], &argp2,SWIGTYPE_p_double, 0 |  0 );
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_double, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublishVector" "', argument " "2"" of type '" "double const []""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationPublishVector" "', argument " "2"" of type '" "double const []""'"); 
   } 
   arg2 = (double *)(argp2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublishVector" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationPublishVector" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  result = (helicsStatus)helicsPublishVector(arg1,(double const (*))arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsPublicationPublishVector(arg1,(double const (*))arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsGetValueSize(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionGetValueSize(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   int res1 ;
+  PyObject * obj0 = 0 ;
   int result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsGetValueSize sub ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsSubscriptionGetValueSize",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetValueSize" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetValueSize" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  result = (int)helicsGetValueSize(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (int)helicsSubscriptionGetValueSize(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsGetValue(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionGetValue(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_subscription arg1 = (helics_subscription) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int *arg4 = (int *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsSubscriptionGetValue",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetValue" "', argument " "1"" of type '" "helics_subscription""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetValue" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = (char *)(buf2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionGetValue" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsSubscriptionGetValue" "', argument " "4"" of type '" "int *""'"); 
+  }
+  arg4 = (int *)(argp4);
+  result = (helics_status)helicsSubscriptionGetValue(arg1,arg2,arg3,arg4);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsSubscriptionGetString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
@@ -4321,129 +6772,97 @@ _wrap_helicsGetValue(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int o
   int alloc2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  int result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsGetValue sub data maxlen ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsSubscriptionGetString",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetValue" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetString" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsGetValue" "', argument " "2"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetString" "', argument " "2"" of type '" "char *""'");
   }
   arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsGetValue" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionGetString" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  result = (int)helicsGetValue(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsSubscriptionGetString(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsGetString(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
-  int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  helicsStatus result;
-  
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsGetString sub str maxlen ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetString" "', argument " "1"" of type '" "helics_subscription""'"); 
-  }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsGetString" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsGetString" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = (int)(val3);
-  result = (helicsStatus)helicsGetString(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
-}
-
-
-SWIGINTERN int
-_wrap_helicsGetInteger(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionGetInteger(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   int64_t *arg2 = (int64_t *) 0 ;
   int res1 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsGetInteger sub val ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsSubscriptionGetInteger",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetInteger" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetInteger" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  res2 = SWIG_ConvertPtr(objv[2], &argp2,SWIGTYPE_p_int64_t, 0 |  0 );
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_int64_t, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsGetInteger" "', argument " "2"" of type '" "int64_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetInteger" "', argument " "2"" of type '" "int64_t *""'"); 
   }
   arg2 = (int64_t *)(argp2);
-  result = (helicsStatus)helicsGetInteger(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsSubscriptionGetInteger(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsGetDouble(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionGetDouble(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   double *arg2 = (double *) 0 ;
   int res1 ;
   double temp2 ;
   int res2 = SWIG_TMPOBJ ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  helics_status result;
   
   arg2 = &temp2;
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsGetDouble sub ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsSubscriptionGetDouble",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetDouble" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetDouble" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  result = (helicsStatus)helicsGetDouble(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsSubscriptionGetDouble(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
   if (SWIG_IsTmpObj(res2)) {
-    Tcl_ListObjAppendElement(interp,Tcl_GetObjResult(interp),SWIG_From_double((*arg2)));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_double((*arg2)));
   } else {
     int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    Tcl_ListObjAppendElement(interp,Tcl_GetObjResult(interp),SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
   }
-  return TCL_OK;
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsGetComplex(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionGetComplex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   double *arg2 = (double *) 0 ;
   double *arg3 = (double *) 0 ;
@@ -4452,91 +6871,105 @@ _wrap_helicsGetComplex(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int
   int res2 = SWIG_TMPOBJ ;
   double temp3 ;
   int res3 = SWIG_TMPOBJ ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  helics_status result;
   
   arg2 = &temp2;
   arg3 = &temp3;
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsGetComplex sub ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsSubscriptionGetComplex",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetComplex" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetComplex" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  result = (helicsStatus)helicsGetComplex(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsSubscriptionGetComplex(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
   if (SWIG_IsTmpObj(res2)) {
-    Tcl_ListObjAppendElement(interp,Tcl_GetObjResult(interp),SWIG_From_double((*arg2)));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_double((*arg2)));
   } else {
     int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    Tcl_ListObjAppendElement(interp,Tcl_GetObjResult(interp),SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
   }
   if (SWIG_IsTmpObj(res3)) {
-    Tcl_ListObjAppendElement(interp,Tcl_GetObjResult(interp),SWIG_From_double((*arg3)));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_double((*arg3)));
   } else {
     int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    Tcl_ListObjAppendElement(interp,Tcl_GetObjResult(interp),SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_double, new_flags));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_double, new_flags));
   }
-  return TCL_OK;
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsGetVectorSize(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionGetVectorSize(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   int res1 ;
+  PyObject * obj0 = 0 ;
   int result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsGetVectorSize sub ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsSubscriptionGetVectorSize",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetVectorSize" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetVectorSize" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  result = (int)helicsGetVectorSize(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (int)helicsSubscriptionGetVectorSize(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsGetVector(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionGetVector(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   double *arg2 ;
   int arg3 ;
+  int *arg4 = (int *) 0 ;
   int res1 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  int result;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsGetVector sub data maxlen ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsSubscriptionGetVector",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetVector" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetVector" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  res2 = SWIG_ConvertPtr(objv[2], &argp2,SWIGTYPE_p_double, 0 |  0 );
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_double, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsGetVector" "', argument " "2"" of type '" "double []""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetVector" "', argument " "2"" of type '" "double []""'"); 
   } 
   arg2 = (double *)(argp2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsGetVector" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionGetVector" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  result = (int)helicsGetVector(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsSubscriptionGetVector" "', argument " "4"" of type '" "int *""'"); 
+  }
+  arg4 = (int *)(argp4);
+  result = (helics_status)helicsSubscriptionGetVector(arg1,arg2,arg3,arg4);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsSetDefaultValue(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionSetDefault(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
@@ -4546,125 +6979,134 @@ _wrap_helicsSetDefaultValue(ClientData clientData SWIGUNUSED, Tcl_Interp *interp
   int alloc2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsSetDefaultValue sub data len ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsSubscriptionSetDefault",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSetDefaultValue" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefault" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSetDefaultValue" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionSetDefault" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSetDefaultValue" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionSetDefault" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  result = (helicsStatus)helicsSetDefaultValue(arg1,(char const *)arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsSubscriptionSetDefault(arg1,(char const *)arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsSetDefaultString(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionSetDefaultString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   char *arg2 = (char *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsSetDefaultString sub str ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsSubscriptionSetDefaultString",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSetDefaultString" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultString" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSetDefaultString" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionSetDefaultString" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  result = (helicsStatus)helicsSetDefaultString(arg1,(char const *)arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsSubscriptionSetDefaultString(arg1,(char const *)arg2);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsSetDefaultInteger(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionSetDefaultInteger(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   int64_t arg2 ;
   int res1 ;
   void *argp2 ;
   int res2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsSetDefaultInteger sub val ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsSubscriptionSetDefaultInteger",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSetDefaultInteger" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultInteger" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
   {
-    res2 = SWIG_ConvertPtr(objv[2], &argp2, SWIGTYPE_p_int64_t,  0 );
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_int64_t,  0 );
     if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSetDefaultInteger" "', argument " "2"" of type '" "int64_t""'"); 
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionSetDefaultInteger" "', argument " "2"" of type '" "int64_t""'"); 
     }  
     if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsSetDefaultInteger" "', argument " "2"" of type '" "int64_t""'");
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsSubscriptionSetDefaultInteger" "', argument " "2"" of type '" "int64_t""'");
     } else {
       arg2 = *((int64_t *)(argp2));
     }
   }
-  result = (helicsStatus)helicsSetDefaultInteger(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsSubscriptionSetDefaultInteger(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsSetDefaultDouble(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionSetDefaultDouble(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   double arg2 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsSetDefaultDouble sub val ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsSubscriptionSetDefaultDouble",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSetDefaultDouble" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultDouble" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsSetDefaultDouble" "', argument " "2"" of type '" "double""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsSubscriptionSetDefaultDouble" "', argument " "2"" of type '" "double""'");
   } 
   arg2 = (double)(val2);
-  result = (helicsStatus)helicsSetDefaultDouble(arg1,arg2);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsSubscriptionSetDefaultDouble(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsSetDefaultComplex(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionSetDefaultComplex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   double arg2 ;
   double arg3 ;
@@ -4673,33 +7115,36 @@ _wrap_helicsSetDefaultComplex(ClientData clientData SWIGUNUSED, Tcl_Interp *inte
   int ecode2 = 0 ;
   double val3 ;
   int ecode3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsSetDefaultComplex sub real imag ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsSubscriptionSetDefaultComplex",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSetDefaultComplex" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultComplex" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  ecode2 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[2], &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsSetDefaultComplex" "', argument " "2"" of type '" "double""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsSubscriptionSetDefaultComplex" "', argument " "2"" of type '" "double""'");
   } 
   arg2 = (double)(val2);
-  ecode3 = SWIG_AsVal_double SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_double(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSetDefaultComplex" "', argument " "3"" of type '" "double""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionSetDefaultComplex" "', argument " "3"" of type '" "double""'");
   } 
   arg3 = (double)(val3);
-  result = (helicsStatus)helicsSetDefaultComplex(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_status)helicsSubscriptionSetDefaultComplex(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsSetDefaultVector(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionSetDefaultVector(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   double *arg2 = (double *) 0 ;
   int arg3 ;
@@ -4708,35 +7153,37 @@ _wrap_helicsSetDefaultVector(ClientData clientData SWIGUNUSED, Tcl_Interp *inter
   int res2 = SWIG_TMPOBJ ;
   int val3 ;
   int ecode3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
   
   arg2 = &temp2;
-  if (SWIG_GetArgs(interp, objc, objv,"oo:helicsSetDefaultVector sub len ",(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsSubscriptionSetDefaultVector",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSetDefaultVector" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultVector" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[2], &val3);
+  ecode3 = SWIG_AsVal_int(obj1, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSetDefaultVector" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionSetDefaultVector" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  result = (helicsStatus)helicsSetDefaultVector(arg1,(double const *)arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsSubscriptionSetDefaultVector(arg1,(double const *)arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
   if (SWIG_IsTmpObj(res2)) {
-    Tcl_ListObjAppendElement(interp,Tcl_GetObjResult(interp),SWIG_From_double((*arg2)));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_double((*arg2)));
   } else {
     int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    Tcl_ListObjAppendElement(interp,Tcl_GetObjResult(interp),SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
   }
-  return TCL_OK;
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsGetSubscriptionType(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionGetType(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
@@ -4746,35 +7193,38 @@ _wrap_helicsGetSubscriptionType(ClientData clientData SWIGUNUSED, Tcl_Interp *in
   int alloc2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsGetSubscriptionType sub str maxlen ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsSubscriptionGetType",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetSubscriptionType" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetType" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsGetSubscriptionType" "', argument " "2"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetType" "', argument " "2"" of type '" "char *""'");
   }
   arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsGetSubscriptionType" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionGetType" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  result = (helicsStatus)helicsGetSubscriptionType(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsSubscriptionGetType(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsGetPublicationType(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsPublicationGetType(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_publication arg1 = (helics_publication) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
@@ -4784,35 +7234,38 @@ _wrap_helicsGetPublicationType(ClientData clientData SWIGUNUSED, Tcl_Interp *int
   int alloc2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsGetPublicationType pub str maxlen ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsPublicationGetType",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetPublicationType" "', argument " "1"" of type '" "helics_publication""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationGetType" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsGetPublicationType" "', argument " "2"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationGetType" "', argument " "2"" of type '" "char *""'");
   }
   arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsGetPublicationType" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationGetType" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  result = (helicsStatus)helicsGetPublicationType(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsPublicationGetType(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsGetSubscriptionKey(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionGetKey(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
@@ -4822,35 +7275,38 @@ _wrap_helicsGetSubscriptionKey(ClientData clientData SWIGUNUSED, Tcl_Interp *int
   int alloc2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsGetSubscriptionKey sub str maxlen ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsSubscriptionGetKey",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetSubscriptionKey" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetKey" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsGetSubscriptionKey" "', argument " "2"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetKey" "', argument " "2"" of type '" "char *""'");
   }
   arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsGetSubscriptionKey" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionGetKey" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  result = (helicsStatus)helicsGetSubscriptionKey(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsSubscriptionGetKey(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsGetPublicationKey(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsPublicationGetKey(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_publication arg1 = (helics_publication) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
@@ -4860,35 +7316,38 @@ _wrap_helicsGetPublicationKey(ClientData clientData SWIGUNUSED, Tcl_Interp *inte
   int alloc2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsGetPublicationKey pub str maxlen ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsPublicationGetKey",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetPublicationKey" "', argument " "1"" of type '" "helics_publication""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationGetKey" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsGetPublicationKey" "', argument " "2"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationGetKey" "', argument " "2"" of type '" "char *""'");
   }
   arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsGetPublicationKey" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationGetKey" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  result = (helicsStatus)helicsGetPublicationKey(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsPublicationGetKey(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsGetSubscriptionUnits(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionGetUnits(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
@@ -4898,35 +7357,38 @@ _wrap_helicsGetSubscriptionUnits(ClientData clientData SWIGUNUSED, Tcl_Interp *i
   int alloc2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsGetSubscriptionUnits sub str maxlen ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsSubscriptionGetUnits",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetSubscriptionUnits" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetUnits" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsGetSubscriptionUnits" "', argument " "2"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetUnits" "', argument " "2"" of type '" "char *""'");
   }
   arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsGetSubscriptionUnits" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionGetUnits" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  result = (helicsStatus)helicsGetSubscriptionUnits(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsSubscriptionGetUnits(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsGetPublicationUnits(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsPublicationGetUnits(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_publication arg1 = (helics_publication) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
@@ -4936,221 +7398,1417 @@ _wrap_helicsGetPublicationUnits(ClientData clientData SWIGUNUSED, Tcl_Interp *in
   int alloc2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  helicsStatus result;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"ooo:helicsGetPublicationUnits pub str maxlen ",(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsPublicationGetUnits",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetPublicationUnits" "', argument " "1"" of type '" "helics_publication""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationGetUnits" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(objv[2], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsGetPublicationUnits" "', argument " "2"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationGetUnits" "', argument " "2"" of type '" "char *""'");
   }
   arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int SWIG_TCL_CALL_ARGS_2(objv[3], &val3);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsGetPublicationUnits" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationGetUnits" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  result = (helicsStatus)helicsGetPublicationUnits(arg1,arg2,arg3);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
+  result = (helics_status)helicsPublicationGetUnits(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_OK;
+  return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsIsValueUpdated(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionIsUpdated(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   int res1 ;
-  int result;
+  PyObject * obj0 = 0 ;
+  helics_bool_t result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsIsValueUpdated sub ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsSubscriptionIsUpdated",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsIsValueUpdated" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionIsUpdated" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  result = (int)helicsIsValueUpdated(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_int((int)(result)));
-  return TCL_OK;
+  result = (helics_bool_t)helicsSubscriptionIsUpdated(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
-SWIGINTERN int
-_wrap_helicsGetLastUpdateTime(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionLastUpdateTime(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
   int res1 ;
+  PyObject * obj0 = 0 ;
   helics_time_t result;
   
-  if (SWIG_GetArgs(interp, objc, objv,"o:helicsGetLastUpdateTime sub ",(void *)0) == TCL_ERROR) SWIG_fail;
-  res1 = SWIG_ConvertPtr(objv[1],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsSubscriptionLastUpdateTime",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetLastUpdateTime" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionLastUpdateTime" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  result = (helics_time_t)helicsGetLastUpdateTime(arg1);
-  Tcl_SetObjResult(interp,SWIG_From_double((double)(result)));
-  return TCL_OK;
+  result = (helics_time_t)helicsSubscriptionLastUpdateTime(arg1);
+  resultobj = SWIG_From_double((double)(result));
+  return resultobj;
 fail:
-  return TCL_ERROR;
+  return NULL;
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsFederateRegisterEndpoint(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_endpoint result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsFederateRegisterEndpoint",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterEndpoint" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterEndpoint" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterEndpoint" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = (char *)(buf3);
+  result = (helics_endpoint)helicsFederateRegisterEndpoint(arg1,(char const *)arg2,(char const *)arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return NULL;
+}
 
-static swig_command_info swig_commands[] = {
-    { SWIG_prefix "helics_iterative_time_time_set", (swig_wrapper_func) _wrap_helics_iterative_time_time_set, NULL},
-    { SWIG_prefix "helics_iterative_time_time_get", (swig_wrapper_func) _wrap_helics_iterative_time_time_get, NULL},
-    { SWIG_prefix "helics_iterative_time_status_set", (swig_wrapper_func) _wrap_helics_iterative_time_status_set, NULL},
-    { SWIG_prefix "helics_iterative_time_status_get", (swig_wrapper_func) _wrap_helics_iterative_time_status_get, NULL},
-    { SWIG_prefix "new_helics_iterative_time", (swig_wrapper_func) _wrap_new_helics_iterative_time, NULL},
-    { SWIG_prefix "delete_helics_iterative_time", (swig_wrapper_func) _wrap_delete_helics_iterative_time, NULL},
-    { SWIG_prefix "helics_iterative_time", (swig_wrapper_func) SWIG_ObjectConstructor, (ClientData)&_wrap_class_helics_iterative_time},
-    { SWIG_prefix "data_t_data_set", (swig_wrapper_func) _wrap_data_t_data_set, NULL},
-    { SWIG_prefix "data_t_data_get", (swig_wrapper_func) _wrap_data_t_data_get, NULL},
-    { SWIG_prefix "data_t_length_set", (swig_wrapper_func) _wrap_data_t_length_set, NULL},
-    { SWIG_prefix "data_t_length_get", (swig_wrapper_func) _wrap_data_t_length_get, NULL},
-    { SWIG_prefix "new_data_t", (swig_wrapper_func) _wrap_new_data_t, NULL},
-    { SWIG_prefix "delete_data_t", (swig_wrapper_func) _wrap_delete_data_t, NULL},
-    { SWIG_prefix "data_t", (swig_wrapper_func) SWIG_ObjectConstructor, (ClientData)&_wrap_class_data_t},
-    { SWIG_prefix "message_t_time_set", (swig_wrapper_func) _wrap_message_t_time_set, NULL},
-    { SWIG_prefix "message_t_time_get", (swig_wrapper_func) _wrap_message_t_time_get, NULL},
-    { SWIG_prefix "message_t_data_set", (swig_wrapper_func) _wrap_message_t_data_set, NULL},
-    { SWIG_prefix "message_t_data_get", (swig_wrapper_func) _wrap_message_t_data_get, NULL},
-    { SWIG_prefix "message_t_length_set", (swig_wrapper_func) _wrap_message_t_length_set, NULL},
-    { SWIG_prefix "message_t_length_get", (swig_wrapper_func) _wrap_message_t_length_get, NULL},
-    { SWIG_prefix "message_t_original_source_set", (swig_wrapper_func) _wrap_message_t_original_source_set, NULL},
-    { SWIG_prefix "message_t_original_source_get", (swig_wrapper_func) _wrap_message_t_original_source_get, NULL},
-    { SWIG_prefix "message_t_source_set", (swig_wrapper_func) _wrap_message_t_source_set, NULL},
-    { SWIG_prefix "message_t_source_get", (swig_wrapper_func) _wrap_message_t_source_get, NULL},
-    { SWIG_prefix "message_t_dest_set", (swig_wrapper_func) _wrap_message_t_dest_set, NULL},
-    { SWIG_prefix "message_t_dest_get", (swig_wrapper_func) _wrap_message_t_dest_get, NULL},
-    { SWIG_prefix "new_message_t", (swig_wrapper_func) _wrap_new_message_t, NULL},
-    { SWIG_prefix "delete_message_t", (swig_wrapper_func) _wrap_delete_message_t, NULL},
-    { SWIG_prefix "message_t", (swig_wrapper_func) SWIG_ObjectConstructor, (ClientData)&_wrap_class_message_t},
-    { SWIG_prefix "helicsGetVersion", (swig_wrapper_func) _wrap_helicsGetVersion, NULL},
-    { SWIG_prefix "helicsCreateCore", (swig_wrapper_func) _wrap_helicsCreateCore, NULL},
-    { SWIG_prefix "helicsCreateCoreFromArgs", (swig_wrapper_func) _wrap_helicsCreateCoreFromArgs, NULL},
-    { SWIG_prefix "helicsCreateBroker", (swig_wrapper_func) _wrap_helicsCreateBroker, NULL},
-    { SWIG_prefix "helicsCreateBrokerFromArgs", (swig_wrapper_func) _wrap_helicsCreateBrokerFromArgs, NULL},
-    { SWIG_prefix "helicsBrokerIsConnected", (swig_wrapper_func) _wrap_helicsBrokerIsConnected, NULL},
-    { SWIG_prefix "helicsCoreIsConnected", (swig_wrapper_func) _wrap_helicsCoreIsConnected, NULL},
-    { SWIG_prefix "helicsFreeCore", (swig_wrapper_func) _wrap_helicsFreeCore, NULL},
-    { SWIG_prefix "helicsFreeBroker", (swig_wrapper_func) _wrap_helicsFreeBroker, NULL},
-    { SWIG_prefix "helicsCreateValueFederate", (swig_wrapper_func) _wrap_helicsCreateValueFederate, NULL},
-    { SWIG_prefix "helicsCreateValueFederateFromFile", (swig_wrapper_func) _wrap_helicsCreateValueFederateFromFile, NULL},
-    { SWIG_prefix "helicsCreateCombinationFederate", (swig_wrapper_func) _wrap_helicsCreateCombinationFederate, NULL},
-    { SWIG_prefix "helicsCreateCombinationFederateFromFile", (swig_wrapper_func) _wrap_helicsCreateCombinationFederateFromFile, NULL},
-    { SWIG_prefix "helicsFederateInfoCreate", (swig_wrapper_func) _wrap_helicsFederateInfoCreate, NULL},
-    { SWIG_prefix "helicsFederateInfoLoadFromArgs", (swig_wrapper_func) _wrap_helicsFederateInfoLoadFromArgs, NULL},
-    { SWIG_prefix "helicsFederateInfoFree", (swig_wrapper_func) _wrap_helicsFederateInfoFree, NULL},
-    { SWIG_prefix "helicsFederateInfoSetFederateName", (swig_wrapper_func) _wrap_helicsFederateInfoSetFederateName, NULL},
-    { SWIG_prefix "helicsFederateInfoSetCoreName", (swig_wrapper_func) _wrap_helicsFederateInfoSetCoreName, NULL},
-    { SWIG_prefix "helicsFederateInfoSetCoreInitString", (swig_wrapper_func) _wrap_helicsFederateInfoSetCoreInitString, NULL},
-    { SWIG_prefix "helicsFederateInfoSetCoreTypeFromString", (swig_wrapper_func) _wrap_helicsFederateInfoSetCoreTypeFromString, NULL},
-    { SWIG_prefix "helicsFederateInfoSetCoreType", (swig_wrapper_func) _wrap_helicsFederateInfoSetCoreType, NULL},
-    { SWIG_prefix "helicsFederateInfoSetFlag", (swig_wrapper_func) _wrap_helicsFederateInfoSetFlag, NULL},
-    { SWIG_prefix "helicsFederateInfoSetoutputDelay", (swig_wrapper_func) _wrap_helicsFederateInfoSetoutputDelay, NULL},
-    { SWIG_prefix "helicsFederateInfoSetTimeDelta", (swig_wrapper_func) _wrap_helicsFederateInfoSetTimeDelta, NULL},
-    { SWIG_prefix "helicsFederateInfoSetinputDelay", (swig_wrapper_func) _wrap_helicsFederateInfoSetinputDelay, NULL},
-    { SWIG_prefix "helicsFederateInfoSetTimeOffset", (swig_wrapper_func) _wrap_helicsFederateInfoSetTimeOffset, NULL},
-    { SWIG_prefix "helicsFederateInfoSetPeriod", (swig_wrapper_func) _wrap_helicsFederateInfoSetPeriod, NULL},
-    { SWIG_prefix "helicsFederateInfoSetMaxIterations", (swig_wrapper_func) _wrap_helicsFederateInfoSetMaxIterations, NULL},
-    { SWIG_prefix "helicsFederateInfoSetLoggingLevel", (swig_wrapper_func) _wrap_helicsFederateInfoSetLoggingLevel, NULL},
-    { SWIG_prefix "helicsFinalize", (swig_wrapper_func) _wrap_helicsFinalize, NULL},
-    { SWIG_prefix "helicsFreeFederate", (swig_wrapper_func) _wrap_helicsFreeFederate, NULL},
-    { SWIG_prefix "helicsCloseLibrary", (swig_wrapper_func) _wrap_helicsCloseLibrary, NULL},
-    { SWIG_prefix "helicsEnterInitializationMode", (swig_wrapper_func) _wrap_helicsEnterInitializationMode, NULL},
-    { SWIG_prefix "helicsEnterInitializationModeAsync", (swig_wrapper_func) _wrap_helicsEnterInitializationModeAsync, NULL},
-    { SWIG_prefix "helicsAsyncOperationCompleted", (swig_wrapper_func) _wrap_helicsAsyncOperationCompleted, NULL},
-    { SWIG_prefix "helicsEnterInitializationModeFinalize", (swig_wrapper_func) _wrap_helicsEnterInitializationModeFinalize, NULL},
-    { SWIG_prefix "helicsEnterExecutionMode", (swig_wrapper_func) _wrap_helicsEnterExecutionMode, NULL},
-    { SWIG_prefix "helicsEnterExecutionModeIterative", (swig_wrapper_func) _wrap_helicsEnterExecutionModeIterative, NULL},
-    { SWIG_prefix "helicsEnterExecutionModeAsync", (swig_wrapper_func) _wrap_helicsEnterExecutionModeAsync, NULL},
-    { SWIG_prefix "helicsEnterExecutionModeIterativeAsync", (swig_wrapper_func) _wrap_helicsEnterExecutionModeIterativeAsync, NULL},
-    { SWIG_prefix "helicsEnterExecutionModeFinalize", (swig_wrapper_func) _wrap_helicsEnterExecutionModeFinalize, NULL},
-    { SWIG_prefix "helicsEnterExecutionModeIterativeFinalize", (swig_wrapper_func) _wrap_helicsEnterExecutionModeIterativeFinalize, NULL},
-    { SWIG_prefix "helicsRequestTime", (swig_wrapper_func) _wrap_helicsRequestTime, NULL},
-    { SWIG_prefix "helicsRequestTimeIterative", (swig_wrapper_func) _wrap_helicsRequestTimeIterative, NULL},
-    { SWIG_prefix "helicsRequestTimeAsync", (swig_wrapper_func) _wrap_helicsRequestTimeAsync, NULL},
-    { SWIG_prefix "helicsRequestTimeIterativeAsync", (swig_wrapper_func) _wrap_helicsRequestTimeIterativeAsync, NULL},
-    { SWIG_prefix "helicsRequestTimeFinalize", (swig_wrapper_func) _wrap_helicsRequestTimeFinalize, NULL},
-    { SWIG_prefix "helicsRequestTimeIterativeFinalize", (swig_wrapper_func) _wrap_helicsRequestTimeIterativeFinalize, NULL},
-    { SWIG_prefix "helicsCreateQuery", (swig_wrapper_func) _wrap_helicsCreateQuery, NULL},
-    { SWIG_prefix "helicsExecuteQuery", (swig_wrapper_func) _wrap_helicsExecuteQuery, NULL},
-    { SWIG_prefix "helicsFreeQuery", (swig_wrapper_func) _wrap_helicsFreeQuery, NULL},
-    { SWIG_prefix "helicsRegisterSubscription", (swig_wrapper_func) _wrap_helicsRegisterSubscription, NULL},
-    { SWIG_prefix "helicsRegisterTypeSubscription", (swig_wrapper_func) _wrap_helicsRegisterTypeSubscription, NULL},
-    { SWIG_prefix "helicsRegisterPublication", (swig_wrapper_func) _wrap_helicsRegisterPublication, NULL},
-    { SWIG_prefix "helicsRegisterTypePublication", (swig_wrapper_func) _wrap_helicsRegisterTypePublication, NULL},
-    { SWIG_prefix "helicsRegisterGlobalPublication", (swig_wrapper_func) _wrap_helicsRegisterGlobalPublication, NULL},
-    { SWIG_prefix "helicsRegisterGlobalTypePublication", (swig_wrapper_func) _wrap_helicsRegisterGlobalTypePublication, NULL},
-    { SWIG_prefix "helicsPublish", (swig_wrapper_func) _wrap_helicsPublish, NULL},
-    { SWIG_prefix "helicsPublishString", (swig_wrapper_func) _wrap_helicsPublishString, NULL},
-    { SWIG_prefix "helicsPublishInteger", (swig_wrapper_func) _wrap_helicsPublishInteger, NULL},
-    { SWIG_prefix "helicsPublishDouble", (swig_wrapper_func) _wrap_helicsPublishDouble, NULL},
-    { SWIG_prefix "helicsPublishComplex", (swig_wrapper_func) _wrap_helicsPublishComplex, NULL},
-    { SWIG_prefix "helicsPublishVector", (swig_wrapper_func) _wrap_helicsPublishVector, NULL},
-    { SWIG_prefix "helicsGetValueSize", (swig_wrapper_func) _wrap_helicsGetValueSize, NULL},
-    { SWIG_prefix "helicsGetValue", (swig_wrapper_func) _wrap_helicsGetValue, NULL},
-    { SWIG_prefix "helicsGetString", (swig_wrapper_func) _wrap_helicsGetString, NULL},
-    { SWIG_prefix "helicsGetInteger", (swig_wrapper_func) _wrap_helicsGetInteger, NULL},
-    { SWIG_prefix "helicsGetDouble", (swig_wrapper_func) _wrap_helicsGetDouble, NULL},
-    { SWIG_prefix "helicsGetComplex", (swig_wrapper_func) _wrap_helicsGetComplex, NULL},
-    { SWIG_prefix "helicsGetVectorSize", (swig_wrapper_func) _wrap_helicsGetVectorSize, NULL},
-    { SWIG_prefix "helicsGetVector", (swig_wrapper_func) _wrap_helicsGetVector, NULL},
-    { SWIG_prefix "helicsSetDefaultValue", (swig_wrapper_func) _wrap_helicsSetDefaultValue, NULL},
-    { SWIG_prefix "helicsSetDefaultString", (swig_wrapper_func) _wrap_helicsSetDefaultString, NULL},
-    { SWIG_prefix "helicsSetDefaultInteger", (swig_wrapper_func) _wrap_helicsSetDefaultInteger, NULL},
-    { SWIG_prefix "helicsSetDefaultDouble", (swig_wrapper_func) _wrap_helicsSetDefaultDouble, NULL},
-    { SWIG_prefix "helicsSetDefaultComplex", (swig_wrapper_func) _wrap_helicsSetDefaultComplex, NULL},
-    { SWIG_prefix "helicsSetDefaultVector", (swig_wrapper_func) _wrap_helicsSetDefaultVector, NULL},
-    { SWIG_prefix "helicsGetSubscriptionType", (swig_wrapper_func) _wrap_helicsGetSubscriptionType, NULL},
-    { SWIG_prefix "helicsGetPublicationType", (swig_wrapper_func) _wrap_helicsGetPublicationType, NULL},
-    { SWIG_prefix "helicsGetSubscriptionKey", (swig_wrapper_func) _wrap_helicsGetSubscriptionKey, NULL},
-    { SWIG_prefix "helicsGetPublicationKey", (swig_wrapper_func) _wrap_helicsGetPublicationKey, NULL},
-    { SWIG_prefix "helicsGetSubscriptionUnits", (swig_wrapper_func) _wrap_helicsGetSubscriptionUnits, NULL},
-    { SWIG_prefix "helicsGetPublicationUnits", (swig_wrapper_func) _wrap_helicsGetPublicationUnits, NULL},
-    { SWIG_prefix "helicsIsValueUpdated", (swig_wrapper_func) _wrap_helicsIsValueUpdated, NULL},
-    { SWIG_prefix "helicsGetLastUpdateTime", (swig_wrapper_func) _wrap_helicsGetLastUpdateTime, NULL},
-    {0, 0, 0}
+
+SWIGINTERN PyObject *_wrap_helicsFederateRegisterGlobalEndpoint(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_endpoint result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsFederateRegisterGlobalEndpoint",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterGlobalEndpoint" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterGlobalEndpoint" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterGlobalEndpoint" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = (char *)(buf3);
+  result = (helics_endpoint)helicsFederateRegisterGlobalEndpoint(arg1,(char const *)arg2,(char const *)arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsEndpointSetDefaultDestination(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  char *arg2 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsEndpointSetDefaultDestination",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointSetDefaultDestination" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSetDefaultDestination" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  result = (helics_status)helicsEndpointSetDefaultDestination(arg1,(char const *)arg2);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsEndpointSendMessageRaw(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  int arg4 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsEndpointSendMessageRaw",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointSendMessageRaw" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendMessageRaw" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSendMessageRaw" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = (char *)(buf3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "helicsEndpointSendMessageRaw" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = (int)(val4);
+  result = (helics_status)helicsEndpointSendMessageRaw(arg1,(char const *)arg2,(char const *)arg3,arg4);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsEndpointSendEventRaw(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  int arg4 ;
+  helics_time_t arg5 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  double val5 ;
+  int ecode5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOOO:helicsEndpointSendEventRaw",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointSendEventRaw" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendEventRaw" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSendEventRaw" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = (char *)(buf3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "helicsEndpointSendEventRaw" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = (int)(val4);
+  ecode5 = SWIG_AsVal_double(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "helicsEndpointSendEventRaw" "', argument " "5"" of type '" "helics_time_t""'");
+  } 
+  arg5 = (helics_time_t)(val5);
+  result = (helics_status)helicsEndpointSendEventRaw(arg1,(char const *)arg2,(char const *)arg3,arg4,arg5);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsEndpointSendMessage(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  message_t *arg2 = (message_t *) 0 ;
+  int res1 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsEndpointSendMessage",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointSendMessage" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_message_t, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendMessage" "', argument " "2"" of type '" "message_t *""'"); 
+  }
+  arg2 = (message_t *)(argp2);
+  result = (helics_status)helicsEndpointSendMessage(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsEndpointSubscribe(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsEndpointSubscribe",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointSubscribe" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSubscribe" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSubscribe" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = (char *)(buf3);
+  result = (helics_status)helicsEndpointSubscribe(arg1,(char const *)arg2,(char const *)arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateHasMessage(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateHasMessage",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateHasMessage" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  result = (int)helicsFederateHasMessage(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsEndpointHasMessage(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsEndpointHasMessage",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointHasMessage" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  result = (int)helicsEndpointHasMessage(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateReceiveCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateReceiveCount",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateReceiveCount" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  result = (int)helicsFederateReceiveCount(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsEndpointReceiveCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsEndpointReceiveCount",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointReceiveCount" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  result = (int)helicsEndpointReceiveCount(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsEndpointGetMessage(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  message_t result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsEndpointGetMessage",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetMessage" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  result = helicsEndpointGetMessage(arg1);
+  resultobj = SWIG_NewPointerObj((message_t *)memcpy((message_t *)calloc(1,sizeof(message_t)),&result,sizeof(message_t)), SWIGTYPE_p_message_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateGetMessage(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  message_t result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateGetMessage",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetMessage" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  result = helicsFederateGetMessage(arg1);
+  resultobj = SWIG_NewPointerObj((message_t *)memcpy((message_t *)calloc(1,sizeof(message_t)),&result,sizeof(message_t)), SWIGTYPE_p_message_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsEndpointGetType(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsEndpointGetType",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetType" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointGetType" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = (char *)(buf2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsEndpointGetType" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (helics_status)helicsEndpointGetType(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsEndpointGetName(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsEndpointGetName",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetName" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointGetName" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = (char *)(buf2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsEndpointGetName" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (helics_status)helicsEndpointGetName(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateRegisterSourceFilter(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_filter_type_t arg2 ;
+  char *arg3 = (char *) 0 ;
+  char *arg4 = (char *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  helics_filter result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsFederateRegisterSourceFilter",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterSourceFilter" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRegisterSourceFilter" "', argument " "2"" of type '" "helics_filter_type_t""'");
+  } 
+  arg2 = (helics_filter_type_t)(val2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterSourceFilter" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = (char *)(buf3);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterSourceFilter" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = (char *)(buf4);
+  result = (helics_filter)helicsFederateRegisterSourceFilter(arg1,arg2,(char const *)arg3,(char const *)arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
+  return resultobj;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateRegisterDestinationFilter(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_filter_type_t arg2 ;
+  char *arg3 = (char *) 0 ;
+  char *arg4 = (char *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  helics_filter result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsFederateRegisterDestinationFilter",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterDestinationFilter" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRegisterDestinationFilter" "', argument " "2"" of type '" "helics_filter_type_t""'");
+  } 
+  arg2 = (helics_filter_type_t)(val2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterDestinationFilter" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = (char *)(buf3);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterDestinationFilter" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = (char *)(buf4);
+  result = (helics_filter)helicsFederateRegisterDestinationFilter(arg1,arg2,(char const *)arg3,(char const *)arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
+  return resultobj;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateRegisterCloningFilter(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_filter result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateRegisterCloningFilter",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterCloningFilter" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterCloningFilter" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  result = (helics_filter)helicsFederateRegisterCloningFilter(arg1,(char const *)arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsCoreRegisterSourceFilter(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_core arg1 = (helics_core) 0 ;
+  helics_filter_type_t arg2 ;
+  char *arg3 = (char *) 0 ;
+  char *arg4 = (char *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  helics_filter result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsCoreRegisterSourceFilter",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreRegisterSourceFilter" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsCoreRegisterSourceFilter" "', argument " "2"" of type '" "helics_filter_type_t""'");
+  } 
+  arg2 = (helics_filter_type_t)(val2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCoreRegisterSourceFilter" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = (char *)(buf3);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsCoreRegisterSourceFilter" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = (char *)(buf4);
+  result = (helics_filter)helicsCoreRegisterSourceFilter(arg1,arg2,(char const *)arg3,(char const *)arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
+  return resultobj;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsCoreRegisterDestinationFilter(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_core arg1 = (helics_core) 0 ;
+  helics_filter_type_t arg2 ;
+  char *arg3 = (char *) 0 ;
+  char *arg4 = (char *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  helics_filter result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:helicsCoreRegisterDestinationFilter",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreRegisterDestinationFilter" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsCoreRegisterDestinationFilter" "', argument " "2"" of type '" "helics_filter_type_t""'");
+  } 
+  arg2 = (helics_filter_type_t)(val2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCoreRegisterDestinationFilter" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = (char *)(buf3);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsCoreRegisterDestinationFilter" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = (char *)(buf4);
+  result = (helics_filter)helicsCoreRegisterDestinationFilter(arg1,arg2,(char const *)arg3,(char const *)arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
+  return resultobj;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsCoreRegisterCloningFilter(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_core arg1 = (helics_core) 0 ;
+  char *arg2 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_filter result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsCoreRegisterCloningFilter",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreRegisterCloningFilter" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCoreRegisterCloningFilter" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  result = (helics_filter)helicsCoreRegisterCloningFilter(arg1,(char const *)arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFilterGetTarget(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_filter arg1 = (helics_filter) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsFilterGetTarget",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterGetTarget" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterGetTarget" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = (char *)(buf2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFilterGetTarget" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (helics_status)helicsFilterGetTarget(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFilterGetName(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_filter arg1 = (helics_filter) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsFilterGetName",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterGetName" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterGetName" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = (char *)(buf2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFilterGetName" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (helics_status)helicsFilterGetName(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFilterSet(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_filter arg1 = (helics_filter) 0 ;
+  char *arg2 = (char *) 0 ;
+  double arg3 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  double val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsFilterSet",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterSet" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterSet" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  ecode3 = SWIG_AsVal_double(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFilterSet" "', argument " "3"" of type '" "double""'");
+  } 
+  arg3 = (double)(val3);
+  result = (helics_status)helicsFilterSet(arg1,(char const *)arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_setString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_filter arg1 = (helics_filter) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:setString",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "setString" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "setString" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "setString" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = (char *)(buf3);
+  result = (helics_status)setString(arg1,(char const *)arg2,(char const *)arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFilterAddDestinationTarget(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_filter arg1 = (helics_filter) 0 ;
+  char *arg2 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFilterAddDestinationTarget",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterAddDestinationTarget" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterAddDestinationTarget" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  result = (helics_status)helicsFilterAddDestinationTarget(arg1,(char const *)arg2);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFilterAddSourceTarget(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_filter arg1 = (helics_filter) 0 ;
+  char *arg2 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFilterAddSourceTarget",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterAddSourceTarget" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterAddSourceTarget" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  result = (helics_status)helicsFilterAddSourceTarget(arg1,(char const *)arg2);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFilterAddDeliveryEndpoint(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_filter arg1 = (helics_filter) 0 ;
+  char *arg2 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFilterAddDeliveryEndpoint",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterAddDeliveryEndpoint" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterAddDeliveryEndpoint" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  result = (helics_status)helicsFilterAddDeliveryEndpoint(arg1,(char const *)arg2);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFilterRemoveDestinationTarget(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_filter arg1 = (helics_filter) 0 ;
+  char *arg2 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFilterRemoveDestinationTarget",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterRemoveDestinationTarget" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterRemoveDestinationTarget" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  result = (helics_status)helicsFilterRemoveDestinationTarget(arg1,(char const *)arg2);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFilterRemoveSourceTarget(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_filter arg1 = (helics_filter) 0 ;
+  char *arg2 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFilterRemoveSourceTarget",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterRemoveSourceTarget" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterRemoveSourceTarget" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  result = (helics_status)helicsFilterRemoveSourceTarget(arg1,(char const *)arg2);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFilterRemoveDeliveryEndpoint(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_filter arg1 = (helics_filter) 0 ;
+  char *arg2 = (char *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFilterRemoveDeliveryEndpoint",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterRemoveDeliveryEndpoint" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterRemoveDeliveryEndpoint" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  result = (helics_status)helicsFilterRemoveDeliveryEndpoint(arg1,(char const *)arg2);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+static PyMethodDef SwigMethods[] = {
+	 { (char *)"SWIG_PyInstanceMethod_New", (PyCFunction)SWIG_PyInstanceMethod_New, METH_O, NULL},
+	 { (char *)"data_t_data_set", _wrap_data_t_data_set, METH_VARARGS, NULL},
+	 { (char *)"data_t_data_get", _wrap_data_t_data_get, METH_VARARGS, NULL},
+	 { (char *)"data_t_length_set", _wrap_data_t_length_set, METH_VARARGS, NULL},
+	 { (char *)"data_t_length_get", _wrap_data_t_length_get, METH_VARARGS, NULL},
+	 { (char *)"new_data_t", _wrap_new_data_t, METH_VARARGS, NULL},
+	 { (char *)"delete_data_t", _wrap_delete_data_t, METH_VARARGS, NULL},
+	 { (char *)"data_t_swigregister", data_t_swigregister, METH_VARARGS, NULL},
+	 { (char *)"message_t_time_set", _wrap_message_t_time_set, METH_VARARGS, NULL},
+	 { (char *)"message_t_time_get", _wrap_message_t_time_get, METH_VARARGS, NULL},
+	 { (char *)"message_t_data_set", _wrap_message_t_data_set, METH_VARARGS, NULL},
+	 { (char *)"message_t_data_get", _wrap_message_t_data_get, METH_VARARGS, NULL},
+	 { (char *)"message_t_length_set", _wrap_message_t_length_set, METH_VARARGS, NULL},
+	 { (char *)"message_t_length_get", _wrap_message_t_length_get, METH_VARARGS, NULL},
+	 { (char *)"message_t_original_source_set", _wrap_message_t_original_source_set, METH_VARARGS, NULL},
+	 { (char *)"message_t_original_source_get", _wrap_message_t_original_source_get, METH_VARARGS, NULL},
+	 { (char *)"message_t_source_set", _wrap_message_t_source_set, METH_VARARGS, NULL},
+	 { (char *)"message_t_source_get", _wrap_message_t_source_get, METH_VARARGS, NULL},
+	 { (char *)"message_t_dest_set", _wrap_message_t_dest_set, METH_VARARGS, NULL},
+	 { (char *)"message_t_dest_get", _wrap_message_t_dest_get, METH_VARARGS, NULL},
+	 { (char *)"message_t_original_dest_set", _wrap_message_t_original_dest_set, METH_VARARGS, NULL},
+	 { (char *)"message_t_original_dest_get", _wrap_message_t_original_dest_get, METH_VARARGS, NULL},
+	 { (char *)"new_message_t", _wrap_new_message_t, METH_VARARGS, NULL},
+	 { (char *)"delete_message_t", _wrap_delete_message_t, METH_VARARGS, NULL},
+	 { (char *)"message_t_swigregister", message_t_swigregister, METH_VARARGS, NULL},
+	 { (char *)"helicsGetVersion", _wrap_helicsGetVersion, METH_VARARGS, NULL},
+	 { (char *)"helicsIsCoreTypeAvailable", _wrap_helicsIsCoreTypeAvailable, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateCore", _wrap_helicsCreateCore, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateCoreFromArgs", _wrap_helicsCreateCoreFromArgs, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateBroker", _wrap_helicsCreateBroker, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateBrokerFromArgs", _wrap_helicsCreateBrokerFromArgs, METH_VARARGS, NULL},
+	 { (char *)"helicsBrokerIsConnected", _wrap_helicsBrokerIsConnected, METH_VARARGS, NULL},
+	 { (char *)"helicsCoreIsConnected", _wrap_helicsCoreIsConnected, METH_VARARGS, NULL},
+	 { (char *)"helicsBrokerGetIdentifier", _wrap_helicsBrokerGetIdentifier, METH_VARARGS, NULL},
+	 { (char *)"helicsCoreGetIdentifier", _wrap_helicsCoreGetIdentifier, METH_VARARGS, NULL},
+	 { (char *)"helicsBrokerGetAddress", _wrap_helicsBrokerGetAddress, METH_VARARGS, NULL},
+	 { (char *)"helicsCoreDisconnect", _wrap_helicsCoreDisconnect, METH_VARARGS, NULL},
+	 { (char *)"helicsBrokerDisconnect", _wrap_helicsBrokerDisconnect, METH_VARARGS, NULL},
+	 { (char *)"helicsCoreFree", _wrap_helicsCoreFree, METH_VARARGS, NULL},
+	 { (char *)"helicsBrokerFree", _wrap_helicsBrokerFree, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateValueFederate", _wrap_helicsCreateValueFederate, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateValueFederateFromJson", _wrap_helicsCreateValueFederateFromJson, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateMessageFederate", _wrap_helicsCreateMessageFederate, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateMessageFederateFromJson", _wrap_helicsCreateMessageFederateFromJson, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateCombinationFederate", _wrap_helicsCreateCombinationFederate, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateCombinationFederateFromJson", _wrap_helicsCreateCombinationFederateFromJson, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoCreate", _wrap_helicsFederateInfoCreate, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoLoadFromArgs", _wrap_helicsFederateInfoLoadFromArgs, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoFree", _wrap_helicsFederateInfoFree, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetFederateName", _wrap_helicsFederateInfoSetFederateName, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetCoreName", _wrap_helicsFederateInfoSetCoreName, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetCoreInitString", _wrap_helicsFederateInfoSetCoreInitString, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetCoreTypeFromString", _wrap_helicsFederateInfoSetCoreTypeFromString, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetCoreType", _wrap_helicsFederateInfoSetCoreType, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetFlag", _wrap_helicsFederateInfoSetFlag, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetOutputDelay", _wrap_helicsFederateInfoSetOutputDelay, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetTimeDelta", _wrap_helicsFederateInfoSetTimeDelta, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetInputDelay", _wrap_helicsFederateInfoSetInputDelay, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetTimeOffset", _wrap_helicsFederateInfoSetTimeOffset, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetPeriod", _wrap_helicsFederateInfoSetPeriod, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetMaxIterations", _wrap_helicsFederateInfoSetMaxIterations, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetLoggingLevel", _wrap_helicsFederateInfoSetLoggingLevel, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateFinalize", _wrap_helicsFederateFinalize, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateFree", _wrap_helicsFederateFree, METH_VARARGS, NULL},
+	 { (char *)"helicsCloseLibrary", _wrap_helicsCloseLibrary, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateEnterInitializationMode", _wrap_helicsFederateEnterInitializationMode, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateEnterInitializationModeAsync", _wrap_helicsFederateEnterInitializationModeAsync, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateIsAsyncOperationCompleted", _wrap_helicsFederateIsAsyncOperationCompleted, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateEnterInitializationModeComplete", _wrap_helicsFederateEnterInitializationModeComplete, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateEnterExecutionMode", _wrap_helicsFederateEnterExecutionMode, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateEnterExecutionModeAsync", _wrap_helicsFederateEnterExecutionModeAsync, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateEnterExecutionModeComplete", _wrap_helicsFederateEnterExecutionModeComplete, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateEnterExecutionModeIterative", _wrap_helicsFederateEnterExecutionModeIterative, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateEnterExecutionModeIterativeAsync", _wrap_helicsFederateEnterExecutionModeIterativeAsync, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateEnterExecutionModeIterativeComplete", _wrap_helicsFederateEnterExecutionModeIterativeComplete, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateGetState", _wrap_helicsFederateGetState, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateGetCoreObject", _wrap_helicsFederateGetCoreObject, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRequestTime", _wrap_helicsFederateRequestTime, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRequestTimeIterative", _wrap_helicsFederateRequestTimeIterative, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRequestTimeAsync", _wrap_helicsFederateRequestTimeAsync, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRequestTimeComplete", _wrap_helicsFederateRequestTimeComplete, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRequestTimeIterativeAsync", _wrap_helicsFederateRequestTimeIterativeAsync, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRequestTimeIterativeComplete", _wrap_helicsFederateRequestTimeIterativeComplete, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateGetName", _wrap_helicsFederateGetName, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateSetTimeDelta", _wrap_helicsFederateSetTimeDelta, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateSetOutputDelay", _wrap_helicsFederateSetOutputDelay, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateSetInputDelay", _wrap_helicsFederateSetInputDelay, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateSetPeriod", _wrap_helicsFederateSetPeriod, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateSetFlag", _wrap_helicsFederateSetFlag, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateSetLoggingLevel", _wrap_helicsFederateSetLoggingLevel, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateGetCurrentTime", _wrap_helicsFederateGetCurrentTime, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateQuery", _wrap_helicsCreateQuery, METH_VARARGS, NULL},
+	 { (char *)"helicsQueryExecute", _wrap_helicsQueryExecute, METH_VARARGS, NULL},
+	 { (char *)"helicsQueryExecuteAsync", _wrap_helicsQueryExecuteAsync, METH_VARARGS, NULL},
+	 { (char *)"helicsQueryExecuteComplete", _wrap_helicsQueryExecuteComplete, METH_VARARGS, NULL},
+	 { (char *)"helicsQueryIsCompleted", _wrap_helicsQueryIsCompleted, METH_VARARGS, NULL},
+	 { (char *)"helicsQueryFree", _wrap_helicsQueryFree, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterSubscription", _wrap_helicsFederateRegisterSubscription, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterTypeSubscription", _wrap_helicsFederateRegisterTypeSubscription, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterOptionalSubscription", _wrap_helicsFederateRegisterOptionalSubscription, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterOptionalTypeSubscription", _wrap_helicsFederateRegisterOptionalTypeSubscription, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterPublication", _wrap_helicsFederateRegisterPublication, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterTypePublication", _wrap_helicsFederateRegisterTypePublication, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterGlobalPublication", _wrap_helicsFederateRegisterGlobalPublication, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterGlobalTypePublication", _wrap_helicsFederateRegisterGlobalTypePublication, METH_VARARGS, NULL},
+	 { (char *)"helicsPublicationPublish", _wrap_helicsPublicationPublish, METH_VARARGS, NULL},
+	 { (char *)"helicsPublicationPublishString", _wrap_helicsPublicationPublishString, METH_VARARGS, NULL},
+	 { (char *)"helicsPublicationPublishInteger", _wrap_helicsPublicationPublishInteger, METH_VARARGS, NULL},
+	 { (char *)"helicsPublicationPublishDouble", _wrap_helicsPublicationPublishDouble, METH_VARARGS, NULL},
+	 { (char *)"helicsPublicationPublishComplex", _wrap_helicsPublicationPublishComplex, METH_VARARGS, NULL},
+	 { (char *)"helicsPublicationPublishVector", _wrap_helicsPublicationPublishVector, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionGetValueSize", _wrap_helicsSubscriptionGetValueSize, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionGetValue", _wrap_helicsSubscriptionGetValue, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionGetString", _wrap_helicsSubscriptionGetString, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionGetInteger", _wrap_helicsSubscriptionGetInteger, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionGetDouble", _wrap_helicsSubscriptionGetDouble, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionGetComplex", _wrap_helicsSubscriptionGetComplex, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionGetVectorSize", _wrap_helicsSubscriptionGetVectorSize, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionGetVector", _wrap_helicsSubscriptionGetVector, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionSetDefault", _wrap_helicsSubscriptionSetDefault, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionSetDefaultString", _wrap_helicsSubscriptionSetDefaultString, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionSetDefaultInteger", _wrap_helicsSubscriptionSetDefaultInteger, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionSetDefaultDouble", _wrap_helicsSubscriptionSetDefaultDouble, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionSetDefaultComplex", _wrap_helicsSubscriptionSetDefaultComplex, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionSetDefaultVector", _wrap_helicsSubscriptionSetDefaultVector, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionGetType", _wrap_helicsSubscriptionGetType, METH_VARARGS, NULL},
+	 { (char *)"helicsPublicationGetType", _wrap_helicsPublicationGetType, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionGetKey", _wrap_helicsSubscriptionGetKey, METH_VARARGS, NULL},
+	 { (char *)"helicsPublicationGetKey", _wrap_helicsPublicationGetKey, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionGetUnits", _wrap_helicsSubscriptionGetUnits, METH_VARARGS, NULL},
+	 { (char *)"helicsPublicationGetUnits", _wrap_helicsPublicationGetUnits, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionIsUpdated", _wrap_helicsSubscriptionIsUpdated, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionLastUpdateTime", _wrap_helicsSubscriptionLastUpdateTime, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterEndpoint", _wrap_helicsFederateRegisterEndpoint, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterGlobalEndpoint", _wrap_helicsFederateRegisterGlobalEndpoint, METH_VARARGS, NULL},
+	 { (char *)"helicsEndpointSetDefaultDestination", _wrap_helicsEndpointSetDefaultDestination, METH_VARARGS, NULL},
+	 { (char *)"helicsEndpointSendMessageRaw", _wrap_helicsEndpointSendMessageRaw, METH_VARARGS, NULL},
+	 { (char *)"helicsEndpointSendEventRaw", _wrap_helicsEndpointSendEventRaw, METH_VARARGS, NULL},
+	 { (char *)"helicsEndpointSendMessage", _wrap_helicsEndpointSendMessage, METH_VARARGS, NULL},
+	 { (char *)"helicsEndpointSubscribe", _wrap_helicsEndpointSubscribe, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateHasMessage", _wrap_helicsFederateHasMessage, METH_VARARGS, NULL},
+	 { (char *)"helicsEndpointHasMessage", _wrap_helicsEndpointHasMessage, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateReceiveCount", _wrap_helicsFederateReceiveCount, METH_VARARGS, NULL},
+	 { (char *)"helicsEndpointReceiveCount", _wrap_helicsEndpointReceiveCount, METH_VARARGS, NULL},
+	 { (char *)"helicsEndpointGetMessage", _wrap_helicsEndpointGetMessage, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateGetMessage", _wrap_helicsFederateGetMessage, METH_VARARGS, NULL},
+	 { (char *)"helicsEndpointGetType", _wrap_helicsEndpointGetType, METH_VARARGS, NULL},
+	 { (char *)"helicsEndpointGetName", _wrap_helicsEndpointGetName, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterSourceFilter", _wrap_helicsFederateRegisterSourceFilter, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterDestinationFilter", _wrap_helicsFederateRegisterDestinationFilter, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterCloningFilter", _wrap_helicsFederateRegisterCloningFilter, METH_VARARGS, NULL},
+	 { (char *)"helicsCoreRegisterSourceFilter", _wrap_helicsCoreRegisterSourceFilter, METH_VARARGS, NULL},
+	 { (char *)"helicsCoreRegisterDestinationFilter", _wrap_helicsCoreRegisterDestinationFilter, METH_VARARGS, NULL},
+	 { (char *)"helicsCoreRegisterCloningFilter", _wrap_helicsCoreRegisterCloningFilter, METH_VARARGS, NULL},
+	 { (char *)"helicsFilterGetTarget", _wrap_helicsFilterGetTarget, METH_VARARGS, NULL},
+	 { (char *)"helicsFilterGetName", _wrap_helicsFilterGetName, METH_VARARGS, NULL},
+	 { (char *)"helicsFilterSet", _wrap_helicsFilterSet, METH_VARARGS, NULL},
+	 { (char *)"setString", _wrap_setString, METH_VARARGS, NULL},
+	 { (char *)"helicsFilterAddDestinationTarget", _wrap_helicsFilterAddDestinationTarget, METH_VARARGS, NULL},
+	 { (char *)"helicsFilterAddSourceTarget", _wrap_helicsFilterAddSourceTarget, METH_VARARGS, NULL},
+	 { (char *)"helicsFilterAddDeliveryEndpoint", _wrap_helicsFilterAddDeliveryEndpoint, METH_VARARGS, NULL},
+	 { (char *)"helicsFilterRemoveDestinationTarget", _wrap_helicsFilterRemoveDestinationTarget, METH_VARARGS, NULL},
+	 { (char *)"helicsFilterRemoveSourceTarget", _wrap_helicsFilterRemoveSourceTarget, METH_VARARGS, NULL},
+	 { (char *)"helicsFilterRemoveDeliveryEndpoint", _wrap_helicsFilterRemoveDeliveryEndpoint, METH_VARARGS, NULL},
+	 { NULL, NULL, 0, NULL }
 };
 
-static swig_var_info swig_variables[] = {
-    {0,0,0,0}
-};
-
-static swig_const_info swig_constants[] = {
-    {0,0,0,0,0,0}
-};
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_data_t = {"_p_data_t", "struct data_t *|data_t *", 0, 0, (void*)&_wrap_class_data_t, 0};
+static swig_type_info _swigt__p_data_t = {"_p_data_t", "struct data_t *|data_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_double = {"_p_double", "helics_time_t *|double *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_helicsStatus = {"_p_helicsStatus", "enum helicsStatus *|helicsStatus *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_helics_iterative_time = {"_p_helics_iterative_time", "struct helics_iterative_time *|helics_iterative_time *", 0, 0, (void*)&_wrap_class_helics_iterative_time, 0};
+static swig_type_info _swigt__p_federate_state = {"_p_federate_state", "enum federate_state *|federate_state *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_filter_type_t = {"_p_helics_filter_type_t", "enum helics_filter_type_t *|helics_filter_type_t *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_iteration_request = {"_p_helics_iteration_request", "enum helics_iteration_request *|helics_iteration_request *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_iteration_status = {"_p_helics_iteration_status", "enum helics_iteration_status *|helics_iteration_status *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_status = {"_p_helics_status", "enum helics_status *|helics_status *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_int = {"_p_int", "helics_bool_t *|int *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int64_t = {"_p_int64_t", "int64_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_iteration_request = {"_p_iteration_request", "enum iteration_request *|iteration_request *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_iteration_status = {"_p_iteration_status", "enum iteration_status *|iteration_status *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_message_t = {"_p_message_t", "struct message_t *|message_t *", 0, 0, (void*)&_wrap_class_message_t, 0};
+static swig_type_info _swigt__p_message_t = {"_p_message_t", "struct message_t *|message_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_char = {"_p_p_char", "char **", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_void = {"_p_void", "helics_publication|helics_core|helics_broker|helics_query|helics_subscription|helics_value_federate|helics_federate|helics_federate_info_t|void *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_void = {"_p_void", "helics_publication|helics_core|helics_broker|helics_query|helics_filter|helics_subscription|helics_federate|helics_federate_info_t|helics_endpoint|void *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_char,
   &_swigt__p_data_t,
   &_swigt__p_double,
-  &_swigt__p_helicsStatus,
-  &_swigt__p_helics_iterative_time,
+  &_swigt__p_federate_state,
+  &_swigt__p_helics_filter_type_t,
+  &_swigt__p_helics_iteration_request,
+  &_swigt__p_helics_iteration_status,
+  &_swigt__p_helics_status,
+  &_swigt__p_int,
   &_swigt__p_int64_t,
-  &_swigt__p_iteration_request,
-  &_swigt__p_iteration_status,
   &_swigt__p_message_t,
   &_swigt__p_p_char,
   &_swigt__p_void,
@@ -5159,11 +8817,13 @@ static swig_type_info *swig_type_initial[] = {
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_data_t[] = {  {&_swigt__p_data_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_helicsStatus[] = {  {&_swigt__p_helicsStatus, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_helics_iterative_time[] = {  {&_swigt__p_helics_iterative_time, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_federate_state[] = {  {&_swigt__p_federate_state, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_filter_type_t[] = {  {&_swigt__p_helics_filter_type_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_iteration_request[] = {  {&_swigt__p_helics_iteration_request, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_iteration_status[] = {  {&_swigt__p_helics_iteration_status, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_status[] = {  {&_swigt__p_helics_status, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_int[] = {  {&_swigt__p_int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int64_t[] = {  {&_swigt__p_int64_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iteration_request[] = {  {&_swigt__p_iteration_request, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iteration_status[] = {  {&_swigt__p_iteration_status, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_message_t[] = {  {&_swigt__p_message_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_char[] = {  {&_swigt__p_p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_void[] = {  {&_swigt__p_void, 0, 0, 0},{0, 0, 0, 0}};
@@ -5172,11 +8832,13 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_char,
   _swigc__p_data_t,
   _swigc__p_double,
-  _swigc__p_helicsStatus,
-  _swigc__p_helics_iterative_time,
+  _swigc__p_federate_state,
+  _swigc__p_helics_filter_type_t,
+  _swigc__p_helics_iteration_request,
+  _swigc__p_helics_iteration_status,
+  _swigc__p_helics_status,
+  _swigc__p_int,
   _swigc__p_int64_t,
-  _swigc__p_iteration_request,
-  _swigc__p_iteration_status,
   _swigc__p_message_t,
   _swigc__p_p_char,
   _swigc__p_void,
@@ -5184,6 +8846,9 @@ static swig_cast_info *swig_cast_initial[] = {
 
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (END) -------- */
+
+static swig_const_info swig_const_table[] = {
+{0, 0, 0, 0.0, 0, 0}};
 
 #ifdef __cplusplus
 }
@@ -5420,31 +9085,255 @@ SWIG_PropagateClientData(void) {
 #endif
 
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+  
+  /* Python-specific SWIG API */
+#define SWIG_newvarlink()                             SWIG_Python_newvarlink()
+#define SWIG_addvarlink(p, name, get_attr, set_attr)  SWIG_Python_addvarlink(p, name, get_attr, set_attr)
+#define SWIG_InstallConstants(d, constants)           SWIG_Python_InstallConstants(d, constants)
+  
+  /* -----------------------------------------------------------------------------
+   * global variable support code.
+   * ----------------------------------------------------------------------------- */
+  
+  typedef struct swig_globalvar {
+    char       *name;                  /* Name of global variable */
+    PyObject *(*get_attr)(void);       /* Return the current value */
+    int       (*set_attr)(PyObject *); /* Set the value */
+    struct swig_globalvar *next;
+  } swig_globalvar;
+  
+  typedef struct swig_varlinkobject {
+    PyObject_HEAD
+    swig_globalvar *vars;
+  } swig_varlinkobject;
+  
+  SWIGINTERN PyObject *
+  swig_varlink_repr(swig_varlinkobject *SWIGUNUSEDPARM(v)) {
+#if PY_VERSION_HEX >= 0x03000000
+    return PyUnicode_InternFromString("<Swig global variables>");
+#else
+    return PyString_FromString("<Swig global variables>");
+#endif
+  }
+  
+  SWIGINTERN PyObject *
+  swig_varlink_str(swig_varlinkobject *v) {
+#if PY_VERSION_HEX >= 0x03000000
+    PyObject *str = PyUnicode_InternFromString("(");
+    PyObject *tail;
+    PyObject *joined;
+    swig_globalvar *var;
+    for (var = v->vars; var; var=var->next) {
+      tail = PyUnicode_FromString(var->name);
+      joined = PyUnicode_Concat(str, tail);
+      Py_DecRef(str);
+      Py_DecRef(tail);
+      str = joined;
+      if (var->next) {
+        tail = PyUnicode_InternFromString(", ");
+        joined = PyUnicode_Concat(str, tail);
+        Py_DecRef(str);
+        Py_DecRef(tail);
+        str = joined;
+      }
+    }
+    tail = PyUnicode_InternFromString(")");
+    joined = PyUnicode_Concat(str, tail);
+    Py_DecRef(str);
+    Py_DecRef(tail);
+    str = joined;
+#else
+    PyObject *str = PyString_FromString("(");
+    swig_globalvar *var;
+    for (var = v->vars; var; var=var->next) {
+      PyString_ConcatAndDel(&str,PyString_FromString(var->name));
+      if (var->next) PyString_ConcatAndDel(&str,PyString_FromString(", "));
+    }
+    PyString_ConcatAndDel(&str,PyString_FromString(")"));
+#endif
+    return str;
+  }
+  
+  SWIGINTERN int
+  swig_varlink_print(swig_varlinkobject *v, FILE *fp, int SWIGUNUSEDPARM(flags)) {
+    char *tmp;
+    PyObject *str = swig_varlink_str(v);
+    fprintf(fp,"Swig global variables ");
+    fprintf(fp,"%s\n", tmp = SWIG_Python_str_AsChar(str));
+    SWIG_Python_str_DelForPy3(tmp);
+    Py_DECREF(str);
+    return 0;
+  }
+  
+  SWIGINTERN void
+  swig_varlink_dealloc(swig_varlinkobject *v) {
+    swig_globalvar *var = v->vars;
+    while (var) {
+      swig_globalvar *n = var->next;
+      free(var->name);
+      free(var);
+      var = n;
+    }
+  }
+  
+  SWIGINTERN PyObject *
+  swig_varlink_getattr(swig_varlinkobject *v, char *n) {
+    PyObject *res = NULL;
+    swig_globalvar *var = v->vars;
+    while (var) {
+      if (strcmp(var->name,n) == 0) {
+        res = (*var->get_attr)();
+        break;
+      }
+      var = var->next;
+    }
+    if (res == NULL && !PyErr_Occurred()) {
+      PyErr_Format(PyExc_AttributeError, "Unknown C global variable '%s'", n);
+    }
+    return res;
+  }
+  
+  SWIGINTERN int
+  swig_varlink_setattr(swig_varlinkobject *v, char *n, PyObject *p) {
+    int res = 1;
+    swig_globalvar *var = v->vars;
+    while (var) {
+      if (strcmp(var->name,n) == 0) {
+        res = (*var->set_attr)(p);
+        break;
+      }
+      var = var->next;
+    }
+    if (res == 1 && !PyErr_Occurred()) {
+      PyErr_Format(PyExc_AttributeError, "Unknown C global variable '%s'", n);
+    }
+    return res;
+  }
+  
+  SWIGINTERN PyTypeObject*
+  swig_varlink_type(void) {
+    static char varlink__doc__[] = "Swig var link object";
+    static PyTypeObject varlink_type;
+    static int type_init = 0;
+    if (!type_init) {
+      const PyTypeObject tmp = {
+#if PY_VERSION_HEX >= 0x03000000
+        PyVarObject_HEAD_INIT(NULL, 0)
+#else
+        PyObject_HEAD_INIT(NULL)
+        0,                                  /* ob_size */
+#endif
+        (char *)"swigvarlink",              /* tp_name */
+        sizeof(swig_varlinkobject),         /* tp_basicsize */
+        0,                                  /* tp_itemsize */
+        (destructor) swig_varlink_dealloc,  /* tp_dealloc */
+        (printfunc) swig_varlink_print,     /* tp_print */
+        (getattrfunc) swig_varlink_getattr, /* tp_getattr */
+        (setattrfunc) swig_varlink_setattr, /* tp_setattr */
+        0,                                  /* tp_compare */
+        (reprfunc) swig_varlink_repr,       /* tp_repr */
+        0,                                  /* tp_as_number */
+        0,                                  /* tp_as_sequence */
+        0,                                  /* tp_as_mapping */
+        0,                                  /* tp_hash */
+        0,                                  /* tp_call */
+        (reprfunc) swig_varlink_str,        /* tp_str */
+        0,                                  /* tp_getattro */
+        0,                                  /* tp_setattro */
+        0,                                  /* tp_as_buffer */
+        0,                                  /* tp_flags */
+        varlink__doc__,                     /* tp_doc */
+        0,                                  /* tp_traverse */
+        0,                                  /* tp_clear */
+        0,                                  /* tp_richcompare */
+        0,                                  /* tp_weaklistoffset */
+#if PY_VERSION_HEX >= 0x02020000
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* tp_iter -> tp_weaklist */
+#endif
+#if PY_VERSION_HEX >= 0x02030000
+        0,                                  /* tp_del */
+#endif
+#if PY_VERSION_HEX >= 0x02060000
+        0,                                  /* tp_version_tag */
+#endif
+#if PY_VERSION_HEX >= 0x03040000
+        0,                                  /* tp_finalize */
+#endif
+#ifdef COUNT_ALLOCS
+        0,                                  /* tp_allocs */
+        0,                                  /* tp_frees */
+        0,                                  /* tp_maxalloc */
+#if PY_VERSION_HEX >= 0x02050000
+        0,                                  /* tp_prev */
+#endif
+        0                                   /* tp_next */
+#endif
+      };
+      varlink_type = tmp;
+      type_init = 1;
+#if PY_VERSION_HEX < 0x02020000
+      varlink_type.ob_type = &PyType_Type;
+#else
+      if (PyType_Ready(&varlink_type) < 0)
+      return NULL;
+#endif
+    }
+    return &varlink_type;
+  }
+  
+  /* Create a variable linking object for use later */
+  SWIGINTERN PyObject *
+  SWIG_Python_newvarlink(void) {
+    swig_varlinkobject *result = PyObject_NEW(swig_varlinkobject, swig_varlink_type());
+    if (result) {
+      result->vars = 0;
+    }
+    return ((PyObject*) result);
+  }
+  
+  SWIGINTERN void 
+  SWIG_Python_addvarlink(PyObject *p, char *name, PyObject *(*get_attr)(void), int (*set_attr)(PyObject *p)) {
+    swig_varlinkobject *v = (swig_varlinkobject *) p;
+    swig_globalvar *gv = (swig_globalvar *) malloc(sizeof(swig_globalvar));
+    if (gv) {
+      size_t size = strlen(name)+1;
+      gv->name = (char *)malloc(size);
+      if (gv->name) {
+        strncpy(gv->name,name,size);
+        gv->get_attr = get_attr;
+        gv->set_attr = set_attr;
+        gv->next = v->vars;
+      }
+    }
+    v->vars = gv;
+  }
+  
+  SWIGINTERN PyObject *
+  SWIG_globals(void) {
+    static PyObject *_SWIG_globals = 0; 
+    if (!_SWIG_globals) _SWIG_globals = SWIG_newvarlink();  
+    return _SWIG_globals;
+  }
   
   /* -----------------------------------------------------------------------------
    * constants/methods manipulation
    * ----------------------------------------------------------------------------- */
   
   /* Install Constants */
-  
   SWIGINTERN void
-  SWIG_Tcl_InstallConstants(Tcl_Interp *interp, swig_const_info constants[]) {
+  SWIG_Python_InstallConstants(PyObject *d, swig_const_info constants[]) {
+    PyObject *obj = 0;
     size_t i;
-    Tcl_Obj *obj;
-    
-    if (!swigconstTableinit) {
-      Tcl_InitHashTable(&swigconstTable, TCL_STRING_KEYS);
-      swigconstTableinit = 1;
-    }
-    for (i = 0; constants[i].type; i++) {
+    for (i = 0; constants[i].type; ++i) {
       switch(constants[i].type) {
-      case SWIG_TCL_POINTER:
-        obj = SWIG_NewPointerObj(constants[i].pvalue, *(constants[i]).ptype,0);
+      case SWIG_PY_POINTER:
+        obj = SWIG_InternalNewPointerObj(constants[i].pvalue, *(constants[i]).ptype,0);
         break;
-      case SWIG_TCL_BINARY:
+      case SWIG_PY_BINARY:
         obj = SWIG_NewPackedObj(constants[i].pvalue, constants[i].lvalue, *(constants[i].ptype));
         break;
       default:
@@ -5452,31 +9341,59 @@ extern "C" {
         break;
       }
       if (obj) {
-        SWIG_Tcl_SetConstantObj(interp, constants[i].name, obj);
+        PyDict_SetItemString(d, constants[i].name, obj);
+        Py_DECREF(obj);
       }
     }
   }
   
-  /* Create fast method lookup tables */
+  /* -----------------------------------------------------------------------------*/
+  /* Fix SwigMethods to carry the callback ptrs when needed */
+  /* -----------------------------------------------------------------------------*/
   
   SWIGINTERN void
-  SWIG_Tcl_InstallMethodLookupTables(void) {
+  SWIG_Python_FixMethods(PyMethodDef *methods,
+    swig_const_info *const_table,
+    swig_type_info **types,
+    swig_type_info **types_initial) {
     size_t i;
-    
-    for (i = 0; i < swig_module.size; ++i) {
-      swig_type_info *type = swig_module.type_initial[i];
-      if (type->clientdata) {
-        swig_class* klass = (swig_class*) type->clientdata;
-        swig_method* meth;
-        Tcl_InitHashTable(&(klass->hashtable), TCL_STRING_KEYS);
-        for (meth = klass->methods; meth && meth->name; ++meth) {
-          int newEntry;
-          Tcl_HashEntry* hashentry = Tcl_CreateHashEntry(&(klass->hashtable), meth->name, &newEntry);
-          Tcl_SetHashValue(hashentry, (ClientData)meth->method);
+    for (i = 0; methods[i].ml_name; ++i) {
+      const char *c = methods[i].ml_doc;
+      if (!c) continue;
+      c = strstr(c, "swig_ptr: ");
+      if (c) {
+        int j;
+        swig_const_info *ci = 0;
+        const char *name = c + 10;
+        for (j = 0; const_table[j].type; ++j) {
+          if (strncmp(const_table[j].name, name, 
+              strlen(const_table[j].name)) == 0) {
+            ci = &(const_table[j]);
+            break;
+          }
+        }
+        if (ci) {
+          void *ptr = (ci->type == SWIG_PY_POINTER) ? ci->pvalue : 0;
+          if (ptr) {
+            size_t shift = (ci->ptype) - types;
+            swig_type_info *ty = types_initial[shift];
+            size_t ldoc = (c - methods[i].ml_doc);
+            size_t lptr = strlen(ty->name)+2*sizeof(void*)+2;
+            char *ndoc = (char*)malloc(ldoc + lptr + 10);
+            if (ndoc) {
+              char *buff = ndoc;
+              strncpy(buff, methods[i].ml_doc, ldoc);
+              buff += ldoc;
+              strncpy(buff, "swig_ptr: ", 10);
+              buff += 10;
+              SWIG_PackVoidPtr(buff, ptr, ty->name, lptr);
+              methods[i].ml_doc = ndoc;
+            }
+          }
         }
       }
     }
-  }
+  } 
   
 #ifdef __cplusplus
 }
@@ -5486,67 +9403,178 @@ extern "C" {
  *  Partial Init method
  * -----------------------------------------------------------------------------*/
 
-SWIGEXPORT int SWIG_init(Tcl_Interp *interp) {
-  size_t i;
-  if (interp == 0) return TCL_ERROR;
-#ifdef USE_TCL_STUBS
-  /* (char*) cast is required to avoid compiler warning/error for Tcl < 8.4. */
-  if (Tcl_InitStubs(interp, (char*)SWIG_TCL_STUBS_VERSION, 0) == NULL) {
-    return TCL_ERROR;
-  }
-#endif  
-#ifdef USE_TK_STUBS
-  /* (char*) cast is required to avoid compiler warning/error. */
-  if (Tk_InitStubs(interp, (char*)SWIG_TCL_STUBS_VERSION, 0) == NULL) {
-    return TCL_ERROR;
-  }
+#ifdef __cplusplus
+extern "C"
+#endif
+
+SWIGEXPORT 
+#if PY_VERSION_HEX >= 0x03000000
+PyObject*
+#else
+void
+#endif
+SWIG_init(void) {
+  PyObject *m, *d, *md;
+#if PY_VERSION_HEX >= 0x03000000
+  static struct PyModuleDef SWIG_module = {
+# if PY_VERSION_HEX >= 0x03020000
+    PyModuleDef_HEAD_INIT,
+# else
+    {
+      PyObject_HEAD_INIT(NULL)
+      NULL, /* m_init */
+      0,    /* m_index */
+      NULL, /* m_copy */
+    },
+# endif
+    (char *) SWIG_name,
+    NULL,
+    -1,
+    SwigMethods,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+  };
 #endif
   
-  Tcl_PkgProvide(interp, (char*)SWIG_name, (char*)SWIG_version);
+#if defined(SWIGPYTHON_BUILTIN)
+  static SwigPyClientData SwigPyObject_clientdata = {
+    0, 0, 0, 0, 0, 0, 0
+  };
+  static PyGetSetDef this_getset_def = {
+    (char *)"this", &SwigPyBuiltin_ThisClosure, NULL, NULL, NULL
+  };
+  static SwigPyGetSet thisown_getset_closure = {
+    (PyCFunction) SwigPyObject_own,
+    (PyCFunction) SwigPyObject_own
+  };
+  static PyGetSetDef thisown_getset_def = {
+    (char *)"thisown", SwigPyBuiltin_GetterClosure, SwigPyBuiltin_SetterClosure, NULL, &thisown_getset_closure
+  };
+  PyTypeObject *builtin_pytype;
+  int builtin_base_count;
+  swig_type_info *builtin_basetype;
+  PyObject *tuple;
+  PyGetSetDescrObject *static_getset;
+  PyTypeObject *metatype;
+  PyTypeObject *swigpyobject;
+  SwigPyClientData *cd;
+  PyObject *public_interface, *public_symbol;
+  PyObject *this_descr;
+  PyObject *thisown_descr;
+  PyObject *self = 0;
+  int i;
   
-#ifdef SWIG_namespace
-  Tcl_Eval(interp, "namespace eval " SWIG_namespace " { }");
+  (void)builtin_pytype;
+  (void)builtin_base_count;
+  (void)builtin_basetype;
+  (void)tuple;
+  (void)static_getset;
+  (void)self;
+  
+  /* Metaclass is used to implement static member variables */
+  metatype = SwigPyObjectType();
+  assert(metatype);
 #endif
   
-  SWIG_InitializeModule((void *) interp);
-  SWIG_PropagateClientData();
+  /* Fix SwigMethods to carry the callback ptrs when needed */
+  SWIG_Python_FixMethods(SwigMethods, swig_const_table, swig_types, swig_type_initial);
   
-  for (i = 0; swig_commands[i].name; i++) {
-    Tcl_CreateObjCommand(interp, (char *) swig_commands[i].name, (swig_wrapper_func) swig_commands[i].wrapper,
-      swig_commands[i].clientdata, NULL);
+#if PY_VERSION_HEX >= 0x03000000
+  m = PyModule_Create(&SWIG_module);
+#else
+  m = Py_InitModule((char *) SWIG_name, SwigMethods);
+#endif
+  
+  md = d = PyModule_GetDict(m);
+  (void)md;
+  
+  SWIG_InitializeModule(0);
+  
+#ifdef SWIGPYTHON_BUILTIN
+  swigpyobject = SwigPyObject_TypeOnce();
+  
+  SwigPyObject_stype = SWIG_MangledTypeQuery("_p_SwigPyObject");
+  assert(SwigPyObject_stype);
+  cd = (SwigPyClientData*) SwigPyObject_stype->clientdata;
+  if (!cd) {
+    SwigPyObject_stype->clientdata = &SwigPyObject_clientdata;
+    SwigPyObject_clientdata.pytype = swigpyobject;
+  } else if (swigpyobject->tp_basicsize != cd->pytype->tp_basicsize) {
+    PyErr_SetString(PyExc_RuntimeError, "Import error: attempted to load two incompatible swig-generated modules.");
+# if PY_VERSION_HEX >= 0x03000000
+    return NULL;
+# else
+    return;
+# endif
   }
-  for (i = 0; swig_variables[i].name; i++) {
-    Tcl_SetVar(interp, (char *) swig_variables[i].name, (char *) "", TCL_GLOBAL_ONLY);
-    Tcl_TraceVar(interp, (char *) swig_variables[i].name, TCL_TRACE_READS | TCL_GLOBAL_ONLY, 
-      (Tcl_VarTraceProc *) swig_variables[i].get, (ClientData) swig_variables[i].addr);
-    Tcl_TraceVar(interp, (char *) swig_variables[i].name, TCL_TRACE_WRITES | TCL_GLOBAL_ONLY, 
-      (Tcl_VarTraceProc *) swig_variables[i].set, (ClientData) swig_variables[i].addr);
-  }
   
-  SWIG_Tcl_InstallConstants(interp, swig_constants);
-  SWIG_Tcl_InstallMethodLookupTables();
+  /* All objects have a 'this' attribute */
+  this_descr = PyDescr_NewGetSet(SwigPyObject_type(), &this_getset_def);
+  (void)this_descr;
   
+  /* All objects have a 'thisown' attribute */
+  thisown_descr = PyDescr_NewGetSet(SwigPyObject_type(), &thisown_getset_def);
+  (void)thisown_descr;
   
-  SWIG_Tcl_SetConstantObj(interp, "helicsOK", SWIG_From_int((int)(helicsOK)));
-  SWIG_Tcl_SetConstantObj(interp, "helicsDiscard", SWIG_From_int((int)(helicsDiscard)));
-  SWIG_Tcl_SetConstantObj(interp, "helicsWarning", SWIG_From_int((int)(helicsWarning)));
-  SWIG_Tcl_SetConstantObj(interp, "helicsError", SWIG_From_int((int)(helicsError)));
-  SWIG_Tcl_SetConstantObj(interp, "no_iteration", SWIG_From_int((int)(no_iteration)));
-  SWIG_Tcl_SetConstantObj(interp, "force_iteration", SWIG_From_int((int)(force_iteration)));
-  SWIG_Tcl_SetConstantObj(interp, "iterate_if_needed", SWIG_From_int((int)(iterate_if_needed)));
-  SWIG_Tcl_SetConstantObj(interp, "next_step", SWIG_From_int((int)(next_step)));
-  SWIG_Tcl_SetConstantObj(interp, "error", SWIG_From_int((int)(error)));
-  SWIG_Tcl_SetConstantObj(interp, "halted", SWIG_From_int((int)(halted)));
-  SWIG_Tcl_SetConstantObj(interp, "iterating", SWIG_From_int((int)(iterating)));
-  SWIG_Tcl_SetConstantObj(interp, "HELICS_STRING_TYPE", SWIG_From_int((int)(0)));
-  SWIG_Tcl_SetConstantObj(interp, "HELICS_DOUBLE_TYPE", SWIG_From_int((int)(1)));
-  SWIG_Tcl_SetConstantObj(interp, "HELICS_INT_TYPE", SWIG_From_int((int)(2)));
-  SWIG_Tcl_SetConstantObj(interp, "HELICS_COMPLEX_TYPE", SWIG_From_int((int)(3)));
-  SWIG_Tcl_SetConstantObj(interp, "HELICS_VECTOR_TYPE", SWIG_From_int((int)(4)));
-  SWIG_Tcl_SetConstantObj(interp, "HELICS_RAW_TYPE", SWIG_From_int((int)(25)));
-  return TCL_OK;
-}
-SWIGEXPORT int Helics_SafeInit(Tcl_Interp *interp) {
-  return SWIG_init(interp);
+  public_interface = PyList_New(0);
+  public_symbol = 0;
+  (void)public_symbol;
+  
+  PyDict_SetItemString(md, "__all__", public_interface);
+  Py_DECREF(public_interface);
+  for (i = 0; SwigMethods[i].ml_name != NULL; ++i)
+  SwigPyBuiltin_AddPublicSymbol(public_interface, SwigMethods[i].ml_name);
+  for (i = 0; swig_const_table[i].name != 0; ++i)
+  SwigPyBuiltin_AddPublicSymbol(public_interface, swig_const_table[i].name);
+#endif
+  
+  SWIG_InstallConstants(d,swig_const_table);
+  
+  SWIG_Python_SetConstant(d, "helics_ok",SWIG_From_int((int)(helics_ok)));
+  SWIG_Python_SetConstant(d, "helics_invalid_object",SWIG_From_int((int)(helics_invalid_object)));
+  SWIG_Python_SetConstant(d, "helics_invalid_argument",SWIG_From_int((int)(helics_invalid_argument)));
+  SWIG_Python_SetConstant(d, "helics_discard",SWIG_From_int((int)(helics_discard)));
+  SWIG_Python_SetConstant(d, "helics_terminated",SWIG_From_int((int)(helics_terminated)));
+  SWIG_Python_SetConstant(d, "helics_warning",SWIG_From_int((int)(helics_warning)));
+  SWIG_Python_SetConstant(d, "helics_invalid_state_transition",SWIG_From_int((int)(helics_invalid_state_transition)));
+  SWIG_Python_SetConstant(d, "helics_invalid_function_call",SWIG_From_int((int)(helics_invalid_function_call)));
+  SWIG_Python_SetConstant(d, "helics_error",SWIG_From_int((int)(helics_error)));
+  SWIG_Python_SetConstant(d, "helics_true",SWIG_From_int((int)((1))));
+  SWIG_Python_SetConstant(d, "helics_false",SWIG_From_int((int)((0))));
+  SWIG_Python_SetConstant(d, "no_iteration",SWIG_From_int((int)(no_iteration)));
+  SWIG_Python_SetConstant(d, "force_iteration",SWIG_From_int((int)(force_iteration)));
+  SWIG_Python_SetConstant(d, "iterate_if_needed",SWIG_From_int((int)(iterate_if_needed)));
+  SWIG_Python_SetConstant(d, "next_step",SWIG_From_int((int)(next_step)));
+  SWIG_Python_SetConstant(d, "iteration_error",SWIG_From_int((int)(iteration_error)));
+  SWIG_Python_SetConstant(d, "iteration_halted",SWIG_From_int((int)(iteration_halted)));
+  SWIG_Python_SetConstant(d, "iterating",SWIG_From_int((int)(iterating)));
+  SWIG_Python_SetConstant(d, "helics_startup_state",SWIG_From_int((int)(helics_startup_state)));
+  SWIG_Python_SetConstant(d, "helics_initialization_state",SWIG_From_int((int)(helics_initialization_state)));
+  SWIG_Python_SetConstant(d, "helics_execution_state",SWIG_From_int((int)(helics_execution_state)));
+  SWIG_Python_SetConstant(d, "helics_finalize_state",SWIG_From_int((int)(helics_finalize_state)));
+  SWIG_Python_SetConstant(d, "helics_error_state",SWIG_From_int((int)(helics_error_state)));
+  SWIG_Python_SetConstant(d, "helics_pending_init_state",SWIG_From_int((int)(helics_pending_init_state)));
+  SWIG_Python_SetConstant(d, "helics_pending_exec_state",SWIG_From_int((int)(helics_pending_exec_state)));
+  SWIG_Python_SetConstant(d, "helics_pending_time_state",SWIG_From_int((int)(helics_pending_time_state)));
+  SWIG_Python_SetConstant(d, "helics_pending_iterative_time_state",SWIG_From_int((int)(helics_pending_iterative_time_state)));
+  SWIG_Python_SetConstant(d, "helics_custom_filter",SWIG_From_int((int)(helics_custom_filter)));
+  SWIG_Python_SetConstant(d, "helics_delay_filter",SWIG_From_int((int)(helics_delay_filter)));
+  SWIG_Python_SetConstant(d, "helics_randomDelay_filter",SWIG_From_int((int)(helics_randomDelay_filter)));
+  SWIG_Python_SetConstant(d, "helics_randomDrop_filter",SWIG_From_int((int)(helics_randomDrop_filter)));
+  SWIG_Python_SetConstant(d, "helics_reroute_filter",SWIG_From_int((int)(helics_reroute_filter)));
+  SWIG_Python_SetConstant(d, "helics_clone_filter",SWIG_From_int((int)(helics_clone_filter)));
+  SWIG_Python_SetConstant(d, "HELICS_STRING_TYPE",SWIG_From_int((int)(0)));
+  SWIG_Python_SetConstant(d, "HELICS_DOUBLE_TYPE",SWIG_From_int((int)(1)));
+  SWIG_Python_SetConstant(d, "HELICS_INT_TYPE",SWIG_From_int((int)(2)));
+  SWIG_Python_SetConstant(d, "HELICS_COMPLEX_TYPE",SWIG_From_int((int)(3)));
+  SWIG_Python_SetConstant(d, "HELICS_VECTOR_TYPE",SWIG_From_int((int)(4)));
+  SWIG_Python_SetConstant(d, "HELICS_RAW_TYPE",SWIG_From_int((int)(25)));
+#if PY_VERSION_HEX >= 0x03000000
+  return m;
+#else
+  return;
+#endif
 }
 
