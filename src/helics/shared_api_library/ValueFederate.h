@@ -8,6 +8,10 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
+
+/** @file
+@brief functions related the value federates for the C api
+*/
 #ifndef HELICS_APISHARED_VALUE_FEDERATE_FUNCTIONS_H_
 #define HELICS_APISHARED_VALUE_FEDERATE_FUNCTIONS_H_
 

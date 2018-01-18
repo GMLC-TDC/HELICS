@@ -12,6 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "recorder.h"
 #include "../core/BrokerFactory.hpp"
 #include "../core/core-exceptions.hpp"
+#include "../core/helicsVersion.hpp"
 #include <iostream>
 
 void showHelp()
@@ -49,7 +50,7 @@ int main (int argc, char *argv[])
         }
         else if ((arg1 == "--version")||(arg1=="-v"))
         {
-            std::cout << "helics_app\n" << helics::getHelicsVersionString() << '\n';
+            std::cout << "helics_app\n" << helics::helicsVersionString() << '\n';
         }
         else if ((arg1 == "--help") || (arg1 == "-?"))
         {

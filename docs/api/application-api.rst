@@ -4,50 +4,50 @@ Application API
 Federate
 --------
 
-.. doxygenfile:: Federate.hpp
+.. doxygenfile:: application_api/Federate.hpp
    :project: helics
 
 
 Value Federate
 --------------
 
-.. doxygenfile:: ValueFederate.hpp
+.. doxygenfile:: application_api/ValueFederate.hpp
    :project: helics
 
 Message Federate
 ----------------
 
-.. doxygenfile:: MessageFederate.hpp
+.. doxygenfile:: application_api/MessageFederate.hpp
    :project: helics
 
 Combination Federate
 --------------------
 
-.. doxygenfile:: CombinationFederate.hpp
+.. doxygenfile:: application_api/CombinationFederate.hpp
    :project: helics
 
 Publications
 ------------
 
-.. doxygenfile:: Publications.hpp
+.. doxygenfile:: application_api/Publications.hpp
    :project: helics
 
 
 Subscriptions
 -------------
 
-.. doxygenfile:: Subscriptions.hpp
+.. doxygenfile:: application_api/Subscriptions.hpp
    :project: helics
 
 
 Endpoints
 ---------
 
-.. doxygenfile:: Endpoints.hpp
+.. doxygenfile:: application_api/Endpoints.hpp
    :project: helics
 
 Filters
 -------
 
-.. doxygenfile:: Filters.hpp
+.. doxygenfile:: application_api/Filters.hpp
    :project: helics

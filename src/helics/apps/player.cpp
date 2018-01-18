@@ -25,6 +25,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "../common/base64.h"
 #include "../common/stringOps.h"
+#include "../core/helicsVersion.hpp"
 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
@@ -985,7 +986,7 @@ int playerArgumentParser (int argc, const char *const *argv, po::variables_map &
 
     if (cmd_vm.count ("version") > 0)
     {
-        std::cout << helics::getHelicsVersionString () << '\n';
+        std::cout << helics::helicsVersionString () << '\n';
         return (-1);
     }
 

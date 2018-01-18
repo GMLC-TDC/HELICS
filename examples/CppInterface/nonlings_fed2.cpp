@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <stdio.h>
 #include <math.h>
 #include <cpp98/ValueFederate.hpp>
-#include <cpp98/helics.hpp> // getHelicsVersionString
+#include <cpp98/helics.hpp> // helicsVersionString
 
 int main(int /*argc*/,char ** /*argv*/)
 {

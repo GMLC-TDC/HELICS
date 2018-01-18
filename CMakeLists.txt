@@ -4,11 +4,11 @@ project (HELICS)
 #-----------------------------------------------------------------------------
 # HELICS Version number
 #-----------------------------------------------------------------------------
-set (HELICS_VERSION_MAJOR 0)
-set (HELICS_VERSION_MINOR 9)
+set (HELICS_VERSION_MAJOR 1)
+set (HELICS_VERSION_MINOR 0)
 set (HELICS_VERSION_PATCH 0)
-
-set (HELICS_DATE "12-08-17")
+set (HELICS_VERSION_BUILD alpha)
+set (HELICS_DATE "01-18-18")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -480,7 +480,7 @@ configure_package_config_file(config/${PROJECT_NAME}Config.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
                               INSTALL_DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-                                 VERSION ${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}
+                                 VERSION ${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}.${HELICS_VERSION_BUILD}
                                  COMPATIBILITY AnyNewerVersion)
 
 configure_file(config/${PROJECT_NAME}Import.cmake.in

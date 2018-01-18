@@ -17,7 +17,7 @@ HELICS documentation
 This is the documentation for Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS) framework. 
 There is also doxygen_ generated documentation available for developers.
 
-.. _doxygen: /doxygen/
+.. _doxygen: /HELICS-src/doxygen/
 
 .. toctree::
    :maxdepth: 1

@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <fstream>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+#include "../core/helicsVersion.hpp"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -347,7 +348,7 @@ void argumentParser (int argc, const char *const *argv, po::variables_map &vm_ma
 
     if (cmd_vm.count ("version") > 0)
     {
-        std::cout << helics::getHelicsVersionString () << '\n';
+        std::cout << helics::helicsVersionString () << '\n';
         return;
     }
 

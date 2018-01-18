@@ -25,6 +25,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/uuid/uuid.hpp>  // uuid class
 #include <boost/uuid/uuid_generators.hpp>  // generators
 #include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
+#include "helicsVersion.hpp"
 
 static inline std::string gen_id ()
 {
@@ -110,8 +111,7 @@ static void argumentParser (int argc, const char *const *argv, boost::program_op
 
     if (cmd_vm.count ("version") > 0)
     {
-        std::cout << HELICS_VERSION_MAJOR << '.' << HELICS_VERSION_MINOR << '.' << HELICS_VERSION_PATCH << " ("
-                  << HELICS_DATE << ")\n";
+        std::cout << helics::helicsVersionString() << '\n';
         return;
     }
 

@@ -12,6 +12,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #ifndef HELICS_API_DATA_H_
 #define HELICS_API_DATA_H_
 
+/** @file
+@brief data structures for the C-API
+*/
+
 #include "../flag-definitions.h"
 #include <stdint.h>
 #ifdef __cplusplus

@@ -17,7 +17,7 @@ static char help[] = "Example to demonstrate the usage of HELICS C Interface wit
 #include <stdio.h>
 #include <cpp98/ValueFederate.hpp>
 #include <cpp98/Broker.hpp>
-#include <cpp98/helics.hpp> // getHelicsVersionString
+#include <cpp98/helics.hpp> // helicsVersionString
 #ifdef _MSC_VER
 #include <windows.h>
 #else

@@ -23,6 +23,7 @@ set(SRC_FILES
 	CommsInterface.cpp
 	CommsBroker.cpp
 	NetworkBrokerData.cpp
+	helicsVersion.cpp
 )
 
 set(TESTCORE_SOURCE_FILES
@@ -73,7 +74,7 @@ core-types.hpp
 core-data.hpp
 helics-time.hpp
 CoreFederateInfo.hpp
-
+helicsVersion.hpp
 ../flag-definitions.h
 )
 
@@ -98,6 +99,7 @@ set(INCLUDE_FILES
 	BasicHandleInfo.hpp
 	FilterFunctions.hpp
 	NetworkBrokerData.hpp
+	helicsVersion.hpp
 )
 
 set(TESTCORE_HEADER_FILES
