@@ -15,7 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 int main(int /*argc*/,char ** /*argv*/)
 {
-  std::string    fedinitstring="--broker=mainbroker --federates=1";
+  std::string    fedinitstring="--federates=1";
   double         deltat=0.01;
   helics_subscription sub;
   helics_publication  pub;
