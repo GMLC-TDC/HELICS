@@ -44,8 +44,8 @@ namespace boost
     }
 }
 
-class tcp_rx_connection;
-class tcp_connection;
+class TcpRxConnection;
+class TcpConnection;
 
 namespace helics {
 
@@ -85,16 +85,16 @@ private:
 
     void txReceive(const char *data, size_t bytes_received, const std::string &errorMessage);
 
-    void txPriorityReceive(std::shared_ptr<tcp_connection> connection, const char *data, size_t bytes_received, const boost::system::error_code &error);
+    void txPriorityReceive(std::shared_ptr<TcpConnection> connection, const char *data, size_t bytes_received, const boost::system::error_code &error);
    /** callback function for receiving data asynchronously from the socket
    @param connection pointer to the connection
    @param data the pointer to the data
    @param bytes_received the length of the received data
    @return a the number of bytes used by the function
    */
-    size_t dataReceive(std::shared_ptr<tcp_rx_connection> connection, const char *data, size_t bytes_received);
+    size_t dataReceive(std::shared_ptr<TcpRxConnection> connection, const char *data, size_t bytes_received);
 
-    bool commErrorHandler(std::shared_ptr<tcp_rx_connection> connection, const boost::system::error_code& error);
+    bool commErrorHandler(std::shared_ptr<TcpRxConnection> connection, const boost::system::error_code& error);
   //  bool errorHandle()
 public:
 	/** get the port number of the comms object to push message to*/

@@ -38,10 +38,10 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     std::string host = "localhost";
 
     auto srv = AsioServiceManager::getServicePointer ();
-    tcp_server server (srv->getBaseService (), TCP_BROKER_PORT);
-    srv->runServiceLoop ();
+    TcpServer server (srv->getBaseService (), TCP_BROKER_PORT);
+    auto serviceLoop=srv->runServiceLoop ();
     std::vector<char> data (1024);
-    auto dataCheck = [&counter](tcp_rx_connection::pointer, const char *datablock, size_t datasize) {
+    auto dataCheck = [&counter](TcpRxConnection::pointer, const char *datablock, size_t datasize) {
         size_t used = 0;
         while (datasize - used >= 20)
         {
@@ -60,10 +60,10 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     server.setDataCall (dataCheck);
     server.start ();
 
-    auto conn1 = tcp_connection::create (srv->getBaseService (), host, "24160", 1024);
-    auto conn2 = tcp_connection::create (srv->getBaseService (), host, "24160", 1024);
-    auto conn3 = tcp_connection::create (srv->getBaseService (), host, "24160", 1024);
-    auto conn4 = tcp_connection::create (srv->getBaseService (), host, "24160", 1024);
+    auto conn1 = TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
+    auto conn2 = TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
+    auto conn3 = TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
+    auto conn4 = TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
 
     auto res = conn1->waitUntilConnected (1000);
     BOOST_CHECK_EQUAL (res, 0);
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     res = conn4->waitUntilConnected (1000);
     BOOST_CHECK_EQUAL (res, 0);
 
-    auto transmitFunc = [](tcp_connection::pointer obj) {
+    auto transmitFunc = [](TcpConnection::pointer obj) {
         std::vector<char> dataB (20);
         for (char ii = 0; ii < 50; ++ii)
         {
@@ -109,7 +109,6 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     conn4->close ();
     server.close ();
 
-    srv->haltServiceLoop ();
 }
 
 BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
@@ -120,10 +119,10 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
 
     auto srv = AsioServiceManager::getServicePointer ();
 
-    tcp_server server (srv->getBaseService (), TCP_BROKER_PORT);
-    srv->runServiceLoop ();
+    TcpServer server (srv->getBaseService (), TCP_BROKER_PORT);
+    auto serviceLoop = srv->runServiceLoop ();
     std::vector<char> data (1024);
-    server.setDataCall ([&counter](tcp_rx_connection::pointer, const char *, size_t data_avail) {
+    server.setDataCall ([&counter](TcpRxConnection::pointer, const char *, size_t data_avail) {
         ++counter;
         return data_avail;
     });
@@ -150,7 +149,6 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
 
     server.close ();
     comm.disconnect ();
-    srv->haltServiceLoop ();
 }
 
 BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
@@ -161,11 +159,11 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     helics::TcpComms comm (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
-    tcp_server server (srv->getBaseService (), TCP_BROKER_PORT);
+    TcpServer server (srv->getBaseService (), TCP_BROKER_PORT);
     srv->runServiceLoop ();
     std::vector<char> data (1024);
     server.setDataCall (
-      [&data, &counter, &len](tcp_rx_connection::pointer, const char *data_rec, size_t data_Size) {
+      [&data, &counter, &len](TcpRxConnection::pointer, const char *data_rec, size_t data_Size) {
           std::copy (data_rec, data_rec + data_Size, data.begin ());
           len = data_Size;
           ++counter;
@@ -213,11 +211,11 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     std::mutex actguard;
     auto srv = AsioServiceManager::getServicePointer ();
 
-    tcp_server server (srv->getBaseService (), TCP_BROKER_PORT);
+    TcpServer server (srv->getBaseService (), TCP_BROKER_PORT);
     srv->runServiceLoop ();
     std::vector<char> data (1024);
     server.setDataCall (
-      [&data, &ServerCounter, &len](tcp_rx_connection::pointer, const char *data_rec, size_t data_Size) {
+      [&data, &ServerCounter, &len](TcpRxConnection::pointer, const char *data_rec, size_t data_Size) {
           std::copy (data_rec, data_rec + data_Size, data.begin ());
           len = data_Size;
           ++ServerCounter;
@@ -237,7 +235,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
 
-    auto txconn = tcp_connection::create (srv->getBaseService (), host, "24180", 1024);
+    auto txconn = TcpConnection::create (srv->getBaseService (), host, "24180", 1024);
     auto res = txconn->waitUntilConnected (1000);
     BOOST_REQUIRE_EQUAL (res, 0);
 
@@ -403,12 +401,12 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
     BOOST_CHECK (core->isInitialized ());
     auto srv = AsioServiceManager::getServicePointer ();
 
-    tcp_server server (srv->getBaseService (), TCP_BROKER_PORT);
+    TcpServer server (srv->getBaseService (), TCP_BROKER_PORT);
     srv->runServiceLoop ();
     std::vector<char> data (1024);
     std::atomic<size_t> len{0};
     server.setDataCall (
-      [&data, &counter, &len](tcp_rx_connection::pointer, const char *data_rec, size_t data_Size) {
+      [&data, &counter, &len](TcpRxConnection::pointer, const char *data_rec, size_t data_Size) {
           std::copy (data_rec, data_rec + data_Size, data.begin ());
           len = data_Size;
           ++counter;

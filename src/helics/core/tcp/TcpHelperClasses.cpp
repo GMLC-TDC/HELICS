@@ -15,7 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 using boost::asio::ip::tcp;
 
-void tcp_rx_connection::start ()
+void TcpRxConnection::start ()
 {
     bool exp = false;
     if (receiving.compare_exchange_strong (exp, true))
@@ -29,7 +29,7 @@ void tcp_rx_connection::start ()
     }
 }
 
-void tcp_rx_connection::handle_read (const boost::system::error_code &error, size_t bytes_transferred)
+void TcpRxConnection::handle_read (const boost::system::error_code &error, size_t bytes_transferred)
 {
     if (disconnected)
     {
@@ -91,21 +91,21 @@ void tcp_rx_connection::handle_read (const boost::system::error_code &error, siz
     }
 }
 
-void tcp_rx_connection::send (const void *buffer, size_t dataLength)
+void TcpRxConnection::send (const void *buffer, size_t dataLength)
 {
     auto sz = socket_.send (boost::asio::buffer (buffer, dataLength));
     assert (sz == dataLength);
     (void)(sz);
 }
 
-void tcp_rx_connection::send (const std::string &dataString)
+void TcpRxConnection::send (const std::string &dataString)
 {
     auto sz = socket_.send (boost::asio::buffer (dataString));
     assert (sz == dataString.size ());
     (void)(sz);
 }
 
-void tcp_rx_connection::close ()
+void TcpRxConnection::close ()
 {
     stop ();
     disconnected = true;
@@ -118,15 +118,15 @@ void tcp_rx_connection::close ()
     socket_.close ();
 }
 
-tcp_connection::pointer tcp_connection::create (boost::asio::io_service &io_service,
+TcpConnection::pointer TcpConnection::create (boost::asio::io_service &io_service,
                                                 const std::string &connection,
                                                 const std::string &port,
                                                 size_t bufferSize)
 {
-    return pointer (new tcp_connection (io_service, connection, port, bufferSize));
+    return pointer (new TcpConnection (io_service, connection, port, bufferSize));
 }
 
-tcp_connection::tcp_connection (boost::asio::io_service &io_service,
+TcpConnection::TcpConnection (boost::asio::io_service &io_service,
                                 const std::string &connection,
                                 const std::string &port,
                                 size_t bufferSize)
@@ -139,7 +139,7 @@ tcp_connection::tcp_connection (boost::asio::io_service &io_service,
                            [this](const boost::system::error_code &error) { connect_handler (error); });
 }
 
-void tcp_connection::connect_handler (const boost::system::error_code &error)
+void TcpConnection::connect_handler (const boost::system::error_code &error)
 {
     if (!error)
     {
@@ -150,7 +150,7 @@ void tcp_connection::connect_handler (const boost::system::error_code &error)
         std::cerr << "connection error " << error.message () << ": code =" << error.value () << '\n';
     }
 }
-void tcp_connection::send (const void *buffer, size_t dataLength)
+void TcpConnection::send (const void *buffer, size_t dataLength)
 {
     if (!isConnected ())
     {
@@ -161,7 +161,7 @@ void tcp_connection::send (const void *buffer, size_t dataLength)
     ((void)(sz));
 }
 
-void tcp_connection::send (const std::string &dataString)
+void TcpConnection::send (const std::string &dataString)
 {
     if (!isConnected ())
     {
@@ -172,12 +172,12 @@ void tcp_connection::send (const std::string &dataString)
     ((void)(sz));
 }
 
-size_t tcp_connection::receive (void *buffer, size_t maxDataLength)
+size_t TcpConnection::receive (void *buffer, size_t maxDataLength)
 {
     return socket_.receive (boost::asio::buffer (buffer, maxDataLength));
 }
 
-int tcp_connection::waitUntilConnected (int timeOut)
+int TcpConnection::waitUntilConnected (int timeOut)
 {
     int cnt = 0;
     while (!isConnected ())
@@ -192,7 +192,7 @@ int tcp_connection::waitUntilConnected (int timeOut)
     return 0;
 }
 
-void tcp_connection::close ()
+void TcpConnection::close ()
 {
     cancel ();
     boost::system::error_code ec;
@@ -207,7 +207,7 @@ void tcp_connection::close ()
     socket_.close ();
 }
 
-void tcp_server::start ()
+void TcpServer::start ()
 {
     if (!connections.empty ())
     {
@@ -216,15 +216,15 @@ void tcp_server::start ()
             conn->start ();
         }
     }
-    tcp_rx_connection::pointer new_connection =
-      tcp_rx_connection::create (acceptor_.get_io_service (), bufferSize);
+    TcpRxConnection::pointer new_connection =
+      TcpRxConnection::create (acceptor_.get_io_service (), bufferSize);
     acceptor_.async_accept (new_connection->socket (),
                             [this, new_connection](const boost::system::error_code &error) {
                                 handle_accept (new_connection, error);
                             });
 }
 
-void tcp_server::handle_accept (tcp_rx_connection::pointer new_connection, const boost::system::error_code &error)
+void TcpServer::handle_accept (TcpRxConnection::pointer new_connection, const boost::system::error_code &error)
 {
     if (!error)
     {
@@ -242,7 +242,7 @@ void tcp_server::handle_accept (tcp_rx_connection::pointer new_connection, const
     }
 }
 
-void tcp_server::stop ()
+void TcpServer::stop ()
 {
     acceptor_.cancel ();
     for (auto &conn : connections)
@@ -251,7 +251,7 @@ void tcp_server::stop ()
     }
 }
 
-void tcp_server::close ()
+void TcpServer::close ()
 {
     acceptor_.cancel ();
     for (auto &conn : connections)

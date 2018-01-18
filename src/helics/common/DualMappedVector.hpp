@@ -23,18 +23,19 @@ class DualMappedVector
 public:
     static_assert(!std::is_same<searchType1, searchType2>::value, "searchType1 and searchType2 cannot be the same type");
     template <typename... Us>
-    auto &insert(const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
+    void insert(const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
     {
-        auto fnd = lookup.find(searchValue);
-        if (fnd != lookup.end())
+        auto fnd = lookup1.find(searchValue1);
+        if (fnd != lookup1.end())
         {
             dataStorage_[fnd->second] = VType(std::forward<Us>(data)...);
+			lookup2[searchValue2] = fnd->second;
         }
         else
         {
             dataStorage_.emplace_back(std::forward<Us>(data)...);
-            lookup1.emplace(searchValue, dataStorage.size() - 1);
-            lookup2.emplace(searchValue2, dataStorage.size() - 1);
+            lookup1.emplace(searchValue1, dataStorage_.size() - 1);
+            lookup2.emplace(searchValue2, dataStorage_.size() - 1);
         }
     }
 
@@ -63,7 +64,7 @@ public:
         auto fnd = lookup1.find(searchValue);
         if (fnd != lookup1.end())
         {
-            return dataStorage_.begin() + fnd.second();
+            return dataStorage_.begin() + fnd->second;
         }
         return dataStorage_.end();
     }
@@ -73,17 +74,147 @@ public:
         auto fnd = lookup2.find(searchValue);
         if (fnd != lookup2.end())
         {
-            return dataStorage_.begin() + fnd.second();
+            return dataStorage_.begin() + fnd->second;
         }
         return dataStorage_.end();
     }
 
+	void removeIndex(size_t index)
+	{
+		if (index >= dataStorage_.size())
+		{
+			return;
+		}
+		dataStorage_.erase(dataStorage_.begin() + index);
+		searchType1 ind1;
+		searchType2 ind2;
+		for (auto &el2 : lookup1)
+		{
+			if (el2.second > index)
+			{
+				el2.second -= 1;
+			}
+			else if (el2.second == index)
+			{
+				ind1 = el2.first;
+			}
+		}
+		for (auto &el2 : lookup2)
+		{
+			if (el2.second > index)
+			{
+				el2.second -= 1;
+			}
+			else if (el2.second == index)
+			{
+				ind2 = el2.first;
+			}
+		}
+		auto fnd1 = lookup1.find(ind1);
+		if (fnd1 != lookup1.end())
+		{
+			lookup1.erase(fnd1);
+		}
+		auto fnd2 = lookup2.find(ind2);
+		if (fnd2 != lookup2.end())
+		{
+			lookup2.erase(fnd2);
+		}
+	}
+
+	void remove(const searchType1 &search)
+	{
+		auto el = lookup1.find(search);
+		if (el == lookup1.end())
+		{
+			return;
+		}
+		auto index = el->second;
+		dataStorage_.erase(dataStorage_.begin() + index);
+		for (auto &el2 : lookup1)
+		{
+			if (el2.second > index)
+			{
+				el2.second -= 1;
+			}
+		}
+		lookup1.erase(el);
+		searchType2 ind2;
+		for (auto &el2 : lookup2)
+		{
+			if (el2.second > index)
+			{
+				el2.second -= 1;
+			}
+			else if (el2.second == index)
+			{
+				ind2 = el2.first;
+			}
+		}
+		auto fnd2 = lookup2.find(ind2);
+		if (fnd2 != lookup2.end())
+		{
+			lookup2.erase(fnd2);
+		}
+	}
+
+	void remove(const searchType2 &search)
+	{
+		auto el = lookup2.find(search);
+		if (el == lookup2.end())
+		{
+			return;
+		}
+		auto index = el->second;
+		dataStorage_.erase(dataStorage_.begin() + index);
+		for (auto &el2 : lookup2)
+		{
+			if (el2.second > index)
+			{
+				el2.second -= 1;
+			}
+		}
+		lookup2.erase(el);
+		searchType1 ind1;
+		for (auto &el2 : lookup1)
+		{
+			if (el2.second > index)
+			{
+				el2.second -= 1;
+			}
+			else if (el2.second == index)
+			{
+				ind1 = el2.first;
+			}
+		}
+		auto fnd1 = lookup1.find(ind1);
+		if (fnd1 != lookup1.end())
+		{
+			lookup1.erase(fnd1);
+		}
+	}
     VType &operator[] (size_t index) { return dataStorage_[index]; }
 
     const VType &operator[] (size_t index) const { return dataStorage_[index]; }
 
-    auto begin() { return dataStorage_.begin(); }
-    auto end() { return dataStorage_.end(); }
+	/** apply a function to all the values
+	@param F must be a function with signature like void fun(const VType &a);*/
+	template<class UnaryFunction >
+	void apply(UnaryFunction F)
+	{
+		std::for_each(dataStorage_.begin(), dataStorage_.end(), F);
+	}
+
+	/** transform all the values
+	F must be a function with signature like void VType(const VType &a);*/
+	template<class UnaryFunction >
+	void transform(UnaryFunction F)
+	{
+		std::transform(dataStorage_.begin(), dataStorage_.end(), dataStorage_.begin(), F);
+	}
+
+	auto end() { return dataStorage_.end(); }
+
     auto cbegin() const { return dataStorage_.cbegin(); }
     auto cend() const { return dataStorage_.cend(); }
 
@@ -97,7 +228,7 @@ public:
     }
 
 private:
-    std::vector<Vtype> dataStorage_; //!< primary storage for data
+    std::vector<VType> dataStorage_; //!< primary storage for data
     std::map<searchType1, size_t> lookup1;  //!< lookup with searchType1
     std::map<searchType2, size_t> lookup2;  //!< lookup with searchType2
 };
