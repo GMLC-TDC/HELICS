@@ -79,3 +79,4 @@ HELICS_Export helics_status helicsFilterRemoveDeliveryEndpoint(helics_filter fil
 #endif
 
 #endif /* HELICS_APISHARED_MESSAGE_FILTER_FEDERATE_FUNCTIONS_H_*/
+
