@@ -31,7 +31,7 @@ To set up your environment:
         .. code-block:: bash
 
             brew install boost
-            brew install zmq
+            brew install zeromq
 
     5. Make sure *cmake* and *git* are available in the Command Prompt with ``which cmake`` and ``which git`` If they aren't, add them to the system PATH variable.
 
