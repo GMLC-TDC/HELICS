@@ -13,6 +13,10 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <stdexcept>
 #include <string>
 
+/** @file
+@details definitions of exceptions used in HELICS
+*/
+
 namespace helics
 {
 /** base exception class for helics*/

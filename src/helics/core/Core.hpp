@@ -23,7 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
  */
 namespace helics
 {
-/**
+/** @file
  * The HELICS core interface.  Abstract class that is
  * implemented for the specific communication systems (e.g. ZMQ and
  * MPI).
@@ -42,10 +42,9 @@ namespace helics
  * Note: Methods should all be pure virtual, leaving syntactical sugar off while iterating API design.
  */
 
-    //for
     class CoreFederateInfo;
 
-/** the object defining the core interface through an abstract class*/
+/** the class defining the core interface through an abstract class*/
 class Core
 {
   public:

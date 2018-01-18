@@ -12,6 +12,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include <string>
 
+/** @file
+@details definitions of types an enumerations used in helics
+*/
 
 /** enumeration of the possible federate states*/
 enum helics_federate_state_type

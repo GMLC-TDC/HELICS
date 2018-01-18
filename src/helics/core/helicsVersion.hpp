@@ -13,13 +13,19 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "helics/helics-config.h"
 #include <string>
 
+/** @file
+file linking with version info and containing some convenience functions
+*/
 namespace helics
 {
+/** @returns a string containing version information*/
 std::string helicsVersionString();
 
+/** get the Major version number*/
 inline int helicsVersionMajor() { return HELICS_VERSION_MAJOR; }
-
+/** get the Minor version number*/
 inline int helicsVersionMinor() { return HELICS_VERSION_MINOR; }
+/** get the patch number*/
 inline int helicsVersionPatch() { return HELICS_VERSION_PATCH; }
 }
 
