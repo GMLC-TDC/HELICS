@@ -32,6 +32,7 @@ MESSAGE("Building without swig")
 add_custom_target("helicsPYTHON" ALL)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics_wrap.c ${CMAKE_CURRENT_BINARY_DIR}/helics_wrap.c)
 
 MESSAGE("CMAKE CURRENT" ${CMAKE_CURRENT_BINARY_DIR})
 ADD_CUSTOM_TARGET("helicsPYTHONEXT" ALL DEPENDS helicsSharedLib helicsPYTHON)
