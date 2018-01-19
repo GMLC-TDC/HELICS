@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -8,7 +8,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "helics/application_api/MessageFederate.h"
+#include "helics/application_api/MessageFederate.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -20,7 +20,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <stdexcept>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
-#include "helics/core/BrokerFactory.h"
+#include "helics/core/BrokerFactory.hpp"
+#include "helics/core/helicsVersion.hpp"
 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
@@ -121,7 +122,7 @@ bool argumentParser (int argc, const char * const *argv, po::variables_map &vm_m
 
     if (cmd_vm.count ("version") > 0)
     {
-		std::cout << helics::getHelicsVersionString () << '\n';
+		std::cout << helics::helicsVersionString () << '\n';
         return true;
     }
 

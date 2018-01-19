@@ -14,8 +14,8 @@ Header file for inclusion of the entire C shared library
 #ifndef C_SHARED_LIBRARY_HEADER_
 #define C_SHARED_LIBRARY_HEADER_
 
-#include "shared_api_library/MessageFederate_c.h"
-#include "shared_api_library/ValueFederate_c.h"
-#include "shared_api_library/MessageFilters_c.h"
+#include "shared_api_library/MessageFederate.h"
+#include "shared_api_library/ValueFederate.h"
+#include "shared_api_library/MessageFilters.h"
 
 #endif

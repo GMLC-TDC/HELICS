@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -25,6 +25,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "../common/base64.h"
 #include "../common/stringOps.h"
+#include "../core/helicsVersion.hpp"
 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
@@ -39,7 +40,7 @@ static void sourceArgumentParser (int argc, const char *const *argv, po::variabl
 namespace helics
 {
 
-source::source (int argc, char *argv[])
+Source::Source (int argc, char *argv[])
 {
     FederateInfo fi ("source");
     fi.loadInfoFromArgs (argc, argv);
@@ -50,38 +51,38 @@ source::source (int argc, char *argv[])
     loadArguments (vm_map);
 }
 
-source::source (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
+Source::Source (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
 {
     fed->setFlag (SOURCE_ONLY_FLAG);
 }
 
-source::source (std::shared_ptr<Core> core, const FederateInfo &fi)
+Source::Source (std::shared_ptr<Core> core, const FederateInfo &fi)
     : fed (std::make_shared<CombinationFederate> (std::move (core), fi))
 {
     fed->setFlag (SOURCE_ONLY_FLAG);
 }
 
-source::source (const std::string &jsonString) : fed (std::make_shared<CombinationFederate> (jsonString))
+Source::Source (const std::string &jsonString) : fed (std::make_shared<CombinationFederate> (jsonString))
 {
     fed->setFlag (SOURCE_ONLY_FLAG);
 
     loadJsonFile (jsonString);
 }
 
-source::~source () = default;
+Source::~Source () = default;
 
 
 
-void source::loadFile (const std::string &jsonFile)
+void Source::loadFile (const std::string &jsonFile)
 {
     fed->registerInterfaces (jsonFile);
 
-    auto pubCount = fed->getSubscriptionCount ();
-  //  for (int ii = 0; ii < pubCount; ++ii)
+  //  auto pubCount = fed->getSubscriptionCount ();
+  // for (int ii = 0; ii < pubCount; ++ii)
   //  {
-  //      publications.emplace_back (fed.get (), ii);
-  //      pubids[publications.back ().getName ()] = static_cast<int> (publications.size () - 1);
-  //  }
+   //     publications.emplace_back (fed.get (), ii);
+   //    pubids[publications.back ().getName ()] = static_cast<int> (publications.size () - 1);
+  // }
   //  auto eptCount = fed->getEndpointCount ();
   //  for (int ii = 0; ii < eptCount; ++ii)
   //  {
@@ -122,15 +123,15 @@ void source::loadFile (const std::string &jsonFile)
 
 
 /*run the source*/
-void source::run ()
+void Source::run ()
 {
     run (stopTime);
     fed->finalize ();
 }
 
-void source::run (Time stopTime_input)
+void Source::run (Time stopTime_input)
 {
-    auto state = fed->currentState ();
+    auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
     {
         initialize ();
@@ -148,7 +149,7 @@ void source::run (Time stopTime_input)
     }
     else
     {
-        auto ctime = fed->getCurrentTime ();
+//        auto ctime = fed->getCurrentTime ();
       
         
     }
@@ -179,7 +180,7 @@ void source::run (Time stopTime_input)
     }
 }
 
-void source::addSource(const std::string &key, helicsType_t type, const std::string &units)
+void Source::addSource(const std::string & /*key*/, helics_type_t /*type*/, const std::string &/*units*/)
 {
     // skip already existing publications
  //   if (pubids.find (key) != pubids.end ())
@@ -191,7 +192,7 @@ void source::addSource(const std::string &key, helicsType_t type, const std::str
 }
 
 
-int source::loadArguments (boost::program_options::variables_map &vm_map)
+int Source::loadArguments (boost::program_options::variables_map &vm_map)
 {
     if (vm_map.count ("input") == 0)
     {
@@ -274,7 +275,7 @@ void sourceArgumentParser (int argc, const char *const *argv, po::variables_map 
 
     if (cmd_vm.count ("version") > 0)
     {
-        std::cout << helics::getHelicsVersionString () << '\n';
+        std::cout << helics::helicsVersionString () << '\n';
         return;
     }
 

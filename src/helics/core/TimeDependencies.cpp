@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -9,8 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "TimeDependencies.h"
-#include "ActionMessage.h"
+#include "TimeDependencies.hpp"
+#include "ActionMessage.hpp"
 #include <algorithm>
 #include <cassert>
 
@@ -40,16 +40,17 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
     case CMD_TIME_REQUEST:
         time_state = CHECK_ACTION_FLAG (m, iterationRequested) ? time_state_t::time_requested_iterative :
                                                                  time_state_t::time_requested;
-     //   printf("%d Request from %d time %f, te=%f, Tdemin=%f\n", fedID, m.source_id, static_cast<double>(m.actionTime), static_cast<double>(m.Te), static_cast<double>(m.Tdemin));
-     //   assert(m.actionTime >= Tnext);
+        //   printf("%d Request from %d time %f, te=%f, Tdemin=%f\n", fedID, m.source_id,
+        //   static_cast<double>(m.actionTime), static_cast<double>(m.Te), static_cast<double>(m.Tdemin));
+        //   assert(m.actionTime >= Tnext);
         Tnext = m.actionTime;
         Te = m.Te;
         Tdemin = m.Tdemin;
         break;
     case CMD_TIME_GRANT:
         time_state = time_state_t::time_granted;
-    //    printf("%d Grant from %d time %f\n", fedID, m.source_id, static_cast<double>(m.actionTime));
-     //   assert(m.actionTime >= Tnext);
+        //    printf("%d Grant from %d time %f\n", fedID, m.source_id, static_cast<double>(m.actionTime));
+        //   assert(m.actionTime >= Tnext);
         Tnext = m.actionTime;
         Te = Tnext;
         Tdemin = Tnext;
@@ -57,7 +58,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
     case CMD_DISCONNECT:
     case CMD_PRIORITY_DISCONNECT:
         time_state = time_state_t::time_granted;
-     //   printf("%d disconnect from %d\n", fedID, m.source_id);
+        //   printf("%d disconnect from %d\n", fedID, m.source_id);
         Tnext = Time::maxVal ();
         Te = Time::maxVal ();
         Tdemin = Time::maxVal ();
@@ -165,7 +166,7 @@ bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const
     return true;
 }
 
-void TimeDependencies::ResetIteratingExecRequests ()
+void TimeDependencies::resetIteratingExecRequests ()
 {
     for (auto &dep : dependencies)
     {
@@ -206,14 +207,13 @@ bool TimeDependencies::checkIfReadyForTimeGrant (bool iterating, Time desiredGra
                 {
                     return false;
                 }
-                
             }
         }
     }
     return true;
 }
 
-void TimeDependencies::ResetIteratingTimeRequests (helics::Time requestTime)
+void TimeDependencies::resetIteratingTimeRequests (helics::Time requestTime)
 {
     for (auto &dep : dependencies)
     {

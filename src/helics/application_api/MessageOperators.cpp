@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -8,7 +8,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "MessageOperators.h"
+#include "MessageOperators.hpp"
 
 namespace helics
 {
@@ -94,21 +94,21 @@ std::unique_ptr<Message> MessageConditionalOperator::process (std::unique_ptr<Me
     return message;
 }
 
-CloneOperator::CloneOperator(std::function<void(const Message *)> userCloneFunction)
-    : evalFunction(std::move(userCloneFunction))
+CloneOperator::CloneOperator (std::function<void(const Message *)> userCloneFunction)
+    : evalFunction (std::move (userCloneFunction))
 {
 }
 
-void CloneOperator::setCloneFunction(std::function<void(const Message *)> userCloneFunction)
+void CloneOperator::setCloneFunction (std::function<void(const Message *)> userCloneFunction)
 {
-    evalFunction = std::move(userCloneFunction);
+    evalFunction = std::move (userCloneFunction);
 }
 
-std::unique_ptr<Message> CloneOperator::process(std::unique_ptr<Message> message)
+std::unique_ptr<Message> CloneOperator::process (std::unique_ptr<Message> message)
 {
     if (evalFunction)
     {
-        evalFunction(message.get());
+        evalFunction (message.get ());
     }
     return message;
 }

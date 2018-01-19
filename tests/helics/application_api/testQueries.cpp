@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -10,7 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "testFixtures.h"
 
-#include "helics/application_api/queryFunctions.h"
+#include "helics/application_api/queryFunctions.hpp"
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 
@@ -41,7 +41,7 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
 
     vFed1->enterInitializationStateAsync ();
     vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateFinalize ();
+    vFed1->enterInitializationStateComplete ();
 
     auto core = vFed1->getCorePointer ();
     auto res = core->query ("test1", "publications");
@@ -77,7 +77,7 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     BOOST_CHECK_EQUAL (res, "[test1;test2]");
     vFed1->enterInitializationStateAsync ();
     vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateFinalize ();
+    vFed1->enterInitializationStateComplete ();
     core = nullptr;
     vFed1->finalize ();
     vFed2->finalize ();
@@ -99,7 +99,7 @@ BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), co
 
     vFed1->enterInitializationStateAsync ();
     vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateFinalize ();
+    vFed1->enterInitializationStateComplete ();
 
     auto res = vFed1->query ("federation", "publications");
 

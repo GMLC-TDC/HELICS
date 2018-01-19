@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -21,7 +21,7 @@ using elsewhere is probably not going to work.  Someday this will be made more g
 
 */
 
-// just enumerating some print levels
+/** enumeration of defined print levels*/
 enum log_level : int
 {
     no_print = -1,  //!< never print

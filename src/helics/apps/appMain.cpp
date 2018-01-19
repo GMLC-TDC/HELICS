@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -10,8 +10,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "player.h"
 #include "recorder.h"
-#include "../core/BrokerFactory.h"
-#include "../core/core-exceptions.h"
+#include "../core/BrokerFactory.hpp"
+#include "../core/core-exceptions.hpp"
+#include "../core/helicsVersion.hpp"
 #include <iostream>
 
 void showHelp()
@@ -39,17 +40,17 @@ int main (int argc, char *argv[])
     {
         if (arg1 == "player")
         {
-            helics::player player(argc, argv);
-            player.run();
+            helics::Player Player(argc, argv);
+            Player.run();
         }
         else if (arg1 == "recorder")
         {
-            helics::recorder recorder(argc, argv);
-            recorder.run();
+            helics::Recorder Recorder(argc, argv);
+            Recorder.run();
         }
         else if ((arg1 == "--version")||(arg1=="-v"))
         {
-            std::cout << "helics_app\n" << helics::getHelicsVersionString() << '\n';
+            std::cout << "helics_app\n" << helics::helicsVersionString() << '\n';
         }
         else if ((arg1 == "--help") || (arg1 == "-?"))
         {

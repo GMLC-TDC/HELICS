@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -13,10 +13,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define HELICS_PLAYER_HPP
 
 #include "../application_api/Publications.hpp"
-#include "../application_api/CombinationFederate.h"
+#include "../application_api/CombinationFederate.hpp"
 #include "../application_api/Endpoints.hpp"
 
-#include "../application_api/HelicsPrimaryTypes.h"
+#include "../application_api/HelicsPrimaryTypes.hpp"
 #include <map>
 #include <memory>
 
@@ -56,75 +56,75 @@ namespace helics
         Message mess;
     };
 
-    /** class implementing a player object, which is capable of reading a file and generating interfaces
+    /** class implementing a Player object, which is capable of reading a file and generating interfaces
     and sending signals at the appropriate times
-    @details  the player class is not thread-safe,  don't try to use it from multiple threads without external protection, that will result in undefined behavior
+    @details  the Player class is not thread-safe,  don't try to use it from multiple threads without external protection, that will result in undefined behavior
     */
-    class player
+    class Player
     {
     public:
         /** default constructor*/
-        player() = default;
+        Player() = default;
         /** construct from command line arguments
         @param argc the number of arguments
         @param argv the strings in the input
         */
-        player(int argc, char *argv[]);
+        Player(int argc, char *argv[]);
         /** construct from a federate info object
         @param fi a pointer info object containing information on the desired federate configuration
         */
-       player(const FederateInfo &fi);
+       Player(const FederateInfo &fi);
         /**constructor taking a federate information structure and using the given core
         @param core a pointer to core object which the federate can join
         @param[in] fi  a federate information structure
         */
-        player(std::shared_ptr<Core> core, const FederateInfo &fi);
+        Player(std::shared_ptr<Core> core, const FederateInfo &fi);
         /**constructor taking a file with the required information
         @param[in] jsonString file or JSON string defining the federate information and other configuration
         */
-        player(const std::string &jsonString);
+        Player(const std::string &jsonString);
 
         /** move construction*/
-        player(player &&other_player) = default;
+        Player(Player &&other_player) = default;
         /** don't allow the copy constructor*/
-        player(const player &other_player) = delete;
+        Player(const Player &other_player) = delete;
         /** move assignment*/
-        player &operator= (player &&fed) = default;
+        Player &operator= (Player &&fed) = default;
         /** don't allow the copy assignment,  the default would fail anyway since federates are not copyable either*/
-        player &operator= (const player &fed) = delete;
-        ~player();
+        Player &operator= (const Player &fed) = delete;
+        ~Player();
 
         /** load a file containing publication information
-        @param filename the file containing the configuration and player data  accepted format are JSON, xml, and a player format which is tab delimited or comma delimited*/
+        @param filename the file containing the configuration and Player data  accepted format are JSON, xml, and a Player format which is tab delimited or comma delimited*/
         void loadFile(const std::string &filename);
-        /** initialize the player federate
+        /** initialize the Player federate
         @details generate all the publications and organize the points, the final publication count will be available after this time
-        and the player will enter the initialization mode, which means it will not be possible to add more publications
+        and the Player will enter the initialization mode, which means it will not be possible to add more publications
         calling run will automatically do this if necessary
         */
         void initialize();
-        /*run the player*/
+        /*run the Player*/
         void run();
 
-        /** run the player until the specified time
+        /** run the Player until the specified time
         @param stopTime_input the desired stop time
         */
         void run(Time stopTime_input);
 
-        /** add a publication to a player
+        /** add a publication to a Player
         @param key the key of the publication to add
         @param type the type of the publication
         @param units the units associated with the publication
         */
-        void addPublication( const std::string &key, helicsType_t type, const std::string &units="");
+        void addPublication( const std::string &key, helics_type_t type, const std::string &units="");
 
-        /** add a publication to a player
+        /** add a publication to a Player
         @param key the key of the publication to add
         @param type the type of the publication
         @param units the units associated with the publication
         */
         template <class valType>
-        typename std::enable_if_t<helicsType<valType>() != helicsType_t::helicsInvalid> 
+        typename std::enable_if_t<helicsType<valType>() != helics_type_t::helicsInvalid> 
             addPublication(const std::string &key, const std::string &units = "")
         {
             if (!useLocal)
@@ -139,12 +139,12 @@ namespace helics
             pubids[key] = static_cast<int> (publications.size()) - 1;
         }
         
-        /** add an endpoint to the player
+        /** add an endpoint to the Player
         @param endpointName the name of the endpoint
         @param endpointType the named type of the endpoint
         */
         void addEndpoint(const std::string &endpointName, const std::string &endpointType = "");
-        /** add a data point to publish through a player
+        /** add a data point to publish through a Player
         @param pubTime the time of the publication
         @param key the key for the publication
         @param val the value to publish
@@ -157,7 +157,7 @@ namespace helics
             points.back().pubName = key;
             points.back().value = val;
         }
-        /** add a message to a player queue
+        /** add a message to a Player queue
         @param pubTime  the time the message should be sent
         @param src the source endpoint of the message
         @param dest the destination endpoint of the message
@@ -165,7 +165,7 @@ namespace helics
         */
         void addMessage(Time sendTime, const std::string &src, const std::string &dest, const std::string &payload);
 
-        /** add an event for a specific time to a player queue
+        /** add an event for a specific time to a Player queue
         @param sendTime  the time the message should be sent
         @param actionTime  the eventTime listed for the message
         @param src the source endpoint of the message
@@ -194,10 +194,10 @@ namespace helics
         {
             return endpoints.size();
         }
-        /** finalize the player federate*/
+        /** finalize the Player federate*/
         void finalize(); 
 
-        /** check if the player is ready to run*/
+        /** check if the Player is ready to run*/
         bool isActive() const
         {
             return !deactivated;
@@ -223,13 +223,13 @@ namespace helics
         /** send all points and messages up to the specified time*/
         void sendInformation(Time sendTime);
 
-        /** extract a time from the string based on player parameters
+        /** extract a time from the string based on Player parameters
         @param str the string containing the time 
         @param lineNumber the lineNumber of the file which is used in case of invalid specification
         */
         helics::Time extractTime(const std::string &str, int lineNumber=0) const;
     private:
-        std::shared_ptr<CombinationFederate> fed; //!< the federate created for the player
+        std::shared_ptr<CombinationFederate> fed; //!< the federate created for the Player
         std::vector<ValueSetter> points;    //!< the points to generate into the federation
         std::vector<MessageHolder> messages; //!< list of message to hold
         std::map<std::string, std::string> tags;    //!< map of the key and type strings
@@ -238,8 +238,8 @@ namespace helics
         std::vector<Endpoint> endpoints;    //!< the actual endpoint objects
         std::map<std::string, int> pubids;  //!< publication id map
         std::map<std::string, int> eptids;  //!< endpoint id maps
-        helics::helicsType_t defType = helics::helicsType_t::helicsString; //!< the default data type unless otherwise specified
-        Time stopTime = Time::maxVal(); //!< the time the player should stop
+        helics::helics_type_t defType = helics::helics_type_t::helicsString; //!< the default data type unless otherwise specified
+        Time stopTime = Time::maxVal(); //!< the time the Player should stop
         std::string masterFileName; //!< the name of the master file used to do the construction
         size_t pointIndex = 0; //!< the current point index
         size_t messageIndex = 0; //!< the current message index

@@ -20,14 +20,14 @@ namespace helics {
 /** a queue that blocks while waiting for an input
 */
 template<typename T>
-class BlockingQueue {
+class BlockingQueue_old {
   public:
 	  /** default constructor*/
-	  BlockingQueue() = default;
+	  BlockingQueue_old() = default;
 
 	/** DISABLE_COPY_AND_ASSIGN */
-	BlockingQueue(const BlockingQueue&) = delete;
-	BlockingQueue& operator=(const BlockingQueue&) = delete;
+	BlockingQueue_old(const BlockingQueue_old&) = delete;
+	BlockingQueue_old& operator=(const BlockingQueue_old&) = delete;
 
 	/** push an object onto the queue*/
     void push(const T& t);
@@ -69,7 +69,7 @@ class BlockingQueue {
 };
 
 template<typename T>
-void BlockingQueue<T>::push(const T& t) {
+void BlockingQueue_old<T>::push(const T& t) {
   std::unique_lock<std::mutex> lock(mutex_);
   queue_.push(t);
   lock.unlock();
@@ -78,7 +78,7 @@ void BlockingQueue<T>::push(const T& t) {
 }
 
 template<typename T>
-stx::optional<T> BlockingQueue<T>::try_pop() {
+stx::optional<T> BlockingQueue_old<T>::try_pop() {
   std::lock_guard<std::mutex> lock(mutex_);
 
   if (queue_.empty()) {
@@ -91,7 +91,7 @@ stx::optional<T> BlockingQueue<T>::try_pop() {
 }
 
 template<typename T>
-T BlockingQueue<T>::pop(const std::string& log_on_wait) {
+T BlockingQueue_old<T>::pop(const std::string& log_on_wait) {
   std::unique_lock<std::mutex> lock(mutex_);
 
   while (queue_.empty()) {
@@ -107,7 +107,7 @@ T BlockingQueue<T>::pop(const std::string& log_on_wait) {
 }
 
 template<typename T>
-stx::optional<T> BlockingQueue<T>::try_peek() const {
+stx::optional<T> BlockingQueue_old<T>::try_peek() const {
   std::lock_guard<std::mutex> lock(mutex_);
 
   if (queue_.empty()) {
@@ -119,7 +119,7 @@ stx::optional<T> BlockingQueue<T>::try_peek() const {
 }
 
 template<typename T>
-size_t BlockingQueue<T>::size() const {
+size_t BlockingQueue_old<T>::size() const {
   std::lock_guard<std::mutex> lock(mutex_);
   return queue_.size();
 }

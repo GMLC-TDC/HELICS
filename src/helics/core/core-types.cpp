@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -8,8 +8,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "core-types.h"
-#include "core-exceptions.h"
+#include "core-types.hpp"
+#include "core-exceptions.hpp"
 #include "helics/helics-config.h"
 #include <algorithm>
 #include <cctype>
@@ -86,10 +86,10 @@ core_type coreTypeFromString (std::string type)
     {
         return core_type::MPI;
     }
-    throw (std::invalid_argument ("unrecognized core type"));
+    return core_type::UNRECOGNIZED;
 }
 
-bool isAvailable (core_type type)
+bool isCoreTypeAvailable (core_type type) noexcept
 {
     bool available = false;
 
@@ -121,6 +121,9 @@ bool isAvailable (core_type type)
 #else
         available = true;
 #endif
+        break;
+    case core_type::DEFAULT:  // default should always be available
+        available = true;
         break;
     default:
         break;

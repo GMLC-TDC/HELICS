@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -12,10 +12,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <memory>
 
-#include "helics/application_api/MessageFederate.h"
-#include "helics/application_api/ValueFederate.h"
-#include "helics/core/BrokerFactory.h"
-#include "helics/core/CoreFactory.h"
+#include "helics/application_api/MessageFederate.hpp"
+#include "helics/application_api/ValueFederate.hpp"
+#include "helics/core/BrokerFactory.hpp"
+#include "helics/core/CoreFactory.hpp"
 
 #ifndef DISABLE_TCP_CORE
 const std::string core_types[] = {"test",   "ipc",   "tcp",   "zmq",   "udp",

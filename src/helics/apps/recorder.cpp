@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -9,8 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "../application_api/Subscriptions.hpp"
-#include "../application_api/ValueFederate.h"
-#include "../application_api/queryFunctions.h"
+#include "../application_api/ValueFederate.hpp"
+#include "../application_api/queryFunctions.hpp"
 #include "../application_api/Filters.hpp"
 #include <algorithm>
 #include <fstream>
@@ -24,6 +24,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include "../common/stringOps.h"
+#include "../core/helicsVersion.hpp"
 
 #include "PrecHelper.h"
 #include <thread>
@@ -37,12 +38,12 @@ static int recorderArgumentParser (int argc, const char *const *argv, po::variab
 
 namespace helics
 {
-    recorder::recorder(FederateInfo &fi) : fed(std::make_shared<CombinationFederate>(fi))
+    Recorder::Recorder(FederateInfo &fi) : fed(std::make_shared<CombinationFederate>(fi))
     {
         fed->setFlag(OBSERVER_FLAG);
     }
 
-    recorder::recorder(int argc, char *argv[])
+    Recorder::Recorder(int argc, char *argv[])
     {
         boost::program_options::variables_map vm_map;
         int res = recorderArgumentParser(argc, argv, vm_map);
@@ -61,24 +62,24 @@ namespace helics
     }
 
 
-    recorder::recorder(std::shared_ptr<Core> core, const FederateInfo &fi) :fed(std::make_shared<CombinationFederate>(std::move(core), fi))
+    Recorder::Recorder(std::shared_ptr<Core> core, const FederateInfo &fi) :fed(std::make_shared<CombinationFederate>(std::move(core), fi))
     {
         fed->setFlag(OBSERVER_FLAG);
     }
 
-    recorder::recorder(const std::string &jsonString) :fed(std::make_shared<CombinationFederate>(jsonString))
+    Recorder::Recorder(const std::string &jsonString) :fed(std::make_shared<CombinationFederate>(jsonString))
     {
         fed->setFlag(OBSERVER_FLAG);
         loadJsonFile(jsonString);
     }
 
   
-    recorder::~recorder()
+    Recorder::~Recorder()
     {
         saveFile(outFileName);
     }
 
-    int recorder::loadFile(const std::string &filename)
+    int Recorder::loadFile(const std::string &filename)
     {
         auto ext = filesystem::path(filename).extension().string();
         if ((ext == ".json") || (ext == ".JSON"))
@@ -92,7 +93,7 @@ namespace helics
     }
 
 
-    int recorder::loadJsonFile(const std::string &jsonString)
+    int Recorder::loadJsonFile(const std::string &jsonString)
     {
         fed->registerInterfaces(jsonString);
 
@@ -202,7 +203,7 @@ namespace helics
         return 0;
     }
 
-   int recorder::loadTextFile(const std::string &textFile)
+   int Recorder::loadTextFile(const std::string &textFile)
     {
        using namespace stringOps;
 
@@ -288,7 +289,7 @@ continue;
         return 0;
     }
 
-    void recorder::writeJsonFile(const std::string &filename)
+    void Recorder::writeJsonFile(const std::string &filename)
     {
         using json = nlohmann::json;
         json JF;
@@ -340,7 +341,7 @@ continue;
         o << std::setw(4) << JF << std::endl;
     }
 
-    void recorder::writeTextFile( const std::string &filename)
+    void Recorder::writeTextFile( const std::string &filename)
     {
         std::ofstream outFile(filename.empty() ? outFileName : filename);
         if (!points.empty())
@@ -379,7 +380,7 @@ continue;
         }
     }
 
-    void recorder::initialize()
+    void Recorder::initialize()
     {
         generateInterfaces();
 
@@ -397,12 +398,12 @@ continue;
         captureForCurrentTime(0.0);
     }
 
-    void recorder::finalize()
+    void Recorder::finalize()
     {
         fed->finalize();
     }
 
-    void recorder::generateInterfaces()
+    void Recorder::generateInterfaces()
     {
         for (auto &tag : subkeys)
         {
@@ -421,7 +422,7 @@ continue;
         loadCaptureInterfaces();
     }
 
-    void recorder::loadCaptureInterfaces()
+    void Recorder::loadCaptureInterfaces()
     {
         for (auto &capt : captureInterfaces)
         {
@@ -438,7 +439,7 @@ continue;
         
     }
 
-    void recorder::captureForCurrentTime(Time currentTime)
+    void Recorder::captureForCurrentTime(Time currentTime)
     {
         for (auto &sub : subscriptions)
         {
@@ -475,19 +476,19 @@ continue;
     }
 
 
-    std::string recorder::encode(const std::string &str2encode)
+    std::string Recorder::encode(const std::string &str2encode)
     {
         return str2encode;
     }
 
-    /*run the player*/
-    void recorder::run()
+    /*run the Player*/
+    void Recorder::run()
     {
             run(autoStopTime);
             fed->finalize();
     }
-    /** run the player until the specified time*/
-    void recorder::run(Time runToTime)
+    /** run the Player until the specified time*/
+    void Recorder::run(Time runToTime)
     {
         initialize();
         if (!mapfile.empty())
@@ -537,7 +538,7 @@ continue;
         
     }
     /** add a subscription to record*/
-    void recorder::addSubscription(const std::string &key)
+    void Recorder::addSubscription(const std::string &key)
     {
         auto res = subkeys.find(key);
         if ((res == subkeys.end())||(res->second==-1))
@@ -550,7 +551,7 @@ continue;
         }
     }
     /** add an endpoint*/
-    void recorder::addEndpoint(const std::string &endpoint)
+    void Recorder::addEndpoint(const std::string &endpoint)
     {
         auto res = eptNames.find(endpoint);
         if ((res == eptNames.end()) || (res->second == -1))
@@ -563,7 +564,7 @@ continue;
         }
     }
     
-    void recorder::addSourceEndpointClone(const std::string &sourceEndpoint)
+    void Recorder::addSourceEndpointClone(const std::string &sourceEndpoint)
     {
         if (!cFilt)
         {
@@ -571,10 +572,10 @@ continue;
             cloneEndpoint = std::make_unique<Endpoint>(fed.get(), "cloneE");
             cFilt->addDeliveryEndpoint(cloneEndpoint->getName());
         }
-        cFilt->addSourceEndpoint(sourceEndpoint);
+        cFilt->addSourceTarget(sourceEndpoint);
     }
     
-    void recorder::addDestEndpointClone(const std::string &destEndpoint)
+    void Recorder::addDestEndpointClone(const std::string &destEndpoint)
     {
         if (!cFilt)
         {
@@ -582,15 +583,15 @@ continue;
             cloneEndpoint = std::make_unique<Endpoint>(fed.get(), "cloneE");
             cFilt->addDeliveryEndpoint(cloneEndpoint->getName());
         }
-        cFilt->addDestinationEndpoint(destEndpoint);
+        cFilt->addDestinationTarget(destEndpoint);
     }
 
-    void recorder::addCapture(const std::string &captureDesc)
+    void Recorder::addCapture(const std::string &captureDesc)
     {
         captureInterfaces.push_back(captureDesc);
     }
 
-    std::pair<std::string, std::string> recorder::getValue(int index) const
+    std::pair<std::string, std::string> Recorder::getValue(int index) const
     {
         if (isValidIndex(index, points))
         {
@@ -599,7 +600,7 @@ continue;
         return { std::string(),std::string() };
     }
     
-    std::unique_ptr<Message> recorder::getMessage(int index) const
+    std::unique_ptr<Message> Recorder::getMessage(int index) const
     {
         if (isValidIndex(index, messages))
         {
@@ -609,7 +610,7 @@ continue;
     }
 
     /** save the data to a file*/
-    void recorder::saveFile(const std::string &filename)
+    void Recorder::saveFile(const std::string &filename)
     {
         auto ext = filesystem::path(filename).extension().string();
         if ((ext == ".json") || (ext == ".JSON"))
@@ -622,7 +623,7 @@ continue;
         }
     }
 
-    int recorder::loadArguments(boost::program_options::variables_map &vm_map)
+    int Recorder::loadArguments(boost::program_options::variables_map &vm_map)
     {
         if (vm_map.count("input") == 0)
         {
@@ -785,7 +786,7 @@ int recorderArgumentParser(int argc, const char *const *argv, po::variables_map 
 
     if (cmd_vm.count ("version") > 0)
     {
-        std::cout << helics::getHelicsVersionString () << '\n';
+        std::cout << helics::helicsVersionString () << '\n';
         return (-1);
     }
 

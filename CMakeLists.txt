@@ -4,11 +4,11 @@ project (HELICS)
 #-----------------------------------------------------------------------------
 # HELICS Version number
 #-----------------------------------------------------------------------------
-set (HELICS_VERSION_MAJOR 0)
-set (HELICS_VERSION_MINOR 9)
+set (HELICS_VERSION_MAJOR 1)
+set (HELICS_VERSION_MINOR 0)
 set (HELICS_VERSION_PATCH 0)
-
-set (HELICS_DATE "12-08-17")
+set (HELICS_VERSION_BUILD alpha)
+set (HELICS_DATE "01-18-18")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -16,12 +16,16 @@ if (BUILD_HELICS_TESTS)
 enable_testing ()
 endif(BUILD_HELICS_TESTS)
 
-OPTION(BUILD_HELICS_EXAMPLES "Enable the test Executables to be built" OFF)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+OPTION(BUILD_HELICS_EXAMPLES "Enable the test Executables to be built" ON)
 
 OPTION(BUILD_PYTHON "Build Python extension" OFF)
+OPTION(GENERATE_PYTHON "Generate Python extension" ON)
+
 OPTION(BUILD_MATLAB "Build MATLAB extension" OFF)
 
-OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" OFF)
+OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" ON)
 IF(NOT MSVC)
 OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface gcc/clang only" OFF)
 ENDIF()
@@ -52,7 +56,7 @@ if (NOT CMAKE_DEBUG_POSTFIX)
 	set(CMAKE_DEBUG_POSTFIX d)
 endif()
 
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/config/cmake/")
 
 include_directories ("${PROJECT_SOURCE_DIR}/ThirdParty")
 include_directories ("${PROJECT_BINARY_DIR}/libs/include")
@@ -110,7 +114,7 @@ IF(UNIX)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
   #this options produces lots of warning but is useful for checking ever once in a while with Clang, GCC warning notices with this aren't as useful
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
-  
+
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
   option (USE_LIBCXX "Use LibC++ vs as opposed to the default" OFF)
   IF(USE_LIBCXX)
@@ -140,7 +144,8 @@ IF(MSVC)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
   add_compile_options(/MP)
-  add_compile_options(-W4  /EHsc /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484 /wd4702 /wd4996)
+  add_compile_options(-W4  /EHsc /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484 /wd4702 /wd4996 )
+  add_compile_options(/sdl)
   ADD_DEFINITIONS(-D_WIN32_WINNT=0x0601)
 ENDIF(MSVC)
   ENDIF(MINGW)
@@ -181,10 +186,10 @@ find_package(Doxygen)
 if(DOXYGEN_FOUND)
 
 	SHOW_VARIABLE(DOXYGEN_OUTPUT_DIR PATH "location to put Doxygen docs" "${CMAKE_CURRENT_SOURCE_DIR}/docs")
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 	add_custom_target(doc
 	${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docs}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docs
 	COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 endif(DOXYGEN_FOUND)
@@ -250,11 +255,11 @@ IF(MINGW)
 		message(status, "disabling TCP core |${DISABLE_TCP_CORE}|")
 		target_link_libraries(helics-static ws2_32)
 	endif()
-		
+
 	else()
 		target_link_libraries(helics-static wsock32 ws2_32)
 	endif()
-	
+
 ENDIF(MINGW)
 
 if (${ZeroMQ_FOUND})
@@ -343,7 +348,7 @@ IF(BUILD_CXX_SHARED_LIB)
 			set_target_properties(helics-shared PROPERTIES
 			LINK_FLAGS "/WHOLEARCHIVE")
 		endif()
-		
+
 	elseif (APPLE)
 		set_target_properties(helics-shared PROPERTIES
         LINK_FLAGS "-Wl,-all_load")
@@ -351,7 +356,7 @@ IF(BUILD_CXX_SHARED_LIB)
 		set_target_properties(helics-shared PROPERTIES
         LINK_FLAGS "-Wl,--whole-archive")
 	endif ()
-	
+
 endif()
 
 if (WIN32)
@@ -456,7 +461,7 @@ endif(ZeroMQ_FOUND)
 # Setup configure.h file for accessing configure options
 #-----------------------------------------------------------------------------
 configure_file (
-  "helics-config.h.in"
+  "config/helics-config.h.in"
   "${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h"
   )
   install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
@@ -470,14 +475,14 @@ install(DIRECTORY ThirdParty/helics_includes DESTINATION ${CMAKE_INSTALL_INCLUDE
 include(CMakePackageConfigHelpers)
 
 
-configure_package_config_file(${PROJECT_NAME}Config.cmake.in
+configure_package_config_file(config/${PROJECT_NAME}Config.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
                               INSTALL_DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-                                 VERSION ${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}
+                                 VERSION ${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}.${HELICS_VERSION_BUILD}
                                  COMPATIBILITY AnyNewerVersion)
 
-configure_file(${PROJECT_NAME}Import.cmake.in
+configure_file(config/${PROJECT_NAME}Import.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake" @ONLY)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake

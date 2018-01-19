@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -8,9 +8,9 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "CoreFactory.h"
-#include "core-exceptions.h"
-#include "core-types.h"
+#include "CoreFactory.hpp"
+#include "core-exceptions.hpp"
+#include "core-types.hpp"
 #include "helics/helics-config.h"
 #if HELICS_HAVE_ZEROMQ
 #include "zmq/ZmqCore.h"
@@ -235,7 +235,7 @@ std::shared_ptr<Core> findCore (const std::string &name) { return searchableObje
 
 bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &ptr)
 {
-    if (ptr->isOpenToNewFederates())
+    if (ptr->isOpenToNewFederates ())
     {
         switch (type)
         {
@@ -260,7 +260,7 @@ bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &pt
             return (dynamic_cast<UdpCore *> (ptr.get ()) != nullptr);
         case core_type::TCP:
 #ifndef DISABLE_TCP_CORE
-            return (dynamic_cast<TcpCore *> (ptr.get()) != nullptr);
+            return (dynamic_cast<TcpCore *> (ptr.get ()) != nullptr);
 #endif
         default:
             return true;

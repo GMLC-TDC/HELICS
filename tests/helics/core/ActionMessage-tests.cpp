@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -9,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include <boost/test/unit_test.hpp>
 
-#include "helics/core/ActionMessage.h"
+#include "helics/core/ActionMessage.hpp"
 #include <cstdio>
 
 BOOST_AUTO_TEST_SUITE (ActionMessage_tests)
@@ -342,7 +342,7 @@ BOOST_AUTO_TEST_CASE (check_conversions)
     // this should return -1
     res = cmd.toByteArray (testBuffer2.get (), cmdStr.size () >> 2);
     BOOST_CHECK_EQUAL (res, -1);
-} 
+}
 
 // check some error handling in the toByteArray function
 BOOST_AUTO_TEST_CASE (check_packetization)
@@ -363,12 +363,12 @@ BOOST_AUTO_TEST_CASE (check_packetization)
     cmd.info ().source = "source as a very long string test .........";  // type aliased to source
     cmd.info ().target = "target";  // units aliased to target
     cmd.info ().orig_source = "original_source";
-    auto cmdStringNormal = cmd.to_string();
+    auto cmdStringNormal = cmd.to_string ();
     auto cmdString = cmd.packetize ();
-    BOOST_CHECK_GE(cmdStringNormal.size() + 6, cmdString.size());
+    BOOST_CHECK_GE (cmdStringNormal.size () + 6, cmdString.size ());
     helics::ActionMessage cmd2;
     auto res = cmd2.depacketize (cmdString.data (), cmdString.size ());
-    BOOST_CHECK_EQUAL(res, cmdString.size());
+    BOOST_CHECK_EQUAL (res, cmdString.size ());
     BOOST_CHECK (cmd.action () == cmd2.action ());
     BOOST_CHECK_EQUAL (cmd.actionTime, cmd2.actionTime);
     BOOST_CHECK_EQUAL (cmd.source_id, cmd2.source_id);

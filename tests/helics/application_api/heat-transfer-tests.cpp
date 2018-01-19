@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -11,8 +11,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/floating_point_comparison.hpp>
 
 #include "helics/application_api/Subscriptions.hpp"
-#include "helics/application_api/ValueFederate.h"
-#include "helics/core/CoreFactory.h"
+#include "helics/application_api/ValueFederate.hpp"
+#include "helics/core/CoreFactory.hpp"
 
 #include "test_configuration.h"
 #include <fstream>

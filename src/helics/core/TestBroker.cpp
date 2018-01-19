@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -9,8 +9,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "TestBroker.h"
-#include "BrokerFactory.h"
-#include "CoreFactory.h"
+#include "BrokerFactory.hpp"
+#include "CoreFactory.hpp"
 #include "TestCore.h"
 
 #include "../common/argParser.h"
@@ -33,7 +33,7 @@ TestBroker::~TestBroker ()
     joinAllThreads ();
 }
 using namespace std::string_literals;
-static const argDescriptors extraArgs{{"brokername"s, "string"s, "identifier for the broker-same as broker"s},
+static const ArgDescriptors extraArgs{{"brokername"s, "string"s, "identifier for the broker-same as broker"s},
                                       {"broker,b"s, "string"s, "identifier for the broker"s},
                                       {"broker_address", "string"s, "location of the broker i.e network address"},
                                       {"brokerinit"s, "string"s, "the initialization string for the broker"s}};

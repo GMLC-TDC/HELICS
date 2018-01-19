@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
@@ -10,8 +10,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_TCP_COMMS_
 #pragma once
 
-#include "../CommsInterface.h"
-#include "../../common/BlockingQueue3.hpp"
+#include "../CommsInterface.hpp"
+#include "../../common/BlockingQueue.hpp"
 #include <atomic>
 #include <set>
 #include <string>
@@ -81,7 +81,7 @@ private:
 	int processIncomingMessage(ActionMessage &cmd);
     ActionMessage generateReplyToIncomingMessage(ActionMessage &cmd);
     //promise and future for communicating port number from tx_thread to rx_thread
-    BlockingQueue3<ActionMessage> rxMessageQueue;
+    BlockingQueue<ActionMessage> rxMessageQueue;
 
     void txReceive(const char *data, size_t bytes_received, const std::string &errorMessage);
 

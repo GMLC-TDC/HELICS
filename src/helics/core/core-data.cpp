@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -8,7 +8,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "core-data.h"
+#include "core-data.hpp"
 
 #include <set>
 
@@ -22,10 +22,10 @@ data_block &data_block::operator= (data_block &&db) noexcept
     return *this;
 }
 
-
 Message::Message (Message &&m) noexcept
     : time (m.time), flags (m.flags), data (std::move (m.data)), dest (std::move (m.dest)),
-      source (std::move (m.source)), original_source (std::move (m.original_source)), original_dest (std::move (m.original_dest))
+      source (std::move (m.source)), original_source (std::move (m.original_source)),
+      original_dest (std::move (m.original_dest))
 
 {
 }
