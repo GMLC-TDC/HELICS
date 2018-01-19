@@ -13,6 +13,7 @@ timeRepresentation.hpp
 delayedDestructor.hpp
 DelayedObjects.hpp
 searchableObjectHolder.hpp
+JsonProcessingFunctions.hpp
 stringToCmdLine.h
 AsioServiceManager.h
 logger.h
@@ -24,12 +25,13 @@ argParser.h
 MappedVector.hpp
 MappedPointerVector.hpp
 DualMappedVector.hpp
-
+GuardedTypes.hpp
 )
 
 set(common_sources
 stringToCmdLine.cpp
 AsioServiceManager.cpp
+jsonProcessingFunctions.cpp
 logger.cpp
 stringOps.cpp
 charMapper.cpp

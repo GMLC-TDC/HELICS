@@ -336,7 +336,8 @@ void CloneFilterOperation::setString (const std::string &property, const std::st
 {
     if (property == "delivery")
     {
-        deliveryAddresses = std::vector<std::string>{val};
+		auto handle = deliveryAddresses.lock();
+		*handle=std::vector<std::string>{ val };
     }
     else if (property == "add delivery")
     {

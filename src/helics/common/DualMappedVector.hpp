@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #pragma once
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <vector>
 #include <type_traits>
@@ -229,8 +229,8 @@ public:
 
 private:
     std::vector<VType> dataStorage_; //!< primary storage for data
-    std::map<searchType1, size_t> lookup1;  //!< lookup with searchType1
-    std::map<searchType2, size_t> lookup2;  //!< lookup with searchType2
+    std::unordered_map<searchType1, size_t> lookup1;  //!< lookup with searchType1
+    std::unordered_map<searchType2, size_t> lookup2;  //!< lookup with searchType2
 };
 
 

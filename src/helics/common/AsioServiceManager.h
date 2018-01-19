@@ -50,7 +50,7 @@ private:
 		servicer(const std::string &managerName,std::shared_ptr<AsioServiceManager> manager) :name(managerName),serviceManager(std::move(manager))
 		{
 		}
-
+		/** this object halts the serviceLoop when deleted*/
 		~servicer()
 		{
 			AsioServiceManager::haltServiceLoop(name);
@@ -110,12 +110,13 @@ public:
     */
     static LoopHandle runServiceLoop( const std::string &serviceName = std::string());
 private:
+	
     /** halt the service loop thread if the counter==0
     @details decrements the loop request counter and if it is 0 then will halt the 
     service loop
     @param in the name of the service
     */
-    static void haltServiceLoop(const std::string &serviceName = "");
+    static void haltServiceLoop(const std::string &serviceName);
 
     friend void serviceRunLoop(std::shared_ptr<AsioServiceManager> ptr);
 };

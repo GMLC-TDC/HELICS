@@ -116,8 +116,8 @@ class atomic_guarded
     }
   private:
     
-    T m_obj;
-    mutable M m_mutex;
+    T m_obj; //!< primary object
+    mutable M m_mutex; //!< mutex protecting object
 };
 
 }

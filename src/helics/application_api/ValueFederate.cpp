@@ -12,17 +12,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "ValueFederateManager.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4702)
-#include "json/json.h"
-#pragma warning(pop)
-#else
-#include "json/json.h"
-#endif
-
-#include <fstream>
 namespace helics
 {
 /**constructor taking a core engine and federate info structure
@@ -126,32 +117,8 @@ void ValueFederate::registerInterfaces (const std::string &jsonString)
     {
         throw (InvalidFunctionCall ("cannot call register Interfaces after entering initialization mode"));
     }
-    std::ifstream file (jsonString);
-    Json_helics::Value doc;
-
-    if (file.is_open ())
-    {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        bool ok = Json_helics::parseFromStream (rbuilder, file, &doc, &errs);
-        if (!ok)
-        {
-            // should I throw an error here?
-            return;
-        }
-    }
-    else
-    {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        std::istringstream jstring (jsonString);
-        bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
-        if (!ok)
-        {
-            // should I throw an error here?
-            return;
-        }
-    }
+	auto doc = loadJsonString(jsonString);
+    
     if (doc.isMember ("publications"))
     {
         auto pubs = doc["publications"];

@@ -161,6 +161,7 @@ AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::st
     throw (std::invalid_argument ("the service name specified was not available"));
 }
 
+
 void AsioServiceManager::haltServiceLoop (const std::string &serviceName)
 {
     std::lock_guard<std::mutex> servelock (serviceLock);

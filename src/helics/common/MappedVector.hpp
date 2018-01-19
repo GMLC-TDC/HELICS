@@ -10,10 +10,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #pragma once
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <vector>
-
+/** class combining a vector of objects with a map to search them by a separate index term
+the main use case is a bunch of inserts then searching with limited to no removal since removal is a rather expensive operation
+*/
 template <class VType, class searchType = std::string>
 class MappedVector
 {
@@ -62,7 +64,7 @@ class MappedVector
     VType &operator[] (size_t index) { return dataStorage_[index]; }
 
     const VType &operator[] (size_t index) const { return dataStorage_[index]; }
-
+	/** remove an element by its index*/
 	void removeIndex(size_t index)
 	{
 		if (index >= dataStorage_.size())
@@ -123,11 +125,18 @@ class MappedVector
 	{
 		std::transform(dataStorage_.begin(), dataStorage_.end(), dataStorage_.begin(), F);
 	}
-
+	/*NOTE:: no begin function should be allowed since this would introduce the possibilty
+	of using iterators for various algorithms which could cause the object to go to a indeterminate state
+	therefore constant iterators are allowed but not modifable iterators
+	someone determined to screw it up could still easily do so*/
+	/** get an iterator to the end of the sequence*/
     auto end () { return dataStorage_.end (); }
+	/** get a const iterator to the beginning of the data vector*/
     auto cbegin () const { return dataStorage_.cbegin (); }
-    auto cend () const { return dataStorage_.cend (); }
+    /** the a constant iterator to the end of the vector*/
+	auto cend () const { return dataStorage_.cend (); }
 
+	/** get the size of the vector*/
     auto size () const { return dataStorage_.size (); }
 
 
@@ -139,5 +148,5 @@ class MappedVector
 
   private:
     std::vector<VType> dataStorage_;
-    std::map<searchType, size_t> lookup;
+    std::unordered_map<searchType, size_t> lookup;
 };
