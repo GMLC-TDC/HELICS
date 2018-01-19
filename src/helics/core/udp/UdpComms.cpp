@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -10,7 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "UdpComms.h"
 #include "../../common/AsioServiceManager.h"
-#include "../ActionMessage.h"
+#include "../ActionMessage.hpp"
+#include "../NetworkBrokerData.hpp"
 #include <memory>
 #include <boost/asio/ip/udp.hpp>
 
@@ -34,6 +35,21 @@ UdpComms::UdpComms (const std::string &brokerTarget, const std::string &localTar
     if (localTarget_.empty ())
     {
         localTarget_ = "localhost";
+    }
+    promisePort = std::promise<int> ();
+    futurePort = promisePort.get_future ();
+}
+
+UdpComms::UdpComms (const NetworkBrokerData &netInfo)
+    : CommsInterface (netInfo), brokerPort (netInfo.brokerPort), PortNumber (netInfo.portNumber)
+{
+    if (localTarget_.empty ())
+    {
+        localTarget_ = "localhost";
+    }
+    if (netInfo.portStart > 0)
+    {
+        openPortStart = netInfo.portStart;
     }
     promisePort = std::promise<int> ();
     futurePort = promisePort.get_future ();

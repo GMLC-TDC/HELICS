@@ -1,45 +1,42 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#ifndef UDP_BROKER_H_
-#define UDP_BROKER_H_
+#ifndef TCP_BROKER_H_
+#define TCP_BROKER_H_
 #pragma once
 
-#include "../CoreBroker.h"
+#include "../CoreBroker.hpp"
 #include "../CommsBroker.hpp"
+#include "../NetworkBrokerData.hpp"
 
 namespace helics
 {
 
-class UdpComms;
+class TcpComms;
 
-class UdpBroker final:public CommsBroker<UdpComms,CoreBroker>
+class TcpBroker final:public CommsBroker<TcpComms,CoreBroker>
 {
 public:
 	/** default constructor*/
-	UdpBroker(bool rootBroker = false) noexcept;
-	UdpBroker(const std::string &broker_name);
+	TcpBroker(bool rootBroker = false) noexcept;
+	TcpBroker(const std::string &broker_name);
 
-	void InitializeFromArgs(int argc, const char * const *argv) override;
+	void initializeFromArgs(int argc, const char * const *argv) override;
 
 	/**destructor*/
-	virtual ~UdpBroker();
+	virtual ~TcpBroker();
 
 	virtual std::string getAddress() const override;
 	static void displayHelp(bool local_only = false);
 private:
 	virtual bool brokerConnect() override;
 	
-	std::string brokerAddress;	//!< the ip address or domain name of the broker
-	std::string localInterface; //!< the interface to use for the local receive ports
-	int PortNumber=-1;	//!< the port number for the reply port
-	int brokerPort=-1;  //!< the port number to use for the broker priority request port
-	int portStart = -1;  //!< the starting port for automatic port definitions
+    NetworkBrokerData netInfo{ NetworkBrokerData::interface_type::tcp };  //!< structure containing the networking information
 
 };
 }

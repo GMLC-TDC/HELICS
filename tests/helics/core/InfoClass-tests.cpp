@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -10,10 +10,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "testFixtures.h"
 #include <boost/test/unit_test.hpp>
 
-#include "helics/core/BasicHandleInfo.h"
-#include "helics/core/EndpointInfo.h"
-#include "helics/core/FilterInfo.h"
-#include "helics/core/SubscriptionInfo.h"
+#include "helics/core/BasicHandleInfo.hpp"
+#include "helics/core/EndpointInfo.hpp"
+#include "helics/core/FilterInfo.hpp"
+#include "helics/core/SubscriptionInfo.hpp"
 
 BOOST_AUTO_TEST_SUITE (InfoClass_tests)
 
@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
 {
     // All default values
     helics::BasicHandleInfo defHnd;
-    BOOST_CHECK_EQUAL (defHnd.id, helics::invalid_Handle);
+    BOOST_CHECK_EQUAL (defHnd.id, helics::invalid_handle);
     BOOST_CHECK_EQUAL (defHnd.fed_id, helics::invalid_fed_id);
     BOOST_CHECK_EQUAL (defHnd.local_fed_id, helics::invalid_fed_id);
     BOOST_CHECK_EQUAL (defHnd.what, helics::HANDLE_UNKNOWN);
@@ -98,27 +98,27 @@ BOOST_AUTO_TEST_CASE (endpointinfo_test)
 
     auto msg_time_max = std::make_unique<helics::Message> ();
     msg_time_max->data = "maxT";
-    msg_time_max->origsrc = "aFed";
+    msg_time_max->original_source = "aFed";
     msg_time_max->time = maxT;
 
     auto msg_time_min = std::make_unique<helics::Message> ();
     msg_time_min->data = "minT";
-    msg_time_min->origsrc = "aFed";
+    msg_time_min->original_source = "aFed";
     msg_time_min->time = minT;
 
     auto msg_time_zero = std::make_unique<helics::Message> ();
     msg_time_zero->data = "zeroT";
-    msg_time_zero->origsrc = "aFed";
+    msg_time_zero->original_source = "aFed";
     msg_time_zero->time = zeroT;
 
     auto msg_time_one_a = std::make_unique<helics::Message> ();
     msg_time_one_a->data = "oneAT";
-    msg_time_one_a->origsrc = "aFed";
+    msg_time_one_a->original_source = "aFed";
     msg_time_one_a->time = helics::Time (1);
 
     auto msg_time_one_b = std::make_unique<helics::Message> ();
     msg_time_one_b->data = "oneBT";
-    msg_time_one_b->origsrc = "bFed";
+    msg_time_one_b->original_source = "bFed";
     msg_time_one_b->time = helics::Time (1);
 
     helics::EndpointInfo endPI (13, 5, "name", "type");
@@ -199,12 +199,12 @@ BOOST_AUTO_TEST_CASE (endpointinfo_test)
     // Recreate messages A and B at time 1
     msg_time_one_a = std::make_unique<helics::Message> ();
     msg_time_one_a->data = "oneAT";
-    msg_time_one_a->origsrc = "aFed";
+    msg_time_one_a->original_source = "aFed";
     msg_time_one_a->time = helics::Time (1);
 
     msg_time_one_b = std::make_unique<helics::Message> ();
     msg_time_one_b->data = "oneBT";
-    msg_time_one_b->origsrc = "bFed";
+    msg_time_one_b->original_source = "bFed";
     msg_time_one_b->time = helics::Time (1);
 
     // Perform the same source name federate test, but reverse order of add messages
@@ -235,27 +235,27 @@ BOOST_AUTO_TEST_CASE (filterinfo_test)
 
     auto msg_time_max = std::make_unique<helics::Message> ();
     msg_time_max->data = "maxT";
-    msg_time_max->origsrc = "aFed";
+    msg_time_max->original_source = "aFed";
     msg_time_max->time = maxT;
 
     auto msg_time_min = std::make_unique<helics::Message> ();
     msg_time_min->data = "minT";
-    msg_time_min->origsrc = "aFed";
+    msg_time_min->original_source = "aFed";
     msg_time_min->time = minT;
 
     auto msg_time_zero = std::make_unique<helics::Message> ();
     msg_time_zero->data = "zeroT";
-    msg_time_zero->origsrc = "aFed";
+    msg_time_zero->original_source = "aFed";
     msg_time_zero->time = zeroT;
 
     auto msg_time_one_a = std::make_unique<helics::Message> ();
     msg_time_one_a->data = "oneAT";
-    msg_time_one_a->origsrc = "aFed";
+    msg_time_one_a->original_source = "aFed";
     msg_time_one_a->time = helics::Time (1);
 
     auto msg_time_one_b = std::make_unique<helics::Message> ();
     msg_time_one_b->data = "oneBT";
-    msg_time_one_b->origsrc = "bFed";
+    msg_time_one_b->original_source = "bFed";
     msg_time_one_b->time = helics::Time (1);
 
     helics::FilterInfo filtI (5, 13, "name", "target", "type_in", "type_out", true);

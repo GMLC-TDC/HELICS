@@ -1,6 +1,6 @@
 shallow_clone: true
 
-version: 0.3.{build}
+version: 1.0.0.alpha.{build}
 
 image: Visual Studio 2015
 
@@ -30,11 +30,15 @@ test_script:
   - cd build
   # For controlling which tests get run:
   # ctest -I <start>,<end>,<stride>,<list of test numbers>
-  # 1 = core tests
-  # 2 = application api tests
-  # 3 = c interface tests
-  # 4 = player/recorder tests
+  # 1 = common_tests
+  # 2 = core tests
+  # 3 = application api tests
+  # 4 = c interface tests
+  # 5 = app tests
+  # 6 = travis_tests
   - ctest -C Release --verbose --timeout 120 -I 0,0,0,1
-  - ctest -C Release --verbose --timeout 240 -I 0,0,0,2
+  - ctest -C Release --verbose --timeout 90 -I 0,0,0,2
+  - ctest -C Release --verbose --timeout 240 -I 0,0,0,3
+  - ctest -C Release --verbose --timeout 90 -I 0,0,0,5
 
 artifacts:

@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -9,11 +9,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "TestBroker.h"
-#include "BrokerFactory.h"
-#include "CoreFactory.h"
+#include "BrokerFactory.hpp"
+#include "CoreFactory.hpp"
 #include "TestCore.h"
 
-#include "argParser.h"
+#include "../common/argParser.h"
 #include <fstream>
 
 namespace helics
@@ -33,7 +33,9 @@ TestBroker::~TestBroker ()
     joinAllThreads ();
 }
 using namespace std::string_literals;
-static const argDescriptors extraArgs{{"brokername"s, "string"s, "identifier for the broker-same as broker"s},
+static const ArgDescriptors extraArgs{{"brokername"s, "string"s, "identifier for the broker-same as broker"s},
+                                      {"broker,b"s, "string"s, "identifier for the broker"s},
+                                      {"broker_address", "string"s, "location of the broker i.e network address"},
                                       {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
 
 void TestBroker::displayHelp (bool localOnly)
@@ -93,15 +95,41 @@ bool TestBroker::brokerConnect ()
         }
 
         auto broker = BrokerFactory::findBroker (brokerName);
-        if (broker)
+        tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
+        if (!tbroker)
         {
-            tbroker = std::static_pointer_cast<helics::CoreBroker> (broker);
+            tbroker = std::static_pointer_cast<CoreBroker> (
+              BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
         }
         else
         {
-            tbroker = std::static_pointer_cast<helics::CoreBroker> (
-              BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
+            if (!tbroker->isOpenToNewFederates ())
+            {
+                tbroker = nullptr;
+                broker = nullptr;
+                BrokerFactory::cleanUpBrokers (200);
+                broker = BrokerFactory::findBroker (brokerName);
+                tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
+                if (!tbroker)
+                {
+                    tbroker = std::static_pointer_cast<CoreBroker> (
+                      BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
+                }
+                else
+                {
+                    if (!tbroker->isOpenToNewFederates ())
+                    {
+                        tbroker = nullptr;
+                        broker = nullptr;
+                    }
+                }
+            }
         }
+        if (tbroker)
+        {
+            tbroker->connect ();
+        }
+        return static_cast<bool> (tbroker);
     }
 
     return static_cast<bool> (tbroker);

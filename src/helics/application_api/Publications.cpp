@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -10,9 +10,24 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "Publications.hpp"
+#include "../core/core-exceptions.hpp"
 
 namespace helics
 {
+PublicationBase::PublicationBase (ValueFederate *valueFed, int pubIndex) : fed (valueFed)
+{
+    auto cnt = fed->getPublicationCount ();
+    if ((pubIndex >= cnt) || (cnt < 0))
+    {
+        throw (helics::InvalidParameter ("no subscription with the specified index"));
+    }
+    id = static_cast<publication_id_t> (pubIndex);
+    key_ = fed->getPublicationKey (id);
+
+    type_ = fed->getPublicationType (id);
+    units_ = fed->getPublicationUnits (id);
+}
+
 void Publication::publish (double val) const
 {
     bool doPublish = true;
@@ -177,4 +192,44 @@ void Publication::publish (std::complex<double> val) const
     }
 }
 
+data_block typeConvert (helics_type_t type, const defV &val)
+{
+    switch (val.which ())
+    {
+    case doubleLoc:  // double
+        return typeConvert (type, boost::get<double> (val));
+    case intLoc:  // int64_t
+        return typeConvert (type, boost::get<int64_t> (val));
+    case stringLoc:  // string
+    default:
+        return typeConvert (type, boost::get<std::string> (val));
+    case complexLoc:  // complex
+        return typeConvert (type, boost::get<std::complex<double>> (val));
+    case vectorLoc:  // vector
+        return typeConvert (type, boost::get<std::vector<double>> (val));
+    case complexVectorLoc:  // complex
+        return typeConvert (type, boost::get<std::vector<std::complex<double>>> (val));
+    }
+}
+
+void Publication::publish (const defV &val) const
+{
+    bool doPublish = true;
+    if (changeDetectionEnabled)
+    {
+        if (prevValue != val)
+        {
+            prevValue = val;
+        }
+        else
+        {
+            doPublish = false;
+        }
+    }
+    if (doPublish)
+    {
+        auto db = typeConvert (pubType, val);
+        fed->publish (id, db);
+    }
+}
 }  // namespace helics

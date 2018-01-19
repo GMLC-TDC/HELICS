@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
@@ -10,8 +10,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define ZMQ_BROKER_H_
 #pragma once
 
-#include "../CoreBroker.h"
+#include "../CoreBroker.hpp"
 #include "../CommsBroker.hpp"
+#include "../NetworkBrokerData.hpp"
 
 namespace helics
 {
@@ -35,13 +36,7 @@ public:
 private:
 	virtual bool brokerConnect() override;
 	
-	std::string brokerAddress;	//!< the protocol string for the broker location
-	std::string localInterface; //!< the interface to use for the local receive ports
-	int repPortNumber=-1;	//!< the port number for the reply port
-	int pullPortNumber=-1;	//!< the port number for the pull port
-	int brokerReqPort=-1;  //!< the port number to use for the broker priority request port
-	int brokerPushPort=-1;  //!< the port number to use for the broker regular push port
-	int portStart = -1;  //!< the starting port for automatic port definitions
+    NetworkBrokerData netInfo{ NetworkBrokerData::interface_type::tcp }; //!< container for the network connection information
 
 };
 }

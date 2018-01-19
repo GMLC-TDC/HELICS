@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -15,7 +15,7 @@ Header file for inclusion of the entire CPP static library
 #ifndef HELICS_APPLICATION_API_HEADER_
 #define HELICS_APPLICATION_API_HEADER_
 
-#include "application_api/CombinationFederate.h"
+#include "application_api/CombinationFederate.hpp"
 #include "application_api/Filters.hpp"
 #include "application_api/Endpoints.hpp"
 #include "application_api/Publications.hpp"

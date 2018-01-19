@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -10,13 +10,28 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "Subscriptions.hpp"
+#include "../core/core-exceptions.hpp"
 
 namespace helics
 {
+SubscriptionBase::SubscriptionBase (ValueFederate *valueFed, int subIndex) : fed (valueFed)
+{
+    auto cnt = fed->getSubscriptionCount ();
+    if ((subIndex >= cnt) || (cnt < 0))
+    {
+        throw (helics::InvalidParameter ("no subscription with the specified index"));
+    }
+    id = static_cast<subscription_id_t> (subIndex);
+    key_ = fed->getSubscriptionKey (id);
+
+    type_ = fed->getSubscriptionType (id);
+    units_ = fed->getSubscriptionUnits (id);
+}
+
 void Subscription::handleCallback (Time time)
 {
     auto dv = fed->getValueRaw (id);
-    if (type == helicsType_t::helicsInvalid)
+    if (type == helics_type_t::helicsInvalid)
     {
         type = getTypeFromString (fed->getPublicationType (id));
     }

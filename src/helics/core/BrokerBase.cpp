@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -9,21 +9,23 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "BrokerBase.h"
+#include "BrokerBase.hpp"
 
 #include "../common/AsioServiceManager.h"
 #include "../common/logger.h"
-#include "TimeCoordinator.h"
+#include "TimeCoordinator.hpp"
 #include "helics/helics-config.h"
 #include <iostream>
 #include <libguarded/guarded.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/uuid/uuid.hpp>  // uuid class
 #include <boost/uuid/uuid_generators.hpp>  // generators
 #include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
+#include "helicsVersion.hpp"
 
 static inline std::string gen_id ()
 {
@@ -64,6 +66,7 @@ static void argumentParser (int argc, const char *const *argv, boost::program_op
         ("minbroker", po::value<int>(), "the minimum number of core/brokers that need to be connected (ignored in cores)")
         ("identifier", po::value<std::string>(), "name of the core/broker")
         ("tick", po::value<int>(), "number of milliseconds per tick counter if there is no broker communication for 2 ticks then secondary actions are taken")
+        ("dumplog","capture a record of all messages and dump a complete log to file or console on termination")
         ("timeout", po::value<int>(), "milliseconds to wait for a broker connection");
 
 
@@ -108,8 +111,7 @@ static void argumentParser (int argc, const char *const *argv, boost::program_op
 
     if (cmd_vm.count ("version") > 0)
     {
-        std::cout << HELICS_VERSION_MAJOR << '.' << HELICS_VERSION_MINOR << '.' << HELICS_VERSION_PATCH << " ("
-                  << HELICS_DATE << ")\n";
+        std::cout << helics::helicsVersionString() << '\n';
         return;
     }
 
@@ -185,7 +187,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     }
     if (vm.count ("maxiter") > 0)
     {
-        _max_iterations = vm["maxiter"].as<int> ();
+        _maxIterations = vm["maxiter"].as<int> ();
     }
 
     if (vm.count ("name") > 0)
@@ -193,6 +195,10 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
         identifier = vm["name"].as<std::string> ();
     }
 
+    if (vm.count ("dumplog") > 0)
+    {
+        dumplog = true;
+    }
     if (vm.count ("identifier") > 0)
     {
         identifier = vm["identifier"].as<std::string> ();
@@ -224,7 +230,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     timeCoord = std::make_unique<TimeCoordinator> ();
     timeCoord->setMessageSender ([this](const ActionMessage &msg) { addActionMessage (msg); });
 
-    loggingObj = std::make_unique<logger> ();
+    loggingObj = std::make_unique<Logger> ();
     if (!logFile.empty ())
     {
         loggingObj->openFile (logFile);
@@ -276,6 +282,23 @@ void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &,
     else if (!loggingObj->isRunning ())
     {
         loggingObj->startLogging ();
+    }
+}
+
+void BrokerBase::setLogLevel (int32_t level) { setLogLevels (level, level); }
+
+/** set the logging levels
+@param consoleLevel the logging level for the console display
+@param fileLevel the logging level for the log file
+*/
+void BrokerBase::setLogLevels (int32_t consoleLevel, int32_t fileLevel)
+{
+    consoleLogLevel = consoleLevel;
+    fileLogLevel = fileLevel;
+    maxLogLevel = std::max (consoleLogLevel, fileLogLevel);
+    if (loggingObj)
+    {
+        loggingObj->changeLevels (consoleLogLevel, fileLogLevel);
     }
 }
 
@@ -335,6 +358,7 @@ bool BrokerBase::tryReconnect () { return false; }
 
 void BrokerBase::queueProcessingLoop ()
 {
+    std::vector<ActionMessage> dumpMessages;
     mainLoopIsRunning.store (true);
     auto serv = AsioServiceManager::getServicePointer ();
     AsioServiceManager::runServiceLoop ();
@@ -347,10 +371,25 @@ void BrokerBase::queueProcessingLoop ()
     ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
     ticktimer.async_wait (timerCallback);
     int messagesSinceLastTick = 0;
-
+    auto logDump = [&, this]() {
+        if (dumplog)
+        {
+            for (auto &act : dumpMessages)
+            {
+                sendToLogger (0, -10, identifier,
+                              (boost::format ("|| dl cmd:%s from %d to %d") % prettyPrintString (act) %
+                               act.source_id % act.dest_id)
+                                .str ());
+            }
+        }
+    };
     while (true)
     {
         auto command = _queue.pop ();
+        if (dumplog)
+        {
+            dumpMessages.push_back (command);
+        }
         switch (command.action ())
         {
         case CMD_TICK:
@@ -377,6 +416,7 @@ void BrokerBase::queueProcessingLoop ()
             AsioServiceManager::haltServiceLoop ();
             mainLoopIsRunning.store (false);
             active->store (false);
+            logDump ();
             return;  // immediate return
         case CMD_STOP:
             ticktimer.cancel ();
@@ -386,6 +426,7 @@ void BrokerBase::queueProcessingLoop ()
                 processCommand (std::move (command));
                 mainLoopIsRunning.store (false);
                 active->store (false);
+                logDump ();
                 return processDisconnect ();
             }
 

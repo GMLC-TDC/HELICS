@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -8,8 +8,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "MessageFederateManager.h"
-#include "../core/core.h"
+#include "MessageFederateManager.hpp"
+#include "../core/Core.hpp"
 namespace helics
 {
 MessageFederateManager::MessageFederateManager (std::shared_ptr<Core> coreOb, Core::federate_id_t id)
@@ -86,7 +86,7 @@ uint64_t MessageFederateManager::receiveCount (endpoint_id_t id) const
 }
 /**
 * Returns the number of pending receives for the specified destination endpoint.
-@details this function is not preferred in multithreaded contexts due to the required locking
+@details this function is not preferred in multi-threaded contexts due to the required locking
 prefer to just use getMessage until it returns an invalid Message.
 */
 uint64_t MessageFederateManager::receiveCount () const
@@ -175,7 +175,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     auto epCount = coreObject->receiveCountAny (fedID);
     // lock the data updates
     std::unique_lock<std::mutex> eplock (endpointLock);
-    Core::Handle endpoint_id;
+    Core::handle_id_t endpoint_id;
     for (size_t ii = 0; ii < epCount; ++ii)
     {
         auto message = coreObject->receiveAny (fedID, endpoint_id);
@@ -216,10 +216,10 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             if (sfnd != subHandleLookup.end ())
             {
                 auto mv = std::make_unique<Message> ();
-                mv->src = sfnd->second.second;
+                mv->source = sfnd->second.second;
                 auto localEndpointIndex = sfnd->second.first.value ();
                 mv->dest = local_endpoints[localEndpointIndex].name;
-                mv->origsrc = mv->src;
+                mv->original_source = mv->source;
                 // get the data value
                 auto data = coreObject->getValue (handle);
 
@@ -247,12 +247,12 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     }
 }
 
-void MessageFederateManager::StartupToInitializeStateTransition ()
+void MessageFederateManager::startupToInitializeStateTransition ()
 {
     messageQueues.resize (local_endpoints.size ());
 }
 
-void MessageFederateManager::InitializeToExecuteStateTransition () {}
+void MessageFederateManager::initializeToExecuteStateTransition () {}
 
 static const std::string nullStr;
 
@@ -273,6 +273,12 @@ std::string MessageFederateManager::getEndpointType (endpoint_id_t id) const
 {
     std::lock_guard<std::mutex> eLock (endpointLock);
     return (id.value () < local_endpoints.size ()) ? local_endpoints[id.value ()].type : nullStr;
+}
+
+int MessageFederateManager::getEndpointCount () const
+{
+    std::lock_guard<std::mutex> eLock (endpointLock);
+    return static_cast<int> (local_endpoints.size ());
 }
 
 void MessageFederateManager::registerCallback (std::function<void(endpoint_id_t, Time)> callback)
@@ -321,19 +327,19 @@ void MessageFederateManager::registerCallback (const std::vector<endpoint_id_t> 
 
 void MessageFederateManager::removeOrderedMessage (unsigned int index)
 {
-    std::lock_guard<std::mutex> mLock (morderMutex);
-    if (index == messageOrder.back ())
+    auto handle = messageOrder.lock ();
+    if (index == handle->back ())
     {
-        messageOrder.pop_back ();
+        handle->pop_back ();
     }
     else
     {
-        auto term = messageOrder.rend ();
-        for (auto ri = messageOrder.rbegin () + 1; ri != term; ++ri)
+        auto term = handle->rend ();
+        for (auto ri = handle->rbegin () + 1; ri != term; ++ri)
         {
             if (*ri == index)
             {
-                messageOrder.erase (ri.base ());
+                handle->erase (ri.base ());
                 break;
             }
         }

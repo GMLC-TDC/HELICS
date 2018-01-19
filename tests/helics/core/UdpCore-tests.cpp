@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -10,11 +10,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/unit_test.hpp>
 
 #include "helics/common/AsioServiceManager.h"
-#include "helics/core/ActionMessage.h"
-#include "helics/core/BrokerFactory.h"
-#include "helics/core/CoreFactory.h"
-#include "helics/core/core-types.h"
-#include "helics/core/core.h"
+#include "helics/core/ActionMessage.hpp"
+#include "helics/core/BrokerFactory.hpp"
+#include "helics/core/CoreFactory.hpp"
+#include "helics/core/core-types.hpp"
+#include "helics/core/Core.hpp"
 #include "helics/core/udp/UdpBroker.h"
 #include "helics/core/udp/UdpComms.h"
 #include "helics/core/udp/UdpCore.h"
@@ -28,6 +28,8 @@ BOOST_AUTO_TEST_SUITE (UDPCore_tests)
 using boost::asio::ip::udp;
 using helics::Core;
 
+#define UDP_BROKER_PORT 23901
+#define UDP_SECONDARY_PORT 23905
 BOOST_AUTO_TEST_CASE (udpComms_broker_test)
 {
     std::atomic<int> counter{0};
@@ -39,7 +41,7 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
     udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
 
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
-    comm.setBrokerPort (23901);
+    comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setName ("tests");
     auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
 
@@ -64,129 +66,6 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
 
-/** test the request set class with various scenarios*/
-/*
-BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
-{
-    std::string host = "tcp://127.0.0.1";
-
-    helics::ZmqRequestSets reqset;
-
-    auto ctx = zmqContextManager::getContextPointer ();
-    zmq::socket_t repSocket1 (ctx->getContext (), ZMQ_REP);
-    repSocket1.bind ("tcp://127.0.0.1:23405");
-    zmq::socket_t repSocket2 (ctx->getContext (), ZMQ_REP);
-    repSocket2.bind ("tcp://127.0.0.1:23406");
-    zmq::socket_t repSocket3 (ctx->getContext (), ZMQ_REP);
-    repSocket3.bind ("tcp://127.0.0.1:23407");
-
-    reqset.addRoutes (1, "tcp://127.0.0.1:23405");
-    reqset.addRoutes (2, "tcp://127.0.0.1:23406");
-    reqset.addRoutes (3, "tcp://127.0.0.1:23407");
-
-    helics::ActionMessage M (helics::CMD_IGNORE);
-    M.index = 1;
-
-    reqset.transmit (1, M);
-    BOOST_CHECK (reqset.waiting ());
-
-    zmq::message_t msg;
-    repSocket1.recv (&msg);
-
-    repSocket1.send (msg);
-    // should still be waiting
-    BOOST_CHECK (reqset.waiting ());
-    auto msgCnt = reqset.checkForMessages ();
-    BOOST_CHECK (!reqset.waiting ());
-    BOOST_CHECK_EQUAL (msgCnt, 1);
-
-    auto M2 = reqset.getMessage ();
-
-    BOOST_CHECK (M2->action () == helics::CMD_IGNORE);
-
-    // send two messages
-    reqset.transmit (2, M);
-    reqset.transmit (2, M);
-    BOOST_CHECK (reqset.waiting ());
-
-    repSocket2.recv (&msg);
-
-    repSocket2.send (msg);
-    reqset.checkForMessages ();
-    BOOST_CHECK (reqset.waiting ());
-    repSocket2.recv (&msg);
-
-    repSocket2.send (msg);
-    reqset.checkForMessages ();
-    BOOST_CHECK (!reqset.waiting ());
-
-    BOOST_CHECK (reqset.hasMessages ());
-}
-*/
-/** test the request set class with various scenarios*/
-/*
-BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
-{
-    std::string host = "tcp://127.0.0.1";
-
-    helics::ZmqRequestSets reqset;
-
-    auto ctx = zmqContextManager::getContextPointer ();
-    zmq::socket_t repSocket1 (ctx->getContext (), ZMQ_REP);
-    repSocket1.bind ("tcp://127.0.0.1:23405");
-    zmq::socket_t repSocket2 (ctx->getContext (), ZMQ_REP);
-    repSocket2.bind ("tcp://127.0.0.1:23406");
-    zmq::socket_t repSocket3 (ctx->getContext (), ZMQ_REP);
-    repSocket3.bind ("tcp://127.0.0.1:23407");
-
-    reqset.addRoutes (1, "tcp://127.0.0.1:23405");
-    reqset.addRoutes (2, "tcp://127.0.0.1:23406");
-    reqset.addRoutes (3, "tcp://127.0.0.1:23407");
-
-    helics::ActionMessage M (helics::CMD_IGNORE);
-    M.index = 1;
-
-    reqset.transmit (1, M);
-    reqset.transmit (2, M);
-    reqset.transmit (3, M);
-    zmq::message_t msg;
-    repSocket1.recv (&msg);
-
-    repSocket1.send (msg);
-
-    repSocket2.recv (&msg);
-
-    repSocket2.send (msg);
-    repSocket3.recv (&msg);
-
-    repSocket3.send (msg);
-    // make sure the check receives all messages
-    reqset.checkForMessages ();
-    BOOST_CHECK (!reqset.waiting ());
-    reqset.transmit (1, M);
-    reqset.transmit (2, M);
-    reqset.transmit (3, M);
-    reqset.transmit (1, M);
-    reqset.transmit (2, M);
-    reqset.transmit (3, M);
-    reqset.transmit (1, M);
-    reqset.transmit (2, M);
-    reqset.transmit (3, M);
-
-    repSocket1.recv (&msg);
-
-    repSocket1.send (msg);
-
-    repSocket2.recv (&msg);
-
-    repSocket2.send (msg);
-    repSocket3.recv (&msg);
-
-    repSocket3.send (msg);
-    BOOST_CHECK_EQUAL (reqset.checkForMessages (), 6);
-}
-*/
-
 BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
 {
     std::atomic<int> counter{0};
@@ -199,8 +78,8 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
 
     BOOST_CHECK (rxSocket.is_open ());
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
-    comm.setBrokerPort (23901);
-    comm.setPortNumber (23903);
+    comm.setBrokerPort (UDP_BROKER_PORT);
+    comm.setPortNumber (UDP_SECONDARY_PORT);
     comm.setName ("tests");
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
@@ -220,7 +99,7 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
 
-BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
+BOOST_AUTO_TEST_CASE (udpComms_rx_test)
 {
     std::atomic<int> counter{0};
     helics::ActionMessage act;
@@ -237,14 +116,9 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
         ++counter;
         act = m;
     });
-    comm.setBrokerPort (23901);
+    comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setPortNumber (23903);
     comm.setName ("tests");
-
-    comm.setCallback ([&counter, &act](helics::ActionMessage m) {
-        ++counter;
-        act = m;
-    });
 
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
@@ -267,7 +141,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
 
-BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
+BOOST_AUTO_TEST_CASE (udpComm_transmit_through)
 {
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
@@ -278,11 +152,11 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
     helics::UdpComms comm (host, host);
     helics::UdpComms comm2 (host, "");
 
-    comm.setBrokerPort (23901);
+    comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setName ("tests");
     comm2.setName ("test2");
-    comm2.setPortNumber (23901);
-    comm.setPortNumber (23908);
+    comm2.setPortNumber (UDP_BROKER_PORT);
+    comm.setPortNumber (UDP_SECONDARY_PORT);
 
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
@@ -316,7 +190,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
 
-BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
+BOOST_AUTO_TEST_CASE (udpComm_transmit_add_route)
 {
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
@@ -327,14 +201,14 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     helics::UdpComms comm2 (host, "");
     helics::UdpComms comm3 (host, host);
 
-    comm.setBrokerPort (23901);
+    comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setName ("tests");
     comm2.setName ("broker");
     comm3.setName ("test3");
-    comm3.setBrokerPort (23901);
+    comm3.setBrokerPort (UDP_BROKER_PORT);
 
-    comm2.setPortNumber (23901);
-    comm.setPortNumber (23905);
+    comm2.setPortNumber (UDP_BROKER_PORT);
+    comm.setPortNumber (UDP_SECONDARY_PORT);
     comm3.setPortNumber (23920);
 
     helics::ActionMessage act;

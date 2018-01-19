@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -11,11 +11,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/common/cppzmq/zmq.hpp"
 #include "helics/common/zmqContextManager.h"
-#include "helics/core/ActionMessage.h"
-#include "helics/core/BrokerFactory.h"
-#include "helics/core/CoreFactory.h"
-#include "helics/core/core-types.h"
-#include "helics/core/core.h"
+#include "helics/core/ActionMessage.hpp"
+#include "helics/core/BrokerFactory.hpp"
+#include "helics/core/CoreFactory.hpp"
+#include "helics/core/core-types.hpp"
+#include "helics/core/Core.hpp"
 #include "helics/core/zmq/ZmqBroker.h"
 #include "helics/core/zmq/ZmqComms.h"
 #include "helics/core/zmq/ZmqCore.h"
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
     repSocket.bind ("tcp://127.0.0.1:23405");
 
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
-    comm.setBrokerPorts (23405);
+    comm.setBrokerPort (23405);
     comm.setName ("tests");
     auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
 
@@ -240,8 +240,8 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
 
     pullSocket.setsockopt (ZMQ_LINGER, 100);
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
-    comm.setBrokerPorts (23405);
-    comm.setPortNumbers (23407);
+    comm.setBrokerPort (23405);
+    comm.setPortNumber (23407);
     comm.setName ("tests");
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
@@ -292,8 +292,8 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
         BOOST_FAIL ("Unable to bind Socket");
     }
     pullSocket.setsockopt (ZMQ_LINGER, 100);
-    comm.setBrokerPorts (23405, 23406);
-    comm.setPortNumbers (23407, 23408);
+    comm.setBrokerPort (23405);
+    comm.setPortNumber (23407);
     comm.setName ("tests");
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
@@ -338,11 +338,11 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
     helics::ZmqComms comm (host, host);
     helics::ZmqComms comm2 (host, "");
 
-    comm.setBrokerPorts (23405, 23406);
+    comm.setBrokerPort (23405);
     comm.setName ("tests");
     comm2.setName ("test2");
-    comm2.setPortNumbers (23405, 23406);
-    comm.setPortNumbers (23407, 23408);
+    comm2.setPortNumber (23405);
+    comm.setPortNumber (23407);
 
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
@@ -387,15 +387,15 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     helics::ZmqComms comm2 (host, "");
     helics::ZmqComms comm3 (host, host);
 
-    comm.setBrokerPorts (23405, 23406);
+    comm.setBrokerPort (23405);
     comm.setName ("tests");
     comm2.setName ("broker");
     comm3.setName ("test3");
-    comm3.setBrokerPorts (23405, 23406);
+    comm3.setBrokerPort (23405);
 
-    comm2.setPortNumbers (23405, 23406);
-    comm.setPortNumbers (23407, 23408);
-    comm3.setPortNumbers (23409, 23410);
+    comm2.setPortNumber (23405);
+    comm.setPortNumber (23407);
+    comm3.setPortNumber (23409);
 
     helics::ActionMessage act;
     helics::ActionMessage act2;
@@ -436,7 +436,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     BOOST_REQUIRE_EQUAL (counter2, 2);
     BOOST_CHECK (act2.action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm2.addRoute (3, comm3.getPushAddress ());
+    comm2.addRoute (3, comm3.getAddress ());
 
     comm2.transmit (3, helics::CMD_ACK);
 
@@ -448,7 +448,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     BOOST_REQUIRE_EQUAL (counter3, 1);
     BOOST_CHECK (act3.action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm2.addRoute (4, comm.getPushAddress ());
+    comm2.addRoute (4, comm.getAddress ());
 
     comm2.transmit (4, helics::CMD_ACK);
 
@@ -465,7 +465,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
 BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
 {
     std::string initializationString =
-      "1 --brokerport=23405 --repport=23410 --local_interface=tcp://127.0.0.1 --name=core1";
+      "1 --brokerport=23405 --port=23410 --local_interface=tcp://127.0.0.1 --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
@@ -536,7 +536,7 @@ BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
 
     auto ccore = static_cast<helics::ZmqCore *> (core.get ());
     // this will test the automatic port allocation
-    BOOST_CHECK_EQUAL (ccore->getAddress (), "tcp://127.0.0.1:23500;tcp://127.0.0.1:23501");
+    BOOST_CHECK_EQUAL (ccore->getAddress (), "tcp://127.0.0.1:23500");
     core->disconnect ();
     broker->disconnect ();
     helics::CoreFactory::cleanUpCores (200);

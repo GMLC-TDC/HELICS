@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright (C) 2017, Battelle Memorial Institute
+#Copyright (C) 2017-2018, Battelle Memorial Institute
 #All rights reserved.
 
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
@@ -28,7 +28,9 @@ target_link_libraries(travis-tests helics-static)
 
 target_link_libraries(travis-tests ${Boost_LIBRARIES_test})
 
-add_test(NAME travis-tests COMMAND travis-tests --log_level=success --report_level=detailed)
+add_test(NAME travis-tests COMMAND travis-tests --log_level=warning --report_level=short)
+
+set_target_properties (travis-tests PROPERTIES FOLDER tests)
 
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)

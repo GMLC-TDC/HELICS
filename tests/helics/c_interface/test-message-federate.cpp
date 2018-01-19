@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -20,7 +20,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test out the message federates
  */
 
-BOOST_FIXTURE_TEST_SUITE (message_federate_tests, FederateTestFixture)
+// BOOST_FIXTURE_TEST_SUITE (message_federate_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_2"};
@@ -33,11 +33,11 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //
 //    mFed1->enterExecutionState ();
 //
-//    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
 //
 //    mFed1->finalize ();
 //
-//    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
+//    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 //}
 //
 // BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_types), core_type)
@@ -50,7 +50,7 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //
 //    mFed1->enterExecutionState ();
 //
-//    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
 //
 //    auto sv = mFed1->getEndpointName (epid);
 //    auto sv2 = mFed1->getEndpointName (epid2);
@@ -65,7 +65,7 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //    BOOST_CHECK (mFed1->getEndpointId ("ep2") == epid2);
 //    mFed1->finalize ();
 //
-//    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
+//    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 //}
 //
 //// same as previous test case but using endpoint objects
@@ -79,7 +79,7 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //	helics::Endpoint epid2(helics::GLOBAL, mFed1.get(), "ep2", "random");
 //	mFed1->enterExecutionState();
 //
-//	BOOST_CHECK(mFed1->currentState() == helics::Federate::op_states::execution);
+//	BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::execution);
 //
 //	auto sv = epid.getName();
 //	auto sv2 = epid2.getName();
@@ -93,7 +93,7 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //	BOOST_CHECK(mFed1->getEndpointId("ep2") == epid2.getID());
 //	mFed1->finalize();
 //
-//	BOOST_CHECK(mFed1->currentState() == helics::Federate::op_states::finalize);
+//	BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::finalize);
 //}
 //
 // BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types), core_type)
@@ -107,7 +107,7 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //
 //    mFed1->enterExecutionState ();
 //
-//    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
 //    helics::data_block data (500, 'a');
 //
 //    mFed1->sendMessage (epid, "ep2", data);
@@ -129,7 +129,7 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //    BOOST_CHECK_EQUAL (M->data[245], data[245]);
 //    mFed1->finalize ();
 //
-//    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
+//    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 //}
 //
 // BOOST_DATA_TEST_CASE(message_federate_send_receive_obj, bdata::make(core_types), core_type)
@@ -145,7 +145,7 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //
 //	mFed1->enterExecutionState();
 //
-//	BOOST_CHECK(mFed1->currentState() == helics::Federate::op_states::execution);
+//	BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::execution);
 //	helics::data_block data(500, 'a');
 //
 //	epid.send("ep2", data);
@@ -167,7 +167,7 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //	BOOST_CHECK_EQUAL(M->data[245], data[245]);
 //	mFed1->finalize();
 //
-//	BOOST_CHECK(mFed1->currentState() == helics::Federate::op_states::finalize);
+//	BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::finalize);
 //}
 //
 // BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_types), core_type)
@@ -185,8 +185,8 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //    mFed2->enterExecutionState ();
 //    f1finish.wait ();
 //
-//    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::execution);
-//    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::execution);
 //
 //    helics::data_block data (500, 'a');
 //    helics::data_block data2 (400, 'b');
@@ -219,8 +219,8 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //    mFed1->finalize ();
 //    mFed2->finalize ();
 //
-//    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
-//    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::finalize);
+//    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
+//    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::finalize);
 //}
 //
 // BOOST_DATA_TEST_CASE(message_federate_send_receive_2fed_obj, bdata::make(core_types), core_type)
@@ -241,8 +241,8 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //	mFed2->enterExecutionState();
 //	f1finish.wait();
 //
-//	BOOST_CHECK(mFed1->currentState() == helics::Federate::op_states::execution);
-//	BOOST_CHECK(mFed2->currentState() == helics::Federate::op_states::execution);
+//	BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::execution);
+//	BOOST_CHECK(mFed2->getCurrentState() == helics::Federate::op_states::execution);
 //
 //	helics::data_block data(500, 'a');
 //	helics::data_block data2(400, 'b');
@@ -275,8 +275,8 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //	mFed1->finalize();
 //	mFed2->finalize();
 //
-//	BOOST_CHECK(mFed1->currentState() == helics::Federate::op_states::finalize);
-//	BOOST_CHECK(mFed2->currentState() == helics::Federate::op_states::finalize);
+//	BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::finalize);
+//	BOOST_CHECK(mFed2->getCurrentState() == helics::Federate::op_states::finalize);
 //}
 //
 // BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make (core_types), core_type)
@@ -294,8 +294,8 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //    mFed2->enterExecutionState ();
 //    f1finish.wait ();
 //
-//    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::execution);
-//    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::execution);
 //
 //    helics::data_block data1 (500, 'a');
 //    helics::data_block data2 (400, 'b');
@@ -336,15 +336,15 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //    BOOST_CHECK_EQUAL (M3->data.size (), data3.size ());
 //    BOOST_CHECK_EQUAL (M4->data.size (), data4.size ());
 //
-//    BOOST_CHECK_EQUAL (M4->src, "fed0/ep1");
+//    BOOST_CHECK_EQUAL (M4->source, "fed0/ep1");
 //    BOOST_CHECK_EQUAL (M4->dest, "ep2");
-//    BOOST_CHECK_EQUAL (M4->origsrc, "fed0/ep1");
+//    BOOST_CHECK_EQUAL (M4->original_source, "fed0/ep1");
 //    BOOST_CHECK_EQUAL (M4->time, 0.0);
 //    mFed1->finalize ();
 //    mFed2->finalize ();
 //
-//    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
-//    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::finalize);
+//    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
+//    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::finalize);
 //}
 //
 ////#define ENABLE_OUTPUT
@@ -402,13 +402,13 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //            if (messString == "ping")
 //            {
 //#ifdef ENABLE_OUTPUT
-//                std::cout << name << " :receive ping from " << std::string (mess->src) << " at time "
+//                std::cout << name << " :receive ping from " << std::string (mess->source) << " at time "
 //                          << static_cast<double> (currentTime) << '\n';
 //#endif
 //                mess->data = "pong";
-//                mess->dest = mess->src;
-//                mess->src = name;
-//                mess->origsrc = mess->src;
+//                mess->dest = mess->source;
+//                mess->source = name;
+//                mess->original_source = mess->source;
 //                mess->time = currentTime;
 //                mFed->sendMessage (ep, std::move (mess));
 //                pings++;
@@ -417,7 +417,7 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //            {
 //                pongs++;
 //#ifdef ENABLE_OUTPUT
-//                std::cout << name << " :receive pong from " << std::string (mess->src) << " at time "
+//                std::cout << name << " :receive pong from " << std::string (mess->source) << " at time "
 //                          << static_cast<double> (currentTime) << '\n';
 //#endif
 //            }
@@ -518,8 +518,8 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //    mFed2->enterExecutionState ();
 //    f1finish.wait ();
 //
-//    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::execution);
-//    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
+//    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::execution);
 //
 //    helics::data_block data (500, 'a');
 //    helics::data_block data2 (400, 'b');
@@ -552,7 +552,7 @@ const std::string core_types[] = {"test", "test_2", "ipc", "ipc_2", "zmq", "zmq_
 //    mFed1->finalize ();
 //    mFed2->finalize ();
 //
-//    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
-//    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::finalize);
+//    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
+//    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::finalize);
 //}
-BOOST_AUTO_TEST_SUITE_END ()
+// BOOST_AUTO_TEST_SUITE_END ()

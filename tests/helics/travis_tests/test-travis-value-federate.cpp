@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -15,9 +15,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
-#include "helics/application_api/ValueFederate.h"
-#include "helics/core/BrokerFactory.h"
-#include "helics/core/CoreFactory.h"
+#include "helics/application_api/ValueFederate.hpp"
+#include "helics/core/BrokerFactory.hpp"
+#include "helics/core/CoreFactory.hpp"
 #include "testFixtures.h"
 
 using namespace std::string_literals;
@@ -28,8 +28,6 @@ BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
-
-const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
 
 BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdata::make (core_types), core_type)
 {
@@ -51,7 +49,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdat
     // enter execution
     vFed1->enterExecutionState ();
 
-    BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
     // check subscriptions
     const auto &sv = subid1.getName ();
     const auto &sv2 = subid2.getName ();
@@ -78,7 +76,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdat
     BOOST_CHECK_EQUAL (pubid3.getUnits (), "V");
     vFed1->finalize ();
 
-    BOOST_CHECK (vFed1->currentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
 BOOST_TEST_DECORATOR (*utf::timeout (5))
@@ -88,7 +86,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications
-    helics::Publication pubid (helics::GLOBAL, vFed1.get (), "pub1", helics::helicsType_t::helicsString);
+    helics::Publication pubid (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsString);
 
     helics::Subscription subid (vFed1.get (), "pub1");
     vFed1->setTimeDelta (1.0);

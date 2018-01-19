@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -8,11 +8,11 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "BrokerFactory.h"
+#include "BrokerFactory.hpp"
 #include "../common/delayedDestructor.hpp"
 #include "../common/searchableObjectHolder.hpp"
-#include "core-exceptions.h"
-#include "core-types.h"
+#include "core-exceptions.hpp"
+#include "core-types.hpp"
 #include "helics/helics-config.h"
 #if HELICS_HAVE_ZEROMQ
 #include "zmq/ZmqBroker.h"
@@ -26,6 +26,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "ipc/IpcBroker.h"
 #include "udp/UdpBroker.h"
 
+#ifndef DISABLE_TCP_CORE
+#include "tcp/TcpBroker.h"
+#endif
+
 #include <cassert>
 
 namespace helics
@@ -34,10 +38,18 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 {
     std::shared_ptr<Broker> broker;
 
+    if (type == core_type::DEFAULT)
+    {
+#if HELICS_HAVE_ZEROMQ
+        type = core_type::ZMQ;
+#else
+        type = core_type::UDP;
+#endif
+    }
+
     switch (type)
     {
     case core_type::ZMQ:
-    {
 #if HELICS_HAVE_ZEROMQ
         if (name.empty ())
         {
@@ -52,9 +64,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
         throw (HelicsException ("ZMQ broker type is not available"));
 #endif
         break;
-    }
     case core_type::MPI:
-    {
 #if HELICS_HAVE_MPI
         if (name.empty ())
         {
@@ -68,9 +78,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
         throw (HelicsException ("mpi broker type is not available"));
 #endif
         break;
-    }
     case core_type::TEST:
-    {
         if (name.empty ())
         {
             broker = std::make_shared<TestBroker> ();
@@ -80,7 +88,6 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
             broker = std::make_shared<TestBroker> (name);
         }
         break;
-    }
     case core_type::INTERPROCESS:
     case core_type::IPC:
         if (name.empty ())
@@ -103,7 +110,19 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
         }
         break;
     case core_type::TCP:
-        throw (HelicsException ("TCP broker type is not available"));
+#ifndef DISABLE_TCP_CORE
+        if (name.empty ())
+        {
+            broker = std::make_shared<TcpBroker> ();
+        }
+        else
+        {
+            broker = std::make_shared<TcpBroker> (name);
+        }
+#else
+        throw (HelicsException ("tcp broker type is not available"));
+#endif
+        break;
     default:
         throw (HelicsException ("unrecognized broker type"));
     }
@@ -179,7 +198,7 @@ bool available (core_type type)
         available = true;
         break;
     case core_type::TCP:
-        available = false;
+        available = true;
         break;
     case core_type::UDP:
         available = true;

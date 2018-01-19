@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was modified by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute;
@@ -118,7 +118,8 @@ AsioServiceManager::~AsioServiceManager ()
     if (leakOnDelete)
     {
         // yes I am purposefully leaking this PHILIP TOP
-        // this capability is needed for some operations on particular OS's with the shared library operations
+        // this capability is needed for some operations on particular OS's with the shared library operations that
+        // will crash if this is closed before the library closes
         auto val = iserv.release ();
         (void)(val);
     }

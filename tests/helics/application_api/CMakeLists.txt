@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright (C) 2017, Battelle Memorial Institute
+#Copyright (C) 2017-2018, Battelle Memorial Institute
 #All rights reserved.
 
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
@@ -11,7 +11,6 @@ testFixtures.h
 )
 
 set(application_api_test_sources
-test_configuration.h
 value-converter-tests.cpp
 application-api-tests.cpp
 data-view-tests.cpp
@@ -43,6 +42,8 @@ target_link_libraries(application-api-tests helics-static)
 
 target_link_libraries(application-api-tests ${Boost_LIBRARIES_test})
 
+set_target_properties (application-api-tests PROPERTIES FOLDER tests)
+
 #add a bigobj indicator for this project
 IF(MINGW)
 target_compile_options(application-api-tests PRIVATE "-Wa,-mbig-obj")
@@ -52,10 +53,12 @@ if (MSVC)
 target_compile_options(application-api-tests PRIVATE /bigobj)
 endif(MSVC)
 
-ADD_DEFINITIONS(-DHELICS_BROKER_LOCATION="${HELICS_BROKER_LOC}")
-ADD_DEFINITIONS(-DHELICS_INSTALL_LOCATION="${CMAKE_INSTALL_PREFIX}")
+target_compile_definitions(application-api-tests PRIVATE "-DHELICS_BROKER_LOCATION=\"${HELICS_BROKER_LOC}\"")
+target_compile_definitions(application-api-tests PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\"")
 
-add_test(NAME application-api-tests COMMAND application-api-tests --log_level=success --report_level=detailed)
+target_compile_definitions(application-api-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
+
+add_test(NAME application-api-tests COMMAND application-api-tests --log_level=warning --report_level=short)
 
 
 

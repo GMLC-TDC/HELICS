@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/floating_point_comparison.hpp>
 
 #include "helics/application_api/Endpoints.hpp"
-#include "helics/application_api/MessageFederate.h"
+#include "helics/application_api/MessageFederate.hpp"
 #include "testFixtures.h"
 
 #include <future>
@@ -26,8 +26,6 @@ BOOST_FIXTURE_TEST_SUITE (message_federate_tests, FederateTestFixture)
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
-
 BOOST_TEST_DECORATOR (*utf::timeout (5))
 BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types), core_type)
 {
@@ -40,7 +38,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types), c
 
     mFed1->enterExecutionState ();
 
-    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
 
     mFed1->sendMessage (epid, "ep2", data);
@@ -62,7 +60,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types), c
     BOOST_CHECK_EQUAL (M->data[245], data[245]);
     mFed1->finalize ();
 
-    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
 BOOST_TEST_DECORATOR (*utf::timeout (5))
@@ -79,7 +77,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_obj, bdata::make (core_types
 
     mFed1->enterExecutionState ();
 
-    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
 
     epid.send ("ep2", data);
@@ -101,7 +99,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_obj, bdata::make (core_types
     BOOST_CHECK_EQUAL (M->data[245], data[245]);
     mFed1->finalize ();
 
-    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
 BOOST_TEST_DECORATOR (*utf::timeout (5))
@@ -120,8 +118,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
     mFed2->enterExecutionState ();
     f1finish.wait ();
 
-    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::execution);
-    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::execution);
 
     helics::data_block data (500, 'a');
     helics::data_block data2 (400, 'b');
@@ -154,8 +152,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
     mFed1->finalize ();
     mFed2->finalize ();
 
-    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
-    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
 BOOST_TEST_DECORATOR (*utf::timeout (5))
@@ -177,8 +175,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_
     mFed2->enterExecutionState ();
     f1finish.wait ();
 
-    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::execution);
-    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::execution);
 
     helics::data_block data (500, 'a');
     helics::data_block data2 (400, 'b');
@@ -211,8 +209,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_
     mFed1->finalize ();
     mFed2->finalize ();
 
-    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
-    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
 BOOST_TEST_DECORATOR (*utf::timeout (5))
@@ -231,8 +229,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     mFed2->enterExecutionState ();
     f1finish.wait ();
 
-    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::execution);
-    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::execution);
 
     helics::data_block data1 (500, 'a');
     helics::data_block data2 (400, 'b');
@@ -273,15 +271,15 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     BOOST_CHECK_EQUAL (M3->data.size (), data3.size ());
     BOOST_CHECK_EQUAL (M4->data.size (), data4.size ());
 
-    BOOST_CHECK_EQUAL (M4->src, "fed0/ep1");
+    BOOST_CHECK_EQUAL (M4->source, "fed0/ep1");
     BOOST_CHECK_EQUAL (M4->dest, "ep2");
-    BOOST_CHECK_EQUAL (M4->origsrc, "fed0/ep1");
+    BOOST_CHECK_EQUAL (M4->original_source, "fed0/ep1");
     BOOST_CHECK_EQUAL (M4->time, 0.0);
     mFed1->finalize ();
     mFed2->finalize ();
 
-    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
-    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
 BOOST_TEST_DECORATOR (*utf::timeout (5))
@@ -300,8 +298,8 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_ty
     mFed2->enterExecutionState ();
     f1finish.wait ();
 
-    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::execution);
-    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::execution);
 
     helics::data_block data (500, 'a');
     helics::data_block data2 (400, 'b');
@@ -334,7 +332,7 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_ty
     mFed1->finalize ();
     mFed2->finalize ();
 
-    BOOST_CHECK (mFed1->currentState () == helics::Federate::op_states::finalize);
-    BOOST_CHECK (mFed2->currentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::finalize);
 }
 BOOST_AUTO_TEST_SUITE_END ()

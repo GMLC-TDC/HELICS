@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <typeinfo>
 #include <vector>
 
-#include "../core/core-data.h"
+#include "../core/core-data.hpp"
 /** @file
 @details basic type information and control for HELICS
 */
@@ -35,6 +35,7 @@ enum class identifiers : char
     subscription,
     filter,
     endpoint,
+    query,
 
 };
 
@@ -94,6 +95,7 @@ using publication_id_t = identifier_id_t<identifier_type, identifiers::publicati
 using subscription_id_t = identifier_id_t<identifier_type, identifiers::subscription, invalid_id_value>;
 using endpoint_id_t = identifier_id_t<identifier_type, identifiers::endpoint, invalid_id_value>;
 using filter_id_t = identifier_id_t<identifier_type, identifiers::filter, invalid_id_value>;
+using query_id_t = identifier_id_t<identifier_type, identifiers::query, invalid_id_value>;
 
 /** template class for generating a known name of a type*/
 template <class X>
@@ -187,7 +189,7 @@ inline std::string typeNameString<std::string> ()
 }
 
 /** the base types for  helics*/
-enum class helicsType_t : int
+enum class helics_type_t : int
 {
     helicsString = 0,
     helicsDouble = 1,
@@ -197,13 +199,14 @@ enum class helicsType_t : int
     helicsVector = 4,
     helicsComplexVector = 5,
     helicsInvalid = 23425,
+    helicsAny = 247652,
 };
 
 /** sometime we just need a ref to a string for the basic types*/
-const std::string &typeNameStringRef (helicsType_t type);
+const std::string &typeNameStringRef (helics_type_t type);
 
 /** convert a string to a type*/
-helicsType_t getTypeFromString (const std::string &typeName);
+helics_type_t getTypeFromString (const std::string &typeName);
 
 std::string helicsComplexString (double real, double imag);
 std::string helicsComplexString (std::complex<double> val);
@@ -220,55 +223,56 @@ std::vector<std::complex<double>> helicsGetComplexVector (const std::string &val
 void helicsGetVector (const std::string &val, std::vector<double> &data);
 void helicsGetComplexVector (const std::string &val, std::vector<std::complex<double>> &data);
 
-data_block typeConvert (helicsType_t type, double val);
-data_block typeConvert (helicsType_t type, int64_t val);
-data_block typeConvert (helicsType_t type, const std::string &val);
-data_block typeConvert (helicsType_t type, const std::vector<double> &val);
-data_block typeConvert (helicsType_t type, const double *vals, size_t size);
-data_block typeConvert (helicsType_t type, const std::vector<std::complex<double>> &val);
-data_block typeConvert (helicsType_t type, std::complex<double> &val);
+data_block typeConvert (helics_type_t type, double val);
+data_block typeConvert (helics_type_t type, int64_t val);
+data_block typeConvert (helics_type_t type, const char *val);
+data_block typeConvert (helics_type_t type, const std::string &val);
+data_block typeConvert (helics_type_t type, const std::vector<double> &val);
+data_block typeConvert (helics_type_t type, const double *vals, size_t size);
+data_block typeConvert (helics_type_t type, const std::vector<std::complex<double>> &val);
+data_block typeConvert (helics_type_t type, const std::complex<double> &val);
 
 /** template class for generating a known name of a type*/
 template <class X>
-constexpr helicsType_t helicsType ()
+constexpr helics_type_t helicsType ()
 {
-    return helicsType_t::helicsInvalid;
+    return helics_type_t::helicsInvalid;
 }
 
 template <>
-constexpr helicsType_t helicsType<int64_t> ()
+constexpr helics_type_t helicsType<int64_t> ()
 {
-    return helicsType_t::helicsInt;
+    return helics_type_t::helicsInt;
 }
 
 template <>
-constexpr helicsType_t helicsType<std::string> ()
+constexpr helics_type_t helicsType<std::string> ()
 {
-    return helicsType_t::helicsString;
+    return helics_type_t::helicsString;
 }
 
 template <>
-constexpr helicsType_t helicsType<double> ()
+constexpr helics_type_t helicsType<double> ()
 {
-    return helicsType_t::helicsDouble;
+    return helics_type_t::helicsDouble;
 }
 
 template <>
-constexpr helicsType_t helicsType<std::complex<double>> ()
+constexpr helics_type_t helicsType<std::complex<double>> ()
 {
-    return helicsType_t::helicsComplex;
+    return helics_type_t::helicsComplex;
 }
 
 template <>
-constexpr helicsType_t helicsType<std::vector<double>> ()
+constexpr helics_type_t helicsType<std::vector<double>> ()
 {
-    return helicsType_t::helicsVector;
+    return helics_type_t::helicsVector;
 }
 
 template <>
-constexpr helicsType_t helicsType<std::vector<std::complex<double>>> ()
+constexpr helics_type_t helicsType<std::vector<std::complex<double>>> ()
 {
-    return helicsType_t::helicsComplexVector;
+    return helics_type_t::helicsComplexVector;
 }
 
 // check if the type is directly convertible to a base HelicsType
@@ -279,7 +283,7 @@ constexpr bool isConvertableType ()
 }
 
 template <class X>
-constexpr typename std::enable_if<helicsType<X> () != helicsType_t::helicsInvalid, bool>::type isConvertableType ()
+constexpr typename std::enable_if<helicsType<X> () != helics_type_t::helicsInvalid, bool>::type isConvertableType ()
 {
     return false;
 }

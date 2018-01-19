@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -21,8 +21,8 @@ using elsewhere is probably not going to work.  Someday this will be made more g
 
 */
 
-// just enumerating some print levels
-enum print_level : int
+/** enumeration of defined print levels*/
+enum log_level : int
 {
     no_print = -1,  //!< never print
     error = 0,  //!< only print errors
@@ -32,21 +32,21 @@ enum print_level : int
     trace = 4,  //!< trace level printing
 };
 
-#define LOG_ERROR(id, ident, message) sendToLogger (id, print_level::error, ident, message);
-#define LOG_WARNING(id, ident, message) sendToLogger (id, print_level::warning, ident, message);
+#define LOG_ERROR(id, ident, message) sendToLogger (id, log_level::error, ident, message);
+#define LOG_WARNING(id, ident, message) sendToLogger (id, log_level::warning, ident, message);
 
 #ifndef LOGGING_DISABLED
 #define LOG_NORMAL(id, ident, message)                                                                            \
-    if (maxLogLevel >= print_level::normal)                                                                       \
+    if (maxLogLevel >= log_level::normal)                                                                         \
     {                                                                                                             \
-        sendToLogger (id, print_level::normal, ident, message);                                                   \
+        sendToLogger (id, log_level::normal, ident, message);                                                     \
     }
 
 #ifndef DEBUG_LOGGING_DISABLED
 #define LOG_DEBUG(id, ident, message)                                                                             \
-    if (maxLogLevel >= print_level::debug)                                                                        \
+    if (maxLogLevel >= log_level::debug)                                                                          \
     {                                                                                                             \
-        sendToLogger (id, print_level::debug, ident, message);                                                    \
+        sendToLogger (id, log_level::debug, ident, message);                                                      \
     }
 #else
 #define LOG_DEBUG(id, ident, message)
@@ -54,9 +54,9 @@ enum print_level : int
 
 #ifndef TRACE_LOGGING_DISABLED
 #define LOG_TRACE(id, ident, message)                                                                             \
-    if (maxLogLevel >= print_level::trace)                                                                        \
+    if (maxLogLevel >= log_level::trace)                                                                          \
     {                                                                                                             \
-        sendToLogger (id, print_level::debug, ident, message);                                                    \
+        sendToLogger (id, log_level::debug, ident, message);                                                      \
     }
 #else
 #define LOG_TRACE(id, ident, message)

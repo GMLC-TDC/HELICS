@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
@@ -10,9 +10,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_UDP_CORE_
 #pragma once
 
-#include "../CommonCore.h"
+#include "../CommonCore.hpp"
 #include "../CommsBroker.hpp"
-
+#include "../NetworkBrokerData.hpp"
 namespace helics {
 
 class UdpComms;
@@ -30,10 +30,7 @@ public:
 	virtual std::string getAddress() const override;
 private:
 	
-	std::string brokerAddress;	//!< the protocol string for the broker location
-	std::string localInterface; //!< the interface to use for the local receive ports
-	int PortNumber=-1;	//!< the port number for the reply port
-	int brokerPortNumber=-1;  //!< the port number to use for the broker priority request port
+    NetworkBrokerData netInfo{ NetworkBrokerData::interface_type::udp };  //!< structure containing the networking information
 	virtual bool brokerConnect() override;
  
 };

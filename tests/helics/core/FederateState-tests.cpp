@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -12,11 +12,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <future>
 
-#include "helics/core/EndpointInfo.h"
-#include "helics/core/FederateState.h"
-#include "helics/core/FilterInfo.h"
-#include "helics/core/PublicationInfo.h"
-#include "helics/core/SubscriptionInfo.h"
+#include "helics/core/EndpointInfo.hpp"
+#include "helics/core/FederateState.hpp"
+#include "helics/core/FilterInfo.hpp"
+#include "helics/core/PublicationInfo.hpp"
+#include "helics/core/SubscriptionInfo.hpp"
 
 BOOST_FIXTURE_TEST_SUITE (FederateState_tests, federateStateTestFixture)
 
@@ -27,8 +27,8 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_CREATED);
 
     BOOST_CHECK_EQUAL (fs->getInfo ().timeDelta, helics::Time::epsilon ());
-    BOOST_CHECK_EQUAL (fs->getInfo ().lookAhead, helics::Time::zeroVal ());
-    BOOST_CHECK_EQUAL (fs->getInfo ().impactWindow, helics::Time::zeroVal ());
+    BOOST_CHECK_EQUAL (fs->getInfo ().outputDelay, helics::Time::zeroVal ());
+    BOOST_CHECK_EQUAL (fs->getInfo ().inputDelay, helics::Time::zeroVal ());
     BOOST_CHECK_EQUAL (fs->getInfo ().period, helics::Time::zeroVal ());
     BOOST_CHECK_EQUAL (fs->getInfo ().observer, false);
     BOOST_CHECK_EQUAL (fs->getInfo ().uninterruptible, false);
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     // BOOST_CHECK_EQUAL(fs->time_minDe, helics::Time::zeroVal());
     // BOOST_CHECK_EQUAL(fs->time_minTe, helics::Time::zeroVal());
     // BOOST_CHECK_EQUAL(fs->time_event, helics::Time::zeroVal());
-    BOOST_CHECK_EQUAL (fs->getInfo ().max_iterations, 3);
+    BOOST_CHECK_EQUAL (fs->getInfo ().maxIterations, 3);
 }
 
 BOOST_AUTO_TEST_CASE (create_subscription_test)
@@ -188,8 +188,9 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
 
     // Test returning when the finished state is entered
     cmd.setAction (helics::CMD_STOP);
-    auto fs_process2 = std::async (std::launch::async,
-                                   [&]() { return fs->enterExecutingState (iteration_request::no_iterations); });
+    auto fs_process2 = std::async (std::launch::async, [&]() {
+        return fs->enterExecutingState (helics_iteration_request::no_iterations);
+    });
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_INITIALIZING);
     fs->addAction (cmd);
     fs->global_id = 0;  // if it doesn't match the id in the command, this will hang
@@ -229,7 +230,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     // Test returning when an error occurs
     cmd.setAction (helics::CMD_ERROR);
     fs_process2 = std::async (std::launch::async,
-                              [&]() { return fs->enterExecutingState (iteration_request::no_iterations); });
+                              [&]() { return fs->enterExecutingState (helics_iteration_request::no_iterations); });
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_INITIALIZING);
     fs->addAction (cmd);
     fs_process2.wait ();
@@ -284,12 +285,12 @@ DependencyInfo(Core::federate_id_t id) :fedID(id) {};
 */
 
 /*
-    uint64_t getQueueSize(Core::Handle id) const;
+    uint64_t getQueueSize(Core::handle_id_t id) const;
     uint64_t getQueueSize() const;
     uint64_t getFilterQueueSize() const;
-    message_t *receive(Core::Handle id);
-    std::pair<Core::Handle, message_t*> receive();
-    std::pair<Core::Handle, message_t*> receiveForFilter();
+    message_t *receive(Core::handle_id_t id);
+    std::pair<Core::handle_id_t, message_t*> receive();
+    std::pair<Core::handle_id_t, message_t*> receiveForFilter();
     bool processQueue();
     void generateKnownDependencies();
     void addDependency(Core::federate_id_t);

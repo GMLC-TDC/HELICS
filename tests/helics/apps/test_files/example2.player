@@ -1,0 +1,9 @@
+#second    topic                type(opt)                    value
+-1 pub1 d 0.3
+1 pub1 0.5
+3 pub1 0.8
+2 pub1 0.7
+# pub 2
+1 pub2 d 0.4
+2 pub2 0.6
+3 pub2 0.9

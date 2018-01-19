@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -10,8 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "testFixtures.h"
 #include <boost/test/unit_test.hpp>
 
-#include "helics/core/BrokerFactory.h"
-#include "helics/core/CoreFactory.h"
+#include "helics/core/BrokerFactory.hpp"
+#include "helics/core/CoreFactory.hpp"
 #include <cctype>
 
 bool hasIndexCode (const std::string &type_name)
@@ -141,59 +141,6 @@ void ValueFederateTestFixture::Setup2FederateTest (std::string core_type_name, h
     }
 }
 
-MessageFederateTestFixture::~MessageFederateTestFixture ()
-{
-    if (mFed1)
-    {
-        mFed1->finalize ();
-    }
-    mFed1 = nullptr;
-    if (mFed2)
-    {
-        mFed2->finalize ();
-    }
-    mFed2 = nullptr;
-    for (auto &brk : broker)
-    {
-        brk->disconnect ();
-    }
-    broker.clear ();
-    helics::cleanupHelicsLibrary ();
-}
-
-void MessageFederateTestFixture::StartBroker (const std::string &core_type_name,
-                                              const std::string &initialization_string)
-{
-    broker.push_back (StartBrokerImp (core_type_name, initialization_string));
-}
-
-void MessageFederateTestFixture::Setup1FederateTest (const std::string &core_type_name)
-{
-    StartBroker (core_type_name, "1");
-
-    helics::FederateInfo fi ("test1");
-    fi.coreType = helics::coreTypeFromString (core_type_name);
-    fi.coreInitString = std::string ("--broker=") + broker[0]->getIdentifier () +
-                        " --broker_address=" + broker[0]->getAddress () + " --federates 1";
-
-    mFed1 = std::make_shared<helics::MessageFederate> (fi);
-}
-
-void MessageFederateTestFixture::Setup2FederateTest (const std::string &core_type_name)
-{
-    StartBroker (core_type_name, "2");
-
-    helics::FederateInfo fi ("test1");
-    fi.coreType = helics::coreTypeFromString (core_type_name);
-    fi.coreInitString = std::string ("--broker=") + broker[0]->getIdentifier () +
-                        " --broker_address=" + broker[0]->getAddress () + " --federates 2";
-
-    mFed1 = std::make_shared<helics::MessageFederate> (fi);
-
-    fi.name = "test2";
-    mFed2 = std::make_shared<helics::MessageFederate> (fi);
-}
-
 bool FederateTestFixture::hasIndexCode (const std::string &type_name)
 {
     if (std::isdigit (type_name.back ()) != 0)
@@ -229,7 +176,7 @@ FederateTestFixture::~FederateTestFixture ()
 {
     for (auto &fed : federates)
     {
-        if (fed && fed->currentState () != helics::Federate::op_states::finalize)
+        if (fed && fed->getCurrentState () != helics::Federate::op_states::finalize)
         {
             fed->finalize ();
         }
@@ -251,7 +198,15 @@ std::shared_ptr<helics::Broker> FederateTestFixture::AddBroker (const std::strin
 std::shared_ptr<helics::Broker>
 FederateTestFixture::AddBroker (const std::string &core_type_name, const std::string &initialization_string)
 {
-    auto broker = StartBrokerImp (core_type_name, initialization_string);
+    std::shared_ptr<helics::Broker> broker;
+    if (extraBrokerArgs.empty ())
+    {
+        broker = StartBrokerImp (core_type_name, initialization_string);
+    }
+    else
+    {
+        broker = StartBrokerImp (core_type_name, initialization_string + " " + extraBrokerArgs);
+    }
     brokers.push_back (broker);
     return broker;
 }

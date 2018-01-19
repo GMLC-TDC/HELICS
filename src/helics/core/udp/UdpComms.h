@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
@@ -10,12 +10,23 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_UDP_COMMS_
 #pragma once
 
-#include "../CommsInterface.h"
+#include "../CommsInterface.hpp"
 #include <atomic>
 #include <set>
 #include <string>
 #include <future>
+#include "helics/helics-config.h"
 
+#if (BOOST_VERSION_LEVEL >=2)
+namespace boost
+{
+    namespace asio
+    {
+        class io_context;
+        using io_service = io_context;
+    }
+}
+#else
 namespace boost
 {
     namespace asio
@@ -23,7 +34,7 @@ namespace boost
         class io_service;
     }
 }
-
+#endif
 namespace helics {
 
 /** generate a string with a full address based on an interface string and port number
@@ -51,6 +62,7 @@ public:
 	/** default constructor*/
 	UdpComms();
 	UdpComms(const std::string &brokerTarget, const std::string &localTarget);
+    UdpComms(const NetworkBrokerData &netInfo);
 	/** destructor*/
 	~UdpComms();
 	/** set the port numbers for the local ports*/

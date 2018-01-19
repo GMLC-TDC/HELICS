@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -8,9 +8,10 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "MessageFederate.h"
-#include "../core/core.h"
-#include "MessageFederateManager.h"
+#include "MessageFederate.hpp"
+#include "../core/Core.hpp"
+#include "../core/core-exceptions.hpp"
+#include "MessageFederateManager.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4702)
@@ -33,9 +34,10 @@ MessageFederate::MessageFederate (std::shared_ptr<Core> core, const FederateInfo
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
 }
-MessageFederate::MessageFederate (const std::string &file) : Federate (file)
+MessageFederate::MessageFederate (const std::string &jsonString) : Federate (jsonString)
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
+    registerInterfaces (jsonString);
 }
 
 MessageFederate::MessageFederate ()
@@ -71,8 +73,8 @@ void MessageFederate::disconnect ()
 
 void MessageFederate::updateTime (Time newTime, Time oldTime) { mfManager->updateTime (newTime, oldTime); }
 
-void MessageFederate::StartupToInitializeStateTransition () { mfManager->StartupToInitializeStateTransition (); }
-void MessageFederate::InitializeToExecuteStateTransition () { mfManager->InitializeToExecuteStateTransition (); }
+void MessageFederate::startupToInitializeStateTransition () { mfManager->startupToInitializeStateTransition (); }
+void MessageFederate::initializeToExecuteStateTransition () { mfManager->initializeToExecuteStateTransition (); }
 
 endpoint_id_t MessageFederate::registerEndpoint (const std::string &name, const std::string &type)
 {
@@ -132,7 +134,17 @@ void MessageFederate::registerInterfaces (const std::string &jsonString)
             auto ept = (*eptIt);
             auto name = ept["name"].asString ();
             auto type = (ept.isMember ("type")) ? ept["type"].asString () : "";
-            auto epid = registerEndpoint (name, type);
+            bool global = (ept.isMember ("global")) ? (ept["global"].asBool ()) : false;
+            endpoint_id_t epid;
+            if (global)
+            {
+                epid = registerGlobalEndpoint (name, type);
+            }
+            else
+            {
+                epid = registerEndpoint (name, type);
+            }
+
             // retrieve the known paths
             if (ept.isMember ("knownPaths"))
             {
@@ -321,4 +333,8 @@ void MessageFederate::registerEndpointCallback (const std::vector<endpoint_id_t>
 {
     mfManager->registerCallback (ep, func);
 }
+
+/** get a count of the number endpoints registered*/
+int MessageFederate::getEndpointCount () const { return mfManager->getEndpointCount (); }
+
 }  // namespace helics

@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright (C) 2017, Battelle Memorial Institute
+#Copyright (C) 2017-2018, Battelle Memorial Institute
 #All rights reserved.
 
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
@@ -7,7 +7,7 @@
 
 set(common_headers
 simpleQueue.hpp
-BlockingQueue3.hpp
+BlockingQueue.hpp
 BlockingPriorityQueue.hpp
 timeRepresentation.hpp
 delayedDestructor.hpp
@@ -15,12 +15,25 @@ searchableObjectHolder.hpp
 stringToCmdLine.h
 AsioServiceManager.h
 logger.h
+stringOps.h
+charMapper.h
+generic_string_ops.hpp
+base64.h
+argParser.h
+MappedVector.hpp
+MappedPointerVector.hpp
+DualMappedVector.hpp
+
 )
 
 set(common_sources
 stringToCmdLine.cpp
 AsioServiceManager.cpp
 logger.cpp
+stringOps.cpp
+charMapper.cpp
+base64.cpp
+argParser.cpp
 )
 
 set(zmq_headers
