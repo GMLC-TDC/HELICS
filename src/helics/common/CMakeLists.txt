@@ -31,7 +31,7 @@ GuardedTypes.hpp
 set(common_sources
 stringToCmdLine.cpp
 AsioServiceManager.cpp
-jsonProcessingFunctions.cpp
+JsonProcessingFunctions.cpp
 logger.cpp
 stringOps.cpp
 charMapper.cpp
