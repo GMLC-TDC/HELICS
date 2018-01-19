@@ -29,7 +29,7 @@ int main()
  // helics_status   status;
   helics_broker  broker;
   const char*    initstring="2 --name=mainbroker";
-  const char*    fedinitstring="--broker=mainbroker --federates=1";
+  const char*    fedinitstring="--federates=1";
   int            isconnected;
   double         deltat=0.01;
   helics_federate vfed;

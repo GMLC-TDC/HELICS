@@ -19,7 +19,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <cstdint>
 #include <memory>
 #include <vector>
-/**
+
+/** @file
+@details defining data used for storing the data for values and for messages
+*/
+
+/** 
  * HELICS Core API
  */
 namespace helics

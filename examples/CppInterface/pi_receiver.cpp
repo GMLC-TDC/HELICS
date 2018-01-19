@@ -15,15 +15,16 @@ static char help[] = " PI RECEIVER: Simple program to demonstrate the usage of H
 #include <stdio.h>
 #include <cpp98/ValueFederate.hpp>
 #include <cpp98/helics.hpp>
+#include "core/helicsVersion.hpp"
 
 int main(int /*argc*/,char ** /*argv*/)
 {
-  std::string    fedinitstring="--broker=mainbroker --federates=1";
+  std::string    fedinitstring="--federates=1";
   double         deltat=0.01;
   helics_subscription sub;
 
 
-  std::string helicsversion = helics::getHelicsVersionString();
+  std::string helicsversion = helics::helicsVersionString();
 
   printf("PI RECEIVER: Helics version = %s\n",helicsversion.c_str());
   printf("%s",help);

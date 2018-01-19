@@ -21,13 +21,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <vector>
 
 #include "helics/helics-config.h"
+#include "../core/helicsVersion.hpp"
 #if HELICS_HAVE_ZEROMQ > 0
 #include "../common/cppzmq/zmq.hpp"
 #include "../common/zmqContextManager.h"
 #endif
 
-static const std::string versionStr (std::to_string (HELICS_VERSION_MAJOR) + "." + std::to_string (HELICS_VERSION_MINOR) + "." +
-                                     std::to_string (HELICS_VERSION_PATCH) + " (" + HELICS_DATE + ")");
+static const std::string versionStr (helics::helicsVersionString());
 
 const char *helicsGetVersion (void) { return versionStr.c_str (); }
 

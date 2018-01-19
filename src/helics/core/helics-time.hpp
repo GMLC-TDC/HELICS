@@ -12,7 +12,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "core-types.hpp"
 #include "../common/timeRepresentation.hpp"
 #include <cstdint>
-
+/** @file
+@details defining the time representation to use througout helics
+*/
 namespace helics
 {
 /**

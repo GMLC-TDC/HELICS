@@ -17,7 +17,7 @@ static char help[] = " PI SENDER: Simple program to demonstrate the usage of HEL
 #include <stdio.h>
 #include <cpp98/ValueFederate.hpp>
 #include <cpp98/Broker.hpp>
-#include <cpp98/helics.hpp> // getHelicsVersionString
+#include <cpp98/helics.hpp> // helicsVersionString
 #ifdef _MSC_VER
 #include <windows.h>
 #else
@@ -27,7 +27,7 @@ static char help[] = " PI SENDER: Simple program to demonstrate the usage of HEL
 int main(int /*argc*/,char ** /*argv*/)
 {
   std::string    initstring="2 --name=mainbroker";
-  std::string    fedinitstring="--broker=mainbroker --federates=1";
+  std::string    fedinitstring="--federates=1";
   double         deltat=0.01;
   helics_publication pub;
 

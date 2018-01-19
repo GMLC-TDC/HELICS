@@ -21,7 +21,7 @@ using elsewhere is probably not going to work.  Someday this will be made more g
 
 */
 
-// just enumerating some print levels
+/** enumeration of defined print levels*/
 enum log_level : int
 {
     no_print = -1,  //!< never print

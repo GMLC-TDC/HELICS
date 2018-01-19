@@ -4,7 +4,7 @@
 #include <boost/filesystem.hpp>
 #include "BrokerFactory.hpp"
 #include "CoreBroker.hpp"
-
+#include "helicsVersion.hpp"
 #include <iostream>
 #include <fstream>
 
@@ -122,7 +122,7 @@ int argumentParser(int argc, const char * const *argv, po::variables_map &vm_map
 
 	if (cmd_vm.count("version") > 0)
 	{
-		std::cout << HELICS_VERSION_MAJOR << '.' << HELICS_VERSION_MINOR << '.' << HELICS_VERSION_PATCH << " (" << HELICS_DATE << ")\n";
+		std::cout <<helics::helicsVersionString()<<'\n';
 		return 1;
 	}
 

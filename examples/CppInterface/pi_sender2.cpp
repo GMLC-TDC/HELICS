@@ -17,7 +17,7 @@ static char help[] = "Example to demonstrate the usage of HELICS C Interface wit
 #include <stdio.h>
 #include <cpp98/ValueFederate.hpp>
 #include <cpp98/Broker.hpp>
-#include <cpp98/helics.hpp> // getHelicsVersionString
+#include <cpp98/helics.hpp> // helicsVersionString
 #ifdef _MSC_VER
 #include <windows.h>
 #else
@@ -27,7 +27,7 @@ static char help[] = "Example to demonstrate the usage of HELICS C Interface wit
 int main(int /*argc*/,char ** /*argv*/)
 {
   std::string    initstring="2 --name=mainbroker";
-  std::string    fedinitstring="--broker=mainbroker --federates=1";
+  std::string    fedinitstring="--federates=1";
   double         deltat=0.01;
   helics_publication pub;
   helics_subscription sub;

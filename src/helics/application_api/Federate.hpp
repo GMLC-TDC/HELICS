@@ -73,16 +73,6 @@ class FederateInfo: public CoreFederateInfo
 */
 FederateInfo LoadFederateInfo(const std::string &jsonString);
 
-/** get a string with the helics version info*/
-std::string getHelicsVersionString();
-
-/** get the major version number*/
-int getHelicsVersionMajor();
-/** get the minor version number*/
-int getHelicsVersionMinor();
-/** get the patch version number*/
-int getHelicsVersionPatch();
-
 class Core;
 
 /** base class for a federate in the application API

@@ -24,6 +24,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include "../common/stringOps.h"
+#include "../core/helicsVersion.hpp"
 
 #include "PrecHelper.h"
 #include <thread>
@@ -785,7 +786,7 @@ int recorderArgumentParser(int argc, const char *const *argv, po::variables_map 
 
     if (cmd_vm.count ("version") > 0)
     {
-        std::cout << helics::getHelicsVersionString () << '\n';
+        std::cout << helics::helicsVersionString () << '\n';
         return (-1);
     }
 

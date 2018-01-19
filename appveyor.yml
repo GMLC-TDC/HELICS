@@ -1,6 +1,6 @@
 shallow_clone: true
 
-version: 0.9.{build}
+version: 1.0.0.alpha.{build}
 
 image: Visual Studio 2015
 

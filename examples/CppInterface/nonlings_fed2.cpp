@@ -11,11 +11,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <stdio.h>
 #include <math.h>
 #include <cpp98/ValueFederate.hpp>
-#include <cpp98/helics.hpp> // getHelicsVersionString
+#include <cpp98/helics.hpp> // helicsVersionString
 
 int main(int /*argc*/,char ** /*argv*/)
 {
-  std::string    fedinitstring="--broker=mainbroker --federates=1";
+  std::string    fedinitstring="--federates=1";
   double         deltat=0.01;
   helics_subscription sub;
   helics_publication  pub;

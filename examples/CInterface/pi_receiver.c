@@ -20,7 +20,7 @@ int main()
   helics_federate_info_t fedinfo;
   const char*    helicsversion;
   helics_status   status;
-  const char*    fedinitstring="--broker=mainbroker --federates=1";
+  const char*    fedinitstring="--federates=1";
   double         deltat=0.01;
   helics_federate vfed;
   helics_subscription sub;

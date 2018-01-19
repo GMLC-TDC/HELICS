@@ -10,7 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include <cpp98/ValueFederate.hpp>
 #include <cpp98/Broker.hpp>
-#include <cpp98/helics.hpp> // getHelicsVersionString
+#include <cpp98/helics.hpp> // helicsVersionString
 #include <math.h>
 #include <stdio.h>
 #ifdef _MSC_VER
@@ -27,7 +27,7 @@ int main (int /*argc*/, char ** /*argv*/)
     helics_publication pub;
     helics_subscription sub;
 
-    std::string helicsversion = helics::getHelicsVersionString ();
+    std::string helicsversion = helics::getHelicsVersionString();
 
     printf (" Helics version = %s\n", helicsversion.c_str());
 
