@@ -21,7 +21,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/program_options.hpp>
 #include "../core/helicsVersion.hpp"
 #include "PrecHelper.h"
-#include "json.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 
 #include "../common/base64.h"
 #include "../common/stringOps.h"

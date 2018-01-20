@@ -21,7 +21,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/program_options.hpp>
 
 #include "PrecHelper.h"
-#include "json.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 
 #include "../common/base64.h"
 #include "../common/stringOps.h"
@@ -90,32 +90,8 @@ void Source::loadFile (const std::string &jsonFile)
    //     eptids[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
   //  }
 
-    using json = nlohmann::json;
-    json JF;
-    try
-    {
-        if (jsonFile.size () > 200)
-        {
-            JF.parse (jsonFile);
-        }
-        else
-        {
-            std::ifstream file (jsonFile);
-            if (!file.is_open ())
-            {
-                JF.parse (jsonFile);
-            }
-            else
-            {
-                file >> JF;
-            }
-        }
-    }
-    catch (const json::exception &je)
-    {
-        std::cerr << je.what () << '\n';
-        return;
-    }
+    auto doc = loadJsonString(jsonFile);
+   
 
    
 

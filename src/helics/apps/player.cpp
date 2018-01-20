@@ -21,7 +21,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/program_options.hpp>
 
 #include "PrecHelper.h"
-#include "json.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 
 #include "../common/base64.h"
 #include "../common/stringOps.h"
@@ -326,98 +326,79 @@ void Player::loadJsonFile (const std::string &jsonFile)
         eptids[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
     }
 
-    using json = nlohmann::json;
-    json JF;
-    try
-    {
-        if (jsonFile.size () > 200)
-        {
-            JF.parse (jsonFile);
-        }
-        else
-        {
-            std::ifstream file (jsonFile);
-            if (!file.is_open ())
-            {
-                JF.parse (jsonFile);
-            }
-            else
-            {
-                file >> JF;
-            }
-        }
-    }
-    catch (const json::exception &je)
-    {
-        std::cerr << je.what () << '\n';
-        return;
-    }
+    auto doc = loadJsonString(jsonFile);
+    
 
-    if (JF.find("player")!=JF.end())
+    if (doc.isMember("player"))
     {
-        auto playerConfig = JF["player"];
-        if (playerConfig.find("stop") != playerConfig.end())
+        auto playerConfig = doc["player"];
+        if (playerConfig.isMember("stop"))
         {
-            stopTime = playerConfig["stop"].get<double>();
+            stopTime = loadJsonTime(playerConfig["stop"]);
         }
-        if (playerConfig.find("local") != playerConfig.end())
+        if (playerConfig.isMember("local"))
         {
-            useLocal = playerConfig["local"].get<bool>();
+            useLocal = playerConfig["local"].asBool();
         }
-        if (playerConfig.find("separator") != playerConfig.end())
+        if (playerConfig.isMember("separator"))
         {
-            fed->setSeparator(playerConfig["separator"].get<char>());
+            auto sep = playerConfig["separator"].asString();
+            if (sep.size() > 0)
+            {
+                fed->setSeparator(sep[0]);
+            }
+           
         }
-        if (playerConfig.find("timeunits") != playerConfig.end())
+        if (playerConfig.isMember("timeunits"))
         {
-            if (playerConfig["timeunits"] == "ns")
+            if (playerConfig["timeunits"].asString() == "ns")
             {
                 timeMultiplier = 1e-9;
             }
         }
-        if (playerConfig.find("file") != playerConfig.end())
+        if (playerConfig.isMember("file"))
         {
-            if (playerConfig["file"].is_array())
+            if (playerConfig["file"].isArray())
             {
-                for (const auto &fname : playerConfig["file"])
+                for (decltype(playerConfig.size()) ii=0;ii<playerConfig.size();++ii)
                 {
-                    loadFile(fname);
+                    loadFile(playerConfig["file"][ii].asString());
                 }
             }
             else
             {
-                loadFile(playerConfig["file"]);
+                loadFile(playerConfig["file"].asString());
             }
         }
     }
-    auto pointArray = JF["points"];
-    if (pointArray.is_array ())
+    auto pointArray = doc["points"];
+    if (pointArray.isArray ())
     {
         points.reserve (points.size () + pointArray.size ());
         for (const auto &pointElement : pointArray)
         {
             Time ptime;
-            if (pointElement.count ("time") > 0)
+            if (pointElement.isMember ("time"))
             {
                 if (timeMultiplier == 1e-9)
                 {
-                    ptime = helics::Time(pointElement["time"].get<int64_t>(), timeUnits::ns);
+                    ptime = helics::Time(pointElement["time"].asInt64(), timeUnits::ns);
                 }
                 else
                 {
-                    ptime = pointElement["time"].get<double>();
+                    ptime = loadJsonTime(pointElement["time"]);
                 }
                 
             }
-            else if (pointElement.count ("t") > 0)
+            else if (pointElement.isMember("t"))
             {
                 if (timeMultiplier == 1e-9)
                 {
-                    ptime = helics::Time(pointElement["t"].get<int64_t>(), timeUnits::ns);
+                    ptime = helics::Time(pointElement["t"].asInt64(), timeUnits::ns);
                 }
                 else
                 {
-                    ptime = pointElement["t"].get<double>();
+                    ptime = loadJsonTime(pointElement["t"]);
                 }
             }
             else
@@ -426,47 +407,47 @@ void Player::loadJsonFile (const std::string &jsonFile)
                 continue;
             }
             defV val;
-            if (pointElement.count ("value") > 0)
+            if (pointElement.isMember ("value"))
             {
                 auto M = pointElement["value"];
-                if (M.is_number_integer ())
+                if (M.isInt64 ())
                 {
-                    val = M.get<int64_t> ();
+                    val = M.asInt64 ();
                 }
-                else if (M.is_number_float ())
+                else if (M.isDouble())
                 {
-                    val = M.get<double> ();
+                    val = M.asDouble();
                 }
                 else
                 {
-                    val = M.get<std::string> ();
+                    val = M.asString();
                 }
             }
-            else if (pointElement.count ("v") > 0)
+            else if (pointElement.isMember ("v"))
             {
                 auto M = pointElement["v"];
-                if (M.is_number_integer ())
+                if (M.isInt64())
                 {
-                    val = M.get<int64_t> ();
+                    val = M.asInt64();
                 }
-                else if (M.is_number_float ())
+                else if (M.isDouble())
                 {
-                    val = M.get<double> ();
+                    val = M.asDouble();
                 }
                 else
                 {
-                    val = M.get<std::string> ();
+                    val = M.asString();
                 }
             }
             std::string type;
-            if (pointElement.count ("type") > 0)
+            if (pointElement.isMember("type"))
             {
-                type = pointElement["type"].get<std::string> ();
+                type = pointElement["type"].asString();
             }
             std::string key;
-            if (pointElement.count ("key") > 0)
+            if (pointElement.isMember("key"))
             {
-                key = pointElement["key"].get<std::string> ();
+                key = pointElement["key"].asString();
             }
             else
             {
@@ -484,33 +465,33 @@ void Player::loadJsonFile (const std::string &jsonFile)
         }
     }
 
-    auto messageArray = JF["messages"];
-    if (messageArray.is_array())
+    auto messageArray = doc["messages"];
+    if (messageArray.isArray())
     {
        messages.reserve(messages.size() + messageArray.size());
         for (const auto &messageElement : messageArray)
         {
             Time ptime;
-            if (messageElement.count("time") > 0)
+            if (messageElement.isMember("time"))
             {
                 if (timeMultiplier == 1e-9)
                 {
-                    ptime = helics::Time(messageElement["time"].get<int64_t>(), timeUnits::ns);
+                    ptime = helics::Time(messageElement["time"].asInt64(), timeUnits::ns);
                 }
                 else
                 {
-                    ptime = messageElement["time"].get<double>();
+                    ptime = loadJsonTime(messageElement["time"]);
                 }
             }
-            else if (messageElement.count("t") > 0)
+            else if (messageElement.isMember("t"))
             {
                 if (timeMultiplier == 1e-9)
                 {
-                    ptime = helics::Time(messageElement["t"].get<int64_t>(), timeUnits::ns);
+                    ptime = helics::Time(messageElement["t"].asInt64(), timeUnits::ns);
                 }
                 else
                 {
-                    ptime = messageElement["t"].get<double>();
+                    ptime = loadJsonTime(messageElement["t"]);
                 }
             }
             else
@@ -519,34 +500,34 @@ void Player::loadJsonFile (const std::string &jsonFile)
                 continue;
             }
             std::string src;
-            if (messageElement.count("src") > 0)
+            if (messageElement.isMember("src"))
             {
-                src = messageElement["src"].get<std::string>();
+                src = messageElement["src"].asString();
             }
-            if (messageElement.count("source") > 0)
+            if (messageElement.isMember("source"))
             {
-                src = messageElement["source"].get<std::string>();
+                src = messageElement["source"].asString();
             }
             std::string dest;
-            if (messageElement.count("dest") > 0)
+            if (messageElement.isMember("dest"))
             {
-                dest = messageElement["dest"].get<std::string>();
+                dest = messageElement["dest"].asString();
             }
-            if (messageElement.count("destination") > 0)
+            if (messageElement.isMember("destination"))
             {
-                dest = messageElement["destination"].get<std::string>();
+                dest = messageElement["destination"].asString();
             }
             Time sendTime = ptime;
             std::string type;
-            if (messageElement.count("sendtime") > 0)
+            if (messageElement.isMember("sendtime"))
             {
                 if (timeMultiplier == 1e-9)
                 {
-                    ptime = helics::Time(messageElement["sendtime"].get<int64_t>(), timeUnits::ns);
+                    ptime = helics::Time(messageElement["sendtime"].asInt64(), timeUnits::ns);
                 }
                 else
                 {
-                    ptime = messageElement["sendtime"].get<double>();
+                    ptime = loadJsonTime(messageElement["sendtime"]);
                 }
             }
             
@@ -555,40 +536,40 @@ void Player::loadJsonFile (const std::string &jsonFile)
             messages.back().mess.source = src;
             messages.back().mess.dest = dest;
             messages.back().mess.time = ptime;
-            if (messageElement.count("data") > 0)
+            if (messageElement.isMember("data"))
             {
-                if (messageElement.count("encoding") > 0)
+                if (messageElement.isMember("encoding"))
                 {
-                    if (messageElement["encoding"] == "base64")
+                    if (messageElement["encoding"].asString() == "base64")
                     {
-                        messages.back().mess.data = decode(messageElement["data"].get<std::string>());
+                        messages.back().mess.data = decode(messageElement["data"].asString());
                     }
                     else
                     {
-                        messages.back().mess.data = messageElement["data"].get<std::string>();
+                        messages.back().mess.data = messageElement["data"].asString();
                     }
                 }
                 else
                 {
-                    messages.back().mess.data = messageElement["data"].get<std::string>();
+                    messages.back().mess.data = messageElement["data"].asString();
                 }
             }
-            else if (messageElement.count("message") > 0)
+            else if (messageElement.isMember("message"))
             {
-                if (messageElement.count("encoding") > 0)
+                if (messageElement.isMember("encoding"))
                 {
-                    if (messageElement["encoding"] == "base64")
+                    if (messageElement["encoding"].asString() == "base64")
                     {
-                        messages.back().mess.data = decode(messageElement["message"].get<std::string>());
+                        messages.back().mess.data = decode(messageElement["message"].asString());
                     }
                     else
                     {
-                        messages.back().mess.data = messageElement["message"].get<std::string>();
+                        messages.back().mess.data = messageElement["message"].asString();
                     }
                 }
                 else
                 {
-                    messages.back().mess.data = messageElement["message"].get<std::string>();
+                    messages.back().mess.data = messageElement["message"].asString();
                 }
             }
            
