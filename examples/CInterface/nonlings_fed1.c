@@ -34,9 +34,10 @@ int main ()
     double x = 0.0, y = 0.0, /*yprv = 100,*/ xprv = 100;
     helics_time_t currenttime = 0.0;
     helics_iteration_status currenttimeiter = iterating;
-    // int isupdated;
+    /*int isupdated;
+    */
     double tol = 1E-8;
-
+    int helics_iter = 0;
     helicsversion = helicsGetVersion ();
 
     printf (" Helics version = %s\n", helicsversion);
@@ -110,7 +111,7 @@ int main ()
     
 
     fflush (NULL);
-    int helics_iter = 0;
+    
     while (currenttimeiter == iterating)
     {
        // yprv = y;

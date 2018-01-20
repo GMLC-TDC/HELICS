@@ -24,9 +24,11 @@ int main()
   helics_subscription sub;
   helics_publication  pub;
   double y = 1.0, x = 0, /*xprv = 100,*/ yprv = 100;
-  // int           isupdated;
+  /* int           isupdated;*/
   double tol = 1E-8;
   int helics_iter = 0;
+  helics_time_t currenttime = 0.0;
+  helics_iteration_status currenttimeiter = iterating;
 
   helicsversion = helicsGetVersion();
 
@@ -78,9 +80,7 @@ int main()
   printf(" Entered execution mode\n");
 
   fflush(NULL);
-  helics_time_t currenttime=0.0;
-  helics_iteration_status currenttimeiter;
-  currenttimeiter = iterating;
+ 
 
 
   while (currenttimeiter==iterating)

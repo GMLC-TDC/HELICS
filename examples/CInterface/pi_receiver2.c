@@ -112,7 +112,7 @@ int main()
   helicsFederateFinalize(vfed);
   printf("PI RECEIVER: Federate finalized\n");
   fflush(NULL);
-  //clean upFederate;
+  /*clean upFederate*/
   helicsFederateFree(vfed);
   helicsCloseLibrary();
   printf("PI RECEIVER: Library Closed\n");

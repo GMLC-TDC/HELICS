@@ -21,7 +21,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 extern "C" {
 #endif
 
-// MESSAGE FEDERATE calls
+/* MESSAGE FEDERATE calls*/
 
 HELICS_Export helics_endpoint helicsFederateRegisterEndpoint (helics_federate fed, const char *name, const char *type);
 

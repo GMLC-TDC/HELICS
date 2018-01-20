@@ -40,21 +40,21 @@ argParser.cpp
 )
 
 set(zmq_headers
-	zmqReactor.h
+	#zmqReactor.h
 	zmqContextManager.h
 	zmqHelper.h
-	zmqSocketDescriptor.h
-	zmqProxyHub.h
+	#zmqSocketDescriptor.h
+	#zmqProxyHub.h
 	cppzmq/zmq.hpp
 	cppzmq/zmq_addon.hpp
 	)
 
 set(zmq_sources
-	zmqReactor.cpp
+	#zmqReactor.cpp
 	zmqContextManager.cpp
-	zmqSocketDescriptor.cpp
+	#zmqSocketDescriptor.cpp
 	zmqHelper.cpp
-	zmqProxyHub.cpp
+	#zmqProxyHub.cpp
 )
 
 set (helics_public_common
