@@ -31,6 +31,12 @@ int main ()
     helics_publication pub;
     helics_subscription sub;
 
+    double x = 0.0, y = 0.0, /*yprv = 100,*/ xprv = 100;
+    helics_time_t currenttime = 0.0;
+    helics_iteration_status currenttimeiter = iterating;
+    // int isupdated;
+    double tol = 1E-8;
+
     helicsversion = helicsGetVersion ();
 
     printf (" Helics version = %s\n", helicsversion);
@@ -61,8 +67,9 @@ int main ()
 
     helicsFederateInfoSetMaxIterations (fedinfo, 100);
 
-    //status = helicsFederateInfoSetLoggingLevel (fedinfo, 5);
-
+    /*
+    status = helicsFederateInfoSetLoggingLevel (fedinfo, 5);
+    */
     /* Create value federate */
     vfed = helicsCreateValueFederate (fedinfo);
     printf (" Value federate created\n");
@@ -87,12 +94,7 @@ int main ()
         return (-3);
     }
 
-    double x = 0.0, y = 0.0, /*yprv = 100,*/ xprv=100;
-    helics_time_t currenttime = 0.0;
-    helics_iteration_status currenttimeiter;
-    currenttimeiter = iterating;
-   // int isupdated;
-    double tol = 1E-8;
+    
 
     helicsPublicationPublishDouble (pub, x);
     /* Enter execution mode */
@@ -112,9 +114,10 @@ int main ()
     while (currenttimeiter == iterating)
     {
        // yprv = y;
-         helicsSubscriptionGetDouble (sub, &y);
+        
         double f1, J1;
         int newt_conv = 0, max_iter = 10, iter = 0;
+        helicsSubscriptionGetDouble(sub, &y);
         /* Solve the equation using Newton */
         while (!newt_conv && iter < max_iter)
         {

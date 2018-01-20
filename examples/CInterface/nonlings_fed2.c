@@ -23,7 +23,10 @@ int main()
   helics_federate vfed;
   helics_subscription sub;
   helics_publication  pub;
-
+  double y = 1.0, x = 0, /*xprv = 100,*/ yprv = 100;
+  // int           isupdated;
+  double tol = 1E-8;
+  int helics_iter = 0;
 
   helicsversion = helicsGetVersion();
 
@@ -62,7 +65,7 @@ int main()
   /* Enter initialization mode */
   status = helicsFederateEnterInitializationMode(vfed);
   printf(" Entered initialization mode\n");
-  double y = 1.0, x = 0, /*xprv = 100,*/ yprv=100;
+  
 
   status = helicsPublicationPublishDouble(pub, y);
   if (status != helics_ok)
@@ -79,17 +82,15 @@ int main()
   helics_iteration_status currenttimeiter;
   currenttimeiter = iterating;
 
- // int           isupdated;
-  double tol=1E-8;
-  int helics_iter = 0;
+
   while (currenttimeiter==iterating)
   {
-
+      double f2, J2;
+      int    newt_conv = 0, max_iter = 10, iter = 0;
    // xprv = x;
      helicsSubscriptionGetDouble(sub,&x);
     ++helics_iter;
-    double f2,J2;
-    int    newt_conv = 0, max_iter=10,iter=0;
+    
 
     /* Solve the equation using Newton */
     while(!newt_conv && iter < max_iter) {

@@ -104,7 +104,7 @@ typedef enum
     helics_randomDelay_filter = 2,
     helics_randomDrop_filter = 3,
     helics_reroute_filter = 4,
-    helics_clone_filter = 5,
+    helics_clone_filter = 5
 
 }helics_filter_type_t;
 
