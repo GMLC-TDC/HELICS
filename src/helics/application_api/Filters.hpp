@@ -28,8 +28,12 @@ enum class defined_filter_types
     randomDrop = 3,
     reroute = 4,
     clone = 5,
+    unrecognized=6
 
 };
+
+/** get the filter type from a string*/
+defined_filter_types filterTypeFromString(const std::string &filterType) noexcept;
 
 /** class for managing a particular filter*/
 class Filter

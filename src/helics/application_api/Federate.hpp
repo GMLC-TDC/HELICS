@@ -13,19 +13,16 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/helics-config.h"
 #include "../core/helics-time.hpp"
-#include "helics_includes/string_view.h"
-
 #include "helicsTypes.hpp"
 
 #include "../core/CoreFederateInfo.hpp"
 #include "../flag-definitions.h"
-#include <atomic>
 #include <string>
 
 #include <memory>
 #include <stdexcept>
-#include <string>
 #include <vector>
+#include <atomic>
 
 
 /**
@@ -36,6 +33,7 @@ namespace helics
 class Core;
 class AsyncFedCallInfo;
 class MessageOperator;
+class Filter;
 /** data class defining federate properties and information
  */
 class FederateInfo: public CoreFederateInfo
@@ -92,14 +90,14 @@ class Federate
 		pending_init,  //!< indicator that the federate is pending entry to initialization state
 		pending_exec,  //!< state pending EnterExecution State
 		pending_time,  //!< state that the federate is pending a timeRequest
-		pending_iterative_time,  //!< state that the federate is pending an iterative time request
+		pending_iterative_time  //!< state that the federate is pending an iterative time request
 	};
 
   protected:
 	std::atomic<op_states> state{op_states::startup};  //!< the current state of the simulation
 	char separator_ = '/';  //!< the separator between automatically prependend names
   private:
-	int32_t fedID = -2'000'000'000;
+	int32_t fedID = -2'000'000'000; //!< the federate ID of the object for use in the core
 
   protected:
 	std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
@@ -107,6 +105,7 @@ class Federate
 	FederateInfo FedInfo;  //!< the information structure that contains the data on the federate
   private:
 	std::unique_ptr<AsyncFedCallInfo> asyncCallInfo;  //!< pointer to a class defining the async call information
+    std::vector<std::shared_ptr<Filter>> localFilters; //!< vector of filters created through the register interfaces function
   public:
 	/**constructor taking a federate information structure
 	@param[in] fi  a federate information structure
@@ -309,8 +308,8 @@ class Federate
 	*/
 	filter_id_t registerSourceFilter(const std::string &filterName,
 		const std::string &sourceEndpoint,
-		const std::string &inputType = "",
-		const std::string &outputType = "");
+		const std::string &inputType = std::string(),
+		const std::string &outputType = std::string());
 	/** define a filter interface for a destination
 	@details a destination filter will be sent any packets that are going to a particular destination
 	multiple filters are not allowed to specify the same destination
@@ -319,8 +318,8 @@ class Federate
 	*/
 	filter_id_t registerDestinationFilter(const std::string &filterName,
 		const std::string &destEndpoint,
-		const std::string &inputType = "",
-		const std::string &outputType = "");
+		const std::string &inputType = std::string(),
+		const std::string &outputType = std::string());
 	/** define a filter interface on a source
 	@details a source filter will be sent any packets that come from a particular source
 	if multiple filters are defined on the same source, they will be placed in some order defined by the core
@@ -329,7 +328,7 @@ class Federate
 	*/
 	filter_id_t registerSourceFilter(const std::string &sourceEndpoint)
 	{
-		return registerSourceFilter("", sourceEndpoint, "", "");
+		return registerSourceFilter(std::string(), sourceEndpoint, std::string(), std::string());
 	}
 	/** define a filter interface for a destination
 	@details a destination filter will be sent any packets that are going to a particular destination
@@ -339,7 +338,7 @@ class Federate
 	*/
 	filter_id_t registerDestinationFilter(const std::string &destEndpoint)
 	{
-		return registerDestinationFilter("", destEndpoint, "", "");
+		return registerDestinationFilter(std::string(), destEndpoint, std::string(), std::string());
 	}
 	/** get the name of a filter
 	@param[in] id the filter to query
@@ -403,7 +402,12 @@ class Federate
 	@details call is only valid in startup mode
 	@param[in] jsonString  the location of the file or json String to load to generate the interfaces
 	*/
-	virtual void registerInterfaces (const std::string &jsonString);
+      virtual void registerInterfaces(const std::string &jsonString);
+      /** register filter interfaces defined in  file or string
+      @details call is only valid in startup mode
+      @param[in] jsonString  the location of the file or json String to load to generate the interfaces
+      */
+      void registerFilterInterfaces(const std::string &jsonString);
 	/** get the underlying federateID for the core*/
 	unsigned int getID () const noexcept { return fedID; }
 	/** get the current state of the federate*/
@@ -415,6 +419,13 @@ class Federate
 	const std::string &getName () const { return FedInfo.name; }
 	/** get a pointer to the core object used by the federate*/
 	std::shared_ptr<Core> getCorePointer () { return coreObject; }
+    // interface for filter objects
+    /** get a shared pointer to a filter object stored in the federate*/
+    std::shared_ptr<Filter> getFilterObject(int index);
+    /** add a shared pointer object to the Federate*/
+    void addFilterObject(std::shared_ptr<Filter> obj);
+    /** get a count of the number of filter objects stored in the federate*/
+    int filterObjectCount() const;
 };
 
 /** function to do some housekeeping work

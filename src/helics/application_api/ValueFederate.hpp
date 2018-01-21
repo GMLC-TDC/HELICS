@@ -265,6 +265,12 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     */
     virtual void registerInterfaces (const std::string &jsonString) override;
 
+        /** register a set of value interfaces (publications and subscriptions)
+        @details call is only valid in startup mode it is a protected call to add an
+        @param[in] jsonString  the location of the file or json String to load to generate the interfaces
+        */
+        void registerValueInterfaces(const std::string &jsonString);
+
     /** get a value as raw data block from the system
     @param[in] id the identifier for the subscription
     @return a constant data block

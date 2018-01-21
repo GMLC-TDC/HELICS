@@ -85,7 +85,13 @@ endpoint_id_t MessageFederate::registerGlobalEndpoint (const std::string &name, 
     throw (InvalidFunctionCall ("cannot call register endpoint after entering initialization mode"));
 }
 
-void MessageFederate::registerInterfaces (const std::string &jsonString)
+void MessageFederate::registerInterfaces(const std::string &jsonString)
+{
+    registerMessageInterfaces(jsonString);
+    Federate::registerInterfaces(jsonString);
+}
+
+void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
 {
     if (state != op_states::startup)
     {
@@ -95,10 +101,8 @@ void MessageFederate::registerInterfaces (const std::string &jsonString)
     
     if (doc.isMember ("endpoints"))
     {
-        auto epts = doc["endpoints"];
-        for (auto eptIt = epts.begin (); eptIt != epts.end (); ++eptIt)
+        for (const auto &ept: doc["endpoints"])
         {
-            auto ept = (*eptIt);
             auto name = ept["name"].asString ();
             auto type = (ept.isMember ("type")) ? ept["type"].asString () : "";
             bool global = (ept.isMember ("global")) ? (ept["global"].asBool ()) : false;
@@ -146,6 +150,7 @@ void MessageFederate::registerInterfaces (const std::string &jsonString)
             }
         }
     }
+    Federate::registerInterfaces(jsonString);
 }
 
 void MessageFederate::subscribe (endpoint_id_t endpoint, const std::string &name, const std::string &type)

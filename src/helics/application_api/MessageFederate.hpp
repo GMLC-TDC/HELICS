@@ -72,6 +72,12 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     endpoint_id_t registerGlobalEndpoint (const std::string &name, const std::string &type = "");
     virtual void registerInterfaces (const std::string &jsonString) override;
 
+    /** register a set Message interfaces
+    @details call is only valid in startup mode it is a protected call to add an 
+    @param[in] jsonString  the location of the file or json String to load to generate the interfaces
+    */
+    void registerMessageInterfaces(const std::string &jsonString);
+
     /** give the core a hint for known communication paths
     @details the function will generate an error in the core if a communication path is not present once the
     simulation is initialized

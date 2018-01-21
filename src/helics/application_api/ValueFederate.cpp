@@ -111,7 +111,13 @@ void ValueFederate::setDefaultValue (subscription_id_t id, data_view block)
     vfManager->setDefaultValue (id, block);
 }
 
-void ValueFederate::registerInterfaces (const std::string &jsonString)
+void ValueFederate::registerInterfaces(const std::string &jsonString)
+{
+    registerValueInterfaces(jsonString);
+    Federate::registerInterfaces(jsonString);
+}
+
+void ValueFederate::registerValueInterfaces(const std::string &jsonString)
 {
     if (state != op_states::startup)
     {
@@ -180,6 +186,7 @@ void ValueFederate::registerInterfaces (const std::string &jsonString)
             }
         }
     }
+    
 }
 
 data_view ValueFederate::getValueRaw (subscription_id_t id) { return vfManager->getValue (id); }

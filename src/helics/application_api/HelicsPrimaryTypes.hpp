@@ -40,7 +40,7 @@ namespace helics
 		vectorLoc = 4,
 		complexVectorLoc=5,
 	};
-
+    /** detect a change from the previous values*/
 	bool changeDetected(const defV &prevValue, const std::string &val, double deltaV);
 	bool changeDetected(const defV &prevValue, const std::vector<double> &val, double deltaV);
 	bool changeDetected(const defV &prevValue, const std::vector<std::complex<double>> &val, double deltaV);
