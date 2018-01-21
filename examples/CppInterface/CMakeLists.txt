@@ -27,14 +27,14 @@ target_link_libraries(nonlings_fed1_cpp helicsSharedLib )
 target_link_libraries(nonlings_fed2_cpp helicsSharedLib )
 
 if (!MSVC)
-target_compile_options(pi_sender_cpp PRIVATE -std=c++98 -pedantic)
-target_compile_options(pi_receiver_cpp PRIVATE -std=c++98 -pedantic)
+target_compile_options(pi_sender_cpp PRIVATE -std=c++98 -pedantic -Werror)
+target_compile_options(pi_receiver_cpp PRIVATE -std=c++98 -pedantic -Werror)
 
-target_compile_options(pi_sender2_cpp PRIVATE -std=c++98 -pedantic)
-target_compile_options(pi_receiver2_cpp PRIVATE -std=c++98 -pedantic)
+target_compile_options(pi_sender2_cpp PRIVATE -std=c++98 -pedantic -Werror)
+target_compile_options(pi_receiver2_cpp PRIVATE -std=c++98 -pedantic -Werror)
 
-target_compile_options(nonlings_fed1_cpp PRIVATE -std=c++98 -pedantic)
-target_compile_options(nonlings_fed2_cpp PRIVATE -std=c++98 -pedantic)
+target_compile_options(nonlings_fed1_cpp PRIVATE -std=c++98 -pedantic -Werror)
+target_compile_options(nonlings_fed2_cpp PRIVATE -std=c++98 -pedantic -Werror)
 endif()
 
 set_target_properties (pi_sender_cpp PROPERTIES

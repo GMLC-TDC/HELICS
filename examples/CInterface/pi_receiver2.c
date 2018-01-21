@@ -27,7 +27,10 @@ int main()
   helics_federate vfed;
   helics_subscription sub;
   helics_publication  pub;
-
+  helics_time_t currenttime = 0.0;
+  double        value = 0.0;
+  int isupdated = 0;
+  double pi = 22.0 / 7.0;
 
   helicsversion = helicsGetVersion();
 
@@ -86,10 +89,6 @@ int main()
       printf("PI RECEIVER: Entered execution mode\n");
   }
 
-  helics_time_t currenttime=0.0;
-  double        value = 0.0;
-  int isupdated=0; 
-  double pi = 22.0/7.0;
 
   while(currenttime < 0.2) {
     
@@ -113,7 +112,7 @@ int main()
   helicsFederateFinalize(vfed);
   printf("PI RECEIVER: Federate finalized\n");
   fflush(NULL);
-  //clean upFederate;
+  /*clean upFederate*/
   helicsFederateFree(vfed);
   helicsCloseLibrary();
   printf("PI RECEIVER: Library Closed\n");

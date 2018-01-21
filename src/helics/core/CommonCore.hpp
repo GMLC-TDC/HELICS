@@ -108,7 +108,7 @@ CommonCore(const std::string &core_name);
   virtual std::unique_ptr<Message> receive (handle_id_t destination) override final;
   virtual std::unique_ptr<Message> receiveAny (federate_id_t federateID, handle_id_t &endpoint_id) override final;
   virtual uint64_t receiveCountAny (federate_id_t federateID) override final;
-  virtual void logMessage(federate_id_t federateID, int logLevel, const std::string &logMessage) override final;
+  virtual void logMessage(federate_id_t federateID, int logLevel, const std::string &messageToLog) override final;
   virtual void setFilterOperator(handle_id_t filter, std::shared_ptr<FilterOperator> callback) override final;
 
   /** set the local identification for the core*/
