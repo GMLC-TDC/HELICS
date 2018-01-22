@@ -17,6 +17,29 @@ cache:
     - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/share
     - dependencies
 
+# Create aliases for some of shared build configuration
+_basic_env:
+- &daily_linux
+  if: type = cron
+  os:
+    - linux
+  compiler: gcc
+  addons:
+    apt:
+      sources:
+        - ubuntu-toolchain-r-test
+      packages:
+        - g++-6
+        - valgrind
+- &linux_base
+  if: type != cron
+  os: linux
+  compiler: gcc
+- &osx_base
+  if: branch IN (master, develop)
+  os: osx
+  compiler: clang
+        
 jobs:
   # On weekdays, the backlog for waiting OS X builds is huge
   fast_finish: true
@@ -25,28 +48,21 @@ jobs:
 
   include:
     # XCode 6.4, OS X 10.10
-    - if: branch IN (master, develop)
+    - <<: *osx_base
       env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=64 HOMEBREW_NO_AUTO_UPDATE=1"
-      os: osx
       osx_image: xcode6.4
-      compiler: clang
     # XCode 7.3, OS X 10.11
-    - if: branch IN (master, develop)
+    - <<: *osx_base
       env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73 HOMEBREW_NO_AUTO_UPDATE=1"
-      os: osx
       osx_image: xcode7.3
-      compiler: clang
 
     # Built without errors on my clone from one of the changes made
     # Possibly local dependencies, or removing Linux-only commands fixed it
     # XCode 8.3, OS X 10.12
     #- env: COMPILER=clang++ BUILD_TYPE=Debug
-    #  os: osx
     #  osx_image: xcode8.3
-    #  compiler: clang
 
-    - if: type != cron
-      compiler: gcc
+    - <<: *linux_base
       addons:
         apt:
           sources:
@@ -54,11 +70,8 @@ jobs:
           packages:
             - g++-6
       env: MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6"
-      os:
-        - linux
 
-    - if: type != cron
-      compiler: gcc
+    - <<: *linux_base
       addons:
         apt:
           sources:
@@ -66,10 +79,8 @@ jobs:
           packages:
             - g++-4.9
       env: MATRIX_EVAL="COMPILER=g++-4.9 && CC=gcc-4.9 && CXX=g++-4.9"
-      os:
-        - linux
 
-    - if: type != cron
+    - <<: *linux_base
       compiler: clang
       addons:
         apt:
@@ -79,38 +90,18 @@ jobs:
           packages:
             - clang-3.6
       env: MATRIX_EVAL="COMPILER=clang++-3.6 && CC='ccache clang-3.6 -Qunused-arguments -fcolor-diagnostics' && CXX='ccache clang++-3.6 -Qunused-arguments -fcolor-diagnostics'
-      os:
-        - linux
+
    # ------------------------------------------------
    # Jobs for daily valgrind and code coverage tests
    # ------------------------------------------------
-    - if: type = cron
-      compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
-            - valgrind
+    - <<: *daily_linux
       env:
         - MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6"
         - RUN_VALGRIND=true
-      os:
-        - linux
-    - if: type = cron
-      compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
+    - <<: *daily_linux
       env:
         - MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6"
         - RUN_COVERAGE=true
-      os:
-        - linux
 
 branches:
   except:
