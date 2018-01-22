@@ -125,21 +125,20 @@ class MappedVector
 	{
 		std::transform(dataStorage_.begin(), dataStorage_.end(), dataStorage_.begin(), F);
 	}
-	/*NOTE:: no begin function should be allowed since this would introduce the possibilty
+	/*NOTE:: only constant iterators allowed since this would introduce the possibilty
 	of using iterators for various algorithms which could cause the object to go to a indeterminate state
 	therefore constant iterators are allowed but not modifable iterators
 	someone determined to screw it up could still easily do so*/
-	/** get an iterator to the end of the sequence*/
-    auto end () { return dataStorage_.end (); }
+
 	/** get a const iterator to the beginning of the data vector*/
-    auto cbegin () const { return dataStorage_.cbegin (); }
+    auto begin () const { return dataStorage_.cbegin (); }
     /** the a constant iterator to the end of the vector*/
-	auto cend () const { return dataStorage_.cend (); }
+	auto end () const { return dataStorage_.cend (); }
 
 	/** get the size of the vector*/
     auto size () const { return dataStorage_.size (); }
 
-
+	/** clear the vector of all data*/
     void clear ()
     {
         dataStorage_.clear ();

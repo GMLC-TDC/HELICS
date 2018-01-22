@@ -1047,7 +1047,7 @@ void CommonCore::setValue (handle_id_t handle, const char *data, uint64_t len)
         return;  // if the value is not required do nothing
     }
     auto fed = getFederate (handleInfo->local_fed_id);
-    if (fed->checkSetValue (handle, data, len))
+    if (fed->checkAndSetValue (handle, data, len))
     {
         LOG_DEBUG (0, fed->getIdentifier (),
                    (boost::format ("setting Value for %s size %d") % handleInfo->key % len).str ());

@@ -27,6 +27,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_AUTO_TEST_SUITE (ZMQCore_tests)
 
 using helics::Core;
+const std::string defServer("tcp://127.0.0.1:23405");
 
 BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
 {
@@ -36,7 +37,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
 
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
-    repSocket.bind ("tcp://127.0.0.1:23405");
+    repSocket.bind (defServer);
 
     comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
     comm.setBrokerPort (23405);
@@ -66,13 +67,13 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
 
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket1 (ctx->getContext (), ZMQ_REP);
-    repSocket1.bind ("tcp://127.0.0.1:23405");
+    repSocket1.bind (defServer);
     zmq::socket_t repSocket2 (ctx->getContext (), ZMQ_REP);
     repSocket2.bind ("tcp://127.0.0.1:23406");
     zmq::socket_t repSocket3 (ctx->getContext (), ZMQ_REP);
     repSocket3.bind ("tcp://127.0.0.1:23407");
 
-    reqset.addRoutes (1, "tcp://127.0.0.1:23405");
+    reqset.addRoutes (1, defServer);
     reqset.addRoutes (2, "tcp://127.0.0.1:23406");
     reqset.addRoutes (3, "tcp://127.0.0.1:23407");
 
@@ -131,7 +132,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
 
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket1 (ctx->getContext (), ZMQ_REP);
-    repSocket1.bind ("tcp://127.0.0.1:23405");
+    repSocket1.bind (defServer);
     zmq::socket_t repSocket2 (ctx->getContext (), ZMQ_REP);
     repSocket2.bind ("tcp://127.0.0.1:23406");
     zmq::socket_t repSocket3 (ctx->getContext (), ZMQ_REP);
@@ -141,7 +142,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     repSocket2.setsockopt (ZMQ_LINGER, 100);
     repSocket3.setsockopt (ZMQ_LINGER, 100);
 
-    reqset.addRoutes (1, "tcp://127.0.0.1:23405");
+    reqset.addRoutes (1, defServer);
     reqset.addRoutes (2, "tcp://127.0.0.1:23406");
     reqset.addRoutes (3, "tcp://127.0.0.1:23407");
 
@@ -216,7 +217,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
     try
     {
-        repSocket.bind ("tcp://127.0.0.1:23405");
+        repSocket.bind (defServer);
     }
     catch (const zmq::error_t &ze)
     {
@@ -270,7 +271,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
     try
     {
-        repSocket.bind ("tcp://127.0.0.1:23405");
+        repSocket.bind (defServer);
     }
     catch (const zmq::error_t &ze)
     {
@@ -474,7 +475,7 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
     try
     {
-        repSocket.bind ("tcp://127.0.0.1:23405");
+        repSocket.bind (defServer);
     }
     catch (const zmq::error_t &ze)
     {

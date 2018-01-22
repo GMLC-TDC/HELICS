@@ -12,8 +12,16 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <libguarded/ordered_guarded.hpp>
 #include <libguarded/shared_guarded.hpp>
+#include <libguarded/guarded.hpp>
+#include <libguarded/atomic_guarded.hpp>
 
 #include "helics/compiler-config.h"
+
+template <class T>
+using guarded = libguarded::guarded<T>;
+
+template <class T>
+using atomic_guarded = libguarded::atomic_guarded<T>;
 
 #ifdef HAVE_SHARED_MUTEX
 template <class T>

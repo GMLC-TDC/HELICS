@@ -215,8 +215,8 @@ public:
 
 	auto end() { return dataStorage_.end(); }
 
-    auto cbegin() const { return dataStorage_.cbegin(); }
-    auto cend() const { return dataStorage_.cend(); }
+    auto begin() const { return dataStorage_.cbegin(); }
+    auto end() const { return dataStorage_.cend(); }
 
     auto size() const { return dataStorage_.size(); }
 

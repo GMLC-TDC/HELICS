@@ -10,15 +10,10 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #define _HELICS_SUBSCRIPTIONINFO_
 
 #include "helics-time.hpp"
-#include "../common/blocking_queue.h"
 #include "helics/helics-config.h"
 #include "Core.hpp"
 #include "core-data.hpp"
 
-#include <cstdint>
-#include <map>
-#include <mutex>
-#include <thread>
 #include <utility>
 #include <vector>
 
@@ -45,7 +40,7 @@ class SubscriptionInfo
     const std::string type;	//! the type of data for the subscription
 	std::string pubType; //!< the type of data that its matching publication uses
     const std::string units;	//!< the units of the subscription
-    bool required;	//!< flag indicating that the subscription requires a matching publication
+    const bool required;	//!< flag indicating that the subscription requires a matching publication
     bool has_target = false;	//!< flag indicating that a target publication was found
     bool only_update_on_change = false;  //!< flag indicating that the data should only be updated on change
 	std::shared_ptr<const data_block> current_data;	//!< the most recent published data

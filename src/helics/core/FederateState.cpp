@@ -162,140 +162,92 @@ void FederateState::createSubscription (Core::handle_id_t handle,
                                         const std::string &units,
                                         handle_check_mode check_mode)
 {
-    auto sub = std::make_unique<SubscriptionInfo> (handle, global_id, key, type, units,
-                                                   (check_mode == handle_check_mode::required));
+	std::lock_guard<std::mutex> lock(_mutex);
+	subscriptions.insert(key, handle,handle, global_id, key, type, units,
+		(check_mode == handle_check_mode::required));
 
-    std::lock_guard<std::mutex> lock (_mutex);
-    subNames.emplace (key, sub.get ());
-    sub->only_update_on_change = only_update_on_change;
-    // need to sort the vectors so the find works properly
-    if (subscriptions.empty () || handle > subscriptions.back ()->id)
-    {
-        subscriptions.push_back (std::move (sub));
-    }
-    else
-    {
-        subscriptions.push_back (std::move (sub));
-        std::sort (subscriptions.begin (), subscriptions.end (), compareFunc);
-    }
+    
+    subscriptions.back()->only_update_on_change = only_update_on_change;
 }
 void FederateState::createPublication (Core::handle_id_t handle,
                                        const std::string &key,
                                        const std::string &type,
                                        const std::string &units)
 {
-    auto pub = std::make_unique<PublicationInfo> (handle, global_id, key, type, units);
 
     std::lock_guard<std::mutex> lock (_mutex);
-    pubNames.emplace (key, pub.get ());
-
-    // need to sort the vectors so the find works properly
-    if (publications.empty () || handle > publications.back ()->id)
-    {
-        publications.push_back (std::move (pub));
-    }
-    else
-    {
-        publications.push_back (std::move (pub));
-        std::sort (publications.begin (), publications.end (), compareFunc);
-    }
+	publications.insert(key, handle, handle, global_id, key, type, units);
 }
 
-void FederateState::createEndpoint (Core::handle_id_t handle, const std::string &key, const std::string &type)
+void FederateState::createEndpoint (Core::handle_id_t handle, const std::string &endpointName, const std::string &type)
 {
-    auto ep = std::make_unique<EndpointInfo> (handle, global_id, key, type);
-
-    std::lock_guard<std::mutex> lock (_mutex);
-    epNames.emplace (key, ep.get ());
+	std::lock_guard<std::mutex> lock(_mutex);
+	endpoints.insert(endpointName, handle, handle, global_id, endpointName, type);
     hasEndpoints = true;
-    if (endpoints.empty () || handle > endpoints.back ()->id)
-    {
-        endpoints.push_back (std::move (ep));
-    }
-    else
-    {
-        endpoints.push_back (std::move (ep));
-        std::sort (endpoints.begin (), endpoints.end (), compareFunc);
-    }
 }
 
-SubscriptionInfo *FederateState::getSubscription (const std::string &subName) const
+const SubscriptionInfo *FederateState::getSubscription (const std::string &subName) const
 {
-    auto fnd = subNames.find (subName);
-    if (fnd != subNames.end ())
-    {
-        return fnd->second;
-    }
-    return nullptr;
+	return subscriptions.find(subName);
 }
 
-SubscriptionInfo *FederateState::getSubscription (Core::handle_id_t handle_) const
+SubscriptionInfo *FederateState::getSubscription(const std::string &subName)
 {
-    static auto cmptr = [](const std::unique_ptr<SubscriptionInfo> &ptrA, Core::handle_id_t handle) {
-        return (ptrA->id < handle);
-    };
-
-    auto fnd = std::lower_bound (subscriptions.begin (), subscriptions.end (), handle_, cmptr);
-    if ((*fnd)->id == handle_)
-    {
-        return fnd->get ();
-    }
-    return nullptr;
+	return subscriptions.find(subName);
 }
 
-PublicationInfo *FederateState::getPublication (const std::string &pubName) const
+
+const SubscriptionInfo *FederateState::getSubscription(Core::handle_id_t handle_) const
 {
-    auto fnd = pubNames.find (pubName);
-    if (fnd != pubNames.end ())
-    {
-        return fnd->second;
-    }
-    return nullptr;
+	return subscriptions.find(handle_);
 }
 
-PublicationInfo *FederateState::getPublication (Core::handle_id_t handle_) const
+SubscriptionInfo *FederateState::getSubscription (Core::handle_id_t handle_)
 {
-    static auto cmptr = [](const std::unique_ptr<PublicationInfo> &ptrA, Core::handle_id_t handle) {
-        return (ptrA->id < handle);
-    };
-
-    auto fnd = std::lower_bound (publications.begin (), publications.end (), handle_, cmptr);
-    if ((*fnd)->id == handle_)
-    {
-        return fnd->get ();
-    }
-    return nullptr;
+	return subscriptions.find(handle_);
 }
 
-EndpointInfo *FederateState::getEndpoint (const std::string &endpointName) const
+const PublicationInfo *FederateState::getPublication (const std::string &pubName) const
 {
-    auto fnd = epNames.find (endpointName);
-    if (fnd != epNames.end ())
-    {
-        return fnd->second;
-    }
-    return nullptr;
+	return publications.find(pubName);
 }
 
-EndpointInfo *FederateState::getEndpoint (Core::handle_id_t handle_) const
+const PublicationInfo *FederateState::getPublication (Core::handle_id_t handle_) const
 {
-    static auto cmptr = [](const std::unique_ptr<EndpointInfo> &ptrA, Core::handle_id_t handle) {
-        return (ptrA->id < handle);
-    };
-
-    auto fnd = std::lower_bound (endpoints.begin (), endpoints.end (), handle_, cmptr);
-    if (fnd == endpoints.end ())
-    {
-        return nullptr;
-    }
-    if (fnd->operator-> ()->id == handle_)
-    {
-        return fnd->get ();
-    }
-    return nullptr;
+	return publications.find(handle_);
 }
 
-bool FederateState::checkSetValue (Core::handle_id_t pub_id, const char *data, uint64_t len) const
+PublicationInfo *FederateState::getPublication(const std::string &pubName)
+{
+	return publications.find(pubName);
+}
+
+PublicationInfo *FederateState::getPublication(Core::handle_id_t handle_)
+{
+	return publications.find(handle_);
+}
+
+const EndpointInfo *FederateState::getEndpoint (const std::string &endpointName) const
+{
+	return endpoints.find(endpointName);
+}
+
+const EndpointInfo *FederateState::getEndpoint (Core::handle_id_t handle_) const
+{
+	return endpoints.find(handle_);
+}
+
+EndpointInfo *FederateState::getEndpoint(const std::string &endpointName)
+{
+	return endpoints.find(endpointName);
+}
+
+EndpointInfo *FederateState::getEndpoint(Core::handle_id_t handle_)
+{
+	return endpoints.find(handle_);
+}
+
+bool FederateState::checkAndSetValue (Core::handle_id_t pub_id, const char *data, uint64_t len)
 {
     if (!only_transmit_on_change)
     {
@@ -320,7 +272,7 @@ uint64_t FederateState::getQueueSize (Core::handle_id_t handle_) const
 uint64_t FederateState::getQueueSize () const
 {
     uint64_t cnt = 0;
-    for (auto &end_point : endpoints)
+    for (const auto &end_point : endpoints)
     {
         cnt += end_point->queueSize (time_granted);
     }

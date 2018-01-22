@@ -288,6 +288,10 @@ protected:
   */
   void organizeFilterOperations();
 
+  /** generate a query response of a federate if possible
+  @param federateID the identifier for the federate to query
+  @param queryStr  the string containing the actual query
+  */
   std::string federateQuery(Core::federate_id_t federateID, const std::string &queryStr) const;
 
   /** send an error code to all the federates*/

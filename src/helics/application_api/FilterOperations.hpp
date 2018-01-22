@@ -16,8 +16,6 @@ file defines some common filter operations
 
 #include "../core/Core.hpp"
 
-#include <libguarded/atomic_guarded.hpp>
-#include <libguarded/guarded.hpp>
 #include "../common/GuardedTypes.hpp"
 #include <mutex>
 #include <set>
@@ -104,7 +102,7 @@ namespace helics
     {
     private:
         std::shared_ptr<MessageDestOperator> op;  //!< the actual operator
-        libguarded::atomic_guarded<std::string> newTarget;  //!< the target destination
+        atomic_guarded<std::string> newTarget;  //!< the target destination
 		shared_guarded<std::set<std::string>> conditions;
     public:
         RerouteFilterOperation();
@@ -124,7 +122,7 @@ namespace helics
     private:
         Core *coreptr; //!< pointer to a core object
         std::shared_ptr<CloneOperator> op;  //!< the actual operator
-		shared_guarded<std::vector<std::string>> deliveryAddresses;
+		shared_guarded<std::vector<std::string>> deliveryAddresses;  //!< the endpoints to deliver the cloned data to
     public:
         /** this operation needs a pointer to a core to operate*/
         explicit CloneFilterOperation(Core *core);

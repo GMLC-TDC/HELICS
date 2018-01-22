@@ -20,7 +20,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-
+/** class managing the coordination of time in HELICS
+the time coordinator manages depedencies and computes whether time can advance or enter execution mode
+*/
 class TimeCoordinator
 {
 private:
@@ -39,7 +41,7 @@ private:
 	std::vector<Core::federate_id_t> dependents;  // federates which temporally depend on this federate
 
 	CoreFederateInfo info;  //!< basic federate info the core uses
-	std::function<void(const ActionMessage &)> sendMessageFunction;
+	std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
 public:
 	Core::federate_id_t source_id;  //!< the identifier for inserting into the source id field of any generated messages;
 	bool iterating=false; //!< indicator that the coordinator should be iterating if need be
@@ -52,29 +54,33 @@ public:
 	TimeCoordinator() = default;
 	TimeCoordinator(const CoreFederateInfo &info_);
 
+	/* get the federate info used by the Core that affects timing*/
 	CoreFederateInfo &getFedInfo()
 	{
 		return info;
 	}
-
+	/** get the core federate info in const setting*/
 	const CoreFederateInfo &getFedInfo() const
 	{
 		return info;
 	}
-
+	/** set the core information using for timing as a block*/
 	void setInfo(const CoreFederateInfo &info_)
 	{
 		info = info_;
 	}
+	/** set the callback function used for the sending messages*/
 	void setMessageSender(std::function<void(const ActionMessage &)> sendMessageFunction_)
 	{
 		sendMessageFunction = std::move(sendMessageFunction_);
 	}
 
+	/** get the current granted time*/
 	Time getGrantedTime() const
 	{
 		return time_granted;
 	}
+	/** get a list of actual depedendencies*/
     std::vector < Core::federate_id_t> getDependencies() const;
     /** get a reference to the dependents vector*/
 	const std::vector<Core::federate_id_t> &getDependents() const { return dependents; }
@@ -127,15 +133,26 @@ public:
 	@return true if it was actually added, false if the federate was already present
 	*/
 	bool addDependent(Core::federate_id_t fedID);
-
+	/** remove a depdendency
+	@param fedID the identifier of the federate to remove*/
 	void removeDependency(Core::federate_id_t fedID);
+	/** remove a depdendent
+	@param fedID the identifier of the federate to remove*/
 	void removeDependent(Core::federate_id_t fedID);
 
 	/** check if entry to the executing state can be granted*/
 	iteration_state checkExecEntry();
 	
-
+	/** request a time 
+	@param nextTime the new requested time
+	@param iterate the mode of iteration to use (no_iteration, force_iteration, iterate_if_needed)
+	@param newValueTime  the time of the next value
+	@param newMessageTime the time of the next message
+	*/
 	void timeRequest(Time nextTime, helics_iteration_request iterate, Time newValueTime, Time newMessageTime);
+	/** function to enter the exec Mode
+	@param mode the mode of iteration_request (no_iteration, force_iteration, iterate_if_needed)
+	*/
 	void enteringExecMode(helics_iteration_request mode);
 	/** check if it is valid to grant a time*/
 	iteration_state checkTimeGrant();

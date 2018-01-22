@@ -23,6 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "core-types.hpp"
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
+#include "../common/DualMappedPointerVector.hpp"
 
 #include <atomic>
 #include <map>
@@ -60,18 +61,13 @@ class FederateState
     std::atomic<helics_federate_state_type> state{HELICS_NONE};  //!< the current state of the federate
     bool only_update_on_change{ false };  //!< flag indicating that values should only be updated on change
     bool only_transmit_on_change{ false };  //!< flag indicating that values should only be transmitted if different than previous values
-    std::map<std::string, SubscriptionInfo *> subNames;  //!< translate names to subscriptions
-    std::map<std::string, PublicationInfo *> pubNames;  //!< translate names to publications
-    std::map<std::string, EndpointInfo *> epNames;  //!< translate names to endpoints
+	DualMappedPointerVector<SubscriptionInfo, std::string, Core::handle_id_t> subscriptions; //!< storage for all the subscriptions
+	DualMappedPointerVector<PublicationInfo, std::string, Core::handle_id_t> publications; //!< storage for all the publications
+	DualMappedPointerVector<EndpointInfo, std::string, Core::handle_id_t> endpoints;  //!< storage for all the endpoints
+
 public:
 	std::atomic<bool> init_transmitted{ false }; //!< the initialization request has been transmitted
 private:
-   
-	std::vector<std::unique_ptr<SubscriptionInfo>> subscriptions;  //!< storage for all the subscriptions
-    std::vector<std::unique_ptr<PublicationInfo>> publications;  //!< storage for all the publications
-    std::vector<std::unique_ptr<EndpointInfo>> endpoints;  //!< storage for all the endpoints
-    
-	
     CommonCore *parent_ = nullptr;  //!< pointer to the higher level;
   public:
     std::atomic<bool> init_requested{false};  //!< this federate has requested entry to initialization
@@ -123,12 +119,18 @@ private:
 	  }
     helics_federate_state_type getState () const;
 
-    SubscriptionInfo *getSubscription (const std::string &subName) const;
-    SubscriptionInfo *getSubscription (Core::handle_id_t handle_) const;
-    PublicationInfo *getPublication (const std::string &pubName) const;
-    PublicationInfo *getPublication (Core::handle_id_t handle_) const;
-    EndpointInfo *getEndpoint (const std::string &endpointName) const;
-    EndpointInfo *getEndpoint (Core::handle_id_t handle_) const;
+    const SubscriptionInfo *getSubscription (const std::string &subName) const;
+    const SubscriptionInfo *getSubscription (Core::handle_id_t handle_) const;
+	SubscriptionInfo *getSubscription(const std::string &subName);
+	SubscriptionInfo *getSubscription(Core::handle_id_t handle_);
+    const PublicationInfo *getPublication (const std::string &pubName) const;
+    const PublicationInfo *getPublication (Core::handle_id_t handle_) const;
+	PublicationInfo *getPublication(const std::string &pubName);
+	PublicationInfo *getPublication(Core::handle_id_t handle_);
+    const EndpointInfo *getEndpoint (const std::string &endpointName) const;
+    const EndpointInfo *getEndpoint (Core::handle_id_t handle_) const;
+	EndpointInfo *getEndpoint(const std::string &endpointName);
+	EndpointInfo *getEndpoint(Core::handle_id_t handle_);
 
 
     void createSubscription (Core::handle_id_t handle,
@@ -261,7 +263,7 @@ private:
     @param len the length of the data
     @return true if it should be published, false if not
     */
-    bool checkSetValue(Core::handle_id_t pub_id, const char *data, uint64_t len) const;
+    bool checkAndSetValue(Core::handle_id_t pub_id, const char *data, uint64_t len);
 };
 }
 #endif

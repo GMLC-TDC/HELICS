@@ -40,6 +40,10 @@ public:
 			lookup.emplace(searchValue, dataStorage_.size() - 1);
 		}
 	}
+
+	/** get a pointer to the last element inserted*/
+	VType *back() { return dataStorage_.back().get(); }
+
 	/** find an element based on the search value
 	@return nullptr if the element is not found
 	*/
@@ -50,10 +54,20 @@ public:
 		{
 			return dataStorage_[fnd->second].get();
 		}
-		else
+		return nullptr;
+	}
+
+	/** find an element based on the search value
+	@return nullptr if the element is not found
+	*/
+	const VType *find(const searchType &searchValue) const
+	{
+		auto fnd = lookup.find(searchValue);
+		if (fnd != lookup.end())
 		{
-			return nullptr;
+			return dataStorage_[fnd->second].get();
 		}
+		return nullptr;
 	}
 
 	VType *operator[] (size_t index) {return(index<dataStorage_.size())?(dataStorage_[index].get()):nullptr; }
@@ -128,9 +142,9 @@ public:
 		}
 	}
 	/** get a const iterator to the start of the data*/
-	auto cbegin() const { return dataStorage_.cbegin(); }
+	auto begin() const { return dataStorage_.cbegin(); }
 	/** get a constant iterator to the end of the data*/
-	auto cend() const { return dataStorage_.cend(); }
+	auto end() const { return dataStorage_.cend(); }
 	/** get the numer of elements in the data*/
 	auto size() const { return dataStorage_.size(); }
 	/** remove all elements from the data*/

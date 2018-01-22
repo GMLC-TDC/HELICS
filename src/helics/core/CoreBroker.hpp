@@ -65,6 +65,8 @@ all wildest imaginations and we can probably afford to change these to 64 bit nu
 constexpr Core::federate_id_t global_federate_id_shift = 0x0001'0000;
 /** a shift in the global id index to discriminate between global ids of brokers vs federates*/
 constexpr Core::federate_id_t global_broker_id_shift = 0x7000'0000;
+
+
 /** class implementing most of the functionality of a generic broker
 Basically acts as a router for information,  deals with stuff internally if it can and sends higher up if it can't
 or does something else if it is the root of the tree

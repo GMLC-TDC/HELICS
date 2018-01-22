@@ -17,7 +17,7 @@ namespace helics
 {
 
     class FilterInfo;
-/** class to manage the ordering of filter operations for an endpoint
+/** data class to manage the ordering of filter operations for an endpoint
 */
 class FilterCoordinator
 {
