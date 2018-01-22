@@ -30,7 +30,6 @@ jobs:
       os: osx
       osx_image: xcode6.4
       compiler: clang
-
     # XCode 7.3, OS X 10.11
     - if: branch IN (master, develop)
       env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73 HOMEBREW_NO_AUTO_UPDATE=1"
@@ -46,7 +45,8 @@ jobs:
     #  osx_image: xcode8.3
     #  compiler: clang
 
-    - compiler: gcc
+    - if: type != cron
+      compiler: gcc
       addons:
         apt:
           sources:
@@ -57,7 +57,8 @@ jobs:
       os:
         - linux
 
-    - compiler: gcc
+    - if: type != cron
+      compiler: gcc
       addons:
         apt:
           sources:
@@ -68,7 +69,8 @@ jobs:
       os:
         - linux
 
-    - compiler: clang
+    - if: type != cron
+      compiler: clang
       addons:
         apt:
           sources:
@@ -77,6 +79,36 @@ jobs:
           packages:
             - clang-3.6
       env: MATRIX_EVAL="COMPILER=clang++-3.6 && CC='ccache clang-3.6 -Qunused-arguments -fcolor-diagnostics' && CXX='ccache clang++-3.6 -Qunused-arguments -fcolor-diagnostics'
+      os:
+        - linux
+   # ------------------------------------------------
+   # Jobs for daily valgrind and code coverage tests
+   # ------------------------------------------------
+    - if: type = cron
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+            - valgrind
+      env:
+        - MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6"
+        - RUN_VALGRIND=true
+      os:
+        - linux
+   - if: type = cron
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6"
+        - RUN_COVERAGE=true
       os:
         - linux
 
