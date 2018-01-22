@@ -98,7 +98,7 @@ jobs:
         - RUN_VALGRIND=true
       os:
         - linux
-   - if: type = cron
+    - if: type = cron
       compiler: gcc
       addons:
         apt:
