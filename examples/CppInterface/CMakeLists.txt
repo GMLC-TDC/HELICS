@@ -11,20 +11,20 @@ include_directories ("${PROJECT_SOURCE_DIR}/src/helics/cpp98")
 add_executable(pi_sender_cpp pi_sender.cpp)
 add_executable(pi_receiver_cpp pi_receiver.cpp)
 
-target_link_libraries(pi_sender_cpp helicsSharedLib )
-target_link_libraries(pi_receiver_cpp helicsSharedLib )
+target_link_libraries(pi_sender_cpp helicsCpp98 )
+target_link_libraries(pi_receiver_cpp helicsCpp98 )
 
 add_executable(pi_sender2_cpp pi_sender2.cpp)
 add_executable(pi_receiver2_cpp pi_receiver2.cpp)
 
-target_link_libraries(pi_sender2_cpp helicsSharedLib )
-target_link_libraries(pi_receiver2_cpp helicsSharedLib )
+target_link_libraries(pi_sender2_cpp helicsCpp98 )
+target_link_libraries(pi_receiver2_cpp helicsCpp98 )
 
 add_executable(nonlings_fed1_cpp nonlings_fed1.cpp)
 add_executable(nonlings_fed2_cpp nonlings_fed2.cpp)
 
-target_link_libraries(nonlings_fed1_cpp helicsSharedLib )
-target_link_libraries(nonlings_fed2_cpp helicsSharedLib )
+target_link_libraries(nonlings_fed1_cpp helicsCpp98 )
+target_link_libraries(nonlings_fed2_cpp helicsCpp98 )
 
 if (!MSVC)
 target_compile_options(pi_sender_cpp PRIVATE -std=c++98 -pedantic)
