@@ -1,5 +1,4 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
@@ -33,3 +32,11 @@ Json_helics::Value loadJsonString(const std::string &jsonString);
 
 /** read a time from a JSON value element*/
 helics::Time loadJsonTime(const Json_helics::Value &timeElement);
+
+/** generate a time from a string, 
+@details the string can be a double or with units
+@example "1.234",  or "1032ms"
+@return a helics time generated from the string
+@throw, invalid_argument if the string is not a valid time
+*/
+helics::Time loadTimeFromString(const std::string &timeString);
