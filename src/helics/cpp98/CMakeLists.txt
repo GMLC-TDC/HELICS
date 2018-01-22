@@ -13,9 +13,10 @@ ValueFederate.hpp
 helics.hpp
 )
 
-add_library(helicsCpp98 STATIC ${helicsCpp98_headers})
-set_target_properties(helicsCpp98 PROPERTIES LINKER_LANGUAGE CXX)
-target_include_directories(helicsCpp98 PUBLIC "${PROJECT_SOURCE_DIR}/src/helics")
+add_library(helicsCpp98 INTERFACE)
+target_include_directories(helicsCpp98 INTERFACE "${PROJECT_SOURCE_DIR}/src/helics")
 target_link_libraries(helicsCpp98 INTERFACE helicsSharedLib)
+
+add_custom_target(helicsCpp98_ide SOURCES ${helicsCpp98_headers})
 
 install(FILES ${helicsCpp98_headers} DESTINATION include/cpp98)
