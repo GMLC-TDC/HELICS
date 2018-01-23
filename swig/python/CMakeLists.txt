@@ -23,6 +23,7 @@ SWIG_LINK_LIBRARIES(helics helicsSharedLib)
 
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6OtjBCQAJ
   set_target_properties(_helics PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
 else ()
   SWIG_LINK_LIBRARIES(helics ${PYTHON_LIBRARIES})
