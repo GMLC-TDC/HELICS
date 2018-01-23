@@ -20,7 +20,13 @@ ELSE (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.7)
 ENDIF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.7)
 
 SWIG_LINK_LIBRARIES(helics helicsSharedLib)
-set_target_properties(_helics PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set_target_properties(_helics PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+else ()
+  SWIG_LINK_LIBRARIES(helics ${PYTHON_LIBRARIES})
+endif()
 
 INSTALL(FILES helics.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
 INSTALL(TARGETS _helics DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
