@@ -23,7 +23,7 @@ make clean; make -j 4; make install
 ### Testing
 
 ```bash
-export PYTHONPATH="/Users/$USER/GitRepos/HELICS-src/build/swig/python"
+export PYTHONPATH="/Users/$USER/helics_install/python"
 
 cd /Users/$USER/GitRepos/HELICS-src/swig/python
 
@@ -31,7 +31,7 @@ python pireceiver.py
 ```
 
 ```bash
-export PYTHONPATH="/Users/$USER/GitRepos/HELICS-src/build/swig/python"
+export PYTHONPATH="/Users/$USER/helics_install/python"
 
 cd /Users/$USER/GitRepos/HELICS-src/swig/python
 
