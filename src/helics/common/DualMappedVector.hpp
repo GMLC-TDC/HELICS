@@ -44,7 +44,7 @@ public:
         auto fnd = lookup1.find(searchValue);
         if (fnd != lookup1.end())
         {
-            return dataStorage_.begin() + fnd.second();
+            return dataStorage_.begin() + fnd->second;
         }
         return dataStorage_.end();
     }
@@ -54,7 +54,7 @@ public:
         auto fnd = lookup2.find(searchValue);
         if (fnd != lookup2.end())
         {
-            return dataStorage_.begin() + fnd.second();
+            return dataStorage_.begin() + fnd->second;
         }
         return dataStorage_.end();
     }
@@ -197,6 +197,9 @@ public:
 
     const VType &operator[] (size_t index) const { return dataStorage_[index]; }
 
+	VType &back() { return dataStorage_.back(); }
+
+	const VType &back() const{ return dataStorage_.back(); }
 	/** apply a function to all the values
 	@param F must be a function with signature like void fun(const VType &a);*/
 	template<class UnaryFunction >

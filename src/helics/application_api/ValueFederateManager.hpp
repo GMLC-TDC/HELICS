@@ -20,6 +20,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <unordered_map>
 #include <map>
 #include <mutex>
+#include "../common/DualMappedVector.hpp"
+#include "../common/MappedVector.hpp"
 
 namespace helics
 {
@@ -63,7 +65,7 @@ namespace helics
 	{
 	
 	public:
-		ValueFederateManager(std::shared_ptr<Core> &coreOb, Core::federate_id_t id);
+		ValueFederateManager(Core *coreOb, Core::federate_id_t id);
 		~ValueFederateManager();
 
 		publication_id_t registerPublication(const std::string &key, const std::string &type, const std::string &units);
@@ -195,7 +197,7 @@ namespace helics
 		std::vector<std::function<void(subscription_id_t,Time)>> callbacks;	//!< the all callback function
 		std::vector<data_view> lastData;	//!< the last data to arrive
 		Time CurrentTime=Time(-1.0); //!< the current simulation time
-		std::shared_ptr<Core> coreObject; //!< the pointer to the actual core
+		Core *coreObject; //!< the pointer to the actual core
 		Core::federate_id_t fedID;  //!< the federation ID from the core API
 		int allCallbackIndex = -1;	//!< index of the allCallback function
 		

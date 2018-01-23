@@ -25,7 +25,6 @@ BOOST_AUTO_TEST_CASE(definition_tests)
 	DualMappedVector<std::vector<std::string>, double,std::string> V2;
 
 	//test move and assignment operators
-	auto V3 = V2;
 	decltype(M) TV2;
 	TV2 = std::move(M);
 

@@ -12,7 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-ValueFederateManager::ValueFederateManager (std::shared_ptr<Core> &coreOb, Core::federate_id_t id)
+ValueFederateManager::ValueFederateManager (Core *coreOb, Core::federate_id_t id)
     : coreObject (coreOb), fedID (id)
 {
 }

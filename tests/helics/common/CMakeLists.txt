@@ -18,6 +18,7 @@ common-tests.cpp
 MappedVectorTests.cpp
 MappedPointerVectorTests.cpp
 DualMappedVectorTests.cpp
+DualMappedPointerVectorTests.cpp
 BlockingQueueTests.cpp
 PriorityBlockingQueueTests.cpp
 SimpleQueueTests.cpp

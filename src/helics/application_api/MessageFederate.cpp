@@ -18,16 +18,16 @@ namespace helics
 {
 MessageFederate::MessageFederate (const FederateInfo &fi) : Federate (fi)
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
 }
 MessageFederate::MessageFederate (std::shared_ptr<Core> core, const FederateInfo &fi)
     : Federate (std::move (core), fi)
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
 }
 MessageFederate::MessageFederate (const std::string &jsonString) : Federate (jsonString)
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
     registerInterfaces (jsonString);
 }
 
@@ -39,7 +39,7 @@ MessageFederate::MessageFederate ()
 MessageFederate::MessageFederate (bool)
 {  // this constructor should only be called by child class that has already constructed the underlying federate in
    // a virtual inheritance
-    mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
 }
 MessageFederate::MessageFederate (MessageFederate &&mFed) noexcept = default;
 

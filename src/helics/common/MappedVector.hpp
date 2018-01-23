@@ -64,6 +64,12 @@ class MappedVector
     VType &operator[] (size_t index) { return dataStorage_[index]; }
 
     const VType &operator[] (size_t index) const { return dataStorage_[index]; }
+
+	/** get the last element of the vector*/
+	VType &back() { return dataStorage_.back(); }
+
+	/** get a const reference to the last element of the vector*/
+	const VType &back() const { return dataStorage_.back(); }
 	/** remove an element by its index*/
 	void removeIndex(size_t index)
 	{
