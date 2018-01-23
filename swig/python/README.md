@@ -2,7 +2,7 @@
 
 ### Install
 
-When installing HELICS using cmake, set `BUILD_SHARED_LIBS` to be `ON` and `BUILD_PYTHON` to be `ON`
+When installing HELICS using cmake, set `BUILD_PYTHON` to be `ON`
 
 ```bash
 cd ~
@@ -16,9 +16,12 @@ cd build
 pwd
 # /Users/$USER/GitRepos/HELICS-src
 
-cmake -DCMAKE_INSTALL_PREFIX=/Users/$USER/helics_install -DBUILD_PYTHON=ON -DBUILD_SHARED_LIBS=ON -DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python-config --prefix)/include/python3.6m ../
+cmake -DCMAKE_INSTALL_PREFIX=/Users/$USER/helics_install -DBUILD_PYTHON=ON -DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python-config --prefix)/include/python3.6m ../
 make clean; make -j 4; make install
 ```
+
+This above command installs HELICS to `/Users/$USER/helics_install`. The Python extension is installed to `/Users/$USER/helics_install/python`.
+
 
 ### Testing
 
