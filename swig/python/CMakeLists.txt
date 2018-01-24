@@ -32,6 +32,16 @@ endif()
 INSTALL(FILES helics.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
 INSTALL(TARGETS _helics DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
 
+if (WIN32)
+	INSTALL(TARGETS helicsSharedLib ${CMAKE_INSTALL_PREFIX}/python/)
+	foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
+		add_custom_command(TARGET _helics POST_BUILD        # Adds a post-build event to _helics
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+			"${keyfile}"      # <--this is in-file
+			"${CMAKE_INSTALL_PREFIX}/python/")                 # <--this is out-file path
+	endforeach(keyfile)
+endif(WIN32)
+
 # execute_process(COMMAND python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 ELSE (GENERATE_PYTHON)
