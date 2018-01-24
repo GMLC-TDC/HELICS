@@ -80,5 +80,5 @@ Command line method
 
 .. code-block:: bash
 
-   cmake -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0" -DBOOST_ROOT="C:\local\boost_1_65_1" -DBUILD_PYTHON=ON -G "Visual Studio 14 2015 Win64" ..
-   cmake --build . --config Release
+   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0" -DBOOST_ROOT="C:\local\boost_1_65_1" -DBUILD_PYTHON=ON -G "Visual Studio 14 2015 Win64" ..
+   cmake --build . --config Release --target install
