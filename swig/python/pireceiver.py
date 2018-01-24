@@ -50,16 +50,18 @@ print("PI RECEIVER: Entering execution mode")
 value = 0.0
 prevtime = 0
 
-currenttime = h.helicsFederateRequestTime(vfed, 0.19)[-1]
+currenttime = h.helicsFederateRequestTime(vfed, 100)[-1]
+print("PI RECEIVER: Current time is {} ".format(currenttime))
+
 isupdated = h.helicsSubscriptionIsUpdated(sub)
 
 if (isupdated == 1):
     result, value = h.helicsSubscriptionGetDouble(sub)
     print("PI RECEIVER: Received value = {} at time {} from PI SENDER".format(value, currenttime))
 
-while (currenttime <= 0.19):
+while (currenttime <= 100):
 
-    currenttime = h.helicsFederateRequestTime(vfed, 0.19)[-1]
+    currenttime = h.helicsFederateRequestTime(vfed, 100)[-1]
 
     isupdated = h.helicsSubscriptionIsUpdated(sub)
 

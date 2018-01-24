@@ -59,13 +59,13 @@ print("PI SENDER: Entering execution mode")
 this_time = 0.0
 value = 22.0 / 7.0
 
-for i in range(0, 10):
-    val = i
+for t in range(5, 10):
+    val = value
 
-    print("PI SENDER: Sending value pi = {} at time {} to PI RECEIVER".format(val, this_time + (deltat * i)))
+    currenttime = h.helicsFederateRequestTime(vfed, t)
+
     status = h.helicsPublicationPublishDouble(pub, val)
-
-    currenttime = h.helicsFederateRequestTime(vfed, this_time + (deltat * i))
+    print("PI SENDER: Sending value pi = {} at time {} to PI RECEIVER".format(val, currenttime[-1]))
 
     time.sleep(1)
 
