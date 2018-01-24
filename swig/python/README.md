@@ -14,6 +14,7 @@ mkdir build
 cd build
 
 cmake -DCMAKE_INSTALL_PREFIX=~/helics_install -DBUILD_PYTHON=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m ../
+
 make clean; make -j 4; make install
 ```
 
