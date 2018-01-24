@@ -2,7 +2,7 @@ import time
 import helics as h
 
 initstring = "2 --name=mainbroker"
-fedinitstring = "--broker=mainbroker --federates=1"
+fedinitstring = "--broker=mainbroker --federates=2"
 deltat = 0.01
 
 helicsversion = h.helicsGetVersion()
@@ -48,11 +48,11 @@ vfed = h.helicsCreateValueFederate(fedinfo)
 print("PI SENDER: Value federate created")
 
 # Register the publication #
-pub = h.helicsRegisterGlobalPublication(vfed, "testA", "double", "")
+pub = h.helicsFederateRegisterGlobalPublication(vfed, "testA", "double", "")
 print("PI SENDER: Publication registered")
 
 # Enter execution mode #
-status = h.helicsEnterExecutionMode(vfed)
+status = h.helicsFederateEnterExecutionMode(vfed)
 print("PI SENDER: Entering execution mode")
 
 # This federate will be publishing deltat*pi for numsteps steps #
@@ -62,21 +62,18 @@ value = 22.0 / 7.0
 for i in range(0, 20):
     val = value
 
-    currenttime = h.helicsRequestTime(vfed, this_time + (deltat * i))
+    currenttime = h.helicsFederateRequestTime(vfed, this_time + (deltat * i))
 
     print("PI SENDER: Sending value pi = {} at time {} to PI RECEIVER".format(val, this_time + (deltat * i)))
-    status = h.helicsPublishDouble(pub, val)
+    status = h.helicsPublicationPublishDouble(pub, val)
 
-status = h.helicsFinalize(vfed)
+status = h.helicsFederateFinalize(vfed)
 print("PI SENDER: Federate finalized")
 
-
-while(h.helicsBrokerIsConnected(broker)):
+while (h.helicsBrokerIsConnected(broker)):
     time.sleep(1)
 
-h.helicsFreeFederate(vfed)
+h.helicsFederateFree(vfed)
 h.helicsCloseLibrary()
 
 print("PI SENDER: Broker disconnected")
-
-
