@@ -33,7 +33,6 @@ INSTALL(FILES helics.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
 INSTALL(TARGETS _helics DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
 
 if (WIN32)
-	INSTALL(TARGETS helicsSharedLib ${CMAKE_INSTALL_PREFIX}/python/)
 	foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 		add_custom_command(TARGET _helics POST_BUILD        # Adds a post-build event to _helics
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
