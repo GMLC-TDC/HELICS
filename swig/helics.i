@@ -1,3 +1,4 @@
+%include output.i
 #define __attribute__(x)
 
 %module helics
@@ -17,6 +18,3 @@
 %include "ValueFederate.h"
 %include "MessageFederate.h"
 %include "MessageFilters.h"
-
-
-
