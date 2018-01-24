@@ -14,7 +14,7 @@ mkdir build
 cd build
 
 pwd
-# /Users/$USER/GitRepos/HELICS-src
+# /Users/$USER/GitRepos/HELICS-src/build/
 
 cmake -DCMAKE_INSTALL_PREFIX=/Users/$USER/helics_install -DBUILD_PYTHON=ON -DBUILD_SHARED_LIBS=ON -DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python-config --prefix)/include/python3.6m ../
 make clean; make -j 4; make install
