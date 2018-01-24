@@ -2,7 +2,7 @@ import time
 import helics as h
 
 initstring = "2 --name=mainbroker"
-fedinitstring = "--broker=mainbroker --federates=2"
+fedinitstring = "--broker=mainbroker --federates=1"
 deltat = 0.01
 
 helicsversion = h.helicsGetVersion()
@@ -59,13 +59,15 @@ print("PI SENDER: Entering execution mode")
 this_time = 0.0
 value = 22.0 / 7.0
 
-for i in range(0, 20):
-    val = value
-
-    currenttime = h.helicsFederateRequestTime(vfed, this_time + (deltat * i))
+for i in range(0, 10):
+    val = i
 
     print("PI SENDER: Sending value pi = {} at time {} to PI RECEIVER".format(val, this_time + (deltat * i)))
     status = h.helicsPublicationPublishDouble(pub, val)
+
+    currenttime = h.helicsFederateRequestTime(vfed, this_time + (deltat * i))
+
+    time.sleep(1)
 
 status = h.helicsFederateFinalize(vfed)
 print("PI SENDER: Federate finalized")

@@ -1,6 +1,6 @@
 import helics as h
 
-fedinitstring = "--broker=mainbroker --federates=2"
+fedinitstring = "--federates=1"
 deltat = 0.01
 
 helicsversion = h.helicsGetVersion()
@@ -50,19 +50,22 @@ print("PI RECEIVER: Entering execution mode")
 value = 0.0
 prevtime = 0
 
-currenttime = h.helicsFederateRequestTime(vfed, 0.19)
+currenttime = h.helicsFederateRequestTime(vfed, 0.19)[-1]
+isupdated = h.helicsSubscriptionIsUpdated(sub)
+
+if (isupdated == 1):
+    result, value = h.helicsSubscriptionGetDouble(sub)
+    print("PI RECEIVER: Received value = {} at time {} from PI SENDER".format(value, currenttime))
 
 while (currenttime <= 0.19):
 
-    currenttime = h.helicsFederateRequestTime(vfed, 0.19)
+    currenttime = h.helicsFederateRequestTime(vfed, 0.19)[-1]
 
     isupdated = h.helicsSubscriptionIsUpdated(sub)
 
-    if (isupdated == 1) and (currenttime > prevtime):
-        result, value = h.helicsGetDouble(sub)
+    if (isupdated == 1):
+        result, value = h.helicsSubscriptionGetDouble(sub)
         print("PI RECEIVER: Received value = {} at time {} from PI SENDER".format(value, currenttime))
-
-    prevtime = currenttime
 
 status = h.helicsFederateFinalize(vfed)
 
