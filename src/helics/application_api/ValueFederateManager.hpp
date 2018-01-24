@@ -189,11 +189,8 @@ namespace helics
         /** get a count of the number subscriptions registered*/
         int getSubscriptionCount() const;
 	private:
-		std::unordered_map<std::string, publication_id_t> publicationKeys; //!< map of the publication keys
-		std::unordered_map<std::string, subscription_id_t> subscriptionKeys; //!< map of the subscription keys
-		std::map<Core::handle_id_t, subscription_id_t> handleLookup;  //!< a map to translate the Handles to subscription_id_t
-		std::vector<subscription_info> subs;	//!< all the subscription info
-		std::vector<publication_info> pubs;	//!< all the publication info
+		DualMappedVector<subscription_info,std::string,Core::handle_id_t> subscriptions; 
+		MappedVector<publication_info> publications;
 		std::vector<std::function<void(subscription_id_t,Time)>> callbacks;	//!< the all callback function
 		std::vector<data_view> lastData;	//!< the last data to arrive
 		Time CurrentTime=Time(-1.0); //!< the current simulation time

@@ -215,9 +215,6 @@ public:
 	{
 		std::transform(dataStorage_.begin(), dataStorage_.end(), dataStorage_.begin(), F);
 	}
-
-	auto end() { return dataStorage_.end(); }
-
     auto begin() const { return dataStorage_.cbegin(); }
     auto end() const { return dataStorage_.cend(); }
 
