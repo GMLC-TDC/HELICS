@@ -292,13 +292,18 @@ void CloningFilter::removeDeliveryEndpoint (const std::string &endpoint)
 
 void CloningFilter::setString (const std::string &property, const std::string &val)
 {
-    if (property == "source")
+    if ((property == "source") || (property == "add source"))
     {
         addSourceTarget (val);
     }
-    else if ((property == "dest") || (property == "destination"))
+    else if ((property == "dest") || (property == "destination") || (property == "add destination") || (property == "add dest"))
     {
         addDestinationTarget (val);
+    }
+    else if ((property == "endpoint") || (property == "add endpoint"))
+    {
+        addSourceTarget(val);
+        addDestinationTarget(val);
     }
     else if ((property == "remove destination") || (property == "remove dest"))
     {
@@ -307,6 +312,11 @@ void CloningFilter::setString (const std::string &property, const std::string &v
     else if (property == "remove source")
     {
         removeSourceTarget (val);
+    }
+    else if (property == "remove endpoint")
+    {
+        removeDestinationTarget(val);
+        removeSourceTarget(val);
     }
     else
     {

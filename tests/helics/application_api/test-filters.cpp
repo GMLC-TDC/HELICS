@@ -354,4 +354,6 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     dcFed->finalize ();
     BOOST_CHECK (sFed->getCurrentState () == helics::Federate::op_states::finalize);
 }
+
+
 BOOST_AUTO_TEST_SUITE_END ()

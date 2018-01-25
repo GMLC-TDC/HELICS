@@ -684,6 +684,10 @@ void Federate::registerFilterInterfaces (const std::string &jsonString)
                 {
                     registerDestinationFilter(name, target, inputType, outputType);
                 }
+                else
+                {
+                    std::cerr << "filter mode " << mode << " is unrecognized no filter created\n";
+                }
             }
             else
             {
@@ -709,26 +713,50 @@ void Federate::registerFilterInterfaces (const std::string &jsonString)
                     clonefilt->addDeliveryEndpoint(target);
                     filter = std::move(clonefilt); 
                 }
+                else
+                {
+                    std::cerr << "filter mode " << mode << " is unrecognized no filter created\n";
+                }
 
                 if (filt.isMember("properties"))
                 {
                     auto props = filt["properties"];
-                    for (const auto &prop : props)
+                    if (props.isArray())
                     {
-                        if ((!prop.isMember("name"))&& (!prop.isMember("value")))
+                        for (const auto &prop : props)
+                        {
+                            if ((!prop.isMember("name")) && (!prop.isMember("value")))
+                            {
+                                std::cerr << "properties must be specified with name and value fields\n";
+                                continue;
+                            }
+                            if (prop["value"].isDouble())
+                            {
+                                filter->set(prop["name"].asString(), prop["value"].asDouble());
+                            }
+                            else
+                            {
+                                filter->setString(prop["name"].asString(), prop["value"].asString());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if ((!props.isMember("name")) && (!props.isMember("value")))
                         {
                             std::cerr << "properties must be specified with name and value fields\n";
                             continue;
                         }
-                        if (prop["value"].isDouble())
+                        if (props["value"].isDouble())
                         {
-                            filter->set(prop["name"].asString(), prop["value"].asDouble());
+                            filter->set(props["name"].asString(), props["value"].asDouble());
                         }
                         else
                         {
-                            filter->setString(prop["name"].asString(), prop["value"].asString());
+                            filter->setString(props["name"].asString(), props["value"].asString());
                         }
                     }
+                    
                 }
                 addFilterObject(std::move(filter));
             }

@@ -87,7 +87,7 @@ int main()
   {
       double f2, J2;
       int    newt_conv = 0, max_iter = 10, iter = 0;
-   // xprv = x;
+   /* xprv = x; */
      helicsSubscriptionGetDouble(sub,&x);
     ++helics_iter;
     

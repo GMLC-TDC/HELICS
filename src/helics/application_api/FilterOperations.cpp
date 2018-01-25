@@ -279,11 +279,11 @@ void RerouteFilterOperation::set (const std::string & /*property*/, double /*val
 
 void RerouteFilterOperation::setString (const std::string &property, const std::string &val)
 {
-    if (property == "target")
+    if (property == "newdestination")
     {
-        newTarget = val;
+        newDest = val;
     }
-    else if (property == "filter")
+    else if (property == "condition")
     {
         try
         {
@@ -311,14 +311,14 @@ std::string RerouteFilterOperation::rerouteOperation (const std::string &dest) c
     auto cond = conditions.lock_shared ();
     if (cond->empty ())
     {
-        return newTarget.load ();
+        return newDest.load ();
     }
     for (auto &sr : *cond)
     {
         std::regex reg (sr);
         if (std::regex_match (dest, reg))
         {
-            return newTarget.load ();
+            return newDest.load ();
         }
     }
     return dest;

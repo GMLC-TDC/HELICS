@@ -114,7 +114,7 @@ int main ()
     
     while (currenttimeiter == iterating)
     {
-       // yprv = y;
+       /* yprv = y; */
         
         double f1, J1;
         int newt_conv = 0, max_iter = 10, iter = 0;

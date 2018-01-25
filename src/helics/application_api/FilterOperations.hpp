@@ -64,6 +64,7 @@ namespace helics
     public:
         explicit DelayFilterOperation(Time delayTime = timeZero);
         virtual void set(const std::string &property, double val) override;
+        virtual void setString(const std::string &property, const std::string &val) override;
         virtual std::shared_ptr<FilterOperator> getOperator() override;
     };
 
@@ -104,7 +105,7 @@ namespace helics
     {
     private:
         std::shared_ptr<MessageDestOperator> op;  //!< the actual operator
-        libguarded::atomic_guarded<std::string> newTarget;  //!< the target destination
+        libguarded::atomic_guarded<std::string> newDest;  //!< the target destination
 		shared_guarded<std::set<std::string>> conditions;
     public:
         RerouteFilterOperation();
