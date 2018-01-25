@@ -1,6 +1,6 @@
-loadlibrary('./../../../helics_install/lib/helics/libhelicsSharedLib.dylib');
+loadlibrary(GetFullPath('~/local/helics-1.0.0a/lib/libhelicsSharedLib.dylib'));
 
-fedinitstring = '--broker=mainbroker --federates=1';
+fedinitstring = '--federates=1';
 deltat = 0.01;
 
 helicsversion = helics.helicsGetVersion();
@@ -34,35 +34,41 @@ vfed = helics.helicsCreateValueFederate(fedinfo);
 display('PI RECEIVER: Value federate created');
 
 % Subscribe to PI SENDER's publication
-sub = helics.helicsRegisterSubscription(vfed, 'testA', 'double', '');
+sub = helics.helicsFederateRegisterSubscription(vfed, 'testA', 'double', '');
 
 display('PI RECEIVER: Subscription registered');
 
-status = helics.helicsEnterExecutionMode(vfed);
+status = helics.helicsFederateEnterExecutionMode(vfed);
 display('PI RECEIVER: Entering execution mode');
 
 value = 0.0;
 prevtime = 0;
 
-currenttime = helics.helicsRequestTime(vfed, 0.19);
+currenttime = helics.helicsFederateRequestTime(vfed, 20);
 
-while currenttime <= 0.19
+isupdated = helics.helicsSubscriptionIsUpdated(sub);
 
-    currenttime = helics.helicsRequestTime(vfed, 0.19);
-
-    isupdated = helics.helicsIsValueUpdated(sub);
-
-    if (isupdated == 1) && (currenttime > prevtime)
-        [result, value] = helics.helicsGetDouble(sub);
-        display(strcat('PI RECEIVER: Received value = ', num2str(value), '', ' at time ', num2str(currenttime), ' from PI SENDER'));
-    end
-
-    prevtime = currenttime;
+if (isupdated == 1)
+    [result, value] = helics.helicsSubscriptionGetDouble(sub);
+    display(strcat('PI RECEIVER: Received value = ', num2str(value), '', ' at time ', num2str(currenttime), ' from PI SENDER'));
 end
 
-status = helics.helicsFinalize(vfed);
 
-helics.helicsFreeFederate(vfed);
+while currenttime <= 20
+
+    currenttime = helics.helicsFederateRequestTime(vfed, 20);
+
+    isupdated = helics.helicsSubscriptionIsUpdated(sub);
+
+    if (isupdated == 1)
+        [result, value] = helics.helicsSubscriptionGetDouble(sub);
+        display(strcat('PI RECEIVER: Received value = ', num2str(value), '', ' at time ', num2str(currenttime), ' from PI SENDER'));
+    end
+end
+
+status = helics.helicsFederateFinalize(vfed);
+
+helics.helicsFederateFree(vfed);
 helics.helicsCloseLibrary();
 
 display('PI RECEIVER: Federate finalized');

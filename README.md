@@ -12,4 +12,4 @@ Repository for the source code for the Hierarchical Engine for Large-scale Infra
 
 [Mac](https://gmlc-tdc.github.io/HELICS-src/installation/mac.html)
 
-[Ubuntu](https://gmlc-tdc.github.io/HELICS-src/installation/linux.html)
+[Linux](https://gmlc-tdc.github.io/HELICS-src/installation/linux.html)

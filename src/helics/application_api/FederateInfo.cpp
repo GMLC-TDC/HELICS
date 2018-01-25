@@ -18,6 +18,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../core/core-exceptions.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
+
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
