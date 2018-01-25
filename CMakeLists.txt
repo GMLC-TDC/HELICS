@@ -240,7 +240,7 @@ add_library(helics-static STATIC
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
-target_link_libraries(helics-static Threads::Threads)
+target_link_libraries(helics-static Threads::Threads) 
 IF (UNIX AND NOT APPLE)
 target_link_libraries(helics-static rt)
 ENDIF()

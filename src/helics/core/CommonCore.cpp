@@ -34,7 +34,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <functional>
 #include <boost/program_options.hpp>
 
-#include "DelayedObjects.hpp"
+#include "../common/DelayedObjects.hpp"
 #include <boost/format.hpp>
 
 namespace helics
@@ -818,10 +818,10 @@ BasicHandleInfo *CommonCore::createBasicHandle (handle_id_t id_,
 }
 
 handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
-                                              const std::string &key,
-                                              const std::string &type,
-                                              const std::string &units,
-                                              handle_check_mode check_mode)
+                                         const std::string &key,
+                                         const std::string &type,
+                                         const std::string &units,
+                                         handle_check_mode check_mode)
 {
     auto fed = getFederate (federateID);
 
@@ -896,9 +896,9 @@ handle_id_t CommonCore::getSubscription (federate_id_t federateID, const std::st
 }
 
 handle_id_t CommonCore::registerPublication (federate_id_t federateID,
-                                             const std::string &key,
-                                             const std::string &type,
-                                             const std::string &units)
+                                        const std::string &key,
+                                        const std::string &type,
+                                        const std::string &units)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -1139,9 +1139,9 @@ handle_id_t CommonCore::getEndpoint (federate_id_t federateID, const std::string
 }
 
 handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
-                                              const std::string &source,
-                                              const std::string &type_in,
-                                              const std::string &type_out)
+                                         const std::string &source,
+                                         const std::string &type_in,
+                                         const std::string &type_out)
 {
     if (brokerState == operating)
     {
@@ -1212,9 +1212,9 @@ handle_id_t CommonCore::getSourceFilter (const std::string &name) const
 }
 
 handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName,
-                                                   const std::string &dest,
-                                                   const std::string &type_in,
-                                                   const std::string &type_out)
+                                              const std::string &dest,
+                                              const std::string &type_in,
+                                              const std::string &type_out)
 {
     if (brokerState == operating)
     {
@@ -1572,7 +1572,7 @@ uint64_t CommonCore::receiveCountAny (federate_id_t federateID)
     return fed->getQueueSize ();
 }
 
-void CommonCore::logMessage (federate_id_t federateID, int logLevel, const std::string &logMessage)
+void CommonCore::logMessage (federate_id_t federateID, int logLevel, const std::string &messageToLog)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -1583,9 +1583,9 @@ void CommonCore::logMessage (federate_id_t federateID, int logLevel, const std::
 
     m.source_id = fed->global_id;
     m.index = logLevel;
-    m.payload = logMessage;
+    m.payload = messageToLog;
     _queue.push (m);
-    sendToLogger (federateID, logLevel, fed->getIdentifier (), logMessage);
+    sendToLogger (federateID, logLevel, fed->getIdentifier (), messageToLog);
 }
 
 bool CommonCore::sendToLogger (federate_id_t federateID,
@@ -2639,7 +2639,7 @@ void CommonCore::checkDependencies ()
     {
         ActionMessage adddep (CMD_ADD_INTERDEPENDENCY);
         adddep.source_id = fedid;
-        routeMessage (adddep, brkid);
+        routeMessage(adddep, brkid);
         routeMessage (adddep,
                       fedid);  // make sure the fed depends on itself in case the broker removes itself later
         adddep.source_id = brkid;

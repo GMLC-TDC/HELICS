@@ -287,7 +287,8 @@ void RerouteFilterOperation::setString (const std::string &property, const std::
     {
         try
         {
-            auto test = std::regex (val);
+			//this line is to verify that it is a valid regex
+            auto test=std::regex (val);
             auto cond = conditions.lock ();
             cond->insert (val);
         }
@@ -336,7 +337,8 @@ void CloneFilterOperation::setString (const std::string &property, const std::st
 {
     if (property == "delivery")
     {
-        deliveryAddresses = std::vector<std::string>{val};
+		auto handle = deliveryAddresses.lock();
+		*handle=std::vector<std::string>{ val };
     }
     else if (property == "add delivery")
     {

@@ -18,15 +18,15 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <string>
 
 /** tcp socket generation for a receiving server*/
-class tcp_rx_connection
-    : public std::enable_shared_from_this<tcp_rx_connection>
+class TcpRxConnection
+    : public std::enable_shared_from_this<TcpRxConnection>
 {
 public:
-    typedef std::shared_ptr<tcp_rx_connection> pointer;
+    typedef std::shared_ptr<TcpRxConnection> pointer;
 
     static pointer create(boost::asio::io_service& io_service, size_t bufferSize)
     {
-        return pointer(new tcp_rx_connection(io_service,bufferSize));
+        return pointer(new TcpRxConnection(io_service,bufferSize));
     }
 
     boost::asio::ip::tcp::socket& socket()
@@ -41,11 +41,11 @@ public:
 
     void close();
 
-    void setDataCall(std::function<size_t (tcp_rx_connection::pointer,const char *, size_t)> dataFunc)
+    void setDataCall(std::function<size_t (TcpRxConnection::pointer,const char *, size_t)> dataFunc)
     {
         dataCall = std::move(dataFunc);
     }
-    void setErrorCall(std::function<bool(tcp_rx_connection::pointer, const boost::system::error_code&)> errorFunc)
+    void setErrorCall(std::function<bool(TcpRxConnection::pointer, const boost::system::error_code&)> errorFunc)
     {
         errorCall = std::move(errorFunc);
     }
@@ -59,7 +59,7 @@ public:
 
     int index = 0;
 private:
-    tcp_rx_connection(boost::asio::io_service& io_service, size_t bufferSize)
+    TcpRxConnection(boost::asio::io_service& io_service, size_t bufferSize)
         : socket_(io_service), data(bufferSize)
     {
     }
@@ -71,18 +71,18 @@ private:
     std::vector<char> data;
    
     std::atomic<bool> disconnected{ false };
-    std::function<size_t (tcp_rx_connection::pointer, const char *, size_t)> dataCall;
-    std::function<bool(tcp_rx_connection::pointer, const boost::system::error_code&)> errorCall;
+    std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
+    std::function<bool(TcpRxConnection::pointer, const boost::system::error_code&)> errorCall;
     std::atomic<bool> receiving{ false };
 };
 
 
 /** tcp socket connection for connecting to a server*/
-class tcp_connection
-    : public std::enable_shared_from_this<tcp_connection>
+class TcpConnection
+    : public std::enable_shared_from_this<TcpConnection>
 {
 public:
-    typedef std::shared_ptr<tcp_connection> pointer;
+    typedef std::shared_ptr<TcpConnection> pointer;
 
     static pointer create(boost::asio::io_service& io_service, const std::string &connection, const std::string &port, size_t bufferSize = 10192);
 
@@ -145,7 +145,7 @@ public:
     std::size_t bytes_transferred           // Number of bytes received.
     );
     */
-    void async_receive(std::function<void(tcp_connection::pointer, const char *, size_t, const boost::system::error_code &error)> callback)
+    void async_receive(std::function<void(TcpConnection::pointer, const char *, size_t, const boost::system::error_code &error)> callback)
     {
         socket_.async_receive(boost::asio::buffer(data, data.size()),
             [connection = shared_from_this(),callback](const boost::system::error_code &error,
@@ -154,7 +154,7 @@ public:
         });
     }
 private:
-    void handle_read(size_t message_size, const boost::system::error_code &error, std::function<void(tcp_connection::pointer, const char *, size_t, const boost::system::error_code &error)> callback)
+    void handle_read(size_t message_size, const boost::system::error_code &error, std::function<void(TcpConnection::pointer, const char *, size_t, const boost::system::error_code &error)> callback)
     {
         callback(shared_from_this(), data.data(), message_size, error);
     }
@@ -170,7 +170,7 @@ public:
     */
     int waitUntilConnected(int timeOut);
 private:
-    tcp_connection(boost::asio::io_service& io_service, const std::string &connection, const std::string &port, size_t bufferSize);
+    TcpConnection(boost::asio::io_service& io_service, const std::string &connection, const std::string &port, size_t bufferSize);
 
     boost::asio::ip::tcp::socket socket_;
     std::atomic<bool> connected{ false };  //!< flag indicating connectivity
@@ -182,10 +182,10 @@ private:
 
 /** helper class for a server*/
 
-class tcp_server
+class TcpServer
 {
 public:
-    tcp_server(boost::asio::io_service& io_service, int PortNum, int nominalBufferSize=10192)
+    TcpServer(boost::asio::io_service& io_service, int PortNum, int nominalBufferSize=10192)
         : acceptor_(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), PortNum)),bufferSize(nominalBufferSize)
     {
 
@@ -197,24 +197,24 @@ public:
 
     void close();
 
-    void setDataCall(std::function<size_t(tcp_rx_connection::pointer, const char *, size_t)> dataFunc)
+    void setDataCall(std::function<size_t(TcpRxConnection::pointer, const char *, size_t)> dataFunc)
     {
         dataCall = std::move(dataFunc);
     }
-    void setErrorCall(std::function<bool(tcp_rx_connection::pointer, const boost::system::error_code&)> errorFunc)
+    void setErrorCall(std::function<bool(TcpRxConnection::pointer, const boost::system::error_code&)> errorFunc)
     {
         errorCall = std::move(errorFunc);
     }
 
 private:
-    void handle_accept(tcp_rx_connection::pointer new_connection,
+    void handle_accept(TcpRxConnection::pointer new_connection,
         const boost::system::error_code& error);
 
     boost::asio::ip::tcp::acceptor acceptor_;
     
     size_t bufferSize;
-    std::function<size_t(tcp_rx_connection::pointer, const char *, size_t)> dataCall;
-    std::function<bool(tcp_rx_connection::pointer, const boost::system::error_code& error)> errorCall;
-    std::vector<std::shared_ptr<tcp_rx_connection>> connections;
+    std::function<size_t(TcpRxConnection::pointer, const char *, size_t)> dataCall;
+    std::function<bool(TcpRxConnection::pointer, const boost::system::error_code& error)> errorCall;
+    std::vector<std::shared_ptr<TcpRxConnection>> connections;
 };
 #endif /* _HELICS_TCP_HELPER_CLASSES_*/

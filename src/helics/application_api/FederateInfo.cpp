@@ -12,19 +12,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "Federate.hpp"
 
 #include <iostream>
-#include <fstream>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include "../core/helicsVersion.hpp"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4702)
-#include "json/json.h"
-#pragma warning(pop)
-#else
-#include "json/json.h"
-#endif
+#include "../common/JsonProcessingFunctions.hpp"
 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
@@ -139,32 +131,8 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
 FederateInfo LoadFederateInfo (const std::string &jsonString)
 {
     FederateInfo fi;
-    std::ifstream file (jsonString);
-    Json_helics::Value doc;
+	Json_helics::Value doc = loadJsonString(jsonString);
 
-    if (file.is_open ())
-    {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        bool ok = Json_helics::parseFromStream (rbuilder, file, &doc, &errs);
-        if (!ok)
-        {
-            std::cerr << errs << std::endl;
-            return fi;
-        }
-    }
-    else
-    {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        std::istringstream jstring (jsonString);
-        bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
-        if (!ok)
-        {
-            std::cerr << errs << std::endl;
-            return fi;
-        }
-    }
 
     if (doc.isMember ("name"))
     {
@@ -228,58 +196,26 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     }
     if (doc.isMember ("period"))
     {
-        if (doc["period"].isObject ())
-        {
-        }
-        else
-        {
-            fi.timeDelta = doc["period"].asDouble ();
-        }
+		fi.period = loadJsonTime(doc["period"]);
     }
 
     if (doc.isMember ("offset"))
     {
-        if (doc["offset"].isObject ())
-        {
-        }
-        else
-        {
-            fi.offset = doc["offset"].asDouble ();
-        }
+		fi.offset = loadJsonTime(doc["offset"]);
     }
 
     if (doc.isMember ("timeDelta"))
     {
-        if (doc["timeDelta"].isObject ())
-        {
-        }
-        else
-        {
-            fi.timeDelta = doc["timeDelta"].asDouble ();
-        }
+		fi.timeDelta = loadJsonTime(doc["timeDelta"]);
     }
 
     if (doc.isMember ("outputDelay"))
     {
-        if (doc["outputDelay"].isObject ())
-        {
-            // TODO:: something about units yet
-        }
-        else
-        {
-            fi.outputDelay = doc["outputDelay"].asDouble ();
-        }
+		fi.outputDelay = loadJsonTime(doc["outputDelay"]);
     }
     if (doc.isMember ("inputDelay"))
     {
-        if (doc["inputDelay"].isObject ())
-        {
-            // TOOD:: something about units yet
-        }
-        else
-        {
-            fi.inputDelay = doc["inputDelay"].asDouble ();
-        }
+		fi.inputDelay = loadJsonTime(doc["inputDelay"]);
     }
     return fi;
 }

@@ -81,31 +81,7 @@ class shared_guarded
     template <class TimePoint>
     shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
 
-    /** generate a copy of the protected object
-    */
-    std::enable_if_t<std::is_copy_constructible<T>::value, T> load() const
-    {
-        m_mutex.lock_shared();
-        T newObj(m_obj);
-        m_mutex.unlock_shared();
-        return newObj;
-    }
 
-    /** store an updated value into the object*/
-    template <typename objType>
-    std::enable_if_t<std::is_copy_assignable<T>::value> store(objType &&newObj)
-    {
-        std::lock_guard<M> glock(m_mutex);
-        m_obj = std::forward<objType>(newObj);
-    }
-
-    /** store an updated value into the object*/
-    template <typename objType>
-    std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
-    {
-        std::lock_guard<M> glock(m_mutex);
-        m_obj = std::forward<objType>(newObj);
-    }
   private:
     class deleter
     {
@@ -266,30 +242,7 @@ public:
     shared_handle lock_shared() const;
     shared_handle try_lock_shared() const;
 
-    /** generate a copy of the protected object
-    */
-    std::enable_if_t<std::is_copy_constructible<T>::value, T> load() const
-    {
-        std::lock_guard<std::mutex> glock(m_mutex);
-        T newObj(m_obj);
-        return newObj;
-    }
 
-    /** store an updated value into the object*/
-    template <typename objType>
-    std::enable_if_t<std::is_copy_assignable<T>::value> store(objType &&newObj)
-    {
-        std::lock_guard<std::mutex> glock(m_mutex);
-        m_obj = std::forward<objType>(newObj);
-    }
-
-    /** store an updated value into the object*/
-    template <typename objType>
-    std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
-    {
-        std::lock_guard<std::mutex> glock(m_mutex);
-        m_obj = std::forward<objType>(newObj);
-    }
 private:
     class deleter
     {
@@ -420,30 +373,9 @@ public:
     template <class TimePoint>
     shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
 
-    /** generate a copy of the protected object
-    */
-    std::enable_if_t<std::is_copy_constructible<T>::value, T> load() const
-    {
-        std::lock_guard<std::timed_mutex> glock(m_mutex);
-        T newObj(m_obj);
-        return newObj;
-    }
+    
 
-    /** store an updated value into the object*/
-    template <typename objType>
-    std::enable_if_t<std::is_copy_assignable<T>::value> store(objType &&newObj)
-    {
-        std::lock_guard<std::timed_mutex> glock(m_mutex);
-        m_obj = std::forward<objType>(newObj);
-    }
-
-    /** store an updated value into the object*/
-    template <typename objType>
-    std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
-    {
-        std::lock_guard<std::timed_mutex> glock(m_mutex);
-        m_obj = std::forward<objType>(newObj);
-    }
+    
 private:
     class deleter
     {

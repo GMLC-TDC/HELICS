@@ -6,7 +6,7 @@
 ##############################################################################
 
 #-----------------------------------------------------------------------------
-# Core tests using Boost
+# Common library tests using Boost
 #-----------------------------------------------------------------------------
 
 set(common_test_headers
@@ -15,9 +15,12 @@ set(common_test_headers
 
 set(common_test_sources
 common-tests.cpp
-testBlockingQueue.cpp
-testPriorityBlockingQueue.cpp
-test-simple-queue.cpp
+MappedVectorTests.cpp
+MappedPointerVectorTests.cpp
+DualMappedVectorTests.cpp
+BlockingQueueTests.cpp
+PriorityBlockingQueueTests.cpp
+SimpleQueueTests.cpp
 )
 
 

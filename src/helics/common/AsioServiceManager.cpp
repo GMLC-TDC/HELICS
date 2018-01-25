@@ -130,7 +130,7 @@ AsioServiceManager::AsioServiceManager (const std::string &serviceName) : name (
     iserv = std::make_unique<boost::asio::io_service> ();
 }
 
-void AsioServiceManager::runServiceLoop (const std::string &serviceName)
+AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::string &serviceName)
 {
     std::lock_guard<std::mutex> servelock (serviceLock);
     auto fnd = services.find (serviceName);
@@ -156,10 +156,11 @@ void AsioServiceManager::runServiceLoop (const std::string &serviceName)
                 ptr->loopRet = std::async (std::launch::async, [ptr]() { serviceRunLoop (ptr); });
             }
         }
-        return;
+        return std::make_unique<servicer>(serviceName,ptr);
     }
     throw (std::invalid_argument ("the service name specified was not available"));
 }
+
 
 void AsioServiceManager::haltServiceLoop (const std::string &serviceName)
 {

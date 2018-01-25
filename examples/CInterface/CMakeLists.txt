@@ -44,6 +44,22 @@ set_target_properties (nonlings_fed2 PROPERTIES
     FOLDER examples)
 
 
+
+
+if (!MSVC)
+target_compile_options(pi_sender PRIVATE -ansi -Wall -pedantic -Werror)
+target_compile_options(pi_receiver PRIVATE -ansi -Wall -pedantic -Werror)
+
+target_compile_options(pi_sender2 PRIVATE -ansi -Wall -pedantic -Werror)
+target_compile_options(pi_receiver2 PRIVATE -ansi -Wall -pedantic -Werror)
+
+target_compile_options(nonlings_fed1 PRIVATE -ansi -Wall -pedantic -Werror)
+target_compile_options(nonlings_fed2 PRIVATE -ansi -Wall -pedantic -Werror)
+endif()
+
+
+
+
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET pi_sender POST_BUILD        # Adds a post-build event to api tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."

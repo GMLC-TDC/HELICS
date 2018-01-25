@@ -74,7 +74,7 @@ core-types.hpp
 core-data.hpp
 helics-time.hpp
 CoreFederateInfo.hpp
-helicsVersion.hpp
+
 ../flag-definitions.h
 )
 
@@ -83,7 +83,6 @@ set(INCLUDE_FILES
 	TimeDependencies.hpp
 	TimeCoordinator.hpp
 	loggingHelper.hpp
-	DelayedObjects.hpp
 	CommsBroker.hpp
 	CommsBroker_impl.hpp
 	CoreBroker.hpp

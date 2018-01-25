@@ -573,9 +573,9 @@ class Core
     /** send a log message to the Core for logging
     @param[in] federateID the federate that is sending the log message
     @param[in] logLevel  an integer for the log level (0- error, 1- warning, 2-status, 3-debug)
-    @param[in] logMessage the message to log
+    @param[in] messageToLog
     */
-    virtual void logMessage (federate_id_t federateID, int logLevel, const std::string &logMessage) = 0;
+    virtual void logMessage (federate_id_t federateID, int logLevel, const std::string &messageToLog) = 0;
 
     /** set the filter callback operator
     @param[in] filter  the handle of the filter

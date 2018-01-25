@@ -23,7 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 /** class for very simple thread safe queue
 @details  uses two vectors for the operations,  once the pull vector is empty it swaps the vectors
-and reverses it so it can pop from the back
+and reverses it so it can pop from the back as well as an atomic flag indicating the queue is empty
 @tparam X the base class of the queue*/
 template <class X>
 class SimpleQueue
@@ -37,12 +37,14 @@ class SimpleQueue
   public:
     /** default constructor */
     SimpleQueue () = default;
+    /** destructor*/
     ~SimpleQueue ()
     {
         // these locks are primarily for memory synchronization multiple access in the destructor would be a bad
         // thing
         std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
         std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
+        /** clear the elements as part of the destruction while the locks are engaged*/
         pushElements.clear ();
         pullElements.clear ();
     }

@@ -10,12 +10,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #ifndef _HELICS_FILTEROPERATIONS_H_
 #define _HELICS_FILTEROPERATIONS_H_
 #pragma once
+/** @file
+file defines some common filter operations
+*/
 
 #include "../core/Core.hpp"
 
-#include "libguarded/guarded.hpp"
-#include "libguarded/shared_guarded.hpp"
-#include "libguarded/atomic_guarded.hpp"
+#include <libguarded/atomic_guarded.hpp>
+#include <libguarded/guarded.hpp>
+#include "../common/GuardedTypes.hpp"
 #include <mutex>
 #include <set>
 #include <atomic>
@@ -102,14 +105,7 @@ namespace helics
     private:
         std::shared_ptr<MessageDestOperator> op;  //!< the actual operator
         libguarded::atomic_guarded<std::string> newTarget;  //!< the target destination
-#ifdef HAVE_SHARED_TIMED_MUTEX
-        
-        libguarded::shared_guarded<std::set<std::string>>
-            conditions;  //!< the original destination must match one of these conditions
-#else
-        libguarded::shared_guarded<std::set<std::string>, std::mutex>
-            conditions;  //!< the original destination must match one of these conditions
-#endif
+		shared_guarded<std::set<std::string>> conditions;
     public:
         RerouteFilterOperation();
         ~RerouteFilterOperation();
@@ -128,13 +124,7 @@ namespace helics
     private:
         Core *coreptr; //!< pointer to a core object
         std::shared_ptr<CloneOperator> op;  //!< the actual operator
-#ifdef HAVE_SHARED_TIMED_MUTEX
-        libguarded::shared_guarded<std::vector<std::string>>
-            deliveryAddresses;  //!< the original destination must match one of these conditions
-#else
-        libguarded::shared_guarded<std::vector<std::string>, std::mutex>
-            deliveryAddresses;  //!< the original destination must match one of these conditions
-#endif
+		shared_guarded<std::vector<std::string>> deliveryAddresses;
     public:
         /** this operation needs a pointer to a core to operate*/
         explicit CloneFilterOperation(Core *core);

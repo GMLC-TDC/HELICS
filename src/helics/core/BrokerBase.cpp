@@ -361,7 +361,7 @@ void BrokerBase::queueProcessingLoop ()
     std::vector<ActionMessage> dumpMessages;
     mainLoopIsRunning.store (true);
     auto serv = AsioServiceManager::getServicePointer ();
-    AsioServiceManager::runServiceLoop ();
+    auto serviceLoop=AsioServiceManager::runServiceLoop ();
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
     auto active = std::make_shared<libguarded::guarded<bool>> (true);
 
@@ -401,8 +401,8 @@ void BrokerBase::queueProcessingLoop ()
             }
             if (CHECK_ACTION_FLAG (command, error_flag))
             {
-                AsioServiceManager::haltServiceLoop ();
-                AsioServiceManager::runServiceLoop ();
+				serviceLoop = nullptr;
+                serviceLoop=AsioServiceManager::runServiceLoop ();
             }
             messagesSinceLastTick = 0;
             // reschedule the timer
@@ -413,14 +413,14 @@ void BrokerBase::queueProcessingLoop ()
             break;
         case CMD_TERMINATE_IMMEDIATELY:
             ticktimer.cancel ();
-            AsioServiceManager::haltServiceLoop ();
+			serviceLoop = nullptr;
             mainLoopIsRunning.store (false);
             active->store (false);
             logDump ();
             return;  // immediate return
         case CMD_STOP:
             ticktimer.cancel ();
-            AsioServiceManager::haltServiceLoop ();
+			serviceLoop = nullptr;
             if (!haltOperations)
             {
                 processCommand (std::move (command));

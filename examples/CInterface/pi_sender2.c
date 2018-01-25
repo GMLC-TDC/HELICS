@@ -36,6 +36,11 @@ int main()
   helics_publication pub;
   helics_subscription sub;
 
+  /* This federate will be publishing deltat*pi for numsteps steps */
+  double pi = 22.0 / 7.0, value;
+  helics_time_t currenttime = 0.0;
+  int  isupdated;
+
   helicsversion = helicsGetVersion();
 
   printf("PI SENDER: Helics version = %s\n",helicsversion);
@@ -93,12 +98,6 @@ int main()
   /* Enter execution mode */
  helicsFederateEnterExecutionMode(vfed);
   printf("PI SENDER: Entered execution mode\n");
-
-  /* This federate will be publishing deltat*pi for numsteps steps */
-  //double this_time = 0.0;
-  double pi = 22.0/7.0,value;
-  helics_time_t currenttime=0.0;
-  int  isupdated;
 
   while(currenttime < 0.2) {
     value = currenttime*pi;
