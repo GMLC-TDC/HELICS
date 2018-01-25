@@ -26,7 +26,7 @@ private:
 	std::string message_ = "HELICS EXCEPTION";
 public:
 	HelicsException()=default;
-	HelicsException(const std::string &message) :message_(message)
+	explicit HelicsException(const std::string &message) :message_(message)
 	{}
 	virtual const char *what() const noexcept override
 	{
@@ -39,14 +39,14 @@ public:
 class FunctionExecutionFailure : public HelicsException
 {
 public:
-	FunctionExecutionFailure(const std::string &message="HELICS execution failure") :HelicsException(message) {};
+    explicit FunctionExecutionFailure(const std::string &message="HELICS execution failure") :HelicsException(message) {};
 };
 
 /** exception for an invalid identification Handle*/
 class InvalidIdentifier : public HelicsException
 {
 public:
-	InvalidIdentifier(const std::string &message = "invalid identifier") :HelicsException(message) {};
+    explicit InvalidIdentifier(const std::string &message = "invalid identifier") :HelicsException(message) {};
 
 };
 
@@ -54,7 +54,7 @@ public:
 class InvalidParameter : public HelicsException
 {
 public:
-	InvalidParameter(const std::string &message = "invalid parameter") :HelicsException(message) {};
+    explicit InvalidParameter(const std::string &message = "invalid parameter") :HelicsException(message) {};
 
 };
 
@@ -62,7 +62,7 @@ public:
 class InvalidFunctionCall : public HelicsException
 {
 public:
-	InvalidFunctionCall(const std::string &message = "invalid function call") :HelicsException(message) {};
+    explicit InvalidFunctionCall(const std::string &message = "invalid function call") :HelicsException(message) {};
 
 };
 
@@ -70,7 +70,7 @@ public:
 class ConnectionFailure : public HelicsException
 {
 public:
-	ConnectionFailure(const std::string &message = "failed to connect") :HelicsException(message) {};
+    explicit ConnectionFailure(const std::string &message = "failed to connect") :HelicsException(message) {};
 
 };
 
@@ -78,7 +78,7 @@ public:
 class RegistrationFailure : public HelicsException
 {
 public:
-	RegistrationFailure(const std::string &message = "registration failure") :HelicsException(message) {};
+    explicit RegistrationFailure(const std::string &message = "registration failure") :HelicsException(message) {};
 
 };
 
@@ -86,7 +86,7 @@ public:
 class HelicsTerminated : public HelicsException
 {
 public:
-	HelicsTerminated(const std::string &message = "HELICS termination") :HelicsException(message) {};
+    explicit HelicsTerminated(const std::string &message = "HELICS termination") :HelicsException(message) {};
 
 };
 }

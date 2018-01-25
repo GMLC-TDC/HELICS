@@ -114,6 +114,7 @@ Federate::Federate (const std::string &jsonString) : Federate (LoadFederateInfo 
 {
     asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
     registerFilterInterfaces(jsonString);
+   
 }
 
 Federate::Federate () noexcept

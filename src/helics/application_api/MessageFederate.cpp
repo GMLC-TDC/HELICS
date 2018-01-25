@@ -117,36 +117,52 @@ void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
             }
 
             // retrieve the known paths
-            if (ept.isMember ("knownPaths"))
+            if (ept.isMember ("knownDestinations"))
             {
-                auto kp = ept["knownPaths"];
+                auto kp = ept["knownDestinations"];
                 if (kp.isString ())
                 {
                     registerKnownCommunicationPath (epid, kp.asString ());
                 }
                 else if (kp.isArray ())
                 {
-                    for (auto kpIt = kp.begin (); kpIt != kp.end (); ++kpIt)
+                    for (const auto &path:kp)
                     {
-                        registerKnownCommunicationPath (epid, (*kpIt).asString ());
+                        registerKnownCommunicationPath (epid, path.asString ());
                     }
                 }
             }
             // endpoints can subscribe to publications
             if (ept.isMember ("subscriptions"))
             {
-                auto sub = ept["subscriptions"];
-                if (sub.isString ())
+                auto subs = ept["subscriptions"];
+                if (subs.isString ())
                 {
-                    subscribe (epid, sub.asString (), "");
+                    subscribe (epid, subs.asString (), std::string());
                 }
-                else if (sub.isArray ())
+                else if (subs.isArray ())
                 {
-                    for (auto subIt = sub.begin (); subIt != sub.end (); ++subIt)
+                    for (const auto &sub:subs)
                     {
-                        subscribe (epid, (*subIt).asString (), "");
+                        subscribe (epid, sub.asString (), std::string());
                     }
                 }
+            }
+        }
+    }
+    // retrieve the known paths
+    if (doc.isMember("knownDestinations"))
+    {
+        auto kp = doc["knownDestinations"];
+        if (kp.isString())
+        {
+           // registerKnownCommunicationPath(epid, kp.asString());
+        }
+        else if (kp.isArray())
+        {
+            for (const auto &path : kp)
+            {
+           //     registerKnownCommunicationPath(epid, (*kpIt).asString());
             }
         }
     }

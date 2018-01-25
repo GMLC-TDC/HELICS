@@ -15,7 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include "../core/helicsVersion.hpp"
-
+#include "../core/core-exceptions.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 
 namespace po = boost::program_options;
@@ -131,7 +131,15 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
 FederateInfo LoadFederateInfo (const std::string &jsonString)
 {
     FederateInfo fi;
-	Json_helics::Value doc = loadJsonString(jsonString);
+    Json_helics::Value doc;
+    try
+    {
+        doc = loadJsonString(jsonString);
+    }
+    catch (const std::invalid_argument &ia)
+    {
+        throw(helics::InvalidParameter(ia.what()));
+    }
 
 
     if (doc.isMember ("name"))

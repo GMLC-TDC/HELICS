@@ -1345,10 +1345,7 @@ FilterInfo *CommonCore::createDestFilter (federate_id_t dest,
 
 void CommonCore::registerFrequentCommunicationsPair (const std::string & /*source*/, const std::string & /*dest*/)
 {
-    std::lock_guard<std::mutex> lock (_mutex);
-
-    assert (isInitialized ());
-    assert (false);
+    //std::lock_guard<std::mutex> lock (_mutex);
 }
 
 void CommonCore::addDependency (federate_id_t /*federateID*/, const std::string & /*federateName*/) {}
