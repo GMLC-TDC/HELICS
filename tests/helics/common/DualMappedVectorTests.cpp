@@ -59,6 +59,45 @@ BOOST_AUTO_TEST_CASE(insertion_tests)
 
 }
 
+BOOST_AUTO_TEST_CASE(additional_searchTerm_tests)
+{
+	DualMappedVector<double, std::string, int64_t> Mvec;
+
+	Mvec.insert("s1", 64, 3.2);
+	Mvec.insert("s2", 63, 4.3);
+	Mvec.insert("s3", 47, 9.7);
+	Mvec.insert("s4", 92, 11.4);
+
+	BOOST_CHECK_EQUAL(Mvec.size(), 4);
+
+	Mvec.addSearchTerm("s5", "s1");
+	BOOST_CHECK_EQUAL(Mvec.size(), 4);
+
+	BOOST_CHECK_EQUAL(*(Mvec.find("s5")), 3.2);
+
+	Mvec.addSearchTerm(93, 47);
+	BOOST_CHECK_EQUAL(*(Mvec.find(93)), 9.7);
+
+	Mvec.addSearchTerm(143, "s3");
+	BOOST_CHECK_EQUAL(*(Mvec.find(143)), 9.7);
+
+	Mvec.addSearchTerm("extra", 63);
+	BOOST_CHECK_EQUAL(*(Mvec.find("extra")), 4.3);
+
+	Mvec.addSearchTermForIndex("astring", 3);
+	BOOST_CHECK_EQUAL(*(Mvec.find("astring")), 11.4);
+
+	auto res=Mvec.addSearchTermForIndex(99, 2);
+	BOOST_CHECK_EQUAL(*(Mvec.find(99)), 9.7);
+	BOOST_CHECK(res);
+
+	//check for appropriate return values
+	BOOST_CHECK(!Mvec.addSearchTerm("missing", "none"));
+	BOOST_CHECK(!Mvec.addSearchTerm(1241, 98));
+	BOOST_CHECK(!Mvec.addSearchTerm("missing", 98));
+	BOOST_CHECK(!Mvec.addSearchTerm(1241, "none"));
+}
+
 BOOST_AUTO_TEST_CASE(iterator_tests)
 {
 	DualMappedVector<double,std::string, int64_t> Mvec;
@@ -75,6 +114,13 @@ BOOST_AUTO_TEST_CASE(iterator_tests)
 	BOOST_CHECK_EQUAL(Mvec[0], 3.2 + 1.0);
 	BOOST_CHECK_EQUAL(Mvec[1], 4.3 + 1.0);
 	BOOST_CHECK_EQUAL(Mvec[2], 9.7 + 1.0);
+
+	double sum = 0.0;
+	for (auto &el : Mvec)
+	{
+		sum += el;
+	}
+	BOOST_CHECK_EQUAL(sum, 4.2 + 5.3 + 10.7 + 12.4);
 }
 
 BOOST_AUTO_TEST_CASE(remove_tests)
@@ -86,6 +132,8 @@ BOOST_AUTO_TEST_CASE(remove_tests)
 	Mvec.insert("s3", 47, 9.7);
 	Mvec.insert("s4", 92, 11.4);
 
+	Mvec.addSearchTerm("s5", 64);
+	Mvec.addSearchTermForIndex(107, 2);
 	BOOST_CHECK_EQUAL(Mvec.size(), 4);
 
 	Mvec.removeIndex(1);
@@ -94,11 +142,13 @@ BOOST_AUTO_TEST_CASE(remove_tests)
 	BOOST_CHECK(Mvec.find("s2") == Mvec.end());
 	BOOST_CHECK_EQUAL(Mvec[1], 9.7);
 	BOOST_CHECK_EQUAL(*Mvec.find("s4"), 11.4);
-
+	BOOST_CHECK_EQUAL(*Mvec.find("s5"), 3.2);
 	Mvec.remove("s1");
 	BOOST_CHECK_EQUAL(Mvec.size(), 2);
 	BOOST_CHECK_EQUAL(*Mvec.find("s4"), 11.4);
 	BOOST_CHECK_EQUAL(Mvec[0], 9.7);
+	BOOST_CHECK(Mvec.find("s5") == Mvec.end());
+	BOOST_CHECK_EQUAL(*Mvec.find(107), 9.7);
 
 
 	auto MV2 = std::move(Mvec);

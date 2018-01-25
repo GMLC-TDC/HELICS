@@ -17,12 +17,18 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <vector>
 #include <type_traits>
 
+/** class to create a searchable vector by defined unique indices.
+The result object can be indexed multiple ways both by searching using indices or by numerical index
+*/
 template <class VType, class searchType1, class searchType2>
 class DualMappedVector
 {
 public:
     static_assert(!std::is_same<searchType1, searchType2>::value, "searchType1 and searchType2 cannot be the same type");
-    template <typename... Us>
+    /** insert a new element into the vector
+	@param searchValue1 the primary unique index of the vector
+	@param searchValue2 the secondary unique index of the vector*/
+	template <typename... Us>
     void insert(const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
     {
         auto fnd = lookup1.find(searchValue1);
@@ -33,12 +39,87 @@ public:
         }
         else
         {
+			auto index = dataStorage_.size();
             dataStorage_.emplace_back(std::forward<Us>(data)...);
-            lookup1.emplace(searchValue1, dataStorage_.size() - 1);
-            lookup2.emplace(searchValue2, dataStorage_.size() - 1);
+            lookup1.emplace(searchValue1,  index);
+            lookup2.emplace(searchValue2, index);
         }
     }
+	/** add an additional index term for searching*/
+	bool addSearchTermForIndex(const searchType1 &searchValue, size_t index)
+	{
+		if (index < dataStorage_.size())
+		{
+			auto res = lookup1.emplace(searchValue, index);
+			return res.second;
+		}
+		return false;
 
+	}
+
+	/** add an additional index term for searching*/
+	auto addSearchTerm(const searchType1 &searchValue, const searchType1 &existingValue)
+	{
+		auto fnd = lookup1.find(existingValue);
+		if (fnd != lookup1.end())
+		{
+			auto res=lookup1.emplace(searchValue, fnd->second);
+			return res.second;
+		}
+		return false;
+
+	}
+
+	/** add an additional index term for searching*/
+	bool addSearchTermForIndex(const searchType2 &searchValue, size_t index)
+	{
+		if (index < dataStorage_.size())
+		{
+			auto res = lookup2.emplace(searchValue, index);
+			return res.second;
+		}
+		return false;
+
+	}
+
+	/** add an additional index term for searching*/
+	auto addSearchTerm(const searchType2 &searchValue, const searchType2 &existingValue)
+	{
+		auto fnd = lookup2.find(existingValue);
+		if (fnd != lookup2.end())
+		{
+			auto res = lookup2.emplace(searchValue, fnd->second);
+			return res.second;
+		}
+		return false;
+
+	}
+
+	/** add an additional index term for searching*/
+	auto addSearchTerm(const searchType2 &searchValue, const searchType1 &existingValue)
+	{
+		auto fnd = lookup1.find(existingValue);
+		if (fnd != lookup1.end())
+		{
+			auto res = lookup2.emplace(searchValue, fnd->second);
+			return res.second;
+		}
+		return false;
+
+	}
+
+	/** add an additional index term for searching*/
+	auto addSearchTerm(const searchType1 &searchValue, const searchType2 &existingValue)
+	{
+		auto fnd = lookup2.find(existingValue);
+		if (fnd != lookup2.end())
+		{
+			auto res = lookup1.emplace(searchValue, fnd->second);
+			return res.second;
+		}
+		return false;
+
+	}
     auto find(const searchType1 &searchValue) const
     {
         auto fnd = lookup1.find(searchValue);
@@ -86,8 +167,8 @@ public:
 			return;
 		}
 		dataStorage_.erase(dataStorage_.begin() + index);
-		searchType1 ind1;
-		searchType2 ind2;
+		std::vector<searchType1> ind1(2);
+		std::vector<searchType2> ind2(2);
 		for (auto &el2 : lookup1)
 		{
 			if (el2.second > index)
@@ -96,7 +177,7 @@ public:
 			}
 			else if (el2.second == index)
 			{
-				ind1 = el2.first;
+				ind1.push_back(el2.first);
 			}
 		}
 		for (auto &el2 : lookup2)
@@ -107,18 +188,25 @@ public:
 			}
 			else if (el2.second == index)
 			{
-				ind2 = el2.first;
+				ind2.push_back(el2.first);
 			}
 		}
-		auto fnd1 = lookup1.find(ind1);
-		if (fnd1 != lookup1.end())
+		for (auto &ind : ind1)
 		{
-			lookup1.erase(fnd1);
+			auto fnd1 = lookup1.find(ind);
+			if (fnd1 != lookup1.end())
+			{
+				lookup1.erase(fnd1);
+			}
 		}
-		auto fnd2 = lookup2.find(ind2);
-		if (fnd2 != lookup2.end())
+		
+		for (auto &ind : ind2)
 		{
-			lookup2.erase(fnd2);
+			auto fnd2 = lookup2.find(ind);
+			if (fnd2 != lookup2.end())
+			{
+				lookup2.erase(fnd2);
+			}
 		}
 	}
 
@@ -130,32 +218,7 @@ public:
 			return;
 		}
 		auto index = el->second;
-		dataStorage_.erase(dataStorage_.begin() + index);
-		for (auto &el2 : lookup1)
-		{
-			if (el2.second > index)
-			{
-				el2.second -= 1;
-			}
-		}
-		lookup1.erase(el);
-		searchType2 ind2;
-		for (auto &el2 : lookup2)
-		{
-			if (el2.second > index)
-			{
-				el2.second -= 1;
-			}
-			else if (el2.second == index)
-			{
-				ind2 = el2.first;
-			}
-		}
-		auto fnd2 = lookup2.find(ind2);
-		if (fnd2 != lookup2.end())
-		{
-			lookup2.erase(fnd2);
-		}
+		removeIndex(index);
 	}
 
 	void remove(const searchType2 &search)
@@ -166,32 +229,7 @@ public:
 			return;
 		}
 		auto index = el->second;
-		dataStorage_.erase(dataStorage_.begin() + index);
-		for (auto &el2 : lookup2)
-		{
-			if (el2.second > index)
-			{
-				el2.second -= 1;
-			}
-		}
-		lookup2.erase(el);
-		searchType1 ind1;
-		for (auto &el2 : lookup1)
-		{
-			if (el2.second > index)
-			{
-				el2.second -= 1;
-			}
-			else if (el2.second == index)
-			{
-				ind1 = el2.first;
-			}
-		}
-		auto fnd1 = lookup1.find(ind1);
-		if (fnd1 != lookup1.end())
-		{
-			lookup1.erase(fnd1);
-		}
+		removeIndex(index);
 	}
     VType &operator[] (size_t index) { return dataStorage_[index]; }
 

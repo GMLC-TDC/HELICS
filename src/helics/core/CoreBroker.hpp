@@ -24,6 +24,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "TimeDependencies.hpp"
 #include "BrokerBase.hpp"
 #include "Broker.hpp"
+#include "../common/DualMappedVector.hpp"
 
 namespace helics
 {
@@ -78,12 +79,12 @@ protected:
 private:
 	bool _isRoot = false;  //!< set to true if this object is a root broker
 	std::vector<std::pair<Core::federate_id_t, bool>> localBrokersInit; //!< indicator if the local brokers are ready to initialize
-	std::vector<BasicFedInfo> _federates; //!< container for all federates
+	DualMappedVector<BasicFedInfo, std::string,Core::federate_id_t> _federates; //!< container for all federates
+	DualMappedVector<BasicBrokerInfo, std::string, Core::federate_id_t> _brokers; //!< container for all the broker information
+	
 	std::vector<BasicHandleInfo> _handles; //!< container for the basic info for all handles
-	std::vector<BasicBrokerInfo> _brokers;  //!< container for the basic broker info for all subbrokers
 	std::string previous_local_broker_identifier; //!< the previous identifier in case a rename is required
-	std::unordered_map<std::string, int32_t> fedNames;  //!< a map to lookup federates <fed name, local federate index>
-	std::unordered_map<std::string, int32_t> brokerNames;  //!< a map to lookup brokers <broker name, local broker index>
+	
 	std::unordered_map<std::string, int32_t> publications; //!< map of publications;
 	std::unordered_multimap<std::string, int32_t> subscriptions; //!< multimap of subscriptions
 	std::unordered_map<std::string, int32_t> endpoints;  //!< map of endpoints
@@ -92,8 +93,6 @@ private:
 	std::map<Core::federate_id_t, int32_t> global_id_translation; //!< map to translate global ids to local ones
 	std::unordered_map<uint64_t, int32_t> handle_table; //!< map to translate global handles to local ones
 	std::map<Core::federate_id_t, int32_t> routing_table;  //!< map for external routes  <global federate id, route id>
-	std::map<Core::federate_id_t, int32_t> broker_table;  //!< map for translating global broker id's to a local index
-	std::map<Core::federate_id_t, int32_t> federate_table; //!< map for translating global federate id's to a local index
 	std::unordered_map<std::string, int32_t> knownExternalEndpoints; //!< external map for all known external endpoints with names and route
     std::mutex mutex_; //mutex lock for name and identifier
 private:
@@ -220,10 +219,10 @@ private:
     std::string generateQueryAnswer(const std::string &query) const;
 	/** locate the route to take to a particular federate*/
 	int32_t getRoute(Core::federate_id_t fedid) const;
-	int32_t getFedByName(const std::string &fedName) const;
-	int32_t getBrokerByName(const std::string &brokerName) const;
-	int32_t getBrokerById(Core::federate_id_t fedid) const;
-	int32_t getFedById(Core::federate_id_t fedid) const;
+	const BasicBrokerInfo *getBrokerById(Core::federate_id_t fedid) const;
+
+	BasicBrokerInfo *getBrokerById(Core::federate_id_t fedid);
+
 
 	void addLocalInfo(BasicHandleInfo &handleInfo, const ActionMessage &m);
 	void addPublication(ActionMessage &m);

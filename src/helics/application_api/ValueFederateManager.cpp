@@ -86,7 +86,7 @@ void ValueFederateManager::addSubscriptionShortcut (subscription_id_t subid, con
     if (subid.value () < subscriptions.size ())
     {
         std::lock_guard<std::mutex> sublock (subscription_mutex);
-       // subscriptionKeys.emplace (shortcutName, subid);
+       subscriptions.addSearchTermForIndex (shortcutName, subid.value());
     }
     else
     {

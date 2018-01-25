@@ -25,19 +25,39 @@ public:
 	MappedPointerVector() = default;
 	MappedPointerVector(MappedPointerVector &&mp) = default;
 	MappedPointerVector &operator=(MappedPointerVector &&mp) = default;
+
+	size_t insert(const searchType &searchValue, std::unique_ptr<VType> &&ptr)
+	{
+		auto fnd = lookup.find(searchValue);
+		if (fnd != lookup.end())
+		{
+			dataStorage_[fnd->second] = std::move(ptr);
+			return fnd->second;
+		}
+		else
+		{
+			auto index = dataStorage_.size();
+			dataStorage_.emplace_back(std::move(ptr));
+			lookup.emplace(searchValue, index);
+			return index;
+		}
+	}
 	/** insert a new element into the vector*/
 	template <typename... Us>
-	void insert(const searchType &searchValue, Us &&... data)
+	size_t insert(const searchType &searchValue, Us &&... data)
 	{
 		auto fnd = lookup.find(searchValue);
 		if (fnd != lookup.end())
 		{
 			dataStorage_[fnd->second] = std::make_unique<VType>(std::forward<Us>(data)...);
+			return fnd->second;
 		}
 		else
 		{
+			auto index = dataStorage_.size();
 			dataStorage_.emplace_back(std::make_unique<VType>(std::forward<Us>(data)...));
-			lookup.emplace(searchValue, dataStorage_.size() - 1);
+			lookup.emplace(searchValue, index);
+			return index;
 		}
 	}
 

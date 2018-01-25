@@ -23,8 +23,9 @@ generic_string_ops.hpp
 base64.h
 argParser.h
 MappedVector.hpp
-MappedPointerVector.hpp
 DualMappedVector.hpp
+MappedPointerVector.hpp
+DualMappedPointerVector.hpp
 GuardedTypes.hpp
 )
 

@@ -10,13 +10,16 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #pragma once
 #include <unordered_map>
+#include <map>
+#include <type_traits>
 #include <memory>
 #include <string>
 #include <vector>
+#include <functional>
 
 /** class merging a vector of pointer with a map that can be used to lookup specific values
 */
-template <class VType, class searchType1, class searchType2>
+template <class VType, class searchType1, class searchType2, class mapType1=std::unordered_map<searchType1,size_t>, class mapType2=std::unordered_map<searchType2,size_t>>
 class DualMappedPointerVector
 {
 	static_assert(!std::is_same<searchType1, searchType2>::value, "searchType1 and searchType2 cannot be the same type");
@@ -24,20 +27,42 @@ public:
 	DualMappedPointerVector() = default;
 	DualMappedPointerVector(DualMappedPointerVector &&mp) = default;
 	DualMappedPointerVector &operator=(DualMappedPointerVector &&mp) = default;
+	/** insert a new element into the vector directly from an existing unique ptr*/
+	size_t insert(const searchType1 &searchValue1,const searchType2 &searchValue2, std::unique_ptr<VType> &&ptr)
+	{
+		auto fnd = lookup1.find(searchValue1);
+		if (fnd != lookup1.end())
+		{
+			dataStorage_[fnd->second] = std::move(ptr);
+			lookup2[searchValue2] = fnd->second;
+			return fnd->second;
+		}
+		else
+		{
+			auto index = dataStorage_.size();
+			dataStorage_.emplace_back(std::move(ptr));
+			lookup1.emplace(searchValue1, index);
+			lookup2.emplace(searchValue2, index);
+			return index;
+		}
+	}
 	/** insert a new element into the vector*/
 	template <typename... Us>
-	void insert(const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
+	size_t insert(const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
 	{
 		auto fnd = lookup1.find(searchValue1);
 		if (fnd != lookup1.end())
 		{
 			dataStorage_[fnd->second] = std::make_unique<VType>(std::forward<Us>(data)...);
+			return fnd->second;
 		}
 		else
 		{
+			auto index = dataStorage_.size();
 			dataStorage_.emplace_back(std::make_unique<VType>(std::forward<Us>(data)...));
-			lookup1.emplace(searchValue1, dataStorage_.size() - 1);
-			lookup2.emplace(searchValue2, dataStorage_.size() - 1);
+			lookup1.emplace(searchValue1, index);
+			lookup2.emplace(searchValue2, index);
+			return index;
 		}
 	}
 	/** find an element based on the search value
@@ -252,7 +277,7 @@ public:
 
 private:
 	std::vector<std::unique_ptr<VType>> dataStorage_; //!< storage for the pointers
-	std::unordered_map<searchType1, size_t> lookup1;	//!< map to lookup the index
-	std::unordered_map<searchType2, size_t> lookup2;	//!< map to lookup the index
+	mapType1 lookup1;	//!< map to lookup the index
+	mapType2 lookup2;	//!< map to lookup the index
 };
 
