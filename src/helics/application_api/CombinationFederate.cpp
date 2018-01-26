@@ -23,10 +23,9 @@ CombinationFederate::CombinationFederate (std::shared_ptr<Core> core, const Fede
 }
 
 CombinationFederate::CombinationFederate (const std::string &jsonString)
-    : Federate (jsonString), ValueFederate (true), MessageFederate (true)
+    : Federate (loadFederateInfo (jsonString)), ValueFederate (true), MessageFederate (true)
 {
-    ValueFederate::registerValueInterfaces (jsonString);
-    MessageFederate::registerMessageInterfaces (jsonString);
+    registerInterfaces (jsonString);
 }
 
 CombinationFederate::CombinationFederate (CombinationFederate &&fed) noexcept = default;
@@ -62,6 +61,6 @@ void CombinationFederate::registerInterfaces (const std::string &jsonString)
 {
     ValueFederate::registerValueInterfaces (jsonString);
     MessageFederate::registerMessageInterfaces (jsonString);
-    Federate::registerFilterInterfaces(jsonString);
+    Federate::registerFilterInterfaces (jsonString);
 }
 }  // namespace helics

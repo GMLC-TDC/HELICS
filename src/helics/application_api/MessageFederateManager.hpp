@@ -12,9 +12,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _MESSAGE_FEDERATE_MANAGER_
 #pragma once
 
-#include "Message.hpp"
 #include "../common/simpleQueue.hpp"
 #include "../core/Core.hpp"
+#include "Message.hpp"
+#include "libguarded/guarded.hpp"
 #include <cstdint>
 #include <functional>
 #include <map>
@@ -23,7 +24,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
-#include "libguarded/guarded.hpp"
 
 namespace helics
 {
@@ -46,8 +46,8 @@ struct endpoint_info
 class MessageFederateManager
 {
   public:
-      /** construct from a pointer to a core and a specified federate id
-      */
+    /** construct from a pointer to a core and a specified federate id
+     */
     MessageFederateManager (std::shared_ptr<Core> coreOb, Core::federate_id_t id);
     ~MessageFederateManager ();
     /** register an endpoint
@@ -137,9 +137,10 @@ class MessageFederateManager
     registerCallback (const std::vector<endpoint_id_t> &ids, std::function<void(endpoint_id_t, Time)> callback);
 
     /**disconnect from the coreObject*/
-    void disconnect();
+    void disconnect ();
     /**get the number of registered endpoints*/
-    int getEndpointCount() const;
+    int getEndpointCount () const;
+
   private:
     std::unordered_map<std::string, endpoint_id_t>
       endpointNames;  //!< container to translate names to endpoint id's
@@ -160,5 +161,5 @@ class MessageFederateManager
   private:  // private functions
     void removeOrderedMessage (unsigned int index);
 };
-} //namespace helics
+}  // namespace helics
 #endif

@@ -9,10 +9,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "MessageFederate.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "MessageFederateManager.hpp"
-#include "../common/JsonProcessingFunctions.hpp"
 
 namespace helics
 {
@@ -25,7 +25,7 @@ MessageFederate::MessageFederate (std::shared_ptr<Core> core, const FederateInfo
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
 }
-MessageFederate::MessageFederate (const std::string &jsonString) : Federate (jsonString)
+MessageFederate::MessageFederate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
     registerInterfaces (jsonString);
@@ -85,10 +85,10 @@ endpoint_id_t MessageFederate::registerGlobalEndpoint (const std::string &name, 
     throw (InvalidFunctionCall ("cannot call register endpoint after entering initialization mode"));
 }
 
-void MessageFederate::registerInterfaces(const std::string &jsonString)
+void MessageFederate::registerInterfaces (const std::string &jsonString)
 {
-    registerMessageInterfaces(jsonString);
-    Federate::registerInterfaces(jsonString);
+    registerMessageInterfaces (jsonString);
+    Federate::registerFilterInterfaces (jsonString);
 }
 
 void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
@@ -97,11 +97,11 @@ void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
     {
         throw (InvalidFunctionCall ("cannot call register Interfaces after entering initialization mode"));
     }
-	auto doc = loadJsonString(jsonString);
-    
+    auto doc = loadJsonString (jsonString);
+
     if (doc.isMember ("endpoints"))
     {
-        for (const auto &ept: doc["endpoints"])
+        for (const auto &ept : doc["endpoints"])
         {
             auto name = ept["name"].asString ();
             auto type = (ept.isMember ("type")) ? ept["type"].asString () : "";
@@ -126,7 +126,7 @@ void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
                 }
                 else if (kp.isArray ())
                 {
-                    for (const auto &path:kp)
+                    for (const auto &path : kp)
                     {
                         registerKnownCommunicationPath (epid, path.asString ());
                     }
@@ -138,18 +138,19 @@ void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
                 auto subs = ept["subscriptions"];
                 if (subs.isString ())
                 {
-                    subscribe (epid, subs.asString (), std::string());
+                    subscribe (epid, subs.asString (), std::string ());
                 }
                 else if (subs.isArray ())
                 {
-                    for (const auto &sub:subs)
+                    for (const auto &sub : subs)
                     {
-                        subscribe (epid, sub.asString (), std::string());
+                        subscribe (epid, sub.asString (), std::string ());
                     }
                 }
             }
         }
     }
+    /*
     // retrieve the known paths
     if (doc.isMember("knownDestinations"))
     {
@@ -160,13 +161,13 @@ void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
         }
         else if (kp.isArray())
         {
-            for (const auto &path : kp)
+           for (const auto &path : kp)
             {
            //     registerKnownCommunicationPath(epid, (*kpIt).asString());
             }
         }
     }
-    Federate::registerInterfaces(jsonString);
+    */
 }
 
 void MessageFederate::subscribe (endpoint_id_t endpoint, const std::string &name, const std::string &type)

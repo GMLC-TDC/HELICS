@@ -10,11 +10,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/unit_test.hpp>
 
 #include "helics/core/BrokerFactory.hpp"
+#include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
+#include "helics/core/CoreFederateInfo.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/core-types.hpp"
-#include "helics/core/Core.hpp"
-#include "helics/core/CoreFederateInfo.hpp"
 
 BOOST_AUTO_TEST_SUITE (TestCore_tests)
 

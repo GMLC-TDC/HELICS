@@ -296,14 +296,15 @@ void CloningFilter::setString (const std::string &property, const std::string &v
     {
         addSourceTarget (val);
     }
-    else if ((property == "dest") || (property == "destination") || (property == "add destination") || (property == "add dest"))
+    else if ((property == "dest") || (property == "destination") || (property == "add destination") ||
+             (property == "add dest"))
     {
         addDestinationTarget (val);
     }
     else if ((property == "endpoint") || (property == "add endpoint"))
     {
-        addSourceTarget(val);
-        addDestinationTarget(val);
+        addSourceTarget (val);
+        addDestinationTarget (val);
     }
     else if ((property == "remove destination") || (property == "remove dest"))
     {
@@ -315,8 +316,8 @@ void CloningFilter::setString (const std::string &property, const std::string &v
     }
     else if (property == "remove endpoint")
     {
-        removeDestinationTarget(val);
-        removeSourceTarget(val);
+        removeDestinationTarget (val);
+        removeSourceTarget (val);
     }
     else
     {

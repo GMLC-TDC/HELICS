@@ -43,11 +43,11 @@
 {
 	"name":"filtername",  //filters can have names (optional)
 	"target":"ept1",  //this is a key field specifying the target endpoint
-	"inputType":"genmessage",  //can trigger some warnings if there is mismatches will probably leave off most of the time
-	"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
+	//"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom" 
+	//"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
 	"mode":"source",  //source is the default but can be "source","destination","clone","cloning"
 	"operation":"delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
-	"properties:  //additional properties for filters are specified in a property array or object if there is just a single one
+	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
 	{
 		"name":"delay",  //A delay filter just has a single property
 		"value":0.2	//times default to seconds though units can also be specified "200 ms" or similar
@@ -58,7 +58,7 @@
 	"target":"filterFed/ept2",  //this is a key field specifying the target endpoint
 	"mode":"source",  //source is the default but can be "source","destination","clone","cloning"
 	"operation":"reroute", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
-	"properties:  //additional properties for filters are specified in a property array or object if there is just a single one
+	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
 	{
 		"name":"newdestination",  //A reroute filter takes a new destination
 		"value":"ept1"	//the value here is the endpoint that should be the new destination
@@ -69,7 +69,7 @@
 	"target":"ept2",  //for cloning filters the target is the delivery address
 	"mode":"clone",  //specify that this is cloning filter
 	//"operation":"clone", //cloning filters don't really need an operation since clone is all they do if one is specified it must be "clone" or "cloning"
-	"properties:  //additional properties for filters are specified in a property array or object if there is just a single one
+	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
 	[{   
 		"name":"destination",  //destination adds a cloning filter for all messages delivered to a particular 
 		"value":"ept1"	//the value here the endpoint that will have its messages cloned

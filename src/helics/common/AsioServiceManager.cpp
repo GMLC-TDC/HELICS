@@ -156,11 +156,10 @@ AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::st
                 ptr->loopRet = std::async (std::launch::async, [ptr]() { serviceRunLoop (ptr); });
             }
         }
-        return std::make_unique<servicer>(serviceName,ptr);
+        return std::make_unique<servicer> (serviceName, ptr);
     }
     throw (std::invalid_argument ("the service name specified was not available"));
 }
-
 
 void AsioServiceManager::haltServiceLoop (const std::string &serviceName)
 {

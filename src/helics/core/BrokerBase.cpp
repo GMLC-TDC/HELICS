@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../common/logger.h"
 #include "TimeCoordinator.hpp"
 #include "helics/helics-config.h"
+#include "helicsVersion.hpp"
 #include <iostream>
 #include <libguarded/guarded.hpp>
 #include <boost/asio/steady_timer.hpp>
@@ -25,7 +26,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/uuid/uuid.hpp>  // uuid class
 #include <boost/uuid/uuid_generators.hpp>  // generators
 #include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
-#include "helicsVersion.hpp"
 
 static inline std::string gen_id ()
 {
@@ -111,7 +111,7 @@ static void argumentParser (int argc, const char *const *argv, boost::program_op
 
     if (cmd_vm.count ("version") > 0)
     {
-        std::cout << helics::helicsVersionString() << '\n';
+        std::cout << helics::helicsVersionString () << '\n';
         return;
     }
 
@@ -361,7 +361,7 @@ void BrokerBase::queueProcessingLoop ()
     std::vector<ActionMessage> dumpMessages;
     mainLoopIsRunning.store (true);
     auto serv = AsioServiceManager::getServicePointer ();
-    auto serviceLoop=AsioServiceManager::runServiceLoop ();
+    auto serviceLoop = AsioServiceManager::runServiceLoop ();
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
     auto active = std::make_shared<libguarded::guarded<bool>> (true);
 
@@ -401,8 +401,8 @@ void BrokerBase::queueProcessingLoop ()
             }
             if (CHECK_ACTION_FLAG (command, error_flag))
             {
-				serviceLoop = nullptr;
-                serviceLoop=AsioServiceManager::runServiceLoop ();
+                serviceLoop = nullptr;
+                serviceLoop = AsioServiceManager::runServiceLoop ();
             }
             messagesSinceLastTick = 0;
             // reschedule the timer
@@ -413,14 +413,14 @@ void BrokerBase::queueProcessingLoop ()
             break;
         case CMD_TERMINATE_IMMEDIATELY:
             ticktimer.cancel ();
-			serviceLoop = nullptr;
+            serviceLoop = nullptr;
             mainLoopIsRunning.store (false);
             active->store (false);
             logDump ();
             return;  // immediate return
         case CMD_STOP:
             ticktimer.cancel ();
-			serviceLoop = nullptr;
+            serviceLoop = nullptr;
             if (!haltOperations)
             {
                 processCommand (std::move (command));

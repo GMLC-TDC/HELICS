@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
 
     BOOST_CHECK_EQUAL (vFed.getSubscriptionCount (), 2);
     BOOST_CHECK_EQUAL (vFed.getPublicationCount (), 2);
-    vFed.disconnect();
+    vFed.disconnect ();
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

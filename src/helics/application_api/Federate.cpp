@@ -9,10 +9,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "Federate.hpp"
-#include "Filters.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreFactory.hpp"
 #include "../core/core-exceptions.hpp"
+#include "Filters.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/Core.hpp"
@@ -110,11 +110,9 @@ Federate::Federate (std::shared_ptr<Core> core, const FederateInfo &fi)
     asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
 }
 
-Federate::Federate (const std::string &jsonString) : Federate (LoadFederateInfo (jsonString))
+Federate::Federate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
 {
-    asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
-    registerFilterInterfaces(jsonString);
-   
+    registerFilterInterfaces (jsonString);
 }
 
 Federate::Federate () noexcept
@@ -614,10 +612,7 @@ void Federate::initializeToExecuteStateTransition ()
     // child classes may do something with this
 }
 
-void Federate::registerInterfaces(const std::string &jsonString)
-{
-    registerFilterInterfaces(jsonString);
-}
+void Federate::registerInterfaces (const std::string &jsonString) { registerFilterInterfaces (jsonString); }
 
 void Federate::registerFilterInterfaces (const std::string &jsonString)
 {
@@ -678,11 +673,11 @@ void Federate::registerFilterInterfaces (const std::string &jsonString)
             {
                 if (mode == "source")
                 {
-                    registerSourceFilter(name, target, inputType, outputType);
+                    registerSourceFilter (name, target, inputType, outputType);
                 }
                 else if ((mode == "dest") || (mode == "destination"))
                 {
-                    registerDestinationFilter(name, target, inputType, outputType);
+                    registerDestinationFilter (name, target, inputType, outputType);
                 }
                 else
                 {
@@ -692,99 +687,89 @@ void Federate::registerFilterInterfaces (const std::string &jsonString)
             else
             {
                 std::shared_ptr<Filter> filter;
-                auto type = filterTypeFromString(operation);
+                auto type = filterTypeFromString (operation);
                 if (type == defined_filter_types::unrecognized)
                 {
-                    std::cerr << "unrecognized filter operation:"<<operation<<'\n';
+                    std::cerr << "unrecognized filter operation:" << operation << '\n';
                     continue;
                 }
                 if (mode == "source")
                 {
-                    filter = make_source_filter(type, this, target, name);
+                    filter = make_source_filter (type, this, target, name);
                 }
                 else if ((mode == "dest") || (mode == "destination"))
                 {
-                    filter = make_destination_filter(type, this, target, name);
+                    filter = make_destination_filter (type, this, target, name);
                 }
                 else if ((mode == "clone") || (mode == "cloning"))
                 {
-                    //TODO:: do something with the name
-                    auto clonefilt=std::make_shared<CloningFilter>(this);
-                    clonefilt->addDeliveryEndpoint(target);
-                    filter = std::move(clonefilt); 
+                    // TODO:: do something with the name
+                    auto clonefilt = std::make_shared<CloningFilter> (this);
+                    clonefilt->addDeliveryEndpoint (target);
+                    filter = std::move (clonefilt);
                 }
                 else
                 {
                     std::cerr << "filter mode " << mode << " is unrecognized no filter created\n";
                 }
 
-                if (filt.isMember("properties"))
+                if (filt.isMember ("properties"))
                 {
                     auto props = filt["properties"];
-                    if (props.isArray())
+                    if (props.isArray ())
                     {
                         for (const auto &prop : props)
                         {
-                            if ((!prop.isMember("name")) && (!prop.isMember("value")))
+                            if ((!prop.isMember ("name")) && (!prop.isMember ("value")))
                             {
                                 std::cerr << "properties must be specified with name and value fields\n";
                                 continue;
                             }
-                            if (prop["value"].isDouble())
+                            if (prop["value"].isDouble ())
                             {
-                                filter->set(prop["name"].asString(), prop["value"].asDouble());
+                                filter->set (prop["name"].asString (), prop["value"].asDouble ());
                             }
                             else
                             {
-                                filter->setString(prop["name"].asString(), prop["value"].asString());
+                                filter->setString (prop["name"].asString (), prop["value"].asString ());
                             }
                         }
                     }
                     else
                     {
-                        if ((!props.isMember("name")) && (!props.isMember("value")))
+                        if ((!props.isMember ("name")) && (!props.isMember ("value")))
                         {
                             std::cerr << "properties must be specified with name and value fields\n";
                             continue;
                         }
-                        if (props["value"].isDouble())
+                        if (props["value"].isDouble ())
                         {
-                            filter->set(props["name"].asString(), props["value"].asDouble());
+                            filter->set (props["name"].asString (), props["value"].asDouble ());
                         }
                         else
                         {
-                            filter->setString(props["name"].asString(), props["value"].asString());
+                            filter->setString (props["name"].asString (), props["value"].asString ());
                         }
                     }
-                    
                 }
-                addFilterObject(std::move(filter));
+                addFilterObject (std::move (filter));
             }
-            
         }
     }
 }
 
-
-std::shared_ptr<Filter> Federate::getFilterObject(int index)
+std::shared_ptr<Filter> Federate::getFilterObject (int index)
 {
-    if (isValidIndex(index, localFilters))
+    if (isValidIndex (index, localFilters))
     {
         return localFilters[index];
     }
     return nullptr;
 }
 
+void Federate::addFilterObject (std::shared_ptr<Filter> obj) { localFilters.push_back (std::move (obj)); }
 
-void Federate::addFilterObject(std::shared_ptr<Filter> obj)
-{
-    localFilters.push_back(std::move(obj));
-}
-
-int Federate::filterObjectCount() const
-{
-    return static_cast<int>(localFilters.size());
-}
+int Federate::filterObjectCount () const { return static_cast<int> (localFilters.size ()); }
 
 std::string Federate::query (const std::string &queryStr)
 {

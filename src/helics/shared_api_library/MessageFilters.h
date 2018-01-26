@@ -21,7 +21,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 extern "C" {
 #endif
 
-
 /** create a source Filter on the specified federate
 @details filters can be created through a federate or a core , linking through a federate allows
 a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
@@ -67,16 +66,15 @@ HELICS_Export helics_status setString (helics_filter filt, const char *property,
 
 /* the following operations only work with cloning filters*/
 
-HELICS_Export helics_status helicsFilterAddDestinationTarget(helics_filter filt, const char *dest);
-HELICS_Export helics_status helicsFilterAddSourceTarget(helics_filter filt, const char *dest);
-HELICS_Export helics_status helicsFilterAddDeliveryEndpoint(helics_filter filt, const char *dest);
+HELICS_Export helics_status helicsFilterAddDestinationTarget (helics_filter filt, const char *dest);
+HELICS_Export helics_status helicsFilterAddSourceTarget (helics_filter filt, const char *dest);
+HELICS_Export helics_status helicsFilterAddDeliveryEndpoint (helics_filter filt, const char *dest);
 
-HELICS_Export helics_status helicsFilterRemoveDestinationTarget(helics_filter filt, const char *dest);
-HELICS_Export helics_status helicsFilterRemoveSourceTarget(helics_filter filt, const char *dest);
-HELICS_Export helics_status helicsFilterRemoveDeliveryEndpoint(helics_filter filt, const char *dest);
+HELICS_Export helics_status helicsFilterRemoveDestinationTarget (helics_filter filt, const char *dest);
+HELICS_Export helics_status helicsFilterRemoveSourceTarget (helics_filter filt, const char *dest);
+HELICS_Export helics_status helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char *dest);
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif
 
 #endif /* HELICS_APISHARED_MESSAGE_FILTER_FEDERATE_FUNCTIONS_H_*/
-

@@ -24,7 +24,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 @details defining data used for storing the data for values and for messages
 */
 
-/** 
+/**
  * HELICS Core API
  */
 namespace helics
@@ -38,7 +38,7 @@ class data_block
   private:
     std::string m_data;  //!< using a string to represent the data
     friend class data_view;  //!< let data view access the string directly
-	friend class ActionMessage; //!< let action Message access the string directly
+    friend class ActionMessage;  //!< let action Message access the string directly
   public:
     /** default constructor */
     data_block () noexcept {};
@@ -134,10 +134,7 @@ class data_block
     void push_back (char newchar) { m_data.push_back (newchar); }
 };
 
-inline bool operator!=(const data_block &db1, const data_block &db2)
-{
-    return !(db1 == db2);
-}
+inline bool operator!= (const data_block &db1, const data_block &db2) { return !(db1 == db2); }
 
 /** class containing a message structure*/
 class Message
@@ -149,7 +146,7 @@ class Message
     std::string dest;  //!< the destination of the message
     std::string source;  //!< the most recent source of the message
     std::string original_source;  //!< the original source of the message
-    std::string original_dest; //!< the original destination of a message
+    std::string original_dest;  //!< the original destination of a message
   public:
     /** default constructor*/
     Message () noexcept {};
@@ -191,16 +188,13 @@ class FilterOperator
 };
 
 /** special filter operator defining no operation the original message is simply returned
-*/
-class NullFilterOperator final :public FilterOperator
+ */
+class NullFilterOperator final : public FilterOperator
 {
-public:
+  public:
     /**default constructor*/
-    NullFilterOperator() = default;
-    virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override
-    {
-        return message;
-    }
+    NullFilterOperator () = default;
+    virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) override { return message; }
 };
 
 /** helper template to check whether an index is actually valid for a particular vector*/
@@ -210,7 +204,7 @@ inline bool isValidIndex (sizeType testSize, const std::vector<dataType> &vec)
     return ((testSize >= sizeType (0)) && (testSize < static_cast<sizeType> (vec.size ())));
 }
 
-bool matchingTypes(const std::string &type1, const std::string &type2);
+bool matchingTypes (const std::string &type1, const std::string &type2);
 
 }  // namespace helics
 
@@ -231,6 +225,5 @@ inline void swap (helics::Message &m1, helics::Message &m2) noexcept
     m1.swap (m2);
 }
 }  // namespace std
-
 
 #endif

@@ -167,8 +167,7 @@ void TcpComms::txPriorityReceive (std::shared_ptr<TcpConnection> connection,
     }
 }
 
-size_t
-TcpComms::dataReceive (std::shared_ptr<TcpRxConnection> connection, const char *data, size_t bytes_received)
+size_t TcpComms::dataReceive (std::shared_ptr<TcpRxConnection> connection, const char *data, size_t bytes_received)
 {
     ActionMessage m;
     size_t used_total = 0;
@@ -252,7 +251,7 @@ void TcpComms::queue_rx_function ()
     auto ioserv = AsioServiceManager::getServicePointer ();
     TcpServer server (ioserv->getBaseService (), PortNumber, maxMessageSize_);
 
-    auto serviceLoop=ioserv->runServiceLoop ();
+    auto serviceLoop = ioserv->runServiceLoop ();
     server.setDataCall ([this](TcpRxConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     });
@@ -305,7 +304,7 @@ void TcpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
     auto ioserv = AsioServiceManager::getServicePointer ();
-    auto serviceLoop=ioserv->runServiceLoop ();
+    auto serviceLoop = ioserv->runServiceLoop ();
     TcpConnection::pointer brokerConnection;
 
     std::map<int, TcpConnection::pointer> routes;  // for all the other possible routes
@@ -322,7 +321,7 @@ void TcpComms::queue_tx_function ()
         try
         {
             brokerConnection = TcpConnection::create (ioserv->getBaseService (), brokerTarget_,
-                                                       std::to_string (brokerPort), maxMessageSize_);
+                                                      std::to_string (brokerPort), maxMessageSize_);
             int cumsleep = 0;
             while (!brokerConnection->isConnected ())
             {

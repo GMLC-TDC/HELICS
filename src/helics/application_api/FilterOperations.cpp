@@ -10,10 +10,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "FilterOperations.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
+#include "../core/core-exceptions.hpp"
 #include "Filters.hpp"
 #include "MessageOperators.hpp"
-#include "../core/core-exceptions.hpp"
-
 #include <algorithm>
 #include <iostream>
 #include <map>
@@ -44,6 +44,13 @@ void DelayFilterOperation::set (const std::string &property, double val)
         {
             delay = Time (val);
         }
+    }
+}
+
+void DelayFilterOperation::setString (const std::string &property, const std::string & /*val*/)
+{
+    if (property == "delay")
+    {
     }
 }
 
@@ -287,8 +294,8 @@ void RerouteFilterOperation::setString (const std::string &property, const std::
     {
         try
         {
-			//this line is to verify that it is a valid regex
-            auto test=std::regex (val);
+            // this line is to verify that it is a valid regex
+            auto test = std::regex (val);
             auto cond = conditions.lock ();
             cond->insert (val);
         }
@@ -337,8 +344,8 @@ void CloneFilterOperation::setString (const std::string &property, const std::st
 {
     if (property == "delivery")
     {
-		auto handle = deliveryAddresses.lock();
-		*handle=std::vector<std::string>{ val };
+        auto handle = deliveryAddresses.lock ();
+        *handle = std::vector<std::string>{val};
     }
     else if (property == "add delivery")
     {
