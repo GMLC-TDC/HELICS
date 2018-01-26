@@ -12,9 +12,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define TIME_COORDINATOR_H_
 #pragma once
 
-#include "TimeDependencies.hpp"
-#include "CoreFederateInfo.hpp"
 #include "ActionMessage.hpp"
+#include "CoreFederateInfo.hpp"
+#include "TimeDependencies.hpp"
 #include <atomic>
 #include <functional>
 
@@ -25,34 +25,37 @@ the time coordinator manages depedencies and computes whether time can advance o
 */
 class TimeCoordinator
 {
-private:
+  private:
 	// the variables for time coordination
-	Time time_granted = Time::minVal();  //!< the most recent time granted
-	Time time_requested = Time::maxVal();  //!< the most recent time requested
+    Time time_granted = Time::minVal ();  //!< the most recent time granted
+    Time time_requested = Time::maxVal ();  //!< the most recent time requested
 	Time time_next = timeZero;  //!< the next possible internal event time
 	Time time_minminDe = timeZero;  //!< the minimum  of the minimum dependency event Time
 	Time time_minDe = timeZero;  //!< the minimum event time of the dependencies
-	Time time_allow = Time::minVal();  //!< the current allowable time 
-	Time time_exec = Time::maxVal();  //!< the time of the next targeted execution
-	Time time_message = Time::maxVal();	//!< the time of the earliest message event
-	Time time_value = Time::maxVal();	//!< the time of the earliest value event
+    Time time_allow = Time::minVal ();  //!< the current allowable time
+    Time time_exec = Time::maxVal ();  //!< the time of the next targeted execution
+    Time time_message = Time::maxVal ();  //!< the time of the earliest message event
+    Time time_value = Time::maxVal ();  //!< the time of the earliest value event
 
 	TimeDependencies dependencies;  // federates which this Federate is temporally dependent on
 	std::vector<Core::federate_id_t> dependents;  // federates which temporally depend on this federate
 
 	CoreFederateInfo info;  //!< basic federate info the core uses
 	std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
-public:
-	Core::federate_id_t source_id;  //!< the identifier for inserting into the source id field of any generated messages;
-	bool iterating=false; //!< indicator that the coordinator should be iterating if need be
+
+  public:
+    Core::federate_id_t
+      source_id;  //!< the identifier for inserting into the source id field of any generated messages;
+    bool iterating = false;  //!< indicator that the coordinator should be iterating if need be
 	bool checkingExec = false; //!< flag indicating that the coordinator is trying to enter the exec mode
 	bool executionMode = false;	//!< flag that the coordinator has entered the execution Mode
-	bool hasInitUpdates = false;//!< flag indicating that a value or message was received during initialization stage
-private:
-	std::atomic<int32_t> iteration{ 0 };  //!< iteration counter
-public:
-	TimeCoordinator() = default;
-	TimeCoordinator(const CoreFederateInfo &info_);
+    bool hasInitUpdates =
+      false;  //!< flag indicating that a value or message was received during initialization stage
+  private:
+    std::atomic<int32_t> iteration{0};  //!< iteration counter
+  public:
+    TimeCoordinator () = default;
+    TimeCoordinator (const CoreFederateInfo &info_);
 
 	/* get the federate info used by the Core that affects timing*/
 	CoreFederateInfo &getFedInfo()
@@ -60,14 +63,12 @@ public:
 		return info;
 	}
 	/** get the core federate info in const setting*/
-	const CoreFederateInfo &getFedInfo() const
-	{
-		return info;
-	}
+    const CoreFederateInfo &getFedInfo () const { return info; }
 	/** set the core information using for timing as a block*/
-	void setInfo(const CoreFederateInfo &info_)
+    void setInfo (const CoreFederateInfo &info_) { info = info_; }
+    void setMessageSender (std::function<void(const ActionMessage &)> sendMessageFunction_)
 	{
-		info = info_;
+        sendMessageFunction = std::move (sendMessageFunction_);
 	}
 	/** set the callback function used for the sending messages*/
 	void setMessageSender(std::function<void(const ActionMessage &)> sendMessageFunction_)
@@ -83,56 +84,57 @@ public:
 	/** get a list of actual depedendencies*/
     std::vector < Core::federate_id_t> getDependencies() const;
     /** get a reference to the dependents vector*/
-	const std::vector<Core::federate_id_t> &getDependents() const { return dependents; }
+    const std::vector<Core::federate_id_t> &getDependents () const { return dependents; }
 	/** get the current iteration counter for an iterative call
 	@details this will work properly even when a federate is processing
 	*/
-	int32_t getCurrentIteration() const { return iteration; }
+    int32_t getCurrentIteration () const { return iteration; }
 	/** compute updates to time values
 	@return true if they have been modified
 	*/
-	bool updateTimeFactors();
+    bool updateTimeFactors ();
 	/** update the time_value variable with a new value if needed
 	*/
-	void updateValueTime(Time valueUpdateTime);
+    void updateValueTime (Time valueUpdateTime);
 	/** update the time_message variable with a new value if needed
 	*/
-	void updateMessageTime(Time messageUpdateTime);
+    void updateMessageTime (Time messageUpdateTime);
 
 	/** take a global id and get a pointer to the dependencyInfo for the other fed
 	will be nullptr if it doesn't exist
 	*/
-	DependencyInfo *getDependencyInfo(Core::federate_id_t ofed);
+    DependencyInfo *getDependencyInfo (Core::federate_id_t ofed);
 	/** check whether a federate is a dependency*/
-	bool isDependency(Core::federate_id_t ofed) const;
+    bool isDependency (Core::federate_id_t ofed) const;
 
-private:
+  private:
 	/** helper function for computing the next event time*/
-	void updateNextExecutionTime();
+    void updateNextExecutionTime ();
 	/** helper function for computing the next possible time to generate an external event
 	*/
-	void updateNextPossibleEventTime();
-public:
+    void updateNextPossibleEventTime ();
+
+  public:
 	/** process a message related to time
 	@return true if it did anything
 	*/
-	bool processTimeMessage(const ActionMessage &cmd);
+    bool processTimeMessage (const ActionMessage &cmd);
 
     /** process a message related to configuration
     @param cmd the update command
     @param initMode set to true to allow init only updates
     */
-    void processConfigUpdateMessage(const ActionMessage &cmd, bool initMode=false);
+    void processConfigUpdateMessage (const ActionMessage &cmd, bool initMode = false);
     /** process a dependency update message*/
-    void processDependencyUpdateMessage(const ActionMessage &cmd);
+    void processDependencyUpdateMessage (const ActionMessage &cmd);
 	/** add a federate dependency
 	@return true if it was actually added, false if the federate was already present
 	*/
-	bool addDependency(Core::federate_id_t fedID);
+    bool addDependency (Core::federate_id_t fedID);
 	/** add a dependent federate
 	@return true if it was actually added, false if the federate was already present
 	*/
-	bool addDependent(Core::federate_id_t fedID);
+    bool addDependent (Core::federate_id_t fedID);
 	/** remove a depdendency
 	@param fedID the identifier of the federate to remove*/
 	void removeDependency(Core::federate_id_t fedID);
@@ -141,8 +143,7 @@ public:
 	void removeDependent(Core::federate_id_t fedID);
 
 	/** check if entry to the executing state can be granted*/
-	iteration_state checkExecEntry();
-	
+    iteration_state checkExecEntry ();
 	/** request a time 
 	@param nextTime the new requested time
 	@param iterate the mode of iteration to use (no_iteration, force_iteration, iterate_if_needed)
@@ -155,9 +156,9 @@ public:
 	*/
 	void enteringExecMode(helics_iteration_request mode);
 	/** check if it is valid to grant a time*/
-	iteration_state checkTimeGrant();
+    iteration_state checkTimeGrant ();
     /** generate a string with the current time status*/
-    std::string printTimeStatus() const;
+    std::string printTimeStatus () const;
 };
 }
 

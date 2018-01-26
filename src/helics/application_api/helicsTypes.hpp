@@ -283,7 +283,8 @@ constexpr bool isConvertableType ()
 }
 
 template <class X>
-constexpr typename std::enable_if<helicsType<X> () != helics_type_t::helicsInvalid, bool>::type isConvertableType ()
+constexpr typename std::enable_if<helicsType<X> () != helics_type_t::helicsInvalid, bool>::type
+isConvertableType ()
 {
     return false;
 }

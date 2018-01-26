@@ -25,7 +25,7 @@ using atomic_guarded = libguarded::atomic_guarded<T>;
 
 #ifdef HAVE_SHARED_MUTEX
 template <class T>
-using shared_guarded= libguarded::shared_guarded<T, std::shared_mutex>;
+using shared_guarded = libguarded::shared_guarded<T, std::shared_mutex>;
 
 template <class T>
 using ordered_guarded = libguarded::ordered_guarded<T, std::shared_mutex>;
@@ -45,4 +45,3 @@ template <class T>
 using ordered_guarded = libguarded::ordered_guarded<T, std::mutex>;
 #endif
 #endif
-

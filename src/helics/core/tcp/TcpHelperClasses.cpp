@@ -119,17 +119,17 @@ void TcpRxConnection::close ()
 }
 
 TcpConnection::pointer TcpConnection::create (boost::asio::io_service &io_service,
-                                                const std::string &connection,
-                                                const std::string &port,
-                                                size_t bufferSize)
+                                              const std::string &connection,
+                                              const std::string &port,
+                                              size_t bufferSize)
 {
     return pointer (new TcpConnection (io_service, connection, port, bufferSize));
 }
 
 TcpConnection::TcpConnection (boost::asio::io_service &io_service,
-                                const std::string &connection,
-                                const std::string &port,
-                                size_t bufferSize)
+                              const std::string &connection,
+                              const std::string &port,
+                              size_t bufferSize)
     : socket_ (io_service), data (bufferSize)
 {
     tcp::resolver resolver (io_service);
@@ -216,8 +216,7 @@ void TcpServer::start ()
             conn->start ();
         }
     }
-    TcpRxConnection::pointer new_connection =
-      TcpRxConnection::create (acceptor_.get_io_service (), bufferSize);
+    TcpRxConnection::pointer new_connection = TcpRxConnection::create (acceptor_.get_io_service (), bufferSize);
     acceptor_.async_accept (new_connection->socket (),
                             [this, new_connection](const boost::system::error_code &error) {
                                 handle_accept (new_connection, error);

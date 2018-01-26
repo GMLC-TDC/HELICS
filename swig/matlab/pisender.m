@@ -1,5 +1,5 @@
 
-loadlibrary('./../../../helics_install/lib/helics/libhelicsSharedLib.dylib');
+loadlibrary(GetFullPath('~/local/helics-1.0.0a/lib/libhelicsSharedLib.dylib'));
 
 initstring = '2 --name=mainbroker';
 fedinitstring = '--broker=mainbroker --federates=1';
@@ -49,11 +49,11 @@ vfed = helics.helicsCreateValueFederate(fedinfo);
 display('PI SENDER: Value federate created');
 
 % Register the publication
-pub = helics.helicsRegisterGlobalPublication(vfed, 'testA', 'double', '');
+pub = helics.helicsFederateRegisterGlobalPublication(vfed, 'testA', 'double', '');
 display('PI SENDER: Publication registered');
 
 % Enter execution mode
-status = helics.helicsEnterExecutionMode(vfed);
+status = helics.helicsFederateEnterExecutionMode(vfed);
 display('PI SENDER: Entering execution mode');
 
 % This federate will be publishing deltat*pi for numsteps steps
@@ -63,13 +63,13 @@ value = 22.0 / 7.0;
 for i = 1:20
     val = value;
 
-    currenttime = helics.helicsRequestTime(vfed, this_time + (deltat * i));
+    currenttime = helics.helicsFederateRequestTime(vfed, i);
 
     display(strcat('PI SENDER: Sending value pi =', num2str(val), ' at time ', num2str(this_time + (deltat * i)),' to PI RECEIVER'));
-    status = helics.helicsPublishDouble(pub, val);
+    status = helics.helicsPublicationPublishDouble(pub, val);
 end
 
-status = helics.helicsFinalize(vfed);
+status = helics.helicsFederateFinalize(vfed);
 display('PI SENDER: Federate finalized');
 
 
@@ -77,7 +77,7 @@ while helics.helicsBrokerIsConnected(broker)
     pause(1);
 end
 
-helics.helicsFreeFederate(vfed);
+helics.helicsFederateFree(vfed);
 helics.helicsCloseLibrary();
 
 display('PI SENDER: Broker disconnected');

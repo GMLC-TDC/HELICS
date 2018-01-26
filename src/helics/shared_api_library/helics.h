@@ -34,7 +34,7 @@ extern "C" {
 #endif
 #endif
 
-/** @file 
+/** @file
 @brief common functions for the C api
 */
 /***************************************************

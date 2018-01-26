@@ -9,10 +9,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "MessageFederate.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "MessageFederateManager.hpp"
-#include "../common/JsonProcessingFunctions.hpp"
 
 namespace helics
 {
@@ -25,7 +25,7 @@ MessageFederate::MessageFederate (std::shared_ptr<Core> core, const FederateInfo
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
 }
-MessageFederate::MessageFederate (const std::string &jsonString) : Federate (jsonString)
+MessageFederate::MessageFederate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
     registerInterfaces (jsonString);
@@ -87,18 +87,22 @@ endpoint_id_t MessageFederate::registerGlobalEndpoint (const std::string &name, 
 
 void MessageFederate::registerInterfaces (const std::string &jsonString)
 {
+    registerMessageInterfaces (jsonString);
+    Federate::registerFilterInterfaces (jsonString);
+}
+
+void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
+{
     if (state != op_states::startup)
     {
         throw (InvalidFunctionCall ("cannot call register Interfaces after entering initialization mode"));
     }
-	auto doc = loadJsonString(jsonString);
-    
+    auto doc = loadJsonString (jsonString);
+
     if (doc.isMember ("endpoints"))
     {
-        auto epts = doc["endpoints"];
-        for (auto eptIt = epts.begin (); eptIt != epts.end (); ++eptIt)
+        for (const auto &ept : doc["endpoints"])
         {
-            auto ept = (*eptIt);
             auto name = ept["name"].asString ();
             auto type = (ept.isMember ("type")) ? ept["type"].asString () : "";
             bool global = (ept.isMember ("global")) ? (ept["global"].asBool ()) : false;
@@ -113,39 +117,57 @@ void MessageFederate::registerInterfaces (const std::string &jsonString)
             }
 
             // retrieve the known paths
-            if (ept.isMember ("knownPaths"))
+            if (ept.isMember ("knownDestinations"))
             {
-                auto kp = ept["knownPaths"];
+                auto kp = ept["knownDestinations"];
                 if (kp.isString ())
                 {
                     registerKnownCommunicationPath (epid, kp.asString ());
                 }
                 else if (kp.isArray ())
                 {
-                    for (auto kpIt = kp.begin (); kpIt != kp.end (); ++kpIt)
+                    for (const auto &path : kp)
                     {
-                        registerKnownCommunicationPath (epid, (*kpIt).asString ());
+                        registerKnownCommunicationPath (epid, path.asString ());
                     }
                 }
             }
             // endpoints can subscribe to publications
             if (ept.isMember ("subscriptions"))
             {
-                auto sub = ept["subscriptions"];
-                if (sub.isString ())
+                auto subs = ept["subscriptions"];
+                if (subs.isString ())
                 {
-                    subscribe (epid, sub.asString (), "");
+                    subscribe (epid, subs.asString (), std::string ());
                 }
-                else if (sub.isArray ())
+                else if (subs.isArray ())
                 {
-                    for (auto subIt = sub.begin (); subIt != sub.end (); ++subIt)
+                    for (const auto &sub : subs)
                     {
-                        subscribe (epid, (*subIt).asString (), "");
+                        subscribe (epid, sub.asString (), std::string ());
                     }
                 }
             }
         }
     }
+    /*
+    // retrieve the known paths
+    if (doc.isMember("knownDestinations"))
+    {
+        auto kp = doc["knownDestinations"];
+        if (kp.isString())
+        {
+           // registerKnownCommunicationPath(epid, kp.asString());
+        }
+        else if (kp.isArray())
+        {
+           for (const auto &path : kp)
+            {
+           //     registerKnownCommunicationPath(epid, (*kpIt).asString());
+            }
+        }
+    }
+    */
 }
 
 void MessageFederate::subscribe (endpoint_id_t endpoint, const std::string &name, const std::string &type)

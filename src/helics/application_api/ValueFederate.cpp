@@ -9,10 +9,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "ValueFederate.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "ValueFederateManager.hpp"
-#include "../common/JsonProcessingFunctions.hpp"
 
 namespace helics
 {
@@ -27,7 +27,7 @@ ValueFederate::ValueFederate (std::shared_ptr<Core> core, const FederateInfo &fi
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
 }
-ValueFederate::ValueFederate (const std::string &jsonString) : Federate (jsonString)
+ValueFederate::ValueFederate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
     registerInterfaces (jsonString);
@@ -114,12 +114,18 @@ void ValueFederate::setDefaultValue (subscription_id_t id, data_view block)
 
 void ValueFederate::registerInterfaces (const std::string &jsonString)
 {
+    registerValueInterfaces (jsonString);
+    Federate::registerInterfaces (jsonString);
+}
+
+void ValueFederate::registerValueInterfaces (const std::string &jsonString)
+{
     if (state != op_states::startup)
     {
         throw (InvalidFunctionCall ("cannot call register Interfaces after entering initialization mode"));
     }
-	auto doc = loadJsonString(jsonString);
-    
+    auto doc = loadJsonString (jsonString);
+
     if (doc.isMember ("publications"))
     {
         auto pubs = doc["publications"];

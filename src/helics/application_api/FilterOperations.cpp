@@ -10,10 +10,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "FilterOperations.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
+#include "../core/core-exceptions.hpp"
 #include "Filters.hpp"
 #include "MessageOperators.hpp"
-#include "../core/core-exceptions.hpp"
-
 #include <algorithm>
 #include <iostream>
 #include <map>
@@ -44,6 +44,13 @@ void DelayFilterOperation::set (const std::string &property, double val)
         {
             delay = Time (val);
         }
+    }
+}
+
+void DelayFilterOperation::setString (const std::string &property, const std::string & /*val*/)
+{
+    if (property == "delay")
+    {
     }
 }
 
@@ -279,16 +286,16 @@ void RerouteFilterOperation::set (const std::string & /*property*/, double /*val
 
 void RerouteFilterOperation::setString (const std::string &property, const std::string &val)
 {
-    if (property == "target")
+    if (property == "newdestination")
     {
-        newTarget = val;
+        newDest = val;
     }
-    else if (property == "filter")
+    else if (property == "condition")
     {
         try
         {
-			//this line is to verify that it is a valid regex
-            auto test=std::regex (val);
+            // this line is to verify that it is a valid regex
+            auto test = std::regex (val);
             auto cond = conditions.lock ();
             cond->insert (val);
         }
@@ -311,14 +318,14 @@ std::string RerouteFilterOperation::rerouteOperation (const std::string &dest) c
     auto cond = conditions.lock_shared ();
     if (cond->empty ())
     {
-        return newTarget.load ();
+        return newDest.load ();
     }
     for (auto &sr : *cond)
     {
         std::regex reg (sr);
         if (std::regex_match (dest, reg))
         {
-            return newTarget.load ();
+            return newDest.load ();
         }
     }
     return dest;
@@ -337,8 +344,8 @@ void CloneFilterOperation::setString (const std::string &property, const std::st
 {
     if (property == "delivery")
     {
-		auto handle = deliveryAddresses.lock();
-		*handle=std::vector<std::string>{ val };
+        auto handle = deliveryAddresses.lock ();
+        *handle = std::vector<std::string>{val};
     }
     else if (property == "add delivery")
     {

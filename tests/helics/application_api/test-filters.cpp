@@ -270,7 +270,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     auto p4 = dcFed->registerGlobalEndpoint ("cm");
 
     helics::CloningFilter cFilt (dcFed.get ());
-    cFilt.addSourceTarget("src");
+    cFilt.addSourceTarget ("src");
     cFilt.addSourceTarget ("src2");
     cFilt.addDeliveryEndpoint ("cm");
 
@@ -353,5 +353,24 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     dFed->finalize ();
     dcFed->finalize ();
     BOOST_CHECK (sFed->getCurrentState () == helics::Federate::op_states::finalize);
+}
+
+BOOST_AUTO_TEST_CASE (test_file_load)
+{
+    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_filters.json");
+
+    BOOST_CHECK_EQUAL (mFed.getName (), "filterFed");
+
+    BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 3);
+    auto id = mFed.getEndpointId ("ept1");
+    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
+
+    BOOST_CHECK_EQUAL (mFed.filterObjectCount (), 3);
+
+    auto filt = mFed.getFilterObject (2);
+
+    auto cloneFilt = std::dynamic_pointer_cast<helics::CloningFilter> (filt);
+    BOOST_CHECK (cloneFilt);
+    mFed.disconnect ();
 }
 BOOST_AUTO_TEST_SUITE_END ()

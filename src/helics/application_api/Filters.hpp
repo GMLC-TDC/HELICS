@@ -28,8 +28,12 @@ enum class defined_filter_types
     randomDrop = 3,
     reroute = 4,
     clone = 5,
+    unrecognized = 6
 
 };
+
+/** get the filter type from a string*/
+defined_filter_types filterTypeFromString (const std::string &filterType) noexcept;
 
 /** class for managing a particular filter*/
 class Filter
@@ -157,7 +161,7 @@ class CloningFilter : public Filter
     /** add a sourceEndpoint to the list of endpoint to clone*/
     void addSourceTarget (const std::string &sourceName);
     /** add a destination endpoint to the list of endpoints to clone*/
-    void addDestinationTarget(const std::string &destinationName);
+    void addDestinationTarget (const std::string &destinationName);
     /** add a delivery address this is the name of an endpoint to deliver the message to*/
     void addDeliveryEndpoint (const std::string &endpoint);
 

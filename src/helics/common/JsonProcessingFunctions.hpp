@@ -9,11 +9,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #pragma once
-/** @file 
+/** @file
 @details functions related to loading and evaluating json files and helper functions for reading them
 using the json cpp library
 */
-
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -25,10 +24,10 @@ using the json cpp library
 #endif
 
 #include "../core/helics-time.hpp"
-/** load a json string or filename that points to a json file and return a 
+/** load a json string or filename that points to a json file and return a
 json::Value to the root object
 */
-Json_helics::Value loadJsonString(const std::string &jsonString);
+Json_helics::Value loadJsonString (const std::string &jsonString);
 
 /** read a time from a JSON value element*/
 helics::Time loadJsonTime(const Json_helics::Value &timeElement);

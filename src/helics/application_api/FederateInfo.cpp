@@ -11,10 +11,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "Federate.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
+#include "../core/core-exceptions.hpp"
+#include "../core/helicsVersion.hpp"
 #include <iostream>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
-#include "../core/helicsVersion.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
 
@@ -128,11 +130,18 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     }
 }
 
-FederateInfo LoadFederateInfo (const std::string &jsonString)
+FederateInfo loadFederateInfo (const std::string &jsonString)
 {
     FederateInfo fi;
-	Json_helics::Value doc = loadJsonString(jsonString);
-
+    Json_helics::Value doc;
+    try
+    {
+        doc = loadJsonString (jsonString);
+    }
+    catch (const std::invalid_argument &ia)
+    {
+        throw (helics::InvalidParameter (ia.what ()));
+    }
 
     if (doc.isMember ("name"))
     {
@@ -196,26 +205,26 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     }
     if (doc.isMember ("period"))
     {
-		fi.period = loadJsonTime(doc["period"]);
+        fi.period = loadJsonTime (doc["period"]);
     }
 
     if (doc.isMember ("offset"))
     {
-		fi.offset = loadJsonTime(doc["offset"]);
+        fi.offset = loadJsonTime (doc["offset"]);
     }
 
     if (doc.isMember ("timeDelta"))
     {
-		fi.timeDelta = loadJsonTime(doc["timeDelta"]);
+        fi.timeDelta = loadJsonTime (doc["timeDelta"]);
     }
 
     if (doc.isMember ("outputDelay"))
     {
-		fi.outputDelay = loadJsonTime(doc["outputDelay"]);
+        fi.outputDelay = loadJsonTime (doc["outputDelay"]);
     }
     if (doc.isMember ("inputDelay"))
     {
-		fi.inputDelay = loadJsonTime(doc["inputDelay"]);
+        fi.inputDelay = loadJsonTime (doc["inputDelay"]);
     }
     return fi;
 }

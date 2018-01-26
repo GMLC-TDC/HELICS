@@ -12,9 +12,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/common/AsioServiceManager.h"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
+#include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-types.hpp"
-#include "helics/core/Core.hpp"
 #include "helics/core/tcp/TcpBroker.h"
 #include "helics/core/tcp/TcpComms.h"
 #include "helics/core/tcp/TcpCore.h"
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
 
     auto srv = AsioServiceManager::getServicePointer ();
     TcpServer server (srv->getBaseService (), TCP_BROKER_PORT);
-    auto serviceLoop=srv->runServiceLoop ();
+    auto serviceLoop = srv->runServiceLoop ();
     std::vector<char> data (1024);
     auto dataCheck = [&counter](TcpRxConnection::pointer, const char *datablock, size_t datasize) {
         size_t used = 0;
@@ -108,7 +108,6 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     conn3->close ();
     conn4->close ();
     server.close ();
-
 }
 
 BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
@@ -162,13 +161,12 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     TcpServer server (srv->getBaseService (), TCP_BROKER_PORT);
     srv->runServiceLoop ();
     std::vector<char> data (1024);
-    server.setDataCall (
-      [&data, &counter, &len](TcpRxConnection::pointer, const char *data_rec, size_t data_Size) {
-          std::copy (data_rec, data_rec + data_Size, data.begin ());
-          len = data_Size;
-          ++counter;
-          return data_Size;
-      });
+    server.setDataCall ([&data, &counter, &len](TcpRxConnection::pointer, const char *data_rec, size_t data_Size) {
+        std::copy (data_rec, data_rec + data_Size, data.begin ());
+        len = data_Size;
+        ++counter;
+        return data_Size;
+    });
     server.start ();
 
     comm.setCallback ([](helics::ActionMessage m) {});
@@ -405,13 +403,12 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
     srv->runServiceLoop ();
     std::vector<char> data (1024);
     std::atomic<size_t> len{0};
-    server.setDataCall (
-      [&data, &counter, &len](TcpRxConnection::pointer, const char *data_rec, size_t data_Size) {
-          std::copy (data_rec, data_rec + data_Size, data.begin ());
-          len = data_Size;
-          ++counter;
-          return data_Size;
-      });
+    server.setDataCall ([&data, &counter, &len](TcpRxConnection::pointer, const char *data_rec, size_t data_Size) {
+        std::copy (data_rec, data_rec + data_Size, data.begin ());
+        len = data_Size;
+        ++counter;
+        return data_Size;
+    });
     server.start ();
 
     bool connected = core->connect ();

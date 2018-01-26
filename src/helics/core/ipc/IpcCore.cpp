@@ -9,9 +9,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "IpcCore.h"
+#include "../Core.hpp"
 #include "../core-data.hpp"
 #include "../core-exceptions.hpp"
-#include "../Core.hpp"
 #include "../helics-time.hpp"
 #include "helics/helics-config.h"
 

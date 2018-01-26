@@ -10,11 +10,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #pragma once
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 /** class combining a vector of objects with a map to search them by a separate index term
-the main use case is a bunch of inserts then searching with limited to no removal since removal is a rather expensive operation
+the main use case is a bunch of inserts then searching with limited to no removal since removal is a rather
+expensive operation
 */
 template <class VType, class searchType = std::string>
 class MappedVector
@@ -42,16 +43,16 @@ class MappedVector
         }
     }
 
-    auto find(const searchType &searchValue)
+    auto find (const searchType &searchValue)
     {
-        auto fnd = lookup.find(searchValue);
-        if (fnd != lookup.end())
+        auto fnd = lookup.find (searchValue);
+        if (fnd != lookup.end ())
         {
-            return dataStorage_.begin() + fnd->second;
+            return dataStorage_.begin () + fnd->second;
         }
         else
         {
-            return dataStorage_.end();
+            return dataStorage_.end ();
         }
     }
 
@@ -78,13 +79,13 @@ class MappedVector
 	/** get a const reference to the last element of the vector*/
 	const VType &back() const { return dataStorage_.back(); }
 	/** remove an element by its index*/
-	void removeIndex(size_t index)
+    void removeIndex (size_t index)
 	{
-		if (index >= dataStorage_.size())
+        if (index >= dataStorage_.size ())
 		{
 			return;
 		}
-		dataStorage_.erase(dataStorage_.begin() + index);
+        dataStorage_.erase (dataStorage_.begin () + index);
 		searchType ind;
 		for (auto &el2 : lookup)
 		{
@@ -97,22 +98,22 @@ class MappedVector
 				ind = el2.first;
 			}
 		}
-		auto fnd = lookup.find(ind);
-		if (fnd != lookup.end())
+        auto fnd = lookup.find (ind);
+        if (fnd != lookup.end ())
 		{
-			lookup.erase(fnd);
+            lookup.erase (fnd);
 		}
 	}
 
-	void remove(const searchType &search)
+    void remove (const searchType &search)
 	{
-		auto el = lookup.find(search);
-		if (el == lookup.end())
+        auto el = lookup.find (search);
+        if (el == lookup.end ())
 		{
 			return;
 		}
 		auto index = el->second;
-		dataStorage_.erase(dataStorage_.begin() + index);
+        dataStorage_.erase (dataStorage_.begin () + index);
 		for (auto &el2 : lookup)
 		{
 			if (el2.second > index)
@@ -120,23 +121,23 @@ class MappedVector
 				el2.second -= 1;
 			}
 		}
-		lookup.erase(el);
+        lookup.erase (el);
 	}
 
 	/** apply a function to all the values
 	@param F must be a function with signature like void fun(const VType &a);*/
-	template<class UnaryFunction >
-	void apply(UnaryFunction F)
+    template <class UnaryFunction>
+    void apply (UnaryFunction F)
 	{
-		std::for_each(dataStorage_.begin(), dataStorage_.end(), F);
+        std::for_each (dataStorage_.begin (), dataStorage_.end (), F);
 	}
 
 	/** transform all the values
 	F must be a function with signature like void VType(const VType &a);*/
-	template<class UnaryFunction >
-	void transform(UnaryFunction F)
+    template <class UnaryFunction>
+    void transform (UnaryFunction F)
 	{
-		std::transform(dataStorage_.begin(), dataStorage_.end(), dataStorage_.begin(), F);
+        std::transform (dataStorage_.begin (), dataStorage_.end (), dataStorage_.begin (), F);
 	}
 	/*NOTE:: only constant iterators allowed since this would introduce the possibilty
 	of using iterators for various algorithms which could cause the object to go to a indeterminate state

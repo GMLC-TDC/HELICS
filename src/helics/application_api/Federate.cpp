@@ -12,20 +12,18 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreFactory.hpp"
 #include "../core/core-exceptions.hpp"
+#include "Filters.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../core/Core.hpp"
 #include "AsyncFedCallInfo.hpp"
 #include "helics/helics-config.h"
 
 #include <cassert>
-#include <fstream>
 #include <iostream>
-#include <sstream>
 
 namespace helics
 {
-
-
 void cleanupHelicsLibrary ()
 {
     BrokerFactory::cleanUpBrokers (200);
@@ -70,6 +68,7 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
     fedID = coreObject->registerFederate (fi.name, fi);
 
     currentTime = coreObject->getCurrentTime (fedID);
+    asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
 }
 
 Federate::Federate (std::shared_ptr<Core> core, const FederateInfo &fi)
@@ -108,9 +107,13 @@ Federate::Federate (std::shared_ptr<Core> core, const FederateInfo &fi)
         return;
     }
     currentTime = coreObject->getCurrentTime (fedID);
+    asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
 }
 
-Federate::Federate (const std::string &jsonString) : Federate (LoadFederateInfo (jsonString)) {}
+Federate::Federate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
+{
+    registerFilterInterfaces (jsonString);
+}
 
 Federate::Federate () noexcept
 {
@@ -125,10 +128,7 @@ Federate::Federate (Federate &&fed) noexcept
     coreObject = std::move (fed.coreObject);
     currentTime = fed.currentTime;
     FedInfo = std::move (fed.FedInfo);
-    if (asyncCallInfo)
-    {
-        asyncCallInfo = std::move (fed.asyncCallInfo);
-    }
+    asyncCallInfo = std::move (fed.asyncCallInfo);
 }
 
 Federate &Federate::operator= (Federate &&fed) noexcept
@@ -139,10 +139,7 @@ Federate &Federate::operator= (Federate &&fed) noexcept
     coreObject = std::move (fed.coreObject);
     currentTime = fed.currentTime;
     FedInfo = std::move (fed.FedInfo);
-    if (asyncCallInfo)
-    {
-        asyncCallInfo = std::move (fed.asyncCallInfo);
-    }
+    asyncCallInfo = std::move (fed.asyncCallInfo);
     return *this;
 }
 
@@ -169,7 +166,7 @@ void Federate::enterInitializationState ()
     }
     else if (state != op_states::initialization)  // if we are already in initialization do nothing
     {
-        throw (InvalidFunctionCall("cannot transition from current state to initialization state"));
+        throw (InvalidFunctionCall ("cannot transition from current state to initialization state"));
     }
 }
 
@@ -177,10 +174,6 @@ void Federate::enterInitializationStateAsync ()
 {
     if (state == op_states::startup)
     {
-        if (!asyncCallInfo)
-        {
-            asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
-        }
         state = op_states::pending_init;
         asyncCallInfo->initFuture =
           std::async (std::launch::async, [this]() { coreObject->enterInitializingState (fedID); });
@@ -215,16 +208,22 @@ bool Federate::isAsyncOperationCompleted () const
 
 void Federate::enterInitializationStateComplete ()
 {
-    if (state == op_states::pending_init)
+    switch (state)
     {
+    case op_states::pending_init:
         asyncCallInfo->initFuture.get ();
         state = op_states::initialization;
         currentTime = coreObject->getCurrentTime (fedID);
         startupToInitializeStateTransition ();
-    }
-    else
-    {
-        throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
+        break;
+    case op_states::initialization:
+        break;
+    case op_states::startup:
+        enterInitializationState ();
+        break;
+    default:
+        throw (InvalidFunctionCall ("cannot call Initialization Complete function without first calling "
+                                    "enterInitializationStateAsync function"));
     }
 }
 
@@ -270,7 +269,7 @@ iteration_result Federate::enterExecutionState (helics_iteration_request iterate
     case op_states::pending_iterative_time:  // since this isn't guaranteed to progress it shouldn't be called in
                                              // this fashion
     default:
-        throw (InvalidFunctionCall("cannot transition from current state to execution state"));
+        throw (InvalidFunctionCall ("cannot transition from current state to execution state"));
         break;
     }
     return res;
@@ -282,11 +281,6 @@ void Federate::enterExecutionStateAsync (helics_iteration_request iterate)
     {
     case op_states::startup:
     {
-        if (!asyncCallInfo)
-        {
-            asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
-        }
-
         auto eExecFunc = [this, iterate]() {
             coreObject->enterInitializingState (fedID);
             startupToInitializeStateTransition ();
@@ -301,11 +295,6 @@ void Federate::enterExecutionStateAsync (helics_iteration_request iterate)
         FALLTHROUGH
     case op_states::initialization:
     {
-        if (!asyncCallInfo)
-        {
-            asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
-        }
-
         auto eExecFunc = [this, iterate]() { return coreObject->enterExecutingState (fedID, iterate); };
         state = op_states::pending_exec;
         asyncCallInfo->execFuture = std::async (std::launch::async, eExecFunc);
@@ -524,10 +513,6 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 {
     if (state == op_states::execution)
     {
-        if (!asyncCallInfo)
-        {
-            asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
-        }
         state = op_states::pending_time;
         asyncCallInfo->timeRequestFuture = std::async (std::launch::async, [this, nextInternalTimeStep]() {
             return coreObject->timeRequest (fedID, nextInternalTimeStep);
@@ -546,10 +531,6 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, helics_iter
 {
     if (state == op_states::execution)
     {
-        if (!asyncCallInfo)
-        {
-            asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
-        }
         state = op_states::pending_iterative_time;
         asyncCallInfo->timeRequestIterativeFuture =
           std::async (std::launch::async, [this, nextInternalTimeStep, iterate]() {
@@ -632,10 +613,164 @@ void Federate::initializeToExecuteStateTransition ()
     // child classes may do something with this
 }
 
-void Federate::registerInterfaces (const std::string & /*jsonString*/)
+void Federate::registerInterfaces (const std::string &jsonString) { registerFilterInterfaces (jsonString); }
+
+void Federate::registerFilterInterfaces (const std::string &jsonString)
 {
-    // child classes would implement this
+    auto doc = loadJsonString (jsonString);
+
+    if (doc.isMember ("filters"))
+    {
+        for (const auto &filt : doc["filters"])
+        {
+            std::string name;
+            bool useTypes = false;
+            if (filt.isMember ("name"))
+            {
+                name = filt["name"].asString ();
+            }
+            std::string target;
+            if (filt.isMember ("target"))
+            {
+                target = filt["target"].asString ();
+            }
+            std::string inputType;
+            if (filt.isMember ("inputType"))
+            {
+                inputType = filt["inputType"].asString ();
+                useTypes = true;
+            }
+            std::string outputType;
+            if (filt.isMember ("outputType"))
+            {
+                outputType = filt["outputType"].asString ();
+                useTypes = true;
+            }
+
+            std::string mode = "source";
+            if (filt.isMember ("mode"))
+            {
+                mode = filt["mode"].asString ();
+            }
+            std::string operation ("custom");
+            if (filt.isMember ("operation"))
+            {
+                operation = filt["operation"].asString ();
+                if ((mode == "clone") || (mode == "cloning"))
+                {
+                    if (operation != "clone")
+                    {
+                        std::cerr << "the only valid operation with cloning filter is \"clone\"\n";
+                        continue;
+                    }
+                }
+            }
+            if ((useTypes) && (operation != "custom"))
+            {
+                std::cerr << "input and output types may only be specified for custom filters\n";
+                continue;
+            }
+            if (useTypes)
+            {
+                if (mode == "source")
+                {
+                    registerSourceFilter (name, target, inputType, outputType);
+                }
+                else if ((mode == "dest") || (mode == "destination"))
+                {
+                    registerDestinationFilter (name, target, inputType, outputType);
+                }
+                else
+                {
+                    std::cerr << "filter mode " << mode << " is unrecognized no filter created\n";
+                }
+            }
+            else
+            {
+                std::shared_ptr<Filter> filter;
+                auto type = filterTypeFromString (operation);
+                if (type == defined_filter_types::unrecognized)
+                {
+                    std::cerr << "unrecognized filter operation:" << operation << '\n';
+                    continue;
+                }
+                if (mode == "source")
+                {
+                    filter = make_source_filter (type, this, target, name);
+                }
+                else if ((mode == "dest") || (mode == "destination"))
+                {
+                    filter = make_destination_filter (type, this, target, name);
+                }
+                else if ((mode == "clone") || (mode == "cloning"))
+                {
+                    // TODO:: do something with the name
+                    auto clonefilt = std::make_shared<CloningFilter> (this);
+                    clonefilt->addDeliveryEndpoint (target);
+                    filter = std::move (clonefilt);
+                }
+                else
+                {
+                    std::cerr << "filter mode " << mode << " is unrecognized no filter created\n";
+                }
+
+                if (filt.isMember ("properties"))
+                {
+                    auto props = filt["properties"];
+                    if (props.isArray ())
+                    {
+                        for (const auto &prop : props)
+                        {
+                            if ((!prop.isMember ("name")) && (!prop.isMember ("value")))
+                            {
+                                std::cerr << "properties must be specified with name and value fields\n";
+                                continue;
+                            }
+                            if (prop["value"].isDouble ())
+                            {
+                                filter->set (prop["name"].asString (), prop["value"].asDouble ());
+                            }
+                            else
+                            {
+                                filter->setString (prop["name"].asString (), prop["value"].asString ());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if ((!props.isMember ("name")) && (!props.isMember ("value")))
+                        {
+                            std::cerr << "properties must be specified with name and value fields\n";
+                            continue;
+                        }
+                        if (props["value"].isDouble ())
+                        {
+                            filter->set (props["name"].asString (), props["value"].asDouble ());
+                        }
+                        else
+                        {
+                            filter->setString (props["name"].asString (), props["value"].asString ());
+                        }
+                    }
+                }
+                addFilterObject (std::move (filter));
+            }
+        }
+    }
 }
+
+std::shared_ptr<Filter> Federate::getFilterObject (int index)
+{
+    if (isValidIndex (index, localFilters))
+    {
+        return localFilters[index];
+    }
+    return nullptr;
+}
+
+void Federate::addFilterObject (std::shared_ptr<Filter> obj) { localFilters.push_back (std::move (obj)); }
+
+int Federate::filterObjectCount () const { return static_cast<int> (localFilters.size ()); }
 
 std::string Federate::query (const std::string &queryStr)
 {
@@ -653,10 +788,6 @@ std::string Federate::query (const std::string &target, const std::string &query
 
 query_id_t Federate::queryAsync (const std::string &target, const std::string &queryStr)
 {
-    if (!asyncCallInfo)
-    {
-        asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
-    }
     int cnt = asyncCallInfo->queryCounter++;
 
     auto queryFut =
@@ -667,10 +798,6 @@ query_id_t Federate::queryAsync (const std::string &target, const std::string &q
 
 query_id_t Federate::queryAsync (const std::string &queryStr)
 {
-    if (!asyncCallInfo)
-    {
-        asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
-    }
     int cnt = asyncCallInfo->queryCounter++;
 
     auto queryFut = std::async (std::launch::async, [this, queryStr]() { return query (queryStr); });
@@ -680,26 +807,20 @@ query_id_t Federate::queryAsync (const std::string &queryStr)
 
 std::string Federate::queryComplete (query_id_t queryIndex)
 {
-    if (asyncCallInfo)
+    auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value ());
+    if (fnd != asyncCallInfo->inFlightQueries.end ())
     {
-        auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value ());
-        if (fnd != asyncCallInfo->inFlightQueries.end ())
-        {
-            return fnd->second.get ();
-        }
+        return fnd->second.get ();
     }
     return {"#invalid"};
 }
 
 bool Federate::isQueryCompleted (query_id_t queryIndex) const
 {
-    if (asyncCallInfo)
+    auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value ());
+    if (fnd != asyncCallInfo->inFlightQueries.end ())
     {
-        auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value ());
-        if (fnd != asyncCallInfo->inFlightQueries.end ())
-        {
-            return (fnd->second.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
-        }
+        return (fnd->second.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
     }
     return false;
 }

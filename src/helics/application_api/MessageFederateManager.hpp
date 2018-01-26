@@ -12,9 +12,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _MESSAGE_FEDERATE_MANAGER_
 #pragma once
 
-#include "Message.hpp"
 #include "../common/simpleQueue.hpp"
 #include "../core/Core.hpp"
+#include "Message.hpp"
+#include "libguarded/guarded.hpp"
 #include <cstdint>
 #include <functional>
 #include <map>
@@ -23,7 +24,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
-#include "libguarded/guarded.hpp"
 #include "../common/DualMappedVector.hpp"
 namespace helics
 {
@@ -140,9 +140,10 @@ class MessageFederateManager
     registerCallback (const std::vector<endpoint_id_t> &ids, std::function<void(endpoint_id_t, Time)> callback);
 
     /**disconnect from the coreObject*/
-    void disconnect();
+    void disconnect ();
     /**get the number of registered endpoints*/
-    int getEndpointCount() const;
+    int getEndpointCount () const;
+
   private:
     DualMappedVector<endpoint_info,std::string, Core::handle_id_t> local_endpoints;  //!< storage for the local endpoint information
     std::vector<std::function<void(endpoint_id_t, Time)>> callbacks;  //!< vector of callbacks
@@ -159,5 +160,5 @@ class MessageFederateManager
   private:  // private functions
     void removeOrderedMessage (unsigned int index);
 };
-} //namespace helics
+}  // namespace helics
 #endif

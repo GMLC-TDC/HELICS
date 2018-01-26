@@ -11,10 +11,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
+#include "helics/core/Core.hpp"
 #include "helics/core/CoreBroker.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-types.hpp"
-#include "helics/core/Core.hpp"
 #include "helics/core/ipc/IpcComms.h"
 #include "helics/core/ipc/IpcCore.h"
 #include "boost/interprocess/ipc/message_queue.hpp"
