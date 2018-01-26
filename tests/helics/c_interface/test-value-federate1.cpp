@@ -38,7 +38,7 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types),
     helics_broker broker;
     helics_federate vFed;
 
-    // SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
+    // SetupTest<helics::ValueFederate> (core_type, 1);
 
     std::cout << "value_federate_initialize_tests - core_type:" << core_type << "\n";
 
@@ -92,7 +92,7 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types),
 
 BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core_types), core_type)
 {
-    // SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1); // can be used when fixtures are enabled
+    // SetupTest<helics::ValueFederate> (core_type, 1); // can be used when fixtures are enabled
 
     helics_status status;
     helics_federate_info_t fi;
@@ -190,7 +190,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     BOOST_CHECK_EQUAL (status, helics_ok);
     vFed = helicsCreateValueFederate (fi);
 
-    // SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
+    // SetupTest<helics::ValueFederate> (core_type, 1);
     // auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     subid = helicsFederateRegisterSubscription (vFed, "sub1", "double", "V");
@@ -332,7 +332,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     helicsBrokerFree (broker);
     helicsCloseLibrary ();
 
-    // SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
+    // SetupTest<helics::ValueFederate> (core_type, 1);
     // auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications
@@ -446,7 +446,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
     std::cout << "value_federate_single_transfer - core_type:" << core_type << "\n";
     // publish string1 at time=0.0;
 
-    // SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
+    // SetupTest<helics::ValueFederate> (core_type, 1);
     // auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications
@@ -509,7 +509,7 @@ void runFederateTestDouble (const char *core,
 
     // FederateTestFixture fixture;
 
-    // fixture.SetupSingleBrokerTest<helics::ValueFederate> (core_type_str, 1);
+    // fixture.SetupTest<helics::ValueFederate> (core_type_str, 1);
     // auto vFed = fixture.GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications
@@ -621,7 +621,7 @@ void runFederateTestInteger (const char *core,
 
     // FederateTestFixture fixture;
 
-    // fixture.SetupSingleBrokerTest<helics::ValueFederate> (core_type_str, 1);
+    // fixture.SetupTest<helics::ValueFederate> (core_type_str, 1);
     // auto vFed = fixture.GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications
@@ -699,7 +699,7 @@ void runFederateTestString (const char *core,
 
     // FederateTestFixture fixture;
 
-    // fixture.SetupSingleBrokerTest<helics::ValueFederate> (core_type_str, 1);
+    // fixture.SetupTest<helics::ValueFederate> (core_type_str, 1);
     // auto vFed = fixture.GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications
@@ -781,7 +781,7 @@ void runFederateTestVectorD (const char *core,
 
     // FederateTestFixture fixture;
 
-    // fixture.SetupSingleBrokerTest<helics::ValueFederate> (core_type_str, 1);
+    // fixture.SetupTest<helics::ValueFederate> (core_type_str, 1);
     // auto vFed = fixture.GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications
@@ -863,7 +863,7 @@ void runFederateTestObj(const std::string &core_type_str,
 {
     FederateTestFixture fixture;
 
-    fixture.SetupSingleBrokerTest<helics::ValueFederate>(core_type_str, 1);
+    fixture.SetupTest<helics::ValueFederate>(core_type_str, 1);
     auto vFed = fixture.GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
@@ -907,7 +907,7 @@ void runFederateTestv2 (const std::string &core_type_str,
                         const X &testValue2)
 {
     FederateTestFixture fixture;
-    fixture.SetupSingleBrokerTest<helics::ValueFederate> (core_type_str, 1);    auto vFed =
+    fixture.SetupTest<helics::ValueFederate> (core_type_str, 1);    auto vFed =
 fixture.GetFederateAs<helics::ValueFederate> (0);
     // register the publications
     auto pubid = vFed->registerGlobalPublication<X> ("pub1");
@@ -1044,7 +1044,7 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer_types_publishers, bdata::mak
 
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer, bdata::make (core_types), core_type)
 {
-    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 2);
+    SetupTest<helics::ValueFederate> (core_type, 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
@@ -1097,7 +1097,7 @@ void runDualFederateTest (const std::string &core_type_str,
 {
     FederateTestFixture fixture;
 
-    fixture.SetupSingleBrokerTest<helics::ValueFederate> (core_type_str, 2);
+    fixture.SetupTest<helics::ValueFederate> (core_type_str, 2);
     auto fedA = fixture.GetFederateAs<helics::ValueFederate> (0);
     auto fedB = fixture.GetFederateAs<helics::ValueFederate> (1);
 
@@ -1158,7 +1158,7 @@ void runDualFederateTestv2 (const std::string &core_type_str,
 {
     FederateTestFixture fixture;
 
-    fixture.SetupSingleBrokerTest<helics::ValueFederate> (core_type_str, 2);
+    fixture.SetupTest<helics::ValueFederate> (core_type_str, 2);
     auto fedA = fixture.GetFederateAs<helics::ValueFederate> (0);
     auto fedB = fixture.GetFederateAs<helics::ValueFederate> (1);
 
@@ -1214,7 +1214,7 @@ void runDualFederateTestObj(const std::string &core_type_str,
 {
     FederateTestFixture fixture;
     using namespace helics;
-    fixture.SetupSingleBrokerTest<helics::ValueFederate>(core_type_str, 2);
+    fixture.SetupTest<helics::ValueFederate>(core_type_str, 2);
     auto fedA = fixture.GetFederateAs<helics::ValueFederate>(0);
     auto fedB = fixture.GetFederateAs<helics::ValueFederate>(1);
 
@@ -1271,7 +1271,7 @@ void runDualFederateTestObj(const std::string &core_type_str,
 /*
 BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_types), core_type)
 {
-    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
+    SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications
@@ -1403,7 +1403,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdat
     helicsBrokerFree (broker);
     helicsCloseLibrary ();
 
-    // SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1);
+    // SetupTest<helics::ValueFederate>(core_type, 1);
     // auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
@@ -1516,7 +1516,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     helicsCloseLibrary ();
 
     std::cout << "value_federate_single_transfer_publisher - core_type:" << core_type << "\n";
-    // SetupSingleBrokerTest<helics::ValueFederate>(core_type, 1);
+    // SetupTest<helics::ValueFederate>(core_type, 1);
     // auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications

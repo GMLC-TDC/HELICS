@@ -48,7 +48,7 @@ struct FederateTestFixture
     helics_broker AddBroker (const std::string &core_type_name, const std::string &initialization_string);
 
     template <typename FedType>
-    void SetupSingleBrokerTest (std::string core_type_name,
+    void SetupTest (std::string core_type_name,
                                 int count,
                                 helicsFederateType fedType,
                                 helics_time_t time_delta = 0.0,

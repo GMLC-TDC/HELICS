@@ -14,7 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 
-BOOST_FIXTURE_TEST_SUITE (query_tests, ValueFederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE (query_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 #if ENABLE_TEST_TIMEOUTS > 0
@@ -27,7 +27,9 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_type)
 {
-    Setup2FederateTest (core_type);
+    SetupTest<helics::ValueFederate>(core_type, 2, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     // register the publications
     vFed1->registerGlobalPublication<double> ("pub1");
 
@@ -36,8 +38,6 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     vFed1->registerPublication<double> ("pub2");
 
     vFed2->registerPublication<double> ("pub3");
-    vFed1->setTimeDelta (1.0);
-    vFed2->setTimeDelta (1.0);
 
     vFed1->enterInitializationStateAsync ();
     vFed2->enterInitializationState ();
@@ -66,7 +66,9 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
 {
-    Setup2FederateTest (core_type);
+    SetupTest<helics::ValueFederate>(core_type, 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto core = vFed1->getCorePointer ();
     auto res = core->query ("root", "federates");
     std::string str ("[");
@@ -89,7 +91,9 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), core_type)
 {
-    Setup2FederateTest (core_type);
+    SetupTest<helics::ValueFederate>(core_type, 2, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     // register the publications
     vFed1->registerPublication<double> ("pub1");
 

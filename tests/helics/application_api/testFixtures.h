@@ -17,23 +17,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 
-struct ValueFederateTestFixture
-{
-    ValueFederateTestFixture () = default;
-    ~ValueFederateTestFixture ();
-
-    void Setup1FederateTest (std::string core_type_name, helics::Time time_delta = helics::timeZero);
-    void Setup2FederateTest (std::string core_type_name, helics::Time time_delta = helics::timeZero);
-
-    void StartBroker (const std::string &core_type_name, const std::string &initialization_string);
-
-    std::vector<std::shared_ptr<helics::Broker>> broker;
-    std::shared_ptr<helics::ValueFederate> vFed1;
-    std::shared_ptr<helics::ValueFederate> vFed2;
-    std::string extraCoreArgs;
-    std::string extraBrokerArgs;
-};
-
 #ifdef QUICK_TESTS_ONLY
 #ifndef DISABLE_TCP_CORE
 const std::string core_types[] = {"test", "ipc_2", "tcp", "test_2", "zmq", "udp"};
@@ -45,11 +28,14 @@ const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
 #else
 #ifndef DISABLE_TCP_CORE
 const std::string core_types[] = {"test",   "ipc",   "zmq",   "udp",   "tcp",
-                                  "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
-const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp"};
+                                  "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2",
+                                "test_3", "ipc_3", "zmq_3", "udp_3", "tcp_3" ,
+                                "test_4", "ipc_4", "zmq_4", "udp_4", "tcp_4" };
+const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp",
+                                        "test_3", "ipc_3", "zmq_3", "udp_3", "tcp_3" };
 #else
 const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp","test_3", "ipc_3", "zmq_3", "udp_3" };
 #endif
 #endif
 
@@ -63,7 +49,7 @@ struct FederateTestFixture
     AddBroker (const std::string &core_type_name, const std::string &initialization_string);
 
     template <class FedType>
-    void SetupSingleBrokerTest (std::string core_type_name,
+    void SetupTest (std::string core_type_name,
                                 int count,
                                 helics::Time time_delta = helics::timeZero,
                                 std::string name_prefix = "fed")
@@ -96,13 +82,12 @@ struct FederateTestFixture
             initString.append (extraCoreArgs);
         }
 
-        helics::FederateInfo fi ("", helics::coreTypeFromString (core_type_name));
+        helics::FederateInfo fi (std::string(), helics::coreTypeFromString (core_type_name));
         fi.timeDelta = time_delta;
 
         std::vector<std::shared_ptr<FedType>> federates_added;
 
-        size_t offset = federates.size ();
-        federates.resize (count + offset);
+        
 
         switch (setup)
         {
@@ -110,7 +95,8 @@ struct FederateTestFixture
         default:
         {
             fi.coreInitString = initString + " --federates " + std::to_string (count);
-
+            size_t offset = federates.size();
+            federates.resize(count + offset);
             for (int ii = 0; ii < count; ++ii)
             {
                 fi.name = name_prefix + std::to_string (ii);
@@ -123,7 +109,8 @@ struct FederateTestFixture
         case 2:
         {  // each federate has its own core
             auto core_type = helics::coreTypeFromString (core_type_name);
-
+            size_t offset = federates.size();
+            federates.resize(count + offset);
             for (int ii = 0; ii < count; ++ii)
             {
                 auto core = helics::CoreFactory::create (core_type, initString + " --federates 1");
@@ -133,6 +120,30 @@ struct FederateTestFixture
                 auto fed = std::make_shared<FedType> (fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
+            }
+        }
+        break;
+        case 3:
+        {
+            auto subbroker = AddBroker(core_type_name, initString + " --federates " + std::to_string(count));
+            auto newTypeString = core_type_name;
+            newTypeString.push_back('_');
+            newTypeString.push_back('2');
+            for (int ii = 0; ii < count; ++ii)
+            {
+                AddFederates<FedType>(newTypeString, 1, subbroker, time_delta, name_prefix);
+            }
+        }
+        break;
+        case 4:
+        {
+            auto newTypeString = core_type_name;
+            newTypeString.push_back('_');
+            newTypeString.push_back('2');
+            for (int ii = 0; ii < count; ++ii)
+            {
+                auto subbroker = AddBroker(core_type_name, initString + " --federates 1");
+                AddFederates<FedType>(newTypeString, 1, subbroker, time_delta, name_prefix);
             }
         }
         break;

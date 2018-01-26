@@ -119,6 +119,82 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
+/** test a filter operator
+The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+*/
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR(*utf::timeout(5))
+#endif
+BOOST_DATA_TEST_CASE(message_filter_function_two_stage, bdata::make(core_types), core_type)
+{
+    auto broker = AddBroker(core_type, 3);
+    AddFederates<helics::MessageFederate>(core_type, 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(core_type, 1, broker, 1.0, "filter2");
+    AddFederates<helics::MessageFederate>(core_type, 1, broker, 1.0, "message");
+
+    auto fFed = GetFederateAs<helics::MessageFederate>(0);
+    auto fFed2 = GetFederateAs<helics::MessageFederate>(1);
+    auto mFed = GetFederateAs<helics::MessageFederate>(2);
+
+    auto p1 = mFed->registerGlobalEndpoint("port1");
+    auto p2 = mFed->registerGlobalEndpoint("port2");
+
+    auto f1 = fFed->registerSourceFilter("filter1", "port1");
+    BOOST_CHECK(f1.value() != helics::invalid_id_value);
+    auto timeOperator = std::make_shared<helics::MessageTimeOperator>();
+    timeOperator->setTimeFunction([](helics::Time time_in) { return time_in + 1.25; });
+    fFed->setFilterOperator(f1, timeOperator);
+
+    auto f2 = fFed2->registerSourceFilter("filter2", "port1");
+    BOOST_CHECK(f2.value() != helics::invalid_id_value);
+
+    fFed2->setFilterOperator(f2, timeOperator);
+
+    fFed->enterExecutionStateAsync();
+    fFed2->enterExecutionStateAsync();
+    mFed->enterExecutionState();
+    fFed->enterExecutionStateComplete();
+    fFed2->enterExecutionStateComplete();
+
+    BOOST_CHECK(fFed->getCurrentState() == helics::Federate::op_states::execution);
+    helics::data_block data(500, 'a');
+    mFed->sendMessage(p1, "port2", data);
+
+    mFed->requestTimeAsync(1.0);
+    fFed->requestTimeAsync(1.0);
+    fFed2->requestTime(1.0);
+    mFed->requestTimeComplete();
+    fFed->requestTimeComplete();
+    auto res = mFed->hasMessage();
+    BOOST_CHECK(!res);
+
+    mFed->requestTimeAsync(2.0);
+    fFed2->requestTimeAsync(2.0);
+    fFed->requestTime(2.0);
+    mFed->requestTimeComplete();
+    fFed2->requestTimeComplete();
+    BOOST_REQUIRE(!mFed->hasMessage(p2));
+
+    fFed->requestTimeAsync(3.0);
+    fFed2->requestTimeAsync(3.0);
+    /*auto retTime = */ mFed->requestTime(3.0);
+
+    BOOST_REQUIRE(mFed->hasMessage(p2));
+
+    auto m2 = mFed->getMessage(p2);
+    BOOST_CHECK_EQUAL(m2->source, "port1");
+    BOOST_CHECK_EQUAL(m2->original_source, "port1");
+    BOOST_CHECK_EQUAL(m2->dest, "port2");
+    BOOST_CHECK_EQUAL(m2->data.size(), data.size());
+    BOOST_CHECK_EQUAL(m2->time, 2.5);
+
+    fFed->requestTimeComplete();
+    fFed2->requestTimeComplete();
+    mFed->finalize();
+    fFed->finalize();
+    fFed2->finalize();
+    BOOST_CHECK(fFed->getCurrentState() == helics::Federate::op_states::finalize);
+}
 /** test two filter operators
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */

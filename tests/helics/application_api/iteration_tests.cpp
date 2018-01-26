@@ -23,7 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace utf = boost::unit_test;
 #endif
 
-BOOST_FIXTURE_TEST_SUITE (iteration_tests, ValueFederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE (iteration_tests, FederateTestFixture)
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 #if ENABLE_TEST_TIMEOUTS > 0
@@ -31,7 +31,8 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_AUTO_TEST_CASE (execution_iteration_test)
 {
-    Setup1FederateTest ("test");
+    SetupTest<helics::ValueFederate> ("test",1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
@@ -60,13 +61,14 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 {
-    Setup2FederateTest ("test");
+    SetupTest<helics::ValueFederate>("test", 2,1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
     auto subid = vFed2->registerRequiredSubscription<double> ("pub1");
-    vFed1->setTimeDelta (1.0);
-    vFed2->setTimeDelta (1.0);
+
 
     vFed1->enterInitializationStateAsync ();
     vFed2->enterInitializationState ();
@@ -94,7 +96,8 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_AUTO_TEST_CASE (time_iteration_test)
 {
-    Setup1FederateTest ("test");
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
@@ -125,13 +128,14 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
 {
-    Setup2FederateTest ("test");
+    SetupTest<helics::ValueFederate>("test", 2, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
     auto subid = vFed2->registerRequiredSubscription<double> ("pub1");
-    vFed1->setTimeDelta (1.0);
-    vFed2->setTimeDelta (1.0);
+
     vFed1->setPeriod (1.0);
     vFed2->setPeriod (1.0);
 
@@ -163,7 +167,9 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
 {
-    Setup2FederateTest ("test");
+    SetupTest<helics::ValueFederate>("test", 2, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     // register the publications
     auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsDouble);
 
@@ -204,7 +210,9 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_AUTO_TEST_CASE (test_iteration_counter)
 {
-    Setup2FederateTest ("test");
+    SetupTest<helics::ValueFederate>("test", 2, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     // register the publications
     auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsInt);
 

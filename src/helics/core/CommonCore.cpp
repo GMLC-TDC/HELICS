@@ -1309,7 +1309,15 @@ void CommonCore::registerFrequentCommunicationsPair (const std::string & /*sourc
     // std::lock_guard<std::mutex> lock (_mutex);
 }
 
-void CommonCore::addDependency (federate_id_t /*federateID*/, const std::string & /*federateName*/) {}
+void CommonCore::addDependency (federate_id_t federateID, const std::string & /*federateName*/) 
+{
+    auto fed = getFederate(federateID);
+    if (fed == nullptr)
+    {
+        throw (InvalidIdentifier("federateID not valid (registerEndpoint)"));
+    }
+
+}
 
 void CommonCore::send (handle_id_t sourceHandle, const std::string &destination, const char *data, uint64_t length)
 {
@@ -1466,9 +1474,7 @@ void CommonCore::queueMessage (ActionMessage &message)
     case CMD_SEND_FOR_FILTER:
     case CMD_SEND_FOR_FILTER_OPERATION:
     case CMD_SEND_FOR_FILTER_RETURN:
-    {
         addActionMessage (message);
-    }
     break;
     default:
         break;
@@ -1671,6 +1677,7 @@ void CommonCore::setQueryCallback (federate_id_t federateID,
     {
         throw (InvalidIdentifier ("FederateID is invalid (setQueryCallback)"));
     }
+    //TODO:: this needs to do something
 }
 
 std::string CommonCore::federateQuery (Core::federate_id_t federateID, const std::string &queryStr) const
