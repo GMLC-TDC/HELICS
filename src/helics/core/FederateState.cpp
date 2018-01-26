@@ -365,8 +365,8 @@ iteration_result FederateState::waitSetup ()
     processing = false;
     return ret;
 }
-/** process until the init state has been entered or there is a failure*/
-iteration_result FederateState::enterInitState ()
+
+iteration_result FederateState::enterInitializationState ()
 {
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))

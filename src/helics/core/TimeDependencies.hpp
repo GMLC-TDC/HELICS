@@ -80,7 +80,7 @@ class TimeDependencies
     /**  const iterator to first dependency*/
     auto cend () const { return dependencies.cend (); }
 
-	/** get a pointer to the dependency information for a partiular object*/
+	/** get a pointer to the dependency information for a particular object*/
     DependencyInfo *getDependencyInfo (Core::federate_id_t id);
 
 	/** check if the dependencies would allow entry to exec mode*/
@@ -88,7 +88,7 @@ class TimeDependencies
 	/** check if the dependencies would allow a grant of the time
 	@param iterating true if the object is iterating
 	@param desiredGrantTime  the time to check for granting
-	@return true if if the object is ready
+	@return true if the object is ready
 	*/
     bool checkIfReadyForTimeGrant (bool iterating, Time desiredGrantTime) const;
     void resetIteratingExecRequests ();

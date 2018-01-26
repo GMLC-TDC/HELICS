@@ -27,7 +27,8 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 #include <limits>
 #include <type_traits>
 
-// enumeration of different time units
+/** enumeration of different time units
+*/
 enum class timeUnits : int
 {
     ps = 0,
@@ -39,14 +40,25 @@ enum class timeUnits : int
     minutes = 6,
     hr = 7,
     day = 8,
+    week = 9,
 
 };
 
 /** defining doubles for time Multipliers*/
-constexpr double timeCountforward[9]{1e12, 1e9, 1e6, 1e3, 1.0, 1.0, 10.0 / 60.0, 1.0 / 3600.0, 1.0 / 86400.0};
+constexpr double timeCountForward[10]{1e12, 1e9, 1e6, 1e3, 1.0, 1.0, 1.0 / 60.0, 1.0 / 3600.0, 1.0 / 86400.0, 1.0/(86400.0*7)};
 
 /** defining doubles for time Multipliers*/
-constexpr double timeCountReverse[9]{1e-12, 1e-9, 1e-6, 1e-3, 1.0, 1.0, 60.0, 3600.0, 86400.0};
+constexpr double timeCountReverse[10]{1e-12, 1e-9, 1e-6, 1e-3, 1.0, 1.0, 60.0, 3600.0, 86400.0, 7*86400};
+
+inline constexpr double toSecondMultiplier(timeUnits units)
+{
+    return timeCountReverse[static_cast<int>(units)];
+}
+
+inline constexpr double toUnitMultiplier(timeUnits units)
+{
+    return timeCountForward[static_cast<int>(units)];
+}
 
 /** generate powers to two as a constexpr
 @param[in] exponent the power of 2 desired*/
@@ -107,11 +119,11 @@ class integer_time
     */
     static std::int64_t toCount (baseType val, timeUnits units) noexcept
     {
-        return static_cast<std::int64_t> (toDouble (val) * timeCountforward[static_cast<int> (units)]);
+        return static_cast<std::int64_t> (toDouble (val) * toUnitMultiplier(units));
     }
     static baseType fromCount (std::uint64_t count, timeUnits units) noexcept
     {
-        return static_cast<baseType> (toDouble (count) / timeCountforward[static_cast<int> (units)]);
+        return static_cast<baseType> (toDouble (count) * toSecondMultiplier(units));
     }
     /** convert to an integer count in seconds */
     static std::int64_t seconds (baseType val) noexcept { return static_cast<std::int64_t> (val >> N); }
@@ -259,7 +271,7 @@ class double_time
     static constexpr baseType epsilon () noexcept { return (std::numeric_limits<base>::epsilon); }
     static std::int64_t toCount (baseType val, timeUnits units) noexcept
     {
-        return static_cast<std::int64_t> (val * timeCountforward[static_cast<int> (units)]);
+        return static_cast<std::int64_t> (val * timeCountForward[static_cast<int> (units)]);
     }
     static baseType fromCount (std::int64_t val, timeUnits units) noexcept
     {

@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
 
     // Test returning when the initialization state is entered
     cmd.setAction (helics::CMD_INIT_GRANT);
-    auto fs_process = std::async (std::launch::async, [&]() { return fs->enterInitState (); });
+    auto fs_process = std::async (std::launch::async, [&]() { return fs->enterInitializationState (); });
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_CREATED);
     fs->addAction (cmd);
     fs_process.wait ();

@@ -24,6 +24,7 @@ set(SRC_FILES
 	CommsBroker.cpp
 	NetworkBrokerData.cpp
 	helicsVersion.cpp
+	helics-time.cpp
 )
 
 set(TESTCORE_SOURCE_FILES

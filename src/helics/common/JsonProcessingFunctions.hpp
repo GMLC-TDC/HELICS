@@ -10,8 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #pragma once
 /** @file
-@details functions related to loading and evaluating json files and helper functions for reading them
-using the json cpp library
+@details functions related to loading and evaluating JSON files and helper functions for reading them
+using the jsoncpp library
 */
 
 #ifdef _MSC_VER
@@ -24,18 +24,10 @@ using the json cpp library
 #endif
 
 #include "../core/helics-time.hpp"
-/** load a json string or filename that points to a json file and return a
+/** load a JSON string or filename that points to a JSON file and return a
 json::Value to the root object
 */
 Json_helics::Value loadJsonString (const std::string &jsonString);
 
 /** read a time from a JSON value element*/
-helics::Time loadJsonTime(const Json_helics::Value &timeElement);
-
-/** generate a time from a string, 
-@details the string can be a double or with units
-@example "1.234",  or "1032ms"
-@return a helics time generated from the string
-@throw, invalid_argument if the string is not a valid time
-*/
-helics::Time loadTimeFromString(const std::string &timeString);
+helics::Time loadJsonTime(const Json_helics::Value &timeElement, timeUnits defaultUnits = timeUnits::sec);

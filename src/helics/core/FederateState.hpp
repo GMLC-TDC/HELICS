@@ -160,8 +160,8 @@ private:
   private:
     /** process the federate queue until returnable event
     @details processQueue will process messages until one of 3 things occur
-    1.  the init state has been entered
-    2.  the execution state has been granted (or init state reentered from a iterative request)
+    1.  the initialization state has been entered
+    2.  the execution state has been granted (or initialization state reentered from a iterative request)
     3.  time has been granted
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
@@ -204,8 +204,8 @@ private:
     // the next 5 functions are the processing functions that actually process the queue
 	/** process until the federate has verified its membership and assigned a global id number*/
     iteration_result waitSetup ();
-	/** process until the init state has been entered or there is a failure*/
-    iteration_result enterInitState ();
+	/** process until the initialization state has been entered or there is a failure*/
+    iteration_result enterInitializationState ();
     /** function to call when entering execution state
 	@param converged indicator of whether the fed should iterate if need be or not
     returns either converged or nonconverged depending on whether an iteration is needed

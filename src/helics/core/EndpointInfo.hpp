@@ -11,12 +11,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #ifndef _HELICS_ENDPOINTINFO_
 #define _HELICS_ENDPOINTINFO_
 
-#include "../common/blocking_queue.h"
 #include "Core.hpp"
 #include "helics-time.hpp"
-#include "helics/helics-config.h"
 
-#include "libguarded/shared_guarded.hpp"
+#include "../common/GuardedTypes.hpp"
 #include <deque>
 namespace helics
 {
@@ -38,12 +36,7 @@ class EndpointInfo
     const std::string key;  //!< name of the endpoint
     const std::string type;  //!< type of the endpoint
   private:
-#ifdef HAVE_SHARED_TIMED_MUTEX
-    libguarded::shared_guarded<std::deque<std::unique_ptr<Message>>> message_queue;  //!< storage for the messages
-#else
-    libguarded::shared_guarded<std::deque<std::unique_ptr<Message>>, std::mutex>
-      message_queue;  //!< storage for the messages
-#endif
+      shared_guarded<std::deque<std::unique_ptr<Message>>> message_queue;  //!< storage for the messages
   public:
     bool hasFilter = false;  //!< indicator that the message has a filter
     /** get the next message up to the specified time*/

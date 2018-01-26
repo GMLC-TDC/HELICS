@@ -15,8 +15,8 @@ file defines some common filter operations
 */
 
 #include "../core/Core.hpp"
-
-#include <mutex>
+#include <atomic>
+#include "../common/GuardedTypes.hpp"
 #include <set>
 
 namespace helics
@@ -101,7 +101,7 @@ class RerouteFilterOperation : public FilterOperations
 {
     private:
         std::shared_ptr<MessageDestOperator> op;  //!< the actual operator
-        atomic_guarded<std::string> newTarget;  //!< the target destination
+        atomic_guarded<std::string> newDest;  //!< the target destination
 		shared_guarded<std::set<std::string>> conditions;
 
     public:

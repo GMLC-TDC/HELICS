@@ -10,7 +10,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "JsonProcessingFunctions.hpp"
-#include "stringOps.h"
 #include <fstream>
 
 Json_helics::Value loadJsonString(const std::string &jsonString)
@@ -42,87 +41,41 @@ Json_helics::Value loadJsonString(const std::string &jsonString)
 	return doc;
 }
 
-
-constexpr double unitMult[] = { 1e-12,1e-9,1e-6,1e-3,1.0,1.0,60.0,3600.0,86400.0 };
-
-const std::map<std::string, timeUnits> timeUnitStrings
-{
-	{"ps",timeUnits::ps},
-	{"ns",timeUnits::ns},
-	{"us",timeUnits::us},
-	{"ms",timeUnits::ms},
-	{"s",timeUnits::s},
-	{"sec",timeUnits::sec},
-	{"seconds",timeUnits::sec},
-	{"second",timeUnits::sec},
-	{"min",timeUnits::minutes},
-	{"minute",timeUnits::minutes},
-	{"minute",timeUnits::minutes},
-	{"hr",timeUnits::hr},
-	{"hour",timeUnits::hr},
-	{"hours",timeUnits::hr},
-	{"day",timeUnits::day}
-};
-
-timeUnits timeUnitsFromString(const std::string &unitString)
-{
-	auto fnd = timeUnitStrings.find(unitString);
-	if (fnd != timeUnitStrings.end())
-	{
-		return fnd->second;
-	}
-	auto lcUstring = convertToLowerCase(stringOps::trim(unitString));
-	fnd = timeUnitStrings.find(lcUstring);
-	if (fnd != timeUnitStrings.end())
-	{
-		return fnd->second;
-	}
-	throw(std::invalid_argument(std::string("unit ") + unitString + " not recognized"));
-}
 /** read a time from a JSON value element*/
-helics::Time loadJsonTime(const Json_helics::Value &timeElement)
+helics::Time loadJsonTime(const Json_helics::Value &timeElement, timeUnits defaultUnits)
 {
-	if (timeElement.isObject())
-	{
-		std::string units = "s";
-		if (timeElement.isMember("units"))
-		{
-			units = timeElement["units"].asString();
-		}
-		if (timeElement.isMember("value"))
-		{
-			if (timeElement["value"].isInt64())
-			{
-				return helics::Time(timeElement["value"].asInt64(), timeUnitsFromString(units));
-			}
-			else
-			{
-				return helics::Time(timeElement["value"].asDouble()*unitMult[static_cast<int>(timeUnitsFromString(units))]);
-			}
-		}
-	}
-	else if (timeElement.isDouble())
-	{
-		return helics::Time(timeElement.asDouble());
-	}
-	else
-	{
-		return loadTimeFromString(timeElement.asString());
-		
-	}
-	return 0;
+    if (timeElement.isObject())
+    {
+        if (timeElement.isMember("units"))
+        {
+            defaultUnits = helics::timeUnitsFromString(timeElement["units"].asString());
+        }
+        if (timeElement.isMember("value"))
+        {
+            if (timeElement["value"].isInt64())
+            {
+                return helics::Time(timeElement["value"].asInt64(), defaultUnits);
+            }
+            else
+            {
+                return helics::Time(timeElement["value"].asDouble()*toSecondMultiplier(defaultUnits));
+            }
+        }
+    }
+    else if (timeElement.isInt64())
+    {
+        return helics::Time(timeElement.asInt64(), defaultUnits);
+    }
+    else if (timeElement.isDouble())
+    {
+        return helics::Time(timeElement.asDouble()*toSecondMultiplier(defaultUnits));
+    }
+    else
+    {
+        return helics::loadTimeFromString(timeElement.asString());
+
+    }
+    return 0;
 }
 
 
-/** read a time from a JSON value element*/
-helics::Time loadTimeFromString(const std::string &timeString)
-{
-	size_t pos;
-	double val = std::stod(timeString, &pos);
-	while ((pos < timeString.size()) && (timeString[pos] != ' '))
-	{
-		++pos;
-	}
-	std::string units = timeString.substr(pos);
-	return helics::Time(val*unitMult[static_cast<int>(timeUnitsFromString(units))]);
-}

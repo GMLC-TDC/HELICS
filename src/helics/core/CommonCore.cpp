@@ -382,7 +382,7 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
         m.source_id = fed->global_id;
         addActionMessage (m);
 
-        auto check = fed->enterInitState ();
+        auto check = fed->enterInitializationState ();
         if (check != iteration_result::next_step)
         {
             fed->init_requested = false;

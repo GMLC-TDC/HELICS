@@ -66,10 +66,6 @@ class TimeCoordinator
     const CoreFederateInfo &getFedInfo () const { return info; }
 	/** set the core information using for timing as a block*/
     void setInfo (const CoreFederateInfo &info_) { info = info_; }
-    void setMessageSender (std::function<void(const ActionMessage &)> sendMessageFunction_)
-	{
-        sendMessageFunction = std::move (sendMessageFunction_);
-	}
 	/** set the callback function used for the sending messages*/
 	void setMessageSender(std::function<void(const ActionMessage &)> sendMessageFunction_)
 	{
@@ -81,7 +77,7 @@ class TimeCoordinator
 	{
 		return time_granted;
 	}
-	/** get a list of actual depedendencies*/
+	/** get a list of actual dependencies*/
     std::vector < Core::federate_id_t> getDependencies() const;
     /** get a reference to the dependents vector*/
     const std::vector<Core::federate_id_t> &getDependents () const { return dependents; }
@@ -122,7 +118,7 @@ class TimeCoordinator
 
     /** process a message related to configuration
     @param cmd the update command
-    @param initMode set to true to allow init only updates
+    @param initMode set to true to allow initialization mode only updates
     */
     void processConfigUpdateMessage (const ActionMessage &cmd, bool initMode = false);
     /** process a dependency update message*/
@@ -135,10 +131,10 @@ class TimeCoordinator
 	@return true if it was actually added, false if the federate was already present
 	*/
     bool addDependent (Core::federate_id_t fedID);
-	/** remove a depdendency
+	/** remove a dependency
 	@param fedID the identifier of the federate to remove*/
 	void removeDependency(Core::federate_id_t fedID);
-	/** remove a depdendent
+	/** remove a dependent
 	@param fedID the identifier of the federate to remove*/
 	void removeDependent(Core::federate_id_t fedID);
 
