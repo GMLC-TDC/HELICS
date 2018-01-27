@@ -9910,7 +9910,7 @@ class basic_json
                    and not std::is_same<ValueType, std::initializer_list<typename string_t::value_type>>::value
 #endif
 #if defined(JSON_HAS_CPP_17)
-                   and not std::is_same<ValueType, typename std::string_view>::value
+    //               and not std::is_same<ValueType, typename std::string_view>::value
 #endif
                    , int >::type = 0 >
     operator ValueType() const
