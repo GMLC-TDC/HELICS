@@ -153,6 +153,8 @@ ENDIF(UNIX)
 
 IF (BUILD_MATLAB OR USE_BOOST_STATIC_LIBS)
   set(Boost_USE_STATIC_LIBS ON)
+  set(BOOST_STATIC ON)
+	  
 ENDIF ()
 
 # -------------------------------------------------------------
@@ -314,7 +316,7 @@ IF("${isSystemDir}" STREQUAL "-1")
    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
-if (NOT USE_BOOST_STATIC_LIBS)
+if (NOT Boost_USE_STATIC_LIBS)
 list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
 endif()
 
