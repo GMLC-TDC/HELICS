@@ -16,6 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <string>
 #include <vector>
 #include <functional>
+#include <algorithm>
 
 /** class merging a vector of pointer with a map that can be used to lookup specific values
 */
@@ -33,14 +34,14 @@ public:
 		auto fnd = lookup1.find(searchValue1);
 		if (fnd != lookup1.end())
 		{
-			dataStorage_[fnd->second] = std::move(ptr);
+			dataStorage[fnd->second] = std::move(ptr);
 			lookup2[searchValue2] = fnd->second;
 			return fnd->second;
 		}
 		else
 		{
-			auto index = dataStorage_.size();
-			dataStorage_.emplace_back(std::move(ptr));
+			auto index = dataStorage.size();
+			dataStorage.emplace_back(std::move(ptr));
 			lookup1.emplace(searchValue1, index);
 			lookup2.emplace(searchValue2, index);
 			return index;
@@ -53,13 +54,13 @@ public:
 		auto fnd = lookup1.find(searchValue1);
 		if (fnd != lookup1.end())
 		{
-			dataStorage_[fnd->second] = std::make_unique<VType>(std::forward<Us>(data)...);
+			dataStorage[fnd->second] = std::make_unique<VType>(std::forward<Us>(data)...);
 			return fnd->second;
 		}
 		else
 		{
-			auto index = dataStorage_.size();
-			dataStorage_.emplace_back(std::make_unique<VType>(std::forward<Us>(data)...));
+			auto index = dataStorage.size();
+			dataStorage.emplace_back(std::make_unique<VType>(std::forward<Us>(data)...));
 			lookup1.emplace(searchValue1, index);
 			lookup2.emplace(searchValue2, index);
 			return index;
@@ -73,7 +74,7 @@ public:
 		auto fnd = lookup1.find(searchValue1);
 		if (fnd != lookup1.end())
 		{
-			return dataStorage_[fnd->second].get();
+			return dataStorage[fnd->second].get();
 		}
 		return nullptr;
 	}
@@ -86,7 +87,7 @@ public:
 		auto fnd = lookup2.find(searchValue2);
 		if (fnd != lookup2.end())
 		{
-			return dataStorage_[fnd->second].get();
+			return dataStorage[fnd->second].get();
 		}
 		return nullptr;
 	}
@@ -99,7 +100,7 @@ public:
 		auto fnd = lookup1.find(searchValue1);
 		if (fnd != lookup1.end())
 		{
-			return dataStorage_[fnd->second].get();
+			return dataStorage[fnd->second].get();
 		}
 		return nullptr;
 	}
@@ -112,26 +113,26 @@ public:
 		auto fnd = lookup2.find(searchValue2);
 		if (fnd != lookup2.end())
 		{
-			return dataStorage_[fnd->second].get();
+			return dataStorage[fnd->second].get();
 		}
 		return nullptr;
 	}
 
-	VType *operator[] (size_t index) { return(index<dataStorage_.size()) ? (dataStorage_[index].get()) : nullptr; }
+	VType *operator[] (size_t index) { return(index<dataStorage.size()) ? (dataStorage[index].get()) : nullptr; }
 
-	const VType *operator[] (size_t index) const { return(index<dataStorage_.size()) ? (dataStorage_[index].get()) : nullptr; }
+	const VType *operator[] (size_t index) const { return(index<dataStorage.size()) ? (dataStorage[index].get()) : nullptr; }
 	
 	/** get a pointer to the last element inserted*/
-	VType *back() { return dataStorage_.back().get(); }
+	VType *back() { return dataStorage.back().get(); }
 	/** remove an element at a specific index
 	@param[in] index the index of the element to remove*/
 	void removeIndex(size_t index)
 	{
-		if (index >= dataStorage_.size())
+		if (index >= dataStorage.size())
 		{
 			return;
 		}
-		dataStorage_.erase(dataStorage_.begin() + index);
+		dataStorage.erase(dataStorage.begin() + index);
 		searchType1 ind1;
 		searchType2 ind2;
 		for (auto &el2 : lookup1)
@@ -176,7 +177,7 @@ public:
 			return;
 		}
 		auto index = el->second;
-		dataStorage_.erase(dataStorage_.begin() + index);
+		dataStorage.erase(dataStorage.begin() + index);
 		for (auto &el2 : lookup1)
 		{
 			if (el2.second > index)
@@ -212,7 +213,7 @@ public:
 			return;
 		}
 		auto index = el->second;
-		dataStorage_.erase(dataStorage_.begin() + index);
+		dataStorage.erase(dataStorage.begin() + index);
 		for (auto &el2 : lookup2)
 		{
 			if (el2.second > index)
@@ -245,7 +246,7 @@ public:
 	template<class UnaryFunction >
 	void apply(UnaryFunction F)
 	{
-		for (auto &vp : dataStorage_)
+		for (auto &vp : dataStorage)
 		{
 			F(vp.get());
 		}
@@ -256,27 +257,27 @@ public:
 	template<class UnaryFunction >
 	void apply(UnaryFunction F) const
 	{
-		for (auto &vp : dataStorage_)
+		for (auto &vp : dataStorage)
 		{
 			F(vp.get());
 		}
 	}
 	/** get a const iterator to the start of the data*/
-	auto begin() const { return dataStorage_.cbegin(); }
+	auto begin() const { return dataStorage.cbegin(); }
 	/** get a constant iterator to the end of the data*/
-	auto end() const { return dataStorage_.cend(); }
+	auto end() const { return dataStorage.cend(); }
 	/** get the numer of elements in the data*/
-	auto size() const { return dataStorage_.size(); }
+	auto size() const { return dataStorage.size(); }
 	/** remove all elements from the data*/
 	void clear()
 	{
-		dataStorage_.clear();
+		dataStorage.clear();
 		lookup1.clear();
 		lookup2.clear();
 	}
 
 private:
-	std::vector<std::unique_ptr<VType>> dataStorage_; //!< storage for the pointers
+	std::vector<std::unique_ptr<VType>> dataStorage; //!< storage for the pointers
 	mapType1 lookup1;	//!< map to lookup the index
 	mapType2 lookup2;	//!< map to lookup the index
 };

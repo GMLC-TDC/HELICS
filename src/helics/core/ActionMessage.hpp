@@ -21,12 +21,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-const int32_t cmd_info_basis = 65536;
-
+constexpr int32_t cmd_info_basis = 65536;
+/** class defining the primary message object used in Helics */
 class ActionMessage
 {
   public:
-    // class for containing possibly larger additional information for certain message types
+    /** class for containing possibly larger additional information for certain message types */
     class AdditionalInfo
     {
       public:
@@ -48,6 +48,7 @@ class ActionMessage
             : source (std::move (ai.source)), type (source), target (std::move (ai.target)), units (target),
               orig_source (std::move (ai.orig_source)), type_out (orig_source),
               original_dest (std::move (ai.original_dest)){};
+        ~AdditionalInfo() = default;
         template <class Archive>
         void save (Archive &ar) const
         {
@@ -63,7 +64,7 @@ class ActionMessage
 
     // need to try to make sure this object is under 64 bytes in size to fit in cache lines NOT there yet
   private:
-    action_message_def::action_t action_ = CMD_IGNORE;  // 4 -- command
+    action_message_def::action_t messageAction = CMD_IGNORE;  // 4 -- command
   public:
     int32_t source_id = 0;  //!< 8 -- for federate_id or route_id
     int32_t source_handle = 0;  //!< 12 -- for local handle or local code
@@ -80,21 +81,22 @@ class ActionMessage
       payload;  //!< string containing the data	//64 std::string is 32 bytes on most platforms (except libc++)
     std::string &name;  //!< alias payload to a name reference for registration functions
   private:
-    std::unique_ptr<AdditionalInfo> info_;  //!< pointer to an additional info structure with more data if required
+    std::unique_ptr<AdditionalInfo> extraInfo;  //!< pointer to an additional info structure with more data if required
   public:
     /** default constructor*/
     ActionMessage () noexcept : index (dest_handle), name (payload){};
     /** construct from an action type
-    @details this is an implicit constructor
+    @details this is intended to be an implicit constructor
+    @param startingAction from an action message definition
     */
-    ActionMessage (action_message_def::action_t startingAction);
+    ActionMessage (action_message_def::action_t startingAction);  // NOLINT (explicit-constructor)  
     /** construct from action, source and destination id's
      */
     ActionMessage (action_message_def::action_t startingAction, int32_t sourceId, int32_t destId);
     /** move constructor*/
     ActionMessage (ActionMessage &&act) noexcept;
     /** build an action message from a message*/
-    ActionMessage (std::unique_ptr<Message> message);
+    explicit ActionMessage (std::unique_ptr<Message> message);
     /** construct from a string*/
     explicit ActionMessage (const std::string &bytes);
     /** construct from a data vector*/
@@ -110,7 +112,7 @@ class ActionMessage
     /** move assignment*/
     ActionMessage &operator= (ActionMessage &&act) noexcept;
     /** get the action of the message*/
-    action_message_def::action_t action () const noexcept { return action_; }
+    action_message_def::action_t action () const noexcept { return messageAction; }
     /** set the action*/
     void setAction (action_message_def::action_t newAction);
     /** get a reference to the additional info structure*/
@@ -126,23 +128,23 @@ class ActionMessage
     template <class Archive>
     void save (Archive &ar) const
     {
-        ar (action_, source_id, source_handle, dest_id, dest_handle);
+        ar (messageAction, source_id, source_handle, dest_id, dest_handle);
         ar (counter, flags);
 
         auto btc = actionTime.getBaseTimeCode ();
         auto Tebase = Te.getBaseTimeCode ();
         auto Tdeminbase = Tdemin.getBaseTimeCode ();
         ar (btc, Tebase, Tdeminbase, payload);
-        if (hasInfo (action_))
+        if (hasInfo (messageAction))
         {
-            ar (info_);
+            ar (extraInfo);
         }
     }
 
     template <class Archive>
     void load (Archive &ar)
     {
-        ar (action_, source_id, source_handle, dest_id, dest_handle);
+        ar (messageAction, source_id, source_handle, dest_id, dest_handle);
 
         ar (counter, flags);
 
@@ -155,13 +157,13 @@ class ActionMessage
         actionTime.setBaseTimeCode (btc);
         Te.setBaseTimeCode (Tebase);
         Tdemin.setBaseTimeCode (Tdeminbase);
-        if (hasInfo (action_))
+        if (hasInfo (messageAction))
         {
-            if (!info_)
+            if (!extraInfo)
             {
-                info_ = std::make_unique<AdditionalInfo> ();
+                extraInfo = std::make_unique<AdditionalInfo> ();
             }
-            ar (info_);
+            ar (extraInfo);
         }
     }
 

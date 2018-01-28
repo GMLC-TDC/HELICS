@@ -85,7 +85,7 @@ class integer_time
   public:
     using baseType = base;
     static constexpr baseType maxVal () noexcept { return (std::numeric_limits<baseType>::max) (); }
-    static constexpr baseType minVal () noexcept { return (std::numeric_limits<baseType>::min) (); }
+    static constexpr baseType minVal () noexcept { return (std::numeric_limits<baseType>::min+1) (); }
     static constexpr baseType zeroVal () noexcept { return 0; }
     static constexpr baseType epsilon () noexcept { return 1; }
     /** convert to a base type representation*/
@@ -180,8 +180,9 @@ class count_time
     static constexpr double ddivFactor = 1.0 / fac10f[N];  // the floating point division factor
   public:
     using baseType = base;
+    /** the maximum representable value must be negatable hence the +1 in the min since that cannot be negated properly*/
     static constexpr baseType maxVal () noexcept { return (std::numeric_limits<baseType>::max) (); }
-    static constexpr baseType minVal () noexcept { return (std::numeric_limits<baseType>::min) (); }
+    static constexpr baseType minVal () noexcept { return (std::numeric_limits<baseType>::min+1) (); }
     static constexpr baseType zeroVal () noexcept { return baseType (0); }
     static constexpr baseType epsilon () noexcept { return baseType (1); }
     static constexpr baseType convert (double t) noexcept

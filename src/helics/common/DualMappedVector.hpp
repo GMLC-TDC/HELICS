@@ -16,6 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <string>
 #include <vector>
 #include <type_traits>
+#include <algorithm>
 
 /** class to create a searchable vector by defined unique indices.
 The result object can be indexed multiple ways both by searching using indices or by numerical index
@@ -34,13 +35,13 @@ public:
         auto fnd = lookup1.find(searchValue1);
         if (fnd != lookup1.end())
         {
-            dataStorage_[fnd->second] = VType(std::forward<Us>(data)...);
+            dataStorage[fnd->second] = VType(std::forward<Us>(data)...);
 			lookup2[searchValue2] = fnd->second;
         }
         else
         {
-			auto index = dataStorage_.size();
-            dataStorage_.emplace_back(std::forward<Us>(data)...);
+			auto index = dataStorage.size();
+            dataStorage.emplace_back(std::forward<Us>(data)...);
             lookup1.emplace(searchValue1,  index);
             lookup2.emplace(searchValue2, index);
         }
@@ -48,7 +49,7 @@ public:
 	/** add an additional index term for searching*/
 	bool addSearchTermForIndex(const searchType1 &searchValue, size_t index)
 	{
-		if (index < dataStorage_.size())
+		if (index < dataStorage.size())
 		{
 			auto res = lookup1.emplace(searchValue, index);
 			return res.second;
@@ -73,7 +74,7 @@ public:
 	/** add an additional index term for searching*/
 	bool addSearchTermForIndex(const searchType2 &searchValue, size_t index)
 	{
-		if (index < dataStorage_.size())
+		if (index < dataStorage.size())
 		{
 			auto res = lookup2.emplace(searchValue, index);
 			return res.second;
@@ -125,9 +126,9 @@ public:
         auto fnd = lookup1.find(searchValue);
         if (fnd != lookup1.end())
         {
-            return dataStorage_.begin() + fnd->second;
+            return dataStorage.begin() + fnd->second;
         }
-        return dataStorage_.end();
+        return dataStorage.end();
     }
 
     auto find(const searchType2 &searchValue) const
@@ -135,9 +136,9 @@ public:
         auto fnd = lookup2.find(searchValue);
         if (fnd != lookup2.end())
         {
-            return dataStorage_.begin() + fnd->second;
+            return dataStorage.begin() + fnd->second;
         }
-        return dataStorage_.end();
+        return dataStorage.end();
     }
 
     auto find(const searchType1 &searchValue)
@@ -145,9 +146,9 @@ public:
         auto fnd = lookup1.find(searchValue);
         if (fnd != lookup1.end())
         {
-            return dataStorage_.begin() + fnd->second;
+            return dataStorage.begin() + fnd->second;
         }
-        return dataStorage_.end();
+        return dataStorage.end();
     }
 
     auto find(const searchType2 &searchValue)
@@ -155,18 +156,18 @@ public:
         auto fnd = lookup2.find(searchValue);
         if (fnd != lookup2.end())
         {
-            return dataStorage_.begin() + fnd->second;
+            return dataStorage.begin() + fnd->second;
         }
-        return dataStorage_.end();
+        return dataStorage.end();
     }
 
 	void removeIndex(size_t index)
 	{
-		if (index >= dataStorage_.size())
+		if (index >= dataStorage.size())
 		{
 			return;
 		}
-		dataStorage_.erase(dataStorage_.begin() + index);
+		dataStorage.erase(dataStorage.begin() + index);
 		std::vector<searchType1> ind1(2);
 		std::vector<searchType2> ind2(2);
 		for (auto &el2 : lookup1)
@@ -231,19 +232,19 @@ public:
 		auto index = el->second;
 		removeIndex(index);
 	}
-    VType &operator[] (size_t index) { return dataStorage_[index]; }
+    VType &operator[] (size_t index) { return dataStorage[index]; }
 
-    const VType &operator[] (size_t index) const { return dataStorage_[index]; }
+    const VType &operator[] (size_t index) const { return dataStorage[index]; }
 
-	VType &back() { return dataStorage_.back(); }
+	VType &back() { return dataStorage.back(); }
 
-	const VType &back() const{ return dataStorage_.back(); }
+	const VType &back() const{ return dataStorage.back(); }
 	/** apply a function to all the values
 	@param F must be a function with signature like void fun(const VType &a);*/
 	template<class UnaryFunction >
 	void apply(UnaryFunction F)
 	{
-		std::for_each(dataStorage_.begin(), dataStorage_.end(), F);
+		std::for_each(dataStorage.begin(), dataStorage.end(), F);
 	}
 
 	/** transform all the values
@@ -251,22 +252,22 @@ public:
 	template<class UnaryFunction >
 	void transform(UnaryFunction F)
 	{
-		std::transform(dataStorage_.begin(), dataStorage_.end(), dataStorage_.begin(), F);
+		std::transform(dataStorage.begin(), dataStorage.end(), dataStorage.begin(), F);
 	}
-    auto begin() const { return dataStorage_.cbegin(); }
-    auto end() const { return dataStorage_.cend(); }
+    auto begin() const { return dataStorage.cbegin(); }
+    auto end() const { return dataStorage.cend(); }
 
-    auto size() const { return dataStorage_.size(); }
+    auto size() const { return dataStorage.size(); }
 
     void clear()
     {
-        dataStorage_.clear();
+        dataStorage.clear();
         lookup1.clear();
         lookup2.clear();
     }
 
 private:
-    std::vector<VType> dataStorage_; //!< primary storage for data
+    std::vector<VType> dataStorage; //!< primary storage for data
     std::unordered_map<searchType1, size_t> lookup1;  //!< lookup with searchType1
     std::unordered_map<searchType2, size_t> lookup2;  //!< lookup with searchType2
 };

@@ -29,19 +29,6 @@ enum helics_federate_state_type
     HELICS_NONE,  //!< unknown state
 };
 
-enum helics_time_unit
-{
-    Y,
-    D,
-    H,
-    MIN,
-    S,
-    MS,
-    US,
-    NS,
-    PS
-};
-
 namespace helics
 {
 /** the type of the cores that are available */

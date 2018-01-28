@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_SUITE (ActionMessage_tests)
 
 using namespace helics;
 /*
-int32_t action_ = action_t::cmd_ignore; //4 -- command
+int32_t messageAction = action_t::cmd_ignore; //4 -- command
 public:
     int32_t source_id = 0;		//8 -- for federate_id or route_id
     int32_t source_handle = 0;	//12 -- for local handle or local code
@@ -30,7 +30,7 @@ public:
     std::string payload;		//!< string containing the data	//56 std::string is 24 bytes on most platforms
     std::string &name;  //!<alias payload to a name reference for registration functions
 private:
-    std::unique_ptr<AdditionalInfo> info_;   //!< pointer to an additional info structure with more data if
+    std::unique_ptr<AdditionalInfo> extraInfo;   //!< pointer to an additional info structure with more data if
 required
 */
 BOOST_AUTO_TEST_CASE (action_test_to_string_conversion)
@@ -41,8 +41,8 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion)
     BOOST_CHECK_LT(b, 64);
     if (b > 64)
     {
-        printf("sizeof(info_)=%d\n", static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>)));
-        printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.info_)) - reinterpret_cast<char
+        printf("sizeof(extraInfo)=%d\n", static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>)));
+        printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
     *>(&m)));
     }
     */
@@ -75,8 +75,8 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
     BOOST_CHECK_LT(b, 64);
     if (b > 64)
     {
-    printf("sizeof(info_)=%d\n", static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>)));
-    printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.info_)) - reinterpret_cast<char *>(&m)));
+    printf("sizeof(extraInfo)=%d\n", static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>)));
+    printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char *>(&m)));
     }
     */
     m.actionTime = 47.2342;

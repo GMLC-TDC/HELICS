@@ -1,5 +1,3 @@
-#pragma once
-
 /*
 
 Copyright (C) 2017-2018, Battelle Memorial Institute
@@ -15,6 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <memory>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 /** class merging a vector of pointer with a map that can be used to lookup specific values
 */
@@ -31,16 +30,13 @@ public:
 		auto fnd = lookup.find(searchValue);
 		if (fnd != lookup.end())
 		{
-			dataStorage_[fnd->second] = std::move(ptr);
+			dataStorage[fnd->second] = std::move(ptr);
 			return fnd->second;
 		}
-		else
-		{
-			auto index = dataStorage_.size();
-			dataStorage_.emplace_back(std::move(ptr));
-			lookup.emplace(searchValue, index);
-			return index;
-		}
+	    auto index = dataStorage.size();
+		dataStorage.emplace_back(std::move(ptr));
+		lookup.emplace(searchValue, index);
+		return index;
 	}
 	/** insert a new element into the vector*/
 	template <typename... Us>
@@ -49,20 +45,17 @@ public:
 		auto fnd = lookup.find(searchValue);
 		if (fnd != lookup.end())
 		{
-			dataStorage_[fnd->second] = std::make_unique<VType>(std::forward<Us>(data)...);
+			dataStorage[fnd->second] = std::make_unique<VType>(std::forward<Us>(data)...);
 			return fnd->second;
 		}
-		else
-		{
-			auto index = dataStorage_.size();
-			dataStorage_.emplace_back(std::make_unique<VType>(std::forward<Us>(data)...));
-			lookup.emplace(searchValue, index);
-			return index;
-		}
+	    auto index = dataStorage.size();
+		dataStorage.emplace_back(std::make_unique<VType>(std::forward<Us>(data)...));
+		lookup.emplace(searchValue, index);
+		return index;
 	}
 
 	/** get a pointer to the last element inserted*/
-	VType *back() { return dataStorage_.back().get(); }
+	VType *back() { return dataStorage.back().get(); }
 
 	/** find an element based on the search value
 	@return nullptr if the element is not found
@@ -72,7 +65,7 @@ public:
 		auto fnd = lookup.find(searchValue);
 		if (fnd != lookup.end())
 		{
-			return dataStorage_[fnd->second].get();
+			return dataStorage[fnd->second].get();
 		}
 		return nullptr;
 	}
@@ -85,23 +78,23 @@ public:
 		auto fnd = lookup.find(searchValue);
 		if (fnd != lookup.end())
 		{
-			return dataStorage_[fnd->second].get();
+			return dataStorage[fnd->second].get();
 		}
 		return nullptr;
 	}
 
-	VType *operator[] (size_t index) {return(index<dataStorage_.size())?(dataStorage_[index].get()):nullptr; }
+	VType *operator[] (size_t index) {return(index<dataStorage.size())?(dataStorage[index].get()):nullptr; }
 
-	const VType *operator[] (size_t index) const { return(index<dataStorage_.size()) ? (dataStorage_[index].get()) : nullptr; }
+	const VType *operator[] (size_t index) const { return(index<dataStorage.size()) ? (dataStorage[index].get()) : nullptr; }
 	/** remove an element at a specific index
 	@param[in] index the index of the element to remove*/
 	void removeIndex(size_t index)
 	{
-		if (index >= dataStorage_.size())
+		if (index >= dataStorage.size())
 		{
 			return;
 		}
-		dataStorage_.erase(dataStorage_.begin() + index);
+		dataStorage.erase(dataStorage.begin() + index);
 		searchType ind;
 		for (auto &el2 : lookup)
 		{
@@ -129,7 +122,7 @@ public:
 			return;
 		}
 		auto index = el->second;
-		dataStorage_.erase(dataStorage_.begin() + index);
+		dataStorage.erase(dataStorage.begin() + index);
 		for (auto &el2 : lookup)
 		{
 			if (el2.second > index)
@@ -145,7 +138,7 @@ public:
 	template<class UnaryFunction >
 	void apply(UnaryFunction F)
 	{
-		for (auto &vp : dataStorage_)
+		for (auto &vp : dataStorage)
 		{
 			F(vp.get());
 		}
@@ -156,25 +149,25 @@ public:
 	template<class UnaryFunction >
 	void apply(UnaryFunction F) const
 	{
-		for (auto &vp : dataStorage_)
+		for (auto &vp : dataStorage)
 		{
 			F(vp.get());
 		}
 	}
 	/** get a const iterator to the start of the data*/
-	auto begin() const { return dataStorage_.cbegin(); }
+	auto begin() const { return dataStorage.cbegin(); }
 	/** get a constant iterator to the end of the data*/
-	auto end() const { return dataStorage_.cend(); }
-	/** get the numer of elements in the data*/
-	auto size() const { return dataStorage_.size(); }
+	auto end() const { return dataStorage.cend(); }
+	/** get the number of elements in the data*/
+	auto size() const { return dataStorage.size(); }
 	/** remove all elements from the data*/
 	void clear()
 	{
-		dataStorage_.clear();
+		dataStorage.clear();
 		lookup.clear();
 	}
 
 private:
-	std::vector<std::unique_ptr<VType>> dataStorage_; //!< storage for the pointers
+	std::vector<std::unique_ptr<VType>> dataStorage; //!< storage for the pointers
 	std::unordered_map<searchType, size_t> lookup;	//!< map to lookup the index
 };
