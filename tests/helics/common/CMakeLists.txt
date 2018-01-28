@@ -34,6 +34,8 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 target_link_libraries(common-tests ${Boost_LIBRARIES_test})
 
+
+
 add_test(NAME common-tests COMMAND common-tests --log_level=warning --report_level=short)
 set_target_properties (common-tests PROPERTIES FOLDER tests)
 
