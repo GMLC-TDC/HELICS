@@ -11,7 +11,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 //#include <iostream>
 #include <helics/application_api/Federate.hpp>
 
-#ifndef _MSC_VER
+#include "helics/helics-config.h"
+
+#ifndef BOOST_STATIC
 #define BOOST_TEST_DYN_LINK
 #endif
 
