@@ -264,7 +264,7 @@ class CommonCore : public Core, public BrokerBase
     int32_t _global_federation_size = 0;  //!< total size of the federation
     bool hasLocalFilters = false;
     std::atomic<int16_t> delayInitCounter{
-      0};  //!< counter for the number of times the entry to init Mode was explicitly delayed
+      0};  //!< counter for the number of times the entry to initialization Mode was explicitly delayed
     std::vector<std::unique_ptr<FederateState>> _federates;  //!< local federate information
     std::vector<int>
       ongoingFilterActionCounter;  //!< counter for the number of ongoing filter transactions for a federate
@@ -282,7 +282,7 @@ class CommonCore : public Core, public BrokerBase
                             fed_handle_pair,
                             std::unordered_map<std::string, size_t>,
                             std::map<fed_handle_pair, size_t>>
-      filters;  // storage for all the filters
+      filters;  //!< storage for all the filters
   private:
     mutable std::mutex _mutex;  //!< mutex protecting the federate creation and modification
     mutable std::mutex

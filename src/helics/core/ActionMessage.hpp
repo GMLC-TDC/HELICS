@@ -71,7 +71,7 @@ class ActionMessage
     int32_t dest_id = 0;  //!< 16 fed_id for a targeted message
     int32_t dest_handle = 0;  //!< 20 local handle for a targeted message
     int32_t &index;  //!< alias to dest_handle
-    uint16_t counter = 0;  //!< 22 counter for filter tracking
+    uint16_t counter = 0;  //!< 22 counter for filter tracking or message counter
     uint16_t flags = 0;  //!<  24 set of messageFlags
 
     Time actionTime = timeZero;  //!< 32 the time an action took place or will take place	//32
@@ -198,29 +198,36 @@ class ActionMessage
     void from_vector (const std::vector<char> &data);
 };
 
-#define SET_ACTION_FLAG(M, flag)                                                                                  \
-    do                                                                                                            \
-    {                                                                                                             \
-        M.flags |= (uint16_t (1) << (flag));                                                                      \
-    } while (false)
+/** template function to set a flag in an object containing a flags field*/
+template <class FlagContainer, class FlagIndex>
+inline void setActionFlag(FlagContainer &M, FlagIndex flag)
+{
+    M.flags |= (decltype(M.flags)(1) << (flag));
+}
 
-#define CHECK_ACTION_FLAG(M, flag) ((M.flags & (uint16_t (1) << (flag))) != 0)
+/** template function to check a flag in an object containing a flags field*/
+template <class FlagContainer, class FlagIndex>
+inline bool checkActionFlag(const FlagContainer &M, FlagIndex flag)
+{
+    return ((M.flags & (decltype(M.flags)(1) << (flag))) != 0);
+}
 
-#define CLEAR_ACTION_FLAG(M, flag)                                                                                \
-    do                                                                                                            \
-    {                                                                                                             \
-        M.flags &= ~(uint16_t (1) << (flag));                                                                     \
-    } while (false)
+/** template function to clear a flag in an object containing a flags field*/
+template <class FlagContainer, class FlagIndex>
+inline void clearActionFlag(FlagContainer &M, FlagIndex flag)
+{
+    M.flags &= ~(decltype(M.flags)(1) << (flag));
+}
 
 /** create a new message object that copies all the information from the ActionMessage into newly allocated memory
  * for the message
  */
-std::unique_ptr<Message> createMessage (const ActionMessage &cmd);
+std::unique_ptr<Message> createMessageFromCommand (const ActionMessage &cmd);
 
 /** create a new message object that moves all the information from the ActionMessage into newly allocated memory
  * for the message
  */
-std::unique_ptr<Message> createMessage (ActionMessage &&cmd);
+std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd);
 
 /** check if a command is a protocol command*/
 inline bool isProtocolCommand (const ActionMessage &command) noexcept
@@ -234,7 +241,7 @@ inline bool isPriorityCommand (const ActionMessage &command) noexcept
     return (command.action () < action_message_def::action_t::cmd_ignore);
 }
 
-inline bool isTimingMessage (const ActionMessage &command) noexcept
+inline bool isTimingCommand (const ActionMessage &command) noexcept
 {
     switch (command.action ())
     {
@@ -250,7 +257,7 @@ inline bool isTimingMessage (const ActionMessage &command) noexcept
     }
 }
 
-inline bool isDependencyMessage (const ActionMessage &command) noexcept
+inline bool isDependencyCommand (const ActionMessage &command) noexcept
 {
     switch (command.action ())
     {
@@ -273,7 +280,7 @@ inline bool isDisconnectCommand (const ActionMessage &command) noexcept
             (command.action () == CMD_TERMINATE_IMMEDIATELY));
 }
 
-/** check if a command is a priority command*/
+/** check if a command is a valid command*/
 inline bool isValidCommand (const ActionMessage &command) noexcept
 {
     return (command.action () != action_message_def::action_t::cmd_invalid);

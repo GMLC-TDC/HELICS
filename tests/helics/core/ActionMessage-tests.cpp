@@ -185,9 +185,9 @@ BOOST_AUTO_TEST_CASE (assignment_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    SET_ACTION_FLAG (cmd, iterationRequested);
-    SET_ACTION_FLAG (cmd, pub_required);
-    SET_ACTION_FLAG (cmd, error_flag);
+    setActionFlag (cmd, iterationRequested);
+    setActionFlag (cmd, pub_required);
+    setActionFlag (cmd, error_flag);
     cmd.actionTime = helics::Time::maxVal ();
     cmd.payload = "hello world";
 
@@ -204,9 +204,9 @@ BOOST_AUTO_TEST_CASE (assignment_test)
     BOOST_CHECK_EQUAL (cmd_assign.source_handle, 2);
     BOOST_CHECK_EQUAL (cmd_assign.dest_id, 3);
     BOOST_CHECK_EQUAL (cmd_assign.dest_handle, 4);
-    BOOST_CHECK (CHECK_ACTION_FLAG (cmd_assign, iterationRequested));
-    BOOST_CHECK (CHECK_ACTION_FLAG (cmd_assign, pub_required));
-    BOOST_CHECK (CHECK_ACTION_FLAG (cmd_assign, error_flag));
+    BOOST_CHECK (checkActionFlag (cmd_assign, iterationRequested));
+    BOOST_CHECK (checkActionFlag (cmd_assign, pub_required));
+    BOOST_CHECK (checkActionFlag (cmd_assign, error_flag));
     BOOST_CHECK_EQUAL (cmd_assign.actionTime, helics::Time::maxVal ());
     BOOST_CHECK_EQUAL (cmd_assign.payload, "hello world");
     BOOST_CHECK_EQUAL (cmd_assign.name, "hello world");  // aliased to payload
@@ -253,9 +253,9 @@ BOOST_AUTO_TEST_CASE (conversion_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    SET_ACTION_FLAG (cmd, iterationRequested);
-    SET_ACTION_FLAG (cmd, pub_required);
-    SET_ACTION_FLAG (cmd, error_flag);
+    setActionFlag (cmd, iterationRequested);
+    setActionFlag (cmd, pub_required);
+    setActionFlag (cmd, error_flag);
     cmd.actionTime = 45.7;
     cmd.payload = "hello world";
 
@@ -290,9 +290,9 @@ BOOST_AUTO_TEST_CASE (message_message_conversion_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    SET_ACTION_FLAG (cmd, iterationRequested);
-    SET_ACTION_FLAG (cmd, pub_required);
-    SET_ACTION_FLAG (cmd, error_flag);
+    setActionFlag (cmd, iterationRequested);
+    setActionFlag (cmd, pub_required);
+    setActionFlag (cmd, error_flag);
     cmd.actionTime = 45.7;
     cmd.payload = "hello world";
 
@@ -302,7 +302,7 @@ BOOST_AUTO_TEST_CASE (message_message_conversion_test)
     cmd.info ().target = "target";  // units aliased to target
     cmd.info ().orig_source = "original_source";
 
-    auto msg = helics::createMessage (cmd);
+    auto msg = helics::createMessageFromCommand (cmd);
 
     BOOST_CHECK_EQUAL (cmd.actionTime, msg->time);
     BOOST_CHECK_EQUAL (cmd.info ().source, msg->source);
@@ -352,9 +352,9 @@ BOOST_AUTO_TEST_CASE (check_packetization)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    SET_ACTION_FLAG (cmd, iterationRequested);
-    SET_ACTION_FLAG (cmd, pub_required);
-    SET_ACTION_FLAG (cmd, error_flag);
+    setActionFlag (cmd, iterationRequested);
+    setActionFlag (cmd, pub_required);
+    setActionFlag (cmd, error_flag);
     cmd.actionTime = 45.7;
     cmd.payload = "hello world";
 

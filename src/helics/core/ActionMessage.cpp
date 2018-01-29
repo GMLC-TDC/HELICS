@@ -336,7 +336,7 @@ void ActionMessage::from_string (const std::string &data) { fromByteArray (data.
 
 void ActionMessage::from_vector (const std::vector<char> &data) { fromByteArray (data.data (), data.size ()); }
 
-std::unique_ptr<Message> createMessage (const ActionMessage &cmd)
+std::unique_ptr<Message> createMessageFromCommand (const ActionMessage &cmd)
 {
     auto msg = std::make_unique<Message> ();
     msg->original_source = cmd.info ().orig_source;
@@ -349,7 +349,7 @@ std::unique_ptr<Message> createMessage (const ActionMessage &cmd)
     return msg;
 }
 
-std::unique_ptr<Message> createMessage (ActionMessage &&cmd)
+std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd)
 {
     auto msg = std::make_unique<Message> ();
     msg->original_source = std::move (cmd.info ().orig_source);
@@ -466,7 +466,7 @@ std::string prettyPrintString (const ActionMessage &command)
         ret.push_back (':');
         ret.append (command.name);
         ret.append ("--");
-        if (CHECK_ACTION_FLAG (command, error_flag))
+        if (checkActionFlag (command, error_flag))
         {
             ret.append ("error");
         }
