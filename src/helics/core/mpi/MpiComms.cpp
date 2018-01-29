@@ -17,20 +17,43 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
+
+bool MpiComms::mpiCommsExists = false;
+
 MpiComms::MpiComms ()
 {
+    if (mpiCommsExists)
+    {
+        printf("WARNING: MPIComms object already created, unexpected results may occur\n");
+    }
+    initMPI();
+    mpiCommsExists = true;
 }
 
 MpiComms::MpiComms(const int &brokerRank)
     : brokerRank(brokerRank)
 {
+    if (mpiCommsExists)
+    {
+        printf("WARNING: MPIComms object already created, unexpected results may occur\n");
+    }
+    initMPI();
+    mpiCommsExists = true;
 }
 
 /** destructor*/
-MpiComms::~MpiComms () { disconnect (); }
+MpiComms::~MpiComms ()
+{
+    disconnect ();
+
+    std::lock_guard<std::mutex> lock(mpiSerialMutex);
+    MPI_Finalize();
+}
 
 bool MpiComms::initMPI()
 {
+    std::lock_guard<std::mutex> lock(mpiSerialMutex);
+
     // Initialize MPI with MPI_THREAD_SERIALIZED
     int mpi_initialized;
     int mpi_thread_level;
@@ -59,19 +82,40 @@ bool MpiComms::initMPI()
 
 void MpiComms::serializeSendMPI(std::vector<char> message, int dest, int tag, MPI_Comm comm) {
     std::lock_guard<std::mutex> lock(mpiSerialMutex);
-    MPI_Send(message.data(), message.size(), MPI_CHAR, dest, tag, comm);
+    MPI_Request req;
+    MPI_Isend(message.data(), message.size(), MPI_CHAR, dest, tag, comm, &req);
+
+    int message_sent = false;
+    while (!message_sent)
+    {
+        MPI_Test(&req, &message_sent, MPI_STATUS_IGNORE);
+    }
 }
 
 std::vector<char> MpiComms::serializeReceiveMPI(int src, int tag, MPI_Comm comm) {
-    std::lock_guard<std::mutex> lock(mpiSerialMutex);
-    int recv_size;
-    std::vector<char> buffer;
+    int message_waiting = false;
     MPI_Status status;
-    MPI_Probe(src, tag, comm, &status);
-    MPI_Get_count(&status, MPI_CHAR, &recv_size);
-    buffer.resize(recv_size);
-    MPI_Recv(buffer.data(), buffer.capacity(), MPI_CHAR, src, tag, comm, MPI_STATUS_IGNORE);
-    return buffer;
+    MPI_Iprobe(src, tag, comm, &message_waiting, &status);
+
+    if (message_waiting == true)
+    {
+        std::lock_guard<std::mutex> lock(mpiSerialMutex);
+        int recv_size;
+        std::vector<char> buffer;
+        MPI_Get_count(&status, MPI_CHAR, &recv_size);
+        buffer.resize(recv_size);
+        MPI_Request req;
+        MPI_Irecv(buffer.data(), buffer.capacity(), MPI_CHAR, src, tag, comm, &req);
+
+        int message_received = false;
+        while (!message_received)
+        {
+            MPI_Test(&req, &message_received, MPI_STATUS_IGNORE);
+        }
+        return buffer;
+    }
+
+    return std::vector<char>();
 }
 
 int MpiComms::processIncomingMessage (ActionMessage &M)
@@ -131,13 +175,9 @@ void MpiComms::queue_rx_function ()
             rx_status = connection_status::error;
             return;
         }
-        if (len == 5)
+        if (shutdown)
         {
-            std::string str (data.data (), len);
-            if (str == "close")
-            {
-                goto CLOSE_RX_LOOP;
-            }
+            goto CLOSE_RX_LOOP;
         }
         ActionMessage M (data.data (), len);
         if (!isValidCommand (M))
@@ -176,7 +216,8 @@ void MpiComms::queue_rx_function ()
         }
     }
 CLOSE_RX_LOOP:
-    // TODO tell tx loop to shut down
+    // Does tx loop need anything special telling it to shut down? ie - sending it a message?
+    shutdown = true;
     rx_status = connection_status::terminated;
 }
 
@@ -244,8 +285,8 @@ void MpiComms::queue_tx_function ()
         }
         else if (route_id == -1)
         {  // send to rx thread loop
-            // Send using MPI to ourself? Can it just get added directly to a receive queue?
             //transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), rxEndpoint, 0, error);
+            // Send to ourself -- may need command line option to enable for openmpi
             serializeSendMPI(cmd.to_vector(), std::stoi(getAddress()), 0, MPI_COMM_WORLD);
             if (error)
             {
@@ -284,20 +325,18 @@ CLOSE_TX_LOOP:
     routes.clear ();
     if (rx_status == connection_status::connected)
     {
-        closeReceiver();
+        shutdown = true;
     }
 
     tx_status = connection_status::terminated;
 }
 
-void MpiComms::closeReceiver ()
-{
-    ActionMessage cmd(CMD_PROTOCOL);
-    cmd.index = CLOSE_RECEIVER;
-    // TODO somehow send message over to rx loop
+void MpiComms::closeReceiver() {
+    shutdown = true;
+    disconnect(); 
 }
 
-std::string MpiComms::getAddress () const {
+std::string MpiComms::getAddress () {
     int world_rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     return std::to_string(world_rank);

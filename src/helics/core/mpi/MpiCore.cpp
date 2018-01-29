@@ -48,11 +48,7 @@ bool MpiCore::brokerConnect ()
 
 std::string MpiCore::getAddress () const
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
-
-    int world_rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-    return std::to_string(world_rank);
+    return MpiComms::getAddress();
 }
 
 }  // namespace helics

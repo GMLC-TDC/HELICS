@@ -72,6 +72,9 @@ private:
 	int brokerRank = -1; //!< the mpi rank of the broker
 
     static std::mutex mpiSerialMutex;
+    static bool mpiCommsExists;
+
+    bool shutdown = false;
     
     virtual void queue_rx_function() override;	//!< the functional loop for the receive queue
     virtual void queue_tx_function() override;  //!< the loop for transmitting data
@@ -89,7 +92,7 @@ private:
 	std::atomic<bool> hasBroker{ false };
 	virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
 public:
-	std::string getAddress() const;
+	static std::string getAddress();
 };
 
 
