@@ -26,7 +26,7 @@ int main()
 {
   helics_federate_info_t fedinfo;
   const char*    helicsversion;
- // helics_status   status;
+ /* helics_status   status; */
   helics_broker  broker;
   const char*    initstring="2 --name=mainbroker";
   const char*    fedinitstring="--federates=1";

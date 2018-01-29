@@ -10,8 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "NetworkBrokerData.hpp"
-#include "BrokerFactory.hpp"
 #include "../common/argParser.h"
+#include "BrokerFactory.hpp"
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/host_name.hpp>
@@ -68,12 +68,12 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
     else if (vm.count ("broker") > 0)
     {
         auto addr = vm["broker"].as<std::string> ();
-		auto brkr = BrokerFactory::findBroker(addr);
-		if (brkr)
-		{
-			addr = brkr->getAddress();
-		}
-        auto sc = addr.find_first_of (';', 1);  
+        auto brkr = BrokerFactory::findBroker (addr);
+        if (brkr)
+        {
+            addr = brkr->getAddress ();
+        }
+        auto sc = addr.find_first_of (';', 1);
         if (sc == std::string::npos)
         {
             auto brkprt = extractInterfaceandPort (addr);

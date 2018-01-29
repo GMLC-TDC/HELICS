@@ -8,8 +8,8 @@ Repository for the source code for the Hierarchical Engine for Large-scale Infra
 
 # Install Instructions
 
-[Windows](docs/installing-on-windows.md)
+[Windows](https://gmlc-tdc.github.io/HELICS-src/installation/windows.html)
 
-[Mac](docs/installing-on-osx.md)
+[Mac](https://gmlc-tdc.github.io/HELICS-src/installation/mac.html)
 
-[Ubuntu](docs/installing-on-ubuntu.md)
+[Linux](https://gmlc-tdc.github.io/HELICS-src/installation/linux.html)

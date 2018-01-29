@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "CoreFactory.hpp"
+#include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
 #include "FederateState.hpp"
 #include "FilterFunctions.hpp"
@@ -23,7 +24,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "SubscriptionInfo.hpp"
 #include "TimeCoordinator.hpp"
 #include "core-exceptions.hpp"
-#include "CoreFederateInfo.hpp"
 #include "loggingHelper.hpp"
 #include <boost/filesystem.hpp>
 
@@ -818,10 +818,10 @@ BasicHandleInfo *CommonCore::createBasicHandle (handle_id_t id_,
 }
 
 handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
-                                         const std::string &key,
-                                         const std::string &type,
-                                         const std::string &units,
-                                         handle_check_mode check_mode)
+                                              const std::string &key,
+                                              const std::string &type,
+                                              const std::string &units,
+                                              handle_check_mode check_mode)
 {
     auto fed = getFederate (federateID);
 
@@ -896,9 +896,9 @@ handle_id_t CommonCore::getSubscription (federate_id_t federateID, const std::st
 }
 
 handle_id_t CommonCore::registerPublication (federate_id_t federateID,
-                                        const std::string &key,
-                                        const std::string &type,
-                                        const std::string &units)
+                                             const std::string &key,
+                                             const std::string &type,
+                                             const std::string &units)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -1139,9 +1139,9 @@ handle_id_t CommonCore::getEndpoint (federate_id_t federateID, const std::string
 }
 
 handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
-                                         const std::string &source,
-                                         const std::string &type_in,
-                                         const std::string &type_out)
+                                              const std::string &source,
+                                              const std::string &type_in,
+                                              const std::string &type_out)
 {
     if (brokerState == operating)
     {
@@ -1212,9 +1212,9 @@ handle_id_t CommonCore::getSourceFilter (const std::string &name) const
 }
 
 handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName,
-                                              const std::string &dest,
-                                              const std::string &type_in,
-                                              const std::string &type_out)
+                                                   const std::string &dest,
+                                                   const std::string &type_in,
+                                                   const std::string &type_out)
 {
     if (brokerState == operating)
     {
@@ -1345,10 +1345,7 @@ FilterInfo *CommonCore::createDestFilter (federate_id_t dest,
 
 void CommonCore::registerFrequentCommunicationsPair (const std::string & /*source*/, const std::string & /*dest*/)
 {
-    std::lock_guard<std::mutex> lock (_mutex);
-
-    assert (isInitialized ());
-    assert (false);
+    // std::lock_guard<std::mutex> lock (_mutex);
 }
 
 void CommonCore::addDependency (federate_id_t /*federateID*/, const std::string & /*federateName*/) {}
@@ -2639,7 +2636,7 @@ void CommonCore::checkDependencies ()
     {
         ActionMessage adddep (CMD_ADD_INTERDEPENDENCY);
         adddep.source_id = fedid;
-        routeMessage(adddep, brkid);
+        routeMessage (adddep, brkid);
         routeMessage (adddep,
                       fedid);  // make sure the fed depends on itself in case the broker removes itself later
         adddep.source_id = brkid;

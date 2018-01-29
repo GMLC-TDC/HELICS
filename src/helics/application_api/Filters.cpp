@@ -22,6 +22,35 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
+static const std::map<std::string, defined_filter_types> filterTypes{{"clone", defined_filter_types::clone},
+                                                                     {"cloning", defined_filter_types::clone},
+                                                                     {"delay", defined_filter_types::delay},
+                                                                     {"timedelay", defined_filter_types::delay},
+                                                                     {"randomdelay",
+                                                                      defined_filter_types::randomDelay},
+                                                                     {"randomdrop",
+                                                                      defined_filter_types::randomDrop},
+                                                                     {"reroute", defined_filter_types::reroute},
+                                                                     {"redirect", defined_filter_types::reroute},
+                                                                     {"custom", defined_filter_types::custom}};
+
+defined_filter_types filterTypeFromString (const std::string &filterType) noexcept
+{
+    auto fnd = filterTypes.find (filterType);
+    if (fnd != filterTypes.end ())
+    {
+        return fnd->second;
+    }
+    auto nfilt = filterType;
+    std::transform (nfilt.begin (), nfilt.end (), nfilt.begin (), ::tolower);
+    fnd = filterTypes.find (nfilt);
+    if (fnd != filterTypes.end ())
+    {
+        return fnd->second;
+    }
+    return defined_filter_types::unrecognized;
+}
+
 void addOperations (Filter *filt, defined_filter_types type, Core *cptr)
 {
     switch (type)
@@ -263,12 +292,18 @@ void CloningFilter::removeDeliveryEndpoint (const std::string &endpoint)
 
 void CloningFilter::setString (const std::string &property, const std::string &val)
 {
-    if (property == "source")
+    if ((property == "source") || (property == "add source"))
     {
         addSourceTarget (val);
     }
-    else if ((property == "dest") || (property == "destination"))
+    else if ((property == "dest") || (property == "destination") || (property == "add destination") ||
+             (property == "add dest"))
     {
+        addDestinationTarget (val);
+    }
+    else if ((property == "endpoint") || (property == "add endpoint"))
+    {
+        addSourceTarget (val);
         addDestinationTarget (val);
     }
     else if ((property == "remove destination") || (property == "remove dest"))
@@ -277,6 +312,11 @@ void CloningFilter::setString (const std::string &property, const std::string &v
     }
     else if (property == "remove source")
     {
+        removeSourceTarget (val);
+    }
+    else if (property == "remove endpoint")
+    {
+        removeDestinationTarget (val);
         removeSourceTarget (val);
     }
     else

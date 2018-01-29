@@ -42,7 +42,7 @@ namespace helics
  * Note: Methods should all be pure virtual, leaving syntactical sugar off while iterating API design.
  */
 
-    class CoreFederateInfo;
+class CoreFederateInfo;
 
 /** the class defining the core interface through an abstract class*/
 class Core
@@ -75,12 +75,12 @@ class Core
      */
     virtual void initialize (const std::string &initializationString) = 0;
     /**
-    * Initialize the core from command line arguments.
-    *
-    * Should be invoked a single time to initialize the co-simulation core.
-    *
-    */
-    virtual void initializeFromArgs(int argc, const char * const *argv) = 0;
+     * Initialize the core from command line arguments.
+     *
+     * Should be invoked a single time to initialize the co-simulation core.
+     *
+     */
+    virtual void initializeFromArgs (int argc, const char *const *argv) = 0;
     /**
      * Returns true if the core has been initialized.
      */
@@ -151,7 +151,8 @@ class Core
      @return nonconverged if the executing state has not been entered and there are updates, complete if the
      simulation is ready to move on to the executing state
      */
-    virtual iteration_result enterExecutingState (federate_id_t federateID, helics_iteration_request iterate = NO_ITERATION) = 0;
+    virtual iteration_result
+    enterExecutingState (federate_id_t federateID, helics_iteration_request iterate = NO_ITERATION) = 0;
 
     /**
      * Register a federate.
@@ -227,9 +228,11 @@ class Core
      *@param federateID the identifier for the federate to process
      * @param next the requested time
      * @param localConverged has the local federate converged
-     @return an iteration_time object with two field grantedTime and a enumeration indicating the state of the iteration
+     @return an iteration_time object with two field grantedTime and a enumeration indicating the state of the
+     iteration
      */
-    virtual iteration_time requestTimeIterative (federate_id_t federateID, Time next, helics_iteration_request iterate) = 0;
+    virtual iteration_time
+    requestTimeIterative (federate_id_t federateID, Time next, helics_iteration_request iterate) = 0;
 
     /**
      * Returns the current reiteration count for the specified federate.
@@ -279,8 +282,8 @@ class Core
      *
      * The value is used to determine the interaction amongst various federates as to
      * when a specific federate can influence another
-	* @param federateID  the identifier for the federate
-	* @param timeoutputDelay
+     * @param federateID  the identifier for the federate
+     * @param timeoutputDelay
      */
     virtual void setPeriod (federate_id_t federateID, Time timePeriod) = 0;
     /**
@@ -288,9 +291,9 @@ class Core
     *
     * The value is used as a time shift for calculating the allowable time in a federate
     the granted time must one of N*period+offset
-    
-	* @param federateID  the identifier for the federate
-	* @param timeOffset the periodic phase shift
+    
+    * @param federateID  the identifier for the federate
+    * @param timeOffset the periodic phase shift
     */
     virtual void setTimeOffset (federate_id_t federateID, Time timeOffset) = 0;
     /**
@@ -298,16 +301,16 @@ class Core
      *
      * The value is used to determine the interaction amongst various federates as to
      * when a specific federate can influence another
-	* @param federateID  the identifier for the federate
-	* @param timeImpact the length of time it take outside message to propagate into a federate
+     * @param federateID  the identifier for the federate
+     * @param timeImpact the length of time it take outside message to propagate into a federate
      */
     virtual void setInputDelay (federate_id_t federateID, Time timeImpact) = 0;
     /**
     Set the logging level
     @details set the logging level for an individual federate
     set federateID to 0 for the core logging level
-	* @param federateID  the identifier for the federate
-	* @param loggingLevel the level of logging to enable
+    * @param federateID  the identifier for the federate
+    * @param loggingLevel the level of logging to enable
     <0-no logging, 0 -error only, 1- warnings, 2-normal, 3-debug, 4-trace
     */
     virtual void setLoggingLevel (federate_id_t federateID, int loggingLevel) = 0;
@@ -318,7 +321,7 @@ class Core
     * @param flag an index code for the flag to set
     @param flagValue the value to set the flag to
     */
-    virtual void setFlag(federate_id_t federateID, int flag, bool flagValue=true) = 0;
+    virtual void setFlag (federate_id_t federateID, int flag, bool flagValue = true) = 0;
     /**
      * Value interface.
      */
@@ -335,10 +338,10 @@ class Core
      * corresponding publication when converting to init mode
      */
     virtual handle_id_t registerSubscription (federate_id_t federateID,
-                                         const std::string &key,
-                                         const std::string &(type),
-                                         const std::string &units,
-                                         handle_check_mode check_mode) = 0;
+                                              const std::string &key,
+                                              const std::string &(type),
+                                              const std::string &units,
+                                              handle_check_mode check_mode) = 0;
     /** get a subscription Handle from its key
     @param federateID the identifier for the federate
     @key the tag of the subscription
@@ -356,9 +359,9 @@ class Core
      @return a handle to identify the publication
      */
     virtual handle_id_t registerPublication (federate_id_t federateID,
-                                        const std::string &key,
-                                        const std::string &type,
-                                        const std::string &units) = 0;
+                                             const std::string &key,
+                                             const std::string &type,
+                                             const std::string &units) = 0;
 
     /** get a publication Handle from its key
     @param federateID the identifier for the federate
@@ -376,7 +379,7 @@ class Core
     @details for publications and subscriptions this is the key
     for filters this is the target and for endpoints this will return an empty string
     */
-    virtual const std::string &getTarget(handle_id_t handle) const = 0;
+    virtual const std::string &getTarget (handle_id_t handle) const = 0;
     /**
      * Returns units for specified handle.
      */
@@ -452,9 +455,9 @@ class Core
      @return the handle for the new filter
      */
     virtual handle_id_t registerSourceFilter (const std::string &filterName,
-                                         const std::string &source,
-                                         const std::string &type_in,
-                                         const std::string &type_out) = 0;
+                                              const std::string &source,
+                                              const std::string &type_in,
+                                              const std::string &type_out) = 0;
     /**
     * Register destination filter.
     @details a destination filter will create an additional processing step of messages before they get to a
@@ -468,9 +471,9 @@ class Core
     @return the handle for the new filter
     */
     virtual handle_id_t registerDestinationFilter (const std::string &filterName,
-                                              const std::string &dest,
-                                              const std::string &type_in,
-                                              const std::string &type_out) = 0;
+                                                   const std::string &dest,
+                                                   const std::string &type_in,
+                                                   const std::string &type_out) = 0;
 
     /** get a source filter Handle from its name or target(this may not be unique so it will only find the first
     one)
@@ -514,7 +517,8 @@ class Core
      * communication network.  This enables simulations to be run with/without
      * a communications model present.
      */
-    virtual void send (handle_id_t sourceHandle, const std::string &destination, const char *data, uint64_t length) = 0;
+    virtual void
+    send (handle_id_t sourceHandle, const std::string &destination, const char *data, uint64_t length) = 0;
 
     /**
      * Send data from source to destination with explicit expected delivery time.
@@ -604,20 +608,24 @@ class Core
     query is answered so use with caution
     */
     virtual std::string query (const std::string &target, const std::string &queryStr) = 0;
-	/** supply a query callback function
-	@details the intention of the query callback is to allow federates to answer particular requests through the query interface
-	this allows other federates to make requests or queries of other federates in an asynchronous fashion.  
-	@param federateID the identifier for the federate
-	@param queryFunction  a function object that returns a string as a result of a query in the form of const string ref.  
-	This callback will be called when a federate received a query that cannot be answered that directed at a particular federate
-	*/
-	virtual void setQueryCallback(federate_id_t federateID, std::function<std::string(const std::string &)> queryFunction)=0;
+    /** supply a query callback function
+    @details the intention of the query callback is to allow federates to answer particular requests through the
+    query interface this allows other federates to make requests or queries of other federates in an asynchronous
+    fashion.
+    @param federateID the identifier for the federate
+    @param queryFunction  a function object that returns a string as a result of a query in the form of const
+    string ref. This callback will be called when a federate received a query that cannot be answered that directed
+    at a particular federate
+    */
+    virtual void setQueryCallback (federate_id_t federateID,
+                                   std::function<std::string (const std::string &)> queryFunction) = 0;
 };
 
 // set at a large negative number but not the largest negative number
 constexpr Core::federate_id_t invalid_fed_id = -2'000'000'000;
 constexpr Core::handle_id_t invalid_handle = -2'000'000'000;
-constexpr Core::handle_id_t direct_send_handle = -1'745'234; //!< this special handle can be used to directly send a message in a core
+constexpr Core::handle_id_t direct_send_handle =
+  -1'745'234;  //!< this special handle can be used to directly send a message in a core
 
 }  // namespace helics
 

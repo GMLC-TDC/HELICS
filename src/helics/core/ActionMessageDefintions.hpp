@@ -11,25 +11,24 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #ifndef ACTION_MESSAGE_DEFINITIONS_
 #define ACTION_MESSAGE_DEFINITIONS_
 #pragma once
+#include <cstdint>
 
 namespace helics
 {
-    enum action_message_flags :uint16_t
-    {
-        iterationRequested = 0,  //!< indicator that an iteration has been requested
-        processingComplete = 1,  //!<indicator that processing has been completed
-        pub_required = 2,  //!< flag indicating a publication is required
-        filt_required = 3, //!< flag indicating that a filter requires a publication
-        error_flag = 4,  //!< flag indicating an error condition associated with the command
-        indicator_flag = 5, //!< flag used for setting values
-        extra_flag1 = 7, //!< extra flag
-    };
+enum action_message_flags : uint16_t
+{
+    iterationRequested = 0,  //!< indicator that an iteration has been requested
+    processingComplete = 1,  //!< indicator that processing has been completed
+    pub_required = 2,  //!< flag indicating a publication is required
+    filt_required = 3,  //!< flag indicating that a filter requires a publication
+    error_flag = 4,  //!< flag indicating an error condition associated with the command
+    indicator_flag = 5,  //!< flag used for setting values
+    extra_flag1 = 7,  //!< extra flag
+};
 
 namespace action_message_def
 {
 const int32_t cmd_info_basis = 0x10000000;
-
-
 
 /** enumeration of globally recognized commands
 @details they are explicitly numbered for debugging and to ensure the enumeration is constant
@@ -54,8 +53,8 @@ enum class action_t : int32_t
     cmd_tick = 1,  //!< command for a timer tick
     cmd_disconnect = 3,  //!< disconnect command
     cmd_disconnect_name = 4,  //!< disconnect a broker or core by name vs id
-    cmd_ping = 6, //!< request for an Echo response
-    cmd_ping_reply=7, //!< response to a ping request
+    cmd_ping = 6,  //!< request for an Echo response
+    cmd_ping_reply = 7,  //!< response to a ping request
 
     cmd_init = 10,  //!< request entry to init mode
     cmd_init_grant = 11,  //!< grant entry to initialization mode
@@ -75,7 +74,7 @@ enum class action_t : int32_t
     cmd_log = 55,  //!< log a message with the root broker
     cmd_warning = 9990,  //!< indicate some sort of warning
     cmd_error = 10000,  //!< indicate an error with a federate
-    cmd_invalid = 1010101, //!< indicates that command has generated an invalid state
+    cmd_invalid = 1010101,  //!< indicates that command has generated an invalid state
     cmd_send_route = 75,  //!< command to define a route information
     cmd_subscriber = 85,  // !< command to send a subscriber
     cmd_add_dependency = 140,  //!< command to send a federate dependency information
@@ -86,7 +85,7 @@ enum class action_t : int32_t
     cmd_remove_interdependency = 149,  //!< command to remove a federate as both dependent and a dependency
 
     cmd_fed_configure = 205,  //!< command to update the configuration of a federate
-    cmd_core_configure = 207, //!< command to update the configuration of a core
+    cmd_core_configure = 207,  //!< command to update the configuration of a core
 
     null_info_command = cmd_info_basis - 1,  //!< biggest command that doesn't have the info structure
     priority_null_info_command =
@@ -95,7 +94,7 @@ enum class action_t : int32_t
           // commands that require the extra info allocation have numbers greater than cmd_info_basis
     cmd_time_request = 500,  //!< request a time or iteration
     cmd_send_message = cmd_info_basis + 20,  //!< send a message
-    cmd_null_message = 726, //!< used when a filter drops a message but it needs to return
+    cmd_null_message = 726,  //!< used when a filter drops a message but it needs to return
     cmd_send_for_filter =
       cmd_info_basis + 30,  //!< send a message to be filtered and forward on to the destination
     cmd_send_for_filter_op =
