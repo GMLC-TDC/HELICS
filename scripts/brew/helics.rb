@@ -19,9 +19,9 @@ class Helics < Formula
 
   def install
 
+    ENV.O0
     mkdir "build" do
       args = std_cmake_args
-      args << "-DQUICK_TESTS_ONLY=ON"
       system "cmake", "..", *args
       system "make", "install"
     end
@@ -31,4 +31,5 @@ class Helics < Formula
     system "false"
   end
 end
+
 
