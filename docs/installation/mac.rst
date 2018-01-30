@@ -62,8 +62,8 @@ To set up your environment:
 
     3. (if needed) Setup a command-line compile environment
 
-         a) Install a C++11 compiler (C++14 preferred). e.g. `clang` from the Xcode command line tools. These can be installed from the command line in Terminal by typing `xcode-select --install` and following the on-screen prompts.
-         b) Install cmake with `brew install cmake`. Alternately, a DMG file is available for cmake from their `website <https://cmake.org/download/>`_.
+         a) Install a C++11 compiler (C++14 preferred). e.g. ``clang`` from the Xcode command line tools. These can be installed from the command line in Terminal by typing ``xcode-select --install`` and following the on-screen prompts.
+         b) Install cmake with ``brew install cmake``. Alternately, a DMG file is available for cmake from their `website <https://cmake.org/download/>`_.
 
     4. Install most dependencies using homebrew.
 
@@ -77,11 +77,11 @@ To set up your environment:
 
 Getting and building from source:
 
-    1. Use `git clone` to to check out a copy of HELICS.
+    1. Use ``git clone`` to to check out a copy of HELICS.
 
     2. Create a build folder. Run cmake and give it the path that HELICS was checked out into.
 
-    3. Run "make".
+    3. Run ``make``.
 
     .. code-block:: bash
 
