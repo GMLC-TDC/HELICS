@@ -17,6 +17,35 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <unistd.h>
 #endif
 
+/* This solves the system being simulated by this simulator. It takes in the coupling variable
+   y and returns the state variable x and the converged status conv
+*/
+void run_sim1(double y,double tol,double *xout,int *converged)
+{
+  double f1, J1, x = *xout;
+  int newt_conv = 0, max_iter = 10, iter = 0;
+  /* Solve the equation using Newton */
+  while (!newt_conv && iter < max_iter) {
+    /* Function value */
+    f1 = x * x - 2 * x - y + 0.5;
+
+    /* Convergence check */
+    if (fabs (f1) < tol) {
+      newt_conv = 1;
+      break;
+    }
+    iter++;
+
+    /* Jacobian */
+    J1 = 2 * x - 2;
+
+    /* Update */
+    x = x - f1 / J1;
+  }
+  *converged = newt_conv;
+  *xout = x;
+}
+
 int main ()
 {
     helics_federate_info_t fedinfo;
@@ -30,14 +59,8 @@ int main ()
     helics_federate vfed;
     helics_publication pub;
     helics_subscription sub;
+    int converged;
 
-    double x = 0.0, y = 0.0, /*yprv = 100,*/ xprv = 100;
-    helics_time_t currenttime = 0.0;
-    helics_iteration_status currenttimeiter = iterating;
-    /*int isupdated;
-    */
-    double tol = 1E-8;
-    int helics_iter = 0;
     helicsversion = helicsGetVersion ();
 
     printf (" Helics version = %s\n", helicsversion);
@@ -68,9 +91,8 @@ int main ()
 
     helicsFederateInfoSetMaxIterations (fedinfo, 100);
 
-    /*
-    status = helicsFederateInfoSetLoggingLevel (fedinfo, 5);
-    */
+    //status = helicsFederateInfoSetLoggingLevel (fedinfo, 5);
+
     /* Create value federate */
     vfed = helicsCreateValueFederate (fedinfo);
     printf (" Value federate created\n");
@@ -79,10 +101,9 @@ int main ()
     pub = helicsFederateRegisterGlobalPublication (vfed, "testA", "double", "");
     printf (" Publication registered\n");
 
+    /* Register the subscription */
     sub = helicsFederateRegisterSubscription (vfed, "testB", "double", "");
     printf (" Subscription registered\n");
-
-    /* Register the subscription */
 
     /* Enter initialization mode */
     status = helicsFederateEnterInitializationMode (vfed);
@@ -95,7 +116,12 @@ int main ()
         return (-3);
     }
 
-    
+    double x = 0.0, y = 0.0, xprv=100;
+    helics_time_t currenttime = 0.0;
+    helics_iteration_status currenttimeiter;
+    currenttimeiter = iterating;
+   // int isupdated;
+    double tol = 1E-8;
 
     helicsPublicationPublishDouble (pub, x);
     /* Enter execution mode */
@@ -109,47 +135,29 @@ int main ()
         return (-3);
     }
     
-
     fflush (NULL);
-    
+    int helics_iter = 0;
     while (currenttimeiter == iterating)
     {
-       /* yprv = y; */
+      helicsSubscriptionGetDouble (sub, &y);
+      /* Solve the system of equations for this federate */
+      run_sim1(y,tol,&x,&converged);
+	 
+      ++helics_iter;
+      printf("Fed1: Current time %4.3f iteration %d x=%f, y=%f\n",currenttime,helics_iter, x, y);
         
-        double f1, J1;
-        int newt_conv = 0, max_iter = 10, iter = 0;
-        helicsSubscriptionGetDouble(sub, &y);
-        /* Solve the equation using Newton */
-        while (!newt_conv && iter < max_iter)
-        {
-            /* Function value */
-            f1 = x * x - 2 * x - y + 0.5;
-
-            if (fabs (f1) < tol)
-            {
-                newt_conv = 1;
-                break;
-            }
-            iter++;
-
-            /* Jacobian */
-            J1 = 2 * x - 2;
-
-            x = x - f1 / J1;
-        }
-        ++helics_iter;
-        printf("Fed1: iteration %d x=%f, y=%f\n",helics_iter, x, y);
-        
-        if ((fabs(x-xprv)>tol)||(helics_iter<5))
-        {
-            helicsPublicationPublishDouble (pub, x);
-            printf("Fed1: publishing new x\n");
-        }
-        fflush(NULL);
-         helicsFederateRequestTimeIterative(vfed, currenttime, iterate_if_needed,&currenttime,&currenttimeiter);
-        xprv = x;
+      if ((fabs(x-xprv)>tol)) {
+	helicsPublicationPublishDouble (pub, x);
+	printf("Fed1: publishing new x\n");
+      } else {
+	printf("Fed1: converged\n");
+      }
+      fflush(NULL);
+      helicsFederateRequestTimeIterative(vfed, currenttime, iterate_if_needed,&currenttime,&currenttimeiter);
+      xprv = x;
     }
 
+    helicsFederateFinalize(vfed);
     printf ("NLIN1: Federate finalized\n");
     fflush (NULL);
     helicsFederateFree (vfed);
