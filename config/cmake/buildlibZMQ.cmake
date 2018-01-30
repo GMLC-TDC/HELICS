@@ -30,10 +30,10 @@ set(trigger_build_dir ${CMAKE_BINARY_DIR}/autobuild/force_libzmq)
 	
 	if (ZMQ_USE_STATIC_LIBRARY)
 	   set(zmq_static_build ON)
-	   set(zmq_shared_build OFF)
+	   set(zmq_shared_build ON)
 	   set(extra_cxx_flags "${extra_cxx_flags} -fPIC")
 	else()
-        set(zmq_static_build OFF)
+        set(zmq_static_build ON)
 	   set(zmq_shared_build ON)
 	endif()
 	
