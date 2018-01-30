@@ -16,7 +16,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 
+
 #include <cstdint>
+#include <map>
 #include <mutex>
 #include <thread>
 #include <utility>

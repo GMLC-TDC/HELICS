@@ -16,6 +16,7 @@ namespace helics
 {
 template class ValueConverter<double>;
 template class ValueConverter<int64_t>;
+template class ValueConverter<uint64_t>;
 template class ValueConverter<char>;
 template class ValueConverter<std::complex<double>>;
 template class ValueConverter<float>;

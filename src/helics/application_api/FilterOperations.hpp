@@ -16,8 +16,8 @@ file defines some common filter operations
 
 #include "../core/Core.hpp"
 #include <atomic>
-#include "../common/GuardedTypes.hpp"
 #include <set>
+#include "../common/GuardedTypes.hpp"
 
 namespace helics
 {
@@ -123,6 +123,7 @@ class CloneFilterOperation : public FilterOperations
         Core *coreptr; //!< pointer to a core object
         std::shared_ptr<CloneOperator> op;  //!< the actual operator
 		shared_guarded<std::vector<std::string>> deliveryAddresses;  //!< the endpoints to deliver the cloned data to
+
 
     public:
         /** this operation needs a pointer to a core to operate*/

@@ -11,11 +11,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #ifndef _HELICS_SUBSCRIPTIONINFO_
 #define _HELICS_SUBSCRIPTIONINFO_
 
-#include "Core.hpp"
-#include "core-data.hpp"
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
-
+#include "../core/Core.hpp"
 #include <utility>
 #include <vector>
 
