@@ -1,6 +1,7 @@
 
 IF (GENERATE_PYTHON)
 
+# https://stackoverflow.com/a/3818084/5451769
 if(MSVC)
   # Force to always compile with W4
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
