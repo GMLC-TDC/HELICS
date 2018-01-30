@@ -2,6 +2,45 @@
 Mac Installation
 ================
 
+Install using brew
+------------------
+
+Requirements
+------------
+
+* brew
+
+Install brew_. It is a package manager for MacOS.
+
+_brew https://brew.sh/
+
+Once you install brew, you can open a terminal and type the following.
+
+.. code-block:: bash
+
+    brew tap GMLC-TDC/helics
+    brew install helics
+
+OR
+
+.. code-block:: bash
+
+    brew install GMLC-TDC/helics/helics
+
+If you want to install it with the Python extension, you can use the following.
+
+.. code-block:: bash
+
+    brew reinstall helics --with-python --with-python-include-dir=$(python3-config --prefix)/include/python3.6m/
+
+You must pass `--with-python-include-dir` with a value. The easiest way to find out what the `--with-python-include-dir` argument should be is by using `python-config` as shown above.
+
+Additionally, you can add `--HEAD` to install from the latest `develop` branch.
+
+
+Install from source
+-------------------
+
 Requirements
 ------------
 
@@ -32,7 +71,7 @@ To set up your environment:
 
             brew install boost
             brew install zeromq
-	    brew install cmake
+            brew install cmake
 
     5. Make sure *cmake* and *git* are available in the Command Prompt with ``which cmake`` and ``which git`` If they aren't, add them to the system PATH variable.
 
