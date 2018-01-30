@@ -12,7 +12,7 @@ Requirements
 
 Install brew_. It is a package manager for MacOS.
 
-_brew https://brew.sh/
+.. _brew: https://brew.sh/
 
 Once you install brew, you can open a terminal and type the following.
 
@@ -115,9 +115,11 @@ Building HELICS using gcc and python
 
 First you will need to build boost using gcc from source. Download boost_ from the boost.org website.
 
-_boost http://www.boost.org/users/history/version_1_64_0.html
+.. _boost: http://www.boost.org/users/history/version_1_64_0.html
 
 Unzip the folder `boost_1_64_0` to any location, for example Downloads.
+
+.. code-block:: bash
 
     $ cd ~/Downloads/boost_1_64_0
     $ ./bootstrap.sh --with-python=/Users/$USER/miniconda3/python3 --prefix=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7
@@ -127,6 +129,8 @@ Unzip the folder `boost_1_64_0` to any location, for example Downloads.
 This will install boost in the ~/local/boost-gcc-1.64 folder
 
 Next, you will need to build HELICS and tell it what the BOOST_ROOT is.
+
+.. code-block:: bash
 
     $ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-1.0.0a/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.64" -DBUILD_PYTHON=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/g++-7 ../
     $ make clean; make -j 4; make install
