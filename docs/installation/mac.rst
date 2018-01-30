@@ -33,9 +33,9 @@ If you want to install it with the Python extension, you can use the following.
 
     brew reinstall helics --with-python --with-python-include-dir=$(python3-config --prefix)/include/python3.6m/
 
-You must pass `--with-python-include-dir` with a value. The easiest way to find out what the `--with-python-include-dir` argument should be is by using `python-config` as shown above.
+You must pass ``--with-python-include-dir`` with a value. The easiest way to find out what the ``--with-python-include-dir`` argument should be is by using ``python-config`` as shown above.
 
-Additionally, you can add `--HEAD` to install from the latest `develop` branch.
+Additionally, you can add ``--HEAD`` to install from the latest ``develop`` branch.
 
 
 Install from source
