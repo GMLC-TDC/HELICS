@@ -16,7 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test out the value converters
  */
 #include "helics/helics.hpp"
-#include "testFixtures.h"
+#include "testFixtures.hpp"
 #include "test_configuration.h"
 
 BOOST_FIXTURE_TEST_SUITE (timing_tests, FederateTestFixture)

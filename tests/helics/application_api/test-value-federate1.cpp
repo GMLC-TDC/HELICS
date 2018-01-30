@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include "testFixtures.h"
+#include "testFixtures.hpp"
 #include "test_configuration.h"
 
 using namespace std::string_literals;

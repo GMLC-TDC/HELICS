@@ -19,23 +19,24 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #ifdef QUICK_TESTS_ONLY
 #ifndef DISABLE_TCP_CORE
-const std::string core_types[] = {"test", "ipc_2", "tcp", "test_2", "zmq", "udp"};
-const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp"};
+const std::string core_types[] = {"test", "ipc_2", "tcp", "test_2", "zmq", "udp","test_3","zmq_3" };
+const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp","test_3","zmq_3"};
 #else
-const std::string core_types[] = {"test", "ipc_2", "test_2", "zmq", "udp"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
+const std::string core_types[] = {"test", "ipc_2", "test_2", "zmq", "udp","test_3","zmq_3" };
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp","test_3","zmq_3" };
 #endif
 #else
 #ifndef DISABLE_TCP_CORE
 const std::string core_types[] = {"test",   "ipc",   "zmq",   "udp",   "tcp",
                                   "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2",
-                                "test_3", "ipc_3", "zmq_3", "udp_3", "tcp_3" ,
-                                "test_4", "ipc_4", "zmq_4", "udp_4", "tcp_4" };
+                                "test_3", "zmq_3", "udp_3", "tcp_3" ,
+                                "test_4", "zmq_4", "udp_4", "tcp_4" };
 const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp",
-                                        "test_3", "ipc_3", "zmq_3", "udp_3", "tcp_3" };
+                                        "test_3", "zmq_3", "udp_3", "tcp_3" };
 #else
-const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp","test_3", "ipc_3", "zmq_3", "udp_3" };
+const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2", "test_3", "zmq_3", "udp_3" ,
+"test_4", "zmq_4", "udp_4" };
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp","test_3", "zmq_3", "udp_3" };
 #endif
 #endif
 

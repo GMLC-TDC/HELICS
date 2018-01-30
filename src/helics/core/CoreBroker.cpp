@@ -207,26 +207,17 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         _federates.back ().route_id = getRoute (command.source_id);
         if (!_isRoot)
         {
-            if (_gateway)
-            {
-                ActionMessage mcopy (CMD_REG_FED);
-                mcopy.name = command.name;
-                mcopy.info ().target = getAddress ();
+          
                 if (global_broker_id != 0)
                 {
-                    mcopy.source_id = global_broker_id;
-                    transmit (0, mcopy);
+                    command.source_id = global_broker_id;
+                    transmit (0, command);
                 }
                 else
                 {
                     // delay the response if we are not fully registered yet
-                    delayTransmitQueue.push (mcopy);
+                    delayTransmitQueue.push (command);
                 }
-            }
-            else
-            {
-                transmit (0, command);
-            }
         }
         else
         {
@@ -264,19 +255,28 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             return;
         }
         _brokers.insert (command.name,static_cast<Core::federate_id_t>(_brokers.size()),command.name);
-        _brokers.back ().route_id = static_cast<decltype (_brokers.back ().route_id)> (_brokers.size ());
-        addRoute (_brokers.back ().route_id, command.info ().target);
+        if (command.source_id == 0)
+        {
+            _brokers.back().route_id = static_cast<decltype (_brokers.back().route_id)> (_brokers.size());
+            addRoute(_brokers.back().route_id, command.info().target);
+        }
+        else
+        {
+            _brokers.back().route_id = getRoute(command.source_id);
+            _brokers.back()._nonLocal = true;
+        }
+       
         if (!_isRoot)
         {
-            if (_gateway)
+            if (global_broker_id != 0)
             {
-                auto mcopy = command;
-                mcopy.source_id = global_broker_id;
-                transmit (0, mcopy);
+                command.source_id = global_broker_id;
+                transmit(0, command);
             }
             else
             {
-                transmit (0, command);
+                // delay the response if we are not fully registered yet
+                delayTransmitQueue.push(command);
             }
         }
         else
@@ -339,6 +339,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             broker->global_id = command.dest_id;
             auto route = broker->route_id;
             _brokers.addSearchTerm(command.dest_id, broker->name);
+            routing_table.emplace(broker->global_id, route);
             command.source_id = global_broker_id;  // we want the intermediate broker to change the source_id
             transmit (route, command);
         }
@@ -1452,12 +1453,12 @@ bool CoreBroker::allInitReady () const
         return false;
     }
 
-    return std::all_of (_brokers.begin (), _brokers.end (), [](auto &brk) { return brk._initRequested; });
+    return std::all_of (_brokers.begin (), _brokers.end (), [](const auto &brk) { return ((brk._nonLocal)||(brk._initRequested)); });
 }
 
 bool CoreBroker::allDisconnected () const
 {
-    return std::all_of (_brokers.begin (), _brokers.end (), [](auto &brk) { return brk._disconnected; });
+    return std::all_of (_brokers.begin (), _brokers.end (), [](const auto &brk) { return brk._disconnected; });
 }
 
 }  // namespace helics

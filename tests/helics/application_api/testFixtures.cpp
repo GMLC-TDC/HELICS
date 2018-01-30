@@ -7,7 +7,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "testFixtures.h"
+#include "testFixtures.hpp"
 #include <boost/test/unit_test.hpp>
 
 #include "helics/core/BrokerFactory.hpp"

@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/application_api/Message.hpp"
 #include "helics/application_api/ValueFederate.hpp"
-#include "testFixtures.h"
+#include "testFixtures.hpp"
 #include "test_configuration.h"
 #include <future>
 /** these test cases test out the value converters and some of the other functions

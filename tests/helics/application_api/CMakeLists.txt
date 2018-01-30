@@ -7,7 +7,7 @@
 
 
 set(application_api_test_headers
-testFixtures.h
+testFixtures.hpp
 )
 
 set(application_api_test_sources

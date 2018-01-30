@@ -8,7 +8,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 
-#include "testFixtures.h"
+#include "testFixtures.hpp"
 #include <complex>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>

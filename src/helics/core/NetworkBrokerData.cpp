@@ -51,6 +51,7 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
         {
             auto brkprt = extractInterfaceandPort (addr);
             brokerAddress = brkprt.first;
+            brokerPort = brkprt.second;
         }
         else
         {
@@ -78,6 +79,7 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
         {
             auto brkprt = extractInterfaceandPort (addr);
             brokerAddress = brkprt.first;
+            brokerPort = brkprt.second;
         }
         else
         {
