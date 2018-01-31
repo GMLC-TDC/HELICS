@@ -23,6 +23,16 @@ if [[ ! -f "dependencies" ]]; then
     mkdir -p dependencies;
 fi
 
+install_boost () {
+    wget -O boost_$1_$2_$3.tar.gz http://sourceforge.net/projects/boost/files/boost/$1.$2.$3/boost_$1_$2_$3.tar.gz/download && tar xzf boost_$1_$2_$3.tar.gz
+    (
+        cd boost_$1_$2_$3/;
+        ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test;
+        ./b2 link=shared threading=multi variant=release > /dev/null;
+        ./b2 install --prefix=../dependencies/boost > /dev/null;
+    )
+}
+
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     if [[ ! -f "cmake-3.4.3-Linux-x86_64/bin/cmake" ]]; then
         echo "*** install cmake"
@@ -55,17 +65,17 @@ if [[ ! -d "dependencies/zmq" ]]; then
     echo "*** built zmq successfully"
 fi
 
+# Install Boost
 if [[ ! -d "dependencies/boost" ]]; then
     echo "*** build boost"
-    wget -O boost_1_61_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz/download && tar xzf boost_1_61_0.tar.gz
-    (
-        cd boost_1_61_0/;
-        ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test;
-        ./b2 link=shared threading=multi variant=release > /dev/null;
-        ./b2 install --prefix=../dependencies/boost > /dev/null;
-    )
+    if [[ "MINIMUM_DEPENDENCIES" == "true" ]]; then
+        install_boost 1 61 0
+    else
+        install_boost 1 65 0
+    fi
     echo "*** built boost successfully"
 fi
+export BOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost}
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     sudo ldconfig ${PWD}/dependencies
