@@ -55,7 +55,7 @@ class TcpComms final:public CommsInterface {
 
 public:
 	/** default constructor*/
-	TcpComms();
+	TcpComms() noexcept;
 	TcpComms(const std::string &brokerTarget, const std::string &localTarget);
     TcpComms(const NetworkBrokerData &netInfo);
 	/** destructor*/
