@@ -17,11 +17,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-/** helper class for Federate info that holds the futures for async calls*/
+/** helper class for Federate info that holds the futures for asynchronous calls*/
 class AsyncFedCallInfo
 {
   public:
-    std::future<void> initFuture; /**future for the init call*/
+    std::future<void> initFuture; /**future for the Enter initialization call*/
     std::future<helics::iteration_result> execFuture; /** future for the enter execution mode call*/
     std::future<helics::Time> timeRequestFuture; /** future for the timeRequest call*/
     std::future<helics::iteration_time>

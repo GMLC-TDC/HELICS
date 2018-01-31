@@ -197,9 +197,13 @@ class NullFilterOperator final : public FilterOperator
     virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) override { return message; }
 };
 
-/** helper template to check whether an index is actually valid for a particular vector*/
-template <class sizeType, class dataType>
-inline bool isValidIndex (sizeType testSize, const std::vector<dataType> &vec)
+/** helper template to check whether an index is actually valid for a particular vector
+@tparam SizedDataType a vector like data type that must have a size function
+@param testSize an index to test
+@param vec a reference to a vector like object that has a size method
+@return true if it is a valid index false otherwise*/
+template <class sizeType, class SizedDataType>
+inline bool isValidIndex (sizeType testSize, const SizedDataType &vec)
 {
     return ((testSize >= sizeType (0)) && (testSize < static_cast<sizeType> (vec.size ())));
 }

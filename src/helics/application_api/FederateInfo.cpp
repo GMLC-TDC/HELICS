@@ -63,26 +63,26 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
 
     if (vm.count ("timedelta") > 0)
     {
-        timeDelta = vm["timedelta"].as<double> ();
+        timeDelta = loadTimeFromString(vm["timedelta"].as<std::string> ());
     }
     if (vm.count ("inputdelay") > 0)
     {
-        timeDelta = vm["inputdelay"].as<double> ();
+        timeDelta = loadTimeFromString(vm["inputdelay"].as<std::string> ());
     }
 
     if (vm.count ("outputdelay") > 0)
     {
-        timeDelta = vm["outputdelay"].as<double> ();
+        timeDelta = loadTimeFromString(vm["outputdelay"].as<std::string> ());
     }
 
     if (vm.count ("period") > 0)
     {
-        period = vm["period"].as<double> ();
+        period = loadTimeFromString(vm["period"].as<std::string> ());
     }
 
     if (vm.count ("offset") > 0)
     {
-        offset = vm["offset"].as<double> ();
+        offset = loadTimeFromString(vm["offset"].as<std::string> ());
     }
     if (vm.count ("maxiterations") > 0)
     {
@@ -249,12 +249,12 @@ void argumentParser (int argc, const char *const *argv, po::variables_map &vm_ma
             ("name,n", po::value<std::string>(), "name of the player federate")
             ("corename", po::value<std::string>(), "the name of the core to create or find")
             ("core,c", po::value<std::string>(), "type of the core to connect to")
-            ("offset", po::value<double>(), "the offset of the time steps")
-            ("period", po::value<double>(), "the period of the federate")
-            ("timedelta", po::value<double>(), "the time delta of the federate")
+            ("offset", po::value<std::string>(), "the offset of the time steps")
+            ("period", po::value<std::string>(), "the period of the federate")
+            ("timedelta", po::value<std::string>(), "the time delta of the federate")
             ("coreinit,i", po::value<std::string>(), "the core initialization string")
-            ("inputdelay", po::value<double>(), "the time delta of the federate")
-            ("outputdelay", po::value<double>(), "the time delta of the federate")
+            ("inputdelay", po::value<std::string>(), "the time delta of the federate")
+            ("outputdelay", po::value<std::string>(), "the time delta of the federate")
             ("flags,f", po::value<std::vector<std::string>>(), "named flag for the federate");
 
 

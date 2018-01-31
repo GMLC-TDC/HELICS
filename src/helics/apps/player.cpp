@@ -134,13 +134,13 @@ helics::Time Player::extractTime(const std::string &str, int lineNumber) const
 {
     try
     {
-        if (timeMultiplier == 1e-9) //ns
+        if (units == timeUnits::ns) //ns
         {
             return helics::Time(std::stoll(str), timeUnits::ns);
         }
         else
         {
-            return helics::Time(std::stod(str));
+            return loadTimeFromString(str,units);
         }
     }
     catch (const std::invalid_argument &ia)
@@ -380,26 +380,11 @@ void Player::loadJsonFile (const std::string &jsonFile)
             Time ptime;
             if (pointElement.isMember ("time"))
             {
-                if (timeMultiplier == 1e-9)
-                {
-                    ptime = helics::Time(pointElement["time"].asInt64(), timeUnits::ns);
-                }
-                else
-                {
-                    ptime = loadJsonTime(pointElement["time"]);
-                }
-                
+                ptime=loadJsonTime(pointElement["time"], units);
             }
             else if (pointElement.isMember("t"))
             {
-                if (timeMultiplier == 1e-9)
-                {
-                    ptime = helics::Time(pointElement["t"].asInt64(), timeUnits::ns);
-                }
-                else
-                {
-                    ptime = loadJsonTime(pointElement["t"]);
-                }
+                ptime = loadJsonTime(pointElement["t"],units);
             }
             else
             {
@@ -474,25 +459,11 @@ void Player::loadJsonFile (const std::string &jsonFile)
             Time ptime;
             if (messageElement.isMember("time"))
             {
-                if (timeMultiplier == 1e-9)
-                {
-                    ptime = helics::Time(messageElement["time"].asInt64(), timeUnits::ns);
-                }
-                else
-                {
-                    ptime = loadJsonTime(messageElement["time"]);
-                }
+                ptime = loadJsonTime(messageElement["time"],units);
             }
             else if (messageElement.isMember("t"))
             {
-                if (timeMultiplier == 1e-9)
-                {
-                    ptime = helics::Time(messageElement["t"].asInt64(), timeUnits::ns);
-                }
-                else
-                {
-                    ptime = loadJsonTime(messageElement["t"]);
-                }
+                ptime = loadJsonTime(messageElement["t"], units);
             }
             else
             {
@@ -521,14 +492,7 @@ void Player::loadJsonFile (const std::string &jsonFile)
             std::string type;
             if (messageElement.isMember("sendtime"))
             {
-                if (timeMultiplier == 1e-9)
-                {
-                    ptime = helics::Time(messageElement["sendtime"].asInt64(), timeUnits::ns);
-                }
-                else
-                {
-                    ptime = loadJsonTime(messageElement["sendtime"]);
-                }
+                ptime = loadJsonTime(messageElement["sendtime"],units);
             }
             
             messages.resize(messages.size() + 1);
@@ -796,7 +760,7 @@ void Player::run (Time stopTime_input)
     }
 }
 
-void Player::addPublication(const std::string &key, helics_type_t type, const std::string &units)
+void Player::addPublication(const std::string &key, helics_type_t type, const std::string &pubUnits)
 {
     // skip already existing publications
     if (pubids.find(key) != pubids.end())
@@ -805,18 +769,18 @@ void Player::addPublication(const std::string &key, helics_type_t type, const st
     }
     if (!useLocal)
     {
-        publications.push_back(Publication(GLOBAL, fed.get(), key, type, units));
+        publications.push_back(Publication(GLOBAL, fed.get(), key, type, pubUnits));
     }
     else
     {
         auto kp = key.find_first_of("./");
         if (kp == std::string::npos)
         {
-            publications.push_back(Publication(fed.get(), key, type, units));
+            publications.push_back(Publication(fed.get(), key, type, pubUnits));
         }
         else
         {
-            publications.push_back(Publication(GLOBAL, fed.get(), key, type, units));
+            publications.push_back(Publication(GLOBAL, fed.get(), key, type, pubUnits));
         }
     }
     pubids[key] = static_cast<int> (publications.size ()) - 1;
@@ -870,9 +834,14 @@ int Player::loadArguments(boost::program_options::variables_map &vm_map)
     }
     if (vm_map.count("timeunits"))
     {
-        if (vm_map["timeunits"].as<std::string>() == "ns")
+        try
         {
-            timeMultiplier = 1e-9;
+            units = timeUnitsFromString(vm_map["timeunits"].as<std::string>());
+            timeMultiplier = toSecondMultiplier(units);
+        }
+        catch (...)
+        {
+            std::cerr << vm_map["timeunits"].as<std::string>() << " is not recognized as a valid unit of time \n";
         }
     }
     std::string file;
@@ -899,7 +868,7 @@ int Player::loadArguments(boost::program_options::variables_map &vm_map)
     stopTime = Time::maxVal ();
     if (vm_map.count ("stop") > 0)
     {
-        stopTime = vm_map["stop"].as<double> ();
+        stopTime = loadTimeFromString(vm_map["stop"].as<std::string> ());
     }
     return 0;
 }
@@ -925,7 +894,7 @@ int playerArgumentParser (int argc, const char *const *argv, po::variables_map &
         ("local","specify otherwise unspecified endpoints and publications as local( i.e.the keys will be prepended with the player name")
         ("separator",po::value<char>(),"specify the separator for local publications and endpoints")
         ("timeunits",po::value<std::string>(),"the units on the timestamp used in file based input")
-		("stop", po::value<double>(), "the time to stop the player");
+		("stop", po::value<std::string>(), "the time to stop the player");
 
 
     // clang-format on

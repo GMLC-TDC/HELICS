@@ -19,6 +19,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 
+#include "../common/DualMappedPointerVector.hpp"
 #include <atomic>
 #include <cstdint>
 #include <map>
@@ -263,7 +264,7 @@ class CommonCore : public Core, public BrokerBase
     int32_t _global_federation_size = 0;  //!< total size of the federation
     bool hasLocalFilters = false;
     std::atomic<int16_t> delayInitCounter{
-      0};  //!< counter for the number of times the entry to init Mode was explicitly delayed
+      0};  //!< counter for the number of times the entry to initialization Mode was explicitly delayed
     std::vector<std::unique_ptr<FederateState>> _federates;  //!< local federate information
     std::vector<int>
       ongoingFilterActionCounter;  //!< counter for the number of ongoing filter transactions for a federate
@@ -272,10 +273,16 @@ class CommonCore : public Core, public BrokerBase
     std::unordered_map<std::string, handle_id_t> publications;  //!< map of all local publications
     std::unordered_map<std::string, handle_id_t> endpoints;  //!< map of all local endpoints
     std::unordered_map<std::string, federate_id_t> federateNames;  //!< map of federate names to id
-    std::map<std::string, FilterInfo *> filterNames;  //!< translate names to filterObjects
+
     std::atomic<int> queryCounter{0};
-    std::map<handle_id_t, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all filters
-    std::vector<std::unique_ptr<FilterInfo>> filters;  //!< storage for all the filters
+    std::map<handle_id_t, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
+    using fed_handle_pair = std::pair<federate_id_t, handle_id_t>;
+    DualMappedPointerVector<FilterInfo,
+                            std::string,
+                            fed_handle_pair,
+                            std::unordered_map<std::string, size_t>,
+                            std::map<fed_handle_pair, size_t>>
+      filters;  //!< storage for all the filters
   private:
     mutable std::mutex _mutex;  //!< mutex protecting the federate creation and modification
     mutable std::mutex
@@ -324,15 +331,16 @@ class CommonCore : public Core, public BrokerBase
     @param command the message to process
     */
     void processFilterInfo (ActionMessage &command);
-    /** get the information on a filter from the keyName*/
-    FilterInfo *getFilter (const std::string &filterName) const;
-    /** get the information on a filter from the handle*/
-    FilterInfo *getFilter (Core::federate_id_t federateID, Core::handle_id_t handle_) const;
+
     /** organize filters
     @detsils organize the filter and report and potential warnings and errors
     */
     void organizeFilterOperations ();
 
+    /** generate a query response of a federate if possible
+    @param federateID the identifier for the federate to query
+    @param queryStr  the string containing the actual query
+    */
     std::string federateQuery (Core::federate_id_t federateID, const std::string &queryStr) const;
 
     /** send an error code to all the federates*/

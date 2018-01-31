@@ -291,7 +291,10 @@ class Core
     *
     * The value is used as a time shift for calculating the allowable time in a federate
     the granted time must one of N*period+offset
-    
+    
+
+
+
     * @param federateID  the identifier for the federate
     * @param timeOffset the periodic phase shift
     */

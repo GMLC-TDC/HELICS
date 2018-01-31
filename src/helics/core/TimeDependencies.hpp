@@ -14,6 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "Core.hpp"
 #include "helics-time.hpp"
+#include <vector>
 
 namespace helics
 {
@@ -42,6 +43,9 @@ class DependencyInfo
     /** construct from a federate id*/
     DependencyInfo (Core::federate_id_t id) : fedID (id){};
 
+	/** process a dependency related message
+	@param m  a reference to an action message that contains some instructions for modifying dependencies
+	@return true if something was modified by the message*/
     bool ProcessMessage (const ActionMessage &m);
 };
 
@@ -76,9 +80,16 @@ class TimeDependencies
     /**  const iterator to first dependency*/
     auto cend () const { return dependencies.cend (); }
 
+	/** get a pointer to the dependency information for a particular object*/
     DependencyInfo *getDependencyInfo (Core::federate_id_t id);
 
+	/** check if the dependencies would allow entry to exec mode*/
     bool checkIfReadyForExecEntry (bool iterating) const;
+	/** check if the dependencies would allow a grant of the time
+	@param iterating true if the object is iterating
+	@param desiredGrantTime  the time to check for granting
+	@return true if the object is ready
+	*/
     bool checkIfReadyForTimeGrant (bool iterating, Time desiredGrantTime) const;
     void resetIteratingExecRequests ();
     void resetIteratingTimeRequests (Time requestTime);

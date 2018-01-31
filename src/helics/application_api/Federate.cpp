@@ -437,6 +437,7 @@ void Federate::disconnect ()
     {
         coreObject->finalize (fedID);
     }
+	state = op_states::finalize;
     coreObject = nullptr;
 }
 

@@ -17,32 +17,32 @@ BOOST_AUTO_TEST_SUITE (mapped_pointer_vector_tests)
 /** test basic operations */
 BOOST_AUTO_TEST_CASE (definition_tests)
 {
-    MappedPointerVector<double> M;
-    MappedPointerVector<std::string> S2;
+	MappedPointerVector<double> M;
+	MappedPointerVector<std::string> S2;
     BOOST_CHECK_EQUAL (M.size (), 0);
     BOOST_CHECK_EQUAL (S2.size (), 0);
-    MappedPointerVector<std::vector<std::string>, double> V2;
+	MappedPointerVector<std::vector<std::string>, double> V2;
 
-    // test move and assignment operators
-    decltype (M) TV2;
-    TV2 = std::move (M);
+	//test move operators
+	decltype(M) TV2;
+	TV2 = std::move(M);
 
     decltype (TV2) TV3 (std::move (TV2));
 }
 
 BOOST_AUTO_TEST_CASE (insertion_tests)
 {
-    MappedPointerVector<std::vector<double>> Mvec;
+	MappedPointerVector<std::vector<double>> Mvec;
     Mvec.insert ("el1", 3, 1.7);
     BOOST_CHECK_EQUAL (Mvec.size (), 1);
     Mvec.insert ("a2", std::vector<double> (45));
     BOOST_CHECK_EQUAL (Mvec.size (), 2);
-    auto V = Mvec[0];
+	auto V = Mvec[0];
     BOOST_CHECK_EQUAL (V->size (), 3);
     BOOST_CHECK_EQUAL ((*V)[0], 1.7);
     BOOST_CHECK_EQUAL ((*V)[2], 1.7);
 
-    auto V2 = Mvec[1];
+	auto V2 = Mvec[1];
     BOOST_CHECK_EQUAL (V2->size (), 45);
 
     auto V3 = Mvec.find ("el1");
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE (insertion_tests)
 
 BOOST_AUTO_TEST_CASE (iterator_tests)
 {
-    MappedPointerVector<double> Mvec;
+	MappedPointerVector<double> Mvec;
 
     Mvec.insert ("s1", 3.2);
     Mvec.insert ("s2", 4.3);
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE (iterator_tests)
 
 BOOST_AUTO_TEST_CASE (remove_tests)
 {
-    MappedPointerVector<double> Mvec;
+	MappedPointerVector<double> Mvec;
 
     Mvec.insert ("s1", 3.2);
     Mvec.insert ("s2", 4.3);

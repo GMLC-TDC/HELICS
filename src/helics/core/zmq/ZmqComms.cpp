@@ -437,11 +437,13 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 {
                     std::cerr << "unable to connect with broker (2)\n";
                     tx_status = connection_status::error;
+					return (-3);
                 }
                 if (rc == 0)
                 {
                     std::cerr << "broker connection timed out (2)\n";
                     tx_status = connection_status::error;
+					return (-3);
                 }
                 if (tx_status == connection_status::error)
                 {
@@ -462,6 +464,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                             brokerPushPort = rxcmd.source_id;
                         }
                         controlSocket.send (msg);
+						return 0;
                     }
                     else if (rxcmd.index == DISCONNECT)
                     {

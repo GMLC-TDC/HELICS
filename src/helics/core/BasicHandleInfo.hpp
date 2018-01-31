@@ -21,10 +21,11 @@ enum BasicHandleType : char
 {
     HANDLE_UNKNOWN,
     HANDLE_PUB,  //!< handle to publish interface
-    HANDLE_SUB,  //!< handle to a subscribe interface
-    HANDLE_END,  //!< handle to an endpoint
+    HANDLE_SUB,	//!< handle to a subscribe interface
+    HANDLE_END,	//!< handle to an endpoint
     HANDLE_SOURCE_FILTER,  //!< handle to a source filter
     HANDLE_DEST_FILTER,  //!< handle to a destination filter
+    HANDLE_CLONE_FILTER,  //!< handle for a cloning filter
 };
 
 /** class defining and capturing basic information about a handle*/
@@ -70,9 +71,9 @@ class BasicHandleInfo
     bool hasDestFilter = false;  //!< indicator that an endpoint has a destination filter
     bool used = false;  //!< indicator that the publication or filter is used
     // 5 byte hole here
-    const std::string key;  //!< the name of the handle
-    const std::string type;  //!< the type of data used by the handle
-    const std::string units;  //!< the units associated with the handle
+    const std::string key;	//!< the name of the handle
+    const std::string type;	//!< the type of data used by the handle
+    const std::string units;	//!< the units associated with the handle
     const std::string target;  //!< the target of the handle mapped onto units since they will not be used together
     const std::string &type_in;  //!< the input type of a filter
     const std::string &type_out;  //!< the output type of a filter

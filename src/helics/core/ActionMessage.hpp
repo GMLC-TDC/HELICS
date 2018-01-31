@@ -21,12 +21,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-const int32_t cmd_info_basis = 65536;
-
+constexpr int32_t cmd_info_basis = 65536;
+/** class defining the primary message object used in Helics */
 class ActionMessage
 {
   public:
-    // class for containing possibly larger additional information for certain message types
+    /** class for containing possibly larger additional information for certain message types */
     class AdditionalInfo
     {
       public:
@@ -48,6 +48,7 @@ class ActionMessage
             : source (std::move (ai.source)), type (source), target (std::move (ai.target)), units (target),
               orig_source (std::move (ai.orig_source)), type_out (orig_source),
               original_dest (std::move (ai.original_dest)){};
+        ~AdditionalInfo() = default;
         template <class Archive>
         void save (Archive &ar) const
         {
@@ -63,14 +64,14 @@ class ActionMessage
 
     // need to try to make sure this object is under 64 bytes in size to fit in cache lines NOT there yet
   private:
-    action_message_def::action_t action_ = CMD_IGNORE;  // 4 -- command
+    action_message_def::action_t messageAction = CMD_IGNORE;  // 4 -- command
   public:
     int32_t source_id = 0;  //!< 8 -- for federate_id or route_id
     int32_t source_handle = 0;  //!< 12 -- for local handle or local code
     int32_t dest_id = 0;  //!< 16 fed_id for a targeted message
     int32_t dest_handle = 0;  //!< 20 local handle for a targeted message
     int32_t &index;  //!< alias to dest_handle
-    uint16_t counter = 0;  //!< 22 counter for filter tracking
+    uint16_t counter = 0;  //!< 22 counter for filter tracking or message counter
     uint16_t flags = 0;  //!<  24 set of messageFlags
 
     Time actionTime = timeZero;  //!< 32 the time an action took place or will take place	//32
@@ -80,21 +81,22 @@ class ActionMessage
       payload;  //!< string containing the data	//64 std::string is 32 bytes on most platforms (except libc++)
     std::string &name;  //!< alias payload to a name reference for registration functions
   private:
-    std::unique_ptr<AdditionalInfo> info_;  //!< pointer to an additional info structure with more data if required
+    std::unique_ptr<AdditionalInfo> extraInfo;  //!< pointer to an additional info structure with more data if required
   public:
     /** default constructor*/
     ActionMessage () noexcept : index (dest_handle), name (payload){};
     /** construct from an action type
-    @details this is an implicit constructor
+    @details this is intended to be an implicit constructor
+    @param startingAction from an action message definition
     */
-    ActionMessage (action_message_def::action_t startingAction);
+    ActionMessage (action_message_def::action_t startingAction);  // NOLINT (explicit-constructor)  
     /** construct from action, source and destination id's
      */
     ActionMessage (action_message_def::action_t startingAction, int32_t sourceId, int32_t destId);
     /** move constructor*/
     ActionMessage (ActionMessage &&act) noexcept;
     /** build an action message from a message*/
-    ActionMessage (std::unique_ptr<Message> message);
+    explicit ActionMessage (std::unique_ptr<Message> message);
     /** construct from a string*/
     explicit ActionMessage (const std::string &bytes);
     /** construct from a data vector*/
@@ -110,7 +112,7 @@ class ActionMessage
     /** move assignment*/
     ActionMessage &operator= (ActionMessage &&act) noexcept;
     /** get the action of the message*/
-    action_message_def::action_t action () const noexcept { return action_; }
+    action_message_def::action_t action () const noexcept { return messageAction; }
     /** set the action*/
     void setAction (action_message_def::action_t newAction);
     /** get a reference to the additional info structure*/
@@ -126,23 +128,23 @@ class ActionMessage
     template <class Archive>
     void save (Archive &ar) const
     {
-        ar (action_, source_id, source_handle, dest_id, dest_handle);
+        ar (messageAction, source_id, source_handle, dest_id, dest_handle);
         ar (counter, flags);
 
         auto btc = actionTime.getBaseTimeCode ();
         auto Tebase = Te.getBaseTimeCode ();
         auto Tdeminbase = Tdemin.getBaseTimeCode ();
         ar (btc, Tebase, Tdeminbase, payload);
-        if (hasInfo (action_))
+        if (hasInfo (messageAction))
         {
-            ar (info_);
+            ar (extraInfo);
         }
     }
 
     template <class Archive>
     void load (Archive &ar)
     {
-        ar (action_, source_id, source_handle, dest_id, dest_handle);
+        ar (messageAction, source_id, source_handle, dest_id, dest_handle);
 
         ar (counter, flags);
 
@@ -155,13 +157,13 @@ class ActionMessage
         actionTime.setBaseTimeCode (btc);
         Te.setBaseTimeCode (Tebase);
         Tdemin.setBaseTimeCode (Tdeminbase);
-        if (hasInfo (action_))
+        if (hasInfo (messageAction))
         {
-            if (!info_)
+            if (!extraInfo)
             {
-                info_ = std::make_unique<AdditionalInfo> ();
+                extraInfo = std::make_unique<AdditionalInfo> ();
             }
-            ar (info_);
+            ar (extraInfo);
         }
     }
 
@@ -196,29 +198,36 @@ class ActionMessage
     void from_vector (const std::vector<char> &data);
 };
 
-#define SET_ACTION_FLAG(M, flag)                                                                                  \
-    do                                                                                                            \
-    {                                                                                                             \
-        M.flags |= (uint16_t (1) << (flag));                                                                      \
-    } while (false)
+/** template function to set a flag in an object containing a flags field*/
+template <class FlagContainer, class FlagIndex>
+inline void setActionFlag(FlagContainer &M, FlagIndex flag)
+{
+    M.flags |= (decltype(M.flags)(1) << (flag));
+}
 
-#define CHECK_ACTION_FLAG(M, flag) ((M.flags & (uint16_t (1) << (flag))) != 0)
+/** template function to check a flag in an object containing a flags field*/
+template <class FlagContainer, class FlagIndex>
+inline bool checkActionFlag(const FlagContainer &M, FlagIndex flag)
+{
+    return ((M.flags & (decltype(M.flags)(1) << (flag))) != 0);
+}
 
-#define CLEAR_ACTION_FLAG(M, flag)                                                                                \
-    do                                                                                                            \
-    {                                                                                                             \
-        M.flags &= ~(uint16_t (1) << (flag));                                                                     \
-    } while (false)
+/** template function to clear a flag in an object containing a flags field*/
+template <class FlagContainer, class FlagIndex>
+inline void clearActionFlag(FlagContainer &M, FlagIndex flag)
+{
+    M.flags &= ~(decltype(M.flags)(1) << (flag));
+}
 
 /** create a new message object that copies all the information from the ActionMessage into newly allocated memory
  * for the message
  */
-std::unique_ptr<Message> createMessage (const ActionMessage &cmd);
+std::unique_ptr<Message> createMessageFromCommand (const ActionMessage &cmd);
 
 /** create a new message object that moves all the information from the ActionMessage into newly allocated memory
  * for the message
  */
-std::unique_ptr<Message> createMessage (ActionMessage &&cmd);
+std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd);
 
 /** check if a command is a protocol command*/
 inline bool isProtocolCommand (const ActionMessage &command) noexcept
@@ -232,7 +241,7 @@ inline bool isPriorityCommand (const ActionMessage &command) noexcept
     return (command.action () < action_message_def::action_t::cmd_ignore);
 }
 
-inline bool isTimingMessage (const ActionMessage &command) noexcept
+inline bool isTimingCommand (const ActionMessage &command) noexcept
 {
     switch (command.action ())
     {
@@ -248,7 +257,7 @@ inline bool isTimingMessage (const ActionMessage &command) noexcept
     }
 }
 
-inline bool isDependencyMessage (const ActionMessage &command) noexcept
+inline bool isDependencyCommand (const ActionMessage &command) noexcept
 {
     switch (command.action ())
     {
@@ -271,7 +280,7 @@ inline bool isDisconnectCommand (const ActionMessage &command) noexcept
             (command.action () == CMD_TERMINATE_IMMEDIATELY));
 }
 
-/** check if a command is a priority command*/
+/** check if a command is a valid command*/
 inline bool isValidCommand (const ActionMessage &command) noexcept
 {
     return (command.action () != action_message_def::action_t::cmd_invalid);

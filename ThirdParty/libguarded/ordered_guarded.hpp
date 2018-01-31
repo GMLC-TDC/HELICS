@@ -75,6 +75,32 @@ class ordered_guarded
     template <class TimePoint>
     shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
 
+	/** generate a copy of the protected object
+	*/
+	std::enable_if_t<std::is_copy_constructible<T>::value, T> load() const
+	{
+		m_mutex.lock_shared();
+		T newObj(m_obj);
+		m_mutex.unlock();
+		return newObj;
+	}
+
+	/** store an updated value into the object*/
+	template <typename objType>
+	std::enable_if_t<std::is_copy_assignable<T>::value> store(objType &&newObj)
+	{
+		std::lock_guard<M> lock(m_mutex);
+		m_obj = std::forward<objType>(newObj);
+	}
+
+	/** store an updated value into the object*/
+	template <typename objType>
+	std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
+	{
+		std::lock_guard<M> lock(m_mutex);
+		m_obj = std::forward<objType>(newObj);
+	}
+
   private:
     class shared_deleter
     {
@@ -172,6 +198,31 @@ public:
 	template <typename Func>
 	void modify(Func && func);
 
+	/** generate a copy of the protected object
+	*/
+	std::enable_if_t<std::is_copy_constructible<T>::value, T> load() const
+	{
+		m_mutex.lock();
+		T newObj(m_obj);
+		m_mutex.unlock();
+		return newObj;
+	}
+
+	/** store an updated value into the object*/
+	template <typename objType>
+	std::enable_if_t<std::is_copy_assignable<T>::value> store(objType &&newObj)
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		m_obj = std::forward<objType>(newObj);
+	}
+
+	/** store an updated value into the object*/
+	template <typename objType>
+	std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		m_obj = std::forward<objType>(newObj);
+	}
 	// shared access, note "shared" in method names
 	shared_handle lock_shared() const;
 	shared_handle try_lock_shared() const;
@@ -254,6 +305,31 @@ public:
 	template <typename Func>
 	void modify(Func && func);
 
+	/** generate a copy of the protected object
+	*/
+	std::enable_if_t<std::is_copy_constructible<T>::value, T> load() const
+	{
+		m_mutex.lock();
+		T newObj(m_obj);
+		m_mutex.unlock();
+		return newObj;
+	}
+
+	/** store an updated value into the object*/
+	template <typename objType>
+	std::enable_if_t<std::is_copy_assignable<T>::value> store(objType &&newObj)
+	{
+		std::lock_guard<std::timed_mutex> lock(m_mutex);
+		m_obj = std::forward<objType>(newObj);
+	}
+
+	/** store an updated value into the object*/
+	template <typename objType>
+	std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
+	{
+		std::lock_guard<std::timed_mutex> lock(m_mutex);
+		m_obj = std::forward<objType>(newObj);
+	}
 	// shared access, note "shared" in method names
 	shared_handle lock_shared() const;
 	shared_handle try_lock_shared() const;

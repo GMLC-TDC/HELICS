@@ -28,6 +28,8 @@ set(trigger_build_dir ${CMAKE_BINARY_DIR}/autobuild/force_libzmq)
 	else(UNIX)
 	endif()
 	
+
+	# both required to be on due to a bug in the zmq cmake CONFIG
 	if (ZMQ_USE_STATIC_LIBRARY)
 	   set(zmq_static_build ON)
 	   set(zmq_shared_build ON)
@@ -36,6 +38,7 @@ set(trigger_build_dir ${CMAKE_BINARY_DIR}/autobuild/force_libzmq)
         set(zmq_static_build ON)
 	   set(zmq_shared_build ON)
 	endif()
+
 	
 	if (VERSION_OPTION)
 		set(extra_cxx_flags "${extra_cxx_flags} ${VERSION_OPTION}")
