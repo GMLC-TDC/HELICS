@@ -114,6 +114,9 @@ IF(UNIX)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wlogical-op>)
+    # this option produces a number of warnings in third party libraries but useful for checking for any internal usages
+ # add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wold-style-cast>)
+  
   #this options produces lots of warning but is useful for checking every once in a while with Clang, GCC warning notices with this aren't as useful
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
   # add some gnu specific options if the compiler is newer
@@ -139,6 +142,8 @@ ELSE(UNIX)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
+  # this option produces a number of warnings in third party libraries but useful for checking for any internal usages
+ # add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wold-style-cast>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wlogical-op>)
   #this options produces lots of warning but is useful for checking ever once in a while with Clang, GCC warning notices with this aren't as useful
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)

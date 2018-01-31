@@ -27,7 +27,7 @@ namespace helics
 using namespace std::string_literals;
 
 static const ArgDescriptors extraArgs{
-  {"root"s, ""s, "specify whether the broker is a root"s},
+  {"root"s, ArgDescriptor::arg_type_t::flag_type, "specify whether the broker is a root"s},
 };
 
 bool matchingTypes (const std::string &type1, const std::string &type2);

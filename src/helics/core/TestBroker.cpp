@@ -33,10 +33,10 @@ TestBroker::~TestBroker ()
     joinAllThreads ();
 }
 using namespace std::string_literals;
-static const ArgDescriptors extraArgs{{"brokername"s, "string"s, "identifier for the broker-same as broker"s},
-                                      {"broker,b"s, "string"s, "identifier for the broker"s},
-                                      {"broker_address", "string"s, "location of the broker i.e network address"},
-                                      {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
+static const ArgDescriptors extraArgs{{"brokername"s, "identifier for the broker-same as broker"s},
+                                      {"broker,b"s, "identifier for the broker"s},
+                                      {"broker_address", "location of the broker i.e network address"},
+                                      {"brokerinit"s, "the initialization string for the broker"s}};
 
 void TestBroker::displayHelp (bool localOnly)
 {

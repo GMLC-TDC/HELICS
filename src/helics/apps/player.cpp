@@ -952,7 +952,7 @@ int playerArgumentParser (int argc, const char *const *argv, po::variables_map &
         }
         else
         {
-            std::ifstream fstr (config_file_name.c_str ());
+            std::ifstream fstr (config_file_name);
             po::store (po::parse_config_file (fstr, config_file), vm_map);
             fstr.close ();
         }

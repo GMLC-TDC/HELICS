@@ -26,7 +26,7 @@ namespace helics
 {
 using identifier_type = uint32_t;
 
-constexpr identifier_type invalid_id_value = (identifier_type) (-1);  //!< defining an invalid id value
+constexpr identifier_type invalid_id_value = static_cast<identifier_type> (-1);  //!< defining an invalid id value
 
 /** the known types of identifiers*/
 enum class identifiers : char
