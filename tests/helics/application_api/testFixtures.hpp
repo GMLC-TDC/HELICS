@@ -100,7 +100,7 @@ struct FederateTestFixture
             federates.resize(count + offset);
             for (int ii = 0; ii < count; ++ii)
             {
-                fi.name = name_prefix + std::to_string (ii);
+                fi.name = name_prefix + std::to_string (ii+offset);
                 auto fed = std::make_shared<FedType> (fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
@@ -117,7 +117,7 @@ struct FederateTestFixture
                 auto core = helics::CoreFactory::create (core_type, initString + " --federates 1");
                 fi.coreName = core->getIdentifier ();
 
-                fi.name = name_prefix + std::to_string (ii);
+                fi.name = name_prefix + std::to_string (ii+offset);
                 auto fed = std::make_shared<FedType> (fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);

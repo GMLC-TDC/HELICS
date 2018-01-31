@@ -306,6 +306,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             auto route = fed->route_id;
             _federates.addSearchTerm(command.dest_id, fed->name);
             transmit (route, command);
+            routing_table.emplace(fed->global_id, route);
         }
         else
         {
@@ -313,6 +314,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             _federates.insert (command.name, command.dest_id,command.name);
             _federates.back ().route_id = getRoute (command.source_id);
             _federates.back ().global_id = command.dest_id;
+            routing_table.emplace(fed->global_id, _federates.back().route_id);
             // it also means we don't forward it
         }
     }
@@ -348,6 +350,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             _brokers.insert (command.name,command.dest_id,command.name);
             _brokers.back ().route_id = getRoute (command.source_id);
             _brokers.back ().global_id = command.dest_id;
+            routing_table.emplace(broker->global_id, _brokers.back().route_id);
 
         }
     }

@@ -10,6 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #ifndef _HELICS_TIME_
 #define _HELICS_TIME_
+#pragma once
 
 #include "../common/timeRepresentation.hpp"
 #include "core-types.hpp"
