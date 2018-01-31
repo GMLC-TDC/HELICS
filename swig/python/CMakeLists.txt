@@ -4,7 +4,7 @@ IF (GENERATE_PYTHON)
 # https://stackoverflow.com/a/3818084/5451769
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   # Update if necessary
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-long-long -pedantic")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings")
 endif()
 
 FIND_PACKAGE(PythonLibs REQUIRED)
