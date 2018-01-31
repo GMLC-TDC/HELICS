@@ -11,6 +11,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "MpiBroker.h"
 #include "MpiComms.h"
 
+#include "../../common/argParser.h"
+
 #include <mpi.h>
 
 namespace helics
@@ -21,10 +23,16 @@ MpiBroker::MpiBroker (const std::string &broker_name) : CommsBroker (broker_name
 
 MpiBroker::~MpiBroker () = default;
 
+using namespace std::string_literals;
+static const ArgDescriptors extraArgs{ { "broker_rank", "int"s, "mpi rank of the broker" } };
+
 void MpiBroker::displayHelp (bool local_only)
 {
     std::cout << " Help for MPI Broker: \n";
-    // TODO add displayHelp function for MPI, similar to NetworkBrokerData::displayHelp ();
+    namespace po = boost::program_options;
+    po::variables_map vm;
+    const char *const argV[] = { "", "--help" };
+    argumentParser(2, argV, vm, extraArgs);
     if (!local_only)
     {
         CoreBroker::displayHelp ();
@@ -35,7 +43,14 @@ void MpiBroker::initializeFromArgs (int argc, const char *const *argv)
 {
     if (brokerState == broker_state_t::created)
     {
-        // TODO parse args for rank of broker
+        namespace po = boost::program_options;
+        po::variables_map vm;
+        argumentParser(argc, argv, vm, extraArgs);
+
+        if (vm.count("broker_rank") > 0)
+        {
+            brokerRank = vm["broker_rank"].as<int>();
+        }
 
         CoreBroker::initializeFromArgs (argc, argv);
     }

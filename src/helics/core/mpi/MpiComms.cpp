@@ -19,6 +19,7 @@ namespace helics
 {
 
 bool MpiComms::mpiCommsExists = false;
+std::mutex MpiComms::mpiSerialMutex;
 
 MpiComms::MpiComms ()
 {
@@ -26,6 +27,7 @@ MpiComms::MpiComms ()
     {
         printf("WARNING: MPIComms object already created, unexpected results may occur\n");
     }
+    std::cout << "MpiComms()" << std::endl;
     initMPI();
     mpiCommsExists = true;
 }
@@ -37,6 +39,8 @@ MpiComms::MpiComms(const int &brokerRank)
     {
         printf("WARNING: MPIComms object already created, unexpected results may occur\n");
     }
+    printf("MpiComms (%d)\n", brokerRank);
+    std::cout << "MpiComms(" << std::to_string(brokerRank) << ")" << std::endl;
     initMPI();
     mpiCommsExists = true;
 }
@@ -46,12 +50,18 @@ MpiComms::~MpiComms ()
 {
     disconnect ();
 
-    std::lock_guard<std::mutex> lock(mpiSerialMutex);
-    MPI_Finalize();
+    int mpi_initialized;
+    MPI_Initialized(&mpi_initialized);
+    if (mpi_initialized)
+    {
+        std::lock_guard<std::mutex> lock(mpiSerialMutex);
+        MPI_Finalize();
+    }
 }
 
 bool MpiComms::initMPI()
 {
+    std::cout << "initMPI()" << std::endl;
     std::lock_guard<std::mutex> lock(mpiSerialMutex);
 
     // Initialize MPI with MPI_THREAD_SERIALIZED
@@ -61,12 +71,15 @@ bool MpiComms::initMPI()
     MPI_Initialized(&mpi_initialized);
 
     if (!mpi_initialized)
+    {
         MPI_Init_thread(nullptr, nullptr, MPI_THREAD_SERIALIZED, &mpi_thread_level);
 
-    if (!mpi_initialized)
-    {
-        std::cerr << "MPI initialization failed" << std::endl;
-        return false;
+        MPI_Initialized(&mpi_initialized);
+        if (!mpi_initialized)
+        {
+            std::cerr << "MPI initialization failed" << std::endl;
+            return false;
+        }
     }
 
     MPI_Query_thread(&mpi_thread_level);

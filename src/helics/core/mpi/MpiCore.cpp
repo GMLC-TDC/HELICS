@@ -11,6 +11,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "MpiCore.h"
 #include "MpiComms.h"
 
+#include "../../common/argParser.h"
+
 #include <mpi.h>
 
 namespace helics
@@ -21,11 +23,21 @@ MpiCore::~MpiCore () = default;
 
 MpiCore::MpiCore (const std::string &core_name) : CommsBroker (core_name) {}
 
+using namespace std::string_literals;
+static const ArgDescriptors extraArgs{ { "broker_rank", "int"s, "mpi rank of the broker" } };
+
 void MpiCore::initializeFromArgs (int argc, const char *const *argv)
 {
     if (brokerState == created)
     {
-        // TODO parse args for rank of broker
+        namespace po = boost::program_options;
+        po::variables_map vm;
+        argumentParser(argc, argv, vm, extraArgs);
+
+        if (vm.count("broker_rank") > 0)
+        {
+            brokerRank = vm["broker_rank"].as<int>();
+        }
 
         CommonCore::initializeFromArgs (argc, argv);
     }
