@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     HOMEBREW_NO_AUTO_UPDATE=1 brew install pcre
 fi
@@ -14,16 +13,27 @@ fi
     make;
     make install;
 )
-
-
 export PATH="$HOME/swig/bin:${PATH}"
 echo "*** built swig successfully {$PATH}"
 
 # Convert commit message to lower case
 commit_msg=`tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE}`
-# Wipe out the dependencies directory if commit message has '[update_cache]'
+# Wipe out cached dependencies if commit message has '[update_cache]'
 if [[ $commit_msg == *'[update_cache]'* ]]; then
-    rm -rf dependencies;
+    local individual
+    if [[ $commit_msg == *'boost'* ]]; then
+        rm -rf dependencies/boost;
+        individual="true"
+    fi
+    if [[ $commit_msg == *'zmq'* ]]; then
+        rm -rf dependencies/zmq;
+        individual="true"
+    fi
+    
+    # If no dependency named in commit message, update entire cache
+    if [[ "$individual" != 'true' ]]; then
+        rm -rf dependencies;
+    fi
 fi
 
 if [[ ! -f "dependencies" ]]; then
@@ -31,7 +41,7 @@ if [[ ! -f "dependencies" ]]; then
 fi
 
 install_boost () {
-    # Split argument 1 into 'ver' array, with '.' as delimiter
+    # Split argument 1 into 'ver' array, using '.' as delimiter
     local -a ver
     IFS='.' read -r -a ver <<< $1
     local boost_version=$1
@@ -55,7 +65,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     echo "*** cmake installed ($PATH)"
 
 elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    if [[ ! -f "cmake-3.9.0-Darwin-x86_64/CMake.app/Contents/bin/cmake" ]]; then
+    if [[ ! -f "cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/bin/cmake" ]]; then
         echo "*** install cmake"
         wget --no-check-certificate http://cmake.org/files/v3.4/cmake-3.4.3-Darwin-x86_64.tar.gz && tar -xzf cmake-3.4.3-Darwin-x86_64.tar.gz;
     fi
