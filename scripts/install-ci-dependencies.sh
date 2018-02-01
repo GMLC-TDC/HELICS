@@ -19,6 +19,13 @@ fi
 export PATH="$HOME/swig/bin:${PATH}"
 echo "*** built swig successfully {$PATH}"
 
+# Convert commit message to lower case
+commit_msg=`tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE}`
+# Wipe out the dependencies directory if commit message has '[update_cache]'
+if [[ $commit_msg == *'[update_cache]'* ]]; then
+    rm -rf dependencies;
+fi
+
 if [[ ! -f "dependencies" ]]; then
     mkdir -p dependencies;
 fi
