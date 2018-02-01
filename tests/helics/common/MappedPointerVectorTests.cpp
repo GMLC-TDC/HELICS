@@ -10,7 +10,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
-
 #include "helics/common/MappedPointerVector.hpp"
 
 BOOST_AUTO_TEST_SUITE(mapped_pointer_vector_tests)
@@ -51,8 +50,6 @@ BOOST_AUTO_TEST_CASE(insertion_tests)
 
 	auto V4 = Mvec.find("a2");
 	BOOST_CHECK_EQUAL(V4->size(), 45);
-
-
 }
 
 BOOST_AUTO_TEST_CASE(iterator_tests)
@@ -67,7 +64,6 @@ BOOST_AUTO_TEST_CASE(iterator_tests)
 	BOOST_CHECK_EQUAL(Mvec.size(), 4);
 
 	Mvec.apply([](double *val) {*val = *val + 1; });
-
 
 	BOOST_CHECK_EQUAL(*Mvec[0], 3.2 + 1.0);
 	BOOST_CHECK_EQUAL(*Mvec[1], 4.3 + 1.0);
@@ -96,7 +92,6 @@ BOOST_AUTO_TEST_CASE(remove_tests)
 	BOOST_CHECK_EQUAL(Mvec.size(), 2);
 	BOOST_CHECK_EQUAL(*Mvec.find("s4"), 11.4);
 	BOOST_CHECK_EQUAL(*Mvec[0], 9.7);
-
 
 	auto MV2 = std::move(Mvec);
 	BOOST_CHECK_EQUAL(MV2.size(), 2);

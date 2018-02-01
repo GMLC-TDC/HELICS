@@ -28,7 +28,7 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 #include <type_traits>
 
 /** enumeration of different time units
-*/
+ */
 enum class timeUnits : int
 {
     ps = 0,
@@ -45,20 +45,15 @@ enum class timeUnits : int
 };
 
 /** defining doubles for time Multipliers*/
-constexpr double timeCountForward[10]{1e12, 1e9, 1e6, 1e3, 1.0, 1.0, 1.0 / 60.0, 1.0 / 3600.0, 1.0 / 86400.0, 1.0/(86400.0*7)};
+constexpr double timeCountForward[10]{1e12, 1e9,        1e6,          1e3,           1.0,
+                                      1.0,  1.0 / 60.0, 1.0 / 3600.0, 1.0 / 86400.0, 1.0 / (86400.0 * 7)};
 
 /** defining doubles for time Multipliers*/
-constexpr double timeCountReverse[10]{1e-12, 1e-9, 1e-6, 1e-3, 1.0, 1.0, 60.0, 3600.0, 86400.0, 7*86400};
+constexpr double timeCountReverse[10]{1e-12, 1e-9, 1e-6, 1e-3, 1.0, 1.0, 60.0, 3600.0, 86400.0, 7 * 86400};
 
-inline constexpr double toSecondMultiplier(timeUnits units)
-{
-    return timeCountReverse[static_cast<int>(units)];
-}
+inline constexpr double toSecondMultiplier (timeUnits units) { return timeCountReverse[static_cast<int> (units)]; }
 
-inline constexpr double toUnitMultiplier(timeUnits units)
-{
-    return timeCountForward[static_cast<int>(units)];
-}
+inline constexpr double toUnitMultiplier (timeUnits units) { return timeCountForward[static_cast<int> (units)]; }
 
 /** generate powers to two as a constexpr
 @param[in] exponent the power of 2 desired*/
@@ -85,7 +80,7 @@ class integer_time
   public:
     using baseType = base;
     static constexpr baseType maxVal () noexcept { return (std::numeric_limits<baseType>::max) (); }
-    static constexpr baseType minVal () noexcept { return (std::numeric_limits<baseType>::min) (); }
+    static constexpr baseType minVal () noexcept { return (std::numeric_limits<baseType>::min) () + 1; }
     static constexpr baseType zeroVal () noexcept { return 0; }
     static constexpr baseType epsilon () noexcept { return 1; }
     /** convert to a base type representation*/
@@ -97,18 +92,6 @@ class integer_time
         baseType nseconds = (divBase << N) + static_cast<base> (frac * multiplier);
         return (t < -1e12) ? nseconds : minVal ();
     }
-    /*static baseType convert(double t) noexcept
-    {
-        if (t < -1e12)
-        {
-            return minVal();
-        }
-        double intpart;
-        double frac = std::modf(t, &intpart);
-        baseType nseconds = (static_cast<base>(intpart) << N) + static_cast<base>(frac*multiplier);
-        return nseconds;
-    }
-    */
     /** convert the value to a double representation in seconds*/
     static double toDouble (baseType val) noexcept
     {
@@ -119,11 +102,11 @@ class integer_time
     */
     static std::int64_t toCount (baseType val, timeUnits units) noexcept
     {
-        return static_cast<std::int64_t> (toDouble (val) * toUnitMultiplier(units));
+        return static_cast<std::int64_t> (toDouble (val) * toUnitMultiplier (units));
     }
     static baseType fromCount (std::uint64_t count, timeUnits units) noexcept
     {
-        return static_cast<baseType> (toDouble (count) * toSecondMultiplier(units));
+        return static_cast<baseType> (toDouble (count) * toSecondMultiplier (units));
     }
     /** convert to an integer count in seconds */
     static std::int64_t seconds (baseType val) noexcept { return static_cast<std::int64_t> (val >> N); }
@@ -180,8 +163,10 @@ class count_time
     static constexpr double ddivFactor = 1.0 / fac10f[N];  // the floating point division factor
   public:
     using baseType = base;
+    /** the maximum representable value must be negatable hence the +1 in the min since that cannot be negated
+     * properly*/
     static constexpr baseType maxVal () noexcept { return (std::numeric_limits<baseType>::max) (); }
-    static constexpr baseType minVal () noexcept { return (std::numeric_limits<baseType>::min) (); }
+    static constexpr baseType minVal () noexcept { return (std::numeric_limits<baseType>::min) () + 1; }
     static constexpr baseType zeroVal () noexcept { return baseType (0); }
     static constexpr baseType epsilon () noexcept { return baseType (1); }
     static constexpr baseType convert (double t) noexcept

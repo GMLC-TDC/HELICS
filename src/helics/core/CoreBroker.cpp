@@ -197,7 +197,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         else  // we are initialized already
         {
             ActionMessage badInit (CMD_FED_ACK);
-            SET_ACTION_FLAG (badInit, error_flag);
+            setActionFlag (badInit, error_flag);
             badInit.source_id = global_broker_id;
             badInit.name = command.name;
             transmit (command.source_id, badInit);  // this isn't correct
@@ -248,7 +248,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         else  // we are initialized already
         {
             ActionMessage badInit (CMD_BROKER_ACK);
-            SET_ACTION_FLAG (badInit, error_flag);
+            setActionFlag (badInit, error_flag);
             badInit.source_id = global_broker_id;
             badInit.name = command.name;
             transmit (command.source_id, badInit);
@@ -323,7 +323,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     {  // we can't be root if we got one of these
         if (command.name == identifier)
         {
-            if (CHECK_ACTION_FLAG (command, error_flag))
+            if (checkActionFlag (command, error_flag))
             {
                 // generate an error message
                 return;
@@ -768,8 +768,8 @@ void CoreBroker::addSubscription (ActionMessage &m)
                           static_cast<int32_t> (_handles.size () - 1));
     addLocalInfo (_handles.back (), m);
     subscriptions.emplace (m.name, static_cast<int32_t> (_handles.size () - 1));
-    _handles.back ().processed = CHECK_ACTION_FLAG (m, processingComplete);
-    if (!CHECK_ACTION_FLAG (m, processingComplete))
+    _handles.back ().processed = checkActionFlag (m, processingComplete);
+    if (!checkActionFlag (m, processingComplete))
     {
         bool proc = FindandNotifySubscriptionPublisher (_handles.back ());
         if (!_isRoot)
@@ -777,7 +777,7 @@ void CoreBroker::addSubscription (ActionMessage &m)
             if (proc)
             {
                 // just let any higher level brokers know we have found the publisher and let them know
-                SET_ACTION_FLAG (m, processingComplete);
+                setActionFlag (m, processingComplete);
             }
 
             transmit (0, m);
@@ -795,7 +795,7 @@ void CoreBroker::addEndpoint (ActionMessage &m)
 
     if (!_isRoot)
     {
-        SET_ACTION_FLAG (m, processingComplete);
+        setActionFlag (m, processingComplete);
         transmit (0, m);
     }
     else
@@ -815,7 +815,7 @@ void CoreBroker::addSourceFilter (ActionMessage &m)
     {
         if (proc)
         {
-            SET_ACTION_FLAG (m, processingComplete);
+            setActionFlag (m, processingComplete);
         }
 
         transmit (0, m);
@@ -856,7 +856,7 @@ void CoreBroker::addDestFilter (ActionMessage &m)
     {
         if (proc)
         {
-            SET_ACTION_FLAG (m, processingComplete);
+            setActionFlag (m, processingComplete);
         }
         transmit (0, m);
     }
@@ -1149,7 +1149,7 @@ void CoreBroker::FindandNotifyEndpointFilters (BasicHandleInfo &handleInfo)
         m.dest_handle = handleInfo.id;
         if (handleInfo.flag)
         {
-            SET_ACTION_FLAG (m, indicator_flag);
+            setActionFlag (m, indicator_flag);
         }
         transmit (getRoute (m.dest_id), m);
 
@@ -1447,11 +1447,11 @@ void CoreBroker::checkDependencies ()
 bool CoreBroker::allInitReady () const
 {
     // the federate count must be greater than the min size
-    if (static_cast<decltype (_min_federates)> (_federates.size ()) < _min_federates)
+    if (static_cast<decltype (minFederateCount)> (_federates.size ()) < minFederateCount)
     {
         return false;
     }
-    if (static_cast<decltype (_min_brokers)> (_brokers.size ()) < _min_brokers)
+    if (static_cast<decltype (minBrokerCount)> (_brokers.size ()) < minBrokerCount)
     {
         return false;
     }

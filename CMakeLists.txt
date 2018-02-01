@@ -37,7 +37,7 @@ OPTION(USE_POSITION_INDEPENDENT_CODE "Build the libraries with Position independ
 endif()
 
 OPTION(BUILD_JAVA "Build Java extension" OFF)
-if (BUILD_PYTHON OR BUILD_C_SHARED_LIB)
+if (BUILD_PYTHON OR BUILD_C_SHARED_LIB OR BUILD_JAVA OR BUILD_MATLAB)
 set(BUILT_C_SHARED_LIB ON)
 endif()
 
@@ -108,17 +108,27 @@ IF(UNIX)
   add_compile_options(-Wall -pedantic)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wextra>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wshadow>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-pedantic>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-aliasing>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
-  #this options produces lots of warning but is useful for checking ever once in a while with Clang, GCC warning notices with this aren't as useful
+  #this options produces lots of warning but is useful for checking every once in a while with Clang, GCC warning notices with this aren't as useful
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
-
+  # add some gnu specific options if the compiler is newer
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+     # this option produces a number of warnings in third party libraries but useful for checking for any internal usages
+ # add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wold-style-cast>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wlogical-op>)
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
+   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wduplicated-cond>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wnull-dereference>)
+  endif()
+  endif()
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
-  option (USE_LIBCXX "Use LibC++ vs as opposed to the default" OFF)
+  option (USE_LIBCXX "Use Libc++ vs as opposed to the default" OFF)
   IF(USE_LIBCXX)
-      add_compile_options(-stdlib=libc++)
+      add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-stdlib=libc++>)
       link_libraries("-stdlib=libc++")
      ENDIF(USE_LIBCXX)
 ELSE(UNIX)
@@ -131,9 +141,18 @@ ELSE(UNIX)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
+  
   #this options produces lots of warning but is useful for checking ever once in a while with Clang, GCC warning notices with this aren't as useful
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
-
+   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+   # this option produces a number of warnings in third party libraries but useful for checking for any internal usages
+ # add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wold-style-cast>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wlogical-op>)
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
+   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wduplicated-cond>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wnull-dereference>)
+  endif()
+  endif()
   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
   ELSE(MINGW)
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
@@ -153,12 +172,14 @@ ENDIF(UNIX)
 
 IF (BUILD_MATLAB OR USE_BOOST_STATIC_LIBS)
   set(Boost_USE_STATIC_LIBS ON)
+  set(BOOST_STATIC ON)
+	  
 ENDIF ()
 
 # -------------------------------------------------------------
 # Check and set latest CXX Standard supported by compiler
 # -------------------------------------------------------------
-OPTION(ENABLE_CXX_17 "set to on to enable C++17 compilation features" OFF)
+OPTION(ENABLE_CXX_17 "set to ON to enable C++17 compilation features" OFF)
 include(CheckLatestCXXStandardOption)
 IF (VERSION_OPTION)
 	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
@@ -314,7 +335,7 @@ IF("${isSystemDir}" STREQUAL "-1")
    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
-if (NOT USE_BOOST_STATIC_LIBS)
+if (NOT Boost_USE_STATIC_LIBS)
 list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
 endif()
 
@@ -336,7 +357,7 @@ ENDIF()
 
 IF(BUILD_CXX_SHARED_LIB)
 	if (BUILD_C_SHARED_LIB OR BUILD_PYTHON)
-		warning("Building the CXX shared library and C shared library in the same build is not advisable due to conflicting symbol visibility guidelines and is unlikely to work very well")
+		message(WARNING "Building the CXX shared library and C shared library in the same build is not advisable due to conflicting symbol visibility guidelines and is unlikely to work very well")
 	endif()
 
 	add_library(helics-shared SHARED src/empty.cpp)

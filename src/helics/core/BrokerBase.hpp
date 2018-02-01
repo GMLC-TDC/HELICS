@@ -1,5 +1,4 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
@@ -22,7 +21,6 @@ and some common methods used cores and brokers
 #include "ActionMessage.hpp"
 #include "Core.hpp"
 #include <atomic>
-#include <chrono>
 #include <memory>
 #include <string>
 #include <thread>
@@ -41,9 +39,9 @@ class BrokerBase
     std::atomic<int32_t> maxLogLevel{1};  //!< the logging level to use levels >=this will be logged
     int32_t consoleLogLevel = 1;  //!< the logging level for console display
     int32_t fileLogLevel = 1;  //!< the logging level for logging to a file
-    int32_t _min_federates = 1;  //!< the minimum number of federates that must connect before entering init mode
-    int32_t _min_brokers = 0;  //!< the minimum number of brokers that must connect before entering init mode
-    int32_t _maxIterations = 10000;  //!< the maximum number of iterative loops that are allowed
+    int32_t minFederateCount = 1;  //!< the minimum number of federates that must connect before entering init mode
+    int32_t minBrokerCount = 0;  //!< the minimum number of brokers that must connect before entering init mode
+    int32_t maxIterationCount = 10000;  //!< the maximum number of iterative loops that are allowed
     int32_t tickTimer = 4000;  //!< counter for the length of a keep alive tick in milliseconds
     int32_t timeout =
       30000;  //!< timeout to wait to establish a broker connection before giving up in milliseconds
@@ -62,7 +60,7 @@ class BrokerBase
   protected:
     std::string logFile;  //< the file to log message to
     std::unique_ptr<TimeCoordinator> timeCoord;  //!< object managing the time control
-    BlockingPriorityQueue<ActionMessage> _queue;  //!< primary routing queue
+    BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
     /** enumeration of the possible core states*/
     enum broker_state_t : int
     {

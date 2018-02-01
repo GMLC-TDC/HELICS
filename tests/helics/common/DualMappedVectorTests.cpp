@@ -10,7 +10,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
-
 #include "helics/common/DualMappedVector.hpp"
 
 BOOST_AUTO_TEST_SUITE(dual_mapped_vector_tests)
@@ -55,8 +54,6 @@ BOOST_AUTO_TEST_CASE(insertion_tests)
 
 	auto V5 = Mvec.find(41);
 	BOOST_CHECK_EQUAL(V5->size(), 3);
-
-
 }
 
 BOOST_AUTO_TEST_CASE(additional_searchTerm_tests)
@@ -97,6 +94,7 @@ BOOST_AUTO_TEST_CASE(additional_searchTerm_tests)
 	BOOST_CHECK(!Mvec.addSearchTerm("missing", 98));
 	BOOST_CHECK(!Mvec.addSearchTerm(1241, "none"));
 }
+
 
 BOOST_AUTO_TEST_CASE(iterator_tests)
 {
@@ -150,11 +148,9 @@ BOOST_AUTO_TEST_CASE(remove_tests)
 	BOOST_CHECK(Mvec.find("s5") == Mvec.end());
 	BOOST_CHECK_EQUAL(*Mvec.find(107), 9.7);
 
-
 	auto MV2 = std::move(Mvec);
 	BOOST_CHECK_EQUAL(MV2.size(), 2);
 
-	
 	auto MV3 = MV2;
 	BOOST_CHECK_EQUAL(MV2.size(), 2);
 	BOOST_CHECK_EQUAL(MV3.size(), 2);
