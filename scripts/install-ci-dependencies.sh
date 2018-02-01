@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     HOMEBREW_NO_AUTO_UPDATE=1 brew install pcre
 fi
@@ -14,14 +13,47 @@ fi
     make;
     make install;
 )
-
-
 export PATH="$HOME/swig/bin:${PATH}"
 echo "*** built swig successfully {$PATH}"
+
+# Convert commit message to lower case
+commit_msg=`tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE}`
+# Wipe out cached dependencies if commit message has '[update_cache]'
+if [[ $commit_msg == *'[update_cache]'* ]]; then
+    local individual
+    if [[ $commit_msg == *'boost'* ]]; then
+        rm -rf dependencies/boost;
+        individual="true"
+    fi
+    if [[ $commit_msg == *'zmq'* ]]; then
+        rm -rf dependencies/zmq;
+        individual="true"
+    fi
+    
+    # If no dependency named in commit message, update entire cache
+    if [[ "$individual" != 'true' ]]; then
+        rm -rf dependencies;
+    fi
+fi
 
 if [[ ! -f "dependencies" ]]; then
     mkdir -p dependencies;
 fi
+
+install_boost () {
+    # Split argument 1 into 'ver' array, using '.' as delimiter
+    local -a ver
+    IFS='.' read -r -a ver <<< $1
+    local boost_version=$1
+    local boost_version_str=boost_${ver[0]}_${ver[1]}_${ver[2]}
+    wget -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
+    (
+        cd ${boost_version_str}/;
+        ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test;
+        ./b2 link=shared threading=multi variant=release > /dev/null;
+        ./b2 install --prefix=../dependencies/boost > /dev/null;
+    )
+}
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     if [[ ! -f "cmake-3.4.3-Linux-x86_64/bin/cmake" ]]; then
@@ -33,7 +65,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     echo "*** cmake installed ($PATH)"
 
 elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    if [[ ! -f "cmake-3.9.0-Darwin-x86_64/CMake.app/Contents/bin/cmake" ]]; then
+    if [[ ! -f "cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/bin/cmake" ]]; then
         echo "*** install cmake"
         wget --no-check-certificate http://cmake.org/files/v3.4/cmake-3.4.3-Darwin-x86_64.tar.gz && tar -xzf cmake-3.4.3-Darwin-x86_64.tar.gz;
     fi
@@ -54,18 +86,17 @@ if [[ ! -d "dependencies/zmq" ]]; then
     )
     echo "*** built zmq successfully"
 fi
-
+# Install Boost
 if [[ ! -d "dependencies/boost" ]]; then
     echo "*** build boost"
-    wget -O boost_1_61_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz/download && tar xzf boost_1_61_0.tar.gz
-    (
-        cd boost_1_61_0/;
-        ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test;
-        ./b2 link=shared threading=multi variant=release > /dev/null;
-        ./b2 install --prefix=../dependencies/boost > /dev/null;
-    )
+    if [[ "$MINIMUM_DEPENDENCIES" == "true" ]]; then
+        install_boost 1.61.0
+    else
+        install_boost 1.65.0
+    fi
     echo "*** built boost successfully"
 fi
+export BOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost}
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     sudo ldconfig ${PWD}/dependencies
