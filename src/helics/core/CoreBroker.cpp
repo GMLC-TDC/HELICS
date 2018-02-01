@@ -35,8 +35,7 @@ bool matchingTypes (const std::string &type1, const std::string &type2);
 void CoreBroker::displayHelp ()
 {
     std::cout << "Broker Specific options:\n";
-    namespace po = boost::program_options;
-    po::variables_map vm;
+    variable_map vm;
     const char *const argV[] = {"", "--help"};
     argumentParser (2, argV, vm, extraArgs);
     BrokerBase::displayHelp ();

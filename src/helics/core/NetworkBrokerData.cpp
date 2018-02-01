@@ -33,14 +33,13 @@ static const ArgDescriptors extraArgs{{"interface"s,
 void NetworkBrokerData::displayHelp ()
 {
     const char *const argV[] = {"", "--help"};
-    boost::program_options::variables_map vm;
+    variable_map vm;
     argumentParser (2, argV, vm, extraArgs);
 }
 
 void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, const std::string &localAddress)
 {
-    namespace po = boost::program_options;
-    po::variables_map vm;
+    variable_map vm;
     argumentParser (argc, argv, vm, extraArgs);
 
     if (vm.count ("broker_address") > 0)

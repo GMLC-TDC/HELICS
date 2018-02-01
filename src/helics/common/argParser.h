@@ -17,7 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <string>
 #include <vector>
-#include <boost/program_options.hpp>
+#include <boost/program_options/variables_map.hpp>
 
 namespace helics
 {
@@ -52,17 +52,21 @@ class ArgDescriptor
 };
 using ArgDescriptors = std::vector<ArgDescriptor>;
 
+using variable_map = boost::program_options::variables_map;
+constexpr int helpReturn(-1);
+constexpr int versionReturn(-2);
+
 /** using boost argument_parser to process a set of command line arguments
 @param[in] argc the number of arguments
 @param[in] argv the actual strings in the argument
-@param[out] vm_map the program_options map of all the arguments
+@param[out] vm_map the variable_map of all the arguments
 @param[in] argDefinitions the definition targets used for the processing
 @param[in] posName, (optional) the name of a positional argument
-@return (-1) if the help argument was called and displayed
+@return helpReturn(-1) if the help argument was called and displayed, versionReturn(-2) if version argument was used 0 otherwise
 */
 int argumentParser (int argc,
                      const char *const *argv,
-                     boost::program_options::variables_map &vm_map,
+                        variable_map &vm_map,
                      const ArgDescriptors &argDefinitions, const std::string &posName=std::string());
 
 }

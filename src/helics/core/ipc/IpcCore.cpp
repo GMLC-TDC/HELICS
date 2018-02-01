@@ -49,10 +49,9 @@ IpcCore::~IpcCore () = default;
 
 void IpcCore::initializeFromArgs (int argc, const char *const *argv)
 {
-    namespace po = boost::program_options;
     if (brokerState == created)
     {
-        po::variables_map vm;
+        variable_map vm;
         argumentParser (argc, argv, vm, extraArgs);
 
         if (vm.count ("broker") > 0)

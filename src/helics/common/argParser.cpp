@@ -13,6 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <fstream>
 #include <iostream>
 #include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
 
 namespace helics
 {
@@ -50,13 +51,14 @@ static void loadArguments (po::options_description &config, const ArgDescriptors
 
 int argumentParser (int argc,
                      const char *const *argv,
-                     boost::program_options::variables_map &vm_map,
+                     variable_map &vm_map,
                      const ArgDescriptors &argDefinitions, const std::string &posName)
 {
     po::options_description cmd_only ("command line only");
     po::options_description config ("configuration");
     po::options_description hidden ("hidden");
 
+    
     // clang-format off
 	// input boost controls
 	cmd_only.add_options()
@@ -75,10 +77,14 @@ int argumentParser (int argc,
     config_file.add (config);
     visible.add (cmd_only).add (config);
 
-    // po::positional_options_description p;
-    // p.add("input", -1);
-
-    po::variables_map cmd_vm;
+    if (!posName.empty())
+    {
+        hidden.add_options() (posName.c_str(), po::value<std::string>(), "positional argument");
+        cmd_line.add(hidden);
+        config_file.add(hidden);
+    }
+    
+    variable_map cmd_vm;
     try
     {
         if (posName.empty())
@@ -107,13 +113,23 @@ int argumentParser (int argc,
     if (cmd_vm.count ("help") > 0)
     {
         std::cout << visible << '\n';
-        return (-1);
+        return helpReturn;
     }
     if (cmd_vm.count("version") > 0)
     {
-        return (-2);
+        return versionReturn;
     }
-    po::store (po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered ().run (), vm_map);
+    if (posName.empty())
+    {
+        po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().run(), vm_map);
+    }
+    else
+    {
+        po::positional_options_description p;
+        p.add(posName.c_str(), -1);
+        po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().positional(p).run(), vm_map);
+    }
+   
 
     if (cmd_vm.count ("config-file") > 0)
     {

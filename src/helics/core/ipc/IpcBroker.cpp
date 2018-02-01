@@ -51,8 +51,7 @@ IpcBroker::~IpcBroker () = default;
 void IpcBroker::displayHelp (bool local_only)
 {
     std::cout << " Help for Interprocess Broker: \n";
-    namespace po = boost::program_options;
-    po::variables_map vm;
+    variable_map vm;
     const char *const argV[] = {"", "--help"};
     argumentParser (2, argV, vm, extraArgs);
     if (!local_only)
@@ -63,10 +62,9 @@ void IpcBroker::displayHelp (bool local_only)
 
 void IpcBroker::initializeFromArgs (int argc, const char *const *argv)
 {
-    namespace po = boost::program_options;
     if (brokerState == broker_state_t::created)
     {
-        po::variables_map vm;
+        variable_map vm;
         argumentParser (argc, argv, vm, extraArgs);
 
         if (vm.count ("broker") > 0)
