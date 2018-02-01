@@ -36,7 +36,7 @@ install_boost () {
     IFS='.' read -r -a ver <<< $1
     local boost_version=$1
     local boost_version_str=boost_${ver[0]}_${ver[1]}_${ver[2]}
-    wget -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf boost_$1_$2_$3.tar.gz
+    wget -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
     (
         cd ${boost_version_str}/;
         ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test;
@@ -76,11 +76,10 @@ if [[ ! -d "dependencies/zmq" ]]; then
     )
     echo "*** built zmq successfully"
 fi
-
 # Install Boost
 if [[ ! -d "dependencies/boost" ]]; then
     echo "*** build boost"
-    if [[ "MINIMUM_DEPENDENCIES" == "true" ]]; then
+    if [[ "$MINIMUM_DEPENDENCIES" == "true" ]]; then
         install_boost 1.61.0
     else
         install_boost 1.65.0
