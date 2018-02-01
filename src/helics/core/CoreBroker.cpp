@@ -350,7 +350,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             _brokers.insert (command.name,command.dest_id,command.name);
             _brokers.back ().route_id = getRoute (command.source_id);
             _brokers.back ().global_id = command.dest_id;
-            routing_table.emplace(broker->global_id, _brokers.back().route_id);
+            routing_table.emplace(broker->global_id, _brokers.back ().route_id);
 
         }
     }

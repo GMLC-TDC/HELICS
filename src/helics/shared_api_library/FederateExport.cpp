@@ -291,6 +291,10 @@ helics_status helicsFederateFinalize (helics_federate fed)
 helics_status helicsFederateEnterInitializationMode (helics_federate fed)
 {
     auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return helics_invalid_object;
+    }
     try
     {
         fedObj->enterInitializationState ();

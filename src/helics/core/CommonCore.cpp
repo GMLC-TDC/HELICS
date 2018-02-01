@@ -1414,29 +1414,36 @@ ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage 
         auto filtFunc = getFilterCoordinator (hndl->id);
         if (filtFunc->hasSourceFilter)
         {
-            for (int ii = 0; ii < static_cast<int> (filtFunc->sourceFilters.size ()); ++ii)
+         //   for (int ii = 0; ii < static_cast<int> (filtFunc->sourceFilters.size ()); ++ii)
+            size_t ii = 0;
+            for (auto &filt:filtFunc->sourceFilters)
             {
-                if (filtFunc->sourceFilters[ii]->fed_id == global_broker_id)
+                if (filt->fed_id == global_broker_id)
                 {
                     // deal with local source filters
                     auto tempMessage = createMessage (std::move (m));
-                    tempMessage = filtFunc->sourceFilters[ii]->filterOp->process (std::move (tempMessage));
-                    m = ActionMessage (std::move (tempMessage));
-                }
-                else
-                {
-                    m.dest_id = filtFunc->sourceFilters[ii]->fed_id;
-                    m.dest_handle = filtFunc->sourceFilters[ii]->handle;
-                    if (ii < static_cast<int> (filtFunc->sourceFilters.size () - 1))
+                    tempMessage = filt->filterOp->process (std::move (tempMessage));
+                    if (tempMessage)
                     {
-                        m.setAction (CMD_SEND_FOR_FILTER_OPERATION);
+                        m = ActionMessage(std::move(tempMessage));
                     }
                     else
                     {
-                        m.setAction (CMD_SEND_FOR_FILTER);
+                        //the filter dropped the message;
+                        m=CMD_IGNORE;
+                        return m;
                     }
+                    
+                }
+                else
+                {
+                    m.dest_id = filt->fed_id;
+                    m.dest_handle = filt->handle;
+                    m.counter = static_cast<uint16_t>(ii);
+                    m.setAction((ii < filtFunc->sourceFilters.size() - 1) ? CMD_SEND_FOR_FILTER_OPERATION : CMD_SEND_FOR_FILTER);
                     return m;
                 }
+                ++ii;
             }
         }
     }
