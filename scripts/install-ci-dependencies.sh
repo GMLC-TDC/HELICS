@@ -24,9 +24,14 @@ if [[ ! -f "dependencies" ]]; then
 fi
 
 install_boost () {
-    wget -O boost_$1_$2_$3.tar.gz http://sourceforge.net/projects/boost/files/boost/$1.$2.$3/boost_$1_$2_$3.tar.gz/download && tar xzf boost_$1_$2_$3.tar.gz
+    # Split argument 1 into 'ver' array, with '.' as delimiter
+    local -a ver
+    IFS='.' read -r -a ver <<< $1
+    local boost_version = $1
+    local boost_version_str = boost_${ver[0]}_${ver[1]}_${ver[2]}
+    wget -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf boost_$1_$2_$3.tar.gz
     (
-        cd boost_$1_$2_$3/;
+        cd ${boost_version_str}/;
         ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test;
         ./b2 link=shared threading=multi variant=release > /dev/null;
         ./b2 install --prefix=../dependencies/boost > /dev/null;
@@ -69,9 +74,9 @@ fi
 if [[ ! -d "dependencies/boost" ]]; then
     echo "*** build boost"
     if [[ "MINIMUM_DEPENDENCIES" == "true" ]]; then
-        install_boost 1 61 0
+        install_boost 1.61.0
     else
-        install_boost 1 65 0
+        install_boost 1.65.0
     fi
     echo "*** built boost successfully"
 fi
