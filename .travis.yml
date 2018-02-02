@@ -1,3 +1,7 @@
+sudo: required
+
+# Use Linux unless specified otherwise
+os: linux
 dist: trusty
 language: cpp
 
@@ -17,7 +21,8 @@ cache:
 _basic_env:
 - &daily_linux
   if: type = cron
-  os: linux
+  os:
+    - linux
   compiler: gcc
   addons:
     apt:
