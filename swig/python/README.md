@@ -16,11 +16,18 @@ cd build
 #### Actually build HELICS
 Note: starting from ~/GitRepos/HELICS-src/build or your similar directory
 
-1. setup the build with cmake. 
-Note: change `python3` to `python` (twice) in the command line if your current python environment uses 2.x (or the default OS python install)
+1. Setup the build with cmake.
+
 ```
 cmake -DCMAKE_INSTALL_PREFIX=~/helics_install -DBUILD_PYTHON=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m ../
 ```
+
+With Python2, the above command is instead the following.
+
+```
+cmake -DCMAKE_INSTALL_PREFIX=~/helics_install -DBUILD_PYTHON=ON -DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython2.7.dylib -DPYTHON_INCLUDE_DIR=$(python-config --prefix)/include/python2.7 ../
+```
+
 2. Run the build
 ```
 # First clean up any old stuff
@@ -57,7 +64,7 @@ python pireceiver.py
 
 You should see something like the following in the PI RECEIVER window (2nd one in directions above)
 ```
-$ python pireceiver.py 
+$ python pireceiver.py
 PI RECEIVER: Helics version = 1.0.0.alpha (01-18-18)
 PI RECEIVER: Creating Federate Info
 PI RECEIVER: Setting Federate Info Name
@@ -69,7 +76,7 @@ PI RECEIVER: Creating Value Federate
 PI RECEIVER: Value federate created
 PI RECEIVER: Subscription registered
 PI RECEIVER: Entering execution mode
-PI RECEIVER: Current time is 5.0 
+PI RECEIVER: Current time is 5.0
 PI RECEIVER: Received value = 3.142857142857143 at time 5.0 from PI SENDER
 PI RECEIVER: Received value = 3.142857142857143 at time 6.0 from PI SENDER
 PI RECEIVER: Received value = 3.142857142857143 at time 7.0 from PI SENDER
