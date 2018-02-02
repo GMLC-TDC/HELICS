@@ -118,7 +118,7 @@ namespace helics
         std::shared_ptr<CombinationFederate> fed; //!< the federate created for the source
         std::vector<SourceObject> sources;  //!< the actual publication objects
         Time stopTime = Time::maxVal(); //!< the time the source should stop
-      
+        bool deactivated = false;
     };
 }
 

@@ -37,7 +37,7 @@ void CoreBroker::displayHelp ()
     std::cout << "Broker Specific options:\n";
     variable_map vm;
     const char *const argV[] = {"", "--help"};
-    argumentParser (2, argV, vm, extraArgs);
+    argumentParser(2, argV, vm, {});
     BrokerBase::displayHelp ();
 }
 
@@ -875,9 +875,7 @@ void CoreBroker::initializeFromArgs (int argc, const char *const *argv)
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong (exp, broker_state_t::initialized))
     {
-        namespace po = boost::program_options;
-
-        po::variables_map vm;
+        variable_map vm;
         argumentParser (argc, argv, vm, extraArgs);
         // Initialize the brokerBase component
         initializeFromCmdArgs (argc, argv);

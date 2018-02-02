@@ -33,12 +33,10 @@ static const ArgDescriptors extraArgs{{"brokername"s, "identifier for the broker
 
 void TestCore::initializeFromArgs (int argc, const char *const *argv)
 {
-    namespace po = boost::program_options;
     bool exp = false;
     if (initialized_.compare_exchange_strong (exp, true))
     {
-        po::variables_map vm;
-
+        variable_map vm;
         argumentParser (argc, argv, vm, extraArgs);
 
         if (vm.count ("broker") > 0)

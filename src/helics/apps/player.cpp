@@ -27,7 +27,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../common/stringOps.h"
 #include "../core/helicsVersion.hpp"
 
-namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
 // static const std::regex creg

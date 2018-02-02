@@ -30,7 +30,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "recorder.h"
 #include <thread>
 
-namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
 namespace helics
@@ -40,7 +39,6 @@ Recorder::Recorder (FederateInfo &fi) : fed (std::make_shared<CombinationFederat
     fed->setFlag (OBSERVER_FLAG);
 }
 
-using namespace std::string_literals;
 static const ArgDescriptors InfoArgs{
     {"stop", "the time to stop recording"},
     {"tags",ArgDescriptor::arg_type_t::vector_string,"tags to record, this argument may be specified any number of times"},
@@ -56,7 +54,7 @@ static const ArgDescriptors InfoArgs{
 Recorder::Recorder (int argc, char *argv[])
 {
     variable_map vm_map;
-    auto res = argumentParser(argc, argv, vm_map, InfoArgs, "input"s);
+    auto res = argumentParser(argc, argv, vm_map, InfoArgs, "input");
     if (res == versionReturn)
     {
         std::cout << helics::helicsVersionString() << '\n';
