@@ -99,7 +99,6 @@ fi
 export BOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost}
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    sudo ldconfig ${PWD}/dependencies
     export LD_LIBRARY_PATH=${PWD}/dependencies/zmq/lib:${PWD}/dependencies/boost/lib:$LD_LIBRARY_PATH
 elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH=${PWD}/dependencies/zmq/lib:${PWD}/dependencies/boost/lib:$LD_LIBRARY_PATH
