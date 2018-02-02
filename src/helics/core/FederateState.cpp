@@ -130,8 +130,6 @@ void FederateState::setParent (CommonCore *coreObject)
     timeCoord->setMessageSender ([coreObject](const ActionMessage &msg) { coreObject->addActionMessage (msg); });
 }
 
-static auto compareFunc = [](const auto &A, const auto &B) { return (A->id < B->id); };
-
 CoreFederateInfo FederateState::getInfo () const
 {
     // lock the mutex to ensure we have the latest values

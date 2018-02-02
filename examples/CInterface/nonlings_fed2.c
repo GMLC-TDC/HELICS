@@ -124,7 +124,8 @@ int main()
   helicsFederateFinalize(vfed);
   printf("NLIN2: Federate finalized\n");
   fflush(NULL);
-  //clean upFederate;
+  /*clean upFederate;
+  */
   helicsFederateFree(vfed);
   helicsCloseLibrary();
   printf("NLIN2: Library Closed\n");
