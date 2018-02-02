@@ -81,7 +81,6 @@ class shared_guarded
     template <class TimePoint>
     shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
 
-
   private:
     class deleter
     {
