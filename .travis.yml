@@ -45,13 +45,13 @@ jobs:
     # XCode 6.4, OS X 10.10
     - <<: *osx_base
       env:
-        - MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=64"
+        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=64"
         - HOMEBREW_NO_AUTO_UPDATE=1
       osx_image: xcode6.4
     # XCode 7.3, OS X 10.11
     - <<: *osx_base
       env:
-        - MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73"
+        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73"
         - HOMEBREW_NO_AUTO_UPDATE=1
       osx_image: xcode7.3
 
@@ -68,7 +68,7 @@ jobs:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6"
+      env: MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
 
     - <<: *linux_base
       addons:
@@ -78,7 +78,7 @@ jobs:
           packages:
             - g++-4.9
       env:
-        - MATRIX_EVAL="COMPILER=g++-4.9 && CC=gcc-4.9 && CXX=g++-4.9"
+        - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
         - MINIMUM_DEPENDENCIES=true
 
     - <<: *linux_base
@@ -90,18 +90,18 @@ jobs:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
-      env: MATRIX_EVAL="COMPILER=clang++-3.6 && CC='ccache clang-3.6 -Qunused-arguments -fcolor-diagnostics' && CXX='ccache clang++-3.6 -Qunused-arguments -fcolor-diagnostics'"
+      env: MATRIX_EVAL="COMPILER=clang && CC='ccache clang-3.6 -Qunused-arguments -fcolor-diagnostics' && CXX='ccache clang++-3.6 -Qunused-arguments -fcolor-diagnostics'"
 
    # ------------------------------------------------
    # Jobs for daily valgrind and code coverage tests
    # ------------------------------------------------
     - <<: *daily_linux
       env:
-        - MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6"
+        - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - RUN_VALGRIND=true
     - <<: *daily_linux
       env:
-        - MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6"
+        - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - RUN_COVERAGE=true
 
 branches:
