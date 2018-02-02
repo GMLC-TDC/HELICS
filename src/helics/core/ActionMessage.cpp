@@ -344,6 +344,7 @@ std::unique_ptr<Message> createMessageFromCommand (const ActionMessage &cmd)
     msg->dest = cmd.info ().target;
     msg->data = cmd.payload;
     msg->time = cmd.actionTime;
+    msg->messageID = cmd.info().messageID;
     msg->source = cmd.info ().source;
 
     return msg;
@@ -358,7 +359,7 @@ std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd)
     msg->data = std::move (cmd.payload);
     msg->time = cmd.actionTime;
     msg->source = std::move (cmd.info ().source);
-
+    msg->messageID = cmd.info().messageID;
     return msg;
 }
 

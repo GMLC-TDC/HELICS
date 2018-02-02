@@ -266,8 +266,7 @@ class CommonCore : public Core, public BrokerBase
     std::atomic<int16_t> delayInitCounter{
       0};  //!< counter for the number of times the entry to initialization Mode was explicitly delayed
     std::vector<std::unique_ptr<FederateState>> _federates;  //!< local federate information
-    std::vector<int>
-      ongoingFilterActionCounter;  //!< counter for the number of ongoing filter transactions for a federate
+    std::atomic<int32_t> messageCounter;  //!< counter for the number of messages that have been sent
     std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
     std::atomic<Core::handle_id_t> handleCounter{1};  //!< counter for the handle index
     std::unordered_map<std::string, handle_id_t> publications;  //!< map of all local publications
