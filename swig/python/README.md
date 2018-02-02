@@ -35,16 +35,10 @@ The above commands installs HELICS to `~/helics_install`. The Python extension i
 
 
 ### Testing
-__Background:__ Running a HELICS federation (via low level commands) requires first starting a helics broker and then running the desired set of federates with it.
+__Background:__ Running a HELICS federation (via low level commands) requires first starting a helics broker and then running the desired set of federates with it. In this case, the pisender starts this broker and then joins as a federate.
 
-1. Open up 3 terminal windows
-2. In the first start the helics_broker for 2 federates with:
-```
-bash
-cd ~/helics_install/bin
-./helics_broker 2
-```
-3. In the second start the python demo sender (sends the value of π every simulation second from 5.0-9.0)
+1. Open up 2 terminal windows
+2. In the first start the python demo sender (sends the value of π every simulation second from 5.0-9.0). This also starts the broker
 ```bash
 export PYTHONPATH="~/helics_install/python"
 
@@ -52,7 +46,7 @@ cd ~/GitRepos/HELICS-src/swig/python
 
 python pisender.py
 ```
-4. In the third, start the python demo reciever (subscribes to the π messages & prints to screen)
+3. In the second, start the python demo reciever (subscribes to the π messages & prints to screen)
 ```bash
 export PYTHONPATH="~/helics_install/python"
 
@@ -61,7 +55,7 @@ cd ~/GitRepos/HELICS-src/swig/python
 python pireceiver.py
 ```
 
-You should see something like the following in the PI RECEIVER window (3rd one in directions above)
+You should see something like the following in the PI RECEIVER window (2nd one in directions above)
 ```
 $ python pireceiver.py 
 PI RECEIVER: Helics version = 1.0.0.alpha (01-18-18)
@@ -85,5 +79,4 @@ PI RECEIVER: Federate finalized
 end of master Object Holder destructor
 ```
 
-Corresponding output should appear from the PI SENDER (window 2), and the `helics_broker` will just exit quietly.
-
+Corresponding output should appear from the PI SENDER (window 1).
