@@ -2,7 +2,7 @@
 
 ### Install
 
-When installing HELICS using cmake, set `BUILD_PYTHON` to be `ON`
+#### Clone HELICS and setup directories (only need to do once)
 
 ```bash
 cd ~
@@ -12,17 +12,47 @@ git clone https://github.com/GMLC-TDC/HELICS-src
 cd HELICS-src
 mkdir build
 cd build
+```
+#### Actually build HELICS
+Note: starting from ~/GitRepos/HELICS-src/build or your similar directory
 
+1. setup the build with cmake. 
+Note: change `python3` to `python` (twice) in the command line if your current python environment uses 2.x (or the default OS python install)
+```
 cmake -DCMAKE_INSTALL_PREFIX=~/helics_install -DBUILD_PYTHON=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m ../
-
-make clean; make -j 4; make install
+```
+2. Run the build
+```
+# First clean up any old stuff
+make clean
+# Then run the actual compilation, using 4 parallel threads
+make -j 4
+# Finally copy files to final locations and adjust environment
+make install
 ```
 
-This above command installs HELICS to `~/helics_install`. The Python extension is installed to `~/helics_install/python`.
+The above commands installs HELICS to `~/helics_install`. The Python extension is installed to `~/helics_install/python`.
 
 
 ### Testing
+__Background:__ Running a HELICS federation (via low level commands) requires first starting a helics broker and then running the desired set of federates with it.
 
+1. Open up 3 terminal windows
+2. In the first start the helics_broker for 2 federates with:
+```
+bash
+cd ~/helics_install/bin
+./helics_broker 2
+```
+3. In the second start the python demo sender (sends the value of π every simulation second from 5.0-9.0)
+```bash
+export PYTHONPATH="~/helics_install/python"
+
+cd ~/GitRepos/HELICS-src/swig/python
+
+python pisender.py
+```
+4. In the third, start the python demo reciever (subscribes to the π messages & prints to screen)
 ```bash
 export PYTHONPATH="~/helics_install/python"
 
@@ -31,12 +61,29 @@ cd ~/GitRepos/HELICS-src/swig/python
 python pireceiver.py
 ```
 
-```bash
-export PYTHONPATH="~/helics_install/python"
-
-cd ~/GitRepos/HELICS-src/swig/python
-
-python pisender.py
+You should see something like the following in the PI RECEIVER window (3rd one in directions above)
+```
+$ python pireceiver.py 
+PI RECEIVER: Helics version = 1.0.0.alpha (01-18-18)
+PI RECEIVER: Creating Federate Info
+PI RECEIVER: Setting Federate Info Name
+PI RECEIVER: Setting Federate Info Core Type
+PI RECEIVER: Setting Federate Info Init String
+PI RECEIVER: Setting Federate Info Time Delta
+PI RECEIVER: Setting Federate Info Logging
+PI RECEIVER: Creating Value Federate
+PI RECEIVER: Value federate created
+PI RECEIVER: Subscription registered
+PI RECEIVER: Entering execution mode
+PI RECEIVER: Current time is 5.0 
+PI RECEIVER: Received value = 3.142857142857143 at time 5.0 from PI SENDER
+PI RECEIVER: Received value = 3.142857142857143 at time 6.0 from PI SENDER
+PI RECEIVER: Received value = 3.142857142857143 at time 7.0 from PI SENDER
+PI RECEIVER: Received value = 3.142857142857143 at time 8.0 from PI SENDER
+PI RECEIVER: Received value = 3.142857142857143 at time 9.0 from PI SENDER
+PI RECEIVER: Federate finalized
+end of master Object Holder destructor
 ```
 
+Corresponding output should appear from the PI SENDER (window 2), and the `helics_broker` will just exit quietly.
 
