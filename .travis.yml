@@ -86,11 +86,10 @@ jobs:
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
+            - llvm-toolchain-trusty-3.9
           packages:
-            - clang-3.6
-      env: MATRIX_EVAL="COMPILER=clang && CC='ccache clang-3.6 -Qunused-arguments -fcolor-diagnostics' && CXX='ccache clang++-3.6 -Qunused-arguments -fcolor-diagnostics'"
+            - clang-3.9
+      env: MATRIX_EVAL="COMPILER=clang && CC='ccache clang-3.9 -Qunused-arguments -fcolor-diagnostics' && CXX='ccache clang++-3.9 -Qunused-arguments -fcolor-diagnostics'"
 
    # ------------------------------------------------
    # Jobs for daily valgrind and code coverage tests
