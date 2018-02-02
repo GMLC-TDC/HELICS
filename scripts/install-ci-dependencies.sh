@@ -49,7 +49,7 @@ install_boost () {
     wget -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
     (
         cd ${boost_version_str}/;
-        ./bootstrap.sh --with-toolset=$COMPILER --with-libraries=date_time,filesystem,program_options,system,test;
+        ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test;
         ./b2 link=shared threading=multi variant=release > /dev/null;
         ./b2 install --prefix=../dependencies/boost > /dev/null;
     )
