@@ -41,8 +41,22 @@ int main (int argc, char *argv[])
 	{
 		targetfederate = vm["target"].as<std::string>();
 	}
-    std::string target = targetfederate + "/endpoint";
-    helics::FederateInfo fi("fed");
+    std::string targetEndpoint = "endpoint";
+    if (vm.count("endpoint") > 0) {
+        targetEndpoint = vm["endpoint"].as<std::string>();
+    }
+    std::string target = targetfederate + "/" + targetEndpoint;
+    std::string myname = "fed";
+    if (vm.count("name") > 0)
+    {
+        myname = vm["name"].as<std::string>();
+    }
+    std::string myendpoint = "endpoint";
+    if (vm.count("source") > 0)
+    {
+        myendpoint = vm["source"].as<std::string>();
+    }
+    helics::FederateInfo fi(myname);
     fi.loadInfoFromArgs(argc, argv);
     fi.logLevel = 5;
     std::shared_ptr<helics::Broker> brk;
@@ -53,8 +67,8 @@ int main (int argc, char *argv[])
 	
     auto mFed = std::make_unique<helics::MessageFederate> (fi);
     auto name = mFed->getName();
-	std::cout << " registering endpoint for " << name<<'\n';
-    auto id = mFed->registerEndpoint("endpoint", "");
+	std::cout << " registering endpoint '" << myendpoint << "' for " << name<<'\n';
+    auto id = mFed->registerEndpoint(myendpoint, "");
 
     std::cout << "entering init State\n";
     mFed->enterInitializationState ();
@@ -64,6 +78,7 @@ int main (int argc, char *argv[])
     for (int i=1; i<10; ++i) {
 		std::string message = "message sent from "+name+" to "+target+" at time " + std::to_string(i);
 		mFed->sendMessage(id, target, message.data(), message.size());
+        std::cout << message << std::endl;
         auto newTime = mFed->requestTime (i);
 		std::cout << "processed time " << static_cast<double> (newTime) << "\n";
 		while (mFed->hasMessage(id))
@@ -94,7 +109,10 @@ bool argumentParser (int argc, const char * const *argv, po::variables_map &vm_m
     opt.add_options()
         ("help,h", "produce help message")
         ("startbroker", po::value<std::string>(),"start a broker with the specified arguments")
-        ("target,t", po::value<std::string>(), "name of the target federate");
+        ("target,t", po::value<std::string>(), "name of the target federate")
+        ("endpoint,e", po::value<std::string>(), "name of the target endpoint")
+        ("name,n", po::value<std::string>(), "name of this federate")
+        ("source,s", po::value<std::string>(), "name of the source endpoint");
 
     // clang-format on
 
