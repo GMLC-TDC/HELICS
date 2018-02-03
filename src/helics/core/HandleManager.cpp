@@ -18,12 +18,13 @@ BasicHandleInfo *HandleManager::addHandle(Core::handle_id_t id,
     const std::string &type,
     const std::string &units)
 {
-    Core::handle_id_t local_id= handles.size();
+    Core::handle_id_t local_id = static_cast<Core::handle_id_t>(handles.size());
     if (id == invalid_handle)
     {
         id = local_id;
     }
-    handles.emplace_back(id, fed_id, what, key, type, units);
+    handles.push_back(std::make_unique<BasicHandleInfo>(id, fed_id, what, key, type, units));
+    return handles.back().get();
 }
 
 BasicHandleInfo *HandleManager::addHandle(Core::handle_id_t id,
@@ -34,12 +35,13 @@ BasicHandleInfo *HandleManager::addHandle(Core::handle_id_t id,
     const std::string &type_in,
     const std::string &type_out)
 {
-    Core::handle_id_t local_id = handles.size();
+    Core::handle_id_t local_id = static_cast<Core::handle_id_t>(handles.size());
     if (id == invalid_handle)
     {
         id = local_id;
     }
-    handles.emplace_back(id, fed_id, what, key, target, type_in, type_out);
+    handles.emplace_back(std::make_unique<BasicHandleInfo>(id, fed_id, what, key, target, type_in, type_out));
+    return handles.back().get();
 }
 
 } // namespace helics

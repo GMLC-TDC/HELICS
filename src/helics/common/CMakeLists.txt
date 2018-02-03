@@ -27,6 +27,7 @@ DualMappedVector.hpp
 MappedPointerVector.hpp
 DualMappedPointerVector.hpp
 GuardedTypes.hpp
+TripWire.hpp
 )
 
 set(common_sources
@@ -38,6 +39,7 @@ stringOps.cpp
 charMapper.cpp
 base64.cpp
 argParser.cpp
+TripWire.cpp
 )
 
 set(zmq_headers
