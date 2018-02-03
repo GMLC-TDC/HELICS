@@ -1,5 +1,6 @@
 import time
 import helics as h
+from math import pi
 
 initstring = "2 --name=mainbroker"
 fedinitstring = "--broker=mainbroker --federates=1"
@@ -57,7 +58,7 @@ print("PI SENDER: Entering execution mode")
 
 # This federate will be publishing deltat*pi for numsteps steps #
 this_time = 0.0
-value = 22.0 / 7.0
+value = pi
 
 for t in range(5, 10):
     val = value

@@ -1,5 +1,6 @@
 %include output.i
 #define __attribute__(x)
+#pragma SWIG nowarn=451
 
 %module helics
 

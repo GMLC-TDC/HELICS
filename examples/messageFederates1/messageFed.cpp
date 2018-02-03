@@ -15,7 +15,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 static const helics::ArgDescriptors InfoArgs{
     {"startbroker","start a broker with the specified arguments"},
-    {"target,t", "name of the target federate"}
+    {"target,t", "name of the target federate"},
+    {"endpoint,e", "name of the target endpoint"},
+    {"source,s", "name of the source endpoint"}
+    //name is captured in the argument processor for federateInfo
 };
 
 int main (int argc, char *argv[])
@@ -34,9 +37,17 @@ int main (int argc, char *argv[])
 	{
 		targetfederate = vm["target"].as<std::string>();
 	}
-    std::string target = targetfederate + "/endpoint";
-   
-    fi.loadInfoFromArgs(argc, argv);
+    std::string targetEndpoint = "endpoint";
+    if (vm.count("endpoint") > 0) {
+        targetEndpoint = vm["endpoint"].as<std::string>();
+    }
+    std::string target = targetfederate + "/" + targetEndpoint;
+    std::string myendpoint = "endpoint";
+    if (vm.count("source") > 0)
+    {
+        myendpoint = vm["source"].as<std::string>();
+    }
+
     fi.logLevel = 5;
     std::shared_ptr<helics::Broker> brk;
     if (vm.count("startbroker") > 0)
@@ -46,8 +57,8 @@ int main (int argc, char *argv[])
 	
     auto mFed = std::make_unique<helics::MessageFederate> (fi);
     auto name = mFed->getName();
-	std::cout << " registering endpoint for " << name<<'\n';
-    auto id = mFed->registerEndpoint("endpoint", "");
+	std::cout << " registering endpoint '" << myendpoint << "' for " << name<<'\n';
+    auto id = mFed->registerEndpoint(myendpoint, "");
 
     std::cout << "entering init State\n";
     mFed->enterInitializationState ();
@@ -57,6 +68,7 @@ int main (int argc, char *argv[])
     for (int i=1; i<10; ++i) {
 		std::string message = "message sent from "+name+" to "+target+" at time " + std::to_string(i);
 		mFed->sendMessage(id, target, message.data(), message.size());
+        std::cout << message << std::endl;
         auto newTime = mFed->requestTime (i);
 		std::cout << "processed time " << static_cast<double> (newTime) << "\n";
 		while (mFed->hasMessage(id))

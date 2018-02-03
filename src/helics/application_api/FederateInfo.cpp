@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsVersion.hpp"
 #include <iostream>
+#include <fstream>
 #include <boost/filesystem.hpp>
 
 #include "../common/argParser.h"
