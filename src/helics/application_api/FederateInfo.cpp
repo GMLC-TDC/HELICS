@@ -11,20 +11,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "Federate.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
+#include "../core/core-exceptions.hpp"
+#include "../core/helicsVersion.hpp"
 #include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
-#include "../core/helicsVersion.hpp"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4702)
-#include "json/json.h"
-#pragma warning(pop)
-#else
-#include "json/json.h"
-#endif
+#include "../common/JsonProcessingFunctions.hpp"
 
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
@@ -69,26 +64,26 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
 
     if (vm.count ("timedelta") > 0)
     {
-        timeDelta = vm["timedelta"].as<double> ();
+        timeDelta = loadTimeFromString(vm["timedelta"].as<std::string> ());
     }
     if (vm.count ("inputdelay") > 0)
     {
-        timeDelta = vm["inputdelay"].as<double> ();
+        timeDelta = loadTimeFromString(vm["inputdelay"].as<std::string> ());
     }
 
     if (vm.count ("outputdelay") > 0)
     {
-        timeDelta = vm["outputdelay"].as<double> ();
+        timeDelta = loadTimeFromString(vm["outputdelay"].as<std::string> ());
     }
 
     if (vm.count ("period") > 0)
     {
-        period = vm["period"].as<double> ();
+        period = loadTimeFromString(vm["period"].as<std::string> ());
     }
 
     if (vm.count ("offset") > 0)
     {
-        offset = vm["offset"].as<double> ();
+        offset = loadTimeFromString(vm["offset"].as<std::string> ());
     }
     if (vm.count ("maxiterations") > 0)
     {
@@ -136,34 +131,17 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     }
 }
 
-FederateInfo LoadFederateInfo (const std::string &jsonString)
+FederateInfo loadFederateInfo (const std::string &jsonString)
 {
     FederateInfo fi;
-    std::ifstream file (jsonString);
     Json_helics::Value doc;
-
-    if (file.is_open ())
+    try
     {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        bool ok = Json_helics::parseFromStream (rbuilder, file, &doc, &errs);
-        if (!ok)
-        {
-            std::cerr << errs << std::endl;
-            return fi;
-        }
+        doc = loadJsonString (jsonString);
     }
-    else
+    catch (const std::invalid_argument &ia)
     {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        std::istringstream jstring (jsonString);
-        bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
-        if (!ok)
-        {
-            std::cerr << errs << std::endl;
-            return fi;
-        }
+        throw (helics::InvalidParameter (ia.what ()));
     }
 
     if (doc.isMember ("name"))
@@ -228,58 +206,26 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     }
     if (doc.isMember ("period"))
     {
-        if (doc["period"].isObject ())
-        {
-        }
-        else
-        {
-            fi.timeDelta = doc["period"].asDouble ();
-        }
+        fi.period = loadJsonTime (doc["period"]);
     }
 
     if (doc.isMember ("offset"))
     {
-        if (doc["offset"].isObject ())
-        {
-        }
-        else
-        {
-            fi.offset = doc["offset"].asDouble ();
-        }
+        fi.offset = loadJsonTime (doc["offset"]);
     }
 
     if (doc.isMember ("timeDelta"))
     {
-        if (doc["timeDelta"].isObject ())
-        {
-        }
-        else
-        {
-            fi.timeDelta = doc["timeDelta"].asDouble ();
-        }
+        fi.timeDelta = loadJsonTime (doc["timeDelta"]);
     }
 
     if (doc.isMember ("outputDelay"))
     {
-        if (doc["outputDelay"].isObject ())
-        {
-            // TODO:: something about units yet
-        }
-        else
-        {
-            fi.outputDelay = doc["outputDelay"].asDouble ();
-        }
+        fi.outputDelay = loadJsonTime (doc["outputDelay"]);
     }
     if (doc.isMember ("inputDelay"))
     {
-        if (doc["inputDelay"].isObject ())
-        {
-            // TOOD:: something about units yet
-        }
-        else
-        {
-            fi.inputDelay = doc["inputDelay"].asDouble ();
-        }
+        fi.inputDelay = loadJsonTime (doc["inputDelay"]);
     }
     return fi;
 }
@@ -304,12 +250,12 @@ void argumentParser (int argc, const char *const *argv, po::variables_map &vm_ma
             ("name,n", po::value<std::string>(), "name of the player federate")
             ("corename", po::value<std::string>(), "the name of the core to create or find")
             ("core,c", po::value<std::string>(), "type of the core to connect to")
-            ("offset", po::value<double>(), "the offset of the time steps")
-            ("period", po::value<double>(), "the period of the federate")
-            ("timedelta", po::value<double>(), "the time delta of the federate")
+            ("offset", po::value<std::string>(), "the offset of the time steps")
+            ("period", po::value<std::string>(), "the period of the federate")
+            ("timedelta", po::value<std::string>(), "the time delta of the federate")
             ("coreinit,i", po::value<std::string>(), "the core initialization string")
-            ("inputdelay", po::value<double>(), "the time delta of the federate")
-            ("outputdelay", po::value<double>(), "the time delta of the federate")
+            ("inputdelay", po::value<std::string>(), "the time delta of the federate")
+            ("outputdelay", po::value<std::string>(), "the time delta of the federate")
             ("flags,f", po::value<std::vector<std::string>>(), "named flag for the federate");
 
 

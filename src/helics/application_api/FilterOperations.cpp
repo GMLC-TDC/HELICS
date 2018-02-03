@@ -10,10 +10,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "FilterOperations.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
+#include "../core/core-exceptions.hpp"
 #include "Filters.hpp"
 #include "MessageOperators.hpp"
-#include "../core/core-exceptions.hpp"
-
 #include <algorithm>
 #include <iostream>
 #include <map>
@@ -44,6 +44,22 @@ void DelayFilterOperation::set (const std::string &property, double val)
         {
             delay = Time (val);
         }
+    }
+}
+
+void DelayFilterOperation::setString (const std::string &property, const std::string &val)
+{
+    if (property == "delay")
+    {
+        try
+        {
+            delay = loadTimeFromString(val);
+        }
+        catch (const std::invalid_argument &ia)
+        {
+            throw (helics::InvalidParameter(val + " is not a valid time string"));
+        }
+       
     }
 }
 
@@ -279,14 +295,15 @@ void RerouteFilterOperation::set (const std::string & /*property*/, double /*val
 
 void RerouteFilterOperation::setString (const std::string &property, const std::string &val)
 {
-    if (property == "target")
+    if (property == "newdestination")
     {
-        newTarget = val;
+        newDest = val;
     }
-    else if (property == "filter")
+    else if (property == "condition")
     {
         try
         {
+            // this line is to verify that it is a valid regex
             auto test = std::regex (val);
             auto cond = conditions.lock ();
             cond->insert (val);
@@ -310,14 +327,14 @@ std::string RerouteFilterOperation::rerouteOperation (const std::string &dest) c
     auto cond = conditions.lock_shared ();
     if (cond->empty ())
     {
-        return newTarget.load ();
+        return newDest.load ();
     }
     for (auto &sr : *cond)
     {
         std::regex reg (sr);
         if (std::regex_match (dest, reg))
         {
-            return newTarget.load ();
+            return newDest.load ();
         }
     }
     return dest;
@@ -336,24 +353,25 @@ void CloneFilterOperation::setString (const std::string &property, const std::st
 {
     if (property == "delivery")
     {
-        deliveryAddresses = std::vector<std::string>{val};
+        auto handle = deliveryAddresses.lock ();
+        *handle = std::vector<std::string>{val};
     }
     else if (property == "add delivery")
     {
-        auto lock = deliveryAddresses.lock ();
-        auto fnd = std::find (lock->cbegin (), lock->cend (), val);
-        if (fnd == lock->cend ())
+        auto handle = deliveryAddresses.lock ();
+        auto fnd = std::find (handle->cbegin (), handle->cend (), val);
+        if (fnd == handle->cend ())
         {
-            lock->push_back (val);
+            handle->push_back (val);
         }
     }
     else if (property == "remove delivery")
     {
-        auto lock = deliveryAddresses.lock ();
-        auto fnd = std::find (lock->cbegin (), lock->cend (), val);
-        if (fnd != lock->cend ())
+        auto handle = deliveryAddresses.lock ();
+        auto fnd = std::find (handle->cbegin (), handle->cend (), val);
+        if (fnd != handle->cend ())
         {
-            lock->erase (fnd);
+            handle->erase (fnd);
         }
     }
 }

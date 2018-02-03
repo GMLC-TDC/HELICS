@@ -12,8 +12,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../core/Core.hpp"
 namespace helics
 {
-MessageFederateManager::MessageFederateManager (std::shared_ptr<Core> coreOb, Core::federate_id_t id)
-    : coreObject (std::move (coreOb)), fedID (id)
+MessageFederateManager::MessageFederateManager (Core *coreOb, Core::federate_id_t id)
+    : coreObject (coreOb), fedID (id)
 {
 }
 MessageFederateManager::~MessageFederateManager () = default;
@@ -25,13 +25,11 @@ void MessageFederateManager::disconnect ()
 }
 endpoint_id_t MessageFederateManager::registerEndpoint (const std::string &name, const std::string &type)
 {
+	auto handle=coreObject->registerEndpoint(fedID, name, type);
     std::lock_guard<std::mutex> eLock (endpointLock);
     endpoint_id_t id = static_cast<identifier_type> (local_endpoints.size ());
-    local_endpoints.emplace_back (name, type);
-    local_endpoints.back ().id = id;
-    local_endpoints.back ().handle = coreObject->registerEndpoint (fedID, name, type);
-    endpointNames.emplace (name, id);
-    handleLookup.emplace (local_endpoints.back ().handle, id);
+    local_endpoints.insert(name,handle,name, type,id,handle);
+
     return id;
 }
 
@@ -185,24 +183,24 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
         }
 
         /** find the id*/
-        auto fid = handleLookup.find (endpoint_id);
-        if (fid != handleLookup.end ())
+        auto fid = local_endpoints.find (endpoint_id);
+        if (fid != local_endpoints.end ())
         {  // assign the data
 
-            auto localEndpointIndex = fid->second.value ();
+            auto localEndpointIndex = fid->id.value ();
             messageQueues[localEndpointIndex].emplace (std::move (message));
             if (local_endpoints[localEndpointIndex].callbackIndex >= 0)
             {
                 auto cb = callbacks[local_endpoints[localEndpointIndex].callbackIndex];
                 eplock.unlock ();
-                cb (fid->second, CurrentTime);
+                cb (fid->id, CurrentTime);
                 eplock.lock ();
             }
             else if (allCallbackIndex >= 0)
             {
                 auto ac = callbacks[allCallbackIndex];
                 eplock.unlock ();
-                ac (fid->second, CurrentTime);
+                ac (fid->id, CurrentTime);
                 eplock.lock ();
             }
         }
@@ -265,8 +263,8 @@ std::string MessageFederateManager::getEndpointName (endpoint_id_t id) const
 endpoint_id_t MessageFederateManager::getEndpointId (const std::string &name) const
 {
     std::lock_guard<std::mutex> eLock (endpointLock);
-    auto sub = endpointNames.find (name);
-    return (sub != endpointNames.end ()) ? sub->second : 0;
+    auto sub = local_endpoints.find (name);
+    return (sub != local_endpoints.end ()) ? sub->id : 0;
 }
 
 std::string MessageFederateManager::getEndpointType (endpoint_id_t id) const

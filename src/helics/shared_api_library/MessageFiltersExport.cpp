@@ -10,9 +10,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "../core/core-exceptions.hpp"
 #include "../helics.hpp"
+#include "MessageFilters.h"
 #include "helics.h"
 #include "internal/api_objects.h"
-#include "MessageFilters.h"
 #include <memory>
 #include <mutex>
 #include <vector>

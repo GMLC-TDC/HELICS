@@ -18,7 +18,7 @@ To set up your environment:
 
     1. Install Microsoft Visual C++ 2015 or newer
 
-    2. Install `Boost <http://www.boost.org/doc/libs/1_64_0/more/getting_started/windows.html>`_ 1.58 or newer. For CMake to detect it automatically either extract Boost to the root of your drive, or set the BOOST_ROOT environment variable to the install location.
+    2. Install `Boost <http://www.boost.org/doc/libs/1_64_0/more/getting_started/windows.html>`_ 1.61 or later recommended (core library should build with 1.58, but tests will not). For CMake to detect it automatically either extract Boost to the root of your drive, or set the BOOST_ROOT environment variable to the install location.
 
     3. *Optional* Install `ZeroMQ <http://zeromq.org/build:_start>`_ if you need ZeroMQ support and need a copy in a global system location. We recommend skipping this step and running cmake with the ``AUTOBUILD_ZMQ=ON`` option to automatically set up a project-only copy of ZeroMQ later on. The ZeroMQ Windows installer is **very** outdated and will not work with new versions of Visual Studio.
 
@@ -74,3 +74,11 @@ A quick test is to double check the versions of the HELICS player and recorder (
 
     > helics_recorder.exe --version
     0.1
+
+Command line method
+-------------------
+
+.. code-block:: bash
+
+   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0" -DBOOST_ROOT="C:\local\boost_1_65_1" -DBUILD_PYTHON=ON -G "Visual Studio 14 2015 Win64" ..
+   cmake --build . --config Release --target install

@@ -6,7 +6,7 @@
 ##############################################################################
 
 #-----------------------------------------------------------------------------
-# Core tests using Boost
+# Common library tests using Boost
 #-----------------------------------------------------------------------------
 
 set(common_test_headers
@@ -15,9 +15,13 @@ set(common_test_headers
 
 set(common_test_sources
 common-tests.cpp
-testBlockingQueue.cpp
-testPriorityBlockingQueue.cpp
-test-simple-queue.cpp
+MappedVectorTests.cpp
+MappedPointerVectorTests.cpp
+DualMappedVectorTests.cpp
+DualMappedPointerVectorTests.cpp
+BlockingQueueTests.cpp
+PriorityBlockingQueueTests.cpp
+SimpleQueueTests.cpp
 )
 
 
@@ -30,6 +34,8 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 
 target_link_libraries(common-tests ${Boost_LIBRARIES_test})
+
+
 
 add_test(NAME common-tests COMMAND common-tests --log_level=warning --report_level=short)
 set_target_properties (common-tests PROPERTIES FOLDER tests)

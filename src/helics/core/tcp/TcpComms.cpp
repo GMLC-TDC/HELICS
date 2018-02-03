@@ -135,12 +135,12 @@ ActionMessage TcpComms::generateReplyToIncomingMessage (ActionMessage &M)
     return resp;
 }
 
-void TcpComms::txPriorityReceive (std::shared_ptr<tcp_connection> connection,
+void TcpComms::txPriorityReceive (std::shared_ptr<TcpConnection> connection,
                                   const char *data,
                                   size_t bytes_received,
                                   const boost::system::error_code &error)
 {
-    if (error)
+    if (error!=nullptr)
     {
         return;
     }
@@ -167,13 +167,13 @@ void TcpComms::txPriorityReceive (std::shared_ptr<tcp_connection> connection,
     }
 }
 
-size_t
-TcpComms::dataReceive (std::shared_ptr<tcp_rx_connection> connection, const char *data, size_t bytes_received)
+size_t TcpComms::dataReceive (std::shared_ptr<TcpRxConnection> connection, const char *data, size_t bytes_received)
 {
-    ActionMessage m;
+    
     size_t used_total = 0;
     while (used_total < bytes_received)
     {
+        ActionMessage m;
         auto used = m.depacketize (data + used_total, bytes_received - used_total);
         if (used == 0)
         {
@@ -207,7 +207,7 @@ TcpComms::dataReceive (std::shared_ptr<tcp_rx_connection> connection, const char
     return used_total;
 }
 
-bool TcpComms::commErrorHandler (std::shared_ptr<tcp_rx_connection> connection,
+bool TcpComms::commErrorHandler (std::shared_ptr<TcpRxConnection> connection,
                                  const boost::system::error_code &error)
 {
     if (rx_status == connection_status::connected)
@@ -250,13 +250,13 @@ void TcpComms::queue_rx_function ()
         return;
     }
     auto ioserv = AsioServiceManager::getServicePointer ();
-    tcp_server server (ioserv->getBaseService (), PortNumber, maxMessageSize_);
+    TcpServer server (ioserv->getBaseService (), PortNumber, maxMessageSize_);
 
-    ioserv->runServiceLoop ();
-    server.setDataCall ([this](tcp_rx_connection::pointer connection, const char *data, size_t datasize) {
+    auto serviceLoop = ioserv->runServiceLoop ();
+    server.setDataCall ([this](TcpRxConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     });
-    server.setErrorCall ([this](tcp_rx_connection::pointer connection, const boost::system::error_code &error) {
+    server.setErrorCall ([this](TcpRxConnection::pointer connection, const boost::system::error_code &error) {
         return commErrorHandler (connection, error);
     });
     server.start ();
@@ -279,7 +279,6 @@ void TcpComms::queue_rx_function ()
 
     disconnecting = true;
     server.close ();
-    ioserv->haltServiceLoop ();
     rx_status = connection_status::terminated;
 }
 
@@ -306,10 +305,10 @@ void TcpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
     auto ioserv = AsioServiceManager::getServicePointer ();
-    ioserv->runServiceLoop ();
-    tcp_connection::pointer brokerConnection;
+    auto serviceLoop = ioserv->runServiceLoop ();
+    TcpConnection::pointer brokerConnection;
 
-    std::map<int, tcp_connection::pointer> routes;  // for all the other possible routes
+    std::map<int, TcpConnection::pointer> routes;  // for all the other possible routes
     if (!brokerTarget_.empty ())
     {
         hasBroker = true;
@@ -322,8 +321,8 @@ void TcpComms::queue_tx_function ()
         }
         try
         {
-            brokerConnection = tcp_connection::create (ioserv->getBaseService (), brokerTarget_,
-                                                       std::to_string (brokerPort), maxMessageSize_);
+            brokerConnection = TcpConnection::create (ioserv->getBaseService (), brokerTarget_,
+                                                      std::to_string (brokerPort), maxMessageSize_);
             int cumsleep = 0;
             while (!brokerConnection->isConnected ())
             {
@@ -331,7 +330,6 @@ void TcpComms::queue_tx_function ()
                 cumsleep += 100;
                 if (cumsleep >= connectionTimeout)
                 {
-                    ioserv->haltServiceLoop ();
                     std::cerr << "initial connection to broker timed out\n" << std::endl;
                     tx_status = connection_status::terminated;
                     return;
@@ -349,7 +347,6 @@ void TcpComms::queue_tx_function ()
                 catch (const boost::system::system_error &error)
                 {
                     std::cerr << "error in initial send to broker " << error.what () << '\n';
-                    ioserv->haltServiceLoop ();
                     tx_status = connection_status::terminated;
                     return;
                 }
@@ -386,7 +383,6 @@ void TcpComms::queue_tx_function ()
                             else if (mess->second.index == DISCONNECT)
                             {
                                 brokerConnection->cancel ();
-                                ioserv->haltServiceLoop ();
                                 tx_status = connection_status::terminated;
                                 return;
                             }
@@ -395,7 +391,6 @@ void TcpComms::queue_tx_function ()
                     cumsleep += 100;
                     if (cumsleep >= connectionTimeout)
                     {
-                        ioserv->haltServiceLoop ();
                         brokerConnection->cancel ();
                         std::cerr << "port number query to broker timed out\n" << std::endl;
                         tx_status = connection_status::terminated;
@@ -445,7 +440,7 @@ void TcpComms::queue_tx_function ()
                         std::string interface;
                         std::string port;
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);
-                        auto new_connect = tcp_connection::create (ioserv->getBaseService (), interface, port);
+                        auto new_connect = TcpConnection::create (ioserv->getBaseService (), interface, port);
 
                         routes.emplace (cmd.dest_id, std::move (new_connect));
                     }
@@ -479,7 +474,7 @@ void TcpComms::queue_tx_function ()
                     brokerConnection->send (cmd.packetize ());
                     if (isPriorityCommand (cmd))
                     {
-                        brokerConnection->async_receive ([this](std::shared_ptr<tcp_connection> connection,
+                        brokerConnection->async_receive ([this](std::shared_ptr<TcpConnection> connection,
                                                                 const char *data, size_t bytes_received,
                                                                 const boost::system::error_code &error) {
                             txPriorityReceive (connection, data, bytes_received, error);
@@ -518,7 +513,7 @@ void TcpComms::queue_tx_function ()
                     rt_find->second->send (cmd.packetize ());
                     if (isPriorityCommand (cmd))
                     {
-                        rt_find->second->async_receive ([this](std::shared_ptr<tcp_connection> connection,
+                        rt_find->second->async_receive ([this](std::shared_ptr<TcpConnection> connection,
                                                                const char *data, size_t bytes_received,
                                                                const boost::system::error_code &error) {
                             txPriorityReceive (connection, data, bytes_received, error);
@@ -545,7 +540,7 @@ void TcpComms::queue_tx_function ()
                         brokerConnection->send (cmd.packetize ());
                         if (isPriorityCommand (cmd))
                         {
-                            brokerConnection->async_receive ([this](std::shared_ptr<tcp_connection> connection,
+                            brokerConnection->async_receive ([this](std::shared_ptr<TcpConnection> connection,
                                                                     const char *data, size_t bytes_received,
                                                                     const boost::system::error_code &error) {
                                 txPriorityReceive (connection, data, bytes_received, error);
@@ -580,7 +575,6 @@ CLOSE_TX_LOOP:
     {
         closeReceiver ();
     }
-    ioserv->haltServiceLoop ();
     tx_status = connection_status::terminated;
 }
 

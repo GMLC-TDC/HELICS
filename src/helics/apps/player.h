@@ -116,7 +116,7 @@ namespace helics
         @param type the type of the publication
         @param units the units associated with the publication
         */
-        void addPublication( const std::string &key, helics_type_t type, const std::string &units="");
+        void addPublication( const std::string &key, helics_type_t type, const std::string &pubUnits=std::string());
 
         /** add a publication to a Player
         @param key the key of the publication to add
@@ -125,15 +125,15 @@ namespace helics
         */
         template <class valType>
         typename std::enable_if_t<helicsType<valType>() != helics_type_t::helicsInvalid> 
-            addPublication(const std::string &key, const std::string &units = "")
+            addPublication(const std::string &key, const std::string &pubUnits = std::string())
         {
             if (!useLocal)
             {
-                publications.push_back(Publication(GLOBAL, fed.get(), key, helicsType<valType>(), units));
+                publications.push_back(Publication(GLOBAL, fed.get(), key, helicsType<valType>(), pubUnits));
             }
             else
             {
-                publications.push_back(Publication(fed.get(), key, helicsType<valType>(), units));
+                publications.push_back(Publication(fed.get(), key, helicsType<valType>(), pubUnits));
             }
             
             pubids[key] = static_cast<int> (publications.size()) - 1;
@@ -143,7 +143,7 @@ namespace helics
         @param endpointName the name of the endpoint
         @param endpointType the named type of the endpoint
         */
-        void addEndpoint(const std::string &endpointName, const std::string &endpointType = "");
+        void addEndpoint(const std::string &endpointName, const std::string &endpointType = std::string());
         /** add a data point to publish through a Player
         @param pubTime the time of the publication
         @param key the key for the publication
@@ -243,6 +243,7 @@ namespace helics
         std::string masterFileName; //!< the name of the master file used to do the construction
         size_t pointIndex = 0; //!< the current point index
         size_t messageIndex = 0; //!< the current message index
+        timeUnits units = timeUnits::sec;
         double timeMultiplier = 1.0; //!< specify the time multiplier for different time specifications
         bool useLocal = false;
         bool fileLoaded = false;

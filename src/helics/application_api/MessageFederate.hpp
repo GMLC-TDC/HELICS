@@ -29,11 +29,11 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param[in] fi  a federate information structure
     */
     MessageFederate (const FederateInfo &fi);
-	/**constructor taking a core and a federate information structure, sore information in fi is ignored
-	@param[in] core a shared ptr to a core to join
-	@param[in] fi  a federate information structure
-	*/
-	MessageFederate(std::shared_ptr<Core> core, const FederateInfo &fi);
+    /**constructor taking a core and a federate information structure, sore information in fi is ignored
+    @param[in] core a shared ptr to a core to join
+    @param[in] fi  a federate information structure
+    */
+    MessageFederate (std::shared_ptr<Core> core, const FederateInfo &fi);
     /**constructor taking a string with the required information
     @param[in] jsonString can be either a json file or a string containing json code
     */
@@ -71,6 +71,12 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     */
     endpoint_id_t registerGlobalEndpoint (const std::string &name, const std::string &type = "");
     virtual void registerInterfaces (const std::string &jsonString) override;
+
+    /** register a set Message interfaces
+    @details call is only valid in startup mode it is a protected call to add an
+    @param[in] jsonString  the location of the file or json String to load to generate the interfaces
+    */
+    void registerMessageInterfaces (const std::string &jsonString);
 
     /** give the core a hint for known communication paths
     @details the function will generate an error in the core if a communication path is not present once the
@@ -192,13 +198,14 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     void registerEndpointCallback (const std::vector<endpoint_id_t> &ep,
                                    std::function<void(endpoint_id_t, Time)> callback);
 
-    virtual void disconnect() override;
+    virtual void disconnect () override;
 
     /**get the number of registered endpoints*/
-    int getEndpointCount() const;
+    int getEndpointCount () const;
+
   private:
     /** @brief PIMPL design pattern with the implementation details for the MessageFederate*/
     std::unique_ptr<MessageFederateManager> mfManager;
 };
-} //namespace helics
+}  // namespace helics
 #endif

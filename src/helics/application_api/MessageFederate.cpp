@@ -9,34 +9,25 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "MessageFederate.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "MessageFederateManager.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4702)
-#include "json/json.h"
-#pragma warning(pop)
-#else
-#include "json/json.h"
-#endif
-
-#include <fstream>
 
 namespace helics
 {
 MessageFederate::MessageFederate (const FederateInfo &fi) : Federate (fi)
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
 }
 MessageFederate::MessageFederate (std::shared_ptr<Core> core, const FederateInfo &fi)
     : Federate (std::move (core), fi)
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
 }
-MessageFederate::MessageFederate (const std::string &jsonString) : Federate (jsonString)
+MessageFederate::MessageFederate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
     registerInterfaces (jsonString);
 }
 
@@ -48,7 +39,7 @@ MessageFederate::MessageFederate ()
 MessageFederate::MessageFederate (bool)
 {  // this constructor should only be called by child class that has already constructed the underlying federate in
    // a virtual inheritance
-    mfManager = std::make_unique<MessageFederateManager> (coreObject, getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
 }
 MessageFederate::MessageFederate (MessageFederate &&mFed) noexcept = default;
 
@@ -96,42 +87,22 @@ endpoint_id_t MessageFederate::registerGlobalEndpoint (const std::string &name, 
 
 void MessageFederate::registerInterfaces (const std::string &jsonString)
 {
+    registerMessageInterfaces (jsonString);
+    Federate::registerFilterInterfaces (jsonString);
+}
+
+void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
+{
     if (state != op_states::startup)
     {
         throw (InvalidFunctionCall ("cannot call register Interfaces after entering initialization mode"));
     }
-    std::ifstream file (jsonString);
-    Json_helics::Value doc;
+    auto doc = loadJsonString (jsonString);
 
-    if (file.is_open ())
-    {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        bool ok = Json_helics::parseFromStream (rbuilder, file, &doc, &errs);
-        if (!ok)
-        {
-            // should I throw an error here?
-            return;
-        }
-    }
-    else
-    {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        std::istringstream jstring (jsonString);
-        bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
-        if (!ok)
-        {
-            // should I throw an error here?
-            return;
-        }
-    }
     if (doc.isMember ("endpoints"))
     {
-        auto epts = doc["endpoints"];
-        for (auto eptIt = epts.begin (); eptIt != epts.end (); ++eptIt)
+        for (const auto &ept : doc["endpoints"])
         {
-            auto ept = (*eptIt);
             auto name = ept["name"].asString ();
             auto type = (ept.isMember ("type")) ? ept["type"].asString () : "";
             bool global = (ept.isMember ("global")) ? (ept["global"].asBool ()) : false;
@@ -146,39 +117,57 @@ void MessageFederate::registerInterfaces (const std::string &jsonString)
             }
 
             // retrieve the known paths
-            if (ept.isMember ("knownPaths"))
+            if (ept.isMember ("knownDestinations"))
             {
-                auto kp = ept["knownPaths"];
+                auto kp = ept["knownDestinations"];
                 if (kp.isString ())
                 {
                     registerKnownCommunicationPath (epid, kp.asString ());
                 }
                 else if (kp.isArray ())
                 {
-                    for (auto kpIt = kp.begin (); kpIt != kp.end (); ++kpIt)
+                    for (const auto &path : kp)
                     {
-                        registerKnownCommunicationPath (epid, (*kpIt).asString ());
+                        registerKnownCommunicationPath (epid, path.asString ());
                     }
                 }
             }
             // endpoints can subscribe to publications
             if (ept.isMember ("subscriptions"))
             {
-                auto sub = ept["subscriptions"];
-                if (sub.isString ())
+                auto subs = ept["subscriptions"];
+                if (subs.isString ())
                 {
-                    subscribe (epid, sub.asString (), "");
+                    subscribe (epid, subs.asString (), std::string ());
                 }
-                else if (sub.isArray ())
+                else if (subs.isArray ())
                 {
-                    for (auto subIt = sub.begin (); subIt != sub.end (); ++subIt)
+                    for (const auto &sub : subs)
                     {
-                        subscribe (epid, (*subIt).asString (), "");
+                        subscribe (epid, sub.asString (), std::string ());
                     }
                 }
             }
         }
     }
+    /*
+    // retrieve the known paths
+    if (doc.isMember("knownDestinations"))
+    {
+        auto kp = doc["knownDestinations"];
+        if (kp.isString())
+        {
+           // registerKnownCommunicationPath(epid, kp.asString());
+        }
+        else if (kp.isArray())
+        {
+           for (const auto &path : kp)
+            {
+           //     registerKnownCommunicationPath(epid, (*kpIt).asString());
+            }
+        }
+    }
+    */
 }
 
 void MessageFederate::subscribe (endpoint_id_t endpoint, const std::string &name, const std::string &type)

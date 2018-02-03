@@ -24,6 +24,7 @@ set(SRC_FILES
 	CommsBroker.cpp
 	NetworkBrokerData.cpp
 	helicsVersion.cpp
+	helics-time.cpp
 )
 
 set(TESTCORE_SOURCE_FILES
@@ -83,7 +84,6 @@ set(INCLUDE_FILES
 	TimeDependencies.hpp
 	TimeCoordinator.hpp
 	loggingHelper.hpp
-	DelayedObjects.hpp
 	CommsBroker.hpp
 	CommsBroker_impl.hpp
 	CoreBroker.hpp
@@ -99,7 +99,6 @@ set(INCLUDE_FILES
 	BasicHandleInfo.hpp
 	FilterFunctions.hpp
 	NetworkBrokerData.hpp
-	helicsVersion.hpp
 )
 
 set(TESTCORE_HEADER_FILES

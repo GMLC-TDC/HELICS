@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../common/logger.h"
 #include "TimeCoordinator.hpp"
 #include "helics/helics-config.h"
+#include "helicsVersion.hpp"
 #include <iostream>
 #include <libguarded/guarded.hpp>
 #include <boost/asio/steady_timer.hpp>
@@ -25,7 +26,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/uuid/uuid.hpp>  // uuid class
 #include <boost/uuid/uuid_generators.hpp>  // generators
 #include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
-#include "helicsVersion.hpp"
 
 static inline std::string gen_id ()
 {
@@ -111,7 +111,7 @@ static void argumentParser (int argc, const char *const *argv, boost::program_op
 
     if (cmd_vm.count ("version") > 0)
     {
-        std::cout << helics::helicsVersionString() << '\n';
+        std::cout << helics::helicsVersionString () << '\n';
         return;
     }
 
@@ -158,7 +158,7 @@ void BrokerBase::joinAllThreads ()
 {
     if (_queue_processing_thread.joinable ())
     {
-        _queue.push (CMD_TERMINATE_IMMEDIATELY);
+        actionQueue.push (CMD_TERMINATE_IMMEDIATELY);
         _queue_processing_thread.join ();
     }
 }
@@ -171,23 +171,23 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     argumentParser (argc, argv, vm);
     if (vm.count ("min") > 0)
     {
-        _min_federates = vm["min"].as<int> ();
+        minFederateCount = vm["min"].as<int> ();
     }
     if (vm.count ("minfed") > 0)
     {
-        _min_federates = vm["minfed"].as<int> ();
+        minFederateCount = vm["minfed"].as<int> ();
     }
     if (vm.count ("federates") > 0)
     {
-        _min_federates = vm["federates"].as<int> ();
+        minFederateCount = vm["federates"].as<int> ();
     }
     if (vm.count ("minbroker") > 0)
     {
-        _min_brokers = vm["minbroker"].as<int> ();
+        minBrokerCount = vm["minbroker"].as<int> ();
     }
     if (vm.count ("maxiter") > 0)
     {
-        _maxIterations = vm["maxiter"].as<int> ();
+        maxIterationCount = vm["maxiter"].as<int> ();
     }
 
     if (vm.count ("name") > 0)
@@ -306,12 +306,12 @@ void BrokerBase::addActionMessage (const ActionMessage &m)
 {
     if (isPriorityCommand (m))
     {
-        _queue.pushPriority (m);
+        actionQueue.pushPriority (m);
     }
     else
     {
         // just route to the general queue;
-        _queue.push (m);
+        actionQueue.push (m);
     }
 }
 
@@ -319,12 +319,12 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
 {
     if (isPriorityCommand (m))
     {
-        _queue.emplacePriority (std::move (m));
+        actionQueue.emplacePriority (std::move (m));
     }
     else
     {
         // just route to the general queue;
-        _queue.emplace (std::move (m));
+        actionQueue.emplace (std::move (m));
     }
 }
 
@@ -348,7 +348,7 @@ void timerTickHandler (BrokerBase *bbase, activeProtector active, const boost::s
         else
         {
             ActionMessage M (CMD_TICK);
-            SET_ACTION_FLAG (M, error_flag);
+            setActionFlag (M, error_flag);
             bbase->addActionMessage (M);
         }
     }
@@ -361,7 +361,7 @@ void BrokerBase::queueProcessingLoop ()
     std::vector<ActionMessage> dumpMessages;
     mainLoopIsRunning.store (true);
     auto serv = AsioServiceManager::getServicePointer ();
-    AsioServiceManager::runServiceLoop ();
+    auto serviceLoop = AsioServiceManager::runServiceLoop ();
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
     auto active = std::make_shared<libguarded::guarded<bool>> (true);
 
@@ -385,7 +385,7 @@ void BrokerBase::queueProcessingLoop ()
     };
     while (true)
     {
-        auto command = _queue.pop ();
+        auto command = actionQueue.pop ();
         if (dumplog)
         {
             dumpMessages.push_back (command);
@@ -399,10 +399,10 @@ void BrokerBase::queueProcessingLoop ()
                 //   std::cout << "sending tick " << std::endl;
                 processCommand (std::move (command));
             }
-            if (CHECK_ACTION_FLAG (command, error_flag))
+            if (checkActionFlag (command, error_flag))
             {
-                AsioServiceManager::haltServiceLoop ();
-                AsioServiceManager::runServiceLoop ();
+                serviceLoop = nullptr;
+                serviceLoop = AsioServiceManager::runServiceLoop ();
             }
             messagesSinceLastTick = 0;
             // reschedule the timer
@@ -413,14 +413,14 @@ void BrokerBase::queueProcessingLoop ()
             break;
         case CMD_TERMINATE_IMMEDIATELY:
             ticktimer.cancel ();
-            AsioServiceManager::haltServiceLoop ();
+            serviceLoop = nullptr;
             mainLoopIsRunning.store (false);
             active->store (false);
             logDump ();
             return;  // immediate return
         case CMD_STOP:
             ticktimer.cancel ();
-            AsioServiceManager::haltServiceLoop ();
+            serviceLoop = nullptr;
             if (!haltOperations)
             {
                 processCommand (std::move (command));

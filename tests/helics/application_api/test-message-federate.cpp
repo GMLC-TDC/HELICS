@@ -586,4 +586,17 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_ty
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
     BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::finalize);
 }
+
+BOOST_AUTO_TEST_CASE (test_file_load)
+{
+    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_message_fed.json");
+
+    BOOST_CHECK_EQUAL (mFed.getName (), "messageFed");
+
+    BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 2);
+    auto id = mFed.getEndpointId ("ept1");
+    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
+
+    mFed.disconnect ();
+}
 BOOST_AUTO_TEST_SUITE_END ()

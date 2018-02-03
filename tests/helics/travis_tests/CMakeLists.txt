@@ -28,7 +28,7 @@ target_link_libraries(travis-tests helics-static)
 
 target_link_libraries(travis-tests ${Boost_LIBRARIES_test})
 
-add_test(NAME travis-tests COMMAND travis-tests --log_level=warning --report_level=short)
+add_test(NAME travis-tests COMMAND travis-tests --log_level=test_suite --report_level=short)
 
 set_target_properties (travis-tests PROPERTIES FOLDER tests)
 

@@ -8,15 +8,14 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "../helics.hpp"
 #include "../core/core-exceptions.hpp"
+#include "../helics.hpp"
 #include "ValueFederate.h"
 #include "internal/api_objects.h"
 #include <map>
 #include <memory>
 #include <mutex>
 #include <vector>
-
 
 static inline void addSubscription (helics_federate fed, helics::SubscriptionObject *sub)
 {
@@ -486,8 +485,8 @@ helics_status helicsSubscriptionGetString (helics_subscription sub, char *str, i
     {
         return helics_invalid_object;
     }
-   
-    if ((str == nullptr)||(maxlen<=0))
+
+    if ((str == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
     }
@@ -627,8 +626,8 @@ helics_status helicsSubscriptionSetDefault (helics_subscription sub, const char 
     {
         return helics_invalid_object;
     }
-    //TODO an empty Vector is valid
-    if ((data == nullptr)||(len<=0))
+    // TODO an empty Vector is valid
+    if ((data == nullptr) || (len <= 0))
     {
         return helics_error;
     }
@@ -715,7 +714,7 @@ helics_status helicsSubscriptionSetDefaultVector (helics_subscription sub, const
         return helics_invalid_object;
     }
     auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
-    if ((data == nullptr)||(len<=0))
+    if ((data == nullptr) || (len <= 0))
     {
         if (subObj->rawOnly)
         {
@@ -750,7 +749,6 @@ helics_status helicsSubscriptionGetType (helics_subscription sub, char *str, int
     if ((str == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
-       
     }
     auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
     std::string type;
@@ -783,7 +781,6 @@ helics_status helicsPublicationGetType (helics_publication pub, char *str, int m
     if ((str == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
-
     }
     auto pubObj = reinterpret_cast<helics::PublicationObject *> (pub);
     std::string type;
@@ -816,7 +813,6 @@ helics_status helicsSubscriptionGetKey (helics_subscription sub, char *str, int 
     if ((str == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
-
     }
     auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
     std::string type;
@@ -849,7 +845,6 @@ helics_status helicsPublicationGetKey (helics_publication pub, char *str, int ma
     if ((str == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
-
     }
     auto pubObj = reinterpret_cast<helics::PublicationObject *> (pub);
     std::string type;
@@ -914,7 +909,6 @@ helics_status helicsPublicationGetUnits (helics_publication pub, char *str, int 
     if ((str == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
-
     }
     auto pubObj = reinterpret_cast<helics::PublicationObject *> (pub);
     std::string type;

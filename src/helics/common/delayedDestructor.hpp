@@ -64,6 +64,7 @@ class DelayedDestructor
     DelayedDestructor (DelayedDestructor &&) noexcept = delete;
     DelayedDestructor &operator= (DelayedDestructor &&) noexcept = delete;
 
+	/** destroy objects that are now longer used*/
     size_t destroyObjects ()
     {
         std::lock_guard<std::mutex> lock (destructionLock);
