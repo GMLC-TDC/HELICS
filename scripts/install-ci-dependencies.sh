@@ -29,7 +29,7 @@ if [[ $commit_msg == *'[update_cache]'* ]]; then
         rm -rf dependencies/zmq;
         individual="true"
     fi
-    
+
     # If no dependency named in commit message, update entire cache
     if [[ "$individual" != 'true' ]]; then
         rm -rf dependencies;
@@ -104,3 +104,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
 elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH=${PWD}/dependencies/zmq/lib:${PWD}/dependencies/boost/lib:$LD_LIBRARY_PATH
 fi
+
+pyenv global 3.6.3
+python3 -m pip install --user --upgrade pip wheel
+python3 -m pip install --user --upgrade pytest

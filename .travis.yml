@@ -39,7 +39,7 @@ _basic_env:
   if: branch IN (master, develop)
   os: osx
   compiler: clang
-        
+
 jobs:
   # On weekdays, the backlog for waiting OS X builds is huge
   fast_finish: true
@@ -119,7 +119,7 @@ install:
 script:
   - mkdir build && cd build
   - export HELICS_DEPENDENCY_FLAGS="-DZeroMQ_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/zmq -DBOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost"
-  - export HELICS_OPTION_FLAGS="-DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON -DTRAVIS_TESTS_ENABLE=ON"
+  - export HELICS_OPTION_FLAGS="-DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON -DTRAVIS_TESTS_ENABLE=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.so -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/"
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
   - make -j2
   # For controlling which tests get run:
@@ -132,6 +132,9 @@ script:
   # 6 = travis-tests
   # - ctest --verbose --timeout 120 -I 0,0,0,1
   - ctest --verbose --timeout 120 -I 0,0,0,6
+  - export PYTHONPATH="$(pwd)/swig/python"
+  - python3 -m helics
+  - pytest -v ../tests/python_helics
 
 notifications:
     email: false
