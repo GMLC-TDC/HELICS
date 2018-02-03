@@ -13,7 +13,7 @@ std::string helicsVersionString ()
     std::string buildStr (HELICS_VERSION_BUILD);
     if (!buildStr.empty ())
     {
-        vstr.push_back ('.');
+        vstr.push_back ('-');
         vstr.append (buildStr);
     }
     vstr.push_back (' ');

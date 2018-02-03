@@ -156,41 +156,33 @@ AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::st
                 ptr->loopRet = std::async (std::launch::async, [ptr]() { serviceRunLoop (ptr); });
             }
         }
-        return std::make_unique<servicer> (serviceName, ptr);
+        return std::make_unique<servicer> (ptr);
     }
     throw (std::invalid_argument ("the service name specified was not available"));
 }
 
-void AsioServiceManager::haltServiceLoop (const std::string &serviceName)
+void AsioServiceManager::haltServiceLoop ()
 {
-    std::lock_guard<std::mutex> servelock (serviceLock);
-    auto fnd = services.find (serviceName);
-    if (fnd != services.end ())
+    if (running)
     {
-        auto ptr = fnd->second;
-        if (ptr->running)
+        // std::cout << "service loop halted "<<ptr->runCounter<<"\n";
+        if (runCounter > 0)
         {
-            // std::cout << "service loop halted "<<ptr->runCounter<<"\n";
-            if (ptr->runCounter > 0)
-            {
-                --ptr->runCounter;
-            }
-            if (ptr->runCounter <= 0)
-            {
-                //    std::cout << "calling halt on service loop \n";
-                ptr->nullwork.reset ();
-                ptr->iserv->stop ();
-                ptr->loopRet.get ();
-                ptr->iserv->reset ();  // prepare for future runs
-            }
+            --runCounter;
         }
-        else
+        if (runCounter <= 0)
         {
-            ptr->runCounter = 0;
+            //    std::cout << "calling halt on service loop \n";
+            nullwork.reset ();
+            iserv->stop ();
+            loopRet.get ();
+            iserv->reset ();  // prepare for future runs
         }
-        return;
     }
-    throw (std::invalid_argument ("the service name specified was not available"));
+    else
+    {
+        runCounter = 0;
+    }
 }
 
 void serviceRunLoop (std::shared_ptr<AsioServiceManager> ptr)
@@ -208,5 +200,5 @@ void serviceRunLoop (std::shared_ptr<AsioServiceManager> ptr)
         std::cout << "caught other error in service loop" << std::endl;
     }
     // std::cout << "service loop stopped\n";
-    ptr->running = false;
+    ptr->running.store( false );
 }
