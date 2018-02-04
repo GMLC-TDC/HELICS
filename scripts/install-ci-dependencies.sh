@@ -46,7 +46,7 @@ install_boost () {
     IFS='.' read -r -a ver <<< $1
     local boost_version=$1
     local boost_version_str=boost_${ver[0]}_${ver[1]}_${ver[2]}
-    wget -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
+    wget --no-check-certificate -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
     (
         cd ${boost_version_str}/;
         ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test;
@@ -96,6 +96,7 @@ if [[ ! -d "dependencies/boost" ]]; then
     fi
     echo "*** built boost successfully"
 fi
+
 export BOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost}
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
