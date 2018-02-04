@@ -4,5 +4,5 @@ def test_import():
 
 def test_version():
     import helics as h
-    h.helicsGetVersion()
+    print(h.helicsGetVersion())
 
