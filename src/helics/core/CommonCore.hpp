@@ -25,6 +25,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <map>
 #include <thread>
 #include <unordered_map>
+#include "../common/GuardedTypes.hpp"
 #include <utility>
 
 namespace helics
@@ -290,8 +291,8 @@ class CommonCore : public Core, public BrokerBase
     /** a logging function for logging or printing messages*/
 
   protected:
-    /** add a message to the queue*/
-    void queueMessage (ActionMessage &message);
+    /** deliver a message to the appropriate location*/
+    void deliverMessage (ActionMessage &message);
     /** function to deal with a source filters*/
     ActionMessage &processMessage (BasicHandleInfo *hndl, ActionMessage &m);
     /** add a new handle to the generic structure

@@ -51,7 +51,7 @@ class FederateState
     ~FederateState ();
 
   private:
-	  std::string name;  //!< the name of the federate
+	  const std::string name;  //!< the name of the federate
 	  std::unique_ptr<TimeCoordinator> timeCoord;  //!< object that manages the time to determine granting
   public:
     Core::federate_id_t local_id = invalid_fed_id;  //!< id code, default to something invalid
