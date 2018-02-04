@@ -22,9 +22,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../common/DualMappedPointerVector.hpp"
 #include <atomic>
 #include <cstdint>
-#include <map>
 #include <thread>
-#include <unordered_map>
 #include "../common/GuardedTypes.hpp"
 #include <utility>
 
