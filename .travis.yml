@@ -135,7 +135,7 @@ script:
   - ctest --verbose --timeout 120 -I 0,0,0,6
   - export PYTHONPATH="$(pwd)/swig/python"
   - python3 -m helics
-  - pytest -v ../tests/python_helics
+  - python3 -m pytest -v ../tests/python_helics
 
 notifications:
     email: false
