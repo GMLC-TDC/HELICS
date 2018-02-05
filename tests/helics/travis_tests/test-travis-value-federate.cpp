@@ -84,7 +84,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
 {
     SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
-
+    BOOST_REQUIRE(vFed1);
     // register the publications
     helics::Publication pubid (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsString);
 
@@ -114,6 +114,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     subid.getValue (s);
 
     BOOST_CHECK_EQUAL (s, "string2");
+    vFed1->finalize();
 }
 
 BOOST_TEST_DECORATOR (*utf::timeout (5))
@@ -162,6 +163,8 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer, bdata::make (core_types), co
     vFed2->getValue (subid, s);
 
     BOOST_CHECK_EQUAL (s, "string2");
+    vFed1->finalize();
+    vFed2->finalize();
 }
 
 BOOST_TEST_DECORATOR (*utf::timeout (10))
@@ -206,5 +209,6 @@ BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_type
     vFed1->getValue (subid, val);
 
     BOOST_CHECK_EQUAL (val, 3.0);
+    vFed1->finalize();
 }
 BOOST_AUTO_TEST_SUITE_END ()

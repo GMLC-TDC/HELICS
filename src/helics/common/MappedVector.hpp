@@ -1,19 +1,20 @@
-
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #pragma once
 #include <string>
 #include <unordered_map>
+#include <map>
 #include <vector>
 #include <algorithm>
+#include "MapTraits.hpp"
+
 /** class combining a vector of objects with a map to search them by a separate index term
 the main use case is a bunch of inserts then searching with limited to no removal since removal is a rather
 expensive operation
@@ -162,5 +163,5 @@ class MappedVector
 
   private:
     std::vector<VType> dataStorage;
-    std::unordered_map<searchType, size_t> lookup;
+    std::conditional_t<is_easily_hashable<searchType>::value, std::unordered_map<searchType, size_t>, std::map<searchType, size_t>> lookup;	//!< map to lookup the index
 };

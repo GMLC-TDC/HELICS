@@ -28,6 +28,7 @@ MappedPointerVector.hpp
 DualMappedPointerVector.hpp
 GuardedTypes.hpp
 TripWire.hpp
+MapTraits.hpp
 )
 
 set(common_sources

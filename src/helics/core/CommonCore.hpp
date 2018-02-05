@@ -278,9 +278,7 @@ class CommonCore : public Core, public BrokerBase
     using fed_handle_pair = std::pair<federate_id_t, handle_id_t>;
     DualMappedPointerVector<FilterInfo,
                             std::string,
-                            fed_handle_pair,
-                            std::unordered_map<std::string, size_t>,
-                            std::map<fed_handle_pair, size_t>>
+                            fed_handle_pair>
       filters;  //!< storage for all the filters
   private:
     mutable std::mutex _mutex;  //!< mutex protecting the federate creation and modification

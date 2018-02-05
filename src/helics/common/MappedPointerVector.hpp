@@ -1,19 +1,20 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #pragma once
 #include <unordered_map>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 #include <algorithm>
+#include "MapTraits.hpp"
 
 /** class merging a vector of pointer with a map that can be used to lookup specific values
 */
@@ -169,5 +170,5 @@ public:
 
 private:
 	std::vector<std::unique_ptr<VType>> dataStorage; //!< storage for the pointers
-	std::unordered_map<searchType, size_t> lookup;	//!< map to lookup the index
+    std::conditional_t<is_easily_hashable<searchType>::value, std::unordered_map<searchType, size_t>, std::map<searchType, size_t>> lookup;	//!< map to lookup the index lookup;
 };
