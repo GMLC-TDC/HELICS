@@ -13,7 +13,7 @@ Let's create a simple ``Hello, World`` example with 2 federates.
    The HELICS co-simulation framework itself makes no specific demands about your editing,
    tooling, or where your code lives. Feel free to use whatever editor or IDE you are comfortable with.
 
-** Create a federations directory **
+**Create a federations directory**
 
 Linux and Mac:
 
@@ -31,7 +31,7 @@ Windows CMD:
     > mkdir hello_world
     > cd hello_world
 
-** Writing your first federation **
+**Writing your first federation**
 
 Next, make a new source file and call it ``hello_world_sender.c``. Copy the contents from hello_world_sender.c_ and paste it into the file.
 
@@ -43,7 +43,7 @@ Next, create a new source file and call it ``hello_world_receiver.c``. Copy the 
 
 We will go through in more detail the contents of these files. For now, save the files and open two terminals.
 
-** Compiling the federates **
+**Compiling the federates**
 
 To compile the federates, you can use the following commands.
 
@@ -57,7 +57,7 @@ Linux and Mac:
 Be sure to use the same compiler you used to build the HELICS library.
 You may need to include additional include paths and library paths in the above command.
 
-** Running a federation **
+**Running a federation**
 
 Linux and Mac:
 
@@ -74,7 +74,7 @@ In the second terminal, run the following command.
     $ ./hello_world_receiver
 
 
-** Anatomy of a HELICS federation **
+**Anatomy of a HELICS federation**
 
 Now, let’s go over what just happened in the ``hello_world_sender.c`` part of the “Hello, world!” program in detail.
 
