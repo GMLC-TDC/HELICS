@@ -14,15 +14,20 @@ HELICS documentation
 
 .. image:: https://img.shields.io/badge/docs-ready-blue.svg
 
-This is the documentation for Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS) framework. 
+This is the documentation for Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS) framework.
+HELICS is a new open-source cyber-physical-energy co-simulation framework for electric power systems.
+HELICS is designed to support very-large-scale (100,000+ federates) co-simulations with off-the-shelf power-system, communication, market, and end-use tools.
+HELICS is intended to be a cross platform tool with the integration of both event driven and time series simulation.
+
+.. toctree::
+ :maxdepth: 1
+
+ installation/index
+ introduction/index
+ tutorial/index
+ api/index
+ developer-guide/index
+
 There is also doxygen_ generated documentation available for developers.
 
 .. _doxygen: /HELICS-src/doxygen/
-
-.. toctree::
-   :maxdepth: 1
-
-   installation/index
-   introduction/index
-   api/index
-   developer-guide/index
