@@ -51,8 +51,8 @@ Linux and Mac:
 
 .. code-block:: bash
 
-    $ $(CC) hello_world_sender.c -o ./hello_world_sender -lhelicsSharedLib
-    $ $(CC) hello_world_receiver.c -o ./hello_world_receiver -lhelicsSharedLib
+    $ cc hello_world_sender.c -o ./hello_world_sender -lhelicsSharedLib
+    $ cc hello_world_receiver.c -o ./hello_world_receiver -lhelicsSharedLib
 
 Be sure to use the same compiler you used to build the HELICS library.
 You may need to include additional include paths and library paths in the above command.
@@ -61,62 +61,90 @@ You may need to include additional include paths and library paths in the above 
 
 Linux and Mac:
 
-Next, open two terminals. In the first terminal, run the following command.
+Next, open three terminals. In the first terminal, run the following command.
 
 .. code-block:: bash
 
-    $ ./hello_world_sender
+    $ ./helics_broker 2
 
 In the second terminal, run the following command.
 
 .. code-block:: bash
 
+    $ ./hello_world_sender
+
+In a third terminal, run the following command.
+
+.. code-block:: bash
+
     $ ./hello_world_receiver
 
+You should see ``Hello, World`` printed out in the terminal where you ran the ``hello_world_receiver``.
 
 **Anatomy of a HELICS federation**
 
-Now, let’s go over what just happened in the ``hello_world_sender.c`` part of the “Hello, world!” program in detail.
+Now, let’s go over what just happened in the ``hello_world_sender.c`` part of the “Hello, World” program in detail.
 
-The following code creates a Broker with the ZeroMQ type core.
-
-.. code-block:: c
-
-    /* Create broker */
-    broker = helicsCreateBroker("zmq","",initstring);
-
-The following block creates a ValueFederate. We will discuss these in more detail in a later chapter.
+The following block creates a ValueFederate. We will discuss what ``FederateInfo`` is and what a ``ValueFederate`` is, along with other types of Federates in more detail in a later chapter.
 
 .. code-block:: c
 
     fedinfo = helicsFederateInfoCreate();
     helicsFederateInfoSetFederateName(fedinfo, "Test sender Federate");
     helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq");
-    helicsFederateInfoSetCoreInitString(fedinfo, "--broker=mainbroker --federates=1");
+    helicsFederateInfoSetCoreInitString(fedinfo, "--federates=1");
     vfed = helicsCreateValueFederate(fedinfo);
 
 The following registers a global publication.
 
 .. code-block:: c
 
-    pub = helicsFederateRegisterGlobalPublication(vfed,"testA","double","");
+    pub = helicsFederateRegisterGlobalPublication(vfed,"testA","string","");
 
-The following ensures that the federation has entered execution mode
+The following ensures that the federation has entered execution mode.
 
 .. code-block:: c
 
     helicsFederateEnterInitializationMode(vfed);
     helicsFederateEnterExecutionMode(vfed);
 
+These functions publish a String and make a RequestTime function call.
+
 .. code-block:: c
 
-    helicsPublicationPublishDouble(pub,val);
+    helicsPublicationPublishString(pub, "Hello, World");
     helicsFederateRequestTime(vfed,currenttime, &currenttime);
 
-This frees the Federate and kills the broker.
+And these functions finally frees the Federate.
 
 .. code-block:: c
 
     helicsFederateFinalize(vfed);
     helicsFederateFree(vfed);
-    helicsBrokerFree(broker);
+    helicsCloseLibrary();
+
+You can see that the ``hello_world_receiver.c`` is also very similar, but uses a Subscription instead.
+A snippet of the code is shown below.
+
+.. code-block:: c
+
+    fedinfo = helicsFederateInfoCreate ();
+    helicsFederateInfoSetFederateName (fedinfo, "TestB Federate");
+    helicsFederateInfoSetCoreTypeFromString (fedinfo, "zmq");
+    helicsFederateInfoSetCoreInitString (fedinfo, fedinitstring);
+
+    vfed = helicsCreateValueFederate (fedinfo);
+    sub = helicsFederateRegisterSubscription (vfed, "testA", "string", "");
+
+    helicsFederateEnterInitializationMode (vfed);
+    helicsFederateEnterExecutionMode (vfed);
+
+    helicsFederateRequestTime (vfed, currenttime, &currenttime);
+
+    isupdated = helicsSubscriptionIsUpdated (sub);
+    helicsSubscriptionGetString (sub, value, 128);
+    printf("%s\n", value);
+
+    helicsFederateFinalize (vfed);
+    helicsFederateFree (vfed);
+    helicsCloseLibrary ();
