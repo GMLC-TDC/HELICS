@@ -1,8 +1,4 @@
-Tutorial
-========
-
-Hello World
------------
+# Hello World
 
 Now that you have HELICS installed, you are ready to create your first
 HELICS federation. Let's create a simple `Hello, World` example with 2
