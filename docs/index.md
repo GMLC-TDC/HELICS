@@ -2,11 +2,8 @@ HELICS documentation
 ====================
 
 ![image](https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=master)
-
 ![image](https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/develop?svg=true)
-
 ![image](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)
-
 ![image](https://img.shields.io/badge/docs-ready-blue.svg)
 
 This is the documentation for Hierarchical Engine for Large-scale
@@ -24,9 +21,7 @@ series simulation.
 
  installation/index
  introduction/index
- api/index
+ API <https://gmlc-tdc.github.io/HELICS-src/doxygen/>
  developer-guide/index
 ```
 
-There is also [doxygen](/HELICS-src/doxygen/) generated documentation
-available for developers.
