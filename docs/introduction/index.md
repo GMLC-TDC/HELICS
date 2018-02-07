@@ -1,6 +1,7 @@
 Introduction
 ============
 
+```eval_rst
 .. toctree::
     :maxdepth: 1
 
@@ -10,6 +11,4 @@ Introduction
     filters
     interfaces
     basic-usage
-
-
-
+```

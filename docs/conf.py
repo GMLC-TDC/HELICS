@@ -30,6 +30,9 @@
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
+import sphinx_rtd_theme
+from sphinxcontrib.pandoc_markdown import MarkdownParser
+
 extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.githubpages',
@@ -53,9 +56,7 @@ templates_path = ['_templates']
 source_suffix = ['.rst', '.md']
 # source_suffix = '.rst'
 
-source_parsers = {
-    '.md': 'recommonmark.parser.CommonMarkParser',
-}
+source_parsers = {'.md': MarkdownParser}
 
 # The master toctree document.
 master_doc = 'index'
@@ -98,7 +99,6 @@ todo_include_todos = False
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
-import sphinx_rtd_theme
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -159,11 +159,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (
-        master_doc, 'HELICS-src.tex', 'HELICS-src Documentation',
-        'Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller',
-        'manual'
-    ),
+    (master_doc, 'HELICS-src.tex', 'HELICS-src Documentation',
+     'Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller', 'manual'),
 ]
 
 # -- Options for manual page output ---------------------------------------
@@ -178,8 +175,5 @@ man_pages = [(master_doc, 'helics-src', 'HELICS-src Documentation', [author], 1)
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (
-        master_doc, 'HELICS-src', 'HELICS-src Documentation', author, 'HELICS-src', 'One line description of project.',
-        'Miscellaneous'
-    ),
+    (master_doc, 'HELICS-src', 'HELICS-src Documentation', author, 'HELICS-src', 'One line description of project.', 'Miscellaneous'),
 ]
