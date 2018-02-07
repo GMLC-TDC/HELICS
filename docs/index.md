@@ -21,7 +21,7 @@ series simulation.
 
  installation/index
  introduction/index
- API <https://gmlc-tdc.github.io/HELICS-src/doxygen/>
  developer-guide/index
+ API <https://gmlc-tdc.github.io/HELICS-src/doxygen/>
 ```
 
