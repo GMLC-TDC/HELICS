@@ -110,7 +110,7 @@ html_theme_options = {'navigation_depth': 4, 'collapse_navigation': False}
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_build/html/_static']
+html_static_path = ['_static']
 
 html_logo = "./img/HELICS_Logo.png"
 html_favicon = html_logo
@@ -177,3 +177,7 @@ man_pages = [(master_doc, 'helics-src', 'HELICS-src Documentation', [author], 1)
 texinfo_documents = [
     (master_doc, 'HELICS-src', 'HELICS-src Documentation', author, 'HELICS-src', 'One line description of project.', 'Miscellaneous'),
 ]
+
+
+def setup(app):
+    app.add_stylesheet('css/custom.css')  # may also be an URL
