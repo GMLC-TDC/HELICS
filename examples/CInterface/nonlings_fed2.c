@@ -59,6 +59,13 @@ int main()
   helics_publication  pub;
   int converged;
   char sendbuf[100],recvbuf[100];
+  double y = 1.0, x = 0, /*xprv = 100,*/ yprv=100;
+  int global_conv=0,my_conv=0,other_conv; /* Global and local convergence */
+  helics_time_t currenttime=0.0;
+  helics_iteration_status currenttimeiter;
+  currenttimeiter = iterating;
+  double tol=1E-8;
+  int helics_iter = 0;
 
   helicsversion = helicsGetVersion();
 
@@ -96,29 +103,20 @@ int main()
   /* Enter initialization mode */
   status = helicsFederateEnterInitializationMode(vfed);
   printf(" Entered initialization mode\n");
-  double y = 1.0, x = 0, /*xprv = 100,*/ yprv=100;
-  int global_conv=0,my_conv=0,other_conv; /* Global and local convergence */
 
   snprintf(sendbuf,100,"%18.16f,%d",y,my_conv);
   status = helicsPublicationPublishString(pub, sendbuf);
-  if (status != helics_ok)
-  {
-      printf("Error sending publication\n");
+  if (status != helics_ok) {
+    printf("Error sending publication\n");
   }
   fflush(NULL);
   /* Enter execution mode */
-   helicsFederateEnterExecutionMode(vfed);
+  helicsFederateEnterExecutionMode(vfed);
   printf(" Entered execution mode\n");
 
   fflush(NULL);
 
-  helics_time_t currenttime=0.0;
-  helics_iteration_status currenttimeiter;
-  currenttimeiter = iterating;
-  double tol=1E-8;
-  int helics_iter = 0;
-  while (currenttimeiter==iterating) {
-    
+  while (currenttimeiter==iterating) {    
     helicsSubscriptionGetString(sub,recvbuf,100);
     sscanf(recvbuf,"%lf,%d",&x,&other_conv);
 
@@ -154,11 +152,9 @@ int main()
   helicsFederateFinalize(vfed);
   printf("NLIN2: Federate finalized\n");
   fflush(NULL);
-  //clean upFederate;
   helicsFederateFree(vfed);
   helicsCloseLibrary();
   printf("NLIN2: Library Closed\n");
   fflush(NULL);
   return(0);
-
 }

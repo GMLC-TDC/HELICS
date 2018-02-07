@@ -64,6 +64,13 @@ int main ()
     helics_subscription sub;
     int converged;
     char sendbuf[100],recvbuf[100];
+        double x = 0.0, y = 1.0, xprv=100;
+    helics_time_t currenttime = 0.0;
+    helics_iteration_status currenttimeiter;
+    currenttimeiter = iterating;
+    double tol = 1E-8;
+    int global_conv=0,my_conv=0,other_conv; /* Global and local convergence */
+    int helics_iter = 0;
 
     helicsversion = helicsGetVersion ();
 
@@ -74,9 +81,8 @@ int main ()
 
     isconnected = helicsBrokerIsConnected (broker);
 
-    if (isconnected)
-    {
-        printf (" Broker created and connected\n");
+    if (isconnected) {
+      printf (" Broker created and connected\n");
     }
 
     /* Create Federate Info object that describes the federate properties */
@@ -95,7 +101,7 @@ int main ()
 
     helicsFederateInfoSetMaxIterations (fedinfo, 100);
 
-    //status = helicsFederateInfoSetLoggingLevel (fedinfo, 5);
+    /*status = helicsFederateInfoSetLoggingLevel (fedinfo, 5); */
 
     /* Create value federate */
     vfed = helicsCreateValueFederate (fedinfo);
@@ -111,43 +117,29 @@ int main ()
 
     /* Enter initialization mode */
     status = helicsFederateEnterInitializationMode (vfed);
-    if (status == helics_ok)
-    {
-        printf(" Entered initialization mode\n");
+    if (status == helics_ok) {
+      printf(" Entered initialization mode\n");
+    } else {
+      return (-3);
     }
-    else
-    {
-        return (-3);
-    }
-
-    double x = -1.0, y = 0.0, xprv=100;
-    helics_time_t currenttime = 0.0;
-    helics_iteration_status currenttimeiter;
-    currenttimeiter = iterating;
-    double tol = 1E-8;
-    int global_conv=0,my_conv=0,other_conv; /* Global and local convergence */
 
     snprintf(sendbuf,100,"%18.16f,%d",x,my_conv);
     helicsPublicationPublishString(pub, sendbuf);
     /* Enter execution mode */
     status = helicsFederateEnterExecutionMode (vfed);
-    if (status == helics_ok)
-    {
-        printf(" Entered execution mode\n");
-    }
-    else
-    {
-        return (-3);
+    if (status == helics_ok) {
+      printf(" Entered execution mode\n");
+    } else {
+      return (-3);
     }
     
     fflush (NULL);
 
-    int helics_iter = 0;
-    while (currenttimeiter == iterating)
-    {
+
+    while (currenttimeiter == iterating) {
       helicsSubscriptionGetString(sub, recvbuf,100);
       sscanf(recvbuf,"%lf,%d",&y,&other_conv);
-
+      
       /* Check for global convergence */
       global_conv = my_conv&other_conv;
 
