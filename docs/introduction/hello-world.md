@@ -21,14 +21,14 @@ whatever editor or IDE you are comfortable with.
 
 Linux and Mac:
 
-``` {.sourceCode .bash}
+```bash
 $ mkdir -p ~/federations/hello_world
 $ cd ~/federations/hello_world
 ```
 
 Windows CMD:
 
-``` {.sourceCode .cmd}
+```bash
 > mkdir %USERPROFILE%\federations
 > cd %USERPROFILE%\federations
 > mkdir hello_world
@@ -56,7 +56,7 @@ To compile the federates, you can use the following commands.
 
 Linux and Mac:
 
-``` {.sourceCode .bash}
+```bash
 $ cc hello_world_sender.c -o ./hello_world_sender -lhelicsSharedLib
 $ cc hello_world_receiver.c -o ./hello_world_receiver -lhelicsSharedLib
 ```
@@ -72,19 +72,19 @@ Linux and Mac:
 Next, open three terminals. In the first terminal, run the following
 command.
 
-``` {.sourceCode .bash}
+```bash
 $ ./helics_broker 2
 ```
 
 In the second terminal, run the following command.
 
-``` {.sourceCode .bash}
+```bash
 $ ./hello_world_sender
 ```
 
 In a third terminal, run the following command.
 
-``` {.sourceCode .bash}
+```bash
 $ ./hello_world_receiver
 ```
 
@@ -100,7 +100,7 @@ The following block creates a ValueFederate. We will discuss what
 `FederateInfo` is and what a `ValueFederate` is, along with other types
 of Federates in more detail in a later chapter.
 
-``` {.sourceCode .c}
+```c
 fedinfo = helicsFederateInfoCreate();
 helicsFederateInfoSetFederateName(fedinfo, "Test sender Federate");
 helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq");
@@ -110,27 +110,27 @@ vfed = helicsCreateValueFederate(fedinfo);
 
 The following registers a global publication.
 
-``` {.sourceCode .c}
+```c
 pub = helicsFederateRegisterGlobalPublication(vfed,"testA","string","");
 ```
 
 The following ensures that the federation has entered execution mode.
 
-``` {.sourceCode .c}
+```c
 helicsFederateEnterInitializationMode(vfed);
 helicsFederateEnterExecutionMode(vfed);
 ```
 
 These functions publish a String and make a RequestTime function call.
 
-``` {.sourceCode .c}
+```c
 helicsPublicationPublishString(pub, "Hello, World");
 helicsFederateRequestTime(vfed,currenttime, &currenttime);
 ```
 
 And these functions finally frees the Federate.
 
-``` {.sourceCode .c}
+```c
 helicsFederateFinalize(vfed);
 helicsFederateFree(vfed);
 helicsCloseLibrary();
@@ -139,7 +139,7 @@ helicsCloseLibrary();
 You can see that the `hello_world_receiver.c` is also very similar, but
 uses a Subscription instead. A snippet of the code is shown below.
 
-``` {.sourceCode .c}
+```c
 fedinfo = helicsFederateInfoCreate ();
 helicsFederateInfoSetFederateName (fedinfo, "TestB Federate");
 helicsFederateInfoSetCoreTypeFromString (fedinfo, "zmq");
