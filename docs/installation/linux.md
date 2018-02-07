@@ -56,11 +56,12 @@ Testing
 A quick test is to double check the versions of the HELICS player and recorder:
 
 ```bash
-    cd /path/to/helics_install/bin
+cd /path/to/helics_install/bin
 
-    $ helics_player --version
-    0.1
+$ helics_player --version
+0.1
 
-    $ helics_recorder --version
-    0.1
+$ helics_recorder --version
+0.1
 ```
+
