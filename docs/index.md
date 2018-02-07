@@ -24,7 +24,6 @@ series simulation.
 
  installation/index
  introduction/index
- tutorial/index
  api/index
  developer-guide/index
 ```
