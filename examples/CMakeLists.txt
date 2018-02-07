@@ -1,4 +1,17 @@
 
+if (STRICT_EXAMPLE_COMPILATION)
+#the examples had better compile without warnings otherwise they should not be allowed
+IF(WIN32)
+IF (MSVC)
+add_compile_options(/WX)
+ELSE(MSVC)
+add_compile_options(-Werror)
+ENDIF(MSVC)
+ELSE()
+add_compile_options(-Werror)
+ENDIF()
+endif()
+
 add_subdirectory (ipcTest)
 add_subdirectory (valueFederates1)
 add_subdirectory (messageFederates1)
