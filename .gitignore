@@ -5,6 +5,7 @@
 build
 build*/
 install*/
+!docs/installation/
 .vscode/
 bin/
 docs/html
