@@ -30,8 +30,6 @@ static const ArgDescriptors extraArgs{
   {"root"s, ""s, "specify whether the broker is a root"s},
 };
 
-bool matchingTypes (const std::string &type1, const std::string &type2);
-
 void CoreBroker::displayHelp ()
 {
     std::cout << "Broker Specific options:\n";

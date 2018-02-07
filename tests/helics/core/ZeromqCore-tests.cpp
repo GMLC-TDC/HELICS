@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
     repSocket.bind (defServer);
 
-    comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
+    comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (23405);
     comm.setName ("tests");
     auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
     }
 
     pullSocket.setsockopt (ZMQ_LINGER, 100);
-    comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
+    comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (23405);
     comm.setPortNumber (23407);
     comm.setName ("tests");

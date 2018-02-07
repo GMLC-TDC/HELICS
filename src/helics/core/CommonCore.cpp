@@ -1672,13 +1672,14 @@ void CommonCore::setIdentifier (const std::string &name)
 }
 
 void CommonCore::setQueryCallback (federate_id_t federateID,
-                                   std::function<std::string (const std::string &)> queryFunction)
+                                   std::function<std::string (const std::string &)> /*queryFunction*/)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("FederateID is invalid (setQueryCallback)"));
     }
+    //TODO:: PT add a query callback processing
 }
 
 std::string CommonCore::federateQuery (Core::federate_id_t federateID, const std::string &queryStr) const
