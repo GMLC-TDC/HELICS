@@ -4,12 +4,12 @@ Windows Installation
 Requirements
 ------------
 
--   Microsoft Visual C++ 2015 or newer (MS Build Tools also works)
--   CMake 3.4 or newer
--   git
--   Boost 1.58 or newer
--   ZeroMQ 4.2.0 or newer (if ZeroMQ support is needed)
--   MS-MPI v8 or newer (if MPI support is needed)
+- Microsoft Visual C++ 2015 or newer (MS Build Tools also works)
+- CMake 3.4 or newer
+- git
+- Boost 1.58 or newer
+- ZeroMQ 4.2.0 or newer (if ZeroMQ support is needed)
+- MS-MPI v8 or newer (if MPI support is needed)
 
 Setup
 -----
