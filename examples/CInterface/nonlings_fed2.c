@@ -8,10 +8,44 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
+
+/* Example form http://mathfaculty.fullerton.edu/mathews//n2003/newtonsystem/newtonsystemproof.pdf
+*/
+
 #include <stdio.h>
 #include <math.h>
 #include <ValueFederate.h>
 #include <math.h>
+
+/* This solves the system being simulated by this simulator. It takes in the coupling variable
+   x, convergence tolerance tol, and returns the state variable yout and the converged status converged
+*/
+void run_sim2(double x,double tol,double *yout,int *converged)
+{
+  double f2,J2,y=*yout;
+  int    newt_conv = 0, max_iter=10,iter=0;
+
+  /* Solve the equation using Newton */
+  while(!newt_conv && iter < max_iter) {
+    /* Function value */
+    f2 = x*x + 4*y*y - 4;
+
+    /* Convergence check */
+    if(fabs(f2) < tol) {
+      newt_conv = 1;
+      break;
+    }
+    iter++;
+
+    /* Jacobian */
+    J2 = 8*y;
+
+    /* Update */
+    y = y - f2/J2;
+  }
+  *yout = y;
+  *converged = newt_conv;
+}
 
 int main()
 {
@@ -23,12 +57,15 @@ int main()
   helics_federate vfed;
   helics_subscription sub;
   helics_publication  pub;
-  double y = 1.0, x = 0, /*xprv = 100,*/ yprv = 100;
-  /* int           isupdated;*/
-  double tol = 1E-8;
+  int converged;
+  char sendbuf[100],recvbuf[100];
+  double y = 1.0, x = 0, /*xprv = 100,*/ yprv=100;
+  int global_conv=0,my_conv=0,other_conv; /* Global and local convergence */
+  helics_time_t currenttime=0.0;
+  helics_iteration_status currenttimeiter;
+  currenttimeiter = iterating;
+  double tol=1E-8;
   int helics_iter = 0;
-  helics_time_t currenttime = 0.0;
-  helics_iteration_status currenttimeiter = iterating;
 
   helicsversion = helicsGetVersion();
 
@@ -56,80 +93,68 @@ int main()
   vfed = helicsCreateValueFederate(fedinfo);
   printf(" Value federate created\n");
 
-  sub = helicsFederateRegisterSubscription(vfed,"testA","double","");
+  sub = helicsFederateRegisterSubscription(vfed,"testA","string","");
   printf(" Subscription registered\n");
 
   /* Register the publication */
-  pub = helicsFederateRegisterGlobalPublication(vfed,"testB","double","");
+  pub = helicsFederateRegisterGlobalPublication(vfed,"testB","string","");
   printf(" Publication registered\n");
-
 
   /* Enter initialization mode */
   status = helicsFederateEnterInitializationMode(vfed);
   printf(" Entered initialization mode\n");
-  
 
-  status = helicsPublicationPublishDouble(pub, y);
-  if (status != helics_ok)
-  {
-      printf("Error sending publication\n");
+  snprintf(sendbuf,100,"%18.16f,%d",y,my_conv);
+  status = helicsPublicationPublishString(pub, sendbuf);
+  if (status != helics_ok) {
+    printf("Error sending publication\n");
   }
   fflush(NULL);
   /* Enter execution mode */
-   helicsFederateEnterExecutionMode(vfed);
+  helicsFederateEnterExecutionMode(vfed);
   printf(" Entered execution mode\n");
 
   fflush(NULL);
- 
 
+  while (currenttimeiter==iterating) {    
+    helicsSubscriptionGetString(sub,recvbuf,100);
+    sscanf(recvbuf,"%lf,%d",&x,&other_conv);
 
-  while (currenttimeiter==iterating)
-  {
-      double f2, J2;
-      int    newt_conv = 0, max_iter = 10, iter = 0;
-   /* xprv = x; */
-     helicsSubscriptionGetDouble(sub,&x);
-    ++helics_iter;
+    /* Check for global convergence */
+    global_conv = my_conv&other_conv;
     
-
-    /* Solve the equation using Newton */
-    while(!newt_conv && iter < max_iter) {
-      /* Function value */
-      f2 = x*x + 4*y*y - 4;
+    if(global_conv) {
+      helicsFederateRequestTimeIterative(vfed, currenttime, no_iteration,&currenttime,&currenttimeiter);
+    } else {
+      /* Solve the system of equations for this federate */
+      run_sim2(x,tol,&y,&converged);
       
-      if(fabs(f2) < tol) {
-	newt_conv = 1;
-	break;
+      ++helics_iter;
+      printf("Fed2 Current time %4.3f iteration %d x=%f, y=%f\n",currenttime, helics_iter,x,y);
+
+      if ((fabs(y-yprv)>tol)) {
+	my_conv = 0;
+	printf("Fed2: publishing new y\n");
+      } else {
+	my_conv = 1;
+	printf("Fed2: converged\n");
       }
-      iter++;
-
-      /* Jacobian */
-      J2 = 8*y;
       
-      y = y - f2/J2;
+      snprintf(sendbuf,100,"%18.16f,%d",y,my_conv);
+      helicsPublicationPublishString(pub, sendbuf);
+      
+      fflush(NULL);
+      helicsFederateRequestTimeIterative(vfed, currenttime, force_iteration,&currenttime,&currenttimeiter);
+      yprv = y;
     }
-    printf("Fed2 iteration %d y=%f, x=%f\n",helics_iter,y,x);
-
-   
-    if ((fabs(y-yprv)>tol)||(helics_iter<5))
-    {
-      helicsPublicationPublishDouble(pub,y);
-      printf("Fed2: publishing y\n");
-    }
-    fflush(NULL);
-    helicsFederateRequestTimeIterative(vfed, currenttime, iterate_if_needed,&currenttime,&currenttimeiter);
-    yprv = y;
   }
 
   helicsFederateFinalize(vfed);
   printf("NLIN2: Federate finalized\n");
   fflush(NULL);
-  /*clean upFederate;
-  */
   helicsFederateFree(vfed);
   helicsCloseLibrary();
   printf("NLIN2: Library Closed\n");
   fflush(NULL);
   return(0);
-
 }
