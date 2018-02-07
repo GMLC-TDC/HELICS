@@ -21,11 +21,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 ActionMessage::ActionMessage (action_message_def::action_t startingAction)
-    : action_ (startingAction), index (dest_handle), name (payload)
+    : messageAction (startingAction), index (dest_handle), name (payload)
 {
     if (hasInfo (startingAction))
     {
-        info_ = std::make_unique<AdditionalInfo> ();
+        extraInfo = std::make_unique<AdditionalInfo> ();
     }
 }
 
@@ -37,34 +37,34 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction, int32
 }
 
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
-    : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
+    : messageAction (act.messageAction), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
       dest_handle (act.dest_handle), index (dest_handle), counter (act.counter), flags (act.flags),
       actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin), payload (std::move (act.payload)),
-      name (payload), info_ (std::move (act.info_))
+      name (payload), extraInfo (std::move (act.extraInfo))
 {
 }
 
 ActionMessage::ActionMessage (const ActionMessage &act)
-    : action_ (act.action_), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
+    : messageAction (act.messageAction), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
       dest_handle (act.dest_handle), index (dest_handle), counter (act.counter), flags (act.flags),
       actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin), payload (act.payload), name (payload)
 
 {
-    if (act.info_)
+    if (act.extraInfo)
     {
-        info_ = std::make_unique<AdditionalInfo> ((*act.info_));
+        extraInfo = std::make_unique<AdditionalInfo> ((*act.extraInfo));
     }
 }
 
 ActionMessage::ActionMessage (std::unique_ptr<Message> message)
-    : action_ (CMD_SEND_MESSAGE), index (dest_handle), actionTime (message->time),
+    : messageAction (CMD_SEND_MESSAGE), index (dest_handle), actionTime (message->time),
       payload (std::move (message->data.m_data)), name (payload)
 {
-    info_ = std::make_unique<AdditionalInfo> ();
-    info_->source = std::move (message->source);
-    info_->orig_source = std::move (message->original_source);
-    info_->original_dest = std::move (message->original_dest);
-    info_->target = std::move (message->dest);
+    extraInfo = std::make_unique<AdditionalInfo> ();
+    extraInfo->source = std::move (message->source);
+    extraInfo->orig_source = std::move (message->original_source);
+    extraInfo->original_dest = std::move (message->original_dest);
+    extraInfo->target = std::move (message->dest);
 }
 
 ActionMessage::ActionMessage (const std::string &bytes) : ActionMessage () { from_string (bytes); }
@@ -77,7 +77,7 @@ ActionMessage::~ActionMessage () = default;
 
 ActionMessage &ActionMessage::operator= (const ActionMessage &act)
 {
-    action_ = act.action_;
+    messageAction = act.messageAction;
     source_id = act.source_id;
     source_handle = act.source_handle;
     dest_id = act.dest_id;
@@ -89,16 +89,16 @@ ActionMessage &ActionMessage::operator= (const ActionMessage &act)
     Tdemin = act.Tdemin;
     payload = act.payload;
 
-    if (act.info_)
+    if (act.extraInfo)
     {
-        info_ = std::make_unique<AdditionalInfo> ((*act.info_));
+        extraInfo = std::make_unique<AdditionalInfo> ((*act.extraInfo));
     }
     return *this;
 }
 
 ActionMessage &ActionMessage::operator= (ActionMessage &&act) noexcept
 {
-    action_ = act.action_;
+    messageAction = act.messageAction;
     source_id = act.source_id;
     source_handle = act.source_handle;
     dest_id = act.dest_id;
@@ -109,53 +109,53 @@ ActionMessage &ActionMessage::operator= (ActionMessage &&act) noexcept
     Te = act.Te;
     Tdemin = act.Tdemin;
     payload = std::move (act.payload);
-    info_ = std::move (act.info_);
+    extraInfo = std::move (act.extraInfo);
     return *this;
 }
 
 void ActionMessage::moveInfo (std::unique_ptr<Message> message)
 {
-    action_ = CMD_SEND_MESSAGE;
+    messageAction = CMD_SEND_MESSAGE;
     payload = std::move (message->data.m_data);
     actionTime = message->time;
-    if (!info_)
+    if (!extraInfo)
     {
-        info_ = std::make_unique<AdditionalInfo> ();
+        extraInfo = std::make_unique<AdditionalInfo> ();
     }
-    info_->source = std::move (message->source);
-    info_->orig_source = std::move (message->original_source);
-    info_->original_dest = std::move (message->original_dest);
-    info_->target = std::move (message->dest);
+    extraInfo->source = std::move (message->source);
+    extraInfo->orig_source = std::move (message->original_source);
+    extraInfo->original_dest = std::move (message->original_dest);
+    extraInfo->target = std::move (message->dest);
 }
 
 void ActionMessage::setAction (action_message_def::action_t newAction)
 {
     if (hasInfo (newAction))
     {
-        if (!info_)
+        if (!extraInfo)
         {
-            info_ = std::make_unique<AdditionalInfo> ();
+            extraInfo = std::make_unique<AdditionalInfo> ();
         }
     }
-    action_ = newAction;
+    messageAction = newAction;
 }
 
 ActionMessage::AdditionalInfo &ActionMessage::info ()
 {
-    if (!info_)
+    if (!extraInfo)
     {
-        info_ = std::make_unique<AdditionalInfo> ();
+        extraInfo = std::make_unique<AdditionalInfo> ();
     }
-    return *info_;
+    return *extraInfo;
 }
 
 const ActionMessage::AdditionalInfo emptyAddInfo;
 
 const ActionMessage::AdditionalInfo &ActionMessage::info () const
 {
-    if (info_)
+    if (extraInfo)
     {
-        return *info_;
+        return *extraInfo;
     }
     return emptyAddInfo;
 }
@@ -217,7 +217,7 @@ std::string ActionMessage::packetize () const
     // don't forget to flush the stream to finish writing into the buffer
     s.flush ();
     // now generate a length header
-    int32_t sz = static_cast<int> (data.size ());
+    auto sz = static_cast<int32_t> (data.size ());
     data[1] = static_cast<char> (((sz >> 16) & 0xFF));
     data[2] = static_cast<char> (((sz >> 8) & 0xFF));
     data[3] = static_cast<char> (sz & 0xFF);
@@ -286,7 +286,7 @@ void ActionMessage::fromByteArray (const char *data, size_t buffer_size)
     }
     catch (const cereal::Exception &ce)
     {
-        action_ = CMD_INVALID;
+        messageAction = CMD_INVALID;
     }
 }
 
@@ -327,7 +327,7 @@ size_t ActionMessage::depacketize (const char *data, size_t buffer_size)
     }
     catch (const cereal::Exception &ce)
     {
-        action_ = CMD_INVALID;
+        messageAction = CMD_INVALID;
         return 0;
     }
 }
@@ -336,7 +336,7 @@ void ActionMessage::from_string (const std::string &data) { fromByteArray (data.
 
 void ActionMessage::from_vector (const std::vector<char> &data) { fromByteArray (data.data (), data.size ()); }
 
-std::unique_ptr<Message> createMessage (const ActionMessage &cmd)
+std::unique_ptr<Message> createMessageFromCommand (const ActionMessage &cmd)
 {
     auto msg = std::make_unique<Message> ();
     msg->original_source = cmd.info ().orig_source;
@@ -349,7 +349,7 @@ std::unique_ptr<Message> createMessage (const ActionMessage &cmd)
     return msg;
 }
 
-std::unique_ptr<Message> createMessage (ActionMessage &&cmd)
+std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd)
 {
     auto msg = std::make_unique<Message> ();
     msg->original_source = std::move (cmd.info ().orig_source);
@@ -466,7 +466,7 @@ std::string prettyPrintString (const ActionMessage &command)
         ret.push_back (':');
         ret.append (command.name);
         ret.append ("--");
-        if (CHECK_ACTION_FLAG (command, error_flag))
+        if (checkActionFlag (command, error_flag))
         {
             ret.append ("error");
         }

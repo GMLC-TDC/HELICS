@@ -1,5 +1,4 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
@@ -11,8 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #pragma once
 /** @file
-@details functions related to loading and evaluating json files and helper functions for reading them
-using the json cpp library
+@details functions related to loading and evaluating JSON files and helper functions for reading them
+using the jsoncpp library
 */
 
 #ifdef _MSC_VER
@@ -25,10 +24,10 @@ using the json cpp library
 #endif
 
 #include "../core/helics-time.hpp"
-/** load a json string or filename that points to a json file and return a
+/** load a JSON string or filename that points to a JSON file and return a
 json::Value to the root object
 */
 Json_helics::Value loadJsonString (const std::string &jsonString);
 
 /** read a time from a JSON value element*/
-helics::Time loadJsonTime (const Json_helics::Value &timeElement);
+helics::Time loadJsonTime(const Json_helics::Value &timeElement, timeUnits defaultUnits = timeUnits::sec);

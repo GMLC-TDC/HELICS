@@ -38,7 +38,7 @@ void TimeCoordinator::enteringExecMode (helics_iteration_request mode)
         execreq.source_id = source_id;
         if (iterating)
         {
-            SET_ACTION_FLAG (execreq, iterationRequested);
+            setActionFlag (execreq, iterationRequested);
         }
         sendMessageFunction (execreq);
     }
@@ -65,7 +65,7 @@ void TimeCoordinator::timeRequest (Time nextTime,
         ActionMessage treq (CMD_TIME_REQUEST);
         if (iterating)
         {
-            SET_ACTION_FLAG (treq, iterationRequested);
+            setActionFlag (treq, iterationRequested);
         }
         treq.source_id = source_id;
         treq.actionTime = time_next;
@@ -260,7 +260,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
                     ActionMessage treq (CMD_TIME_GRANT);
                     treq.source_id = source_id;
                     treq.actionTime = time_granted;
-                    SET_ACTION_FLAG (treq, iterationRequested);
+                    setActionFlag (treq, iterationRequested);
                     sendMessageFunction (treq);
                 }
                 return iteration_state::next_step;
@@ -291,7 +291,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
                     ActionMessage treq (CMD_TIME_GRANT);
                     treq.source_id = source_id;
                     treq.actionTime = time_granted;
-                    SET_ACTION_FLAG (treq, iterationRequested);
+                    setActionFlag (treq, iterationRequested);
                     sendMessageFunction (treq);
                 }
                 return iteration_state::iterating;
@@ -309,7 +309,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         upd.Tdemin = time_minDe;
         if (iterating)
         {
-            SET_ACTION_FLAG (upd, iterationRequested);
+            setActionFlag (upd, iterationRequested);
         }
         sendMessageFunction (upd);
 
@@ -434,7 +434,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
         {
             ActionMessage execgrant (CMD_EXEC_GRANT);
             execgrant.source_id = source_id;
-            SET_ACTION_FLAG (execgrant, iterationRequested);
+            setActionFlag (execgrant, iterationRequested);
             sendMessageFunction (execgrant);
         }
     }
@@ -505,27 +505,27 @@ void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd, bool
         switch (cmd.dest_id)
         {
         case UNINTERRUPTIBLE_FLAG:
-            info.uninterruptible = CHECK_ACTION_FLAG (cmd, indicator_flag);
+            info.uninterruptible = checkActionFlag (cmd, indicator_flag);
             break;
         case ONLY_TRANSMIT_ON_CHANGE_FLAG:
-            info.only_transmit_on_change = CHECK_ACTION_FLAG (cmd, indicator_flag);
+            info.only_transmit_on_change = checkActionFlag (cmd, indicator_flag);
             break;
         case ONLY_UPDATE_ON_CHANGE_FLAG:
-            info.only_update_on_change = CHECK_ACTION_FLAG (cmd, indicator_flag);
+            info.only_update_on_change = checkActionFlag (cmd, indicator_flag);
             break;
         case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
-            info.wait_for_current_time_updates = CHECK_ACTION_FLAG (cmd, indicator_flag);
+            info.wait_for_current_time_updates = checkActionFlag (cmd, indicator_flag);
             break;
         case SOURCE_ONLY_FLAG:
             if (initMode)
             {
-                info.source_only = CHECK_ACTION_FLAG (cmd, indicator_flag);
+                info.source_only = checkActionFlag (cmd, indicator_flag);
             }
             break;
         case OBSERVER_FLAG:
             if (initMode)
             {
-                info.observer = CHECK_ACTION_FLAG (cmd, indicator_flag);
+                info.observer = checkActionFlag (cmd, indicator_flag);
             }
             break;
         default:

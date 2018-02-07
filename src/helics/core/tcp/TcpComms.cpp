@@ -140,7 +140,7 @@ void TcpComms::txPriorityReceive (std::shared_ptr<TcpConnection> connection,
                                   size_t bytes_received,
                                   const boost::system::error_code &error)
 {
-    if (error)
+    if (error!=nullptr)
     {
         return;
     }
@@ -169,10 +169,11 @@ void TcpComms::txPriorityReceive (std::shared_ptr<TcpConnection> connection,
 
 size_t TcpComms::dataReceive (std::shared_ptr<TcpRxConnection> connection, const char *data, size_t bytes_received)
 {
-    ActionMessage m;
+    
     size_t used_total = 0;
     while (used_total < bytes_received)
     {
+        ActionMessage m;
         auto used = m.depacketize (data + used_total, bytes_received - used_total);
         if (used == 0)
         {

@@ -20,15 +20,16 @@ namespace helics
  */
 ValueFederate::ValueFederate (const FederateInfo &fi) : Federate (fi)
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject, getID ());
+	//the core object get instantiated in the Federate constructor
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
 }
 ValueFederate::ValueFederate (std::shared_ptr<Core> core, const FederateInfo &fi) : Federate (std::move (core), fi)
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject, getID ());
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
 }
 ValueFederate::ValueFederate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject, getID ());
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
     registerInterfaces (jsonString);
 }
 
@@ -36,7 +37,7 @@ ValueFederate::ValueFederate () = default;
 
 ValueFederate::ValueFederate (bool /*res*/)
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject, getID ());
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
 }
 
 ValueFederate::ValueFederate (ValueFederate &&fed) noexcept = default;

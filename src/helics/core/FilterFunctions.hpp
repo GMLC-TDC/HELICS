@@ -18,15 +18,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 class FilterInfo;
-/** class to manage the ordering of filter operations for an endpoint
+/** data class to manage the ordering of filter operations for an endpoint
  */
 class FilterCoordinator
 {
   public:
-    std::vector<FilterInfo *> sourceFilters;  //!< ordered set of source operators
+	std::vector<FilterInfo *> sourceFilters; //!< ordered set of source operators
     FilterInfo *destFilter = nullptr;  //!< the destination operator handle
 
-    std::vector<FilterInfo *> allSourceFilters;  //!< storage for all the source filters before sorting
+	std::vector<FilterInfo *> allSourceFilters; //!< storage for all the source filters before sorting
     bool hasSourceFilter = false;  //!< indicator that an endpoint has source filters
     bool hasDestFilter = false;  //!< indicator that an endpoint has a destination filter
     int ongoingTransactions = 0;  //!< counter for the number of filtered message returns expected

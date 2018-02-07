@@ -47,10 +47,19 @@ void DelayFilterOperation::set (const std::string &property, double val)
     }
 }
 
-void DelayFilterOperation::setString (const std::string &property, const std::string & /*val*/)
+void DelayFilterOperation::setString (const std::string &property, const std::string &val)
 {
     if (property == "delay")
     {
+        try
+        {
+            delay = loadTimeFromString(val);
+        }
+        catch (const std::invalid_argument &ia)
+        {
+            throw (helics::InvalidParameter(val + " is not a valid time string"));
+        }
+       
     }
 }
 
@@ -349,20 +358,20 @@ void CloneFilterOperation::setString (const std::string &property, const std::st
     }
     else if (property == "add delivery")
     {
-        auto lock = deliveryAddresses.lock ();
-        auto fnd = std::find (lock->cbegin (), lock->cend (), val);
-        if (fnd == lock->cend ())
+        auto handle = deliveryAddresses.lock ();
+        auto fnd = std::find (handle->cbegin (), handle->cend (), val);
+        if (fnd == handle->cend ())
         {
-            lock->push_back (val);
+            handle->push_back (val);
         }
     }
     else if (property == "remove delivery")
     {
-        auto lock = deliveryAddresses.lock ();
-        auto fnd = std::find (lock->cbegin (), lock->cend (), val);
-        if (fnd != lock->cend ())
+        auto handle = deliveryAddresses.lock ();
+        auto fnd = std::find (handle->cbegin (), handle->cend (), val);
+        if (fnd != handle->cend ())
         {
-            lock->erase (fnd);
+            handle->erase (fnd);
         }
     }
 }

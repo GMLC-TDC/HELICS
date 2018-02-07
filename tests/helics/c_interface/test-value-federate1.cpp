@@ -1024,7 +1024,8 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer_types_publishers, bdata::mak
     runFederateTestObj<float>(core_type, 10.3f, 45.3f, 22.7f);
     runFederateTestObj<std::string>(core_type, "start", "inside of the functional relationship of helics",
         std::string("I am a string"));
-    
+    
+
 
 
 

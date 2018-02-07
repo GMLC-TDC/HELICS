@@ -96,7 +96,7 @@ class data_view
         ref = nullptr;
         return *this;
     }
-    /** create a new datablock from the data*/
+    /** create a new data_block from the data*/
     data_block to_data_block () const { return data_block (dblock.data (), dblock.length ()); }
     /** swap function */
 

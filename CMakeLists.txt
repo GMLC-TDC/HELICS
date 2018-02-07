@@ -7,8 +7,8 @@ project (HELICS)
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
 set (HELICS_VERSION_PATCH 0)
-set (HELICS_VERSION_BUILD alpha)
-set (HELICS_DATE "01-18-18")
+set (HELICS_VERSION_BUILD alpha2)
+set (HELICS_DATE "02-02-18")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -113,9 +113,18 @@ IF(UNIX)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
-  #this options produces lots of warning but is useful for checking ever once in a while with Clang, GCC warning notices with this aren't as useful
+  #this options produces lots of warning but is useful for checking every once in a while with Clang, GCC warning notices with this aren't as useful
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
-
+  # add some gnu specific options if the compiler is newer
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+     # this option produces a number of warnings in third party libraries but useful for checking for any internal usages
+ # add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wold-style-cast>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wlogical-op>)
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
+   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wduplicated-cond>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wnull-dereference>)
+  endif()
+  endif()
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
   option (USE_LIBCXX "Use Libc++ vs as opposed to the default" OFF)
   IF(USE_LIBCXX)
@@ -132,9 +141,18 @@ ELSE(UNIX)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
+  
   #this options produces lots of warning but is useful for checking ever once in a while with Clang, GCC warning notices with this aren't as useful
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
-
+   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+   # this option produces a number of warnings in third party libraries but useful for checking for any internal usages
+ # add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wold-style-cast>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wlogical-op>)
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
+   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wduplicated-cond>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wnull-dereference>)
+  endif()
+  endif()
   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
   ELSE(MINGW)
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
