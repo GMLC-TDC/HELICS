@@ -29,17 +29,18 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include <boost/asio/io_service.hpp>
 
-/** class defining a (potential) singleton Asio Io_service manager for all boost::asio usage*/
+/** class defining a (potential) singleton ASIO io_service manager for all boost::asio usage*/
 class AsioServiceManager
 {
 private:
 	static std::map<std::string, std::shared_ptr<AsioServiceManager>> services; //!< container for pointers to all the available contexts
+    std::atomic<int> runCounter{ 0 };  //!< counter for the number of times the runServiceLoop has been called
 	std::string name;  //!< service name
 	std::unique_ptr<boost::asio::io_service> iserv; //!< pointer to the actual context
     std::unique_ptr<boost::asio::io_service::work> nullwork; //!< pointer to an object used to keep a service running
     bool leakOnDelete = false; //!< this is done to prevent some warning messages for use in DLL's  
     std::atomic<bool> running{ false };
-    int runCounter = 0;  //!< counter for the number of times the runServiceLoop has been called
+   
     std::future<void> loopRet;
 	AsioServiceManager(const std::string &contextName);
     
@@ -47,17 +48,16 @@ private:
 	class servicer
 	{
 	public:
-		servicer(const std::string &managerName,std::shared_ptr<AsioServiceManager> manager) :name(managerName),serviceManager(std::move(manager))
+		explicit servicer(std::shared_ptr<AsioServiceManager> manager):serviceManager(std::move(manager))
 		{
 		}
 		/** this object halts the serviceLoop when deleted*/
 		~servicer()
 		{
-			AsioServiceManager::haltServiceLoop(name);
+            serviceManager->haltServiceLoop();
 		}
 
 	private:
-		std::string name; //!< the name of the service
 		std::shared_ptr<AsioServiceManager> serviceManager; //!< a pointer to the service manager
 	};
 public:
@@ -114,9 +114,8 @@ private:
     /** halt the service loop thread if the counter==0
     @details decrements the loop request counter and if it is 0 then will halt the 
     service loop
-    @param in the name of the service
     */
-    static void haltServiceLoop(const std::string &serviceName);
+    void haltServiceLoop();
 
     friend void serviceRunLoop(std::shared_ptr<AsioServiceManager> ptr);
 };

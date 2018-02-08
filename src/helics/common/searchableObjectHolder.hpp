@@ -18,6 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <memory>
 #include <mutex>
 #include <thread>
+#include "TripWire.hpp"
 
 /** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
  * threading issues*/
@@ -27,13 +28,18 @@ class SearchableObjectHolder
   private:
     std::mutex mapLock;
     std::map<std::string, std::shared_ptr<X>> ObjectMap;
-
+    tripwire::TripWireDetector trippedDetect;
   public:
     SearchableObjectHolder () = default;
     SearchableObjectHolder (SearchableObjectHolder &&) noexcept = delete;
     SearchableObjectHolder &operator= (SearchableObjectHolder &&) noexcept = delete;
     ~SearchableObjectHolder ()
     {
+        //this is a short circuit used to detect shutdown
+        if (trippedDetect.isTripped())
+        {
+            return;
+        }
         std::unique_lock<std::mutex> lock (mapLock);
         int cntr = 0;
         while (true)

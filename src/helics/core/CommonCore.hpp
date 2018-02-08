@@ -22,9 +22,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../common/DualMappedPointerVector.hpp"
 #include <atomic>
 #include <cstdint>
-#include <map>
 #include <thread>
-#include <unordered_map>
+#include "../common/GuardedTypes.hpp"
 #include <utility>
 
 namespace helics
@@ -273,14 +272,13 @@ class CommonCore : public Core, public BrokerBase
     std::unordered_map<std::string, handle_id_t> endpoints;  //!< map of all local endpoints
     std::unordered_map<std::string, federate_id_t> federateNames;  //!< map of federate names to id
 
+    std::map<federate_id_t, std::set<int32_t>> ongoingFilterProcesses; //!< map of ongoing filtered messages
     std::atomic<int> queryCounter{0};
     std::map<handle_id_t, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
     using fed_handle_pair = std::pair<federate_id_t, handle_id_t>;
     DualMappedPointerVector<FilterInfo,
                             std::string,
-                            fed_handle_pair,
-                            std::unordered_map<std::string, size_t>,
-                            std::map<fed_handle_pair, size_t>>
+                            fed_handle_pair>
       filters;  //!< storage for all the filters
   private:
     mutable std::mutex _mutex;  //!< mutex protecting the federate creation and modification
@@ -289,8 +287,8 @@ class CommonCore : public Core, public BrokerBase
     /** a logging function for logging or printing messages*/
 
   protected:
-    /** add a message to the queue*/
-    void queueMessage (ActionMessage &message);
+    /** deliver a message to the appropriate location*/
+    void deliverMessage (ActionMessage &message);
     /** function to deal with a source filters*/
     ActionMessage &processMessage (BasicHandleInfo *hndl, ActionMessage &m);
     /** add a new handle to the generic structure

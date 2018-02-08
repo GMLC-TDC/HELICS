@@ -1332,14 +1332,14 @@ void CommonCore::send (handle_id_t sourceHandle, const std::string &destination,
 
     m.info ().orig_source = hndl->key;
     m.info ().source = hndl->key;
+    m.info().messageID = ++messageCounter;
     m.source_handle = sourceHandle;
     m.source_id = hndl->fed_id;
 
     m.payload = std::string (data, length);
     m.info ().target = destination;
     m.actionTime = fed->grantedTime ();
-
-    queueMessage (processMessage (hndl, m));
+    addActionMessage(m);
 }
 
 void CommonCore::sendEvent (Time time,
@@ -1365,8 +1365,8 @@ void CommonCore::sendEvent (Time time,
     m.info ().orig_source = hndl->key;
     m.info ().source = hndl->key;
     m.info ().target = destination;
-
-    queueMessage (processMessage (hndl, m));
+    m.info().messageID = ++messageCounter;
+    addActionMessage(m);
 }
 
 void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message> message)
@@ -1376,8 +1376,7 @@ void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message>
         ActionMessage m (std::move (message));
         m.source_id = global_broker_id;
         m.source_handle = sourceHandle;
-
-        queueMessage (m);
+        addActionMessage (m);
         return;
     }
     auto hndl = getHandleInfo (sourceHandle);
@@ -1394,8 +1393,11 @@ void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message>
     m.info ().source = hndl->key;
     m.source_id = hndl->fed_id;
     m.source_handle = sourceHandle;
-
-    queueMessage (processMessage (hndl, m));
+    if (m.info().messageID == 0)
+    {
+        m.info().messageID = ++messageCounter;
+    }
+    addActionMessage(m);
 }
 
 // Checks for filter operations
@@ -1436,7 +1438,15 @@ ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage 
                     m.dest_id = filt->fed_id;
                     m.dest_handle = filt->handle;
                     m.counter = static_cast<uint16_t>(ii);
-                    m.setAction((ii < filtFunc->sourceFilters.size() - 1) ? CMD_SEND_FOR_FILTER_OPERATION : CMD_SEND_FOR_FILTER);
+                    if (ii < filtFunc->sourceFilters.size() - 1)
+                    {
+                        m.setAction(CMD_SEND_FOR_FILTER_AND_RETURN);
+                        ongoingFilterProcesses[m.source_id].insert(m.info().messageID);
+                    }
+                    else
+                    {
+                        m.setAction(CMD_SEND_FOR_FILTER);
+                    }
                     return m;
                 }
                 ++ii;
@@ -1447,7 +1457,7 @@ ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage 
     return m;
 }
 
-void CommonCore::queueMessage (ActionMessage &message)
+void CommonCore::deliverMessage (ActionMessage &message)
 {
     switch (message.action ())
     {
@@ -1457,7 +1467,16 @@ void CommonCore::queueMessage (ActionMessage &message)
         auto localP = getLocalEndpoint (message.info ().target);
         if (localP == nullptr)
         {  // must be a remote endpoint push it to the main queue to deal with
-            addActionMessage (message);
+            auto kfnd = knownExternalEndpoints.find(message.info().target);
+            if (kfnd != knownExternalEndpoints.end())
+            {  // destination is known
+                auto route = getRoute(kfnd->second);
+                transmit(route, message);
+            }
+            else
+            {
+                transmit(0, message);
+            }
             return;
         }
         if (localP->hasDestFilter)  // the endpoint has a destination filter
@@ -1466,18 +1485,23 @@ void CommonCore::queueMessage (ActionMessage &message)
 
             auto tempMessage = createMessageFromCommand (std::move (message));
             auto nmessage = ffunc->destFilter->filterOp->process (std::move (tempMessage));
-
             message.moveInfo (std::move (nmessage));
         }
         message.dest_id = localP->fed_id;
         message.dest_handle = localP->id;
-        addActionMessage (message);
+        auto fed = getFederate(localP->fed_id);
+        fed->addAction(message);
+        
     }
     break;
     case CMD_SEND_FOR_FILTER:
-    case CMD_SEND_FOR_FILTER_OPERATION:
-    case CMD_SEND_FOR_FILTER_RETURN:
-        addActionMessage (message);
+    case CMD_SEND_FOR_FILTER_AND_RETURN:
+    case CMD_FILTER_RESULT:
+    case CMD_NULL_MESSAGE:
+    {
+        auto route = getRoute(message.dest_id);
+        transmit(route, message);
+    }
     break;
     default:
         break;
@@ -2007,7 +2031,7 @@ void CommonCore::processCommand (ActionMessage &&command)
                 LOG_DEBUG (command.source_id, "core", "dropping unrecognized CMD_EXEC_*");
                 return;
             }
-            if (ongoingFilterActionCounter[fed->local_id] == 0)
+            if (ongoingFilterProcesses[fed->local_id].empty())
             {
                 auto &dep = fed->getDependents ();
                 for (auto &fed_id : dep)
@@ -2096,7 +2120,9 @@ void CommonCore::processCommand (ActionMessage &&command)
         routeMessage (command);
         break;
     case CMD_SEND_FOR_FILTER:
-    case CMD_SEND_FOR_FILTER_OPERATION:
+    case CMD_SEND_FOR_FILTER_AND_RETURN:
+    case CMD_NULL_MESSAGE:
+    case CMD_FILTER_RESULT:
         processMessageFilter (command);
         break;
     case CMD_PUB:
@@ -2395,31 +2421,15 @@ void CommonCore::processCommand (ActionMessage &&command)
     break;
 
     case CMD_SEND_MESSAGE:
-    {
-        // TODO:: PT This isn't the best way of doing this
-        auto fnd = endpoints.find (command.info ().target);
-        if (fnd != endpoints.end ())
-        {  // destination is local
-            auto fed = getHandleFederate (fnd->second);
-
-            command.dest_id = fed->global_id;
-            command.dest_handle = fnd->second;
-            fed->addAction (command);
+        if (isLocal(command.source_id))
+        {
+            auto handle = getHandleInfo(command.source_handle);
+            deliverMessage(processMessage(handle, command));
         }
         else
         {
-            auto kfnd = knownExternalEndpoints.find (command.info ().target);
-            if (kfnd != knownExternalEndpoints.end ())
-            {  // destination is known
-                auto route = getRoute (kfnd->second);
-                transmit (route, command);
-            }
-            else
-            {
-                transmit (0, command);
-            }
+            deliverMessage(command);
         }
-    }
     break;
     default:
         if (isPriorityCommand (command))
@@ -2803,31 +2813,53 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
     else if (cmd.dest_id == global_broker_id)
     {
         // deal with local source filters
-
+        
         auto FiltI = filters.find (fed_handle_pair(global_broker_id, cmd.dest_handle));
         if (FiltI != nullptr)
         {
             if (FiltI->filterOp != nullptr)
             {
-                bool returnToSender = (cmd.action () == CMD_SEND_FOR_FILTER_OPERATION);
+                bool returnToSender = (cmd.action () == CMD_SEND_FOR_FILTER_AND_RETURN);
+                auto source = cmd.source_id;
+                auto source_handle = cmd.source_handle;
+                auto mid = cmd.info().messageID;
                 auto tempMessage = createMessageFromCommand (std::move (cmd));
                 tempMessage = FiltI->filterOp->process (std::move (tempMessage));
-                cmd = ActionMessage (std::move (tempMessage));
-
-                if (!returnToSender)
+                if (tempMessage)
                 {
-                    cmd.setAction (CMD_SEND_MESSAGE);
-                    cmd.dest_id = 0;
-                    cmd.dest_handle = 0;
-                    queueMessage (cmd);
+                    cmd = ActionMessage(std::move(tempMessage));
                 }
                 else
                 {
-                    // TODO:: deal with multiple filters correctly (need to return to sender)
-                    cmd.setAction (CMD_SEND_MESSAGE);
+                    cmd = CMD_IGNORE;
+                }
+
+                if (!returnToSender)
+                {
+                    if (cmd.action() == CMD_IGNORE)
+                    {
+                        return;
+                    }
                     cmd.dest_id = 0;
                     cmd.dest_handle = 0;
-                    queueMessage (cmd);
+                    deliverMessage (cmd);
+                }
+                else
+                {
+                    cmd.dest_id = source;
+                    cmd.dest_handle = source_handle;
+                    if (cmd.action() == CMD_IGNORE)
+                    {
+                        cmd.setAction(CMD_NULL_MESSAGE);
+                        cmd.source_handle = mid;
+                        deliverMessage(cmd);
+                        return;
+                    }
+                    cmd.setAction (CMD_FILTER_RESULT);
+                    
+                    cmd.source_handle = FiltI->handle;
+                    cmd.source_id = global_broker_id;
+                    deliverMessage (cmd);
                 }
             }
         }

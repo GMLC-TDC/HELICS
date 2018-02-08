@@ -619,8 +619,9 @@ void CoreBroker::processCommand (ActionMessage &&command)
         break;
     case CMD_SEND_MESSAGE:
     case CMD_SEND_FOR_FILTER:
-    case CMD_SEND_FOR_FILTER_OPERATION:
-    case CMD_SEND_FOR_FILTER_RETURN:
+    case CMD_SEND_FOR_FILTER_AND_RETURN:
+    case CMD_FILTER_RESULT:
+    case CMD_NULL_MESSAGE:
         if (command.dest_id == 0)
         {
             auto route = fillMessageRouteInformation (command);

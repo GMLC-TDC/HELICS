@@ -1,12 +1,10 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 #ifndef HELICS_DELAYED_DESTRUCTOR_HPP_
 #define HELICS_DELAYED_DESTRUCTOR_HPP_
@@ -19,6 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <mutex>
 #include <thread>
 #include <vector>
+#include "TripWire.hpp"
 
 /** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
  * threading issues*/
@@ -29,7 +28,7 @@ class DelayedDestructor
     std::mutex destructionLock;
     std::vector<std::shared_ptr<X>> ElementsToBeDestroyed;
     std::function<void(std::shared_ptr<X> &ptr)> callBeforeDeleteFunction;
-
+    tripwire::TripWireDetector tripDetect;
   public:
     DelayedDestructor () = default;
     explicit DelayedDestructor (std::function<void(std::shared_ptr<X> &ptr)> callFirst)
@@ -45,6 +44,11 @@ class DelayedDestructor
             destroyObjects ();
             if (!ElementsToBeDestroyed.empty ())
             {
+                //short circuit if the tripline was triggered
+                if (tripDetect.isTripped())
+                {
+                    return;
+                }
                 if (ii > 4)
                 {
                     destroyObjects ();

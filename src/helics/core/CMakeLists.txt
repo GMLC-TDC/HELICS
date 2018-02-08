@@ -25,6 +25,7 @@ set(SRC_FILES
 	NetworkBrokerData.cpp
 	helicsVersion.cpp
 	helics-time.cpp
+	HandleManager.cpp
 )
 
 set(TESTCORE_SOURCE_FILES
@@ -99,6 +100,7 @@ set(INCLUDE_FILES
 	BasicHandleInfo.hpp
 	FilterFunctions.hpp
 	NetworkBrokerData.hpp
+	HandleManager.hpp
 )
 
 set(TESTCORE_HEADER_FILES

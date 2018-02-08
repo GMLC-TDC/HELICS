@@ -49,6 +49,7 @@ class ActionMessage
             : source (std::move (ai.source)), type (source), target (std::move (ai.target)), units (target),
               orig_source (std::move (ai.orig_source)), type_out (orig_source),
               original_dest (std::move (ai.original_dest)), messageID(ai.messageID) {};
+        ~AdditionalInfo() = default;
         template <class Archive>
         void save (Archive &ar) const
         {

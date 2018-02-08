@@ -204,9 +204,9 @@ public:
     static void closeLogger(const std::string &loggerName = "");
    /** sends a message to the default Logger*/
     static void logMessage(const std::string &message);
-
+    /*destructor*/
     virtual ~LoggerManager();
-
+    /** get the name of the logger*/
     const std::string &getName() const
     {
         return name;

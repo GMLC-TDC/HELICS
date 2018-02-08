@@ -95,7 +95,6 @@ BOOST_AUTO_TEST_CASE(additional_searchTerm_tests)
 	BOOST_CHECK(!Mvec.addSearchTerm(1241, "none"));
 }
 
-
 BOOST_AUTO_TEST_CASE(iterator_tests)
 {
 	DualMappedVector<double,std::string, int64_t> Mvec;
@@ -163,4 +162,4 @@ BOOST_AUTO_TEST_CASE(remove_tests)
 	BOOST_CHECK_EQUAL(MV3.size(), 0);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END ()

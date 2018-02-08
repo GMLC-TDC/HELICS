@@ -1,22 +1,19 @@
-#pragma once
-
-
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #pragma once
 #include <unordered_map>
 #include <string>
 #include <vector>
 #include <type_traits>
 #include <algorithm>
+#include "MapTraits.hpp"
 
 /** class to create a searchable vector by defined unique indices.
 The result object can be indexed multiple ways both by searching using indices or by numerical index
@@ -268,8 +265,8 @@ public:
 
 private:
     std::vector<VType> dataStorage; //!< primary storage for data
-    std::unordered_map<searchType1, size_t> lookup1;  //!< lookup with searchType1
-    std::unordered_map<searchType2, size_t> lookup2;  //!< lookup with searchType2
+    std::conditional_t<is_easily_hashable<searchType1>::value, std::unordered_map<searchType1, size_t>, std::map<searchType1, size_t>> lookup1;	//!< map to lookup the index
+    std::conditional_t<is_easily_hashable<searchType2>::value, std::unordered_map<searchType2, size_t>, std::map<searchType2, size_t>> lookup2;	//!< map to lookup the index
 };
 
 

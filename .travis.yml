@@ -78,7 +78,9 @@ jobs:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
-      env: MATRIX_EVAL="COMPILER=g++-4.9 && CC=gcc-4.9 && CXX=g++-4.9"
+      env:
+        - MATRIX_EVAL="COMPILER=g++-4.9 && CC=gcc-4.9 && CXX=g++-4.9"
+        - MINIMUM_DEPENDENCIES=true
 
     - <<: *linux_base
       compiler: clang

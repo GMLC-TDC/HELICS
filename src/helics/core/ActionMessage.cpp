@@ -420,8 +420,9 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_time_request, "time_request"},
   {action_message_def::action_t::cmd_send_message, "send_message"},
   {action_message_def::action_t::cmd_send_for_filter, "send_for_filter"},
-  {action_message_def::action_t::cmd_send_for_filter_op, "send_for_filter_op"},
+  {action_message_def::action_t::cmd_filter_result, "result from running a filter"},
   {action_message_def::action_t::cmd_send_for_filter_return, "send_for_filter_return"},
+  {action_message_def::action_t::cmd_null_message, "null message" },
 
   {action_message_def::action_t::cmd_reg_pub, "reg_pub"},
   {action_message_def::action_t::cmd_notify_pub, "notify_pub"},
@@ -500,7 +501,14 @@ std::string prettyPrintString (const ActionMessage &command)
                       .str ());
         break;
     case CMD_FED_CONFIGURE:
-
+        break;
+    case CMD_SEND_MESSAGE:
+        ret.push_back(':');
+        ret.append((boost::format("From (%s)(%d:%d) To %s size %d at %f") % command.info().orig_source%command.source_id % command.source_handle %
+            command.info().target % command.payload.size() % static_cast<double> (command.actionTime))
+            .str());
+        break;
+        break;
     default:
         break;
     }
