@@ -205,7 +205,7 @@ namespace helics
     private:
         int loadArguments(boost::program_options::variables_map &vm_map);
         /** load from a jsonString 
-        @param either a json filename or a string containing json
+        @param either a JSON filename or a string containing JSON
         */
         void loadJsonFile(const std::string &jsonString);
         /** load a text file*/

@@ -32,7 +32,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <cstring>
 #include <fstream>
 #include <functional>
-#include <boost/program_options.hpp>
 
 #include "../common/DelayedObjects.hpp"
 #include <boost/format.hpp>
@@ -2430,6 +2429,8 @@ void CommonCore::processCommand (ActionMessage &&command)
         {
             deliverMessage(command);
         }
+       
+    }
     break;
     default:
         if (isPriorityCommand (command))
