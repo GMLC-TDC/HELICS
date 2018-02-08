@@ -1,5 +1,4 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
@@ -9,34 +8,34 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "helics/application_api/ValueFederate.hpp"
-#include <algorithm>
-#include <fstream>
+#include <thread>
 #include <iostream>
-#include <map>
-#include <memory>
-#include <regex>
-#include <set>
-#include <stdexcept>
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
-#include "helics/core/helicsVersion.hpp"
+#include "helics/core/BrokerFactory.hpp"
+#include "helics/common/argParser.h"
 
-namespace po = boost::program_options;
-namespace filesystem = boost::filesystem;
-
-static bool argumentParser (int argc, const char * const *argv, po::variables_map &vm_map);
-
+static const helics::ArgDescriptors InfoArgs{
+    { "startbroker","start a broker with the specified arguments" },
+    { "target,t", "name of the target federate" }
+};
 
 int main (int argc, const char * const *argv)
 {
-    po::variables_map vm;
-    if (argumentParser (argc, argv, vm)) {
+    helics::FederateInfo fi("fed");
+    helics::variable_map vm;
+    auto parseResult = argumentParser(argc, argv, vm, InfoArgs);
+    fi.loadInfoFromArgs(argc, argv);
+    if (parseResult != 0)
+    {
         return 0;
     }
 
-    helics::FederateInfo fi ("fed");
-    fi.loadInfoFromArgs(argc, argv);
 	fi.logLevel = 5;
+    std::shared_ptr<helics::Broker> brk;
+    if (vm.count("startbroker") > 0)
+    {
+        brk = helics::BrokerFactory::create(fi.coreType, vm["startbroker"].as<std::string>());
+    }
+
     auto vFed = std::make_unique<helics::ValueFederate> (fi);
 
     auto id = vFed->registerGlobalPublication ("name", "type");
@@ -52,53 +51,13 @@ int main (int argc, const char * const *argv)
         std::cout << "processed time " << static_cast<double> (newTime) << "\n";
     }
     vFed->finalize ();
-
+    if (brk)
+    {
+        while (brk->isConnected())
+        {
+            std::this_thread::yield();
+        }
+        brk = nullptr;
+    }
     return 0;
-}
-
-bool argumentParser (int argc, const char * const *argv, po::variables_map &vm_map)
-{
-    po::options_description opt ("options");
-
-    // clang-format off
-    // input boost controls
-    opt.add_options()
-        ("help,h", "produce help message")
-        ("version", "produce a version string");
-
-    // clang-format on
-
-    po::variables_map cmd_vm;
-    try
-    {
-        po::store (po::command_line_parser (argc, argv).options (opt).run (), cmd_vm);
-    }
-    catch (std::exception &e)
-    {
-        std::cerr << e.what () << std::endl;
-        throw (e);
-    }
-
-    po::notify (cmd_vm);
-
-    // objects/pointers/variables/constants
-
-    // program options control
-    if (cmd_vm.count ("help") > 0)
-    {
-        std::cout << opt << '\n';
-        return true;
-    }
-
-    if (cmd_vm.count ("version") > 0)
-    {
-		std::cout << helics::helicsVersionString () << '\n';
-        return true;
-    }
-
-    po::store (po::command_line_parser (argc, argv).options (opt).run (), vm_map);
-
-    po::notify (vm_map);
-
-    return false;
 }

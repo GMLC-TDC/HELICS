@@ -39,7 +39,7 @@ _basic_env:
   if: branch IN (master, develop)
   os: osx
   compiler: clang
-        
+
 jobs:
   # On weekdays, the backlog for waiting OS X builds is huge
   fast_finish: true
@@ -49,11 +49,11 @@ jobs:
   include:
     # XCode 6.4, OS X 10.10
     - <<: *osx_base
-      env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=64 HOMEBREW_NO_AUTO_UPDATE=1"
+      env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && SHARED_LIB_EXT=dylib && TRAVIS_XCODE_VERSION=64 HOMEBREW_NO_AUTO_UPDATE=1"
       osx_image: xcode6.4
     # XCode 7.3, OS X 10.11
     - <<: *osx_base
-      env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73 HOMEBREW_NO_AUTO_UPDATE=1"
+      env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && SHARED_LIB_EXT=dylib && TRAVIS_XCODE_VERSION=73 HOMEBREW_NO_AUTO_UPDATE=1"
       osx_image: xcode7.3
 
     # Built without errors on my clone from one of the changes made
@@ -69,7 +69,7 @@ jobs:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6"
+      env: MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6 && SHARED_LIB_EXT=so"
 
     - <<: *linux_base
       addons:
@@ -79,7 +79,7 @@ jobs:
           packages:
             - g++-4.9
       env:
-        - MATRIX_EVAL="COMPILER=g++-4.9 && CC=gcc-4.9 && CXX=g++-4.9"
+        - MATRIX_EVAL="COMPILER=g++-4.9 && CC=gcc-4.9 && CXX=g++-4.9 && SHARED_LIB_EXT=so"
         - MINIMUM_DEPENDENCIES=true
 
     - <<: *linux_base
@@ -91,18 +91,19 @@ jobs:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
-      env: MATRIX_EVAL="COMPILER=clang++-3.6 && CC='ccache clang-3.6 -Qunused-arguments -fcolor-diagnostics' && CXX='ccache clang++-3.6 -Qunused-arguments -fcolor-diagnostics'
+      env: MATRIX_EVAL="SHARED_LIB_EXT=so && COMPILER=clang++-3.6 && CC='ccache clang-3.6 -Qunused-arguments -fcolor-diagnostics' && CXX='ccache clang++-3.6 -Qunused-arguments -fcolor-diagnostics'
+
 
    # ------------------------------------------------
    # Jobs for daily valgrind and code coverage tests
    # ------------------------------------------------
     - <<: *daily_linux
       env:
-        - MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6"
+        - MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6 && SHARED_LIB_EXT=so"
         - RUN_VALGRIND=true
     - <<: *daily_linux
       env:
-        - MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6"
+        - MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6 && SHARED_LIB_EXT=so"
         - RUN_COVERAGE=true
 
 branches:
@@ -119,7 +120,7 @@ install:
 script:
   - mkdir build && cd build
   - export HELICS_DEPENDENCY_FLAGS="-DZeroMQ_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/zmq -DBOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost"
-  - export HELICS_OPTION_FLAGS="-DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON -DTRAVIS_TESTS_ENABLE=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON"
+  - export HELICS_OPTION_FLAGS="-DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON -DTRAVIS_TESTS_ENABLE=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.${SHARED_LIB_EXT} -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/"
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
   - make -j2
   # For controlling which tests get run:
@@ -132,6 +133,9 @@ script:
   # 6 = travis-tests
   # - ctest --verbose --timeout 120 -I 0,0,0,1
   - ctest --verbose --timeout 120 -I 0,0,0,6
+  - export PYTHONPATH="$(pwd)/swig/python"
+  - python3 -m helics
+  - python3 -m pytest -v ../tests/python_helics
 
 notifications:
     email: false

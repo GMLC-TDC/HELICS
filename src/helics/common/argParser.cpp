@@ -13,54 +13,61 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <fstream>
 #include <iostream>
 #include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
 
 namespace helics
 {
-void argumentParser (int argc,
-                     const char *const *argv,
-                     boost::program_options::variables_map &vm_map,
-                     const ArgDescriptors &additionalArgs)
+namespace po = boost::program_options;
+
+static void loadArguments (po::options_description &config, const ArgDescriptors &argDefinitions)
 {
-    namespace po = boost::program_options;
+    for (auto &addArg : argDefinitions)
+    {
+        switch (addArg.type_)
+        {
+        case ArgDescriptor::arg_type_t::flag_type:
+            config.add_options() (addArg.arg_.c_str(), addArg.desc_.c_str());
+            break;
+        case ArgDescriptor::arg_type_t::string_type:
+            config.add_options() (addArg.arg_.c_str(), po::value<std::string>(), addArg.desc_.c_str());
+            break;
+        case ArgDescriptor::arg_type_t::int_type:
+            config.add_options() (addArg.arg_.c_str(), po::value<int>(), addArg.desc_.c_str());
+            break;
+        case ArgDescriptor::arg_type_t::double_type:
+            config.add_options() (addArg.arg_.c_str(), po::value<double>(), addArg.desc_.c_str());
+            break;
+        case ArgDescriptor::arg_type_t::vector_string:
+            config.add_options() (addArg.arg_.c_str(), po::value<std::vector<std::string>>(),
+                addArg.desc_.c_str());
+            break;
+        case ArgDescriptor::arg_type_t::vector_double:
+            config.add_options() (addArg.arg_.c_str(), po::value<std::vector<double>>(),
+                addArg.desc_.c_str());
+            break;
+        }
+    }
+}
+
+int argumentParser (int argc,
+                     const char *const *argv,
+                     variable_map &vm_map,
+                     const ArgDescriptors &argDefinitions, const std::string &posName)
+{
     po::options_description cmd_only ("command line only");
     po::options_description config ("configuration");
     po::options_description hidden ("hidden");
 
+    
     // clang-format off
 	// input boost controls
 	cmd_only.add_options()
 		("help,?", "produce help message")
+        ("version,v","display a version string")
 		("config-file", po::value<std::string>(), "specify a configuration file to use");
-
-	for (auto &addArg : additionalArgs)
-	{
-		if (addArg.type_.empty())
-		{
-			config.add_options()
-				(addArg.flag_.c_str(), addArg.desc_.c_str());
-		}
-		else if (addArg.type_ == "string")
-		{
-			config.add_options()
-				(addArg.flag_.c_str(), po::value <std::string>(), addArg.desc_.c_str());
-		}
-		else if (addArg.type_ == "int")
-		{
-			config.add_options()
-				(addArg.flag_.c_str(), po::value <int>(), addArg.desc_.c_str());
-		}
-		else if (addArg.type_ == "double")
-		{
-			config.add_options()
-				(addArg.flag_.c_str(), po::value <double>(), addArg.desc_.c_str());
-		}
-		else if (addArg.type_ == "vector_string")
-		{
-			config.add_options()
-				(addArg.flag_.c_str(), po::value <std::vector<std::string>>(), addArg.desc_.c_str());
-		}
-	}
     // clang-format on
+
+    loadArguments (config, argDefinitions);
 
     po::options_description cmd_line ("command line options");
     po::options_description config_file ("configuration file options");
@@ -70,13 +77,27 @@ void argumentParser (int argc,
     config_file.add (config);
     visible.add (cmd_only).add (config);
 
-    // po::positional_options_description p;
-    // p.add("input", -1);
-
-    po::variables_map cmd_vm;
+    if (!posName.empty())
+    {
+        hidden.add_options() (posName.c_str(), po::value<std::string>(), "positional argument");
+        cmd_line.add(hidden);
+        config_file.add(hidden);
+    }
+    
+    variable_map cmd_vm;
     try
     {
-        po::store (po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered ().run (), cmd_vm);
+        if (posName.empty())
+        {
+            po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().run(), cmd_vm);
+        }
+        else
+        {
+            po::positional_options_description p;
+            p.add(posName.c_str(), -1);
+            po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().positional(p).run(), cmd_vm);
+        }
+        
     }
     catch (std::exception &e)
     {
@@ -92,10 +113,23 @@ void argumentParser (int argc,
     if (cmd_vm.count ("help") > 0)
     {
         std::cout << visible << '\n';
-        return;
+        return helpReturn;
     }
-
-    po::store (po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered ().run (), vm_map);
+    if (cmd_vm.count("version") > 0)
+    {
+        return versionReturn;
+    }
+    if (posName.empty())
+    {
+        po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().run(), vm_map);
+    }
+    else
+    {
+        po::positional_options_description p;
+        p.add(posName.c_str(), -1);
+        po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().positional(p).run(), vm_map);
+    }
+   
 
     if (cmd_vm.count ("config-file") > 0)
     {
@@ -114,6 +148,7 @@ void argumentParser (int argc,
     }
 
     po::notify (vm_map);
+    return 0;
 }
 
 }  // namespace helics

@@ -23,17 +23,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <set>
 #include <stdexcept>
 #include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
+#include "../common/argParser.h"
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "PrecHelper.h"
 #include "recorder.h"
 #include <thread>
 
-namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
-
-static int recorderArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
 namespace helics
 {
@@ -42,11 +39,27 @@ Recorder::Recorder (FederateInfo &fi) : fed (std::make_shared<CombinationFederat
     fed->setFlag (OBSERVER_FLAG);
 }
 
+static const ArgDescriptors InfoArgs{
+    {"stop", "the time to stop recording"},
+    {"tags",ArgDescriptor::arg_type_t::vector_string,"tags to record, this argument may be specified any number of times"},
+    {"endpoints",ArgDescriptor::arg_type_t::vector_string,"endpoints to capture, this argument may be specified multiple time"},
+    {"sourceclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture generated packets from, this argument may be specified multiple time"},
+    {"destclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture all packets with the specified endpoint as a destination, this argument may be specified multiple time"},
+    {"clone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to clone all packets to and from"},
+    {"capture", ArgDescriptor::arg_type_t::vector_string,"capture all the publications of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list"},
+    {"output,o","the output file for recording the data"},
+    {"mapfile", "write progress to a memory mapped file"}
+};
+
 Recorder::Recorder (int argc, char *argv[])
 {
-    boost::program_options::variables_map vm_map;
-    int res = recorderArgumentParser (argc, argv, vm_map);
-    if (res != 0)
+    variable_map vm_map;
+    auto res = argumentParser(argc, argv, vm_map, InfoArgs, "input");
+    if (res == versionReturn)
+    {
+        std::cout << helics::helicsVersionString() << '\n';
+    }
+    if (res < 0)
     {
         deactivated = true;
         return;
@@ -675,98 +688,10 @@ int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
         outFileName = vm_map["output"].as<std::string> ();
     }
 
+    if (vm_map.count("stop") > 0)
+    {
+        autoStopTime = loadTimeFromString(vm_map["stop"].as<std::string>());
+    }
     return 0;
 }
-}
-
-int recorderArgumentParser (int argc, const char *const *argv, po::variables_map &vm_map)
-{
-    po::options_description cmd_only ("command line only");
-    po::options_description config ("configuration");
-    po::options_description hidden ("hidden");
-
-    // clang-format off
-    // input boost controls
-    cmd_only.add_options () 
-		("help,?", "produce help message")
-		("version,v","helics version number")
-		("config-file", po::value<std::string> (),"specify a configuration file to use");
-
-
-    config.add_options()
-        ("stop", po::value<double>(), "the time to stop recording")
-        ("tags",po::value<std::vector<std::string>>(),"tags to record, this argument may be specified any number of times")
-        ("endpoints",po::value<std::vector<std::string>>(),"endpoints to capture, this argument may be specified multiple time")
-        ("sourceclone", po::value<std::vector<std::string>>(), "existing endpoints to capture generated packets from, this argument may be specified multiple time")
-        ("destclone", po::value<std::vector<std::string>>(), "existing endpoints to capture all packets with the specified endpoint as a destination, this argument may be specified multiple time")
-        ("clone", po::value<std::vector<std::string>>(), "existing endpoints to clone all packets to and from")
-        ("capture", po::value < std::vector<std::string>>(),"capture all the publications of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list")
-		("output,o",po::value<std::string>(),"the output file for recording the data")
-		("mapfile", po::value<std::string>(), "write progress to a memory mapped file");
-
-    hidden.add_options () ("input", po::value<std::string> (), "input file");
-    // clang-format on
-
-    po::options_description cmd_line ("command line options");
-    po::options_description config_file ("configuration file options");
-    po::options_description visible ("allowed options");
-
-    cmd_line.add (cmd_only).add (config).add (hidden);
-    config_file.add (config).add (hidden);
-    visible.add (cmd_only).add (config);
-
-    po::positional_options_description p;
-    p.add ("input", -1);
-
-    po::variables_map cmd_vm;
-    try
-    {
-        po::store (
-          po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered ().positional (p).run (),
-          cmd_vm);
-    }
-    catch (std::exception &e)
-    {
-        std::cerr << e.what () << std::endl;
-        throw (e);
-    }
-
-    po::notify (cmd_vm);
-
-    // objects/pointers/variables/constants
-
-    // program options control
-    if (cmd_vm.count ("help") > 0)
-    {
-        std::cout << visible << '\n';
-        return (-1);
-    }
-
-    if (cmd_vm.count ("version") > 0)
-    {
-        std::cout << helics::helicsVersionString () << '\n';
-        return (-1);
-    }
-
-    po::store (po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered ().positional (p).run (),
-               vm_map);
-
-    if (cmd_vm.count ("config-file") > 0)
-    {
-        std::string config_file_name = cmd_vm["config-file"].as<std::string> ();
-        if (!filesystem::exists (config_file_name))
-        {
-            std::cerr << "config file " << config_file_name << " does not exist\n";
-            throw (std::invalid_argument ("unknown config file"));
-        }
-        else
-        {
-            std::ifstream fstr (config_file_name.c_str ());
-            po::store (po::parse_config_file (fstr, config_file), vm_map);
-            fstr.close ();
-        }
-    }
-
-    po::notify (vm_map);
-    return 0;
 }

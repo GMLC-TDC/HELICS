@@ -32,7 +32,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <cstring>
 #include <fstream>
 #include <functional>
-#include <boost/program_options.hpp>
 
 #include "../common/DelayedObjects.hpp"
 #include <boost/format.hpp>
@@ -1408,8 +1407,15 @@ ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage 
                 {
                     // deal with local source filters
                     auto tempMessage = createMessageFromCommand (std::move (m));
-                    tempMessage = filtFunc->sourceFilters[ii]->filterOp->process (std::move (tempMessage));
-                    m = ActionMessage (std::move (tempMessage));
+                    if (tempMessage)
+                    {
+                        tempMessage = filtFunc->sourceFilters[ii]->filterOp->process(std::move(tempMessage));
+                        m = ActionMessage(std::move(tempMessage));
+                    }
+                    else
+                    {
+                        m = CMD_IGNORE;
+                    }
                 }
                 else
                 {
