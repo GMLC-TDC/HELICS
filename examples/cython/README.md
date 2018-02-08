@@ -1,5 +1,9 @@
 # HELICS python extension
 
+**Note**: As of HELICS v1.0.0, the recommended way to use HELICS in Python is using the SWIG generated extension.
+The Cython extension is deprecated and will not be maintained.
+The following code is left here as an example of how an integration with Cython may work.
+
 ### Install instructions
 
 ```bash

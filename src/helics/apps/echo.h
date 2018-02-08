@@ -106,6 +106,11 @@ namespace helics
         {
             return endpoints.size();
         }
+        /** check if the Player is ready to run*/
+        bool isActive() const
+        {
+            return !deactivated;
+        }
     private:
         int loadArguments(boost::program_options::variables_map &vm_map);
        
@@ -116,6 +121,7 @@ namespace helics
         Time delayTime = timeZero;  //!< respond to each message with the specified delay
         Time stopTime = Time::maxVal(); //!< the time the Player should stop
         size_t echoCounter = 0; //!< the current message index
+        bool deactivated = false;
     };
 }
 

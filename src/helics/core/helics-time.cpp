@@ -54,7 +54,7 @@ helics::Time loadTimeFromString (const std::string &timeString)
 {
     size_t pos;
     double val = std::stod (timeString, &pos);
-    if (pos == std::string::npos)
+    if (pos >= timeString.size())
     {
         return Time (val);
     }
@@ -66,7 +66,7 @@ helics::Time loadTimeFromString(const std::string &timeString,timeUnits defUnits
 {
     size_t pos;
     double val = std::stod(timeString, &pos);
-    if (pos == std::string::npos)
+    if (pos >= timeString.size())
     {
         return Time(val*toSecondMultiplier(defUnits));
     }
