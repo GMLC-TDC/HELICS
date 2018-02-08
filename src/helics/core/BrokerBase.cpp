@@ -26,6 +26,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/uuid/uuid.hpp>  // uuid class
 #include <boost/uuid/uuid_generators.hpp>  // generators
 #include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
+#include "../common/argParser.h"
 
 static inline std::string gen_id ()
 {
@@ -39,104 +40,6 @@ static inline std::string gen_id ()
     return pid_str + "-" + uuid_str;
 }
 
-static void argumentParser (int argc, const char *const *argv, boost::program_options::variables_map &vm_map)
-{
-    namespace po = boost::program_options;
-    po::options_description cmd_only ("command line only");
-    po::options_description config ("configuration");
-    po::options_description hidden ("hidden");
-
-    // clang-format off
-	// input boost controls
-	cmd_only.add_options()
-		("help,h", "produce help message")
-		("version,v", "helics version number")
-		("config-file", po::value<std::string>(), "specify a configuration file to use");
-
-
-    config.add_options()
-        ("name,n", po::value<std::string>(), "name of the broker/core")
-        ("federates", po::value<int>(), "the minimum number of federates that will be connecting")
-        ("minfed", po::value<int>(), "the minimum number of federates that will be connecting")
-        ("maxiter", po::value<int>(), "maximum number of iterations")
-        ("logfile", po::value<std::string>(), "the file to log message to")
-        ("loglevel", po::value<int>(), "the level which to log the higher this is set to the more gets logs (-1) for no logging")
-        ("fileloglevel", po::value<int>(), "the level at which messages get sent to the file")
-        ("consoleloglevel", po::value<int>(), "the level at which message get sent to the console")
-        ("minbroker", po::value<int>(), "the minimum number of core/brokers that need to be connected (ignored in cores)")
-        ("identifier", po::value<std::string>(), "name of the core/broker")
-        ("tick", po::value<int>(), "number of milliseconds per tick counter if there is no broker communication for 2 ticks then secondary actions are taken")
-        ("dumplog","capture a record of all messages and dump a complete log to file or console on termination")
-        ("timeout", po::value<int>(), "milliseconds to wait for a broker connection");
-
-
-	hidden.add_options() ("min", po::value<int>(), "minimum number of federates");
-
-    // clang-format on
-
-    po::options_description cmd_line ("command line options");
-    po::options_description config_file ("configuration file options");
-    po::options_description visible ("allowed options");
-
-    cmd_line.add (cmd_only).add (config).add (hidden);
-    config_file.add (config);
-    visible.add (cmd_only).add (config);
-
-    po::positional_options_description p;
-    p.add ("min", -1);
-
-    po::variables_map cmd_vm;
-    try
-    {
-        po::store (
-          po::command_line_parser (argc, argv).options (cmd_line).positional (p).allow_unregistered ().run (),
-          cmd_vm);
-    }
-    catch (std::exception &e)
-    {
-        std::cerr << e.what () << std::endl;
-        throw (e);
-    }
-
-    po::notify (cmd_vm);
-
-    // objects/pointers/variables/constants
-
-    // program options control
-    if (cmd_vm.count ("help") > 0)
-    {
-        std::cout << visible << '\n';
-        return;
-    }
-
-    if (cmd_vm.count ("version") > 0)
-    {
-        std::cout << helics::helicsVersionString () << '\n';
-        return;
-    }
-
-    po::store (po::command_line_parser (argc, argv).options (cmd_line).positional (p).allow_unregistered ().run (),
-               vm_map);
-
-    if (cmd_vm.count ("config-file") > 0)
-    {
-        std::string config_file_name = cmd_vm["config-file"].as<std::string> ();
-        if (!boost::filesystem::exists (config_file_name))
-        {
-            std::cerr << "config file " << config_file_name << " does not exist\n";
-            throw (std::invalid_argument ("unknown config file"));
-        }
-        else
-        {
-            std::ifstream fstr (config_file_name.c_str ());
-            po::store (po::parse_config_file (fstr, config_file), vm_map);
-            fstr.close ();
-        }
-    }
-
-    po::notify (vm_map);
-}
-
 namespace helics
 {
 BrokerBase::BrokerBase () noexcept {}
@@ -148,10 +51,9 @@ BrokerBase::~BrokerBase () { joinAllThreads (); }
 void BrokerBase::displayHelp ()
 {
     std::cout << " Global options for all Brokers:\n";
-    namespace po = boost::program_options;
-    po::variables_map vm;
+    variable_map vm;
     const char *const argV[] = {"", "--help"};
-    argumentParser (2, argV, vm);
+    argumentParser(2, argV, vm, {});
 }
 
 void BrokerBase::joinAllThreads ()
@@ -163,15 +65,37 @@ void BrokerBase::joinAllThreads ()
     }
 }
 
+static const ArgDescriptors extraArgs{
+    {"name,n", "name of the broker/core"},
+    {"federates", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
+    {"minfed", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
+    {"maxiter", ArgDescriptor::arg_type_t::int_type, "maximum number of iterations"},
+    {"logfile", "the file to log message to"},
+    {"loglevel", ArgDescriptor::arg_type_t::int_type, "the level which to log the higher this is set to the more gets logs (-1) for no logging"},
+    {"fileloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which messages get sent to the file"},
+    {"consoleloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which message get sent to the console"},
+    {"minbrokers", ArgDescriptor::arg_type_t::int_type, "the minimum number of core/brokers that need to be connected (ignored in cores)"},
+    {"identifier", "name of the core/broker"},
+    {"tick", "number of milliseconds per tick counter if there is no broker communication for 2 ticks then secondary actions are taken  (can also be entered as a time like '10s' or '45ms')"},
+    {"dumplog",ArgDescriptor::arg_type_t::flag_type,"capture a record of all messages and dump a complete log to file or console on termination"},
+    {"timeout", "milliseconds to wait for a broker connection (can also be entered as a time like '10s' or '45ms') "}
+};
+
 void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
 {
-    namespace po = boost::program_options;
-
-    po::variables_map vm;
-    argumentParser (argc, argv, vm);
+    variable_map vm;
+    argumentParser (argc, argv, vm,extraArgs,"min");
     if (vm.count ("min") > 0)
     {
-        minFederateCount = vm["min"].as<int> ();
+        try
+        {
+            minFederateCount = std::stod(vm["min"].as<std::string>());
+        }
+        catch (const std::invalid_argument &ia)
+        {
+            std::cerr << vm["min"].as<std::string>() << " is not a valid minimum federate count\n";
+        }
+        
     }
     if (vm.count ("minfed") > 0)
     {
@@ -181,9 +105,9 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     {
         minFederateCount = vm["federates"].as<int> ();
     }
-    if (vm.count ("minbroker") > 0)
+    if (vm.count ("minbrokers") > 0)
     {
-        minBrokerCount = vm["minbroker"].as<int> ();
+        minBrokerCount = vm["minbrokers"].as<int> ();
     }
     if (vm.count ("maxiter") > 0)
     {
@@ -213,11 +137,13 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     }
     if (vm.count ("timeout") > 0)
     {
-        timeout = vm["timeout"].as<int> ();
+        auto time_out=loadTimeFromString(vm["timeout"].as<std::string> (),timeUnits::ms);
+        timeout = time_out.toCount(timeUnits::ms);
     }
     if (vm.count ("tick") > 0)
     {
-        tickTimer = vm["tick"].as<int> ();
+        auto time_tick = loadTimeFromString(vm["tick"].as<std::string>(), timeUnits::ms);
+        tickTimer = time_tick.toCount(timeUnits::ms);
     }
     if (!noAutomaticID)
     {

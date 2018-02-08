@@ -26,19 +26,17 @@ TestCore::TestCore (const std::string &core_name) : CommonCore (core_name) {}
 
 TestCore::TestCore (std::shared_ptr<CoreBroker> nbroker) : tbroker (std::move (nbroker)) {}
 using namespace std::string_literals;
-static const ArgDescriptors extraArgs{{"brokername"s, "string"s, "identifier for the broker-same as broker"s},
-                                      {"broker,b"s, "string"s, "identifier for the broker"s},
-                                      {"broker_address", "string"s, "location of the broker i.e network address"},
-                                      {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
+static const ArgDescriptors extraArgs{{"brokername"s, "identifier for the broker-same as broker"s},
+                                      {"broker,b"s, "identifier for the broker"s},
+                                      {"broker_address", "location of the broker i.e network address"},
+                                      {"brokerinit"s, "the initialization string for the broker"s}};
 
 void TestCore::initializeFromArgs (int argc, const char *const *argv)
 {
-    namespace po = boost::program_options;
     bool exp = false;
     if (initialized_.compare_exchange_strong (exp, true))
     {
-        po::variables_map vm;
-
+        variable_map vm;
         argumentParser (argc, argv, vm, extraArgs);
 
         if (vm.count ("broker") > 0)
