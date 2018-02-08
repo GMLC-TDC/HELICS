@@ -17,10 +17,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <vector>
 #include <functional>
 #include <algorithm>
+#include "MapTraits.hpp"
 
 /** class merging a vector of pointer with a map that can be used to lookup specific values
 */
-template <class VType, class searchType1, class searchType2, class mapType1=std::unordered_map<searchType1,size_t>, class mapType2=std::unordered_map<searchType2,size_t>>
+template <class VType, class searchType1, class searchType2>
 class DualMappedPointerVector
 {
 	static_assert(!std::is_same<searchType1, searchType2>::value, "searchType1 and searchType2 cannot be the same type");
@@ -266,7 +267,7 @@ public:
 	auto begin() const { return dataStorage.cbegin(); }
 	/** get a constant iterator to the end of the data*/
 	auto end() const { return dataStorage.cend(); }
-	/** get the numer of elements in the data*/
+	/** get the number of elements in the data*/
 	auto size() const { return dataStorage.size(); }
 	/** remove all elements from the data*/
 	void clear()
@@ -278,7 +279,7 @@ public:
 
 private:
 	std::vector<std::unique_ptr<VType>> dataStorage; //!< storage for the pointers
-	mapType1 lookup1;	//!< map to lookup the index
-	mapType2 lookup2;	//!< map to lookup the index
+	std::conditional_t<is_easily_hashable<searchType1>::value,std::unordered_map<searchType1,size_t>,std::map<searchType1,size_t>> lookup1;	//!< map to lookup the index
+    std::conditional_t<is_easily_hashable<searchType2>::value, std::unordered_map<searchType2, size_t>, std::map<searchType2, size_t>> lookup2;	//!< map to lookup the index
 };
 
