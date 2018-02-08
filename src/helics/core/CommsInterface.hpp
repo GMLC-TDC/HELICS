@@ -17,7 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <atomic>
 #include <functional>
 #include <thread>
-
+#include "../common/TripWire.hpp"
 namespace helics
 {
 class NetworkBrokerData;
@@ -108,6 +108,8 @@ class CommsInterface
     virtual void closeReceiver () = 0;  //!< function to instruct the receiver loop to close
     virtual void reconnectTransmitter ();  //!< function to reconnect the transmitter
     virtual void reconnectReceiver ();  //!< function to reconnect the receiver
+    
+    tripwire::TripWireDetector tripDetector;  //!< try to detect if everything is shutting down
 };
 
 template <class X>

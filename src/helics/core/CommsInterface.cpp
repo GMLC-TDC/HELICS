@@ -132,6 +132,12 @@ bool CommsInterface::connect ()
 void CommsInterface::setName (const std::string &name_) { name = name_; }
 void CommsInterface::disconnect ()
 {
+    if (tripDetector.isTripped())
+    {
+        rx_status = connection_status::terminated;
+        tx_status = connection_status::terminated;
+        return;
+    }
     if (rx_status.load () <= connection_status::connected)
     {
         closeReceiver ();
@@ -155,6 +161,13 @@ void CommsInterface::disconnect ()
             std::cerr << "unable to terminate connection\n";
             break;
         }
+        //check the trip detector
+        if (tripDetector.isTripped())
+        {
+            rx_status = connection_status::terminated;
+            tx_status = connection_status::terminated;
+            return;
+        }
     }
     cnt = 0;
     while (tx_status.load () <= connection_status::connected)
@@ -170,6 +183,13 @@ void CommsInterface::disconnect ()
         {
             std::cerr << "unable to terminate connection\n";
             break;
+        }
+        //check the trip detector
+        if (tripDetector.isTripped())
+        {
+            rx_status = connection_status::terminated;
+            tx_status = connection_status::terminated;
+            return;
         }
     }
 }
@@ -187,7 +207,7 @@ bool CommsInterface::reconnect ()
         ++cnt;
         if (cnt == 400)  // Eventually give up
         {
-            std::cerr << "unable to terminate connection\n";
+            std::cerr << "unable to reconnect\n";
             break;
         }
     }
@@ -198,7 +218,7 @@ bool CommsInterface::reconnect ()
         ++cnt;
         if (cnt == 400)
         {
-            std::cerr << "unable to terminate connection\n";
+            std::cerr << "unable to reconnect\n";
             break;
         }
     }

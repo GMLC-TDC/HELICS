@@ -35,6 +35,8 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
+    BOOST_REQUIRE(fFed);
+    BOOST_REQUIRE(mFed);
 
     auto p1 = mFed->registerGlobalEndpoint ("port1");
     auto p2 = mFed->registerGlobalEndpoint ("port2");
@@ -96,6 +98,8 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
+    BOOST_REQUIRE(fFed);
+    BOOST_REQUIRE(mFed);
 
     auto p1 = mFed->registerGlobalEndpoint ("port1");
     auto p2 = mFed->registerGlobalEndpoint ("port2");
