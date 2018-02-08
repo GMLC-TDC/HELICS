@@ -117,8 +117,21 @@ IF (BUILD_MATLAB OR USE_BOOST_STATIC_LIBS)
   set(BOOST_STATIC ON)
 	  
 ENDIF ()
+# -------------------------------------------------------------
+# add coverage target
+# -------------------------------------------------------------
+ option (TEST_CODE_COVERAGE "Build a target for testing code coverage" OFF)
+ if (TEST_CODE_COVERAGE)
+ include(CodeCoverage)
 
+ set(COVERAGE_EXCLUDES 'ThirdParty/*' 'tests/*' 'swig/*' 'examples/*')
+ add_compile_options(${COVERAGE_COMPILER_FLAGS})
+  SETUP_TARGET_FOR_COVERAGE(
+     NAME helics_coverage                    # New target name
+     EXECUTABLE CTest # Executable in PROJECT_BINARY_DIR
+	)
 
+ endif(TEST_CODE_COVERAGE)
 # -------------------------------------------------------------
 # add threading support
 # -------------------------------------------------------------

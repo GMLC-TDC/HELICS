@@ -1,5 +1,5 @@
 
-if (STRICT_EXAMPLE_COMPILATION)
+if (EXAMPLES_WARNINGS_AS_ERROR)
 #the examples had better compile without warnings otherwise they should not be allowed
 IF(WIN32)
 IF (MSVC)
