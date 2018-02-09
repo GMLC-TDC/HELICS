@@ -29,6 +29,7 @@ inline int helicsVersionMajor () { return HELICS_VERSION_MAJOR; }
 inline int helicsVersionMinor () { return HELICS_VERSION_MINOR; }
 /** get the patch number*/
 inline int helicsVersionPatch () { return HELICS_VERSION_PATCH; }
-}
+
+} //namespace helics
 
 #endif /*_HELICS_VERSION_*/
