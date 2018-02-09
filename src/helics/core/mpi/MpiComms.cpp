@@ -25,7 +25,7 @@ MpiComms::MpiComms ()
 {
     if (mpiCommsExists)
     {
-        printf("WARNING: MPIComms object already created, unexpected results may occur\n");
+        std::cout << "WARNING: MPIComms object already created, unexpected results may occur\n" << std::endl;
     }
     std::cout << "MpiComms()" << std::endl;
     initMPI();
@@ -37,9 +37,8 @@ MpiComms::MpiComms(const int &brokerRank)
 {
     if (mpiCommsExists)
     {
-        printf("WARNING: MPIComms object already created, unexpected results may occur\n");
+        std::cout << "WARNING: MPIComms object already created, unexpected results may occur\n" << std::endl;
     }
-    printf("MpiComms (%d)\n", brokerRank);
     std::cout << "MpiComms(" << std::to_string(brokerRank) << ")" << std::endl;
     initMPI();
     mpiCommsExists = true;
@@ -94,6 +93,13 @@ bool MpiComms::initMPI()
 }
 
 void MpiComms::serializeSendMPI(std::vector<char> message, int dest, int tag, MPI_Comm comm) {
+    std::cout << "serializeSendMPI(" << dest << "," << tag << "," << comm << ")" << std::endl;
+    std::cout << "\t" << std::hex;
+    for (int i = 0; i < message.size(); i++)
+    {
+        std::cout << std::hex << (int)message[i];
+    }
+    std::cout << std::dec << std::endl;
     std::lock_guard<std::mutex> lock(mpiSerialMutex);
     MPI_Request req;
     MPI_Isend(message.data(), message.size(), MPI_CHAR, dest, tag, comm, &req);
@@ -103,31 +109,43 @@ void MpiComms::serializeSendMPI(std::vector<char> message, int dest, int tag, MP
     {
         MPI_Test(&req, &message_sent, MPI_STATUS_IGNORE);
     }
+    std::cout << "message sent" << std::endl;
 }
 
 std::vector<char> MpiComms::serializeReceiveMPI(int src, int tag, MPI_Comm comm) {
+    std::cout << "serializeReceiveMPI(" << src << "," << tag << "," << comm << ")" << std::endl;
     int message_waiting = false;
     MPI_Status status;
-    MPI_Iprobe(src, tag, comm, &message_waiting, &status);
 
-    if (message_waiting == true)
+    while (!message_waiting)
     {
-        std::lock_guard<std::mutex> lock(mpiSerialMutex);
-        int recv_size;
-        std::vector<char> buffer;
-        MPI_Get_count(&status, MPI_CHAR, &recv_size);
-        buffer.resize(recv_size);
-        MPI_Request req;
-        MPI_Irecv(buffer.data(), buffer.capacity(), MPI_CHAR, src, tag, comm, &req);
+        MPI_Iprobe(src, tag, comm, &message_waiting, &status);
 
-        int message_received = false;
-        while (!message_received)
+        if (message_waiting == true)
         {
-            MPI_Test(&req, &message_received, MPI_STATUS_IGNORE);
-        }
-        return buffer;
-    }
+            std::lock_guard<std::mutex> lock(mpiSerialMutex);
+            int recv_size;
+            std::vector<char> buffer;
+            MPI_Get_count(&status, MPI_CHAR, &recv_size);
+            buffer.resize(recv_size);
+            MPI_Request req;
+            MPI_Irecv(buffer.data(), buffer.capacity(), MPI_CHAR, src, tag, comm, &req);
 
+            int message_received = false;
+            while (!message_received)
+            {
+                MPI_Test(&req, &message_received, MPI_STATUS_IGNORE);
+            }
+            std::cout << "\t" << std::hex;
+            for (int i = 0; i < buffer.size(); i++)
+            {
+                std::cout << std::hex << (int)buffer[i];
+            }
+            std::cout << std::dec << std::endl;
+            std::cout << "message received" << std::endl;
+            return buffer;
+        }
+    }
     return std::vector<char>();
 }
 
@@ -192,6 +210,7 @@ void MpiComms::queue_rx_function ()
         {
             goto CLOSE_RX_LOOP;
         }
+
         ActionMessage M (data.data (), len);
         if (!isValidCommand (M))
         {
