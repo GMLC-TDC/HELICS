@@ -77,18 +77,9 @@ jobs:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-6
-      env: MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6 && SHARED_LIB_EXT=so && USE_SWIG=false"
-
-    - <<: *linux_base
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
             - g++-4.9
       env:
-        - MATRIX_EVAL="COMPILER=g++-4.9 && CC=gcc-4.9 && CXX=g++-4.9 && SHARED_LIB_EXT=so && USE_SWIG=true"
+        - MATRIX_EVAL="COMPILER=g++-4.9 && CC=gcc-4.9 && CXX=g++-4.9 && SHARED_LIB_EXT=so && USE_SWIG=false"
         - MINIMUM_DEPENDENCIES=true
 
     - <<: *linux_base
