@@ -283,11 +283,6 @@ void ActionMessage::fromByteArray (const char *data, size_t buffer_size)
     try
     {
         load (ia);
-        auto pos=s.tellg();
-        if (static_cast<int>(buffer_size) - 20 > pos)
-        {
-            std::cout <<"buffer "<<buffer_size<<" used ="<<pos << ":: data not all used\n";
-        }
     }
     catch (const cereal::Exception &ce)
     {
