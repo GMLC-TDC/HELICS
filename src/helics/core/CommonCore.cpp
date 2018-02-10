@@ -1400,62 +1400,6 @@ void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message>
     addActionMessage(m);
 }
 
-// Checks for filter operations
-ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage &m)
-{
-    if (hndl == nullptr)
-    {
-        return m;
-    }
-    if (hndl->hasSourceFilter)
-    {
-        auto filtFunc = getFilterCoordinator (hndl->id);
-        if (filtFunc->hasSourceFilter)
-        {
-         //   for (int ii = 0; ii < static_cast<int> (filtFunc->sourceFilters.size ()); ++ii)
-            size_t ii = 0;
-            for (auto &filt:filtFunc->sourceFilters)
-            {
-                if (filt->fed_id == global_broker_id)
-                {
-                    // deal with local source filters
-                    auto tempMessage = createMessageFromCommand (std::move (m));
-                    tempMessage = filt->filterOp->process (std::move (tempMessage));
-                    if (tempMessage)
-                    {
-                        m = ActionMessage(std::move(tempMessage));
-                    }
-                    else
-                    {
-                        //the filter dropped the message;
-                        m=CMD_IGNORE;
-                        return m;
-                    }
-                    
-                }
-                else
-                {
-                    m.dest_id = filt->fed_id;
-                    m.dest_handle = filt->handle;
-                    m.counter = static_cast<uint16_t>(ii);
-                    if (ii < filtFunc->sourceFilters.size() - 1)
-                    {
-                        m.setAction(CMD_SEND_FOR_FILTER_AND_RETURN);
-                        ongoingFilterProcesses[m.source_id].insert(m.info().messageID);
-                    }
-                    else
-                    {
-                        m.setAction(CMD_SEND_FOR_FILTER);
-                    }
-                    return m;
-                }
-                ++ii;
-            }
-        }
-    }
-
-    return m;
-}
 
 void CommonCore::deliverMessage (ActionMessage &message)
 {
@@ -1827,6 +1771,11 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             }
             // push the command to the local queue
             fed->addAction (command);
+            if (static_cast<int32_t>(ongoingFilterProcesses.size()) <= fed->local_id)
+            {
+                ongoingFilterProcesses.resize(fed->local_id + 1);
+                delayedTimingMessages.resize(fed->local_id + 1);
+            }
         }
     }
     break;
@@ -1939,6 +1888,18 @@ void CommonCore::transmitDelayedMessages (federate_id_t source)
             delayTransmitQueue.push (std::move (am));
         }
     }
+    if (source < static_cast<decltype(source)>(delayedTimingMessages.size()))
+    {
+        if (!delayedTimingMessages[source].empty())
+        {
+            for (auto &delayedMsg : delayedTimingMessages[source])
+            {
+                routeMessage(delayedMsg);
+            }
+            delayedTimingMessages[source].clear();
+        }
+    }
+    
 }
 
 void CommonCore::processCommand (ActionMessage &&command)
@@ -2024,30 +1985,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
         else if (command.dest_id == 0)
         {
-            // route the message to all dependent feds
-            auto fed = getFederate (command.source_id);
-            if (fed == nullptr)
-            {
-                LOG_DEBUG (command.source_id, "core", "dropping unrecognized CMD_EXEC_*");
-                return;
-            }
-            if (ongoingFilterProcesses[fed->local_id].empty())
-            {
-                auto &dep = fed->getDependents ();
-                for (auto &fed_id : dep)
-                {
-                    routeMessage (command, fed_id);
-                }
-            }
-            else
-            {
-                auto &dep = fed->getDependents ();
-                for (auto &fed_id : dep)
-                {
-                    command.dest_id = fed_id;
-                    delayTransmitQueue.push (command);
-                }
-            }
+            distributeTimingMessage(command);
         }
         else
         {
@@ -2065,17 +2003,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
         else if (command.dest_id == 0)
         {
-            // route the message to all dependent feds
-            auto fed = getFederate (command.source_id);
-            if (fed == nullptr)
-            {
-                return;
-            }
-            auto &dep = fed->getDependents ();
-            for (auto &fed_id : dep)
-            {
-                routeMessage (command, fed_id);
-            }
+            distributeTimingMessage(command);
         }
         else
         {
@@ -2085,17 +2013,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_DISCONNECT:
         if (command.dest_id == 0)
         {
-            // route the message to all dependent feds
-            auto fed = getFederate (command.source_id);
-            if (fed == nullptr)
-            {
-                return;
-            }
-            auto &dep = fed->getDependents ();
-            for (auto &fed_id : dep)
-            {
-                routeMessage (command, fed_id);
-            }
+            distributeTimingMessage(command);
             if (allDisconnected ())
             {
                 brokerState = broker_state_t::terminated;
@@ -2121,9 +2039,11 @@ void CommonCore::processCommand (ActionMessage &&command)
         break;
     case CMD_SEND_FOR_FILTER:
     case CMD_SEND_FOR_FILTER_AND_RETURN:
+        processMessageFilter(command);
+        break;
     case CMD_NULL_MESSAGE:
     case CMD_FILTER_RESULT:
-        processMessageFilter (command);
+        processFilterReturn(command);
         break;
     case CMD_PUB:
         // route the message to all the subscribers
@@ -2402,7 +2322,6 @@ void CommonCore::processCommand (ActionMessage &&command)
         broker_state_t exp = initializing;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::operating))
         {  // forward the grant to all federates
-            ongoingFilterActionCounter.resize (_federates.size ());
             for (auto &fed : _federates)
             {
                 organizeFilterOperations ();
@@ -2497,6 +2416,34 @@ void CommonCore::processFilterInfo (ActionMessage &command)
     default:
         // all other commands do not impact filters
         break;
+    }
+}
+
+void CommonCore::distributeTimingMessage(ActionMessage &command)
+{
+    // route the message to all dependent feds
+    auto fed = getFederate(command.source_id);
+    if (fed == nullptr)
+    {
+        LOG_DEBUG(command.source_id, "core", std::string("dropping unrecognized ")+ std::string(actionMessageType(command.action())));
+        return;
+    }
+    if (ongoingFilterProcesses[fed->local_id].empty())
+    {
+        auto &dep = fed->getDependents();
+        for (auto &fed_id : dep)
+        {
+            routeMessage(command, fed_id);
+        }
+    }
+    else
+    {
+        auto &dep = fed->getDependents();
+        for (auto &fed_id : dep)
+        {
+            command.dest_id = fed_id;
+            delayedTimingMessages[fed->local_id].push_back(command);
+        }
     }
 }
 
@@ -2804,6 +2751,134 @@ void CommonCore::routeMessage (ActionMessage &&cmd)
     }
 }
 
+
+// Checks for filter operations
+ActionMessage &CommonCore::processMessage(BasicHandleInfo *hndl, ActionMessage &m)
+{
+    if (hndl == nullptr)
+    {
+        return m;
+    }
+    if (hndl->hasSourceFilter)
+    {
+        auto filtFunc = getFilterCoordinator(hndl->id);
+        if (filtFunc->hasSourceFilter)
+        {
+            //   for (int ii = 0; ii < static_cast<int> (filtFunc->sourceFilters.size ()); ++ii)
+            size_t ii = 0;
+            for (auto &filt : filtFunc->sourceFilters)
+            {
+                if (filt->fed_id == global_broker_id)
+                {
+                    // deal with local source filters
+                    auto tempMessage = createMessageFromCommand(std::move(m));
+                    tempMessage = filt->filterOp->process(std::move(tempMessage));
+                    if (tempMessage)
+                    {
+                        m = ActionMessage(std::move(tempMessage));
+                    }
+                    else
+                    {
+                        //the filter dropped the message;
+                        m = CMD_IGNORE;
+                        return m;
+                    }
+
+                }
+                else
+                {
+                    m.dest_id = filt->fed_id;
+                    m.dest_handle = filt->handle;
+                    m.counter = static_cast<uint16_t>(ii);
+                    if (ii < filtFunc->sourceFilters.size() - 1)
+                    {
+                        m.setAction(CMD_SEND_FOR_FILTER_AND_RETURN);
+                        ongoingFilterProcesses[hndl->local_fed_id].insert(m.info().messageID);
+                    }
+                    else
+                    {
+                        m.setAction(CMD_SEND_FOR_FILTER);
+                    }
+                    return m;
+                }
+                ++ii;
+            }
+        }
+    }
+
+    return m;
+}
+
+void CommonCore::processFilterReturn(ActionMessage &cmd)
+{
+    auto handle = getHandleInfo(cmd.dest_handle);
+    if (handle == nullptr)
+    {
+        return;
+    }
+    if (ongoingFilterProcesses[handle->local_fed_id].find(cmd.info().messageID) != ongoingFilterProcesses[handle->local_fed_id].end())
+    {
+        auto messID = cmd.info().messageID;
+        auto filtFunc = getFilterCoordinator(handle->id);
+        if (filtFunc->hasSourceFilter)
+        {
+            for (int ii=cmd.counter+1;ii<filtFunc->sourceFilters.size();++ii)
+            {
+                auto filt = filtFunc->sourceFilters[ii];
+                if (filt->fed_id == global_broker_id)
+                {
+                    // deal with local source filters
+                    auto tempMessage = createMessageFromCommand(std::move(cmd));
+                    tempMessage = filt->filterOp->process(std::move(tempMessage));
+                    if (tempMessage)
+                    {
+                        cmd = ActionMessage(std::move(tempMessage));
+                    }
+                    else
+                    {
+                        ongoingFilterProcesses[handle->local_fed_id].erase(messID);
+                        if (ongoingFilterProcesses[handle->local_fed_id].empty())
+                        {
+                            transmitDelayedMessages(handle->local_fed_id);
+                        }
+                        return;
+                    }
+
+                }
+                else
+                {
+                    cmd.dest_id = filt->fed_id;
+                    cmd.dest_handle = filt->handle;
+                    cmd.counter = static_cast<uint16_t>(ii);
+                    if (ii < filtFunc->sourceFilters.size() - 1)
+                    {
+                        cmd.setAction(CMD_SEND_FOR_FILTER_AND_RETURN);
+                    }
+                    else
+                    {
+                        cmd.setAction(CMD_SEND_FOR_FILTER);
+                        ongoingFilterProcesses[handle->local_fed_id].erase(messID);
+                    }
+                    routeMessage(cmd);
+                    if (ongoingFilterProcesses[handle->local_fed_id].empty())
+                    {
+                        transmitDelayedMessages(handle->local_fed_id);
+                    }
+                    return;
+                }
+                ++ii;
+            }
+        }
+        ongoingFilterProcesses[handle->local_fed_id].erase(messID);
+        deliverMessage(cmd);
+        if (ongoingFilterProcesses[handle->local_fed_id].empty())
+        {
+            transmitDelayedMessages(handle->local_fed_id);
+        }
+    }
+   
+}
+
 void CommonCore::processMessageFilter (ActionMessage &cmd)
 {
     if (cmd.dest_id == 0)
@@ -2887,4 +2962,6 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
         transmit (route, cmd);
     }
 }
+
+
 }  // namespace helics

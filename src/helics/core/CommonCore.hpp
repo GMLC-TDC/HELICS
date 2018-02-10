@@ -237,6 +237,8 @@ class CommonCore : public Core, public BrokerBase
 
     /** process any filter or route the message*/
     void processMessageFilter (ActionMessage &command);
+    /** process an filter message return*/
+    void processFilterReturn(ActionMessage &command);
     /** create a source filter */
     FilterInfo *createSourceFilter (federate_id_t dest,
                                     Core::handle_id_t handle,
@@ -265,14 +267,15 @@ class CommonCore : public Core, public BrokerBase
     std::atomic<int16_t> delayInitCounter{
       0};  //!< counter for the number of times the entry to initialization Mode was explicitly delayed
     std::vector<std::unique_ptr<FederateState>> _federates;  //!< local federate information
-    std::atomic<int32_t> messageCounter;  //!< counter for the number of messages that have been sent
+    std::atomic<int32_t> messageCounter{ 54 };  //!< counter for the number of messages that have been sent
     std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
     std::atomic<Core::handle_id_t> handleCounter{1};  //!< counter for the handle index
     std::unordered_map<std::string, handle_id_t> publications;  //!< map of all local publications
     std::unordered_map<std::string, handle_id_t> endpoints;  //!< map of all local endpoints
     std::unordered_map<std::string, federate_id_t> federateNames;  //!< map of federate names to id
 
-    std::map<federate_id_t, std::set<int32_t>> ongoingFilterProcesses; //!< map of ongoing filtered messages
+    std::vector<std::set<int32_t>> ongoingFilterProcesses; //!< sets of ongoing filtered messages
+    std::vector<std::vector<ActionMessage>> delayedTimingMessages; //!< delayedTimingMessages from ongoing Filter actions
     std::atomic<int> queryCounter{0};
     std::map<handle_id_t, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
     using fed_handle_pair = std::pair<federate_id_t, handle_id_t>;
@@ -342,6 +345,9 @@ class CommonCore : public Core, public BrokerBase
 
     /** send an error code to all the federates*/
     void sendErrorToFederates (int error_code);
+
+    /** handle delivery of a timing message*/
+    void distributeTimingMessage(ActionMessage &command);
 };
 
 }  // namespace helics

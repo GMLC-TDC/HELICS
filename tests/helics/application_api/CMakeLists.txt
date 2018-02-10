@@ -11,23 +11,23 @@ testFixtures.hpp
 )
 
 set(application_api_test_sources
-value-converter-tests.cpp
+ValueConverterTests.cpp
 application-api-tests.cpp
-data-view-tests.cpp
-test-value-federate1.cpp
-test-value-federate2.cpp
-test-message-federate.cpp
-test-filters.cpp
-federate_tests.cpp
-timing_tests.cpp
-iteration_tests.cpp
+data_viewTests.cpp
+ValueFederateTests1.cpp
+ValueFederateTests2.cpp
+MessageFederateTests.cpp
+FilterTests.cpp
+FederateTests.cpp
+TimingTests.cpp
+iterationTests.cpp
 subPubObjectTests.cpp
 testFixtures.cpp
 )
 
 IF (NOT QUICK_TESTS_ONLY)
 list(APPEND application_api_test_sources 
-testQueries.cpp
+QueryTests.cpp
 heat-transfer-tests.cpp
 )
 ENDIF(NOT QUICK_TESTS_ONLY)

@@ -65,6 +65,7 @@ ActionMessage::ActionMessage (std::unique_ptr<Message> message)
     extraInfo->orig_source = std::move (message->original_source);
     extraInfo->original_dest = std::move (message->original_dest);
     extraInfo->target = std::move (message->dest);
+    extraInfo->messageID = message->messageID;
 }
 
 ActionMessage::ActionMessage (const std::string &bytes) : ActionMessage () { from_string (bytes); }
@@ -126,6 +127,7 @@ void ActionMessage::moveInfo (std::unique_ptr<Message> message)
     extraInfo->orig_source = std::move (message->original_source);
     extraInfo->original_dest = std::move (message->original_dest);
     extraInfo->target = std::move (message->dest);
+    extraInfo->messageID = message->messageID;
 }
 
 void ActionMessage::setAction (action_message_def::action_t newAction)
