@@ -18,10 +18,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/CoreFactory.hpp"
 
 #ifndef DISABLE_TCP_CORE
-const std::string core_types[] = {"test",   "ipc",   "tcp",   "zmq",   "udp",
+const std::string travis_core_types[] = {"test",   "ipc",   "tcp",   "zmq",   "udp",
                                   "test_2", "ipc_2", "tcp_2", "zmq_2", "udp_2"};
 #else
-const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
+const std::string travis_core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
 #endif
 
 struct FederateTestFixture

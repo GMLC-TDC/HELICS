@@ -5,10 +5,7 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef TEST_FIXTURES_HEADER_
-#define TEST_FIXTURES_HEADER_
 
 #include <memory>
 
@@ -38,6 +35,13 @@ const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2"
 "test_4", "zmq_4", "udp_4" };
 const std::string core_types_single[] = {"test", "ipc", "zmq", "udp","test_3", "zmq_3", "udp_3" };
 #endif
+#endif
+
+#ifndef DISABLE_TCP_CORE
+const std::string travis_core_types[] = { "test",   "ipc",   "tcp",   "zmq",   "udp",
+"test_2", "ipc_2", "tcp_2", "zmq_2", "udp_2" };
+#else
+const std::string travis_core_types[] = { "test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2" };
 #endif
 
 struct FederateTestFixture
@@ -169,5 +173,3 @@ struct FederateTestFixture
     int getIndexCode (const std::string &type_name);
     auto AddBrokerImp (const std::string &core_type_name, const std::string &initialization_string);
 };
-
-#endif

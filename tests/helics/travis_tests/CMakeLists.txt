@@ -7,7 +7,7 @@
 
 
 set(travis_test_headers
-testFixtures.h
+../application_api/testFixtures.hpp
 )
 
 set(travis_test_sources
@@ -15,7 +15,7 @@ travis-tests.cpp
 test-travis-value-federate.cpp
 test-travis-message-federate.cpp
 test-travis-filters.cpp
-testFixtures.cpp
+../application_api/testFixtures.cpp
 )
 
 
