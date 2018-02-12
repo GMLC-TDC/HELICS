@@ -135,7 +135,7 @@ ActionMessage TcpComms::generateReplyToIncomingMessage (ActionMessage &M)
     return resp;
 }
 
-void TcpComms::txPriorityReceive (std::shared_ptr<TcpConnection> connection,
+void TcpComms::txPriorityReceive (std::shared_ptr<TcpConnection> /*connection*/,
                                   const char *data,
                                   size_t bytes_received,
                                   const boost::system::error_code &error)
@@ -207,7 +207,7 @@ size_t TcpComms::dataReceive (std::shared_ptr<TcpRxConnection> connection, const
     return used_total;
 }
 
-bool TcpComms::commErrorHandler (std::shared_ptr<TcpRxConnection> connection,
+bool TcpComms::commErrorHandler (std::shared_ptr<TcpRxConnection> /*connection*/,
                                  const boost::system::error_code &error)
 {
     if (rx_status == connection_status::connected)
