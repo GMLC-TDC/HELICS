@@ -11,34 +11,49 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "Federate.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
+#include "../core/core-exceptions.hpp"
+#include "../core/helicsVersion.hpp"
 #include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
-#include "../core/helicsVersion.hpp"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4702)
-#include "json/json.h"
-#pragma warning(pop)
-#else
-#include "json/json.h"
-#endif
+#include "../common/argParser.h"
 
-namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
-
-static void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map);
 
 namespace helics
 {
+
+using namespace std::string_literals;
+static const ArgDescriptors InfoArgs{
+    {"broker,b"s,  "address of the broker to connect"s },
+{"name,n"s,  "name of the player federate"s },
+{"corename"s,  "the name of the core to create or find"s },
+{"core,c"s,  "type of the core to connect to"s },
+{"offset"s,  "the offset of the time steps"s },
+{"period"s, "the period of the federate"s },
+{"timedelta"s,  "the time delta of the federate"s },
+{"coreinit,i"s,  "the core initialization string"s },
+{"inputdelay"s,  "the input delay on incoming communication of the federate"s },
+{"outputdelay"s,  "the output delay for outgoing communication of the federate"s },
+{"flags,f"s, ArgDescriptor::arg_type_t::vector_string, "named flag for the federate"s }
+};
+
 FederateInfo::FederateInfo (int argc, const char *const *argv) { loadInfoFromArgs (argc, argv); }
 
 void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
 {
-    po::variables_map vm;
-    argumentParser (argc, argv, vm);
+    variable_map vm;
+    auto res= argumentParser(argc, argv, vm, InfoArgs);
+    if (res == versionReturn)
+    {
+        std::cout << helics::helicsVersionString() << '\n';
+    }
+    if (res < 0)
+    {
+        return;
+    }
     if (vm.count ("name") > 0)
     {
         name = vm["name"].as<std::string> ();
@@ -69,26 +84,26 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
 
     if (vm.count ("timedelta") > 0)
     {
-        timeDelta = vm["timedelta"].as<double> ();
+        timeDelta = loadTimeFromString(vm["timedelta"].as<std::string> ());
     }
     if (vm.count ("inputdelay") > 0)
     {
-        timeDelta = vm["inputdelay"].as<double> ();
+        timeDelta = loadTimeFromString(vm["inputdelay"].as<std::string> ());
     }
 
     if (vm.count ("outputdelay") > 0)
     {
-        timeDelta = vm["outputdelay"].as<double> ();
+        timeDelta = loadTimeFromString(vm["outputdelay"].as<std::string> ());
     }
 
     if (vm.count ("period") > 0)
     {
-        period = vm["period"].as<double> ();
+        period = loadTimeFromString(vm["period"].as<std::string> ());
     }
 
     if (vm.count ("offset") > 0)
     {
-        offset = vm["offset"].as<double> ();
+        offset = loadTimeFromString(vm["offset"].as<std::string> ());
     }
     if (vm.count ("maxiterations") > 0)
     {
@@ -136,34 +151,17 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     }
 }
 
-FederateInfo LoadFederateInfo (const std::string &jsonString)
+FederateInfo loadFederateInfo (const std::string &jsonString)
 {
     FederateInfo fi;
-    std::ifstream file (jsonString);
     Json_helics::Value doc;
-
-    if (file.is_open ())
+    try
     {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        bool ok = Json_helics::parseFromStream (rbuilder, file, &doc, &errs);
-        if (!ok)
-        {
-            std::cerr << errs << std::endl;
-            return fi;
-        }
+        doc = loadJsonString (jsonString);
     }
-    else
+    catch (const std::invalid_argument &ia)
     {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        std::istringstream jstring (jsonString);
-        bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
-        if (!ok)
-        {
-            std::cerr << errs << std::endl;
-            return fi;
-        }
+        throw (helics::InvalidParameter (ia.what ()));
     }
 
     if (doc.isMember ("name"))
@@ -228,147 +226,27 @@ FederateInfo LoadFederateInfo (const std::string &jsonString)
     }
     if (doc.isMember ("period"))
     {
-        if (doc["period"].isObject ())
-        {
-        }
-        else
-        {
-            fi.timeDelta = doc["period"].asDouble ();
-        }
+        fi.period = loadJsonTime (doc["period"]);
     }
 
     if (doc.isMember ("offset"))
     {
-        if (doc["offset"].isObject ())
-        {
-        }
-        else
-        {
-            fi.offset = doc["offset"].asDouble ();
-        }
+        fi.offset = loadJsonTime (doc["offset"]);
     }
 
     if (doc.isMember ("timeDelta"))
     {
-        if (doc["timeDelta"].isObject ())
-        {
-        }
-        else
-        {
-            fi.timeDelta = doc["timeDelta"].asDouble ();
-        }
+        fi.timeDelta = loadJsonTime (doc["timeDelta"]);
     }
 
     if (doc.isMember ("outputDelay"))
     {
-        if (doc["outputDelay"].isObject ())
-        {
-            // TODO:: something about units yet
-        }
-        else
-        {
-            fi.outputDelay = doc["outputDelay"].asDouble ();
-        }
+        fi.outputDelay = loadJsonTime (doc["outputDelay"]);
     }
     if (doc.isMember ("inputDelay"))
     {
-        if (doc["inputDelay"].isObject ())
-        {
-            // TOOD:: something about units yet
-        }
-        else
-        {
-            fi.inputDelay = doc["inputDelay"].asDouble ();
-        }
+        fi.inputDelay = loadJsonTime (doc["inputDelay"]);
     }
     return fi;
 }
 }  // namespace helics
-
-void argumentParser (int argc, const char *const *argv, po::variables_map &vm_map)
-{
-    po::options_description cmd_only ("command line only");
-    po::options_description config ("configuration");
-    po::options_description hidden ("hidden");
-
-    // clang-format off
-        // input boost controls
-        cmd_only.add_options()
-            ("help,h", "produce help message")
-            ("version,v", "helics version number")
-            ("config-file", po::value<std::string>(), "specify a configuration file to use");
-
-
-        config.add_options()
-            ("broker,b", po::value<std::string>(), "address of the broker to connect")
-            ("name,n", po::value<std::string>(), "name of the player federate")
-            ("corename", po::value<std::string>(), "the name of the core to create or find")
-            ("core,c", po::value<std::string>(), "type of the core to connect to")
-            ("offset", po::value<double>(), "the offset of the time steps")
-            ("period", po::value<double>(), "the period of the federate")
-            ("timedelta", po::value<double>(), "the time delta of the federate")
-            ("coreinit,i", po::value<std::string>(), "the core initialization string")
-            ("inputdelay", po::value<double>(), "the time delta of the federate")
-            ("outputdelay", po::value<double>(), "the time delta of the federate")
-            ("flags,f", po::value<std::vector<std::string>>(), "named flag for the federate");
-
-
-        hidden.add_options() ("input", po::value<std::string>(), "input file");
-    // clang-format on
-
-    po::options_description cmd_line ("command line options");
-    po::options_description config_file ("configuration file options");
-    po::options_description visible ("allowed options");
-
-    cmd_line.add (cmd_only).add (config).add (hidden);
-    config_file.add (config).add (hidden);
-    visible.add (cmd_only).add (config);
-
-    po::variables_map cmd_vm;
-    try
-    {
-        po::store (po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered ().run (), cmd_vm);
-    }
-    catch (std::exception &e)
-    {
-        std::cerr << e.what () << std::endl;
-        throw (e);
-    }
-
-    po::notify (cmd_vm);
-
-    // objects/pointers/variables/constants
-
-    // program options control
-    if (cmd_vm.count ("help") > 0)
-    {
-        std::cout << visible << '\n';
-        return;
-    }
-
-    if (cmd_vm.count ("version") > 0)
-    {
-        std::cout << helics::helicsVersionString () << '\n';
-        return;
-    }
-
-    po::store (po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered ().run (), vm_map);
-
-    if (cmd_vm.count ("config-file") > 0)
-    {
-        std::string config_file_name = cmd_vm["config-file"].as<std::string> ();
-        if (!filesystem::exists (config_file_name))
-        {
-            std::cerr << "config file " << config_file_name << " does not exist\n";
-            throw (std::invalid_argument ("unknown config file"));
-        }
-        else
-        {
-            std::ifstream fstr (config_file_name.c_str ());
-            po::store (po::parse_config_file (fstr, config_file), vm_map);
-            fstr.close ();
-        }
-    }
-
-    po::notify (vm_map);
-}

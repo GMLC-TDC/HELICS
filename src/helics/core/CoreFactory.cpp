@@ -231,7 +231,12 @@ static DelayedDestructor<CommonCore>
 
 static SearchableObjectHolder<CommonCore> searchableObjects;  //!< the object managing the searchable objects
 
+//this will trip the line when it is destroyed at global destruction time
+static tripwire::TripWireTrigger tripTrigger;
+
 std::shared_ptr<Core> findCore (const std::string &name) { return searchableObjects.findObject (name); }
+
+
 
 bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &ptr)
 {

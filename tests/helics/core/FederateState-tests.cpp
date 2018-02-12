@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
 
     // Test returning when the initialization state is entered
     cmd.setAction (helics::CMD_INIT_GRANT);
-    auto fs_process = std::async (std::launch::async, [&]() { return fs->enterInitState (); });
+    auto fs_process = std::async (std::launch::async, [&]() { return fs->enterInitializationState (); });
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_CREATED);
     fs->addAction (cmd);
     fs_process.wait ();
@@ -206,7 +206,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     cmd.setAction (helics::CMD_FED_ACK);
     cmd.dest_id = 22;
     cmd.name = "fed_name";
-    CLEAR_ACTION_FLAG (cmd, error_flag);
+    clearActionFlag (cmd, error_flag);
     fs_process = std::async (std::launch::async, [&]() { return fs->waitSetup (); });
     fs->addAction (cmd);
     fs_process.wait ();
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     // Test CMD_FED_ACK message with an error
     cmd.setAction (helics::CMD_FED_ACK);
     cmd.dest_id = 23;
-    SET_ACTION_FLAG (cmd, error_flag);
+    setActionFlag (cmd, error_flag);
     fs_process = std::async (std::launch::async, [&]() { return fs->waitSetup (); });
     fs->addAction (cmd);
     fs_process.wait ();

@@ -9,35 +9,27 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "ValueFederate.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "ValueFederateManager.hpp"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4702)
-#include "json/json.h"
-#pragma warning(pop)
-#else
-#include "json/json.h"
-#endif
-
-#include <fstream>
 namespace helics
 {
 /**constructor taking a core engine and federate info structure
  */
 ValueFederate::ValueFederate (const FederateInfo &fi) : Federate (fi)
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject, getID ());
+	//the core object get instantiated in the Federate constructor
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
 }
 ValueFederate::ValueFederate (std::shared_ptr<Core> core, const FederateInfo &fi) : Federate (std::move (core), fi)
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject, getID ());
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
 }
-ValueFederate::ValueFederate (const std::string &jsonString) : Federate (jsonString)
+ValueFederate::ValueFederate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject, getID ());
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
     registerInterfaces (jsonString);
 }
 
@@ -45,10 +37,10 @@ ValueFederate::ValueFederate () = default;
 
 ValueFederate::ValueFederate (bool /*res*/)
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject, getID ());
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
 }
 
-ValueFederate::ValueFederate (ValueFederate &&fed) noexcept = default;
+ValueFederate::ValueFederate (ValueFederate &&) noexcept = default;
 
 ValueFederate::~ValueFederate () = default;
 
@@ -122,36 +114,18 @@ void ValueFederate::setDefaultValue (subscription_id_t id, data_view block)
 
 void ValueFederate::registerInterfaces (const std::string &jsonString)
 {
+    registerValueInterfaces (jsonString);
+    Federate::registerInterfaces (jsonString);
+}
+
+void ValueFederate::registerValueInterfaces (const std::string &jsonString)
+{
     if (state != op_states::startup)
     {
         throw (InvalidFunctionCall ("cannot call register Interfaces after entering initialization mode"));
     }
-    std::ifstream file (jsonString);
-    Json_helics::Value doc;
+    auto doc = loadJsonString (jsonString);
 
-    if (file.is_open ())
-    {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        bool ok = Json_helics::parseFromStream (rbuilder, file, &doc, &errs);
-        if (!ok)
-        {
-            // should I throw an error here?
-            return;
-        }
-    }
-    else
-    {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        std::istringstream jstring (jsonString);
-        bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
-        if (!ok)
-        {
-            // should I throw an error here?
-            return;
-        }
-    }
     if (doc.isMember ("publications"))
     {
         auto pubs = doc["publications"];

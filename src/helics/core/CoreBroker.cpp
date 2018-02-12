@@ -27,18 +27,15 @@ namespace helics
 using namespace std::string_literals;
 
 static const ArgDescriptors extraArgs{
-  {"root"s, ""s, "specify whether the broker is a root"s},
+  {"root"s, ArgDescriptor::arg_type_t::flag_type, "specify whether the broker is a root"s},
 };
-
-bool matchingTypes (const std::string &type1, const std::string &type2);
 
 void CoreBroker::displayHelp ()
 {
     std::cout << "Broker Specific options:\n";
-    namespace po = boost::program_options;
-    po::variables_map vm;
+    variable_map vm;
     const char *const argV[] = {"", "--help"};
-    argumentParser (2, argV, vm, extraArgs);
+    argumentParser(2, argV, vm, {});
     BrokerBase::displayHelp ();
 }
 
@@ -62,40 +59,31 @@ int32_t CoreBroker::getRoute (Core::federate_id_t fedid) const
     return (fnd != routing_table.end ()) ? fnd->second : 0;  // zero is the default route
 }
 
-int32_t CoreBroker::getFedByName (const std::string &fedName) const
-{
-    auto fnd = fedNames.find (fedName);
-    return (fnd != fedNames.end ()) ? fnd->second : -1;
-}
 
-int32_t CoreBroker::getBrokerByName (const std::string &brokerName) const
-{
-    auto fnd = brokerNames.find (brokerName);
-    return (fnd != brokerNames.end ()) ? fnd->second : -1;
-}
-
-int32_t CoreBroker::getBrokerById (Core::federate_id_t fedid) const
+BasicBrokerInfo *CoreBroker::getBrokerById (Core::federate_id_t fedid)
 {
     if (_isRoot)
     {
         auto brkNum = static_cast<int32_t> (fedid - global_broker_id_shift);
-        return (brkNum < static_cast<int32_t> (_brokers.size ())) ? brkNum : (-1);
+        return (isValidIndex(brkNum,_brokers) ? &_brokers[brkNum] : nullptr);
     }
 
-    auto fnd = broker_table.find (fedid);
-    return (fnd != broker_table.end ()) ? fnd->second : (-1);
+    auto fnd = _brokers.find (fedid);
+    return (fnd != _brokers.end ()) ? &(*fnd) : nullptr;
 }
 
-int32_t CoreBroker::getFedById (Core::federate_id_t fedid) const
+const BasicBrokerInfo *CoreBroker::getBrokerById(Core::federate_id_t fedid) const
 {
-    if (_isRoot)
-    {
-        return static_cast<int32_t> (fedid - global_federate_id_shift);
-    }
+	if (_isRoot)
+	{
+		auto brkNum = static_cast<int32_t> (fedid - global_broker_id_shift);
+		return (brkNum < static_cast<int32_t> (_brokers.size())) ? &_brokers[brkNum] : nullptr;
+	}
 
-    auto fnd = federate_table.find (fedid);
-    return (fnd != federate_table.end ()) ? fnd->second : -1;
+	auto fnd = _brokers.find(fedid);
+	return (fnd != _brokers.end()) ? &(*fnd) : nullptr;
 }
+
 
 void CoreBroker::generateQueryResult (const ActionMessage &command)
 {
@@ -206,16 +194,14 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         else  // we are initialized already
         {
             ActionMessage badInit (CMD_FED_ACK);
-            SET_ACTION_FLAG (badInit, error_flag);
+            setActionFlag (badInit, error_flag);
             badInit.source_id = global_broker_id;
             badInit.name = command.name;
             transmit (command.source_id, badInit);  // this isn't correct
             return;
         }
-        _federates.emplace_back (command.name);
+        _federates.insert (command.name,static_cast<Core::federate_id_t>(_federates.size()),command.name);
         _federates.back ().route_id = getRoute (command.source_id);
-
-        fedNames.emplace (command.name, static_cast<int32_t> (_federates.size () - 1));
         if (!_isRoot)
         {
             if (_gateway)
@@ -268,15 +254,14 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         else  // we are initialized already
         {
             ActionMessage badInit (CMD_BROKER_ACK);
-            SET_ACTION_FLAG (badInit, error_flag);
+            setActionFlag (badInit, error_flag);
             badInit.source_id = global_broker_id;
             badInit.name = command.name;
             transmit (command.source_id, badInit);
             return;
         }
-        _brokers.emplace_back (command.name);
+        _brokers.insert (command.name,static_cast<Core::federate_id_t>(_brokers.size()),command.name);
         _brokers.back ().route_id = static_cast<decltype (_brokers.back ().route_id)> (_brokers.size ());
-        brokerNames.emplace (command.name, static_cast<int32_t> (_brokers.size () - 1));
         addRoute (_brokers.back ().route_id, command.info ().target);
         if (!_isRoot)
         {
@@ -311,22 +296,20 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     break;
     case CMD_FED_ACK:
     {  // we can't be root if we got one of these
-        auto fed_num = getFedByName (command.name);
-        if (fed_num >= 0)
+        auto fed = _federates.find(command.name);
+        if (fed!=_federates.end())
         {
-            _federates[fed_num].global_id = command.dest_id;
-            auto route = _federates[fed_num].route_id;
-            federate_table.emplace (command.dest_id, fed_num);
+           fed->global_id = command.dest_id;
+            auto route = fed->route_id;
+            _federates.addSearchTerm(command.dest_id, fed->name);
             transmit (route, command);
         }
         else
         {
             // this means we haven't seen this federate before for some reason
-            _federates.emplace_back (command.name);
+            _federates.insert (command.name, command.dest_id,command.name);
             _federates.back ().route_id = getRoute (command.source_id);
             _federates.back ().global_id = command.dest_id;
-            fedNames.emplace (command.name, static_cast<int32_t> (_federates.size () - 1));
-            federate_table.emplace (command.dest_id, static_cast<int32_t> (_federates.size () - 1));
             // it also means we don't forward it
         }
     }
@@ -335,7 +318,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     {  // we can't be root if we got one of these
         if (command.name == identifier)
         {
-            if (CHECK_ACTION_FLAG (command, error_flag))
+            if (checkActionFlag (command, error_flag))
             {
                 // generate an error message
                 return;
@@ -347,31 +330,30 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
 
             return;
         }
-        auto broker_num = getBrokerByName (command.name);
-        if (broker_num >= 0)
+        auto broker = _brokers.find(command.name);
+        if (broker !=_brokers.end())
         {
-            _brokers[broker_num].global_id = command.dest_id;
-            auto route = _brokers[broker_num].route_id;
-            broker_table.emplace (command.dest_id, broker_num);
+            broker->global_id = command.dest_id;
+            auto route = broker->route_id;
+            _brokers.addSearchTerm(command.dest_id, broker->name);
             command.source_id = global_broker_id;  // we want the intermediate broker to change the source_id
             transmit (route, command);
         }
         else
         {
-            _brokers.emplace_back (command.name);
+            _brokers.insert (command.name,command.dest_id,command.name);
             _brokers.back ().route_id = getRoute (command.source_id);
             _brokers.back ().global_id = command.dest_id;
-            brokerNames.emplace (command.name, static_cast<int32_t> (_brokers.size () - 1));
-            broker_table.emplace (command.dest_id, static_cast<int32_t> (_brokers.size () - 1));
+
         }
     }
     break;
     case CMD_PRIORITY_DISCONNECT:
     {
-        auto brkNum = getBrokerById (command.source_id);
-        if (brkNum >= 0)
+        auto brk = getBrokerById (command.source_id);
+        if (brk != nullptr)
         {
-            _brokers[brkNum]._disconnected = true;
+            brk->_disconnected = true;
         }
         if (allDisconnected ())
         {
@@ -465,11 +447,10 @@ void CoreBroker::processCommand (ActionMessage &&command)
         break;
     case CMD_INIT:
     {
-        auto brkNum = getBrokerById (command.source_id);
-        if (brkNum >= 0)
+        auto brk = getBrokerById (command.source_id);
+        if (brk !=nullptr)
         {
-            std::lock_guard<std::mutex> lock (mutex_);
-            _brokers[brkNum]._initRequested = true;
+            brk->_initRequested = true;
         }
         if (allInitReady ())
         {
@@ -481,9 +462,9 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 checkDependencies ();
                 ActionMessage m (CMD_INIT_GRANT);
                 brokerState = broker_state_t::operating;
-                for (auto &brk : _brokers)
+                for (auto &broker : _brokers)
                 {
-                    transmit (brk.route_id, m);
+                    transmit (broker.route_id, m);
                 }
                 timeCoord->enteringExecMode (helics_iteration_request::no_iterations);
                 auto res = timeCoord->checkExecEntry ();
@@ -504,14 +485,15 @@ void CoreBroker::processCommand (ActionMessage &&command)
     break;
     case CMD_INIT_NOT_READY:
     {
-        auto brkNum = getBrokerById (command.source_id);
+        
         if (allInitReady ())
         {
             transmit (0, command);
         }
-        if (brkNum >= 0)
+		auto brk = getBrokerById(command.source_id);
+        if (brk != nullptr)
         {
-            _brokers[brkNum]._initRequested = false;
+            brk->_initRequested = false;
         }
     }
     break;
@@ -535,10 +517,11 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_DISCONNECT_NAME:
         if (command.dest_id == 0)
         {
-            auto brkNum = getBrokerByName (command.payload);
-            if (brkNum >= 0)
+
+            auto brk = _brokers.find (command.payload);
+            if (brk!=_brokers.end())
             {
-                _brokers[brkNum]._disconnected = true;
+                brk->_disconnected = true;
             }
         }
         FALLTHROUGH
@@ -546,10 +529,10 @@ void CoreBroker::processCommand (ActionMessage &&command)
     {
         if ((command.dest_id == 0) || (command.dest_id == global_broker_id))
         {
-            auto brkNum = getBrokerById (command.source_id);
-            if (brkNum >= 0)
+            auto brk = getBrokerById (command.source_id);
+            if (brk !=nullptr)
             {
-                _brokers[brkNum]._disconnected = true;
+                brk->_disconnected = true;
             }
             if (allDisconnected ())
             {
@@ -778,8 +761,8 @@ void CoreBroker::addSubscription (ActionMessage &m)
                           static_cast<int32_t> (_handles.size () - 1));
     addLocalInfo (_handles.back (), m);
     subscriptions.emplace (m.name, static_cast<int32_t> (_handles.size () - 1));
-    _handles.back ().processed = CHECK_ACTION_FLAG (m, processingComplete);
-    if (!CHECK_ACTION_FLAG (m, processingComplete))
+    _handles.back ().processed = checkActionFlag (m, processingComplete);
+    if (!checkActionFlag (m, processingComplete))
     {
         bool proc = FindandNotifySubscriptionPublisher (_handles.back ());
         if (!_isRoot)
@@ -787,7 +770,7 @@ void CoreBroker::addSubscription (ActionMessage &m)
             if (proc)
             {
                 // just let any higher level brokers know we have found the publisher and let them know
-                SET_ACTION_FLAG (m, processingComplete);
+                setActionFlag (m, processingComplete);
             }
 
             transmit (0, m);
@@ -805,7 +788,7 @@ void CoreBroker::addEndpoint (ActionMessage &m)
 
     if (!_isRoot)
     {
-        SET_ACTION_FLAG (m, processingComplete);
+        setActionFlag (m, processingComplete);
         transmit (0, m);
     }
     else
@@ -825,7 +808,7 @@ void CoreBroker::addSourceFilter (ActionMessage &m)
     {
         if (proc)
         {
-            SET_ACTION_FLAG (m, processingComplete);
+            setActionFlag (m, processingComplete);
         }
 
         transmit (0, m);
@@ -866,7 +849,7 @@ void CoreBroker::addDestFilter (ActionMessage &m)
     {
         if (proc)
         {
-            SET_ACTION_FLAG (m, processingComplete);
+            setActionFlag (m, processingComplete);
         }
         transmit (0, m);
     }
@@ -890,9 +873,7 @@ void CoreBroker::initializeFromArgs (int argc, const char *const *argv)
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong (exp, broker_state_t::initialized))
     {
-        namespace po = boost::program_options;
-
-        po::variables_map vm;
+        variable_map vm;
         argumentParser (argc, argv, vm, extraArgs);
         // Initialize the brokerBase component
         initializeFromCmdArgs (argc, argv);
@@ -1159,7 +1140,7 @@ void CoreBroker::FindandNotifyEndpointFilters (BasicHandleInfo &handleInfo)
         m.dest_handle = handleInfo.id;
         if (handleInfo.flag)
         {
-            SET_ACTION_FLAG (m, indicator_flag);
+            setActionFlag (m, indicator_flag);
         }
         transmit (getRoute (m.dest_id), m);
 
@@ -1338,19 +1319,17 @@ void CoreBroker::processQuery (const ActionMessage &m)
     else
     {
         int32_t route = 0;
-        auto res = getFedByName (m.info ().target);
-        if (res != -1)
+        auto fed = _federates.find (m.info ().target);
+        if (fed != _federates.end())
         {
-            auto &fed = _federates[res];
-            route = fed.route_id;
+            route = fed->route_id;
         }
         else
         {
-            res = getBrokerByName (m.info ().target);
-            if (res != -1)
+            auto broker = _brokers.find (m.info ().target);
+            if (broker != _brokers.end())
             {
-                auto &brk = _brokers[res];
-                route = brk.route_id;
+                route = broker->route_id;
             }
         }
 
@@ -1459,11 +1438,11 @@ void CoreBroker::checkDependencies ()
 bool CoreBroker::allInitReady () const
 {
     // the federate count must be greater than the min size
-    if (static_cast<decltype (_min_federates)> (_federates.size ()) < _min_federates)
+    if (static_cast<decltype (minFederateCount)> (_federates.size ()) < minFederateCount)
     {
         return false;
     }
-    if (static_cast<decltype (_min_brokers)> (_brokers.size ()) < _min_brokers)
+    if (static_cast<decltype (minBrokerCount)> (_brokers.size ()) < minBrokerCount)
     {
         return false;
     }

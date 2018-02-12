@@ -10,8 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "NetworkBrokerData.hpp"
-#include "BrokerFactory.hpp"
 #include "../common/argParser.h"
+#include "BrokerFactory.hpp"
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/host_name.hpp>
@@ -21,26 +21,25 @@ using namespace std::string_literals;
 
 namespace helics
 {
-static const ArgDescriptors extraArgs{{"interface"s, "string"s,
+static const ArgDescriptors extraArgs{{"interface"s,
                                        "the local interface to use for the receive ports"s},
-                                      {"broker,b"s, "string"s, "identifier for the broker"s},
-                                      {"broker_address", "string"s, "location of the broker i.e network address"},
-                                      {"brokerport"s, "int"s, "port number for the broker priority port"s},
-                                      {"localport"s, "int"s, "port number for the local receive port"s},
-                                      {"port"s, "int"s, "port number for the broker's port"s},
-                                      {"portstart"s, "int"s, "starting port for automatic port definitions"s}};
+                                      {"broker,b"s, "identifier for the broker"s},
+                                      {"broker_address", "location of the broker i.e network address"},
+                                      {"brokerport"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker priority port"s},
+                                      {"localport"s, ArgDescriptor::arg_type_t::int_type, "port number for the local receive port"s},
+                                      {"port"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker's port"s},
+                                      {"portstart"s, ArgDescriptor::arg_type_t::int_type, "starting port for automatic port definitions"s}};
 
 void NetworkBrokerData::displayHelp ()
 {
     const char *const argV[] = {"", "--help"};
-    boost::program_options::variables_map vm;
+    variable_map vm;
     argumentParser (2, argV, vm, extraArgs);
 }
 
 void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, const std::string &localAddress)
 {
-    namespace po = boost::program_options;
-    po::variables_map vm;
+    variable_map vm;
     argumentParser (argc, argv, vm, extraArgs);
 
     if (vm.count ("broker_address") > 0)
@@ -68,12 +67,12 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
     else if (vm.count ("broker") > 0)
     {
         auto addr = vm["broker"].as<std::string> ();
-		auto brkr = BrokerFactory::findBroker(addr);
-		if (brkr)
-		{
-			addr = brkr->getAddress();
-		}
-        auto sc = addr.find_first_of (';', 1);  
+        auto brkr = BrokerFactory::findBroker (addr);
+        if (brkr)
+        {
+            addr = brkr->getAddress ();
+        }
+        auto sc = addr.find_first_of (';', 1);
         if (sc == std::string::npos)
         {
             auto brkprt = extractInterfaceandPort (addr);

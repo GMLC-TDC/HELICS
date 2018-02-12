@@ -44,7 +44,8 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     /** move assignment*/
     CombinationFederate &operator= (CombinationFederate &&fed) noexcept;
 
-    virtual void disconnect() override;
+    virtual void disconnect () override;
+
   protected:
     virtual void updateTime (Time newTime, Time oldTime) override;
     virtual void startupToInitializeStateTransition () override;
@@ -53,5 +54,5 @@ class CombinationFederate : public ValueFederate, public MessageFederate
   public:
     virtual void registerInterfaces (const std::string &jsonString) override;
 };
-} //namespace helics
+}  // namespace helics
 #endif

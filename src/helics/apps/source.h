@@ -69,7 +69,7 @@ namespace helics
         */
         Source(std::shared_ptr<Core> core, const FederateInfo &fi);
         /**constructor taking a file with the required information
-        @param[in] jsonString file or json string defining the federate information and other configuration
+        @param[in] jsonString file or JSON string defining the federate information and other configuration
         */
         Source(const std::string &jsonString);
 
@@ -118,7 +118,7 @@ namespace helics
         std::shared_ptr<CombinationFederate> fed; //!< the federate created for the source
         std::vector<SourceObject> sources;  //!< the actual publication objects
         Time stopTime = Time::maxVal(); //!< the time the source should stop
-      
+        bool deactivated = false;
     };
 }
 

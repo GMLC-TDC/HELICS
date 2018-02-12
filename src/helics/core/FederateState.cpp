@@ -130,8 +130,6 @@ void FederateState::setParent (CommonCore *coreObject)
     timeCoord->setMessageSender ([coreObject](const ActionMessage &msg) { coreObject->addActionMessage (msg); });
 }
 
-static auto compareFunc = [](const auto &A, const auto &B) { return (A->id < B->id); };
-
 CoreFederateInfo FederateState::getInfo () const
 {
     // lock the mutex to ensure we have the latest values
@@ -162,140 +160,91 @@ void FederateState::createSubscription (Core::handle_id_t handle,
                                         const std::string &units,
                                         handle_check_mode check_mode)
 {
-    auto sub = std::make_unique<SubscriptionInfo> (handle, global_id, key, type, units,
-                                                   (check_mode == handle_check_mode::required));
+    auto subHandle = subscriptions.lock();
+	subHandle->insert(key, handle,handle, global_id, key, type, units,
+		(check_mode == handle_check_mode::required));
 
-    std::lock_guard<std::mutex> lock (_mutex);
-    subNames.emplace (key, sub.get ());
-    sub->only_update_on_change = only_update_on_change;
-    // need to sort the vectors so the find works properly
-    if (subscriptions.empty () || handle > subscriptions.back ()->id)
-    {
-        subscriptions.push_back (std::move (sub));
-    }
-    else
-    {
-        subscriptions.push_back (std::move (sub));
-        std::sort (subscriptions.begin (), subscriptions.end (), compareFunc);
-    }
+    
+    subHandle->back()->only_update_on_change = only_update_on_change;
 }
 void FederateState::createPublication (Core::handle_id_t handle,
                                        const std::string &key,
                                        const std::string &type,
                                        const std::string &units)
 {
-    auto pub = std::make_unique<PublicationInfo> (handle, global_id, key, type, units);
 
-    std::lock_guard<std::mutex> lock (_mutex);
-    pubNames.emplace (key, pub.get ());
-
-    // need to sort the vectors so the find works properly
-    if (publications.empty () || handle > publications.back ()->id)
-    {
-        publications.push_back (std::move (pub));
-    }
-    else
-    {
-        publications.push_back (std::move (pub));
-        std::sort (publications.begin (), publications.end (), compareFunc);
-    }
+	publications.lock()->insert(key, handle, handle, global_id, key, type, units);
 }
 
-void FederateState::createEndpoint (Core::handle_id_t handle, const std::string &key, const std::string &type)
+void FederateState::createEndpoint (Core::handle_id_t handle, const std::string &endpointName, const std::string &type)
 {
-    auto ep = std::make_unique<EndpointInfo> (handle, global_id, key, type);
-
-    std::lock_guard<std::mutex> lock (_mutex);
-    epNames.emplace (key, ep.get ());
+    auto endHandle = endpoints.lock();
+	endHandle->insert(endpointName, handle, handle, global_id, endpointName, type);
     hasEndpoints = true;
-    if (endpoints.empty () || handle > endpoints.back ()->id)
-    {
-        endpoints.push_back (std::move (ep));
-    }
-    else
-    {
-        endpoints.push_back (std::move (ep));
-        std::sort (endpoints.begin (), endpoints.end (), compareFunc);
-    }
 }
 
-SubscriptionInfo *FederateState::getSubscription (const std::string &subName) const
+const SubscriptionInfo *FederateState::getSubscription (const std::string &subName) const
 {
-    auto fnd = subNames.find (subName);
-    if (fnd != subNames.end ())
-    {
-        return fnd->second;
-    }
-    return nullptr;
+	return subscriptions.lock_shared()->find(subName);
 }
 
-SubscriptionInfo *FederateState::getSubscription (Core::handle_id_t handle_) const
+SubscriptionInfo *FederateState::getSubscription(const std::string &subName)
 {
-    static auto cmptr = [](const std::unique_ptr<SubscriptionInfo> &ptrA, Core::handle_id_t handle) {
-        return (ptrA->id < handle);
-    };
-
-    auto fnd = std::lower_bound (subscriptions.begin (), subscriptions.end (), handle_, cmptr);
-    if ((*fnd)->id == handle_)
-    {
-        return fnd->get ();
-    }
-    return nullptr;
+	return subscriptions.lock()->find(subName);
 }
 
-PublicationInfo *FederateState::getPublication (const std::string &pubName) const
+
+const SubscriptionInfo *FederateState::getSubscription(Core::handle_id_t handle_) const
 {
-    auto fnd = pubNames.find (pubName);
-    if (fnd != pubNames.end ())
-    {
-        return fnd->second;
-    }
-    return nullptr;
+	return subscriptions.lock_shared()->find(handle_);
 }
 
-PublicationInfo *FederateState::getPublication (Core::handle_id_t handle_) const
+SubscriptionInfo *FederateState::getSubscription (Core::handle_id_t handle_)
 {
-    static auto cmptr = [](const std::unique_ptr<PublicationInfo> &ptrA, Core::handle_id_t handle) {
-        return (ptrA->id < handle);
-    };
-
-    auto fnd = std::lower_bound (publications.begin (), publications.end (), handle_, cmptr);
-    if ((*fnd)->id == handle_)
-    {
-        return fnd->get ();
-    }
-    return nullptr;
+	return subscriptions.lock()->find(handle_);
 }
 
-EndpointInfo *FederateState::getEndpoint (const std::string &endpointName) const
+const PublicationInfo *FederateState::getPublication (const std::string &pubName) const
 {
-    auto fnd = epNames.find (endpointName);
-    if (fnd != epNames.end ())
-    {
-        return fnd->second;
-    }
-    return nullptr;
+	return publications.lock_shared()->find(pubName);
 }
 
-EndpointInfo *FederateState::getEndpoint (Core::handle_id_t handle_) const
+const PublicationInfo *FederateState::getPublication (Core::handle_id_t handle_) const
 {
-    static auto cmptr = [](const std::unique_ptr<EndpointInfo> &ptrA, Core::handle_id_t handle) {
-        return (ptrA->id < handle);
-    };
-
-    auto fnd = std::lower_bound (endpoints.begin (), endpoints.end (), handle_, cmptr);
-    if (fnd == endpoints.end ())
-    {
-        return nullptr;
-    }
-    if (fnd->operator-> ()->id == handle_)
-    {
-        return fnd->get ();
-    }
-    return nullptr;
+	return publications.lock()->find(handle_);
 }
 
-bool FederateState::checkSetValue (Core::handle_id_t pub_id, const char *data, uint64_t len) const
+PublicationInfo *FederateState::getPublication(const std::string &pubName)
+{
+	return publications.lock()->find(pubName);
+}
+
+PublicationInfo *FederateState::getPublication(Core::handle_id_t handle_)
+{
+	return publications.lock()->find(handle_);
+}
+
+const EndpointInfo *FederateState::getEndpoint (const std::string &endpointName) const
+{
+	return endpoints.lock_shared()->find(endpointName);
+}
+
+const EndpointInfo *FederateState::getEndpoint (Core::handle_id_t handle_) const
+{
+	return endpoints.lock_shared()->find(handle_);
+}
+
+EndpointInfo *FederateState::getEndpoint(const std::string &endpointName)
+{
+	return endpoints.lock()->find(endpointName);
+}
+
+EndpointInfo *FederateState::getEndpoint(Core::handle_id_t handle_)
+{
+	return endpoints.lock()->find(handle_);
+}
+
+bool FederateState::checkAndSetValue (Core::handle_id_t pub_id, const char *data, uint64_t len)
 {
     if (!only_transmit_on_change)
     {
@@ -320,7 +269,8 @@ uint64_t FederateState::getQueueSize (Core::handle_id_t handle_) const
 uint64_t FederateState::getQueueSize () const
 {
     uint64_t cnt = 0;
-    for (auto &end_point : endpoints)
+    auto slock = endpoints.lock_shared();
+    for (const auto &end_point :*slock)
     {
         cnt += end_point->queueSize (time_granted);
     }
@@ -341,8 +291,9 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::handle_id_t &id)
 {
     Time earliest_time = Time::maxVal ();
     EndpointInfo *endpointI = nullptr;
+    auto slock = endpoints.lock_shared();
     // Find the end point with the earliest message time
-    for (auto &end_point : endpoints)
+    for (auto &end_point : *slock)
     {
         auto t = end_point->firstMessageTime ();
         if (t < earliest_time)
@@ -413,8 +364,8 @@ iteration_result FederateState::waitSetup ()
     processing = false;
     return ret;
 }
-/** process until the init state has been entered or there is a failure*/
-iteration_result FederateState::enterInitState ()
+
+iteration_result FederateState::enterInitializationState ()
 {
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
@@ -537,7 +488,8 @@ iteration_time FederateState::requestTime (Time nextTime, helics_iteration_reque
 void FederateState::fillEventVector (Time currentTime)
 {
     events.clear ();
-    for (auto &sub : subscriptions)
+    auto slock = subscriptions.lock_shared();
+    for (auto &sub : *slock)
     {
         bool updated = sub->updateTime (currentTime);
         if (updated)
@@ -725,7 +677,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         if (epi != nullptr)
         {
             timeCoord->updateMessageTime (cmd.actionTime);
-            epi->addMessage (createMessage (std::move (cmd)));
+            epi->addMessage (createMessageFromCommand (std::move (cmd)));
         }
     }
     break;
@@ -822,7 +774,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         if (cmd.name == name)
         {
-            if (CHECK_ACTION_FLAG (cmd, error_flag))
+            if (checkActionFlag (cmd, error_flag))
             {
                 setState (HELICS_ERROR);
                 return iteration_state::error;
@@ -848,10 +800,10 @@ void FederateState::processConfigUpdate (const ActionMessage &m)
         switch (m.dest_id)
         {
         case ONLY_TRANSMIT_ON_CHANGE_FLAG:
-            only_transmit_on_change = CHECK_ACTION_FLAG (m, indicator_flag);
+            only_transmit_on_change = checkActionFlag (m, indicator_flag);
             break;
         case ONLY_UPDATE_ON_CHANGE_FLAG:
-            only_update_on_change = CHECK_ACTION_FLAG (m, indicator_flag);
+            only_update_on_change = checkActionFlag (m, indicator_flag);
             break;
         default:
             break;
@@ -875,7 +827,8 @@ void FederateState::addDependent (Core::federate_id_t fedThatDependsOnThis)
 Time FederateState::nextValueTime () const
 {
     auto firstValueTime = Time::maxVal ();
-    for (auto &sub : subscriptions)
+    auto slock = subscriptions.lock_shared();
+    for (auto &sub : *slock)
     {
         auto nvt = sub->nextValueTime ();
         if (nvt >= time_granted)
@@ -893,7 +846,8 @@ Time FederateState::nextValueTime () const
 Time FederateState::nextMessageTime () const
 {
     auto firstMessageTime = Time::maxVal ();
-    for (auto &ep : endpoints)
+    auto slock = endpoints.lock_shared();
+    for (auto &ep : *slock)
     {
         auto messageTime = ep->firstMessageTime ();
         if (messageTime >= time_granted)
@@ -927,13 +881,14 @@ std::string FederateState::processQuery (const std::string &query) const
     {
         std::string ret;
         ret.push_back ('[');
-        std::unique_lock<std::mutex> lock (_mutex);
-        for (auto &pub : publications)
         {
-            ret.append (pub->key);
-            ret.push_back (';');
+            auto pubHandle = publications.lock_shared();
+            for (auto &pub : *pubHandle)
+            {
+                ret.append(pub->key);
+                ret.push_back(';');
+            }
         }
-        lock.unlock ();
         if (ret.size () > 1)
         {
             ret.back () = ']';
@@ -948,13 +903,14 @@ std::string FederateState::processQuery (const std::string &query) const
     {
         std::string ret;
         ret.push_back ('[');
-        std::unique_lock<std::mutex> lock (_mutex);
-        for (auto &ept : endpoints)
         {
-            ret.append (ept->key);
-            ret.push_back (';');
+            auto endHandle = endpoints.lock_shared();
+            for (auto &ept : *endHandle)
+            {
+                ret.append(ept->key);
+                ret.push_back(';');
+            }
         }
-        lock.unlock ();
         if (ret.size () > 1)
         {
             ret.back () = ']';

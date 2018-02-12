@@ -12,9 +12,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/common/AsioServiceManager.h"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
+#include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-types.hpp"
-#include "helics/core/Core.hpp"
 #include "helics/core/udp/UdpBroker.h"
 #include "helics/core/udp/UdpComms.h"
 #include "helics/core/udp/UdpCore.h"
@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
 
     udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
 
-    comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
+    comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setName ("tests");
     auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
     udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
 
     BOOST_CHECK (rxSocket.is_open ());
-    comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
+    comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setPortNumber (UDP_SECONDARY_PORT);
     comm.setName ("tests");

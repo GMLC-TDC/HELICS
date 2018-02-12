@@ -26,7 +26,7 @@ int main()
 {
   helics_federate_info_t fedinfo;
   const char*    helicsversion;
- // helics_status   status;
+ /* helics_status   status; */
   helics_broker  broker;
   const char*    initstring="2 --name=mainbroker";
   const char*    fedinitstring="--federates=1";
@@ -35,6 +35,11 @@ int main()
   helics_federate vfed;
   helics_publication pub;
   helics_subscription sub;
+
+  /* This federate will be publishing deltat*pi for numsteps steps */
+  double pi = 22.0 / 7.0, value;
+  helics_time_t currenttime = 0.0;
+  int  isupdated;
 
   helicsversion = helicsGetVersion();
 
@@ -93,12 +98,6 @@ int main()
   /* Enter execution mode */
  helicsFederateEnterExecutionMode(vfed);
   printf("PI SENDER: Entered execution mode\n");
-
-  /* This federate will be publishing deltat*pi for numsteps steps */
-  //double this_time = 0.0;
-  double pi = 22.0/7.0,value;
-  helics_time_t currenttime=0.0;
-  int  isupdated;
 
   while(currenttime < 0.2) {
     value = currenttime*pi;

@@ -35,7 +35,7 @@ std::string helicsTypeString (core_type type)
     case core_type::UDP:
         return "udp_";
     default:
-        return "";
+        return std::string();
     }
 }
 

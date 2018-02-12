@@ -37,7 +37,7 @@ zmqReactor::zmqReactor (const std::string &reactorName, const std::string &conte
     loopThread = std::thread (&zmqReactor::reactorLoop, this);
 }
 
-static const int zero (0);
+static constexpr int zero (0);
 
 zmqReactor::~zmqReactor () { terminateReactor (); }
 

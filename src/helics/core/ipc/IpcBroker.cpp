@@ -10,8 +10,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "IpcBroker.h"
 #include "../../common/blocking_queue.h"
-#include "../core-data.hpp"
 #include "../Core.hpp"
+#include "../core-data.hpp"
 #include "../helics-time.hpp"
 #include "helics/helics-config.h"
 
@@ -37,10 +37,10 @@ constexpr size_t maxMessageCount = 256;
 namespace helics
 {
 using namespace std::string_literals;
-static const ArgDescriptors extraArgs{{"queueloc"s, "string"s, "the named location of the shared queue"s},
-                                      {"broker,b"s, "string"s, "identifier for the broker"s},
-                                      {"broker_address", "string"s, "location of the broker i.e network address"},
-                                      {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
+static const ArgDescriptors extraArgs{ {"queueloc"s , "the named location of the shared queue"s},
+                                      {"broker,b"s, "identifier for the broker"s},
+                                      {"broker_address", "location of the broker i.e network address"},
+                                      {"brokerinit"s, "the initialization string for the broker"s}};
 
 IpcBroker::IpcBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
@@ -51,8 +51,7 @@ IpcBroker::~IpcBroker () = default;
 void IpcBroker::displayHelp (bool local_only)
 {
     std::cout << " Help for Interprocess Broker: \n";
-    namespace po = boost::program_options;
-    po::variables_map vm;
+    variable_map vm;
     const char *const argV[] = {"", "--help"};
     argumentParser (2, argV, vm, extraArgs);
     if (!local_only)
@@ -63,10 +62,9 @@ void IpcBroker::displayHelp (bool local_only)
 
 void IpcBroker::initializeFromArgs (int argc, const char *const *argv)
 {
-    namespace po = boost::program_options;
     if (brokerState == broker_state_t::created)
     {
-        po::variables_map vm;
+        variable_map vm;
         argumentParser (argc, argv, vm, extraArgs);
 
         if (vm.count ("broker") > 0)

@@ -11,7 +11,9 @@ BlockingQueue.hpp
 BlockingPriorityQueue.hpp
 timeRepresentation.hpp
 delayedDestructor.hpp
+DelayedObjects.hpp
 searchableObjectHolder.hpp
+JsonProcessingFunctions.hpp
 stringToCmdLine.h
 AsioServiceManager.h
 logger.h
@@ -21,37 +23,42 @@ generic_string_ops.hpp
 base64.h
 argParser.h
 MappedVector.hpp
-MappedPointerVector.hpp
 DualMappedVector.hpp
-
+MappedPointerVector.hpp
+DualMappedPointerVector.hpp
+GuardedTypes.hpp
+TripWire.hpp
+MapTraits.hpp
 )
 
 set(common_sources
 stringToCmdLine.cpp
 AsioServiceManager.cpp
+JsonProcessingFunctions.cpp
 logger.cpp
 stringOps.cpp
 charMapper.cpp
 base64.cpp
 argParser.cpp
+TripWire.cpp
 )
 
 set(zmq_headers
-	zmqReactor.h
+	#zmqReactor.h
 	zmqContextManager.h
 	zmqHelper.h
-	zmqSocketDescriptor.h
-	zmqProxyHub.h
+	#zmqSocketDescriptor.h
+	#zmqProxyHub.h
 	cppzmq/zmq.hpp
 	cppzmq/zmq_addon.hpp
 	)
 
 set(zmq_sources
-	zmqReactor.cpp
+	#zmqReactor.cpp
 	zmqContextManager.cpp
-	zmqSocketDescriptor.cpp
+	#zmqSocketDescriptor.cpp
 	zmqHelper.cpp
-	zmqProxyHub.cpp
+	#zmqProxyHub.cpp
 )
 
 set (helics_public_common

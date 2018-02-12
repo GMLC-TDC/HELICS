@@ -120,7 +120,7 @@ std::string trim (const std::string &input, const std::string &whitespace)
     const auto strStart = input.find_first_not_of (whitespace);
     if (strStart == std::string::npos)
     {
-        return "";  // no content
+        return std::string ();  // no content
     }
 
     const auto strEnd = input.find_last_not_of (whitespace);

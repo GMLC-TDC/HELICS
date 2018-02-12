@@ -9,9 +9,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 #include "helics/application_api/Federate.hpp"
 #include "helics/core/BrokerFactory.hpp"
+#include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
-#include "helics/core/Core.hpp"
 #include "test_configuration.h"
 #include <future>
 #include <boost/test/unit_test.hpp>

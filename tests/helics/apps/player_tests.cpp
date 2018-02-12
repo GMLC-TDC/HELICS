@@ -210,10 +210,12 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
 
 BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make (simple_files), file)
 {
-    exeTestRunner playerExe ("", "helics_player");
+    exeTestRunner playerExe (std::string(HELICS_BIN_LOC)+"/apps/", "helics_player");
 
-    exeTestRunner brokerExe ("", "helics_broker");
+    exeTestRunner brokerExe (std::string(HELICS_BIN_LOC)+"/core/", "helics_broker");
 
+BOOST_REQUIRE(playerExe.isActive());
+BOOST_REQUIRE(brokerExe.isActive());
     auto res = brokerExe.runAsync ("2 --type=zmq --name=zmq_broker");
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
     auto res2 = playerExe.runCaptureOutputAsync ("--name=player --core=zmq " + exampleFile);

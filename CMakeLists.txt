@@ -7,8 +7,8 @@ project (HELICS)
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
 set (HELICS_VERSION_PATCH 0)
-set (HELICS_VERSION_BUILD alpha)
-set (HELICS_DATE "01-18-18")
+set (HELICS_VERSION_BUILD alpha2)
+set (HELICS_DATE "02-02-18")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -37,7 +37,7 @@ OPTION(USE_POSITION_INDEPENDENT_CODE "Build the libraries with Position independ
 endif()
 
 OPTION(BUILD_JAVA "Build Java extension" OFF)
-if (BUILD_PYTHON OR BUILD_C_SHARED_LIB)
+if (BUILD_PYTHON OR BUILD_C_SHARED_LIB OR BUILD_JAVA OR BUILD_MATLAB)
 set(BUILT_C_SHARED_LIB ON)
 endif()
 
@@ -56,7 +56,7 @@ if (NOT CMAKE_DEBUG_POSTFIX)
 	set(CMAKE_DEBUG_POSTFIX d)
 endif()
 
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/config/cmake/")
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/")
 
 include_directories ("${PROJECT_SOURCE_DIR}/ThirdParty")
 include_directories ("${PROJECT_BINARY_DIR}/libs/include")
@@ -94,78 +94,44 @@ IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
   message(FATAL_ERROR "In-source build is not supported. Please, use an empty directory for building the project.")
 ENDIF()
 
-# -------------------------------------------------------------
-# Setup compiler options and configurations
-# -------------------------------------------------------------
-message(STATUS "setting up for ${CMAKE_CXX_COMPILER_ID}")
+include(compiler_flags)
+
 IF(UNIX)
   # Since default builds of boost library under Unix don't use
   # CMake, turn off using CMake build and find include/libs the
   # regular way.
   set(Boost_NO_BOOST_CMAKE ON)
-
   set(Boost_USE_MULTITHREADED      OFF)   # Needed if MT libraries not built
-  add_compile_options(-Wall -pedantic)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wextra>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wshadow>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-aliasing>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
-  #this options produces lots of warning but is useful for checking ever once in a while with Clang, GCC warning notices with this aren't as useful
-  #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
-
-   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
-  option (USE_LIBCXX "Use LibC++ vs as opposed to the default" OFF)
-  IF(USE_LIBCXX)
-      add_compile_options(-stdlib=libc++)
-      link_libraries("-stdlib=libc++")
-     ENDIF(USE_LIBCXX)
+  option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
 ELSE(UNIX)
   IF(MINGW)
-  add_compile_options(-Wall -pedantic)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wextra>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wshadow>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-pedantic>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-aliasing>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
-  #this options produces lots of warning but is useful for checking ever once in a while with Clang, GCC warning notices with this aren't as useful
-  #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
-
   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
   ELSE(MINGW)
+  #this would most likely be MSVC
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
-# -------------------------------------------------------------
-# Extra definitions for visual studio
-# -------------------------------------------------------------
-IF(MSVC)
-  ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
-  ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
-  add_compile_options(/MP)
-  add_compile_options(-W4  /EHsc /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484 /wd4702 /wd4996 )
-  add_compile_options(/sdl)
-  ADD_DEFINITIONS(-D_WIN32_WINNT=0x0601)
-ENDIF(MSVC)
   ENDIF(MINGW)
 ENDIF(UNIX)
 
 IF (BUILD_MATLAB OR USE_BOOST_STATIC_LIBS)
   set(Boost_USE_STATIC_LIBS ON)
+  set(BOOST_STATIC ON)
+	  
 ENDIF ()
-
 # -------------------------------------------------------------
-# Check and set latest CXX Standard supported by compiler
+# add coverage target
 # -------------------------------------------------------------
-OPTION(ENABLE_CXX_17 "set to on to enable C++17 compilation features" OFF)
-include(CheckLatestCXXStandardOption)
-IF (VERSION_OPTION)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
-ELSE ()
-	set(CMAKE_CXX_STANDARD 14)
-ENDIF ()
+ option (TEST_CODE_COVERAGE "Build a target for testing code coverage" OFF)
+ if (TEST_CODE_COVERAGE)
+ include(CodeCoverage)
 
+ set(COVERAGE_EXCLUDES 'ThirdParty/*' 'tests/*' 'swig/*' 'examples/*')
+ add_compile_options(${COVERAGE_COMPILER_FLAGS})
+  SETUP_TARGET_FOR_COVERAGE(
+     NAME helics_coverage                    # New target name
+     EXECUTABLE CTest # Executable in PROJECT_BINARY_DIR
+	)
+
+ endif(TEST_CODE_COVERAGE)
 # -------------------------------------------------------------
 # add threading support
 # -------------------------------------------------------------
@@ -185,11 +151,11 @@ IF (HELICS_GENERATE_DOXYGEN_DOC)
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
 
-	SHOW_VARIABLE(DOXYGEN_OUTPUT_DIR PATH "location to put Doxygen docs" "${CMAKE_CURRENT_SOURCE_DIR}/docs")
+	SHOW_VARIABLE(DOXYGEN_OUTPUT_DIR PATH "location to put Doxygen docs" "${PROJECT_BINARY_DIR}/docs")
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 	add_custom_target(doc
 	${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docs
+	WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
 	COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 endif(DOXYGEN_FOUND)
@@ -239,7 +205,7 @@ add_library(helics-static STATIC
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
-target_link_libraries(helics-static Threads::Threads)
+target_link_libraries(helics-static Threads::Threads) 
 IF (UNIX AND NOT APPLE)
 target_link_libraries(helics-static rt)
 ENDIF()
@@ -313,7 +279,7 @@ IF("${isSystemDir}" STREQUAL "-1")
    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
-if (NOT USE_BOOST_STATIC_LIBS)
+if (NOT Boost_USE_STATIC_LIBS)
 list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
 endif()
 
@@ -335,7 +301,7 @@ ENDIF()
 
 IF(BUILD_CXX_SHARED_LIB)
 	if (BUILD_C_SHARED_LIB OR BUILD_PYTHON)
-		warning("Building the CXX shared library and C shared library in the same build is not advisable due to conflicting symbol visibility guidelines and is unlikely to work very well")
+		message(WARNING "Building the CXX shared library and C shared library in the same build is not advisable due to conflicting symbol visibility guidelines and is unlikely to work very well")
 	endif()
 
 	add_library(helics-shared SHARED src/empty.cpp)
@@ -421,21 +387,25 @@ install (TARGETS helics-static EXPORT helics-targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 	set(helics_static_file "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}")
-
+	set(helics_static_file_debug "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 IF(BUILD_CXX_SHARED_LIB)
 install (TARGETS helics-shared EXPORT helics-targets
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 	set(helics_cxx_shared_file "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_SHARED_LIBRARY_SUFFIX}")
+	set(helics_cxx_shared_file_debug "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 ELSE (BUILD_CXX_SHARED_LIB)
 	set(helics_cxx_shared_file )
+	set(helics_cxx_shared_file_debug )
 ENDIF(BUILD_CXX_SHARED_LIB)
 
 IF(BUILD_C_SHARED_LIB OR BUILD_PYTHON)
 	set(helics_c_shared_file "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_SHARED_LIBRARY_SUFFIX}")
+	set(helics_c_shared_file_debug "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 ELSE()
 	set(helics_c_shared_file )
+	set(helics_c_shared_file_debug )
 ENDIF()
 
 

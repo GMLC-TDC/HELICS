@@ -17,57 +17,73 @@ cache:
     - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/share
     - dependencies
 
-matrix:
+# Create aliases for some of shared build configuration
+_basic_env:
+- &daily_linux
+  if: type = cron
+  os:
+    - linux
+  compiler: gcc
+  addons:
+    apt:
+      sources:
+        - ubuntu-toolchain-r-test
+      packages:
+        - g++-6
+        - valgrind
+- &linux_base
+  if: type != cron
+  os: linux
+  compiler: gcc
+- &osx_base
+  if: branch IN (master, develop)
+  os: osx
+  compiler: clang
+
+jobs:
   # On weekdays, the backlog for waiting OS X builds is huge
   fast_finish: true
   allow_failures:
     - os: osx
 
   include:
-
     # XCode 6.4, OS X 10.10
-    - env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=64 HOMEBREW_NO_AUTO_UPDATE=1"
-      os: osx
+    - <<: *osx_base
+      env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && SHARED_LIB_EXT=dylib && TRAVIS_XCODE_VERSION=64 HOMEBREW_NO_AUTO_UPDATE=1"
       osx_image: xcode6.4
-      compiler: clang
-
     # XCode 7.3, OS X 10.11
-    - env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73 HOMEBREW_NO_AUTO_UPDATE=1"
-      os: osx
+    - <<: *osx_base
+      env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && SHARED_LIB_EXT=dylib && TRAVIS_XCODE_VERSION=73 HOMEBREW_NO_AUTO_UPDATE=1"
       osx_image: xcode7.3
-      compiler: clang
 
     # Built without errors on my clone from one of the changes made
     # Possibly local dependencies, or removing Linux-only commands fixed it
     # XCode 8.3, OS X 10.12
     #- env: COMPILER=clang++ BUILD_TYPE=Debug
-    #  os: osx
     #  osx_image: xcode8.3
-    #  compiler: clang
 
-    - compiler: gcc
+    - <<: *linux_base
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6"
-      os:
-        - linux
+      env: MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6 && SHARED_LIB_EXT=so"
 
-    - compiler: gcc
+    - <<: *linux_base
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
-      env: MATRIX_EVAL="COMPILER=g++-4.9 && CC=gcc-4.9 && CXX=g++-4.9"
-      os:
-        - linux
+      env:
+        - MATRIX_EVAL="COMPILER=g++-4.9 && CC=gcc-4.9 && CXX=g++-4.9 && SHARED_LIB_EXT=so"
+        - MINIMUM_DEPENDENCIES=true
 
-    - compiler: clang
+    - <<: *linux_base
+      compiler: clang
       addons:
         apt:
           sources:
@@ -75,9 +91,20 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
-      env: MATRIX_EVAL="COMPILER=clang++-3.6 && CC='ccache clang-3.6 -Qunused-arguments -fcolor-diagnostics' && CXX='ccache clang++-3.6 -Qunused-arguments -fcolor-diagnostics'
-      os:
-        - linux
+      env: MATRIX_EVAL="SHARED_LIB_EXT=so && COMPILER=clang++-3.6 && CC='ccache clang-3.6 -Qunused-arguments -fcolor-diagnostics' && CXX='ccache clang++-3.6 -Qunused-arguments -fcolor-diagnostics'
+
+
+   # ------------------------------------------------
+   # Jobs for daily valgrind and code coverage tests
+   # ------------------------------------------------
+    - <<: *daily_linux
+      env:
+        - MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6 && SHARED_LIB_EXT=so"
+        - RUN_VALGRIND=true
+    - <<: *daily_linux
+      env:
+        - MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6 && SHARED_LIB_EXT=so"
+        - RUN_COVERAGE=true
 
 branches:
   except:
@@ -93,7 +120,7 @@ install:
 script:
   - mkdir build && cd build
   - export HELICS_DEPENDENCY_FLAGS="-DZeroMQ_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/zmq -DBOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost"
-  - export HELICS_OPTION_FLAGS="-DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON -DTRAVIS_TESTS_ENABLE=ON"
+  - export HELICS_OPTION_FLAGS="-DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON -DTRAVIS_TESTS_ENABLE=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.${SHARED_LIB_EXT} -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/"
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
   - make -j2
   # For controlling which tests get run:
@@ -106,6 +133,9 @@ script:
   # 6 = travis-tests
   # - ctest --verbose --timeout 120 -I 0,0,0,1
   - ctest --verbose --timeout 120 -I 0,0,0,6
+  - export PYTHONPATH="$(pwd)/swig/python"
+  - python3 -m helics
+  - python3 -m pytest -v ../tests/python_helics
 
 notifications:
     email: false

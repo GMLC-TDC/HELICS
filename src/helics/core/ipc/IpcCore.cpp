@@ -9,9 +9,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "IpcCore.h"
+#include "../Core.hpp"
 #include "../core-data.hpp"
 #include "../core-exceptions.hpp"
-#include "../Core.hpp"
 #include "../helics-time.hpp"
 #include "helics/helics-config.h"
 
@@ -32,14 +32,14 @@ namespace helics
 {
 using namespace std::string_literals;
 static const ArgDescriptors extraArgs{
-  {"queueloc"s, "string"s, "the file location of the shared queue"s},
-  {"broker,b"s, "string"s, "identifier for the broker"s},
-  {"broker_address", "string"s, "location of the broker i.e network address"},
-  {"broker_auto_start"s, "", "automatically start the broker"s},
-  {"broker_init"s, "string"s,
+  {"queueloc"s,  "the file location of the shared queue"s},
+  {"broker,b"s,  "identifier for the broker"s},
+  {"broker_address",  "location of the broker i.e network address"},
+  {"broker_auto_start"s,ArgDescriptor::arg_type_t::flag_type, "automatically start the broker"s},
+  {"broker_init"s,
    "the init string to pass to the broker upon startup-will only be used if the autostart is activated"s},
-  {"brokername"s, "string"s, "identifier for the broker-same as broker"s},
-  {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
+  {"brokername"s, "identifier for the broker-same as broker"s},
+  {"brokerinit"s, "the initialization string for the broker"s}};
 
 IpcCore::IpcCore () noexcept {}
 
@@ -49,10 +49,9 @@ IpcCore::~IpcCore () = default;
 
 void IpcCore::initializeFromArgs (int argc, const char *const *argv)
 {
-    namespace po = boost::program_options;
     if (brokerState == created)
     {
-        po::variables_map vm;
+        variable_map vm;
         argumentParser (argc, argv, vm, extraArgs);
 
         if (vm.count ("broker") > 0)
