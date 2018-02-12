@@ -39,9 +39,9 @@ const std::string core_types_single[] = {"test", "ipc", "zmq", "udp","test_3", "
 
 #ifndef DISABLE_TCP_CORE
 const std::string travis_core_types[] = { "test",   "ipc",   "tcp",   "zmq",   "udp",
-"test_2", "ipc_2", "tcp_2", "zmq_2", "udp_2" };
+"test_2","zmq_4", "ipc_2","test_4", "tcp_2", "zmq_2", "udp_2","test_3","zmq_3" };
 #else
-const std::string travis_core_types[] = { "test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2" };
+const std::string travis_core_types[] = { "test", "ipc", "zmq", "udp", "test_2","zmq_4", "ipc_2","test_4", "zmq_2", "udp_2","test_3","zmq_3" };
 #endif
 
 struct FederateTestFixture
@@ -152,6 +152,17 @@ struct FederateTestFixture
             }
         }
         break;
+        case 7: //two layers of subbrokers
+        {      
+                auto newTypeString = core_type_name;
+                newTypeString.push_back('_');
+                newTypeString.push_back('4');
+                for (int ii = 0; ii < count; ++ii)
+                {
+                    auto subbroker = AddBroker(core_type_name, initString + " --federates 1");
+                    AddFederates<FedType>(newTypeString, 1, subbroker, time_delta, name_prefix);
+                }
+        }
         }
 
         return federates_added;

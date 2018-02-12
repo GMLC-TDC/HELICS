@@ -2866,7 +2866,6 @@ void CommonCore::processFilterReturn(ActionMessage &cmd)
                     }
                     return;
                 }
-                ++ii;
             }
         }
         ongoingFilterProcesses[handle->local_fed_id].erase(messID);
