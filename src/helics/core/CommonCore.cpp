@@ -2822,7 +2822,7 @@ void CommonCore::processFilterReturn(ActionMessage &cmd)
         auto filtFunc = getFilterCoordinator(handle->id);
         if (filtFunc->hasSourceFilter)
         {
-            for (int ii=cmd.counter+1;ii<filtFunc->sourceFilters.size();++ii)
+            for (decltype(cmd.counter) ii=cmd.counter+1;ii<filtFunc->sourceFilters.size();++ii)
             {
                 auto filt = filtFunc->sourceFilters[ii];
                 if (filt->fed_id == global_broker_id)

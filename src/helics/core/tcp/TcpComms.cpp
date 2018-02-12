@@ -238,7 +238,11 @@ void TcpComms::queue_rx_function ()
                 auto mp = message.source_handle;
                 if (openPortStart < 0)
                 {
-                    if (mp < BEGIN_OPEN_PORT_RANGE_SUBBROKER)
+                    if (mp<BEGIN_OPEN_PORT_RANGE)
+                    {
+                        openPortStart = BEGIN_OPEN_PORT_RANGE;
+                    }
+                    else if (mp < BEGIN_OPEN_PORT_RANGE_SUBBROKER)
                     {
                         openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER + (mp - BEGIN_OPEN_PORT_RANGE) * 10;
                     }
