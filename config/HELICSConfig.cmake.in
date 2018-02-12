@@ -14,15 +14,18 @@ set_and_check(${PN}_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR
 
 set(C_SHARED_BUILT @BUILT_C_SHARED_LIB@)
 if (C_SHARED_BUILT )
-set_and_check(${PN}_C_SHARED_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@/@helics_c_shared_file@")
+set(${PN}_C_SHARED_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@/@helics_c_shared_file@")
+set(${PN}_C_SHARED_LIBRARY_DEBUG "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@/@helics_c_shared_file_debug@")
 endif()
 
 set(CXX_SHARED_BUILT @BUILD_CXX_SHARED_LIB@)
 if (CXX_SHARED_BUILT)
-set_and_check(${PN}_CXX_SHARED_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@/@helics_cxx_shared_file@")
+set(${PN}_CXX_SHARED_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@/@helics_cxx_shared_file@")
+set(${PN}_CXX_SHARED_LIBRARY_DEBUG "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@/@helics_cxx_shared_file_debug@")
 endif()
 
-set_and_check(${PN}_STATIC_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_static_file@")
+set(${PN}_STATIC_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_static_file@")
+set(${PN}_STATIC_LIBRARY_DEBUG "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_static_file_debug@")
 
 set(${PN}_DEPENDENCIES "@helics_dependencies@")
 check_required_components(${PN})

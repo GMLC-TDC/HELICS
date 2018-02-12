@@ -15,12 +15,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../common/simpleQueue.hpp"
 #include "../core/Core.hpp"
 #include "Message.hpp"
-#include "libguarded/guarded.hpp"
+#include "../common/GuardedTypes.hpp"
 #include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -145,16 +144,17 @@ class MessageFederateManager
     int getEndpointCount () const;
 
   private:
-    DualMappedVector<endpoint_info,std::string, Core::handle_id_t> local_endpoints;  //!< storage for the local endpoint information
+    shared_guarded<DualMappedVector<endpoint_info,std::string, Core::handle_id_t>> local_endpoints;  //!< storage for the local endpoint information
     std::vector<std::function<void(endpoint_id_t, Time)>> callbacks;  //!< vector of callbacks
 
     std::map<Core::handle_id_t, std::pair<endpoint_id_t, std::string>> subHandleLookup;  //!< map for subscriptions
     Time CurrentTime;  //!< the current simulation time
 	Core *coreObject;  //!< the pointer to the actual core
+    std::atomic<endpoint_id_t::underlyingType> endpointCount{ 0 };  //!< the count of actual endpoints
     Core::federate_id_t fedID;  //!< storage for the federate ID
     mutable std::mutex endpointLock;  //!< lock for protecting the endpoint list
     std::vector<SimpleQueue<std::unique_ptr<Message>>> messageQueues;  //!< the storage for the message queues
-    libguarded::guarded<std::vector<unsigned int>> messageOrder;  //!< maintaining a list of the ordered messages
+    guarded<std::vector<unsigned int>> messageOrder;  //!< maintaining a list of the ordered messages
     int allCallbackIndex = -1;  //!< index of the all callback function
     bool hasSubscriptions = false;  //!< indicator that the message filter subscribes to data values
   private:  // private functions

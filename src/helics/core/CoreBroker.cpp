@@ -27,18 +27,15 @@ namespace helics
 using namespace std::string_literals;
 
 static const ArgDescriptors extraArgs{
-  {"root"s, ""s, "specify whether the broker is a root"s},
+  {"root"s, ArgDescriptor::arg_type_t::flag_type, "specify whether the broker is a root"s},
 };
-
-bool matchingTypes (const std::string &type1, const std::string &type2);
 
 void CoreBroker::displayHelp ()
 {
     std::cout << "Broker Specific options:\n";
-    namespace po = boost::program_options;
-    po::variables_map vm;
+    variable_map vm;
     const char *const argV[] = {"", "--help"};
-    argumentParser (2, argV, vm, extraArgs);
+    argumentParser(2, argV, vm, {});
     BrokerBase::displayHelp ();
 }
 
@@ -876,9 +873,7 @@ void CoreBroker::initializeFromArgs (int argc, const char *const *argv)
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong (exp, broker_state_t::initialized))
     {
-        namespace po = boost::program_options;
-
-        po::variables_map vm;
+        variable_map vm;
         argumentParser (argc, argv, vm, extraArgs);
         // Initialize the brokerBase component
         initializeFromCmdArgs (argc, argv);

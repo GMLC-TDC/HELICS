@@ -32,7 +32,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <cstring>
 #include <fstream>
 #include <functional>
-#include <boost/program_options.hpp>
 
 #include "../common/DelayedObjects.hpp"
 #include <boost/format.hpp>
@@ -1330,8 +1329,8 @@ void CommonCore::send (handle_id_t sourceHandle, const std::string &destination,
     m.payload = std::string (data, length);
     m.info ().target = destination;
     m.actionTime = fed->grantedTime ();
-
-    queueMessage (processMessage (hndl, m));
+    addActionMessage(m);
+    //queueMessage (processMessage (hndl, m));
 }
 
 void CommonCore::sendEvent (Time time,
@@ -1357,8 +1356,8 @@ void CommonCore::sendEvent (Time time,
     m.info ().orig_source = hndl->key;
     m.info ().source = hndl->key;
     m.info ().target = destination;
-
-    queueMessage (processMessage (hndl, m));
+    addActionMessage(m);
+    //queueMessage (processMessage (hndl, m));
 }
 
 void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message> message)
@@ -1369,7 +1368,7 @@ void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message>
         m.source_id = global_broker_id;
         m.source_handle = sourceHandle;
 
-        queueMessage (m);
+        addActionMessage (m);
         return;
     }
     auto hndl = getHandleInfo (sourceHandle);
@@ -1386,8 +1385,8 @@ void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message>
     m.info ().source = hndl->key;
     m.source_id = hndl->fed_id;
     m.source_handle = sourceHandle;
-
-    queueMessage (processMessage (hndl, m));
+    addActionMessage(m);
+   // queueMessage (processMessage (hndl, m));
 }
 
 // Checks for filter operations
@@ -1408,8 +1407,15 @@ ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage 
                 {
                     // deal with local source filters
                     auto tempMessage = createMessageFromCommand (std::move (m));
-                    tempMessage = filtFunc->sourceFilters[ii]->filterOp->process (std::move (tempMessage));
-                    m = ActionMessage (std::move (tempMessage));
+                    if (tempMessage)
+                    {
+                        tempMessage = filtFunc->sourceFilters[ii]->filterOp->process(std::move(tempMessage));
+                        m = ActionMessage(std::move(tempMessage));
+                    }
+                    else
+                    {
+                        m = CMD_IGNORE;
+                    }
                 }
                 else
                 {
@@ -1432,7 +1438,7 @@ ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage 
     return m;
 }
 
-void CommonCore::queueMessage (ActionMessage &message)
+void CommonCore::deliverMessage (ActionMessage &message)
 {
     switch (message.action ())
     {
@@ -1442,7 +1448,16 @@ void CommonCore::queueMessage (ActionMessage &message)
         auto localP = getLocalEndpoint (message.info ().target);
         if (localP == nullptr)
         {  // must be a remote endpoint push it to the main queue to deal with
-            addActionMessage (message);
+            auto kfnd = knownExternalEndpoints.find(message.info().target);
+            if (kfnd != knownExternalEndpoints.end())
+            {  // destination is known
+                auto route = getRoute(kfnd->second);
+                transmit(route, message);
+            }
+            else
+            {
+                transmit(0, message);
+            }
             return;
         }
         if (localP->hasDestFilter)  // the endpoint has a destination filter
@@ -1456,14 +1471,17 @@ void CommonCore::queueMessage (ActionMessage &message)
         }
         message.dest_id = localP->fed_id;
         message.dest_handle = localP->id;
-        addActionMessage (message);
+        auto fed = getFederate(localP->fed_id);
+        fed->addAction(message);
+        
     }
     break;
     case CMD_SEND_FOR_FILTER:
     case CMD_SEND_FOR_FILTER_OPERATION:
     case CMD_SEND_FOR_FILTER_RETURN:
     {
-        addActionMessage (message);
+        auto route = getRoute(message.dest_id);
+        transmit(route, message);
     }
     break;
     default:
@@ -1660,13 +1678,14 @@ void CommonCore::setIdentifier (const std::string &name)
 }
 
 void CommonCore::setQueryCallback (federate_id_t federateID,
-                                   std::function<std::string (const std::string &)> queryFunction)
+                                   std::function<std::string (const std::string &)> /*queryFunction*/)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("FederateID is invalid (setQueryCallback)"));
     }
+    //TODO:: PT add a query callback processing
 }
 
 std::string CommonCore::federateQuery (Core::federate_id_t federateID, const std::string &queryStr) const
@@ -2382,29 +2401,38 @@ void CommonCore::processCommand (ActionMessage &&command)
 
     case CMD_SEND_MESSAGE:
     {
-        // TODO:: PT This isn't the best way of doing this
-        auto fnd = endpoints.find (command.info ().target);
-        if (fnd != endpoints.end ())
-        {  // destination is local
-            auto fed = getHandleFederate (fnd->second);
-
-            command.dest_id = fed->global_id;
-            command.dest_handle = fnd->second;
-            fed->addAction (command);
+        if (isLocal(command.source_id))
+        {
+            auto handle = getHandleInfo(command.source_handle);
+            deliverMessage(processMessage(handle, command));
         }
         else
         {
-            auto kfnd = knownExternalEndpoints.find (command.info ().target);
-            if (kfnd != knownExternalEndpoints.end ())
-            {  // destination is known
-                auto route = getRoute (kfnd->second);
-                transmit (route, command);
+            // TODO:: PT This isn't the best way of doing this
+            auto fnd = endpoints.find(command.info().target);
+            if (fnd != endpoints.end())
+            {  // destination is local
+                auto fed = getHandleFederate(fnd->second);
+
+                command.dest_id = fed->global_id;
+                command.dest_handle = fnd->second;
+                fed->addAction(command);
             }
             else
             {
-                transmit (0, command);
+                auto kfnd = knownExternalEndpoints.find(command.info().target);
+                if (kfnd != knownExternalEndpoints.end())
+                {  // destination is known
+                    auto route = getRoute(kfnd->second);
+                    transmit(route, command);
+                }
+                else
+                {
+                    transmit(0, command);
+                }
             }
         }
+       
     }
     break;
     default:
@@ -2805,7 +2833,7 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
                     cmd.setAction (CMD_SEND_MESSAGE);
                     cmd.dest_id = 0;
                     cmd.dest_handle = 0;
-                    queueMessage (cmd);
+                    deliverMessage (cmd);
                 }
                 else
                 {
@@ -2813,7 +2841,7 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
                     cmd.setAction (CMD_SEND_MESSAGE);
                     cmd.dest_id = 0;
                     cmd.dest_handle = 0;
-                    queueMessage (cmd);
+                    deliverMessage (cmd);
                 }
             }
         }

@@ -29,7 +29,7 @@ if [[ $commit_msg == *'[update_cache]'* ]]; then
         rm -rf dependencies/zmq;
         individual="true"
     fi
-    
+
     # If no dependency named in commit message, update entire cache
     if [[ "$individual" != 'true' ]]; then
         rm -rf dependencies;
@@ -46,7 +46,7 @@ install_boost () {
     IFS='.' read -r -a ver <<< $1
     local boost_version=$1
     local boost_version_str=boost_${ver[0]}_${ver[1]}_${ver[2]}
-    wget -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
+    wget --no-check-certificate -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
     (
         cd ${boost_version_str}/;
         ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,test;
@@ -96,6 +96,7 @@ if [[ ! -d "dependencies/boost" ]]; then
     fi
     echo "*** built boost successfully"
 fi
+
 export BOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost}
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
@@ -103,3 +104,16 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
 elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH=${PWD}/dependencies/zmq/lib:${PWD}/dependencies/boost/lib:$LD_LIBRARY_PATH
 fi
+
+if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    # HOMEBREW_NO_AUTO_UPDATE=1 brew install boost
+    brew update
+    brew install python3
+    pip3 install pytest
+else
+    pyenv global 3.6.3
+    python3 -m pip install --user --upgrade pip wheel
+    python3 -m pip install --user --upgrade pytest
+fi
+
+
