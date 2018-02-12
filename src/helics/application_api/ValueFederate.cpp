@@ -40,7 +40,7 @@ ValueFederate::ValueFederate (bool /*res*/)
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
 }
 
-ValueFederate::ValueFederate (ValueFederate &&fed) noexcept = default;
+ValueFederate::ValueFederate (ValueFederate &&) noexcept = default;
 
 ValueFederate::~ValueFederate () = default;
 

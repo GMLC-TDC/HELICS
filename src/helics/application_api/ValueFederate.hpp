@@ -510,7 +510,7 @@ operation vs the member getValue calls
 template <class X>
 void getValue (std::shared_ptr<ValueFederate> &fed, const std::string &Key, X &obj)
 {
-    return fed->getValue<X> (fed->getSubscriptionId (Key));
+    obj=fed->getValue<X> (fed->getSubscriptionId (Key));
 }
 
 /** get a value directly from the subscription key name
@@ -537,7 +537,7 @@ operation vs the member getValue calls
 template <class X>
 void getValue (ValueFederate &fed, const std::string &Key, X &obj)
 {
-    return fed.getValue<X> (fed.getSubscriptionId (Key));
+    obj=fed.getValue<X> (fed.getSubscriptionId (Key));
 }
 }  // namespace helics
 #endif
