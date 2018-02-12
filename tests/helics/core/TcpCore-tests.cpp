@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     });
     server.start ();
 
-    comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
+    comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setName ("tests");
     comm.setTimeout (1000);
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     });
     server.start ();
 
-    comm.setCallback ([](helics::ActionMessage m) {});
+    comm.setCallback ([](helics::ActionMessage /*m*/) {});
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setPortNumber (TCP_SECONDARY_PORT);
     comm.setName ("tests");

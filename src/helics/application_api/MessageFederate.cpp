@@ -41,7 +41,7 @@ MessageFederate::MessageFederate (bool)
    // a virtual inheritance
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
 }
-MessageFederate::MessageFederate (MessageFederate &&mFed) noexcept = default;
+MessageFederate::MessageFederate (MessageFederate &&) noexcept = default;
 
 MessageFederate &MessageFederate::operator= (MessageFederate &&mFed) noexcept
 {

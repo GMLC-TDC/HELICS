@@ -28,7 +28,7 @@ CombinationFederate::CombinationFederate (const std::string &jsonString)
     registerInterfaces (jsonString);
 }
 
-CombinationFederate::CombinationFederate (CombinationFederate &&fed) noexcept = default;
+CombinationFederate::CombinationFederate (CombinationFederate &&) noexcept = default;
 CombinationFederate::~CombinationFederate () = default;
 
 void CombinationFederate::disconnect ()
@@ -37,7 +37,7 @@ void CombinationFederate::disconnect ()
     MessageFederate::disconnect ();
 }
 
-CombinationFederate &CombinationFederate::operator= (CombinationFederate &&fed) noexcept = default;
+CombinationFederate &CombinationFederate::operator= (CombinationFederate &&) noexcept = default;
 
 void CombinationFederate::updateTime (Time newTime, Time oldTime)
 {
