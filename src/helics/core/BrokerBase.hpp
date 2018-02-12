@@ -5,7 +5,6 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
 /**
@@ -14,8 +13,6 @@ virtual base class for object that function like a broker includes common parame
 and some common methods used cores and brokers
 */
 
-#ifndef BROKER_BASE_H_
-#define BROKER_BASE_H_
 #pragma once
 #include "../common/BlockingPriorityQueue.hpp"
 #include "ActionMessage.hpp"
@@ -154,4 +151,3 @@ class BrokerBase
 };
 
 }  // namespace helics
-#endif

@@ -44,17 +44,17 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     vFed1->enterInitializationStateComplete ();
 
     auto core = vFed1->getCorePointer ();
-    auto res = core->query ("test1", "publications");
-    BOOST_CHECK_EQUAL (res, "[pub1;test1/pub2]");
+    auto res = core->query ("fed0", "publications");
+    BOOST_CHECK_EQUAL (res, "[pub1;fed0/pub2]");
     auto rvec = vectorizeQueryResult (res);
 
     BOOST_REQUIRE_EQUAL (rvec.size (), 2);
     BOOST_CHECK_EQUAL (rvec[0], "pub1");
-    BOOST_CHECK_EQUAL (rvec[1], "test1/pub2");
-    BOOST_CHECK_EQUAL (vFed2->query ("test1", "publications"), "[pub1;test1/pub2]");
-    BOOST_CHECK_EQUAL (vFed1->query ("test2", "isinit"), "true");
+    BOOST_CHECK_EQUAL (rvec[1], "fed0/pub2");
+    BOOST_CHECK_EQUAL (vFed2->query ("fed0", "publications"), "[pub1;fed0/pub2]");
+    BOOST_CHECK_EQUAL (vFed1->query ("fed1", "isinit"), "true");
 
-    BOOST_CHECK_EQUAL (vFed1->query ("test2", "publications"), "[test2/pub3]");
+    BOOST_CHECK_EQUAL (vFed1->query ("fed1", "publications"), "[fed1/pub3]");
     core = nullptr;
     vFed1->finalize ();
     vFed2->finalize ();
@@ -76,7 +76,7 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     str.push_back (';');
     str.append (vFed2->getName ());
     str.push_back (']');
-    BOOST_CHECK_EQUAL (res, "[test1;test2]");
+    BOOST_CHECK_EQUAL (res, "[fed0;fed1]");
     vFed1->enterInitializationStateAsync ();
     vFed2->enterInitializationState ();
     vFed1->enterInitializationStateComplete ();
@@ -110,9 +110,9 @@ BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), co
     auto rvec = vectorizeAndSortQueryResult (res);
 
     BOOST_REQUIRE_EQUAL (rvec.size (), 3);
-    BOOST_CHECK_EQUAL (rvec[0], "test1/pub1");
-    BOOST_CHECK_EQUAL (rvec[1], "test2/pub2");
-    BOOST_CHECK_EQUAL (rvec[2], "test2/pub3");
+    BOOST_CHECK_EQUAL (rvec[0], "fed0/pub1");
+    BOOST_CHECK_EQUAL (rvec[1], "fed1/pub2");
+    BOOST_CHECK_EQUAL (rvec[2], "fed1/pub3");
     vFed1->finalize ();
     vFed2->finalize ();
 }

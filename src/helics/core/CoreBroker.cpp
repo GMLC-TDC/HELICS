@@ -57,6 +57,10 @@ void CoreBroker::setIdentifier (const std::string &name)
 }
 int32_t CoreBroker::getRoute (Core::federate_id_t fedid) const
 {
+    if ((fedid == 0) || (fedid == higher_broker_id))
+    {
+        return 0;
+    }
     auto fnd = routing_table.find (fedid);
     return (fnd != routing_table.end ()) ? fnd->second : 0;  // zero is the default route
 }
@@ -178,7 +182,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
 {
     // deal with a few types of message immediately
     LOG_TRACE (
-      0, getIdentifier (),
+      global_broker_id, getIdentifier (),
       (boost::format ("|| priority_cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
     switch (command.action ())
     {
@@ -400,7 +404,7 @@ void CoreBroker::transmitDelayedMessages ()
 
 void CoreBroker::processCommand (ActionMessage &&command)
 {
-    LOG_TRACE (0, getIdentifier (),
+    LOG_TRACE (global_broker_id, getIdentifier (),
                (boost::format ("|| cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
     switch (command.action ())
     {
@@ -470,7 +474,10 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 brokerState = broker_state_t::operating;
                 for (auto &broker : _brokers)
                 {
-                    transmit (broker.route_id, m);
+                    if (!broker._nonLocal)
+                    {
+                        transmit(broker.route_id, m);
+                    }
                 }
                 timeCoord->enteringExecMode (helics_iteration_request::no_iterations);
                 auto res = timeCoord->checkExecEntry ();
@@ -483,6 +490,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
             }
             else
             {
+                checkDependencies();
                 command.source_id = global_broker_id;
                 transmit (0, command);
             }
@@ -578,6 +586,8 @@ void CoreBroker::processCommand (ActionMessage &&command)
                     enteredExecutionMode = true;
                     timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations,
                                             Time::maxVal (), Time::maxVal ());
+                    LOG_DEBUG(global_broker_id, getIdentifier(),
+                        "entering Exec Mode");
                 }
             }
         }
@@ -598,6 +608,8 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_TIME_GRANT:
         if (command.source_id == global_broker_id)
         {
+            LOG_DEBUG(global_broker_id, getIdentifier(),
+                (boost::format("time request update %s") % prettyPrintString(command)).str());
             for (auto dep : timeCoord->getDependents ())
             {
                 routeMessage (command, dep);
@@ -797,6 +809,17 @@ void CoreBroker::addEndpoint (ActionMessage &m)
     {
         setActionFlag (m, processingComplete);
         transmit (0, m);
+        if (!hasTimeDependency)
+        {
+            if (timeCoord->addDependency(higher_broker_id))
+            {
+                hasTimeDependency = true;
+                ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id, higher_broker_id);
+                transmit(getRoute(higher_broker_id), add);
+
+                timeCoord->addDependent(higher_broker_id);
+            }
+        }
     }
     else
     {
@@ -819,6 +842,17 @@ void CoreBroker::addSourceFilter (ActionMessage &m)
         }
 
         transmit (0, m);
+        if (!hasTimeDependency)
+        {
+            if (timeCoord->addDependency(higher_broker_id))
+            {
+                hasTimeDependency = true;
+                ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id, higher_broker_id);
+                transmit(getRoute(higher_broker_id), add);
+
+                timeCoord->addDependent(higher_broker_id);
+            }
+        }
     }
 }
 
@@ -859,6 +893,17 @@ void CoreBroker::addDestFilter (ActionMessage &m)
             setActionFlag (m, processingComplete);
         }
         transmit (0, m);
+        if (!hasTimeDependency)
+        {
+            if (timeCoord->addDependency(higher_broker_id))
+            {
+                hasTimeDependency = true;
+                ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id, higher_broker_id);
+                transmit(getRoute(higher_broker_id), add);
+
+                timeCoord->addDependent(higher_broker_id);
+            }
+        }
     }
 }
 
@@ -986,15 +1031,14 @@ void CoreBroker::disconnect () { processDisconnect (); }
 
 void CoreBroker::routeMessage (ActionMessage &cmd, Core::federate_id_t dest)
 {
+    cmd.dest_id = dest;
     if ((dest == 0) || (dest == higher_broker_id))
     {
-        cmd.dest_id = 0;
         transmit (0, cmd);
     }
     else
     {
         auto route = getRoute (dest);
-        cmd.dest_id = dest;
         transmit (route, cmd);
     }
 }
@@ -1339,8 +1383,21 @@ void CoreBroker::processQuery (const ActionMessage &m)
                 route = broker->route_id;
             }
         }
+        if ((route == 0) && (isRoot()))
+        {
+            ActionMessage queryResp(CMD_QUERY_REPLY);
+            queryResp.dest_id = m.source_id;
+            queryResp.source_id = global_broker_id;
+            queryResp.index = m.index;
 
-        transmit (route, m);
+            queryResp.payload = "#invalid";
+            transmit(getRoute(queryResp.dest_id), queryResp);
+        }
+        else
+        {
+            transmit(route, m);
+        }
+       
     }
 }
 
@@ -1415,7 +1472,7 @@ void CoreBroker::checkDependencies ()
         int localcnt = 0;
         for (auto &dep : timeCoord->getDependents ())
         {
-            if (dep == higher_broker_id)
+            if (dep != higher_broker_id)
             {
                 ++localcnt;
                 fedid = dep;
@@ -1435,6 +1492,8 @@ void CoreBroker::checkDependencies ()
 
         rmdep.source_id = global_broker_id;
         routeMessage (rmdep, higher_broker_id);
+        routeMessage(rmdep, fedid);
+
         ActionMessage adddep (CMD_ADD_INTERDEPENDENCY);
         adddep.source_id = fedid;
         routeMessage (adddep, higher_broker_id);

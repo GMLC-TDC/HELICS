@@ -1728,7 +1728,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
 {
     // deal with a few types of message immediately
     LOG_TRACE (
-      0, getIdentifier (),
+     global_broker_id, getIdentifier (),
       (boost::format ("|| priority_cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
     switch (command.action ())
     {
@@ -1903,7 +1903,7 @@ void CommonCore::transmitDelayedMessages (federate_id_t source)
 
 void CommonCore::processCommand (ActionMessage &&command)
 {
-    LOG_TRACE (0, getIdentifier (),
+    LOG_TRACE (global_broker_id, getIdentifier (),
                (boost::format ("|| cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
     switch (command.action ())
     {
@@ -2349,7 +2349,6 @@ void CommonCore::processCommand (ActionMessage &&command)
             deliverMessage(command);
         }
        
-    }
     break;
     default:
         if (isPriorityCommand (command))

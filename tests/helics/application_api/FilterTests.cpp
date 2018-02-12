@@ -178,7 +178,10 @@ BOOST_DATA_TEST_CASE(message_filter_function_two_stage, bdata::make(core_types),
     fFed->requestTimeAsync(3.0);
     fFed2->requestTimeAsync(3.0);
     /*auto retTime = */ mFed->requestTime(3.0);
-
+    if (!mFed->hasMessage(p2))
+    {
+        printf("missing message\n");
+    }
     BOOST_REQUIRE(mFed->hasMessage(p2));
 
     auto m2 = mFed->getMessage(p2);
