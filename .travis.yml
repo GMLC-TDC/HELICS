@@ -123,6 +123,8 @@ script:
 
   - export HELICS_OPTION_FLAGS="-DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON -DTRAVIS_TESTS_ENABLE=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.${SHARED_LIB_EXT} -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/"
   - if [[ "$USE_SWIG" == 'false' ]] ; then HELICS_OPTION_FLAGS+="-DGENERATE_PYTHON=OFF" ; fi
+  - echo "$HELICS_OPTION_FLAGS"
+  - echo "$HELICS_DEPENDENCY_FLAGS"
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
   - make -j2
   # For controlling which tests get run:
