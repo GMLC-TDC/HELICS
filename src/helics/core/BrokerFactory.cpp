@@ -14,6 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
 #include "helics/helics-config.h"
+#include "../common/TripWire.hpp"
 #if HELICS_HAVE_ZEROMQ
 #include "zmq/ZmqBroker.h"
 #endif
@@ -174,42 +175,6 @@ std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, 
     return broker;
 }
 
-bool available (core_type type)
-{
-    bool available = false;
-
-    switch (type)
-    {
-    case core_type::ZMQ:
-#if HELICS_HAVE_ZEROMQ
-        available = true;
-#endif
-        break;
-    case core_type::MPI:
-#if HELICS_HAVE_MPI
-        available = true;
-#endif
-        break;
-    case core_type::TEST:
-        available = true;
-        break;
-    case core_type::INTERPROCESS:
-    case core_type::IPC:
-        available = true;
-        break;
-    case core_type::TCP:
-        available = true;
-        break;
-    case core_type::UDP:
-        available = true;
-        break;
-    default:
-        break;
-    }
-
-    return available;
-}
-
 /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
 static auto destroyerCallFirst = [](auto &broker) {
@@ -227,6 +192,9 @@ static DelayedDestructor<CoreBroker>
   delayedDestroyer (destroyerCallFirst);  //!< the object handling the delayed destruction
 
 static SearchableObjectHolder<CoreBroker> searchableObjects;  //!< the object managing the searchable objects
+
+//this will trip the line when it is destroyed at global destruction time
+static tripwire::TripWireTrigger tripTrigger;
 
 std::shared_ptr<Broker> findBroker (const std::string &brokerName)
 {

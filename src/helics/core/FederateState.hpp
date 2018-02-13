@@ -23,7 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 #include "../common/DualMappedPointerVector.hpp"
-
+#include "../common/GuardedTypes.hpp"
 #include <atomic>
 #include <map>
 #include <mutex>
@@ -51,7 +51,7 @@ class FederateState
     ~FederateState ();
 
   private:
-	  std::string name;  //!< the name of the federate
+	  const std::string name;  //!< the name of the federate
 	  std::unique_ptr<TimeCoordinator> timeCoord;  //!< object that manages the time to determine granting
   public:
     Core::federate_id_t local_id = invalid_fed_id;  //!< id code, default to something invalid
@@ -62,9 +62,9 @@ class FederateState
     bool only_update_on_change{false};  //!< flag indicating that values should only be updated on change
     bool only_transmit_on_change{
       false};  //!< flag indicating that values should only be transmitted if different than previous values
-	DualMappedPointerVector<SubscriptionInfo, std::string, Core::handle_id_t> subscriptions; //!< storage for all the subscriptions
-	DualMappedPointerVector<PublicationInfo, std::string, Core::handle_id_t> publications; //!< storage for all the publications
-	DualMappedPointerVector<EndpointInfo, std::string, Core::handle_id_t> endpoints;  //!< storage for all the endpoints
+	shared_guarded<DualMappedPointerVector<SubscriptionInfo, std::string, Core::handle_id_t>> subscriptions; //!< storage for all the subscriptions
+    shared_guarded<DualMappedPointerVector<PublicationInfo, std::string, Core::handle_id_t>> publications; //!< storage for all the publications
+    shared_guarded<DualMappedPointerVector<EndpointInfo, std::string, Core::handle_id_t>> endpoints;  //!< storage for all the endpoints
 
 public:
 	std::atomic<bool> init_transmitted{ false }; //!< the initialization request has been transmitted

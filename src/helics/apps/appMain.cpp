@@ -18,10 +18,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 void showHelp()
 {
     std::cout << "helics_app <appName> <appArguments>...\n";
-    std::cout << "available apps: echo, source, player, recorder, broker\n";
+    std::cout << "available apps: echo, source, player, recorder, broker, tracer\n";
     std::cout << " helics_app -? or --help shows this help\n";
         std::cout << "helics_app <appName> --help for application specific help\n";
-        std::cout << "helics_app --version will show the helics version string\n";
+        std::cout << "helics_app --version or -v will show the helics version string\n";
 }
 int main (int argc, char *argv[])
 { 
@@ -41,12 +41,20 @@ int main (int argc, char *argv[])
         if (arg1 == "player")
         {
             helics::Player Player(argc, argv);
-            Player.run();
+            if (Player.isActive())
+            {
+                Player.run();
+            }
+            
         }
         else if (arg1 == "recorder")
         {
             helics::Recorder Recorder(argc, argv);
-            Recorder.run();
+            if (Recorder.isActive())
+            {
+                Recorder.run();
+            }
+           
         }
         else if ((arg1 == "--version")||(arg1=="-v"))
         {
@@ -65,6 +73,10 @@ int main (int argc, char *argv[])
 
         }
         else if (arg1 == "broker")
+        {
+
+        }
+        else if (arg1 == "tracer")
         {
 
         }

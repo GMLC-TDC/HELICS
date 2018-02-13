@@ -5,8 +5,8 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include <boost/test/unit_test.hpp>
 
 #include "helics/core/ActionMessage.hpp"
@@ -17,7 +17,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/core-types.hpp"
 #include "helics/core/ipc/IpcComms.h"
 #include "helics/core/ipc/IpcCore.h"
-#include "boost/interprocess/ipc/message_queue.hpp"
+
+#include <boost/interprocess/ipc/message_queue.hpp>
 
 #include "helics/core/ipc/IpcQueueHelper.h"
 
@@ -39,7 +40,7 @@ BOOST_AUTO_TEST_CASE (ipccomms_broker_test)
     bool mqConn = mq.connect (brokerLoc, 1024, 1024);
     BOOST_REQUIRE (mqConn);
 
-    comm.setCallback ([&counter](helics::ActionMessage m) { ++counter; });
+    comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
 
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
