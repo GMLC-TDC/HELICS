@@ -62,8 +62,7 @@ int main()
   double y = 1.0, x = 0, /*xprv = 100,*/ yprv=100;
   int global_conv=0,my_conv=0,other_conv; /* Global and local convergence */
   helics_time_t currenttime=0.0;
-  helics_iteration_status currenttimeiter;
-  currenttimeiter = iterating;
+  helics_iteration_status currenttimeiter=iterating;
   double tol=1E-8;
   int helics_iter = 0;
 
