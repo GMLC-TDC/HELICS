@@ -24,13 +24,12 @@ namespace helics
     MpiBroker::~MpiBroker() = default;
 
     using namespace std::string_literals;
-    static const ArgDescriptors extraArgs{ { "broker_rank", "int"s, "mpi rank of the broker" } };
+    static const ArgDescriptors extraArgs{ { "broker_rank", ArgDescriptor::arg_type_t::int_type, "mpi rank of the broker" } };
 
     void MpiBroker::displayHelp(bool local_only)
     {
         std::cout << " Help for MPI Broker: \n";
-        namespace po = boost::program_options;
-        po::variables_map vm;
+        variable_map vm;
         const char *const argV[] = { "", "--help" };
         argumentParser(2, argV, vm, extraArgs);
         if (!local_only)
@@ -43,8 +42,7 @@ namespace helics
     {
         if (brokerState == broker_state_t::created)
         {
-            namespace po = boost::program_options;
-            po::variables_map vm;
+            variable_map vm;
             argumentParser(argc, argv, vm, extraArgs);
 
             if (vm.count("broker_rank") > 0)

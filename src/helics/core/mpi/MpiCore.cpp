@@ -24,15 +24,14 @@ MpiCore::~MpiCore () = default;
 MpiCore::MpiCore (const std::string &core_name) : CommsBroker (core_name) {}
 
 using namespace std::string_literals;
-static const ArgDescriptors extraArgs{ { "broker_rank", "int"s, "mpi rank of the broker" } };
+static const ArgDescriptors extraArgs{ { "broker_rank", ArgDescriptor::arg_type_t::int_type, "mpi rank of the broker" } };
 
 void MpiCore::initializeFromArgs (int argc, const char *const *argv)
 {
     if (brokerState == created)
     {
-        namespace po = boost::program_options;
-        po::variables_map vm;
-        argumentParser(argc, argv, vm, extraArgs);
+        variable_map vm;
+        argumentParser (argc, argv, vm, extraArgs);
 
         if (vm.count("broker_rank") > 0)
         {
