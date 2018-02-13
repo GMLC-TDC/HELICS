@@ -66,8 +66,7 @@ int main ()
     char sendbuf[100],recvbuf[100];
         double x = 0.0, y = 1.0, xprv=100;
     helics_time_t currenttime = 0.0;
-    helics_iteration_status currenttimeiter;
-    currenttimeiter = iterating;
+    helics_iteration_status currenttimeiter=iterating;
     double tol = 1E-8;
     int global_conv=0,my_conv=0,other_conv; /* Global and local convergence */
     int helics_iter = 0;
