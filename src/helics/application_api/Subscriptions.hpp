@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_SUBSCRIPTION_H_
-#define _HELICS_SUBSCRIPTION_H_
+
 #pragma once
 
 #include "HelicsPrimaryTypes.hpp"
@@ -36,7 +33,7 @@ class SubscriptionBase
     SubscriptionBase (ValueFederate *valueFed,
                       const std::string &key,
                       const std::string &type = "def",
-                      const std::string &units = "")
+                      const std::string &units = std::string())
         : fed (valueFed), key_ (key), type_ (type), units_ (units)
     {
         id = fed->registerRequiredSubscription (key_, type_, units_);
@@ -46,7 +43,7 @@ class SubscriptionBase
                       ValueFederate *valueFed,
                       const std::string &key,
                       const std::string &type = "def",
-                      const std::string &units = "")
+                      const std::string &units = std::string())
         : fed (valueFed), key_ (key), type_ (type), units_ (units)
     {
         if (required)
@@ -124,7 +121,7 @@ class Subscription : public SubscriptionBase
     Subscription (ValueFederate *valueFed,
                   const std::string &key,
                   helics_type_t defType,
-                  const std::string &units = "")
+                  const std::string &units = std::string())
         : SubscriptionBase (valueFed, key, typeNameStringRef (defType), units)
     {
     }
@@ -133,7 +130,7 @@ class Subscription : public SubscriptionBase
                   ValueFederate *valueFed,
                   const std::string &key,
                   helics_type_t defType,
-                  const std::string &units = "")
+                  const std::string &units = std::string())
         : SubscriptionBase (required, valueFed, key, typeNameStringRef (defType), units)
     {
     }
@@ -619,4 +616,3 @@ class VectorSubscription2d
 };
 
 }  // namespace helics
-#endif

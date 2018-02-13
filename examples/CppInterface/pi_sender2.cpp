@@ -83,17 +83,16 @@ int main(int /*argc*/,char ** /*argv*/)
 
   /* This federate will be publishing deltat*pi for numsteps steps */
   //double this_time = 0.0;
-  double pi = 22.0/7.0,value;
+  double pi = 22.0/7.0;
   helics_time_t currenttime=0.0;
-  int isupdated;
 
   while(currenttime < 0.2) {
-    value = currenttime*pi;
+    double value = currenttime*pi;
 
     printf("PI SENDER: Sending value %3.2f*pi = %4.3f at time %3.2f to PI RECEIVER\n",currenttime,value,currenttime);
     vfed->publish(pub, value); /* Note: the receiver will get this at currenttime+deltat */
 
-    isupdated = 0;
+    int isupdated = 0;
     while(!isupdated) {
       currenttime = vfed->requestTime(currenttime);
       isupdated = vfed->isUpdated(sub);

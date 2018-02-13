@@ -226,11 +226,11 @@ class randomDelayGenerator
     double generate () { return randDouble (dist.load (), param1.load (), param2.load ()); }
 };
 
-RandomDelayFilterOperation::RandomDelayFilterOperation ()
+RandomDelayFilterOperation::RandomDelayFilterOperation ():rdelayGen(std::make_unique<randomDelayGenerator>()),
+td(std::make_shared<MessageTimeOperator>(
+    [this](Time messageTime) { return messageTime + rdelayGen->generate(); }))
 {
-    rdelayGen = std::make_unique<randomDelayGenerator> ();
-    td = std::make_shared<MessageTimeOperator> (
-      [this](Time messageTime) { return messageTime + rdelayGen->generate (); });
+    
 }
 RandomDelayFilterOperation::~RandomDelayFilterOperation () = default;
 
