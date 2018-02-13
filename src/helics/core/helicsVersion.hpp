@@ -21,14 +21,14 @@ file linking with version info and containing some convenience functions
 namespace helics
 {
 /** @returns a string containing version information*/
-std::string helicsVersionString ();
+std::string versionString ();
 
 /** get the Major version number*/
-inline int helicsVersionMajor () { return HELICS_VERSION_MAJOR; }
+constexpr int versionMajor=HELICS_VERSION_MAJOR;
 /** get the Minor version number*/
-inline int helicsVersionMinor () { return HELICS_VERSION_MINOR; }
+constexpr int versionMinor=HELICS_VERSION_MINOR;
 /** get the patch number*/
-inline int helicsVersionPatch () { return HELICS_VERSION_PATCH; }
+constexpr int versionPatch=HELICS_VERSION_PATCH;
 
 } //namespace helics
 

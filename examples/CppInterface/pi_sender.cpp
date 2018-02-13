@@ -31,7 +31,7 @@ int main(int /*argc*/,char ** /*argv*/)
   double         deltat=0.01;
   helics_publication pub;
 
-  std::string helicsversion = helics::getHelicsVersionString();
+  std::string helicsversion = helics::getversionString();
 
   printf("PI SENDER: Helics version = %s\n",helicsversion.c_str());
   printf("%s",help);
