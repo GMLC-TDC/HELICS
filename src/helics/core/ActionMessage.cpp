@@ -510,7 +510,6 @@ std::string prettyPrintString (const ActionMessage &command)
             command.info().target % command.payload.size() % static_cast<double> (command.actionTime))
             .str());
         break;
-        break;
     default:
         break;
     }
