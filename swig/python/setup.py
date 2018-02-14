@@ -19,14 +19,18 @@ if 'HELICS_VERSION_MAJOR' in VERSION:
 
 if platform.system() == 'Darwin':
     os_specific_cflags = ''
-    os_specific_ldflags = ''  # '-shared'
+    os_specific_ldflags = '' # '-shared'
+    extra_compile_args = []
 else:
     os_specific_cflags = ''
     os_specific_ldflags = ''
+    extra_compile_args = ['-std=c++11']
 
 HELICS_INSTALL = os.path.abspath(os.getenv("HELICS_INSTALL", '${CMAKE_CURRENT_BINARY_DIR}'))
 HELICS_INCLUDE_DIR = os.path.abspath(os.getenv("HELICS_INCLUDE", os.path.join(HELICS_INSTALL, "../../../src/helics/shared_api_library/")))
 HELICS_LIB_DIR = os.path.abspath(os.getenv("HELICS_INCLUDE", os.path.join(HELICS_INSTALL, "../../src/helics/shared_api_library/")))
+ZMQ_INCLUDE_DIR = os.path.abspath(os.getenv("ZMQ_INCLUDE", os.path.join(HELICS_INSTALL, ".")))
+ZMQ_LIB_DIR = os.path.abspath(os.getenv("ZMQ_LIB", os.path.join(HELICS_INSTALL, ".")))
 
 if HELICS_INSTALL is None or "CMAKE_INSTALL_PREFIX" in HELICS_INSTALL:
 
@@ -34,21 +38,25 @@ if HELICS_INSTALL is None or "CMAKE_INSTALL_PREFIX" in HELICS_INSTALL:
     import sys
     sys.exit(1)
 
-os.environ['CFLAGS'] = '-Wall -I"{}" -I"{}" -I"{}" -fPIC {os_specific_cflags}'.format(
+os.environ['CFLAGS'] = '-Wall -I"{}" -I"{}" -I"{}" -I"{}" -fPIC {os_specific_cflags}'.format(
     HELICS_INCLUDE_DIR,
     os.path.join(HELICS_INCLUDE_DIR, 'helics'),
     os.path.join(HELICS_INCLUDE_DIR, 'shared_api_library'),
+    ZMQ_INCLUDE_DIR,
     os_specific_cflags=os_specific_cflags,
 )
 
-os.environ['LDFLAGS'] = '{} -lzmq -L"{}"'.format(os_specific_ldflags, HELICS_LIB_DIR)
-
+os.environ['LDFLAGS'] = '{} -lzmq -L"{}" -L"{}"'.format(os_specific_ldflags, HELICS_LIB_DIR, ZMQ_LIB_DIR)
 helics_module = Extension(
-    "_helics", sources=[
+    "_helics",
+    sources=[
         "helics_wrap.c",
-    ], libraries=[
+    ],
+    libraries=[
         "helicsSharedLib",
-    ])
+    ],
+    extra_compile_args=extra_compile_args,
+)
 
 setup(
     name='helics',

@@ -79,6 +79,10 @@ HELICS_Export helics_status helicsEndpointGetType (helics_endpoint endpoint, cha
 */
 HELICS_Export helics_status helicsEndpointGetName (helics_endpoint endpoint, char *str, int maxlen);
 
+/** get the number of endpoints in a federate
+@return (-1) if fed was not a valid federate otherwise returns the number of subscriptions*/
+HELICS_Export int helicsFederateGetEndpointCount(helics_federate fed);
+
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif
