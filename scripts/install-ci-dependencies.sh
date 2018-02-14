@@ -97,7 +97,8 @@ if [[ ! -d "dependencies/boost" ]]; then
     echo "*** built boost successfully"
 fi
 
-export BOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost}
+export ZMQ_INCLUDE=${TRAVIS_BUILD_DIR}/dependencies/zmq/include
+export ZMQ_LIB=${TRAVIS_BUILD_DIR}/dependencies/zmq/lib
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     sudo ldconfig ${PWD}/dependencies
