@@ -20,9 +20,11 @@ if 'HELICS_VERSION_MAJOR' in VERSION:
 if platform.system() == 'Darwin':
     os_specific_cflags = ''
     os_specific_ldflags = '' # '-shared'
+    extra_compile_args = []
 else:
     os_specific_cflags = ''
     os_specific_ldflags = ''
+    extra_compile_args = ['-std=c++11']
 
 HELICS_INSTALL = os.path.abspath(os.getenv("HELICS_INSTALL", '${CMAKE_CURRENT_BINARY_DIR}'))
 HELICS_INCLUDE_DIR = os.path.abspath(os.getenv("HELICS_INCLUDE", os.path.join(HELICS_INSTALL, "../../../src/helics/shared_api_library/")))
@@ -45,7 +47,6 @@ os.environ['CFLAGS'] = '-Wall -I"{}" -I"{}" -I"{}" -I"{}" -fPIC {os_specific_cfl
 )
 
 os.environ['LDFLAGS'] = '{} -lzmq -L"{}" -L"{}"'.format(os_specific_ldflags, HELICS_LIB_DIR, ZMQ_LIB_DIR)
-
 helics_module = Extension(
     "_helics",
     sources=[
@@ -54,7 +55,7 @@ helics_module = Extension(
     libraries=[
         "helicsSharedLib",
     ],
-    extra_compile_args=['-std=c++11'],
+    extra_compile_args=extra_compile_args,
 )
 
 setup(
