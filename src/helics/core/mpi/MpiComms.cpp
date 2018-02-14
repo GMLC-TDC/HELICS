@@ -41,6 +41,10 @@ MpiComms::MpiComms(const int &brokerRank)
     }
     std::cout << "MpiComms(" << std::to_string(brokerRank) << ")" << std::endl;
     initMPI();
+    if (brokerRank == -1)
+    {
+        setBrokerRank (std::stoi (getAddress ()));
+    }
     mpiCommsExists = true;
 }
 
@@ -92,6 +96,7 @@ bool MpiComms::initMPI()
 }
 
 void MpiComms::serializeSendMPI(std::vector<char> message, int dest, int tag, MPI_Comm comm) {
+    std::cout << "SendMPI from " << getAddress() << " to " << dest << std::endl;
     //std::cout << "serializeSendMPI(" << dest << "," << tag << "," << comm << ")" << std::endl;
     //std::cout << "\t" << std::hex;
     //for (int i = 0; i < message.size(); i++)
@@ -164,24 +169,6 @@ int MpiComms::processIncomingMessage (ActionMessage &M)
     return 0;
 }
 
-ActionMessage MpiComms::generateReplyToIncomingMessage (ActionMessage &M)
-{
-    if (isProtocolCommand (M))
-    {
-        switch (M.index)
-        {
-        case CLOSE_RECEIVER:
-            return M;
-        default:
-            M.index = NULL_REPLY;
-            return M;
-        }
-    }
-    ActionCallback (std::move (M));
-    ActionMessage resp (CMD_PRIORITY_ACK);
-    return resp;
-}
-
 void MpiComms::queue_rx_function ()
 {
     bool isInitializedMPI = initMPI();
@@ -198,7 +185,6 @@ void MpiComms::queue_rx_function ()
     while (true)
     {
         // Receive using MPI
-        auto len = 0; //socket.receive_from (boost::asio::buffer (data), remote_endp, 0, error);
         data = serializeReceiveMPI (MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD);
         if (error)
         {
@@ -225,28 +211,10 @@ void MpiComms::queue_rx_function ()
                 goto CLOSE_RX_LOOP;
             }
         }
-        if (isPriorityCommand (M))
+        auto res = processIncomingMessage (M);
+        if (res < 0)
         {
-            auto reply = generateReplyToIncomingMessage (M);
-            if (isProtocolCommand (reply))
-            {
-                if (reply.index == DISCONNECT)
-                {
-                    goto CLOSE_RX_LOOP;
-                }
-            }
-            // Send using MPI
-            //socket.send_to (boost::asio::buffer (reply.to_string ()), remote_endp, 0, ignored_error);
-            serializeSendMPI(reply.to_vector(), brokerRank, 0, MPI_COMM_WORLD);
-            std::cout << "message sent to broker: " << prettyPrintString(reply) << std::endl;
-        }
-        else
-        {
-            auto res = processIncomingMessage (M);
-            if (res < 0)
-            {
-                goto CLOSE_RX_LOOP;
-            }
+            goto CLOSE_RX_LOOP;
         }
     }
 CLOSE_RX_LOOP:
@@ -280,6 +248,7 @@ void MpiComms::queue_tx_function ()
         ActionMessage cmd;
 
         std::tie (route_id, cmd) = txQueue.pop ();
+        std::cout << "Got message off txQueue: " << prettyPrintString(cmd) << std::endl;
         bool processed = false;
         if (isProtocolCommand (cmd))
         {
@@ -310,8 +279,8 @@ void MpiComms::queue_tx_function ()
             {
                 // Send using MPI to broker
                 //transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), broker_endpoint, 0, error);
+                std::cout << "send msg to brkr rt: " << prettyPrintString(cmd) << std::endl;
                 serializeSendMPI(cmd.to_vector(), brokerRank, 0, MPI_COMM_WORLD);
-                std::cout << "message sent to brkr rt: " << prettyPrintString(cmd) << std::endl;
                 if (error)
                 {
                     std::cerr << "transmit failure to broker " << error.message () << '\n';
@@ -322,8 +291,8 @@ void MpiComms::queue_tx_function ()
         {  // send to rx thread loop
             //transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), rxEndpoint, 0, error);
             // Send to ourself -- may need command line option to enable for openmpi
+            std::cout << "send msg to self" << prettyPrintString(cmd) << std::endl;
             serializeSendMPI(cmd.to_vector(), std::stoi(getAddress()), 0, MPI_COMM_WORLD);
-            std::cout << "message sent to self: " << prettyPrintString(cmd) << std::endl;
             if (error)
             {
                 std::cerr << "transmit failure to receiver " << error.message () << '\n';
@@ -336,8 +305,8 @@ void MpiComms::queue_tx_function ()
             {
                 // Send using MPI to rank given by route
                 //transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), rt_find->second, 0, error);
+                std::cout << "send msg to rt: " << prettyPrintString(cmd) << std::endl;
                 serializeSendMPI(cmd.to_vector(), std::stoi(rt_find->second), 0, MPI_COMM_WORLD);
-                std::cout << "message sent to rt: " << prettyPrintString(cmd) << std::endl;
                 if (error)
                 {
                     std::cerr << "transmit failure to route to " << route_id << " " << error.message () << '\n';
@@ -349,8 +318,8 @@ void MpiComms::queue_tx_function ()
                 {
                     // Send using MPI to broker
                     //transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), broker_endpoint, 0, error);
+                    std::cout << "send msg to brkr: " << prettyPrintString(cmd) << std::endl;
                     serializeSendMPI(cmd.to_vector(), brokerRank, 0, MPI_COMM_WORLD);
-                    std::cout << "message sent to brkr: " << prettyPrintString(cmd) << std::endl;
                     if (error)
                     {
                         std::cerr << "transmit failure to broker " << error.message () << '\n';

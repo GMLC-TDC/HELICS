@@ -90,7 +90,9 @@ private:
     std::vector<char> serializeReceiveMPI(int src, int tag, MPI_Comm comm);
 
 	std::atomic<bool> hasBroker{ false };
-	virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
+    virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
+
+    void setBrokerRank (const int &rank) { brokerRank = rank; }
 public:
 	static std::string getAddress();
 };
