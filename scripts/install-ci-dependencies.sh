@@ -107,6 +107,12 @@ elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH=${PWD}/dependencies/zmq/lib:${PWD}/dependencies/boost/lib:$LD_LIBRARY_PATH
 fi
 
+if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    export LD_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$LD_LIBRARY_PATH
+elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    export DYLD_FALLBACK_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$DYLD_FALLBACK_LIBRARY_PATH
+fi
+
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     # HOMEBREW_NO_AUTO_UPDATE=1 brew install boost
     brew update
