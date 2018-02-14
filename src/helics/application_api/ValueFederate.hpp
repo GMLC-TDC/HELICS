@@ -43,11 +43,14 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** default constructor*/
     ValueFederate ();
     // protected:
-    // protected constructor called by child class to initialize the class vs the default constructor
+    /** protected constructor called by child class to initialize the class vs the default constructor
+    */
     ValueFederate (bool res);
 
   public:
+      /** federate is not copyable*/
     ValueFederate (const ValueFederate &fed) = delete;
+    /** default move constructor*/
     ValueFederate (ValueFederate &&fed) noexcept;
     /** destructor*/
     virtual ~ValueFederate ();
