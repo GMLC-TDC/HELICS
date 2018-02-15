@@ -8,7 +8,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 /** @file
-@brief functions related the value federates for the C api
+@brief The C-API function for valueFederates
 */
 #ifndef HELICS_APISHARED_VALUE_FEDERATE_FUNCTIONS_H_
 #define HELICS_APISHARED_VALUE_FEDERATE_FUNCTIONS_H_
@@ -20,11 +20,18 @@ extern "C" {
 #endif
 
 /* sub/pub registration */
+
+/** a sequence of characters*/
 #define HELICS_STRING_TYPE 0
+/** a double precision floating point number*/
 #define HELICS_DOUBLE_TYPE 1
+/** a 64 bit integer*/
 #define HELICS_INT_TYPE 2
+/** a pair of doubles representing a complex number*/
 #define HELICS_COMPLEX_TYPE 3
+/** an array of doubles*/
 #define HELICS_VECTOR_TYPE 4
+/** raw data type*/
 #define HELICS_RAW_TYPE 25
 
 /** create a subscription

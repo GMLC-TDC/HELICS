@@ -83,17 +83,23 @@ HELICS_Export helics_status helicsEndpointSendMessage (helics_endpoint endpoint,
 @param type the type of the publication that is expected (nullptr or "" for DON'T CARE)
 */
 HELICS_Export helics_status helicsEndpointSubscribe (helics_endpoint endpoint, const char *key, const char *type);
-/** check if the federate has any outstanding messages*/
-HELICS_Export int helicsFederateHasMessage (helics_federate fed);
-/* check if a given endpoint has any unread messages*/
-HELICS_Export int helicsEndpointHasMessage (helics_endpoint endpoint);
+/** check if the federate has any outstanding messages
+@param fed the federate to check if it has
+@return helics_true if the federate has a message waiting false otherwise*/
+HELICS_Export helics_bool_t helicsFederateHasMessage (helics_federate fed);
+/** check if a given endpoint has any unread messages
+@param endpoint the endpoint to check
+@return helics_true if the endpoint has a message, false otherwise*/
+HELICS_Export helics_bool_t helicsEndpointHasMessage (helics_endpoint endpoint);
 
 /**
  * Returns the number of pending receives for the specified destination endpoint.
+ @param fed the federate to get the number of waiting messages
  */
 HELICS_Export int helicsFederateReceiveCount (helics_federate fed);
 /**
  * Returns the number of pending receives for all endpoints of particular federate.
+ @param endpoint the endpoint to query
  */
 HELICS_Export int helicsEndpointReceiveCount (helics_endpoint endpoint);
 

@@ -156,7 +156,7 @@ helics_status helicsEndpointSubscribe (helics_endpoint endpoint, const char *key
     return helics_ok;
 }
 
-int helicsFederateHasMessage (helics_federate fed)
+helics_bool_t helicsFederateHasMessage (helics_federate fed)
 {
     if (fed == nullptr)
     {
@@ -167,10 +167,10 @@ int helicsFederateHasMessage (helics_federate fed)
     {
         return false;
     }
-    return (mFed->hasMessage ()) ? 1 : 0;
+    return (mFed->hasMessage ()) ? helics_true : helics_false;
 }
 
-int helicsEndpointHasMessage (helics_endpoint endpoint)
+helics_bool_t helicsEndpointHasMessage (helics_endpoint endpoint)
 {
     if (endpoint == nullptr)
     {
@@ -178,7 +178,7 @@ int helicsEndpointHasMessage (helics_endpoint endpoint)
     }
 
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    return (endObj->endptr->hasMessage ()) ? 1 : 0;
+    return (endObj->endptr->hasMessage ()) ? helics_true : helics_false;
 }
 
 int helicsFederateReceiveCount (helics_federate fed)
