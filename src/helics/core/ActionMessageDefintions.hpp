@@ -89,17 +89,16 @@ enum class action_t : int32_t
 
     null_info_command = cmd_info_basis - 1,  //!< biggest command that doesn't have the info structure
     priority_null_info_command =
-      -cmd_info_basis -
-      1,  //!< the biggest negative priority command
-          // commands that require the extra info allocation have numbers greater than cmd_info_basis
+    -cmd_info_basis -
+    1,  //!< the biggest negative priority command
+        // commands that require the extra info allocation have numbers greater than cmd_info_basis
     cmd_time_request = 500,  //!< request a time or iteration
     cmd_send_message = cmd_info_basis + 20,  //!< send a message
     cmd_null_message = 726,  //!< used when a filter drops a message but it needs to return
     cmd_send_for_filter =
-      cmd_info_basis + 30,  //!< send a message to be filtered and forward on to the destination
-    cmd_send_for_filter_op =
-      cmd_info_basis + 32,  //!< send a message to be filters via a callback operation and return to the source
+    cmd_info_basis + 30,  //!< send a message to be filtered and forward on to the destination
     cmd_send_for_filter_return = cmd_info_basis + 35,  //!< send a message back to its originator after filtering
+    cmd_filter_result = cmd_info_basis + 40,  //!< the results of a filter message going back to its originator
     cmd_reg_pub = cmd_info_basis + 50,  //!< register a publication
     cmd_notify_pub = 50,  //!< notify of a publication
     cmd_reg_dst_filter = cmd_info_basis + 60,  //!< register a destination filter
@@ -145,8 +144,9 @@ enum class action_t : int32_t
 #define CMD_TIME_CHECK action_message_def::action_t::cmd_time_check
 #define CMD_SEND_MESSAGE action_message_def::action_t::cmd_send_message
 #define CMD_SEND_FOR_FILTER action_message_def::action_t::cmd_send_for_filter
-#define CMD_SEND_FOR_FILTER_OPERATION action_message_def::action_t::cmd_send_for_filter_op
-#define CMD_SEND_FOR_FILTER_RETURN action_message_def::action_t::cmd_send_for_filter_return
+#define CMD_SEND_FOR_FILTER_AND_RETURN action_message_def::action_t::cmd_send_for_filter_return
+#define CMD_NULL_MESSAGE action_message_def::action_t::cmd_null_message
+#define CMD_FILTER_RESULT action_message_def::action_t::cmd_filter_result
 #define CMD_PUB action_message_def::action_t::cmd_pub
 #define CMD_LOG action_message_def::action_t::cmd_log
 #define CMD_WARNING action_message_def::action_t::cmd_warning

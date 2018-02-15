@@ -148,9 +148,18 @@ HELICS_Export helics_status helicsSubscriptionGetUnits (helics_subscription sub,
 
 HELICS_Export helics_status helicsPublicationGetUnits (helics_publication pub, char *str, int maxlen);
 
+/** check if a particular subscription was updated 
+@return true if it has been updated since the last value retrieval*/
 HELICS_Export helics_bool_t helicsSubscriptionIsUpdated (helics_subscription sub);
-
+/** get the last time a subscription was updated */
 HELICS_Export helics_time_t helicsSubscriptionLastUpdateTime (helics_subscription sub);
+/** get the number of publications in a federate
+@return (-1) if fed was not a valid federate otherwise returns the number of publications*/
+HELICS_Export int helicsFederateGetPublicationCount(helics_federate fed);
+
+/** get the number of subscriptions in a federate
+@return (-1) if fed was not a valid federate otherwise returns the number of subscriptions*/
+HELICS_Export int helicsFederateGetSubscriptionCount(helics_federate fed);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

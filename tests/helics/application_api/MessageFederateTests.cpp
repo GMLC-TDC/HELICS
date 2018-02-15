@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/application_api/Endpoints.hpp"
 #include "helics/application_api/MessageFederate.hpp"
-#include "testFixtures.h"
+#include "testFixtures.hpp"
 #include "test_configuration.h"
 
 #include <future>
@@ -32,7 +32,7 @@ namespace utf = boost::unit_test;
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::MessageFederate> (core_type, 1);
+    SetupTest<helics::MessageFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
 
     mFed1->enterExecutionState ();
@@ -46,7 +46,7 @@ BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types
 
 BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::MessageFederate> (core_type, 1);
+    SetupTest<helics::MessageFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
 
     auto epid = mFed1->registerEndpoint ("ep1");
@@ -75,7 +75,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
 // same as previous test case but using endpoint objects
 BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::MessageFederate> (core_type, 1);
+    SetupTest<helics::MessageFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
 
     helics::Endpoint epid (mFed1.get (), "ep1");
@@ -104,7 +104,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::MessageFederate> (core_type, 1);
+    SetupTest<helics::MessageFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
 
     auto epid = mFed1->registerEndpoint ("ep1");
@@ -143,7 +143,7 @@ BOOST_TEST_DECORATOR(*utf::timeout(5))
 #endif
 BOOST_DATA_TEST_CASE(message_federate_send_receive_callback, bdata::make(core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::MessageFederate>(core_type, 1);
+    SetupTest<helics::MessageFederate>(core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
     auto epid = mFed1->registerEndpoint("ep1");
@@ -192,7 +192,7 @@ BOOST_TEST_DECORATOR(*utf::timeout(5))
 #endif
 BOOST_DATA_TEST_CASE(message_federate_send_receive_callback_obj, bdata::make(core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::MessageFederate>(core_type, 1);
+    SetupTest<helics::MessageFederate>(core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
     helics::Endpoint ep1(mFed1, "ep1");
@@ -240,7 +240,7 @@ BOOST_TEST_DECORATOR(*utf::timeout(5))
 #endif
 BOOST_DATA_TEST_CASE(message_federate_send_receive_callback_obj2, bdata::make(core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::MessageFederate>(core_type, 1);
+    SetupTest<helics::MessageFederate>(core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
     helics::Endpoint ep1(mFed1, "ep1");
@@ -288,7 +288,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 BOOST_DATA_TEST_CASE (message_federate_send_receive_obj, bdata::make (core_types_single), core_type)
 {
     using namespace helics;
-    SetupSingleBrokerTest<helics::MessageFederate> (core_type, 1);
+    SetupTest<helics::MessageFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
 
     Endpoint epid (mFed1.get (), "ep1");
@@ -328,10 +328,12 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_types), core_type)
 {
-    SetupSingleBrokerTest<helics::MessageFederate> (core_type, 2);
+   // extraBrokerArgs = "--logleve=4";
+    SetupTest<helics::MessageFederate> (core_type, 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
     auto mFed2 = GetFederateAs<helics::MessageFederate> (1);
-
+    //mFed1->setLoggingLevel(4);
+    //mFed2->setLoggingLevel(4);
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
 
@@ -365,11 +367,13 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
     BOOST_CHECK (res);
 
     auto M1 = mFed1->getMessage (epid);
+    BOOST_REQUIRE(M1);
     BOOST_REQUIRE_EQUAL (M1->data.size (), data2.size ());
 
     BOOST_CHECK_EQUAL (M1->data[245], data2[245]);
 
     auto M2 = mFed2->getMessage (epid2);
+    BOOST_REQUIRE(M2);
     BOOST_REQUIRE_EQUAL (M2->data.size (), data.size ());
 
     BOOST_CHECK_EQUAL (M2->data[245], data[245]);
@@ -386,7 +390,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_types), core_type)
 {
     using namespace helics;
-    SetupSingleBrokerTest<MessageFederate> (core_type, 2);
+    SetupTest<MessageFederate> (core_type, 2);
     auto mFed1 = GetFederateAs<MessageFederate> (0);
     auto mFed2 = GetFederateAs<MessageFederate> (1);
 
@@ -424,11 +428,13 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_
     BOOST_CHECK (res);
 
     auto M1 = epid.getMessage ();
+    BOOST_REQUIRE(M1);
     BOOST_REQUIRE_EQUAL (M1->data.size (), data2.size ());
 
     BOOST_CHECK_EQUAL (M1->data[245], data2[245]);
 
     auto M2 = epid2.getMessage ();
+    BOOST_REQUIRE(M2);
     BOOST_REQUIRE_EQUAL (M2->data.size (), data.size ());
 
     BOOST_CHECK_EQUAL (M2->data[245], data[245]);
@@ -444,7 +450,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make (core_types), core_type)
 {
-    SetupSingleBrokerTest<helics::MessageFederate> (core_type, 2);
+    SetupTest<helics::MessageFederate> (core_type, 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
     auto mFed2 = GetFederateAs<helics::MessageFederate> (1);
 
@@ -483,6 +489,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     BOOST_CHECK_EQUAL (cnt, 4);
 
     auto M1 = mFed2->getMessage (epid2);
+    BOOST_REQUIRE(M1);
     BOOST_REQUIRE_EQUAL (M1->data.size (), data1.size ());
 
     BOOST_CHECK_EQUAL (M1->data[245], data1[245]);
@@ -490,6 +497,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     cnt = mFed2->receiveCount (epid2);
     BOOST_CHECK_EQUAL (cnt, 3);
     auto M2 = mFed2->getMessage ();
+    BOOST_REQUIRE(M2);
     BOOST_REQUIRE_EQUAL (M2->data.size (), data2.size ());
     BOOST_CHECK_EQUAL (M2->data[245], data2[245]);
     cnt = mFed2->receiveCount (epid2);
@@ -497,6 +505,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
 
     auto M3 = mFed2->getMessage ();
     auto M4 = mFed2->getMessage (epid2);
+    BOOST_REQUIRE(M3);
+    BOOST_REQUIRE(M4);
     BOOST_CHECK_EQUAL (M3->data.size (), data3.size ());
     BOOST_CHECK_EQUAL (M4->data.size (), data4.size ());
 
@@ -516,7 +526,7 @@ BOOST_TEST_DECORATOR(*utf::timeout(5))
 #endif
 BOOST_DATA_TEST_CASE(message_federate_send_receive_2fed_multisend_callback, bdata::make(core_types), core_type)
 {
-    SetupSingleBrokerTest<helics::MessageFederate>(core_type, 2);
+    SetupTest<helics::MessageFederate>(core_type, 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
 
@@ -559,6 +569,7 @@ BOOST_DATA_TEST_CASE(message_federate_send_receive_2fed_multisend_callback, bdat
     BOOST_CHECK_EQUAL(cnt, 4);
 
     auto M1 = mFed2->getMessage(epid2);
+    BOOST_REQUIRE(M1);
     BOOST_REQUIRE_EQUAL(M1->data.size(), data1.size());
 
     BOOST_CHECK_EQUAL(M1->data[245], data1[245]);
@@ -566,6 +577,7 @@ BOOST_DATA_TEST_CASE(message_federate_send_receive_2fed_multisend_callback, bdat
     cnt = mFed2->receiveCount(epid2);
     BOOST_CHECK_EQUAL(cnt, 3);
     auto M2 = mFed2->getMessage();
+    BOOST_REQUIRE(M2);
     BOOST_REQUIRE_EQUAL(M2->data.size(), data2.size());
     BOOST_CHECK_EQUAL(M2->data[245], data2[245]);
     cnt = mFed2->receiveCount(epid2);
@@ -753,7 +765,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_type)
 {
-    SetupSingleBrokerTest<helics::MessageFederate> (core_type, 2);
+    SetupTest<helics::MessageFederate> (core_type, 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
     auto mFed2 = GetFederateAs<helics::MessageFederate> (1);
 

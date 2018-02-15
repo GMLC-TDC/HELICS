@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include "testFixtures.h"
+#include "../application_api/testFixtures.hpp"
 
 using namespace std::string_literals;
 /** these test cases test out the value federates
@@ -29,11 +29,11 @@ BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture)
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdata::make (travis_core_types), core_type)
 {
     using namespace helics;
-    SetupSingleBrokerTest<ValueFederate> (core_type, 1);
-    auto vFed1 = GetFederateAs<ValueFederate> (0);
+    SetupTest<helics::ValueFederate> (core_type, 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications
     Publication pubid (vFed1.get (), "pub1", helicsType<std::string> ());
@@ -81,9 +81,9 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdat
 }
 
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (travis_core_types), core_type)
 {
-    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
+    SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     BOOST_REQUIRE(vFed1);
     // register the publications
@@ -119,9 +119,9 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
 }
 
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer, bdata::make (travis_core_types), core_type)
 {
-    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 2);
+    SetupTest<helics::ValueFederate> (core_type, 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
@@ -169,9 +169,9 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer, bdata::make (core_types), co
 }
 
 BOOST_TEST_DECORATOR (*utf::timeout (10))
-BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (travis_core_types), core_type)
 {
-    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
+    SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications

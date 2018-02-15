@@ -104,7 +104,7 @@ class Publication : public PublicationBase
                  FedPtr valueFed,
                  std::string key,
                  helics_type_t type,
-                 std::string units = std::string())
+                 const std::string &units = std::string())
         : PublicationBase (locality, valueFed, key, typeNameStringRef (type), units), pubType (type)
     {
     }

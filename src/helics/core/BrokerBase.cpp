@@ -179,11 +179,11 @@ bool BrokerBase::sendToLogger (Core::federate_id_t federateID,
         }
         if (loggerFunction)
         {
-            loggerFunction (logLevel, name, message);
+            loggerFunction (logLevel, name+"("+std::to_string(federateID)+")", message);
         }
         else if (loggingObj)
         {
-            loggingObj->log (logLevel, name + "::" + message);
+            loggingObj->log (logLevel, name + "(" + std::to_string(federateID) + ")::" + message);
         }
         return true;
     }

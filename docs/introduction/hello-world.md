@@ -57,7 +57,6 @@ $ cc hello_world_sender.c -o ./hello_world_sender -lhelicsSharedLib
 $ cc hello_world_receiver.c -o ./hello_world_receiver -lhelicsSharedLib
 ```
 
-Be sure to use the same compiler you used to build the HELICS library.
 You may need to include additional include paths and library paths in
 the above command.
 
@@ -98,30 +97,34 @@ of Federates in more detail in a later chapter.
 
 ```c
 fedinfo = helicsFederateInfoCreate();
-helicsFederateInfoSetFederateName(fedinfo, "Test sender Federate");
+helicsFederateInfoSetFederateName(fedinfo, "hello_world_sender");
 helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq");
 helicsFederateInfoSetCoreInitString(fedinfo, "--federates=1");
+helicsFederateInfoSetPeriod(fedinfo, 1.0);
 vfed = helicsCreateValueFederate(fedinfo);
 ```
 
 The following registers a global publication.
 
 ```c
-pub = helicsFederateRegisterGlobalPublication(vfed,"testA","string","");
+pub = helicsFederateRegisterGlobalPublication(vfed,"hello","string","");
 ```
 
 The following ensures that the federation has entered execution mode.
+if `helicsFederateEnterInitializationMode` is not included the call to
+`helicsFederateEnterExecutionMode` will automatically make the call in the background
 
 ```c
 helicsFederateEnterInitializationMode(vfed);
 helicsFederateEnterExecutionMode(vfed);
 ```
 
-These functions publish a String and make a RequestTime function call.
+These functions publish a String and make a RequestTime function call to 
+advance time in the simulation
 
 ```c
 helicsPublicationPublishString(pub, "Hello, World");
-helicsFederateRequestTime(vfed,currenttime, &currenttime);
+helicsFederateRequestTime(vfed,1.0, &currenttime);
 ```
 
 And these functions finally frees the Federate.
@@ -137,17 +140,20 @@ uses a Subscription instead. A snippet of the code is shown below.
 
 ```c
 fedinfo = helicsFederateInfoCreate ();
-helicsFederateInfoSetFederateName (fedinfo, "TestB Federate");
+helicsFederateInfoSetFederateName (fedinfo, "hello_world_receiver");
 helicsFederateInfoSetCoreTypeFromString (fedinfo, "zmq");
 helicsFederateInfoSetCoreInitString (fedinfo, fedinitstring);
+helicsFederateInfoSetPeriod(fedinfo, 1.0);
 
 vfed = helicsCreateValueFederate (fedinfo);
-sub = helicsFederateRegisterSubscription (vfed, "testA", "string", "");
+sub = helicsFederateRegisterSubscription (vfed, "hello", "string", "");
 
 helicsFederateEnterInitializationMode (vfed);
 helicsFederateEnterExecutionMode (vfed);
-
-helicsFederateRequestTime (vfed, currenttime, &currenttime);
+    
+/** request that helics grant the federate a time of 1.0
+    the new time will be returned in currentime*/
+helicsFederateRequestTime (vfed, 1.0, &currenttime);
 
 isupdated = helicsSubscriptionIsUpdated (sub);
 helicsSubscriptionGetString (sub, value, 128);

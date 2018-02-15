@@ -58,7 +58,7 @@ int main (int argc, char *argv[])
         }
         else if ((arg1 == "--version")||(arg1=="-v"))
         {
-            std::cout << "helics_app\n" << helics::helicsVersionString() << '\n';
+            std::cout << "helics_app\n" << helics::versionString() << '\n';
         }
         else if ((arg1 == "--help") || (arg1 == "-?"))
         {

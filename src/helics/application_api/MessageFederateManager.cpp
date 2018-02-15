@@ -194,6 +194,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             messageQueues[localEndpointIndex].emplace (std::move (message));
             if ((*localEpt)[localEndpointIndex].callbackIndex >= 0)
             {
+                //need to be copied otherwise there is a potential race condition on lock removal
                 auto cb = callbacks[(*localEpt)[localEndpointIndex].callbackIndex];
                 eplock.unlock ();
                 cb (fid->id, CurrentTime);
@@ -201,6 +202,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             }
             else if (allCallbackIndex >= 0)
             {
+                //need to be copied otherwise there is a potential race condition on lock removal
                 auto ac = callbacks[allCallbackIndex];
                 eplock.unlock ();
                 ac (fid->id, CurrentTime);

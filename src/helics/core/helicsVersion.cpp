@@ -2,7 +2,7 @@
 
 namespace helics
 {
-std::string helicsVersionString ()
+std::string versionString ()
 {
     std::string vstr = std::to_string (HELICS_VERSION_MAJOR);
     vstr.push_back ('.');

@@ -29,7 +29,7 @@ int main (int argc, char *argv[])
         }
         else if (exit_early == helics::versionReturn)
         {
-            std::cout << helics::helicsVersionString() << '\n';
+            std::cout << helics::versionString() << '\n';
         }
         return 0;
     }

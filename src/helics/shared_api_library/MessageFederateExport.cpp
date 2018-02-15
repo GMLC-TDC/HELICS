@@ -1,13 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include "../core/core-exceptions.hpp"
 #include "../helics.hpp"
 #include "MessageFederate.h"
@@ -78,7 +77,7 @@ helics_status helicsEndpointSetDefaultDestination (helics_endpoint endpoint, con
 {
     if (endpoint == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     endObj->endptr->setTargetDestination (dest);
@@ -89,7 +88,7 @@ helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char
 {
     if (endpoint == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     if ((dest == nullptr) || (std::string (dest).empty ()))
@@ -107,7 +106,7 @@ helics_status helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *
 {
     if (endpoint == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     if ((dest == nullptr) || (std::string (dest).empty ()))
@@ -125,11 +124,11 @@ helics_status helicsEndpointSendMessage (helics_endpoint endpoint, message_t *me
 {
     if (message == nullptr)
     {
-        return helics_discard;
+        return helics_invalid_argument;
     }
     if (endpoint == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
     }
 
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
@@ -164,6 +163,10 @@ int helicsFederateHasMessage (helics_federate fed)
         return false;
     }
     auto mFed = getMessageFed (fed);
+    if (mFed == nullptr)
+    {
+        return false;
+    }
     return (mFed->hasMessage ()) ? 1 : 0;
 }
 
@@ -185,6 +188,10 @@ int helicsFederateReceiveCount (helics_federate fed)
         return 0;
     }
     auto mFed = getMessageFed (fed);
+    if (mFed == nullptr)
+    {
+        return 0;
+    }
     return mFed->receiveCount ();
 }
 
@@ -255,9 +262,13 @@ message_t helicsFederateGetMessage (helics_federate fed)
 
 helics_status helicsEndpointGetType (helics_endpoint endpoint, char *str, int maxlen)
 {
-    if ((endpoint == nullptr) || (str == nullptr))
+    if (endpoint == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
+    }
+    if ((str == nullptr) || (maxlen <= 0))
+    {
+        return helics_invalid_argument;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     auto type = endObj->endptr->getType ();
@@ -275,9 +286,13 @@ helics_status helicsEndpointGetType (helics_endpoint endpoint, char *str, int ma
 
 helics_status helicsEndpointGetName (helics_endpoint endpoint, char *str, int maxlen)
 {
-    if ((endpoint == nullptr) || (str == nullptr))
+    if (endpoint == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
+    }
+    if ((str == nullptr) || (maxlen <= 0))
+    {
+        return helics_invalid_argument;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     auto type = endObj->endptr->getName ();
@@ -291,4 +306,20 @@ helics_status helicsEndpointGetName (helics_endpoint endpoint, char *str, int ma
         strcpy (str, type.c_str ());
     }
     return helics_ok;
+}
+
+int helicsFederateGetEndpointCount(helics_federate fed)
+{
+    if (fed == nullptr)
+    {
+        return (-1);
+    }
+    auto mfedObj = getMessageFed(fed);
+    if (mfedObj == nullptr)
+    {
+        auto fedObj = getFed(fed);
+        //if this is not nullptr than it is a valid fed object just not a message federate object so it has 0 endpoints
+        return (fedObj != nullptr) ? 0 : (-1);
+    }
+    return static_cast<int>(mfedObj->getEndpointCount());
 }

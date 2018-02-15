@@ -1,5 +1,4 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
@@ -17,14 +16,15 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <memory>
 #include <mutex>
 #include <vector>
+#include "../common/TripWire.hpp"
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
-static const int validationIdentifier = 0x2352188;
+static const int fedValidationIdentifier = 0x2352188;
 
 helics::Federate *getFed (helics_federate fed)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
-    if (fedObj->valid == validationIdentifier)
+    if (fedObj->valid == fedValidationIdentifier)
     {
         return fedObj->fedptr.get ();
     }
@@ -34,9 +34,9 @@ helics::Federate *getFed (helics_federate fed)
 helics::ValueFederate *getValueFed (helics_federate fed)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
-    if (fedObj->valid == validationIdentifier)
+    if (fedObj->valid == fedValidationIdentifier)
     {
-        if ((fedObj->type == helics::vtype::valueFed) || (fedObj->type == helics::vtype::combinFed))
+        if ((fedObj->type == helics::vtype::valueFed) || (fedObj->type == helics::vtype::combinationFed))
         {
             return dynamic_cast<helics::ValueFederate *> (fedObj->fedptr.get ());
         }
@@ -47,9 +47,9 @@ helics::ValueFederate *getValueFed (helics_federate fed)
 helics::MessageFederate *getMessageFed (helics_federate fed)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
-    if (fedObj->valid == validationIdentifier)
+    if (fedObj->valid == fedValidationIdentifier)
     {
-        if ((fedObj->type == helics::vtype::messageFed) || (fedObj->type == helics::vtype::combinFed))
+        if ((fedObj->type == helics::vtype::messageFed) || (fedObj->type == helics::vtype::combinationFed))
         {
             return dynamic_cast<helics::MessageFederate *> (fedObj->fedptr.get ());
         }
@@ -60,7 +60,7 @@ helics::MessageFederate *getMessageFed (helics_federate fed)
 std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
-    if (fedObj->valid == validationIdentifier)
+    if (fedObj->valid == fedValidationIdentifier)
     {
         return fedObj->fedptr;
     }
@@ -70,9 +70,9 @@ std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed)
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
-    if (fedObj->valid == validationIdentifier)
+    if (fedObj->valid == fedValidationIdentifier)
     {
-        if ((fedObj->type == helics::vtype::valueFed) || (fedObj->type == helics::vtype::combinFed))
+        if ((fedObj->type == helics::vtype::valueFed) || (fedObj->type == helics::vtype::combinationFed))
         {
             return std::dynamic_pointer_cast<helics::ValueFederate> (fedObj->fedptr);
         }
@@ -83,9 +83,9 @@ std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed
 std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate fed)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
-    if (fedObj->valid == validationIdentifier)
+    if (fedObj->valid == fedValidationIdentifier)
     {
-        if ((fedObj->type == helics::vtype::messageFed) || (fedObj->type == helics::vtype::combinFed))
+        if ((fedObj->type == helics::vtype::messageFed) || (fedObj->type == helics::vtype::combinationFed))
         {
             return std::dynamic_pointer_cast<helics::MessageFederate> (fedObj->fedptr);
         }
@@ -93,89 +93,108 @@ std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate
     return nullptr;
 }
 
-MasterObjectHolder::MasterObjectHolder () noexcept {}
+MasterObjectHolder::MasterObjectHolder() noexcept {}
 
 MasterObjectHolder::~MasterObjectHolder ()
 {
     deleteAll ();
-    std::cout << "end of master Object Holder destructor" << std::endl;
+    //std::cout << "end of master Object Holder destructor" << std::endl;
 }
 int MasterObjectHolder::addBroker (helics::BrokerObject *broker)
 {
-    std::lock_guard<std::mutex> lock (ObjectLock);
-    auto index = static_cast<int> (brokers.size ());
-    brokers.push_back (broker);
+    auto handle = brokers.lock();
+    auto index = static_cast<int> (handle->size ());
+    handle->push_back (broker);
     return index;
 }
 
 int MasterObjectHolder::addCore (helics::CoreObject *core)
 {
-    std::lock_guard<std::mutex> lock (ObjectLock);
-    auto index = static_cast<int> (cores.size ());
-    cores.push_back (core);
+    auto handle = cores.lock();
+    auto index = static_cast<int> (handle->size ());
+    handle->push_back (core);
     return index;
 }
 
 int MasterObjectHolder::addFed (helics::FedObject *fed)
 {
-    std::lock_guard<std::mutex> lock (ObjectLock);
-    auto index = static_cast<int> (feds.size ());
-    feds.push_back (fed);
+    auto handle = feds.lock();
+    auto index = static_cast<int> (handle->size ());
+    handle->push_back (fed);
     return index;
 }
 
 void MasterObjectHolder::clearBroker (int index)
 {
-    std::lock_guard<std::mutex> lock (ObjectLock);
-    if (index < static_cast<int> (brokers.size ()))
+    auto broker = brokers.lock();
+    if (index < static_cast<int> (broker->size ()))
     {
-        brokers[index] = nullptr;
+        (*broker)[index] = nullptr;
     }
 }
 
 void MasterObjectHolder::clearCore (int index)
 {
-    std::lock_guard<std::mutex> lock (ObjectLock);
-    if (index < static_cast<int> (cores.size ()))
+    auto core = cores.lock();
+    if (index < static_cast<int> (core->size ()))
     {
-        cores[index] = nullptr;
+        (*core)[index] = nullptr;
     }
 }
 
 void MasterObjectHolder::clearFed (int index)
 {
-    std::lock_guard<std::mutex> lock (ObjectLock);
-    if (index < static_cast<int> (feds.size ()))
+    auto fed = feds.lock();
+    if (index < static_cast<int> (fed->size ()))
     {
-        feds[index] = nullptr;
+        (*fed)[index] = nullptr;
     }
 }
 
 void MasterObjectHolder::deleteAll ()
 {
-    std::lock_guard<std::mutex> lock (ObjectLock);
-    for (auto obj : brokers)
     {
-        delete obj;
+        auto brokerHandle = brokers.lock();
+        for (auto obj : *brokerHandle)
+        {
+            delete obj;
+        }
+        brokerHandle->clear();
     }
-    for (auto obj : cores)
     {
-        delete obj;
+        auto coreHandle = cores.lock();
+        for (auto obj : *coreHandle)
+        {
+            delete obj;
+        }
+        coreHandle->clear();
     }
-    for (auto obj : feds)
-    {
-        delete obj;
-    }
-    brokers.clear ();
-    feds.clear ();
-    cores.clear ();
+        auto fedHandle =feds.lock();
+        for (auto obj : *fedHandle)
+        {
+            delete obj;
+        }
+        fedHandle->clear();
+   
 }
 
-static MasterObjectHolder mHolder;
+std::shared_ptr<MasterObjectHolder> getMasterHolder () 
+{ 
+    static auto instance=std::make_shared<MasterObjectHolder>(); 
+    return instance;
+}
 
-MasterObjectHolder *getMasterHolder () { return &mHolder; }
+tripwire::TripWireTrigger tripTrigger;
 
-void clearAllObjects () { mHolder.deleteAll (); }
+void clearAllObjects() 
+{
+    auto v = getMasterHolder();
+    if (v)
+    {
+        v->deleteAll();
+    }
+    
+}
 
 /* Creation and destruction of Federates */
 helics_federate helicsCreateValueFederate (const helics_federate_info_t fi)
@@ -191,7 +210,7 @@ helics_federate helicsCreateValueFederate (const helics_federate_info_t fi)
         fed->fedptr = std::make_shared<helics::ValueFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
     }
     fed->type = helics::vtype::valueFed;
-    fed->valid = validationIdentifier;
+    fed->valid = fedValidationIdentifier;
     return reinterpret_cast<void *> (fed);
 }
 
@@ -201,7 +220,7 @@ helics_federate helicsCreateValueFederateFromJson (const char *json)
     fed->index = getMasterHolder ()->addFed (fed);
     fed->fedptr = std::make_shared<helics::ValueFederate> ((json != nullptr) ? std::string (json) : std::string ());
     fed->type = helics::vtype::valueFed;
-    fed->valid = validationIdentifier;
+    fed->valid = fedValidationIdentifier;
     return reinterpret_cast<void *> (fed);
 }
 
@@ -219,7 +238,7 @@ helics_federate helicsCreateMessageFederate (const helics_federate_info_t fi)
         fed->fedptr = std::make_shared<helics::MessageFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
     }
     fed->type = helics::vtype::messageFed;
-    fed->valid = validationIdentifier;
+    fed->valid = fedValidationIdentifier;
     return reinterpret_cast<void *> (fed);
 }
 
@@ -229,7 +248,7 @@ helics_federate helicsCreateMessageFederateFromJson (const char *json)
     fed->index = getMasterHolder ()->addFed (fed);
     fed->fedptr = std::make_shared<helics::MessageFederate> ((json != nullptr) ? std::string (json) : std::string ());
     fed->type = helics::vtype::messageFed;
-    fed->valid = validationIdentifier;
+    fed->valid = fedValidationIdentifier;
     return reinterpret_cast<void *> (fed);
 }
 
@@ -246,8 +265,8 @@ helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi
     {
         fed->fedptr = std::make_shared<helics::CombinationFederate> (*reinterpret_cast<helics::FederateInfo *> (fi));
     }
-    fed->type = helics::vtype::combinFed;
-    fed->valid = validationIdentifier;
+    fed->type = helics::vtype::combinationFed;
+    fed->valid = fedValidationIdentifier;
     return reinterpret_cast<void *> (fed);
 }
 
@@ -256,8 +275,8 @@ helics_federate helicsCreateCombinationFederateFromJson (const char *json)
     auto *fed = new helics::FedObject;
     fed->index = getMasterHolder ()->addFed (fed);
     fed->fedptr = std::make_shared<helics::CombinationFederate> ((json != nullptr) ? std::string (json) : std::string ());
-    fed->type = helics::vtype::combinFed;
-    fed->valid = validationIdentifier;
+    fed->type = helics::vtype::combinationFed;
+    fed->valid = fedValidationIdentifier;
     return reinterpret_cast<void *> (fed);
 }
 
@@ -270,7 +289,7 @@ helics_core helicsFederateGetCoreObject (helics_federate fed)
     }
     auto *core = new helics::CoreObject;
     core->index = getMasterHolder ()->addCore (core);
-    core->valid = validationIdentifier;
+    core->valid = fedValidationIdentifier;
     core->coreptr = fedObj->getCorePointer ();
     return reinterpret_cast<helics_core> (core);
 }
@@ -291,6 +310,10 @@ helics_status helicsFederateFinalize (helics_federate fed)
 helics_status helicsFederateEnterInitializationMode (helics_federate fed)
 {
     auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return helics_invalid_object;
+    }
     try
     {
         fedObj->enterInitializationState ();

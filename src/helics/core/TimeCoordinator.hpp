@@ -152,4 +152,4 @@ class TimeCoordinator
     /** generate a string with the current time status*/
     std::string printTimeStatus () const;
 };
-}
+} //namespace helics
