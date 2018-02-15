@@ -1,17 +1,13 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
-#ifndef HELICS_RECORDER_HPP
-#define HELICS_RECORDER_HPP
-
+#pragma once
 #include "../application_api/Subscriptions.hpp"
 #include "../application_api/CombinationFederate.hpp"
 #include "../application_api/Endpoints.hpp"
@@ -19,7 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <memory>
 #include <set>
 
-#include "PrecHelper.h"
+#include "PrecHelper.hpp"
 
 namespace boost
 {
@@ -180,5 +176,3 @@ namespace helics
     };
 
 } //namespace helics
-
-#endif // HELICS_RECORDER_HPP

@@ -7,8 +7,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "source.h"
-#include "PrecHelper.h"
+#include "Source.hpp"
+#include "PrecHelper.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -19,7 +19,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/filesystem.hpp>
 #include "../common/argParser.h"
 
-#include "PrecHelper.h"
 #include "../common/JsonProcessingFunctions.hpp"
 
 #include "../common/base64.h"

@@ -1,15 +1,11 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef TIME_COORDINATOR_H_
-#define TIME_COORDINATOR_H_
 #pragma once
 
 #include "ActionMessage.hpp"
@@ -21,7 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 /** class managing the coordination of time in HELICS
-the time coordinator manages depedencies and computes whether time can advance or enter execution mode
+the time coordinator manages dependencies and computes whether time can advance or enter execution mode
 */
 class TimeCoordinator
 {
@@ -37,8 +33,8 @@ class TimeCoordinator
     Time time_message = Time::maxVal ();  //!< the time of the earliest message event
     Time time_value = Time::maxVal ();  //!< the time of the earliest value event
 
-	TimeDependencies dependencies;  // federates which this Federate is temporally dependent on
-	std::vector<Core::federate_id_t> dependents;  // federates which temporally depend on this federate
+	TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
+	std::vector<Core::federate_id_t> dependents;  //!< federates which temporally depend on this federate
 
 	CoreFederateInfo info;  //!< basic federate info the core uses
 	std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
@@ -55,7 +51,7 @@ class TimeCoordinator
     std::atomic<int32_t> iteration{0};  //!< iteration counter
   public:
     TimeCoordinator () = default;
-    TimeCoordinator (const CoreFederateInfo &info_);
+    explicit TimeCoordinator (const CoreFederateInfo &info_);
 
 	/* get the federate info used by the Core that affects timing*/
 	CoreFederateInfo &getFedInfo()
@@ -157,5 +153,3 @@ class TimeCoordinator
     std::string printTimeStatus () const;
 };
 }
-
-#endif

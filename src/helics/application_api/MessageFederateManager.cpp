@@ -280,26 +280,26 @@ int MessageFederateManager::getEndpointCount () const
     return static_cast<int> (endpointCount);
 }
 
-void MessageFederateManager::registerCallback (std::function<void(endpoint_id_t, Time)> callback)
+void MessageFederateManager::registerCallback (const std::function<void(endpoint_id_t, Time)> &callback)
 {
     std::lock_guard<std::mutex> eLock (endpointLock);
     if (allCallbackIndex < 0)
     {
         allCallbackIndex = static_cast<int> (callbacks.size ());
-        callbacks.emplace_back (std::move (callback));
+        callbacks.push_back (callback);
     }
     else
     {
-        callbacks[allCallbackIndex] = std::move (callback);
+        callbacks[allCallbackIndex] = callback;
     }
 }
 
-void MessageFederateManager::registerCallback (endpoint_id_t id, std::function<void(endpoint_id_t, Time)> callback)
+void MessageFederateManager::registerCallback (endpoint_id_t id, const std::function<void(endpoint_id_t, Time)> &callback)
 {
     if (id.value () < endpointCount)
     {
         (*local_endpoints.lock())[id.value ()].callbackIndex = static_cast<int> (callbacks.size ());
-        callbacks.emplace_back (std::move (callback));
+        callbacks.push_back (callback);
     }
     else
     {
@@ -308,11 +308,11 @@ void MessageFederateManager::registerCallback (endpoint_id_t id, std::function<v
 }
 
 void MessageFederateManager::registerCallback (const std::vector<endpoint_id_t> &ids,
-                                               std::function<void(endpoint_id_t, Time)> callback)
+                                               const std::function<void(endpoint_id_t, Time)> &callback)
 {
 
     int ind = static_cast<int> (callbacks.size ());
-    callbacks.emplace_back (std::move (callback));
+    callbacks.push_back (callback);
     auto cnt = endpointCount.load();
     auto eptLock = local_endpoints.lock();
     for (auto id : ids)

@@ -185,18 +185,18 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     /** register a callback for all endpoints
     @param[in] callback the function to execute upon receipt of a message for any endpoint
     */
-    void registerEndpointCallback (std::function<void(endpoint_id_t, Time)> callback);
+    void registerEndpointCallback (const std::function<void(endpoint_id_t, Time)> &callback);
     /** register a callback for a specific endpoint
     @param[in] ep the endpoint to associate with the specified callback
     @param[in] callback the function to execute upon receipt of a message for the given endpoint
     */
-    void registerEndpointCallback (endpoint_id_t ep, std::function<void(endpoint_id_t, Time)> callback);
+    void registerEndpointCallback (endpoint_id_t ep, const std::function<void(endpoint_id_t, Time)> &callback);
     /** register a callback for a set of specific endpoint
     @param[in] ep a vector of endpoints to associate with the specified callback
     @param[in] callback the function to execute upon receipt of a message for the given endpoint
     */
     void registerEndpointCallback (const std::vector<endpoint_id_t> &ep,
-                                   std::function<void(endpoint_id_t, Time)> callback);
+                                   const std::function<void(endpoint_id_t, Time)> &callback);
 
     virtual void disconnect () override;
 

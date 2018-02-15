@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef HELICS_TYPES_H_
-#define HELICS_TYPES_H_
+
 #pragma once
 #include <complex>
 #include <cstdint>
@@ -48,6 +45,17 @@ enum class interface_visibility
 
 constexpr interface_visibility GLOBAL = interface_visibility::global;
 constexpr interface_visibility LOCAL = interface_visibility::local;
+
+/** enumeration of a whether a publication is required or is optional*/
+enum class interface_availability
+{
+    required,
+    optional,
+};
+
+constexpr interface_availability OPTIONAL = interface_availability::optional;
+constexpr interface_availability REQUIRED = interface_availability::required;
+
 /** class defining an  identifier type
 @details  the intent of this class is to limit the operations available on a publication identifier
 to those that are a actually required and make sense, and make it as low impact as possible.
@@ -96,6 +104,8 @@ using subscription_id_t = identifier_id_t<identifier_type, identifiers::subscrip
 using endpoint_id_t = identifier_id_t<identifier_type, identifiers::endpoint, invalid_id_value>;
 using filter_id_t = identifier_id_t<identifier_type, identifiers::filter, invalid_id_value>;
 using query_id_t = identifier_id_t<identifier_type, identifiers::query, invalid_id_value>;
+
+using named_point = std::pair<std::string, double>;
 
 /** template class for generating a known name of a type*/
 template <class X>
@@ -188,6 +198,11 @@ inline std::string typeNameString<std::string> ()
     return "string";
 }
 
+template <>
+inline std::string typeNameString<named_point>()
+{
+    return "named_point";
+}
 /** the base types for  helics*/
 enum class helics_type_t : int
 {
@@ -198,6 +213,7 @@ enum class helics_type_t : int
     helicsComplex = 3,
     helicsVector = 4,
     helicsComplexVector = 5,
+    helicsNamedPoint = 6,
     helicsInvalid = 23425,
     helicsAny = 247652,
 };
@@ -357,4 +373,3 @@ constexpr std::complex<double> invalidValue<std::complex<double>> ()
 }
 
 }  // namespace helics
-#endif

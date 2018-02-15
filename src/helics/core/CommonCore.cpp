@@ -1447,7 +1447,7 @@ void CommonCore::deliverMessage (ActionMessage &message)
         // Find the destination endpoint
         auto localP = getLocalEndpoint (message.info ().target);
         if (localP == nullptr)
-        {  // must be a remote endpoint push it to the main queue to deal with
+        { 
             auto kfnd = knownExternalEndpoints.find(message.info().target);
             if (kfnd != knownExternalEndpoints.end())
             {  // destination is known
@@ -1471,8 +1471,10 @@ void CommonCore::deliverMessage (ActionMessage &message)
         }
         message.dest_id = localP->fed_id;
         message.dest_handle = localP->id;
+         
+        timeCoord->processTimeMessage(message);
         auto fed = getFederate(localP->fed_id);
-        fed->addAction(message);
+        fed->addAction(std::move(message));
         
     }
     break;

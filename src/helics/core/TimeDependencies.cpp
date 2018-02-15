@@ -63,6 +63,17 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Te = Time::maxVal ();
         Tdemin = Time::maxVal ();
         break;
+    case CMD_SEND_MESSAGE:
+        if (m.actionTime < Te)
+        {
+            Te = m.actionTime;
+            if (Te < Tdemin)
+            {
+                Tdemin = Te;
+            }
+            return true;
+        }
+        return false;
     default:
         return false;
     }
@@ -132,12 +143,25 @@ void TimeDependencies::removeDependency (Core::federate_id_t id)
 
 bool TimeDependencies::updateTime (const ActionMessage &m)
 {
-    auto depInfo = getDependencyInfo (m.source_id);
-    if (depInfo == nullptr)
+    if (m.action() == CMD_SEND_MESSAGE)
     {
-        return false;
+        auto depInfo = getDependencyInfo(m.dest_id);
+        if (depInfo == nullptr)
+        {
+            return false;
+        }
+        return depInfo->ProcessMessage(m);
     }
-    return depInfo->ProcessMessage (m);
+    else
+    {
+        auto depInfo = getDependencyInfo(m.source_id);
+        if (depInfo == nullptr)
+        {
+            return false;
+        }
+        return depInfo->ProcessMessage(m);
+    }
+   
 }
 
 bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const

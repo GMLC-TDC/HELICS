@@ -186,6 +186,102 @@ BOOST_DATA_TEST_CASE(message_federate_send_receive_callback, bdata::make(core_ty
     BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::finalize);
 }
 
+
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR(*utf::timeout(5))
+#endif
+BOOST_DATA_TEST_CASE(message_federate_send_receive_callback_obj, bdata::make(core_types_single), core_type)
+{
+    SetupSingleBrokerTest<helics::MessageFederate>(core_type, 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+
+    helics::Endpoint ep1(mFed1, "ep1");
+    helics::Endpoint ep2(helics::GLOBAL, mFed1, "ep2", "random");
+  
+
+    helics::endpoint_id_t rxend;
+    helics::Time timeRx;
+    auto mend = [&](helics::endpoint_id_t ept, helics::Time rtime) {rxend = ept; timeRx = rtime; };
+
+    ep2.setCallback(mend);
+
+    mFed1->setTimeDelta(1.0);
+
+    mFed1->enterExecutionState();
+
+    BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::execution);
+    helics::data_block data(500, 'a');
+
+    ep1.send("ep2", data);
+
+    auto time = mFed1->requestTime(1.0);
+    BOOST_CHECK_EQUAL(time, 1.0);
+
+    auto res = ep2.hasMessage();
+    BOOST_CHECK(res);
+    res = ep1.hasMessage();
+    BOOST_CHECK(!res);
+
+    BOOST_CHECK(rxend==ep2.getID());
+    BOOST_CHECK_EQUAL(timeRx, helics::Time(1.0));
+    auto M = ep2.getMessage();
+    BOOST_REQUIRE(M);
+    BOOST_REQUIRE_EQUAL(M->data.size(), data.size());
+
+    BOOST_CHECK_EQUAL(M->data[245], data[245]);
+    mFed1->finalize();
+
+    BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::finalize);
+}
+
+
+#if ENABLE_TEST_TIMEOUTS > 0
+BOOST_TEST_DECORATOR(*utf::timeout(5))
+#endif
+BOOST_DATA_TEST_CASE(message_federate_send_receive_callback_obj2, bdata::make(core_types_single), core_type)
+{
+    SetupSingleBrokerTest<helics::MessageFederate>(core_type, 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+
+    helics::Endpoint ep1(mFed1, "ep1");
+    helics::Endpoint ep2(helics::GLOBAL, mFed1, "ep2", "random");
+
+
+    helics::endpoint_id_t rxend;
+    helics::Time timeRx;
+    auto mend = [&](helics::Endpoint *ept, helics::Time rtime) {rxend = ept->getID(); timeRx = rtime; };
+
+    ep2.setCallback(mend);
+
+    mFed1->setTimeDelta(1.0);
+
+    mFed1->enterExecutionState();
+
+    BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::execution);
+    helics::data_block data(500, 'a');
+
+    ep1.send("ep2", data);
+
+    auto time = mFed1->requestTime(1.0);
+    BOOST_CHECK_EQUAL(time, 1.0);
+
+    auto res = ep2.hasMessage();
+    BOOST_CHECK(res);
+    res = ep1.hasMessage();
+    BOOST_CHECK(!res);
+
+    BOOST_CHECK(rxend==ep2.getID());
+    BOOST_CHECK_EQUAL(timeRx, helics::Time(1.0));
+    auto M = ep2.getMessage();
+    BOOST_REQUIRE(M);
+    BOOST_REQUIRE_EQUAL(M->data.size(), data.size());
+
+    BOOST_CHECK_EQUAL(M->data[245], data[245]);
+    mFed1->finalize();
+
+    BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::finalize);
+}
+
 #if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif

@@ -209,11 +209,11 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     helics::Publication pubid3 (vFed1.get (), "pub3", helics::helicsType<double> (), "V");
 
     // these aren't meant to match the publications
-    helics::Subscription subid1 (false, vFed1.get (), "sub1");
+    helics::Subscription subid1 (helics::OPTIONAL, vFed1.get (), "sub1");
 
-    helics::SubscriptionT<int> subid2 (false, vFed1.get (), "sub2");
+    helics::SubscriptionT<int> subid2 (helics::OPTIONAL, vFed1.get (), "sub2");
 
-    helics::Subscription subid3 (false, vFed1.get (), "sub3", "V");
+    helics::Subscription subid3 (helics::OPTIONAL, vFed1.get (), "sub3", "V");
     // enter execution
     vFed1->enterExecutionState ();
 
