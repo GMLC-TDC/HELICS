@@ -23,7 +23,7 @@ data_block &data_block::operator= (data_block &&db) noexcept
 }
 
 Message::Message (Message &&m) noexcept
-    : time (m.time), flags (m.flags), data (std::move (m.data)), dest (std::move (m.dest)),
+    : time (m.time), flags (m.flags),messageID(m.messageID), data (std::move (m.data)), dest (std::move (m.dest)),
       source (std::move (m.source)), original_source (std::move (m.original_source)),
       original_dest (std::move (m.original_dest))
 
@@ -32,24 +32,26 @@ Message::Message (Message &&m) noexcept
 
 Message &Message::operator= (Message &&m) noexcept
 {
+    time = m.time;
+    flags = m.flags;
+    messageID = m.messageID;
+    data = std::move(m.data);
     original_source = std::move (m.original_source);
     source = std::move (m.source);
     dest = std::move (m.dest);
-    data = std::move (m.data);
-    time = m.time;
-    flags = m.flags;
     original_dest = std::move (m.original_dest);
     return *this;
 }
 
 void Message::swap (Message &m2) noexcept
 {
+    std::swap(time, m2.time);
+    std::swap(flags, m2.flags);
+    std::swap(messageID, m2.messageID);
     original_source.swap (m2.original_source);
     source.swap (m2.source);
     dest.swap (m2.dest);
     data.swap (m2.data);
-    std::swap (time, m2.time);
-    std::swap (flags, m2.flags);
     original_dest.swap (m2.original_dest);
 }
 

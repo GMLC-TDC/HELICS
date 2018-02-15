@@ -28,7 +28,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     /**constructor taking a federate information structure and using the default core
     @param[in] fi  a federate information structure
     */
-    MessageFederate (const FederateInfo &fi);
+    explicit MessageFederate (const FederateInfo &fi);
     /**constructor taking a core and a federate information structure, sore information in fi is ignored
     @param[in] core a shared ptr to a core to join
     @param[in] fi  a federate information structure
@@ -37,13 +37,13 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     /**constructor taking a string with the required information
     @param[in] jsonString can be either a json file or a string containing json code
     */
-    MessageFederate (const std::string &jsonString);
+    explicit MessageFederate (const std::string &jsonString);
     /** move constructor*/
     MessageFederate (MessageFederate &&mFed) noexcept;
     /** default constructor*/
     MessageFederate ();
     /** special constructor should only be used by child classes in constructor due to virtual inheritance*/
-    MessageFederate (bool res);
+    explicit MessageFederate (bool res);
     // copy constructor and copy assignment are disabled
   public:
     /** destructor */

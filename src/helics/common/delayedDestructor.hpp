@@ -6,8 +6,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
-#ifndef HELICS_DELAYED_DESTRUCTOR_HPP_
-#define HELICS_DELAYED_DESTRUCTOR_HPP_
+
 #pragma once
 
 #include <algorithm>
@@ -147,4 +146,3 @@ class DelayedDestructor
         ElementsToBeDestroyed.push_back (obj);
     }
 };
-#endif  // HELICS_DELAYED_DESTRUCTOR_HPP_

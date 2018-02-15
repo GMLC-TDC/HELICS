@@ -589,6 +589,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         if (state == HELICS_CREATED)
         {
             setState (HELICS_INITIALIZING);
+            LOG_DEBUG("Granting Initialization");
             return iteration_state::next_step;
         }
         break;
@@ -613,6 +614,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             return grant;
         case iteration_state::next_step:
             setState (HELICS_EXECUTING);
+            LOG_DEBUG("Granting Execution");
             return grant;
         case iteration_state::continue_processing:
             break;
@@ -623,9 +625,11 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     break;
     case CMD_TERMINATE_IMMEDIATELY:
         setState (HELICS_FINISHED);
+        LOG_DEBUG("Terminating");
         return iteration_state::halted;
     case CMD_STOP:
         setState (HELICS_FINISHED);
+        LOG_DEBUG("Terminating");
         return iteration_state::halted;
     case CMD_DISCONNECT:
         if (cmd.source_id == global_id)
@@ -667,6 +671,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         if (ret != iteration_state::continue_processing)
         {
             time_granted = timeCoord->getGrantedTime ();
+            LOG_DEBUG(std::string("Granted Time=") + std::to_string(time_granted));
             return ret;
         }
     }
@@ -678,6 +683,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         {
             timeCoord->updateMessageTime (cmd.actionTime);
             epi->addMessage (createMessageFromCommand (std::move (cmd)));
+            LOG_DEBUG("receive_message " + prettyPrintString(cmd));
         }
     }
     break;
@@ -692,6 +698,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         {
             subI->addData (cmd.actionTime, std::make_shared<const data_block> (std::move (cmd.payload)));
             timeCoord->updateValueTime (cmd.actionTime);
+            LOG_DEBUG("receive publication " + prettyPrintString(cmd));
             LOG_TRACE (timeCoord->printTimeStatus ());
         }
     }
@@ -871,7 +878,7 @@ void FederateState::logMessage (int level, const std::string &logMessageSource, 
 {
     if ((loggerFunction) && (level <= logLevel))
     {
-        loggerFunction (level, (logMessageSource.empty ()) ? name : logMessageSource, message);
+        loggerFunction (level, (logMessageSource.empty ()) ? name+"("+std::to_string(global_id)+")" : logMessageSource, message);
     }
 }
 
@@ -885,9 +892,9 @@ std::string FederateState::processQuery (const std::string &query) const
             auto pubHandle = publications.lock_shared();
             for (auto &pub : *pubHandle)
             {
-                ret.append(pub->key);
-                ret.push_back(';');
-            }
+            ret.append (pub->key);
+            ret.push_back (';');
+        }
         }
         if (ret.size () > 1)
         {
@@ -907,9 +914,9 @@ std::string FederateState::processQuery (const std::string &query) const
             auto endHandle = endpoints.lock_shared();
             for (auto &ept : *endHandle)
             {
-                ret.append(ept->key);
-                ret.push_back(';');
-            }
+            ret.append (ept->key);
+            ret.push_back (';');
+        }
         }
         if (ret.size () > 1)
         {

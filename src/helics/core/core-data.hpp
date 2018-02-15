@@ -140,8 +140,9 @@ inline bool operator!= (const data_block &db1, const data_block &db2) { return !
 class Message
 {
   public:
-    Time time;  //!< the event time the message is sent
-    std::uint16_t flags;  //!< message flags
+    Time time=timeZero;  //!< the event time the message is sent
+    std::uint16_t flags=0;  //!< message flags
+    int32_t messageID=0; //!< the messageID for a message
     data_block data;  //!< the data packet for the message
     std::string dest;  //!< the destination of the message
     std::string source;  //!< the most recent source of the message
@@ -149,7 +150,7 @@ class Message
     std::string original_dest;  //!< the original destination of a message
   public:
     /** default constructor*/
-    Message () noexcept {};
+    Message ()=default;
     /** move constructor*/
     Message (Message &&m) noexcept;
     /** copy constructor*/

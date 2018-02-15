@@ -26,7 +26,7 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     /**constructor taking a federate information structure and using the default core
     @param fi  a federate information structure
     */
-    CombinationFederate (const FederateInfo &fi);
+    explicit CombinationFederate (const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
@@ -35,7 +35,7 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     /**constructor taking a file with the required information
     @param[in] file a file defining the federate information
     */
-    CombinationFederate (const std::string &jsonString);
+    explicit CombinationFederate (const std::string &jsonString);
 
     /** move construction*/
     CombinationFederate (CombinationFederate &&fed) noexcept;

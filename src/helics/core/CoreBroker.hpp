@@ -51,7 +51,8 @@ class BasicBrokerInfo
 
 	bool _initRequested = false;	//!< flag indicating the broker has requesting initialization
 	bool _disconnected = false;		//!< flag indicating that the broker has disconnected
-	bool _hasEndpoints = true;		//!< flag indicating that a broker has endpoints it is coordinating
+	bool _hasEndpoints = false;		//!< flag indicating that a broker has endpoints it is coordinating
+    bool _nonLocal = false;           //!< flag indicating that a broker is a direct subbroker of the managing object
 	std::string routeInfo;	//!< string describing the connection information for the route
     BasicBrokerInfo (const std::string &brokerName) : name (brokerName){};
 };

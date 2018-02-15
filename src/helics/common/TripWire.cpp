@@ -10,31 +10,16 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "TripWire.hpp"
 namespace tripwire
 {
-triplineType TripWire::getline()
+triplineType TripWire::getline ()
 {
-    static triplineType staticline = std::make_shared<std::atomic<bool>>(false);
+    static triplineType staticline = std::make_shared<std::atomic<bool>> (false);
     return staticline;
 }
 
-    TripWireDetector::TripWireDetector():lineDetector(TripWire::getline())
-    {
+TripWireDetector::TripWireDetector () : lineDetector (TripWire::getline ()) {}
+bool TripWireDetector::isTripped () const { return lineDetector->load (); }
 
-    }
-    bool TripWireDetector::isTripped() const
-    {
-        return lineDetector->load();
-    }
+TripWireTrigger::TripWireTrigger () : lineTrigger (TripWire::getline ()) {}
 
-
-
-TripWireTrigger::TripWireTrigger():lineTrigger(TripWire::getline())
-{
-}
-
-TripWireTrigger::~TripWireTrigger()
-{
-    lineTrigger->store(true);
-}
-
-
+TripWireTrigger::~TripWireTrigger () { lineTrigger->store (true); }
 }

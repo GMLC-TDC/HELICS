@@ -102,9 +102,9 @@ void simB (std::shared_ptr<helics::Core> core, const std::string &NAME)
 
     // time loop
 
-    core->requestTimeIterative (id, 100, helics::helics_iteration_request::iterate_if_needed);
+    core->requestTimeIterative (id, 100, helics::helics_iteration_request::force_iteration);
     core->requestTimeIterative (id, 100, helics::helics_iteration_request::no_iterations);
-    core->requestTimeIterative (id, 105, helics::helics_iteration_request::iterate_if_needed);
+    core->requestTimeIterative (id, 105, helics::helics_iteration_request::force_iteration);
     core->requestTimeIterative (id, 105, helics::helics_iteration_request::no_iterations);
     core->finalize (id);
 }
