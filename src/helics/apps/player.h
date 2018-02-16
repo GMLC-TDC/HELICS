@@ -73,7 +73,7 @@ namespace helics
         /** construct from a federate info object
         @param fi a pointer info object containing information on the desired federate configuration
         */
-       Player(const FederateInfo &fi);
+        explicit Player(const FederateInfo &fi);
         /**constructor taking a federate information structure and using the given core
         @param core a pointer to core object which the federate can join
         @param[in] fi  a federate information structure
@@ -82,7 +82,7 @@ namespace helics
         /**constructor taking a file with the required information
         @param[in] jsonString file or JSON string defining the federate information and other configuration
         */
-        Player(const std::string &jsonString);
+        explicit Player(const std::string &jsonString);
 
         /** move construction*/
         Player(Player &&other_player) = default;

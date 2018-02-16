@@ -5,6 +5,8 @@ HELICS documentation
 ![image](https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/develop?svg=true)
 ![image](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)
 ![image](https://img.shields.io/badge/docs-ready-blue.svg)
+![image](https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e)
+
 
 This is the documentation for Hierarchical Engine for Large-scale
 Infrastructure Co-Simulation (HELICS) framework. HELICS is a new
@@ -22,6 +24,7 @@ series simulation.
  installation/index
  introduction/index
  developer-guide/index
+ apps/index
  API <https://gmlc-tdc.github.io/HELICS-src/doxygen/>
 ```
 

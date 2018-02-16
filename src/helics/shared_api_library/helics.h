@@ -35,18 +35,18 @@ extern "C" {
 #endif
 
 /** @file
-@brief common functions for the C api
+@brief common functions for the HELICS C api
 */
 /***************************************************
 Common Functions
 ****************************************************/
 
-/* Inquire version numbers of header files */
-
+/** get a version string for HELICS */
 HELICS_Export const char *helicsGetVersion ();
 
 /**
  * Returns true if core/broker type specified is available in current compilation.
+ @details possible options include "test","zmq","udp","ipc","interprocess","tcp","default", "mpi"
  */
 HELICS_Export helics_bool_t helicsIsCoreTypeAvailable (const char *type);
 

@@ -148,7 +148,7 @@ HELICS_Export helics_publication helicsFederateRegisterGlobalTypePublication (he
                                                                               const char *units);
 
 /**
-* \defgroup publication functions
+* \defgroup publications Publication functions
 @details functions for publishing data of various kinds
 The data will get translated to the type specifed when the publication was constructed automatically
 regardless of the function used to publish the data
@@ -203,7 +203,7 @@ HELICS_Export helics_status helicsPublicationPublishVector (helics_publication p
 /**@}*/
 
 /**
-* \defgroup getValue functions
+* \defgroup getValue GetValue functions
 @details data can be returned in number of formats,  for instance if data is published as a double it can be returned as a string
 and vice versa,  not all translations make that much sense but they do work.
 * @{
@@ -268,7 +268,7 @@ HELICS_Export helics_status helicsSubscriptionGetVector (helics_subscription sub
 /**@}*/
 
 /**
-* \defgroup set default values
+* \defgroup default_values Default Value functions
 @details these functions set the default value for a subscription. That is the value returned if nothing was published from elsewhere
 * @{
 */
