@@ -35,18 +35,18 @@ extern "C" {
 #endif
 
 /** @file
-@brief common functions for the C api
+@brief common functions for the HELICS C api
 */
 /***************************************************
 Common Functions
 ****************************************************/
 
-/* Inquire version numbers of header files */
-
+/** get a version string for HELICS */
 HELICS_Export const char *helicsGetVersion ();
 
 /**
  * Returns true if core/broker type specified is available in current compilation.
+ @details possible options include "test","zmq","udp","ipc","interprocess","tcp","default", "mpi"
  */
 HELICS_Export helics_bool_t helicsIsCoreTypeAvailable (const char *type);
 
@@ -229,15 +229,80 @@ HELICS_Export helics_status helicsFederateInfoSetCoreInitString (helics_federate
 is not recognized
 */
 HELICS_Export helics_status helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi, const char *coretype);
+
+/** set the core type by integer code
+@details valid values available by definitions in api-data.h
+@param fi the federate info object to alter
+@param coretype an numerical code for a core type
+@return a helics_status enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference helics_discard if the string
+is not recognized
+*/
 HELICS_Export helics_status helicsFederateInfoSetCoreType (helics_federate_info_t fi, int coretype);
+/** set a flag in the info structure
+@details valid flags are available  flag-definitions.h
+@param fi the federate info object to alter
+@param flag a numerical index for a flag
+@param value the desired value of the flag helics_true or helics_false
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the coretype
+is not recognized
+*/
 HELICS_Export helics_status helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, helics_bool_t value);
+/** set the output delay for a federate
+@param fi the federate info object to alter
+@param outputDelay the desired output delay of the federate
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the specified outputdelay is invalid
+*/
+
 HELICS_Export helics_status helicsFederateInfoSetOutputDelay (helics_federate_info_t fi, helics_time_t outputDelay);
+/** set the minimum time delta between returns for a federate info object
+@param fi the federate info object to alter
+@param timeDelta the desired output delay of the federate
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the specified time_delta is invalid
+*/
+
 HELICS_Export helics_status helicsFederateInfoSetTimeDelta (helics_federate_info_t fi, helics_time_t timeDelta);
+/** set the input delay for a federate info object
+@param fi the federate info object to alter
+@param inputDelay the desired output delay of the federate
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the specified inputDelay is invalid
+*/
 HELICS_Export helics_status helicsFederateInfoSetInputDelay (helics_federate_info_t fi, helics_time_t inputDelay);
+
+/** set the time offset for federate in the info object
+@details a federate will grant time only on integer periods if the period is specified>0
+the offset will shift this return by some amount of time such that the federate will only grant times such as \f$ N*period+offset \f$
+@param fi the federateInfo object to alter
+@param timeOffset the desired timeOffset
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the specified offset is invalid
+*/
 HELICS_Export helics_status helicsFederateInfoSetTimeOffset (helics_federate_info_t fi, helics_time_t timeOffset);
+
+/** set the period for federate in the info object
+@details a federate will grant time only on integer periods if the period is specified>0
+the offset will shift this return by some amount of time such that the federate will only grant times such as \f$ N*period+offset \f$
+period must be strictly greater than 0, though setting to 0 implies a period of the timeEpsilon used in HELICS
+@param fi the federateInfo object to alter
+@param period the desired period
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the specified period is invalid
+*/
 HELICS_Export helics_status helicsFederateInfoSetPeriod (helics_federate_info_t fi, helics_time_t period);
+
+/** set the max iteration count to use in federate in the info object
+@details a federate will iterate for at most min(maxIterations,core maxIterations)
+@param fi the federateInfo object to alter
+@param maxIterations the maximum number of iterations a federate is allowed per timestep
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the specified offset is invalid
+*/
 HELICS_Export helics_status helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int maxIterations);
+
+/** set the logging level of a federate
+@details<0 none, 0, errors only, 1+warnings, 2+summary, 3+debug, 4+trace
+@param fi the federateInfo object to alter
+@param logLevel the specified log level for a federate
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference
+*/
 HELICS_Export helics_status helicsFederateInfoSetLoggingLevel (helics_federate_info_t fi, int logLevel);
+
 /** finalize the federate this halts all communication in the federate and disconnects it from the core
  */
 HELICS_Export helics_status helicsFederateFinalize (helics_federate fed);
@@ -268,7 +333,7 @@ HELICS_Export helics_status helicsFederateEnterInitializationModeComplete (helic
 
 /** request that the federate enter the Execution mode
 @details this call is blocking until granted entry by the core object for an asynchronous alternative call
-/ref helicsFederateEnterExecutionModeAsync
+/ref helicsFederateEnterExecutionModeAsync  on return from this call the federate will be at time 0
 @param fed a federate to change modes
 @return a helics_status enumeration helics_error if something went wrong helicsInvalidReference if fed is invalid
 */
@@ -285,11 +350,32 @@ HELICS_Export helics_status helicsFederateEnterExecutionModeAsync (helics_federa
 */
 HELICS_Export helics_status helicsFederateEnterExecutionModeComplete (helics_federate fed);
 
+/** request an iterative time
+@details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and
+iteration request and return a time and iteration status
+@param fed the federate to make the request of
+@param iterate the requested iteration mode
+@param[out] outIterate  the iteration specification of the result
+@return a helics_status object with a return code of the result
+*/
 HELICS_Export helics_status helicsFederateEnterExecutionModeIterative (helics_federate fed,
                                                                        helics_iteration_request iterate,
                                                                        helics_iteration_status *outIterate);
+
+/** request an iterative entry to the execution mode
+@details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and
+iteration request and return a time and iteration status
+@param fed the federate to make the request of
+@param iterate the requested iteration mode
+@return a helics_status object with a return code of the result
+*/
 HELICS_Export helics_status helicsFederateEnterExecutionModeIterativeAsync (helics_federate fed, helics_iteration_request iterate);
 
+/** complete the asyncrhonous iterative call into ExecutionModel
+@param fed the federate to make the request of
+@param[out] outIterate  the iteration specification of the result
+@return a helics_status object with a return code of the result helics_ok if there were no issues
+*/
 HELICS_Export helics_status helicsFederateEnterExecutionModeIterativeComplete (helics_federate fed, helics_iteration_status *outIterate);
 
 /** get the current state of a federate
@@ -302,6 +388,7 @@ HELICS_Export helics_status helicsFederateGetState (helics_federate fed, federat
 @return a core object, nullptr if invalid
 */
 HELICS_Export helics_core helicsFederateGetCoreObject (helics_federate fed);
+
 /** request the next time for federate execution
 @param fed the federate to make the request of
 @param requestTime the next requested time
@@ -326,14 +413,38 @@ HELICS_Export helics_status helicsFederateRequestTimeIterative (helics_federate 
                                                                 helics_time_t *timeOut,
                                                                 helics_iteration_status *outIterate);
 
+/** request the next time for federate execution in an asynchronous call
+@details call /ref helicsFederateRequestTimeComplete to finish the call
+@param fed the federate to make the request of
+@param requestTime the next requested time
+@return a helics_status if the return value is equal to helics_ok*/
 HELICS_Export helics_status helicsFederateRequestTimeAsync (helics_federate fed, helics_time_t requestTime);
 
+/** complete an asyncrhonous requestTime call
+@param fed the federate to make the request of
+@param[out]  timeOut the time granted to the federate
+@return a helics_status if the return value is equal to helics_ok the timeOut will contain the new granted time, otherwise timeOut is
+invalid*/
 HELICS_Export helics_status helicsFederateRequestTimeComplete (helics_federate fed, helics_time_t *timeOut);
 
+/** request an iterative time through an asyncrhonous call
+@details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and
+iteration request and return a time and iteration status call /ref helicsFederateRequestTimeIterativeComplete to finish the process
+@param fed the federate to make the request of
+@param requestTime the next desired time
+@param iterate the requested iteration mode
+@return a helics_status object with a return code of the result
+*/
 HELICS_Export helics_status helicsFederateRequestTimeIterativeAsync (helics_federate fed,
                                                                      helics_time_t requestTime,
                                                                      helics_iteration_request iterate);
 
+/** complete an iterative time request asyncrhonous call
+@param fed the federate to make the request of
+@param[out] timeOut the granted time
+@param[out] outIterate  the iteration specification of the result
+@return a helics_status object with a return code of the result
+*/
 HELICS_Export helics_status helicsFederateRequestTimeIterativeComplete (helics_federate fed,
                                                                         helics_time_t *timeOut,
                                                                         helics_iteration_status *outIterate);

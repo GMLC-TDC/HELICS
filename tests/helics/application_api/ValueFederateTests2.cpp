@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "helics/application_api/Message.hpp"
 #include "helics/application_api/ValueFederate.hpp"
-#include "testFixtures.h"
+#include "testFixtures.hpp"
 #include "test_configuration.h"
 #include <future>
 /** these test cases test out the value converters and some of the other functions
@@ -32,7 +32,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
+    SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     vFed1->registerPublication<std::string> ("pub1");
@@ -59,7 +59,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1, 1.0);
+    SetupTest<helics::ValueFederate> (core_type, 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     auto pubid1 = vFed1->registerPublication<std::string> ("pub1");
@@ -120,7 +120,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1, 1.0);
+    SetupTest<helics::ValueFederate> (core_type, 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     auto pubid1 = vFed1->registerPublication<std::string> ("pub1");
@@ -165,7 +165,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 1);
+    SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     auto pubid1 = vFed1->registerPublicationIndexed<double> ("pub1", 0);
@@ -197,7 +197,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
 {
-    SetupSingleBrokerTest<helics::ValueFederate> (core_type, 2);
+    SetupTest<helics::ValueFederate> (core_type, 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 

@@ -20,7 +20,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <memory>
 
 static const int BEGIN_OPEN_PORT_RANGE = 23500;
-static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 23757;
+static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 23600;
 
 static const int DEFAULT_BROKER_PULL_PORT_NUMBER = 23405;
 static const int DEFAULT_BROKER_REP_PORT_NUMBER = 23404;
@@ -190,10 +190,6 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
 
 void ZmqComms::queue_rx_function ()
 {
-    //  std::signal(SIGTERM, [](int) {std::signal(SIGTERM, SIG_DFL); raise(SIGTERM); });
-
-    conditionalChangeOnDestroy<connection_status> cchange (rx_status, connection_status::error,
-                                                           connection_status::connected);
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
     pullSocket.setsockopt (ZMQ_LINGER, 200);
@@ -227,6 +223,17 @@ void ZmqComms::queue_rx_function ()
             if (M.index == PORT_DEFINITIONS)
             {
                 pullPortNumber = M.dest_id;
+                if (openPortStart < 0)
+                {
+                    if (pullPortNumber < BEGIN_OPEN_PORT_RANGE_SUBBROKER)
+                    {
+                        openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER + (pullPortNumber - BEGIN_OPEN_PORT_RANGE) * 10;
+                    }
+                    else
+                    {
+                        openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER + (pullPortNumber - BEGIN_OPEN_PORT_RANGE_SUBBROKER) * 10+10;
+                    }
+                }
                 if (repPortNumber < 0)
                 {
                     repPortNumber = M.source_handle;  // aliased for the protocol message

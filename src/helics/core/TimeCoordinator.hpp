@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef TIME_COORDINATOR_H_
-#define TIME_COORDINATOR_H_
+
 #pragma once
 
 #include "ActionMessage.hpp"
@@ -21,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 /** class managing the coordination of time in HELICS
-the time coordinator manages depedencies and computes whether time can advance or enter execution mode
+the time coordinator manages dependencies and computes whether time can advance or enter execution mode
 */
 class TimeCoordinator
 {
@@ -156,6 +153,4 @@ class TimeCoordinator
     /** generate a string with the current time status*/
     std::string printTimeStatus () const;
 };
-}
-
-#endif
+} //namespace helics

@@ -49,7 +49,7 @@ __Background:__ Running a HELICS federation (via low level commands) requires fi
 ```bash
 export PYTHONPATH="~/helics_install/python"
 
-cd ~/GitRepos/HELICS-src/swig/python
+cd ~/GitRepos/HELICS-src/examples/python
 
 python pisender.py
 ```
@@ -57,7 +57,7 @@ python pisender.py
 ```bash
 export PYTHONPATH="~/helics_install/python"
 
-cd ~/GitRepos/HELICS-src/swig/python
+cd ~/GitRepos/HELICS-src/examples/python
 
 python pireceiver.py
 ```

@@ -16,7 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test out the value converters
  */
 #include "helics/helics.hpp"
-#include "testFixtures.h"
+#include "testFixtures.hpp"
 #include "test_configuration.h"
 
 BOOST_FIXTURE_TEST_SUITE (timing_tests, FederateTestFixture)
@@ -30,7 +30,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_AUTO_TEST_CASE (simple_timing_test)
 {
-    SetupSingleBrokerTest<helics::ValueFederate> ("test", 2);
+    SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
@@ -60,7 +60,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_AUTO_TEST_CASE (simple_timing_test2)
 {
-    SetupSingleBrokerTest<helics::ValueFederate> ("test", 2);
+    SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
@@ -93,7 +93,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_AUTO_TEST_CASE (simple_timing_test_message)
 {
-    SetupSingleBrokerTest<helics::MessageFederate> ("test", 2);
+    SetupTest<helics::MessageFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::MessageFederate> (0);
     auto vFed2 = GetFederateAs<helics::MessageFederate> (1);
 
@@ -126,7 +126,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_AUTO_TEST_CASE (timing_with_impact_window)
 {
-    SetupSingleBrokerTest<helics::MessageFederate> ("test", 2);
+    SetupTest<helics::MessageFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::MessageFederate> (0);
     auto vFed2 = GetFederateAs<helics::MessageFederate> (1);
 

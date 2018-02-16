@@ -19,12 +19,12 @@ namespace helics
 class CombinationFederate : public ValueFederate, public MessageFederate
 {
   public:
-    CombinationFederate (FederateInfo &fi)
+    explicit CombinationFederate (FederateInfo &fi)
     {
         fed = helicsCreateCombinationFederate (fi.getInfo());
     }
 
-    CombinationFederate (const std::string &jsonString)
+    explicit CombinationFederate (const std::string &jsonString)
     {
         fed = helicsCreateCombinationFederateFromJson (jsonString.c_str());
     }

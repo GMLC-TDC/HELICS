@@ -97,13 +97,20 @@ if [[ ! -d "dependencies/boost" ]]; then
     echo "*** built boost successfully"
 fi
 
-export BOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost}
+export ZMQ_INCLUDE=${TRAVIS_BUILD_DIR}/dependencies/zmq/include
+export ZMQ_LIB=${TRAVIS_BUILD_DIR}/dependencies/zmq/lib
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     sudo ldconfig ${PWD}/dependencies
     export LD_LIBRARY_PATH=${PWD}/dependencies/zmq/lib:${PWD}/dependencies/boost/lib:$LD_LIBRARY_PATH
 elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH=${PWD}/dependencies/zmq/lib:${PWD}/dependencies/boost/lib:$LD_LIBRARY_PATH
+fi
+
+if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    export LD_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$LD_LIBRARY_PATH
+elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    export DYLD_FALLBACK_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$DYLD_FALLBACK_LIBRARY_PATH
 fi
 
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then

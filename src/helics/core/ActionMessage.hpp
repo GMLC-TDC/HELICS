@@ -37,28 +37,29 @@ class ActionMessage
         std::string orig_source;  //!< the original source
         std::string &type_out;  //!< alias type_out to orig_source for filter
         std::string original_dest;  //!< the original destination of a message
+        int32_t messageID = 0;
         /** constructor*/
         AdditionalInfo () noexcept : type (source), units (target), type_out (orig_source){};
         /** copy constructor*/
         AdditionalInfo (const AdditionalInfo &ai)
             : source (ai.source), type (source), target (ai.target), units (target), orig_source (ai.orig_source),
-              type_out (orig_source), original_dest (ai.original_dest){};
+              type_out (orig_source), original_dest (ai.original_dest), messageID(ai.messageID){};
         /** move constructor*/
         AdditionalInfo (AdditionalInfo &&ai) noexcept
             : source (std::move (ai.source)), type (source), target (std::move (ai.target)), units (target),
               orig_source (std::move (ai.orig_source)), type_out (orig_source),
-              original_dest (std::move (ai.original_dest)){};
+              original_dest (std::move (ai.original_dest)), messageID(ai.messageID) {};
         ~AdditionalInfo() = default;
         template <class Archive>
         void save (Archive &ar) const
         {
-            ar (source, target, orig_source, original_dest);
+            ar (source, target, orig_source, original_dest,messageID);
         }
 
         template <class Archive>
         void load (Archive &ar)
         {
-            ar (source, target, orig_source, original_dest);
+            ar (source, target, orig_source, original_dest,messageID);
         }
     };
 

@@ -28,6 +28,7 @@ struct is_easily_hashable<std::string>
     static const bool value = true;
 };
 
+/** type overload for std::wstring*/
 template<>
 struct is_easily_hashable<std::wstring>
 {

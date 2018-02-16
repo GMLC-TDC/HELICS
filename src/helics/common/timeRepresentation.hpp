@@ -371,7 +371,7 @@ class TimeRepresentation
         DOUBLETIME
         return *this;
     }
-
+    /** direct conversion to double static cast overload*/
     operator double () const noexcept { return Tconv::toDouble (timecode_); }
 
     TimeRepresentation &operator+= (const TimeRepresentation &rhs) noexcept
@@ -553,6 +553,7 @@ inline double operator/ (TimeRepresentation<Tconv> t1, TimeRepresentation<Tconv>
     return static_cast<double> (t1) / static_cast<double> (t2);
 }
 
+/** subtraction if one is a time treat both as a time*/
 template <class Tconv>
 inline TimeRepresentation<Tconv> operator- (TimeRepresentation<Tconv> t, double x)
 {
