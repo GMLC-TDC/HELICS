@@ -52,22 +52,15 @@ Save the files.
 
 Linux and Mac:
 
-Next, open three terminals. In the first terminal, run the following
-command.
-
-```bash
-$ ./helics_broker 2
-```
-
-In the second terminal, run the following command.
+Next, open two terminals. In the first terminal, run the following command.
 
 ```bash
 $ python pisender.py
 ```
 
-In a third terminal, run the following command.
+In a second terminal, run the following command.
 
 ```bash
-$ python pisender.py
+$ python pireceiver.py
 ```
 
