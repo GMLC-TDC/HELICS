@@ -6,14 +6,15 @@ Included with HELICS are a number of apps that provide useful utilities and test
 
 ```eval_rst
 .. toctree::
-    :maxdepth: 1
+  :maxdepth: 1
 
-    Recorder
-	Player
-	Echo
-	Source
-	Tracer
-	Broker
-	App
-	cmdArgs
+  Recorder
+  Player
+  Echo
+  Source
+  Tracer
+  Broker
+  App
+  cmdArgs
 ```
+
