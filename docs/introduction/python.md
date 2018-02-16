@@ -64,3 +64,8 @@ In a second terminal, run the following command.
 $ python pireceiver.py
 ```
 
+If done correctly, you should see an output like so:
+
+![Python Example](../img/python-example.png)
+
+
