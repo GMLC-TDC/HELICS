@@ -52,16 +52,19 @@ MpiComms::MpiComms(const int &brokerRank)
 /** destructor*/
 MpiComms::~MpiComms ()
 {
-    std::cout << "Disconnecting, finalizing MPI" << std::endl;
+    std::cout << "Disconnecting MPIComms" << std::endl;
     disconnect ();
+    std::cout << "Finished disconnect" << std::endl;
 
     int mpi_initialized;
     MPI_Initialized(&mpi_initialized);
     if (mpi_initialized)
     {
+        std::cout << "Finalizing MPI" << std::endl;
         std::lock_guard<std::mutex> lock(mpiSerialMutex);
         MPI_Finalize();
         shutdown = true;
+        std::cout << "MPI Finalized" << std::endl;
     }
 }
 
@@ -208,6 +211,7 @@ void MpiComms::queue_rx_function ()
         }
     }
 CLOSE_RX_LOOP:
+    std::cout << "Shutdown RX Loop" << std::endl;
     shutdown = true;
     rx_status = connection_status::terminated;
 }
@@ -297,6 +301,7 @@ void MpiComms::queue_tx_function ()
         }
     }
 CLOSE_TX_LOOP:
+    std::cout << "Shutdown TX Loop" << std::endl;
     routes.clear ();
     if (rx_status == connection_status::connected)
     {
