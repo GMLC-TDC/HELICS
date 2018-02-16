@@ -6,6 +6,7 @@ Introduction
     :maxdepth: 1
 
     hello-world
+    python
     terminology
     types-of-federates
     pubsub-vs-message
