@@ -613,12 +613,12 @@ void CommonCore::setOutputDelay (federate_id_t federateID, Time outputDelayTime)
         throw (InvalidParameter ("outputDelay time must be >=0"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_outputDelay;
+    cmd.index = UPDATE_OUTPUT_DELAY;
     cmd.actionTime = outputDelayTime;
     fed->updateFederateInfo (cmd);
 }
 
-void CommonCore::setInputDelay (federate_id_t federateID, Time impactTime)
+void CommonCore::setInputDelay (federate_id_t federateID, Time inputDelayTime)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -626,13 +626,13 @@ void CommonCore::setInputDelay (federate_id_t federateID, Time impactTime)
         throw (InvalidIdentifier ("federateID not valid (SetinputDelay)"));
     }
 
-    if (impactTime < timeZero)
+    if (inputDelayTime < timeZero)
     {
         throw (InvalidParameter ("impact window must be >=0"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_IMPACT_WINDOW;
-    cmd.actionTime = impactTime;
+    cmd.index = UPDATE_INPUT_DELAY;
+    cmd.actionTime = inputDelayTime;
     fed->updateFederateInfo (cmd);
 }
 

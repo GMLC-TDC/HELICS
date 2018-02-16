@@ -23,6 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <cereal/cereal.hpp>
 #include <cereal/types/complex.hpp>
 #include <cereal/types/vector.hpp>
+#include <cereal/types/utility.hpp>
 #include <complex>
 #include <cstring>
 #include <iterator>

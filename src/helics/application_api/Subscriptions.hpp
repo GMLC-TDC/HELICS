@@ -384,7 +384,7 @@ class VectorSubscription
         static_assert(std::is_base_of<ValueFederate, std::remove_reference_t<decltype(*valueFed)>>::value, "first argument must be a pointer to a ValueFederate");
         ids.reserve (count);
         vals.resize (count, defValue);
-        if (interface_availabilty==interface_availability::required)
+        if (required==interface_availability::required)
         {
             for (auto ind = startIndex; ind < startIndex + count; ++ind)
             {

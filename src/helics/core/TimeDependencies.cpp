@@ -64,15 +64,31 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tdemin = Time::maxVal ();
         break;
     case CMD_SEND_MESSAGE:
-        if (m.actionTime < Te)
+        if (m.actionTime >= Tnext)
         {
-            Te = m.actionTime;
-            if (Te < Tdemin)
+            if (m.actionTime < Te)
             {
-                Tdemin = Te;
+                Te = std::min(Tnext, m.actionTime);
+                if (Te < Tdemin)
+                {
+                    Tdemin = Te;
+                }
+                return true;
             }
-            return true;
         }
+        else
+        {
+            if (Tnext < Te)
+            {
+                Te = Tnext;
+                if (Te < Tdemin)
+                {
+                    Tdemin = Te;
+                }
+                return true;
+            }
+        }
+        
         return false;
     default:
         return false;

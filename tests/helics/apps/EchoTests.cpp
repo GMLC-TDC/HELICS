@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(echo_test1)
     ep1.send("test", "hello world");
     auto retTime=mfed.requestTime(1.0);
     BOOST_CHECK(ep1.hasMessage());
-
+    BOOST_CHECK_LT(retTime, 1.0);
     auto m = ep1.getMessage();
     BOOST_REQUIRE(m);
     BOOST_CHECK_EQUAL(m->data.to_string(), "hello world");

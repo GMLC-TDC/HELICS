@@ -49,8 +49,8 @@ constexpr interface_visibility LOCAL = interface_visibility::local;
 /** enumeration of a whether a publication is required or is optional*/
 enum class interface_availability
 {
-    required,
-    optional,
+    required,  //!< the matching interface is required to exist
+    optional    //!< the matching interface is NOT required
 };
 
 constexpr interface_availability OPTIONAL = interface_availability::optional;

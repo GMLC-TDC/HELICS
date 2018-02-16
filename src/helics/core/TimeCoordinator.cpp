@@ -110,7 +110,16 @@ void TimeCoordinator::updateNextPossibleEventTime ()
     {
         time_next = time_granted + info.outputDelay;
     }
-    time_next = std::max (time_next, time_minminDe + info.inputDelay + info.outputDelay);
+    if (time_minminDe + info.inputDelay + info.outputDelay > time_next)
+    {
+        time_next = time_minminDe + info.inputDelay + info.outputDelay;
+        if (info.period > timeEpsilon)
+        {
+            auto blk = static_cast<int> (std::ceil((time_next - time_granted) / info.period));
+            time_next = time_granted + blk * info.period;
+        }
+    }
+    
     time_next = std::min (time_next, time_exec);
 }
 void TimeCoordinator::updateValueTime (Time valueUpdateTime)
@@ -487,10 +496,10 @@ void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd, bool
 {
     switch (cmd.index)
     {
-    case UPDATE_outputDelay:
+    case UPDATE_OUTPUT_DELAY:
         info.outputDelay = cmd.actionTime;
         break;
-    case UPDATE_IMPACT_WINDOW:
+    case UPDATE_INPUT_DELAY:
         info.inputDelay = cmd.actionTime;
         break;
     case UPDATE_MINDELTA:

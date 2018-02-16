@@ -1,20 +1,18 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef ACTION_MESSAGE_DEFINITIONS_
-#define ACTION_MESSAGE_DEFINITIONS_
+
 #pragma once
 #include <cstdint>
 
 namespace helics
 {
+/** flag definitions for the action Message Flag field*/
 enum action_message_flags : uint16_t
 {
     iterationRequested = 0,  //!< indicator that an iteration has been requested
@@ -24,8 +22,9 @@ enum action_message_flags : uint16_t
     error_flag = 4,  //!< flag indicating an error condition associated with the command
     indicator_flag = 5,  //!< flag used for setting values
     extra_flag1 = 7,  //!< extra flag
+    clone_flag = 9,  //!< flag indicating the filter is a clone filter
 };
-
+/** namespace for message definitions*/
 namespace action_message_def
 {
 const int32_t cmd_info_basis = 0x10000000;
@@ -69,6 +68,7 @@ enum class action_t : int32_t
 
     cmd_time_grant = 35,  //!< grant a time or iteration
     cmd_time_check = 36,  //!< command to run a check on whether time can be granted
+    cmd_request_current_time = 38,  //!< command to request the current time status of a federate
     cmd_pub = 45,  //!< publish a value
     cmd_bye = 2000,  //!< message stating this is the last communication from a federate
     cmd_log = 55,  //!< log a message with the root broker
@@ -88,15 +88,14 @@ enum class action_t : int32_t
     cmd_core_configure = 207,  //!< command to update the configuration of a core
 
     null_info_command = cmd_info_basis - 1,  //!< biggest command that doesn't have the info structure
-    priority_null_info_command =
-    -cmd_info_basis -
-    1,  //!< the biggest negative priority command
-        // commands that require the extra info allocation have numbers greater than cmd_info_basis
+    /** the biggest negative priority command*/
+    priority_null_info_command = -cmd_info_basis - 1,
+    // commands that require the extra info allocation have numbers greater than cmd_info_basis
     cmd_time_request = 500,  //!< request a time or iteration
     cmd_send_message = cmd_info_basis + 20,  //!< send a message
     cmd_null_message = 726,  //!< used when a filter drops a message but it needs to return
     cmd_send_for_filter =
-    cmd_info_basis + 30,  //!< send a message to be filtered and forward on to the destination
+      cmd_info_basis + 30,  //!< send a message to be filtered and forward on to the destination
     cmd_send_for_filter_return = cmd_info_basis + 35,  //!< send a message back to its originator after filtering
     cmd_filter_result = cmd_info_basis + 40,  //!< the results of a filter message going back to its originator
     cmd_reg_pub = cmd_info_basis + 50,  //!< register a publication
@@ -142,6 +141,7 @@ enum class action_t : int32_t
 #define CMD_TIME_REQUEST action_message_def::action_t::cmd_time_request
 #define CMD_TIME_GRANT action_message_def::action_t::cmd_time_grant
 #define CMD_TIME_CHECK action_message_def::action_t::cmd_time_check
+#define CMD_REQUEST_CURRENT_TIME action_message_def::action_t::cmd_request_current_time
 #define CMD_SEND_MESSAGE action_message_def::action_t::cmd_send_message
 #define CMD_SEND_FOR_FILTER action_message_def::action_t::cmd_send_for_filter
 #define CMD_SEND_FOR_FILTER_AND_RETURN action_message_def::action_t::cmd_send_for_filter_return
@@ -204,8 +204,8 @@ enum class action_t : int32_t
 #define NULL_REPLY 0;
 
 // definitions for FED_CONFIGURE_COMMAND
-#define UPDATE_outputDelay 0
-#define UPDATE_IMPACT_WINDOW 1
+#define UPDATE_INPUT_DELAY 0
+#define UPDATE_OUTPUT_DELAY 1
 #define UPDATE_MINDELTA 2
 #define UPDATE_PERIOD 3
 #define UPDATE_OFFSET 4
@@ -226,4 +226,3 @@ inline bool hasInfo (action_message_def::action_t action)
 const char *actionMessageType (action_message_def::action_t action);
 
 }  // namespace helics
-#endif  // ACTION_MESSAGE_DEFINITIONS_
