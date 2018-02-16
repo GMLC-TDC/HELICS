@@ -35,7 +35,6 @@ public:
 private:
 	virtual bool brokerConnect() override;
     int brokerRank = -1; //!< the mpi rank of the parent broker
-
 };
 }
 #endif

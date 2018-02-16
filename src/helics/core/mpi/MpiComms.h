@@ -70,6 +70,7 @@ public:
 	~MpiComms();
 private:
 	int brokerRank = -1; //!< the mpi rank of the broker
+    static int commRank; //!< the mpi rank of this comm object
 
     static std::mutex mpiSerialMutex;
     static bool mpiCommsExists;
