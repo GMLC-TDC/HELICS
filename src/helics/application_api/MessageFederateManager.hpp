@@ -1,18 +1,15 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _MESSAGE_FEDERATE_MANAGER_
-#define _MESSAGE_FEDERATE_MANAGER_
+
 #pragma once
 
-#include "../common/DualMappedVector.hpp"
+#include "../common/DualMappedPointerVector.hpp"
 #include "../common/GuardedTypes.hpp"
 #include "../common/simpleQueue.hpp"
 #include "../core/Core.hpp"
@@ -143,7 +140,7 @@ class MessageFederateManager
     int getEndpointCount () const;
 
   private:
-    shared_guarded<DualMappedVector<endpoint_info, std::string, Core::handle_id_t>>
+    shared_guarded<DualMappedPointerVector<endpoint_info, std::string, Core::handle_id_t>>
       local_endpoints;  //!< storage for the local endpoint information
     std::vector<std::function<void(endpoint_id_t, Time)>> callbacks;  //!< vector of callbacks
 
@@ -161,4 +158,3 @@ class MessageFederateManager
     void removeOrderedMessage (unsigned int index);
 };
 }  // namespace helics
-#endif

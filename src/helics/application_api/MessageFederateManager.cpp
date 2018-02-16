@@ -40,7 +40,7 @@ void MessageFederateManager::registerKnownCommunicationPath (endpoint_id_t local
     auto sharedElock = local_endpoints.lock_shared();
     if (localEndpoint.value () < endpointCount)
     {
-        coreObject->registerFrequentCommunicationsPair ((*sharedElock)[localEndpoint.value ()].name,
+        coreObject->registerFrequentCommunicationsPair ((*sharedElock)[localEndpoint.value ()]->name,
                                                         remoteEndpoint);
     }
 }
@@ -133,7 +133,7 @@ void MessageFederateManager::sendMessage (endpoint_id_t source, const std::strin
 {
     if (source.value () < endpointCount)
     {
-        coreObject->send ((*local_endpoints.lock_shared())[source.value ()].handle, dest, message.data (), message.size ());
+        coreObject->send ((*local_endpoints.lock_shared())[source.value ()]->handle, dest, message.data (), message.size ());
     }
     else
     {
@@ -148,7 +148,7 @@ void MessageFederateManager::sendMessage (endpoint_id_t source,
 {
     if (source.value () < endpointCount)
     {
-        coreObject->sendEvent (sendTime, (*local_endpoints.lock_shared())[source.value ()].handle, dest, message.data (),
+        coreObject->sendEvent (sendTime, (*local_endpoints.lock_shared())[source.value ()]->handle, dest, message.data (),
                                message.size ());
     }
     else
@@ -161,7 +161,7 @@ void MessageFederateManager::sendMessage (endpoint_id_t source, std::unique_ptr<
 {
     if (source.value () < endpointCount)
     {
-        coreObject->sendMessage ((*local_endpoints.lock_shared())[source.value ()].handle, std::move (message));
+        coreObject->sendMessage ((*local_endpoints.lock_shared())[source.value ()]->handle, std::move (message));
     }
     else
     {
@@ -175,7 +175,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     auto epCount = coreObject->receiveCountAny (fedID);
     // lock the data updates
     std::unique_lock<std::mutex> eplock (endpointLock);
-    auto localEpt = local_endpoints.lock();
+    
     Core::handle_id_t endpoint_id;
     for (size_t ii = 0; ii < epCount; ++ii)
     {
@@ -186,16 +186,16 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
         }
 
         /** find the id*/
-        auto fid = localEpt->find (endpoint_id);
-        if (fid != localEpt->end ())
+        auto fid = (local_endpoints.lock())->find (endpoint_id);
+        if (fid != nullptr)
         {  // assign the data
 
             auto localEndpointIndex = fid->id.value ();
             messageQueues[localEndpointIndex].emplace (std::move (message));
-            if ((*localEpt)[localEndpointIndex].callbackIndex >= 0)
+            if (fid->callbackIndex >= 0)
             {
                 //need to be copied otherwise there is a potential race condition on lock removal
-                auto cb = callbacks[(*localEpt)[localEndpointIndex].callbackIndex];
+                auto cb = callbacks[fid->callbackIndex];
                 eplock.unlock ();
                 cb (fid->id, CurrentTime);
                 eplock.lock ();
@@ -221,7 +221,8 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
                 auto mv = std::make_unique<Message> ();
                 mv->source = sfnd->second.second;
                 auto localEndpointIndex = sfnd->second.first.value ();
-                mv->dest = (*localEpt)[localEndpointIndex].name;
+                auto eptInfo = (*local_endpoints.lock())[localEndpointIndex];
+                mv->dest = eptInfo->name;
                 mv->original_source = mv->source;
                 // get the data value
                 auto data = coreObject->getValue (handle);
@@ -229,10 +230,10 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
                 mv->data = *data;
                 mv->time = CurrentTime;
                 messageQueues[localEndpointIndex].push (std::move (mv));
-                if ((*localEpt)[localEndpointIndex].callbackIndex >= 0)
+                if (eptInfo->callbackIndex >= 0)
                 {
                     // make sure the lock is not engaged for the callback
-                    auto cb = callbacks[(*localEpt)[localEndpointIndex].callbackIndex];
+                    auto cb = callbacks[eptInfo->callbackIndex];
                     eplock.unlock ();
                     cb (sfnd->second.first, newTime);
                     eplock.lock ();
@@ -261,19 +262,19 @@ static const std::string nullStr;
 
 std::string MessageFederateManager::getEndpointName (endpoint_id_t id) const
 {
-    return (id.value () < endpointCount) ? (*local_endpoints.lock_shared())[id.value ()].name : nullStr;
+    return (id.value () < endpointCount) ? (*local_endpoints.lock_shared())[id.value ()]->name : nullStr;
 }
 
 endpoint_id_t MessageFederateManager::getEndpointId (const std::string &name) const
 {
     auto sharedEpt = local_endpoints.lock_shared();
     auto sub = sharedEpt->find (name);
-    return (sub != sharedEpt->end ()) ? sub->id : 0;
+    return (sub != nullptr) ? sub->id : 0;
 }
 
 std::string MessageFederateManager::getEndpointType (endpoint_id_t id) const
 {
-    return (id.value () < endpointCount) ? (*local_endpoints.lock_shared())[id.value ()].type : nullStr;
+    return (id.value () < endpointCount) ? (*local_endpoints.lock_shared())[id.value ()]->type : nullStr;
 }
 
 int MessageFederateManager::getEndpointCount () const
@@ -300,7 +301,7 @@ void MessageFederateManager::registerCallback (endpoint_id_t id, const std::func
 {
     if (id.value () < endpointCount)
     {
-        (*local_endpoints.lock())[id.value ()].callbackIndex = static_cast<int> (callbacks.size ());
+        (*local_endpoints.lock())[id.value ()]->callbackIndex = static_cast<int> (callbacks.size ());
         callbacks.push_back (callback);
     }
     else
@@ -321,7 +322,7 @@ void MessageFederateManager::registerCallback (const std::vector<endpoint_id_t> 
     {
         if (id.value () < cnt)
         {
-            (*eptLock)[id.value ()].callbackIndex = ind;
+            (*eptLock)[id.value ()]->callbackIndex = ind;
         }
     }
 }

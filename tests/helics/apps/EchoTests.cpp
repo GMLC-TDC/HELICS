@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(echo_test_delay)
     mfed.requestTime(1.0);
     BOOST_CHECK(!ep1.hasMessage());
     auto ntime=mfed.requestTime(2.0);
-    BOOST_CHECK_EQUAL(ntime, 1.2);
+    BOOST_CHECK_EQUAL(ntime, helics::timeEpsilon+1.2);
     BOOST_CHECK(ep1.hasMessage());
     auto m = ep1.getMessage();
     BOOST_REQUIRE(m);
