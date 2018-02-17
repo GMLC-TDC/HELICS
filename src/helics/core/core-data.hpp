@@ -43,7 +43,7 @@ class data_block
     /** default constructor */
     data_block () noexcept {};
     /** size allocation constructor */
-    data_block (size_t blockSize) { m_data.resize (blockSize); };
+    explicit data_block (size_t blockSize) { m_data.resize (blockSize); };
     /** size and data */
     data_block (size_t blockSize, char init) : m_data (blockSize, init){};
     /** copy constructor */

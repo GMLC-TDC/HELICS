@@ -52,7 +52,7 @@ class TimeCoordinator
     std::atomic<int32_t> iteration{0};  //!< iteration counter
   public:
     TimeCoordinator () = default;
-    TimeCoordinator (const CoreFederateInfo &info_);
+    explicit TimeCoordinator (const CoreFederateInfo &info_);
 
 	/* get the federate info used by the Core that affects timing*/
 	CoreFederateInfo &getFedInfo()

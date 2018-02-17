@@ -30,7 +30,7 @@ static const std::map<std::string, int> typeSizes = {
   {"int64", 9},     {"uint64", 9},    {"complex", 17}, {"complex_f", 9},
 };
 
-int getTypeSize (const std::string type)
+int getTypeSize (const std::string &type)
 {
     auto ret = typeSizes.find (type);
     return (ret == typeSizes.end ()) ? (-1) : ret->second;
