@@ -1,12 +1,10 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
 #include "TimeDependencies.hpp"
@@ -46,6 +44,15 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = m.actionTime;
         Te = m.Te;
         Tdemin = m.Tdemin;
+        if (forwardEvent < Te)
+        {
+            Te = forwardEvent;
+        }
+        if (Te < Tdemin)
+        {
+            Tdemin = Te;
+        }
+        forwardEvent = Time::maxVal();
         break;
     case CMD_TIME_GRANT:
         time_state = time_state_t::time_granted;
@@ -64,6 +71,14 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tdemin = Time::maxVal ();
         break;
     case CMD_SEND_MESSAGE:
+        if (time_state == time_state_t::time_granted)
+        {
+            if (m.actionTime < forwardEvent)
+            {
+                forwardEvent = m.actionTime;
+            }
+            return false;
+        }
         if (m.actionTime >= Tnext)
         {
             if (m.actionTime < Te)

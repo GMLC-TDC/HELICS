@@ -32,7 +32,7 @@ class TimeCoordinator
     Time time_exec = Time::maxVal ();  //!< the time of the next targeted execution
     Time time_message = Time::maxVal ();  //!< the time of the earliest message event
     Time time_value = Time::maxVal ();  //!< the time of the earliest value event
-
+    Time time_grantBase = Time::minVal();  //!< time to use as a basis for calculating the next grantable time(usually time granted unless values are changing)
 	TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
 	std::vector<Core::federate_id_t> dependents;  //!< federates which temporally depend on this federate
 
@@ -101,11 +101,16 @@ class TimeCoordinator
 
   private:
 	/** helper function for computing the next event time*/
-    void updateNextExecutionTime ();
+    bool updateNextExecutionTime ();
 	/** helper function for computing the next possible time to generate an external event
 	*/
     void updateNextPossibleEventTime ();
+    /** get the next possible time that a time coordinator could grant*/
+    Time getNextPossibleTime() const;
+    Time generateAllowedTime(Time testTime) const;
 
+    void sendTimeRequest() const;
+    void updateTimeGrant();
   public:
 	/** process a message related to time
 	@return true if it did anything

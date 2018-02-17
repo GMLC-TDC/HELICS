@@ -243,6 +243,7 @@ iteration_result Federate::enterExecutionState (helics_iteration_request iterate
         {
         case iteration_result::next_step:
             state = op_states::execution;
+            currentTime = timeZero;
             initializeToExecuteStateTransition ();
             break;
         case iteration_result::iterating:
@@ -322,6 +323,7 @@ iteration_result Federate::enterExecutionStateComplete ()
     {
     case iteration_result::next_step:
         state = op_states::execution;
+        currentTime = timeZero;
         initializeToExecuteStateTransition ();
         break;
     case iteration_result::iterating:

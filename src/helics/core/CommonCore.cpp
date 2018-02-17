@@ -2639,10 +2639,25 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
 {
     if (isTimingCommand (cmd))
     {
-        if (timeCoord->processTimeMessage (cmd))
+        if (!enteredExecutionMode)
         {
-            timeCoord->checkTimeGrant ();
+            timeCoord->processTimeMessage(cmd);
+            auto res = timeCoord->checkExecEntry();
+            if (res == iteration_state::next_step)
+            {
+                enteredExecutionMode = true;
+                timeCoord->timeRequest(Time::maxVal(), helics_iteration_request::no_iterations,
+                    Time::maxVal(), Time::maxVal());
+            }
         }
+        else
+        {
+            if (timeCoord->processTimeMessage(cmd))
+            {
+                timeCoord->checkTimeGrant();
+            }
+        }
+        
     }
     else if (isDependencyCommand (cmd))
     {
