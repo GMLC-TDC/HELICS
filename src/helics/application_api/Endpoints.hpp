@@ -161,6 +161,8 @@ class Endpoint
     /** get the actual endpoint id for the fed*/
     endpoint_id_t getID () const { return id; }
     private:
+        /** helper function to set up the internal federate callback locally before calling 
+        the user defined callback*/
         void returnCallback(Time messageTime)
         {
             if (localCallback)
