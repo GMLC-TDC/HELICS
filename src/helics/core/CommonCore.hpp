@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_COMMON_CORE_
-#define _HELICS_COMMON_CORE_
+
 #pragma once
 
 #include "../common/simpleQueue.hpp"
@@ -351,5 +348,3 @@ class CommonCore : public Core, public BrokerBase
 };
 
 }  // namespace helics
-
-#endif /* _HELICS_TEST_CORE_ */

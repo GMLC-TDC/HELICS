@@ -25,7 +25,7 @@ and some common methods used cores and brokers
 namespace helics
 {
 class Logger;
-class TimeCoordinator;
+class ForwardingTimeCoordinator;
 /** base class for broker like objects
  */
 class BrokerBase
@@ -56,7 +56,7 @@ class BrokerBase
 
   protected:
     std::string logFile;  //< the file to log message to
-    std::unique_ptr<TimeCoordinator> timeCoord;  //!< object managing the time control
+    std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
     BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
     /** enumeration of the possible core states*/
     enum broker_state_t : int

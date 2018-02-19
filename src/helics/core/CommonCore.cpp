@@ -22,7 +22,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "FilterInfo.hpp"
 #include "PublicationInfo.hpp"
 #include "SubscriptionInfo.hpp"
-#include "TimeCoordinator.hpp"
+#include "ForwardingTimeCoordinator.hpp"
 #include "core-exceptions.hpp"
 #include "loggingHelper.hpp"
 #include <boost/filesystem.hpp>
@@ -1433,10 +1433,9 @@ void CommonCore::deliverMessage (ActionMessage &message)
         message.dest_id = localP->fed_id;
         message.dest_handle = localP->id;
          
-        if (timeCoord->processTimeMessage(message))
-        {
-            timeCoord->checkTimeGrant();
-        }
+        
+        timeCoord->processTimeMessage(message);
+
         auto fed = getFederate(localP->fed_id);
         fed->addAction(std::move(message));
         
@@ -1975,8 +1974,6 @@ void CommonCore::processCommand (ActionMessage &&command)
                 if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations,
-                                            Time::maxVal (), Time::maxVal ());
                 }
             }
         }
@@ -2331,13 +2328,11 @@ void CommonCore::processCommand (ActionMessage &&command)
                 organizeFilterOperations ();
                 fed->addAction (command);
             }
-            timeCoord->enteringExecMode (helics_iteration_request::no_iterations);
+            timeCoord->enteringExecMode ();
             auto res = timeCoord->checkExecEntry ();
             if (res == iteration_state::next_step)
             {
                 enteredExecutionMode = true;
-                timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations, Time::maxVal (),
-                                        Time::maxVal ());
             }
         }
     }
@@ -2646,16 +2641,11 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
             if (res == iteration_state::next_step)
             {
                 enteredExecutionMode = true;
-                timeCoord->timeRequest(Time::maxVal(), helics_iteration_request::no_iterations,
-                    Time::maxVal(), Time::maxVal());
             }
         }
         else
         {
-            if (timeCoord->processTimeMessage(cmd))
-            {
-                timeCoord->checkTimeGrant();
-            }
+            timeCoord->processTimeMessage(cmd);
         }
         
     }

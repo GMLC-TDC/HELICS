@@ -83,7 +83,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         {
             if (m.actionTime < Te)
             {
-                Te = std::min(Tnext, m.actionTime);
+                Te = std::max(Tnext, m.actionTime);
                 if (Te < Tdemin)
                 {
                     Tdemin = Te;

@@ -49,6 +49,8 @@ class TimeCoordinator
       false;  //!< flag indicating that a value or message was received during initialization stage
   private:
     std::atomic<int32_t> iteration{0};  //!< iteration counter
+public:
+    bool forwarding = false; //indicator that the time coordinator is a forwarding coordinator
   public:
     TimeCoordinator () = default;
     explicit TimeCoordinator (const CoreFederateInfo &info_);

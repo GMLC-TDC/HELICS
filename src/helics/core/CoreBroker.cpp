@@ -17,7 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/format.hpp>
 
 #include "../common/logger.h"
-#include "TimeCoordinator.hpp"
+#include "ForwardingTimeCoordinator.hpp"
 #include "loggingHelper.hpp"
 #include <fstream>
 #include <json/json.h>
@@ -477,13 +477,11 @@ void CoreBroker::processCommand (ActionMessage &&command)
                         transmit(broker.route_id, m);
                     }
                 }
-                timeCoord->enteringExecMode (helics_iteration_request::no_iterations);
+                timeCoord->enteringExecMode ();
                 auto res = timeCoord->checkExecEntry ();
                 if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations,
-                                            Time::maxVal (), Time::maxVal ());
                 }
             }
             else
@@ -516,13 +514,11 @@ void CoreBroker::processCommand (ActionMessage &&command)
             transmit (brk.route_id, command);
         }
         {
-            timeCoord->enteringExecMode (helics_iteration_request::no_iterations);
+            timeCoord->enteringExecMode ();
             auto res = timeCoord->checkExecEntry ();
             if (res == iteration_state::next_step)
             {
                 enteredExecutionMode = true;
-                timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations, Time::maxVal (),
-                                        Time::maxVal ());
             }
         }
         break;
@@ -582,8 +578,6 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations,
-                                            Time::maxVal (), Time::maxVal ());
                     LOG_DEBUG(global_broker_id, getIdentifier(),
                         "entering Exec Mode");
                 }
@@ -615,10 +609,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         else if (command.dest_id == global_broker_id)
         {
-            if (timeCoord->processTimeMessage (command))
-            {
-                timeCoord->checkTimeGrant ();
-            }
+            timeCoord->processTimeMessage(command);
         }
         else
         {
