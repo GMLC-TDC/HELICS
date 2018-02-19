@@ -208,7 +208,7 @@ class Subscription : public SubscriptionBase
         getValue (gval);
         return static_cast<X> (gval);
     }
-    /** get the most recent calculation with the result as a convertible type*/
+    /** get the most recent value with the result as a convertible type*/
     template <class X>
     typename std::enable_if_t<isConvertableType<X> ()> getValueAs (X &out)
     {

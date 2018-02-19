@@ -50,6 +50,7 @@ bool changeDetected (const defV &prevValue, const double *vals, size_t size, dou
 bool changeDetected (const defV &prevValue, const std::complex<double> &val, double deltaV);
 bool changeDetected (const defV &prevValue, double val, double deltaV);
 bool changeDetected (const defV &prevValue, int64_t val, double deltaV);
+bool changeDetected(const defV &prevValue, named_point val, double deltaV);
 
 void valueExtract (const defV &dv, std::string &val);
 

@@ -65,8 +65,8 @@ std::shared_ptr<FilterOperator> DelayFilterOperation::getOperator ()
     return std::static_pointer_cast<FilterOperator> (td);
 }
 
-// enumeration of possible random number generator distributions
-enum class random_dists_t : int
+/** enumeration of possible random number generator distributions */
+static enum class random_dists_t : int
 {
     constant,
     uniform,
@@ -251,6 +251,16 @@ void RandomDelayFilterOperation::setString (const std::string &property, const s
         {
             rdelayGen->dist.store (res->second);
         }
+    }
+    else if ((property == "param1") || (property == "mean") || (property == "min") || (property == "alpha"))
+    {
+        auto tm = loadTimeFromString(val);
+        rdelayGen->param1.store(static_cast<double>(tm));
+    }
+    else if ((property == "param2") || (property == "stddev") || (property == "max") || (property == "beta"))
+    {
+        auto tm = loadTimeFromString(val);
+        rdelayGen->param2.store(static_cast<double>(tm));
     }
 }
 
