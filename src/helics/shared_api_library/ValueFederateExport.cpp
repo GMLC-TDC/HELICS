@@ -1002,3 +1002,9 @@ int helicsFederateGetSubscriptionCount(helics_federate fed)
     }
     return static_cast<int>(vfedObj->getSubscriptionCount());
 }
+
+void helicsCleanupHelicsLibrary()
+{
+    helics::cleanupHelicsLibrary();
+}
+

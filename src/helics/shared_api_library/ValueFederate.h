@@ -383,6 +383,10 @@ HELICS_Export int helicsFederateGetPublicationCount(helics_federate fed);
 @return (-1) if fed was not a valid federate otherwise returns the number of subscriptions*/
 HELICS_Export int helicsFederateGetSubscriptionCount(helics_federate fed);
 
+/** function to do some housekeeping work
+@details this runs some cleanup routines and tries to close out any residual thread that haven't been shutdown
+yet*/
+HELICS_Export void helicsCleanupHelicsLibrary ();
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif
