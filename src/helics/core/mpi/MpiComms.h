@@ -6,8 +6,6 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#ifndef _HELICS_MPI_COMMS_
-#define _HELICS_MPI_COMMS_
 #pragma once
 
 #include "../CommsInterface.hpp"
@@ -21,43 +19,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 #include <mpi.h>
 
-#if (BOOST_VERSION_LEVEL >=2)
-namespace boost
-{
-    namespace asio
-    {
-        class io_context;
-        using io_service = io_context;
-    }
-}
-#else
-namespace boost
-{
-    namespace asio
-    {
-        class io_service;
-    }
-}
-#endif
 namespace helics {
-
-/** generate a string with a full address based on an interface string and port number
-@details,  how things get merged depend on what interface is used some use port number some do not
-
-@param[in] interface a string with an interface description i.e 127.0.0.1 
-@param portNumber the number of the port to use
-@return a string with the merged address
-*/
-std::string makePortAddress(const std::string &networkInterface, int portNumber);
-
-/** extract a port number and interface string from an address number
-@details,  if there is no port number it default to -1 this is true if none was listed
-or the interface doesn't use port numbers
-
-@param[in] address a string with an network location description i.e 127.0.0.1:34
-@return a pair with a string and int with the interface name and port number
-*/
-std::pair<std::string, int> extractInterfaceandPort(const std::string &address);
 
 /** implementation for the communication interface that uses ZMQ messages to communicate*/
 class MpiComms final:public CommsInterface {
@@ -73,9 +35,9 @@ private:
     static int commRank; //!< the mpi rank of this comm object
 
     static std::mutex mpiSerialMutex;
-    static bool mpiCommsExists;
+    static std::atomic<bool> mpiCommsExists;
 
-    bool shutdown = false;
+    std::atomic<bool> shutdown = false;
     
     virtual void queue_rx_function() override;	//!< the functional loop for the receive queue
     virtual void queue_tx_function() override;  //!< the loop for transmitting data
@@ -100,6 +62,4 @@ public:
 
 
 } // namespace helics
-
-#endif /* _HELICS_MPI_COMMS_ */
 

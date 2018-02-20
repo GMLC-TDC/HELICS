@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 
-bool MpiComms::mpiCommsExists = false;
+std::atomic<bool> MpiComms::mpiCommsExists = false;
 std::mutex MpiComms::mpiSerialMutex;
 int MpiComms::commRank = -1;
 
@@ -172,9 +172,6 @@ void MpiComms::queue_rx_function ()
     }
     rx_status = connection_status::connected;
 
-    std::vector<char> data (10192);
-    boost::system::error_code error;
-    boost::system::error_code ignored_error;
     while (true)
     {
         // Receive using MPI
