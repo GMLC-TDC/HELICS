@@ -20,8 +20,8 @@ MessageFederate::MessageFederate (const FederateInfo &fi) : Federate (fi)
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
 }
-MessageFederate::MessageFederate (std::shared_ptr<Core> core, const FederateInfo &fi)
-    : Federate (std::move (core), fi)
+MessageFederate::MessageFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : Federate (core, fi)
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
 }

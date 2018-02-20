@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _VALUE_FEDERATE_H_
-#define _VALUE_FEDERATE_H_
+
 #pragma once
 
 #include "../core/core-data.hpp"
@@ -34,7 +31,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] core a shared ptr to a core to join
     @param[in] fi  a federate information structure
     */
-    ValueFederate (std::shared_ptr<Core> core, const FederateInfo &fi);
+    ValueFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a string with the required information
     @param[in] jsonString can be either a json file or a string containing json code
     */
@@ -540,4 +537,3 @@ void getValue (ValueFederate &fed, const std::string &Key, X &obj)
     obj=fed.getValue<X> (fed.getSubscriptionId (Key));
 }
 }  // namespace helics
-#endif

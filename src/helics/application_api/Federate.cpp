@@ -71,8 +71,8 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
     asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
 }
 
-Federate::Federate (std::shared_ptr<Core> core, const FederateInfo &fi)
-    : coreObject (std::move (core)), FedInfo (fi)
+Federate::Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : coreObject (core), FedInfo (fi)
 {
     if (!coreObject)
     {
