@@ -106,7 +106,7 @@ class Echo
     /** load information from a JSON file*/
     void loadJsonFile (const std::string &filename);
     /** echo an actual message from an endpoint*/
-    void echoMessage(Endpoint *ept, Time currentTime);
+    void echoMessage(const Endpoint *ept, Time currentTime);
   private:
     std::shared_ptr<MessageFederate> fed;  //!< the federate created for the Player
     std::vector<Endpoint> endpoints;  //!< the actual endpoint objects

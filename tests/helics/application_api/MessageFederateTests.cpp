@@ -249,7 +249,7 @@ BOOST_DATA_TEST_CASE(message_federate_send_receive_callback_obj2, bdata::make(co
 
     helics::endpoint_id_t rxend;
     helics::Time timeRx;
-    auto mend = [&](helics::Endpoint *ept, helics::Time rtime) {rxend = ept->getID(); timeRx = rtime; };
+    auto mend = [&](const helics::Endpoint *ept, helics::Time rtime) {rxend = ept->getID(); timeRx = rtime; };
 
     ep2.setCallback(mend);
 
