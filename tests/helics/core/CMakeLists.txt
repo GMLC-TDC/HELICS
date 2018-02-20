@@ -47,7 +47,7 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 target_link_libraries(core-tests ${Boost_LIBRARIES_test})
 
-add_test(NAME core-tests COMMAND core-tests --log_level=warning --report_level=short)
+add_test(NAME core-tests COMMAND core-tests --log_level=test_suite --report_level=short)
 set_target_properties (core-tests PROPERTIES FOLDER tests)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)

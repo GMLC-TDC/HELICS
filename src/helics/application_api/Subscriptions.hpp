@@ -415,7 +415,7 @@ class VectorSubscription
                         int startIndex,
                         int count,
                         const X &defValue,
-                        std::string units = std::string())
+                        const std::string &units = std::string())
         : VectorSubscription (false, valueFed, name, startIndex, count, defValue, units)
     {
     }

@@ -611,7 +611,10 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         else if (command.dest_id == global_broker_id)
         {
-            timeCoord->processTimeMessage(command);
+            if (timeCoord->processTimeMessage(command))
+            {
+                timeCoord->updateTimeFactors();
+            }
         }
         else
         {

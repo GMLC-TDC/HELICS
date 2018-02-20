@@ -53,7 +53,7 @@ class Source
     /** construct from a federate info object
     @param fi a pointer info object containing information on the desired federate configuration
     */
-    Source (const FederateInfo &fi);
+    explicit Source (const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
@@ -62,7 +62,7 @@ class Source
     /**constructor taking a file with the required information
     @param[in] jsonString file or JSON string defining the federate information and other configuration
     */
-    Source (const std::string &jsonString);
+    explicit Source (const std::string &jsonString);
 
     /** move construction*/
     Source (Source &&other_source) = default;

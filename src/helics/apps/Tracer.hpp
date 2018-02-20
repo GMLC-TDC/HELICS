@@ -56,7 +56,7 @@ class Tracer
 {
   public:
     /** construct from a FederateInfo structure*/
-    Tracer (FederateInfo &fi);
+    explicit Tracer (FederateInfo &fi);
     /** construct from command line arguments*/
     Tracer (int argc, char *argv[]);
 
@@ -68,15 +68,15 @@ class Tracer
     /**constructor taking a file with the required information
     @param[in] file a file defining the federate information
     */
-    Tracer (const std::string &jsonString);
+    explicit Tracer (const std::string &jsonString);
     /** move construction*/
-    Tracer (Tracer &&other_player) = default;
+    Tracer (Tracer &&other_tracer) = default;
     /** don't allow the copy constructor*/
-    Tracer (const Tracer &other_player) = delete;
+    Tracer (const Tracer &other_tracer) = delete;
     /** move assignment*/
-    Tracer &operator= (Tracer &&fed) = default;
+    Tracer &operator= (Tracer &&tracer) = default;
     /** don't allow the copy assignment,  the default would fail anyway since federates are not copyable either*/
-    Tracer &operator= (const Tracer &fed) = delete;
+    Tracer &operator= (const Tracer &tracer) = delete;
     /** destructor*/
     ~Tracer ();
 
