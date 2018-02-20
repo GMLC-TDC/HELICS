@@ -535,12 +535,11 @@ BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
     connected = core->connect ();
     BOOST_CHECK (connected);
 
-    auto ccore = static_cast<helics::ZmqCore *> (core.get ());
-    // this will test the automatic port allocation it should be one of these two depending on whether 
-    // the previous core closed before this test got started
-    BOOST_CHECK ((ccore->getAddress ()=="tcp://127.0.0.1:23500")|| (ccore->getAddress() == "tcp://127.0.0.1:23650"));
     core->disconnect ();
+
+    BOOST_CHECK(!core->isConnected());
     broker->disconnect ();
+    BOOST_CHECK(!broker->isConnected());
     helics::CoreFactory::cleanUpCores (200);
     helics::BrokerFactory::cleanUpBrokers (200);
 }
