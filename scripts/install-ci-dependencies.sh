@@ -43,7 +43,7 @@ fi
 install_boost () {
     # Split argument 1 into 'ver' array, using '.' as delimiter
     local -a ver
-    IFS='.' read -r -a ver <<< $1
+    IFS='. ' read -r -a ver <<< $1
     local boost_version=$1
     local boost_version_str=boost_${ver[0]}_${ver[1]}_${ver[2]}
     wget --no-check-certificate -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
