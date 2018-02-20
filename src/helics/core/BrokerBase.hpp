@@ -79,6 +79,7 @@ class BrokerBase
     bool enteredExecutionMode = false;  //!< flag indicating that the broker has entered execution mode
     bool waitingForServerPingReply = false;  //!< flag indicating we are waiting for a ping reply
   public:
+      /** display help messages for the broker*/
     static void displayHelp ();
     BrokerBase () noexcept;
     BrokerBase (const std::string &broker_name);

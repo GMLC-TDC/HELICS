@@ -66,7 +66,7 @@ std::shared_ptr<FilterOperator> DelayFilterOperation::getOperator ()
 }
 
 /** enumeration of possible random number generator distributions */
-static enum class random_dists_t : int
+ enum class random_dists_t : int
 {
     constant,
     uniform,

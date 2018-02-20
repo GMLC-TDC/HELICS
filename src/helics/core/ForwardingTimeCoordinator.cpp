@@ -31,7 +31,7 @@ void ForwardingTimeCoordinator::enteringExecMode ()
     }
 }
 
-bool ForwardingTimeCoordinator::updateTimeFactors ()
+void ForwardingTimeCoordinator::updateTimeFactors ()
 {
     Time minNext = Time::maxVal ();
     Time minminDe = Time::maxVal ();
@@ -43,6 +43,13 @@ bool ForwardingTimeCoordinator::updateTimeFactors ()
         {
             minNext = dep.Tnext;
             tState = dep.time_state;
+        }
+        else if (dep.Tnext == minNext)
+        {
+            if (dep.time_state == DependencyInfo::time_state_t::time_granted)
+            {
+                tState = dep.time_state;
+            }
         }
         if (dep.Tdemin >= dep.Tnext)
         {
@@ -64,10 +71,13 @@ bool ForwardingTimeCoordinator::updateTimeFactors ()
         }
     }
 
-    bool update = false;
-    time_minminDe = std::min (minDe, minminDe);
-    Time prev_next = time_next;
+    minminDe = std::min(minDe, minminDe);
 
+    bool update = (time_state!=tState);
+    time_state = tState;
+    
+    Time prev_next = time_next;
+    time_next = minNext;
     //	printf("%d UDPATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
     // static_cast<double>(minminDe), static_cast<double>(minDe));
     if (prev_next != time_next)
@@ -80,7 +90,11 @@ bool ForwardingTimeCoordinator::updateTimeFactors ()
         update = true;
         time_minDe = minDe;
     }
-
+    if (minminDe != time_minminDe)
+    {
+        time_minminDe = minminDe;
+        update = true;
+    }
     if (update)
     {
         sendTimeRequest();
@@ -142,18 +156,38 @@ iteration_state ForwardingTimeCoordinator::checkTimeGrant()
 */
 void ForwardingTimeCoordinator::sendTimeRequest () const
 {
-    ActionMessage upd (CMD_TIME_REQUEST);
-    upd.source_id = source_id;
-    upd.actionTime = time_next;
-    upd.Te = time_minDe;
-    upd.Tdemin = time_minminDe;
-    if (iterating)
+    if (!sendMessageFunction)
     {
-        setActionFlag (upd, iterationRequested);
+        return;
     }
-    sendMessageFunction (upd);
-    //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
-    // static_cast<double>(time_exec), static_cast<double>(time_minDe));
+    if (time_state == DependencyInfo::time_state_t::time_granted)
+    {
+        ActionMessage upd(CMD_TIME_GRANT);
+        upd.source_id = source_id;
+        upd.actionTime = time_next;
+        if (iterating)
+        {
+            setActionFlag(upd, iterationRequested);
+        }
+        sendMessageFunction(upd);
+    }
+    else
+    {
+        ActionMessage upd(CMD_TIME_REQUEST);
+        upd.source_id = source_id;
+        upd.actionTime = time_next;
+        upd.Te = time_minDe;
+        upd.Tdemin = time_minminDe;
+        if (iterating)
+        {
+            setActionFlag(upd, iterationRequested);
+        }
+        sendMessageFunction(upd);
+        
+        //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
+        // static_cast<double>(time_exec), static_cast<double>(time_minDe));
+    }
+    
 }
 
 std::string ForwardingTimeCoordinator::printTimeStatus () const
@@ -239,7 +273,10 @@ iteration_state ForwardingTimeCoordinator::checkExecEntry ()
     ret = iteration_state::next_step;
 
     executionMode = true;
-
+    time_next = timeZero;
+    time_state = DependencyInfo::time_state_t::time_granted;
+    time_minDe = timeZero;
+    time_minminDe = timeZero;
     if (sendMessageFunction)
     {
         ActionMessage execgrant (CMD_EXEC_GRANT);

@@ -26,7 +26,7 @@ private:
     Time time_next = timeZero;  //!< the next possible internal event time
     Time time_minminDe = timeZero;  //!< the minimum  of the minimum dependency event Time
     Time time_minDe = timeZero;  //!< the minimum event time of the dependencies
-
+    DependencyInfo::time_state_t time_state = DependencyInfo::time_state_t::time_requested; //!< the current forwarding time state
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     std::vector<Core::federate_id_t> dependents;  //!< federates which temporally depend on this federate
 
@@ -53,9 +53,9 @@ public:
     const std::vector<Core::federate_id_t> &getDependents() const { return dependents; }
 
     /** compute updates to time values
-    @return true if they have been modified
+    and send an update if needed
     */
-    bool updateTimeFactors();
+    void updateTimeFactors();
 
     /** take a global id and get a pointer to the dependencyInfo for the other fed
     will be nullptr if it doesn't exist
@@ -65,7 +65,7 @@ public:
     bool isDependency(Core::federate_id_t ofed) const;
 
 private:
-
+    /**send out the latest time request command*/
     void sendTimeRequest() const;
 public:
     /** process a message related to time
@@ -95,7 +95,6 @@ public:
     iteration_state checkExecEntry();
   
     /** function to enter the exec Mode
-    @param mode the mode of iteration_request (no_iteration, force_iteration, iterate_if_needed)
     */
     void enteringExecMode();
     

@@ -353,6 +353,12 @@ bool CommonCore::allDisconnected () const
     return std::all_of (_federates.begin (), _federates.end (), pred);
 }
 
+void CommonCore::setCoreReadyToInit()
+{
+    //use the flag mechanics that do the same thing
+    setFlag(invalid_fed_id, ENABLE_INIT_ENTRY);
+}
+
 void CommonCore::enterInitializingState (federate_id_t federateID)
 {
     auto fed = getFederate (federateID);

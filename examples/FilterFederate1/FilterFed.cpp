@@ -84,11 +84,13 @@ int main (int argc, char *argv[])
         break;
     }
     case helics::defined_filter_types::randomDrop:
+    {
         double dropprob = 0.33;
         if (vm.count("dropprob") > 0) {
             dropprob = vm["dropprob"].as<double>();
-            filt->set("dropprob",dropprob);
         }
+        filt->set("dropprob", dropprob);
+    }
         break;
     case helics::defined_filter_types::randomDelay:
         filt->setString("distribution", "uniform");
@@ -98,13 +100,8 @@ int main (int argc, char *argv[])
         }
     }
     /*setup and run
-    the federate doesn't really do anything here just a dummy*/
-    fed->enterExecutionState ();
-    std::cout << "entered exec State\n";
-    auto res = fed->requestTime(50);
-    std::cout << "finalized fed\n";
-    auto core = fed->getCorePointer();
-    fed->finalize ();
+    */
+    core->setCoreReadyToInit();
     
     //just do a wait loop while the core is still processing so the filters have time to work
     while (core->isConnected())

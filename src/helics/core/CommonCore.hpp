@@ -61,6 +61,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void error (federate_id_t federateID, int errorCode = -1) override final;
     virtual void finalize (federate_id_t federateID) override final;
     virtual void enterInitializingState (federate_id_t federateID) override final;
+    virtual void setCoreReadyToInit() override final;
     virtual iteration_result
     enterExecutingState (federate_id_t federateID, helics_iteration_request iterate = NO_ITERATION) override final;
     virtual federate_id_t registerFederate (const std::string &name, const CoreFederateInfo &info) override final;
