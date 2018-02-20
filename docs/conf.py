@@ -30,8 +30,37 @@
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
+import os
 import sphinx_rtd_theme
 from sphinxcontrib.pandoc_markdown import MarkdownParser
+
+def which(program):
+    def is_exe(fpath):
+        return os.path.exists(fpath) and os.access(fpath, os.X_OK) and os.path.isfile(fpath)
+
+    def ext_candidates(fpath):
+        yield fpath
+        for ext in os.environ.get("PATHEXT", "").split(os.pathsep):
+            yield fpath + ext
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, program)
+            for candidate in ext_candidates(exe_file):
+                if is_exe(candidate):
+                    return candidate
+
+    return None
+
+if which("pandoc") is None:
+    import warnings
+    warnings.warn("`pandoc` not found in PATH. Please consider installing Pandoc or consult the developer documentation")
+    from recommonmark.parser import CommonMarkParser as MarkdownParser
+
 
 extensions = [
     'sphinx.ext.mathjax',

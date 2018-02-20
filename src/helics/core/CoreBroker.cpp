@@ -580,6 +580,8 @@ void CoreBroker::processCommand (ActionMessage &&command)
                     enteredExecutionMode = true;
                     LOG_DEBUG(global_broker_id, getIdentifier(),
                         "entering Exec Mode");
+                    LOG_DEBUG(global_broker_id, getIdentifier(),
+                        "entering Exec Mode");
                 }
             }
         }

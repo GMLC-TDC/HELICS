@@ -58,6 +58,10 @@ Recorder::Recorder (int argc, char *argv[])
     {
         std::cout << helics::versionString() << '\n';
     }
+    if (res == helpReturn)
+    {
+        FederateInfo helpTemp(argc, argv);
+    }
     if (res < 0)
     {
         deactivated = true;

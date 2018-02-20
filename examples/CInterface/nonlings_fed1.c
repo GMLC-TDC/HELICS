@@ -25,12 +25,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 void run_sim1(double y,double tol,double *xout,int *converged)
 {
-  double f1, J1, x = *xout;
+  double J1, x = *xout;
   int newt_conv = 0, max_iter = 10, iter = 0;
   /* Solve the equation using Newton */
   while (!newt_conv && iter < max_iter) {
     /* Function value */
-    f1 = x * x - 2 * x - y + 0.5;
+    double f1 = x * x - 2 * x - y + 0.5;
 
     /* Convergence check */
     if (fabs (f1) < tol) {
@@ -68,7 +68,7 @@ int main ()
     helics_time_t currenttime = 0.0;
     helics_iteration_status currenttimeiter=iterating;
     double tol = 1E-8;
-    int global_conv=0,my_conv=0,other_conv; /* Global and local convergence */
+    int my_conv=0,other_conv; /* Global and local convergence */
     int helics_iter = 0;
 
     helicsversion = helicsGetVersion ();
@@ -136,6 +136,7 @@ int main ()
 
 
     while (currenttimeiter == iterating) {
+        int global_conv;
       helicsSubscriptionGetString(sub, recvbuf,100);
       sscanf(recvbuf,"%lf,%d",&y,&other_conv);
       

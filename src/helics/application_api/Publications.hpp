@@ -273,7 +273,7 @@ class PublicationOnChange : public PublicationT<X>
     PublicationOnChange(FedPtr valueFed,
         const std::string &name,
         const X &minChange,
-        const std::string &units = std::string())
+                         const std::string &units = std::string())
         : PublicationT<X> (valueFed, name, units), publishDelta (minChange)
     {
         prev = X ();

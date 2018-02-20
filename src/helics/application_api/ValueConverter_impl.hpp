@@ -1,15 +1,11 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_VALUE_CONVERTER_IMPL_
-#define _HELICS_VALUE_CONVERTER_IMPL_
 
 #pragma once
 /** the purpose of these objects are to convert a specific type into a data block for use in the core algorithms
@@ -204,4 +200,3 @@ X ValueConverter<X>::interpret (const data_view &block)
     return val;
 }
 }  // namespace helics
-#endif

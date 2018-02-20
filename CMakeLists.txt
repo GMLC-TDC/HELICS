@@ -9,6 +9,7 @@ set (HELICS_VERSION_MINOR 0)
 set (HELICS_VERSION_PATCH 0)
 set (HELICS_VERSION_BUILD alpha.3)
 set (HELICS_DATE "02-12-18")
+set (HELICS_VERSION_STRING "1.0.0-alpha.3 (02-15-18)")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -460,3 +461,10 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
 			   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake
               DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
+
+if (CMAKE_INSTALL_PREFIX)
+    message(STATUS "Using CMAKE_INSTALL_PREFIX: " ${CMAKE_INSTALL_PREFIX})
+endif()
+
+
+
