@@ -75,6 +75,7 @@ int main (int argc, char *argv[])
     switch (ftype)
     {
     case helics::defined_filter_types::delay:
+    default:
     {
         std::string delay = "1.0";
         if (vm.count("delay") > 0) {

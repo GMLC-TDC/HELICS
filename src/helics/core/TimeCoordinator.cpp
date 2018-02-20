@@ -90,20 +90,21 @@ void TimeCoordinator::updateNextPossibleEventTime ()
 {
     if (!iterating)
     {
-        time_next = time_granted + info.timeDelta + info.outputDelay;
-        time_next = generateAllowedTime(time_next);
+        time_next = getNextPossibleTime();
     }
     else
     {
-        time_next = time_granted + info.outputDelay;
+        time_next = time_granted;
     }
-    if (time_minminDe + info.inputDelay + info.outputDelay > time_next)
+    if (time_minminDe < Time::maxVal())
     {
-        time_next = time_minminDe + info.inputDelay + info.outputDelay;
-        time_next= generateAllowedTime(time_next);
+        if (time_minminDe + info.inputDelay > time_next)
+        {
+            time_next = time_minminDe + info.inputDelay;
+            time_next = generateAllowedTime(time_next);
+        }
     }
-    
-    time_next = std::min (time_next, time_exec);
+    time_next = std::min(time_next, time_exec) + info.outputDelay;
 }
 
 void TimeCoordinator::updateValueTime (Time valueUpdateTime)
@@ -149,9 +150,29 @@ Time TimeCoordinator::getNextPossibleTime() const
 {
     if (time_granted == timeZero)
     {
-        return std::max(info.offset, info.timeDelta);
+        if (info.offset > info.timeDelta)
+        {
+            return info.offset;
+        }
+        else if (info.offset == timeZero)
+        {
+            return generateAllowedTime(std::max(info.timeDelta, info.period));
+        }
+        else if (info.period <= Time::epsilon())
+        {
+            return info.timeDelta;
+        }
+        else
+        {
+            Time retTime = info.offset + info.period;
+            while (retTime < info.timeDelta)
+            {
+                retTime += info.period;
+            }
+            return retTime;
+        }
     }
-    return time_grantBase + std::max(info.timeDelta, info.period);
+    return generateAllowedTime(time_grantBase + std::max(info.timeDelta, info.period));
 }
 
 Time TimeCoordinator::generateAllowedTime(Time testTime) const
@@ -335,7 +356,7 @@ void TimeCoordinator::sendTimeRequest() const
     ActionMessage upd(CMD_TIME_REQUEST);
     upd.source_id = source_id;
     upd.actionTime = time_next;
-    upd.Te = time_exec + info.outputDelay;;
+    upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
     upd.Tdemin = time_minDe;
     if (iterating)
     {

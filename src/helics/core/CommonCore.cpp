@@ -2651,7 +2651,10 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
         }
         else
         {
-            timeCoord->processTimeMessage(cmd);
+            if (timeCoord->processTimeMessage(cmd))
+            {
+                timeCoord->updateTimeFactors();
+            }
         }
         
     }

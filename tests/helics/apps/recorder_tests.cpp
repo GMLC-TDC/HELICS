@@ -428,7 +428,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_endpoint_clone)
 {
     helics::FederateInfo fi ("rec1");
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
+    fi.coreName = "core3";
     fi.coreInitString = "3";
     helics::Recorder rec1 (fi);
     fi.period = 1.0;
@@ -482,7 +482,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
 {
     helics::FederateInfo fi ("rec1");
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
+    fi.coreName = "core4";
     fi.coreInitString = "3";
     helics::Recorder rec1 (fi);
     fi.period = 1.0;
@@ -534,7 +534,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile1)
 {
     helics::FederateInfo fi ("rec1");
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
+    fi.coreName = "core5";
     fi.coreInitString = "3";
     helics::Recorder rec1 (fi);
     fi.period = 1.0;
@@ -592,7 +592,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile2)
 {
     helics::FederateInfo fi ("rec1");
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core1";
+    fi.coreName = "core6";
     fi.coreInitString = "2";
     helics::Recorder rec1 (fi);
     fi.name = "block1";
@@ -636,7 +636,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
 {
     helics::FederateInfo fi ("rec1");
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
+    fi.coreName = "core7";
     fi.coreInitString = "3";
     helics::Recorder rec1 (fi);
     fi.period = 1.0;

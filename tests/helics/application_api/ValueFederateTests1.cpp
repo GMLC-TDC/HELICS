@@ -5,8 +5,8 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -686,6 +686,8 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer, bdata::make (core_types), co
     vFed2->getValue (subid, s);
 
     BOOST_CHECK_EQUAL (s, "string2");
+    vFed2->finalize();
+    vFed1->finalize();
 }
 
 template <class X>
