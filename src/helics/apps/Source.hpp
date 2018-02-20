@@ -58,7 +58,7 @@ class Source
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
     */
-    Source (std::shared_ptr<Core> core, const FederateInfo &fi);
+    Source (const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] jsonString file or JSON string defining the federate information and other configuration
     */

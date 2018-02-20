@@ -64,7 +64,7 @@ class Tracer
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
     */
-    Tracer (std::shared_ptr<Core> core, const FederateInfo &fi);
+    Tracer (const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] file a file defining the federate information
     */

@@ -47,7 +47,7 @@ class Echo
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
     */
-    Echo (std::shared_ptr<Core> core, const FederateInfo &fi);
+    Echo (const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] jsonString file or json string defining the federate information and other configuration
     */

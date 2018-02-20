@@ -58,8 +58,8 @@ Echo::Echo (const FederateInfo &fi) : fed (std::make_shared<MessageFederate> (fi
 
 }
 
-Echo::Echo (std::shared_ptr<Core> core, const FederateInfo &fi)
-    : fed (std::make_shared<MessageFederate> (std::move (core), fi))
+Echo::Echo (const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : fed (std::make_shared<MessageFederate> (core, fi))
 {
 
 }

@@ -108,7 +108,7 @@ class Publication : public PublicationBase
     @param[in] units the units associated with a Federate
     */
     template<class FedPtr>
-    Publication(FedPtr valueFed, const std::string &key, helics_type_t type, std::string units = std::string())
+    Publication(FedPtr valueFed, const std::string &key, helics_type_t type, const std::string &units = std::string())
         : PublicationBase (valueFed, key, typeNameStringRef (type), units), pubType (type)
     {
     }

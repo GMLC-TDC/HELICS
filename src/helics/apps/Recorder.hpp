@@ -57,7 +57,7 @@ namespace helics
     {
     public:
         /** construct from a FederateInfo structure*/
-        Recorder(FederateInfo &fi);
+        explicit Recorder(FederateInfo &fi);
         /** construct from command line arguments*/
         Recorder(int argc, char *argv[]);
 
@@ -65,19 +65,19 @@ namespace helics
         @param core a pointer to core object which the federate can join
         @param[in] fi  a federate information structure
         */
-        Recorder(std::shared_ptr<Core> core, const FederateInfo &fi);
+        Recorder(const std::shared_ptr<Core> &core, const FederateInfo &fi);
         /**constructor taking a file with the required information
         @param[in] file a file defining the federate information
         */
-        Recorder(const std::string &jsonString);
+        explicit Recorder(const std::string &jsonString);
         /** move construction*/
-        Recorder(Recorder &&other_player) = default;
+        Recorder(Recorder &&other_recorder) = default;
         /** don't allow the copy constructor*/
-        Recorder(const Recorder &other_player) = delete;
+        Recorder(const Recorder &other_recorder) = delete;
         /** move assignment*/
-        Recorder &operator= (Recorder &&fed) = default;
+        Recorder &operator= (Recorder &&record) = default;
         /** don't allow the copy assignment,  the default would fail anyway since federates are not copyable either*/
-        Recorder &operator= (const Recorder &fed) = delete;
+        Recorder &operator= (const Recorder &record) = delete;
         /** destructor*/
         ~Recorder();
 

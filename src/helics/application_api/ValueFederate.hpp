@@ -38,7 +38,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     explicit ValueFederate (const std::string &jsonString);
 
     /** default constructor*/
-    ValueFederate ();
+    explicit ValueFederate ();
 
     /** special constructor called by child class to initialize the class vs the default constructor
     */

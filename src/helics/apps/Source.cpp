@@ -63,8 +63,8 @@ Source::Source (const FederateInfo &fi) : fed (std::make_shared<CombinationFeder
     fed->setFlag (SOURCE_ONLY_FLAG);
 }
 
-Source::Source (std::shared_ptr<Core> core, const FederateInfo &fi)
-    : fed (std::make_shared<CombinationFederate> (std::move (core), fi))
+Source::Source (const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : fed (std::make_shared<CombinationFederate> (core, fi))
 {
     fed->setFlag (SOURCE_ONLY_FLAG);
 }

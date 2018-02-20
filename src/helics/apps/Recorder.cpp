@@ -76,8 +76,8 @@ Recorder::Recorder (int argc, char *argv[])
     loadArguments (vm_map);
 }
 
-Recorder::Recorder (std::shared_ptr<Core> core, const FederateInfo &fi)
-    : fed (std::make_shared<CombinationFederate> (std::move (core), fi))
+Recorder::Recorder (const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : fed (std::make_shared<CombinationFederate> (core, fi))
 {
     fed->setFlag (OBSERVER_FLAG);
 }
