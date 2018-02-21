@@ -71,6 +71,6 @@ namespace helics
 
 std::string MpiBroker::getAddress () const
 {
-    return MpiComms::getAddress();
+    return comms->getAddress();
 }
 }  // namespace helics

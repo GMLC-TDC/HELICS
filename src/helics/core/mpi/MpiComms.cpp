@@ -18,20 +18,21 @@ namespace helics
 {
 
 MpiComms::MpiComms ()
+    : shutdown (false)
 {
     std::cout << "MpiComms()" << std::endl;
 
-    auto mpi_service = MpiService::getInstance ();
+    auto& mpi_service = MpiService::getInstance ();
     commAddress = mpi_service.addMpiComms (this);
     std::cout << "- commAddress = " << commAddress << std::endl;
 }
 
-MpiComms::MpiComms(const std::string &brokerAddress)
-    : brokerAddress(brokerAddress)
+MpiComms::MpiComms(const std::string &broker)
+    : brokerAddress(broker), shutdown (false)
 {
     std::cout << "MpiComms(" << brokerAddress << ")" << std::endl;
 
-    auto mpi_service = MpiService::getInstance ();
+    auto& mpi_service = MpiService::getInstance ();
     commAddress = mpi_service.addMpiComms (this);
     std::cout << "- commAddress = " << commAddress << std::endl;
 }
@@ -42,9 +43,6 @@ MpiComms::~MpiComms ()
     std::cout << "Disconnecting MPIComms" << std::endl;
     disconnect ();
     std::cout << "Finished disconnect" << std::endl;
-
-    auto mpi_service = MpiService::getInstance ();
-    mpi_service.removeMpiComms (this);
 }
 
 int MpiComms::processIncomingMessage (ActionMessage &M)
@@ -73,22 +71,22 @@ void MpiComms::queue_rx_function ()
 
         if (M)
         {
-            std::cout << "message received: " << prettyPrintString(M) << std::endl;
-            if (!isValidCommand (M))
+            std::cout << "message received: " << prettyPrintString(M.value ()) << std::endl;
+            if (!isValidCommand (M.value ()))
             {
                 std::cerr << "invalid command received" << std::endl;
                 continue;
             }
 
-            if (isProtocolCommand (M))
+            if (isProtocolCommand (M.value ()))
             {
-                if (M.index == CLOSE_RECEIVER)
+                if (M->index == CLOSE_RECEIVER)
                 {
                     goto CLOSE_RX_LOOP;
                 }
             }
 
-            auto res = processIncomingMessage (M);
+            auto res = processIncomingMessage (M.value ());
             if (res < 0)
             {
                 goto CLOSE_RX_LOOP;
@@ -153,7 +151,7 @@ void MpiComms::queue_tx_function ()
             {
                 // Send using MPI to broker
                 std::cout << "send msg to brkr rt: " << prettyPrintString(cmd) << std::endl;
-                txMessageQueue.emplace (brokerAddress, cmd);
+                txMessageQueue.emplace (brokerAddress, cmd.to_vector ());
             }
         }
         else if (route_id == -1)
@@ -169,7 +167,7 @@ void MpiComms::queue_tx_function ()
             {
                 // Send using MPI to rank given by route
                 std::cout << "send msg to rt: " << prettyPrintString(cmd) << std::endl;
-                txMessageQueue.emplace (rt_find->second, cmd);
+                txMessageQueue.emplace (rt_find->second, cmd.to_vector ());
             }
             else
             {
@@ -177,7 +175,7 @@ void MpiComms::queue_tx_function ()
                 {
                     // Send using MPI to broker
                     std::cout << "send msg to brkr: " << prettyPrintString(cmd) << std::endl;
-                    txMessageQueue.emplace (brokerAddress, cmd);
+                    txMessageQueue.emplace (brokerAddress, cmd.to_vector ());
                 }
             }
         }
@@ -196,10 +194,6 @@ CLOSE_TX_LOOP:
 void MpiComms::closeReceiver() {
     shutdown = true;
     disconnect(); 
-}
-
-std::string MpiComms::getAddress () {
-    return commAddress;
 }
 
 }  // namespace helics

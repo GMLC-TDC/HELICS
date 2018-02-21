@@ -33,7 +33,7 @@ private:
     std::string brokerAddress; //!< the mpi rank:tag of the broker
     std::string commAddress; //!< the mpi rank:tag of this comm object
 
-    std::atomic<bool> shutdown = false;
+    std::atomic<bool> shutdown;
     
     virtual void queue_rx_function() override;	//!< the functional loop for the receive queue
     virtual void queue_tx_function() override;  //!< the loop for transmitting data
@@ -45,7 +45,7 @@ private:
     /** queue for pending incoming messages*/
     BlockingQueue<ActionMessage> rxMessageQueue;
     /** queue for pending outgoing messages*/
-    BlockingQueue<std::pair<std::string, ActionMessage>> txMessageQueue;
+    BlockingQueue<std::pair<std::string, std::vector<char>>> txMessageQueue;
 
 	std::atomic<bool> hasBroker{ false };
     virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
@@ -54,7 +54,7 @@ private:
 public:
 	std::string getAddress () { return commAddress; }
     BlockingQueue<ActionMessage>& getRxMessageQueue () { return rxMessageQueue; }
-    BlockingQueue<std::pair<std::string, ActionMessage>>& getTxMessageQueue () { return txMessageQueue; }
+    BlockingQueue<std::pair<std::string, std::vector<char>>>& getTxMessageQueue () { return txMessageQueue; }
 };
 
 

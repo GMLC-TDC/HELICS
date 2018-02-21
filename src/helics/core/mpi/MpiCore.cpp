@@ -58,7 +58,7 @@ bool MpiCore::brokerConnect ()
 
 std::string MpiCore::getAddress () const
 {
-    return MpiComms::getAddress();
+    return comms->getAddress();
 }
 
 }  // namespace helics

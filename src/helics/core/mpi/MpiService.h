@@ -12,11 +12,11 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "../../common/BlockingQueue.hpp"
 #include "../ActionMessage.hpp"
 #include <atomic>
-#include <set>
 #include <string>
-#include <future>
 #include <functional>
+#include <list>
 #include <vector>
+#include <utility>
 #include <thread>
 #include <memory>
 #include <mutex>
@@ -33,10 +33,12 @@ public:
     static MpiService& getInstance();
     static void setMpiCommunicator (MPI_Comm communicator);
 
+    std::string addMpiComms (MpiComms *comm);
+    std::string getAddress (MpiComms *comm);
     int getRank();
-    int addMpiComms (MpiComms *comm);
-    void removeMpiComms (MpiComms *comm);
     int getTag (MpiComms *comm);
+
+    void sendAndReceiveMessages ();
 
 private:
     MpiService();
@@ -44,9 +46,13 @@ private:
     MpiService(const MpiService&) = delete;
     MpiService& operator=(const MpiService&) = delete;
 
-    std::vector<MpiComms*> comms;
-    static std::atomic<int> commRank; //!< the mpi rank of this process object
+    int commRank;
     static MPI_Comm mpiCommunicator;
+
+    std::vector<MpiComms*> comms;
+    std::list<std::pair<MPI_Request, std::vector<char>>> send_requests;
+
+    std::atomic<bool> startup_flag;
     std::atomic<bool> stop_service;
     std::unique_ptr<std::thread> service_thread;
 
