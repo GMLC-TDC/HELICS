@@ -8,6 +8,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "testFixtures.hpp"
+#include "helics/shared_api_library/internal/api_objects.h"
 #include <boost/test/unit_test.hpp>
 
 #include <cctype>
@@ -72,29 +73,30 @@ FederateTestFixture::~FederateTestFixture ()
         if (fed)
         {
             federate_state state;
-            CE (helicsFederateGetState (fed.get(), &state));
+            CE (helicsFederateGetState (fed, &state));
             if (state != helics_finalize_state)
             {
-                CE (helicsFederateFinalize (fed.get()));
+                CE (helicsFederateFinalize (fed));
             }
+            helicsFederateFree (fed);
         }
     }
     federates.clear ();
     for (auto &broker : brokers)
     {
-        CE (helicsBrokerDisconnect (broker.get()));
+        CE (helicsBrokerDisconnect (broker));
+        helicsBrokerFree (broker);
     }
     brokers.clear ();
     helicsCleanupHelicsLibrary ();
 }
 
-std::shared_ptr<helics_broker> FederateTestFixture::AddBroker (const std::string &core_type_name, int count)
+helics_broker FederateTestFixture::AddBroker (const std::string &core_type_name, int count)
 {
     return AddBroker (core_type_name, std::to_string (count));
 }
 
-std::shared_ptr<helics_broker>
-FederateTestFixture::AddBroker (const std::string &core_type_name, const std::string &initialization_string)
+helics_broker FederateTestFixture::AddBroker (const std::string &core_type_name, const std::string &initialization_string)
 {
     helics_broker broker;
     if (extraBrokerArgs.empty ())
@@ -105,7 +107,9 @@ FederateTestFixture::AddBroker (const std::string &core_type_name, const std::st
     {
         broker = StartBrokerImp (core_type_name, initialization_string + " " + extraBrokerArgs);
     }
-    auto shared = std::make_shared<helics_broker>(broker);
-    brokers.push_back (shared);
-    return shared;
+    BOOST_CHECK(nullptr != broker);
+    auto BrokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
+    BOOST_CHECK(BrokerObj->valid == brokerValidationIdentifier);
+    brokers.push_back (broker);
+    return broker;
 }
