@@ -13,11 +13,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <future>
 
-#include "helics/application_api/Publications.hpp"
-#include "helics/application_api/Subscriptions.hpp"
-#include "helics/application_api/ValueFederate.hpp"
-#include "helics/core/BrokerFactory.hpp"
-#include "helics/core/CoreFactory.hpp"
 #include "testFixtures.hpp"
 #include "test_configuration.h"
 
@@ -36,18 +31,22 @@ namespace utf = boost::unit_test;
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_single), core_type)
 {
-    SetupTest<helics::ValueFederate> (core_type, 1);
-    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    SetupTest (helicsCreateValueFederate, core_type, 1);
+    auto vFed1 = GetFederateAt (0);
 
-    vFed1->enterExecutionState ();
+    CE (helicsFederateEnterExecutionMode (vFed1));
+    federate_state state;
+    CE (helicsFederateGetState (vFed1, &state));
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (state == helics_execution_state);
 
-    vFed1->finalize ();
+    CE (helicsFederateFinalize (vFed1));
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
+    CE (helicsFederateGetState (vFed1, &state));
+    BOOST_CHECK (state == helics_finalize_state);
 }
 
+#if 0
 BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 1);
@@ -1059,7 +1058,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (40))
 BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_types), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 1);
-    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed1 = GetFederateAt (0);
 
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
@@ -1098,4 +1097,5 @@ BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_type
 
     BOOST_CHECK_EQUAL (val, 3.0);
 }
+#endif
 BOOST_AUTO_TEST_SUITE_END ()
