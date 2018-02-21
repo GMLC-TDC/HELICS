@@ -60,6 +60,8 @@ typedef void *helics_query;
 
 /** time definition used in the C interface to helics*/
 typedef double helics_time_t;
+const helics_time_t helics_time_zero = 0.0;
+const helics_time_t helics_time_epsilon = 1.0;
 
 /** defining a boolean type for use in the helics interface*/
 typedef int helics_bool_t;
