@@ -44,6 +44,13 @@ install_boost () {
     # Split argument 1 into 'ver' array, using '.' as delimiter
     local -a ver
     IFS='. ' read -r -a ver <<< $1
+
+    # Set a flag to indicate that boost unit tests not supported
+    if [[ ver[0] <= 1 && ver[1] < 61 ]]; then
+        export CI_NO_TESTS=true
+    fi
+
+    # Download and install Boost
     local boost_version=$1
     local boost_version_str=boost_${ver[0]}_${ver[1]}_${ver[2]}
     wget --no-check-certificate -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
@@ -89,10 +96,10 @@ fi
 # Install Boost
 if [[ ! -d "dependencies/boost" ]]; then
     echo "*** build boost"
-    if [[ "$MINIMUM_DEPENDENCIES" == "true" ]]; then
-        install_boost 1.61.0
-    else
+    if [[ -z "$CI_BOOST_VERSION" ]]; then
         install_boost 1.65.0
+    else
+        install_boost $CI_BOOST_VERSION
     fi
     echo "*** built boost successfully"
 fi

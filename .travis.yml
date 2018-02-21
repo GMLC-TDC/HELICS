@@ -48,6 +48,7 @@ jobs:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=64"
         - HOMEBREW_NO_AUTO_UPDATE=1
         - SHARED_LIB_EXT=dylib
+        - CI_BOOST_VERSION=1.58.0
       osx_image: xcode6.4
     # XCode 7.3, OS X 10.11
     - <<: *osx_base
@@ -84,7 +85,7 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
         - SHARED_LIB_EXT=so
-        - MINIMUM_DEPENDENCIES=true
+        - CI_BOOST_VERSION=1.61.0
 
     - <<: *linux_base
       compiler: clang
@@ -128,7 +129,8 @@ install:
 script:
   - mkdir build && cd build
   - export HELICS_DEPENDENCY_FLAGS="-DZeroMQ_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/zmq -DBOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost"
-  - export HELICS_OPTION_FLAGS="-DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON -DTRAVIS_TESTS_ENABLE=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.${SHARED_LIB_EXT} -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/"
+  - export HELICS_OPTION_FLAGS="-DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.${SHARED_LIB_EXT} -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/"
+  - if [[ -z "$CI_NO_TESTS" ]]; then export HELICS_OPTION_FLAGS="$HELICS_OPTION_FLAGS -DTRAVIS_TESTS_ENABLE=ON"; else; export HELICS_OPTION_FLAGS="$HELICS_OPTION_FLAGS -DBUILD_HELICS_TESTS=OFF"; fi
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
   - make -j2
   # For controlling which tests get run:
