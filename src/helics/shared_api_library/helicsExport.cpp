@@ -41,10 +41,6 @@ helics_bool_t helicsIsCoreTypeAvailable (const char *type)
     return (helics::isCoreTypeAvailable (coreType)) ? helics_true : helics_false;
 }
 
-/** this is a random identifier put in place when the federate or core or broker gets created*/
-static const int coreValidationIdentifier = 0x378424EC;
-static const int brokerValidationIdentifier = 0xA3467D20;
-
 helics_federate_info_t helicsFederateInfoCreate ()
 {
     auto *fi = new helics::FederateInfo;
