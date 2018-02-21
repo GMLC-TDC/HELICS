@@ -9,6 +9,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #pragma once
 
 #include "../CommsInterface.hpp"
+#include "../../common/BlockingQueue.hpp"
 #include <atomic>
 #include <set>
 #include <string>
@@ -21,7 +22,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics {
 
-/** implementation for the communication interface that uses ZMQ messages to communicate*/
+/** implementation for the communication interface that uses MPI to communicate*/
 class MpiComms final:public CommsInterface {
 
 public:
@@ -33,6 +34,7 @@ public:
 private:
 	int brokerRank = -1; //!< the mpi rank of the broker
     static int commRank; //!< the mpi rank of this comm object
+    int commTag; //!< the mpi tag of this comm object
 
     static std::mutex mpiSerialMutex;
     static std::atomic<bool> mpiCommsExists;
@@ -48,6 +50,11 @@ private:
     return code for required action 0=NONE, -1 TERMINATE*/
     int processIncomingMessage(ActionMessage &cmd);
     ActionMessage generateReplyToIncomingMessage(ActionMessage &cmd);
+
+    /** queue for pending incoming messages*/
+    BlockingQueue<ActionMessage> rxMessageQueue;
+    /** queue for pending outgoing messages*/
+    BlockingQueue<ActionMessage> txMessageQueue;
 
     void serializeSendMPI(std::vector<char> message, int dest, int tag, MPI_Comm comm);
     std::vector<char> serializeReceiveMPI(int src, int tag, MPI_Comm comm);
