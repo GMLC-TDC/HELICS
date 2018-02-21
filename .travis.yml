@@ -74,6 +74,7 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - SHARED_LIB_EXT=so
+        - USE_SWIG=true
 
     - <<: *linux_base
       addons:
@@ -85,6 +86,7 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
         - SHARED_LIB_EXT=so
+        - USE_SWIG=false
         - CI_BOOST_VERSION=1.61.0
 
     - <<: *linux_base
@@ -100,6 +102,7 @@ jobs:
             - MATRIX_EVAL="COMPILER=clang && CC='ccache clang-3.6' && CXX='ccache clang++-3.6'"
             - CCACHE_CPP2=yes
             - SHARED_LIB_EXT=so
+            - USE_SWIG=true
 
    # ------------------------------------------------
    # Jobs for daily valgrind and code coverage tests
@@ -108,11 +111,13 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - SHARED_LIB_EXT=so
+        - USE_SWIG=true
         - RUN_VALGRIND=true
     - <<: *daily_linux
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - SHARED_LIB_EXT=so
+        - USE_SWIG=true
         - RUN_COVERAGE=true
 
 branches:
@@ -130,7 +135,10 @@ script:
   - mkdir build && cd build
   - export HELICS_DEPENDENCY_FLAGS="-DZeroMQ_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/zmq -DBOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost"
   - export HELICS_OPTION_FLAGS="-DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.${SHARED_LIB_EXT} -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/"
-  - if [[ -z "$CI_NO_TESTS" ]]; then export HELICS_OPTION_FLAGS="$HELICS_OPTION_FLAGS -DTRAVIS_TESTS_ENABLE=ON"; else; export HELICS_OPTION_FLAGS="$HELICS_OPTION_FLAGS -DBUILD_HELICS_TESTS=OFF"; fi
+  - if [[ -z "$CI_NO_TESTS" ]]; then HELICS_OPTION_FLAGS+=" -DTRAVIS_TESTS_ENABLE=ON"; else; HELICS_OPTION_FLAGS+=" -DBUILD_HELICS_TESTS=OFF"; fi
+  - if [[ "$USE_SWIG" == 'false' ]] ; then HELICS_OPTION_FLAGS+=" -DGENERATE_PYTHON=OFF" ; fi
+    # - echo "$HELICS_OPTION_FLAGS"
+    # - echo "$HELICS_DEPENDENCY_FLAGS"
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
   - make -j2
   # For controlling which tests get run:
@@ -144,6 +152,8 @@ script:
   # - ctest --verbose --timeout 120 -I 0,0,0,1
   - ctest --verbose --timeout 120 -I 0,0,0,6
   - export PYTHONPATH="$(pwd)/swig/python"
+    # - echo "$LD_LIBRARY_PATH"
+    # - echo "$DYLD_FALLBACK_LIBRARY_PATH"
   - python3 -m helics
   - python3 -m pytest -v ../tests/python_helics
 

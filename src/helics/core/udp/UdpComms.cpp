@@ -16,7 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/asio/ip/udp.hpp>
 
 static const int BEGIN_OPEN_PORT_RANGE = 23964;
-static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24093;
+static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24053;
 
 static const int DEFAULT_UDP_BROKER_PORT_NUMBER = 23901;
 
@@ -293,6 +293,17 @@ void UdpComms::queue_tx_function ()
                     if (m.index == PORT_DEFINITIONS)
                     {
                         PortNumber = m.source_handle;
+                        if (openPortStart < 0)
+                        {
+                            if (PortNumber < BEGIN_OPEN_PORT_RANGE_SUBBROKER)
+                            {
+                                openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER + (PortNumber - BEGIN_OPEN_PORT_RANGE) * 10;
+                            }
+                            else
+                            {
+                                openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER + (PortNumber - BEGIN_OPEN_PORT_RANGE_SUBBROKER) * 10 + 10;
+                            }
+                        }
                         promisePort.set_value (PortNumber);
                     }
                     else if (m.index == DISCONNECT)

@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_PUBLICATION_H_
-#define _HELICS_PUBLICATION_H_
+
 #pragma once
 
 #include "HelicsPrimaryTypes.hpp"
@@ -31,7 +28,7 @@ class PublicationBase
     PublicationBase (ValueFederate *valueFed,
                      const std::string &key,
                      const std::string &type,
-                     const std::string &units = "")
+                     const std::string &units = std::string())
         : fed (valueFed), key_ (key), type_ (type), units_ (units)
     {
         id = fed->registerPublication (key_, type_, units_);
@@ -41,7 +38,7 @@ class PublicationBase
                      ValueFederate *valueFed,
                      const std::string &key,
                      const std::string &type,
-                     const std::string &units = "")
+                     const std::string &units = std::string())
         : fed (valueFed), key_ (key), type_ (type), units_ (units)
     {
         if (locality == GLOBAL)
@@ -102,7 +99,7 @@ class Publication : public PublicationBase
                  ValueFederate *valueFed,
                  std::string key,
                  helics_type_t type,
-                 std::string units = "")
+                 const std::string &units = std::string())
         : PublicationBase (locality, valueFed, key, typeNameStringRef (type), units), pubType (type)
     {
     }
@@ -151,7 +148,7 @@ class Publication : public PublicationBase
 
 template <class X>
 typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsInvalid, std::unique_ptr<Publication>>
-make_publication (ValueFederate *valueFed, const std::string &name, const std::string &units = "")
+make_publication (ValueFederate *valueFed, const std::string &name, const std::string &units = std::string())
 {
     return std::make_unique<Publication> (valueFed, helicsType<X> (), name, units);
 }
@@ -161,7 +158,7 @@ typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsInvalid, std:
 make_publication (interface_visibility locality,
                   ValueFederate *valueFed,
                   const std::string &name,
-                  const std::string &units = "")
+                  const std::string &units = std::string())
 {
     return std::make_unique<Publication> (locality, valueFed, name, helicsType<X> (), units);
 }
@@ -177,7 +174,7 @@ class PublicationT : public PublicationBase
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
-    PublicationT (ValueFederate *valueFed, const std::string &name, const std::string &units = "")
+    PublicationT (ValueFederate *valueFed, const std::string &name, const std::string &units = std::string())
         : PublicationBase (valueFed, name, typeNameString<X> (), units)
     {
     }
@@ -189,7 +186,7 @@ class PublicationT : public PublicationBase
     PublicationT (interface_visibility locality,
                   ValueFederate *valueFed,
                   const std::string &name,
-                  const std::string &units = "")
+                  const std::string &units = std::string())
         : PublicationBase (locality, valueFed, name, typeNameString<X> (), units)
     {
     }
@@ -226,7 +223,7 @@ class PublicationOnChange : public PublicationT<X>
     PublicationOnChange (ValueFederate *valueFed,
                          const std::string &name,
                          const X &minChange,
-                         const std::string &units = "")
+                         const std::string &units = std::string())
         : PublicationT<X> (valueFed, name, units), publishDelta (minChange)
     {
         prev = X ();
@@ -244,4 +241,3 @@ class PublicationOnChange : public PublicationT<X>
     }
 };
 }  // namespace helics
-#endif

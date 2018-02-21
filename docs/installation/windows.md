@@ -105,10 +105,33 @@ recorder (located in the buildsrchelicsplayerDebug folder):
 0.1
 ```
 
-Command line method
--------------------
+Building HELICS with python support
+-----------------------------------
 
 ```bash
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0" -DBOOST_ROOT="C:\local\boost_1_65_1" -DBUILD_PYTHON=ON -G "Visual Studio 14 2015 Win64" ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0" -DBOOST_ROOT="C:\local\boost_1_65_1" -DBUILD_PYTHON=ON -G "Visual Studio 14 2015 Win64" -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)\include\python3.6m\ -DPYTHON_LIBRARY=$(python3-config --prefix)\lib\python3.6m\libpython3.6m.dll ..
 cmake --build . --config Release --target install
 ```
+
+
+Add the following to the Windows PYTHONPATH environment variable or run the following in the command line.
+
+```bash
+set PYTHONPATH=C:\local\helics-v1.0.0\python;%PYTHONPATH%
+```
+
+If you open a interactive Python session and import helics, you should be able to get the version of `helics` and an output that is similar to the following.
+
+```bash
+$ ipython
+Python 3.6.4 |Anaconda, Inc.| (default, Jan 16 2018, 12:04:33)
+Type 'copyright', 'credits' or 'license' for more information
+IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
+
+In [1]: import helics
+
+In [2]: helics.helicsGetVersion()
+Out[2]: '1.0.0-alpha.3 (02-12-18)'
+
+```
+

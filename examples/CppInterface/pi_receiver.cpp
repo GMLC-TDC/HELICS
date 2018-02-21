@@ -24,7 +24,7 @@ int main(int /*argc*/,char ** /*argv*/)
   helics_subscription sub;
 
 
-  std::string helicsversion = helics::helicsVersionString();
+  std::string helicsversion = helics::versionString();
 
   printf("PI RECEIVER: Helics version = %s\n",helicsversion.c_str());
   printf("%s",help);
@@ -64,12 +64,11 @@ int main(int /*argc*/,char ** /*argv*/)
 
   helics_time_t currenttime=0.0;
   double        value = 0.0;
-  int isupdated=0; 
 
   while(currenttime < 0.20) {
     currenttime = vfed->requestTime(currenttime);
 
-    isupdated = vfed->isUpdated(sub);
+    int isupdated = vfed->isUpdated(sub);
     if(isupdated) {
       /* NOTE: The value sent by sender at time t is received by receiver at time t+deltat */
       value = vfed->getDouble(sub);

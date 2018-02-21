@@ -27,7 +27,7 @@ int main(int /*argc*/,char ** /*argv*/)
   helics_publication  pub;
 
 
-  std::string helicsversion = helics::helicsVersionString();
+  std::string helicsversion = helics::versionString();
 
   printf("PI RECEIVER: Helics version = %s\n",helicsversion.c_str());
   printf("%s",help);

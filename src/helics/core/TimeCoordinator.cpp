@@ -184,15 +184,26 @@ bool TimeCoordinator::updateTimeFactors ()
         {
             minNext = dep.Tnext;
         }
-        if ((dep.Tdemin < minDe) && (dep.Tdemin >= dep.Tnext))
+        if (dep.Tdemin >= dep.Tnext)
         {
-            minminDe = dep.Tdemin;
+            if (dep.Tdemin < minminDe)
+            {
+                minminDe = dep.Tdemin;
+            }
         }
+        else
+        {
+            //this minimum dependent event time received was invalid and can't be trusted
+            //therefore it can't be used to determine a time grant
+            minminDe = -1;
+        }
+        
         if (dep.Te < minDe)
         {
             minDe = dep.Te;
         }
     }
+    
     bool update = false;
     time_minminDe = std::min (minDe, minminDe);
     Time prev_next = time_next;

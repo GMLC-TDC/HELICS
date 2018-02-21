@@ -7,8 +7,10 @@ project (HELICS)
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
 set (HELICS_VERSION_PATCH 0)
-set (HELICS_VERSION_BUILD alpha2)
+
+set (HELICS_VERSION_BUILD alpha.2)
 set (HELICS_DATE "02-02-18")
+set (HELICS_VERSION_STRING "1.0.0-alpha.2 (02-15-18)")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -115,7 +117,7 @@ ENDIF(UNIX)
 IF (BUILD_MATLAB OR USE_BOOST_STATIC_LIBS)
   set(Boost_USE_STATIC_LIBS ON)
   set(BOOST_STATIC ON)
-	  
+
 ENDIF ()
 # -------------------------------------------------------------
 # add coverage target
@@ -206,7 +208,7 @@ add_library(helics-static STATIC
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
-target_link_libraries(helics-static Threads::Threads) 
+target_link_libraries(helics-static Threads::Threads)
 IF (UNIX AND NOT APPLE)
 target_link_libraries(helics-static rt)
 ENDIF()
@@ -460,3 +462,10 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
 			   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake
               DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
+
+if (CMAKE_INSTALL_PREFIX)
+    message(STATUS "Using CMAKE_INSTALL_PREFIX: " ${CMAKE_INSTALL_PREFIX})
+endif()
+
+
+

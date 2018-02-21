@@ -78,7 +78,7 @@ void addOperations (Filter *filt, defined_filter_types type, Core *cptr)
     break;
     case defined_filter_types::reroute:
     {
-        auto op = std::make_shared<RandomDropFilterOperation> ();
+        auto op = std::make_shared<RerouteFilterOperation> ();
         filt->setFilterOperations (std::move (op));
     }
     break;

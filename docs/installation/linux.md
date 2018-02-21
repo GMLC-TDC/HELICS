@@ -50,6 +50,39 @@ make
 make install
 ```
 
+Building HELICS with python support
+-----------------------------------
+
+Run the following:
+
+```bash
+$ cmake -DBUILD_PYTHON=ON -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/ -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/python3.6m/libpython3.6m.so -DCMAKE_INSTALL_PREFIX=~/local/helics-1.0.0/ ..
+$ make -j8
+$ make install
+```
+
+Add the following to your `~/.bashrc` file.
+
+```bash
+export PYTHONPATH=~/local/helics-1.0.0/python:$PYTHONPATH
+```
+
+If you open a interactive Python session and import helics, you should be able to get the version of `helics` and an output that is similar to the following.
+
+```bash
+$ ipython
+Python 3.6.4 |Anaconda, Inc.| (default, Jan 16 2018, 12:04:33)
+Type 'copyright', 'credits' or 'license' for more information
+IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
+
+In [1]: import helics
+
+In [2]: helics.helicsGetVersion()
+Out[2]: '1.0.0-alpha.3 (02-12-18)'
+
+```
+
+
 Testing
 -------
 

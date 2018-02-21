@@ -57,7 +57,11 @@ Recorder::Recorder (int argc, char *argv[])
     auto res = argumentParser(argc, argv, vm_map, InfoArgs, "input");
     if (res == versionReturn)
     {
-        std::cout << helics::helicsVersionString() << '\n';
+        std::cout << helics::versionString() << '\n';
+    }
+    if (res == helpReturn)
+    {
+        FederateInfo helpTemp(argc, argv);
     }
     if (res < 0)
     {

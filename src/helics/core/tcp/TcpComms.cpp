@@ -16,14 +16,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <memory>
 
 static const int BEGIN_OPEN_PORT_RANGE = 24228;
-static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24357;
+static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24328;
 
 static const int DEFAULT_TCP_BROKER_PORT_NUMBER = 24160;
 
 namespace helics
 {
 using boost::asio::ip::tcp;
-TcpComms::TcpComms () {}
+TcpComms::TcpComms () noexcept {}
 
 TcpComms::TcpComms (const std::string &brokerTarget, const std::string &localTarget)
     : CommsInterface (brokerTarget, localTarget)
@@ -67,7 +67,7 @@ int TcpComms::findOpenPort ()
     }
     while (usedPortNumbers.find (start) != usedPortNumbers.end ())
     {
-        start += 2;
+        ++start;
     }
     usedPortNumbers.insert (start);
     return start;
@@ -234,7 +234,26 @@ void TcpComms::queue_rx_function ()
             switch (message.index)
             {
             case PORT_DEFINITIONS:
-                PortNumber = message.source_handle;
+            {
+                auto mp = message.source_handle;
+                if (openPortStart < 0)
+                {
+                    if (mp<BEGIN_OPEN_PORT_RANGE)
+                    {
+                        openPortStart = BEGIN_OPEN_PORT_RANGE;
+                    }
+                    else if (mp < BEGIN_OPEN_PORT_RANGE_SUBBROKER)
+                    {
+                        openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER + (mp - BEGIN_OPEN_PORT_RANGE) * 10;
+                    }
+                    else
+                    {
+                        openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER + (mp - BEGIN_OPEN_PORT_RANGE_SUBBROKER) * 10 + 10;
+                    }
+                }
+                PortNumber = mp;
+            }
+                
                 break;
             case CLOSE_RECEIVER:
             case DISCONNECT:
