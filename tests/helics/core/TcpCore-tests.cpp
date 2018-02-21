@@ -410,7 +410,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
         return data_Size;
     });
     server.start ();
-
+    BOOST_TEST_PASSPOINT();
     bool connected = core->connect ();
     BOOST_CHECK (connected);
 
