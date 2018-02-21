@@ -53,6 +53,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
             Tdemin = Te;
         }
         forwardEvent = Time::maxVal();
+        minFed = m.source_handle;
         break;
     case CMD_TIME_GRANT:
         time_state = time_state_t::time_granted;
@@ -61,6 +62,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = m.actionTime;
         Te = Tnext;
         Tdemin = Tnext;
+        minFed = m.source_handle;
         break;
     case CMD_DISCONNECT:
     case CMD_PRIORITY_DISCONNECT:
@@ -69,6 +71,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = Time::maxVal ();
         Te = Time::maxVal ();
         Tdemin = Time::maxVal ();
+        minFed = invalid_fed_id;
         break;
     case CMD_SEND_MESSAGE:
         if (time_state == time_state_t::time_granted)

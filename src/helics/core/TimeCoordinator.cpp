@@ -357,7 +357,8 @@ void TimeCoordinator::sendTimeRequest() const
     upd.source_id = source_id;
     upd.actionTime = time_next;
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
-    upd.Tdemin = time_minDe;
+    upd.Tdemin = (time_minDe < time_next) ? time_next : time_minDe;
+  
     if (iterating)
     {
         setActionFlag(upd, iterationRequested);

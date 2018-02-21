@@ -23,6 +23,7 @@ enum action_message_flags : uint16_t
     indicator_flag = 5,  //!< flag used for setting values
     extra_flag1 = 7,  //!< extra flag
     clone_flag = 9,  //!< flag indicating the filter is a clone filter
+    broker_min_time=12, //!< flag indicating that a broker the time constraint
 };
 /** namespace for message definitions*/
 namespace action_message_def

@@ -2173,19 +2173,16 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_REG_DST_FILTER:
     case CMD_REG_SRC_FILTER:
         // for these registration filters any processing is already done in the
-        // registration functions so this is just a router
+        // registration functions so this is just a router and add the time dependency
         if (command.dest_id == 0)
         {
-            if (!hasTimeDependency)
+            if (!hasFilters)
             {
-                hasLocalFilters = true;
-                hasTimeDependency = true;
-                if (timeCoord->addDependency (higher_broker_id))
+                hasFilters = true;
+                if (timeCoord->addDependent (higher_broker_id))
                 {
-                    ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id, higher_broker_id);
+                    ActionMessage add (CMD_ADD_DEPENDENCY, global_broker_id, higher_broker_id);
                     transmit (higher_broker_id, add);
-
-                    timeCoord->addDependent (higher_broker_id);
                 }
             }
         }
@@ -2486,7 +2483,7 @@ void CommonCore::checkDependencies ()
     }
     lock.unlock ();
     // if we have filters we need to be a timeCoordinator
-    if (hasLocalFilters)
+    if (hasFilters)
     {
         return;
     }

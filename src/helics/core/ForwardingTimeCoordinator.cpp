@@ -36,9 +36,14 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
     Time minNext = Time::maxVal ();
     Time minminDe = Time::maxVal ();
     Time minDe = minminDe;
+    Core::federate_id_t minFed = invalid_fed_id;
     DependencyInfo::time_state_t tState = DependencyInfo::time_state_t::time_requested;
     for (auto &dep : dependencies)
     {
+        if (dep.minFed == source_id)
+        {
+            continue;
+        }
         if (dep.Tnext < minNext)
         {
             minNext = dep.Tnext;
@@ -56,6 +61,11 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
             if (dep.Tdemin < minminDe)
             {
                 minminDe = dep.Tdemin;
+                minFed = dep.fedID;
+            }
+            else if (dep.Tdemin == minminDe)
+            {
+                minFed = invalid_fed_id;
             }
         }
         else
@@ -93,6 +103,12 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
     if (minminDe != time_minminDe)
     {
         time_minminDe = minminDe;
+        update = true;
+    }
+    
+    if (minFed != lastMinFed)
+    {
+        lastMinFed = minFed;
         update = true;
     }
     if (update)
@@ -164,6 +180,7 @@ void ForwardingTimeCoordinator::sendTimeRequest () const
     {
         ActionMessage upd(CMD_TIME_GRANT);
         upd.source_id = source_id;
+        upd.source_handle = lastMinFed;
         upd.actionTime = time_next;
         if (iterating)
         {
@@ -175,6 +192,7 @@ void ForwardingTimeCoordinator::sendTimeRequest () const
     {
         ActionMessage upd(CMD_TIME_REQUEST);
         upd.source_id = source_id;
+        upd.source_handle = lastMinFed;
         upd.actionTime = time_next;
         upd.Te = time_minDe;
         upd.Tdemin = time_minminDe;

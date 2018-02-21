@@ -59,7 +59,7 @@ class BrokerBase
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
     BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
     /** enumeration of the possible core states*/
-    enum broker_state_t : int
+    enum broker_state_t : int16_t
     {
         created = -5,  //!< the broker has been created
         initialized = -4,  //!< the broker itself has been initialized and is ready to connect
@@ -78,6 +78,7 @@ class BrokerBase
     bool hasTimeDependency = false;  //!< set to true if the broker has Time dependencies
     bool enteredExecutionMode = false;  //!< flag indicating that the broker has entered execution mode
     bool waitingForServerPingReply = false;  //!< flag indicating we are waiting for a ping reply
+    bool hasFilters = false;  //!< flag indicating filters come through the broker
   public:
       /** display help messages for the broker*/
     static void displayHelp ();

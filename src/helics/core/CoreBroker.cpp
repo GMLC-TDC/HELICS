@@ -1,13 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include "CoreBroker.hpp"
 #include "../common/stringToCmdLine.h"
 #include "BrokerFactory.hpp"
@@ -836,15 +835,13 @@ void CoreBroker::addSourceFilter (ActionMessage &m)
         }
 
         transmit (0, m);
-        if (!hasTimeDependency)
+        if (!hasFilters)
         {
-            if (timeCoord->addDependency(higher_broker_id))
+            hasFilters = true;
+            if (timeCoord->addDependent(higher_broker_id))
             {
-                hasTimeDependency = true;
-                ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id, higher_broker_id);
+                ActionMessage add(CMD_ADD_DEPENDENCY, global_broker_id, higher_broker_id);
                 transmit(getRoute(higher_broker_id), add);
-
-                timeCoord->addDependent(higher_broker_id);
             }
         }
     }
@@ -887,15 +884,14 @@ void CoreBroker::addDestFilter (ActionMessage &m)
             setActionFlag (m, processingComplete);
         }
         transmit (0, m);
-        if (!hasTimeDependency)
+        if (!hasFilters)
         {
-            if (timeCoord->addDependency(higher_broker_id))
+            hasFilters = true;
+            if (timeCoord->addDependent(higher_broker_id))
             {
                 hasTimeDependency = true;
-                ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id, higher_broker_id);
+                ActionMessage add(CMD_ADD_DEPENDENCY, global_broker_id, higher_broker_id);
                 transmit(getRoute(higher_broker_id), add);
-
-                timeCoord->addDependent(higher_broker_id);
             }
         }
     }
