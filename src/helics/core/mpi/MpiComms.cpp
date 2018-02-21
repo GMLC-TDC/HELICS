@@ -9,44 +9,31 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "MpiComms.h"
+#include "MpiService.h"
 #include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.hpp"
 #include <memory>
 
-#include <mpi.h>
-
 namespace helics
 {
 
-std::atomic<bool> MpiComms::mpiCommsExists = false;
-std::mutex MpiComms::mpiSerialMutex;
-int MpiComms::commRank = -1;
-
 MpiComms::MpiComms ()
 {
-    if (mpiCommsExists)
-    {
-        std::cout << "WARNING: MPIComms object already created, unexpected results may occur" << std::endl;
-    }
     std::cout << "MpiComms()" << std::endl;
-    initMPI();
-    mpiCommsExists = true;
+
+    auto mpi_service = MpiService::getInstance ();
+    commAddress = mpi_service.addMpiComms (this);
+    std::cout << "- commAddress = " << commAddress << std::endl;
 }
 
-MpiComms::MpiComms(const int &brokerRank)
-    : brokerRank(brokerRank)
+MpiComms::MpiComms(const std::string &brokerAddress)
+    : brokerAddress(brokerAddress)
 {
-    if (mpiCommsExists)
-    {
-        std::cout << "WARNING: MPIComms object already created, unexpected results may occur" << std::endl;
-    }
-    std::cout << "MpiComms(" << std::to_string(brokerRank) << ")" << std::endl;
-    initMPI();
-    if (brokerRank == -1)
-    {
-        setBrokerRank (commRank);
-    }
-    mpiCommsExists = true;
+    std::cout << "MpiComms(" << brokerAddress << ")" << std::endl;
+
+    auto mpi_service = MpiService::getInstance ();
+    commAddress = mpi_service.addMpiComms (this);
+    std::cout << "- commAddress = " << commAddress << std::endl;
 }
 
 /** destructor*/
@@ -56,94 +43,8 @@ MpiComms::~MpiComms ()
     disconnect ();
     std::cout << "Finished disconnect" << std::endl;
 
-    int mpi_initialized;
-    MPI_Initialized(&mpi_initialized);
-    if (mpi_initialized)
-    {
-        std::cout << "Finalizing MPI" << std::endl;
-        std::lock_guard<std::mutex> lock(mpiSerialMutex);
-        MPI_Finalize();
-        shutdown = true;
-        std::cout << "MPI Finalized" << std::endl;
-    }
-}
-
-bool MpiComms::initMPI()
-{
-    std::lock_guard<std::mutex> lock(mpiSerialMutex);
-
-    // Initialize MPI with MPI_THREAD_SERIALIZED
-    int mpi_initialized;
-    int mpi_thread_level;
-
-    MPI_Initialized(&mpi_initialized);
-
-    if (!mpi_initialized)
-    {
-        MPI_Init_thread(nullptr, nullptr, MPI_THREAD_SERIALIZED, &mpi_thread_level);
-
-        MPI_Initialized(&mpi_initialized);
-        if (!mpi_initialized)
-        {
-            std::cerr << "MPI initialization failed" << std::endl;
-            return false;
-        }
-    }
-
-    MPI_Query_thread(&mpi_thread_level);
-
-    if (mpi_thread_level < MPI_THREAD_SERIALIZED)
-    {
-        std::cerr << "MPI_THREAD_SERIALIZED support required" << std::endl;
-        return false;
-    }
-
-    return true;
-}
-
-void MpiComms::serializeSendMPI(std::vector<char> message, int dest, int tag, MPI_Comm comm) {
-    std::cout << "SendMPI from " << getAddress() << " to " << dest << std::endl;
-    std::lock_guard<std::mutex> lock(mpiSerialMutex);
-    MPI_Request req;
-    MPI_Isend(message.data(), message.size(), MPI_CHAR, dest, tag, comm, &req);
-
-    int message_sent = false;
-    while (!message_sent)
-    {
-        MPI_Test(&req, &message_sent, MPI_STATUS_IGNORE);
-    }
-}
-
-std::vector<char> MpiComms::serializeReceiveMPI(int src, int tag, MPI_Comm comm) {
-    int message_waiting = false;
-    MPI_Status status;
-
-    while (!message_waiting && !shutdown)
-    {
-        std::lock_guard<std::mutex> probe_lock(mpiSerialMutex);
-        if (!shutdown)
-        {
-            MPI_Iprobe(src, tag, comm, &message_waiting, &status);
-        }
-
-        if (message_waiting == true)
-        {
-            int recv_size;
-            std::vector<char> buffer;
-            MPI_Get_count(&status, MPI_CHAR, &recv_size);
-            buffer.resize(recv_size);
-            MPI_Request req;
-            MPI_Irecv(buffer.data(), buffer.capacity(), MPI_CHAR, src, tag, comm, &req);
-
-            int message_received = false;
-            while (!message_received)
-            {
-                MPI_Test(&req, &message_received, MPI_STATUS_IGNORE);
-            }
-            return buffer;
-        }
-    }
-    return std::vector<char>();
+    auto mpi_service = MpiService::getInstance ();
+    mpi_service.removeMpiComms (this);
 }
 
 int MpiComms::processIncomingMessage (ActionMessage &M)
@@ -164,49 +65,41 @@ int MpiComms::processIncomingMessage (ActionMessage &M)
 
 void MpiComms::queue_rx_function ()
 {
-    bool isInitializedMPI = initMPI();
-    if (!isInitializedMPI)
-    {
-        rx_status = connection_status::error;
-        return;
-    }
     rx_status = connection_status::connected;
 
     while (true)
-    {
-        // Receive using MPI
-        data = serializeReceiveMPI (MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD);
-        if (error)
-        {
-            rx_status = connection_status::error;
-            return;
-        }
-        if (shutdown)
-        {
-            goto CLOSE_RX_LOOP;
-        }
+    { 
+        auto M = rxMessageQueue.try_pop ();
 
-        ActionMessage M;
-        M.from_vector (data);
-        std::cout << "message received: " << prettyPrintString(M) << std::endl;
-        if (!isValidCommand (M))
+        if (M)
         {
-            std::cerr << "invalid command received" << std::endl;
-            continue;
-        }
-        if (isProtocolCommand (M))
-        {
-            if (M.index == CLOSE_RECEIVER)
+            std::cout << "message received: " << prettyPrintString(M) << std::endl;
+            if (!isValidCommand (M))
+            {
+                std::cerr << "invalid command received" << std::endl;
+                continue;
+            }
+
+            if (isProtocolCommand (M))
+            {
+                if (M.index == CLOSE_RECEIVER)
+                {
+                    goto CLOSE_RX_LOOP;
+                }
+            }
+
+            auto res = processIncomingMessage (M);
+            if (res < 0)
             {
                 goto CLOSE_RX_LOOP;
             }
         }
-        auto res = processIncomingMessage (M);
-        if (res < 0)
+        
+        if (shutdown)
         {
             goto CLOSE_RX_LOOP;
         }
-    }
+   }
 CLOSE_RX_LOOP:
     std::cout << "Shutdown RX Loop" << std::endl;
     shutdown = true;
@@ -215,19 +108,11 @@ CLOSE_RX_LOOP:
 
 void MpiComms::queue_tx_function ()
 {
-    bool isInitializedMPI = initMPI();
-    if (!isInitializedMPI)
-    {
-        tx_status = connection_status::error;
-        return;
-    }
     tx_status = connection_status::connected;
 
-    std::vector<char> buffer;
-    boost::system::error_code error;
     std::map<int, std::string> routes;  // for all the other possible routes
 
-    if (brokerRank != -1)
+    if (brokerAddress != "")
     {
         hasBroker = true;
     }
@@ -268,14 +153,14 @@ void MpiComms::queue_tx_function ()
             {
                 // Send using MPI to broker
                 std::cout << "send msg to brkr rt: " << prettyPrintString(cmd) << std::endl;
-                serializeSendMPI(cmd.to_vector(), brokerRank, 0, MPI_COMM_WORLD);
+                txMessageQueue.emplace (brokerAddress, cmd);
             }
         }
         else if (route_id == -1)
         {  // send to rx thread loop
             // Send to ourself -- may need command line option to enable for openmpi
             std::cout << "send msg to self" << prettyPrintString(cmd) << std::endl;
-            serializeSendMPI(cmd.to_vector(), commRank, 0, MPI_COMM_WORLD);
+            rxMessageQueue.push (cmd);
         }
         else
         {
@@ -284,7 +169,7 @@ void MpiComms::queue_tx_function ()
             {
                 // Send using MPI to rank given by route
                 std::cout << "send msg to rt: " << prettyPrintString(cmd) << std::endl;
-                serializeSendMPI(cmd.to_vector(), std::stoi(rt_find->second), 0, MPI_COMM_WORLD);
+                txMessageQueue.emplace (rt_find->second, cmd);
             }
             else
             {
@@ -292,7 +177,7 @@ void MpiComms::queue_tx_function ()
                 {
                     // Send using MPI to broker
                     std::cout << "send msg to brkr: " << prettyPrintString(cmd) << std::endl;
-                    serializeSendMPI(cmd.to_vector(), brokerRank, 0, MPI_COMM_WORLD);
+                    txMessageQueue.emplace (brokerAddress, cmd);
                 }
             }
         }
@@ -314,11 +199,7 @@ void MpiComms::closeReceiver() {
 }
 
 std::string MpiComms::getAddress () {
-    if (commRank == -1)
-    {
-        MPI_Comm_rank(MPI_COMM_WORLD, &commRank);
-    }
-    return std::to_string(commRank);
+    return commAddress;
 }
 
 }  // namespace helics
