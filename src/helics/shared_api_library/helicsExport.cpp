@@ -680,3 +680,9 @@ HELICS_Export helics_bool_t helicsQueryIsCompleted (helics_query query)
 }
 
 void helicsQueryFree (helics_query query) { delete reinterpret_cast<helics::queryObject *> (query); }
+
+void helicsCleanupHelicsLibrary()
+{
+    helics::cleanupHelicsLibrary();
+}
+
