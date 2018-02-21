@@ -31,6 +31,11 @@ void ForwardingTimeCoordinator::enteringExecMode ()
     }
 }
 
+static inline bool isBroker(Core::federate_id_t id)
+{
+    return ((id == 1) || (id >= 0x7000'0000));
+}
+
 void ForwardingTimeCoordinator::updateTimeFactors ()
 {
     Time minNext = Time::maxVal ();
@@ -109,7 +114,11 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
     if (minFed != lastMinFed)
     {
         lastMinFed = minFed;
-        update = true;
+        if (isBroker(minFed))
+        {
+            update = true;
+        }
+       
     }
     if (update)
     {
