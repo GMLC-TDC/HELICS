@@ -44,6 +44,7 @@ set (MPI_SOURCE_FILES
 	mpi/MpiCore.cpp
 	mpi/MpiBroker.cpp
 	mpi/MpiComms.cpp
+    mpi/MpiService.cpp
 )
 
 set (ZMQ_SOURCE_FILES
@@ -126,6 +127,7 @@ set(MPI_HEADER_FILES
 	mpi/MpiCore.h
 	mpi/MpiBroker.h
 	mpi/MpiComms.h
+    mpi/MpiService.h
 	)
 
 set(UDP_HEADER_FILES
@@ -148,7 +150,7 @@ set(TCP_HEADER_FILES
 		list(APPEND SRC_FILES ${TCP_SOURCE_FILES})
 		list(APPEND INCLUDE_FILES ${TCP_HEADER_FILES} )
 	endif()
-	
+
 
 if (${ZeroMQ_FOUND})
    list(APPEND SRC_FILES ${ZMQ_SOURCE_FILES})
