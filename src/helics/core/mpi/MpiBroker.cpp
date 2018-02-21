@@ -24,7 +24,7 @@ namespace helics
     MpiBroker::~MpiBroker() = default;
 
     using namespace std::string_literals;
-    static const ArgDescriptors extraArgs{ { "broker_rank", ArgDescriptor::arg_type_t::int_type, "mpi rank of the broker" } };
+    static const ArgDescriptors extraArgs{ { "broker_address", ArgDescriptor::arg_type_t::string_type, "location of a broker using mpi (rank:tag)" } };
 
     void MpiBroker::displayHelp(bool local_only)
     {
@@ -45,9 +45,9 @@ namespace helics
             variable_map vm;
             argumentParser(argc, argv, vm, extraArgs);
 
-            if (vm.count("broker_rank") > 0)
+            if (vm.count("broker_address") > 0)
             {
-                brokerRank = vm["broker_rank"].as<int>();
+                brokerAddress = vm["broker_address"].as<std::string>();
             }
 
             CoreBroker::initializeFromArgs(argc, argv);
@@ -56,16 +56,11 @@ namespace helics
 
     bool MpiBroker::brokerConnect()
     {
-        std::lock_guard<std::mutex> lock(dataMutex);
-        if (brokerRank == -1)
-        {
-            setAsRoot();
-        }
-        comms = std::make_unique<MpiComms>(brokerRank);
+        comms = std::make_unique<MpiComms>(brokerAddress);
         comms->setCallback([this](ActionMessage M) { addActionMessage(std::move(M)); });
         comms->setName(getIdentifier());
 
-        if (getAddress().compare(std::to_string(brokerRank)) == 0)
+        if (brokerAddress == "")
         {
             setAsRoot();
         }

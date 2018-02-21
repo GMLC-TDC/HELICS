@@ -28,7 +28,7 @@ public:
 public:
 	virtual std::string getAddress() const override;
 private:
-    int brokerRank = -1; //!< the mpi rank of the broker
+    std::string brokerAddress; //!< the mpi rank:tag of the broker
 	virtual bool brokerConnect() override;
  
 };
