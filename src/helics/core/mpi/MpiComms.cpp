@@ -20,29 +20,23 @@ namespace helics
 MpiComms::MpiComms ()
     : shutdown (false)
 {
-    std::cout << "MpiComms()" << std::endl;
-
     auto& mpi_service = MpiService::getInstance ();
     commAddress = mpi_service.addMpiComms (this);
-    std::cout << "- commAddress = " << commAddress << std::endl;
+    std::cout << "MpiComms() - commAddress = " << commAddress << std::endl;
 }
 
 MpiComms::MpiComms(const std::string &broker)
     : brokerAddress(broker), shutdown (false)
 {
-    std::cout << "MpiComms(" << brokerAddress << ")" << std::endl;
-
     auto& mpi_service = MpiService::getInstance ();
     commAddress = mpi_service.addMpiComms (this);
-    std::cout << "- commAddress = " << commAddress << std::endl;
+    std::cout << "MpiComms(" << brokerAddress << ")" << "- commAddress " << commAddress << std::endl;
 }
 
 /** destructor*/
 MpiComms::~MpiComms ()
 {
-    std::cout << "Disconnecting MPIComms" << std::endl;
     disconnect ();
-    std::cout << "Finished disconnect" << std::endl;
 }
 
 int MpiComms::processIncomingMessage (ActionMessage &M)
@@ -71,7 +65,6 @@ void MpiComms::queue_rx_function ()
 
         if (M)
         {
-            std::cout << "message received: " << prettyPrintString(M.value ()) << std::endl;
             if (!isValidCommand (M.value ()))
             {
                 std::cerr << "invalid command received" << std::endl;

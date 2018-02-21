@@ -88,7 +88,6 @@ void MpiService::serviceLoop ()
     // MPI may have already been finalized if HELICS is used by a program that also uses MPI
     if (mpi_initialized)
     {
-        std::cout << "Finalizing MPI" << std::endl;
         MPI_Finalize();
         std::cout << "MPI Finalized" << std::endl;
     }
