@@ -46,7 +46,7 @@ check_minimum_version () {
     IFS='. ' read -r -a ver <<< $1
 
     local -a ver_min
-    IFS='. ' read -r -a ver_min <<< $1
+    IFS='. ' read -r -a ver_min <<< $2
 
     if [[ ver[0] -lt ver_min[0] ]] || [[ ver[0] -eq ver_min[0] && ver[1] -lt ver_min[1] ]] || [[ ver[0] -eq ver_min[0] && ver[1] -eq ver_min[1] && ver[2] -lt ver_min[2] ]]; then
         return 1
@@ -111,7 +111,7 @@ if [[ ! -d "dependencies/boost" ]]; then
         install_boost 1.65.0
     else
         install_boost $CI_BOOST_VERSION
-        if ! check_minimum_version $CI_BOOST_VERSION 1.61.0 then
+        if ! check_minimum_version $CI_BOOST_VERSION 1.61.0; then
             export CI_NO_TESTS=true
         fi
     fi
