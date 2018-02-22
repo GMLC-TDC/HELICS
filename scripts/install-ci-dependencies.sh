@@ -48,7 +48,7 @@ check_minimum_version () {
     local -a ver_min
     IFS='. ' read -r -a ver_min <<< $2
 
-    if [[ ver[0] -lt ver_min[0] ]] || [[ ver[0] -eq ver_min[0] && ver[1] -lt ver_min[1] ]] || [[ ver[0] -eq ver_min[0] && ver[1] -eq ver_min[1] && ver[2] -lt ver_min[2] ]]; then
+    if [[ ${ver[0]} -lt ${ver_min[0]} ]] || [[ ${ver[0]} -eq ${ver_min[0]} && ${ver[1]} -lt ${ver_min[1]} ]] || [[ ${ver[0]} -eq ${ver_min[0]} && ${ver[1]} -eq ${ver_min[1]} && ${ver[2]} -lt ${ver_min[2]} ]]; then
         return 1
     else
         return 0
