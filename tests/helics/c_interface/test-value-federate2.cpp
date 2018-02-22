@@ -21,7 +21,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 // BOOST_FIXTURE_TEST_SUITE (value_federate_tests2, FederateTestFixture)
-BOOST_AUTO_TEST_SUITE(value_federate_tests)
+BOOST_AUTO_TEST_SUITE(value_federate_tests2)
 
 namespace bdata = boost::unit_test::data;
 //const std::string core_types[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
@@ -38,7 +38,7 @@ BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type
 	helics_subscription sub1;
 	helics_time_t gtime;
 	const char s[] = ";";
-	int len = strlen(s);
+	int len = static_cast<int>(strlen(s));
 	char val[] = "";
 	int actualLen = 10;
 	broker = helicsCreateBroker(core_type.c_str(), "", "--federates=2");
@@ -60,9 +60,17 @@ BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type
 
 	BOOST_CHECK(helicsSubscriptionIsUpdated(sub1));
 
+    int len1 = helicsSubscriptionGetValueSize(sub1);
+
+    BOOST_CHECK_EQUAL(len1, len);
 	status = helicsSubscriptionGetValue(sub1, val, 100, &actualLen);
-	int len1 = helicsSubscriptionGetValueSize(sub1);
-	BOOST_CHECK_EQUAL(actualLen, len);
+    BOOST_CHECK_EQUAL(actualLen, len);
+
+    len1 = helicsSubscriptionGetValueSize(sub1);
+
+    BOOST_CHECK_EQUAL(len1, len);
+
+	
 
 	BOOST_CHECK(helicsSubscriptionIsUpdated(sub1) == false);
 
@@ -243,7 +251,7 @@ BOOST_DATA_TEST_CASE(test_async_calls, bdata::make(core_types), core_type)
 	helics_subscription subid;
 	helics_time_t gtime;
 	helics_time_t f1time;
-	federate_state state;
+	//federate_state state;
 	char s[100] = "";
 	broker = helicsCreateBroker(core_type.c_str(), "", "--federates=2");
 	fi = helicsFederateInfoCreate();

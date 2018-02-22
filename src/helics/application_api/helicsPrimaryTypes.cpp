@@ -285,6 +285,7 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::string &val
         break;
     }
     case helics_type_t::helicsString:
+    case helics_type_t::helicsAny:
     {
         val = dv.string ();
         break;
