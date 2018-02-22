@@ -36,7 +36,7 @@ MpiComms::MpiComms(const std::string &broker)
 /** destructor*/
 MpiComms::~MpiComms ()
 {
-   disconnect ();
+    disconnect ();
 }
 
 int MpiComms::processIncomingMessage (ActionMessage &M)
@@ -129,6 +129,8 @@ void MpiComms::queue_tx_function ()
                 }
                 break;
                 case DISCONNECT:
+                    std::cout << "WE GOT OUR DISCONNECT, WOWOWWWW!!!!!!" << getAddress () << std::endl;
+                    rxMessageQueue.push (cmd);
                     goto CLOSE_TX_LOOP;  // break out of loop
                 }
             }
@@ -181,6 +183,9 @@ CLOSE_TX_LOOP:
         shutdown = true;
     }
 
+    auto & mpi_service = MpiService::getInstance ();
+    mpi_service.removeMpiComms (this);
+    
     tx_status = connection_status::terminated;
 }
 

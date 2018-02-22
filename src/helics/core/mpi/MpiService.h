@@ -34,6 +34,7 @@ public:
     static void setMpiCommunicator (MPI_Comm communicator);
 
     std::string addMpiComms (MpiComms *comm);
+    void removeMpiComms (MpiComms *comm);
     std::string getAddress (MpiComms *comm);
     int getRank();
     int getTag (MpiComms *comm);
@@ -52,6 +53,7 @@ private:
     std::vector<MpiComms*> comms;
     std::list<std::pair<MPI_Request, std::vector<char>>> send_requests;
 
+    std::atomic<int> comms_connected;
     std::atomic<bool> startup_flag;
     std::atomic<bool> stop_service;
     std::unique_ptr<std::thread> service_thread;

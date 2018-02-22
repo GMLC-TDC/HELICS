@@ -28,6 +28,7 @@ void MpiService::setMpiCommunicator (MPI_Comm communicator)
 MpiService::MpiService ()
     : commRank (-1)
 {
+    comms_connected = 0;
     stop_service = false;
     startup_flag = false;
 }
@@ -76,14 +77,29 @@ void MpiService::serviceLoop ()
     std::cout << "Started MPI service loop for rank " << commRank << std::endl;
 
 
-    while (!stop_service)
+    bool has_tx_queue = true;
+    while (!stop_service || has_tx_queue || comms_connected > 0)
     {
         // send/receive MPI messages
         sendAndReceiveMessages ();
+
+        // check if there are any pending messages to send
+        // exiting is not safe if there are
+        has_tx_queue = false;
+        for (unsigned int i = 0; i < comms.size(); i++)
+        {
+            if (comms[i] != nullptr)
+            {
+                if (!comms[i]->getTxMessageQueue ().empty ())
+                {
+                    has_tx_queue = true;
+                    break;
+                }
+            }
+        }
     }
 
     std::cout << "End receive loop for rank " << commRank << std::endl;
-
 
     // Post receives for any waiting sends
     int message_waiting = 1;
@@ -121,12 +137,26 @@ void MpiService::serviceLoop ()
 std::string MpiService::addMpiComms (MpiComms *comm)
 {
     comms.push_back (comm);
+    comms_connected += 1;
 
     // If somehow this gets called while MPI is still initializing, wait until MPI initialization completes
     while (startup_flag && !stop_service);
 
     // return the rank:tag for the MpiComms object
     return std::to_string(commRank) + ":" + std::to_string(comms.size()-1);
+}
+
+void MpiService::removeMpiComms (MpiComms *comm)
+{
+    for (unsigned int i = 0; i < comms.size (); i++)
+    {
+        if (comms[i] == comm)
+        {
+            comms[i] = nullptr;
+            comms_connected -= 1;
+            break;
+        }
+    }
 }
 
 std::string MpiService::getAddress (MpiComms *comm)
@@ -207,11 +237,17 @@ void MpiService::sendAndReceiveMessages ()
     // Also, a method of doing time synchronization using MPI reductions should be added
     for (unsigned int i = 0; i < comms.size(); i++)
     {
+        // Skip any nullptr entries
+        if (comms[i] == nullptr)
+        {
+            continue;
+        }
+
         // Handle receives for the MpiComms object
         int message_waiting = 1;
         MPI_Status status;
 
-        while (message_waiting && !stop_service)
+        while (message_waiting)
         {
             // Check if there is a messages waiting
             MPI_Iprobe (MPI_ANY_SOURCE, i, mpiCommunicator, &message_waiting, &status);
@@ -230,7 +266,7 @@ void MpiService::sendAndReceiveMessages ()
 
                 // Wait until the asynchronous receive request has finished
                 int message_received = false;
-                while (!message_received && !stop_service)
+                while (!message_received)
                 {
                     MPI_Test (&req, &message_received, MPI_STATUS_IGNORE);
                 }
@@ -245,7 +281,7 @@ void MpiService::sendAndReceiveMessages ()
 
         // Send messages for the MpiComms object
         auto sendMsg = comms[i]->getTxMessageQueue ().try_pop ();
-        while (sendMsg && !stop_service)
+        while (sendMsg)
         {
             std::vector<char> msg;
             std::string address;
@@ -266,9 +302,12 @@ void MpiService::sendAndReceiveMessages ()
             }
             else
             {
-                // Add the message directly to the destination rx queue (same process)
-                ActionMessage M (msg);
-                comms[destTag]->getRxMessageQueue ().push (M);
+                if (comms[destTag] != nullptr)
+                {
+                    // Add the message directly to the destination rx queue (same process)
+                    ActionMessage M (msg);
+                     comms[destTag]->getRxMessageQueue ().push (M);
+                }
             }
             sendMsg = comms[i]->getTxMessageQueue ().try_pop ();
         }
