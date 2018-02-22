@@ -223,7 +223,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     BOOST_CHECK (f1 != NULL);
     CE (helicsFilterSet (f1, "delay", 2.5));
 
-    auto f2 = helicsFederateRegisterSourceFilter (fFed, helics_delay_filter, "port1", "filter2");
+    auto f2 = helicsFederateRegisterSourceFilter (fFed, helics_delay_filter, "port2", "filter2");
     BOOST_CHECK (f2 != NULL);
     CE (helicsFilterSet (f2, "delay", 2.5));
 
