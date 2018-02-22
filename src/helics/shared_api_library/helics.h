@@ -536,6 +536,11 @@ HELICS_Export helics_bool_t helicsQueryIsCompleted (helics_query query);
 /** free the memory associated with a query object*/
 HELICS_Export void helicsQueryFree (helics_query);
 
+/** function to do some housekeeping work
+@details this runs some cleanup routines and tries to close out any residual thread that haven't been shutdown
+yet*/
+HELICS_Export void helicsCleanupHelicsLibrary ();
+
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif

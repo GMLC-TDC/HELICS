@@ -22,8 +22,17 @@ iteration_tests.cpp
 ctestFixtures.cpp
 )
 
+IF (NOT QUICK_TESTS_ONLY)
+#list(APPEND application_api_test_sources 
+#QueryTests.cpp
+#heat-transfer-tests.cpp
+#)
+ENDIF(NOT QUICK_TESTS_ONLY)
+
 include_directories( SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/src/helics/shared_api_library)
+include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 
 add_executable(c_interface_tests ${c_interface_test_sources} ${c_interface_test_headers})
 

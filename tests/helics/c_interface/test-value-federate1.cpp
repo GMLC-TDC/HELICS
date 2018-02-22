@@ -27,7 +27,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_AUTO_TEST_SUITE (value_federate_tests)
 
 namespace bdata = boost::unit_test::data;
-const std::string core_types[] = {"test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2"};
+//const std::string core_types[] = {"test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2"};
 
 /** test simple creation and destruction*/
 

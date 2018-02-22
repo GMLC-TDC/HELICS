@@ -19,6 +19,10 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "../../common/TripWire.hpp"
 #include <mutex>
 
+/** this is a random identifier put in place when the federate or core or broker gets created*/
+static const int coreValidationIdentifier = 0x378424EC;
+static const int brokerValidationIdentifier = 0xA3467D20;
+
 namespace helics
 {
 	class Core;
