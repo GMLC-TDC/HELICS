@@ -39,6 +39,8 @@ public:
     int getRank();
     int getTag (MpiComms *comm);
 
+    void sendMessage (std::string address, std::vector<char> message) { txMessageQueue.emplace (address, message); }
+
     void sendAndReceiveMessages ();
 
 private:
@@ -52,6 +54,8 @@ private:
 
     std::vector<MpiComms*> comms;
     std::list<std::pair<MPI_Request, std::vector<char>>> send_requests;
+    BlockingQueue<std::pair<std::string, std::vector<char>>> txMessageQueue;
+
 
     std::atomic<int> comms_connected;
     std::atomic<bool> startup_flag;

@@ -77,29 +77,12 @@ void MpiService::serviceLoop ()
     std::cout << "Started MPI service loop for rank " << commRank << std::endl;
 
 
-    bool has_tx_queue = true;
-    while (!stop_service || has_tx_queue || comms_connected > 0)
+    // Run as long as we have something in the send queue or the chance of getting something
+    while (!stop_service || comms_connected > 0 || !(txMessageQueue.empty ()))
     {
         // send/receive MPI messages
         sendAndReceiveMessages ();
-
-        // check if there are any pending messages to send
-        // exiting is not safe if there are
-        has_tx_queue = false;
-        for (unsigned int i = 0; i < comms.size(); i++)
-        {
-            if (comms[i] != nullptr)
-            {
-                if (!comms[i]->getTxMessageQueue ().empty ())
-                {
-                    has_tx_queue = true;
-                    break;
-                }
-            }
-        }
     }
-
-    std::cout << "End receive loop for rank " << commRank << std::endl;
 
     // Post receives for any waiting sends
     int message_waiting = 1;
@@ -109,7 +92,6 @@ void MpiService::serviceLoop ()
         MPI_Iprobe (MPI_ANY_SOURCE, MPI_ANY_TAG, mpiCommunicator, &message_waiting, &status);
         if (message_waiting)
         {
-            std::cout << "Unfinished receive to rank " << commRank << std::endl;
             // Get the size of the message waiting to be received
             int recv_size;
             std::vector<char> buffer;
@@ -279,38 +261,39 @@ void MpiService::sendAndReceiveMessages ()
             }
         }
 
-        // Send messages for the MpiComms object
-        auto sendMsg = comms[i]->getTxMessageQueue ().try_pop ();
-        while (sendMsg)
+    }
+    
+    // Send messages from the queue
+    auto sendMsg = txMessageQueue.try_pop ();
+    while (sendMsg)
+    {
+        std::vector<char> msg;
+        std::string address;
+        std::tie (address, msg) = sendMsg.value ();
+
+        MPI_Request req;
+        auto sendRequestData = std::make_pair (req, msg);
+
+        int addr_delim_pos = address.find (":");
+        int destRank = std::stoi (address.substr (0, addr_delim_pos));;
+        int destTag = std::stoi (address.substr (addr_delim_pos+1, address.length ()));
+
+        if (destRank != commRank)
         {
-            std::vector<char> msg;
-            std::string address;
-            std::tie (address, msg) = sendMsg.value ();
-
-            MPI_Request req;
-            auto sendRequestData = std::make_pair (req, msg);
-
-            int addr_delim_pos = address.find (":");
-            int destRank = std::stoi (address.substr (0, addr_delim_pos));;
-            int destTag = std::stoi (address.substr (addr_delim_pos+1, address.length ()));
-
-            if (destRank != commRank)
-            {
-                // Send the message using asynchronous send
-                MPI_Isend(sendRequestData.second.data (), sendRequestData.second.size (), MPI_CHAR, destRank, destTag, mpiCommunicator, &sendRequestData.first);
-                send_requests.push_back (sendRequestData);
-            }
-            else
-            {
-                if (comms[destTag] != nullptr)
-                {
-                    // Add the message directly to the destination rx queue (same process)
-                    ActionMessage M (msg);
-                     comms[destTag]->getRxMessageQueue ().push (M);
-                }
-            }
-            sendMsg = comms[i]->getTxMessageQueue ().try_pop ();
+            // Send the message using asynchronous send
+            MPI_Isend(sendRequestData.second.data (), sendRequestData.second.size (), MPI_CHAR, destRank, destTag, mpiCommunicator, &sendRequestData.first);
+            send_requests.push_back (sendRequestData);
         }
+        else
+        {
+            if (comms[destTag] != nullptr)
+            {
+                // Add the message directly to the destination rx queue (same process)
+                ActionMessage M (msg);
+                 comms[destTag]->getRxMessageQueue ().push (M);
+            }
+        }
+        sendMsg = txMessageQueue.try_pop ();
     }
 
     send_requests.remove_if (

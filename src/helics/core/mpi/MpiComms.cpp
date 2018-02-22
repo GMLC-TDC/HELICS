@@ -101,6 +101,8 @@ void MpiComms::queue_tx_function ()
 {
     tx_status = connection_status::connected;
 
+    auto & mpi_service = MpiService::getInstance ();
+
     std::map<int, std::string> routes;  // for all the other possible routes
 
     if (brokerAddress != "")
@@ -129,7 +131,6 @@ void MpiComms::queue_tx_function ()
                 }
                 break;
                 case DISCONNECT:
-                    std::cout << "WE GOT OUR DISCONNECT, WOWOWWWW!!!!!!" << getAddress () << std::endl;
                     rxMessageQueue.push (cmd);
                     goto CLOSE_TX_LOOP;  // break out of loop
                 }
@@ -146,7 +147,7 @@ void MpiComms::queue_tx_function ()
             {
                 // Send using MPI to broker
                 //std::cout << "send msg to brkr rt: " << prettyPrintString(cmd) << std::endl;
-                txMessageQueue.emplace (brokerAddress, cmd.to_vector ());
+                mpi_service.sendMessage (brokerAddress, cmd.to_vector ());
             }
         }
         else if (route_id == -1)
@@ -162,7 +163,7 @@ void MpiComms::queue_tx_function ()
             {
                 // Send using MPI to rank given by route
                 //std::cout << "send msg to rt: " << prettyPrintString(cmd) << std::endl;
-                txMessageQueue.emplace (rt_find->second, cmd.to_vector ());
+                mpi_service.sendMessage (rt_find->second, cmd.to_vector ());
             }
             else
             {
@@ -170,7 +171,7 @@ void MpiComms::queue_tx_function ()
                 {
                     // Send using MPI to broker
                     //std::cout << "send msg to brkr: " << prettyPrintString(cmd) << std::endl;
-                    txMessageQueue.emplace (brokerAddress, cmd.to_vector ());
+                    mpi_service.sendMessage (brokerAddress, cmd.to_vector ());
                 }
             }
         }
@@ -182,11 +183,8 @@ CLOSE_TX_LOOP:
     {
         shutdown = true;
     }
-
-    auto & mpi_service = MpiService::getInstance ();
-    mpi_service.removeMpiComms (this);
-    
     tx_status = connection_status::terminated;
+    mpi_service.removeMpiComms (this);
 }
 
 void MpiComms::closeReceiver() {
