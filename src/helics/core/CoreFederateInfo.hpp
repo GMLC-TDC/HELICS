@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef HELICS_CORE_FEDERATE_INFO_
-#define HELICS_CORE_FEDERATE_INFO_
+
 #pragma once
 
 #include "helics-time.hpp"
@@ -21,12 +18,11 @@ class CoreFederateInfo
 {
   public:
     Time timeDelta = timeEpsilon;  // the minimum time advance allowed by the federate
-                                   // federate
-    Time outputDelay = timeZero;  //!< the outputDelay value, the amount of time values take to propage to be
+    Time outputDelay = timeZero;  //!< the outputDelay value, the amount of time values and messages take to propagate to be
                                   //!< available to external federates
     Time inputDelay =
       timeZero;  //!< the time it takes values and messages to propagate to be accessible to the Federate
-    Time period = timeZero;  //!< a period value,  all granted times must be on this period
+    Time period = timeZero;  //!< a period value,  all granted times must be on this period n*Period+offset
     Time offset = timeZero;  //!< offset to the time period
     int logLevel = 1;  //!< the logging level above which not to log to file
     bool observer = false;  //!< flag indicating that the federate is an observer
@@ -44,4 +40,3 @@ class CoreFederateInfo
 };
 
 }  // namespace helics
-#endif  // HELICS_CORE_FEDERATE_INFO_

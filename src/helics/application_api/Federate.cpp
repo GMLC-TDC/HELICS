@@ -63,7 +63,12 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
     if (!coreObject->isConnected ())
     {
         coreObject->connect ();
+        if (!coreObject->isConnected())
+        {
+            throw (RegistrationFailure("Unable to connect to broker->unable to register federate"));
+        }
     }
+    
     // this call will throw an error on failure
     fedID = coreObject->registerFederate (fi.name, fi);
 

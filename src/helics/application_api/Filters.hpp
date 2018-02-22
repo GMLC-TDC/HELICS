@@ -55,7 +55,10 @@ class Filter
     /** set a message operator to process the message*/
     void setOperator (std::shared_ptr<FilterOperator> mo);
 
+    /** get the underlying filter id for use with a federate*/
     filter_id_t getID () const { return fid; }
+
+    /** get the underlying core handle for use with a core*/
     Core::handle_id_t getCoreHandle () const { return id; }
 
     /** get the target of the filter*/
