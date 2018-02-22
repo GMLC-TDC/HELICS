@@ -121,7 +121,7 @@ HELICS_Export helics_status helicsFilterSet (helics_filter filt, const char *pro
 @param property a string containing the property to set
 @param val a string containing the new value
 */
-HELICS_Export helics_status setString (helics_filter filt, const char *property, const char *val);
+HELICS_Export helics_status helicsFilterSetString (helics_filter filt, const char *property, const char *val);
 
 /**
 * \defgroup clone filter functions

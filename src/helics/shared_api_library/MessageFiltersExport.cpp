@@ -300,7 +300,7 @@ helics_status helicsFilterSet (helics_filter filt, const char *property, double 
     return helics_ok;
 }
 
-helics_status setString (helics_filter filt, const char *property, const char *val)
+helics_status helicsFilterSetString (helics_filter filt, const char *property, const char *val)
 {
     auto filter = getFilter (filt);
     if (filter == nullptr)
