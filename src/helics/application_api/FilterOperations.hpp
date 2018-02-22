@@ -70,8 +70,8 @@ class randomDelayGenerator;
 class RandomDelayFilterOperation : public FilterOperations
 {
     private:
-        std::shared_ptr<MessageTimeOperator> td;
         std::unique_ptr<randomDelayGenerator> rdelayGen;
+        std::shared_ptr<MessageTimeOperator> td;
 
     public:
     RandomDelayFilterOperation ();
