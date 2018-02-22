@@ -16,7 +16,7 @@ c_interface_tests.cpp
 test-value-federate1.cpp
 test-value-federate2.cpp
 test-message-federate.cpp
-test-filter-federate.cpp
+FilterTests.cpp
 federate_tests.cpp
 iteration_tests.cpp
 ctestFixtures.cpp
@@ -39,6 +39,8 @@ add_executable(c_interface_tests ${c_interface_test_sources} ${c_interface_test_
 target_link_libraries(c_interface_tests helicsSharedLib ${Boost_LIBRARIES_test})
 
 set_target_properties (c_interface_tests PROPERTIES FOLDER tests)
+
+target_compile_definitions(c_interface_tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
 
 add_test(NAME c_interface_tests COMMAND c_interface_tests --log_level=warning --report_level=short)
 
