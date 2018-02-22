@@ -18,7 +18,7 @@ application-api-tests.cpp
 ValueFederateTests1.cpp
 #ValueFederateTests2.cpp
 #MessageFederateTests.cpp
-#FilterTests.cpp
+FilterTests.cpp
 #FederateTests.cpp
 #TimingTests.cpp
 #iterationTests.cpp
