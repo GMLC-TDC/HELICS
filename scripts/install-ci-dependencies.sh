@@ -40,15 +40,25 @@ if [[ ! -f "dependencies" ]]; then
     mkdir -p dependencies;
 fi
 
+# Compares two semantic version numbers (major.minor.revision)
+check_minimum_version () {
+    local -a ver
+    IFS='. ' read -r -a ver <<< $1
+
+    local -a ver_min
+    IFS='. ' read -r -a ver_min <<< $1
+
+    if [[ ver[0] -lt ver_min[0] ]] || [[ ver[0] -eq ver_min[0] && ver[1] -lt ver_min[1] ]] || [[ ver[0] -eq ver_min[0] && ver[1] -eq ver_min[1] && ver[2] -lt ver_min[2] ]]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
 install_boost () {
     # Split argument 1 into 'ver' array, using '.' as delimiter
     local -a ver
     IFS='. ' read -r -a ver <<< $1
-
-    # Set a flag to indicate that boost unit tests not supported
-    if [ ver[0] -le 1 ] && [ ver[1] -lt 61 ]; then
-        export CI_NO_TESTS=true
-    fi
 
     # Download and install Boost
     local boost_version=$1
@@ -93,6 +103,7 @@ if [[ ! -d "dependencies/zmq" ]]; then
     )
     echo "*** built zmq successfully"
 fi
+
 # Install Boost
 if [[ ! -d "dependencies/boost" ]]; then
     echo "*** build boost"
@@ -100,6 +111,9 @@ if [[ ! -d "dependencies/boost" ]]; then
         install_boost 1.65.0
     else
         install_boost $CI_BOOST_VERSION
+        if ! check_minimum_version $CI_BOOST_VERSION 1.61.0 then
+            export CI_NO_TESTS=true
+        fi
     fi
     echo "*** built boost successfully"
 fi
