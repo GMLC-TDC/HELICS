@@ -170,7 +170,6 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     helicsCleanupHelicsLibrary ();
 }
 
-#if 0
 BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
                       bdata::make (core_types_single),
                       core_type)
@@ -179,15 +178,15 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     auto vFed1 = GetFederateAt (0);
 
     // register the publications
-    auto pubid = vFed1->registerPublication<std::string> ("pub1");
-    auto pubid2 = vFed1->registerGlobalPublication<int> ("pub2");
+    auto pubid = helicsFederateRegisterTypePublication (vFed1, "pub1", HELICS_STRING_TYPE, "");
+    auto pubid2 = helicsFederateRegisterGlobalTypePublication (vFed1, "pub2", HELICS_INT_TYPE, "");
 
-    auto pubid3 = vFed1->registerPublication ("pub3", "double", "V");
+    auto pubid3 = helicsFederateRegisterPublication (vFed1, "pub3", "double", "V");
 
-    auto subid = vFed1->registerOptionalSubscription ("sub1", "double", "V");
-    auto subid2 = vFed1->registerOptionalSubscription<int> ("sub2");
+    auto subid = helicsFederateRegisterOptionalSubscription (vFed1, "sub1", "double", "V");
+    auto subid2 = helicsFederateRegisterOptionalTypeSubscription (vFed1, "sub2", HELICS_INT_TYPE, "");
 
-    auto subid3 = vFed1->registerOptionalSubscription ("sub3", "double", "V");
+    auto subid3 = helicsFederateRegisterOptionalSubscription (vFed1, "sub3", "double", "V");
     // enter execution
     CE (helicsFederateEnterExecutionMode (vFed1));
 
@@ -195,33 +194,43 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     CE (helicsFederateGetState (vFed1, &state));
     BOOST_CHECK (state == helics_execution_state);
 
-    auto sv = vFed1->getSubscriptionKey (subid);
-    auto sv2 = vFed1->getSubscriptionKey (subid2);
+    char sv[HELICS_INT_TYPE];
+    CE (helicsSubscriptionGetKey (subid, sv, HELICS_SIZE_MAX));
+    char sv2[HELICS_INT_TYPE];
+    CE (helicsSubscriptionGetKey (subid2, sv2, HELICS_SIZE_MAX));
     BOOST_CHECK_EQUAL (sv, "sub1");
     BOOST_CHECK_EQUAL (sv2, "sub2");
-    auto sub3name = vFed1->getSubscriptionKey (subid3);
+    char sub3name[HELICS_INT_TYPE];
+    CE (helicsSubscriptionGetKey (subid3, sub3name, HELICS_SIZE_MAX));
     BOOST_CHECK_EQUAL (sub3name, "sub3");
 
-    BOOST_CHECK_EQUAL (vFed1->getSubscriptionType (subid3), "double");
-    BOOST_CHECK_EQUAL (vFed1->getSubscriptionUnits (subid3), "V");
+    char tmp[HELICS_SIZE_MAX];
+    CE (helicsSubscriptionGetType (subid3, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL (tmp, "double");
+    CE (helicsSubscriptionGetUnits (subid3, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL (tmp, "V");
 
     // check publications
 
-    sv = vFed1->getPublicationKey (pubid);
-    sv2 = vFed1->getPublicationKey (pubid2);
+    CE (helicsPublicationGetKey (pubid, sv, HELICS_SIZE_MAX));
+    CE (helicsPublicationGetKey (pubid2, sv2, HELICS_SIZE_MAX));
     BOOST_CHECK_EQUAL (sv, "fed0/pub1");
     BOOST_CHECK_EQUAL (sv2, "pub2");
-    auto pub3name = vFed1->getPublicationKey (pubid3);
+    char pub3name[HELICS_SIZE_MAX];
+    CE (helicsPublicationGetKey (pubid3, pub3name, HELICS_SIZE_MAX));
     BOOST_CHECK_EQUAL (pub3name, "fed0/pub3");
 
-    BOOST_CHECK_EQUAL (vFed1->getPublicationType (pubid3), "double");
-    BOOST_CHECK_EQUAL (vFed1->getPublicationUnits (pubid3), "V");
+    CE (helicsPublicationGetType (pubid3, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL (tmp, "double");
+    CE (helicsPublicationGetUnits (pubid3, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL (tmp, "V");
     CE (helicsFederateFinalize (vFed1));
 
     CE (helicsFederateGetState (vFed1, &state));
     BOOST_CHECK (state == helics_finalize_state);
     helicsCleanupHelicsLibrary ();
 }
+#if 0
 
 BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
                       bdata::make (core_types_single),
