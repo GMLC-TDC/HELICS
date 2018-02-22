@@ -66,6 +66,7 @@ install_boost () {
     wget --no-check-certificate -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
     (
         cd ${boost_version_str}/;
+        ./bootstrap --show-libraries
         ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test;
         ./b2 link=shared threading=multi variant=release > /dev/null;
         ./b2 install --prefix=../dependencies/boost > /dev/null;
