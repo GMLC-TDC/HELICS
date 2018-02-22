@@ -46,7 +46,7 @@ install_boost () {
     IFS='. ' read -r -a ver <<< $1
 
     # Set a flag to indicate that boost unit tests not supported
-    if [[ ver[0] <= 1 && ver[1] < 61 ]]; then
+    if [ ver[0] -le 1] && [ ver[1] -lt 61 ]; then
         export CI_NO_TESTS=true
     fi
 
