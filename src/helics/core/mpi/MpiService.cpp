@@ -54,8 +54,6 @@ void MpiService::startService ()
 
 void MpiService::serviceLoop ()
 {
-    std::cout << "Starting MPI service loop" << std::endl;
-
     // Startup/teardown for MPI can all go in separate functions
     // For integrating helics MPI calls with existing MPI applications, user may want to call from their own thread
 
@@ -75,10 +73,36 @@ void MpiService::serviceLoop ()
     // signal that we have finished starting
     startup_flag = false;
 
+    std::cout << "Started MPI service loop for rank " << commRank << std::endl;
+
+
     while (!stop_service)
     {
         // send/receive MPI messages
         sendAndReceiveMessages ();
+    }
+
+    std::cout << "End receive loop for rank " << commRank << std::endl;
+
+
+    // Post receives for any waiting sends
+    int message_waiting = 1;
+    MPI_Status status;
+    while (message_waiting)
+    {
+        MPI_Iprobe (MPI_ANY_SOURCE, MPI_ANY_TAG, mpiCommunicator, &message_waiting, &status);
+        if (message_waiting)
+        {
+            std::cout << "Unfinished receive to rank " << commRank << std::endl;
+            // Get the size of the message waiting to be received
+            int recv_size;
+            std::vector<char> buffer;
+            MPI_Get_count (&status, MPI_CHAR, &recv_size);
+            buffer.resize (recv_size);
+            
+            // Receive the message
+            MPI_Recv (buffer.data (), buffer.capacity (), MPI_CHAR, MPI_ANY_SOURCE, MPI_ANY_TAG, mpiCommunicator, &status);
+        }
     }
 
     // Finalize MPI
@@ -88,8 +112,9 @@ void MpiService::serviceLoop ()
     // MPI may have already been finalized if HELICS is used by a program that also uses MPI
     if (mpi_initialized)
     {
+        std::cout << "About to finalize MPI for rank " << commRank << std::endl;
         MPI_Finalize();
-        std::cout << "MPI Finalized" << std::endl;
+        std::cout << "MPI Finalized for rank " << commRank << std::endl;
     }
 }
 
@@ -183,7 +208,7 @@ void MpiService::sendAndReceiveMessages ()
     for (unsigned int i = 0; i < comms.size(); i++)
     {
         // Handle receives for the MpiComms object
-        int message_waiting = true;
+        int message_waiting = 1;
         MPI_Status status;
 
         while (message_waiting && !stop_service)
@@ -233,10 +258,18 @@ void MpiService::sendAndReceiveMessages ()
             int destRank = std::stoi (address.substr (0, addr_delim_pos));;
             int destTag = std::stoi (address.substr (addr_delim_pos+1, address.length ()));
 
-            // Send the message using asynchronous send
-            MPI_Isend(sendRequestData.second.data (), sendRequestData.second.size (), MPI_CHAR, destRank, destTag, mpiCommunicator, &sendRequestData.first);
-            send_requests.push_back (sendRequestData);
-
+            if (destRank != commRank)
+            {
+                // Send the message using asynchronous send
+                MPI_Isend(sendRequestData.second.data (), sendRequestData.second.size (), MPI_CHAR, destRank, destTag, mpiCommunicator, &sendRequestData.first);
+                send_requests.push_back (sendRequestData);
+            }
+            else
+            {
+                // Add the message directly to the destination rx queue (same process)
+                ActionMessage M (msg);
+                comms[destTag]->getRxMessageQueue ().push (M);
+            }
             sendMsg = comms[i]->getTxMessageQueue ().try_pop ();
         }
     }

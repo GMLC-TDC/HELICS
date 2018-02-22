@@ -30,13 +30,13 @@ MpiComms::MpiComms(const std::string &broker)
 {
     auto& mpi_service = MpiService::getInstance ();
     commAddress = mpi_service.addMpiComms (this);
-    std::cout << "MpiComms(" << brokerAddress << ")" << "- commAddress " << commAddress << std::endl;
+    std::cout << "MpiComms(" << brokerAddress << ")" << " - commAddress " << commAddress << std::endl;
 }
 
 /** destructor*/
 MpiComms::~MpiComms ()
 {
-    disconnect ();
+   disconnect ();
 }
 
 int MpiComms::processIncomingMessage (ActionMessage &M)
@@ -92,7 +92,7 @@ void MpiComms::queue_rx_function ()
         }
    }
 CLOSE_RX_LOOP:
-    std::cout << "Shutdown RX Loop" << std::endl;
+    std::cout << "Shutdown RX Loop for " << commAddress << std::endl;
     shutdown = true;
     rx_status = connection_status::terminated;
 }
@@ -143,14 +143,14 @@ void MpiComms::queue_tx_function ()
             if (hasBroker)
             {
                 // Send using MPI to broker
-                std::cout << "send msg to brkr rt: " << prettyPrintString(cmd) << std::endl;
+                //std::cout << "send msg to brkr rt: " << prettyPrintString(cmd) << std::endl;
                 txMessageQueue.emplace (brokerAddress, cmd.to_vector ());
             }
         }
         else if (route_id == -1)
         {  // send to rx thread loop
             // Send to ourself -- may need command line option to enable for openmpi
-            std::cout << "send msg to self" << prettyPrintString(cmd) << std::endl;
+            //std::cout << "send msg to self" << prettyPrintString(cmd) << std::endl;
             rxMessageQueue.push (cmd);
         }
         else
@@ -159,7 +159,7 @@ void MpiComms::queue_tx_function ()
             if (rt_find != routes.end ())
             {
                 // Send using MPI to rank given by route
-                std::cout << "send msg to rt: " << prettyPrintString(cmd) << std::endl;
+                //std::cout << "send msg to rt: " << prettyPrintString(cmd) << std::endl;
                 txMessageQueue.emplace (rt_find->second, cmd.to_vector ());
             }
             else
@@ -167,14 +167,14 @@ void MpiComms::queue_tx_function ()
                 if (hasBroker)
                 {
                     // Send using MPI to broker
-                    std::cout << "send msg to brkr: " << prettyPrintString(cmd) << std::endl;
+                    //std::cout << "send msg to brkr: " << prettyPrintString(cmd) << std::endl;
                     txMessageQueue.emplace (brokerAddress, cmd.to_vector ());
                 }
             }
         }
     }
 CLOSE_TX_LOOP:
-    std::cout << "Shutdown TX Loop" << std::endl;
+    std::cout << "Shutdown TX Loop for " << commAddress  << std::endl;
     routes.clear ();
     if (rx_status == connection_status::connected)
     {
