@@ -35,6 +35,8 @@ public:
 private:
 	virtual bool brokerConnect() override;
     std::string brokerAddress; //!< the mpi rank:tag of the parent broker
+    int brokerRank;
+    int brokerTag;
 };
 }
 #endif
