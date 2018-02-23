@@ -681,3 +681,4 @@ void helicsCleanupHelicsLibrary()
 {
     helics::cleanupHelicsLibrary();
 }
+
