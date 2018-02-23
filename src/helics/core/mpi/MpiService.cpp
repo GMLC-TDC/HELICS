@@ -99,7 +99,7 @@ void MpiService::serviceLoop ()
             buffer.resize (recv_size);
             
             // Receive the message
-            MPI_Recv (buffer.data (), buffer.capacity (), MPI_CHAR, MPI_ANY_SOURCE, MPI_ANY_TAG, mpiCommunicator, &status);
+            MPI_Recv (buffer.data (), buffer.capacity (), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG, mpiCommunicator, &status);
         }
     }
 
@@ -244,7 +244,7 @@ void MpiService::sendAndReceiveMessages ()
 
                 // Post an asynchronous receive
                 MPI_Request req;
-                MPI_Irecv (buffer.data (), buffer.capacity (), MPI_CHAR, MPI_ANY_SOURCE, i, mpiCommunicator, &req);
+                MPI_Irecv (buffer.data (), buffer.capacity (), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG, mpiCommunicator, &req);
 
                 // Wait until the asynchronous receive request has finished
                 int message_received = false;
