@@ -39,9 +39,9 @@ BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type
 	helics_time_t gtime;
 	const char s[] = ";";
 	int len = static_cast<int>(strlen(s));
-	char val[] = "";
+	char val[100] = "";
 	int actualLen = 10;
-	broker = helicsCreateBroker(core_type.c_str(), "", "--federates=2");
+	broker = helicsCreateBroker(core_type.c_str(), "", "--federates=1");
 	fi = helicsFederateInfoCreate();
 	status = helicsFederateInfoSetFederateName(fi, "fed0");
 	status = helicsFederateInfoSetCoreTypeFromString(fi, core_type.c_str());

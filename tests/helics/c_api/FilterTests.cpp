@@ -5,8 +5,8 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include "ctestFixtures.hpp"
 #include "test_configuration.h"
 #include <boost/test/unit_test.hpp>
@@ -58,7 +58,7 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-#if ENABLE_TEST_TIMEOUTS > 0
+#if ENABLE_TEST_TIMEOUTS > 0 
 BOOST_TEST_DECORATOR (*utf::timeout (5))
 #endif
 BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_type)
@@ -287,9 +287,8 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     auto p2 = helicsFederateRegisterGlobalEndpoint (dFed, "dest", "");
     auto p3 = helicsFederateRegisterGlobalEndpoint (dcFed, "cm", "");
 
-    auto f1 = helicsFederateRegisterSourceFilter (dcFed, helics_clone_filter, "src", "");
+    auto f1 = helicsFederateRegisterCloningFilter (dcFed, "cm");
     CE (helicsFilterAddSourceTarget (f1, "src"));
-    CE (helicsFilterAddDeliveryEndpoint (f1, "cm"));
 
     CE (helicsFederateEnterExecutionModeAsync (sFed));
     CE (helicsFederateEnterExecutionModeAsync (dcFed));
