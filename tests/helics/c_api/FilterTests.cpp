@@ -223,7 +223,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     BOOST_CHECK (f1 != NULL);
     CE (helicsFilterSet (f1, "delay", 2.5));
 
-    auto f2 = helicsFederateRegisterSourceFilter (fFed, helics_delay_filter, "port1", "filter2");
+    auto f2 = helicsFederateRegisterSourceFilter (fFed, helics_delay_filter, "port2", "filter2");
     BOOST_CHECK (f2 != NULL);
     CE (helicsFilterSet (f2, "delay", 2.5));
 
@@ -359,10 +359,9 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     auto p3 = helicsFederateRegisterGlobalEndpoint (dFed, "dest", "");
     auto p4 = helicsFederateRegisterGlobalEndpoint (dcFed, "cm", "");
 
-    auto f1 = helicsFederateRegisterSourceFilter (dcFed, helics_clone_filter, "src", "");
+    auto f1 = helicsFederateRegisterCloningFilter (dcFed, "cm");
     CE (helicsFilterAddSourceTarget (f1, "src"));
     CE (helicsFilterAddSourceTarget (f1, "src2"));
-    CE (helicsFilterAddDeliveryEndpoint (f1, "cm"));
 
     CE (helicsFederateEnterExecutionModeAsync (sFed));
     CE (helicsFederateEnterExecutionModeAsync (sFed2));

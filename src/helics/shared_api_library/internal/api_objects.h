@@ -122,6 +122,7 @@ namespace helics
         int valid;
 	};
 
+    /** enumeration of possible filter object types*/
     enum class ftype
     {
         source,

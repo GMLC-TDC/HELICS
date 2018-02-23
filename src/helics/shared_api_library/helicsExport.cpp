@@ -569,7 +569,6 @@ void helicsCloseLibrary ()
     {
         zmqContextManager::getContext ().close ();
     }
-
 #endif
     helics::LoggerManager::closeLogger ();
 }
@@ -682,3 +681,117 @@ void helicsCleanupHelicsLibrary()
     helics::cleanupHelicsLibrary();
 }
 
+
+MasterObjectHolder::MasterObjectHolder() noexcept {}
+
+MasterObjectHolder::~MasterObjectHolder()
+{
+#if HELICS_HAVE_ZEROMQ > 0
+    if (zmqContextManager::setContextToLeakOnDelete())
+    {
+        zmqContextManager::getContext().close();
+    }
+#endif
+    deleteAll();
+    //std::cout << "end of master Object Holder destructor" << std::endl;
+}
+int MasterObjectHolder::addBroker(helics::BrokerObject *broker)
+{
+    auto handle = brokers.lock();
+    auto index = static_cast<int> (handle->size());
+    handle->push_back(broker);
+    return index;
+}
+
+int MasterObjectHolder::addCore(helics::CoreObject *core)
+{
+    auto handle = cores.lock();
+    auto index = static_cast<int> (handle->size());
+    handle->push_back(core);
+    return index;
+}
+
+int MasterObjectHolder::addFed(helics::FedObject *fed)
+{
+    auto handle = feds.lock();
+    auto index = static_cast<int> (handle->size());
+    handle->push_back(fed);
+    return index;
+}
+
+void MasterObjectHolder::clearBroker(int index)
+{
+    auto broker = brokers.lock();
+    if (index < static_cast<int> (broker->size()))
+    {
+        (*broker)[index] = nullptr;
+    }
+}
+
+void MasterObjectHolder::clearCore(int index)
+{
+    auto core = cores.lock();
+    if (index < static_cast<int> (core->size()))
+    {
+        (*core)[index] = nullptr;
+    }
+}
+
+void MasterObjectHolder::clearFed(int index)
+{
+    auto fed = feds.lock();
+    if (index < static_cast<int> (fed->size()))
+    {
+        (*fed)[index] = nullptr;
+    }
+}
+
+void MasterObjectHolder::deleteAll()
+{
+    if (tripDetect.isTripped())
+    {
+        return;
+    }
+    {
+        auto brokerHandle = brokers.lock();
+        for (auto obj : *brokerHandle)
+        {
+            delete obj;
+        }
+        brokerHandle->clear();
+    }
+    {
+        auto coreHandle = cores.lock();
+        for (auto obj : *coreHandle)
+        {
+            delete obj;
+        }
+        coreHandle->clear();
+    }
+    auto fedHandle = feds.lock();
+    for (auto obj : *fedHandle)
+    {
+        delete obj;
+    }
+    fedHandle->clear();
+
+}
+
+std::shared_ptr<MasterObjectHolder> getMasterHolder()
+{
+    static auto instance = std::make_shared<MasterObjectHolder>();
+    static tripwire::TripWireTrigger tripTriggerholder;
+    return instance;
+}
+
+tripwire::TripWireTrigger tripTrigger;
+
+void clearAllObjects()
+{
+    auto v = getMasterHolder();
+    if (v)
+    {
+        v->deleteAll();
+    }
+
+}
