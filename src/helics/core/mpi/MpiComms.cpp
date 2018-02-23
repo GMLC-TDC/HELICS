@@ -189,7 +189,9 @@ CLOSE_TX_LOOP:
 
 void MpiComms::closeReceiver() {
     shutdown = true;
-    disconnect(); 
+    ActionMessage cmd (CMD_PROTOCOL);
+    cmd.index = CLOSE_RECEIVER;
+    rxMessageQueue.push (cmd);
 }
 
 }  // namespace helics

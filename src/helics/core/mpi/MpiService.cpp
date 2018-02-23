@@ -94,8 +94,12 @@ void MpiService::serviceLoop ()
         sendAndReceiveMessages ();
     }
 
+    MPI_Barrier (mpiCommunicator);
+
     // Make sure that receives get posted for any remaining sends
     drainRemainingMessages ();
+
+    MPI_Barrier (mpiCommunicator);
 
     // If HELICS initialized MPI, also finalize MPI
     if (helics_initialized_mpi)
@@ -257,7 +261,10 @@ void MpiService::sendAndReceiveMessages ()
                 ActionMessage M (buffer);
 
                 // Add to the received message queue for the MpiComms object
-                comms[i]->getRxMessageQueue ().push (M);
+                if (comms[i] != nullptr)
+                {
+                    comms[i]->getRxMessageQueue ().push (M);
+                }
             }
         }
 
