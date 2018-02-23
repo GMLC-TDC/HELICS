@@ -32,6 +32,7 @@ class MpiService {
 public:
     static MpiService& getInstance();
     static void setMpiCommunicator (MPI_Comm communicator);
+    static void setStartServiceThread (bool start);
 
     std::string addMpiComms (MpiComms *comm);
     void removeMpiComms (MpiComms *comm);
@@ -52,6 +53,7 @@ private:
 
     int commRank;
     static MPI_Comm mpiCommunicator;
+    static bool startServiceThread;
 
     std::vector<MpiComms*> comms;
     std::list<std::pair<MPI_Request, std::vector<char>>> send_requests;

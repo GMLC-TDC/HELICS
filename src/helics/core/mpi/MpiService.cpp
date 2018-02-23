@@ -12,17 +12,26 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 namespace helics {
 
 MPI_Comm MpiService::mpiCommunicator = MPI_COMM_NULL;
+bool MpiService::startServiceThread = true;
 
 MpiService& MpiService::getInstance ()
 {
     static MpiService instance;
-    instance.startService ();
+    if (startServiceThread)
+    {
+        instance.startService ();
+    }
     return instance;
 }
 
 void MpiService::setMpiCommunicator (MPI_Comm communicator)
 {
     mpiCommunicator = communicator;
+}
+
+void MpiService::setStartServiceThread (bool start)
+{
+    startServiceThread = start;
 }
 
 MpiService::MpiService ()
