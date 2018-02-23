@@ -40,14 +40,6 @@ target_link_libraries(shared-library-tests ${Boost_LIBRARIES_test})
 
 set_target_properties (shared-library-tests PROPERTIES FOLDER tests)
 
-#add a bigobj indicator for this project
-#IF(MINGW)
-#target_compile_options(shared-library-tests PRIVATE "-Wa,-mbig-obj")
-#ENDIF(MINGW)
-
-#if (MSVC)
-#target_compile_options(shared-library-tests PRIVATE /bigobj)
-#endif(MSVC)
 
 target_compile_definitions(shared-library-tests PRIVATE "-DHELICS_BROKER_LOCATION=\"${HELICS_BROKER_LOC}\"")
 target_compile_definitions(shared-library-tests PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\"")

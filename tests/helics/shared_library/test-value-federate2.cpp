@@ -5,6 +5,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
+
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -12,11 +13,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <future>
 #include <iostream>
-#include "ctestFixtures.h"
+#include "ctestFixtures.hpp"
 
 #include "test_configuration.h"
 
-#include <ValueFederate.h>
 /** these test cases test out the value converters and some of the other functions
 */
 
@@ -30,7 +30,6 @@ namespace bdata = boost::unit_test::data;
 
 BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type)
 {
-	helics_status status;
 	helics_federate_info_t fi;
 	helics_broker broker;
 	helics_federate vFed1;
@@ -39,31 +38,34 @@ BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type
 	helics_time_t gtime;
 	const char s[] = ";";
 	int len = static_cast<int>(strlen(s));
-	char val[] = "";
+	char val[100] = "";
 	int actualLen = 10;
-	broker = helicsCreateBroker(core_type.c_str(), "", "--federates=2");
+	broker = helicsCreateBroker(core_type.c_str(), "", "--federates=1");
 	fi = helicsFederateInfoCreate();
-	status = helicsFederateInfoSetFederateName(fi, "fed0");
-	status = helicsFederateInfoSetCoreTypeFromString(fi, core_type.c_str());
+    CE(helicsFederateInfoSetFederateName(fi, "fed0"));
+        CE(helicsFederateInfoSetCoreTypeFromString(fi, core_type.c_str()));
 	vFed1 = helicsCreateValueFederate(fi);
 
 	pubid1 = helicsFederateRegisterPublication(vFed1, "pub1", "string", "");
+    BOOST_CHECK(pubid1 != nullptr);
 	pubid2 = helicsFederateRegisterGlobalPublication(vFed1, "pub2", "integer", "");
+    BOOST_CHECK(pubid2 != nullptr);
 	pubid3 = helicsFederateRegisterPublication(vFed1, "pub3", "", "");
+    BOOST_CHECK(pubid3 != nullptr);
 	sub1 = helicsFederateRegisterOptionalSubscription(vFed1, "fed0/pub3", "", "");
-	status = helicsFederateSetTimeDelta(vFed1, 1.0);
+    CE(helicsFederateSetTimeDelta(vFed1, 1.0));
 
-	status = helicsFederateEnterExecutionMode(vFed1);
-	status = helicsPublicationPublish(pubid3, s, len);
+    CE(helicsFederateEnterExecutionMode(vFed1));
+    CE(helicsPublicationPublish(pubid3, s, len));
 
-	status = helicsFederateRequestTime(vFed1, 1.0, &gtime);
+    CE(helicsFederateRequestTime(vFed1, 1.0, &gtime));
 
 	BOOST_CHECK(helicsSubscriptionIsUpdated(sub1));
 
     int len1 = helicsSubscriptionGetValueSize(sub1);
 
     BOOST_CHECK_EQUAL(len1, len);
-	status = helicsSubscriptionGetValue(sub1, val, 100, &actualLen);
+    CE(helicsSubscriptionGetValue(sub1, val, 100, &actualLen));
     BOOST_CHECK_EQUAL(actualLen, len);
 
     len1 = helicsSubscriptionGetValueSize(sub1);
@@ -382,14 +384,13 @@ BOOST_DATA_TEST_CASE(test_async_calls, bdata::make(core_types), core_type)
 //
 BOOST_AUTO_TEST_CASE(test_file_load)
 {
-	helics_status status;
-	helics_federate_info_t fi;
 	helics_federate vFed;
 	char s[100] = "";
-	fi = helicsFederateInfoCreate();
+	//fi = helicsFederateInfoCreate();
 	// path of the json file is hardcoded for now
-	vFed = helicsCreateValueFederateFromJson("C:/HELICS/HELICS-src/tests/helics/c_interface/test_files/example_value_fed.json");
-	status = helicsFederateGetName(vFed, s, 200);
+	vFed = helicsCreateValueFederateFromJson(TEST_DIR "/test_files/example_value_fed.json");
+    BOOST_REQUIRE_NE(vFed, nullptr);
+	CE (helicsFederateGetName(vFed, s, 100));
 	BOOST_CHECK_EQUAL(s, "valueFed");
 	BOOST_CHECK_EQUAL(helicsFederateGetSubscriptionCount(vFed), 2);
 	BOOST_CHECK_EQUAL(helicsFederateGetPublicationCount(vFed), 2);
@@ -399,5 +400,6 @@ BOOST_AUTO_TEST_CASE(test_file_load)
 
 	//	 BOOST_CHECK_EQUAL(vFed.getSubscriptionCount(), 2);
 	//	 BOOST_CHECK_EQUAL(vFed.getPublicationCount(), 2);
+    helicsFederateFree(vFed);
 }
 BOOST_AUTO_TEST_SUITE_END()
