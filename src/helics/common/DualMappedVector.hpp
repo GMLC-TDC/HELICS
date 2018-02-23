@@ -9,6 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #pragma once
 #include <unordered_map>
+#include <map>
 #include <string>
 #include <vector>
 #include <type_traits>

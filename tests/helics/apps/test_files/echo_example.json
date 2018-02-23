@@ -1,0 +1,15 @@
+{
+  "echo": {
+    "delay": "1.2s"
+  },
+  "endpoints": [
+    {
+      "name": "test",
+      "global": true
+    },
+    {
+      "name": "test2",
+      "global": true
+    }
+  ]
+}

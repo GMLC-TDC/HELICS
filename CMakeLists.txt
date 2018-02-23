@@ -7,10 +7,9 @@ project (HELICS)
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
 set (HELICS_VERSION_PATCH 0)
-
-set (HELICS_VERSION_BUILD alpha.2)
-set (HELICS_DATE "02-02-18")
-set (HELICS_VERSION_STRING "1.0.0-alpha.2 (02-15-18)")
+set (HELICS_VERSION_BUILD alpha.3)
+set (HELICS_DATE "02-12-18")
+set (HELICS_VERSION_STRING "1.0.0-alpha.3 (02-15-18)")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -114,10 +113,9 @@ ELSE(UNIX)
   ENDIF(MINGW)
 ENDIF(UNIX)
 
-IF (BUILD_MATLAB OR USE_BOOST_STATIC_LIBS)
+IF (USE_BOOST_STATIC_LIBS)
   set(Boost_USE_STATIC_LIBS ON)
   set(BOOST_STATIC ON)
-
 ENDIF ()
 # -------------------------------------------------------------
 # add coverage target

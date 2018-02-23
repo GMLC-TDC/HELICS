@@ -8,7 +8,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "PrecHelper.h"
+#include "PrecHelper.hpp"
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push

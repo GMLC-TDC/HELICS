@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_CORE_
-#define _HELICS_CORE_
+
 #pragma once
 
 #include "core-data.hpp"
@@ -33,13 +30,9 @@ namespace helics
  * separate threads in order to function correctly.
  *
  *
- *  For Memory management all message_t and data_t pointers return from the core API should be released via
- a call to the dereference function,  the core assumes all data given it via send or publish calls could be invalid
- after the call returns
- *
  * Implementations should be thread safe.
  *
- * Note: Methods should all be pure virtual, leaving syntactical sugar off while iterating API design.
+ * Note: Methods should all be pure virtual.
  */
 
 class CoreFederateInfo;
@@ -140,6 +133,11 @@ class Core
      * May only be invoked in Created state otherwise an error is thrown
      */
     virtual void enterInitializingState (federate_id_t federateID) = 0;
+
+    /** set the core to ready to enter init
+    @details this function only needs to be called for cores that don't have any federates but may
+    have filters for cores with federates it won't do anything*/
+    virtual void setCoreReadyToInit() = 0; 
 
     /**
      * Change the federate state to the Executing state.
@@ -632,4 +630,3 @@ constexpr Core::handle_id_t direct_send_handle =
 
 }  // namespace helics
 
-#endif /* _HELICS_CORE_ */

@@ -114,6 +114,9 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message)
     res = vFed2->requestTimeComplete ();
     BOOST_CHECK_EQUAL (res, 0.9);  // the message should show up at the next available time point
     vFed2->requestTimeAsync (2.0);
+    res = vFed2->requestTimeComplete();
+    BOOST_CHECK_EQUAL(res, 2.25);  // the message should show up at the next available time point
+    vFed2->requestTimeAsync(3.0);
     res = vFed1->requestTimeComplete ();
     BOOST_CHECK_EQUAL (res, 2.4);
     vFed1->finalize ();
