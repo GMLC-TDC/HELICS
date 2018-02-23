@@ -31,6 +31,7 @@ MpiService::MpiService ()
     comms_connected = 0;
     stop_service = false;
     startup_flag = false;
+    helics_initialized_mpi = false;
 }
 
 MpiService::~MpiService ()
@@ -87,16 +88,20 @@ void MpiService::serviceLoop ()
     // Make sure that receives get posted for any remaining sends
     drainRemainingMessages ();
 
-    // Finalize MPI
-    int mpi_initialized;
-    MPI_Initialized(&mpi_initialized);
-    
-    // MPI may have already been finalized if HELICS is used by a program that also uses MPI
-    if (mpi_initialized)
+    // If HELICS initialized MPI, also finalize MPI
+    if (helics_initialized_mpi)
     {
-        std::cout << "About to finalize MPI for rank " << commRank << std::endl;
-        MPI_Finalize();
-        std::cout << "MPI Finalized for rank " << commRank << std::endl;
+        // Finalize MPI
+        int mpi_initialized;
+        MPI_Initialized(&mpi_initialized);
+    
+        // Probably not a necessary check, a user using MPI should have also initialized it themselves
+        if (mpi_initialized)
+        {
+            std::cout << "About to finalize MPI for rank " << commRank << std::endl;
+            MPI_Finalize();
+            std::cout << "MPI Finalized for rank " << commRank << std::endl;
+        }
     }
 }
 
@@ -182,6 +187,8 @@ bool MpiService::initMPI()
             std::cerr << "MPI initialization failed" << std::endl;
             return false;
         }
+
+        helics_initialized_mpi = true;
     }
 
     MPI_Query_thread(&mpi_thread_level);

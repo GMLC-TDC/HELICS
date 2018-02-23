@@ -57,7 +57,7 @@ private:
     std::list<std::pair<MPI_Request, std::vector<char>>> send_requests;
     BlockingQueue<std::pair<std::string, std::vector<char>>> txMessageQueue;
 
-
+    bool helics_initialized_mpi;
     std::atomic<int> comms_connected;
     std::atomic<bool> startup_flag;
     std::atomic<bool> stop_service;
