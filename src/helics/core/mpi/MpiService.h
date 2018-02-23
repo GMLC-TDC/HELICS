@@ -39,7 +39,7 @@ public:
     int getRank();
     int getTag (MpiComms *comm);
 
-    void sendMessage (std::string address, std::vector<char> message) { txMessageQueue.emplace (address, message); }
+    void sendMessage (std::string address, std::vector<char> message) { txMessageQueue.emplace (address, std::move (message)); }
 
     void sendAndReceiveMessages ();
 
