@@ -467,6 +467,21 @@ helics_status helicsBrokerGetAddress (helics_broker broker, char *address, int m
     return helics_ok;
 }
 
+helics_status helicsCoreSetReadyToInit(helics_core core)
+{
+    if (core == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    auto cr = getCore(core);
+    if (cr == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    cr->setCoreReadyToInit();
+    return helics_ok;
+}
+
 helics_status helicsCoreDisconnect (helics_core core)
 {
     if (core == nullptr)

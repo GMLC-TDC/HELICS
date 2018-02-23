@@ -1,13 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include "CoreBroker.hpp"
 #include "../common/stringToCmdLine.h"
 #include "BrokerFactory.hpp"
@@ -17,7 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/format.hpp>
 
 #include "../common/logger.h"
-#include "TimeCoordinator.hpp"
+#include "ForwardingTimeCoordinator.hpp"
 #include "loggingHelper.hpp"
 #include <fstream>
 #include <json/json.h>
@@ -477,13 +476,11 @@ void CoreBroker::processCommand (ActionMessage &&command)
                         transmit(broker.route_id, m);
                     }
                 }
-                timeCoord->enteringExecMode (helics_iteration_request::no_iterations);
+                timeCoord->enteringExecMode ();
                 auto res = timeCoord->checkExecEntry ();
                 if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations,
-                                            Time::maxVal (), Time::maxVal ());
                 }
             }
             else
@@ -516,13 +513,11 @@ void CoreBroker::processCommand (ActionMessage &&command)
             transmit (brk.route_id, command);
         }
         {
-            timeCoord->enteringExecMode (helics_iteration_request::no_iterations);
+            timeCoord->enteringExecMode ();
             auto res = timeCoord->checkExecEntry ();
             if (res == iteration_state::next_step)
             {
                 enteredExecutionMode = true;
-                timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations, Time::maxVal (),
-                                        Time::maxVal ());
             }
         }
         break;
@@ -582,8 +577,8 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations,
-                                            Time::maxVal (), Time::maxVal ());
+                    LOG_DEBUG(global_broker_id, getIdentifier(),
+                        "entering Exec Mode");
                     LOG_DEBUG(global_broker_id, getIdentifier(),
                         "entering Exec Mode");
                 }
@@ -615,9 +610,9 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         else if (command.dest_id == global_broker_id)
         {
-            if (timeCoord->processTimeMessage (command))
+            if (timeCoord->processTimeMessage(command))
             {
-                timeCoord->checkTimeGrant ();
+                timeCoord->updateTimeFactors();
             }
         }
         else
@@ -840,15 +835,13 @@ void CoreBroker::addSourceFilter (ActionMessage &m)
         }
 
         transmit (0, m);
-        if (!hasTimeDependency)
+        if (!hasFilters)
         {
-            if (timeCoord->addDependency(higher_broker_id))
+            hasFilters = true;
+            if (timeCoord->addDependent(higher_broker_id))
             {
-                hasTimeDependency = true;
-                ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id, higher_broker_id);
+                ActionMessage add(CMD_ADD_DEPENDENCY, global_broker_id, higher_broker_id);
                 transmit(getRoute(higher_broker_id), add);
-
-                timeCoord->addDependent(higher_broker_id);
             }
         }
     }
@@ -891,15 +884,14 @@ void CoreBroker::addDestFilter (ActionMessage &m)
             setActionFlag (m, processingComplete);
         }
         transmit (0, m);
-        if (!hasTimeDependency)
+        if (!hasFilters)
         {
-            if (timeCoord->addDependency(higher_broker_id))
+            hasFilters = true;
+            if (timeCoord->addDependent(higher_broker_id))
             {
                 hasTimeDependency = true;
-                ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id, higher_broker_id);
+                ActionMessage add(CMD_ADD_DEPENDENCY, global_broker_id, higher_broker_id);
                 transmit(getRoute(higher_broker_id), add);
-
-                timeCoord->addDependent(higher_broker_id);
             }
         }
     }

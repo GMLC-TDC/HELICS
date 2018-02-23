@@ -148,6 +148,28 @@ std::shared_ptr<Core> create (core_type type, const std::string &core_name, std:
     return core;
 }
 
+std::shared_ptr<Core> create(int argc, const char *const *argv)
+{
+    core_type type = core_type::DEFAULT;
+    for (int ii = 1; ii < argc; ++ii)
+    {
+        if (strncmp("coretype", argv[ii], 8) == 0)
+        {
+            if (strlen(argv[ii]) > 9)
+            {
+                type = coreTypeFromString(&(argv[ii][9]));
+            }
+            else
+            {
+                type = coreTypeFromString(argv[ii + 1]);
+            }
+            break;
+        }
+    }
+    return create(type, argc, argv);
+}
+
+
 std::shared_ptr<Core> create (core_type type, int argc, const char *const *argv)
 {
     auto core = makeCore (type, "");

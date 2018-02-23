@@ -1,19 +1,16 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
 /** @file
 functions for dealing with query results*/
 
-#ifndef _HELICS_QUERY_FUNCTIONS_H_
-#define _HELICS_QUERY_FUNCTIONS_H_
+
 #pragma once
 
 #include <string>
@@ -59,4 +56,4 @@ bool waitForInit (helics::Federate *fed, const std::string &fedName, int timeout
 @return true if the federate exists, false if the timeout occurred
 */
 bool waitForFed (helics::Federate *fed, const std::string &fedName, int timeout = 10000 /*time in ms*/);
-#endif /*_HELICS_QUERY_FUNCTIONS_H_*/
+

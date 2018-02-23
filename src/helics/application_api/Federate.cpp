@@ -71,8 +71,8 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
     asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
 }
 
-Federate::Federate (std::shared_ptr<Core> core, const FederateInfo &fi)
-    : coreObject (std::move (core)), FedInfo (fi)
+Federate::Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : coreObject (core), FedInfo (fi)
 {
     if (!coreObject)
     {
@@ -243,6 +243,7 @@ iteration_result Federate::enterExecutionState (helics_iteration_request iterate
         {
         case iteration_result::next_step:
             state = op_states::execution;
+            currentTime = timeZero;
             initializeToExecuteStateTransition ();
             break;
         case iteration_result::iterating:
@@ -322,6 +323,7 @@ iteration_result Federate::enterExecutionStateComplete ()
     {
     case iteration_result::next_step:
         state = op_states::execution;
+        currentTime = timeZero;
         initializeToExecuteStateTransition ();
         break;
     case iteration_result::iterating:

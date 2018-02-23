@@ -6,7 +6,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
-
 #pragma once
 
 #include "HelicsPrimaryTypes.hpp"
@@ -30,23 +29,27 @@ class SubscriptionBase
   public:
     SubscriptionBase () = default;
 
-    SubscriptionBase (ValueFederate *valueFed,
+    template<class FedPtr>
+    SubscriptionBase (FedPtr valueFed,
                       const std::string &key,
                       const std::string &type = "def",
                       const std::string &units = std::string())
-        : fed (valueFed), key_ (key), type_ (type), units_ (units)
+        : fed (std::addressof(*valueFed)), key_ (key), type_ (type), units_ (units)
     {
+        static_assert(std::is_base_of<ValueFederate, std::remove_reference_t<decltype(*valueFed)>>::value, "first argument must be a pointer to a ValueFederate");
         id = fed->registerRequiredSubscription (key_, type_, units_);
     }
 
-    SubscriptionBase (bool required,
-                      ValueFederate *valueFed,
+    template<class FedPtr>
+    SubscriptionBase (interface_availability required,
+                      FedPtr valueFed,
                       const std::string &key,
                       const std::string &type = "def",
                       const std::string &units = std::string())
-        : fed (valueFed), key_ (key), type_ (type), units_ (units)
+        : fed (std::addressof(*valueFed)), key_ (key), type_ (type), units_ (units)
     {
-        if (required)
+        static_assert(std::is_base_of<ValueFederate, std::remove_reference_t<decltype(*valueFed)>>::value, "second argument must be a pointer to a ValueFederate");
+        if (required==interface_availability::required)
         {
             id = fed->registerRequiredSubscription (key_, type_, units_);
         }
@@ -108,25 +111,28 @@ class Subscription : public SubscriptionBase
     double delta = -1.0;  //!< the minimum difference
   public:
     Subscription () = default;
-    Subscription (ValueFederate *valueFed, const std::string &key, const std::string &units = "")
+    template<class FedPtr>
+    Subscription (FedPtr valueFed, const std::string &key, const std::string &units = std::string())
         : SubscriptionBase (valueFed, key, "def", units)
     {
     }
 
-    Subscription (bool required, ValueFederate *valueFed, const std::string &key, const std::string &units = "")
+    template<class FedPtr>
+    Subscription (interface_availability required, FedPtr valueFed, const std::string &key, const std::string &units = std::string())
         : SubscriptionBase (required, valueFed, key, "def", units)
     {
     }
 
-    Subscription (ValueFederate *valueFed,
+    template<class FedPtr>
+    Subscription (FedPtr valueFed,
                   const std::string &key,
                   helics_type_t defType,
                   const std::string &units = std::string())
         : SubscriptionBase (valueFed, key, typeNameStringRef (defType), units)
     {
     }
-
-    Subscription (bool required,
+    template<class FedPtr>
+    Subscription (interface_availability required,
                   ValueFederate *valueFed,
                   const std::string &key,
                   helics_type_t defType,
@@ -202,7 +208,7 @@ class Subscription : public SubscriptionBase
         getValue (gval);
         return static_cast<X> (gval);
     }
-    /** get the most recent calculation with the result as a convertible type*/
+    /** get the most recent value with the result as a convertible type*/
     template <class X>
     typename std::enable_if_t<isConvertableType<X> ()> getValueAs (X &out)
     {
@@ -278,7 +284,8 @@ class SubscriptionT : public SubscriptionBase
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
-    SubscriptionT (ValueFederate *valueFed, const std::string &name, const std::string &units = "")
+    template<class FedPtr>
+    SubscriptionT (FedPtr valueFed, const std::string &name, const std::string &units = std::string())
         : SubscriptionBase (valueFed, name, ValueConverter<X>::type (), units)
     {
     }
@@ -288,7 +295,8 @@ class SubscriptionT : public SubscriptionBase
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
-    SubscriptionT (bool required, ValueFederate *valueFed, const std::string &name, const std::string &units = "")
+    template<class FedPtr>
+    SubscriptionT (interface_availability required, FedPtr valueFed, const std::string &name, const std::string &units = "")
         : SubscriptionBase (required, valueFed, name, ValueConverter<X>::type (), units)
     {
     }
@@ -363,18 +371,20 @@ class VectorSubscription
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
-    VectorSubscription (bool required,
-                        ValueFederate *valueFed,
+    template<class FedPtr>
+    VectorSubscription (interface_availability required,
+                        FedPtr valueFed,
                         std::string name,
                         int startIndex,
                         int count,
                         const X &defValue,
-                        const std::string &units = "")
-        : fed (valueFed), m_name (std::move (name)), m_units (units)
+                        const std::string &units = std::string())
+        : fed (std::addressof(*valueFed)), m_name (std::move (name)), m_units (units)
     {
+        static_assert(std::is_base_of<ValueFederate, std::remove_reference_t<decltype(*valueFed)>>::value, "first argument must be a pointer to a ValueFederate");
         ids.reserve (count);
         vals.resize (count, defValue);
-        if (required)
+        if (required==interface_availability::required)
         {
             for (auto ind = startIndex; ind < startIndex + count; ++ind)
             {
@@ -399,12 +409,13 @@ class VectorSubscription
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
-    VectorSubscription (ValueFederate *valueFed,
+    template<class FedPtr>
+    VectorSubscription (FedPtr valueFed,
                         std::string name,
                         int startIndex,
                         int count,
                         const X &defValue,
-                        std::string units = "")
+                        const std::string &units = std::string())
         : VectorSubscription (false, valueFed, name, startIndex, count, defValue, units)
     {
     }
@@ -484,20 +495,22 @@ class VectorSubscription2d
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
-    VectorSubscription2d (bool required,
-                          ValueFederate *valueFed,
-                          std::string name,
-                          int startIndex_x,
-                          int count_x,
-                          int startIndex_y,
-                          int count_y,
-                          const X &defValue,
-                          const std::string &units = "")
-        : fed (valueFed), m_name (std::move (name)), m_units (units)
+    template<class FedPtr>
+    VectorSubscription2d(interface_availability required,
+        FedPtr valueFed,
+        std::string name,
+        int startIndex_x,
+        int count_x,
+        int startIndex_y,
+        int count_y,
+        const X &defValue,
+        const std::string &units = std::string())
+        : fed (std::addressof(*valueFed)), m_name (std::move (name)), m_units (units)
     {
+        static_assert(std::is_base_of<ValueFederate, std::remove_reference_t<decltype(*valueFed)>>::value, "Second argument must be a pointer to a ValueFederate");
         ids.reserve (count_x * count_y);
         vals.resize (count_x * count_y, defValue);
-        if (required)
+        if (required==interface_availability::required)
         {
             for (auto ind_x = startIndex_x; ind_x < startIndex_x + count_x; ++ind_x)
             {
@@ -533,15 +546,16 @@ class VectorSubscription2d
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
-    VectorSubscription2d (ValueFederate *valueFed,
-                          const std::string &name,
-                          int startIndex_x,
-                          int count_x,
-                          int startIndex_y,
-                          int count_y,
-                          const X &defValue,
-                          const std::string &units = "")
-        : VectorSubscription2d (false,
+    template<class FedPtr>
+    VectorSubscription2d(FedPtr valueFed,
+        const std::string &name,
+        int startIndex_x,
+        int count_x,
+        int startIndex_y,
+        int count_y,
+        const X &defValue,
+        const std::string &units = std::string())
+        : VectorSubscription2d(interface_availability::optional,
                                 valueFed,
                                 name,
                                 startIndex_x,

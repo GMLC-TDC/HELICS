@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef TIME_DEPENDENCIES_H_
-#define TIME_DEPENDENCIES_H_
+
 #pragma once
 
 #include "Core.hpp"
@@ -24,7 +21,7 @@ class DependencyInfo
 {
   public:
     /**enumeration of possible states for a federate to be in regards to time request*/
-    enum class time_state_t : int
+    enum class time_state_t : int16_t
     {
         initialized = 0,
         exec_requested_iterative = 1,
@@ -34,14 +31,17 @@ class DependencyInfo
         time_requested = 5,
     };
     Core::federate_id_t fedID = invalid_fed_id;  //!< identifier for the dependency
+    Core::federate_id_t minFed = invalid_fed_id; //!< identfier for the min dependency
     time_state_t time_state = time_state_t::initialized;  //!< the current state of the dependency
+    
     Time Tnext = negEpsilon;  //!< next possible message or value
     Time Te = timeZero;  //!< the next currently scheduled event
     Time Tdemin = timeZero;  //!< min dependency event time
+    Time forwardEvent = Time::maxVal(); //!< a predicted event
     /** default constructor*/
     DependencyInfo () = default;
     /** construct from a federate id*/
-    DependencyInfo (Core::federate_id_t id) : fedID (id){};
+    explicit DependencyInfo (Core::federate_id_t id) : fedID (id){};
 
 	/** process a dependency related message
 	@param m  a reference to an action message that contains some instructions for modifying dependencies
@@ -95,4 +95,3 @@ class TimeDependencies
     void resetIteratingTimeRequests (Time requestTime);
 };
 }
-#endif  // DEPENDENCY_INFO_H_
