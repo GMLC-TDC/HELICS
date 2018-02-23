@@ -113,10 +113,9 @@ ELSE(UNIX)
   ENDIF(MINGW)
 ENDIF(UNIX)
 
-IF (BUILD_MATLAB OR USE_BOOST_STATIC_LIBS)
+IF (USE_BOOST_STATIC_LIBS)
   set(Boost_USE_STATIC_LIBS ON)
   set(BOOST_STATIC ON)
-	  
 ENDIF ()
 # -------------------------------------------------------------
 # add coverage target
@@ -207,7 +206,7 @@ add_library(helics-static STATIC
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
-target_link_libraries(helics-static Threads::Threads) 
+target_link_libraries(helics-static Threads::Threads)
 IF (UNIX AND NOT APPLE)
 target_link_libraries(helics-static rt)
 ENDIF()
