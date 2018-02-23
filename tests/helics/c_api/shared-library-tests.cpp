@@ -15,7 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define BOOST_TEST_DYN_LINK
 #endif
 
-#define BOOST_TEST_MODULE application_api_tests
+#define BOOST_TEST_MODULE shared-library-tests
 #define BOOST_TEST_DETECT_MEMORY_LEAK 0
 
 #include <boost/test/unit_test.hpp>

@@ -7,7 +7,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "testFixtures.hpp"
+#include "ctestFixtures.hpp"
 #include "test_configuration.h"
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -85,7 +85,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     CE (helicsFederateGetState (fFed, &state));
     BOOST_CHECK (state == helics_execution_state);
     std::string data(500, 'a');
-    CE (helicsEndpointSendMessageRaw (p1, "port2", data.c_str(), data.size()));
+    CE (helicsEndpointSendMessageRaw (p1, "port2", data.c_str(), static_cast<int>(data.size())));
 
     helics_time_t timeOut;
     CE (helicsFederateRequestTimeAsync (mFed, 1.0));
@@ -109,7 +109,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     BOOST_CHECK_EQUAL (m2.source, "port1");
     BOOST_CHECK_EQUAL (m2.original_source, "port1");
     BOOST_CHECK_EQUAL (m2.dest, "port2");
-    BOOST_CHECK_EQUAL (m2.length, data.size ());
+    BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t>(data.size()));
     BOOST_CHECK_EQUAL (m2.time, 2.5);
 
     CE (helicsFederateRequestTime (mFed, 3.0, &timeOut));
@@ -158,7 +158,7 @@ BOOST_DATA_TEST_CASE(message_filter_function_two_stage, bdata::make(core_types),
     CE (helicsFederateGetState (fFed, &state));
     BOOST_CHECK(state == helics_execution_state);
     std::string data(500, 'a');
-    CE (helicsEndpointSendMessageRaw (p1, "port2", data.c_str(), data.size()));
+    CE (helicsEndpointSendMessageRaw (p1, "port2", data.c_str(), static_cast<int>(data.size())));
 
     helics_time_t timeOut;
     CE (helicsFederateRequestTimeAsync (mFed, .0));
@@ -189,7 +189,7 @@ BOOST_DATA_TEST_CASE(message_filter_function_two_stage, bdata::make(core_types),
     BOOST_CHECK_EQUAL(m2.source, "port1");
     BOOST_CHECK_EQUAL(m2.original_source, "port1");
     BOOST_CHECK_EQUAL(m2.dest, "port2");
-    BOOST_CHECK_EQUAL(m2.length, data.size());
+    BOOST_CHECK_EQUAL(m2.length, static_cast<int64_t>(data.size()));
     BOOST_CHECK_EQUAL(m2.time, 2.5);
 
     CE (helicsFederateRequestTimeComplete (fFed, &timeOut));
@@ -235,7 +235,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     CE (helicsFederateGetState (fFed, &state));
     BOOST_CHECK (state == helics_execution_state);
     std::string data (500, 'a');
-    CE (helicsEndpointSendMessageRaw (p1, "port2", data.c_str(), data.size()));
+    CE (helicsEndpointSendMessageRaw (p1, "port2", data.c_str(), static_cast<int>(data.size())));
 
     helics_time_t timeOut;
     CE (helicsFederateRequestTimeAsync (mFed, 1.0));
@@ -244,7 +244,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
 
     auto res = helicsFederateHasMessage (mFed);
     BOOST_CHECK (!res);
-    CE (helicsEndpointSendMessageRaw (p2, "port1", data.c_str(), data.size()));
+    CE (helicsEndpointSendMessageRaw (p2, "port1", data.c_str(), static_cast<int>(data.size())));
     CE (helicsFederateRequestTimeAsync (mFed, 2.0));
     CE (helicsFederateRequestTime (fFed, 2.0, &timeOut));
     CE (helicsFederateRequestTimeComplete (mFed, &timeOut));
@@ -260,7 +260,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     BOOST_CHECK_EQUAL (m2.source, "port1");
     BOOST_CHECK_EQUAL (m2.original_source, "port1");
     BOOST_CHECK_EQUAL (m2.dest, "port2");
-    BOOST_CHECK_EQUAL (m2.length, data.size ());
+    BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t>(data.size()));
     BOOST_CHECK_EQUAL (m2.time, 2.5);
 
     BOOST_CHECK (!helicsEndpointHasMessage (p1));
@@ -301,7 +301,7 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     CE (helicsFederateGetState (sFed, &state));
     BOOST_CHECK (state == helics_execution_state);
     std::string data (500, 'a');
-    CE (helicsEndpointSendMessageRaw (p1, "dest", data.c_str(), data.size()));
+    CE (helicsEndpointSendMessageRaw (p1, "dest", data.c_str(), static_cast<int>(data.size())));
 
     helics_time_t timeOut;
     CE (helicsFederateRequestTimeAsync (sFed, 1.0));
@@ -319,7 +319,7 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
         BOOST_CHECK_EQUAL (m2.source, "src");
         BOOST_CHECK_EQUAL (m2.original_source, "src");
         BOOST_CHECK_EQUAL (m2.dest, "dest");
-        BOOST_CHECK_EQUAL (m2.length, data.size ());
+        BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t>(data.size ()));
     }
 
     // now check the message clone
@@ -333,7 +333,7 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
         BOOST_CHECK_EQUAL (m2.original_source, "src");
         BOOST_CHECK_EQUAL (m2.dest, "cm");
         BOOST_CHECK_EQUAL (m2.original_dest, "dest");
-        BOOST_CHECK_EQUAL (m2.length, data.size ());
+        BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t>(data.size()));
     }
 
     CE (helicsFederateFinalize (sFed));
@@ -378,8 +378,8 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     BOOST_CHECK (state == helics_execution_state);
     std::string data (500, 'a');
     std::string data2 (400, 'b');
-    CE (helicsEndpointSendMessageRaw (p1, "dest", data.c_str(), data.size()));
-    CE (helicsEndpointSendMessageRaw (p2, "dest", data2.c_str(), data2.size()));
+    CE (helicsEndpointSendMessageRaw (p1, "dest", data.c_str(), static_cast<int>(data.size())));
+    CE (helicsEndpointSendMessageRaw (p2, "dest", data2.c_str(), static_cast<int>(data2.size())));
 
     helics_time_t timeOut;
     CE (helicsFederateRequestTimeAsync (sFed, 1.0));
@@ -401,7 +401,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
         BOOST_CHECK_EQUAL (m2.source, "src");
         BOOST_CHECK_EQUAL (m2.original_source, "src");
         BOOST_CHECK_EQUAL (m2.dest, "dest");
-        BOOST_CHECK_EQUAL (m2.length, data.size ());
+        BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t>(data.size()));
         res = helicsFederateHasMessage (dFed);
         BOOST_CHECK (res);
 
@@ -411,7 +411,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
             BOOST_CHECK_EQUAL (m2.source, "src2");
             BOOST_CHECK_EQUAL (m2.original_source, "src2");
             BOOST_CHECK_EQUAL (m2.dest, "dest");
-            BOOST_CHECK_EQUAL (m2.length, data2.size ());
+            BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t>(data2.size()));
         }
     }
 
@@ -428,7 +428,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
         BOOST_CHECK_EQUAL (m2.original_source, "src");
         BOOST_CHECK_EQUAL (m2.dest, "cm");
         BOOST_CHECK_EQUAL (m2.original_dest, "dest");
-        BOOST_CHECK_EQUAL (m2.length, data.size ());
+        BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t>(data.size()));
         res = helicsFederateHasMessage (dcFed);
         BOOST_CHECK (res);
 
@@ -439,7 +439,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
             BOOST_CHECK_EQUAL (m2.original_source, "src2");
             BOOST_CHECK_EQUAL (m2.dest, "cm");
             BOOST_CHECK_EQUAL (m2.original_dest, "dest");
-            BOOST_CHECK_EQUAL (m2.length, data2.size ());
+            BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t>(data2.size()));
         }
     }
 

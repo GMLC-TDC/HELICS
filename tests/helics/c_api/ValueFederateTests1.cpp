@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <future>
 
-#include "testFixtures.hpp"
+#include "ctestFixtures.hpp"
 #include "test_configuration.h"
 
 using namespace std::string_literals;
@@ -194,13 +194,13 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     CE (helicsFederateGetState (vFed1, &state));
     BOOST_CHECK (state == helics_execution_state);
 
-    char sv[HELICS_INT_TYPE];
+    char sv[HELICS_SIZE_MAX];
     CE (helicsSubscriptionGetKey (subid, sv, HELICS_SIZE_MAX));
-    char sv2[HELICS_INT_TYPE];
+    char sv2[HELICS_SIZE_MAX];
     CE (helicsSubscriptionGetKey (subid2, sv2, HELICS_SIZE_MAX));
     BOOST_CHECK_EQUAL (sv, "sub1");
     BOOST_CHECK_EQUAL (sv2, "sub2");
-    char sub3name[HELICS_INT_TYPE];
+    char sub3name[HELICS_SIZE_MAX];
     CE (helicsSubscriptionGetKey (subid3, sub3name, HELICS_SIZE_MAX));
     BOOST_CHECK_EQUAL (sub3name, "sub3");
 
