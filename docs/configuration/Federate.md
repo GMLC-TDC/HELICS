@@ -28,3 +28,6 @@ For a detailed description of the timing parameters see [Timing in Helics](Timin
 The interfaces (Publications, Subscriptions, Endpoints, and a Filters) are how a federate interacts with the larger federation
 These can be set up through API calls or through Configuration Files
 Json files can also contain information for the FederateInfo structure including timing and connectivity information
+
+The specific different kinds of Federates define the patterns for different elements.  ValueFederates define the interfaces for publish and Subscribe mechanisms.
+MessageFederates define interfaces for endpoints and the basic Federate contains API's for interacting with Filters

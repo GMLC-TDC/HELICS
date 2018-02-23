@@ -382,6 +382,7 @@ endif(ENABLE_CLANG_TOOLS)
 
 add_subdirectory(swig)
 
+add_subdirectory(docs)
 
 set(HELICS_CMAKECONFIG_INSTALL_DIR "cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
 
