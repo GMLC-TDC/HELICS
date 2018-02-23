@@ -8,7 +8,7 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "player.h"
+#include "Player.hpp"
 #include "../core/core-exceptions.hpp"
 #include <iostream>
 

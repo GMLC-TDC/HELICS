@@ -134,7 +134,8 @@ script:
   # 4 = c interface tests
   # 5 = helics-apps tests
   # 6 = travis-tests
-  # - ctest --verbose --timeout 120 -I 0,0,0,1
+  - ctest --verbose --timeout 120 -I 0,0,0,1
+  # - ctest --verbose --timeout 120 -I 0,0,0,2
   - ctest --verbose --timeout 120 -I 0,0,0,6
   - export PYTHONPATH="$(pwd)/swig/python"
     # - echo "$LD_LIBRARY_PATH"

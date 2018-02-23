@@ -1,19 +1,17 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
 #include "BrokerBase.hpp"
 
 #include "../common/AsioServiceManager.h"
 #include "../common/logger.h"
-#include "TimeCoordinator.hpp"
+#include "ForwardingTimeCoordinator.hpp"
 #include "helics/helics-config.h"
 #include "helicsVersion.hpp"
 #include <iostream>
@@ -48,13 +46,7 @@ BrokerBase::BrokerBase (const std::string &broker_name) : identifier (broker_nam
 
 BrokerBase::~BrokerBase () { joinAllThreads (); }
 
-void BrokerBase::displayHelp ()
-{
-    std::cout << " Global options for all Brokers:\n";
-    variable_map vm;
-    const char *const argV[] = {"", "--help"};
-    argumentParser(2, argV, vm, {});
-}
+
 
 void BrokerBase::joinAllThreads ()
 {
@@ -80,6 +72,15 @@ static const ArgDescriptors extraArgs{
     {"dumplog",ArgDescriptor::arg_type_t::flag_type,"capture a record of all messages and dump a complete log to file or console on termination"},
     {"timeout", "milliseconds to wait for a broker connection (can also be entered as a time like '10s' or '45ms') "}
 };
+
+
+void BrokerBase::displayHelp()
+{
+    std::cout << " Global options for all Brokers:\n";
+    variable_map vm;
+    const char *const argV[] = { "", "-?" };
+    argumentParser(2, argV, vm, extraArgs);
+}
 
 void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
 {
@@ -153,7 +154,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
         }
     }
 
-    timeCoord = std::make_unique<TimeCoordinator> ();
+    timeCoord = std::make_unique<ForwardingTimeCoordinator> ();
     timeCoord->setMessageSender ([this](const ActionMessage &msg) { addActionMessage (msg); });
 
     loggingObj = std::make_unique<Logger> ();
@@ -179,11 +180,11 @@ bool BrokerBase::sendToLogger (Core::federate_id_t federateID,
         }
         if (loggerFunction)
         {
-            loggerFunction (logLevel, name+"("+std::to_string(federateID)+")", message);
+            loggerFunction (logLevel, name+'('+std::to_string(federateID)+')', message);
         }
         else if (loggingObj)
         {
-            loggingObj->log (logLevel, name + "(" + std::to_string(federateID) + ")::" + message);
+            loggingObj->log (logLevel, name + '(' + std::to_string(federateID) + ")::" + message);
         }
         return true;
     }

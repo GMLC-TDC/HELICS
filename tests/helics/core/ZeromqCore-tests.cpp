@@ -5,8 +5,8 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include <boost/test/unit_test.hpp>
 
 #include "helics/common/cppzmq/zmq.hpp"
@@ -535,11 +535,11 @@ BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
     connected = core->connect ();
     BOOST_CHECK (connected);
 
-    auto ccore = static_cast<helics::ZmqCore *> (core.get ());
-    // this will test the automatic port allocation
-    BOOST_CHECK_EQUAL (ccore->getAddress (), "tcp://127.0.0.1:23500");
     core->disconnect ();
+
+    BOOST_CHECK(!core->isConnected());
     broker->disconnect ();
+    BOOST_CHECK(!broker->isConnected());
     helics::CoreFactory::cleanUpCores (200);
     helics::BrokerFactory::cleanUpBrokers (200);
 }

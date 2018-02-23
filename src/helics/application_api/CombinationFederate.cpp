@@ -17,8 +17,8 @@ CombinationFederate::CombinationFederate (const FederateInfo &fi)
     : Federate (fi), ValueFederate (true), MessageFederate (true)
 {
 }
-CombinationFederate::CombinationFederate (std::shared_ptr<Core> core, const FederateInfo &fi)
-    : Federate (std::move (core), fi), ValueFederate (true), MessageFederate (true)
+CombinationFederate::CombinationFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : Federate (core, fi), ValueFederate (true), MessageFederate (true)
 {
 }
 

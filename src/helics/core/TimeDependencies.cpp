@@ -1,12 +1,10 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
 #include "TimeDependencies.hpp"
@@ -46,6 +44,16 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = m.actionTime;
         Te = m.Te;
         Tdemin = m.Tdemin;
+        if (forwardEvent < Te)
+        {
+            Te = forwardEvent;
+        }
+        if (Te < Tdemin)
+        {
+            Tdemin = Te;
+        }
+        forwardEvent = Time::maxVal();
+        minFed = m.source_handle;
         break;
     case CMD_TIME_GRANT:
         time_state = time_state_t::time_granted;
@@ -54,6 +62,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = m.actionTime;
         Te = Tnext;
         Tdemin = Tnext;
+        minFed = m.source_handle;
         break;
     case CMD_DISCONNECT:
     case CMD_PRIORITY_DISCONNECT:
@@ -62,7 +71,43 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = Time::maxVal ();
         Te = Time::maxVal ();
         Tdemin = Time::maxVal ();
+        minFed = invalid_fed_id;
         break;
+    case CMD_SEND_MESSAGE:
+        if (time_state == time_state_t::time_granted)
+        {
+            if (m.actionTime < forwardEvent)
+            {
+                forwardEvent = m.actionTime;
+            }
+            return false;
+        }
+        if (m.actionTime >= Tnext)
+        {
+            if (m.actionTime < Te)
+            {
+                Te = std::max(Tnext, m.actionTime);
+                if (Te < Tdemin)
+                {
+                    Tdemin = Te;
+                }
+                return true;
+            }
+        }
+        else
+        {
+            if (Tnext < Te)
+            {
+                Te = Tnext;
+                if (Te < Tdemin)
+                {
+                    Tdemin = Te;
+                }
+                return true;
+            }
+        }
+        
+        return false;
     default:
         return false;
     }
@@ -132,12 +177,25 @@ void TimeDependencies::removeDependency (Core::federate_id_t id)
 
 bool TimeDependencies::updateTime (const ActionMessage &m)
 {
-    auto depInfo = getDependencyInfo (m.source_id);
-    if (depInfo == nullptr)
+    if (m.action() == CMD_SEND_MESSAGE)
     {
-        return false;
+        auto depInfo = getDependencyInfo(m.dest_id);
+        if (depInfo == nullptr)
+        {
+            return false;
+        }
+        return depInfo->ProcessMessage(m);
     }
-    return depInfo->ProcessMessage (m);
+    else
+    {
+        auto depInfo = getDependencyInfo(m.source_id);
+        if (depInfo == nullptr)
+        {
+            return false;
+        }
+        return depInfo->ProcessMessage(m);
+    }
+   
 }
 
 bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const

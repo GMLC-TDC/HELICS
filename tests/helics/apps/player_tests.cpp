@@ -14,7 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "exeTestHelper.h"
 #include "helics/application_api/Subscriptions.hpp"
-#include "helics/apps/player.h"
+#include "helics/apps/Player.hpp"
 #include "helics/common/stringToCmdLine.h"
 #include "helics/core/BrokerFactory.hpp"
 #include <future>
@@ -117,7 +117,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (si
 {
     helics::FederateInfo fi ("player1");
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core1";
+    fi.coreName = "core3";
     fi.coreInitString = "2";
     helics::Player play1 (fi);
     fi.name = "block1";
@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_CASE (simple_player_testjson)
 {
     helics::FederateInfo fi ("player1");
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
+    fi.coreName = "core7";
     fi.coreInitString = "2";
     helics::Player play1 (fi);
     fi.name = "block1";
@@ -304,7 +304,7 @@ BOOST_AUTO_TEST_CASE (player_test_message)
 {
     helics::FederateInfo fi ("player1");
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
+    fi.coreName = "core8";
     fi.coreInitString = "2";
     helics::Player play1 (fi);
     fi.name = "block1";
@@ -335,7 +335,7 @@ BOOST_AUTO_TEST_CASE (player_test_message2)
 {
     helics::FederateInfo fi ("player1");
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
+    fi.coreName = "core9";
     fi.coreInitString = "2";
     helics::Player play1 (fi);
     fi.name = "block1";
@@ -390,7 +390,7 @@ BOOST_AUTO_TEST_CASE (player_test_message3)
 {
     helics::FederateInfo fi ("player1");
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
+    fi.coreName = "core10";
     fi.coreInitString = "2";
     helics::Player play1 (fi);
     fi.name = "block1";
@@ -449,7 +449,7 @@ BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::
 {
     helics::FederateInfo fi ("player1");
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
+    fi.coreName = "core11";
     fi.coreInitString = "2";
     helics::Player play1 (fi);
     fi.name = "block1";

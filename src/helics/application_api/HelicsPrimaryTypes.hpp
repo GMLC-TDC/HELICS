@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef HELICS_PRIMARY_TYPES_H_
-#define HELICS_PRIMARY_TYPES_H_
+
 #pragma once
 
 #include "ValueConverter.hpp"
@@ -53,6 +50,7 @@ bool changeDetected (const defV &prevValue, const double *vals, size_t size, dou
 bool changeDetected (const defV &prevValue, const std::complex<double> &val, double deltaV);
 bool changeDetected (const defV &prevValue, double val, double deltaV);
 bool changeDetected (const defV &prevValue, int64_t val, double deltaV);
+bool changeDetected(const defV &prevValue, named_point val, double deltaV);
 
 void valueExtract (const defV &dv, std::string &val);
 
@@ -167,6 +165,12 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
         val = static_cast<X> (std::abs (V));
         break;
     }
+    case helics_type_t::helicsNamedPoint:
+    {
+        auto V = ValueConverter<named_point>::interpret(dv);
+        val = static_cast<X> (V.second);
+        break;
+    }
     case helics_type_t::helicsComplexVector:
     {
         auto V = ValueConverter<std::vector<std::complex<double>>>::interpret (dv);
@@ -179,4 +183,3 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
 }
 }  // namespace helics
 
-#endif  // HELICS_PRIMARY_TYPES_H_

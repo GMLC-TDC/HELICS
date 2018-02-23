@@ -17,6 +17,10 @@ communication, market, and end-use tools. HELICS is intended to be a
 cross platform tool with the integration of both event driven and time
 series simulation.
 
+- [GitHub](https://github.com/GMLC-TDC/HELICS-src)
+- [Gitter](https://gitter.im/GMLC-TDC/HELICS-src)
+- [Documentation](https://gmlc-tdc.github.io/HELICS-src)
+
 ```eval_rst
 .. toctree::
  :maxdepth: 1

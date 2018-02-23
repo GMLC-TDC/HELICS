@@ -5,8 +5,8 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -209,11 +209,11 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     helics::Publication pubid3 (vFed1.get (), "pub3", helics::helicsType<double> (), "V");
 
     // these aren't meant to match the publications
-    helics::Subscription subid1 (false, vFed1.get (), "sub1");
+    helics::Subscription subid1 (helics::OPTIONAL, vFed1.get (), "sub1");
 
-    helics::SubscriptionT<int> subid2 (false, vFed1.get (), "sub2");
+    helics::SubscriptionT<int> subid2 (helics::OPTIONAL, vFed1.get (), "sub2");
 
-    helics::Subscription subid3 (false, vFed1.get (), "sub3", "V");
+    helics::Subscription subid3 (helics::OPTIONAL, vFed1.get (), "sub3", "V");
     // enter execution
     vFed1->enterExecutionState ();
 
@@ -686,6 +686,8 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer, bdata::make (core_types), co
     vFed2->getValue (subid, s);
 
     BOOST_CHECK_EQUAL (s, "string2");
+    vFed2->finalize();
+    vFed1->finalize();
 }
 
 template <class X>

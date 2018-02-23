@@ -10,5 +10,5 @@ function varargout = helicsFederateIsAsyncOperationCompleted(varargin)
     %-------
     %0 if not completed, 1 if completed
     %
-  [varargout{1:nargout}] = helicsMEX(69, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(70, varargin{:});
 end

@@ -22,7 +22,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "FilterInfo.hpp"
 #include "PublicationInfo.hpp"
 #include "SubscriptionInfo.hpp"
-#include "TimeCoordinator.hpp"
+#include "ForwardingTimeCoordinator.hpp"
 #include "core-exceptions.hpp"
 #include "loggingHelper.hpp"
 #include <boost/filesystem.hpp>
@@ -353,6 +353,12 @@ bool CommonCore::allDisconnected () const
     return std::all_of (_federates.begin (), _federates.end (), pred);
 }
 
+void CommonCore::setCoreReadyToInit()
+{
+    //use the flag mechanics that do the same thing
+    setFlag(invalid_fed_id, ENABLE_INIT_ENTRY);
+}
+
 void CommonCore::enterInitializingState (federate_id_t federateID)
 {
     auto fed = getFederate (federateID);
@@ -613,12 +619,12 @@ void CommonCore::setOutputDelay (federate_id_t federateID, Time outputDelayTime)
         throw (InvalidParameter ("outputDelay time must be >=0"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_outputDelay;
+    cmd.index = UPDATE_OUTPUT_DELAY;
     cmd.actionTime = outputDelayTime;
     fed->updateFederateInfo (cmd);
 }
 
-void CommonCore::setInputDelay (federate_id_t federateID, Time impactTime)
+void CommonCore::setInputDelay (federate_id_t federateID, Time inputDelayTime)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -626,13 +632,13 @@ void CommonCore::setInputDelay (federate_id_t federateID, Time impactTime)
         throw (InvalidIdentifier ("federateID not valid (SetinputDelay)"));
     }
 
-    if (impactTime < timeZero)
+    if (inputDelayTime < timeZero)
     {
         throw (InvalidParameter ("impact window must be >=0"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_IMPACT_WINDOW;
-    cmd.actionTime = impactTime;
+    cmd.index = UPDATE_INPUT_DELAY;
+    cmd.actionTime = inputDelayTime;
     fed->updateFederateInfo (cmd);
 }
 
@@ -1409,7 +1415,7 @@ void CommonCore::deliverMessage (ActionMessage &message)
         // Find the destination endpoint
         auto localP = getLocalEndpoint (message.info ().target);
         if (localP == nullptr)
-        {  // must be a remote endpoint push it to the main queue to deal with
+        { 
             auto kfnd = knownExternalEndpoints.find(message.info().target);
             if (kfnd != knownExternalEndpoints.end())
             {  // destination is known
@@ -1432,8 +1438,12 @@ void CommonCore::deliverMessage (ActionMessage &message)
         }
         message.dest_id = localP->fed_id;
         message.dest_handle = localP->id;
+         
+        
+        timeCoord->processTimeMessage(message);
+
         auto fed = getFederate(localP->fed_id);
-        fed->addAction(message);
+        fed->addAction(std::move(message));
         
     }
     break;
@@ -1970,8 +1980,6 @@ void CommonCore::processCommand (ActionMessage &&command)
                 if (res == iteration_state::next_step)
                 {
                     enteredExecutionMode = true;
-                    timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations,
-                                            Time::maxVal (), Time::maxVal ());
                 }
             }
         }
@@ -2165,19 +2173,16 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_REG_DST_FILTER:
     case CMD_REG_SRC_FILTER:
         // for these registration filters any processing is already done in the
-        // registration functions so this is just a router
+        // registration functions so this is just a router and add the time dependency
         if (command.dest_id == 0)
         {
-            if (!hasTimeDependency)
+            if (!hasFilters)
             {
-                hasLocalFilters = true;
-                hasTimeDependency = true;
-                if (timeCoord->addDependency (higher_broker_id))
+                hasFilters = true;
+                if (timeCoord->addDependent (higher_broker_id))
                 {
-                    ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id, higher_broker_id);
+                    ActionMessage add (CMD_ADD_DEPENDENCY, global_broker_id, higher_broker_id);
                     transmit (higher_broker_id, add);
-
-                    timeCoord->addDependent (higher_broker_id);
                 }
             }
         }
@@ -2326,13 +2331,11 @@ void CommonCore::processCommand (ActionMessage &&command)
                 organizeFilterOperations ();
                 fed->addAction (command);
             }
-            timeCoord->enteringExecMode (helics_iteration_request::no_iterations);
+            timeCoord->enteringExecMode ();
             auto res = timeCoord->checkExecEntry ();
             if (res == iteration_state::next_step)
             {
                 enteredExecutionMode = true;
-                timeCoord->timeRequest (Time::maxVal (), helics_iteration_request::no_iterations, Time::maxVal (),
-                                        Time::maxVal ());
             }
         }
     }
@@ -2480,7 +2483,7 @@ void CommonCore::checkDependencies ()
     }
     lock.unlock ();
     // if we have filters we need to be a timeCoordinator
-    if (hasLocalFilters)
+    if (hasFilters)
     {
         return;
     }
@@ -2634,10 +2637,23 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
 {
     if (isTimingCommand (cmd))
     {
-        if (timeCoord->processTimeMessage (cmd))
+        if (!enteredExecutionMode)
         {
-            timeCoord->checkTimeGrant ();
+            timeCoord->processTimeMessage(cmd);
+            auto res = timeCoord->checkExecEntry();
+            if (res == iteration_state::next_step)
+            {
+                enteredExecutionMode = true;
+            }
         }
+        else
+        {
+            if (timeCoord->processTimeMessage(cmd))
+            {
+                timeCoord->updateTimeFactors();
+            }
+        }
+        
     }
     else if (isDependencyCommand (cmd))
     {

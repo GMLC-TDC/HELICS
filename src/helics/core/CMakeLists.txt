@@ -19,6 +19,7 @@ set(SRC_FILES
 	core-types.cpp
 	core-data.cpp
 	TimeCoordinator.cpp
+	ForwardingTimeCoordinator.cpp
 	TimeDependencies.cpp
 	CommsInterface.cpp
 	CommsBroker.cpp
@@ -85,6 +86,7 @@ set(INCLUDE_FILES
 	BrokerBase.hpp
 	TimeDependencies.hpp
 	TimeCoordinator.hpp
+	ForwardingTimeCoordinator.hpp
 	loggingHelper.hpp
 	CommsBroker.hpp
 	CommsBroker_impl.hpp

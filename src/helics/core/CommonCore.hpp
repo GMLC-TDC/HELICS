@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_COMMON_CORE_
-#define _HELICS_COMMON_CORE_
+
 #pragma once
 
 #include "../common/simpleQueue.hpp"
@@ -64,6 +61,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void error (federate_id_t federateID, int errorCode = -1) override final;
     virtual void finalize (federate_id_t federateID) override final;
     virtual void enterInitializingState (federate_id_t federateID) override final;
+    virtual void setCoreReadyToInit() override final;
     virtual iteration_result
     enterExecutingState (federate_id_t federateID, helics_iteration_request iterate = NO_ITERATION) override final;
     virtual federate_id_t registerFederate (const std::string &name, const CoreFederateInfo &info) override final;
@@ -208,7 +206,6 @@ class CommonCore : public Core, public BrokerBase
 
   private:
     std::string prevIdentifier;  //!< storage for the case of requiring a renaming
-
     std::map<Core::federate_id_t, Core::federate_id_t>
       global_id_translation;  //!< map to translate global ids to local ones
     std::map<Core::federate_id_t, int32_t>
@@ -263,7 +260,6 @@ class CommonCore : public Core, public BrokerBase
 
   protected:
     int32_t _global_federation_size = 0;  //!< total size of the federation
-    bool hasLocalFilters = false;
     std::atomic<int16_t> delayInitCounter{
       0};  //!< counter for the number of times the entry to initialization Mode was explicitly delayed
     std::vector<std::unique_ptr<FederateState>> _federates;  //!< local federate information
@@ -351,5 +347,3 @@ class CommonCore : public Core, public BrokerBase
 };
 
 }  // namespace helics
-
-#endif /* _HELICS_TEST_CORE_ */
