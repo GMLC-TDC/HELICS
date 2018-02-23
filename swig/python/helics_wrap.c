@@ -4380,6 +4380,26 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsCoreSetReadyToInit(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_core arg1 = (helics_core) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsCoreSetReadyToInit",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreSetReadyToInit" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  result = (helics_status)helicsCoreSetReadyToInit(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsCoreDisconnect(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_core arg1 = (helics_core) 0 ;
@@ -7821,14 +7841,14 @@ SWIGINTERN PyObject *_wrap_helicsFederateHasMessage(PyObject *SWIGUNUSEDPARM(sel
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
   PyObject * obj0 = 0 ;
-  int result;
+  helics_bool_t result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateHasMessage",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateHasMessage" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (int)helicsFederateHasMessage(arg1);
+  result = (helics_bool_t)helicsFederateHasMessage(arg1);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
@@ -7841,14 +7861,14 @@ SWIGINTERN PyObject *_wrap_helicsEndpointHasMessage(PyObject *SWIGUNUSEDPARM(sel
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   int res1 ;
   PyObject * obj0 = 0 ;
-  int result;
+  helics_bool_t result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:helicsEndpointHasMessage",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointHasMessage" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  result = (int)helicsEndpointHasMessage(arg1);
+  result = (helics_bool_t)helicsEndpointHasMessage(arg1);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
@@ -8887,6 +8907,7 @@ static PyMethodDef SwigMethods[] = {
 		"a helics_status enumeration indicating any error condition\n"
 		"\n"
 		""},
+	 { (char *)"helicsCoreSetReadyToInit", _wrap_helicsCoreSetReadyToInit, METH_VARARGS, NULL},
 	 { (char *)"helicsCoreDisconnect", _wrap_helicsCoreDisconnect, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"

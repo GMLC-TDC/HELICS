@@ -28,6 +28,7 @@ class NetworkBrokerData
             udp,	//!< using udp ports for communication
             both,	//!< using both types of ports for communication
         };
+        std::string brokerName;  //!< the identifier for the broker
         std::string brokerAddress;	//!< the address or domain name of the broker
         std::string localInterface; //!< the interface to use for the local receive ports
         int portNumber = -1;	//!< the port number for the local interface

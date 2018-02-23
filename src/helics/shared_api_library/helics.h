@@ -118,6 +118,12 @@ HELICS_Export helics_status helicsCoreGetIdentifier (helics_core core, char *ide
 */
 HELICS_Export helics_status helicsBrokerGetAddress (helics_broker broker, char *address, int maxlen);
 
+/** set the core to ready to init
+@details this function is used for cores that have filters but no federates so there needs to be
+a direct signal to the core to trigger the federation initialization
+*/
+HELICS_Export helics_status helicsCoreSetReadyToInit(helics_core core);
+
 /** get an identifier for the core
 @param core the core to query
 @param[out] identifier storage space to place the identifier string

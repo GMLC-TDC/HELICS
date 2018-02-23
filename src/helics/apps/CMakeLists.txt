@@ -5,19 +5,21 @@
 #This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 ##############################################################################
 set(helics_apps_library_headers
-	player.h
-	recorder.h
-	PrecHelper.h
-	echo.h
-	source.h
+	Player.hpp
+	Recorder.hpp
+	PrecHelper.hpp
+	Echo.hpp
+	Source.hpp
+	Tracer.hpp
 	)
 
 set(helics_apps_library_files
-	player.cpp
-	recorder.cpp
+	Player.cpp
+	Recorder.cpp
 	PrecHelper.cpp
-	echo.cpp
-	source.cpp
+	Echo.cpp
+	Source.cpp
+	Tracer.cpp
 )
 
 add_library(helics_apps-static STATIC ${helics_apps_library_files} ${helics_apps_library_headers})

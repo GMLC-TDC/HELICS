@@ -5,10 +5,8 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_FILTER_H_
-#define _HELICS_FILTER_H_
+
 #pragma once
 
 #include "../core/Core.hpp"
@@ -50,13 +48,17 @@ class Filter
     explicit Filter (Federate *fed);
     /** construct through a core object*/
     explicit Filter (Core *cr);
+
     /** virtual destructor*/
     virtual ~Filter () = default;
 
     /** set a message operator to process the message*/
     void setOperator (std::shared_ptr<FilterOperator> mo);
 
+    /** get the underlying filter id for use with a federate*/
     filter_id_t getID () const { return fid; }
+
+    /** get the underlying core handle for use with a core*/
     Core::handle_id_t getCoreHandle () const { return id; }
 
     /** get the target of the filter*/
@@ -231,4 +233,3 @@ std::unique_ptr<SourceFilter> make_source_filter (defined_filter_types type,
                                                   const std::string &name = EMPTY_STRING);
 
 }  // namespace helics
-#endif
