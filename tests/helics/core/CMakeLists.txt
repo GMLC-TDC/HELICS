@@ -23,7 +23,6 @@ CoreFactory-tests.cpp
 #CommonCore-tests.cpp
 TestCore-tests.cpp
 ZeromqCore-tests.cpp
-MpiCore-tests.cpp
 Node_Core-tests.cpp
 testFixtures.cpp
 IPCcore_tests.cpp
@@ -34,7 +33,11 @@ TimeCoordinatorTests.cpp
 )
 
 if (NOT DISABLE_TCP_CORE)
-list(APPEND core_test_sources TcpCore-tests.cpp)
+    list(APPEND core_test_sources TcpCore-tests.cpp)
+endif()
+
+if (MPI_ENABLE)
+    list(APPEND core_test_sources MpiCore-tests.cpp)
 endif()
 
 add_executable(core-tests ${core_test_sources} ${core_test_headers})

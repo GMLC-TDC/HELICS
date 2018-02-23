@@ -1,38 +1,62 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#ifndef _HELICS_MPI_COMMS_
-#define _HELICS_MPI_COMMS_
 #pragma once
 
-#include "helics/core/CommsInterface.h"
+#include "../CommsInterface.hpp"
+#include "../../common/BlockingQueue.hpp"
 #include <atomic>
+#include <set>
+#include <string>
+#include <future>
+#include <vector>
+#include <mutex>
+#include "helics/helics-config.h"
 
 namespace helics {
 
-/** implementation for the core that uses zmq messages to communicate*/
-class MpiComms:public CommsInterface {
+/** implementation for the communication interface that uses MPI to communicate*/
+class MpiComms final:public CommsInterface {
 
 public:
 	/** default constructor*/
-	MpiComms() = default;
-	MpiComms(const std::string &brokerTarget, const std::string &localTarget);
+	MpiComms();
+    MpiComms(const std::string &brokerAddress);
 	/** destructor*/
 	~MpiComms();
 private:
-	virtual void queue_rx_function() override;	//!< the functional loop for the receive queue
-	virtual void queue_tx_function() override;  //!< the loop for transmitting data
-	virtual void closeTransmitter() override; //!< function to instruct the transmitter loop to close
-	virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
+    std::string brokerAddress; //!< the mpi rank:tag of the broker
+    std::string commAddress; //!< the mpi rank:tag of this comm object
+
+    std::atomic<bool> shutdown;
+    
+    virtual void queue_rx_function() override;	//!< the functional loop for the receive queue
+    virtual void queue_tx_function() override;  //!< the loop for transmitting data
+
+    /** process an incoming message
+    return code for required action 0=NONE, -1 TERMINATE*/
+    int processIncomingMessage(ActionMessage &cmd);
+
+    /** queue for pending incoming messages*/
+    BlockingQueue<ActionMessage> rxMessageQueue;
+    /** queue for pending outgoing messages*/
+    BlockingQueue<std::pair<std::string, std::vector<char>>> txMessageQueue;
+
+	std::atomic<bool> hasBroker{ false };
+    virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
+
+    void setBrokerAddress (const std::string &address) { brokerAddress = address; }
+public:
+	std::string getAddress () { return commAddress; }
+    BlockingQueue<ActionMessage>& getRxMessageQueue () { return rxMessageQueue; }
+    BlockingQueue<std::pair<std::string, std::vector<char>>>& getTxMessageQueue () { return txMessageQueue; }
 };
 
 
 } // namespace helics
-
-#endif /* _HELICS_IPC_COMMS_ */
 
