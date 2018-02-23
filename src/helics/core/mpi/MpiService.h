@@ -42,6 +42,7 @@ public:
     void sendMessage (std::string address, std::vector<char> message) { txMessageQueue.emplace (address, std::move (message)); }
 
     void sendAndReceiveMessages ();
+    void drainRemainingMessages ();
 
 private:
     MpiService();

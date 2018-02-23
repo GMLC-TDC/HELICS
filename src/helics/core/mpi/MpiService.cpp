@@ -84,24 +84,8 @@ void MpiService::serviceLoop ()
         sendAndReceiveMessages ();
     }
 
-    // Post receives for any waiting sends
-    int message_waiting = 1;
-    MPI_Status status;
-    while (message_waiting)
-    {
-        MPI_Iprobe (MPI_ANY_SOURCE, MPI_ANY_TAG, mpiCommunicator, &message_waiting, &status);
-        if (message_waiting)
-        {
-            // Get the size of the message waiting to be received
-            int recv_size;
-            std::vector<char> buffer;
-            MPI_Get_count (&status, MPI_CHAR, &recv_size);
-            buffer.resize (recv_size);
-            
-            // Receive the message
-            MPI_Recv (buffer.data (), buffer.capacity (), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG, mpiCommunicator, &status);
-        }
-    }
+    // Make sure that receives get posted for any remaining sends
+    drainRemainingMessages ();
 
     // Finalize MPI
     int mpi_initialized;
@@ -309,6 +293,28 @@ void MpiService::sendAndReceiveMessages ()
 
                 return send_finished == 1;
             });
+}
+
+void MpiService::drainRemainingMessages ()
+{
+    // Post receives for any waiting sends
+    int message_waiting = 1;
+    MPI_Status status;
+    while (message_waiting)
+    {
+        MPI_Iprobe (MPI_ANY_SOURCE, MPI_ANY_TAG, mpiCommunicator, &message_waiting, &status);
+        if (message_waiting)
+        {
+            // Get the size of the message waiting to be received
+            int recv_size;
+            std::vector<char> buffer;
+            MPI_Get_count (&status, MPI_CHAR, &recv_size);
+            buffer.resize (recv_size);
+            
+            // Receive the message
+            MPI_Recv (buffer.data (), buffer.capacity (), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG, mpiCommunicator, &status);
+        }
+    }
 }
 
 } // namespace helics
