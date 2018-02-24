@@ -8,8 +8,6 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#ifndef _HELICS_IPC_QUEUE_HELPER_
-#define _HELICS_IPC_QUEUE_HELPER_
 #pragma once
 
 #include "../ActionMessage.hpp"
@@ -19,6 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <iostream>
 #include <memory>
 #include <thread>
+
 #include <boost/interprocess/ipc/message_queue.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
@@ -146,4 +145,3 @@ class shared_queue_state
 
 }  // namespace helics
 
-#endif /* _HELICS_IPC_QUEUE_HELPER_ */

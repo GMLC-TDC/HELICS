@@ -19,7 +19,7 @@ CommsInterface::CommsInterface (const std::string &localTarget, const std::strin
 }
 
 CommsInterface::CommsInterface (const NetworkBrokerData &netInfo)
-    : localTarget_ (netInfo.localInterface), brokerTarget_ (netInfo.brokerAddress)
+    : localTarget_ (netInfo.localInterface), brokerTarget_ (netInfo.brokerAddress),brokerName_(netInfo.brokerName)
 {
 }
 /** destructor*/

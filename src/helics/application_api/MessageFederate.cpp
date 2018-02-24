@@ -20,8 +20,8 @@ MessageFederate::MessageFederate (const FederateInfo &fi) : Federate (fi)
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
 }
-MessageFederate::MessageFederate (std::shared_ptr<Core> core, const FederateInfo &fi)
-    : Federate (std::move (core), fi)
+MessageFederate::MessageFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : Federate (core, fi)
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
 }
@@ -41,7 +41,7 @@ MessageFederate::MessageFederate (bool)
    // a virtual inheritance
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
 }
-MessageFederate::MessageFederate (MessageFederate &&mFed) noexcept = default;
+MessageFederate::MessageFederate (MessageFederate &&) noexcept = default;
 
 MessageFederate &MessageFederate::operator= (MessageFederate &&mFed) noexcept
 {
@@ -309,16 +309,16 @@ std::string MessageFederate::getEndpointName (endpoint_id_t id) const { return m
 
 std::string MessageFederate::getEndpointType (endpoint_id_t ep) { return mfManager->getEndpointType (ep); }
 
-void MessageFederate::registerEndpointCallback (std::function<void(endpoint_id_t, Time)> func)
+void MessageFederate::registerEndpointCallback (const std::function<void(endpoint_id_t, Time)> &func)
 {
     mfManager->registerCallback (func);
 }
-void MessageFederate::registerEndpointCallback (endpoint_id_t ep, std::function<void(endpoint_id_t, Time)> func)
+void MessageFederate::registerEndpointCallback (endpoint_id_t ep, const std::function<void(endpoint_id_t, Time)> &func)
 {
     mfManager->registerCallback (ep, func);
 }
 void MessageFederate::registerEndpointCallback (const std::vector<endpoint_id_t> &ep,
-                                                std::function<void(endpoint_id_t, Time)> func)
+                                                const std::function<void(endpoint_id_t, Time)> &func)
 {
     mfManager->registerCallback (ep, func);
 }

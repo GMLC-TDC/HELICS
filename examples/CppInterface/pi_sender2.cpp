@@ -1,17 +1,15 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 static char help[] = "Example to demonstrate the usage of HELICS C Interface with two federates.\n\
             This example implements a loose-coupling protocol to exchange values between two federates. \n\
             Here, a ZMQ broker is created and a value federate. The value federate can both.\n\
-            publish and subcribe. This federate publishes a value and waits for the value \n\
+            publish and subscribe. This federate publishes a value and waits for the value \n\
             published by the other federate. Once the value has arrived, it publishes its next value \n\n";
 
 #include <stdio.h>
@@ -85,17 +83,16 @@ int main(int /*argc*/,char ** /*argv*/)
 
   /* This federate will be publishing deltat*pi for numsteps steps */
   //double this_time = 0.0;
-  double pi = 22.0/7.0,value;
+  double pi = 22.0/7.0;
   helics_time_t currenttime=0.0;
-  int isupdated;
 
   while(currenttime < 0.2) {
-    value = currenttime*pi;
+    double value = currenttime*pi;
 
     printf("PI SENDER: Sending value %3.2f*pi = %4.3f at time %3.2f to PI RECEIVER\n",currenttime,value,currenttime);
-    vfed->publish(pub, value); /* Note: the receiver will get this at currentime+deltat */
+    vfed->publish(pub, value); /* Note: the receiver will get this at currenttime+deltat */
 
-    isupdated = 0;
+    int isupdated = 0;
     while(!isupdated) {
       currenttime = vfed->requestTime(currenttime);
       isupdated = vfed->isUpdated(sub);

@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_COMMON_CORE_
-#define _HELICS_COMMON_CORE_
+
 #pragma once
 
 #include "../common/simpleQueue.hpp"
@@ -64,6 +61,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void error (federate_id_t federateID, int errorCode = -1) override final;
     virtual void finalize (federate_id_t federateID) override final;
     virtual void enterInitializingState (federate_id_t federateID) override final;
+    virtual void setCoreReadyToInit() override final;
     virtual iteration_result
     enterExecutingState (federate_id_t federateID, helics_iteration_request iterate = NO_ITERATION) override final;
     virtual federate_id_t registerFederate (const std::string &name, const CoreFederateInfo &info) override final;
@@ -208,7 +206,6 @@ class CommonCore : public Core, public BrokerBase
 
   private:
     std::string prevIdentifier;  //!< storage for the case of requiring a renaming
-
     std::map<Core::federate_id_t, Core::federate_id_t>
       global_id_translation;  //!< map to translate global ids to local ones
     std::map<Core::federate_id_t, int32_t>
@@ -237,6 +234,8 @@ class CommonCore : public Core, public BrokerBase
 
     /** process any filter or route the message*/
     void processMessageFilter (ActionMessage &command);
+    /** process an filter message return*/
+    void processFilterReturn(ActionMessage &command);
     /** create a source filter */
     FilterInfo *createSourceFilter (federate_id_t dest,
                                     Core::handle_id_t handle,
@@ -261,18 +260,18 @@ class CommonCore : public Core, public BrokerBase
 
   protected:
     int32_t _global_federation_size = 0;  //!< total size of the federation
-    bool hasLocalFilters = false;
     std::atomic<int16_t> delayInitCounter{
       0};  //!< counter for the number of times the entry to initialization Mode was explicitly delayed
     std::vector<std::unique_ptr<FederateState>> _federates;  //!< local federate information
-    std::vector<int>
-      ongoingFilterActionCounter;  //!< counter for the number of ongoing filter transactions for a federate
+    std::atomic<int32_t> messageCounter{ 54 };  //!< counter for the number of messages that have been sent
     std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
     std::atomic<Core::handle_id_t> handleCounter{1};  //!< counter for the handle index
     std::unordered_map<std::string, handle_id_t> publications;  //!< map of all local publications
     std::unordered_map<std::string, handle_id_t> endpoints;  //!< map of all local endpoints
     std::unordered_map<std::string, federate_id_t> federateNames;  //!< map of federate names to id
 
+    std::vector<std::set<int32_t>> ongoingFilterProcesses; //!< sets of ongoing filtered messages
+    std::vector<std::vector<ActionMessage>> delayedTimingMessages; //!< delayedTimingMessages from ongoing Filter actions
     std::atomic<int> queryCounter{0};
     std::map<handle_id_t, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
     using fed_handle_pair = std::pair<federate_id_t, handle_id_t>;
@@ -342,8 +341,9 @@ class CommonCore : public Core, public BrokerBase
 
     /** send an error code to all the federates*/
     void sendErrorToFederates (int error_code);
+
+    /** handle delivery of a timing message*/
+    void distributeTimingMessage(ActionMessage &command);
 };
 
 }  // namespace helics
-
-#endif /* _HELICS_TEST_CORE_ */

@@ -1,6 +1,6 @@
 shallow_clone: true
 
-version: 1.0.0.alpha2.{build}
+version: 1.0.0.beta.{build}
 
 image: Visual Studio 2015
 
@@ -33,12 +33,12 @@ test_script:
   # 1 = common_tests
   # 2 = core tests
   # 3 = application api tests
-  # 4 = c interface tests
+  # 4 = shared library tests
   # 5 = app tests
   # 6 = travis_tests
   - ctest -C Release --verbose --timeout 120 -I 0,0,0,1
   - ctest -C Release --verbose --timeout 90 -I 0,0,0,2
   - ctest -C Release --verbose --timeout 240 -I 0,0,0,3
-  - ctest -C Release --verbose --timeout 90 -I 0,0,0,5
+  #- ctest -C Release --verbose --timeout 90 -I 0,0,0,5
 
 artifacts:

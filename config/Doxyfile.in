@@ -31,7 +31,15 @@ PROJECT_NAME           = helics
 # This could be handy for archiving the generated documentation or
 # if some version control system is used.
 
-PROJECT_NUMBER         = @HELICS_VERSION_MAJOR@.@HELICS_VERSION_MINOR@.@HELICS_VERSION_PATCH@.@HELICS_VERSION_BUILD@
+PROJECT_NUMBER         = @HELICS_VERSION_MAJOR@.@HELICS_VERSION_MINOR@.@HELICS_VERSION_PATCH@-@HELICS_VERSION_BUILD@
+
+# With the PROJECT_LOGO tag one can specify an logo or icon that is
+# included in the documentation. The maximum height of the logo should not
+# exceed 55 pixels and the maximum width should not exceed 200 pixels.
+# Doxygen will copy the logo to the output directory.
+
+PROJECT_LOGO           = "@CMAKE_CURRENT_SOURCE_DIR@/docs/img/HELICS_48x48.png"
+
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute)
 # base path where the generated documentation will be put.
@@ -569,7 +577,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = "@CMAKE_CURRENT_SOURCE_DIR@/src/"
+INPUT                  = "@CMAKE_CURRENT_SOURCE_DIR@/"
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -612,7 +620,7 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */test/* */ThirdParty/* */install/* */bin/* */build/* */config/* */build2/* */html/* */examples/* */cmake/*
+EXCLUDE_PATTERNS       = */test/* */ThirdParty/* */install/* */bin/* */build*/* */config/* */build2/* */html/* */examples/* */cmake/* */test/* */cppzmq/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -620,7 +628,7 @@ EXCLUDE_PATTERNS       = */test/* */ThirdParty/* */install/* */bin/* */build/* *
 # wildcard * is used, a substring. Examples: ANamespace, AClass,
 # AClass::ANamespace, ANamespace::*Test
 
-EXCLUDE_SYMBOLS        =
+EXCLUDE_SYMBOLS        = zmq, json_helics
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or
 # directories that contain example code fragments that are included (see
@@ -646,7 +654,7 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see
 # the \image command).
 
-IMAGE_PATH             = "@CMAKE_CURRENT_SOURCE_DIR@/docs/images"
+IMAGE_PATH             = "@CMAKE_CURRENT_SOURCE_DIR@/docs/img"
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

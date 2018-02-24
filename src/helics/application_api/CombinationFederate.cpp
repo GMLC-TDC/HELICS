@@ -17,8 +17,8 @@ CombinationFederate::CombinationFederate (const FederateInfo &fi)
     : Federate (fi), ValueFederate (true), MessageFederate (true)
 {
 }
-CombinationFederate::CombinationFederate (std::shared_ptr<Core> core, const FederateInfo &fi)
-    : Federate (std::move (core), fi), ValueFederate (true), MessageFederate (true)
+CombinationFederate::CombinationFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : Federate (core, fi), ValueFederate (true), MessageFederate (true)
 {
 }
 
@@ -28,7 +28,7 @@ CombinationFederate::CombinationFederate (const std::string &jsonString)
     registerInterfaces (jsonString);
 }
 
-CombinationFederate::CombinationFederate (CombinationFederate &&fed) noexcept = default;
+CombinationFederate::CombinationFederate (CombinationFederate &&) noexcept = default;
 CombinationFederate::~CombinationFederate () = default;
 
 void CombinationFederate::disconnect ()
@@ -37,7 +37,7 @@ void CombinationFederate::disconnect ()
     MessageFederate::disconnect ();
 }
 
-CombinationFederate &CombinationFederate::operator= (CombinationFederate &&fed) noexcept = default;
+CombinationFederate &CombinationFederate::operator= (CombinationFederate &&) noexcept = default;
 
 void CombinationFederate::updateTime (Time newTime, Time oldTime)
 {

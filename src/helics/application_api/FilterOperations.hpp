@@ -70,11 +70,14 @@ class randomDelayGenerator;
 class RandomDelayFilterOperation : public FilterOperations
 {
     private:
-        std::shared_ptr<MessageTimeOperator> td;
-        std::unique_ptr<randomDelayGenerator> rdelayGen;
+        std::shared_ptr<MessageTimeOperator> td;   //!< pointer to the time operator
+        std::unique_ptr<randomDelayGenerator> rdelayGen; //!< pointer to the random number generator
 
     public:
+        /** default constructor*/
     RandomDelayFilterOperation ();
+    //the destructor is defined mainly to prevent the need to define the randomDelayGenerator object here
+    /** destructor*/
     ~RandomDelayFilterOperation ();
     virtual void set (const std::string &property, double val) override;
     virtual void setString (const std::string &property, const std::string &val) override;

@@ -1,12 +1,10 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
 #include "HelicsPrimaryTypes.hpp"
@@ -119,6 +117,18 @@ bool changeDetected (const defV &prevValue, int64_t val, double deltaV)
     if (prevValue.which () == intLoc)
     {
         if (std::abs (boost::get<int64_t> (prevValue) - val) < static_cast<int64_t> (deltaV) + 1)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool changeDetected(const defV &prevValue, named_point val, double deltaV)
+{
+    if (prevValue.which() == doubleLoc)
+    {
+        if (std::abs(boost::get<double>(prevValue) - val.second) <= deltaV)
         {
             return false;
         }
@@ -285,6 +295,7 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::string &val
         break;
     }
     case helics_type_t::helicsString:
+    case helics_type_t::helicsAny:
     {
         val = dv.string ();
         break;

@@ -21,12 +21,12 @@ namespace helics
 class MessageFederate : public virtual Federate
 {
   public:
-    MessageFederate (FederateInfo &fi)
+    explicit MessageFederate (FederateInfo &fi)
     {
         fed = helicsCreateMessageFederate (fi.getInfo ());
     }
 
-    MessageFederate (const std::string &jsonString)
+    explicit MessageFederate (const std::string &jsonString)
     {
         fed = helicsCreateMessageFederateFromJson (jsonString.c_str());
     }

@@ -1,15 +1,15 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#include "player.h"
-#include "recorder.h"
+
+#include "Player.hpp"
+#include "Recorder.hpp"
+#include "Echo.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsVersion.hpp"
@@ -58,7 +58,7 @@ int main (int argc, char *argv[])
         }
         else if ((arg1 == "--version")||(arg1=="-v"))
         {
-            std::cout << "helics_app\n" << helics::helicsVersionString() << '\n';
+            std::cout << "helics_app\n" << helics::versionString() << '\n';
         }
         else if ((arg1 == "--help") || (arg1 == "-?"))
         {
@@ -66,7 +66,11 @@ int main (int argc, char *argv[])
         }
         else if (arg1 == "echo")
         {
-
+            helics::Echo Echo(argc, argv);
+            if (Echo.isActive())
+            {
+                Echo.run();
+            }
         }
         else if (arg1 == "source")
         {

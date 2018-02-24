@@ -42,7 +42,7 @@ helics_subscription helicsFederateRegisterSubscription (helics_federate fed, con
             return nullptr;
         }
         auto *sub = new helics::SubscriptionObject ();
-        sub->subptr = std::make_unique<helics::Subscription> (fedObj.get (), key, (units == nullptr) ? nullStr : std::string (units));
+        sub->subptr = std::make_unique<helics::Subscription> (fedObj, key, (units == nullptr) ? nullStr : std::string (units));
         sub->fedptr = std::move (fedObj);
         addSubscription (fed, sub);
         return reinterpret_cast<helics_subscription> (sub);
@@ -119,7 +119,7 @@ helics_subscription helicsFederateRegisterOptionalSubscription (helics_federate 
         }
         auto *sub = new helics::SubscriptionObject ();
         sub->subptr =
-          std::make_unique<helics::Subscription> (false, fedObj.get (), key, (units == nullptr) ? nullStr : std::string (units));
+          std::make_unique<helics::Subscription> (helics::OPTIONAL, fedObj.get (), key, (units == nullptr) ? nullStr : std::string (units));
         sub->fedptr = std::move (fedObj);
         addSubscription (fed, sub);
         return reinterpret_cast<helics_subscription> (sub);
@@ -172,7 +172,7 @@ helics_subscription helicsFederateRegisterOptionalTypeSubscription (helics_feder
     try
     {
         sub = new helics::SubscriptionObject ();
-        sub->subptr = std::make_unique<helics::Subscription> (false, fedObj.get (), key, static_cast<helics::helics_type_t> (type),
+        sub->subptr = std::make_unique<helics::Subscription> (fedObj.get (), key, static_cast<helics::helics_type_t> (type),
                                                               (units == nullptr) ? nullStr : std::string (units));
         sub->fedptr = std::move (fedObj);
         addSubscription (fed, sub);
@@ -955,7 +955,7 @@ helics_time_t helicsSubscriptionLastUpdateTime (helics_subscription sub)
 {
     if (sub == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
     }
     auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
     if (subObj->rawOnly)
@@ -969,3 +969,37 @@ helics_time_t helicsSubscriptionLastUpdateTime (helics_subscription sub)
         return time.getBaseTimeCode ();
     }
 }
+
+
+int helicsFederateGetPublicationCount(helics_federate fed)
+{
+    if (fed == nullptr)
+    {
+        return (-1);
+    }
+    auto vfedObj = getValueFed(fed);
+    if (vfedObj==nullptr)
+    {
+        auto fedObj = getFed(fed);
+        //if this is not nullptr than it is a valid fed object just not a value federate object so it has 0 subscriptions
+        return (fedObj != nullptr) ? 0 : (-1);
+    }
+    return static_cast<int>(vfedObj->getPublicationCount());
+}
+
+int helicsFederateGetSubscriptionCount(helics_federate fed)
+{
+    if (fed == nullptr)
+    {
+        return (-1);
+    }
+    auto vfedObj = getValueFed(fed);
+    if (vfedObj == nullptr)
+    {
+        auto fedObj = getFed(fed);
+        //if this is not nullptr than it is a valid fed object just not a value federate object so it has 0 subscriptions
+        return (fedObj != nullptr) ? 0 : (-1);
+    }
+    return static_cast<int>(vfedObj->getSubscriptionCount());
+}
+

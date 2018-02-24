@@ -8,5 +8,5 @@ function varargout = helicsFederateGetState(varargin)
     %* `state` :
     %    the resulting state if helics_status return helics_ok
     %
-  [varargout{1:nargout}] = helicsMEX(77, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(80, varargin{:});
 end

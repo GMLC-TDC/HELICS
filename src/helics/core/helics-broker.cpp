@@ -29,7 +29,7 @@ int main (int argc, char *argv[])
         }
         else if (exit_early == helics::versionReturn)
         {
-            std::cout << helics::helicsVersionString() << '\n';
+            std::cout << helics::versionString() << '\n';
         }
         return 0;
     }
@@ -47,7 +47,7 @@ int main (int argc, char *argv[])
         std::cerr << "Unable to generate broker: " << ie.what () << '\n';
         return (-2);
     }
-    auto broker = helics::BrokerFactory::create (type, argc, argv);
+    auto broker = helics::BrokerFactory::create (type,name, argc, argv);
     if (broker->isConnected ())
     {
         do  // sleep until the broker finishes

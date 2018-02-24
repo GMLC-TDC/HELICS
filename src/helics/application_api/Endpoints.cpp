@@ -23,4 +23,11 @@ Endpoint::Endpoint (MessageFederate *mFed, int endpointIndex) : fed (mFed)
     }
     id = static_cast<endpoint_id_t> (endpointIndex);
 }
+
+void Endpoint::setCallback(std::function<void(const Endpoint *, Time)> callback)
+{
+    //copy by value otherwise this object can't be used in vectors by itself
+    Endpoint local(*this);
+    fed->registerEndpointCallback(id, [callback, local](endpoint_id_t, Time messageTime) {callback(&local, messageTime); });
+}
 }  // namespace helics

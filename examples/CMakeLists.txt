@@ -1,7 +1,21 @@
 
+if (EXAMPLES_WARNINGS_AS_ERROR)
+#the examples had better compile without warnings otherwise they should not be allowed
+IF(WIN32)
+IF (MSVC)
+add_compile_options(/WX)
+ELSE(MSVC)
+add_compile_options(-Werror)
+ENDIF(MSVC)
+ELSE()
+add_compile_options(-Werror)
+ENDIF()
+endif()
+
 add_subdirectory (ipcTest)
 add_subdirectory (valueFederates1)
 add_subdirectory (messageFederates1)
+add_subdirectory (FilterFederate1)
 if(BUILD_C_SHARED_LIB)
 add_subdirectory (CInterface)
 add_subdirectory (CppInterface)

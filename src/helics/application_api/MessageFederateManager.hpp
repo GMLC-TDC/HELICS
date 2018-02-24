@@ -1,21 +1,19 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _MESSAGE_FEDERATE_MANAGER_
-#define _MESSAGE_FEDERATE_MANAGER_
+
 #pragma once
 
+#include "../common/DualMappedPointerVector.hpp"
+#include "../common/GuardedTypes.hpp"
 #include "../common/simpleQueue.hpp"
 #include "../core/Core.hpp"
 #include "Message.hpp"
-#include "../common/GuardedTypes.hpp"
 #include <cstdint>
 #include <functional>
 #include <map>
@@ -23,23 +21,21 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
-#include "../common/DualMappedVector.hpp"
 namespace helics
 {
 class Core;
 /** data class containing information on an endpoint for Message Federate Manager*/
 class endpoint_info
 {
-public:
+  public:
     std::string name;
     std::string type;
-	endpoint_id_t id = invalid_id_value;
-	Core::handle_id_t handle = invalid_handle;
+    endpoint_id_t id = invalid_id_value;
+    Core::handle_id_t handle = invalid_handle;
     int callbackIndex = -1;
-	endpoint_info() = default;
-    endpoint_info (std::string n_name, std::string n_type,endpoint_id_t n_id,Core::handle_id_t n_handle)
-        : name (std::move (n_name)), type (std::move (n_type)),id(n_id),handle(n_handle){};
-
+    endpoint_info () = default;
+    endpoint_info (std::string n_name, std::string n_type, endpoint_id_t n_id, Core::handle_id_t n_handle)
+        : name (std::move (n_name)), type (std::move (n_type)), id (n_id), handle (n_handle){};
 };
 
 /** class handling the implementation details of a value Federate
@@ -48,8 +44,8 @@ public:
 class MessageFederateManager
 {
   public:
-      /** construct from a pointer to a core and a specified federate id
-      */
+    /** construct from a pointer to a core and a specified federate id
+     */
     MessageFederateManager (Core *coreOb, Core::federate_id_t id);
     ~MessageFederateManager ();
     /** register an endpoint
@@ -125,18 +121,18 @@ class MessageFederateManager
     @details there can only be one generic callback
     @param[in] callback the function to call
     */
-    void registerCallback (std::function<void(endpoint_id_t, Time)> callback);
+    void registerCallback (const std::function<void(endpoint_id_t, Time)> &callback);
     /** register a callback function to call when the specified endpoint receives a message
     @param[in] id  the endpoint id to register the callback for
     @param[in] callback the function to call
     */
-    void registerCallback (endpoint_id_t id, std::function<void(endpoint_id_t, Time)> callback);
+    void registerCallback (endpoint_id_t id, const std::function<void(endpoint_id_t, Time)> &callback);
     /** register a callback function to call when one of the specified endpoint ids receives a message
     @param[in] ids  the set of ids to register the callback for
     @param[in] callback the function to call
     */
-    void
-    registerCallback (const std::vector<endpoint_id_t> &ids, std::function<void(endpoint_id_t, Time)> callback);
+    void registerCallback (const std::vector<endpoint_id_t> &ids,
+                           const std::function<void(endpoint_id_t, Time)> &callback);
 
     /**disconnect from the coreObject*/
     void disconnect ();
@@ -144,13 +140,14 @@ class MessageFederateManager
     int getEndpointCount () const;
 
   private:
-    shared_guarded<DualMappedVector<endpoint_info,std::string, Core::handle_id_t>> local_endpoints;  //!< storage for the local endpoint information
+    shared_guarded<DualMappedPointerVector<endpoint_info, std::string, Core::handle_id_t>>
+      local_endpoints;  //!< storage for the local endpoint information
     std::vector<std::function<void(endpoint_id_t, Time)>> callbacks;  //!< vector of callbacks
 
     std::map<Core::handle_id_t, std::pair<endpoint_id_t, std::string>> subHandleLookup;  //!< map for subscriptions
     Time CurrentTime;  //!< the current simulation time
-	Core *coreObject;  //!< the pointer to the actual core
-    std::atomic<endpoint_id_t::underlyingType> endpointCount{ 0 };  //!< the count of actual endpoints
+    Core *coreObject;  //!< the pointer to the actual core
+    std::atomic<endpoint_id_t::underlyingType> endpointCount{0};  //!< the count of actual endpoints
     Core::federate_id_t fedID;  //!< storage for the federate ID
     mutable std::mutex endpointLock;  //!< lock for protecting the endpoint list
     std::vector<SimpleQueue<std::unique_ptr<Message>>> messageQueues;  //!< the storage for the message queues
@@ -161,4 +158,3 @@ class MessageFederateManager
     void removeOrderedMessage (unsigned int index);
 };
 }  // namespace helics
-#endif

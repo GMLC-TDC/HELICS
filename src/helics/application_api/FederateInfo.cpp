@@ -14,8 +14,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsVersion.hpp"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <boost/filesystem.hpp>
 
 #include "../common/argParser.h"
@@ -24,31 +24,30 @@ namespace filesystem = boost::filesystem;
 
 namespace helics
 {
-
 using namespace std::string_literals;
-static const ArgDescriptors InfoArgs{
-    {"broker,b"s,  "address of the broker to connect"s },
-{"name,n"s,  "name of the player federate"s },
-{"corename"s,  "the name of the core to create or find"s },
-{"core,c"s,  "type of the core to connect to"s },
-{"offset"s,  "the offset of the time steps"s },
-{"period"s, "the period of the federate"s },
-{"timedelta"s,  "the time delta of the federate"s },
-{"coreinit,i"s,  "the core initialization string"s },
-{"inputdelay"s,  "the input delay on incoming communication of the federate"s },
-{"outputdelay"s,  "the output delay for outgoing communication of the federate"s },
-{"flags,f"s, ArgDescriptor::arg_type_t::vector_string, "named flag for the federate"s }
-};
+static const ArgDescriptors InfoArgs{{"broker,b"s, "address of the broker to connect"s},
+                                     {"name,n"s, "name of the player federate"s},
+                                     {"corename"s, "the name of the core to create or find"s},
+                                     {"core,c"s, "type of the core to connect to"s},
+                                     {"offset"s, "the offset of the time steps"s},
+                                     {"period"s, "the period of the federate"s},
+                                     {"timedelta"s, "the time delta of the federate"s},
+                                     {"coreinit,i"s, "the core initialization string"s},
+                                     {"inputdelay"s, "the input delay on incoming communication of the federate"s},
+                                     {"outputdelay"s,
+                                      "the output delay for outgoing communication of the federate"s},
+                                     {"flags,f"s, ArgDescriptor::arg_type_t::vector_string,
+                                      "named flag for the federate"s}};
 
 FederateInfo::FederateInfo (int argc, const char *const *argv) { loadInfoFromArgs (argc, argv); }
 
 void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
 {
     variable_map vm;
-    auto res= argumentParser(argc, argv, vm, InfoArgs);
+    auto res = argumentParser (argc, argv, vm, InfoArgs);
     if (res == versionReturn)
     {
-        std::cout << helics::helicsVersionString() << '\n';
+        std::cout << helics::versionString () << '\n';
     }
     if (res < 0)
     {
@@ -84,26 +83,26 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
 
     if (vm.count ("timedelta") > 0)
     {
-        timeDelta = loadTimeFromString(vm["timedelta"].as<std::string> ());
+        timeDelta = loadTimeFromString (vm["timedelta"].as<std::string> ());
     }
     if (vm.count ("inputdelay") > 0)
     {
-        timeDelta = loadTimeFromString(vm["inputdelay"].as<std::string> ());
+        timeDelta = loadTimeFromString (vm["inputdelay"].as<std::string> ());
     }
 
     if (vm.count ("outputdelay") > 0)
     {
-        timeDelta = loadTimeFromString(vm["outputdelay"].as<std::string> ());
+        timeDelta = loadTimeFromString (vm["outputdelay"].as<std::string> ());
     }
 
     if (vm.count ("period") > 0)
     {
-        period = loadTimeFromString(vm["period"].as<std::string> ());
+        period = loadTimeFromString (vm["period"].as<std::string> ());
     }
 
     if (vm.count ("offset") > 0)
     {
-        offset = loadTimeFromString(vm["offset"].as<std::string> ());
+        offset = loadTimeFromString (vm["offset"].as<std::string> ());
     }
     if (vm.count ("maxiterations") > 0)
     {

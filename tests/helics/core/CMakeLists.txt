@@ -23,16 +23,21 @@ CoreFactory-tests.cpp
 #CommonCore-tests.cpp
 TestCore-tests.cpp
 ZeromqCore-tests.cpp
-MpiCore-tests.cpp
 Node_Core-tests.cpp
 testFixtures.cpp
 IPCcore_tests.cpp
 data-block-tests.cpp
 UdpCore-tests.cpp
+ForwardingTimeCoordinatorTests.cpp
+TimeCoordinatorTests.cpp
 )
 
 if (NOT DISABLE_TCP_CORE)
-list(APPEND core_test_sources TcpCore-tests.cpp)
+    list(APPEND core_test_sources TcpCore-tests.cpp)
+endif()
+
+if (MPI_ENABLE)
+    list(APPEND core_test_sources MpiCore-tests.cpp)
 endif()
 
 add_executable(core-tests ${core_test_sources} ${core_test_headers})
@@ -45,7 +50,7 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 target_link_libraries(core-tests ${Boost_LIBRARIES_test})
 
-add_test(NAME core-tests COMMAND core-tests --log_level=warning --report_level=short)
+add_test(NAME core-tests COMMAND core-tests --log_level=test_suite --report_level=short)
 set_target_properties (core-tests PROPERTIES FOLDER tests)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)

@@ -1,4 +1,4 @@
-#FederateName/topic1
+#type name
 
 sub pub1
 subscription pub2

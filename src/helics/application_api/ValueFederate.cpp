@@ -23,7 +23,7 @@ ValueFederate::ValueFederate (const FederateInfo &fi) : Federate (fi)
 	//the core object get instantiated in the Federate constructor
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
 }
-ValueFederate::ValueFederate (std::shared_ptr<Core> core, const FederateInfo &fi) : Federate (std::move (core), fi)
+ValueFederate::ValueFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi) : Federate (core, fi)
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
 }
@@ -40,7 +40,7 @@ ValueFederate::ValueFederate (bool /*res*/)
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
 }
 
-ValueFederate::ValueFederate (ValueFederate &&fed) noexcept = default;
+ValueFederate::ValueFederate (ValueFederate &&) noexcept = default;
 
 ValueFederate::~ValueFederate () = default;
 

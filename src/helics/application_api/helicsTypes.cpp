@@ -1,12 +1,10 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
 #include "helicsTypes.hpp"
@@ -502,11 +500,11 @@ data_block typeConvert (helics_type_t type, const double *vals, size_t size)
     case helics_type_t::helicsComplex:
     {
         std::complex<double> V (0.0, 0.0);
-        if (size >= 2)
+        if ((size >= 2)&&(vals!=nullptr))
         {
             V = std::complex<double> (vals[0], vals[1]);
         }
-        else if (size == 1)
+        else if ((size == 1)&&(vals!=nullptr))
         {
             V = std::complex<double> (vals[0], 0.0);
         }
@@ -522,10 +520,13 @@ data_block typeConvert (helics_type_t type, const double *vals, size_t size)
     case helics_type_t::helicsComplexVector:
     {
         std::vector<std::complex<double>> CD;
-        CD.reserve (size / 2);
-        for (size_t ii = 0; ii < size - 1; ++ii)
+        if ((size > 0) && (vals != nullptr))
         {
-            CD.emplace_back (vals[ii], vals[ii + 1]);
+            CD.reserve(size / 2);
+            for (size_t ii = 0; ii < size - 1; ++ii)
+            {
+                CD.emplace_back(vals[ii], vals[ii + 1]);
+            }
         }
         return ValueConverter<std::vector<std::complex<double>>>::convert (CD);
     }

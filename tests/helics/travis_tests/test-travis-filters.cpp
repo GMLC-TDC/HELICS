@@ -5,11 +5,11 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include "helics/application_api/Federate.hpp"
 #include "helics/application_api/MessageOperators.hpp"
-#include "testFixtures.h"
+#include "../application_api/testFixtures.hpp"
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -27,7 +27,7 @@ namespace utf = boost::unit_test;
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (travis_core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
@@ -90,7 +90,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (travis_core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
