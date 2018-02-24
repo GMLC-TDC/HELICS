@@ -35,12 +35,12 @@ class ValueFederate : public virtual Federate
   public:
     friend class helics::FederateInfo;
 
-    ValueFederate (FederateInfo &fi)
+    explicit ValueFederate (FederateInfo &fi)
     {
         fed = helicsCreateValueFederate (fi.getInfo());
     }
 
-    ValueFederate (const std::string &jsonString)
+    explicit ValueFederate (const std::string &jsonString)
     {
         fed = helicsCreateValueFederateFromJson (jsonString.c_str());
     }

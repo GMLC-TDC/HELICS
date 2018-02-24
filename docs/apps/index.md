@@ -10,14 +10,14 @@ Included with HELICS are a number of apps that provide useful utilities and test
 
   Recorder
   Player
+  App
   cmdArgs
+  Echo
 ```
 
 <!--
 TODO: Add following to TOC above
-Echo
 Source
 Tracer
 Broker
-App
 -->
