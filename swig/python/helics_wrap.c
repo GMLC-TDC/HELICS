@@ -3039,6 +3039,9 @@ SWIGINTERNINLINE PyObject*
 }
 
 
+  #define SWIG_From_double   PyFloat_FromDouble 
+
+
 SWIGINTERN swig_type_info*
 SWIG_pchar_descriptor(void)
 {
@@ -3250,9 +3253,6 @@ SWIG_AsVal_double (PyObject *obj, double *val)
 }
 
 
-  #define SWIG_From_double   PyFloat_FromDouble 
-
-
 #include <limits.h>
 #if !defined(SWIG_NO_LLONG_MAX)
 # if !defined(LLONG_MAX) && defined(__GNUC__) && defined (__LONG_LONG_MAX__)
@@ -3360,6 +3360,34 @@ SWIG_AsVal_int (PyObject * obj, int *val)
 #ifdef __cplusplus
 extern "C" {
 #endif
+SWIGINTERN int Swig_var_helics_time_zero_set(PyObject *_val SWIGUNUSED) {
+  SWIG_Error(SWIG_AttributeError,"Variable helics_time_zero is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_helics_time_zero_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_double((double)(helics_time_zero));
+  return pyobj;
+}
+
+
+SWIGINTERN int Swig_var_helics_time_epsilon_set(PyObject *_val SWIGUNUSED) {
+  SWIG_Error(SWIG_AttributeError,"Variable helics_time_epsilon is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_helics_time_epsilon_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_double((double)(helics_time_epsilon));
+  return pyobj;
+}
+
+
 SWIGINTERN PyObject *_wrap_data_t_data_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   struct data_t *arg1 = (struct data_t *) 0 ;
@@ -6062,6 +6090,18 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsCleanupHelicsLibrary(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  
+  if (!PyArg_ParseTuple(args,(char *)":helicsCleanupHelicsLibrary")) SWIG_fail;
+  helicsCleanupHelicsLibrary();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsFederateRegisterSubscription(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
@@ -8457,7 +8497,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_setString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_helicsFilterSetString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
@@ -8474,22 +8514,22 @@ SWIGINTERN PyObject *_wrap_setString(PyObject *SWIGUNUSEDPARM(self), PyObject *a
   PyObject * obj2 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:setString",&obj0,&obj1,&obj2)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsFilterSetString",&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "setString" "', argument " "1"" of type '" "helics_filter""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterSetString" "', argument " "1"" of type '" "helics_filter""'"); 
   }
   res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "setString" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterSetString" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
   res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "setString" "', argument " "3"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFilterSetString" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = (char *)(buf3);
-  result = (helics_status)setString(arg1,(char const *)arg2,(char const *)arg3);
+  result = (helics_status)helicsFilterSetString(arg1,(char const *)arg2,(char const *)arg3);
   resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
@@ -9616,6 +9656,7 @@ static PyMethodDef SwigMethods[] = {
 		"free the memory associated with a query object\n"
 		"\n"
 		""},
+	 { (char *)"helicsCleanupHelicsLibrary", _wrap_helicsCleanupHelicsLibrary, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateRegisterSubscription", _wrap_helicsFederateRegisterSubscription, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -10057,10 +10098,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"\n"
 		""},
-	 { (char *)"setString", _wrap_setString, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsFilterSetString", _wrap_helicsFilterSetString, METH_VARARGS, NULL},
 	 { (char *)"helicsFilterAddDestinationTarget", _wrap_helicsFilterAddDestinationTarget, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -10848,6 +10886,9 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_invalid_state_transition",SWIG_From_int((int)(helics_invalid_state_transition)));
   SWIG_Python_SetConstant(d, "helics_invalid_function_call",SWIG_From_int((int)(helics_invalid_function_call)));
   SWIG_Python_SetConstant(d, "helics_error",SWIG_From_int((int)(helics_error)));
+  PyDict_SetItemString(md,(char *)"cvar", SWIG_globals());
+  SWIG_addvarlink(SWIG_globals(),(char *)"helics_time_zero",Swig_var_helics_time_zero_get, Swig_var_helics_time_zero_set);
+  SWIG_addvarlink(SWIG_globals(),(char *)"helics_time_epsilon",Swig_var_helics_time_epsilon_get, Swig_var_helics_time_epsilon_set);
   SWIG_Python_SetConstant(d, "helics_true",SWIG_From_int((int)((1))));
   SWIG_Python_SetConstant(d, "helics_false",SWIG_From_int((int)((0))));
   SWIG_Python_SetConstant(d, "no_iteration",SWIG_From_int((int)(no_iteration)));
