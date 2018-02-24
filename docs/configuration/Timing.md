@@ -35,4 +35,32 @@ The input Delay can be thought of as the propagation delay for signals going int
 Basically all values and signals are only acknowledged in the timing calculations after the prescribed delay
 
 ### Output Delay
-The output delay is the match to the InputDelay.   
+The output delay is symmetrical to the input delay.  Except it applies to all outgoing messages.  Basically once a time is granted the federate cannot effect
+other federates until T+outputDelay
+
+## Timing Flags
+
+### uninterruptible
+if set to true the federate can only return time expressly requested(or the next valid time after the requested time)
+
+### source_only
+indicator that the federate is only used for signal generation and doesn't depend on any other federate for timing.
+Having subscriptions or receiving messages is still possible but the timing of them non-deterministic.
+
+### observer
+If the observer flag is set to true, the federate is intended to be receive only and will not impact timing of any other federate
+sending messages from an observer federate is undefined.  
+
+### rollback (not used)
+Should be set to true for federates that support rollback
+
+### only_update_on_change
+If set to true a federate will only trigger a value update if the value has actually changed on a granted time.
+Change is defined as binary equivalence,  Subscription objects can be used for numerical limits and other change detection.
+
+### only_transmit_on_change 
+if set to true a federate will only transmit publishes if the value has changed.  Change is defined as binary equivalence.
+If numerical deltas and ranges are desired use Publication objects for finer grained control.  This flag applies federate wide.
+
+
+
