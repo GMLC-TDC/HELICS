@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _ARG_PARSER_
-#define _ARG_PARSER_
+
 
 /**
 @file common function for parsing command line arguments for core and brokers
@@ -28,32 +25,41 @@ class ArgDescriptor
       /** enumeration of possible types of the arguments*/
       enum class arg_type_t :int
       {
-          string_type,
-          flag_type, 
-          double_type,
-          int_type,
-          vector_string,
-          vector_double,
+          string_type, //!< descriptor of a string argument
+          flag_type, //!< descriptor of a flag argument implying no values, just a flag
+          double_type, //!< descriptor for a floating point argument
+          int_type, //!< descriptor for an integer argument
+          vector_string, //!< descriptor for multiple string arguments
+          vector_double,    //!< descriptor for multiple double arguments
       };
     std::string arg_;  //!< a key for the argument
     arg_type_t type_=arg_type_t::string_type;  //!< the type of argument that is expected
     std::string desc_;  //!< a help file description
     ArgDescriptor () = default;
+    /** constructor that takes a key, a type and a description string
+    @param arg the key for the flag of the for "key", or "key,k" if a short argument is desired
+    @param type the type of the argument
+    @parm desc a descriptor displayed in the help window for a string*/
     ArgDescriptor (std::string arg, arg_type_t type, std::string desc)
         : arg_ (std::move (arg)), type_ (type), desc_ (std::move (desc))
     {
         
     }
-    /** two argument constructor assuming the results will be strings*/
+    /** two argument constructor assuming the results will be strings
+    @param arg the key for the parameter
+    @param desc a description of the argument displayed for help*/
     ArgDescriptor(std::string arg, std::string desc)
         : arg_(std::move(arg)), desc_(std::move(desc))
     {
     }
 };
+/** convenience alias*/
 using ArgDescriptors = std::vector<ArgDescriptor>;
 
 using variable_map = boost::program_options::variables_map;
+/** return value if the help argument is called*/
 constexpr int helpReturn(-1);
+/** return argument if a version argument was detected*/
 constexpr int versionReturn(-2);
 
 /** using boost argument_parser to process a set of command line arguments
@@ -69,6 +75,7 @@ int argumentParser (int argc,
                         variable_map &vm_map,
                      const ArgDescriptors &argDefinitions, const std::string &posName=std::string());
 
-}
 
-#endif  //_ARG_PARSER_
+} // namespace helics 
+
+

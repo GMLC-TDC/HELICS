@@ -1,16 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
-#ifndef _HELICS_MESSAGE_FEDERATE_API_
-#define _HELICS_MESSAGE_FEDERATE_API_
 #pragma once
 
 #include "Federate.hpp"
@@ -28,22 +24,22 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     /**constructor taking a federate information structure and using the default core
     @param[in] fi  a federate information structure
     */
-    MessageFederate (const FederateInfo &fi);
+    explicit MessageFederate (const FederateInfo &fi);
     /**constructor taking a core and a federate information structure, sore information in fi is ignored
     @param[in] core a shared ptr to a core to join
     @param[in] fi  a federate information structure
     */
-    MessageFederate (std::shared_ptr<Core> core, const FederateInfo &fi);
+    MessageFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a string with the required information
     @param[in] jsonString can be either a json file or a string containing json code
     */
-    MessageFederate (const std::string &jsonString);
+    explicit MessageFederate (const std::string &jsonString);
     /** move constructor*/
     MessageFederate (MessageFederate &&mFed) noexcept;
     /** default constructor*/
     MessageFederate ();
     /** special constructor should only be used by child classes in constructor due to virtual inheritance*/
-    MessageFederate (bool res);
+    explicit MessageFederate (bool res);
     // copy constructor and copy assignment are disabled
   public:
     /** destructor */
@@ -185,18 +181,18 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     /** register a callback for all endpoints
     @param[in] callback the function to execute upon receipt of a message for any endpoint
     */
-    void registerEndpointCallback (std::function<void(endpoint_id_t, Time)> callback);
+    void registerEndpointCallback (const std::function<void(endpoint_id_t, Time)> &callback);
     /** register a callback for a specific endpoint
     @param[in] ep the endpoint to associate with the specified callback
     @param[in] callback the function to execute upon receipt of a message for the given endpoint
     */
-    void registerEndpointCallback (endpoint_id_t ep, std::function<void(endpoint_id_t, Time)> callback);
+    void registerEndpointCallback (endpoint_id_t ep, const std::function<void(endpoint_id_t, Time)> &callback);
     /** register a callback for a set of specific endpoint
     @param[in] ep a vector of endpoints to associate with the specified callback
     @param[in] callback the function to execute upon receipt of a message for the given endpoint
     */
     void registerEndpointCallback (const std::vector<endpoint_id_t> &ep,
-                                   std::function<void(endpoint_id_t, Time)> callback);
+                                   const std::function<void(endpoint_id_t, Time)> &callback);
 
     virtual void disconnect () override;
 
@@ -208,4 +204,3 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     std::unique_ptr<MessageFederateManager> mfManager;
 };
 }  // namespace helics
-#endif

@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/CoreFederateInfo.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/core-types.hpp"
+#include "helics/core/TestCore.h"
 
 BOOST_AUTO_TEST_SUITE (TestCore_tests)
 
@@ -23,16 +24,27 @@ using namespace helics::CoreFactory;
 
 BOOST_AUTO_TEST_CASE (testcore_initialization_test)
 {
-    std::string initializationString = "4";
+    auto broker = helics::BrokerFactory::create(helics::core_type::TEST, "");
+    BOOST_CHECK(broker->isConnected());
+    std::string initializationString = std::string("4")+" --broker="+broker->getIdentifier();
     auto core = create (helics::core_type::TEST, initializationString);
 
-    BOOST_REQUIRE (core != nullptr);
+    auto Tcore = std::dynamic_pointer_cast<helics::TestCore>(core);
+
+    BOOST_REQUIRE (core);
+    BOOST_REQUIRE(Tcore);
     BOOST_CHECK (core->isInitialized ());
 
     core->connect ();
+    
+    
     BOOST_CHECK (core->isConnected ());
     core->disconnect ();
+    broker->disconnect();
     BOOST_CHECK_EQUAL (core->isConnected (), false);
+    BOOST_CHECK_EQUAL(broker->isConnected(), false);
+    core = nullptr;
+    broker = nullptr;
 }
 
 BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)

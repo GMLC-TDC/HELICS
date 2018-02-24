@@ -1,4 +1,3 @@
-
 /*
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
@@ -6,7 +5,6 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
 #ifndef HELICS_API_DATA_H_
@@ -60,6 +58,8 @@ typedef void *helics_query;
 
 /** time definition used in the C interface to helics*/
 typedef double helics_time_t;
+const helics_time_t helics_time_zero = 0.0;
+const helics_time_t helics_time_epsilon = 1.0;
 
 /** defining a boolean type for use in the helics interface*/
 typedef int helics_bool_t;
@@ -132,6 +132,24 @@ typedef struct message_t
     const char *original_dest; /*!< the original destination of the message */
 
 } message_t;
+
+/** pick a core type depending on compile configuration usually either ZMQ if available or UDP */
+#define HELICS_CORE_TYPE_DEFAULT = 0  
+/** use the Zero MQ networking protocol */
+#define HELICS_CORE_TYPE_ZMQ = 1  
+/** use MPI for operation on a parallel cluster */
+#define HELICS_CORE_TYPE_MPI = 2 
+/** use the Test core if all federates are in the same process */
+#define HELICS_CORE_TYPE_TEST = 3
+/** interprocess uses memory mapped files to transfer data (for use when all federates are
+on the same machine */
+#define HELICS_CORE_TYPE_INTERPROCESS = 4
+/** same as INTERPROCESS */
+#define HELICS_CORE_TYPE_IPC = 5
+/** use a generic TCP protocol message stream to send messages */
+#define HELICS_CORE_TYPE_TCP = 6
+/** use UDP packets to send the data */
+#define HELICS_CORE_TYPE_UDP = 7 
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

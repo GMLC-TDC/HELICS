@@ -8,9 +8,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#ifndef HELICS_BLOCKING_QUEUE3_HPP_
-#define HELICS_BLOCKING_QUEUE3_HPP_
 
+#pragma once
 #include "helics_includes/optional.h"
 #include <algorithm>
 #include <atomic>
@@ -343,4 +342,3 @@ bool BlockingQueue<T>::empty () const
 {
     return queueEmptyFlag;
 }
-#endif

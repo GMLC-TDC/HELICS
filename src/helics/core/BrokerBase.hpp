@@ -5,7 +5,6 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
 /**
@@ -14,8 +13,6 @@ virtual base class for object that function like a broker includes common parame
 and some common methods used cores and brokers
 */
 
-#ifndef BROKER_BASE_H_
-#define BROKER_BASE_H_
 #pragma once
 #include "../common/BlockingPriorityQueue.hpp"
 #include "ActionMessage.hpp"
@@ -28,7 +25,7 @@ and some common methods used cores and brokers
 namespace helics
 {
 class Logger;
-class TimeCoordinator;
+class ForwardingTimeCoordinator;
 /** base class for broker like objects
  */
 class BrokerBase
@@ -59,10 +56,10 @@ class BrokerBase
 
   protected:
     std::string logFile;  //< the file to log message to
-    std::unique_ptr<TimeCoordinator> timeCoord;  //!< object managing the time control
+    std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
     BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
     /** enumeration of the possible core states*/
-    enum broker_state_t : int
+    enum broker_state_t : int16_t
     {
         created = -5,  //!< the broker has been created
         initialized = -4,  //!< the broker itself has been initialized and is ready to connect
@@ -81,7 +78,9 @@ class BrokerBase
     bool hasTimeDependency = false;  //!< set to true if the broker has Time dependencies
     bool enteredExecutionMode = false;  //!< flag indicating that the broker has entered execution mode
     bool waitingForServerPingReply = false;  //!< flag indicating we are waiting for a ping reply
+    bool hasFilters = false;  //!< flag indicating filters come through the broker
   public:
+      /** display help messages for the broker*/
     static void displayHelp ();
     BrokerBase () noexcept;
     BrokerBase (const std::string &broker_name);
@@ -154,4 +153,3 @@ class BrokerBase
 };
 
 }  // namespace helics
-#endif

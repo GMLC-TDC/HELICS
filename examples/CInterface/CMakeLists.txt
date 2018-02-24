@@ -25,6 +25,12 @@ add_executable(nonlings_fed2 nonlings_fed2.c)
 target_link_libraries(nonlings_fed1 helicsSharedLib )
 target_link_libraries(nonlings_fed2 helicsSharedLib )
 
+add_executable(hello_world_sender hello_world/hello_world_sender.c)
+add_executable(hello_world_receiver hello_world/hello_world_receiver.c)
+
+target_link_libraries(hello_world_sender helicsSharedLib )
+target_link_libraries(hello_world_receiver helicsSharedLib )
+
 set_target_properties (pi_sender PROPERTIES
     FOLDER examples)
 
@@ -43,7 +49,11 @@ set_target_properties (nonlings_fed1 PROPERTIES
 set_target_properties (nonlings_fed2 PROPERTIES
     FOLDER examples)
 
-
+set_target_properties (hello_world_sender PROPERTIES
+    FOLDER examples)
+	
+set_target_properties (hello_world_receiver PROPERTIES
+    FOLDER examples)
 
 
 if (!MSVC)
@@ -55,6 +65,9 @@ target_compile_options(pi_receiver2 PRIVATE -ansi -Wall -pedantic -Werror)
 
 target_compile_options(nonlings_fed1 PRIVATE -ansi -Wall -pedantic -Werror)
 target_compile_options(nonlings_fed2 PRIVATE -ansi -Wall -pedantic -Werror)
+
+target_compile_options(hello_world_sender PRIVATE -ansi -Wall -pedantic -Werror)
+target_compile_options(hello_world_receiver PRIVATE -ansi -Wall -pedantic -Werror)
 endif()
 
 

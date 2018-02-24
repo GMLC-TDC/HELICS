@@ -7,8 +7,9 @@ project (HELICS)
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
 set (HELICS_VERSION_PATCH 0)
-set (HELICS_VERSION_BUILD alpha2)
-set (HELICS_DATE "02-02-18")
+set (HELICS_VERSION_BUILD beta)
+set (HELICS_DATE "02-23-18")
+set (HELICS_VERSION_STRING "1.0.0-beta (02-23-18)")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -112,10 +113,9 @@ ELSE(UNIX)
   ENDIF(MINGW)
 ENDIF(UNIX)
 
-IF (BUILD_MATLAB OR USE_BOOST_STATIC_LIBS)
+IF (USE_BOOST_STATIC_LIBS)
   set(Boost_USE_STATIC_LIBS ON)
   set(BOOST_STATIC ON)
-	  
 ENDIF ()
 # -------------------------------------------------------------
 # add coverage target
@@ -188,7 +188,6 @@ endif(ZeroMQ_ENABLE)
 OPTION(MPI_ENABLE "Enable MPI networking library" OFF)
 IF (MPI_ENABLE)
 find_package(MPI)
-set(MPI_C_FOUND FALSE)
 if (${MPI_C_FOUND})
    set(HELICS_HAVE_MPI TRUE)
    include_directories("${MPI_C_INCLUDE_PATH}")
@@ -206,7 +205,7 @@ add_library(helics-static STATIC
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
-target_link_libraries(helics-static Threads::Threads) 
+target_link_libraries(helics-static Threads::Threads)
 IF (UNIX AND NOT APPLE)
 target_link_libraries(helics-static rt)
 ENDIF()
@@ -380,6 +379,7 @@ endif(ENABLE_CLANG_TOOLS)
 
 add_subdirectory(swig)
 
+add_subdirectory(docs)
 
 set(HELICS_CMAKECONFIG_INSTALL_DIR "cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
 
@@ -460,3 +460,10 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
 			   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake
               DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
+
+if (CMAKE_INSTALL_PREFIX)
+    message(STATUS "Using CMAKE_INSTALL_PREFIX: " ${CMAKE_INSTALL_PREFIX})
+endif()
+
+
+

@@ -1,12 +1,10 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
 #include "FilterOperations.hpp"
@@ -53,13 +51,12 @@ void DelayFilterOperation::setString (const std::string &property, const std::st
     {
         try
         {
-            delay = loadTimeFromString(val);
+            delay = loadTimeFromString (val);
         }
         catch (const std::invalid_argument &ia)
         {
-            throw (helics::InvalidParameter(val + " is not a valid time string"));
+            throw (helics::InvalidParameter (val + " is not a valid time string"));
         }
-       
     }
 }
 
@@ -68,8 +65,8 @@ std::shared_ptr<FilterOperator> DelayFilterOperation::getOperator ()
     return std::static_pointer_cast<FilterOperator> (td);
 }
 
-// enumeration of possible random number generator distributions
-enum class random_dists_t : int
+/** enumeration of possible random number generator distributions */
+ enum class random_dists_t : int
 {
     constant,
     uniform,
@@ -227,10 +224,10 @@ class randomDelayGenerator
 };
 
 RandomDelayFilterOperation::RandomDelayFilterOperation ()
+    : td (std::make_shared<MessageTimeOperator> (
+        [this](Time messageTime) { return messageTime + rdelayGen->generate (); })),
+      rdelayGen (std::make_unique<randomDelayGenerator> ())
 {
-    rdelayGen = std::make_unique<randomDelayGenerator> ();
-    td = std::make_shared<MessageTimeOperator> (
-      [this](Time messageTime) { return messageTime + rdelayGen->generate (); });
 }
 RandomDelayFilterOperation::~RandomDelayFilterOperation () = default;
 
@@ -254,6 +251,16 @@ void RandomDelayFilterOperation::setString (const std::string &property, const s
         {
             rdelayGen->dist.store (res->second);
         }
+    }
+    else if ((property == "param1") || (property == "mean") || (property == "min") || (property == "alpha"))
+    {
+        auto tm = loadTimeFromString(val);
+        rdelayGen->param1.store(static_cast<double>(tm));
+    }
+    else if ((property == "param2") || (property == "stddev") || (property == "max") || (property == "beta"))
+    {
+        auto tm = loadTimeFromString(val);
+        rdelayGen->param2.store(static_cast<double>(tm));
     }
 }
 

@@ -1,13 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 static char help[] = "Example to demonstrate the usage of HELICS C Interface with two federates.\n\
             This example implements a loose-coupling protocol to exchange values between two federates. \n\
             Here, a value federate, that can both publish and subcribe is created.\n\
@@ -27,7 +26,7 @@ int main(int /*argc*/,char ** /*argv*/)
   helics_publication  pub;
 
 
-  std::string helicsversion = helics::helicsVersionString();
+  std::string helicsversion = helics::versionString();
 
   printf("PI RECEIVER: Helics version = %s\n",helicsversion.c_str());
   printf("%s",help);
@@ -71,13 +70,12 @@ int main(int /*argc*/,char ** /*argv*/)
   printf("PI RECEIVER: Entered execution state\n");
 
   helics_time_t currenttime=0.0;
-  double        value = 0.0;
-  int isupdated=0; 
+ 
   double pi = 22.0/7.0;
 
   while(currenttime < 0.2) {
     
-    isupdated = 0;
+    bool isupdated = false;
     while(!isupdated) {
       currenttime = vfed->requestTime(currenttime);
       isupdated = vfed->isUpdated(sub);
@@ -86,7 +84,7 @@ int main(int /*argc*/,char ** /*argv*/)
 		  break;
 	  }
     }
-    value = vfed->getDouble(sub); /* Note: The sender sent this value at currenttime-deltat */
+    double value = vfed->getDouble(sub); /* Note: The sender sent this value at currenttime-deltat */
     printf("PI RECEIVER: Received value = %4.3f at time %3.2f from PI SENDER\n",value,currenttime);
 
     value = currenttime*pi;

@@ -111,9 +111,10 @@ class Federate
     */
     Federate (const FederateInfo &fi);
     /**constructor taking a core and a federate information structure
+    @param core a shared pointer to a core object, the pointer will be copied
     @param[in] fi  a federate information structure
     */
-    Federate (std::shared_ptr<Core> core, const FederateInfo &fi);
+    Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] jsonString can be either a JSON file or a string containing JSON code
     */

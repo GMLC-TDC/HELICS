@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef MESSAGE_OPERATORS_H_
-#define MESSAGE_OPERATORS_H_
+
 #pragma once
 
 #include <functional>
@@ -29,7 +26,7 @@ class MessageTimeOperator : public FilterOperator
     /** default constructor*/
     MessageTimeOperator () = default;
     /** set the function to modify the time of the message in the constructor*/
-    MessageTimeOperator (std::function<Time (Time)> userTimeFunction);
+    explicit MessageTimeOperator (std::function<Time (Time)> userTimeFunction);
     /** set the function to modify the time of the message*/
     void setTimeFunction (std::function<Time (Time)> userTimeFunction);
 
@@ -45,7 +42,7 @@ class MessageDestOperator : public FilterOperator
     /** default constructor*/
     MessageDestOperator () = default;
     /** set the function to modify the time of the message in the constructor*/
-    MessageDestOperator (std::function<std::string (const std::string &)> userDestFunction);
+    explicit MessageDestOperator (std::function<std::string (const std::string &)> userDestFunction);
     /** set the function to modify the time of the message*/
     void setDestFunction (std::function<std::string (const std::string &)> userDestFunction);
 
@@ -62,7 +59,7 @@ class MessageDataOperator : public FilterOperator
     /** default constructor*/
     MessageDataOperator () = default;
     /** set the function to modify the data of the message in the constructor*/
-    MessageDataOperator (std::function<data_view (data_view)> userDataFunction);
+    explicit MessageDataOperator (std::function<data_view (data_view)> userDataFunction);
     /** set the function to modify the data of the message*/
     void setDataFunction (std::function<data_view (data_view)> userDataFunction);
 
@@ -81,7 +78,7 @@ class MessageConditionalOperator : public FilterOperator
     /** default constructor*/
     MessageConditionalOperator () = default;
     /** set the function to modify the data of the message in the constructor*/
-    MessageConditionalOperator (std::function<bool(const Message *)> userConditionalFunction);
+    explicit MessageConditionalOperator (std::function<bool(const Message *)> userConditionalFunction);
     /** set the function to modify the data of the message*/
     void setConditionFunction (std::function<bool(const Message *)> userConditionalFunction);
 
@@ -110,4 +107,3 @@ class CloneOperator : public FilterOperator
 };
 
 }  // namespace helics
-#endif

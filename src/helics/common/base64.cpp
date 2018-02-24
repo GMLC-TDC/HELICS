@@ -88,7 +88,6 @@ std::vector<unsigned char> base64_decode (std::string const &encoded_string, siz
 {
     auto in_len = encoded_string.size ();
     int i = 0;
-    int j = 0;
     int in_ = static_cast<int> (offset);
     unsigned char char_array_4[4], char_array_3[3];
     std::vector<unsigned char> ret;
@@ -119,7 +118,7 @@ std::vector<unsigned char> base64_decode (std::string const &encoded_string, siz
 
     if (i > 0)
     {
-        for (j = i; j < 4; j++)
+        for (int j = i; j < 4; j++)
         {
             char_array_4[j] = 0;
         }
@@ -132,7 +131,7 @@ std::vector<unsigned char> base64_decode (std::string const &encoded_string, siz
         char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
         char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
-        for (j = 0; (j < i - 1); j++)
+        for (int j = 0; (j < i - 1); j++)
         {
             ret.push_back (char_array_3[j]);
         }
@@ -145,7 +144,6 @@ std::string base64_decode_to_string (std::string const &encoded_string, size_t o
 {
     auto in_len = encoded_string.size ();
     int i = 0;
-    int j = 0;
     int in_ = static_cast<int> (offset);
     unsigned char char_array_4[4], char_array_3[3];
     std::string ret;
@@ -176,7 +174,7 @@ std::string base64_decode_to_string (std::string const &encoded_string, size_t o
 
     if (i > 0)
     {
-        for (j = i; j < 4; j++)
+        for (int j = i; j < 4; j++)
         {
             char_array_4[j] = 0;
         }
@@ -189,7 +187,7 @@ std::string base64_decode_to_string (std::string const &encoded_string, size_t o
         char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
         char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
-        for (j = 0; (j < i - 1); j++)
+        for (int j = 0; (j < i - 1); j++)
         {
             ret.push_back (char_array_3[j]);
         }
@@ -203,7 +201,6 @@ size_t base64_decode (std::string const &encoded_string, void *data, size_t max_
 {
     auto in_len = encoded_string.size ();
     int i = 0;
-    int j = 0;
     int in_ = 0;
     unsigned char char_array_4[4], char_array_3[3];
     unsigned char *outData = reinterpret_cast<unsigned char *> (data);
@@ -246,7 +243,7 @@ size_t base64_decode (std::string const &encoded_string, void *data, size_t max_
 
     if (i > 0)
     {
-        for (j = i; j < 4; j++)
+        for (int j = i; j < 4; j++)
         {
             char_array_4[j] = 0;
         }
@@ -259,7 +256,7 @@ size_t base64_decode (std::string const &encoded_string, void *data, size_t max_
         char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
         char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
-        for (j = 0; (j < i - 1); j++)
+        for (int j = 0; (j < i - 1); j++)
         {
             if (dataIndex < max_size)
             {

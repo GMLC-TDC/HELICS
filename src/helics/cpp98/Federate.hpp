@@ -126,20 +126,20 @@ class FederateInfo
 class InvalidStateTransition : public std::runtime_error
 {
   public:
-    InvalidStateTransition (const char *s) : std::runtime_error (s) {}
+    explicit InvalidStateTransition (const char *s) : std::runtime_error (s) {}
 };
 
 /** defining an exception class for invalid function calls*/
 class InvalidFunctionCall : public std::runtime_error
 {
   public:
-    InvalidFunctionCall (const char *s) : std::runtime_error (s) {}
+    explicit InvalidFunctionCall (const char *s) : std::runtime_error (s) {}
 };
 /** defining an exception class for invalid parameter values*/
 class InvalidParameterValue : public std::runtime_error
 {
   public:
-    InvalidParameterValue (const char *s) : std::runtime_error (s) {}
+    explicit InvalidParameterValue (const char *s) : std::runtime_error (s) {}
 };
 
 

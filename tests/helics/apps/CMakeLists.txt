@@ -18,6 +18,7 @@ player_tests.cpp
 recorder_tests.cpp
 exeTestHelper.cpp
 combo_tests.cpp
+EchoTests.cpp
 exeTestHelper.h
 )
 
