@@ -86,7 +86,7 @@ int main (int /*argc*/, char ** /*argv*/)
     {
     //    yprv = y;
         y = vfed->getDouble (sub);
-        double f1, J1;
+        double f1;
         int newt_conv = 0, max_iter = 10, iter = 0;
         /* Solve the equation using Newton */
         while (!newt_conv && iter < max_iter)
@@ -102,7 +102,7 @@ int main (int /*argc*/, char ** /*argv*/)
             iter++;
 
             /* Jacobian */
-            J1 = 2 * x - 2;
+            double J1 = 2 * x - 2;
 
             x = x - f1 / J1;
         }

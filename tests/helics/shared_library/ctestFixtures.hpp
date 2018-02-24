@@ -40,10 +40,10 @@ struct FederateTestFixture
 
     void SetupTest (
             FedCreator ctor,
-            std::string core_type_name,
+            const std::string &core_type_name,
             int count,
             helics_time_t time_delta = helics_time_zero,
-            std::string name_prefix = "fed")
+            const std::string &name_prefix = "fed")
     {
         helics_broker broker = AddBroker (core_type_name, count);
         BOOST_CHECK(nullptr != broker);
@@ -56,7 +56,7 @@ struct FederateTestFixture
             int count,
             helics_broker broker,
             helics_time_t time_delta = helics_time_zero,
-            std::string name_prefix = "fed")
+            const std::string &name_prefix = "fed")
     {
         char tmp[HELICS_SIZE_MAX];
         bool hasIndex = hasIndexCode (core_type_name);
