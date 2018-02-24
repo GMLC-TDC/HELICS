@@ -5,8 +5,8 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -164,7 +164,6 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
 
 BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (core_types), core_type)
 {
-    helics_status status;
     helics_federate_info_t fi;
     helics_broker broker;
     helics_federate vFed;
@@ -175,10 +174,8 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
 
     broker = helicsCreateBroker (core_type.c_str (), "", "--federates=1");
     fi = helicsFederateInfoCreate ();
-    status = helicsFederateInfoSetFederateName (fi, "fed0");
-    BOOST_CHECK_EQUAL (status, helics_ok);
-    status = helicsFederateInfoSetCoreTypeFromString (fi, core_type.c_str ());
-    BOOST_CHECK_EQUAL (status, helics_ok);
+    CE(helicsFederateInfoSetFederateName (fi, "fed0"));
+    CE(helicsFederateInfoSetCoreTypeFromString(fi, core_type.c_str()));
     vFed = helicsCreateValueFederate (fi);
 
     // SetupTest<helics::ValueFederate> (core_type, 1);
@@ -192,38 +189,33 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     subid3 = helicsFederateRegisterSubscription (vFed, "sub3", "double", "V");
     // auto subid3 = vFed1->registerOptionalSubscription ("sub3", "double", "V");
 
-    status = helicsFederateEnterExecutionMode (vFed);
+    CE(helicsFederateEnterExecutionMode (vFed));
 
-    BOOST_CHECK_EQUAL (status, helics_ok);
     // vFed1->enterExecutionState ();
 
     // BOOST_CHECK (vFed->getCurrentState () == helics::Federate::op_states::execution);
 
-    status = helicsSubscriptionGetKey (subid, subname, 100);
-    BOOST_CHECK_EQUAL (status, helics_ok);
-    status = helicsSubscriptionGetKey (subid2, subname2, 100);
-    BOOST_CHECK_EQUAL (status, helics_ok);
+    CE (helicsSubscriptionGetKey (subid, subname, 100));
+
+    CE (helicsSubscriptionGetKey (subid2, subname2, 100));
     // auto sv = vFed1->getSubscriptionName(subid);
     // auto sv2 = vFed1->getSubscriptionName (subid2);
     BOOST_CHECK_EQUAL (subname, "sub1");
     BOOST_CHECK_EQUAL (subname2, "sub2");
     // BOOST_CHECK_EQUAL (sv, "sub1");
     // BOOST_CHECK_EQUAL (sv2, "sub2");
-    status = helicsSubscriptionGetKey (subid3, subname3, 100);
-    BOOST_CHECK_EQUAL (status, helics_ok);
+    CE( helicsSubscriptionGetKey (subid3, subname3, 100));
     // auto sub3name = vFed1->getSubscriptionName (subid3);
 
     // vFed1->addSubscriptionShortcut (subid, "Shortcut"); //appears to be relevant for C++ API only
     BOOST_CHECK_EQUAL (subname3, "sub3");
     // BOOST_CHECK_EQUAL (sub3name, "sub3");
 
-    status = helicsSubscriptionGetType (subid3, subtype3, 100);
-    BOOST_CHECK_EQUAL (status, helics_ok);
+    CE(helicsSubscriptionGetType (subid3, subtype3, 100));
     BOOST_CHECK_EQUAL (subtype3, "double");
     // BOOST_CHECK_EQUAL (vFed1->getSubscriptionType (subid3), "double");
 
-    status = helicsSubscriptionGetUnits (subid3, subunit3, 100);
-    BOOST_CHECK_EQUAL (status, helics_ok);
+    CE( helicsSubscriptionGetUnits (subid3, subunit3, 100));
     BOOST_CHECK_EQUAL (subunit3, "V");
     // BOOST_CHECK_EQUAL (vFed1->getSubscriptionUnits (subid3), "V");
 
@@ -234,13 +226,11 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     // BOOST_CHECK (vFed1->getSubscriptionId ("Shortcut") == subid); //not relevant for C-API as subscription
     // shortcuts and IDs are relevant for C++ API only
 
-    status = helicsFederateFinalize (vFed);
-
-    BOOST_CHECK_EQUAL (status, helics_ok);
+   CE(helicsFederateFinalize (vFed));
     // vFed1->finalize ();
 
     // BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
-    status = helicsFederateFinalize (vFed);
+    CE(helicsFederateFinalize (vFed));
     helicsFederateInfoFree (fi);
     helicsFederateFree (vFed);
     helicsBrokerFree (broker);
@@ -251,7 +241,6 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
                       bdata::make (core_types),
                       core_type)
 {
-    helics_status status;
     helics_federate_info_t fi;
     helics_broker broker;
     helics_federate vFed;
@@ -265,10 +254,9 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 
     broker = helicsCreateBroker (core_type.c_str (), "", "--federates=1");
     fi = helicsFederateInfoCreate ();
-    status = helicsFederateInfoSetFederateName (fi, "fed0");
-    BOOST_CHECK_EQUAL (status, helics_ok);
-    status = helicsFederateInfoSetCoreTypeFromString (fi, core_type.c_str ());
-    BOOST_CHECK_EQUAL (status, helics_ok);
+    CE(helicsFederateInfoSetFederateName (fi, "fed0"));
+
+    CE( helicsFederateInfoSetCoreTypeFromString (fi, core_type.c_str ()));
     vFed = helicsCreateValueFederate (fi);
 
     pubid = helicsFederateRegisterPublication (vFed, "pub1", "", "");
@@ -280,8 +268,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     subid2 = helicsFederateRegisterSubscription (vFed, "sub2", "int", "");
     subid3 = helicsFederateRegisterSubscription (vFed, "sub3", "double", "V");
 
-    helicsFederateEnterExecutionMode (vFed);
-    BOOST_CHECK (status == helics_ok);
+    CE(helicsFederateEnterExecutionMode (vFed));
 
     helicsSubscriptionGetKey (subid, subname, 100);
     helicsSubscriptionGetKey (subid2, subname2, 100);
@@ -315,8 +302,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     helicsPublicationGetUnits (pubid3, pubunit3, 100);
     BOOST_CHECK_EQUAL (pubunit3, "V");
 
-    status = helicsFederateFinalize (vFed);
-    BOOST_CHECK_EQUAL (status, helics_ok);
+    CE(helicsFederateFinalize (vFed));
 
     helicsFederateInfoFree (fi);
     helicsFederateFree (vFed);

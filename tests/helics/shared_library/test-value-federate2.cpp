@@ -15,8 +15,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <iostream>
 #include "ctestFixtures.hpp"
 
-#include "test_configuration.h"
-
 /** these test cases test out the value converters and some of the other functions
 */
 
@@ -245,7 +243,6 @@ BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type
 //#endif
 BOOST_DATA_TEST_CASE(test_async_calls, bdata::make(core_types), core_type)
 {
-	helics_status status;
 	helics_federate_info_t fi, fi1;
 	helics_broker broker;
 	helics_federate vFed1, vFed2;
@@ -258,9 +255,9 @@ BOOST_DATA_TEST_CASE(test_async_calls, bdata::make(core_types), core_type)
 	broker = helicsCreateBroker(core_type.c_str(), "", "--federates=2");
 	fi = helicsFederateInfoCreate();
 	fi1 = helicsFederateInfoCreate();
-	status = helicsFederateInfoSetFederateName(fi, "fed0");
-	status = helicsFederateInfoSetFederateName(fi1, "fed1");
-	status = helicsFederateInfoSetCoreTypeFromString(fi, core_type.c_str());
+	CE(helicsFederateInfoSetFederateName(fi, "fed0"));
+    CE(helicsFederateInfoSetFederateName(fi1, "fed1"));
+    CE(helicsFederateInfoSetCoreTypeFromString(fi, core_type.c_str()));
 	//status = helicsFederateInfoSetTimeDelta(fi, 1.0);
 	vFed1 = helicsCreateValueFederate(fi);
 	vFed2 = helicsCreateValueFederate(fi1);
@@ -268,53 +265,53 @@ BOOST_DATA_TEST_CASE(test_async_calls, bdata::make(core_types), core_type)
 	// register the publications
 	pubid = helicsFederateRegisterGlobalPublication(vFed1, "pub1", "string", "");
 	subid = helicsFederateRegisterSubscription(vFed2, "pub1", "string", "");
-	status = helicsFederateSetTimeDelta(vFed1, 1.0);
-	status = helicsFederateSetTimeDelta(vFed2, 1.0);
+    CE(helicsFederateSetTimeDelta(vFed1, 1.0));
+    CE(helicsFederateSetTimeDelta(vFed2, 1.0));
 
-	status = helicsFederateEnterExecutionModeAsync(vFed1);
-	status = helicsFederateEnterExecutionModeAsync(vFed2);
-	status = helicsFederateEnterExecutionModeComplete(vFed1);
-	status = helicsFederateEnterExecutionModeComplete(vFed2);
+    CE(helicsFederateEnterExecutionModeAsync(vFed1));
+    CE(helicsFederateEnterExecutionModeAsync(vFed2));
+    CE(helicsFederateEnterExecutionModeComplete(vFed1));
+    CE(helicsFederateEnterExecutionModeComplete(vFed2));
 
 	// publish string1 at time=0.0;
-	status = helicsPublicationPublishString(pubid, "string1");
+    CE(helicsPublicationPublishString(pubid, "string1"));
 
-	status = helicsFederateRequestTimeAsync(vFed1, 1.0);
-	status = helicsFederateRequestTimeComplete(vFed1, &f1time);
-	status = helicsFederateRequestTimeAsync(vFed2, 1.0);
-	status = helicsFederateRequestTimeComplete(vFed2, &gtime);
+    CE(helicsFederateRequestTimeAsync(vFed1, 1.0));
+    CE(helicsFederateRequestTimeComplete(vFed1, &f1time));
+    CE(helicsFederateRequestTimeAsync(vFed2, 1.0));
+    CE(helicsFederateRequestTimeComplete(vFed2, &gtime));
 
 	BOOST_CHECK_EQUAL(f1time, 1.0);
 	BOOST_CHECK_EQUAL(gtime, 1.0);
 
 	// get the value
-	status = helicsSubscriptionGetString(subid, s, 100);
+    CE(helicsSubscriptionGetString(subid, s, 100));
 
 	// make sure the string is what we expect
 	BOOST_CHECK_EQUAL(s, "string1");
 
 	// publish a second string
-	status = helicsPublicationPublishString(pubid, "string2");
+    CE(helicsPublicationPublishString(pubid, "string2"));
 
 	// make sure the value is still what we expect
-	status = helicsSubscriptionGetString(subid, s, 100);
+    CE(helicsSubscriptionGetString(subid, s, 100));
 	BOOST_CHECK_EQUAL(s, "string1");
 
 	// advance time
-	status = helicsFederateRequestTimeAsync(vFed1, 2.0);
-	status = helicsFederateRequestTimeComplete(vFed1, &f1time);
-	status = helicsFederateRequestTimeAsync(vFed2, 2.0);
-	status = helicsFederateRequestTimeComplete(vFed2, &gtime);
+    CE(helicsFederateRequestTimeAsync(vFed1, 2.0));
+    CE(helicsFederateRequestTimeComplete(vFed1, &f1time));
+    CE(helicsFederateRequestTimeAsync(vFed2, 2.0));
+    CE(helicsFederateRequestTimeComplete(vFed2, &gtime));
 
 	BOOST_CHECK_EQUAL(f1time, 2.0);
 	BOOST_CHECK_EQUAL(gtime, 2.0);
 
 	// make sure the value was updated
-	status = helicsSubscriptionGetString(subid, s, 100);
+    CE(helicsSubscriptionGetString(subid, s, 100));
 	BOOST_CHECK_EQUAL(s, "string2");
 
-	status = helicsFederateFinalize(vFed1);
-	status = helicsFederateFinalize(vFed2);
+    CE(helicsFederateFinalize(vFed1));
+    CE(helicsFederateFinalize(vFed2));
 
 	helicsFederateInfoFree(fi);
 	helicsFederateInfoFree(fi1);
@@ -389,7 +386,7 @@ BOOST_AUTO_TEST_CASE(test_file_load)
 	//fi = helicsFederateInfoCreate();
 	// path of the json file is hardcoded for now
 	vFed = helicsCreateValueFederateFromJson(TEST_DIR "/test_files/example_value_fed.json");
-    BOOST_REQUIRE_NE(vFed, nullptr);
+    BOOST_REQUIRE(vFed!=nullptr);
 	CE (helicsFederateGetName(vFed, s, 100));
 	BOOST_CHECK_EQUAL(s, "valueFed");
 	BOOST_CHECK_EQUAL(helicsFederateGetSubscriptionCount(vFed), 2);

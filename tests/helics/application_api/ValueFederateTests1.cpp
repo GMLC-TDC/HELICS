@@ -21,7 +21,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "testFixtures.hpp"
 #include "test_configuration.h"
 
-using namespace std::string_literals;
 /** these test cases test out the value federates
  */
 
