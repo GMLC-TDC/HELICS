@@ -12,5 +12,5 @@ function varargout = helicsFederateInfoSetFederateName(varargin)
     %-------
     %a helics_status enumeration helics_ok on success
     %
-  [varargout{1:nargout}] = helicsMEX(52, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(54, varargin{:});
 end

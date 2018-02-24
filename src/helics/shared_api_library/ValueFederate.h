@@ -150,7 +150,7 @@ HELICS_Export helics_publication helicsFederateRegisterGlobalTypePublication (he
 /**
 * \defgroup publications Publication functions
 @details functions for publishing data of various kinds
-The data will get translated to the type specifed when the publication was constructed automatically
+The data will get translated to the type specified when the publication was constructed automatically
 regardless of the function used to publish the data
 * @{
 */
@@ -159,28 +159,28 @@ regardless of the function used to publish the data
 @param pub the publication to publish for
 @param data a pointer to the raw data
 @param len the size in bytes of the data to publish
-@return helics_ok if everthing was ok
+@return helics_ok if everything was OK
 */
 HELICS_Export helics_status helicsPublicationPublish (helics_publication pub, const char *data, int len);
 
 /** publish a string
 @param pub the publication to publish for
 @param str a pointer to a NULL terminated string
-@return helics_ok if everthing was ok
+@return helics_ok if everything was OK
 */
 HELICS_Export helics_status helicsPublicationPublishString (helics_publication pub, const char *str);
 
 /** publish an integer value
 @param pub the publication to publish for
 @param val the numerical value to publish
-@return helics_ok if everthing was ok
+@return helics_ok if everything was OK
 */
 HELICS_Export helics_status helicsPublicationPublishInteger (helics_publication pub, int64_t val);
 
 /** publish a double floating point value
 @param pub the publication to publish for
 @param val the numerical value to publish
-@return helics_ok if everthing was ok
+@return helics_ok if everything was OK
 */
 HELICS_Export helics_status helicsPublicationPublishDouble (helics_publication pub, double val);
 
@@ -188,7 +188,7 @@ HELICS_Export helics_status helicsPublicationPublishDouble (helics_publication p
 @param pub the publication to publish for
 @param real the real part of a complex number to publish
 @param imag the imaginary part of a complex number to publish
-@return helics_ok if everthing was ok
+@return helics_ok if everything was OK
 */
 HELICS_Export helics_status helicsPublicationPublishComplex (helics_publication pub, double real, double imag);
 
@@ -196,7 +196,7 @@ HELICS_Export helics_status helicsPublicationPublishComplex (helics_publication 
 @param pub the publication to publish for
 @param data a pointer to an array of double data
 @param len the number of points to publish
-@return helics_ok if everthing was ok
+@return helics_ok if everything was OK
 */
 HELICS_Export helics_status helicsPublicationPublishVector (helics_publication pub, const double data[], int len);
 
@@ -277,28 +277,28 @@ HELICS_Export helics_status helicsSubscriptionGetVector (helics_subscription sub
 @param sub the subscription to set the default for
 @param data a pointer to the raw data to use for the default
 @param len the size of the raw data
-@return helics_ok if everthing was ok
+@return helics_ok if everything was OK
 */
 HELICS_Export helics_status helicsSubscriptionSetDefault (helics_subscription sub, const char *data, int len);
 
 /** set the default as a string
 @param sub the subscription to set the default for
 @param str a pointer to the default string
-@return helics_ok if everthing was ok
+@return helics_ok if everything was OK
 */
 HELICS_Export helics_status helicsSubscriptionSetDefaultString (helics_subscription sub, const char *str);
 
 /** set the default as an integer
 @param sub the subscription to set the default for
 @param val the default integer
-@return helics_ok if everthing was ok
+@return helics_ok if everything was OK
 */
 HELICS_Export helics_status helicsSubscriptionSetDefaultInteger (helics_subscription sub, int64_t val);
 
 /** set the default as a double
 @param sub the subscription to set the default for
 @param val the default double value
-@return helics_ok if everthing was ok
+@return helics_ok if everything was OK
 */
 HELICS_Export helics_status helicsSubscriptionSetDefaultDouble (helics_subscription sub, double val);
 
@@ -306,7 +306,7 @@ HELICS_Export helics_status helicsSubscriptionSetDefaultDouble (helics_subscript
 @param sub the subscription to set the default for
 @param real the default real value
 @param imag the default imaginary value
-@return helics_ok if everthing was ok
+@return helics_ok if everything was OK
 */
 HELICS_Export helics_status helicsSubscriptionSetDefaultComplex (helics_subscription sub, double real, double imag);
 
@@ -314,7 +314,7 @@ HELICS_Export helics_status helicsSubscriptionSetDefaultComplex (helics_subscrip
 @param sub the subscription to set the default for
 @param data a pointer to an array of double data
 @param len the number of points to publish
-@return helics_ok if everthing was ok
+@return helics_ok if everything was OK
 */
 HELICS_Export helics_status helicsSubscriptionSetDefaultVector (helics_subscription sub, const double *data, int len);
 

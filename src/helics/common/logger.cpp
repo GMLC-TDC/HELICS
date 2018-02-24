@@ -147,7 +147,10 @@ LoggingCore::LoggingCore () { loggingThread = std::thread (&LoggingCore::process
 
 LoggingCore::~LoggingCore ()
 {
-    loggingQueue.emplace (-1, "!!>close");
+    if (!tripDetector.isTripped())
+    {
+        loggingQueue.emplace(-1, "!!>close");
+    }
     loggingThread.join ();
 }
 

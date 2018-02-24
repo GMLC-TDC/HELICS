@@ -214,6 +214,7 @@ static message_t emptyMessage ()
     empty.length = 0;
     empty.dest = nullptr;
     empty.original_source = nullptr;
+    empty.original_dest = nullptr;
     empty.source = nullptr;
     return empty;
 }
@@ -233,7 +234,8 @@ message_t helicsEndpointGetMessage (helics_endpoint endpoint)
     mess.length = endObj->lastMessage->data.size ();
     mess.original_source = endObj->lastMessage->original_source.c_str ();
     mess.source = endObj->lastMessage->source.c_str ();
-    mess.time = endObj->lastMessage->time.getBaseTimeCode ();
+    mess.original_dest = endObj->lastMessage->original_dest.c_str();
+    mess.time = static_cast<helics_time_t>(endObj->lastMessage->time);
     return mess;
 }
 
@@ -255,8 +257,9 @@ message_t helicsFederateGetMessage (helics_federate fed)
     mess.dest = fedObj->lastMessage->dest.c_str ();
     mess.length = fedObj->lastMessage->data.size ();
     mess.original_source = fedObj->lastMessage->original_source.c_str ();
+    mess.original_dest = fedObj->lastMessage->original_dest.c_str();
     mess.source = fedObj->lastMessage->source.c_str ();
-    mess.time = fedObj->lastMessage->time.getBaseTimeCode ();
+    mess.time = static_cast<helics_time_t>(fedObj->lastMessage->time);
     return mess;
 }
 

@@ -23,6 +23,7 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 #pragma once
 
 #include "BlockingQueue.hpp"
+#include "TripWire.hpp"
 #include <fstream>
 #include <atomic>
 #include <thread>
@@ -41,6 +42,7 @@ namespace helics
         std::vector<std::function<void(std::string &&message)>> functions; //!< container for the functions
         std::mutex functionLock;    //!< lock for updating the functions
         BlockingQueue<std::pair<int32_t, std::string>> loggingQueue;  //!< the actual queue containing the strings to log
+        tripwire::TripWireDetector tripDetector;
     public:
         /** default constructor*/
         LoggingCore();

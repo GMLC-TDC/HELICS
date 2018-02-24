@@ -54,10 +54,10 @@ struct FederateTestFixture
     AddBroker (const std::string &core_type_name, const std::string &initialization_string);
 
     template <class FedType>
-    void SetupTest (std::string core_type_name,
+    void SetupTest (const std::string &core_type_name,
                                 int count,
                                 helics::Time time_delta = helics::timeZero,
-                                std::string name_prefix = "fed")
+                                const std::string &name_prefix = "fed")
     {
         auto broker = AddBroker (core_type_name, count);
         AddFederates<FedType> (core_type_name, count, broker, time_delta, name_prefix);
@@ -68,7 +68,7 @@ struct FederateTestFixture
                                                         int count,
                                                         std::shared_ptr<helics::Broker> broker,
                                                         helics::Time time_delta = helics::timeZero,
-                                                        std::string name_prefix = "fed")
+                                                        const std::string &name_prefix = "fed")
     {
         bool hasIndex = hasIndexCode (core_type_name);
         int setup = (hasIndex) ? getIndexCode (core_type_name) : 1;

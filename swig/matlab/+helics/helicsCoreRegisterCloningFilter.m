@@ -1,4 +1,4 @@
 function varargout = helicsCoreRegisterCloningFilter(varargin)
     %
-  [varargout{1:nargout}] = helicsMEX(159, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(162, varargin{:});
 end
