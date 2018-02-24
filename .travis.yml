@@ -131,7 +131,7 @@ script:
   # 1 = common_tests
   # 2 = core tests
   # 3 = application api tests
-  # 4 = c interface tests
+  # 4 = shared_library tests
   # 5 = helics-apps tests
   # 6 = travis-tests
   - ctest --verbose --timeout 120 -I 0,0,0,1

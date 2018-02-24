@@ -20,7 +20,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #endif
 
 #if HELICS_HAVE_MPI
-#include "mpi/mpiBroker.h"
+#include "mpi/MpiBroker.h"
 #endif
 
 #include "TestBroker.h"

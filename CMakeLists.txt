@@ -7,9 +7,9 @@ project (HELICS)
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
 set (HELICS_VERSION_PATCH 0)
-set (HELICS_VERSION_BUILD alpha.3)
-set (HELICS_DATE "02-12-18")
-set (HELICS_VERSION_STRING "1.0.0-alpha.3 (02-15-18)")
+set (HELICS_VERSION_BUILD beta)
+set (HELICS_DATE "02-23-18")
+set (HELICS_VERSION_STRING "1.0.0-beta (02-23-18)")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -188,7 +188,6 @@ endif(ZeroMQ_ENABLE)
 OPTION(MPI_ENABLE "Enable MPI networking library" OFF)
 IF (MPI_ENABLE)
 find_package(MPI)
-set(MPI_C_FOUND FALSE)
 if (${MPI_C_FOUND})
    set(HELICS_HAVE_MPI TRUE)
    include_directories("${MPI_C_INCLUDE_PATH}")
@@ -380,6 +379,7 @@ endif(ENABLE_CLANG_TOOLS)
 
 add_subdirectory(swig)
 
+add_subdirectory(docs)
 
 set(HELICS_CMAKECONFIG_INSTALL_DIR "cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
 

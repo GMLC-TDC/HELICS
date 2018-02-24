@@ -1,13 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include <cpp98/ValueFederate.hpp>
 #include <cpp98/Broker.hpp>
 #include <cpp98/helics.hpp> // helicsVersionString
@@ -68,7 +67,7 @@ int main (int /*argc*/, char ** /*argv*/)
     vfed->enterInitializationState (); // can throw helics::InvalidStateTransition exception
     printf (" Entered initialization state\n");
 
-    double x = 0.0, y = 0.0, /*yprv = 100,*/ xprv=100;
+    double x = 0.0, /*yprv = 100,*/ xprv=100;
     helics_time_t currenttime = 0.0;
     helics::helics_iteration_time currenttimeiter;
     currenttimeiter.status = iterating;
@@ -85,14 +84,13 @@ int main (int /*argc*/, char ** /*argv*/)
     while (currenttimeiter.status == iterating)
     {
     //    yprv = y;
-        y = vfed->getDouble (sub);
-        double f1;
+        double y = vfed->getDouble (sub);
         int newt_conv = 0, max_iter = 10, iter = 0;
         /* Solve the equation using Newton */
         while (!newt_conv && iter < max_iter)
         {
             /* Function value */
-            f1 = x * x - 2 * x - y + 0.5;
+            double f1 = x * x - 2 * x - y + 0.5;
 
             if (fabs (f1) < tol)
             {
