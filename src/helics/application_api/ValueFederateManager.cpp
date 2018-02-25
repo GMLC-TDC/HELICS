@@ -94,7 +94,7 @@ void ValueFederateManager::addSubscriptionShortcut (subscription_id_t subid, con
     }
 }
 
-void ValueFederateManager::setDefaultValue (subscription_id_t id, data_view block)
+void ValueFederateManager::setDefaultValue (subscription_id_t id, const data_view &block)
 {
     if (id.value () < subscriptions.size ())
     {
@@ -145,7 +145,7 @@ inline bool isBlockSizeValid (int size, const publication_info &pubI)
     return ((pubI.size < 0) || (pubI.size == size));
 }
 
-void ValueFederateManager::publish (publication_id_t id, data_view block)
+void ValueFederateManager::publish (publication_id_t id, const data_view &block)
 {
     if (id.value () < publications.size ())
     {  // send directly to the core

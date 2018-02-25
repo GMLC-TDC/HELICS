@@ -1,20 +1,16 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_IPC_COMMS_
-#define _HELICS_IPC_COMMS_
 #pragma once
 
 #include "../CommsInterface.hpp"
 #include <atomic>
 
 namespace helics {
-
+namespace ipc {
 /** implementation for the core that uses boost interprocess messages to communicate*/
 class IpcComms final:public CommsInterface {
 
@@ -39,7 +35,6 @@ private:
 #define IPC_BACKCHANNEL_TRY_RESET 2
 #define IPC_BACKCHANNEL_DISCONNECT 4
 
+} // namespace ipc
 } // namespace helics
-
-#endif /* _HELICS_IPC_COMMS_ */
 

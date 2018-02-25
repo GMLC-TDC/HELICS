@@ -1,19 +1,16 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_IPC_CORE_
-#define _HELICS_IPC_CORE_
+
 #pragma once
 
 #include "../CommonCore.hpp"
 #include "../CommsBroker.hpp"
 namespace helics {
-
+namespace ipc {
 class IpcComms;
 
 /** implementation for the core that uses Interprocess messages to communicate*/
@@ -36,7 +33,6 @@ private:
 	std::string brokername;	//!< the name of the broker
 };
 
-
+} // namespace ipc
 } // namespace helics
  
-#endif /* _HELICS_ZEROMQ_CORE_ */

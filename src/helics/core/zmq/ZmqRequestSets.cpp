@@ -15,6 +15,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
+namespace zeromq {
 ZmqRequestSets::ZmqRequestSets () { ctx = zmqContextManager::getContextPointer (); }
 void ZmqRequestSets::addRoutes (int routeNumber, const std::string &routeInfo)
 {
@@ -178,5 +179,5 @@ private:
     std::queue<std::pair<int, ActionMessage>> waiting_messages;
     std::queue<ActionMessage> Responses;
     */
-
+} // namespace zeromq
 }  // namespace helics

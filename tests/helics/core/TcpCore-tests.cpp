@@ -5,7 +5,6 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 #include <boost/test/unit_test.hpp>
 
@@ -114,7 +113,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
 {
     std::atomic<int> counter{0};
     std::string host = "localhost";
-    helics::TcpComms comm (host, host);
+    helics::tcp::TcpComms comm (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
 
@@ -155,7 +154,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     std::atomic<int> counter{0};
     std::atomic<size_t> len{0};
     std::string host = "localhost";
-    helics::TcpComms comm (host, host);
+    helics::tcp::TcpComms comm (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
     TcpServer server (srv->getBaseService (), TCP_BROKER_PORT);
@@ -205,7 +204,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     std::atomic<size_t> len{0};
     helics::ActionMessage act;
     std::string host = "localhost";
-    helics::TcpComms comm (host, host);
+    helics::tcp::TcpComms comm (host, host);
     std::mutex actguard;
     auto srv = AsioServiceManager::getServicePointer ();
 
@@ -261,8 +260,8 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     helics::ActionMessage act2;
 
     std::string host = "localhost";
-    helics::TcpComms comm (host, host);
-    helics::TcpComms comm2 (host, "");
+    helics::tcp::TcpComms comm (host, host);
+    helics::tcp::TcpComms comm2 (host, "");
 
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setName ("tests");
@@ -309,9 +308,9 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
     std::atomic<int> counter3{0};
 
     std::string host = "localhost";
-    helics::TcpComms comm (host, host);
-    helics::TcpComms comm2 (host, "");
-    helics::TcpComms comm3 (host, host);
+    helics::tcp::TcpComms comm (host, host);
+    helics::tcp::TcpComms comm2 (host, "");
+    helics::tcp::TcpComms comm3 (host, host);
 
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setName ("tests");
@@ -460,7 +459,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_core_broker_default_test)
     connected = core->connect ();
     BOOST_CHECK (connected);
 
-    auto ccore = static_cast<helics::TcpCore *> (core.get ());
+    auto ccore = static_cast<helics::tcp::TcpCore *> (core.get ());
     // this will test the automatic port allocation
     BOOST_CHECK_EQUAL (ccore->getAddress (), "localhost:24228");
     core->disconnect ();

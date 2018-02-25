@@ -6,6 +6,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
+
 #pragma once
 
 #include "ActionMessage.hpp"
@@ -28,6 +29,7 @@ private:
     Time time_minDe = timeZero;  //!< the minimum event time of the dependencies
     DependencyInfo::time_state_t time_state = DependencyInfo::time_state_t::time_requested; //!< the current forwarding time state
     Core::federate_id_t lastMinFed = invalid_fed_id; //!< the latest minimum fed
+    Core::federate_id_t parent = invalid_fed_id;  //!< the id for the parent object which should also be a ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     std::vector<Core::federate_id_t> dependents;  //!< federates which temporally depend on this federate
 

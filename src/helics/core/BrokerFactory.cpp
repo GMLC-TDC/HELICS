@@ -44,7 +44,11 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #if HELICS_HAVE_ZEROMQ
         type = core_type::ZMQ;
 #else
+#ifndef DISABLE_TCP_CORE
+        type = core_type::TCP;
+#else
         type = core_type::UDP;
+#endif
 #endif
     }
 
@@ -54,11 +58,11 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #if HELICS_HAVE_ZEROMQ
         if (name.empty ())
         {
-            broker = std::make_shared<ZmqBroker> ();
+            broker = std::make_shared<zeromq::ZmqBroker> ();
         }
         else
         {
-            broker = std::make_shared<ZmqBroker> (name);
+            broker = std::make_shared<zeromq::ZmqBroker> (name);
         }
 
 #else
@@ -69,11 +73,11 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #if HELICS_HAVE_MPI
         if (name.empty ())
         {
-            broker = std::make_shared<MpiBroker> ();
+            broker = std::make_shared<mpi::MpiBroker> ();
         }
         else
         {
-            broker = std::make_shared<MpiBroker> (name);
+            broker = std::make_shared<mpi::MpiBroker> (name);
         }
 #else
         throw (HelicsException ("mpi broker type is not available"));
@@ -82,43 +86,43 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
     case core_type::TEST:
         if (name.empty ())
         {
-            broker = std::make_shared<TestBroker> ();
+            broker = std::make_shared<testcore::TestBroker> ();
         }
         else
         {
-            broker = std::make_shared<TestBroker> (name);
+            broker = std::make_shared<testcore::TestBroker> (name);
         }
         break;
     case core_type::INTERPROCESS:
     case core_type::IPC:
         if (name.empty ())
         {
-            broker = std::make_shared<IpcBroker> ();
+            broker = std::make_shared<ipc::IpcBroker> ();
         }
         else
         {
-            broker = std::make_shared<IpcBroker> (name);
+            broker = std::make_shared<ipc::IpcBroker> (name);
         }
         break;
     case core_type::UDP:
         if (name.empty ())
         {
-            broker = std::make_shared<UdpBroker> ();
+            broker = std::make_shared<udp::UdpBroker> ();
         }
         else
         {
-            broker = std::make_shared<UdpBroker> (name);
+            broker = std::make_shared<udp::UdpBroker> (name);
         }
         break;
     case core_type::TCP:
 #ifndef DISABLE_TCP_CORE
         if (name.empty ())
         {
-            broker = std::make_shared<TcpBroker> ();
+            broker = std::make_shared<tcp::TcpBroker> ();
         }
         else
         {
-            broker = std::make_shared<TcpBroker> (name);
+            broker = std::make_shared<tcp::TcpBroker> (name);
         }
 #else
         throw (HelicsException ("tcp broker type is not available"));
@@ -240,37 +244,43 @@ void displayHelp (core_type type)
     {
     case core_type::ZMQ:
 #if HELICS_HAVE_ZEROMQ
-        ZmqBroker::displayHelp (true);
+        zeromq::ZmqBroker::displayHelp (true);
 #endif
         break;
     case core_type::MPI:
 #if HELICS_HAVE_MPI
-        MpiBroker::displayHelp (true);
+        mpi::MpiBroker::displayHelp (true);
 #endif
         break;
     case core_type::TEST:
-        TestBroker::displayHelp (true);
+        testcore::TestBroker::displayHelp (true);
         break;
     case core_type::INTERPROCESS:
     case core_type::IPC:
-        IpcBroker::displayHelp (true);
+        ipc::IpcBroker::displayHelp (true);
         break;
     case core_type::TCP:
+#ifndef DISABLE_TCP_CORE
+       tcp::TcpBroker::displayHelp(true);
+#endif
         break;
     case core_type::UDP:
-        UdpBroker::displayHelp (true);
+        udp::UdpBroker::displayHelp (true);
         break;
     default:
 #if HELICS_HAVE_ZEROMQ
-        ZmqBroker::displayHelp (true);
+        zeromq::ZmqBroker::displayHelp (true);
 #endif
 #if HELICS_HAVE_MPI
         MpiBroker::displayHelp (true);
 #endif
-        IpcBroker::displayHelp (true);
+        ipc::IpcBroker::displayHelp (true);
 
-        TestBroker::displayHelp (true);
-        UdpBroker::displayHelp (true);
+        testcore::TestBroker::displayHelp (true);
+#ifndef DISABLE_TCP_CORE
+        tcp::TcpBroker::displayHelp(true);
+#endif
+        udp::UdpBroker::displayHelp (true);
         break;
     }
 

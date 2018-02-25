@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_SUBSCRIPTIONINFO_
-#define _HELICS_SUBSCRIPTIONINFO_
+#pragma once
 
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
@@ -58,9 +55,7 @@ class SubscriptionInfo
 	@return true if the value has changed
 	*/
     bool updateTime (Time newTime);
-
+    /** get the event based on the event queue*/
     Time nextValueTime () const;
 };
 }  // namespace helics
-
-#endif /* _HELICS_TEST_CORE_ */

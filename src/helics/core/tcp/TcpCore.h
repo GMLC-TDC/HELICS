@@ -14,28 +14,28 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "../CommsBroker.hpp"
 #include "../NetworkBrokerData.hpp"
 namespace helics {
-
+namespace tcp {
 class TcpComms;
 /** implementation for the core that uses tcp messages to communicate*/
-class TcpCore final: public CommsBroker<TcpComms,CommonCore> {
+class TcpCore final : public CommsBroker<TcpComms, CommonCore> {
 
 public:
-	/** default constructor*/
-  TcpCore() noexcept;
-  TcpCore(const std::string &core_name);
-  ~TcpCore();
-  virtual void initializeFromArgs (int argc, const char * const *argv) override;
-         
+    /** default constructor*/
+    TcpCore() noexcept;
+    TcpCore(const std::string &core_name);
+    ~TcpCore();
+    virtual void initializeFromArgs(int argc, const char * const *argv) override;
+
 public:
-	virtual std::string getAddress() const override;
+    virtual std::string getAddress() const override;
 private:
-	
+
     NetworkBrokerData netInfo{ NetworkBrokerData::interface_type::tcp }; //!< structure containing the networking information
-	virtual bool brokerConnect() override;
- 
+    virtual bool brokerConnect() override;
+
 };
 
-
+} // namespace tcp
 } // namespace helics
  
 #endif /* _HELICS_TCP_CORE_ */

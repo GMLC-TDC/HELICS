@@ -1,12 +1,10 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 static char help[] = "Example to demonstrate the usage of HELICS C Interface with two federates.\n\
             This example implements a loose-coupling protocol to exchange values between two federates. \n\
@@ -29,7 +27,6 @@ int main()
   helics_publication  pub;
   helics_time_t currenttime = 0.0;
   double        value = 0.0;
-  int isupdated = 0;
   double pi = 22.0 / 7.0;
 
   helicsversion = helicsGetVersion();
@@ -92,7 +89,7 @@ int main()
 
   while(currenttime < 0.2) {
     
-    isupdated = 0;
+     int isupdated = 0;
     while(!isupdated) {
       helicsFederateRequestTime(vfed,currenttime, &currenttime);
       isupdated = helicsSubscriptionIsUpdated(sub);

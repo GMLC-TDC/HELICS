@@ -22,6 +22,8 @@ namespace helics
 using federate_id_t = Core::federate_id_t;
 using handle_id_t = Core::handle_id_t;
 
+namespace testcore
+{
 TestCore::TestCore (const std::string &core_name) : CommonCore (core_name) {}
 
 TestCore::TestCore (std::shared_ptr<CoreBroker> nbroker) : tbroker (std::move (nbroker)) {}
@@ -188,4 +190,5 @@ void TestCore::addRoute (int route_id, const std::string &routeInfo)
 
 std::string TestCore::getAddress () const { return getIdentifier (); }
 
+} // namespace testcore
 }  // namespace helics

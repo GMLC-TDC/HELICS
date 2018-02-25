@@ -94,7 +94,7 @@ class ValueFederateManager
 		@param[in] id the subscription identifier
 		@param[in] block the data block representing the default value
 		*/
-    void setDefaultValue (subscription_id_t id, data_view block);
+    void setDefaultValue (subscription_id_t id, const data_view &block);
 
 		/** get a value as raw data block from the system
 		@param[in] id the identifier for the subscription
@@ -103,7 +103,7 @@ class ValueFederateManager
     data_view getValue (subscription_id_t id);
 
 		/** publish a value*/
-    void publish (publication_id_t id, data_view block);
+    void publish (publication_id_t id, const data_view &block);
 
 		/** check if a given subscription has and update*/
     bool queryUpdate (subscription_id_t sub_id) const;

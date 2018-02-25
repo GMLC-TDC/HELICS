@@ -1,12 +1,10 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
 #include "CommsBroker.hpp"
@@ -29,16 +27,16 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-template class CommsBroker<IpcComms, CoreBroker>;
-template class CommsBroker<IpcComms, CommonCore>;
-template class CommsBroker<ZmqComms, CoreBroker>;
-template class CommsBroker<ZmqComms, CommonCore>;
-template class CommsBroker<UdpComms, CoreBroker>;
-template class CommsBroker<UdpComms, CommonCore>;
+template class CommsBroker<ipc::IpcComms, CoreBroker>;
+template class CommsBroker<ipc::IpcComms, CommonCore>;
+template class CommsBroker<zeromq::ZmqComms, CoreBroker>;
+template class CommsBroker<zeromq::ZmqComms, CommonCore>;
+template class CommsBroker<udp::UdpComms, CoreBroker>;
+template class CommsBroker<udp::UdpComms, CommonCore>;
 
 #ifndef DISABLE_TCP_CORE
-template class CommsBroker<TcpComms, CommonCore>;
-template class CommsBroker<TcpComms, CoreBroker>;
+template class CommsBroker<tcp::TcpComms, CommonCore>;
+template class CommsBroker<tcp::TcpComms, CoreBroker>;
 #endif
 
 #if HELICS_HAVE_MPI

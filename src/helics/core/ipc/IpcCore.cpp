@@ -1,12 +1,10 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 #include "IpcCore.h"
 #include "../Core.hpp"
@@ -29,6 +27,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/filesystem.hpp>
 
 namespace helics
+{
+namespace ipc
 {
 using namespace std::string_literals;
 static const ArgDescriptors extraArgs{
@@ -101,4 +101,5 @@ std::string IpcCore::getAddress () const
     return fileloc;
 }
 
+} // namespace ipc
 }  // namespace helics

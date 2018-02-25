@@ -569,9 +569,8 @@ class VectorSubscription2d
     /** move constructor*/
     VectorSubscription2d (VectorSubscription2d &&vs) noexcept
         : fed (vs.fed), m_name (std::move (vs.m_name)), m_units (std::move (vs.m_units)), ids (std::move (vs.ids)),
-          update_callback (std::move (vs.update_callback)), vals (std::move (vs.vals))
+          update_callback (std::move (vs.update_callback)), vals (std::move (vs.vals)),indices(vs.indices)
     {
-        indices = vs.indices;
         // need to transfer the callback to the new object
         fed->registerSubscriptionNotificationCallback (ids, [this](subscription_id_t id, Time tm) {
             handleCallback (id, tm);

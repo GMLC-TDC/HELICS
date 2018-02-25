@@ -12,6 +12,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
+namespace zeromq {
 ZmqBroker::ZmqBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 ZmqBroker::ZmqBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
@@ -76,4 +77,6 @@ std::string ZmqBroker::getAddress () const
         return makePortAddress (netInfo.localInterface, netInfo.portNumber);
     }
 }
+
+} // namespace zeromq
 }  // namespace helics
