@@ -1,4 +1,4 @@
 function varargout = helicsFilterSet(varargin)
     %
-  [varargout{1:nargout}] = helicsMEX(162, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(165, varargin{:});
 end

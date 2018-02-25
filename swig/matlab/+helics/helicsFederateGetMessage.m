@@ -8,5 +8,5 @@ function varargout = helicsFederateGetMessage(varargin)
     %-------
     %a unique_ptr to a Message object containing the message data
     %
-  [varargout{1:nargout}] = helicsMEX(150, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(153, varargin{:});
 end

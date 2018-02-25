@@ -13,5 +13,5 @@ function varargout = helicsCreateMessageFederate(varargin)
     %-------
     %an opaque message federate object
     %
-  [varargout{1:nargout}] = helicsMEX(45, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(47, varargin{:});
 end

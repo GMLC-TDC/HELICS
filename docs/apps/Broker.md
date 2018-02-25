@@ -1,10 +1,9 @@
-Recorder
+Broker
 =======
 
-The Recorder application is one of the HELICS apps available with the library
-Its purpose is to provide a easy way to capture data from a federation
-It acts as a federate that can "capture" values or messages from specific publications
-or direct endpoints or cloned endpoints which exist elsewhere
+Brokers function as intermediaries or roots in the HELICS hiearchy
+The Broker can be run through the helics_broker or via helics-app
+
 
 Command line arguments
 ----------

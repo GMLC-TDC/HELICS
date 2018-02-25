@@ -47,7 +47,7 @@ int main (int argc, char *argv[])
         std::cerr << "Unable to generate broker: " << ie.what () << '\n';
         return (-2);
     }
-    auto broker = helics::BrokerFactory::create (type, argc, argv);
+    auto broker = helics::BrokerFactory::create (type,name, argc, argv);
     if (broker->isConnected ())
     {
         do  // sleep until the broker finishes

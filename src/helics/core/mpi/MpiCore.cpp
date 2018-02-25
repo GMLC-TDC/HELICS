@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
+Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
@@ -9,90 +9,74 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "MpiCore.h"
-#include "helics/config.h"
-#include "helics/core/core-data.h"
-#include "helics/core/core-exceptions.h"
-#include "helics/core/core.h"
-#include "helics/core/helics-time.h"
-
-#include <algorithm>
-#include <cassert>
-#include <chrono>
-#include <cstdint>
-#include <cstring>
-#include <fstream>
-#include <sstream>
-
 #include "MpiComms.h"
 
-#include "helics/core/argParser.h"
-#include <boost/filesystem.hpp>
+#include "../../common/argParser.h"
+
+#include <mpi.h>
 
 namespace helics
 {
-using namespace std::string_literals;
-static const argDescriptors extraArgs{
-  {"queueloc"s, "string"s, "the file location of the shared queue"s},
-  {"broker_auto_start"s, ""s, "automatically start the broker"s},
-  {"broker_init"s, "string"s,
-   "the init string to pass to the broker upon startup-will only be used if the autostart is activated"s},
-  {"brokername"s, "string"s, "identifier for the broker-same as broker"s},
-  {"brokerinit"s, "string"s, "the initialization string for the broker"s}};
-
 MpiCore::MpiCore () noexcept {}
 
+//MpiCore::~MpiCore () = default;
+MpiCore::~MpiCore () { std::cout << "MpiCore destructor for " << getAddress () << std::endl;  }
 MpiCore::MpiCore (const std::string &core_name) : CommsBroker (core_name) {}
 
-MpiCore::~MpiCore () {}
+using namespace std::string_literals;
+static const ArgDescriptors extraArgs{
+    { "broker_address", ArgDescriptor::arg_type_t::string_type, "location of a broker using mpi (rank:tag)" },
+    { "broker_rank", ArgDescriptor::arg_type_t::int_type, "mpi rank of a broker using mpi"},
+    { "broker_tag", ArgDescriptor::arg_type_t::int_type, "mpi tag of a broker using mpi"}
+};
 
-void MpiCore::InitializeFromArgs (int argc, const char *const *argv)
+void MpiCore::initializeFromArgs (int argc, const char *const *argv)
 {
-    namespace po = boost::program_options;
     if (brokerState == created)
     {
-        po::variables_map vm;
+        variable_map vm;
         argumentParser (argc, argv, vm, extraArgs);
 
-        if (vm.count ("broker") > 0)
+        brokerRank = 0;
+        brokerTag = 0;
+
+        if (vm.count("broker_address") > 0)
         {
-            brokername = vm["broker"].as<std::string> ();
+            auto addr = vm["broker_address"].as<std::string>();
+            auto delim_pos = addr.find_first_of(":", 1);
+            brokerRank = std::stoi(addr.substr(0, delim_pos));
+            brokerTag = std::stoi(addr.substr(delim_pos+1, addr.length()));
         }
 
-        if (vm.count ("broker_address") > 0)
+        if (vm.count("broker_rank") > 0)
         {
-            brokerloc = vm["broker_address"].as<std::string> ();
+            brokerRank = vm["broker_rank"].as<int>();
         }
 
-        if (vm.count ("fileloc") > 0)
+        if (vm.count("broker_tag") > 0)
         {
-            fileloc = vm["fileloc"].as<std::string> ();
+            brokerTag = vm["broker_tag"].as<int>();
         }
 
-        CommonCore::InitializeFromArgs (argc, argv);
+        brokerAddress = std::to_string(brokerRank) + ":" + std::to_string(brokerTag);
+
+        CommonCore::initializeFromArgs (argc, argv);
     }
 }
 
 bool MpiCore::brokerConnect ()
 {
-    if (fileloc.empty ())
-    {
-        fileloc = getIdentifier () + "_queue.hqf";
-    }
-
-    if (brokerloc.empty ())
-    {
-        if (brokername.empty ())
-        {
-            brokername = "_ipc";
-        }
-        brokerloc = brokername + "_queue.hqf";
-    }
-
-    comms = std::make_unique<MpiComms> (fileloc, brokerloc);
+    comms = std::make_unique<MpiComms> (brokerAddress);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
-    return comms->connect ();
+    comms->setName (getIdentifier ());
+
+    auto res = comms->connect ();
+    return res;
 }
 
-std::string MpiCore::getAddress () const { return fileloc; }
+std::string MpiCore::getAddress () const
+{
+    return comms->getAddress();
+}
 
 }  // namespace helics
