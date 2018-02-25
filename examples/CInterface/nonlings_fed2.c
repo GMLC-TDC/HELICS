@@ -58,7 +58,7 @@ int main()
   helics_publication  pub;
   int converged;
   char sendbuf[100],recvbuf[100];
-  double y = 1.0, x = 0, /*xprv = 100,*/ yprv=100;
+  double y = 1.0, /*xprv = 100,*/ yprv=100;
   int my_conv=0,other_conv; /* Global and local convergence */
   helics_time_t currenttime=0.0;
   helics_iteration_status currenttimeiter=iterating;
@@ -120,6 +120,7 @@ int main()
 
   while (currenttimeiter==iterating) { 
       int global_conv = 0;
+      double x = 0.0;
     helicsSubscriptionGetString(sub,recvbuf,100);
     sscanf(recvbuf,"%lf,%d",&x,&other_conv);
 

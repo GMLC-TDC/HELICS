@@ -132,7 +132,7 @@ class Publication : public PublicationBase
     @param valueFed a pointer to the appropriate value Federate
     @param pubIndex the index of the subscription
     */
-    Publication (ValueFederate *valueFed, int pubIndex) : PublicationBase (valueFed, pubIndex) {}
+    Publication (ValueFederate *valueFed, int pubIndex) : PublicationBase (valueFed, pubIndex),pubType(getTypeFromString(getType())) {}
     /** send a value for publication
     @param[in] val the value to publish*/
     void publish (double val) const;

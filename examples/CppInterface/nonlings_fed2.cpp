@@ -54,7 +54,7 @@ int main(int /*argc*/,char ** /*argv*/)
   /* Enter initialization state */
   vfed->enterInitializationState(); // can throw helics::InvalidStateTransition exception
   printf(" Entered initialization state\n");
-  double y = 1.0, x = 0, /*xprv = 100,*/yprv=100;
+  double y = 1.0, /*xprv = 100,*/yprv=100;
 
   vfed->publish(pub, y);
   fflush(NULL);
@@ -74,15 +74,15 @@ int main(int /*argc*/,char ** /*argv*/)
   {
 
 //    xprv = x;
-    x = vfed->getDouble(sub);
+    double x = vfed->getDouble(sub);
     ++helics_iter;
-    double f2,J2;
+    double J2;
     int    newt_conv = 0, max_iter=10,iter=0;
 
     /* Solve the equation using Newton */
     while(!newt_conv && iter < max_iter) {
       /* Function value */
-      f2 = x*x + 4*y*y - 4;
+      double f2 = x*x + 4*y*y - 4;
       
       if(fabs(f2) < tol) {
 	newt_conv = 1;
