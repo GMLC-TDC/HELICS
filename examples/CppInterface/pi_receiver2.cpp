@@ -24,7 +24,7 @@ int main(int /*argc*/,char ** /*argv*/)
   helics_subscription sub;
   helics_publication  pub;
 
-  printf("PI RECEIVER: Helics version = %s\n", helics::getHelicsVersionString());
+  printf("PI RECEIVER: Helics version = %s\n", helicsGetVersion());
   printf("%s",help);
 
   /* Create Federate Info object that describes the federate properties

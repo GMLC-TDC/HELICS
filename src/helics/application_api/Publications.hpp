@@ -189,7 +189,7 @@ template <class X, class FedPtr>
 typename std::enable_if_t<helicsType<X>() != helics_type_t::helicsInvalid, std::unique_ptr<Publication>>
 make_publication(FedPtr valueFed, const std::string &key, const std::string &units = std::string())
 {
-    return std::make_unique<Publication> (valueFed, helicsType<X> (), name, units);
+    return std::make_unique<Publication> (valueFed, helicsType<X> (), key, units);
 }
 
 /** create a pointer to a publication
@@ -274,9 +274,8 @@ class PublicationOnChange : public PublicationT<X>
         const std::string &key,
         const X &minChange,
                          const std::string &units = std::string())
-        : PublicationT<X> (valueFed, name, units), publishDelta (minChange)
+        : PublicationT<X> (valueFed, key, units), publishDelta (minChange),prev(X())
     {
-        prev = X ();
     }
     /** send a value for publication
     @details the value is only published if it exceeds the specified level

@@ -20,11 +20,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 void run_sim2(double x,double tol,double *yout,int *converged)
 {
-  double J2,y=*yout;
+  double y=*yout;
   int    newt_conv = 0, max_iter=10,iter=0;
 
   /* Solve the equation using Newton */
   while(!newt_conv && iter < max_iter) {
+      double J2;
     /* Function value */
     double f2 = x*x + 4*y*y - 4;
 
