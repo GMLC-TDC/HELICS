@@ -31,7 +31,7 @@ if [[ $commit_msg == *'[update_cache]'* ]]; then
         rm -rf dependencies/zmq;
         individual="true"
     fi
-    if [[ $commit_msg == *'swig'*]]; then
+    if [[ $commit_msg == *'swig'* ]]; then
         rm -rf ${swig_install_path};
         individual="true"
     fi
