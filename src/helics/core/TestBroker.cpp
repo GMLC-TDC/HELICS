@@ -1,12 +1,10 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 #include "TestBroker.h"
 #include "BrokerFactory.hpp"
@@ -17,6 +15,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <fstream>
 
 namespace helics
+{
+namespace testcore
 {
 TestBroker::TestBroker (bool rootBroker) noexcept : CoreBroker (rootBroker) {}
 
@@ -219,4 +219,5 @@ void TestBroker::addRoute (int route_id, const std::string &routeInfo)
 
 std::string TestBroker::getAddress () const { return getIdentifier (); }
 
+} // namespace testcore
 }  // namespace helics

@@ -34,7 +34,7 @@ int main()
   double         deltat=0.01;
   helics_federate vfed;
   helics_publication pub;
-  double value = 22.0 / 7.0, val;
+  double value = 22.0 / 7.0;
   helics_time_t currenttime = 0.0;
   int           numsteps = 20, i;
 
@@ -94,7 +94,7 @@ int main()
   
 
   for(i=0; i < numsteps; i++) {
-    val = currenttime*value;
+    double val = currenttime*value;
 
     printf("PI SENDER: Sending value %3.2fpi = %4.3f at time %3.2f to PI RECEIVER\n",deltat*i,val,currenttime);
     helicsPublicationPublishDouble(pub,val);

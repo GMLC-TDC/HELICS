@@ -15,6 +15,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
+namespace udp
+{
 class UdpComms;
 
 class UdpBroker final : public CommsBroker<UdpComms, CoreBroker>
@@ -37,4 +39,6 @@ class UdpBroker final : public CommsBroker<UdpComms, CoreBroker>
     NetworkBrokerData netInfo{
       NetworkBrokerData::interface_type::udp};  //!< structure containing the networking information
 };
-}
+
+}  // namespace udp
+}  // namespace helics

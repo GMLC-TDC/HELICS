@@ -1,12 +1,10 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 #include "MpiBroker.h"
 #include "MpiComms.h"
@@ -17,14 +15,16 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-    MpiBroker::MpiBroker(bool rootBroker) noexcept : CommsBroker(rootBroker) {}
+namespace mpi
+{
+MpiBroker::MpiBroker(bool rootBroker) noexcept : CommsBroker(rootBroker) {}
 
-    MpiBroker::MpiBroker(const std::string &broker_name) : CommsBroker(broker_name) {}
+MpiBroker::MpiBroker(const std::string &broker_name) : CommsBroker(broker_name) {}
 
-    //MpiBroker::~MpiBroker() = default;
-    MpiBroker::~MpiBroker () { std::cout << "MpiBroker destructor for " << getAddress () << std::endl;  }
+//MpiBroker::~MpiBroker() = default;
+MpiBroker::~MpiBroker() { std::cout << "MpiBroker destructor for " << getAddress() << std::endl; }
 
-    using namespace std::string_literals;
+using namespace std::string_literals;
 static const ArgDescriptors extraArgs{
     { "broker_address", ArgDescriptor::arg_type_t::string_type, "location of a broker using mpi (rank:tag)" },
     { "broker_rank", ArgDescriptor::arg_type_t::int_type, "mpi rank of a broker using mpi"},
@@ -32,71 +32,72 @@ static const ArgDescriptors extraArgs{
 };
 
 
-    void MpiBroker::displayHelp(bool local_only)
+void MpiBroker::displayHelp(bool local_only)
+{
+    std::cout << " Help for MPI Broker: \n";
+    variable_map vm;
+    const char *const argV[] = { "", "--help" };
+    argumentParser(2, argV, vm, extraArgs);
+    if (!local_only)
     {
-        std::cout << " Help for MPI Broker: \n";
+        CoreBroker::displayHelp();
+    }
+}
+
+void MpiBroker::initializeFromArgs(int argc, const char *const *argv)
+{
+    if (brokerState == broker_state_t::created)
+    {
         variable_map vm;
-        const char *const argV[] = { "", "--help" };
-        argumentParser(2, argV, vm, extraArgs);
-        if (!local_only)
+        argumentParser(argc, argv, vm, extraArgs);
+
+        if (vm.count("broker_address") > 0)
         {
-            CoreBroker::displayHelp();
+            auto addr = vm["broker_address"].as<std::string>();
+            auto delim_pos = addr.find_first_of(":", 1);
+
+            brokerRank = std::stoi(addr.substr(0, delim_pos));
+            brokerTag = std::stoi(addr.substr(delim_pos + 1, addr.length()));
+            brokerAddress = addr;
         }
-    }
-
-    void MpiBroker::initializeFromArgs(int argc, const char *const *argv)
-    {
-        if (brokerState == broker_state_t::created)
+        else if ((vm.count("broker_rank") > 0) || (vm.count("broker_tag") > 0))
         {
-            variable_map vm;
-            argumentParser(argc, argv, vm, extraArgs);
+            brokerRank = 0;
+            brokerTag = 0;
 
-            if (vm.count("broker_address") > 0)
+            if (vm.count("broker_rank") > 0)
             {
-                auto addr = vm["broker_address"].as<std::string>();
-                auto delim_pos = addr.find_first_of(":", 1);
-
-                brokerRank = std::stoi(addr.substr(0, delim_pos));
-                brokerTag = std::stoi(addr.substr(delim_pos+1, addr.length()));
-                brokerAddress = addr;
-            }
-            else if ((vm.count("broker_rank") > 0) || (vm.count("broker_tag") > 0))
-            {
-                brokerRank = 0;
-                brokerTag = 0;
-
-                if (vm.count("broker_rank") > 0)
-                {
-                    brokerRank = vm["broker_rank"].as<int>();
-                }
-
-                if (vm.count("broker_tag") > 0)
-                {
-                    brokerTag = vm["broker_tag"].as<int>();
-                }
+                brokerRank = vm["broker_rank"].as<int>();
             }
 
-            CoreBroker::initializeFromArgs(argc, argv);
+            if (vm.count("broker_tag") > 0)
+            {
+                brokerTag = vm["broker_tag"].as<int>();
+            }
         }
+
+        CoreBroker::initializeFromArgs(argc, argv);
+    }
+}
+
+bool MpiBroker::brokerConnect()
+{
+    comms = std::make_unique<MpiComms>(brokerAddress);
+    comms->setCallback([this](ActionMessage M) { addActionMessage(std::move(M)); });
+    comms->setName(getIdentifier());
+
+    if (brokerAddress == "")
+    {
+        setAsRoot();
     }
 
-    bool MpiBroker::brokerConnect()
-    {
-        comms = std::make_unique<MpiComms>(brokerAddress);
-        comms->setCallback([this](ActionMessage M) { addActionMessage(std::move(M)); });
-        comms->setName(getIdentifier());
-
-        if (brokerAddress == "")
-        {
-            setAsRoot();
-        }
-
-    auto res = comms->connect ();
+    auto res = comms->connect();
     return res;
 }
 
-std::string MpiBroker::getAddress () const
+std::string MpiBroker::getAddress() const
 {
     return comms->getAddress();
 }
+} // namespace mpi
 }  // namespace helics

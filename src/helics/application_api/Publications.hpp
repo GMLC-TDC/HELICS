@@ -28,7 +28,7 @@ class PublicationBase
     /** base constructor for a publication
     @tparam avalueFed a pointer of some kind to a value federate (any dereferencable type with * and -> operator that
     results in a valueFederate object
-    @param key the identitfier for the publication
+    @param key the identifier for the publication
     @param type the type of the publication
     @param units, an optional string defining the units*/
     template<class FedPtr>
@@ -46,7 +46,7 @@ class PublicationBase
     @param locality either GLOBAL or LOCAL, LOCAL prepends the federate name to create a global identifier
     @tparam valueFed a pointer of some kind to a value federate (any dereferencable type with * and -> operator that
     results in a valueFederate object
-    @param key the identitfier for the publication
+    @param key the identifier for the publication
     @param type the type of the publication
     @param units, an optional string defining the units*/
     template<class FedPtr>
@@ -103,8 +103,8 @@ class Publication : public PublicationBase
       Publication() = default;
     /**constructor to build a publication object
     @param[in] valueFed  the ValueFederate to use
+    @param[in] key the identifier for the publication
     @param type_ the defined type of the publication
-    @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
     template<class FedPtr>
@@ -115,14 +115,14 @@ class Publication : public PublicationBase
     /**constructor to build a publication object
     @param locality  set to global for a global publication or local for a local one
     @param[in] valueFed  the ValueFederate to use
+    @param[in] key the identifier for the publication
     @param type_ the defined type of the publication
-    @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
     template<class FedPtr>
     Publication (interface_visibility locality,
                  FedPtr valueFed,
-                 std::string key,
+                 const std::string &key,
                  helics_type_t type,
                  const std::string &units = std::string())
         : PublicationBase (locality, valueFed, key, typeNameStringRef (type), units), pubType (type)
@@ -132,7 +132,7 @@ class Publication : public PublicationBase
     @param valueFed a pointer to the appropriate value Federate
     @param pubIndex the index of the subscription
     */
-    Publication (ValueFederate *valueFed, int pubIndex) : PublicationBase (valueFed, pubIndex) {}
+    Publication (ValueFederate *valueFed, int pubIndex) : PublicationBase (valueFed, pubIndex),pubType(getTypeFromString(getType())) {}
     /** send a value for publication
     @param[in] val the value to publish*/
     void publish (double val) const;
@@ -187,9 +187,9 @@ class Publication : public PublicationBase
 */
 template <class X, class FedPtr>
 typename std::enable_if_t<helicsType<X>() != helics_type_t::helicsInvalid, std::unique_ptr<Publication>>
-make_publication(FedPtr valueFed, const std::string &name, const std::string &units = std::string())
+make_publication(FedPtr valueFed, const std::string &key, const std::string &units = std::string())
 {
-    return std::make_unique<Publication> (valueFed, helicsType<X> (), name, units);
+    return std::make_unique<Publication> (valueFed, helicsType<X> (), key, units);
 }
 
 /** create a pointer to a publication
@@ -204,13 +204,13 @@ template <class X, class FedPtr>
 typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsInvalid, std::unique_ptr<Publication>>
 make_publication (interface_visibility locality,
                   FedPtr valueFed,
-                  const std::string &name,
+                  const std::string &key,
                   const std::string &units = std::string())
 {
-    return std::make_unique<Publication> (locality, valueFed, name, helicsType<X> (), units);
+    return std::make_unique<Publication> (locality, valueFed, key, helicsType<X> (), units);
 }
 
-/** class to handle a publication of an arbritrary type*/
+/** class to handle a publication of an arbitrary type*/
 template <class X>
 class PublicationT : public PublicationBase
 {
@@ -218,25 +218,25 @@ class PublicationT : public PublicationBase
     PublicationT () = default;
     /**constructor to build a publication object
     @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the subscription
+    @param[in] key the identifier for the publication
     @param[in] units the units associated with a Federate
     */
     template<class FedPtr>
-    PublicationT(FedPtr valueFed, const std::string &name, const std::string &units = std::string())
-        : PublicationBase (valueFed, name, typeNameString<X> (), units)
+    PublicationT(FedPtr valueFed, const std::string &key, const std::string &units = std::string())
+        : PublicationBase (valueFed, key, typeNameString<X> (), units)
     {
     }
     /**constructor to build a publication object
     @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the subscription
+    @param[in] key the identifier for the publication
     @param[in] units the units associated with a Federate
     */
     template<class FedPtr>
     PublicationT (interface_visibility locality,
                   FedPtr valueFed,
-                  const std::string &name,
+                  const std::string &key,
                   const std::string &units = std::string())
-        : PublicationBase (locality, valueFed, name, typeNameString<X> (), units)
+        : PublicationBase (locality, valueFed, key, typeNameString<X> (), units)
     {
     }
     /** send a value for publication
@@ -253,7 +253,7 @@ class PublicationT : public PublicationBase
     }
 };
 
-/** class to handle a publication on change for an arbritrary type
+/** class to handle a publication on change for an arbitrary type
 but the value is only published in the change is greater than a certain level*/
 template <class X>
 class PublicationOnChange : public PublicationT<X>
@@ -265,18 +265,17 @@ class PublicationOnChange : public PublicationT<X>
     PublicationOnChange () = default;
     /**constructor to build a publishOnChange object
     @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the subscription
+    @param[in] key the identifier for the publication
     @param[in] minChange  the minimum change required to actually publish the value
     @param[in] units the units associated with a Federate
     */
     template <class FedPtr>
     PublicationOnChange(FedPtr valueFed,
-        const std::string &name,
+        const std::string &key,
         const X &minChange,
                          const std::string &units = std::string())
-        : PublicationT<X> (valueFed, name, units), publishDelta (minChange)
+        : PublicationT<X> (valueFed, key, units), publishDelta (minChange),prev(X())
     {
-        prev = X ();
     }
     /** send a value for publication
     @details the value is only published if it exceeds the specified level

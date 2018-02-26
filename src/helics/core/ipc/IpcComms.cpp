@@ -26,6 +26,8 @@ using ipc_state = boost::interprocess::shared_memory_object;
 
 namespace helics
 {
+namespace ipc
+{
 IpcComms::IpcComms (const std::string &brokerTarget, const std::string &localTarget)
     : CommsInterface (brokerTarget, localTarget)
 {
@@ -288,4 +290,5 @@ void IpcComms::closeReceiver ()
     }
 }
 
+} // namespace ipc
 }  // namespace helics

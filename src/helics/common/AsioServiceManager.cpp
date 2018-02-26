@@ -125,9 +125,9 @@ AsioServiceManager::~AsioServiceManager ()
     }
 }
 
-AsioServiceManager::AsioServiceManager (const std::string &serviceName) : name (serviceName)
+AsioServiceManager::AsioServiceManager (const std::string &serviceName)
+    : name (serviceName), iserv (std::make_unique<boost::asio::io_service> ())
 {
-    iserv = std::make_unique<boost::asio::io_service> ();
 }
 
 AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::string &serviceName)
@@ -200,5 +200,5 @@ void serviceRunLoop (std::shared_ptr<AsioServiceManager> ptr)
         std::cout << "caught other error in service loop" << std::endl;
     }
     // std::cout << "service loop stopped\n";
-    ptr->running.store( false );
+    ptr->running.store (false);
 }

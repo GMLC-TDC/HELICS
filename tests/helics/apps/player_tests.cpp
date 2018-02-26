@@ -255,6 +255,10 @@ BOOST_REQUIRE(brokerExe.isActive());
     retTime = vfed.requestTime (5);
     BOOST_CHECK_EQUAL (retTime, 5.0);
     vfed.finalize ();
+    auto out2 = res2.get();
+    res.get();
+   // out = 0;
+
 }
 
 BOOST_AUTO_TEST_CASE (simple_player_testjson)

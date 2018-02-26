@@ -620,8 +620,8 @@ class pingpongFed
     int pings = 0;  //!< the number of pings received
     int pongs = 0;  //!< the number of pongs received
   public:
-    pingpongFed (std::string fname, helics::Time tDelta, helics::core_type ctype)
-        : delta (tDelta), name (std::move (fname)), coreType (ctype)
+    pingpongFed (const std::string &fname, helics::Time tDelta, helics::core_type ctype)
+        : delta (tDelta), name (fname), coreType (ctype)
     {
         if (delta <= 0.0)
         {

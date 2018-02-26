@@ -1,5 +1,3 @@
-#pragma once
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil;  eval: (c-set-offset 'innamespace 0); -*- */
 /*
  * LLNS Copyright Start
  * Copyright (c) 2016, Lawrence Livermore National Security
@@ -14,7 +12,7 @@
 
 #ifndef EXE_HELPER_HEADER_
 #define EXE_HELPER_HEADER_
-
+#pragma once
 #include <future>
 #include <string>
 
@@ -23,7 +21,7 @@ class exeTestRunner
 {
   private:
     std::string exeString;
-    bool active;
+    bool active=false;
     static int counter;
     std::string outFile;
 

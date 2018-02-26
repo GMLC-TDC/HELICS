@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_CORE_FACTORY_
-#define _HELICS_CORE_FACTORY_
+
 
 #include "core-types.hpp"
 #include <memory>
@@ -42,7 +39,7 @@ std::shared_ptr<Core> create (core_type type, const std::string &initializationS
 std::shared_ptr<Core> create (core_type type, int argc, const char *const *argv);
 
 /** create a core from arguments
-@details an argument of coretype must be specified to define the type,  otherwise the default type is used
+@details an argument of '--coretype' must be specified to define the type,  otherwise the default type is used
 @param argc the number of arguments
 @param argv the actual argument parameters
 @return a pointer to the created core
@@ -112,5 +109,3 @@ void copyCoreIdentifier (const std::string &copyFromName, const std::string &cop
 }  // namespace CoreFactory
 
 }  // namespace helics
-
-#endif

@@ -5,7 +5,6 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 #include <boost/test/unit_test.hpp>
 
@@ -34,7 +33,7 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
 {
     std::atomic<int> counter{0};
     std::string host = "localhost";
-    helics::UdpComms comm (host, host);
+    helics::udp::UdpComms comm (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
 
@@ -70,7 +69,7 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
 {
     std::atomic<int> counter{0};
     std::string host = "localhost";
-    helics::UdpComms comm (host, host);
+    helics::udp::UdpComms comm (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
 
@@ -104,7 +103,7 @@ BOOST_AUTO_TEST_CASE (udpComms_rx_test)
     std::atomic<int> counter{0};
     helics::ActionMessage act;
     std::string host = "localhost";
-    helics::UdpComms comm (host, host);
+    helics::udp::UdpComms comm (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
 
@@ -149,8 +148,8 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_through)
     helics::ActionMessage act2;
 
     std::string host = "localhost";
-    helics::UdpComms comm (host, host);
-    helics::UdpComms comm2 (host, "");
+    helics::udp::UdpComms comm (host, host);
+    helics::udp::UdpComms comm2 (host, "");
 
     comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setName ("tests");
@@ -197,9 +196,9 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_add_route)
     std::atomic<int> counter3{0};
 
     std::string host = "localhost";
-    helics::UdpComms comm (host, host);
-    helics::UdpComms comm2 (host, "");
-    helics::UdpComms comm3 (host, host);
+    helics::udp::UdpComms comm (host, host);
+    helics::udp::UdpComms comm2 (host, "");
+    helics::udp::UdpComms comm3 (host, host);
 
     comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setName ("tests");
@@ -328,7 +327,7 @@ BOOST_AUTO_TEST_CASE (udpCore_core_broker_default_test)
     connected = core->connect ();
     BOOST_CHECK (connected);
 
-    auto ccore = static_cast<helics::UdpCore *> (core.get ());
+    auto ccore = static_cast<helics::udp::UdpCore *> (core.get ());
     // this will test the automatic port allocation
     BOOST_CHECK_EQUAL (ccore->getAddress (), "localhost:23964");
     core->disconnect ();

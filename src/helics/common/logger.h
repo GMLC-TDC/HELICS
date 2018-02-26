@@ -38,6 +38,7 @@ namespace helics
     class LoggingCore
     {
     private:
+        static std::atomic<bool> fastShutdown; //set to true to enable a fast shutdown
         std::thread loggingThread;	//!< the thread object containing the thread running the actual Logger
         std::vector<std::function<void(std::string &&message)>> functions; //!< container for the functions
         std::mutex functionLock;    //!< lock for updating the functions
@@ -72,6 +73,8 @@ namespace helics
         void haltOperations(int);
         /** update a callback for a particular instance*/
         void updateProcessingFunction(int index, std::function<void(std::string &&message)> newFunction);
+        /** enable a fast shutdown in situations where a thread may be force-ably terminated*/
+        static void setFastShutdown();
     private:
         void processingLoop();
     };
@@ -206,6 +209,7 @@ public:
     static void closeLogger(const std::string &loggerName = "");
    /** sends a message to the default Logger*/
     static void logMessage(const std::string &message);
+    
     /*destructor*/
     virtual ~LoggerManager();
     /** get the name of the logger*/

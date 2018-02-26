@@ -1,6 +1,6 @@
 shallow_clone: true
 
-version: 1.0.0.beta.{build}
+version: 1.0.0.beta.1.{build}
 
 image: Visual Studio 2015
 
@@ -39,6 +39,6 @@ test_script:
   - ctest -C Release --verbose --timeout 120 -I 0,0,0,1
   - ctest -C Release --verbose --timeout 90 -I 0,0,0,2
   - ctest -C Release --verbose --timeout 240 -I 0,0,0,3
-  #- ctest -C Release --verbose --timeout 90 -I 0,0,0,5
+  - ctest -C Release --verbose --timeout 90 -I 0,0,0,5
 
 artifacts:

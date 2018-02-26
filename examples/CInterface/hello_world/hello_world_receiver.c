@@ -19,7 +19,7 @@ int main ()
     helics_time_t currenttime = 0.0; /* the current time of the simulation*/
     helics_status  status;/* the result code from a call to the helics Library*/
     helics_bool_t isUpdated;  /* storage for a check if a value has been updated*/
-    char value[128] = ""; /**space to store the sent value*/
+    
 
     /** create an info structure to define some parameters used in federate creation*/
     fedinfo = helicsFederateInfoCreate ();
@@ -67,6 +67,7 @@ int main ()
     isUpdated = helicsSubscriptionIsUpdated (sub);
     if (isUpdated)
     { /* get the value*/
+        char value[128] = ""; /**space to store the sent value*/
         helicsSubscriptionGetString(sub, value, 128);
         printf("%s\n", value);
     }

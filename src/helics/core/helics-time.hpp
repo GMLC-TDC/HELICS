@@ -64,4 +64,4 @@ Time loadTimeFromString(const std::string &timeString, timeUnits defUnit);
 */
 timeUnits timeUnitsFromString(const std::string &unitString);
 
-}
+} // namespace helics

@@ -1,18 +1,20 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
 #include "TcpHelperClasses.h"
 #include <iostream>
 #include <thread>
 
+namespace helics
+{
+namespace tcp
+{
 using boost::asio::ip::tcp;
 
 void TcpRxConnection::start ()
@@ -259,3 +261,6 @@ void TcpServer::close ()
     }
     connections.clear ();
 }
+
+} //namespace tcp
+} // namespace helics

@@ -5,8 +5,8 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include "testFixtures.h"
 #include <boost/test/unit_test.hpp>
 
@@ -18,10 +18,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/PublicationInfo.hpp"
 #include "helics/core/SubscriptionInfo.hpp"
 
-federateStateTestFixture::federateStateTestFixture ()
+federateStateTestFixture::federateStateTestFixture ():fs(std::make_unique<helics::FederateState>("fed_name",helics::CoreFederateInfo()))
 {
-    helics::CoreFederateInfo info;
-    fs = std::unique_ptr<helics::FederateState> (new helics::FederateState ("fed_name", info));
+
 }
 
 federateStateTestFixture::~federateStateTestFixture () = default;

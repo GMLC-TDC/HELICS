@@ -13,6 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
+namespace tcp {
 TcpCore::TcpCore () noexcept {}
 
 TcpCore::~TcpCore () = default;
@@ -61,4 +62,5 @@ std::string TcpCore::getAddress () const
     return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
 
+} // namespace tcp
 }  // namespace helics

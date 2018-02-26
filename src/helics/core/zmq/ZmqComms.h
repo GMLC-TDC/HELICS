@@ -21,7 +21,7 @@ class message_t;
 class socket_t;
 }
 namespace helics {
-
+namespace zeromq {
 /** implementation for the communication interface that uses ZMQ messages to communicate*/
 class ZmqComms final:public CommsInterface {
 
@@ -66,7 +66,7 @@ public:
     std::string getPushAddress() const;
 };
 
-
+} // namespace zeromq
 } // namespace helics
 
 #endif /* _HELICS_IPC_COMMS_ */

@@ -7,9 +7,9 @@ project (HELICS)
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
 set (HELICS_VERSION_PATCH 0)
-set (HELICS_VERSION_BUILD beta)
-set (HELICS_DATE "02-23-18")
-set (HELICS_VERSION_STRING "1.0.0-beta (02-23-18)")
+set (HELICS_VERSION_BUILD beta.1)
+set (HELICS_DATE "02-26-18")
+set (HELICS_VERSION_STRING "1.0.0-beta.1 ${HELICS_DATE}")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -103,7 +103,7 @@ IF(UNIX)
   # regular way.
   set(Boost_NO_BOOST_CMAKE ON)
   set(Boost_USE_MULTITHREADED      OFF)   # Needed if MT libraries not built
-  option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
+   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
 ELSE(UNIX)
   IF(MINGW)
   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)

@@ -19,7 +19,7 @@ This software was modified by Pacific Northwest National Laboratory, operated by
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
-additions include load store operations
+additions include load store operations and template specialization for std::mutex and std::timed_mutex
 */
 
 #ifndef LIBGUARDED_ORDERED_GUARDED_HPP

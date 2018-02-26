@@ -27,6 +27,7 @@ static const int DEFAULT_BROKER_REP_PORT_NUMBER = 23404;
 
 namespace helics
 {
+namespace zeromq {
 ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTarget)
     : CommsInterface (brokerTarget, localTarget)
 {
@@ -779,4 +780,6 @@ std::string ZmqComms::getPushAddress () const
         return makePortAddress (localTarget_, pullPortNumber);
     }
 }
+
+} // namespace zeromq
 }  // namespace helics

@@ -155,7 +155,7 @@ class Federate
 {
   public:
     // Default constructor, not meant to be used
-    Federate () {};
+    Federate ():fed(nullptr),exec_async_iterate(false) {};
 
     virtual ~Federate ()
     {

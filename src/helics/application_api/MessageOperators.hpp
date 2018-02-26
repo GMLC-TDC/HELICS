@@ -97,7 +97,7 @@ class CloneOperator : public FilterOperator
     /** default constructor*/
     CloneOperator () = default;
     /** set the function to modify the data of the message in the constructor*/
-    CloneOperator (std::function<void(const Message *)> userCloneFunction);
+    explicit CloneOperator (std::function<void(const Message *)> userCloneFunction);
     /** set the function to modify the data of the message*/
     void setCloneFunction (std::function<void(const Message *)> userCloneFunction);
 
