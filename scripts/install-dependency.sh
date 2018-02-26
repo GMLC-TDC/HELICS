@@ -99,4 +99,8 @@ case "$1" in
         install_path=$2
         install_zmq ${install_path}
         ;;
+    *)
+        echo "Usage:"
+        echo "$0 (boost|cmake|swig) version install_path"
+        echo "$0 zmq install_path"
 esac
