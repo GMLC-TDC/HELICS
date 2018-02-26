@@ -4,20 +4,22 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     HOMEBREW_NO_AUTO_UPDATE=1 brew install pcre
 fi
 
-(
-    cd /tmp/;
-    curl -s -J -O -k -L 'https://sourceforge.net/projects/swig/files/swig/swig-3.0.10/swig-3.0.10.tar.gz/download';
-    tar zxf swig-3.0.10.tar.gz;
-    cd swig-3.0.10;
-    ./configure --prefix $HOME/swig/;
-    make;
-    make install;
-)
-export PATH="$HOME/swig/bin:${PATH}"
-echo "*** built swig successfully {$PATH}"
+local boost_version=$CI_BOOST_VERSION
+if [[ -z "$CI_BOOST_VERSION" ]]; then
+    boost_version=1.65.0
+fi
+local boost_install_path=${TRAVIS_BUILD_DIR}/dependencies/boost
+
+local cmake_version=3.4.3
+
+local swig_version=3.0.10
+local swig_install_path=${TRAVIS_BUILD_DIR}/dependencies/swig
+
+local zmq_install_path=${TRAVIS_BUILD_DIR}/dependencies/zmq
 
 # Convert commit message to lower case
 commit_msg=`tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE}`
+
 # Wipe out cached dependencies if commit message has '[update_cache]'
 if [[ $commit_msg == *'[update_cache]'* ]]; then
     local individual
@@ -29,6 +31,10 @@ if [[ $commit_msg == *'[update_cache]'* ]]; then
         rm -rf dependencies/zmq;
         individual="true"
     fi
+    if [[ $commit_msg == *'swig'*]]; then
+        rm -rf ${swig_install_path};
+        individual="true"
+    fi
 
     # If no dependency named in commit message, update entire cache
     if [[ "$individual" != 'true' ]]; then
@@ -36,95 +42,53 @@ if [[ $commit_msg == *'[update_cache]'* ]]; then
     fi
 fi
 
-if [[ ! -f "dependencies" ]]; then
+if [[ ! -d "dependencies" ]]; then
     mkdir -p dependencies;
 fi
 
-# Compares two semantic version numbers (major.minor.revision)
-check_minimum_version () {
-    local -a ver
-    IFS='. ' read -r -a ver <<< $1
+# Install CMake
+if [[ ! -d "cmake-install" ]]; then
+    ./install_dependency.sh cmake ${cmake_version}
+fi
 
-    local -a ver_min
-    IFS='. ' read -r -a ver_min <<< $2
-
-    if [[ ${ver[0]} -lt ${ver_min[0]} ]] || [[ ${ver[0]} -eq ${ver_min[0]} && ${ver[1]} -lt ${ver_min[1]} ]] || [[ ${ver[0]} -eq ${ver_min[0]} && ${ver[1]} -eq ${ver_min[1]} && ${ver[2]} -lt ${ver_min[2]} ]]; then
-        return 1
-    else
-        return 0
-    fi
-}
-
-install_boost () {
-    # Split argument 1 into 'ver' array, using '.' as delimiter
-    local -a ver
-    IFS='. ' read -r -a ver <<< $1
-
-    # Download and install Boost
-    local boost_version=$1
-    local boost_version_str=boost_${ver[0]}_${ver[1]}_${ver[2]}
-    wget --no-check-certificate -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
-    (
-        cd ${boost_version_str}/;
-        ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test;
-        ./b2 link=shared threading=multi variant=release > /dev/null;
-        ./b2 install --prefix=../dependencies/boost > /dev/null;
-    )
-}
-
+# Set path to CMake executable depending on OS
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    if [[ ! -f "cmake-3.4.3-Linux-x86_64/bin/cmake" ]]; then
-        echo "*** install cmake"
-        wget --no-check-certificate http://cmake.org/files/v3.4/cmake-3.4.3-Linux-x86_64.tar.gz && tar -xzf cmake-3.4.3-Linux-x86_64.tar.gz;
-    fi
-
-    export PATH="${PWD}/cmake-3.4.3-Linux-x86_64/bin:${PATH}"
+    export PATH="${PWD}/cmake-install/bin:${PATH}"
     echo "*** cmake installed ($PATH)"
-
 elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    if [[ ! -f "cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/bin/cmake" ]]; then
-        echo "*** install cmake"
-        wget --no-check-certificate http://cmake.org/files/v3.4/cmake-3.4.3-Darwin-x86_64.tar.gz && tar -xzf cmake-3.4.3-Darwin-x86_64.tar.gz;
-    fi
-    export PATH="${PWD}/cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/bin:${PATH}"
+    export PATH="${PWD}/cmake-install/CMake.app/Contents/bin:${PATH}"
     echo "*** cmake installed ($PATH)"
 fi
 
-if [[ ! -d "dependencies/zmq" ]]; then
+# Install SWIG
+if [[ ! -d "${swig_install_path}" ]]; then
+    ./install_dependency.sh swig ${swig_version} ${swig_install_path}
+fi
+export PATH="${swig_install_path}:${PATH}"
+echo "*** built swig successfully {$PATH}"
+
+# Install ZeroMQ
+if [[ ! -d "${zmq_install_path}" ]]; then
     echo "*** build libzmq"
-    git clone git://github.com/zeromq/libzmq.git
-    (
-        cd libzmq;
-        ./autogen.sh;
-        mkdir build && cd build;
-        cmake .. -DWITH_PERF_TOOL=OFF -DZMQ_BUILD_TESTS=OFF -DENABLE_CPACK=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../../dependencies/zmq
-        make;
-        make install;
-    )
+    ./install_dependency.sh zmq ${zmq_install_path}
     echo "*** built zmq successfully"
 fi
 
 # Install Boost
-if [[ ! -d "dependencies/boost" ]]; then
+if [[ ! -d "${boost_install_path}" ]]; then
     echo "*** build boost"
-    if [[ -z "$CI_BOOST_VERSION" ]]; then
-        install_boost 1.65.0
-    else
-        install_boost $CI_BOOST_VERSION
-        if ! check_minimum_version $CI_BOOST_VERSION 1.61.0; then
-            export CI_NO_TESTS=true
-        fi
-    fi
+    ./install_dependency.sh boost ${boost_version} ${boost_install_path}
     echo "*** built boost successfully"
 fi
 
-export ZMQ_INCLUDE=${TRAVIS_BUILD_DIR}/dependencies/zmq/include
-export ZMQ_LIB=${TRAVIS_BUILD_DIR}/dependencies/zmq/lib
+# Export variables and set load library paths
+export ZMQ_INCLUDE=${zmq_install_path}/include
+export ZMQ_LIB=${zmq_install_path}/lib
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    export LD_LIBRARY_PATH=${PWD}/dependencies/zmq/lib:${PWD}/dependencies/boost/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$LD_LIBRARY_PATH
 elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    export DYLD_FALLBACK_LIBRARY_PATH=${PWD}/dependencies/zmq/lib:${PWD}/dependencies/boost/lib:$LD_LIBRARY_PATH
+    export DYLD_FALLBACK_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$DYLD_FALLBACK_LIBRARY_PATH
 fi
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
