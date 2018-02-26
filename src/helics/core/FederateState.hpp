@@ -1,15 +1,11 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef FEDERATE_STATE_H_
-#define FEDERATE_STATE_H_
 #pragma once
 
 #include "../common/BlockingQueue.hpp"
@@ -261,5 +257,4 @@ private:
     */
     bool checkAndSetValue(Core::handle_id_t pub_id, const char *data, uint64_t len);
 };
-}
-#endif
+} // namespace helics

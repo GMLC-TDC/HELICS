@@ -43,7 +43,8 @@ def which(program):
         for ext in os.environ.get("PATHEXT", "").split(os.pathsep):
             yield fpath + ext
 
-    fpath, fname = os.path.split(program)
+    #fpath, fname = os.path.split(program)
+    fpath=os.path.dirname(program)
     if fpath:
         if is_exe(program):
             return program

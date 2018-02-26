@@ -10,7 +10,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "MpiService.h"
 
 namespace helics {
-
+namespace mpi
+{
 MPI_Comm MpiService::mpiCommunicator = MPI_COMM_NULL;
 bool MpiService::startServiceThread = true;
 
@@ -340,4 +341,5 @@ void MpiService::drainRemainingMessages ()
     }
 }
 
+} // namespace mpi
 } // namespace helics

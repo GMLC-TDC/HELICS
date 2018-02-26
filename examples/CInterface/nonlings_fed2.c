@@ -1,12 +1,10 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
 /* Example form http://mathfaculty.fullerton.edu/mathews//n2003/newtonsystem/newtonsystemproof.pdf
@@ -22,13 +20,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 void run_sim2(double x,double tol,double *yout,int *converged)
 {
-  double f2,J2,y=*yout;
+  double y=*yout;
   int    newt_conv = 0, max_iter=10,iter=0;
 
   /* Solve the equation using Newton */
   while(!newt_conv && iter < max_iter) {
+      double J2;
     /* Function value */
-    f2 = x*x + 4*y*y - 4;
+    double f2 = x*x + 4*y*y - 4;
 
     /* Convergence check */
     if(fabs(f2) < tol) {
@@ -59,8 +58,8 @@ int main()
   helics_publication  pub;
   int converged;
   char sendbuf[100],recvbuf[100];
-  double y = 1.0, x = 0, /*xprv = 100,*/ yprv=100;
-  int global_conv=0,my_conv=0,other_conv; /* Global and local convergence */
+  double y = 1.0, /*xprv = 100,*/ yprv=100;
+  int my_conv=0,other_conv; /* Global and local convergence */
   helics_time_t currenttime=0.0;
   helics_iteration_status currenttimeiter=iterating;
   double tol=1E-8;
@@ -101,6 +100,10 @@ int main()
 
   /* Enter initialization mode */
   status = helicsFederateEnterInitializationMode(vfed);
+  if (status != helics_ok) {
+      printf("Error entering Initialization\n");
+      return(-1);
+  }
   printf(" Entered initialization mode\n");
 
   snprintf(sendbuf,100,"%18.16f,%d",y,my_conv);
@@ -115,7 +118,9 @@ int main()
 
   fflush(NULL);
 
-  while (currenttimeiter==iterating) {    
+  while (currenttimeiter==iterating) { 
+      int global_conv = 0;
+      double x = 0.0;
     helicsSubscriptionGetString(sub,recvbuf,100);
     sscanf(recvbuf,"%lf,%d",&x,&other_conv);
 

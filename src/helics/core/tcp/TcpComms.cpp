@@ -22,6 +22,7 @@ static const int DEFAULT_TCP_BROKER_PORT_NUMBER = 24160;
 
 namespace helics
 {
+namespace tcp {
 using boost::asio::ip::tcp;
 TcpComms::TcpComms () noexcept {}
 
@@ -605,4 +606,6 @@ void TcpComms::closeReceiver ()
 }
 
 std::string TcpComms::getAddress () const { return makePortAddress (localTarget_, PortNumber); }
+
+} // namespace tcp
 }  // namespace helics

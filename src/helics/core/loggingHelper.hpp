@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_LOGGING_HELPER_
-#define _HELICS_LOGGING_HELPER_
+
 #pragma once
 
 #include "helics/helics-config.h"
@@ -18,7 +15,6 @@ this file is meant to be included in the commonCore.cpp and coreBroker.cpp
 and inherited class files
 it assumes some knowledge of the internals of those programs via MACROS
 using elsewhere is probably not going to work.  Someday this will be made more generic
-
 */
 
 /** enumeration of defined print levels*/
@@ -66,5 +62,3 @@ enum log_level : int
 #define LOG_DEBUG(id, ident, message)
 #define LOG_TRACE(id, ident, message)
 #endif
-
-#endif /* _HELICS_LOGGING_HELPER_ */

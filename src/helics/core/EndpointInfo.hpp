@@ -5,10 +5,7 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_ENDPOINTINFO_
-#define _HELICS_ENDPOINTINFO_
 
 #include "Core.hpp"
 #include "helics-time.hpp"
@@ -50,5 +47,3 @@ class EndpointInfo
     Time firstMessageTime () const;
 };
 }  // namespace helics
-
-#endif

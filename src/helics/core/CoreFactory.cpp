@@ -52,11 +52,11 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 #if HELICS_HAVE_ZEROMQ
         if (name.empty ())
         {
-            core = std::make_shared<ZmqCore> ();
+            core = std::make_shared<zeromq::ZmqCore> ();
         }
         else
         {
-            core = std::make_shared<ZmqCore> (name);
+            core = std::make_shared<zeromq::ZmqCore> (name);
         }
 
 #else
@@ -67,11 +67,11 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 #if HELICS_HAVE_MPI
         if (name.empty ())
         {
-            core = std::make_shared<MpiCore> ();
+            core = std::make_shared<mpi::MpiCore> ();
         }
         else
         {
-            core = std::make_shared<MpiCore> (name);
+            core = std::make_shared<mpi::MpiCore> (name);
         }
 #else
         throw (HelicsException ("MPI core is not available"));
@@ -80,43 +80,43 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
     case core_type::TEST:
         if (name.empty ())
         {
-            core = std::make_shared<TestCore> ();
+            core = std::make_shared<testcore::TestCore> ();
         }
         else
         {
-            core = std::make_shared<TestCore> (name);
+            core = std::make_shared<testcore::TestCore> (name);
         }
         break;
     case core_type::INTERPROCESS:
     case core_type::IPC:
         if (name.empty ())
         {
-            core = std::make_shared<IpcCore> ();
+            core = std::make_shared<ipc::IpcCore> ();
         }
         else
         {
-            core = std::make_shared<IpcCore> (name);
+            core = std::make_shared<ipc::IpcCore> (name);
         }
         break;
     case core_type::UDP:
         if (name.empty ())
         {
-            core = std::make_shared<UdpCore> ();
+            core = std::make_shared<udp::UdpCore> ();
         }
         else
         {
-            core = std::make_shared<UdpCore> (name);
+            core = std::make_shared<udp::UdpCore> (name);
         }
         break;
     case core_type::TCP:
 #ifndef DISABLE_TCP_CORE
         if (name.empty ())
         {
-            core = std::make_shared<TcpCore> ();
+            core = std::make_shared<tcp::TcpCore> ();
         }
         else
         {
-            core = std::make_shared<TcpCore> (name);
+            core = std::make_shared<tcp::TcpCore> (name);
         }
 #else
         throw (HelicsException ("TCP core is not available"));
@@ -268,26 +268,26 @@ bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &pt
         {
         case core_type::ZMQ:
 #if HELICS_HAVE_ZEROMQ
-            return (dynamic_cast<ZmqCore *> (ptr.get ()) != nullptr);
+            return (dynamic_cast<zeromq::ZmqCore *> (ptr.get ()) != nullptr);
 #else
             break;
 #endif
         case core_type::MPI:
 #if HELICS_HAVE_MPI
-            return (dynamic_cast<MpiCore *> (ptr.get ()) != nullptr);
+            return (dynamic_cast<mpi::MpiCore *> (ptr.get ()) != nullptr);
 #else
             break;
 #endif
         case core_type::TEST:
-            return (dynamic_cast<TestCore *> (ptr.get ()) != nullptr);
+            return (dynamic_cast<testcore::TestCore *> (ptr.get ()) != nullptr);
         case core_type::INTERPROCESS:
         case core_type::IPC:
-            return (dynamic_cast<IpcCore *> (ptr.get ()) != nullptr);
+            return (dynamic_cast<ipc::IpcCore *> (ptr.get ()) != nullptr);
         case core_type::UDP:
-            return (dynamic_cast<UdpCore *> (ptr.get ()) != nullptr);
+            return (dynamic_cast<udp::UdpCore *> (ptr.get ()) != nullptr);
         case core_type::TCP:
 #ifndef DISABLE_TCP_CORE
-            return (dynamic_cast<TcpCore *> (ptr.get ()) != nullptr);
+            return (dynamic_cast<tcp::TcpCore *> (ptr.get ()) != nullptr);
 #endif
         default:
             return true;

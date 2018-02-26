@@ -16,7 +16,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 
 namespace helics
 {
-
+namespace zeromq {
 class ZmqComms;
 
 class ZmqBroker final:public CommsBroker<ZmqComms,CoreBroker>
@@ -39,5 +39,7 @@ private:
     NetworkBrokerData netInfo{ NetworkBrokerData::interface_type::tcp }; //!< container for the network connection information
 
 };
-}
+
+} // namespace zeromq
+} // namespace helics
 #endif

@@ -5,7 +5,6 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 
 /* 
@@ -25,10 +24,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 void run_sim1(double y,double tol,double *xout,int *converged)
 {
-  double J1, x = *xout;
+  double x = *xout;
   int newt_conv = 0, max_iter = 10, iter = 0;
   /* Solve the equation using Newton */
   while (!newt_conv && iter < max_iter) {
+      double J1;
     /* Function value */
     double f1 = x * x - 2 * x - y + 0.5;
 

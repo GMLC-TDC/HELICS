@@ -14,7 +14,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include "../CommsBroker.hpp"
 #include "../NetworkBrokerData.hpp"
 namespace helics {
-
+namespace zeromq {
 class ZmqComms;
 /** implementation for the core that uses zmq messages to communicate*/
 class ZmqCore final: public CommsBroker<ZmqComms,CommonCore> {
@@ -38,7 +38,7 @@ private:
  
 };
 
-
+} // namespace zeromq
 } // namespace helics
  
 #endif /* _HELICS_ZEROMQ_CORE_ */

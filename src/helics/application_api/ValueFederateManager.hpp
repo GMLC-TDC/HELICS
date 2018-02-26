@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _VALUE_FEDERATE_MANAGER_H_
-#define _VALUE_FEDERATE_MANAGER_H_
+
 #pragma once
 
 #include "../core/Core.hpp"
@@ -24,6 +21,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <utility>
 #include "../common/DualMappedVector.hpp"
 #include "../common/MappedVector.hpp"
+#include <atomic>
 
 namespace helics
 {
@@ -94,7 +92,7 @@ class ValueFederateManager
 		@param[in] id the subscription identifier
 		@param[in] block the data block representing the default value
 		*/
-    void setDefaultValue (subscription_id_t id, data_view block);
+    void setDefaultValue (subscription_id_t id, const data_view &block);
 
 		/** get a value as raw data block from the system
 		@param[in] id the identifier for the subscription
@@ -103,7 +101,7 @@ class ValueFederateManager
     data_view getValue (subscription_id_t id);
 
 		/** publish a value*/
-    void publish (publication_id_t id, data_view block);
+    void publish (publication_id_t id, const data_view &block);
 
 		/** check if a given subscription has and update*/
     bool queryUpdate (subscription_id_t sub_id) const;
@@ -193,11 +191,13 @@ class ValueFederateManager
 	private:
 		DualMappedVector<subscription_info,std::string,Core::handle_id_t> subscriptions; 
 		MappedVector<publication_info> publications;
+        std::atomic<publication_id_t::underlyingType> publicationCount{ 0 };  //!< the count of actual endpoints
     std::vector<std::function<void(subscription_id_t, Time)>> callbacks;  //!< the all callback function
 		std::vector<data_view> lastData;	//!< the last data to arrive
     Time CurrentTime = Time (-1.0);  //!< the current simulation time
 		Core *coreObject; //!< the pointer to the actual core
 		Core::federate_id_t fedID;  //!< the federation ID from the core API
+        std::atomic<subscription_id_t::underlyingType> subscriptionCount{ 0 };  //!< the count of actual endpoints
 		int allCallbackIndex = -1;	//!< index of the allCallback function
 
 		mutable std::mutex subscription_mutex; //!< mutex protecting the subscription information
@@ -207,4 +207,3 @@ class ValueFederateManager
 };
 
 }  // namespace helics
-#endif

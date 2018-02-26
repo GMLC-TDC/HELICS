@@ -22,6 +22,7 @@ static const int DEFAULT_UDP_BROKER_PORT_NUMBER = 23901;
 
 namespace helics
 {
+namespace udp {
 using boost::asio::ip::udp;
 UdpComms::UdpComms ()
 {
@@ -509,4 +510,7 @@ void UdpComms::closeReceiver ()
 }
 
 std::string UdpComms::getAddress () const { return makePortAddress (localTarget_, PortNumber); }
+
+} // namespace udp
+
 }  // namespace helics

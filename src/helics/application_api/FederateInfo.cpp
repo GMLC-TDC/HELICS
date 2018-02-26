@@ -47,7 +47,7 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     auto res = argumentParser (argc, argv, vm, InfoArgs);
     if (res == versionReturn)
     {
-        std::cout << helics::versionString () << '\n';
+        std::cout << helics::versionString << '\n';
     }
     if (res < 0)
     {

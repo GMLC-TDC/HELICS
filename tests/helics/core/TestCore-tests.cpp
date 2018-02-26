@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE (testcore_initialization_test)
     std::string initializationString = std::string("4")+" --broker="+broker->getIdentifier();
     auto core = create (helics::core_type::TEST, initializationString);
 
-    auto Tcore = std::dynamic_pointer_cast<helics::TestCore>(core);
+    auto Tcore = std::dynamic_pointer_cast<helics::testcore::TestCore>(core);
 
     BOOST_REQUIRE (core);
     BOOST_REQUIRE(Tcore);
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     class TestOperator : public helics::FilterOperator
     {
       public:
-        TestOperator (const std::string &name) : filterName (name) {}
+        explicit TestOperator (const std::string &name) : filterName (name) {}
 
         std::unique_ptr<helics::Message> process (std::unique_ptr<helics::Message> msg) override
         {

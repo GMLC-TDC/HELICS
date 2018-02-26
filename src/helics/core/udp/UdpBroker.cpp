@@ -1,18 +1,18 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include "UdpBroker.h"
 #include "UdpComms.h"
 
 namespace helics
 {
+namespace udp {
 UdpBroker::UdpBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 UdpBroker::UdpBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
@@ -70,4 +70,5 @@ std::string UdpBroker::getAddress () const
     }
     return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
+} // namespace udp
 }  // namespace helics

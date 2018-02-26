@@ -13,6 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
+namespace udp {
 UdpCore::UdpCore () noexcept {}
 
 UdpCore::~UdpCore () = default;
@@ -60,4 +61,5 @@ std::string UdpCore::getAddress () const
     return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
 
+} // namespace udp
 }  // namespace helics

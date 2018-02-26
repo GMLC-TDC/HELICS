@@ -357,7 +357,7 @@ class VectorSubscription
 {
   private:
     ValueFederate *fed = nullptr;  //!< reference to the value federate
-    std::string m_name;  //!< the name of the subscription
+    std::string m_key;  //!< the key for the subscription
     std::string m_units;  //!< the defined units of the federate
     std::vector<subscription_id_t> ids;  //!< the id of the federate
     std::function<void(int, Time)> update_callback;  //!< callback function for when a value is updated
@@ -368,18 +368,21 @@ class VectorSubscription
     /**constructor to build a subscription object
     @param[in] required a flag indicating that the subscription is required to have a matching publication
     @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the subscription
-    @param[in] units the units associated with a Federate
+    @param[in] key the identifier for the publication to subscribe to
+    @param[in] startIndex the index to start with
+    @param[in] count the number of values to subscribe to
+    @param[in] defValue the default value
+    @param[in] units the units associated with the Subscription
     */
     template<class FedPtr>
     VectorSubscription (interface_availability required,
                         FedPtr valueFed,
-                        std::string name,
+                        const std::string &key,
                         int startIndex,
                         int count,
                         const X &defValue,
                         const std::string &units = std::string())
-        : fed (std::addressof(*valueFed)), m_name (std::move (name)), m_units (units)
+        : fed (std::addressof(*valueFed)), m_key (key), m_units (units)
     {
         static_assert(std::is_base_of<ValueFederate, std::remove_reference_t<decltype(*valueFed)>>::value, "first argument must be a pointer to a ValueFederate");
         ids.reserve (count);
@@ -388,7 +391,7 @@ class VectorSubscription
         {
             for (auto ind = startIndex; ind < startIndex + count; ++ind)
             {
-                auto id = fed->registerRequiredSubscription<X> (m_name, ind, m_units);
+                auto id = fed->registerRequiredSubscription<X> (m_key, ind, m_units);
                 ids.push_back (id);
             }
         }
@@ -396,7 +399,7 @@ class VectorSubscription
         {
             for (auto ind = startIndex; ind < startIndex + count; ++ind)
             {
-                auto id = fed->registerOptionalSubscription<X> (m_name, ind, m_units);
+                auto id = fed->registerOptionalSubscription<X> (m_key, ind, m_units);
                 ids.push_back (id);
             }
         }
@@ -406,22 +409,25 @@ class VectorSubscription
     }
     /**constructor to build a subscription object
     @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the subscription
-    @param[in] units the units associated with a Federate
+    @param[in] key the identifier for the publication to subscribe to
+    @param[in] startIndex the index to start with
+    @param[in] count the number of values to subscribe to
+    @param[in] defValue the default value
+    @param[in] units the units associated with the Subscription
     */
     template<class FedPtr>
     VectorSubscription (FedPtr valueFed,
-                        std::string name,
+                        const std::string &key,
                         int startIndex,
                         int count,
                         const X &defValue,
                         const std::string &units = std::string())
-        : VectorSubscription (false, valueFed, name, startIndex, count, defValue, units)
+        : VectorSubscription (false, valueFed, key, startIndex, count, defValue, units)
     {
     }
     /** move constructor*/
     VectorSubscription (VectorSubscription &&vs) noexcept
-        : fed (vs.fed), m_name (std::move (vs.m_name)), m_units (std::move (vs.m_units)), ids (std::move (vs.ids)),
+        : fed (vs.fed), m_key (std::move (vs.m_key)), m_units (std::move (vs.m_units)), ids (std::move (vs.ids)),
           update_callback (std::move (vs.update_callback)), vals (std::move (vs.vals))
     {
         // need to transfer the callback to the new object
@@ -433,7 +439,7 @@ class VectorSubscription
     VectorSubscription &operator= (VectorSubscription &&vs) noexcept
     {
         fed = vs.fed;
-        m_name = std::move (vs.m_name);
+        m_key = std::move (vs.m_key);
         m_units = std::move (vs.m_units);
         ids = std::move (vs.ids);
         update_callback = std::move (vs.update_callback);
@@ -480,7 +486,7 @@ class VectorSubscription2d
 {
   private:
     ValueFederate *fed = nullptr;  //!< reference to the value federate
-    std::string m_name;  //!< the name of the subscription
+    std::string m_key;  //!< the name of the subscription
     std::string m_units;  //!< the defined units of the federate
     std::vector<subscription_id_t> ids;  //!< the id of the federate
     std::function<void(int, Time)> update_callback;  //!< callback function for when a value is updated
@@ -492,20 +498,25 @@ class VectorSubscription2d
     /**constructor to build a subscription object
     @param[in] required a flag indicating that the subscription is required to have a matching publication
     @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the subscription
-    @param[in] units the units associated with a Federate
+     @param[in] key the identifier for the publication to subscribe to
+    @param[in] startIndex_x the index to start with in the x dimension
+    @param[in] count_x the number of values in the x direction
+    @param[in] startIndex_y the index to start with in the x dimension
+    @param[in] count_y the number of values in the x direction
+    @param[in] defValue the default value
+    @param[in] units the units associated with the Subscription
     */
     template<class FedPtr>
     VectorSubscription2d(interface_availability required,
         FedPtr valueFed,
-        std::string name,
+        const std::string &key,
         int startIndex_x,
         int count_x,
         int startIndex_y,
         int count_y,
         const X &defValue,
         const std::string &units = std::string())
-        : fed (std::addressof(*valueFed)), m_name (std::move (name)), m_units (units)
+        : fed (std::addressof(*valueFed)), m_key (key), m_units (units)
     {
         static_assert(std::is_base_of<ValueFederate, std::remove_reference_t<decltype(*valueFed)>>::value, "Second argument must be a pointer to a ValueFederate");
         ids.reserve (count_x * count_y);
@@ -516,7 +527,7 @@ class VectorSubscription2d
             {
                 for (auto ind_y = startIndex_y; ind_y < startIndex_y + count_y; ++ind_y)
                 {
-                    auto id = fed->registerRequiredSubscriptionIndexed<X> (m_name, ind_x, ind_y, m_units);
+                    auto id = fed->registerRequiredSubscriptionIndexed<X> (m_key, ind_x, ind_y, m_units);
                     ids.push_back (id);
                 }
             }
@@ -527,7 +538,7 @@ class VectorSubscription2d
             {
                 for (auto ind_y = startIndex_y; ind_y < startIndex_y + count_y; ++ind_y)
                 {
-                    auto id = fed->registerOptionalSubscriptionIndexed<X> (m_name, ind_x, ind_y, m_units);
+                    auto id = fed->registerOptionalSubscriptionIndexed<X> (m_key, ind_x, ind_y, m_units);
                     ids.push_back (id);
                 }
             }
@@ -543,12 +554,17 @@ class VectorSubscription2d
 
     /**constructor to build a subscription object
     @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the subscription
-    @param[in] units the units associated with a Federate
+    @param[in] key the identifier for the publication to subscribe to
+    @param[in] startIndex_x the index to start with in the x dimension
+    @param[in] count_x the number of values in the x direction
+    @param[in] startIndex_y the index to start with in the x dimension
+    @param[in] count_y the number of values in the x direction
+    @param[in] defValue the default value
+    @param[in] units the units associated with the Subscription
     */
     template<class FedPtr>
     VectorSubscription2d(FedPtr valueFed,
-        const std::string &name,
+        const std::string &key,
         int startIndex_x,
         int count_x,
         int startIndex_y,
@@ -557,7 +573,7 @@ class VectorSubscription2d
         const std::string &units = std::string())
         : VectorSubscription2d(interface_availability::optional,
                                 valueFed,
-                                name,
+                                key,
                                 startIndex_x,
                                 count_x,
                                 startIndex_y,
@@ -568,10 +584,9 @@ class VectorSubscription2d
     }
     /** move constructor*/
     VectorSubscription2d (VectorSubscription2d &&vs) noexcept
-        : fed (vs.fed), m_name (std::move (vs.m_name)), m_units (std::move (vs.m_units)), ids (std::move (vs.ids)),
-          update_callback (std::move (vs.update_callback)), vals (std::move (vs.vals))
+        : fed (vs.fed), m_key (std::move (vs.m_key)), m_units (std::move (vs.m_units)), ids (std::move (vs.ids)),
+          update_callback (std::move (vs.update_callback)), vals (std::move (vs.vals)),indices(vs.indices)
     {
-        indices = vs.indices;
         // need to transfer the callback to the new object
         fed->registerSubscriptionNotificationCallback (ids, [this](subscription_id_t id, Time tm) {
             handleCallback (id, tm);
@@ -582,7 +597,7 @@ class VectorSubscription2d
     VectorSubscription2d &operator= (VectorSubscription2d &&vs) noexcept
     {
         fed = vs.fed;
-        m_name = std::move (vs.m_name);
+        m_key = std::move (vs.m_key);
         m_units = std::move (vs.m_units);
         ids = std::move (vs.ids);
         update_callback = std::move (vs.update_callback);

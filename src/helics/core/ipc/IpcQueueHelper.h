@@ -1,12 +1,10 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 #pragma once
 
@@ -27,8 +25,10 @@ using ipc_state = boost::interprocess::shared_memory_object;
 
 namespace helics
 {
+namespace ipc
+{
 /** translate a string to a C++ qualified name for variable naming purposes
-*/
+ */
 inline std::string stringTranslateToCppName (std::string in)
 {
     std::replace_if (in.begin (), in.end (), [](auto c) { return !(std::isalnum (c) || (c == '_')); }, '_');
@@ -38,18 +38,18 @@ inline std::string stringTranslateToCppName (std::string in)
 enum class queue_state_t : int
 {
     unknown = -1,
-    startup = 0, 
+    startup = 0,
     connected = 1,
     operating = 2,
     closing = 3,
 };
 
 /** class defining a shared queue state meaning interaction with a queue the object is not the owner of
-*/
+ */
 class shared_queue_state
 {
   private:
-      using ipcmutex = boost::interprocess::interprocess_mutex;
+    using ipcmutex = boost::interprocess::interprocess_mutex;
     mutable ipcmutex data_lock;
     queue_state_t state = queue_state_t::startup;
 
@@ -77,7 +77,6 @@ class shared_queue_state
                 boost::interprocess::scoped_lock<ipcmutex> lock (data_lock);
                 state = newState;
                 success = true;
-                
             }
             catch (const boost::interprocess::lock_exception &)
             {
@@ -90,58 +89,57 @@ class shared_queue_state
                     return false;
                 }
             }
-		}
-		return success;
-	}
-    };
+        }
+        return success;
+    }
+};
 
 /** class implementing a queue owned by a particular object*/
-    class ownedQueue
-    {
-      private:
-        std::unique_ptr<ipc_queue> rqueue;
-        std::unique_ptr<ipc_state> queue_state;
-        std::string connectionNameOrig;
-        std::string connectionName;
-        std::string stateName;
-        std::string errorString;
-        std::vector<char> buffer;
-        int mxSize = 0;
-        bool connected = false;
+class ownedQueue
+{
+  private:
+    std::unique_ptr<ipc_queue> rqueue;
+    std::unique_ptr<ipc_state> queue_state;
+    std::string connectionNameOrig;
+    std::string connectionName;
+    std::string stateName;
+    std::string errorString;
+    std::vector<char> buffer;
+    int mxSize = 0;
+    bool connected = false;
 
-      public:
-        ownedQueue () = default;
-        ~ownedQueue ();
-        bool connect (const std::string &connection, int maxMessages, int maxSize);
+  public:
+    ownedQueue () = default;
+    ~ownedQueue ();
+    bool connect (const std::string &connection, int maxMessages, int maxSize);
 
-        void changeState (queue_state_t newState);
+    void changeState (queue_state_t newState);
 
-        stx::optional<ActionMessage> getMessage (int timeout);
-        ActionMessage getMessage ();
+    stx::optional<ActionMessage> getMessage (int timeout);
+    ActionMessage getMessage ();
 
-        const std::string &getError () const { return errorString; }
-    };
+    const std::string &getError () const { return errorString; }
+};
 
-    /** class implementing interactions with a queue to transmit data*/
-    class sendToQueue
-    {
-      private:
-        std::unique_ptr<ipc_queue> txqueue; //!< the actual interprocess queue
-        std::string connectionNameOrig; //!< the connection name as specified   
-        std::string connectionName; //!< translation of the connection name using only valid characters
-        std::string errorString; //!< buffer for any error code
-        std::vector<char> buffer; //!< storage for serialized data of the message
-        bool connected = false; //!< flag indicating connectivity
+/** class implementing interactions with a queue to transmit data*/
+class sendToQueue
+{
+  private:
+    std::unique_ptr<ipc_queue> txqueue;  //!< the actual interprocess queue
+    std::string connectionNameOrig;  //!< the connection name as specified
+    std::string connectionName;  //!< translation of the connection name using only valid characters
+    std::string errorString;  //!< buffer for any error code
+    std::vector<char> buffer;  //!< storage for serialized data of the message
+    bool connected = false;  //!< flag indicating connectivity
 
-      public:
-        sendToQueue () = default;
+  public:
+    sendToQueue () = default;
 
-        bool connect (const std::string &connection, bool initOnly, int retries);
+    bool connect (const std::string &connection, bool initOnly, int retries);
 
-        void sendMessage (const ActionMessage &cmd, int priority);
+    void sendMessage (const ActionMessage &cmd, int priority);
 
-        const std::string &getError () const { return errorString; }
-    };
-
+    const std::string &getError () const { return errorString; }
+};
+}  // namespace ipc
 }  // namespace helics
-

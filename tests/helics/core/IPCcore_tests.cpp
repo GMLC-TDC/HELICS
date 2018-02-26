@@ -34,9 +34,9 @@ BOOST_AUTO_TEST_CASE (ipccomms_broker_test)
     std::atomic<int> counter{0};
     std::string brokerLoc = "brokerIPC";
     std::string localLoc = "localIPC";
-    helics::IpcComms comm (localLoc, brokerLoc);
+    helics::ipc::IpcComms comm (localLoc, brokerLoc);
 
-    helics::ownedQueue mq;
+    helics::ipc::ownedQueue mq;
     bool mqConn = mq.connect (brokerLoc, 1024, 1024);
     BOOST_REQUIRE (mqConn);
 
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE (ipccomms_rx_test)
     helics::ActionMessage act;
     std::string brokerLoc = "";
     std::string localLoc = "localIPC";
-    helics::IpcComms comm (localLoc, brokerLoc);
+    helics::ipc::IpcComms comm (localLoc, brokerLoc);
 
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE (ipccomms_rx_test)
 
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
-    helics::sendToQueue mq;
+    helics::ipc::sendToQueue mq;
     mq.connect (localLoc, true, 2);
 
     helics::ActionMessage cmd (helics::CMD_ACK);
@@ -90,8 +90,8 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_through)
     helics::ActionMessage act;
     helics::ActionMessage act2;
 
-    helics::IpcComms comm (localLoc, brokerLoc);
-    helics::IpcComms comm2 (brokerLoc, "");
+    helics::ipc::IpcComms comm (localLoc, brokerLoc);
+    helics::ipc::IpcComms comm2 (brokerLoc, "");
 
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
@@ -139,9 +139,9 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     helics::ActionMessage act2;
     helics::ActionMessage act3;
 
-    helics::IpcComms comm (localLoc, brokerLoc);
-    helics::IpcComms comm2 (brokerLoc, "");
-    helics::IpcComms comm3 (localLocB, brokerLoc);
+    helics::ipc::IpcComms comm (localLoc, brokerLoc);
+    helics::ipc::IpcComms comm2 (brokerLoc, "");
+    helics::ipc::IpcComms comm3 (localLocB, brokerLoc);
 
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE (ipccore_initialization_test)
     BOOST_REQUIRE (core != nullptr);
     BOOST_CHECK (core->isInitialized ());
 
-    helics::ownedQueue mq;
+    helics::ipc::ownedQueue mq;
     bool mqConn = mq.connect ("testBroker", 1024, 1024);
     BOOST_REQUIRE (mqConn);
 

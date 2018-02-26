@@ -1,25 +1,15 @@
+/*
+Copyright (C) 2017-2018, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+*/
+
 #include "helicsVersion.hpp"
 
 namespace helics
 {
-std::string versionString ()
-{
-    std::string vstr = std::to_string (HELICS_VERSION_MAJOR);
-    vstr.push_back ('.');
-    vstr.append (std::to_string (HELICS_VERSION_MINOR));
-    vstr.push_back ('.');
-    vstr.append (std::to_string (HELICS_VERSION_PATCH));
-
-    std::string buildStr (HELICS_VERSION_BUILD);
-    if (!buildStr.empty ())
-    {
-        vstr.push_back ('-');
-        vstr.append (buildStr);
-    }
-    vstr.push_back (' ');
-    vstr.push_back ('(');
-    vstr += HELICS_DATE;
-    vstr.push_back (')');
-    return vstr;
-}
+const char * versionString = HELICS_VERSION_STRING;
 }
