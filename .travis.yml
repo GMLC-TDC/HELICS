@@ -6,6 +6,9 @@ cache:
   directories:
     - dependencies
 
+before_cache:
+  - scripts/cleanup-cmake.sh
+
 # Create aliases for some of shared build configuration
 _basic_env:
 - &daily_linux

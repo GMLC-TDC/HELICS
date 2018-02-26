@@ -4,7 +4,7 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     HOMEBREW_NO_AUTO_UPDATE=1 brew install pcre
 fi
 
-CI_DEPENDENCY_DIR=${TRAVIS_BUILD_DIR}/dependencies
+export CI_DEPENDENCY_DIR=${TRAVIS_BUILD_DIR}/dependencies
 
 boost_version=$CI_BOOST_VERSION
 if [[ -z "$CI_BOOST_VERSION" ]]; then
