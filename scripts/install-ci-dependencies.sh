@@ -4,18 +4,21 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     HOMEBREW_NO_AUTO_UPDATE=1 brew install pcre
 fi
 
+CI_DEPENDENCY_DIR=${TRAVIS_BUILD_DIR}/dependencies
+
 boost_version=$CI_BOOST_VERSION
 if [[ -z "$CI_BOOST_VERSION" ]]; then
     boost_version=1.65.0
 fi
-boost_install_path=${TRAVIS_BUILD_DIR}/dependencies/boost
+boost_install_path=${CI_DEPENDENCY_DIR}/boost
 
 cmake_version=3.4.3
+cmake_install_path=${CI_DEPENDENCY_DIR}/cmake
 
 swig_version=3.0.10
-swig_install_path=${TRAVIS_BUILD_DIR}/dependencies/swig
+swig_install_path=${CI_DEPENDENCY_DIR}/swig
 
-zmq_install_path=${TRAVIS_BUILD_DIR}/dependencies/zmq
+zmq_install_path=${CI_DEPENDENCY_DIR}/zmq
 
 # Convert commit message to lower case
 commit_msg=`tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE}`
@@ -24,11 +27,11 @@ commit_msg=`tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE}`
 if [[ $commit_msg == *'[update_cache]'* ]]; then
     individual="false"
     if [[ $commit_msg == *'boost'* ]]; then
-        rm -rf dependencies/boost;
+        rm -rf ${boost_install_path};
         individual="true"
     fi
     if [[ $commit_msg == *'zmq'* ]]; then
-        rm -rf dependencies/zmq;
+        rm -rf ${zmq_install_path};
         individual="true"
     fi
     if [[ $commit_msg == *'swig'* ]]; then
@@ -38,25 +41,25 @@ if [[ $commit_msg == *'[update_cache]'* ]]; then
 
     # If no dependency named in commit message, update entire cache
     if [[ "$individual" != 'true' ]]; then
-        rm -rf dependencies;
+        rm -rf ${CI_DEPENDENCY_DIR};
     fi
 fi
 
-if [[ ! -d "dependencies" ]]; then
-    mkdir -p dependencies;
+if [[ ! -d "${CI_DEPENDENCY_DIR}" ]]; then
+    mkdir -p ${CI_DEPENDENCY_DIR};
 fi
 
 # Install CMake
 if [[ ! -d "cmake-install" ]]; then
-    ./scripts/install-dependency.sh cmake ${cmake_version}
+    ./scripts/install-dependency.sh cmake ${cmake_version} ${cmake_install_path}
 fi
 
 # Set path to CMake executable depending on OS
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    export PATH="${PWD}/cmake-install/bin:${PATH}"
+    export PATH="${cmake_install_path}/bin:${PATH}"
     echo "*** cmake installed ($PATH)"
 elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    export PATH="${PWD}/cmake-install/CMake.app/Contents/bin:${PATH}"
+    export PATH="${cmake_install_path}/CMake.app/Contents/bin:${PATH}"
     echo "*** cmake installed ($PATH)"
 fi
 

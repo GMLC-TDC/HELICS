@@ -4,13 +4,6 @@ language: cpp
 cache:
   ccache: true
   directories:
-    - cmake-install/bin
-    - cmake-install/plugins
-    - cmake-install/share
-    - cmake-install/CMake.app/Contents/bin
-    - cmake-install/CMake.app/Contents/Frameworks
-    - cmake-install/CMake.app/Contents/MacOS
-    - cmake-install/CMake.app/Contents/share
     - dependencies
 
 # Create aliases for some of shared build configuration

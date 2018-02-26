@@ -73,9 +73,12 @@ install_cmake () {
     local os_name="$(uname -s)"
     local cmake_version=$1
     local cmake_version_str=cmake-${cmake_version}-${os_name}-x86_64
+    local install_path=$2
     wget --no-check-certificate -O ${cmake_version_str}.tar.gz http://cmake.org/files/v${ver[0]}.${ver[1]}/${cmake_version_str}.tar.gz;
     tar -xzf ${cmake_version_str}.tar.gz ;
-    mv ${cmake_version_str} cmake-install;
+
+    # Move CMake into install location using -T (renames the directory if dest doesn't exist or is empty)
+    mv -T ${cmake_version_str} ${install_path};
     rm ${cmake_version_str}.tar.gz
 }
 
@@ -87,7 +90,7 @@ case "$1" in
         install_boost ${install_version} ${install_path}
         ;;
     cmake)
-        install_cmake ${install_version}
+        install_cmake ${install_version} ${install_path}
         ;;
     swig)
         install_swig ${install_version} ${install_path}
