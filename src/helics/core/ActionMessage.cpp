@@ -58,9 +58,8 @@ ActionMessage::ActionMessage (const ActionMessage &act)
 
 ActionMessage::ActionMessage (std::unique_ptr<Message> message)
     : messageAction (CMD_SEND_MESSAGE), index (dest_handle), actionTime (message->time),
-      payload (std::move (message->data.m_data)), name (payload)
+      payload (std::move (message->data.m_data)), name (payload), extraInfo(std::make_unique<AdditionalInfo>())
 {
-    extraInfo = std::make_unique<AdditionalInfo> ();
     extraInfo->source = std::move (message->source);
     extraInfo->orig_source = std::move (message->original_source);
     extraInfo->original_dest = std::move (message->original_dest);

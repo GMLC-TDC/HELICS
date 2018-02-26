@@ -40,5 +40,5 @@ private:
     std::string brokerloc;  //!< the name of the shared queue of the broker
     std::string brokername;  //!< the name of the broker
 };
-}
+} // namespace ipc
 }  // namespace helics

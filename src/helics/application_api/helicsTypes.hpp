@@ -229,12 +229,16 @@ std::string helicsComplexString (std::complex<double> val);
 std::string helicsVectorString (const std::vector<double> &val);
 std::string helicsVectorString (const double *vals, size_t size);
 std::string helicsComplexVectorString (const std::vector<std::complex<double>> &val);
+std::string helicsNamedPointString(const named_point &point);
+std::string helicsNamedPointString(const std::string &pointName, double val);
 /** convert a string to a complex number*/
 std::complex<double> helicsGetComplex (const std::string &val);
 /** convert a string to a vector*/
 std::vector<double> helicsGetVector (const std::string &val);
 /** convert a string to a complex vector*/
 std::vector<std::complex<double>> helicsGetComplexVector (const std::string &val);
+
+named_point helicsGetNamedPoint(const std::string &val);
 
 void helicsGetVector (const std::string &val, std::vector<double> &data);
 void helicsGetComplexVector (const std::string &val, std::vector<std::complex<double>> &data);

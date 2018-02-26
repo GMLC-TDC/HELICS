@@ -42,13 +42,16 @@ class error_code;
 }
 }
 
-class TcpRxConnection;
-class TcpConnection;
+
 
 namespace helics
 {
 namespace tcp
 {
+
+class TcpRxConnection;
+class TcpConnection;
+
 /** implementation for the communication interface that uses TCP messages to communicate*/
 class TcpComms final : public CommsInterface
 {

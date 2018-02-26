@@ -706,6 +706,7 @@ MasterObjectHolder::~MasterObjectHolder()
         zmqContextManager::getContext().close();
     }
 #endif
+    helics::LoggingCore::setFastShutdown();
     deleteAll();
     //std::cout << "end of master Object Holder destructor" << std::endl;
 }

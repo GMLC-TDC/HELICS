@@ -28,4 +28,4 @@ class FilterCoordinator
     bool hasDestFilter = false;  //!< indicator that an endpoint has a destination filter
     int ongoingTransactions = 0;  //!< counter for the number of filtered message returns expected
 };
-}
+} // namespace helics

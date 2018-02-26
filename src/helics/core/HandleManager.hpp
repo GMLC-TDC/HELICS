@@ -49,4 +49,4 @@ public:
         const std::string &type_out);
 };
 
-}
+} // namespace helics

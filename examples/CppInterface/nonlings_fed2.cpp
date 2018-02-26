@@ -76,7 +76,6 @@ int main(int /*argc*/,char ** /*argv*/)
 //    xprv = x;
     double x = vfed->getDouble(sub);
     ++helics_iter;
-    double J2;
     int    newt_conv = 0, max_iter=10,iter=0;
 
     /* Solve the equation using Newton */
@@ -91,7 +90,7 @@ int main(int /*argc*/,char ** /*argv*/)
       iter++;
 
       /* Jacobian */
-      J2 = 8*y;
+      double J2 = 8*y;
       
       y = y - f2/J2;
     }

@@ -176,6 +176,7 @@ std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, 
     if (!reg)
     {
     }
+    broker->connect();
     return broker;
 }
 

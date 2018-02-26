@@ -1,16 +1,13 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_SUBSCRIPTION_
-#define _HELICS_SUBSCRIPTION_
 
+#pragma once
 
 #include "Core.hpp"
 #include "helics-time.hpp"
@@ -54,5 +51,3 @@ class PublicationInfo
     bool CheckSetValue (const char *checkData, uint64_t len);
 };
 } // namespace helics
-
-#endif
