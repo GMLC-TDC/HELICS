@@ -145,7 +145,7 @@ script:
   # - ctest --verbose --timeout 120 -I 0,0,0,2
   - ctest --verbose --timeout 120 -I 0,0,0,6
   # - ctest --verbose --timeout 360 -I 0,0,0,4
-  - export PYTHONPATH="$(pwd)/dependencies/swig/python"
+  - export PYTHONPATH="${TRAVIS_BUILD_DIR}/dependencies/swig/python"
     # - echo "$LD_LIBRARY_PATH"
     # - echo "$DYLD_FALLBACK_LIBRARY_PATH"
   - python3 -m helics
