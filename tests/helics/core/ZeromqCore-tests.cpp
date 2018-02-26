@@ -28,12 +28,17 @@ BOOST_AUTO_TEST_SUITE (ZMQCore_tests)
 
 using helics::Core;
 const std::string defServer("tcp://127.0.0.1:23405");
+const std::string host = "tcp://127.0.0.1";
+
+const std::string defRoute1("tcp://127.0.0.1:23406");
+
+const std::string defRoute2("tcp://127.0.0.1:23407");
 
 BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
 {
     std::atomic<int> counter{0};
-    std::string host = "tcp://127.0.0.1";
-    helics::ZmqComms comm (host, host);
+    
+    helics::zeromq::ZmqComms comm (host, host);
 
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
@@ -61,21 +66,20 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
 /** test the request set class with various scenarios*/
 BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
 {
-    std::string host = "tcp://127.0.0.1";
 
-    helics::ZmqRequestSets reqset;
+    helics::zeromq::ZmqRequestSets reqset;
 
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket1 (ctx->getContext (), ZMQ_REP);
     repSocket1.bind (defServer);
     zmq::socket_t repSocket2 (ctx->getContext (), ZMQ_REP);
-    repSocket2.bind ("tcp://127.0.0.1:23406");
+    repSocket2.bind (defRoute1);
     zmq::socket_t repSocket3 (ctx->getContext (), ZMQ_REP);
-    repSocket3.bind ("tcp://127.0.0.1:23407");
+    repSocket3.bind (defRoute2);
 
     reqset.addRoutes (1, defServer);
-    reqset.addRoutes (2, "tcp://127.0.0.1:23406");
-    reqset.addRoutes (3, "tcp://127.0.0.1:23407");
+    reqset.addRoutes (2, defRoute1);
+    reqset.addRoutes (3, defRoute2);
 
     helics::ActionMessage M (helics::CMD_IGNORE);
     M.index = 1;
@@ -126,25 +130,23 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
 /** test the request set class with various scenarios*/
 BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
 {
-    std::string host = "tcp://127.0.0.1";
-
-    helics::ZmqRequestSets reqset;
+    helics::zeromq::ZmqRequestSets reqset;
 
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket1 (ctx->getContext (), ZMQ_REP);
     repSocket1.bind (defServer);
     zmq::socket_t repSocket2 (ctx->getContext (), ZMQ_REP);
-    repSocket2.bind ("tcp://127.0.0.1:23406");
+    repSocket2.bind (defRoute1);
     zmq::socket_t repSocket3 (ctx->getContext (), ZMQ_REP);
-    repSocket3.bind ("tcp://127.0.0.1:23407");
+    repSocket3.bind (defRoute2);
 
     repSocket1.setsockopt (ZMQ_LINGER, 100);
     repSocket2.setsockopt (ZMQ_LINGER, 100);
     repSocket3.setsockopt (ZMQ_LINGER, 100);
 
     reqset.addRoutes (1, defServer);
-    reqset.addRoutes (2, "tcp://127.0.0.1:23406");
-    reqset.addRoutes (3, "tcp://127.0.0.1:23407");
+    reqset.addRoutes (2, defRoute1);
+    reqset.addRoutes (3, defRoute2);
 
     helics::ActionMessage M (helics::CMD_IGNORE);
     M.index = 1;
@@ -210,8 +212,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
 BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
 {
     std::atomic<int> counter{0};
-    std::string host = "tcp://127.0.0.1";
-    helics::ZmqComms comm (host, host);
+    helics::zeromq::ZmqComms comm (host, host);
 
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
@@ -229,7 +230,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
     try
     {
-        pullSocket.bind ("tcp://127.0.0.1:23406");
+        pullSocket.bind (defRoute1);
     }
     catch (const zmq::error_t &ze)
     {
@@ -264,8 +265,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
 {
     std::atomic<int> counter{0};
     helics::ActionMessage act;
-    std::string host = "tcp://127.0.0.1";
-    helics::ZmqComms comm (host, host);
+    helics::zeromq::ZmqComms comm (host, host);
 
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
@@ -283,7 +283,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
     try
     {
-        pullSocket.bind ("tcp://127.0.0.1:23406");
+        pullSocket.bind (defRoute1);
     }
     catch (const zmq::error_t &ze)
     {
@@ -335,9 +335,8 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
     helics::ActionMessage act;
     helics::ActionMessage act2;
 
-    std::string host = "tcp://127.0.0.1";
-    helics::ZmqComms comm (host, host);
-    helics::ZmqComms comm2 (host, "");
+    helics::zeromq::ZmqComms comm (host, host);
+    helics::zeromq::ZmqComms comm2 (host, "");
 
     comm.setBrokerPort (23405);
     comm.setName ("tests");
@@ -382,11 +381,9 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     std::atomic<int> counter3{0};
-
-    std::string host = "tcp://127.0.0.1";
-    helics::ZmqComms comm (host, host);
-    helics::ZmqComms comm2 (host, "");
-    helics::ZmqComms comm3 (host, host);
+    helics::zeromq::ZmqComms comm (host, host);
+    helics::zeromq::ZmqComms comm2 (host, "");
+    helics::zeromq::ZmqComms comm3 (host, host);
 
     comm.setBrokerPort (23405);
     comm.setName ("tests");
@@ -487,7 +484,7 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
     try
     {
-        pullSocket.bind ("tcp://127.0.0.1:23406");
+        pullSocket.bind (defRoute1);
     }
     catch (const zmq::error_t &ze)
     {

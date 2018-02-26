@@ -143,11 +143,20 @@ void LoggerNoThread::flush ()
     std::cout.flush ();
 }
 
+std::atomic<bool> LoggingCore::fastShutdown{ false };
+
 LoggingCore::LoggingCore () { loggingThread = std::thread (&LoggingCore::processingLoop, this); }
 
 LoggingCore::~LoggingCore ()
 {
-    if (!tripDetector.isTripped())
+    if (LoggingCore::fastShutdown)
+    {
+        if (!tripDetector.isTripped())
+        {
+            loggingQueue.emplace(-1, "!!>close");
+        }
+    }
+    else
     {
         loggingQueue.emplace(-1, "!!>close");
     }
@@ -169,6 +178,11 @@ int LoggingCore::addFileProcessor (std::function<void(std::string &&message)> ne
     std::lock_guard<std::mutex> fLock (functionLock);
     functions.push_back (std::move (newFunction));
     return static_cast<int> (functions.size ()) - 1;
+}
+
+void LoggingCore::setFastShutdown()
+{
+    fastShutdown.store(true);
 }
 
 void LoggingCore::haltOperations (int loggerIndex)
@@ -268,6 +282,7 @@ void LoggingCore::processingLoop ()
 
 bool LoggerNoThread::isRunning () const { return true; }
 
+
 /** a storage system for the available Logger objects allowing references by name to the core
  */
 std::map<std::string, std::shared_ptr<LoggerManager>> LoggerManager::loggers;
@@ -311,7 +326,7 @@ void LoggerManager::closeLogger (const std::string &loggerName)
 void LoggerManager::logMessage (const std::string &message)
 {
     std::lock_guard<std::mutex> loglock (loggerLock);
-    auto fnd = loggers.find ("");
+    auto fnd = loggers.find (std::string());
     if (fnd != loggers.end ())
     {
         if (fnd->second->loggingControl)

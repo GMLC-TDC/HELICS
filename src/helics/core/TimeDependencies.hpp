@@ -6,7 +6,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
-
 #pragma once
 
 #include "Core.hpp"
@@ -31,21 +30,21 @@ class DependencyInfo
         time_requested = 5,
     };
     Core::federate_id_t fedID = invalid_fed_id;  //!< identifier for the dependency
-    Core::federate_id_t minFed = invalid_fed_id; //!< identfier for the min dependency
+    Core::federate_id_t minFed = invalid_fed_id;  //!< identfier for the min dependency
     time_state_t time_state = time_state_t::initialized;  //!< the current state of the dependency
-    
+
     Time Tnext = negEpsilon;  //!< next possible message or value
     Time Te = timeZero;  //!< the next currently scheduled event
     Time Tdemin = timeZero;  //!< min dependency event time
-    Time forwardEvent = Time::maxVal(); //!< a predicted event
+    Time forwardEvent = Time::maxVal ();  //!< a predicted event
     /** default constructor*/
     DependencyInfo () = default;
     /** construct from a federate id*/
     explicit DependencyInfo (Core::federate_id_t id) : fedID (id){};
 
-	/** process a dependency related message
-	@param m  a reference to an action message that contains some instructions for modifying dependencies
-	@return true if something was modified by the message*/
+    /** process a dependency related message
+    @param m  a reference to an action message that contains some instructions for modifying dependencies
+    @return true if something was modified by the message*/
     bool ProcessMessage (const ActionMessage &m);
 };
 
@@ -80,18 +79,18 @@ class TimeDependencies
     /**  const iterator to first dependency*/
     auto cend () const { return dependencies.cend (); }
 
-	/** get a pointer to the dependency information for a particular object*/
+    /** get a pointer to the dependency information for a particular object*/
     DependencyInfo *getDependencyInfo (Core::federate_id_t id);
 
-	/** check if the dependencies would allow entry to exec mode*/
+    /** check if the dependencies would allow entry to exec mode*/
     bool checkIfReadyForExecEntry (bool iterating) const;
-	/** check if the dependencies would allow a grant of the time
-	@param iterating true if the object is iterating
-	@param desiredGrantTime  the time to check for granting
-	@return true if the object is ready
-	*/
+    /** check if the dependencies would allow a grant of the time
+    @param iterating true if the object is iterating
+    @param desiredGrantTime  the time to check for granting
+    @return true if the object is ready
+    */
     bool checkIfReadyForTimeGrant (bool iterating, Time desiredGrantTime) const;
     void resetIteratingExecRequests ();
     void resetIteratingTimeRequests (Time requestTime);
 };
-}
+}  // namespace helics

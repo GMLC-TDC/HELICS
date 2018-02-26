@@ -19,7 +19,7 @@ namespace helics
 {
 
 /** @returns a string containing version information*/
-std::string versionString ();
+extern const char * versionString;
 
 /** get the Major version number*/
 constexpr int versionMajor=HELICS_VERSION_MAJOR;

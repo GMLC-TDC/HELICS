@@ -33,6 +33,7 @@ class io_service;
 #endif
 namespace helics
 {
+namespace udp {
 /** implementation for the communication interface that uses ZMQ messages to communicate*/
 class UdpComms final : public CommsInterface
 {
@@ -74,4 +75,5 @@ class UdpComms final : public CommsInterface
     std::string getAddress () const;
 };
 
+} // namespace udp
 }  // namespace helics

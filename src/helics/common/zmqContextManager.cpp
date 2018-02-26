@@ -85,7 +85,7 @@ zmqContextManager::~zmqContextManager ()
     }
 }
 
-zmqContextManager::zmqContextManager (const std::string &contextName) : name (contextName)
+zmqContextManager::zmqContextManager (const std::string &contextName)
+    : name (contextName), zcontext (std::make_unique<zmq::context_t> ())
 {
-    zcontext = std::make_unique<zmq::context_t> ();
 }

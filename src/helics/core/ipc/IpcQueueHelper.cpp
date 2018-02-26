@@ -16,9 +16,11 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/date_time/microsec_time_clock.hpp>
 
 #include <boost/date_time/local_time/local_time.hpp>
-namespace ipc = boost::interprocess;
+namespace boostipc = boost::interprocess;
 
 namespace helics
+{
+namespace ipc
 {
 ownedQueue::~ownedQueue ()
 {
@@ -52,7 +54,8 @@ bool ownedQueue::connect (const std::string &connection, int maxMessages, int ma
 
     try
     {
-        queue_state = std::make_unique<ipc_state> (ipc::create_only, stateName.c_str (), ipc::read_write);
+        queue_state =
+          std::make_unique<ipc_state> (boostipc::create_only, stateName.c_str (), boostipc::read_write);
     }
     catch (boost::interprocess::interprocess_exception const &ipe)
     {
@@ -61,7 +64,7 @@ bool ownedQueue::connect (const std::string &connection, int maxMessages, int ma
     }
     queue_state->truncate (sizeof (shared_queue_state) + 256);
     // Map the whole shared memory in this process
-    ipc::mapped_region region (*queue_state, ipc::read_write);
+    boostipc::mapped_region region (*queue_state, boostipc::read_write);
 
     // auto *sstate = reinterpret_cast<shared_queue_state *> (region.get_address ());
     auto *sstate = new (region.get_address ()) shared_queue_state;
@@ -69,7 +72,7 @@ bool ownedQueue::connect (const std::string &connection, int maxMessages, int ma
 
     try
     {
-        rqueue = std::make_unique<ipc_queue> (boost::interprocess::create_only, connectionName.c_str (),
+        rqueue = std::make_unique<ipc_queue> (boostipc::create_only, connectionName.c_str (),
                                               maxMessages, maxSize);
     }
     catch (boost::interprocess::interprocess_exception const &ipe)
@@ -88,7 +91,7 @@ void ownedQueue::changeState (queue_state_t newState)
 {
     if (connected)
     {
-        ipc::mapped_region region (*queue_state, ipc::read_write);
+        boostipc::mapped_region region (*queue_state, boostipc::read_write);
 
         auto *sstate = reinterpret_cast<shared_queue_state *> (region.get_address ());
         sstate->setState (newState);
@@ -175,8 +178,9 @@ bool sendToQueue::connect (const std::string &connection, bool initOnly, int ret
     {
         try
         {
-            auto queue_state = std::make_unique<ipc_state> (ipc::open_only, stateName.c_str (), ipc::read_write);
-            ipc::mapped_region region (*queue_state, ipc::read_write);
+            auto queue_state =
+              std::make_unique<ipc_state> (boostipc::open_only, stateName.c_str (), boostipc::read_write);
+            boostipc::mapped_region region (*queue_state, boostipc::read_write);
 
             auto *sstate = reinterpret_cast<shared_queue_state *> (region.get_address ());
 
@@ -232,12 +236,12 @@ bool sendToQueue::connect (const std::string &connection, bool initOnly, int ret
     {
         try
         {
-            txqueue = std::make_unique<ipc_queue> (ipc::open_only, connectionName.c_str ());
+            txqueue = std::make_unique<ipc_queue> (boostipc::open_only, connectionName.c_str ());
             connected = true;
         }
         catch (boost::interprocess::interprocess_exception const &ipe)
         {
-            // this likely means the sfile doesn't exist yet
+            // this likely means the shared file doesn't exist yet
             ++tries;
             if (tries <= retries)
             {
@@ -262,4 +266,5 @@ void sendToQueue::sendMessage (const ActionMessage &cmd, int priority)
         txqueue->send (buffer.data (), buffer.size (), priority);
     }
 }
+}  // namespace ipc
 }  // namespace helics

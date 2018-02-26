@@ -9,13 +9,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 static char help[] = "Example to demonstrate the usage of HELICS C Interface with two federates.\n\
             This example implements a loose-coupling protocol to exchange values between two federates. \n\
-            Here, a value federate, that can both publish and subcribe is created.\n\
+            Here, a value federate, that can both publish and subscribe is created.\n\
             This federate can only publish a value once it receives value from the other federate.\n\n";
 
 #include <stdio.h>
 #include <cpp98/ValueFederate.hpp>
 #include <cpp98/helics.hpp> // helicsVersionString
-#include "core/helicsVersion.hpp"
 #include <math.h>
 
 int main(int /*argc*/,char ** /*argv*/)
@@ -25,10 +24,7 @@ int main(int /*argc*/,char ** /*argv*/)
   helics_subscription sub;
   helics_publication  pub;
 
-
-  std::string helicsversion = helics::versionString();
-
-  printf("PI RECEIVER: Helics version = %s\n",helicsversion.c_str());
+  printf("PI RECEIVER: Helics version = %s\n", helicsGetVersion());
   printf("%s",help);
 
   /* Create Federate Info object that describes the federate properties

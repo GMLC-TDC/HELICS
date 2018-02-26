@@ -13,6 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
+namespace zeromq {
 ZmqCore::ZmqCore () noexcept {}
 
 ZmqCore::~ZmqCore () = default;
@@ -68,4 +69,5 @@ std::string ZmqCore::getAddress () const
     }
 }
 
+} // namespace zeromq
 }  // namespace helics

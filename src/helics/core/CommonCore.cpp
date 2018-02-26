@@ -1433,8 +1433,16 @@ void CommonCore::deliverMessage (ActionMessage &message)
             auto ffunc = getFilterCoordinator (localP->id);
 
             auto tempMessage = createMessageFromCommand (std::move (message));
-            auto nmessage = ffunc->destFilter->filterOp->process (std::move (tempMessage));
-            message.moveInfo (std::move (nmessage));
+            if (ffunc->destFilter->filterOp)
+            {
+                auto nmessage = ffunc->destFilter->filterOp->process(std::move(tempMessage));
+                message.moveInfo(std::move(nmessage));
+            }
+            else
+            {
+                message.moveInfo(std::move(tempMessage));
+            }
+            
         }
         message.dest_id = localP->fed_id;
         message.dest_handle = localP->id;

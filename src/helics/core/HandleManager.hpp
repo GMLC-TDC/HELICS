@@ -5,7 +5,6 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 #pragma once
 #include "Core.hpp"
@@ -31,15 +30,16 @@ private:
     std::unordered_multimap<std::string, Core::handle_id_t> subscriptions; //!< multimap of subscriptions
     std::unordered_multimap<std::string, Core::handle_id_t> filters;  //!< multimap for all the filters
 public:
+    /** default constructor*/
     HandleManager() = default;
-
+    /** add a handle to manage*/
     BasicHandleInfo *addHandle(Core::handle_id_t id,
         Core::federate_id_t fed_id,
         BasicHandleType what,
         const std::string &key,
         const std::string &type,
         const std::string &units);
-
+    /** add a handle to manage*/
     BasicHandleInfo *addHandle(Core::handle_id_t id,
         Core::federate_id_t fed_id,
         BasicHandleType what,
@@ -49,4 +49,4 @@ public:
         const std::string &type_out);
 };
 
-}
+} // namespace helics
