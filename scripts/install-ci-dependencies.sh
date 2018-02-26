@@ -77,7 +77,7 @@ fi
 # Install Boost
 if [[ ! -d "${boost_install_path}" ]]; then
     echo "*** build boost"
-    ./scripts/install-dependency.sh boost ${boost_version} ${boost_install_path}
+    travis_wait ./scripts/install-dependency.sh boost ${boost_version} ${boost_install_path}
     echo "*** built boost successfully"
 fi
 
