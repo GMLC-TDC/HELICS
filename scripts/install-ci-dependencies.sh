@@ -4,25 +4,25 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     HOMEBREW_NO_AUTO_UPDATE=1 brew install pcre
 fi
 
-local boost_version=$CI_BOOST_VERSION
+boost_version=$CI_BOOST_VERSION
 if [[ -z "$CI_BOOST_VERSION" ]]; then
     boost_version=1.65.0
 fi
-local boost_install_path=${TRAVIS_BUILD_DIR}/dependencies/boost
+boost_install_path=${TRAVIS_BUILD_DIR}/dependencies/boost
 
-local cmake_version=3.4.3
+cmake_version=3.4.3
 
-local swig_version=3.0.10
-local swig_install_path=${TRAVIS_BUILD_DIR}/dependencies/swig
+swig_version=3.0.10
+swig_install_path=${TRAVIS_BUILD_DIR}/dependencies/swig
 
-local zmq_install_path=${TRAVIS_BUILD_DIR}/dependencies/zmq
+zmq_install_path=${TRAVIS_BUILD_DIR}/dependencies/zmq
 
 # Convert commit message to lower case
 commit_msg=`tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE}`
 
 # Wipe out cached dependencies if commit message has '[update_cache]'
 if [[ $commit_msg == *'[update_cache]'* ]]; then
-    local individual
+    individual="false"
     if [[ $commit_msg == *'boost'* ]]; then
         rm -rf dependencies/boost;
         individual="true"
@@ -48,7 +48,7 @@ fi
 
 # Install CMake
 if [[ ! -d "cmake-install" ]]; then
-    ./install_dependency.sh cmake ${cmake_version}
+    ./scripts/install-dependency.sh cmake ${cmake_version}
 fi
 
 # Set path to CMake executable depending on OS
@@ -62,7 +62,7 @@ fi
 
 # Install SWIG
 if [[ ! -d "${swig_install_path}" ]]; then
-    ./install_dependency.sh swig ${swig_version} ${swig_install_path}
+    ./scripts/install-dependency.sh swig ${swig_version} ${swig_install_path}
 fi
 export PATH="${swig_install_path}:${PATH}"
 echo "*** built swig successfully {$PATH}"
@@ -70,14 +70,14 @@ echo "*** built swig successfully {$PATH}"
 # Install ZeroMQ
 if [[ ! -d "${zmq_install_path}" ]]; then
     echo "*** build libzmq"
-    ./install_dependency.sh zmq ${zmq_install_path}
+    ./scripts/install-dependency.sh zmq ${zmq_install_path}
     echo "*** built zmq successfully"
 fi
 
 # Install Boost
 if [[ ! -d "${boost_install_path}" ]]; then
     echo "*** build boost"
-    ./install_dependency.sh boost ${boost_version} ${boost_install_path}
+    ./scripts/install-dependency.sh boost ${boost_version} ${boost_install_path}
     echo "*** built boost successfully"
 fi
 
