@@ -50,7 +50,7 @@ if [[ ! -d "${CI_DEPENDENCY_DIR}" ]]; then
 fi
 
 # Install CMake
-if [[ ! -d "cmake-install" ]]; then
+if [[ ! -d "${cmake_install_path}" ]]; then
     ./scripts/install-dependency.sh cmake ${cmake_version} ${cmake_install_path}
 fi
 
