@@ -1,13 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include "../application_api/Filters.hpp"
 #include "../application_api/Subscriptions.hpp"
 #include "../application_api/ValueFederate.hpp"
@@ -15,7 +14,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../common/stringOps.h"
 #include "../core/helicsVersion.hpp"
 #include <algorithm>
-#include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -40,15 +38,12 @@ Tracer::Tracer (FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (
 }
 
 static const ArgDescriptors InfoArgs{
-    {"stop", "the time to stop recording"},
+    {"stop", "the time to stop tracing"},
     {"tags",ArgDescriptor::arg_type_t::vector_string,"tags to record, this argument may be specified any number of times"},
-    {"endpoints",ArgDescriptor::arg_type_t::vector_string,"endpoints to capture, this argument may be specified multiple time"},
     {"sourceclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture generated packets from, this argument may be specified multiple time"},
     {"destclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture all packets with the specified endpoint as a destination, this argument may be specified multiple time"},
     {"clone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to clone all packets to and from"},
-    {"capture", ArgDescriptor::arg_type_t::vector_string,"capture all the publications of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list"},
-    {"output,o","the output file for recording the data"},
-    {"mapfile", "write progress to a memory mapped file"}
+    {"capture", ArgDescriptor::arg_type_t::vector_string,"capture all the publications and endpoints of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list"},
 };
 
 Tracer::Tracer (int argc, char *argv[])
@@ -64,7 +59,7 @@ Tracer::Tracer (int argc, char *argv[])
         deactivated = true;
         return;
     }
-    FederateInfo fi ("recorder");
+    FederateInfo fi ("tracer");
 
     fi.loadInfoFromArgs (argc, argv);
     fed = std::make_shared<CombinationFederate> (fi);
@@ -85,7 +80,7 @@ Tracer::Tracer (const std::string &jsonString) : fed (std::make_shared<Combinati
     loadJsonFile (jsonString);
 }
 
-Tracer::~Tracer () { saveFile (outFileName); }
+Tracer::~Tracer() = default;
 
 int Tracer::loadFile (const std::string &filename)
 {
@@ -104,19 +99,12 @@ int Tracer::loadJsonFile (const std::string &jsonString)
 {
     fed->registerInterfaces (jsonString);
 
-    auto pubCount = fed->getSubscriptionCount ();
-    for (int ii = 0; ii < pubCount; ++ii)
+    auto subCount = fed->getSubscriptionCount ();
+    for (int ii = 0; ii < subCount; ++ii)
     {
         subscriptions.emplace_back (fed.get (), ii);
         subids.emplace (subscriptions.back ().getID (), static_cast<int> (subscriptions.size ()) - 1);
         subkeys.emplace (subscriptions.back ().getName (), static_cast<int> (subscriptions.size ()) - 1);
-    }
-    auto eptCount = fed->getEndpointCount ();
-    for (int ii = 0; ii < eptCount; ++ii)
-    {
-        endpoints.emplace_back (fed.get (), ii);
-        eptNames[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
-        eptids.emplace (endpoints.back ().getID (), static_cast<int> (endpoints.size () - 1));
     }
 
     auto doc = loadJsonString (jsonString);
@@ -220,7 +208,7 @@ int Tracer::loadTextFile (const std::string &textFile)
             }
             else if ((blk[0] == "endpoint") || (blk[0] == "ept") || (blk[0] == "e"))
             {
-                addEndpoint (removeQuotes (blk[1]));
+               //mainly here so the same files work with recorder as tracer so ignore this line
             }
             else if ((blk[0] == "sourceclone") || (blk[0] == "source") || (blk[0] == "src"))
             {
@@ -273,106 +261,9 @@ int Tracer::loadTextFile (const std::string &textFile)
     return 0;
 }
 
-void Tracer::writeJsonFile (const std::string &filename)
-{
-    Json_helics::Value doc;
-    if (!points.empty ())
-    {
-        doc["points"] = Json_helics::Value(Json_helics::arrayValue);
-        for (auto &v : points)
-        {
-            Json_helics::Value point;
-            point["key"] = subscriptions[v.index].getKey ();
-            point["value"] = v.value;
-            point["time"] = static_cast<double> (v.time);
-
-            if (v.first)
-            {
-                point["type"] = subscriptions[v.index].getType ();
-            }
-           doc["points"].append(point);
-        }
-    }
-
-    if (!messages.empty ())
-    {
-        doc["messages"] = Json_helics::Value(Json_helics::arrayValue);
-        for (auto &mess : messages)
-        {
-            Json_helics::Value message;
-            message["time"] = static_cast<double> (mess->time);
-            message["src"] = mess->source;
-            if ((!mess->original_source.empty ()) && (mess->original_source != mess->source))
-            {
-                message["original_source"] = mess->original_source;
-            }
-            if ((mess->dest.size () < 7) || (mess->dest.compare (mess->dest.size () - 6, 6, "cloneE") != 0))
-            {
-                message["dest"] = mess->dest;
-                message["orig_dest"] = mess->original_dest;
-            }
-            else
-            {
-                message["dest"] = mess->original_dest;
-            }
-            message["message"] = encode (mess->data.to_string ());
-            doc["messages"].append(message);
-        }
-    }
-
-    std::ofstream o (filename);
-    o << doc << std::endl;
-}
-
-void Tracer::writeTextFile (const std::string &filename)
-{
-    std::ofstream outFile (filename.empty () ? outFileName : filename);
-    if (!points.empty ())
-    {
-        outFile << "#time \ttag\t value\t type*\n";
-    }
-    for (auto &v : points)
-    {
-        if (v.first)
-        {
-            outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getKey () << '\t'
-                    << v.value << '\t' << subscriptions[v.index].getType () << '\n';
-        }
-        else
-        {
-            outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getKey () << '\t'
-                    << v.value << '\n';
-        }
-    }
-    if (!messages.empty ())
-    {
-        outFile << "# m\t time \tsource\t dest\t message\n";
-    }
-    for (auto &m : messages)
-    {
-        outFile << "m\t" << static_cast<double> (m->time) << '\t' << m->source << '\t';
-        if ((m->dest.size () < 7) || (m->dest.compare (m->dest.size () - 6, 6, "cloneE") != 0))
-        {
-            outFile << m->dest;
-        }
-        else
-        {
-            outFile << m->original_dest;
-        }
-        outFile << "\t\"" << encode (m->data.to_string ()) << "\"\n";
-    }
-}
-
 void Tracer::initialize ()
 {
     generateInterfaces ();
-
-    vStat.reserve (subkeys.size ());
-    for (auto &val : subkeys)
-    {
-        vStat.emplace_back (ValueStats ());
-        vStat.back ().key = val.first;
-    }
 
     fed->enterInitializationState ();
     captureForCurrentTime (-1.0);
@@ -392,13 +283,7 @@ void Tracer::generateInterfaces ()
             addSubscription (tag.first);
         }
     }
-    for (auto &ept : eptNames)
-    {
-        if (ept.second == -1)
-        {
-            addEndpoint (ept.first);
-        }
-    }
+    
     loadCaptureInterfaces ();
 }
 
@@ -425,31 +310,35 @@ void Tracer::captureForCurrentTime (Time currentTime)
         if (sub.isUpdated ())
         {
             auto val = sub.getValue<std::string> ();
-            int ii = subids[sub.getID ()];
-            points.emplace_back (currentTime, ii, val);
-            if (vStat[ii].cnt == 0)
+            std::cout << '[' << currentTime << ']' << sub.getKey() << '=';
+            if (val.size() < 150)
             {
-                points.back ().first = true;
+                std::cout  << val << '\n';
             }
-            ++vStat[ii].cnt;
-            vStat[ii].lastVal = val;
-            vStat[ii].time = -1.0;
+            else
+            {
+                std::cout << "block[" << val.size() << "]\n";
+            }
+            
         }
     }
 
-    for (auto &ept : endpoints)
-    {
-        while (ept.hasMessage ())
-        {
-            messages.push_back (ept.getMessage ());
-        }
-    }
+  
     // get the clone endpoints
     if (cloneEndpoint)
     {
         while (cloneEndpoint->hasMessage ())
         {
-            messages.push_back (cloneEndpoint->getMessage ());
+            auto mess = cloneEndpoint->getMessage();
+            std::cout << '[' << currentTime << "]message from " << mess->source << " to " << mess->original_dest << "::";
+            if (mess->data.size()<50)
+            {
+                std::cout << mess->data.to_string() << '\n';
+            }
+            else
+            {
+                std::cout << "size " <<mess->data.size()<< '\n';
+            }
         }
     }
 }
@@ -466,16 +355,7 @@ void Tracer::run ()
 void Tracer::run (Time runToTime)
 {
     initialize ();
-    if (!mapfile.empty ())
-    {
-        std::ofstream out (mapfile);
-        for (auto &stat : vStat)
-        {
-            out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t' << stat.lastVal
-                << '\n';
-        }
-        out.flush ();
-    }
+   
     Time nextPrintTime = 10.0;
     try
     {
@@ -485,16 +365,7 @@ void Tracer::run (Time runToTime)
             if (T < runToTime)
             {
                 captureForCurrentTime (T);
-                if (!mapfile.empty ())
-                {
-                    std::ofstream out (mapfile);
-                    for (auto &stat : vStat)
-                    {
-                        out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t'
-                            << stat.lastVal << '\n';
-                    }
-                    out.flush ();
-                }
+               
             }
             else
             {
@@ -524,19 +395,6 @@ void Tracer::addSubscription (const std::string &key)
         subkeys[key] = index;  // this is a potential replacement
     }
 }
-/** add an endpoint*/
-void Tracer::addEndpoint (const std::string &endpoint)
-{
-    auto res = eptNames.find (endpoint);
-    if ((res == eptNames.end ()) || (res->second == -1))
-    {
-        endpoints.emplace_back(GLOBAL, fed.get (), endpoint);
-        auto index = static_cast<int> (endpoints.size ()) - 1;
-        auto id = endpoints.back ().getID ();
-        eptids.emplace (id, index);  // this is a new element
-        eptNames[endpoint] = index;  // this is a potential replacement
-    }
-}
 
 void Tracer::addSourceEndpointClone (const std::string &sourceEndpoint)
 {
@@ -562,38 +420,6 @@ void Tracer::addDestEndpointClone (const std::string &destEndpoint)
 
 void Tracer::addCapture (const std::string &captureDesc) { captureInterfaces.push_back (captureDesc); }
 
-std::pair<std::string, std::string> Tracer::getValue (int index) const
-{
-    if (isValidIndex (index, points))
-    {
-        return {subscriptions[points[index].index].getKey (), points[index].value};
-    }
-    return {std::string (), std::string ()};
-}
-
-std::unique_ptr<Message> Tracer::getMessage (int index) const
-{
-    if (isValidIndex (index, messages))
-    {
-        return std::make_unique<Message> (*messages[index]);
-    }
-    return nullptr;
-}
-
-/** save the data to a file*/
-void Tracer::saveFile (const std::string &filename)
-{
-    auto ext = filesystem::path (filename).extension ().string ();
-    if ((ext == ".json") || (ext == ".JSON"))
-    {
-        writeJsonFile (filename);
-    }
-    else
-    {
-        writeTextFile (filename);
-    }
-}
-
 int Tracer::loadArguments (boost::program_options::variables_map &vm_map)
 {
     if (vm_map.count ("input") == 0)
@@ -618,19 +444,6 @@ int Tracer::loadArguments (boost::program_options::variables_map &vm_map)
             for (const auto &tagname : taglist)
             {
                 subkeys.emplace (stringOps::removeQuotes (tagname), -1);
-            }
-        }
-    }
-    // get the extra tags from the arguments
-    if (vm_map.count ("endpoints") > 0)
-    {
-        auto argEpt = vm_map["endpoints"].as<std::vector<std::string>> ();
-        for (const auto &ept : argEpt)
-        {
-            auto eptlist = stringOps::splitlineQuotes (ept);
-            for (const auto &eptname : eptlist)
-            {
-                eptNames.emplace (stringOps::removeQuotes (eptname), -1);
             }
         }
     }
@@ -676,16 +489,6 @@ int Tracer::loadArguments (boost::program_options::variables_map &vm_map)
         {
             addDestEndpointClone (clone);
         }
-    }
-    if (vm_map.count ("mapfile") > 0)
-    {
-        mapfile = vm_map["mapfile"].as<std::string> ();
-    }
-
-    outFileName = "out.txt";
-    if (vm_map.count ("output") > 0)
-    {
-        outFileName = vm_map["output"].as<std::string> ();
     }
 
     if (vm_map.count("stop") > 0)
