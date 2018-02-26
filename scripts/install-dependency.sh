@@ -77,8 +77,8 @@ install_cmake () {
     wget --no-check-certificate -O ${cmake_version_str}.tar.gz http://cmake.org/files/v${ver[0]}.${ver[1]}/${cmake_version_str}.tar.gz;
     tar -xzf ${cmake_version_str}.tar.gz ;
 
-    # Move CMake into install location using -T (renames the directory if dest doesn't exist or is empty)
-    mv -T ${cmake_version_str} ${install_path};
+    # Move cmake to "install" location
+    mv ${cmake_version_str} ${install_path};
     rm ${cmake_version_str}.tar.gz
 }
 
