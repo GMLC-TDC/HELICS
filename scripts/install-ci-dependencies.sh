@@ -64,7 +64,7 @@ fi
 if [[ ! -d "${swig_install_path}" ]]; then
     ./scripts/install-dependency.sh swig ${swig_version} ${swig_install_path}
 fi
-export PATH="${swig_install_path}:${PATH}"
+export PATH="${swig_install_path}/bin:${PATH}"
 echo "*** built swig successfully {$PATH}"
 
 # Install ZeroMQ
