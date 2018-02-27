@@ -14,11 +14,12 @@ set(helics_apps_test_sources
 player_recorder_tests.cpp
 multi_player_tests.cpp
 multi_tests.cpp
-player_tests.cpp
-recorder_tests.cpp
+PlayerTests.cpp
+RecorderTests.cpp
 exeTestHelper.cpp
 combo_tests.cpp
 EchoTests.cpp
+TracerTests.cpp
 exeTestHelper.h
 )
 
