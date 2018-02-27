@@ -5,7 +5,6 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 #ifndef HELICS_CPP98_FEDERATE_HPP_
 #define HELICS_CPP98_FEDERATE_HPP_
@@ -31,13 +30,13 @@ class FederateInfo
         fi = helicsFederateInfoCreate ();
     }
 
-    FederateInfo (std::string fedname)
+    explicit FederateInfo (const std::string &fedname)
     {
         fi = helicsFederateInfoCreate ();
         helicsFederateInfoSetFederateName (fi, fedname.c_str());
     }
 
-    FederateInfo (std::string fedname, std::string coretype)
+    FederateInfo (const std::string &fedname, const std::string &coretype)
     {
         fi = helicsFederateInfoCreate ();
         helicsFederateInfoSetFederateName (fi, fedname.c_str());
@@ -49,22 +48,22 @@ class FederateInfo
         helicsFederateInfoFree (fi);
     }
 
-    void setFederateName (std::string name)
+    void setFederateName (const std::string &name)
     {
         helicsFederateInfoSetFederateName (fi, name.c_str());
     }
 
-    void setCoreName (std::string corename)
+    void setCoreName (const std::string &corename)
     {
         helicsFederateInfoSetCoreName (fi, corename.c_str());
     }
 
-    void setCoreInitString (std::string coreInit)
+    void setCoreInitString (const std::string &coreInit)
     {
         helicsFederateInfoSetCoreInitString (fi, coreInit.c_str());
     }
 
-    void setCoreTypeFromString (std::string coretype)
+    void setCoreTypeFromString (const std::string &coretype)
     {
         helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str());
     }

@@ -273,7 +273,7 @@ void displayHelp (core_type type)
         zeromq::ZmqBroker::displayHelp (true);
 #endif
 #if HELICS_HAVE_MPI
-        mpi::MpiBroker::displayHelp (true);
+        MpiBroker::displayHelp (true);
 #endif
         ipc::IpcBroker::displayHelp (true);
 

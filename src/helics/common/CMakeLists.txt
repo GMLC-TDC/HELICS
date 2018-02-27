@@ -6,6 +6,7 @@
 ##############################################################################
 
 set(common_headers
+AirLock.hpp
 simpleQueue.hpp
 BlockingQueue.hpp
 BlockingPriorityQueue.hpp

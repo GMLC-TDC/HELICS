@@ -90,7 +90,8 @@ class ActionMessage
     @details this is intended to be an implicit constructor
     @param startingAction from an action message definition
     */
-    ActionMessage (action_message_def::action_t startingAction);  // NOLINT (explicit-constructor)  
+    // cppcheck-suppress noExplicitConstructor
+    /* implicit */ActionMessage (action_message_def::action_t startingAction);
     /** construct from action, source and destination id's
      */
     ActionMessage (action_message_def::action_t startingAction, int32_t sourceId, int32_t destId);

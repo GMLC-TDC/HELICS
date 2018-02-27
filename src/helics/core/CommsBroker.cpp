@@ -40,7 +40,7 @@ template class CommsBroker<tcp::TcpComms, CoreBroker>;
 #endif
 
 #if HELICS_HAVE_MPI
-template class CommsBroker<mpi::MpiComms, CoreBroker>;
-template class CommsBroker<mpi::MpiComms, CommonCore>;
+template class CommsBroker<MpiComms, CoreBroker>;
+template class CommsBroker<MpiComms, CommonCore>;
 #endif
 }  // namespace helics

@@ -73,7 +73,8 @@ class identifier_id_t
     /** default constructor*/
     constexpr identifier_id_t () noexcept : _value (invalidValue){};
     /** value based constructor*/
-    constexpr identifier_id_t (BaseType val) noexcept : _value (val){};
+    // cppcheck-suppress noExplicitConstructor
+    /* implicit */ constexpr identifier_id_t (BaseType val) noexcept : _value (val){};
     /** copy constructor*/
     constexpr identifier_id_t (const identifier_id_t &id) noexcept : _value (id._value){};
     /** assignment from number*/
