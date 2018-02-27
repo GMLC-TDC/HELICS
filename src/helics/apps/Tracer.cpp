@@ -64,7 +64,7 @@ Tracer::Tracer(int argc, char *argv[])
         deactivated = true;
         return;
     }
-    FederateInfo fi("tracer");
+    FederateInfo fi ("tracer");
 
     fi.loadInfoFromArgs(argc, argv);
     fed = std::make_shared<CombinationFederate>(fi);
@@ -104,7 +104,7 @@ int Tracer::loadJsonFile(const std::string &jsonString)
 {
     fed->registerInterfaces(jsonString);
 
-    auto subCount = fed->getSubscriptionCount();
+    auto subCount = fed->getSubscriptionCount ();
     for (int ii = 0; ii < subCount; ++ii)
     {
         subscriptions.emplace_back(fed.get(), ii);
@@ -293,7 +293,7 @@ void Tracer::generateInterfaces()
             addSubscription(tag.first);
         }
     }
-
+    
     loadCaptureInterfaces();
 }
 
