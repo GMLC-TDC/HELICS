@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../application_api/Subscriptions.hpp"
 #include <map>
 #include <memory>
-#include <set>
+#include <functional>
 
 #include "PrecHelper.hpp"
 
@@ -71,6 +71,8 @@ class Tracer
     void run (Time stopTime);
     /** add a subscription to capture*/
     void addSubscription (const std::string &key);
+    /** add an endpoint*/
+    void addEndpoint(const std::string &endpoint);
     /** copy all messages that come from a specified endpoint*/
     void addSourceEndpointClone (const std::string &sourceEndpoint);
     /** copy all messages that are going to a specific endpoint*/
@@ -85,7 +87,35 @@ class Tracer
 
     /** check if the Tracer is ready to run*/
     bool isActive () const { return !deactivated; }
-
+    /** set the callback for a message received through cloned interfaces
+    @details the function signature will take the time in the Tracer a unique ptr to the message
+    */
+    void setClonedMessageCallback(std::function<void(Time, std::unique_ptr<Message>)> callback)
+    {
+        clonedMessageCallback = std::move(callback);
+    }
+    /** set the callback for a message received through endpoints
+    @details the function signature will take the time in the Tracer, the endpoint name as a string, and a unique ptr to the message
+    */
+    void setEndpointMessageCallback(std::function<void(Time, const std::string &, std::unique_ptr<Message>)> callback)
+    {
+        endpointMessageCallback = std::move(callback);
+    }
+    /** set the callback for a value published
+    @details the function signature will take the time in the Tracer, the publication key as a string, and the value as a string
+    */
+    void setValueCallback(std::function<void(Time, const std::string &, const std::string &)> callback)
+    {
+        valueCallback = std::move(callback);
+    }
+    /** turn the screen display on for values and messages*/
+    void enableTextOutput() {
+        printMessage = true;
+    }
+    void disableTextOutput()
+    {
+        printMessage = false;
+    }
   private:
     /** load arguments through a variable map created through command line arguments
      */
@@ -101,23 +131,27 @@ class Tracer
     void generateInterfaces ();
     void captureForCurrentTime (Time currentTime);
     void loadCaptureInterfaces ();
-    /** encode the string in base64 if needed otherwise just return the string*/
-    std::string encode (const std::string &str2encode);
 
+    
+    
   protected:
     std::shared_ptr<CombinationFederate> fed;  //!< the federate
     std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
   
     std::vector<Subscription> subscriptions;  //!< the actual subscription objects
-    std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
-    std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
-
-    std::map<helics::subscription_id_t, int> subids;  //!< map of the subscription ids
     std::map<std::string, int> subkeys;  //!< translate subscription names to an index
+
+    std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
+    std::map<std::string, int> eptNames;    //!< translate endpoint name to index
+    std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
     std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
 
     Time autoStopTime = Time::maxVal ();  //!< the stop time
     bool deactivated = false;
+    bool printMessage = false;
+    std::function<void(Time, std::unique_ptr<Message>)> clonedMessageCallback;
+    std::function<void(Time, const std::string &, std::unique_ptr<Message>)> endpointMessageCallback;
+    std::function<void(Time, const std::string &, const std::string &)> valueCallback;
 };
 
 }  // namespace helics

@@ -22,6 +22,7 @@ Endpoint::Endpoint (MessageFederate *mFed, int endpointIndex) : fed (mFed)
         throw (helics::InvalidParameter ("no subscription with the specified index"));
     }
     id = static_cast<endpoint_id_t> (endpointIndex);
+    actualName = fed->getEndpointName(id);
 }
 
 void Endpoint::setCallback(std::function<void(const Endpoint *, Time)> callback)

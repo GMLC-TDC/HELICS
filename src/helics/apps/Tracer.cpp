@@ -14,11 +14,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../common/stringOps.h"
 #include "../core/helicsVersion.hpp"
 #include <algorithm>
-#include <iostream>
 #include <map>
 #include <memory>
+#include <iostream>
 #include <regex>
-#include <set>
 #include <stdexcept>
 #include <boost/filesystem.hpp>
 #include "../common/argParser.h"
@@ -27,6 +26,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "PrecHelper.hpp"
 #include "Tracer.hpp"
 #include <thread>
+#include <boost/format.hpp>
+#include "../common/logger.h"
+
 
 namespace filesystem = boost::filesystem;
 
@@ -40,7 +42,8 @@ Tracer::Tracer (FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (
 static const ArgDescriptors InfoArgs{
     {"stop", "the time to stop tracing"},
     {"tags",ArgDescriptor::arg_type_t::vector_string,"tags to record, this argument may be specified any number of times"},
-    {"sourceclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture generated packets from, this argument may be specified multiple time"},
+{ "endpoints",ArgDescriptor::arg_type_t::vector_string,"endpoints to capture, this argument may be specified multiple time" },
+{"sourceclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture generated packets from, this argument may be specified multiple time"},
     {"destclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture all packets with the specified endpoint as a destination, this argument may be specified multiple time"},
     {"clone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to clone all packets to and from"},
     {"capture", ArgDescriptor::arg_type_t::vector_string,"capture all the publications and endpoints of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list"},
@@ -103,8 +106,13 @@ int Tracer::loadJsonFile (const std::string &jsonString)
     for (int ii = 0; ii < subCount; ++ii)
     {
         subscriptions.emplace_back (fed.get (), ii);
-        subids.emplace (subscriptions.back ().getID (), static_cast<int> (subscriptions.size ()) - 1);
-        subkeys.emplace (subscriptions.back ().getName (), static_cast<int> (subscriptions.size ()) - 1);
+        subkeys.emplace(subscriptions.back().getName(), static_cast<int> (subscriptions.size()) - 1);
+    }
+    auto eptCount = fed->getEndpointCount();
+    for (int ii = 0; ii < eptCount; ++ii)
+    {
+        endpoints.emplace_back(fed.get(), ii);
+        eptNames[endpoints.back().getName()] = static_cast<int> (endpoints.size() - 1);
     }
 
     auto doc = loadJsonString (jsonString);
@@ -208,7 +216,7 @@ int Tracer::loadTextFile (const std::string &textFile)
             }
             else if ((blk[0] == "endpoint") || (blk[0] == "ept") || (blk[0] == "e"))
             {
-               //mainly here so the same files work with recorder as tracer so ignore this line
+                addEndpoint(removeQuotes(blk[1]));
             }
             else if ((blk[0] == "sourceclone") || (blk[0] == "source") || (blk[0] == "src"))
             {
@@ -305,24 +313,59 @@ void Tracer::loadCaptureInterfaces ()
 
 void Tracer::captureForCurrentTime (Time currentTime)
 {
+    static auto logger = LoggerManager::getLoggerCore();
     for (auto &sub : subscriptions)
     {
         if (sub.isUpdated ())
         {
             auto val = sub.getValue<std::string> ();
-            std::cout << '[' << currentTime << ']' << sub.getKey() << '=';
-            if (val.size() < 150)
+            
+            if (printMessage)
             {
-                std::cout  << val << '\n';
+                std::string valstr;
+                if (val.size() < 150)
+                {
+                    valstr = (boost::format("[%f]%s=%s") % currentTime % sub.getKey() % val).str();
+                   
+                }
+                else
+                {
+                    valstr = (boost::format("[%f]%s=block[%d]") % currentTime % sub.getKey() % val.size()).str();
+                }
+                logger->addMessage(std::move(valstr));
             }
-            else
+            if (valueCallback)
             {
-                std::cout << "block[" << val.size() << "]\n";
+                valueCallback(currentTime, sub.getKey(), val);
             }
             
         }
     }
 
+    for (auto &ept : endpoints)
+    {
+        while (ept.hasMessage())
+        {
+            auto mess = ept.getMessage();
+            if (printMessage)
+            {
+                std::string messstr;
+                if (mess->data.size()<50)
+                {
+                    messstr = (boost::format("[%f]message from %s to %s::%s") % currentTime % mess->source % mess->dest %mess->data.to_string()).str();
+                }
+                else
+                {
+                    messstr = (boost::format("[%f]message from %s to %s:: size %d") % currentTime % mess->source % mess->dest %mess->data.size()).str();
+                }
+                logger->addMessage(std::move(messstr));
+            }
+            if (endpointMessageCallback)
+            {
+                endpointMessageCallback(currentTime, ept.getName(), std::move(mess));
+            }
+        }
+    }
   
     // get the clone endpoints
     if (cloneEndpoint)
@@ -330,20 +373,27 @@ void Tracer::captureForCurrentTime (Time currentTime)
         while (cloneEndpoint->hasMessage ())
         {
             auto mess = cloneEndpoint->getMessage();
-            std::cout << '[' << currentTime << "]message from " << mess->source << " to " << mess->original_dest << "::";
-            if (mess->data.size()<50)
+            if (printMessage)
             {
-                std::cout << mess->data.to_string() << '\n';
+                std::string messstr;
+                if (mess->data.size()<50)
+                {
+                    messstr = (boost::format("[%f]message from %s to %s::%s") % currentTime % mess->source % mess->original_dest %mess->data.to_string()).str();
+                }
+                else
+                {
+                    messstr = (boost::format("[%f]message from %s to %s:: size %d") % currentTime % mess->source % mess->original_dest %mess->data.size()).str();
+                }
+                logger->addMessage(std::move(messstr));
             }
-            else
+            if (clonedMessageCallback)
             {
-                std::cout << "size " <<mess->data.size()<< '\n';
+                clonedMessageCallback(currentTime, std::move(mess));
             }
         }
     }
 }
 
-std::string Tracer::encode (const std::string &str2encode) { return str2encode; }
 
 /*run the Player*/
 void Tracer::run ()
@@ -391,11 +441,23 @@ void Tracer::addSubscription (const std::string &key)
         subscriptions.push_back (helics::Subscription (fed.get (), key));
         auto index = static_cast<int> (subscriptions.size ()) - 1;
         auto id = subscriptions.back ().getID ();
-        subids[id] = index;  // this is a new element
         subkeys[key] = index;  // this is a potential replacement
     }
 }
 
+
+/** add an endpoint*/
+void Tracer::addEndpoint(const std::string &endpoint)
+{
+    auto res = eptNames.find(endpoint);
+    if ((res == eptNames.end()) || (res->second == -1))
+    {
+        endpoints.push_back(helics::Endpoint(GLOBAL, fed.get(), endpoint));
+        auto index = static_cast<int> (endpoints.size()) - 1;
+        auto id = endpoints.back().getID();
+        eptNames[endpoint] = index;  // this is a potential replacement
+    }
+}
 void Tracer::addSourceEndpointClone (const std::string &sourceEndpoint)
 {
     if (!cFilt)
