@@ -1,12 +1,10 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
 #include "Player.hpp"
 #include "PrecHelper.hpp"
@@ -42,6 +40,8 @@ std::map<std::string, int> eptids;
 */
 
 namespace helics
+{
+namespace apps
 {
 static inline bool vComp (const ValueSetter &v1, const ValueSetter &v2) { return (v1.time < v2.time); }
 static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { return (m1.sendTime < m2.sendTime); }
@@ -884,5 +884,6 @@ int Player::loadArguments(boost::program_options::variables_map &vm_map)
     return 0;
 }
 
-}  // namespace helics
+}  // namespace apps
+} // namespace helics
 

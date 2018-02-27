@@ -56,3 +56,25 @@ add_custom_command(TARGET helics_apps-tests POST_BUILD        # Adds a post-buil
         "$<TARGET_FILE_DIR:helics_apps-tests>/")                 # <--this is out-file path
 endforeach(keyfile)
 ENDIF(WIN32)
+
+if (BUILD_APPS)
+add_custom_command(TARGET helics_apps-tests POST_BUILD        # Adds a post-build event to core tests
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        "$<TARGET_FILE:helics_app>"      # <--this is in-file
+        "$<TARGET_FILE_DIR:helics_apps-tests>/")                 # <--this is out-file path
+endif(BUILD_APPS)
+
+if (BUILD_PLAYER)
+add_custom_command(TARGET helics_apps-tests POST_BUILD        # Adds a post-build event to core tests
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        "$<TARGET_FILE:helics_player>"      # <--this is in-file
+        "$<TARGET_FILE_DIR:helics_apps-tests>/")                 # <--this is out-file path
+endif(BUILD_PLAYER)
+
+if (BUILD_RECORDER)
+add_custom_command(TARGET helics_apps-tests POST_BUILD        # Adds a post-build event to core tests
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        "$<TARGET_FILE:helics_recorder>"      # <--this is in-file
+        "$<TARGET_FILE_DIR:helics_apps-tests>/")                 # <--this is out-file path
+endif(BUILD_RECORDER)
+

@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core1";
     fi.coreInitString = "2";
-    helics::Player play1 (fi);
+    helics::apps::Player play1 (fi);
     fi.name = "block1";
     play1.addPublication ("pub1", helics::helics_type_t::helicsDouble);
     play1.addPoint (1.0, "pub1", 0.5);
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test2)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core2";
     fi.coreInitString = "2";
-    helics::Player play1 (fi);
+    helics::apps::Player play1 (fi);
     fi.name = "block1";
     play1.addPublication<double> ("pub1");
     play1.addPoint (1.0, "pub1", 0.5);
@@ -115,11 +115,13 @@ const std::vector<std::string> simple_files{"example1.player", "example2.player"
 
 BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (simple_files), file)
 {
+    static char indx = 'a';
     helics::FederateInfo fi ("player1");
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core3";
+    fi.coreName.push_back(indx++);
     fi.coreInitString = "2";
-    helics::Player play1 (fi);
+    helics::apps::Player play1 (fi);
     fi.name = "block1";
     play1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
 
@@ -166,7 +168,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
 
     StringToCmdLine cmdArg ("--name=player --broker=ipc_broker --core=ipc " + exampleFile);
 
-    helics::Player play1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    helics::apps::Player play1 (cmdArg.getArgCount (), cmdArg.getArgV ());
 
     helics::FederateInfo fi ("obj");
     fi.coreType = helics::core_type::IPC;
@@ -267,7 +269,7 @@ BOOST_AUTO_TEST_CASE (simple_player_testjson)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core7";
     fi.coreInitString = "2";
-    helics::Player play1 (fi);
+    helics::apps::Player play1 (fi);
     fi.name = "block1";
     play1.loadFile (std::string (TEST_DIR) + "/test_files/example6.json");
 
@@ -310,7 +312,7 @@ BOOST_AUTO_TEST_CASE (player_test_message)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core8";
     fi.coreInitString = "2";
-    helics::Player play1 (fi);
+    helics::apps::Player play1 (fi);
     fi.name = "block1";
 
     helics::MessageFederate mfed (fi);
@@ -341,7 +343,7 @@ BOOST_AUTO_TEST_CASE (player_test_message2)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core9";
     fi.coreInitString = "2";
-    helics::Player play1 (fi);
+    helics::apps::Player play1 (fi);
     fi.name = "block1";
 
     helics::MessageFederate mfed (fi);
@@ -396,7 +398,7 @@ BOOST_AUTO_TEST_CASE (player_test_message3)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core10";
     fi.coreInitString = "2";
-    helics::Player play1 (fi);
+    helics::apps::Player play1 (fi);
     fi.name = "block1";
 
     helics::MessageFederate mfed (fi);
@@ -451,11 +453,13 @@ const std::vector<std::string> simple_message_files{"example_message1.player", "
 
 BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::make (simple_message_files), file)
 {
+    static char indx = 'a';
     helics::FederateInfo fi ("player1");
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core11";
+    fi.coreName.push_back(indx++);
     fi.coreInitString = "2";
-    helics::Player play1 (fi);
+    helics::apps::Player play1 (fi);
     fi.name = "block1";
 
     helics::MessageFederate mfed (fi);

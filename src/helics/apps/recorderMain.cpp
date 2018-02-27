@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 {
     try
     {
-        helics::Recorder Recorder(argc, argv);
+        helics::apps::Recorder Recorder(argc, argv);
         if (Recorder.isActive())
         {
             Recorder.run();

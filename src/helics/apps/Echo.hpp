@@ -24,6 +24,8 @@ class variables_map;
 
 namespace helics
 {
+namespace apps
+{
 /** class implementing a Echo object, which will generate endpoint interfaces and send a data message back to the
 source at the with a specified delay
 @details  the Echo class is not threadsafe in general,  don't try to use it from multiple threads without external protection,
@@ -117,4 +119,5 @@ class Echo
     bool fileLoaded = false; //!< indicator that a file has been loaded already
     std::mutex delayTimeLock; //mutex protecting delayTime
 };
-}
+}  // namespace apps
+} // namespace helics

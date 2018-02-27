@@ -30,6 +30,8 @@ class variables_map;
 
 namespace helics
 {
+namespace apps
+{
 class ValueSetter
 {
   public:
@@ -235,4 +237,5 @@ class Player
     bool fileLoaded = false;
     bool deactivated = false;
 };
-}
+}  // namespace apps
+} // namespace helics

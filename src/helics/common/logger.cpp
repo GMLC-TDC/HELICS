@@ -149,7 +149,7 @@ LoggingCore::LoggingCore () { loggingThread = std::thread (&LoggingCore::process
 
 LoggingCore::~LoggingCore ()
 {
-    if (LoggingCore::fastShutdown)
+    if (fastShutdown)
     {
         if (!tripDetector.isTripped())
         {

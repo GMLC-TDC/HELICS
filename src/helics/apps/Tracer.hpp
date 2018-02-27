@@ -30,6 +30,8 @@ namespace helics
 
 class CloningFilter;
 
+namespace apps
+{
 /** class designed to capture data points from a set of subscriptions or endpoints*/
 class Tracer
 {
@@ -154,4 +156,5 @@ class Tracer
     std::function<void(Time, const std::string &, const std::string &)> valueCallback;
 };
 
-}  // namespace helics
+}  // namespace apps
+} // namespace helics

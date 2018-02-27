@@ -26,7 +26,8 @@ namespace filesystem = boost::filesystem;
 
 namespace helics
 {
-
+namespace apps
+{
 static const ArgDescriptors InfoArgs{
     {"delay", "the delay with which the echo app will echo message" },
     {"stop", "the time to stop the echo"}
@@ -246,4 +247,5 @@ void Echo::loadJsonFile(const std::string &jsonFile)
     }
 }
 
-}  // namespace helics
+}  // namespace apps
+} // namespace helics

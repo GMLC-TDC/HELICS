@@ -27,6 +27,10 @@ namespace boost
 
 namespace helics
 {
+class CloningFilter;
+
+namespace apps
+{
     /** helper class for capturing data points*/
     class ValueCapture
     {
@@ -50,7 +54,7 @@ namespace helics
         int cnt = 0;
     };
 
-    class CloningFilter;
+    
 
     /** class designed to capture data points from a set of subscriptions or endpoints*/
     class Recorder
@@ -175,4 +179,5 @@ namespace helics
         bool deactivated = false;
     };
 
-} //namespace helics
+}  // namespace apps
+} // namespace helics
