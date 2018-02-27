@@ -114,15 +114,17 @@ class guarded
 
     /** generate a copy of the protected object
     */
-    std::enable_if_t<std::is_copy_constructible<T>::value, T> load()
+    std::conditional_t<std::is_copy_assignable<T>::value,T,void> load()
     {
         std::lock_guard<M> glock(m_mutex);
-        return m_obj;
+        auto retObj= std::conditional_t<std::is_copy_assignable<T>::value, T, void>(m_obj);
+        return retObj;
+
     }
 
     /** store an updated value into the object*/
     template <typename objType>
-    std::enable_if_t<std::is_copy_assignable<T>::value> store(objType &&newObj)
+     void store(objType &&newObj)
     { //uses a forwarding reference
         std::lock_guard<M> glock(m_mutex);
         m_obj = std::forward<objType>(newObj);
@@ -130,9 +132,10 @@ class guarded
 
     /** store an updated value into the object*/
     template <typename objType>
-    std::enable_if_t<std::is_move_assignable<T>::value> operator=(objType &&newObj)
+    void operator=(objType &&newObj)
     { //uses a forwarding reference
-        store(std::forward<objType>(newObj));
+        std::lock_guard<M> glock(m_mutex);
+        m_obj = std::forward<objType>(newObj);
     }
 
   private:

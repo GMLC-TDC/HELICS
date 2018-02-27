@@ -17,6 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "exeTestHelper.h"
 #include "helics/application_api/Publications.hpp"
 #include "helics/apps/Tracer.hpp"
+#include "../ThirdParty/libguarded/guarded.hpp"
 #include "helics/common/stringToCmdLine.h"
 #include "helics/core/BrokerFactory.hpp"
 #include <future>
@@ -26,7 +27,7 @@ BOOST_AUTO_TEST_SUITE(tracer_tests)
 BOOST_AUTO_TEST_CASE(simple_tracer_test)
 {
     std::atomic<double> lastVal;
-    std::atomic<double> lastTime;
+    std::atomic<double> lastTime{ 0.0 };
     auto cb = [&lastVal,&lastTime](helics::Time tm, const std::string &, const std::string &newval) {
         lastTime = static_cast<double>(tm);
         lastVal = std::stod(newval);
@@ -63,39 +64,10 @@ BOOST_AUTO_TEST_CASE(simple_tracer_test)
 
 }
 
-BOOST_AUTO_TEST_CASE(simple_recorder_test2)
+BOOST_AUTO_TEST_CASE(tracer_test_message)
 {
-    helics::FederateInfo fi("trace1");
-    fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core1";
-    fi.coreInitString = "2";
-    helics::Tracer trace1(fi);
-    fi.name = "block1";
-    trace1.addSubscription("pub1");
-
-    helics::ValueFederate vfed(fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
-    auto fut = std::async(std::launch::async, [&trace1]() { trace1.run(4); });
-    vfed.enterExecutionState();
-    auto retTime = vfed.requestTime(1);
-    BOOST_CHECK_EQUAL(retTime, 1.0);
-    pub1.publish(3.4);
-
-    retTime = vfed.requestTime(2.0);
-    BOOST_CHECK_EQUAL(retTime, 2.0);
-    pub1.publish(4.7);
-
-    retTime = vfed.requestTime(5);
-    BOOST_CHECK_EQUAL(retTime, 5.0);
-
-    vfed.finalize();
-    fut.get();
-    trace1.finalize();
-   
-}
-
-BOOST_AUTO_TEST_CASE(recorder_test_message)
-{
+    libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
+    std::atomic<double> lastTime{ 0.0 };
     helics::FederateInfo fi("trace1");
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core2";
@@ -103,11 +75,16 @@ BOOST_AUTO_TEST_CASE(recorder_test_message)
     helics::Tracer trace1(fi);
     fi.name = "block1";
 
+    auto cb = [&mguard,&lastTime](helics::Time tm, const std::string &, std::unique_ptr<helics::Message> mess) {
+        mguard = std::move(mess);
+        lastTime = static_cast<double>(tm);
+    };
+
     helics::MessageFederate mfed(fi);
     helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
 
-    //trace1.addEndpoint("src1");
-
+    trace1.addEndpoint("src1");
+    trace1.setEndpointMessageCallback(cb);
     auto fut = std::async(std::launch::async, [&trace1]() { trace1.run(5.0); });
     mfed.enterExecutionState();
 
@@ -115,10 +92,42 @@ BOOST_AUTO_TEST_CASE(recorder_test_message)
     e1.send("src1", "this is a test message");
     BOOST_CHECK_EQUAL(retTime, 1.0);
     retTime = mfed.requestTime(2.0);
+    int cnt = 0;
+    while (lastTime < 0.5)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        if (cnt++ > 10)
+        {
+            break;
+        }
+    }
+    BOOST_CHECK_CLOSE(lastTime.load(), 1.0, 0.00000001);
+    {
+        auto mhandle = mguard.lock();
+        BOOST_CHECK_EQUAL((*mhandle)->data.to_string(), "this is a test message");
+        BOOST_CHECK_EQUAL((*mhandle)->source, "d1");
+        BOOST_CHECK_EQUAL((*mhandle)->dest, "src1");
+    }
     e1.send("src1", "this is a test message2");
     BOOST_CHECK_EQUAL(retTime, 2.0);
-
     mfed.finalize();
+    cnt = 0;
+    while (lastTime < 1.5)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        if (cnt++ > 10)
+        {
+            break;
+        }
+    }
+    BOOST_CHECK_CLOSE(lastTime.load(), 2.0, 0.00000001);
+    {
+        auto mhandle = mguard.lock();
+        BOOST_CHECK_EQUAL((*mhandle)->data.to_string(), "this is a test message2");
+        BOOST_CHECK_EQUAL((*mhandle)->source, "d1");
+        BOOST_CHECK_EQUAL((*mhandle)->dest, "src1");
+    }
+    
     fut.get();
 }
 
