@@ -10,6 +10,10 @@ platform:
 configuration:
   - Release
 
+cache:
+  - C:\ProgramData\chocolatey\bin -> appveyor.yml
+  - C:\ProgramData\chocolatey\lib -> appveyor.yml
+
 install:
 
 before_build:
