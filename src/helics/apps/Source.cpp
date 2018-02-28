@@ -29,7 +29,8 @@ namespace filesystem = boost::filesystem;
 
 namespace helics
 {
-
+namespace apps
+{
 using namespace std::string_literals;
 static const ArgDescriptors InfoArgs{
     { "stop", "the time to stop recording" }
@@ -200,4 +201,5 @@ int Source::loadArguments (boost::program_options::variables_map &vm_map)
     return 0;
 }
 
-}  // namespace helics
+}  // namespace apps
+} // namespace helics

@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core1";
     fi.coreInitString = "2";
-    helics::Recorder rec1 (fi);
+    helics::apps::Recorder rec1 (fi);
     fi.name = "block1";
     rec1.addSubscription ("pub1");
 
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test2)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core1";
     fi.coreInitString = "2";
-    helics::Recorder rec1 (fi);
+    helics::apps::Recorder rec1 (fi);
     fi.name = "block1";
     rec1.addSubscription ("pub1");
 
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_message)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core2";
     fi.coreInitString = "2";
-    helics::Recorder rec1 (fi);
+    helics::apps::Recorder rec1 (fi);
     fi.name = "block1";
 
     helics::MessageFederate mfed (fi);
@@ -139,7 +139,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_files, boost::unit_test::data::make (
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core1";
     fi.coreInitString = "2";
-    helics::Recorder rec1 (fi);
+    helics::apps::Recorder rec1 (fi);
 
     rec1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
     fi.name = "block1";
@@ -199,7 +199,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files,
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core1";
     fi.coreInitString = "2";
-    helics::Recorder rec1 (fi);
+    helics::apps::Recorder rec1 (fi);
 
     rec1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
     fi.name = "block1";
@@ -267,7 +267,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
 
     StringToCmdLine cmdArg ("--name=rec --broker=ipc_broker --core=ipc " + exampleFile);
 
-    helics::Recorder rec1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    helics::apps::Recorder rec1 (cmdArg.getArgCount (), cmdArg.getArgV ());
 
     helics::FederateInfo fi ("obj");
     fi.coreType = helics::core_type::IPC;
@@ -332,7 +332,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_destendpoint_clone)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core2";
     fi.coreInitString = "3";
-    helics::Recorder rec1 (fi);
+    helics::apps::Recorder rec1 (fi);
     fi.period = 1.0;
     fi.name = "block1";
 
@@ -381,7 +381,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_srcendpoint_clone)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core2";
     fi.coreInitString = "3";
-    helics::Recorder rec1 (fi);
+    helics::apps::Recorder rec1 (fi);
     fi.period = 1.0;
     fi.name = "block1";
 
@@ -430,7 +430,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_endpoint_clone)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core3";
     fi.coreInitString = "3";
-    helics::Recorder rec1 (fi);
+    helics::apps::Recorder rec1 (fi);
     fi.period = 1.0;
     fi.name = "block1";
 
@@ -484,7 +484,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core4";
     fi.coreInitString = "3";
-    helics::Recorder rec1 (fi);
+    helics::apps::Recorder rec1 (fi);
     fi.period = 1.0;
     fi.name = "block1";
 
@@ -536,7 +536,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile1)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core5";
     fi.coreInitString = "3";
-    helics::Recorder rec1 (fi);
+    helics::apps::Recorder rec1 (fi);
     fi.period = 1.0;
     fi.name = "block1";
 
@@ -594,7 +594,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile2)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core6";
     fi.coreInitString = "2";
-    helics::Recorder rec1 (fi);
+    helics::apps::Recorder rec1 (fi);
     fi.name = "block1";
     rec1.addSubscription ("pub1");
 
@@ -638,7 +638,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core7";
     fi.coreInitString = "3";
-    helics::Recorder rec1 (fi);
+    helics::apps::Recorder rec1 (fi);
     fi.period = 1.0;
     fi.name = "block1";
 

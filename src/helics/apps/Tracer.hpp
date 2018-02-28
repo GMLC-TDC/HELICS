@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../application_api/Subscriptions.hpp"
 #include <map>
 #include <memory>
-#include <set>
+#include <functional>
 
 #include "PrecHelper.hpp"
 
@@ -27,30 +27,11 @@ class variables_map;
 
 namespace helics
 {
-/** helper class for capturing data points*/
-class ValueCapture
-{
-  public:
-    helics::Time time;
-    int index = -1;
-    bool first = false;
-    std::string value;
-    ValueCapture () = default;
-    ValueCapture (helics::Time t1, int id1, const std::string &val) : time (t1), index (id1), value (val){};
-};
-
-/** helper class for displaying statistics*/
-class ValueStats
-{
-  public:
-    helics::Time time = helics::Time::minVal ();
-    std::string lastVal;
-    std::string key;
-    int cnt = 0;
-};
 
 class CloningFilter;
 
+namespace apps
+{
 /** class designed to capture data points from a set of subscriptions or endpoints*/
 class Tracer
 {
@@ -93,7 +74,7 @@ class Tracer
     /** add a subscription to capture*/
     void addSubscription (const std::string &key);
     /** add an endpoint*/
-    void addEndpoint (const std::string &endpoint);
+    void addEndpoint(const std::string &endpoint);
     /** copy all messages that come from a specified endpoint*/
     void addSourceEndpointClone (const std::string &sourceEndpoint);
     /** copy all messages that are going to a specific endpoint*/
@@ -102,29 +83,41 @@ class Tracer
     @param captureDesc describes a federate to capture all the interfaces for
     */
     void addCapture (const std::string &captureDesc);
-    /** save the data to a file*/
-    void saveFile (const std::string &filename);
-    /** get the number of captured points*/
-    auto pointCount () const { return points.size (); }
-    /** get the number of captured messages*/
-    auto messageCount () const { return messages.size (); }
-    /** get a string with the value of point index
-    @param index the number of the point to retrieve
-    @return a pair with the tag as the first element and the value as the second
-    */
-    std::pair<std::string, std::string> getValue (int index) const;
-    /** get a message
-    @details makes a copy of a message and returns it in a unique_ptr
-    @param index the number of the message to retrieve
-    */
-    std::unique_ptr<Message> getMessage (int index) const;
-
+    
     /** finalize the federate*/
     void finalize ();
 
     /** check if the Tracer is ready to run*/
     bool isActive () const { return !deactivated; }
-
+    /** set the callback for a message received through cloned interfaces
+    @details the function signature will take the time in the Tracer a unique ptr to the message
+    */
+    void setClonedMessageCallback(std::function<void(Time, std::unique_ptr<Message>)> callback)
+    {
+        clonedMessageCallback = std::move(callback);
+    }
+    /** set the callback for a message received through endpoints
+    @details the function signature will take the time in the Tracer, the endpoint name as a string, and a unique ptr to the message
+    */
+    void setEndpointMessageCallback(std::function<void(Time, const std::string &, std::unique_ptr<Message>)> callback)
+    {
+        endpointMessageCallback = std::move(callback);
+    }
+    /** set the callback for a value published
+    @details the function signature will take the time in the Tracer, the publication key as a string, and the value as a string
+    */
+    void setValueCallback(std::function<void(Time, const std::string &, const std::string &)> callback)
+    {
+        valueCallback = std::move(callback);
+    }
+    /** turn the screen display on for values and messages*/
+    void enableTextOutput() {
+        printMessage = true;
+    }
+    void disableTextOutput()
+    {
+        printMessage = false;
+    }
   private:
     /** load arguments through a variable map created through command line arguments
      */
@@ -135,36 +128,33 @@ class Tracer
     int loadJsonFile (const std::string &jsonString);
     /** load a text file*/
     int loadTextFile (const std::string &textFile);
-    /** helper function to write the date to a JSON file*/
-    void writeJsonFile (const std::string &filename);
-    /** helper function to write the date to a text file*/
-    void writeTextFile (const std::string &filename);
-
+    
     void initialize ();
     void generateInterfaces ();
     void captureForCurrentTime (Time currentTime);
     void loadCaptureInterfaces ();
-    /** encode the string in base64 if needed otherwise just return the string*/
-    std::string encode (const std::string &str2encode);
 
+    
+    
   protected:
     std::shared_ptr<CombinationFederate> fed;  //!< the federate
     std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
-    std::vector<ValueCapture> points;  //!< lists of points that were captured
+  
     std::vector<Subscription> subscriptions;  //!< the actual subscription objects
-    std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
-    std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
-    std::vector<std::unique_ptr<Message>> messages;  //!< list of messages
-    std::map<helics::subscription_id_t, int> subids;  //!< map of the subscription ids
     std::map<std::string, int> subkeys;  //!< translate subscription names to an index
-    std::map<helics::endpoint_id_t, int> eptids;  // translate subscription id to index
-    std::map<std::string, int> eptNames;  //!< translate endpoint name to index
-    std::vector<ValueStats> vStat;  //!< storage for statistics capture
+
+    std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
+    std::map<std::string, int> eptNames;    //!< translate endpoint name to index
+    std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
     std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
-    std::string mapfile;  //!< file name for the on-line file updater
-    std::string outFileName;  //!< the final output file
+
     Time autoStopTime = Time::maxVal ();  //!< the stop time
     bool deactivated = false;
+    bool printMessage = false;
+    std::function<void(Time, std::unique_ptr<Message>)> clonedMessageCallback;
+    std::function<void(Time, const std::string &, std::unique_ptr<Message>)> endpointMessageCallback;
+    std::function<void(Time, const std::string &, const std::string &)> valueCallback;
 };
 
-}  // namespace helics
+}  // namespace apps
+} // namespace helics

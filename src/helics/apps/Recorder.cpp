@@ -33,6 +33,8 @@ namespace filesystem = boost::filesystem;
 
 namespace helics
 {
+namespace apps
+{
 Recorder::Recorder (FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
 {
     fed->setFlag (OBSERVER_FLAG);
@@ -697,4 +699,5 @@ int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
     }
     return 0;
 }
-}
+}  // namespace apps
+} // namespace helics

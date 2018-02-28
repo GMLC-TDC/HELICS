@@ -14,11 +14,12 @@ set(helics_apps_test_sources
 player_recorder_tests.cpp
 multi_player_tests.cpp
 multi_tests.cpp
-player_tests.cpp
-recorder_tests.cpp
+PlayerTests.cpp
+RecorderTests.cpp
 exeTestHelper.cpp
 combo_tests.cpp
 EchoTests.cpp
+TracerTests.cpp
 exeTestHelper.h
 )
 
@@ -42,7 +43,6 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_test(NAME helics_apps-tests COMMAND helics_apps-tests --log_level=test_suite --report_level=short)
 
-
 target_compile_definitions(helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
 
 target_compile_definitions(helics_apps-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics/\")
@@ -55,3 +55,4 @@ add_custom_command(TARGET helics_apps-tests POST_BUILD        # Adds a post-buil
         "$<TARGET_FILE_DIR:helics_apps-tests>/")                 # <--this is out-file path
 endforeach(keyfile)
 ENDIF(WIN32)
+

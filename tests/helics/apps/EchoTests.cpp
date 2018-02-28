@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(echo_test1)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core1";
     fi.coreInitString = "2";
-    helics::Echo echo1(fi);
+    helics::apps::Echo echo1(fi);
     fi.name = "source";
     echo1.addEndpoint("test");
     //fi.logLevel = 4;
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(echo_test_delay)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core2";
     fi.coreInitString = "2";
-    helics::Echo echo1(fi);
+    helics::apps::Echo echo1(fi);
     fi.name = "source";
     echo1.addEndpoint("test");
     echo1.setEchoDelay(1.2);
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(echo_test_delay_period)
     fi.coreName = "core3";
     fi.coreInitString = "2";
     fi.period = 1.1;
-    helics::Echo echo1(fi);
+    helics::apps::Echo echo1(fi);
     fi.period = 0;
     fi.name = "source";
     echo1.addEndpoint("test");
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(echo_test_multiendpoint)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core4";
     fi.coreInitString = "2";
-    helics::Echo echo1(fi);
+    helics::apps::Echo echo1(fi);
     fi.name = "source";
     echo1.addEndpoint("test");
     echo1.addEndpoint("test2");
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(echo_test_fileload)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core4";
     fi.coreInitString = "2";
-    helics::Echo echo1(fi);
+    helics::apps::Echo echo1(fi);
     echo1.loadFile(std::string(TEST_DIR) + "/test_files/echo_example.json");
     fi.name = "source";
    
