@@ -43,7 +43,6 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_test(NAME helics_apps-tests COMMAND helics_apps-tests --log_level=test_suite --report_level=short)
 
-
 target_compile_definitions(helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
 
 target_compile_definitions(helics_apps-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics/\")
@@ -56,25 +55,4 @@ add_custom_command(TARGET helics_apps-tests POST_BUILD        # Adds a post-buil
         "$<TARGET_FILE_DIR:helics_apps-tests>/")                 # <--this is out-file path
 endforeach(keyfile)
 ENDIF(WIN32)
-
-if (BUILD_APPS)
-add_custom_command(TARGET helics_apps-tests POST_BUILD        # Adds a post-build event to core tests
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
-        "$<TARGET_FILE:helics_app>"      # <--this is in-file
-        "$<TARGET_FILE_DIR:helics_apps-tests>/")                 # <--this is out-file path
-endif(BUILD_APPS)
-
-if (BUILD_PLAYER)
-add_custom_command(TARGET helics_apps-tests POST_BUILD        # Adds a post-build event to core tests
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
-        "$<TARGET_FILE:helics_player>"      # <--this is in-file
-        "$<TARGET_FILE_DIR:helics_apps-tests>/")                 # <--this is out-file path
-endif(BUILD_PLAYER)
-
-if (BUILD_RECORDER)
-add_custom_command(TARGET helics_apps-tests POST_BUILD        # Adds a post-build event to core tests
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
-        "$<TARGET_FILE:helics_recorder>"      # <--this is in-file
-        "$<TARGET_FILE_DIR:helics_apps-tests>/")                 # <--this is out-file path
-endif(BUILD_RECORDER)
 

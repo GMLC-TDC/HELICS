@@ -507,9 +507,9 @@ BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::
 /*
 BOOST_AUTO_TEST_CASE (simple_player_test)
 {
-    static exeTestRunner playerExe ("", "helics_player");
+    static exeTestRunner playerExe (HELICS_BIN_LOC "apps/", "helics_player");
 
-    static exeTestRunner brokerExe ("", "helics_broker");
+    static exeTestRunner brokerExe (HELICS_BIN_LOC "core/", "helics_broker");
 
     auto res = brokerExe.runAsync ("1 --type=ipc --name=ipc_broker");
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/example1.Player";
