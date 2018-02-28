@@ -1,7 +1,7 @@
-function v = HELICS_RAW_TYPE()
+function v = HELICS_CORE_TYPE_MPI()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 46);
+    vInitialized = helicsMEX(0, 35);
   end
   v = vInitialized;
 end
