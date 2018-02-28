@@ -31,7 +31,7 @@
 # 2012-01-31, Lars Bilke
 # - Enable Code Coverage
 #
-# 2013-09-17, Joakim Söderberg
+# 2013-09-17, Joakim SÃ¶derberg
 # - Added support for Clang.
 # - Some additional usage instructions.
 #
