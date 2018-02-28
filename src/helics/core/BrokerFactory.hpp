@@ -1,15 +1,12 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-#ifndef _HELICS_BROKER_FACTORY_
-#define _HELICS_BROKER_FACTORY_
+
 #pragma once
 
 #include "Broker.hpp"
@@ -75,5 +72,3 @@ void copyBrokerIdentifier (const std::string &copyFromName, const std::string &c
 void displayHelp (core_type type = core_type::UNRECOGNIZED);
 }  // namespace BrokerFactory
 }  // namespace helics
-
-#endif  //_HELICS_BROKER_FACTORY_

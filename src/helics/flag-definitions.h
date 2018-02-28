@@ -6,6 +6,8 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
+
+//defines left in this code as it is used in the shared library
 #ifndef _HELICS_FLAG_DEFINITIONS_
 #define _HELICS_FLAG_DEFINITIONS_
 #pragma once

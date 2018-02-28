@@ -44,4 +44,65 @@ BasicHandleInfo *HandleManager::addHandle(Core::handle_id_t id,
     return handles.back().get();
 }
 
+
+BasicHandleInfo *HandleManager::getHandleInfo(Core::handle_id_t id_) const
+{
+    if (isValidIndex(id_, handles))
+    {
+        return handles[id_].get();
+    }
+
+    return nullptr;
+}
+
+BasicHandleInfo *HandleManager::getEndpoint(const std::string &name) const
+{
+
+    auto fnd = endpoints.find(name);
+    if (fnd != endpoints.end())
+    {
+        return handles[fnd->second].get();
+    }
+    return nullptr;
+}
+
+BasicHandleInfo *HandleManager::getFilter(const std::string &name) const
+{
+
+    auto fnd = filters.find(name);
+    if (fnd != filters.end())
+    {
+        return handles[fnd->second].get();
+    }
+    return nullptr;
+}
+
+BasicHandleInfo *HandleManager::getSubscription(const std::string &name) const
+{
+
+    auto fnd = subscriptions.find(name);
+    if (fnd != subscriptions.end())
+    {
+        return handles[fnd->second].get();
+    }
+    return nullptr;
+}
+
+BasicHandleInfo *HandleManager::getPublication(const std::string &name) const
+{
+
+    auto fnd = publications.find(name);
+    if (fnd != publications.end())
+    {
+        return handles[fnd->second].get();
+    }
+    return nullptr;
+}
+
+int32_t HandleManager::getLocalFedID(Core::handle_id_t id_) const
+{
+    // only activate the lock if we not in an operating state
+    return (isValidIndex(id_, handles)) ? handles[id_]->local_fed_id : invalid_fed_id;
+}
+
 } // namespace helics

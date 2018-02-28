@@ -1,16 +1,11 @@
 /*
-
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
-
-#ifndef _CORE_DATA_TYPES_H_
-#define _CORE_DATA_TYPES_H_
 #pragma once
 
 #include "helics-time.hpp"
@@ -235,5 +230,3 @@ inline void swap (helics::Message &m1, helics::Message &m2) noexcept
     m1.swap (m2);
 }
 }  // namespace std
-
-#endif
