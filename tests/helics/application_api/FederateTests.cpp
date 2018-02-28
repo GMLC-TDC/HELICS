@@ -5,20 +5,20 @@ All rights reserved.
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
 */
+
 #include "helics/application_api/Federate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
-#include "test_configuration.h"
 #include <future>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 /** these test cases test out the value converters
  */
 
+#define CORE_TYPE_TO_TEST helics::core_type::TEST
 BOOST_AUTO_TEST_SUITE (federate_tests)
 
 BOOST_AUTO_TEST_CASE (federate_initialize_tests)
