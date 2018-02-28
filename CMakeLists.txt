@@ -345,21 +345,11 @@ endif()
 
 add_subdirectory (src)
 
-if (BUILD_HELICS_TESTS)
-if (MSVC)
-SET(ENABLE_TEST_TIMEOUTS OFF)
-ELSE(MSVC)
-OPTION(ENABLE_TEST_TIMEOUTS "Enable timeouts on test" ON)
-ENDIF(MSVC)
-add_subdirectory (tests)
-
-
 #-----------------------------------------------------------------------------
 # Setup CTEST environment
 #-----------------------------------------------------------------------------
 include (CTest)
-
-endif(BUILD_HELICS_TESTS)
+add_subdirectory (tests)
 
 if (BUILD_HELICS_EXAMPLES)
 add_subdirectory (examples)
