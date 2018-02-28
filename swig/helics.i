@@ -1,4 +1,5 @@
 %include output.i
+%include "cstring.i"
 #define __attribute__(x)
 #pragma SWIG nowarn=451
 
@@ -13,9 +14,9 @@
 %}
 
 %apply double *OUTPUT {double*};
-%apply double *OUTPUT {double data[]};
 %apply helics_time_t *OUTPUT {helics_time_t*};
-%apply char *OUTPUT{char *};
+%apply (char *STRING, size_t LENGTH) { (const char *data, int len) };
+%cstring_output_maxsize(char *str, int maxlen); 
 %apply int *OUTPUT{int *};
 %apply int64_t *OUTPUT{int64_t *};
 %apply federate_state *OUTPUT{federate_state  *state};
