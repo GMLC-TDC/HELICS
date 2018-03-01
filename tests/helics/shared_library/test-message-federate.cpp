@@ -12,7 +12,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/floating_point_comparison.hpp>
 
 #include "ctestFixtures.hpp"
-#include "test_configuration.h"
 
 #include <future>
 #include <iostream>
