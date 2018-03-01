@@ -16,7 +16,7 @@ int main (int argc, char *argv[])
 { 
     try
     {
-        helics::Player Player(argc, argv);
+        helics::apps::Player Player(argc, argv);
         if (Player.isActive())
         {
             Player.run();

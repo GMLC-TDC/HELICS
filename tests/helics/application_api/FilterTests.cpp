@@ -11,7 +11,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/application_api/Filters.hpp"
 #include "helics/application_api/MessageOperators.hpp"
 #include "testFixtures.hpp"
-#include "test_configuration.h"
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -23,14 +22,12 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (filter_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-#if ENABLE_TEST_TIMEOUTS > 0
+
 namespace utf = boost::unit_test;
-#endif
 
 /** test registration of filters*/
-#if ENABLE_TEST_TIMEOUTS > 0
+
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
 BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
@@ -59,9 +56,8 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-#if ENABLE_TEST_TIMEOUTS > 0
+
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
 BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
@@ -122,9 +118,8 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-#if ENABLE_TEST_TIMEOUTS > 0
+
 BOOST_TEST_DECORATOR(*utf::timeout(5))
-#endif
 BOOST_DATA_TEST_CASE(message_filter_function_two_stage, bdata::make(core_types), core_type)
 {
     auto broker = AddBroker(core_type, 3);
@@ -201,9 +196,8 @@ BOOST_DATA_TEST_CASE(message_filter_function_two_stage, bdata::make(core_types),
 /** test two filter operators
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-#if ENABLE_TEST_TIMEOUTS > 0
+
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
 BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
@@ -212,6 +206,8 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
+    BOOST_REQUIRE(fFed);
+    BOOST_REQUIRE(mFed);
 
     auto p1 = mFed->registerGlobalEndpoint ("port1");
     auto p2 = mFed->registerGlobalEndpoint ("port2");
@@ -242,8 +238,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     fFed->requestTime (2.0);
     mFed->requestTimeComplete ();
     BOOST_REQUIRE (!mFed->hasMessage (p2));
-    // there may be something wrong here yet but this test isn't the one to find it and
-    // this may prevent spurious errors for now.
+   
     std::this_thread::yield ();
     mFed->requestTime (3.0);
 
@@ -434,22 +429,5 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     BOOST_CHECK (sFed->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_AUTO_TEST_CASE (test_file_load)
-{
-    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_filters.json");
 
-    BOOST_CHECK_EQUAL (mFed.getName (), "filterFed");
-
-    BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 3);
-    auto id = mFed.getEndpointId ("ept1");
-    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
-
-    BOOST_CHECK_EQUAL (mFed.filterObjectCount (), 3);
-
-    auto filt = mFed.getFilterObject (2);
-
-    auto cloneFilt = std::dynamic_pointer_cast<helics::CloningFilter> (filt);
-    BOOST_CHECK (cloneFilt);
-    mFed.disconnect ();
-}
 BOOST_AUTO_TEST_SUITE_END ()

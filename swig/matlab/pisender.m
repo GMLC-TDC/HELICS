@@ -1,5 +1,5 @@
 
-loadlibrary(GetFullPath('~/local/helics-1.0.0a/lib/libhelicsSharedLib.dylib'));
+loadlibrary(GetFullPath('~/local/helics-develop/lib/libhelicsSharedLib.dylib'));
 
 initstring = '2 --name=mainbroker';
 fedinitstring = '--broker=mainbroker --federates=1';

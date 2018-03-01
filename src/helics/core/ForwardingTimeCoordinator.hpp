@@ -29,8 +29,7 @@ class ForwardingTimeCoordinator
     DependencyInfo::time_state_t time_state =
       DependencyInfo::time_state_t::time_requested;  //!< the current forwarding time state
     Core::federate_id_t lastMinFed = invalid_fed_id;  //!< the latest minimum fed
-    Core::federate_id_t parent =
-      invalid_fed_id;  //!< the id for the parent object which should also be a ForwardingTimeCoordinator
+   // Core::federate_id_t parent = invalid_fed_id;  //!< the id for the parent object which should also be a ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     std::vector<Core::federate_id_t> dependents;  //!< federates which temporally depend on this federate
 

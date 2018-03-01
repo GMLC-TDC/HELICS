@@ -10,6 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "Player.hpp"
 #include "Recorder.hpp"
 #include "Echo.hpp"
+#include "Tracer.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsVersion.hpp"
@@ -32,7 +33,7 @@ int main (int argc, char *argv[])
     std::string arg1(argv[1]);
     //now redo the arguments remove the second argument which is the app name
     argc -= 1;
-    for (int ii = 2; ii < argc; ++ii)
+    for (int ii = 2; ii <= argc; ++ii)
     {
         argv[ii - 1] = argv[ii];
     }
@@ -40,7 +41,7 @@ int main (int argc, char *argv[])
     {
         if (arg1 == "player")
         {
-            helics::Player Player(argc, argv);
+            helics::apps::Player Player(argc, argv);
             if (Player.isActive())
             {
                 Player.run();
@@ -49,7 +50,7 @@ int main (int argc, char *argv[])
         }
         else if (arg1 == "recorder")
         {
-            helics::Recorder Recorder(argc, argv);
+            helics::apps::Recorder Recorder(argc, argv);
             if (Recorder.isActive())
             {
                 Recorder.run();
@@ -66,7 +67,7 @@ int main (int argc, char *argv[])
         }
         else if (arg1 == "echo")
         {
-            helics::Echo Echo(argc, argv);
+            helics::apps::Echo Echo(argc, argv);
             if (Echo.isActive())
             {
                 Echo.run();
@@ -82,7 +83,12 @@ int main (int argc, char *argv[])
         }
         else if (arg1 == "tracer")
         {
-
+            helics::apps::Tracer Tracer(argc, argv);
+            if (Tracer.isActive())
+            {
+                Tracer.enableTextOutput();
+                Tracer.run();
+            }
         }
         else
         {

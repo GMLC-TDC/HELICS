@@ -28,6 +28,8 @@ class variables_map;
 
 namespace helics
 {
+namespace apps
+{
 class SourceObject
 {
   public:
@@ -112,4 +114,5 @@ class Source
     Time stopTime = Time::maxVal ();  //!< the time the source should stop
     bool deactivated = false;
 };
-} //namespace helics
+}  // namespace apps
+} // namespace helics

@@ -1526,6 +1526,11 @@ uint64_t CommonCore::receiveCountAny (federate_id_t federateID)
 
 void CommonCore::logMessage (federate_id_t federateID, int logLevel, const std::string &messageToLog)
 {
+    if (federateID == 0)
+    {
+        sendToLogger(0, logLevel,getIdentifier(), messageToLog);
+        return;
+    }
     auto fed = getFederate (federateID);
     if (fed == nullptr)
     {

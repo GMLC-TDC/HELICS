@@ -15,7 +15,7 @@ ctestFixtures.cpp
 #ValueConverterTests.cpp
 shared-library-tests.cpp
 #data_viewTests.cpp
-ValueFederateTests1.cpp
+#ValueFederateTests1.cpp
 test-value-federate1.cpp
 test-value-federate2.cpp
 #ValueFederateTests2.cpp

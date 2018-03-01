@@ -150,7 +150,10 @@ AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::st
             if (ptr->getBaseService ().stopped ())
             {
                 // std::cout << "run Service loop already stopped" << ptr->runCounter << "\n";
-                ptr->loopRet.get ();
+                if (ptr->loopRet.valid())
+                {
+                    ptr->loopRet.get();
+                }
                 ptr->nullwork = std::make_unique<boost::asio::io_service::work> (ptr->getBaseService ());
                 ptr->running = true;
                 ptr->loopRet = std::async (std::launch::async, [ptr]() { serviceRunLoop (ptr); });

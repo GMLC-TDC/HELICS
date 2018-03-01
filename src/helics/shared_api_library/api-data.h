@@ -134,22 +134,22 @@ typedef struct message_t
 } message_t;
 
 /** pick a core type depending on compile configuration usually either ZMQ if available or UDP */
-#define HELICS_CORE_TYPE_DEFAULT = 0  
+#define HELICS_CORE_TYPE_DEFAULT 0  
 /** use the Zero MQ networking protocol */
-#define HELICS_CORE_TYPE_ZMQ = 1  
+#define HELICS_CORE_TYPE_ZMQ 1  
 /** use MPI for operation on a parallel cluster */
-#define HELICS_CORE_TYPE_MPI = 2 
+#define HELICS_CORE_TYPE_MPI 2 
 /** use the Test core if all federates are in the same process */
-#define HELICS_CORE_TYPE_TEST = 3
+#define HELICS_CORE_TYPE_TEST 3
 /** interprocess uses memory mapped files to transfer data (for use when all federates are
 on the same machine */
-#define HELICS_CORE_TYPE_INTERPROCESS = 4
+#define HELICS_CORE_TYPE_INTERPROCESS 4
 /** same as INTERPROCESS */
-#define HELICS_CORE_TYPE_IPC = 5
+#define HELICS_CORE_TYPE_IPC 5
 /** use a generic TCP protocol message stream to send messages */
-#define HELICS_CORE_TYPE_TCP = 6
+#define HELICS_CORE_TYPE_TCP 6
 /** use UDP packets to send the data */
-#define HELICS_CORE_TYPE_UDP = 7 
+#define HELICS_CORE_TYPE_UDP 7 
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

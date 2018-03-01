@@ -1,4 +1,4 @@
-loadlibrary(GetFullPath('~/local/helics-1.0.0a/lib/libhelicsSharedLib.dylib'));
+loadlibrary(GetFullPath('~/local/helics-develop/lib/libhelicsSharedLib.dylib'));
 
 fedinitstring = '--federates=1';
 deltat = 0.01;
@@ -56,7 +56,7 @@ end
 
 while currenttime <= 20
 
-    currenttime = helics.helicsFederateRequestTime(vfed, 20);
+    [status, currenttime] = helics.helicsFederateRequestTime(vfed, 20);
 
     isupdated = helics.helicsSubscriptionIsUpdated(sub);
 
