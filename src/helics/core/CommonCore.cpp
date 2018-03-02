@@ -812,7 +812,7 @@ handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
         notice.dest_handle = id;
         notice.source_id = pub->fed_id;
         notice.source_handle = pub->id;
-        notice.payload = type;
+        notice.payload = pub->type;
         fed->addAction (notice);
     }
     else
