@@ -6,7 +6,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
-#include "helics/application_api/MessageFederate.hpp"
+#include "helics/application_api/Endpoints.hpp"
 #include <iostream>
 #include <thread>
 #include "helics/core/BrokerFactory.hpp"
@@ -58,23 +58,26 @@ int main (int argc, char *argv[])
     auto name = mFed->getName();
 	std::cout << " registering endpoint '" << myendpoint << "' for " << name<<'\n';
 
-    //this line actually creates an endpoint
-    auto id = mFed->registerEndpoint(myendpoint);
+    // create the endpoint using the Endpoint object interface
+    helics::Endpoint endpoint(mFed.get(), myendpoint);
+
 
     std::cout << "entering init State\n";
     mFed->enterInitializationState ();
     std::cout << "entered init State\n";
     mFed->enterExecutionState ();
     std::cout << "entered exec State\n";
+    // set a defined target for the endpoint so it doesn't have to specfied on every call
+    endpoint.setTargetDestination(target);
     for (int i=1; i<10; ++i) {
 		std::string message = "message sent from "+name+" to "+target+" at time " + std::to_string(i);
-		mFed->sendMessage(id, target, message.data(), message.size());
+		endpoint.send(message.data(), message.size());
         std::cout << message << std::endl;
         auto newTime = mFed->requestTime (i);
 		std::cout << "processed time " << static_cast<double> (newTime) << "\n";
-		while (mFed->hasMessage(id))
+		while (endpoint.hasMessage())
 		{
-			auto nmessage = mFed->getMessage(id);
+			auto nmessage = endpoint.getMessage();
 			std::cout << "received message from " << nmessage->source << " at " << static_cast<double>(nmessage->time) << " ::" << nmessage->data.to_string() << '\n';
 		}
         
