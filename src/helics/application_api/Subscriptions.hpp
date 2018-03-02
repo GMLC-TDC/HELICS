@@ -246,11 +246,13 @@ class Subscription : public SubscriptionBase
     */
     void setMinimumChange (double deltaV)
     {
+        //this first check enables change detection if it was disabled via negative delta
         if (delta < 0.0)
         {
             changeDetectionEnabled = true;
         }
         delta = deltaV;
+        // the second checks if we should disable from negative delta
         if (delta < 0.0)
         {
             changeDetectionEnabled = false;

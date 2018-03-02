@@ -59,6 +59,8 @@ void valueExtract (const defV &dv, std::vector<double> &val);
 
 void valueExtract (const defV &dv, std::vector<std::complex<double>> &val);
 
+void valueExtract(const defV &dv, named_point &val);
+
 void valueExtract (const data_view &dv, helics_type_t baseType, std::string &val);
 
 void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<double> &val);
@@ -91,11 +93,19 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &
         auto &vec = boost::get<std::vector<double>> (dv);
         if (!vec.empty ())
         {
-            val = static_cast<X> (vec.front ());
+            if (vec.size() == 2)
+            {
+                val = static_cast<X> (std::hypot(vec[0],vec[1]));
+            }
+            else
+            {
+                val = static_cast<X> (vec.front());
+            }
+           
         }
         else
         {
-            val = std::numeric_limits<X>::min ();
+            val = X(0);
         }
         break;
     }
@@ -108,7 +118,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &
         }
         else
         {
-            val = std::numeric_limits<X>::min ();
+            val =X(0);
         }
         break;
     }
@@ -123,21 +133,38 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
     {
     case helics_type_t::helicsAny:
     {
-        try
+        if (dv.size() == 9)
         {
-            val = static_cast<X> (std::stod (dv.string ()));
-        }
-        catch (const std::invalid_argument &ble)
-        {  // well lets try a direct conversion
-            auto V = ValueConverter<double>::interpret (dv);
-            if (isnormal (V))
+            auto V = ValueConverter<double>::interpret(dv);
+            if (std::isnormal(V))
             {
                 val = static_cast<X> (V);
             }
             else
             {
-                auto Vint = ValueConverter<int64_t>::interpret (dv);
+                auto Vint = ValueConverter<int64_t>::interpret(dv);
                 val = static_cast<X> (Vint);
+            }
+        }
+        else if (dv.size() == 17)
+        {
+            auto V = ValueConverter<std::complex<double>>::interpret(dv);
+            val = static_cast<X> (std::abs(V));
+        }
+        try
+        {
+            val = static_cast<X> (std::stod (dv.string ()));
+        }
+        catch (const std::invalid_argument &ble)
+        {  // well lets try a vector conversion
+            auto V = ValueConverter<std::vector<double>>::interpret(dv);
+            if (V.size() == 2)
+            {
+                val = static_cast<X> (std::hypot(V[0], V[1]));
+            }
+            else
+            {
+                val = (V.empty()) ? X(0) : static_cast<X> (V.front());
             }
         }
         break;
@@ -163,7 +190,14 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
     case helics_type_t::helicsVector:
     {
         auto V = ValueConverter<std::vector<double>>::interpret (dv);
-        val = (!V.empty ()) ? static_cast<X> (V[0]) : 0.0;
+        if (V.size() == 2)
+        {
+            val = static_cast<X> (std::hypot(V[0], V[1]));
+        }
+        else
+        {
+            val = (V.empty()) ? X(0) : static_cast<X> (V.front());
+        }
         break;
     }
     case helics_type_t::helicsComplex:

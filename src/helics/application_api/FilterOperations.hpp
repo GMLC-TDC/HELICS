@@ -105,7 +105,7 @@ class RerouteFilterOperation : public FilterOperations
     private:
         std::shared_ptr<MessageDestOperator> op;  //!< the actual operator
         atomic_guarded<std::string> newDest;  //!< the target destination
-		shared_guarded<std::set<std::string>> conditions;
+		shared_guarded<std::set<std::string>> conditions; //!< the conditions on which the rerouting will occur
 
     public:
     RerouteFilterOperation ();

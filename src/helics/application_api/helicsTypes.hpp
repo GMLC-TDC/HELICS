@@ -232,6 +232,7 @@ std::string helicsVectorString (const double *vals, size_t size);
 std::string helicsComplexVectorString (const std::vector<std::complex<double>> &val);
 std::string helicsNamedPointString(const named_point &point);
 std::string helicsNamedPointString(const std::string &pointName, double val);
+std::string helicsNamedPointString(const char *pointName, double val);
 /** convert a string to a complex number*/
 std::complex<double> helicsGetComplex (const std::string &val);
 /** convert a string to a vector*/
@@ -244,6 +245,10 @@ named_point helicsGetNamedPoint(const std::string &val);
 void helicsGetVector (const std::string &val, std::vector<double> &data);
 void helicsGetComplexVector (const std::string &val, std::vector<std::complex<double>> &data);
 
+/** convert a value to a data block to be interpreted using the specified type
+@param type the type used for the data conversion
+@param val a double to convert
+*/
 data_block typeConvert (helics_type_t type, double val);
 data_block typeConvert (helics_type_t type, int64_t val);
 data_block typeConvert (helics_type_t type, const char *val);
@@ -252,6 +257,9 @@ data_block typeConvert (helics_type_t type, const std::vector<double> &val);
 data_block typeConvert (helics_type_t type, const double *vals, size_t size);
 data_block typeConvert (helics_type_t type, const std::vector<std::complex<double>> &val);
 data_block typeConvert (helics_type_t type, const std::complex<double> &val);
+data_block typeConvert(helics_type_t type, named_point &val);
+data_block typeConvert(helics_type_t type, const char *str, double val);
+data_block typeConvert(helics_type_t type, const std::string &str, double val);
 
 /** template class for generating a known name of a type*/
 template <class X>

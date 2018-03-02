@@ -278,6 +278,58 @@ void valueExtract (const defV &dv, std::vector<std::complex<double>> &val)
     }
 }
 
+void valueExtract(const defV &dv, named_point &val)
+{
+    
+    switch (dv.which())
+    {
+    case doubleLoc:  // double
+        val.first = "value";
+        val.second = boost::get<double>(dv);
+        break;
+    case intLoc:  // int64_t
+        val.first = "value";
+        val.second = static_cast<double> (boost::get<int64_t>(dv));
+        break;
+    case stringLoc:  // string
+    default:
+        val = helicsGetNamedPoint(boost::get<std::string>(dv));
+        break;
+    case complexLoc:  // complex
+        val.first = "value";
+        val.second = std::abs(boost::get<std::complex<double>>(dv));
+        break;
+    case vectorLoc:  // vector
+    {
+        val.first = "value";
+        auto &vec = boost::get<std::vector<double>>(dv);
+        if (vec.size() == 2)
+        {
+            val.second = std::hypot(vec[0], vec[1]);
+        }
+        else 
+        {
+            val.second = (vec.empty())?0.0:(vec.front());
+        }
+        break;
+    }
+    case complexVectorLoc:
+    {
+        val.first = "value";
+        auto &vec = boost::get<std::vector<std::complex<double>>>(dv);
+        if (!vec.empty())
+        {
+            val.second = std::abs(vec.front());
+        }
+        else
+        {
+            val.second = 0.0;
+        }
+        break;
+    }
+    }
+}
+
 void valueExtract (const data_view &dv, helics_type_t baseType, std::string &val)
 {
     switch (baseType)
