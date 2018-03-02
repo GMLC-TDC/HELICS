@@ -442,7 +442,6 @@ void Tracer::addSubscription(const std::string &key)
     {
         subscriptions.push_back(helics::Subscription(fed.get(), key));
         auto index = static_cast<int> (subscriptions.size()) - 1;
-        auto id = subscriptions.back().getID();
         subkeys[key] = index;  // this is a potential replacement
     }
 }
@@ -456,7 +455,6 @@ void Tracer::addEndpoint(const std::string &endpoint)
     {
         endpoints.push_back(helics::Endpoint(GLOBAL, fed.get(), endpoint));
         auto index = static_cast<int> (endpoints.size()) - 1;
-        auto id = endpoints.back().getID();
         eptNames[endpoint] = index;  // this is a potential replacement
     }
 }

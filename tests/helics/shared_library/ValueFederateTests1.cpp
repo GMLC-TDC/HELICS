@@ -23,9 +23,8 @@ using namespace std::string_literals;
 BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-#if ENABLE_TEST_TIMEOUTS > 0
+
 namespace utf = boost::unit_test;
-#endif
 
 // const std::string core_types[] = {"udp" };
 /** test simple creation and destruction*/

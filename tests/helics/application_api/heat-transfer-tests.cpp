@@ -14,16 +14,13 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/CoreFactory.hpp"
 
-#include "test_configuration.h"
 #include <fstream>
 #include <thread>
 
 using helics::operator"" _t ;
 helics::Time tend = 3600.0_t;  // simulation end time
 
-#if ENABLE_TEST_TIMEOUTS > 0
 namespace utf = boost::unit_test;
-#endif
 
 /** class implementing a single heat transfer block*/
 class HeatUnitBlock
@@ -240,10 +237,7 @@ class observer
 
 BOOST_AUTO_TEST_SUITE (heat_transfer_tests)
 
-#ifndef QUICK_TESTS_ONLY
-#if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (30))
-#endif
 BOOST_AUTO_TEST_CASE (linear_tests)
 {
     auto wcore = helics::CoreFactory::FindOrCreate (helics::core_type::TEST, "wallcore", "22");
@@ -272,7 +266,5 @@ BOOST_AUTO_TEST_CASE (linear_tests)
     }
     obs.saveFile ("tempData.csv");
 }
-
-#endif
 
 BOOST_AUTO_TEST_SUITE_END ()

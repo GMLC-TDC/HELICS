@@ -6,6 +6,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
+#pragma once
 
 #include <memory>
 
@@ -14,6 +15,17 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 
+#ifdef KEY_TESTS
+#ifndef DISABLE_TCP_CORE
+const std::string core_types[] = { "test",   "ipc",   "tcp",   "zmq",   "udp",
+"test_2","zmq_4", "ipc_2","test_4", "tcp_2", "zmq_2", "udp_2","test_3","zmq_3" };
+const std::string core_types_single[] = { "test",   "ipc",   "tcp",   "zmq",   "udp",
+"test_3","zmq_3" };
+#else
+const std::string core_types[] = { "test", "ipc", "zmq", "udp", "test_2","zmq_4", "ipc_2","test_4", "zmq_2", "udp_2","test_3","zmq_3" };
+const std::string core_types_single[] = { "test", "ipc", "zmq", "udp","test_3","zmq_3" };
+#endif
+#else // KEY_TESTS
 #ifdef QUICK_TESTS_ONLY
 #ifndef DISABLE_TCP_CORE
 const std::string core_types[] = {"test", "ipc_2", "tcp", "test_2", "zmq", "udp","test_3","zmq_3" };
@@ -22,7 +34,7 @@ const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp","tes
 const std::string core_types[] = {"test", "ipc_2", "test_2", "zmq", "udp","test_3","zmq_3" };
 const std::string core_types_single[] = {"test", "ipc", "zmq", "udp","test_3","zmq_3" };
 #endif
-#else
+#else // QUICK_TESTS_ONLY
 #ifndef DISABLE_TCP_CORE
 const std::string core_types[] = {"test",   "ipc",   "zmq",   "udp",   "tcp",
                                   "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2",
@@ -35,14 +47,11 @@ const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2"
 "test_4", "zmq_4", "udp_4" };
 const std::string core_types_single[] = {"test", "ipc", "zmq", "udp","test_3", "zmq_3", "udp_3" };
 #endif
-#endif
+#endif // QUICK_TESTS_ONLY
 
-#ifndef DISABLE_TCP_CORE
-const std::string travis_core_types[] = { "test",   "ipc",   "tcp",   "zmq",   "udp",
-"test_2","zmq_4", "ipc_2","test_4", "tcp_2", "zmq_2", "udp_2","test_3","zmq_3" };
-#else
-const std::string travis_core_types[] = { "test", "ipc", "zmq", "udp", "test_2","zmq_4", "ipc_2","test_4", "zmq_2", "udp_2","test_3","zmq_3" };
-#endif
+#endif //KEY_TESTS
+
+
 
 struct FederateTestFixture
 {
