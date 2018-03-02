@@ -33,3 +33,8 @@ else()
     # SET_TARGET_PROPERTIES(_helics PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 endif()
+
+# realizing this will have to be in a separate script cmake or otherwise that gets run after the rest of things are built
+# since I don't think the java sources are created at configure time we probably want a configure file to do this and make the modification that Andy talked about 
+#file( GLOB JAVA_SOURCES *.java )
+#add_jar(helics_jar OUTPUT_NAME helics.jar VERSION ${HELICS_VERSION})
