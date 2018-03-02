@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-BasicHandleInfo *HandleManager::addHandle(Core::handle_id_t id,
+BasicHandleInfo *HandleManager::addHandle(
     Core::federate_id_t fed_id,
     BasicHandleType what,
     const std::string &key,
@@ -19,15 +19,14 @@ BasicHandleInfo *HandleManager::addHandle(Core::handle_id_t id,
     const std::string &units)
 {
     Core::handle_id_t local_id = static_cast<Core::handle_id_t>(handles.size());
-    if (id == invalid_handle)
-    {
-        id = local_id;
-    }
-    handles.push_back(std::make_unique<BasicHandleInfo>(id, fed_id, what, key, type, units));
-    return handles.back().get();
+    std::string actKey = (!key.empty()) ? key : generateName(what);
+    handles.push_back(std::make_unique<BasicHandleInfo>(local_id, fed_id, what, actKey, type, units));
+    auto hpointer = handles.back().get();
+    addType(hpointer, local_id);
+    return hpointer;
 }
 
-BasicHandleInfo *HandleManager::addHandle(Core::handle_id_t id,
+BasicHandleInfo *HandleManager::addHandle(
     Core::federate_id_t fed_id,
     BasicHandleType what,
     const std::string &key,
@@ -36,12 +35,10 @@ BasicHandleInfo *HandleManager::addHandle(Core::handle_id_t id,
     const std::string &type_out)
 {
     Core::handle_id_t local_id = static_cast<Core::handle_id_t>(handles.size());
-    if (id == invalid_handle)
-    {
-        id = local_id;
-    }
-    handles.emplace_back(std::make_unique<BasicHandleInfo>(id, fed_id, what, key, target, type_in, type_out));
-    return handles.back().get();
+    handles.emplace_back(std::make_unique<BasicHandleInfo>(local_id, fed_id, what, key, target, type_in, type_out));
+    auto hpointer = handles.back().get();
+    addType(hpointer, local_id);
+    return hpointer;
 }
 
 
@@ -105,4 +102,48 @@ int32_t HandleManager::getLocalFedID(Core::handle_id_t id_) const
     return (isValidIndex(id_, handles)) ? handles[id_]->local_fed_id : invalid_fed_id;
 }
 
+void HandleManager::addType(BasicHandleInfo *handle, int32_t index)
+{
+    switch (handle->what)
+    {
+        case BasicHandleType::HANDLE_END:
+            endpoints.emplace(handle->key, index);
+            break;
+        case BasicHandleType::HANDLE_PUB:
+            publications.emplace(handle->key, index);
+            break;
+        case BasicHandleType::HANDLE_CLONE_FILTER:
+        case BasicHandleType::HANDLE_DEST_FILTER:
+        case BasicHandleType::HANDLE_SOURCE_FILTER:
+            if (!handle->key.empty())
+            {
+                filters.emplace(handle->key, index);
+            }
+            break;
+        case BasicHandleType::HANDLE_SUB:
+            subscriptions.emplace(handle->key, index);
+            break;
+        default:
+            break;
+    }
+}
+
+std::string HandleManager::generateName(BasicHandleType what)
+{
+    switch (what)
+    {
+    case BasicHandleType::HANDLE_END:
+        return std::string("ept_") + std::to_string(handles.size());
+    case BasicHandleType::HANDLE_PUB:
+        return std::string("pub_") + std::to_string(handles.size());
+    case BasicHandleType::HANDLE_CLONE_FILTER:
+        return std::string("cFilter_") + std::to_string(handles.size());
+    case BasicHandleType::HANDLE_DEST_FILTER:
+        return std::string("dFilter_") + std::to_string(handles.size());
+    case BasicHandleType::HANDLE_SOURCE_FILTER:
+        return std::string("sFilter_") + std::to_string(handles.size());
+    default:
+        return std::string("handle_") + std::to_string(handles.size());
+    }
+}
 } // namespace helics

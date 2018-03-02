@@ -33,15 +33,13 @@ class HandleManager
     /** default constructor*/
     HandleManager () = default;
     /** add a handle to manage*/
-    BasicHandleInfo *addHandle (Core::handle_id_t id,
-                                Core::federate_id_t fed_id,
+    BasicHandleInfo *addHandle (Core::federate_id_t fed_id,
                                 BasicHandleType what,
                                 const std::string &key,
                                 const std::string &type,
                                 const std::string &units);
     /** add a handle to manage*/
-    BasicHandleInfo *addHandle (Core::handle_id_t id,
-                                Core::federate_id_t fed_id,
+    BasicHandleInfo *addHandle (Core::federate_id_t fed_id,
                                 BasicHandleType what,
                                 const std::string &key,
                                 const std::string &target,
@@ -54,6 +52,9 @@ class HandleManager
     BasicHandleInfo *getPublication (const std::string &name) const;
 
     int32_t getLocalFedID (Core::handle_id_t id_) const;
+private:
+    void addType(BasicHandleInfo *handle, int32_t index);
+    std::string generateName(BasicHandleType what);
 };
 
 }  // namespace helics

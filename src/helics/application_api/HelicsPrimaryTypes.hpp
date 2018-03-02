@@ -131,7 +131,15 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
         catch (const std::invalid_argument &ble)
         {  // well lets try a direct conversion
             auto V = ValueConverter<double>::interpret (dv);
-            val = static_cast<X> (V);
+            if (isnormal(V))
+            {
+                val = static_cast<X> (V);
+            }
+            else
+            {
+                auto Vint = ValueConverter<int64_t>::interpret(dv);
+                val = static_cast<X> (Vint);
+            }
         }
         break;
     }
