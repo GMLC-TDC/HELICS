@@ -6,13 +6,12 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
-
 #pragma once
 
 #include <functional>
 
 #include "../core/core-data.hpp"
-#include "Message.hpp"
+#include "data_view.hpp"
 /** @file
 @brief define helper classes to scope filter operations
 */

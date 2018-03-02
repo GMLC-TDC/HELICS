@@ -12,7 +12,7 @@ Endpoints.hpp
 Filters.hpp
 Federate.hpp
 helicsTypes.hpp
-Message.hpp
+data_view.hpp
 MessageFederate.hpp
 MessageOperators.hpp
 ValueConverter.hpp

@@ -10,8 +10,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "core-data.hpp"
 #include <functional>
-#include <memory>
-#include <string>
 #include <utility>
 
 /**
