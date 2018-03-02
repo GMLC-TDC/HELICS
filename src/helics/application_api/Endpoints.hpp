@@ -6,7 +6,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
-
 #pragma once
 
 #include "MessageFederate.hpp"
@@ -129,7 +128,7 @@ public:
     @details this is to send a pre-built message
     @param[in] mess a reference to an actual message object
     */
-    void send (Message &mess) const { fed->sendMessage (id, mess); }
+    void send (const Message &mess) const { fed->sendMessage (id, mess); }
     /** get an available message if there is no message the returned object is empty*/
     auto getMessage () const { return fed->getMessage (id); }
     /** check if there is a message available*/
