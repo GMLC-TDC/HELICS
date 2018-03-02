@@ -50,7 +50,7 @@ isupdated = helics.helicsSubscriptionIsUpdated(sub);
 
 if (isupdated == 1)
     [result, value] = helics.helicsSubscriptionGetDouble(sub);
-    display(strcat('PI RECEIVER: Received value = ', num2str(value), '', ' at time ', num2str(currenttime), ' from PI SENDER'));
+    display(['PI RECEIVER: Received value = ', '', num2str(value), '', ' at time ', '', num2str(currenttime), ' from PI SENDER']);
 end
 
 
@@ -62,7 +62,7 @@ while currenttime <= 20
 
     if (isupdated == 1)
         [result, value] = helics.helicsSubscriptionGetDouble(sub);
-        display(strcat('PI RECEIVER: Received value = ', num2str(value), '', ' at time ', num2str(currenttime), ' from PI SENDER'));
+        display(['PI RECEIVER: Received value = ', '', num2str(value), '', ' at time ', '', num2str(currenttime), ' from PI SENDER']);
     end
 end
 
