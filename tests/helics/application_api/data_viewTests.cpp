@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test data_block and data_view objects
  */
 
-#include "helics/application_api/Message.hpp"
+#include "helics/application_api/data_view.hpp"
 
 BOOST_AUTO_TEST_SUITE (data_view_tests)
 

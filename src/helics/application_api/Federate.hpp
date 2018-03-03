@@ -14,12 +14,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "../core/CoreFederateInfo.hpp"
 #include "../flag-definitions.h"
-#include <string>
 
 #include <atomic>
 #include <memory>
 #include <stdexcept>
-#include <vector>
 
 /**
  * HELICS Application API
@@ -62,7 +60,7 @@ class FederateInfo : public CoreFederateInfo
     void loadInfoFromArgs (int argc, const char *const *argv);
 };
 
-/** generate a FederateInfo object from a json file
+/** generate a FederateInfo object from a JSON file
  */
 FederateInfo loadFederateInfo (const std::string &jsonString);
 

@@ -22,6 +22,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <thread>
 #include "../common/GuardedTypes.hpp"
 #include <utility>
+#include "HandleManager.hpp"
 
 namespace helics
 {
@@ -264,10 +265,12 @@ class CommonCore : public Core, public BrokerBase
       0};  //!< counter for the number of times the entry to initialization Mode was explicitly delayed
     std::vector<std::unique_ptr<FederateState>> _federates;  //!< local federate information
     std::atomic<int32_t> messageCounter{ 54 };  //!< counter for the number of messages that have been sent
-    std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
-    std::atomic<Core::handle_id_t> handleCounter{1};  //!< counter for the handle index
-    std::unordered_map<std::string, handle_id_t> publications;  //!< map of all local publications
-    std::unordered_map<std::string, handle_id_t> endpoints;  //!< map of all local endpoints
+
+   // std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
+    HandleManager handles; //!< local handle information;
+    //std::atomic<Core::handle_id_t> handleCounter{1};  //!< counter for the handle index
+    //std::unordered_map<std::string, handle_id_t> publications;  //!< map of all local publications
+    //std::unordered_map<std::string, handle_id_t> endpoints;  //!< map of all local endpoints
     std::unordered_map<std::string, federate_id_t> federateNames;  //!< map of federate names to id
 
     std::vector<std::set<int32_t>> ongoingFilterProcesses; //!< sets of ongoing filtered messages
@@ -293,8 +296,7 @@ class CommonCore : public Core, public BrokerBase
     /** add a new handle to the generic structure
     and return a pointer to it, the pointer is non-owning
     */
-    BasicHandleInfo *createBasicHandle (handle_id_t id_,
-                                        federate_id_t global_federateId,
+    BasicHandleInfo *createBasicHandle (federate_id_t global_federateId,
                                         federate_id_t local_federateId,
                                         BasicHandleType HandleType,
                                         const std::string &key,
@@ -305,8 +307,7 @@ class CommonCore : public Core, public BrokerBase
     and return a pointer to it the pointer is non owning
     variation targeted at filters
     */
-    BasicHandleInfo *createBasicHandle (handle_id_t id_,
-                                        federate_id_t global_federateId,
+    BasicHandleInfo *createBasicHandle (federate_id_t global_federateId,
                                         federate_id_t local_federateId,
                                         BasicHandleType HandleType,
                                         const std::string &key,

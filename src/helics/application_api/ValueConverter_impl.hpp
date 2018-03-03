@@ -6,13 +6,13 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
-
 #pragma once
+
 /** the purpose of these objects are to convert a specific type into a data block for use in the core algorithms
  */
 
 #include "../core/core-data.hpp"
-#include "Message.hpp"
+#include "data_view.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cereal/archives/portable_binary.hpp>
@@ -24,10 +24,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <cstring>
 #include <iterator>
 #include <stdexcept>
-#include <string>
 #include <type_traits>
 #include <utility>
-#include <vector>
 //#include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>

@@ -10,8 +10,6 @@ function (build_libzmq)
 
 set(trigger_build_dir ${CMAKE_BINARY_DIR}/autobuild/force_libzmq)
 
-
-
 	include(escape_string)
 	
 	escape_string(cxx_compiler_string ${CMAKE_CXX_COMPILER})

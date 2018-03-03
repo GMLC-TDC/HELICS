@@ -22,6 +22,7 @@ DualMappedPointerVectorTests.cpp
 BlockingQueueTests.cpp
 PriorityBlockingQueueTests.cpp
 SimpleQueueTests.cpp
+AirLockTests.cpp
 TimeTests.cpp
 )
 

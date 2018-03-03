@@ -51,6 +51,7 @@ const std::string core_types_single[] = {"test", "ipc", "zmq", "udp","test_3", "
 
 #endif //KEY_TESTS
 
+const std::string defaultNamePrefix = "fed";
 
 
 struct FederateTestFixture
@@ -66,7 +67,7 @@ struct FederateTestFixture
     void SetupTest (const std::string &core_type_name,
                                 int count,
                                 helics::Time time_delta = helics::timeZero,
-                                const std::string &name_prefix = "fed")
+                                const std::string &name_prefix = defaultNamePrefix)
     {
         auto broker = AddBroker (core_type_name, count);
         AddFederates<FedType> (core_type_name, count, broker, time_delta, name_prefix);
@@ -77,7 +78,7 @@ struct FederateTestFixture
                                                         int count,
                                                         std::shared_ptr<helics::Broker> broker,
                                                         helics::Time time_delta = helics::timeZero,
-                                                        const std::string &name_prefix = "fed")
+                                                        const std::string &name_prefix = defaultNamePrefix)
     {
         bool hasIndex = hasIndexCode (core_type_name);
         int setup = (hasIndex) ? getIndexCode (core_type_name) : 1;
