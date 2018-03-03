@@ -19,26 +19,30 @@ endif(BUILD_HELICS_TESTS)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-OPTION(BUILD_HELICS_EXAMPLES "Enable the test Executables to be built" ON)
+OPTION(BUILD_HELICS_EXAMPLES "Enable the example Executables to be built" ON)
 
+OPTION(GENERATE_PYTHON "Generate Python extension using swig" OFF)
 OPTION(BUILD_PYTHON "Build Python extension" OFF)
-OPTION(GENERATE_PYTHON "Generate Python extension" ON)
-
+OPTION(GENERATE_MATLAB "Generate Matlab extension code using swig" OFF)
 OPTION(BUILD_MATLAB "Build MATLAB extension" OFF)
+OPTION(GENERATE_OCTAVE "Generate Octave extension code using swig" OFF)
+OPTION(BUILD_OCTAVE "Build Octave extension" OFF)
+OPTION(GENERATE_JAVA "Generate Java extension using swig" OFF)
+OPTION(BUILD_JAVA "Build Java extension" OFF)
 
 OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" ON)
 IF(NOT MSVC)
 OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface gcc/clang only" OFF)
 ENDIF()
 
-if (BUILD_PYTHON OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
+if (BUILD_PYTHON OR BUILD_MATLAB OR BUILD_JAVA OR BUILD_OCTAVE OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
 set(BUILD_SHARED_LIBS ON)
 else()
 OPTION(USE_POSITION_INDEPENDENT_CODE "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library" OFF)
 endif()
 
-OPTION(BUILD_JAVA "Build Java extension" OFF)
-if (BUILD_PYTHON OR BUILD_C_SHARED_LIB OR BUILD_JAVA OR BUILD_MATLAB)
+
+if (BUILD_PYTHON OR BUILD_MATLAB OR BUILD_JAVA OR BUILD_OCTAVE OR BUILD_C_SHARED_LIB)
 set(BUILT_C_SHARED_LIB ON)
 endif()
 
