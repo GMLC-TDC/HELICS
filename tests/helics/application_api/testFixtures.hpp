@@ -53,6 +53,7 @@ const std::string core_types_single[] = {"test", "ipc", "zmq", "udp","test_3", "
 
 const std::string defaultNamePrefix = "fed";
 
+
 struct FederateTestFixture
 {
     FederateTestFixture () = default;

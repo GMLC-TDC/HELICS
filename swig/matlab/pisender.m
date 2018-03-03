@@ -65,7 +65,7 @@ for i = 1:20
 
     currenttime = helics.helicsFederateRequestTime(vfed, i);
 
-    display(strcat('PI SENDER: Sending value pi =', num2str(val), ' at time ', num2str(this_time + (deltat * i)),' to PI RECEIVER'));
+    display(['PI SENDER: Sending value pi = ', '', num2str(val), ' at time ', '', num2str(this_time + (deltat * i)),' to PI RECEIVER']);
     status = helics.helicsPublicationPublishDouble(pub, val);
 end
 
