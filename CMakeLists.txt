@@ -1,3 +1,13 @@
+##############################################################################
+#Copyright (C) 2017-2018, Battelle Memorial Institute
+#All rights reserved.
+
+#This software was co-developed by Pacific Northwest National Laboratory, 
+#operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory,
+#operated by the Alliance for Sustainable Energy, LLC; 
+#and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+##############################################################################
+
 cmake_minimum_required (VERSION 3.4)
 project (HELICS)
 
@@ -117,9 +127,11 @@ IF (USE_BOOST_STATIC_LIBS)
   set(Boost_USE_STATIC_LIBS ON)
   set(BOOST_STATIC ON)
 ENDIF ()
+
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
+IF(BUILD_HELICS_TESTS)
  option (TEST_CODE_COVERAGE "Build a target for testing code coverage" OFF)
  if (TEST_CODE_COVERAGE)
  include(CodeCoverage)
@@ -132,6 +144,7 @@ ENDIF ()
 	)
 
  endif(TEST_CODE_COVERAGE)
+ endif(BUILD_HELICS_TESTS)
 # -------------------------------------------------------------
 # add threading support
 # -------------------------------------------------------------
@@ -348,8 +361,10 @@ add_subdirectory (src)
 #-----------------------------------------------------------------------------
 # Setup CTEST environment
 #-----------------------------------------------------------------------------
+IF(BUILD_HELICS_TESTS)
 include (CTest)
 add_subdirectory (tests)
+ENDIF(BUILD_HELICS_TESTS)
 
 if (BUILD_HELICS_EXAMPLES)
 add_subdirectory (examples)

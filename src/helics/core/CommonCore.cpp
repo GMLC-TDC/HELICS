@@ -385,7 +385,7 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
     throw (InvalidFunctionCall ("federate already has requested entry to initializing State"));
 }
 
-iteration_result CommonCore::enterExecutingState (federate_id_t federateID, helics_iteration_request iterate)
+iteration_result CommonCore::enterExecutingState (federate_id_t federateID, iteration_request iterate)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -507,7 +507,7 @@ Time CommonCore::timeRequest (federate_id_t federateID, Time next)
     }
     if (HELICS_EXECUTING == fed->getState ())
     {
-        auto ret = fed->requestTime (next, helics_iteration_request::no_iterations);
+        auto ret = fed->requestTime (next, iteration_request::no_iterations);
         if (ret.state != iteration_result::error)
         {
             return ret.grantedTime;
@@ -518,7 +518,7 @@ Time CommonCore::timeRequest (federate_id_t federateID, Time next)
 }
 
 iteration_time
-CommonCore::requestTimeIterative (federate_id_t federateID, Time next, helics_iteration_request iterate)
+CommonCore::requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate)
 {
     auto fed = getFederate (federateID);
     if (fed == nullptr)
@@ -532,11 +532,11 @@ CommonCore::requestTimeIterative (federate_id_t federateID, Time next, helics_it
     }
 
     // limit the iterations
-    if (iterate == helics_iteration_request::iterate_if_needed)
+    if (iterate == iteration_request::iterate_if_needed)
     {
         if (fed->getCurrentIteration () >= maxIterationCount)
         {
-            iterate = helics_iteration_request::no_iterations;
+            iterate = iteration_request::no_iterations;
         }
     }
 

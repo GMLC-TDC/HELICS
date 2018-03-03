@@ -404,7 +404,7 @@ iteration_result FederateState::enterInitializationState ()
     return ret;
 }
 
-iteration_result FederateState::enterExecutingState (helics_iteration_request iterate)
+iteration_result FederateState::enterExecutingState (iteration_request iterate)
 {
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
@@ -416,13 +416,14 @@ iteration_result FederateState::enterExecutingState (helics_iteration_request it
             time_granted = timeZero;
         }
         fillEventVector (time_granted);
+        
         processing = false;
         return static_cast<iteration_result> (ret);
     }
 
     while (!processing.compare_exchange_weak (expected, true))
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (20));
+        std::this_thread::sleep_for (std::chrono::milliseconds (50));
     }
     iteration_result ret;
     switch (getState ())
@@ -446,7 +447,7 @@ iteration_result FederateState::enterExecutingState (helics_iteration_request it
     return ret;
 }
 
-iteration_time FederateState::requestTime (Time nextTime, helics_iteration_request iterate)
+iteration_time FederateState::requestTime (Time nextTime, iteration_request iterate)
 {
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))

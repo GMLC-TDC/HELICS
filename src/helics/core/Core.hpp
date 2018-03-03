@@ -147,7 +147,7 @@ class Core
      simulation is ready to move on to the executing state
      */
     virtual iteration_result
-    enterExecutingState (federate_id_t federateID, helics_iteration_request iterate = NO_ITERATION) = 0;
+    enterExecutingState (federate_id_t federateID, iteration_request iterate = NO_ITERATION) = 0;
 
     /**
      * Register a federate.
@@ -227,7 +227,7 @@ class Core
      iteration
      */
     virtual iteration_time
-    requestTimeIterative (federate_id_t federateID, Time next, helics_iteration_request iterate) = 0;
+    requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate) = 0;
 
     /**
      * Returns the current reiteration count for the specified federate.

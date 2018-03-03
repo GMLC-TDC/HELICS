@@ -1,5 +1,4 @@
-#ifndef HELICS_CONFIG_H
-#define HELICS_CONFIG_H
+
 #pragma once
 
 #include "compiler-config.h"
@@ -25,4 +24,3 @@
 #define HELICS_VERSION_STRING "${HELICS_VERSION_STRING}"
 #define HELICS_DATE "${HELICS_DATE}"
 
-#endif

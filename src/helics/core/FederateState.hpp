@@ -206,14 +206,14 @@ private:
 	@param converged indicator of whether the fed should iterate if need be or not
     returns either converged or nonconverged depending on whether an iteration is needed
     */
-    iteration_result enterExecutingState (helics_iteration_request iterate);
+    iteration_result enterExecutingState (iteration_request iterate);
 	/** request a time advancement
 	@param nextTime the time of the requested advancement
     @param converged set to complete to end dense time step iteration, nonconverged to continue iterating if need
     be
 	@return an iteration time with two elements the granted time and the convergence state
 	*/
-    iteration_time requestTime (Time nextTime, helics_iteration_request iterate);
+    iteration_time requestTime (Time nextTime, iteration_request iterate);
 	/** function to process the queue in a generic fashion used to just process messages
 	with no specific end in mind
 	*/

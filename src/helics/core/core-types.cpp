@@ -17,7 +17,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 namespace helics
 {
-std::string helicsTypeString (core_type type)
+std::string to_string (core_type type)
 {
     switch (type)
     {

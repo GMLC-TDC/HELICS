@@ -70,7 +70,7 @@ else()
 	set(BOOST_VERSION_LEVEL 1)
 ENDIF()
 
-mark_as_advanced(CLEAR BOOST_ROOT)
+#mark_as_advanced(CLEAR BOOST_ROOT)
 
 #message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR}")
 #message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS}")
