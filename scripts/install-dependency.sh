@@ -102,7 +102,7 @@ if [[ "$FORCE_TOOLSET" ]]; then
             ;;
         clang*)
             ln -s $(which ${CC}) clang
-            ln -s ${which ${CXX}) clang++
+            ln -s $(which ${CXX}) clang++
             ;;
         intel*)
             ln -s $(which ${CXX}) icc
