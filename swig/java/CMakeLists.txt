@@ -17,6 +17,7 @@ SWIG_LINK_LIBRARIES(JNIhelics helicsSharedLib)
 SWIG_LINK_LIBRARIES(JNIhelics ${JAVA_LIBRARIES})
 
 
+set_target_properties (JNIhelics PROPERTIES FOLDER interfaces)
 
 if (APPLE)
 
@@ -33,3 +34,20 @@ else()
     # SET_TARGET_PROPERTIES(_helics PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 endif()
+
+configure_file(${PROJECT_SOURCE_DIR}/config/MakeJarCMakeLists.txt.in ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt @ONLY)
+
+ADD_CUSTOM_COMMAND(
+    TARGET "JNIhelics" POST_BUILD
+    COMMAND ${CMAKE_COMMAND}
+    ARGS " -D ADDITIONAL_JAR_FILES=$<TARGET_FILE:helicsSharedLib> ."
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+)
+
+ADD_CUSTOM_COMMAND(
+    TARGET "JNIhelics" POST_BUILD
+    COMMAND ${CMAKE_COMMAND}
+    ARGS " --build ." 
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    COMMENT "Building jar file" 
+)

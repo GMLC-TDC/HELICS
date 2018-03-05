@@ -20,6 +20,7 @@ target_link_libraries(helicsCpp98 INTERFACE helicsSharedLib)
 IF (MSVC)
 add_library(helicsCpp98_ide STATIC ${helicsCpp98_headers} ../../empty.cpp)
 target_include_directories(helicsCpp98_ide PRIVATE "${PROJECT_SOURCE_DIR}/src/helics")
+set_target_properties (helicsCpp98_ide PROPERTIES FOLDER interfaces)
 ENDIF(MSVC)
 
 install(FILES ${helicsCpp98_headers} DESTINATION include/cpp98)

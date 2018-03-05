@@ -136,11 +136,7 @@ ENDIF ()
 	)
 
  endif(TEST_CODE_COVERAGE)
-# -------------------------------------------------------------
-# add threading support
-# -------------------------------------------------------------
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
+
 
 # -------------------------------------------------------------
 # Get some configuration for C++17 as that becomes available
@@ -168,6 +164,19 @@ endif (HELICS_GENERATE_DOXYGEN_DOC)
 FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 
 
+
+
+# -------------------------------------------------------------
+# BOOST  find the boost libraries
+# -------------------------------------------------------------
+include(addBoost)
+
+add_library(helics-static STATIC
+    $<TARGET_OBJECTS:application_api>
+    $<TARGET_OBJECTS:helics_core>
+    $<TARGET_OBJECTS:helics_common>
+)
+
 # -------------------------------------------------------------
 # Enable ZeroMQ
 # -------------------------------------------------------------
@@ -181,7 +190,7 @@ include(addZeroMQ)
 
 if (ZeroMQ_FOUND)
    set(HELICS_HAVE_ZEROMQ TRUE)
-   include_directories ("${ZeroMQ_INCLUDE_DIR}")
+   target_include_directories (helics-static PRIVATE "${ZeroMQ_INCLUDE_DIR}")
  endif(ZeroMQ_FOUND)
 endif(ZeroMQ_ENABLE)
 
@@ -194,24 +203,20 @@ IF (MPI_ENABLE)
 find_package(MPI)
 if (${MPI_C_FOUND})
    set(HELICS_HAVE_MPI TRUE)
-   include_directories("${MPI_C_INCLUDE_PATH}")
+   target_include_directories(helics-static PRIVATE "${MPI_C_INCLUDE_PATH}")
 endif (${MPI_C_FOUND})
 ENDIF(MPI_ENABLE)
 
-
 # -------------------------------------------------------------
-# BOOST  find the boost libraries
+# add threading support
 # -------------------------------------------------------------
-include(addBoost)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
-add_library(helics-static STATIC
-    $<TARGET_OBJECTS:application_api>
-    $<TARGET_OBJECTS:helics_core>
-    $<TARGET_OBJECTS:helics_common>
-)
-target_link_libraries(helics-static Threads::Threads)
+target_link_libraries(helics-static PUBLIC Threads::Threads)
+
 IF (UNIX AND NOT APPLE)
-target_link_libraries(helics-static rt)
+target_link_libraries(helics-static PUBLIC rt)
 ENDIF()
 
 IF(MINGW)
@@ -219,15 +224,15 @@ IF(MINGW)
 	if (BOOST_VERSION_LEVEL GREATER 1)
 	#set(DISABLE_TCP_CORE TRUE)
 		set(DISABLE_TCP_CORE FALSE)
-		target_link_libraries(helics-static wsock32 ws2_32)
+		target_link_libraries(helics-static PUBLIC wsock32 ws2_32)
 	else()
 		set(DISABLE_TCP_CORE TRUE)
 		message(status, "disabling TCP core |${DISABLE_TCP_CORE}|")
-		target_link_libraries(helics-static ws2_32)
+		target_link_libraries(helics-static PUBLIC ws2_32)
 	endif()
 
 	else()
-		target_link_libraries(helics-static wsock32 ws2_32)
+		target_link_libraries(helics-static PUBLIC wsock32 ws2_32)
 	endif()
 
 ENDIF(MINGW)
@@ -240,7 +245,7 @@ if (${ZeroMQ_FOUND})
 		set(ZeroMQ_DEPENDENCY ${ZeroMQ_LIBRARY})
 	endif()
 	message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
-	target_link_libraries(helics-static ${ZeroMQ_DEPENDENCY})
+	target_link_libraries(helics-static PUBLIC ${ZeroMQ_DEPENDENCY})
 else()
    if (ZeroMQ_ENABLE)
    message(WARNING "ZeroMQ not found")
@@ -248,14 +253,14 @@ else()
 endif ()
 
 if (${MPI_C_FOUND})
-   target_link_libraries(helics-static ${MPI_C_LIBRARIES})
+   target_link_libraries(helics-static PUBLIC ${MPI_C_LIBRARIES})
 endif (${MPI_C_FOUND})
 
 
 
 link_directories(${Boost_LIBRARY_DIRS})
 
-target_link_libraries(helics-static ${Boost_LIBRARIES_core})
+target_link_libraries(helics-static PUBLIC ${Boost_LIBRARIES_core})
 
 
 include(GNUInstallDirs)
@@ -395,7 +400,7 @@ ELSE (BUILD_CXX_SHARED_LIB)
 	set(helics_cxx_shared_file_debug )
 ENDIF(BUILD_CXX_SHARED_LIB)
 
-IF(BUILD_C_SHARED_LIB OR BUILD_PYTHON)
+IF(BUILD_C_SHARED_LIB OR BUILD_PYTHON OR BUILD_JAVA OR BUILD_MATLAB OR BUILD_OCTAVE)
 	set(helics_c_shared_file "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_SHARED_LIBRARY_SUFFIX}")
 	set(helics_c_shared_file_debug "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 ELSE()
@@ -404,7 +409,10 @@ ELSE()
 ENDIF()
 
 
-install (EXPORT helics-targets DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
+install (EXPORT helics-targets 
+	NAMESPACE Helics::
+	DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
+	)
 
 set(helics_dependencies ${Boost_LIBRARIES_core})
 
