@@ -58,7 +58,7 @@ install_boost () {
     (
         cd ${boost_version_str}/;
         ./bootstrap.sh --with-toolset=${boost_toolset} --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test;
-        ./b2 link=shared threading=multi variant=release > /dev/null;
+        ./b2 -j2 link=shared threading=multi variant=release cxxflags=-std=c++14 > /dev/null;
         ./b2 install --prefix=${install_path} > /dev/null;
     )
     rm ${boost_version_str}.tar.gz
