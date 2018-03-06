@@ -28,8 +28,8 @@ BOOST_TEST_DECORATOR (*utf::timeout (5))
 BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
-    AddFederates (helicsCreateMessageFederate, core_type, 2, broker, helics_time_zero, "filter");
-    AddFederates (helicsCreateMessageFederate, core_type, 2, broker, helics_time_zero, "message");
+    AddFederates (helicsCreateMessageFederate, core_type, 1, broker, helics_time_zero, "filter");
+    AddFederates (helicsCreateMessageFederate, core_type, 1, broker, helics_time_zero, "message");
 
     auto fFed = GetFederateAt (0);
     auto mFed = GetFederateAt (1);
@@ -453,6 +453,8 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     BOOST_CHECK_EQUAL (name, "filterFed");
 
     BOOST_CHECK_EQUAL (helicsFederateGetEndpointCount (mFed), 3);
+    helicsFederateFinalize(mFed);
+    helicsFederateFree(mFed);
     //auto id = mFed.getEndpointId ("ept1");
     //BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
 

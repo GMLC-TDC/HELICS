@@ -158,5 +158,7 @@ public:
     iteration_state checkTimeGrant ();
     /** generate a string with the current time status*/
     std::string printTimeStatus () const;
+    /** return true if there are active dependencies*/
+    bool hasActiveTimeDependencies() const;
 };
 } //namespace helics

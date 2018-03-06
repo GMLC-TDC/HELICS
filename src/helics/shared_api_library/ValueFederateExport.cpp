@@ -76,9 +76,9 @@ helics_subscription helicsFederateRegisterSubscription (helics_federate fed, con
 }
 helics_subscription helicsFederateRegisterTypeSubscription (helics_federate fed, const char *key, int type, const char *units)
 {
-    if ((type < 0) || (type > HELICS_VECTOR_TYPE))
+    if ((type < 0) || (type > HELICS_DATA_TYPE_VECTOR))
     {
-        if (type == HELICS_RAW_TYPE)
+        if (type == HELICS_DATA_TYPE_RAW)
         {
             return helicsFederateRegisterSubscription (fed, key, "", units);
         }
@@ -154,9 +154,9 @@ helics_subscription helicsFederateRegisterOptionalSubscription (helics_federate 
 
 helics_subscription helicsFederateRegisterOptionalTypeSubscription (helics_federate fed, const char *key, int type, const char *units)
 {
-    if ((type < 0) || (type > HELICS_VECTOR_TYPE))
+    if ((type < 0) || (type > HELICS_DATA_TYPE_VECTOR))
     {
-        if (type == HELICS_RAW_TYPE)
+        if (type == HELICS_DATA_TYPE_RAW)
         {
             return helicsFederateRegisterOptionalSubscription (fed, key, "", units);
         }
@@ -217,9 +217,9 @@ helics_publication helicsFederateRegisterPublication (helics_federate fed, const
 }
 helics_publication helicsFederateRegisterTypePublication (helics_federate fed, const char *key, int type, const char *units)
 {
-    if ((type < 0) || (type > HELICS_VECTOR_TYPE))
+    if ((type < 0) || (type > HELICS_DATA_TYPE_VECTOR))
     {
-        if (type == HELICS_RAW_TYPE)
+        if (type == HELICS_DATA_TYPE_RAW)
         {
             return helicsFederateRegisterPublication (fed, key, "", units);
         }
@@ -280,9 +280,9 @@ helics_publication helicsFederateRegisterGlobalPublication (helics_federate fed,
 
 helics_publication helicsFederateRegisterGlobalTypePublication (helics_federate fed, const char *key, int type, const char *units)
 {
-    if ((type < 0) || (type > HELICS_VECTOR_TYPE))
+    if ((type < 0) || (type > HELICS_DATA_TYPE_VECTOR))
     {
-        if (type == HELICS_RAW_TYPE)
+        if (type == HELICS_DATA_TYPE_RAW)
         {
             return helicsFederateRegisterGlobalPublication (fed, key, "", units);
         }
@@ -298,7 +298,9 @@ helics_publication helicsFederateRegisterGlobalTypePublication (helics_federate 
     {
         pub = new helics::PublicationObject ();
         pub->pubptr =
-          std::make_unique<helics::Publication> (helics::GLOBAL, fedObj.get (), key, static_cast<helics::helics_type_t> (type), units);
+          std::make_unique<helics::Publication> (helics::GLOBAL, fedObj.get (), key, 
+              static_cast<helics::helics_type_t> (type), 
+            (units == nullptr) ? nullStr : std::string(units));
         pub->fedptr = std::move (fedObj);
         addPublication (fed, pub);
         return reinterpret_cast<helics_publication> (pub);

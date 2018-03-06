@@ -104,5 +104,8 @@ class ForwardingTimeCoordinator
 
     /** generate a string with the current time status*/
     std::string printTimeStatus () const;
+
+    /** check if there are any active Time dependencies*/
+    bool hasActiveTimeDependencies() const;
 };
 }  // namespace helics

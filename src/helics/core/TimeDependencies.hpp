@@ -92,5 +92,8 @@ class TimeDependencies
     bool checkIfReadyForTimeGrant (bool iterating, Time desiredGrantTime) const;
     void resetIteratingExecRequests ();
     void resetIteratingTimeRequests (Time requestTime);
+
+    /** check if there are active dependencies*/
+    bool hasActiveTimeDependencies() const;
 };
 }  // namespace helics

@@ -108,6 +108,7 @@ struct FederateTestFixture
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
             }
+            helicsCoreFree(core);
         }
         break;
         case 2:
@@ -126,6 +127,7 @@ struct FederateTestFixture
                 auto fed = ctor (fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
+                helicsCoreFree(core);
             }
         }
         break;
@@ -151,58 +153,6 @@ struct FederateTestFixture
                 auto subbroker = AddBroker(core_type_name, initString + " --federates 1");
                 AddFederates (ctor, newTypeString, 1, subbroker, time_delta, name_prefix);
             }
-        }
-        break;
-        case 5: //pairs of federates per core
-        {
-            size_t offset = federates.size();
-            federates.resize(count + offset);
-            for (int ii = 0; ii < count; ii += 2)
-            {
-                auto init = initString + " --federates " + std::to_string((ii < count - 1) ? 2 : 1);
-                auto core = helicsCreateCore (core_type_name.c_str(), NULL, init.c_str());
-                CE (helicsCoreGetIdentifier (core, tmp, HELICS_SIZE_MAX));
-                CE (helicsFederateInfoSetCoreName (fi, tmp));
-
-                auto name = name_prefix + std::to_string (ii + offset);
-                CE (helicsFederateInfoSetFederateName (fi, name.c_str()));
-                auto fed = ctor (fi);
-                federates[ii + offset] = fed;
-                federates_added.push_back(fed);
-                if (ii + 1 < count)
-                {
-                    name = name_prefix + std::to_string(ii + offset + 1);
-                    CE (helicsFederateInfoSetFederateName (fi, name.c_str()));
-                    auto fed2 = ctor (fi);
-                    federates[ii + offset + 1] = fed2;
-                    federates_added.push_back(fed2);
-                }
-            }
-        }
-            break;
-        case 6: //pairs of cores per subbroker
-        {
-            auto newTypeString = core_type_name;
-            newTypeString.push_back('_');
-            newTypeString.push_back('5');
-            for (int ii = 0; ii < count; ii+=4)
-            {
-                int fedcnt = (ii > count - 3) ? 4 : (count - ii);
-                auto subbroker = AddBroker(core_type_name, initString + " --federates "+std::to_string(fedcnt));
-                AddFederates (ctor, newTypeString, fedcnt, subbroker, time_delta, name_prefix);
-            }
-        }
-        break;
-        case 7: //two layers of subbrokers
-        {      
-                auto newTypeString = core_type_name;
-                newTypeString.push_back('_');
-                newTypeString.push_back('4');
-                for (int ii = 0; ii < count; ++ii)
-                {
-                    auto subbroker = AddBroker(core_type_name, initString + " --federates 1");
-                    AddFederates (ctor, newTypeString, 1, subbroker, time_delta, name_prefix);
-                }
         }
         break;
         }
