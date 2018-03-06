@@ -13,6 +13,7 @@ set_property(SOURCE ../helics.i PROPERTY CPLUSPLUS ON)
 
 link_directories(${OCTAVE_LINK_DIRS})
 include(useSWIG_extra)
+target_include_directories(helicsOctave PRIVATE ${OCTAVE_INCLUDE_DIRS})
 
 SWIG_GEN_SOURCES(helicsOctave TYPE MODULE LANGUAGE octave SOURCES ../helics.i)
 
