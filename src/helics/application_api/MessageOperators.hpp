@@ -41,12 +41,12 @@ class MessageDestOperator : public FilterOperator
     /** default constructor*/
     MessageDestOperator () = default;
     /** set the function to modify the time of the message in the constructor*/
-    explicit MessageDestOperator (std::function<std::string (const std::string &)> userDestFunction);
+    explicit MessageDestOperator (std::function<std::string (const std::string &, const std::string &)> userDestFunction);
     /** set the function to modify the time of the message*/
-    void setDestFunction (std::function<std::string (const std::string &)> userDestFunction);
+    void setDestFunction (std::function<std::string (const std::string &, const std::string &)> userDestFunction);
 
   private:
-    std::function<std::string (const std::string &)>
+    std::function<std::string (const std::string &, const std::string &)>
       DestUpdateFunction;  //!< the function that actually does the processing
     virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) override;
 };
