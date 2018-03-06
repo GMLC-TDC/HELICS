@@ -51,12 +51,12 @@ std::unique_ptr<Message> MessageDataOperator::process (std::unique_ptr<Message> 
     return message;
 }
 
-MessageDestOperator::MessageDestOperator (std::function<std::string (const std::string &)> userDestFunction)
+MessageDestOperator::MessageDestOperator (std::function<std::string (const std::string &, const std::string &)> userDestFunction)
     : DestUpdateFunction (std::move (userDestFunction))
 {
 }
 
-void MessageDestOperator::setDestFunction (std::function<std::string (const std::string &)> userDestFunction)
+void MessageDestOperator::setDestFunction (std::function<std::string (const std::string &, const std::string &)> userDestFunction)
 {
     DestUpdateFunction = std::move (userDestFunction);
 }
@@ -66,7 +66,7 @@ std::unique_ptr<Message> MessageDestOperator::process (std::unique_ptr<Message> 
     if (DestUpdateFunction)
     {
         message->original_dest = message->dest;
-        message->dest = DestUpdateFunction (message->dest);
+        message->dest = DestUpdateFunction (message->source, message->dest);
     }
     return message;
 }
