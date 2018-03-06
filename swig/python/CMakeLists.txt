@@ -35,11 +35,11 @@ else ()
   SWIG_LINK_LIBRARIES(helics ${PYTHON_LIBRARIES})
 endif()
 
-INSTALL(FILES helics.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
-INSTALL(TARGETS _helics DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
-
 set_target_properties (_helics PROPERTIES FOLDER interfaces)
 
+INSTALL(FILES helics.py DESTINATION python)
+INSTALL(TARGETS _helics DESTINATION python)
+INSTALL(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION java)
 INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION python)
 
 # execute_process(COMMAND python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)

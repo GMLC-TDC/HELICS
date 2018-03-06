@@ -28,6 +28,7 @@
 #IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR 
 #IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#modified Philip Top 2018 to add windows search paths
 
 # Try to find the build flags to compile octave shared objects (oct and mex files)
 # Once done this will define
@@ -40,9 +41,59 @@
 # OCTAVE_LIBRARY_DEBUG - the debug version
 # OCTAVE_LIBRARY - a default library, with priority debug.
 
+IF (WIN32)
+
+message(STATUS "win32 octave search")
+set (octave_versions
+Octave-4.2.1
+Octave-4.2.0
+Octave-4.0.3
+Octave-4.0.2
+Octave-4.0.1
+Octave-4.0.0
+)
+
+set(poss_prefixes
+C:
+C:/Octave
+"C:/Program Files"
+C:/local
+C:/local/Octave
+D:
+D:/Octave
+"D:/Program Files"
+D:/local
+D:/local/Octave
+)
+
+# create an empty list
+list(APPEND octave_paths "")
+
+foreach( dir ${poss_prefixes})
+	foreach( octver ${octave_versions})
+		IF (IS_DIRECTORY ${dir}/${octver})
+			list(APPEND oct_paths ${dir}/${octver})
+			message(STATUS "found oct path ${dir}/${octver}")
+		ENDIF()
+	endforeach()
+endforeach()
+
+
+ENDIF(WIN32)
+
 # use mkoctfile
+if (NOT MKOCTFILE_EXECUTABLE)
 set(MKOCTFILE_EXECUTABLE MKOCTFILE_EXECUTABLE-NOTFOUND)
-find_program(MKOCTFILE_EXECUTABLE NAME mkoctfile PATHS)
+endif()
+find_program(MKOCTFILE_EXECUTABLE NAME mkoctfile 
+	HINTS 
+		${OCTAVE_INSTALL_LOCATION} 
+	PATHS 
+		${oct_paths} 
+	PATH_SUFFIXES 
+		bin
+	)
+
 mark_as_advanced(MKOCTFILE_EXECUTABLE)
 
 if(MKOCTFILE_EXECUTABLE)
@@ -101,6 +152,7 @@ if(MKOCTFILE_EXECUTABLE)
   set( OCTAVE_LIBRARY ${_mkoctfile_libs})
   set( OCTAVE_LIBRARY_RELEASE ${OCTAVE_LIBRARY})
   set( OCTAVE_LIBRARY_DEBUG ${OCTAVE_LIBRARY})
+  
 endif()
 
 mark_as_advanced(

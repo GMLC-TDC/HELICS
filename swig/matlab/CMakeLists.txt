@@ -31,3 +31,5 @@ ADD_CUSTOM_COMMAND(
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     COMMENT "Building Matlab extension"
 )
+
+set_target_properties (helicsMATLABMEX PROPERTIES FOLDER interfaces)
