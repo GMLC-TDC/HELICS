@@ -154,17 +154,16 @@ set(TCP_HEADER_FILES
 	endif()
 
 
-if (${ZeroMQ_FOUND})
+if (HELICS_HAVE_ZEROMQ)
    list(APPEND SRC_FILES ${ZMQ_SOURCE_FILES})
    list(APPEND INCLUDE_FILES ${ZMQ_HEADER_FILES})
-endif (${ZeroMQ_FOUND})
+endif (HELICS_HAVE_ZEROMQ)
 
 if (${MPI_C_FOUND})
    list(APPEND SRC_FILES ${MPI_SOURCE_FILES})
    list(APPEND INCLUDE_FILES ${MPI_HEADER_FILES})
 endif (${MPI_C_FOUND})
 
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
 if (${MPI_C_FOUND})
@@ -179,7 +178,16 @@ if (NOT DISABLE_TCP_CORE)
    source_group("tcp" FILES ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
 endif()
 
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
+target_include_directories(helics_core SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
+target_include_directories(helics_core SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/ThirdParty)
+
+if (HELICS_HAVE_ZEROMQ)
+   target_include_directories (helics_core PRIVATE "${ZeroMQ_INCLUDE_DIR}")
+endif (HELICS_HAVE_ZEROMQ)
+
+if (HELICS_HAVE_MPI)
+   target_include_directories(helics_core PRIVATE "${MPI_C_INCLUDE_PATH}")
+endif(HELICS_HAVE_MPI)
 
 install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION include/helics/core)
 

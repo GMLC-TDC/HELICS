@@ -190,9 +190,12 @@ include(addZeroMQ)
 
 if (ZeroMQ_FOUND)
    set(HELICS_HAVE_ZEROMQ TRUE)
-   target_include_directories (helics-static PRIVATE "${ZeroMQ_INCLUDE_DIR}")
+ else(ZeroMQ_FOUND)
+ set(HELICS_HAVE_ZEROMQ FALSE)
  endif(ZeroMQ_FOUND)
-endif(ZeroMQ_ENABLE)
+ ELSE(ZeroMQ_ENABLE)
+ set(HELICS_HAVE_ZEROMQ FALSE)
+ENDIF(ZeroMQ_ENABLE)
 
 # -------------------------------------------------------------
 # finding MPI
@@ -200,11 +203,14 @@ endif(ZeroMQ_ENABLE)
 
 OPTION(MPI_ENABLE "Enable MPI networking library" OFF)
 IF (MPI_ENABLE)
-find_package(MPI)
-if (${MPI_C_FOUND})
-   set(HELICS_HAVE_MPI TRUE)
-   target_include_directories(helics-static PRIVATE "${MPI_C_INCLUDE_PATH}")
-endif (${MPI_C_FOUND})
+	find_package(MPI)
+	if (MPI_C_FOUND)
+		set(HELICS_HAVE_MPI TRUE)
+	else()
+		set(HELICS_HAVE_MPI FALSE)
+	endif (MPI_C_FOUND)
+ELSE(MPI_ENABLE)
+	set(HELICS_HAVE_MPI FALSE)
 ENDIF(MPI_ENABLE)
 
 # -------------------------------------------------------------

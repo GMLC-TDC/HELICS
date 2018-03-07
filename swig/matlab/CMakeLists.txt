@@ -1,4 +1,4 @@
-# Generate SWIG wrapper (for both MATLAB and Octave)
+# Generate SWIG wrapper (for both MATLAB)
 
 MESSAGE(STATUS "Building MATLAB")
 
