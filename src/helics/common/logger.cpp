@@ -176,6 +176,15 @@ void LoggingCore::addMessage (int index, const std::string &message) { loggingQu
 int LoggingCore::addFileProcessor (std::function<void(std::string &&message)> newFunction)
 {
     std::lock_guard<std::mutex> fLock (functionLock);
+    for (int ii=0;ii<static_cast<int>(functions.size());++ii)
+    {
+        if (functions[ii])
+        {
+            continue;
+        }
+        functions[ii] = std::move(newFunction);
+        return ii;
+    }
     functions.push_back (std::move (newFunction));
     return static_cast<int> (functions.size ()) - 1;
 }

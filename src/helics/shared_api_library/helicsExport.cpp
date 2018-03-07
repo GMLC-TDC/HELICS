@@ -693,6 +693,9 @@ void helicsQueryFree (helics_query query) { delete reinterpret_cast<helics::quer
 void helicsCleanupHelicsLibrary()
 {
     helics::cleanupHelicsLibrary();
+  //  helics::LoggerManager::closeLogger();
+    
+  //  zmqContextManager::closeContext();
 }
 
 
