@@ -30,3 +30,8 @@ You should see the output that is similar to the following.
 HELICS Version: 1.0.0-beta.1 02-26-18
 ```
 
+creating a jar file.
+
+```bash
+jar cfv helics.jar <java files>
+```
