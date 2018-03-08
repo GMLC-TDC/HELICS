@@ -16,33 +16,24 @@ include(useSWIG_extra)
 
 SWIG_GEN_SOURCES(helicsOctave TYPE MODULE LANGUAGE octave SOURCES ../helics.i)
 
-message(STATUS "include ${OCTAVE_INCLUDE_DIRS} lib ${OCTAVE_LINK_DIRS}")
+#MESSAGE(STATUS ${CMAKE_SOURCE_DIR}/swig/octave)
 
-MESSAGE(STATUS ${CMAKE_SOURCE_DIR}/swig/octave)
-#MESSAGE(STATUS ${CMAKE_CURRENT_BINARY_DIR})
 
 #add_custom_target("helicsOCT" ALL)
 
 ADD_CUSTOM_TARGET(helicsOCTfile ALL
-    COMMAND ${CMAKE_COMMAND} -E echo "mkoctfile('-v -I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/', '-L $<TARGET_LINKER_FILE_DIR:helicsSharedLib> -lhelicsSharedLibd','helicsOCTAVE_wrap.cpp')"
+    COMMAND ${CMAKE_COMMAND} -E echo "mkoctfile('-v -I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/', '-L $<TARGET_LINKER_FILE_DIR:helicsSharedLib> -lhelicsSharedLibd -o${CMAKE_CURRENT_BINARY_DIR}/helics.oct','${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cpp')" >mkhelicsOctFile.m
 	DEPENDS helicsOctave helicsSharedLib
-    COMMENT "generating OCT file"
+    COMMENT "generating OCT file script"
+	BYPRODUCTS mkhelicsOctFile.m
 )
 
 ADD_CUSTOM_TARGET(helicsOCT ALL
-    COMMAND ${OCTAVE_EXECUTABLE} "-q mkoctfile('-v -I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/', '-L $<TARGET_LINKER_FILE_DIR:helicsSharedLib> -lhelicsSharedLibd','helicsOCTAVE_wrap.cpp')"
-	DEPENDS helicsOctave helicsSharedLib
+    COMMAND ${OCTAVE_EXECUTABLE} "-q" "${CMAKE_CURRENT_BINARY_DIR}/mkhelicsOctFile.m"
+	DEPENDS helicsOctave helicsSharedLib helicsOCTfile
     COMMENT "generating OCT file"
+	WORKING_DIRECTORY ${OCTAVE_EXECUTABLE_DIR}
 )
 
-# INCLUDE_DIRECTORIES(${Matlab_INCLUDE_DIRS})
-
-#ADD_CUSTOM_TARGET("helicsMATLABMEX" ALL DEPENDS helicsSharedLib)
-
-#ADD_CUSTOM_COMMAND(
-#    TARGET "helicsMATLABMEX" POST_BUILD
-#    COMMAND "mex" #
-#    ARGS "-I../../../src/helics/shared_api_library" "helicsMEX.cxx" "-lhelicsSharedLib" "-L../../src/helics/shared_api_library/"
-#    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-#    COMMENT "Building Matlab extension"
-#)
+set_target_properties (helicsOCTfile PROPERTIES FOLDER interfaces)
+set_target_properties (helicsOCT PROPERTIES FOLDER interfaces)
