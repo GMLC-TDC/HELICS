@@ -104,6 +104,7 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     # HOMEBREW_NO_AUTO_UPDATE=1 brew install boost
     brew update
     brew install python3
+    brew upgrade python
     pip3 install pytest
 else
     pyenv global 3.6.3
