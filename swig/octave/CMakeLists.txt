@@ -23,8 +23,14 @@ MESSAGE(STATUS ${CMAKE_SOURCE_DIR}/swig/octave)
 
 #add_custom_target("helicsOCT" ALL)
 
+ADD_CUSTOM_TARGET(helicsOCTfile ALL
+    COMMAND ${CMAKE_COMMAND} -E echo "mkoctfile('-v -I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/', '-L $<TARGET_LINKER_FILE_DIR:helicsSharedLib> -lhelicsSharedLibd','helicsOCTAVE_wrap.cpp')"
+	DEPENDS helicsOctave helicsSharedLib
+    COMMENT "generating OCT file"
+)
+
 ADD_CUSTOM_TARGET(helicsOCT ALL
-    COMMAND ${MKOCTFILE_EXECUTABLE} "-I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/" -l $<TARGET_LINKER_FILE:helicsSharedLib> "helicsOCTAVE_wrap.cpp"
+    COMMAND ${OCTAVE_EXECUTABLE} "-q mkoctfile('-v -I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/', '-L $<TARGET_LINKER_FILE_DIR:helicsSharedLib> -lhelicsSharedLibd','helicsOCTAVE_wrap.cpp')"
 	DEPENDS helicsOctave helicsSharedLib
     COMMENT "generating OCT file"
 )

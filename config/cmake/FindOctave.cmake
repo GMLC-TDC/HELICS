@@ -28,7 +28,7 @@
 #IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR 
 #IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#modified Philip Top 2018 to add windows search paths
+#modified Philip Top 2018 to add windows search paths and find octave executable itself
 
 # Try to find the build flags to compile octave shared objects (oct and mex files)
 # Once done this will define
