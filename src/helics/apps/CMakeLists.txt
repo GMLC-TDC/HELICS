@@ -63,8 +63,12 @@ INSTALL(TARGETS helics_apps-static EXPORT helics-targets
 
 #install(FILES $<TARGET_PDB_FILE:${helics_apps-static}> DESTINATION ${CMAKE_INSTALL_LIBDIR} OPTIONAL COMPONENT libs)
 
-INSTALL(FILES ${helics_apps_public_headers} 
+INSTALL(FILES ${helics_apps_public_headers}
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/apps COMPONENT headers)
+
+INSTALL(TARGETS helics_apps-static EXPORT helics-targets
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if (BUILD_PLAYER)
 INSTALL(TARGETS helics_player DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
@@ -101,4 +105,11 @@ add_custom_command(TARGET helics_app POST_BUILD        # Adds a post-build event
 endforeach(keyfile)
 endif()
 endif()
+
+configure_file(helicsConfigMain.h.in helicsConfigMain.h)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+add_executable(helics-config helicsConfigMain.cpp helicsConfigMain.h)
+install(TARGETS helics-config
+RUNTIME DESTINATION bin
+)
 
