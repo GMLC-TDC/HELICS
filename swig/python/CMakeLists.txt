@@ -35,9 +35,6 @@ else ()
   SWIG_LINK_LIBRARIES(helics ${PYTHON_LIBRARIES})
 endif()
 
-INSTALL(FILES helics.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
-INSTALL(TARGETS _helics DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
-
 if (WIN32)
   foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
     add_custom_command(TARGET _helics POST_BUILD        # Adds a post-build event to _helics
@@ -71,5 +68,8 @@ ADD_CUSTOM_COMMAND(
     COMMENT "Building Python extension"
 )
 
-
 ENDIF (GENERATE_PYTHON)
+
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
+INSTALL(TARGETS _helics DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
+
