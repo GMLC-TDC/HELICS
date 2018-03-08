@@ -24,7 +24,7 @@ set(helics_apps_library_files
 
 add_library(helics_apps-static STATIC ${helics_apps_library_files} ${helics_apps_library_headers})
 
-target_include_directories(helics_apps-static SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
+target_include_directories(helics_apps-static SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
 
 target_include_directories(helics_apps-static SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/ThirdParty)
 
