@@ -7,8 +7,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#ifndef HELICS_CPP98_BROKER_HPP_
-#define HELICS_CPP98_BROKER_HPP_
+#ifndef HELICS_CPP98_CORE_HPP_
+#define HELICS_CPP98_CORE_HPP_
 #pragma once
 
 #include "../shared_api_library/helics.h"
@@ -18,34 +18,34 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace helics
 {
 
-class Broker
+class Core
 {
   public:
     // Default constructor, not meant to be used
-    Broker () {};
+    Core () {};
 
-    Broker (std::string type, std::string name, std::string initString)
+    Core (const std::string &type, const std::string &name, const std::string &initString)
     {
-        broker = helicsCreateBroker (type.c_str(), name.c_str(), initString.c_str());
+        core = helicsCreateCore (type.c_str(), name.c_str(), initString.c_str());
     }
 
-    Broker (std::string type, std::string name, int argc, const char **argv)
+    Core (const std::string &type, const std::string &name, int argc, const char **argv)
     {
-        broker = helicsCreateBrokerFromArgs (type.c_str(), name.c_str(), argc, argv);
+        core = helicsCreateCoreFromArgs (type.c_str(), name.c_str(), argc, argv);
     }
 
-    virtual ~Broker ()
+    virtual ~Core ()
     {
-        helicsBrokerFree (broker);
+        helicsCoreFree (core);
     }
 
     bool isConnected ()
     {
-        return helicsBrokerIsConnected (broker);
+        return helicsCoreIsConnected (core);
     }
 
   protected:
-    helics_broker broker;
+    helics_core core;
 };
 
 } //namespace helics

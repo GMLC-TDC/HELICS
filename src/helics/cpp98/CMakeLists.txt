@@ -6,6 +6,7 @@
 ##############################################################################
 set(helicsCpp98_headers
 Broker.hpp
+Core.hpp
 CombinationFederate.hpp
 Federate.hpp
 MessageFederate.hpp

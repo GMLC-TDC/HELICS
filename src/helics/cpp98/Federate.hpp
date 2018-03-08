@@ -10,7 +10,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define HELICS_CPP98_FEDERATE_HPP_
 #pragma once
 
-#include "shared_api_library/helics.h"
+#include "../shared_api_library/helics.h"
 
 #include <string>
 #include <vector>

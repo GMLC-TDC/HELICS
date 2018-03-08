@@ -8,20 +8,26 @@
 
 set(shared_library_test_headers
 ctestFixtures.hpp
+cpptestFixtures.hpp
 )
 
 set(shared_library_test_sources
 ctestFixtures.cpp
+cpptestFixtures.cpp
 #ValueConverterTests.cpp
 shared-library-tests.cpp
 #data_viewTests.cpp
 #ValueFederateTests1.cpp
 test-value-federate1.cpp
 test-value-federate2.cpp
+test-value-federate1_cpp.cpp
+test-value-federate2_cpp.cpp
 #ValueFederateTests2.cpp
 #MessageFederateTests.cpp
 FilterTests.cpp
+FilterTests_cpp.cpp
 test-message-federate.cpp
+test-message-federate_cpp.cpp
 #FederateTests.cpp
 #TimingTests.cpp
 #iterationTests.cpp
