@@ -23,6 +23,5 @@ if(BUILD_MATLAB OR GENERATE_MATLAB)
 endif()
 
 if (BUILD_OCTAVE OR GENERATE_OCTAVE)
-	FIND_PACKAGE(OCTAVE)
 	add_subdirectory(octave)
 endif()

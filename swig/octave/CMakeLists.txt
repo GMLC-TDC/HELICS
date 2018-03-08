@@ -12,19 +12,9 @@ endif()
 set_property(SOURCE ../helics.i PROPERTY CPLUSPLUS ON)
 
 link_directories(${OCTAVE_LINK_DIRS})
+include(useSWIG_extra)
 
-SWIG_ADD_LIBRARY(helicsOctave TYPE MODULE LANGUAGE octave SOURCES ../helics.i)
-target_include_directories(helicsOctave PRIVATE ${OCTAVE_INCLUDE_DIRS})
-if (UNIX OR MINGW)
-target_compile_options(helicsOctave PRIVATE -Wno-unused-parameter -Wno-overloaded-virtual -Wno-pedantic)
-if (MINGW)
-target_compile_definitions(helicsOctave PRIVATE -DEBADMSG=0x456 -DEIDRM=0x242 -DENOLINK=0x256f -DENODATA=0x253f -DENOSR=0x222f -DENOSTR=0x12341 -DENOTRECOVERABLE=0x6227 -DETIME=0x34536 -DETXTBSY=0x6252e)
-endif(MINGW)
-endif()
-
-SWIG_LINK_LIBRARIES(helicsOctave ${OCTAVE_LIBRARY})
-
-set_target_properties (helicsOctave PROPERTIES FOLDER interfaces)
+SWIG_GEN_SOURCES(helicsOctave TYPE MODULE LANGUAGE octave SOURCES ../helics.i)
 
 message(STATUS "include ${OCTAVE_INCLUDE_DIRS} lib ${OCTAVE_LINK_DIRS}")
 
@@ -33,13 +23,11 @@ MESSAGE(STATUS ${CMAKE_SOURCE_DIR}/swig/octave)
 
 #add_custom_target("helicsOCT" ALL)
 
-#ADD_CUSTOM_COMMAND(
-#    TARGET "helicsOctave" PRE_BUILD
-#    COMMAND ${CMAKE_COMMAND} -E copy_directory
-#    ${CMAKE_SOURCE_DIR}/swig/octave ${CMAKE_CURRENT_BINARY_DIR}
-#    COMMENT "Copying OCTAVE files"
-#    VERBATIM
-#)
+ADD_CUSTOM_TARGET(helicsOCT ALL
+    COMMAND ${MKOCTFILE_EXECUTABLE} "-I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/" -l $<TARGET_LINKER_FILE:helicsSharedLib> "helicsOCTAVE_wrap.cpp"
+	DEPENDS helicsOctave helicsSharedLib
+    COMMENT "generating OCT file"
+)
 
 # INCLUDE_DIRECTORIES(${Matlab_INCLUDE_DIRS})
 

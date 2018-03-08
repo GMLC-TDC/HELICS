@@ -26,15 +26,22 @@ add_executable(nonlings_fed2_cpp nonlings_fed2.cpp)
 target_link_libraries(nonlings_fed1_cpp helicsCpp98 )
 target_link_libraries(nonlings_fed2_cpp helicsCpp98 )
 
+set_property(TARGET pi_sender_cpp PROPERTY CXX_STANDARD 98)
+set_property(TARGET pi_receiver_cpp PROPERTY CXX_STANDARD 98)
+set_property(TARGET pi_sender2_cpp PROPERTY CXX_STANDARD 98)
+set_property(TARGET pi_receiver2_cpp PROPERTY CXX_STANDARD 98)
+set_property(TARGET nonlings_fed1_cpp PROPERTY CXX_STANDARD 98)
+set_property(TARGET nonlings_fed2_cpp PROPERTY CXX_STANDARD 98)
+
 if (!MSVC)
-target_compile_options(pi_sender_cpp PRIVATE -std=c++98 -pedantic -Werror)
-target_compile_options(pi_receiver_cpp PRIVATE -std=c++98 -pedantic -Werror)
+target_compile_options(pi_sender_cpp PRIVATE -pedantic -Werror)
+target_compile_options(pi_receiver_cpp PRIVATE -pedantic -Werror)
 
-target_compile_options(pi_sender2_cpp PRIVATE -std=c++98 -pedantic -Werror)
-target_compile_options(pi_receiver2_cpp PRIVATE -std=c++98 -pedantic -Werror)
+target_compile_options(pi_sender2_cpp PRIVATE -pedantic -Werror)
+target_compile_options(pi_receiver2_cpp PRIVATE -pedantic -Werror)
 
-target_compile_options(nonlings_fed1_cpp PRIVATE -std=c++98 -pedantic -Werror)
-target_compile_options(nonlings_fed2_cpp PRIVATE -std=c++98 -pedantic -Werror)
+target_compile_options(nonlings_fed1_cpp PRIVATE -pedantic -Werror)
+target_compile_options(nonlings_fed2_cpp PRIVATE -pedantic -Werror)
 endif()
 
 set_target_properties (pi_sender_cpp PROPERTIES

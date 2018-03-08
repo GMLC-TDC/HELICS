@@ -25,8 +25,11 @@ OPTION(GENERATE_PYTHON "Generate Python extension using swig" OFF)
 OPTION(BUILD_PYTHON "Build Python extension" OFF)
 OPTION(GENERATE_MATLAB "Generate Matlab extension code using swig" OFF)
 OPTION(BUILD_MATLAB "Build MATLAB extension" OFF)
+
+
 OPTION(GENERATE_OCTAVE "Generate Octave extension code using swig" OFF)
 OPTION(BUILD_OCTAVE "Build Octave extension" OFF)
+
 OPTION(GENERATE_JAVA "Generate Java extension using swig" OFF)
 OPTION(BUILD_JAVA "Build Java extension" OFF)
 
