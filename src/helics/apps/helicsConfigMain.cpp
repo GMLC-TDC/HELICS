@@ -18,7 +18,7 @@ const char kPathSeparator =
                             '/';
 #endif
 
-static void show_usage(std::string name)
+static void show_usage(std::string const& name)
 {
     std::cerr << "Usage: " << name << " --prefix|--includes|--libs|--help" << std::endl;
 }
