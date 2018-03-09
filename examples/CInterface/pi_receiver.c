@@ -1,6 +1,6 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
+Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 static char help[] = " PI RECEIVER: Simple program to demonstrate the usage of HELICS C Interface.\n\
             This example creates a value federate subscribing to the publication \n\
