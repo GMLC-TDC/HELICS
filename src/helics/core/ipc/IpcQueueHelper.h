@@ -11,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../ActionMessage.hpp"
 #include <algorithm>
 #include <cctype>
-#include <helics_includes/optional.h>
+#include <helics_includes/optional.hpp>
 #include <iostream>
 #include <memory>
 #include <thread>

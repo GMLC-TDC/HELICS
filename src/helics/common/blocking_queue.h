@@ -14,7 +14,7 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 #include <mutex>
 #include <queue>
 #include <string>
-#include <helics_includes/optional.h>
+#include <helics_includes/optional.hpp>
 
 namespace helics {
 /** a queue that blocks while waiting for an input

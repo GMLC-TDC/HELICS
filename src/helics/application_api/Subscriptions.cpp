@@ -33,20 +33,20 @@ void Subscription::handleCallback (Time time)
     {
         type = getTypeFromString (fed->getPublicationType (id));
     }
-    switch (value_callback.which ())
+    switch (value_callback.index ())
     {
     case doubleLoc:
     {
         double val;
         valueExtract (dv, type, val);
-        boost::get<std::function<void(const double &, Time)>> (value_callback) (val, time);
+        mpark::get<std::function<void(const double &, Time)>> (value_callback) (val, time);
     }
     break;
     case intLoc:
     {
         int64_t val;
         valueExtract (dv, type, val);
-        boost::get<std::function<void(const int64_t &, Time)>> (value_callback) (val, time);
+        mpark::get<std::function<void(const int64_t &, Time)>> (value_callback) (val, time);
     }
     break;
     case stringLoc:
@@ -54,28 +54,28 @@ void Subscription::handleCallback (Time time)
     {
         std::string val;
         valueExtract (dv, type, val);
-        boost::get<std::function<void(const std::string &, Time)>> (value_callback) (val, time);
+        mpark::get<std::function<void(const std::string &, Time)>> (value_callback) (val, time);
     }
     break;
     case complexLoc:
     {
         std::complex<double> val;
         valueExtract (dv, type, val);
-        boost::get<std::function<void(const std::complex<double> &, Time)>> (value_callback) (val, time);
+        mpark::get<std::function<void(const std::complex<double> &, Time)>> (value_callback) (val, time);
     }
     break;
     case vectorLoc:
     {
         std::vector<double> val;
         valueExtract (dv, type, val);
-        boost::get<std::function<void(const std::vector<double> &, Time)>> (value_callback) (val, time);
+        mpark::get<std::function<void(const std::vector<double> &, Time)>> (value_callback) (val, time);
     }
     break;
     case complexVectorLoc:
     {
         std::vector<std::complex<double>> val;
         valueExtract (dv, type, val);
-        boost::get<std::function<void(const std::vector<std::complex<double>> &, Time)>> (value_callback) (val,
+        mpark::get<std::function<void(const std::vector<std::complex<double>> &, Time)>> (value_callback) (val,
                                                                                                            time);
     }
     break;

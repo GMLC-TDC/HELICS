@@ -508,7 +508,7 @@ HELICS_Export helics_status helicsFederateGetCurrentTime (helics_federate fed, h
 @details a query object consists of a target and query string
 */
 HELICS_Export helics_query helicsCreateQuery (const char *target, const char *query);
-
+ 
 /** Execute a query
 @details the call will block until the query finishes which may require communication or other delays
 @param query the query object to use in the query

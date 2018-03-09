@@ -14,9 +14,9 @@ namespace helics
 {
 bool changeDetected (const defV &prevValue, const std::string &val, double /*deltaV*/)
 {
-    if (prevValue.which () == stringLoc)
+    if (prevValue.index () == stringLoc)
     {
-        if (val == boost::get<std::string> (prevValue))
+        if (val == mpark::get<std::string> (prevValue))
         {
             return false;
         }
@@ -26,9 +26,9 @@ bool changeDetected (const defV &prevValue, const std::string &val, double /*del
 
 bool changeDetected (const defV &prevValue, const std::vector<double> &val, double deltaV)
 {
-    if (prevValue.which () == vectorLoc)
+    if (prevValue.index () == vectorLoc)
     {
-        const auto &prevV = boost::get<std::vector<double>> (prevValue);
+        const auto &prevV = mpark::get<std::vector<double>> (prevValue);
         if (val.size () == prevV.size ())
         {
             for (size_t ii = 0; ii < val.size (); ++ii)
@@ -46,9 +46,9 @@ bool changeDetected (const defV &prevValue, const std::vector<double> &val, doub
 
 bool changeDetected (const defV &prevValue, const std::vector<std::complex<double>> &val, double deltaV)
 {
-    if (prevValue.which () == complexVectorLoc)
+    if (prevValue.index () == complexVectorLoc)
     {
-        const auto &prevV = boost::get<std::vector<std::complex<double>>> (prevValue);
+        const auto &prevV = mpark::get<std::vector<std::complex<double>>> (prevValue);
         if (val.size () == prevV.size ())
         {
             for (size_t ii = 0; ii < val.size (); ++ii)
@@ -66,9 +66,9 @@ bool changeDetected (const defV &prevValue, const std::vector<std::complex<doubl
 
 bool changeDetected (const defV &prevValue, const double *vals, size_t size, double deltaV)
 {
-    if (prevValue.which () == vectorLoc)
+    if (prevValue.index () == vectorLoc)
     {
-        const auto &prevV = boost::get<std::vector<double>> (prevValue);
+        const auto &prevV = mpark::get<std::vector<double>> (prevValue);
         if (size == prevV.size ())
         {
             for (size_t ii = 0; ii < size; ++ii)
@@ -86,9 +86,9 @@ bool changeDetected (const defV &prevValue, const double *vals, size_t size, dou
 
 bool changeDetected (const defV &prevValue, const std::complex<double> &val, double deltaV)
 {
-    if (prevValue.which () == complexLoc)
+    if (prevValue.index () == complexLoc)
     {
-        const auto &prevV = boost::get<std::complex<double>> (prevValue);
+        const auto &prevV = mpark::get<std::complex<double>> (prevValue);
         if (std::abs (prevV.real () - val.real ()) > deltaV)
         {
             return true;
@@ -103,9 +103,9 @@ bool changeDetected (const defV &prevValue, const std::complex<double> &val, dou
 }
 bool changeDetected (const defV &prevValue, double val, double deltaV)
 {
-    if (prevValue.which () == doubleLoc)
+    if (prevValue.index () == doubleLoc)
     {
-        if (std::abs (boost::get<double> (prevValue) - val) <= deltaV)
+        if (std::abs (mpark::get<double> (prevValue) - val) <= deltaV)
         {
             return false;
         }
@@ -114,9 +114,9 @@ bool changeDetected (const defV &prevValue, double val, double deltaV)
 }
 bool changeDetected (const defV &prevValue, int64_t val, double deltaV)
 {
-    if (prevValue.which () == intLoc)
+    if (prevValue.index () == intLoc)
     {
-        if (std::abs (boost::get<int64_t> (prevValue) - val) < static_cast<int64_t> (deltaV) + 1)
+        if (std::abs (mpark::get<int64_t> (prevValue) - val) < static_cast<int64_t> (deltaV) + 1)
         {
             return false;
         }
@@ -126,9 +126,9 @@ bool changeDetected (const defV &prevValue, int64_t val, double deltaV)
 
 bool changeDetected(const defV &prevValue, named_point val, double deltaV)
 {
-    if (prevValue.which() == doubleLoc)
+    if (prevValue.index() == doubleLoc)
     {
-        if (std::abs(boost::get<double>(prevValue) - val.second) <= deltaV)
+        if (std::abs(mpark::get<double>(prevValue) - val.second) <= deltaV)
         {
             return false;
         }
@@ -138,50 +138,50 @@ bool changeDetected(const defV &prevValue, named_point val, double deltaV)
 
 void valueExtract (const defV &dv, std::string &val)
 {
-    switch (dv.which ())
+    switch (dv.index ())
     {
     case doubleLoc:  // double
-        val = std::to_string (boost::get<double> (dv));
+        val = std::to_string (mpark::get<double> (dv));
         break;
     case intLoc:  // int64_t
-        val = std::to_string (boost::get<int64_t> (dv));
+        val = std::to_string (mpark::get<int64_t> (dv));
         break;
     case stringLoc:  // string
     default:
-        val = boost::get<std::string> (dv);
+        val = mpark::get<std::string> (dv);
         break;
     case complexLoc:  // complex
-        val = helicsComplexString (boost::get<std::complex<double>> (dv));
+        val = helicsComplexString (mpark::get<std::complex<double>> (dv));
         break;
     case vectorLoc:  // vector
-        val = helicsVectorString (boost::get<std::vector<double>> (dv));
+        val = helicsVectorString (mpark::get<std::vector<double>> (dv));
         break;
     case complexVectorLoc:  // vector
-        val = helicsComplexVectorString (boost::get<std::vector<std::complex<double>>> (dv));
+        val = helicsComplexVectorString (mpark::get<std::vector<std::complex<double>>> (dv));
         break;
     }
 }
 
 void valueExtract (const defV &dv, std::complex<double> &val)
 {
-    switch (dv.which ())
+    switch (dv.index ())
     {
     case doubleLoc:  // double
-        val = std::complex<double> (boost::get<double> (dv), 0.0);
+        val = std::complex<double> (mpark::get<double> (dv), 0.0);
         break;
     case intLoc:  // int64_t
-        val = std::complex<double> (static_cast<double> (boost::get<int64_t> (dv)), 0.0);
+        val = std::complex<double> (static_cast<double> (mpark::get<int64_t> (dv)), 0.0);
         break;
     case stringLoc:  // string
     default:
-        val = helicsGetComplex (boost::get<std::string> (dv));
+        val = helicsGetComplex (mpark::get<std::string> (dv));
         break;
     case complexLoc:  // complex
-        val = boost::get<std::complex<double>> (dv);
+        val = mpark::get<std::complex<double>> (dv);
         break;
     case vectorLoc:  // vector
     {
-        auto &vec = boost::get<std::vector<double>> (dv);
+        auto &vec = mpark::get<std::vector<double>> (dv);
         if (vec.size () == 1)
         {
             val = std::complex<double> (vec[0], 0.0);
@@ -194,7 +194,7 @@ void valueExtract (const defV &dv, std::complex<double> &val)
     }
     case complexVectorLoc:
     {
-        auto &vec = boost::get<std::vector<std::complex<double>>> (dv);
+        auto &vec = mpark::get<std::vector<std::complex<double>>> (dv);
         if (!vec.empty ())
         {
             val = vec.front ();
@@ -207,31 +207,31 @@ void valueExtract (const defV &dv, std::complex<double> &val)
 void valueExtract (const defV &dv, std::vector<double> &val)
 {
     val.resize (0);
-    switch (dv.which ())
+    switch (dv.index ())
     {
     case doubleLoc:  // double
-        val.push_back (boost::get<double> (dv));
+        val.push_back (mpark::get<double> (dv));
         break;
     case intLoc:  // int64_t
-        val.push_back (static_cast<double> (boost::get<int64_t> (dv)));
+        val.push_back (static_cast<double> (mpark::get<int64_t> (dv)));
         break;
     case stringLoc:  // string
     default:
-        helicsGetVector (boost::get<std::string> (dv), val);
+        helicsGetVector (mpark::get<std::string> (dv), val);
         break;
     case complexLoc:  // complex
     {
-        auto cval = boost::get<std::complex<double>> (dv);
+        auto cval = mpark::get<std::complex<double>> (dv);
         val.push_back (cval.real ());
         val.push_back (cval.imag ());
     }
     break;
     case vectorLoc:  // vector
-        val = boost::get<std::vector<double>> (dv);
+        val = mpark::get<std::vector<double>> (dv);
         break;
     case complexVectorLoc:  // complex
     {
-        auto cv = boost::get<std::vector<std::complex<double>>> (dv);
+        auto cv = mpark::get<std::vector<std::complex<double>>> (dv);
         val.resize (2 * cv.size ());
         for (auto &cval : cv)
         {
@@ -245,26 +245,26 @@ void valueExtract (const defV &dv, std::vector<double> &val)
 void valueExtract (const defV &dv, std::vector<std::complex<double>> &val)
 {
     val.resize (0);
-    switch (dv.which ())
+    switch (dv.index ())
     {
     case doubleLoc:  // double
-        val.emplace_back (boost::get<double> (dv), 0.0);
+        val.emplace_back (mpark::get<double> (dv), 0.0);
         break;
     case intLoc:  // int64_t
-        val.emplace_back (static_cast<double> (boost::get<int64_t> (dv)), 0.0);
+        val.emplace_back (static_cast<double> (mpark::get<int64_t> (dv)), 0.0);
         break;
     case stringLoc:  // string
     default:
-        helicsGetComplexVector (boost::get<std::string> (dv), val);
+        helicsGetComplexVector (mpark::get<std::string> (dv), val);
         break;
     case complexLoc:  // complex
     {
-        val.push_back (boost::get<std::complex<double>> (dv));
+        val.push_back (mpark::get<std::complex<double>> (dv));
     }
     break;
     case vectorLoc:  // vector
     {
-        auto &v = boost::get<std::vector<double>> (dv);
+        auto &v = mpark::get<std::vector<double>> (dv);
         val.resize (v.size () / 2);
         for (size_t ii = 0; ii < v.size () - 1; ii += 2)
         {
@@ -273,7 +273,7 @@ void valueExtract (const defV &dv, std::vector<std::complex<double>> &val)
         break;
     }
     case complexVectorLoc:  // complex
-        val = boost::get<std::vector<std::complex<double>>> (dv);
+        val = mpark::get<std::vector<std::complex<double>>> (dv);
         break;
     }
 }
@@ -281,28 +281,28 @@ void valueExtract (const defV &dv, std::vector<std::complex<double>> &val)
 void valueExtract(const defV &dv, named_point &val)
 {
     
-    switch (dv.which())
+    switch (dv.index())
     {
     case doubleLoc:  // double
         val.first = "value";
-        val.second = boost::get<double>(dv);
+        val.second = mpark::get<double>(dv);
         break;
     case intLoc:  // int64_t
         val.first = "value";
-        val.second = static_cast<double> (boost::get<int64_t>(dv));
+        val.second = static_cast<double> (mpark::get<int64_t>(dv));
         break;
     case stringLoc:  // string
     default:
-        val = helicsGetNamedPoint(boost::get<std::string>(dv));
+        val = helicsGetNamedPoint(mpark::get<std::string>(dv));
         break;
     case complexLoc:  // complex
         val.first = "value";
-        val.second = std::abs(boost::get<std::complex<double>>(dv));
+        val.second = std::abs(mpark::get<std::complex<double>>(dv));
         break;
     case vectorLoc:  // vector
     {
         val.first = "value";
-        auto &vec = boost::get<std::vector<double>>(dv);
+        auto &vec = mpark::get<std::vector<double>>(dv);
         if (vec.size() == 2)
         {
             val.second = std::hypot(vec[0], vec[1]);
@@ -316,7 +316,7 @@ void valueExtract(const defV &dv, named_point &val)
     case complexVectorLoc:
     {
         val.first = "value";
-        auto &vec = boost::get<std::vector<std::complex<double>>>(dv);
+        auto &vec = mpark::get<std::vector<std::complex<double>>>(dv);
         if (!vec.empty())
         {
             val.second = std::abs(vec.front());

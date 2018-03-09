@@ -34,8 +34,6 @@ add_library(helicsSharedLib SHARED ${helicsShared_sources} ${helicsShared_header
 
 target_link_libraries(helicsSharedLib helics-static)
 
-target_include_directories(helicsSharedLib SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
-
 if (HELICS_HAVE_ZEROMQ)
    target_include_directories (helicsSharedLib PRIVATE "${ZeroMQ_INCLUDE_DIR}")
 endif(HELICS_HAVE_ZEROMQ)

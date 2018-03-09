@@ -8,7 +8,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #pragma once
-#include "helics_includes/optional.h"
+#include "helics_includes/optional.hpp"
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>

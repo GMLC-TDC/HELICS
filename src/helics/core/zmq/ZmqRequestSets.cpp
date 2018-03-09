@@ -8,7 +8,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 */
 
 #include "ZmqRequestSets.h"
-#include "helics_includes/optional.h"
+#include "helics_includes/optional.hpp"
 #include <algorithm>
 
 namespace helics

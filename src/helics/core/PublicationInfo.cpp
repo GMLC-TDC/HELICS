@@ -9,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "PublicationInfo.hpp"
-#include "helics_includes/string_view.h"
+#include "helics_includes/string_view.hpp"
 namespace helics
 {
 bool PublicationInfo::CheckSetValue (const char *dataToCheck, uint64_t len)

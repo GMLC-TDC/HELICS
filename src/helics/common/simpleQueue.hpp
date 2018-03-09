@@ -6,7 +6,6 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
-
 #pragma once
 
 #include <algorithm>
@@ -15,7 +14,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <type_traits>
 #include <vector>
 
-#include <helics_includes/optional.h>
+#include <helics_includes/optional.hpp>
 
 /** class for very simple thread safe queue
 @details  uses two vectors for the operations,  once the pull vector is empty it swaps the vectors

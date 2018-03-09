@@ -22,7 +22,7 @@ SWIG_GEN_SOURCES(helicsOctave TYPE MODULE LANGUAGE octave SOURCES ../helics.i)
 #add_custom_target("helicsOCT" ALL)
 
 ADD_CUSTOM_TARGET(helicsOCTfile ALL
-    COMMAND ${CMAKE_COMMAND} -E echo "mkoctfile('-v -I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/', '-L $<TARGET_LINKER_FILE_DIR:helicsSharedLib> -lhelicsSharedLibd -o${CMAKE_CURRENT_BINARY_DIR}/helics.oct','${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cpp')" >mkhelicsOctFile.m
+    COMMAND ${CMAKE_COMMAND} -E echo "mkoctfile('-I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/', '-L $<TARGET_LINKER_FILE_DIR:helicsSharedLib> -lhelicsSharedLibd -o${CMAKE_CURRENT_BINARY_DIR}/helics.oct','${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cpp')" >mkhelicsOctFile.m
 	DEPENDS helicsOctave helicsSharedLib
     COMMENT "generating OCT file script"
 	BYPRODUCTS mkhelicsOctFile.m

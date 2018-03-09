@@ -6,10 +6,9 @@ This software was co-developed by Pacific Northwest National Laboratory, operate
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
-
 #pragma once
 
-#include "helics_includes/optional.h"
+#include "helics_includes/optional.hpp"
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
