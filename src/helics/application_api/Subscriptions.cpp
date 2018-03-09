@@ -94,3 +94,4 @@ bool Subscription::isUpdated () const
     }
 }
 }  // namespace helics
+

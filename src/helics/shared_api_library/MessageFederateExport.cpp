@@ -326,3 +326,4 @@ int helicsFederateGetEndpointCount(helics_federate fed)
     }
     return static_cast<int>(mfedObj->getEndpointCount());
 }
+

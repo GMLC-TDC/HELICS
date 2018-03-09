@@ -27,18 +27,19 @@ public:
   /** destructor*/
   ~ZmqCore();
   virtual void initializeFromArgs (int argc, const char * const *argv) override;
-         
+
 public:
 	virtual std::string getAddress() const override;
 private:
-	
+
     NetworkBrokerData netInfo{ NetworkBrokerData::interface_type::tcp }; //!< container for the network connection information
 
 	virtual bool brokerConnect() override;
- 
+
 };
 
 } // namespace zeromq
 } // namespace helics
- 
+
 #endif /* _HELICS_ZEROMQ_CORE_ */
+

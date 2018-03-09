@@ -19,13 +19,13 @@ int main ()
     helics_time_t currenttime = 0.0; /* the current time of the simulation*/
     helics_status  status;/* the result code from a call to the helics Library*/
     helics_bool_t isUpdated;  /* storage for a check if a value has been updated*/
-    
+
 
     /** create an info structure to define some parameters used in federate creation*/
     fedinfo = helicsFederateInfoCreate ();
     /** set the federate name*/
     helicsFederateInfoSetFederateName (fedinfo, "hello_world_receiver");
-    
+
     /** set the core type to use
     can be "test", "ipc", "udp", "tcp", "zmq", "mpi"
     not all are available on all platforms
@@ -83,3 +83,4 @@ int main ()
     helicsCloseLibrary ();
     return (0);
 }
+

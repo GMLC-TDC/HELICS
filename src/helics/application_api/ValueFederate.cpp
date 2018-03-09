@@ -310,3 +310,4 @@ int ValueFederate::getPublicationCount () const { return vfManager->getPublicati
 /** get a count of the number subscriptions registered*/
 int ValueFederate::getSubscriptionCount () const { return vfManager->getSubscriptionCount (); }
 }  // namespace helics
+

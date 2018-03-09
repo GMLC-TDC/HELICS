@@ -155,3 +155,4 @@ BOOST_AUTO_TEST_CASE (timing_with_impact_window)
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 BOOST_AUTO_TEST_SUITE_END ()
+

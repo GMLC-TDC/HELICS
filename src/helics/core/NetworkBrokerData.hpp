@@ -88,3 +88,4 @@ std::string getLocalExternalAddressV4 ();
 /** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/
 std::string getLocalExternalAddressV4 (const std::string &server);
 }  // namespace helics
+

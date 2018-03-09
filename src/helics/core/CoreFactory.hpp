@@ -109,3 +109,4 @@ void copyCoreIdentifier (const std::string &copyFromName, const std::string &cop
 }  // namespace CoreFactory
 
 }  // namespace helics
+

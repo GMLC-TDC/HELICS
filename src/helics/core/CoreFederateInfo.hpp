@@ -39,3 +39,4 @@ class CoreFederateInfo
 };
 
 }  // namespace helics
+

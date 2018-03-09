@@ -33,3 +33,4 @@ struct globalTestConfig
 //____________________________________________________________________________//
 
 BOOST_GLOBAL_FIXTURE (globalTestConfig);
+

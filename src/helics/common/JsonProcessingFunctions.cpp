@@ -78,4 +78,3 @@ helics::Time loadJsonTime(const Json_helics::Value &timeElement, timeUnits defau
     return 0;
 }
 
-

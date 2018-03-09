@@ -30,10 +30,10 @@ class MessageFederate : public virtual Federate
     {
         fed = helicsCreateMessageFederateFromJson (jsonString.c_str());
     }
-   
+
     // Default constructor, not meant to be used
     MessageFederate () {}
-    
+
     virtual ~MessageFederate ()
     {
     }
@@ -103,7 +103,7 @@ class MessageFederate : public virtual Federate
     {
         helicsEndpointSendMessageRaw (source, dest.c_str(), data, len);
     }
-    
+
     void sendMessage (helics_endpoint source, const std::string &dest, const char *data, size_t len, helics_time_t time)
     {
         helicsEndpointSendEventRaw (source, dest.c_str(), data, len, time);
@@ -130,10 +130,11 @@ class MessageFederate : public virtual Federate
         std::string result (str);
         return result;
     }
- 
+
   private:
     std::vector<helics_endpoint> local_endpoints;
- 
+
 };
 } //namespace helics
 #endif
+

@@ -102,7 +102,7 @@ struct FederateTestFixture
 
         std::vector<std::shared_ptr<FedType>> federates_added;
 
-        
+
 
         switch (setup)
         {
@@ -202,7 +202,7 @@ struct FederateTestFixture
         }
         break;
         case 7: //two layers of subbrokers
-        {      
+        {
                 auto newTypeString = core_type_name;
                 newTypeString.push_back('_');
                 newTypeString.push_back('4');
@@ -234,3 +234,4 @@ struct FederateTestFixture
     int getIndexCode (const std::string &type_name);
     auto AddBrokerImp (const std::string &core_type_name, const std::string &initialization_string);
 };
+

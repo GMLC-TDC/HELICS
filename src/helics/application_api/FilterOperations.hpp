@@ -142,3 +142,4 @@ class CloneFilterOperation : public FilterOperations
 };
 
 }  // namespace helics
+

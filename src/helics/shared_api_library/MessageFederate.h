@@ -140,3 +140,4 @@ HELICS_Export int helicsFederateGetEndpointCount(helics_federate fed);
 #endif
 
 #endif /*HELICS_APISHARED_MESSAGE_FEDERATE_FUNCTIONS_H_*/
+

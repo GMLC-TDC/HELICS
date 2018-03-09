@@ -106,3 +106,4 @@ class CloneOperator : public FilterOperator
 };
 
 }  // namespace helics
+

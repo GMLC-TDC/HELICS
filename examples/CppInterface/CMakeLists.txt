@@ -42,7 +42,7 @@ set_target_properties (pi_sender_cpp PROPERTIES
 
 set_target_properties (pi_sender2_cpp PROPERTIES
     FOLDER examples)
-	
+
 set_target_properties (pi_receiver_cpp PROPERTIES
     FOLDER examples)
 
@@ -66,3 +66,4 @@ add_custom_command(TARGET pi_sender_cpp POST_BUILD        # Adds a post-build ev
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
         "$<TARGET_FILE_DIR:pi_sender_cpp>/")                 # <--this is out-file path
+

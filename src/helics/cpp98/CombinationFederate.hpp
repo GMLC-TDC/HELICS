@@ -31,3 +31,4 @@ class CombinationFederate : public ValueFederate, public MessageFederate
 };
 } //namespace helics
 #endif
+

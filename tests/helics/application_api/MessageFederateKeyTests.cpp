@@ -362,3 +362,4 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_ty
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
+

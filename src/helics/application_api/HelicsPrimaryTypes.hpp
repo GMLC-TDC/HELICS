@@ -101,7 +101,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &
             {
                 val = static_cast<X> (vec.front());
             }
-           
+
         }
         else
         {
@@ -223,3 +223,4 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
     }
 }
 }  // namespace helics
+

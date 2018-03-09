@@ -260,3 +260,4 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
+

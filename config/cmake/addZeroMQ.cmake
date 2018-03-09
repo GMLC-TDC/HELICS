@@ -1,4 +1,4 @@
-#file to include ZMQ 
+#file to include ZMQ
 
 OPTION(ZMQ_USE_STATIC_LIBRARY
   "use the ZMQ static library" OFF)
@@ -57,5 +57,3 @@ else()
 	endif()
 endif()
 
-	
-	

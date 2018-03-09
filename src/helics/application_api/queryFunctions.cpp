@@ -113,3 +113,4 @@ bool waitForFed (helics::Federate *fed, const std::string &fedName, int timeout)
     }
     return true;
 }
+

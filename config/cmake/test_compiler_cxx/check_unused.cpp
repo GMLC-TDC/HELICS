@@ -6,3 +6,4 @@ int main(int argc, char * /*argv*/[])
     assert(b); // in release mode, assert is compiled out, and b is unused
                // no warning because it is declared [[maybe_unused]]
 }
+

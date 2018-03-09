@@ -41,12 +41,12 @@ int main(int /*argc*/,char ** /*argv*/)
   if(broker.isConnected()) {
     printf("PI SENDER: Broker created and connected\n");
   }
-  
-  /* Create Federate Info object that describes the federate properties 
+
+  /* Create Federate Info object that describes the federate properties
    * Sets federate name and core type from string
    */
   helics::FederateInfo fi("TestA Federate", "zmq");
-  
+
   /* Federate init string */
   fi.setCoreInitString(fedinitstring);
 
@@ -97,7 +97,7 @@ int main(int /*argc*/,char ** /*argv*/)
       currenttime = vfed->requestTime(currenttime);
       isupdated = vfed->isUpdated(sub);
     }
-     
+
     /* NOTE: The value sent by sender at time t is received by receiver at time t+deltat */
     value = vfed->getDouble(sub); /* Note: The receiver sent this at currenttime-deltat */
     printf("PI SENDER: Received value = %4.3f at time %3.2f from PI RECEIVER\n",value,currenttime);
@@ -121,3 +121,4 @@ int main(int /*argc*/,char ** /*argv*/)
   fflush(NULL);
   return(0);
 }
+

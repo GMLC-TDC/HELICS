@@ -164,7 +164,7 @@ void FederateState::createSubscription (Core::handle_id_t handle,
 	subHandle->insert(key, handle,handle, global_id, key, type, units,
 		(check_mode == handle_check_mode::required));
 
-    
+
     subHandle->back()->only_update_on_change = only_update_on_change;
 }
 void FederateState::createPublication (Core::handle_id_t handle,
@@ -935,3 +935,4 @@ std::string FederateState::processQuery (const std::string &query) const
     return "#invalid";
 }
 }  // namespace helics
+

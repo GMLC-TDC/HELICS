@@ -108,3 +108,4 @@ int main(int /*argc*/,char ** /*argv*/)
   helicsCloseLibrary();
   return(0);
 }
+

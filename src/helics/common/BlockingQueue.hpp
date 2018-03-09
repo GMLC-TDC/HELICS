@@ -339,3 +339,4 @@ bool BlockingQueue<T>::empty () const
 {
     return queueEmptyFlag;
 }
+

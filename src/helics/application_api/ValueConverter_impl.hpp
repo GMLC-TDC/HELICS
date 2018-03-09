@@ -198,3 +198,4 @@ X ValueConverter<X>::interpret (const data_view &block)
     return val;
 }
 }  // namespace helics
+

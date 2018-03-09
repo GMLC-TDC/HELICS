@@ -56,7 +56,7 @@ int argumentParser (int argc,
     po::options_description config ("configuration");
     po::options_description hidden ("hidden");
 
-    
+
     // clang-format off
 	// input boost controls
 	cmd_only.add_options()
@@ -81,7 +81,7 @@ int argumentParser (int argc,
         cmd_line.add(hidden);
         config_file.add(hidden);
     }
-    
+
     variable_map cmd_vm;
     try
     {
@@ -95,7 +95,7 @@ int argumentParser (int argc,
             p.add(posName.c_str(), -1);
             po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().positional(p).run(), cmd_vm);
         }
-        
+
     }
     catch (std::exception &e)
     {
@@ -127,7 +127,7 @@ int argumentParser (int argc,
         p.add(posName.c_str(), -1);
         po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().positional(p).run(), vm_map);
     }
-   
+
 
     if (cmd_vm.count ("config-file") > 0)
     {
@@ -150,3 +150,4 @@ int argumentParser (int argc,
 }
 
 }  // namespace helics
+

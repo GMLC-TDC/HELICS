@@ -43,7 +43,7 @@ class ArgDescriptor
     ArgDescriptor (std::string arg, arg_type_t type, std::string desc)
         : arg_ (std::move (arg)), type_ (type), desc_ (std::move (desc))
     {
-        
+
     }
     /** two argument constructor assuming the results will be strings
     @param arg the key for the parameter
@@ -76,6 +76,5 @@ int argumentParser (int argc,
                      const ArgDescriptors &argDefinitions, const std::string &posName=std::string());
 
 
-} // namespace helics 
-
+} // namespace helics
 

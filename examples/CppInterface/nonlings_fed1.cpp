@@ -38,7 +38,7 @@ int main (int /*argc*/, char ** /*argv*/)
         printf (" Broker created and connected\n");
     }
 
-    /* Create Federate Info object that describes the federate properties 
+    /* Create Federate Info object that describes the federate properties
      * Set federate name and core type from string
      */
     helics::FederateInfo fi ("TestA Federate", "zmq");
@@ -106,7 +106,7 @@ int main (int /*argc*/, char ** /*argv*/)
         }
         ++helics_iter;
         printf("Fed1: iteration %d x=%f, y=%f\n",helics_iter, x, y);
-        
+
         if ((fabs(x-xprv)>tol)||(helics_iter<5))
         {
             vfed->publish (pub, x);
@@ -135,3 +135,4 @@ int main (int /*argc*/, char ** /*argv*/)
     fflush (NULL);
     return (0);
 }
+

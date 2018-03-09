@@ -98,7 +98,7 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
         {
             brokerName = addr;
         }
-        
+
     }
     if (vm.count("brokername") > 0)
     {
@@ -241,3 +241,4 @@ std::string getLocalExternalAddressV4 (const std::string & /*server*/)
 }
 
 }  // namespace helics
+

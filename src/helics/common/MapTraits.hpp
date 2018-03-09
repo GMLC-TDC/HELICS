@@ -34,3 +34,4 @@ struct is_easily_hashable<std::wstring>
 {
     static const bool value = true;
 };
+

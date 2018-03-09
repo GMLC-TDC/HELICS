@@ -59,3 +59,4 @@ add_custom_command(TARGET core-tests POST_BUILD        # Adds a post-build event
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:core-tests>/")                 # <--this is out-file path
 endforeach(keyfile)
+

@@ -106,3 +106,4 @@ class ForwardingTimeCoordinator
     std::string printTimeStatus () const;
 };
 }  // namespace helics
+

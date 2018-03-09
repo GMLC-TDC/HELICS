@@ -48,3 +48,4 @@ add_custom_command(TARGET common-tests POST_BUILD        # Adds a post-build eve
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:common-tests>/")                 # <--this is out-file path
 endforeach(keyfile)
+

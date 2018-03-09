@@ -22,7 +22,7 @@ int main() {
   fedinfo = helicsFederateInfoCreate();
   /** set the federate name*/
   helicsFederateInfoSetFederateName(fedinfo, "hello_world_sender");
-  /** set the core type to use 
+  /** set the core type to use
   can be "test", "ipc", "udp", "tcp", "zmq", "mpi"
   not all are available on all platforms
   and should be set to match the broker and receiver
@@ -38,14 +38,14 @@ int main() {
   {
       return (-2);
   }
-  /** register a publication interface on vFed, with a global Name of "hello" 
+  /** register a publication interface on vFed, with a global Name of "hello"
   of a type "string", with no units*/
   pub = helicsFederateRegisterGlobalPublication(vfed, "hello", "string", "");
   if (pub == NULL)
   {
       return (-3);
   }
-  /** transition the federate to execution mode 
+  /** transition the federate to execution mode
   * the helicsFederateEnterInitializationMode is not necessary if there is nothing to do in the initialization mode
   */
   status=helicsFederateEnterInitializationMode(vfed);
@@ -75,3 +75,4 @@ int main() {
   helicsCloseLibrary();
   return(0);
 }
+

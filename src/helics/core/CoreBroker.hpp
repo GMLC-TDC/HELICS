@@ -84,10 +84,10 @@ class CoreBroker : public Broker, public BrokerBase
       localBrokersInit;  //!< indicator if the local brokers are ready to initialize
 	DualMappedVector<BasicFedInfo, std::string,Core::federate_id_t> _federates; //!< container for all federates
 	DualMappedVector<BasicBrokerInfo, std::string, Core::federate_id_t> _brokers; //!< container for all the broker information
-	
+
 	std::vector<BasicHandleInfo> _handles; //!< container for the basic info for all handles
 	std::string previous_local_broker_identifier; //!< the previous identifier in case a rename is required
-	
+
 	std::unordered_map<std::string, int32_t> publications; //!< map of publications;
 	std::unordered_multimap<std::string, int32_t> subscriptions; //!< multimap of subscriptions
 	std::unordered_map<std::string, int32_t> endpoints;  //!< map of endpoints
@@ -246,3 +246,4 @@ inline uint64_t makeGlobalHandleIdentifier (Core::federate_id_t fed_id, Core::ha
 }  // namespace helics
 
 #endif
+

@@ -32,3 +32,4 @@ void Endpoint::setCallback(std::function<void(const Endpoint *, Time)> callback)
     fed->registerEndpointCallback(id, [callback, local](endpoint_id_t, Time messageTime) {callback(&local, messageTime); });
 }
 }  // namespace helics
+

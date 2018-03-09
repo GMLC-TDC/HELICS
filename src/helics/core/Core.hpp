@@ -134,7 +134,7 @@ class Core
     /** set the core to ready to enter init
     @details this function only needs to be called for cores that don't have any federates but may
     have filters for cores with federates it won't do anything*/
-    virtual void setCoreReadyToInit() = 0; 
+    virtual void setCoreReadyToInit() = 0;
 
     /**
      * Change the federate state to the Executing state.
@@ -286,7 +286,7 @@ class Core
     *
     * The value is used as a time shift for calculating the allowable time in a federate
     the granted time must one of N*period+offset
-    
+
 
 
 

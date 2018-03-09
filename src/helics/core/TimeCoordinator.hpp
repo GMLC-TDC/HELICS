@@ -143,7 +143,7 @@ public:
 
 	/** check if entry to the executing state can be granted*/
     iteration_state checkExecEntry ();
-	/** request a time 
+	/** request a time
 	@param nextTime the new requested time
 	@param iterate the mode of iteration to use (no_iteration, force_iteration, iterate_if_needed)
 	@param newValueTime  the time of the next value
@@ -160,3 +160,4 @@ public:
     std::string printTimeStatus () const;
 };
 } //namespace helics
+

@@ -108,3 +108,4 @@ BOOST_AUTO_TEST_CASE (remove_tests)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
+

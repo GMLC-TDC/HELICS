@@ -108,7 +108,7 @@ void MpiService::serviceLoop ()
         // Finalize MPI
         int mpi_initialized;
         MPI_Initialized(&mpi_initialized);
-    
+
         // Probably not a necessary check, a user using MPI should have also initialized it themselves
         if (mpi_initialized)
         {
@@ -270,7 +270,7 @@ void MpiService::sendAndReceiveMessages ()
         }
 
     }
-    
+
     // Send messages from the queue
     auto sendMsg = txMessageQueue.try_pop ();
     while (sendMsg)
@@ -334,7 +334,7 @@ void MpiService::drainRemainingMessages ()
             std::vector<char> buffer;
             MPI_Get_count (&status, MPI_CHAR, &recv_size);
             buffer.resize (recv_size);
-            
+
             // Receive the message
             MPI_Recv (buffer.data (), buffer.capacity (), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG, mpiCommunicator, &status);
         }
@@ -343,3 +343,4 @@ void MpiService::drainRemainingMessages ()
 
 } // namespace mpi
 } // namespace helics
+

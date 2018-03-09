@@ -302,3 +302,4 @@ DependencyInfo(Core::federate_id_t id) :fedID(id) {};
 */
 
 BOOST_AUTO_TEST_SUITE_END ()
+

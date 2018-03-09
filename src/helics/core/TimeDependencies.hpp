@@ -94,3 +94,4 @@ class TimeDependencies
     void resetIteratingTimeRequests (Time requestTime);
 };
 }  // namespace helics
+

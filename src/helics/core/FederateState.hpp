@@ -258,3 +258,4 @@ private:
     bool checkAndSetValue(Core::handle_id_t pub_id, const char *data, uint64_t len);
 };
 } // namespace helics
+

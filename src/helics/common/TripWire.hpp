@@ -49,3 +49,4 @@ private:
     triplineType lineTrigger; //!< the tripwire
 };
 } //namespace tripwire
+

@@ -37,7 +37,7 @@ const std::string defRoute2("tcp://127.0.0.1:23407");
 BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
 {
     std::atomic<int> counter{0};
-    
+
     helics::zeromq::ZmqComms comm (host, host);
 
     auto ctx = zmqContextManager::getContextPointer ();
@@ -542,3 +542,4 @@ BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
+

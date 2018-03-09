@@ -179,3 +179,4 @@ private:
     */
 } // namespace zeromq
 }  // namespace helics
+

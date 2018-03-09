@@ -417,3 +417,4 @@ helics_status helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char
     cfilt->removeDeliveryEndpoint (delivery);
     return helics_ok;
 }
+

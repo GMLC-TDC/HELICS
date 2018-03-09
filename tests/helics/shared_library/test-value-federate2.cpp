@@ -70,7 +70,7 @@ BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type
 
     BOOST_CHECK_EQUAL(len1, len);
 
-	
+
 
 	BOOST_CHECK(helicsSubscriptionIsUpdated(sub1) == false);
 
@@ -400,3 +400,4 @@ BOOST_AUTO_TEST_CASE(test_file_load)
     helicsFederateFree(vFed);
 }
 BOOST_AUTO_TEST_SUITE_END()
+

@@ -11,4 +11,3 @@ cdef extern from "helics/application_api/identifierTypes.hpp" namespace "helics"
     cdef cppclass subscription_id_t:
         pass
 
-

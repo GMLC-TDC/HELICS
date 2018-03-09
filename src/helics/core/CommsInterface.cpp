@@ -271,3 +271,4 @@ void CommsInterface::reconnectReceiver ()
 }
 
 }  // namespace helics
+

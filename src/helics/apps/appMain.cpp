@@ -25,7 +25,7 @@ void showHelp()
         std::cout << "helics_app --version or -v will show the helics version string\n";
 }
 int main (int argc, char *argv[])
-{ 
+{
     if (argc == 1)
     {
         showHelp();
@@ -46,7 +46,7 @@ int main (int argc, char *argv[])
             {
                 Player.run();
             }
-            
+
         }
         else if (arg1 == "recorder")
         {
@@ -55,7 +55,7 @@ int main (int argc, char *argv[])
             {
                 Recorder.run();
             }
-           
+
         }
         else if ((arg1 == "--version")||(arg1=="-v"))
         {
@@ -108,9 +108,10 @@ int main (int argc, char *argv[])
         helics::cleanupHelicsLibrary();
         return (-4);
     }
-    
+
 
     helics::cleanupHelicsLibrary();
     return 0;
-   
+
 }
+

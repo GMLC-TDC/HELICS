@@ -96,7 +96,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
         {
             std::cerr << vm["min"].as<std::string>() << " is not a valid minimum federate count\n";
         }
-        
+
     }
     if (vm.count ("minfed") > 0)
     {
@@ -375,3 +375,4 @@ void BrokerBase::queueProcessingLoop ()
     }
 }
 }  // namespace helics
+

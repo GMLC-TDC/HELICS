@@ -207,7 +207,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         _federates.back ().route_id = getRoute (command.source_id);
         if (!_isRoot)
         {
-          
+
                 if (global_broker_id != 0)
                 {
                     command.source_id = global_broker_id;
@@ -265,7 +265,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             _brokers.back().route_id = getRoute(command.source_id);
             _brokers.back()._nonLocal = true;
         }
-       
+
         if (!_isRoot)
         {
             if (global_broker_id != 0)
@@ -494,7 +494,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
     break;
     case CMD_INIT_NOT_READY:
     {
-        
+
         if (allInitReady ())
         {
             transmit (0, command);
@@ -1387,7 +1387,7 @@ void CoreBroker::processQuery (const ActionMessage &m)
         {
             transmit(route, m);
         }
-       
+
     }
 }
 
@@ -1512,3 +1512,4 @@ bool CoreBroker::allDisconnected () const
 }
 
 }  // namespace helics
+

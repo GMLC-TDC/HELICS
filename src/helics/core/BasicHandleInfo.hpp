@@ -76,3 +76,4 @@ class BasicHandleInfo
     const std::string &type_out;  //!< the output type of a filter
 };
 }  // namespace helics
+

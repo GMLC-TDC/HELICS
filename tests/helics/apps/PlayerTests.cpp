@@ -523,3 +523,4 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
 }
 */
 BOOST_AUTO_TEST_SUITE_END ()
+

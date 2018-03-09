@@ -133,3 +133,4 @@ bool isCoreTypeAvailable (core_type type) noexcept
 }
 
 }  // namespace helics
+

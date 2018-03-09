@@ -1139,3 +1139,4 @@ BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_type
 }
 #endif
 BOOST_AUTO_TEST_SUITE_END ()
+

@@ -754,7 +754,7 @@ BasicHandleInfo *CommonCore::createBasicHandle (federate_id_t global_federateId,
     auto handle = handles.addHandle( global_federateId, HandleType, key, target, type_in, type_out);
     handle->local_fed_id = local_federateId;
     return handle;
-    
+
 }
 
 handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
@@ -773,7 +773,7 @@ handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
     {
         throw (InvalidFunctionCall ("subscriptions must be registered before calling enterInitializationMode"));
     }
-    
+
 
     auto handle=createBasicHandle ( fed->global_id, fed->local_id, HANDLE_SUB, key, type, units,
                        (check_mode == handle_check_mode::required));
@@ -857,12 +857,12 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
         throw (InvalidParameter ());
     }
     auto handle=createBasicHandle(fed->global_id, fed->local_id, HANDLE_PUB, key, type, units, false);
-    
+
     auto id = handle->id;
-    
+
     fed->createPublication (id, key, type, units);
 
-    
+
 
     ActionMessage m (CMD_REG_PUB);
     m.source_id = fed->global_id;
@@ -1048,7 +1048,7 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
     }
     lock.unlock();
     auto handle= createBasicHandle( fed->global_id, fed->local_id, HANDLE_END, name, type, "", false);
-    
+
     auto id = handle->id;
     fed->createEndpoint (id, name, type);
 
@@ -1175,7 +1175,7 @@ handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName
 
     auto filtInfo = createDestFilter (global_broker_id, id, handle->key, dest, type_in, type_out);
 
-    
+
 
     ActionMessage m (CMD_REG_DST_FILTER);
     m.source_id = global_broker_id;
@@ -1234,13 +1234,13 @@ FilterInfo *CommonCore::createSourceFilter (federate_id_t dest,
                                             const std::string &type_in,
                                             const std::string &type_out)
 {
-	
+
 
     auto filt =
       std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle,
                                     key,
                                     target, type_in, type_out, false);
-   
+
 	auto retTarget = filt.get();
 	std::lock_guard<std::mutex> lock(_handlemutex);
     if (filt->fed_id == global_broker_id)
@@ -1260,7 +1260,7 @@ FilterInfo *CommonCore::createSourceFilter (federate_id_t dest,
 		filters.insert(actualKey, { filt->fed_id,filt->handle }, std::move(filt));
 	}
 
-    
+
     return retTarget;
 }
 
@@ -1297,7 +1297,7 @@ void CommonCore::registerFrequentCommunicationsPair (const std::string & /*sourc
     // std::lock_guard<std::mutex> lock (_mutex);
 }
 
-void CommonCore::addDependency (federate_id_t federateID, const std::string & /*federateName*/) 
+void CommonCore::addDependency (federate_id_t federateID, const std::string & /*federateName*/)
 {
     auto fed = getFederate(federateID);
     if (fed == nullptr)
@@ -1402,7 +1402,7 @@ void CommonCore::deliverMessage (ActionMessage &message)
         // Find the destination endpoint
         auto localP = getLocalEndpoint (message.info ().target);
         if (localP == nullptr)
-        { 
+        {
             auto kfnd = knownExternalEndpoints.find(message.info().target);
             if (kfnd != knownExternalEndpoints.end())
             {  // destination is known
@@ -1429,17 +1429,17 @@ void CommonCore::deliverMessage (ActionMessage &message)
             {
                 message.moveInfo(std::move(tempMessage));
             }
-            
+
         }
         message.dest_id = localP->fed_id;
         message.dest_handle = localP->id;
-         
-        
+
+
         timeCoord->processTimeMessage(message);
 
         auto fed = getFederate(localP->fed_id);
         fed->addAction(std::move(message));
-        
+
     }
     break;
     case CMD_SEND_FOR_FILTER:
@@ -1908,7 +1908,7 @@ void CommonCore::transmitDelayedMessages (federate_id_t source)
             delayedTimingMessages[source].clear();
         }
     }
-    
+
 }
 
 void CommonCore::processCommand (ActionMessage &&command)
@@ -2351,7 +2351,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         {
             deliverMessage(command);
         }
-       
+
     break;
     default:
         if (isPriorityCommand (command))
@@ -2653,7 +2653,7 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
                 timeCoord->updateTimeFactors();
             }
         }
-        
+
     }
     else if (isDependencyCommand (cmd))
     {
@@ -2891,7 +2891,7 @@ void CommonCore::processFilterReturn(ActionMessage &cmd)
             transmitDelayedMessages(handle->local_fed_id);
         }
     }
-   
+
 }
 
 void CommonCore::processMessageFilter (ActionMessage &cmd)
@@ -2903,7 +2903,7 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
     else if (cmd.dest_id == global_broker_id)
     {
         // deal with local source filters
-        
+
         auto FiltI = filters.find (fed_handle_pair(global_broker_id, cmd.dest_handle));
         if (FiltI != nullptr)
         {
@@ -2946,7 +2946,7 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
                         return;
                     }
                     cmd.setAction (CMD_FILTER_RESULT);
-                    
+
                     cmd.source_handle = FiltI->handle;
                     cmd.source_id = global_broker_id;
                     deliverMessage (cmd);
@@ -2980,3 +2980,4 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
 
 
 }  // namespace helics
+

@@ -13,7 +13,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <iostream>
 
 int main (int argc, char *argv[])
-{ 
+{
     try
     {
         helics::apps::Player Player(argc, argv);
@@ -21,7 +21,7 @@ int main (int argc, char *argv[])
         {
             Player.run();
         }
-       
+
     }
     catch (const std::invalid_argument &ia)
     {
@@ -38,5 +38,6 @@ int main (int argc, char *argv[])
 
     helics::cleanupHelicsLibrary();
     return 0;
-   
+
 }
+

@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(remove_tests)
 	auto MV2 = std::move(Mvec);
 	BOOST_CHECK_EQUAL(MV2.size(), 2);
 
-	
+
 	auto MV3 = std::move(MV2);
 	BOOST_CHECK_EQUAL(MV3.size(), 2);
 
@@ -115,3 +115,4 @@ BOOST_AUTO_TEST_CASE(remove_tests)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+

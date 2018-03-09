@@ -52,7 +52,7 @@ class BrokerBase
     std::atomic<bool> haltOperations{false};  //!< flag indicating that no further message should be processed
   private:
     std::atomic<bool> mainLoopIsRunning{false};  //!< flag indicating that the main processing loop is running
-    bool dumplog = false; //!< flag indicating the broker should capture a dump log 
+    bool dumplog = false; //!< flag indicating the broker should capture a dump log
 
   protected:
     std::string logFile;  //< the file to log message to
@@ -153,3 +153,4 @@ class BrokerBase
 };
 
 }  // namespace helics
+

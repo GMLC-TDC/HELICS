@@ -128,3 +128,4 @@ def worker(name, fType):
     click.echo(s)
 
     vf.finalize()
+

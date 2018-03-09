@@ -141,3 +141,4 @@ class SearchableObjectHolder
     }
 };
 #endif /*HELICS_SEARCHABLE_OBJECT_HOLDER_HPP_*/
+

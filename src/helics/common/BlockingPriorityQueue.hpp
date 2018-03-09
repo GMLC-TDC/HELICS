@@ -426,3 +426,4 @@ bool BlockingPriorityQueue<T>::empty () const
     return queueEmptyFlag;
 }
 #endif /*HELICS_BLOCKING_PRIORITY_QUEUE_HPP_*/
+

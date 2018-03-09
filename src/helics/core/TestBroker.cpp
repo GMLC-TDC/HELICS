@@ -221,3 +221,4 @@ std::string TestBroker::getAddress () const { return getIdentifier (); }
 
 } // namespace testcore
 }  // namespace helics
+

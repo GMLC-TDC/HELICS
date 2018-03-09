@@ -647,3 +647,4 @@ class VectorSubscription2d
 };
 
 }  // namespace helics
+

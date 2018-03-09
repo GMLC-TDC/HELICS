@@ -29,3 +29,4 @@ class FilterCoordinator
     int ongoingTransactions = 0;  //!< counter for the number of filtered message returns expected
 };
 } // namespace helics
+

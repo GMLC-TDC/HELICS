@@ -111,3 +111,4 @@ class TcpComms final : public CommsInterface
 
 }  // namespace tcp
 }  // namespace helics
+

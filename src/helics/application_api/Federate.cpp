@@ -68,7 +68,7 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
             throw (RegistrationFailure("Unable to connect to broker->unable to register federate"));
         }
     }
-    
+
     // this call will throw an error on failure
     fedID = coreObject->registerFederate (fi.name, fi);
 
@@ -891,3 +891,4 @@ void Federate::setFilterOperator (const std::vector<filter_id_t> &filter_ids, st
 }
 
 }  // namespace helics
+

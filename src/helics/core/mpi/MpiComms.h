@@ -63,3 +63,4 @@ class MpiComms final : public CommsInterface
 
 } // namespace mpi
 }  // namespace helics
+

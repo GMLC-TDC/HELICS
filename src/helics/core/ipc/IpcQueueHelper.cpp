@@ -268,3 +268,4 @@ void sendToQueue::sendMessage (const ActionMessage &cmd, int priority)
 }
 }  // namespace ipc
 }  // namespace helics
+

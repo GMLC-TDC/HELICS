@@ -231,3 +231,4 @@ void Publication::publish (const defV &val) const
     }
 }
 }  // namespace helics
+

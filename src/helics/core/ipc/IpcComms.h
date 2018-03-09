@@ -40,3 +40,4 @@ class IpcComms final : public CommsInterface
 
 }  // namespace ipc
 }  // namespace helics
+

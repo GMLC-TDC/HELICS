@@ -522,3 +522,4 @@ std::ostream &operator<< (std::ostream &os, const ActionMessage &command)
     return os;
 }
 }  // namespace helics
+

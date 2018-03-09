@@ -44,3 +44,4 @@ template class CommsBroker<mpi::MpiComms, CoreBroker>;
 template class CommsBroker<mpi::MpiComms, CommonCore>;
 #endif
 }  // namespace helics
+

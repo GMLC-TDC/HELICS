@@ -108,3 +108,4 @@ FederateTestFixture::AddBroker (const std::string &core_type_name, const std::st
     brokers.push_back (broker);
     return broker;
 }
+

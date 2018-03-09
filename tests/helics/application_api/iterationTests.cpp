@@ -266,3 +266,4 @@ BOOST_AUTO_TEST_CASE (test_iteration_counter)
     }
 }
 BOOST_AUTO_TEST_SUITE_END ()
+

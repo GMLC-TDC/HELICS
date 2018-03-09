@@ -36,8 +36,8 @@ BOOST_AUTO_TEST_CASE (testcore_initialization_test)
     BOOST_CHECK (core->isInitialized ());
 
     core->connect ();
-    
-    
+
+
     BOOST_CHECK (core->isConnected ());
     core->disconnect ();
     broker->disconnect();
@@ -230,3 +230,4 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
+

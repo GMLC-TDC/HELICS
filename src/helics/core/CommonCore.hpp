@@ -348,3 +348,4 @@ class CommonCore : public Core, public BrokerBase
 };
 
 }  // namespace helics
+

@@ -90,7 +90,7 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
 
     bool update = (time_state!=tState);
     time_state = tState;
-    
+
     Time prev_next = time_next;
     time_next = minNext;
     //	printf("%d UDPATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
@@ -110,7 +110,7 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
         time_minminDe = minminDe;
         update = true;
     }
-    
+
     if (minFed != lastMinFed)
     {
         lastMinFed = minFed;
@@ -118,7 +118,7 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
         {
             update = true;
         }
-       
+
     }
     if (update)
     {
@@ -210,11 +210,11 @@ void ForwardingTimeCoordinator::sendTimeRequest () const
             setActionFlag(upd, iterationRequested);
         }
         sendMessageFunction(upd);
-        
+
         //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
         // static_cast<double>(time_exec), static_cast<double>(time_minDe));
     }
-    
+
 }
 
 std::string ForwardingTimeCoordinator::printTimeStatus () const
@@ -349,3 +349,4 @@ void ForwardingTimeCoordinator::processDependencyUpdateMessage (const ActionMess
 }
 
 }  // namespace helics
+

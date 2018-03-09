@@ -51,10 +51,10 @@ int main()
   if(isconnected) {
     printf("PI SENDER: Broker created and connected\n");
   }
-  
+
   /* Create Federate Info object that describes the federate properties */
   fedinfo = helicsFederateInfoCreate();
-  
+
   /* Set Federate name */
   helicsFederateInfoSetFederateName(fedinfo,"Test sender Federate");
 
@@ -91,7 +91,7 @@ int main()
   printf("PI SENDER: Entered execution mode\n");
 
   /* This federate will be publishing deltat*pi for numsteps steps */
-  
+
 
   for(i=0; i < numsteps; i++) {
     double val = currenttime*value;
@@ -118,3 +118,4 @@ int main()
   helicsCloseLibrary();
   return(0);
 }
+

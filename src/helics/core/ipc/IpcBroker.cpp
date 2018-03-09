@@ -122,3 +122,4 @@ std::string IpcBroker::getAddress() const
 
 } // namespace ipc
 }  // namespace helics
+

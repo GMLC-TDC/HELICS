@@ -103,3 +103,4 @@ std::string IpcCore::getAddress () const
 
 } // namespace ipc
 }  // namespace helics
+

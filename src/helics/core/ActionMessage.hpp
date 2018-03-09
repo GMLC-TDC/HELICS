@@ -299,3 +299,4 @@ std::ostream &operator<< (std::ostream &os, const ActionMessage &command);
 
 }  // namespace helics
 #endif
+

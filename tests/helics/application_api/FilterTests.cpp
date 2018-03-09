@@ -238,7 +238,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     fFed->requestTime (2.0);
     mFed->requestTimeComplete ();
     BOOST_REQUIRE (!mFed->hasMessage (p2));
-   
+
     std::this_thread::yield ();
     mFed->requestTime (3.0);
 
@@ -431,3 +431,4 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
 
 
 BOOST_AUTO_TEST_SUITE_END ()
+

@@ -32,3 +32,4 @@ coreBrokerTestFixture::~coreBrokerTestFixture () = default;
 commonCoreTestFixture::commonCoreTestFixture () = default;
 
 commonCoreTestFixture::~commonCoreTestFixture () = default;
+

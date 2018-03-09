@@ -370,7 +370,7 @@ HELICS_Export helics_status helicsPublicationGetUnits (helics_publication pub, c
 
 /**@}*/
 
-/** check if a particular subscription was updated 
+/** check if a particular subscription was updated
 @return true if it has been updated since the last value retrieval*/
 HELICS_Export helics_bool_t helicsSubscriptionIsUpdated (helics_subscription sub);
 /** get the last time a subscription was updated */
@@ -388,3 +388,4 @@ HELICS_Export int helicsFederateGetSubscriptionCount(helics_federate fed);
 #endif
 
 #endif /* HELICS_APISHARED_VALUE_FEDERATE_FUNCTIONS_H_*/
+

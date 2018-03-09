@@ -113,3 +113,4 @@ std::unique_ptr<Message> CloneOperator::process (std::unique_ptr<Message> messag
     return message;
 }
 }  // namespace helics
+

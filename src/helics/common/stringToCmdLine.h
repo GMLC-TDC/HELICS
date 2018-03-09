@@ -28,7 +28,7 @@ class StringToCmdLine
 public:
 	/** construct from a string*/
 	StringToCmdLine(const std::string &cmdString);
-	/** load a string 
+	/** load a string
 	@param cmdString a single string containing command line arguments
 	*/
 	void load(const std::string &cmdString);
@@ -42,7 +42,8 @@ private:
 	std::vector<std::string> stringCap; //!< the locations for the captured strings
 	std::vector<char *> stringPtrs; //!< vector of char * pointers matching stringCap
 	int argCount;	//!< the number of arguments
-	
+
 };
 
 #endif
+

@@ -280,7 +280,7 @@ void valueExtract (const defV &dv, std::vector<std::complex<double>> &val)
 
 void valueExtract(const defV &dv, named_point &val)
 {
-    
+
     switch (dv.which())
     {
     case doubleLoc:  // double
@@ -307,7 +307,7 @@ void valueExtract(const defV &dv, named_point &val)
         {
             val.second = std::hypot(vec[0], vec[1]);
         }
-        else 
+        else
         {
             val.second = (vec.empty())?0.0:(vec.front());
         }
@@ -511,3 +511,4 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::complex<dou
 }
 
 }  // namespace helics
+

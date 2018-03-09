@@ -637,3 +637,4 @@ helicsFederateRequestTimeIterativeComplete (helics_federate fed, helics_time_t *
     *timeOut = static_cast<double> (val.grantedTime);
     return helics_ok;
 }
+

@@ -249,3 +249,4 @@ FederateInfo loadFederateInfo (const std::string &jsonString)
     return fi;
 }
 }  // namespace helics
+

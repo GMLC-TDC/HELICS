@@ -11,3 +11,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 
     worker('test1', 'pub')
+

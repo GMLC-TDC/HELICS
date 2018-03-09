@@ -202,3 +202,4 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     std::unique_ptr<MessageFederateManager> mfManager;
 };
 }  // namespace helics
+

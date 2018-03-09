@@ -205,3 +205,4 @@ void serviceRunLoop (std::shared_ptr<AsioServiceManager> ptr)
     // std::cout << "service loop stopped\n";
     ptr->running.store (false);
 }
+

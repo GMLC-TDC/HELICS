@@ -400,3 +400,4 @@ make_source_filter (defined_filter_types type, Federate *fed, const std::string 
 }
 
 }  // namespace helics
+

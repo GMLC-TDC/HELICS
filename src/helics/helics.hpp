@@ -22,3 +22,4 @@ Header file for inclusion of the entire CPP static library
 #include "application_api/Subscriptions.hpp"
 
 #endif /*HELICS_APPLICATION_API_HEADER_*/
+

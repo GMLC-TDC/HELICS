@@ -27,14 +27,14 @@ BOOST_AUTO_TEST_CASE(simple_times)
     Time time2(5, timeUnits::sec);
     Time time3(5000, timeUnits::ms);
     BOOST_CHECK_EQUAL(time2, time3);
-    
+
     BOOST_CHECK_EQUAL(time2.toCount(timeUnits::s), 5);
     BOOST_CHECK_EQUAL(time2.toCount(timeUnits::ms), 5000);
     BOOST_CHECK_EQUAL(time2.toCount(timeUnits::us), 5'000'000);
     BOOST_CHECK_EQUAL(time2.toCount(timeUnits::ns), 5'000'000'000);
     BOOST_CHECK_EQUAL(time2.toCount(timeUnits::ps), 5'000'000'000'000);
     BOOST_CHECK_EQUAL(time2.toCount(timeUnits::minutes), 0);
-    
+
     time3 = 5.01;
     BOOST_CHECK_NE(time2, time3);
 
@@ -68,14 +68,14 @@ BOOST_AUTO_TEST_CASE(test_baseConversion)
     time4.setBaseTimeCode(cnt);
 
     BOOST_CHECK_EQUAL(time3, time4);
-    
+
 }
 
 BOOST_AUTO_TEST_CASE(test_math)
 {
     Time time1(4.3);
     Time time2(2.7);
-    
+
     BOOST_CHECK_EQUAL(time1 + time2, Time(7.0));
     BOOST_CHECK_EQUAL(time1 + 1.7, Time(6.0));
 
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(test_math)
     BOOST_CHECK_EQUAL(time1, Time(7.0));
     time1 -= time2;
     BOOST_CHECK_EQUAL(time1, Time(4.3));
-    
+
     auto time3 = Time(1.0);
     time3 *= 4;
     BOOST_CHECK_EQUAL(time3, Time(4.0));
@@ -181,3 +181,4 @@ BOOST_AUTO_TEST_CASE(test_string_conversions)
     BOOST_CHECK_THROW(loadTimeFromString("happy"), std::invalid_argument);
 }
 BOOST_AUTO_TEST_SUITE_END()
+
