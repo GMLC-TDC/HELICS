@@ -293,7 +293,7 @@ std::shared_ptr<FilterOperator> RandomDropFilterOperation::getOperator ()
 RerouteFilterOperation::RerouteFilterOperation ()
 {
     op =
-      std::make_shared<MessageDestOperator> ([this](const std::string &src, const std::string &dest) { return rerouteOperation (dest); });
+      std::make_shared<MessageDestOperator> ([this](const std::string &src, const std::string &dest) { return rerouteOperation (src, dest); });
 }
 
 RerouteFilterOperation::~RerouteFilterOperation () = default;
@@ -329,7 +329,7 @@ std::shared_ptr<FilterOperator> RerouteFilterOperation::getOperator ()
     return std::static_pointer_cast<FilterOperator> (op);
 }
 
-std::string RerouteFilterOperation::rerouteOperation (const std::string &dest) const
+std::string RerouteFilterOperation::rerouteOperation ( const std::string & /*src*/, const std::string &dest) const
 {
     auto cond = conditions.lock_shared ();
     if (cond->empty ())

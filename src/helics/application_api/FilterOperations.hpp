@@ -114,7 +114,7 @@ class RerouteFilterOperation : public FilterOperations
 
     private:
         /** function to execute the rerouting operation*/
-    std::string rerouteOperation (const std::string &dest) const;
+    std::string rerouteOperation (const std::string &src, const std::string &dest) const;
 };
 
 /** filter for rerouting a packet to a particular endpoint*/
