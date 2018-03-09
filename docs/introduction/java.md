@@ -17,7 +17,7 @@ public class HelloWorld {
 }
 ```
 
-Run the following to compile all Java classes.
+Run the following to compile all Java classes. You will first have to create a `com/java/helics` folder relative to the source folder, and place all the swig generated java files in that folder.
 
 ```bash
 javac com/java/helics/helics.java
