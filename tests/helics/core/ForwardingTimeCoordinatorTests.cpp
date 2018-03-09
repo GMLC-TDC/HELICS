@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(execMode_entry)
     //iteration_state
     auto ret=ftc.checkExecEntry();
     BOOST_CHECK(ret == iteration_state::continue_processing);
-    
+
     ActionMessage execReady(CMD_EXEC_REQUEST);
     execReady.source_id = 2;
     auto modified=ftc.processTimeMessage(execReady);
@@ -226,3 +226,4 @@ BOOST_AUTO_TEST_CASE(timing_test1)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+

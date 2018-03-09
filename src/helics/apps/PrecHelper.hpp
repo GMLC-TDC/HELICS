@@ -17,3 +17,4 @@ class FederateInfo;
 helics::helics_type_t getType (const std::string &typeString);
 
 char typeCharacter (helics::helics_type_t type);
+

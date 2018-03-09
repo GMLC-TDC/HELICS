@@ -31,7 +31,7 @@ public:
     AirLock() = default;
     /** destructor*/
     ~AirLock() = default;
-    /** try to load the airlock 
+    /** try to load the airlock
     @return true if successful, false if not*/
     template <class Z>
     bool try_load(Z &&val)
@@ -48,7 +48,7 @@ public:
         }
         return false;
     }
-    /** load the airlock,  
+    /** load the airlock,
     @details the call will block until the airlock is ready to be loaded
     */
     template <class Z>
@@ -69,10 +69,10 @@ public:
             data = std::forward<Z>(val);
             loaded = true;
         }
-        
+
     }
 
-    /** unload the airlock, 
+    /** unload the airlock,
     @return the value is returned in an optional which needs to be checked if it contains a value
     */
     stx::optional<T> try_unload()
@@ -102,3 +102,4 @@ private:
     std::condition_variable condition;  //!< condition variable for notification of new data
 
 };
+

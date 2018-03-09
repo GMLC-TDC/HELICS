@@ -64,3 +64,4 @@ void CombinationFederate::registerInterfaces (const std::string &jsonString)
     Federate::registerFilterInterfaces (jsonString);
 }
 }  // namespace helics
+

@@ -290,3 +290,4 @@ void displayHelp (core_type type)
 
 }  // namespace BrokerFactory
 }  // namespace helics
+

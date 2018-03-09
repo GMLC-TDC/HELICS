@@ -66,14 +66,14 @@ namespace helics
         CoreObject() = default;
         ~CoreObject();
 	};
-	
-    
+
+
 
 
     class SubscriptionObject;
     class PublicationObject;
     class EndpointObject;
-   
+
 
 	/** object wrapping a federate for the c-api*/
 	class FedObject
@@ -152,7 +152,7 @@ namespace helics
         query_id_t asyncIndexCode=invalid_id_value;  //!< the index to use for the queryComplete call
         bool activeAsync = false;
         int valid;
-        
+
 	};
 }
 
@@ -190,3 +190,4 @@ std::shared_ptr<MasterObjectHolder> getMasterHolder();
 void clearAllObjects();
 
 #endif
+

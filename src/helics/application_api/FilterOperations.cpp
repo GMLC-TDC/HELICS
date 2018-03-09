@@ -400,3 +400,4 @@ void CloneFilterOperation::sendMessage (const Message *mess) const
     }
 }
 }  // namespace helics
+

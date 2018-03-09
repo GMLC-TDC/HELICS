@@ -701,3 +701,4 @@ int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
 }
 }  // namespace apps
 } // namespace helics
+

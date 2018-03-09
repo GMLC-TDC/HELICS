@@ -54,3 +54,4 @@ void StringToCmdLine::load (const std::string &cmdString)
     }
     stringPtrs[0] = &(nullstr[0]);
 }
+

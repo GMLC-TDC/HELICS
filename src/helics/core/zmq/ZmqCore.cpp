@@ -71,3 +71,4 @@ std::string ZmqCore::getAddress () const
 
 } // namespace zeromq
 }  // namespace helics
+

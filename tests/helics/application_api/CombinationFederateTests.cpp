@@ -292,3 +292,4 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     cFed.disconnect ();
 }
 BOOST_AUTO_TEST_SUITE_END ()
+

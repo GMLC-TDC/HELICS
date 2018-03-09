@@ -337,3 +337,4 @@ void runDualFederateTestObj(const std::string &core_type_str,
     fedB->finalize();
     helics::cleanupHelicsLibrary();
 }
+

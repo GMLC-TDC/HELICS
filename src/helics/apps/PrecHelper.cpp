@@ -73,7 +73,7 @@ helics_type_t getType (const std::string &typeString)
     std::transform (tstr.begin (), tstr.end (), tstr.begin (), ::tolower);
 
     return getTypeFromString(tstr);
-   
+
 }
 
 

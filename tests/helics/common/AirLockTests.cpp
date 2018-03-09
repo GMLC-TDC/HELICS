@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(move_only_tests)
 
     auto b = alock.try_unload();
     BOOST_CHECK_EQUAL(**b, 4534.23);
-   
+
     b = alock.try_unload();
     BOOST_CHECK(!(b));
     BOOST_CHECK(!alock.isLoaded());
@@ -91,3 +91,4 @@ BOOST_AUTO_TEST_CASE(move_mthread_tests)
 
 
 BOOST_AUTO_TEST_SUITE_END()
+

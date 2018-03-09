@@ -66,11 +66,11 @@ int main(int /*argc*/,char ** /*argv*/)
   printf("PI RECEIVER: Entered execution state\n");
 
   helics_time_t currenttime=0.0;
- 
+
   double pi = 22.0/7.0;
 
   while(currenttime < 0.2) {
-    
+
     bool isupdated = false;
     while(!isupdated) {
       currenttime = vfed->requestTime(currenttime);
@@ -98,3 +98,4 @@ int main(int /*argc*/,char ** /*argv*/)
   fflush(NULL);
   return(0);
 }
+

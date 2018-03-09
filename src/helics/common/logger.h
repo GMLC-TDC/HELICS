@@ -79,7 +79,7 @@ namespace helics
         void processingLoop();
     };
 
-/** class implementing a thread safe Logger 
+/** class implementing a thread safe Logger
 @details the Logger uses a queuing mechanism and condition variable to store messages to a queue and print/display them
 in a single thread allowing for asynchronous logging
 */
@@ -209,7 +209,7 @@ public:
     static void closeLogger(const std::string &loggerName = "");
    /** sends a message to the default Logger*/
     static void logMessage(const std::string &message);
-    
+
     /*destructor*/
     virtual ~LoggerManager();
     /** get the name of the logger*/
@@ -222,3 +222,4 @@ public:
 };
 }//namespace helics
 #endif
+

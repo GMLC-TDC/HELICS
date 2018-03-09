@@ -476,3 +476,4 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests_perf_bq)
 
 #endif
 BOOST_AUTO_TEST_SUITE_END ()
+

@@ -127,3 +127,4 @@ size_t BlockingQueue_old<T>::size() const {
 }  // namespace helics
 
 #endif
+

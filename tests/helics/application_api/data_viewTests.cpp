@@ -128,3 +128,4 @@ BOOST_AUTO_TEST_CASE (data_view_shared_ptr)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
+

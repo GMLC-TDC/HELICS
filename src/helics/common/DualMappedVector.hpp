@@ -198,7 +198,7 @@ public:
 				lookup1.erase(fnd1);
 			}
 		}
-		
+
 		for (auto &ind : ind2)
 		{
 			auto fnd2 = lookup2.find(ind);
@@ -269,5 +269,4 @@ private:
     std::conditional_t<is_easily_hashable<searchType1>::value, std::unordered_map<searchType1, size_t>, std::map<searchType1, size_t>> lookup1;	//!< map to lookup the index
     std::conditional_t<is_easily_hashable<searchType2>::value, std::unordered_map<searchType2, size_t>, std::map<searchType2, size_t>> lookup2;	//!< map to lookup the index
 };
-
 

@@ -138,3 +138,4 @@ inline void swap (helics::data_view &db1, helics::data_view &db2) noexcept
     db1.swap (db2);
 }
 }  // namespace helics
+

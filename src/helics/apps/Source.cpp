@@ -99,9 +99,9 @@ void Source::loadFile (const std::string &jsonFile)
   //  }
 
     auto doc = loadJsonString(jsonFile);
-   
 
-   
+
+
 
 }
 
@@ -123,19 +123,19 @@ void Source::run (Time stopTime_input)
     if (state != Federate::op_states::execution)
     {
         // send stuff before timeZero
-      
+
 
 
         fed->enterExecutionState ();
         // send the stuff at timeZero
-      
-       
+
+
     }
     else
     {
 //        auto ctime = fed->getCurrentTime ();
-      
-        
+
+
     }
 
     helics::Time nextPrintTime = 10.0;
@@ -144,7 +144,7 @@ void Source::run (Time stopTime_input)
     while (moreToSend)
     {
         nextSendTime = Time::maxVal ();
-       
+
         if (nextSendTime > stopTime_input)
         {
             break;
@@ -155,7 +155,7 @@ void Source::run (Time stopTime_input)
             continue;
         }
         auto newTime = fed->requestTime (nextSendTime);
-        
+
         if (newTime >= nextPrintTime)
         {
             std::cout << "processed time " << static_cast<double> (newTime) << "\n";
@@ -203,3 +203,4 @@ int Source::loadArguments (boost::program_options::variables_map &vm_map)
 
 }  // namespace apps
 } // namespace helics
+

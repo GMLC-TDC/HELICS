@@ -51,3 +51,4 @@ class FilterInfo
       invalid_fed_id, invalid_handle};  //!< the actual target information for the filter
 };
 }  // namespace helics
+

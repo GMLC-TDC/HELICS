@@ -29,3 +29,4 @@ namespace zmq
 
 zmq::socket_type socketTypeFromString(const std::string &socketType);
 #endif
+

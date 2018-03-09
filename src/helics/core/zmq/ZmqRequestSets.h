@@ -80,3 +80,4 @@ private:
 }  // namespace helics
 
 #endif
+

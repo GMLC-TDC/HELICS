@@ -192,3 +192,4 @@ std::string TestCore::getAddress () const { return getIdentifier (); }
 
 } // namespace testcore
 }  // namespace helics
+

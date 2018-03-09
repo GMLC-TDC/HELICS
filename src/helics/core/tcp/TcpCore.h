@@ -37,3 +37,4 @@ class TcpCore final : public CommsBroker<TcpComms, CommonCore>
 
 }  // namespace tcp
 }  // namespace helics
+

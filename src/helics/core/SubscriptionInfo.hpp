@@ -59,3 +59,4 @@ class SubscriptionInfo
     Time nextValueTime () const;
 };
 }  // namespace helics
+

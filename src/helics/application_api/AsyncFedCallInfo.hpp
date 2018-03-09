@@ -29,3 +29,4 @@ class AsyncFedCallInfo
       inFlightQueries;  //!< the queries that are actually in flight at a given time
 };
 }  // namespace helics
+

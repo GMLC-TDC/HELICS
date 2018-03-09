@@ -166,3 +166,4 @@ std::future<std::string> exeTestRunner::runCaptureOutputAsync (const std::string
         return str;
     });
 }
+

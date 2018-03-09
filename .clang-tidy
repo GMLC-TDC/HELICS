@@ -3,7 +3,7 @@ Checks:         '*,-llvm-include-order,-llvm-header-guard,-readability-redundant
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
-CheckOptions:    
+CheckOptions:
   - key:             cert-dcl59-cpp.HeaderFileExtensions
     value:           h,hh,hpp,hxx
   - key:             cert-err61-cpp.CheckThrowTemporaries
@@ -366,3 +366,4 @@ CheckOptions:
     value:           '0'
   - key:             readability-simplify-boolean-expr.ChainedConditionalReturn
     value:           '0'
+

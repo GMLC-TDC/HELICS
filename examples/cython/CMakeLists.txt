@@ -32,3 +32,4 @@ if (PYTHON)
 
     install(CODE "execute_process(COMMAND ${PYTHON} ${SETUP_PY} build_ext install)")
 endif()
+

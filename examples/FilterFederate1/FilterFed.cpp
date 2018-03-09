@@ -43,7 +43,7 @@ int main (int argc, char *argv[])
         targetEndpoint = vm["endpoint"].as<std::string>();
     }
     std::string target = targetfederate + "/" + targetEndpoint;
-    
+
     std::string filtType = "delay";
     if (vm.count("filtertype") > 0) {
         targetEndpoint = vm["filtertype"].as<std::string>();
@@ -63,14 +63,14 @@ int main (int argc, char *argv[])
         std::cerr << "invalid filter type specified valid types are \"delay\",\"random drop\",\"random delay\"\n";
         return (-2);
     }
-    
-   
+
+
     auto core = helics::CoreFactory::create(argc, argv);
 	std::cout << " registering filter '"<< "' for " << target<<'\n';
 
     //create a source filter object with type, the fed pointer and a target endpoint
     auto filt = helics::make_source_filter(ftype, core.get(), target);
-    
+
     // get a few specific parameters related to the particular filter
     switch (ftype)
     {
@@ -103,7 +103,7 @@ int main (int argc, char *argv[])
     /*setup and run
     */
     core->setCoreReadyToInit();
-    
+
     //just do a wait loop while the core is still processing so the filters have time to work
     while (core->isConnected())
     {
@@ -111,3 +111,4 @@ int main (int argc, char *argv[])
     }
     return 0;
 }
+

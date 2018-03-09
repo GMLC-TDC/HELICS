@@ -536,3 +536,4 @@ void getValue (ValueFederate &fed, const std::string &Key, X &obj)
     obj=fed.getValue<X> (fed.getSubscriptionId (Key));
 }
 }  // namespace helics
+

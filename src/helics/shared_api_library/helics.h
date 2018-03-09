@@ -552,3 +552,4 @@ HELICS_Export void helicsCleanupHelicsLibrary ();
 #endif
 
 #endif
+

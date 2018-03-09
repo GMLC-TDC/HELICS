@@ -51,3 +51,4 @@ class PublicationInfo
     bool CheckSetValue (const char *checkData, uint64_t len);
 };
 } // namespace helics
+

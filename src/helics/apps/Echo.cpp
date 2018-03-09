@@ -50,7 +50,7 @@ Echo::Echo (int argc, char *argv[])
     FederateInfo fi ("echo");
     fi.loadInfoFromArgs (argc, argv);
     fed = std::make_shared<MessageFederate> (fi);
-    
+
     loadArguments (vm_map);
 }
 
@@ -114,9 +114,9 @@ void Echo::run (Time stopTime_input)
     }
     if (state < Federate::op_states::execution)
     {
-     
+
         fed->enterExecutionState ();
-        
+
     }
     else if (state == Federate::op_states::finalize)
     {
@@ -249,3 +249,4 @@ void Echo::loadJsonFile(const std::string &jsonFile)
 
 }  // namespace apps
 } // namespace helics
+

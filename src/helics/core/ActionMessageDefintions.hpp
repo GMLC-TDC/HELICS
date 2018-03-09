@@ -231,3 +231,4 @@ inline bool hasInfo (action_message_def::action_t action)
 const char *actionMessageType (action_message_def::action_t action);
 
 }  // namespace helics
+

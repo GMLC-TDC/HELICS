@@ -45,3 +45,4 @@ extensions = [Extension("helics",
 setup(name='helics', version='${PYHELICS_PACKAGE_VERSION}', ext_modules=cythonize(
     extensions, gdb_debug=True
 ))
+

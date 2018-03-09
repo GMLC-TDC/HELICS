@@ -51,10 +51,10 @@ int main()
   if(isconnected) {
     printf("PI SENDER: Broker created and connected\n");
   }
-  
+
   /* Create Federate Info object that describes the federate properties */
   fedinfo = helicsFederateInfoCreate();
-  
+
   /* Set Federate name */
   helicsFederateInfoSetFederateName(fedinfo,"TestA Federate");
 
@@ -107,7 +107,7 @@ int main()
       helicsFederateRequestTime(vfed,currenttime, &currenttime);
       isupdated = helicsSubscriptionIsUpdated(sub);
     }
-     
+
     /* NOTE: The value sent by sender at time t is received by receiver at time t+deltat */
     helicsSubscriptionGetDouble(sub,&value); /* Note: The receiver sent this at currenttime-deltat */
     printf("PI SENDER: Received value = %4.3f at time %3.2f from PI RECEIVER\n",value,currenttime);
@@ -131,3 +131,4 @@ int main()
   fflush(NULL);
   return(0);
 }
+

@@ -103,3 +103,4 @@ bool isCoreTypeAvailable (core_type type) noexcept;
 
 #define PUBLICATION_REQUIRED helics::handle_check_mode::required
 #define PUBLICATION_OPTIONAL helics::handle_check_mode::optional
+

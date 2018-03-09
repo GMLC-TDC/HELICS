@@ -232,3 +232,4 @@ std::unique_ptr<SourceFilter> make_source_filter (defined_filter_types type,
                                                   const std::string &name = EMPTY_STRING);
 
 }  // namespace helics
+

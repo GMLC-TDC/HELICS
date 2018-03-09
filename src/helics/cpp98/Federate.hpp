@@ -142,7 +142,7 @@ class InvalidParameterValue : public std::runtime_error
 };
 
 
-typedef struct 
+typedef struct
 {
 public:
     helics_time_t grantedTime; //!< the time of the granted step
@@ -305,3 +305,4 @@ class Federate
 
 } //namespace helics
 #endif
+

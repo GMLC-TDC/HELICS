@@ -13,3 +13,4 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_AUTO_TEST_SUITE (multi_player_tests)
 
 BOOST_AUTO_TEST_SUITE_END ()
+

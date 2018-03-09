@@ -42,3 +42,4 @@ private:
 };
 } // namespace ipc
 }  // namespace helics
+

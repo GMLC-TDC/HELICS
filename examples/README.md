@@ -25,3 +25,4 @@ cd /path/to/helics_install/bin
 ```
 
 This will run a 24 second (simulation time) co-simulation between a "player" federate that reads data from a file and a "recorder" federate that records selected data to a file (output.log).
+

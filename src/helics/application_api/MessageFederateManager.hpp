@@ -157,3 +157,4 @@ class MessageFederateManager
     void removeOrderedMessage (unsigned int index);
 };
 }  // namespace helics
+

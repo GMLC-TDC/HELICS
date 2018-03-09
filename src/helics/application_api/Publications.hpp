@@ -86,7 +86,7 @@ class PublicationBase
     const std::string &getUnits () const { return units_; }
 };
 
-/** class wrapping the calls for a publication in an object so identifiers and pointers do not 
+/** class wrapping the calls for a publication in an object so identifiers and pointers do not
 need to be used for every call
 */
 class Publication : public PublicationBase
@@ -169,7 +169,7 @@ class Publication : public PublicationBase
         }
     }
     /** if set to false, the change detection mechanisms are not enabled
-    if set to true the values will be published if there is sufficient change as specified in 
+    if set to true the values will be published if there is sufficient change as specified in
     the call to setMinimumChange
     */
     void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
@@ -289,3 +289,4 @@ class PublicationOnChange : public PublicationT<X>
     }
 };
 }  // namespace helics
+

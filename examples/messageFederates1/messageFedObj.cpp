@@ -53,7 +53,7 @@ int main (int argc, char *argv[])
     {
         brk = helics::BrokerFactory::create(fi.coreType, vm["startbroker"].as<std::string>());
     }
-	
+
     auto mFed = std::make_unique<helics::MessageFederate> (fi);
     auto name = mFed->getName();
 	std::cout << " registering endpoint '" << myendpoint << "' for " << name<<'\n';
@@ -80,7 +80,7 @@ int main (int argc, char *argv[])
 			auto nmessage = endpoint.getMessage();
 			std::cout << "received message from " << nmessage->source << " at " << static_cast<double>(nmessage->time) << " ::" << nmessage->data.to_string() << '\n';
 		}
-        
+
     }
     mFed->finalize ();
     if (brk)
@@ -93,3 +93,4 @@ int main (int argc, char *argv[])
     }
     return 0;
 }
+

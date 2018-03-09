@@ -182,7 +182,7 @@ class ValueFederateManager
     int getSubscriptionCount () const;
 
 	private:
-		DualMappedVector<subscription_info,std::string,Core::handle_id_t> subscriptions; 
+		DualMappedVector<subscription_info,std::string,Core::handle_id_t> subscriptions;
 		MappedVector<publication_info> publications;
         std::atomic<publication_id_t::underlyingType> publicationCount{ 0 };  //!< the count of actual endpoints
     std::vector<std::function<void(subscription_id_t, Time)>> callbacks;  //!< the all callback function
@@ -200,3 +200,4 @@ class ValueFederateManager
 };
 
 }  // namespace helics
+

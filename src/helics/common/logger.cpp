@@ -346,3 +346,4 @@ LoggerManager::LoggerManager (const std::string &loggerName) : name (loggerName)
     loggingControl = std::make_shared<LoggingCore> ();
 }
 }  // namespace helics
+

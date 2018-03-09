@@ -59,7 +59,7 @@ void MpiComms::queue_rx_function ()
     rx_status = connection_status::connected;
 
     while (true)
-    { 
+    {
         auto M = rxMessageQueue.try_pop ();
 
         if (M)
@@ -84,7 +84,7 @@ void MpiComms::queue_rx_function ()
                 goto CLOSE_RX_LOOP;
             }
         }
-        
+
         if (shutdown)
         {
             goto CLOSE_RX_LOOP;
@@ -194,3 +194,4 @@ void MpiComms::closeReceiver() {
 }
 } // namespace mpi
 }  // namespace helics
+

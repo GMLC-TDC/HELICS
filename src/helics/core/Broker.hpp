@@ -54,3 +54,4 @@ class Broker
     virtual std::string getAddress () const = 0;
 };
 }  // namespace helics
+

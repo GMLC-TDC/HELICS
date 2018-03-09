@@ -13,3 +13,4 @@ namespace helics
 {
 const char * versionString = HELICS_VERSION_STRING;
 }
+

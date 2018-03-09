@@ -66,3 +66,4 @@ if(BUILD_C_SHARED_LIB)
             "$<TARGET_FILE_DIR:shared-library-tests>/")                 # <--this is out-file path
 endif()
 endif(WIN32)
+

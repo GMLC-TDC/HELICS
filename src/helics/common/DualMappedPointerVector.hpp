@@ -121,7 +121,7 @@ public:
 	VType *operator[] (size_t index) { return(index<dataStorage.size()) ? (dataStorage[index].get()) : nullptr; }
 
 	const VType *operator[] (size_t index) const { return(index<dataStorage.size()) ? (dataStorage[index].get()) : nullptr; }
-	
+
 	/** get a pointer to the last element inserted*/
 	VType *back() { return dataStorage.back().get(); }
 	/** remove an element at a specific index

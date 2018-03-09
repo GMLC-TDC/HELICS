@@ -70,3 +70,4 @@ socket_type socketTypeFromString (const std::string &socketType)
     assert (false);  // NEED to make this a throw operation instead once exceptions are integrated
     return socket_type::req;
 }
+

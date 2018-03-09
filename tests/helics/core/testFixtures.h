@@ -37,3 +37,4 @@ struct commonCoreTestFixture
 
     std::unique_ptr<helics::CommonCore> core;
 };
+

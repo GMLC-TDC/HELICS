@@ -40,7 +40,7 @@ publication_id_t ValueFederateManager::registerPublication (const std::string &k
 {
     auto sz = getTypeSize (type);
 	auto coreID = coreObject->registerPublication(fedID, key, type, units);
-   
+
     std::lock_guard<std::mutex> publock (publication_mutex);
     publication_id_t id = static_cast<identifier_type> (publications.size ());
     ++publicationCount;
@@ -372,3 +372,4 @@ void ValueFederateManager::registerCallback (const std::vector<subscription_id_t
     }
 }
 }  // namespace helics
+

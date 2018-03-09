@@ -36,7 +36,7 @@ set_target_properties (pi_sender PROPERTIES
 
 set_target_properties (pi_sender2 PROPERTIES
     FOLDER examples)
-	
+
 set_target_properties (pi_receiver PROPERTIES
     FOLDER examples)
 
@@ -51,7 +51,7 @@ set_target_properties (nonlings_fed2 PROPERTIES
 
 set_target_properties (hello_world_sender PROPERTIES
     FOLDER examples)
-	
+
 set_target_properties (hello_world_receiver PROPERTIES
     FOLDER examples)
 
@@ -84,3 +84,4 @@ add_custom_command(TARGET pi_sender POST_BUILD        # Adds a post-build event 
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
         "$<TARGET_FILE_DIR:pi_sender>/")                 # <--this is out-file path
+

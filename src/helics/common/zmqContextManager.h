@@ -37,9 +37,9 @@ private:
 	static std::map<std::string, std::shared_ptr<zmqContextManager>> contexts; //!< container for pointers to all the available contexts
 	std::string name;  //!< context name
 	std::unique_ptr<zmq::context_t> zcontext; //!< pointer to the actual context
-    std::atomic<bool> leakOnDelete{ false }; //!< this is done to prevent some warning messages for use in DLL's  
+    std::atomic<bool> leakOnDelete{ false }; //!< this is done to prevent some warning messages for use in DLL's
 	zmqContextManager(const std::string &contextName);
-	
+
 public:
 	static std::shared_ptr<zmqContextManager> getContextPointer(const std::string &contextName=std::string());
 
@@ -69,3 +69,4 @@ public:
 };
 
 #endif
+

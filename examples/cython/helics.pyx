@@ -178,4 +178,3 @@ cdef class PyValueFederate(object):
             i = deref(self.vFed).requestTime(nextInternalTimeStep)
         return i
 
-

@@ -70,3 +70,4 @@ void zmqSocketDescriptor::modifySocket (zmq::socket_t &sock) const
         }
     }
 }
+

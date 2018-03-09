@@ -65,3 +65,4 @@ setup(
     ext_modules=[helics_module],
     py_modules=["helics"],
 )
+

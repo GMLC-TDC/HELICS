@@ -146,3 +146,4 @@ class DelayedDestructor
         ElementsToBeDestroyed.push_back (obj);
     }
 };
+

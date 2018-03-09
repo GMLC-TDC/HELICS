@@ -35,7 +35,7 @@ public:
 	static void displayHelp(bool local_only = false);
 private:
 	virtual bool brokerConnect() override;
-	
+
     NetworkBrokerData netInfo{ NetworkBrokerData::interface_type::tcp }; //!< container for the network connection information
 
 };
@@ -43,3 +43,4 @@ private:
 } // namespace zeromq
 } // namespace helics
 #endif
+

@@ -143,3 +143,4 @@ class sendToQueue
 };
 }  // namespace ipc
 }  // namespace helics
+

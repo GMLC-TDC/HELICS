@@ -90,3 +90,4 @@ int main (int, char **)
 }
 
 void sendPublication (helics::ValueFederate &vFed, ValueSetter const &vs) { vFed.publish (vs.id_, vs.value_); }
+

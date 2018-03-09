@@ -82,7 +82,7 @@ int main(int /*argc*/,char ** /*argv*/)
     while(!newt_conv && iter < max_iter) {
       /* Function value */
       double f2 = x*x + 4*y*y - 4;
-      
+
       if(fabs(f2) < tol) {
 	newt_conv = 1;
 	break;
@@ -91,12 +91,12 @@ int main(int /*argc*/,char ** /*argv*/)
 
       /* Jacobian */
       double J2 = 8*y;
-      
+
       y = y - f2/J2;
     }
     printf("Fed2 iteration %d y=%f, x=%f\n",helics_iter,y,x);
 
-   
+
     if ((fabs(y-yprv)>tol)||(helics_iter<5))
     {
       vfed->publish(pub,y);
@@ -118,3 +118,4 @@ int main(int /*argc*/,char ** /*argv*/)
   return(0);
 
 }
+

@@ -266,3 +266,4 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests3)
 
 #endif
 BOOST_AUTO_TEST_SUITE_END ()
+

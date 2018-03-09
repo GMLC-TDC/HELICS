@@ -41,3 +41,4 @@ class IpcCore final : public CommsBroker<IpcComms, CommonCore>
 
 }  // namespace ipc
 }  // namespace helics
+

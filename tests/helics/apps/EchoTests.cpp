@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE(echo_test_fileload)
     helics::apps::Echo echo1(fi);
     echo1.loadFile(std::string(TEST_DIR) + "/test_files/echo_example.json");
     fi.name = "source";
-   
+
     helics::MessageFederate mfed(fi);
     helics::Endpoint ep1(&mfed, "src");
     auto fut = std::async(std::launch::async, [&echo1]() { echo1.run(5.0); });
@@ -187,3 +187,4 @@ BOOST_AUTO_TEST_CASE(echo_test_fileload)
 
 
 BOOST_AUTO_TEST_SUITE_END()
+

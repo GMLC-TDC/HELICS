@@ -50,7 +50,7 @@ include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
 INSTALL(TARGETS helics_apps-static EXPORT helics-targets
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-	
+
 if (BUILD_PLAYER)
 INSTALL(TARGETS helics_player DESTINATION ${CMAKE_INSTALL_BINDIR})
 
@@ -86,5 +86,4 @@ add_custom_command(TARGET helics_app POST_BUILD        # Adds a post-build event
 endforeach(keyfile)
 endif()
 endif()
-
 

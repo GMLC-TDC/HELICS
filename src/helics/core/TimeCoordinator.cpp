@@ -50,7 +50,7 @@ void TimeCoordinator::timeRequest (Time nextTime,
                                    Time newMessageTime)
 {
     iterating = (iterate != helics_iteration_request::no_iterations);
-    
+
     if (nextTime <= getNextPossibleTime())
     {
         nextTime = getNextPossibleTime();
@@ -59,7 +59,7 @@ void TimeCoordinator::timeRequest (Time nextTime,
     time_value = newValueTime;
     time_message = newMessageTime;
     updateTimeFactors();
-   
+
     if (!dependents.empty ())
     {
         sendTimeRequest();
@@ -260,13 +260,13 @@ bool TimeCoordinator::updateTimeFactors ()
             //therefore it can't be used to determine a time grant
             minminDe = -1;
         }
-        
+
         if (dep.Te < minDe)
         {
             minDe = dep.Te;
         }
     }
-    
+
     bool update = false;
     time_minminDe = std::min (minDe, minminDe);
     Time prev_next = time_next;
@@ -358,7 +358,7 @@ void TimeCoordinator::sendTimeRequest() const
     upd.actionTime = time_next;
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
     upd.Tdemin = (time_minDe < time_next) ? time_next : time_minDe;
-  
+
     if (iterating)
     {
         setActionFlag(upd, iterationRequested);
@@ -600,3 +600,4 @@ void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd, bool
 }
 
 }  // namespace helics
+

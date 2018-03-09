@@ -147,3 +147,4 @@ std::string HandleManager::generateName(BasicHandleType what)
     }
 }
 } // namespace helics
+

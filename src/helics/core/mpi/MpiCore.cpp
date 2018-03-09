@@ -81,3 +81,4 @@ std::string MpiCore::getAddress () const
 
 } // namespace mpi
 }  // namespace helics
+

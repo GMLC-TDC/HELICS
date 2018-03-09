@@ -47,3 +47,4 @@ class EndpointInfo
     Time firstMessageTime () const;
 };
 }  // namespace helics
+

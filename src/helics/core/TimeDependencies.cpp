@@ -106,7 +106,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
                 return true;
             }
         }
-        
+
         return false;
     default:
         return false;
@@ -195,7 +195,7 @@ bool TimeDependencies::updateTime (const ActionMessage &m)
         }
         return depInfo->ProcessMessage(m);
     }
-   
+
 }
 
 bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const
@@ -288,3 +288,4 @@ void TimeDependencies::resetIteratingTimeRequests (helics::Time requestTime)
 }
 
 }  // namespace helics
+

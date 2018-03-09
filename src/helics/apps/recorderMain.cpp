@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
         {
             Recorder.run();
         }
-        
+
     }
     catch (const std::invalid_argument &ia)
     {
@@ -40,3 +40,4 @@ int main(int argc, char *argv[])
     return 0;
 
 }
+

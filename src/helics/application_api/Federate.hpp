@@ -432,3 +432,4 @@ class Federate
 yet*/
 void cleanupHelicsLibrary ();
 }  // namespace helics
+

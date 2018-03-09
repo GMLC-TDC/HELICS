@@ -23,3 +23,4 @@ TripWireTrigger::TripWireTrigger () : lineTrigger (TripWire::getline ()) {}
 
 TripWireTrigger::~TripWireTrigger () { lineTrigger->store (true); }
 }
+

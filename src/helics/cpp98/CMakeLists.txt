@@ -23,3 +23,4 @@ target_include_directories(helicsCpp98_ide PRIVATE "${PROJECT_SOURCE_DIR}/src/he
 ENDIF(MSVC)
 
 install(FILES ${helicsCpp98_headers} DESTINATION include/cpp98)
+

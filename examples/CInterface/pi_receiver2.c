@@ -36,7 +36,7 @@ int main()
 
   /* Create Federate Info object that describes the federate properties */
   fedinfo = helicsFederateInfoCreate();
-  
+
   /* Set Federate name */
   helicsFederateInfoSetFederateName(fedinfo,"Test receiver Federate");
 
@@ -88,7 +88,7 @@ int main()
 
 
   while(currenttime < 0.2) {
-    
+
      int isupdated = 0;
     while(!isupdated) {
       helicsFederateRequestTime(vfed,currenttime, &currenttime);
@@ -116,3 +116,4 @@ int main()
   fflush(NULL);
   return(0);
 }
+

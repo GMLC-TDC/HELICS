@@ -433,3 +433,4 @@ std::string xmlCharacterCodeReplace (std::string str)
     return out;
 }
 }  // namespace stringOps
+

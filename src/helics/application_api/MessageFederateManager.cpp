@@ -175,7 +175,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     auto epCount = coreObject->receiveCountAny (fedID);
     // lock the data updates
     std::unique_lock<std::mutex> eplock (endpointLock);
-    
+
     Core::handle_id_t endpoint_id;
     for (size_t ii = 0; ii < epCount; ++ii)
     {
@@ -348,3 +348,4 @@ void MessageFederateManager::removeOrderedMessage (unsigned int index)
     }
 }
 }  // namespace helics
+

@@ -111,3 +111,4 @@ BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), co
     vFed2->finalize ();
 }
 BOOST_AUTO_TEST_SUITE_END ()
+

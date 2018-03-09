@@ -267,3 +267,4 @@ BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types_obj7, bdata::make(core_t
     // this one is going to test really ugly strings
 }
 BOOST_AUTO_TEST_SUITE_END()
+

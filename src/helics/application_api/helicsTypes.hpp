@@ -386,3 +386,4 @@ constexpr std::complex<double> invalidValue<std::complex<double>> ()
 }
 
 }  // namespace helics
+

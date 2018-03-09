@@ -113,3 +113,4 @@ helics_broker FederateTestFixture::AddBroker (const std::string &core_type_name,
     brokers.push_back (broker);
     return broker;
 }
+

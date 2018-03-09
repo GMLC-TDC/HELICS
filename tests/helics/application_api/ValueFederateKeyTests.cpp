@@ -301,3 +301,4 @@ BOOST_DATA_TEST_CASE(test_all_callback, bdata::make(core_types_single), core_typ
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+

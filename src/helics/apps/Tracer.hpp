@@ -83,7 +83,7 @@ class Tracer
     @param captureDesc describes a federate to capture all the interfaces for
     */
     void addCapture (const std::string &captureDesc);
-    
+
     /** finalize the federate*/
     void finalize ();
 
@@ -128,18 +128,18 @@ class Tracer
     int loadJsonFile (const std::string &jsonString);
     /** load a text file*/
     int loadTextFile (const std::string &textFile);
-    
+
     void initialize ();
     void generateInterfaces ();
     void captureForCurrentTime (Time currentTime);
     void loadCaptureInterfaces ();
 
-    
-    
+
+
   protected:
     std::shared_ptr<CombinationFederate> fed;  //!< the federate
     std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
-  
+
     std::vector<Subscription> subscriptions;  //!< the actual subscription objects
     std::map<std::string, int> subkeys;  //!< translate subscription names to an index
 
@@ -158,3 +158,4 @@ class Tracer
 
 }  // namespace apps
 } // namespace helics
+
