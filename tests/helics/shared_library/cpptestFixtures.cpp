@@ -69,22 +69,18 @@ FederateTestFixture::~FederateTestFixture ()
 {
     for (auto &fed : federates)
     {
-        if (fed)
-        {
-            federate_state state;
+        federate_state state = fed.getState();
             CE (helicsFederateGetState (fed, &state));
             if (state != helics_finalize_state)
             {
                 CE (helicsFederateFinalize (fed));
             }
             helicsFederateFree (fed);
-        }
     }
     federates.clear ();
     for (auto &broker : brokers)
     {
-        CE (helicsBrokerDisconnect (broker));
-        helicsBrokerFree (broker);
+        broker.disconnect()
     }
     brokers.clear ();
     helicsCleanupHelicsLibrary ();

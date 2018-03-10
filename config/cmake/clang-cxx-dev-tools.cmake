@@ -6,32 +6,32 @@ file(GLOB_RECURSE
      ALL_TEST_FILES
       tests/helics/*.[ch]pp tests/helics/*.[ch]
      )
-	 
+
 file(GLOB_RECURSE
      ALL_EXAMPLE_FILES
       examples/*.[ch]pp examples/*.[ch]
      )
-	 
+
 file(GLOB
      ALL_APPLICATION_API_FILES
       src/helics/application_api/*.[ch]pp
      )
-	 
+
 file(GLOB
      ALL_PLAYER_FILES
       src/helics/player/*.[ch]pp
      )
-	 
+
 file(GLOB
      ALL_SHARED_LIB_FILES
       src/helics/shared_api_library/*.[ch]pp src/helics/shared_api_library/*.[ch] src/helics/shared_api_library/*.[CH]
      )
-	 
+
 file(GLOB
      ALL_CORE_LIB_FILES
       src/helics/core/*.[ch]pp src/helics/core/zmq/*.[ch]pp src/helics/core/ipc/*.[ch]pp src/helics/core/mpi/*.[ch]pp src/helics/core/udp/*.[ch]pp src/helics/core/tcp/*.[ch]pp
      )
-	 
+
 file(GLOB
      ALL_COMMON_FILES
       src/helics/common/*.[ch]pp
@@ -42,12 +42,12 @@ set(ALL_APPLICATION_FILES
 		${ALL_PLAYER_FILES}
 		${ALL_SHARED_LIB_FILES}
 		)
-		
+
 set(ALL_CORE_FILES
 		${ALL_CORE_LIB_FILES}
 		${ALL_COMMON_FILES}
 		)
-		
+
 set(INCLUDE_DIRECTORIES
 ${PROJECT_SOURCE_DIR}/src/core
 ${ROJECT_SOURCE_DIR}/src/application_api
@@ -63,14 +63,14 @@ ${PROJECT_BINARY_DIR}/include
 ${PROJECT_SOURCE_DIR}/ThirdParty
 ${Boost_INCLUDE_DIR}
 )
- 
+
 
 SET(INCLUDES "")
    FOREACH(f ${INCLUDE_DIRECTORIES})
       LIST(APPEND INCLUDES "-I${f}")
    ENDFOREACH(f)
-   
-   
+
+
 # Adding clang-format target if executable is found
 find_program(CLANG_FORMAT "clang-format")
 if(CLANG_FORMAT)
@@ -89,7 +89,7 @@ if(CLANG_FORMAT)
     -style=file
     ${ALL_APPLICATION_FILES}
     )
-	
+
 	add_custom_target(
     clang-format-core
     COMMAND ${CLANG_FORMAT}
@@ -97,7 +97,7 @@ if(CLANG_FORMAT)
     -style=file
     ${ALL_CORE_FILES}
     )
-	
+
 	add_custom_target(
     clang-format-examples
     COMMAND ${CLANG_FORMAT}
@@ -105,8 +105,8 @@ if(CLANG_FORMAT)
     -style=file
     ${ALL_CORE_FILES}
     )
-	
-	add_custom_target(clang-format-all 
+
+	add_custom_target(clang-format-all
                   DEPENDS clang-format-test clang-format-application clang-format-core clang-format-examples)
 endif()
 
@@ -126,18 +126,18 @@ if(CLANG_TIDY)
   add_custom_target(
     clang-tidy-application
     COMMAND ${CLANG_TIDY}
-    ${ALL_APPLICATION_FILES} 
-   -config='' 
+    ${ALL_APPLICATION_FILES}
+   -config=''
    --
     -std=c++14
     ${INCLUDES}
     )
-	
+
 	add_custom_target(
     clang-tidy-core
     COMMAND ${CLANG_TIDY}
     ${ALL_CORE_FILES}
-   -config='' 
+   -config=''
    --
     -std=c++14
     ${INCLUDES}
@@ -146,12 +146,13 @@ if(CLANG_TIDY)
 		COMMAND ${CLANG_TIDY}
     ${PROJECT_SOURCE_DIR}/src/helics/core/CommonCore.cpp
 	${PROJECT_SOURCE_DIR}/src/helics/core/CoreBroker.cpp
-   -config='' 
+   -config=''
    --
     -std=c++14
     ${INCLUDES}
     )
-	
-	add_custom_target(clang-tidy-all 
+
+	add_custom_target(clang-tidy-all
                   DEPENDS clang-tidy-test clang-tidy-application clang-tidy-core)
 endif()
+

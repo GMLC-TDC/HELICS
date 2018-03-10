@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #ifndef HELICS_API_DATA_H_
@@ -134,11 +131,11 @@ typedef struct message_t
 } message_t;
 
 /** pick a core type depending on compile configuration usually either ZMQ if available or UDP */
-#define HELICS_CORE_TYPE_DEFAULT 0  
+#define HELICS_CORE_TYPE_DEFAULT 0
 /** use the Zero MQ networking protocol */
-#define HELICS_CORE_TYPE_ZMQ 1  
+#define HELICS_CORE_TYPE_ZMQ 1
 /** use MPI for operation on a parallel cluster */
-#define HELICS_CORE_TYPE_MPI 2 
+#define HELICS_CORE_TYPE_MPI 2
 /** use the Test core if all federates are in the same process */
 #define HELICS_CORE_TYPE_TEST 3
 /** interprocess uses memory mapped files to transfer data (for use when all federates are
@@ -149,10 +146,11 @@ on the same machine */
 /** use a generic TCP protocol message stream to send messages */
 #define HELICS_CORE_TYPE_TCP 6
 /** use UDP packets to send the data */
-#define HELICS_CORE_TYPE_UDP 7 
+#define HELICS_CORE_TYPE_UDP 7
 
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif
 
 #endif
+

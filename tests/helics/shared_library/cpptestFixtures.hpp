@@ -165,7 +165,7 @@ struct FederateTestFixture
     }
 
     std::vector<helics::Broker> brokers;
-    std::vector<helics_federate> federates;
+    std::vector<helics::Federate> federates;
     std::string extraCoreArgs;
     std::string extraBrokerArgs;
 

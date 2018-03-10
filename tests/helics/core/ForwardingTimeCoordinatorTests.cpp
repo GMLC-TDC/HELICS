@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "testFixtures.h"
 #include <boost/test/unit_test.hpp>
@@ -154,7 +150,7 @@ BOOST_AUTO_TEST_CASE(execMode_entry)
     //iteration_state
     auto ret=ftc.checkExecEntry();
     BOOST_CHECK(ret == iteration_state::continue_processing);
-    
+
     ActionMessage execReady(CMD_EXEC_REQUEST);
     execReady.source_id = 2;
     auto modified=ftc.processTimeMessage(execReady);
@@ -226,3 +222,4 @@ BOOST_AUTO_TEST_CASE(timing_test1)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+

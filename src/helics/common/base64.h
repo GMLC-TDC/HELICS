@@ -42,3 +42,4 @@ std::vector<vType> base64_decode_type(std::string const& encoded_string)
 
 }//namespace utilities
 #endif
+

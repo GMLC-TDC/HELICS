@@ -1,8 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was modified by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 /*
 * LLNS Copyright Start
@@ -28,7 +27,7 @@ class StringToCmdLine
 public:
 	/** construct from a string*/
 	StringToCmdLine(const std::string &cmdString);
-	/** load a string 
+	/** load a string
 	@param cmdString a single string containing command line arguments
 	*/
 	void load(const std::string &cmdString);
@@ -42,7 +41,8 @@ private:
 	std::vector<std::string> stringCap; //!< the locations for the captured strings
 	std::vector<char *> stringPtrs; //!< vector of char * pointers matching stringCap
 	int argCount;	//!< the number of arguments
-	
+
 };
 
 #endif
+

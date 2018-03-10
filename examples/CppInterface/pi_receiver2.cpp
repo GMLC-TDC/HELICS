@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 static char help[] = "Example to demonstrate the usage of HELICS C Interface with two federates.\n\
@@ -66,11 +63,11 @@ int main(int /*argc*/,char ** /*argv*/)
   printf("PI RECEIVER: Entered execution state\n");
 
   helics_time_t currenttime=0.0;
- 
+
   double pi = 22.0/7.0;
 
   while(currenttime < 0.2) {
-    
+
     bool isupdated = false;
     while(!isupdated) {
       currenttime = vfed->requestTime(currenttime);
@@ -98,3 +95,4 @@ int main(int /*argc*/,char ** /*argv*/)
   fflush(NULL);
   return(0);
 }
+

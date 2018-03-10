@@ -1,8 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 /*
@@ -37,9 +36,9 @@ private:
 	static std::map<std::string, std::shared_ptr<zmqContextManager>> contexts; //!< container for pointers to all the available contexts
 	std::string name;  //!< context name
 	std::unique_ptr<zmq::context_t> zcontext; //!< pointer to the actual context
-    std::atomic<bool> leakOnDelete{ false }; //!< this is done to prevent some warning messages for use in DLL's  
+    std::atomic<bool> leakOnDelete{ false }; //!< this is done to prevent some warning messages for use in DLL's
 	zmqContextManager(const std::string &contextName);
-	
+
 public:
 	static std::shared_ptr<zmqContextManager> getContextPointer(const std::string &contextName=std::string());
 
@@ -69,3 +68,4 @@ public:
 };
 
 #endif
+

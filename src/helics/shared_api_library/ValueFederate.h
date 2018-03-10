@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 /** @file
@@ -370,7 +367,7 @@ HELICS_Export helics_status helicsPublicationGetUnits (helics_publication pub, c
 
 /**@}*/
 
-/** check if a particular subscription was updated 
+/** check if a particular subscription was updated
 @return true if it has been updated since the last value retrieval*/
 HELICS_Export helics_bool_t helicsSubscriptionIsUpdated (helics_subscription sub);
 /** get the last time a subscription was updated */
@@ -388,3 +385,4 @@ HELICS_Export int helicsFederateGetSubscriptionCount(helics_federate fed);
 #endif
 
 #endif /* HELICS_APISHARED_VALUE_FEDERATE_FUNCTIONS_H_*/
+

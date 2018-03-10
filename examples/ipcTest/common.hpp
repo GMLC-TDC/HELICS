@@ -15,3 +15,4 @@ struct ValuePacket
 };  // struct ValuePacket
 
 #endif /* TOM_COMMON_HPP__ */
+

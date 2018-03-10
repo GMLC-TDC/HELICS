@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 /*defines left in this code as it is used in the shared library*/
@@ -12,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define _HELICS_FLAG_DEFINITIONS_
 #pragma once
 /** @file
-@details define statements for flag codes 
+@details define statements for flag codes
 */
 
 /** flag indicating that a federate is observe only*/
@@ -34,8 +31,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #define FORWARD_COMPUTE_FLAG 9
 
 /** used to delay a core from entering initialization mode even if it would otherwise be ready*/
-#define DELAY_INIT_ENTRY 45  
+#define DELAY_INIT_ENTRY 45
 /** used to clear the DELAY_INIT_ENTRY flag in cores*/
-#define ENABLE_INIT_ENTRY 47 
+#define ENABLE_INIT_ENTRY 47
 
 #endif
+
