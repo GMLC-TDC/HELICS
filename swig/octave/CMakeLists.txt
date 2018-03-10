@@ -22,8 +22,8 @@ ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURENT_BINARY_DIR}/helicsOCTAVE_wrap.cxx
     "-octave" "-c++"
     -o "helicsOCTAVE_wrap.cxx"
 	"-I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library"
-	${CMAKE_SOURCE_DIR}/swig/helics.i
-  DEPENDS ${CMAKE_SOURCE_DIR}/swig/helics.i ${SHARED_LIB_HEADERS}
+	${CMAKE_SOURCE_DIR}/swig/Octave/helicsOctave.i
+  DEPENDS ${CMAKE_SOURCE_DIR}/swig/helics.i ${CMAKE_SOURCE_DIR}/swig/Octave/helicsOctave.i ${SHARED_LIB_HEADERS}
 )
 
 ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURENT_BINARY_DIR}/helicsOCTAVE_wrap.cpp
