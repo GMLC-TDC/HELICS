@@ -1,5 +1,7 @@
 # Generate SWIG wrapper (for both MATLAB)
 
+FIND_PACKAGE(MATLAB REQUIRED)
+
 MESSAGE(STATUS "Building MATLAB")
 
 # Compile MEX file

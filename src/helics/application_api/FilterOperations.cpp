@@ -329,19 +329,33 @@ std::shared_ptr<FilterOperator> RerouteFilterOperation::getOperator ()
     return std::static_pointer_cast<FilterOperator> (op);
 }
 
-std::string RerouteFilterOperation::rerouteOperation ( const std::string & /*src*/, const std::string &dest) const
+std::string newDestGeneration(const std::string &src, const std::string &dest, const std::string &formula)
+{
+    if (formula.find_first_of('$') == std::string::npos)
+    {
+        return formula;
+    }
+    std::string newDest = formula;
+    std::regex srcreg("\\$\\{source\\}");
+    std::regex_replace(newDest,srcreg, src); 
+    std::regex destreg("\\$\\{dest\\}");
+    std::regex_replace(newDest, destreg, dest);
+    return newDest;
+}
+
+std::string RerouteFilterOperation::rerouteOperation ( const std::string & src, const std::string &dest) const
 {
     auto cond = conditions.lock_shared ();
     if (cond->empty ())
     {
-        return newDest.load ();
+        return newDestGeneration(src,dest,newDest.load());
     }
     for (auto &sr : *cond)
     {
         std::regex reg (sr);
         if (std::regex_match (dest, reg))
         {
-            return newDest.load ();
+            return newDestGeneration(src, dest, newDest.load());
         }
     }
     return dest;

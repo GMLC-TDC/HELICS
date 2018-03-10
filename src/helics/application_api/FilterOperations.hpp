@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
+All rights reserved.  
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
 Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
@@ -115,6 +115,7 @@ class RerouteFilterOperation : public FilterOperations
     private:
         /** function to execute the rerouting operation*/
     std::string rerouteOperation (const std::string &src, const std::string &dest) const;
+
 };
 
 /** filter for rerouting a packet to a particular endpoint*/

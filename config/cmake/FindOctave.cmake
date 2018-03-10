@@ -43,7 +43,7 @@
 
 IF (WIN32)
 
-message(STATUS "win32 octave search")
+#message(STATUS "win32 octave search")
 set (octave_versions
 Octave-4.2.1
 Octave-4.2.0

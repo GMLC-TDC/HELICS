@@ -1,5 +1,7 @@
 %include output.i
 %include "cstring.i"
+%include "typemaps.i"
+%include "various.i"
 #define __attribute__(x)
 #pragma SWIG nowarn=451
 

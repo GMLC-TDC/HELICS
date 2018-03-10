@@ -1,6 +1,24 @@
 
-IF (GENERATE_PYTHON)
+IF (DISABLE_SWIG)
 
+MESSAGE("Building without swig")
+
+add_custom_target("helicsPYTHON" ALL)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py ${CMAKE_CURRENT_BINARY_DIR}/setup.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics_wrap.c ${CMAKE_CURRENT_BINARY_DIR}/helics_wrap.c COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics.py ${CMAKE_CURRENT_BINARY_DIR}/helics.py COPYONLY)
+
+ADD_CUSTOM_TARGET("helicsPYTHONEXT" ALL DEPENDS helicsSharedLib helicsPYTHON)
+
+ADD_CUSTOM_COMMAND(
+    TARGET "helicsPYTHONEXT" POST_BUILD
+    COMMAND "pip" #
+    ARGS "install" "-e" "."
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    COMMENT "Building Python extension"
+)
+ELSE()
 # https://stackoverflow.com/a/3818084/5451769
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   # Update if necessary
@@ -37,36 +55,16 @@ endif()
 
 set_target_properties (_helics PROPERTIES FOLDER interfaces)
 
-INSTALL(FILES helics.py DESTINATION python)
-INSTALL(TARGETS _helics DESTINATION python)
-INSTALL(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION java)
-INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION python)
+
 
 # execute_process(COMMAND python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 INSTALL(TARGETS _helics DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
 
-ELSE (GENERATE_PYTHON)
+ENDIF (DISABLE_SWIG)
 
-MESSAGE("Building without swig")
-
-add_custom_target("helicsPYTHON" ALL)
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics_wrap.c ${CMAKE_CURRENT_BINARY_DIR}/helics_wrap.c)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics.py ${CMAKE_CURRENT_BINARY_DIR}/helics.py)
-
-ADD_CUSTOM_TARGET("helicsPYTHONEXT" ALL DEPENDS helicsSharedLib helicsPYTHON)
-
-ADD_CUSTOM_COMMAND(
-    TARGET "helicsPYTHONEXT" POST_BUILD
-    COMMAND "pip" #
-    ARGS "install" "-e" "."
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMENT "Building Python extension"
-)
-
-ENDIF (GENERATE_PYTHON)
-
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python)
+INSTALL(TARGETS _helics DESTINATION python)
+INSTALL(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION python)
+INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION python)
 

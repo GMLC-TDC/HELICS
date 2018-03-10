@@ -21,31 +21,26 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 OPTION(BUILD_HELICS_EXAMPLES "Enable the example Executables to be built" ON)
 
-OPTION(GENERATE_PYTHON "Generate Python extension using swig" OFF)
-OPTION(BUILD_PYTHON "Build Python extension" OFF)
-OPTION(GENERATE_MATLAB "Generate Matlab extension code using swig" OFF)
-OPTION(BUILD_MATLAB "Build MATLAB extension" OFF)
+OPTION(BUILD_PYTHON_INTERFACE "Build Python extension" OFF)
+OPTION(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF)
+OPTION(BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF)
+OPTION(BUILD_JAVA_INTERFACE "Build Java extension" OFF)
 
-
-OPTION(GENERATE_OCTAVE "Generate Octave extension code using swig" OFF)
-OPTION(BUILD_OCTAVE "Build Octave extension" OFF)
-
-OPTION(GENERATE_JAVA "Generate Java extension using swig" OFF)
-OPTION(BUILD_JAVA "Build Java extension" OFF)
+OPTION(DISABLE_SWIG "Disable the use of swig to generate interface code and use repo code" OFF)
 
 OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" ON)
 IF(NOT MSVC)
 OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface gcc/clang only" OFF)
 ENDIF()
 
-if (BUILD_PYTHON OR BUILD_MATLAB OR BUILD_JAVA OR BUILD_OCTAVE OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
+if (BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
 set(BUILD_SHARED_LIBS ON)
 else()
 OPTION(USE_POSITION_INDEPENDENT_CODE "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library" OFF)
 endif()
 
 
-if (BUILD_PYTHON OR BUILD_MATLAB OR BUILD_JAVA OR BUILD_OCTAVE OR BUILD_C_SHARED_LIB)
+if (BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE OR BUILD_C_SHARED_LIB)
 set(BUILT_C_SHARED_LIB ON)
 endif()
 
@@ -385,7 +380,10 @@ if (ENABLE_CLANG_TOOLS)
 include(clang-cxx-dev-tools)
 endif(ENABLE_CLANG_TOOLS)
 
+if (BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE)
 add_subdirectory(swig)
+endif()
+
 
 add_subdirectory(docs)
 
