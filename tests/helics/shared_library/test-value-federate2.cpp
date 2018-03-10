@@ -1,9 +1,6 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 */
 
 #include <boost/test/unit_test.hpp>
@@ -70,7 +67,7 @@ BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type
 
     BOOST_CHECK_EQUAL(len1, len);
 
-	
+
 
 	BOOST_CHECK(helicsSubscriptionIsUpdated(sub1) == false);
 
@@ -400,3 +397,4 @@ BOOST_AUTO_TEST_CASE(test_file_load)
     helicsFederateFree(vFed);
 }
 BOOST_AUTO_TEST_SUITE_END()
+

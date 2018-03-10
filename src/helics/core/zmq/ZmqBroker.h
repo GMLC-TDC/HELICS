@@ -1,10 +1,8 @@
 /*
 
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #ifndef ZMQ_BROKER_H_
 #define ZMQ_BROKER_H_
@@ -35,7 +33,7 @@ public:
 	static void displayHelp(bool local_only = false);
 private:
 	virtual bool brokerConnect() override;
-	
+
     NetworkBrokerData netInfo{ NetworkBrokerData::interface_type::tcp }; //!< container for the network connection information
 
 };
@@ -43,3 +41,4 @@ private:
 } // namespace zeromq
 } // namespace helics
 #endif
+

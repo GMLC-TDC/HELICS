@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
@@ -157,7 +153,7 @@ BOOST_AUTO_TEST_CASE(echo_test_fileload)
     helics::apps::Echo echo1(fi);
     echo1.loadFile(std::string(TEST_DIR) + "/test_files/echo_example.json");
     fi.name = "source";
-   
+
     helics::MessageFederate mfed(fi);
     helics::Endpoint ep1(&mfed, "src");
     auto fut = std::async(std::launch::async, [&echo1]() { echo1.run(5.0); });
@@ -187,3 +183,4 @@ BOOST_AUTO_TEST_CASE(echo_test_fileload)
 
 
 BOOST_AUTO_TEST_SUITE_END()
+

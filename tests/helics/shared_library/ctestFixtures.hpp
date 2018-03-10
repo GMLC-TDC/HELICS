@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include <boost/test/unit_test.hpp>
@@ -87,7 +84,7 @@ struct FederateTestFixture
 
         std::vector<helics_federate> federates_added;
 
-        
+
 
         switch (setup)
         {
@@ -194,7 +191,7 @@ struct FederateTestFixture
         }
         break;
         case 7: //two layers of subbrokers
-        {      
+        {
                 auto newTypeString = core_type_name;
                 newTypeString.push_back('_');
                 newTypeString.push_back('4');
@@ -225,3 +222,4 @@ struct FederateTestFixture
     int getIndexCode (const std::string &type_name);
     auto AddBrokerImp (const std::string &core_type_name, const std::string &initialization_string);
 };
+

@@ -104,3 +104,4 @@ case "$1" in
         echo "$0 (boost|cmake|swig) version install_path"
         echo "$0 zmq install_path"
 esac
+

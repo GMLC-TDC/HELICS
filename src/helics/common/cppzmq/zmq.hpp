@@ -233,9 +233,9 @@ namespace zmq
             typedef typename std::iterator_traits<I>::difference_type size_type;
             size_type const size_ = std::distance(first, last)*sizeof(value_t);
 #endif
-            
 
-            
+
+
             int const rc = zmq_msg_init_size (&msg, size_);
             if (rc != 0)
                 throw error_t ();
@@ -560,7 +560,7 @@ namespace zmq
             setsockopt(option_, &optval, sizeof(T) );
         }
 
-		
+
 
         inline void setsockopt (int option_, const void *optval_,
             size_t optvallen_)
@@ -953,7 +953,7 @@ namespace zmq
 #elif ZMQ_VERSION >= ZMQ_MAKE_VERSION(4, 2, 1)
         virtual void on_event_handshake_failed(const zmq_event_t &event_, const char* addr_) { (void) event_; (void) addr_; }
         virtual void on_event_handshake_succeed(const zmq_event_t &event_, const char* addr_) { (void) event_; (void) addr_; }
-#endif		
+#endif
         virtual void on_event_unknown(const zmq_event_t &event_, const char* addr_) { (void)event_; (void)addr_; }
     private:
 
@@ -1010,9 +1010,9 @@ namespace zmq
 
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4, 2, 3)
             if (zmq_errno () == EAGAIN)
-#else			
+#else
             if (zmq_errno () == ETIMEDOUT)
-#endif			
+#endif
                 return false;
 
             throw error_t ();
@@ -1027,3 +1027,4 @@ namespace zmq
 }
 
 #endif
+

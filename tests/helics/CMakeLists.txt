@@ -11,3 +11,4 @@ endif()
 if(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_APPS)
     add_subdirectory(apps)
 endif()
+

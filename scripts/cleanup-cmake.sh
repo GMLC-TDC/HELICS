@@ -18,4 +18,3 @@ elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     rm -f ${cmake_install_path}/CMake.app/Contents/bin/cmake-gui
 fi
 
-

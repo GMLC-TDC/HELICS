@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
@@ -83,7 +80,7 @@ class Tracer
     @param captureDesc describes a federate to capture all the interfaces for
     */
     void addCapture (const std::string &captureDesc);
-    
+
     /** finalize the federate*/
     void finalize ();
 
@@ -128,18 +125,18 @@ class Tracer
     int loadJsonFile (const std::string &jsonString);
     /** load a text file*/
     int loadTextFile (const std::string &textFile);
-    
+
     void initialize ();
     void generateInterfaces ();
     void captureForCurrentTime (Time currentTime);
     void loadCaptureInterfaces ();
 
-    
-    
+
+
   protected:
     std::shared_ptr<CombinationFederate> fed;  //!< the federate
     std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
-  
+
     std::vector<Subscription> subscriptions;  //!< the actual subscription objects
     std::map<std::string, int> subkeys;  //!< translate subscription names to an index
 
@@ -158,3 +155,4 @@ class Tracer
 
 }  // namespace apps
 } // namespace helics
+

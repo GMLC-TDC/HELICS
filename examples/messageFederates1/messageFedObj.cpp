@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "helics/application_api/Endpoints.hpp"
 #include <iostream>
@@ -53,7 +50,7 @@ int main (int argc, char *argv[])
     {
         brk = helics::BrokerFactory::create(fi.coreType, vm["startbroker"].as<std::string>());
     }
-	
+
     auto mFed = std::make_unique<helics::MessageFederate> (fi);
     auto name = mFed->getName();
 	std::cout << " registering endpoint '" << myendpoint << "' for " << name<<'\n';
@@ -80,7 +77,7 @@ int main (int argc, char *argv[])
 			auto nmessage = endpoint.getMessage();
 			std::cout << "received message from " << nmessage->source << " at " << static_cast<double>(nmessage->time) << " ::" << nmessage->data.to_string() << '\n';
 		}
-        
+
     }
     mFed->finalize ();
     if (brk)
@@ -93,3 +90,4 @@ int main (int argc, char *argv[])
     }
     return 0;
 }
+

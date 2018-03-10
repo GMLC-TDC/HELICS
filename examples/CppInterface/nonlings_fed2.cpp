@@ -1,12 +1,8 @@
 /*
 
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include <stdio.h>
 #include <math.h>
@@ -82,7 +78,7 @@ int main(int /*argc*/,char ** /*argv*/)
     while(!newt_conv && iter < max_iter) {
       /* Function value */
       double f2 = x*x + 4*y*y - 4;
-      
+
       if(fabs(f2) < tol) {
 	newt_conv = 1;
 	break;
@@ -91,12 +87,12 @@ int main(int /*argc*/,char ** /*argv*/)
 
       /* Jacobian */
       double J2 = 8*y;
-      
+
       y = y - f2/J2;
     }
     printf("Fed2 iteration %d y=%f, x=%f\n",helics_iter,y,x);
 
-   
+
     if ((fabs(y-yprv)>tol)||(helics_iter<5))
     {
       vfed->publish(pub,y);
@@ -118,3 +114,4 @@ int main(int /*argc*/,char ** /*argv*/)
   return(0);
 
 }
+

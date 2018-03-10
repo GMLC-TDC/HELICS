@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "helicsTypes.hpp"
@@ -275,7 +272,7 @@ named_point helicsGetNamedPoint(const std::string &val)
     auto str1 = val.substr(loc + 1, locsep - loc);
     boost::algorithm::trim(str1);
     str1.pop_back();
-    
+
     named_point point;
     point.first = str1.substr(1);
     auto vstr = val.substr(locsep + 1, locend - locsep - 1);
@@ -430,7 +427,7 @@ data_block emptyBlock(helics_type_t outputType, helics_type_t inputType=helics_t
         case helics_type_t::helicsComplexVector:
             return helicsComplexVectorString(std::vector<std::complex<double>>());
         }
-        
+
     case helics_type_t::helicsComplexVector:
     {
         return ValueConverter<std::vector<std::complex<double>>>::convert(std::vector<std::complex<double>>());
@@ -493,7 +490,7 @@ data_block typeConvert (helics_type_t type, const char *val)
     {
         return emptyBlock(type);
     }
-    switch (type) 
+    switch (type)
     {
     case helics_type_t::helicsDouble:
         return ValueConverter<double>::convert (boost::lexical_cast<double> (val));
@@ -765,3 +762,4 @@ data_block typeConvert(helics_type_t type, const std::string &str, double val)
 }
 
 }  // namespace helics
+

@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #pragma once
@@ -54,7 +51,7 @@ namespace apps
         int cnt = 0;
     };
 
-    
+
 
     /** class designed to capture data points from a set of subscriptions or endpoints*/
     class Recorder
@@ -124,7 +121,7 @@ namespace apps
         @return a pair with the tag as the first element and the value as the second
         */
         std::pair<std::string,std::string> getValue(int index) const;
-        /** get a message 
+        /** get a message
         @details makes a copy of a message and returns it in a unique_ptr
         @param index the number of the message to retrieve
         */
@@ -160,7 +157,7 @@ namespace apps
         /** encode the string in base64 if needed otherwise just return the string*/
         std::string encode(const std::string &str2encode);
     protected:
-        std::shared_ptr<CombinationFederate> fed; //!< the federate 
+        std::shared_ptr<CombinationFederate> fed; //!< the federate
         std::unique_ptr<CloningFilter> cFilt; //!< a pointer to a clone filter
         std::vector<ValueCapture> points;   //!< lists of points that were captured
         std::vector<Subscription> subscriptions;    //!< the actual subscription objects
@@ -181,3 +178,4 @@ namespace apps
 
 }  // namespace apps
 } // namespace helics
+

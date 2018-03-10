@@ -1,8 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 /*
@@ -38,12 +37,12 @@ private:
 	std::string name;  //!< service name
 	std::unique_ptr<boost::asio::io_service> iserv; //!< pointer to the actual context
     std::unique_ptr<boost::asio::io_service::work> nullwork; //!< pointer to an object used to keep a service running
-    bool leakOnDelete = false; //!< this is done to prevent some warning messages for use in DLL's  
+    bool leakOnDelete = false; //!< this is done to prevent some warning messages for use in DLL's
     std::atomic<bool> running{ false };
-   
+
     std::future<void> loopRet;
 	AsioServiceManager(const std::string &contextName);
-    
+
 	/** servicing helper class to manage lifetimes of a service loop*/
 	class servicer
 	{
@@ -110,9 +109,9 @@ public:
     */
     static LoopHandle runServiceLoop( const std::string &serviceName = std::string());
 private:
-	
+
     /** halt the service loop thread if the counter==0
-    @details decrements the loop request counter and if it is 0 then will halt the 
+    @details decrements the loop request counter and if it is 0 then will halt the
     service loop
     */
     void haltServiceLoop();
@@ -123,3 +122,4 @@ private:
 void serviceRunLoop(std::shared_ptr<AsioServiceManager> ptr);
 
 #endif
+

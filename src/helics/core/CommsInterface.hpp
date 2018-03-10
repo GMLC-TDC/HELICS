@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
@@ -104,7 +101,7 @@ class CommsInterface
     virtual void closeReceiver () = 0;  //!< function to instruct the receiver loop to close
     virtual void reconnectTransmitter ();  //!< function to reconnect the transmitter
     virtual void reconnectReceiver ();  //!< function to reconnect the receiver
-    
+
     tripwire::TripWireDetector tripDetector;  //!< try to detect if everything is shutting down
 };
 
@@ -137,3 +134,4 @@ class conditionalChangeOnDestroy
 };
 
 }  // namespace helics
+

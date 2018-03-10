@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include <cpp98/ValueFederate.hpp>
@@ -38,7 +35,7 @@ int main (int /*argc*/, char ** /*argv*/)
         printf (" Broker created and connected\n");
     }
 
-    /* Create Federate Info object that describes the federate properties 
+    /* Create Federate Info object that describes the federate properties
      * Set federate name and core type from string
      */
     helics::FederateInfo fi ("TestA Federate", "zmq");
@@ -106,7 +103,7 @@ int main (int /*argc*/, char ** /*argv*/)
         }
         ++helics_iter;
         printf("Fed1: iteration %d x=%f, y=%f\n",helics_iter, x, y);
-        
+
         if ((fabs(x-xprv)>tol)||(helics_iter<5))
         {
             vfed->publish (pub, x);
@@ -135,3 +132,4 @@ int main (int /*argc*/, char ** /*argv*/)
     fflush (NULL);
     return (0);
 }
+

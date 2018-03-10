@@ -1,8 +1,7 @@
 ##############################################################################
-#Copyright (C) 2017-2018, Battelle Memorial Institute
-#All rights reserved.
-
-#This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+# Copyright © 2017-2018,
+# Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+#All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 set(helics_apps_library_headers
 	Player.hpp
@@ -53,7 +52,7 @@ endif()
 INSTALL(TARGETS helics_apps-static EXPORT helics-targets
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-	
+
 if (BUILD_PLAYER)
 INSTALL(TARGETS helics_player DESTINATION ${CMAKE_INSTALL_BINDIR})
 
@@ -89,5 +88,4 @@ add_custom_command(TARGET helics_app POST_BUILD        # Adds a post-build event
 endforeach(keyfile)
 endif()
 endif()
-
 

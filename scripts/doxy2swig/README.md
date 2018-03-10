@@ -59,3 +59,4 @@ To attach docstrings to classes with SWIG for python and using the `-builtin` op
 a version of SWIG >= 3.0.7 is required.
 Without this, the class documentation including constructor lists (`-c`) and attribute
 lists (`-a`) will not be available from python.
+

@@ -16,3 +16,4 @@ set_target_properties (ipcTest1 PROPERTIES
 set_target_properties (ipcTest2 PROPERTIES
     FOLDER examples
 )
+
