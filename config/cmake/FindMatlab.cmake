@@ -1427,6 +1427,7 @@ endif()
 unset(_matlab_find_mex_compiler)
 
 # component Matlab program
+
 list(FIND Matlab_FIND_COMPONENTS MAIN_PROGRAM _matlab_find_matlab_program)
 if(_matlab_find_matlab_program GREATER -1)
   find_program(

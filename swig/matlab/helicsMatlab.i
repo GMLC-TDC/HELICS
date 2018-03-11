@@ -1,3 +1,3 @@
-%include "cstring.i"
+#%include "cstring.i"
 %include "../helics.i"
 
