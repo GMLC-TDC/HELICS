@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
@@ -101,7 +98,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &
             {
                 val = static_cast<X> (vec.front());
             }
-           
+
         }
         else
         {
@@ -223,3 +220,4 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
     }
 }
 }  // namespace helics
+

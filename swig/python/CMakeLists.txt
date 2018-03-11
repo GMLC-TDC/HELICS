@@ -35,9 +35,6 @@ else ()
   SWIG_LINK_LIBRARIES(helics ${PYTHON_LIBRARIES})
 endif()
 
-INSTALL(FILES helics.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
-INSTALL(TARGETS _helics DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
-
 if (WIN32)
   foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
     add_custom_command(TARGET _helics POST_BUILD        # Adds a post-build event to _helics
@@ -49,8 +46,9 @@ endif(WIN32)
 
 # execute_process(COMMAND python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-ELSE (GENERATE_PYTHON)
+INSTALL(TARGETS _helics DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
 
+ELSE (GENERATE_PYTHON)
 
 MESSAGE("Building without swig")
 
@@ -60,7 +58,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py ${CMAKE_CURRENT_BINARY_DIR}/
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics_wrap.c ${CMAKE_CURRENT_BINARY_DIR}/helics_wrap.c)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics.py ${CMAKE_CURRENT_BINARY_DIR}/helics.py)
 
-MESSAGE("CMAKE CURRENT" ${CMAKE_CURRENT_BINARY_DIR})
 ADD_CUSTOM_TARGET("helicsPYTHONEXT" ALL DEPENDS helicsSharedLib helicsPYTHON)
 
 ADD_CUSTOM_COMMAND(
@@ -71,5 +68,7 @@ ADD_CUSTOM_COMMAND(
     COMMENT "Building Python extension"
 )
 
-
 ENDIF (GENERATE_PYTHON)
+
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
+

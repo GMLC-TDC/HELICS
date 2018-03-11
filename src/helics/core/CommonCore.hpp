@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #pragma once
@@ -22,7 +19,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <thread>
 #include "../common/GuardedTypes.hpp"
 #include <utility>
-#include "HandleManager.hpp"
+#include "HandlePointerManager.hpp"
 
 namespace helics
 {
@@ -38,7 +35,7 @@ enum BasicHandleType : char;
 
 /** base class implementing a standard interaction strategy between federates
 @details the CommonCore is virtual class that manages local federates and handles most of the
-interaction between federate it is meant to be instantiated for specific interfederate communication
+interaction between federate it is meant to be instantiated for specific inter-federate communication
 strategies*/
 class CommonCore : public Core, public BrokerBase
 {
@@ -256,7 +253,9 @@ class CommonCore : public Core, public BrokerBase
 
     /** handle command with the core itself as a destination at the core*/
     void processCommandsForCore (const ActionMessage &cmd);
-
+    /** check if a newly registered subscription has a local publication
+    if it does return true*/
+    bool checkForLocalPublication(ActionMessage &cmd);
   protected:
     int32_t _global_federation_size = 0;  //!< total size of the federation
     std::atomic<int16_t> delayInitCounter{
@@ -265,7 +264,7 @@ class CommonCore : public Core, public BrokerBase
     std::atomic<int32_t> messageCounter{ 54 };  //!< counter for the number of messages that have been sent
 
    // std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
-    HandleManager handles; //!< local handle information;
+    HandlePointerManager handles; //!< local handle information;
     //std::atomic<Core::handle_id_t> handleCounter{1};  //!< counter for the handle index
     //std::unordered_map<std::string, handle_id_t> publications;  //!< map of all local publications
     //std::unordered_map<std::string, handle_id_t> endpoints;  //!< map of all local endpoints
@@ -346,3 +345,4 @@ class CommonCore : public Core, public BrokerBase
 };
 
 }  // namespace helics
+

@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 
@@ -43,7 +40,7 @@ class ArgDescriptor
     ArgDescriptor (std::string arg, arg_type_t type, std::string desc)
         : arg_ (std::move (arg)), type_ (type), desc_ (std::move (desc))
     {
-        
+
     }
     /** two argument constructor assuming the results will be strings
     @param arg the key for the parameter
@@ -76,6 +73,5 @@ int argumentParser (int argc,
                      const ArgDescriptors &argDefinitions, const std::string &posName=std::string());
 
 
-} // namespace helics 
-
+} // namespace helics
 

@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -139,7 +135,7 @@ BOOST_AUTO_TEST_CASE(tracer_test_message)
         BOOST_CHECK_EQUAL((*mhandle)->source, "d1");
         BOOST_CHECK_EQUAL((*mhandle)->dest, "src1");
     }
-    
+
     fut.get();
 }
 
@@ -193,7 +189,7 @@ BOOST_DATA_TEST_CASE(simple_tracer_test_files, boost::unit_test::data::make(simp
     fut.get();
     BOOST_CHECK_EQUAL(counter.load(), 4);
     trace1.finalize();
-    
+
 }
 
 const std::vector<std::string> simple_message_files{ "example4.recorder", "example5.record", "example6rec.json" };
@@ -258,7 +254,7 @@ BOOST_DATA_TEST_CASE(simple_tracer_test_message_files,
     BOOST_CHECK_EQUAL(counter.load(), 4);
     BOOST_CHECK_EQUAL(mcounter.load(), 2);
     trace1.finalize();
-   
+
 }
 
 BOOST_DATA_TEST_CASE(simple_tracer_test_message_files_cmd,
@@ -356,13 +352,13 @@ BOOST_AUTO_TEST_CASE(tracer_test_destendpoint_clone)
     e1.send("d2", "this is a test message");
     BOOST_CHECK_EQUAL(retTime, 1.0);
 
-    
+
 
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
     BOOST_CHECK_EQUAL(retTime, 2.0);
     mfed2.requestTimeComplete();
-    
+
     int cnt = 0;
     while (lastTime < 0.5)
     {
@@ -445,7 +441,7 @@ BOOST_AUTO_TEST_CASE(tracer_test_srcendpoint_clone)
     e1.send("d2", "this is a test message");
     BOOST_CHECK_EQUAL(retTime, 1.0);
 
-   
+
 
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
@@ -481,12 +477,12 @@ BOOST_AUTO_TEST_CASE(tracer_test_srcendpoint_clone)
         BOOST_CHECK_EQUAL((*mhandle)->source, "d2");
         BOOST_CHECK_EQUAL((*mhandle)->original_dest, "d1");
     }
-    
+
 }
 
 BOOST_AUTO_TEST_CASE(tracer_test_endpoint_clone)
 {
-    
+
     libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{ 0.0 };
     helics::FederateInfo fi("trace1");
@@ -712,3 +708,4 @@ BOOST_DATA_TEST_CASE(simple_tracer_test_message_files_exe,
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+

@@ -30,3 +30,4 @@ if(BUILD_MATLAB)
     FIND_PACKAGE(MATLAB REQUIRED)
     add_subdirectory(matlab)
 endif(BUILD_MATLAB)
+

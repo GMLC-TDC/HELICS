@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "HelicsPrimaryTypes.hpp"
@@ -280,7 +277,7 @@ void valueExtract (const defV &dv, std::vector<std::complex<double>> &val)
 
 void valueExtract(const defV &dv, named_point &val)
 {
-    
+
     switch (dv.which())
     {
     case doubleLoc:  // double
@@ -307,7 +304,7 @@ void valueExtract(const defV &dv, named_point &val)
         {
             val.second = std::hypot(vec[0], vec[1]);
         }
-        else 
+        else
         {
             val.second = (vec.empty())?0.0:(vec.front());
         }
@@ -511,3 +508,4 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::complex<dou
 }
 
 }  // namespace helics
+

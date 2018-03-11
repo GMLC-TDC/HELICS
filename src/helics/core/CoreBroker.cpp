@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "CoreBroker.hpp"
@@ -207,7 +204,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         _federates.back ().route_id = getRoute (command.source_id);
         if (!_isRoot)
         {
-          
+
                 if (global_broker_id != 0)
                 {
                     command.source_id = global_broker_id;
@@ -265,7 +262,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             _brokers.back().route_id = getRoute(command.source_id);
             _brokers.back()._nonLocal = true;
         }
-       
+
         if (!_isRoot)
         {
             if (global_broker_id != 0)
@@ -494,7 +491,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
     break;
     case CMD_INIT_NOT_READY:
     {
-        
+
         if (allInitReady ())
         {
             transmit (0, command);
@@ -773,8 +770,8 @@ void CoreBroker::addSubscription (ActionMessage &m)
                           static_cast<int32_t> (_handles.size () - 1));
     addLocalInfo (_handles.back (), m);
     subscriptions.emplace (m.name, static_cast<int32_t> (_handles.size () - 1));
-    _handles.back ().processed = checkActionFlag (m, processingComplete);
-    if (!checkActionFlag (m, processingComplete))
+    _handles.back ().processed = checkActionFlag (m, processing_complete);
+    if (!checkActionFlag (m, processing_complete))
     {
         bool proc = FindandNotifySubscriptionPublisher (_handles.back ());
         if (!_isRoot)
@@ -782,7 +779,7 @@ void CoreBroker::addSubscription (ActionMessage &m)
             if (proc)
             {
                 // just let any higher level brokers know we have found the publisher and let them know
-                setActionFlag (m, processingComplete);
+                setActionFlag (m, processing_complete);
             }
 
             transmit (0, m);
@@ -800,7 +797,7 @@ void CoreBroker::addEndpoint (ActionMessage &m)
 
     if (!_isRoot)
     {
-        setActionFlag (m, processingComplete);
+        setActionFlag (m, processing_complete);
         transmit (0, m);
         if (!hasTimeDependency)
         {
@@ -831,7 +828,7 @@ void CoreBroker::addSourceFilter (ActionMessage &m)
     {
         if (proc)
         {
-            setActionFlag (m, processingComplete);
+            setActionFlag (m, processing_complete);
         }
 
         transmit (0, m);
@@ -881,7 +878,7 @@ void CoreBroker::addDestFilter (ActionMessage &m)
     {
         if (proc)
         {
-            setActionFlag (m, processingComplete);
+            setActionFlag (m, processing_complete);
         }
         transmit (0, m);
         if (!hasFilters)
@@ -1387,7 +1384,7 @@ void CoreBroker::processQuery (const ActionMessage &m)
         {
             transmit(route, m);
         }
-       
+
     }
 }
 
@@ -1512,3 +1509,4 @@ bool CoreBroker::allDisconnected () const
 }
 
 }  // namespace helics
+

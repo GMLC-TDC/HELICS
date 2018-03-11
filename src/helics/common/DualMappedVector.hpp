@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #pragma once
@@ -198,7 +195,7 @@ public:
 				lookup1.erase(fnd1);
 			}
 		}
-		
+
 		for (auto &ind : ind2)
 		{
 			auto fnd2 = lookup2.find(ind);
@@ -269,5 +266,4 @@ private:
     std::conditional_t<is_easily_hashable<searchType1>::value, std::unordered_map<searchType1, size_t>, std::map<searchType1, size_t>> lookup1;	//!< map to lookup the index
     std::conditional_t<is_easily_hashable<searchType2>::value, std::unordered_map<searchType2, size_t>, std::map<searchType2, size_t>> lookup2;	//!< map to lookup the index
 };
-
 

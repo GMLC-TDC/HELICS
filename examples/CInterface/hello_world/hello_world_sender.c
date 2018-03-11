@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 /* include the HELICS header for value Federates*/
@@ -22,7 +19,7 @@ int main() {
   fedinfo = helicsFederateInfoCreate();
   /** set the federate name*/
   helicsFederateInfoSetFederateName(fedinfo, "hello_world_sender");
-  /** set the core type to use 
+  /** set the core type to use
   can be "test", "ipc", "udp", "tcp", "zmq", "mpi"
   not all are available on all platforms
   and should be set to match the broker and receiver
@@ -38,14 +35,14 @@ int main() {
   {
       return (-2);
   }
-  /** register a publication interface on vFed, with a global Name of "hello" 
+  /** register a publication interface on vFed, with a global Name of "hello"
   of a type "string", with no units*/
   pub = helicsFederateRegisterGlobalPublication(vfed, "hello", "string", "");
   if (pub == NULL)
   {
       return (-3);
   }
-  /** transition the federate to execution mode 
+  /** transition the federate to execution mode
   * the helicsFederateEnterInitializationMode is not necessary if there is nothing to do in the initialization mode
   */
   status=helicsFederateEnterInitializationMode(vfed);
@@ -75,3 +72,4 @@ int main() {
   helicsCloseLibrary();
   return(0);
 }
+

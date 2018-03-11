@@ -159,3 +159,4 @@ charMapper<unsigned char> pairMapper ()
 }
 
 }  // namespace utilities
+

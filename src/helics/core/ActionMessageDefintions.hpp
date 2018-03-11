@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #pragma once
@@ -15,8 +12,8 @@ namespace helics
 /** flag definitions for the action Message Flag field*/
 enum action_message_flags : uint16_t
 {
-    iterationRequested = 0,  //!< indicator that an iteration has been requested
-    processingComplete = 1,  //!< indicator that processing has been completed
+    iteration_requested = 0,  //!< indicator that an iteration has been requested
+    processing_complete = 1,  //!< indicator that processing has been completed
     pub_required = 2,  //!< flag indicating a publication is required
     filt_required = 3,  //!< flag indicating that a filter requires a publication
     error_flag = 4,  //!< flag indicating an error condition associated with the command
@@ -231,3 +228,4 @@ inline bool hasInfo (action_message_def::action_t action)
 const char *actionMessageType (action_message_def::action_t action);
 
 }  // namespace helics
+

@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include <boost/test/unit_test.hpp>
 
@@ -185,7 +181,7 @@ BOOST_AUTO_TEST_CASE (assignment_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    setActionFlag (cmd, iterationRequested);
+    setActionFlag (cmd, iteration_requested);
     setActionFlag (cmd, pub_required);
     setActionFlag (cmd, error_flag);
     cmd.actionTime = helics::Time::maxVal ();
@@ -204,7 +200,7 @@ BOOST_AUTO_TEST_CASE (assignment_test)
     BOOST_CHECK_EQUAL (cmd_assign.source_handle, 2);
     BOOST_CHECK_EQUAL (cmd_assign.dest_id, 3);
     BOOST_CHECK_EQUAL (cmd_assign.dest_handle, 4);
-    BOOST_CHECK (checkActionFlag (cmd_assign, iterationRequested));
+    BOOST_CHECK (checkActionFlag (cmd_assign, iteration_requested));
     BOOST_CHECK (checkActionFlag (cmd_assign, pub_required));
     BOOST_CHECK (checkActionFlag (cmd_assign, error_flag));
     BOOST_CHECK_EQUAL (cmd_assign.actionTime, helics::Time::maxVal ());
@@ -253,7 +249,7 @@ BOOST_AUTO_TEST_CASE (conversion_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    setActionFlag (cmd, iterationRequested);
+    setActionFlag (cmd, iteration_requested);
     setActionFlag (cmd, pub_required);
     setActionFlag (cmd, error_flag);
     cmd.actionTime = 45.7;
@@ -290,7 +286,7 @@ BOOST_AUTO_TEST_CASE (message_message_conversion_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    setActionFlag (cmd, iterationRequested);
+    setActionFlag (cmd, iteration_requested);
     setActionFlag (cmd, pub_required);
     setActionFlag (cmd, error_flag);
     cmd.actionTime = 45.7;
@@ -352,7 +348,7 @@ BOOST_AUTO_TEST_CASE (check_packetization)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    setActionFlag (cmd, iterationRequested);
+    setActionFlag (cmd, iteration_requested);
     setActionFlag (cmd, pub_required);
     setActionFlag (cmd, error_flag);
     cmd.actionTime = 45.7;
@@ -385,3 +381,4 @@ BOOST_AUTO_TEST_CASE (check_packetization)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
+

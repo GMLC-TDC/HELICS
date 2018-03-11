@@ -1,12 +1,7 @@
 /*
-
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "ForwardingTimeCoordinator.hpp"
@@ -90,7 +85,7 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
 
     bool update = (time_state!=tState);
     time_state = tState;
-    
+
     Time prev_next = time_next;
     time_next = minNext;
     //	printf("%d UDPATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
@@ -110,7 +105,7 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
         time_minminDe = minminDe;
         update = true;
     }
-    
+
     if (minFed != lastMinFed)
     {
         lastMinFed = minFed;
@@ -118,7 +113,7 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
         {
             update = true;
         }
-       
+
     }
     if (update)
     {
@@ -193,7 +188,7 @@ void ForwardingTimeCoordinator::sendTimeRequest () const
         upd.actionTime = time_next;
         if (iterating)
         {
-            setActionFlag(upd, iterationRequested);
+            setActionFlag(upd, iteration_requested);
         }
         sendMessageFunction(upd);
     }
@@ -207,14 +202,14 @@ void ForwardingTimeCoordinator::sendTimeRequest () const
         upd.Tdemin = time_minminDe;
         if (iterating)
         {
-            setActionFlag(upd, iterationRequested);
+            setActionFlag(upd, iteration_requested);
         }
         sendMessageFunction(upd);
-        
+
         //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
         // static_cast<double>(time_exec), static_cast<double>(time_minDe));
     }
-    
+
 }
 
 std::string ForwardingTimeCoordinator::printTimeStatus () const
@@ -349,3 +344,4 @@ void ForwardingTimeCoordinator::processDependencyUpdateMessage (const ActionMess
 }
 
 }  // namespace helics
+

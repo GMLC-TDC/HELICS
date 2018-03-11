@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "TimeDependencies.hpp"
@@ -19,11 +16,11 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
     switch (m.action ())
     {
     case CMD_EXEC_REQUEST:
-        time_state = checkActionFlag (m, iterationRequested) ? time_state_t::exec_requested_iterative :
+        time_state = checkActionFlag (m, iteration_requested) ? time_state_t::exec_requested_iterative :
                                                                  time_state_t::exec_requested;
         break;
     case CMD_EXEC_GRANT:
-        if (!checkActionFlag (m, iterationRequested))
+        if (!checkActionFlag (m, iteration_requested))
         {
             time_state = time_state_t::time_granted;
             Tnext = timeZero;
@@ -36,7 +33,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         }
         break;
     case CMD_TIME_REQUEST:
-        time_state = checkActionFlag (m, iterationRequested) ? time_state_t::time_requested_iterative :
+        time_state = checkActionFlag (m, iteration_requested) ? time_state_t::time_requested_iterative :
                                                                  time_state_t::time_requested;
         //   printf("%d Request from %d time %f, te=%f, Tdemin=%f\n", fedID, m.source_id,
         //   static_cast<double>(m.actionTime), static_cast<double>(m.Te), static_cast<double>(m.Tdemin));
@@ -106,7 +103,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
                 return true;
             }
         }
-        
+
         return false;
     default:
         return false;
@@ -195,7 +192,7 @@ bool TimeDependencies::updateTime (const ActionMessage &m)
         }
         return depInfo->ProcessMessage(m);
     }
-   
+
 }
 
 bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const
@@ -288,3 +285,4 @@ void TimeDependencies::resetIteratingTimeRequests (helics::Time requestTime)
 }
 
 }  // namespace helics
+
