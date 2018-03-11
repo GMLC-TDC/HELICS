@@ -1,5 +1,5 @@
 
-IF (DISABLE_SWIG)
+IF (DISABLE_SWIG OR NOT SWIG_EXECUTABLE)
 
 MESSAGE("Building without swig")
 
@@ -18,7 +18,7 @@ ADD_CUSTOM_COMMAND(
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     COMMENT "Building Python extension"
 )
-ELSE(DISABLE_SWIG)
+ELSE()
 # https://stackoverflow.com/a/3818084/5451769
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   # Update if necessary
@@ -61,7 +61,7 @@ set_target_properties (_helics PROPERTIES FOLDER interfaces)
 
 INSTALL(TARGETS _helics DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
 
-ENDIF (DISABLE_SWIG)
+ENDIF ()
 
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python)
 INSTALL(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION python)
