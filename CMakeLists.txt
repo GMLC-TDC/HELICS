@@ -312,12 +312,8 @@ IF(BUILD_CXX_SHARED_LIB)
 
 endif()
 
-if (WIN32)
 FILE(GLOB KEY_LIBRARY_FILES  ${PROJECT_BINARY_DIR}/libs/bin/*)
 message(STATUS "key files ${KEY_LIBRARY_FILES}")
-else()
-set(KEY_LIBRARY_FILES "")
-endif()
 
 OPTION(DISABLE_LOGGING "disable all normal, debug, and trace logging in HELICS" OFF)
 if (NOT DISABLE_LOGGING)
@@ -335,12 +331,13 @@ add_subdirectory (src)
 #-----------------------------------------------------------------------------
 # Setup CTEST environment
 #-----------------------------------------------------------------------------
-include (CTest)
-add_subdirectory (tests)
+IF (BUILD_HELICS_TESTS)
+	include (CTest)
+	add_subdirectory (tests)
+ENDIF(BUILD_HELICS_TESTS)
 
 if (BUILD_HELICS_EXAMPLES)
-add_subdirectory (examples)
-
+	add_subdirectory (examples)
 endif(BUILD_HELICS_EXAMPLES)
 
 INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
