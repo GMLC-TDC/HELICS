@@ -23,6 +23,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "BrokerBase.hpp"
 #include "TimeDependencies.hpp"
 #include "../common/DualMappedVector.hpp"
+#include "HandleManager.hpp"
 
 namespace helics
 {
@@ -80,14 +81,15 @@ class CoreBroker : public Broker, public BrokerBase
       localBrokersInit;  //!< indicator if the local brokers are ready to initialize
 	DualMappedVector<BasicFedInfo, std::string,Core::federate_id_t> _federates; //!< container for all federates
 	DualMappedVector<BasicBrokerInfo, std::string, Core::federate_id_t> _brokers; //!< container for all the broker information
+    std::string previous_local_broker_identifier; //!< the previous identifier in case a rename is required
 
-	std::vector<BasicHandleInfo> _handles; //!< container for the basic info for all handles
-	std::string previous_local_broker_identifier; //!< the previous identifier in case a rename is required
-
-	std::unordered_map<std::string, int32_t> publications; //!< map of publications;
-	std::unordered_multimap<std::string, int32_t> subscriptions; //!< multimap of subscriptions
-	std::unordered_map<std::string, int32_t> endpoints;  //!< map of endpoints
-	std::unordered_multimap<std::string, int32_t> filters;  //!< multimap for all the filters
+    HandleManager handles;
+	//std::vector<BasicHandleInfo> _handles; //!< container for the basic info for all handles
+	
+	//std::unordered_map<std::string, int32_t> publications; //!< map of publications;
+	//std::unordered_multimap<std::string, int32_t> subscriptions; //!< multimap of subscriptions
+	//std::unordered_map<std::string, int32_t> endpoints;  //!< map of endpoints
+	//std::unordered_multimap<std::string, int32_t> filters;  //!< multimap for all the filters
 
 	std::map<Core::federate_id_t, int32_t> global_id_translation; //!< map to translate global ids to local ones
 	std::unordered_map<uint64_t, int32_t> handle_table; //!< map to translate global handles to local ones
@@ -233,11 +235,6 @@ private:
     /** generate a json string containing the federate/broker/Core Map*/
     std::string generateFederateMap () const;
 };
-
-inline uint64_t makeGlobalHandleIdentifier (Core::federate_id_t fed_id, Core::handle_id_t handle)
-{
-    return (static_cast<uint64_t> (fed_id) << 32) + static_cast<uint64_t> (handle);
-}
 
 }  // namespace helics
 
