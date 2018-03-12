@@ -52,7 +52,7 @@ install_mpich () {
     # Download and install MPICH (only works with v3+, version number scheme is different for v2)
     local mpich_version=$1
     local mpich_version_str=mpich-${mpich_version}
-    local install_path=$(realpath $2)
+    local install_path=$2
     wget --no-check-certificate -O ${mpich_version_str}.tar.gz http://www.mpich.org/static/downloads/${mpich_version}/${mpich_version_str}.tar.gz;
     tar xzf ${mpich_version_str}.tar.gz ;
     (
@@ -83,7 +83,7 @@ install_openmpi () {
     local openmpi_version=$1
     local openmpi_short_ver=v${ver[0]}.${ver[1]}
     local openmpi_version_str=openmpi-${openmpi_version}
-    local install_path=$(realpath $2)
+    local install_path=$2
     wget --no-check-certificate -O ${openmpi_version_str}.tar.gz https://www.open-mpi.org/software/ompi/${openmpi_short_ver}/downloads/${openmpi_version_str}.tar.gz;
     tar xzf ${openmpi_version_str}.tar.gz ;
     (
