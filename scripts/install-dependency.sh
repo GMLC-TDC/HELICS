@@ -61,8 +61,8 @@ install_mpich () {
             --disable-dependency-tracking \
             --enable-fast=yes \
             --enable-g=none \
-            --enable-timing=none
-            --enable-shared=yes \
+            --enable-timing=none \
+            --enable-shared \
             --disable-static \
             --disable-java \
             --disable-fortran \
