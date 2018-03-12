@@ -38,7 +38,7 @@ install_zmq () {
         cd libzmq;
         ./autogen.sh;
         mkdir -p build && cd build;
-        cmake .. -DWITH_PERF_TOOL=OFF -DZMQ_BUILD_TESTS=OFF -DENABLE_CPACK=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${install_path}"
+        cmake .. -DWITH_PERF_TOOL=OFF -DZMQ_BUILD_TESTS=OFF -DENABLE_CPACK=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${install_path}" ${cmake_cxx_standard_option}
         make;
         make install;
     )
@@ -58,7 +58,7 @@ install_boost () {
     (
         cd ${boost_version_str}/;
         ./bootstrap.sh --with-toolset=${boost_toolset} --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test;
-        ./b2 -j2 link=shared threading=multi variant=release cxxflags=-std=c++14 > /dev/null;
+        ./b2 -j2 link=shared threading=multi variant=release cxxflags=${CXX_FLAGS} > /dev/null;
         ./b2 install --prefix=${install_path} > /dev/null;
     )
     rm ${boost_version_str}.tar.gz
@@ -91,6 +91,12 @@ compiler_toolset=$4
 if [[ -z $compiler_toolset ]]; then
     compiler_toolset=gcc
 fi
+
+if [[ "$CXX_STANDARD" ]]; then
+    cmake_cxx_standard_option=-DCMAKE_CXX_STANDARD=${CXX_STANDARD}
+    CXX_FLAGS="${CXX_FLAGS} -std=c++${CXX_STANDARD}"
+fi
+
 
 # If FORCE_TOOLSET is set, create symlinks and add directory to path
 # May be needed to force boost to build with the right compiler version
