@@ -80,7 +80,7 @@ BasicHandleInfo * HandleManager::getHandleInfo(int32_t index)
 static uint64_t generateSearchKey(Core::federate_id_t fed_id, Core::handle_id_t id)
 {
     auto searchKey = static_cast<uint64_t>(fed_id) << 32;
-    searchKey += static_cast<uint64_t>(id) && (0x0000'0000'FFFF'FFFF);
+    searchKey += static_cast<uint64_t>(id) & (0x0000'0000'FFFF'FFFF);
     return searchKey;
 }
 

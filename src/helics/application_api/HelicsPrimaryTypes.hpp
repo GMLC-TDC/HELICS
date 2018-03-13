@@ -30,13 +30,13 @@ using defV = boost::variant<double,
 /**enumeration of the order inside the variant so the Which function returns match the enumeration*/
 enum type_location
 {
-
     doubleLoc = 0,
     intLoc = 1,
     stringLoc = 2,
     complexLoc = 3,
     vectorLoc = 4,
     complexVectorLoc = 5,
+    namedPointLoc=6
 };
 /** detect a change from the previous values*/
 bool changeDetected (const defV &prevValue, const std::string &val, double deltaV);
@@ -47,6 +47,7 @@ bool changeDetected (const defV &prevValue, const std::complex<double> &val, dou
 bool changeDetected (const defV &prevValue, double val, double deltaV);
 bool changeDetected (const defV &prevValue, int64_t val, double deltaV);
 bool changeDetected (const defV &prevValue, named_point val, double deltaV);
+bool changeDetected(const defV &prevValue, bool val, double deltaV);
 
 void valueExtract (const defV &dv, std::string &val);
 
@@ -65,6 +66,8 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<doub
 void valueExtract (const data_view &dv, helics_type_t baseType, std::complex<double> &val);
 
 void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<std::complex<double>> &val);
+
+void valueExtract(const data_view &dv, helics_type_t baseType, named_point &val);
 
 /** for numeric types*/
 template <class X>
@@ -167,8 +170,15 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
         break;
     }
     case helics_type_t::helicsString:
-    {
         val = static_cast<X> (boost::lexical_cast<double> (dv.string ()));
+        break;
+    case helics_type_t::helicsBool:
+        val = static_cast<X>((dv.string() == "0") ? false : true);
+        break;
+    case helics_type_t::helicsNamedPoint:
+    {
+        auto npval = ValueConverter<named_point>::interpret(dv);
+        static_cast<X>(npval.second);
         break;
     }
     case helics_type_t::helicsDouble:
@@ -201,12 +211,6 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
     {
         auto V = ValueConverter<std::complex<double>>::interpret (dv);
         val = static_cast<X> (std::abs (V));
-        break;
-    }
-    case helics_type_t::helicsNamedPoint:
-    {
-        auto V = ValueConverter<named_point>::interpret (dv);
-        val = static_cast<X> (V.second);
         break;
     }
     case helics_type_t::helicsComplexVector:

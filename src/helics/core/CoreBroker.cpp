@@ -37,7 +37,7 @@ void CoreBroker::displayHelp ()
 
 CoreBroker::~CoreBroker ()
 {
-    std::lock_guard<std::mutex> lock (mutex_);
+    std::lock_guard<std::mutex> lock (name_mutex_);
     // make sure everything is synchronized
 }
 
@@ -45,7 +45,7 @@ void CoreBroker::setIdentifier (const std::string &name)
 {
     if (brokerState <= broker_state_t::connecting)  // can't be changed after initialization
     {
-        std::lock_guard<std::mutex> lock (mutex_);
+        std::lock_guard<std::mutex> lock (name_mutex_);
         identifier = name;
     }
 }

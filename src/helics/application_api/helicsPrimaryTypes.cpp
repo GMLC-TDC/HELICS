@@ -21,6 +21,18 @@ bool changeDetected (const defV &prevValue, const std::string &val, double /*del
     return true;
 }
 
+bool changeDetected(const defV &prevValue, bool val, double /*deltaV*/)
+{
+if (prevValue.which() == stringLoc)
+{
+    if (val?"1":"0"== boost::get<std::string>(prevValue))
+    {
+        return false;
+    }
+}
+return true;
+}
+
 bool changeDetected (const defV &prevValue, const std::vector<double> &val, double deltaV)
 {
     if (prevValue.which () == vectorLoc)
@@ -349,6 +361,11 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::string &val
         val = dv.string ();
         break;
     }
+    case helics_type_t::helicsNamedPoint:
+    {
+        auto npval = ValueConverter<named_point>::interpret(dv);
+        val = helicsNamedPointString(npval);
+    }
     case helics_type_t::helicsVector:
     {
         val = helicsVectorString (ValueConverter<std::vector<double>>::interpret (dv));
@@ -387,6 +404,19 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<doub
     case helics_type_t::helicsString:
     {
         helicsGetVector (dv.string (), val);
+        break;
+    }
+    case helics_type_t::helicsNamedPoint:
+    {
+        auto npval = ValueConverter<named_point>::interpret(dv);
+        if (std::isnan(npval.second))
+        {
+            val = helicsGetVector(dv.string());
+        }
+        else
+        {
+            val.push_back(npval.second);
+        }
         break;
     }
     case helics_type_t::helicsVector:
@@ -452,6 +482,19 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<std:
         ValueConverter<std::vector<std::complex<double>>>::interpret (dv, val);
         break;
     }
+    case helics_type_t::helicsNamedPoint:
+    {
+        auto npval = ValueConverter<named_point>::interpret(dv);
+        if (std::isnan(npval.second))
+        {
+            val = helicsGetComplexVector(dv.string());
+        }
+        else
+        {
+            val.emplace_back(npval.second, 0.0);
+        }
+        break;
+    }
     case helics_type_t::helicsComplex:
     {
         auto cval = ValueConverter<std::complex<double>>::interpret (dv);
@@ -483,6 +526,19 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::complex<dou
         val = helicsGetComplex (dv.string ());
         break;
     }
+    case helics_type_t::helicsNamedPoint:
+    {
+        auto npval = ValueConverter<named_point>::interpret(dv);
+        if (std::isnan(npval.second))
+        {
+            val = helicsGetComplex(dv.string());
+        }
+        else
+        {
+            val = std::complex<double>(npval.second, 0.0);
+        }
+        break;
+    }
     case helics_type_t::helicsVector:
     {
         auto vec = ValueConverter<std::vector<double>>::interpret (dv);
@@ -501,6 +557,62 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::complex<dou
         val = ValueConverter<std::complex<double>>::interpret (dv);
         break;
     }
+    case helics_type_t::helicsInvalid:
+    default:
+        break;
+    }
+}
+
+
+void valueExtract(const data_view &dv, helics_type_t baseType, named_point &val)
+{
+    switch (baseType)
+    {
+    case helics_type_t::helicsDouble:
+    {
+        auto V = ValueConverter<double>::interpret(dv);
+        val.first = "value";
+        val.second = V;
+        break;
+    }
+    case helics_type_t::helicsInt:
+    {
+        auto V = ValueConverter<int64_t>::interpret(dv);
+        val.first = "value";
+        val.second = static_cast<double>(V);
+        break;
+    }
+    case helics_type_t::helicsString:
+    case helics_type_t::helicsAny:
+    {
+        val = helicsGetNamedPoint(dv.string());
+        break;
+    }
+    case helics_type_t::helicsVector:
+    {
+        auto vec = ValueConverter<std::vector<double>>::interpret(dv);
+        val.first = "value";
+        
+        val.second = (vec.empty())?0:vec[0];
+        break;
+    }
+    case helics_type_t::helicsComplex:
+    {
+        auto cval = ValueConverter<std::complex<double>>::interpret(dv);
+        val.first = "value";
+        val.second = std::abs(cval);
+        break;
+    }
+    case helics_type_t::helicsComplexVector:
+    {
+        auto cvec=ValueConverter<std::vector<std::complex<double>>>::interpret(dv);
+        val.first = "value";
+        val.second = (cvec.empty()) ?0.0: std::abs(cvec[0]);
+        break;
+    }
+    case helics_type_t::helicsNamedPoint:
+        val = ValueConverter<named_point>::interpret(dv);
+        break;
     case helics_type_t::helicsInvalid:
     default:
         break;

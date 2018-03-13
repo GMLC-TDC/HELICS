@@ -48,7 +48,7 @@ class BasicBrokerInfo
 
 	bool _initRequested = false;	//!< flag indicating the broker has requesting initialization
 	bool _disconnected = false;		//!< flag indicating that the broker has disconnected
-	bool _hasEndpoints = false;		//!< flag indicating that a broker has endpoints it is coordinating
+	bool _hasTimeDependency = false;		//!< flag indicating that a broker has endpoints it is coordinating
     bool _nonLocal = false;           //!< flag indicating that a broker is a direct subbroker of the managing object
 	std::string routeInfo;	//!< string describing the connection information for the route
     BasicBrokerInfo (const std::string &brokerName) : name (brokerName){};
@@ -77,25 +77,16 @@ class CoreBroker : public Broker, public BrokerBase
 	bool _gateway = false;  //!< set to true if this broker should act as a gateway.
   private:
 	bool _isRoot = false;  //!< set to true if this object is a root broker
-    std::vector<std::pair<Core::federate_id_t, bool>>
-      localBrokersInit;  //!< indicator if the local brokers are ready to initialize
 	DualMappedVector<BasicFedInfo, std::string,Core::federate_id_t> _federates; //!< container for all federates
 	DualMappedVector<BasicBrokerInfo, std::string, Core::federate_id_t> _brokers; //!< container for all the broker information
     std::string previous_local_broker_identifier; //!< the previous identifier in case a rename is required
 
-    HandleManager handles;
-	//std::vector<BasicHandleInfo> _handles; //!< container for the basic info for all handles
-	
-	//std::unordered_map<std::string, int32_t> publications; //!< map of publications;
-	//std::unordered_multimap<std::string, int32_t> subscriptions; //!< multimap of subscriptions
-	//std::unordered_map<std::string, int32_t> endpoints;  //!< map of endpoints
-	//std::unordered_multimap<std::string, int32_t> filters;  //!< multimap for all the filters
+    HandleManager handles; //!< structure for managing handles and search operations on handles
 
 	std::map<Core::federate_id_t, int32_t> global_id_translation; //!< map to translate global ids to local ones
-	std::unordered_map<uint64_t, int32_t> handle_table; //!< map to translate global handles to local ones
 	std::map<Core::federate_id_t, int32_t> routing_table;  //!< map for external routes  <global federate id, route id>
 	std::unordered_map<std::string, int32_t> knownExternalEndpoints; //!< external map for all known external endpoints with names and route
-    std::mutex mutex_; //mutex lock for name and identifier
+    std::mutex name_mutex_; //mutex lock for name and identifier
 private:
 
 	/** function that processes all the messages
