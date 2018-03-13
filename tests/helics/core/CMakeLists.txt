@@ -39,13 +39,16 @@ if (MPI_ENABLE)
     list(APPEND core_test_sources MpiCore-tests.cpp)
 endif()
 
-add_executable(core-tests ${core_test_sources} ${core_test_headers})
-target_link_libraries(core-tests helics-static)
-
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
+add_executable(core-tests ${core_test_sources} ${core_test_headers})
+target_link_libraries(core-tests helics-static)
+
+if (HELICS_HAVE_ZEROMQ)
+   target_include_directories (core-tests PRIVATE "${ZeroMQ_INCLUDE_DIR}")
+endif (HELICS_HAVE_ZEROMQ)
 
 target_link_libraries(core-tests ${Boost_LIBRARIES_test})
 

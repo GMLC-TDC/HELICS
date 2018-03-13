@@ -65,17 +65,21 @@ set (helics_public_common
 timeRepresentation.hpp
 )
 
-if (${ZeroMQ_FOUND})
+if (HELICS_HAVE_ZEROMQ)
    list(APPEND common_headers ${zmq_headers})
    list(APPEND common_sources ${zmq_sources})
-endif (${ZeroMQ_FOUND})
+endif (HELICS_HAVE_ZEROMQ)
 
 list(APPEND common_sources ${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp.cpp)
 
 add_library(helics_common OBJECT ${common_sources} ${common_headers})
 set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)
 
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
+target_include_directories(helics_common SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
+
+if (HELICS_HAVE_ZEROMQ)
+   target_include_directories (helics_common PRIVATE "${ZeroMQ_INCLUDE_DIR}")
+endif(HELICS_HAVE_ZEROMQ)
 
 install(FILES ${helics_public_common} DESTINATION include/helics/common)
 

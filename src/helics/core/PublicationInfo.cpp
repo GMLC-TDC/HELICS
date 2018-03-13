@@ -5,7 +5,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "PublicationInfo.hpp"
-#include "helics_includes/string_view.h"
+#include "helics_includes/string_view.hpp"
 namespace helics
 {
 bool PublicationInfo::CheckSetValue (const char *dataToCheck, uint64_t len)

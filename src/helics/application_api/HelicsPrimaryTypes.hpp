@@ -12,15 +12,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "boost/lexical_cast.hpp"
-#include <boost/variant.hpp>
+#include <helics_includes/variant.hpp>
 /** @file
 @brief naming a set of types that are interchangeable and recognizable inside the HELICS application API and core
 */
 namespace helics
 {
 /** define a variant with the different types*/
-using defV = boost::variant<double,
+using defV = mpark::variant<double,
                             int64_t,
                             std::string,
                             std::complex<double>,
@@ -36,7 +35,7 @@ enum type_location
     stringLoc = 2,
     complexLoc = 3,
     vectorLoc = 4,
-    complexVectorLoc = 5,
+    complexVectorLoc = 5
 };
 /** detect a change from the previous values*/
 bool changeDetected (const defV &prevValue, const std::string &val, double deltaV);
@@ -70,24 +69,32 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<std:
 template <class X>
 std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &val)
 {
-    switch (dv.which ())
+    switch (dv.index ())
     {
     case doubleLoc:  // double
-        val = static_cast<X> (boost::get<double> (dv));
+        val = static_cast<X> (mpark::get<double> (dv));
         break;
     case intLoc:  // int64_t
-        val = static_cast<X> (boost::get<int64_t> (dv));
+        val = static_cast<X> (mpark::get<int64_t> (dv));
         break;
     case stringLoc:  // string
     default:
-        val = boost::lexical_cast<X> (boost::get<std::string> (dv));
+        if IF_CONSTEXPR(std::is_integral<X>::value)
+        {
+            val = static_cast<X>(std::stoll(mpark::get<std::string>(dv)));
+        }
+        else
+        {
+            val = static_cast<X>(std::stod (mpark::get<std::string>(dv)));
+        }
+        
         break;
     case complexLoc:  // complex
-        val = static_cast<X> (std::abs (boost::get<std::complex<double>> (dv)));
+        val = static_cast<X> (std::abs (mpark::get<std::complex<double>> (dv)));
         break;
     case vectorLoc:  // vector
     {
-        auto &vec = boost::get<std::vector<double>> (dv);
+        auto &vec = mpark::get<std::vector<double>> (dv);
         if (!vec.empty ())
         {
             if (vec.size() == 2)
@@ -108,7 +115,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &
     }
     case complexVectorLoc:  // complex vector
     {
-        auto &vec = boost::get<std::vector<std::complex<double>>> (dv);
+        auto &vec = mpark::get<std::vector<std::complex<double>>> (dv);
         if (!vec.empty ())
         {
             val = static_cast<X> (std::abs (vec.front ()));
@@ -168,7 +175,14 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
     }
     case helics_type_t::helicsString:
     {
-        val = static_cast<X> (boost::lexical_cast<double> (dv.string ()));
+        if IF_CONSTEXPR(std::is_integral<X>::value)
+        {
+            val = static_cast<X>(std::stoll(ValueConverter<std::string>::interpret(dv)));
+        }
+        else
+        {
+            val = static_cast<X>(std::stod(ValueConverter<std::string>::interpret(dv)));
+        }
         break;
     }
     case helics_type_t::helicsDouble:

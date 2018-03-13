@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../../common/cppzmq/zmq.hpp"
 #include "../../common/zmqContextManager.h"
 #include "../ActionMessage.hpp"
-#include "helics_includes/optional.h"
+#include "helics_includes/optional.hpp"
 #include <deque>
 #include <map>
 #include <string>
