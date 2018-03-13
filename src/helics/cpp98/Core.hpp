@@ -39,9 +39,35 @@ class Core
         helicsCoreFree (core);
     }
 
-    bool isConnected ()
+    bool isConnected () const
     {
         return helicsCoreIsConnected (core);
+    }
+
+    Core(const Core &cr)
+    {
+        core = helicsCoreClone(cr.core);
+    }
+    Core &operator=(const Core &cr)
+    {
+        core = helicsCoreClone(cr.core);
+        return *this;
+    }
+    void setReadyToInit()
+    {
+        helicsCoreSetReadyToInit(core);
+    }
+    void disconnect()
+    {
+        helicsCoreDisconnect(core);
+    }
+
+    std::string getIdentifier() const
+    {
+        char str[255];
+        helicsCoreGetIdentifier(core, &str[0], sizeof(str));
+        std::string result(str);
+        return result;
     }
 
   protected:

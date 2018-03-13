@@ -18,7 +18,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test out the value converters and some of the other functions
 */
 
-BOOST_FIXTURE_TEST_SUITE(value_federate_tests2, FederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE(value_federate_tests2_cpp, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 //const std::string core_types[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };

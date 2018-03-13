@@ -19,7 +19,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test out the value federates
  */
 
-BOOST_FIXTURE_TEST_SUITE(value_federate_tests1, FederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE(value_federate_tests1_cpp, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 

@@ -153,6 +153,16 @@ class Federate
     // Default constructor, not meant to be used
     Federate ():fed(nullptr),exec_async_iterate(false) {};
 
+    Federate(const Federate &fedObj):exec_async_iterate(fedObj.exec_async_iterate)
+    {
+        fed = helicsFederateClone(fedObj.fed);
+    }
+    Federate &operator=(const Federate &fedObj)
+    {
+        exec_async_iterate = fedObj.exec_async_iterate;
+        fed = helicsFederateClone(fedObj.fed);
+        return *this;
+    }
     virtual ~Federate ()
     {
         helicsFederateFree (fed);

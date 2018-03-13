@@ -13,6 +13,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "../src/helics/cpp98/Broker.hpp"
 #include "../src/helics/cpp98/Federate.hpp"
+#include "../src/helics/cpp98/Core.hpp"
+#include <memory>
 
 #define HELICS_SIZE_MAX 512
 
@@ -28,29 +30,28 @@ const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2"
 const std::string core_types_single[] = {"test", "ipc", "zmq", "udp","test_3", "zmq_3", "udp_3" };
 #endif
 
-typedef helics_federate (*FedCreator)(helics_federate_info_t);
 
-struct FederateTestFixture
+struct FederateTestFixture_cpp
 {
-    FederateTestFixture () = default;
-    ~FederateTestFixture ();
+    FederateTestFixture_cpp() = default;
+    ~FederateTestFixture_cpp();
 
-    helics::Broker AddBroker (const std::string &core_type_name, int count);
-    helics::Broker AddBroker (const std::string &core_type_name, const std::string &initialization_string);
+    std::shared_ptr<helics::Broker> AddBroker (const std::string &core_type_name, int count);
+    std::shared_ptr<helics::Broker> AddBroker (const std::string &core_type_name, const std::string &initialization_string);
 
+    template<class FedType>
     void SetupTest (
-            FedCreator ctor,
             const std::string &core_type_name,
             int count,
             helics_time_t time_delta = helics_time_zero,
             const std::string &name_prefix = "fed")
     {
-        helics::Broker broker = AddBroker (core_type_name, count);
-        AddFederates (ctor, core_type_name, count, broker, time_delta, name_prefix);
+        auto broker = AddBroker (core_type_name, count);
+        AddFederates<FedType> ( core_type_name, count, *broker, time_delta, name_prefix);
     }
 
+    template<class FedType>
     std::vector<helics::Federate> AddFederates (
-            FedCreator ctor,
             std::string core_type_name,
             int count,
             helics::Broker &broker,
@@ -67,11 +68,9 @@ struct FederateTestFixture
         }
 
         std::string initString = std::string ("--broker=");
-        CE (helicsBrokerGetIdentifier (broker, tmp, HELICS_SIZE_MAX));
-        initString += tmp;
+        initString += broker.getIdentifier();
         initString += " --broker_address=";
-        CE (helicsBrokerGetAddress (broker, tmp, HELICS_SIZE_MAX));
-        initString += tmp;
+        initString += broker.getAddress();
 
         if (!extraCoreArgs.empty ())
         {
@@ -79,14 +78,12 @@ struct FederateTestFixture
             initString.append (extraCoreArgs);
         }
 
-        helics_federate_info_t fi = helicsFederateInfoCreate ();
-        CE( helicsFederateInfoSetFederateName (fi, ""));
-        CE( helicsFederateInfoSetCoreTypeFromString (fi, core_type_name.c_str()));
-        CE( helicsFederateInfoSetTimeDelta (fi, time_delta));
+        helics::FederateInfo fi;
+        fi.setFederateName = "";
 
-        std::vector<helics_federate> federates_added;
-
-        
+        fi.setCoreTypeFromString(core_type_name);
+        fi.setTimeDelta(time_delta);
+        std::vector<helics::Federate> federates_added;
 
         switch (setup)
         {
@@ -94,20 +91,19 @@ struct FederateTestFixture
         default:
         {
             auto init = initString + " --federates "+ std::to_string(count);
-            auto core = helicsCreateCore (core_type_name.c_str(), NULL, init.c_str());
-            CE (helicsCoreGetIdentifier (core, tmp, HELICS_SIZE_MAX));
-            CE (helicsFederateInfoSetCoreName (fi, tmp));
+            helics::Core core(core_type_name, NULL, init);
+            
+            fi.setCoreName(core.getIdentifier());
             size_t offset = federates.size();
             federates.resize(count + offset);
             for (int ii = 0; ii < count; ++ii)
             {
                 auto name = name_prefix + std::to_string (ii+offset);
-                CE (helicsFederateInfoSetFederateName (fi, name.c_str()));
-                auto fed = ctor (fi);
+                fi.setFederateName(name);
+                auto fed=std::make_shared<FedType>(fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
             }
-            helicsCoreFree(core);
         }
         break;
         case 2:
@@ -117,16 +113,14 @@ struct FederateTestFixture
             for (int ii = 0; ii < count; ++ii)
             {
                 auto init = initString + " --federates 1";
-                auto core = helicsCreateCore (core_type_name.c_str(), NULL, init.c_str());
-                CE (helicsCoreGetIdentifier (core, tmp, HELICS_SIZE_MAX));
-                CE (helicsFederateInfoSetCoreName (fi, tmp));
+                helics::Core core(core_type_name, NULL, init);
+                fi.setCoreName(core.getIdentifier());
 
                 auto name = name_prefix + std::to_string (ii+offset);
-                CE (helicsFederateInfoSetFederateName (fi, name.c_str()));
-                auto fed = ctor (fi);
+                fi.setFederateName(name);
+                auto fed = std::make_shared<FedType>(fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
-                helicsCoreFree(core);
             }
         }
         break;
@@ -138,7 +132,7 @@ struct FederateTestFixture
             newTypeString.push_back('2');
             for (int ii = 0; ii < count; ++ii)
             {
-                AddFederates (ctor, newTypeString, 1, subbroker, time_delta, name_prefix);
+                AddFederates<FedType> ( newTypeString, 1, *subbroker, time_delta, name_prefix);
             }
         }
         break;
@@ -150,7 +144,7 @@ struct FederateTestFixture
             for (int ii = 0; ii < count; ++ii)
             {
                 auto subbroker = AddBroker(core_type_name, initString + " --federates 1");
-                AddFederates (ctor, newTypeString, 1, subbroker, time_delta, name_prefix);
+                AddFederates<FedType> ( newTypeString, 1, *subbroker, time_delta, name_prefix);
             }
         }
         break;
@@ -159,13 +153,14 @@ struct FederateTestFixture
         return federates_added;
     }
 
-    helics_federate GetFederateAt (int index)
-    {
-        return federates.at(index);
-    }
+            template <class FedType>
+            std::shared_ptr<FedType> GetFederateAs(int index)
+            {
+                return std::dynamic_pointer_cast<FedType> (federates[index]);
+            }
 
-    std::vector<helics::Broker> brokers;
-    std::vector<helics::Federate> federates;
+            std::vector<std::shared_ptr<helics::Broker>> brokers;
+            std::vector<std::shared_ptr<helics::Federate>> federates;
     std::string extraCoreArgs;
     std::string extraBrokerArgs;
 

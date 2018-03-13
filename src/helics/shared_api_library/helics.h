@@ -63,6 +63,12 @@ HELICS_Export helics_core helicsCreateCore (const char *type, const char *name, 
 */
 HELICS_Export helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, const char *const *argv);
 
+/** create a new reference to an existing broker
+@details this will create a new broker object that references the existing broker it must be freed as well
+@param broker an existing helics_broker
+@return a new refernce to the same broker*/
+HELICS_Export helics_core helicsCoreClone(helics_core core);
+
 /** create a broker object
 @param type the type of the broker to create
 @param name the name of the broker , may be a nullptr or empty string to have a name automatically assigned
@@ -80,6 +86,11 @@ HELICS_Export helics_broker helicsCreateBroker (const char *type, const char *na
 */
 HELICS_Export helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, const char *const *argv);
 
+/** create a new reference to an existing broker
+@details this will create a new broker object that references the existing broker it must be freed as well
+@param broker an existing helics_broker
+@return a new refernce to the same broker*/
+HELICS_Export helics_broker helicsBrokerClone(helics_broker broker);
 /** check if a broker is connected
 a connected broker implies is attached to cores or cores could reach out to communicate
 return 0 if not connected , something else if it is connected*/
@@ -127,6 +138,13 @@ HELICS_Export helics_status helicsCoreSetReadyToInit(helics_core core);
 @return a helics_status enumeration indicating any error condition
 */
 HELICS_Export helics_status helicsCoreDisconnect (helics_core core);
+
+/** get an existing federate object from a core by name
+@details the federate must have been created by one of the other functions and at least one of the objects referencing the created federate
+must still be active in the process
+@param fedName the name of the federate to retrieve
+@return NULL if no fed is available by that name otherwise a helics_federate with that name*/
+HELICS_Export helics_federate helicsGetFederateByName(const char *fedName);
 
 /** get the network address associated with a broker
 @param broker the broker to query
@@ -187,6 +205,12 @@ helics_federate, helics_message_federate or helics_federate object as an argumen
 @return an opaque combination federate object
 */
 HELICS_Export helics_federate helicsCreateCombinationFederateFromJson (const char *json);
+
+/** create a new reference to an existing federate
+@details this will create a new helics_federate object that references the existing federate it must be freed as well
+@param fed an existing helics_federate
+@return a new reference to the same federate*/
+HELICS_Export helics_federate helicsFederateClone(helics_federate fed);
 
 /** create a federate info object for specifying federate information when constructing a federate
 @return a helics_federate_info_t object which is a reference to the created object
