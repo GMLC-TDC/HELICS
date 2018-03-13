@@ -31,10 +31,11 @@ internal/api_objects.h
 
 add_library(helicsSharedLib SHARED ${helicsShared_sources} ${helicsShared_headers})
 
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-
 target_link_libraries(helicsSharedLib helics-static)
 
+if (HELICS_HAVE_ZEROMQ)
+   target_include_directories (helicsSharedLib PRIVATE "${ZeroMQ_INCLUDE_DIR}")
+endif(HELICS_HAVE_ZEROMQ)
 
 INSTALL(TARGETS helicsSharedLib EXPORT helics-targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

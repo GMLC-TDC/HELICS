@@ -12,7 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <mutex>
 #include <queue>
 #include <string>
-#include <helics_includes/optional.h>
+#include <helics_includes/optional.hpp>
 
 namespace helics {
 /** a queue that blocks while waiting for an input

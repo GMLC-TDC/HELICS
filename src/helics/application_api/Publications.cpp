@@ -189,21 +189,21 @@ void Publication::publish (std::complex<double> val) const
 
 data_block typeConvert (helics_type_t type, const defV &val)
 {
-    switch (val.which ())
+    switch (val.index())
     {
     case doubleLoc:  // double
-        return typeConvert (type, boost::get<double> (val));
+        return typeConvert (type, mpark::get<double> (val));
     case intLoc:  // int64_t
-        return typeConvert (type, boost::get<int64_t> (val));
+        return typeConvert (type, mpark::get<int64_t> (val));
     case stringLoc:  // string
     default:
-        return typeConvert (type, boost::get<std::string> (val));
+        return typeConvert (type, mpark::get<std::string> (val));
     case complexLoc:  // complex
-        return typeConvert (type, boost::get<std::complex<double>> (val));
+        return typeConvert (type, mpark::get<std::complex<double>> (val));
     case vectorLoc:  // vector
-        return typeConvert (type, boost::get<std::vector<double>> (val));
+        return typeConvert (type, mpark::get<std::vector<double>> (val));
     case complexVectorLoc:  // complex
-        return typeConvert (type, boost::get<std::vector<std::complex<double>>> (val));
+        return typeConvert (type, mpark::get<std::vector<std::complex<double>>> (val));
     }
 }
 

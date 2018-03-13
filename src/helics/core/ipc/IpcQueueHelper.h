@@ -8,7 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../ActionMessage.hpp"
 #include <algorithm>
 #include <cctype>
-#include <helics_includes/optional.h>
+#include <helics_includes/optional.hpp>
 #include <iostream>
 #include <memory>
 #include <thread>

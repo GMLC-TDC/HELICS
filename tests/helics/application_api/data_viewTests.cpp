@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE (data_view_constructor_tests)
     BOOST_CHECK_EQUAL (dv2.string (), str);
 
     data_view dv3 (str, 7);
-    BOOST_CHECK_EQUAL (dv3.size (), 7);
+    BOOST_CHECK_EQUAL (dv3.size (), 7u);
     BOOST_CHECK_EQUAL (dv3.string (), "this is");
 
     stx::string_view stv (str, 10);
