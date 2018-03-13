@@ -397,7 +397,7 @@ iteration request and return a time and iteration status
 */
 HELICS_Export helics_status helicsFederateEnterExecutionModeIterativeAsync (helics_federate fed, helics_iteration_request iterate);
 
-/** complete the asyncrhonous iterative call into ExecutionModel
+/** complete the asynchronous iterative call into ExecutionModel
 @param fed the federate to make the request of
 @param[out] outIterate  the iteration specification of the result
 @return a helics_status object with a return code of the result helics_ok if there were no issues
@@ -446,14 +446,14 @@ HELICS_Export helics_status helicsFederateRequestTimeIterative (helics_federate 
 @return a helics_status if the return value is equal to helics_ok*/
 HELICS_Export helics_status helicsFederateRequestTimeAsync (helics_federate fed, helics_time_t requestTime);
 
-/** complete an asyncrhonous requestTime call
+/** complete an asynchronous requestTime call
 @param fed the federate to make the request of
 @param[out]  timeOut the time granted to the federate
 @return a helics_status if the return value is equal to helics_ok the timeOut will contain the new granted time, otherwise timeOut is
 invalid*/
 HELICS_Export helics_status helicsFederateRequestTimeComplete (helics_federate fed, helics_time_t *timeOut);
 
-/** request an iterative time through an asyncrhonous call
+/** request an iterative time through an asynchronous call
 @details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and
 iteration request and return a time and iteration status call /ref helicsFederateRequestTimeIterativeComplete to finish the process
 @param fed the federate to make the request of
@@ -465,7 +465,7 @@ HELICS_Export helics_status helicsFederateRequestTimeIterativeAsync (helics_fede
                                                                      helics_time_t requestTime,
                                                                      helics_iteration_request iterate);
 
-/** complete an iterative time request asyncrhonous call
+/** complete an iterative time request asynchronous call
 @param fed the federate to make the request of
 @param[out] timeOut the granted time
 @param[out] outIterate  the iteration specification of the result
@@ -528,7 +528,7 @@ HELICS_Export helics_status helicsFederateGetCurrentTime (helics_federate fed, h
 @details a query object consists of a target and query string
 */
 HELICS_Export helics_query helicsCreateQuery (const char *target, const char *query);
-
+ 
 /** Execute a query
 @details the call will block until the query finishes which may require communication or other delays
 @param query the query object to use in the query
@@ -554,8 +554,8 @@ the return will be nullptr if query is an invalid object
 HELICS_Export const char *helicsQueryExecuteComplete (helics_query query);
 
 /** check if an asynchronously executed query has completed
-@return will return helics_true if an async query has complete or a regular query call was made with a result
-and false if an async query has not completed or is invalid
+@return will return helics_true if an asynchronous query has complete or a regular query call was made with a result
+and false if an asynchronous query has not completed or is invalid
 */
 HELICS_Export helics_bool_t helicsQueryIsCompleted (helics_query query);
 

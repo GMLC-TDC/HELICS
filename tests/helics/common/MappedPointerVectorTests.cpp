@@ -15,8 +15,8 @@ BOOST_AUTO_TEST_CASE(definition_tests)
 {
 	MappedPointerVector<double> M;
 	MappedPointerVector<std::string> S2;
-	BOOST_CHECK_EQUAL(M.size(), 0);
-	BOOST_CHECK_EQUAL(S2.size(), 0);
+	BOOST_CHECK_EQUAL(M.size(), 0u);
+	BOOST_CHECK_EQUAL(S2.size(), 0u);
 	MappedPointerVector<std::vector<std::string>, double> V2;
 
 	//test move operators

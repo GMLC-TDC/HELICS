@@ -15,8 +15,8 @@ BOOST_AUTO_TEST_CASE (definition_tests)
 {
     MappedVector<double> M;
     MappedVector<std::string> S2;
-    BOOST_CHECK_EQUAL (M.size (), 0);
-    BOOST_CHECK_EQUAL (S2.size (), 0);
+    BOOST_CHECK_EQUAL (M.size (), 0u);
+    BOOST_CHECK_EQUAL (S2.size (), 0u);
     MappedVector<std::vector<std::string>, double> V2;
 
     // test move and assignment operators
@@ -32,11 +32,11 @@ BOOST_AUTO_TEST_CASE (insertion_tests)
 {
     MappedVector<std::vector<double>> Mvec;
     Mvec.insert ("el1", 3, 1.7);
-    BOOST_CHECK_EQUAL (Mvec.size (), 1);
+    BOOST_CHECK_EQUAL (Mvec.size (), 1u);
     Mvec.insert ("a2", std::vector<double> (45));
-    BOOST_CHECK_EQUAL (Mvec.size (), 2);
+    BOOST_CHECK_EQUAL (Mvec.size (), 2u);
     auto &V = Mvec[0];
-    BOOST_CHECK_EQUAL (V.size (), 3);
+    BOOST_CHECK_EQUAL (V.size (), 3u);
     BOOST_CHECK_EQUAL (V[0], 1.7);
     BOOST_CHECK_EQUAL (V[2], 1.7);
 

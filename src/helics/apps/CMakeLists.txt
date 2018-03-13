@@ -23,10 +23,15 @@ set(helics_apps_library_files
 
 add_library(helics_apps-static STATIC ${helics_apps_library_files} ${helics_apps_library_headers})
 
+target_include_directories(helics_apps-static SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
+
+target_include_directories(helics_apps-static SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/ThirdParty)
+
 if (BUILD_PLAYER)
 add_executable(helics_player playerMain.cpp)
 target_link_libraries(helics_player helics_apps-static helics-static)
 set_target_properties (helics_player PROPERTIES FOLDER apps)
+target_include_directories(helics_player SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
 endif()
 
 
@@ -34,17 +39,15 @@ if (BUILD_RECORDER)
 add_executable(helics_recorder recorderMain.cpp)
 target_link_libraries(helics_recorder helics_apps-static helics-static)
 set_target_properties (helics_recorder PROPERTIES FOLDER apps)
+target_include_directories(helics_recorder SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
 endif()
 
 IF(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_APPS)
 add_executable(helics_app appMain.cpp)
 target_link_libraries(helics_app helics_apps-static helics-static)
 set_target_properties (helics_app PROPERTIES FOLDER apps)
+target_include_directories(helics_app SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
 endif()
-
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
-
 
 INSTALL(TARGETS helics_apps-static EXPORT helics-targets
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

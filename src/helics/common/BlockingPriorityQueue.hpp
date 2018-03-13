@@ -7,7 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #ifndef HELICS_BLOCKING_PRIORITY_QUEUE_HPP_
 #define HELICS_BLOCKING_PRIORITY_QUEUE_HPP_
 
-#include "helics_includes/optional.h"
+#include "helics_includes/optional.hpp"
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>

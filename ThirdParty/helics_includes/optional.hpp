@@ -18,7 +18,7 @@
 #if !defined(STX_NO_STD_OPTIONAL) && defined(__APPLE__)
 // This header is empty on C++ but defines _LIBCPP_VERSION for us
 #include <ciso646>
-#if defined(_LIBCPP_VERSION) && (_LIBCPP_VERSION <= 3800)
+#if defined(_LIBCPP_VERSION) && (_LIBCPP_VERSION <= 4000)
 #define STX_NO_STD_OPTIONAL
 #endif // _LIBCPP_VERSION
 #endif // __APPLE__
@@ -573,6 +573,7 @@ public:
   // 20.5.4.5, Observers
   
   explicit constexpr operator bool() const noexcept { return initialized(); }
+  constexpr bool has_value() const noexcept { return initialized(); }
   
   constexpr T const* operator ->() const {
     return TR2_OPTIONAL_ASSERTED_EXPRESSION(initialized(), dataptr());
@@ -674,6 +675,8 @@ public:
 
 # endif
 
+  // 20.6.3.6, modifiers
+  void reset() noexcept { clear(); }
 };
 
 
@@ -768,12 +771,19 @@ public:
   explicit constexpr operator bool() const noexcept {
     return ref != nullptr;
   }
+ 
+  constexpr bool has_value() const noexcept {
+    return ref != nullptr;
+  }
   
   template <class V>
   constexpr typename std::decay<T>::type value_or(V&& v) const
   {
     return *this ? **this : detail_::convert<typename std::decay<T>::type>(constexpr_forward<V>(v));
   }
+
+  // x.x.x.x, modifiers
+  void reset() noexcept { ref = nullptr; }
 };
 
 
