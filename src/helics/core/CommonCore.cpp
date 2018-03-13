@@ -169,42 +169,19 @@ CommonCore::~CommonCore ()
 {
     // make sure everything is synced up so just run the lock
     std::unique_lock<std::mutex> lock (_handlemutex);
-    std::unique_lock<std::mutex> lock2 (_mutex);
     joinAllThreads ();
 }
 
 FederateState *CommonCore::getFederate (federate_id_t federateID) const
 {
-    // only activate the lock if we not in an operating state
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (_mutex);
-
-    if (isValidIndex (federateID, _federates))
-    {
-        return _federates[federateID].get ();
-    }
-
-    auto fnd = global_id_translation.find (federateID);
-    if (fnd != global_id_translation.end ())
-    {
-        return _federates[fnd->second].get ();
-    }
-
-    return nullptr;
+    auto feds = federates.lock();
+    return (*feds)[federateID];
 }
 
 FederateState *CommonCore::getFederate (const std::string &federateName) const
 {
-    // only activate the lock if we not in an operating state
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (_mutex);
-
-    auto fed = federateNames.find (federateName);
-    if (fed != federateNames.end ())
-    {
-        return _federates[fed->second].get ();
-    }
-    return nullptr;
+    auto feds = federates.lock();
+    return feds->find(federateName);
 }
 
 FederateState *CommonCore::getHandleFederate (handle_id_t id_)
@@ -215,10 +192,41 @@ FederateState *CommonCore::getHandleFederate (handle_id_t id_)
     // this list is now constant no need to lock
     auto local_fed_id = handles.getLocalFedID (id_);
     if (local_fed_id != invalid_fed_id)
+    { 
+        auto feds=federates.lock();
+        return (*feds)[local_fed_id];
+    }
+
+    return nullptr;
+}
+
+FederateState *CommonCore::getFederateCore(federate_id_t federateID)
+{
+
+    if (isValidIndex(federateID, loopFederates))
+    {
+        return loopFederates[federateID];
+    }
+    auto fed = loopFederates.find(federateID);
+    return (fed != loopFederates.end()) ? (*fed) : nullptr;
+}
+
+FederateState *CommonCore::getFederateCore(const std::string &federateName)
+{
+    auto fed = loopFederates.find(federateName);
+    return (fed != loopFederates.end()) ? (*fed) : nullptr;
+}
+
+FederateState *CommonCore::getHandleFederateCore(handle_id_t id_)
+{
+    // only activate the lock if we not in an operating state
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex>(_handlemutex, std::defer_lock) :
+        std::unique_lock<std::mutex>(_handlemutex);
+    // this list is now constant no need to lock
+    auto local_fed_id = handles.getLocalFedID(id_);
+    if (local_fed_id != invalid_fed_id)
     {  // now need to be careful about deadlock here
-        auto lock2 = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                                                  std::unique_lock<std::mutex> (_mutex);
-        return _federates[local_fed_id].get ();
+        return loopFederates[local_fed_id];
     }
 
     return nullptr;
@@ -242,18 +250,11 @@ BasicHandleInfo *CommonCore::getLocalEndpoint (const std::string &name)
 
 bool CommonCore::isLocal (Core::federate_id_t global_id) const
 {
-    // only activate the lock if we not in an operating state
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (_mutex);
-    auto fnd = global_id_translation.find (global_id);
-    return (fnd != global_id_translation.end ());
+    return (loopFederates.find(global_id) != loopFederates.end());
 }
 
 int32_t CommonCore::getRoute (Core::federate_id_t global_id) const
 {
-    // only activate the lock if we not in an operating state
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (_mutex);
     auto fnd = routing_table.find (global_id);
     return (fnd != routing_table.end ()) ? fnd->second : 0;
 }
@@ -313,27 +314,24 @@ bool CommonCore::allInitReady () const
     {
         return false;
     }
-    std::lock_guard<std::mutex> lock (_mutex);
     // the federate count must be greater than the min size
-    if (static_cast<decltype (minFederateCount)> (_federates.size ()) < minFederateCount)
+    if (static_cast<decltype (minFederateCount)> (loopFederates.size ()) < minFederateCount)
     {
         return false;
     }
     // all federates must be requesting init
-    return std::all_of (_federates.begin (), _federates.end (),
+    return std::all_of (loopFederates.begin (), loopFederates.end (),
                         [](const auto &fed) { return fed->init_transmitted.load (); });
 }
 
 bool CommonCore::allDisconnected () const
 {
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (_mutex);
     // all federates must have hit finished state
     auto pred = [](const auto &fed) {
         auto state = fed->getState ();
         return (HELICS_FINISHED == state) || (HELICS_ERROR == state);
     };
-    return std::all_of (_federates.begin (), _federates.end (), pred);
+    return std::all_of (loopFederates.begin (), loopFederates.end (), pred);
 }
 
 void CommonCore::setCoreReadyToInit ()
@@ -409,7 +407,16 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
     {
         throw (RegistrationFailure ("Core has already moved to operating state"));
     }
-    auto fed = std::make_unique<FederateState> (name, info);
+    FederateState *fed;
+    federate_id_t local_id;
+    {
+        auto feds = federates.lock();
+        auto id = feds->insert(name,name, info);
+        local_id = static_cast<decltype (fed->local_id)>(id);
+        fed = (*feds)[id];
+    }
+   
+    
     // setting up the Logger
     // auto ptr = fed.get();
     // if we are using the Logger, log all messages coming from the federates so they can control the level*/
@@ -417,14 +424,9 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
         sendToLogger (0, -2, ident, message);
     });
 
-    std::unique_lock<std::mutex> lock (_mutex);
-    auto id = fed->local_id = static_cast<decltype (fed->local_id)> (_federates.size ());
-
+    fed->local_id = local_id;
     fed->setParent (this);
-    _federates.push_back (std::move (fed));
-    federateNames.emplace (name, id);
-    lock.unlock ();
-
+   
     ActionMessage m (CMD_REG_FED);
     m.name = name;
     if (global_broker_id != 0)
@@ -440,10 +442,10 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
     }
 
     // now wait for the federateQueue to get the response
-    auto valid = getFederate (id)->waitSetup ();
+    auto valid = fed->waitSetup ();
     if (valid == iteration_result::next_step)
     {
-        return id;
+        return local_id;
     }
     throw (RegistrationFailure ());
 }
@@ -468,12 +470,11 @@ const std::string &CommonCore::getFederateNameNoThrow (federate_id_t federateID)
 
 federate_id_t CommonCore::getFederateId (const std::string &name)
 {
-    std::lock_guard<std::mutex> lock (_mutex);
-
-    auto res = federateNames.find (name);
-    if (res != federateNames.end ())
+    auto feds = federates.lock();
+    auto fed = feds->find (name);
+    if (fed != nullptr)
     {
-        return res->second;
+        return fed->local_id;
     }
 
     return invalid_fed_id;
@@ -486,8 +487,7 @@ int32_t CommonCore::getFederationSize ()
         return _global_federation_size;
     }
     // if we are in initialization return the local federation size
-    std::lock_guard<std::mutex> lock (_mutex);
-    return static_cast<int32_t> (_federates.size ());
+    return static_cast<int32_t> (federates.lock()->size());
 }
 
 Time CommonCore::timeRequest (federate_id_t federateID, Time next)
@@ -657,8 +657,11 @@ void CommonCore::setLoggingLevel (federate_id_t federateID, int loggingLevel)
 {
     if (federateID == invalid_fed_id)
     {
-        std::lock_guard<std::mutex> lock (_mutex);
-        setLogLevel (loggingLevel);
+        ActionMessage cmd(CMD_CORE_CONFIGURE);
+        cmd.index = UPDATE_LOG_LEVEL;
+        cmd.dest_id = loggingLevel;
+        addActionMessage(cmd);
+        //setLogLevel (loggingLevel);
         return;
     }
 
@@ -1502,7 +1505,8 @@ void CommonCore::setLoggingCallback (
 {
     if (federateID == 0)
     {
-        std::lock_guard<std::mutex> lock (_mutex);
+        std::lock_guard<std::mutex> lock (_handlemutex);
+        //TODO:: this is not totally threadsafe
         setLoggerFunction (std::move (logFunction));
     }
     else
@@ -1562,19 +1566,14 @@ void CommonCore::setFilterOperator (handle_id_t filter, std::shared_ptr<FilterOp
 
 FilterCoordinator *CommonCore::getFilterCoordinator (handle_id_t id_)
 {
-    // only activate the lock if we not in an operating state
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (_mutex);
     auto fnd = filterCoord.find (id_);
     if (fnd == filterCoord.end ())
     {
         if (brokerState < operating)
         {
-            lock.unlock ();  // we know we are locked here so calling unlock is safe
             // just make a dummy filterFunction so we have something to return
             auto ff = std::make_unique<FilterCoordinator> ();
             auto ffp = ff.get ();
-            lock.lock ();
             filterCoord.emplace (id_, std::move (ff));
             return ffp;
         }
@@ -1587,7 +1586,6 @@ void CommonCore::setIdentifier (const std::string &name)
 {
     if (brokerState == created)
     {
-        std::lock_guard<std::mutex> lock (_mutex);
         identifier = name;
     }
     else
@@ -1690,6 +1688,12 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     switch (command.action ())
     {
     case CMD_REG_FED:
+        {
+            auto fed = getFederate(command.name);
+            loopFederates.insert(command.name, fed->local_id, fed);
+        }
+        transmit(0, command);
+        break;
     case CMD_REG_BROKER:
         // These really shouldn't happen here probably means something went wrong in setup but we can handle it
         // forward the connection request to the higher level
@@ -1712,19 +1716,10 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         break;
     case CMD_FED_ACK:
     {
-        auto id = getFederateId (command.name);
-        if (id != invalid_fed_id)
+        auto fed = getFederateCore(command.name);
+        if (fed != nullptr)
         {
-            auto fed = getFederate (id);
-            if (fed == nullptr)
-            {
-                break;
-            }
-            // now add the new global id to the translation table
-            {  // scope for the lock
-                std::lock_guard<std::mutex> lock (_mutex);
-                global_id_translation.emplace (command.dest_id, fed->local_id);
-            }
+            loopFederates.addSearchTerm(command.dest_id, command.name);
             // push the command to the local queue
             fed->addAction (command);
             if (static_cast<int32_t> (ongoingFilterProcesses.size ()) <= fed->local_id)
@@ -1814,7 +1809,7 @@ void CommonCore::sendErrorToFederates (int error_code)
 {
     ActionMessage errorCom (CMD_ERROR);
     errorCom.index = error_code;
-    for (auto &fed : _federates)
+    for (auto &fed : loopFederates)
     {
         routeMessage (errorCom, fed->global_id);
     }
@@ -2002,7 +1997,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         // route the message to all the subscribers
         if (command.dest_id == 0)
         {
-            auto fed = getFederate (command.source_id);
+            auto fed = getFederateCore (command.source_id);
             if (fed != nullptr)
             {
                 auto pubInfo = fed->getPublication (command.source_handle);
@@ -2048,7 +2043,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         // registration functions so this is just a router
         if (command.dest_id != 0)
         {
-            auto fed = getFederate (command.dest_id);
+            auto fed = getFederateCore (command.dest_id);
             if (fed != nullptr)
             {
                 fed->addAction (command);
@@ -2094,7 +2089,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             bool added = timeCoord->addDependency (command.source_id);
             if (added)
             {
-                auto fed = getFederate (command.source_id);
+                auto fed = getFederateCore (command.source_id);
                 ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id, command.source_id);
 
                 fed->addAction (add);
@@ -2146,7 +2141,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_NOTIFY_SUB:
     {
         // just forward these to the appropriate federate
-        auto fed = getFederate (command.dest_id);
+        auto fed = getFederateCore (command.dest_id);
         if (fed != nullptr)
         {
             fed->addAction (command);
@@ -2190,7 +2185,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             endhandle->hasSourceFilter = true;
         }
 
-        auto fed = getFederate (command.dest_id);
+        auto fed = getFederateCore (command.dest_id);
         if (fed != nullptr)
         {
             fed->addAction (command);
@@ -2251,10 +2246,14 @@ void CommonCore::processCommand (ActionMessage &&command)
                 }
             }
         }
+        else if (command.index == UPDATE_LOG_LEVEL)
+        {
+            setLogLevel(command.dest_id);
+        }
         break;
     case CMD_INIT:
     {
-        auto fed = getFederate (command.source_id);
+        auto fed = getFederateCore (command.source_id);
         if (fed != nullptr)
         {
             fed->init_transmitted = true;
@@ -2276,7 +2275,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         broker_state_t exp = initializing;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::operating))
         {  // forward the grant to all federates
-            for (auto &fed : _federates)
+            for (auto &fed : loopFederates)
             {
                 organizeFilterOperations ();
                 fed->addAction (command);
@@ -2375,7 +2374,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
 void CommonCore::distributeTimingMessage (ActionMessage &command)
 {
     // route the message to all dependent feds
-    auto fed = getFederate (command.source_id);
+    auto fed = getFederateCore (command.source_id);
     if (fed == nullptr)
     {
         LOG_DEBUG (command.source_id, "core",
@@ -2403,10 +2402,9 @@ void CommonCore::distributeTimingMessage (ActionMessage &command)
 
 void CommonCore::checkDependencies ()
 {
-    std::unique_lock<std::mutex> lock (_mutex);
     bool isobs = false;
     bool issource = false;
-    for (auto &fed : _federates)
+    for (auto &fed : loopFederates)
     {
         if (fed->hasEndpoints)
         {
@@ -2432,7 +2430,7 @@ void CommonCore::checkDependencies ()
             }
         }
     }
-    lock.unlock ();
+
     // if we have filters we need to be a timeCoordinator
     if (hasFilters)
     {
@@ -2679,7 +2677,7 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
     }
     else if (isLocal (cmd.dest_id))
     {
-        auto fed = getFederate (cmd.dest_id);
+        auto fed = getFederateCore (cmd.dest_id);
         if (fed != nullptr)
         {
             fed->addAction (cmd);
@@ -2705,7 +2703,7 @@ void CommonCore::routeMessage (ActionMessage &&cmd, federate_id_t dest)
     }
     else if (isLocal (dest))
     {
-        auto fed = getFederate (dest);
+        auto fed = getFederateCore (dest);
         if (fed != nullptr)
         {
             fed->addAction (std::move (cmd));
@@ -2730,7 +2728,7 @@ void CommonCore::routeMessage (ActionMessage &&cmd)
     }
     else if (isLocal (cmd.dest_id))
     {
-        auto fed = getFederate (cmd.dest_id);
+        auto fed = getFederateCore (cmd.dest_id);
         if (fed != nullptr)
         {
             fed->addAction (std::move (cmd));

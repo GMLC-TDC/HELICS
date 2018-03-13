@@ -416,7 +416,11 @@ class Federate
     /** get a pointer to the core object used by the federate*/
     std::shared_ptr<Core> getCorePointer () { return coreObject; }
     // interface for filter objects
-    /** get a shared pointer to a filter object stored in the federate*/
+    /** get a shared pointer to a filter object stored in the federate
+    @details filters can be created through the JSON file in which case there is no reference to
+    them elsewhere.  They are stored in the federate unless retrieved
+    @param index the index number of the stored federate
+    @return a shared_ptr to a filter object*/
     std::shared_ptr<Filter> getFilterObject (int index);
     /** add a shared pointer object to the Federate*/
     void addFilterObject (std::shared_ptr<Filter> obj);

@@ -1,9 +1,4 @@
 /*
-Copyright © 2017-2018,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
-*/
-/*
  * LLNS Copyright Start
  * Copyright (c) 2017, Lawrence Livermore National Security
  * This work was performed under the auspices of the U.S. Department
@@ -13,7 +8,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
  * All rights reserved.
  * LLNS Copyright End
  */
+ /*
+ Copyright © 2017-2018,
+ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
+ added
+ */
 /* define the basic indexing types*/
 
 #ifndef TIME_REPRESENTATION_H_
