@@ -141,6 +141,7 @@ script:
   - if [[ "$USE_MPI" ]]; then HELICS_OPTION_FLAGS+=" -DMPI_ENABLE=ON -DMPI_C_COMPILER=${TRAVIS_DEPENDENCY_DIR}/mpi/bin/mpicc -DMPI_CXX_COMPILER=${TRAVIS_DEPENDENCY_DIR}/mpi/bin/mpic++ -DMPI_C_LIBRARIES=${TRAVIS_DEPENDENCY_DIR}/mpi/lib -DMPI_C_INCLUDE_PATH=${TRAVIS_DEPENDENCY_DIR}/mpi/include -DMPI_CXX_LIBRARIES=${TRAVIS_DEPENDENCY_DIR}/mpi/lib -DMPI_CXX_INCLUDE_PATH=${TRAVIS_DEPENDENCY_DIR}/mpi/include" ; fi
     # - echo "$HELICS_OPTION_FLAGS"
     # - echo "$HELICS_DEPENDENCY_FLAGS"
+  - if [[ "$USE_MPI" ]]; then CC=${TRAVIS_DEPENDENCY_DIR}/mpi/bin/mpicc ; CXX=${TRAVIS_DEPENDENCY_DIR}/mpi/bin/mpic++ ; fi
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
   - make -j2
   # For controlling which tests get run:
