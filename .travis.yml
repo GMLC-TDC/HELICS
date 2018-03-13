@@ -137,7 +137,7 @@ script:
   - export HELICS_DEPENDENCY_FLAGS="-DZeroMQ_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/zmq -DBOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost"
   - export HELICS_OPTION_FLAGS="-DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.${SHARED_LIB_EXT} -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/"
   - if [[ "$USE_SWIG" == 'false' ]] ; then HELICS_OPTION_FLAGS+=" -DGENERATE_PYTHON=OFF" ; fi
-  - if [[ "$USE_MPI" ]]; then HELICS_OPTION_FLAGS+=" -DMPI_ENABLE=ON -DMPI_C_COMPILER=dependencies/mpi/bin/mpicc -DMPI_CXX_COMPILER=dependencies/mpi/bin/mpic++" ; fi
+  - if [[ "$USE_MPI" ]]; then HELICS_OPTION_FLAGS+=" -DMPI_ENABLE=ON -DMPI_C_COMPILER=dependencies/mpi/bin/mpicc -DMPI_CXX_COMPILER=dependencies/mpi/bin/mpic++ -DMPI_C_LIBRARIES=dependencies/mpi/lib -DMPI_C_INCLUDE_PATH=dependencies/mpi/include -DMPI_CXX_LIBRARIES=dependencies/mpi/lib -DMPI_CXX_INCLUDE_PATH=dependencies/mpi/include" ; fi
     # - echo "$HELICS_OPTION_FLAGS"
     # - echo "$HELICS_DEPENDENCY_FLAGS"
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
