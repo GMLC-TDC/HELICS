@@ -2,7 +2,7 @@ shallow_clone: true
 
 version: 1.0.0.beta.1.{build}
 
-image: Visual Studio 2017
+image: Visual Studio 2015
 
 platform:
   - x64
@@ -17,11 +17,10 @@ cache:
 install:
 
 before_build:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install swig --yes --limit-output #> $null
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 14 2015 Win64" -DAUTOBUILD_ZMQ=ON -DBUILD_RELEASE_ONLY=ON -DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON
+  - cmake .. -G "Visual Studio 14 2015 Win64" -DAUTOBUILD_ZMQ=ON -DBUILD_RELEASE_ONLY=ON -DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBOOST_ROOT="C:\Libraries\boost_1_63_0"
   - cd ..
 
 build:
