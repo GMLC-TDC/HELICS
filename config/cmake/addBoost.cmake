@@ -27,34 +27,23 @@ D:/boost
 
 # create an empty list
 list(APPEND boost_paths "")
-list(APPEND boost_paths ${BOOST_ROOT})
-
+list(APPEND boost_paths ${BOOST_INSTALL_PATH})
+mark_as_advanced(BOOST_INSTALL_PATH)
 foreach( dir ${poss_prefixes})
 	foreach( boostver ${boost_versions})
 		IF (IS_DIRECTORY ${dir}/${boostver})
-			list(APPEND boost_paths ${dir}/${boostver})
+			IF (EXISTS ${dir}/${boostver}/boost/version.hpp)
+				list(APPEND boost_paths ${dir}/${boostver})
+			ENDIF()
 		ENDIF()
 	endforeach()
 endforeach()
 
 message(STATUS "boost paths ${boost_paths}")
 
-while (NOT Boost_FOUND AND boost_paths)
-set(BOOST_TEST_PATH "")
-find_path(BOOST_TEST_PATH
-			NAMES 			boost/version.hpp
-			PATHS		${boost_paths}
-		)
-
-		if (BOOST_TEST_PATH)
-			message(STATUS "boost test path=${BOOST_TEST_PATH}")
-			set(BOOST_ROOT ${BOOST_TEST_PATH} CACHE)
-		endif(BOOST_TEST_PATH)
-		
-		SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
-
 # Minimum version of Boost required for building HELICS
 
+foreach (BOOST_ROOT in boost_paths)
 if (${MPI_C_FOUND})
   #find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
   find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options mpi unit_test_framework filesystem system date_time timer chrono mpi REQUIRED)
@@ -62,13 +51,13 @@ ELSE(${MPI_C_FOUND})
   find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time timer chrono REQUIRED)
 ENDIF(${MPI_C_FOUND})
 
-if (NOT Boost_FOUND AND boost_paths)
-	message(STATUS "${BOOST_ROOT} is not valid") 
-	list(REMOVE_AT boost_paths 0)
+if (Boost_FOUND )
+	break()
 endif()
-endwhile()
+endforeach()
 else(MSVC)
 
+set(BOOST_ROOT ${BOOST_INSTALL_PATH})
 if (${MPI_C_FOUND})
   #find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
   find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options mpi unit_test_framework filesystem system date_time timer chrono mpi REQUIRED)
