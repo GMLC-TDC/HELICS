@@ -110,6 +110,7 @@ public:
 
     void sendTimeRequest() const;
     void updateTimeGrant();
+    void transmitTimingMessage(ActionMessage &msg) const;
   public:
 	/** process a message related to time
 	@return true if it did anything
@@ -153,6 +154,8 @@ public:
 	void enteringExecMode(iteration_request mode);
 	/** check if it is valid to grant a time*/
     iteration_state checkTimeGrant ();
+    /** disconnect*/
+    void disconnect();
     /** generate a string with the current time status*/
     std::string printTimeStatus () const;
 };

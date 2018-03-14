@@ -274,8 +274,8 @@ class CommonCore : public Core, public BrokerBase
 
     HandlePointerManager handles; //!< local handle information;
 
-    std::vector<std::set<int32_t>> ongoingFilterProcesses; //!< sets of ongoing filtered messages
-    std::vector<std::vector<ActionMessage>> delayedTimingMessages; //!< delayedTimingMessages from ongoing Filter actions
+    std::map<int32_t,std::set<int32_t>> ongoingFilterProcesses; //!< sets of ongoing filtered messages
+    std::map<int32_t,std::vector<ActionMessage>> delayedTimingMessages; //!< delayedTimingMessages from ongoing Filter actions
     std::atomic<int> queryCounter{0};
     std::map<handle_id_t, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
     using fed_handle_pair = std::pair<federate_id_t, handle_id_t>;
@@ -341,9 +341,6 @@ class CommonCore : public Core, public BrokerBase
 
     /** send an error code to all the federates*/
     void sendErrorToFederates (int error_code);
-
-    /** handle delivery of a timing message*/
-    void distributeTimingMessage(ActionMessage &command);
 };
 
 }  // namespace helics

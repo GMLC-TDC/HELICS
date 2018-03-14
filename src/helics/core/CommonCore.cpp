@@ -429,18 +429,7 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
    
     ActionMessage m (CMD_REG_FED);
     m.name = name;
-    if (global_broker_id != 0)
-    {
-        m.source_id = global_broker_id;
-
-        transmit (0, m);  // just directly transmit, no need to process in the queue since it is a priority message
-    }
-    else
-    {
-        // this will get processed when this core is assigned a global id
-        delayTransmitQueue.push (m);
-    }
-
+    addActionMessage(m);
     // now wait for the federateQueue to get the response
     auto valid = fed->waitSetup ();
     if (valid == iteration_result::next_step)
@@ -1396,13 +1385,12 @@ void CommonCore::deliverMessage (ActionMessage &message)
     case CMD_SEND_FOR_FILTER_AND_RETURN:
     case CMD_FILTER_RESULT:
     case CMD_NULL_MESSAGE:
+    default:
     {
         auto route = getRoute (message.dest_id);
         transmit (route, message);
     }
     break;
-    default:
-        break;
     }
 }
 
@@ -1692,7 +1680,16 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             auto fed = getFederate(command.name);
             loopFederates.insert(command.name, fed->local_id, fed);
         }
-        transmit(0, command);
+        if (global_broker_id != 0)
+        {
+            command.source_id = global_broker_id;
+            transmit(0, command);  // just directly transmit, no need to process in the queue since it is a priority message
+        }
+        else
+        {
+            // this will get processed when this core is assigned a global id
+            delayTransmitQueue.push(std::move(command));
+        }
         break;
     case CMD_REG_BROKER:
         // These really shouldn't happen here probably means something went wrong in setup but we can handle it
@@ -1722,11 +1719,6 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             loopFederates.addSearchTerm(command.dest_id, command.name);
             // push the command to the local queue
             fed->addAction (command);
-            if (static_cast<int32_t> (ongoingFilterProcesses.size ()) <= fed->local_id)
-            {
-                ongoingFilterProcesses.resize (fed->local_id + 1);
-                delayedTimingMessages.resize (fed->local_id + 1);
-            }
         }
     }
     break;
@@ -1912,6 +1904,14 @@ void CommonCore::processCommand (ActionMessage &&command)
 
     case CMD_EXEC_GRANT:
     case CMD_EXEC_REQUEST:
+        if (isLocal(command.source_id))
+        {
+            if (!ongoingFilterProcesses[command.source_id].empty())
+            {
+                delayedTimingMessages[command.source_id].push_back(command);
+                break;
+            }
+        }
         if (command.dest_id == global_broker_id)
         {
             timeCoord->processTimeMessage (command);
@@ -1931,10 +1931,6 @@ void CommonCore::processCommand (ActionMessage &&command)
                 routeMessage (command, dep);
             }
         }
-        else if (command.dest_id == 0)
-        {
-            distributeTimingMessage (command);
-        }
         else
         {
             routeMessage (command);
@@ -1942,16 +1938,20 @@ void CommonCore::processCommand (ActionMessage &&command)
         break;
     case CMD_TIME_REQUEST:
     case CMD_TIME_GRANT:
+        if (isLocal(command.source_id))
+        {
+            if (!ongoingFilterProcesses[command.source_id].empty())
+            {
+                delayedTimingMessages[command.source_id].push_back(command);
+                break;
+            }
+        }
         if (command.source_id == global_broker_id)
         {
             for (auto dep : timeCoord->getDependents ())
             {
                 routeMessage (command, dep);
             }
-        }
-        else if (command.dest_id == 0)
-        {
-            distributeTimingMessage (command);
         }
         else
         {
@@ -1961,7 +1961,6 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_DISCONNECT:
         if (command.dest_id == 0)
         {
-            distributeTimingMessage (command);
             if (allDisconnected ())
             {
                 brokerState = broker_state_t::terminated;
@@ -2368,35 +2367,6 @@ void CommonCore::processFilterInfo (ActionMessage &command)
     default:
         // all other commands do not impact filters
         break;
-    }
-}
-
-void CommonCore::distributeTimingMessage (ActionMessage &command)
-{
-    // route the message to all dependent feds
-    auto fed = getFederateCore (command.source_id);
-    if (fed == nullptr)
-    {
-        LOG_DEBUG (command.source_id, "core",
-                   std::string ("dropping unrecognized ") + std::string (actionMessageType (command.action ())));
-        return;
-    }
-    if (ongoingFilterProcesses[fed->local_id].empty ())
-    {
-        auto &dep = fed->getDependents ();
-        for (auto &fed_id : dep)
-        {
-            routeMessage (command, fed_id);
-        }
-    }
-    else
-    {
-        auto &dep = fed->getDependents ();
-        for (auto &fed_id : dep)
-        {
-            command.dest_id = fed_id;
-            delayedTimingMessages[fed->local_id].push_back (command);
-        }
     }
 }
 

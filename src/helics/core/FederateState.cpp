@@ -632,6 +632,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         if (cmd.source_id == global_id)
         {
             setState (HELICS_FINISHED);
+            timeCoord->disconnect();
             return iteration_state::halted;
         }
         else
