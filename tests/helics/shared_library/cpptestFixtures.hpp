@@ -79,7 +79,7 @@ struct FederateTestFixture_cpp
         }
 
         helics::FederateInfo fi;
-        fi.setFederateName = "";
+        fi.setFederateName("");
 
         fi.setCoreTypeFromString(core_type_name);
         fi.setTimeDelta(time_delta);

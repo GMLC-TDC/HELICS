@@ -4,9 +4,9 @@ set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
 IF (MSVC)
 
 set (boost_versions
-#boost_1_66_0
-#boost_1_65_1
-#boost_1_65_0
+boost_1_66_0
+boost_1_65_1
+boost_1_65_0
 boost_1_64_0
 boost_1_63_0
 boost_1_62_0
@@ -43,7 +43,7 @@ message(STATUS "boost paths ${boost_paths}")
 
 # Minimum version of Boost required for building HELICS
 
-foreach (BOOST_ROOT in boost_paths)
+set(BOOST_ROOT "${boost_paths}")
 if (${MPI_C_FOUND})
   #find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
   find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options mpi unit_test_framework filesystem system date_time timer chrono mpi REQUIRED)
@@ -51,10 +51,6 @@ ELSE(${MPI_C_FOUND})
   find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time timer chrono REQUIRED)
 ENDIF(${MPI_C_FOUND})
 
-if (Boost_FOUND )
-	break()
-endif()
-endforeach()
 else(MSVC)
 
 set(BOOST_ROOT ${BOOST_INSTALL_PATH})
