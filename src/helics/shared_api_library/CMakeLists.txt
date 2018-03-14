@@ -37,15 +37,15 @@ if (HELICS_HAVE_ZEROMQ)
    target_include_directories (helicsSharedLib PRIVATE "${ZeroMQ_INCLUDE_DIR}")
 endif(HELICS_HAVE_ZEROMQ)
 
+#this is redundant but I need it once for the targets and once for cpack
+# cant use COMPONENT and distinct directories together
 INSTALL(TARGETS helicsSharedLib EXPORT helics-targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-INSTALL(FILES ${helicsShared_headers} DESTINATION include/helics/shared_api_library)
+INSTALL(FILES $<TARGET_LINKER_FILE:helicsSharedLib> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs)
+INSTALL(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime)
 
-
-if (WIN32 AND BUILD_PYTHON)
-	INSTALL(TARGETS helicsSharedLib DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
-endif(WIN32 AND BUILD_PYTHON)
+INSTALL(FILES ${helicsShared_headers} DESTINATION include/helics/shared_api_library COMPONENT headers)
 

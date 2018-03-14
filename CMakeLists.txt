@@ -8,8 +8,9 @@ set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
 set (HELICS_VERSION_PATCH 0)
 set (HELICS_VERSION_BUILD beta.1)
-set (HELICS_DATE "02-26-18")
-set (HELICS_VERSION_STRING "1.0.0-beta.1 ${HELICS_DATE}")
+set (HELICS_DATE "03-02-18")
+set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}-${HELICS_VERSION_BUILD}")
+set (HELICS_VERSION_STRING "${HELICS_VERSION} ${HELICS_DATE}")
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -340,7 +341,9 @@ if (BUILD_HELICS_EXAMPLES)
 	add_subdirectory (examples)
 endif(BUILD_HELICS_EXAMPLES)
 
-INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
+INSTALL(FILES ${KEY_LIBRARY_FILES} 
+	DESTINATION bin
+	COMPONENT runtime)
 # -------------------------------------------------------------
 # Enable clang analysis and formatting tools
 # -------------------------------------------------------------
@@ -361,8 +364,7 @@ add_subdirectory(docs)
 set(HELICS_CMAKECONFIG_INSTALL_DIR "cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
 
 install (TARGETS helics-static EXPORT helics-targets
-	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+	DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs)
 
 	set(helics_static_file "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}")
 	set(helics_static_file_debug "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
@@ -371,6 +373,10 @@ install (TARGETS helics-shared EXPORT helics-targets
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+	
+	INSTALL(FILES $<TARGET_LINKER_FILE:helics-shared> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs)
+	INSTALL(FILES $<TARGET_FILE:helics-shared> DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libs)
+
 	set(helics_cxx_shared_file "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_SHARED_LIBRARY_SUFFIX}")
 	set(helics_cxx_shared_file_debug "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 ELSE (BUILD_CXX_SHARED_LIB)
@@ -390,6 +396,7 @@ ENDIF()
 install (EXPORT helics-targets 
 	NAMESPACE Helics::
 	DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
+	COMPONENT libs
 	)
 
 set(helics_dependencies ${Boost_LIBRARIES_core})
@@ -415,11 +422,15 @@ configure_file (
   "config/helics-config.h.in"
   "${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h"
   )
-  install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
-  install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/compiler-config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics)
-  install(DIRECTORY ThirdParty/cereal DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+  install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/helics-config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
+		COMPONENT headers)
+  install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/compiler-config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
+		COMPONENT headers)
+  install(DIRECTORY ThirdParty/cereal DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+		COMPONENT headers)
 
-install(DIRECTORY ThirdParty/helics_includes DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY ThirdParty/helics_includes DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+		COMPONENT headers)
 
 
 
@@ -439,9 +450,58 @@ configure_file(config/${PROJECT_NAME}Import.cmake.in
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
 			   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake
-              DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
+              DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
+			  COMPONENT libs)
 
 if (CMAKE_INSTALL_PREFIX)
     message(STATUS "Using CMAKE_INSTALL_PREFIX: " ${CMAKE_INSTALL_PREFIX})
 endif()
 
+# -------------------------------------------------------------
+# CPack 
+# -------------------------------------------------------------
+
+set(CPACK_PACKAGE_NAME "Helics")
+set(CPACK_PACKAGE_VENDOR "GMLC")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HELICS Installer")
+set(CPACK_PACKAGE_VERSION "${HELICS_VERSION}")
+set(CPACK_PACKAGE_VERSION_MAJOR ${HELICS_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${HELICS_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${HELICS_VERSION_PATCH})
+
+set(CPACK_COMPONENTS_ALL applications headers libs runtime matlab python java octave)
+
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}\\\\LICENSE")
+
+set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
+ set(CPACK_COMPONENT_LIBS_DISPLAY_NAME "Libraries")
+ set(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "Headers")
+ set(CPACK_COMPONENT_RUNTIME_DISPLAY_NAME "Runtime Libraries")
+
+  
+ set(CPACK_COMPONENT_MATLAB_GROUP interfaces)
+ set(CPACK_COMPONENT_JAVA_GROUP interfaces)
+ set(CPACK_COMPONENT_OCTAVE_GROUP interfaces)
+ set(CPACK_COMPONENT_PYTHON_GROUP interfaces)
+ 
+ set(CPACK_COMPONENT_APPLICATION_DESCRIPTION "Executables and helper applications for HELICS")
+ set(CPACK_COMPONENT_LIBS_DESCRIPTION "Libraries for compiling and linking with HELICS")
+ set(CPACK_COMPONENT_HEADERS_DESCRIPTION "Headers for linking and compiling with HELICS")
+ set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
+ 
+ set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION "additional language interfaces for HELICS")
+ 
+ set(CPACK_COMPONENT_LIBS_DEPENDS headers)
+ SET(CPACK_COMPONENT_RUNTIME_REQUIRED ON)
+ 
+set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico")
+set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
+
+set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local\\\\")
+set(CPACK_NSIS_PACKAGE_NAME "HELICS Installer")
+set(CPACK_NSIS_URL_INFO_ABOUT "https://www.github.org/GMLC-TDC/Helics-src")
+set(CPACK_NSIS_MENU_LINKS 
+	"https://www.github.org/GMLC-TDC/Helics-src" "HELICS code"
+	"https://gmlc-tdc.github.io/HELICS-src/" "Helics Documentation")
+#THIS LINE MUST BE LAST
+include(CPack)

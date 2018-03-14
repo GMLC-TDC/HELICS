@@ -188,7 +188,7 @@ if (HELICS_HAVE_MPI)
    target_include_directories(helics_core PRIVATE "${MPI_C_INCLUDE_PATH}")
 endif(HELICS_HAVE_MPI)
 
-install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION include/helics/core)
+install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION include/helics/core COMPONENT headers)
 
 OPTION(BUILD_BROKER "Build a helics Broker" ON)
 if (BUILD_BROKER)
@@ -198,7 +198,7 @@ add_executable(helics_broker helics-broker.cpp)
    set_target_properties (helics_broker PROPERTIES FOLDER apps)
    set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "build folder location of the broker")
    #message(STATUS "bloc ${CMAKE_CURRENT_BINARY_DIR}")
-   INSTALL(TARGETS helics_broker DESTINATION bin)
+   INSTALL(TARGETS helics_broker DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET helics_broker POST_BUILD        # Adds a post-build event to core tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
