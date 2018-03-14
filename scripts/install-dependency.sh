@@ -32,8 +32,8 @@ install_swig () {
 
 install_zmq () {
     # Clone the zeromq repo and build it
-    local zmq_version=$2
-    local install_path=$3
+    local zmq_version=$1
+    local install_path=$2
     if [[ "${zmq_version}" == "HEAD" ]]; then
         git clone git://github.com/zeromq/libzmq.git;
     else 
