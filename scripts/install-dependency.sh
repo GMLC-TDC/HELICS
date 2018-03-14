@@ -32,8 +32,13 @@ install_swig () {
 
 install_zmq () {
     # Clone the zeromq repo and build it
-    local install_path=$1
-    git clone git://github.com/zeromq/libzmq.git;
+    local zmq_version=$1
+    local install_path=$2
+    if [[ "${zmq_version}" == "HEAD" ]]; then
+        git clone git://github.com/zeromq/libzmq.git;
+    else 
+        git clone --branch v${zmq_version} git://github.com/zeromq/libzmq.git;
+    fi
     (
         cd libzmq;
         ./autogen.sh;
@@ -159,12 +164,15 @@ case "$1" in
         install_swig ${install_version} ${install_path}
         ;;
     zmq)
-        install_path=$2
-        install_zmq ${install_path}
+        if [[ -z $install_path ]]; then
+            install_version="HEAD"
+            install_path=$2
+        fi
+        install_zmq ${install_version} ${install_path}
         ;;
     *)
         echo "Usage:"
         echo "$0 (boost|cmake|mpich|openmpi|swig) version install_path"
-        echo "$0 zmq install_path"
+        echo "$0 zmq [version=HEAD] install_path"
 esac
 

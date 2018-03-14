@@ -35,6 +35,7 @@ fi
 swig_version=3.0.10
 swig_install_path=${CI_DEPENDENCY_DIR}/swig
 
+zmq_version=4.2.3
 zmq_install_path=${CI_DEPENDENCY_DIR}/zmq
 
 # Convert commit message to lower case
@@ -96,7 +97,7 @@ echo "*** built swig successfully {$PATH}"
 # Install ZeroMQ
 if [[ ! -d "${zmq_install_path}" ]]; then
     echo "*** build libzmq"
-    ./scripts/install-dependency.sh zmq ${zmq_install_path}
+    ./scripts/install-dependency.sh zmq ${zmq_version} ${zmq_install_path}
     echo "*** built zmq successfully"
 fi
 
