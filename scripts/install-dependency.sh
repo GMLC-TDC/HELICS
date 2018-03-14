@@ -36,7 +36,7 @@ install_zmq () {
     local install_path=$2
     git clone git://github.com/zeromq/libzmq.git;
     cd libzmq
-    git checkout 494c2a71f8066adfeb4860311eca5cbe2aa4effb
+    git checkout 0c6c935726b4b66ddf78616f4258c46fcaf11913
     cd ..
     (
         cd libzmq;
