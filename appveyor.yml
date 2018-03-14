@@ -2,7 +2,7 @@ shallow_clone: true
 
 version: 1.0.0.beta.1.{build}
 
-image: Visual Studio 2015
+image: Visual Studio 2017
 
 platform:
   - x64
