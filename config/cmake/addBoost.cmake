@@ -1,3 +1,6 @@
+set(BOOST_MINIMUM_VERSION 1.58)
+set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
+
 IF (MSVC)
 
 set (boost_versions
@@ -24,6 +27,7 @@ D:/boost
 
 # create an empty list
 list(APPEND boost_paths "")
+list(APPEND boost_paths ${BOOST_ROOT})
 
 foreach( dir ${poss_prefixes})
 	foreach( boostver ${boost_versions})
@@ -33,28 +37,48 @@ foreach( dir ${poss_prefixes})
 	endforeach()
 endforeach()
 
+message(STATUS "boost paths ${boost_paths}")
 
+while (NOT Boost_FOUND AND boost_paths)
+set(BOOST_TEST_PATH "")
 find_path(BOOST_TEST_PATH
 			NAMES 			boost/version.hpp
 			PATHS		${boost_paths}
 		)
 
 		if (BOOST_TEST_PATH)
-		set(BOOST_ROOT ${BOOST_TEST_PATH})
+			message(STATUS "boost test path=${BOOST_TEST_PATH}")
+			set(BOOST_ROOT ${BOOST_TEST_PATH} CACHE)
 		endif(BOOST_TEST_PATH)
-ENDIF(MSVC)
-
-SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
+		
+		SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
 
 # Minimum version of Boost required for building HELICS
-set(BOOST_MINIMUM_VERSION 1.58)
-set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
+
 if (${MPI_C_FOUND})
   #find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
   find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options mpi unit_test_framework filesystem system date_time timer chrono mpi REQUIRED)
 ELSE(${MPI_C_FOUND})
   find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time timer chrono REQUIRED)
 ENDIF(${MPI_C_FOUND})
+
+if (NOT Boost_FOUND AND boost_paths)
+	message(STATUS "${BOOST_ROOT} is not valid") 
+	list(REMOVE_AT boost_paths 0)
+endif()
+endwhile()
+else(MSVC)
+
+if (${MPI_C_FOUND})
+  #find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
+  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options mpi unit_test_framework filesystem system date_time timer chrono mpi REQUIRED)
+ELSE(${MPI_C_FOUND})
+  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time timer chrono REQUIRED)
+ENDIF(${MPI_C_FOUND})
+
+ENDIF(MSVC)
+
+
 
 # Minimum version of Boost required for building test suite
 if (Boost_VERSION LESS 106100)
