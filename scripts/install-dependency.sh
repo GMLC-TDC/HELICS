@@ -35,7 +35,7 @@ install_zmq () {
     local zmq_version=$1
     local install_path=$2
     git clone git://github.com/zeromq/libzmq.git;
-    git checkout d54633add13e359d5c0f3d565b8e664ca69a5b76
+    git checkout 31387f84e4ea4567e3504ce8bafb217546b40ac3
     (
         cd libzmq;
         ./autogen.sh;
