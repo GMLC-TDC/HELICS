@@ -27,7 +27,7 @@ target_include_directories(helics_apps-static SYSTEM PRIVATE ${Boost_INCLUDE_DIR
 
 target_include_directories(helics_apps-static SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/ThirdParty)
 
-install(FILES ${helics_apps_library_headers} DESTINATION include/helics/apps COMPONENT headers)
+install(FILES ${helics_apps_library_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/apps COMPONENT headers)
 if (BUILD_PLAYER)
 add_executable(helics_player playerMain.cpp)
 target_link_libraries(helics_player helics_apps-static helics-static)

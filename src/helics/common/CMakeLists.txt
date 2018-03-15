@@ -81,5 +81,5 @@ if (HELICS_HAVE_ZEROMQ)
    target_include_directories (helics_common PRIVATE "${ZeroMQ_INCLUDE_DIR}")
 endif(HELICS_HAVE_ZEROMQ)
 
-install(FILES ${helics_public_common} DESTINATION include/helics/common COMPONENT headers)
+install(FILES ${helics_public_common} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/common COMPONENT headers)
 

@@ -7,10 +7,21 @@ project (HELICS)
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
 set (HELICS_VERSION_PATCH 0)
-set (HELICS_VERSION_BUILD beta.1)
-set (HELICS_DATE "03-02-18")
+set (HELICS_VERSION_BUILD beta.2)
+set (HELICS_DATE "03-20-18")
 set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}-${HELICS_VERSION_BUILD}")
 set (HELICS_VERSION_STRING "${HELICS_VERSION} ${HELICS_DATE}")
+
+#-----------------------------------------------------------------------------
+# set the install path to a local directory
+#-----------------------------------------------------------------------------
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+	 if (WIN32)
+		if (MSVC)
+			set (CMAKE_INSTALL_PREFIX "/usr/local/helics_${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}/" CACHE PATH "default install path" FORCE )
+		endif(MSVC)
+	endif(WIN32)
+endif()
 
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
@@ -254,7 +265,7 @@ SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # (but later on when installing)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
 
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
@@ -262,9 +273,9 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
 # the RPATH to be used when installing, but only if it's not a system directory
-LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/bin" isSystemDir)
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" isSystemDir)
 IF("${isSystemDir}" STREQUAL "-1")
-   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
+   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 if (NOT Boost_USE_STATIC_LIBS)
@@ -288,7 +299,7 @@ IF(BUILD_SHARED_LIBS AND NOT BUILD_CXX_SHARED_LIB)
 ENDIF()
 
 IF(BUILD_CXX_SHARED_LIB)
-	if (BUILD_C_SHARED_LIB OR BUILD_PYTHON)
+	if (BUILD_C_SHARED_LIB OR BUILD_PYTHON_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_OCTAVE_INTERFACE)
 		message(WARNING "Building the CXX shared library and C shared library in the same build is not advisable due to conflicting symbol visibility guidelines and is unlikely to work very well")
 	endif()
 
@@ -384,7 +395,7 @@ ELSE (BUILD_CXX_SHARED_LIB)
 	set(helics_cxx_shared_file_debug )
 ENDIF(BUILD_CXX_SHARED_LIB)
 
-IF(BUILD_C_SHARED_LIB OR BUILD_PYTHON OR BUILD_JAVA OR BUILD_MATLAB OR BUILD_OCTAVE)
+IF(BUILD_C_SHARED_LIB OR BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE)
 	set(helics_c_shared_file "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_SHARED_LIBRARY_SUFFIX}")
 	set(helics_c_shared_file_debug "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 ELSE()
@@ -463,7 +474,7 @@ endif()
 
 set(CPACK_PACKAGE_NAME "Helics")
 set(CPACK_PACKAGE_VENDOR "GMLC")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HELICS Installer")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HELICS")
 set(CPACK_PACKAGE_VERSION "${HELICS_VERSION}")
 set(CPACK_PACKAGE_VERSION_MAJOR ${HELICS_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${HELICS_VERSION_MINOR})
@@ -494,14 +505,19 @@ set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
  set(CPACK_COMPONENT_LIBS_DEPENDS headers)
  SET(CPACK_COMPONENT_RUNTIME_REQUIRED ON)
  
+ set(CPACK_PACKAGE_EXECUTABLES "helics_broker" "Helics Broker")
 set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico")
 set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
 
 set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local\\\\")
-set(CPACK_NSIS_PACKAGE_NAME "HELICS Installer")
-set(CPACK_NSIS_URL_INFO_ABOUT "https://www.github.org/GMLC-TDC/Helics-src")
+
+set(CPACK_NSIS_URL_INFO_ABOUT "https://www.github.com/GMLC-TDC/Helics-src")
 set(CPACK_NSIS_MENU_LINKS 
-	"https://www.github.org/GMLC-TDC/Helics-src" "HELICS code"
-	"https://gmlc-tdc.github.io/HELICS-src/" "Helics Documentation")
+	"https://www.github.com/GMLC-TDC/Helics-src" "HELICS Github"
+	"https://gmlc-tdc.github.io/HELICS-src/" "Helics Documentation"
+	"https://www.helics.org" "Helics Web page"
+	"https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg" "TDC YouTube channel")
+	
+set(CPACK_SOURCE_IGNORE_FILES  "/Build*/;/build*/;/.git/")
 #THIS LINE MUST BE LAST
 include(CPack)

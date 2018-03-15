@@ -22,5 +22,5 @@ target_include_directories(helicsCpp98_ide PRIVATE "${PROJECT_SOURCE_DIR}/src/he
 set_target_properties (helicsCpp98_ide PROPERTIES FOLDER interfaces)
 ENDIF(MSVC)
 
-install(FILES ${helicsCpp98_headers} DESTINATION include/cpp98 COMPONENT headers)
+install(FILES ${helicsCpp98_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cpp98 COMPONENT headers)
 

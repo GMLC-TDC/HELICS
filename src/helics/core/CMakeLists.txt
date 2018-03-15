@@ -188,7 +188,7 @@ if (HELICS_HAVE_MPI)
    target_include_directories(helics_core PRIVATE "${MPI_C_INCLUDE_PATH}")
 endif(HELICS_HAVE_MPI)
 
-install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION include/helics/core COMPONENT headers)
+install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/core COMPONENT headers)
 
 OPTION(BUILD_BROKER "Build a helics Broker" ON)
 if (BUILD_BROKER)
