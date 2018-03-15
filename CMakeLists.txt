@@ -481,8 +481,11 @@ set(CPACK_PACKAGE_VERSION_MINOR ${HELICS_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${HELICS_VERSION_PATCH})
 
 set(CPACK_COMPONENTS_ALL applications headers libs runtime matlab python java octave)
-
+if (WIN32)
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}\\\\LICENSE")
+else(WIN32)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+endif(WIN32)
 
 set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
  set(CPACK_COMPONENT_LIBS_DISPLAY_NAME "Libraries")
@@ -506,17 +509,24 @@ set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
  SET(CPACK_COMPONENT_RUNTIME_REQUIRED ON)
  
  set(CPACK_PACKAGE_EXECUTABLES "helics_broker" "Helics Broker")
-set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico")
-set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
-
-set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local\\\\")
-
-set(CPACK_NSIS_URL_INFO_ABOUT "https://www.github.com/GMLC-TDC/Helics-src")
+ if (WIN32)
+	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico")
+	set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
+	set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local\\\\")
+	set(CPACK_NSIS_URL_INFO_ABOUT "https://www.github.com/GMLC-TDC/Helics-src")
 set(CPACK_NSIS_MENU_LINKS 
 	"https://www.github.com/GMLC-TDC/Helics-src" "HELICS Github"
 	"https://gmlc-tdc.github.io/HELICS-src/" "Helics Documentation"
 	"https://www.helics.org" "Helics Web page"
 	"https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg" "TDC YouTube channel")
+else (WIN32)
+	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
+endif(WIN32)
+
+
+
+
+
 	
 set(CPACK_SOURCE_IGNORE_FILES  "/Build*/;/build*/;/.git/")
 #THIS LINE MUST BE LAST
