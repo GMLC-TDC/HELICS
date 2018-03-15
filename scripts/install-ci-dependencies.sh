@@ -15,9 +15,27 @@ boost_install_path=${CI_DEPENDENCY_DIR}/boost
 cmake_version=3.4.3
 cmake_install_path=${CI_DEPENDENCY_DIR}/cmake
 
+if [[ "$USE_MPI" ]]; then
+    mpi_install_path=${CI_DEPENDENCY_DIR}/mpi
+    case "$USE_MPI" in
+        mpich*)
+            mpi_implementation=mpich
+            mpi_version=3.2
+            ;;
+        openmpi*)
+            mpi_implementation=openmpi
+            mpi_version=3.0.0
+            ;;
+        *)
+            echo "USE_MPI must be either mpich or openmpi to build mpi as a dependency"
+            ;;
+    esac
+fi
+
 swig_version=3.0.10
 swig_install_path=${CI_DEPENDENCY_DIR}/swig
 
+zmq_version=4.2.3
 zmq_install_path=${CI_DEPENDENCY_DIR}/zmq
 
 # Convert commit message to lower case
@@ -37,6 +55,12 @@ if [[ $commit_msg == *'[update_cache]'* ]]; then
     if [[ $commit_msg == *'swig'* ]]; then
         rm -rf ${swig_install_path};
         individual="true"
+    fi
+    if [[ "$USE_MPI" ]]; then
+        if [[$commit_msg == *'mpi'* ]]; then
+            rm -rf ${mpi_install_path};
+            individual="true"
+        fi
     fi
 
     # If no dependency named in commit message, update entire cache
@@ -73,8 +97,18 @@ echo "*** built swig successfully {$PATH}"
 # Install ZeroMQ
 if [[ ! -d "${zmq_install_path}" ]]; then
     echo "*** build libzmq"
-    ./scripts/install-dependency.sh zmq ${zmq_install_path}
+    ./scripts/install-dependency.sh zmq ${zmq_version} ${zmq_install_path}
     echo "*** built zmq successfully"
+fi
+
+# Install MPI if USE_MPI is set
+if [[ "$USE_MPI" ]]; then
+    if [[ ! -d "${mpi_install_path}" ]]; then
+        # if mpi_implementation isn't set, then the mpi implementation requested wasn't recognized
+        if [[ ! -z "${mpi_implementation}" ]]; then
+            travis_wait ./scripts/install-dependency.sh ${mpi_implementation} ${mpi_version} ${mpi_install_path}
+        fi
+    fi
 fi
 
 # Install Boost

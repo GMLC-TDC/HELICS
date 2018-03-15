@@ -53,12 +53,7 @@ ENDIF(MSVC)
 # Minimum version of Boost required for building HELICS
 set(BOOST_MINIMUM_VERSION 1.58)
 set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
-if (${MPI_C_FOUND})
-  #find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
-  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options mpi unit_test_framework filesystem system date_time timer chrono mpi REQUIRED)
-ELSE(${MPI_C_FOUND})
-  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time timer chrono REQUIRED)
-ENDIF(${MPI_C_FOUND})
+find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time timer chrono REQUIRED)
 
 # Minimum version of Boost required for building test suite
 if (Boost_VERSION LESS 106100)
