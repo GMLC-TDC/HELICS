@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
@@ -41,12 +38,12 @@ class MessageDestOperator : public FilterOperator
     /** default constructor*/
     MessageDestOperator () = default;
     /** set the function to modify the time of the message in the constructor*/
-    explicit MessageDestOperator (std::function<std::string (const std::string &)> userDestFunction);
+    explicit MessageDestOperator (std::function<std::string (const std::string &, const std::string &)> userDestFunction);
     /** set the function to modify the time of the message*/
-    void setDestFunction (std::function<std::string (const std::string &)> userDestFunction);
+    void setDestFunction (std::function<std::string (const std::string &, const std::string &)> userDestFunction);
 
   private:
-    std::function<std::string (const std::string &)>
+    std::function<std::string (const std::string &, const std::string &)>
       DestUpdateFunction;  //!< the function that actually does the processing
     virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) override;
 };
@@ -106,3 +103,4 @@ class CloneOperator : public FilterOperator
 };
 
 }  // namespace helics
+

@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "Player.hpp"
 #include "PrecHelper.hpp"
@@ -76,7 +73,7 @@ Player::Player (int argc, char *argv[])
     fed = std::make_shared<CombinationFederate> (fi);
     fed->setFlag (SOURCE_ONLY_FLAG);
     loadArguments(vm_map);
-   
+
 }
 
 Player::Player (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
@@ -212,7 +209,7 @@ void Player::loadTextFile (const std::string &filename)
         {
             if (str[fc + 1] == '!')
             {
-                /*  //allow configuration inside the regular text file 
+                /*  //allow configuration inside the regular text file
                 if (playerConfig.find("stop") != playerConfig.end())
                 {
                     stopTime = playerConfig["stop"].get<double>();
@@ -264,7 +261,7 @@ void Player::loadTextFile (const std::string &filename)
                 {
                     continue;
                 }
-               
+
                 messages[mIndex].mess.source = blk[2];
                 messages[mIndex].mess.dest = blk[3];
                 messages[mIndex].mess.time = messages[mIndex].sendTime;
@@ -275,7 +272,7 @@ void Player::loadTextFile (const std::string &filename)
                 {
                     continue;
                 }
-               
+
                 messages[mIndex].mess.source = blk[3];
                 messages[mIndex].mess.dest = blk[4];
                 if ((messages[mIndex].mess.time = extractTime(blk[2], lcount)) == Time::minVal())
@@ -298,7 +295,7 @@ void Player::loadTextFile (const std::string &filename)
                 {
                     continue;
                 }
-                
+
                 points[pIndex].pubName = blk[1];
                 points[pIndex].value = blk[2];
                 ++pIndex;
@@ -340,7 +337,7 @@ void Player::loadJsonFile (const std::string &jsonFile)
     }
 
     auto doc = loadJsonString(jsonFile);
-    
+
 
     if (doc.isMember("player"))
     {
@@ -360,7 +357,7 @@ void Player::loadJsonFile (const std::string &jsonFile)
             {
                 fed->setSeparator(sep[0]);
             }
-           
+
         }
         if (playerConfig.isMember("timeunits"))
         {
@@ -507,7 +504,7 @@ void Player::loadJsonFile (const std::string &jsonFile)
             {
                 ptime = loadJsonTime(messageElement["sendtime"],units);
             }
-            
+
             messages.resize(messages.size() + 1);
             messages.back().sendTime = sendTime;
             messages.back().mess.source = src;
@@ -549,7 +546,7 @@ void Player::loadJsonFile (const std::string &jsonFile)
                     messages.back().mess.data = messageElement["message"].asString();
                 }
             }
-           
+
         }
     }
 }
@@ -710,7 +707,7 @@ void Player::run (Time stopTime_input)
         fed->enterExecutionState ();
         // send the stuff at timeZero
         sendInformation(timeZero);
-        
+
     }
     else
     {
@@ -764,7 +761,7 @@ void Player::run (Time stopTime_input)
         }
         auto newTime = fed->requestTime (nextSendTime);
         sendInformation(newTime);
-        
+
         if (newTime >= nextPrintTime)
         {
             std::cout << "processed time " << static_cast<double> (newTime) << "\n";
@@ -876,7 +873,7 @@ int Player::loadArguments(boost::program_options::variables_map &vm_map)
     {
         loadFile(file);
     }
-   
+
     if (vm_map.count ("stop") > 0)
     {
         stopTime = loadTimeFromString(vm_map["stop"].as<std::string> ());

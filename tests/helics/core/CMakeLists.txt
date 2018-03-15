@@ -1,8 +1,7 @@
 ##############################################################################
-#Copyright (C) 2017-2018, Battelle Memorial Institute
-#All rights reserved.
-
-#This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+# Copyright © 2017-2018,
+# Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+#All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 
 #-----------------------------------------------------------------------------
@@ -40,13 +39,16 @@ if (MPI_ENABLE)
     list(APPEND core_test_sources MpiCore-tests.cpp)
 endif()
 
-add_executable(core-tests ${core_test_sources} ${core_test_headers})
-target_link_libraries(core-tests helics-static)
-
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
+add_executable(core-tests ${core_test_sources} ${core_test_headers})
+target_link_libraries(core-tests helics-static)
+
+if (HELICS_HAVE_ZEROMQ)
+   target_include_directories (core-tests PRIVATE "${ZeroMQ_INCLUDE_DIR}")
+endif (HELICS_HAVE_ZEROMQ)
 
 target_link_libraries(core-tests ${Boost_LIBRARIES_test})
 
@@ -59,3 +61,4 @@ add_custom_command(TARGET core-tests POST_BUILD        # Adds a post-build event
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:core-tests>/")                 # <--this is out-file path
 endforeach(keyfile)
+

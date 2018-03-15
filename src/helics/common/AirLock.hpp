@@ -1,15 +1,11 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
-#include "helics_includes/optional.h"
+#include "helics_includes/optional.hpp"
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
@@ -31,7 +27,7 @@ public:
     AirLock() = default;
     /** destructor*/
     ~AirLock() = default;
-    /** try to load the airlock 
+    /** try to load the airlock
     @return true if successful, false if not*/
     template <class Z>
     bool try_load(Z &&val)
@@ -48,7 +44,7 @@ public:
         }
         return false;
     }
-    /** load the airlock,  
+    /** load the airlock,
     @details the call will block until the airlock is ready to be loaded
     */
     template <class Z>
@@ -69,10 +65,10 @@ public:
             data = std::forward<Z>(val);
             loaded = true;
         }
-        
+
     }
 
-    /** unload the airlock, 
+    /** unload the airlock,
     @return the value is returned in an optional which needs to be checked if it contains a value
     */
     stx::optional<T> try_unload()
@@ -102,3 +98,4 @@ private:
     std::condition_variable condition;  //!< condition variable for notification of new data
 
 };
+

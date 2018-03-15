@@ -1,7 +1,7 @@
 # LLNS Copyright Start
 # Copyright (c) 2017, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department 
-# of Energy by Lawrence Livermore National Laboratory in part under 
+# This work was performed under the auspices of the U.S. Department
+# of Energy by Lawrence Livermore National Laboratory in part under
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -27,11 +27,13 @@ try_compile(SHARED_MUTEX_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/che
 #try_compile(CLAMP_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_clamp.cpp  )
 #try_compile(HYPOT3_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_hypot3.cpp  )
 
+try_compile(IFCONSTEXPR_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_constexpr_if.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG} )
+
 endif(ENABLE_CXX_17)
 
 try_compile(VARIABLE_TEMPLATE_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_variable_template.cpp )
 
-try_compile(IFCONSTEXPR_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_constexpr_if.cpp  )
+
 try_compile(FALLTHROUGH_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_fallthrough.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG})
 
 try_compile(UNUSED_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_unused.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG} )
@@ -99,3 +101,4 @@ CONFIGURE_FILE(${CMAKE_CURRENT_LIST_DIR}/compiler-config.h.in ${PROJECT_BINARY_D
 endif()
 
 endif(NOT NO_CONFIG_GENERATION)
+

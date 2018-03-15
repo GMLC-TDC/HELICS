@@ -279,3 +279,4 @@ std::string xmlCharacterCodeReplace (std::string str);
 
 
 #endif
+

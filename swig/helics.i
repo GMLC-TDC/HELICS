@@ -1,5 +1,5 @@
 %include output.i
-%include "cstring.i"
+%include "typemaps.i"
 #define __attribute__(x)
 #pragma SWIG nowarn=451
 
@@ -27,3 +27,4 @@
 %include "ValueFederate.h"
 %include "MessageFederate.h"
 %include "MessageFilters.h"
+

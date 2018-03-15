@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
@@ -143,7 +140,7 @@ public:
 
 	/** check if entry to the executing state can be granted*/
     iteration_state checkExecEntry ();
-	/** request a time 
+	/** request a time
 	@param nextTime the new requested time
 	@param iterate the mode of iteration to use (no_iteration, force_iteration, iterate_if_needed)
 	@param newValueTime  the time of the next value
@@ -160,3 +157,4 @@ public:
     std::string printTimeStatus () const;
 };
 } //namespace helics
+

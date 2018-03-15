@@ -338,7 +338,7 @@ public:
             return nullptr;
         return &m_parts[index];
     }
-    
+
     // Get a string copy of a specific message part
     std::string peekstr(size_t index) const
     {
@@ -599,3 +599,4 @@ private:
 }
 
 #endif
+

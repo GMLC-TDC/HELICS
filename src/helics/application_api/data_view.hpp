@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
@@ -12,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../core/helics-time.hpp"
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
-#include "helics_includes/string_view.h"
+#include "helics_includes/string_view.hpp"
 #include <memory>
 
 namespace helics
@@ -138,3 +135,4 @@ inline void swap (helics::data_view &db1, helics::data_view &db2) noexcept
     db1.swap (db2);
 }
 }  // namespace helics
+

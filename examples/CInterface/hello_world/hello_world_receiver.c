@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include <ValueFederate.h>
@@ -19,13 +16,13 @@ int main ()
     helics_time_t currenttime = 0.0; /* the current time of the simulation*/
     helics_status  status;/* the result code from a call to the helics Library*/
     helics_bool_t isUpdated;  /* storage for a check if a value has been updated*/
-    
+
 
     /** create an info structure to define some parameters used in federate creation*/
     fedinfo = helicsFederateInfoCreate ();
     /** set the federate name*/
     helicsFederateInfoSetFederateName (fedinfo, "hello_world_receiver");
-    
+
     /** set the core type to use
     can be "test", "ipc", "udp", "tcp", "zmq", "mpi"
     not all are available on all platforms
@@ -83,3 +80,4 @@ int main ()
     helicsCloseLibrary ();
     return (0);
 }
+

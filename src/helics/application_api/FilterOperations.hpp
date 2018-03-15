@@ -1,10 +1,8 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
 #pragma once
 
@@ -114,7 +112,8 @@ class RerouteFilterOperation : public FilterOperations
 
     private:
         /** function to execute the rerouting operation*/
-    std::string rerouteOperation (const std::string &dest) const;
+    std::string rerouteOperation (const std::string &src, const std::string &dest) const;
+
 };
 
 /** filter for rerouting a packet to a particular endpoint*/
@@ -142,3 +141,4 @@ class CloneFilterOperation : public FilterOperations
 };
 
 }  // namespace helics
+

@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "ValueFederateManager.hpp"
 
@@ -40,7 +37,7 @@ publication_id_t ValueFederateManager::registerPublication (const std::string &k
 {
     auto sz = getTypeSize (type);
 	auto coreID = coreObject->registerPublication(fedID, key, type, units);
-   
+
     std::lock_guard<std::mutex> publock (publication_mutex);
     publication_id_t id = static_cast<identifier_type> (publications.size ());
     ++publicationCount;
@@ -372,3 +369,4 @@ void ValueFederateManager::registerCallback (const std::vector<subscription_id_t
     }
 }
 }  // namespace helics
+

@@ -1,12 +1,8 @@
 /*
 
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "FederateState.hpp"
 
@@ -164,7 +160,7 @@ void FederateState::createSubscription (Core::handle_id_t handle,
 	subHandle->insert(key, handle,handle, global_id, key, type, units,
 		(check_mode == handle_check_mode::required));
 
-    
+
     subHandle->back()->only_update_on_change = only_update_on_change;
 }
 void FederateState::createPublication (Core::handle_id_t handle,
@@ -935,3 +931,4 @@ std::string FederateState::processQuery (const std::string &query) const
     return "#invalid";
 }
 }  // namespace helics
+

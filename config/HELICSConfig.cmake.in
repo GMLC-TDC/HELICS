@@ -29,3 +29,4 @@ set(${PN}_STATIC_LIBRARY_DEBUG "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@he
 
 set(${PN}_DEPENDENCIES "@helics_dependencies@")
 check_required_components(${PN})
+

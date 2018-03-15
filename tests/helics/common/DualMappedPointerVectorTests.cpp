@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -20,8 +16,8 @@ BOOST_AUTO_TEST_CASE(definition_tests)
 {
 	DualMappedPointerVector<double, std::string, int64_t> M;
 	DualMappedPointerVector < std::string, std::string, double > S2;
-	BOOST_CHECK_EQUAL(M.size(), 0);
-	BOOST_CHECK_EQUAL(S2.size(), 0);
+	BOOST_CHECK_EQUAL(M.size(), 0u);
+	BOOST_CHECK_EQUAL(S2.size(), 0u);
 	DualMappedPointerVector<std::vector<std::string>, double, std::string> V2;
 
 	//test move operators
@@ -104,7 +100,7 @@ BOOST_AUTO_TEST_CASE(remove_tests)
 	auto MV2 = std::move(Mvec);
 	BOOST_CHECK_EQUAL(MV2.size(), 2);
 
-	
+
 	auto MV3 = std::move(MV2);
 	BOOST_CHECK_EQUAL(MV3.size(), 2);
 
@@ -115,3 +111,4 @@ BOOST_AUTO_TEST_CASE(remove_tests)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+

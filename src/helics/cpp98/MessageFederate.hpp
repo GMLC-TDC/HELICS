@@ -1,12 +1,8 @@
 /*
 
-Copyright (C) 2017, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #ifndef HELICS_CPP98_MESSAGE_FEDERATE_HPP_
@@ -30,10 +26,10 @@ class MessageFederate : public virtual Federate
     {
         fed = helicsCreateMessageFederateFromJson (jsonString.c_str());
     }
-   
+
     // Default constructor, not meant to be used
     MessageFederate () {}
-    
+
     virtual ~MessageFederate ()
     {
     }
@@ -103,7 +99,7 @@ class MessageFederate : public virtual Federate
     {
         helicsEndpointSendMessageRaw (source, dest.c_str(), data, len);
     }
-    
+
     void sendMessage (helics_endpoint source, const std::string &dest, const char *data, size_t len, helics_time_t time)
     {
         helicsEndpointSendEventRaw (source, dest.c_str(), data, len, time);
@@ -130,10 +126,11 @@ class MessageFederate : public virtual Federate
         std::string result (str);
         return result;
     }
- 
+
   private:
     std::vector<helics_endpoint> local_endpoints;
- 
+
 };
 } //namespace helics
 #endif
+

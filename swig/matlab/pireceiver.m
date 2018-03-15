@@ -1,4 +1,4 @@
-loadlibrary(GetFullPath('~/local/helics-develop/lib/libhelicsSharedLib.dylib'));
+%loadlibrary(GetFullPath('~/local/helics-develop/lib/libhelicsSharedLib.dylib'));
 
 fedinitstring = '--federates=1';
 deltat = 0.01;

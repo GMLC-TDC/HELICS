@@ -1,11 +1,10 @@
 ##############################################################################
-#Copyright (C) 2017, Battelle Memorial Institute
-#All rights reserved.
-
-#This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+# Copyright © 2017-2018,
+# Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+#All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 # Find the ZeroMQ includes and library
-# 
+#
 # This module defines
 # ZeroMQ_INCLUDE_DIR, where to find zmq.h
 # ZeroMQ_LIBRARY, the library needed to use ZeroMQ
@@ -36,30 +35,30 @@ find_path(ZeroMQ_ROOT_DIR
   PATHS
     /usr
     /usr/local
-	
+
 )
 find_path(ZeroMQ_INCLUDE_DIR zmq.h ${ZeroMQ_ROOT_DIR}/include)
 if (MSVC)
   # Read registry key holding version
     get_filename_component(ZeroMQ_NAME "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ZeroMQ (x64);DisplayVersion]" NAME)
- 
+
   # Replace dots with underscores
   string(REGEX REPLACE "\\." "_" ZeroMQ_NAME ${ZeroMQ_NAME})
   # Get Visual studio version number
-  
- 
+
+
   #message(STATUS "toolset =${CMAKE_VS_PLATFORM_TOOLSET}")
 
   if (${ZeroMQ_NAME} MATCHES "registry") # if key was not found, the string "registry" is returned
     set(_ZeroMQ_VERSIONS "4_2_3" "4_2_2" "4_2_1" "4_2_0" "4_1_5" "4_1_4" "4_0_4" "4_0_3" "4_0_2" "4_0_1" "4_0_0")
     set(ZeroMQ_LIBRARY_NAME)
-	
+
 		foreach(ver ${_ZeroMQ_VERSIONS})
 				list(APPEND ZeroMQ_LIBRARY_NAME "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-${ver}")
 		endforeach()
   else()
     # Format ZeroMQ library file name
-	
+
 		foreach(vs ${_VS_VERSIONS})
 			set(ZeroMQ_LIBRARY_NAME "libzmq-v${CMAKE_VS_PLATFORM_TOOLSET}-mt-${ZeroMQ_NAME}")
 		endforeach()
@@ -79,7 +78,7 @@ HINTS
     /lib
     /usr/lib
     /usr/local/lib
-    
+
 )
 if (ZeroMQ_INCLUDE_DIR AND ZeroMQ_LIBRARY AND NOT ZeroMQ_LIBRARY-NOTFOUND)
   set(ZeroMQ_FOUND 1)
@@ -92,3 +91,4 @@ IF(NOT ZeroMQ_FIND_QUIETLY)
 endif()
 # show the ZeroMQ_INCLUDE_DIR and ZeroMQ_LIBRARY variables only in the advanced view
 mark_as_advanced(ZeroMQ_ROOT_DIR ZeroMQ_INCLUDE_DIR ZeroMQ_LIBRARY ZeroMQ_FOUND)
+

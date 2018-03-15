@@ -9,7 +9,7 @@ engines:
  coverage:
    enabled: false
 languages:
- 
+
 exclude_paths:
   - ThirdParty/**/*
   - ThirdParty/*
@@ -17,3 +17,4 @@ exclude_paths:
   - swig/**/*
   - scripts/**/*
   - src/helics/common/cppzmq/*
+
