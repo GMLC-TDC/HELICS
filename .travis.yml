@@ -75,6 +75,7 @@ jobs:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - SHARED_LIB_EXT=so
         - USE_SWIG=true
+        - USE_MPI=mpich
 
     - <<: *linux_base
       addons:
@@ -87,7 +88,6 @@ jobs:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
         - SHARED_LIB_EXT=so
         - USE_SWIG=false
-        - USE_MPI=mpich
         - CI_BOOST_VERSION=1.61.0
 
     - <<: *linux_base
