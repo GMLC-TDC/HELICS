@@ -353,7 +353,7 @@ if (BUILD_HELICS_EXAMPLES)
 endif(BUILD_HELICS_EXAMPLES)
 
 INSTALL(FILES ${KEY_LIBRARY_FILES} 
-	DESTINATION bin
+	DESTINATION ${CMAKE_INSTALL_BINDIR}
 	COMPONENT runtime)
 # -------------------------------------------------------------
 # Enable clang analysis and formatting tools
