@@ -104,6 +104,7 @@ jobs:
             - CCACHE_CPP2=yes
             - SHARED_LIB_EXT=so
             - USE_SWIG=true
+            - USE_MPI=mpich
 
    # ------------------------------------------------
    # Jobs for daily valgrind and code coverage tests
