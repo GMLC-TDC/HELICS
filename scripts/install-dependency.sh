@@ -38,7 +38,7 @@ install_zmq () {
         cd libzmq;
         ./autogen.sh;
         mkdir -p build && cd build;
-        cmake .. -DWITH_PERF_TOOL=OFF -DZMQ_BUILD_TESTS=OFF -DENABLE_CPACK=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${install_path}" ${cmake_cxx_standard_option}
+        cmake .. -DWITH_PERF_TOOL=OFF -DZMQ_BUILD_TESTS=OFF -DENABLE_CPACK=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${install_path}"
         make;
         make install;
     )
