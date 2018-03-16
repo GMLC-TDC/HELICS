@@ -121,6 +121,16 @@ jobs:
         - USE_SWIG=true
         - RUN_COVERAGE=true
     - <<: *daily_linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env:
+        - MATRIX_EVAL="COMPILER=gcc && CC='gcc-5' && CXX='g++-5'"
+        - SHARED_LIB_EXT=so
+    - <<: *daily_linux
       compiler: clang
       addons:
         apt:
