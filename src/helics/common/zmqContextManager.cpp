@@ -21,6 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <iostream>
 #include <map>
 #include <mutex>
+#include <thread>
 
 /** a storage system for the available core objects allowing references by name to the core
  */
