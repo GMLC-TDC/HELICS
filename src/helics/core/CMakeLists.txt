@@ -165,6 +165,8 @@ endif (${MPI_C_FOUND})
 
 add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
+target_compile_options(helics_core PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+
 if (${MPI_C_FOUND})
 source_group("mpi" FILES ${MPI_SOURCE_FILES} ${MPI_HEADER_FILES})
 endif (${MPI_C_FOUND})

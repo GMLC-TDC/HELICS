@@ -50,6 +50,8 @@ FederateInfo.cpp
 
 add_library(application_api OBJECT ${application_api_sources} ${public_application_api_headers} ${private_application_api_headers})
 
+target_compile_options(application_api PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+
 target_include_directories(application_api SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
 target_include_directories(application_api SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/ThirdParty)
 

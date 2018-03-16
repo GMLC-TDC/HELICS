@@ -31,7 +31,7 @@ internal/api_objects.h
 
 add_library(helicsSharedLib SHARED ${helicsShared_sources} ${helicsShared_headers})
 
-target_link_libraries(helicsSharedLib helics-static)
+target_link_libraries(helicsSharedLib PRIVATE helics-static)
 
 if (HELICS_HAVE_ZEROMQ)
    target_include_directories (helicsSharedLib PRIVATE "${ZeroMQ_INCLUDE_DIR}")

@@ -161,6 +161,8 @@ add_library(helics-static STATIC
     $<TARGET_OBJECTS:helics_common>
 )
 
+target_compile_options(helics-static PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+
 # -------------------------------------------------------------
 # Enable ZeroMQ
 # -------------------------------------------------------------
