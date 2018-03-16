@@ -620,6 +620,7 @@ void helicsCloseLibrary ()
     }
 #endif
     helics::LoggerManager::closeLogger ();
+    //helics::cleanupHelicsLibrary();
 }
 
 helics_query helicsCreateQuery (const char *target, const char *query)

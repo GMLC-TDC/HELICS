@@ -21,7 +21,7 @@ namespace utf = boost::unit_test;
 
 /** test registration of filters*/
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
@@ -53,7 +53,7 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
@@ -117,7 +117,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR(*utf::timeout(12))
 BOOST_DATA_TEST_CASE(message_filter_function_two_stage, bdata::make(core_types), core_type)
 {
     auto broker = AddBroker(core_type, 3);
@@ -197,7 +197,7 @@ BOOST_DATA_TEST_CASE(message_filter_function_two_stage, bdata::make(core_types),
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);

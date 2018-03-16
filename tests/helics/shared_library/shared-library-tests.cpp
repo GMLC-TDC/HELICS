@@ -21,9 +21,9 @@ struct globalTestConfig
     globalTestConfig () = default;
     ~globalTestConfig ()
     {
-         std::cout << "cleaning up" << std::endl;
-        helicsCleanupHelicsLibrary ();
-        std::cout << "finished cleaning up" << std::endl;
+        // std::cout << "cleaning up" << std::endl;
+        helicsCloseLibrary ();
+        //std::cout << "finished cleaning up" << std::endl;
     }
 };
 

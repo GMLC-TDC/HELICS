@@ -41,6 +41,7 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 add_executable(shared-library-tests ${shared_library_test_sources} ${shared_library_test_headers})
 target_link_libraries(shared-library-tests helicsSharedLib)
 
+target_link_libraries(shared-library-tests ${Boost_LIBRARIES_core})
 target_link_libraries(shared-library-tests ${Boost_LIBRARIES_test})
 
 set_target_properties (shared-library-tests PROPERTIES FOLDER tests)

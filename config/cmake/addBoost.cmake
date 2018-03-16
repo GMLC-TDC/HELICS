@@ -24,7 +24,7 @@ D:/boost
 )
 
 # create an empty list
-list(APPEND boost_paths ${BOOST_INSTALL_PATH})
+list(APPEND boost_paths "")
 mark_as_advanced(BOOST_INSTALL_PATH)
 foreach( dir ${poss_prefixes})
 	foreach( boostver ${boost_versions})
@@ -38,7 +38,8 @@ endforeach()
 
 find_path(BOOST_TEST_PATH
 			NAMES 			boost/version.hpp
-			PATHS		${boost_paths}
+			PATHS		${BOOST_INSTALL_PATH}
+						${boost_paths}
 		)
 
 		if (BOOST_TEST_PATH)
