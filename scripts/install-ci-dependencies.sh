@@ -18,10 +18,11 @@ cmake_install_path=${CI_DEPENDENCY_DIR}/cmake
 swig_version=3.0.10
 swig_install_path=${CI_DEPENDENCY_DIR}/swig
 
+zmq_version=4.2.3
 zmq_install_path=${CI_DEPENDENCY_DIR}/zmq
 
 # Convert commit message to lower case
-commit_msg=`tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE}`
+commit_msg=$(tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE})
 
 # Wipe out cached dependencies if commit message has '[update_cache]'
 if [[ $commit_msg == *'[update_cache]'* ]]; then
@@ -73,7 +74,7 @@ echo "*** built swig successfully {$PATH}"
 # Install ZeroMQ
 if [[ ! -d "${zmq_install_path}" ]]; then
     echo "*** build libzmq"
-    ./scripts/install-dependency.sh zmq ${zmq_install_path}
+    ./scripts/install-dependency.sh zmq ${zmq_version} ${zmq_install_path}
     echo "*** built zmq successfully"
 fi
 

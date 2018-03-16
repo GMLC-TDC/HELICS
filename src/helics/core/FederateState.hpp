@@ -148,7 +148,7 @@ private:
     @param[out] id the endpoint related to the message*/
     std::unique_ptr<Message> receiveAny (Core::handle_id_t &id);
 	/** set the CommonCore object that is managing this Federate*/
-    void setParent (CommonCore *coreObject);
+    void setParent(CommonCore *coreObject) { parent_ = coreObject; };
 
   private:
     /** process the federate queue until returnable event
@@ -253,6 +253,9 @@ private:
     @return true if it should be published, false if not
     */
     bool checkAndSetValue(Core::handle_id_t pub_id, const char *data, uint64_t len);
+
+    /** route a message either forward to parent or add to queue*/
+    void routeMessage(const ActionMessage &msg);
 };
 } // namespace helics
 

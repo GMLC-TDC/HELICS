@@ -172,7 +172,7 @@ CommonCore::~CommonCore ()
     joinAllThreads ();
 }
 
-FederateState *CommonCore::getFederate (federate_id_t federateID) const
+FederateState *CommonCore::getFederateAt (federate_id_t federateID) const
 {
     auto feds = federates.lock();
     return (*feds)[federateID];
@@ -264,7 +264,7 @@ bool CommonCore::isInitialized () const { return (brokerState >= initialized); }
 bool CommonCore::isOpenToNewFederates () const { return ((brokerState != created) && (brokerState < operating)); }
 void CommonCore::error (federate_id_t federateID, int errorCode)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid error"));
@@ -287,7 +287,7 @@ void CommonCore::error (federate_id_t federateID, int errorCode)
 
 void CommonCore::finalize (federate_id_t federateID)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid finalize"));
@@ -342,7 +342,7 @@ void CommonCore::setCoreReadyToInit ()
 
 void CommonCore::enterInitializingState (federate_id_t federateID)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid  Enter Enit"));
@@ -377,7 +377,7 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
 
 iteration_result CommonCore::enterExecutingState (federate_id_t federateID, iteration_request iterate)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (EnterExecutingState)"));
@@ -441,7 +441,7 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
 
 const std::string &CommonCore::getFederateName (federate_id_t federateID) const
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (federateName)"));
@@ -453,7 +453,7 @@ static const std::string unknownString ("#unknown");
 
 const std::string &CommonCore::getFederateNameNoThrow (federate_id_t federateID) const noexcept
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     return (fed == nullptr) ? unknownString : fed->getIdentifier ();
 }
 
@@ -481,7 +481,7 @@ int32_t CommonCore::getFederationSize ()
 
 Time CommonCore::timeRequest (federate_id_t federateID, Time next)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid timeRequest"));
@@ -500,7 +500,7 @@ Time CommonCore::timeRequest (federate_id_t federateID, Time next)
 
 iteration_time CommonCore::requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid timeRequestIterative"));
@@ -525,7 +525,7 @@ iteration_time CommonCore::requestTimeIterative (federate_id_t federateID, Time 
 
 Time CommonCore::getCurrentTime (federate_id_t federateID) const
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw InvalidIdentifier ("federateID not valid (getCurrentTime)");
@@ -535,7 +535,7 @@ Time CommonCore::getCurrentTime (federate_id_t federateID) const
 
 uint64_t CommonCore::getCurrentReiteration (federate_id_t federateID) const
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw InvalidIdentifier ("federateID not valid (getCurrentReiteration)");
@@ -545,7 +545,7 @@ uint64_t CommonCore::getCurrentReiteration (federate_id_t federateID) const
 
 void CommonCore::setMaximumIterations (federate_id_t federateID, int32_t iterations)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (getMaximumIterations)"));
@@ -558,7 +558,7 @@ void CommonCore::setMaximumIterations (federate_id_t federateID, int32_t iterati
 
 void CommonCore::setTimeDelta (federate_id_t federateID, Time time)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
@@ -580,7 +580,7 @@ void CommonCore::setTimeDelta (federate_id_t federateID, Time time)
 
 void CommonCore::setOutputDelay (federate_id_t federateID, Time outputDelayTime)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (setOutputDelay)"));
@@ -597,7 +597,7 @@ void CommonCore::setOutputDelay (federate_id_t federateID, Time outputDelayTime)
 
 void CommonCore::setInputDelay (federate_id_t federateID, Time inputDelayTime)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (SetinputDelay)"));
@@ -615,7 +615,7 @@ void CommonCore::setInputDelay (federate_id_t federateID, Time inputDelayTime)
 
 void CommonCore::setPeriod (federate_id_t federateID, Time timePeriod)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (setPeriod)"));
@@ -631,7 +631,7 @@ void CommonCore::setPeriod (federate_id_t federateID, Time timePeriod)
 }
 void CommonCore::setTimeOffset (federate_id_t federateID, Time timeOffset)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (setTimeOffset)"));
@@ -654,7 +654,7 @@ void CommonCore::setLoggingLevel (federate_id_t federateID, int loggingLevel)
         return;
     }
 
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (setLoggingLevel)"));
@@ -693,7 +693,7 @@ void CommonCore::setFlag (federate_id_t federateID, int flag, bool flagValue)
         return;
     }
 
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (setFlag)"));
@@ -745,7 +745,7 @@ handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
                                               const std::string &units,
                                               handle_check_mode check_mode)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
 
     if (fed == nullptr)
     {
@@ -771,7 +771,7 @@ handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
     m.info ().units = units;
     if (check_mode == handle_check_mode::required)
     {
-        setActionFlag (m, pub_required);
+        setActionFlag (m, required_flag);
     }
     addActionMessage (m);
 
@@ -780,7 +780,7 @@ handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
 
 handle_id_t CommonCore::getSubscription (federate_id_t federateID, const std::string &key) const
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed != nullptr)
     {
         return fed->getSubscription (key)->id;
@@ -793,7 +793,7 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
                                              const std::string &type,
                                              const std::string &units)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (getSubscription)"));
@@ -829,7 +829,7 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
 
 handle_id_t CommonCore::getPublication (federate_id_t federateID, const std::string &key) const
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed != nullptr)
     {
         auto pub = fed->getPublication (key);
@@ -870,7 +870,7 @@ const std::string &CommonCore::getType (handle_id_t handle) const
     {
         if (handleInfo->what == HANDLE_SUB)
         {
-            auto fed = getFederate (handleInfo->local_fed_id);
+            auto fed = getFederateAt (handleInfo->local_fed_id);
             auto subInfo = fed->getSubscription (handleInfo->id);
             if (subInfo->pubType.empty ())
             {
@@ -939,7 +939,7 @@ void CommonCore::setValue (handle_id_t handle, const char *data, uint64_t len)
     {
         return;  // if the value is not required do nothing
     }
-    auto fed = getFederate (handleInfo->local_fed_id);
+    auto fed = getFederateAt (handleInfo->local_fed_id);
     if (fed->checkAndSetValue (handle, data, len))
     {
         LOG_DEBUG (0, fed->getIdentifier (),
@@ -966,12 +966,12 @@ std::shared_ptr<const data_block> CommonCore::getValue (handle_id_t handle)
         throw (InvalidIdentifier ("Handle does not identify a subscription"));
     }
 
-    return getFederate (handleInfo->local_fed_id)->getSubscription (handle)->getData ();
+    return getFederateAt (handleInfo->local_fed_id)->getSubscription (handle)->getData ();
 }
 
 const std::vector<handle_id_t> &CommonCore::getValueUpdates (federate_id_t federateID)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (getValueUpdates)"));
@@ -982,7 +982,7 @@ const std::vector<handle_id_t> &CommonCore::getValueUpdates (federate_id_t feder
 handle_id_t
 CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name, const std::string &type)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (registerEndpoint)"));
@@ -1017,7 +1017,7 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
 
 handle_id_t CommonCore::getEndpoint (federate_id_t federateID, const std::string &name) const
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed != nullptr)
     {
         auto ept = fed->getEndpoint (name);
@@ -1072,7 +1072,7 @@ handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
         auto endid = ept->fed_id;
         ept->hasSourceFilter = true;
         lock.unlock ();
-        setActionFlag (m, processing_complete);
+        setActionFlag (m, processing_complete_flag);
         // send to broker and core
         addActionMessage (m);
         // now send the same command to the endpoint
@@ -1149,7 +1149,7 @@ handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName
         }
         ept->hasDestFilter = true;
         lock.unlock ();
-        setActionFlag (m, processing_complete);
+        setActionFlag (m, processing_complete_flag);
         // send to broker and core
         addActionMessage (m);
         // now send the same command to the endpoint
@@ -1243,7 +1243,7 @@ void CommonCore::registerFrequentCommunicationsPair (const std::string & /*sourc
 
 void CommonCore::addDependency (federate_id_t federateID, const std::string & /*federateName*/)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (registerEndpoint)"));
@@ -1262,7 +1262,7 @@ void CommonCore::send (handle_id_t sourceHandle, const std::string &destination,
     {
         throw (InvalidIdentifier ("handle does not point to an endpoint"));
     }
-    auto fed = getFederate (hndl->local_fed_id);
+    auto fed = getFederateAt (hndl->local_fed_id);
     ActionMessage m (CMD_SEND_MESSAGE);
 
     m.info ().orig_source = hndl->key;
@@ -1377,7 +1377,7 @@ void CommonCore::deliverMessage (ActionMessage &message)
 
         timeCoord->processTimeMessage (message);
 
-        auto fed = getFederate (localP->fed_id);
+        auto fed = getFederateCore (localP->fed_id);
         fed->addAction (std::move (message));
     }
     break;
@@ -1421,7 +1421,7 @@ std::unique_ptr<Message> CommonCore::receive (handle_id_t destination)
 
 std::unique_ptr<Message> CommonCore::receiveAny (federate_id_t federateID, handle_id_t &endpoint_id)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("FederateID is not valid (receiveAny)"));
@@ -1436,7 +1436,7 @@ std::unique_ptr<Message> CommonCore::receiveAny (federate_id_t federateID, handl
 
 uint64_t CommonCore::receiveCountAny (federate_id_t federateID)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("FederateID is not valid (receiveCountAny)"));
@@ -1456,7 +1456,7 @@ void CommonCore::logMessage (federate_id_t federateID, int logLevel, const std::
         sendToLogger (0, logLevel, getIdentifier (), messageToLog);
         return;
     }
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("FederateID is not valid (logMessage)"));
@@ -1477,7 +1477,7 @@ bool CommonCore::sendToLogger (federate_id_t federateID,
 {
     if (!BrokerBase::sendToLogger (federateID, logLevel, name, message))
     {
-        auto fed = getFederate (federateID);
+        auto fed = getFederateAt (federateID);
         if (fed == nullptr)
         {
             return false;
@@ -1499,7 +1499,7 @@ void CommonCore::setLoggingCallback (
     }
     else
     {
-        auto fed = getFederate (federateID);
+        auto fed = getFederateAt (federateID);
         if (fed == nullptr)
         {
             throw (InvalidIdentifier ("FederateID is not valid (setLoggingCallback)"));
@@ -1585,7 +1585,7 @@ void CommonCore::setIdentifier (const std::string &name)
 void CommonCore::setQueryCallback (federate_id_t federateID,
                                    std::function<std::string (const std::string &)> /*queryFunction*/)
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("FederateID is invalid (setQueryCallback)"));
@@ -1595,7 +1595,7 @@ void CommonCore::setQueryCallback (federate_id_t federateID,
 
 std::string CommonCore::federateQuery (Core::federate_id_t federateID, const std::string &queryStr) const
 {
-    auto fed = getFederate (federateID);
+    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         if ((queryStr == "exists") || (queryStr == "exist"))
@@ -1677,8 +1677,9 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     {
     case CMD_REG_FED:
         {
+            //this one in the core needs to be the threadsafe version
             auto fed = getFederate(command.name);
-            loopFederates.insert(command.name, fed->local_id, fed);
+            loopFederates.insert(command.name, nullptr, fed);
         }
         if (global_broker_id != 0)
         {
@@ -1750,6 +1751,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         }
         else
         {
+            //TODO PT This could be done better
             auto fedID = getFederateId (command.info ().target);
             repStr = federateQuery (fedID, command.payload);
         }
@@ -2057,7 +2059,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         {
             if (checkForLocalPublication (command))
             {
-                setActionFlag (command, processing_complete);
+                setActionFlag (command, processing_complete_flag);
             }
             transmit (0, command);
         }
@@ -2212,7 +2214,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             }
         }
 
-        auto fed = getFederate (command.dest_id);
+        auto fed = getFederateCore (command.dest_id);
         if (fed != nullptr)
         {
             fed->addAction (command);
@@ -2290,7 +2292,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     break;
 
     case CMD_SEND_MESSAGE:
-        if (isLocal (command.source_id))
+        if ((command.dest_id==0)&&(isLocal (command.source_id)))
         {
             auto handle = getHandleInfo (command.source_handle);
             deliverMessage (processMessage (handle, command));
@@ -2622,7 +2624,7 @@ void CommonCore::routeMessage (ActionMessage &cmd, federate_id_t dest)
     }
     else if (isLocal (dest))
     {
-        auto fed = getFederate (dest);
+        auto fed = getFederateCore (dest);
         if (fed != nullptr)
         {
             fed->addAction (cmd);
@@ -2751,7 +2753,7 @@ ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage 
                     if (ii < filtFunc->sourceFilters.size () - 1)
                     {
                         m.setAction (CMD_SEND_FOR_FILTER_AND_RETURN);
-                        ongoingFilterProcesses[hndl->local_fed_id].insert (m.info ().messageID);
+                        ongoingFilterProcesses[hndl->fed_id].insert (m.info ().messageID);
                     }
                     else
                     {
@@ -2774,8 +2776,8 @@ void CommonCore::processFilterReturn (ActionMessage &cmd)
     {
         return;
     }
-    if (ongoingFilterProcesses[handle->local_fed_id].find (cmd.info ().messageID) !=
-        ongoingFilterProcesses[handle->local_fed_id].end ())
+    if (ongoingFilterProcesses[handle->fed_id].find (cmd.info ().messageID) !=
+        ongoingFilterProcesses[handle->fed_id].end ())
     {
         auto messID = cmd.info ().messageID;
         auto filtFunc = getFilterCoordinator (handle->id);
@@ -2795,10 +2797,10 @@ void CommonCore::processFilterReturn (ActionMessage &cmd)
                     }
                     else
                     {
-                        ongoingFilterProcesses[handle->local_fed_id].erase (messID);
-                        if (ongoingFilterProcesses[handle->local_fed_id].empty ())
+                        ongoingFilterProcesses[handle->fed_id].erase (messID);
+                        if (ongoingFilterProcesses[handle->fed_id].empty ())
                         {
-                            transmitDelayedMessages (handle->local_fed_id);
+                            transmitDelayedMessages (handle->fed_id);
                         }
                         return;
                     }
@@ -2815,22 +2817,22 @@ void CommonCore::processFilterReturn (ActionMessage &cmd)
                     else
                     {
                         cmd.setAction (CMD_SEND_FOR_FILTER);
-                        ongoingFilterProcesses[handle->local_fed_id].erase (messID);
+                        ongoingFilterProcesses[handle->fed_id].erase (messID);
                     }
                     routeMessage (cmd);
-                    if (ongoingFilterProcesses[handle->local_fed_id].empty ())
+                    if (ongoingFilterProcesses[handle->fed_id].empty ())
                     {
-                        transmitDelayedMessages (handle->local_fed_id);
+                        transmitDelayedMessages (handle->fed_id);
                     }
                     return;
                 }
             }
         }
-        ongoingFilterProcesses[handle->local_fed_id].erase (messID);
+        ongoingFilterProcesses[handle->fed_id].erase (messID);
         deliverMessage (cmd);
-        if (ongoingFilterProcesses[handle->local_fed_id].empty ())
+        if (ongoingFilterProcesses[handle->fed_id].empty ())
         {
-            transmitDelayedMessages (handle->local_fed_id);
+            transmitDelayedMessages (handle->fed_id);
         }
     }
 }
@@ -2871,6 +2873,8 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
                     {
                         return;
                     }
+                    cmd.source_id = source;
+                    cmd.source_handle = source_handle;
                     cmd.dest_id = 0;
                     cmd.dest_handle = 0;
                     deliverMessage (cmd);

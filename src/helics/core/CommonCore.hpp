@@ -180,7 +180,7 @@ class CommonCore : public Core, public BrokerBase
     @param routeInfo a string containing the information necessary to connect*/
     virtual void addRoute (int route_id, const std::string &routeInfo) = 0;
     /** get the federate Information from the federateID*/
-    FederateState *getFederate (federate_id_t federateID) const;
+    FederateState *getFederateAt (federate_id_t federateID) const;
     /** get the federate Information from the federateID*/
     FederateState *getFederate (const std::string &federateName) const;
     /** get the federate Information from a handle

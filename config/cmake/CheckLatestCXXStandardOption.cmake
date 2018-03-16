@@ -33,8 +33,8 @@ endif()
 
 #boost libraries don't compile under /std:c++latest flag 1.66 might solve this issue
 if (MSVC)
-if (ENABLE_CXX_17)
-set(VERSION_OPTION /std:c++latest)
-endif(ENABLE_CXX_17)
+	if (ENABLE_CXX_17)
+		set(VERSION_OPTION /std:c++latest)
+	endif(ENABLE_CXX_17)
 endif()
 

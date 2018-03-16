@@ -770,8 +770,8 @@ void CoreBroker::addSubscription (ActionMessage &m)
     auto &sub=handles.addHandle(m.source_id, m.source_handle,  HANDLE_SUB, m.name, m.info ().type, m.info ().units);
    
     addLocalInfo (sub, m);
-    sub.processed = checkActionFlag (m, processing_complete);
-    if (!checkActionFlag (m, processing_complete))
+    sub.processed = checkActionFlag (m, processing_complete_flag);
+    if (!checkActionFlag (m, processing_complete_flag))
     {
         bool proc = FindandNotifySubscriptionPublisher (sub);
         if (!_isRoot)
@@ -779,7 +779,7 @@ void CoreBroker::addSubscription (ActionMessage &m)
             if (proc)
             {
                 // just let any higher level brokers know we have found the publisher and let them know
-                setActionFlag (m, processing_complete);
+                setActionFlag (m, processing_complete_flag);
             }
 
             transmit (0, m);
@@ -795,7 +795,7 @@ void CoreBroker::addEndpoint (ActionMessage &m)
 
     if (!_isRoot)
     {
-        setActionFlag (m, processing_complete);
+        setActionFlag (m, processing_complete_flag);
         transmit (0, m);
         if (!hasTimeDependency)
         {
@@ -825,7 +825,7 @@ void CoreBroker::addSourceFilter (ActionMessage &m)
     {
         if (proc)
         {
-            setActionFlag (m, processing_complete);
+            setActionFlag (m, processing_complete_flag);
         }
 
         transmit (0, m);
@@ -872,7 +872,7 @@ void CoreBroker::addDestFilter (ActionMessage &m)
     {
         if (proc)
         {
-            setActionFlag (m, processing_complete);
+            setActionFlag (m, processing_complete_flag);
         }
         transmit (0, m);
         if (!hasFilters)

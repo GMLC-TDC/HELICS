@@ -94,7 +94,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     BOOST_REQUIRE (!mFed->hasMessage (p2));
 
     fFed->requestTimeAsync (3.0);
-    /*auto retTime = */ mFed->requestTime (3.0);
+    auto retTime =  mFed->requestTime (3.0);
 
     BOOST_REQUIRE (mFed->hasMessage (p2));
 
@@ -323,6 +323,7 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     BOOST_CHECK (sFed->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
+#if 0
 BOOST_AUTO_TEST_CASE (message_multi_clone_test)
 {
     auto broker = AddBroker ("test", 4);
@@ -426,6 +427,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     BOOST_CHECK (sFed->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
+#endif
 
 BOOST_AUTO_TEST_SUITE_END ()
 

@@ -13,7 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <vector>
 
 #include "BasicHandleInfo.hpp"
-#include "helics_includes\optional.h"
+#include "helics_includes\optional.hpp"
 namespace helics
 {
 /** class for managing a coordinating the different types of handles used in helics

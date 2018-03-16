@@ -60,6 +60,8 @@ FederateState::FederateState (const std::string &name_, const CoreFederateInfo &
 {
     state = HELICS_CREATED;
     timeCoord = std::make_unique<TimeCoordinator> (info_);
+    timeCoord->setMessageSender([this](const ActionMessage &msg) { routeMessage(msg); });
+    
     logLevel = info_.logLevel;
     only_update_on_change = info_.only_update_on_change;
     only_transmit_on_change = info_.only_transmit_on_change;
@@ -119,12 +121,6 @@ void FederateState::reInit ()
 helics_federate_state_type FederateState::getState () const { return state; }
 
 int32_t FederateState::getCurrentIteration () const { return timeCoord->getCurrentIteration (); }
-
-void FederateState::setParent (CommonCore *coreObject)
-{
-    parent_ = coreObject;
-    timeCoord->setMessageSender ([coreObject](const ActionMessage &msg) { coreObject->addActionMessage (msg); });
-}
 
 CoreFederateInfo FederateState::getInfo () const
 {
@@ -313,6 +309,18 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::handle_id_t &id)
     return nullptr;
 }
 
+void FederateState::routeMessage(const ActionMessage &msg)
+{
+    if (msg.dest_id == global_id)
+    {
+        addAction(msg);
+    }
+    else if (parent_!=nullptr)
+    {
+        parent_->addActionMessage(msg);
+    }
+}
+
 void FederateState::addAction (const ActionMessage &action)
 {
     if (action.action () != CMD_IGNORE)
@@ -405,7 +413,25 @@ iteration_result FederateState::enterExecutingState (iteration_request iterate)
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
-        timeCoord->enteringExecMode (iterate);
+        //timeCoord->enteringExecMode (iterate);
+        ActionMessage exec(CMD_EXEC_REQUEST);
+        exec.source_id = global_id;
+        switch (iterate)
+        {
+        case iteration_request::force_iteration:
+            setActionFlag(exec, iteration_requested_flag);
+            setActionFlag(exec, required_flag);
+            break;
+        case iteration_request::iterate_if_needed:
+            setActionFlag(exec, iteration_requested_flag);
+            break;
+        case iteration_request::no_iterations:
+            break;
+        }
+
+        addAction(exec);
+        ActionMessage execReq(CMD_EXEC_CHECK);
+        queue.emplace(execReq);
         auto ret = processQueue ();
         if (ret == iteration_state::next_step)
         {
@@ -450,8 +476,29 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
     {  // only enter this loop once per federate
         events.clear ();  // clear the event queue
         LOG_TRACE (timeCoord->printTimeStatus ());
-        timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
-        queue.push (CMD_TIME_CHECK);
+        //timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
+
+        ActionMessage treq(CMD_TIME_REQUEST);
+        treq.source_id = global_id;
+        treq.actionTime = nextTime;
+        switch (iterate)
+        {
+        case iteration_request::force_iteration:
+            setActionFlag(treq, iteration_requested_flag);
+            setActionFlag(treq, required_flag);
+            break;
+        case iteration_request::iterate_if_needed:
+            setActionFlag(treq, iteration_requested_flag);
+            break;
+        case iteration_request::no_iterations:
+            break;
+        }
+
+        addAction(treq);
+        LOG_TRACE(timeCoord->printTimeStatus());
+        //timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
+        queue.push(CMD_TIME_CHECK);
+
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
         iterating = (ret == iteration_state::iterating);
@@ -591,6 +638,18 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         break;
     case CMD_EXEC_REQUEST:
+        if ((cmd.source_id == global_id) && (cmd.dest_id == 0))
+        { //this sets up a time request
+            iteration_request iterate = iteration_request::no_iterations;
+            if (checkActionFlag(cmd, iteration_requested_flag))
+            {
+                iterate = (checkActionFlag(cmd, required_flag)) ? iteration_request::force_iteration : iteration_request::iterate_if_needed;
+            }
+            timeCoord->enteringExecMode(iterate);
+            break;
+
+        }
+        FALLTHROUGH
     case CMD_EXEC_GRANT:
         if (!timeCoord->processTimeMessage (cmd))
         {
@@ -653,6 +712,17 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         break;
     case CMD_TIME_REQUEST:
+        if ((cmd.source_id == global_id) && (cmd.dest_id == 0))
+        { //this sets up a time request
+            iteration_request iterate = iteration_request::no_iterations;
+            if (checkActionFlag(cmd, iteration_requested_flag))
+            {
+                iterate = (checkActionFlag(cmd, required_flag)) ? iteration_request::force_iteration : iteration_request::iterate_if_needed;
+            }
+            timeCoord->timeRequest(cmd.actionTime, iterate, nextValueTime(), nextMessageTime());
+            break;
+        }
+        FALLTHROUGH
     case CMD_TIME_GRANT:
         if (!timeCoord->processTimeMessage (cmd))
         {

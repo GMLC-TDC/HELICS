@@ -186,7 +186,7 @@ void ForwardingTimeCoordinator::sendTimeRequest () const
         upd.actionTime = time_next;
         if (iterating)
         {
-            setActionFlag(upd, iteration_requested);
+            setActionFlag(upd, iteration_requested_flag);
         }
         transmitTimingMessage(upd);
     }
@@ -200,7 +200,7 @@ void ForwardingTimeCoordinator::sendTimeRequest () const
         upd.Tdemin = time_minminDe;
         if (iterating)
         {
-            setActionFlag(upd, iteration_requested);
+            setActionFlag(upd, iteration_requested_flag);
         }
         transmitTimingMessage(upd);
 

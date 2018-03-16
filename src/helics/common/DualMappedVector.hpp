@@ -41,6 +41,44 @@ public:
             lookup2.emplace(searchValue2, index);
         }
     }
+
+    /** insert a new element into the vector
+    @param searchValue1 the primary unique index of the vector
+    @param searchValue2 the secondary unique index of the vector*/
+    template <typename... Us>
+    void insert(const searchType1 &searchValue1, std::nullptr_t /*searchValue2*/, Us &&... data)
+    {
+        auto fnd = lookup1.find(searchValue1);
+        if (fnd != lookup1.end())
+        {
+            dataStorage[fnd->second] = VType(std::forward<Us>(data)...);
+        }
+        else
+        {
+            auto index = dataStorage.size();
+            dataStorage.emplace_back(std::forward<Us>(data)...);
+            lookup1.emplace(searchValue1, index);
+        }
+    }
+
+    /** insert a new element into the vector
+    @param searchValue1 the primary unique index of the vector
+    @param searchValue2 the secondary unique index of the vector*/
+    template <typename... Us>
+    void insert(std::nullptr_t /*searchValue1*/, const searchType2 &searchValue2, Us &&... data)
+    {
+        auto fnd = lookup2.find(searchValue1);
+        if (fnd != lookup2.end())
+        {
+            dataStorage[fnd->second] = VType(std::forward<Us>(data)...);
+        }
+        else
+        {
+            auto index = dataStorage.size();
+            dataStorage.emplace_back(std::forward<Us>(data)...);
+            lookup1.emplace(searchValue1, index);
+        }
+    }
 	/** add an additional index term for searching*/
 	bool addSearchTermForIndex(const searchType1 &searchValue, size_t index)
 	{

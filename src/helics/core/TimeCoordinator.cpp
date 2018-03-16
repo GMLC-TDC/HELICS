@@ -31,7 +31,7 @@ void TimeCoordinator::enteringExecMode (iteration_request mode)
     execreq.source_id = source_id;
     if (iterating)
     {
-        setActionFlag (execreq, iteration_requested);
+        setActionFlag (execreq, iteration_requested_flag);
     }
     transmitTimingMessage (execreq);
 }
@@ -360,7 +360,7 @@ void TimeCoordinator::sendTimeRequest () const
 
     if (iterating)
     {
-        setActionFlag (upd, iteration_requested);
+        setActionFlag (upd, iteration_requested_flag);
     }
     transmitTimingMessage (upd);
     //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
@@ -503,7 +503,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
         hasInitUpdates = false;
         ActionMessage execgrant (CMD_EXEC_GRANT);
         execgrant.source_id = source_id;
-        setActionFlag (execgrant, iteration_requested);
+        setActionFlag (execgrant, iteration_requested_flag);
         transmitTimingMessage (execgrant);
     }
     return ret;
