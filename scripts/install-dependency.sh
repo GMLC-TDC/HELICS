@@ -120,7 +120,7 @@ install_boost () {
     (
         cd ${boost_version_str}/;
         ./bootstrap.sh --with-toolset=${boost_toolset} --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test;
-        ./b2 -j2 link=shared threading=multi variant=release cxxflags=${CXX_FLAGS} > /dev/null;
+        ./b2 -j2 link=shared threading=multi variant=release cxxflags=${BOOST_CXX_FLAGS} > /dev/null;
         ./b2 install --prefix=${install_path} > /dev/null;
     )
     rm ${boost_version_str}.tar.gz
@@ -154,9 +154,10 @@ if [[ -z $compiler_toolset ]]; then
     compiler_toolset=gcc
 fi
 
-if [[ "$CXX_STANDARD" ]]; then
-    cmake_cxx_standard_option=-DCMAKE_CXX_STANDARD=${CXX_STANDARD}
-    CXX_FLAGS="${CXX_FLAGS} -std=c++${CXX_STANDARD}"
+if [[ "$CXX_STANDARD" == 17 ]]; then
+    echo "Building dependency with C++17"
+    cmake_cxx_standard_option=-DCMAKE_CXX_STANDARD=17
+    BOOST_CXX_FLAGS="-std=c++17"
 fi
 
 
