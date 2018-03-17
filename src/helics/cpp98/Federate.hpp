@@ -14,6 +14,21 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <complex>
 #include <stdexcept>
 
+//  Detect whether the compiler supports C++11 rvalue references.
+#if (defined(__GNUC__) && (__GNUC__ > 4 || \
+      (__GNUC__ == 4 && __GNUC_MINOR__ > 2)) && \
+      defined(__GXX_EXPERIMENTAL_CXX0X__))
+#define HELICS_HAS_RVALUE_REFS
+#elif defined(__clang__)
+#if __has_feature(cxx_rvalue_references)
+#define HELICS_HAS_RVALUE_REFS
+#endif
+#elif defined(_MSC_VER) && (_MSC_VER >= 1900)
+#define HELICS_HAS_RVALUE_REFS
+#elif defined(_MSC_VER) && (_MSC_VER >= 1600)
+#define HELICS_HAS_RVALUE_REFS
+#endif
+
 // defines for setFlag values in core/flag-definitions.h
 // enum for core_type:int in core/core-types.h
 
@@ -163,6 +178,20 @@ class Federate
         fed = helicsFederateClone(fedObj.fed);
         return *this;
     }
+#ifdef HELICS_HAS_RVALUE_REFS
+    Federate(Federate &&fedObj) :exec_async_iterate(fedObj.exec_async_iterate)
+    {
+        fed = fedObj.fed;
+        fedObj.fed = NULL;
+    }
+    Federate &operator=(Federate &&fedObj)
+    {
+        exec_async_iterate = fedObj.exec_async_iterate;
+        fed = fedObj.fed;
+        fedObj.fed = NULL;
+        return *this;
+    }
+#endif
     virtual ~Federate ()
     {
         helicsFederateFree (fed);

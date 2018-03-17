@@ -163,15 +163,8 @@ class ValueFederate : public virtual Federate
 
     void setDefaultValue (helics_subscription sub, const std::vector<double> &data)
     {
-        // c++98 doesn't guarantee vector data will be contiguous --are there any reasonable implementations where it is not otherwise this should not do a copy?
-        double *arr = (double*) malloc(data.size() * sizeof(double));
-        for (unsigned int i = 0; i < data.size(); i++)
-        {
-            arr[i] = data[i];
-        }
         // returns helics_status
-        helicsSubscriptionSetDefaultVector (sub, arr, static_cast<int>(data.size() * sizeof(double)));
-        free (arr);
+        helicsSubscriptionSetDefaultVector (sub, data.data(), static_cast<int>(data.size() * sizeof(double)));
     }
 
     /** Methods to get subscription values **/
@@ -184,9 +177,11 @@ class ValueFederate : public virtual Federate
 
     std::string getString (helics_subscription sub)
     {
-        char str[255];
-        helicsSubscriptionGetString (sub, &str[0], sizeof(str));
-        std::string result (str);
+        int size = helicsSubscriptionGetValueSize(sub);
+        std::string result;
+        result.resize(size+1);
+        helicsSubscriptionGetString (sub, &result[0], size+1);
+        result[size] = '\0';
         return result;
     }
 
@@ -218,6 +213,13 @@ class ValueFederate : public virtual Federate
         int actualSize;
         helicsSubscriptionGetVector (sub, data, maxlen,&actualSize);
         return actualSize;
+    }
+
+    void getVector(helics_subscription sub, std::vector<double> &data)
+    {
+        int actualSize = helicsSubscriptionGetVectorSize(sub);
+        data.resize(actualSize);
+        helicsSubscriptionGetVector(sub, data.data(), actualSize, &actualSize);
     }
 
     /** Methods to publish values **/

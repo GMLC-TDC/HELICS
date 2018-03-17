@@ -33,7 +33,9 @@ add_library(helicsSharedLib SHARED ${helicsShared_sources} ${helicsShared_header
 
 target_link_libraries(helicsSharedLib helics-static )
 if (UNIX OR MINGW)
-target_link_libraries(helicsSharedLib -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt)
+	if (NOT APPLE)
+		target_link_libraries(helicsSharedLib -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt)
+	endif(NOT APPLE)
 endif()
 
 if (HELICS_HAVE_ZEROMQ)
