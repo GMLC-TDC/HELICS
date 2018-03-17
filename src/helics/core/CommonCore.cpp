@@ -174,14 +174,14 @@ CommonCore::~CommonCore ()
 
 FederateState *CommonCore::getFederateAt (federate_id_t federateID) const
 {
-    auto feds = federates.lock();
+    auto feds = federates.lock ();
     return (*feds)[federateID];
 }
 
 FederateState *CommonCore::getFederate (const std::string &federateName) const
 {
-    auto feds = federates.lock();
-    return feds->find(federateName);
+    auto feds = federates.lock ();
+    return feds->find (federateName);
 }
 
 FederateState *CommonCore::getHandleFederate (handle_id_t id_)
@@ -192,38 +192,37 @@ FederateState *CommonCore::getHandleFederate (handle_id_t id_)
     // this list is now constant no need to lock
     auto local_fed_id = handles.getLocalFedID (id_);
     if (local_fed_id != invalid_fed_id)
-    { 
-        auto feds=federates.lock();
+    {
+        auto feds = federates.lock ();
         return (*feds)[local_fed_id];
     }
 
     return nullptr;
 }
 
-FederateState *CommonCore::getFederateCore(federate_id_t federateID)
+FederateState *CommonCore::getFederateCore (federate_id_t federateID)
 {
-
-    if (isValidIndex(federateID, loopFederates))
+    if (isValidIndex (federateID, loopFederates))
     {
         return loopFederates[federateID];
     }
-    auto fed = loopFederates.find(federateID);
-    return (fed != loopFederates.end()) ? (*fed) : nullptr;
+    auto fed = loopFederates.find (federateID);
+    return (fed != loopFederates.end ()) ? (*fed) : nullptr;
 }
 
-FederateState *CommonCore::getFederateCore(const std::string &federateName)
+FederateState *CommonCore::getFederateCore (const std::string &federateName)
 {
-    auto fed = loopFederates.find(federateName);
-    return (fed != loopFederates.end()) ? (*fed) : nullptr;
+    auto fed = loopFederates.find (federateName);
+    return (fed != loopFederates.end ()) ? (*fed) : nullptr;
 }
 
-FederateState *CommonCore::getHandleFederateCore(handle_id_t id_)
+FederateState *CommonCore::getHandleFederateCore (handle_id_t id_)
 {
     // only activate the lock if we not in an operating state
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex>(_handlemutex, std::defer_lock) :
-        std::unique_lock<std::mutex>(_handlemutex);
+    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
+                                             std::unique_lock<std::mutex> (_handlemutex);
     // this list is now constant no need to lock
-    auto local_fed_id = handles.getLocalFedID(id_);
+    auto local_fed_id = handles.getLocalFedID (id_);
     if (local_fed_id != invalid_fed_id)
     {  // now need to be careful about deadlock here
         return loopFederates[local_fed_id];
@@ -250,7 +249,7 @@ BasicHandleInfo *CommonCore::getLocalEndpoint (const std::string &name)
 
 bool CommonCore::isLocal (Core::federate_id_t global_id) const
 {
-    return (loopFederates.find(global_id) != loopFederates.end());
+    return (loopFederates.find (global_id) != loopFederates.end ());
 }
 
 int32_t CommonCore::getRoute (Core::federate_id_t global_id) const
@@ -410,13 +409,12 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
     FederateState *fed;
     federate_id_t local_id;
     {
-        auto feds = federates.lock();
-        auto id = feds->insert(name,name, info);
-        local_id = static_cast<decltype (fed->local_id)>(id);
+        auto feds = federates.lock ();
+        auto id = feds->insert (name, name, info);
+        local_id = static_cast<decltype (fed->local_id)> (id);
         fed = (*feds)[id];
     }
-   
-    
+
     // setting up the Logger
     // auto ptr = fed.get();
     // if we are using the Logger, log all messages coming from the federates so they can control the level*/
@@ -426,10 +424,10 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
 
     fed->local_id = local_id;
     fed->setParent (this);
-   
+
     ActionMessage m (CMD_REG_FED);
     m.name = name;
-    addActionMessage(m);
+    addActionMessage (m);
     // now wait for the federateQueue to get the response
     auto valid = fed->waitSetup ();
     if (valid == iteration_result::next_step)
@@ -459,7 +457,7 @@ const std::string &CommonCore::getFederateNameNoThrow (federate_id_t federateID)
 
 federate_id_t CommonCore::getFederateId (const std::string &name)
 {
-    auto feds = federates.lock();
+    auto feds = federates.lock ();
     auto fed = feds->find (name);
     if (fed != nullptr)
     {
@@ -476,7 +474,7 @@ int32_t CommonCore::getFederationSize ()
         return _global_federation_size;
     }
     // if we are in initialization return the local federation size
-    return static_cast<int32_t> (federates.lock()->size());
+    return static_cast<int32_t> (federates.lock ()->size ());
 }
 
 Time CommonCore::timeRequest (federate_id_t federateID, Time next)
@@ -646,11 +644,11 @@ void CommonCore::setLoggingLevel (federate_id_t federateID, int loggingLevel)
 {
     if (federateID == invalid_fed_id)
     {
-        ActionMessage cmd(CMD_CORE_CONFIGURE);
+        ActionMessage cmd (CMD_CORE_CONFIGURE);
         cmd.index = UPDATE_LOG_LEVEL;
         cmd.dest_id = loggingLevel;
-        addActionMessage(cmd);
-        //setLogLevel (loggingLevel);
+        addActionMessage (cmd);
+        // setLogLevel (loggingLevel);
         return;
     }
 
@@ -948,7 +946,7 @@ void CommonCore::setValue (handle_id_t handle, const char *data, uint64_t len)
         mv.source_id = handleInfo->fed_id;
         mv.source_handle = handle;
         mv.payload = std::string (data, len);
-        mv.actionTime = fed->grantedTime ();
+        mv.actionTime = fed->nextAllowedSendTime ();
 
         actionQueue.push (mv);
     }
@@ -1273,7 +1271,7 @@ void CommonCore::send (handle_id_t sourceHandle, const std::string &destination,
 
     m.payload = std::string (data, length);
     m.info ().target = destination;
-    m.actionTime = fed->grantedTime ();
+    m.actionTime = fed->nextAllowedSendTime ();
     addActionMessage (m);
 }
 
@@ -1295,7 +1293,8 @@ void CommonCore::sendEvent (Time time,
     ActionMessage m (CMD_SEND_MESSAGE);
     m.source_handle = sourceHandle;
     m.source_id = hndl->fed_id;
-    m.actionTime = time;
+    auto minTime = getFederateAt(hndl->local_fed_id)->nextAllowedSendTime();
+    m.actionTime = std::max(time, minTime);
     m.payload = std::string (data, length);
     m.info ().orig_source = hndl->key;
     m.info ().source = hndl->key;
@@ -1331,6 +1330,11 @@ void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message>
     if (m.info ().messageID == 0)
     {
         m.info ().messageID = ++messageCounter;
+    }
+    auto minTime = getFederateAt(hndl->local_fed_id)->nextAllowedSendTime();
+    if (m.actionTime < minTime)
+    {
+        m.actionTime = minTime;
     }
     addActionMessage (m);
 }
@@ -1494,7 +1498,7 @@ void CommonCore::setLoggingCallback (
     if (federateID == 0)
     {
         std::lock_guard<std::mutex> lock (_handlemutex);
-        //TODO:: this is not totally threadsafe
+        // TODO:: this is not totally threadsafe
         setLoggerFunction (std::move (logFunction));
     }
     else
@@ -1676,25 +1680,27 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     switch (command.action ())
     {
     case CMD_REG_FED:
-        {
-            //this one in the core needs to be the threadsafe version
-            auto fed = getFederate(command.name);
-            loopFederates.insert(command.name, nullptr, fed);
-        }
+    {
+        // this one in the core needs to be the threadsafe version
+        auto fed = getFederate (command.name);
+        loopFederates.insert (command.name, nullptr, fed);
+    }
         if (global_broker_id != 0)
         {
+            //forward on to Broker
             command.source_id = global_broker_id;
-            transmit(0, command);  // just directly transmit, no need to process in the queue since it is a priority message
+            transmit (0,command);
         }
         else
         {
             // this will get processed when this core is assigned a global id
-            delayTransmitQueue.push(std::move(command));
+            delayTransmitQueue.push (std::move (command));
         }
         break;
     case CMD_REG_BROKER:
         // These really shouldn't happen here probably means something went wrong in setup but we can handle it
         // forward the connection request to the higher level
+        LOG_WARNING(0, identifier, "Core received reg broker message, likely improper federation setup\n");
         transmit (0, command);
         break;
     case CMD_BROKER_ACK:
@@ -1703,7 +1709,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             if (checkActionFlag (command, error_flag))
             {
                 LOG_ERROR (0, identifier, "broker responded with error\n");
-                // generate error messages in response to all the delayed messages
+                // TODO:generate error messages in response to all the delayed messages
                 break;
             }
             global_broker_id = command.dest_id;
@@ -1714,10 +1720,19 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         break;
     case CMD_FED_ACK:
     {
-        auto fed = getFederateCore(command.name);
+        auto fed = getFederateCore (command.name);
         if (fed != nullptr)
         {
-            loopFederates.addSearchTerm(command.dest_id, command.name);
+            if (checkActionFlag(command, error_flag))
+            {
+                LOG_ERROR(0, identifier, std::string("broker responded with error for registration of ")+command.name+"\n");
+            }
+            else
+            {
+                fed->global_id = command.dest_id;
+                loopFederates.addSearchTerm(command.dest_id, command.name);
+            }
+           
             // push the command to the local queue
             fed->addAction (command);
         }
@@ -1751,7 +1766,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         }
         else
         {
-            //TODO PT This could be done better
+            // TODO PT This could be done better
             auto fedID = getFederateId (command.info ().target);
             repStr = federateQuery (fedID, command.payload);
         }
@@ -1906,11 +1921,11 @@ void CommonCore::processCommand (ActionMessage &&command)
 
     case CMD_EXEC_GRANT:
     case CMD_EXEC_REQUEST:
-        if (isLocal(command.source_id))
+        if (isLocal (command.source_id))
         {
-            if (!ongoingFilterProcesses[command.source_id].empty())
+            if (!ongoingFilterProcesses[command.source_id].empty ())
             {
-                delayedTimingMessages[command.source_id].push_back(command);
+                delayedTimingMessages[command.source_id].push_back (command);
                 break;
             }
         }
@@ -1940,11 +1955,11 @@ void CommonCore::processCommand (ActionMessage &&command)
         break;
     case CMD_TIME_REQUEST:
     case CMD_TIME_GRANT:
-        if (isLocal(command.source_id))
+        if (isLocal (command.source_id))
         {
-            if (!ongoingFilterProcesses[command.source_id].empty())
+            if (!ongoingFilterProcesses[command.source_id].empty ())
             {
-                delayedTimingMessages[command.source_id].push_back(command);
+                delayedTimingMessages[command.source_id].push_back (command);
                 break;
             }
         }
@@ -2249,7 +2264,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
         else if (command.index == UPDATE_LOG_LEVEL)
         {
-            setLogLevel(command.dest_id);
+            setLogLevel (command.dest_id);
         }
         break;
     case CMD_INIT:
@@ -2276,9 +2291,9 @@ void CommonCore::processCommand (ActionMessage &&command)
         broker_state_t exp = initializing;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::operating))
         {  // forward the grant to all federates
+            organizeFilterOperations();
             for (auto &fed : loopFederates)
             {
-                organizeFilterOperations ();
                 fed->addAction (command);
             }
             timeCoord->enteringExecMode ();
@@ -2292,10 +2307,9 @@ void CommonCore::processCommand (ActionMessage &&command)
     break;
 
     case CMD_SEND_MESSAGE:
-        if ((command.dest_id==0)&&(isLocal (command.source_id)))
+        if ((command.dest_id == 0) && (isLocal (command.source_id)))
         {
-            auto handle = getHandleInfo (command.source_handle);
-            deliverMessage (processMessage (handle, command));
+            deliverMessage (processMessage (command));
         }
         else
         {
@@ -2380,7 +2394,8 @@ void CommonCore::checkDependencies ()
     {
         if (fed->hasEndpoints)
         {
-            if (fed->getInfo ().observer)
+            auto fedInfo = fed->getInfo();
+            if (fedInfo.observer)
             {
                 timeCoord->removeDependency (fed->global_id);
                 ActionMessage rmdep (CMD_REMOVE_DEPENDENT);
@@ -2714,15 +2729,16 @@ void CommonCore::routeMessage (ActionMessage &&cmd)
 }
 
 // Checks for filter operations
-ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage &m)
+ActionMessage &CommonCore::processMessage (ActionMessage &m)
 {
-    if (hndl == nullptr)
+    auto handle = getHandleInfo (m.source_handle);
+    if (handle == nullptr)
     {
         return m;
     }
-    if (hndl->hasSourceFilter)
+    if (handle->hasSourceFilter)
     {
-        auto filtFunc = getFilterCoordinator (hndl->id);
+        auto filtFunc = getFilterCoordinator (handle->id);
         if (filtFunc->hasSourceFilter)
         {
             //   for (int ii = 0; ii < static_cast<int> (filtFunc->sourceFilters.size ()); ++ii)
@@ -2753,7 +2769,7 @@ ActionMessage &CommonCore::processMessage (BasicHandleInfo *hndl, ActionMessage 
                     if (ii < filtFunc->sourceFilters.size () - 1)
                     {
                         m.setAction (CMD_SEND_FOR_FILTER_AND_RETURN);
-                        ongoingFilterProcesses[hndl->fed_id].insert (m.info ().messageID);
+                        ongoingFilterProcesses[handle->fed_id].insert (m.info ().messageID);
                     }
                     else
                     {

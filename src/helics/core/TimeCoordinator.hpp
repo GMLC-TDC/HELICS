@@ -72,6 +72,11 @@ public:
 	{
 		return time_granted;
 	}
+    /** get the current granted time*/
+    Time allowedSendTime() const
+    {
+        return time_granted+info.outputDelay;
+    }
 	/** get a list of actual dependencies*/
     std::vector < Core::federate_id_t> getDependencies() const;
     /** get a reference to the dependents vector*/

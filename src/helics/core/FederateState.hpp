@@ -48,14 +48,15 @@ class FederateState
 	  std::unique_ptr<TimeCoordinator> timeCoord;  //!< object that manages the time to determine granting
   public:
     Core::federate_id_t local_id = invalid_fed_id;  //!< id code, default to something invalid
-    Core::federate_id_t global_id = invalid_fed_id;  //!< global id code, default to invalid
+    std::atomic<Core::federate_id_t> global_id{ invalid_fed_id };  //!< global id code, default to invalid
 
   private:
-    std::atomic<helics_federate_state_type> state{HELICS_NONE};  //!< the current state of the federate
-    bool only_update_on_change{false};  //!< flag indicating that values should only be updated on change
-    bool only_transmit_on_change{
-      false};  //!< flag indicating that values should only be transmitted if different than previous values
+    
 	shared_guarded<DualMappedPointerVector<SubscriptionInfo, std::string, Core::handle_id_t>> subscriptions; //!< storage for all the subscriptions
+    std::atomic<helics_federate_state_type> state{ HELICS_NONE };  //!< the current state of the federate
+    bool only_update_on_change{ false };  //!< flag indicating that values should only be updated on change
+    bool only_transmit_on_change{
+        false };  //!< flag indicating that values should only be transmitted if different than previous values
     shared_guarded<DualMappedPointerVector<PublicationInfo, std::string, Core::handle_id_t>> publications; //!< storage for all the publications
     shared_guarded<DualMappedPointerVector<EndpointInfo, std::string, Core::handle_id_t>> endpoints;  //!< storage for all the endpoints
 
@@ -80,6 +81,7 @@ private:
     std::map<Core::handle_id_t, std::vector<std::unique_ptr<Message>>>
       message_queue;  // structure of message queues
 	Time time_granted = startupTime;  //!< the most recent granted time;
+    Time allowed_send_time = startupTime; //!< the next time a message can be sent;
     mutable std::mutex _mutex;  //!< the mutex protecting the fed state
 
     std::atomic<bool> processing{false};  //!< the federate is processing
@@ -186,6 +188,8 @@ private:
     void updateFederateInfo (const ActionMessage &cmd);
 	/** get the granted time of a federate*/
     Time grantedTime () const { return time_granted; }
+    /** get allowable message time*/
+    Time nextAllowedSendTime() const { return allowed_send_time; }
 	/**get a reference to the handles of subscriptions with value updates
 	*/
     const std::vector<Core::handle_id_t> &getEvents () const;

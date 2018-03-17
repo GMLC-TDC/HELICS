@@ -52,6 +52,17 @@ zmq::context_t &zmqContextManager::getContext (const std::string &contextName)
     return getContextPointer (contextName)->getBaseContext ();
 }
 
+void zmqContextManager::startContext(const std::string &contextName)
+{
+    std::lock_guard<std::mutex> conlock(contextLock);
+    auto fnd = contexts.find(contextName);
+    if (fnd == contexts.end())
+    {
+        auto newContext = std::shared_ptr<zmqContextManager>(new zmqContextManager(contextName));
+        contexts.emplace(contextName, std::move(newContext));
+    }
+}
+
 void zmqContextManager::closeContext (const std::string &contextName)
 {
     std::lock_guard<std::mutex> conlock (contextLock);

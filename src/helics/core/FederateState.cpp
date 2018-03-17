@@ -501,6 +501,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
 
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
+        allowed_send_time = timeCoord->allowedSendTime();
         iterating = (ret == iteration_state::iterating);
 
         iteration_time retTime = {time_granted, static_cast<iteration_result> (ret)};

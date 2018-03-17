@@ -291,7 +291,7 @@ class CommonCore : public Core, public BrokerBase
     /** deliver a message to the appropriate location*/
     void deliverMessage (ActionMessage &message);
     /** function to deal with a source filters*/
-    ActionMessage &processMessage (BasicHandleInfo *hndl, ActionMessage &m);
+    ActionMessage &processMessage (ActionMessage &m);
     /** add a new handle to the generic structure
     and return a pointer to it, the pointer is non-owning
     */
