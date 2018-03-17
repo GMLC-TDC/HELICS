@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE (data_view_constructor_tests)
     // build from a vector
     std::vector<char> cvector (23, 'd');
     data_view db7 (cvector);
-    BOOST_CHECK_EQUAL (db7.size (), 23);
+    BOOST_CHECK_EQUAL (db7.size (), 23u);
     BOOST_CHECK_EQUAL (db7[17], 'd');
 
     std::vector<double> dvector (10, 0.07);
