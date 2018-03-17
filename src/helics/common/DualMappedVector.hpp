@@ -67,7 +67,7 @@ public:
     template <typename... Us>
     void insert(std::nullptr_t /*searchValue1*/, const searchType2 &searchValue2, Us &&... data)
     {
-        auto fnd = lookup2.find(searchValue1);
+        auto fnd = lookup2.find(searchValue2);
         if (fnd != lookup2.end())
         {
             dataStorage[fnd->second] = VType(std::forward<Us>(data)...);
@@ -76,7 +76,7 @@ public:
         {
             auto index = dataStorage.size();
             dataStorage.emplace_back(std::forward<Us>(data)...);
-            lookup1.emplace(searchValue1, index);
+            lookup2.emplace(searchValue2, index);
         }
     }
 	/** add an additional index term for searching*/

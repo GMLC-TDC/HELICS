@@ -637,9 +637,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         {
             transmit (getRoute (command.dest_id), command);
         }
-
         break;
-
     case CMD_PUB:
         transmit (getRoute (command.dest_id), command);
         break;
