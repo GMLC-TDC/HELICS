@@ -1848,16 +1848,14 @@ void CommonCore::transmitDelayedMessages (federate_id_t source)
             delayTransmitQueue.push (std::move (am));
         }
     }
-    if (source < static_cast<decltype (source)> (delayedTimingMessages.size ()))
+
+    if (!delayedTimingMessages[source].empty ())
     {
-        if (!delayedTimingMessages[source].empty ())
+        for (auto &delayedMsg : delayedTimingMessages[source])
         {
-            for (auto &delayedMsg : delayedTimingMessages[source])
-            {
-                routeMessage (delayedMsg);
-            }
-            delayedTimingMessages[source].clear ();
+            routeMessage (delayedMsg);
         }
+        delayedTimingMessages[source].clear ();
     }
 }
 

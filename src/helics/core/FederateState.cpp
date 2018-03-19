@@ -379,6 +379,7 @@ iteration_result FederateState::enterInitializationState ()
         if (ret == iteration_state::next_step)
         {
             time_granted = initialTime;
+            allowed_send_time = initialTime;
         }
         return static_cast<iteration_result> (ret);
     }
@@ -436,6 +437,7 @@ iteration_result FederateState::enterExecutingState (iteration_request iterate)
         if (ret == iteration_state::next_step)
         {
             time_granted = timeZero;
+           allowed_send_time = timeCoord->allowedSendTime();
         }
         fillEventVector (time_granted);
         
@@ -551,6 +553,7 @@ iteration_result FederateState::genericUnspecifiedQueueProcess ()
     {  // only 1 thread can enter this loop once per federate
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
+        allowed_send_time = timeCoord->allowedSendTime();
         processing = false;
         return static_cast<iteration_result> (ret);
     }
@@ -707,6 +710,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
                 if (ret != iteration_state::continue_processing)
                 {
                     time_granted = timeCoord->getGrantedTime ();
+                    allowed_send_time = timeCoord->allowedSendTime();
                     return ret;
                 }
             }
@@ -740,6 +744,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         if (ret != iteration_state::continue_processing)
         {
             time_granted = timeCoord->getGrantedTime ();
+            allowed_send_time = timeCoord->allowedSendTime();
             LOG_DEBUG(std::string("Granted Time=") + std::to_string(time_granted));
             return ret;
         }
