@@ -7,7 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define HELICS_CPP98_FEDERATE_HPP_
 #pragma once
 
-#include "shared_api_library/helics.h"
+#include "../shared_api_library/helics.h"
 
 #include <string>
 #include <vector>
@@ -153,6 +153,16 @@ class Federate
     // Default constructor, not meant to be used
     Federate ():fed(NULL),exec_async_iterate(false) {};
 
+    Federate(const Federate &fedObj):exec_async_iterate(fedObj.exec_async_iterate)
+    {
+        fed = helicsFederateClone(fedObj.fed);
+    }
+    Federate &operator=(const Federate &fedObj)
+    {
+        exec_async_iterate = fedObj.exec_async_iterate;
+        fed = helicsFederateClone(fedObj.fed);
+        return *this;
+    }
     virtual ~Federate ()
     {
         helicsFederateFree (fed);

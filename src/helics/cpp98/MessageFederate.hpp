@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -9,8 +8,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define HELICS_CPP98_MESSAGE_FEDERATE_HPP_
 #pragma once
 
-#include "helics.hpp"
 #include "Federate.hpp"
+#include "../shared_api_library/MessageFederate.h"
 
 namespace helics
 {

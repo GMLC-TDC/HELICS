@@ -1,7 +1,10 @@
 /*
-Copyright © 2017-2018,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Copyright (C) 2017-2018, Battelle Memorial Institute
+All rights reserved.
+
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
 
 #include <boost/test/unit_test.hpp>
@@ -16,7 +19,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 // these test cases test out the message federates
 
 
-BOOST_FIXTURE_TEST_SUITE (message_federate_tests, FederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE (message_federate_tests_cpp, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 

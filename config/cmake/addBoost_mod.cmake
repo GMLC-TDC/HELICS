@@ -1,4 +1,6 @@
-SHOW_VARIABLE(BOOST_INSTALL_PATH PATH "Boost root directory" "${BOOST_INSTALL_PATH}")
+set(BOOST_MINIMUM_VERSION 1.58)
+set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
+
 IF (MSVC)
 
 set (boost_versions
@@ -24,7 +26,7 @@ D:/boost
 )
 
 # create an empty list
-list(APPEND boost_paths "")
+list(APPEND boost_paths ${BOOST_INSTALL_PATH})
 mark_as_advanced(BOOST_INSTALL_PATH)
 foreach( dir ${poss_prefixes})
 	foreach( boostver ${boost_versions})
@@ -36,25 +38,31 @@ foreach( dir ${poss_prefixes})
 	endforeach()
 endforeach()
 
-find_path(BOOST_TEST_PATH
-			NAMES 			boost/version.hpp
-			PATHS		${BOOST_INSTALL_PATH}
-						${boost_paths}
-		)
+message(STATUS "boost paths ${boost_paths}")
 
-		if (BOOST_TEST_PATH)
-		set(BOOST_ROOT ${BOOST_TEST_PATH})
-		endif(BOOST_TEST_PATH)
-ELSE(MSVC)
-set(BOOST_ROOT "${BOOST_INSTALL_PATH}")
+# Minimum version of Boost required for building HELICS
+
+set(BOOST_ROOT "${boost_paths}")
+if (${MPI_C_FOUND})
+  #find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
+  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options mpi unit_test_framework filesystem system date_time timer chrono mpi REQUIRED)
+ELSE(${MPI_C_FOUND})
+  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time timer chrono REQUIRED)
+ENDIF(${MPI_C_FOUND})
+
+else(MSVC)
+
+set(BOOST_ROOT ${BOOST_INSTALL_PATH})
+if (${MPI_C_FOUND})
+  #find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
+  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options mpi unit_test_framework filesystem system date_time timer chrono mpi REQUIRED)
+ELSE(${MPI_C_FOUND})
+  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time timer chrono REQUIRED)
+ENDIF(${MPI_C_FOUND})
+
 ENDIF(MSVC)
 
 
-
-# Minimum version of Boost required for building HELICS
-set(BOOST_MINIMUM_VERSION 1.58)
-set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
-find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time timer chrono REQUIRED)
 
 # Minimum version of Boost required for building test suite
 if (Boost_VERSION LESS 106100)

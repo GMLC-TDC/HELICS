@@ -1,6 +1,9 @@
 /*
-Copyright © 2017-2018,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+Copyright (C) 2017-2018, Battelle Memorial Institute
+All rights reserved.
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
+Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 */
 
 #include <boost/test/unit_test.hpp>
@@ -15,7 +18,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 /** these test cases test out the value converters and some of the other functions
 */
 
-BOOST_FIXTURE_TEST_SUITE(value_federate_tests2, FederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE(value_federate_tests2_cpp, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 //const std::string core_types[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
@@ -57,8 +60,6 @@ BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type
     len1 = helicsSubscriptionGetValueSize(sub1);
 
     BOOST_CHECK_EQUAL(len1, len);
-
-
 
 	BOOST_CHECK(helicsSubscriptionIsUpdated(sub1) == false);
 
@@ -156,4 +157,3 @@ BOOST_AUTO_TEST_CASE(test_file_load)
     helicsFederateFree(vFed);
 }
 BOOST_AUTO_TEST_SUITE_END()
-
