@@ -137,6 +137,7 @@ jobs:
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-5.0
+            - libstdc++6
           packages:
             - clang-5.0
       env:
