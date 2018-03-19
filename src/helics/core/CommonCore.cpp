@@ -330,6 +330,13 @@ bool CommonCore::allInitReady () const
 
 bool CommonCore::allDisconnected () const
 {
+    if (hasFilters)
+    {
+    //     if (timeCoord->hasActiveTimeDependencies())
+     //   {
+      //      return false;
+      //  }
+    }
     auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_mutex, std::defer_lock) :
                                              std::unique_lock<std::mutex> (_mutex);
     // all federates must have hit finished state
@@ -338,6 +345,7 @@ bool CommonCore::allDisconnected () const
         return (HELICS_FINISHED == state) || (HELICS_ERROR == state);
     };
     return std::all_of (_federates.begin (), _federates.end (), pred);
+    
 }
 
 void CommonCore::setCoreReadyToInit()
@@ -434,13 +442,22 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
     if (global_broker_id != 0)
     {
         m.source_id = global_broker_id;
-
-        transmit (0, m);  // just directly transmit, no need to process in the queue since it is a priority message
+        transmit(0, m);
     }
     else
     {
         // this will get processed when this core is assigned a global id
         delayTransmitQueue.push (m);
+        if (global_broker_id != 0)
+        { //this means the broker id was updated in the midst of assigning to the delay queue
+            //TODO this is a bit of a hack but needs more of the thread_safety work before it will be fixed
+            auto mess = delayTransmitQueue.pop();
+            if (mess)
+            {
+                mess->source_id = global_broker_id;
+                transmit(0, *mess);  // just directly transmit, no need to process in the queue since it is a priority message
+            }
+        }
     }
 
     // now wait for the federateQueue to get the response
@@ -2649,7 +2666,17 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
                 timeCoord->updateTimeFactors();
             }
         }
-
+        if (cmd.action() == CMD_DISCONNECT)
+        {
+            if (allDisconnected())
+            {
+                brokerState = broker_state_t::terminated;
+                ActionMessage dis(CMD_DISCONNECT);
+                dis.source_id = global_broker_id;
+                transmit(0, dis);
+                addActionMessage(CMD_STOP);
+            }
+        }
     }
     else if (isDependencyCommand (cmd))
     {

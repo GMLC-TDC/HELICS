@@ -7,20 +7,26 @@
 
 set(shared_library_test_headers
 ctestFixtures.hpp
+cpptestFixtures.hpp
 )
 
 set(shared_library_test_sources
 ctestFixtures.cpp
+cpptestFixtures.cpp
 #ValueConverterTests.cpp
 shared-library-tests.cpp
 #data_viewTests.cpp
 #ValueFederateTests1.cpp
 test-value-federate1.cpp
 test-value-federate2.cpp
+test-value-federate1_cpp.cpp
+test-value-federate2_cpp.cpp
 #ValueFederateTests2.cpp
 #MessageFederateTests.cpp
 FilterTests.cpp
+FilterTests_cpp.cpp
 test-message-federate.cpp
+test-message-federate_cpp.cpp
 #FederateTests.cpp
 #TimingTests.cpp
 #iterationTests.cpp
@@ -33,7 +39,15 @@ include_directories( SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_executable(shared-library-tests ${shared_library_test_sources} ${shared_library_test_headers})
-target_compile_options(shared-library-tests PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+
+IF (VERSION_OPTION)
+	IF (MSVC)
+		target_compile_options(shared-library-tests PUBLIC ${VERSION_OPTION})
+	ELSE()
+		target_compile_options(shared-library-tests PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+	ENDIF (MSVC)
+ENDIF(VERSION_OPTION)
+
 target_link_libraries(shared-library-tests helicsSharedLib)
 
 target_link_libraries(shared-library-tests ${Boost_LIBRARIES_core})
@@ -47,7 +61,7 @@ target_compile_definitions(shared-library-tests PRIVATE "-DHELICS_INSTALL_LOCATI
 
 target_compile_definitions(shared-library-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
 
-add_test(NAME shared-library-tests COMMAND shared-library-tests --log_level=warning --report_level=short)
+add_test(NAME shared-library-tests COMMAND shared-library-tests --log_level=test_suite --report_level=short)
 
 
 

@@ -175,6 +175,7 @@ private:
 public:
     MasterObjectHolder() noexcept;
     ~MasterObjectHolder();
+    helics::FedObject *findFed(const std::string &fedName);
     int addBroker(helics::BrokerObject * broker);
     int addCore(helics::CoreObject *core);
     int addFed(helics::FedObject *fed);

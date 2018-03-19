@@ -1,4 +1,4 @@
 function varargout = helicsSubscriptionGetInteger(varargin)
     %
-  [varargout{1:nargout}] = helicsMEX(120, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(126, varargin{:});
 end

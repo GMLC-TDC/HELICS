@@ -3513,6 +3513,34 @@ SWIGINTERN PyObject *Swig_var_helics_time_epsilon_get(void) {
 }
 
 
+SWIGINTERN int Swig_var_helics_true_set(PyObject *_val SWIGUNUSED) {
+  SWIG_Error(SWIG_AttributeError,"Variable helics_true is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_helics_true_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_int((int)(helics_true));
+  return pyobj;
+}
+
+
+SWIGINTERN int Swig_var_helics_false_set(PyObject *_val SWIGUNUSED) {
+  SWIG_Error(SWIG_AttributeError,"Variable helics_false is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_helics_false_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_int((int)(helics_false));
+  return pyobj;
+}
+
+
 SWIGINTERN PyObject *_wrap_data_t_data_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   struct data_t *arg1 = (struct data_t *) 0 ;
@@ -4266,6 +4294,26 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsCoreClone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_core arg1 = (helics_core) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  helics_core result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsCoreClone",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreClone" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  result = (helics_core)helicsCoreClone(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsCreateBroker(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
@@ -4366,6 +4414,26 @@ SWIGINTERN PyObject *_wrap_helicsCreateBrokerFromArgs(PyObject *SWIGUNUSEDPARM(s
 fail:
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsBrokerClone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_broker arg1 = (helics_broker) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  helics_broker result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsBrokerClone",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerClone" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  result = (helics_broker)helicsBrokerClone(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  return resultobj;
+fail:
   return NULL;
 }
 
@@ -4573,6 +4641,31 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsGetFederateByName(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  char *arg1 = (char *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  PyObject * obj0 = 0 ;
+  helics_federate result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsGetFederateByName",&obj0)) SWIG_fail;
+  res1 = SWIG_AsCharPtrAndSize(obj0, &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetFederateByName" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = (char *)(buf1);
+  result = (helics_federate)helicsGetFederateByName((char const *)arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return resultobj;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsBrokerDisconnect(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_broker arg1 = (helics_broker) 0 ;
@@ -4762,6 +4855,26 @@ SWIGINTERN PyObject *_wrap_helicsCreateCombinationFederateFromJson(PyObject *SWI
   return resultobj;
 fail:
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateClone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  helics_federate result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateClone",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateClone" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  result = (helics_federate)helicsFederateClone(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  return resultobj;
+fail:
   return NULL;
 }
 
@@ -8878,6 +8991,7 @@ static PyMethodDef SwigMethods[] = {
 		"a helics_core object\n"
 		"\n"
 		""},
+	 { (char *)"helicsCoreClone", _wrap_helicsCoreClone, METH_VARARGS, NULL},
 	 { (char *)"helicsCreateBroker", _wrap_helicsCreateBroker, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -8923,6 +9037,7 @@ static PyMethodDef SwigMethods[] = {
 		"a helics_core object\n"
 		"\n"
 		""},
+	 { (char *)"helicsBrokerClone", _wrap_helicsBrokerClone, METH_VARARGS, NULL},
 	 { (char *)"helicsBrokerIsConnected", _wrap_helicsBrokerIsConnected, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -9016,6 +9131,7 @@ static PyMethodDef SwigMethods[] = {
 		"a helics_status enumeration indicating any error condition\n"
 		"\n"
 		""},
+	 { (char *)"helicsGetFederateByName", _wrap_helicsGetFederateByName, METH_VARARGS, NULL},
 	 { (char *)"helicsBrokerDisconnect", _wrap_helicsBrokerDisconnect, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -9160,6 +9276,7 @@ static PyMethodDef SwigMethods[] = {
 		"an opaque combination federate object\n"
 		"\n"
 		""},
+	 { (char *)"helicsFederateClone", _wrap_helicsFederateClone, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateInfoCreate", _wrap_helicsFederateInfoCreate, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -10938,8 +11055,8 @@ SWIG_init(void) {
   PyDict_SetItemString(md,(char *)"cvar", SWIG_globals());
   SWIG_addvarlink(SWIG_globals(),(char *)"helics_time_zero",Swig_var_helics_time_zero_get, Swig_var_helics_time_zero_set);
   SWIG_addvarlink(SWIG_globals(),(char *)"helics_time_epsilon",Swig_var_helics_time_epsilon_get, Swig_var_helics_time_epsilon_set);
-  SWIG_Python_SetConstant(d, "helics_true",SWIG_From_int((int)((1))));
-  SWIG_Python_SetConstant(d, "helics_false",SWIG_From_int((int)((0))));
+  SWIG_addvarlink(SWIG_globals(),(char *)"helics_true",Swig_var_helics_true_get, Swig_var_helics_true_set);
+  SWIG_addvarlink(SWIG_globals(),(char *)"helics_false",Swig_var_helics_false_get, Swig_var_helics_false_set);
   SWIG_Python_SetConstant(d, "no_iteration",SWIG_From_int((int)(no_iteration)));
   SWIG_Python_SetConstant(d, "force_iteration",SWIG_From_int((int)(force_iteration)));
   SWIG_Python_SetConstant(d, "iterate_if_needed",SWIG_From_int((int)(iterate_if_needed)));
@@ -10970,12 +11087,12 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "HELICS_CORE_TYPE_IPC",SWIG_From_int((int)(5)));
   SWIG_Python_SetConstant(d, "HELICS_CORE_TYPE_TCP",SWIG_From_int((int)(6)));
   SWIG_Python_SetConstant(d, "HELICS_CORE_TYPE_UDP",SWIG_From_int((int)(7)));
-  SWIG_Python_SetConstant(d, "HELICS_STRING_TYPE",SWIG_From_int((int)(0)));
-  SWIG_Python_SetConstant(d, "HELICS_DOUBLE_TYPE",SWIG_From_int((int)(1)));
-  SWIG_Python_SetConstant(d, "HELICS_INT_TYPE",SWIG_From_int((int)(2)));
-  SWIG_Python_SetConstant(d, "HELICS_COMPLEX_TYPE",SWIG_From_int((int)(3)));
-  SWIG_Python_SetConstant(d, "HELICS_VECTOR_TYPE",SWIG_From_int((int)(4)));
-  SWIG_Python_SetConstant(d, "HELICS_RAW_TYPE",SWIG_From_int((int)(25)));
+  SWIG_Python_SetConstant(d, "HELICS_DATA_TYPE_STRING",SWIG_From_int((int)(0)));
+  SWIG_Python_SetConstant(d, "HELICS_DATA_TYPE_DOUBLE",SWIG_From_int((int)(1)));
+  SWIG_Python_SetConstant(d, "HELICS_DATA_TYPE_INT",SWIG_From_int((int)(2)));
+  SWIG_Python_SetConstant(d, "HELICS_DATA_TYPE_COMPLEX",SWIG_From_int((int)(3)));
+  SWIG_Python_SetConstant(d, "HELICS_DATA_TYPE_VECTOR",SWIG_From_int((int)(4)));
+  SWIG_Python_SetConstant(d, "HELICS_DATA_TYPE_RAW",SWIG_From_int((int)(25)));
 #if PY_VERSION_HEX >= 0x03000000
   return m;
 #else

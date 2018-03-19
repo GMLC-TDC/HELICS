@@ -15,14 +15,15 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define BOOST_TEST_DETECT_MEMORY_LEAK 0
 
 #include <boost/test/unit_test.hpp>
-
+#include <iostream>
 struct globalTestConfig
 {
     globalTestConfig () = default;
     ~globalTestConfig ()
     {
         // std::cout << "cleaning up" << std::endl;
-        helicsCleanupHelicsLibrary ();
+        helicsCloseLibrary ();
+        //std::cout << "finished cleaning up" << std::endl;
     }
 };
 

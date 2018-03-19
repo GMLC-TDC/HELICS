@@ -15,5 +15,5 @@ function varargout = helicsFederateRequestTime(varargin)
     %a helics_status if the return value is equal to helics_ok the timeOut will
     %contain the new granted time, otherwise timeOut is invalid
     %
-  [varargout{1:nargout}] = helicsMEX(82, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(88, varargin{:});
 end

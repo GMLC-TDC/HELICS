@@ -26,7 +26,7 @@ endif()
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
 if (BUILD_HELICS_TESTS)
-enable_testing ()
+	enable_testing ()
 endif(BUILD_HELICS_TESTS)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -42,18 +42,18 @@ OPTION(DISABLE_SWIG "Disable the use of swig to generate interface code and use 
 
 OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" ON)
 IF(NOT MSVC)
-OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface gcc/clang only" OFF)
+	OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface gcc/clang only" OFF)
 ENDIF()
 
 if (BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
-set(BUILD_SHARED_LIBS ON)
+	set(BUILD_SHARED_LIBS ON)
 else()
-OPTION(USE_POSITION_INDEPENDENT_CODE "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library" OFF)
+	OPTION(USE_POSITION_INDEPENDENT_CODE "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library" OFF)
 endif()
 
 
 if (BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE OR BUILD_C_SHARED_LIB)
-set(BUILT_C_SHARED_LIB ON)
+	set(BUILT_C_SHARED_LIB ON)
 endif()
 
 IF(BUILD_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
@@ -93,12 +93,12 @@ IF(UNIX)
   set(Boost_USE_MULTITHREADED      OFF)   # Needed if MT libraries not built
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
 ELSE(UNIX)
-  IF(MINGW)
-  option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
-  ELSE(MINGW)
+  IF(MSYS)
+	option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
+  ELSE(MSYS)
   #this would most likely be MSVC
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
-  ENDIF(MINGW)
+  ENDIF(MSYS)
 ENDIF(UNIX)
 
 IF (USE_BOOST_STATIC_LIBS)
@@ -160,8 +160,15 @@ add_library(helics-static STATIC
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
+message(STATUS "setting version option to \"${VERSION_OPTION}\"")
+IF (VERSION_OPTION)
+	IF (MSVC)
+		target_compile_options(helics-static PUBLIC ${VERSION_OPTION})
+	ELSE()
+		target_compile_options(helics-static PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+	ENDIF (MSVC)
+ENDIF(VERSION_OPTION)
 
-target_compile_options(helics-static PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
 
 # -------------------------------------------------------------
 # Enable ZeroMQ
@@ -171,16 +178,15 @@ OPTION(ZeroMQ_ENABLE "Enable ZeroMQ networking library" ON)
 # If ZeroMQ library is enabled try to locate it and link against it
 
 IF (ZeroMQ_ENABLE)
+	include(addZeroMQ)
 
-include(addZeroMQ)
-
-if (ZeroMQ_FOUND)
-   set(HELICS_HAVE_ZEROMQ TRUE)
- else(ZeroMQ_FOUND)
- set(HELICS_HAVE_ZEROMQ FALSE)
- endif(ZeroMQ_FOUND)
+	if (ZeroMQ_FOUND)
+		set(HELICS_HAVE_ZEROMQ TRUE)
+	else(ZeroMQ_FOUND)
+		set(HELICS_HAVE_ZEROMQ FALSE)
+	endif(ZeroMQ_FOUND)
  ELSE(ZeroMQ_ENABLE)
- set(HELICS_HAVE_ZEROMQ FALSE)
+	set(HELICS_HAVE_ZEROMQ FALSE)
 ENDIF(ZeroMQ_ENABLE)
 
 # -------------------------------------------------------------
@@ -208,7 +214,7 @@ find_package(Threads REQUIRED)
 target_link_libraries(helics-static PUBLIC Threads::Threads)
 
 IF (UNIX AND NOT APPLE)
-target_link_libraries(helics-static PUBLIC rt)
+	target_link_libraries(helics-static PUBLIC rt)
 ENDIF()
 
 IF(MINGW)

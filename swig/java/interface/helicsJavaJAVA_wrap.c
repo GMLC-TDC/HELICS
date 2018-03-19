@@ -255,11 +255,11 @@ SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_helics_1time_1epsilon_
 
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1true_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  int result;
+  helics_bool_t result;
   
   (void)jenv;
   (void)jcls;
-  result = (int)((1));
+  result = (helics_bool_t)(helics_bool_t)helics_true;
   jresult = (jint)result; 
   return jresult;
 }
@@ -267,11 +267,11 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1true_1get(JNIEnv 
 
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1false_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  int result;
+  helics_bool_t result;
   
   (void)jenv;
   (void)jcls;
-  result = (int)((0));
+  result = (helics_bool_t)(helics_bool_t)helics_false;
   jresult = (jint)result; 
   return jresult;
 }
@@ -940,6 +940,20 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateCoreFromArgs
 }
 
 
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCoreClone(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  helics_core arg1 = (helics_core) 0 ;
+  helics_core result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_core *)&jarg1; 
+  result = (helics_core)helicsCoreClone(arg1);
+  *(helics_core *)&jresult = result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateBroker(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jstring jarg3) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
@@ -999,6 +1013,20 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateBrokerFromAr
   *(helics_broker *)&jresult = result; 
   if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsBrokerClone(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  helics_broker arg1 = (helics_broker) 0 ;
+  helics_broker result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_broker *)&jarg1; 
+  result = (helics_broker)helicsBrokerClone(arg1);
+  *(helics_broker *)&jresult = result; 
   return jresult;
 }
 
@@ -1124,6 +1152,25 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsCoreDisconnect(JNIE
   arg1 = *(helics_core *)&jarg1; 
   result = (helics_status)helicsCoreDisconnect(arg1);
   jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsGetFederateByName(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jlong jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  helics_federate result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (helics_federate)helicsGetFederateByName((char const *)arg1);
+  *(helics_federate *)&jresult = result; 
+  if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
   return jresult;
 }
 
@@ -1257,6 +1304,20 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateCombinationF
   result = (helics_federate)helicsCreateCombinationFederateFromJson((char const *)arg1);
   *(helics_federate *)&jresult = result; 
   if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateClone(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_federate result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_federate *)&jarg1; 
+  result = (helics_federate)helicsFederateClone(arg1);
+  *(helics_federate *)&jresult = result; 
   return jresult;
 }
 
@@ -2260,7 +2321,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsCleanupHelicsLibrar
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1STRING_1TYPE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DATA_1TYPE_1STRING_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -2272,7 +2333,7 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1STRING_1TYPE_1get
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DOUBLE_1TYPE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DATA_1TYPE_1DOUBLE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -2284,7 +2345,7 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DOUBLE_1TYPE_1get
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1INT_1TYPE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DATA_1TYPE_1INT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -2296,7 +2357,7 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1INT_1TYPE_1get(JN
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1COMPLEX_1TYPE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DATA_1TYPE_1COMPLEX_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -2308,7 +2369,7 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1COMPLEX_1TYPE_1ge
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1VECTOR_1TYPE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DATA_1TYPE_1VECTOR_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -2320,7 +2381,7 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1VECTOR_1TYPE_1get
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1RAW_1TYPE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DATA_1TYPE_1RAW_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
