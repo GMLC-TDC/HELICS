@@ -10,22 +10,23 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "Federate.hpp"
 #include "../shared_api_library/ValueFederate.h"
+#include "Publication.hpp"
+#include "Subscription.hpp"
 
 #include <sstream>
-
-// TODO: Update to use methods in c interface for getting length of data pointed to that can be gotten (all the ones taking a max len argument) - function may not exist yet
 
 namespace helics
 {
 enum PubSubTypes
 {
-    STRING_TYPE = 0,
-    DOUBLE_TYPE = 1,
-    INT_TYPE = 2,
-    COMPLEX_TYPE = 3,
-    VECTOR_TYPE = 4,
-    RAW_TYPE = 25
+    STRING_TYPE = HELICS_DATA_TYPE_STRING,
+    DOUBLE_TYPE = HELICS_DATA_TYPE_DOUBLE,
+    INT_TYPE = HELICS_DATA_TYPE_INT,
+    COMPLEX_TYPE = HELICS_DATA_TYPE_COMPLEX,
+    VECTOR_TYPE = HELICS_DATA_TYPE_VECTOR,
+    RAW_TYPE = HELICS_DATA_TYPE_RAW
 };
+
 class ValueFederate : public virtual Federate
 {
   public:
