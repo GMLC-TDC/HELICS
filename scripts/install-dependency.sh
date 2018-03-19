@@ -155,7 +155,7 @@ if [[ -z $compiler_toolset ]]; then
 fi
 
 if [[ "$CXX_STANDARD" == 17 ]]; then
-    echo "Building dependency with C++17"
+    echo "Install dependency with C++17 flag requested"
     cmake_cxx_standard_option=-DCMAKE_CXX_STANDARD=17
     BOOST_CXX_FLAGS="-std=c++17"
 fi
