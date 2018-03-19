@@ -8,7 +8,7 @@ add_subdirectory(common)
 add_subdirectory(core)
 add_subdirectory(application_api)
 
-install(FILES flag-definitions.h helics.hpp DESTINATION include/helics)
+install(FILES flag-definitions.h helics.hpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics COMPONENT headers)
 
 IF(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_APPS)
 add_subdirectory(apps)
@@ -17,6 +17,6 @@ ENDIF()
 if (BUILD_C_SHARED_LIB OR BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE)
 add_subdirectory(shared_api_library)
 add_subdirectory(cpp98)
-install(FILES chelics.h DESTINATION include/helics)
+install(FILES chelics.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics COMPONENT headers)
 endif()
 
