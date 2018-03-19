@@ -615,9 +615,8 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdat
     char subname[100] = "n1", subname2[100] = "n2", subname3[100] = "n3", subtype[100] = "n4",
          subtype2[100] = "n5", subtype3[100] = "n6", subunit3[100] = "n7";
 
-    FederateTestFixture fixture;
-    fixture.SetupTest(helicsCreateValueFederate, core_type.c_str(), 1, 1.0);
-    auto vFed = fixture.GetFederateAt(0);
+    SetupTest(helicsCreateValueFederate, core_type.c_str(), 1, 1.0);
+    auto vFed = GetFederateAt(0);
 
     // register the publications
     pubid = helicsFederateRegisterPublication (vFed, "pub1", "", "");
@@ -680,9 +679,8 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     char s[100] = "n2";
     int retValue;
 
-    FederateTestFixture fixture;
-    fixture.SetupTest(helicsCreateValueFederate, core_type.c_str(), 1, 1.0);
-    auto vFed = fixture.GetFederateAt(0);
+    SetupTest(helicsCreateValueFederate, core_type.c_str(), 1, 1.0);
+    auto vFed = GetFederateAt(0);
 
     // register the publications
 
