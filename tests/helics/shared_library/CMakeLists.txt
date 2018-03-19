@@ -39,7 +39,15 @@ include_directories( SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_executable(shared-library-tests ${shared_library_test_sources} ${shared_library_test_headers})
-target_compile_options(shared-library-tests PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+
+IF (VERSION_OPTION)
+	IF (MSVC)
+		target_compile_options(helics-static PUBLIC ${VERSION_OPTION})
+	ELSE()
+		target_compile_options(helics-static PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+	ENDIF (MSVC)
+ENDIF(VERSION_OPTION)
+
 target_link_libraries(shared-library-tests helicsSharedLib)
 
 target_link_libraries(shared-library-tests ${Boost_LIBRARIES_core})

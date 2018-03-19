@@ -50,7 +50,13 @@ FederateInfo.cpp
 
 add_library(application_api OBJECT ${application_api_sources} ${public_application_api_headers} ${private_application_api_headers})
 
-target_compile_options(application_api PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+IF (VERSION_OPTION)
+	IF (MSVC)
+		target_compile_options(helics-static PUBLIC ${VERSION_OPTION})
+	ELSE()
+		target_compile_options(helics-static PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+	ENDIF (MSVC)
+ENDIF(VERSION_OPTION)
 
 target_include_directories(application_api SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
 target_include_directories(application_api SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/ThirdParty)
