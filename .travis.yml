@@ -137,8 +137,8 @@ jobs:
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-5.0
-            - libstdc++6
           packages:
+            - libstdc++-6-dev
             - clang-5.0
       env:
         - MATRIX_EVAL="COMPILER=clang && CC='ccache clang-5.0' && CXX='ccache clang++-5.0'"
