@@ -133,4 +133,3 @@ class MessageFederate : public virtual Federate
 };
 } //namespace helics
 #endif
-

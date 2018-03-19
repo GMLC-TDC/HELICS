@@ -347,4 +347,3 @@ class ValueFederate : public virtual Federate
 };
 } //namespace helics
 #endif
-

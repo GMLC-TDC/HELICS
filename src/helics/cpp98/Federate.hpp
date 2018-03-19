@@ -328,4 +328,3 @@ class Federate
 
 } //namespace helics
 #endif
-

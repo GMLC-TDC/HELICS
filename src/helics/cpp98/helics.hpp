@@ -26,4 +26,3 @@ std::string getHelicsVersionString()
 
 } //namespace helics
 #endif
-

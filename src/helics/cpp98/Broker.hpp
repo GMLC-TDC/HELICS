@@ -72,4 +72,3 @@ class Broker
 
 } //namespace helics
 #endif
-
