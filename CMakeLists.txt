@@ -160,6 +160,7 @@ add_library(helics-static STATIC
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
+message(STATUS "setting version option to \"${VERSION_OPTION}\"")
 IF (VERSION_OPTION)
 	IF (MSVC)
 		target_compile_options(helics-static PUBLIC ${VERSION_OPTION})
