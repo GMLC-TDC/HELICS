@@ -95,7 +95,7 @@ BOOST_DATA_TEST_CASE(message_federate_endpoint_registration_objs, bdata::make(co
 }
 
 
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR(*utf::timeout (12))
 BOOST_DATA_TEST_CASE(message_federate_send_receive_callback, bdata::make(core_types_single), core_type)
 {
     SetupTest<helics::MessageFederate>(core_type, 1);
@@ -143,7 +143,7 @@ BOOST_DATA_TEST_CASE(message_federate_send_receive_callback, bdata::make(core_ty
 
 
 
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR(*utf::timeout (12))
 BOOST_DATA_TEST_CASE(message_federate_send_receive_callback_obj, bdata::make(core_types_single), core_type)
 {
     SetupTest<helics::MessageFederate>(core_type, 1);
@@ -190,7 +190,7 @@ BOOST_DATA_TEST_CASE(message_federate_send_receive_callback_obj, bdata::make(cor
 
 
 
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR(*utf::timeout (12))
 BOOST_DATA_TEST_CASE(message_federate_send_receive_callback_obj2, bdata::make(core_types_single), core_type)
 {
     SetupTest<helics::MessageFederate>(core_type, 1);
@@ -235,7 +235,7 @@ BOOST_DATA_TEST_CASE(message_federate_send_receive_callback_obj2, bdata::make(co
     BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::finalize);
 }
 
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR(*utf::timeout (12))
 BOOST_DATA_TEST_CASE(message_federate_send_receive_2fed_multisend_callback, bdata::make(core_types), core_type)
 {
     SetupTest<helics::MessageFederate>(core_type, 2);

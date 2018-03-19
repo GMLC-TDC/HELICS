@@ -5,11 +5,17 @@
 ##############################################################################
 set(helicsCpp98_headers
 Broker.hpp
+Core.hpp
 CombinationFederate.hpp
 Federate.hpp
 MessageFederate.hpp
 ValueFederate.hpp
 helics.hpp
+Publication.hpp
+Subscription.hpp
+Endpoint.hpp
+Filter.hpp
+config.hpp
 )
 
 add_library(helicsCpp98 INTERFACE)

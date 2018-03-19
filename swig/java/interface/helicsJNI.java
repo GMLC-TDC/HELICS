@@ -9,6 +9,7 @@
 package com.java.helics;
 
 public class helicsJNI {
+
   public final static native int helics_ok_get();
   public final static native double helics_time_zero_get();
   public final static native double helics_time_epsilon_get();
@@ -55,8 +56,10 @@ public class helicsJNI {
   public final static native int helicsIsCoreTypeAvailable(String jarg1);
   public final static native long helicsCreateCore(String jarg1, String jarg2, String jarg3);
   public final static native long helicsCreateCoreFromArgs(String jarg1, String jarg2, int jarg3, long jarg4);
+  public final static native long helicsCoreClone(long jarg1);
   public final static native long helicsCreateBroker(String jarg1, String jarg2, String jarg3);
   public final static native long helicsCreateBrokerFromArgs(String jarg1, String jarg2, int jarg3, long jarg4);
+  public final static native long helicsBrokerClone(long jarg1);
   public final static native int helicsBrokerIsConnected(long jarg1);
   public final static native int helicsCoreIsConnected(long jarg1);
   public final static native int helicsBrokerGetIdentifier(long jarg1, String jarg2, int jarg3);
@@ -64,6 +67,7 @@ public class helicsJNI {
   public final static native int helicsBrokerGetAddress(long jarg1, String jarg2, int jarg3);
   public final static native int helicsCoreSetReadyToInit(long jarg1);
   public final static native int helicsCoreDisconnect(long jarg1);
+  public final static native long helicsGetFederateByName(String jarg1);
   public final static native int helicsBrokerDisconnect(long jarg1);
   public final static native void helicsCoreFree(long jarg1);
   public final static native void helicsBrokerFree(long jarg1);
@@ -73,6 +77,7 @@ public class helicsJNI {
   public final static native long helicsCreateMessageFederateFromJson(String jarg1);
   public final static native long helicsCreateCombinationFederate(long jarg1);
   public final static native long helicsCreateCombinationFederateFromJson(String jarg1);
+  public final static native long helicsFederateClone(long jarg1);
   public final static native long helicsFederateInfoCreate();
   public final static native int helicsFederateInfoLoadFromArgs(long jarg1, int jarg2, long jarg3);
   public final static native void helicsFederateInfoFree(long jarg1);
@@ -125,12 +130,12 @@ public class helicsJNI {
   public final static native int helicsQueryIsCompleted(long jarg1);
   public final static native void helicsQueryFree(long jarg1);
   public final static native void helicsCleanupHelicsLibrary();
-  public final static native int HELICS_STRING_TYPE_get();
-  public final static native int HELICS_DOUBLE_TYPE_get();
-  public final static native int HELICS_INT_TYPE_get();
-  public final static native int HELICS_COMPLEX_TYPE_get();
-  public final static native int HELICS_VECTOR_TYPE_get();
-  public final static native int HELICS_RAW_TYPE_get();
+  public final static native int HELICS_DATA_TYPE_STRING_get();
+  public final static native int HELICS_DATA_TYPE_DOUBLE_get();
+  public final static native int HELICS_DATA_TYPE_INT_get();
+  public final static native int HELICS_DATA_TYPE_COMPLEX_get();
+  public final static native int HELICS_DATA_TYPE_VECTOR_get();
+  public final static native int HELICS_DATA_TYPE_RAW_get();
   public final static native long helicsFederateRegisterSubscription(long jarg1, String jarg2, String jarg3, String jarg4);
   public final static native long helicsFederateRegisterTypeSubscription(long jarg1, String jarg2, int jarg3, String jarg4);
   public final static native long helicsFederateRegisterOptionalSubscription(long jarg1, String jarg2, String jarg3, String jarg4);

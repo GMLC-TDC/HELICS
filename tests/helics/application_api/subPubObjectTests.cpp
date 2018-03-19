@@ -23,7 +23,7 @@ namespace utf = boost::unit_test;
 
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (subscriptionTObject_tests)
 {
     helics::FederateInfo fi ("test1");
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE (subscriptionTObject_tests)
 }
 
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (subscriptionObject_tests)
 {
     helics::FederateInfo fi ("test1");

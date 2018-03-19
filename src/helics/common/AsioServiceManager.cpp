@@ -173,10 +173,13 @@ void AsioServiceManager::haltServiceLoop ()
         if (runCounter <= 0)
         {
             //    std::cout << "calling halt on service loop \n";
-            nullwork.reset ();
-            iserv->stop ();
-            loopRet.get ();
-            iserv->reset ();  // prepare for future runs
+            if (nullwork)
+            {
+                nullwork.reset();
+                iserv->stop();
+                loopRet.get();
+                iserv->reset();  // prepare for future runs
+            }
         }
     }
     else

@@ -56,13 +56,13 @@ typedef void *helics_query;
 /** time definition used in the C interface to helics*/
 typedef double helics_time_t;
 const helics_time_t helics_time_zero = 0.0;
-const helics_time_t helics_time_epsilon = 1.0;
+const helics_time_t helics_time_epsilon = 1.0e-9;
 
 /** defining a boolean type for use in the helics interface*/
 typedef int helics_bool_t;
 
-#define helics_true (1)
-#define helics_false (0)
+const helics_bool_t helics_true = 1;
+const helics_bool_t helics_false = 0;
 
 /** enumeration of the different iteration results*/
 typedef enum {

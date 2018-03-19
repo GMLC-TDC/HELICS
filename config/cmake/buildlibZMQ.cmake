@@ -64,6 +64,8 @@ ExternalProject_Add(libzmq
         -DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}/libs
         -DCMAKE_BUILD_TYPE=\$\{CMAKE_BUILD_TYPE\}
 		-DZMQ_BUILD_TESTS=OFF
+		-DENABLE_CURVE=OFF
+		-DENABLE_DRAFTS=OFF
 		-DBUILD_STATIC=${zmq_static_build}
 		-DBUILD_SHARED=${zmq_shared_build}
 		\"-DCMAKE_CXX_FLAGS=${extra_cxx_flags}\"
