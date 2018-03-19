@@ -13,7 +13,7 @@ if [[ "$TRAVIS" == "true" ]]; then
 
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         os_name="Linux"
-    elif [[ "$TRAVIS_OS_NAME" == "osx"]]; then
+    elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         os_name="Darwin"
     fi
 else
