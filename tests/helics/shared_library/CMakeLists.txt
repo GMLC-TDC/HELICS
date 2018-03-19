@@ -33,8 +33,10 @@ include_directories( SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_executable(shared-library-tests ${shared_library_test_sources} ${shared_library_test_headers})
+target_compile_options(shared-library-tests PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
 target_link_libraries(shared-library-tests helicsSharedLib)
 
+target_link_libraries(shared-library-tests ${Boost_LIBRARIES_core})
 target_link_libraries(shared-library-tests ${Boost_LIBRARIES_test})
 
 set_target_properties (shared-library-tests PROPERTIES FOLDER tests)

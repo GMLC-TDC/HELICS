@@ -50,10 +50,12 @@ FederateInfo.cpp
 
 add_library(application_api OBJECT ${application_api_sources} ${public_application_api_headers} ${private_application_api_headers})
 
+target_compile_options(application_api PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+
 target_include_directories(application_api SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
 target_include_directories(application_api SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/ThirdParty)
 
-install(FILES ${public_application_api_headers} DESTINATION include/helics/application_api)
+install(FILES ${public_application_api_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/application_api COMPONENT headers)
 
 
 link_directories(${external_link_directories})
