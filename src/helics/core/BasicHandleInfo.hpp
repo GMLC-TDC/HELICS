@@ -64,7 +64,8 @@ class BasicHandleInfo
     bool hasSourceFilter = false;  //!< indicator that an endpoint handle has a source filter
     bool hasDestFilter = false;  //!< indicator that an endpoint has a destination filter
     bool used = false;  //!< indicator that the publication or filter is used
-    // 5 byte hole here
+    bool cloning = false;
+    // 4 byte hole here
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle
     const std::string units;  //!< the units associated with the handle

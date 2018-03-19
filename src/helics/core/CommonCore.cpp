@@ -1150,6 +1150,68 @@ handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
     return id;
 }
 
+handle_id_t CommonCore::registerCloningSourceFilter(const std::string &filterName,
+    const std::string &source,
+    const std::string &type_in,
+    const std::string &type_out)
+{
+    if (brokerState == operating)
+    {
+        throw (InvalidFunctionCall("Core has already entered initialization state"));
+    }
+    // check to make sure the name isn't already used
+    if (!filterName.empty())
+    {
+        std::lock_guard<std::mutex> lock(_handlemutex);
+        auto handle = handles.getFilter(filterName);
+        if (handle != nullptr)
+        {
+            throw (InvalidIdentifier("there already exists a filter with this name"));
+        }
+    }
+
+    auto handle = createBasicHandle(global_broker_id, 0, HANDLE_SOURCE_FILTER, filterName, source, type_in, type_out);
+
+    auto id = handle->id;
+    handle->cloning = true;
+    auto filtInfo = createSourceFilter(global_broker_id, id, handle->key, source, type_in, type_out);
+
+    ActionMessage m(CMD_REG_SRC_FILTER);
+    m.source_id = global_broker_id;
+    m.source_handle = id;
+    m.name = filtInfo->key;
+    setActionFlag(m, clone_flag);
+    m.info().target = source;
+    m.info().type = type_in;
+    m.info().type_out = type_out;
+
+    std::unique_lock<std::mutex> lock(_handlemutex);
+
+    auto ept = handles.getEndpoint(source);
+    if (ept != nullptr)
+    {
+        auto endhandle = ept->id;
+        auto endid = ept->fed_id;
+        ept->hasSourceFilter = true;
+        lock.unlock();
+        setActionFlag(m, processingComplete);
+        // send to broker and core
+        addActionMessage(m);
+        // now send the same command to the endpoint
+        m.dest_handle = endhandle;
+        m.dest_id = endid;
+        // send to
+        addActionMessage(m);
+    }
+    else
+    {
+        lock.unlock();
+        //
+        addActionMessage(m);
+    }
+    return id;
+}
+
 handle_id_t CommonCore::getSourceFilter (const std::string &name) const
 {
     std::lock_guard<std::mutex> lock (_handlemutex);
@@ -1184,6 +1246,7 @@ handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName
 
     auto handle = createBasicHandle(global_broker_id, 0, HANDLE_DEST_FILTER, filterName, dest, type_in, type_out);
 
+    handle->cloning = true;
     auto id = handle->id;
 
     auto filtInfo = createDestFilter (global_broker_id, id, handle->key, dest, type_in, type_out);
@@ -1194,6 +1257,7 @@ handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName
     m.source_id = global_broker_id;
     m.source_handle = id;
     m.name = filtInfo->key;
+    setActionFlag(m, clone_flag);
     m.info ().target = dest;
     m.info ().type = type_in;
     m.info ().type_out = type_out;
@@ -1225,6 +1289,74 @@ handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName
         lock.unlock ();
         //
         addActionMessage (std::move (m));
+    }
+    return id;
+}
+
+handle_id_t CommonCore::registerCloningDestinationFilter(const std::string &filterName,
+    const std::string &dest,
+    const std::string &type_in,
+    const std::string &type_out)
+{
+    if (brokerState == operating)
+    {
+        throw (InvalidFunctionCall("Core has already entered initialization state"));
+    }
+
+    // check to make sure the name isn't already used
+    if (!filterName.empty())
+    {
+        std::lock_guard<std::mutex> lock(_handlemutex);
+        auto handle = handles.getFilter(filterName);
+        if (handle != nullptr)
+        {
+            throw (InvalidIdentifier("there already exists a filter with this name"));
+        }
+    }
+
+    auto handle = createBasicHandle(global_broker_id, 0, HANDLE_DEST_FILTER, filterName, dest, type_in, type_out);
+
+    auto id = handle->id;
+
+    auto filtInfo = createDestFilter(global_broker_id, id, handle->key, dest, type_in, type_out);
+
+
+
+    ActionMessage m(CMD_REG_DST_FILTER);
+    m.source_id = global_broker_id;
+    m.source_handle = id;
+    m.name = filtInfo->key;
+    m.info().target = dest;
+    m.info().type = type_in;
+    m.info().type_out = type_out;
+
+    std::unique_lock<std::mutex> lock(_handlemutex);
+
+    auto ept = handles.getEndpoint(dest);
+    if (ept != nullptr)
+    {
+        auto endhandle = ept->id;
+        auto endid = ept->fed_id;
+        if (ept->hasDestFilter)
+        {
+            throw (RegistrationFailure("endpoint " + dest + " already has a destination filter"));
+        }
+        ept->hasDestFilter = true;
+        lock.unlock();
+        setActionFlag(m, processingComplete);
+        // send to broker and core
+        addActionMessage(m);
+        // now send the same command to the endpoint
+        m.dest_handle = endhandle;
+        m.dest_id = endid;
+        // send to
+        addActionMessage(std::move(m));
+    }
+    else
+    {
+        lock.unlock();
+        //
+        addActionMessage(std::move(m));
     }
     return id;
 }

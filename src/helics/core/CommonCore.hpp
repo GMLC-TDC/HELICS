@@ -110,6 +110,14 @@ class CommonCore : public Core, public BrokerBase
                                                    const std::string &dest,
                                                    const std::string &type_in,
                                                    const std::string &type_out) override final;
+    virtual handle_id_t registerCloningSourceFilter(const std::string &filterName,
+        const std::string &source,
+        const std::string &type_in,
+        const std::string &type_out) override final;
+    virtual handle_id_t registerCloningDestinationFilter(const std::string &filterName,
+        const std::string &dest,
+        const std::string &type_in,
+        const std::string &type_out) override final;
     virtual handle_id_t getSourceFilter (const std::string &name) const override final;
     virtual handle_id_t getDestinationFilter (const std::string &name) const override final;
     virtual void addDependency (federate_id_t federateID, const std::string &federateName) override final;
