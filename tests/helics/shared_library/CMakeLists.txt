@@ -42,9 +42,9 @@ add_executable(shared-library-tests ${shared_library_test_sources} ${shared_libr
 
 IF (VERSION_OPTION)
 	IF (MSVC)
-		target_compile_options(helics-static PUBLIC ${VERSION_OPTION})
+		target_compile_options(shared-library-tests PUBLIC ${VERSION_OPTION})
 	ELSE()
-		target_compile_options(helics-static PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+		target_compile_options(shared-library-tests PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
 	ENDIF (MSVC)
 ENDIF(VERSION_OPTION)
 
