@@ -34,10 +34,11 @@ install_zmq () {
     # Clone the zeromq repo and build it
     local zmq_version=$1
     local install_path=$2
-    git clone git://github.com/zeromq/libzmq.git;
-    cd libzmq
-    git checkout e49a861f7ce0bcf65700de32d314cdb122d5f703
-    cd ..
+    if [[ "${zmq_version}" == "HEAD" ]]; then
+        git clone git://github.com/zeromq/libzmq.git;
+    else 
+        git clone --branch v${zmq_version} git://github.com/zeromq/libzmq.git;
+    fi
     (
         cd libzmq;
         ./autogen.sh;
