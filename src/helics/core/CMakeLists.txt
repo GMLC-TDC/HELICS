@@ -167,9 +167,9 @@ add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FI
 
 IF (VERSION_OPTION)
 	IF (MSVC)
-		target_compile_options(helics-static PUBLIC ${VERSION_OPTION})
+		target_compile_options(helics_core PUBLIC ${VERSION_OPTION})
 	ELSE()
-		target_compile_options(helics-static PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+		target_compile_options(helics_core PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
 	ENDIF (MSVC)
 ENDIF(VERSION_OPTION)
 

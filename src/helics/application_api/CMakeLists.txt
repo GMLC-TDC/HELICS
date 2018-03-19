@@ -52,9 +52,9 @@ add_library(application_api OBJECT ${application_api_sources} ${public_applicati
 
 IF (VERSION_OPTION)
 	IF (MSVC)
-		target_compile_options(helics-static PUBLIC ${VERSION_OPTION})
+		target_compile_options(application_api PUBLIC ${VERSION_OPTION})
 	ELSE()
-		target_compile_options(helics-static PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+		target_compile_options(application_api PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
 	ENDIF (MSVC)
 ENDIF(VERSION_OPTION)
 
