@@ -1,12 +1,8 @@
 /*
 
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "ZmqComms.h"
 #include "../../common/zmqContextManager.h"
@@ -374,10 +370,10 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
             brokerReqPort = DEFAULT_BROKER_REP_PORT_NUMBER;
         }
         zmq::socket_t brokerReq (ctx->getContext (), ZMQ_REQ);
+        brokerReq.setsockopt(ZMQ_LINGER, 50);
         try
         {
-            brokerReq.connect (makePortAddress (brokerTarget_, brokerReqPort));
-            brokerReq.setsockopt(ZMQ_LINGER, 50);
+            brokerReq.connect (makePortAddress (brokerTarget_, brokerReqPort)); 
         }
         catch (zmq::error_t &ze)
         {
@@ -741,7 +737,7 @@ void ZmqComms::closeReceiver ()
         // try connecting with the receivers push socket
         auto ctx = zmqContextManager::getContextPointer ();
         zmq::socket_t pushSocket (ctx->getContext (), ZMQ_PUSH);
-        pushSocket.setsockopt (ZMQ_LINGER, 500);
+        pushSocket.setsockopt (ZMQ_LINGER, 200);
         if (localTarget_ == "tcp://*")
         {
             pushSocket.connect (makePortAddress ("tcp://127.0.0.1", pullPortNumber));
@@ -783,3 +779,4 @@ std::string ZmqComms::getPushAddress () const
 
 } // namespace zeromq
 }  // namespace helics
+

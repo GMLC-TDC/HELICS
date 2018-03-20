@@ -14,5 +14,5 @@ function varargout = helicsFederateInfoSetCoreInitString(varargin)
     %a helics_status enumeration helics_ok on success helicsInvalidReference if fi is
     %not a valid reference
     %
-  [varargout{1:nargout}] = helicsMEX(56, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(62, varargin{:});
 end

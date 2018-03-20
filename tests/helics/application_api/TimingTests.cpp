@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include <boost/test/unit_test.hpp>
@@ -17,17 +13,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
  */
 #include "helics/helics.hpp"
 #include "testFixtures.hpp"
-#include "test_configuration.h"
 
 BOOST_FIXTURE_TEST_SUITE (timing_tests, FederateTestFixture)
-#if ENABLE_TEST_TIMEOUTS > 0
+
 namespace utf = boost::unit_test;
-#endif
 
 /** just a check that in the simple case we do actually get the time back we requested*/
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (simple_timing_test)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
@@ -55,9 +48,8 @@ BOOST_AUTO_TEST_CASE (simple_timing_test)
     vFed2->finalize ();
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (simple_timing_test2)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
@@ -88,9 +80,8 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2)
     vFed2->finalize ();
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (simple_timing_test_message)
 {
     SetupTest<helics::MessageFederate> ("test", 2);
@@ -124,9 +115,8 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message)
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (timing_with_impact_window)
 {
     SetupTest<helics::MessageFederate> ("test", 2);
@@ -161,3 +151,4 @@ BOOST_AUTO_TEST_CASE (timing_with_impact_window)
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 BOOST_AUTO_TEST_SUITE_END ()
+

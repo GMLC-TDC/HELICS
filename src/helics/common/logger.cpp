@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was modified by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute;
-the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence
-Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 /*
  * LLNS Copyright Start
@@ -149,7 +146,7 @@ LoggingCore::LoggingCore () { loggingThread = std::thread (&LoggingCore::process
 
 LoggingCore::~LoggingCore ()
 {
-    if (LoggingCore::fastShutdown)
+    if (fastShutdown)
     {
         if (!tripDetector.isTripped())
         {
@@ -176,6 +173,15 @@ void LoggingCore::addMessage (int index, const std::string &message) { loggingQu
 int LoggingCore::addFileProcessor (std::function<void(std::string &&message)> newFunction)
 {
     std::lock_guard<std::mutex> fLock (functionLock);
+    for (int ii=0;ii<static_cast<int>(functions.size());++ii)
+    {
+        if (functions[ii])
+        {
+            continue;
+        }
+        functions[ii] = std::move(newFunction);
+        return ii;
+    }
     functions.push_back (std::move (newFunction));
     return static_cast<int> (functions.size ()) - 1;
 }
@@ -346,3 +352,4 @@ LoggerManager::LoggerManager (const std::string &loggerName) : name (loggerName)
     loggingControl = std::make_shared<LoggingCore> ();
 }
 }  // namespace helics
+

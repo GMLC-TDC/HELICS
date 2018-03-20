@@ -1,15 +1,11 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 */
-#ifndef _HELICS_FILTEROPERATIONS_H_
-#define _HELICS_FILTEROPERATIONS_H_
 #pragma once
+
 /** @file
 file defines some common filter operations
 */
@@ -105,7 +101,7 @@ class RerouteFilterOperation : public FilterOperations
     private:
         std::shared_ptr<MessageDestOperator> op;  //!< the actual operator
         atomic_guarded<std::string> newDest;  //!< the target destination
-		shared_guarded<std::set<std::string>> conditions;
+		shared_guarded<std::set<std::string>> conditions; //!< the conditions on which the rerouting will occur
 
     public:
     RerouteFilterOperation ();
@@ -116,7 +112,8 @@ class RerouteFilterOperation : public FilterOperations
 
     private:
         /** function to execute the rerouting operation*/
-    std::string rerouteOperation (const std::string &dest) const;
+    std::string rerouteOperation (const std::string &src, const std::string &dest) const;
+
 };
 
 /** filter for rerouting a packet to a particular endpoint*/
@@ -145,4 +142,3 @@ class CloneFilterOperation : public FilterOperations
 
 }  // namespace helics
 
-#endif /*_HELICS_FILTEROPERATIONS_H_*/

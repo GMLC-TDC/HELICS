@@ -1,12 +1,8 @@
 /*
 
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "Endpoints.hpp"
@@ -22,6 +18,7 @@ Endpoint::Endpoint (MessageFederate *mFed, int endpointIndex) : fed (mFed)
         throw (helics::InvalidParameter ("no subscription with the specified index"));
     }
     id = static_cast<endpoint_id_t> (endpointIndex);
+    actualName = fed->getEndpointName(id);
 }
 
 void Endpoint::setCallback(std::function<void(const Endpoint *, Time)> callback)
@@ -31,3 +28,4 @@ void Endpoint::setCallback(std::function<void(const Endpoint *, Time)> callback)
     fed->registerEndpointCallback(id, [callback, local](endpoint_id_t, Time messageTime) {callback(&local, messageTime); });
 }
 }  // namespace helics
+

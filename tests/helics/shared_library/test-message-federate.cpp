@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include <boost/test/unit_test.hpp>
@@ -12,7 +9,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/floating_point_comparison.hpp>
 
 #include "ctestFixtures.hpp"
-#include "test_configuration.h"
 
 #include <future>
 #include <iostream>
@@ -23,9 +19,8 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (message_federate_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-#if ENABLE_TEST_TIMEOUTS > 0
+
 namespace utf = boost::unit_test;
-#endif
 
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)
@@ -77,9 +72,8 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
 	BOOST_CHECK (mFed1State == federate_state::helics_finalize_state);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_single), core_type)
 {
 	SetupTest(helicsCreateMessageFederate,core_type, 1);
@@ -120,9 +114,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_sin
 	BOOST_CHECK (mFed1State == federate_state::helics_finalize_state);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_types), core_type)
 {
    // extraBrokerArgs = "--logleve=4";
@@ -192,9 +185,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
 	BOOST_CHECK (mFed2State == federate_state::helics_finalize_state);
 }
 /*
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_types), core_type)
 {
     using namespace helics;
@@ -253,9 +245,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_
     BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make (core_types), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 2);
@@ -448,9 +439,8 @@ class pingpongFed
     }
 };
 
-#if ENABLE_TEST_TIMEOUTS > 0
+
 BOOST_TEST_DECORATOR (*utf::timeout (20))
-#endif
 BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 {
     if (core_type != "test")
@@ -486,9 +476,8 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
     BOOST_CHECK_EQUAL (p3.pongs, 2);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 2);

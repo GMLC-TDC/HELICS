@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was modified by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute;
-the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence
-Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 /*
  * LLNS Copyright Start
@@ -24,6 +21,7 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 #include <iostream>
 #include <map>
 #include <mutex>
+#include <thread>
 
 /** a storage system for the available core objects allowing references by name to the core
  */
@@ -43,7 +41,7 @@ std::shared_ptr<zmqContextManager> zmqContextManager::getContextPointer (const s
     {
         return fnd->second;
     }
-
+   // std::cout << "creating context in " << std::this_thread::get_id() << std::endl;
     auto newContext = std::shared_ptr<zmqContextManager> (new zmqContextManager (contextName));
     contexts.emplace (contextName, newContext);
     return newContext;
@@ -77,11 +75,17 @@ bool zmqContextManager::setContextToLeakOnDelete (const std::string &contextName
 }
 zmqContextManager::~zmqContextManager ()
 {
+    //std::cout << "destroying context in " << std::this_thread::get_id() << std::endl;
+    
     if (leakOnDelete)
     {
         // yes I am purposefully leaking this PHILIP TOP
         auto val = zcontext.release ();
         (void)(val);
+    }
+    else
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 }
 
@@ -89,3 +93,4 @@ zmqContextManager::zmqContextManager (const std::string &contextName)
     : name (contextName), zcontext (std::make_unique<zmq::context_t> ())
 {
 }
+

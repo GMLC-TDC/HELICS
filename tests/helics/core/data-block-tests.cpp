@@ -1,19 +1,16 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
 /** these test cases test data_block and data_view objects
  */
 
-#include "helics/application_api/Message.hpp"
+#include "helics/core/core-data.hpp"
 
 BOOST_AUTO_TEST_SUITE (data_block_tests)
 
@@ -21,7 +18,7 @@ using namespace helics;
 BOOST_AUTO_TEST_CASE (simple_data_block_tests)
 {
     data_block db (7);
-    BOOST_CHECK_EQUAL (db.size (), 7);
+    BOOST_CHECK_EQUAL (db.size (), 7u);
     // test direct assignment
     db[0] = 'h';
     db[1] = 'a';
@@ -40,7 +37,7 @@ BOOST_AUTO_TEST_CASE (simple_data_block_tests)
 BOOST_AUTO_TEST_CASE (data_block_constructor_tests)
 {
     data_block db (3, 't');
-    BOOST_CHECK_EQUAL (db.size (), 3);
+    BOOST_CHECK_EQUAL (db.size (), 3u);
 
     BOOST_CHECK_EQUAL (db.to_string (), "ttt");
 
@@ -51,14 +48,14 @@ BOOST_AUTO_TEST_CASE (data_block_constructor_tests)
     BOOST_CHECK_EQUAL (db2.to_string (), str);
 
     data_block db3 (str, 7);
-    BOOST_CHECK_EQUAL (db3.size (), 7);
+    BOOST_CHECK_EQUAL (db3.size (), 7u);
     BOOST_CHECK_EQUAL (db3.to_string (), "this is");
 
     data_block db4 (400, 'r');
     // test move constructor
     data_block db5 (std::move (db4));
-    BOOST_CHECK_EQUAL (db5.size (), 400);
-    BOOST_CHECK_EQUAL (db4.size (), 0);
+    BOOST_CHECK_EQUAL (db5.size (), 400u);
+    BOOST_CHECK_EQUAL (db4.size (), 0u);
     // test copy constructor
     data_block db6 (db5);
     BOOST_CHECK_EQUAL (db6.size (), db5.size ());
@@ -143,3 +140,4 @@ BOOST_AUTO_TEST_CASE (data_block_swap)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
+

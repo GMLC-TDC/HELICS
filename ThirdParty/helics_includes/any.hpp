@@ -8,7 +8,7 @@
 //   + https://cplusplus.github.io/LWG/lwg-active.html#2509
 //
 //
-// Copyright (c) 2016 Denilson das Mercês Amorim
+// Copyright (c) 2016 Denilson das MercÃªs Amorim
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -301,7 +301,7 @@ private: // Storage and Virtual Method Table
     template<typename T>
     struct requires_allocation :
         std::integral_constant<bool,
-                !(std::is_nothrow_move_constructible<T>::value      // N4562 §6.3/3 [any.class]
+                !(std::is_nothrow_move_constructible<T>::value      // N4562 6.3/3 [any.class]
                   && sizeof(T) <= sizeof(storage_union::stack)
                   && std::alignment_of<T>::value <= std::alignment_of<storage_union::stack_storage_t>::value)>
     {};

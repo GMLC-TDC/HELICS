@@ -1,22 +1,14 @@
 /*
-
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
-#ifndef _CORE_DATA_TYPES_H_
-#define _CORE_DATA_TYPES_H_
 #pragma once
 
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 
-#include <cstdint>
+#include <string>
 #include <memory>
 #include <vector>
 
@@ -51,18 +43,23 @@ class data_block
     /** move constructor */
     data_block (data_block &&db) noexcept;
     /** construct from char * */
-    data_block (const char *s) : m_data (s){};
+    // cppcheck-suppress noExplicitConstructor
+    /* implicit */ data_block (const char *s) : m_data (s){};
     /** construct from string */
-    data_block (const std::string &str) : m_data (str){};
+    // cppcheck-suppress noExplicitConstructor
+    /* implicit */ data_block (const std::string &str) : m_data (str){};
     /** move from string */
-    data_block (std::string &&str) noexcept : m_data (std::move (str)){};
+    // cppcheck-suppress noExplicitConstructor
+    /* implicit */ data_block (std::string &&str) noexcept : m_data (std::move (str)){};
     /** char * and length */
     data_block (const char *s, size_t len) : m_data (s, len){};
     /** construct from a vector object */
-    data_block (const std::vector<char> &vdata) : m_data (vdata.data (), vdata.size ()){};
+    // cppcheck-suppress noExplicitConstructor
+    /* implicit */ data_block (const std::vector<char> &vdata) : m_data (vdata.data (), vdata.size ()){};
     /** construct from an arbitrary vector*/
     template <class X>
-    data_block (const std::vector<X> &vdata)
+    // cppcheck-suppress noExplicitConstructor
+    /* implicit */ data_block (const std::vector<X> &vdata)
         : m_data (reinterpret_cast<const char *> (vdata.data ()), vdata.size () * sizeof (X))
     {
     }
@@ -140,9 +137,9 @@ inline bool operator!= (const data_block &db1, const data_block &db2) { return !
 class Message
 {
   public:
-    Time time=timeZero;  //!< the event time the message is sent
-    std::uint16_t flags=0;  //!< message flags
-    int32_t messageID=0; //!< the messageID for a message
+    Time time = timeZero;  //!< the event time the message is sent
+    std::uint16_t flags = 0;  //!< message flags
+    int32_t messageID = 0;  //!< the messageID for a message
     data_block data;  //!< the data packet for the message
     std::string dest;  //!< the destination of the message
     std::string source;  //!< the most recent source of the message
@@ -150,7 +147,7 @@ class Message
     std::string original_dest;  //!< the original destination of a message
   public:
     /** default constructor*/
-    Message ()=default;
+    Message () = default;
     /** move constructor*/
     Message (Message &&m) noexcept;
     /** copy constructor*/
@@ -164,6 +161,8 @@ class Message
     /** check if the Message contains an actual Message
     @return false if there is no Message data*/
     bool isValid () const noexcept;
+    /** get the payload as a string*/
+    const std::string &to_string() const { return data.to_string(); }
 };
 
 /**
@@ -231,4 +230,3 @@ inline void swap (helics::Message &m1, helics::Message &m2) noexcept
 }
 }  // namespace std
 
-#endif

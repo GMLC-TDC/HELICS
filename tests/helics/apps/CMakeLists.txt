@@ -1,8 +1,7 @@
 ##############################################################################
-#Copyright (C) 2017-2018, Battelle Memorial Institute
-#All rights reserved.
-
-#This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+# Copyright © 2017-2018,
+# Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+#All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 
 #-----------------------------------------------------------------------------
@@ -14,11 +13,12 @@ set(helics_apps_test_sources
 player_recorder_tests.cpp
 multi_player_tests.cpp
 multi_tests.cpp
-player_tests.cpp
-recorder_tests.cpp
+PlayerTests.cpp
+RecorderTests.cpp
 exeTestHelper.cpp
 combo_tests.cpp
 EchoTests.cpp
+TracerTests.cpp
 exeTestHelper.h
 )
 
@@ -42,7 +42,6 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_test(NAME helics_apps-tests COMMAND helics_apps-tests --log_level=test_suite --report_level=short)
 
-
 target_compile_definitions(helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
 
 target_compile_definitions(helics_apps-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics/\")
@@ -55,3 +54,4 @@ add_custom_command(TARGET helics_apps-tests POST_BUILD        # Adds a post-buil
         "$<TARGET_FILE_DIR:helics_apps-tests>/")                 # <--this is out-file path
 endforeach(keyfile)
 ENDIF(WIN32)
+

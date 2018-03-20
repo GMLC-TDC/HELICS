@@ -1,14 +1,8 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#ifndef _HELICS_FEDERATE_API_
-#define _HELICS_FEDERATE_API_
 #pragma once
 
 #include "../core/helics-time.hpp"
@@ -17,12 +11,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "../core/CoreFederateInfo.hpp"
 #include "../flag-definitions.h"
-#include <string>
 
 #include <atomic>
 #include <memory>
 #include <stdexcept>
-#include <vector>
 
 /**
  * HELICS Application API
@@ -65,7 +57,7 @@ class FederateInfo : public CoreFederateInfo
     void loadInfoFromArgs (int argc, const char *const *argv);
 };
 
-/** generate a FederateInfo object from a json file
+/** generate a FederateInfo object from a JSON file
  */
 FederateInfo loadFederateInfo (const std::string &jsonString);
 
@@ -437,4 +429,4 @@ class Federate
 yet*/
 void cleanupHelicsLibrary ();
 }  // namespace helics
-#endif
+

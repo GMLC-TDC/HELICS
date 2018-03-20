@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
@@ -23,6 +20,8 @@ class variables_map;
 }
 
 namespace helics
+{
+namespace apps
 {
 /** class implementing a Echo object, which will generate endpoint interfaces and send a data message back to the
 source at the with a specified delay
@@ -117,4 +116,6 @@ class Echo
     bool fileLoaded = false; //!< indicator that a file has been loaded already
     std::mutex delayTimeLock; //mutex protecting delayTime
 };
-}
+}  // namespace apps
+} // namespace helics
+

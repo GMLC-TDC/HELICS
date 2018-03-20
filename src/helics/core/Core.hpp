@@ -1,18 +1,12 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
 #include "core-data.hpp"
 #include <functional>
-#include <memory>
-#include <string>
 #include <utility>
 
 /**
@@ -137,7 +131,7 @@ class Core
     /** set the core to ready to enter init
     @details this function only needs to be called for cores that don't have any federates but may
     have filters for cores with federates it won't do anything*/
-    virtual void setCoreReadyToInit() = 0; 
+    virtual void setCoreReadyToInit() = 0;
 
     /**
      * Change the federate state to the Executing state.
@@ -289,7 +283,7 @@ class Core
     *
     * The value is used as a time shift for calculating the allowable time in a federate
     the granted time must one of N*period+offset
-    
+
 
 
 

@@ -1,10 +1,8 @@
 
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #ifndef HELICS_API_OBJECTS_H_
@@ -66,14 +64,14 @@ namespace helics
         CoreObject() = default;
         ~CoreObject();
 	};
-	
-    
+
+
 
 
     class SubscriptionObject;
     class PublicationObject;
     class EndpointObject;
-   
+
 
 	/** object wrapping a federate for the c-api*/
 	class FedObject
@@ -152,7 +150,7 @@ namespace helics
         query_id_t asyncIndexCode=invalid_id_value;  //!< the index to use for the queryComplete call
         bool activeAsync = false;
         int valid;
-        
+
 	};
 }
 
@@ -177,6 +175,7 @@ private:
 public:
     MasterObjectHolder() noexcept;
     ~MasterObjectHolder();
+    helics::FedObject *findFed(const std::string &fedName);
     int addBroker(helics::BrokerObject * broker);
     int addCore(helics::CoreObject *core);
     int addFed(helics::FedObject *fed);
@@ -190,3 +189,4 @@ std::shared_ptr<MasterObjectHolder> getMasterHolder();
 void clearAllObjects();
 
 #endif
+

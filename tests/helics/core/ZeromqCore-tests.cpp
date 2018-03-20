@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include <boost/test/unit_test.hpp>
@@ -37,7 +34,7 @@ const std::string defRoute2("tcp://127.0.0.1:23407");
 BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
 {
     std::atomic<int> counter{0};
-    
+
     helics::zeromq::ZmqComms comm (host, host);
 
     auto ctx = zmqContextManager::getContextPointer ();
@@ -542,3 +539,4 @@ BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
+

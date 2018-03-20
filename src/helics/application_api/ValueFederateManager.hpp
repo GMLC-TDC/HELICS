@@ -1,24 +1,14 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
 #include "../core/Core.hpp"
-#include "Message.hpp"
+#include "data_view.hpp"
 #include "helicsTypes.hpp"
-#include <cstdint>
-#include <functional>
-#include <map>
-#include <memory>
 #include <mutex>
-#include <unordered_map>
-#include <utility>
 #include "../common/DualMappedVector.hpp"
 #include "../common/MappedVector.hpp"
 #include <atomic>
@@ -189,7 +179,7 @@ class ValueFederateManager
     int getSubscriptionCount () const;
 
 	private:
-		DualMappedVector<subscription_info,std::string,Core::handle_id_t> subscriptions; 
+		DualMappedVector<subscription_info,std::string,Core::handle_id_t> subscriptions;
 		MappedVector<publication_info> publications;
         std::atomic<publication_id_t::underlyingType> publicationCount{ 0 };  //!< the count of actual endpoints
     std::vector<std::function<void(subscription_id_t, Time)>> callbacks;  //!< the all callback function
@@ -207,3 +197,4 @@ class ValueFederateManager
 };
 
 }  // namespace helics
+

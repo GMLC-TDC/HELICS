@@ -5,11 +5,8 @@
 #include "helicsVersion.hpp"
 #include <fstream>
 #include <iostream>
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
 #include "../common/argParser.h"
 
-namespace filesystem = boost::filesystem;
 
 static const helics::ArgDescriptors InfoArgs{
     {"name,n", "name of the broker"},
@@ -68,3 +65,4 @@ int main (int argc, char *argv[])
     }
     return 0;
 }
+

@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "testFixtures.hpp"
@@ -19,16 +15,14 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueConverter.hpp"
 
-#if ENABLE_TEST_TIMEOUTS > 0
+
 namespace utf = boost::unit_test;
-#endif
 
 BOOST_FIXTURE_TEST_SUITE (iteration_tests, FederateTestFixture)
 
 /** just a check that in the simple case we do actually get the time back we requested*/
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (execution_iteration_test)
 {
     SetupTest<helics::ValueFederate> ("test",1);
@@ -56,9 +50,8 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 {
     SetupTest<helics::ValueFederate>("test", 2,1.0);
@@ -91,9 +84,8 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 }
 
 /** just a check that in the simple case we do actually get the time back we requested*/
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (time_iteration_test)
 {
     SetupTest<helics::ValueFederate>("test", 1);
@@ -123,9 +115,8 @@ BOOST_AUTO_TEST_CASE (time_iteration_test)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
 {
     SetupTest<helics::ValueFederate>("test", 2, 1.0);
@@ -162,9 +153,8 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
 {
     SetupTest<helics::ValueFederate>("test", 2, 1.0);
@@ -205,9 +195,8 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (test_iteration_counter)
 {
     SetupTest<helics::ValueFederate>("test", 2, 1.0);
@@ -273,3 +262,4 @@ BOOST_AUTO_TEST_CASE (test_iteration_counter)
     }
 }
 BOOST_AUTO_TEST_SUITE_END ()
+

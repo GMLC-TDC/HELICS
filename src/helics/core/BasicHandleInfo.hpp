@@ -1,15 +1,9 @@
 /*
-
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#ifndef BASIC_HANDLE_INFO_H_
-#define BASIC_HANDLE_INFO_H_
+
 #pragma once
 
 #include "Core.hpp"
@@ -21,8 +15,8 @@ enum BasicHandleType : char
 {
     HANDLE_UNKNOWN,
     HANDLE_PUB,  //!< handle to publish interface
-    HANDLE_SUB,	//!< handle to a subscribe interface
-    HANDLE_END,	//!< handle to an endpoint
+    HANDLE_SUB,  //!< handle to a subscribe interface
+    HANDLE_END,  //!< handle to an endpoint
     HANDLE_SOURCE_FILTER,  //!< handle to a source filter
     HANDLE_DEST_FILTER,  //!< handle to a destination filter
     HANDLE_CLONE_FILTER,  //!< handle for a cloning filter
@@ -71,12 +65,12 @@ class BasicHandleInfo
     bool hasDestFilter = false;  //!< indicator that an endpoint has a destination filter
     bool used = false;  //!< indicator that the publication or filter is used
     // 5 byte hole here
-    const std::string key;	//!< the name of the handle
-    const std::string type;	//!< the type of data used by the handle
-    const std::string units;	//!< the units associated with the handle
+    const std::string key;  //!< the name of the handle
+    const std::string type;  //!< the type of data used by the handle
+    const std::string units;  //!< the units associated with the handle
     const std::string target;  //!< the target of the handle mapped onto units since they will not be used together
     const std::string &type_in;  //!< the input type of a filter
     const std::string &type_out;  //!< the output type of a filter
 };
-}
-#endif
+}  // namespace helics
+

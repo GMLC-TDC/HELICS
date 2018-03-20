@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -13,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test data_block and data_view objects
  */
 
-#include "helics/application_api/Message.hpp"
+#include "helics/application_api/data_view.hpp"
 
 BOOST_AUTO_TEST_SUITE (data_view_tests)
 
@@ -40,7 +36,7 @@ BOOST_AUTO_TEST_CASE (data_view_constructor_tests)
     BOOST_CHECK_EQUAL (dv2.string (), str);
 
     data_view dv3 (str, 7);
-    BOOST_CHECK_EQUAL (dv3.size (), 7);
+    BOOST_CHECK_EQUAL (dv3.size (), 7u);
     BOOST_CHECK_EQUAL (dv3.string (), "this is");
 
     stx::string_view stv (str, 10);
@@ -52,7 +48,7 @@ BOOST_AUTO_TEST_CASE (data_view_constructor_tests)
     // build from a vector
     std::vector<char> cvector (23, 'd');
     data_view db7 (cvector);
-    BOOST_CHECK_EQUAL (db7.size (), 23);
+    BOOST_CHECK_EQUAL (db7.size (), 23u);
     BOOST_CHECK_EQUAL (db7[17], 'd');
 
     std::vector<double> dvector (10, 0.07);
@@ -128,3 +124,4 @@ BOOST_AUTO_TEST_CASE (data_view_shared_ptr)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
+

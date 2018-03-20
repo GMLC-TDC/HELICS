@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #pragma once
@@ -88,6 +85,7 @@ enum class action_t : int32_t
     cmd_fed_configure = 205,  //!< command to update the configuration of a federate
     cmd_core_configure = 207,  //!< command to update the configuration of a core
 
+    cmd_update_filter_op= 10427,  //!< command to update a filter op [should only used internal to a core]
     null_info_command = cmd_info_basis - 1,  //!< biggest command that doesn't have the info structure
     /** the biggest negative priority command*/
     priority_null_info_command = -cmd_info_basis - 1,
@@ -164,6 +162,7 @@ enum class action_t : int32_t
 
 #define CMD_REG_SRC_FILTER action_message_def::action_t::cmd_reg_src_filter
 #define CMD_NOTIFY_SRC_FILTER action_message_def::action_t::cmd_notify_src_filter
+#define CMD_UPDATE_FILTER_OP action_message_def::action_t::cmd_update_filter_op
 
 #define CMD_ADD_DEPENDENCY action_message_def::action_t::cmd_add_dependency
 #define CMD_REMOVE_DEPENDENCY action_message_def::action_t::cmd_remove_dependency
@@ -229,3 +228,4 @@ inline bool hasInfo (action_message_def::action_t action)
 const char *actionMessageType (action_message_def::action_t action);
 
 }  // namespace helics
+

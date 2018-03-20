@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
@@ -31,7 +27,7 @@ BOOST_AUTO_TEST_CASE (save_load_file1)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core2";
     fi.coreInitString = "3";
-    helics::Recorder rec1 (fi);
+    helics::apps::Recorder rec1 (fi);
     fi.period = 1.0;
     fi.name = "block1";
 
@@ -97,7 +93,7 @@ BOOST_AUTO_TEST_CASE (check_created_files1, *boost::unit_test::depends_on ("comb
     fi.coreInitString = "1";
     fi.period = 1.0;
 
-    helics::Player play1 (fi);
+    helics::apps::Player play1 (fi);
     auto filename = boost::filesystem::temp_directory_path () / "savefile.txt";
     play1.loadFile (filename.string ());
 
@@ -119,7 +115,7 @@ BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("comb
     fi.coreInitString = "1";
     fi.period = 1.0;
 
-    helics::Player play1 (fi);
+    helics::apps::Player play1 (fi);
     auto filename = boost::filesystem::temp_directory_path () / "savefile.json";
     play1.loadFile (filename.string ());
 
@@ -134,3 +130,4 @@ BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("comb
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
+

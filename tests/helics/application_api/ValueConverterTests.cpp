@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include <boost/test/unit_test.hpp>
@@ -17,11 +13,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 /** these test cases test out the value converters
  */
-#include "helics/application_api/Message.hpp"
+#include "helics/application_api/data_view.hpp"
 #include "helics/application_api/ValueConverter.hpp"
 #include "helics/application_api/ValueConverter_impl.hpp"
 #include "helics/core/core-data.hpp"
-#include <vector>
 
 using namespace std::string_literals;
 
@@ -210,3 +205,4 @@ BOOST_AUTO_TEST_CASE (test_converter_errors)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
+

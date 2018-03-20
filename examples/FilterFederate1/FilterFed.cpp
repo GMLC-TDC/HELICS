@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "helics/core/CoreFactory.hpp"
@@ -43,7 +40,7 @@ int main (int argc, char *argv[])
         targetEndpoint = vm["endpoint"].as<std::string>();
     }
     std::string target = targetfederate + "/" + targetEndpoint;
-    
+
     std::string filtType = "delay";
     if (vm.count("filtertype") > 0) {
         targetEndpoint = vm["filtertype"].as<std::string>();
@@ -63,14 +60,14 @@ int main (int argc, char *argv[])
         std::cerr << "invalid filter type specified valid types are \"delay\",\"random drop\",\"random delay\"\n";
         return (-2);
     }
-    
-   
+
+
     auto core = helics::CoreFactory::create(argc, argv);
 	std::cout << " registering filter '"<< "' for " << target<<'\n';
 
     //create a source filter object with type, the fed pointer and a target endpoint
     auto filt = helics::make_source_filter(ftype, core.get(), target);
-    
+
     // get a few specific parameters related to the particular filter
     switch (ftype)
     {
@@ -103,7 +100,7 @@ int main (int argc, char *argv[])
     /*setup and run
     */
     core->setCoreReadyToInit();
-    
+
     //just do a wait loop while the core is still processing so the filters have time to work
     while (core->isConnected())
     {
@@ -111,3 +108,4 @@ int main (int argc, char *argv[])
     }
     return 0;
 }
+

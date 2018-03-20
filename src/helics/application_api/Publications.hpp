@@ -1,12 +1,8 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
 #include "HelicsPrimaryTypes.hpp"
@@ -87,7 +83,7 @@ class PublicationBase
     const std::string &getUnits () const { return units_; }
 };
 
-/** class wrapping the calls for a publication in an object so identifiers and pointers do not 
+/** class wrapping the calls for a publication in an object so identifiers and pointers do not
 need to be used for every call
 */
 class Publication : public PublicationBase
@@ -170,7 +166,7 @@ class Publication : public PublicationBase
         }
     }
     /** if set to false, the change detection mechanisms are not enabled
-    if set to true the values will be published if there is sufficient change as specified in 
+    if set to true the values will be published if there is sufficient change as specified in
     the call to setMinimumChange
     */
     void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
@@ -290,3 +286,4 @@ class PublicationOnChange : public PublicationT<X>
     }
 };
 }  // namespace helics
+

@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "MpiComms.h"
 #include "MpiService.h"
@@ -59,7 +56,7 @@ void MpiComms::queue_rx_function ()
     rx_status = connection_status::connected;
 
     while (true)
-    { 
+    {
         auto M = rxMessageQueue.try_pop ();
 
         if (M)
@@ -84,7 +81,7 @@ void MpiComms::queue_rx_function ()
                 goto CLOSE_RX_LOOP;
             }
         }
-        
+
         if (shutdown)
         {
             goto CLOSE_RX_LOOP;
@@ -194,3 +191,4 @@ void MpiComms::closeReceiver() {
 }
 } // namespace mpi
 }  // namespace helics
+

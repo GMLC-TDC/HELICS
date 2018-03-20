@@ -1,22 +1,20 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #ifndef HELICS_CPP98_FEDERATE_HPP_
 #define HELICS_CPP98_FEDERATE_HPP_
 #pragma once
 
-#include "shared_api_library/helics.h"
+#include "../shared_api_library/helics.h"
 
 #include <string>
 #include <vector>
 #include <complex>
 #include <stdexcept>
+#include "config.hpp"
+#include "Filter.hpp"
 
 // defines for setFlag values in core/flag-definitions.h
 // enum for core_type:int in core/core-types.h
@@ -31,13 +29,13 @@ class FederateInfo
         fi = helicsFederateInfoCreate ();
     }
 
-    FederateInfo (std::string fedname)
+    explicit FederateInfo (const std::string &fedname)
     {
         fi = helicsFederateInfoCreate ();
         helicsFederateInfoSetFederateName (fi, fedname.c_str());
     }
 
-    FederateInfo (std::string fedname, std::string coretype)
+    FederateInfo (const std::string &fedname, const std::string &coretype)
     {
         fi = helicsFederateInfoCreate ();
         helicsFederateInfoSetFederateName (fi, fedname.c_str());
@@ -49,22 +47,22 @@ class FederateInfo
         helicsFederateInfoFree (fi);
     }
 
-    void setFederateName (std::string name)
+    void setFederateName (const std::string &name)
     {
         helicsFederateInfoSetFederateName (fi, name.c_str());
     }
 
-    void setCoreName (std::string corename)
+    void setCoreName (const std::string &corename)
     {
         helicsFederateInfoSetCoreName (fi, corename.c_str());
     }
 
-    void setCoreInitString (std::string coreInit)
+    void setCoreInitString (const std::string &coreInit)
     {
         helicsFederateInfoSetCoreInitString (fi, coreInit.c_str());
     }
 
-    void setCoreTypeFromString (std::string coretype)
+    void setCoreTypeFromString (const std::string &coretype)
     {
         helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str());
     }
@@ -143,7 +141,7 @@ class InvalidParameterValue : public std::runtime_error
 };
 
 
-typedef struct 
+typedef struct
 {
 public:
     helics_time_t grantedTime; //!< the time of the granted step
@@ -155,8 +153,32 @@ class Federate
 {
   public:
     // Default constructor, not meant to be used
-    Federate ():fed(nullptr),exec_async_iterate(false) {};
+    Federate ():fed(NULL),exec_async_iterate(false) {};
 
+    Federate(const Federate &fedObj):exec_async_iterate(fedObj.exec_async_iterate)
+    {
+        fed = helicsFederateClone(fedObj.fed);
+    }
+    Federate &operator=(const Federate &fedObj)
+    {
+        exec_async_iterate = fedObj.exec_async_iterate;
+        fed = helicsFederateClone(fedObj.fed);
+        return *this;
+    }
+#ifdef HELICS_HAS_RVALUE_REFS
+    Federate(Federate &&fedObj) :exec_async_iterate(fedObj.exec_async_iterate)
+    {
+        fed = fedObj.fed;
+        fedObj.fed = NULL;
+    }
+    Federate &operator=(Federate &&fedObj)
+    {
+        exec_async_iterate = fedObj.exec_async_iterate;
+        fed = fedObj.fed;
+        fedObj.fed = NULL;
+        return *this;
+    }
+#endif
     virtual ~Federate ()
     {
         helicsFederateFree (fed);

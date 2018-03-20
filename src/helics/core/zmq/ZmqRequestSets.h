@@ -1,12 +1,8 @@
 /*
 
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #ifndef _HELICS_ZEROMQ_REQUEST_SETS_
 #define _HELICS_ZEROMQ_REQUEST_SETS_
@@ -15,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../../common/cppzmq/zmq.hpp"
 #include "../../common/zmqContextManager.h"
 #include "../ActionMessage.hpp"
-#include "helics_includes/optional.h"
+#include "helics_includes/optional.hpp"
 #include <deque>
 #include <map>
 #include <string>
@@ -80,3 +76,4 @@ private:
 }  // namespace helics
 
 #endif
+

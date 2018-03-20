@@ -29,7 +29,7 @@
 "name":"ept2", // the name of the publication
  "type":"message2", // the type assocaited with a endpoint (optional)
  //the fact that there is no global value creates a local endpoint with global name comboFed/ept2
- "knownDestinations":"ept1", //this value can be an array of strings or just a single one it names key paths 
+ "knownDestinations":"ept1", //this value can be an array of strings or just a single one it names key paths
  //knownDestinations can be used to optimize the communication pathways inside of HELICS
  "subscriptions":"pub1"  //subscribe an endpoint to a particular publication  this means that an endpoint will get a message whenever anything is published to that particular key
  //the message will be raw data so it would have to be translated to be useful. this can also be a json array to subscribe to multiple publications
@@ -63,3 +63,4 @@
 ]
 
 }
+

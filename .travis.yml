@@ -1,28 +1,23 @@
-sudo: required
-
-# Use Linux unless specified otherwise
-os: linux
 dist: trusty
 language: cpp
 
 cache:
   ccache: true
   directories:
-    - cmake-3.4.3-Linux-x86_64/bin
-    - cmake-3.4.3-Linux-x86_64/plugins
-    - cmake-3.4.3-Linux-x86_64/share
-    - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/bin
-    - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/Frameworks
-    - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/MacOS
-    - cmake-3.4.3-Darwin-x86_64/CMake.app/Contents/share
     - dependencies
+
+before_cache:
+  - ${TRAVIS_BUILD_DIR}/scripts/cleanup-cmake.sh
+
+env:
+  global:
+    - MAKEFLAGS="-j 2"
 
 # Create aliases for some of shared build configuration
 _basic_env:
 - &daily_linux
   if: type = cron
-  os:
-    - linux
+  os: linux
   compiler: gcc
   addons:
     apt:
@@ -49,11 +44,18 @@ jobs:
   include:
     # XCode 6.4, OS X 10.10
     - <<: *osx_base
-      env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && SHARED_LIB_EXT=dylib && TRAVIS_XCODE_VERSION=64 HOMEBREW_NO_AUTO_UPDATE=1"
+      env:
+        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=64"
+        - HOMEBREW_NO_AUTO_UPDATE=1
+        - SHARED_LIB_EXT=dylib
+        - CI_BOOST_VERSION=1.58.0
       osx_image: xcode6.4
     # XCode 7.3, OS X 10.11
     - <<: *osx_base
-      env: MATRIX_EVAL="COMPILER=clang++ && BUILD_TYPE=Release && SHARED_LIB_EXT=dylib && TRAVIS_XCODE_VERSION=73 HOMEBREW_NO_AUTO_UPDATE=1"
+      env:
+        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73"
+        - HOMEBREW_NO_AUTO_UPDATE=1
+        - SHARED_LIB_EXT=dylib
       osx_image: xcode7.3
 
     # Built without errors on my clone from one of the changes made
@@ -69,7 +71,11 @@ jobs:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6 && SHARED_LIB_EXT=so && USE_SWIG=true"
+      env:
+        - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
+        - SHARED_LIB_EXT=so
+        - USE_SWIG=true
+        - USE_MPI=mpich
 
     - <<: *linux_base
       addons:
@@ -79,8 +85,10 @@ jobs:
           packages:
             - g++-4.9
       env:
-        - MATRIX_EVAL="COMPILER=g++-4.9 && CC=gcc-4.9 && CXX=g++-4.9 && SHARED_LIB_EXT=so && USE_SWIG=false"
-        - MINIMUM_DEPENDENCIES=true
+        - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
+        - SHARED_LIB_EXT=so
+        - USE_SWIG=false
+        - CI_BOOST_VERSION=1.61.0
 
     - <<: *linux_base
       compiler: clang
@@ -91,53 +99,90 @@ jobs:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
-      env: MATRIX_EVAL="SHARED_LIB_EXT=so && USE_SWIG=true && COMPILER=clang++-3.6 && CC='ccache clang-3.6 -Qunused-arguments -fcolor-diagnostics' && CXX='ccache clang++-3.6 -Qunused-arguments -fcolor-diagnostics'
-
+      env:
+        - MATRIX_EVAL="COMPILER=clang && CC='ccache clang-3.6' && CXX='ccache clang++-3.6'"
+        - CCACHE_CPP2=yes
+        - SHARED_LIB_EXT=so
+        - USE_SWIG=true
 
    # ------------------------------------------------
    # Jobs for daily valgrind and code coverage tests
    # ------------------------------------------------
     - <<: *daily_linux
       env:
-        - MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6 && SHARED_LIB_EXT=so && USE_SWIG=true"
+        - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
+        - SHARED_LIB_EXT=so
+        - USE_SWIG=true
         - RUN_VALGRIND=true
     - <<: *daily_linux
       env:
-        - MATRIX_EVAL="COMPILER=g++-6 && CC=gcc-6 && CXX=g++-6 && SHARED_LIB_EXT=so && USE_SWIG=true"
+        - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
+        - SHARED_LIB_EXT=so
+        - USE_SWIG=true
         - RUN_COVERAGE=true
+    - <<: *daily_linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env:
+        - MATRIX_EVAL="COMPILER=gcc && CC='gcc-5' && CXX='g++-5'"
+        - SHARED_LIB_EXT=so
+    - <<: *daily_linux
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - libstdc++-6-dev
+            - clang-5.0
+      env:
+        - MATRIX_EVAL="COMPILER=clang && CC='ccache clang-5.0' && CXX='ccache clang++-5.0'"
+        - CCACHE_CPP2=yes
+        - SHARED_LIB_EXT=so
+        - USE_SWIG=true
+        - CXX_STANDARD=17
 
 branches:
   except:
     - gh-pages
 
-
 before_install:
   - eval "${MATRIX_EVAL}"
+  - $CXX --version
 
 install:
   - source scripts/install-ci-dependencies.sh
 
 script:
   - mkdir build && cd build
-  - export HELICS_DEPENDENCY_FLAGS="-DZeroMQ_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/zmq -DBOOST_ROOT=${TRAVIS_BUILD_DIR}/dependencies/boost"
-  - export HELICS_OPTION_FLAGS="-DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON=ON -DTRAVIS_TESTS_ENABLE=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.${SHARED_LIB_EXT} -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/"
-  - if [[ "$USE_SWIG" == 'false' ]] ; then HELICS_OPTION_FLAGS+=" -DGENERATE_PYTHON=OFF" ; fi
+  - export HELICS_DEPENDENCY_FLAGS="-DZeroMQ_INSTALL_PATH=${CI_DEPENDENCY_DIR}/zmq -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
+  - export HELICS_OPTION_FLAGS="-DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON_INTERFACE=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.${SHARED_LIB_EXT} -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/"
+  - if [[ "$USE_SWIG" == 'false' ]] ; then HELICS_OPTION_FLAGS+=" -DDISABLE_SWIG=ON" ; fi
+  - if [[ "$USE_MPI" ]]; then HELICS_OPTION_FLAGS+=" -DMPI_ENABLE=ON" ; fi
+  - if [[ "$CXX_STANDARD" == 17 ]] ; then HELICS_OPTION_FLAGS+=" -DENABLE_CXX_17=ON" ; fi
     # - echo "$HELICS_OPTION_FLAGS"
     # - echo "$HELICS_DEPENDENCY_FLAGS"
+  - if [[ "$USE_MPI" ]]; then CC=${CI_DEPENDENCY_DIR}/mpi/bin/mpicc ; CXX=${CI_DEPENDENCY_DIR}/mpi/bin/mpic++ ; fi
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
   - make -j2
   # For controlling which tests get run:
   # ctest -I <start>,<end>,<stride>,<list of test numbers>
   # 1 = common_tests
   # 2 = core tests
-  # 3 = application api tests
-  # 4 = shared_library tests
-  # 5 = helics-apps tests
-  # 6 = travis-tests
+  # 3 = key_tests
+  # 4 = application api tests
+  # 5 = extended_api tests
+  # 6 = shared_library tests
+  # 7 = helics-apps tests
   - ctest --verbose --timeout 120 -I 0,0,0,1
   # - ctest --verbose --timeout 120 -I 0,0,0,2
-  - ctest --verbose --timeout 120 -I 0,0,0,6
-  # - ctest --verbose --timeout 360 -I 0,0,0,4
+  - ctest --verbose --timeout 180 -I 0,0,0,3
+  - ctest --verbose --timeout 360 -I 0,0,0,6
   - export PYTHONPATH="$(pwd)/swig/python"
     # - echo "$LD_LIBRARY_PATH"
     # - echo "$DYLD_FALLBACK_LIBRARY_PATH"
@@ -146,3 +191,4 @@ script:
 
 notifications:
     email: false
+

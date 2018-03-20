@@ -15,3 +15,4 @@ STRING(REGEX REPLACE " " "\\\\ " OUT_STRING_TEMP ${OUT_STRING_TEMP})
 #message(STATUS "${outstring} should be set to ${OUT_STRING_TEMP}")
 set(${outstring} ${OUT_STRING_TEMP} PARENT_SCOPE)
  endfunction()
+

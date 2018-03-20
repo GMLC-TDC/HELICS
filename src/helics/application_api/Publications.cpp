@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "Publications.hpp"
@@ -192,21 +189,21 @@ void Publication::publish (std::complex<double> val) const
 
 data_block typeConvert (helics_type_t type, const defV &val)
 {
-    switch (val.which ())
+    switch (val.index())
     {
     case doubleLoc:  // double
-        return typeConvert (type, boost::get<double> (val));
+        return typeConvert (type, mpark::get<double> (val));
     case intLoc:  // int64_t
-        return typeConvert (type, boost::get<int64_t> (val));
+        return typeConvert (type, mpark::get<int64_t> (val));
     case stringLoc:  // string
     default:
-        return typeConvert (type, boost::get<std::string> (val));
+        return typeConvert (type, mpark::get<std::string> (val));
     case complexLoc:  // complex
-        return typeConvert (type, boost::get<std::complex<double>> (val));
+        return typeConvert (type, mpark::get<std::complex<double>> (val));
     case vectorLoc:  // vector
-        return typeConvert (type, boost::get<std::vector<double>> (val));
+        return typeConvert (type, mpark::get<std::vector<double>> (val));
     case complexVectorLoc:  // complex
-        return typeConvert (type, boost::get<std::vector<std::complex<double>>> (val));
+        return typeConvert (type, mpark::get<std::vector<std::complex<double>>> (val));
     }
 }
 
@@ -231,3 +228,4 @@ void Publication::publish (const defV &val) const
     }
 }
 }  // namespace helics
+

@@ -1,8 +1,7 @@
 ##############################################################################
-#Copyright (C) 2017-2018, Battelle Memorial Institute
-#All rights reserved.
-
-#This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+# Copyright © 2017-2018,
+# Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+#All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 
 #-----------------------------------------------------------------------------
@@ -22,6 +21,7 @@ DualMappedPointerVectorTests.cpp
 BlockingQueueTests.cpp
 PriorityBlockingQueueTests.cpp
 SimpleQueueTests.cpp
+AirLockTests.cpp
 TimeTests.cpp
 )
 
@@ -47,3 +47,4 @@ add_custom_command(TARGET common-tests POST_BUILD        # Adds a post-build eve
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:common-tests>/")                 # <--this is out-file path
 endforeach(keyfile)
+

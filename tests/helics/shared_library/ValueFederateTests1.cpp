@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -23,9 +19,8 @@ using namespace std::string_literals;
 BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-#if ENABLE_TEST_TIMEOUTS > 0
+
 namespace utf = boost::unit_test;
-#endif
 
 // const std::string core_types[] = {"udp" };
 /** test simple creation and destruction*/
@@ -1140,3 +1135,4 @@ BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_type
 }
 #endif
 BOOST_AUTO_TEST_SUITE_END ()
+

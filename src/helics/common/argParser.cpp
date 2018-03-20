@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "argParser.h"
@@ -56,7 +53,7 @@ int argumentParser (int argc,
     po::options_description config ("configuration");
     po::options_description hidden ("hidden");
 
-    
+
     // clang-format off
 	// input boost controls
 	cmd_only.add_options()
@@ -81,7 +78,7 @@ int argumentParser (int argc,
         cmd_line.add(hidden);
         config_file.add(hidden);
     }
-    
+
     variable_map cmd_vm;
     try
     {
@@ -95,7 +92,7 @@ int argumentParser (int argc,
             p.add(posName.c_str(), -1);
             po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().positional(p).run(), cmd_vm);
         }
-        
+
     }
     catch (std::exception &e)
     {
@@ -127,7 +124,7 @@ int argumentParser (int argc,
         p.add(posName.c_str(), -1);
         po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().positional(p).run(), vm_map);
     }
-   
+
 
     if (cmd_vm.count ("config-file") > 0)
     {
@@ -150,3 +147,4 @@ int argumentParser (int argc,
 }
 
 }  // namespace helics
+

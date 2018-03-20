@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -113,7 +109,7 @@ BOOST_AUTO_TEST_CASE (emplace_tests)
     BOOST_CHECK_EQUAL (b->second, 34.1);
 }
 
-#ifndef QUICK_TESTS_ONLY
+
 /** test with single consumer/single producer*/
 BOOST_AUTO_TEST_CASE (multithreaded_tests)
 {
@@ -169,6 +165,7 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests)
     BOOST_CHECK_EQUAL (V, 1'010'000);
 }
 
+#ifndef QUICK_TESTS_ONLY
 /** test with multiple consumer/single producer*/
 BOOST_AUTO_TEST_CASE (multithreaded_tests2)
 {
@@ -265,3 +262,4 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests3)
 
 #endif
 BOOST_AUTO_TEST_SUITE_END ()
+

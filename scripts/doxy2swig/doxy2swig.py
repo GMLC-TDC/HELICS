@@ -76,7 +76,7 @@ def shift(txt, indent = '    ', prepend = ''):
     """Return a list corresponding to the lines of text in the `txt` list
     indented by `indent`. Prepend instead the string given in `prepend` to the
     beginning of the first line. Note that if len(prepend) > len(indent), then
-    `prepend` will be truncated (doing better is tricky!). This preserves a 
+    `prepend` will be truncated (doing better is tricky!). This preserves a
     special '' entry at the end of `txt` (see `do_para` for the meaning).
     """
     if type(indent) is int:
@@ -258,7 +258,7 @@ class Doxy2SWIG:
         self.add_text(pre_char)
         self.subnode_parse(node)
         self.add_text(post_char)
-    
+
 # MARK: Helper functions
     def get_specific_subnodes(self, node, name, recursive=0):
         """Given a node and a name, return a list of child `ELEMENT_NODEs`, that
@@ -392,7 +392,7 @@ class Doxy2SWIG:
     def get_memberdef_nodes_and_signatures(self, node, kind):
         """Collects the memberdef nodes and corresponding signatures that
         correspond to public function entries that are at most depth 2 deeper
-        than the current (compounddef) node. Returns a dictionary with 
+        than the current (compounddef) node. Returns a dictionary with
         function signatures (what swig expects after the %feature directive)
         as keys, and a list of corresponding memberdef nodes as values."""
         sig_dict = {}
@@ -425,7 +425,7 @@ class Doxy2SWIG:
             else:
                 sig_dict[sig] = [n]
         return sig_dict
-    
+
     def handle_typical_memberdefs_no_overload(self, signature, memberdef_nodes):
         """Produce standard documentation for memberdef_nodes."""
         for n in memberdef_nodes:
@@ -457,12 +457,12 @@ class Doxy2SWIG:
             self.add_line_with_subsequent_indent('* ' + self.get_function_signature(n))
             self.subnode_parse(n, pieces=[], indent=4, ignore=['definition', 'name'])
         self.add_text(['";', '\n'])
-    
+
 
 # MARK: Tag handlers
     def do_linebreak(self, node):
         self.add_text('  ')
-    
+
     def do_ndash(self, node):
         self.add_text('--')
 
@@ -474,7 +474,7 @@ class Doxy2SWIG:
 
     def do_bold(self, node):
         self.surround_parse(node, '**', '**')
-    
+
     def do_computeroutput(self, node):
         self.surround_parse(node, '`', '`')
 
@@ -493,19 +493,19 @@ class Doxy2SWIG:
         # make following text have no gap to the heading:
         pieces.extend([''.join(self.pieces) + '  \n', ''])
         self.pieces = pieces
-    
+
     def do_verbatim(self, node):
         self.start_new_paragraph()
         self.subnode_parse(node, pieces=[''], indent=4)
-    
+
     def do_blockquote(self, node):
         self.start_new_paragraph()
         self.subnode_parse(node, pieces=[''], indent='> ')
-    
+
     def do_hruler(self, node):
         self.start_new_paragraph()
         self.add_text('* * * * *  \n')
-    
+
     def do_includes(self, node):
         self.add_text('\nC++ includes: ')
         self.subnode_parse(node)
@@ -610,7 +610,7 @@ class Doxy2SWIG:
     def do_parameternamelist(self, node):
         self.subnode_parse(node)
         self.add_text([' :', '  \n'])
-    
+
     def do_parametername(self, node):
         if self.pieces != [] and self.pieces != ['* ', '']:
             self.add_text(', ')
@@ -642,7 +642,7 @@ class Doxy2SWIG:
 # MARK: %feature("docstring") producing tag handlers
     def do_compounddef(self, node):
         """This produces %feature("docstring") entries for classes, and handles
-        class, namespace and file memberdef entries specially to allow for 
+        class, namespace and file memberdef entries specially to allow for
         overloaded functions. For other cases, passes parsing on to standard
         handlers (which may produce unexpected results).
         """
@@ -693,7 +693,7 @@ class Doxy2SWIG:
             md_nodes = self.get_memberdef_nodes_and_signatures(node, kind)
             for sig in md_nodes:
                 self.handle_typical_memberdefs(sig, md_nodes[sig])
-    
+
     def do_memberdef(self, node):
         """Handle cases outside of class, struct, file or namespace. These are
         now dealt with by `handle_overloaded_memberfunction`.
@@ -726,7 +726,7 @@ class Doxy2SWIG:
             if n not in first.values():
                 self.parse(n)
         self.add_text(['";', '\n'])
-    
+
 # MARK: Entry tag handlers (dont print anything meaningful)
     def do_sectiondef(self, node):
         kind = node.attributes['kind'].value
@@ -818,11 +818,11 @@ def main():
                       default=False,
                       dest='q',
                       help='be quiet and minimize output')
-    
+
     options, args = parser.parse_args()
     if len(args) != 2:
         parser.error("no input and output specified")
-    
+
     p = Doxy2SWIG(args[0],
                   with_function_signature = options.f,
                   with_type_info = options.t,
@@ -836,3 +836,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

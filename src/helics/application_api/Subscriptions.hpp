@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
@@ -13,7 +10,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helicsTypes.hpp"
 #include <algorithm>
 #include <array>
-#include <boost/lexical_cast.hpp>
 namespace helics
 {
 /** base class for a subscription object*/
@@ -96,7 +92,7 @@ class SubscriptionBase
 class Subscription : public SubscriptionBase
 {
   private:
-    boost::variant<std::function<void(const std::string &, Time)>,
+    mpark::variant<std::function<void(const std::string &, Time)>,
                    std::function<void(const double &, Time)>,
                    std::function<void(const int64_t &, Time)>,
                    std::function<void(const std::complex<double> &, Time)>,
@@ -246,11 +242,13 @@ class Subscription : public SubscriptionBase
     */
     void setMinimumChange (double deltaV)
     {
+        //this first check enables change detection if it was disabled via negative delta
         if (delta < 0.0)
         {
             changeDetectionEnabled = true;
         }
         delta = deltaV;
+        // the second checks if we should disable from negative delta
         if (delta < 0.0)
         {
             changeDetectionEnabled = false;
@@ -645,3 +643,4 @@ class VectorSubscription2d
 };
 
 }  // namespace helics
+

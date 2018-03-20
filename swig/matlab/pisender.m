@@ -1,5 +1,5 @@
 
-loadlibrary(GetFullPath('~/local/helics-1.0.0a/lib/libhelicsSharedLib.dylib'));
+%loadlibrary(GetFullPath('~/local/helics-develop/lib/libhelicsSharedLib.dylib'));
 
 initstring = '2 --name=mainbroker';
 fedinitstring = '--broker=mainbroker --federates=1';
@@ -65,7 +65,7 @@ for i = 1:20
 
     currenttime = helics.helicsFederateRequestTime(vfed, i);
 
-    display(strcat('PI SENDER: Sending value pi =', num2str(val), ' at time ', num2str(this_time + (deltat * i)),' to PI RECEIVER'));
+    display(['PI SENDER: Sending value pi = ', '', num2str(val), ' at time ', '', num2str(this_time + (deltat * i)),' to PI RECEIVER']);
     status = helics.helicsPublicationPublishDouble(pub, val);
 end
 

@@ -10,3 +10,4 @@ if (EXISTS ${ZMQ_CMAKE_INCLUDE})
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/HELICSConfig.cmake)
+

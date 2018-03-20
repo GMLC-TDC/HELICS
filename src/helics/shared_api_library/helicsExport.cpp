@@ -1,12 +1,8 @@
 /*
 
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "../common/logger.h"
 #include "../core/BrokerFactory.hpp"
@@ -324,6 +320,31 @@ helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int ar
     return reinterpret_cast<helics_core> (core);
 }
 
+helics_core helicsCoreClone(helics_core core)
+{
+    if (core == nullptr)
+    {
+        return nullptr;
+    }
+    auto *coreObj = reinterpret_cast<helics::CoreObject *> (core);
+    auto *coreClone = new helics::CoreObject;
+    coreClone->index = getMasterHolder()->addCore(coreClone);
+    coreClone->valid = coreValidationIdentifier;
+    coreClone->coreptr = coreObj->coreptr;
+    return reinterpret_cast<helics_core> (coreClone);
+}
+
+helics_federate helicsGetFederateByName( const char *fedName)
+{
+    auto mob = getMasterHolder();
+    auto fed = mob->findFed(fedName);
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
+    return helicsFederateClone(reinterpret_cast<helics_federate>(fed));
+
+}
 helics_broker helicsCreateBroker (const char *type, const char *name, const char *initString)
 {
     helics::core_type ct;
@@ -359,6 +380,20 @@ helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, in
     broker->valid = brokerValidationIdentifier;
     broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string (name) : nullstr, argc, argv);
     return reinterpret_cast<helics_broker> (broker);
+}
+
+helics_broker helicsBrokerClone(helics_broker broker)
+{
+    if (broker == nullptr)
+    {
+        return nullptr;
+    }
+    auto *brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
+    auto *brokerClone = new helics::BrokerObject;
+    brokerClone->index = getMasterHolder()->addBroker(brokerClone);
+    brokerClone->valid = brokerValidationIdentifier;
+    brokerClone->brokerptr = brokerObj->brokerptr;
+    return reinterpret_cast<helics_broker> (brokerClone);
 }
 
 helics_bool_t helicsBrokerIsConnected (helics_broker broker)
@@ -585,6 +620,7 @@ void helicsCloseLibrary ()
     }
 #endif
     helics::LoggerManager::closeLogger ();
+    //helics::cleanupHelicsLibrary();
 }
 
 helics_query helicsCreateQuery (const char *target, const char *query)
@@ -693,6 +729,9 @@ void helicsQueryFree (helics_query query) { delete reinterpret_cast<helics::quer
 void helicsCleanupHelicsLibrary()
 {
     helics::cleanupHelicsLibrary();
+  //  helics::LoggerManager::closeLogger();
+    
+  //  zmqContextManager::closeContext();
 }
 
 
@@ -732,6 +771,22 @@ int MasterObjectHolder::addFed(helics::FedObject *fed)
     auto index = static_cast<int> (handle->size());
     handle->push_back(fed);
     return index;
+}
+
+helics::FedObject *MasterObjectHolder::findFed(const std::string &fedName)
+{
+    auto handle = feds.lock();
+    for (auto fed : (*handle))
+    {
+        if (fed->fedptr)
+        {
+            if (fed->fedptr->getName() == fedName)
+            {
+                return fed;
+            }
+        }
+    }
+    return nullptr;
 }
 
 void MasterObjectHolder::clearBroker(int index)
@@ -810,3 +865,4 @@ void clearAllObjects()
     }
 
 }
+

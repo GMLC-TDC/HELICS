@@ -1,13 +1,8 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
-
 #pragma once
 
 #include <algorithm>
@@ -16,7 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <type_traits>
 #include <vector>
 
-#include <helics_includes/optional.h>
+#include <helics_includes/optional.hpp>
 
 /** class for very simple thread safe queue
 @details  uses two vectors for the operations,  once the pull vector is empty it swaps the vectors
@@ -264,3 +259,4 @@ class SimpleQueue
         return t;
     }
 };
+

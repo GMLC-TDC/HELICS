@@ -1,22 +1,17 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
+
 /**
 @file
 the purpose of these objects are to convert a specific type into a data block for use in the core algorithms
 */
 
-#include <string>
-
 #include "../core/Core.hpp"
-#include "Message.hpp"
+#include "data_view.hpp"
 #include <complex>
 #include <type_traits>
 
@@ -64,3 +59,4 @@ class ValueConverter<std::string>
     static std::string type () { return "string"; }
 };
 }  // namespace helics
+

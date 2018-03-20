@@ -10,13 +10,17 @@ platform:
 configuration:
   - Release
 
+cache:
+  - C:\ProgramData\chocolatey\bin -> appveyor.yml
+  - C:\ProgramData\chocolatey\lib -> appveyor.yml
+
 install:
 
 before_build:
   - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install swig --yes --limit-output #> $null
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 14 2015 Win64" -DAUTOBUILD_ZMQ=ON -DBUILD_RELEASE_ONLY=ON -DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DQUICK_TESTS_ONLY=ON
+  - cmake .. -G "Visual Studio 14 2015 Win64" -DAUTOBUILD_ZMQ=ON -DBOOST_INSTALL_PATH=C:/libraries/boost_1_63_0 -DBUILD_RELEASE_ONLY=ON -DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON
   - cd ..
 
 build:
@@ -32,13 +36,15 @@ test_script:
   # ctest -I <start>,<end>,<stride>,<list of test numbers>
   # 1 = common_tests
   # 2 = core tests
-  # 3 = application api tests
-  # 4 = shared library tests
-  # 5 = app tests
-  # 6 = travis_tests
+  # 3 = key_tests
+  # 4 = application api tests
+  # 5 = extended_api tests
+  # 6 = shared_library tests
+  # 7 = helics-apps tests
   - ctest -C Release --verbose --timeout 120 -I 0,0,0,1
   - ctest -C Release --verbose --timeout 90 -I 0,0,0,2
-  - ctest -C Release --verbose --timeout 240 -I 0,0,0,3
-  - ctest -C Release --verbose --timeout 90 -I 0,0,0,5
+  - ctest -C Release --verbose --timeout 240 -I 0,0,0,4
+  #- ctest -C Release --verbose --timeout 90 -I 0,0,0,7
 
 artifacts:
+

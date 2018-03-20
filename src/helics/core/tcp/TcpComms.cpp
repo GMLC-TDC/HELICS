@@ -1,12 +1,8 @@
 /*
 
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "TcpComms.h"
 #include "../../common/AsioServiceManager.h"
@@ -170,7 +166,7 @@ void TcpComms::txPriorityReceive (std::shared_ptr<TcpConnection> /*connection*/,
 
 size_t TcpComms::dataReceive (std::shared_ptr<TcpRxConnection> connection, const char *data, size_t bytes_received)
 {
-    
+
     size_t used_total = 0;
     while (used_total < bytes_received)
     {
@@ -254,7 +250,7 @@ void TcpComms::queue_rx_function ()
                 }
                 PortNumber = mp;
             }
-                
+
                 break;
             case CLOSE_RECEIVER:
             case DISCONNECT:
@@ -507,7 +503,7 @@ void TcpComms::queue_tx_function ()
                     {
                         if (!isDisconnectCommand (cmd))
                         {
-                            std::cerr << "broker send0 " << se.what () << '\n';
+                            std::cerr << "broker send 0 "<< actionMessageType(cmd.action()) <<':'<< se.what () << '\n';
                         }
                     }
                 }
@@ -609,3 +605,4 @@ std::string TcpComms::getAddress () const { return makePortAddress (localTarget_
 
 } // namespace tcp
 }  // namespace helics
+

@@ -1,7 +1,7 @@
 # LLNS Copyright Start
 # Copyright (c) 2017, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department 
-# of Energy by Lawrence Livermore National Laboratory in part under 
+# This work was performed under the auspices of the U.S. Department
+# of Energy by Lawrence Livermore National Laboratory in part under
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -14,32 +14,35 @@ else( MSVC )
 set(WERROR_FLAG "-Werror")
 endif ( MSVC )
 
+
 set(TEST_CXX_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test_compiler_cxx)
 
 if (ENABLE_CXX_17)
-try_compile(OPTIONAL_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_optional.cpp )
+try_compile(OPTIONAL_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_optional.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
 
-try_compile(VARIANT_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_variant.cpp )
+try_compile(VARIANT_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_variant.cpp COMPILE_DEFINITIONS ${VERSION_OPTION})
 
-try_compile(STRING_VIEW_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_string_view.cpp )
+try_compile(STRING_VIEW_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_string_view.cpp COMPILE_DEFINITIONS ${VERSION_OPTION})
 
-try_compile(SHARED_MUTEX_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_shared_mutex.cpp)
-#try_compile(CLAMP_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_clamp.cpp  )
-#try_compile(HYPOT3_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_hypot3.cpp  )
+#try_compile(CLAMP_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_clamp.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
+#try_compile(HYPOT3_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_hypot3.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
+
+try_compile(IFCONSTEXPR_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_constexpr_if.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG} )
+
+try_compile(FALLTHROUGH_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_fallthrough.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG} ${VERSION_OPTION})
+
+try_compile(UNUSED_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_unused.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG} ${VERSION_OPTION})
 
 endif(ENABLE_CXX_17)
 
-try_compile(VARIABLE_TEMPLATE_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_variable_template.cpp )
+try_compile(VARIABLE_TEMPLATE_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_variable_template.cpp COMPILE_DEFINITIONS ${VERSION_OPTION})
+# this is normally a C++17 thing but clang <3.5 had it available before the standard switched to shared_timed_mutex
+try_compile(SHARED_MUTEX_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_shared_mutex.cpp COMPILE_DEFINITIONS ${VERSION_OPTION})
 
-try_compile(IFCONSTEXPR_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_constexpr_if.cpp  )
-try_compile(FALLTHROUGH_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_fallthrough.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG})
+try_compile(SHARED_TIMED_MUTEX_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_shared_timed_mutex.cpp COMPILE_DEFINITIONS ${VERSION_OPTION})
 
-try_compile(UNUSED_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_unused.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG} )
+try_compile(EXPERIMENTAL_STRING_VIEW_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_experimental_string_view.cpp COMPILE_DEFINITIONS ${VERSION_OPTION})
 
-try_compile(SHARED_TIMED_MUTEX_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_shared_timed_mutex.cpp)
-
-
-try_compile(EXPERIMENTAL_STRING_VIEW_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_experimental_string_view.cpp )
 #message(STATUS ${RESULT})
 if (OPTIONAL_AVAILABLE)
 set(HAVE_OPTIONAL 1)
@@ -74,7 +77,7 @@ set(HAVE_FALLTHROUGH 1)
 endif()
 
 if (VARIABLE_TEMPLATE_AVAILABLE)
-set(HAVE_VARIABLE_TEMPLATE 1)
+set(HAVE_VARIABLE_TEMPLATES 1)
 endif()
 
 if (UNUSED_AVAILABLE)
@@ -99,3 +102,4 @@ CONFIGURE_FILE(${CMAKE_CURRENT_LIST_DIR}/compiler-config.h.in ${PROJECT_BINARY_D
 endif()
 
 endif(NOT NO_CONFIG_GENERATION)
+

@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include <boost/test/unit_test.hpp>
@@ -168,13 +165,21 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
 
     comm.transmit (0, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    if (counter2 != 1)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(350));
+    }
     BOOST_REQUIRE_EQUAL (counter2, 1);
     BOOST_CHECK (act2.action () == helics::action_message_def::action_t::cmd_ack);
 
     comm3.transmit (0, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    if (counter2 != 1)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(350));
+    }
     BOOST_REQUIRE_EQUAL (counter2, 2);
     BOOST_CHECK (act2.action () == helics::action_message_def::action_t::cmd_ack);
 
@@ -182,10 +187,10 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
 
     comm2.transmit (3, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
     if (counter3 != 1)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (250));
+        std::this_thread::sleep_for (std::chrono::milliseconds (350));
     }
     BOOST_REQUIRE_EQUAL (counter3, 1);
     BOOST_CHECK (act3.action () == helics::action_message_def::action_t::cmd_ack);
@@ -194,8 +199,12 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
 
     comm2.transmit (4, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
-    BOOST_REQUIRE_EQUAL (counter, 1);
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    if (counter.load() != 1)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(350));
+    }
+    BOOST_REQUIRE_EQUAL (counter.load(), 1);
     BOOST_CHECK (act.action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
@@ -255,3 +264,4 @@ BOOST_AUTO_TEST_CASE (ipcCore_core_broker_default_test)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
+

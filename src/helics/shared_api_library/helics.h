@@ -1,12 +1,8 @@
 /*
 
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #ifndef HELICS_APISHARED_FUNCTIONS_H_
 #define HELICS_APISHARED_FUNCTIONS_H_
@@ -67,6 +63,12 @@ HELICS_Export helics_core helicsCreateCore (const char *type, const char *name, 
 */
 HELICS_Export helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, const char *const *argv);
 
+/** create a new reference to an existing broker
+@details this will create a new broker object that references the existing broker it must be freed as well
+@param broker an existing helics_broker
+@return a new refernce to the same broker*/
+HELICS_Export helics_core helicsCoreClone(helics_core core);
+
 /** create a broker object
 @param type the type of the broker to create
 @param name the name of the broker , may be a nullptr or empty string to have a name automatically assigned
@@ -84,6 +86,11 @@ HELICS_Export helics_broker helicsCreateBroker (const char *type, const char *na
 */
 HELICS_Export helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, const char *const *argv);
 
+/** create a new reference to an existing broker
+@details this will create a new broker object that references the existing broker it must be freed as well
+@param broker an existing helics_broker
+@return a new refernce to the same broker*/
+HELICS_Export helics_broker helicsBrokerClone(helics_broker broker);
 /** check if a broker is connected
 a connected broker implies is attached to cores or cores could reach out to communicate
 return 0 if not connected , something else if it is connected*/
@@ -131,6 +138,13 @@ HELICS_Export helics_status helicsCoreSetReadyToInit(helics_core core);
 @return a helics_status enumeration indicating any error condition
 */
 HELICS_Export helics_status helicsCoreDisconnect (helics_core core);
+
+/** get an existing federate object from a core by name
+@details the federate must have been created by one of the other functions and at least one of the objects referencing the created federate
+must still be active in the process
+@param fedName the name of the federate to retrieve
+@return NULL if no fed is available by that name otherwise a helics_federate with that name*/
+HELICS_Export helics_federate helicsGetFederateByName(const char *fedName);
 
 /** get the network address associated with a broker
 @param broker the broker to query
@@ -191,6 +205,12 @@ helics_federate, helics_message_federate or helics_federate object as an argumen
 @return an opaque combination federate object
 */
 HELICS_Export helics_federate helicsCreateCombinationFederateFromJson (const char *json);
+
+/** create a new reference to an existing federate
+@details this will create a new helics_federate object that references the existing federate it must be freed as well
+@param fed an existing helics_federate
+@return a new reference to the same federate*/
+HELICS_Export helics_federate helicsFederateClone(helics_federate fed);
 
 /** create a federate info object for specifying federate information when constructing a federate
 @return a helics_federate_info_t object which is a reference to the created object
@@ -377,7 +397,7 @@ iteration request and return a time and iteration status
 */
 HELICS_Export helics_status helicsFederateEnterExecutionModeIterativeAsync (helics_federate fed, helics_iteration_request iterate);
 
-/** complete the asyncrhonous iterative call into ExecutionModel
+/** complete the asynchronous iterative call into ExecutionModel
 @param fed the federate to make the request of
 @param[out] outIterate  the iteration specification of the result
 @return a helics_status object with a return code of the result helics_ok if there were no issues
@@ -426,14 +446,14 @@ HELICS_Export helics_status helicsFederateRequestTimeIterative (helics_federate 
 @return a helics_status if the return value is equal to helics_ok*/
 HELICS_Export helics_status helicsFederateRequestTimeAsync (helics_federate fed, helics_time_t requestTime);
 
-/** complete an asyncrhonous requestTime call
+/** complete an asynchronous requestTime call
 @param fed the federate to make the request of
 @param[out]  timeOut the time granted to the federate
 @return a helics_status if the return value is equal to helics_ok the timeOut will contain the new granted time, otherwise timeOut is
 invalid*/
 HELICS_Export helics_status helicsFederateRequestTimeComplete (helics_federate fed, helics_time_t *timeOut);
 
-/** request an iterative time through an asyncrhonous call
+/** request an iterative time through an asynchronous call
 @details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and
 iteration request and return a time and iteration status call /ref helicsFederateRequestTimeIterativeComplete to finish the process
 @param fed the federate to make the request of
@@ -445,7 +465,7 @@ HELICS_Export helics_status helicsFederateRequestTimeIterativeAsync (helics_fede
                                                                      helics_time_t requestTime,
                                                                      helics_iteration_request iterate);
 
-/** complete an iterative time request asyncrhonous call
+/** complete an iterative time request asynchronous call
 @param fed the federate to make the request of
 @param[out] timeOut the granted time
 @param[out] outIterate  the iteration specification of the result
@@ -508,7 +528,7 @@ HELICS_Export helics_status helicsFederateGetCurrentTime (helics_federate fed, h
 @details a query object consists of a target and query string
 */
 HELICS_Export helics_query helicsCreateQuery (const char *target, const char *query);
-
+ 
 /** Execute a query
 @details the call will block until the query finishes which may require communication or other delays
 @param query the query object to use in the query
@@ -534,8 +554,8 @@ the return will be nullptr if query is an invalid object
 HELICS_Export const char *helicsQueryExecuteComplete (helics_query query);
 
 /** check if an asynchronously executed query has completed
-@return will return helics_true if an async query has complete or a regular query call was made with a result
-and false if an async query has not completed or is invalid
+@return will return helics_true if an asynchronous query has complete or a regular query call was made with a result
+and false if an asynchronous query has not completed or is invalid
 */
 HELICS_Export helics_bool_t helicsQueryIsCompleted (helics_query query);
 
@@ -552,3 +572,4 @@ HELICS_Export void helicsCleanupHelicsLibrary ();
 #endif
 
 #endif
+

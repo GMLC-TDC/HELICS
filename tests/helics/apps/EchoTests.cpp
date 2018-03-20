@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
@@ -29,7 +25,7 @@ BOOST_AUTO_TEST_CASE(echo_test1)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core1";
     fi.coreInitString = "2";
-    helics::Echo echo1(fi);
+    helics::apps::Echo echo1(fi);
     fi.name = "source";
     echo1.addEndpoint("test");
     //fi.logLevel = 4;
@@ -55,7 +51,7 @@ BOOST_AUTO_TEST_CASE(echo_test_delay)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core2";
     fi.coreInitString = "2";
-    helics::Echo echo1(fi);
+    helics::apps::Echo echo1(fi);
     fi.name = "source";
     echo1.addEndpoint("test");
     echo1.setEchoDelay(1.2);
@@ -85,7 +81,7 @@ BOOST_AUTO_TEST_CASE(echo_test_delay_period)
     fi.coreName = "core3";
     fi.coreInitString = "2";
     fi.period = 1.1;
-    helics::Echo echo1(fi);
+    helics::apps::Echo echo1(fi);
     fi.period = 0;
     fi.name = "source";
     echo1.addEndpoint("test");
@@ -115,7 +111,7 @@ BOOST_AUTO_TEST_CASE(echo_test_multiendpoint)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core4";
     fi.coreInitString = "2";
-    helics::Echo echo1(fi);
+    helics::apps::Echo echo1(fi);
     fi.name = "source";
     echo1.addEndpoint("test");
     echo1.addEndpoint("test2");
@@ -154,10 +150,10 @@ BOOST_AUTO_TEST_CASE(echo_test_fileload)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core4";
     fi.coreInitString = "2";
-    helics::Echo echo1(fi);
+    helics::apps::Echo echo1(fi);
     echo1.loadFile(std::string(TEST_DIR) + "/test_files/echo_example.json");
     fi.name = "source";
-   
+
     helics::MessageFederate mfed(fi);
     helics::Endpoint ep1(&mfed, "src");
     auto fut = std::async(std::launch::async, [&echo1]() { echo1.run(5.0); });
@@ -187,3 +183,4 @@ BOOST_AUTO_TEST_CASE(echo_test_fileload)
 
 
 BOOST_AUTO_TEST_SUITE_END()
+

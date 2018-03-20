@@ -1,13 +1,10 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-/* 
+/*
    Example from http://mathfaculty.fullerton.edu/mathews//n2003/newtonsystem/newtonsystemproof.pdf.
 */
 #include <ValueFederate.h>
@@ -131,7 +128,7 @@ int main ()
     } else {
       return (-3);
     }
-    
+
     fflush (NULL);
 
 
@@ -139,20 +136,20 @@ int main ()
         int global_conv;
       helicsSubscriptionGetString(sub, recvbuf,100);
       sscanf(recvbuf,"%lf,%d",&y,&other_conv);
-      
+
       /* Check for global convergence */
       global_conv = my_conv&other_conv;
 
       if(global_conv) {
 	helicsFederateRequestTimeIterative(vfed, currenttime, no_iteration,&currenttime,&currenttimeiter);
       } else {
-      
+
 	/* Solve the system of equations for this federate */
 	run_sim1(y,tol,&x,&converged);
-	 
+
 	++helics_iter;
 	printf("Fed1: Current time %4.3f iteration %d x=%f, y=%f\n",currenttime,helics_iter, x, y);
-        
+
 	if ((fabs(x-xprv)>tol)) {
 	  my_conv = 0;
 	  printf("Fed1: publishing new x\n");
@@ -163,9 +160,9 @@ int main ()
 
 	snprintf(sendbuf,100,"%18.16f,%d",x,my_conv);
 	helicsPublicationPublishString(pub, sendbuf);
-	
+
 	fflush(NULL);
-	
+
 	helicsFederateRequestTimeIterative(vfed, currenttime, force_iteration,&currenttime,&currenttimeiter);
 	xprv = x;
       }
@@ -190,3 +187,4 @@ int main ()
     fflush (NULL);
     return (0);
 }
+

@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "Source.hpp"
 #include "PrecHelper.hpp"
@@ -29,7 +25,8 @@ namespace filesystem = boost::filesystem;
 
 namespace helics
 {
-
+namespace apps
+{
 using namespace std::string_literals;
 static const ArgDescriptors InfoArgs{
     { "stop", "the time to stop recording" }
@@ -98,9 +95,9 @@ void Source::loadFile (const std::string &jsonFile)
   //  }
 
     auto doc = loadJsonString(jsonFile);
-   
 
-   
+
+
 
 }
 
@@ -122,19 +119,19 @@ void Source::run (Time stopTime_input)
     if (state != Federate::op_states::execution)
     {
         // send stuff before timeZero
-      
+
 
 
         fed->enterExecutionState ();
         // send the stuff at timeZero
-      
-       
+
+
     }
     else
     {
 //        auto ctime = fed->getCurrentTime ();
-      
-        
+
+
     }
 
     helics::Time nextPrintTime = 10.0;
@@ -143,7 +140,7 @@ void Source::run (Time stopTime_input)
     while (moreToSend)
     {
         nextSendTime = Time::maxVal ();
-       
+
         if (nextSendTime > stopTime_input)
         {
             break;
@@ -154,7 +151,7 @@ void Source::run (Time stopTime_input)
             continue;
         }
         auto newTime = fed->requestTime (nextSendTime);
-        
+
         if (newTime >= nextPrintTime)
         {
             std::cout << "processed time " << static_cast<double> (newTime) << "\n";
@@ -200,4 +197,6 @@ int Source::loadArguments (boost::program_options::variables_map &vm_map)
     return 0;
 }
 
-}  // namespace helics
+}  // namespace apps
+} // namespace helics
+

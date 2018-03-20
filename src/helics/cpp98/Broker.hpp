@@ -1,17 +1,13 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #ifndef HELICS_CPP98_BROKER_HPP_
 #define HELICS_CPP98_BROKER_HPP_
 #pragma once
 
-#include "shared_api_library/helics.h"
+#include "../shared_api_library/helics.h"
 
 #include <string>
 
@@ -34,16 +30,42 @@ class Broker
         broker = helicsCreateBrokerFromArgs (type.c_str(), name.c_str(), argc, argv);
     }
 
+    Broker(const Broker &brk)
+    {
+        broker = helicsBrokerClone(brk.broker);
+    }
+    Broker &operator=(const Broker &brk)
+    {
+        broker = helicsBrokerClone(brk.broker);
+        return *this;
+    }
     virtual ~Broker ()
     {
         helicsBrokerFree (broker);
     }
 
-    bool isConnected ()
+    bool isConnected () const
     {
         return helicsBrokerIsConnected (broker);
     }
-
+    void disconnect()
+    {
+        helicsBrokerDisconnect(broker);
+    }
+    std::string getIdentifier() const
+    {
+        char str[255];
+        helicsBrokerGetIdentifier(broker, &str[0], sizeof(str));
+        std::string result(str);
+        return result;
+    }
+    std::string getAddress() const
+    {
+        char str[255];
+        helicsBrokerGetAddress(broker, &str[0], sizeof(str));
+        std::string result(str);
+        return result;
+    }
   protected:
     helics_broker broker;
 };

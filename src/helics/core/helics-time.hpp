@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
@@ -41,14 +38,13 @@ struct iteration_time
     constexpr iteration_time (Time t, iteration_result iterate) noexcept : grantedTime (t), state (iterate){};
 };
 
-
 /** generate a time from a string,
 @details the string can be a double or with units
 @example "1.234",  or "1032ms"
 @return a helics time generated from the string
 @throw, invalid_argument if the string is not a valid time
 */
-Time loadTimeFromString(const std::string &timeString);
+Time loadTimeFromString (const std::string &timeString);
 
 /** generate a time from a string,
 @details the string can be a double or with units
@@ -56,12 +52,13 @@ Time loadTimeFromString(const std::string &timeString);
 @return a helics time generated from the string
 @throw, invalid_argument if the string is not a valid time
 */
-Time loadTimeFromString(const std::string &timeString, timeUnits defUnit);
+Time loadTimeFromString (const std::string &timeString, timeUnits defUnit);
 
 /** generate a time related unit,
 @return a timeUnits enumeration value
 @throw, invalid_argument if the string is not a valid unit
 */
-timeUnits timeUnitsFromString(const std::string &unitString);
+timeUnits timeUnitsFromString (const std::string &unitString);
 
-} // namespace helics
+}  // namespace helics
+

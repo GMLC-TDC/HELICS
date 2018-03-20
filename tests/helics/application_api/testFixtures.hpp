@@ -1,11 +1,9 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#pragma once
 
 #include <memory>
 
@@ -14,6 +12,17 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 
+#ifdef KEY_TESTS
+#ifndef DISABLE_TCP_CORE
+const std::string core_types[] = { "test",   "ipc",   "tcp",   "zmq",   "udp",
+"test_2","zmq_4", "ipc_2","test_4", "tcp_2", "zmq_2", "udp_2","test_3","zmq_3" };
+const std::string core_types_single[] = { "test",   "ipc",   "tcp",   "zmq",   "udp",
+"test_3","zmq_3" };
+#else
+const std::string core_types[] = { "test", "ipc", "zmq", "udp", "test_2","zmq_4", "ipc_2","test_4", "zmq_2", "udp_2","test_3","zmq_3" };
+const std::string core_types_single[] = { "test", "ipc", "zmq", "udp","test_3","zmq_3" };
+#endif
+#else // KEY_TESTS
 #ifdef QUICK_TESTS_ONLY
 #ifndef DISABLE_TCP_CORE
 const std::string core_types[] = {"test", "ipc_2", "tcp", "test_2", "zmq", "udp","test_3","zmq_3" };
@@ -22,7 +31,7 @@ const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp","tes
 const std::string core_types[] = {"test", "ipc_2", "test_2", "zmq", "udp","test_3","zmq_3" };
 const std::string core_types_single[] = {"test", "ipc", "zmq", "udp","test_3","zmq_3" };
 #endif
-#else
+#else // QUICK_TESTS_ONLY
 #ifndef DISABLE_TCP_CORE
 const std::string core_types[] = {"test",   "ipc",   "zmq",   "udp",   "tcp",
                                   "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2",
@@ -35,14 +44,12 @@ const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2"
 "test_4", "zmq_4", "udp_4" };
 const std::string core_types_single[] = {"test", "ipc", "zmq", "udp","test_3", "zmq_3", "udp_3" };
 #endif
-#endif
+#endif // QUICK_TESTS_ONLY
 
-#ifndef DISABLE_TCP_CORE
-const std::string travis_core_types[] = { "test",   "ipc",   "tcp",   "zmq",   "udp",
-"test_2","zmq_4", "ipc_2","test_4", "tcp_2", "zmq_2", "udp_2","test_3","zmq_3" };
-#else
-const std::string travis_core_types[] = { "test", "ipc", "zmq", "udp", "test_2","zmq_4", "ipc_2","test_4", "zmq_2", "udp_2","test_3","zmq_3" };
-#endif
+#endif //KEY_TESTS
+
+const std::string defaultNamePrefix = "fed";
+
 
 struct FederateTestFixture
 {
@@ -57,7 +64,7 @@ struct FederateTestFixture
     void SetupTest (const std::string &core_type_name,
                                 int count,
                                 helics::Time time_delta = helics::timeZero,
-                                const std::string &name_prefix = "fed")
+                                const std::string &name_prefix = defaultNamePrefix)
     {
         auto broker = AddBroker (core_type_name, count);
         AddFederates<FedType> (core_type_name, count, broker, time_delta, name_prefix);
@@ -68,7 +75,7 @@ struct FederateTestFixture
                                                         int count,
                                                         std::shared_ptr<helics::Broker> broker,
                                                         helics::Time time_delta = helics::timeZero,
-                                                        const std::string &name_prefix = "fed")
+                                                        const std::string &name_prefix = defaultNamePrefix)
     {
         bool hasIndex = hasIndexCode (core_type_name);
         int setup = (hasIndex) ? getIndexCode (core_type_name) : 1;
@@ -92,7 +99,7 @@ struct FederateTestFixture
 
         std::vector<std::shared_ptr<FedType>> federates_added;
 
-        
+
 
         switch (setup)
         {
@@ -192,7 +199,7 @@ struct FederateTestFixture
         }
         break;
         case 7: //two layers of subbrokers
-        {      
+        {
                 auto newTypeString = core_type_name;
                 newTypeString.push_back('_');
                 newTypeString.push_back('4');
@@ -224,3 +231,4 @@ struct FederateTestFixture
     int getIndexCode (const std::string &type_name);
     auto AddBrokerImp (const std::string &core_type_name, const std::string &initialization_string);
 };
+

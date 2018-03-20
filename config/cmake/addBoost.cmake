@@ -1,3 +1,4 @@
+SHOW_VARIABLE(BOOST_INSTALL_PATH PATH "Boost root directory" "${BOOST_INSTALL_PATH}")
 IF (MSVC)
 
 set (boost_versions
@@ -24,44 +25,39 @@ D:/boost
 
 # create an empty list
 list(APPEND boost_paths "")
-
+mark_as_advanced(BOOST_INSTALL_PATH)
 foreach( dir ${poss_prefixes})
 	foreach( boostver ${boost_versions})
 		IF (IS_DIRECTORY ${dir}/${boostver})
-			list(APPEND boost_paths ${dir}/${boostver})
+			IF (EXISTS ${dir}/${boostver}/boost/version.hpp)
+				list(APPEND boost_paths ${dir}/${boostver})
+			ENDIF()
 		ENDIF()
 	endforeach()
 endforeach()
 
-
 find_path(BOOST_TEST_PATH
 			NAMES 			boost/version.hpp
-			PATHS		${boost_paths}
+			PATHS		${BOOST_INSTALL_PATH}
+						${boost_paths}
 		)
 
 		if (BOOST_TEST_PATH)
 		set(BOOST_ROOT ${BOOST_TEST_PATH})
 		endif(BOOST_TEST_PATH)
+ELSE(MSVC)
+set(BOOST_ROOT "${BOOST_INSTALL_PATH}")
 ENDIF(MSVC)
 
-SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
+
 
 # Minimum version of Boost required for building HELICS
 set(BOOST_MINIMUM_VERSION 1.58)
 set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
-if (${MPI_C_FOUND})
-  #find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem mpi system date_time REQUIRED)
-  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options mpi unit_test_framework filesystem system date_time timer chrono mpi REQUIRED)
-ELSE(${MPI_C_FOUND})
-  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time timer chrono REQUIRED)
-ENDIF(${MPI_C_FOUND})
+find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time timer chrono REQUIRED)
 
 # Minimum version of Boost required for building test suite
 if (Boost_VERSION LESS 106100)
-if (BUILD_HELICS_TESTS)
-  set(BUILD_HELICS_TESTS OFF)
-  message(WARNING "Boost version >=1.61 required for building HELICS tests (Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION})")
-endif(BUILD_HELICS_TESTS)
   set(BOOST_VERSION_LEVEL 0)
 elseif (Boost_VERSION GREATER 106599)
 	#in 1.166 there were some changes to asio and inclusion of beast that will enable other components

@@ -1,10 +1,11 @@
-Recorder
+Source
 =======
 
-The Recorder application is one of the HELICS apps available with the library
-Its purpose is to provide a easy way to capture data from a federation
-It acts as a federate that can "capture" values or messages from specific publications
-or direct endpoints or cloned endpoints which exist elsewhere
+The Source app generates signals for other federates, it functions similarly to the 
+player but doesn't take a prescribed file instead it generates signals according to some
+mathematical function, like sine, ramp, pulse, or random walk. 
+THis can be useful for sending probing signals or just testing responses of the federate to various stimuli.
+
 
 Command line arguments
 ----------

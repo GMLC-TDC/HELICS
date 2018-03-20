@@ -1,8 +1,7 @@
 ##############################################################################
-#Copyright (C) 2017-2018, Battelle Memorial Institute
-#All rights reserved.
-
-#This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+# Copyright © 2017-2018,
+# Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+#All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 set(public_application_api_headers
 CombinationFederate.hpp
@@ -12,7 +11,7 @@ Endpoints.hpp
 Filters.hpp
 Federate.hpp
 helicsTypes.hpp
-Message.hpp
+data_view.hpp
 MessageFederate.hpp
 MessageOperators.hpp
 ValueConverter.hpp
@@ -51,8 +50,19 @@ FederateInfo.cpp
 
 add_library(application_api OBJECT ${application_api_sources} ${public_application_api_headers} ${private_application_api_headers})
 
-install(FILES ${public_application_api_headers} DESTINATION include/helics/application_api)
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
+IF (VERSION_OPTION)
+	IF (MSVC)
+		target_compile_options(application_api PUBLIC ${VERSION_OPTION})
+	ELSE()
+		target_compile_options(application_api PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+	ENDIF (MSVC)
+ENDIF(VERSION_OPTION)
+
+target_include_directories(application_api SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
+target_include_directories(application_api SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/ThirdParty)
+
+install(FILES ${public_application_api_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/application_api COMPONENT headers)
+
 
 link_directories(${external_link_directories})
 

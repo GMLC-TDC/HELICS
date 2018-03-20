@@ -1,15 +1,9 @@
 /*
-
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#ifndef _HELICS_BROKER_
-#define _HELICS_BROKER_
+
 #pragma once
 
 #include <string>
@@ -56,5 +50,5 @@ class Broker
     /** get the connection address for the broker*/
     virtual std::string getAddress () const = 0;
 };
-}
-#endif /*_HELICS_BROKER_*/
+}  // namespace helics
+

@@ -1,14 +1,10 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "ctestFixtures.hpp"
-#include "test_configuration.h"
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -20,19 +16,17 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 BOOST_FIXTURE_TEST_SUITE (filter_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-#if ENABLE_TEST_TIMEOUTS > 0
+
 namespace utf = boost::unit_test;
-#endif
 
 /** test registration of filters*/
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
-    AddFederates (helicsCreateMessageFederate, core_type, 2, broker, helics_time_zero, "filter");
-    AddFederates (helicsCreateMessageFederate, core_type, 2, broker, helics_time_zero, "message");
+    AddFederates (helicsCreateMessageFederate, core_type, 1, broker, helics_time_zero, "filter");
+    AddFederates (helicsCreateMessageFederate, core_type, 1, broker, helics_time_zero, "message");
 
     auto fFed = GetFederateAt (0);
     auto mFed = GetFederateAt (1);
@@ -58,9 +52,8 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-#if ENABLE_TEST_TIMEOUTS > 0 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
@@ -123,9 +116,8 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR(*utf::timeout(5))
-#endif
+
+BOOST_TEST_DECORATOR(*utf::timeout(20))
 BOOST_DATA_TEST_CASE(message_filter_function_two_stage, bdata::make(core_types), core_type)
 {
     auto broker = AddBroker(core_type, 3);
@@ -204,9 +196,8 @@ BOOST_DATA_TEST_CASE(message_filter_function_two_stage, bdata::make(core_types),
 /** test two filter operators
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
@@ -342,6 +333,7 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     BOOST_CHECK (state == helics_finalize_state);
 }
 
+/*
 BOOST_AUTO_TEST_CASE (message_multi_clone_test)
 {
     auto broker = AddBroker ("test", 4);
@@ -448,7 +440,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     CE (helicsFederateGetState (sFed, &state));
     BOOST_CHECK (state == helics_finalize_state);
 }
-
+*/
 BOOST_AUTO_TEST_CASE (test_file_load)
 {
     std::string filename = std::string(TEST_DIR) + "/test_files/example_filters.json";
@@ -459,6 +451,8 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     BOOST_CHECK_EQUAL (name, "filterFed");
 
     BOOST_CHECK_EQUAL (helicsFederateGetEndpointCount (mFed), 3);
+    helicsFederateFinalize(mFed);
+    helicsFederateFree(mFed);
     //auto id = mFed.getEndpointId ("ept1");
     //BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
 
@@ -471,3 +465,4 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     //mFed.disconnect ();
 }
 BOOST_AUTO_TEST_SUITE_END ()
+

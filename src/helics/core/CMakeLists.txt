@@ -1,8 +1,7 @@
 ##############################################################################
-#Copyright (C) 2017-2018, Battelle Memorial Institute
-#All rights reserved.
-
-#This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+# Copyright © 2017-2018,
+# Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+#All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 set(SRC_FILES
     CoreFactory.cpp
@@ -154,18 +153,25 @@ set(TCP_HEADER_FILES
 	endif()
 
 
-if (${ZeroMQ_FOUND})
+if (HELICS_HAVE_ZEROMQ)
    list(APPEND SRC_FILES ${ZMQ_SOURCE_FILES})
    list(APPEND INCLUDE_FILES ${ZMQ_HEADER_FILES})
-endif (${ZeroMQ_FOUND})
+endif (HELICS_HAVE_ZEROMQ)
 
 if (${MPI_C_FOUND})
    list(APPEND SRC_FILES ${MPI_SOURCE_FILES})
    list(APPEND INCLUDE_FILES ${MPI_HEADER_FILES})
 endif (${MPI_C_FOUND})
 
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
+
+IF (VERSION_OPTION)
+	IF (MSVC)
+		target_compile_options(helics_core PUBLIC ${VERSION_OPTION})
+	ELSE()
+		target_compile_options(helics_core PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+	ENDIF (MSVC)
+ENDIF(VERSION_OPTION)
 
 if (${MPI_C_FOUND})
 source_group("mpi" FILES ${MPI_SOURCE_FILES} ${MPI_HEADER_FILES})
@@ -179,18 +185,28 @@ if (NOT DISABLE_TCP_CORE)
    source_group("tcp" FILES ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
 endif()
 
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
+target_include_directories(helics_core SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
+target_include_directories(helics_core SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/ThirdParty)
 
-install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION include/helics/core)
+if (HELICS_HAVE_ZEROMQ)
+   target_include_directories (helics_core PRIVATE "${ZeroMQ_INCLUDE_DIR}")
+endif (HELICS_HAVE_ZEROMQ)
+
+if (HELICS_HAVE_MPI)
+   target_include_directories(helics_core PRIVATE "${MPI_C_INCLUDE_PATH}")
+endif(HELICS_HAVE_MPI)
+
+install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/core COMPONENT headers)
 
 OPTION(BUILD_BROKER "Build a helics Broker" ON)
 if (BUILD_BROKER)
 add_executable(helics_broker helics-broker.cpp)
    target_link_libraries(helics_broker helics-static)
+   target_include_directories(helics_broker SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
    set_target_properties (helics_broker PROPERTIES FOLDER apps)
    set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "build folder location of the broker")
    #message(STATUS "bloc ${CMAKE_CURRENT_BINARY_DIR}")
-   INSTALL(TARGETS helics_broker DESTINATION bin)
+   INSTALL(TARGETS helics_broker DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET helics_broker POST_BUILD        # Adds a post-build event to core tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
@@ -198,5 +214,4 @@ add_custom_command(TARGET helics_broker POST_BUILD        # Adds a post-build ev
         "$<TARGET_FILE_DIR:helics_broker>/")                 # <--this is out-file path
 endforeach(keyfile)
 endif()
-
 

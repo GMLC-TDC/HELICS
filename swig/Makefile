@@ -1,6 +1,6 @@
-# Copyright (C) 2017, Battelle Memorial Institute
-# All rights reserved.
-# This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+# Copyright © 2017-2018,
+# Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+# All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 
 # Makefile for creating our standalone Cython program
@@ -31,5 +31,4 @@ clean-all: clean clean-cpp
 build: clean
 	swig -I../src/helics/shared_api_library -python helics.i
 	gcc -fpic helics_wrap.c $(CPPINCLUDE) -I../src/helics/shared_api_library -shared -lhelicsSharedLib -L../../helics_install/lib -L$(LIBDIR1) -L$(LIBDIR2) -W,-rpath -W,$(LIBDIR1) -W,-rpath -W,$(LIBDIR2) -l$(PYLIB) $(LIBS) $(SYSLIBS) -o _helics.so
-
 

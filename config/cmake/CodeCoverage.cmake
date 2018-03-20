@@ -31,7 +31,7 @@
 # 2012-01-31, Lars Bilke
 # - Enable Code Coverage
 #
-# 2013-09-17, Joakim Söderberg
+# 2013-09-17, Joakim SÃ¶derberg
 # - Added support for Clang.
 # - Some additional usage instructions.
 #
@@ -237,3 +237,4 @@ function(APPEND_COVERAGE_COMPILER_FLAGS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COVERAGE_COMPILER_FLAGS}" PARENT_SCOPE)
     message(STATUS "Appending code coverage compiler flags: ${COVERAGE_COMPILER_FLAGS}")
 endfunction() # APPEND_COVERAGE_COMPILER_FLAGS
+

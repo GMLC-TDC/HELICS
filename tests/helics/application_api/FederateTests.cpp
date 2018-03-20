@@ -1,24 +1,21 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+
 #include "helics/application_api/Federate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
-#include "test_configuration.h"
 #include <future>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 /** these test cases test out the value converters
  */
 
+#define CORE_TYPE_TO_TEST helics::core_type::TEST
 BOOST_AUTO_TEST_SUITE (federate_tests)
 
 BOOST_AUTO_TEST_CASE (federate_initialize_tests)
@@ -101,7 +98,7 @@ BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
 
 BOOST_AUTO_TEST_CASE(federate_bad_broker_error_zmq)
 {
-   
+
     helics::FederateInfo fi("test1");
     fi.coreType = helics::core_type::ZMQ;
     fi.coreInitString = "1 --broker=b1 --tick=100 --timeout=2000";
@@ -278,3 +275,4 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls)
     Fed2->finalize ();
 }
 BOOST_AUTO_TEST_SUITE_END ()
+

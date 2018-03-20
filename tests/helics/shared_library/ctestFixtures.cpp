@@ -1,11 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "ctestFixtures.hpp"
 #include "helics/shared_api_library/internal/api_objects.h"
@@ -13,7 +9,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include <cctype>
 
-bool hasIndexCode (const std::string &type_name)
+static bool hasIndexCode (const std::string &type_name)
 {
     if (std::isdigit (type_name.back ()) != 0)
     {
@@ -25,9 +21,7 @@ bool hasIndexCode (const std::string &type_name)
     return false;
 }
 
-int getIndexCode (const std::string &type_name) { return static_cast<int> (type_name.back () - '0'); }
-
-auto StartBrokerImp (const std::string &core_type_name, const std::string &initialization_string)
+static auto StartBrokerImp (const std::string &core_type_name, const std::string &initialization_string)
 {
     if (hasIndexCode (core_type_name))
     {
@@ -73,10 +67,10 @@ FederateTestFixture::~FederateTestFixture ()
         if (fed)
         {
             federate_state state;
-            CE (helicsFederateGetState (fed, &state));
+            helicsFederateGetState (fed, &state);
             if (state != helics_finalize_state)
             {
-                CE (helicsFederateFinalize (fed));
+                helicsFederateFinalize (fed);
             }
             helicsFederateFree (fed);
         }
@@ -84,7 +78,7 @@ FederateTestFixture::~FederateTestFixture ()
     federates.clear ();
     for (auto &broker : brokers)
     {
-        CE (helicsBrokerDisconnect (broker));
+        helicsBrokerDisconnect (broker);
         helicsBrokerFree (broker);
     }
     brokers.clear ();
@@ -113,3 +107,4 @@ helics_broker FederateTestFixture::AddBroker (const std::string &core_type_name,
     brokers.push_back (broker);
     return broker;
 }
+

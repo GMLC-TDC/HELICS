@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was modified by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute;
-the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence
-Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 /*
  * LLNS Copyright Start
@@ -150,7 +147,10 @@ AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::st
             if (ptr->getBaseService ().stopped ())
             {
                 // std::cout << "run Service loop already stopped" << ptr->runCounter << "\n";
-                ptr->loopRet.get ();
+                if (ptr->loopRet.valid())
+                {
+                    ptr->loopRet.get();
+                }
                 ptr->nullwork = std::make_unique<boost::asio::io_service::work> (ptr->getBaseService ());
                 ptr->running = true;
                 ptr->loopRet = std::async (std::launch::async, [ptr]() { serviceRunLoop (ptr); });
@@ -173,10 +173,13 @@ void AsioServiceManager::haltServiceLoop ()
         if (runCounter <= 0)
         {
             //    std::cout << "calling halt on service loop \n";
-            nullwork.reset ();
-            iserv->stop ();
-            loopRet.get ();
-            iserv->reset ();  // prepare for future runs
+            if (nullwork)
+            {
+                nullwork.reset();
+                iserv->stop();
+                loopRet.get();
+                iserv->reset();  // prepare for future runs
+            }
         }
     }
     else
@@ -202,3 +205,4 @@ void serviceRunLoop (std::shared_ptr<AsioServiceManager> ptr)
     // std::cout << "service loop stopped\n";
     ptr->running.store (false);
 }
+

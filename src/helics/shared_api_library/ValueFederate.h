@@ -1,10 +1,7 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 /** @file
@@ -22,17 +19,17 @@ extern "C" {
 /* sub/pub registration */
 
 /** a sequence of characters*/
-#define HELICS_STRING_TYPE 0
+#define HELICS_DATA_TYPE_STRING 0
 /** a double precision floating point number*/
-#define HELICS_DOUBLE_TYPE 1
+#define HELICS_DATA_TYPE_DOUBLE 1
 /** a 64 bit integer*/
-#define HELICS_INT_TYPE 2
+#define HELICS_DATA_TYPE_INT 2
 /** a pair of doubles representing a complex number*/
-#define HELICS_COMPLEX_TYPE 3
+#define HELICS_DATA_TYPE_COMPLEX 3
 /** an array of doubles*/
-#define HELICS_VECTOR_TYPE 4
+#define HELICS_DATA_TYPE_VECTOR 4
 /** raw data type*/
-#define HELICS_RAW_TYPE 25
+#define HELICS_DATA_TYPE_RAW 25
 
 /** create a subscription
 @details the subscription becomes part of the federate and is destroyed when the federate is freed so there are no separate free functions
@@ -84,8 +81,8 @@ HELICS_Export helics_subscription helicsFederateRegisterOptionalSubscription (he
 for subscriptions and publications optional implies that there may or may not be matching publication elsewhere in the federation
 @param fed the federate object in which to create a subscription
 @param key the identifier matching a publication to get a subscription for
-@param type a known type identifier HELICS_STRING_TYPE, HELICS_INT_TYPE, HELICS_DOUBLE_TYPE, HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE,
-HELICS_RAW_TYPE
+@param type a known type identifier HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT, HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR,
+HELICS_DATA_TYPE_RAW
 @param units a string listing the units of the subscription maybe NULL
 @return an object containing the subscription
 */
@@ -370,7 +367,7 @@ HELICS_Export helics_status helicsPublicationGetUnits (helics_publication pub, c
 
 /**@}*/
 
-/** check if a particular subscription was updated 
+/** check if a particular subscription was updated
 @return true if it has been updated since the last value retrieval*/
 HELICS_Export helics_bool_t helicsSubscriptionIsUpdated (helics_subscription sub);
 /** get the last time a subscription was updated */
@@ -388,3 +385,4 @@ HELICS_Export int helicsFederateGetSubscriptionCount(helics_federate fed);
 #endif
 
 #endif /* HELICS_APISHARED_VALUE_FEDERATE_FUNCTIONS_H_*/
+

@@ -1,8 +1,8 @@
+if (BOOST_VERSION_LEVEL GREATER 0)
+	add_subdirectory (helics)
+else()
+  message(WARNING "Boost version >=1.61 required for building HELICS tests (Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION})")
+endif()
 
-if (ENABLE_TEST_TIMEOUTS)
-add_definitions(-DENABLE_TEST_TIMEOUTS=1)
-else(ENABLE_TEST_TIMEOUTS)
-add_definitions(-DENABLE_TEST_TIMEOUTS=0)
-endif(ENABLE_TEST_TIMEOUTS)
 
-add_subdirectory (helics)
+

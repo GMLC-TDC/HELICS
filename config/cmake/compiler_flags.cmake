@@ -13,11 +13,11 @@ IF(UNIX)
   set(Boost_NO_BOOST_CMAKE ON)
 
   set(Boost_USE_MULTITHREADED      OFF)   # Needed if MT libraries not built
-  
+
   if (ENABLE_ERROR_ON_WARNINGS)
   add_compile_options(-Werror)
   endif(ENABLE_ERROR_ON_WARNINGS)
-  
+
    if (ENABLE_EXTRA_COMPILER_WARNINGS)
   add_compile_options(-Wall -pedantic)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wextra>)
@@ -53,7 +53,7 @@ ELSE(UNIX)
     if (ENABLE_ERROR_ON_WARNINGS)
   add_compile_options(-Werror)
   endif(ENABLE_ERROR_ON_WARNINGS)
-  
+
   if (ENABLE_EXTRA_COMPILER_WARNINGS)
   add_compile_options(-Wall -pedantic)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wextra>)
@@ -65,7 +65,7 @@ ELSE(UNIX)
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wredundant-decls>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wcast-align>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
-  
+
   #this options produces lots of warning but is useful for checking ever once in a while with Clang, GCC warning notices with this aren't as useful
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -88,7 +88,7 @@ IF(MSVC)
   if (ENABLE_ERROR_ON_WARNINGS)
   add_compile_options(/WX)
   endif(ENABLE_ERROR_ON_WARNINGS)
-  
+
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
   add_compile_options(/MP /EHsc)
@@ -106,8 +106,7 @@ ENDIF(UNIX)
 # -------------------------------------------------------------
 OPTION(ENABLE_CXX_17 "set to ON to enable C++17 compilation features" OFF)
 include(CheckLatestCXXStandardOption)
-IF (VERSION_OPTION)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
-ELSE ()
+IF (NOT VERSION_OPTION)
 	set(CMAKE_CXX_STANDARD 14)
 ENDIF ()
+

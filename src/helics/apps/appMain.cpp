@@ -1,15 +1,13 @@
 /*
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "Player.hpp"
 #include "Recorder.hpp"
 #include "Echo.hpp"
+#include "Tracer.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsVersion.hpp"
@@ -24,7 +22,7 @@ void showHelp()
         std::cout << "helics_app --version or -v will show the helics version string\n";
 }
 int main (int argc, char *argv[])
-{ 
+{
     if (argc == 1)
     {
         showHelp();
@@ -32,7 +30,7 @@ int main (int argc, char *argv[])
     std::string arg1(argv[1]);
     //now redo the arguments remove the second argument which is the app name
     argc -= 1;
-    for (int ii = 2; ii < argc; ++ii)
+    for (int ii = 2; ii <= argc; ++ii)
     {
         argv[ii - 1] = argv[ii];
     }
@@ -40,21 +38,21 @@ int main (int argc, char *argv[])
     {
         if (arg1 == "player")
         {
-            helics::Player Player(argc, argv);
+            helics::apps::Player Player(argc, argv);
             if (Player.isActive())
             {
                 Player.run();
             }
-            
+
         }
         else if (arg1 == "recorder")
         {
-            helics::Recorder Recorder(argc, argv);
+            helics::apps::Recorder Recorder(argc, argv);
             if (Recorder.isActive())
             {
                 Recorder.run();
             }
-           
+
         }
         else if ((arg1 == "--version")||(arg1=="-v"))
         {
@@ -66,7 +64,7 @@ int main (int argc, char *argv[])
         }
         else if (arg1 == "echo")
         {
-            helics::Echo Echo(argc, argv);
+            helics::apps::Echo Echo(argc, argv);
             if (Echo.isActive())
             {
                 Echo.run();
@@ -82,7 +80,12 @@ int main (int argc, char *argv[])
         }
         else if (arg1 == "tracer")
         {
-
+            helics::apps::Tracer Tracer(argc, argv);
+            if (Tracer.isActive())
+            {
+                Tracer.enableTextOutput();
+                Tracer.run();
+            }
         }
         else
         {
@@ -102,9 +105,10 @@ int main (int argc, char *argv[])
         helics::cleanupHelicsLibrary();
         return (-4);
     }
-    
+
 
     helics::cleanupHelicsLibrary();
     return 0;
-   
+
 }
+
