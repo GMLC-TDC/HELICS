@@ -21,6 +21,7 @@ class FilterCoordinator
     FilterInfo *destFilter = nullptr;  //!< the destination operator handle
 
 	std::vector<FilterInfo *> allSourceFilters; //!< storage for all the source filters before sorting
+    std::vector<FilterInfo *> cloningDestFilters;  //!< storage for cloning destination filters
     bool hasSourceFilter = false;  //!< indicator that an endpoint has source filters
     bool hasDestFilter = false;  //!< indicator that an endpoint has a destination filter
     int ongoingTransactions = 0;  //!< counter for the number of filtered message returns expected
