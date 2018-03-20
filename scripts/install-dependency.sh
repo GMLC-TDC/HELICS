@@ -151,7 +151,19 @@ install_path=$3
 
 compiler_toolset=$4
 if [[ -z $compiler_toolset ]]; then
-    compiler_toolset=gcc
+    case "$COMPILER" in
+        gcc*)
+            compiler_toolset=gcc
+            ;;
+        clang*)
+            compiler_toolset=clang
+            ;;
+        intel*)
+            compiler_toolset=intel
+            ;;
+        *)
+            compiler_toolset=gcc
+    esac
 fi
 
 if [[ "$CXX_STANDARD" == 17 ]]; then
