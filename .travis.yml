@@ -154,6 +154,7 @@ branches:
 before_install:
   - eval "${MATRIX_EVAL}"
   - $CXX --version
+  - java --version
 
 install:
   - source scripts/install-ci-dependencies.sh
