@@ -12,6 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cstdint>
 #include <string>
 #include <vector>
+#include "helics\helics-config.h"
 #include <helics_includes/variant.hpp>
 /** @file
 @brief naming a set of types that are interchangeable and recognizable inside the HELICS application API and core
@@ -19,12 +20,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 /** define a variant with the different types*/
+
 using defV = mpark::variant<double,
-                            int64_t,
-                            std::string,
-                            std::complex<double>,
-                            std::vector<double>,
-                            std::vector<std::complex<double>>>;
+    int64_t,
+    std::string,
+    std::complex<double>,
+    std::vector<double>,
+    std::vector<std::complex<double>>>;
 
 /**enumeration of the order inside the variant so the Which function returns match the enumeration*/
 enum type_location

@@ -46,6 +46,7 @@ static const ArgDescriptors InfoArgs{
     {"clone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to clone all packets to and from"},
     {"capture", ArgDescriptor::arg_type_t::vector_string,"capture all the publications of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list"},
     {"output,o","the output file for recording the data"},
+    {"allow_iteration", ArgDescriptor::arg_type_t::flag_type,"allow iteration on values"},
     {"mapfile", "write progress to a memory mapped file"}
 };
 
@@ -287,7 +288,10 @@ void Recorder::writeJsonFile (const std::string &filename)
             point["key"] = subscriptions[v.index].getKey ();
             point["value"] = v.value;
             point["time"] = static_cast<double> (v.time);
-
+            if (v.iteration > 0)
+            {
+                point["iteration"] = v.iteration;
+            }
             if (v.first)
             {
                 point["type"] = subscriptions[v.index].getType ();
@@ -342,8 +346,17 @@ void Recorder::writeTextFile (const std::string &filename)
         }
         else
         {
-            outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getKey () << '\t'
+            if (v.iteration > 0)
+            {
+                outFile << static_cast<double> (v.time)<<':'<<v.iteration << "\t\t" << subscriptions[v.index].getKey() << '\t'
                     << v.value << '\n';
+            }
+            else
+            {
+                outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getKey() << '\t'
+                    << v.value << '\n';
+            }
+           
         }
     }
     if (!messages.empty ())

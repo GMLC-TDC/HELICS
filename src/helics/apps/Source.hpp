@@ -31,6 +31,9 @@ class SourceObject
 {
   public:
     Publication pub;
+    Time period;
+    Time nextTime;
+    int generatorIndex;
     // source type
 };
 
@@ -94,9 +97,18 @@ class Source
     /** add a publication to a source
     @param key the key of the publication to add
     @param type the type of the publication
+    @param period the period of the publication
     @param units the units associated with the publication
     */
-    void addSource (const std::string &key, helics_type_t type, const std::string &units = "");
+    void addPublication (const std::string &key, helics_type_t type, Time period, const std::string &units = "");
+    /** add a signal generator to the source object
+    @return an index for later reference of the signal generator
+    */
+    int addSignalGenerator(const std::string &name, const std::string &type);
+    /** tie a publication to a signal generator*/
+    void linkPublicationToGenerator(const std::string &key, const std::string &generator);
+    /** tie a publication to a signal generator*/
+    void linkPublicationToGenerator(const std::string &key, int genIndex);
 
   private:
     int loadArguments (boost::program_options::variables_map &vm_map);
@@ -108,8 +120,14 @@ class Source
   private:
     std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the source
     std::vector<SourceObject> sources;  //!< the actual publication objects
+    std::map<std::string, int> generatorIndex; //!< map of generator names to indices
+    std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
+    std::map<std::string, int> pubids;  //!< publication id map
     Time stopTime = Time::maxVal ();  //!< the time the source should stop
-    bool deactivated = false;
+    Time defaultPeriod = 1.0; //!< the default period of publication
+    bool deactivated = false; //!< indicator that the app is disabled
+    bool useLocal = false;
+    bool fileLoaded = false;
 };
 }  // namespace apps
 } // namespace helics

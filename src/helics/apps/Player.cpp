@@ -40,7 +40,7 @@ namespace helics
 {
 namespace apps
 {
-static inline bool vComp (const ValueSetter &v1, const ValueSetter &v2) { return (v1.time < v2.time); }
+static inline bool vComp (const ValueSetter &v1, const ValueSetter &v2) { return (v1.time==v2.time)?(v1.iteration<v2.iteration):(v1.time < v2.time); }
 static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { return (m1.sendTime < m2.sendTime); }
 
 static const ArgDescriptors InfoArgs{
@@ -289,11 +289,23 @@ void Player::loadTextFile (const std::string &filename)
         }
         else
         {
-            if (blk.size () == 3)
+            if (blk.size() == 3)
             {
-                if ((points[pIndex].time = extractTime(blk[0], lcount)) == Time::minVal())
+                auto cloc = blk[0].find_last_not_of(':');
+                if (cloc == std::string::npos)
                 {
-                    continue;
+                    if ((points[pIndex].time = extractTime(trim(blk[0]), lcount)) == Time::minVal())
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0,cloc-1), lcount)) == Time::minVal())
+                    {
+                        continue;
+                    }
+                    points[pIndex].iteration = std::stoi(blk[0].substr(cloc + 1));
                 }
 
                 points[pIndex].pubName = blk[1];
@@ -302,9 +314,21 @@ void Player::loadTextFile (const std::string &filename)
             }
             else if (blk.size () == 4)
             {
-                if ((points[pIndex].time = extractTime(trim(blk[0]), lcount)) == Time::minVal())
+                auto cloc = blk[0].find_last_not_of(':');
+                if (cloc == std::string::npos)
                 {
-                    continue;
+                    if ((points[pIndex].time = extractTime(trim(blk[0]), lcount)) == Time::minVal())
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc - 1), lcount)) == Time::minVal())
+                    {
+                        continue;
+                    }
+                    points[pIndex].iteration = std::stoi(blk[0].substr(cloc + 1));
                 }
                 points[pIndex].pubName = blk[1];
                 points[pIndex].type = blk[2];
@@ -388,13 +412,34 @@ void Player::loadJsonFile (const std::string &jsonFile)
         for (const auto &pointElement : pointArray)
         {
             Time ptime;
+            int iterationIndex = 0;
             if (pointElement.isMember ("time"))
             {
-                ptime=loadJsonTime(pointElement["time"], units);
+                auto str = pointElement["time"].asString();
+                auto cloc = str.find_last_of(':');
+                if (cloc != std::string::npos)
+                {
+                    ptime = loadJsonTime(str, units);
+                }
+                else
+                {
+                    ptime = loadJsonTime(str.substr(0,cloc-1), units);
+                    iterationIndex = std::stoi(str.substr(cloc + 1));
+                }
             }
             else if (pointElement.isMember("t"))
             {
-                ptime = loadJsonTime(pointElement["t"],units);
+                auto str = pointElement["t"].asString();
+                auto cloc = str.find_last_of(':');
+                if (cloc != std::string::npos)
+                {
+                    ptime = loadJsonTime(str, units);
+                }
+                else
+                {
+                    ptime = loadJsonTime(str.substr(0, cloc - 1), units);
+                    iterationIndex = std::stoi(str.substr(cloc + 1));
+                }
             }
             else
             {
@@ -439,6 +484,10 @@ void Player::loadJsonFile (const std::string &jsonFile)
             {
                 type = pointElement["type"].asString();
             }
+            if (pointElement.isMember("iteration"))
+            {
+                iterationIndex = pointElement["iteration"].asInt();
+            }
             std::string key;
             if (pointElement.isMember("key"))
             {
@@ -451,6 +500,7 @@ void Player::loadJsonFile (const std::string &jsonFile)
             }
             points.resize (points.size () + 1);
             points.back ().time = ptime;
+            points.back().iteration = iterationIndex;
             points.back ().pubName = key;
             points.back ().value = val;
             if (!type.empty ())

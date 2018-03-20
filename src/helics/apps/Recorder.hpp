@@ -34,6 +34,7 @@ namespace apps
     public:
         helics::Time time;
         int index=-1;
+        int16_t iteration = 0;
         bool first = false;
         std::string value;
         ValueCapture() = default;
@@ -174,6 +175,7 @@ namespace apps
         std::string outFileName;    //!< the final output file
         Time autoStopTime = Time::maxVal(); //!< the stop time
         bool deactivated = false;
+        bool allow_iteration = false;  //!< flag to allow iteration of the federate for time requests
     };
 
 }  // namespace apps

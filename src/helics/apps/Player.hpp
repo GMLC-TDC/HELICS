@@ -33,6 +33,7 @@ class ValueSetter
 {
   public:
     Time time;
+    int iteration = 0;
     int index;
     std::string type;
     std::string pubName;

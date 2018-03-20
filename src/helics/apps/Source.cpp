@@ -29,7 +29,8 @@ namespace apps
 {
 using namespace std::string_literals;
 static const ArgDescriptors InfoArgs{
-    { "stop", "the time to stop recording" }
+    { "stop", "the time to stop recording" },
+    {"default_period","the default period publications"}
 };
 
 Source::Source (int argc, char *argv[])
@@ -160,39 +161,71 @@ void Source::run (Time stopTime_input)
     }
 }
 
-void Source::addSource(const std::string & /*key*/, helics_type_t /*type*/, const std::string &/*units*/)
+void Source::addPublication(const std::string  &key, helics_type_t type, Time period, const std::string &units)
 {
     // skip already existing publications
- //   if (pubids.find (key) != pubids.end ())
-  //  {
-   //     std::cerr << "publication already exists\n";
-   // }
-  //  publications.push_back (Publication (GLOBAL, fed.get (), key, type, units));
-//    pubids[key] = static_cast<int> (publications.size ()) - 1;
+    if (pubids.find (key) != pubids.end ())
+    {
+        std::cerr << "publication already exists\n";
+        return;
+    }
+    SourceObject newObj;
+    
+    newObj.pub=Publication (useLocal?LOCAL:GLOBAL, fed.get (), key, type, units);
+    newObj.period = period;
+    sources.push_back(newObj);
+    pubids[key] = static_cast<int> (sources.size ()) - 1;
 }
 
+int Source::addSignalGenerator(const std::string &name, const std::string &type)
+{
+    return 0;
+}
+
+/** tie a publication to a signal generator*/
+void Source::linkPublicationToGenerator(const std::string &key, const std::string &generator)
+{
+
+}
+
+/** tie a publication to a signal generator*/
+void Source::linkPublicationToGenerator(const std::string &key, int genIndex)
+{
+
+}
 
 int Source::loadArguments (boost::program_options::variables_map &vm_map)
 {
-    if (vm_map.count ("input") == 0)
+    std::string file;
+    if (vm_map.count("input") == 0)
     {
-        return (-1);
+        if (!fileLoaded)
+        {
+            if (filesystem::exists("helics.json"))
+            {
+                file = "helics.json";
+            }
+        }
+    }
+    if (filesystem::exists(vm_map["input"].as<std::string>()))
+    {
+        file = vm_map["input"].as<std::string>();
+    }
+    if (!file.empty())
+    {
+        loadFile(file);
     }
 
-
-    if (!filesystem::exists (vm_map["input"].as<std::string> ()))
+    if (vm_map.count("stop") > 0)
     {
-        std::cerr << vm_map["input"].as<std::string> () << " does not exist \n";
-        return -3;
+        stopTime = loadTimeFromString(vm_map["stop"].as<std::string>());
     }
-    loadFile (vm_map["input"].as<std::string> ());
 
  //   std::cout << "read file " << points.size () << " points for " << tags.size () << " tags \n";
 
-    stopTime = Time::maxVal ();
-    if (vm_map.count ("stop") > 0)
+    if (vm_map.count("default_period") == 0)
     {
-        stopTime = vm_map["stop"].as<double> ();
+        defaultPeriod = loadTimeFromString(vm_map["default_period"].as<std::string>());
     }
     return 0;
 }
