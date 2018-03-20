@@ -65,6 +65,7 @@ jobs:
     #  osx_image: xcode8.3
 
     - <<: *linux_base
+      language: java
       addons:
         apt:
           sources:
