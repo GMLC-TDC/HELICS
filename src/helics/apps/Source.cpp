@@ -27,6 +27,17 @@ namespace helics
 {
 namespace apps
 {
+
+void SignalGenerator::set(const std::string & /*parameter*/, double /*val*/)
+{
+
+}
+/** set a string parameter*/
+void SignalGenerator::setString(const std::string & /*parameter*/, const std::string &/*val*/)
+{
+
+}
+
 using namespace std::string_literals;
 static const ArgDescriptors InfoArgs{
     { "stop", "the time to stop recording" },
@@ -177,19 +188,19 @@ void Source::addPublication(const std::string  &key, helics_type_t type, Time pe
     pubids[key] = static_cast<int> (sources.size ()) - 1;
 }
 
-int Source::addSignalGenerator(const std::string &name, const std::string &type)
+int Source::addSignalGenerator(const std::string & /*name*/, const std::string & /*type*/)
 {
     return 0;
 }
 
 /** tie a publication to a signal generator*/
-void Source::linkPublicationToGenerator(const std::string &key, const std::string &generator)
+void Source::linkPublicationToGenerator(const std::string & /*key*/, const std::string & /*generator*/)
 {
 
 }
 
 /** tie a publication to a signal generator*/
-void Source::linkPublicationToGenerator(const std::string &key, int genIndex)
+void Source::linkPublicationToGenerator(const std::string & /*key*/, int /*genIndex*/)
 {
 
 }

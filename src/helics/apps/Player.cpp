@@ -708,11 +708,20 @@ void Player::finalize()
     fed->finalize();
 }
 
-void Player::sendInformation(Time sendTime)
+void Player::sendInformation(Time sendTime, int iteration)
 {
     if (!points.empty())
     {
-        while (points[pointIndex].time <= sendTime)
+        while (points[pointIndex].time < sendTime)
+        {
+            publications[points[pointIndex].index].publish(points[pointIndex].value);
+            ++pointIndex;
+            if (pointIndex >= points.size())
+            {
+                break;
+            }
+        }
+        while ((points[pointIndex].time == sendTime)&&(points[pointIndex].iteration==iteration))
         {
             publications[points[pointIndex].index].publish(points[pointIndex].value);
             ++pointIndex;
@@ -789,16 +798,20 @@ void Player::run (Time stopTime_input)
     helics::Time nextPrintTime = 10.0;
     bool moreToSend = true;
     Time nextSendTime = timeZero;
+    int nextIteration = 0;
+    int currentIteration = 0;
     while (moreToSend)
     {
         nextSendTime = Time::maxVal ();
         if (pointIndex < points.size ())
         {
             nextSendTime = std::min (nextSendTime, points[pointIndex].time);
+            nextIteration = points[pointIndex].iteration;
         }
         if (messageIndex < messages.size ())
         {
             nextSendTime = std::min (nextSendTime, messages[messageIndex].sendTime);
+            nextIteration = 0;
         }
         if (nextSendTime > stopTime_input)
         {
@@ -809,14 +822,24 @@ void Player::run (Time stopTime_input)
             moreToSend = false;
             continue;
         }
-        auto newTime = fed->requestTime (nextSendTime);
-        sendInformation(newTime);
-
-        if (newTime >= nextPrintTime)
+        if (nextIteration == 0)
         {
-            std::cout << "processed time " << static_cast<double> (newTime) << "\n";
-            nextPrintTime += 10.0;
+            auto newTime = fed->requestTime(nextSendTime);
+            sendInformation(newTime, currentIteration);
+
+            if (newTime >= nextPrintTime)
+            {
+                std::cout << "processed time " << static_cast<double> (newTime) << "\n";
+                nextPrintTime += 10.0;
+            }
         }
+        else
+        {
+            fed->requestTimeIterative(nextSendTime, helics_iteration_request::force_iteration);
+            ++currentIteration;
+            sendInformation(nextSendTime, currentIteration);
+        }
+        
     }
 }
 

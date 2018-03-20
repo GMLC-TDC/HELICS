@@ -433,7 +433,7 @@ void Recorder::loadCaptureInterfaces ()
     }
 }
 
-void Recorder::captureForCurrentTime (Time currentTime)
+void Recorder::captureForCurrentTime (Time currentTime, int iteration)
 {
     for (auto &sub : subscriptions)
     {
@@ -442,6 +442,11 @@ void Recorder::captureForCurrentTime (Time currentTime)
             auto val = sub.getValue<std::string> ();
             int ii = subids[sub.getID ()];
             points.emplace_back (currentTime, ii, val);
+            if (iteration > 0)
+            {
+                points.back().iteration = iteration;
+            }
+           
             if (vStat[ii].cnt == 0)
             {
                 points.back ().first = true;
@@ -496,22 +501,35 @@ void Recorder::run (Time runToTime)
     {
         while (true)
         {
-            auto T = fed->requestTime (runToTime);
-            if (T < runToTime)
+            helics::Time T;
+            int iteration = 0;
+            if (allow_iteration)
             {
-                captureForCurrentTime (T);
-                if (!mapfile.empty ())
+                auto ItRes = fed->requestTimeIterative(runToTime, helics_iteration_request::iterate_if_needed);
+                if (ItRes.state == iteration_result::next_step)
                 {
-                    std::ofstream out (mapfile);
-                    for (auto &stat : vStat)
-                    {
-                        out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t'
-                            << stat.lastVal << '\n';
-                    }
-                    out.flush ();
+                    iteration = 0;
                 }
+                T = ItRes.grantedTime;
+                captureForCurrentTime(T, iteration);
+                ++iteration;
             }
             else
+            {
+                T = fed->requestTime(runToTime);
+                captureForCurrentTime(T);
+            }
+            if (!mapfile.empty())
+            {
+                std::ofstream out(mapfile);
+                for (auto &stat : vStat)
+                {
+                    out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t'
+                        << stat.lastVal << '\n';
+                }
+                out.flush();
+            }
+            if (T >= runToTime)
             {
                 break;
             }
@@ -691,6 +709,10 @@ int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
         {
             addDestEndpointClone (clone);
         }
+    }
+    if (vm_map.count("allow_iteration") > 0)
+    {
+        allow_iteration = true;
     }
     if (vm_map.count ("mapfile") > 0)
     {

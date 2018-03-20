@@ -128,7 +128,7 @@ class Tracer
 
     void initialize ();
     void generateInterfaces ();
-    void captureForCurrentTime (Time currentTime);
+    void captureForCurrentTime (Time currentTime, int iteration=0);
     void loadCaptureInterfaces ();
 
 
@@ -148,6 +148,7 @@ class Tracer
     Time autoStopTime = Time::maxVal ();  //!< the stop time
     bool deactivated = false;
     bool printMessage = false;
+    bool allow_iteration = false;  //!< flag to allow iteration of the federate for time requests
     std::function<void(Time, std::unique_ptr<Message>)> clonedMessageCallback;
     std::function<void(Time, const std::string &, std::unique_ptr<Message>)> endpointMessageCallback;
     std::function<void(Time, const std::string &, const std::string &)> valueCallback;

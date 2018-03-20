@@ -45,6 +45,7 @@ static const ArgDescriptors InfoArgs{
     {"sourceclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture generated packets from, this argument may be specified multiple time"},
     {"destclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture all packets with the specified endpoint as a destination, this argument may be specified multiple time"},
     {"clone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to clone all packets to and from"},
+    { "allow_iteration", ArgDescriptor::arg_type_t::flag_type,"allow iteration on values" },
     {"capture", ArgDescriptor::arg_type_t::vector_string,"capture all the publications and endpoints of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list"},
 };
 
@@ -310,7 +311,7 @@ void Tracer::loadCaptureInterfaces()
     }
 }
 
-void Tracer::captureForCurrentTime(Time currentTime)
+void Tracer::captureForCurrentTime(Time currentTime, int iteration)
 {
     static auto logger = LoggerManager::getLoggerCore();
     for (auto &sub : subscriptions)
@@ -324,12 +325,26 @@ void Tracer::captureForCurrentTime(Time currentTime)
                 std::string valstr;
                 if (val.size() < 150)
                 {
-                    valstr = (boost::format("[%f]value %s=%s") % currentTime % sub.getKey() % val).str();
-
+                    if (iteration > 0)
+                    {
+                        valstr = (boost::format("[%f:%d]value %s=%s") % currentTime %iteration% sub.getKey() % val).str();
+                    }
+                    else
+                    {
+                        valstr = (boost::format("[%f]value %s=%s") % currentTime % sub.getKey() % val).str();
+                    }
                 }
                 else
                 {
-                    valstr = (boost::format("[%f]value %s=block[%d]") % currentTime % sub.getKey() % val.size()).str();
+                    if (iteration > 0)
+                    {
+                        valstr = (boost::format("[%f:%d]value %s=block[%d]") % currentTime %iteration% sub.getKey() % val.size()).str();
+                    }
+                    else
+                    {
+                        valstr = (boost::format("[%f]value %s=block[%d]") % currentTime % sub.getKey() % val.size()).str();
+                    }
+                   
                 }
                 logger->addMessage(std::move(valstr));
             }
@@ -410,13 +425,25 @@ void Tracer::run(Time runToTime)
     {
         while (true)
         {
-            auto T = fed->requestTime(runToTime);
-            if (T < runToTime)
+            helics::Time T;
+            int iteration = 0;
+            if (allow_iteration)
             {
-                captureForCurrentTime(T);
-
+                auto ItRes = fed->requestTimeIterative(runToTime, helics_iteration_request::iterate_if_needed);
+                if (ItRes.state == iteration_result::next_step)
+                {
+                    iteration = 0;
+                }
+                T = ItRes.grantedTime;
+                captureForCurrentTime(T,iteration);
+                ++iteration;
             }
             else
+            {
+                T = fed->requestTime(runToTime);
+                captureForCurrentTime(T);
+            }
+            if (T >= runToTime)
             {
                 break;
             }
@@ -549,7 +576,10 @@ int Tracer::loadArguments(boost::program_options::variables_map &vm_map)
             addDestEndpointClone(clone);
         }
     }
-
+    if (vm_map.count("allow_iteration") > 0)
+    {
+        allow_iteration = true;
+    }
     if (vm_map.count("stop") > 0)
     {
         autoStopTime = loadTimeFromString(vm_map["stop"].as<std::string>());

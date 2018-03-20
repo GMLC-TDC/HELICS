@@ -205,7 +205,7 @@ class Player
     /** function to decode data strings for messages*/
     std::string decode (std::string &&stringToDecode);
     /** send all points and messages up to the specified time*/
-    void sendInformation (Time sendTime);
+    void sendInformation (Time sendTime, int iteration=0);
 
     /** extract a time from the string based on Player parameters
     @param str the string containing the time

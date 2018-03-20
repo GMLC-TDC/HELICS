@@ -153,7 +153,7 @@ namespace apps
 
         void initialize();
         void generateInterfaces();
-        void captureForCurrentTime(Time currentTime);
+        void captureForCurrentTime(Time currentTime, int iteration=0);
         void loadCaptureInterfaces();
         /** encode the string in base64 if needed otherwise just return the string*/
         std::string encode(const std::string &str2encode);
