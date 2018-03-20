@@ -221,6 +221,28 @@ bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const
     return true;
 }
 
+
+constexpr Core::federate_id_t global_federate_id_shift = 0x0001'0000;
+/** a shift in the global id index to discriminate between global ids of brokers vs federates*/
+constexpr Core::federate_id_t global_broker_id_shift = 0x7000'0000;
+
+bool TimeDependencies::hasActiveTimeDependencies() const
+{
+    for (const auto &dep : dependencies)
+    {
+        //We only care about federates not brokers or cores
+            if ((dep.fedID >= global_federate_id_shift) && (dep.fedID < global_broker_id_shift))
+            {
+                if (dep.Tnext < Time::maxVal())
+                {
+                    return true;
+                }
+            
+        }
+    }
+    return false;
+}
+
 void TimeDependencies::resetIteratingExecRequests ()
 {
     for (auto &dep : dependencies)

@@ -104,8 +104,6 @@ helics_warning = _helics.helics_warning
 helics_invalid_state_transition = _helics.helics_invalid_state_transition
 helics_invalid_function_call = _helics.helics_invalid_function_call
 helics_error = _helics.helics_error
-helics_true = _helics.helics_true
-helics_false = _helics.helics_false
 no_iteration = _helics.no_iteration
 force_iteration = _helics.force_iteration
 iterate_if_needed = _helics.iterate_if_needed
@@ -177,6 +175,8 @@ data_t_swigregister(data_t)
 cvar = _helics.cvar
 helics_time_zero = cvar.helics_time_zero
 helics_time_epsilon = cvar.helics_time_epsilon
+helics_true = cvar.helics_true
+helics_false = cvar.helics_false
 
 class message_t(_object):
     """
@@ -316,6 +316,10 @@ def helicsCreateCoreFromArgs(type, name, argc, argv):
     """
     return _helics.helicsCreateCoreFromArgs(type, name, argc, argv)
 
+def helicsCoreClone(core):
+    return _helics.helicsCoreClone(core)
+helicsCoreClone = _helics.helicsCoreClone
+
 def helicsCreateBroker(type, name, initString):
     """
 
@@ -366,6 +370,10 @@ def helicsCreateBrokerFromArgs(type, name, argc, argv):
 
     """
     return _helics.helicsCreateBrokerFromArgs(type, name, argc, argv)
+
+def helicsBrokerClone(broker):
+    return _helics.helicsBrokerClone(broker)
+helicsBrokerClone = _helics.helicsBrokerClone
 
 def helicsBrokerIsConnected(broker):
     """
@@ -480,6 +488,10 @@ def helicsCoreDisconnect(core):
 
     """
     return _helics.helicsCoreDisconnect(core)
+
+def helicsGetFederateByName(fedName):
+    return _helics.helicsGetFederateByName(fedName)
+helicsGetFederateByName = _helics.helicsGetFederateByName
 
 def helicsBrokerDisconnect(broker):
     """
@@ -651,6 +663,10 @@ def helicsCreateCombinationFederateFromJson(json):
 
     """
     return _helics.helicsCreateCombinationFederateFromJson(json)
+
+def helicsFederateClone(fed):
+    return _helics.helicsFederateClone(fed)
+helicsFederateClone = _helics.helicsFederateClone
 
 def helicsFederateInfoCreate():
     """
@@ -1353,12 +1369,12 @@ def helicsQueryFree(arg1):
 def helicsCleanupHelicsLibrary():
     return _helics.helicsCleanupHelicsLibrary()
 helicsCleanupHelicsLibrary = _helics.helicsCleanupHelicsLibrary
-HELICS_STRING_TYPE = _helics.HELICS_STRING_TYPE
-HELICS_DOUBLE_TYPE = _helics.HELICS_DOUBLE_TYPE
-HELICS_INT_TYPE = _helics.HELICS_INT_TYPE
-HELICS_COMPLEX_TYPE = _helics.HELICS_COMPLEX_TYPE
-HELICS_VECTOR_TYPE = _helics.HELICS_VECTOR_TYPE
-HELICS_RAW_TYPE = _helics.HELICS_RAW_TYPE
+HELICS_DATA_TYPE_STRING = _helics.HELICS_DATA_TYPE_STRING
+HELICS_DATA_TYPE_DOUBLE = _helics.HELICS_DATA_TYPE_DOUBLE
+HELICS_DATA_TYPE_INT = _helics.HELICS_DATA_TYPE_INT
+HELICS_DATA_TYPE_COMPLEX = _helics.HELICS_DATA_TYPE_COMPLEX
+HELICS_DATA_TYPE_VECTOR = _helics.HELICS_DATA_TYPE_VECTOR
+HELICS_DATA_TYPE_RAW = _helics.HELICS_DATA_TYPE_RAW
 
 def helicsFederateRegisterSubscription(fed, key, type, units):
     """

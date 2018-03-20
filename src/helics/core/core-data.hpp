@@ -161,6 +161,8 @@ class Message
     /** check if the Message contains an actual Message
     @return false if there is no Message data*/
     bool isValid () const noexcept;
+    /** get the payload as a string*/
+    const std::string &to_string() const { return data.to_string(); }
 };
 
 /**

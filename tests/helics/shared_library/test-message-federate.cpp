@@ -73,7 +73,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
 }
 
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_single), core_type)
 {
 	SetupTest(helicsCreateMessageFederate,core_type, 1);
@@ -115,7 +115,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_sin
 }
 
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_types), core_type)
 {
    // extraBrokerArgs = "--logleve=4";
@@ -186,7 +186,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
 }
 /*
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_types), core_type)
 {
     using namespace helics;
@@ -246,7 +246,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_
 }
 
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make (core_types), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 2);
@@ -477,7 +477,7 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 }
 
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 2);

@@ -1,4 +1,4 @@
 function varargout = helicsSubscriptionGetVectorSize(varargin)
     %
-  [varargout{1:nargout}] = helicsMEX(123, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(129, varargin{:});
 end
