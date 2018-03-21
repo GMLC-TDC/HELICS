@@ -331,6 +331,7 @@ bool CommonCore::allDisconnected () const
         return (HELICS_FINISHED == state) || (HELICS_ERROR == state);
     };
     return std::all_of (loopFederates.begin (), loopFederates.end (), pred);
+    
 }
 
 void CommonCore::setCoreReadyToInit ()
@@ -2586,6 +2587,17 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
             {
                 timeCoord->updateTimeFactors ();
             }
+        }
+        if (cmd.action() == CMD_DISCONNECT)
+        {
+            if (allDisconnected())
+            {
+                brokerState = broker_state_t::terminated;
+                ActionMessage dis(CMD_DISCONNECT);
+                dis.source_id = global_broker_id;
+                transmit(0, dis);
+                addActionMessage(CMD_STOP);
+    }
         }
     }
     else if (isDependencyCommand (cmd))

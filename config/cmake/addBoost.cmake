@@ -1,3 +1,4 @@
+SHOW_VARIABLE(BOOST_INSTALL_PATH PATH "Boost root directory" "${BOOST_INSTALL_PATH}")
 IF (MSVC)
 
 set (boost_versions
@@ -24,27 +25,31 @@ D:/boost
 
 # create an empty list
 list(APPEND boost_paths "")
-
+mark_as_advanced(BOOST_INSTALL_PATH)
 foreach( dir ${poss_prefixes})
 	foreach( boostver ${boost_versions})
 		IF (IS_DIRECTORY ${dir}/${boostver})
-			list(APPEND boost_paths ${dir}/${boostver})
+			IF (EXISTS ${dir}/${boostver}/boost/version.hpp)
+				list(APPEND boost_paths ${dir}/${boostver})
+			ENDIF()
 		ENDIF()
 	endforeach()
 endforeach()
 
-
 find_path(BOOST_TEST_PATH
 			NAMES 			boost/version.hpp
-			PATHS		${boost_paths}
+			PATHS		${BOOST_INSTALL_PATH}
+						${boost_paths}
 		)
 
 		if (BOOST_TEST_PATH)
 		set(BOOST_ROOT ${BOOST_TEST_PATH})
 		endif(BOOST_TEST_PATH)
+ELSE(MSVC)
+set(BOOST_ROOT "${BOOST_INSTALL_PATH}")
 ENDIF(MSVC)
 
-SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
+
 
 # Minimum version of Boost required for building HELICS
 set(BOOST_MINIMUM_VERSION 1.58)

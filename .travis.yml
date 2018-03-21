@@ -135,7 +135,7 @@ install:
 script:
   - mkdir build && cd build
   - export TRAVIS_DEPENDENCY_DIR=${TRAVIS_BUILD_DIR}/dependencies
-  - export HELICS_DEPENDENCY_FLAGS="-DZeroMQ_INSTALL_PATH=${TRAVIS_DEPENDENCY_DIR}/zmq -DBOOST_ROOT=${TRAVIS_DEPENDENCY_DIR}/boost"
+  - export HELICS_DEPENDENCY_FLAGS="-DZeroMQ_INSTALL_PATH=${TRAVIS_DEPENDENCY_DIR}/zmq -DBOOST_INSTALL_PATH=${TRAVIS_DEPENDENCY_DIR}/boost"
   - export HELICS_OPTION_FLAGS="-DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON -DBUILD_PYTHON_INTERFACE=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.${SHARED_LIB_EXT} -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/"
   - if [[ "$USE_SWIG" == 'false' ]] ; then HELICS_OPTION_FLAGS+=" -DDISABLE_SWIG=ON" ; fi
   - if [[ "$USE_MPI" ]]; then HELICS_OPTION_FLAGS+=" -DMPI_ENABLE=ON" ; fi
@@ -156,7 +156,7 @@ script:
   - ctest --verbose --timeout 120 -I 0,0,0,1
   # - ctest --verbose --timeout 120 -I 0,0,0,2
   - ctest --verbose --timeout 180 -I 0,0,0,3
-  # - ctest --verbose --timeout 360 -I 0,0,0,4
+  - ctest --verbose --timeout 360 -I 0,0,0,6
   - export PYTHONPATH="$(pwd)/swig/python"
     # - echo "$LD_LIBRARY_PATH"
     # - echo "$DYLD_FALLBACK_LIBRARY_PATH"

@@ -14,5 +14,5 @@ function varargout = helicsFederateEnterExecutionMode(varargin)
     %a helics_status enumeration helics_error if something went wrong
     %helicsInvalidReference if fed is invalid
     %
-  [varargout{1:nargout}] = helicsMEX(74, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(80, varargin{:});
 end

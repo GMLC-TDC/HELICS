@@ -5,5 +5,5 @@ function varargout = helicsFederateEnterInitializationMode(varargin)
     %iteration is requested on entry to the execution state This is a blocking call
     %and will block until the core allows it to proceed
     %
-  [varargout{1:nargout}] = helicsMEX(70, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(76, varargin{:});
 end

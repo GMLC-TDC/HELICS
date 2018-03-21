@@ -7,12 +7,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define HELICS_CPP98_FEDERATE_HPP_
 #pragma once
 
-#include "shared_api_library/helics.h"
+#include "../shared_api_library/helics.h"
 
 #include <string>
 #include <vector>
 #include <complex>
 #include <stdexcept>
+#include "config.hpp"
+#include "Filter.hpp"
 
 // defines for setFlag values in core/flag-definitions.h
 // enum for core_type:int in core/core-types.h
@@ -153,6 +155,30 @@ class Federate
     // Default constructor, not meant to be used
     Federate ():fed(NULL),exec_async_iterate(false) {};
 
+    Federate(const Federate &fedObj):exec_async_iterate(fedObj.exec_async_iterate)
+    {
+        fed = helicsFederateClone(fedObj.fed);
+    }
+    Federate &operator=(const Federate &fedObj)
+    {
+        exec_async_iterate = fedObj.exec_async_iterate;
+        fed = helicsFederateClone(fedObj.fed);
+        return *this;
+    }
+#ifdef HELICS_HAS_RVALUE_REFS
+    Federate(Federate &&fedObj) :exec_async_iterate(fedObj.exec_async_iterate)
+    {
+        fed = fedObj.fed;
+        fedObj.fed = NULL;
+    }
+    Federate &operator=(Federate &&fedObj)
+    {
+        exec_async_iterate = fedObj.exec_async_iterate;
+        fed = fedObj.fed;
+        fedObj.fed = NULL;
+        return *this;
+    }
+#endif
     virtual ~Federate ()
     {
         helicsFederateFree (fed);
@@ -302,4 +328,3 @@ class Federate
 
 } //namespace helics
 #endif
-

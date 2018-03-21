@@ -80,7 +80,7 @@ BOOST_DATA_TEST_CASE(value_federate_subscriber_and_publisher_registration,
     BOOST_CHECK(vFed1->getCurrentState() == Federate::op_states::finalize);
 }
 
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR(*utf::timeout (12))
 BOOST_DATA_TEST_CASE(value_federate_single_transfer_publisher, bdata::make(core_types_single), core_type)
 {
     SetupTest<helics::ValueFederate>(core_type, 1);
@@ -118,7 +118,7 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer_publisher, bdata::make(core_
     vFed1->finalize();
 }
 
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR(*utf::timeout (12))
 BOOST_DATA_TEST_CASE(value_federate_dual_transfer, bdata::make(core_types), core_type)
 {
     SetupTest<helics::ValueFederate>(core_type, 2);
@@ -213,7 +213,7 @@ BOOST_DATA_TEST_CASE(value_federate_single_init_publish, bdata::make(core_types)
     vFed1->finalize();
 }
 
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR(*utf::timeout (12))
 BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types_single), core_type)
 {
     SetupTest<helics::ValueFederate>(core_type, 1);
@@ -239,7 +239,7 @@ BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types_single), co
 
 /** test the all callback*/
 
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR(*utf::timeout (12))
 BOOST_DATA_TEST_CASE(test_all_callback, bdata::make(core_types_single), core_type)
 {
     SetupTest<helics::ValueFederate>(core_type, 1, 1.0);

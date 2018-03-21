@@ -1,31 +1,32 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
+
 */
 #ifndef HELICS_CPP98_VALUE_FEDERATE_HPP_
 #define HELICS_CPP98_VALUE_FEDERATE_HPP_
 #pragma once
 
-#include "helics.hpp"
 #include "Federate.hpp"
+#include "../shared_api_library/ValueFederate.h"
+#include "Publication.hpp"
+#include "Subscription.hpp"
 
 #include <sstream>
-
-// TODO: Update to use methods in c interface for getting length of data pointed to that can be gotten (all the ones taking a max len argument) - function may not exist yet
 
 namespace helics
 {
 enum PubSubTypes
 {
-    STRING_TYPE = 0,
-    DOUBLE_TYPE = 1,
-    INT_TYPE = 2,
-    COMPLEX_TYPE = 3,
-    VECTOR_TYPE = 4,
-    RAW_TYPE = 25
+    STRING_TYPE = HELICS_DATA_TYPE_STRING,
+    DOUBLE_TYPE = HELICS_DATA_TYPE_DOUBLE,
+    INT_TYPE = HELICS_DATA_TYPE_INT,
+    COMPLEX_TYPE = HELICS_DATA_TYPE_COMPLEX,
+    VECTOR_TYPE = HELICS_DATA_TYPE_VECTOR,
+    RAW_TYPE = HELICS_DATA_TYPE_RAW
 };
+
 class ValueFederate : public virtual Federate
 {
   public:
@@ -163,15 +164,8 @@ class ValueFederate : public virtual Federate
 
     void setDefaultValue (helics_subscription sub, const std::vector<double> &data)
     {
-        // c++98 doesn't guarantee vector data will be contiguous --are there any reasonable implementations where it is not otherwise this should not do a copy?
-        double *arr = (double*) malloc(data.size() * sizeof(double));
-        for (unsigned int i = 0; i < data.size(); i++)
-        {
-            arr[i] = data[i];
-        }
         // returns helics_status
-        helicsSubscriptionSetDefaultVector (sub, arr, static_cast<int>(data.size() * sizeof(double)));
-        free (arr);
+        helicsSubscriptionSetDefaultVector (sub, data.data(), static_cast<int>(data.size() * sizeof(double)));
     }
 
     /** Methods to get subscription values **/
@@ -184,9 +178,11 @@ class ValueFederate : public virtual Federate
 
     std::string getString (helics_subscription sub)
     {
-        char str[255];
-        helicsSubscriptionGetString (sub, &str[0], sizeof(str));
-        std::string result (str);
+        int size = helicsSubscriptionGetValueSize(sub);
+        std::string result;
+        result.resize(size+1);
+        helicsSubscriptionGetString (sub, &result[0], size+1);
+        result[size] = '\0';
         return result;
     }
 
@@ -218,6 +214,13 @@ class ValueFederate : public virtual Federate
         int actualSize;
         helicsSubscriptionGetVector (sub, data, maxlen,&actualSize);
         return actualSize;
+    }
+
+    void getVector(helics_subscription sub, std::vector<double> &data)
+    {
+        int actualSize = helicsSubscriptionGetVectorSize(sub);
+        data.resize(actualSize);
+        helicsSubscriptionGetVector(sub, data.data(), actualSize, &actualSize);
     }
 
     /** Methods to publish values **/
@@ -344,4 +347,3 @@ class ValueFederate : public virtual Federate
 };
 } //namespace helics
 #endif
-

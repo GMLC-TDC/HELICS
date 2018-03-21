@@ -146,7 +146,12 @@ void TimeCoordinator::updateValueTime (Time valueUpdateTime)
     }
 }
 
-Time TimeCoordinator::getNextPossibleTime () const
+bool TimeCoordinator::hasActiveTimeDependencies() const
+{
+    return dependencies.hasActiveTimeDependencies();
+}
+
+Time TimeCoordinator::getNextPossibleTime() const
 {
     if (time_granted == timeZero)
     {

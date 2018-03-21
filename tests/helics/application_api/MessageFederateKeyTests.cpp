@@ -27,7 +27,7 @@ namespace utf = boost::unit_test;
 /** test simple creation and destruction*/
 
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 1);
@@ -64,7 +64,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_sin
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_federate_send_receive_obj, bdata::make (core_types_single), core_type)
 {
     using namespace helics;
@@ -104,7 +104,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_obj, bdata::make (core_types
 }
 
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_types), core_type)
 {
    // extraBrokerArgs = "--logleve=4";
@@ -164,7 +164,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
 }
 
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_types), core_type)
 {
     using namespace helics;
@@ -298,7 +298,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 2);
