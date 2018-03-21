@@ -3,13 +3,17 @@
 # Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
-set(helics_apps_library_headers
+set(helics_apps_public_headers
 	Player.hpp
 	Recorder.hpp
-	PrecHelper.hpp
 	Echo.hpp
 	Source.hpp
 	Tracer.hpp
+	)
+
+set(helics_apps_private_headers
+	PrecHelper.hpp
+	SignalGenerators.hpp
 	)
 
 set(helics_apps_library_files
@@ -21,7 +25,7 @@ set(helics_apps_library_files
 	Tracer.cpp
 )
 
-add_library(helics_apps-static STATIC ${helics_apps_library_files} ${helics_apps_library_headers})
+add_library(helics_apps-static STATIC ${helics_apps_library_files} ${helics_apps_public_headers} ${helics_apps_private_headers})
 
 target_include_directories(helics_apps-static SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
 
@@ -52,6 +56,9 @@ endif()
 INSTALL(TARGETS helics_apps-static EXPORT helics-targets
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+INSTALL(FILES ${helics_apps_public_headers} 
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT headers)
 
 if (BUILD_PLAYER)
 INSTALL(TARGETS helics_player DESTINATION ${CMAKE_INSTALL_BINDIR})

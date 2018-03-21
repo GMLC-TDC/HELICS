@@ -20,6 +20,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/base64.h"
 #include "../common/stringOps.h"
 #include "../core/helicsVersion.hpp"
+#include "../core/core-exceptions.hpp"
+#include "SignalGenerators.hpp"
 
 namespace filesystem = boost::filesystem;
 
@@ -188,21 +190,61 @@ void Source::addPublication(const std::string  &key, helics_type_t type, Time pe
     pubids[key] = static_cast<int> (sources.size ()) - 1;
 }
 
-int Source::addSignalGenerator(const std::string & /*name*/, const std::string & /*type*/)
+int Source::addSignalGenerator(const std::string & name, const std::string &type)
 {
-    return 0;
+    std::shared_ptr<SignalGenerator> gen;
+    if (type == "sine")
+    {
+        gen = std::make_shared<SineGenerator>();
+    }
+    else if (type == "ramp")
+    {
+        gen = std::make_shared<RampGenerator>();
+    }
+    else if ((type == "oscillator") || (type == "phasor"))
+    {
+        gen = std::make_shared<PhasorGenerator>();
+    }
+    generators.push_back(std::move(gen));
+    int index = static_cast<int>(generators.size() - 1);
+    generatorIndex.emplace(name, index);
+    return index;
 }
 
 /** tie a publication to a signal generator*/
-void Source::linkPublicationToGenerator(const std::string & /*key*/, const std::string & /*generator*/)
+void Source::linkPublicationToGenerator(const std::string &key, const std::string & generator)
 {
-
+    auto fnd = pubids.find(key);
+    if (fnd != pubids.end())
+    {
+        auto findGen = generatorIndex.find(generator);
+        if (findGen != generatorIndex.end())
+        {
+            sources[fnd->second].generatorIndex = findGen->second;
+            return;
+        }
+        //only get here if something wasn't found
+        throw(InvalidParameter(generator +" did not name a valid generator"));
+    }
+    //only get here if something wasn't found
+    throw(InvalidParameter(key+" was not recognized as a valid publication"));
 }
 
 /** tie a publication to a signal generator*/
-void Source::linkPublicationToGenerator(const std::string & /*key*/, int /*genIndex*/)
+void Source::linkPublicationToGenerator(const std::string &key, int genIndex)
 {
-
+    auto fnd = pubids.find(key);
+    if (fnd != pubids.end())
+    {
+       if (genIndex<static_cast<int>(generators.size()))
+        {
+            sources[fnd->second].generatorIndex = genIndex;
+            return;
+        }
+       throw(InvalidParameter("generator index was invalid"));
+    }
+    //only get here if something wasn't found
+    throw(InvalidParameter(key + " was not recognized as a valid publication"));
 }
 
 int Source::loadArguments (boost::program_options::variables_map &vm_map)

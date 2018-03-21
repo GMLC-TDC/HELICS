@@ -37,6 +37,25 @@ class SourceObject
     // source type
 };
 
+class SignalGenerator
+{
+protected:
+    Time lastTime = timeZero;
+    Time keyTime = timeZero;
+public:
+    SignalGenerator() = default;
+    virtual ~SignalGenerator() = default;
+    /** set a numerical parameter*/
+    virtual void set(const std::string &parameter, double val);
+    /** set a string parameter*/
+    virtual void setString(const std::string &parameter, const std::string &val);
+    /** generate a new value at time signalTime
+    @return a value and a defV object*/
+    virtual defV generate(Time signalTime) = 0;
+    /** set the key time*/
+    void setTime(Time indexTime) { keyTime = indexTime; }
+};
+
 /** class implementing a source federate, which is capable of generating signals of various kinds
 and sending signals at the appropriate times
 @details  the source class is not threadsafe,  don't try to use it from multiple threads without external
@@ -120,6 +139,7 @@ class Source
   private:
     std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the source
     std::vector<SourceObject> sources;  //!< the actual publication objects
+    std::vector<std::shared_ptr<SignalGenerator>> generators; //!< the signal generators
     std::map<std::string, int> generatorIndex; //!< map of generator names to indices
     std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
     std::map<std::string, int> pubids;  //!< publication id map
