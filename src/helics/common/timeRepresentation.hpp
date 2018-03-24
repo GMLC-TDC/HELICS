@@ -386,6 +386,8 @@ class TimeRepresentation
         DOUBLETIME
         return *this;
     }
+    /** direct conversion to chrono nanoseconds*/
+    operator std::chrono::nanoseconds(){return std::chrono::nanoseconds(Tconv::toCount(timecode_, timeUnits::ns);) }
     /** direct conversion to double static cast overload*/
     operator double () const noexcept { return Tconv::toDouble (timecode_); }
 

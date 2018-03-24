@@ -14,10 +14,6 @@ namespace apps
 {
 void  RampGenerator::set(const std::string &parameter, double val)
 {
-    double level = 0.0;
-    double ramp = 0.0;
-    Time keyTime = timeZero;
-    
     if (parameter == "level")
     {
         level = val;
@@ -93,7 +89,7 @@ defV SineGenerator::generate(Time signalTime)
     Amplitude += dAdt * dt;
     // compute the sine wave component
     double newValue = level+Amplitude * sin(2.0 * pi * (frequency * tdiff) + offset);
-    double period = (frequency > 0.0) ? 1.0 / frequency : 1e36;
+    period = (frequency > 0.0) ? 1.0 / frequency : 1e36;
     while (tdiff > period)
     {
         tdiff -= period;
@@ -150,7 +146,7 @@ defV PhasorGenerator::generate(Time signalTime)
 
     frequency += dfdt * dt;
     Amplitude += dAdt * dt;
-    std::complex<double> rotation = std::polar(1.0, frequency*dt * (2 * pi));
+    rotation = std::polar(1.0, frequency*dt * (2 * pi));
     state *= rotation;
     lastTime = signalTime;
     return Amplitude*state+std::complex<double>(bias_real,bias_imag);

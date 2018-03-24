@@ -212,15 +212,7 @@ void Echo::loadJsonFile(const std::string &jsonFile)
         {
             stopTime = loadJsonTime(playerConfig["stop"]);
         }
-        if (playerConfig.isMember("separator"))
-        {
-            auto sep = playerConfig["separator"].asString();
-            if (sep.size() > 0)
-            {
-                fed->setSeparator(sep[0]);
-            }
-
-        }
+       
         if (playerConfig.isMember("file"))
         {
             if (playerConfig["file"].isArray())

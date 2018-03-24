@@ -67,7 +67,7 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
 
     // this call will throw an error on failure
     fedID = coreObject->registerFederate (fi.name, fi);
-
+    separator_ = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
 }
@@ -107,6 +107,7 @@ Federate::Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi)
         state = op_states::error;
         return;
     }
+    separator_ = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
 }
@@ -129,6 +130,7 @@ Federate::Federate (Federate &&fed) noexcept
     coreObject = std::move (fed.coreObject);
     currentTime = fed.currentTime;
     FedInfo = std::move (fed.FedInfo);
+    separator_ = fed.separator_;
     asyncCallInfo = std::move (fed.asyncCallInfo);
 }
 
@@ -140,6 +142,7 @@ Federate &Federate::operator= (Federate &&fed) noexcept
     coreObject = std::move (fed.coreObject);
     currentTime = fed.currentTime;
     FedInfo = std::move (fed.FedInfo);
+    separator_ = fed.separator_;
     asyncCallInfo = std::move (fed.asyncCallInfo);
     return *this;
 }

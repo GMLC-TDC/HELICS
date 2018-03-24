@@ -47,13 +47,7 @@ class ActionMessage
               original_dest (std::move (ai.original_dest)), messageID(ai.messageID) {};
         ~AdditionalInfo() = default;
         template <class Archive>
-        void save (Archive &ar) const
-        {
-            ar (source, target, orig_source, original_dest,messageID);
-        }
-
-        template <class Archive>
-        void load (Archive &ar)
+        void serialize (Archive &ar)
         {
             ar (source, target, orig_source, original_dest,messageID);
         }

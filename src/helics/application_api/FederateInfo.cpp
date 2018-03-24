@@ -29,6 +29,7 @@ static const ArgDescriptors InfoArgs{{"broker,b"s, "address of the broker to con
                                      {"period"s, "the period of the federate"s},
                                      {"timedelta"s, "the time delta of the federate"s},
                                      {"coreinit,i"s, "the core initialization string"s},
+                                        { "separator"s, "separator character for local federates"s },
                                      {"inputdelay"s, "the input delay on incoming communication of the federate"s},
                                      {"outputdelay"s,
                                       "the output delay for outgoing communication of the federate"s},
@@ -104,7 +105,14 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     {
         maxIterations = static_cast<int16_t> (vm["maxiterations"].as<int> ());
     }
-
+    if (vm.count("separator") > 0)
+    {
+        auto sep = vm["separator"].as<std::string>();
+        if (!sep.empty())
+        {
+            separator = sep[0];
+        }
+    }
     if (vm.count ("flags") > 0)
     {
         auto vflag = vm["flags"].as<std::vector<std::string>> ();
@@ -195,6 +203,14 @@ FederateInfo loadFederateInfo (const std::string &jsonString)
     if (doc.isMember ("forward_compute"))
     {
         fi.forwardCompute = doc["forward_compute"].asBool ();
+    }
+    if (doc.isMember("separator"))
+    {
+        auto sep = doc["separator"].asString();
+        if (!sep.empty())
+        {
+            fi.separator = sep[0];
+        }
     }
     if (doc.isMember ("coreType"))
     {

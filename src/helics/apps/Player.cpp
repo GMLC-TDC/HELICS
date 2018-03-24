@@ -46,7 +46,6 @@ static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { re
 static const ArgDescriptors InfoArgs{
     {"datatype",  "type of the publication data type to use"},
     {"local", ArgDescriptor::arg_type_t::flag_type, "specify otherwise unspecified endpoints and publications as local( i.e.the keys will be prepended with the player name"},
-    {"separator", "specify the separator for local publications and endpoints"},
     {"timeunits", "the default units on the timestamps used in file based input"},
     {"stop",  "the time to stop the player"}
 };
@@ -218,10 +217,6 @@ void Player::loadTextFile (const std::string &filename)
                 {
                     useLocal = playerConfig["local"].get<bool>();
                 }
-                if (playerConfig.find("separator") != playerConfig.end())
-                {
-                    fed->setSeparator(playerConfig["separator"].get<char>());
-                }
                 if (playerConfig.find("timeunits") != playerConfig.end())
                 {
                     if (playerConfig["timeunits"] == "ns")
@@ -347,7 +342,7 @@ void Player::loadJsonFile (const std::string &jsonFile)
 {
     fed->registerInterfaces (jsonFile);
 
-    auto pubCount = fed->getSubscriptionCount ();
+    auto pubCount = fed->getPublicationCount ();
     for (int ii = 0; ii < pubCount; ++ii)
     {
         publications.emplace_back (fed.get (), ii);
@@ -373,15 +368,6 @@ void Player::loadJsonFile (const std::string &jsonFile)
         if (playerConfig.isMember("local"))
         {
             useLocal = playerConfig["local"].asBool();
-        }
-        if (playerConfig.isMember("separator"))
-        {
-            auto sep = playerConfig["separator"].asString();
-            if (sep.size() > 0)
-            {
-                fed->setSeparator(sep[0]);
-            }
-
         }
         if (playerConfig.isMember("timeunits"))
         {
@@ -910,10 +896,6 @@ int Player::loadArguments(boost::program_options::variables_map &vm_map)
     if (vm_map.count("local"))
     {
         useLocal = true;
-    }
-    if (vm_map.count("separator"))
-    {
-        fed->setSeparator(vm_map["separator"].as<std::string>()[0]);
     }
     if (vm_map.count("timeunits"))
     {

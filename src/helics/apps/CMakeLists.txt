@@ -20,6 +20,7 @@ set(helics_apps_library_files
 	Player.cpp
 	Recorder.cpp
 	PrecHelper.cpp
+	SignalGenerators.cpp
 	Echo.cpp
 	Source.cpp
 	Tracer.cpp

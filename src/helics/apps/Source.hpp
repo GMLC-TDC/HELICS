@@ -104,7 +104,7 @@ class Source
     after this time and the source will enter the initialization mode, which means it will not be possible to add
     more publications calling run will automatically do this if necessary
     */
-    void initialize ();
+    void initialize() {};
     /*run the source*/
     void run ();
 
@@ -124,18 +124,26 @@ class Source
     @return an index for later reference of the signal generator
     */
     int addSignalGenerator(const std::string &name, const std::string &type);
+    /** set the start time for a publication */
+    void setStartTime(const std::string &key, Time startTime);
+    /** set the start time for a publication */
+    void setPeriod(const std::string &key, Time period);
     /** tie a publication to a signal generator*/
     void linkPublicationToGenerator(const std::string &key, const std::string &generator);
     /** tie a publication to a signal generator*/
     void linkPublicationToGenerator(const std::string &key, int genIndex);
-
+    /** get a pointer to the signal generator*/
+    std::shared_ptr<SignalGenerator> getGenerator(int index);
   private:
     int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
     @param either a json filename or a string containing json
     */
     void loadJsonFile (const std::string &jsonString);
-
+    /** execute a source object and update its time return the next execution time*/
+    Time runSource(SourceObject &obj, Time currentTime);
+    /** execute all the sources*/
+    Time runSourceLoop(Time currentTime);
   private:
     std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the source
     std::vector<SourceObject> sources;  //!< the actual publication objects

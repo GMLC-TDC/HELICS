@@ -91,30 +91,65 @@ Source::~Source () = default;
 
 
 
-void Source::loadFile (const std::string &jsonFile)
+void Source::loadFile (const std::string &filename)
 {
-    fed->registerInterfaces (jsonFile);
-
-  //  auto pubCount = fed->getSubscriptionCount ();
-  // for (int ii = 0; ii < pubCount; ++ii)
-  //  {
-   //     publications.emplace_back (fed.get (), ii);
-   //    pubids[publications.back ().getName ()] = static_cast<int> (publications.size () - 1);
-  // }
-  //  auto eptCount = fed->getEndpointCount ();
-  //  for (int ii = 0; ii < eptCount; ++ii)
-  //  {
-  //      endpoints.emplace_back (fed.get (), ii);
-   //     eptids[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
-  //  }
-
-    auto doc = loadJsonString(jsonFile);
-
-
-
+    
+    auto ext = filesystem::path(filename).extension().string();
+    if ((ext == ".json") || (ext == ".JSON"))
+    {
+        loadJsonFile(filename);
+    }
+    else
+    {
+        // loadTextFile(filename);
+    }
 
 }
 
+
+void Source::loadJsonFile(const std::string &jsonFile)
+{
+    fed->registerInterfaces(jsonFile);
+
+    auto pubCount = fed->getPublicationCount();
+    for (int ii = 0; ii < pubCount; ++ii)
+    {
+        SourceObject newObj;
+
+        newObj.pub = Publication(fed.get(), ii);
+        newObj.period = defaultPeriod;
+        sources.push_back(newObj);
+        pubids[newObj.pub.getKey()] = static_cast<int> (sources.size()) - 1;
+
+    }
+   /* auto eptCount = fed->getEndpointCount();
+    for (int ii = 0; ii < eptCount; ++ii)
+    {
+        endpoints.emplace_back(fed.get(), ii);
+        eptids[endpoints.back().getName()] = static_cast<int> (endpoints.size() - 1);
+    }
+    */
+    auto doc = loadJsonString(jsonFile);
+
+
+    if (doc.isMember("source"))
+    {
+        auto playerConfig = doc["source"];
+        if (playerConfig.isMember("stop"))
+        {
+            stopTime = loadJsonTime(playerConfig["stop"]);
+        }
+        if (playerConfig.isMember("local"))
+        {
+            useLocal = playerConfig["local"].asBool();
+        }
+    }
+    auto genArray = doc["generators"];
+    if (genArray.isArray())
+    {
+        
+    }
+}
 
 /*run the source*/
 void Source::run ()
@@ -130,48 +165,43 @@ void Source::run (Time stopTime_input)
     {
         initialize ();
     }
+    Time nextRequestTime = Time::maxVal();
+    Time currentTime;
     if (state != Federate::op_states::execution)
     {
         // send stuff before timeZero
 
-
+        runSourceLoop(timeZero - timeEpsilon);
 
         fed->enterExecutionState ();
         // send the stuff at timeZero
-
-
+        nextRequestTime = runSourceLoop(timeZero);
+        currentTime = timeZero;
     }
     else
     {
-//        auto ctime = fed->getCurrentTime ();
-
-
+       currentTime = fed->getCurrentTime ();
+       
+       for (auto &src : sources)
+       {
+           if (src.nextTime < nextRequestTime)
+           {
+               nextRequestTime = src.nextTime;
+           }
+       }
     }
-
-    helics::Time nextPrintTime = 10.0;
-    bool moreToSend = true;
-    Time nextSendTime = timeZero;
-    while (moreToSend)
+    helics::Time nextPrintTime = currentTime+10.0;
+    while ((nextRequestTime < Time::maxVal()) && (nextRequestTime < stopTime_input))
     {
-        nextSendTime = Time::maxVal ();
-
-        if (nextSendTime > stopTime_input)
+        currentTime = fed->requestTime(nextRequestTime);
+        nextRequestTime = runSourceLoop(currentTime);
+        if (currentTime >= nextPrintTime)
         {
-            break;
-        }
-        if (nextSendTime == Time::maxVal ())
-        {
-            moreToSend = false;
-            continue;
-        }
-        auto newTime = fed->requestTime (nextSendTime);
-
-        if (newTime >= nextPrintTime)
-        {
-            std::cout << "processed time " << static_cast<double> (newTime) << "\n";
+            std::cout << "processed time " << static_cast<double> (currentTime) << "\n";
             nextPrintTime += 10.0;
         }
     }
+   
 }
 
 void Source::addPublication(const std::string  &key, helics_type_t type, Time period, const std::string &units)
@@ -211,6 +241,35 @@ int Source::addSignalGenerator(const std::string & name, const std::string &type
     return index;
 }
 
+std::shared_ptr<SignalGenerator> Source::getGenerator(int index)
+{
+
+    if (index<static_cast<int>(generators.size()))
+    {
+        return generators[index];
+    }
+    return nullptr;
+}
+
+/** set the start time for a publication */
+void Source::setStartTime(const std::string &key, Time startTime)
+{
+    auto fnd = pubids.find(key);
+    if (fnd != pubids.end())
+    {
+        sources[fnd->second].nextTime = startTime;
+    }
+}
+/** set the start time for a publication */
+void Source::setPeriod(const std::string &key, Time period)
+{
+    auto fnd = pubids.find(key);
+    if (fnd != pubids.end())
+    {
+        sources[fnd->second].period = period;
+    }
+}
+
 /** tie a publication to a signal generator*/
 void Source::linkPublicationToGenerator(const std::string &key, const std::string & generator)
 {
@@ -247,6 +306,55 @@ void Source::linkPublicationToGenerator(const std::string &key, int genIndex)
     throw(InvalidParameter(key + " was not recognized as a valid publication"));
 }
 
+
+Time Source::runSource(SourceObject &obj, Time currentTime)
+{
+    if (currentTime >= obj.nextTime)
+    {
+        if (obj.generatorIndex >= static_cast<int>(generators.size()))
+        {
+            return Time::maxVal();
+        }
+        auto val=generators[obj.generatorIndex]->generate(currentTime);
+        obj.pub.publish(val);
+        obj.nextTime += obj.period;
+        if (obj.nextTime < currentTime)
+        {
+            auto periods = std::floor( (currentTime - obj.nextTime) / obj.period);
+            obj.nextTime += periods * obj.period + obj.period;
+        }
+    }
+    return obj.nextTime;
+}
+
+Time Source::runSourceLoop(Time currentTime)
+{
+    if (currentTime < timeZero)
+    {
+        for (auto &src : sources)
+        {
+            if (src.nextTime < timeZero)
+            {
+                runSource(src, currentTime);
+                src.nextTime = timeZero;
+            }
+        }
+        return timeZero;
+    }
+    else
+    {
+        Time minTime = Time::maxVal();
+        for (auto &src : sources)
+        {
+            auto tm = runSource(src, currentTime);
+            if (tm < minTime)
+            {
+                minTime = tm;
+            }
+        }
+        return minTime;
+    }
+}
 int Source::loadArguments (boost::program_options::variables_map &vm_map)
 {
     std::string file;
