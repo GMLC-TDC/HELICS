@@ -88,7 +88,7 @@ std::pair<double,int> runInitIterations(std::shared_ptr<helics::ValueFederate> &
     return { cval,itcount };
         
 }
-BOOST_TEST_DECORATOR(*utf::timeout(5))
+BOOST_TEST_DECORATOR(*utf::timeout(12))
 BOOST_DATA_TEST_CASE(execution_iteration_round_robin, bdata::make(core_types), core_type)
 {
     SetupTest<helics::ValueFederate>(core_type, 3);

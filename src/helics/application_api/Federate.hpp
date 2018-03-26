@@ -139,6 +139,7 @@ class Federate
     void enterInitializationStateComplete ();
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
+    @param iterate an optional flag indicating the desired iteration mode
     */
     iteration_result
     enterExecutionState (iteration_request iterate = iteration_request::no_iterations);
@@ -179,7 +180,8 @@ class Federate
 
     /** request a time advancement
     @param[in] the next requested time step
-    @return the granted time step*/
+    @param[in] iterate a requested iteration mode
+    @return the granted time step in a structure containing a return time and an iteration_result*/
     iteration_time requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate);
 
     /** request a time advancement
