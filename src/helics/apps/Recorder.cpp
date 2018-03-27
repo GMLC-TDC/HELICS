@@ -519,7 +519,7 @@ void Recorder::addSubscription (const std::string &key)
     auto res = subkeys.find (key);
     if ((res == subkeys.end ()) || (res->second == -1))
     {
-        subscriptions.push_back (helics::Subscription (fed.get (), key));
+        subscriptions.emplace_back (fed, key);
         auto index = static_cast<int> (subscriptions.size ()) - 1;
         auto id = subscriptions.back ().getID ();
         subids[id] = index;  // this is a new element
@@ -532,7 +532,7 @@ void Recorder::addEndpoint (const std::string &endpoint)
     auto res = eptNames.find (endpoint);
     if ((res == eptNames.end ()) || (res->second == -1))
     {
-        endpoints.push_back (helics::Endpoint (GLOBAL, fed.get (), endpoint));
+        endpoints.emplace_back (GLOBAL, fed.get (), endpoint);
         auto index = static_cast<int> (endpoints.size ()) - 1;
         auto id = endpoints.back ().getID ();
         eptids.emplace (id, index);  // this is a new element
@@ -692,7 +692,9 @@ int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
 
     if (vm_map.count("stop") > 0)
     {
+        printf("stop  from %s\n",  vm_map["stop"].as<std::string>().c_str());
         autoStopTime = loadTimeFromString(vm_map["stop"].as<std::string>());
+        printf("stop at %f from %s\n", static_cast<double>(autoStopTime), vm_map["stop"].as<std::string>().c_str());
     }
     return 0;
 }

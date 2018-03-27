@@ -5,11 +5,17 @@
 ##############################################################################
 set(helicsCpp98_headers
 Broker.hpp
+Core.hpp
 CombinationFederate.hpp
 Federate.hpp
 MessageFederate.hpp
 ValueFederate.hpp
 helics.hpp
+Publication.hpp
+Subscription.hpp
+Endpoint.hpp
+Filter.hpp
+config.hpp
 )
 
 add_library(helicsCpp98 INTERFACE)
@@ -22,5 +28,5 @@ target_include_directories(helicsCpp98_ide PRIVATE "${PROJECT_SOURCE_DIR}/src/he
 set_target_properties (helicsCpp98_ide PROPERTIES FOLDER interfaces)
 ENDIF(MSVC)
 
-install(FILES ${helicsCpp98_headers} DESTINATION include/cpp98)
+install(FILES ${helicsCpp98_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cpp98 COMPONENT headers)
 

@@ -282,6 +282,11 @@ std::vector<Core::federate_id_t> ForwardingTimeCoordinator::getDependencies () c
     return deps;
 }
 
+bool ForwardingTimeCoordinator::hasActiveTimeDependencies() const
+{
+    return dependencies.hasActiveTimeDependencies();
+}
+
 iteration_state ForwardingTimeCoordinator::checkExecEntry ()
 {
     auto ret = iteration_state::continue_processing;

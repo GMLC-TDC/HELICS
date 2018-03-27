@@ -502,7 +502,7 @@ void TcpComms::queue_tx_function ()
                     {
                         if (!isDisconnectCommand (cmd))
                         {
-                            std::cerr << "broker send0 " << se.what () << '\n';
+                            std::cerr << "broker send 0 "<< actionMessageType(cmd.action()) <<':'<< se.what () << '\n';
                         }
                     }
                 }

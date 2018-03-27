@@ -21,6 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <iostream>
 #include <map>
 #include <mutex>
+#include <thread>
 
 /** a storage system for the available core objects allowing references by name to the core
  */
@@ -40,7 +41,7 @@ std::shared_ptr<zmqContextManager> zmqContextManager::getContextPointer (const s
     {
         return fnd->second;
     }
-
+   // std::cout << "creating context in " << std::this_thread::get_id() << std::endl;
     auto newContext = std::shared_ptr<zmqContextManager> (new zmqContextManager (contextName));
     contexts.emplace (contextName, newContext);
     return newContext;
@@ -85,11 +86,17 @@ bool zmqContextManager::setContextToLeakOnDelete (const std::string &contextName
 }
 zmqContextManager::~zmqContextManager ()
 {
+    //std::cout << "destroying context in " << std::this_thread::get_id() << std::endl;
+    
     if (leakOnDelete)
     {
         // yes I am purposefully leaking this PHILIP TOP
         auto val = zcontext.release ();
         (void)(val);
+    }
+    else
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 }
 

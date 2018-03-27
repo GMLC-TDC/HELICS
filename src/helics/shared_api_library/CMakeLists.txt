@@ -31,21 +31,28 @@ internal/api_objects.h
 
 add_library(helicsSharedLib SHARED ${helicsShared_sources} ${helicsShared_headers})
 
-target_link_libraries(helicsSharedLib helics-static)
+target_link_libraries(helicsSharedLib PRIVATE helics-static)
+if (UNIX OR MINGW)
+	if (NOT APPLE)
+		target_link_libraries(helicsSharedLib PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt)
+	endif(NOT APPLE)
+endif()
 
 if (HELICS_HAVE_ZEROMQ)
    target_include_directories (helicsSharedLib PRIVATE "${ZeroMQ_INCLUDE_DIR}")
 endif(HELICS_HAVE_ZEROMQ)
 
+#this is redundant but I need it once for the targets and once for cpack
+# cant use COMPONENT and distinct directories together
 INSTALL(TARGETS helicsSharedLib EXPORT helics-targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-INSTALL(FILES ${helicsShared_headers} DESTINATION include/helics/shared_api_library)
-
-
-if (WIN32 AND BUILD_PYTHON)
-	INSTALL(TARGETS helicsSharedLib DESTINATION ${CMAKE_INSTALL_PREFIX}/python/)
-endif(WIN32 AND BUILD_PYTHON)
+INSTALL(FILES $<TARGET_LINKER_FILE:helicsSharedLib> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs)
+INSTALL(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime)
+IF (MSVC)
+install(FILES $<TARGET_PDB_FILE:helicsSharedLib> DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL COMPONENT libs)
+ENDIF(MSVC)
+INSTALL(FILES ${helicsShared_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library COMPONENT headers)
 

@@ -8,7 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define _HELICS_CPP98_API_
 #pragma once
 
-#include "chelics.h"
+#include "CombinationFederate.hpp"
 #include <string>
 
 
@@ -26,4 +26,3 @@ std::string getHelicsVersionString()
 
 } //namespace helics
 #endif
-

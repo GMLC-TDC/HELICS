@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include <cctype>
 
-bool hasIndexCode (const std::string &type_name)
+static bool hasIndexCode (const std::string &type_name)
 {
     if (std::isdigit (type_name.back ()) != 0)
     {
@@ -21,9 +21,7 @@ bool hasIndexCode (const std::string &type_name)
     return false;
 }
 
-int getIndexCode (const std::string &type_name) { return static_cast<int> (type_name.back () - '0'); }
-
-auto StartBrokerImp (const std::string &core_type_name, const std::string &initialization_string)
+static auto StartBrokerImp (const std::string &core_type_name, const std::string &initialization_string)
 {
     if (hasIndexCode (core_type_name))
     {
@@ -69,10 +67,10 @@ FederateTestFixture::~FederateTestFixture ()
         if (fed)
         {
             federate_state state;
-            CE (helicsFederateGetState (fed, &state));
+            helicsFederateGetState (fed, &state);
             if (state != helics_finalize_state)
             {
-                CE (helicsFederateFinalize (fed));
+                helicsFederateFinalize (fed);
             }
             helicsFederateFree (fed);
         }
@@ -80,7 +78,7 @@ FederateTestFixture::~FederateTestFixture ()
     federates.clear ();
     for (auto &broker : brokers)
     {
-        CE (helicsBrokerDisconnect (broker));
+        helicsBrokerDisconnect (broker);
         helicsBrokerFree (broker);
     }
     brokers.clear ();
