@@ -119,11 +119,12 @@ install_boost () {
     wget --no-check-certificate -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
     (
         cd ${boost_version_str}/;
-        ./bootstrap.sh --with-toolset=${boost_toolset} --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test;
+        ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test;
         ./b2 -j2 \
             link=shared \
             threading=multi \
             variant=release \
+            toolset=${boost_toolset} \
             cxxflags=${BOOST_CXX_FLAGS} > /dev/null;
         ./b2 install --prefix=${install_path} > /dev/null;
     )
