@@ -80,6 +80,18 @@ int argumentParser (int argc,
     }
 
     variable_map cmd_vm;
+    int xstyle = po::command_line_style::allow_long |
+        po::command_line_style::allow_short | po::command_line_style::short_allow_adjacent |
+        po::command_line_style::short_allow_next |
+        po::command_line_style::allow_long | po::command_line_style::long_allow_adjacent |
+        po::command_line_style::long_allow_next |
+        po::command_line_style::allow_sticky |
+        po::command_line_style::allow_dash_for_short;
+
+    if (WIN32)
+    {
+        xstyle |= po::command_line_style::allow_slash_for_short;
+    }
     try
     {
         if (posName.empty())
@@ -90,7 +102,10 @@ int argumentParser (int argc,
         {
             po::positional_options_description p;
             p.add(posName.c_str(), -1);
-            po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().positional(p).run(), cmd_vm);
+            po::command_line_parser parser{ argc, argv };
+            parser.options(cmd_line).allow_unregistered().positional(p);
+            parser.style(xstyle);
+            po::store(parser.run(), cmd_vm);
         }
 
     }
@@ -116,13 +131,13 @@ int argumentParser (int argc,
     }
     if (posName.empty())
     {
-        po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().run(), vm_map);
+        po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().style(xstyle).run(), vm_map);
     }
     else
     {
         po::positional_options_description p;
         p.add(posName.c_str(), -1);
-        po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().positional(p).run(), vm_map);
+        po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().positional(p).style(xstyle).run(), vm_map);
     }
 
 

@@ -696,6 +696,11 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         {
             setState (HELICS_FINISHED);
             timeCoord->disconnect();
+            cmd.dest_id = 0;
+            if (parent_ != nullptr)
+            {
+                parent_->addActionMessage(cmd);
+            }
             return iteration_state::halted;
         }
         else

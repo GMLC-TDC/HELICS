@@ -202,10 +202,6 @@ FederateState *CommonCore::getHandleFederate (handle_id_t id_)
 
 FederateState *CommonCore::getFederateCore (federate_id_t federateID)
 {
-    if (isValidIndex (federateID, loopFederates))
-    {
-        return loopFederates[federateID];
-    }
     auto fed = loopFederates.find (federateID);
     return (fed != loopFederates.end ()) ? (*fed) : nullptr;
 }
@@ -293,8 +289,8 @@ void CommonCore::finalize (federate_id_t federateID)
     }
     ActionMessage bye (CMD_DISCONNECT);
     bye.source_id = fed->global_id;
-
-    fed->addAction (bye);
+    bye.dest_id = fed->global_id;
+    addActionMessage(bye);
     iteration_result ret = iteration_result::next_step;
     while (ret != iteration_result::halted)
     {
@@ -304,7 +300,7 @@ void CommonCore::finalize (federate_id_t federateID)
             break;
         }
     }
-    addActionMessage (bye);
+    
 }
 
 bool CommonCore::allInitReady () const
@@ -949,7 +945,7 @@ void CommonCore::setValue (handle_id_t handle, const char *data, uint64_t len)
         mv.payload = std::string (data, len);
         mv.actionTime = fed->nextAllowedSendTime ();
 
-        actionQueue.push (mv);
+        actionQueue.push (std::move(mv));
     }
 }
 
@@ -1273,7 +1269,7 @@ void CommonCore::send (handle_id_t sourceHandle, const std::string &destination,
     m.payload = std::string (data, length);
     m.info ().target = destination;
     m.actionTime = fed->nextAllowedSendTime ();
-    addActionMessage (m);
+    addActionMessage (std::move(m));
 }
 
 void CommonCore::sendEvent (Time time,
@@ -1301,7 +1297,7 @@ void CommonCore::sendEvent (Time time,
     m.info ().source = hndl->key;
     m.info ().target = destination;
     m.info ().messageID = ++messageCounter;
-    addActionMessage (m);
+    addActionMessage (std::move(m));
 }
 
 void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message> message)
@@ -1311,7 +1307,7 @@ void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message>
         ActionMessage m (std::move (message));
         m.source_id = global_broker_id;
         m.source_handle = sourceHandle;
-        addActionMessage (m);
+        addActionMessage (std::move(m));
         return;
     }
     auto hndl = getHandleInfo (sourceHandle);
@@ -1337,7 +1333,7 @@ void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message>
     {
         m.actionTime = minTime;
     }
-    addActionMessage (m);
+    addActionMessage (std::move(m));
 }
 
 void CommonCore::deliverMessage (ActionMessage &message)
