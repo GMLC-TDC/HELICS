@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ $DEBUG_INSTALL_DEPENDENCY ]]; then
+    set -x
+fi
+
 # Compares two semantic version numbers (major.minor.revision)
 check_minimum_version () {
     local -a ver
@@ -174,6 +178,9 @@ fi
 if [[ "$CXX_STANDARD" == 17 ]]; then
     echo "Install dependency with C++17 flag requested"
     BOOST_CXX_FLAGS="-std=c++17"
+elif [[ "$CXX_STANDARD" == 14 ]]; then
+    echo "Install dependency with C++14 flag requested"
+    BOOST_CXX_FLAGS="-std=c++14"
 fi
 
 
@@ -228,3 +235,6 @@ case "$1" in
         echo "$0 zmq [version=HEAD] install_path"
 esac
 
+if [[ $DEBUG_INSTALL_DEPENDENCY ]]; then
+    set +x
+fi
