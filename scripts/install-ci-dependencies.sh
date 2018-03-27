@@ -9,7 +9,7 @@ if [[ "$TRAVIS" == "true" ]]; then
     export CI_DEPENDENCY_DIR=${TRAVIS_BUILD_DIR}/dependencies
 
     # Convert commit message to lower case
-    commit_msg=`tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE}`
+    commit_msg=$(tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE})
 
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         os_name="Linux"
