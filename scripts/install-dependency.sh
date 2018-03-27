@@ -151,7 +151,7 @@ install_path=$3
 
 compiler_toolset=$4
 if [[ -z $compiler_toolset ]]; then
-    case "$COMPILER" in
+    case $COMPILER in
         gcc*)
             compiler_toolset=gcc
             ;;
@@ -175,7 +175,7 @@ fi
 # If FORCE_TOOLSET is set, create symlinks and add directory to path
 # May be needed to force boost to build with the right compiler version
 if [[ "$FORCE_TOOLSET" ]]; then
-    case "${compiler_toolset}" in
+    case ${compiler_toolset} in
         gcc*)
             ln -s $(which ${CC}) gcc
             ln -s $(which ${CXX}) g++
