@@ -69,8 +69,10 @@ private:
 
     bool iterating = false;  //!< the federate is iterating at a time step
     bool hasEndpoints = false;  //!< the federate has endpoints
+    bool timeGranted_mode = false;  //!< indicator if the federate is in a granted state or a requested state waiting to grant 
     // 1 byte free
     int logLevel = 1;
+    
  //   std::vector<ActionMessage> messLog;
   private:
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate

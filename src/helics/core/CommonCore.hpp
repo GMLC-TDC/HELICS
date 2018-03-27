@@ -223,7 +223,8 @@ class CommonCore : public Core, public BrokerBase
     void transmitDelayedMessages ();
 
     /** actually transmit messages that were delayed for a particular source
-    @param[*/
+    @param[in] source the identifier for the message to transmit
+    */
     void transmitDelayedMessages (Core::federate_id_t source);
 
     /**function for doing the actual routing either to a local fed or up the broker chain*/
@@ -270,7 +271,7 @@ class CommonCore : public Core, public BrokerBase
       0};  //!< counter for the number of times the entry to initialization Mode was explicitly delayed
     shared_guarded<MappedPointerVector<FederateState,std::string>> federates;  //!< threadsafe local federate information list for external functions
     DualMappedVector<FederateState *,std::string,federate_id_t> loopFederates;  //federate pointers stored for the core loop
-    std::atomic<int32_t> messageCounter{ 54 };  //!< counter for the number of messages that have been sent
+    std::atomic<int32_t> messageCounter{ 54 };  //!< counter for the number of messages that have been sent, nothing magical about 54 just a number bigger than 1 to prevent confustion
 
     HandlePointerManager handles; //!< local handle information;
 
