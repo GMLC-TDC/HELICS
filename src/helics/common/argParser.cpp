@@ -88,10 +88,9 @@ int argumentParser (int argc,
         po::command_line_style::allow_sticky |
         po::command_line_style::allow_dash_for_short;
 
-    if (WIN32)
-    {
+#ifdef WIN32
         xstyle |= po::command_line_style::allow_slash_for_short;
-    }
+#endif
     try
     {
         if (posName.empty())
