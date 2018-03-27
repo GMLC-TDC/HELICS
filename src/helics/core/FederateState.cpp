@@ -311,11 +311,7 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::handle_id_t &id)
 
 void FederateState::routeMessage(const ActionMessage &msg)
 {
-    if (msg.dest_id == global_id)
-    {
-        addAction(msg);
-    }
-    else if (parent_!=nullptr)
+    if (parent_!=nullptr)
     {
         parent_->addActionMessage(msg);
     }
