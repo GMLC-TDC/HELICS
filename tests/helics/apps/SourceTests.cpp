@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(simple_source_test)
     src1.setStartTime("pub1", 1.0);
     helics::ValueFederate vfed(fi);
     helics::Subscription sub1(&vfed, "pub1");
-    auto fut = std::async(std::launch::async, [&src1]() { src1.run(5); });
+    auto fut = std::async(std::launch::async, [&src1]() { src1.run(5); src1.finalize(); });
     vfed.enterExecutionState();
     auto retTime = vfed.requestTime(5);
     BOOST_CHECK_EQUAL(retTime, 1.0);

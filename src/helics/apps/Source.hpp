@@ -134,6 +134,9 @@ class Source
     void linkPublicationToGenerator(const std::string &key, int genIndex);
     /** get a pointer to the signal generator*/
     std::shared_ptr<SignalGenerator> getGenerator(int index);
+
+    /** finalize the Source federate*/
+    void finalize();
   private:
     int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString

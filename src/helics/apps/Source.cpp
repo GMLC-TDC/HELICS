@@ -90,6 +90,10 @@ Source::Source (const std::string &jsonString) : fed (std::make_shared<Combinati
 Source::~Source () = default;
 
 
+void Source::finalize()
+{
+    fed->finalize();
+}
 
 void Source::loadFile (const std::string &filename)
 {
@@ -191,7 +195,7 @@ void Source::run (Time stopTime_input)
        }
     }
     helics::Time nextPrintTime = currentTime+10.0;
-    while ((nextRequestTime < Time::maxVal()) && (nextRequestTime < stopTime_input))
+    while ((nextRequestTime < Time::maxVal()) && (nextRequestTime <= stopTime_input))
     {
         currentTime = fed->requestTime(nextRequestTime);
         nextRequestTime = runSourceLoop(currentTime);
