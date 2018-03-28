@@ -20,7 +20,7 @@ namespace utf = boost::unit_test;
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (simple_timing_test)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE (simple_timing_test)
 }
 
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (simple_timing_test2)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2)
 }
 
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (simple_timing_test_message)
 {
     SetupTest<helics::MessageFederate> ("test", 2);
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message)
 }
 
 
-BOOST_TEST_DECORATOR (*utf::timeout (5))
+BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (timing_with_impact_window)
 {
     SetupTest<helics::MessageFederate> ("test", 2);

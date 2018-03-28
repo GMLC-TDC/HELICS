@@ -17,6 +17,14 @@ public class helics implements helicsConstants {
     return helicsJNI.helics_time_epsilon_get();
   }
 
+  public static int getHelics_true() {
+    return helicsJNI.helics_true_get();
+  }
+
+  public static int getHelics_false() {
+    return helicsJNI.helics_false_get();
+  }
+
   public static String helicsGetVersion() {
     return helicsJNI.helicsGetVersion();
   }
@@ -35,6 +43,11 @@ public class helics implements helicsConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
+  public static SWIGTYPE_p_void helicsCoreClone(SWIGTYPE_p_void core) {
+    long cPtr = helicsJNI.helicsCoreClone(SWIGTYPE_p_void.getCPtr(core));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
   public static SWIGTYPE_p_void helicsCreateBroker(String type, String name, String initString) {
     long cPtr = helicsJNI.helicsCreateBroker(type, name, initString);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
@@ -42,6 +55,11 @@ public class helics implements helicsConstants {
 
   public static SWIGTYPE_p_void helicsCreateBrokerFromArgs(String type, String name, int argc, SWIGTYPE_p_p_char argv) {
     long cPtr = helicsJNI.helicsCreateBrokerFromArgs(type, name, argc, SWIGTYPE_p_p_char.getCPtr(argv));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  public static SWIGTYPE_p_void helicsBrokerClone(SWIGTYPE_p_void broker) {
+    long cPtr = helicsJNI.helicsBrokerClone(SWIGTYPE_p_void.getCPtr(broker));
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -71,6 +89,11 @@ public class helics implements helicsConstants {
 
   public static helics_status helicsCoreDisconnect(SWIGTYPE_p_void core) {
     return helics_status.swigToEnum(helicsJNI.helicsCoreDisconnect(SWIGTYPE_p_void.getCPtr(core)));
+  }
+
+  public static SWIGTYPE_p_void helicsGetFederateByName(String fedName) {
+    long cPtr = helicsJNI.helicsGetFederateByName(fedName);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
   public static helics_status helicsBrokerDisconnect(SWIGTYPE_p_void broker) {
@@ -112,6 +135,11 @@ public class helics implements helicsConstants {
 
   public static SWIGTYPE_p_void helicsCreateCombinationFederateFromJson(String json) {
     long cPtr = helicsJNI.helicsCreateCombinationFederateFromJson(json);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  public static SWIGTYPE_p_void helicsFederateClone(SWIGTYPE_p_void fed) {
+    long cPtr = helicsJNI.helicsFederateClone(SWIGTYPE_p_void.getCPtr(fed));
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 

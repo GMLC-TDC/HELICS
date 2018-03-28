@@ -48,14 +48,14 @@ BOOST_AUTO_TEST_CASE (data_block_constructor_tests)
     BOOST_CHECK_EQUAL (db2.to_string (), str);
 
     data_block db3 (str, 7);
-    BOOST_CHECK_EQUAL (db3.size (), 7);
+    BOOST_CHECK_EQUAL (db3.size (), 7u);
     BOOST_CHECK_EQUAL (db3.to_string (), "this is");
 
     data_block db4 (400, 'r');
     // test move constructor
     data_block db5 (std::move (db4));
-    BOOST_CHECK_EQUAL (db5.size (), 400);
-    BOOST_CHECK_EQUAL (db4.size (), 0);
+    BOOST_CHECK_EQUAL (db5.size (), 400u);
+    BOOST_CHECK_EQUAL (db4.size (), 0u);
     // test copy constructor
     data_block db6 (db5);
     BOOST_CHECK_EQUAL (db6.size (), db5.size ());

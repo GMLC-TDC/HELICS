@@ -1,10 +1,26 @@
 #!/bin/bash
 
-if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    HOMEBREW_NO_AUTO_UPDATE=1 brew install pcre
-fi
+# Set variables based on build environment
+if [[ "$TRAVIS" == "true" ]]; then
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install pcre
+    fi
 
-export CI_DEPENDENCY_DIR=${TRAVIS_BUILD_DIR}/dependencies
+    export CI_DEPENDENCY_DIR=${TRAVIS_BUILD_DIR}/dependencies
+
+    # Convert commit message to lower case
+    commit_msg=`tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE}`
+
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        os_name="Linux"
+    elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        os_name="Darwin"
+    fi
+else
+    export CI_DEPENDENCY_DIR=$1
+    commit_msg=""
+    os_name="$(uname -s)"
+fi
 
 boost_version=$CI_BOOST_VERSION
 if [[ -z "$CI_BOOST_VERSION" ]]; then
@@ -15,13 +31,28 @@ boost_install_path=${CI_DEPENDENCY_DIR}/boost
 cmake_version=3.4.3
 cmake_install_path=${CI_DEPENDENCY_DIR}/cmake
 
+if [[ "$USE_MPI" ]]; then
+    mpi_install_path=${CI_DEPENDENCY_DIR}/mpi
+    case "$USE_MPI" in
+        mpich*)
+            mpi_implementation=mpich
+            mpi_version=3.2
+            ;;
+        openmpi*)
+            mpi_implementation=openmpi
+            mpi_version=3.0.0
+            ;;
+        *)
+            echo "USE_MPI must be either mpich or openmpi to build mpi as a dependency"
+            ;;
+    esac
+fi
+
 swig_version=3.0.10
 swig_install_path=${CI_DEPENDENCY_DIR}/swig
 
+zmq_version=4.2.3
 zmq_install_path=${CI_DEPENDENCY_DIR}/zmq
-
-# Convert commit message to lower case
-commit_msg=`tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE}`
 
 # Wipe out cached dependencies if commit message has '[update_cache]'
 if [[ $commit_msg == *'[update_cache]'* ]]; then
@@ -37,6 +68,12 @@ if [[ $commit_msg == *'[update_cache]'* ]]; then
     if [[ $commit_msg == *'swig'* ]]; then
         rm -rf ${swig_install_path};
         individual="true"
+    fi
+    if [[ "$USE_MPI" ]]; then
+        if [[$commit_msg == *'mpi'* ]]; then
+            rm -rf ${mpi_install_path};
+            individual="true"
+        fi
     fi
 
     # If no dependency named in commit message, update entire cache
@@ -55,10 +92,10 @@ if [[ ! -d "${cmake_install_path}" ]]; then
 fi
 
 # Set path to CMake executable depending on OS
-if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+if [[ "$os_name" == "Linux" ]]; then
     export PATH="${cmake_install_path}/bin:${PATH}"
     echo "*** cmake installed ($PATH)"
-elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+elif [[ "$os_name" == "Darwin" ]]; then
     export PATH="${cmake_install_path}/CMake.app/Contents/bin:${PATH}"
     echo "*** cmake installed ($PATH)"
 fi
@@ -73,8 +110,18 @@ echo "*** built swig successfully {$PATH}"
 # Install ZeroMQ
 if [[ ! -d "${zmq_install_path}" ]]; then
     echo "*** build libzmq"
-    ./scripts/install-dependency.sh zmq ${zmq_install_path}
+    ./scripts/install-dependency.sh zmq ${zmq_version} ${zmq_install_path}
     echo "*** built zmq successfully"
+fi
+
+# Install MPI if USE_MPI is set
+if [[ "$USE_MPI" ]]; then
+    if [[ ! -d "${mpi_install_path}" ]]; then
+        # if mpi_implementation isn't set, then the mpi implementation requested wasn't recognized
+        if [[ ! -z "${mpi_implementation}" ]]; then
+            travis_wait ./scripts/install-dependency.sh ${mpi_implementation} ${mpi_version} ${mpi_install_path}
+        fi
+    fi
 fi
 
 # Install Boost
@@ -88,19 +135,19 @@ fi
 export ZMQ_INCLUDE=${zmq_install_path}/include
 export ZMQ_LIB=${zmq_install_path}/lib
 
-if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+if [[ "$os_name" == "Linux" ]]; then
     export LD_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$LD_LIBRARY_PATH
-elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+elif [[ "$os_name" == "Darwin" ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$DYLD_FALLBACK_LIBRARY_PATH
 fi
 
-if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+if [[ "$os_name" == "Linux" ]]; then
     export LD_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$LD_LIBRARY_PATH
-elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+elif [[ "$os_name" == "Darwin" ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$DYLD_FALLBACK_LIBRARY_PATH
 fi
 
-if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+if [[ "$os_name" == "Darwin" ]]; then
     # HOMEBREW_NO_AUTO_UPDATE=1 brew install boost
     brew update
     brew install python3

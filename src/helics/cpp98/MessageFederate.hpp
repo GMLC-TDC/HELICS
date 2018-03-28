@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -9,8 +8,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define HELICS_CPP98_MESSAGE_FEDERATE_HPP_
 #pragma once
 
-#include "helics.hpp"
 #include "Federate.hpp"
+#include "Endpoint.hpp"
+#include "../shared_api_library/MessageFederate.h"
 
 namespace helics
 {
@@ -97,12 +97,12 @@ class MessageFederate : public virtual Federate
     /** Methods for sending a message **/
     void sendMessage (helics_endpoint source, const std::string &dest, const char *data, size_t len)
     {
-        helicsEndpointSendMessageRaw (source, dest.c_str(), data, len);
+        helicsEndpointSendMessageRaw (source, dest.c_str(), data, static_cast<int>(len));
     }
 
     void sendMessage (helics_endpoint source, const std::string &dest, const char *data, size_t len, helics_time_t time)
     {
-        helicsEndpointSendEventRaw (source, dest.c_str(), data, len, time);
+        helicsEndpointSendEventRaw (source, dest.c_str(), data, static_cast<int>(len), time);
     }
 
     void sendMessage (helics_endpoint source, message_t &message)
@@ -133,4 +133,3 @@ class MessageFederate : public virtual Federate
 };
 } //namespace helics
 #endif
-

@@ -9,8 +9,6 @@
 package com.java.helics;
 
 public interface helicsConstants {
-  public final static int helics_true = helicsJNI.helics_true_get();
-  public final static int helics_false = helicsJNI.helics_false_get();
   public final static int HELICS_CORE_TYPE_DEFAULT = helicsJNI.HELICS_CORE_TYPE_DEFAULT_get();
   public final static int HELICS_CORE_TYPE_ZMQ = helicsJNI.HELICS_CORE_TYPE_ZMQ_get();
   public final static int HELICS_CORE_TYPE_MPI = helicsJNI.HELICS_CORE_TYPE_MPI_get();
@@ -19,10 +17,10 @@ public interface helicsConstants {
   public final static int HELICS_CORE_TYPE_IPC = helicsJNI.HELICS_CORE_TYPE_IPC_get();
   public final static int HELICS_CORE_TYPE_TCP = helicsJNI.HELICS_CORE_TYPE_TCP_get();
   public final static int HELICS_CORE_TYPE_UDP = helicsJNI.HELICS_CORE_TYPE_UDP_get();
-  public final static int HELICS_STRING_TYPE = helicsJNI.HELICS_STRING_TYPE_get();
-  public final static int HELICS_DOUBLE_TYPE = helicsJNI.HELICS_DOUBLE_TYPE_get();
-  public final static int HELICS_INT_TYPE = helicsJNI.HELICS_INT_TYPE_get();
-  public final static int HELICS_COMPLEX_TYPE = helicsJNI.HELICS_COMPLEX_TYPE_get();
-  public final static int HELICS_VECTOR_TYPE = helicsJNI.HELICS_VECTOR_TYPE_get();
-  public final static int HELICS_RAW_TYPE = helicsJNI.HELICS_RAW_TYPE_get();
+  public final static int HELICS_DATA_TYPE_STRING = helicsJNI.HELICS_DATA_TYPE_STRING_get();
+  public final static int HELICS_DATA_TYPE_DOUBLE = helicsJNI.HELICS_DATA_TYPE_DOUBLE_get();
+  public final static int HELICS_DATA_TYPE_INT = helicsJNI.HELICS_DATA_TYPE_INT_get();
+  public final static int HELICS_DATA_TYPE_COMPLEX = helicsJNI.HELICS_DATA_TYPE_COMPLEX_get();
+  public final static int HELICS_DATA_TYPE_VECTOR = helicsJNI.HELICS_DATA_TYPE_VECTOR_get();
+  public final static int HELICS_DATA_TYPE_RAW = helicsJNI.HELICS_DATA_TYPE_RAW_get();
 }

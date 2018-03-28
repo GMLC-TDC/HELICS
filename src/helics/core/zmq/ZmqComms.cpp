@@ -370,10 +370,10 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
             brokerReqPort = DEFAULT_BROKER_REP_PORT_NUMBER;
         }
         zmq::socket_t brokerReq (ctx->getContext (), ZMQ_REQ);
+        brokerReq.setsockopt(ZMQ_LINGER, 50);
         try
         {
-            brokerReq.connect (makePortAddress (brokerTarget_, brokerReqPort));
-            brokerReq.setsockopt(ZMQ_LINGER, 50);
+            brokerReq.connect (makePortAddress (brokerTarget_, brokerReqPort)); 
         }
         catch (zmq::error_t &ze)
         {
@@ -737,7 +737,7 @@ void ZmqComms::closeReceiver ()
         // try connecting with the receivers push socket
         auto ctx = zmqContextManager::getContextPointer ();
         zmq::socket_t pushSocket (ctx->getContext (), ZMQ_PUSH);
-        pushSocket.setsockopt (ZMQ_LINGER, 500);
+        pushSocket.setsockopt (ZMQ_LINGER, 200);
         if (localTarget_ == "tcp://*")
         {
             pushSocket.connect (makePortAddress ("tcp://127.0.0.1", pullPortNumber));

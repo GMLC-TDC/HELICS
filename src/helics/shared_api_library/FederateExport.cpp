@@ -174,6 +174,21 @@ helics_federate helicsCreateCombinationFederateFromJson (const char *json)
     return reinterpret_cast<void *> (fed);
 }
 
+helics_federate helicsFederateClone(helics_federate fed)
+{
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
+    auto *fedObj = reinterpret_cast<helics::FedObject *> (fed);
+    auto *fedClone = new helics::FedObject;
+    fedClone->fedptr = fedObj->fedptr;
+    fedClone->index = getMasterHolder()->addFed(fedClone);
+    fedClone->type = fedObj->type;
+    fedClone->valid = fedObj->valid;
+    return reinterpret_cast<void *> (fedClone);
+}
+
 helics_core helicsFederateGetCoreObject (helics_federate fed)
 {
     auto fedObj = getFed (fed);

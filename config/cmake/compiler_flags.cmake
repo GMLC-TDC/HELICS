@@ -106,9 +106,7 @@ ENDIF(UNIX)
 # -------------------------------------------------------------
 OPTION(ENABLE_CXX_17 "set to ON to enable C++17 compilation features" OFF)
 include(CheckLatestCXXStandardOption)
-IF (VERSION_OPTION)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
-ELSE ()
+IF (NOT VERSION_OPTION)
 	set(CMAKE_CXX_STANDARD 14)
 ENDIF ()
 
