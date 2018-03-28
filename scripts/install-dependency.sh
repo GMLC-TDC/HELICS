@@ -120,9 +120,6 @@ install_boost () {
     local boost_version_str=boost_${ver[0]}_${ver[1]}_${ver[2]}
     local install_path=$2
     local boost_toolset=$3
-    if [[ "$(uname -s)" == "Darwin" ]]; then
-        boost_toolset=darwin
-    fi
     wget --no-check-certificate -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
     (
         cd ${boost_version_str}/;
