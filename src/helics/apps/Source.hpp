@@ -33,7 +33,8 @@ class SourceObject
     Publication pub;
     Time period;
     Time nextTime;
-    int generatorIndex;
+    int generatorIndex=-1;
+    std::string generatorName;
     // source type
 };
 
@@ -100,11 +101,9 @@ class Source
     source format which is tab delimited or comma delimited*/
     void loadFile (const std::string &filename);
     /** initialize the source federate
-    @details generate all the publications and organize the points, the final publication count will be available
-    after this time and the source will enter the initialization mode, which means it will not be possible to add
-    more publications calling run will automatically do this if necessary
+    @details connect all sources with a generator
     */
-    void initialize() {};
+    void initialize();
     /*run the source*/
     void run ();
 
@@ -115,11 +114,23 @@ class Source
 
     /** add a publication to a source
     @param key the key of the publication to add
+    @param generator the name of the generator to link with
     @param type the type of the publication
     @param period the period of the publication
     @param units the units associated with the publication
     */
-    void addPublication (const std::string &key, helics_type_t type, Time period, const std::string &units = "");
+    void addPublication (const std::string &key,const std::string &generator, helics_type_t type, Time period, const std::string &units = std::string());
+
+    /** add a publication to a source
+    @param key the key of the publication to add
+    @param type the type of the publication
+    @param period the period of the publication
+    @param units the units associated with the publication
+    */
+    void addPublication(const std::string &key, helics_type_t type, Time period, const std::string &units = std::string())
+    {
+        addPublication(key, std::string(), type, period, units);
+    }
     /** add a signal generator to the source object
     @return an index for later reference of the signal generator
     */
@@ -151,7 +162,7 @@ class Source
     std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the source
     std::vector<SourceObject> sources;  //!< the actual publication objects
     std::vector<std::shared_ptr<SignalGenerator>> generators; //!< the signal generators
-    std::map<std::string, int> generatorIndex; //!< map of generator names to indices
+    std::map<std::string, int> generatorLookup; //!< map of generator names to indices
     std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
     std::map<std::string, int> pubids;  //!< publication id map
     Time stopTime = Time::maxVal ();  //!< the time the source should stop

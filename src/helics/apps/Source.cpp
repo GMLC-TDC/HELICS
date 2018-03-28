@@ -66,28 +66,28 @@ Source::Source (int argc, char *argv[])
     fed = std::make_shared<CombinationFederate>(fi);
     fed->setFlag(SOURCE_ONLY_FLAG);
 
-    loadArguments(vm_map);
+loadArguments(vm_map);
 }
 
-Source::Source (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
+Source::Source(const FederateInfo &fi) : fed(std::make_shared<CombinationFederate>(fi))
 {
-    fed->setFlag (SOURCE_ONLY_FLAG);
+    fed->setFlag(SOURCE_ONLY_FLAG);
 }
 
-Source::Source (const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : fed (std::make_shared<CombinationFederate> (core, fi))
+Source::Source(const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : fed(std::make_shared<CombinationFederate>(core, fi))
 {
-    fed->setFlag (SOURCE_ONLY_FLAG);
+    fed->setFlag(SOURCE_ONLY_FLAG);
 }
 
-Source::Source (const std::string &jsonString) : fed (std::make_shared<CombinationFederate> (jsonString))
+Source::Source(const std::string &jsonString) : fed(std::make_shared<CombinationFederate>(jsonString))
 {
-    fed->setFlag (SOURCE_ONLY_FLAG);
+    fed->setFlag(SOURCE_ONLY_FLAG);
 
-    loadJsonFile (jsonString);
+    loadJsonFile(jsonString);
 }
 
-Source::~Source () = default;
+Source::~Source() = default;
 
 
 void Source::finalize()
@@ -95,9 +95,9 @@ void Source::finalize()
     fed->finalize();
 }
 
-void Source::loadFile (const std::string &filename)
+void Source::loadFile(const std::string &filename)
 {
-    
+
     auto ext = filesystem::path(filename).extension().string();
     if ((ext == ".json") || (ext == ".JSON"))
     {
@@ -126,13 +126,13 @@ void Source::loadJsonFile(const std::string &jsonFile)
         pubids[newObj.pub.getKey()] = static_cast<int> (sources.size()) - 1;
 
     }
-   /* auto eptCount = fed->getEndpointCount();
-    for (int ii = 0; ii < eptCount; ++ii)
-    {
-        endpoints.emplace_back(fed.get(), ii);
-        eptids[endpoints.back().getName()] = static_cast<int> (endpoints.size() - 1);
-    }
-    */
+    /* auto eptCount = fed->getEndpointCount();
+     for (int ii = 0; ii < eptCount; ++ii)
+     {
+         endpoints.emplace_back(fed.get(), ii);
+         eptids[endpoints.back().getName()] = static_cast<int> (endpoints.size() - 1);
+     }
+     */
     auto doc = loadJsonString(jsonFile);
 
 
@@ -151,10 +151,53 @@ void Source::loadJsonFile(const std::string &jsonFile)
     auto genArray = doc["generators"];
     if (genArray.isArray())
     {
-        
+
     }
 }
 
+void Source::initialize()
+{
+    auto state = fed->getCurrentState();
+    if (state != Federate::op_states::startup)
+    {
+        return;
+    }
+
+    int ii = 0;
+    for (auto &src : sources)
+    {
+        if (src.generatorIndex < 0)
+        {
+            if (!src.generatorName.empty())
+            {
+                auto fnd = generatorLookup.find(src.generatorName);
+                if (fnd != generatorLookup.end())
+                {
+                    src.generatorIndex = fnd->second;
+                }
+                else
+                {
+                    std::cout << "unable to link to signal generator " << src.generatorName << std::endl;
+                    src.nextTime = Time::maxVal();
+                    src.generatorIndex = 0;
+                }
+            }
+            else
+            {
+                if (ii < static_cast<int>(generators.size()))
+                {
+                    src.generatorIndex = ii;
+                }
+                else
+                {
+                    src.generatorIndex = 0;
+                }
+            }
+        }
+    }
+
+    fed->enterInitializationState();
+}
 /*run the source*/
 void Source::run ()
 {
@@ -208,7 +251,7 @@ void Source::run (Time stopTime_input)
    
 }
 
-void Source::addPublication(const std::string  &key, helics_type_t type, Time period, const std::string &units)
+void Source::addPublication(const std::string  &key, const std::string &generator, helics_type_t type, Time period, const std::string &units)
 {
     // skip already existing publications
     if (pubids.find (key) != pubids.end ())
@@ -220,6 +263,14 @@ void Source::addPublication(const std::string  &key, helics_type_t type, Time pe
     
     newObj.pub=Publication (useLocal?LOCAL:GLOBAL, fed.get (), key, type, units);
     newObj.period = period;
+    if (!generator.empty())
+    {
+        auto res = generatorLookup.find(generator);
+        if (res != generatorLookup.end())
+        {
+            newObj.generatorIndex = res->second;
+        }
+    }
     sources.push_back(newObj);
     pubids[key] = static_cast<int> (sources.size ()) - 1;
 }
@@ -241,7 +292,7 @@ int Source::addSignalGenerator(const std::string & name, const std::string &type
     }
     generators.push_back(std::move(gen));
     int index = static_cast<int>(generators.size() - 1);
-    generatorIndex.emplace(name, index);
+    generatorLookup.emplace(name, index);
     return index;
 }
 
@@ -280,8 +331,8 @@ void Source::linkPublicationToGenerator(const std::string &key, const std::strin
     auto fnd = pubids.find(key);
     if (fnd != pubids.end())
     {
-        auto findGen = generatorIndex.find(generator);
-        if (findGen != generatorIndex.end())
+        auto findGen = generatorLookup.find(generator);
+        if (findGen != generatorLookup.end())
         {
             sources[fnd->second].generatorIndex = findGen->second;
             return;
