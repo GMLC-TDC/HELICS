@@ -1,10 +1,26 @@
 #!/bin/bash
 
-if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    HOMEBREW_NO_AUTO_UPDATE=1 brew install pcre
-fi
+# Set variables based on build environment
+if [[ "$TRAVIS" == "true" ]]; then
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install pcre
+    fi
 
-export CI_DEPENDENCY_DIR=${TRAVIS_BUILD_DIR}/dependencies
+    export CI_DEPENDENCY_DIR=${TRAVIS_BUILD_DIR}/dependencies
+
+    # Convert commit message to lower case
+    commit_msg=$(tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE})
+
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        os_name="Linux"
+    elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        os_name="Darwin"
+    fi
+else
+    export CI_DEPENDENCY_DIR=$1
+    commit_msg=""
+    os_name="$(uname -s)"
+fi
 
 boost_version=$CI_BOOST_VERSION
 if [[ -z "$CI_BOOST_VERSION" ]]; then
@@ -17,7 +33,7 @@ cmake_install_path=${CI_DEPENDENCY_DIR}/cmake
 
 if [[ "$USE_MPI" ]]; then
     mpi_install_path=${CI_DEPENDENCY_DIR}/mpi
-    case "$USE_MPI" in
+    case $USE_MPI in
         mpich*)
             mpi_implementation=mpich
             mpi_version=3.2
@@ -37,9 +53,6 @@ swig_install_path=${CI_DEPENDENCY_DIR}/swig
 
 zmq_version=4.2.3
 zmq_install_path=${CI_DEPENDENCY_DIR}/zmq
-
-# Convert commit message to lower case
-commit_msg=$(tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE})
 
 # Wipe out cached dependencies if commit message has '[update_cache]'
 if [[ $commit_msg == *'[update_cache]'* ]]; then
@@ -79,10 +92,10 @@ if [[ ! -d "${cmake_install_path}" ]]; then
 fi
 
 # Set path to CMake executable depending on OS
-if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+if [[ "$os_name" == "Linux" ]]; then
     export PATH="${cmake_install_path}/bin:${PATH}"
     echo "*** cmake installed ($PATH)"
-elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+elif [[ "$os_name" == "Darwin" ]]; then
     export PATH="${cmake_install_path}/CMake.app/Contents/bin:${PATH}"
     echo "*** cmake installed ($PATH)"
 fi
@@ -122,19 +135,19 @@ fi
 export ZMQ_INCLUDE=${zmq_install_path}/include
 export ZMQ_LIB=${zmq_install_path}/lib
 
-if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+if [[ "$os_name" == "Linux" ]]; then
     export LD_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$LD_LIBRARY_PATH
-elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+elif [[ "$os_name" == "Darwin" ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$DYLD_FALLBACK_LIBRARY_PATH
 fi
 
-if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+if [[ "$os_name" == "Linux" ]]; then
     export LD_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$LD_LIBRARY_PATH
-elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+elif [[ "$os_name" == "Darwin" ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$DYLD_FALLBACK_LIBRARY_PATH
 fi
 
-if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+if [[ "$os_name" == "Darwin" ]]; then
     # HOMEBREW_NO_AUTO_UPDATE=1 brew install boost
     brew update
     brew install python3
