@@ -92,7 +92,7 @@ class integer_time
     }
     static constexpr baseType convert(std::chrono::nanoseconds nsTime) noexcept
     {
-        return static_cast<baseType> (toDouble(count) * toSecondMultiplier(1));
+        return static_cast<baseType> (toDouble(nsTime.count()) * toSecondMultiplier(1));
     }
     /** convert the value to a double representation in seconds*/
     static constexpr double toDouble (baseType val) noexcept
@@ -344,7 +344,7 @@ class TimeRepresentation
 #else
     /** normal time constructor from a double representation of seconds*/
     constexpr TimeRepresentation (double t) noexcept : timecode_ (Tconv::convert (t)) {}
-    constexpr TimeRepresentation(std::chrono::nanoseconds nsTime) noexcept : timecode(Tconv::convert(nsTime)) {}
+    constexpr TimeRepresentation(std::chrono::nanoseconds nsTime) noexcept : timecode_(Tconv::convert(nsTime)) {}
     constexpr TimeRepresentation (std::int64_t count, timeUnits units) noexcept
         : timecode_ (Tconv::fromCount (count, units))
     {
@@ -387,7 +387,7 @@ class TimeRepresentation
         return *this;
     }
     /** direct conversion to chrono nanoseconds*/
-    operator std::chrono::nanoseconds(){return std::chrono::nanoseconds(Tconv::toCount(timecode_, timeUnits::ns);) }
+    operator std::chrono::nanoseconds(){return std::chrono::nanoseconds(Tconv::toCount(timecode_, timeUnits::ns)); }
     /** direct conversion to double static cast overload*/
     operator double () const noexcept { return Tconv::toDouble (timecode_); }
 
