@@ -69,8 +69,14 @@ helics::Time loadJsonTime(const Json_helics::Value &timeElement, timeUnits defau
     else
     {
         return helics::loadTimeFromString(timeElement.asString());
-
     }
-    return 0;
+    return helics::Time::minVal();
 }
 
+
+std::string getKey(const Json_helics::Value &element)
+{
+    return (element.isMember("key")) ?
+        element["key"].asString() :
+        ((element.isMember("name")) ? element["name"].asString() : std::string());
+}

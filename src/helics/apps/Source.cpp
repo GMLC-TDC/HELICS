@@ -133,8 +133,8 @@ void Source::loadJsonFile(const std::string &jsonFile)
          eptids[endpoints.back().getName()] = static_cast<int> (endpoints.size() - 1);
      }
      */
+    
     auto doc = loadJsonString(jsonFile);
-
 
     if (doc.isMember("source"))
     {
@@ -148,10 +148,98 @@ void Source::loadJsonFile(const std::string &jsonFile)
             useLocal = playerConfig["local"].asBool();
         }
     }
-    auto genArray = doc["generators"];
-    if (genArray.isArray())
-    {
 
+
+    if (doc.isMember("publications"))
+    {
+        auto pubArray = doc["publications"];
+
+            for (const auto &pubElement : pubArray)
+            {
+                auto key = getKey(pubElement);
+                if (pubElement.isMember("start"))
+                {
+                    setStartTime(key, loadJsonTime(pubElement["start"]));
+                }
+                if (pubElement.isMember("period"))
+                {
+                    setPeriod(key, loadJsonTime(pubElement["period"]));
+                }
+                if (pubElement.isMember("generator"))
+                {
+                    if (pubElement["generator"].isInt())
+                    {
+                        linkPublicationToGenerator(key, pubElement["generator"].asInt());
+                    }
+                    else
+                    {
+                        linkPublicationToGenerator(key, pubElement["generator"].asString());
+                    }
+                }
+
+            }
+        
+    }
+    if (doc.isMember("generators"))
+    {
+        auto genArray = doc["generators"];
+        for (const auto &genElement : genArray)
+        {
+            auto key = getKey(genElement);
+            auto type = genElement["type"];
+            int index = -1;
+            if (!type.isNull())
+            {
+                index=addSignalGenerator(key, type.asString());
+            }
+            else
+            {
+                std::cout << "generator " << key << " does not specify a type\n";
+                continue;
+            }
+            auto mnames = genElement.getMemberNames();
+            for (auto &el : mnames)
+            {
+                if ((el == "type") || (el == "name") || (el == "key"))
+                {
+                    continue;
+                }
+                else if (el == "property")
+                {
+
+                }
+                else
+                {
+                    if (genElement[el].isDouble())
+                    {
+                        generators[index]->set(el, genElement[el].asDouble());
+                    }
+                    else
+                    {
+                        try
+                        {
+                            auto time = loadJsonTime(genElement[el]);
+                            if (time > Time::minVal())
+                            {
+                                generators[index]->set(el, static_cast<double>(time));
+                            }
+                            else
+                            {
+                                generators[index]->setString(el, genElement[el].asString());
+                            }
+                        }
+                        catch (const std::invalid_argument &)
+                        {
+                            generators[index]->setString(el, genElement[el].asString());
+                        }
+                       
+                        
+                    }
+                }
+                
+            }
+        }
+        
     }
 }
 
@@ -192,6 +280,14 @@ void Source::initialize()
                 {
                     src.generatorIndex = 0;
                 }
+            }
+        }
+        else
+        {
+            if (src.generatorIndex >= static_cast<int>(generators.size()))
+            {
+                std::cerr << "invalid generator index for " << src.pub.getKey() << "disabling output\n";
+                src.nextTime = Time::maxVal();
             }
         }
     }
@@ -329,36 +425,34 @@ void Source::setPeriod(const std::string &key, Time period)
 void Source::linkPublicationToGenerator(const std::string &key, const std::string & generator)
 {
     auto fnd = pubids.find(key);
-    if (fnd != pubids.end())
+    if (fnd == pubids.end())
     {
+        //only get here if something wasn't found
+        throw(InvalidParameter(key + " was not recognized as a valid publication"));
+    }
         auto findGen = generatorLookup.find(generator);
         if (findGen != generatorLookup.end())
         {
             sources[fnd->second].generatorIndex = findGen->second;
             return;
         }
-        //only get here if something wasn't found
-        throw(InvalidParameter(generator +" did not name a valid generator"));
-    }
-    //only get here if something wasn't found
-    throw(InvalidParameter(key+" was not recognized as a valid publication"));
+        else
+        {
+            sources[fnd->second].generatorName = generator;
+        }
+
 }
 
 /** tie a publication to a signal generator*/
 void Source::linkPublicationToGenerator(const std::string &key, int genIndex)
 {
     auto fnd = pubids.find(key);
-    if (fnd != pubids.end())
+    if (fnd == pubids.end())
     {
-       if (genIndex<static_cast<int>(generators.size()))
-        {
-            sources[fnd->second].generatorIndex = genIndex;
-            return;
-        }
-       throw(InvalidParameter("generator index was invalid"));
+        //only get here if something wasn't found
+        throw(InvalidParameter(key + " was not recognized as a valid publication"));      
     }
-    //only get here if something wasn't found
-    throw(InvalidParameter(key + " was not recognized as a valid publication"));
+    sources[fnd->second].generatorIndex = genIndex;
 }
 
 

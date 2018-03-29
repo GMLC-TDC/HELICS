@@ -99,7 +99,7 @@ void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
     {
         for (const auto &ept : doc["endpoints"])
         {
-            auto name = ept["name"].asString ();
+            auto name = getKey(ept);
             auto type = (ept.isMember ("type")) ? ept["type"].asString () : "";
             bool global = (ept.isMember ("global")) ? (ept["global"].asBool ()) : false;
             endpoint_id_t epid;

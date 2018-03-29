@@ -179,5 +179,147 @@ BOOST_AUTO_TEST_CASE(sine_source_test)
     fut.get();
 }
 
+
+BOOST_AUTO_TEST_CASE(simple_source_test_file)
+{
+    helics::FederateInfo fi("player1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core1";
+    fi.coreInitString = "2";
+    helics::apps::Source src1(fi);
+    src1.loadFile(std::string(TEST_DIR) + "/test_files/simple_source_test.json");
+
+    fi.name = "block1";
+    helics::ValueFederate vfed(fi);
+    helics::Subscription sub1(&vfed, "pub1");
+    auto fut = std::async(std::launch::async, [&src1]() { src1.run(5); src1.finalize(); });
+    vfed.enterExecutionState();
+    auto retTime = vfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 1.0);
+    auto val = sub1.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 1.3);
+
+    retTime = vfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 2.0);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 1.6);
+
+    retTime = vfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 3.0);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 1.9);
+
+    retTime = vfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 4.0);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 2.2);
+
+    retTime = vfed.requestTime(6);
+    BOOST_CHECK_EQUAL(retTime, 5.0);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 2.5);
+    vfed.finalize();
+    fut.get();
+}
+
+BOOST_AUTO_TEST_CASE(simple_source_test2_file)
+{
+    helics::FederateInfo fi("player1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core2";
+    fi.coreInitString = "2";
+    helics::apps::Source src1(fi);
+    fi.name = "block1";
+
+    src1.loadFile(std::string(TEST_DIR) + "/test_files/simple_source_test2.json");
+    helics::ValueFederate vfed(fi);
+    helics::Subscription sub1(&vfed, "pub1");
+    helics::Subscription sub2(&vfed, "pub2");
+    auto fut = std::async(std::launch::async, [&src1]() { src1.run(5); src1.finalize(); });
+    vfed.enterExecutionState();
+    auto retTime = vfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 1.0);
+    auto val = sub1.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 1.3);
+
+    retTime = vfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 2.0);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 1.6);
+
+    retTime = vfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 3.0);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 1.9);
+    val = sub2.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 3.8);
+
+    retTime = vfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 4.0);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 2.2);
+    val = sub2.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 3.8);
+
+    retTime = vfed.requestTime(6);
+    BOOST_CHECK_EQUAL(retTime, 5.0);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 2.5);
+    val = sub2.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 5.0);
+    vfed.finalize();
+    fut.get();
+}
+
+
+
+BOOST_AUTO_TEST_CASE(sine_source_test_file)
+{
+    helics::FederateInfo fi("player1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core1";
+    fi.coreInitString = "2";
+    helics::apps::Source src1(fi);
+    src1.loadFile(std::string(TEST_DIR) + "/test_files/simple_sine_source.json");
+
+    fi.name = "block1";
+
+    helics::ValueFederate vfed(fi);
+    helics::Subscription sub1(&vfed, "pub1");
+    auto fut = std::async(std::launch::async, [&src1]() { src1.run(5); src1.finalize(); });
+    vfed.enterExecutionState();
+    auto retTime = vfed.requestTime(5);
+
+    BOOST_CHECK_EQUAL(retTime, 1.0);
+    double val = sub1.getValue<double>();
+    BOOST_CHECK_SMALL(val, 1e-12);
+
+    retTime = vfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 1.5);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_CLOSE(val, -1.0, 1e-9);
+
+    retTime = vfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 2.0);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_SMALL(val, 1e-12);
+
+    retTime = vfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 2.5);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_CLOSE(val, 1.0, 1e-9);
+
+    retTime = vfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 3.0);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_SMALL(val, 1e-12);
+
+    retTime = vfed.requestTime(5);
+    BOOST_CHECK_EQUAL(retTime, 3.5);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_CLOSE(val, -1.0, 1e-9);
+    vfed.finalize();
+    fut.get();
+}
 BOOST_AUTO_TEST_SUITE_END()
 
