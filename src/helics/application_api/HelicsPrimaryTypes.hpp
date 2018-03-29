@@ -12,7 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "helics\helics-config.h"
+#include "helics/helics-config.h"
 #include <helics_includes/variant.hpp>
 /** @file
 @brief naming a set of types that are interchangeable and recognizable inside the HELICS application API and core
