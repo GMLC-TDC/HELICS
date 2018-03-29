@@ -283,6 +283,7 @@ class double_time
 /** prototype class for representing time
 @details time representation class that has as a template argument a class that can define time as a number
 and has some required features
+The debug version has a double included for debugging assistance and human readability, the release version removes the double calculations
 */
 template <class Tconv>
 class TimeRepresentation
@@ -380,6 +381,7 @@ class TimeRepresentation
     }
     /** generate the time in seconds*/
     constexpr std::int64_t seconds () const noexcept { return Tconv::seconds (timecode_); }
+    /** convert to an integer 64 value*/
     std::int64_t toCount (timeUnits units) const noexcept { return Tconv::toCount (timecode_, units); }
 
     /** default copy operation*/
@@ -471,52 +473,55 @@ class TimeRepresentation
         DOUBLETIME
         return *this;
     }
-    constexpr TimeRepresentation operator+ (const TimeRepresentation &other) const noexcept
-    {
-        TimeRepresentation trep;
-        trep.timecode_ = timecode_ + other.timecode_;
-        DOUBLETIMEEXT (trep)
-        return trep;
-    }
+   
 #ifdef _DEBUG
     constexpr TimeRepresentation operator- () const noexcept
     {
         return TimeRepresentation (std::integral_constant<int, 4> (), -timecode_, -dtime_);
+    }
+    constexpr TimeRepresentation operator+ (const TimeRepresentation &other) const noexcept
+    {
+        return TimeRepresentation(std::integral_constant<int, 4>(), timecode_ + other.timecode_, dtime_ + other.dtime_);
+    }
+    constexpr TimeRepresentation operator- (const TimeRepresentation &other) const noexcept
+    {
+        return TimeRepresentation(std::integral_constant<int, 4>(), timecode_ - other.timecode_, dtime_ - other.dtime_);
+    }
+    constexpr TimeRepresentation operator* (int multiplier) const noexcept
+    {
+        return TimeRepresentation(std::integral_constant<int, 4>(), timecode_*multiplier, dtime_*multiplier);
+    }
+
+    constexpr TimeRepresentation operator/ (int divisor) const noexcept
+    {
+        return TimeRepresentation(std::integral_constant<int, 4>(), timecode_/divisor, Tconv::toDouble(timecode_ / divisor));
     }
 #else
     constexpr TimeRepresentation operator- () const noexcept
     {
         return TimeRepresentation (std::integral_constant<int, 4> (), -timecode_);
     }
-#endif
-
+    constexpr TimeRepresentation operator+ (const TimeRepresentation &other) const noexcept
+    {
+        return TimeRepresentation(std::integral_constant<int, 4>(), timecode_ + other.timecode_);
+    }
     constexpr TimeRepresentation operator- (const TimeRepresentation &other) const noexcept
     {
-        TimeRepresentation trep;
-        trep.timecode_ = timecode_ - other.timecode_;
-        DOUBLETIMEEXT (trep)
-        return trep;
+        return TimeRepresentation(std::integral_constant<int, 4>(), timecode_ - other.timecode_);
     }
-
     constexpr TimeRepresentation operator* (int multiplier) const noexcept
     {
-        TimeRepresentation trep;
-        trep.timecode_ = timecode_ * multiplier;
-        DOUBLETIMEEXT (trep)
-        return trep;
+        return TimeRepresentation(std::integral_constant<int, 4>(), timecode_*multiplier);
     }
+    constexpr TimeRepresentation operator/ (int divisor) const noexcept
+    {
+        return TimeRepresentation(std::integral_constant<int, 4>(), timecode_ / divisor);
+    }
+#endif
 
     constexpr TimeRepresentation operator* (double multiplier) const noexcept
     {
         return TimeRepresentation (Tconv::toDouble (timecode_) * multiplier);
-    }
-
-    constexpr TimeRepresentation operator/ (int divisor) const noexcept
-    {
-        TimeRepresentation trep;
-        trep.timecode_ = timecode_ / divisor;
-        DOUBLETIMEEXT (trep)
-        return trep;
     }
 
     constexpr TimeRepresentation operator/ (double divisor) const noexcept
