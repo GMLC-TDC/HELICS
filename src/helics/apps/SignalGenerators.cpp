@@ -46,7 +46,7 @@ defV RampGenerator::generate(Time signalTime)
 
 void  SineGenerator::set(const std::string &parameter, double val)
 {
-    if (parameter == "frequency")
+    if ((parameter == "frequency") || (parameter == "freq")||(parameter=="f"))
     {
         frequency = val;
     }
@@ -62,7 +62,7 @@ void  SineGenerator::set(const std::string &parameter, double val)
     {
         dAdt = val;
     }
-    else if (parameter == "amplitude")
+    else if ((parameter == "amplitude") || (parameter == "amp")||(parameter=="a"))
     {
         Amplitude = val;
     }
@@ -101,7 +101,7 @@ defV SineGenerator::generate(Time signalTime)
 
 void  PhasorGenerator::set(const std::string &parameter, double val)
 {
-    if (parameter == "frequency")
+    if ((parameter == "frequency")||(parameter=="freq") || (parameter == "f"))
     {
         frequency = val;
     }
@@ -117,7 +117,7 @@ void  PhasorGenerator::set(const std::string &parameter, double val)
     {
         dAdt = val;
     }
-    else if (parameter == "amplitude")
+    else if ((parameter == "amplitude")||(parameter=="amp") || (parameter == "a"))
     {
         Amplitude = val;
     }
@@ -137,6 +137,28 @@ void  PhasorGenerator::set(const std::string &parameter, double val)
     else
     {
         SignalGenerator::set(parameter, val);
+    }
+}
+
+void PhasorGenerator::set(const std::string &parameter, std::complex<double> val)
+{
+    if ((parameter == "bias") || (parameter == "level"))
+    {
+        bias_real = val.real();
+        bias_imag = val.imag();
+    }
+}
+
+void PhasorGenerator::setString(const std::string &parameter, const std::string &val)
+{
+    auto valc = helicsGetComplex(val);
+    if (std::abs(valc) < 1e12)
+    {
+        set(parameter, valc);
+    }
+    else
+    {
+        SignalGenerator::setString(parameter, val);
     }
 }
 

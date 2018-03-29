@@ -24,9 +24,9 @@ private:
     double ramp = 0.0;
 public:
 
-    virtual void set(const std::string &parameter, double val);
+    virtual void set(const std::string &parameter, double val) override;
 
-    virtual defV generate(Time signalTime);
+    virtual defV generate(Time signalTime) override;
 };
 
 class SineGenerator : public SignalGenerator
@@ -42,9 +42,9 @@ private:
     Time lastCycle = timeZero;
 public:
 
-    virtual void set(const std::string &parameter, double val);
+    virtual void set(const std::string &parameter, double val) override;
 
-    virtual defV generate(Time signalTime);
+    virtual defV generate(Time signalTime) override;
 };
 
 class PhasorGenerator : public SignalGenerator
@@ -62,9 +62,10 @@ private:
     std::complex<double> rotation{ 1.0,0 };
 public:
 
-    virtual void set(const std::string &parameter, double val);
-
-    virtual defV generate(Time signalTime);
+    virtual void set(const std::string &parameter, double val) override;
+    void set(const std::string &parameter, std::complex<double> val);
+    virtual void setString(const std::string &parameter, const std::string &val) override;
+    virtual defV generate(Time signalTime) override;
 };
 }
 }
