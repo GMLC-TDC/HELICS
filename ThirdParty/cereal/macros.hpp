@@ -53,7 +53,7 @@
     archives are accessed by only one thread at a time; it is safe
     to use multiple archives in paralel, but not to access one archive
     from many places simultaneously. */
-#define CEREAL_THREAD_SAFE 0
+#define CEREAL_THREAD_SAFE 1
 #endif // CEREAL_THREAD_SAFE
 
 #ifndef CEREAL_SIZE_TYPE
@@ -131,5 +131,16 @@
     #endif // end CEREAL_HAS_NOEXCEPT
   #endif // end !defined(CEREAL_HAS_NOEXCEPT)
 #endif // ifndef CEREAL_NOEXCEPT
+
+// ######################################################################
+//! Checks if C++17 is available
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+#define CEREAL_HAS_CPP17
+#endif
+
+//! Checks if C++14 is available
+//#if __cplusplus >= 201402L
+#define CEREAL_HAS_CPP14
+//#endif
 
 #endif // CEREAL_MACROS_HPP_

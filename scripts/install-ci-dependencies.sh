@@ -9,7 +9,7 @@ if [[ "$TRAVIS" == "true" ]]; then
     export CI_DEPENDENCY_DIR=${TRAVIS_BUILD_DIR}/dependencies
 
     # Convert commit message to lower case
-    commit_msg=`tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE}`
+    commit_msg=$(tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE})
 
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         os_name="Linux"
@@ -33,7 +33,7 @@ cmake_install_path=${CI_DEPENDENCY_DIR}/cmake
 
 if [[ "$USE_MPI" ]]; then
     mpi_install_path=${CI_DEPENDENCY_DIR}/mpi
-    case "$USE_MPI" in
+    case $USE_MPI in
         mpich*)
             mpi_implementation=mpich
             mpi_version=3.2

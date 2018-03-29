@@ -13,7 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-std::string helicsTypeString (core_type type)
+std::string to_string (core_type type)
 {
     switch (type)
     {

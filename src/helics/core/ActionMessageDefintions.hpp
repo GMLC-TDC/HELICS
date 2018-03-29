@@ -12,15 +12,15 @@ namespace helics
 /** flag definitions for the action Message Flag field*/
 enum action_message_flags : uint16_t
 {
-    iterationRequested = 0,  //!< indicator that an iteration has been requested
-    processingComplete = 1,  //!< indicator that processing has been completed
-    pub_required = 2,  //!< flag indicating a publication is required
-    filt_required = 3,  //!< flag indicating that a filter requires a publication
+    iteration_requested_flag = 0,  //!< indicator that an iteration has been requested
+    processing_complete_flag = 1,  //!< indicator that processing has been completed
+    required_flag = 2,  //!< flag indicating that an action or match is required
+
     error_flag = 4,  //!< flag indicating an error condition associated with the command
     indicator_flag = 5,  //!< flag used for setting values
     extra_flag1 = 7,  //!< extra flag
     clone_flag = 9,  //!< flag indicating the filter is a clone filter
-    broker_min_time=12, //!< flag indicating that a broker the time constraint
+    broker_min_time_flag=12, //!< flag indicating that a broker the time constraint
 };
 /** namespace for message definitions*/
 namespace action_message_def
