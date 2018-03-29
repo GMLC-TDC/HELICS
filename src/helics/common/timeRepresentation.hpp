@@ -397,28 +397,28 @@ class TimeRepresentation
     /** direct conversion to double static cast overload*/
     constexpr operator double () const noexcept { return Tconv::toDouble (timecode_); }
 
-    constexpr TimeRepresentation &operator+= (const TimeRepresentation &rhs) noexcept
+    TimeRepresentation &operator+= (const TimeRepresentation &rhs) noexcept
     {
         timecode_ += rhs.timecode_;
         DOUBLETIME
         return *this;
     }
 
-    constexpr TimeRepresentation &operator-= (const TimeRepresentation &rhs) noexcept
+     TimeRepresentation &operator-= (const TimeRepresentation &rhs) noexcept
     {
         timecode_ -= rhs.timecode_;
         DOUBLETIME
         return *this;
     }
 
-    constexpr TimeRepresentation &operator*= (int multiplier) noexcept
+     TimeRepresentation &operator*= (int multiplier) noexcept
     {
         timecode_ *= multiplier;
         DOUBLETIME
         return *this;
     }
 
-    constexpr TimeRepresentation &operator*= (double multiplier) noexcept
+    TimeRepresentation &operator*= (double multiplier) noexcept
     {
         TimeRepresentation nt (Tconv::toDouble (timecode_) * multiplier);
         timecode_ = nt.timecode_;
@@ -426,14 +426,14 @@ class TimeRepresentation
         return *this;
     }
 
-    constexpr TimeRepresentation &operator/= (int divisor) noexcept
+    TimeRepresentation &operator/= (int divisor) noexcept
     {
         timecode_ /= divisor;
         DOUBLETIME
         return *this;
     }
 
-    constexpr TimeRepresentation &operator/= (double divisor) noexcept
+    TimeRepresentation &operator/= (double divisor) noexcept
     {
         TimeRepresentation nt (Tconv::toDouble (timecode_) / divisor);
         timecode_ = nt.timecode_;
@@ -471,7 +471,7 @@ class TimeRepresentation
         DOUBLETIME
         return *this;
     }
-    TimeRepresentation operator+ (const TimeRepresentation &other) const noexcept
+    constexpr TimeRepresentation operator+ (const TimeRepresentation &other) const noexcept
     {
         TimeRepresentation trep;
         trep.timecode_ = timecode_ + other.timecode_;
@@ -490,7 +490,7 @@ class TimeRepresentation
     }
 #endif
 
-    TimeRepresentation operator- (const TimeRepresentation &other) const noexcept
+    constexpr TimeRepresentation operator- (const TimeRepresentation &other) const noexcept
     {
         TimeRepresentation trep;
         trep.timecode_ = timecode_ - other.timecode_;
