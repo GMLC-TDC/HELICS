@@ -20,6 +20,8 @@ class Endpoint
     std::string actualName; //!< the name of the endpoint
     std::string targetDest;  //!< a predefined target destination
 public:
+    /** default constructor*/
+    Endpoint() = default;
     /**constructor to build an endpoint object
     @param[in] mFed  the MessageFederate to use
     @param[in] name the name of the endpoint

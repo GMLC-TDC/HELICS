@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-* Copyright (c) 2015-2017 Ansel Sermersheim
+* Copyright (c) 2015-2018 Ansel Sermersheim
 * All rights reserved.
 *
 * This file is part of libguarded
@@ -58,6 +58,8 @@ class rcu_list
     class const_iterator;
     class reverse_iterator;
     class const_reverse_iterator;
+    class end_iterator;
+    class end_reverse_iterator;
 
     class rcu_guard;
     using rcu_write_guard = rcu_guard;
@@ -74,11 +76,11 @@ class rcu_list
     ~rcu_list();
 
     iterator begin();
-    iterator end();
+    end_iterator end();
     const_iterator begin() const;
-    const_iterator end() const;
+    end_iterator end() const;
     const_iterator cbegin() const;
-    const_iterator cend() const;
+    end_iterator cend() const;
 
     void clear();
 
@@ -166,7 +168,8 @@ namespace detail
 
 // allocator-aware deleter for unique_ptr
 template <typename Alloc>
-class deallocator {
+class deallocator
+{
     using allocator_type = Alloc;
     using allocator_traits = std::allocator_traits<allocator_type>;
     using pointer = typename allocator_traits::pointer;
@@ -174,7 +177,9 @@ class deallocator {
     allocator_type alloc;
 
   public:
-    explicit deallocator(const allocator_type& alloc) noexcept : alloc(alloc) {}
+    explicit deallocator(const allocator_type &alloc) noexcept : alloc(alloc)
+    {
+    }
 
     void operator()(pointer p)
     {
@@ -185,8 +190,7 @@ class deallocator {
 
 // unique_ptr counterpart for std::allocate_shared()
 template <typename T, typename Alloc, typename... Args>
-std::unique_ptr<T, deallocator<Alloc>> allocate_unique(Alloc& alloc,
-                                                       Args&&... args)
+std::unique_ptr<T, deallocator<Alloc>> allocate_unique(Alloc &alloc, Args &&... args)
 {
     using allocator_traits = std::allocator_traits<Alloc>;
     auto p = allocator_traits::allocate(alloc, 1);
@@ -318,14 +322,14 @@ class rcu_list<T, M, Alloc>::iterator
         return &(m_current->data);
     }
 
-    bool operator==(const const_iterator &other) const
+    bool operator==(const end_iterator &) const
     {
-        return m_current == other.m_current;
+        return m_current == nullptr;
     }
 
-    bool operator!=(const const_iterator &other) const
+    bool operator!=(const end_iterator &) const
     {
-        return m_current != other.m_current;
+        return m_current != nullptr;
     }
 
     iterator &operator++()
@@ -334,22 +338,22 @@ class rcu_list<T, M, Alloc>::iterator
         return *this;
     }
 
-    const_iterator &operator--()
+    iterator &operator--()
     {
         m_current = m_current->prev.load();
         return *this;
     }
 
-    const_iterator operator++(int)
+    iterator operator++(int)
     {
-        const_iterator old(*this);
+        iterator old(*this);
         ++(*this);
         return old;
     }
 
-    const_iterator operator--(int)
+    iterator operator--(int)
     {
-        const_iterator old(*this);
+        iterator old(*this);
         --(*this);
         return old;
     }
@@ -358,7 +362,8 @@ class rcu_list<T, M, Alloc>::iterator
     friend rcu_list<T, M, Alloc>;
     friend rcu_list<T, M, Alloc>::const_iterator;
 
-    explicit iterator(const typename rcu_list<T, M, Alloc>::const_iterator &it) : m_current(it.m_current)
+    explicit iterator(const typename rcu_list<T, M, Alloc>::const_iterator &it)
+        : m_current(it.m_current)
     {
     }
 
@@ -387,20 +392,21 @@ class rcu_list<T, M, Alloc>::const_iterator
     const T &operator*() const
     {
         return m_current->data;
-    };
+    }
+
     const T *operator->() const
     {
         return &(m_current->data);
-    };
-
-    bool operator==(const const_iterator &other) const
-    {
-        return m_current == other.m_current;
     }
 
-    bool operator!=(const const_iterator &other) const
+    bool operator==(const end_iterator &) const
     {
-        return m_current != other.m_current;
+        return m_current == nullptr;
+    }
+
+    bool operator!=(const end_iterator &) const
+    {
+        return m_current != nullptr;
     }
 
     const_iterator &operator++()
@@ -440,6 +446,33 @@ class rcu_list<T, M, Alloc>::const_iterator
 /*----------------------------------------*/
 
 template <typename T, typename M, typename Alloc>
+class rcu_list<T, M, Alloc>::end_iterator
+{
+  public:
+    bool operator==(iterator iter) const
+    {
+        return iter == *this;
+    }
+
+    bool operator!=(iterator iter) const
+    {
+        return iter != *this;
+    }
+
+    bool operator==(const_iterator iter) const
+    {
+        return iter == *this;
+    }
+
+    bool operator!=(const_iterator iter) const
+    {
+        return iter != *this;
+    }
+};
+
+/*----------------------------------------*/
+
+template <typename T, typename M, typename Alloc>
 rcu_list<T, M, Alloc>::rcu_list()
 {
     m_head.store(nullptr);
@@ -447,9 +480,7 @@ rcu_list<T, M, Alloc>::rcu_list()
 }
 
 template <typename T, typename M, typename Alloc>
-rcu_list<T, M, Alloc>::rcu_list(const Alloc &alloc)
-  : m_node_alloc(alloc),
-    m_zombie_alloc(alloc)
+rcu_list<T, M, Alloc>::rcu_list(const Alloc &alloc) : m_node_alloc(alloc), m_zombie_alloc(alloc)
 {
 }
 
@@ -487,9 +518,9 @@ auto rcu_list<T, M, Alloc>::begin() -> iterator
 }
 
 template <typename T, typename M, typename Alloc>
-auto rcu_list<T, M, Alloc>::end() -> iterator
+auto rcu_list<T, M, Alloc>::end() -> end_iterator
 {
-    return iterator();
+    return end_iterator();
 }
 
 template <typename T, typename M, typename Alloc>
@@ -499,9 +530,9 @@ auto rcu_list<T, M, Alloc>::begin() const -> const_iterator
 }
 
 template <typename T, typename M, typename Alloc>
-auto rcu_list<T, M, Alloc>::end() const -> const_iterator
+auto rcu_list<T, M, Alloc>::end() const -> end_iterator
 {
-    return const_iterator();
+    return end_iterator();
 }
 
 template <typename T, typename M, typename Alloc>

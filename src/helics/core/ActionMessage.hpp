@@ -177,7 +177,7 @@ class ActionMessage
     void to_string (std::string &data) const;
     /** convert to a byte string*/
     std::string to_string () const;
-    /** packettize the message with a simple header and tail sequence
+    /** packetize the message with a simple header and tail sequence
      */
     std::string packetize () const;
     /** covert to a byte vector using a reference*/

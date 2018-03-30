@@ -298,18 +298,18 @@ helics_status helicsFederateEnterExecutionMode (helics_federate fed)
     }
 }
 
-static helics::helics_iteration_request getIterationRequest (helics_iteration_request iterate)
+static helics::iteration_request getIterationRequest (helics_iteration_request iterate)
 {
     switch (iterate)
     {
     case no_iteration:
     default:
-        return helics::helics_iteration_request::no_iterations;
+        return helics::iteration_request::no_iterations;
     case force_iteration:
-        return helics::helics_iteration_request::force_iteration;
+        return helics::iteration_request::force_iteration;
 
     case iterate_if_needed:
-        return helics::helics_iteration_request::iterate_if_needed;
+        return helics::iteration_request::iterate_if_needed;
     }
 }
 

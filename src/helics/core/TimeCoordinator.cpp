@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -20,45 +19,50 @@ TimeCoordinator::TimeCoordinator (const CoreFederateInfo &info_) : info (info_)
     }
 }
 
-void TimeCoordinator::enteringExecMode (helics_iteration_request mode)
+void TimeCoordinator::enteringExecMode (iteration_request mode)
 {
     if (executionMode)
     {
         return;
     }
-    iterating = (mode != helics_iteration_request::no_iterations);
+    iterating = (mode != iteration_request::no_iterations);
     checkingExec = true;
-    if ((!dependents.empty ()) && (sendMessageFunction))
+    ActionMessage execreq (CMD_EXEC_REQUEST);
+    execreq.source_id = source_id;
+    if (iterating)
     {
-        ActionMessage execreq (CMD_EXEC_REQUEST);
-        execreq.source_id = source_id;
-        if (iterating)
-        {
-            setActionFlag (execreq, iterationRequested);
-        }
-        sendMessageFunction (execreq);
+        setActionFlag (execreq, iteration_requested_flag);
     }
+    transmitTimingMessage (execreq);
+}
+
+
+void TimeCoordinator::disconnect()
+{
+    ActionMessage bye(CMD_DISCONNECT);
+    bye.source_id = source_id;
+    transmitTimingMessage(bye);
 }
 
 void TimeCoordinator::timeRequest (Time nextTime,
-                                   helics_iteration_request iterate,
+                                   iteration_request iterate,
                                    Time newValueTime,
                                    Time newMessageTime)
 {
-    iterating = (iterate != helics_iteration_request::no_iterations);
+    iterating = (iterate != iteration_request::no_iterations);
 
-    if (nextTime <= getNextPossibleTime())
+    if (nextTime <= getNextPossibleTime ())
     {
-        nextTime = getNextPossibleTime();
+        nextTime = getNextPossibleTime ();
     }
     time_requested = nextTime;
     time_value = newValueTime;
     time_message = newMessageTime;
-    updateTimeFactors();
+    updateTimeFactors ();
 
     if (!dependents.empty ())
     {
-        sendTimeRequest();
+        sendTimeRequest ();
     }
 }
 
@@ -73,11 +77,11 @@ bool TimeCoordinator::updateNextExecutionTime ()
     time_exec = std::min (time_requested, time_exec);
     if (time_exec <= time_granted)
     {
-        time_exec = (iterating) ? time_granted : getNextPossibleTime();
+        time_exec = (iterating) ? time_granted : getNextPossibleTime ();
     }
     if ((time_exec - time_granted) > 0.0)
     {
-        time_exec=generateAllowedTime(time_exec);
+        time_exec = generateAllowedTime (time_exec);
     }
     return (time_exec != cexec);
 }
@@ -86,21 +90,21 @@ void TimeCoordinator::updateNextPossibleEventTime ()
 {
     if (!iterating)
     {
-        time_next = getNextPossibleTime();
+        time_next = getNextPossibleTime ();
     }
     else
     {
         time_next = time_granted;
     }
-    if (time_minminDe < Time::maxVal())
+    if (time_minminDe < Time::maxVal ())
     {
         if (time_minminDe + info.inputDelay > time_next)
         {
             time_next = time_minminDe + info.inputDelay;
-            time_next = generateAllowedTime(time_next);
+            time_next = generateAllowedTime (time_next);
         }
     }
-    time_next = std::min(time_next, time_exec) + info.outputDelay;
+    time_next = std::min (time_next, time_exec) + info.outputDelay;
 }
 
 void TimeCoordinator::updateValueTime (Time valueUpdateTime)
@@ -122,7 +126,7 @@ void TimeCoordinator::updateValueTime (Time valueUpdateTime)
         }
         else
         {
-            auto nextPossibleTime = getNextPossibleTime();
+            auto nextPossibleTime = getNextPossibleTime ();
             if (valueUpdateTime <= nextPossibleTime)
             {
                 time_value = nextPossibleTime;
@@ -134,9 +138,9 @@ void TimeCoordinator::updateValueTime (Time valueUpdateTime)
         }
         if (time_value < ptime)
         {
-            if (updateNextExecutionTime())
+            if (updateNextExecutionTime ())
             {
-                sendTimeRequest();
+                sendTimeRequest ();
             }
         }
     }
@@ -157,9 +161,9 @@ Time TimeCoordinator::getNextPossibleTime() const
         }
         else if (info.offset == timeZero)
         {
-            return generateAllowedTime(std::max(info.timeDelta, info.period));
+            return generateAllowedTime (std::max (info.timeDelta, info.period));
         }
-        else if (info.period <= Time::epsilon())
+        else if (info.period <= Time::epsilon ())
         {
             return info.timeDelta;
         }
@@ -173,20 +177,20 @@ Time TimeCoordinator::getNextPossibleTime() const
             return retTime;
         }
     }
-    return generateAllowedTime(time_grantBase + std::max(info.timeDelta, info.period));
+    return generateAllowedTime (time_grantBase + std::max (info.timeDelta, info.period));
 }
 
-Time TimeCoordinator::generateAllowedTime(Time testTime) const
+Time TimeCoordinator::generateAllowedTime (Time testTime) const
 {
     if (info.period > timeEpsilon)
     {
-        if (testTime == Time::maxVal())
+        if (testTime == Time::maxVal ())
         {
             return testTime;
         }
         if (testTime - time_grantBase > info.period)
         {
-            auto blk = static_cast<int> (std::ceil((testTime - time_grantBase) / info.period));
+            auto blk = static_cast<int> (std::ceil ((testTime - time_grantBase) / info.period));
             testTime = time_grantBase + blk * info.period;
         }
         else
@@ -217,7 +221,7 @@ void TimeCoordinator::updateMessageTime (Time messageUpdateTime)
         }
         else
         {
-            auto nextPossibleTime = getNextPossibleTime();
+            auto nextPossibleTime = getNextPossibleTime ();
             if (messageUpdateTime <= nextPossibleTime)
             {
                 time_message = nextPossibleTime;
@@ -229,9 +233,9 @@ void TimeCoordinator::updateMessageTime (Time messageUpdateTime)
         }
         if (time_message < ptime)
         {
-            if (updateNextExecutionTime())
+            if (updateNextExecutionTime ())
             {
-                sendTimeRequest();
+                sendTimeRequest ();
             }
         }
     }
@@ -257,8 +261,8 @@ bool TimeCoordinator::updateTimeFactors ()
         }
         else
         {
-            //this minimum dependent event time received was invalid and can't be trusted
-            //therefore it can't be used to determine a time grant
+            // this minimum dependent event time received was invalid and can't be trusted
+            // therefore it can't be used to determine a time grant
             minminDe = -1;
         }
 
@@ -279,22 +283,22 @@ bool TimeCoordinator::updateTimeFactors ()
     {
         update = true;
     }
-    if (minDe < Time::maxVal())
+    if (minDe < Time::maxVal ())
     {
-        minDe = generateAllowedTime(minDe) + info.outputDelay;
+        minDe = generateAllowedTime (minDe) + info.outputDelay;
     }
     if (minDe != time_minDe)
     {
         update = true;
         time_minDe = minDe;
     }
-    if (minNext < Time::maxVal())
+    if (minNext < Time::maxVal ())
     {
         time_allow = info.inputDelay + minNext;
     }
     else
     {
-        time_allow = Time::maxVal();
+        time_allow = Time::maxVal ();
     }
     updateNextExecutionTime ();
     return update;
@@ -307,19 +311,19 @@ iteration_state TimeCoordinator::checkTimeGrant ()
     {
         if (time_allow > time_exec)
         {
-            updateTimeGrant();
+            updateTimeGrant ();
             return iteration_state::next_step;
         }
         if (time_allow == time_exec)
         {
             if (time_requested <= time_exec)
             {
-                updateTimeGrant();
+                updateTimeGrant ();
                 return iteration_state::next_step;
             }
             if (dependencies.checkIfReadyForTimeGrant (false, time_exec))
             {
-                updateTimeGrant();
+                updateTimeGrant ();
                 return iteration_state::next_step;
             }
         }
@@ -328,16 +332,16 @@ iteration_state TimeCoordinator::checkTimeGrant ()
     {
         if (time_allow > time_exec)
         {
-            dependencies.resetIteratingTimeRequests(time_exec);
-            updateTimeGrant();
+            dependencies.resetIteratingTimeRequests (time_exec);
+            updateTimeGrant ();
             return iteration_state::iterating;
         }
         if (time_allow == time_exec)  // time_allow==time_exec==time_granted
         {
             if (dependencies.checkIfReadyForTimeGrant (true, time_exec))
             {
-                dependencies.resetIteratingTimeRequests(time_exec);
-                updateTimeGrant();
+                dependencies.resetIteratingTimeRequests (time_exec);
+                updateTimeGrant ();
                 return iteration_state::iterating;
             }
         }
@@ -346,40 +350,37 @@ iteration_state TimeCoordinator::checkTimeGrant ()
     // if we haven't returned we need to update the time messages
     if ((!dependents.empty ()) && (update))
     {
-        sendTimeRequest();
+        sendTimeRequest ();
     }
     return iteration_state::continue_processing;
 }
 
-
-void TimeCoordinator::sendTimeRequest() const
+void TimeCoordinator::sendTimeRequest () const
 {
-    ActionMessage upd(CMD_TIME_REQUEST);
+    ActionMessage upd (CMD_TIME_REQUEST);
     upd.source_id = source_id;
     upd.actionTime = time_next;
-    upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
+    upd.Te = (time_exec != Time::maxVal ()) ? time_exec + info.outputDelay : time_exec;
     upd.Tdemin = (time_minDe < time_next) ? time_next : time_minDe;
 
     if (iterating)
     {
-        setActionFlag(upd, iterationRequested);
+        setActionFlag (upd, iteration_requested_flag);
     }
-    sendMessageFunction(upd);
+    transmitTimingMessage (upd);
     //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
     // static_cast<double>(time_exec), static_cast<double>(time_minDe));
 }
 
-void  TimeCoordinator::updateTimeGrant()
+void TimeCoordinator::updateTimeGrant ()
 {
     time_granted = time_exec;
     time_grantBase = time_granted;
-    if ((!dependents.empty()) && (sendMessageFunction))
-    {
-        ActionMessage treq(CMD_TIME_GRANT);
-        treq.source_id = source_id;
-        treq.actionTime = time_granted;
-        sendMessageFunction(treq);
-    }
+
+    ActionMessage treq (CMD_TIME_GRANT);
+    treq.source_id = source_id;
+    treq.actionTime = time_granted;
+    transmitTimingMessage (treq);
     // printf("%d GRANT allow=%f next=%f, exec=%f, Tdemin=%f\n", source_id,
     // static_cast<double>(time_allow), static_cast<double>(time_next), static_cast<double>(time_exec),
     // static_cast<double>(time_minDe));
@@ -449,6 +450,18 @@ std::vector<Core::federate_id_t> TimeCoordinator::getDependencies () const
     return deps;
 }
 
+void TimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
+{
+    if (sendMessageFunction)
+    {
+        for (auto dep : dependents)
+        {
+            msg.dest_id = dep;
+            sendMessageFunction (msg);
+        }
+    }
+}
+
 iteration_state TimeCoordinator::checkExecEntry ()
 {
     auto ret = iteration_state::continue_processing;
@@ -485,24 +498,18 @@ iteration_state TimeCoordinator::checkExecEntry ()
         time_grantBase = time_granted;
         executionMode = true;
 
-        if (sendMessageFunction)
-        {
-            ActionMessage execgrant (CMD_EXEC_GRANT);
-            execgrant.source_id = source_id;
-            sendMessageFunction (execgrant);
-        }
+        ActionMessage execgrant (CMD_EXEC_GRANT);
+        execgrant.source_id = source_id;
+        transmitTimingMessage (execgrant);
     }
     else if (ret == iteration_state::iterating)
     {
         dependencies.resetIteratingExecRequests ();
         hasInitUpdates = false;
-        if (sendMessageFunction)
-        {
-            ActionMessage execgrant (CMD_EXEC_GRANT);
-            execgrant.source_id = source_id;
-            setActionFlag (execgrant, iterationRequested);
-            sendMessageFunction (execgrant);
-        }
+        ActionMessage execgrant (CMD_EXEC_GRANT);
+        execgrant.source_id = source_id;
+        setActionFlag (execgrant, iteration_requested_flag);
+        transmitTimingMessage (execgrant);
     }
     return ret;
 }
@@ -601,4 +608,3 @@ void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd, bool
 }
 
 }  // namespace helics
-

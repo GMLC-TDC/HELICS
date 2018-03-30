@@ -48,14 +48,15 @@ class FederateState
 	  std::unique_ptr<TimeCoordinator> timeCoord;  //!< object that manages the time to determine granting
   public:
     Core::federate_id_t local_id = invalid_fed_id;  //!< id code, default to something invalid
-    Core::federate_id_t global_id = invalid_fed_id;  //!< global id code, default to invalid
+    std::atomic<Core::federate_id_t> global_id{ invalid_fed_id };  //!< global id code, default to invalid
 
   private:
-    std::atomic<helics_federate_state_type> state{HELICS_NONE};  //!< the current state of the federate
-    bool only_update_on_change{false};  //!< flag indicating that values should only be updated on change
-    bool only_transmit_on_change{
-      false};  //!< flag indicating that values should only be transmitted if different than previous values
+    
 	shared_guarded<DualMappedPointerVector<SubscriptionInfo, std::string, Core::handle_id_t>> subscriptions; //!< storage for all the subscriptions
+    std::atomic<helics_federate_state_type> state{ HELICS_NONE };  //!< the current state of the federate
+    bool only_update_on_change{ false };  //!< flag indicating that values should only be updated on change
+    bool only_transmit_on_change{
+        false };  //!< flag indicating that values should only be transmitted if different than previous values
     shared_guarded<DualMappedPointerVector<PublicationInfo, std::string, Core::handle_id_t>> publications; //!< storage for all the publications
     shared_guarded<DualMappedPointerVector<EndpointInfo, std::string, Core::handle_id_t>> endpoints;  //!< storage for all the endpoints
 
@@ -68,8 +69,10 @@ private:
 
     bool iterating = false;  //!< the federate is iterating at a time step
     bool hasEndpoints = false;  //!< the federate has endpoints
+    bool timeGranted_mode = false;  //!< indicator if the federate is in a granted state or a requested state waiting to grant 
     // 1 byte free
     int logLevel = 1;
+    
  //   std::vector<ActionMessage> messLog;
   private:
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
@@ -80,6 +83,7 @@ private:
     std::map<Core::handle_id_t, std::vector<std::unique_ptr<Message>>>
       message_queue;  // structure of message queues
 	Time time_granted = startupTime;  //!< the most recent granted time;
+    Time allowed_send_time = startupTime; //!< the next time a message can be sent;
     mutable std::mutex _mutex;  //!< the mutex protecting the fed state
 
     std::atomic<bool> processing{false};  //!< the federate is processing
@@ -148,7 +152,7 @@ private:
     @param[out] id the endpoint related to the message*/
     std::unique_ptr<Message> receiveAny (Core::handle_id_t &id);
 	/** set the CommonCore object that is managing this Federate*/
-    void setParent (CommonCore *coreObject);
+    void setParent(CommonCore *coreObject) { parent_ = coreObject; };
 
   private:
     /** process the federate queue until returnable event
@@ -186,6 +190,8 @@ private:
     void updateFederateInfo (const ActionMessage &cmd);
 	/** get the granted time of a federate*/
     Time grantedTime () const { return time_granted; }
+    /** get allowable message time*/
+    Time nextAllowedSendTime() const { return allowed_send_time; }
 	/**get a reference to the handles of subscriptions with value updates
 	*/
     const std::vector<Core::handle_id_t> &getEvents () const;
@@ -203,14 +209,14 @@ private:
 	@param converged indicator of whether the fed should iterate if need be or not
     returns either converged or nonconverged depending on whether an iteration is needed
     */
-    iteration_result enterExecutingState (helics_iteration_request iterate);
+    iteration_result enterExecutingState (iteration_request iterate);
 	/** request a time advancement
 	@param nextTime the time of the requested advancement
     @param converged set to complete to end dense time step iteration, nonconverged to continue iterating if need
     be
 	@return an iteration time with two elements the granted time and the convergence state
 	*/
-    iteration_time requestTime (Time nextTime, helics_iteration_request iterate);
+    iteration_time requestTime (Time nextTime, iteration_request iterate);
 	/** function to process the queue in a generic fashion used to just process messages
 	with no specific end in mind
 	*/
@@ -253,6 +259,9 @@ private:
     @return true if it should be published, false if not
     */
     bool checkAndSetValue(Core::handle_id_t pub_id, const char *data, uint64_t len);
+
+    /** route a message either forward to parent or add to queue*/
+    void routeMessage(const ActionMessage &msg);
 };
 } // namespace helics
 

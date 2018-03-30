@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -19,12 +18,10 @@ void ForwardingTimeCoordinator::enteringExecMode ()
         return;
     }
     checkingExec = true;
-    if ((!dependents.empty ()) && (sendMessageFunction))
-    {
         ActionMessage execreq (CMD_EXEC_REQUEST);
         execreq.source_id = source_id;
-        sendMessageFunction (execreq);
-    }
+        transmitTimingMessage(execreq);
+
 }
 
 static inline bool isBroker(Core::federate_id_t id)
@@ -189,9 +186,9 @@ void ForwardingTimeCoordinator::sendTimeRequest () const
         upd.actionTime = time_next;
         if (iterating)
         {
-            setActionFlag(upd, iterationRequested);
+            setActionFlag(upd, iteration_requested_flag);
         }
-        sendMessageFunction(upd);
+        transmitTimingMessage(upd);
     }
     else
     {
@@ -203,9 +200,9 @@ void ForwardingTimeCoordinator::sendTimeRequest () const
         upd.Tdemin = time_minminDe;
         if (iterating)
         {
-            setActionFlag(upd, iterationRequested);
+            setActionFlag(upd, iteration_requested_flag);
         }
-        sendMessageFunction(upd);
+        transmitTimingMessage(upd);
 
         //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
         // static_cast<double>(time_exec), static_cast<double>(time_minDe));
@@ -305,14 +302,24 @@ iteration_state ForwardingTimeCoordinator::checkExecEntry ()
     time_state = DependencyInfo::time_state_t::time_granted;
     time_minDe = timeZero;
     time_minminDe = timeZero;
-    if (sendMessageFunction)
-    {
+
         ActionMessage execgrant (CMD_EXEC_GRANT);
         execgrant.source_id = source_id;
-        sendMessageFunction (execgrant);
-    }
+        transmitTimingMessage (execgrant);
 
     return ret;
+}
+
+void ForwardingTimeCoordinator::transmitTimingMessage(ActionMessage &msg) const
+{
+    if (sendMessageFunction)
+    {
+        for (auto dep : dependents)
+        {
+            msg.dest_id = dep;
+            sendMessageFunction(msg);
+        }
+    }
 }
 
 bool ForwardingTimeCoordinator::processTimeMessage (const ActionMessage &cmd)

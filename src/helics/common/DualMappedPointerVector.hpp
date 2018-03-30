@@ -51,6 +51,7 @@ public:
 		if (fnd != lookup1.end())
 		{
 			dataStorage[fnd->second] = std::make_unique<VType>(std::forward<Us>(data)...);
+            lookup2[searchValue2] = fnd->second;
 			return fnd->second;
 		}
 		else
@@ -62,10 +63,48 @@ public:
 			return index;
 		}
 	}
+
+    /** insert a new element into the vector*/
+    template <typename... Us>
+    size_t insert(const searchType1 &searchValue1, std::nullptr_t /*unused*/, Us &&... data)
+    {
+        auto fnd = lookup1.find(searchValue1);
+        if (fnd != lookup1.end())
+        {
+            dataStorage[fnd->second] = std::make_unique<VType>(std::forward<Us>(data)...);
+            return fnd->second;
+        }
+        else
+        {
+            auto index = dataStorage.size();
+            dataStorage.emplace_back(std::make_unique<VType>(std::forward<Us>(data)...));
+            lookup1.emplace(searchValue1, index);
+            return index;
+        }
+    }
+
+    /** insert a new element into the vector*/
+    template <typename... Us>
+    size_t insert(std::nullptr_t /*unused*/, const searchType2 &searchValue2, Us &&... data)
+    {
+        auto fnd = lookup2.find(searchValue2);
+        if (fnd != lookup2.end())
+        {
+            dataStorage[fnd->second] = std::make_unique<VType>(std::forward<Us>(data)...);
+            return fnd->second;
+        }
+        else
+        {
+            auto index = dataStorage.size();
+            dataStorage.emplace_back(std::make_unique<VType>(std::forward<Us>(data)...));
+            lookup2.emplace(searchValue2, index);
+            return index;
+        }
+    }
 	/** find an element based on the search value
 	@return nullptr if the element is not found
 	*/
-	VType *find(const searchType1 &searchValue1)
+	VType *find(const searchType1 &searchValue1) const
 	{
 		auto fnd = lookup1.find(searchValue1);
 		if (fnd != lookup1.end())
@@ -78,7 +117,7 @@ public:
 	/** find an element based on the search value
 	@return nullptr if the element is not found
 	*/
-	VType *find(const searchType2 &searchValue2)
+	VType *find(const searchType2 &searchValue2) const
 	{
 		auto fnd = lookup2.find(searchValue2);
 		if (fnd != lookup2.end())
@@ -88,35 +127,7 @@ public:
 		return nullptr;
 	}
 
-	/** find an element based on the search value
-	@return nullptr if the element is not found
-	*/
-	const VType *find(const searchType1 &searchValue1) const
-	{
-		auto fnd = lookup1.find(searchValue1);
-		if (fnd != lookup1.end())
-		{
-			return dataStorage[fnd->second].get();
-		}
-		return nullptr;
-	}
-
-	/** find an element based on the search value
-	@return nullptr if the element is not found
-	*/
-	const VType *find(const searchType2 &searchValue2) const
-	{
-		auto fnd = lookup2.find(searchValue2);
-		if (fnd != lookup2.end())
-		{
-			return dataStorage[fnd->second].get();
-		}
-		return nullptr;
-	}
-
-	VType *operator[] (size_t index) { return(index<dataStorage.size()) ? (dataStorage[index].get()) : nullptr; }
-
-	const VType *operator[] (size_t index) const { return(index<dataStorage.size()) ? (dataStorage[index].get()) : nullptr; }
+	VType *operator[] (size_t index) const{ return(index<dataStorage.size()) ? (dataStorage[index].get()) : nullptr; }
 
 	/** get a pointer to the last element inserted*/
 	VType *back() { return dataStorage.back().get(); }
