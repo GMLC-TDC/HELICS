@@ -142,6 +142,14 @@ inline std::string typeNameString<float> ()
 {
     return "float";
 }
+
+/** for boolean*/
+template <>
+inline std::string typeNameString<bool>()
+{
+    return "bool";
+}
+
 /** for character*/
 template <>
 inline std::string typeNameString<char> ()
@@ -212,6 +220,7 @@ enum class helics_type_t : int
     helicsVector = 4,
     helicsComplexVector = 5,
     helicsNamedPoint = 6,
+    helicsBool =7,
     helicsInvalid = 23425,
     helicsAny = 247652,
 };
@@ -257,6 +266,7 @@ data_block typeConvert (helics_type_t type, const std::complex<double> &val);
 data_block typeConvert(helics_type_t type, named_point &val);
 data_block typeConvert(helics_type_t type, const char *str, double val);
 data_block typeConvert(helics_type_t type, const std::string &str, double val);
+data_block typeConvert (helics_type_t type, bool val);
 
 /** template class for generating a known name of a type*/
 template <class X>
@@ -269,6 +279,12 @@ template <>
 constexpr helics_type_t helicsType<int64_t> ()
 {
     return helics_type_t::helicsInt;
+}
+
+template <>
+constexpr helics_type_t helicsType<bool>()
+{
+    return helics_type_t::helicsBool;
 }
 
 template <>

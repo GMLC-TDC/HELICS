@@ -54,6 +54,9 @@ swig_install_path=${CI_DEPENDENCY_DIR}/swig
 zmq_version=4.2.3
 zmq_install_path=${CI_DEPENDENCY_DIR}/zmq
 
+# Convert commit message to lower case
+commit_msg=$(tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE})
+
 # Wipe out cached dependencies if commit message has '[update_cache]'
 if [[ $commit_msg == *'[update_cache]'* ]]; then
     individual="false"

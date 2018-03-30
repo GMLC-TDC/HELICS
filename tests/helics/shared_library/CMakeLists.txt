@@ -34,11 +34,13 @@ test-message-federate_cpp.cpp
 #QueryTests.cpp
 )
 
-include_directories( SYSTEM ${Boost_INCLUDE_DIR})
 
-include_directories(${PROJECT_SOURCE_DIR}/src)
+
 
 add_executable(shared-library-tests ${shared_library_test_sources} ${shared_library_test_headers})
+
+target_include_directories(shared-library-tests SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
+target_include_directories(shared-library-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 IF (VERSION_OPTION)
 	IF (MSVC)
@@ -74,11 +76,9 @@ add_custom_command(TARGET shared-library-tests POST_BUILD        # Adds a post-b
         "$<TARGET_FILE_DIR:shared-library-tests>/")                 # <--this is out-file path
 endforeach(keyfile)
 
-if(BUILD_C_SHARED_LIB)
     add_custom_command(TARGET shared-library-tests POST_BUILD        # Adds a post-build event to api tests
         COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
             "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
             "$<TARGET_FILE_DIR:shared-library-tests>/")                 # <--this is out-file path
-endif()
 endif(WIN32)
 

@@ -228,7 +228,7 @@ void Federate::enterInitializationStateComplete ()
     }
 }
 
-iteration_result Federate::enterExecutionState (helics_iteration_request iterate)
+iteration_result Federate::enterExecutionState (iteration_request iterate)
 {
     iteration_result res = iteration_result::next_step;
     switch (state)
@@ -277,7 +277,7 @@ iteration_result Federate::enterExecutionState (helics_iteration_request iterate
     return res;
 }
 
-void Federate::enterExecutionStateAsync (helics_iteration_request iterate)
+void Federate::enterExecutionStateAsync (iteration_request iterate)
 {
     switch (state)
     {
@@ -481,7 +481,7 @@ Time Federate::requestTime (Time nextInternalTimeStep)
     }
 }
 
-iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, helics_iteration_request iterate)
+iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate)
 {
     if (state == op_states::execution)
     {
@@ -530,7 +530,7 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 /** request a time advancement
 @param[in] the next requested time step
 @return the granted time step*/
-void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, helics_iteration_request iterate)
+void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
     if (state == op_states::execution)
     {

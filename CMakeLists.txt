@@ -1,3 +1,13 @@
+##############################################################################
+#Copyright (C) 2017-2018, Battelle Memorial Institute
+#All rights reserved.
+
+#This software was co-developed by Pacific Northwest National Laboratory, 
+#operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory,
+#operated by the Alliance for Sustainable Energy, LLC; 
+#and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+##############################################################################
+
 cmake_minimum_required (VERSION 3.4)
 project (HELICS)
 
@@ -105,9 +115,11 @@ IF (USE_BOOST_STATIC_LIBS)
   set(Boost_USE_STATIC_LIBS ON)
   set(BOOST_STATIC ON)
 ENDIF ()
+
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
+IF(BUILD_HELICS_TESTS)
  option (TEST_CODE_COVERAGE "Build a target for testing code coverage" OFF)
  if (TEST_CODE_COVERAGE)
  include(CodeCoverage)
@@ -120,6 +132,7 @@ ENDIF ()
 	)
 
  endif(TEST_CODE_COVERAGE)
+ endif(BUILD_HELICS_TESTS)
 
 
 # -------------------------------------------------------------
@@ -351,9 +364,9 @@ add_subdirectory (src)
 #-----------------------------------------------------------------------------
 # Setup CTEST environment
 #-----------------------------------------------------------------------------
-IF (BUILD_HELICS_TESTS)
-	include (CTest)
-	add_subdirectory (tests)
+IF(BUILD_HELICS_TESTS)
+include (CTest)
+add_subdirectory (tests)
 ENDIF(BUILD_HELICS_TESTS)
 
 if (BUILD_HELICS_EXAMPLES)
@@ -385,6 +398,7 @@ set(HELICS_CMAKECONFIG_INSTALL_DIR "cmake/${PROJECT_NAME}" CACHE STRING "install
 install (TARGETS helics-static EXPORT helics-targets
 	DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs)
 
+	#install(FILES $<TARGET_PDB_FILE:helics-static> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs OPTIONAL)
 	set(helics_static_file "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}")
 	set(helics_static_file_debug "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 IF(BUILD_CXX_SHARED_LIB)
@@ -532,10 +546,6 @@ else (WIN32)
 endif(WIN32)
 
 
-
-
-
-	
 set(CPACK_SOURCE_IGNORE_FILES  "/Build*/;/build*/;/.git/")
 #THIS LINE MUST BE LAST
 include(CPack)

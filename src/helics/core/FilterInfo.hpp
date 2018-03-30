@@ -5,15 +5,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "../common/blocking_queue.h"
 #include "Core.hpp"
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 
-#include <map>
-#include <mutex>
-#include <thread>
-#include <vector>
+#include <utility>
+#include <memory>
 
 namespace helics
 {

@@ -72,6 +72,11 @@ public:
 	{
 		return time_granted;
 	}
+    /** get the current granted time*/
+    Time allowedSendTime() const
+    {
+        return time_granted+info.outputDelay;
+    }
 	/** get a list of actual dependencies*/
     std::vector < Core::federate_id_t> getDependencies() const;
     /** get a reference to the dependents vector*/
@@ -110,6 +115,7 @@ public:
 
     void sendTimeRequest() const;
     void updateTimeGrant();
+    void transmitTimingMessage(ActionMessage &msg) const;
   public:
 	/** process a message related to time
 	@return true if it did anything
@@ -146,13 +152,15 @@ public:
 	@param newValueTime  the time of the next value
 	@param newMessageTime the time of the next message
 	*/
-	void timeRequest(Time nextTime, helics_iteration_request iterate, Time newValueTime, Time newMessageTime);
+	void timeRequest(Time nextTime, iteration_request iterate, Time newValueTime, Time newMessageTime);
 	/** function to enter the exec Mode
 	@param mode the mode of iteration_request (no_iteration, force_iteration, iterate_if_needed)
 	*/
-	void enteringExecMode(helics_iteration_request mode);
+	void enteringExecMode(iteration_request mode);
 	/** check if it is valid to grant a time*/
     iteration_state checkTimeGrant ();
+    /** disconnect*/
+    void disconnect();
     /** generate a string with the current time status*/
     std::string printTimeStatus () const;
     /** return true if there are active dependencies*/
