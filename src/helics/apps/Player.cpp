@@ -821,7 +821,7 @@ void Player::run (Time stopTime_input)
         }
         else
         {
-            fed->requestTimeIterative(nextSendTime, helics_iteration_request::force_iteration);
+            fed->requestTimeIterative(nextSendTime, iteration_request::force_iteration);
             ++currentIteration;
             sendInformation(nextSendTime, currentIteration);
         }

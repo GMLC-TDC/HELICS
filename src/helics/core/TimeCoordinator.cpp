@@ -309,6 +309,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
     bool update = updateTimeFactors ();
     if ((!iterating) || (time_exec > time_granted))
     {
+        iteration = 0;
         if (time_allow > time_exec)
         {
             updateTimeGrant ();
@@ -333,6 +334,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         if (time_allow > time_exec)
         {
             dependencies.resetIteratingTimeRequests (time_exec);
+            ++iteration;
             updateTimeGrant ();
             return iteration_state::iterating;
         }
@@ -341,6 +343,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
             if (dependencies.checkIfReadyForTimeGrant (true, time_exec))
             {
                 dependencies.resetIteratingTimeRequests (time_exec);
+                ++iteration;
                 updateTimeGrant ();
                 return iteration_state::iterating;
             }
@@ -366,6 +369,7 @@ void TimeCoordinator::sendTimeRequest () const
     if (iterating)
     {
         setActionFlag (upd, iteration_requested_flag);
+        upd.counter = iteration;
     }
     transmitTimingMessage (upd);
     //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
@@ -380,6 +384,7 @@ void TimeCoordinator::updateTimeGrant ()
     ActionMessage treq (CMD_TIME_GRANT);
     treq.source_id = source_id;
     treq.actionTime = time_granted;
+    treq.counter = iteration;
     transmitTimingMessage (treq);
     // printf("%d GRANT allow=%f next=%f, exec=%f, Tdemin=%f\n", source_id,
     // static_cast<double>(time_allow), static_cast<double>(time_next), static_cast<double>(time_exec),
@@ -497,7 +502,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
         time_granted = timeZero;
         time_grantBase = time_granted;
         executionMode = true;
-
+        iteration = 0;
         ActionMessage execgrant (CMD_EXEC_GRANT);
         execgrant.source_id = source_id;
         transmitTimingMessage (execgrant);
@@ -506,8 +511,10 @@ iteration_state TimeCoordinator::checkExecEntry ()
     {
         dependencies.resetIteratingExecRequests ();
         hasInitUpdates = false;
+        ++iteration;
         ActionMessage execgrant (CMD_EXEC_GRANT);
         execgrant.source_id = source_id;
+        execgrant.counter = iteration;
         setActionFlag (execgrant, iteration_requested_flag);
         transmitTimingMessage (execgrant);
     }

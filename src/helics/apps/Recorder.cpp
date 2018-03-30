@@ -505,7 +505,7 @@ void Recorder::run (Time runToTime)
             int iteration = 0;
             if (allow_iteration)
             {
-                auto ItRes = fed->requestTimeIterative(runToTime, helics_iteration_request::iterate_if_needed);
+                auto ItRes = fed->requestTimeIterative(runToTime, iteration_request::iterate_if_needed);
                 if (ItRes.state == iteration_result::next_step)
                 {
                     iteration = 0;

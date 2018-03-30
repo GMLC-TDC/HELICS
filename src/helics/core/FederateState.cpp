@@ -435,7 +435,25 @@ iteration_result FederateState::enterExecutingState (iteration_request iterate)
             time_granted = timeZero;
            allowed_send_time = timeCoord->allowedSendTime();
         }
-        fillEventVector (time_granted);
+        switch (iterate)
+        {
+        case iteration_request::force_iteration:
+            fillEventVectorNextIteration(time_granted);
+            break;
+        case iteration_request::iterate_if_needed:
+            if (ret == iteration_state::next_step)
+            {
+                fillEventVectorUpTo(time_granted);
+            }
+            else
+            {
+                fillEventVectorNextIteration(time_granted);
+            }
+            break;
+        case iteration_request::no_iterations:
+            fillEventVectorUpTo(time_granted);
+            break;
+        }
         
         processing = false;
         return static_cast<iteration_result> (ret);
@@ -504,7 +522,33 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
 
         iteration_time retTime = {time_granted, static_cast<iteration_result> (ret)};
         // now fill the event vector so external systems know what has been updated
-        fillEventVector (time_granted);
+        switch (iterate)
+        {
+        case iteration_request::force_iteration:
+            fillEventVectorNextIteration(time_granted);
+            break;
+        case iteration_request::iterate_if_needed:
+            if (time_granted < nextTime)
+            {
+                fillEventVectorNextIteration(time_granted);
+            }
+            else
+            {
+                fillEventVectorUpTo(time_granted);
+            }
+            break;
+        case iteration_request::no_iterations:
+            if (time_granted < nextTime)
+            {
+                fillEventVectorInclusive(time_granted);
+            }
+            else
+            {
+                fillEventVectorUpTo(time_granted);
+            }
+            
+            break;
+        }
         processing = false;
         return retTime;
     }
@@ -528,16 +572,44 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
     return retTime;
 }
 
-void FederateState::fillEventVector (Time currentTime)
+void FederateState::fillEventVectorUpTo (Time currentTime)
 {
     events.clear ();
     auto slock = subscriptions.lock_shared();
     for (auto &sub : *slock)
     {
-        bool updated = sub->updateTime (currentTime);
+        bool updated = sub->updateTimeUpTo (currentTime);
         if (updated)
         {
             events.push_back (sub->id);
+        }
+    }
+}
+
+void FederateState::fillEventVectorInclusive(Time currentTime)
+{
+    events.clear();
+    auto slock = subscriptions.lock_shared();
+    for (auto &sub : *slock)
+    {
+        bool updated = sub->updateTimeInclusive(currentTime);
+        if (updated)
+        {
+            events.push_back(sub->id);
+        }
+    }
+}
+
+void FederateState::fillEventVectorNextIteration(Time currentTime)
+{
+    events.clear();
+    auto slock = subscriptions.lock_shared();
+    for (auto &sub : *slock)
+    {
+        bool updated = sub->updateTimeNextIteration(currentTime);
+        if (updated)
+        {
+            events.push_back(sub->id);
         }
     }
 }
@@ -788,7 +860,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         if (cmd.source_id == subI->target.first)
         {
-            subI->addData (cmd.actionTime, std::make_shared<const data_block> (std::move (cmd.payload)));
+            subI->addData (cmd.actionTime,cmd.counter, std::make_shared<const data_block> (std::move (cmd.payload)));
             timeCoord->updateValueTime (cmd.actionTime);
             LOG_DEBUG("receive publication " + prettyPrintString(cmd));
             LOG_TRACE (timeCoord->printTimeStatus ());

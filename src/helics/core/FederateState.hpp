@@ -173,7 +173,15 @@ private:
 	/** fill event list
 	@param the time of the update
 	*/
-    void fillEventVector (Time currentTime);
+    void fillEventVectorUpTo (Time currentTime);
+    /** fill event list
+    @param the time of the update
+    */
+    void fillEventVectorInclusive(Time currentTime);
+    /** fill event list
+    @param the time of the update
+    */
+    void fillEventVectorNextIteration(Time currentTime);
     /** add a dependency to the timing coordination*/
     void addDependency (Core::federate_id_t fedToDependOn);
     /** add a dependent federate*/
