@@ -29,6 +29,11 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param[in] jsonString can be either a json file or a string containing json code
     */
     explicit MessageFederate (const std::string &jsonString);
+    /**constructor taking a string with the required information
+    @param[in] name the name of the federate
+    @param[in] jsonString can be either a json file or a string containing json code
+    */
+    MessageFederate(const std::string &name, const std::string &jsonString);
     /** move constructor*/
     MessageFederate (MessageFederate &&mFed) noexcept;
     /** default constructor*/

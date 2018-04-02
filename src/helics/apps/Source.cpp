@@ -12,18 +12,16 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <memory>
 #include <set>
 #include <stdexcept>
-#include <boost/filesystem.hpp>
+
 #include "../common/argParser.h"
 
 #include "../common/JsonProcessingFunctions.hpp"
 
-#include "../common/base64.h"
 #include "../common/stringOps.h"
 #include "../core/helicsVersion.hpp"
 #include "../core/core-exceptions.hpp"
 #include "SignalGenerators.hpp"
 
-namespace filesystem = boost::filesystem;
 
 namespace helics
 {
@@ -42,79 +40,82 @@ void SignalGenerator::setString(const std::string & /*parameter*/, const std::st
 
 using namespace std::string_literals;
 static const ArgDescriptors InfoArgs{
-    { "stop", "the time to stop recording" },
     {"default_period","the default period publications"}
 };
 
-Source::Source (int argc, char *argv[])
+Source::Source (int argc, char *argv[]):App("source",argc,argv)
 {
-
+    fed->setFlag(SOURCE_ONLY_FLAG);
     variable_map vm_map;
-    auto res = argumentParser(argc, argv, vm_map, InfoArgs, "input"s);
-    if (res == versionReturn)
+    argumentParser(argc, argv, vm_map, InfoArgs, "input"s);
+    loadArguments(vm_map);
+    if (!masterFileName.empty())
     {
-        std::cout << helics::versionString << '\n';
+        loadFile(masterFileName);
     }
-    if (res < 0)
+}
+
+Source::Source(const FederateInfo &fi) : App(fi)
+{
+    fed->setFlag(SOURCE_ONLY_FLAG);
+}
+
+Source::Source(const std::shared_ptr<Core> &core, const FederateInfo &fi):App(core,fi)
+{
+    fed->setFlag(SOURCE_ONLY_FLAG);
+}
+
+Source::Source(const std::string &jsonString) : App(jsonString)
+{
+    fed->setFlag(SOURCE_ONLY_FLAG);
+
+    Source::loadJsonFile(jsonString);
+}
+
+static void setGeneratorProperty(SignalGenerator *gen, const std::string &name, const Json_helics::Value &prop)
+{
+    if (prop.isDouble())
     {
-        deactivated = true;
-        return;
-    }
-    FederateInfo fi("source");
-
-    fi.loadInfoFromArgs(argc, argv);
-    fed = std::make_shared<CombinationFederate>(fi);
-    fed->setFlag(SOURCE_ONLY_FLAG);
-
-loadArguments(vm_map);
-}
-
-Source::Source(const FederateInfo &fi) : fed(std::make_shared<CombinationFederate>(fi))
-{
-    fed->setFlag(SOURCE_ONLY_FLAG);
-}
-
-Source::Source(const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : fed(std::make_shared<CombinationFederate>(core, fi))
-{
-    fed->setFlag(SOURCE_ONLY_FLAG);
-}
-
-Source::Source(const std::string &jsonString) : fed(std::make_shared<CombinationFederate>(jsonString))
-{
-    fed->setFlag(SOURCE_ONLY_FLAG);
-
-    loadJsonFile(jsonString);
-}
-
-Source::~Source() = default;
-
-
-void Source::finalize()
-{
-    fed->finalize();
-}
-
-void Source::loadFile(const std::string &filename)
-{
-
-    auto ext = filesystem::path(filename).extension().string();
-    if ((ext == ".json") || (ext == ".JSON"))
-    {
-        loadJsonFile(filename);
+        gen->set(name, prop.asDouble());
     }
     else
     {
-        // loadTextFile(filename);
+        try
+        {
+            auto time = loadJsonTime(prop);
+            if (time > Time::minVal())
+            {
+                gen->set(name, static_cast<double>(time));
+            }
+            else
+            {
+                gen->setString(name, prop.asString());
+            }
+        }
+        catch (const std::invalid_argument &)
+        {
+            gen->setString(name, prop.asString());
+        }
+
+
     }
-
 }
-
 
 void Source::loadJsonFile(const std::string &jsonFile)
 {
-    fed->registerInterfaces(jsonFile);
+    //we want to load the default period before constructing the interfaces so the default period works
+    auto doc = loadJsonString(jsonFile);
 
+    if (doc.isMember("source"))
+    {
+        auto appConfig = doc["source"];
+        if (appConfig.isMember("defaultperiod"))
+        {
+            defaultPeriod = loadJsonTime(appConfig["defaultperiod"]);
+        }
+    }
+
+    loadJsonFileConfiguration("source", jsonFile);
     auto pubCount = fed->getPublicationCount();
     for (int ii = 0; ii < pubCount; ++ii)
     {
@@ -134,20 +135,7 @@ void Source::loadJsonFile(const std::string &jsonFile)
      }
      */
     
-    auto doc = loadJsonString(jsonFile);
-
-    if (doc.isMember("source"))
-    {
-        auto playerConfig = doc["source"];
-        if (playerConfig.isMember("stop"))
-        {
-            stopTime = loadJsonTime(playerConfig["stop"]);
-        }
-        if (playerConfig.isMember("local"))
-        {
-            useLocal = playerConfig["local"].asBool();
-        }
-    }
+    
 
 
     if (doc.isMember("publications"))
@@ -204,37 +192,19 @@ void Source::loadJsonFile(const std::string &jsonFile)
                 {
                     continue;
                 }
-                else if (el == "property")
+                else if (el == "properties")
                 {
-
+                    for (auto &prop : genElement["properties"])
+                    {
+                        if ((prop.isMember("name")) && (prop.isMember("value")))
+                        {
+                            setGeneratorProperty(generators[index].get(),prop["name"].asString(), prop["value"]);
+                        }
+                    }
                 }
                 else
                 {
-                    if (genElement[el].isDouble())
-                    {
-                        generators[index]->set(el, genElement[el].asDouble());
-                    }
-                    else
-                    {
-                        try
-                        {
-                            auto time = loadJsonTime(genElement[el]);
-                            if (time > Time::minVal())
-                            {
-                                generators[index]->set(el, static_cast<double>(time));
-                            }
-                            else
-                            {
-                                generators[index]->setString(el, genElement[el].asString());
-                            }
-                        }
-                        catch (const std::invalid_argument &)
-                        {
-                            generators[index]->setString(el, genElement[el].asString());
-                        }
-                       
-                        
-                    }
+                    setGeneratorProperty(generators[index].get(), el, genElement[el]);
                 }
                 
             }
@@ -294,14 +264,9 @@ void Source::initialize()
 
     fed->enterInitializationState();
 }
-/*run the source*/
-void Source::run ()
-{
-    run (stopTime);
-    fed->finalize ();
-}
 
-void Source::run (Time stopTime_input)
+
+void Source::runTo (Time stopTime_input)
 {
     auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
@@ -506,31 +471,6 @@ Time Source::runSourceLoop(Time currentTime)
 }
 int Source::loadArguments (boost::program_options::variables_map &vm_map)
 {
-    std::string file;
-    if (vm_map.count("input") == 0)
-    {
-        if (!fileLoaded)
-        {
-            if (filesystem::exists("helics.json"))
-            {
-                file = "helics.json";
-            }
-        }
-    }
-    if (filesystem::exists(vm_map["input"].as<std::string>()))
-    {
-        file = vm_map["input"].as<std::string>();
-    }
-    if (!file.empty())
-    {
-        loadFile(file);
-    }
-
-    if (vm_map.count("stop") > 0)
-    {
-        stopTime = loadTimeFromString(vm_map["stop"].as<std::string>());
-    }
-
  //   std::cout << "read file " << points.size () << " points for " << tags.size () << " tags \n";
 
     if (vm_map.count("default_period") == 0)

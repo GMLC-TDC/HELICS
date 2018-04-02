@@ -27,6 +27,12 @@ MessageFederate::MessageFederate (const std::string &jsonString) : Federate (loa
     registerInterfaces (jsonString);
 }
 
+MessageFederate::MessageFederate(const std::string &name, const std::string &jsonString) : Federate(loadFederateInfo(name,jsonString))
+{
+    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), getID());
+    registerInterfaces(jsonString);
+}
+
 MessageFederate::MessageFederate ()
 {
     // default constructor

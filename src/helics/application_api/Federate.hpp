@@ -62,6 +62,10 @@ class FederateInfo : public CoreFederateInfo
  */
 FederateInfo loadFederateInfo (const std::string &jsonString);
 
+/** generate a FederateInfo object from a JSON file
+*/
+FederateInfo loadFederateInfo(const std::string &name, const std::string &jsonString);
+
 class Core;
 
 /** base class for a federate in the application API
@@ -102,7 +106,11 @@ class Federate
     /**constructor taking a federate information structure
     @param[in] fi  a federate information structure
     */
-    Federate (const FederateInfo &fi);
+    explicit Federate (const FederateInfo &fi);
+    /**constructor taking a federate information structure
+    @param[in] fi  a federate information structure
+    */
+    Federate(const std::string &name, const FederateInfo &fi);
     /**constructor taking a core and a federate information structure
     @param core a shared pointer to a core object, the pointer will be copied
     @param[in] fi  a federate information structure
@@ -111,8 +119,13 @@ class Federate
     /**constructor taking a file with the required information
     @param[in] jsonString can be either a JSON file or a string containing JSON code
     */
-    Federate (const std::string &jsonString);
-
+    explicit Federate (const std::string &jsonString);
+    /**constructor taking a file with the required information and the name of the federate
+    @param[in] name the name of the federate
+    @param[in] jsonString can be either a JSON file or a string containing JSON code
+    */
+    Federate(const std::string &name, const std::string &jsonString);
+    /**default constructor*/
     Federate () noexcept;
     Federate (Federate &&fed) noexcept;
     Federate (const Federate &fed) = delete;

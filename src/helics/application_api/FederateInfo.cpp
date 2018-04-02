@@ -154,9 +154,14 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     }
 }
 
-FederateInfo loadFederateInfo (const std::string &jsonString)
+FederateInfo loadFederateInfo(const std::string &jsonString)
 {
-    FederateInfo fi;
+    return loadFederateInfo(std::string(), jsonString);
+}
+
+FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonString)
+{
+    FederateInfo fi(name);
     Json_helics::Value doc;
     try
     {

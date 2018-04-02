@@ -27,7 +27,7 @@ class DependencyInfo
         time_requested = 5,
     };
     Core::federate_id_t fedID = invalid_fed_id;  //!< identifier for the dependency
-    Core::federate_id_t minFed = invalid_fed_id;  //!< identfier for the min dependency
+    Core::federate_id_t minFed = invalid_fed_id;  //!< identifier for the min dependency
     time_state_t time_state = time_state_t::initialized;  //!< the current state of the dependency
 
     Time Tnext = negEpsilon;  //!< next possible message or value
@@ -63,6 +63,8 @@ class TimeDependencies
     void removeDependency (Core::federate_id_t id);
     /** update the info about a dependency based on a message*/
     bool updateTime (const ActionMessage &m);
+    /** get the number of dependencies*/
+    auto size() const { return dependencies.size(); }
     /** iterator to first dependency*/
     auto begin () { return dependencies.begin (); }
     /** iterator to end point*/
@@ -87,7 +89,10 @@ class TimeDependencies
     @return true if the object is ready
     */
     bool checkIfReadyForTimeGrant (bool iterating, Time desiredGrantTime) const;
+    /** reset the iterative exec requests to prepare for the next iteration*/
     void resetIteratingExecRequests ();
+    /** reset iterative time requests to prepare for next iteration
+    @param requestTime  the time that is being iterated*/
     void resetIteratingTimeRequests (Time requestTime);
 
     /** check if there are active dependencies*/

@@ -4,26 +4,24 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
+#include "Recorder.hpp"
+
 #include "../application_api/Filters.hpp"
-#include "../application_api/Subscriptions.hpp"
-#include "../application_api/ValueFederate.hpp"
 #include "../application_api/queryFunctions.hpp"
 #include "../common/stringOps.h"
-#include "../core/helicsVersion.hpp"
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
-#include <memory>
 #include <regex>
 #include <set>
 #include <stdexcept>
-#include <boost/filesystem.hpp>
 #include "../common/argParser.h"
-
+#include "boost/filesystem.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "PrecHelper.hpp"
-#include "Recorder.hpp"
+
 #include <thread>
 
 namespace filesystem = boost::filesystem;
@@ -32,13 +30,12 @@ namespace helics
 {
 namespace apps
 {
-Recorder::Recorder (FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
+Recorder::Recorder (FederateInfo &fi) : App(fi)
 {
     fed->setFlag (OBSERVER_FLAG);
 }
 
 static const ArgDescriptors InfoArgs{
-    {"stop", "the time to stop recording"},
     {"tags",ArgDescriptor::arg_type_t::vector_string,"tags to record, this argument may be specified any number of times"},
     {"endpoints",ArgDescriptor::arg_type_t::vector_string,"endpoints to capture, this argument may be specified multiple time"},
     {"sourceclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture generated packets from, this argument may be specified multiple time"},
@@ -50,62 +47,35 @@ static const ArgDescriptors InfoArgs{
     {"mapfile", "write progress to a memory mapped file"}
 };
 
-Recorder::Recorder (int argc, char *argv[])
+Recorder::Recorder (int argc, char *argv[]):App("recorder",argc,argv)
 {
+    fed->setFlag (OBSERVER_FLAG);
     variable_map vm_map;
-    auto res = argumentParser(argc, argv, vm_map, InfoArgs, "input");
-    if (res == versionReturn)
+    argumentParser(argc, argv, vm_map, InfoArgs);
+    loadArguments(vm_map);
+    if (!masterFileName.empty())
     {
-        std::cout << helics::versionString << '\n';
+        loadFile(masterFileName);
     }
-    if (res == helpReturn)
-    {
-        FederateInfo helpTemp(argc, argv);
-    }
-    if (res < 0)
-    {
-        deactivated = true;
-        return;
-    }
-    FederateInfo fi ("recorder");
-
-    fi.loadInfoFromArgs (argc, argv);
-    fed = std::make_shared<CombinationFederate> (fi);
-    fed->setFlag (OBSERVER_FLAG);
-
-    loadArguments (vm_map);
 }
 
-Recorder::Recorder (const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : fed (std::make_shared<CombinationFederate> (core, fi))
+Recorder::Recorder (const std::shared_ptr<Core> &core, const FederateInfo &fi):App(core,fi)
 {
     fed->setFlag (OBSERVER_FLAG);
 }
 
-Recorder::Recorder (const std::string &jsonString) : fed (std::make_shared<CombinationFederate> (jsonString))
+Recorder::Recorder (const std::string &jsonString) : App(jsonString)
 {
     fed->setFlag (OBSERVER_FLAG);
-    loadJsonFile (jsonString);
+    Recorder::loadJsonFile(jsonString);
 }
 
 Recorder::~Recorder () { saveFile (outFileName); }
 
-int Recorder::loadFile (const std::string &filename)
-{
-    auto ext = filesystem::path (filename).extension ().string ();
-    if ((ext == ".json") || (ext == ".JSON"))
-    {
-        return loadJsonFile (filename);
-    }
-    else
-    {
-        return loadTextFile (filename);
-    }
-}
 
-int Recorder::loadJsonFile (const std::string &jsonString)
+void Recorder::loadJsonFile (const std::string &jsonString)
 {
-    fed->registerInterfaces (jsonString);
+    loadJsonFileConfiguration("recorder", jsonString);
 
     auto pubCount = fed->getSubscriptionCount ();
     for (int ii = 0; ii < pubCount; ++ii)
@@ -186,11 +156,9 @@ int Recorder::loadJsonFile (const std::string &jsonString)
     {
         addCapture (captures.asString ());
     }
-
-    return 0;
 }
 
-int Recorder::loadTextFile (const std::string &textFile)
+void Recorder::loadTextFile (const std::string &textFile)
 {
     using namespace stringOps;
 
@@ -273,7 +241,6 @@ int Recorder::loadTextFile (const std::string &textFile)
         }
     }
     infile.close ();
-    return 0;
 }
 
 void Recorder::writeJsonFile (const std::string &filename)
@@ -396,7 +363,6 @@ void Recorder::initialize ()
     captureForCurrentTime (0.0);
 }
 
-void Recorder::finalize () { fed->finalize (); }
 
 void Recorder::generateInterfaces ()
 {
@@ -476,14 +442,8 @@ void Recorder::captureForCurrentTime (Time currentTime, int iteration)
 
 std::string Recorder::encode (const std::string &str2encode) { return str2encode; }
 
-/*run the Player*/
-void Recorder::run ()
-{
-    run (autoStopTime);
-    fed->finalize ();
-}
 /** run the Player until the specified time*/
-void Recorder::run (Time runToTime)
+void Recorder::runTo (Time runToTime)
 {
     initialize ();
     if (!mapfile.empty ())
@@ -629,17 +589,6 @@ void Recorder::saveFile (const std::string &filename)
 
 int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
 {
-    if (vm_map.count ("input") == 0)
-    {
-        return -1;
-    }
-
-    if (!filesystem::exists (vm_map["input"].as<std::string> ()))
-    {
-        std::cerr << vm_map["input"].as<std::string> () << "is not a valid input file \n";
-        return -3;
-    }
-    loadFile (vm_map["input"].as<std::string> ());
 
     // get the extra tags from the arguments
     if (vm_map.count ("tags") > 0)
@@ -723,13 +672,6 @@ int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
     if (vm_map.count ("output") > 0)
     {
         outFileName = vm_map["output"].as<std::string> ();
-    }
-
-    if (vm_map.count("stop") > 0)
-    {
-        printf("stop  from %s\n",  vm_map["stop"].as<std::string>().c_str());
-        autoStopTime = loadTimeFromString(vm_map["stop"].as<std::string>());
-        printf("stop at %f from %s\n", static_cast<double>(autoStopTime), vm_map["stop"].as<std::string>().c_str());
     }
     return 0;
 }

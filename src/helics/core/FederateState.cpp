@@ -19,39 +19,49 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/helics-config.h"
 #include <boost/foreach.hpp>
 
-#define LOG_ERROR(message) logMessage (0, "", message);
-#define LOG_WARNING(message) logMessage (1, "", message);
+static const std::string nullStr;
+#define LOG_ERROR(message) logMessage (0, nullStr, message)
+#define LOG_WARNING(message) logMessage (1, nullStr, message)
 
 #ifndef LOGGING_DISABLED
 #define LOG_NORMAL(message)                                                                                       \
-    if (logLevel >= 2)                                                                                            \
+    do                                                                                                            \
     {                                                                                                             \
-        logMessage (2, "", message);                                                                              \
-    }
+        if (logLevel >= 2)                                                                                        \
+        {                                                                                                         \
+            logMessage (2, nullStr, message);                                                                     \
+        }                                                                                                         \
+    } while (false)
 
 #ifndef DEBUG_LOGGING_DISABLED
 #define LOG_DEBUG(message)                                                                                        \
-    if (logLevel >= 3)                                                                                            \
+    do                                                                                                            \
     {                                                                                                             \
-        logMessage (3, "", message);                                                                              \
-    }
+        if (logLevel >= 3)                                                                                        \
+        {                                                                                                         \
+            logMessage (3, nullStr, message);                                                                     \
+        }                                                                                                         \
+    } while (false)
 #else
 #define LOG_DEBUG(message)
 #endif
 
 #ifndef TRACE_LOGGING_DISABLED
 #define LOG_TRACE(message)                                                                                        \
-    if (logLevel >= 4)                                                                                            \
+    do                                                                                                            \
     {                                                                                                             \
-        logMessage (4, "", message);                                                                              \
-    }
+        if (logLevel >= 4)                                                                                        \
+        {                                                                                                         \
+            logMessage (4, nullStr, message);                                                                     \
+        }                                                                                                         \
+    } while (false)
 #else
-#define LOG_TRACE(message)
+#define LOG_TRACE(message) ((void)0)
 #endif
 #else  // LOGGING_DISABLED
-#define LOG_NORMAL(message)
-#define LOG_DEBUG(message)
-#define LOG_TRACE(message)
+#define LOG_NORMAL(message) ((void)0)
+#define LOG_DEBUG(message) ((void)0)
+#define LOG_TRACE(message) ((void)0)
 #endif  // LOGGING_DISABLED
 
 namespace helics
@@ -60,8 +70,8 @@ FederateState::FederateState (const std::string &name_, const CoreFederateInfo &
 {
     state = HELICS_CREATED;
     timeCoord = std::make_unique<TimeCoordinator> (info_);
-    timeCoord->setMessageSender([this](const ActionMessage &msg) { routeMessage(msg); });
-    
+    timeCoord->setMessageSender ([this](const ActionMessage &msg) { routeMessage (msg); });
+
     logLevel = info_.logLevel;
     only_update_on_change = info_.only_update_on_change;
     only_transmit_on_change = info_.only_transmit_on_change;
@@ -152,89 +162,85 @@ void FederateState::createSubscription (Core::handle_id_t handle,
                                         const std::string &units,
                                         handle_check_mode check_mode)
 {
-    auto subHandle = subscriptions.lock();
-	subHandle->insert(key, handle,handle, global_id, key, type, units,
-		(check_mode == handle_check_mode::required));
+    auto subHandle = subscriptions.lock ();
+    subHandle->insert (key, handle, handle, global_id, key, type, units,
+                       (check_mode == handle_check_mode::required));
 
-
-    subHandle->back()->only_update_on_change = only_update_on_change;
+    subHandle->back ()->only_update_on_change = only_update_on_change;
 }
 void FederateState::createPublication (Core::handle_id_t handle,
                                        const std::string &key,
                                        const std::string &type,
                                        const std::string &units)
 {
-
-	publications.lock()->insert(key, handle, handle, global_id, key, type, units);
+    publications.lock ()->insert (key, handle, handle, global_id, key, type, units);
 }
 
-void FederateState::createEndpoint (Core::handle_id_t handle, const std::string &endpointName, const std::string &type)
+void FederateState::createEndpoint (Core::handle_id_t handle,
+                                    const std::string &endpointName,
+                                    const std::string &type)
 {
-    auto endHandle = endpoints.lock();
-	endHandle->insert(endpointName, handle, handle, global_id, endpointName, type);
+    auto endHandle = endpoints.lock ();
+    endHandle->insert (endpointName, handle, handle, global_id, endpointName, type);
     hasEndpoints = true;
 }
 
 const SubscriptionInfo *FederateState::getSubscription (const std::string &subName) const
 {
-	return subscriptions.lock_shared()->find(subName);
+    return subscriptions.lock_shared ()->find (subName);
 }
 
-SubscriptionInfo *FederateState::getSubscription(const std::string &subName)
+SubscriptionInfo *FederateState::getSubscription (const std::string &subName)
 {
-	return subscriptions.lock()->find(subName);
+    return subscriptions.lock ()->find (subName);
 }
 
-
-const SubscriptionInfo *FederateState::getSubscription(Core::handle_id_t handle_) const
+const SubscriptionInfo *FederateState::getSubscription (Core::handle_id_t handle_) const
 {
-	return subscriptions.lock_shared()->find(handle_);
+    return subscriptions.lock_shared ()->find (handle_);
 }
 
 SubscriptionInfo *FederateState::getSubscription (Core::handle_id_t handle_)
 {
-	return subscriptions.lock()->find(handle_);
+    return subscriptions.lock ()->find (handle_);
 }
 
 const PublicationInfo *FederateState::getPublication (const std::string &pubName) const
 {
-	return publications.lock_shared()->find(pubName);
+    return publications.lock_shared ()->find (pubName);
 }
 
 const PublicationInfo *FederateState::getPublication (Core::handle_id_t handle_) const
 {
-	return publications.lock()->find(handle_);
+    return publications.lock ()->find (handle_);
 }
 
-PublicationInfo *FederateState::getPublication(const std::string &pubName)
+PublicationInfo *FederateState::getPublication (const std::string &pubName)
 {
-	return publications.lock()->find(pubName);
+    return publications.lock ()->find (pubName);
 }
 
-PublicationInfo *FederateState::getPublication(Core::handle_id_t handle_)
+PublicationInfo *FederateState::getPublication (Core::handle_id_t handle_)
 {
-	return publications.lock()->find(handle_);
+    return publications.lock ()->find (handle_);
 }
 
 const EndpointInfo *FederateState::getEndpoint (const std::string &endpointName) const
 {
-	return endpoints.lock_shared()->find(endpointName);
+    return endpoints.lock_shared ()->find (endpointName);
 }
 
 const EndpointInfo *FederateState::getEndpoint (Core::handle_id_t handle_) const
 {
-	return endpoints.lock_shared()->find(handle_);
+    return endpoints.lock_shared ()->find (handle_);
 }
 
-EndpointInfo *FederateState::getEndpoint(const std::string &endpointName)
+EndpointInfo *FederateState::getEndpoint (const std::string &endpointName)
 {
-	return endpoints.lock()->find(endpointName);
+    return endpoints.lock ()->find (endpointName);
 }
 
-EndpointInfo *FederateState::getEndpoint(Core::handle_id_t handle_)
-{
-	return endpoints.lock()->find(handle_);
-}
+EndpointInfo *FederateState::getEndpoint (Core::handle_id_t handle_) { return endpoints.lock ()->find (handle_); }
 
 bool FederateState::checkAndSetValue (Core::handle_id_t pub_id, const char *data, uint64_t len)
 {
@@ -261,8 +267,8 @@ uint64_t FederateState::getQueueSize (Core::handle_id_t handle_) const
 uint64_t FederateState::getQueueSize () const
 {
     uint64_t cnt = 0;
-    auto slock = endpoints.lock_shared();
-    for (const auto &end_point :*slock)
+    auto slock = endpoints.lock_shared ();
+    for (const auto &end_point : *slock)
     {
         cnt += end_point->queueSize (time_granted);
     }
@@ -283,7 +289,7 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::handle_id_t &id)
 {
     Time earliest_time = Time::maxVal ();
     EndpointInfo *endpointI = nullptr;
-    auto slock = endpoints.lock_shared();
+    auto slock = endpoints.lock_shared ();
     // Find the end point with the earliest message time
     for (auto &end_point : *slock)
     {
@@ -309,11 +315,15 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::handle_id_t &id)
     return nullptr;
 }
 
-void FederateState::routeMessage(const ActionMessage &msg)
+void FederateState::routeMessage (const ActionMessage &msg)
 {
-    if (parent_!=nullptr)
+    if (parent_ != nullptr)
     {
-        parent_->addActionMessage(msg);
+        parent_->addActionMessage (msg);
+    }
+    else
+    {
+        queue.push (msg);
     }
 }
 
@@ -410,51 +420,51 @@ iteration_result FederateState::enterExecutingState (iteration_request iterate)
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
-        //timeCoord->enteringExecMode (iterate);
-        ActionMessage exec(CMD_EXEC_REQUEST);
+        // timeCoord->enteringExecMode (iterate);
+        ActionMessage exec (CMD_EXEC_REQUEST);
         exec.source_id = global_id;
         switch (iterate)
         {
         case iteration_request::force_iteration:
-            setActionFlag(exec, iteration_requested_flag);
-            setActionFlag(exec, required_flag);
+            setActionFlag (exec, iteration_requested_flag);
+            setActionFlag (exec, required_flag);
             break;
         case iteration_request::iterate_if_needed:
-            setActionFlag(exec, iteration_requested_flag);
+            setActionFlag (exec, iteration_requested_flag);
             break;
         case iteration_request::no_iterations:
             break;
         }
 
-        addAction(exec);
-        ActionMessage execReq(CMD_EXEC_CHECK);
-        queue.emplace(execReq);
+        addAction (exec);
+        ActionMessage execReq (CMD_EXEC_CHECK);
+        queue.emplace (execReq);
         auto ret = processQueue ();
         if (ret == iteration_state::next_step)
         {
             time_granted = timeZero;
-           allowed_send_time = timeCoord->allowedSendTime();
+            allowed_send_time = timeCoord->allowedSendTime ();
         }
         switch (iterate)
         {
         case iteration_request::force_iteration:
-            fillEventVectorNextIteration(time_granted);
+            fillEventVectorNextIteration (time_granted);
             break;
         case iteration_request::iterate_if_needed:
             if (ret == iteration_state::next_step)
             {
-                fillEventVectorUpTo(time_granted);
+                fillEventVectorUpTo (time_granted);
             }
             else
             {
-                fillEventVectorNextIteration(time_granted);
+                fillEventVectorNextIteration (time_granted);
             }
             break;
         case iteration_request::no_iterations:
-            fillEventVectorUpTo(time_granted);
+            fillEventVectorUpTo (time_granted);
             break;
         }
-        
+
         processing = false;
         return static_cast<iteration_result> (ret);
     }
@@ -492,32 +502,32 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
     {  // only enter this loop once per federate
         events.clear ();  // clear the event queue
         LOG_TRACE (timeCoord->printTimeStatus ());
-        //timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
+        // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
 
-        ActionMessage treq(CMD_TIME_REQUEST);
+        ActionMessage treq (CMD_TIME_REQUEST);
         treq.source_id = global_id;
         treq.actionTime = nextTime;
         switch (iterate)
         {
         case iteration_request::force_iteration:
-            setActionFlag(treq, iteration_requested_flag);
-            setActionFlag(treq, required_flag);
+            setActionFlag (treq, iteration_requested_flag);
+            setActionFlag (treq, required_flag);
             break;
         case iteration_request::iterate_if_needed:
-            setActionFlag(treq, iteration_requested_flag);
+            setActionFlag (treq, iteration_requested_flag);
             break;
         case iteration_request::no_iterations:
             break;
         }
 
-        addAction(treq);
-        LOG_TRACE(timeCoord->printTimeStatus());
-        //timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
-        queue.push(CMD_TIME_CHECK);
+        addAction (treq);
+        LOG_TRACE (timeCoord->printTimeStatus ());
+        // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
+        queue.push (CMD_TIME_CHECK);
 
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
-        allowed_send_time = timeCoord->allowedSendTime();
+        allowed_send_time = timeCoord->allowedSendTime ();
         iterating = (ret == iteration_state::iterating);
 
         iteration_time retTime = {time_granted, static_cast<iteration_result> (ret)};
@@ -525,28 +535,28 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         switch (iterate)
         {
         case iteration_request::force_iteration:
-            fillEventVectorNextIteration(time_granted);
+            fillEventVectorNextIteration (time_granted);
             break;
         case iteration_request::iterate_if_needed:
             if (time_granted < nextTime)
             {
-                fillEventVectorNextIteration(time_granted);
+                fillEventVectorNextIteration (time_granted);
             }
             else
             {
-                fillEventVectorUpTo(time_granted);
+                fillEventVectorUpTo (time_granted);
             }
             break;
         case iteration_request::no_iterations:
             if (time_granted < nextTime)
             {
-                fillEventVectorInclusive(time_granted);
+                fillEventVectorInclusive (time_granted);
             }
             else
             {
-                fillEventVectorUpTo(time_granted);
+                fillEventVectorUpTo (time_granted);
             }
-            
+
             break;
         }
         processing = false;
@@ -575,7 +585,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
 void FederateState::fillEventVectorUpTo (Time currentTime)
 {
     events.clear ();
-    auto slock = subscriptions.lock_shared();
+    auto slock = subscriptions.lock_shared ();
     for (auto &sub : *slock)
     {
         bool updated = sub->updateTimeUpTo (currentTime);
@@ -586,30 +596,30 @@ void FederateState::fillEventVectorUpTo (Time currentTime)
     }
 }
 
-void FederateState::fillEventVectorInclusive(Time currentTime)
+void FederateState::fillEventVectorInclusive (Time currentTime)
 {
-    events.clear();
-    auto slock = subscriptions.lock_shared();
+    events.clear ();
+    auto slock = subscriptions.lock_shared ();
     for (auto &sub : *slock)
     {
-        bool updated = sub->updateTimeInclusive(currentTime);
+        bool updated = sub->updateTimeInclusive (currentTime);
         if (updated)
         {
-            events.push_back(sub->id);
+            events.push_back (sub->id);
         }
     }
 }
 
-void FederateState::fillEventVectorNextIteration(Time currentTime)
+void FederateState::fillEventVectorNextIteration (Time currentTime)
 {
-    events.clear();
-    auto slock = subscriptions.lock_shared();
+    events.clear ();
+    auto slock = subscriptions.lock_shared ();
     for (auto &sub : *slock)
     {
-        bool updated = sub->updateTimeNextIteration(currentTime);
+        bool updated = sub->updateTimeNextIteration (currentTime);
         if (updated)
         {
-            events.push_back(sub->id);
+            events.push_back (sub->id);
         }
     }
 }
@@ -621,7 +631,7 @@ iteration_result FederateState::genericUnspecifiedQueueProcess ()
     {  // only 1 thread can enter this loop once per federate
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
-        allowed_send_time = timeCoord->allowedSendTime();
+        allowed_send_time = timeCoord->allowedSendTime ();
         processing = false;
         return static_cast<iteration_result> (ret);
     }
@@ -645,6 +655,37 @@ const std::vector<Core::handle_id_t> &FederateState::getEvents () const
     return emptyHandles;
 }
 
+iteration_state FederateState::processDelayQueue()
+{
+    auto ret_code = iteration_state::continue_processing;
+    if (!delayQueue.empty())
+    {
+        // copy the messages over since they could just be placed on the delay queue again
+        decltype (delayQueue) tempQueue;
+        std::swap(delayQueue, tempQueue);
+        while ((ret_code == iteration_state::continue_processing) && (!tempQueue.empty()))
+        {
+            auto cmd = tempQueue.front();
+            tempQueue.pop_front();
+            ret_code = processActionMessage(cmd);
+        }
+        if (ret_code != iteration_state::continue_processing)
+        {
+            if (!tempQueue.empty())
+            {
+                while (!tempQueue.empty())
+                {
+                    auto cmd = tempQueue.back();
+                    tempQueue.pop_back();
+                    delayQueue.push_front(cmd);
+                }
+            }
+            return ret_code;
+        }
+    }
+    return ret_code;
+}
+
 iteration_state FederateState::processQueue ()
 {
     if (state == HELICS_FINISHED)
@@ -655,34 +696,8 @@ iteration_state FederateState::processQueue ()
     {
         return iteration_state::error;
     }
-    auto ret_code = iteration_state::continue_processing;
-
     // process the delay Queue first
-    if (!delayQueue.empty ())
-    {
-        // copy the messages over since they could just be placed on the delay queue again
-        decltype (delayQueue) tempQueue;
-        std::swap (delayQueue, tempQueue);
-        while ((ret_code == iteration_state::continue_processing) && (!tempQueue.empty ()))
-        {
-            auto cmd = tempQueue.front ();
-            tempQueue.pop_front ();
-            ret_code = processActionMessage (cmd);
-        }
-        if (ret_code != iteration_state::continue_processing)
-        {
-            if (!tempQueue.empty ())
-            {
-                while (!tempQueue.empty ())
-                {
-                    auto cmd = tempQueue.back ();
-                    tempQueue.pop_back ();
-                    delayQueue.push_front (cmd);
-                }
-            }
-            return ret_code;
-        }
-    }
+    auto ret_code = processDelayQueue();
 
     while (ret_code == iteration_state::continue_processing)
     {
@@ -705,23 +720,23 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         if (state == HELICS_CREATED)
         {
             setState (HELICS_INITIALIZING);
-            LOG_DEBUG("Granting Initialization");
+            LOG_DEBUG ("Granting Initialization");
             timeGranted_mode = true;
             return iteration_state::next_step;
         }
         break;
     case CMD_EXEC_REQUEST:
         if ((cmd.source_id == global_id) && (cmd.dest_id == 0))
-        { //this sets up a time request
+        {  // this sets up a time request
             iteration_request iterate = iteration_request::no_iterations;
-            if (checkActionFlag(cmd, iteration_requested_flag))
+            if (checkActionFlag (cmd, iteration_requested_flag))
             {
-                iterate = (checkActionFlag(cmd, required_flag)) ? iteration_request::force_iteration : iteration_request::iterate_if_needed;
+                iterate = (checkActionFlag (cmd, required_flag)) ? iteration_request::force_iteration :
+                                                                   iteration_request::iterate_if_needed;
             }
-            timeCoord->enteringExecMode(iterate);
+            timeCoord->enteringExecMode (iterate);
             timeGranted_mode = false;
             break;
-
         }
         FALLTHROUGH
     case CMD_EXEC_GRANT:
@@ -738,15 +753,15 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         if (!timeGranted_mode)
         {
-            auto grant = timeCoord->checkExecEntry();
+            auto grant = timeCoord->checkExecEntry ();
             switch (grant)
             {
             case iteration_state::iterating:
                 timeGranted_mode = true;
                 return grant;
             case iteration_state::next_step:
-                setState(HELICS_EXECUTING);
-                LOG_DEBUG("Granting Execution");
+                setState (HELICS_EXECUTING);
+                LOG_DEBUG ("Granting Execution");
                 timeGranted_mode = true;
                 return grant;
             case iteration_state::continue_processing:
@@ -756,26 +771,25 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
                 return grant;
             }
         }
-        
     }
     break;
     case CMD_TERMINATE_IMMEDIATELY:
         setState (HELICS_FINISHED);
-        LOG_DEBUG("Terminating");
+        LOG_DEBUG ("Terminating");
         return iteration_state::halted;
     case CMD_STOP:
         setState (HELICS_FINISHED);
-        LOG_DEBUG("Terminating");
+        LOG_DEBUG ("Terminating");
         return iteration_state::halted;
     case CMD_DISCONNECT:
         if (cmd.source_id == global_id)
         {
             setState (HELICS_FINISHED);
-            timeCoord->disconnect();
+            timeCoord->disconnect ();
             cmd.dest_id = 0;
             if (parent_ != nullptr)
             {
-                parent_->addActionMessage(cmd);
+                parent_->addActionMessage (cmd);
             }
             return iteration_state::halted;
         }
@@ -789,11 +803,11 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
                 }
                 if (!timeGranted_mode)
                 {
-                    auto ret = timeCoord->checkTimeGrant();
+                    auto ret = timeCoord->checkTimeGrant ();
                     if (ret != iteration_state::continue_processing)
                     {
-                        time_granted = timeCoord->getGrantedTime();
-                        allowed_send_time = timeCoord->allowedSendTime();
+                        time_granted = timeCoord->getGrantedTime ();
+                        allowed_send_time = timeCoord->allowedSendTime ();
                         timeGranted_mode = true;
                         return ret;
                     }
@@ -803,13 +817,14 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         break;
     case CMD_TIME_REQUEST:
         if ((cmd.source_id == global_id) && (cmd.dest_id == 0))
-        { //this sets up a time request
+        {  // this sets up a time request
             iteration_request iterate = iteration_request::no_iterations;
-            if (checkActionFlag(cmd, iteration_requested_flag))
+            if (checkActionFlag (cmd, iteration_requested_flag))
             {
-                iterate = (checkActionFlag(cmd, required_flag)) ? iteration_request::force_iteration : iteration_request::iterate_if_needed;
+                iterate = (checkActionFlag (cmd, required_flag)) ? iteration_request::force_iteration :
+                                                                   iteration_request::iterate_if_needed;
             }
-            timeCoord->timeRequest(cmd.actionTime, iterate, nextValueTime(), nextMessageTime());
+            timeCoord->timeRequest (cmd.actionTime, iterate, nextValueTime (), nextMessageTime ());
             timeGranted_mode = false;
             break;
         }
@@ -828,12 +843,12 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         if (!timeGranted_mode)
         {
-            auto ret = timeCoord->checkTimeGrant();
+            auto ret = timeCoord->checkTimeGrant ();
             if (ret != iteration_state::continue_processing)
             {
-                time_granted = timeCoord->getGrantedTime();
-                allowed_send_time = timeCoord->allowedSendTime();
-                LOG_DEBUG(std::string("Granted Time=") + std::to_string(time_granted));
+                time_granted = timeCoord->getGrantedTime ();
+                allowed_send_time = timeCoord->allowedSendTime ();
+                LOG_DEBUG (std::string ("Granted Time=") + std::to_string (time_granted));
                 timeGranted_mode = true;
                 return ret;
             }
@@ -847,7 +862,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         {
             timeCoord->updateMessageTime (cmd.actionTime);
             epi->addMessage (createMessageFromCommand (std::move (cmd)));
-            LOG_DEBUG("receive_message " + prettyPrintString(cmd));
+            LOG_DEBUG ("receive_message " + prettyPrintString (cmd));
         }
     }
     break;
@@ -860,9 +875,10 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         if (cmd.source_id == subI->target.first)
         {
-            subI->addData (cmd.actionTime,cmd.counter, std::make_shared<const data_block> (std::move (cmd.payload)));
+            subI->addData (cmd.actionTime, cmd.counter,
+                           std::make_shared<const data_block> (std::move (cmd.payload)));
             timeCoord->updateValueTime (cmd.actionTime);
-            LOG_DEBUG("receive publication " + prettyPrintString(cmd));
+            LOG_DEBUG ("receive publication " + prettyPrintString (cmd));
             LOG_TRACE (timeCoord->printTimeStatus ());
         }
     }
@@ -998,7 +1014,7 @@ void FederateState::addDependent (Core::federate_id_t fedThatDependsOnThis)
 Time FederateState::nextValueTime () const
 {
     auto firstValueTime = Time::maxVal ();
-    auto slock = subscriptions.lock_shared();
+    auto slock = subscriptions.lock_shared ();
     for (auto &sub : *slock)
     {
         auto nvt = sub->nextValueTime ();
@@ -1017,7 +1033,7 @@ Time FederateState::nextValueTime () const
 Time FederateState::nextMessageTime () const
 {
     auto firstMessageTime = Time::maxVal ();
-    auto slock = endpoints.lock_shared();
+    auto slock = endpoints.lock_shared ();
     for (auto &ep : *slock)
     {
         auto messageTime = ep->firstMessageTime ();
@@ -1042,7 +1058,10 @@ void FederateState::logMessage (int level, const std::string &logMessageSource, 
 {
     if ((loggerFunction) && (level <= logLevel))
     {
-        loggerFunction (level, (logMessageSource.empty ()) ? name+"("+std::to_string(global_id)+")" : logMessageSource, message);
+        loggerFunction (level,
+                        (logMessageSource.empty ()) ? name + '(' + std::to_string (global_id) + ')' :
+                                                      logMessageSource,
+                        message);
     }
 }
 
@@ -1053,12 +1072,12 @@ std::string FederateState::processQuery (const std::string &query) const
         std::string ret;
         ret.push_back ('[');
         {
-            auto pubHandle = publications.lock_shared();
+            auto pubHandle = publications.lock_shared ();
             for (auto &pub : *pubHandle)
             {
-            ret.append (pub->key);
-            ret.push_back (';');
-        }
+                ret.append (pub->key);
+                ret.push_back (';');
+            }
         }
         if (ret.size () > 1)
         {
@@ -1075,12 +1094,12 @@ std::string FederateState::processQuery (const std::string &query) const
         std::string ret;
         ret.push_back ('[');
         {
-            auto endHandle = endpoints.lock_shared();
+            auto endHandle = endpoints.lock_shared ();
             for (auto &ept : *endHandle)
             {
-            ret.append (ept->key);
-            ret.push_back (';');
-        }
+                ret.append (ept->key);
+                ret.push_back (';');
+            }
         }
         if (ret.size () > 1)
         {
@@ -1099,4 +1118,3 @@ std::string FederateState::processQuery (const std::string &query) const
     return "#invalid";
 }
 }  // namespace helics
-

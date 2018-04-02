@@ -45,58 +45,36 @@ static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { re
 
 static const ArgDescriptors InfoArgs{
     {"datatype",  "type of the publication data type to use"},
-    {"local", ArgDescriptor::arg_type_t::flag_type, "specify otherwise unspecified endpoints and publications as local( i.e.the keys will be prepended with the player name"},
-    {"timeunits", "the default units on the timestamps used in file based input"},
-    {"stop",  "the time to stop the player"}
+    {"timeunits", "the default units on the timestamps used in file based input"}
 };
 
-Player::Player (int argc, char *argv[])
+Player::Player (int argc, char *argv[]):App("player",argc,argv)
 {
+    fed->setFlag (SOURCE_ONLY_FLAG);
     variable_map vm_map;
-    auto res = argumentParser(argc, argv, vm_map, InfoArgs,"input");
-    if (res == versionReturn)
-    {
-        std::cout << helics::versionString<< '\n';
-    }
-    if (res == helpReturn)
-    {
-        FederateInfo helpTemp(argc, argv);
-    }
-    if (res < 0)
-    {
-        deactivated = true;
-        return;
-    }
-    FederateInfo fi ("player");
-    fi.loadInfoFromArgs (argc, argv);
-    fed = std::make_shared<CombinationFederate> (fi);
-    fed->setFlag (SOURCE_ONLY_FLAG);
+    argumentParser(argc, argv, vm_map, InfoArgs);
     loadArguments(vm_map);
-
-}
-
-Player::Player (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
-{
-    fed->setFlag (SOURCE_ONLY_FLAG);
-}
-
-Player::Player (const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : fed (std::make_shared<CombinationFederate> (core, fi))
-{
-    fed->setFlag (SOURCE_ONLY_FLAG);
-}
-
-Player::Player (const std::string &jsonString) : fed (std::make_shared<CombinationFederate> (jsonString))
-{
-    fed->setFlag (SOURCE_ONLY_FLAG);
-    if (jsonString.size () < 200)
+    if (!masterFileName.empty())
     {
-        masterFileName = jsonString;
+        loadFile(masterFileName);
     }
-    loadJsonFile (jsonString);
 }
 
-Player::~Player () = default;
+Player::Player (const FederateInfo &fi) : App(fi)
+{
+    fed->setFlag (SOURCE_ONLY_FLAG);
+}
+
+Player::Player (const std::shared_ptr<Core> &core, const FederateInfo &fi):App(core,fi)
+{
+    fed->setFlag (SOURCE_ONLY_FLAG);
+}
+
+Player::Player (const std::string &jsonString) : App (jsonString)
+{
+    fed->setFlag (SOURCE_ONLY_FLAG);
+    Player::loadJsonFile(jsonString);
+}
 
 void Player::addMessage (Time sendTime,
                          const std::string &src,
@@ -125,20 +103,6 @@ void Player::addMessage (Time sendTime,
     messages.back ().mess.time = actionTime;
 }
 
-void Player::loadFile (const std::string &filename)
-{
-    auto ext = filesystem::path (filename).extension ().string ();
-    if ((ext == ".json") || (ext == ".JSON"))
-    {
-        loadJsonFile (filename);
-    }
-    else
-    {
-        loadTextFile (filename);
-    }
-}
-
-
 helics::Time Player::extractTime(const std::string &str, int lineNumber) const
 {
     try
@@ -161,6 +125,7 @@ helics::Time Player::extractTime(const std::string &str, int lineNumber) const
 
 void Player::loadTextFile (const std::string &filename)
 {
+    App::loadTextFile(filename);
     using namespace stringOps;
     std::ifstream infile (filename);
     std::string str;
@@ -209,33 +174,12 @@ void Player::loadTextFile (const std::string &filename)
             if (str[fc + 1] == '!')
             {
                 /*  //allow configuration inside the regular text file
-                if (playerConfig.find("stop") != playerConfig.end())
-                {
-                    stopTime = playerConfig["stop"].get<double>();
-                }
-                if (playerConfig.find("local") != playerConfig.end())
-                {
-                    useLocal = playerConfig["local"].get<bool>();
-                }
+               
                 if (playerConfig.find("timeunits") != playerConfig.end())
                 {
                     if (playerConfig["timeunits"] == "ns")
                     {
                         timeMultiplier = 1e-9;
-                    }
-                }
-                if (playerConfig.find("file") != playerConfig.end())
-                {
-                    if (playerConfig["file"].is_array())
-                    {
-                        for (const auto &fname : playerConfig["file"])
-                        {
-                            loadFile(fname);
-                        }
-                    }
-                    else
-                    {
-                        loadFile(playerConfig["file"]);
                     }
                 }
                 */
@@ -286,7 +230,7 @@ void Player::loadTextFile (const std::string &filename)
         {
             if (blk.size() == 3)
             {
-                auto cloc = blk[0].find_last_not_of(':');
+                auto cloc = blk[0].find_last_of(':');
                 if (cloc == std::string::npos)
                 {
                     if ((points[pIndex].time = extractTime(trim(blk[0]), lcount)) == Time::minVal())
@@ -296,7 +240,7 @@ void Player::loadTextFile (const std::string &filename)
                 }
                 else
                 {
-                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0,cloc-1), lcount)) == Time::minVal())
+                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0,cloc), lcount)) == Time::minVal())
                     {
                         continue;
                     }
@@ -309,7 +253,7 @@ void Player::loadTextFile (const std::string &filename)
             }
             else if (blk.size () == 4)
             {
-                auto cloc = blk[0].find_last_not_of(':');
+                auto cloc = blk[0].find_last_of(':');
                 if (cloc == std::string::npos)
                 {
                     if ((points[pIndex].time = extractTime(trim(blk[0]), lcount)) == Time::minVal())
@@ -319,7 +263,7 @@ void Player::loadTextFile (const std::string &filename)
                 }
                 else
                 {
-                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc - 1), lcount)) == Time::minVal())
+                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc), lcount)) == Time::minVal())
                     {
                         continue;
                     }
@@ -340,7 +284,7 @@ void Player::loadTextFile (const std::string &filename)
 
 void Player::loadJsonFile (const std::string &jsonFile)
 {
-    fed->registerInterfaces (jsonFile);
+    loadJsonFileConfiguration("player", jsonFile);
 
     auto pubCount = fed->getPublicationCount ();
     for (int ii = 0; ii < pubCount; ++ii)
@@ -361,35 +305,13 @@ void Player::loadJsonFile (const std::string &jsonFile)
     if (doc.isMember("player"))
     {
         auto playerConfig = doc["player"];
-        if (playerConfig.isMember("stop"))
-        {
-            stopTime = loadJsonTime(playerConfig["stop"]);
-        }
-        if (playerConfig.isMember("local"))
-        {
-            useLocal = playerConfig["local"].asBool();
-        }
         if (playerConfig.isMember("timeunits"))
         {
             if (playerConfig["timeunits"].asString() == "ns")
             {
                 timeMultiplier = 1e-9;
             }
-        }
-        if (playerConfig.isMember("file"))
-        {
-            if (playerConfig["file"].isArray())
-            {
-                for (decltype(playerConfig.size()) ii=0;ii<playerConfig.size();++ii)
-                {
-                    loadFile(playerConfig["file"][ii].asString());
-                }
-            }
-            else
-            {
-                loadFile(playerConfig["file"].asString());
-            }
-        }
+        } 
     }
     auto pointArray = doc["points"];
     if (pointArray.isArray ())
@@ -689,11 +611,6 @@ void Player::initialize ()
 }
 
 
-void Player::finalize()
-{
-    fed->finalize();
-}
-
 void Player::sendInformation(Time sendTime, int iteration)
 {
     if (!points.empty())
@@ -731,14 +648,7 @@ void Player::sendInformation(Time sendTime, int iteration)
     }
 }
 
-/*run the Player*/
-void Player::run ()
-{
-    run (stopTime);
-    fed->disconnect();
-}
-
-void Player::run (Time stopTime_input)
+void Player::runTo (Time stopTime_input)
 {
     auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
@@ -808,9 +718,10 @@ void Player::run (Time stopTime_input)
             moreToSend = false;
             continue;
         }
-        if (nextIteration == 0)
+        if ((nextIteration == 0)||(nextSendTime>fed->getCurrentTime()))
         {
             auto newTime = fed->requestTime(nextSendTime);
+            currentIteration = 0;
             sendInformation(newTime, currentIteration);
 
             if (newTime >= nextPrintTime)
@@ -883,7 +794,7 @@ void Player::addEndpoint(const std::string &endpointName, const std::string &end
 
 int Player::loadArguments(boost::program_options::variables_map &vm_map)
 {
-
+    App::loadArguments(vm_map);
     if (vm_map.count("datatype") > 0)
     {
         defType = helics::getTypeFromString(vm_map["datatype"].as<std::string>());
@@ -892,10 +803,6 @@ int Player::loadArguments(boost::program_options::variables_map &vm_map)
             std::cerr << vm_map["datatype"].as<std::string>() << " is not recognized as a valid type \n";
             return -3;
         }
-    }
-    if (vm_map.count("local"))
-    {
-        useLocal = true;
     }
     if (vm_map.count("timeunits"))
     {
@@ -908,30 +815,6 @@ int Player::loadArguments(boost::program_options::variables_map &vm_map)
         {
             std::cerr << vm_map["timeunits"].as<std::string>() << " is not recognized as a valid unit of time \n";
         }
-    }
-    std::string file;
-    if (vm_map.count("input") == 0)
-    {
-        if (!fileLoaded)
-        {
-            if (filesystem::exists("helics.json"))
-            {
-                file = "helics.json";
-            }
-        }
-    }
-    if (filesystem::exists (vm_map["input"].as<std::string> ()))
-    {
-        file = vm_map["input"].as<std::string>();
-    }
-    if (!file.empty())
-    {
-        loadFile(file);
-    }
-
-    if (vm_map.count ("stop") > 0)
-    {
-        stopTime = loadTimeFromString(vm_map["stop"].as<std::string> ());
     }
     return 0;
 }

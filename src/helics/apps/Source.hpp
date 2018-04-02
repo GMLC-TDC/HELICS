@@ -5,7 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #pragma once
-#include "../application_api/CombinationFederate.hpp"
+#include "helicsApp.hpp"
 #include "../application_api/Endpoints.hpp"
 #include "../application_api/Publications.hpp"
 
@@ -15,13 +15,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "PrecHelper.hpp"
 #include <set>
 
-namespace boost
-{
-namespace program_options
-{
-class variables_map;
-}
-}
 
 namespace helics
 {
@@ -62,7 +55,7 @@ and sending signals at the appropriate times
 @details  the source class is not threadsafe,  don't try to use it from multiple threads without external
 protection, that will result in undefined behavior
 */
-class Source
+class Source:public App
 {
   public:
     /** default constructor*/
@@ -88,29 +81,19 @@ class Source
 
     /** move construction*/
     Source (Source &&other_source) = default;
-    /** don't allow the copy constructor*/
-    Source (const Source &other_source) = delete;
+
     /** move assignment*/
     Source &operator= (Source &&fed) = default;
-    /** don't allow the copy assignment,  the default would fail anyway since federates are not copyable either*/
-    Source &operator= (const Source &fed) = delete;
-    ~Source ();
 
-    /** load a file containing publication information
-    @param filename the file containing the configuration and source data  accepted format are json, xml, and a
-    source format which is tab delimited or comma delimited*/
-    void loadFile (const std::string &filename);
     /** initialize the source federate
     @details connect all sources with a generator
     */
     void initialize();
-    /*run the source*/
-    void run ();
 
     /** run the source until the specified time
     @param stopTime_input the desired stop time
     */
-    void run (Time stopTime_input);
+    virtual void runTo (Time stopTime_input) override;
 
     /** add a publication to a source
     @param key the key of the publication to add
@@ -146,30 +129,25 @@ class Source
     /** get a pointer to the signal generator*/
     std::shared_ptr<SignalGenerator> getGenerator(int index);
 
-    /** finalize the Source federate*/
-    void finalize();
   private:
     int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
     @param either a json filename or a string containing json
     */
-    void loadJsonFile (const std::string &jsonString);
+    virtual void loadJsonFile(const std::string &jsonString) override;
     /** execute a source object and update its time return the next execution time*/
     Time runSource(SourceObject &obj, Time currentTime);
     /** execute all the sources*/
     Time runSourceLoop(Time currentTime);
   private:
-    std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the source
+
     std::vector<SourceObject> sources;  //!< the actual publication objects
     std::vector<std::shared_ptr<SignalGenerator>> generators; //!< the signal generators
     std::map<std::string, int> generatorLookup; //!< map of generator names to indices
     std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
     std::map<std::string, int> pubids;  //!< publication id map
-    Time stopTime = Time::maxVal ();  //!< the time the source should stop
     Time defaultPeriod = 1.0; //!< the default period of publication
-    bool deactivated = false; //!< indicator that the app is disabled
-    bool useLocal = false;
-    bool fileLoaded = false;
+
 };
 }  // namespace apps
 } // namespace helics

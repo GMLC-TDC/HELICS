@@ -12,7 +12,9 @@ namespace helics
 {
 std::shared_ptr<const data_block> SubscriptionInfo::getData () { return current_data.data; }
 
-auto recordComparison = [](const SubscriptionInfo::dataRecord &rec1, const SubscriptionInfo::dataRecord &rec2) { return (rec1.time < rec2.time) ? true : ((rec1.time == rec2.time) ? (rec1.index < rec2.index) : false); };
+auto recordComparison = [](const SubscriptionInfo::dataRecord &rec1, const SubscriptionInfo::dataRecord &rec2) {
+    return (rec1.time < rec2.time) ? true : ((rec1.time == rec2.time) ? (rec1.index < rec2.index) : false);
+};
 
 void SubscriptionInfo::addData (Time valueTime, unsigned int index, std::shared_ptr<const data_block> data)
 {
@@ -22,113 +24,105 @@ void SubscriptionInfo::addData (Time valueTime, unsigned int index, std::shared_
     }
     else
     {
-        dataRecord newRecord(valueTime, index, std::move(data));
-        auto m = std::upper_bound(data_queue.begin(), data_queue.end(), newRecord, recordComparison);
-        data_queue.insert (m, std::move(newRecord));
+        dataRecord newRecord (valueTime, index, std::move (data));
+        auto m = std::upper_bound (data_queue.begin (), data_queue.end (), newRecord, recordComparison);
+        data_queue.insert (m, std::move (newRecord));
     }
 }
 
 bool SubscriptionInfo::updateTimeUpTo (Time newTime)
 {
     auto currentValue = data_queue.begin ();
-    auto last = currentValue;
     auto it_final = data_queue.end ();
     if (currentValue == it_final)
     {
         return false;
     }
-        while ((currentValue != it_final) && (currentValue->time < newTime))
-        {
-            last = currentValue;
-            ++currentValue;
-        }
-        if (last != currentValue)
-        {
-            auto res = updateData(std::move(*last));
-            data_queue.erase(data_queue.begin(), currentValue);
-            return res;
+    auto last = currentValue;
+    ++currentValue;
+    while ((currentValue != it_final) && (currentValue->time < newTime))
+    {
+        last = currentValue;
+        ++currentValue;
     }
-        return false;
-        
 
+    auto res = updateData (std::move (*last));
+    data_queue.erase (data_queue.begin (), currentValue);
+    return res;
 }
 
-bool SubscriptionInfo::updateTimeNextIteration(Time newTime)
+bool SubscriptionInfo::updateTimeNextIteration (Time newTime)
 {
-    auto currentValue = data_queue.begin();
-    auto last = currentValue;
-    auto it_final = data_queue.end();
+    auto currentValue = data_queue.begin ();
+    auto it_final = data_queue.end ();
     if (currentValue == it_final)
     {
         return false;
     }
-        while ((currentValue != it_final) && (currentValue->time < newTime))
+    auto last = currentValue;
+    ++currentValue;
+    while ((currentValue != it_final) && (currentValue->time < newTime))
+    {
+        last = currentValue;
+        ++currentValue;
+    }
+    if (currentValue != it_final)
+    {
+        if (currentValue->time == newTime)
         {
+            auto cindex = currentValue->index;
             last = currentValue;
             ++currentValue;
-        }
-        if (currentValue != it_final)
-        {
-            if (currentValue->time == newTime)
+            while ((currentValue != it_final) && (currentValue->time == newTime) &&
+                   (currentValue->index == cindex))
             {
-                auto cindex = currentValue->index;
                 last = currentValue;
                 ++currentValue;
-                while ((currentValue != it_final) && (currentValue->time == newTime) && (currentValue->index == cindex))
-                {
-                    last = currentValue;
-                    ++currentValue;
-                }
             }
         }
-        if (last != currentValue)
-        {
-            auto res = updateData(std::move(*last));
-            data_queue.erase(data_queue.begin(), currentValue);
-            return res;
-        }
-        return false;
+    }
 
+    auto res = updateData (std::move (*last));
+    data_queue.erase (data_queue.begin (), currentValue);
+    return res;
 }
 
-bool SubscriptionInfo::updateTimeInclusive(Time newTime)
+bool SubscriptionInfo::updateTimeInclusive (Time newTime)
 {
-    auto currentValue = data_queue.begin();
-    auto last = currentValue;
-    auto it_final = data_queue.end();
+    auto currentValue = data_queue.begin ();
+    auto it_final = data_queue.end ();
     if (currentValue == it_final)
     {
         return false;
     }
+    auto last = currentValue;
+    ++currentValue;
     while ((currentValue != it_final) && (currentValue->time <= newTime))
     {
         last = currentValue;
         ++currentValue;
     }
-    if (last != currentValue)
-    {
-        auto res = updateData(std::move(*last));
-        data_queue.erase(data_queue.begin(), currentValue);
-        return res;
-    }
-    return false;
+
+    auto res = updateData (std::move (*last));
+    data_queue.erase (data_queue.begin (), currentValue);
+    return res;
 }
 
-bool SubscriptionInfo::updateData(dataRecord &&update)
+bool SubscriptionInfo::updateData (dataRecord &&update)
 {
     if (!only_update_on_change)
     {
-        current_data = std::move(update);
+        current_data = std::move (update);
         return true;
     }
 
     if (*current_data.data != *(update.data))
     {
-        current_data = std::move(update);
+        current_data = std::move (update);
         return true;
     }
     else if (current_data.time == update.time)
-    { //this is for bookkeeping purposes should still return false
+    {  // this is for bookkeeping purposes should still return false
         current_data.index = update.index;
     }
     return false;
@@ -143,4 +137,3 @@ Time SubscriptionInfo::nextValueTime () const
     return data_queue.front ().time;
 }
 }  // namespace helics
-

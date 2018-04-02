@@ -49,9 +49,12 @@ class TimeCoordinator
 public:
     bool forwarding = false; //indicator that the time coordinator is a forwarding coordinator
   public:
-    TimeCoordinator () = default;
+      /** default constructor*/
+    TimeCoordinator ();
+    /** construct from a federate info */
     explicit TimeCoordinator (const CoreFederateInfo &info_);
-
+    /** construct from a federate info and message send function*/
+    TimeCoordinator(const CoreFederateInfo &info_, std::function<void(const ActionMessage &)> sendMessageFunction_);
 	/* get the federate info used by the Core that affects timing*/
 	CoreFederateInfo &getFedInfo()
 	{
@@ -62,10 +65,7 @@ public:
 	/** set the core information using for timing as a block*/
     void setInfo (const CoreFederateInfo &info_) { info = info_; }
 	/** set the callback function used for the sending messages*/
-	void setMessageSender(std::function<void(const ActionMessage &)> sendMessageFunction_)
-	{
-		sendMessageFunction = std::move(sendMessageFunction_);
-	}
+    void setMessageSender(std::function<void(const ActionMessage &)> sendMessageFunction_);
 
 	/** get the current granted time*/
 	Time getGrantedTime() const

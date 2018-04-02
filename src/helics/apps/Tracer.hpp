@@ -5,11 +5,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "../application_api/CombinationFederate.hpp"
+#include "helicsApp.hpp"
 #include "../application_api/Endpoints.hpp"
 #include "../application_api/Subscriptions.hpp"
 #include <map>
-#include <memory>
 #include <functional>
 
 #include "PrecHelper.hpp"
@@ -30,7 +29,7 @@ class CloningFilter;
 namespace apps
 {
 /** class designed to capture data points from a set of subscriptions or endpoints*/
-class Tracer
+class Tracer: public App
 {
   public:
     /** construct from a FederateInfo structure*/
@@ -49,25 +48,12 @@ class Tracer
     explicit Tracer (const std::string &jsonString);
     /** move construction*/
     Tracer (Tracer &&other_tracer) = default;
-    /** don't allow the copy constructor*/
-    Tracer (const Tracer &other_tracer) = delete;
     /** move assignment*/
     Tracer &operator= (Tracer &&tracer) = default;
-    /** don't allow the copy assignment,  the default would fail anyway since federates are not copyable either*/
-    Tracer &operator= (const Tracer &tracer) = delete;
-    /** destructor*/
-    ~Tracer ();
-
-    /** load a file containing subscription information
-    @param filename the name of the file to load (.txt, .json, or .xml
-    @return 0 on success <0 on failure
-    */
-    int loadFile (const std::string &filename);
-
-    /*run the Player*/
-    void run ();
+    /**destructor*/
+    ~Tracer();
     /** run the Player until the specified time*/
-    void run (Time stopTime);
+    void runTo (Time stopTime);
     /** add a subscription to capture*/
     void addSubscription (const std::string &key);
     /** add an endpoint*/
@@ -81,11 +67,6 @@ class Tracer
     */
     void addCapture (const std::string &captureDesc);
 
-    /** finalize the federate*/
-    void finalize ();
-
-    /** check if the Tracer is ready to run*/
-    bool isActive () const { return !deactivated; }
     /** set the callback for a message received through cloned interfaces
     @details the function signature will take the time in the Tracer a unique ptr to the message
     */
@@ -115,6 +96,7 @@ class Tracer
     {
         printMessage = false;
     }
+
   private:
     /** load arguments through a variable map created through command line arguments
      */
@@ -122,11 +104,11 @@ class Tracer
     /** load from a jsonString
     @param either a JSON filename or a string containing JSON
     */
-    int loadJsonFile (const std::string &jsonString);
+    virtual void loadJsonFile (const std::string &jsonString) override;
     /** load a text file*/
-    int loadTextFile (const std::string &textFile);
+    virtual void loadTextFile(const std::string &textFile) override;
 
-    void initialize ();
+    virtual void initialize () override;
     void generateInterfaces ();
     void captureForCurrentTime (Time currentTime, int iteration=0);
     void loadCaptureInterfaces ();
@@ -134,7 +116,8 @@ class Tracer
 
 
   protected:
-    std::shared_ptr<CombinationFederate> fed;  //!< the federate
+      bool printMessage = false;
+      bool allow_iteration = false;  //!< flag to allow iteration of the federate for time requests
     std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
 
     std::vector<Subscription> subscriptions;  //!< the actual subscription objects
@@ -145,10 +128,6 @@ class Tracer
     std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
     std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
 
-    Time autoStopTime = Time::maxVal ();  //!< the stop time
-    bool deactivated = false;
-    bool printMessage = false;
-    bool allow_iteration = false;  //!< flag to allow iteration of the federate for time requests
     std::function<void(Time, std::unique_ptr<Message>)> clonedMessageCallback;
     std::function<void(Time, const std::string &, std::unique_ptr<Message>)> endpointMessageCallback;
     std::function<void(Time, const std::string &, const std::string &)> valueCallback;

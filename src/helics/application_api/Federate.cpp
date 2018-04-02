@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -26,8 +25,13 @@ void cleanupHelicsLibrary ()
     CoreFactory::cleanUpCores (200);
 }
 
-Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
+Federate::Federate(const FederateInfo &fi) : Federate(fi.name, fi)
 {
+}
+
+Federate::Federate(const std::string &name, const FederateInfo &fi) : FedInfo(fi)
+{
+
     if (fi.coreName.empty ())
     {
         coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
@@ -66,7 +70,7 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
     }
 
     // this call will throw an error on failure
-    fedID = coreObject->registerFederate (fi.name, fi);
+    fedID = coreObject->registerFederate (name, fi);
     separator_ = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
@@ -115,6 +119,11 @@ Federate::Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi)
 Federate::Federate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
 {
     registerFilterInterfaces (jsonString);
+}
+
+Federate::Federate(const std::string &name, const std::string &jsonString) : Federate(loadFederateInfo(name,jsonString))
+{
+    registerFilterInterfaces(jsonString);
 }
 
 Federate::Federate () noexcept

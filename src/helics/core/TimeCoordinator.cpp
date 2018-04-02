@@ -11,11 +11,33 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-TimeCoordinator::TimeCoordinator (const CoreFederateInfo &info_) : info (info_)
+static auto nullMessageFunction = [](const ActionMessage &) {};
+TimeCoordinator::TimeCoordinator() :sendMessageFunction(nullMessageFunction)
+{
+}
+TimeCoordinator::TimeCoordinator(const CoreFederateInfo &info_) : TimeCoordinator(info_, nullMessageFunction)
+{
+}
+
+TimeCoordinator::TimeCoordinator(const CoreFederateInfo &info_, std::function<void(const ActionMessage &)> sendMessageFunction_):info(info_),sendMessageFunction(std::move(sendMessageFunction_))
 {
     if (info.timeDelta <= timeZero)
     {
         info.timeDelta = timeEpsilon;
+    }
+    if (!sendMessageFunction)
+    {
+        sendMessageFunction = nullMessageFunction;
+    }
+}
+
+
+void TimeCoordinator::setMessageSender(std::function<void(const ActionMessage &)> sendMessageFunction_)
+{
+    sendMessageFunction = std::move(sendMessageFunction_);
+    if (!sendMessageFunction)
+    {
+        sendMessageFunction = nullMessageFunction;
     }
 }
 
@@ -448,6 +470,7 @@ DependencyInfo *TimeCoordinator::getDependencyInfo (Core::federate_id_t ofed)
 std::vector<Core::federate_id_t> TimeCoordinator::getDependencies () const
 {
     std::vector<Core::federate_id_t> deps;
+    deps.reserve(dependencies.size());
     for (auto &dep : dependencies)
     {
         deps.push_back (dep.fedID);
@@ -457,14 +480,11 @@ std::vector<Core::federate_id_t> TimeCoordinator::getDependencies () const
 
 void TimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
 {
-    if (sendMessageFunction)
-    {
         for (auto dep : dependents)
         {
             msg.dest_id = dep;
             sendMessageFunction (msg);
         }
-    }
 }
 
 iteration_state TimeCoordinator::checkExecEntry ()

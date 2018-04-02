@@ -164,6 +164,16 @@ private:
     @return a convergence state value with an indicator of return reason and state of convergence
     */
 	iteration_state processQueue ();
+
+    /** process the federate delayed Message queue until a returnable event or it is empty
+    @details processQueue will process messages until one of 3 things occur
+    1.  the initialization state has been entered
+    2.  the execution state has been granted (or initialization state reentered from a iterative request)
+    3.  time has been granted
+    4. a break event is encountered
+    @return a convergence state value with an indicator of return reason and state of convergence
+    */
+    iteration_state processDelayQueue();
 	/** process a single message
 	@return a convergence state value with an indicator of return reason and state of convergence
 	*/

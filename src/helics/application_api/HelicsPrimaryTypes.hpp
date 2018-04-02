@@ -160,20 +160,27 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
             auto V = ValueConverter<std::complex<double>>::interpret(dv);
             val = static_cast<X> (std::abs(V));
         }
-        try
+        else if (dv.size() == 1)
         {
-            val = static_cast<X> (std::stod (dv.string ()));
+            val = static_cast<X>((dv[0] == '0') ? 0 : 1);
         }
-        catch (const std::invalid_argument &ble)
-        {  // well lets try a vector conversion
-            auto V = ValueConverter<std::vector<double>>::interpret(dv);
-            if (V.size() == 2)
+        else
+        {
+            try
             {
-                val = static_cast<X> (std::hypot(V[0], V[1]));
+                val = static_cast<X> (std::stod(dv.string()));
             }
-            else
-            {
-                val = (V.empty()) ? X(0) : static_cast<X> (V.front());
+            catch (const std::invalid_argument &ble)
+            {  // well lets try a vector conversion
+                auto V = ValueConverter<std::vector<double>>::interpret(dv);
+                if (V.size() == 2)
+                {
+                    val = static_cast<X> (std::hypot(V[0], V[1]));
+                }
+                else
+                {
+                    val = (V.empty()) ? X(0) : static_cast<X> (V.front());
+                }
             }
         }
         break;

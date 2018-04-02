@@ -33,13 +33,12 @@ namespace helics
 {
 namespace apps
 {
-Tracer::Tracer(FederateInfo &fi) : fed(std::make_shared<CombinationFederate>(fi))
+Tracer::Tracer(FederateInfo &fi) : App(fi)
 {
     fed->setFlag(OBSERVER_FLAG);
 }
 
 static const ArgDescriptors InfoArgs{
-    {"stop", "the time to stop tracing"},
     {"tags",ArgDescriptor::arg_type_t::vector_string,"tags to record, this argument may be specified any number of times"},
     { "endpoints",ArgDescriptor::arg_type_t::vector_string,"endpoints to capture, this argument may be specified multiple time" },
     {"sourceclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture generated packets from, this argument may be specified multiple time"},
@@ -49,35 +48,24 @@ static const ArgDescriptors InfoArgs{
     {"capture", ArgDescriptor::arg_type_t::vector_string,"capture all the publications and endpoints of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list"},
 };
 
-Tracer::Tracer(int argc, char *argv[])
+Tracer::Tracer(int argc, char *argv[]):App("tracer",argc,argv)
 {
+    fed->setFlag(OBSERVER_FLAG);
     variable_map vm_map;
-    auto res = argumentParser(argc, argv, vm_map, InfoArgs, "input");
-    if (res == versionReturn)
-    {
-        std::cout << helics::versionString << '\n';
-    }
-    if (res < 0)
-    {
-        deactivated = true;
-        return;
-    }
-    FederateInfo fi ("tracer");
-
-    fi.loadInfoFromArgs(argc, argv);
-    fed = std::make_shared<CombinationFederate>(fi);
-    fed->setFlag(OBSERVER_FLAG);
-
+    argumentParser(argc, argv, vm_map, InfoArgs);
     loadArguments(vm_map);
+    if (!masterFileName.empty())
+    {
+        loadFile(masterFileName);
+    }
 }
 
-Tracer::Tracer(const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : fed(std::make_shared<CombinationFederate>(core, fi))
+Tracer::Tracer(const std::shared_ptr<Core> &core, const FederateInfo &fi):App(core,fi)
 {
     fed->setFlag(OBSERVER_FLAG);
 }
 
-Tracer::Tracer(const std::string &jsonString) : fed(std::make_shared<CombinationFederate>(jsonString))
+Tracer::Tracer(const std::string &jsonString) : App(jsonString)
 {
     fed->setFlag(OBSERVER_FLAG);
     loadJsonFile(jsonString);
@@ -85,22 +73,9 @@ Tracer::Tracer(const std::string &jsonString) : fed(std::make_shared<Combination
 
 Tracer::~Tracer() = default;
 
-int Tracer::loadFile(const std::string &filename)
+void Tracer::loadJsonFile(const std::string &jsonString)
 {
-    auto ext = filesystem::path(filename).extension().string();
-    if ((ext == ".json") || (ext == ".JSON"))
-    {
-        return loadJsonFile(filename);
-    }
-    else
-    {
-        return loadTextFile(filename);
-    }
-}
-
-int Tracer::loadJsonFile(const std::string &jsonString)
-{
-    fed->registerInterfaces(jsonString);
+    loadJsonFileConfiguration("tracer",jsonString);
 
     auto subCount = fed->getSubscriptionCount ();
     for (int ii = 0; ii < subCount; ++ii)
@@ -180,13 +155,12 @@ int Tracer::loadJsonFile(const std::string &jsonString)
         addCapture(captures.asString());
     }
 
-    return 0;
 }
 
-int Tracer::loadTextFile(const std::string &textFile)
+void Tracer::loadTextFile(const std::string &textFile)
 {
     using namespace stringOps;
-
+    App::loadTextFile(textFile);
     std::ifstream infile(textFile);
     std::string str;
     int lc = 0;
@@ -198,7 +172,7 @@ int Tracer::loadTextFile(const std::string &textFile)
             continue;
         }
         auto fc = str.find_first_not_of(" \t\n\r\0");
-        if ((fc == std::string::npos) || (str[fc] == '#'))
+        if ((fc == std::string::npos) || (str[fc] == '#') || (str[fc] == '!'))
         {
             continue;
         }
@@ -266,21 +240,19 @@ int Tracer::loadTextFile(const std::string &textFile)
         }
     }
     infile.close();
-    return 0;
 }
 
 void Tracer::initialize()
 {
-    generateInterfaces();
+    auto state = fed->getCurrentState();
+    if (state == Federate::op_states::startup)
+    {
+        generateInterfaces();
 
-    fed->enterInitializationState();
-    captureForCurrentTime(-1.0);
-
-    fed->enterExecutionState();
-    captureForCurrentTime(0.0);
+        fed->enterInitializationState();
+        captureForCurrentTime(-1.0);
+    }
 }
-
-void Tracer::finalize() { fed->finalize(); }
 
 void Tracer::generateInterfaces()
 {
@@ -409,16 +381,24 @@ void Tracer::captureForCurrentTime(Time currentTime, int iteration)
 }
 
 
-/*run the Player*/
-void Tracer::run()
-{
-    run(autoStopTime);
-    fed->finalize();
-}
 /** run the Player until the specified time*/
-void Tracer::run(Time runToTime)
+void Tracer::runTo(Time runToTime)
 {
-    initialize();
+    auto state = fed->getCurrentState();
+    if (state == Federate::op_states::startup)
+    {
+        initialize();
+        state = Federate::op_states::initialization;
+    }
+
+    if (state == Federate::op_states::initialization)
+    {
+        fed->enterExecutionState();
+        captureForCurrentTime(0.0);
+    }
+
+
+    
 
     Time nextPrintTime = 10.0;
     try
@@ -579,10 +559,6 @@ int Tracer::loadArguments(boost::program_options::variables_map &vm_map)
     if (vm_map.count("allow_iteration") > 0)
     {
         allow_iteration = true;
-    }
-    if (vm_map.count("stop") > 0)
-    {
-        autoStopTime = loadTimeFromString(vm_map["stop"].as<std::string>());
     }
     return 0;
 }

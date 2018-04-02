@@ -29,6 +29,12 @@ ValueFederate::ValueFederate (const std::string &jsonString) : Federate (loadFed
     registerInterfaces (jsonString);
 }
 
+ValueFederate::ValueFederate(const std::string &name, const std::string &jsonString) : Federate(loadFederateInfo(name,jsonString))
+{
+    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), getID());
+    registerInterfaces(jsonString);
+}
+
 ValueFederate::ValueFederate () = default;
 
 ValueFederate::ValueFederate (bool /*res*/)

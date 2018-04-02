@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -12,96 +11,45 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include <set>
 #include <stdexcept>
-#include <boost/filesystem.hpp>
-#include "../common/argParser.h"
 #include "../core/helicsVersion.hpp"
-
+#include "../common/argParser.h"
 #include "../common/JsonProcessingFunctions.hpp"
-
-namespace filesystem = boost::filesystem;
 
 namespace helics
 {
 namespace apps
 {
 static const ArgDescriptors InfoArgs{
-    {"delay", "the delay with which the echo app will echo message" },
-    {"stop", "the time to stop the echo"}
+    {"delay", "the delay with which the echo app will echo message" }
 };
 
-Echo::Echo (int argc, char *argv[])
+Echo::Echo (int argc, char *argv[]):App("echo",argc,argv)
 {
     variable_map vm_map;
-    auto res = argumentParser(argc, argv, vm_map, InfoArgs,"input");
-    if (res == versionReturn)
+    argumentParser(argc, argv, vm_map, InfoArgs);
+    loadArguments(vm_map);
+    if (!masterFileName.empty())
     {
-        std::cout << helics::versionString << '\n';
-    }
-    if (res < 0)
-    {
-        deactivated = true;
-        return;
-    }
-
-    FederateInfo fi ("echo");
-    fi.loadInfoFromArgs (argc, argv);
-    fed = std::make_shared<MessageFederate> (fi);
-
-    loadArguments (vm_map);
-}
-
-Echo::Echo (const FederateInfo &fi) : fed (std::make_shared<MessageFederate> (fi))
-{
-
-}
-
-Echo::Echo (const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : fed (std::make_shared<MessageFederate> (core, fi))
-{
-
-}
-
-Echo::Echo (const std::string &jsonString) : fed (std::make_shared<MessageFederate> (jsonString))
-{
-    loadFile (jsonString);
-}
-
-Echo::~Echo () = default;
-
-void Echo::loadFile (const std::string &filename)
-{
-
-    auto ext = filesystem::path(filename).extension().string();
-    if ((ext == ".json") || (ext == ".JSON"))
-    {
-        loadJsonFile(filename);
-    }
-    else
-    {
-        //loadTextFile(filename);
-    }
-
-}
-
-
-void Echo::initialize ()
-{
-    auto state = fed->getCurrentState ();
-    if (state == Federate::op_states::startup)
-    {
-        fed->enterInitializationState ();
+        loadFile(masterFileName);
     }
 }
 
-
-/*run the Echo*/
-void Echo::run ()
+Echo::Echo (const FederateInfo &fi) : App(fi)
 {
-    run (stopTime);
-    fed->finalize ();
+
 }
 
-void Echo::run (Time stopTime_input)
+Echo::Echo (const std::shared_ptr<Core> &core, const FederateInfo &fi):App(core,fi)
+{
+
+}
+
+Echo::Echo (const std::string &jsonString) : App(jsonString)
+{
+    loadJsonFile(jsonString);
+}
+
+void Echo::runTo (Time stopTime_input)
 {
     auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
@@ -110,9 +58,7 @@ void Echo::run (Time stopTime_input)
     }
     if (state < Federate::op_states::execution)
     {
-
         fed->enterExecutionState ();
-
     }
     else if (state == Federate::op_states::finalize)
     {
@@ -144,11 +90,6 @@ void Echo::echoMessage(const Endpoint *ept, Time currentTime)
     }
 }
 
-void Echo::finalize()
-{
-    fed->finalize();
-}
-
 void Echo::addEndpoint (const std::string &endpointName, const std::string &endpointType)
 {
     endpoints.emplace_back (GLOBAL, fed.get (), endpointName, endpointType);
@@ -157,30 +98,6 @@ void Echo::addEndpoint (const std::string &endpointName, const std::string &endp
 
 int Echo::loadArguments (boost::program_options::variables_map &vm_map)
 {
-    std::string file;
-    if (vm_map.count("input") == 0)
-    {
-        if (!fileLoaded)
-        {
-            if (filesystem::exists("helics.json"))
-            {
-                file = "helics.json";
-            }
-        }
-    }
-    if (filesystem::exists(vm_map["input"].as<std::string>()))
-    {
-        file = vm_map["input"].as<std::string>();
-    }
-    if (!file.empty())
-    {
-        loadFile(file);
-    }
-
-    if (vm_map.count ("stop") > 0)
-    {
-        stopTime = loadTimeFromString(vm_map["stop"].as<std::string> ());
-    }
     if (vm_map.count("delay") > 0)
     {
         std::lock_guard<std::mutex> lock(delayTimeLock);
@@ -193,8 +110,7 @@ int Echo::loadArguments (boost::program_options::variables_map &vm_map)
 
 void Echo::loadJsonFile(const std::string &jsonFile)
 {
-    fed->registerInterfaces(jsonFile);
-
+    loadJsonFileConfiguration("echo",jsonFile);
     auto eptCount = fed->getEndpointCount();
     for (int ii = 0; ii < eptCount; ++ii)
     {
@@ -207,30 +123,12 @@ void Echo::loadJsonFile(const std::string &jsonFile)
 
     if (doc.isMember("echo"))
     {
-        auto playerConfig = doc["echo"];
-        if (playerConfig.isMember("stop"))
-        {
-            stopTime = loadJsonTime(playerConfig["stop"]);
-        }
-       
-        if (playerConfig.isMember("file"))
-        {
-            if (playerConfig["file"].isArray())
-            {
-                for (decltype(playerConfig.size()) ii = 0; ii<playerConfig.size(); ++ii)
-                {
-                    loadFile(playerConfig["file"][ii].asString());
-                }
-            }
-            else
-            {
-                loadFile(playerConfig["file"].asString());
-            }
-        }
-        if (playerConfig.isMember("delay"))
+        auto echoConfig = doc["echo"];
+      
+        if (echoConfig.isMember("delay"))
         {
             std::lock_guard<std::mutex> lock(delayTimeLock);
-            delayTime = loadJsonTime(playerConfig["delay"]);
+            delayTime = loadJsonTime(echoConfig["delay"]);
         }
     }
 }

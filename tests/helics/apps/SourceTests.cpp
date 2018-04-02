@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(simple_source_test)
     src1.setStartTime("pub1", 1.0);
     helics::ValueFederate vfed(fi);
     helics::Subscription sub1(&vfed, "pub1");
-    auto fut = std::async(std::launch::async, [&src1]() { src1.run(5); src1.finalize(); });
+    auto fut = std::async(std::launch::async, [&src1]() { src1.runTo(5); src1.finalize(); });
     vfed.enterExecutionState();
     auto retTime = vfed.requestTime(5);
     BOOST_CHECK_EQUAL(retTime, 1.0);
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(simple_source_test2)
     helics::ValueFederate vfed(fi);
     helics::Subscription sub1(&vfed, "pub1");
     helics::Subscription sub2(&vfed, "pub2");
-    auto fut = std::async(std::launch::async, [&src1]() { src1.run(5); src1.finalize(); });
+    auto fut = std::async(std::launch::async, [&src1]() { src1.runTo(5); src1.finalize(); });
     vfed.enterExecutionState();
     auto retTime = vfed.requestTime(5);
     BOOST_CHECK_EQUAL(retTime, 1.0);
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(sine_source_test)
     src1.setStartTime("pub1", 1.0);
     helics::ValueFederate vfed(fi);
     helics::Subscription sub1(&vfed, "pub1");
-    auto fut = std::async(std::launch::async, [&src1]() { src1.run(5); src1.finalize(); });
+    auto fut = std::async(std::launch::async, [&src1]() { src1.runTo(5); src1.finalize(); });
     vfed.enterExecutionState();
     auto retTime = vfed.requestTime(5);
    
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(simple_source_test_file)
     fi.name = "block1";
     helics::ValueFederate vfed(fi);
     helics::Subscription sub1(&vfed, "pub1");
-    auto fut = std::async(std::launch::async, [&src1]() { src1.run(5); src1.finalize(); });
+    auto fut = std::async(std::launch::async, [&src1]() { src1.runTo(5); src1.finalize(); });
     vfed.enterExecutionState();
     auto retTime = vfed.requestTime(5);
     BOOST_CHECK_EQUAL(retTime, 1.0);
@@ -235,7 +235,7 @@ BOOST_AUTO_TEST_CASE(simple_source_test2_file)
     helics::ValueFederate vfed(fi);
     helics::Subscription sub1(&vfed, "pub1");
     helics::Subscription sub2(&vfed, "pub2");
-    auto fut = std::async(std::launch::async, [&src1]() { src1.run(5); src1.finalize(); });
+    auto fut = std::async(std::launch::async, [&src1]() { src1.runTo(5); src1.finalize(); });
     vfed.enterExecutionState();
     auto retTime = vfed.requestTime(5);
     BOOST_CHECK_EQUAL(retTime, 1.0);
@@ -286,7 +286,7 @@ BOOST_AUTO_TEST_CASE(sine_source_test_file)
 
     helics::ValueFederate vfed(fi);
     helics::Subscription sub1(&vfed, "pub1");
-    auto fut = std::async(std::launch::async, [&src1]() { src1.run(5); src1.finalize(); });
+    auto fut = std::async(std::launch::async, [&src1]() { src1.runTo(5); src1.finalize(); });
     vfed.enterExecutionState();
     auto retTime = vfed.requestTime(5);
 
