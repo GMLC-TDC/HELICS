@@ -1,3 +1,4 @@
+import time
 import pytest as pt
 import helics as h
 
@@ -27,7 +28,7 @@ def vFed():
 
     helicsversion = h.helicsGetVersion()
 
-    print("PI SENDER: Helics version = {}".format(helicsversion))
+    print("Helics version = {}".format(helicsversion))
 
     # Create broker #
     print("Creating Broker")
@@ -65,7 +66,15 @@ def vFed():
 
     vFed = h.helicsCreateValueFederate(fedinfo)
 
-    return vFed
+    yield vFed
+
+    status = h.helicsFederateFinalize(vFed)
+
+    while (h.helicsBrokerIsConnected(broker)):
+        time.sleep(1)
+
+    h.helicsFederateFree(vFed)
+    h.helicsCloseLibrary()
 
 
 
