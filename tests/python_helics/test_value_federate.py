@@ -64,3 +64,8 @@ def vFed():
     status = h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
 
     vFed = h.helicsCreateValueFederate(fedinfo)
+
+    return vFed
+
+
+
