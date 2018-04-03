@@ -22,9 +22,6 @@
 %apply int *OUTPUT{federate_state  *state};
 %apply int *OUTPUT{helics_iteration_status *};
 
-%include carrays.i
-%array_class(double, doubleArray);
-
 %include "api-data.h"
 %include "helics.h"
 %include "ValueFederate.h"

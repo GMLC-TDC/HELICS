@@ -57,5 +57,9 @@
 %typemap(freearg) float value[ANY] {
    if ($1) free($1);
 }
+
+%include carrays.i
+%array_class(double, doubleArray);
+
 %include "../helics.i"
 

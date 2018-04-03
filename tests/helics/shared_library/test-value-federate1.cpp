@@ -677,7 +677,6 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     //	helics_time_t stime = 1.0;
     helics_time_t gtime;
     char s[100] = "n2";
-    int retValue;
 
     SetupTest(helicsCreateValueFederate, core_type.c_str(), 1, 1.0);
     auto vFed = GetFederateAt(0);
@@ -704,7 +703,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     // make sure the value is still what we expect
     CE (helicsSubscriptionGetString (subid, s, 100));
     BOOST_CHECK_EQUAL (s, "string1");
-    BOOST_CHECK_EQUAL (retValue, 7);
+    
 
     // advance time
     CE(helicsFederateRequestTime (vFed, 2.0, &gtime));
