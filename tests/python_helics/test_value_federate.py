@@ -212,7 +212,7 @@ def test_value_federate_runFederateTestComplex(vFed):
     assert value2 == iTestValue
 
 
-@pt.mark.skip
+# @pt.mark.skip
 def test_value_federate_runFederateTestInteger(vFed):
     defaultValue = 1
     testValue = 2
@@ -244,7 +244,7 @@ def test_value_federate_runFederateTestInteger(vFed):
     assert value == 0
 
 
-@pt.mark.skip
+# @pt.mark.skip
 def test_value_federate_runFederateTestString(vFed):
     defaultValue = "String1"
     testValue = "String2"
@@ -266,7 +266,7 @@ def test_value_federate_runFederateTestString(vFed):
     status, value = h.helicsSubscriptionGetString(subid)
     assert value == testValue
 
-@pt.mark.skip
+# @pt.mark.skip
 def test_value_federate_runFederateTestVectorD(vFed):
     defaultValue = [0, 1, 2]
     testValue = [3, 4, 5]
