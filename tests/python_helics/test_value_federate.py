@@ -253,13 +253,13 @@ def test_value_federate_runFederateTestString(vFed):
     # TODO: Fix error with the following function
     h.helicsPublicationPublishString(pubid, testValue)
 
-    status, value = h.helicsSubscriptionGetString(subid)
+    status, value = h.helicsSubscriptionGetString(subid, 100)
     assert value == defaultValue
 
     status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
     assert grantedtime == 0.01
 
-    status, value = h.helicsSubscriptionGetString(subid)
+    status, value = h.helicsSubscriptionGetString(subid, 100)
     assert value == testValue
 
 # @pt.mark.skip
