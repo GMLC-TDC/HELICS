@@ -36,15 +36,12 @@
     PyErr_SetString(PyExc_ValueError,"Expected a sequence");
     return NULL;
   }
-  if (PySequence_Length($input) != $1_dim0) {
-    PyErr_SetString(PyExc_ValueError,"Size mismatch. Expected $1_dim0 elements");
-    return NULL;
-  }
-  $1 = (double *) malloc($1_dim0*sizeof(double));
-  $2=$1_dim0;
-  for (i = 0; i < $1_dim0; i++) {
+  $2=PySequence_Length($input);
+  $1 = (double *) malloc($2*sizeof(double));
+  
+  for (i = 0; i < $2; i++) {
     PyObject *o = PySequence_GetItem($input,i);
-    if (PyNumber_Check(o)) {
+    if (PyFloat_Check(o)) {
       $1[i] = PyFloat_AsDouble(o);
     } else {
       PyErr_SetString(PyExc_ValueError,"Sequence elements must be numbers");      
@@ -56,6 +53,28 @@
 
 %typemap(freearg) float value[ANY] {
    if ($1) free($1);
+}
+
+%typemap(argout) (helics_subscription sub, double data[], int maxlen, int *actualSize) {
+  PyObject *o=$input;
+  PyObject *o2;
+  $3=helicsSubscriptionGetSize(o);
+  if ($3 == 0)
+  {
+	return 2;
+  }
+  o2=PyList_New($3);
+  $2 = (double *) malloc($3*sizeof(double));
+  int actSize;
+  $4=&actSize;
+  
+  for (i = 0; i < actSize; i++) {
+	PyObjct *o_item=PyFloat_FromDouble($2[i]);
+      PyList_SetItem(o2, i, o_item);
+      }
+	  
+  $result = SWIG_Python_AppendOutput($result, o2);
+  Py_DECREF(o2);
 }
 
 %include carrays.i
