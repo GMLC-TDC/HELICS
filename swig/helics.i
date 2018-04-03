@@ -16,8 +16,6 @@
 %apply double *OUTPUT {double*};
 %apply helics_time_t *OUTPUT {helics_time_t*};
 %apply (char *STRING, size_t LENGTH) { (const char *data, int len) };
-%cstring_output_maxsize(char *str, int maxlen);
-%cstring_bounded_output(char* str, 1024);
 
 %apply int *OUTPUT{int *};
 %apply long long *OUTPUT{int64_t *};
