@@ -63,7 +63,7 @@ target_compile_definitions(shared-library-tests PRIVATE "-DHELICS_INSTALL_LOCATI
 
 target_compile_definitions(shared-library-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
 
-add_test(NAME shared-library-tests COMMAND shared-library-tests --log_level=message --report_level=short)
+add_test(NAME shared-library-tests COMMAND shared-library-tests --log_level=test_suite --report_level=short)
 
 
 
