@@ -224,13 +224,13 @@ def test_value_federate_runFederateTestInteger(vFed):
     h.helicsPublicationPublishInteger(pubid, testValue)
 
     status, value = h.helicsSubscriptionGetInteger(subid)
-    assert value == 0 # defaultValue
+    assert value == defaultValue
 
     status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
     assert grantedtime == 0.01
 
     status, value = h.helicsSubscriptionGetInteger(subid)
-    assert value == defaultValue
+    assert value == testValue
 
     h.helicsPublicationPublishInteger(pubid, testValue + 1)
 
@@ -238,7 +238,7 @@ def test_value_federate_runFederateTestInteger(vFed):
     assert grantedtime == 0.02
 
     status, value = h.helicsSubscriptionGetInteger(subid)
-    assert value == testValue
+    assert value == testValue + 1
 
 
 # @pt.mark.skip
