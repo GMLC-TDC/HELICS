@@ -1,0 +1,17 @@
+{
+	"publications":[
+{
+	"global":true,
+"key":"pub1", "type":"double",
+	"start":1.0,
+	"period":0.5
+}],
+
+"generators":[
+{
+	"name":"sine",
+	"type":"sine",
+	"period":"2s",
+	"amplitude":1.0
+}]
+}

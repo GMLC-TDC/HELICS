@@ -253,7 +253,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
 
     int actualLen;
     // make sure the value is still what we expect
-    CE(helicsSubscriptionGetValue (subid, s, 100, &actualLen));
+    CE(helicsSubscriptionGetRawValue (subid, s, 100, &actualLen));
     BOOST_CHECK_EQUAL (std::string (s, actualLen), "string1");
 
     // advance time
@@ -263,7 +263,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
     // make sure the string is what we expect
-    CE(helicsSubscriptionGetValue (subid, s, 100, &actualLen));
+    CE(helicsSubscriptionGetRawValue (subid, s, 100, &actualLen));
 
     BOOST_CHECK_EQUAL (actualLen, 7);
     BOOST_CHECK_EQUAL (std::string (s, actualLen), "string2");
@@ -677,7 +677,6 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     //	helics_time_t stime = 1.0;
     helics_time_t gtime;
     char s[100] = "n2";
-    int retValue;
 
     SetupTest(helicsCreateValueFederate, core_type.c_str(), 1, 1.0);
     auto vFed = GetFederateAt(0);
@@ -702,15 +701,15 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     CE (helicsPublicationPublishString (pubid, "string2"));
 
     // make sure the value is still what we expect
-    CE (helicsSubscriptionGetValue (subid, s, 100, &retValue));
+    CE (helicsSubscriptionGetString (subid, s, 100));
     BOOST_CHECK_EQUAL (s, "string1");
-    BOOST_CHECK_EQUAL (retValue, 7);
+    
 
     // advance time
     CE(helicsFederateRequestTime (vFed, 2.0, &gtime));
     // make sure the value was updated
     BOOST_CHECK_EQUAL (gtime, 2.0);
-    CE (helicsSubscriptionGetValue (subid, s, 100, &retValue));
+    CE (helicsSubscriptionGetString (subid, s, 100));
     BOOST_CHECK_EQUAL (s, "string2");
 
     CE (helicsFederateFinalize (vFed));

@@ -393,7 +393,7 @@ endif()
 
 add_subdirectory(docs)
 
-set(HELICS_CMAKECONFIG_INSTALL_DIR "cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
+set(HELICS_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
 
 install (TARGETS helics-static EXPORT helics-targets
 	DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs)
@@ -474,8 +474,8 @@ configure_package_config_file(config/${PROJECT_NAME}Config.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
                               INSTALL_DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-                                 VERSION ${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}.${HELICS_VERSION_BUILD}
-                                 COMPATIBILITY AnyNewerVersion)
+                                 VERSION ${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}-${HELICS_VERSION_BUILD}
+                                 COMPATIBILITY SameMajorVersion)
 
 configure_file(config/${PROJECT_NAME}Import.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake" @ONLY)

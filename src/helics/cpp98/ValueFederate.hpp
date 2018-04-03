@@ -169,10 +169,12 @@ class ValueFederate : public virtual Federate
     }
 
     /** Methods to get subscription values **/
-    int getValue (helics_subscription sub, char *data, int maxlen)
+    int getRawValue (helics_subscription sub, std::vector<char> &data)
     {
+        int size = helicsSubscriptionGetValueSize(sub);
+        data.resize(size);
         int actualSize;
-       helicsSubscriptionGetValue (sub, data, maxlen,&actualSize);
+       helicsSubscriptionGetRawValue (sub, data.data(), static_cast<int>(data.size()),&actualSize);
        return actualSize;
     }
 

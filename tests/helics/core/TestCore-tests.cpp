@@ -20,7 +20,8 @@ using namespace helics::CoreFactory;
 
 BOOST_AUTO_TEST_CASE (testcore_initialization_test)
 {
-    auto broker = helics::BrokerFactory::create(helics::core_type::TEST, "");
+    auto broker = helics::BrokerFactory::create(helics::core_type::TEST, std::string());
+    BOOST_REQUIRE(broker);
     BOOST_CHECK(broker->isConnected());
     std::string initializationString = std::string("4")+" --broker="+broker->getIdentifier();
     auto core = create (helics::core_type::TEST, initializationString);

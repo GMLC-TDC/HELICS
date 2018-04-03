@@ -1,0 +1,31 @@
+{
+	"publications":[
+{
+	"global":true,
+"key":"pub1", "type":"double",
+"generator":"ramp",
+	"start":1.0,
+	"period":1.0
+},
+{
+	"global":true,
+"key":"pub2", "type":"double",
+"generator":"ramp2",
+	"start":3.0,
+	"period":2.0
+}],
+
+"generators":[
+{
+	"name":"ramp",
+	"type":"ramp",
+	"ramp":0.3,
+	"level":1.0
+},
+{
+	"name":"ramp2",
+	"type":"ramp",
+	"ramp":0.6,
+	"level":2.0
+}]
+}

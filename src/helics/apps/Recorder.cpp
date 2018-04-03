@@ -4,26 +4,24 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
+#include "Recorder.hpp"
+
 #include "../application_api/Filters.hpp"
-#include "../application_api/Subscriptions.hpp"
-#include "../application_api/ValueFederate.hpp"
 #include "../application_api/queryFunctions.hpp"
 #include "../common/stringOps.h"
-#include "../core/helicsVersion.hpp"
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
-#include <memory>
 #include <regex>
 #include <set>
 #include <stdexcept>
-#include <boost/filesystem.hpp>
 #include "../common/argParser.h"
-
+#include "boost/filesystem.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "PrecHelper.hpp"
-#include "Recorder.hpp"
+
 #include <thread>
 
 namespace filesystem = boost::filesystem;
@@ -32,13 +30,12 @@ namespace helics
 {
 namespace apps
 {
-Recorder::Recorder (FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
+Recorder::Recorder (FederateInfo &fi) : App(fi)
 {
     fed->setFlag (OBSERVER_FLAG);
 }
 
 static const ArgDescriptors InfoArgs{
-    {"stop", "the time to stop recording"},
     {"tags",ArgDescriptor::arg_type_t::vector_string,"tags to record, this argument may be specified any number of times"},
     {"endpoints",ArgDescriptor::arg_type_t::vector_string,"endpoints to capture, this argument may be specified multiple time"},
     {"sourceclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture generated packets from, this argument may be specified multiple time"},
@@ -46,65 +43,39 @@ static const ArgDescriptors InfoArgs{
     {"clone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to clone all packets to and from"},
     {"capture", ArgDescriptor::arg_type_t::vector_string,"capture all the publications of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list"},
     {"output,o","the output file for recording the data"},
+    {"allow_iteration", ArgDescriptor::arg_type_t::flag_type,"allow iteration on values"},
     {"mapfile", "write progress to a memory mapped file"}
 };
 
-Recorder::Recorder (int argc, char *argv[])
+Recorder::Recorder (int argc, char *argv[]):App("recorder",argc,argv)
 {
+    fed->setFlag (OBSERVER_FLAG);
     variable_map vm_map;
-    auto res = argumentParser(argc, argv, vm_map, InfoArgs, "input");
-    if (res == versionReturn)
+    argumentParser(argc, argv, vm_map, InfoArgs);
+    loadArguments(vm_map);
+    if (!masterFileName.empty())
     {
-        std::cout << helics::versionString << '\n';
+        loadFile(masterFileName);
     }
-    if (res == helpReturn)
-    {
-        FederateInfo helpTemp(argc, argv);
-    }
-    if (res < 0)
-    {
-        deactivated = true;
-        return;
-    }
-    FederateInfo fi ("recorder");
-
-    fi.loadInfoFromArgs (argc, argv);
-    fed = std::make_shared<CombinationFederate> (fi);
-    fed->setFlag (OBSERVER_FLAG);
-
-    loadArguments (vm_map);
 }
 
-Recorder::Recorder (const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : fed (std::make_shared<CombinationFederate> (core, fi))
+Recorder::Recorder (const std::shared_ptr<Core> &core, const FederateInfo &fi):App(core,fi)
 {
     fed->setFlag (OBSERVER_FLAG);
 }
 
-Recorder::Recorder (const std::string &jsonString) : fed (std::make_shared<CombinationFederate> (jsonString))
+Recorder::Recorder (const std::string &jsonString) : App(jsonString)
 {
     fed->setFlag (OBSERVER_FLAG);
-    loadJsonFile (jsonString);
+    Recorder::loadJsonFile(jsonString);
 }
 
 Recorder::~Recorder () { saveFile (outFileName); }
 
-int Recorder::loadFile (const std::string &filename)
-{
-    auto ext = filesystem::path (filename).extension ().string ();
-    if ((ext == ".json") || (ext == ".JSON"))
-    {
-        return loadJsonFile (filename);
-    }
-    else
-    {
-        return loadTextFile (filename);
-    }
-}
 
-int Recorder::loadJsonFile (const std::string &jsonString)
+void Recorder::loadJsonFile (const std::string &jsonString)
 {
-    fed->registerInterfaces (jsonString);
+    loadJsonFileConfiguration("recorder", jsonString);
 
     auto pubCount = fed->getSubscriptionCount ();
     for (int ii = 0; ii < pubCount; ++ii)
@@ -185,11 +156,9 @@ int Recorder::loadJsonFile (const std::string &jsonString)
     {
         addCapture (captures.asString ());
     }
-
-    return 0;
 }
 
-int Recorder::loadTextFile (const std::string &textFile)
+void Recorder::loadTextFile (const std::string &textFile)
 {
     using namespace stringOps;
 
@@ -272,7 +241,6 @@ int Recorder::loadTextFile (const std::string &textFile)
         }
     }
     infile.close ();
-    return 0;
 }
 
 void Recorder::writeJsonFile (const std::string &filename)
@@ -287,7 +255,10 @@ void Recorder::writeJsonFile (const std::string &filename)
             point["key"] = subscriptions[v.index].getKey ();
             point["value"] = v.value;
             point["time"] = static_cast<double> (v.time);
-
+            if (v.iteration > 0)
+            {
+                point["iteration"] = v.iteration;
+            }
             if (v.first)
             {
                 point["type"] = subscriptions[v.index].getType ();
@@ -342,8 +313,17 @@ void Recorder::writeTextFile (const std::string &filename)
         }
         else
         {
-            outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getKey () << '\t'
+            if (v.iteration > 0)
+            {
+                outFile << static_cast<double> (v.time)<<':'<<v.iteration << "\t\t" << subscriptions[v.index].getKey() << '\t'
                     << v.value << '\n';
+            }
+            else
+            {
+                outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getKey() << '\t'
+                    << v.value << '\n';
+            }
+           
         }
     }
     if (!messages.empty ())
@@ -383,7 +363,6 @@ void Recorder::initialize ()
     captureForCurrentTime (0.0);
 }
 
-void Recorder::finalize () { fed->finalize (); }
 
 void Recorder::generateInterfaces ()
 {
@@ -420,7 +399,7 @@ void Recorder::loadCaptureInterfaces ()
     }
 }
 
-void Recorder::captureForCurrentTime (Time currentTime)
+void Recorder::captureForCurrentTime (Time currentTime, int iteration)
 {
     for (auto &sub : subscriptions)
     {
@@ -429,6 +408,11 @@ void Recorder::captureForCurrentTime (Time currentTime)
             auto val = sub.getValue<std::string> ();
             int ii = subids[sub.getID ()];
             points.emplace_back (currentTime, ii, val);
+            if (iteration > 0)
+            {
+                points.back().iteration = iteration;
+            }
+           
             if (vStat[ii].cnt == 0)
             {
                 points.back ().first = true;
@@ -458,14 +442,8 @@ void Recorder::captureForCurrentTime (Time currentTime)
 
 std::string Recorder::encode (const std::string &str2encode) { return str2encode; }
 
-/*run the Player*/
-void Recorder::run ()
-{
-    run (autoStopTime);
-    fed->finalize ();
-}
 /** run the Player until the specified time*/
-void Recorder::run (Time runToTime)
+void Recorder::runTo (Time runToTime)
 {
     initialize ();
     if (!mapfile.empty ())
@@ -483,22 +461,35 @@ void Recorder::run (Time runToTime)
     {
         while (true)
         {
-            auto T = fed->requestTime (runToTime);
-            if (T < runToTime)
+            helics::Time T;
+            int iteration = 0;
+            if (allow_iteration)
             {
-                captureForCurrentTime (T);
-                if (!mapfile.empty ())
+                auto ItRes = fed->requestTimeIterative(runToTime, iteration_request::iterate_if_needed);
+                if (ItRes.state == iteration_result::next_step)
                 {
-                    std::ofstream out (mapfile);
-                    for (auto &stat : vStat)
-                    {
-                        out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t'
-                            << stat.lastVal << '\n';
-                    }
-                    out.flush ();
+                    iteration = 0;
                 }
+                T = ItRes.grantedTime;
+                captureForCurrentTime(T, iteration);
+                ++iteration;
             }
             else
+            {
+                T = fed->requestTime(runToTime);
+                captureForCurrentTime(T);
+            }
+            if (!mapfile.empty())
+            {
+                std::ofstream out(mapfile);
+                for (auto &stat : vStat)
+                {
+                    out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t'
+                        << stat.lastVal << '\n';
+                }
+                out.flush();
+            }
+            if (T >= runToTime)
             {
                 break;
             }
@@ -598,17 +589,6 @@ void Recorder::saveFile (const std::string &filename)
 
 int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
 {
-    if (vm_map.count ("input") == 0)
-    {
-        return -1;
-    }
-
-    if (!filesystem::exists (vm_map["input"].as<std::string> ()))
-    {
-        std::cerr << vm_map["input"].as<std::string> () << "is not a valid input file \n";
-        return -3;
-    }
-    loadFile (vm_map["input"].as<std::string> ());
 
     // get the extra tags from the arguments
     if (vm_map.count ("tags") > 0)
@@ -679,6 +659,10 @@ int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
             addDestEndpointClone (clone);
         }
     }
+    if (vm_map.count("allow_iteration") > 0)
+    {
+        allow_iteration = true;
+    }
     if (vm_map.count ("mapfile") > 0)
     {
         mapfile = vm_map["mapfile"].as<std::string> ();
@@ -688,13 +672,6 @@ int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
     if (vm_map.count ("output") > 0)
     {
         outFileName = vm_map["output"].as<std::string> ();
-    }
-
-    if (vm_map.count("stop") > 0)
-    {
-        printf("stop  from %s\n",  vm_map["stop"].as<std::string>().c_str());
-        autoStopTime = loadTimeFromString(vm_map["stop"].as<std::string>());
-        printf("stop at %f from %s\n", static_cast<double>(autoStopTime), vm_map["stop"].as<std::string>().c_str());
     }
     return 0;
 }

@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-std::pair<double,int> runInitIterations(std::shared_ptr<helics::ValueFederate> &vfed, int index, int total)
+std::pair<double,int> runInitIterations(helics::ValueFederate *vfed, int index, int total)
 {
     using namespace helics;
     Publication pub(vfed, "pub", helics_type_t::helicsDouble);
@@ -80,23 +80,38 @@ std::pair<double,int> runInitIterations(std::shared_ptr<helics::ValueFederate> &
         double val2 = sub_low.getValue<double>();
         cval = (val1 + val2) / 2.0;
         ++itcount;
-        /*if (index == 2)
-        {
-            printf("[%d] (%d)=%f,(%d)=%f, curr=%f\n", itcount, (index == 0) ? total - 1 : index - 1,val2, (index == total - 1) ? (0) : index + 1, val1, cval);
-        }*/
+         //   printf("[%d]<%d> (%d)=%f,(%d)=%f, curr=%f\n", itcount,index, (index == 0) ? total - 1 : index - 1,val2, (index == total - 1) ? (0) : index + 1, val1, cval);
     }
     return { cval,itcount };
         
 }
+
+std::vector<std::pair<double, int>> run_iteration_round_robin(std::vector<std::shared_ptr<helics::ValueFederate>> &fedVec)
+{
+    int N = static_cast<int>(fedVec.size());
+    std::vector<std::future<std::pair<double, int>>> futures;
+    for (decltype(N) ii = 0; ii < N; ++ii)
+    {
+        auto vFed = fedVec[ii].get();
+        futures.push_back(std::async(std::launch::async, [vFed,ii,N]() {return runInitIterations(vFed, ii, N); }));
+    }
+    std::vector<std::pair<double, int>> results(N);
+    for (decltype(N) ii = 0; ii < N; ++ii)
+    {
+        results[ii] = futures[ii].get();
+    }
+    return results;
+}
+
 BOOST_TEST_DECORATOR(*utf::timeout(12))
 BOOST_DATA_TEST_CASE(execution_iteration_round_robin, bdata::make(core_types), core_type)
 {
     SetupTest<helics::ValueFederate>(core_type, 3);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-   auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
-   auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
-   auto fut1 = std::async(std::launch::async, [&vFed1]() {return runInitIterations(vFed1, 0, 3); });
-       auto fut2 = std::async(std::launch::async, [&vFed2]() {return runInitIterations(vFed2, 1, 3); });
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0).get();
+   auto vFed2 = GetFederateAs<helics::ValueFederate>(1).get();
+   auto vFed3 = GetFederateAs<helics::ValueFederate>(2).get();
+   auto fut1 = std::async(std::launch::async, [vFed1]() {return runInitIterations(vFed1, 0, 3); });
+       auto fut2 = std::async(std::launch::async, [vFed2]() {return runInitIterations(vFed2, 1, 3); });
 
        auto res3 = runInitIterations(vFed3, 2, 3);
        auto res2=fut2.get();
@@ -106,6 +121,25 @@ BOOST_DATA_TEST_CASE(execution_iteration_round_robin, bdata::make(core_types), c
        BOOST_CHECK_CLOSE(res1.first, 2.5, 0.1);
 }
 
+BOOST_AUTO_TEST_CASE(execution_iteration_loop3)
+{
+    int N = 5;
+    SetupTest<helics::ValueFederate>("test", N);
+    std::vector<std::shared_ptr<helics::ValueFederate>> vfeds(N);
+    for (int ii = 0; ii < N; ++ii)
+    {
+        vfeds[ii]= GetFederateAs<helics::ValueFederate>(ii);
+    }
+    auto results = run_iteration_round_robin(vfeds);
+    for (int ii = 1; ii < N; ++ii)
+    {
+        if (results[ii].second < 50)
+        {
+            BOOST_CHECK_CLOSE(results[ii].first, results[0].first, 0.1);
+        }
+        
+    }
+}
 
 BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)

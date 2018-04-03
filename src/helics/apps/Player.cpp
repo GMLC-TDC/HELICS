@@ -40,64 +40,41 @@ namespace helics
 {
 namespace apps
 {
-static inline bool vComp (const ValueSetter &v1, const ValueSetter &v2) { return (v1.time < v2.time); }
+static inline bool vComp (const ValueSetter &v1, const ValueSetter &v2) { return (v1.time==v2.time)?(v1.iteration<v2.iteration):(v1.time < v2.time); }
 static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { return (m1.sendTime < m2.sendTime); }
 
 static const ArgDescriptors InfoArgs{
     {"datatype",  "type of the publication data type to use"},
-    {"local", ArgDescriptor::arg_type_t::flag_type, "specify otherwise unspecified endpoints and publications as local( i.e.the keys will be prepended with the player name"},
-    {"separator", "specify the separator for local publications and endpoints"},
-    {"timeunits", "the default units on the timestamps used in file based input"},
-    {"stop",  "the time to stop the player"}
+    {"timeunits", "the default units on the timestamps used in file based input"}
 };
 
-Player::Player (int argc, char *argv[])
+Player::Player (int argc, char *argv[]):App("player",argc,argv)
 {
+    fed->setFlag (SOURCE_ONLY_FLAG);
     variable_map vm_map;
-    auto res = argumentParser(argc, argv, vm_map, InfoArgs,"input");
-    if (res == versionReturn)
-    {
-        std::cout << helics::versionString<< '\n';
-    }
-    if (res == helpReturn)
-    {
-        FederateInfo helpTemp(argc, argv);
-    }
-    if (res < 0)
-    {
-        deactivated = true;
-        return;
-    }
-    FederateInfo fi ("player");
-    fi.loadInfoFromArgs (argc, argv);
-    fed = std::make_shared<CombinationFederate> (fi);
-    fed->setFlag (SOURCE_ONLY_FLAG);
+    argumentParser(argc, argv, vm_map, InfoArgs);
     loadArguments(vm_map);
-
-}
-
-Player::Player (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi))
-{
-    fed->setFlag (SOURCE_ONLY_FLAG);
-}
-
-Player::Player (const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : fed (std::make_shared<CombinationFederate> (core, fi))
-{
-    fed->setFlag (SOURCE_ONLY_FLAG);
-}
-
-Player::Player (const std::string &jsonString) : fed (std::make_shared<CombinationFederate> (jsonString))
-{
-    fed->setFlag (SOURCE_ONLY_FLAG);
-    if (jsonString.size () < 200)
+    if (!masterFileName.empty())
     {
-        masterFileName = jsonString;
+        loadFile(masterFileName);
     }
-    loadJsonFile (jsonString);
 }
 
-Player::~Player () = default;
+Player::Player (const FederateInfo &fi) : App(fi)
+{
+    fed->setFlag (SOURCE_ONLY_FLAG);
+}
+
+Player::Player (const std::shared_ptr<Core> &core, const FederateInfo &fi):App(core,fi)
+{
+    fed->setFlag (SOURCE_ONLY_FLAG);
+}
+
+Player::Player (const std::string &jsonString) : App (jsonString)
+{
+    fed->setFlag (SOURCE_ONLY_FLAG);
+    Player::loadJsonFile(jsonString);
+}
 
 void Player::addMessage (Time sendTime,
                          const std::string &src,
@@ -126,20 +103,6 @@ void Player::addMessage (Time sendTime,
     messages.back ().mess.time = actionTime;
 }
 
-void Player::loadFile (const std::string &filename)
-{
-    auto ext = filesystem::path (filename).extension ().string ();
-    if ((ext == ".json") || (ext == ".JSON"))
-    {
-        loadJsonFile (filename);
-    }
-    else
-    {
-        loadTextFile (filename);
-    }
-}
-
-
 helics::Time Player::extractTime(const std::string &str, int lineNumber) const
 {
     try
@@ -162,6 +125,7 @@ helics::Time Player::extractTime(const std::string &str, int lineNumber) const
 
 void Player::loadTextFile (const std::string &filename)
 {
+    App::loadTextFile(filename);
     using namespace stringOps;
     std::ifstream infile (filename);
     std::string str;
@@ -210,37 +174,12 @@ void Player::loadTextFile (const std::string &filename)
             if (str[fc + 1] == '!')
             {
                 /*  //allow configuration inside the regular text file
-                if (playerConfig.find("stop") != playerConfig.end())
-                {
-                    stopTime = playerConfig["stop"].get<double>();
-                }
-                if (playerConfig.find("local") != playerConfig.end())
-                {
-                    useLocal = playerConfig["local"].get<bool>();
-                }
-                if (playerConfig.find("separator") != playerConfig.end())
-                {
-                    fed->setSeparator(playerConfig["separator"].get<char>());
-                }
+               
                 if (playerConfig.find("timeunits") != playerConfig.end())
                 {
                     if (playerConfig["timeunits"] == "ns")
                     {
                         timeMultiplier = 1e-9;
-                    }
-                }
-                if (playerConfig.find("file") != playerConfig.end())
-                {
-                    if (playerConfig["file"].is_array())
-                    {
-                        for (const auto &fname : playerConfig["file"])
-                        {
-                            loadFile(fname);
-                        }
-                    }
-                    else
-                    {
-                        loadFile(playerConfig["file"]);
                     }
                 }
                 */
@@ -289,11 +228,23 @@ void Player::loadTextFile (const std::string &filename)
         }
         else
         {
-            if (blk.size () == 3)
+            if (blk.size() == 3)
             {
-                if ((points[pIndex].time = extractTime(blk[0], lcount)) == Time::minVal())
+                auto cloc = blk[0].find_last_of(':');
+                if (cloc == std::string::npos)
                 {
-                    continue;
+                    if ((points[pIndex].time = extractTime(trim(blk[0]), lcount)) == Time::minVal())
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0,cloc), lcount)) == Time::minVal())
+                    {
+                        continue;
+                    }
+                    points[pIndex].iteration = std::stoi(blk[0].substr(cloc + 1));
                 }
 
                 points[pIndex].pubName = blk[1];
@@ -302,9 +253,21 @@ void Player::loadTextFile (const std::string &filename)
             }
             else if (blk.size () == 4)
             {
-                if ((points[pIndex].time = extractTime(trim(blk[0]), lcount)) == Time::minVal())
+                auto cloc = blk[0].find_last_of(':');
+                if (cloc == std::string::npos)
                 {
-                    continue;
+                    if ((points[pIndex].time = extractTime(trim(blk[0]), lcount)) == Time::minVal())
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc), lcount)) == Time::minVal())
+                    {
+                        continue;
+                    }
+                    points[pIndex].iteration = std::stoi(blk[0].substr(cloc + 1));
                 }
                 points[pIndex].pubName = blk[1];
                 points[pIndex].type = blk[2];
@@ -321,9 +284,9 @@ void Player::loadTextFile (const std::string &filename)
 
 void Player::loadJsonFile (const std::string &jsonFile)
 {
-    fed->registerInterfaces (jsonFile);
+    loadJsonFileConfiguration("player", jsonFile);
 
-    auto pubCount = fed->getSubscriptionCount ();
+    auto pubCount = fed->getPublicationCount ();
     for (int ii = 0; ii < pubCount; ++ii)
     {
         publications.emplace_back (fed.get (), ii);
@@ -342,44 +305,13 @@ void Player::loadJsonFile (const std::string &jsonFile)
     if (doc.isMember("player"))
     {
         auto playerConfig = doc["player"];
-        if (playerConfig.isMember("stop"))
-        {
-            stopTime = loadJsonTime(playerConfig["stop"]);
-        }
-        if (playerConfig.isMember("local"))
-        {
-            useLocal = playerConfig["local"].asBool();
-        }
-        if (playerConfig.isMember("separator"))
-        {
-            auto sep = playerConfig["separator"].asString();
-            if (sep.size() > 0)
-            {
-                fed->setSeparator(sep[0]);
-            }
-
-        }
         if (playerConfig.isMember("timeunits"))
         {
             if (playerConfig["timeunits"].asString() == "ns")
             {
                 timeMultiplier = 1e-9;
             }
-        }
-        if (playerConfig.isMember("file"))
-        {
-            if (playerConfig["file"].isArray())
-            {
-                for (decltype(playerConfig.size()) ii=0;ii<playerConfig.size();++ii)
-                {
-                    loadFile(playerConfig["file"][ii].asString());
-                }
-            }
-            else
-            {
-                loadFile(playerConfig["file"].asString());
-            }
-        }
+        } 
     }
     auto pointArray = doc["points"];
     if (pointArray.isArray ())
@@ -388,13 +320,34 @@ void Player::loadJsonFile (const std::string &jsonFile)
         for (const auto &pointElement : pointArray)
         {
             Time ptime;
+            int iterationIndex = 0;
             if (pointElement.isMember ("time"))
             {
-                ptime=loadJsonTime(pointElement["time"], units);
+                auto str = pointElement["time"].asString();
+                auto cloc = str.find_last_of(':');
+                if (cloc != std::string::npos)
+                {
+                    ptime = loadJsonTime(str, units);
+                }
+                else
+                {
+                    ptime = loadJsonTime(str.substr(0,cloc-1), units);
+                    iterationIndex = std::stoi(str.substr(cloc + 1));
+                }
             }
             else if (pointElement.isMember("t"))
             {
-                ptime = loadJsonTime(pointElement["t"],units);
+                auto str = pointElement["t"].asString();
+                auto cloc = str.find_last_of(':');
+                if (cloc != std::string::npos)
+                {
+                    ptime = loadJsonTime(str, units);
+                }
+                else
+                {
+                    ptime = loadJsonTime(str.substr(0, cloc - 1), units);
+                    iterationIndex = std::stoi(str.substr(cloc + 1));
+                }
             }
             else
             {
@@ -439,6 +392,10 @@ void Player::loadJsonFile (const std::string &jsonFile)
             {
                 type = pointElement["type"].asString();
             }
+            if (pointElement.isMember("iteration"))
+            {
+                iterationIndex = pointElement["iteration"].asInt();
+            }
             std::string key;
             if (pointElement.isMember("key"))
             {
@@ -451,6 +408,7 @@ void Player::loadJsonFile (const std::string &jsonFile)
             }
             points.resize (points.size () + 1);
             points.back ().time = ptime;
+            points.back().iteration = iterationIndex;
             points.back ().pubName = key;
             points.back ().value = val;
             if (!type.empty ())
@@ -653,16 +611,20 @@ void Player::initialize ()
 }
 
 
-void Player::finalize()
-{
-    fed->finalize();
-}
-
-void Player::sendInformation(Time sendTime)
+void Player::sendInformation(Time sendTime, int iteration)
 {
     if (!points.empty())
     {
-        while (points[pointIndex].time <= sendTime)
+        while (points[pointIndex].time < sendTime)
+        {
+            publications[points[pointIndex].index].publish(points[pointIndex].value);
+            ++pointIndex;
+            if (pointIndex >= points.size())
+            {
+                break;
+            }
+        }
+        while ((points[pointIndex].time == sendTime)&&(points[pointIndex].iteration==iteration))
         {
             publications[points[pointIndex].index].publish(points[pointIndex].value);
             ++pointIndex;
@@ -686,14 +648,7 @@ void Player::sendInformation(Time sendTime)
     }
 }
 
-/*run the Player*/
-void Player::run ()
-{
-    run (stopTime);
-    fed->disconnect();
-}
-
-void Player::run (Time stopTime_input)
+void Player::runTo (Time stopTime_input)
 {
     auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
@@ -739,16 +694,20 @@ void Player::run (Time stopTime_input)
     helics::Time nextPrintTime = 10.0;
     bool moreToSend = true;
     Time nextSendTime = timeZero;
+    int nextIteration = 0;
+    int currentIteration = 0;
     while (moreToSend)
     {
         nextSendTime = Time::maxVal ();
         if (pointIndex < points.size ())
         {
             nextSendTime = std::min (nextSendTime, points[pointIndex].time);
+            nextIteration = points[pointIndex].iteration;
         }
         if (messageIndex < messages.size ())
         {
             nextSendTime = std::min (nextSendTime, messages[messageIndex].sendTime);
+            nextIteration = 0;
         }
         if (nextSendTime > stopTime_input)
         {
@@ -759,14 +718,25 @@ void Player::run (Time stopTime_input)
             moreToSend = false;
             continue;
         }
-        auto newTime = fed->requestTime (nextSendTime);
-        sendInformation(newTime);
-
-        if (newTime >= nextPrintTime)
+        if ((nextIteration == 0)||(nextSendTime>fed->getCurrentTime()))
         {
-            std::cout << "processed time " << static_cast<double> (newTime) << "\n";
-            nextPrintTime += 10.0;
+            auto newTime = fed->requestTime(nextSendTime);
+            currentIteration = 0;
+            sendInformation(newTime, currentIteration);
+
+            if (newTime >= nextPrintTime)
+            {
+                std::cout << "processed time " << static_cast<double> (newTime) << "\n";
+                nextPrintTime += 10.0;
+            }
         }
+        else
+        {
+            fed->requestTimeIterative(nextSendTime, iteration_request::force_iteration);
+            ++currentIteration;
+            sendInformation(nextSendTime, currentIteration);
+        }
+        
     }
 }
 
@@ -824,7 +794,7 @@ void Player::addEndpoint(const std::string &endpointName, const std::string &end
 
 int Player::loadArguments(boost::program_options::variables_map &vm_map)
 {
-
+    App::loadArguments(vm_map);
     if (vm_map.count("datatype") > 0)
     {
         defType = helics::getTypeFromString(vm_map["datatype"].as<std::string>());
@@ -833,14 +803,6 @@ int Player::loadArguments(boost::program_options::variables_map &vm_map)
             std::cerr << vm_map["datatype"].as<std::string>() << " is not recognized as a valid type \n";
             return -3;
         }
-    }
-    if (vm_map.count("local"))
-    {
-        useLocal = true;
-    }
-    if (vm_map.count("separator"))
-    {
-        fed->setSeparator(vm_map["separator"].as<std::string>()[0]);
     }
     if (vm_map.count("timeunits"))
     {
@@ -853,30 +815,6 @@ int Player::loadArguments(boost::program_options::variables_map &vm_map)
         {
             std::cerr << vm_map["timeunits"].as<std::string>() << " is not recognized as a valid unit of time \n";
         }
-    }
-    std::string file;
-    if (vm_map.count("input") == 0)
-    {
-        if (!fileLoaded)
-        {
-            if (filesystem::exists("helics.json"))
-            {
-                file = "helics.json";
-            }
-        }
-    }
-    if (filesystem::exists (vm_map["input"].as<std::string> ()))
-    {
-        file = vm_map["input"].as<std::string>();
-    }
-    if (!file.empty())
-    {
-        loadFile(file);
-    }
-
-    if (vm_map.count ("stop") > 0)
-    {
-        stopTime = loadTimeFromString(vm_map["stop"].as<std::string> ());
     }
     return 0;
 }

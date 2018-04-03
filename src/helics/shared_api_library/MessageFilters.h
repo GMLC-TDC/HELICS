@@ -94,17 +94,17 @@ HELICS_Export helics_filter helicsCoreRegisterCloningFilter (helics_core fed, co
 
 /** get the target of the filter and store in the given string
 @param filt the given filter
-@param[out] str storage for the name of the target
+@param[out] outputString storage for the name of the target
 @param maxlen the maximum length of string that str can store
 @return a helics_status enumeration helics_ok if everything worked*/
-HELICS_Export helics_status helicsFilterGetTarget (helics_filter filt, char *str, int maxlen);
+HELICS_Export helics_status helicsFilterGetTarget (helics_filter filt, char *outputString, int maxlen);
 
 /** get the name of the filter and store in the given string
 @param filt the given filter
-@param[out] str storage for the name of the target
+@param[out] outputString storage for the name of the target
 @param maxlen the maximum length of string that str can store
 @return a helics_status enumeration helics_ok if everything worked*/
-HELICS_Export helics_status helicsFilterGetName (helics_filter filt, char *str, int maxlen);
+HELICS_Export helics_status helicsFilterGetName (helics_filter filt, char *outputString, int maxlen);
 
 /** set a property on a filter
 @param filt the filter to modify
