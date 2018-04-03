@@ -212,36 +212,33 @@ def test_value_federate_runFederateTestComplex(vFed):
     assert value2 == iTestValue
 
 
-# @pt.mark.skip
 def test_value_federate_runFederateTestInteger(vFed):
     defaultValue = 1
     testValue = 2
     pubid = h.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", h.HELICS_DATA_TYPE_INT, "")
     subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "int", "")
-    # h.helicsSubscriptionSetDefaultInteger(subid, defaultValue)
+    h.helicsSubscriptionSetDefaultInteger(subid, defaultValue)
 
     h.helicsFederateEnterExecutionMode (vFed)
 
-    # TODO: Fix error with the following function
-    # h.helicsPublicationPublishInteger(pubid, testValue)
+    h.helicsPublicationPublishInteger(pubid, testValue)
 
     status, value = h.helicsSubscriptionGetInteger(subid)
     assert value == 0 # defaultValue
 
     status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
-    assert grantedtime == 1.0
+    assert grantedtime == 0.01
 
     status, value = h.helicsSubscriptionGetInteger(subid)
-    assert value == 0
+    assert value == defaultValue
 
-    # publish string1 at time=0.0;
-    # h.helicsPublicationPublishInteger(pubid, testValue + 1)
+    h.helicsPublicationPublishInteger(pubid, testValue + 1)
 
     status, grantedtime = h.helicsFederateRequestTime (vFed, 2.0)
-    assert grantedtime == 2.0
+    assert grantedtime == 0.02
 
     status, value = h.helicsSubscriptionGetInteger(subid)
-    assert value == 0
+    assert value == testValue
 
 
 # @pt.mark.skip
