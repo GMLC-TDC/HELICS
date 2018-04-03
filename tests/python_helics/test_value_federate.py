@@ -241,7 +241,6 @@ def test_value_federate_runFederateTestInteger(vFed):
     assert value == testValue + 1
 
 
-# @pt.mark.skip
 def test_value_federate_runFederateTestString(vFed):
     defaultValue = "String1"
     testValue = "String2"
