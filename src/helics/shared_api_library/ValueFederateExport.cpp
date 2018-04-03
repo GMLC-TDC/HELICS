@@ -434,7 +434,7 @@ int helicsSubscriptionGetValueSize (helics_subscription sub)
     return static_cast<int> (str.size ());
 }
 
-helics_status helicsSubscriptionGetValue (helics_subscription sub, char *data, int maxlen, int *actualSize)
+helics_status helicsSubscriptionGetRawValue (helics_subscription sub, char *data, int maxlen, int *actualSize)
 {
     if (sub == nullptr)
     {
@@ -490,7 +490,7 @@ helics_status helicsSubscriptionGetString (helics_subscription sub, char *output
         return helics_invalid_argument;
     }
     int len;
-    auto res = helicsSubscriptionGetValue (sub, outputString, maxlen, &len);
+    auto res = helicsSubscriptionGetRawValue (sub, outputString, maxlen, &len);
     // make sure we have a null terminator
     if (len == maxlen)
     {

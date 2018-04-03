@@ -2,7 +2,7 @@
 
 %cstring_output_maxsize(char *outputString, int maxlen);
 
-# typemap for the input arguments
+//typemap for the input arguments
 %typemap(in) (int argc, const char *const *argv) {
   /* Check if is a list */
   if (PyList_Check($input)) {

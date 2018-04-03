@@ -217,7 +217,7 @@ HELICS_Export int helicsSubscriptionGetValueSize (helics_subscription sub);
 @param[out] actualLength  the actual length of data copied to data
 @return a helics_status value, helics_ok if everything went fine
 */
-HELICS_Export helics_status helicsSubscriptionGetValue (helics_subscription sub, char *data, int maxlen, int *actualLength);
+HELICS_Export helics_status helicsSubscriptionGetRawValue (helics_subscription sub, char *data, int maxlen, int *actualLength);
 
 /** get a string value from a subscription
 @param sub the subscription to get the data for
