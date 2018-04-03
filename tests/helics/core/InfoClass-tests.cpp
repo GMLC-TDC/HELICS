@@ -284,8 +284,8 @@ BOOST_AUTO_TEST_CASE (subscriptioninfo_test)
 
     // Expect this to fail
     auto hello_data = std::make_shared<helics::data_block> ("hello world");
-    subI.addData (helics::timeZero, hello_data);
-    subI.updateTime (helics::timeZero);
+    subI.addData (helics::timeZero,0, hello_data);
+    subI.updateTimeInclusive (helics::timeZero);
     ret_data = subI.getData ();
 
     // When movement of data is updated (see above), this can be uncommented and updated
@@ -294,8 +294,18 @@ BOOST_AUTO_TEST_CASE (subscriptioninfo_test)
 
     auto time_one_data = std::make_shared<helics::data_block> ("time one");
     auto time_one_repeat_data = std::make_shared<helics::data_block> ("time one repeat");
-    subI.addData (1, time_one_data);
-    subI.addData (1, time_one_repeat_data);
+    subI.addData (1, 0,time_one_data);
+    subI.addData (1,0, time_one_repeat_data);
+
+    subI.updateTimeInclusive(1.0);
+    ret_data = subI.getData();
+    BOOST_CHECK(ret_data->to_string() == "time one repeat");
+    subI.addData(2, 0, time_one_data);
+    subI.addData(2, 1, time_one_repeat_data);
+
+    subI.updateTimeNextIteration(2.0);
+    ret_data = subI.getData();
+    BOOST_CHECK(ret_data->to_string() == "time one");
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

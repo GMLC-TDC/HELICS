@@ -29,6 +29,12 @@ ValueFederate::ValueFederate (const std::string &jsonString) : Federate (loadFed
     registerInterfaces (jsonString);
 }
 
+ValueFederate::ValueFederate(const std::string &name, const std::string &jsonString) : Federate(loadFederateInfo(name,jsonString))
+{
+    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), getID());
+    registerInterfaces(jsonString);
+}
+
 ValueFederate::ValueFederate () = default;
 
 ValueFederate::ValueFederate (bool /*res*/)
@@ -127,9 +133,7 @@ void ValueFederate::registerValueInterfaces (const std::string &jsonString)
         auto pubs = doc["publications"];
         for (const auto &pub : pubs)
         {
-            auto key = (pub.isMember ("key")) ?
-                         pub["key"].asString () :
-                         ((pub.isMember ("name")) ? pub["name"].asString () : std::string ());
+            auto key = getKey(pub);
 
             auto id = vfManager->getPublicationId (key);
             if (id != invalid_id_value)
@@ -154,9 +158,7 @@ void ValueFederate::registerValueInterfaces (const std::string &jsonString)
         auto subs = doc["subscriptions"];
         for (const auto &sub : subs)
         {
-            auto key = (sub.isMember ("key")) ?
-                         sub["key"].asString () :
-                         ((sub.isMember ("name")) ? sub["name"].asString () : std::string ());
+            auto key = getKey(sub);
             auto id = vfManager->getSubscriptionId (key);
             if (id != invalid_id_value)
             {

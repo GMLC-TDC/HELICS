@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test)
 
     helics::ValueFederate vfed (fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.run (4); });
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
     vfed.enterExecutionState ();
     auto retTime = vfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test2)
 
     helics::ValueFederate vfed (fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.run (4); });
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
     vfed.enterExecutionState ();
     auto retTime = vfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_message)
 
     rec1.addEndpoint ("src1");
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.run (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
     mfed.enterExecutionState ();
 
     auto retTime = mfed.requestTime (1.0);
@@ -144,7 +144,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_files, boost::unit_test::data::make (
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
     helics::Publication pub2 (helics::GLOBAL, &vfed, "pub2", helics::helics_type_t::helicsDouble);
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.run (4); });
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
     vfed.enterExecutionState ();
     auto retTime = vfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -205,7 +205,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files,
     helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::helics_type_t::helicsDouble);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.run (5); });
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5); });
     cfed.enterExecutionState ();
     auto retTime = cfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -274,7 +274,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
     helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::helics_type_t::helicsDouble);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.run (5); });
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5); });
     cfed.enterExecutionState ();
     auto retTime = cfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -319,6 +319,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
     BOOST_CHECK_EQUAL (v1.second, std::to_string (3.9));
 
     auto m = rec1.getMessage (1);
+    BOOST_REQUIRE(m);
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message2");
 }
 
@@ -343,7 +344,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_destendpoint_clone)
     rec1.addDestEndpointClone ("d1");
     rec1.addDestEndpointClone ("d2");
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.run (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
     mfed2.enterExecutionStateAsync ();
     mfed.enterExecutionState ();
     mfed2.enterExecutionStateComplete ();
@@ -365,7 +366,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_destendpoint_clone)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
+    BOOST_CHECK_GE (rec1.messageCount (), 2);
 
     auto m = rec1.getMessage (0);
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message");
@@ -392,7 +393,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_srcendpoint_clone)
     rec1.addSourceEndpointClone ("d1");
     rec1.addSourceEndpointClone ("d2");
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.run (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
     mfed2.enterExecutionStateAsync ();
     mfed.enterExecutionState ();
     mfed2.enterExecutionStateComplete ();
@@ -414,7 +415,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_srcendpoint_clone)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
+    BOOST_CHECK_GE (rec1.messageCount (), 2);
 
     auto m = rec1.getMessage (0);
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message");
@@ -441,7 +442,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_endpoint_clone)
     rec1.addDestEndpointClone ("d1");
     rec1.addSourceEndpointClone ("d1");
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.run (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
     mfed2.enterExecutionStateAsync ();
     mfed.enterExecutionState ();
     mfed2.enterExecutionStateComplete ();
@@ -494,7 +495,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
 
     rec1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.run (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
     mfed2.enterExecutionStateAsync ();
     mfed.enterExecutionState ();
     mfed2.enterExecutionStateComplete ();
@@ -516,7 +517,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
+    BOOST_CHECK_GE (rec1.messageCount (), 2);
 
     auto m = rec1.getMessage (0);
     BOOST_CHECK (m);
@@ -547,7 +548,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile1)
     rec1.addDestEndpointClone ("d1");
     rec1.addSourceEndpointClone ("d1");
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.run (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
     mfed2.enterExecutionStateAsync ();
     mfed.enterExecutionState ();
     mfed2.enterExecutionStateComplete ();
@@ -596,7 +597,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile2)
 
     helics::ValueFederate vfed (fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.run (4); });
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
     vfed.enterExecutionState ();
     auto retTime = vfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -652,7 +653,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
 
     helics::Publication pub1 (helics::GLOBAL, &mfed, "pub1", helics::helics_type_t::helicsDouble);
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.run (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
     mfed2.enterExecutionStateAsync ();
     mfed.enterExecutionState ();
     mfed2.enterExecutionStateComplete ();

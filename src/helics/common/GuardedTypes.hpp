@@ -1,9 +1,9 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+
 #pragma once
 
 #include <libguarded/ordered_guarded.hpp>
@@ -18,6 +18,12 @@ using guarded = libguarded::guarded<T>;
 
 template <class T>
 using atomic_guarded = libguarded::atomic_guarded<T>;
+
+template <class T>
+using shared_guarded_m = libguarded::shared_guarded<T, std::mutex>;
+
+template <class T>
+using ordered_guarded_m = libguarded::ordered_guarded<T, std::mutex>;
 
 #ifdef HAVE_SHARED_MUTEX
 template <class T>

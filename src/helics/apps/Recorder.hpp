@@ -6,21 +6,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #pragma once
 #include "../application_api/Subscriptions.hpp"
-#include "../application_api/CombinationFederate.hpp"
+#include "helicsApp.hpp"
 #include "../application_api/Endpoints.hpp"
 #include <map>
 #include <memory>
 #include <set>
 
 #include "PrecHelper.hpp"
-
-namespace boost
-{
-    namespace program_options
-    {
-        class variables_map;
-    }
-}
 
 namespace helics
 {
@@ -34,6 +26,7 @@ namespace apps
     public:
         helics::Time time;
         int index=-1;
+        int16_t iteration = 0;
         bool first = false;
         std::string value;
         ValueCapture() = default;
@@ -54,7 +47,7 @@ namespace apps
 
 
     /** class designed to capture data points from a set of subscriptions or endpoints*/
-    class Recorder
+    class Recorder:public App
     {
     public:
         /** construct from a FederateInfo structure*/
@@ -73,25 +66,12 @@ namespace apps
         explicit Recorder(const std::string &jsonString);
         /** move construction*/
         Recorder(Recorder &&other_recorder) = default;
-        /** don't allow the copy constructor*/
-        Recorder(const Recorder &other_recorder) = delete;
         /** move assignment*/
         Recorder &operator= (Recorder &&record) = default;
-        /** don't allow the copy assignment,  the default would fail anyway since federates are not copyable either*/
-        Recorder &operator= (const Recorder &record) = delete;
         /** destructor*/
         ~Recorder();
-
-        /** load a file containing subscription information
-        @param filename the name of the file to load (.txt, .json, or .xml
-        @return 0 on success <0 on failure
-        */
-        int loadFile(const std::string &filename);
-
-        /*run the Player*/
-        void run();
         /** run the Player until the specified time*/
-        void run(Time stopTime);
+        virtual void runTo(Time stopTime) override;
         /** add a subscription to capture*/
         void addSubscription(const std::string &key);
         /** add an endpoint*/
@@ -127,14 +107,7 @@ namespace apps
         */
         std::unique_ptr<Message> getMessage(int index) const;
 
-        /** finalize the federate*/
-        void finalize();
 
-        /** check if the Recorder is ready to run*/
-        bool isActive() const
-        {
-            return !deactivated;
-        }
     private:
         /** load arguments through a variable map created through command line arguments
         */
@@ -142,22 +115,22 @@ namespace apps
         /** load from a jsonString
         @param either a JSON filename or a string containing JSON
         */
-        int loadJsonFile(const std::string &jsonString);
+        virtual void loadJsonFile(const std::string &jsonString) override;
         /** load a text file*/
-        int loadTextFile(const std::string &textFile);
+        virtual void loadTextFile(const std::string &textFile) override;
         /** helper function to write the date to a JSON file*/
         void writeJsonFile(const std::string &filename);
         /** helper function to write the date to a text file*/
         void writeTextFile(const std::string &filename);
 
-        void initialize();
+        virtual void initialize() override;
         void generateInterfaces();
-        void captureForCurrentTime(Time currentTime);
+        void captureForCurrentTime(Time currentTime, int iteration=0);
         void loadCaptureInterfaces();
         /** encode the string in base64 if needed otherwise just return the string*/
         std::string encode(const std::string &str2encode);
     protected:
-        std::shared_ptr<CombinationFederate> fed; //!< the federate
+        bool allow_iteration = false; //!< trigger to allow Iteration
         std::unique_ptr<CloningFilter> cFilt; //!< a pointer to a clone filter
         std::vector<ValueCapture> points;   //!< lists of points that were captured
         std::vector<Subscription> subscriptions;    //!< the actual subscription objects
@@ -172,8 +145,6 @@ namespace apps
         std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
         std::string mapfile;    //!< file name for the on-line file updater
         std::string outFileName;    //!< the final output file
-        Time autoStopTime = Time::maxVal(); //!< the stop time
-        bool deactivated = false;
     };
 
 }  // namespace apps

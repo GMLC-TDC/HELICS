@@ -57,14 +57,19 @@ ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m
   -P ${CMAKE_CURRENT_SOURCE_DIR}/generateMEXcreationScript.cmake
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
 )
-
+IF (WIN32)
 ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}
-  COMMAND ${Matlab_MAIN_PROGRAM} -nojvm -nodesktop -r "\"run('${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m');quit;\""
-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m helicsSharedLib
+  COMMAND ${Matlab_MAIN_PROGRAM} -nojvm -nosplash -minimize -r "\"run('${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m');quit;\""
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m helicsSharedLib ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
 )
-
+ELSE()
+ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}
+  COMMAND ${Matlab_MAIN_PROGRAM} -nojvm -nodisplay -nosplash -r "\"run('${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m');quit;\""
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m helicsSharedLib ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
+)
+ENDIF()
 ADD_CUSTOM_TARGET(helicsMEX ALL
-   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}
+   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION} helicsSharedLib
 )
 
 set_target_properties (helicsMEX PROPERTIES FOLDER interfaces)

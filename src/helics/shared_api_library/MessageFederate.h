@@ -114,19 +114,19 @@ HELICS_Export message_t helicsFederateGetMessage (helics_federate fed);
 
 /** get the type specified for an endpoint
 @param endpoint  the endpoint object in question
-@param[out] str the location where the string is stored
+@param[out] outputString the location where the string is stored
 @param[in] maxlen the maximum string length that can be stored in str
 @return a status variable
 */
-HELICS_Export helics_status helicsEndpointGetType (helics_endpoint endpoint, char *str, int maxlen);
+HELICS_Export helics_status helicsEndpointGetType (helics_endpoint endpoint, char *outputString, int maxlen);
 
 /** get the name of an endpoint
 @param endpoint  the endpoint object in question
-@param[out] str the location where the string is stored
+@param[out] outputString the location where the string is stored
 @param[in] maxlen the maximum string length that can be stored in str
 @return a status variable
 */
-HELICS_Export helics_status helicsEndpointGetName (helics_endpoint endpoint, char *str, int maxlen);
+HELICS_Export helics_status helicsEndpointGetName (helics_endpoint endpoint, char *outputString, int maxlen);
 
 /** get the number of endpoints in a federate
 @return (-1) if fed was not a valid federate otherwise returns the number of subscriptions*/

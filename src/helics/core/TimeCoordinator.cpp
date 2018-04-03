@@ -11,11 +11,33 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-TimeCoordinator::TimeCoordinator (const CoreFederateInfo &info_) : info (info_)
+static auto nullMessageFunction = [](const ActionMessage &) {};
+TimeCoordinator::TimeCoordinator() :sendMessageFunction(nullMessageFunction)
+{
+}
+TimeCoordinator::TimeCoordinator(const CoreFederateInfo &info_) : TimeCoordinator(info_, nullMessageFunction)
+{
+}
+
+TimeCoordinator::TimeCoordinator(const CoreFederateInfo &info_, std::function<void(const ActionMessage &)> sendMessageFunction_):info(info_),sendMessageFunction(std::move(sendMessageFunction_))
 {
     if (info.timeDelta <= timeZero)
     {
         info.timeDelta = timeEpsilon;
+    }
+    if (!sendMessageFunction)
+    {
+        sendMessageFunction = nullMessageFunction;
+    }
+}
+
+
+void TimeCoordinator::setMessageSender(std::function<void(const ActionMessage &)> sendMessageFunction_)
+{
+    sendMessageFunction = std::move(sendMessageFunction_);
+    if (!sendMessageFunction)
+    {
+        sendMessageFunction = nullMessageFunction;
     }
 }
 
@@ -50,11 +72,21 @@ void TimeCoordinator::timeRequest (Time nextTime,
                                    Time newMessageTime)
 {
     iterating = (iterate != iteration_request::no_iterations);
-
-    if (nextTime <= getNextPossibleTime ())
+    if (iterating)
     {
-        nextTime = getNextPossibleTime ();
+        if (nextTime < time_granted)
+        {
+            nextTime = time_granted;
+        }
     }
+    else
+    {
+        if (nextTime < getNextPossibleTime())
+        {
+            nextTime = getNextPossibleTime();
+        }
+    }
+    
     time_requested = nextTime;
     time_value = newValueTime;
     time_message = newMessageTime;
@@ -309,6 +341,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
     bool update = updateTimeFactors ();
     if ((!iterating) || (time_exec > time_granted))
     {
+        iteration = 0;
         if (time_allow > time_exec)
         {
             updateTimeGrant ();
@@ -332,7 +365,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
     {
         if (time_allow > time_exec)
         {
-            dependencies.resetIteratingTimeRequests (time_exec);
+            ++iteration;
             updateTimeGrant ();
             return iteration_state::iterating;
         }
@@ -340,7 +373,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         {
             if (dependencies.checkIfReadyForTimeGrant (true, time_exec))
             {
-                dependencies.resetIteratingTimeRequests (time_exec);
+                ++iteration;
                 updateTimeGrant ();
                 return iteration_state::iterating;
             }
@@ -366,6 +399,7 @@ void TimeCoordinator::sendTimeRequest () const
     if (iterating)
     {
         setActionFlag (upd, iteration_requested_flag);
+        upd.counter = iteration;
     }
     transmitTimingMessage (upd);
     //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
@@ -380,6 +414,11 @@ void TimeCoordinator::updateTimeGrant ()
     ActionMessage treq (CMD_TIME_GRANT);
     treq.source_id = source_id;
     treq.actionTime = time_granted;
+    treq.counter = iteration;
+    if (iterating)
+    {
+        dependencies.resetIteratingTimeRequests(time_exec);
+    }
     transmitTimingMessage (treq);
     // printf("%d GRANT allow=%f next=%f, exec=%f, Tdemin=%f\n", source_id,
     // static_cast<double>(time_allow), static_cast<double>(time_next), static_cast<double>(time_exec),
@@ -443,6 +482,7 @@ DependencyInfo *TimeCoordinator::getDependencyInfo (Core::federate_id_t ofed)
 std::vector<Core::federate_id_t> TimeCoordinator::getDependencies () const
 {
     std::vector<Core::federate_id_t> deps;
+    deps.reserve(dependencies.size());
     for (auto &dep : dependencies)
     {
         deps.push_back (dep.fedID);
@@ -452,14 +492,11 @@ std::vector<Core::federate_id_t> TimeCoordinator::getDependencies () const
 
 void TimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
 {
-    if (sendMessageFunction)
-    {
         for (auto dep : dependents)
         {
             msg.dest_id = dep;
             sendMessageFunction (msg);
         }
-    }
 }
 
 iteration_state TimeCoordinator::checkExecEntry ()
@@ -473,7 +510,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
     {
         if (hasInitUpdates)
         {
-            if (iteration > info.maxIterations)
+            if (iteration >= info.maxIterations)
             {
                 ret = iteration_state::next_step;
             }
@@ -497,24 +534,71 @@ iteration_state TimeCoordinator::checkExecEntry ()
         time_granted = timeZero;
         time_grantBase = time_granted;
         executionMode = true;
-
+        iteration = 0;
+       
         ActionMessage execgrant (CMD_EXEC_GRANT);
         execgrant.source_id = source_id;
         transmitTimingMessage (execgrant);
+        
     }
     else if (ret == iteration_state::iterating)
     {
         dependencies.resetIteratingExecRequests ();
         hasInitUpdates = false;
+        ++iteration;
         ActionMessage execgrant (CMD_EXEC_GRANT);
         execgrant.source_id = source_id;
+        execgrant.counter = iteration;
         setActionFlag (execgrant, iteration_requested_flag);
         transmitTimingMessage (execgrant);
     }
     return ret;
 }
 
-bool TimeCoordinator::processTimeMessage (const ActionMessage &cmd) { return dependencies.updateTime (cmd); }
+static bool isDelayableMessage(const ActionMessage &cmd, Core::federate_id_t localId)
+{
+    return (((cmd.action() == CMD_TIME_GRANT) || (cmd.action() == CMD_EXEC_GRANT)) && (cmd.source_id != localId));
+}
+
+message_process_result TimeCoordinator::processTimeMessage (const ActionMessage &cmd) 
+{ 
+    if (isDelayableMessage(cmd,source_id))
+    {
+        auto dep = dependencies.getDependencyInfo(cmd.source_id);
+        if (dep == nullptr)
+        {
+            return message_process_result::no_effect;
+        }
+            switch (dep->time_state)
+            {
+            case DependencyInfo::time_state_t::time_requested:
+                if (dep->Tnext > time_exec)
+                {
+                    return message_process_result::delay_processing;
+                }
+                break;
+            case DependencyInfo::time_state_t::time_requested_iterative:
+                if (dep->Tnext > time_exec)
+                {
+                    return message_process_result::delay_processing;
+                }
+                if ((iterating) && (time_exec == dep->Tnext))
+                {
+                    return message_process_result::delay_processing;
+                }
+                break;
+            case DependencyInfo::time_state_t::exec_requested_iterative:
+                if ((iterating) && (checkingExec))
+                {
+                    return message_process_result::delay_processing;
+                }
+                break;
+            default:
+                break;
+            }
+    }
+    return (dependencies.updateTime(cmd)) ? message_process_result::processed : message_process_result::no_effect;
+}
 
 void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
 {

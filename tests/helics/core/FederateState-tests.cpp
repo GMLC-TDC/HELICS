@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     // BOOST_CHECK_EQUAL(fs->time_minDe, helics::Time::zeroVal());
     // BOOST_CHECK_EQUAL(fs->time_minTe, helics::Time::zeroVal());
     // BOOST_CHECK_EQUAL(fs->time_event, helics::Time::zeroVal());
-    BOOST_CHECK_EQUAL (fs->getInfo ().maxIterations, 3);
+    BOOST_CHECK_EQUAL (fs->getInfo ().maxIterations, 50);
 }
 
 BOOST_AUTO_TEST_CASE (create_subscription_test)

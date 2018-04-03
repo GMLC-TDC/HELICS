@@ -1,7 +1,7 @@
 %include "cstring.i"
 
 %cstring_output_maxsize(char *outputString, int maxlen);
-%cstring_output_maxsize(char *str, int maxlen);
+
 %cstring_bounded_output(char* str, 1024);
 
 
@@ -15,11 +15,11 @@
     for (i = 0; i < $1; i++) {
       PyObject *o = PyList_GetItem($input,i);
       if (PyString_Check(o))
-    $2[i] = PyString_AsString(PyList_GetItem($input,i));
+	$2[i] = PyString_AsString(PyList_GetItem($input,i));
       else {
-    PyErr_SetString(PyExc_TypeError,"list must contain strings");
-    free($2);
-    return NULL;
+	PyErr_SetString(PyExc_TypeError,"list must contain strings");
+	free($2);
+	return NULL;
       }
     }
     $2[i] = 0;
@@ -50,7 +50,7 @@
     if (PyNumber_Check(o)) {
       $1[i] = PyFloat_AsDouble(o);
     } else {
-      PyErr_SetString(PyExc_ValueError,"Sequence elements must be numbers");
+      PyErr_SetString(PyExc_ValueError,"Sequence elements must be numbers");      
       free($1);
       return NULL;
     }

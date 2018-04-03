@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(simple_tracer_test)
     trace1.setValueCallback(cb);
     helics::ValueFederate vfed(fi);
     helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
-    auto fut = std::async(std::launch::async, [&trace1]() { trace1.run(4); });
+    auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(4); });
     vfed.enterExecutionState();
     auto retTime = vfed.requestTime(1);
     BOOST_CHECK_EQUAL(retTime, 1.0);
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(tracer_test_message)
 
     trace1.addEndpoint("src1");
     trace1.setEndpointMessageCallback(cb);
-    auto fut = std::async(std::launch::async, [&trace1]() { trace1.run(5.0); });
+    auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5.0); });
     mfed.enterExecutionState();
 
     auto retTime = mfed.requestTime(1.0);
@@ -164,7 +164,7 @@ BOOST_DATA_TEST_CASE(simple_tracer_test_files, boost::unit_test::data::make(simp
     helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
     helics::Publication pub2(helics::GLOBAL, &vfed, "pub2", helics::helics_type_t::helicsDouble);
 
-    auto fut = std::async(std::launch::async, [&trace1]() { trace1.run(4); });
+    auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(4); });
     vfed.enterExecutionState();
     auto retTime = vfed.requestTime(1);
     BOOST_CHECK_EQUAL(retTime, 1.0);
@@ -226,7 +226,7 @@ BOOST_DATA_TEST_CASE(simple_tracer_test_message_files,
     helics::Publication pub2(helics::GLOBAL, &cfed, "pub2", helics::helics_type_t::helicsDouble);
     helics::Endpoint e1(helics::GLOBAL, &cfed, "d1");
 
-    auto fut = std::async(std::launch::async, [&trace1]() { trace1.run(5); });
+    auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5); });
     cfed.enterExecutionState();
     auto retTime = cfed.requestTime(1);
     BOOST_CHECK_EQUAL(retTime, 1.0);
@@ -283,7 +283,7 @@ BOOST_DATA_TEST_CASE(simple_tracer_test_message_files_cmd,
     helics::Publication pub2(helics::GLOBAL, &cfed, "pub2", helics::helics_type_t::helicsDouble);
     helics::Endpoint e1(helics::GLOBAL, &cfed, "d1");
 
-    auto fut = std::async(std::launch::async, [&trace1]() { trace1.run(5); });
+    auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5); });
     cfed.enterExecutionState();
     auto retTime = cfed.requestTime(1);
     BOOST_CHECK_EQUAL(retTime, 1.0);
@@ -340,7 +340,7 @@ BOOST_AUTO_TEST_CASE(tracer_test_destendpoint_clone)
     trace1.addDestEndpointClone("d1");
     trace1.addDestEndpointClone("d2");
 
-    auto fut = std::async(std::launch::async, [&trace1]() { trace1.run(5.0); });
+    auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5.0); });
     mfed2.enterExecutionStateAsync();
     mfed.enterExecutionState();
     mfed2.enterExecutionStateComplete();
@@ -429,7 +429,7 @@ BOOST_AUTO_TEST_CASE(tracer_test_srcendpoint_clone)
     trace1.addSourceEndpointClone("d1");
     trace1.addSourceEndpointClone("d2");
 
-    auto fut = std::async(std::launch::async, [&trace1]() { trace1.run(5.0); });
+    auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5.0); });
     mfed2.enterExecutionStateAsync();
     mfed.enterExecutionState();
     mfed2.enterExecutionStateComplete();
@@ -511,7 +511,7 @@ BOOST_AUTO_TEST_CASE(tracer_test_endpoint_clone)
     trace1.addDestEndpointClone("d1");
     trace1.addSourceEndpointClone("d1");
 
-    auto fut = std::async(std::launch::async, [&trace1]() { trace1.run(5.0); });
+    auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5.0); });
     mfed2.enterExecutionStateAsync();
     mfed.enterExecutionState();
     mfed2.enterExecutionStateComplete();
@@ -592,7 +592,7 @@ BOOST_DATA_TEST_CASE(simple_clone_test_file, boost::unit_test::data::make(simple
         lastTime = static_cast<double>(tm);
     };
     trace1.setClonedMessageCallback(cb);
-    auto fut = std::async(std::launch::async, [&trace1]() { trace1.run(5.0); });
+    auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5.0); });
     mfed2.enterExecutionStateAsync();
     mfed.enterExecutionState();
     mfed2.enterExecutionStateComplete();

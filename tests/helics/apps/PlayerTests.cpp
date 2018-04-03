@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
 
     helics::ValueFederate vfed (fi);
     helics::Subscription sub1 (&vfed, "pub1");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1]() { play1.run(); });
     vfed.enterExecutionState ();
     auto retTime = vfed.requestTime (5);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -53,6 +53,48 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
     BOOST_CHECK_EQUAL (retTime, 5.0);
     vfed.finalize ();
     fut.get ();
+}
+
+BOOST_AUTO_TEST_CASE(simple_player_test_iterative)
+{
+    helics::FederateInfo fi("player1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core1";
+    fi.coreInitString = "2";
+    helics::apps::Player play1(fi);
+    fi.name = "block1";
+    play1.addPublication("pub1", helics::helics_type_t::helicsDouble);
+    play1.addPoint(1.0, 0,"pub1", 0.5);
+    play1.addPoint(1.0,1, "pub1", 0.7);
+    play1.addPoint(1.0,2, "pub1", 0.8);
+
+    helics::ValueFederate vfed(fi);
+    helics::Subscription sub1(&vfed, "pub1");
+    auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
+    vfed.enterExecutionState();
+    auto retTime = vfed.requestTimeIterative(5,helics::iteration_request::iterate_if_needed);
+    BOOST_CHECK_EQUAL(retTime.grantedTime, 1.0);
+    BOOST_CHECK(retTime.state == helics::iteration_result::next_step);
+    auto val = sub1.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 0.5);
+
+    retTime = vfed.requestTimeIterative(5, helics::iteration_request::iterate_if_needed);
+    BOOST_CHECK_EQUAL(retTime.grantedTime, 1.0);
+    BOOST_CHECK(retTime.state == helics::iteration_result::iterating);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 0.7);
+
+    retTime = vfed.requestTimeIterative(5, helics::iteration_request::iterate_if_needed);
+    BOOST_CHECK_EQUAL(retTime.grantedTime, 1.0);
+    BOOST_CHECK(retTime.state == helics::iteration_result::iterating);
+    val = sub1.getValue<double>();
+    BOOST_CHECK_EQUAL(val, 0.8);
+
+    retTime = vfed.requestTimeIterative(5, helics::iteration_request::iterate_if_needed);
+    BOOST_CHECK_EQUAL(retTime.grantedTime, 5.0);
+    BOOST_CHECK(retTime.state == helics::iteration_result::next_step);
+    vfed.finalize();
+    fut.get();
 }
 
 BOOST_AUTO_TEST_CASE (simple_player_test2)
@@ -76,7 +118,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test2)
     helics::ValueFederate vfed (fi);
     helics::Subscription sub1 (&vfed, "pub1");
     helics::Subscription sub2 (&vfed, "pub2");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1]() { play1.run(); });
     vfed.enterExecutionState ();
 
     auto retTime = vfed.requestTime (5);
@@ -124,7 +166,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (si
     helics::ValueFederate vfed (fi);
     helics::Subscription sub1 (&vfed, "pub1");
     helics::Subscription sub2 (&vfed, "pub2");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1]() { play1.run(); });
     vfed.enterExecutionState ();
     auto val = sub1.getValue<double> ();
     BOOST_CHECK_EQUAL (val, 0.3);
@@ -173,7 +215,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
     helics::ValueFederate vfed (fi);
     helics::Subscription sub1 (&vfed, "pub1");
     helics::Subscription sub2 (&vfed, "pub2");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1]() { play1.run(); });
     vfed.enterExecutionState ();
     auto val = sub1.getValue<double> ();
     BOOST_CHECK_EQUAL (val, 0.3);
@@ -272,7 +314,7 @@ BOOST_AUTO_TEST_CASE (simple_player_testjson)
     helics::ValueFederate vfed (fi);
     helics::Subscription sub1 (&vfed, "pub1");
     helics::Subscription sub2 (&vfed, "pub2");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1]() { play1.run(); });
     vfed.enterExecutionState ();
 
     auto retTime = vfed.requestTime (5);
@@ -349,7 +391,7 @@ BOOST_AUTO_TEST_CASE (player_test_message2)
     play1.addMessage (2.0, "src", "dest", "this is test message2");
 
     play1.addMessage (3.0, "src", "dest", "this is message 3");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1]() { play1.run(); });
     mfed.enterExecutionState ();
 
     auto retTime = mfed.requestTime (5);
@@ -405,7 +447,7 @@ BOOST_AUTO_TEST_CASE (player_test_message3)
 
     play1.addMessage (2.0, 3.0, "src", "dest", "this is message 3");
     // mfed.getCorePointer()->setLoggingLevel(helics::invalid_fed_id, 5);
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1]() { play1.run(); });
     mfed.enterExecutionState ();
 
     auto retTime = mfed.requestTime (5);
@@ -461,7 +503,7 @@ BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::
     helics::MessageFederate mfed (fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "dest");
     play1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1]() { play1.run(); });
     mfed.enterExecutionState ();
 
     auto retTime = mfed.requestTime (5);

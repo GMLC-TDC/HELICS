@@ -27,6 +27,12 @@ MessageFederate::MessageFederate (const std::string &jsonString) : Federate (loa
     registerInterfaces (jsonString);
 }
 
+MessageFederate::MessageFederate(const std::string &name, const std::string &jsonString) : Federate(loadFederateInfo(name,jsonString))
+{
+    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), getID());
+    registerInterfaces(jsonString);
+}
+
 MessageFederate::MessageFederate ()
 {
     // default constructor
@@ -99,7 +105,7 @@ void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
     {
         for (const auto &ept : doc["endpoints"])
         {
-            auto name = ept["name"].asString ();
+            auto name = getKey(ept);
             auto type = (ept.isMember ("type")) ? ept["type"].asString () : "";
             bool global = (ept.isMember ("global")) ? (ept["global"].asBool ()) : false;
             endpoint_id_t epid;

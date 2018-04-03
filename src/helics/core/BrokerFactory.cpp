@@ -134,7 +134,7 @@ namespace BrokerFactory
 {
 std::shared_ptr<Broker> create (core_type type, const std::string &initializationString)
 {
-    auto broker = makeBroker (type, "");
+    auto broker = makeBroker (type, std::string());
     broker->initialize (initializationString);
     registerBroker (broker);
     broker->connect ();

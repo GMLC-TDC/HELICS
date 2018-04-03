@@ -260,13 +260,13 @@ message_t helicsFederateGetMessage (helics_federate fed)
     return mess;
 }
 
-helics_status helicsEndpointGetType (helics_endpoint endpoint, char *str, int maxlen)
+helics_status helicsEndpointGetType (helics_endpoint endpoint, char *outputString, int maxlen)
 {
     if (endpoint == nullptr)
     {
         return helics_invalid_object;
     }
-    if ((str == nullptr) || (maxlen <= 0))
+    if ((outputString == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
     }
@@ -274,23 +274,23 @@ helics_status helicsEndpointGetType (helics_endpoint endpoint, char *str, int ma
     auto type = endObj->endptr->getType ();
     if (static_cast<int> (type.size ()) > maxlen)
     {
-        strncpy (str, type.c_str (), maxlen);
-        str[maxlen - 1] = 0;
+        strncpy (outputString, type.c_str (), maxlen);
+        outputString[maxlen - 1] = 0;
     }
     else
     {
-        strcpy (str, type.c_str ());
+        strcpy (outputString, type.c_str ());
     }
     return helics_ok;
 }
 
-helics_status helicsEndpointGetName (helics_endpoint endpoint, char *str, int maxlen)
+helics_status helicsEndpointGetName (helics_endpoint endpoint, char *outputString, int maxlen)
 {
     if (endpoint == nullptr)
     {
         return helics_invalid_object;
     }
-    if ((str == nullptr) || (maxlen <= 0))
+    if ((outputString == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
     }
@@ -298,12 +298,12 @@ helics_status helicsEndpointGetName (helics_endpoint endpoint, char *str, int ma
     auto type = endObj->endptr->getName ();
     if (static_cast<int> (type.size ()) > maxlen)
     {
-        strncpy (str, type.c_str (), maxlen);
-        str[maxlen - 1] = 0;
+        strncpy (outputString, type.c_str (), maxlen);
+        outputString[maxlen - 1] = 0;
     }
     else
     {
-        strcpy (str, type.c_str ());
+        strcpy (outputString, type.c_str ());
     }
     return helics_ok;
 }

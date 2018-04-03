@@ -294,6 +294,11 @@ constexpr helics_type_t helicsType<std::string> ()
 }
 
 template <>
+constexpr helics_type_t helicsType<named_point>()
+{
+    return helics_type_t::helicsNamedPoint;
+}
+template <>
 constexpr helics_type_t helicsType<double> ()
 {
     return helics_type_t::helicsDouble;
@@ -324,13 +329,6 @@ constexpr bool isConvertableType ()
     return false;
 }
 
-template <class X>
-constexpr typename std::enable_if<helicsType<X> () != helics_type_t::helicsInvalid, bool>::type
-isConvertableType ()
-{
-    return false;
-}
-
 template <>
 constexpr bool isConvertableType<float> ()
 {
@@ -351,6 +349,12 @@ constexpr bool isConvertableType<int> ()
 
 template <>
 constexpr bool isConvertableType<short> ()
+{
+    return true;
+}
+
+template <>
+constexpr bool isConvertableType<unsigned short>()
 {
     return true;
 }
