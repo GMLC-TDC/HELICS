@@ -2,6 +2,9 @@
 
 %cstring_output_maxsize(char *outputString, int maxlen);
 
+%cstring_bounded_output(char* str, 1024);
+
+
 //typemap for the input arguments
 %typemap(in) (int argc, const char *const *argv) {
   /* Check if is a list */
