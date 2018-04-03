@@ -226,7 +226,7 @@ def test_value_federate_runFederateTestInteger(vFed):
     status, value = h.helicsSubscriptionGetInteger(subid)
     assert value == defaultValue
 
-    status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
+    status, grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
     assert grantedtime == 0.01
 
     status, value = h.helicsSubscriptionGetInteger(subid)
