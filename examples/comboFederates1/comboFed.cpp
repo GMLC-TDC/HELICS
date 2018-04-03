@@ -3,7 +3,7 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "helics/application_api/MessageFederate.hpp"
+#include "helics/application_api/CombinationFederate.hpp"
 #include <iostream>
 #include <thread>
 #include "helics/core/BrokerFactory.hpp"
@@ -12,7 +12,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 static const helics::ArgDescriptors InfoArgs{
     {"startbroker","start a broker with the specified arguments"},
     {"target,t", "name of the target federate"},
-    { "messagetarget", "name of the target federate, same as target" },
+    {"valuetarget","name of the value federate to target"},
+    {"messgetarget","name of the message federate to target"},
     {"endpoint,e", "name of the target endpoint"},
     {"source,s", "name of the source endpoint"}
     //name is captured in the argument processor for federateInfo
@@ -29,20 +30,26 @@ int main (int argc, char *argv[])
         return 0;
     }
 
-	std::string targetfederate = "fed";
+	std::string vtarget = "fed";
+    std::string mtarget = "fed";
 	if (vm.count("target") > 0)
 	{
-		targetfederate = vm["target"].as<std::string>();
+		mtarget= vm["target"].as<std::string>();
+        vtarget = mtarget;
 	}
+    if (vm.count("valuetarget") > 0)
+    {
+        vtarget = vm["valuetarget"].as<std::string>();
+    }
     if (vm.count("messagetarget") > 0)
     {
-        targetfederate = vm["messagetarget"].as<std::string>();
+        mtarget = vm["messagetarget"].as<std::string>();
     }
     std::string targetEndpoint = "endpoint";
     if (vm.count("endpoint") > 0) {
         targetEndpoint = vm["endpoint"].as<std::string>();
     }
-    std::string target = targetfederate + "/" + targetEndpoint;
+    std::string etarget = mtarget + "/" + targetEndpoint;
     std::string myendpoint = "endpoint";
     if (vm.count("source") > 0)
     {
@@ -56,32 +63,42 @@ int main (int argc, char *argv[])
         brk = helics::BrokerFactory::create(fi.coreType, vm["startbroker"].as<std::string>());
     }
 
-    auto mFed = std::make_unique<helics::MessageFederate> (fi);
-    auto name = mFed->getName();
+    auto cFed = std::make_unique<helics::CombinationFederate> (fi);
+    auto name = cFed->getName();
 	std::cout << " registering endpoint '" << myendpoint << "' for " << name<<'\n';
 
     //this line actually creates an endpoint
-    auto id = mFed->registerEndpoint(myendpoint);
+    auto id = cFed->registerEndpoint(myendpoint);
 
+    auto pubid = cFed->registerPublication("pub", "double");
+
+    auto subid = cFed->registerOptionalSubscription(vtarget + "/pub", "double");
     std::cout << "entering init State\n";
-    mFed->enterInitializationState ();
+    cFed->enterInitializationState ();
     std::cout << "entered init State\n";
-    mFed->enterExecutionState ();
+    cFed->enterExecutionState ();
     std::cout << "entered exec State\n";
     for (int i=1; i<10; ++i) {
-		std::string message = "message sent from "+name+" to "+target+" at time " + std::to_string(i);
-		mFed->sendMessage(id, target, message.data(), message.size());
+		std::string message = "message sent from "+name+" to "+etarget+" at time " + std::to_string(i);
+		cFed->sendMessage(id, etarget, message.data(), message.size());
+        cFed->publish(pubid, i);
         std::cout << message << std::endl;
-        auto newTime = mFed->requestTime (i);
+        auto newTime = cFed->requestTime (i);
 		std::cout << "processed time " << static_cast<double> (newTime) << "\n";
-		while (mFed->hasMessage(id))
+		while (cFed->hasMessage(id))
 		{
-			auto nmessage = mFed->getMessage(id);
+			auto nmessage = cFed->getMessage(id);
 			std::cout << "received message from " << nmessage->source << " at " << static_cast<double>(nmessage->time) << " ::" << nmessage->data.to_string() << '\n';
 		}
+        
+        if (cFed->isUpdated(subid))
+        {
+            auto val = cFed->getValue<double>(subid);
+            std::cout << "received updated value of "<<val<<" at " << newTime << " from " << cFed->getSubscriptionKey(subid) << '\n';
+        }
 
     }
-    mFed->finalize ();
+    cFed->finalize ();
     if (brk)
     {
         while (brk->isConnected())

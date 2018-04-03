@@ -144,74 +144,8 @@ class Subscription : public SubscriptionBase
     /** check if the value has been updated*/
     virtual bool isUpdated () const override;
 
-    /** get the latest value for the subscription
-    @param[out] out the location to store the value
-    */
-    template <class X>
-    typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsInvalid> getValue (X &out)
-    {
-        if (fed->isUpdated (id))
-        {
-            auto dv = fed->getValueRaw (id);
-            if (type == helics_type_t::helicsInvalid)
-            {
-                type = getTypeFromString (fed->getPublicationType (id));
-            }
-            if (type != helics_type_t::helicsInvalid)
-            {
-                valueExtract (dv, type, out);
-                if (changeDetectionEnabled)
-                {
-                    if (changeDetected (lastValue, out, delta))
-                    {
-                        lastValue = out;
-                    }
-                    else
-                    {
-                        valueExtract (lastValue, out);
-                    }
-                }
-                else
-                {
-                    lastValue = out;
-                }
-            }
-            else
-            {
-                out = invalidValue<X> ();
-            }
-        }
-        else
-        {
-            valueExtract (lastValue, out);
-        }
-    }
-    /** get the most recent value
-    @return the value*/
-    template <class X>
-    typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsInvalid, X> getValue ()
-    {
-        X val;
-        getValue (val);
-        return val;
-    }
-    /** get the most recent value
-    @return the value*/
-    template <class X>
-    typename std::enable_if_t<isConvertableType<X> (), X> getValueAs ()
-    {
-        std::conditional<std::is_integral<X>::value, int64_t, double> gval;
-        getValue (gval);
-        return static_cast<X> (gval);
-    }
-    /** get the most recent value with the result as a convertible type*/
-    template <class X>
-    typename std::enable_if_t<isConvertableType<X> ()> getValueAs (X &out)
-    {
-        std::conditional<std::is_integral<X>::value, int64_t, double> gval;
-        getValue (gval);
-        out = static_cast<X> (gval);
-    }
+    
+   
 
     using SubscriptionBase::registerCallback;
     /** register a callback for the update
@@ -232,7 +166,7 @@ class Subscription : public SubscriptionBase
     /** set the default value to use before any update has been published
      */
     template <class X>
-    typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsInvalid, void> setDefault (const X &val)
+    void setDefault (const X &val)
     {
         lastValue = val;
     }
@@ -260,7 +194,84 @@ class Subscription : public SubscriptionBase
     void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
 
   private:
+      /** deal with the callback from the application API*/
     void handleCallback (Time time);
+    template <class X>
+    void getValue_impl(std::true_type /*V*/, X &out)
+    {
+        if (fed->isUpdated(id))
+        {
+            auto dv = fed->getValueRaw(id);
+            if (type == helics_type_t::helicsInvalid)
+            {
+                type = getTypeFromString(fed->getPublicationType(id));
+            }
+            if (type != helics_type_t::helicsInvalid)
+            {
+                valueExtract(dv, type, out);
+                if (changeDetectionEnabled)
+                {
+                    if (changeDetected(lastValue, out, delta))
+                    {
+                        lastValue = out;
+                    }
+                    else
+                    {
+                        valueExtract(lastValue, out);
+                    }
+                }
+                else
+                {
+                    lastValue = out;
+                }
+            }
+            else
+            {
+                out = invalidValue<X>();
+            }
+        }
+        else
+        {
+            valueExtract(lastValue, out);
+        }
+    }
+    template <class X>
+    void getValue_impl(std::false_type /*V*/, X &out)
+    {
+        std::conditional<std::is_integral<X>::value, int64_t, double> gval;
+        getValue_impl(std::true_type(),gval);
+        out = static_cast<X> (gval);
+    }
+    template <class X>
+    X getValue_impl(std::true_type /*V*/)
+    {
+        X val;
+        getValue_impl(std::true_type(),val);
+        return val;
+    }
+    template <class X>
+    X getValue_impl(std::false_type /*V*/)
+    {
+        std::conditional<std::is_integral<X>::value, int64_t, double> gval;
+        getValue_impl(std::true_type(), gval);
+        return static_cast<X> (gval);
+    }
+    public:
+        /** get the latest value for the subscription
+        @param[out] out the location to store the value
+        */
+        template <class X>
+        typename std::enable_if_t<( (helicsType<X>() != helics_type_t::helicsInvalid)|| (isConvertableType<X>()) )> getValue(X &out)
+        {
+            getValue_impl<X>(std::conditional_t<(helicsType<X>() != helics_type_t::helicsInvalid), std::true_type, std::false_type>(), out);
+        }
+        /** get the most recent value
+        @return the value*/
+        template <class X>
+        typename std::enable_if_t<( (helicsType<X>() != helics_type_t::helicsInvalid)|| (isConvertableType<X>())), X> getValue()
+        {
+            return getValue_impl<X>(std::conditional_t<(helicsType<X>() != helics_type_t::helicsInvalid), std::true_type, std::false_type>());
+        }
 };
 
 /** class to handle a subscription

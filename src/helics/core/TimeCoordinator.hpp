@@ -13,6 +13,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
+/** enumeration of possible processing results*/
+enum class message_process_result
+{
+    no_effect = 0, //!< the message did not result in an update
+    processed,  //!< the message was used to update the current state
+    delay_processing, //!< the message should be delayed and reprocessed later
+};
+
 /** class managing the coordination of time in HELICS
 the time coordinator manages dependencies and computes whether time can advance or enter execution mode
 */
@@ -37,6 +45,7 @@ class TimeCoordinator
 	std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
 
   public:
+      
     Core::federate_id_t
       source_id;  //!< the identifier for inserting into the source id field of any generated messages;
     bool iterating = false;  //!< indicator that the coordinator should be iterating if need be
@@ -118,9 +127,9 @@ public:
     void transmitTimingMessage(ActionMessage &msg) const;
   public:
 	/** process a message related to time
-	@return true if it did anything
+	@return the result of processing the message
 	*/
-    bool processTimeMessage (const ActionMessage &cmd);
+    message_process_result processTimeMessage (const ActionMessage &cmd);
 
     /** process a message related to configuration
     @param cmd the update command

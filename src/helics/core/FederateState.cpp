@@ -657,6 +657,7 @@ const std::vector<Core::handle_id_t> &FederateState::getEvents () const
 
 iteration_state FederateState::processDelayQueue()
 {
+    delayedFederates.clear();
     auto ret_code = iteration_state::continue_processing;
     if (!delayQueue.empty())
     {
@@ -665,25 +666,48 @@ iteration_state FederateState::processDelayQueue()
         std::swap(delayQueue, tempQueue);
         while ((ret_code == iteration_state::continue_processing) && (!tempQueue.empty()))
         {
-            auto cmd = tempQueue.front();
-            tempQueue.pop_front();
+            auto &cmd = tempQueue.front();
+            
+            if (messageShouldBeDelayed(cmd))
+            {
+                delayQueue.push_back(std::move(cmd));
+                continue;
+            }
             ret_code = processActionMessage(cmd);
+            tempQueue.pop_front();
         }
         if (ret_code != iteration_state::continue_processing)
         {
-            if (!tempQueue.empty())
-            {
                 while (!tempQueue.empty())
                 {
-                    auto cmd = tempQueue.back();
-                    tempQueue.pop_back();
-                    delayQueue.push_front(cmd);
+                    auto &cmd = tempQueue.front();
+                    delayQueue.push_back(std::move(cmd));
+                    tempQueue.pop_front();
                 }
-            }
-            return ret_code;
         }
     }
     return ret_code;
+}
+
+void FederateState::addFederateToDelay(Core::federate_id_t id)
+{
+    if ((delayedFederates.empty())|| (id>delayedFederates.back()))
+    {
+        delayedFederates.push_back(id);
+    }
+    auto res = std::lower_bound(delayedFederates.begin(), delayedFederates.end(), id);
+    delayedFederates.insert(res,id);
+}
+
+bool FederateState::messageShouldBeDelayed(const ActionMessage &cmd) const
+{
+    if (delayedFederates.empty()) 
+    {
+        return false;
+    }
+    auto res = std::lower_bound(delayedFederates.begin(), delayedFederates.end(), cmd.source_id);
+    return ((res!=delayedFederates.end())&&(*res == cmd.source_id));
+    
 }
 
 iteration_state FederateState::processQueue ()
@@ -702,6 +726,11 @@ iteration_state FederateState::processQueue ()
     while (ret_code == iteration_state::continue_processing)
     {
         auto cmd = queue.pop ();
+        if (messageShouldBeDelayed(cmd))
+        {
+            delayQueue.push_back(cmd);
+            continue;
+        }
         //    messLog.push_back(cmd);
         ret_code = processActionMessage (cmd);
     }
@@ -736,12 +765,19 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             }
             timeCoord->enteringExecMode (iterate);
             timeGranted_mode = false;
-            break;
+            return processDelayQueue();
         }
         FALLTHROUGH
     case CMD_EXEC_GRANT:
-        if (!timeCoord->processTimeMessage (cmd))
+        switch(timeCoord->processTimeMessage (cmd))
         {
+        case message_process_result::delay_processing:
+            addFederateToDelay(cmd.source_id);
+            delayQueue.push_back(std::move(cmd));
+            return iteration_state::continue_processing;
+        case message_process_result::no_effect:
+            return iteration_state::continue_processing;
+        default:
             break;
         }
         FALLTHROUGH
@@ -795,8 +831,17 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         else
         {
-            if (timeCoord->processTimeMessage (cmd))
+            switch (timeCoord->processTimeMessage(cmd))
             {
+            case message_process_result::delay_processing:
+                addFederateToDelay(cmd.source_id);
+                delayQueue.push_back(std::move(cmd));
+                return iteration_state::continue_processing;
+            case message_process_result::no_effect:
+                return iteration_state::continue_processing;
+            default:
+                break;
+            }
                 if (state != HELICS_EXECUTING)
                 {
                     break;
@@ -812,7 +857,6 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
                         return ret;
                     }
                 }
-            }
         }
         break;
     case CMD_TIME_REQUEST:
@@ -826,12 +870,19 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             }
             timeCoord->timeRequest (cmd.actionTime, iterate, nextValueTime (), nextMessageTime ());
             timeGranted_mode = false;
-            break;
+            return processDelayQueue();
         }
         FALLTHROUGH
     case CMD_TIME_GRANT:
-        if (!timeCoord->processTimeMessage (cmd))
+        switch(timeCoord->processTimeMessage (cmd))
         {
+        case message_process_result::delay_processing:
+            addFederateToDelay(cmd.source_id);
+            delayQueue.push_back(std::move(cmd));
+            return iteration_state::continue_processing;
+        case message_process_result::no_effect:
+            return iteration_state::continue_processing;
+        default:
             break;
         }
         FALLTHROUGH

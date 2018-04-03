@@ -225,7 +225,7 @@ HELICS_Export helics_status helicsSubscriptionGetValue (helics_subscription sub,
 @param maxlen the maximum size of information that str can hold
 @return a helics_status value, helics_ok if everything went fine
 */
-HELICS_Export helics_status helicsSubscriptionGetString (helics_subscription sub, char *str, int maxlen);
+HELICS_Export helics_status helicsSubscriptionGetString (helics_subscription sub, char *outputString, int maxlen);
 
 /** get an integer value from a subscription
 @param sub the subscription to get the data for
@@ -324,46 +324,46 @@ HELICS_Export helics_status helicsSubscriptionSetDefaultVector (helics_subscript
 
 /** get the type of a subscription
 @param sub the subscription to query
-@param[out] str a pointer to a memory location to store the resulting string
+@param[out] outputString a pointer to a memory location to store the resulting string
 @param maxlen the maximum size of string that str can store
 @return a helics_status enumeration, helics_ok if everything worked*/
-HELICS_Export helics_status helicsSubscriptionGetType (helics_subscription sub, char *str, int maxlen);
+HELICS_Export helics_status helicsSubscriptionGetType (helics_subscription sub, char *outputString, int maxlen);
 
 /** get the type of a publication
 @param pub the publication to query
-@param[out] str a pointer to a memory location to store the resulting string
+@param[out] outputString a pointer to a memory location to store the resulting string
 @param maxlen the maximum size of string that str can store
 @return a helics_status enumeration, helics_ok if everything worked*/
-HELICS_Export helics_status helicsPublicationGetType (helics_publication pub, char *str, int maxlen);
+HELICS_Export helics_status helicsPublicationGetType (helics_publication pub, char *outputString, int maxlen);
 
 /** get the key of a subscription
 @param sub the subscription to query
-@param[out] str a pointer to a memory location to store the resulting string
+@param[out] outputString a pointer to a memory location to store the resulting string
 @param maxlen the maximum size of string that str can store
 @return a helics_status enumeration, helics_ok if everything worked*/
-HELICS_Export helics_status helicsSubscriptionGetKey (helics_subscription sub, char *str, int maxlen);
+HELICS_Export helics_status helicsSubscriptionGetKey (helics_subscription sub, char *outputString, int maxlen);
 
 /** get the key of a publication
 @details this will be the global key used to identify the publication to the federation
 @param pub the publication to query
-@param[out] str a pointer to a memory location to store the resulting string
+@param[out] outputString a pointer to a memory location to store the resulting string
 @param maxlen the maximum size of string that str can store
 @return a helics_status enumeration, helics_ok if everything worked*/
-HELICS_Export helics_status helicsPublicationGetKey (helics_publication pub, char *str, int maxlen);
+HELICS_Export helics_status helicsPublicationGetKey (helics_publication pub, char *outputString, int maxlen);
 
 /** get the units of a subscription
 @param sub the subscription to query
-@param[out] str a pointer to a memory location to store the resulting string
+@param[out] outputString a pointer to a memory location to store the resulting string
 @param maxlen the maximum size of string that str can store
 @return a helics_status enumeration, helics_ok if everything worked*/
-HELICS_Export helics_status helicsSubscriptionGetUnits (helics_subscription sub, char *str, int maxlen);
+HELICS_Export helics_status helicsSubscriptionGetUnits (helics_subscription sub, char *outputString, int maxlen);
 
 /** get the units of a publication
 @param pub the publication to query
-@param[out] str a pointer to a memory location to store the resulting string
+@param[out] outputString a pointer to a memory location to store the resulting string
 @param maxlen the maximum size of string that str can store
 @return a helics_status enumeration, helics_ok if everything worked*/
-HELICS_Export helics_status helicsPublicationGetUnits (helics_publication pub, char *str, int maxlen);
+HELICS_Export helics_status helicsPublicationGetUnits (helics_publication pub, char *outputString, int maxlen);
 
 /**@}*/
 

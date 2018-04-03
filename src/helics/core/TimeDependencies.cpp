@@ -174,24 +174,15 @@ void TimeDependencies::removeDependency (Core::federate_id_t id)
 
 bool TimeDependencies::updateTime (const ActionMessage &m)
 {
-    if (m.action () == CMD_SEND_MESSAGE)
-    {
-        auto depInfo = getDependencyInfo (m.dest_id);
+    auto dependency_id = (m.action() != CMD_SEND_MESSAGE) ? m.source_id : m.dest_id;
+
+        auto depInfo = getDependencyInfo (dependency_id);
         if (depInfo == nullptr)
         {
             return false;
         }
         return depInfo->ProcessMessage (m);
-    }
-    else
-    {
-        auto depInfo = getDependencyInfo (m.source_id);
-        if (depInfo == nullptr)
-        {
-            return false;
-        }
-        return depInfo->ProcessMessage (m);
-    }
+    
 }
 
 bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const

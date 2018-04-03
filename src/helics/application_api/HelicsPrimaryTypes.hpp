@@ -26,7 +26,8 @@ using defV = mpark::variant<double,
     std::string,
     std::complex<double>,
     std::vector<double>,
-    std::vector<std::complex<double>>>;
+    std::vector<std::complex<double>>,
+    named_point>;
 
 /**enumeration of the order inside the variant so the Which function returns match the enumeration*/
 enum type_location

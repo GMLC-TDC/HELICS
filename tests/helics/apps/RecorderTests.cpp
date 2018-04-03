@@ -366,7 +366,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_destendpoint_clone)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
+    BOOST_CHECK_GE (rec1.messageCount (), 2);
 
     auto m = rec1.getMessage (0);
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message");
@@ -415,7 +415,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_srcendpoint_clone)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
+    BOOST_CHECK_GE (rec1.messageCount (), 2);
 
     auto m = rec1.getMessage (0);
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message");
@@ -517,7 +517,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
+    BOOST_CHECK_GE (rec1.messageCount (), 2);
 
     auto m = rec1.getMessage (0);
     BOOST_CHECK (m);

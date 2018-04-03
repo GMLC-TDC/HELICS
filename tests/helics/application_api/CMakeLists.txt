@@ -89,8 +89,8 @@ target_compile_definitions(application-api-tests PRIVATE "-DQUICK_TESTS_ONLY")
 
 target_compile_definitions(key-tests PRIVATE "-DKEY_TESTS")
 
-add_test(NAME key-tests COMMAND key-tests --log_level=test_suite --report_level=short)
-add_test(NAME application-api-tests COMMAND application-api-tests --log_level=test_suite --report_level=short)
+add_test(NAME key-tests COMMAND key-tests --log_level=message --report_level=short)
+add_test(NAME application-api-tests COMMAND application-api-tests --log_level=message --report_level=short)
 
 add_test(NAME extended-api-tests COMMAND extended-api-tests --log_level=warning --report_level=short)
 

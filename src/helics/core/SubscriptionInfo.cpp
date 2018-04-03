@@ -70,9 +70,7 @@ bool SubscriptionInfo::updateTimeNextIteration (Time newTime)
     {
         if (currentValue->time == newTime)
         {
-            auto cindex = currentValue->index;
-            last = currentValue;
-            ++currentValue;
+            auto cindex = last->index;
             while ((currentValue != it_final) && (currentValue->time == newTime) &&
                    (currentValue->index == cindex))
             {

@@ -11,6 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 static const helics::ArgDescriptors InfoArgs{
     { "startbroker","start a broker with the specified arguments" },
+    { "valuetarget", "name of the target federate, same as target" },
     { "target,t", "name of the target federate" }
 };
 
@@ -32,18 +33,34 @@ int main (int argc, const char * const *argv)
         brk = helics::BrokerFactory::create(fi.coreType, vm["startbroker"].as<std::string>());
     }
 
+    std::string target = "fed";
+    if (vm.count("target") > 0)
+    {
+        target = vm["target"].as<std::string>();
+    }
+    if (vm.count("valuetarget") > 0)
+    {
+        target = vm["valuetarget"].as<std::string>();
+    }
     auto vFed = std::make_unique<helics::ValueFederate> (fi);
 
-    auto id = vFed->registerGlobalPublication ("name", "type");
+    auto id = vFed->registerPublication ("pub", "double");
 
+    auto subid = vFed->registerOptionalSubscription(target + "/pub","double");
     std::cout << "entering init State\n";
     vFed->enterInitializationState ();
     std::cout << "entered init State\n";
     vFed->enterExecutionState ();
     std::cout << "entered exec State\n";
     for (int i=1; i<10; ++i) {
+        vFed->publish(id, i);
         auto newTime = vFed->requestTime (i);
-        vFed->publish (id, i);
+        if (vFed->isUpdated(subid))
+        {
+            auto val = vFed->getValue<double>(subid);
+            std::cout << "received updated value of " << val << " at "<< newTime << " from " << vFed->getSubscriptionKey(subid) << '\n';
+        }
+        
         std::cout << "processed time " << static_cast<double> (newTime) << "\n";
     }
     vFed->finalize ();

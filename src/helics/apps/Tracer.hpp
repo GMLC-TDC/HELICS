@@ -53,7 +53,7 @@ class Tracer: public App
     /**destructor*/
     ~Tracer();
     /** run the Player until the specified time*/
-    void runTo (Time stopTime);
+    virtual void runTo (Time stopTime) override;
     /** add a subscription to capture*/
     void addSubscription (const std::string &key);
     /** add an endpoint*/

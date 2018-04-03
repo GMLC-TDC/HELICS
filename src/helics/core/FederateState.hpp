@@ -80,6 +80,7 @@ private:
     std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time
 
     std::vector<Core::handle_id_t> events;  //!< list of value events to process
+    std::vector<Core::federate_id_t> delayedFederates; //!< list of federates to delay messages from
     std::map<Core::handle_id_t, std::vector<std::unique_ptr<Message>>>
       message_queue;  // structure of message queues
 	Time time_granted = startupTime;  //!< the most recent granted time;
@@ -103,6 +104,10 @@ private:
 	/** update the federate state */
     void setState (helics_federate_state_type newState);
 
+    /** check if a message should be delayed*/
+    bool messageShouldBeDelayed(const ActionMessage &cmd) const;
+    /** add a federate to the delayed list*/
+    void addFederateToDelay(Core::federate_id_t id);
   public:
    /** reset the federate to created state*/
     void reset ();

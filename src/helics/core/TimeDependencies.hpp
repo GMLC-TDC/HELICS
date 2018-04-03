@@ -12,6 +12,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 class ActionMessage;
+
+
 /** data class containing information about inter-federate dependencies*/
 class DependencyInfo
 {
@@ -26,6 +28,7 @@ class DependencyInfo
         time_requested_iterative = 4,
         time_requested = 5,
     };
+    
     Core::federate_id_t fedID = invalid_fed_id;  //!< identifier for the dependency
     Core::federate_id_t minFed = invalid_fed_id;  //!< identifier for the min dependency
     time_state_t time_state = time_state_t::initialized;  //!< the current state of the dependency
@@ -41,7 +44,7 @@ class DependencyInfo
 
     /** process a dependency related message
     @param m  a reference to an action message that contains some instructions for modifying dependencies
-    @return true if something was modified by the message*/
+    @return the results of processing the message*/
     bool ProcessMessage (const ActionMessage &m);
 };
 

@@ -88,7 +88,7 @@ class Source:public App
     /** initialize the source federate
     @details connect all sources with a generator
     */
-    void initialize();
+    virtual void initialize() override;
 
     /** run the source until the specified time
     @param stopTime_input the desired stop time
