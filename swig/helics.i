@@ -13,8 +13,6 @@
 #include "MessageFilters.h"
 %}
 
-%include <cstring.i>
-
 %apply double *OUTPUT {double*};
 %apply helics_time_t *OUTPUT {helics_time_t*};
 %apply (char *STRING, size_t LENGTH) { (const char *data, int len) };
