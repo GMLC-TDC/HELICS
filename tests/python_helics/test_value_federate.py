@@ -268,7 +268,7 @@ def test_value_federate_runFederateTestVectorD(vFed):
     testValue = [3, 4, 5]
     pubid = h.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", h.HELICS_DATA_TYPE_VECTOR, "")
     subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "vector", "")
-    h.helicsSubscriptionSetDefaultVector(subid, defaultValue)
+    h.helicsSubscriptionSetDefaultVector(subid, len(defaultValue))
 
     h.helicsFederateEnterExecutionMode(vFed)
 

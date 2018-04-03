@@ -15,11 +15,11 @@
     for (i = 0; i < $1; i++) {
       PyObject *o = PyList_GetItem($input,i);
       if (PyString_Check(o))
-	$2[i] = PyString_AsString(PyList_GetItem($input,i));
+    $2[i] = PyString_AsString(PyList_GetItem($input,i));
       else {
-	PyErr_SetString(PyExc_TypeError,"list must contain strings");
-	free($2);
-	return NULL;
+    PyErr_SetString(PyExc_TypeError,"list must contain strings");
+    free($2);
+    return NULL;
       }
     }
     $2[i] = 0;
