@@ -21,6 +21,7 @@
 %apply long long *OUTPUT{int64_t *};
 %apply int *OUTPUT{federate_state  *state};
 %apply int *OUTPUT{helics_iteration_status *};
+%apply long long {int64_t};
 
 %include "api-data.h"
 %include "helics.h"
