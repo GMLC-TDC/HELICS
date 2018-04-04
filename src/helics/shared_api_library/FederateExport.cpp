@@ -526,26 +526,26 @@ helics_status helicsFederateGetState (helics_federate fed, federate_state *state
     return helics_ok;
 }
 
-helics_status helicsFederateGetName (helics_federate fed, char *str, int maxlen)
+helics_status helicsFederateGetName (helics_federate fed, char *outputString, int maxlen)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
     {
         return helics_invalid_object;
     }
-    if (str == nullptr)
+    if (outputString == nullptr)
     {
         return helics_discard;
     }
     auto &ident = fedObj->getName ();
     if (static_cast<int> (ident.size ()) > maxlen)
     {
-        strncpy (str, ident.c_str (), maxlen);
-        str[maxlen - 1] = 0;
+        strncpy (outputString, ident.c_str (), maxlen);
+        outputString[maxlen - 1] = 0;
     }
     else
     {
-        strcpy (str, ident.c_str ());
+        strcpy (outputString, ident.c_str ());
     }
     return helics_ok;
 }

@@ -80,6 +80,7 @@ private:
     std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time
 
     std::vector<Core::handle_id_t> events;  //!< list of value events to process
+    std::vector<Core::federate_id_t> delayedFederates; //!< list of federates to delay messages from
     std::map<Core::handle_id_t, std::vector<std::unique_ptr<Message>>>
       message_queue;  // structure of message queues
 	Time time_granted = startupTime;  //!< the most recent granted time;
@@ -103,6 +104,10 @@ private:
 	/** update the federate state */
     void setState (helics_federate_state_type newState);
 
+    /** check if a message should be delayed*/
+    bool messageShouldBeDelayed(const ActionMessage &cmd) const;
+    /** add a federate to the delayed list*/
+    void addFederateToDelay(Core::federate_id_t id);
   public:
    /** reset the federate to created state*/
     void reset ();
@@ -164,6 +169,16 @@ private:
     @return a convergence state value with an indicator of return reason and state of convergence
     */
 	iteration_state processQueue ();
+
+    /** process the federate delayed Message queue until a returnable event or it is empty
+    @details processQueue will process messages until one of 3 things occur
+    1.  the initialization state has been entered
+    2.  the execution state has been granted (or initialization state reentered from a iterative request)
+    3.  time has been granted
+    4. a break event is encountered
+    @return a convergence state value with an indicator of return reason and state of convergence
+    */
+    iteration_state processDelayQueue();
 	/** process a single message
 	@return a convergence state value with an indicator of return reason and state of convergence
 	*/
@@ -173,7 +188,15 @@ private:
 	/** fill event list
 	@param the time of the update
 	*/
-    void fillEventVector (Time currentTime);
+    void fillEventVectorUpTo (Time currentTime);
+    /** fill event list
+    @param the time of the update
+    */
+    void fillEventVectorInclusive(Time currentTime);
+    /** fill event list
+    @param the time of the update
+    */
+    void fillEventVectorNextIteration(Time currentTime);
     /** add a dependency to the timing coordination*/
     void addDependency (Core::federate_id_t fedToDependOn);
     /** add a dependent federate*/

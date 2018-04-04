@@ -117,7 +117,7 @@ std::complex<double> helicsGetComplex (const std::string &val)
         return std::complex<double> (-1e49, -1e49);
     }
     std::smatch m;
-    double re = 0.0;
+    double re = -1e49;
     double im = 0.0;
     std::regex_search (val, m, creg);
     try
@@ -140,6 +140,7 @@ std::complex<double> helicsGetComplex (const std::string &val)
                 auto strval = val.substr (0, val.size () - 1);
                 boost::algorithm::trim (strval);
                 im = boost::lexical_cast<double> (strval);
+                re = 0.0;
             }
             else
             {
@@ -151,7 +152,7 @@ std::complex<double> helicsGetComplex (const std::string &val)
     }
     catch (const boost::bad_lexical_cast &)
     {
-        im = 0.0;
+        re = -1e49;
     }
     return {re, im};
 }

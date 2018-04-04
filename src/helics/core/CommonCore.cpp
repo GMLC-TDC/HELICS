@@ -942,6 +942,7 @@ void CommonCore::setValue (handle_id_t handle, const char *data, uint64_t len)
         ActionMessage mv (CMD_PUB);
         mv.source_id = handleInfo->fed_id;
         mv.source_handle = handle;
+        mv.counter = static_cast<uint16_t>(fed->getCurrentIteration());
         mv.payload = std::string (data, len);
         mv.actionTime = fed->nextAllowedSendTime ();
 
@@ -2370,6 +2371,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                   createSourceFilter (command.source_id, command.source_handle, command.name,
                                       command.info ().target, command.info ().type, command.info ().type_out);
             }
+            std::lock_guard<std::mutex> hlock(_handlemutex);
             filterInfo->allSourceFilters.push_back (newFilter);
             filterInfo->hasSourceFilter = true;
         }
