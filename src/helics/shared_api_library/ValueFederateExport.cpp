@@ -590,12 +590,10 @@ int helicsSubscriptionGetVectorSize (helics_subscription sub)
     if (subObj->rawOnly)
     {
         auto V = subObj->fedptr->getValue<std::vector<double>> (subObj->id);
-        printf("getting raw Vec size=%d\n", static_cast<int> (V.size()));
         return static_cast<int> (V.size ());
     }
 
     auto V = subObj->subptr->getValue<std::vector<double>> ();
-    printf("getting Vec size=%d\n", static_cast<int> (V.size()));
     return static_cast<int> (V.size ());
 }
 
