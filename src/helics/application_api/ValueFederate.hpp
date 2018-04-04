@@ -32,6 +32,10 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] jsonString can be either a json file or a string containing json code
     */
     explicit ValueFederate (const std::string &jsonString);
+    /**constructor taking a string with the required information
+    @param[in] jsonString can be either a json file or a string containing json code
+    */
+    ValueFederate(const std::string &name, const std::string &jsonString);
 
     /** default constructor*/
     explicit ValueFederate ();

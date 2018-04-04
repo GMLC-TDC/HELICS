@@ -20,6 +20,7 @@ enum action_message_flags : uint16_t
     indicator_flag = 5,  //!< flag used for setting values
     extra_flag1 = 7,  //!< extra flag
     clone_flag = 9,  //!< flag indicating the filter is a clone filter
+    destination_processing_flag=11, //!< flag indicating the message is for destination processing
     broker_min_time_flag=12, //!< flag indicating that a broker the time constraint
 };
 /** namespace for message definitions*/

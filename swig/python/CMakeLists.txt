@@ -22,7 +22,7 @@ ELSE()
 # https://stackoverflow.com/a/3818084/5451769
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   # Update if necessary
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes")
 endif()
 
 FIND_PACKAGE(PythonLibs REQUIRED)
@@ -39,9 +39,9 @@ SET_PROPERTY(SOURCE ../helics.i PROPERTY SWIG_MODULE_NAME helics)
 
 IF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.7)
   SWIG_ADD_LIBRARY(helics TYPE MODULE LANGUAGE python SOURCES helicsPython.i)
-ELSE (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.7)
+ELSE ()
   SWIG_ADD_MODULE(helics python helicsPython.i)
-ENDIF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.7)
+ENDIF ()
 
 SWIG_LINK_LIBRARIES(helics helicsSharedLib)
 

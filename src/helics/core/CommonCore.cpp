@@ -942,6 +942,7 @@ void CommonCore::setValue (handle_id_t handle, const char *data, uint64_t len)
         ActionMessage mv (CMD_PUB);
         mv.source_id = handleInfo->fed_id;
         mv.source_handle = handle;
+        mv.counter = static_cast<uint16_t>(fed->getCurrentIteration());
         mv.payload = std::string (data, len);
         mv.actionTime = fed->nextAllowedSendTime ();
 
@@ -1129,7 +1130,7 @@ handle_id_t CommonCore::registerCloningSourceFilter(const std::string &filterNam
         auto endid = ept->fed_id;
         ept->hasSourceFilter = true;
         lock.unlock();
-        setActionFlag(m, processingComplete);
+        setActionFlag(m, processing_complete_flag);
         // send to broker and core
         addActionMessage(m);
         // now send the same command to the endpoint
@@ -1276,7 +1277,7 @@ handle_id_t CommonCore::registerCloningDestinationFilter(const std::string &filt
         }
         ept->hasDestFilter = true;
         lock.unlock();
-        setActionFlag(m, processingComplete);
+        setActionFlag(m, processing_complete_flag);
         // send to broker and core
         addActionMessage(m);
         // now send the same command to the endpoint
@@ -2475,7 +2476,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                                            command.info ().target, command.info ().type, command.info ().type_out);
             }
 
-            filterInfo->hasDestFilter = true;
+            filterInfo->hasDestFilters = true;
             filterInfo->destFilter = filter;
         }
 
@@ -2502,8 +2503,9 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                   createSourceFilter (command.source_id, command.source_handle, command.name,
                                       command.info ().target, command.info ().type, command.info ().type_out);
             }
+            std::lock_guard<std::mutex> hlock(_handlemutex);
             filterInfo->allSourceFilters.push_back (newFilter);
-            filterInfo->hasSourceFilter = true;
+            filterInfo->hasSourceFilters = true;
         }
     }
     break;
@@ -2877,7 +2879,7 @@ ActionMessage &CommonCore::processMessage (ActionMessage &m)
     if (handle->hasSourceFilter)
     {
         auto filtFunc = getFilterCoordinator (handle->id);
-        if (filtFunc->hasSourceFilter)
+        if (filtFunc->hasSourceFilters)
         {
             //   for (int ii = 0; ii < static_cast<int> (filtFunc->sourceFilters.size ()); ++ii)
             size_t ii = 0;
@@ -2935,7 +2937,7 @@ void CommonCore::processFilterReturn (ActionMessage &cmd)
     {
         auto messID = cmd.info ().messageID;
         auto filtFunc = getFilterCoordinator (handle->id);
-        if (filtFunc->hasSourceFilter)
+        if (filtFunc->hasSourceFilters)
         {
             for (decltype (cmd.counter) ii = cmd.counter + 1; ii < filtFunc->sourceFilters.size (); ++ii)
             {

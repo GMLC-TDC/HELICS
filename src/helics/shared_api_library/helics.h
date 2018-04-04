@@ -477,11 +477,11 @@ HELICS_Export helics_status helicsFederateRequestTimeIterativeComplete (helics_f
 
 /** get the name of the federate
 @param fed the federate object to query
-@param[out] str memory buffer to store the result
+@param[out] outputString memory buffer to store the result
 @param maxlen the maximum size of the buffer
 @return helics_status object indicating success or error
 */
-HELICS_Export helics_status helicsFederateGetName (helics_federate fed, char *str, int maxlen);
+HELICS_Export helics_status helicsFederateGetName (helics_federate fed, char *outputString, int maxlen);
 
 /** set the minimum time delta for the federate
 @param[in] tdelta the minimum time delta to return from a time request function
