@@ -12,20 +12,13 @@ def vFed():
 
     helicsversion = h.helicsGetVersion()
 
-    # print("Helics version = {}".format(helicsversion))
-
     # Create broker #
-    # print("Creating Broker")
     broker = h.helicsCreateBroker("zmq", "", initstring)
-    # print("Created Broker")
 
-    # print("Checking if Broker is connected")
     isconnected = h.helicsBrokerIsConnected(broker)
-    # print("Checked if Broker is connected")
 
     if isconnected == 1:
         pass
-        # print("Broker created and connected")
 
     # Create Federate Info object that describes the federate properties #
     fedinfo = h.helicsFederateInfoCreate()
@@ -82,15 +75,11 @@ def test_value_federate_publication_registration(vFed):
     pubid3 = h.helicsFederateRegisterPublication(vFed, "pub3", "double", "V")
     h.helicsFederateEnterExecutionMode(vFed)
 
-    with pt.raises(TypeError):
-        print(h.helicsPublicationGetKey(pubid1))
-    with pt.raises(TypeError):
-        print(h.helicsPublicationGetKey(pubid2))
-    with pt.raises(TypeError):
-        print(h.helicsPublicationGetKey(pubid3))
-
-    with pt.raises(TypeError):
-        print(h.helicsPublicationGetType(pubid3))
+    print(h.helicsPublicationGetKey(pubid1))
+    print(h.helicsPublicationGetKey(pubid2))
+    print(h.helicsPublicationGetKey(pubid3))
+    print(h.helicsPublicationGetType(pubid3))
+    print(h.helicsPublicationGetUnits(pubid3))
 
 def test_value_federate_publisher_registration(vFed):
     pubid1 = h.helicsFederateRegisterTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_STRING, "")
@@ -262,7 +251,6 @@ def test_value_federate_runFederateTestString(vFed):
     status, value = h.helicsSubscriptionGetString(subid, 100)
     assert value == testValue
 
-# @pt.mark.skip
 def test_value_federate_runFederateTestVectorD(vFed):
     defaultValue = [0, 1, 2]
     testValue = [3, 4, 5]
