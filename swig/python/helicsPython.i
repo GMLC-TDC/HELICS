@@ -33,55 +33,62 @@
   free((char *) $2);
 }
 
-%typemap(in) double value[ANY] (const double data[], int len) {
+%typemap(in) (const double *vectorInput, int vectorlength) {
   int i;
-  if (!PySequence_Check($input)) {
-    PyErr_SetString(PyExc_ValueError,"Expected a sequence");
+  if (!PyList_Check($input)) {
+    PyErr_SetString(PyExc_ValueError,"Expected a list");
     return NULL;
   }
-  $2=PySequence_Length($input);
+  $2=PyList_Size($input);
+  printf("setting default vec size=%d\n",$2);
   $1 = (double *) malloc($2*sizeof(double));
   
   for (i = 0; i < $2; i++) {
-    PyObject *o = PySequence_GetItem($input,i);
+    PyObject *o = PyList_GetItem($input,i);
     if (PyFloat_Check(o)) {
       $1[i] = PyFloat_AsDouble(o);
-    } else {
-      PyErr_SetString(PyExc_ValueError,"Sequence elements must be numbers");      
+	}else if (PyInt_Check(o))
+	{
+		$1[i] = (double)(PyInt_AsLong(o));
+	} else {
+      PyErr_SetString(PyExc_ValueError,"List elements must be numbers");      
       free($1);
       return NULL;
     }
   }
 }
 
-%typemap(freearg) float value[ANY] {
+%typemap(argout) (const double *vectorInput, int vectorlength) 
+{
+}
+
+%typemap(freearg) (const double *vectorInput, int vectorlength) {
    if ($1) free($1);
 }
 
-%typemap(argout) (helics_subscription sub, double data[], int maxlen, int *actualSize) {
-  PyObject *o=$input;
-  PyObject *o2;
-  $3=helicsSubscriptionGetSize(o);
-  if ($3 == 0)
-  {
-	return 2;
-  }
-  o2=PyList_New($3);
-  $2 = (double *) malloc($3*sizeof(double));
-  int actSize;
-  $4=&actSize;
+%typemap(in, numinputs=0) (double data[], int maxlen, int *actualSize) {
+  $2=helicsSubscriptionGetVectorSize(arg1);
+  printf("get vec size %d\n",$2);
+  $1 = (double *) malloc($2*sizeof(double));
+  $3=&($2);
   
-  for (i = 0; i < actSize; i++) {
-	PyObjct *o_item=PyFloat_FromDouble($2[i]);
+}
+
+%typemap(freearg) (double data[], int maxlen, int *actualSize) {
+   if ($1) free($1);
+}
+
+%typemap(argout) (double data[], int maxlen, int *actualSize) {
+  int i;
+  PyObject *o2=PyList_New(*$3);
+  printf("vec size %d %d\n",$2,*$3);
+  for (i = 0; i < *$3; i++) {
+	PyObject *o_item=PyFloat_FromDouble($1[i]);
       PyList_SetItem(o2, i, o_item);
       }
 	  
   $result = SWIG_Python_AppendOutput($result, o2);
-  Py_DECREF(o2);
 }
-
-%include carrays.i
-%array_class(double, doubleArray);
 
 %include "../helics.i"
 

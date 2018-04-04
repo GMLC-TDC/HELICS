@@ -166,9 +166,9 @@ class Subscription : public SubscriptionBase
     /** set the default value to use before any update has been published
      */
     template <class X>
-    void setDefault (const X &val)
+    void setDefault (X &&val)
     {
-        lastValue = val;
+        lastValue = std::forward<X>(val);
     }
 
     /** set the minimum delta for change detection

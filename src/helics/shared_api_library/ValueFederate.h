@@ -195,7 +195,7 @@ HELICS_Export helics_status helicsPublicationPublishComplex (helics_publication 
 @param len the number of points to publish
 @return helics_ok if everything was OK
 */
-HELICS_Export helics_status helicsPublicationPublishVector (helics_publication pub, const double data[], int len);
+HELICS_Export helics_status helicsPublicationPublishVector (helics_publication pub, const double *vectorInput, int vectorlength);
 
 /**@}*/
 
@@ -313,7 +313,7 @@ HELICS_Export helics_status helicsSubscriptionSetDefaultComplex (helics_subscrip
 @param len the number of points to publish
 @return helics_ok if everything was OK
 */
-HELICS_Export helics_status helicsSubscriptionSetDefaultVector (helics_subscription sub, const double *data, int len);
+HELICS_Export helics_status helicsSubscriptionSetDefaultVector (helics_subscription sub, const double *vectorInput, int vectorlength);
 
 /**@}*/
 

@@ -399,20 +399,28 @@ helics_status helicsPublicationPublishComplex (helics_publication pub, double re
     return helics_ok;
 }
 
-helics_status helicsPublicationPublishVector (helics_publication pub, const double data[], int len)
+helics_status helicsPublicationPublishVector (helics_publication pub, const double *vectorInput, int vectorlength)
 {
     if (pub == nullptr)
     {
         return helics_invalid_object;
     }
     auto pubObj = reinterpret_cast<helics::PublicationObject *> (pub);
-    if (pubObj->rawOnly)
+    if ((vectorInput == nullptr) || (vectorlength <= 0))
     {
-        pubObj->fedptr->publish (pubObj->id, std::vector<double> (data, data + len));
+        pubObj->pubptr->publish(std::vector<double>());
     }
     else
     {
-        pubObj->pubptr->publish (std::vector<double> (data, data + len));
+        if (pubObj->rawOnly)
+        {
+            pubObj->fedptr->publish(pubObj->id, std::vector<double>(vectorInput, vectorInput + vectorlength));
+        }
+        else
+        {
+            pubObj->pubptr->publish(std::vector<double>(vectorInput, vectorInput + vectorlength));
+        }
+       
     }
     return helics_ok;
 }
@@ -582,10 +590,12 @@ int helicsSubscriptionGetVectorSize (helics_subscription sub)
     if (subObj->rawOnly)
     {
         auto V = subObj->fedptr->getValue<std::vector<double>> (subObj->id);
+        printf("getting raw Vec size=%d\n", static_cast<int> (V.size()));
         return static_cast<int> (V.size ());
     }
 
     auto V = subObj->subptr->getValue<std::vector<double>> ();
+    printf("getting Vec size=%d\n", static_cast<int> (V.size()));
     return static_cast<int> (V.size ());
 }
 
@@ -709,14 +719,14 @@ helics_status helicsSubscriptionSetDefaultComplex (helics_subscription sub, doub
     return helics_ok;
 }
 
-helics_status helicsSubscriptionSetDefaultVector (helics_subscription sub, const double *data, int len)
+helics_status helicsSubscriptionSetDefaultVector (helics_subscription sub, const double *vectorInput, int vectorlength)
 {
     if (sub == nullptr)
     {
         return helics_invalid_object;
     }
     auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
-    if ((data == nullptr) || (len <= 0))
+    if ((vectorInput == nullptr) || (vectorlength <= 0))
     {
         if (subObj->rawOnly)
         {
@@ -731,11 +741,11 @@ helics_status helicsSubscriptionSetDefaultVector (helics_subscription sub, const
     {
         if (subObj->rawOnly)
         {
-            subObj->fedptr->setDefaultValue (subObj->id, std::vector<double> (data, data + len));
+            subObj->fedptr->setDefaultValue (subObj->id, std::vector<double> (vectorInput, vectorInput + vectorlength));
         }
         else
         {
-            subObj->subptr->setDefault (std::vector<double> (data, data + len));
+            subObj->subptr->setDefault (std::vector<double> (vectorInput, vectorInput + vectorlength));
         }
     }
 

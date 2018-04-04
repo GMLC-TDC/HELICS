@@ -268,12 +268,12 @@ def test_value_federate_runFederateTestVectorD(vFed):
     testValue = [3, 4, 5]
     pubid = h.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", h.HELICS_DATA_TYPE_VECTOR, "")
     subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "vector", "")
-    h.helicsSubscriptionSetDefaultVector(subid, len(defaultValue))
+    h.helicsSubscriptionSetDefaultVector(subid, defaultValue)
 
     h.helicsFederateEnterExecutionMode(vFed)
 
     # TODO: Fix error with the following function
-    h.helicsPublicationPublishVector(pubid, testValue, 3)
+    h.helicsPublicationPublishVector(pubid, testValue)
 
     status, value = h.helicsSubscriptionGetVector(subid)
     assert value == defaultValue

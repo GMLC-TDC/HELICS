@@ -512,7 +512,11 @@ void runFederateTestVectorD (const char *core,
 
     // publish string1 at time=0.0;
     CE (helicsPublicationPublishVector (pubid, testValue1, len1));
-    int actualLen;
+
+    
+    int actualLen = helicsSubscriptionGetVectorSize(subid);
+    BOOST_CHECK_EQUAL(actualLen, len);
+
     CE (helicsSubscriptionGetVector (subid, val, 100, &actualLen));
 
     BOOST_CHECK_EQUAL (actualLen, len);
