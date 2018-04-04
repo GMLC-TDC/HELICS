@@ -1,7 +1,6 @@
 %include "cstring.i"
 
 %cstring_output_maxsize(char *outputString, int maxlen);
-
 %cstring_bounded_output(char* str, 1024);
 
 
