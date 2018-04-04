@@ -276,10 +276,10 @@ def test_value_federate_runFederateTestVectorD(vFed):
     h.helicsPublicationPublishVector(pubid, testValue)
 
     status, value = h.helicsSubscriptionGetVector(subid)
-    assert value == defaultValue
+    assert value == [0, 1, 2]
 
-    status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
+    status, grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
     assert grantedtime == 0.01
 
     status, value = h.helicsSubscriptionGetVector(subid)
-    assert value == testValue
+    assert value == [3, 4, 5]

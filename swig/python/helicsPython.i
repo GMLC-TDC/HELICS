@@ -40,9 +40,8 @@
     return NULL;
   }
   $2=PyList_Size($input);
-  printf("setting default vec size=%d\n",$2);
   $1 = (double *) malloc($2*sizeof(double));
-  
+
   for (i = 0; i < $2; i++) {
     PyObject *o = PyList_GetItem($input,i);
     if (PyFloat_Check(o)) {
@@ -51,14 +50,14 @@
 	{
 		$1[i] = (double)(PyInt_AsLong(o));
 	} else {
-      PyErr_SetString(PyExc_ValueError,"List elements must be numbers");      
+      PyErr_SetString(PyExc_ValueError,"List elements must be numbers");
       free($1);
       return NULL;
     }
   }
 }
 
-%typemap(argout) (const double *vectorInput, int vectorlength) 
+%typemap(argout) (const double *vectorInput, int vectorlength)
 {
 }
 
@@ -67,26 +66,28 @@
 }
 
 %typemap(in, numinputs=0) (double data[], int maxlen, int *actualSize) {
-  $2=helicsSubscriptionGetVectorSize(arg1);
-  printf("get vec size %d\n",$2);
-  $1 = (double *) malloc($2*sizeof(double));
   $3=&($2);
-  
 }
 
 %typemap(freearg) (double data[], int maxlen, int *actualSize) {
    if ($1) free($1);
 }
 
+// Set argument to NULL before any conversion occurs
+%typemap(check)(double data[], int maxlen, int *actualSize) {
+    $2=helicsSubscriptionGetVectorSize(arg1);
+    $1 = (double *) malloc($2*sizeof(double));
+    $3=&($2);
+}
+
 %typemap(argout) (double data[], int maxlen, int *actualSize) {
   int i;
   PyObject *o2=PyList_New(*$3);
-  printf("vec size %d %d\n",$2,*$3);
   for (i = 0; i < *$3; i++) {
 	PyObject *o_item=PyFloat_FromDouble($1[i]);
       PyList_SetItem(o2, i, o_item);
       }
-	  
+
   $result = SWIG_Python_AppendOutput($result, o2);
 }
 
