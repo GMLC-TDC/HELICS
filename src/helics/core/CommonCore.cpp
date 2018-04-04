@@ -2353,7 +2353,6 @@ void CommonCore::processFilterInfo (ActionMessage &command)
     case CMD_REG_SRC_FILTER:
     case CMD_NOTIFY_SRC_FILTER:
     {
-        std::lock_guard<std::mutex> hlock(_handlemutex);
         bool FilterAlreadyPresent = false;
         for (auto &filt : filterInfo->allSourceFilters)
         {
@@ -2372,6 +2371,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                   createSourceFilter (command.source_id, command.source_handle, command.name,
                                       command.info ().target, command.info ().type, command.info ().type_out);
             }
+            std::lock_guard<std::mutex> hlock(_handlemutex);
             filterInfo->allSourceFilters.push_back (newFilter);
             filterInfo->hasSourceFilter = true;
         }
