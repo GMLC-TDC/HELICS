@@ -75,11 +75,21 @@ def test_value_federate_publication_registration(vFed):
     pubid3 = h.helicsFederateRegisterPublication(vFed, "pub3", "double", "V")
     h.helicsFederateEnterExecutionMode(vFed)
 
-    print(h.helicsPublicationGetKey(pubid1))
-    print(h.helicsPublicationGetKey(pubid2))
-    print(h.helicsPublicationGetKey(pubid3))
-    print(h.helicsPublicationGetType(pubid3))
-    print(h.helicsPublicationGetUnits(pubid3))
+    status, publication_key = h.helicsPublicationGetKey(pubid1, 100)
+    assert status == 0
+    assert publication_key == 'TestA Federate/pub1'
+    status, publication_key = h.helicsPublicationGetKey(pubid2, 100)
+    assert status == 0
+    assert publication_key == 'pub2'
+    status, publication_key = h.helicsPublicationGetKey(pubid3, 100)
+    assert status == 0
+    assert publication_key == 'TestA Federate/pub3'
+    status, publication_type = h.helicsPublicationGetType(pubid3, 100)
+    assert status == 0
+    assert publication_type == 'double'
+    status, publication_units = h.helicsPublicationGetUnits(pubid3, 100)
+    assert status == 0
+    assert publication_units == 'V'
 
 def test_value_federate_publisher_registration(vFed):
     pubid1 = h.helicsFederateRegisterTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_STRING, "")
