@@ -135,7 +135,7 @@ class ValueFederate : public virtual Federate
     void setDefaultValue (helics_subscription sub, const char *data, int len)
     {
         // returns helics_status
-        helicsSubscriptionSetDefault (sub, data, len);
+        helicsSubscriptionSetDefaultRaw (sub, data, len);
     }
 
     void setDefaultValue (helics_subscription sub, const std::string &str)
@@ -182,8 +182,9 @@ class ValueFederate : public virtual Federate
     {
         int size = helicsSubscriptionGetValueSize(sub);
         std::string result;
+        
         result.resize(size+1);
-        helicsSubscriptionGetString (sub, &result[0], size+1);
+        helicsSubscriptionGetString (sub, &result[0], size+1,&size);
         result[size] = '\0';
         return result;
     }
@@ -229,7 +230,7 @@ class ValueFederate : public virtual Federate
     void publish (helics_publication pub, const char *data, int len)
     {
         // returns helics_status
-        helicsPublicationPublish (pub, data, len);
+        helicsPublicationPublishRaw (pub, data, len);
     }
 
     void publish (helics_publication pub, std::string str)

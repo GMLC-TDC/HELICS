@@ -17,6 +17,7 @@ api-data.h
 ValueFederate.h
 MessageFederate.h
 MessageFilters.h
+helicsCallbacks.h
 )
 
 set(helicsShared_sources
@@ -25,6 +26,7 @@ FederateExport.cpp
 ValueFederateExport.cpp
 MessageFederateExport.cpp
 MessageFiltersExport.cpp
+helicsCallbacks.cpp
 internal/api_objects.h
 )
 

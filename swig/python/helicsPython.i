@@ -1,7 +1,39 @@
 %include "cstring.i"
 
-%cstring_output_maxsize(char *outputString, int maxlen);
-%cstring_bounded_output(char* str, 1024);
+//typemap for short maxlen strings
+%typemap(in, numinputs=0) (char *STRING, int maxlen) {
+  $2=256;
+  $1=(char *)malloc(256);
+}
+
+%typemap(argout) (char *STRING, int maxlen) {
+  PyObject *str=PyString_FromString($1);
+  $result = SWIG_Python_AppendOutput($result, o2);
+}
+
+%typemap(freearg) (char *STRING, int maxlen) {
+   if ($1) free($1);
+}
+
+//typemap for string output with a length return
+%typemap(in, numinputs=0) (char *STRING, int maxlen, int *actualLength) {
+  $3=&($2);
+}
+
+%typemap(freearg) (char *STRING, int maxlen, int *actualLength) {
+   if ($1) free($1);
+}
+
+%typemap(check)(char *STRING, int maxlen, iint *actualLength) {
+    $2=helicsSubscriptionGetStringSize(arg1);
+    $1 = (char *) malloc($2);
+}
+
+%typemap(argout) (char *STRING, int maxlen, int *actualSize) {
+  int i;
+  PyObject *o2=PyString_FromStringAndSize($1,$2);
+  $result = SWIG_Python_AppendOutput($result, o2);
+}
 
 
 //typemap for the input arguments
@@ -76,7 +108,6 @@
 %typemap(check)(double data[], int maxlen, int *actualSize) {
     $2=helicsSubscriptionGetVectorSize(arg1);
     $1 = (double *) malloc($2*sizeof(double));
-    $3=&($2);
 }
 
 %typemap(argout) (double data[], int maxlen, int *actualSize) {

@@ -81,7 +81,7 @@ helics_status helicsEndpointSetDefaultDestination (helics_endpoint endpoint, con
     return helics_ok;
 }
 
-helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const char *data, int len)
+helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength)
 {
     if (endpoint == nullptr)
     {
@@ -90,16 +90,16 @@ helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     if ((dest == nullptr) || (std::string (dest).empty ()))
     {
-        endObj->endptr->send (data, len);
+        endObj->endptr->send ((const char *)data, inputDataLength);
     }
     else
     {
-        endObj->endptr->send (dest, data, len);
+        endObj->endptr->send (dest, (const char *)data, inputDataLength);
     }
     return helics_ok;
 }
 
-helics_status helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time)
+helics_status helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength, helics_time_t time)
 {
     if (endpoint == nullptr)
     {
@@ -108,11 +108,11 @@ helics_status helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     if ((dest == nullptr) || (std::string (dest).empty ()))
     {
-        endObj->endptr->send (data, len, time);
+        endObj->endptr->send ((const char *)data, inputDataLength, time);
     }
     else
     {
-        endObj->endptr->send (dest, data, len, time);
+        endObj->endptr->send (dest, (const char *)data, inputDataLength, time);
     }
     return helics_ok;
 }

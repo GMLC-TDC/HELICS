@@ -394,6 +394,12 @@ void Federate::setPeriod (Time period, Time offset)
 
 void Federate::setLoggingLevel (int loggingLevel) { coreObject->setLoggingLevel (fedID, loggingLevel); }
 
+void Federate::setLoggingCallback(
+    const std::function<void(int, const std::string &, const std::string &)> &logFunction)
+{
+    coreObject->setLoggingCallback(fedID, logFunction);
+}
+
 void Federate::setFlag (int flag, bool flagValue)
 {
     if ((flag > 10) || (flag < 0))

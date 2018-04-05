@@ -6870,7 +6870,7 @@ SWIGINTERN PyObject *_wrap_helicsPublicationPublish(PyObject *SWIGUNUSEDPARM(sel
   }  
   arg2 = (char *)(buf2);
   arg3 = (int)(size2 - 1);
-  result = (helics_status)helicsPublicationPublish(arg1,(char const *)arg2,arg3);
+  result = (helics_status)helicsPublicationPublishRaw(arg1,(char const *)arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return resultobj;

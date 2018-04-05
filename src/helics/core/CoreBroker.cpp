@@ -157,6 +157,11 @@ void CoreBroker::generateQueryResult (const ActionMessage &command)
     transmit (getRoute (queryResp.dest_id), queryResp);
 }
 
+void CoreBroker::setLoggingCallback(const std::function<void(int, const std::string &, const std::string &)> &logFunction)
+{
+    BrokerBase::setLoggerFunction(logFunction);
+}
+
 int32_t CoreBroker::fillMessageRouteInformation (ActionMessage &mess)
 {
     auto &endpointName = mess.info ().target;
