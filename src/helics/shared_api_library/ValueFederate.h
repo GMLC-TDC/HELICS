@@ -225,7 +225,7 @@ HELICS_Export helics_status helicsSubscriptionGetRawValue (helics_subscription s
 @param maxlen the maximum size of information that str can hold
 @return a helics_status value, helics_ok if everything went fine
 */
-HELICS_Export helics_status helicsSubscriptionGetString (helics_subscription sub, char *outputString, int maxlen, int *actualLength);
+HELICS_Export helics_status helicsSubscriptionGetString (helics_subscription sub, char *outputString, int maxStringlen, int *actualLength);
 
 /** get an integer value from a subscription
 @param sub the subscription to get the data for

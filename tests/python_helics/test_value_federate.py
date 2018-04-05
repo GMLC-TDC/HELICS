@@ -75,19 +75,19 @@ def test_value_federate_publication_registration(vFed):
     pubid3 = h.helicsFederateRegisterPublication(vFed, "pub3", "double", "V")
     h.helicsFederateEnterExecutionMode(vFed)
 
-    status, publication_key = h.helicsPublicationGetKey(pubid1, 100)
+    status, publication_key = h.helicsPublicationGetKey(pubid1)
     assert status == 0
     assert publication_key == 'TestA Federate/pub1'
-    status, publication_key = h.helicsPublicationGetKey(pubid2, 100)
+    status, publication_key = h.helicsPublicationGetKey(pubid2)
     assert status == 0
     assert publication_key == 'pub2'
-    status, publication_key = h.helicsPublicationGetKey(pubid3, 100)
+    status, publication_key = h.helicsPublicationGetKey(pubid3)
     assert status == 0
     assert publication_key == 'TestA Federate/pub3'
-    status, publication_type = h.helicsPublicationGetType(pubid3, 100)
+    status, publication_type = h.helicsPublicationGetType(pubid3)
     assert status == 0
     assert publication_type == 'double'
-    status, publication_units = h.helicsPublicationGetUnits(pubid3, 100)
+    status, publication_units = h.helicsPublicationGetUnits(pubid3)
     assert status == 0
     assert publication_units == 'V'
 
@@ -150,7 +150,7 @@ def test_value_federate_single_transfer(vFed):
 
     assert grantedtime == 0.01
 
-    status, s = h.helicsSubscriptionGetString(subid, 100)
+    status, s = h.helicsSubscriptionGetString(subid)
 
     assert status == 0
     assert s == "string1"
@@ -252,13 +252,13 @@ def test_value_federate_runFederateTestString(vFed):
     # TODO: Fix error with the following function
     h.helicsPublicationPublishString(pubid, testValue)
 
-    status, value = h.helicsSubscriptionGetString(subid, 100)
+    status, value = h.helicsSubscriptionGetString(subid)
     assert value == defaultValue
 
     status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
     assert grantedtime == 0.01
 
-    status, value = h.helicsSubscriptionGetString(subid, 100)
+    status, value = h.helicsSubscriptionGetString(subid)
     assert value == testValue
 
 def test_value_federate_runFederateTestVectorD(vFed):
