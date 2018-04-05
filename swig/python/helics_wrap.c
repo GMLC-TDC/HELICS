@@ -7876,8 +7876,22 @@ SWIGINTERN PyObject *_wrap_helicsEndpointSendMessageRaw(PyObject *SWIGUNUSEDPARM
   arg2 = (char *)(buf2);
   {
     if (PyUnicode_Check(obj2)) {
-      arg3=PyString_AsString(obj2);
-      arg4=PyString_Size(obj2);
+      int kind=PyUnicode_KIND(obj2);
+      arg3=PyUnicode_DATA(obj2);
+      switch(kind)
+      {
+      case PyUnicode_1BYTE_KIND:
+      default:
+        arg4=PyUnicode_GetLength(obj2);
+        break;
+      case PyUnicode_2BYTE_KIND:
+      case PyUnicode_WCHAR_KIND:
+        arg4=PyUnicode_GetLength(obj2)*2;
+        break;
+      case PyUnicode_4BYTE_KIND:
+        arg4=PyUnicode_GetLength(obj2)*4;
+        break;
+      }
     }
     else if (PyBytes_Check(obj2)) {
       arg3=PyBytes_AsString(obj2);
@@ -7933,8 +7947,22 @@ SWIGINTERN PyObject *_wrap_helicsEndpointSendEventRaw(PyObject *SWIGUNUSEDPARM(s
   arg2 = (char *)(buf2);
   {
     if (PyUnicode_Check(obj2)) {
-      arg3=PyString_AsString(obj2);
-      arg4=PyString_Size(obj2);
+      int kind=PyUnicode_KIND(obj2);
+      arg3=PyUnicode_DATA(obj2);
+      switch(kind)
+      {
+      case PyUnicode_1BYTE_KIND:
+      default:
+        arg4=PyUnicode_GetLength(obj2);
+        break;
+      case PyUnicode_2BYTE_KIND:
+      case PyUnicode_WCHAR_KIND:
+        arg4=PyUnicode_GetLength(obj2)*2;
+        break;
+      case PyUnicode_4BYTE_KIND:
+        arg4=PyUnicode_GetLength(obj2)*4;
+        break;
+      }
     }
     else if (PyBytes_Check(obj2)) {
       arg3=PyBytes_AsString(obj2);
