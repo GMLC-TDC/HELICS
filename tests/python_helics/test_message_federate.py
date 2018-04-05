@@ -99,7 +99,7 @@ def test_message_federate_endpoint_registration(mFed):
 
     data = "random-data"
 
-    status = h.helicsEndpointSendEventRaw(epid1, "ep2", data, 500)
+    status = h.helicsEndpointSendEventRaw(epid1, "ep2", data, len(data))
 
     status, granted_time = h.helicsFederateRequestTime(mFed, 1.0)
 
