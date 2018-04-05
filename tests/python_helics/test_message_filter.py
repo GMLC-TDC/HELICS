@@ -67,7 +67,9 @@ def AddFederate(broker, core_type="zmq", count=1, time_delta=1.0, name_prefix="f
 @pt.fixture()
 def broker():
     broker = AddBroker("zmq", 1)
-    return broker
+    yield broker
+    h.helicsBrokerDisconnect(broker)
+    h.helicsCloseLibrary()
 
 def test_broker_functions(broker):
 
