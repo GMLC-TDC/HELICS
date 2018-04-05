@@ -114,6 +114,12 @@ def test_message_filter_function(broker):
     # TODO: Fix segfaults on the next line
     # h.helicsEndpointSendMessageRaw(p1, "port2", data)
 
+    # TODO: Also segfaults
+    # print(h.helicsFederateRequestTimeAsync (mFed, 1.0))
+    # print(h.helicsFederateRequestTime(fFed, 1.0))
+    # print(h.helicsFederateRequestTimeComplete (mFed))
+
+
     # f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "filter2", "port2")
     # ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
     # f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "", "filter0/fout")
