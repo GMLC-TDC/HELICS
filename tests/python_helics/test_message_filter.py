@@ -20,11 +20,7 @@ def AddBroker(core_type="zmq", number_of_federates=1):
 
     return broker
 
-def AddFederate(broker, core_type="zmq", count=1, time_delta=1.0, name_prefix="fed"):
-
-    initstring = "--broker="
-    initstring = initstring + h.helicsBrokerGetIdentifier(broker)
-    initstring = initstring + " --broker_address" + h.helicsBrokerGetAddress(broker)
+def AddFederate(broker, core_type="zmq", count=1, deltat=1.0, name_prefix="fed"):
 
     # Create Federate Info object that describes the federate properties #
     fedinfo = h.helicsFederateInfoCreate()
@@ -51,18 +47,16 @@ def AddFederate(broker, core_type="zmq", count=1, time_delta=1.0, name_prefix="f
 
     mFed = h.helicsCreateMessageFederate(fedinfo)
 
-    yield mFed
+    return mFed
 
-    status = h.helicsFederateFinalize(mFed)
+def FreeFederate(fed):
+    status = h.helicsFederateFinalize(fed)
 
-    status, state = h.helicsFederateGetState(mFed)
+    status, state = h.helicsFederateGetState(fed)
     assert state == 3
 
-    while (h.helicsBrokerIsConnected(broker)):
-        time.sleep(1)
+    h.helicsFederateFree(fed)
 
-    h.helicsFederateFree(mFed)
-    h.helicsCloseLibrary()
 
 @pt.fixture()
 def broker():
@@ -81,5 +75,51 @@ def test_broker_functions(broker):
     status, address = h.helicsBrokerGetAddress(broker)
     assert status == 0
     initstring = initstring + address
+
+def test_message_filter_registration(broker):
+
+    fFed = AddFederate(broker, "zmq", 1, 1, "filter")
+    mFed = AddFederate(broker, "zmq", 1, 1, "message")
+
+    h.helicsFederateRegisterGlobalEndpoint(mFed, "port1", "")
+    h.helicsFederateRegisterGlobalEndpoint(mFed, "port2", None)
+
+    f1 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "filter1", "port1")
+    f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "filter2", "port2")
+    ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
+    f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "", "filter0/fout")
+
+    FreeFederate(fFed)
+    FreeFederate(mFed)
+
+def test_message_filter_function(broker):
+
+    fFed = AddFederate(broker, "zmq", 1, 1, "filter")
+    mFed = AddFederate(broker, "zmq", 1, 1, "message")
+
+    p1 = h.helicsFederateRegisterGlobalEndpoint(mFed, "port1", "")
+    p2 = h.helicsFederateRegisterGlobalEndpoint(mFed, "port2", "")
+
+    f1 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_delay_filter, "port1", "filter1")
+    h.helicsFilterSet(f1, "delay", 2.5)
+
+    h.helicsFederateEnterExecutionModeAsync(fFed)
+    h.helicsFederateEnterExecutionMode(mFed)
+    h.helicsFederateEnterExecutionModeComplete(fFed)
+
+    status, state = h.helicsFederateGetState(fFed)
+    assert state == 2
+
+    data = "hello world"
+    # TODO: Fix segfaults on the next line
+    # h.helicsEndpointSendMessageRaw(p1, "port2", data)
+
+    # f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "filter2", "port2")
+    # ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
+    # f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "", "filter0/fout")
+
+    FreeFederate(fFed)
+    FreeFederate(mFed)
+
 
 
