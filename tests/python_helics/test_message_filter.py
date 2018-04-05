@@ -18,6 +18,7 @@ def AddBroker(core_type="zmq", number_of_federates=1):
     if isconnected == 1:
         pass
 
+    return broker
 
 def AddFederate(broker, core_type="zmq", count=1, time_delta=1.0, name_prefix="fed"):
 
@@ -71,7 +72,12 @@ def broker():
 def test_broker_functions(broker):
 
     initstring = "--broker="
-    initstring = initstring + h.helicsBrokerGetIdentifier(broker)
-    initstring = initstring + " --broker_address" + h.helicsBrokerGetAddress(broker)
+    status, identifier = h.helicsBrokerGetIdentifier(broker)
+    assert status == 0
+    initstring = initstring + identifier
+    initstring = initstring + " --broker_address"
+    status, address = h.helicsBrokerGetAddress(broker)
+    assert status == 0
+    initstring = initstring + address
 
 
