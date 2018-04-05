@@ -131,8 +131,22 @@
 // typemap for raw data input
 %typemap(in) (const void *data, int inputDataLength) {
   if (PyUnicode_Check($input)) {
-    $1=PyString_AsString($input);
-	$2=PyString_Size($input);
+	int kind=PyUnicode_KIND($input);
+    $1=PyUnicode_DATA($input);
+	switch(kind)
+	{
+	case PyUnicode_1BYTE_KIND:
+	default:
+		$2=PyUnicode_GetLength($input);
+	break;
+	case PyUnicode_2BYTE_KIND:
+	case PyUnicode_WCHAR_KIND:
+		$2=PyUnicode_GetLength($input)*2;
+	break;
+	case PyUnicode_4BYTE_KIND:
+		$2=PyUnicode_GetLength($input)*4;
+	break;
+	}
   }
   else if (PyBytes_Check($input)) {
     $1=PyBytes_AsString($input);

@@ -88,14 +88,29 @@ helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char
         return helics_invalid_object;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    if ((dest == nullptr) || (std::string (dest).empty ()))
+    if ((data == nullptr) || (inputDataLength <= 0))
     {
-        endObj->endptr->send ((const char *)data, inputDataLength);
+        if ((dest == nullptr) || (std::string(dest).empty()))
+        {
+            endObj->endptr->send(std::string());
+        }
+        else
+        {
+            endObj->endptr->send(dest, std::string());
+        }
     }
     else
     {
-        endObj->endptr->send (dest, (const char *)data, inputDataLength);
+        if ((dest == nullptr) || (std::string(dest).empty()))
+        {
+            endObj->endptr->send((const char *)data, inputDataLength);
+        }
+        else
+        {
+            endObj->endptr->send(dest, (const char *)data, inputDataLength);
+        }
     }
+    
     return helics_ok;
 }
 
@@ -106,14 +121,29 @@ helics_status helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *
         return helics_invalid_object;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    if ((dest == nullptr) || (std::string (dest).empty ()))
+    if ((data == nullptr) || (inputDataLength <= 0))
     {
-        endObj->endptr->send ((const char *)data, inputDataLength, time);
+        if ((dest == nullptr) || (std::string(dest).empty()))
+        {
+            endObj->endptr->send(std::string(), time);
+        }
+        else
+        {
+            endObj->endptr->send(dest, std::string(), time);
+        }
     }
     else
     {
-        endObj->endptr->send (dest, (const char *)data, inputDataLength, time);
+        if ((dest == nullptr) || (std::string(dest).empty()))
+        {
+            endObj->endptr->send((const char *)data, inputDataLength, time);
+        }
+        else
+        {
+            endObj->endptr->send(dest, (const char *)data, inputDataLength, time);
+        }
     }
+    
     return helics_ok;
 }
 
