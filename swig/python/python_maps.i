@@ -130,7 +130,7 @@
 
 // typemap for raw data input
 %typemap(in) (const void *data, int inputDataLength) {
-  if (PyString_Check($input)) {
+  if (PyUnicode_Check($input)) {
     $1=PyString_AsString($input);
 	$2=PyString_Size($input);
   }
