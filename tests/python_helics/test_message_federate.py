@@ -99,23 +99,29 @@ def test_message_federate_endpoint_registration(mFed):
 
     data = "random-data"
 
-    status = h.helicsEndpointSendEventRaw(epid1, "ep2", data, len(data))
+    status = h.helicsEndpointSendEventRaw(epid1, "ep2", data, 1)
 
     status, granted_time = h.helicsFederateRequestTime(mFed, 1.0)
 
     assert granted_time == 1.0
 
-    res = h.helicsFederateHasMessage (mFed)
-    assert res == 0
+    res = h.helicsFederateHasMessage(mFed)
+    assert res == 1
 
-    res = h.helicsEndpointHasMessage (epid1)
+    res = h.helicsEndpointHasMessage(epid1)
     # TODO: Figure out why this is returning zero
-    assert res != 0
+    assert res == 0
 
     res = h.helicsEndpointHasMessage (epid2)
-    assert res == 0
+    assert res == 1
 
     # This causes a segfault
-    res = h.helicsEndpointGetMessage(epid2)
-    assert res == 0
+    message = h.helicsEndpointGetMessage(epid2)
+
+    assert message.data == 'random-data'
+    assert message.length == 11
+    assert message.original_dest == ''
+    assert message.original_source == 'TestA Federate/ep1'
+    assert message.source == 'TestA Federate/ep1'
+    assert message.time == 1.0
 
