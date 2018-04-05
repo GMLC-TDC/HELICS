@@ -118,5 +118,10 @@ def test_message_federate_endpoint_registration(mFed):
     # This causes a segfault
     message = h.helicsEndpointGetMessage(epid2)
 
-    assert message == 0
+    assert message.data == 'random-data'
+    assert message.length == 11
+    assert message.original_dest == ''
+    assert message.original_source == 'TestA Federate/ep1'
+    assert message.source == 'TestA Federate/ep1'
+    assert message.time == 1.0
 
