@@ -115,14 +115,8 @@
 }
 
 %typemap(argout) (double data[], int maxlen, int *actualSize) {
-  int i;
-  PyObject *o2=PyList_New(*$3);
-  for (i = 0; i < *$3; i++) {
-	PyObject *o_item=PyFloat_FromDouble($1[i]);
-      PyList_SetItem(o2, i, o_item);
-      }
 
-  $result = SWIG_Python_AppendOutput($result, o2);
+  if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize($1,*$3);
 }
 
 
