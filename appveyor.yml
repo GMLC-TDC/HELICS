@@ -46,5 +46,8 @@ test_script:
   - ctest -C Release --verbose --timeout 240 -I 0,0,0,4
   #- ctest -C Release --verbose --timeout 90 -I 0,0,0,7
 
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 artifacts:
 
