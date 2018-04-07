@@ -2207,23 +2207,40 @@ int _wrap_helicsCreateCoreFromArgs(int resc, mxArray *resv[], int argc, mxArray 
   arg2 = reinterpret_cast< char * >(buf2);
   {
     /* Check if is a list */
-    if (PyList_Check(argv[2])) {
-      int i;
-      arg3 = PyList_Size(argv[2]);
-      arg4 = (char **) malloc((arg3+1)*sizeof(char *));
-      for (i = 0; i < arg3; i++) {
-        PyObject *o = PyList_GetItem(argv[2],i);
-        if (PyString_Check(o))
-        arg4[i] = PyString_AsString(PyList_GetItem(argv[2],i));
-        else {
-          PyErr_SetString(PyExc_TypeError,"list must contain strings");
-          free(arg4);
-          return NULL;
+    if (mxIsCell(argv[2])) {
+      int ii;
+      int allocation2=0;
+      char *buffer_cell=NULL;
+      int cellSize=static_cast<int>(mxGetNumberOfElements(argv[2]));
+      arg4 = (char **) malloc((cellSize+1)*sizeof(char *));
+      for (ii=0;ii<cellSize;++ii)
+      {
+        mxArray *cellElement=mxGetCell(argv[2], ii);
+        int resCode = SWIG_AsCharPtrAndSize(cellElement, &buffer_cell, NULL, &allocation2);
+        if (!SWIG_IsOK(resCode)) {
+          SWIG_exception_fail(SWIG_ArgError(resCode), "cell elements must be a string");
         }
+        arg4[ii+1]=buffer_cell;
       }
-      arg4[i] = 0;
-    } else {
-      PyErr_SetString(PyExc_TypeError,"not a list");
+      
+    } 
+    else if (mxIsChar(argv[2]))
+    {
+      int retval=0;
+      char *buffer=NULL;
+      int allocation=0;
+      arg3=2;
+      arg4 = (char **) malloc(2*sizeof(char *));
+      retval = SWIG_AsCharPtrAndSize(argv[2], &buffer, NULL, &allocation);
+      if (!SWIG_IsOK(retval)) {
+        SWIG_exception_fail(SWIG_ArgError(retval), "conversion to string failed");
+      }
+      arg4[0]=buffer;
+      arg4[1]=buffer;
+    }
+    else
+    {
+      SWIG_exception_fail(SWIG_ArgError(3), "argument must be a cell array or string");
       return NULL;
     }
   }
@@ -2233,14 +2250,14 @@ int _wrap_helicsCreateCoreFromArgs(int resc, mxArray *resv[], int argc, mxArray 
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   {
-    free((char *) arg4);
+    free((char **) arg4);
   }
   return 0;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   {
-    free((char *) arg4);
+    free((char **) arg4);
   }
   return 1;
 }
@@ -2346,23 +2363,40 @@ int _wrap_helicsCreateBrokerFromArgs(int resc, mxArray *resv[], int argc, mxArra
   arg2 = reinterpret_cast< char * >(buf2);
   {
     /* Check if is a list */
-    if (PyList_Check(argv[2])) {
-      int i;
-      arg3 = PyList_Size(argv[2]);
-      arg4 = (char **) malloc((arg3+1)*sizeof(char *));
-      for (i = 0; i < arg3; i++) {
-        PyObject *o = PyList_GetItem(argv[2],i);
-        if (PyString_Check(o))
-        arg4[i] = PyString_AsString(PyList_GetItem(argv[2],i));
-        else {
-          PyErr_SetString(PyExc_TypeError,"list must contain strings");
-          free(arg4);
-          return NULL;
+    if (mxIsCell(argv[2])) {
+      int ii;
+      int allocation2=0;
+      char *buffer_cell=NULL;
+      int cellSize=static_cast<int>(mxGetNumberOfElements(argv[2]));
+      arg4 = (char **) malloc((cellSize+1)*sizeof(char *));
+      for (ii=0;ii<cellSize;++ii)
+      {
+        mxArray *cellElement=mxGetCell(argv[2], ii);
+        int resCode = SWIG_AsCharPtrAndSize(cellElement, &buffer_cell, NULL, &allocation2);
+        if (!SWIG_IsOK(resCode)) {
+          SWIG_exception_fail(SWIG_ArgError(resCode), "cell elements must be a string");
         }
+        arg4[ii+1]=buffer_cell;
       }
-      arg4[i] = 0;
-    } else {
-      PyErr_SetString(PyExc_TypeError,"not a list");
+      
+    } 
+    else if (mxIsChar(argv[2]))
+    {
+      int retval=0;
+      char *buffer=NULL;
+      int allocation=0;
+      arg3=2;
+      arg4 = (char **) malloc(2*sizeof(char *));
+      retval = SWIG_AsCharPtrAndSize(argv[2], &buffer, NULL, &allocation);
+      if (!SWIG_IsOK(retval)) {
+        SWIG_exception_fail(SWIG_ArgError(retval), "conversion to string failed");
+      }
+      arg4[0]=buffer;
+      arg4[1]=buffer;
+    }
+    else
+    {
+      SWIG_exception_fail(SWIG_ArgError(3), "argument must be a cell array or string");
       return NULL;
     }
   }
@@ -2372,14 +2406,14 @@ int _wrap_helicsCreateBrokerFromArgs(int resc, mxArray *resv[], int argc, mxArra
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   {
-    free((char *) arg4);
+    free((char **) arg4);
   }
   return 0;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   {
-    free((char *) arg4);
+    free((char **) arg4);
   }
   return 1;
 }
@@ -2900,23 +2934,40 @@ int _wrap_helicsFederateInfoLoadFromArgs(int resc, mxArray *resv[], int argc, mx
   }
   {
     /* Check if is a list */
-    if (PyList_Check(argv[1])) {
-      int i;
-      arg2 = PyList_Size(argv[1]);
-      arg3 = (char **) malloc((arg2+1)*sizeof(char *));
-      for (i = 0; i < arg2; i++) {
-        PyObject *o = PyList_GetItem(argv[1],i);
-        if (PyString_Check(o))
-        arg3[i] = PyString_AsString(PyList_GetItem(argv[1],i));
-        else {
-          PyErr_SetString(PyExc_TypeError,"list must contain strings");
-          free(arg3);
-          return NULL;
+    if (mxIsCell(argv[1])) {
+      int ii;
+      int allocation2=0;
+      char *buffer_cell=NULL;
+      int cellSize=static_cast<int>(mxGetNumberOfElements(argv[1]));
+      arg3 = (char **) malloc((cellSize+1)*sizeof(char *));
+      for (ii=0;ii<cellSize;++ii)
+      {
+        mxArray *cellElement=mxGetCell(argv[1], ii);
+        int resCode = SWIG_AsCharPtrAndSize(cellElement, &buffer_cell, NULL, &allocation2);
+        if (!SWIG_IsOK(resCode)) {
+          SWIG_exception_fail(SWIG_ArgError(resCode), "cell elements must be a string");
         }
+        arg3[ii+1]=buffer_cell;
       }
-      arg3[i] = 0;
-    } else {
-      PyErr_SetString(PyExc_TypeError,"not a list");
+      
+    } 
+    else if (mxIsChar(argv[1]))
+    {
+      int retval=0;
+      char *buffer=NULL;
+      int allocation=0;
+      arg2=2;
+      arg3 = (char **) malloc(2*sizeof(char *));
+      retval = SWIG_AsCharPtrAndSize(argv[1], &buffer, NULL, &allocation);
+      if (!SWIG_IsOK(retval)) {
+        SWIG_exception_fail(SWIG_ArgError(retval), "conversion to string failed");
+      }
+      arg3[0]=buffer;
+      arg3[1]=buffer;
+    }
+    else
+    {
+      SWIG_exception_fail(SWIG_ArgError(3), "argument must be a cell array or string");
       return NULL;
     }
   }
@@ -2924,12 +2975,12 @@ int _wrap_helicsFederateInfoLoadFromArgs(int resc, mxArray *resv[], int argc, mx
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   {
-    free((char *) arg3);
+    free((char **) arg3);
   }
   return 0;
 fail:
   {
-    free((char *) arg3);
+    free((char **) arg3);
   }
   return 1;
 }
@@ -5026,27 +5077,12 @@ int _wrap_helicsPublicationPublishVector(int resc, mxArray *resv[], int argc, mx
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishVector" "', argument " "1"" of type '" "helics_publication""'"); 
   }
   {
-    int i;
-    if (!PyList_Check(argv[1])) {
-      PyErr_SetString(PyExc_ValueError,"Expected a list");
+    if (!mxIsDouble(argv[1])) {
+      SWIG_exception_fail(SWIG_ArgError(3), "argument must be a double array");
       return NULL;
     }
-    arg3=PyList_Size(argv[1]);
-    arg2 = (double *) malloc(arg3*sizeof(double));
-    
-    for (i = 0; i < arg3; i++) {
-      PyObject *o = PyList_GetItem(argv[1],i);
-      if (PyFloat_Check(o)) {
-        arg2[i] = PyFloat_AsDouble(o);
-      }else if (PyInt_Check(o))
-      {
-        arg2[i] = (double)(PyInt_AsLong(o));
-      } else {
-        PyErr_SetString(PyExc_ValueError,"List elements must be numbers");
-        free(arg2);
-        return NULL;
-      }
-    }
+    arg3=static_cast<int>(mxGetNumberOfElements(argv[1]));
+    arg2=mxGetPr(argv[1]);
   }
   result = (helics_status)helicsPublicationPublishVector(arg1,(double const *)arg2,arg3);
   _out = SWIG_From_int(static_cast< int >(result));
@@ -5054,14 +5090,8 @@ int _wrap_helicsPublicationPublishVector(int resc, mxArray *resv[], int argc, mx
   {
     
   }
-  {
-    if (arg2) free(arg2);
-  }
   return 0;
 fail:
-  {
-    if (arg2) free(arg2);
-  }
   return 1;
 }
 
@@ -5333,7 +5363,9 @@ int _wrap_helicsSubscriptionGetVector(int resc, mxArray *resv[], int argc, mxArr
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize(arg2,*arg4);
+    mxArray *mat=mxCreateDoubleMatrix(*arg4,1,mxREAL);
+    mxSetPr(mat,arg2);
+    if (--resc>=0) *resv++ = mat;
   }
   {
     if (arg2) free(arg2);
@@ -5530,27 +5562,12 @@ int _wrap_helicsSubscriptionSetDefaultVector(int resc, mxArray *resv[], int argc
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultVector" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
   {
-    int i;
-    if (!PyList_Check(argv[1])) {
-      PyErr_SetString(PyExc_ValueError,"Expected a list");
+    if (!mxIsDouble(argv[1])) {
+      SWIG_exception_fail(SWIG_ArgError(3), "argument must be a double array");
       return NULL;
     }
-    arg3=PyList_Size(argv[1]);
-    arg2 = (double *) malloc(arg3*sizeof(double));
-    
-    for (i = 0; i < arg3; i++) {
-      PyObject *o = PyList_GetItem(argv[1],i);
-      if (PyFloat_Check(o)) {
-        arg2[i] = PyFloat_AsDouble(o);
-      }else if (PyInt_Check(o))
-      {
-        arg2[i] = (double)(PyInt_AsLong(o));
-      } else {
-        PyErr_SetString(PyExc_ValueError,"List elements must be numbers");
-        free(arg2);
-        return NULL;
-      }
-    }
+    arg3=static_cast<int>(mxGetNumberOfElements(argv[1]));
+    arg2=mxGetPr(argv[1]);
   }
   result = (helics_status)helicsSubscriptionSetDefaultVector(arg1,(double const *)arg2,arg3);
   _out = SWIG_From_int(static_cast< int >(result));
@@ -5558,14 +5575,8 @@ int _wrap_helicsSubscriptionSetDefaultVector(int resc, mxArray *resv[], int argc
   {
     
   }
-  {
-    if (arg2) free(arg2);
-  }
   return 0;
 fail:
-  {
-    if (arg2) free(arg2);
-  }
   return 1;
 }
 
@@ -6010,6 +6021,10 @@ int _wrap_helicsEndpointSendMessageRaw(int resc, mxArray *resv[], int argc, mxAr
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  size_t size3 = 0 ;
+  int alloc3 = 0 ;
   mxArray * _out;
   helics_status result;
   
@@ -6025,45 +6040,21 @@ int _wrap_helicsEndpointSendMessageRaw(int resc, mxArray *resv[], int argc, mxAr
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendMessageRaw" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  {
-    if (PyUnicode_Check(argv[2])) {
-      int kind=PyUnicode_KIND(argv[2]);
-      arg3=PyUnicode_DATA(argv[2]);
-      switch(kind)
-      {
-      case PyUnicode_1BYTE_KIND:
-      default:
-        arg4=PyUnicode_GetLength(argv[2]);
-        break;
-      case PyUnicode_2BYTE_KIND:
-      case PyUnicode_WCHAR_KIND:
-        arg4=PyUnicode_GetLength(argv[2])*2;
-        break;
-      case PyUnicode_4BYTE_KIND:
-        arg4=PyUnicode_GetLength(argv[2])*4;
-        break;
-      }
-    }
-    else if (PyBytes_Check(argv[2])) {
-      arg3=PyBytes_AsString(argv[2]);
-      arg4=PyBytes_Size(argv[2]);
-    }
-    else 
-    {
-      PyErr_SetString(PyExc_ValueError,"Expected a string or bytes");
-      return NULL;
-    }
-  }
+  res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, &size3, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSendMessageRaw" "', argument " "3"" of type '" "void const *""'");
+  }  
+  arg3 = reinterpret_cast< void * >(buf3);
+  arg4 = static_cast< int >(size3 - 1);
   result = (helics_status)helicsEndpointSendMessageRaw(arg1,(char const *)arg2,(void const *)arg3,arg4);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
-  {
-    
-  }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return 1;
 }
 
@@ -6078,6 +6069,10 @@ int _wrap_helicsEndpointSendEventRaw(int resc, mxArray *resv[], int argc, mxArra
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  size_t size3 = 0 ;
+  int alloc3 = 0 ;
   double val5 ;
   int ecode5 = 0 ;
   mxArray * _out;
@@ -6095,35 +6090,12 @@ int _wrap_helicsEndpointSendEventRaw(int resc, mxArray *resv[], int argc, mxArra
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendEventRaw" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  {
-    if (PyUnicode_Check(argv[2])) {
-      int kind=PyUnicode_KIND(argv[2]);
-      arg3=PyUnicode_DATA(argv[2]);
-      switch(kind)
-      {
-      case PyUnicode_1BYTE_KIND:
-      default:
-        arg4=PyUnicode_GetLength(argv[2]);
-        break;
-      case PyUnicode_2BYTE_KIND:
-      case PyUnicode_WCHAR_KIND:
-        arg4=PyUnicode_GetLength(argv[2])*2;
-        break;
-      case PyUnicode_4BYTE_KIND:
-        arg4=PyUnicode_GetLength(argv[2])*4;
-        break;
-      }
-    }
-    else if (PyBytes_Check(argv[2])) {
-      arg3=PyBytes_AsString(argv[2]);
-      arg4=PyBytes_Size(argv[2]);
-    }
-    else 
-    {
-      PyErr_SetString(PyExc_ValueError,"Expected a string or bytes");
-      return NULL;
-    }
-  }
+  res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, &size3, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSendEventRaw" "', argument " "3"" of type '" "void const *""'");
+  }  
+  arg3 = reinterpret_cast< void * >(buf3);
+  arg4 = static_cast< int >(size3 - 1);
   ecode5 = SWIG_AsVal_double(argv[3], &val5);
   if (!SWIG_IsOK(ecode5)) {
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "helicsEndpointSendEventRaw" "', argument " "5"" of type '" "helics_time_t""'");
@@ -6132,13 +6104,12 @@ int _wrap_helicsEndpointSendEventRaw(int resc, mxArray *resv[], int argc, mxArra
   result = (helics_status)helicsEndpointSendEventRaw(arg1,(char const *)arg2,(void const *)arg3,arg4,arg5);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
-  {
-    
-  }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return 1;
 }
 

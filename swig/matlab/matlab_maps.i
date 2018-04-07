@@ -36,62 +36,60 @@
 //typemap for the input arguments
 %typemap(in) (int argc, const char *const *argv) {
   /* Check if is a list */
-  if (PyList_Check($input)) {
-    int i;
-    $1 = PyList_Size($input);
-    $2 = (char **) malloc(($1+1)*sizeof(char *));
-    for (i = 0; i < $1; i++) {
-      PyObject *o = PyList_GetItem($input,i);
-      if (PyString_Check(o))
-	$2[i] = PyString_AsString(PyList_GetItem($input,i));
-      else {
-	PyErr_SetString(PyExc_TypeError,"list must contain strings");
-	free($2);
-	return NULL;
-      }
-    }
-    $2[i] = 0;
-  } else {
-    PyErr_SetString(PyExc_TypeError,"not a list");
+  if (mxIsCell($input)) {
+    int ii;
+	int allocation2=0;
+	char *buffer_cell=NULL;
+	int cellSize=static_cast<int>(mxGetNumberOfElements($input));
+	$2 = (char **) malloc((cellSize+1)*sizeof(char *));
+	for (ii=0;ii<cellSize;++ii)
+	{
+		mxArray *cellElement=mxGetCell($input, ii);
+		int resCode = SWIG_AsCharPtrAndSize(cellElement, &buffer_cell, NULL, &allocation2);
+		if (!SWIG_IsOK(resCode)) {
+			SWIG_exception_fail(SWIG_ArgError(resCode), "cell elements must be a string");
+		}
+		$2[ii+1]=buffer_cell;
+	}
+    
+  } 
+  else if (mxIsChar($input))
+  {
+  int retval=0;
+  char *buffer=NULL;
+  int allocation=0;
+	$1=2;
+	$2 = (char **) malloc(2*sizeof(char *));
+	retval = SWIG_AsCharPtrAndSize($input, &buffer, NULL, &allocation);
+  if (!SWIG_IsOK(retval)) {
+    SWIG_exception_fail(SWIG_ArgError(retval), "conversion to string failed");
+  }
+	$2[0]=buffer;
+	$2[1]=buffer;
+  }
+  else
+  {
+    SWIG_exception_fail(SWIG_ArgError(3), "argument must be a cell array or string");
     return NULL;
   }
 }
 
 %typemap(freearg) (int argc, const char *const *argv) {
-  free((char *) $2);
+  free((char **) $2);
 }
 
 // typemap for vector input functions
 %typemap(in) (const double *vectorInput, int vectorlength) {
-  int i;
-  if (!PyList_Check($input)) {
-    PyErr_SetString(PyExc_ValueError,"Expected a list");
+  if (!mxIsDouble($input)) {
+    SWIG_exception_fail(SWIG_ArgError(3), "argument must be a double array");
     return NULL;
   }
-  $2=PyList_Size($input);
-  $1 = (double *) malloc($2*sizeof(double));
-
-  for (i = 0; i < $2; i++) {
-    PyObject *o = PyList_GetItem($input,i);
-    if (PyFloat_Check(o)) {
-      $1[i] = PyFloat_AsDouble(o);
-	}else if (PyInt_Check(o))
-	{
-		$1[i] = (double)(PyInt_AsLong(o));
-	} else {
-      PyErr_SetString(PyExc_ValueError,"List elements must be numbers");
-      free($1);
-      return NULL;
-    }
-  }
+  $2=static_cast<int>(mxGetNumberOfElements($input));
+  $1=mxGetPr($input);
 }
 
 %typemap(argout) (const double *vectorInput, int vectorlength)
 {
-}
-
-%typemap(freearg) (const double *vectorInput, int vectorlength) {
-   if ($1) free($1);
 }
 
 // typemap for vector output functions
@@ -116,10 +114,13 @@
 
 %typemap(argout) (double data[], int maxlen, int *actualSize) {
 
-  if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize($1,*$3);
+	mxArray *mat=mxCreateDoubleMatrix(*$3,1,mxREAL);
+	mxSetPr(mat,$1);
+  if (--resc>=0) *resv++ = mat;
 }
 
-
+%apply (char *STRING, size_t LENGTH) { (const void *data, int inputDataLength) };
+/*
 // typemap for raw data input
 %typemap(in) (const void *data, int inputDataLength) {
   if (PyUnicode_Check($input)) {
@@ -147,13 +148,14 @@
   else 
   {
 	PyErr_SetString(PyExc_ValueError,"Expected a string or bytes");
-    return NULL;
-  }
+   return NULL;
+ }
 }
+*/
 
-%typemap(argout) (const void *data, int inputDataLength)
-{
-}
+//%typemap(argout) (const void *data, int inputDataLength)
+//{
+//}
 
 
 // typemap for raw data output function
