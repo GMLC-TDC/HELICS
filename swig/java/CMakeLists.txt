@@ -72,26 +72,6 @@ ADD_CUSTOM_COMMAND(
 	VERBATIM
 )
 
-ADD_CUSTOM_COMMAND(
-    TARGET "JNIhelics" POST_BUILD
-    COMMAND javac
-	ARGS -classpath ${CMAKE_CURRENT_BINARY_DIR}/buildjar/helics.jar -d ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/HelloWorld.java
-	COMMENT "Building HelloWorld.java"
-    VERBATIM
-)
-
-ADD_CUSTOM_COMMAND(
-    TARGET "JNIhelics" POST_BUILD
-    COMMAND javac
-	ARGS -classpath ${CMAKE_CURRENT_BINARY_DIR}/buildjar/helics.jar -d ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/ApplicationApiTest.java
-    COMMENT "Building ApplicationApiTest.java"
-    VERBATIM
-)
-
-ADD_TEST(NAME java_hello COMMAND java -Djava.library.path=${CMAKE_CURRENT_BINARY_DIR} -classpath ${CMAKE_CURRENT_BINARY_DIR}/buildjar/helics.jar:${CMAKE_CURRENT_BINARY_DIR} HelloWorld)
-
-ADD_TEST(NAME java_application_api_test COMMAND java -Djava.library.path=${CMAKE_CURRENT_BINARY_DIR} -classpath ${CMAKE_CURRENT_BINARY_DIR}/buildjar/helics.jar:${CMAKE_CURRENT_BINARY_DIR} ApplicationApiTest)
-
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/buildjar/helics.jar DESTINATION java COMPONENT java)
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/buildjar/helics-${HELICS_VERSION}.jar DESTINATION java COMPONENT java OPTIONAL)
 INSTALL(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION java COMPONENT java)
