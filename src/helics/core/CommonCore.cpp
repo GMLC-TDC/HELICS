@@ -1271,10 +1271,7 @@ handle_id_t CommonCore::registerCloningDestinationFilter(const std::string &filt
     {
         auto endhandle = ept->id;
         auto endid = ept->fed_id;
-        if (ept->hasDestFilter)
-        {
-            throw (RegistrationFailure("endpoint " + dest + " already has a destination filter"));
-        }
+       
         ept->hasDestFilter = true;
         lock.unlock();
         setActionFlag(m, processing_complete_flag);
@@ -1357,6 +1354,11 @@ FilterInfo *CommonCore::createDestFilter (federate_id_t dest,
     else
     {
         auto actualKey = key;
+        if (actualKey.empty())
+        {
+            actualKey = "dFilter_";
+            actualKey.append(std::to_string(handle));
+        }
         actualKey.push_back ('_');
         actualKey.append (std::to_string (filt->fed_id));
         filters.insert (actualKey, {filt->fed_id, filt->handle}, std::move (filt));
@@ -1369,13 +1371,17 @@ void CommonCore::registerFrequentCommunicationsPair (const std::string & /*sourc
     // std::lock_guard<std::mutex> lock (_mutex);
 }
 
-void CommonCore::addDependency (federate_id_t federateID, const std::string & /*federateName*/)
+void CommonCore::addDependency (federate_id_t federateID, const std::string &federateName)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (registerEndpoint)"));
     }
+    ActionMessage search(CMD_SEARCH_DEPENDENCY);
+    search.source_id = fed->global_id;
+    search.name = federateName;
+    addActionMessage(std::move(search));
 }
 
 void CommonCore::send (handle_id_t sourceHandle, const std::string &destination, const char *data, uint64_t length)
@@ -2121,6 +2127,25 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
 
         break;
+    case CMD_SEARCH_DEPENDENCY:
+    {
+        auto fed=getFederateCore(command.name);
+        if (fed != nullptr)
+        {
+            if (fed->global_id != invalid_fed_id)
+            {
+                ActionMessage dep(CMD_ADD_DEPENDENCY, fed->global_id, command.source_id);
+                routeMessage(dep);
+                dep=ActionMessage(CMD_ADD_DEPENDENT, command.source_id, fed->global_id);
+                routeMessage(dep);
+                break;
+            }
+           
+        }
+        //it is not found send to broker
+        transmit(0, command);
+    }
+        break;
     case CMD_ADD_DEPENDENCY:
     case CMD_REMOVE_DEPENDENCY:
     case CMD_ADD_DEPENDENT:
@@ -2466,8 +2491,29 @@ void CommonCore::processFilterInfo (ActionMessage &command)
     case CMD_REG_DST_FILTER:
     case CMD_NOTIFY_DST_FILTER:
     {
-        if ((filterInfo->destFilter == nullptr) || (filterInfo->destFilter->fed_id != command.source_id) ||
-            (filterInfo->destFilter->handle != command.source_handle))
+        bool FilterAlreadyPresent = false;
+        if (filterInfo->destFilter != nullptr)
+        {
+            if ((filterInfo->destFilter->fed_id == command.source_id) && (filterInfo->destFilter->handle == command.source_handle))
+            {
+                FilterAlreadyPresent = true;
+                break;
+            }
+        }
+        if (!FilterAlreadyPresent)
+        {
+            for (auto &filt : filterInfo->cloningDestFilters)
+            {
+                if ((filt->fed_id == command.source_id) && (filt->handle == command.source_handle))
+                {
+                    FilterAlreadyPresent = true;
+                    break;
+                }
+            }
+        }
+       
+
+        if (!FilterAlreadyPresent)
         {
             auto filter = filters.find (fed_handle_pair (command.source_id, command.source_handle));
             if (filter == nullptr)
@@ -2477,7 +2523,16 @@ void CommonCore::processFilterInfo (ActionMessage &command)
             }
 
             filterInfo->hasDestFilters = true;
-            filterInfo->destFilter = filter;
+            if (checkActionFlag(command, clone_flag))
+            {
+                filter->cloning = true;
+                filterInfo->cloningDestFilters.push_back(filter);
+            }
+            else
+            {
+                filterInfo->destFilter = filter;
+            }
+            
         }
 
         break;
@@ -2502,6 +2557,10 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                 newFilter =
                   createSourceFilter (command.source_id, command.source_handle, command.name,
                                       command.info ().target, command.info ().type, command.info ().type_out);
+                if (checkActionFlag(command, clone_flag))
+                {
+                    newFilter->cloning = true;
+                }
             }
             std::lock_guard<std::mutex> hlock(_handlemutex);
             filterInfo->allSourceFilters.push_back (newFilter);

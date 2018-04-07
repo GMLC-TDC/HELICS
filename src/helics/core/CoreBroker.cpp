@@ -465,31 +465,13 @@ void CoreBroker::processCommand (ActionMessage &&command)
         {
             if (_isRoot)
             {
-                checkSubscriptions ();
-                checkEndpoints ();
-                checkFilters ();
-                checkDependencies ();
-                ActionMessage m (CMD_INIT_GRANT);
-                brokerState = broker_state_t::operating;
-                for (auto &broker : _brokers)
-                {
-                    if (!broker._nonLocal)
-                    {
-                        transmit(broker.route_id, m);
-                    }
-                }
-                timeCoord->enteringExecMode ();
-                auto res = timeCoord->checkExecEntry ();
-                if (res == iteration_state::next_step)
-                {
-                    enteredExecutionMode = true;
-                }
+                executeInitializationOperations();
             }
             else
             {
                 checkDependencies();
                 command.source_id = global_broker_id;
-                transmit (0, command);
+                transmit(0, command);
             }
         }
     }
@@ -523,6 +505,30 @@ void CoreBroker::processCommand (ActionMessage &&command)
             }
         }
         break;
+    case CMD_SEARCH_DEPENDENCY:
+    {
+        auto fed = _federates.find(command.name);
+        if (fed != _federates.end())
+        {
+            if (fed->global_id != invalid_fed_id)
+            {
+                ActionMessage dep(CMD_ADD_DEPENDENCY, fed->global_id, command.source_id);
+                routeMessage(dep);
+                dep=ActionMessage (CMD_ADD_DEPENDENT,  command.source_id,fed->global_id );
+                routeMessage(dep);
+                break;
+            }
+        }
+        if (isRoot())
+        {
+            delayedDependencies.emplace_back(command.name, command.source_id);
+        }
+        else
+        {
+            routeMessage(command);
+        }
+        break;
+    }
     case CMD_DISCONNECT_NAME:
         if (command.dest_id == 0)
         {
@@ -1035,6 +1041,29 @@ void CoreBroker::routeMessage (const ActionMessage &cmd)
     }
 }
 
+void CoreBroker::executeInitializationOperations()
+{
+        checkSubscriptions();
+        checkEndpoints();
+        checkFilters();
+        checkDependencies();
+        ActionMessage m(CMD_INIT_GRANT);
+        brokerState = broker_state_t::operating;
+        for (auto &broker : _brokers)
+        {
+            if (!broker._nonLocal)
+            {
+                transmit(broker.route_id, m);
+            }
+        }
+        timeCoord->enteringExecMode();
+        auto res = timeCoord->checkExecEntry();
+        if (res == iteration_state::next_step)
+        {
+            enteredExecutionMode = true;
+        }
+}
+
 bool CoreBroker::FindandNotifySubscriptionPublisher (BasicHandleInfo &handleInfo)
 {
     if (!handleInfo.processed)
@@ -1400,6 +1429,25 @@ void CoreBroker::checkDependencies ()
 {
     if (_isRoot)
     {
+        for (const auto &newdep : delayedDependencies)
+        {
+            auto depfed = _federates.find(newdep.first);
+            if (depfed != _federates.end())
+            {
+                ActionMessage addDep(CMD_ADD_DEPENDENCY,  newdep.second, depfed->global_id);
+                routeMessage(addDep);
+                addDep=ActionMessage(CMD_ADD_DEPENDENT,   depfed->global_id, newdep.second);
+                routeMessage(addDep);
+            }
+            else
+            {
+                ActionMessage logWarning(CMD_LOG, 0, newdep.second);
+                logWarning.index = warning;
+                logWarning.payload = "unable to locate " + newdep.first + " to establish dependency";
+                routeMessage(logWarning);
+            }
+        }
+
         if (timeCoord->getDependents ().size () == 1)
         {  // if there is just one dependency remove it
             auto depid = timeCoord->getDependents ()[0];

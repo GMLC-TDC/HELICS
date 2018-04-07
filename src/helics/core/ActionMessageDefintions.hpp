@@ -76,6 +76,7 @@ enum class action_t : int32_t
     cmd_invalid = 1010101,  //!< indicates that command has generated an invalid state
     cmd_send_route = 75,  //!< command to define a route information
     cmd_subscriber = 85,  // !< command to send a subscriber
+    cmd_search_dependency=134, //!< command to add a dependency by name
     cmd_add_dependency = 140,  //!< command to send a federate dependency information
     cmd_remove_dependency = 141,  //!< command to remove a dependency
     cmd_add_dependent = 144,  //!< command to add a dependent to a federate
@@ -165,6 +166,7 @@ enum class action_t : int32_t
 #define CMD_NOTIFY_SRC_FILTER action_message_def::action_t::cmd_notify_src_filter
 #define CMD_UPDATE_FILTER_OP action_message_def::action_t::cmd_update_filter_op
 
+#define CMD_SEARCH_DEPENDENCY action_message_def::action_t::cmd_search_dependency
 #define CMD_ADD_DEPENDENCY action_message_def::action_t::cmd_add_dependency
 #define CMD_REMOVE_DEPENDENCY action_message_def::action_t::cmd_remove_dependency
 #define CMD_ADD_DEPENDENT action_message_def::action_t::cmd_add_dependent
