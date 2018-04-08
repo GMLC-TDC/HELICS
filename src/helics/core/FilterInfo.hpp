@@ -39,7 +39,7 @@ class FilterInfo
     const std::string outputType;  //!< the outputType of data of the filter
     const bool dest_filter = false;  //! indicator that the filter is a destination filter
     bool cloning = false;  //!< indicator that the filter is a cloning filter
-    // there is a 7 byte gap here
+    // there is a 6 byte gap here
     std::shared_ptr<FilterOperator> filterOp;  //!< the callback operation of the filter
 
     std::pair<Core::federate_id_t, Core::handle_id_t> target{

@@ -333,7 +333,7 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     BOOST_CHECK (state == helics_finalize_state);
 }
 
-/*
+
 BOOST_AUTO_TEST_CASE (message_multi_clone_test)
 {
     auto broker = AddBroker ("test", 4);
@@ -440,7 +440,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     CE (helicsFederateGetState (sFed, &state));
     BOOST_CHECK (state == helics_finalize_state);
 }
-*/
+
 BOOST_AUTO_TEST_CASE (test_file_load)
 {
     std::string filename = std::string(TEST_DIR) + "/test_files/example_filters.json";

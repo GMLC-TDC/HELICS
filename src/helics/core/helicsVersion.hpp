@@ -15,7 +15,7 @@ namespace helics
 {
 
 /** @returns a string containing version information*/
-constexpr char * versionString = HELICS_VERSION_STRING;
+constexpr auto versionString = HELICS_VERSION_STRING;
 
 /** get the Major version number*/
 constexpr int versionMajor=HELICS_VERSION_MAJOR;
