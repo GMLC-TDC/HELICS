@@ -29,6 +29,9 @@ build:
   verbosity: minimal
 
 after_build:
+  - cd build
+  - cpack
+  - cd ..
 
 test_script:
   - cd build
@@ -45,6 +48,7 @@ test_script:
   - ctest -C Release --verbose --timeout 90 -I 0,0,0,2
   - ctest -C Release --verbose --timeout 240 -I 0,0,0,4
   #- ctest -C Release --verbose --timeout 90 -I 0,0,0,7
+  - cd ..
 
 artifacts:
-
+  - path: build/Helics-1.0.0-beta.2-win64.exe
