@@ -290,7 +290,7 @@ void CommonCore::finalize (federate_id_t federateID)
     ActionMessage bye (CMD_DISCONNECT);
     bye.source_id = fed->global_id;
     bye.dest_id = fed->global_id;
-    addActionMessage(bye);
+    addActionMessage (bye);
     iteration_result ret = iteration_result::next_step;
     while (ret != iteration_result::halted)
     {
@@ -300,7 +300,6 @@ void CommonCore::finalize (federate_id_t federateID)
             break;
         }
     }
-    
 }
 
 bool CommonCore::allInitReady () const
@@ -327,7 +326,6 @@ bool CommonCore::allDisconnected () const
         return (HELICS_FINISHED == state) || (HELICS_ERROR == state);
     };
     return std::all_of (loopFederates.begin (), loopFederates.end (), pred);
-    
 }
 
 void CommonCore::setCoreReadyToInit ()
@@ -942,11 +940,11 @@ void CommonCore::setValue (handle_id_t handle, const char *data, uint64_t len)
         ActionMessage mv (CMD_PUB);
         mv.source_id = handleInfo->fed_id;
         mv.source_handle = handle;
-        mv.counter = static_cast<uint16_t>(fed->getCurrentIteration());
+        mv.counter = static_cast<uint16_t> (fed->getCurrentIteration ());
         mv.payload = std::string (data, len);
         mv.actionTime = fed->nextAllowedSendTime ();
 
-        actionQueue.push (std::move(mv));
+        actionQueue.push (std::move (mv));
     }
 }
 
@@ -1086,6 +1084,74 @@ handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
     return id;
 }
 
+handle_id_t CommonCore::registerCloningSourceFilter (const std::string &filterName,
+                                                     const std::string &source,
+                                                     const std::string &type_in,
+                                                     const std::string &type_out)
+{
+    if (brokerState == operating)
+    {
+        throw (InvalidFunctionCall ("Core has already entered initialization state"));
+    }
+    // check to make sure the name isn't already used
+    if (!filterName.empty ())
+    {
+        std::lock_guard<std::mutex> lock (_handlemutex);
+        auto handle = handles.getFilter (filterName);
+        if (handle != nullptr)
+        {
+            throw (InvalidIdentifier ("there already exists a filter with this name"));
+        }
+    }
+
+    auto handle =
+      createBasicHandle (global_broker_id, 0, HANDLE_SOURCE_FILTER, filterName, source, type_in, type_out);
+
+    auto id = handle->id;
+    handle->cloning = true;
+    auto filtInfo = createSourceFilter (global_broker_id, id, handle->key, source, type_in, type_out);
+
+    {
+        std::lock_guard<std::mutex> lock(_handlemutex);
+        filtInfo->cloning = true;
+    }
+
+    ActionMessage m (CMD_REG_SRC_FILTER);
+    m.source_id = global_broker_id;
+    m.source_handle = id;
+    m.name = filtInfo->key;
+    setActionFlag (m, clone_flag);
+    m.info ().target = source;
+    m.info ().type = type_in;
+    m.info ().type_out = type_out;
+
+    std::unique_lock<std::mutex> lock (_handlemutex);
+
+    auto ept = handles.getEndpoint (source);
+    if (ept != nullptr)
+    {
+        auto endhandle = ept->id;
+        auto endid = ept->fed_id;
+        ept->hasSourceFilter = true;
+        lock.unlock ();
+        setActionFlag (m, processing_complete_flag);
+        // send to broker and core
+        addActionMessage (m);
+        // now send the same command to the endpoint
+        m.dest_handle = endhandle;
+        m.dest_id = endid;
+        // send to
+        addActionMessage (m);
+    }
+    else
+    {
+        lock.unlock ();
+        //
+        addActionMessage (m);
+    }
+    return id;
+}
+
 handle_id_t CommonCore::getSourceFilter (const std::string &name) const
 {
     std::lock_guard<std::mutex> lock (_handlemutex);
@@ -1163,6 +1229,74 @@ handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName
     return id;
 }
 
+handle_id_t CommonCore::registerCloningDestinationFilter (const std::string &filterName,
+                                                          const std::string &dest,
+                                                          const std::string &type_in,
+                                                          const std::string &type_out)
+{
+    if (brokerState == operating)
+    {
+        throw (InvalidFunctionCall ("Core has already entered initialization state"));
+    }
+
+    // check to make sure the name isn't already used
+    if (!filterName.empty ())
+    {
+        std::lock_guard<std::mutex> lock (_handlemutex);
+        auto handle = handles.getFilter (filterName);
+        if (handle != nullptr)
+        {
+            throw (InvalidIdentifier ("there already exists a filter with this name"));
+        }
+    }
+
+    auto handle = createBasicHandle (global_broker_id, 0, HANDLE_DEST_FILTER, filterName, dest, type_in, type_out);
+
+    handle->cloning = true;
+    auto id = handle->id;
+
+    auto filtInfo = createDestFilter (global_broker_id, id, handle->key, dest, type_in, type_out);
+    { //this is just to keep a scope around the lock
+        std::lock_guard<std::mutex> lock(_handlemutex);
+        filtInfo->cloning = true;
+    }
+    ActionMessage m (CMD_REG_DST_FILTER);
+    m.source_id = global_broker_id;
+    m.source_handle = id;
+    m.name = filtInfo->key;
+    setActionFlag (m, clone_flag);
+    m.info ().target = dest;
+    m.info ().type = type_in;
+    m.info ().type_out = type_out;
+
+    std::unique_lock<std::mutex> lock (_handlemutex);
+
+    auto ept = handles.getEndpoint (dest);
+    if (ept != nullptr)
+    {
+        auto endhandle = ept->id;
+        auto endid = ept->fed_id;
+
+        ept->hasDestFilter = true;
+        lock.unlock ();
+        setActionFlag (m, processing_complete_flag);
+        // send to broker and core
+        addActionMessage (m);
+        // now send the same command to the endpoint
+        m.dest_handle = endhandle;
+        m.dest_id = endid;
+        // send to
+        addActionMessage (std::move (m));
+    }
+    else
+    {
+        lock.unlock ();
+        //
+        addActionMessage (std::move (m));
+    }
+    return id;
+}
+
 handle_id_t CommonCore::getDestinationFilter (const std::string &name) const
 {
     std::lock_guard<std::mutex> lock (_handlemutex);
@@ -1185,19 +1319,19 @@ FilterInfo *CommonCore::createSourceFilter (federate_id_t dest,
                                               type_in, type_out, false);
 
     auto retTarget = filt.get ();
+    auto actualKey = key;
+    if (actualKey.empty())
+    {
+        actualKey = "sFilter_";
+        actualKey.append(std::to_string(handle));
+    }
     std::lock_guard<std::mutex> lock (_handlemutex);
     if (filt->fed_id == global_broker_id)
     {
-        filters.insert (filt->key, {filt->fed_id, filt->handle}, std::move (filt));
+        filters.insert (actualKey, {filt->fed_id, filt->handle}, std::move (filt));
     }
     else
     {
-        auto actualKey = key;
-        if (actualKey.empty ())
-        {
-            actualKey = "sFilter_";
-            actualKey.append (std::to_string (handle));
-        }
         actualKey.push_back ('_');
         actualKey.append (std::to_string (filt->fed_id));
         filters.insert (actualKey, {filt->fed_id, filt->handle}, std::move (filt));
@@ -1216,15 +1350,19 @@ FilterInfo *CommonCore::createDestFilter (federate_id_t dest,
     auto filt = std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle, key, target,
                                               type_in, type_out, true);
     auto retTarget = filt.get ();
-
+    auto actualKey = key;
+    if (actualKey.empty())
+    {
+        actualKey = "dFilter_";
+        actualKey.append(std::to_string(handle));
+    }
     std::lock_guard<std::mutex> lock (_handlemutex);
     if (filt->fed_id == global_broker_id)
     {
-        filters.insert (filt->key, {filt->fed_id, filt->handle}, std::move (filt));
+        filters.insert (actualKey, {filt->fed_id, filt->handle}, std::move (filt));
     }
     else
     {
-        auto actualKey = key;
         actualKey.push_back ('_');
         actualKey.append (std::to_string (filt->fed_id));
         filters.insert (actualKey, {filt->fed_id, filt->handle}, std::move (filt));
@@ -1237,13 +1375,17 @@ void CommonCore::registerFrequentCommunicationsPair (const std::string & /*sourc
     // std::lock_guard<std::mutex> lock (_mutex);
 }
 
-void CommonCore::addDependency (federate_id_t federateID, const std::string & /*federateName*/)
+void CommonCore::addDependency (federate_id_t federateID, const std::string &federateName)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (registerEndpoint)"));
     }
+    ActionMessage search (CMD_SEARCH_DEPENDENCY);
+    search.source_id = fed->global_id;
+    search.name = federateName;
+    addActionMessage (std::move (search));
 }
 
 void CommonCore::send (handle_id_t sourceHandle, const std::string &destination, const char *data, uint64_t length)
@@ -1270,7 +1412,7 @@ void CommonCore::send (handle_id_t sourceHandle, const std::string &destination,
     m.payload = std::string (data, length);
     m.info ().target = destination;
     m.actionTime = fed->nextAllowedSendTime ();
-    addActionMessage (std::move(m));
+    addActionMessage (std::move (m));
 }
 
 void CommonCore::sendEvent (Time time,
@@ -1291,14 +1433,14 @@ void CommonCore::sendEvent (Time time,
     ActionMessage m (CMD_SEND_MESSAGE);
     m.source_handle = sourceHandle;
     m.source_id = hndl->fed_id;
-    auto minTime = getFederateAt(hndl->local_fed_id)->nextAllowedSendTime();
-    m.actionTime = std::max(time, minTime);
+    auto minTime = getFederateAt (hndl->local_fed_id)->nextAllowedSendTime ();
+    m.actionTime = std::max (time, minTime);
     m.payload = std::string (data, length);
     m.info ().orig_source = hndl->key;
     m.info ().source = hndl->key;
     m.info ().target = destination;
     m.info ().messageID = ++messageCounter;
-    addActionMessage (std::move(m));
+    addActionMessage (std::move (m));
 }
 
 void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message> message)
@@ -1308,7 +1450,7 @@ void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message>
         ActionMessage m (std::move (message));
         m.source_id = global_broker_id;
         m.source_handle = sourceHandle;
-        addActionMessage (std::move(m));
+        addActionMessage (std::move (m));
         return;
     }
     auto hndl = getHandleInfo (sourceHandle);
@@ -1329,12 +1471,12 @@ void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message>
     {
         m.info ().messageID = ++messageCounter;
     }
-    auto minTime = getFederateAt(hndl->local_fed_id)->nextAllowedSendTime();
+    auto minTime = getFederateAt (hndl->local_fed_id)->nextAllowedSendTime ();
     if (m.actionTime < minTime)
     {
         m.actionTime = minTime;
     }
-    addActionMessage (std::move(m));
+    addActionMessage (std::move (m));
 }
 
 void CommonCore::deliverMessage (ActionMessage &message)
@@ -1359,19 +1501,72 @@ void CommonCore::deliverMessage (ActionMessage &message)
             }
             return;
         }
-        if (localP->hasDestFilter)  // the endpoint has a destination filter
+        // now we deal with local processing
+        if (localP->hasDestFilter)
         {
             auto ffunc = getFilterCoordinator (localP->id);
-
-            auto tempMessage = createMessageFromCommand (std::move (message));
-            if (ffunc->destFilter->filterOp)
+            if (ffunc->destFilter != nullptr)
             {
-                auto nmessage = ffunc->destFilter->filterOp->process (std::move (tempMessage));
-                message.moveInfo (std::move (nmessage));
+                if (ffunc->destFilter->fed_id != global_broker_id)
+                { //now we have deal with non-local processing destination filter
+                    //first block the federate time advancement until the return is received
+                    ActionMessage tblock(CMD_TIME_BLOCK, global_broker_id, localP->fed_id);
+                    auto mid= ++messageCounter;
+                    tblock.index = mid;
+                    auto fed = getFederateCore(localP->fed_id);
+                    fed->addAction(tblock);
+                    //now send a message to get filtered
+                    message.setAction(CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
+                    message.info().messageID = mid;
+                    message.source_id = localP->fed_id;
+                    message.source_handle = localP->id;
+                    message.dest_id = ffunc->destFilter->fed_id;
+                    message.dest_handle = ffunc->destFilter->handle;
+                    ongoingDestFilterProcesses[localP->fed_id].emplace(mid);
+                    routeMessage(std::move(message));
+                    return;
+                    
+                }
+                else
+                {
+                    //the filter is part of this core
+                    auto tempMessage = createMessageFromCommand (std::move (message));
+                    if (ffunc->destFilter->filterOp)
+                    {
+                        auto nmessage = ffunc->destFilter->filterOp->process (std::move (tempMessage));
+                        message.moveInfo (std::move (nmessage));
+                    }
+                    else
+                    {
+                        message.moveInfo (std::move (tempMessage));
+                    }
+                }
             }
-            else
+            //now go to the cloning filters
+            for (auto &clFilter : ffunc->cloningDestFilters)
             {
-                message.moveInfo (std::move (tempMessage));
+                if (clFilter->fed_id == global_broker_id)
+                {
+                    auto FiltI = filters.find (fed_handle_pair (global_broker_id, clFilter->handle));
+                    if (FiltI != nullptr)
+                    {
+                        if (FiltI->filterOp != nullptr)
+                        {
+                            if (FiltI->cloning)
+                            {
+                                FiltI->filterOp->process (createMessageFromCommand (message));
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    ActionMessage clone (message);
+                    clone.setAction (CMD_SEND_FOR_FILTER);
+                    clone.dest_id = clFilter->fed_id;
+                    clone.dest_handle = clFilter->handle;
+                    routeMessage (clone);
+                }
             }
         }
         message.dest_id = localP->fed_id;
@@ -1385,8 +1580,11 @@ void CommonCore::deliverMessage (ActionMessage &message)
     break;
     case CMD_SEND_FOR_FILTER:
     case CMD_SEND_FOR_FILTER_AND_RETURN:
+    case CMD_SEND_FOR_DEST_FILTER_AND_RETURN:
     case CMD_FILTER_RESULT:
+    case CMD_DEST_FILTER_RESULT:
     case CMD_NULL_MESSAGE:
+    case CMD_NULL_DEST_MESSAGE:
     default:
     {
         auto route = getRoute (message.dest_id);
@@ -1685,9 +1883,9 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     }
         if (global_broker_id != 0)
         {
-            //forward on to Broker
+            // forward on to Broker
             command.source_id = global_broker_id;
-            transmit (0,command);
+            transmit (0, command);
         }
         else
         {
@@ -1698,7 +1896,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     case CMD_REG_BROKER:
         // These really shouldn't happen here probably means something went wrong in setup but we can handle it
         // forward the connection request to the higher level
-        LOG_WARNING(0, identifier, "Core received reg broker message, likely improper federation setup\n");
+        LOG_WARNING (0, identifier, "Core received reg broker message, likely improper federation setup\n");
         transmit (0, command);
         break;
     case CMD_BROKER_ACK:
@@ -1721,16 +1919,17 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         auto fed = getFederateCore (command.name);
         if (fed != nullptr)
         {
-            if (checkActionFlag(command, error_flag))
+            if (checkActionFlag (command, error_flag))
             {
-                LOG_ERROR(0, identifier, std::string("broker responded with error for registration of ")+command.name+"\n");
+                LOG_ERROR (0, identifier,
+                           std::string ("broker responded with error for registration of ") + command.name + "\n");
             }
             else
             {
                 fed->global_id = command.dest_id;
-                loopFederates.addSearchTerm(command.dest_id, command.name);
+                loopFederates.addSearchTerm (command.dest_id, command.name);
             }
-           
+
             // push the command to the local queue
             fed->addAction (command);
         }
@@ -1989,6 +2188,24 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
 
         break;
+    case CMD_SEARCH_DEPENDENCY:
+    {
+        auto fed = getFederateCore (command.name);
+        if (fed != nullptr)
+        {
+            if (fed->global_id != invalid_fed_id)
+            {
+                ActionMessage dep (CMD_ADD_DEPENDENCY, fed->global_id, command.source_id);
+                routeMessage (dep);
+                dep = ActionMessage (CMD_ADD_DEPENDENT, command.source_id, fed->global_id);
+                routeMessage (dep);
+                break;
+            }
+        }
+        // it is not found send to broker
+        transmit (0, command);
+    }
+    break;
     case CMD_ADD_DEPENDENCY:
     case CMD_REMOVE_DEPENDENCY:
     case CMD_ADD_DEPENDENT:
@@ -1999,11 +2216,16 @@ void CommonCore::processCommand (ActionMessage &&command)
         break;
     case CMD_SEND_FOR_FILTER:
     case CMD_SEND_FOR_FILTER_AND_RETURN:
+    case CMD_SEND_FOR_DEST_FILTER_AND_RETURN:
         processMessageFilter (command);
         break;
     case CMD_NULL_MESSAGE:
     case CMD_FILTER_RESULT:
-        processFilterReturn (command);
+        processFilterReturn(command);
+        break;
+    case CMD_DEST_FILTER_RESULT:
+    case CMD_NULL_DEST_MESSAGE:
+        processDestFilterReturn(command);
         break;
     case CMD_PUB:
         // route the message to all the subscribers
@@ -2197,40 +2419,30 @@ void CommonCore::processCommand (ActionMessage &&command)
             endhandle->hasSourceFilter = true;
         }
 
-        auto fed = getFederateCore (command.dest_id);
-        if (fed != nullptr)
-        {
-            fed->addAction (command);
-        }
         processFilterInfo (command);
+        if (command.source_id != global_broker_id)
+        {
+            auto fed = getFederateCore (command.dest_id);
+            if (fed != nullptr)
+            {
+                command.setAction (CMD_ADD_DEPENDENT);
+                fed->addAction (command);
+            }
+        }
     }
     break;
     case CMD_NOTIFY_DST_FILTER:
     {
-        auto endhandle = getHandleInfo (command.dest_handle);
-        if (endhandle != nullptr)
-        {
-            if (!endhandle->hasDestFilter)
-            {
-                endhandle->hasDestFilter = true;
-            }
-            else
-            {
-                ActionMessage err (CMD_ERROR);
-                err.source_id = command.dest_id;
-                err.source_handle = command.dest_handle;
-                err.payload = "Endpoint " + endhandle->key + " already has a destination filter";
-                transmit (0, err);
-                break;
-            }
-        }
-
-        auto fed = getFederateCore (command.dest_id);
-        if (fed != nullptr)
-        {
-            fed->addAction (command);
-        }
         processFilterInfo (command);
+        if (command.source_id != global_broker_id)
+        {
+            auto fed = getFederateCore (command.dest_id);
+            if (fed != nullptr)
+            {
+                command.setAction (CMD_ADD_DEPENDENT);
+                fed->addAction (command);
+            }
+        }
     }
     break;
     case CMD_CORE_CONFIGURE:
@@ -2287,7 +2499,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         broker_state_t exp = initializing;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::operating))
         {  // forward the grant to all federates
-            organizeFilterOperations();
+            organizeFilterOperations ();
             for (auto &fed : loopFederates)
             {
                 fed->addAction (command);
@@ -2334,9 +2546,46 @@ void CommonCore::processFilterInfo (ActionMessage &command)
     case CMD_REG_DST_FILTER:
     case CMD_NOTIFY_DST_FILTER:
     {
-        if ((filterInfo->destFilter == nullptr) || (filterInfo->destFilter->fed_id != command.source_id) ||
-            (filterInfo->destFilter->handle != command.source_handle))
+        bool FilterAlreadyPresent = false;
+        if (filterInfo->destFilter != nullptr)
         {
+            if ((filterInfo->destFilter->fed_id == command.source_id) &&
+                (filterInfo->destFilter->handle == command.source_handle))
+            {
+                FilterAlreadyPresent = true;
+                break;
+            }
+        }
+        if (!FilterAlreadyPresent)
+        {
+            for (auto &filt : filterInfo->cloningDestFilters)
+            {
+                if ((filt->fed_id == command.source_id) && (filt->handle == command.source_handle))
+                {
+                    FilterAlreadyPresent = true;
+                    break;
+                }
+            }
+        }
+
+        if (!FilterAlreadyPresent)
+        {
+            auto endhandle = getHandleInfo(command.dest_handle);
+            if (endhandle != nullptr)
+            {
+                endhandle->hasDestFilter = true;
+                if ((!checkActionFlag(command, clone_flag)) && (filterInfo->hasDestFilters))
+                {
+                    //duplicate non cloning destination filters are not allowed
+                    ActionMessage err(CMD_ERROR);
+                    err.dest_id = command.source_id;
+                    err.source_id = command.dest_id;
+                    err.source_handle = command.dest_handle;
+                    err.payload = "Endpoint " + endhandle->key + " already has a destination filter";
+                    routeMessage(std::move(err));
+                    return;
+                }
+            }
             auto filter = filters.find (fed_handle_pair (command.source_id, command.source_handle));
             if (filter == nullptr)
             {
@@ -2344,8 +2593,16 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                                            command.info ().target, command.info ().type, command.info ().type_out);
             }
 
-            filterInfo->hasDestFilter = true;
-            filterInfo->destFilter = filter;
+            filterInfo->hasDestFilters = true;
+            if (checkActionFlag (command, clone_flag))
+            {
+                filter->cloning = true;
+                filterInfo->cloningDestFilters.push_back (filter);
+            }
+            else
+            {
+                filterInfo->destFilter = filter;
+            }
         }
 
         break;
@@ -2370,10 +2627,14 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                 newFilter =
                   createSourceFilter (command.source_id, command.source_handle, command.name,
                                       command.info ().target, command.info ().type, command.info ().type_out);
+                if (checkActionFlag (command, clone_flag))
+                {
+                    newFilter->cloning = true;
+                }
             }
-            std::lock_guard<std::mutex> hlock(_handlemutex);
+            std::lock_guard<std::mutex> hlock (_handlemutex);
             filterInfo->allSourceFilters.push_back (newFilter);
-            filterInfo->hasSourceFilter = true;
+            filterInfo->hasSourceFilters = true;
         }
     }
     break;
@@ -2391,7 +2652,7 @@ void CommonCore::checkDependencies ()
     {
         if (fed->hasEndpoints)
         {
-            auto fedInfo = fed->getInfo();
+            auto fedInfo = fed->getInfo ();
             if (fedInfo.observer)
             {
                 timeCoord->removeDependency (fed->global_id);
@@ -2528,6 +2789,7 @@ void CommonCore::organizeFilterOperations ()
             std::vector<bool> used (fi->allSourceFilters.size (), false);
             bool someUnused = true;
             bool usedMore = true;
+            bool firstPass = true;
             std::string currentType = endpointType;
             while (someUnused && usedMore)
             {
@@ -2539,18 +2801,39 @@ void CommonCore::organizeFilterOperations ()
                     {
                         continue;
                     }
-                    // TODO:: this will need some work to finish sorting out but should work for initial tests
-                    if (matchingTypes (fi->allSourceFilters[ii]->inputType, currentType))
+                    if (firstPass)
                     {
-                        used[ii] = true;
-                        usedMore = true;
-                        fi->sourceFilters.push_back (fi->allSourceFilters[ii]);
-                        currentType = fi->allSourceFilters[ii]->outputType;
+                        if (fi->allSourceFilters[ii]->cloning)
+                        {
+                            fi->sourceFilters.push_back (fi->allSourceFilters[ii]);
+                            used[ii] = true;
+                            usedMore = true;
+                        }
+                        else
+                        {
+                            someUnused = true;
+                        }
                     }
                     else
                     {
-                        someUnused = true;
+                        // TODO:: this will need some work to finish sorting out but should work for initial tests
+                        if (matchingTypes (fi->allSourceFilters[ii]->inputType, currentType))
+                        {
+                            used[ii] = true;
+                            usedMore = true;
+                            fi->sourceFilters.push_back (fi->allSourceFilters[ii]);
+                            currentType = fi->allSourceFilters[ii]->outputType;
+                        }
+                        else
+                        {
+                            someUnused = true;
+                        }
                     }
+                }
+                if (firstPass)
+                {
+                    firstPass = false;
+                    usedMore = true;
                 }
             }
             for (size_t ii = 0; ii < fi->allSourceFilters.size (); ++ii)
@@ -2586,16 +2869,16 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
                 timeCoord->updateTimeFactors ();
             }
         }
-        if (cmd.action() == CMD_DISCONNECT)
+        if (cmd.action () == CMD_DISCONNECT)
         {
-            if (allDisconnected())
+            if (allDisconnected ())
             {
                 brokerState = broker_state_t::terminated;
-                ActionMessage dis(CMD_DISCONNECT);
+                ActionMessage dis (CMD_DISCONNECT);
                 dis.source_id = global_broker_id;
-                transmit(0, dis);
-                addActionMessage(CMD_STOP);
-    }
+                transmit (0, dis);
+                addActionMessage (CMD_STOP);
+            }
         }
     }
     else if (isDependencyCommand (cmd))
@@ -2747,7 +3030,7 @@ ActionMessage &CommonCore::processMessage (ActionMessage &m)
     if (handle->hasSourceFilter)
     {
         auto filtFunc = getFilterCoordinator (handle->id);
-        if (filtFunc->hasSourceFilter)
+        if (filtFunc->hasSourceFilters)
         {
             //   for (int ii = 0; ii < static_cast<int> (filtFunc->sourceFilters.size ()); ++ii)
             size_t ii = 0;
@@ -2755,19 +3038,35 @@ ActionMessage &CommonCore::processMessage (ActionMessage &m)
             {
                 if (filt->fed_id == global_broker_id)
                 {
-                    // deal with local source filters
-                    auto tempMessage = createMessageFromCommand (std::move (m));
-                    tempMessage = filt->filterOp->process (std::move (tempMessage));
-                    if (tempMessage)
+                    if (filt->cloning)
                     {
-                        m = ActionMessage (std::move (tempMessage));
+                        filt->filterOp->process (createMessageFromCommand(m));
                     }
                     else
                     {
-                        // the filter dropped the message;
-                        m = CMD_IGNORE;
-                        return m;
+                        // deal with local source filters
+                        auto tempMessage = createMessageFromCommand (std::move (m));
+                        tempMessage = filt->filterOp->process (std::move (tempMessage));
+                        if (tempMessage)
+                        {
+                            m = ActionMessage (std::move (tempMessage));
+                        }
+                        else
+                        {
+                            // the filter dropped the message;
+                            m = CMD_IGNORE;
+                            return m;
+                        }
                     }
+                }
+                else if (filt->cloning)
+                {
+                    ActionMessage cloneMessage (m);
+                    cloneMessage.setAction (CMD_SEND_FOR_FILTER);
+                    setActionFlag (m, clone_flag);
+                    cloneMessage.dest_id = filt->fed_id;
+                    cloneMessage.dest_handle = filt->handle;
+                    routeMessage (cloneMessage);
                 }
                 else
                 {
@@ -2793,6 +3092,66 @@ ActionMessage &CommonCore::processMessage (ActionMessage &m)
     return m;
 }
 
+void CommonCore::processDestFilterReturn(ActionMessage &command)
+{
+    auto handle = getHandleInfo(command.dest_handle);
+    if (handle == nullptr)
+    {
+        return;
+    }
+    auto messID = (command.action() == CMD_DEST_FILTER_RESULT) ? command.info().messageID : command.index;
+    if (ongoingDestFilterProcesses[handle->fed_id].find(messID) !=
+        ongoingDestFilterProcesses[handle->fed_id].end())
+    {
+        ongoingDestFilterProcesses[handle->fed_id].erase(messID);
+        if (command.action() == CMD_NULL_DEST_MESSAGE)
+        {
+            ActionMessage removeTimeBlock(CMD_TIME_UNBLOCK, global_broker_id, command.dest_id);
+            removeTimeBlock.index = messID;
+            routeMessage(removeTimeBlock);
+            return;
+        }
+        auto filtFunc = getFilterCoordinator(handle->id);
+        
+        //now go to the cloning filters
+        for (auto &clFilter : filtFunc->cloningDestFilters)
+        {
+            if (clFilter->fed_id == global_broker_id)
+            {
+                auto FiltI = filters.find(fed_handle_pair(global_broker_id, clFilter->handle));
+                if (FiltI != nullptr)
+                {
+                    if (FiltI->filterOp != nullptr)
+                    {
+                        if (FiltI->cloning)
+                        {
+                            FiltI->filterOp->process(createMessageFromCommand(command));
+                        }
+                    }
+                }
+            }
+            else
+            {
+                ActionMessage clone(command);
+                clone.setAction(CMD_SEND_FOR_FILTER);
+                clone.dest_id = clFilter->fed_id;
+                clone.dest_handle = clFilter->handle;
+                routeMessage(clone);
+            }
+        }
+
+
+        timeCoord->processTimeMessage(command);
+        command.setAction(CMD_SEND_MESSAGE);
+        routeMessage(std::move(command));
+        //now unblock the time
+        ActionMessage removeTimeBlock(CMD_TIME_UNBLOCK, global_broker_id, command.dest_id);
+        removeTimeBlock.index = messID;
+        routeMessage(removeTimeBlock);
+
+    }
+}
+
 void CommonCore::processFilterReturn (ActionMessage &cmd)
 {
     auto handle = getHandleInfo (cmd.dest_handle);
@@ -2800,15 +3159,25 @@ void CommonCore::processFilterReturn (ActionMessage &cmd)
     {
         return;
     }
-    if (ongoingFilterProcesses[handle->fed_id].find (cmd.info ().messageID) !=
+
+    auto messID = (cmd.action() == CMD_FILTER_RESULT) ? cmd.info().messageID : cmd.index;
+
+    if (ongoingFilterProcesses[handle->fed_id].find (messID) !=
         ongoingFilterProcesses[handle->fed_id].end ())
     {
-        auto messID = cmd.info ().messageID;
+        if (cmd.action() == CMD_NULL_MESSAGE)
+        {
+            ongoingFilterProcesses[handle->fed_id].erase(messID);
+            if (ongoingFilterProcesses[handle->fed_id].empty())
+            {
+                transmitDelayedMessages(handle->fed_id);
+            }
+        }
         auto filtFunc = getFilterCoordinator (handle->id);
-        if (filtFunc->hasSourceFilter)
+        if (filtFunc->hasSourceFilters)
         {
             for (decltype (cmd.counter) ii = cmd.counter + 1; ii < filtFunc->sourceFilters.size (); ++ii)
-            {
+            {  // cloning filters come first so we don't need to check for them in this code branch
                 auto filt = filtFunc->sourceFilters[ii];
                 if (filt->fed_id == global_broker_id)
                 {
@@ -2876,54 +3245,63 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
         {
             if (FiltI->filterOp != nullptr)
             {
-                bool returnToSender = (cmd.action () == CMD_SEND_FOR_FILTER_AND_RETURN);
-                auto source = cmd.source_id;
-                auto source_handle = cmd.source_handle;
-                auto mid = cmd.info ().messageID;
-                auto tempMessage = createMessageFromCommand (std::move (cmd));
-                tempMessage = FiltI->filterOp->process (std::move (tempMessage));
-                if (tempMessage)
+                if (FiltI->cloning)
                 {
-                    cmd = ActionMessage (std::move (tempMessage));
+                    FiltI->filterOp->process (createMessageFromCommand (std::move (cmd)));
                 }
                 else
                 {
-                    cmd = CMD_IGNORE;
-                }
-
-                if (!returnToSender)
-                {
-                    if (cmd.action () == CMD_IGNORE)
+                    bool destFilter = (cmd.action() == CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
+                    bool returnToSender = ((cmd.action() == CMD_SEND_FOR_FILTER_AND_RETURN) || destFilter );
+                    auto source = cmd.source_id;
+                    auto source_handle = cmd.source_handle;
+                    auto mid = cmd.info ().messageID;
+                    auto tempMessage = createMessageFromCommand (std::move (cmd));
+                    tempMessage = FiltI->filterOp->process (std::move (tempMessage));
+                    if (tempMessage)
                     {
-                        return;
+                        cmd = ActionMessage (std::move (tempMessage));
                     }
-                    cmd.source_id = source;
-                    cmd.source_handle = source_handle;
-                    cmd.dest_id = 0;
-                    cmd.dest_handle = 0;
-                    deliverMessage (cmd);
-                }
-                else
-                {
-                    cmd.dest_id = source;
-                    cmd.dest_handle = source_handle;
-                    if (cmd.action () == CMD_IGNORE)
+                    else
                     {
-                        cmd.setAction (CMD_NULL_MESSAGE);
-                        cmd.source_handle = mid;
+                        cmd = CMD_IGNORE;
+                    }
+
+                    if (!returnToSender)
+                    {
+                        if (cmd.action () == CMD_IGNORE)
+                        {
+                            return;
+                        }
+                        cmd.source_id = source;
+                        cmd.source_handle = source_handle;
+                        cmd.dest_id = 0;
+                        cmd.dest_handle = 0;
                         deliverMessage (cmd);
-                        return;
                     }
-                    cmd.setAction (CMD_FILTER_RESULT);
+                    else
+                    {
+                        cmd.dest_id = source;
+                        cmd.dest_handle = source_handle;
+                        if (cmd.action () == CMD_IGNORE)
+                        {
+                            cmd.setAction (destFilter?CMD_NULL_DEST_MESSAGE:CMD_NULL_MESSAGE);
+                            cmd.source_handle = mid;
+                            deliverMessage (cmd);
+                            return;
+                        }
+                        cmd.setAction (destFilter ? CMD_DEST_FILTER_RESULT:CMD_FILTER_RESULT);
 
-                    cmd.source_handle = FiltI->handle;
-                    cmd.source_id = global_broker_id;
-                    deliverMessage (cmd);
+                        cmd.source_handle = FiltI->handle;
+                        cmd.source_id = global_broker_id;
+                        deliverMessage (cmd);
+                    }
                 }
             }
         }
         else
         {
+            assert(false);
             // this is an odd condition (not sure what to do yet)
             /*	m.dest_id = filtFunc->sourceOperators[ii].fed_id;
                 m.dest_handle = filtFunc->sourceOperators[ii].handle;

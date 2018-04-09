@@ -38,9 +38,10 @@ class TimeCoordinator
     Time time_message = Time::maxVal ();  //!< the time of the earliest message event
     Time time_value = Time::maxVal ();  //!< the time of the earliest value event
     Time time_grantBase = Time::minVal();  //!< time to use as a basis for calculating the next grantable time(usually time granted unless values are changing)
-	TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
+    Time time_block = Time::maxVal();  //!< a blocking time to not grant time >= the specified time
+    TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
 	std::vector<Core::federate_id_t> dependents;  //!< federates which temporally depend on this federate
-
+    std::deque<std::pair<Time, int32_t>> timeBlocks; //!< blocks for a particular timeblocking link
 	CoreFederateInfo info;  //!< basic federate info the core uses
 	std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
 
@@ -125,6 +126,8 @@ public:
     void sendTimeRequest() const;
     void updateTimeGrant();
     void transmitTimingMessage(ActionMessage &msg) const;
+
+    message_process_result processTimeBlockMessage(const ActionMessage &cmd);
   public:
 	/** process a message related to time
 	@return the result of processing the message

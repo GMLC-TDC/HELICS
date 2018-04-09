@@ -23,7 +23,6 @@ set(SRC_FILES
 	CommsInterface.cpp
 	CommsBroker.cpp
 	NetworkBrokerData.cpp
-	helicsVersion.cpp
 	helics-time.cpp
 	HandleManager.cpp
 	HandlePointerManager.cpp

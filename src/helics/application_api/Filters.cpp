@@ -239,7 +239,7 @@ CloningFilter::CloningFilter (Federate *fed) : Filter (fed)
 
 void CloningFilter::addSourceTarget (const std::string &sourceName)
 {
-    auto filtid = corePtr->registerSourceFilter (getName (), sourceName, std::string (), std::string ());
+    auto filtid = corePtr->registerCloningSourceFilter (getName (), sourceName, std::string (), std::string ());
     sourceFilters.push_back (filtid);
     sourceEndpoints.push_back (sourceName);
     corePtr->setFilterOperator (filtid, filtOp->getOperator ());
@@ -247,7 +247,7 @@ void CloningFilter::addSourceTarget (const std::string &sourceName)
 
 void CloningFilter::addDestinationTarget (const std::string &destinationName)
 {
-    auto filtid = corePtr->registerDestinationFilter (getName (), destinationName, std::string (), std::string ());
+    auto filtid = corePtr->registerCloningDestinationFilter (getName (), destinationName, std::string (), std::string ());
     destFilters.push_back (filtid);
     destEndpoints.push_back (destinationName);
     corePtr->setFilterOperator (filtid, filtOp->getOperator ());

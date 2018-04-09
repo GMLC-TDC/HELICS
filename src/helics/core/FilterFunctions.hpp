@@ -21,9 +21,11 @@ class FilterCoordinator
     FilterInfo *destFilter = nullptr;  //!< the destination operator handle
 
 	std::vector<FilterInfo *> allSourceFilters; //!< storage for all the source filters before sorting
-    bool hasSourceFilter = false;  //!< indicator that an endpoint has source filters
-    bool hasDestFilter = false;  //!< indicator that an endpoint has a destination filter
-    int ongoingTransactions = 0;  //!< counter for the number of filtered message returns expected
+    std::vector<FilterInfo *> cloningDestFilters;  //!< storage for cloning destination filters
+    bool hasSourceFilters = false;  //!< indicator that an endpoint has source filters
+    bool hasDestFilters = false;  //!< indicator that an endpoint has a destination filter
+    int ongoingSourceTransactions = 0;  //!< counter for the number of filtered message returns expected
+    int ongoingDestTransactions = 0;  //!< counter for the number of filtered message returns expected on Destination
 };
 } // namespace helics
 

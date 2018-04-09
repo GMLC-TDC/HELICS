@@ -331,6 +331,26 @@ class Federate
                                            const std::string &destEndpoint,
                                            const std::string &inputType = std::string (),
                                            const std::string &outputType = std::string ());
+    /** define a cloning filter interface on a source
+    @details a source filter will be sent any packets that come from a particular source
+    if multiple filters are defined on the same source, they will be placed in some order defined by the core
+    @param[in] the name of the endpoint
+    @param[in] the inputType which the source filter can receive
+    */
+    filter_id_t registerCloningSourceFilter(const std::string &filterName,
+        const std::string &sourceEndpoint,
+        const std::string &inputType = std::string(),
+        const std::string &outputType = std::string());
+    /** define a cloning filter interface for a destination
+    @details a destination filter will be sent any packets that are going to a particular destination
+    multiple filters are not allowed to specify the same destination
+    @param[in] the name of the destination endpoint
+    @param[in] the inputType which the destination filter can receive
+    */
+    filter_id_t registerCloningDestinationFilter(const std::string &filterName,
+        const std::string &destEndpoint,
+        const std::string &inputType = std::string(),
+        const std::string &outputType = std::string());
     /** define a filter interface on a source
     @details a source filter will be sent any packets that come from a particular source
     if multiple filters are defined on the same source, they will be placed in some order defined by the core
@@ -350,6 +370,26 @@ class Federate
     filter_id_t registerDestinationFilter (const std::string &destEndpoint)
     {
         return registerDestinationFilter (std::string (), destEndpoint, std::string (), std::string ());
+    }
+    /** define a cloning filter interface on a source
+    @details a source filter will be sent any packets that come from a particular source
+    if multiple filters are defined on the same source, they will be placed in some order defined by the core
+    @param[in] the name of the endpoint
+    @param[in] the inputType which the source filter can receive
+    */
+    filter_id_t registerCloningSourceFilter(const std::string &sourceEndpoint)
+    {
+        return registerCloningSourceFilter(std::string(), sourceEndpoint, std::string(), std::string());
+    }
+    /** define a cloning filter interface for a destination
+    @details a destination filter will be sent any packets that are going to a particular destination
+    multiple filters are not allowed to specify the same destination
+    @param[in] the name of the destination endpoint
+    @param[in] the inputType which the destination filter can receive
+    */
+    filter_id_t registerCloningDestinationFilter(const std::string &destEndpoint)
+    {
+        return registerCloningDestinationFilter(std::string(), destEndpoint, std::string(), std::string());
     }
     /** get the name of a filter
     @param[in] id the filter to query

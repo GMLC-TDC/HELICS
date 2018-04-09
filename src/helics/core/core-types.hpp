@@ -11,8 +11,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 @details definitions of types an enumerations used in helics
 */
 
+namespace helics
+{
 /** enumeration of the possible federate states*/
-enum helics_federate_state_type
+enum federate_state_t
 {
     HELICS_CREATED, /*!> state upon creation, all registration calls are allowed*/
     HELICS_INITIALIZING,  //!< the federation has entered initialization state and initial values can be published
@@ -22,8 +24,6 @@ enum helics_federate_state_type
     HELICS_NONE,  //!< unknown state
 };
 
-namespace helics
-{
 /** the type of the cores that are available */
 enum class core_type : int
 {

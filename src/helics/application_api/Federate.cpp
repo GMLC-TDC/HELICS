@@ -856,6 +856,22 @@ filter_id_t Federate::registerDestinationFilter (const std::string &filterName,
     return coreObject->registerDestinationFilter (filterName, destEndpoint, inputType, outputType);
 }
 
+filter_id_t Federate::registerCloningSourceFilter(const std::string &filterName,
+    const std::string &sourceEndpoint,
+    const std::string &inputType,
+    const std::string &outputType)
+{
+    return coreObject->registerCloningSourceFilter(filterName, sourceEndpoint, inputType, outputType);
+}
+
+filter_id_t Federate::registerCloningDestinationFilter(const std::string &filterName,
+    const std::string &destEndpoint,
+    const std::string &inputType,
+    const std::string &outputType)
+{
+    return coreObject->registerCloningDestinationFilter(filterName, destEndpoint, inputType, outputType);
+}
+
 std::string Federate::getFilterName (filter_id_t id) const { return coreObject->getHandleName (id.value ()); }
 std::string Federate::getFilterEndpoint (filter_id_t id) const { return coreObject->getTarget (id.value ()); }
 
