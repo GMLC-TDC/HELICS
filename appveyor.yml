@@ -30,7 +30,7 @@ build:
 
 after_build:
   - cd build
-  - cpack -B $PWD/installer-output
+  - cpack -B %cd%/installer-output
   - cd ..
 
 test_script:
