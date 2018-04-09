@@ -6,7 +6,7 @@
 }
 
 %typemap(argout) (char *outputString, int maxlen) {
-  JCALL1(ReleaseByteArrayElements, jenv, $input, $1, 0);
+  JCALL3(ReleaseByteArrayElements, jenv, $input, $1, 0);
 }
 
 %typemap(jni) (char *outputString, int maxlen) "jbyteArray"
@@ -14,6 +14,7 @@
 %typemap(jstype) (char *outputString, int maxlen) "byte[]"
 %typemap(javain) (char *outputString, int maxlen) "$javainput"
 
+%apply (char *outputString, int maxlen) { (char *outputString, int maxStringlen) };
 
 ////typemap for large string output with a length return in C
 //%typemap(in, numinputs=0) (char *outputString, int maxStringlen, int *actualLength) {
