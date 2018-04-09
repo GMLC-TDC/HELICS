@@ -1,6 +1,6 @@
 shallow_clone: true
 
-version: 1.0.0.beta.1.{build}
+version: 1.0.0-beta.2.{build}
 
 image: Visual Studio 2015
 
@@ -30,7 +30,7 @@ build:
 
 after_build:
   - cd build
-  - cpack
+  - cpack -R ${APPVEYOR_BUILD_VERSION}
   - cd ..
 
 test_script:
@@ -51,4 +51,4 @@ test_script:
   - cd ..
 
 artifacts:
-  - path: build/Helics-1.0.0-beta.2-win64.exe
+  - path: build/Helics-${APPVEYOR_BUILD_VERSION}-win64.exe
