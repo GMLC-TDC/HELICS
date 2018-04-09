@@ -247,8 +247,10 @@ class CommonCore : public Core, public BrokerBase
 
     /** process any filter or route the message*/
     void processMessageFilter (ActionMessage &command);
-    /** process an filter message return*/
+    /** process a filter message return*/
     void processFilterReturn(ActionMessage &command);
+    /** process a destination filter message return*/
+    void processDestFilterReturn(ActionMessage &command);
     /** create a source filter */
     FilterInfo *createSourceFilter (federate_id_t dest,
                                     Core::handle_id_t handle,
@@ -284,6 +286,8 @@ class CommonCore : public Core, public BrokerBase
     HandlePointerManager handles; //!< local handle information;
 
     std::map<int32_t,std::set<int32_t>> ongoingFilterProcesses; //!< sets of ongoing filtered messages
+    std::map<int32_t, std::set<int32_t>> ongoingDestFilterProcesses; //!< sets of ongoing destination filter processing
+
     std::map<int32_t,std::vector<ActionMessage>> delayedTimingMessages; //!< delayedTimingMessages from ongoing Filter actions
     std::atomic<int> queryCounter{0};
     std::map<handle_id_t, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters

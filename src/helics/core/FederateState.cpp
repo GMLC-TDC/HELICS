@@ -755,6 +755,50 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     case CMD_IGNORE:
     default:
         break;
+    case CMD_TIME_BLOCK:
+    case CMD_TIME_UNBLOCK:
+    {
+        auto processed = timeCoord->processTimeMessage (cmd);
+        if (processed == message_process_result::processed)
+        {
+            if (!timeGranted_mode)
+            {
+                if (state == HELICS_INITIALIZING)
+                {
+                    auto grant = timeCoord->checkExecEntry ();
+                    switch (grant)
+                    {
+                    case iteration_state::iterating:
+                        timeGranted_mode = true;
+                        return grant;
+                    case iteration_state::next_step:
+                        setState (HELICS_EXECUTING);
+                        LOG_DEBUG ("Granting Execution");
+                        timeGranted_mode = true;
+                        return grant;
+                    case iteration_state::continue_processing:
+                        break;
+                    default:
+                        timeGranted_mode = true;
+                        return grant;
+                    }
+                }
+                else if (state == HELICS_EXECUTING)
+                {
+                    auto ret = timeCoord->checkTimeGrant ();
+                    if (ret != iteration_state::continue_processing)
+                    {
+                        time_granted = timeCoord->getGrantedTime ();
+                        allowed_send_time = timeCoord->allowedSendTime ();
+                        LOG_DEBUG (std::string ("Granted Time=") + std::to_string (time_granted));
+                        timeGranted_mode = true;
+                        return ret;
+                    }
+                }
+            }
+        }
+        break;
+    }
     case CMD_INIT_GRANT:
         if (state == HELICS_CREATED)
         {

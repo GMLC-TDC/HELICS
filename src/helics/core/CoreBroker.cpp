@@ -823,7 +823,10 @@ void CoreBroker::addSourceFilter (ActionMessage &m)
     auto &filt=handles.addHandle (m.source_id, m.source_handle, HANDLE_SOURCE_FILTER, m.name, m.info ().target,
                            m.info ().type, m.info ().type_out);
     addLocalInfo (filt, m);
-   
+    if (checkActionFlag(m, clone_flag))
+    {
+        filt.cloning = true;
+    }
     bool proc = FindandNotifyFilterEndpoint (filt);
     if (!_isRoot)
     {
@@ -870,6 +873,10 @@ void CoreBroker::addDestFilter (ActionMessage &m)
     auto &filt = handles.addHandle(m.source_id,m.source_handle, HANDLE_DEST_FILTER, m.name, m.info().target,
         m.info().type, m.info().type_out);
     addLocalInfo(filt, m);
+    if (checkActionFlag(m, clone_flag))
+    {
+        filt.cloning = true;
+    }
   
     bool proc = FindandNotifyFilterEndpoint (filt);
     if (!_isRoot)
@@ -1162,9 +1169,12 @@ bool CoreBroker::FindandNotifyFilterEndpoint (BasicHandleInfo &handleInfo)
                                                                      CMD_NOTIFY_DST_FILTER);
             m.source_id = handleInfo.fed_id;
             m.source_handle = handleInfo.id;
+            if (handleInfo.cloning)
+            {
+                setActionFlag(m, clone_flag);
+            }
             m.dest_id = endHandle->fed_id;
             m.dest_handle = endHandle->id;
-
             transmit (getRoute (m.dest_id), m);
 
             handleInfo.processed = true;
