@@ -30,7 +30,7 @@ build:
 
 after_build:
   - cd build
-  - cpack -R ${APPVEYOR_BUILD_VERSION}
+  - cpack -B $PWD/installer-output
   - cd ..
 
 test_script:
@@ -51,4 +51,4 @@ test_script:
   - cd ..
 
 artifacts:
-  - path: build/Helics-${APPVEYOR_BUILD_VERSION}-win64.exe
+  - path: build/installer-output/Helics-*.exe
