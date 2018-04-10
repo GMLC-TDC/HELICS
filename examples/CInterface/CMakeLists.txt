@@ -69,7 +69,7 @@ target_compile_options(hello_world_sender PRIVATE -ansi -Wall -pedantic -Werror)
 target_compile_options(hello_world_receiver PRIVATE -ansi -Wall -pedantic -Werror)
 endif()
 
-
+add_subdirectory(messageFed1)
 
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
