@@ -120,16 +120,27 @@ install_boost () {
     local boost_version_str=boost_${ver[0]}_${ver[1]}_${ver[2]}
     local install_path=$2
     local boost_toolset=$3
+
+    local b2_extra_options=""
+    if [[ "${BOOST_CXX_FLAGS}" ]]; then
+        b2_extra_options="cxxflags=${BOOST_CXX_FLAGS} ${b2_extra_options}"
+    fi
+
+    local b2_link_type=shared
+    if [[ "${BOOST_USE_STATIC}" ]]; then
+        b2_link_type=static
+    fi
+
     wget --no-check-certificate -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
     (
         cd ${boost_version_str}/;
         ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test;
         ./b2 -j2 \
-            link=shared \
+            link=${b2_link_type} \
             threading=multi \
             variant=release \
             toolset=${boost_toolset} \
-            cxxflags=${BOOST_CXX_FLAGS} > /dev/null;
+            ${b2_extra_options} > /dev/null;
         ./b2 install --prefix=${install_path} > /dev/null;
     )
     rm ${boost_version_str}.tar.gz
@@ -156,7 +167,11 @@ install_cmake () {
 
 
 install_version=$2
-install_path=$3
+if [[ $3 == '/'* ]]; then
+    install_path=$3
+else
+    install_path=$(pwd)/$3
+fi
 
 compiler_toolset=$4
 if [[ -z $compiler_toolset ]]; then
