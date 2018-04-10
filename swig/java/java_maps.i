@@ -46,8 +46,6 @@
     const char * c_string = JCALL2(GetStringUTFChars,jenv,j_string,0);
     $2[i] = malloc((strlen(c_string)+1)*sizeof(char));
     strcpy($2[i], c_string);
-    (*jenv)->ReleaseStringUTFChars(jenv, j_string, c_string);
-    (*jenv)->DeleteLocalRef(jenv, j_string);
     JCALL2(ReleaseStringUTFChars,jenv, j_string, c_string);
     JCALL1(DeleteLocalRef,jenv, j_string);
   }
