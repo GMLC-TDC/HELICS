@@ -184,7 +184,43 @@ class Federate
         helicsFederateFree (fed);
     }
 
-    void enterInitializationState ()
+    helics_federate baseObject() const { return fed; }
+    void setFlag(int flag, int value)
+    {
+        helicsFederateSetFlag(fed, flag, value);
+    }
+
+    void setOutputDelay(helics_time_t outputDelay)
+    {
+        helicsFederateSetOutputDelay(fed, outputDelay);
+    }
+
+    void setTimeDelta(helics_time_t timeDelta)
+    {
+        helicsFederateSetTimeDelta(fed, timeDelta);
+    }
+
+    void setInputDelay(helics_time_t inputDelay)
+    {
+        helicsFederateSetInputDelay(fed, inputDelay);
+    }
+
+    void setPeriod(helics_time_t period, helics_time_t offset)
+    {
+        helicsFederateSetPeriod(fed, period,offset);
+    }
+
+    void setMaxIterations(int max_iterations)
+    {
+        helicsFederateSetMaxIterations(fed, max_iterations);
+    }
+
+    void setLoggingLevel(int logLevel)
+    {
+        helicsFederateInfoSetLoggingLevel(fed, logLevel);
+    }
+
+    void enterInitializationMode ()
     {
         if (helics_ok != helicsFederateEnterInitializationMode (fed))
         {
@@ -192,7 +228,7 @@ class Federate
         }
     }
 
-    void enterInitializationStateAsync ()
+    void enterInitializationModeAsync ()
     {
         if (helics_ok != helicsFederateEnterInitializationModeAsync (fed))
         {
@@ -206,7 +242,7 @@ class Federate
         return helicsFederateIsAsyncOperationCompleted (fed) > 0;
     }
 
-    void enterInitializationStateComplete ()
+    void enterInitializationModeComplete ()
     {
         if (helics_ok != helicsFederateEnterInitializationModeComplete (fed))
         {
@@ -214,7 +250,7 @@ class Federate
         }
     }
 
-    helics_iteration_status enterExecutionState (helics_iteration_request iterate = no_iteration)
+    helics_iteration_status enterExecutionMode (helics_iteration_request iterate = no_iteration)
     {
         helics_iteration_status out_iterate = next_step;
         if (iterate == no_iteration)
@@ -228,7 +264,7 @@ class Federate
         return out_iterate;
     }
 
-    void enterExecutionStateAsync (helics_iteration_request iterate = no_iteration)
+    void enterExecutionModeAsync (helics_iteration_request iterate = no_iteration)
     {
         if (iterate == no_iteration)
         {
@@ -242,7 +278,7 @@ class Federate
         }
     }
 
-    helics_iteration_status enterExecutionStateComplete ()
+    helics_iteration_status enterExecutionModeComplete ()
     {
         helics_iteration_status out_iterate = next_step;
         if (exec_async_iterate)
@@ -302,6 +338,13 @@ class Federate
         return itTime;
     }
 
+    std::string getName() const
+    {
+        char str[255];
+        helicsFederateGetName(fed, &str[0], sizeof(str));
+        std::string result(str);
+        return result;
+    }
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of
     the federation and the specific string being queried

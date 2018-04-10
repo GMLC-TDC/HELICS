@@ -66,7 +66,7 @@ HELICS_Export helics_core helicsCreateCoreFromArgs (const char *type, const char
 /** create a new reference to an existing broker
 @details this will create a new broker object that references the existing broker it must be freed as well
 @param broker an existing helics_broker
-@return a new refernce to the same broker*/
+@return a new reference to the same broker*/
 HELICS_Export helics_core helicsCoreClone(helics_core core);
 
 /** create a broker object
@@ -89,7 +89,7 @@ HELICS_Export helics_broker helicsCreateBrokerFromArgs (const char *type, const 
 /** create a new reference to an existing broker
 @details this will create a new broker object that references the existing broker it must be freed as well
 @param broker an existing helics_broker
-@return a new refernce to the same broker*/
+@return a new reference to the same broker*/
 HELICS_Export helics_broker helicsBrokerClone(helics_broker broker);
 /** check if a broker is connected
 a connected broker implies is attached to cores or cores could reach out to communicate
@@ -517,6 +517,14 @@ HELICS_Export helics_status helicsFederateSetFlag (helics_federate fed, int flag
 @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
 */
 HELICS_Export helics_status helicsFederateSetLoggingLevel (helics_federate fed, int loggingLevel);
+
+/** set the max iteration count to use in federate in the info object
+@details a federate will iterate for at most min(maxIterations,core maxIterations)
+@param fi the federateInfo object to alter
+@param maxIterations the maximum number of iterations a federate is allowed per timestep
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fed is not a valid reference helics_discard if the specified offset is invalid
+*/
+HELICS_Export helics_status helicsFederateSetMaxIterations(helics_federate_info_t fi, int maxIterations);
 
 /** get the current time of the federate
 @param fed the federate object to query
