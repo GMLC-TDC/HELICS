@@ -3,7 +3,7 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include <ValueFederate.h>
+#include <MessageFederate.h>
 #include <stdio.h>
 #ifdef _MSC_VER
 #include <windows.h>
@@ -27,18 +27,17 @@ static const char defSourceEndpoint[] = "endpoint";
 
 int main (int argc, char *argv[])
 {
-    helics_federate_info_t fedinfo;
-	char *target = defTarget;
-    char *endpoint = defTargetEndpoint;
-    char *source = defSourceEndpoint;
+    helics_federate_info_t fedinfo = helicsFederateInfoCreate();
+	const char *target = defTarget;
+    const char *endpoint = defTargetEndpoint;
+    const char *source = defSourceEndpoint;
     char *targetEndpoint = NULL;
     int ii;
     helics_federate mFed = NULL;
-    helics_broker brk = NULL;
     helics_endpoint ept = NULL;
-    int startbroker = 0;
     char str[255];
-
+    char message[1024];
+    helics_time_t newTime;
     for (ii = 1; ii < argc; ++ii)
     {
         
@@ -49,7 +48,7 @@ int main (int argc, char *argv[])
         }
         else if (strcmp(argv[ii], "endpoint")==0)
         {
-            target = argv[ii + 1];
+            endpoint = argv[ii + 1];
             ++ii;
         }
         else if (strcmp(argv[ii], "source") == 0)
@@ -75,29 +74,28 @@ int main (int argc, char *argv[])
     strcat(targetEndpoint, "/");
     strcat(targetEndpoint, endpoint);
 
-    auto name = mFed->getName();
-	std::cout << " registering endpoint '" << myendpoint << "' for " << name<<'\n';
-
+    helicsFederateGetName(mFed, str, 255);
+    printf("registering endpoint %s for %s\n", targetEndpoint, str);
     //this line actually creates an endpoint
-    auto id = mFed->registerEndpoint(myendpoint);
+    ept = helicsFederateRegisterEndpoint(mFed, targetEndpoint, "");
 
-
-    std::cout << "entering init State\n";
-    helicsFederateEnterInitializionMode(mFed);
-    std::cout << "entered init State\n";
-    mFed->enterExecutionState ();
+    printf("entering init Mode\n");
+    helicsFederateEnterInitializationMode(mFed);
+    printf("entered init Mode\n");
     helicsFederateEnterExecutionMode(mFed);
-    std::cout << "entered exec State\n";
+    printf("entered execution Mode\n");
     for (int i=1; i<10; ++i) {
-		std::string message = "message sent from "+name+" to "+target+" at time " + std::to_string(i);
-		mFed->sendMessage(id, target, message.data(), message.size());
-        std::cout << message << std::endl;
-        auto newTime = mFed->requestTime (i);
-		std::cout << "processed time " << static_cast<double> (newTime) << "\n";
-		while (mFed->hasMessage(id))
+        snprintf(message,1024, "message sent from %s to %s at time %d", str, targetEndpoint, i);
+        helicsEndpointSendMessageRaw(ept, targetEndpoint, message, (int)(strlen(message)));
+		
+        printf(" %s \n", message);
+        helicsFederateRequestTime(mFed, (helics_time_t)i, &newTime);
+
+        printf("granted time %f\n", newTime);
+		while (helicsEndpointHasMessage(ept)==helics_true)
 		{
-			auto nmessage = mFed->getMessage(id);
-			std::cout << "received message from " << nmessage->source << " at " << static_cast<double>(nmessage->time) << " ::" << nmessage->data.to_string() << '\n';
+			message_t nmessage = helicsEndpointGetMessage(ept);
+            printf("received message from %s at %f ::%s\n", nmessage.source, nmessage.time, nmessage.data);
 		}
 
     }
