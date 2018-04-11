@@ -406,8 +406,15 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
     {
         auto feds = federates.lock ();
         auto id = feds->insert (name, name, info);
-        local_id = static_cast<decltype (fed->local_id)> (id);
-        fed = (*feds)[id];
+        if (id)
+        {
+            local_id = static_cast<decltype (fed->local_id)> (*id);
+            fed = (*feds)[*id];
+        }
+        else
+        {
+            throw(RegistrationFailure("duplicate names "+name+"detected multiple federates with the same name"));
+        }
     }
 
     // setting up the Logger
@@ -1922,7 +1929,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             if (checkActionFlag (command, error_flag))
             {
                 LOG_ERROR (0, identifier,
-                           std::string ("broker responded with error for registration of ") + command.name + "\n");
+                           std::string ("broker responded with error for registration of ") + command.name + "::"+commandErrorString(command.index)+"\n");
             }
             else
             {

@@ -201,11 +201,21 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             ActionMessage badInit (CMD_FED_ACK);
             setActionFlag (badInit, error_flag);
             badInit.source_id = global_broker_id;
+            badInit.index = 5;
             badInit.name = command.name;
-            transmit (command.source_id, badInit);  // this isn't correct
+            transmit (getRoute(command.source_id), badInit);  
             return;
         }
-        _federates.insert (command.name,static_cast<Core::federate_id_t>(_federates.size()),command.name);
+        if (!_federates.insert(command.name, static_cast<Core::federate_id_t>(_federates.size()), command.name))
+        {
+            ActionMessage badName(CMD_FED_ACK);
+            setActionFlag(badName, error_flag);
+            badName.source_id = global_broker_id;
+            badName.index = 6;
+            badName.name = command.name;
+            transmit(getRoute(command.source_id), badName);  
+            return;
+        }
         _federates.back ().route_id = getRoute (command.source_id);
         if (!_isRoot)
         {
