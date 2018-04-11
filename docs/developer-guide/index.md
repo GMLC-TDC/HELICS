@@ -6,6 +6,8 @@ Developer Guide
    :maxdepth: 1
 
    style
+   swig
+   tests
    docs
    contributing
 ```
