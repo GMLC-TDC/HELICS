@@ -25,7 +25,7 @@ BOOST_DATA_TEST_CASE(value_federate_initialize_tests, bdata::make(core_types_sin
 {
     SetupTest(helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt(0);
-
+    BOOST_REQUIRE(vFed1 != nullptr);
     CE(helicsFederateEnterExecutionMode(vFed1));
 
     federate_state state;
@@ -36,6 +36,7 @@ BOOST_DATA_TEST_CASE(value_federate_initialize_tests, bdata::make(core_types_sin
 
     CE(helicsFederateGetState(vFed1, &state));
     BOOST_CHECK(state == helics_finalize_state);
+    helicsCleanupHelicsLibrary();
 }
 
 BOOST_DATA_TEST_CASE(value_federate_publication_registration, bdata::make(core_types_single), core_type)
