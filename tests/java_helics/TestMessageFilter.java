@@ -73,13 +73,14 @@ public class TestMessageFilter {
 	public static void main(String[] args) {
 		SWIGTYPE_p_void broker = AddBroker("zmq");
 		String initstring = "--broker=";
-		String identifier = "";
-		helics_status status = helics.helicsBrokerGetIdentifier(broker, identifier, 100);
+		byte[] identifier = new byte[100];
+		helics_status status = helics.helicsBrokerGetIdentifier(broker, identifier);
 		assert status == helics_status.helics_ok;
-		initstring = initstring + identifier;
+		String id = new String(identifier);
+		initstring = initstring + id;
 		initstring = initstring + " --broker_address";
-		String address = "";
-		status = helics.helicsBrokerGetAddress(broker, address, 100);
+		byte[] address = new byte[100];
+		status = helics.helicsBrokerGetAddress(broker, address);
 		assert status == helics_status.helics_ok;
 		test_message_filter_registration(broker);
 		helics.helicsBrokerDisconnect(broker);

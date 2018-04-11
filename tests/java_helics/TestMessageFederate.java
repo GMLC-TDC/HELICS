@@ -41,23 +41,27 @@ public class TestMessageFederate {
 		
 		helics.helicsFederateEnterExecutionMode(msgFederate);
 		int maxLen = 100;
-		String endpoint_name = "";
-		helics_status status = helics.helicsEndpointGetName(epid1, endpoint_name, maxLen);
+		byte[] endpoint_name = new byte[100];
+		helics_status status = helics.helicsEndpointGetName(epid1, endpoint_name);
 		assert status == helics_status.helics_ok;
-		assert endpoint_name == "TestA Federate/ep1";
+		String ep = new String(endpoint_name);
+		assert ep == "TestA Federate/ep1";
 		
-		status = helics.helicsEndpointGetName(epid2, endpoint_name, maxLen);
+		status = helics.helicsEndpointGetName(epid2, endpoint_name);
 		assert status == helics_status.helics_ok;
-		assert endpoint_name == "ep2";
+		String ep2 = new String(endpoint_name);
+		assert ep2 == "ep2";
 		
-		String endpoint_type = "";
-		status = helics.helicsEndpointGetType(epid1, endpoint_type, maxLen);
+		byte[] endpoint_type = new byte[100];
+		status = helics.helicsEndpointGetType(epid1, endpoint_type);
 		assert status == helics_status.helics_ok;
-		assert endpoint_type == "";
+		String et = new String(endpoint_type);
+		assert et == "";
 		
-		status = helics.helicsEndpointGetType(epid2, endpoint_type, maxLen);
+		status = helics.helicsEndpointGetType(epid2, endpoint_type);
 		assert status == helics_status.helics_ok;
-		assert endpoint_type == "random";
+		String et2 = new String(endpoint_type);
+		assert et2 == "random";
     	
     }
     
@@ -70,9 +74,9 @@ public class TestMessageFederate {
 		helics_status status = helics.helicsFederateInfoSetTimeDelta(msgFederate, timeDelta);
         helics.helicsFederateEnterExecutionMode(msgFederate);
 
-        String data = "random-data";
-
-        status = helics.helicsEndpointSendEventRaw(epid1, "ep2", data.getBytes(), 1.0);
+        //String data = "random-data";
+		SWIGTYPE_p_void data = null;
+        status = helics.helicsEndpointSendEventRaw(epid1, "ep2", data, 10, 1.0);
         
         double request_time = 1.0;
         double[] timeout = {1.0};
