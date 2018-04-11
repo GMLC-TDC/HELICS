@@ -6,16 +6,16 @@ def get_input(grantedtime):
 
     valid_input = False
     while not valid_input:
-        print("Enter request_time (int) (and value to send (float)): ", end="")
+        print("Enter request_time (int) (and value_to_send (float)) [e.g.: 4, 10.0]: ", end="")
         string = input()
         string = string.strip()
         request_time_str = string.replace(",", " ").split(" ")[0]
         try:
             request_time = int(request_time_str)
             if request_time <= grantedtime:
-                print("request_time has to be greater than grantedtime.")
                 raise RuntimeError("Cannot proceed here because invalid input.")
         except:
+            print("request_time has to be an 'int' and has to be greater than grantedtime.")
             valid_input = False
             continue
         else:
@@ -31,6 +31,7 @@ def get_input(grantedtime):
         try:
             value_to_send = float(value_to_send)
         except:
+            print("value_to_send must be a float or be blank")
             valid_input = False
             continue
         else:
