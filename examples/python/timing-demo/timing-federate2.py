@@ -80,6 +80,7 @@ def main():
 
     pubid = h.helicsFederateRegisterGlobalTypePublication(fed, "federate2-to-federate1", h.HELICS_DATA_TYPE_DOUBLE, "")
     subid = h.helicsFederateRegisterSubscription (fed, "federate1-to-federate2", "double", "")
+    epid = h.helicsFederateRegisterGlobalEndpoint(fed, "endpoint2", "")
 
     # print("Setting default value")
     h.helicsSubscriptionSetDefaultDouble(subid, 0)
@@ -101,8 +102,13 @@ def main():
         if value_to_send is not None:
             print("Sending {} to Federate 1".format(value_to_send))
             status = h.helicsPublicationPublishDouble(pubid, value_to_send)
+            status = h.helicsEndpointSendMessageRaw(epid, "endpoint1", str(value_to_send))
+
         status, value = h.helicsSubscriptionGetDouble(subid)
-        print("Received {} from Federate 1".format(value))
+        print("Received value {} from Federate 1".format(value))
+        while h.helicsEndpointHasMessage(epid):
+            value = h.helicsEndpointGetMessage(epid)
+            print("Received message {} from Federate 1".format(value.data))
         print("----------------------------------")
 
 
