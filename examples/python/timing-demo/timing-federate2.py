@@ -6,18 +6,34 @@ def get_input():
 
     valid_input = False
     while not valid_input:
-        print("Enter request_time (int): ", end="")
+        print("Enter request_time (int) (and value to send (float)): ", end="")
         string = input()
-        request_time_str = string.strip()
+        string = string.strip()
+        request_time_str = string.replace(",", " ").split(" ")[0]
         try:
             request_time = int(request_time_str)
         except:
             valid_input = False
+            continue
         else:
             valid_input = True
 
-    return request_time
+        try:
+            value_to_send = string.replace(",", " ").split(" ")[1]
+        except:
+            value_to_send = None
+            valid_input = True
+            continue
 
+        try:
+            value_to_send = float(value_to_send)
+        except:
+            valid_input = False
+            continue
+        else:
+            valid_input = True
+
+    return request_time, value_to_send
 
 
 def create_value_federate(deltat=1.0, fedinitstring="--federates=1"):
@@ -66,19 +82,25 @@ def main():
     print("Entering execution mode")
     h.helicsFederateEnterExecutionMode(fed)
 
+    grantedtime = -1
     while True:
-        stop_at_time = get_input()
-        print("Sending {} to Federate 1".format(stop_at_time))
-        status = h.helicsPublicationPublishDouble(pubid, stop_at_time)
-        print(">>>>>>>> Requesting time = {}".format(stop_at_time))
-        status, grantedtime = h.helicsFederateRequestTime (fed, stop_at_time)
-        print("<<<<<<<< Granted Time = {}".format(grantedtime))
+        stop_at_time, value_to_send = get_input()
+        while grantedtime < stop_at_time:
+            print(">>>>>>>> Requesting time = {}".format(stop_at_time))
+            status, grantedtime = h.helicsFederateRequestTime(fed, stop_at_time)
+            print("<<<<<<<< Granted Time = {}".format(grantedtime))
+        assert grantedtime == stop_at_time
+        if value_to_send is not None:
+            print("Sending {} to Federate 1".format(value_to_send))
+            status = h.helicsPublicationPublishDouble(pubid, value_to_send)
         status, value = h.helicsSubscriptionGetDouble(subid)
         print("Received {} from Federate 1".format(value))
         print("----------------------------------")
+
 
     destroy_value_federate(fed)
 
 
 if __name__ == "__main__":
     main()
+
