@@ -42,24 +42,27 @@ int main (int argc, char *argv[])
     for (ii = 1; ii < argc; ++ii)
     {
         
-        if (strcmp(argv[ii], "target")==0)
+        if (strcmp(argv[ii], "--target")==0)
         {
             target=argv[ii + 1];
             ++ii;
         }
-        else if (strcmp(argv[ii], "endpoint")==0)
+        else if (strcmp(argv[ii], "--endpoint")==0)
         {
             endpoint = argv[ii + 1];
             ++ii;
         }
-        else if (strcmp(argv[ii], "source") == 0)
+        else if (strcmp(argv[ii], "--source") == 0)
         {
             source = argv[ii + 1];
             ++ii;
         }
-        else if (strcmp(argv[ii], "help") == 0)
+        else if ((strcmp(argv[ii], "--help") == 0)||(strcmp(argv[ii],"-?")==0))
         {
-            //print something
+            printf(" --target <target federate name>  ,the name of the federate to send messages to\n");
+            printf(" --endpoint <target endpoint name> , the name of the endpoint to send message to\n");
+            printf(" --source <endpoint>, the name of the source endpoint to create\n");
+            printf(" --help, -? display help\n");
             return 0;
         }
       
@@ -77,7 +80,7 @@ int main (int argc, char *argv[])
 
     helicsFederateGetName(mFed, str, 255);
     printf("registering endpoint %s for %s\n", source, str);
-    //this line actually creates an endpoint
+    /*this line actually creates an endpoint */
     ept = helicsFederateRegisterEndpoint(mFed, source, "");
 
     printf("entering init Mode\n");
@@ -85,12 +88,12 @@ int main (int argc, char *argv[])
     printf("entered init Mode\n");
     helicsFederateEnterExecutionMode(mFed);
     printf("entered execution Mode\n");
-    for (int i=1; i<10; ++i) {
-        snprintf(message,1024, "message sent from %s to %s at time %d", str, targetEndpoint, i);
+    for (ii=1; ii<10; ++ii) {
+        snprintf(message,1024, "message sent from %s to %s at time %d", str, targetEndpoint, ii);
         helicsEndpointSendMessageRaw(ept, targetEndpoint, message, (int)(strlen(message)));
 		
         printf(" %s \n", message);
-        helicsFederateRequestTime(mFed, (helics_time_t)i, &newTime);
+        helicsFederateRequestTime(mFed, (helics_time_t)ii, &newTime);
 
         printf("granted time %f\n", newTime);
 		while (helicsEndpointHasMessage(ept)==helics_true)
@@ -100,6 +103,7 @@ int main (int argc, char *argv[])
 		}
 
     }
+    printf("finalizing federate\n");
     helicsFederateFinalize(mFed);
    
     return 0;
