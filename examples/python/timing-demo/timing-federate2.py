@@ -74,7 +74,7 @@ def main():
         status, grantedtime = h.helicsFederateRequestTime (fed, stop_at_time)
         print("<<<<<<<< Granted Time = {}".format(grantedtime))
         status, value = h.helicsSubscriptionGetDouble(subid)
-        print("Received {} from Federate 1".format(receivedValue))
+        print("Received {} from Federate 1".format(value))
         print("----------------------------------")
 
     destroy_value_federate(fed)
