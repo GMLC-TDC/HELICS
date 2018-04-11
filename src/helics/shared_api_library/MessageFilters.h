@@ -90,7 +90,7 @@ through other functions
 @param deliveryEndpoint the specified endpoint to deliver the message
 @return a helics_filter object
 */
-HELICS_Export helics_filter helicsCoreRegisterCloningFilter (helics_core fed, const char *deliveryEndpoint);
+HELICS_Export helics_filter helicsCoreRegisterCloningFilter (helics_core core, const char *deliveryEndpoint);
 
 /** get the target of the filter and store in the given string
 @param filt the given filter

@@ -8,7 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../shared_api_library/helics.h"
-
+#include "../shared_api_library/MessageFilters.h"
 #include <string>
 
 namespace helics
@@ -34,7 +34,9 @@ class Core
     {
         helicsCoreFree (core);
     }
+    operator helics_core() { return core; }
 
+    helics_core baseObject() const { return core; }
     bool isConnected () const
     {
         return helicsCoreIsConnected (core);
@@ -66,6 +68,40 @@ class Core
         return result;
     }
 
+    Filter registerSourceFilter(helics_filter_type_t type,
+        const std::string &target,
+        const std::string &name = std::string())
+    {
+        return Filter(helicsCoreRegisterSourceFilter(core, type, target.c_str(), name.c_str()));
+    }
+
+    /** create a destination Filter on the specified federate
+    @details filters can be created through a federate or a core , linking through a federate allows
+    a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
+    @param fed the fed to register through
+    @param type the type of filter to create
+    @param target the name of endpoint to target
+    @param name the name of the filter (can be NULL)
+    @return a helics_filter object
+    */
+    Filter registerDestinationFilter(helics_filter_type_t type,
+        const std::string &target,
+        const std::string &name = std::string())
+    {
+        return Filter(helicsCoreRegisterDestinationFilter(core, type, target.c_str(), name.c_str()));
+    }
+
+    /** create a cloning Filter on the specified federate
+    @details cloning filters copy a message and send it to multiple locations source and destination can be added
+    through other functions
+    @param fed the fed to register through
+    @param deliveryEndpoint the specified endpoint to deliver the message
+    @return a helics_filter object
+    */
+    CloningFilter registerCloningFilter( const std::string &deliveryEndpoint)
+    {
+        return CloningFilter(helicsCoreRegisterCloningFilter(core, deliveryEndpoint.c_str()));
+    }
   protected:
     helics_core core;
 };

@@ -29,6 +29,8 @@ public:
         return *this;
     }
 
+    operator helics_subscription() const { return sub; }
+
     helics_subscription baseObject() const { return sub; }
     /** Methods to set default values for subscriptions **/
     void setDefaultValue( const char *data, int len)

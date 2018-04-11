@@ -29,6 +29,8 @@ public:
         return *this;
     }
 
+    operator helics_publication() const { return pub; }
+
     helics_publication baseObject() const { return pub; }
 /** Methods to publish values **/
 void publish( const char *data, int len)

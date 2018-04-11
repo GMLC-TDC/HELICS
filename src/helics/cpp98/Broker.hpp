@@ -44,6 +44,10 @@ class Broker
         helicsBrokerFree (broker);
     }
 
+    operator helics_broker() { return broker; }
+
+    helics_broker baseObject() const { return broker; }
+
     bool isConnected () const
     {
         return helicsBrokerIsConnected (broker);

@@ -27,6 +27,7 @@ public:
         ep = endpoint.ep;
         return *this;
     }
+    operator helics_endpoint() { return ep; }
 
     helics_endpoint baseObject() const { return ep; }
     /* Checks if endpoint has unread messages **/
