@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <MessageFederate.h>
 #include <ValueFederate.h>
 #include <stdio.h>
+#include <string.h>
 #ifdef _MSC_VER
 #include <windows.h>
 #else
@@ -82,7 +83,7 @@ int main(int argc, char *argv[])
     }
 
     helicsFederateInfoSetFederateName(fedinfo, "fed");
-    helicsFederateInfoLoadFromArgs(fedinfo, argc, argv);
+    helicsFederateInfoLoadFromArgs(fedinfo, argc, (const char * const*)argv);
 
     cFed = helicsCreateCombinationFederate(fedinfo);
 
