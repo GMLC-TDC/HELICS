@@ -2,6 +2,22 @@ import time
 import helics as h
 import random
 
+def get_input():
+
+    valid_input = False
+    while not valid_input:
+        print("Enter request_time (int): ", end="")
+        string = input()
+        request_time_str = string.strip()
+        try:
+            request_time = int(request_time_str)
+        except:
+            valid_input = False
+        else:
+            valid_input = True
+
+    return request_time
+
 
 def create_broker():
     initstring = "2 --name=mainbroker"
@@ -14,7 +30,7 @@ def create_broker():
     return broker
 
 
-def create_value_federate(broker, deltat=0, fedinitstring="--broker=mainbroker --federates=1"):
+def create_value_federate(broker, deltat=1.0, fedinitstring="--broker=mainbroker --federates=1"):
 
     fedinfo = h.helicsFederateInfoCreate()
 
@@ -61,18 +77,18 @@ def main():
 
     h.helicsSubscriptionSetDefaultDouble(subid, 0)
 
+    print("Entering execution mode")
     h.helicsFederateEnterExecutionMode(fed)
 
-    hours = 1
-    seconds = int(60 * 60 * hours)
-    grantedtime = -1
-    random.seed(0)
     while True:
-        status = h.helicsPublicationPublishDouble(pubid, 1.0)
-        while grantedtime < t:
-            status, grantedtime = h.helicsFederateRequestTime (fed, t)
-            print("<<<<<<<< Granted Time = {}".format(grantedtime))
+        stop_at_time = get_input()
+        print("Sending {} to Federate 2".format(stop_at_time))
+        status = h.helicsPublicationPublishDouble(pubid, stop_at_time)
+        print(">>>>>>>> Requesting time = {}".format(stop_at_time))
+        status, grantedtime = h.helicsFederateRequestTime (fed, stop_at_time)
+        print("<<<<<<<< Granted Time = {}".format(grantedtime))
         status, value = h.helicsSubscriptionGetDouble(subid)
+        print("Received {} from Federate 2".format(value))
         print("----------------------------------")
 
     destroy_value_federate(fed, broker)

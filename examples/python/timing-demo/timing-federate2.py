@@ -2,7 +2,25 @@ import time
 import helics as h
 import random
 
-def create_value_federate(deltat=0, fedinitstring="--federates=1"):
+def get_input():
+
+    valid_input = False
+    while not valid_input:
+        print("Enter request_time (int): ", end="")
+        string = input()
+        request_time_str = string.strip()
+        try:
+            request_time = int(request_time_str)
+        except:
+            valid_input = False
+        else:
+            valid_input = True
+
+    return request_time
+
+
+
+def create_value_federate(deltat=1.0, fedinitstring="--federates=1"):
 
     fedinfo = h.helicsFederateInfoCreate()
 
@@ -35,27 +53,6 @@ def destroy_value_federate(fed):
 
     h.helicsCloseLibrary()
 
-def get_input():
-
-    valid_input = False
-    while not valid_input:
-        print("Enter request_time (int) and value to publish (double): ", end="")
-        string = input()
-        string_list = string.strip().replace(",", " ").split(" ")
-        if len(string_list) != 2:
-            valid_input = False
-            continue
-        request_time_str, double_value_str = string_list
-        try:
-            request_time = int(request_time_str)
-            double_value = float(double_value_str)
-        except:
-            valid_input = False
-        else:
-            valid_input = True
-
-    return request_time, double_value
-
 def main():
 
     fed = create_value_federate()
@@ -66,25 +63,22 @@ def main():
     # print("Setting default value")
     h.helicsSubscriptionSetDefaultDouble(subid, 0)
 
-    # print("Entering execution mode")
+    print("Entering execution mode")
     h.helicsFederateEnterExecutionMode(fed)
 
-    hours = 1
-    seconds = int(60 * 60 * hours)
-    grantedtime = -1
-    random.seed(0)
-    # for t in range(1, seconds + 1, 60 * 5):
-    stop_at_time = 6000
-    while grantedtime < stop_at_time:
-        stop_at_time, double_value = get_input()
-        status = h.helicsPublicationPublishDouble(pubid, double_value)
+    while True:
+        stop_at_time = get_input()
+        print("Sending {} to Federate 1".format(stop_at_time))
+        status = h.helicsPublicationPublishDouble(pubid, stop_at_time)
         print(">>>>>>>> Requesting time = {}".format(stop_at_time))
         status, grantedtime = h.helicsFederateRequestTime (fed, stop_at_time)
         print("<<<<<<<< Granted Time = {}".format(grantedtime))
-        status, receivedValue = h.helicsSubscriptionGetDouble(subid)
+        status, value = h.helicsSubscriptionGetDouble(subid)
+        print("Received {} from Federate 1".format(receivedValue))
         print("----------------------------------")
 
     destroy_value_federate(fed)
+
 
 if __name__ == "__main__":
     main()
