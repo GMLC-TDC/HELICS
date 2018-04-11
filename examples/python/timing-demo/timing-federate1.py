@@ -107,7 +107,7 @@ def main():
         assert grantedtime == stop_at_time
         if value_to_send is not None:
             print("Sending {} to Federate 2".format(value_to_send))
-            status = h.helicsPublicationPublishDouble(pubid, stop_at_time)
+            status = h.helicsPublicationPublishDouble(pubid, value_to_send)
         status, value = h.helicsSubscriptionGetDouble(subid)
         print("Received {} from Federate 2".format(value))
         print("----------------------------------")
