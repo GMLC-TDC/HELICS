@@ -16,6 +16,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <memory>
 #include <stdexcept>
 #include <functional>
+#include <mutex>
 
 /**
  * HELICS Application API
@@ -100,6 +101,7 @@ class Federate
     Time currentTime;  //!< the current simulation time
     FederateInfo FedInfo;  //!< the information structure that contains the data on the federate
   private:
+      mutable std::mutex asyncLock;  //!< mutex protecting asyncCallInfo
     std::unique_ptr<AsyncFedCallInfo> asyncCallInfo;  //!< pointer to a class defining the async call information
     std::vector<std::shared_ptr<Filter>>
       localFilters;  //!< vector of filters created through the register interfaces function

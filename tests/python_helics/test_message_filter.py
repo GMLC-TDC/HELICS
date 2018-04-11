@@ -104,23 +104,27 @@ def test_message_filter_function(broker):
     p2 = h.helicsFederateRegisterGlobalEndpoint(mFed, "port2", "")
 
     f1 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_delay_filter, "port1", "filter1")
-    h.helicsFilterSet(f1, "delay", 2.5)
-
-    h.helicsFederateEnterExecutionModeAsync(fFed)
-    h.helicsFederateEnterExecutionMode(mFed)
-    h.helicsFederateEnterExecutionModeComplete(fFed)
-
+    status=h.helicsFilterSet(f1, "delay", 2.5)
+    print("A status =",status)
+    status=h.helicsFederateEnterExecutionModeAsync(fFed)
+    print("B",status)
+    status=h.helicsFederateEnterExecutionMode(mFed)
+    print("C",status)
+    status=h.helicsFederateEnterExecutionModeComplete(fFed)
+    assert status == 0
+    print("getting state ",status)
     status, state = h.helicsFederateGetState(fFed)
+    print("status= ",status, "state = ",state)
     assert state == 2
-
+    print("got state")
     data = "hello world"
     # TODO: Fix segfaults on the next line
-    # h.helicsEndpointSendMessageRaw(p1, "port2", data)
+    h.helicsEndpointSendMessageRaw(p1, "port2", data)
 
     # TODO: Also segfaults
-    # print(h.helicsFederateRequestTimeAsync (mFed, 1.0))
-    # print(h.helicsFederateRequestTime(fFed, 1.0))
-    # print(h.helicsFederateRequestTimeComplete (mFed))
+    print(h.helicsFederateRequestTimeAsync (mFed, 1.0))
+    print(h.helicsFederateRequestTime(fFed, 1.0))
+    print(h.helicsFederateRequestTimeComplete (mFed))
 
 
     # f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "filter2", "port2")

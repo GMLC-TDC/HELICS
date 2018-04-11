@@ -92,8 +92,8 @@ BOOST_DATA_TEST_CASE(test_async_calls, bdata::make(core_types), core_type)
     pubid.publish("string1");
 
     vFed1->requestTimeAsync(1.0);
+    vFed2->requestTimeAsync(1.0);
     f1time=vFed1->requestTimeComplete();
-    vFed2->requestTimeAsync( 1.0);
     gtime=vFed2->requestTimeComplete();
 
 	BOOST_CHECK_EQUAL(f1time, 1.0);
@@ -114,15 +114,15 @@ BOOST_DATA_TEST_CASE(test_async_calls, bdata::make(core_types), core_type)
 
 	// advance time
     vFed1->requestTimeAsync( 2.0);
-    f1time=vFed1->requestTimeComplete();
     vFed2->requestTimeAsync(2.0);
+    f1time=vFed1->requestTimeComplete();
     gtime=vFed2->requestTimeComplete();
 
 	BOOST_CHECK_EQUAL(f1time, 2.0);
 	BOOST_CHECK_EQUAL(gtime, 2.0);
 
 	// make sure the value was updated
-    subid.getString();
+    s=subid.getString();
 	BOOST_CHECK_EQUAL(s, "string2");
 
     vFed1->finalize();

@@ -158,7 +158,7 @@ regardless of the function used to publish the data
 @param len the size in bytes of the data to publish
 @return helics_ok if everything was OK
 */
-HELICS_Export helics_status helicsPublicationPublishRaw (helics_publication pub, const void *data, int datalen);
+HELICS_Export helics_status helicsPublicationPublishRaw (helics_publication pub, const void *data, int inputDataLength);
 
 /** publish a string
 @param pub the publication to publish for
@@ -276,7 +276,7 @@ HELICS_Export helics_status helicsSubscriptionGetVector (helics_subscription sub
 @param len the size of the raw data
 @return helics_ok if everything was OK
 */
-HELICS_Export helics_status helicsSubscriptionSetDefaultRaw (helics_subscription sub, const void *data, int datalen);
+HELICS_Export helics_status helicsSubscriptionSetDefaultRaw (helics_subscription sub, const void *data, int inputDataLength);
 
 /** set the default as a string
 @param sub the subscription to set the default for
