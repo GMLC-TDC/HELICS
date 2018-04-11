@@ -2,7 +2,7 @@ import time
 import helics as h
 import random
 
-def get_input():
+def get_input(grantedtime):
 
     valid_input = False
     while not valid_input:
@@ -12,6 +12,9 @@ def get_input():
         request_time_str = string.replace(",", " ").split(" ")[0]
         try:
             request_time = int(request_time_str)
+            if request_time <= grantedtime:
+                print("request_time has to be greater than grantedtime.")
+                raise RuntimeError("Cannot proceed here because invalid input.")
         except:
             valid_input = False
             continue
@@ -84,12 +87,15 @@ def main():
 
     grantedtime = -1
     while True:
-        stop_at_time, value_to_send = get_input()
+        stop_at_time, value_to_send = get_input(grantedtime)
         while grantedtime < stop_at_time:
             print(">>>>>>>> Requesting time = {}".format(stop_at_time))
             status, grantedtime = h.helicsFederateRequestTime(fed, stop_at_time)
+            if grantedtime != stop_at_time:
+                status, value = h.helicsSubscriptionGetDouble(subid)
+                print("Unexpected value {} from Federate 2".format(value))
             print("<<<<<<<< Granted Time = {}".format(grantedtime))
-        assert grantedtime == stop_at_time
+        assert grantedtime == stop_at_time, "stop_at_time = {}, grantedtime = {}".format(stop_at_time, grantedtime)
         if value_to_send is not None:
             print("Sending {} to Federate 1".format(value_to_send))
             status = h.helicsPublicationPublishDouble(pubid, value_to_send)
