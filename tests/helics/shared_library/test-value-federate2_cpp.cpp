@@ -29,9 +29,8 @@ BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type
 	helics_time_t gtime;
     std::string s(500,';');
 	int len = static_cast<int>(s.size());
-    FederateTestFixture_cpp fixture;
-    fixture.SetupTest<helics::ValueFederate>(core_type, 1);
-    auto vFed1 = fixture.GetFederateAs<helics::ValueFederate>(0);
+    SetupTest<helics::ValueFederate>(core_type, 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 	auto pubid1 = vFed1->registerPublication( "pub1", "string", "");
     BOOST_CHECK(pubid1.baseObject() != nullptr);
 	auto pubid2 = vFed1->registerGlobalPublication("pub2", "integer", "");
@@ -73,10 +72,9 @@ BOOST_DATA_TEST_CASE(test_async_calls, bdata::make(core_types), core_type)
 	helics_time_t gtime;
 	helics_time_t f1time;
 	//federate_state state;
-    FederateTestFixture_cpp fixture;
-    fixture.SetupTest<helics::ValueFederate>(core_type, 2);
-    auto vFed1 = fixture.GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = fixture.GetFederateAs<helics::ValueFederate>(1);
+   SetupTest<helics::ValueFederate>(core_type, 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
 
 	// register the publications

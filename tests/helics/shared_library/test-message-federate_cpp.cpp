@@ -8,15 +8,17 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
-#include "ctestFixtures.hpp"
+#include "cpptestFixtures.hpp"
 
 #include <future>
 #include <iostream>
 #include <thread>
+
+#include "../src/helics/cpp98/MessageFederate.hpp"
 // these test cases test out the message federates
 
 
-BOOST_FIXTURE_TEST_SUITE (message_federate_tests_cpp, FederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE (message_federate_tests_cpp, FederateTestFixture_cpp)
 
 namespace bdata = boost::unit_test::data;
 
@@ -25,21 +27,21 @@ namespace utf = boost::unit_test;
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)
 {
-    SetupTest(helicsCreateMessageFederate,core_type, 1);
-    auto mFed1 = GetFederateAt(0);
+    SetupTest<helics::MessageFederate>(core_type, 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
-    CE (helicsFederateEnterExecutionMode (mFed1));
+    mFed1->enterExecutionMode ();
 
-    federate_state mFed1State;
-    CE(helicsFederateGetState(mFed1, &mFed1State));
+    federate_state mFed1State = mFed1->getState();
     BOOST_CHECK (mFed1State == helics_execution_state);
 
-    CE (helicsFederateFinalize(mFed1));
+    mFed1->finalize();
 
-   CE(helicsFederateGetState(mFed1, &mFed1State));
+    mFed1State = mFed1->getState();
     BOOST_CHECK (mFed1State == federate_state::helics_finalize_state);
 }
 
+/*
 BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_types_single), core_type)
 {
 	SetupTest(helicsCreateMessageFederate,core_type, 1);
@@ -184,6 +186,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
     CE(helicsFederateGetState(mFed2, &mFed2State));
 	BOOST_CHECK (mFed2State == federate_state::helics_finalize_state);
 }
+*/
 /*
 
 BOOST_TEST_DECORATOR (*utf::timeout (12))

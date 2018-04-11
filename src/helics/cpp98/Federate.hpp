@@ -156,6 +156,13 @@ class Federate
 
     void setLoggingLevel (int logLevel) { helicsFederateInfoSetLoggingLevel (fed, logLevel); }
 
+    federate_state getState() const
+    {
+        federate_state fedState;
+        helicsFederateGetState(fed, &fedState);
+        return fedState;
+    }
+
     void enterInitializationMode ()
     {
         if (helics_ok != helicsFederateEnterInitializationMode (fed))
