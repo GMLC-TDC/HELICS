@@ -11,6 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <string>
 #include <vector>
 #include <algorithm>
+#include "helics_includes/optional.hpp"
 #include "MapTraits.hpp"
 
 /** class merging a vector of pointer with a map that can be used to lookup specific values
@@ -23,7 +24,34 @@ public:
 	MappedPointerVector(MappedPointerVector &&mp) = default;
 	MappedPointerVector &operator=(MappedPointerVector &&mp) = default;
 
-	size_t insert(const searchType &searchValue, std::unique_ptr<VType> &&ptr)
+    stx::optional<size_t> insert(const searchType &searchValue, std::unique_ptr<VType> &&ptr)
+    {
+        auto fnd = lookup.find(searchValue);
+        if (fnd != lookup.end())
+        {
+            return stx::nullopt;
+        }
+        auto index = dataStorage.size();
+        dataStorage.emplace_back(std::move(ptr));
+        lookup.emplace(searchValue, index);
+        return index;
+    }
+    /** insert a new element into the vector*/
+    template <typename... Us>
+    stx::optional<size_t> insert(const searchType &searchValue, Us &&... data)
+    {
+        auto fnd = lookup.find(searchValue);
+        if (fnd != lookup.end())
+        {
+            return stx::nullopt;
+        }
+        auto index = dataStorage.size();
+        dataStorage.emplace_back(std::make_unique<VType>(std::forward<Us>(data)...));
+        lookup.emplace(searchValue, index);
+        return index;
+    }
+
+	size_t insert_or_assign(const searchType &searchValue, std::unique_ptr<VType> &&ptr)
 	{
 		auto fnd = lookup.find(searchValue);
 		if (fnd != lookup.end())
@@ -38,7 +66,7 @@ public:
 	}
 	/** insert a new element into the vector*/
 	template <typename... Us>
-	size_t insert(const searchType &searchValue, Us &&... data)
+	size_t insert_or_assign(const searchType &searchValue, Us &&... data)
 	{
 		auto fnd = lookup.find(searchValue);
 		if (fnd != lookup.end())
