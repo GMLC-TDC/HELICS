@@ -75,9 +75,9 @@ int main (int argc, char *argv[])
     strcat(targetEndpoint, endpoint);
 
     helicsFederateGetName(mFed, str, 255);
-    printf("registering endpoint %s for %s\n", targetEndpoint, str);
+    printf("registering endpoint %s for %s\n", source, str);
     //this line actually creates an endpoint
-    ept = helicsFederateRegisterEndpoint(mFed, targetEndpoint, "");
+    ept = helicsFederateRegisterEndpoint(mFed, source, "");
 
     printf("entering init Mode\n");
     helicsFederateEnterInitializationMode(mFed);

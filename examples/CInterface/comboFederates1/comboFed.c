@@ -92,9 +92,9 @@ int main(int argc, char *argv[])
     strcat(targetEndpoint, endpoint);
 
     helicsFederateGetName(cFed, str, 255);
-    printf("registering endpoint %s for %s\n", targetEndpoint, str);
+    printf("registering endpoint %s for %s\n", source, str);
     //this line actually creates an endpoint
-    ept = helicsFederateRegisterEndpoint(cFed, targetEndpoint, "");
+    ept = helicsFederateRegisterEndpoint(cFed, source, "");
 
     pubid = helicsFederateRegisterPublication(cFed, "pub", "double", "");
     
