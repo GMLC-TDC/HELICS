@@ -48,3 +48,4 @@ ADD_TEST(NAME java_MessageFilter_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.lib
 
 ADD_TEST(NAME java_ValueFederate_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=${CMAKE_BINARY_DIR}/swig/java -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics.jar:${CMAKE_BINARY_DIR}/tests/java_helics TestValueFederate)
 
+set_tests_properties(java_hello java_application_api_test java_MessageFederate_test java_MessageFilter_test java_ValueFederate_test PROPERTIES LABELS Java)
