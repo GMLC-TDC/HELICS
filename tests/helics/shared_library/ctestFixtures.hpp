@@ -159,7 +159,11 @@ struct FederateTestFixture
 
     helics_federate GetFederateAt (int index)
     {
-        return federates.at(index);
+        if (index < static_cast<int>(federates.size()))
+        {
+            return federates.at(index);
+        }
+        return nullptr;
     }
 
     std::vector<helics_broker> brokers;

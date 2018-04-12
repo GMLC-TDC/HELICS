@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -309,7 +308,7 @@ helics_publication helicsFederateRegisterGlobalTypePublication (helics_federate 
 }
 
 /* getting and publishing values */
-helics_status helicsPublicationPublish (helics_publication pub, const char *data, int len)
+helics_status helicsPublicationPublishRaw (helics_publication pub, const void *data, int datalen)
 {
     if (pub == nullptr)
     {
@@ -318,11 +317,11 @@ helics_status helicsPublicationPublish (helics_publication pub, const char *data
     auto pubObj = reinterpret_cast<helics::PublicationObject *> (pub);
     if (pubObj->rawOnly)
     {
-        pubObj->fedptr->publish (pubObj->id, data, len);
+        pubObj->fedptr->publish (pubObj->id, (const char *)data, datalen);
     }
     else
     {
-        pubObj->fedptr->publish (pubObj->pubptr->getID (), data, len);
+        pubObj->fedptr->publish (pubObj->pubptr->getID (), (const char *)data, datalen);
     }
     return helics_ok;
 }
@@ -442,13 +441,13 @@ int helicsSubscriptionGetValueSize (helics_subscription sub)
     return static_cast<int> (str.size ());
 }
 
-helics_status helicsSubscriptionGetRawValue (helics_subscription sub, char *data, int maxlen, int *actualSize)
+helics_status helicsSubscriptionGetRawValue (helics_subscription sub, void *data, int maxDatalen, int *actualSize)
 {
     if (sub == nullptr)
     {
         return helics_invalid_object;
     }
-    if ((data == nullptr) || (maxlen < 0))
+    if ((data == nullptr) || (maxDatalen < 0))
     {
         return helics_invalid_argument;
     }
@@ -456,7 +455,7 @@ helics_status helicsSubscriptionGetRawValue (helics_subscription sub, char *data
     if (subObj->rawOnly)
     {
         auto dv = subObj->fedptr->getValueRaw (subObj->id);
-        if (maxlen > static_cast<int> (dv.size ()))
+        if (maxDatalen > static_cast<int> (dv.size ()))
         {
             memcpy (data, dv.data (), dv.size ());
             if (actualSize != nullptr)
@@ -466,27 +465,27 @@ helics_status helicsSubscriptionGetRawValue (helics_subscription sub, char *data
 
             return helics_ok;
         }
-        memcpy (data, dv.data (), maxlen);
+        memcpy (data, dv.data (), maxDatalen);
         if (actualSize != nullptr)
         {
-            *actualSize = maxlen;
+            *actualSize = maxDatalen;
         }
         return helics_warning;
     }
 
     auto str = subObj->subptr->getValue<std::string> ();
-    if (maxlen > static_cast<int> (str.size ()))
+    if (maxDatalen > static_cast<int> (str.size ()))
     {
-        strcpy (data, str.c_str ());
+        memcpy (data, str.data(), static_cast<int> (str.size()));
         *actualSize = static_cast<int> (str.size ());
         return helics_ok;
     }
-    memcpy (data, str.data (), maxlen);
-    *actualSize = maxlen;
+    memcpy (data, str.data (), maxDatalen);
+    *actualSize = maxDatalen;
     return helics_warning;
 }
 
-helics_status helicsSubscriptionGetString (helics_subscription sub, char *outputString, int maxlen)
+helics_status helicsSubscriptionGetString (helics_subscription sub, char *outputString, int maxlen, int *actualLength)
 {
     if (sub == nullptr)
     {
@@ -497,15 +496,15 @@ helics_status helicsSubscriptionGetString (helics_subscription sub, char *output
     {
         return helics_invalid_argument;
     }
-    int len;
-    auto res = helicsSubscriptionGetRawValue (sub, outputString, maxlen, &len);
+
+    auto res = helicsSubscriptionGetRawValue (sub, outputString, maxlen, actualLength);
     // make sure we have a null terminator
-    if (len == maxlen)
+    if (*actualLength == maxlen)
     {
         outputString[maxlen - 1] = '\0';
         return helics_warning;
     }
-    outputString[len] = '\0';
+    outputString[*actualLength] = '\0';
     return res;
 }
 
@@ -630,20 +629,23 @@ helics_status helicsSubscriptionGetVector (helics_subscription sub, double data[
     return (length < maxlen) ? helics_ok : helics_warning;
 }
 
-helics_status helicsSubscriptionSetDefault (helics_subscription sub, const char *data, int len)
+helics_status helicsSubscriptionSetDefaultRaw (helics_subscription sub, const void *data, int dataLen)
 {
     if (sub == nullptr)
     {
         return helics_invalid_object;
     }
-    // TODO an empty Vector is valid
-    if ((data == nullptr) || (len <= 0))
-    {
-        return helics_error;
-    }
     auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
 
-    subObj->fedptr->setDefaultValue (subObj->id, helics::data_view (data, len));
+    if ((data == nullptr) || (dataLen <= 0))
+    {
+        subObj->fedptr->setDefaultValue(subObj->id,std::string());
+    }
+    else
+    {
+        subObj->fedptr->setDefaultValue(subObj->id, helics::data_view((const char *)data, dataLen));
+    }
+    
     return helics_ok;
 }
 

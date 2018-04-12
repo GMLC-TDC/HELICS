@@ -1,5 +1,3 @@
-#%include "cstring.i"
-
-%cstring_output_maxsize(char *str, int maxlen);
+%include "matlab_maps.i"
 %include "../helics.i"
 

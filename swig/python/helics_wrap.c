@@ -3414,116 +3414,6 @@ SWIG_AsVal_int (PyObject * obj, int *val)
   return res;
 }
 
-
-SWIGINTERN int
-SWIG_AsVal_unsigned_SS_long (PyObject *obj, unsigned long *val) 
-{
-#if PY_VERSION_HEX < 0x03000000
-  if (PyInt_Check(obj)) {
-    long v = PyInt_AsLong(obj);
-    if (v >= 0) {
-      if (val) *val = v;
-      return SWIG_OK;
-    } else {
-      return SWIG_OverflowError;
-    }
-  } else
-#endif
-  if (PyLong_Check(obj)) {
-    unsigned long v = PyLong_AsUnsignedLong(obj);
-    if (!PyErr_Occurred()) {
-      if (val) *val = v;
-      return SWIG_OK;
-    } else {
-      PyErr_Clear();
-      return SWIG_OverflowError;
-    }
-  }
-#ifdef SWIG_PYTHON_CAST_MODE
-  {
-    int dispatch = 0;
-    unsigned long v = PyLong_AsUnsignedLong(obj);
-    if (!PyErr_Occurred()) {
-      if (val) *val = v;
-      return SWIG_AddCast(SWIG_OK);
-    } else {
-      PyErr_Clear();
-    }
-    if (!dispatch) {
-      double d;
-      int res = SWIG_AddCast(SWIG_AsVal_double (obj,&d));
-      if (SWIG_IsOK(res) && SWIG_CanCastAsInteger(&d, 0, ULONG_MAX)) {
-	if (val) *val = (unsigned long)(d);
-	return res;
-      }
-    }
-  }
-#endif
-  return SWIG_TypeError;
-}
-
-
-#ifdef SWIG_LONG_LONG_AVAILABLE
-SWIGINTERN int
-SWIG_AsVal_unsigned_SS_long_SS_long (PyObject *obj, unsigned long long *val)
-{
-  int res = SWIG_TypeError;
-  if (PyLong_Check(obj)) {
-    unsigned long long v = PyLong_AsUnsignedLongLong(obj);
-    if (!PyErr_Occurred()) {
-      if (val) *val = v;
-      return SWIG_OK;
-    } else {
-      PyErr_Clear();
-      res = SWIG_OverflowError;
-    }
-  } else {
-    unsigned long v;
-    res = SWIG_AsVal_unsigned_SS_long (obj,&v);
-    if (SWIG_IsOK(res)) {
-      if (val) *val = v;
-      return res;
-    }
-  }
-#ifdef SWIG_PYTHON_CAST_MODE
-  {
-    const double mant_max = 1LL << DBL_MANT_DIG;
-    double d;
-    res = SWIG_AsVal_double (obj,&d);
-    if (SWIG_IsOK(res) && !SWIG_CanCastAsInteger(&d, 0, mant_max))
-      return SWIG_OverflowError;
-    if (SWIG_IsOK(res) && SWIG_CanCastAsInteger(&d, 0, mant_max)) {
-      if (val) *val = (unsigned long long)(d);
-      return SWIG_AddCast(res);
-    }
-    res = SWIG_TypeError;
-  }
-#endif
-  return res;
-}
-#endif
-
-
-SWIGINTERNINLINE int
-SWIG_AsVal_size_t (PyObject * obj, size_t *val)
-{
-  int res = SWIG_TypeError;
-#ifdef SWIG_LONG_LONG_AVAILABLE
-  if (sizeof(size_t) <= sizeof(unsigned long)) {
-#endif
-    unsigned long v;
-    res = SWIG_AsVal_unsigned_SS_long (obj, val ? &v : 0);
-    if (SWIG_IsOK(res) && val) *val = (size_t)(v);
-#ifdef SWIG_LONG_LONG_AVAILABLE
-  } else if (sizeof(size_t) <= sizeof(unsigned long long)) {
-    unsigned long long v;
-    res = SWIG_AsVal_unsigned_SS_long_SS_long (obj, val ? &v : 0);
-    if (SWIG_IsOK(res) && val) *val = (size_t)(v);
-  }
-#endif
-  return res;
-}
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -4540,37 +4430,32 @@ SWIGINTERN PyObject *_wrap_helicsBrokerGetIdentifier(PyObject *SWIGUNUSEDPARM(se
   char *arg2 = (char *) 0 ;
   int arg3 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsBrokerGetIdentifier",&obj0,&obj1,&obj2)) SWIG_fail;
+  {
+    arg3=256;
+    arg2=(char *)malloc(256);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsBrokerGetIdentifier",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerGetIdentifier" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsBrokerGetIdentifier" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsBrokerGetIdentifier" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = (int)(val3);
   result = (helics_status)helicsBrokerGetIdentifier(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    PyObject *str=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, str);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -4581,37 +4466,32 @@ SWIGINTERN PyObject *_wrap_helicsCoreGetIdentifier(PyObject *SWIGUNUSEDPARM(self
   char *arg2 = (char *) 0 ;
   int arg3 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsCoreGetIdentifier",&obj0,&obj1,&obj2)) SWIG_fail;
+  {
+    arg3=256;
+    arg2=(char *)malloc(256);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsCoreGetIdentifier",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreGetIdentifier" "', argument " "1"" of type '" "helics_core""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCoreGetIdentifier" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsCoreGetIdentifier" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = (int)(val3);
   result = (helics_status)helicsCoreGetIdentifier(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    PyObject *str=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, str);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -4622,37 +4502,32 @@ SWIGINTERN PyObject *_wrap_helicsBrokerGetAddress(PyObject *SWIGUNUSEDPARM(self)
   char *arg2 = (char *) 0 ;
   int arg3 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsBrokerGetAddress",&obj0,&obj1,&obj2)) SWIG_fail;
+  {
+    arg3=256;
+    arg2=(char *)malloc(256);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsBrokerGetAddress",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerGetAddress" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsBrokerGetAddress" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = (char *)(buf2);
-  ecode3 = SWIG_AsVal_int(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsBrokerGetAddress" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = (int)(val3);
   result = (helics_status)helicsBrokerGetAddress(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    PyObject *str=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, str);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -5995,32 +5870,32 @@ SWIGINTERN PyObject *_wrap_helicsFederateGetName(PyObject *SWIGUNUSEDPARM(self),
   char *arg2 = (char *) 0 ;
   int arg3 ;
   int res1 ;
-  int res2 ;
-  size_t size2 ;
-  char *buff2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateGetName",&obj0,&obj1)) SWIG_fail;
+  {
+    arg3=256;
+    arg2=(char *)malloc(256);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateGetName",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetName" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  res2 = SWIG_AsVal_size_t (obj1, &size2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateGetName" "', argument " "2"" of type '" "(char *outputString, int maxlen)""'");
-  }
-  buff2= (char *)calloc(size2+1, sizeof(char));
-  arg3 = (int)(size2);
-  arg2 = (char *)(buff2);
   result = (helics_status)helicsFederateGetName(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
-  if (buff2) free((char*)buff2);
+  {
+    PyObject *str=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, str);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (buff2) free((char*)buff2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -6845,37 +6720,38 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_helicsPublicationPublish(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_helicsPublicationPublishRaw(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_publication arg1 = (helics_publication) 0 ;
-  char *arg2 = (char *) 0 ;
+  void *arg2 = (void *) 0 ;
   int arg3 ;
   int res1 ;
   int res2 ;
-  char *buf2 = 0 ;
-  size_t size2 = 0 ;
-  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsPublicationPublish",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsPublicationPublishRaw",&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublish" "', argument " "1"" of type '" "helics_publication""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishRaw" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, &size2, &alloc2);
+  res2 = SWIG_ConvertPtr(obj1,SWIG_as_voidptrptr(&arg2), 0, 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationPublish" "', argument " "2"" of type '" "char const *""'");
-  }  
-  arg2 = (char *)(buf2);
-  arg3 = (int)(size2 - 1);
-  result = (helics_status)helicsPublicationPublish(arg1,(char const *)arg2,arg3);
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationPublishRaw" "', argument " "2"" of type '" "void const *""'"); 
+  }
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationPublishRaw" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (helics_status)helicsPublicationPublishRaw(arg1,(void const *)arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return resultobj;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return NULL;
 }
 
@@ -6904,8 +6780,6 @@ SWIGINTERN PyObject *_wrap_helicsPublicationPublishString(PyObject *SWIGUNUSEDPA
   arg2 = (char *)(buf2);
   result = (helics_status)helicsPublicationPublishString(arg1,(char const *)arg2);
   resultobj = SWIG_From_int((int)(result));
-  arg2[1024] = 0;  
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return resultobj;
 fail:
@@ -7088,13 +6962,11 @@ fail:
 SWIGINTERN PyObject *_wrap_helicsSubscriptionGetRawValue(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
-  char *arg2 = (char *) 0 ;
+  void *arg2 = (void *) 0 ;
   int arg3 ;
   int *arg4 = (int *) 0 ;
   int res1 ;
   int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
   int temp4 ;
@@ -7110,11 +6982,10 @@ SWIGINTERN PyObject *_wrap_helicsSubscriptionGetRawValue(PyObject *SWIGUNUSEDPAR
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetRawValue" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  res2 = SWIG_ConvertPtr(obj1,SWIG_as_voidptrptr(&arg2), 0, 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetRawValue" "', argument " "2"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetRawValue" "', argument " "2"" of type '" "void *""'"); 
   }
-  arg2 = (char *)(buf2);
   ecode3 = SWIG_AsVal_int(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionGetRawValue" "', argument " "3"" of type '" "int""'");
@@ -7128,10 +6999,8 @@ SWIGINTERN PyObject *_wrap_helicsSubscriptionGetRawValue(PyObject *SWIGUNUSEDPAR
     int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_int, new_flags));
   }
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return resultobj;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return NULL;
 }
 
@@ -7141,33 +7010,37 @@ SWIGINTERN PyObject *_wrap_helicsSubscriptionGetString(PyObject *SWIGUNUSEDPARM(
   helics_subscription arg1 = (helics_subscription) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
+  int *arg4 = (int *) 0 ;
   int res1 ;
-  int res2 ;
-  size_t size2 ;
-  char *buff2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsSubscriptionGetString",&obj0,&obj1)) SWIG_fail;
+  {
+    arg4=&(arg3);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsSubscriptionGetString",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetString" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  res2 = SWIG_AsVal_size_t (obj1, &size2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetString" "', argument " "2"" of type '" "(char *outputString, int maxlen)""'");
+  {
+    arg3=helicsSubscriptionGetValueSize(arg1)+2;
+    arg2 = (char *) malloc(arg3);
   }
-  buff2= (char *)calloc(size2+1, sizeof(char));
-  arg3 = (int)(size2);
-  arg2 = (char *)(buff2);
-  result = (helics_status)helicsSubscriptionGetString(arg1,arg2,arg3);
+  result = (helics_status)helicsSubscriptionGetString(arg1,arg2,arg3,arg4);
   resultobj = SWIG_From_int((int)(result));
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
-  if (buff2) free((char*)buff2);
+  {
+    PyObject *o2=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, o2);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (buff2) free((char*)buff2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -7303,6 +7176,9 @@ SWIGINTERN PyObject *_wrap_helicsSubscriptionGetVector(PyObject *SWIGUNUSEDPARM(
   helics_status result;
   
   {
+    arg2=(double *)(NULL);
+  }
+  {
     arg4=&(arg3);
   }
   if (!PyArg_ParseTuple(args,(char *)"O:helicsSubscriptionGetVector",&obj0)) SWIG_fail;
@@ -7313,7 +7189,6 @@ SWIGINTERN PyObject *_wrap_helicsSubscriptionGetVector(PyObject *SWIGUNUSEDPARM(
   {
     arg3=helicsSubscriptionGetVectorSize(arg1);
     arg2 = (double *) malloc(arg3*sizeof(double));
-    arg4=&(arg3);
   }
   result = (helics_status)helicsSubscriptionGetVector(arg1,arg2,arg3,arg4);
   resultobj = SWIG_From_int((int)(result));
@@ -7339,37 +7214,38 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_helicsSubscriptionSetDefault(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_helicsSubscriptionSetDefaultRaw(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
-  char *arg2 = (char *) 0 ;
+  void *arg2 = (void *) 0 ;
   int arg3 ;
   int res1 ;
   int res2 ;
-  char *buf2 = 0 ;
-  size_t size2 = 0 ;
-  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsSubscriptionSetDefault",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsSubscriptionSetDefaultRaw",&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefault" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultRaw" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, &size2, &alloc2);
+  res2 = SWIG_ConvertPtr(obj1,SWIG_as_voidptrptr(&arg2), 0, 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionSetDefault" "', argument " "2"" of type '" "char const *""'");
-  }  
-  arg2 = (char *)(buf2);
-  arg3 = (int)(size2 - 1);
-  result = (helics_status)helicsSubscriptionSetDefault(arg1,(char const *)arg2,arg3);
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionSetDefaultRaw" "', argument " "2"" of type '" "void const *""'"); 
+  }
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionSetDefaultRaw" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (helics_status)helicsSubscriptionSetDefaultRaw(arg1,(void const *)arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return resultobj;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return NULL;
 }
 
@@ -7398,8 +7274,6 @@ SWIGINTERN PyObject *_wrap_helicsSubscriptionSetDefaultString(PyObject *SWIGUNUS
   arg2 = (char *)(buf2);
   result = (helics_status)helicsSubscriptionSetDefaultString(arg1,(char const *)arg2);
   resultobj = SWIG_From_int((int)(result));
-  arg2[1024] = 0;  
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return resultobj;
 fail:
@@ -7565,32 +7439,32 @@ SWIGINTERN PyObject *_wrap_helicsSubscriptionGetType(PyObject *SWIGUNUSEDPARM(se
   char *arg2 = (char *) 0 ;
   int arg3 ;
   int res1 ;
-  int res2 ;
-  size_t size2 ;
-  char *buff2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsSubscriptionGetType",&obj0,&obj1)) SWIG_fail;
+  {
+    arg3=256;
+    arg2=(char *)malloc(256);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsSubscriptionGetType",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetType" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  res2 = SWIG_AsVal_size_t (obj1, &size2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetType" "', argument " "2"" of type '" "(char *outputString, int maxlen)""'");
-  }
-  buff2= (char *)calloc(size2+1, sizeof(char));
-  arg3 = (int)(size2);
-  arg2 = (char *)(buff2);
   result = (helics_status)helicsSubscriptionGetType(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
-  if (buff2) free((char*)buff2);
+  {
+    PyObject *str=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, str);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (buff2) free((char*)buff2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -7601,32 +7475,32 @@ SWIGINTERN PyObject *_wrap_helicsPublicationGetType(PyObject *SWIGUNUSEDPARM(sel
   char *arg2 = (char *) 0 ;
   int arg3 ;
   int res1 ;
-  int res2 ;
-  size_t size2 ;
-  char *buff2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsPublicationGetType",&obj0,&obj1)) SWIG_fail;
+  {
+    arg3=256;
+    arg2=(char *)malloc(256);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsPublicationGetType",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationGetType" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  res2 = SWIG_AsVal_size_t (obj1, &size2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationGetType" "', argument " "2"" of type '" "(char *outputString, int maxlen)""'");
-  }
-  buff2= (char *)calloc(size2+1, sizeof(char));
-  arg3 = (int)(size2);
-  arg2 = (char *)(buff2);
   result = (helics_status)helicsPublicationGetType(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
-  if (buff2) free((char*)buff2);
+  {
+    PyObject *str=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, str);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (buff2) free((char*)buff2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -7637,32 +7511,32 @@ SWIGINTERN PyObject *_wrap_helicsSubscriptionGetKey(PyObject *SWIGUNUSEDPARM(sel
   char *arg2 = (char *) 0 ;
   int arg3 ;
   int res1 ;
-  int res2 ;
-  size_t size2 ;
-  char *buff2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsSubscriptionGetKey",&obj0,&obj1)) SWIG_fail;
+  {
+    arg3=256;
+    arg2=(char *)malloc(256);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsSubscriptionGetKey",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetKey" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  res2 = SWIG_AsVal_size_t (obj1, &size2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetKey" "', argument " "2"" of type '" "(char *outputString, int maxlen)""'");
-  }
-  buff2= (char *)calloc(size2+1, sizeof(char));
-  arg3 = (int)(size2);
-  arg2 = (char *)(buff2);
   result = (helics_status)helicsSubscriptionGetKey(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
-  if (buff2) free((char*)buff2);
+  {
+    PyObject *str=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, str);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (buff2) free((char*)buff2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -7673,32 +7547,32 @@ SWIGINTERN PyObject *_wrap_helicsPublicationGetKey(PyObject *SWIGUNUSEDPARM(self
   char *arg2 = (char *) 0 ;
   int arg3 ;
   int res1 ;
-  int res2 ;
-  size_t size2 ;
-  char *buff2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsPublicationGetKey",&obj0,&obj1)) SWIG_fail;
+  {
+    arg3=256;
+    arg2=(char *)malloc(256);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsPublicationGetKey",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationGetKey" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  res2 = SWIG_AsVal_size_t (obj1, &size2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationGetKey" "', argument " "2"" of type '" "(char *outputString, int maxlen)""'");
-  }
-  buff2= (char *)calloc(size2+1, sizeof(char));
-  arg3 = (int)(size2);
-  arg2 = (char *)(buff2);
   result = (helics_status)helicsPublicationGetKey(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
-  if (buff2) free((char*)buff2);
+  {
+    PyObject *str=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, str);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (buff2) free((char*)buff2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -7709,32 +7583,32 @@ SWIGINTERN PyObject *_wrap_helicsSubscriptionGetUnits(PyObject *SWIGUNUSEDPARM(s
   char *arg2 = (char *) 0 ;
   int arg3 ;
   int res1 ;
-  int res2 ;
-  size_t size2 ;
-  char *buff2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsSubscriptionGetUnits",&obj0,&obj1)) SWIG_fail;
+  {
+    arg3=256;
+    arg2=(char *)malloc(256);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsSubscriptionGetUnits",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetUnits" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
-  res2 = SWIG_AsVal_size_t (obj1, &size2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetUnits" "', argument " "2"" of type '" "(char *outputString, int maxlen)""'");
-  }
-  buff2= (char *)calloc(size2+1, sizeof(char));
-  arg3 = (int)(size2);
-  arg2 = (char *)(buff2);
   result = (helics_status)helicsSubscriptionGetUnits(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
-  if (buff2) free((char*)buff2);
+  {
+    PyObject *str=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, str);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (buff2) free((char*)buff2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -7745,32 +7619,32 @@ SWIGINTERN PyObject *_wrap_helicsPublicationGetUnits(PyObject *SWIGUNUSEDPARM(se
   char *arg2 = (char *) 0 ;
   int arg3 ;
   int res1 ;
-  int res2 ;
-  size_t size2 ;
-  char *buff2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsPublicationGetUnits",&obj0,&obj1)) SWIG_fail;
+  {
+    arg3=256;
+    arg2=(char *)malloc(256);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsPublicationGetUnits",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationGetUnits" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  res2 = SWIG_AsVal_size_t (obj1, &size2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationGetUnits" "', argument " "2"" of type '" "(char *outputString, int maxlen)""'");
-  }
-  buff2= (char *)calloc(size2+1, sizeof(char));
-  arg3 = (int)(size2);
-  arg2 = (char *)(buff2);
   result = (helics_status)helicsPublicationGetUnits(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
-  if (buff2) free((char*)buff2);
+  {
+    PyObject *str=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, str);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (buff2) free((char*)buff2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -7979,16 +7853,12 @@ SWIGINTERN PyObject *_wrap_helicsEndpointSendMessageRaw(PyObject *SWIGUNUSEDPARM
   PyObject *resultobj = 0;
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
+  void *arg3 = (void *) 0 ;
   int arg4 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  size_t size3 = 0 ;
-  int alloc3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -8004,20 +7874,44 @@ SWIGINTERN PyObject *_wrap_helicsEndpointSendMessageRaw(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendMessageRaw" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, &size3, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSendMessageRaw" "', argument " "3"" of type '" "char const *""'");
-  }  
-  arg3 = (char *)(buf3);
-  arg4 = (int)(size3 - 1);
-  result = (helics_status)helicsEndpointSendMessageRaw(arg1,(char const *)arg2,(char const *)arg3,arg4);
+  {
+    if (PyUnicode_Check(obj2)) {
+      int kind=PyUnicode_KIND(obj2);
+      arg3=PyUnicode_DATA(obj2);
+      switch(kind)
+      {
+      case PyUnicode_1BYTE_KIND:
+      default:
+        arg4=PyUnicode_GetLength(obj2);
+        break;
+      case PyUnicode_2BYTE_KIND:
+      case PyUnicode_WCHAR_KIND:
+        arg4=PyUnicode_GetLength(obj2)*2;
+        break;
+      case PyUnicode_4BYTE_KIND:
+        arg4=PyUnicode_GetLength(obj2)*4;
+        break;
+      }
+    }
+    else if (PyBytes_Check(obj2)) {
+      arg3=PyBytes_AsString(obj2);
+      arg4=PyBytes_Size(obj2);
+    }
+    else 
+    {
+      PyErr_SetString(PyExc_ValueError,"Expected a string or bytes");
+      return NULL;
+    }
+  }
+  result = (helics_status)helicsEndpointSendMessageRaw(arg1,(char const *)arg2,(void const *)arg3,arg4);
   resultobj = SWIG_From_int((int)(result));
+  {
+    
+  }
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
   return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
   return NULL;
 }
 
@@ -8026,17 +7920,13 @@ SWIGINTERN PyObject *_wrap_helicsEndpointSendEventRaw(PyObject *SWIGUNUSEDPARM(s
   PyObject *resultobj = 0;
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
+  void *arg3 = (void *) 0 ;
   int arg4 ;
   helics_time_t arg5 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  size_t size3 = 0 ;
-  int alloc3 = 0 ;
   double val5 ;
   int ecode5 = 0 ;
   PyObject * obj0 = 0 ;
@@ -8055,25 +7945,49 @@ SWIGINTERN PyObject *_wrap_helicsEndpointSendEventRaw(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendEventRaw" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, &size3, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSendEventRaw" "', argument " "3"" of type '" "char const *""'");
-  }  
-  arg3 = (char *)(buf3);
-  arg4 = (int)(size3 - 1);
+  {
+    if (PyUnicode_Check(obj2)) {
+      int kind=PyUnicode_KIND(obj2);
+      arg3=PyUnicode_DATA(obj2);
+      switch(kind)
+      {
+      case PyUnicode_1BYTE_KIND:
+      default:
+        arg4=PyUnicode_GetLength(obj2);
+        break;
+      case PyUnicode_2BYTE_KIND:
+      case PyUnicode_WCHAR_KIND:
+        arg4=PyUnicode_GetLength(obj2)*2;
+        break;
+      case PyUnicode_4BYTE_KIND:
+        arg4=PyUnicode_GetLength(obj2)*4;
+        break;
+      }
+    }
+    else if (PyBytes_Check(obj2)) {
+      arg3=PyBytes_AsString(obj2);
+      arg4=PyBytes_Size(obj2);
+    }
+    else 
+    {
+      PyErr_SetString(PyExc_ValueError,"Expected a string or bytes");
+      return NULL;
+    }
+  }
   ecode5 = SWIG_AsVal_double(obj3, &val5);
   if (!SWIG_IsOK(ecode5)) {
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "helicsEndpointSendEventRaw" "', argument " "5"" of type '" "helics_time_t""'");
   } 
   arg5 = (helics_time_t)(val5);
-  result = (helics_status)helicsEndpointSendEventRaw(arg1,(char const *)arg2,(char const *)arg3,arg4,arg5);
+  result = (helics_status)helicsEndpointSendEventRaw(arg1,(char const *)arg2,(void const *)arg3,arg4,arg5);
   resultobj = SWIG_From_int((int)(result));
+  {
+    
+  }
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
   return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
   return NULL;
 }
 
@@ -8277,32 +8191,32 @@ SWIGINTERN PyObject *_wrap_helicsEndpointGetType(PyObject *SWIGUNUSEDPARM(self),
   char *arg2 = (char *) 0 ;
   int arg3 ;
   int res1 ;
-  int res2 ;
-  size_t size2 ;
-  char *buff2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsEndpointGetType",&obj0,&obj1)) SWIG_fail;
+  {
+    arg3=256;
+    arg2=(char *)malloc(256);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsEndpointGetType",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetType" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  res2 = SWIG_AsVal_size_t (obj1, &size2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointGetType" "', argument " "2"" of type '" "(char *outputString, int maxlen)""'");
-  }
-  buff2= (char *)calloc(size2+1, sizeof(char));
-  arg3 = (int)(size2);
-  arg2 = (char *)(buff2);
   result = (helics_status)helicsEndpointGetType(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
-  if (buff2) free((char*)buff2);
+  {
+    PyObject *str=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, str);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (buff2) free((char*)buff2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -8313,32 +8227,32 @@ SWIGINTERN PyObject *_wrap_helicsEndpointGetName(PyObject *SWIGUNUSEDPARM(self),
   char *arg2 = (char *) 0 ;
   int arg3 ;
   int res1 ;
-  int res2 ;
-  size_t size2 ;
-  char *buff2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsEndpointGetName",&obj0,&obj1)) SWIG_fail;
+  {
+    arg3=256;
+    arg2=(char *)malloc(256);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsEndpointGetName",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetName" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  res2 = SWIG_AsVal_size_t (obj1, &size2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointGetName" "', argument " "2"" of type '" "(char *outputString, int maxlen)""'");
-  }
-  buff2= (char *)calloc(size2+1, sizeof(char));
-  arg3 = (int)(size2);
-  arg2 = (char *)(buff2);
   result = (helics_status)helicsEndpointGetName(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
-  if (buff2) free((char*)buff2);
+  {
+    PyObject *str=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, str);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (buff2) free((char*)buff2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -8645,32 +8559,32 @@ SWIGINTERN PyObject *_wrap_helicsFilterGetTarget(PyObject *SWIGUNUSEDPARM(self),
   char *arg2 = (char *) 0 ;
   int arg3 ;
   int res1 ;
-  int res2 ;
-  size_t size2 ;
-  char *buff2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFilterGetTarget",&obj0,&obj1)) SWIG_fail;
+  {
+    arg3=256;
+    arg2=(char *)malloc(256);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFilterGetTarget",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterGetTarget" "', argument " "1"" of type '" "helics_filter""'"); 
   }
-  res2 = SWIG_AsVal_size_t (obj1, &size2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterGetTarget" "', argument " "2"" of type '" "(char *outputString, int maxlen)""'");
-  }
-  buff2= (char *)calloc(size2+1, sizeof(char));
-  arg3 = (int)(size2);
-  arg2 = (char *)(buff2);
   result = (helics_status)helicsFilterGetTarget(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
-  if (buff2) free((char*)buff2);
+  {
+    PyObject *str=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, str);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (buff2) free((char*)buff2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -8681,32 +8595,32 @@ SWIGINTERN PyObject *_wrap_helicsFilterGetName(PyObject *SWIGUNUSEDPARM(self), P
   char *arg2 = (char *) 0 ;
   int arg3 ;
   int res1 ;
-  int res2 ;
-  size_t size2 ;
-  char *buff2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFilterGetName",&obj0,&obj1)) SWIG_fail;
+  {
+    arg3=256;
+    arg2=(char *)malloc(256);
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFilterGetName",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterGetName" "', argument " "1"" of type '" "helics_filter""'"); 
   }
-  res2 = SWIG_AsVal_size_t (obj1, &size2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterGetName" "', argument " "2"" of type '" "(char *outputString, int maxlen)""'");
-  }
-  buff2= (char *)calloc(size2+1, sizeof(char));
-  arg3 = (int)(size2);
-  arg2 = (char *)(buff2);
   result = (helics_status)helicsFilterGetName(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
-  if (buff2) free((char*)buff2);
+  {
+    PyObject *str=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, str);
+  }
+  {
+    if (arg2) free(arg2);
+  }
   return resultobj;
 fail:
-  if (buff2) free((char*)buff2);
+  {
+    if (arg2) free(arg2);
+  }
   return NULL;
 }
 
@@ -10040,10 +9954,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"\n"
 		""},
-	 { (char *)"helicsPublicationPublish", _wrap_helicsPublicationPublish, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsPublicationPublishRaw", _wrap_helicsPublicationPublishRaw, METH_VARARGS, NULL},
 	 { (char *)"helicsPublicationPublishString", _wrap_helicsPublicationPublishString, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -10106,10 +10017,7 @@ static PyMethodDef SwigMethods[] = {
 		"    pointer to variable to store the actual size\n"
 		"\n"
 		""},
-	 { (char *)"helicsSubscriptionSetDefault", _wrap_helicsSubscriptionSetDefault, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsSubscriptionSetDefaultRaw", _wrap_helicsSubscriptionSetDefaultRaw, METH_VARARGS, NULL},
 	 { (char *)"helicsSubscriptionSetDefaultString", _wrap_helicsSubscriptionSetDefaultString, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"

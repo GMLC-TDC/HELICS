@@ -185,6 +185,7 @@ void Federate::enterInitializationState ()
 
 void Federate::enterInitializationStateAsync ()
 {
+    std::lock_guard<std::mutex> alock(asyncLock);
     if (state == op_states::startup)
     {
         state = op_states::pending_init;
@@ -203,6 +204,7 @@ void Federate::enterInitializationStateAsync ()
 
 bool Federate::isAsyncOperationCompleted () const
 {
+    std::lock_guard<std::mutex> alock(asyncLock);
     switch (state)
     {
     case op_states::pending_init:
@@ -221,13 +223,16 @@ bool Federate::isAsyncOperationCompleted () const
 
 void Federate::enterInitializationStateComplete ()
 {
+    std::lock_guard<std::mutex> alock(asyncLock);
     switch (state)
     {
     case op_states::pending_init:
-        asyncCallInfo->initFuture.get ();
+    {
+        asyncCallInfo->initFuture.get();
         state = op_states::initialization;
-        currentTime = coreObject->getCurrentTime (fedID);
-        startupToInitializeStateTransition ();
+        currentTime = coreObject->getCurrentTime(fedID);
+        startupToInitializeStateTransition();
+    }
         break;
     case op_states::initialization:
         break;
@@ -291,6 +296,7 @@ iteration_result Federate::enterExecutionState (iteration_request iterate)
 
 void Federate::enterExecutionStateAsync (iteration_request iterate)
 {
+    std::lock_guard<std::mutex> alock(asyncLock);
     switch (state)
     {
     case op_states::startup:
@@ -300,6 +306,7 @@ void Federate::enterExecutionStateAsync (iteration_request iterate)
             startupToInitializeStateTransition ();
             return coreObject->enterExecutingState (fedID, iterate);
         };
+        
         state = op_states::pending_exec;
         asyncCallInfo->execFuture = std::async (std::launch::async, eExecFunc);
     }
@@ -327,6 +334,7 @@ void Federate::enterExecutionStateAsync (iteration_request iterate)
 
 iteration_result Federate::enterExecutionStateComplete ()
 {
+    std::lock_guard<std::mutex> alock(asyncLock);
     if (state != op_states::pending_exec)
     {
         throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
@@ -393,6 +401,13 @@ void Federate::setPeriod (Time period, Time offset)
 }
 
 void Federate::setLoggingLevel (int loggingLevel) { coreObject->setLoggingLevel (fedID, loggingLevel); }
+
+void Federate::setMaxIterations(int maxIterations) { coreObject->setMaximumIterations(fedID, maxIterations); }
+void Federate::setLoggingCallback(
+    const std::function<void(int, const std::string &, const std::string &)> &logFunction)
+{
+    coreObject->setLoggingCallback(fedID, logFunction);
+}
 
 void Federate::setFlag (int flag, bool flagValue)
 {
@@ -526,6 +541,7 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
 
 void Federate::requestTimeAsync (Time nextInternalTimeStep)
 {
+    std::lock_guard<std::mutex> alock(asyncLock);
     if (state == op_states::execution)
     {
         state = op_states::pending_time;
@@ -544,6 +560,7 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 @return the granted time step*/
 void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
+    std::lock_guard<std::mutex> alock(asyncLock);
     if (state == op_states::execution)
     {
         state = op_states::pending_iterative_time;
@@ -563,6 +580,7 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_r
 @return the granted time step*/
 Time Federate::requestTimeComplete ()
 {
+    std::lock_guard<std::mutex> alock(asyncLock);
     if (state == op_states::pending_time)
     {
         auto newTime = asyncCallInfo->timeRequestFuture.get ();
@@ -583,6 +601,7 @@ Time Federate::requestTimeComplete ()
 @return the granted time step*/
 iteration_time Federate::requestTimeIterativeComplete ()
 {
+    std::lock_guard<std::mutex> alock(asyncLock);
     if (state == op_states::pending_iterative_time)
     {
         auto iterativeTime = asyncCallInfo->timeRequestIterativeFuture.get ();
@@ -803,6 +822,7 @@ std::string Federate::query (const std::string &target, const std::string &query
 
 query_id_t Federate::queryAsync (const std::string &target, const std::string &queryStr)
 {
+    std::lock_guard<std::mutex> alock(asyncLock);
     int cnt = asyncCallInfo->queryCounter++;
 
     auto queryFut =
@@ -813,6 +833,7 @@ query_id_t Federate::queryAsync (const std::string &target, const std::string &q
 
 query_id_t Federate::queryAsync (const std::string &queryStr)
 {
+    std::lock_guard<std::mutex> alock(asyncLock);
     int cnt = asyncCallInfo->queryCounter++;
 
     auto queryFut = std::async (std::launch::async, [this, queryStr]() { return query (queryStr); });
@@ -822,6 +843,7 @@ query_id_t Federate::queryAsync (const std::string &queryStr)
 
 std::string Federate::queryComplete (query_id_t queryIndex)
 {
+    std::lock_guard<std::mutex> alock(asyncLock);
     auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value ());
     if (fnd != asyncCallInfo->inFlightQueries.end ())
     {
@@ -832,6 +854,7 @@ std::string Federate::queryComplete (query_id_t queryIndex)
 
 bool Federate::isQueryCompleted (query_id_t queryIndex) const
 {
+    std::lock_guard<std::mutex> alock(asyncLock);
     auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value ());
     if (fnd != asyncCallInfo->inFlightQueries.end ())
     {

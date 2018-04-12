@@ -54,6 +54,7 @@ int main()
   helics_subscription sub;
   helics_publication  pub;
   int converged;
+  int stringLength;
   char sendbuf[100],recvbuf[100];
   double y = 1.0, /*xprv = 100,*/ yprv=100;
   int my_conv=0,other_conv; /* Global and local convergence */
@@ -118,7 +119,7 @@ int main()
   while (currenttimeiter==iterating) {
       int global_conv = 0;
       double x = 0.0;
-    helicsSubscriptionGetString(sub,recvbuf,100);
+    helicsSubscriptionGetString(sub,recvbuf,100, &stringLength);
     sscanf(recvbuf,"%lf,%d",&x,&other_conv);
 
     /* Check for global convergence */

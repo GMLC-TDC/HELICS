@@ -54,7 +54,7 @@ HELICS_Export helics_status helicsEndpointSetDefaultDestination (helics_endpoint
 @param len the length of the data to send
 @return helics_ok if everything worked
 */
-HELICS_Export helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const char *data, int len);
+HELICS_Export helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength);
 
 /** send a message at a specific time to the specified destination
 @param endpoint the endpoint to send the data from
@@ -65,7 +65,7 @@ HELICS_Export helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoi
 @return helics_ok if everything worked
 */
 HELICS_Export helics_status
-helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time);
+helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength, helics_time_t time);
 
 /** send a message object from a specific endpoint
 @param endpoint the endpoint to send the data from

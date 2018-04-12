@@ -56,7 +56,7 @@ Building HELICS with python support
 Run the following:
 
 ```bash
-$ cmake -DBUILD_PYTHON=ON -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/ -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/python3.6m/libpython3.6m.so -DCMAKE_INSTALL_PREFIX=~/local/helics-1.0.0/ ..
+$ cmake -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/ -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/python3.6m/libpython3.6m.so -DCMAKE_INSTALL_PREFIX=~/local/helics-1.0.0/ ..
 $ make -j8
 $ make install
 ```
