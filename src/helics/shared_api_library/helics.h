@@ -22,7 +22,7 @@ extern "C" {
   it may be set to __declspec(dllimport).
 */
 #if !defined(HELICS_Export)
-#if defined _WIN32 || defined __CYGWIN__
+#if defined (_WIN32) || defined (__CYGWIN__)
 /* Note: both gcc & MSVC on Windows support this syntax. */
 #define HELICS_Export __declspec(dllexport)
 #else
