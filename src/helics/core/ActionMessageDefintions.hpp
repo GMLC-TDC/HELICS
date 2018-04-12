@@ -244,6 +244,11 @@ inline bool hasInfo (action_message_def::action_t action)
 @return a pointer to string with the name
 */
 const char *actionMessageType (action_message_def::action_t action);
+/** return a string associated with a particular error code
+@param errorcode The error to get the string for
+@return a pointer to string with the name
+*/
+const char *commandErrorString(int errorcode);
 
 }  // namespace helics
 

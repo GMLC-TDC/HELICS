@@ -11,6 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <vector>
 #include <algorithm>
 #include "MapTraits.hpp"
+#include "helics_includes/optional.hpp"
 
 /** class combining a vector of objects with a map to search them by a separate index term
 the main use case is a bunch of inserts then searching with limited to no removal since removal is a rather
@@ -25,13 +26,12 @@ class MappedVector
 	  @return the index of the value placed
 	  */
     template <typename... Us>
-    size_t insert (const searchType &searchValue, Us &&... data)
+    stx::optional<size_t> insert (const searchType &searchValue, Us &&... data)
     {
         auto fnd = lookup.find (searchValue);
         if (fnd != lookup.end ())
         {
-            dataStorage[fnd->second] = VType (std::forward<Us> (data)...);
-			return fnd->second;
+            return stx::nullopt;
         }
         else
         {
@@ -39,6 +39,28 @@ class MappedVector
             dataStorage.emplace_back (std::forward<Us> (data)...);
             lookup.emplace (searchValue, index);
 			return index;
+        }
+    }
+
+    /** insert an element into the mapped vector
+    @param searchValue the unique index to use for the value if it exists the existing value is replaced
+    @return the index of the value placed
+    */
+    template <typename... Us>
+    size_t insert_or_assign(const searchType &searchValue, Us &&... data)
+    {
+        auto fnd = lookup.find(searchValue);
+        if (fnd != lookup.end())
+        {
+            dataStorage[fnd->second] = VType(std::forward<Us>(data)...);
+            return fnd->second;
+        }
+        else
+        {
+            auto index = dataStorage.size();
+            dataStorage.emplace_back(std::forward<Us>(data)...);
+            lookup.emplace(searchValue, index);
+            return index;
         }
     }
 
