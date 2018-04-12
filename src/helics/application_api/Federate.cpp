@@ -402,7 +402,6 @@ void Federate::setPeriod (Time period, Time offset)
 
 void Federate::setLoggingLevel (int loggingLevel) { coreObject->setLoggingLevel (fedID, loggingLevel); }
 
-void Federate::setMaxIterations(int maxIterations) { coreObject->setMaximumIterations(fedID, maxIterations); }
 void Federate::setLoggingCallback(
     const std::function<void(int, const std::string &, const std::string &)> &logFunction)
 {

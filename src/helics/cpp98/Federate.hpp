@@ -164,6 +164,7 @@ class Federate
     }
 
     void enterInitializationMode ()
+    void enterInitializationState ()
     {
         if (helics_ok != helicsFederateEnterInitializationMode (fed))
         {
@@ -171,7 +172,7 @@ class Federate
         }
     }
 
-    void enterInitializationModeAsync ()
+    void enterInitializationStateAsync ()
     {
         if (helics_ok != helicsFederateEnterInitializationModeAsync (fed))
         {
@@ -185,7 +186,7 @@ class Federate
         return helicsFederateIsAsyncOperationCompleted (fed) > 0;
     }
 
-    void enterInitializationModeComplete ()
+    void enterInitializationStateComplete ()
     {
         if (helics_ok != helicsFederateEnterInitializationModeComplete (fed))
         {
@@ -193,7 +194,7 @@ class Federate
         }
     }
 
-    helics_iteration_status enterExecutionMode (helics_iteration_request iterate = no_iteration)
+    helics_iteration_status enterExecutionState (helics_iteration_request iterate = no_iteration)
     {
         helics_iteration_status out_iterate = next_step;
         if (iterate == no_iteration)
@@ -207,7 +208,7 @@ class Federate
         return out_iterate;
     }
 
-    void enterExecutionModeAsync (helics_iteration_request iterate = no_iteration)
+    void enterExecutionStateAsync (helics_iteration_request iterate = no_iteration)
     {
         if (iterate == no_iteration)
         {
@@ -221,7 +222,7 @@ class Federate
         }
     }
 
-    helics_iteration_status enterExecutionModeComplete ()
+    helics_iteration_status enterExecutionStateComplete ()
     {
         helics_iteration_status out_iterate = next_step;
         if (exec_async_iterate)
@@ -278,6 +279,7 @@ class Federate
         return itTime;
     }
 
+<<<<<<< HEAD
     std::string getName () const
     {
         char str[255];
@@ -285,6 +287,8 @@ class Federate
         std::string result (str);
         return result;
     }
+=======
+>>>>>>> parent of cd3c1af... update to the cpp98 interface and some test cases using that interface
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of
     the federation and the specific string being queried

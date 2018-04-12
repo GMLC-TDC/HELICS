@@ -20,8 +20,8 @@ int main (int /*argc*/, char ** /*argv*/)
     std::string initstring = "2 --name=mainbroker";
     std::string fedinitstring = "--broker=mainbroker --federates=1";
     double deltat = 0.01;
-    helics::Publication pub;
-    helics::Subscription sub;
+    helics_publication pub;
+    helics_subscription sub;
 
     std::string helicsversion = helics::getHelicsVersionString();
 
@@ -61,7 +61,7 @@ int main (int /*argc*/, char ** /*argv*/)
     /* Register the subscription */
 
     /* Enter initialization state */
-    vfed->enterInitializationMode (); // can throw helics::InvalidStateTransition exception
+    vfed->enterInitializationState (); // can throw helics::InvalidStateTransition exception
     printf (" Entered initialization state\n");
 
     double x = 0.0, /*yprv = 100,*/ xprv=100;
@@ -71,9 +71,9 @@ int main (int /*argc*/, char ** /*argv*/)
    // int isUpdated;
     double tol = 1E-8;
 
-    pub.publish (x);
+    vfed->publish (pub, x);
     /* Enter execution state */
-    vfed->enterExecutionMode (); // can throw helics::InvalidStateTransition exception
+    vfed->enterExecutionState (); // can throw helics::InvalidStateTransition exception
     printf (" Entered execution state\n");
 
     fflush (NULL);
@@ -81,7 +81,7 @@ int main (int /*argc*/, char ** /*argv*/)
     while (currenttimeiter.status == iterating)
     {
     //    yprv = y;
-        double y = sub.getDouble ();
+        double y = vfed->getDouble (sub);
         int newt_conv = 0, max_iter = 10, iter = 0;
         /* Solve the equation using Newton */
         while (!newt_conv && iter < max_iter)
@@ -106,7 +106,7 @@ int main (int /*argc*/, char ** /*argv*/)
 
         if ((fabs(x-xprv)>tol)||(helics_iter<5))
         {
-            pub.publish (x);
+            vfed->publish (pub, x);
             printf("Fed1: publishing new x\n");
         }
         fflush(NULL);

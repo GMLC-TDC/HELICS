@@ -131,7 +131,6 @@
 //}
 //
 //
-
 //// typemap for raw data input
 //%typemap(in) (const void *data, int inputDataLength) {
 //  if (PyUnicode_Check($input)) {

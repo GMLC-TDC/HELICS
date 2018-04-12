@@ -1,4 +1,4 @@
 function varargout = helicsEndpointSendMessageRaw(varargin)
     %
-  [varargout{1:nargout}] = helicsMEX(151, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(150, varargin{:});
 end
