@@ -3,7 +3,7 @@
 # Take the path to the helics broker as a script argument
 # Set VERBOSE env var to output stdout from the federates
 if [[ -z $1 || -z $2 ]]; then
-    echo "Usage: $0 timeout_length [--broker helics_broker] helics_fed1..N "
+    echo "Usage: $0 timeout_length [--broker helics_broker] helics_fed1 [--args ARGS] helics_fed2 ..."
     exit 1
 fi
 timeout_len=$1
@@ -18,6 +18,14 @@ function launch_federation_with_broker () {
     local helics_broker=$1
     shift
     local num_federates=${#@}
+
+    # To support arguments for federates, decrement num_federates by 2x for each time '--args' appears in "$@"
+    for arg in "$@";
+    do
+        if [[ "${arg}" == "--args" ]]; then
+            let num_federates=num_federates-2
+        fi
+    done
 
     # Launch broker in the background with the number of federates
     if [[ "$VERBOSE" ]]; then
@@ -54,7 +62,41 @@ function launch_federation_with_broker () {
 function launch_federation () {
     local outputfiles=()
     local returncodes=()
-    for fed in $@;
+
+    # Parse the function arguments for federate command and arguments
+    local federates=()
+    local fed_cmd=""
+    local isarg=false
+    for arg in "$@";
+    do
+
+        if [[ "${fed_cmd}" != "" ]]; then
+            if [[ "${isarg}" == "true" ]]; then
+                # Current argument is an argument that goes with a command
+                federates+=("${fed_cmd} ${arg}")
+                # Reset processing to next argument being a command
+                isarg=false
+                fed_cmd=""
+            elif [[ "${arg}" != "--args" ]]; then
+                # Current argument is another command, previous command had no arguments
+                federates+=("${fed_cmd}")
+                fed_cmd="${arg}"
+            else
+                # Next argument is the argument for the previous command
+                isarg=true
+            fi
+        else
+            # Current argument is a command
+            fed_cmd="${arg}"
+        fi
+    done
+    # Handle the case of the last argument being a command without arguments
+    if [[ "${fed_cmd}" != "" ]]; then
+        federates+=("${fed_cmd}")
+    fi
+
+    # Launch federates
+    for fed in "${federates[@]}";
     do
         # Create temp file for federate output
         output_file=$(mktemp)
