@@ -26,7 +26,7 @@ public class TestValueFederate {
 	    SWIGTYPE_p_void fedinfo = helics.helicsFederateInfoCreate();
 
 	    // Set Federate name 
-	    helics_status status = helics.helicsFederateInfoSetFederateName(fedinfo, "TestA Federate");
+	    helics_status status = helics.helicsFederateInfoSetFederateName(fedinfo, name_prefix + "TestA Federate");
 
 	    // Set core type from string 
 	    status = helics.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq");
