@@ -69,7 +69,7 @@ target_compile_options(hello_world_sender PRIVATE -ansi -Wall -pedantic -Werror)
 target_compile_options(hello_world_receiver PRIVATE -ansi -Wall -pedantic -Werror)
 endif()
 
-if (BUILD_HELICS_TESTS AND NOT MSVC)
+if (BUILD_HELICS_EXAMPLES and BUILD_HELICS_TESTS AND NOT MSVC)
     add_test(NAME pi_example
              COMMAND ${PROJECT_SOURCE_DIR}/scripts/test_example.sh 10 $<TARGET_FILE:pi_sender> $<TARGET_FILE:pi_receiver>)
     add_test(NAME pi_example2
