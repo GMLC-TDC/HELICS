@@ -69,8 +69,8 @@ target_compile_options(hello_world_sender PRIVATE -ansi -Wall -pedantic -Werror)
 target_compile_options(hello_world_receiver PRIVATE -ansi -Wall -pedantic -Werror)
 endif()
 
-
-
+add_subdirectory(messageFed1)
+add_subdirectory(comboFederates1)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET pi_sender POST_BUILD        # Adds a post-build event to api tests

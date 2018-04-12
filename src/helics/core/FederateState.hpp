@@ -53,7 +53,7 @@ class FederateState
   private:
     
 	shared_guarded<DualMappedPointerVector<SubscriptionInfo, std::string, Core::handle_id_t>> subscriptions; //!< storage for all the subscriptions
-    std::atomic<helics_federate_state_type> state{ HELICS_NONE };  //!< the current state of the federate
+    std::atomic<federate_state_t> state{ HELICS_NONE };  //!< the current state of the federate
     bool only_update_on_change{ false };  //!< flag indicating that values should only be updated on change
     bool only_transmit_on_change{
         false };  //!< flag indicating that values should only be transmitted if different than previous values
@@ -102,7 +102,7 @@ private:
     Time nextMessageTime () const;
 
 	/** update the federate state */
-    void setState (helics_federate_state_type newState);
+    void setState (federate_state_t newState);
 
     /** check if a message should be delayed*/
     bool messageShouldBeDelayed(const ActionMessage &cmd) const;
@@ -115,7 +115,7 @@ private:
     void reInit ();
 	  /** get the name of the federate*/
     const std::string &getIdentifier () const { return name; }
-    helics_federate_state_type getState () const;
+    federate_state_t getState () const;
 
     const SubscriptionInfo *getSubscription (const std::string &subName) const;
     const SubscriptionInfo *getSubscription (Core::handle_id_t handle_) const;

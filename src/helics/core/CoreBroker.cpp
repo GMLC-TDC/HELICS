@@ -206,11 +206,21 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             ActionMessage badInit (CMD_FED_ACK);
             setActionFlag (badInit, error_flag);
             badInit.source_id = global_broker_id;
+            badInit.index = 5;
             badInit.name = command.name;
-            transmit (command.source_id, badInit);  // this isn't correct
+            transmit (getRoute(command.source_id), badInit);  
             return;
         }
-        _federates.insert (command.name,static_cast<Core::federate_id_t>(_federates.size()),command.name);
+        if (!_federates.insert(command.name, static_cast<Core::federate_id_t>(_federates.size()), command.name))
+        {
+            ActionMessage badName(CMD_FED_ACK);
+            setActionFlag(badName, error_flag);
+            badName.source_id = global_broker_id;
+            badName.index = 6;
+            badName.name = command.name;
+            transmit(getRoute(command.source_id), badName);  
+            return;
+        }
         _federates.back ().route_id = getRoute (command.source_id);
         if (!_isRoot)
         {
@@ -470,31 +480,13 @@ void CoreBroker::processCommand (ActionMessage &&command)
         {
             if (_isRoot)
             {
-                checkSubscriptions ();
-                checkEndpoints ();
-                checkFilters ();
-                checkDependencies ();
-                ActionMessage m (CMD_INIT_GRANT);
-                brokerState = broker_state_t::operating;
-                for (auto &broker : _brokers)
-                {
-                    if (!broker._nonLocal)
-                    {
-                        transmit(broker.route_id, m);
-                    }
-                }
-                timeCoord->enteringExecMode ();
-                auto res = timeCoord->checkExecEntry ();
-                if (res == iteration_state::next_step)
-                {
-                    enteredExecutionMode = true;
-                }
+                executeInitializationOperations();
             }
             else
             {
                 checkDependencies();
                 command.source_id = global_broker_id;
-                transmit (0, command);
+                transmit(0, command);
             }
         }
     }
@@ -528,6 +520,30 @@ void CoreBroker::processCommand (ActionMessage &&command)
             }
         }
         break;
+    case CMD_SEARCH_DEPENDENCY:
+    {
+        auto fed = _federates.find(command.name);
+        if (fed != _federates.end())
+        {
+            if (fed->global_id != invalid_fed_id)
+            {
+                ActionMessage dep(CMD_ADD_DEPENDENCY, fed->global_id, command.source_id);
+                routeMessage(dep);
+                dep=ActionMessage (CMD_ADD_DEPENDENT,  command.source_id,fed->global_id );
+                routeMessage(dep);
+                break;
+            }
+        }
+        if (isRoot())
+        {
+            delayedDependencies.emplace_back(command.name, command.source_id);
+        }
+        else
+        {
+            routeMessage(command);
+        }
+        break;
+    }
     case CMD_DISCONNECT_NAME:
         if (command.dest_id == 0)
         {
@@ -822,7 +838,10 @@ void CoreBroker::addSourceFilter (ActionMessage &m)
     auto &filt=handles.addHandle (m.source_id, m.source_handle, HANDLE_SOURCE_FILTER, m.name, m.info ().target,
                            m.info ().type, m.info ().type_out);
     addLocalInfo (filt, m);
-   
+    if (checkActionFlag(m, clone_flag))
+    {
+        filt.cloning = true;
+    }
     bool proc = FindandNotifyFilterEndpoint (filt);
     if (!_isRoot)
     {
@@ -869,6 +888,10 @@ void CoreBroker::addDestFilter (ActionMessage &m)
     auto &filt = handles.addHandle(m.source_id,m.source_handle, HANDLE_DEST_FILTER, m.name, m.info().target,
         m.info().type, m.info().type_out);
     addLocalInfo(filt, m);
+    if (checkActionFlag(m, clone_flag))
+    {
+        filt.cloning = true;
+    }
   
     bool proc = FindandNotifyFilterEndpoint (filt);
     if (!_isRoot)
@@ -1040,6 +1063,29 @@ void CoreBroker::routeMessage (const ActionMessage &cmd)
     }
 }
 
+void CoreBroker::executeInitializationOperations()
+{
+        checkSubscriptions();
+        checkEndpoints();
+        checkFilters();
+        checkDependencies();
+        ActionMessage m(CMD_INIT_GRANT);
+        brokerState = broker_state_t::operating;
+        for (auto &broker : _brokers)
+        {
+            if (!broker._nonLocal)
+            {
+                transmit(broker.route_id, m);
+            }
+        }
+        timeCoord->enteringExecMode();
+        auto res = timeCoord->checkExecEntry();
+        if (res == iteration_state::next_step)
+        {
+            enteredExecutionMode = true;
+        }
+}
+
 bool CoreBroker::FindandNotifySubscriptionPublisher (BasicHandleInfo &handleInfo)
 {
     if (!handleInfo.processed)
@@ -1138,9 +1184,12 @@ bool CoreBroker::FindandNotifyFilterEndpoint (BasicHandleInfo &handleInfo)
                                                                      CMD_NOTIFY_DST_FILTER);
             m.source_id = handleInfo.fed_id;
             m.source_handle = handleInfo.id;
+            if (handleInfo.cloning)
+            {
+                setActionFlag(m, clone_flag);
+            }
             m.dest_id = endHandle->fed_id;
             m.dest_handle = endHandle->id;
-
             transmit (getRoute (m.dest_id), m);
 
             handleInfo.processed = true;
@@ -1405,6 +1454,25 @@ void CoreBroker::checkDependencies ()
 {
     if (_isRoot)
     {
+        for (const auto &newdep : delayedDependencies)
+        {
+            auto depfed = _federates.find(newdep.first);
+            if (depfed != _federates.end())
+            {
+                ActionMessage addDep(CMD_ADD_DEPENDENCY,  newdep.second, depfed->global_id);
+                routeMessage(addDep);
+                addDep=ActionMessage(CMD_ADD_DEPENDENT,   depfed->global_id, newdep.second);
+                routeMessage(addDep);
+            }
+            else
+            {
+                ActionMessage logWarning(CMD_LOG, 0, newdep.second);
+                logWarning.index = warning;
+                logWarning.payload = "unable to locate " + newdep.first + " to establish dependency";
+                routeMessage(logWarning);
+            }
+        }
+
         if (timeCoord->getDependents ().size () == 1)
         {  // if there is just one dependency remove it
             auto depid = timeCoord->getDependents ()[0];

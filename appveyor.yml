@@ -1,6 +1,6 @@
 shallow_clone: true
 
-version: 1.0.0.beta.1.{build}
+version: 1.0.0-beta.2.{build}
 
 image: Visual Studio 2015
 
@@ -29,6 +29,9 @@ build:
   verbosity: minimal
 
 after_build:
+  - cd build
+  - cpack -B %cd%/installer-output
+  - cd ..
 
 test_script:
   - cd build
@@ -45,6 +48,7 @@ test_script:
   - ctest -C Release --verbose --timeout 90 -I 0,0,0,2
   - ctest -C Release --verbose --timeout 240 -I 0,0,0,4
   #- ctest -C Release --verbose --timeout 90 -I 0,0,0,7
+  - cd ..
 
 artifacts:
-
+  - path: build/installer-output/Helics-*.exe

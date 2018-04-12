@@ -83,6 +83,7 @@ class CoreBroker : public Broker, public BrokerBase
 
     HandleManager handles; //!< structure for managing handles and search operations on handles
 
+    std::vector<std::pair<std::string, int32_t>> delayedDependencies;  //!< set of dependencies that need to be created on init
 	std::map<Core::federate_id_t, int32_t> global_id_translation; //!< map to translate global ids to local ones
 	std::map<Core::federate_id_t, int32_t> routing_table;  //!< map for external routes  <global federate id, route id>
 	std::unordered_map<std::string, int32_t> knownExternalEndpoints; //!< external map for all known external endpoints with names and route
@@ -114,6 +115,8 @@ private:
     /**generate the results of a query directed at the broker*/
     void generateQueryResult (const ActionMessage &command);
 
+    /** handle initialization operations*/
+    void executeInitializationOperations();
   public:
 	/** connect the core to its broker
 	@details should be done after initialization has complete*/

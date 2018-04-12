@@ -13,6 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <functional>
 #include <algorithm>
 #include "MapTraits.hpp"
+#include "helics_includes/optional.hpp"
 
 /** class merging a vector of pointer with a map that can be used to lookup specific values
 */
@@ -25,14 +26,12 @@ public:
 	DualMappedPointerVector(DualMappedPointerVector &&mp) = default;
 	DualMappedPointerVector &operator=(DualMappedPointerVector &&mp) = default;
 	/** insert a new element into the vector directly from an existing unique ptr*/
-	size_t insert(const searchType1 &searchValue1,const searchType2 &searchValue2, std::unique_ptr<VType> &&ptr)
+    stx::optional<size_t> insert(const searchType1 &searchValue1,const searchType2 &searchValue2, std::unique_ptr<VType> &&ptr)
 	{
 		auto fnd = lookup1.find(searchValue1);
 		if (fnd != lookup1.end())
 		{
-			dataStorage[fnd->second] = std::move(ptr);
-			lookup2[searchValue2] = fnd->second;
-			return fnd->second;
+            return stx::nullopt;
 		}
 		else
 		{
@@ -45,14 +44,12 @@ public:
 	}
 	/** insert a new element into the vector*/
 	template <typename... Us>
-	size_t insert(const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
+    stx::optional<size_t> insert(const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
 	{
 		auto fnd = lookup1.find(searchValue1);
 		if (fnd != lookup1.end())
 		{
-			dataStorage[fnd->second] = std::make_unique<VType>(std::forward<Us>(data)...);
-            lookup2[searchValue2] = fnd->second;
-			return fnd->second;
+            return stx::nullopt;
 		}
 		else
 		{
@@ -66,7 +63,83 @@ public:
 
     /** insert a new element into the vector*/
     template <typename... Us>
-    size_t insert(const searchType1 &searchValue1, std::nullptr_t /*unused*/, Us &&... data)
+    stx::optional<size_t> insert(const searchType1 &searchValue1, std::nullptr_t /*unused*/, Us &&... data)
+    {
+        auto fnd = lookup1.find(searchValue1);
+        if (fnd != lookup1.end())
+        {
+            return stx::nullopt;
+        }
+        else
+        {
+            auto index = dataStorage.size();
+            dataStorage.emplace_back(std::make_unique<VType>(std::forward<Us>(data)...));
+            lookup1.emplace(searchValue1, index);
+            return index;
+        }
+    }
+
+    /** insert a new element into the vector*/
+    template <typename... Us>
+    stx::optional<size_t> insert(std::nullptr_t /*unused*/, const searchType2 &searchValue2, Us &&... data)
+    {
+        auto fnd = lookup2.find(searchValue2);
+        if (fnd != lookup2.end())
+        {
+            return stx::nullopt;
+        }
+        else
+        {
+            auto index = dataStorage.size();
+            dataStorage.emplace_back(std::make_unique<VType>(std::forward<Us>(data)...));
+            lookup2.emplace(searchValue2, index);
+            return index;
+        }
+    }
+
+    /** insert a new element into the vector directly from an existing unique ptr*/
+    size_t insert_or_assign(const searchType1 &searchValue1, const searchType2 &searchValue2, std::unique_ptr<VType> &&ptr)
+    {
+        auto fnd = lookup1.find(searchValue1);
+        if (fnd != lookup1.end())
+        {
+            dataStorage[fnd->second] = std::move(ptr);
+            lookup2[searchValue2] = fnd->second;
+            return fnd->second;
+        }
+        else
+        {
+            auto index = dataStorage.size();
+            dataStorage.emplace_back(std::move(ptr));
+            lookup1.emplace(searchValue1, index);
+            lookup2.emplace(searchValue2, index);
+            return index;
+        }
+    }
+    /** insert a new element into the vector*/
+    template <typename... Us>
+    size_t insert_or_assign(const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
+    {
+        auto fnd = lookup1.find(searchValue1);
+        if (fnd != lookup1.end())
+        {
+            dataStorage[fnd->second] = std::make_unique<VType>(std::forward<Us>(data)...);
+            lookup2[searchValue2] = fnd->second;
+            return fnd->second;
+        }
+        else
+        {
+            auto index = dataStorage.size();
+            dataStorage.emplace_back(std::make_unique<VType>(std::forward<Us>(data)...));
+            lookup1.emplace(searchValue1, index);
+            lookup2.emplace(searchValue2, index);
+            return index;
+        }
+    }
+
+    /** insert a new element into the vector*/
+    template <typename... Us>
+    size_t insert_or_assign(const searchType1 &searchValue1, std::nullptr_t /*unused*/, Us &&... data)
     {
         auto fnd = lookup1.find(searchValue1);
         if (fnd != lookup1.end())
@@ -85,7 +158,7 @@ public:
 
     /** insert a new element into the vector*/
     template <typename... Us>
-    size_t insert(std::nullptr_t /*unused*/, const searchType2 &searchValue2, Us &&... data)
+    size_t insert_or_assign(std::nullptr_t /*unused*/, const searchType2 &searchValue2, Us &&... data)
     {
         auto fnd = lookup2.find(searchValue2);
         if (fnd != lookup2.end())
@@ -101,6 +174,7 @@ public:
             return index;
         }
     }
+
 	/** find an element based on the search value
 	@return nullptr if the element is not found
 	*/

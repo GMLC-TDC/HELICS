@@ -339,6 +339,10 @@ bool TimeCoordinator::updateTimeFactors ()
 iteration_state TimeCoordinator::checkTimeGrant ()
 {
     bool update = updateTimeFactors ();
+    if (time_block <= time_exec)
+    {
+        return iteration_state::continue_processing;
+    }
     if ((!iterating) || (time_exec > time_granted))
     {
         iteration = 0;
@@ -380,7 +384,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         }
     }
 
-    // if we haven't returned we need to update the time messages
+    // if we haven't returned we may need to update the time messages
     if ((!dependents.empty ()) && (update))
     {
         sendTimeRequest ();
@@ -502,27 +506,31 @@ void TimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
 iteration_state TimeCoordinator::checkExecEntry ()
 {
     auto ret = iteration_state::continue_processing;
+    if (time_block <= timeZero)
+    {
+        return ret;
+    }
     if (!dependencies.checkIfReadyForExecEntry (iterating))
     {
         return ret;
     }
     if (iterating)
     {
-        if (hasInitUpdates)
+    if (hasInitUpdates)
+    {
+        if (iteration >= info.maxIterations)
         {
-            if (iteration >= info.maxIterations)
-            {
-                ret = iteration_state::next_step;
-            }
-            else
-            {
-                ret = iteration_state::iterating;
-            }
+        ret = iteration_state::next_step;
         }
         else
         {
-            ret = iteration_state::next_step;  // todo add a check for updates and iteration limit
+            ret = iteration_state::iterating;
         }
+    }
+    else
+    {
+        ret = iteration_state::next_step;  // todo add a check for updates and iteration limit
+    }
     }
     else
     {
@@ -535,22 +543,22 @@ iteration_state TimeCoordinator::checkExecEntry ()
         time_grantBase = time_granted;
         executionMode = true;
         iteration = 0;
-       
-        ActionMessage execgrant (CMD_EXEC_GRANT);
-        execgrant.source_id = source_id;
-        transmitTimingMessage (execgrant);
-        
+
+ActionMessage execgrant(CMD_EXEC_GRANT);
+execgrant.source_id = source_id;
+transmitTimingMessage(execgrant);
+
     }
     else if (ret == iteration_state::iterating)
     {
-        dependencies.resetIteratingExecRequests ();
+        dependencies.resetIteratingExecRequests();
         hasInitUpdates = false;
         ++iteration;
-        ActionMessage execgrant (CMD_EXEC_GRANT);
+        ActionMessage execgrant(CMD_EXEC_GRANT);
         execgrant.source_id = source_id;
         execgrant.counter = iteration;
-        setActionFlag (execgrant, iteration_requested_flag);
-        transmitTimingMessage (execgrant);
+        setActionFlag(execgrant, iteration_requested_flag);
+        transmitTimingMessage(execgrant);
     }
     return ret;
 }
@@ -560,44 +568,95 @@ static bool isDelayableMessage(const ActionMessage &cmd, Core::federate_id_t loc
     return (((cmd.action() == CMD_TIME_GRANT) || (cmd.action() == CMD_EXEC_GRANT)) && (cmd.source_id != localId));
 }
 
-message_process_result TimeCoordinator::processTimeMessage (const ActionMessage &cmd) 
-{ 
-    if (isDelayableMessage(cmd,source_id))
+message_process_result TimeCoordinator::processTimeMessage(const ActionMessage &cmd)
+{
+    if ((cmd.action() == CMD_TIME_BLOCK) || (cmd.action() == CMD_TIME_UNBLOCK))
+    {
+        return processTimeBlockMessage(cmd);
+    }
+    if (isDelayableMessage(cmd, source_id))
     {
         auto dep = dependencies.getDependencyInfo(cmd.source_id);
         if (dep == nullptr)
         {
             return message_process_result::no_effect;
         }
-            switch (dep->time_state)
+        switch (dep->time_state)
+        {
+        case DependencyInfo::time_state_t::time_requested:
+            if (dep->Tnext > time_exec)
             {
-            case DependencyInfo::time_state_t::time_requested:
-                if (dep->Tnext > time_exec)
-                {
-                    return message_process_result::delay_processing;
-                }
-                break;
-            case DependencyInfo::time_state_t::time_requested_iterative:
-                if (dep->Tnext > time_exec)
-                {
-                    return message_process_result::delay_processing;
-                }
-                if ((iterating) && (time_exec == dep->Tnext))
-                {
-                    return message_process_result::delay_processing;
-                }
-                break;
-            case DependencyInfo::time_state_t::exec_requested_iterative:
-                if ((iterating) && (checkingExec))
-                {
-                    return message_process_result::delay_processing;
-                }
-                break;
-            default:
-                break;
+                return message_process_result::delay_processing;
             }
+            break;
+        case DependencyInfo::time_state_t::time_requested_iterative:
+            if (dep->Tnext > time_exec)
+            {
+                return message_process_result::delay_processing;
+            }
+            if ((iterating) && (time_exec == dep->Tnext))
+            {
+                return message_process_result::delay_processing;
+            }
+            break;
+        case DependencyInfo::time_state_t::exec_requested_iterative:
+            if ((iterating) && (checkingExec))
+            {
+                return message_process_result::delay_processing;
+            }
+            break;
+        default:
+            break;
+        }
     }
     return (dependencies.updateTime(cmd)) ? message_process_result::processed : message_process_result::no_effect;
+}
+
+message_process_result TimeCoordinator::processTimeBlockMessage(const ActionMessage &cmd)
+{
+    if (cmd.action() == CMD_TIME_BLOCK)
+    {
+        timeBlocks.emplace_back(cmd.actionTime, cmd.index);
+        if (cmd.actionTime < time_block)
+        {
+            time_block = cmd.actionTime;
+        }
+    }
+    else if (cmd.action() == CMD_TIME_UNBLOCK)
+    {
+        if (!timeBlocks.empty())
+        {
+            auto ltime = Time::maxVal();
+            if (timeBlocks.front().second == cmd.index)
+            {
+                ltime = timeBlocks.front().first;
+                timeBlocks.pop_front();
+            }
+            else
+            {
+                auto blk = std::find_if(timeBlocks.begin(), timeBlocks.end(), [&cmd](const auto &block) {return (block.second == cmd.index); });
+                if (blk != timeBlocks.end())
+                {
+                    ltime = blk->first;
+                    timeBlocks.erase(blk);
+                }
+            }
+            if (ltime <= time_block)
+            {
+                if (!timeBlocks.empty())
+                {
+                    auto res = std::min_element(timeBlocks.begin(), timeBlocks.end(), [](const auto &blk1, const auto &blk2) {return (blk1.first < blk2.first); });
+                    time_block = res->first;
+                }
+                else
+                {
+                    time_block = Time::maxVal();
+                }
+                return message_process_result::processed;
+            }
+        }
+    }
+    return message_process_result::no_effect;
 }
 
 void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
