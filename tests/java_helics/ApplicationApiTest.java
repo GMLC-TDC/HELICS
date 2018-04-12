@@ -20,7 +20,8 @@ public class ApplicationApiTest {
 	}
 	
 	public static void main(String[] args) {
-		SWIGTYPE_p_void myFederate = ApplicationApiTest.createValueFederate("javaFederate", 1);
+        SWIGTYPE_p_void broker = helics.helicsCreateBroker("zmq", "", "1");
+        SWIGTYPE_p_void myFederate = ApplicationApiTest.createValueFederate("javaFederate", 1);
 		SWIGTYPE_p_void fedPublication = helics.helicsFederateRegisterPublication(myFederate, "pub1", "integer", null);
 		SWIGTYPE_p_void fedSubscription = helics.helicsFederateRegisterSubscription(myFederate,"player/pub", "integer", null);
 		helics_status rv = helics.helicsFederateEnterInitializationMode(myFederate);
