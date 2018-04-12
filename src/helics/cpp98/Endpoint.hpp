@@ -60,6 +60,27 @@ public:
     {
         helicsEndpointSendEventRaw(ep, dest.c_str(), data, static_cast<int>(len), time);
     }
+    /** Methods for sending a message **/
+    void sendMessage(const std::string &dest, const std::string &data)
+    {
+        helicsEndpointSendMessageRaw(ep, dest.c_str(), data.c_str(), static_cast<int>(data.size()));
+    }
+
+    void sendMessage(const std::string &dest, const std::string &data,helics_time_t time)
+    {
+        helicsEndpointSendEventRaw(ep, dest.c_str(), data.c_str(), static_cast<int>(data.size()), time);
+    }
+
+    /** Methods for sending a message **/
+    void sendMessage(const std::string &dest, const std::vector<char> &data)
+    {
+        helicsEndpointSendMessageRaw(ep, dest.c_str(), data.data(), static_cast<int>(data.size()));
+    }
+
+    void sendMessage(const std::string &dest, const std::vector<char> &data, helics_time_t time)
+    {
+        helicsEndpointSendEventRaw(ep, dest.c_str(), data.data(), static_cast<int>(data.size()), time);
+    }
 
     void sendMessage( message_t &message)
     {
