@@ -51,7 +51,7 @@ BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type
     int len1 = helicsSubscriptionGetValueSize(sub1);
 
     BOOST_CHECK_EQUAL(len1, len);
-    CE(helicsSubscriptionGetValue(sub1, val, 600, &actualLen));
+    CE(helicsSubscriptionGetRawValue(sub1, val, 600, &actualLen));
     BOOST_CHECK_EQUAL(actualLen, len);
 
     len1 = helicsSubscriptionGetValueSize(sub1);

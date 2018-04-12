@@ -19,6 +19,7 @@ exeTestHelper.cpp
 combo_tests.cpp
 EchoTests.cpp
 TracerTests.cpp
+SourceTests.cpp
 exeTestHelper.h
 )
 

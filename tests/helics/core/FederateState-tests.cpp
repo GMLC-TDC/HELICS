@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     // BOOST_CHECK_EQUAL(fs->time_minDe, helics::Time::zeroVal());
     // BOOST_CHECK_EQUAL(fs->time_minTe, helics::Time::zeroVal());
     // BOOST_CHECK_EQUAL(fs->time_event, helics::Time::zeroVal());
-    BOOST_CHECK_EQUAL (fs->getInfo ().maxIterations, 3);
+    BOOST_CHECK_EQUAL (fs->getInfo ().maxIterations, 50);
 }
 
 BOOST_AUTO_TEST_CASE (create_subscription_test)
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     // Test returning when the finished state is entered
     cmd.setAction (helics::CMD_STOP);
     auto fs_process2 = std::async (std::launch::async, [&]() {
-        return fs->enterExecutingState (helics_iteration_request::no_iterations);
+        return fs->enterExecutingState (iteration_request::no_iterations);
     });
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_INITIALIZING);
     fs->addAction (cmd);
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     // Test returning when an error occurs
     cmd.setAction (helics::CMD_ERROR);
     fs_process2 = std::async (std::launch::async,
-                              [&]() { return fs->enterExecutingState (helics_iteration_request::no_iterations); });
+                              [&]() { return fs->enterExecutingState (iteration_request::no_iterations); });
     BOOST_CHECK_EQUAL (fs->getState (), helics_federate_state_type::HELICS_INITIALIZING);
     fs->addAction (cmd);
     fs_process2.wait ();

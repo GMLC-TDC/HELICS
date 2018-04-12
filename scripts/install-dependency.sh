@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ $DEBUG_INSTALL_DEPENDENCY ]]; then
+    set -x
+fi
+
 # Compares two semantic version numbers (major.minor.revision)
 check_minimum_version () {
     local -a ver
@@ -119,8 +123,13 @@ install_boost () {
     wget --no-check-certificate -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
     (
         cd ${boost_version_str}/;
-        ./bootstrap.sh --with-toolset=${boost_toolset} --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test;
-        ./b2 -j2 link=shared threading=multi variant=release cxxflags=${BOOST_CXX_FLAGS} > /dev/null;
+        ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test;
+        ./b2 -j2 \
+            link=shared \
+            threading=multi \
+            variant=release \
+            toolset=${boost_toolset} \
+            cxxflags=${BOOST_CXX_FLAGS} > /dev/null;
         ./b2 install --prefix=${install_path} > /dev/null;
     )
     rm ${boost_version_str}.tar.gz
@@ -151,19 +160,34 @@ install_path=$3
 
 compiler_toolset=$4
 if [[ -z $compiler_toolset ]]; then
-    compiler_toolset=gcc
+    case $COMPILER in
+        gcc*)
+            compiler_toolset=gcc
+            ;;
+        clang*)
+            compiler_toolset=clang
+            ;;
+        intel*)
+            compiler_toolset=intel
+            ;;
+        *)
+            compiler_toolset=gcc
+    esac
 fi
 
 if [[ "$CXX_STANDARD" == 17 ]]; then
     echo "Install dependency with C++17 flag requested"
     BOOST_CXX_FLAGS="-std=c++17"
+elif [[ "$CXX_STANDARD" == 14 ]]; then
+    echo "Install dependency with C++14 flag requested"
+    BOOST_CXX_FLAGS="-std=c++14"
 fi
 
 
 # If FORCE_TOOLSET is set, create symlinks and add directory to path
 # May be needed to force boost to build with the right compiler version
 if [[ "$FORCE_TOOLSET" ]]; then
-    case "${compiler_toolset}" in
+    case ${compiler_toolset} in
         gcc*)
             ln -s $(which ${CC}) gcc
             ln -s $(which ${CXX}) g++
@@ -211,3 +235,6 @@ case "$1" in
         echo "$0 zmq [version=HEAD] install_path"
 esac
 
+if [[ $DEBUG_INSTALL_DEPENDENCY ]]; then
+    set +x
+fi

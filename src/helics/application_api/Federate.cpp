@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -26,8 +25,13 @@ void cleanupHelicsLibrary ()
     CoreFactory::cleanUpCores (200);
 }
 
-Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
+Federate::Federate(const FederateInfo &fi) : Federate(fi.name, fi)
 {
+}
+
+Federate::Federate(const std::string &name, const FederateInfo &fi) : FedInfo(fi)
+{
+
     if (fi.coreName.empty ())
     {
         coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
@@ -66,8 +70,8 @@ Federate::Federate (const FederateInfo &fi) : FedInfo (fi)
     }
 
     // this call will throw an error on failure
-    fedID = coreObject->registerFederate (fi.name, fi);
-
+    fedID = coreObject->registerFederate (name, fi);
+    separator_ = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
 }
@@ -107,6 +111,7 @@ Federate::Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi)
         state = op_states::error;
         return;
     }
+    separator_ = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
 }
@@ -114,6 +119,11 @@ Federate::Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi)
 Federate::Federate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
 {
     registerFilterInterfaces (jsonString);
+}
+
+Federate::Federate(const std::string &name, const std::string &jsonString) : Federate(loadFederateInfo(name,jsonString))
+{
+    registerFilterInterfaces(jsonString);
 }
 
 Federate::Federate () noexcept
@@ -129,6 +139,7 @@ Federate::Federate (Federate &&fed) noexcept
     coreObject = std::move (fed.coreObject);
     currentTime = fed.currentTime;
     FedInfo = std::move (fed.FedInfo);
+    separator_ = fed.separator_;
     asyncCallInfo = std::move (fed.asyncCallInfo);
 }
 
@@ -140,6 +151,7 @@ Federate &Federate::operator= (Federate &&fed) noexcept
     coreObject = std::move (fed.coreObject);
     currentTime = fed.currentTime;
     FedInfo = std::move (fed.FedInfo);
+    separator_ = fed.separator_;
     asyncCallInfo = std::move (fed.asyncCallInfo);
     return *this;
 }
@@ -228,7 +240,7 @@ void Federate::enterInitializationStateComplete ()
     }
 }
 
-iteration_result Federate::enterExecutionState (helics_iteration_request iterate)
+iteration_result Federate::enterExecutionState (iteration_request iterate)
 {
     iteration_result res = iteration_result::next_step;
     switch (state)
@@ -277,7 +289,7 @@ iteration_result Federate::enterExecutionState (helics_iteration_request iterate
     return res;
 }
 
-void Federate::enterExecutionStateAsync (helics_iteration_request iterate)
+void Federate::enterExecutionStateAsync (iteration_request iterate)
 {
     switch (state)
     {
@@ -481,7 +493,7 @@ Time Federate::requestTime (Time nextInternalTimeStep)
     }
 }
 
-iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, helics_iteration_request iterate)
+iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate)
 {
     if (state == op_states::execution)
     {
@@ -530,7 +542,7 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 /** request a time advancement
 @param[in] the next requested time step
 @return the granted time step*/
-void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, helics_iteration_request iterate)
+void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
     if (state == op_states::execution)
     {

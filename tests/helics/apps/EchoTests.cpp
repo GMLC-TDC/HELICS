@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(echo_test1)
     //fi.logLevel = 4;
     helics::MessageFederate mfed(fi);
     helics::Endpoint ep1(&mfed, "src");
-    auto fut = std::async(std::launch::async, [&echo1]() { echo1.run(5.0); });
+    auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutionState();
     ep1.send("test", "hello world");
     auto retTime=mfed.requestTime(1.0);
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(echo_test_delay)
     echo1.setEchoDelay(1.2);
     helics::MessageFederate mfed(fi);
     helics::Endpoint ep1(&mfed, "src");
-    auto fut = std::async(std::launch::async, [&echo1]() { echo1.run(5.0); });
+    auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutionState();
     ep1.send("test", "hello world");
     mfed.requestTime(1.0);
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(echo_test_delay_period)
     echo1.setEchoDelay(1.2);
     helics::MessageFederate mfed(fi);
     helics::Endpoint ep1(&mfed, "src");
-    auto fut = std::async(std::launch::async, [&echo1]() { echo1.run(5.0); });
+    auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutionState();
     ep1.send("test", "hello world");
     mfed.requestTime(1.0);
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(echo_test_multiendpoint)
     echo1.setEchoDelay(1.2);
     helics::MessageFederate mfed(fi);
     helics::Endpoint ep1(&mfed, "src");
-    auto fut = std::async(std::launch::async, [&echo1]() { echo1.run(5.0); });
+    auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutionState();
     ep1.send("test", "hello world");
     mfed.requestTime(1.0);
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(echo_test_fileload)
 
     helics::MessageFederate mfed(fi);
     helics::Endpoint ep1(&mfed, "src");
-    auto fut = std::async(std::launch::async, [&echo1]() { echo1.run(5.0); });
+    auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutionState();
     ep1.send("test", "hello world");
     mfed.requestTime(1.0);

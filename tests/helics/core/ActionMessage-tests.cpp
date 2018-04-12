@@ -181,8 +181,8 @@ BOOST_AUTO_TEST_CASE (assignment_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    setActionFlag (cmd, iterationRequested);
-    setActionFlag (cmd, pub_required);
+    setActionFlag (cmd, iteration_requested_flag);
+    setActionFlag (cmd, required_flag);
     setActionFlag (cmd, error_flag);
     cmd.actionTime = helics::Time::maxVal ();
     cmd.payload = "hello world";
@@ -200,8 +200,8 @@ BOOST_AUTO_TEST_CASE (assignment_test)
     BOOST_CHECK_EQUAL (cmd_assign.source_handle, 2);
     BOOST_CHECK_EQUAL (cmd_assign.dest_id, 3);
     BOOST_CHECK_EQUAL (cmd_assign.dest_handle, 4);
-    BOOST_CHECK (checkActionFlag (cmd_assign, iterationRequested));
-    BOOST_CHECK (checkActionFlag (cmd_assign, pub_required));
+    BOOST_CHECK (checkActionFlag (cmd_assign, iteration_requested_flag));
+    BOOST_CHECK (checkActionFlag (cmd_assign, required_flag));
     BOOST_CHECK (checkActionFlag (cmd_assign, error_flag));
     BOOST_CHECK_EQUAL (cmd_assign.actionTime, helics::Time::maxVal ());
     BOOST_CHECK_EQUAL (cmd_assign.payload, "hello world");
@@ -249,8 +249,8 @@ BOOST_AUTO_TEST_CASE (conversion_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    setActionFlag (cmd, iterationRequested);
-    setActionFlag (cmd, pub_required);
+    setActionFlag (cmd, iteration_requested_flag);
+    setActionFlag (cmd, required_flag);
     setActionFlag (cmd, error_flag);
     cmd.actionTime = 45.7;
     cmd.payload = "hello world";
@@ -286,8 +286,8 @@ BOOST_AUTO_TEST_CASE (message_message_conversion_test)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    setActionFlag (cmd, iterationRequested);
-    setActionFlag (cmd, pub_required);
+    setActionFlag (cmd, iteration_requested_flag);
+    setActionFlag (cmd, required_flag);
     setActionFlag (cmd, error_flag);
     cmd.actionTime = 45.7;
     cmd.payload = "hello world";
@@ -348,8 +348,8 @@ BOOST_AUTO_TEST_CASE (check_packetization)
     cmd.source_handle = 2;
     cmd.dest_id = 3;
     cmd.dest_handle = 4;
-    setActionFlag (cmd, iterationRequested);
-    setActionFlag (cmd, pub_required);
+    setActionFlag (cmd, iteration_requested_flag);
+    setActionFlag (cmd, required_flag);
     setActionFlag (cmd, error_flag);
     cmd.actionTime = 45.7;
     cmd.payload = "hello world";

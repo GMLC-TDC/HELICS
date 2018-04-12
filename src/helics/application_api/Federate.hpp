@@ -35,6 +35,7 @@ class FederateInfo : public CoreFederateInfo
     bool rollback = false;  //!< indicator that the federate has rollback features
     bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must
                                   //! support rollback at least in a limited sense if set to true]
+    char separator = '/';   //!< separator for global name of localFederates
     core_type coreType;  //!< the type of the core
     std::string coreName;  //!< the name of the core
     std::string coreInitString;  //!< an initialization string for the core API object
@@ -60,6 +61,10 @@ class FederateInfo : public CoreFederateInfo
 /** generate a FederateInfo object from a JSON file
  */
 FederateInfo loadFederateInfo (const std::string &jsonString);
+
+/** generate a FederateInfo object from a JSON file
+*/
+FederateInfo loadFederateInfo(const std::string &name, const std::string &jsonString);
 
 class Core;
 
@@ -101,7 +106,11 @@ class Federate
     /**constructor taking a federate information structure
     @param[in] fi  a federate information structure
     */
-    Federate (const FederateInfo &fi);
+    explicit Federate (const FederateInfo &fi);
+    /**constructor taking a federate information structure
+    @param[in] fi  a federate information structure
+    */
+    Federate(const std::string &name, const FederateInfo &fi);
     /**constructor taking a core and a federate information structure
     @param core a shared pointer to a core object, the pointer will be copied
     @param[in] fi  a federate information structure
@@ -110,8 +119,13 @@ class Federate
     /**constructor taking a file with the required information
     @param[in] jsonString can be either a JSON file or a string containing JSON code
     */
-    Federate (const std::string &jsonString);
-
+    explicit Federate (const std::string &jsonString);
+    /**constructor taking a file with the required information and the name of the federate
+    @param[in] name the name of the federate
+    @param[in] jsonString can be either a JSON file or a string containing JSON code
+    */
+    Federate(const std::string &name, const std::string &jsonString);
+    /**default constructor*/
     Federate () noexcept;
     Federate (Federate &&fed) noexcept;
     Federate (const Federate &fed) = delete;
@@ -139,13 +153,14 @@ class Federate
     void enterInitializationStateComplete ();
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
+    @param iterate an optional flag indicating the desired iteration mode
     */
     iteration_result
-    enterExecutionState (helics_iteration_request iterate = helics_iteration_request::no_iterations);
+    enterExecutionState (iteration_request iterate = iteration_request::no_iterations);
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
-    void enterExecutionStateAsync (helics_iteration_request iterate = helics_iteration_request::no_iterations);
+    void enterExecutionStateAsync (iteration_request iterate = iteration_request::no_iterations);
     /** complete the async call for entering Execution state
     @details call will not block but will return quickly.  The enterInitializationStateFinalize must be called
     before doing other operations
@@ -179,8 +194,9 @@ class Federate
 
     /** request a time advancement
     @param[in] the next requested time step
-    @return the granted time step*/
-    iteration_time requestTimeIterative (Time nextInternalTimeStep, helics_iteration_request iterate);
+    @param[in] iterate a requested iteration mode
+    @return the granted time step in a structure containing a return time and an iteration_result*/
+    iteration_time requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate);
 
     /** request a time advancement
     @param[in] the next requested time step
@@ -191,7 +207,7 @@ class Federate
     @param[in] the next requested time step
     @param iterate a requested iteration level (none, require, optional)
     @return the granted time step*/
-    void requestTimeIterativeAsync (Time nextInternalTimeStep, helics_iteration_request iterate);
+    void requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate);
 
     /** request a time advancement
     @param[in] the next requested time step
@@ -416,7 +432,11 @@ class Federate
     /** get a pointer to the core object used by the federate*/
     std::shared_ptr<Core> getCorePointer () { return coreObject; }
     // interface for filter objects
-    /** get a shared pointer to a filter object stored in the federate*/
+    /** get a shared pointer to a filter object stored in the federate
+    @details filters can be created through the JSON file in which case there is no reference to
+    them elsewhere.  They are stored in the federate unless retrieved
+    @param index the index number of the stored federate
+    @return a shared_ptr to a filter object*/
     std::shared_ptr<Filter> getFilterObject (int index);
     /** add a shared pointer object to the Federate*/
     void addFilterObject (std::shared_ptr<Filter> obj);
