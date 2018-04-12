@@ -97,14 +97,14 @@ def main():
     pubid = h.helicsFederateRegisterGlobalTypePublication(fed, "federate1-to-federate2", h.HELICS_DATA_TYPE_DOUBLE, "")
     subid = h.helicsFederateRegisterSubscription(fed, "federate2-to-federate1", "double", "")
     epid = h.helicsFederateRegisterGlobalEndpoint(fed, "endpoint1", "")
-    fid = h.helicsFederateRegisterSourceFilter(fed, h.helics_delay_filter, "endpoint2", "filter-name")
+    # fid = h.helicsFederateRegisterSourceFilter(fed, h.helics_delay_filter, "endpoint2", "filter-name")
 
     h.helicsSubscriptionSetDefaultDouble(subid, 0)
 
     print("Entering execution mode")
     h.helicsFederateEnterExecutionMode(fed)
 
-    h.helicsFilterSet(fid, "delay", 2.0)
+    # h.helicsFilterSet(fid, "delay", 2.0)
 
     grantedtime = -1
     while True:
@@ -114,7 +114,7 @@ def main():
             status, grantedtime = h.helicsFederateRequestTime(fed, stop_at_time)
             if grantedtime != stop_at_time:
                 status, value = h.helicsSubscriptionGetDouble(subid)
-                print("Unexpected value {} from Federate 2".format(value))
+                print("Interrupt value {} from Federate 2".format(value))
             print("<<<<<<<< Granted Time = {}".format(grantedtime))
         assert grantedtime == stop_at_time, "stop_at_time = {}, grantedtime = {}".format(stop_at_time, grantedtime)
         if value_to_send is not None:

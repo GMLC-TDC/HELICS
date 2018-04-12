@@ -96,7 +96,7 @@ def main():
             status, grantedtime = h.helicsFederateRequestTime(fed, stop_at_time)
             if grantedtime != stop_at_time:
                 status, value = h.helicsSubscriptionGetDouble(subid)
-                print("Unexpected value {} from Federate 2".format(value))
+                print("Interrupt value {} from Federate 1".format(value))
             print("<<<<<<<< Granted Time = {}".format(grantedtime))
         assert grantedtime == stop_at_time, "stop_at_time = {}, grantedtime = {}".format(stop_at_time, grantedtime)
         if value_to_send is not None:
