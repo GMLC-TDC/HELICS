@@ -362,6 +362,7 @@ helics_status helicsPublicationPublishInteger (helics_publication pub, int64_t v
     }
     return helics_ok;
 }
+
 helics_status helicsPublicationPublishDouble (helics_publication pub, double val)
 {
     if (pub == nullptr)
@@ -398,20 +399,28 @@ helics_status helicsPublicationPublishComplex (helics_publication pub, double re
     return helics_ok;
 }
 
-helics_status helicsPublicationPublishVector (helics_publication pub, const double data[], int len)
+helics_status helicsPublicationPublishVector (helics_publication pub, const double *vectorInput, int vectorlength)
 {
     if (pub == nullptr)
     {
         return helics_invalid_object;
     }
     auto pubObj = reinterpret_cast<helics::PublicationObject *> (pub);
-    if (pubObj->rawOnly)
+    if ((vectorInput == nullptr) || (vectorlength <= 0))
     {
-        pubObj->fedptr->publish (pubObj->id, std::vector<double> (data, data + len));
+        pubObj->pubptr->publish(std::vector<double>());
     }
     else
     {
-        pubObj->pubptr->publish (std::vector<double> (data, data + len));
+        if (pubObj->rawOnly)
+        {
+            pubObj->fedptr->publish(pubObj->id, std::vector<double>(vectorInput, vectorInput + vectorlength));
+        }
+        else
+        {
+            pubObj->pubptr->publish(std::vector<double>(vectorInput, vectorInput + vectorlength));
+        }
+       
     }
     return helics_ok;
 }
@@ -433,7 +442,7 @@ int helicsSubscriptionGetValueSize (helics_subscription sub)
     return static_cast<int> (str.size ());
 }
 
-helics_status helicsSubscriptionGetValue (helics_subscription sub, char *data, int maxlen, int *actualSize)
+helics_status helicsSubscriptionGetRawValue (helics_subscription sub, char *data, int maxlen, int *actualSize)
 {
     if (sub == nullptr)
     {
@@ -477,28 +486,29 @@ helics_status helicsSubscriptionGetValue (helics_subscription sub, char *data, i
     return helics_warning;
 }
 
-helics_status helicsSubscriptionGetString (helics_subscription sub, char *str, int maxlen)
+helics_status helicsSubscriptionGetString (helics_subscription sub, char *outputString, int maxlen)
 {
     if (sub == nullptr)
     {
         return helics_invalid_object;
     }
 
-    if ((str == nullptr) || (maxlen <= 0))
+    if ((outputString == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
     }
     int len;
-    auto res = helicsSubscriptionGetValue (sub, str, maxlen, &len);
+    auto res = helicsSubscriptionGetRawValue (sub, outputString, maxlen, &len);
     // make sure we have a null terminator
     if (len == maxlen)
     {
-        str[maxlen - 1] = '\0';
+        outputString[maxlen - 1] = '\0';
         return helics_warning;
     }
-    str[len] = '\0';
+    outputString[len] = '\0';
     return res;
 }
+
 helics_status helicsSubscriptionGetInteger (helics_subscription sub, int64_t *val)
 {
     if (sub == nullptr)
@@ -520,6 +530,7 @@ helics_status helicsSubscriptionGetInteger (helics_subscription sub, int64_t *va
     }
     return helics_ok;
 }
+
 helics_status helicsSubscriptionGetDouble (helics_subscription sub, double *val)
 {
     if (sub == nullptr)
@@ -541,6 +552,7 @@ helics_status helicsSubscriptionGetDouble (helics_subscription sub, double *val)
     }
     return helics_ok;
 }
+
 helics_status helicsSubscriptionGetComplex (helics_subscription sub, double *real, double *imag)
 {
     if (sub == nullptr)
@@ -705,14 +717,14 @@ helics_status helicsSubscriptionSetDefaultComplex (helics_subscription sub, doub
     return helics_ok;
 }
 
-helics_status helicsSubscriptionSetDefaultVector (helics_subscription sub, const double *data, int len)
+helics_status helicsSubscriptionSetDefaultVector (helics_subscription sub, const double *vectorInput, int vectorlength)
 {
     if (sub == nullptr)
     {
         return helics_invalid_object;
     }
     auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
-    if ((data == nullptr) || (len <= 0))
+    if ((vectorInput == nullptr) || (vectorlength <= 0))
     {
         if (subObj->rawOnly)
         {
@@ -727,24 +739,24 @@ helics_status helicsSubscriptionSetDefaultVector (helics_subscription sub, const
     {
         if (subObj->rawOnly)
         {
-            subObj->fedptr->setDefaultValue (subObj->id, std::vector<double> (data, data + len));
+            subObj->fedptr->setDefaultValue (subObj->id, std::vector<double> (vectorInput, vectorInput + vectorlength));
         }
         else
         {
-            subObj->subptr->setDefault (std::vector<double> (data, data + len));
+            subObj->subptr->setDefault (std::vector<double> (vectorInput, vectorInput + vectorlength));
         }
     }
 
     return helics_ok;
 }
 
-helics_status helicsSubscriptionGetType (helics_subscription sub, char *str, int maxlen)
+helics_status helicsSubscriptionGetType (helics_subscription sub, char *outputString, int maxlen)
 {
     if (sub == nullptr)
     {
         return helics_invalid_object;
     }
-    if ((str == nullptr) || (maxlen <= 0))
+    if ((outputString == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
     }
@@ -760,23 +772,23 @@ helics_status helicsSubscriptionGetType (helics_subscription sub, char *str, int
     }
     if (static_cast<int> (type.size ()) > maxlen)
     {
-        strncpy (str, type.c_str (), maxlen);
-        str[maxlen - 1] = 0;
+        strncpy (outputString, type.c_str (), maxlen);
+        outputString[maxlen - 1] = 0;
     }
     else
     {
-        strcpy (str, type.c_str ());
+        strcpy (outputString, type.c_str ());
     }
     return helics_ok;
 }
 
-helics_status helicsPublicationGetType (helics_publication pub, char *str, int maxlen)
+helics_status helicsPublicationGetType (helics_publication pub, char *outputString, int maxlen)
 {
     if (pub == nullptr)
     {
         return helics_invalid_object;
     }
-    if ((str == nullptr) || (maxlen <= 0))
+    if ((outputString == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
     }
@@ -792,23 +804,23 @@ helics_status helicsPublicationGetType (helics_publication pub, char *str, int m
     }
     if (static_cast<int> (type.size ()) > maxlen)
     {
-        strncpy (str, type.c_str (), maxlen);
-        str[maxlen - 1] = 0;
+        strncpy (outputString, type.c_str (), maxlen);
+        outputString[maxlen - 1] = 0;
     }
     else
     {
-        strcpy (str, type.c_str ());
+        strcpy (outputString, type.c_str ());
     }
     return helics_ok;
 }
 
-helics_status helicsSubscriptionGetKey (helics_subscription sub, char *str, int maxlen)
+helics_status helicsSubscriptionGetKey (helics_subscription sub, char *outputString, int maxlen)
 {
     if (sub == nullptr)
     {
         return helics_invalid_object;
     }
-    if ((str == nullptr) || (maxlen <= 0))
+    if ((outputString == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
     }
@@ -824,23 +836,23 @@ helics_status helicsSubscriptionGetKey (helics_subscription sub, char *str, int 
     }
     if (static_cast<int> (type.size ()) > maxlen)
     {
-        strncpy (str, type.c_str (), maxlen);
-        str[maxlen - 1] = 0;
+        strncpy (outputString, type.c_str (), maxlen);
+        outputString[maxlen - 1] = 0;
     }
     else
     {
-        strcpy (str, type.c_str ());
+        strcpy (outputString, type.c_str ());
     }
     return helics_ok;
 }
 
-helics_status helicsPublicationGetKey (helics_publication pub, char *str, int maxlen)
+helics_status helicsPublicationGetKey (helics_publication pub, char *outputString, int maxlen)
 {
     if (pub == nullptr)
     {
         return helics_invalid_object;
     }
-    if ((str == nullptr) || (maxlen <= 0))
+    if ((outputString == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
     }
@@ -856,23 +868,23 @@ helics_status helicsPublicationGetKey (helics_publication pub, char *str, int ma
     }
     if (static_cast<int> (type.size ()) > maxlen)
     {
-        strncpy (str, type.c_str (), maxlen);
-        str[maxlen - 1] = 0;
+        strncpy (outputString, type.c_str (), maxlen);
+        outputString[maxlen - 1] = 0;
     }
     else
     {
-        strcpy (str, type.c_str ());
+        strcpy (outputString, type.c_str ());
     }
     return helics_ok;
 }
 
-helics_status helicsSubscriptionGetUnits (helics_subscription sub, char *str, int maxlen)
+helics_status helicsSubscriptionGetUnits (helics_subscription sub, char *outputString, int maxlen)
 {
     if (sub == nullptr)
     {
         return helics_invalid_object;
     }
-    if ((str == nullptr) || (maxlen <= 0))
+    if ((outputString == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
     }
@@ -888,23 +900,23 @@ helics_status helicsSubscriptionGetUnits (helics_subscription sub, char *str, in
     }
     if (static_cast<int> (type.size ()) > maxlen)
     {
-        strncpy (str, type.c_str (), maxlen);
-        str[maxlen - 1] = 0;
+        strncpy (outputString, type.c_str (), maxlen);
+        outputString[maxlen - 1] = 0;
     }
     else
     {
-        strcpy (str, type.c_str ());
+        strcpy (outputString, type.c_str ());
     }
     return helics_ok;
 }
 
-helics_status helicsPublicationGetUnits (helics_publication pub, char *str, int maxlen)
+helics_status helicsPublicationGetUnits (helics_publication pub, char *outputString, int maxlen)
 {
     if (pub == nullptr)
     {
         return helics_invalid_object;
     }
-    if ((str == nullptr) || (maxlen <= 0))
+    if ((outputString == nullptr) || (maxlen <= 0))
     {
         return helics_invalid_argument;
     }
@@ -920,12 +932,12 @@ helics_status helicsPublicationGetUnits (helics_publication pub, char *str, int 
     }
     if (static_cast<int> (type.size ()) > maxlen)
     {
-        strncpy (str, type.c_str (), maxlen);
-        str[maxlen - 1] = 0;
+        strncpy (outputString, type.c_str (), maxlen);
+        outputString[maxlen - 1] = 0;
     }
     else
     {
-        strcpy (str, type.c_str ());
+        strcpy (outputString, type.c_str ());
     }
     return helics_ok;
 }

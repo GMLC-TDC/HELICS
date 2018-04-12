@@ -5,15 +5,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "../common/blocking_queue.h"
 #include "Core.hpp"
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 
-#include <map>
-#include <mutex>
-#include <thread>
-#include <vector>
+#include <utility>
+#include <memory>
 
 namespace helics
 {
@@ -41,7 +38,8 @@ class FilterInfo
     const std::string inputType;  //!< the type of data for the filter
     const std::string outputType;  //!< the outputType of data of the filter
     const bool dest_filter = false;  //! indicator that the filter is a destination filter
-    // there is a 7 byte gap here
+    bool cloning = false;  //!< indicator that the filter is a cloning filter
+    // there is a 6 byte gap here
     std::shared_ptr<FilterOperator> filterOp;  //!< the callback operation of the filter
 
     std::pair<Core::federate_id_t, Core::handle_id_t> target{

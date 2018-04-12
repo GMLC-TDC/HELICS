@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -363,6 +362,8 @@ std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd)
 
 constexpr char nullStr[] = "unknown";
 
+//done in this screwy way because this can be called after things have started to be deconstructed so static consts can cause seg faults
+
 constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
   // priority commands
   {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
@@ -398,6 +399,8 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
 
   {action_message_def::action_t::cmd_time_grant, "time_grant"},
   {action_message_def::action_t::cmd_time_check, "time_check"},
+{ action_message_def::action_t::cmd_time_block, "time_block" },
+{ action_message_def::action_t::cmd_time_unblock, "time_unblock" },
   {action_message_def::action_t::cmd_pub, "pub"},
   {action_message_def::action_t::cmd_bye, "bye"},
   {action_message_def::action_t::cmd_log, "log"},
@@ -446,6 +449,27 @@ const char *actionMessageType (action_message_def::action_t action)
 {
     auto pptr = static_cast<const actionPair *> (actionStrings);
     auto res = std::find_if (pptr, pptr + actEnd, [action](const auto &pt) { return (pt.first == action); });
+    if (res != pptr + actEnd)
+    {
+        return res->second;
+    }
+    return static_cast<const char *> (nullStr);
+}
+
+
+
+constexpr std::pair<int, const char *> errorStrings[] = {
+    // priority commands
+    {5, "already in initialization mode" },
+{ 6, "duplicate federate name detected" }};
+
+using errorPair = std::pair<int, const char *>;
+constexpr size_t errEnd = sizeof(errorStrings) / sizeof(errorPair);
+
+const char *commandErrorString(int errorcode)
+{
+    auto pptr = static_cast<const errorPair *> (errorStrings);
+    auto res = std::find_if(pptr, pptr + actEnd, [errorcode](const auto &pt) { return (pt.first == errorcode); });
     if (res != pptr + actEnd)
     {
         return res->second;

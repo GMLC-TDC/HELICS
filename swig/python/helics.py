@@ -291,7 +291,7 @@ def helicsCreateCore(type, name, initString):
     """
     return _helics.helicsCreateCore(type, name, initString)
 
-def helicsCreateCoreFromArgs(type, name, argc, argv):
+def helicsCreateCoreFromArgs(type, name, argc):
     """
 
 
@@ -314,7 +314,7 @@ def helicsCreateCoreFromArgs(type, name, argc, argv):
     a helics_core object
 
     """
-    return _helics.helicsCreateCoreFromArgs(type, name, argc, argv)
+    return _helics.helicsCreateCoreFromArgs(type, name, argc)
 
 def helicsCoreClone(core):
     return _helics.helicsCoreClone(core)
@@ -346,7 +346,7 @@ def helicsCreateBroker(type, name, initString):
     """
     return _helics.helicsCreateBroker(type, name, initString)
 
-def helicsCreateBrokerFromArgs(type, name, argc, argv):
+def helicsCreateBrokerFromArgs(type, name, argc):
     """
 
 
@@ -369,7 +369,7 @@ def helicsCreateBrokerFromArgs(type, name, argc, argv):
     a helics_core object
 
     """
-    return _helics.helicsCreateBrokerFromArgs(type, name, argc, argv)
+    return _helics.helicsCreateBrokerFromArgs(type, name, argc)
 
 def helicsBrokerClone(broker):
     return _helics.helicsBrokerClone(broker)
@@ -682,7 +682,7 @@ def helicsFederateInfoCreate():
     """
     return _helics.helicsFederateInfoCreate()
 
-def helicsFederateInfoLoadFromArgs(fi, argc, argv):
+def helicsFederateInfoLoadFromArgs(fi, argc):
     """
 
 
@@ -702,7 +702,7 @@ def helicsFederateInfoLoadFromArgs(fi, argc, argv):
     a helics_status enumeration indicating success or any potential errors
 
     """
-    return _helics.helicsFederateInfoLoadFromArgs(fi, argc, argv)
+    return _helics.helicsFederateInfoLoadFromArgs(fi, argc)
 
 def helicsFederateInfoFree(fi):
     """
@@ -1124,7 +1124,7 @@ def helicsFederateRequestTimeIterativeComplete(fed):
     """
     return _helics.helicsFederateRequestTimeIterativeComplete(fed)
 
-def helicsFederateGetName(fed, str):
+def helicsFederateGetName(fed, outputString):
     """
 
 
@@ -1144,7 +1144,7 @@ def helicsFederateGetName(fed, str):
     helics_status object indicating success or error
 
     """
-    return _helics.helicsFederateGetName(fed, str)
+    return _helics.helicsFederateGetName(fed, outputString)
 
 def helicsFederateSetTimeDelta(fed, time):
     """
@@ -1559,12 +1559,12 @@ def helicsPublicationPublishComplex(pub, real, imag):
     """
     return _helics.helicsPublicationPublishComplex(pub, real, imag)
 
-def helicsPublicationPublishVector(pub, data, len):
+def helicsPublicationPublishVector(pub, vectorInput):
     """
 
 
     """
-    return _helics.helicsPublicationPublishVector(pub, data, len)
+    return _helics.helicsPublicationPublishVector(pub, vectorInput)
 
 def helicsSubscriptionGetValueSize(sub):
     """
@@ -1573,19 +1573,16 @@ def helicsSubscriptionGetValueSize(sub):
     """
     return _helics.helicsSubscriptionGetValueSize(sub)
 
-def helicsSubscriptionGetValue(sub, data, maxlen):
+def helicsSubscriptionGetRawValue(sub, data, maxlen):
+    return _helics.helicsSubscriptionGetRawValue(sub, data, maxlen)
+helicsSubscriptionGetRawValue = _helics.helicsSubscriptionGetRawValue
+
+def helicsSubscriptionGetString(sub, outputString):
     """
 
 
     """
-    return _helics.helicsSubscriptionGetValue(sub, data, maxlen)
-
-def helicsSubscriptionGetString(sub, str):
-    """
-
-
-    """
-    return _helics.helicsSubscriptionGetString(sub, str)
+    return _helics.helicsSubscriptionGetString(sub, outputString)
 
 def helicsSubscriptionGetInteger(sub):
     """
@@ -1615,7 +1612,7 @@ def helicsSubscriptionGetVectorSize(sub):
     """
     return _helics.helicsSubscriptionGetVectorSize(sub)
 
-def helicsSubscriptionGetVector(sub, data, maxlen):
+def helicsSubscriptionGetVector(sub):
     """
 
 
@@ -1633,7 +1630,7 @@ def helicsSubscriptionGetVector(sub, data, maxlen):
         pointer to variable to store the actual size
 
     """
-    return _helics.helicsSubscriptionGetVector(sub, data, maxlen)
+    return _helics.helicsSubscriptionGetVector(sub)
 
 def helicsSubscriptionSetDefault(sub, data):
     """
@@ -1670,54 +1667,54 @@ def helicsSubscriptionSetDefaultComplex(sub, real, imag):
     """
     return _helics.helicsSubscriptionSetDefaultComplex(sub, real, imag)
 
-def helicsSubscriptionSetDefaultVector(sub, len):
+def helicsSubscriptionSetDefaultVector(sub, vectorInput):
     """
 
 
     """
-    return _helics.helicsSubscriptionSetDefaultVector(sub, len)
+    return _helics.helicsSubscriptionSetDefaultVector(sub, vectorInput)
 
-def helicsSubscriptionGetType(sub, str):
+def helicsSubscriptionGetType(sub, outputString):
     """
 
 
     """
-    return _helics.helicsSubscriptionGetType(sub, str)
+    return _helics.helicsSubscriptionGetType(sub, outputString)
 
-def helicsPublicationGetType(pub, str):
+def helicsPublicationGetType(pub, outputString):
     """
 
 
     """
-    return _helics.helicsPublicationGetType(pub, str)
+    return _helics.helicsPublicationGetType(pub, outputString)
 
-def helicsSubscriptionGetKey(sub, str):
+def helicsSubscriptionGetKey(sub, outputString):
     """
 
 
     """
-    return _helics.helicsSubscriptionGetKey(sub, str)
+    return _helics.helicsSubscriptionGetKey(sub, outputString)
 
-def helicsPublicationGetKey(pub, str):
+def helicsPublicationGetKey(pub, outputString):
     """
 
 
     """
-    return _helics.helicsPublicationGetKey(pub, str)
+    return _helics.helicsPublicationGetKey(pub, outputString)
 
-def helicsSubscriptionGetUnits(sub, str):
+def helicsSubscriptionGetUnits(sub, outputString):
     """
 
 
     """
-    return _helics.helicsSubscriptionGetUnits(sub, str)
+    return _helics.helicsSubscriptionGetUnits(sub, outputString)
 
-def helicsPublicationGetUnits(pub, str):
+def helicsPublicationGetUnits(pub, outputString):
     """
 
 
     """
-    return _helics.helicsPublicationGetUnits(pub, str)
+    return _helics.helicsPublicationGetUnits(pub, outputString)
 
 def helicsSubscriptionIsUpdated(sub):
     """
@@ -1870,7 +1867,7 @@ def helicsFederateGetMessage(fed):
     """
     return _helics.helicsFederateGetMessage(fed)
 
-def helicsEndpointGetType(endpoint, str):
+def helicsEndpointGetType(endpoint, outputString):
     """
 
 
@@ -1890,9 +1887,9 @@ def helicsEndpointGetType(endpoint, str):
     a status variable
 
     """
-    return _helics.helicsEndpointGetType(endpoint, str)
+    return _helics.helicsEndpointGetType(endpoint, outputString)
 
-def helicsEndpointGetName(endpoint, str):
+def helicsEndpointGetName(endpoint, outputString):
     """
 
 
@@ -1912,7 +1909,7 @@ def helicsEndpointGetName(endpoint, str):
     a status variable
 
     """
-    return _helics.helicsEndpointGetName(endpoint, str)
+    return _helics.helicsEndpointGetName(endpoint, outputString)
 
 def helicsFederateGetEndpointCount(fed):
     return _helics.helicsFederateGetEndpointCount(fed)
@@ -1981,23 +1978,23 @@ def helicsCoreRegisterCloningFilter(fed, deliveryEndpoint):
     """
     return _helics.helicsCoreRegisterCloningFilter(fed, deliveryEndpoint)
 
-def helicsFilterGetTarget(filt, str):
+def helicsFilterGetTarget(filt, outputString):
     """
 
 
     get the target of the filter
 
     """
-    return _helics.helicsFilterGetTarget(filt, str)
+    return _helics.helicsFilterGetTarget(filt, outputString)
 
-def helicsFilterGetName(filt, str):
+def helicsFilterGetName(filt, outputString):
     """
 
 
     get the name of the filter
 
     """
-    return _helics.helicsFilterGetName(filt, str)
+    return _helics.helicsFilterGetName(filt, outputString)
 
 def helicsFilterSet(filt, property, val):
     """

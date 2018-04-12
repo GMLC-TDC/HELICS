@@ -1,6 +1,6 @@
 shallow_clone: true
 
-version: 1.0.0.beta.1.{build}
+version: 1.0.0-beta.2.{build}
 
 image: Visual Studio 2015
 
@@ -20,7 +20,7 @@ before_build:
   - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install swig --yes --limit-output #> $null
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 14 2015 Win64" -DAUTOBUILD_ZMQ=ON -DBOOST_INSTALL_PATH=C:/libraries/boost_1_63_0 -DBUILD_RELEASE_ONLY=ON -DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON
+  - cmake .. -G "Visual Studio 14 2015 Win64" -DAUTOBUILD_ZMQ=ON -DBOOST_INSTALL_PATH=C:/libraries/boost_1_63_0 -DBUILD_RELEASE_ONLY=ON -DBUILD_C_SHARED_LIB=ON -DBUILD_JAVA_INTERFACE=ON -DBUILD_HELICS_EXAMPLES=ON
   - cd ..
 
 build:
@@ -29,6 +29,9 @@ build:
   verbosity: minimal
 
 after_build:
+  - cd build
+  - cpack -B %cd%/installer-output
+  - cd ..
 
 test_script:
   - cd build
@@ -45,9 +48,10 @@ test_script:
   - ctest -C Release --verbose --timeout 90 -I 0,0,0,2
   - ctest -C Release --verbose --timeout 240 -I 0,0,0,4
   #- ctest -C Release --verbose --timeout 90 -I 0,0,0,7
+  - cd ..
 
 on_finish:
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 artifacts:
-
+  - path: build/installer-output/Helics-*.exe

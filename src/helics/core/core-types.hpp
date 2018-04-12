@@ -11,8 +11,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 @details definitions of types an enumerations used in helics
 */
 
+namespace helics
+{
 /** enumeration of the possible federate states*/
-enum helics_federate_state_type
+enum federate_state_t
 {
     HELICS_CREATED, /*!> state upon creation, all registration calls are allowed*/
     HELICS_INITIALIZING,  //!< the federation has entered initialization state and initial values can be published
@@ -22,8 +24,6 @@ enum helics_federate_state_type
     HELICS_NONE,  //!< unknown state
 };
 
-namespace helics
-{
 /** the type of the cores that are available */
 enum class core_type : int
 {
@@ -63,17 +63,17 @@ enum class iteration_result : signed char
 };
 
 /** enumeration of the possible iteration requests by a federate*/
-enum class helics_iteration_request : signed char
+enum class iteration_request : signed char
 {
     no_iterations = 0,  //!< indicator that the iterations have completed
     force_iteration = 1,  //!< force an iteration whether it is needed or not
     iterate_if_needed = 2,  //!< indicator that the iterations need to continue
 };
 
-#define ITERATION_COMPLETE helics::helics_iteration_request::no_iterations
-#define NO_ITERATION helics::helics_iteration_request::no_iterations
-#define FORCE_ITERATION helics::helics_iteration_request::force_iteration
-#define ITERATE_IF_NEEDED helics::helics_iteration_request::iterate_if_needed
+#define ITERATION_COMPLETE helics::iteration_request::no_iterations
+#define NO_ITERATION helics::iteration_request::no_iterations
+#define FORCE_ITERATION helics::iteration_request::force_iteration
+#define ITERATE_IF_NEEDED helics::iteration_request::iterate_if_needed
 
 /** defining some check modes for dealing with required or optional components*/
 enum class handle_check_mode : char
@@ -83,7 +83,7 @@ enum class handle_check_mode : char
 };
 
 /**generate a string based on the core type*/
-std::string helicsTypeString (core_type type);
+std::string to_string (core_type type);
 
 /** generate a core type value from a std::string
 @param a string describing the desired core type

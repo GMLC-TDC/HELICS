@@ -47,13 +47,7 @@ class ActionMessage
               original_dest (std::move (ai.original_dest)), messageID(ai.messageID) {};
         ~AdditionalInfo() = default;
         template <class Archive>
-        void save (Archive &ar) const
-        {
-            ar (source, target, orig_source, original_dest,messageID);
-        }
-
-        template <class Archive>
-        void load (Archive &ar)
+        void serialize (Archive &ar)
         {
             ar (source, target, orig_source, original_dest,messageID);
         }
@@ -177,7 +171,7 @@ class ActionMessage
     void to_string (std::string &data) const;
     /** convert to a byte string*/
     std::string to_string () const;
-    /** packettize the message with a simple header and tail sequence
+    /** packetize the message with a simple header and tail sequence
      */
     std::string packetize () const;
     /** covert to a byte vector using a reference*/

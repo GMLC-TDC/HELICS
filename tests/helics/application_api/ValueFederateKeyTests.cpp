@@ -266,8 +266,16 @@ BOOST_DATA_TEST_CASE(test_all_callback, bdata::make(core_types_single), core_typ
     vFed1->requestTime(1.0);
     // the callback should have occurred here
     BOOST_CHECK(lastId == sub3);
-    BOOST_CHECK_EQUAL(lastTime, 1.0);
-    BOOST_CHECK_EQUAL(vFed1->getLastUpdateTime(sub3), lastTime);
+    if (lastId == sub3)
+    {
+        BOOST_CHECK_EQUAL(lastTime, 1.0);
+        BOOST_CHECK_EQUAL(vFed1->getLastUpdateTime(sub3), lastTime);
+    }
+    else
+    {
+        BOOST_FAIL(" missed callback\n");
+    }
+    
     vFed1->publish(pubid2, 4);
     vFed1->requestTime(2.0);
     // the callback should have occurred here

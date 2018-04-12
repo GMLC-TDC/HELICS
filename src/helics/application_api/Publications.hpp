@@ -22,7 +22,7 @@ class PublicationBase
   public:
     PublicationBase () = default;
     /** base constructor for a publication
-    @tparam avalueFed a pointer of some kind to a value federate (any dereferencable type with * and -> operator that
+    @tparam a valueFed a pointer of some kind to a value federate (any dereferencable type with * and -> operator that
     results in a valueFederate object
     @param key the identifier for the publication
     @param type the type of the publication
@@ -140,6 +140,7 @@ class Publication : public PublicationBase
     void publish (const double *vals, int size) const;
     void publish (std::complex<double> val) const;
     void publish (const defV &val) const;
+    void publish (bool val) const;
     /** secondary publish function to allow unit conversion before publication
     @param[in] val the value to publish
     @param[in] units  the units association with the publication

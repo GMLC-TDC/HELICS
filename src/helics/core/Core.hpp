@@ -144,7 +144,7 @@ class Core
      simulation is ready to move on to the executing state
      */
     virtual iteration_result
-    enterExecutingState (federate_id_t federateID, helics_iteration_request iterate = NO_ITERATION) = 0;
+    enterExecutingState (federate_id_t federateID, iteration_request iterate = NO_ITERATION) = 0;
 
     /**
      * Register a federate.
@@ -224,7 +224,7 @@ class Core
      iteration
      */
     virtual iteration_time
-    requestTimeIterative (federate_id_t federateID, Time next, helics_iteration_request iterate) = 0;
+    requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate) = 0;
 
     /**
      * Returns the current reiteration count for the specified federate.
@@ -437,6 +437,36 @@ class Core
     @param name the name of the endpoint
     @return a handle to identify the endpoint*/
     virtual handle_id_t getEndpoint (federate_id_t federateID, const std::string &name) const = 0;
+
+    /**
+    * Register a cloning source filter, a cloning filter operates on a copy of the message vs the actual message
+    *
+    @param filterName the name of the filter (may be left blank and one will be automatically assigned)
+    @param source the target endpoint for the filter
+    @param type_in the input type of the filter
+    @param type_out the output type of the filter (may be left blank if the filter doesn't change type)
+    @return the handle for the new filter
+    */
+    virtual handle_id_t registerCloningSourceFilter(const std::string &filterName,
+        const std::string &source,
+        const std::string &type_in,
+        const std::string &type_out) = 0;
+    /**
+    * Register a cloning destination filter.
+    @details a destination filter will create an additional processing step of messages before they get to a
+    destination endpoint,  a destination may have multiple cloning filters but only one non-cloning filter
+    *
+    * May only be invoked in the Initialization state.
+    @param filterName the name of the filter (may be left blank)
+    @param dest the target endpoint for the filter
+    @param type_in the input type of the filter (may be left blank,  this is for error checking and will produce a
+    warning if it doesn't match with the input type of the target endpoint
+    @return the handle for the new filter
+    */
+    virtual handle_id_t registerCloningDestinationFilter(const std::string &filterName,
+        const std::string &dest,
+        const std::string &type_in,
+        const std::string &type_out) = 0;
 
     /**
      * Register source filter.

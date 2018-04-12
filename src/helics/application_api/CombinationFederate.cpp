@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -22,6 +21,12 @@ CombinationFederate::CombinationFederate (const std::string &jsonString)
     : Federate (loadFederateInfo (jsonString)), ValueFederate (true), MessageFederate (true)
 {
     registerInterfaces (jsonString);
+}
+
+CombinationFederate::CombinationFederate(const std::string &name, const std::string &jsonString)
+    : Federate(loadFederateInfo(name,jsonString)), ValueFederate(true), MessageFederate(true)
+{
+    registerInterfaces(jsonString);
 }
 
 CombinationFederate::CombinationFederate (CombinationFederate &&) noexcept = default;

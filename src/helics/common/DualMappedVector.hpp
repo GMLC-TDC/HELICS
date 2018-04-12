@@ -25,19 +25,118 @@ public:
 	@param searchValue1 the primary unique index of the vector
 	@param searchValue2 the secondary unique index of the vector*/
 	template <typename... Us>
-    void insert(const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
+    bool insert(const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
     {
         auto fnd = lookup1.find(searchValue1);
         if (fnd != lookup1.end())
         {
-            dataStorage[fnd->second] = VType(std::forward<Us>(data)...);
-			lookup2[searchValue2] = fnd->second;
+            return false;
         }
         else
         {
 			auto index = dataStorage.size();
             dataStorage.emplace_back(std::forward<Us>(data)...);
             lookup1.emplace(searchValue1,  index);
+            lookup2.emplace(searchValue2, index);
+        }
+        return true;
+    }
+
+    /** insert a new element into the vector
+    @param searchValue1 the primary unique index of the vector
+    @param searchValue2 the secondary unique index of the vector*/
+    template <typename... Us>
+    bool insert(const searchType1 &searchValue1, std::nullptr_t /*searchValue2*/, Us &&... data)
+    {
+        auto fnd = lookup1.find(searchValue1);
+        if (fnd != lookup1.end())
+        {
+            return false;
+        }
+        else
+        {
+            auto index = dataStorage.size();
+            dataStorage.emplace_back(std::forward<Us>(data)...);
+            lookup1.emplace(searchValue1, index);
+        }
+        return true;
+    }
+
+    /** insert a new element into the vector
+    @param searchValue1 the primary unique index of the vector
+    @param searchValue2 the secondary unique index of the vector*/
+    template <typename... Us>
+    bool insert(std::nullptr_t /*searchValue1*/, const searchType2 &searchValue2, Us &&... data)
+    {
+        auto fnd = lookup2.find(searchValue2);
+        if (fnd != lookup2.end())
+        {
+            return false;
+        }
+        else
+        {
+            auto index = dataStorage.size();
+            dataStorage.emplace_back(std::forward<Us>(data)...);
+            lookup2.emplace(searchValue2, index);
+        }
+        return true;
+    }
+
+    /** insert a new element into the vector
+    @param searchValue1 the primary unique index of the vector
+    @param searchValue2 the secondary unique index of the vector*/
+    template <typename... Us>
+    void insert_or_assign(const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
+    {
+        auto fnd = lookup1.find(searchValue1);
+        if (fnd != lookup1.end())
+        {
+            dataStorage[fnd->second] = VType(std::forward<Us>(data)...);
+            lookup2[searchValue2] = fnd->second;
+        }
+        else
+        {
+            auto index = dataStorage.size();
+            dataStorage.emplace_back(std::forward<Us>(data)...);
+            lookup1.emplace(searchValue1, index);
+            lookup2.emplace(searchValue2, index);
+        }
+    }
+
+    /** insert a new element into the vector
+    @param searchValue1 the primary unique index of the vector
+    @param searchValue2 the secondary unique index of the vector*/
+    template <typename... Us>
+    void insert_or_assign(const searchType1 &searchValue1, std::nullptr_t /*searchValue2*/, Us &&... data)
+    {
+        auto fnd = lookup1.find(searchValue1);
+        if (fnd != lookup1.end())
+        {
+            dataStorage[fnd->second] = VType(std::forward<Us>(data)...);
+        }
+        else
+        {
+            auto index = dataStorage.size();
+            dataStorage.emplace_back(std::forward<Us>(data)...);
+            lookup1.emplace(searchValue1, index);
+        }
+    }
+
+    /** insert a new element into the vector
+    @param searchValue1 the primary unique index of the vector
+    @param searchValue2 the secondary unique index of the vector*/
+    template <typename... Us>
+    void insert_or_assign(std::nullptr_t /*searchValue1*/, const searchType2 &searchValue2, Us &&... data)
+    {
+        auto fnd = lookup2.find(searchValue2);
+        if (fnd != lookup2.end())
+        {
+            dataStorage[fnd->second] = VType(std::forward<Us>(data)...);
+        }
+        else
+        {
+            auto index = dataStorage.size();
+            dataStorage.emplace_back(std::forward<Us>(data)...);
             lookup2.emplace(searchValue2, index);
         }
     }

@@ -68,10 +68,10 @@ class ForwardingTimeCoordinator
   private:
     /**send out the latest time request command*/
     void sendTimeRequest () const;
-
+    void transmitTimingMessage(ActionMessage &msg) const;
   public:
     /** process a message related to time
-    @return true if it did anything
+    @return a message_process_result if it did anything
     */
     bool processTimeMessage (const ActionMessage &cmd);
 

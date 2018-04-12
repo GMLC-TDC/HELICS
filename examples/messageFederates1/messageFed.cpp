@@ -12,6 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 static const helics::ArgDescriptors InfoArgs{
     {"startbroker","start a broker with the specified arguments"},
     {"target,t", "name of the target federate"},
+    { "messagetarget", "name of the target federate, same as target" },
     {"endpoint,e", "name of the target endpoint"},
     {"source,s", "name of the source endpoint"}
     //name is captured in the argument processor for federateInfo
@@ -33,6 +34,10 @@ int main (int argc, char *argv[])
 	{
 		targetfederate = vm["target"].as<std::string>();
 	}
+    if (vm.count("messagetarget") > 0)
+    {
+        targetfederate = vm["messagetarget"].as<std::string>();
+    }
     std::string targetEndpoint = "endpoint";
     if (vm.count("endpoint") > 0) {
         targetEndpoint = vm["endpoint"].as<std::string>();

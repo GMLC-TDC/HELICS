@@ -13,6 +13,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
+/** enumeration of possible processing results*/
+enum class message_process_result
+{
+    no_effect = 0, //!< the message did not result in an update
+    processed,  //!< the message was used to update the current state
+    delay_processing, //!< the message should be delayed and reprocessed later
+};
+
 /** class managing the coordination of time in HELICS
 the time coordinator manages dependencies and computes whether time can advance or enter execution mode
 */
@@ -30,13 +38,15 @@ class TimeCoordinator
     Time time_message = Time::maxVal ();  //!< the time of the earliest message event
     Time time_value = Time::maxVal ();  //!< the time of the earliest value event
     Time time_grantBase = Time::minVal();  //!< time to use as a basis for calculating the next grantable time(usually time granted unless values are changing)
-	TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
+    Time time_block = Time::maxVal();  //!< a blocking time to not grant time >= the specified time
+    TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
 	std::vector<Core::federate_id_t> dependents;  //!< federates which temporally depend on this federate
-
+    std::deque<std::pair<Time, int32_t>> timeBlocks; //!< blocks for a particular timeblocking link
 	CoreFederateInfo info;  //!< basic federate info the core uses
 	std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
 
   public:
+      
     Core::federate_id_t
       source_id;  //!< the identifier for inserting into the source id field of any generated messages;
     bool iterating = false;  //!< indicator that the coordinator should be iterating if need be
@@ -49,9 +59,12 @@ class TimeCoordinator
 public:
     bool forwarding = false; //indicator that the time coordinator is a forwarding coordinator
   public:
-    TimeCoordinator () = default;
+      /** default constructor*/
+    TimeCoordinator ();
+    /** construct from a federate info */
     explicit TimeCoordinator (const CoreFederateInfo &info_);
-
+    /** construct from a federate info and message send function*/
+    TimeCoordinator(const CoreFederateInfo &info_, std::function<void(const ActionMessage &)> sendMessageFunction_);
 	/* get the federate info used by the Core that affects timing*/
 	CoreFederateInfo &getFedInfo()
 	{
@@ -62,16 +75,18 @@ public:
 	/** set the core information using for timing as a block*/
     void setInfo (const CoreFederateInfo &info_) { info = info_; }
 	/** set the callback function used for the sending messages*/
-	void setMessageSender(std::function<void(const ActionMessage &)> sendMessageFunction_)
-	{
-		sendMessageFunction = std::move(sendMessageFunction_);
-	}
+    void setMessageSender(std::function<void(const ActionMessage &)> sendMessageFunction_);
 
 	/** get the current granted time*/
 	Time getGrantedTime() const
 	{
 		return time_granted;
 	}
+    /** get the current granted time*/
+    Time allowedSendTime() const
+    {
+        return time_granted+info.outputDelay;
+    }
 	/** get a list of actual dependencies*/
     std::vector < Core::federate_id_t> getDependencies() const;
     /** get a reference to the dependents vector*/
@@ -110,11 +125,14 @@ public:
 
     void sendTimeRequest() const;
     void updateTimeGrant();
+    void transmitTimingMessage(ActionMessage &msg) const;
+
+    message_process_result processTimeBlockMessage(const ActionMessage &cmd);
   public:
 	/** process a message related to time
-	@return true if it did anything
+	@return the result of processing the message
 	*/
-    bool processTimeMessage (const ActionMessage &cmd);
+    message_process_result processTimeMessage (const ActionMessage &cmd);
 
     /** process a message related to configuration
     @param cmd the update command
@@ -146,13 +164,15 @@ public:
 	@param newValueTime  the time of the next value
 	@param newMessageTime the time of the next message
 	*/
-	void timeRequest(Time nextTime, helics_iteration_request iterate, Time newValueTime, Time newMessageTime);
+	void timeRequest(Time nextTime, iteration_request iterate, Time newValueTime, Time newMessageTime);
 	/** function to enter the exec Mode
 	@param mode the mode of iteration_request (no_iteration, force_iteration, iterate_if_needed)
 	*/
-	void enteringExecMode(helics_iteration_request mode);
+	void enteringExecMode(iteration_request mode);
 	/** check if it is valid to grant a time*/
     iteration_state checkTimeGrant ();
+    /** disconnect*/
+    void disconnect();
     /** generate a string with the current time status*/
     std::string printTimeStatus () const;
     /** return true if there are active dependencies*/
