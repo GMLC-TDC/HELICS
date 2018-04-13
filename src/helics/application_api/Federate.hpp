@@ -79,15 +79,15 @@ class Federate
     enum class op_states : char
     {
         startup = 0,  //!< when created the federate is in startup state
-        initialization,  //!< entered after the enterInitializationState call has returned
-        execution,  //!< entered after the enterExectuationState call has returned
-        finalize,  //!< the federate has finished executing normally final values may be retrieved
-        error,  //!< error state no core communication is possible but values can be retrieved
+        initialization=1,  //!< entered after the enterInitializationState call has returned
+        execution=2,  //!< entered after the enterExectuationState call has returned
+        finalize=3,  //!< the federate has finished executing normally final values may be retrieved
+        error=4,  //!< error state no core communication is possible but values can be retrieved
         // the following states are for asynchronous operations
-        pending_init,  //!< indicator that the federate is pending entry to initialization state
-        pending_exec,  //!< state pending EnterExecution State
-        pending_time,  //!< state that the federate is pending a timeRequest
-        pending_iterative_time  //!< state that the federate is pending an iterative time request
+        pending_init=5,  //!< indicator that the federate is pending entry to initialization state
+        pending_exec=6,  //!< state pending EnterExecution State
+        pending_time=7,  //!< state that the federate is pending a timeRequest
+        pending_iterative_time=8  //!< state that the federate is pending an iterative time request
     };
 
   protected:
