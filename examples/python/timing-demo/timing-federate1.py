@@ -117,7 +117,7 @@ def main():
                 print("Interrupt value '{}' from Federate 2".format(value))
             print("<<<<<<<< Granted Time = {}".format(grantedtime))
         assert grantedtime == stop_at_time, "stop_at_time = {}, grantedtime = {}".format(stop_at_time, grantedtime)
-        if value_to_send is not None or value_to_send != '':
+        if value_to_send is not None and value_to_send != '':
             print("Sending '{}' to Federate 2".format(value_to_send))
             status = h.helicsPublicationPublishString(pubid, str(value_to_send))
             status = h.helicsEndpointSendMessageRaw(epid, "endpoint2", str(value_to_send))
