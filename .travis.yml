@@ -181,8 +181,9 @@ script:
   # 7 = helics-apps tests
   - ctest --verbose --timeout 120 -I 0,0,0,1
   # - ctest --verbose --timeout 120 -I 0,0,0,2
+  - ctest --verbose --timeout 240 -I 0,0,0,6
+  - ctest --verbose --timeout 240 -I 0,0,0,7
   - ctest --verbose --timeout 180 -I 0,0,0,3
-  - ctest --verbose --timeout 360 -I 0,0,0,6
   - ctest --verbose -L Java
   - export PYTHONPATH="$(pwd)/swig/python"
     # - echo "$LD_LIBRARY_PATH"
