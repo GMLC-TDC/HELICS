@@ -290,13 +290,13 @@ helics_status helicsFederateEnterExecutionMode (helics_federate fed)
     }
     try
     {
-        printf("current state=%d\n", static_cast<int>(fedObj->getCurrentState()));
+        //printf("current state=%d\n", static_cast<int>(fedObj->getCurrentState()));
         fedObj->enterExecutionState ();
         return helics_ok;
     }
     catch (helics::InvalidFunctionCall &)
     {
-        printf("current state=%d\n", static_cast<int>(fedObj->getCurrentState()));
+      //  printf("current state=%d\n", static_cast<int>(fedObj->getCurrentState()));
         return helics_invalid_state_transition;
     }
 }
