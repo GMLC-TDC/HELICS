@@ -185,6 +185,8 @@ script:
   # - ctest --verbose --timeout 240 -I 0,0,0,7
   - ctest --verbose --timeout 180 -I 0,0,0,3
   - ctest --verbose -L Java
+  - ctest -L Examples
+
   - export PYTHONPATH="$(pwd)/swig/python"
     # - echo "$LD_LIBRARY_PATH"
     # - echo "$DYLD_FALLBACK_LIBRARY_PATH"

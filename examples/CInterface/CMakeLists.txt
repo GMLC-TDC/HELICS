@@ -72,6 +72,18 @@ endif()
 add_subdirectory(messageFed1)
 add_subdirectory(comboFederates1)
 
+if (BUILD_HELICS_EXAMPLES AND BUILD_HELICS_TESTS AND NOT MSVC)
+    add_test(NAME pi_example
+             COMMAND ${PROJECT_SOURCE_DIR}/scripts/test_example.sh 10 $<TARGET_FILE:pi_sender> $<TARGET_FILE:pi_receiver>)
+    add_test(NAME pi_example2
+             COMMAND ${PROJECT_SOURCE_DIR}/scripts/test_example.sh 10 $<TARGET_FILE:pi_sender2> $<TARGET_FILE:pi_receiver2>)
+    add_test(NAME nonlings_example
+             COMMAND ${PROJECT_SOURCE_DIR}/scripts/test_example.sh 10 $<TARGET_FILE:nonlings_fed1> $<TARGET_FILE:nonlings_fed2>)
+    add_test(NAME hello_world_example
+             COMMAND ${PROJECT_SOURCE_DIR}/scripts/test_example.sh 10 $<TARGET_FILE:hello_world_sender> $<TARGET_FILE:hello_world_receiver>)
+    set_tests_properties(pi_example pi_example2 nonlings_example hello_world_example PROPERTIES LABELS Examples)
+endif()
+
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET pi_sender POST_BUILD        # Adds a post-build event to api tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
