@@ -5,12 +5,8 @@
 ##############################################################################
 
 
-set(shared_library_test_headers
-ctestFixtures.hpp
-cpptestFixtures.hpp
-)
 
-set(shared_library_test_sources
+set(c_shared_library_test_sources
 ctestFixtures.cpp
 cpptestFixtures.cpp
 #ValueConverterTests.cpp
@@ -34,10 +30,30 @@ test-message-federate_cpp.cpp
 #QueryTests.cpp
 )
 
+set(cpp_shared_library_test_sources
+cpptestFixtures.cpp
+cppshared-library-tests.cpp
+#test-value-federate1_cpp.cpp
+test-value-federate2_cpp.cpp
+#ValueFederateTests2.cpp
+#MessageFederateTests.cpp
+FilterTests.cpp
+FilterTests_cpp.cpp
+test-message-federate.cpp
+test-message-federate_cpp.cpp
+#FederateTests.cpp
+#TimingTests.cpp
+#iterationTests.cpp
+#subPubObjectTests.cpp
+#QueryTests.cpp
+)
 
 
 
-add_executable(shared-library-tests ${shared_library_test_sources} ${shared_library_test_headers})
+
+add_executable(shared-library-tests ${c_shared_library_test_sources} ctestFixtures.hpp)
+
+add_executable(shared-library-tests-cpp ${cpp_shared_library_test_sources} cpptestFixtures.hpp)
 
 target_include_directories(shared-library-tests SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
 target_include_directories(shared-library-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
