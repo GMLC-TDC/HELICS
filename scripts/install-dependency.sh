@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ $DEBUG_INSTALL_DEPENDENCY ]]; then
+if [[ ${DEBUG_INSTALL_DEPENDENCY+x} ]]; then
     set -x
 fi
 
@@ -169,7 +169,7 @@ else
 fi
 
 compiler_toolset=$4
-if [[ -z $compiler_toolset ]]; then
+if [[ -z ${compiler_toolset+x} ]]; then
     case $COMPILER in
         gcc*)
             compiler_toolset=gcc
@@ -196,8 +196,8 @@ fi
 
 # If FORCE_TOOLSET is set, create symlinks and add directory to path
 # May be needed to force boost to build with the right compiler version
-if [[ "$FORCE_TOOLSET" ]]; then
-    case ${compiler_toolset} in
+if [[ ${FORCE_TOOLSET+x} ]]; then
+    case "${compiler_toolset}" in
         gcc*)
             ln -s $(which ${CC}) gcc
             ln -s $(which ${CXX}) g++
@@ -237,7 +237,7 @@ case "$1" in
         install_swig ${install_version} ${install_path}
         ;;
     zmq)
-        if [[ -z $install_path ]]; then
+        if [[ -z ${install_path:+x} ]]; then
             install_version="HEAD"
             install_path=$2
         fi
@@ -254,6 +254,6 @@ esac
 popd
 rm -rf ${dependency_temp_dir}
 
-if [[ $DEBUG_INSTALL_DEPENDENCY ]]; then
+if [[ ${DEBUG_INSTALL_DEPENDENCY+x} ]]; then
     set +x
 fi
