@@ -86,12 +86,7 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
 
     Time prev_next = time_next;
     time_next = minNext;
-    //	printf("%d UDPATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
-    // static_cast<double>(minminDe), static_cast<double>(minDe));
-    if (prev_next != time_next)
-    {
-        update = true;
-    }
+   
 
     if (minDe != time_minDe)
     {
@@ -101,6 +96,20 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
     if (minminDe != time_minminDe)
     {
         time_minminDe = minminDe;
+        update = true;
+    }
+
+    if (time_minminDe < Time::maxVal())
+    {
+        if (time_minminDe > time_next)
+        {
+            time_next = time_minminDe;
+        }
+    }
+    //	printf("%d UDPATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
+    // static_cast<double>(minminDe), static_cast<double>(minDe));
+    if (prev_next != time_next)
+    {
         update = true;
     }
 
