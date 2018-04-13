@@ -295,5 +295,21 @@ public class TestValueFederate {
 	    status = helics.helicsSubscriptionGetVector(subid, pData, 3,actualLen);
 	    //assert value == [3, 4, 5]
 	}
+	
+	public static void main(String[] args) {
+		SWIGTYPE_p_void broker = AddBroker("zmq");
+		String initstring = "--broker=";
+		byte[] identifier = new byte[100];
+		helics_status status = helics.helicsBrokerGetIdentifier(broker, identifier);
+		assert status == helics_status.helics_ok;
+		String id = new String(identifier);
+		initstring = initstring + id;
+		initstring = initstring + " --broker_address";
+		byte[] address = new byte[100];
+		status = helics.helicsBrokerGetAddress(broker, address);
+		assert status == helics_status.helics_ok;
+		helics.helicsBrokerDisconnect(broker);
+		helics.helicsCloseLibrary();
+	}
 
 }
