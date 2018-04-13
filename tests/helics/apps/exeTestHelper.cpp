@@ -137,11 +137,14 @@ std::string exeTestRunner::runCaptureOutput (const std::string &args) const
         return "invalid executable";
     }
     std::string rstr = exeString + " " + args + " > " + outFile;
-    system (rstr.c_str ());
+    int ret=system (rstr.c_str ());
 
     std::ifstream t (outFile);
     std::string str ((std::istreambuf_iterator<char> (t)), std::istreambuf_iterator<char> ());
 
+    str.append(exeString);
+    str.append(" returned ");
+    str.append(std::to_string(ret) + "\n");
     remove (outFile.c_str ());
     return str;
 }
@@ -158,10 +161,11 @@ std::future<std::string> exeTestRunner::runCaptureOutputAsync (const std::string
     std::string rstr = exeString + " " + args + " > " + outFile;
     std::string oFile = outFile;
     return std::async (std::launch::async, [rstr, oFile]() {
-        system (rstr.c_str ());
+        int ret = system(rstr.c_str());
         std::ifstream t (oFile);
         std::string str ((std::istreambuf_iterator<char> (t)), std::istreambuf_iterator<char> ());
-
+        str.append("execution returned ");
+        str.append(std::to_string(ret) + "\n");
         remove (oFile.c_str ());
         return str;
     });
