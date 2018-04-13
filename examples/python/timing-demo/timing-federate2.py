@@ -90,7 +90,11 @@ def main():
 
     grantedtime = -1
     while True:
-        stop_at_time, value_to_send = get_input(grantedtime)
+        try:
+            stop_at_time, value_to_send = get_input(grantedtime)
+        except KeyboardInterrupt:
+            print("")
+            break
         while grantedtime < stop_at_time:
             print(">>>>>>>> Requesting time = {}".format(stop_at_time))
             status, grantedtime = h.helicsFederateRequestTime(fed, stop_at_time)
