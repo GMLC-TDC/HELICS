@@ -112,7 +112,7 @@ def main():
         print("Received value '{}' from Federate 1".format(value))
         while h.helicsEndpointHasMessage(epid):
             value = h.helicsEndpointGetMessage(epid)
-            print("Received message '{}' from Federate 1".format(value.data))
+            print("Received message '{}' at time {} from Federate 1".format(value.data, value.time))
         print("----------------------------------")
 
 

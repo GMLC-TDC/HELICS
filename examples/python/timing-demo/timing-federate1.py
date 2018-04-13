@@ -130,7 +130,7 @@ def main():
         print("Received value '{}' from Federate 2".format(value))
         while h.helicsEndpointHasMessage(epid):
             value = h.helicsEndpointGetMessage(epid)
-            print("Received message '{}' from Federate 2".format(value.data))
+            print("Received message '{}' at time {} from Federate 2".format(value.data, value.time))
         print("----------------------------------")
 
     destroy_value_federate(fed, broker)
