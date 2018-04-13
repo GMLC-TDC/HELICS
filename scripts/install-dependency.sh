@@ -19,19 +19,25 @@ check_minimum_version () {
     fi
 }
 
+# Download and untar a file
+fetch_and_untar () {
+    local output_name=$1
+    local url=$2
+    wget --no-check-certificate -O ${output_name} ${url}
+    tar -zxf ${output_name}
+}
+
 install_swig () {
     #Download and install SWIG
     local swig_version=$1
     local swig_version_str=swig-${swig_version}
     local install_path=$2
-    curl -s -J -k -L -O https://sourceforge.net/projects/swig/files/swig/${swig_version_str}/${swig_version_str}.tar.gz/download && tar -zxf ${swig_version_str}.tar.gz
-    (
-        cd ${swig_version_str};
-        ./configure --prefix ${install_path};
-        make;
-        make install;
-    )
-    rm ${swig_version_str}.tar.gz
+    fetch_and_untar ${swig_version_str}.tar.gz \
+        https://sourceforge.net/projects/swig/files/swig/${swig_version_str}/${swig_version_str}.tar.gz/download
+    cd ${swig_version_str};
+    ./configure --prefix ${install_path};
+    make;
+    make install;
 }
 
 install_zmq () {
@@ -43,14 +49,12 @@ install_zmq () {
     else
         git clone --branch v${zmq_version} git://github.com/zeromq/libzmq.git;
     fi
-    (
-        cd libzmq;
-        ./autogen.sh;
-        mkdir -p build && cd build;
-        cmake .. -DENABLE_CURVE=OFF -DWITH_PERF_TOOL=OFF -DZMQ_BUILD_TESTS=OFF -DENABLE_CPACK=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${install_path}"
-        make;
-        make install;
-    )
+    cd libzmq;
+    ./autogen.sh;
+    mkdir -p build && cd build;
+    cmake .. -DENABLE_CURVE=OFF -DWITH_PERF_TOOL=OFF -DZMQ_BUILD_TESTS=OFF -DENABLE_CPACK=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${install_path}"
+    make;
+    make install;
 }
 
 install_mpich () {
@@ -62,24 +66,21 @@ install_mpich () {
     local mpich_version=$1
     local mpich_version_str=mpich-${mpich_version}
     local install_path=$2
-    wget --no-check-certificate -O ${mpich_version_str}.tar.gz http://www.mpich.org/static/downloads/${mpich_version}/${mpich_version_str}.tar.gz;
-    tar xzf ${mpich_version_str}.tar.gz ;
-    (
-        cd ${mpich_version_str}/;
-        ./configure --prefix=${install_path} \
-            --disable-dependency-tracking \
-            --enable-fast=yes \
-            --enable-g=none \
-            --enable-timing=none \
-            --enable-shared \
-            --disable-static \
-            --disable-java \
-            --disable-fortran \
-            --enable-threads=serialized ;
-        make;
-        make install;
-    )
-    rm ${mpich_version_str}.tar.gz
+    fetch_and_untar ${mpich_version_str}.tar.gz \
+        http://www.mpich.org/static/downloads/${mpich_version}/${mpich_version_str}.tar.gz
+    cd ${mpich_version_str}/;
+    ./configure --prefix=${install_path} \
+        --disable-dependency-tracking \
+        --enable-fast=yes \
+        --enable-g=none \
+        --enable-timing=none \
+        --enable-shared \
+        --disable-static \
+        --disable-java \
+        --disable-fortran \
+        --enable-threads=serialized ;
+    make;
+    make install;
 }
 
 
@@ -93,21 +94,18 @@ install_openmpi () {
     local openmpi_short_ver=v${ver[0]}.${ver[1]}
     local openmpi_version_str=openmpi-${openmpi_version}
     local install_path=$2
-    wget --no-check-certificate -O ${openmpi_version_str}.tar.gz https://www.open-mpi.org/software/ompi/${openmpi_short_ver}/downloads/${openmpi_version_str}.tar.gz;
-    tar xzf ${openmpi_version_str}.tar.gz ;
-    (
-        cd ${openmpi_version_str}/;
-        ./configure --prefix=${install_path} \
-            --disable-dependency-tracking \
-            --enable-coverage=no \
-            --enable-shared=yes \
-            --enable-static=no \
-            --enable-java=no \
-            --enable-mpi-fortran=no ;
-        make;
-        make install;
-    )
-    rm ${openmpi_version_str}.tar.gz
+    fetch_and_untar ${openmpi_version_str}.tar.gz \
+        https://www.open-mpi.org/software/ompi/${openmpi_short_ver}/downloads/${openmpi_version_str}.tar.gz
+    cd ${openmpi_version_str}/;
+    ./configure --prefix=${install_path} \
+        --disable-dependency-tracking \
+        --enable-coverage=no \
+        --enable-shared=yes \
+        --enable-static=no \
+        --enable-java=no \
+        --enable-mpi-fortran=no ;
+    make;
+    make install;
 }
 
 install_boost () {
@@ -120,19 +118,28 @@ install_boost () {
     local boost_version_str=boost_${ver[0]}_${ver[1]}_${ver[2]}
     local install_path=$2
     local boost_toolset=$3
-    wget --no-check-certificate -O ${boost_version_str}.tar.gz http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download && tar xzf ${boost_version_str}.tar.gz
-    (
-        cd ${boost_version_str}/;
-        ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test;
-        ./b2 -j2 \
-            link=shared \
-            threading=multi \
-            variant=release \
-            toolset=${boost_toolset} \
-            cxxflags=${BOOST_CXX_FLAGS} > /dev/null;
-        ./b2 install --prefix=${install_path} > /dev/null;
-    )
-    rm ${boost_version_str}.tar.gz
+
+    local b2_extra_options=""
+    if [[ "${BOOST_CXX_FLAGS}" ]]; then
+        b2_extra_options="cxxflags=${BOOST_CXX_FLAGS} ${b2_extra_options}"
+    fi
+
+    local b2_link_type=shared
+    if [[ "${BOOST_USE_STATIC}" ]]; then
+        b2_link_type=static
+    fi
+
+    fetch_and_untar ${boost_version_str}.tar.gz \
+        http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download
+    cd ${boost_version_str}/;
+    ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test;
+    ./b2 -j2 \
+        link=${b2_link_type} \
+        threading=multi \
+        variant=release \
+        toolset=${boost_toolset} \
+        ${b2_extra_options} > /dev/null;
+    ./b2 install --prefix=${install_path} > /dev/null;
 }
 
 install_cmake () {
@@ -146,17 +153,20 @@ install_cmake () {
     local cmake_version=$1
     local cmake_version_str=cmake-${cmake_version}-${os_name}-x86_64
     local install_path=$2
-    wget --no-check-certificate -O ${cmake_version_str}.tar.gz http://cmake.org/files/v${ver[0]}.${ver[1]}/${cmake_version_str}.tar.gz;
-    tar -xzf ${cmake_version_str}.tar.gz ;
+    fetch_and_untar ${cmake_version_str}.tar.gz \
+        http://cmake.org/files/v${ver[0]}.${ver[1]}/${cmake_version_str}.tar.gz
 
     # Move cmake to "install" location
     mv ${cmake_version_str} ${install_path};
-    rm ${cmake_version_str}.tar.gz
 }
 
 
 install_version=$2
-install_path=$3
+if [[ $3 == '/'* ]]; then
+    install_path=$3
+else
+    install_path=$(pwd)/$3
+fi
 
 compiler_toolset=$4
 if [[ -z $compiler_toolset ]]; then
@@ -205,6 +215,11 @@ if [[ "$FORCE_TOOLSET" ]]; then
     PATH=$(pwd):$PATH
 fi
 
+# Create and use a temp directory for downloading/building dependencies
+# First command may fail on older versions of macOS
+dependency_temp_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'deptmpdir')
+pushd ${dependency_temp_dir}
+
 case "$1" in
     boost)
         install_boost ${install_version} ${install_path} ${compiler_toolset}
@@ -234,6 +249,10 @@ case "$1" in
         echo "$0 boost version install_path [toolset=gcc]"
         echo "$0 zmq [version=HEAD] install_path"
 esac
+
+# Return to the original direcotry and get rid of the temp directory
+popd
+rm -rf ${dependency_temp_dir}
 
 if [[ $DEBUG_INSTALL_DEPENDENCY ]]; then
     set +x
