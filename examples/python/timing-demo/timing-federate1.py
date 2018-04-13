@@ -6,7 +6,7 @@ def get_input(grantedtime):
 
     valid_input = False
     while not valid_input:
-        print("Enter request_time (int) (and value_to_send (float)) [e.g.: 4, 10.0]: ", end="")
+        print("Enter request_time (int) (and value_to_send (str)) [e.g.: 4 hello, world]: ", end="")
         string = input()
         string = string.strip()
         request_time_str = string.replace(",", " ").split(" ")[0]
@@ -22,16 +22,16 @@ def get_input(grantedtime):
             valid_input = True
 
         try:
-            value_to_send = string.replace(",", " ").split(" ")[1]
+            value_to_send = string.replace(request_time_str, "").strip().strip(",").strip()
         except:
             value_to_send = None
             valid_input = True
             continue
 
         try:
-            value_to_send = float(value_to_send)
+            value_to_send = str(value_to_send)
         except:
-            print("value_to_send must be a float or be blank")
+            print("value_to_send must be a str or be blank")
             valid_input = False
             continue
         else:
@@ -94,7 +94,7 @@ def main():
     broker = create_broker()
     fed = create_value_federate(broker)
 
-    pubid = h.helicsFederateRegisterGlobalTypePublication(fed, "federate1-to-federate2", h.HELICS_DATA_TYPE_DOUBLE, "")
+    pubid = h.helicsFederateRegisterGlobalTypePublication(fed, "federate1-to-federate2", h.HELICS_DATA_TYPE_STRING, "")
     subid = h.helicsFederateRegisterSubscription(fed, "federate2-to-federate1", "double", "")
     epid = h.helicsFederateRegisterGlobalEndpoint(fed, "endpoint1", "")
     # fid = h.helicsFederateRegisterSourceFilter(fed, h.helics_delay_filter, "endpoint2", "filter-name")
@@ -113,19 +113,19 @@ def main():
             print(">>>>>>>> Requesting time = {}".format(stop_at_time))
             status, grantedtime = h.helicsFederateRequestTime(fed, stop_at_time)
             if grantedtime != stop_at_time:
-                status, value = h.helicsSubscriptionGetDouble(subid)
-                print("Interrupt value {} from Federate 2".format(value))
+                status, value = h.helicsSubscriptionGetString(subid)
+                print("Interrupt value '{}' from Federate 2".format(value))
             print("<<<<<<<< Granted Time = {}".format(grantedtime))
         assert grantedtime == stop_at_time, "stop_at_time = {}, grantedtime = {}".format(stop_at_time, grantedtime)
-        if value_to_send is not None:
-            print("Sending {} to Federate 2".format(value_to_send))
-            status = h.helicsPublicationPublishDouble(pubid, value_to_send)
+        if value_to_send is not None or value_to_send != '':
+            print("Sending '{}' to Federate 2".format(value_to_send))
+            status = h.helicsPublicationPublishString(pubid, str(value_to_send))
             status = h.helicsEndpointSendMessageRaw(epid, "endpoint2", str(value_to_send))
-        status, value = h.helicsSubscriptionGetDouble(subid)
-        print("Received value {} from Federate 2".format(value))
+        status, value = h.helicsSubscriptionGetString(subid)
+        print("Received value '{}' from Federate 2".format(value))
         while h.helicsEndpointHasMessage(epid):
             value = h.helicsEndpointGetMessage(epid)
-            print("Received message {} from Federate 2".format(value.data))
+            print("Received message '{}' from Federate 2".format(value.data))
         print("----------------------------------")
 
     destroy_value_federate(fed, broker)

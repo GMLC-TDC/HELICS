@@ -22,16 +22,16 @@ def get_input(grantedtime):
             valid_input = True
 
         try:
-            value_to_send = string.replace(",", " ").split(" ")[1]
+            value_to_send = string.replace(request_time_str, "").strip().strip(",").strip()
         except:
             value_to_send = None
             valid_input = True
             continue
 
         try:
-            value_to_send = float(value_to_send)
+            value_to_send = str(value_to_send)
         except:
-            print("value_to_send must be a float or be blank")
+            print("value_to_send must be a str or be blank")
             valid_input = False
             continue
         else:
@@ -78,7 +78,7 @@ def main():
 
     fed = create_value_federate()
 
-    pubid = h.helicsFederateRegisterGlobalTypePublication(fed, "federate2-to-federate1", h.HELICS_DATA_TYPE_DOUBLE, "")
+    pubid = h.helicsFederateRegisterGlobalTypePublication(fed, "federate2-to-federate1", h.HELICS_DATA_TYPE_STRING, "")
     subid = h.helicsFederateRegisterSubscription (fed, "federate1-to-federate2", "double", "")
     epid = h.helicsFederateRegisterGlobalEndpoint(fed, "endpoint2", "")
 
@@ -95,20 +95,20 @@ def main():
             print(">>>>>>>> Requesting time = {}".format(stop_at_time))
             status, grantedtime = h.helicsFederateRequestTime(fed, stop_at_time)
             if grantedtime != stop_at_time:
-                status, value = h.helicsSubscriptionGetDouble(subid)
-                print("Interrupt value {} from Federate 1".format(value))
+                status, value = h.helicsSubscriptionGetString(subid)
+                print("Interrupt value '{}' from Federate 1".format(value))
             print("<<<<<<<< Granted Time = {}".format(grantedtime))
         assert grantedtime == stop_at_time, "stop_at_time = {}, grantedtime = {}".format(stop_at_time, grantedtime)
-        if value_to_send is not None:
-            print("Sending {} to Federate 1".format(value_to_send))
-            status = h.helicsPublicationPublishDouble(pubid, value_to_send)
+        if value_to_send is not None or value_to_send != '':
+            print("Sending '{}' to Federate 1".format(value_to_send))
+            status = h.helicsPublicationPublishString(pubid, str(value_to_send))
             status = h.helicsEndpointSendMessageRaw(epid, "endpoint1", str(value_to_send))
 
-        status, value = h.helicsSubscriptionGetDouble(subid)
-        print("Received value {} from Federate 1".format(value))
+        status, value = h.helicsSubscriptionGetString(subid)
+        print("Received value '{}' from Federate 1".format(value))
         while h.helicsEndpointHasMessage(epid):
             value = h.helicsEndpointGetMessage(epid)
-            print("Received message {} from Federate 1".format(value.data))
+            print("Received message '{}' from Federate 1".format(value.data))
         print("----------------------------------")
 
 
