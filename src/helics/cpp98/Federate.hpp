@@ -279,7 +279,6 @@ class Federate
         return itTime;
     }
 
-<<<<<<< HEAD
     std::string getName () const
     {
         char str[255];
@@ -287,8 +286,6 @@ class Federate
         std::string result (str);
         return result;
     }
-=======
->>>>>>> parent of cd3c1af... update to the cpp98 interface and some test cases using that interface
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of
     the federation and the specific string being queried
