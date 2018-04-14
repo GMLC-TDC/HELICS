@@ -26,7 +26,7 @@ def AddFederate(broker, core_type="zmq", count=1, deltat=1.0, name_prefix="fed")
     fedinfo = h.helicsFederateInfoCreate()
 
     # Set Federate name #
-    status = h.helicsFederateInfoSetFederateName(fedinfo, "TestA Federate")
+    status = h.helicsFederateInfoSetFederateName(fedinfo, name_prefix)
 
     # Set core type from string #
     status = h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
@@ -76,8 +76,6 @@ def test_broker_functions(broker):
     assert status == 0
     initstring = initstring + address
 
-@pt.mark.skip("""test core dumps for unknown reason
-""")
 def test_message_filter_registration(broker):
 
     fFed = AddFederate(broker, "zmq", 1, 1, "filter")
@@ -90,16 +88,13 @@ def test_message_filter_registration(broker):
     f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "filter2", "port2")
     ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
     f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "", "filter0/fout")
-    
+
     h.helicsFederateFinalize(mFed)
     h.helicsFederateFinalize(fFed)
 
     FreeFederate(fFed)
     FreeFederate(mFed)
 
-@pt.mark.skip("""terminate called after throwing an instance of 'std::future_error'
-  what():  std::future_error: No associated state
-""")
 def test_message_filter_function(broker):
 
     fFed = AddFederate(broker, "zmq", 1, 1, "filter")
@@ -110,31 +105,33 @@ def test_message_filter_function(broker):
 
     f1 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_delay_filter, "port1", "filter1")
     status=h.helicsFilterSet(f1, "delay", 2.5)
-    print("A status =",status)
+    assert status == 0
     status=h.helicsFederateEnterExecutionModeAsync(fFed)
-    print("B",status)
+    assert status == 0
     status=h.helicsFederateEnterExecutionMode(mFed)
-    print("C",status)
+    assert status == 0
     status=h.helicsFederateEnterExecutionModeComplete(fFed)
     assert status == 0
-    print("getting state ",status)
     status, state = h.helicsFederateGetState(fFed)
-    print("status= ",status, "state = ",state)
+    assert status == 0
     assert state == 2
-    print("got state")
     data = "hello world"
     # TODO: Fix segfaults on the next line
     h.helicsEndpointSendMessageRaw(p1, "port2", data)
 
     # TODO: Also segfaults
-    print(h.helicsFederateRequestTimeAsync (mFed, 1.0))
-    print(h.helicsFederateRequestTime(fFed, 1.0))
-    print(h.helicsFederateRequestTimeComplete (mFed))
+    grantedtime = h.helicsFederateRequestTimeAsync (mFed, 1.0)
+    assert grantedtime == 0
+    status, grantedtime = h.helicsFederateRequestTime(fFed, 1.0)
+    assert status == 0
+    assert grantedtime == 1.0
+    status, grantedtime = h.helicsFederateRequestTimeComplete (mFed)
+    assert status == 0
+    assert grantedtime == 1.0
 
-
-    # f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "filter2", "port2")
-    # ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
-    # f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "", "filter0/fout")
+    f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "filter2", "port2")
+    ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
+    f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "", "filter0/fout")
 
     FreeFederate(fFed)
     FreeFederate(mFed)
