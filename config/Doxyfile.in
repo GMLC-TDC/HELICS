@@ -31,7 +31,7 @@ PROJECT_NAME           = helics
 # This could be handy for archiving the generated documentation or
 # if some version control system is used.
 
-PROJECT_NUMBER         = @HELICS_VERSION_MAJOR@.@HELICS_VERSION_MINOR@.@HELICS_VERSION_PATCH@-@HELICS_VERSION_BUILD@
+PROJECT_NUMBER         = @HELICS_VERSION@
 
 # With the PROJECT_LOGO tag one can specify an logo or icon that is
 # included in the documentation. The maximum height of the logo should not
@@ -606,7 +606,7 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 
-EXCLUDE                = ./build/ ./ThirdParty/ ./bin/ ./build2/ ./examples/ ./config/ ./install/ ./html/ ./test/ ./cmake
+EXCLUDE                = ./build/ ./ThirdParty/ ./bin/ ./build2/ ./examples/ ./config/ ./install/ ./html/ ./tests/ ./cmake ./swig ./scripts
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or
 # directories that are symbolic links (a Unix filesystem feature) are excluded
@@ -620,7 +620,7 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */test/* */ThirdParty/* */install/* */bin/* */build*/* */config/* */build2/* */html/* */examples/* */cmake/* */test/* */cppzmq/*
+EXCLUDE_PATTERNS       = */test/* */ThirdParty/* */install/* */bin/* */build*/* */config/* */build2/* */html/* */examples/* */cmake/* */tests/* */cppzmq/* */swig/* */scripts/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
