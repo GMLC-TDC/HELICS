@@ -38,9 +38,31 @@ Our GitHub pages provides a rich set of [documentation](https://gmlc-tdc.github.
 
 Additionally, our initial requirements document can be found [here](https://github.com/GMLC-TDC/specification-doc/blob/master/src/specification.md), which describes a number of our early design considerations.
 
-# Models, Applications, and Tools
+# Tools with HELICS support
 
-As a co-simulation framework, HELICS is designed to bring together domain-specific modeling tools so they interact during run time. It effectively tries to build on the sholders of giants by not reinventing trusted simulation tools, but instead, mearly acts as a mediator to coordinate such interactions. HELICS's full power is only apparent when you use it to combine these domain-specific tools. 
+As a co-simulation framework, HELICS is designed to bring together domain-specific modeling tools so they interact during run time. It effectively tries to build on the sholders of giants by not reinventing trusted simulation tools, but instead, mearly acting as a mediator to coordinate such interactions. HELICS's full power is only apparent when you use it to combine these domain-specific tools.  
+
+Thankfully the HELICS API is designed to be minimally invasive and make it straightforward to connect most any tool that provides either a scripting interface or access to source code. As listed below, a growing set of energy domain tools have HELICS support either natively or through an external interface. We also provide a set of helper apps for various utility and testing purposes.
+
+We are always looking for help adding support for more tools, so please contact us if you have any additions.
+
+#### Power systems Tools
+
+* [GridLAB-D](https://www.gridlabd.org/), distribution power-flow, DER models, basic house thermal and end-use load models, and more. HELICS support currently provided in the [`feature/1024` branch](https://github.com/gridlab-d/gridlab-d/tree/feature/1024) which you have to build yourself as described here
+* [Griddyn](https://github.com/LLNL/GridDyn), a transmission power flow and dynamics simulator. HELICS support currently provided through an experimental branch.
+* [PSST](https://github.com/kdheepak/psst), a python-based unit-commitment and dispatch market simulator. HELICS examples are included in the  [HELICS-Tutorial](https://github.com/GMLC-TDC/HELICS-Tutorial)
+* InterPSS, a Java-based power systems simulator.
+
+#### Communication Tools
+
+* [ns-3](https://www.nsnam.org/), a discrete-event communication network simulator. Supported via the [HELICS fork of ns-3](https://github.com/GMLC-TDC/ns-3-dev-git)
+* HELICS also includes built-in support for simple communications manipulations such as delays, lossy channels, etc. through its built-in filters.
+
+#### HELICS helper Apps
+
+* [HELICS runner](https://github.com/GMLC-TDC/helics-runner) provides a simple way to automate configuring, starting, and stopping HELICS co-simulations.
+* [Player](https://gmlc-tdc.github.io/HELICS-src/apps/Player.html), which acts as a simple send-only federate that simply publishes a stream of timed HELICS messages from a user-defined file. HELICS Player is included in the HELICS distribution.
+* [Recorder](https://gmlc-tdc.github.io/HELICS-src/apps/Recorder.html), which acts a s simple received-only federate that prints out or saves messages from one or more subscribed streams. HELICS Recorder is included in the HELICS distribution.
 
 # Publications
 
