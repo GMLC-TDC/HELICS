@@ -9,7 +9,9 @@
 package com.java.helics;
 
 public class helicsJNI {
-
+  static {
+    System.loadLibrary("JNIhelicsd");
+  }
   public final static native int helics_ok_get();
   public final static native double helics_time_zero_get();
   public final static native double helics_time_epsilon_get();
@@ -55,16 +57,16 @@ public class helicsJNI {
   public final static native String helicsGetVersion();
   public final static native int helicsIsCoreTypeAvailable(String jarg1);
   public final static native long helicsCreateCore(String jarg1, String jarg2, String jarg3);
-  public final static native long helicsCreateCoreFromArgs(String jarg1, String jarg2, int jarg3, long jarg4);
+  public final static native long helicsCreateCoreFromArgs(String jarg1, String jarg2, String[] jarg3);
   public final static native long helicsCoreClone(long jarg1);
   public final static native long helicsCreateBroker(String jarg1, String jarg2, String jarg3);
-  public final static native long helicsCreateBrokerFromArgs(String jarg1, String jarg2, int jarg3, long jarg4);
+  public final static native long helicsCreateBrokerFromArgs(String jarg1, String jarg2, String[] jarg3);
   public final static native long helicsBrokerClone(long jarg1);
   public final static native int helicsBrokerIsConnected(long jarg1);
   public final static native int helicsCoreIsConnected(long jarg1);
-  public final static native int helicsBrokerGetIdentifier(long jarg1, String jarg2, int jarg3);
-  public final static native int helicsCoreGetIdentifier(long jarg1, String jarg2, int jarg3);
-  public final static native int helicsBrokerGetAddress(long jarg1, String jarg2, int jarg3);
+  public final static native int helicsBrokerGetIdentifier(long jarg1, byte[] jarg2);
+  public final static native int helicsCoreGetIdentifier(long jarg1, byte[] jarg2);
+  public final static native int helicsBrokerGetAddress(long jarg1, byte[] jarg2);
   public final static native int helicsCoreSetReadyToInit(long jarg1);
   public final static native int helicsCoreDisconnect(long jarg1);
   public final static native long helicsGetFederateByName(String jarg1);
@@ -79,7 +81,7 @@ public class helicsJNI {
   public final static native long helicsCreateCombinationFederateFromJson(String jarg1);
   public final static native long helicsFederateClone(long jarg1);
   public final static native long helicsFederateInfoCreate();
-  public final static native int helicsFederateInfoLoadFromArgs(long jarg1, int jarg2, long jarg3);
+  public final static native int helicsFederateInfoLoadFromArgs(long jarg1, String[] jarg2);
   public final static native void helicsFederateInfoFree(long jarg1);
   public final static native int helicsFederateInfoSetFederateName(long jarg1, String jarg2);
   public final static native int helicsFederateInfoSetCoreName(long jarg1, String jarg2);
@@ -115,13 +117,14 @@ public class helicsJNI {
   public final static native int helicsFederateRequestTimeComplete(long jarg1, double[] jarg2);
   public final static native int helicsFederateRequestTimeIterativeAsync(long jarg1, double jarg2, int jarg3);
   public final static native int helicsFederateRequestTimeIterativeComplete(long jarg1, double[] jarg2, int[] jarg3);
-  public final static native int helicsFederateGetName(long jarg1, String jarg2, int jarg3);
+  public final static native int helicsFederateGetName(long jarg1, byte[] jarg2);
   public final static native int helicsFederateSetTimeDelta(long jarg1, double jarg2);
   public final static native int helicsFederateSetOutputDelay(long jarg1, double jarg2);
   public final static native int helicsFederateSetInputDelay(long jarg1, double jarg2);
   public final static native int helicsFederateSetPeriod(long jarg1, double jarg2, double jarg3);
   public final static native int helicsFederateSetFlag(long jarg1, int jarg2, int jarg3);
   public final static native int helicsFederateSetLoggingLevel(long jarg1, int jarg2);
+  public final static native int helicsFederateSetMaxIterations(long jarg1, int jarg2);
   public final static native int helicsFederateGetCurrentTime(long jarg1, double[] jarg2);
   public final static native long helicsCreateQuery(String jarg1, String jarg2);
   public final static native String helicsQueryExecute(long jarg1, long jarg2);
@@ -144,32 +147,32 @@ public class helicsJNI {
   public final static native long helicsFederateRegisterTypePublication(long jarg1, String jarg2, int jarg3, String jarg4);
   public final static native long helicsFederateRegisterGlobalPublication(long jarg1, String jarg2, String jarg3, String jarg4);
   public final static native long helicsFederateRegisterGlobalTypePublication(long jarg1, String jarg2, int jarg3, String jarg4);
-  public final static native int helicsPublicationPublish(long jarg1, byte[] jarg2);
+  public final static native int helicsPublicationPublishRaw(long jarg1, long jarg2, int jarg3);
   public final static native int helicsPublicationPublishString(long jarg1, String jarg2);
   public final static native int helicsPublicationPublishInteger(long jarg1, long jarg2);
   public final static native int helicsPublicationPublishDouble(long jarg1, double jarg2);
   public final static native int helicsPublicationPublishComplex(long jarg1, double jarg2, double jarg3);
-  public final static native int helicsPublicationPublishVector(long jarg1, long jarg2, int jarg3);
+  public final static native int helicsPublicationPublishVector(long jarg1, double[] jarg2, int jarg3);
   public final static native int helicsSubscriptionGetValueSize(long jarg1);
-  public final static native int helicsSubscriptionGetValue(long jarg1, String jarg2, int jarg3, int[] jarg4);
-  public final static native int helicsSubscriptionGetString(long jarg1, String jarg2, int jarg3);
+  public final static native int helicsSubscriptionGetRawValue(long jarg1, long jarg2, int jarg3, int[] jarg4);
+  public final static native int helicsSubscriptionGetString(long jarg1, byte[] jarg2, int[] jarg4);
   public final static native int helicsSubscriptionGetInteger(long jarg1, long[] jarg2);
   public final static native int helicsSubscriptionGetDouble(long jarg1, double[] jarg2);
   public final static native int helicsSubscriptionGetComplex(long jarg1, double[] jarg2, double[] jarg3);
   public final static native int helicsSubscriptionGetVectorSize(long jarg1);
   public final static native int helicsSubscriptionGetVector(long jarg1, long jarg2, int jarg3, int[] jarg4);
-  public final static native int helicsSubscriptionSetDefault(long jarg1, byte[] jarg2);
+  public final static native int helicsSubscriptionSetDefaultRaw(long jarg1, long jarg2, int jarg3);
   public final static native int helicsSubscriptionSetDefaultString(long jarg1, String jarg2);
   public final static native int helicsSubscriptionSetDefaultInteger(long jarg1, long jarg2);
   public final static native int helicsSubscriptionSetDefaultDouble(long jarg1, double jarg2);
   public final static native int helicsSubscriptionSetDefaultComplex(long jarg1, double jarg2, double jarg3);
   public final static native int helicsSubscriptionSetDefaultVector(long jarg1, double[] jarg2, int jarg3);
-  public final static native int helicsSubscriptionGetType(long jarg1, String jarg2, int jarg3);
-  public final static native int helicsPublicationGetType(long jarg1, String jarg2, int jarg3);
-  public final static native int helicsSubscriptionGetKey(long jarg1, String jarg2, int jarg3);
-  public final static native int helicsPublicationGetKey(long jarg1, String jarg2, int jarg3);
-  public final static native int helicsSubscriptionGetUnits(long jarg1, String jarg2, int jarg3);
-  public final static native int helicsPublicationGetUnits(long jarg1, String jarg2, int jarg3);
+  public final static native int helicsSubscriptionGetType(long jarg1, byte[] jarg2);
+  public final static native int helicsPublicationGetType(long jarg1, byte[] jarg2);
+  public final static native int helicsSubscriptionGetKey(long jarg1, byte[] jarg2);
+  public final static native int helicsPublicationGetKey(long jarg1, byte[] jarg2);
+  public final static native int helicsSubscriptionGetUnits(long jarg1, byte[] jarg2);
+  public final static native int helicsPublicationGetUnits(long jarg1, byte[] jarg2);
   public final static native int helicsSubscriptionIsUpdated(long jarg1);
   public final static native double helicsSubscriptionLastUpdateTime(long jarg1);
   public final static native int helicsFederateGetPublicationCount(long jarg1);
@@ -177,8 +180,8 @@ public class helicsJNI {
   public final static native long helicsFederateRegisterEndpoint(long jarg1, String jarg2, String jarg3);
   public final static native long helicsFederateRegisterGlobalEndpoint(long jarg1, String jarg2, String jarg3);
   public final static native int helicsEndpointSetDefaultDestination(long jarg1, String jarg2);
-  public final static native int helicsEndpointSendMessageRaw(long jarg1, String jarg2, byte[] jarg3);
-  public final static native int helicsEndpointSendEventRaw(long jarg1, String jarg2, byte[] jarg3, double jarg5);
+  public final static native int helicsEndpointSendMessageRaw(long jarg1, String jarg2, long jarg3, int jarg4);
+  public final static native int helicsEndpointSendEventRaw(long jarg1, String jarg2, long jarg3, int jarg4, double jarg5);
   public final static native int helicsEndpointSendMessage(long jarg1, long jarg2, message_t jarg2_);
   public final static native int helicsEndpointSubscribe(long jarg1, String jarg2, String jarg3);
   public final static native int helicsFederateHasMessage(long jarg1);
@@ -187,8 +190,8 @@ public class helicsJNI {
   public final static native int helicsEndpointReceiveCount(long jarg1);
   public final static native long helicsEndpointGetMessage(long jarg1);
   public final static native long helicsFederateGetMessage(long jarg1);
-  public final static native int helicsEndpointGetType(long jarg1, String jarg2, int jarg3);
-  public final static native int helicsEndpointGetName(long jarg1, String jarg2, int jarg3);
+  public final static native int helicsEndpointGetType(long jarg1, byte[] jarg2);
+  public final static native int helicsEndpointGetName(long jarg1, byte[] jarg2);
   public final static native int helicsFederateGetEndpointCount(long jarg1);
   public final static native long helicsFederateRegisterSourceFilter(long jarg1, int jarg2, String jarg3, String jarg4);
   public final static native long helicsFederateRegisterDestinationFilter(long jarg1, int jarg2, String jarg3, String jarg4);
@@ -196,8 +199,8 @@ public class helicsJNI {
   public final static native long helicsCoreRegisterSourceFilter(long jarg1, int jarg2, String jarg3, String jarg4);
   public final static native long helicsCoreRegisterDestinationFilter(long jarg1, int jarg2, String jarg3, String jarg4);
   public final static native long helicsCoreRegisterCloningFilter(long jarg1, String jarg2);
-  public final static native int helicsFilterGetTarget(long jarg1, String jarg2, int jarg3);
-  public final static native int helicsFilterGetName(long jarg1, String jarg2, int jarg3);
+  public final static native int helicsFilterGetTarget(long jarg1, byte[] jarg2);
+  public final static native int helicsFilterGetName(long jarg1, byte[] jarg2);
   public final static native int helicsFilterSet(long jarg1, String jarg2, double jarg3);
   public final static native int helicsFilterSetString(long jarg1, String jarg2, String jarg3);
   public final static native int helicsFilterAddDestinationTarget(long jarg1, String jarg2);
