@@ -9,9 +9,7 @@
 package com.java.helics;
 
 public class helicsJNI {
-  static {
-    System.loadLibrary("JNIhelicsd");
-  }
+
   public final static native int helics_ok_get();
   public final static native double helics_time_zero_get();
   public final static native double helics_time_epsilon_get();
