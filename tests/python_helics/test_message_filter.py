@@ -88,6 +88,9 @@ def test_message_filter_registration(broker):
     f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "filter2", "port2")
     ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
     f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "", "filter0/fout")
+    
+    h.helicsFederateFinalize(mFed)
+    h.helicsFederateFinalize(fFed)
 
     FreeFederate(fFed)
     FreeFederate(mFed)
