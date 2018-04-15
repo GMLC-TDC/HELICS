@@ -72,7 +72,7 @@ extensions = [
 ]
 
 breathe_projects = {
-    "helics": "./xml",
+    "helics": "./../build-doxygen/docs/xml",
 }
 
 breathe_default_project = "helics"
