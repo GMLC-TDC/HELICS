@@ -130,4 +130,3 @@ BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("comb
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
-

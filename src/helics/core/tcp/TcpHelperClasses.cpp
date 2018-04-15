@@ -110,7 +110,7 @@ void TcpRxConnection::close ()
     disconnected = true;
     boost::system::error_code ec;
     socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_send, ec);
-    if (ec!=nullptr)
+    if (ec != nullptr)
     {
         std::cerr << "error occurred sending shutdown" << std::endl;
     }
@@ -196,7 +196,7 @@ void TcpConnection::close ()
     cancel ();
     boost::system::error_code ec;
     socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_send, ec);
-    if (ec!=nullptr)
+    if (ec != nullptr)
     {
         // I don't know what to do with this, in practice this message is mostly spurious
         // but is seems I should do something with it, I just don't know what
@@ -259,6 +259,5 @@ void TcpServer::close ()
     connections.clear ();
 }
 
-} //namespace tcp
-} // namespace helics
-
+}  // namespace tcp
+}  // namespace helics

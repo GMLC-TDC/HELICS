@@ -21,9 +21,9 @@ namespace utf = boost::unit_test;
 BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_type)
 {
-    SetupTest<helics::ValueFederate>(core_type, 2, 1.0);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> (core_type, 2, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     // register the publications
     vFed1->registerGlobalPublication<double> ("pub1");
 
@@ -58,9 +58,9 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
 BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
 {
-    SetupTest<helics::ValueFederate>(core_type, 2);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> (core_type, 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     auto core = vFed1->getCorePointer ();
     auto res = core->query ("root", "federates");
     std::string str ("[");
@@ -78,13 +78,12 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     helics::cleanupHelicsLibrary ();
 }
 
-
 BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), core_type)
 {
-    SetupTest<helics::ValueFederate>(core_type, 2, 1.0);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> (core_type, 2, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     // register the publications
     vFed1->registerPublication<double> ("pub1");
 
@@ -108,4 +107,3 @@ BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), co
     vFed2->finalize ();
 }
 BOOST_AUTO_TEST_SUITE_END ()
-

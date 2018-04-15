@@ -4,36 +4,32 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "MpiComms.h"
-#include "MpiService.h"
 #include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.hpp"
+#include "MpiService.h"
 #include <memory>
 
 namespace helics
 {
 namespace mpi
 {
-MpiComms::MpiComms ()
-    : shutdown (false)
+MpiComms::MpiComms () : shutdown (false)
 {
-    auto& mpi_service = MpiService::getInstance ();
+    auto &mpi_service = MpiService::getInstance ();
     commAddress = mpi_service.addMpiComms (this);
     std::cout << "MpiComms() - commAddress = " << commAddress << std::endl;
 }
 
-MpiComms::MpiComms(const std::string &broker)
-    : brokerAddress(broker), shutdown (false)
+MpiComms::MpiComms (const std::string &broker) : brokerAddress (broker), shutdown (false)
 {
-    auto& mpi_service = MpiService::getInstance ();
+    auto &mpi_service = MpiService::getInstance ();
     commAddress = mpi_service.addMpiComms (this);
-    std::cout << "MpiComms(" << brokerAddress << ")" << " - commAddress " << commAddress << std::endl;
+    std::cout << "MpiComms(" << brokerAddress << ")"
+              << " - commAddress " << commAddress << std::endl;
 }
 
 /** destructor*/
-MpiComms::~MpiComms ()
-{
-    disconnect ();
-}
+MpiComms::~MpiComms () { disconnect (); }
 
 int MpiComms::processIncomingMessage (ActionMessage &M)
 {
@@ -86,7 +82,7 @@ void MpiComms::queue_rx_function ()
         {
             goto CLOSE_RX_LOOP;
         }
-   }
+    }
 CLOSE_RX_LOOP:
     std::cout << "Shutdown RX Loop for " << commAddress << std::endl;
     shutdown = true;
@@ -97,7 +93,7 @@ void MpiComms::queue_tx_function ()
 {
     tx_status = connection_status::connected;
 
-    auto & mpi_service = MpiService::getInstance ();
+    auto &mpi_service = MpiService::getInstance ();
 
     std::map<int, std::string> routes;  // for all the other possible routes
 
@@ -122,7 +118,7 @@ void MpiComms::queue_tx_function ()
                 case NEW_ROUTE:
                 {
                     // cmd.payload would be the MPI rank of the destination
-                    routes.emplace(cmd.dest_id, cmd.payload);
+                    routes.emplace (cmd.dest_id, cmd.payload);
                     processed = true;
                 }
                 break;
@@ -142,14 +138,14 @@ void MpiComms::queue_tx_function ()
             if (hasBroker)
             {
                 // Send using MPI to broker
-                //std::cout << "send msg to brkr rt: " << prettyPrintString(cmd) << std::endl;
+                // std::cout << "send msg to brkr rt: " << prettyPrintString(cmd) << std::endl;
                 mpi_service.sendMessage (brokerAddress, cmd.to_vector ());
             }
         }
         else if (route_id == -1)
         {  // send to rx thread loop
             // Send to ourself -- may need command line option to enable for openmpi
-            //std::cout << "send msg to self" << prettyPrintString(cmd) << std::endl;
+            // std::cout << "send msg to self" << prettyPrintString(cmd) << std::endl;
             rxMessageQueue.push (cmd);
         }
         else
@@ -158,7 +154,7 @@ void MpiComms::queue_tx_function ()
             if (rt_find != routes.end ())
             {
                 // Send using MPI to rank given by route
-                //std::cout << "send msg to rt: " << prettyPrintString(cmd) << std::endl;
+                // std::cout << "send msg to rt: " << prettyPrintString(cmd) << std::endl;
                 mpi_service.sendMessage (rt_find->second, cmd.to_vector ());
             }
             else
@@ -166,14 +162,14 @@ void MpiComms::queue_tx_function ()
                 if (hasBroker)
                 {
                     // Send using MPI to broker
-                    //std::cout << "send msg to brkr: " << prettyPrintString(cmd) << std::endl;
+                    // std::cout << "send msg to brkr: " << prettyPrintString(cmd) << std::endl;
                     mpi_service.sendMessage (brokerAddress, cmd.to_vector ());
                 }
             }
         }
     }
 CLOSE_TX_LOOP:
-    std::cout << "Shutdown TX Loop for " << commAddress  << std::endl;
+    std::cout << "Shutdown TX Loop for " << commAddress << std::endl;
     routes.clear ();
     if (rx_status == connection_status::connected)
     {
@@ -183,12 +179,12 @@ CLOSE_TX_LOOP:
     mpi_service.removeMpiComms (this);
 }
 
-void MpiComms::closeReceiver() {
+void MpiComms::closeReceiver ()
+{
     shutdown = true;
     ActionMessage cmd (CMD_PROTOCOL);
     cmd.index = CLOSE_RECEIVER;
     rxMessageQueue.push (cmd);
 }
-} // namespace mpi
+}  // namespace mpi
 }  // namespace helics
-

@@ -47,12 +47,14 @@ std::unique_ptr<Message> MessageDataOperator::process (std::unique_ptr<Message> 
     return message;
 }
 
-MessageDestOperator::MessageDestOperator (std::function<std::string (const std::string &, const std::string &)> userDestFunction)
+MessageDestOperator::MessageDestOperator (
+  std::function<std::string (const std::string &, const std::string &)> userDestFunction)
     : DestUpdateFunction (std::move (userDestFunction))
 {
 }
 
-void MessageDestOperator::setDestFunction (std::function<std::string (const std::string &, const std::string &)> userDestFunction)
+void MessageDestOperator::setDestFunction (
+  std::function<std::string (const std::string &, const std::string &)> userDestFunction)
 {
     DestUpdateFunction = std::move (userDestFunction);
 }
@@ -109,4 +111,3 @@ std::unique_ptr<Message> CloneOperator::process (std::unique_ptr<Message> messag
     return message;
 }
 }  // namespace helics
-

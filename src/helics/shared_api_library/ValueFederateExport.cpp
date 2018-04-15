@@ -292,10 +292,8 @@ helics_publication helicsFederateRegisterGlobalTypePublication (helics_federate 
     try
     {
         pub = new helics::PublicationObject ();
-        pub->pubptr =
-          std::make_unique<helics::Publication> (helics::GLOBAL, fedObj.get (), key, 
-              static_cast<helics::helics_type_t> (type), 
-            (units == nullptr) ? nullStr : std::string(units));
+        pub->pubptr = std::make_unique<helics::Publication> (helics::GLOBAL, fedObj.get (), key, static_cast<helics::helics_type_t> (type),
+                                                             (units == nullptr) ? nullStr : std::string (units));
         pub->fedptr = std::move (fedObj);
         addPublication (fed, pub);
         return reinterpret_cast<helics_publication> (pub);
@@ -407,19 +405,18 @@ helics_status helicsPublicationPublishVector (helics_publication pub, const doub
     auto pubObj = reinterpret_cast<helics::PublicationObject *> (pub);
     if ((vectorInput == nullptr) || (vectorlength <= 0))
     {
-        pubObj->pubptr->publish(std::vector<double>());
+        pubObj->pubptr->publish (std::vector<double> ());
     }
     else
     {
         if (pubObj->rawOnly)
         {
-            pubObj->fedptr->publish(pubObj->id, std::vector<double>(vectorInput, vectorInput + vectorlength));
+            pubObj->fedptr->publish (pubObj->id, std::vector<double> (vectorInput, vectorInput + vectorlength));
         }
         else
         {
-            pubObj->pubptr->publish(std::vector<double>(vectorInput, vectorInput + vectorlength));
+            pubObj->pubptr->publish (std::vector<double> (vectorInput, vectorInput + vectorlength));
         }
-       
     }
     return helics_ok;
 }
@@ -476,7 +473,7 @@ helics_status helicsSubscriptionGetRawValue (helics_subscription sub, void *data
     auto str = subObj->subptr->getValue<std::string> ();
     if (maxDatalen > static_cast<int> (str.size ()))
     {
-        memcpy (data, str.data(), static_cast<int> (str.size()));
+        memcpy (data, str.data (), static_cast<int> (str.size ()));
         *actualSize = static_cast<int> (str.size ());
         return helics_ok;
     }
@@ -639,13 +636,13 @@ helics_status helicsSubscriptionSetDefaultRaw (helics_subscription sub, const vo
 
     if ((data == nullptr) || (dataLen <= 0))
     {
-        subObj->fedptr->setDefaultValue(subObj->id,std::string());
+        subObj->fedptr->setDefaultValue (subObj->id, std::string ());
     }
     else
     {
-        subObj->fedptr->setDefaultValue(subObj->id, helics::data_view((const char *)data, dataLen));
+        subObj->fedptr->setDefaultValue (subObj->id, helics::data_view ((const char *)data, dataLen));
     }
-    
+
     return helics_ok;
 }
 
@@ -982,36 +979,34 @@ helics_time_t helicsSubscriptionLastUpdateTime (helics_subscription sub)
     }
 }
 
-
-int helicsFederateGetPublicationCount(helics_federate fed)
+int helicsFederateGetPublicationCount (helics_federate fed)
 {
     if (fed == nullptr)
     {
         return (-1);
     }
-    auto vfedObj = getValueFed(fed);
-    if (vfedObj==nullptr)
-    {
-        auto fedObj = getFed(fed);
-        //if this is not nullptr than it is a valid fed object just not a value federate object so it has 0 subscriptions
-        return (fedObj != nullptr) ? 0 : (-1);
-    }
-    return static_cast<int>(vfedObj->getPublicationCount());
-}
-
-int helicsFederateGetSubscriptionCount(helics_federate fed)
-{
-    if (fed == nullptr)
-    {
-        return (-1);
-    }
-    auto vfedObj = getValueFed(fed);
+    auto vfedObj = getValueFed (fed);
     if (vfedObj == nullptr)
     {
-        auto fedObj = getFed(fed);
-        //if this is not nullptr than it is a valid fed object just not a value federate object so it has 0 subscriptions
+        auto fedObj = getFed (fed);
+        // if this is not nullptr than it is a valid fed object just not a value federate object so it has 0 subscriptions
         return (fedObj != nullptr) ? 0 : (-1);
     }
-    return static_cast<int>(vfedObj->getSubscriptionCount());
+    return static_cast<int> (vfedObj->getPublicationCount ());
 }
 
+int helicsFederateGetSubscriptionCount (helics_federate fed)
+{
+    if (fed == nullptr)
+    {
+        return (-1);
+    }
+    auto vfedObj = getValueFed (fed);
+    if (vfedObj == nullptr)
+    {
+        auto fedObj = getFed (fed);
+        // if this is not nullptr than it is a valid fed object just not a value federate object so it has 0 subscriptions
+        return (fedObj != nullptr) ? 0 : (-1);
+    }
+    return static_cast<int> (vfedObj->getSubscriptionCount ());
+}

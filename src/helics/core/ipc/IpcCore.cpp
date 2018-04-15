@@ -29,10 +29,10 @@ namespace ipc
 {
 using namespace std::string_literals;
 static const ArgDescriptors extraArgs{
-  {"queueloc"s,  "the file location of the shared queue"s},
-  {"broker,b"s,  "identifier for the broker"s},
-  {"broker_address",  "location of the broker i.e network address"},
-  {"broker_auto_start"s,ArgDescriptor::arg_type_t::flag_type, "automatically start the broker"s},
+  {"queueloc"s, "the file location of the shared queue"s},
+  {"broker,b"s, "identifier for the broker"s},
+  {"broker_address", "location of the broker i.e network address"},
+  {"broker_auto_start"s, ArgDescriptor::arg_type_t::flag_type, "automatically start the broker"s},
   {"broker_init"s,
    "the init string to pass to the broker upon startup-will only be used if the autostart is activated"s},
   {"brokername"s, "identifier for the broker-same as broker"s},
@@ -98,6 +98,5 @@ std::string IpcCore::getAddress () const
     return fileloc;
 }
 
-} // namespace ipc
+}  // namespace ipc
 }  // namespace helics
-

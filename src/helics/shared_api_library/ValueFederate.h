@@ -81,8 +81,8 @@ HELICS_Export helics_subscription helicsFederateRegisterOptionalSubscription (he
 for subscriptions and publications optional implies that there may or may not be matching publication elsewhere in the federation
 @param fed the federate object in which to create a subscription
 @param key the identifier matching a publication to get a subscription for
-@param type a known type identifier HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT, HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR,
-HELICS_DATA_TYPE_RAW
+@param type a known type identifier HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT, HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX,
+HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_RAW
 @param units a string listing the units of the subscription maybe NULL
 @return an object containing the subscription
 */
@@ -110,7 +110,8 @@ HELICS_Export helics_publication helicsFederateRegisterPublication (helics_feder
 for subscriptions and publications
 @param fed the federate object in which to create a publication
 @param key the identifier for the publication
-@param type a code identifying the type of the publication one of HELICS_STRING_TYPE, HELICS_DOUBLE_TYPE, HELICS_INT_TYPE, HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE
+@param type a code identifying the type of the publication one of HELICS_STRING_TYPE, HELICS_DOUBLE_TYPE, HELICS_INT_TYPE,
+HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE
 @param units a string listing the units of the subscription maybe NULL
 @return an object containing the publication
 */
@@ -135,7 +136,8 @@ HELICS_Export helics_publication helicsFederateRegisterGlobalPublication (helics
 for subscriptions and publications
 @param fed the federate object in which to create a publication
 @param key the identifier for the publication
-@param type a code identifying the type of the publication one of HELICS_STRING_TYPE, HELICS_DOUBLE_TYPE, HELICS_INT_TYPE, HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE
+@param type a code identifying the type of the publication one of HELICS_STRING_TYPE, HELICS_DOUBLE_TYPE, HELICS_INT_TYPE,
+HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE
 @param units a string listing the units of the subscription maybe NULL
 @return an object containing the publication
 */
@@ -318,9 +320,9 @@ HELICS_Export helics_status helicsSubscriptionSetDefaultVector (helics_subscript
 /**@}*/
 
 /**
-* \defgroup information retrieval
-* @{
-*/
+ * \defgroup information retrieval
+ * @{
+ */
 
 /** get the type of a subscription
 @param sub the subscription to query
@@ -374,15 +376,14 @@ HELICS_Export helics_bool_t helicsSubscriptionIsUpdated (helics_subscription sub
 HELICS_Export helics_time_t helicsSubscriptionLastUpdateTime (helics_subscription sub);
 /** get the number of publications in a federate
 @return (-1) if fed was not a valid federate otherwise returns the number of publications*/
-HELICS_Export int helicsFederateGetPublicationCount(helics_federate fed);
+HELICS_Export int helicsFederateGetPublicationCount (helics_federate fed);
 
 /** get the number of subscriptions in a federate
 @return (-1) if fed was not a valid federate otherwise returns the number of subscriptions*/
-HELICS_Export int helicsFederateGetSubscriptionCount(helics_federate fed);
+HELICS_Export int helicsFederateGetSubscriptionCount (helics_federate fed);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif
 
 #endif /* HELICS_APISHARED_VALUE_FEDERATE_FUNCTIONS_H_*/
-

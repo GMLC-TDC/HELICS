@@ -44,4 +44,3 @@ class Barrier
 } /* namespace helics */
 
 #endif /* _BARRIER_H_ */
-

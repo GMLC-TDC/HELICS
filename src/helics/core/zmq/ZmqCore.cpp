@@ -5,11 +5,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "ZmqCore.h"
-#include "ZmqComms.h"
 #include "../../common/zmqContextManager.h"
+#include "ZmqComms.h"
 namespace helics
 {
-namespace zeromq {
+namespace zeromq
+{
 ZmqCore::ZmqCore () noexcept {}
 
 ZmqCore::~ZmqCore () = default;
@@ -27,7 +28,7 @@ void ZmqCore::initializeFromArgs (int argc, const char *const *argv)
 
 bool ZmqCore::brokerConnect ()
 {
-    zmqContextManager::startContext();
+    zmqContextManager::startContext ();
     std::lock_guard<std::mutex> lock (dataMutex);
     if (netInfo.brokerAddress.empty ())  // cores require a broker
     {
@@ -66,6 +67,5 @@ std::string ZmqCore::getAddress () const
     }
 }
 
-} // namespace zeromq
+}  // namespace zeromq
 }  // namespace helics
-

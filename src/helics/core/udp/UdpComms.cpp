@@ -18,7 +18,8 @@ static const int DEFAULT_UDP_BROKER_PORT_NUMBER = 23901;
 
 namespace helics
 {
-namespace udp {
+namespace udp
+{
 using boost::asio::ip::udp;
 UdpComms::UdpComms ()
 {
@@ -294,11 +295,13 @@ void UdpComms::queue_tx_function ()
                         {
                             if (PortNumber < BEGIN_OPEN_PORT_RANGE_SUBBROKER)
                             {
-                                openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER + (PortNumber - BEGIN_OPEN_PORT_RANGE) * 10;
+                                openPortStart =
+                                  BEGIN_OPEN_PORT_RANGE_SUBBROKER + (PortNumber - BEGIN_OPEN_PORT_RANGE) * 10;
                             }
                             else
                             {
-                                openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER + (PortNumber - BEGIN_OPEN_PORT_RANGE_SUBBROKER) * 10 + 10;
+                                openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER +
+                                                (PortNumber - BEGIN_OPEN_PORT_RANGE_SUBBROKER) * 10 + 10;
                             }
                         }
                         promisePort.set_value (PortNumber);
@@ -507,7 +510,6 @@ void UdpComms::closeReceiver ()
 
 std::string UdpComms::getAddress () const { return makePortAddress (localTarget_, PortNumber); }
 
-} // namespace udp
+}  // namespace udp
 
 }  // namespace helics
-

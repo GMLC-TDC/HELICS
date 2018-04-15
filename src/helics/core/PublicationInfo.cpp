@@ -17,4 +17,3 @@ bool PublicationInfo::CheckSetValue (const char *dataToCheck, uint64_t len)
     return false;
 }
 }  // namespace helics
-

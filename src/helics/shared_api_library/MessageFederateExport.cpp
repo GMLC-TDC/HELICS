@@ -90,31 +90,32 @@ helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     if ((data == nullptr) || (inputDataLength <= 0))
     {
-        if ((dest == nullptr) || (std::string(dest).empty()))
+        if ((dest == nullptr) || (std::string (dest).empty ()))
         {
-            endObj->endptr->send(std::string());
+            endObj->endptr->send (std::string ());
         }
         else
         {
-            endObj->endptr->send(dest, std::string());
+            endObj->endptr->send (dest, std::string ());
         }
     }
     else
     {
-        if ((dest == nullptr) || (std::string(dest).empty()))
+        if ((dest == nullptr) || (std::string (dest).empty ()))
         {
-            endObj->endptr->send((const char *)data, inputDataLength);
+            endObj->endptr->send ((const char *)data, inputDataLength);
         }
         else
         {
-            endObj->endptr->send(dest, (const char *)data, inputDataLength);
+            endObj->endptr->send (dest, (const char *)data, inputDataLength);
         }
     }
-    
+
     return helics_ok;
 }
 
-helics_status helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength, helics_time_t time)
+helics_status
+helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength, helics_time_t time)
 {
     if (endpoint == nullptr)
     {
@@ -123,27 +124,27 @@ helics_status helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     if ((data == nullptr) || (inputDataLength <= 0))
     {
-        if ((dest == nullptr) || (std::string(dest).empty()))
+        if ((dest == nullptr) || (std::string (dest).empty ()))
         {
-            endObj->endptr->send(std::string(), time);
+            endObj->endptr->send (std::string (), time);
         }
         else
         {
-            endObj->endptr->send(dest, std::string(), time);
+            endObj->endptr->send (dest, std::string (), time);
         }
     }
     else
     {
-        if ((dest == nullptr) || (std::string(dest).empty()))
+        if ((dest == nullptr) || (std::string (dest).empty ()))
         {
-            endObj->endptr->send((const char *)data, inputDataLength, time);
+            endObj->endptr->send ((const char *)data, inputDataLength, time);
         }
         else
         {
-            endObj->endptr->send(dest, (const char *)data, inputDataLength, time);
+            endObj->endptr->send (dest, (const char *)data, inputDataLength, time);
         }
     }
-    
+
     return helics_ok;
 }
 
@@ -255,15 +256,20 @@ message_t helicsEndpointGetMessage (helics_endpoint endpoint)
 
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     endObj->lastMessage = endObj->endptr->getMessage ();
-    message_t mess{};
-    mess.data = endObj->lastMessage->data.data ();
-    mess.dest = endObj->lastMessage->dest.c_str ();
-    mess.length = endObj->lastMessage->data.size ();
-    mess.original_source = endObj->lastMessage->original_source.c_str ();
-    mess.source = endObj->lastMessage->source.c_str ();
-    mess.original_dest = endObj->lastMessage->original_dest.c_str();
-    mess.time = static_cast<helics_time_t>(endObj->lastMessage->time);
-    return mess;
+
+    if (endObj->lastMessage)
+    {
+        message_t mess{};
+        mess.data = endObj->lastMessage->data.data ();
+        mess.dest = endObj->lastMessage->dest.c_str ();
+        mess.length = endObj->lastMessage->data.size ();
+        mess.original_source = endObj->lastMessage->original_source.c_str ();
+        mess.source = endObj->lastMessage->source.c_str ();
+        mess.original_dest = endObj->lastMessage->original_dest.c_str ();
+        mess.time = static_cast<helics_time_t> (endObj->lastMessage->time);
+        return mess;
+    }
+    return emptyMessage ();
 }
 
 message_t helicsFederateGetMessage (helics_federate fed)
@@ -279,15 +285,20 @@ message_t helicsFederateGetMessage (helics_federate fed)
         return emptyMessage ();
     }
     fedObj->lastMessage = mFed->getMessage ();
-    message_t mess{};
-    mess.data = fedObj->lastMessage->data.data ();
-    mess.dest = fedObj->lastMessage->dest.c_str ();
-    mess.length = fedObj->lastMessage->data.size ();
-    mess.original_source = fedObj->lastMessage->original_source.c_str ();
-    mess.original_dest = fedObj->lastMessage->original_dest.c_str();
-    mess.source = fedObj->lastMessage->source.c_str ();
-    mess.time = static_cast<helics_time_t>(fedObj->lastMessage->time);
-    return mess;
+
+    if (fedObj->lastMessage)
+    {
+        message_t mess{};
+        mess.data = fedObj->lastMessage->data.data ();
+        mess.dest = fedObj->lastMessage->dest.c_str ();
+        mess.length = fedObj->lastMessage->data.size ();
+        mess.original_source = fedObj->lastMessage->original_source.c_str ();
+        mess.original_dest = fedObj->lastMessage->original_dest.c_str ();
+        mess.source = fedObj->lastMessage->source.c_str ();
+        mess.time = static_cast<helics_time_t> (fedObj->lastMessage->time);
+        return mess;
+    }
+    return emptyMessage ();
 }
 
 helics_status helicsEndpointGetType (helics_endpoint endpoint, char *outputString, int maxlen)
@@ -338,19 +349,18 @@ helics_status helicsEndpointGetName (helics_endpoint endpoint, char *outputStrin
     return helics_ok;
 }
 
-int helicsFederateGetEndpointCount(helics_federate fed)
+int helicsFederateGetEndpointCount (helics_federate fed)
 {
     if (fed == nullptr)
     {
         return (-1);
     }
-    auto mfedObj = getMessageFed(fed);
+    auto mfedObj = getMessageFed (fed);
     if (mfedObj == nullptr)
     {
-        auto fedObj = getFed(fed);
-        //if this is not nullptr than it is a valid fed object just not a message federate object so it has 0 endpoints
+        auto fedObj = getFed (fed);
+        // if this is not nullptr than it is a valid fed object just not a message federate object so it has 0 endpoints
         return (fedObj != nullptr) ? 0 : (-1);
     }
-    return static_cast<int>(mfedObj->getEndpointCount());
+    return static_cast<int> (mfedObj->getEndpointCount ());
 }
-

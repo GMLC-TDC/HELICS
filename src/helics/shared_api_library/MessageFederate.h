@@ -54,7 +54,10 @@ HELICS_Export helics_status helicsEndpointSetDefaultDestination (helics_endpoint
 @param len the length of the data to send
 @return helics_ok if everything worked
 */
-HELICS_Export helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength);
+HELICS_Export helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint,
+                                                          const char *dest,
+                                                          const void *data,
+                                                          int inputDataLength);
 
 /** send a message at a specific time to the specified destination
 @param endpoint the endpoint to send the data from
@@ -130,11 +133,10 @@ HELICS_Export helics_status helicsEndpointGetName (helics_endpoint endpoint, cha
 
 /** get the number of endpoints in a federate
 @return (-1) if fed was not a valid federate otherwise returns the number of subscriptions*/
-HELICS_Export int helicsFederateGetEndpointCount(helics_federate fed);
+HELICS_Export int helicsFederateGetEndpointCount (helics_federate fed);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif
 
 #endif /*HELICS_APISHARED_MESSAGE_FEDERATE_FUNCTIONS_H_*/
-

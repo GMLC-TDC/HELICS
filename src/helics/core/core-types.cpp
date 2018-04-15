@@ -31,7 +31,7 @@ std::string to_string (core_type type)
     case core_type::UDP:
         return "udp_";
     default:
-        return std::string();
+        return std::string ();
     }
 }
 
@@ -129,4 +129,3 @@ bool isCoreTypeAvailable (core_type type) noexcept
 }
 
 }  // namespace helics
-

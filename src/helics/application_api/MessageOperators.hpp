@@ -38,7 +38,8 @@ class MessageDestOperator : public FilterOperator
     /** default constructor*/
     MessageDestOperator () = default;
     /** set the function to modify the time of the message in the constructor*/
-    explicit MessageDestOperator (std::function<std::string (const std::string &, const std::string &)> userDestFunction);
+    explicit MessageDestOperator (
+      std::function<std::string (const std::string &, const std::string &)> userDestFunction);
     /** set the function to modify the time of the message*/
     void setDestFunction (std::function<std::string (const std::string &, const std::string &)> userDestFunction);
 
@@ -103,4 +104,3 @@ class CloneOperator : public FilterOperator
 };
 
 }  // namespace helics
-

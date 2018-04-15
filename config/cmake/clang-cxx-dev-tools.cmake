@@ -18,17 +18,17 @@ file(GLOB
      )
 
 file(GLOB
-     ALL_PLAYER_FILES
-      src/helics/player/*.[ch]pp
+     ALL_APP_FILES
+      src/helics/apps/*.[ch]pp
      )
 
 file(GLOB
-     ALL_SHARED_LIB_FILES
-      src/helics/shared_api_library/*.[ch]pp src/helics/shared_api_library/*.[ch] src/helics/shared_api_library/*.[CH]
+     ALL_SHARED_API_FILES
+      src/helics/shared_api_library/*.[ch]pp src/helics/shared_api_library/*.[ch] src/helics/shared_api_library/internal/*.h
      )
 
 file(GLOB
-     ALL_CORE_LIB_FILES
+     ALL_CORE_FILES
       src/helics/core/*.[ch]pp src/helics/core/zmq/*.[ch]pp src/helics/core/ipc/*.[ch]pp src/helics/core/mpi/*.[ch]pp src/helics/core/udp/*.[ch]pp src/helics/core/tcp/*.[ch]pp
      )
 
@@ -39,19 +39,19 @@ file(GLOB
 
 set(ALL_APPLICATION_FILES
 		${ALL_APPLICATION_API_FILES}
-		${ALL_PLAYER_FILES}
-		${ALL_SHARED_LIB_FILES}
+		${ALL_APP_FILES}
+		${ALL_SHARED_API_FILES}
 		)
 
 set(ALL_CORE_FILES
-		${ALL_CORE_LIB_FILES}
+		${ALL_CORE_FILES}
 		${ALL_COMMON_FILES}
 		)
 
 set(INCLUDE_DIRECTORIES
 ${PROJECT_SOURCE_DIR}/src/core
 ${ROJECT_SOURCE_DIR}/src/application_api
-${PROJECT_SOURCE_DIR}/src/player
+${PROJECT_SOURCE_DIR}/src/app
 ${PROJECT_SOURCE_DIR}/src/common
 ${PROJECT_SOURCE_DIR}/src/shared_api_library
 ${PROJECT_SOURCE_DIR}/test
@@ -103,7 +103,7 @@ if(CLANG_FORMAT)
     COMMAND ${CLANG_FORMAT}
     -i
     -style=file
-    ${ALL_CORE_FILES}
+    ${ALL_EXAMPLE_FILES}
     )
 
 	add_custom_target(clang-format-all

@@ -9,7 +9,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-namespace udp {
+namespace udp
+{
 UdpCore::UdpCore () noexcept {}
 
 UdpCore::~UdpCore () = default;
@@ -57,6 +58,5 @@ std::string UdpCore::getAddress () const
     return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
 
-} // namespace udp
+}  // namespace udp
 }  // namespace helics
-

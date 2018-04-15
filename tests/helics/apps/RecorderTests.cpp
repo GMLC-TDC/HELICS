@@ -319,7 +319,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
     BOOST_CHECK_EQUAL (v1.second, std::to_string (3.9));
 
     auto m = rec1.getMessage (1);
-    BOOST_REQUIRE(m);
+    BOOST_REQUIRE (m);
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message2");
 }
 
@@ -695,4 +695,3 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
     boost::filesystem::remove (filename2);
 }
 BOOST_AUTO_TEST_SUITE_END ()
-

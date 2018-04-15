@@ -23,4 +23,3 @@ template class ValueConverter<std::vector<std::string>>;
 template class ValueConverter<std::vector<std::complex<double>>>;
 template class ValueConverter<named_point>;
 }  // namespace helics
-

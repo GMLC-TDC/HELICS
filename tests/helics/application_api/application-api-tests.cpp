@@ -5,8 +5,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 //#include <iostream>
-#include <helics/application_api/Federate.hpp>
 #include "helics/helics-config.h"
+#include <helics/application_api/Federate.hpp>
 
 #ifndef BOOST_STATIC
 #define BOOST_TEST_DYN_LINK
@@ -30,4 +30,3 @@ struct globalTestConfig
 //____________________________________________________________________________//
 
 BOOST_GLOBAL_FIXTURE (globalTestConfig);
-

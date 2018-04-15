@@ -9,8 +9,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 
-#include <utility>
 #include <memory>
+#include <utility>
 
 namespace helics
 {
@@ -46,4 +46,3 @@ class FilterInfo
       invalid_fed_id, invalid_handle};  //!< the actual target information for the filter
 };
 }  // namespace helics
-

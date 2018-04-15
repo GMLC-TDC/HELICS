@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #pragma once
 
+#include "TripWire.hpp"
 #include <algorithm>
 #include <functional>
 #include <iostream>
@@ -13,7 +14,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <mutex>
 #include <thread>
 #include <vector>
-#include "TripWire.hpp"
 
 /** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
  * threading issues*/
@@ -25,6 +25,7 @@ class DelayedDestructor
     std::vector<std::shared_ptr<X>> ElementsToBeDestroyed;
     std::function<void(std::shared_ptr<X> &ptr)> callBeforeDeleteFunction;
     tripwire::TripWireDetector tripDetect;
+
   public:
     DelayedDestructor () = default;
     explicit DelayedDestructor (std::function<void(std::shared_ptr<X> &ptr)> callFirst)
@@ -40,8 +41,8 @@ class DelayedDestructor
             destroyObjects ();
             if (!ElementsToBeDestroyed.empty ())
             {
-                //short circuit if the tripline was triggered
-                if (tripDetect.isTripped())
+                // short circuit if the tripline was triggered
+                if (tripDetect.isTripped ())
                 {
                     return;
                 }
@@ -64,7 +65,7 @@ class DelayedDestructor
     DelayedDestructor (DelayedDestructor &&) noexcept = delete;
     DelayedDestructor &operator= (DelayedDestructor &&) noexcept = delete;
 
-	/** destroy objects that are now longer used*/
+    /** destroy objects that are now longer used*/
     size_t destroyObjects ()
     {
         std::lock_guard<std::mutex> lock (destructionLock);
@@ -143,4 +144,3 @@ class DelayedDestructor
         ElementsToBeDestroyed.push_back (obj);
     }
 };
-

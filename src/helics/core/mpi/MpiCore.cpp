@@ -16,16 +16,15 @@ namespace mpi
 {
 MpiCore::MpiCore () noexcept {}
 
-//MpiCore::~MpiCore () = default;
-MpiCore::~MpiCore () { std::cout << "MpiCore destructor for " << getAddress () << std::endl;  }
+// MpiCore::~MpiCore () = default;
+MpiCore::~MpiCore () { std::cout << "MpiCore destructor for " << getAddress () << std::endl; }
 MpiCore::MpiCore (const std::string &core_name) : CommsBroker (core_name) {}
 
 using namespace std::string_literals;
 static const ArgDescriptors extraArgs{
-    { "broker_address", ArgDescriptor::arg_type_t::string_type, "location of a broker using mpi (rank:tag)" },
-    { "broker_rank", ArgDescriptor::arg_type_t::int_type, "mpi rank of a broker using mpi"},
-    { "broker_tag", ArgDescriptor::arg_type_t::int_type, "mpi tag of a broker using mpi"}
-};
+  {"broker_address", ArgDescriptor::arg_type_t::string_type, "location of a broker using mpi (rank:tag)"},
+  {"broker_rank", ArgDescriptor::arg_type_t::int_type, "mpi rank of a broker using mpi"},
+  {"broker_tag", ArgDescriptor::arg_type_t::int_type, "mpi tag of a broker using mpi"}};
 
 void MpiCore::initializeFromArgs (int argc, const char *const *argv)
 {
@@ -37,25 +36,25 @@ void MpiCore::initializeFromArgs (int argc, const char *const *argv)
         brokerRank = 0;
         brokerTag = 0;
 
-        if (vm.count("broker_address") > 0)
+        if (vm.count ("broker_address") > 0)
         {
-            auto addr = vm["broker_address"].as<std::string>();
-            auto delim_pos = addr.find_first_of(":", 1);
-            brokerRank = std::stoi(addr.substr(0, delim_pos));
-            brokerTag = std::stoi(addr.substr(delim_pos+1, addr.length()));
+            auto addr = vm["broker_address"].as<std::string> ();
+            auto delim_pos = addr.find_first_of (":", 1);
+            brokerRank = std::stoi (addr.substr (0, delim_pos));
+            brokerTag = std::stoi (addr.substr (delim_pos + 1, addr.length ()));
         }
 
-        if (vm.count("broker_rank") > 0)
+        if (vm.count ("broker_rank") > 0)
         {
-            brokerRank = vm["broker_rank"].as<int>();
+            brokerRank = vm["broker_rank"].as<int> ();
         }
 
-        if (vm.count("broker_tag") > 0)
+        if (vm.count ("broker_tag") > 0)
         {
-            brokerTag = vm["broker_tag"].as<int>();
+            brokerTag = vm["broker_tag"].as<int> ();
         }
 
-        brokerAddress = std::to_string(brokerRank) + ":" + std::to_string(brokerTag);
+        brokerAddress = std::to_string (brokerRank) + ":" + std::to_string (brokerTag);
 
         CommonCore::initializeFromArgs (argc, argv);
     }
@@ -71,11 +70,7 @@ bool MpiCore::brokerConnect ()
     return res;
 }
 
-std::string MpiCore::getAddress () const
-{
-    return comms->getAddress();
-}
+std::string MpiCore::getAddress () const { return comms->getAddress (); }
 
-} // namespace mpi
+}  // namespace mpi
 }  // namespace helics
-

@@ -38,6 +38,10 @@ Getting and building from source:
 
 3. Run "make".
 
+####Notes for Ubuntu
+building with GCC 4.9 and 5.X on Ubuntu requires some additional flags due to the way Ubuntu builds those compilers
+add -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_MATH" to make it work.  If you built the compilers from source this may not be required
+
 ```bash
 
 git clone https://github.com/GMLC-TDC/HELICS-src
@@ -97,4 +101,3 @@ $ helics_player --version
 $ helics_recorder --version
 0.1
 ```
-

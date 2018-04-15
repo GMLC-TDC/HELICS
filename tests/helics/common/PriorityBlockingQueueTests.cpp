@@ -379,4 +379,3 @@ BOOST_AUTO_TEST_CASE (pop_callback_tests)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
-

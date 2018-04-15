@@ -109,7 +109,6 @@ BOOST_AUTO_TEST_CASE (emplace_tests)
     BOOST_CHECK_EQUAL (b->second, 34.1);
 }
 
-
 /** test with single consumer/single producer*/
 BOOST_AUTO_TEST_CASE (multithreaded_tests)
 {
@@ -262,4 +261,3 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests3)
 
 #endif
 BOOST_AUTO_TEST_SUITE_END ()
-

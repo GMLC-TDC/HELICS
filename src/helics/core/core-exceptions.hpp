@@ -78,4 +78,3 @@ class HelicsTerminated : public HelicsException
     explicit HelicsTerminated (const std::string &message = "HELICS termination") : HelicsException (message){};
 };
 }
-

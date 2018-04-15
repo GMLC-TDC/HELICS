@@ -8,9 +8,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 */
 #include "cpptestFixtures.hpp"
-#include <boost/test/unit_test.hpp>
 #include "../src/helics/cpp98/Broker.hpp"
 #include <cctype>
+#include <boost/test/unit_test.hpp>
 
 static bool hasIndexCode (const std::string &type_name)
 {
@@ -24,15 +24,14 @@ static bool hasIndexCode (const std::string &type_name)
     return false;
 }
 
-
 static auto StartBrokerImp (const std::string &core_type_name, const std::string &initialization_string)
 {
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
-        return std::make_shared<helics::Broker> (new_type, std::string(), initialization_string);
+        return std::make_shared<helics::Broker> (new_type, std::string (), initialization_string);
     }
-    return std::make_shared<helics::Broker>(core_type_name, std::string(), initialization_string);
+    return std::make_shared<helics::Broker> (core_type_name, std::string (), initialization_string);
 }
 
 bool FederateTestFixture_cpp::hasIndexCode (const std::string &type_name)
@@ -53,27 +52,27 @@ int FederateTestFixture_cpp::getIndexCode (const std::string &type_name)
 }
 
 auto FederateTestFixture_cpp::AddBrokerImp (const std::string &core_type_name,
-                                        const std::string &initialization_string)
+                                            const std::string &initialization_string)
 {
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
-        return std::make_shared<helics::Broker>(new_type, std::string(), initialization_string);
+        return std::make_shared<helics::Broker> (new_type, std::string (), initialization_string);
     }
 
-    return std::make_shared<helics::Broker>(core_type_name, std::string(), initialization_string);
+    return std::make_shared<helics::Broker> (core_type_name, std::string (), initialization_string);
 }
 
-FederateTestFixture_cpp::~FederateTestFixture_cpp()
+FederateTestFixture_cpp::~FederateTestFixture_cpp ()
 {
     for (auto &fed : federates)
     {
-        fed->finalize();
+        fed->finalize ();
     }
     federates.clear ();
     for (auto &broker : brokers)
     {
-        broker->disconnect();
+        broker->disconnect ();
     }
     brokers.clear ();
     helicsCleanupHelicsLibrary ();
@@ -84,7 +83,8 @@ std::shared_ptr<helics::Broker> FederateTestFixture_cpp::AddBroker (const std::s
     return AddBroker (core_type_name, std::to_string (count));
 }
 
-std::shared_ptr<helics::Broker> FederateTestFixture_cpp::AddBroker (const std::string &core_type_name, const std::string &initialization_string)
+std::shared_ptr<helics::Broker>
+FederateTestFixture_cpp::AddBroker (const std::string &core_type_name, const std::string &initialization_string)
 {
     std::shared_ptr<helics::Broker> broker;
     if (extraBrokerArgs.empty ())
