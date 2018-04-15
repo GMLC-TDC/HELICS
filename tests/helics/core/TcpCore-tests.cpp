@@ -157,12 +157,13 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     helics::tcp::TcpServer server (srv->getBaseService (), TCP_BROKER_PORT);
     srv->runServiceLoop ();
     std::vector<char> data (1024);
-    server.setDataCall ([&data, &counter, &len](helics::tcp::TcpRxConnection::pointer, const char *data_rec, size_t data_Size) {
-        std::copy (data_rec, data_rec + data_Size, data.begin ());
-        len = data_Size;
-        ++counter;
-        return data_Size;
-    });
+    server.setDataCall (
+      [&data, &counter, &len](helics::tcp::TcpRxConnection::pointer, const char *data_rec, size_t data_Size) {
+          std::copy (data_rec, data_rec + data_Size, data.begin ());
+          len = data_Size;
+          ++counter;
+          return data_Size;
+      });
     server.start ();
 
     comm.setCallback ([](helics::ActionMessage /*m*/) {});
@@ -208,13 +209,13 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     helics::tcp::TcpServer server (srv->getBaseService (), TCP_BROKER_PORT);
     srv->runServiceLoop ();
     std::vector<char> data (1024);
-    server.setDataCall (
-      [&data, &ServerCounter, &len](helics::tcp::TcpRxConnection::pointer, const char *data_rec, size_t data_Size) {
-          std::copy (data_rec, data_rec + data_Size, data.begin ());
-          len = data_Size;
-          ++ServerCounter;
-          return data_Size;
-      });
+    server.setDataCall ([&data, &ServerCounter, &len](helics::tcp::TcpRxConnection::pointer, const char *data_rec,
+                                                      size_t data_Size) {
+        std::copy (data_rec, data_rec + data_Size, data.begin ());
+        len = data_Size;
+        ++ServerCounter;
+        return data_Size;
+    });
     server.start ();
 
     comm.setCallback ([&CommCounter, &act, &actguard](helics::ActionMessage m) {
@@ -399,14 +400,15 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
     srv->runServiceLoop ();
     std::vector<char> data (1024);
     std::atomic<size_t> len{0};
-    server.setDataCall ([&data, &counter, &len](helics::tcp::TcpRxConnection::pointer, const char *data_rec, size_t data_Size) {
-        std::copy (data_rec, data_rec + data_Size, data.begin ());
-        len = data_Size;
-        ++counter;
-        return data_Size;
-    });
+    server.setDataCall (
+      [&data, &counter, &len](helics::tcp::TcpRxConnection::pointer, const char *data_rec, size_t data_Size) {
+          std::copy (data_rec, data_rec + data_Size, data.begin ());
+          len = data_Size;
+          ++counter;
+          return data_Size;
+      });
     server.start ();
-    BOOST_TEST_PASSPOINT();
+    BOOST_TEST_PASSPOINT ();
     bool connected = core->connect ();
     BOOST_CHECK (connected);
 
@@ -448,9 +450,9 @@ BOOST_AUTO_TEST_CASE (tcpCore_core_broker_default_test)
     std::string initializationString = "1";
 
     auto broker = helics::BrokerFactory::create (helics::core_type::TCP, initializationString);
-    BOOST_REQUIRE(broker);
+    BOOST_REQUIRE (broker);
     auto core = helics::CoreFactory::create (helics::core_type::TCP, initializationString);
-    BOOST_REQUIRE(core);
+    BOOST_REQUIRE (core);
     bool connected = broker->isConnected ();
     BOOST_CHECK (connected);
     connected = core->connect ();
@@ -468,4 +470,3 @@ BOOST_AUTO_TEST_CASE (tcpCore_core_broker_default_test)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
-

@@ -27,7 +27,8 @@ class ForwardingTimeCoordinator
     DependencyInfo::time_state_t time_state =
       DependencyInfo::time_state_t::time_requested;  //!< the current forwarding time state
     Core::federate_id_t lastMinFed = invalid_fed_id;  //!< the latest minimum fed
-   // Core::federate_id_t parent = invalid_fed_id;  //!< the id for the parent object which should also be a ForwardingTimeCoordinator
+    // Core::federate_id_t parent = invalid_fed_id;  //!< the id for the parent object which should also be a
+    // ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     std::vector<Core::federate_id_t> dependents;  //!< federates which temporally depend on this federate
 
@@ -68,10 +69,11 @@ class ForwardingTimeCoordinator
   private:
     /**send out the latest time request command*/
     void sendTimeRequest () const;
-    void transmitTimingMessage(ActionMessage &msg) const;
+    void transmitTimingMessage (ActionMessage &msg) const;
     /** generate a new timing request message by recalculating the times ignoring a particular brokers input
-    */
-    ActionMessage generateTimeRequestIgnoreDependency(const ActionMessage &msg, Core::federate_id_t iFed) const;
+     */
+    ActionMessage generateTimeRequestIgnoreDependency (const ActionMessage &msg, Core::federate_id_t iFed) const;
+
   public:
     /** process a message related to time
     @return a message_process_result if it did anything
@@ -106,7 +108,6 @@ class ForwardingTimeCoordinator
     std::string printTimeStatus () const;
 
     /** check if there are any active Time dependencies*/
-    bool hasActiveTimeDependencies() const;
+    bool hasActiveTimeDependencies () const;
 };
 }  // namespace helics
-

@@ -17,7 +17,8 @@ static const int DEFAULT_TCP_BROKER_PORT_NUMBER = 24160;
 
 namespace helics
 {
-namespace tcp {
+namespace tcp
+{
 using boost::asio::ip::tcp;
 TcpComms::TcpComms () noexcept {}
 
@@ -136,7 +137,7 @@ void TcpComms::txPriorityReceive (std::shared_ptr<TcpConnection> /*connection*/,
                                   size_t bytes_received,
                                   const boost::system::error_code &error)
 {
-    if (error!=nullptr)
+    if (error != nullptr)
     {
         return;
     }
@@ -165,7 +166,6 @@ void TcpComms::txPriorityReceive (std::shared_ptr<TcpConnection> /*connection*/,
 
 size_t TcpComms::dataReceive (std::shared_ptr<TcpRxConnection> connection, const char *data, size_t bytes_received)
 {
-
     size_t used_total = 0;
     while (used_total < bytes_received)
     {
@@ -234,7 +234,7 @@ void TcpComms::queue_rx_function ()
                 auto mp = message.source_handle;
                 if (openPortStart < 0)
                 {
-                    if (mp<BEGIN_OPEN_PORT_RANGE)
+                    if (mp < BEGIN_OPEN_PORT_RANGE)
                     {
                         openPortStart = BEGIN_OPEN_PORT_RANGE;
                     }
@@ -244,13 +244,14 @@ void TcpComms::queue_rx_function ()
                     }
                     else
                     {
-                        openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER + (mp - BEGIN_OPEN_PORT_RANGE_SUBBROKER) * 10 + 10;
+                        openPortStart =
+                          BEGIN_OPEN_PORT_RANGE_SUBBROKER + (mp - BEGIN_OPEN_PORT_RANGE_SUBBROKER) * 10 + 10;
                     }
                 }
                 PortNumber = mp;
             }
 
-                break;
+            break;
             case CLOSE_RECEIVER:
             case DISCONNECT:
                 disconnecting = true;
@@ -502,7 +503,8 @@ void TcpComms::queue_tx_function ()
                     {
                         if (!isDisconnectCommand (cmd))
                         {
-                            std::cerr << "broker send 0 "<< actionMessageType(cmd.action()) <<':'<< se.what () << '\n';
+                            std::cerr << "broker send 0 " << actionMessageType (cmd.action ()) << ':' << se.what ()
+                                      << '\n';
                         }
                     }
                 }
@@ -602,6 +604,5 @@ void TcpComms::closeReceiver ()
 
 std::string TcpComms::getAddress () const { return makePortAddress (localTarget_, PortNumber); }
 
-} // namespace tcp
+}  // namespace tcp
 }  // namespace helics
-

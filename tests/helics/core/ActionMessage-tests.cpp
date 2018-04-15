@@ -72,7 +72,8 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
     if (b > 64)
     {
     printf("sizeof(extraInfo)=%d\n", static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>)));
-    printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char *>(&m)));
+    printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
+    *>(&m)));
     }
     */
     m.actionTime = 47.2342;
@@ -381,4 +382,3 @@ BOOST_AUTO_TEST_CASE (check_packetization)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
-

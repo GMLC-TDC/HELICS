@@ -29,7 +29,7 @@ static const ArgDescriptors InfoArgs{{"broker,b"s, "address of the broker to con
                                      {"period"s, "the period of the federate"s},
                                      {"timedelta"s, "the time delta of the federate"s},
                                      {"coreinit,i"s, "the core initialization string"s},
-                                        { "separator"s, "separator character for local federates"s },
+                                     {"separator"s, "separator character for local federates"s},
                                      {"inputdelay"s, "the input delay on incoming communication of the federate"s},
                                      {"outputdelay"s,
                                       "the output delay for outgoing communication of the federate"s},
@@ -105,10 +105,10 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     {
         maxIterations = static_cast<int16_t> (vm["maxiterations"].as<int> ());
     }
-    if (vm.count("separator") > 0)
+    if (vm.count ("separator") > 0)
     {
-        auto sep = vm["separator"].as<std::string>();
-        if (!sep.empty())
+        auto sep = vm["separator"].as<std::string> ();
+        if (!sep.empty ())
         {
             separator = sep[0];
         }
@@ -154,14 +154,14 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     }
 }
 
-FederateInfo loadFederateInfo(const std::string &jsonString)
+FederateInfo loadFederateInfo (const std::string &jsonString)
 {
-    return loadFederateInfo(std::string(), jsonString);
+    return loadFederateInfo (std::string (), jsonString);
 }
 
 FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonString)
 {
-    FederateInfo fi(name);
+    FederateInfo fi (name);
     Json_helics::Value doc;
     try
     {
@@ -209,10 +209,10 @@ FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonS
     {
         fi.forwardCompute = doc["forward_compute"].asBool ();
     }
-    if (doc.isMember("separator"))
+    if (doc.isMember ("separator"))
     {
-        auto sep = doc["separator"].asString();
-        if (!sep.empty())
+        auto sep = doc["separator"].asString ();
+        if (!sep.empty ())
         {
             fi.separator = sep[0];
         }
@@ -266,4 +266,3 @@ FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonS
     return fi;
 }
 }  // namespace helics
-

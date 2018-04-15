@@ -8,8 +8,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 
-#include <string>
 #include <memory>
+#include <string>
 #include <vector>
 
 /** @file
@@ -162,7 +162,7 @@ class Message
     @return false if there is no Message data*/
     bool isValid () const noexcept;
     /** get the payload as a string*/
-    const std::string &to_string() const { return data.to_string(); }
+    const std::string &to_string () const { return data.to_string (); }
 };
 
 /**
@@ -229,4 +229,3 @@ inline void swap (helics::Message &m1, helics::Message &m2) noexcept
     m1.swap (m2);
 }
 }  // namespace std
-

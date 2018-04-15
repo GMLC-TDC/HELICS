@@ -41,7 +41,7 @@ std::shared_ptr<Core> create (core_type type, int argc, const char *const *argv)
 @param argv the actual argument parameters
 @return a pointer to the created core
 */
-std::shared_ptr<Core> create(int argc, const char *const *argv);
+std::shared_ptr<Core> create (int argc, const char *const *argv);
 
 /** create a core from a type, name, and initializationString
 @param type the type of core to create
@@ -106,4 +106,3 @@ void copyCoreIdentifier (const std::string &copyFromName, const std::string &cop
 }  // namespace CoreFactory
 
 }  // namespace helics
-

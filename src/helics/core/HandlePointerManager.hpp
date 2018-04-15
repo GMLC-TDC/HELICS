@@ -49,26 +49,14 @@ class HandlePointerManager
     BasicHandleInfo *getPublication (const std::string &name) const;
 
     int32_t getLocalFedID (Core::handle_id_t id_) const;
-    auto begin()
-    {
-        return handles.begin();
-    }
-    auto end()
-    {
-        return handles.end();
-    }
-    auto begin() const
-    {
-        return handles.begin();
-    }
-    auto end() const
-    {
-        return handles.end();
-    }
-private:
-    void addType(BasicHandleInfo *handle, int32_t index);
-    std::string generateName(BasicHandleType what);
+    auto begin () { return handles.begin (); }
+    auto end () { return handles.end (); }
+    auto begin () const { return handles.begin (); }
+    auto end () const { return handles.end (); }
+
+  private:
+    void addType (BasicHandleInfo *handle, int32_t index);
+    std::string generateName (BasicHandleType what);
 };
 
 }  // namespace helics
-

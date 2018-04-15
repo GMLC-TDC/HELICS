@@ -264,4 +264,3 @@ BOOST_AUTO_TEST_CASE (linear_tests)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
-

@@ -64,4 +64,3 @@ int32_t EndpointInfo::queueSize (Time maxTime) const
     return cnt;
 }
 }  // namespace helics
-

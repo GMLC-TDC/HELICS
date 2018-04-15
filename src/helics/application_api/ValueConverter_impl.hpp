@@ -15,8 +15,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cereal/archives/portable_binary.hpp>
 #include <cereal/cereal.hpp>
 #include <cereal/types/complex.hpp>
-#include <cereal/types/vector.hpp>
 #include <cereal/types/utility.hpp>
+#include <cereal/types/vector.hpp>
 #include <complex>
 #include <cstring>
 #include <iterator>
@@ -195,4 +195,3 @@ X ValueConverter<X>::interpret (const data_view &block)
     return val;
 }
 }  // namespace helics
-

@@ -11,11 +11,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define BOOST_TEST_DYN_LINK
 #endif
 
-#define BOOST_TEST_MODULE cpp-shared-library-tests
+#define BOOST_TEST_MODULE cpp - shared - library - tests
 #define BOOST_TEST_DETECT_MEMORY_LEAK 0
 
-#include <boost/test/unit_test.hpp>
 #include <iostream>
+#include <boost/test/unit_test.hpp>
 struct globalTestConfig
 {
     globalTestConfig () = default;
@@ -23,11 +23,10 @@ struct globalTestConfig
     {
         // std::cout << "cleaning up" << std::endl;
         helicsCloseLibrary ();
-        //std::cout << "finished cleaning up" << std::endl;
+        // std::cout << "finished cleaning up" << std::endl;
     }
 };
 
 //____________________________________________________________________________//
 
 BOOST_GLOBAL_FIXTURE (globalTestConfig);
-

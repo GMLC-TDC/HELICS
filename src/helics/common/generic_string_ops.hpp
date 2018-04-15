@@ -161,4 +161,3 @@ std::vector<X> generalized_section_splitting (const X &line,
 }
 
 #endif
-

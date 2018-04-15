@@ -13,9 +13,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 /** these test cases test out the value converters
  */
-#include "helics/application_api/data_view.hpp"
 #include "helics/application_api/ValueConverter.hpp"
 #include "helics/application_api/ValueConverter_impl.hpp"
+#include "helics/application_api/data_view.hpp"
 #include "helics/core/core-data.hpp"
 
 using namespace std::string_literals;
@@ -205,4 +205,3 @@ BOOST_AUTO_TEST_CASE (test_converter_errors)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
-

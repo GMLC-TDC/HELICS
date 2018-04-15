@@ -12,4 +12,3 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 }  // namespace helics
-

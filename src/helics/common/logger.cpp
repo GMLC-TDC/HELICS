@@ -140,7 +140,7 @@ void LoggerNoThread::flush ()
     std::cout.flush ();
 }
 
-std::atomic<bool> LoggingCore::fastShutdown{ false };
+std::atomic<bool> LoggingCore::fastShutdown{false};
 
 LoggingCore::LoggingCore () { loggingThread = std::thread (&LoggingCore::processingLoop, this); }
 
@@ -148,14 +148,14 @@ LoggingCore::~LoggingCore ()
 {
     if (fastShutdown)
     {
-        if (!tripDetector.isTripped())
+        if (!tripDetector.isTripped ())
         {
-            loggingQueue.emplace(-1, "!!>close");
+            loggingQueue.emplace (-1, "!!>close");
         }
     }
     else
     {
-        loggingQueue.emplace(-1, "!!>close");
+        loggingQueue.emplace (-1, "!!>close");
     }
     loggingThread.join ();
 }
@@ -173,23 +173,20 @@ void LoggingCore::addMessage (int index, const std::string &message) { loggingQu
 int LoggingCore::addFileProcessor (std::function<void(std::string &&message)> newFunction)
 {
     std::lock_guard<std::mutex> fLock (functionLock);
-    for (int ii=0;ii<static_cast<int>(functions.size());++ii)
+    for (int ii = 0; ii < static_cast<int> (functions.size ()); ++ii)
     {
         if (functions[ii])
         {
             continue;
         }
-        functions[ii] = std::move(newFunction);
+        functions[ii] = std::move (newFunction);
         return ii;
     }
     functions.push_back (std::move (newFunction));
     return static_cast<int> (functions.size ()) - 1;
 }
 
-void LoggingCore::setFastShutdown()
-{
-    fastShutdown.store(true);
-}
+void LoggingCore::setFastShutdown () { fastShutdown.store (true); }
 
 void LoggingCore::haltOperations (int loggerIndex)
 {
@@ -288,7 +285,6 @@ void LoggingCore::processingLoop ()
 
 bool LoggerNoThread::isRunning () const { return true; }
 
-
 /** a storage system for the available Logger objects allowing references by name to the core
  */
 std::map<std::string, std::shared_ptr<LoggerManager>> LoggerManager::loggers;
@@ -332,7 +328,7 @@ void LoggerManager::closeLogger (const std::string &loggerName)
 void LoggerManager::logMessage (const std::string &message)
 {
     std::lock_guard<std::mutex> loglock (loggerLock);
-    auto fnd = loggers.find (std::string());
+    auto fnd = loggers.find (std::string ());
     if (fnd != loggers.end ())
     {
         if (fnd->second->loggingControl)
@@ -352,4 +348,3 @@ LoggerManager::LoggerManager (const std::string &loggerName) : name (loggerName)
     loggingControl = std::make_shared<LoggingCore> ();
 }
 }  // namespace helics
-

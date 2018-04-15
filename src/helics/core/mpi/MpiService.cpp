@@ -7,13 +7,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "MpiService.h"
 
-namespace helics {
+namespace helics
+{
 namespace mpi
 {
 MPI_Comm MpiService::mpiCommunicator = MPI_COMM_NULL;
 bool MpiService::startServiceThread = true;
 
-MpiService& MpiService::getInstance ()
+MpiService &MpiService::getInstance ()
 {
     static MpiService instance;
     if (startServiceThread)
@@ -23,18 +24,11 @@ MpiService& MpiService::getInstance ()
     return instance;
 }
 
-void MpiService::setMpiCommunicator (MPI_Comm communicator)
-{
-    mpiCommunicator = communicator;
-}
+void MpiService::setMpiCommunicator (MPI_Comm communicator) { mpiCommunicator = communicator; }
 
-void MpiService::setStartServiceThread (bool start)
-{
-    startServiceThread = start;
-}
+void MpiService::setStartServiceThread (bool start) { startServiceThread = start; }
 
-MpiService::MpiService ()
-    : commRank (-1)
+MpiService::MpiService () : commRank (-1)
 {
     comms_connected = 0;
     stop_service = false;
@@ -58,7 +52,8 @@ void MpiService::startService ()
     {
         startup_flag = true;
         service_thread = std::make_unique<std::thread> (&MpiService::serviceLoop, this);
-        while (startup_flag && !stop_service);
+        while (startup_flag && !stop_service)
+            ;
     }
 }
 
@@ -85,7 +80,6 @@ void MpiService::serviceLoop ()
 
     std::cout << "Started MPI service loop for rank " << commRank << std::endl;
 
-
     // Run as long as we have something in the send queue or the chance of getting something
     while (!stop_service || comms_connected > 0 || !(txMessageQueue.empty ()))
     {
@@ -105,13 +99,13 @@ void MpiService::serviceLoop ()
     {
         // Finalize MPI
         int mpi_initialized;
-        MPI_Initialized(&mpi_initialized);
+        MPI_Initialized (&mpi_initialized);
 
         // Probably not a necessary check, a user using MPI should have also initialized it themselves
         if (mpi_initialized)
         {
             std::cout << "About to finalize MPI for rank " << commRank << std::endl;
-            MPI_Finalize();
+            MPI_Finalize ();
             std::cout << "MPI Finalized for rank " << commRank << std::endl;
         }
     }
@@ -123,10 +117,11 @@ std::string MpiService::addMpiComms (MpiComms *comm)
     comms_connected += 1;
 
     // If somehow this gets called while MPI is still initializing, wait until MPI initialization completes
-    while (startup_flag && !stop_service);
+    while (startup_flag && !stop_service)
+        ;
 
     // return the rank:tag for the MpiComms object
-    return std::to_string(commRank) + ":" + std::to_string(comms.size()-1);
+    return std::to_string (commRank) + ":" + std::to_string (comms.size () - 1);
 }
 
 void MpiService::removeMpiComms (MpiComms *comm)
@@ -149,9 +144,10 @@ std::string MpiService::getAddress (MpiComms *comm)
         if (comms[i] == comm)
         {
             // If somehow this gets called while MPI is still initializing, wait until MPI initialization completes
-            while (startup_flag && !stop_service);
+            while (startup_flag && !stop_service)
+                ;
 
-            return std::to_string(commRank) + ":" + std::to_string(i);
+            return std::to_string (commRank) + ":" + std::to_string (i);
         }
     }
 
@@ -162,11 +158,11 @@ std::string MpiService::getAddress (MpiComms *comm)
 int MpiService::getRank ()
 {
     // If somehow this gets called while MPI is still initializing, wait until MPI initialization completes
-    while (startup_flag && !stop_service);
+    while (startup_flag && !stop_service)
+        ;
 
     return commRank;
 }
-
 
 int MpiService::getTag (MpiComms *comm)
 {
@@ -181,19 +177,19 @@ int MpiService::getTag (MpiComms *comm)
     return -1;
 }
 
-bool MpiService::initMPI()
+bool MpiService::initMPI ()
 {
     // Initialize MPI with MPI_THREAD_FUNNELED
     int mpi_initialized;
     int mpi_thread_level;
 
-    MPI_Initialized(&mpi_initialized);
+    MPI_Initialized (&mpi_initialized);
 
     if (!mpi_initialized)
     {
-        MPI_Init_thread(nullptr, nullptr, MPI_THREAD_FUNNELED, &mpi_thread_level);
+        MPI_Init_thread (nullptr, nullptr, MPI_THREAD_FUNNELED, &mpi_thread_level);
 
-        MPI_Initialized(&mpi_initialized);
+        MPI_Initialized (&mpi_initialized);
         if (!mpi_initialized)
         {
             std::cerr << "MPI initialization failed" << std::endl;
@@ -203,7 +199,7 @@ bool MpiService::initMPI()
         helics_initialized_mpi = true;
     }
 
-    MPI_Query_thread(&mpi_thread_level);
+    MPI_Query_thread (&mpi_thread_level);
 
     if (mpi_thread_level < MPI_THREAD_FUNNELED)
     {
@@ -220,7 +216,7 @@ void MpiService::sendAndReceiveMessages ()
     // Using fixed size chunks for sending messages would allow posting blocks of irecv requests
     // If we know that a message will get received, a blocking MPI_Wait_any could be used for send requests
     // Also, a method of doing time synchronization using MPI reductions should be added
-    for (unsigned int i = 0; i < comms.size(); i++)
+    for (unsigned int i = 0; i < comms.size (); i++)
     {
         // Skip any nullptr entries
         if (comms[i] == nullptr)
@@ -247,7 +243,8 @@ void MpiService::sendAndReceiveMessages ()
 
                 // Post an asynchronous receive
                 MPI_Request req;
-                MPI_Irecv (buffer.data (), buffer.capacity (), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG, mpiCommunicator, &req);
+                MPI_Irecv (buffer.data (), buffer.capacity (), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG,
+                           mpiCommunicator, &req);
 
                 // Wait until the asynchronous receive request has finished
                 int message_received = false;
@@ -266,7 +263,6 @@ void MpiService::sendAndReceiveMessages ()
                 }
             }
         }
-
     }
 
     // Send messages from the queue
@@ -281,13 +277,15 @@ void MpiService::sendAndReceiveMessages ()
         auto sendRequestData = std::make_pair (req, msg);
 
         int addr_delim_pos = address.find (":");
-        int destRank = std::stoi (address.substr (0, addr_delim_pos));;
-        int destTag = std::stoi (address.substr (addr_delim_pos+1, address.length ()));
+        int destRank = std::stoi (address.substr (0, addr_delim_pos));
+        ;
+        int destTag = std::stoi (address.substr (addr_delim_pos + 1, address.length ()));
 
         if (destRank != commRank)
         {
             // Send the message using asynchronous send
-            MPI_Isend(sendRequestData.second.data (), sendRequestData.second.size (), MPI_CHAR, destRank, destTag, mpiCommunicator, &sendRequestData.first);
+            MPI_Isend (sendRequestData.second.data (), sendRequestData.second.size (), MPI_CHAR, destRank, destTag,
+                       mpiCommunicator, &sendRequestData.first);
             send_requests.push_back (sendRequestData);
         }
         else
@@ -296,25 +294,23 @@ void MpiService::sendAndReceiveMessages ()
             {
                 // Add the message directly to the destination rx queue (same process)
                 ActionMessage M (msg);
-                 comms[destTag]->getRxMessageQueue ().push (M);
+                comms[destTag]->getRxMessageQueue ().push (M);
             }
         }
         sendMsg = txMessageQueue.try_pop ();
     }
 
-    send_requests.remove_if (
-            [](std::pair<MPI_Request,std::vector<char>> req)
-            {
-                int send_finished;
-                MPI_Test (&req.first, &send_finished, MPI_STATUS_IGNORE);
+    send_requests.remove_if ([](std::pair<MPI_Request, std::vector<char>> req) {
+        int send_finished;
+        MPI_Test (&req.first, &send_finished, MPI_STATUS_IGNORE);
 
-                if (send_finished == 1)
-                {
-                    // Any cleanup needed here? Freeing the vector or MPI_Request?
-                }
+        if (send_finished == 1)
+        {
+            // Any cleanup needed here? Freeing the vector or MPI_Request?
+        }
 
-                return send_finished == 1;
-            });
+        return send_finished == 1;
+    });
 }
 
 void MpiService::drainRemainingMessages ()
@@ -334,11 +330,11 @@ void MpiService::drainRemainingMessages ()
             buffer.resize (recv_size);
 
             // Receive the message
-            MPI_Recv (buffer.data (), buffer.capacity (), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG, mpiCommunicator, &status);
+            MPI_Recv (buffer.data (), buffer.capacity (), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG,
+                      mpiCommunicator, &status);
         }
     }
 }
 
-} // namespace mpi
-} // namespace helics
-
+}  // namespace mpi
+}  // namespace helics

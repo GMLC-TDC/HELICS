@@ -26,9 +26,9 @@ static auto StartBrokerImp (const std::string &core_type_name, const std::string
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
-        return helicsCreateBroker (new_type.c_str(), NULL, initialization_string.c_str());
+        return helicsCreateBroker (new_type.c_str (), NULL, initialization_string.c_str ());
     }
-    return helicsCreateBroker (core_type_name.c_str(), NULL, initialization_string.c_str());
+    return helicsCreateBroker (core_type_name.c_str (), NULL, initialization_string.c_str ());
 }
 
 bool FederateTestFixture::hasIndexCode (const std::string &type_name)
@@ -54,10 +54,10 @@ auto FederateTestFixture::AddBrokerImp (const std::string &core_type_name,
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
-        return helicsCreateBroker (new_type.c_str(), NULL, initialization_string.c_str());
+        return helicsCreateBroker (new_type.c_str (), NULL, initialization_string.c_str ());
     }
 
-    return helicsCreateBroker (core_type_name.c_str(), NULL, initialization_string.c_str());
+    return helicsCreateBroker (core_type_name.c_str (), NULL, initialization_string.c_str ());
 }
 
 FederateTestFixture::~FederateTestFixture ()
@@ -68,10 +68,10 @@ FederateTestFixture::~FederateTestFixture ()
         {
             federate_state state;
             helicsFederateGetState (fed, &state);
-            helics_core core = helicsFederateGetCoreObject(fed);
+            helics_core core = helicsFederateGetCoreObject (fed);
             if (core != nullptr)
             {
-                helicsCoreDisconnect(core);
+                helicsCoreDisconnect (core);
             }
             if (state != helics_finalize_state)
             {
@@ -95,7 +95,8 @@ helics_broker FederateTestFixture::AddBroker (const std::string &core_type_name,
     return AddBroker (core_type_name, std::to_string (count));
 }
 
-helics_broker FederateTestFixture::AddBroker (const std::string &core_type_name, const std::string &initialization_string)
+helics_broker
+FederateTestFixture::AddBroker (const std::string &core_type_name, const std::string &initialization_string)
 {
     helics_broker broker;
     if (extraBrokerArgs.empty ())
@@ -106,10 +107,9 @@ helics_broker FederateTestFixture::AddBroker (const std::string &core_type_name,
     {
         broker = StartBrokerImp (core_type_name, initialization_string + " " + extraBrokerArgs);
     }
-    BOOST_CHECK(nullptr != broker);
+    BOOST_CHECK (nullptr != broker);
     auto BrokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
-    BOOST_CHECK(BrokerObj->valid == brokerValidationIdentifier);
+    BOOST_CHECK (BrokerObj->valid == brokerValidationIdentifier);
     brokers.push_back (broker);
     return broker;
 }
-

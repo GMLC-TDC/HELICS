@@ -19,10 +19,10 @@ enum action_message_flags : uint16_t
     error_flag = 4,  //!< flag indicating an error condition associated with the command
     indicator_flag = 5,  //!< flag used for setting values
     extra_flag1 = 7,  //!< extra flag
-    forwarding_coordinator =8, //!< flag indicating that a dependency is a forwarding coordinator
+    forwarding_coordinator = 8,  //!< flag indicating that a dependency is a forwarding coordinator
     clone_flag = 9,  //!< flag indicating the filter is a clone filter
-    destination_processing_flag=11, //!< flag indicating the message is for destination processing
-    broker_min_time_flag=12, //!< flag indicating that a broker the time constraint
+    destination_processing_flag = 11,  //!< flag indicating the message is for destination processing
+    broker_min_time_flag = 12,  //!< flag indicating that a broker the time constraint
 };
 /** namespace for message definitions*/
 namespace action_message_def
@@ -70,8 +70,8 @@ enum class action_t : int32_t
     cmd_time_check = 36,  //!< command to run a check on whether time can be granted
     cmd_request_current_time = 38,  //!< command to request the current time status of a federate
 
-    cmd_time_block=40,   //!< prevent a federate from granting time until the block is cleared
-    cmd_time_unblock=41,  //!< clear a time block
+    cmd_time_block = 40,  //!< prevent a federate from granting time until the block is cleared
+    cmd_time_unblock = 41,  //!< clear a time block
 
     cmd_pub = 45,  //!< publish a value
     cmd_bye = 2000,  //!< message stating this is the last communication from a federate
@@ -81,7 +81,7 @@ enum class action_t : int32_t
     cmd_invalid = 1010101,  //!< indicates that command has generated an invalid state
     cmd_send_route = 75,  //!< command to define a route information
     cmd_subscriber = 85,  // !< command to send a subscriber
-    cmd_search_dependency=134, //!< command to add a dependency by name
+    cmd_search_dependency = 134,  //!< command to add a dependency by name
     cmd_add_dependency = 140,  //!< command to send a federate dependency information
     cmd_remove_dependency = 141,  //!< command to remove a dependency
     cmd_add_dependent = 144,  //!< command to add a dependent to a federate
@@ -92,7 +92,7 @@ enum class action_t : int32_t
     cmd_fed_configure = 205,  //!< command to update the configuration of a federate
     cmd_core_configure = 207,  //!< command to update the configuration of a core
 
-    cmd_update_filter_op= 10427,  //!< command to update a filter op [should only used internal to a core]
+    cmd_update_filter_op = 10427,  //!< command to update a filter op [should only used internal to a core]
     null_info_command = cmd_info_basis - 1,  //!< biggest command that doesn't have the info structure
     /** the biggest negative priority command*/
     priority_null_info_command = -cmd_info_basis - 1,
@@ -100,13 +100,15 @@ enum class action_t : int32_t
     cmd_time_request = 500,  //!< request a time or iteration
     cmd_send_message = cmd_info_basis + 20,  //!< send a message
     cmd_null_message = 726,  //!< used when a filter drops a message but it needs to return
-    cmd_null_dest_message=730, //!< used when a destination filter drops a message
+    cmd_null_dest_message = 730,  //!< used when a destination filter drops a message
     cmd_send_for_filter =
       cmd_info_basis + 30,  //!< send a message to be filtered and forward on to the destination
-    cmd_send_for_dest_filter_return = cmd_info_basis+31, //!< send a message to a destination filter for processing
+    cmd_send_for_dest_filter_return =
+      cmd_info_basis + 31,  //!< send a message to a destination filter for processing
     cmd_send_for_filter_return = cmd_info_basis + 35,  //!< send a message back to its originator after filtering
     cmd_filter_result = cmd_info_basis + 40,  //!< the results of a filter message going back to its originator
-    cmd_dest_filter_result=cmd_info_basis+41,  //!< the result of a destination filter going back to its originator
+    cmd_dest_filter_result =
+      cmd_info_basis + 41,  //!< the result of a destination filter going back to its originator
     cmd_reg_pub = cmd_info_basis + 50,  //!< register a publication
     cmd_notify_pub = 50,  //!< notify of a publication
     cmd_reg_dst_filter = cmd_info_basis + 60,  //!< register a destination filter
@@ -249,7 +251,6 @@ const char *actionMessageType (action_message_def::action_t action);
 @param errorcode The error to get the string for
 @return a pointer to string with the name
 */
-const char *commandErrorString(int errorcode);
+const char *commandErrorString (int errorcode);
 
 }  // namespace helics
-

@@ -27,8 +27,8 @@ BOOST_FIXTURE_TEST_SUITE (iteration_tests, FederateTestFixture)
 BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (execution_iteration_test)
 {
-    SetupTest<helics::ValueFederate> ("test",1);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    SetupTest<helics::ValueFederate> ("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
@@ -52,106 +52,106 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-std::pair<double,int> runInitIterations(helics::ValueFederate *vfed, int index, int total)
+std::pair<double, int> runInitIterations (helics::ValueFederate *vfed, int index, int total)
 {
     using namespace helics;
-    Publication pub(vfed, "pub", helics_type_t::helicsDouble);
-    pub.setMinimumChange(0.001);
+    Publication pub (vfed, "pub", helics_type_t::helicsDouble);
+    pub.setMinimumChange (0.001);
     std::string low_target = "fed";
-    low_target += std::to_string((index==0)?total - 1:index-1);
+    low_target += std::to_string ((index == 0) ? total - 1 : index - 1);
     low_target += "/pub";
     std::string high_target = "fed";
-    high_target += std::to_string((index == total - 1)?(0):index+1);
+    high_target += std::to_string ((index == total - 1) ? (0) : index + 1);
     high_target += "/pub";
-    Subscription sub_low(vfed, low_target);
-    Subscription sub_high(vfed, high_target);
-    sub_low.setDefault(static_cast<double>(2*index));
-    sub_high.setDefault(static_cast<double>(2 * index + 1));
-    vfed->enterInitializationState();
-    double cval = static_cast<double>(2 * index) + 0.5;
-    
+    Subscription sub_low (vfed, low_target);
+    Subscription sub_high (vfed, high_target);
+    sub_low.setDefault (static_cast<double> (2 * index));
+    sub_high.setDefault (static_cast<double> (2 * index + 1));
+    vfed->enterInitializationState ();
+    double cval = static_cast<double> (2 * index) + 0.5;
+
     auto itres = iteration_result::iterating;
     int itcount = 0;
     while (itres == iteration_result::iterating)
     {
-        pub.publish(cval);
-        itres = vfed->enterExecutionState(iteration_request::iterate_if_needed);
-        double val1 = sub_high.getValue<double>();
-        double val2 = sub_low.getValue<double>();
+        pub.publish (cval);
+        itres = vfed->enterExecutionState (iteration_request::iterate_if_needed);
+        double val1 = sub_high.getValue<double> ();
+        double val2 = sub_low.getValue<double> ();
         cval = (val1 + val2) / 2.0;
         ++itcount;
-         //   printf("[%d]<%d> (%d)=%f,(%d)=%f, curr=%f\n", itcount,index, (index == 0) ? total - 1 : index - 1,val2, (index == total - 1) ? (0) : index + 1, val1, cval);
+        //   printf("[%d]<%d> (%d)=%f,(%d)=%f, curr=%f\n", itcount,index, (index == 0) ? total - 1 : index -
+        //   1,val2, (index == total - 1) ? (0) : index + 1, val1, cval);
     }
-    return { cval,itcount };
-        
+    return {cval, itcount};
 }
 
-std::vector<std::pair<double, int>> run_iteration_round_robin(std::vector<std::shared_ptr<helics::ValueFederate>> &fedVec)
+std::vector<std::pair<double, int>>
+run_iteration_round_robin (std::vector<std::shared_ptr<helics::ValueFederate>> &fedVec)
 {
-    int N = static_cast<int>(fedVec.size());
+    int N = static_cast<int> (fedVec.size ());
     std::vector<std::future<std::pair<double, int>>> futures;
-    for (decltype(N) ii = 0; ii < N; ++ii)
+    for (decltype (N) ii = 0; ii < N; ++ii)
     {
-        auto vFed = fedVec[ii].get();
-        futures.push_back(std::async(std::launch::async, [vFed,ii,N]() {return runInitIterations(vFed, ii, N); }));
+        auto vFed = fedVec[ii].get ();
+        futures.push_back (
+          std::async (std::launch::async, [vFed, ii, N]() { return runInitIterations (vFed, ii, N); }));
     }
-    std::vector<std::pair<double, int>> results(N);
-    for (decltype(N) ii = 0; ii < N; ++ii)
+    std::vector<std::pair<double, int>> results (N);
+    for (decltype (N) ii = 0; ii < N; ++ii)
     {
-        results[ii] = futures[ii].get();
+        results[ii] = futures[ii].get ();
     }
     return results;
 }
 
-BOOST_TEST_DECORATOR(*utf::timeout(12))
-BOOST_DATA_TEST_CASE(execution_iteration_round_robin, bdata::make(core_types), core_type)
+BOOST_TEST_DECORATOR (*utf::timeout (12))
+BOOST_DATA_TEST_CASE (execution_iteration_round_robin, bdata::make (core_types), core_type)
 {
-    SetupTest<helics::ValueFederate>(core_type, 3);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0).get();
-   auto vFed2 = GetFederateAs<helics::ValueFederate>(1).get();
-   auto vFed3 = GetFederateAs<helics::ValueFederate>(2).get();
-   auto fut1 = std::async(std::launch::async, [vFed1]() {return runInitIterations(vFed1, 0, 3); });
-       auto fut2 = std::async(std::launch::async, [vFed2]() {return runInitIterations(vFed2, 1, 3); });
+    SetupTest<helics::ValueFederate> (core_type, 3);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0).get ();
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1).get ();
+    auto vFed3 = GetFederateAs<helics::ValueFederate> (2).get ();
+    auto fut1 = std::async (std::launch::async, [vFed1]() { return runInitIterations (vFed1, 0, 3); });
+    auto fut2 = std::async (std::launch::async, [vFed2]() { return runInitIterations (vFed2, 1, 3); });
 
-       auto res3 = runInitIterations(vFed3, 2, 3);
-       auto res2=fut2.get();
-       auto res1 = fut1.get();
-       BOOST_CHECK_CLOSE(res3.first, 2.5, 0.1);
-       BOOST_CHECK_CLOSE(res2.first, 2.5, 0.1);
-       BOOST_CHECK_CLOSE(res1.first, 2.5, 0.1);
+    auto res3 = runInitIterations (vFed3, 2, 3);
+    auto res2 = fut2.get ();
+    auto res1 = fut1.get ();
+    BOOST_CHECK_CLOSE (res3.first, 2.5, 0.1);
+    BOOST_CHECK_CLOSE (res2.first, 2.5, 0.1);
+    BOOST_CHECK_CLOSE (res1.first, 2.5, 0.1);
 }
 
-BOOST_AUTO_TEST_CASE(execution_iteration_loop3)
+BOOST_AUTO_TEST_CASE (execution_iteration_loop3)
 {
     int N = 5;
-    SetupTest<helics::ValueFederate>("test", N);
-    std::vector<std::shared_ptr<helics::ValueFederate>> vfeds(N);
+    SetupTest<helics::ValueFederate> ("test", N);
+    std::vector<std::shared_ptr<helics::ValueFederate>> vfeds (N);
     for (int ii = 0; ii < N; ++ii)
     {
-        vfeds[ii]= GetFederateAs<helics::ValueFederate>(ii);
+        vfeds[ii] = GetFederateAs<helics::ValueFederate> (ii);
     }
-    auto results = run_iteration_round_robin(vfeds);
+    auto results = run_iteration_round_robin (vfeds);
     for (int ii = 1; ii < N; ++ii)
     {
         if (results[ii].second < 50)
         {
-            BOOST_CHECK_CLOSE(results[ii].first, results[0].first, 0.1);
+            BOOST_CHECK_CLOSE (results[ii].first, results[0].first, 0.1);
         }
-        
     }
 }
 
 BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 {
-    SetupTest<helics::ValueFederate>("test", 2,1.0);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> ("test", 2, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
     auto subid = vFed2->registerRequiredSubscription<double> ("pub1");
-
 
     vFed1->enterInitializationStateAsync ();
     vFed2->enterInitializationState ();
@@ -178,8 +178,8 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (time_iteration_test)
 {
-    SetupTest<helics::ValueFederate>("test", 1);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    SetupTest<helics::ValueFederate> ("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
@@ -205,13 +205,12 @@ BOOST_AUTO_TEST_CASE (time_iteration_test)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-
 BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
 {
-    SetupTest<helics::ValueFederate>("test", 2, 1.0);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> ("test", 2, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
@@ -243,13 +242,12 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-
 BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
 {
-    SetupTest<helics::ValueFederate>("test", 2, 1.0);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> ("test", 2, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     // register the publications
     auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsDouble);
 
@@ -285,13 +283,12 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-
 BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (test_iteration_counter)
 {
-    SetupTest<helics::ValueFederate>("test", 2, 1.0);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> ("test", 2, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     // register the publications
     auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsInt);
 
@@ -352,4 +349,3 @@ BOOST_AUTO_TEST_CASE (test_iteration_counter)
     }
 }
 BOOST_AUTO_TEST_SUITE_END ()
-

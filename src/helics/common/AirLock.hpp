@@ -17,27 +17,28 @@ http://www.domaigne.com/blog/computing/condvars-signal-with-mutex-locked-or-not/
 will check performance at a later time
 */
 /** class implementing a airlock
-@details this class is used to transfer an object from a thread safe context to a single thread so it can be accessed without locks
+@details this class is used to transfer an object from a thread safe context to a single thread so it can be
+accessed without locks
 */
 template <typename T>
 class AirLock
 {
-public:
+  public:
     /** default constructor */
-    AirLock() = default;
+    AirLock () = default;
     /** destructor*/
-    ~AirLock() = default;
+    ~AirLock () = default;
     /** try to load the airlock
     @return true if successful, false if not*/
     template <class Z>
-    bool try_load(Z &&val)
+    bool try_load (Z &&val)
     {
         if (!loaded)
         {
-            std::lock_guard<std::mutex> lock(door);
+            std::lock_guard<std::mutex> lock (door);
             if (!loaded)
             {
-                data = std::forward<Z>(val);
+                data = std::forward<Z> (val);
                 loaded = true;
                 return true;
             }
@@ -48,39 +49,38 @@ public:
     @details the call will block until the airlock is ready to be loaded
     */
     template <class Z>
-    void load(Z &&val)
+    void load (Z &&val)
     {
-        std::unique_lock<std::mutex> lock(door);
+        std::unique_lock<std::mutex> lock (door);
         if (!loaded)
         {
-            data = std::forward<Z>(val);
+            data = std::forward<Z> (val);
             loaded = true;
         }
         else
         {
             while (loaded)
             {
-                condition.wait(lock);
+                condition.wait (lock);
             }
-            data = std::forward<Z>(val);
+            data = std::forward<Z> (val);
             loaded = true;
         }
-
     }
 
     /** unload the airlock,
     @return the value is returned in an optional which needs to be checked if it contains a value
     */
-    stx::optional<T> try_unload()
+    stx::optional<T> try_unload ()
     {
         if (loaded)
         {
-            std::lock_guard<std::mutex> lock(door);
+            std::lock_guard<std::mutex> lock (door);
             if (loaded)
             {
-                stx::optional<T> val{ std::move(data) };
+                stx::optional<T> val{std::move (data)};
                 loaded = false;
-                condition.notify_one();
+                condition.notify_one ();
                 return val;
             }
         }
@@ -90,12 +90,11 @@ public:
     @details this may or may  not mean anything depending on usage
     it is correct but may be incorrect immediately after the call
     */
-    bool isLoaded() const { return loaded; }
-private:
-    std::atomic_bool loaded{ false }; //!< flag if the airlock is loaded with cargo
-    std::mutex door; //!<check if one of the doors to the airlock is open
-    T data; //!< the data to be stored in the airlock
+    bool isLoaded () const { return loaded; }
+
+  private:
+    std::atomic_bool loaded{false};  //!< flag if the airlock is loaded with cargo
+    std::mutex door;  //!< check if one of the doors to the airlock is open
+    T data;  //!< the data to be stored in the airlock
     std::condition_variable condition;  //!< condition variable for notification of new data
-
 };
-

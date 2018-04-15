@@ -31,7 +31,7 @@ class EndpointInfo
     const std::string key;  //!< name of the endpoint
     const std::string type;  //!< type of the endpoint
   private:
-      shared_guarded<std::deque<std::unique_ptr<Message>>> message_queue;  //!< storage for the messages
+    shared_guarded<std::deque<std::unique_ptr<Message>>> message_queue;  //!< storage for the messages
   public:
     bool hasFilter = false;  //!< indicator that the message has a filter
     /** get the next message up to the specified time*/
@@ -44,4 +44,3 @@ class EndpointInfo
     Time firstMessageTime () const;
 };
 }  // namespace helics
-

@@ -13,7 +13,6 @@ namespace helics
 {
 class ActionMessage;
 
-
 /** data class containing information about inter-federate dependencies*/
 class DependencyInfo
 {
@@ -28,7 +27,7 @@ class DependencyInfo
         time_requested_iterative = 4,
         time_requested = 5,
     };
-    
+
     Core::federate_id_t fedID = invalid_fed_id;  //!< identifier for the dependency
     Core::federate_id_t minFed = invalid_fed_id;  //!< identifier for the min dependency
     time_state_t time_state = time_state_t::initialized;  //!< the current state of the dependency
@@ -67,7 +66,7 @@ class TimeDependencies
     /** update the info about a dependency based on a message*/
     bool updateTime (const ActionMessage &m);
     /** get the number of dependencies*/
-    auto size() const { return dependencies.size(); }
+    auto size () const { return dependencies.size (); }
     /** iterator to first dependency*/
     auto begin () { return dependencies.begin (); }
     /** iterator to end point*/
@@ -85,7 +84,7 @@ class TimeDependencies
     const DependencyInfo *getDependencyInfo (Core::federate_id_t id) const;
 
     /** get a pointer to the dependency information for a particular object*/
-    DependencyInfo *getDependencyInfo(Core::federate_id_t id);
+    DependencyInfo *getDependencyInfo (Core::federate_id_t id);
 
     /** check if the dependencies would allow entry to exec mode*/
     bool checkIfReadyForExecEntry (bool iterating) const;
@@ -102,7 +101,6 @@ class TimeDependencies
     void resetIteratingTimeRequests (Time requestTime);
 
     /** check if there are active dependencies*/
-    bool hasActiveTimeDependencies() const;
+    bool hasActiveTimeDependencies () const;
 };
 }  // namespace helics
-

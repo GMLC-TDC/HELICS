@@ -8,4 +8,3 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 BOOST_AUTO_TEST_SUITE (multi_tests)
 
 BOOST_AUTO_TEST_SUITE_END ()
-

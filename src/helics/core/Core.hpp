@@ -131,7 +131,7 @@ class Core
     /** set the core to ready to enter init
     @details this function only needs to be called for cores that don't have any federates but may
     have filters for cores with federates it won't do anything*/
-    virtual void setCoreReadyToInit() = 0;
+    virtual void setCoreReadyToInit () = 0;
 
     /**
      * Change the federate state to the Executing state.
@@ -447,10 +447,10 @@ class Core
     @param type_out the output type of the filter (may be left blank if the filter doesn't change type)
     @return the handle for the new filter
     */
-    virtual handle_id_t registerCloningSourceFilter(const std::string &filterName,
-        const std::string &source,
-        const std::string &type_in,
-        const std::string &type_out) = 0;
+    virtual handle_id_t registerCloningSourceFilter (const std::string &filterName,
+                                                     const std::string &source,
+                                                     const std::string &type_in,
+                                                     const std::string &type_out) = 0;
     /**
     * Register a cloning destination filter.
     @details a destination filter will create an additional processing step of messages before they get to a
@@ -463,10 +463,10 @@ class Core
     warning if it doesn't match with the input type of the target endpoint
     @return the handle for the new filter
     */
-    virtual handle_id_t registerCloningDestinationFilter(const std::string &filterName,
-        const std::string &dest,
-        const std::string &type_in,
-        const std::string &type_out) = 0;
+    virtual handle_id_t registerCloningDestinationFilter (const std::string &filterName,
+                                                          const std::string &dest,
+                                                          const std::string &type_in,
+                                                          const std::string &type_out) = 0;
 
     /**
      * Register source filter.
@@ -653,4 +653,3 @@ constexpr Core::handle_id_t direct_send_handle =
   -1'745'234;  //!< this special handle can be used to directly send a message in a core
 
 }  // namespace helics
-

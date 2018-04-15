@@ -1,22 +1,20 @@
 #include "helics/helics-config.h"
 
+#include "../common/argParser.h"
 #include "BrokerFactory.hpp"
 #include "CoreBroker.hpp"
 #include "helicsVersion.hpp"
 #include <fstream>
 #include <iostream>
-#include "../common/argParser.h"
-
 
 static const helics::ArgDescriptors InfoArgs{
-    {"name,n", "name of the broker"},
-    {"type,t",  "type of the broker (\"(zmq)\", \"ipc\", \"test\", \"mpi\", \"test\", \"tcp\", \"udp\")"}
-};
+  {"name,n", "name of the broker"},
+  {"type,t", "type of the broker (\"(zmq)\", \"ipc\", \"test\", \"mpi\", \"test\", \"tcp\", \"udp\")"}};
 
 int main (int argc, char *argv[])
 {
     helics::variable_map vm;
-    auto exit_early = helics::argumentParser (argc, argv, vm,InfoArgs);
+    auto exit_early = helics::argumentParser (argc, argv, vm, InfoArgs);
 
     if (exit_early != 0)
     {
@@ -44,7 +42,7 @@ int main (int argc, char *argv[])
         std::cerr << "Unable to generate broker: " << ie.what () << '\n';
         return (-2);
     }
-    auto broker = helics::BrokerFactory::create (type,name, argc, argv);
+    auto broker = helics::BrokerFactory::create (type, name, argc, argv);
     if (broker->isConnected ())
     {
         do  // sleep until the broker finishes
@@ -65,4 +63,3 @@ int main (int argc, char *argv[])
     }
     return 0;
 }
-

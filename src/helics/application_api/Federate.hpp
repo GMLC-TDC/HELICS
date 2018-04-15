@@ -13,10 +13,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../flag-definitions.h"
 
 #include <atomic>
-#include <memory>
-#include <stdexcept>
 #include <functional>
+#include <memory>
 #include <mutex>
+#include <stdexcept>
 
 /**
  * HELICS Application API
@@ -37,7 +37,7 @@ class FederateInfo : public CoreFederateInfo
     bool rollback = false;  //!< indicator that the federate has rollback features
     bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must
                                   //! support rollback at least in a limited sense if set to true]
-    char separator = '/';   //!< separator for global name of localFederates
+    char separator = '/';  //!< separator for global name of localFederates
     core_type coreType;  //!< the type of the core
     std::string coreName;  //!< the name of the core
     std::string coreInitString;  //!< an initialization string for the core API object
@@ -65,8 +65,8 @@ class FederateInfo : public CoreFederateInfo
 FederateInfo loadFederateInfo (const std::string &jsonString);
 
 /** generate a FederateInfo object from a JSON file
-*/
-FederateInfo loadFederateInfo(const std::string &name, const std::string &jsonString);
+ */
+FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonString);
 
 class Core;
 
@@ -79,15 +79,15 @@ class Federate
     enum class op_states : char
     {
         startup = 0,  //!< when created the federate is in startup state
-        initialization=1,  //!< entered after the enterInitializationState call has returned
-        execution=2,  //!< entered after the enterExectuationState call has returned
-        finalize=3,  //!< the federate has finished executing normally final values may be retrieved
-        error=4,  //!< error state no core communication is possible but values can be retrieved
+        initialization = 1,  //!< entered after the enterInitializationState call has returned
+        execution = 2,  //!< entered after the enterExectuationState call has returned
+        finalize = 3,  //!< the federate has finished executing normally final values may be retrieved
+        error = 4,  //!< error state no core communication is possible but values can be retrieved
         // the following states are for asynchronous operations
-        pending_init=5,  //!< indicator that the federate is pending entry to initialization state
-        pending_exec=6,  //!< state pending EnterExecution State
-        pending_time=7,  //!< state that the federate is pending a timeRequest
-        pending_iterative_time=8  //!< state that the federate is pending an iterative time request
+        pending_init = 5,  //!< indicator that the federate is pending entry to initialization state
+        pending_exec = 6,  //!< state pending EnterExecution State
+        pending_time = 7,  //!< state that the federate is pending a timeRequest
+        pending_iterative_time = 8  //!< state that the federate is pending an iterative time request
     };
 
   protected:
@@ -101,7 +101,7 @@ class Federate
     Time currentTime;  //!< the current simulation time
     FederateInfo FedInfo;  //!< the information structure that contains the data on the federate
   private:
-      mutable std::mutex asyncLock;  //!< mutex protecting asyncCallInfo
+    mutable std::mutex asyncLock;  //!< mutex protecting asyncCallInfo
     std::unique_ptr<AsyncFedCallInfo> asyncCallInfo;  //!< pointer to a class defining the async call information
     std::vector<std::shared_ptr<Filter>>
       localFilters;  //!< vector of filters created through the register interfaces function
@@ -113,7 +113,7 @@ class Federate
     /**constructor taking a federate information structure
     @param[in] fi  a federate information structure
     */
-    Federate(const std::string &name, const FederateInfo &fi);
+    Federate (const std::string &name, const FederateInfo &fi);
     /**constructor taking a core and a federate information structure
     @param core a shared pointer to a core object, the pointer will be copied
     @param[in] fi  a federate information structure
@@ -127,7 +127,7 @@ class Federate
     @param[in] name the name of the federate
     @param[in] jsonString can be either a JSON file or a string containing JSON code
     */
-    Federate(const std::string &name, const std::string &jsonString);
+    Federate (const std::string &name, const std::string &jsonString);
     /**default constructor*/
     Federate () noexcept;
     Federate (Federate &&fed) noexcept;
@@ -158,8 +158,7 @@ class Federate
     @details call will block until all federates have entered this mode
     @param iterate an optional flag indicating the desired iteration mode
     */
-    iteration_result
-    enterExecutionState (iteration_request iterate = iteration_request::no_iterations);
+    iteration_result enterExecutionState (iteration_request iterate = iteration_request::no_iterations);
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
@@ -259,7 +258,7 @@ class Federate
     /**  set the maximum number of local iterations
     @param maxIterations the maximum number of allowed iterations before helics forces a return
     */
-    void setMaxIterations(int maxIterations);
+    void setMaxIterations (int maxIterations);
 
     /** define a logging function to use for logging message and notices from the federation and individual
     federate
@@ -267,8 +266,8 @@ class Federate
     it takes 3 inputs an integer for logLevel 0-4+  0 -error, 1- warning 2-status, 3-debug 44trace
     A string indicating the source of the message and another string with the actual message
     */
-    void setLoggingCallback(
-        const std::function<void(int, const std::string &, const std::string &)> &logFunction);
+    void
+    setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of
@@ -353,20 +352,20 @@ class Federate
     @param[in] the name of the endpoint
     @param[in] the inputType which the source filter can receive
     */
-    filter_id_t registerCloningSourceFilter(const std::string &filterName,
-        const std::string &sourceEndpoint,
-        const std::string &inputType = std::string(),
-        const std::string &outputType = std::string());
+    filter_id_t registerCloningSourceFilter (const std::string &filterName,
+                                             const std::string &sourceEndpoint,
+                                             const std::string &inputType = std::string (),
+                                             const std::string &outputType = std::string ());
     /** define a cloning filter interface for a destination
     @details a destination filter will be sent any packets that are going to a particular destination
     multiple filters are not allowed to specify the same destination
     @param[in] the name of the destination endpoint
     @param[in] the inputType which the destination filter can receive
     */
-    filter_id_t registerCloningDestinationFilter(const std::string &filterName,
-        const std::string &destEndpoint,
-        const std::string &inputType = std::string(),
-        const std::string &outputType = std::string());
+    filter_id_t registerCloningDestinationFilter (const std::string &filterName,
+                                                  const std::string &destEndpoint,
+                                                  const std::string &inputType = std::string (),
+                                                  const std::string &outputType = std::string ());
     /** define a filter interface on a source
     @details a source filter will be sent any packets that come from a particular source
     if multiple filters are defined on the same source, they will be placed in some order defined by the core
@@ -393,9 +392,9 @@ class Federate
     @param[in] the name of the endpoint
     @param[in] the inputType which the source filter can receive
     */
-    filter_id_t registerCloningSourceFilter(const std::string &sourceEndpoint)
+    filter_id_t registerCloningSourceFilter (const std::string &sourceEndpoint)
     {
-        return registerCloningSourceFilter(std::string(), sourceEndpoint, std::string(), std::string());
+        return registerCloningSourceFilter (std::string (), sourceEndpoint, std::string (), std::string ());
     }
     /** define a cloning filter interface for a destination
     @details a destination filter will be sent any packets that are going to a particular destination
@@ -403,9 +402,9 @@ class Federate
     @param[in] the name of the destination endpoint
     @param[in] the inputType which the destination filter can receive
     */
-    filter_id_t registerCloningDestinationFilter(const std::string &destEndpoint)
+    filter_id_t registerCloningDestinationFilter (const std::string &destEndpoint)
     {
-        return registerCloningDestinationFilter(std::string(), destEndpoint, std::string(), std::string());
+        return registerCloningDestinationFilter (std::string (), destEndpoint, std::string (), std::string ());
     }
     /** get the name of a filter
     @param[in] id the filter to query
@@ -505,4 +504,3 @@ class Federate
 yet*/
 void cleanupHelicsLibrary ();
 }  // namespace helics
-

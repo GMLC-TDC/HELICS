@@ -95,27 +95,22 @@ BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
     BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::error);
 }
 
-
-BOOST_AUTO_TEST_CASE(federate_bad_broker_error_zmq)
+BOOST_AUTO_TEST_CASE (federate_bad_broker_error_zmq)
 {
-
-    helics::FederateInfo fi("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = helics::core_type::ZMQ;
     fi.coreInitString = "1 --broker=b1 --tick=100 --timeout=2000";
 
-
-    BOOST_CHECK_THROW(std::make_shared<helics::Federate>(fi), helics::RegistrationFailure);
+    BOOST_CHECK_THROW (std::make_shared<helics::Federate> (fi), helics::RegistrationFailure);
 }
 
-BOOST_AUTO_TEST_CASE(federate_timeout_error_zmq)
+BOOST_AUTO_TEST_CASE (federate_timeout_error_zmq)
 {
-
-    helics::FederateInfo fi("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = helics::core_type::ZMQ;
     fi.coreInitString = "1 --tick=100 --timeout=2000";
 
-
-    BOOST_CHECK_THROW(std::make_shared<helics::Federate>(fi), helics::RegistrationFailure);
+    BOOST_CHECK_THROW (std::make_shared<helics::Federate> (fi), helics::RegistrationFailure);
 }
 #endif
 
@@ -275,4 +270,3 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls)
     Fed2->finalize ();
 }
 BOOST_AUTO_TEST_SUITE_END ()
-
