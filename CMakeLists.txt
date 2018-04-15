@@ -1,11 +1,7 @@
 ##############################################################################
-#Copyright (C) 2017-2018, Battelle Memorial Institute
-#All rights reserved.
-
-#This software was co-developed by Pacific Northwest National Laboratory, 
-#operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory,
-#operated by the Alliance for Sustainable Energy, LLC; 
-#and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+#Copyright © 2017-2018,
+#Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+#All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 
 cmake_minimum_required (VERSION 3.4)
@@ -17,9 +13,9 @@ project (HELICS)
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
 set (HELICS_VERSION_PATCH 0)
-set (HELICS_VERSION_BUILD beta.2)
-set (HELICS_DATE "03-20-18")
-set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}-${HELICS_VERSION_BUILD}")
+set (HELICS_VERSION_BUILD 0)
+set (HELICS_DATE "04-15-18")
+set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}")
 set (HELICS_VERSION_STRING "${HELICS_VERSION} ${HELICS_DATE}")
 
 #-----------------------------------------------------------------------------
@@ -27,9 +23,12 @@ set (HELICS_VERSION_STRING "${HELICS_VERSION} ${HELICS_DATE}")
 #-----------------------------------------------------------------------------
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 	 if (WIN32)
-		if (MSVC)
+		if (MSYS)
+			set (CMAKE_INSTALL_PREFIX "/usr/local/helics_${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}/" CACHE PATH "default install path" FORCE )
+		else(MSYS)
 			set (CMAKE_INSTALL_PREFIX "C:/local/helics_${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}/" CACHE PATH "default install path" FORCE )
-		endif(MSVC)
+		endif(MSYS)
+		
 	endif(WIN32)
 endif()
 
@@ -45,7 +44,7 @@ OPTION(BUILD_HELICS_EXAMPLES "Enable the example Executables to be built" ON)
 
 OPTION(BUILD_PYTHON_INTERFACE "Build Python extension" OFF)
 OPTION(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF)
-OPTION(BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF)
+OPTION(BUILD_OCTAVE_INTERFACE "Build Octave extension (very experimental)" OFF)
 OPTION(BUILD_JAVA_INTERFACE "Build Java extension" OFF)
 
 OPTION(DISABLE_SWIG "Disable the use of swig to generate interface code and use repo code" OFF)
@@ -173,7 +172,7 @@ add_library(helics-static STATIC
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
-message(STATUS "setting version option to \"${VERSION_OPTION}\"")
+message(STATUS "setting version build options to \"${VERSION_OPTION}\"")
 IF (VERSION_OPTION)
 	IF (MSVC)
 		target_compile_options(helics-static PUBLIC ${VERSION_OPTION})
@@ -534,9 +533,9 @@ set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
  set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION "additional language interfaces for HELICS")
  
  set(CPACK_COMPONENT_LIBS_DEPENDS headers)
- SET(CPACK_COMPONENT_RUNTIME_REQUIRED ON)
+ set(CPACK_COMPONENT_RUNTIME_REQUIRED ON)
  
- set(CPACK_PACKAGE_EXECUTABLES "helics_broker" "Helics Broker")
+ set(CPACK_PACKAGE_EXECUTABLES "helics_broker" "Helics Broker" "helics_app" "Helics app executable")
  if (WIN32)
 	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico")
 	set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")

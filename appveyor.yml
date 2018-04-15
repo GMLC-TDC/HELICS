@@ -1,6 +1,6 @@
 shallow_clone: true
 
-version: 1.0.0-beta.2.{build}
+version: 1.0.0.{build}
 
 image: Visual Studio 2015
 
@@ -45,7 +45,7 @@ test_script:
   # 6 = shared_library tests
   # 7 = helics-apps tests
   - ctest -C Release --verbose --timeout 120 -I 0,0,0,1
-  - ctest -C Release --verbose --timeout 90 -I 0,0,0,2
+  - ctest -C Release --verbose --timeout 120 -I 0,0,0,2
   - ctest -C Release --verbose --timeout 240 -I 0,0,0,4
   - ctest -C Release --verbose --timeout 120 -I 0,0,0,8
   - ctest --verbose -L Java
