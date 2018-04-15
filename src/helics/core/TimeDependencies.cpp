@@ -124,10 +124,21 @@ bool TimeDependencies::isDependency (Core::federate_id_t ofed) const
     return (res->fedID == ofed);
 }
 
-DependencyInfo *TimeDependencies::getDependencyInfo (Core::federate_id_t ofed)
+const DependencyInfo *TimeDependencies::getDependencyInfo (Core::federate_id_t ofed) const
 {
-    auto res = std::lower_bound (dependencies.begin (), dependencies.end (), ofed, dependencyCompare);
-    if ((res == dependencies.end ()) || (res->fedID != ofed))
+    auto res = std::lower_bound (dependencies.cbegin (), dependencies.cend (), ofed, dependencyCompare);
+    if ((res == dependencies.cend ()) || (res->fedID != ofed))
+    {
+        return nullptr;
+    }
+
+    return &(*res);
+}
+
+DependencyInfo *TimeDependencies::getDependencyInfo(Core::federate_id_t ofed)
+{
+    auto res = std::lower_bound(dependencies.begin(), dependencies.end(), ofed, dependencyCompare);
+    if ((res == dependencies.end()) || (res->fedID != ofed))
     {
         return nullptr;
     }

@@ -82,7 +82,10 @@ class TimeDependencies
     auto cend () const { return dependencies.cend (); }
 
     /** get a pointer to the dependency information for a particular object*/
-    DependencyInfo *getDependencyInfo (Core::federate_id_t id);
+    const DependencyInfo *getDependencyInfo (Core::federate_id_t id) const;
+
+    /** get a pointer to the dependency information for a particular object*/
+    DependencyInfo *getDependencyInfo(Core::federate_id_t id);
 
     /** check if the dependencies would allow entry to exec mode*/
     bool checkIfReadyForExecEntry (bool iterating) const;

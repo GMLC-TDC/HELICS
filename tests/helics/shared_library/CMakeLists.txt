@@ -61,17 +61,10 @@ IF (VERSION_OPTION)
 	ENDIF (MSVC)
 ENDIF(VERSION_OPTION)
 
-target_link_libraries(shared-library-tests helicsSharedLib)
-target_link_libraries(shared-library-tests-cpp helicsSharedLib)
+target_link_libraries(shared-library-tests helicsSharedLib ${Boost_LIBRARIES_core} ${Boost_LIBRARIES_test})
+target_link_libraries(shared-library-tests-cpp helicsSharedLib ${Boost_LIBRARIES_core} ${Boost_LIBRARIES_test})
 
-target_link_libraries(shared-library-tests ${Boost_LIBRARIES_core})
-target_link_libraries(shared-library-tests ${Boost_LIBRARIES_test})
-target_link_libraries(shared-library-tests-cpp ${Boost_LIBRARIES_core})
-target_link_libraries(shared-library-tests-cpp ${Boost_LIBRARIES_test})
-
-set_target_properties (shared-library-tests PROPERTIES FOLDER tests)
-
-set_target_properties (shared-library-tests-cpp PROPERTIES FOLDER tests)
+set_target_properties (shared-library-tests shared-library-tests-cpp PROPERTIES FOLDER tests)
 
 target_compile_definitions(shared-library-tests PRIVATE "-DHELICS_BROKER_LOCATION=\"${HELICS_BROKER_LOC}\"")
 target_compile_definitions(shared-library-tests PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\"")
