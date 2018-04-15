@@ -614,17 +614,6 @@ helics_status helicsFederateSetLoggingLevel (helics_federate fed, int loggingLev
     return helics_ok;
 }
 
-helics_status helicsFederateSetMaxIterations(helics_federate fed, int maxIterations)
-{
-    auto fedObj = getFed(fed);
-    if (fedObj == nullptr)
-    {
-        return helics_invalid_object;
-    }
-    fedObj->setMaxIterations(maxIterations);
-    return helics_ok;
-}
-
 /** get the current time of the federate
 @param fed the federate object to query
 @param[out] time storage location for the time variable

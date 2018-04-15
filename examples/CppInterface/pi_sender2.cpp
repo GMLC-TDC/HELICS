@@ -24,8 +24,8 @@ int main(int /*argc*/,char ** /*argv*/)
   std::string    initstring="2 --name=mainbroker";
   std::string    fedinitstring="--federates=1";
   double         deltat=0.01;
-  helics::Publication pub;
- helics::Subscription sub;
+  helics_publication pub;
+  helics_subscription sub;
 
   std::string helicsversion = helics::getHelicsVersionString();
 
@@ -71,11 +71,11 @@ int main(int /*argc*/,char ** /*argv*/)
   /* Register the subscription */
 
   /* Enter initialization state */
-  vfed->enterInitializationMode(); // can throw helics::InvalidStateTransition exception
+  vfed->enterInitializationState(); // can throw helics::InvalidStateTransition exception
   printf("PI SENDER: Entered initialization state\n");
 
   /* Enter execution state */
-  vfed->enterExecutionMode(); // can throw helics::InvalidStateTransition exception
+  vfed->enterExecutionState(); // can throw helics::InvalidStateTransition exception
   printf("PI SENDER: Entered execution state\n");
 
   /* This federate will be publishing deltat*pi for numsteps steps */
@@ -87,16 +87,16 @@ int main(int /*argc*/,char ** /*argv*/)
     double value = currenttime*pi;
 
     printf("PI SENDER: Sending value %3.2f*pi = %4.3f at time %3.2f to PI RECEIVER\n",currenttime,value,currenttime);
-    pub.publish( value); /* Note: the receiver will get this at currenttime+deltat */
+    vfed->publish(pub, value); /* Note: the receiver will get this at currenttime+deltat */
 
     int isupdated = 0;
     while(!isupdated) {
       currenttime = vfed->requestTime(currenttime);
-      isupdated = sub.isUpdated();
+      isupdated = vfed->isUpdated(sub);
     }
 
     /* NOTE: The value sent by sender at time t is received by receiver at time t+deltat */
-    value = sub.getDouble(); /* Note: The receiver sent this at currenttime-deltat */
+    value = vfed->getDouble(sub); /* Note: The receiver sent this at currenttime-deltat */
     printf("PI SENDER: Received value = %4.3f at time %3.2f from PI RECEIVER\n",value,currenttime);
   }
 

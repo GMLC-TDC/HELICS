@@ -256,10 +256,6 @@ class Federate
     @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
     */
     void setLoggingLevel (int loggingLevel);
-    /**  set the maximum number of local iterations
-    @param maxIterations the maximum number of allowed iterations before helics forces a return
-    */
-    void setMaxIterations(int maxIterations);
 
     /** define a logging function to use for logging message and notices from the federation and individual
     federate

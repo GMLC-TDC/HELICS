@@ -164,6 +164,7 @@ class Federate
     }
 
     void enterInitializationMode ()
+    void enterInitializationState ()
     {
         if (helics_ok != helicsFederateEnterInitializationMode (fed))
         {
@@ -171,7 +172,7 @@ class Federate
         }
     }
 
-    void enterInitializationModeAsync ()
+    void enterInitializationStateAsync ()
     {
         if (helics_ok != helicsFederateEnterInitializationModeAsync (fed))
         {
@@ -185,7 +186,7 @@ class Federate
         return helicsFederateIsAsyncOperationCompleted (fed) > 0;
     }
 
-    void enterInitializationModeComplete ()
+    void enterInitializationStateComplete ()
     {
         if (helics_ok != helicsFederateEnterInitializationModeComplete (fed))
         {
@@ -193,7 +194,7 @@ class Federate
         }
     }
 
-    helics_iteration_status enterExecutionMode (helics_iteration_request iterate = no_iteration)
+    helics_iteration_status enterExecutionState (helics_iteration_request iterate = no_iteration)
     {
         helics_iteration_status out_iterate = next_step;
         if (iterate == no_iteration)
@@ -207,7 +208,7 @@ class Federate
         return out_iterate;
     }
 
-    void enterExecutionModeAsync (helics_iteration_request iterate = no_iteration)
+    void enterExecutionStateAsync (helics_iteration_request iterate = no_iteration)
     {
         if (iterate == no_iteration)
         {
@@ -221,7 +222,7 @@ class Federate
         }
     }
 
-    helics_iteration_status enterExecutionModeComplete ()
+    helics_iteration_status enterExecutionStateComplete ()
     {
         helics_iteration_status out_iterate = next_step;
         if (exec_async_iterate)
