@@ -23,9 +23,12 @@ set (HELICS_VERSION_STRING "${HELICS_VERSION} ${HELICS_DATE}")
 #-----------------------------------------------------------------------------
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 	 if (WIN32)
-		if (MSVC)
+		if (MSYS)
+			set (CMAKE_INSTALL_PREFIX "/usr/local/helics_${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}/" CACHE PATH "default install path" FORCE )
+		else(MSYS)
 			set (CMAKE_INSTALL_PREFIX "C:/local/helics_${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}/" CACHE PATH "default install path" FORCE )
-		endif(MSVC)
+		endif(MSYS)
+		
 	endif(WIN32)
 endif()
 

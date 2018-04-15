@@ -45,7 +45,7 @@ test_script:
   # 6 = shared_library tests
   # 7 = helics-apps tests
   - ctest -C Release --verbose --timeout 120 -I 0,0,0,1
-  - ctest -C Release --verbose --timeout 90 -I 0,0,0,2
+  - ctest -C Release --verbose --timeout 120 -I 0,0,0,2
   - ctest -C Release --verbose --timeout 240 -I 0,0,0,4
   #- ctest -C Release --verbose --timeout 90 -I 0,0,0,7
   - cd ..
