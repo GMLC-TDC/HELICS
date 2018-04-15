@@ -256,15 +256,20 @@ message_t helicsEndpointGetMessage (helics_endpoint endpoint)
 
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
     endObj->lastMessage = endObj->endptr->getMessage ();
-    message_t mess{};
-    mess.data = endObj->lastMessage->data.data ();
-    mess.dest = endObj->lastMessage->dest.c_str ();
-    mess.length = endObj->lastMessage->data.size ();
-    mess.original_source = endObj->lastMessage->original_source.c_str ();
-    mess.source = endObj->lastMessage->source.c_str ();
-    mess.original_dest = endObj->lastMessage->original_dest.c_str ();
-    mess.time = static_cast<helics_time_t> (endObj->lastMessage->time);
-    return mess;
+
+    if (endObj->lastMessage)
+    {
+        message_t mess{};
+        mess.data = endObj->lastMessage->data.data ();
+        mess.dest = endObj->lastMessage->dest.c_str ();
+        mess.length = endObj->lastMessage->data.size ();
+        mess.original_source = endObj->lastMessage->original_source.c_str ();
+        mess.source = endObj->lastMessage->source.c_str ();
+        mess.original_dest = endObj->lastMessage->original_dest.c_str ();
+        mess.time = static_cast<helics_time_t> (endObj->lastMessage->time);
+        return mess;
+    }
+    return emptyMessage ();
 }
 
 message_t helicsFederateGetMessage (helics_federate fed)
@@ -280,15 +285,20 @@ message_t helicsFederateGetMessage (helics_federate fed)
         return emptyMessage ();
     }
     fedObj->lastMessage = mFed->getMessage ();
-    message_t mess{};
-    mess.data = fedObj->lastMessage->data.data ();
-    mess.dest = fedObj->lastMessage->dest.c_str ();
-    mess.length = fedObj->lastMessage->data.size ();
-    mess.original_source = fedObj->lastMessage->original_source.c_str ();
-    mess.original_dest = fedObj->lastMessage->original_dest.c_str ();
-    mess.source = fedObj->lastMessage->source.c_str ();
-    mess.time = static_cast<helics_time_t> (fedObj->lastMessage->time);
-    return mess;
+
+    if (fedObj->lastMessage)
+    {
+        message_t mess{};
+        mess.data = fedObj->lastMessage->data.data ();
+        mess.dest = fedObj->lastMessage->dest.c_str ();
+        mess.length = fedObj->lastMessage->data.size ();
+        mess.original_source = fedObj->lastMessage->original_source.c_str ();
+        mess.original_dest = fedObj->lastMessage->original_dest.c_str ();
+        mess.source = fedObj->lastMessage->source.c_str ();
+        mess.time = static_cast<helics_time_t> (fedObj->lastMessage->time);
+        return mess;
+    }
+    return emptyMessage ();
 }
 
 helics_status helicsEndpointGetType (helics_endpoint endpoint, char *outputString, int maxlen)

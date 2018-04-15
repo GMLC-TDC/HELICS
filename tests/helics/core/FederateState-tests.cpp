@@ -183,15 +183,18 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     BOOST_CHECK_EQUAL (fs->getState (), federate_state_t::HELICS_INITIALIZING);
 
     // Test returning when the finished state is entered
-    cmd.setAction (helics::CMD_STOP);
+    cmd.setAction(helics::CMD_STOP);
+    fs->addAction(cmd);
+    BOOST_CHECK_EQUAL(fs->getState(), federate_state_t::HELICS_INITIALIZING);
     auto fs_process2 = std::async (std::launch::async,
                                    [&]() { return fs->enterExecutingState (iteration_request::no_iterations); });
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state_t::HELICS_INITIALIZING);
-    fs->addAction (cmd);
+    
     fs->global_id = 0;  // if it doesn't match the id in the command, this will hang
     fs_process2.wait ();
     fs->global_id = helics::invalid_fed_id;
-    BOOST_CHECK (fs_process2.get () == iteration_result::halted);
+    auto state = fs_process2.get();
+   
+    BOOST_CHECK (state == iteration_result::halted);
     BOOST_CHECK_EQUAL (fs->getState (), federate_state_t::HELICS_FINISHED);
 
     // Return to created state

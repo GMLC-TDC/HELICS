@@ -10,6 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../shared_api_library/helics.h"
 #include "../shared_api_library/MessageFilters.h"
 #include <string>
+#include "../cpp98/Filter.hpp"
 
 namespace helics
 {
