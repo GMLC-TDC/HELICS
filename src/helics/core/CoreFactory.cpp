@@ -144,27 +144,26 @@ std::shared_ptr<Core> create (core_type type, const std::string &core_name, std:
     return core;
 }
 
-std::shared_ptr<Core> create(int argc, const char *const *argv)
+std::shared_ptr<Core> create (int argc, const char *const *argv)
 {
     core_type type = core_type::DEFAULT;
     for (int ii = 1; ii < argc; ++ii)
     {
-        if (strncmp("coretype", argv[ii], 8) == 0)
+        if (strncmp ("coretype", argv[ii], 8) == 0)
         {
-            if (strlen(argv[ii]) > 9)
+            if (strlen (argv[ii]) > 9)
             {
-                type = coreTypeFromString(&(argv[ii][9]));
+                type = coreTypeFromString (&(argv[ii][9]));
             }
             else
             {
-                type = coreTypeFromString(argv[ii + 1]);
+                type = coreTypeFromString (argv[ii + 1]);
             }
             break;
         }
     }
-    return create(type, argc, argv);
+    return create (type, argc, argv);
 }
-
 
 std::shared_ptr<Core> create (core_type type, int argc, const char *const *argv)
 {
@@ -249,12 +248,10 @@ static DelayedDestructor<CommonCore>
 
 static SearchableObjectHolder<CommonCore> searchableObjects;  //!< the object managing the searchable objects
 
-//this will trip the line when it is destroyed at global destruction time
+// this will trip the line when it is destroyed at global destruction time
 static tripwire::TripWireTrigger tripTrigger;
 
 std::shared_ptr<Core> findCore (const std::string &name) { return searchableObjects.findObject (name); }
-
-
 
 bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &ptr)
 {
@@ -332,4 +329,3 @@ void unregisterCore (const std::string &name)
 
 }  // namespace CoreFactory
 }  // namespace helics
-

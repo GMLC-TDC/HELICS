@@ -54,7 +54,6 @@ through other functions
 */
 HELICS_Export helics_filter helicsFederateRegisterCloningFilter (helics_federate fed, const char *deliveryEndpoint);
 
-
 /** create a source Filter on the specified core
 @details filters can be created through a federate or a core , linking through a federate allows
 a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
@@ -154,4 +153,3 @@ HELICS_Export helics_status helicsFilterRemoveDeliveryEndpoint (helics_filter fi
 #endif
 
 #endif /* HELICS_APISHARED_MESSAGE_FILTER_FEDERATE_FUNCTIONS_H_*/
-

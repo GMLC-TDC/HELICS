@@ -8,3 +8,5 @@ ENDIF(UNIX)
 
 get_filename_component(BUILD_DIR ${BUILD_FILE} DIRECTORY)
 configure_file(${SOURCE_DIR}/mkhelicsMEXFile.m.in ${BUILD_DIR}/mkhelicsMEXFile.m)
+
+configure_file(${SOURCE_DIR}/generatehelicsMEXFile.m.in ${BUILD_DIR}/generatehelicsMEXFile.m)

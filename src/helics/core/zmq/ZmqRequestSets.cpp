@@ -10,8 +10,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-namespace zeromq {
-ZmqRequestSets::ZmqRequestSets (): ctx(zmqContextManager::getContextPointer()) {}
+namespace zeromq
+{
+ZmqRequestSets::ZmqRequestSets () : ctx (zmqContextManager::getContextPointer ()) {}
 void ZmqRequestSets::addRoutes (int routeNumber, const std::string &routeInfo)
 {
     auto zsock = std::make_unique<zmq::socket_t> (ctx->getContext (), ZMQ_REQ);
@@ -174,6 +175,5 @@ private:
     std::queue<std::pair<int, ActionMessage>> waiting_messages;
     std::queue<ActionMessage> Responses;
     */
-} // namespace zeromq
+}  // namespace zeromq
 }  // namespace helics
-

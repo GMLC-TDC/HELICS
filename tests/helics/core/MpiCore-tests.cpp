@@ -8,9 +8,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE (MpiCore_tests)
-//BOOST_FIXTURE_TEST_SUITE (MpiCore_tests, mpiCoreTestFixture)
+// BOOST_FIXTURE_TEST_SUITE (MpiCore_tests, mpiCoreTestFixture)
 
 BOOST_AUTO_TEST_CASE (init_test) {}
 
 BOOST_AUTO_TEST_SUITE_END ()
-

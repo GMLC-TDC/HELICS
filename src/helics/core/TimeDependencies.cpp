@@ -135,10 +135,10 @@ const DependencyInfo *TimeDependencies::getDependencyInfo (Core::federate_id_t o
     return &(*res);
 }
 
-DependencyInfo *TimeDependencies::getDependencyInfo(Core::federate_id_t ofed)
+DependencyInfo *TimeDependencies::getDependencyInfo (Core::federate_id_t ofed)
 {
-    auto res = std::lower_bound(dependencies.begin(), dependencies.end(), ofed, dependencyCompare);
-    if ((res == dependencies.end()) || (res->fedID != ofed))
+    auto res = std::lower_bound (dependencies.begin (), dependencies.end (), ofed, dependencyCompare);
+    if ((res == dependencies.end ()) || (res->fedID != ofed))
     {
         return nullptr;
     }
@@ -185,15 +185,14 @@ void TimeDependencies::removeDependency (Core::federate_id_t id)
 
 bool TimeDependencies::updateTime (const ActionMessage &m)
 {
-    auto dependency_id = (m.action() != CMD_SEND_MESSAGE) ? m.source_id : m.dest_id;
+    auto dependency_id = (m.action () != CMD_SEND_MESSAGE) ? m.source_id : m.dest_id;
 
-        auto depInfo = getDependencyInfo (dependency_id);
-        if (depInfo == nullptr)
-        {
-            return false;
-        }
-        return depInfo->ProcessMessage (m);
-    
+    auto depInfo = getDependencyInfo (dependency_id);
+    if (depInfo == nullptr)
+    {
+        return false;
+    }
+    return depInfo->ProcessMessage (m);
 }
 
 bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const
@@ -206,8 +205,8 @@ bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const
     }
     else
     {
-        return std::none_of(dependencies.begin(), dependencies.end(), [](const auto &dep) {
-            return (dep.time_state <DependencyInfo::time_state_t::exec_requested);
+        return std::none_of (dependencies.begin (), dependencies.end (), [](const auto &dep) {
+            return (dep.time_state < DependencyInfo::time_state_t::exec_requested);
         });
     }
 }
@@ -218,8 +217,9 @@ constexpr Core::federate_id_t global_broker_id_shift = 0x7000'0000;
 
 bool TimeDependencies::hasActiveTimeDependencies () const
 {
-    return std::any_of(dependencies.begin(), dependencies.end(), [](const auto &dep) {
-        return (((dep.fedID >= global_federate_id_shift) && (dep.fedID < global_broker_id_shift))&& (dep.Tnext < Time::maxVal()));
+    return std::any_of (dependencies.begin (), dependencies.end (), [](const auto &dep) {
+        return (((dep.fedID >= global_federate_id_shift) && (dep.fedID < global_broker_id_shift)) &&
+                (dep.Tnext < Time::maxVal ()));
     });
 }
 

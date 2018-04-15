@@ -6,8 +6,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #pragma once
 
-#include <string>
 #include <functional>
+#include <string>
 
 namespace helics
 {
@@ -56,7 +56,7 @@ class Broker
     std::string &message) the function takes a level indicating the logging level string with the source name and a
     string with the message
     */
-    virtual void setLoggingCallback(const std::function<void(int, const std::string &, const std::string &)> &logFunction) = 0;
+    virtual void
+    setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction) = 0;
 };
 }  // namespace helics
-

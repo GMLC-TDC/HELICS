@@ -19,8 +19,8 @@ data_block &data_block::operator= (data_block &&db) noexcept
 }
 
 Message::Message (Message &&m) noexcept
-    : time (m.time), flags (m.flags),messageID(m.messageID), data (std::move (m.data)), dest (std::move (m.dest)),
-      source (std::move (m.source)), original_source (std::move (m.original_source)),
+    : time (m.time), flags (m.flags), messageID (m.messageID), data (std::move (m.data)),
+      dest (std::move (m.dest)), source (std::move (m.source)), original_source (std::move (m.original_source)),
       original_dest (std::move (m.original_dest))
 
 {
@@ -31,7 +31,7 @@ Message &Message::operator= (Message &&m) noexcept
     time = m.time;
     flags = m.flags;
     messageID = m.messageID;
-    data = std::move(m.data);
+    data = std::move (m.data);
     original_source = std::move (m.original_source);
     source = std::move (m.source);
     dest = std::move (m.dest);
@@ -41,9 +41,9 @@ Message &Message::operator= (Message &&m) noexcept
 
 void Message::swap (Message &m2) noexcept
 {
-    std::swap(time, m2.time);
-    std::swap(flags, m2.flags);
-    std::swap(messageID, m2.messageID);
+    std::swap (time, m2.time);
+    std::swap (flags, m2.flags);
+    std::swap (messageID, m2.messageID);
     original_source.swap (m2.original_source);
     source.swap (m2.source);
     dest.swap (m2.dest);
@@ -86,4 +86,3 @@ bool matchingTypes (const std::string &type1, const std::string &type2)
     return false;
 }
 }  // namespace helics
-

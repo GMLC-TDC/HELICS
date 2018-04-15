@@ -6,10 +6,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #pragma once
 
+#include <libguarded/atomic_guarded.hpp>
+#include <libguarded/guarded.hpp>
 #include <libguarded/ordered_guarded.hpp>
 #include <libguarded/shared_guarded.hpp>
-#include <libguarded/guarded.hpp>
-#include <libguarded/atomic_guarded.hpp>
 
 #include "helics/compiler-config.h"
 
@@ -47,4 +47,3 @@ template <class T>
 using ordered_guarded = libguarded::ordered_guarded<T, std::mutex>;
 #endif
 #endif
-

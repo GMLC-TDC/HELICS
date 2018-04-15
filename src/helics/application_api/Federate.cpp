@@ -25,13 +25,10 @@ void cleanupHelicsLibrary ()
     CoreFactory::cleanUpCores (200);
 }
 
-Federate::Federate(const FederateInfo &fi) : Federate(fi.name, fi)
-{
-}
+Federate::Federate (const FederateInfo &fi) : Federate (fi.name, fi) {}
 
-Federate::Federate(const std::string &name, const FederateInfo &fi) : FedInfo(fi)
+Federate::Federate (const std::string &name, const FederateInfo &fi) : FedInfo (fi)
 {
-
     if (fi.coreName.empty ())
     {
         coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
@@ -63,9 +60,9 @@ Federate::Federate(const std::string &name, const FederateInfo &fi) : FedInfo(fi
     if (!coreObject->isConnected ())
     {
         coreObject->connect ();
-        if (!coreObject->isConnected())
+        if (!coreObject->isConnected ())
         {
-            throw (RegistrationFailure("Unable to connect to broker->unable to register federate"));
+            throw (RegistrationFailure ("Unable to connect to broker->unable to register federate"));
         }
     }
 
@@ -76,8 +73,7 @@ Federate::Federate(const std::string &name, const FederateInfo &fi) : FedInfo(fi
     asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
 }
 
-Federate::Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : coreObject (core), FedInfo (fi)
+Federate::Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi) : coreObject (core), FedInfo (fi)
 {
     if (!coreObject)
     {
@@ -121,9 +117,10 @@ Federate::Federate (const std::string &jsonString) : Federate (loadFederateInfo 
     registerFilterInterfaces (jsonString);
 }
 
-Federate::Federate(const std::string &name, const std::string &jsonString) : Federate(loadFederateInfo(name,jsonString))
+Federate::Federate (const std::string &name, const std::string &jsonString)
+    : Federate (loadFederateInfo (name, jsonString))
 {
-    registerFilterInterfaces(jsonString);
+    registerFilterInterfaces (jsonString);
 }
 
 Federate::Federate () noexcept
@@ -185,7 +182,7 @@ void Federate::enterInitializationState ()
 
 void Federate::enterInitializationStateAsync ()
 {
-    std::lock_guard<std::mutex> alock(asyncLock);
+    std::lock_guard<std::mutex> alock (asyncLock);
     if (state == op_states::startup)
     {
         state = op_states::pending_init;
@@ -204,7 +201,7 @@ void Federate::enterInitializationStateAsync ()
 
 bool Federate::isAsyncOperationCompleted () const
 {
-    std::lock_guard<std::mutex> alock(asyncLock);
+    std::lock_guard<std::mutex> alock (asyncLock);
     switch (state)
     {
     case op_states::pending_init:
@@ -223,17 +220,17 @@ bool Federate::isAsyncOperationCompleted () const
 
 void Federate::enterInitializationStateComplete ()
 {
-    std::lock_guard<std::mutex> alock(asyncLock);
+    std::lock_guard<std::mutex> alock (asyncLock);
     switch (state)
     {
     case op_states::pending_init:
     {
-        asyncCallInfo->initFuture.get();
+        asyncCallInfo->initFuture.get ();
         state = op_states::initialization;
-        currentTime = coreObject->getCurrentTime(fedID);
-        startupToInitializeStateTransition();
+        currentTime = coreObject->getCurrentTime (fedID);
+        startupToInitializeStateTransition ();
     }
-        break;
+    break;
     case op_states::initialization:
         break;
     case op_states::startup:
@@ -296,7 +293,7 @@ iteration_result Federate::enterExecutionState (iteration_request iterate)
 
 void Federate::enterExecutionStateAsync (iteration_request iterate)
 {
-    std::lock_guard<std::mutex> alock(asyncLock);
+    std::lock_guard<std::mutex> alock (asyncLock);
     switch (state)
     {
     case op_states::startup:
@@ -306,7 +303,7 @@ void Federate::enterExecutionStateAsync (iteration_request iterate)
             startupToInitializeStateTransition ();
             return coreObject->enterExecutingState (fedID, iterate);
         };
-        
+
         state = op_states::pending_exec;
         asyncCallInfo->execFuture = std::async (std::launch::async, eExecFunc);
     }
@@ -334,7 +331,7 @@ void Federate::enterExecutionStateAsync (iteration_request iterate)
 
 iteration_result Federate::enterExecutionStateComplete ()
 {
-    std::lock_guard<std::mutex> alock(asyncLock);
+    std::lock_guard<std::mutex> alock (asyncLock);
     if (state != op_states::pending_exec)
     {
         throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
@@ -402,11 +399,11 @@ void Federate::setPeriod (Time period, Time offset)
 
 void Federate::setLoggingLevel (int loggingLevel) { coreObject->setLoggingLevel (fedID, loggingLevel); }
 
-void Federate::setMaxIterations(int maxIterations) { coreObject->setMaximumIterations(fedID, maxIterations); }
-void Federate::setLoggingCallback(
-    const std::function<void(int, const std::string &, const std::string &)> &logFunction)
+void Federate::setMaxIterations (int maxIterations) { coreObject->setMaximumIterations (fedID, maxIterations); }
+void Federate::setLoggingCallback (
+  const std::function<void(int, const std::string &, const std::string &)> &logFunction)
 {
-    coreObject->setLoggingCallback(fedID, logFunction);
+    coreObject->setLoggingCallback (fedID, logFunction);
 }
 
 void Federate::setFlag (int flag, bool flagValue)
@@ -467,7 +464,7 @@ void Federate::disconnect ()
     {
         coreObject->finalize (fedID);
     }
-	state = op_states::finalize;
+    state = op_states::finalize;
     coreObject = nullptr;
 }
 
@@ -541,7 +538,7 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
 
 void Federate::requestTimeAsync (Time nextInternalTimeStep)
 {
-    std::lock_guard<std::mutex> alock(asyncLock);
+    std::lock_guard<std::mutex> alock (asyncLock);
     if (state == op_states::execution)
     {
         state = op_states::pending_time;
@@ -560,7 +557,7 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 @return the granted time step*/
 void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
-    std::lock_guard<std::mutex> alock(asyncLock);
+    std::lock_guard<std::mutex> alock (asyncLock);
     if (state == op_states::execution)
     {
         state = op_states::pending_iterative_time;
@@ -580,7 +577,7 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_r
 @return the granted time step*/
 Time Federate::requestTimeComplete ()
 {
-    std::lock_guard<std::mutex> alock(asyncLock);
+    std::lock_guard<std::mutex> alock (asyncLock);
     if (state == op_states::pending_time)
     {
         auto newTime = asyncCallInfo->timeRequestFuture.get ();
@@ -601,7 +598,7 @@ Time Federate::requestTimeComplete ()
 @return the granted time step*/
 iteration_time Federate::requestTimeIterativeComplete ()
 {
-    std::lock_guard<std::mutex> alock(asyncLock);
+    std::lock_guard<std::mutex> alock (asyncLock);
     if (state == op_states::pending_iterative_time)
     {
         auto iterativeTime = asyncCallInfo->timeRequestIterativeFuture.get ();
@@ -822,7 +819,7 @@ std::string Federate::query (const std::string &target, const std::string &query
 
 query_id_t Federate::queryAsync (const std::string &target, const std::string &queryStr)
 {
-    std::lock_guard<std::mutex> alock(asyncLock);
+    std::lock_guard<std::mutex> alock (asyncLock);
     int cnt = asyncCallInfo->queryCounter++;
 
     auto queryFut =
@@ -833,7 +830,7 @@ query_id_t Federate::queryAsync (const std::string &target, const std::string &q
 
 query_id_t Federate::queryAsync (const std::string &queryStr)
 {
-    std::lock_guard<std::mutex> alock(asyncLock);
+    std::lock_guard<std::mutex> alock (asyncLock);
     int cnt = asyncCallInfo->queryCounter++;
 
     auto queryFut = std::async (std::launch::async, [this, queryStr]() { return query (queryStr); });
@@ -843,7 +840,7 @@ query_id_t Federate::queryAsync (const std::string &queryStr)
 
 std::string Federate::queryComplete (query_id_t queryIndex)
 {
-    std::lock_guard<std::mutex> alock(asyncLock);
+    std::lock_guard<std::mutex> alock (asyncLock);
     auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value ());
     if (fnd != asyncCallInfo->inFlightQueries.end ())
     {
@@ -854,7 +851,7 @@ std::string Federate::queryComplete (query_id_t queryIndex)
 
 bool Federate::isQueryCompleted (query_id_t queryIndex) const
 {
-    std::lock_guard<std::mutex> alock(asyncLock);
+    std::lock_guard<std::mutex> alock (asyncLock);
     auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value ());
     if (fnd != asyncCallInfo->inFlightQueries.end ())
     {
@@ -879,20 +876,20 @@ filter_id_t Federate::registerDestinationFilter (const std::string &filterName,
     return coreObject->registerDestinationFilter (filterName, destEndpoint, inputType, outputType);
 }
 
-filter_id_t Federate::registerCloningSourceFilter(const std::string &filterName,
-    const std::string &sourceEndpoint,
-    const std::string &inputType,
-    const std::string &outputType)
+filter_id_t Federate::registerCloningSourceFilter (const std::string &filterName,
+                                                   const std::string &sourceEndpoint,
+                                                   const std::string &inputType,
+                                                   const std::string &outputType)
 {
-    return coreObject->registerCloningSourceFilter(filterName, sourceEndpoint, inputType, outputType);
+    return coreObject->registerCloningSourceFilter (filterName, sourceEndpoint, inputType, outputType);
 }
 
-filter_id_t Federate::registerCloningDestinationFilter(const std::string &filterName,
-    const std::string &destEndpoint,
-    const std::string &inputType,
-    const std::string &outputType)
+filter_id_t Federate::registerCloningDestinationFilter (const std::string &filterName,
+                                                        const std::string &destEndpoint,
+                                                        const std::string &inputType,
+                                                        const std::string &outputType)
 {
-    return coreObject->registerCloningDestinationFilter(filterName, destEndpoint, inputType, outputType);
+    return coreObject->registerCloningDestinationFilter (filterName, destEndpoint, inputType, outputType);
 }
 
 std::string Federate::getFilterName (filter_id_t id) const { return coreObject->getHandleName (id.value ()); }
@@ -938,4 +935,3 @@ void Federate::setFilterOperator (const std::vector<filter_id_t> &filter_ids, st
 }
 
 }  // namespace helics
-

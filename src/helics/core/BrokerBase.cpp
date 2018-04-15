@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "BrokerBase.hpp"
 
 #include "../common/AsioServiceManager.h"
+#include "../common/argParser.h"
 #include "../common/logger.h"
 #include "ForwardingTimeCoordinator.hpp"
 #include "helics/helics-config.h"
@@ -21,7 +22,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/uuid/uuid.hpp>  // uuid class
 #include <boost/uuid/uuid_generators.hpp>  // generators
 #include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
-#include "../common/argParser.h"
 
 static inline std::string gen_id ()
 {
@@ -43,8 +43,6 @@ BrokerBase::BrokerBase (const std::string &broker_name) : identifier (broker_nam
 
 BrokerBase::~BrokerBase () { joinAllThreads (); }
 
-
-
 void BrokerBase::joinAllThreads ()
 {
     if (_queue_processing_thread.joinable ())
@@ -55,45 +53,47 @@ void BrokerBase::joinAllThreads ()
 }
 
 static const ArgDescriptors extraArgs{
-    {"name,n", "name of the broker/core"},
-    {"federates", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
-    {"minfed", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
-    {"maxiter", ArgDescriptor::arg_type_t::int_type, "maximum number of iterations"},
-    {"logfile", "the file to log message to"},
-    {"loglevel", ArgDescriptor::arg_type_t::int_type, "the level which to log the higher this is set to the more gets logs (-1) for no logging"},
-    {"fileloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which messages get sent to the file"},
-    {"consoleloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which message get sent to the console"},
-    {"minbrokers", ArgDescriptor::arg_type_t::int_type, "the minimum number of core/brokers that need to be connected (ignored in cores)"},
-    {"identifier", "name of the core/broker"},
-    {"tick", "number of milliseconds per tick counter if there is no broker communication for 2 ticks then secondary actions are taken  (can also be entered as a time like '10s' or '45ms')"},
-    {"dumplog",ArgDescriptor::arg_type_t::flag_type,"capture a record of all messages and dump a complete log to file or console on termination"},
-    {"timeout", "milliseconds to wait for a broker connection (can also be entered as a time like '10s' or '45ms') "}
-};
+  {"name,n", "name of the broker/core"},
+  {"federates", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
+  {"minfed", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
+  {"maxiter", ArgDescriptor::arg_type_t::int_type, "maximum number of iterations"},
+  {"logfile", "the file to log message to"},
+  {"loglevel", ArgDescriptor::arg_type_t::int_type,
+   "the level which to log the higher this is set to the more gets logs (-1) for no logging"},
+  {"fileloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which messages get sent to the file"},
+  {"consoleloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which message get sent to the console"},
+  {"minbrokers", ArgDescriptor::arg_type_t::int_type,
+   "the minimum number of core/brokers that need to be connected (ignored in cores)"},
+  {"identifier", "name of the core/broker"},
+  {"tick", "number of milliseconds per tick counter if there is no broker communication for 2 ticks then "
+           "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')"},
+  {"dumplog", ArgDescriptor::arg_type_t::flag_type,
+   "capture a record of all messages and dump a complete log to file or console on termination"},
+  {"timeout",
+   "milliseconds to wait for a broker connection (can also be entered as a time like '10s' or '45ms') "}};
 
-
-void BrokerBase::displayHelp()
+void BrokerBase::displayHelp ()
 {
     std::cout << " Global options for all Brokers:\n";
     variable_map vm;
-    const char *const argV[] = { "", "-?" };
-    argumentParser(2, argV, vm, extraArgs);
+    const char *const argV[] = {"", "-?"};
+    argumentParser (2, argV, vm, extraArgs);
 }
 
 void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
 {
     variable_map vm;
-    argumentParser (argc, argv, vm,extraArgs,"min");
+    argumentParser (argc, argv, vm, extraArgs, "min");
     if (vm.count ("min") > 0)
     {
         try
         {
-            minFederateCount = std::stod(vm["min"].as<std::string>());
+            minFederateCount = std::stod (vm["min"].as<std::string> ());
         }
         catch (const std::invalid_argument &ia)
         {
-            std::cerr << vm["min"].as<std::string>() << " is not a valid minimum federate count\n";
+            std::cerr << vm["min"].as<std::string> () << " is not a valid minimum federate count\n";
         }
-
     }
     if (vm.count ("minfed") > 0)
     {
@@ -135,13 +135,13 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     }
     if (vm.count ("timeout") > 0)
     {
-        auto time_out=loadTimeFromString(vm["timeout"].as<std::string> (),timeUnits::ms);
-        timeout = time_out.toCount(timeUnits::ms);
+        auto time_out = loadTimeFromString (vm["timeout"].as<std::string> (), timeUnits::ms);
+        timeout = time_out.toCount (timeUnits::ms);
     }
     if (vm.count ("tick") > 0)
     {
-        auto time_tick = loadTimeFromString(vm["tick"].as<std::string>(), timeUnits::ms);
-        tickTimer = time_tick.toCount(timeUnits::ms);
+        auto time_tick = loadTimeFromString (vm["tick"].as<std::string> (), timeUnits::ms);
+        tickTimer = time_tick.toCount (timeUnits::ms);
     }
     if (!noAutomaticID)
     {
@@ -177,11 +177,11 @@ bool BrokerBase::sendToLogger (Core::federate_id_t federateID,
         }
         if (loggerFunction)
         {
-            loggerFunction (logLevel, name+'('+std::to_string(federateID)+')', message);
+            loggerFunction (logLevel, name + '(' + std::to_string (federateID) + ')', message);
         }
         else if (loggingObj)
         {
-            loggingObj->log (logLevel, name + '(' + std::to_string(federateID) + ")::" + message);
+            loggingObj->log (logLevel, name + '(' + std::to_string (federateID) + ")::" + message);
         }
         return true;
     }
@@ -372,4 +372,3 @@ void BrokerBase::queueProcessingLoop ()
     }
 }
 }  // namespace helics
-

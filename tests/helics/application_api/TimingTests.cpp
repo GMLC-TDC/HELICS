@@ -48,7 +48,6 @@ BOOST_AUTO_TEST_CASE (simple_timing_test)
     vFed2->finalize ();
 }
 
-
 BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (simple_timing_test2)
 {
@@ -80,7 +79,6 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2)
     vFed2->finalize ();
 }
 
-
 BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (simple_timing_test_message)
 {
@@ -105,16 +103,15 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message)
     res = vFed2->requestTimeComplete ();
     BOOST_CHECK_EQUAL (res, 0.9);  // the message should show up at the next available time point
     vFed2->requestTimeAsync (2.0);
-    res = vFed2->requestTimeComplete();
-    BOOST_CHECK_EQUAL(res, 2.25);  // the message should show up at the next available time point
-    vFed2->requestTimeAsync(3.0);
+    res = vFed2->requestTimeComplete ();
+    BOOST_CHECK_EQUAL (res, 2.25);  // the message should show up at the next available time point
+    vFed2->requestTimeAsync (3.0);
     res = vFed1->requestTimeComplete ();
     BOOST_CHECK_EQUAL (res, 2.4);
     vFed1->finalize ();
     vFed2
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
-
 
 BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (timing_with_impact_window)
@@ -151,4 +148,3 @@ BOOST_AUTO_TEST_CASE (timing_with_impact_window)
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 BOOST_AUTO_TEST_SUITE_END ()
-

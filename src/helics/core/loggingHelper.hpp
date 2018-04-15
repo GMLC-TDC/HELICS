@@ -59,4 +59,3 @@ enum log_level : int
 #define LOG_DEBUG(id, ident, message)
 #define LOG_TRACE(id, ident, message)
 #endif
-

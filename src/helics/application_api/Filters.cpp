@@ -247,7 +247,8 @@ void CloningFilter::addSourceTarget (const std::string &sourceName)
 
 void CloningFilter::addDestinationTarget (const std::string &destinationName)
 {
-    auto filtid = corePtr->registerCloningDestinationFilter (getName (), destinationName, std::string (), std::string ());
+    auto filtid =
+      corePtr->registerCloningDestinationFilter (getName (), destinationName, std::string (), std::string ());
     destFilters.push_back (filtid);
     destEndpoints.push_back (destinationName);
     corePtr->setFilterOperator (filtid, filtOp->getOperator ());
@@ -397,4 +398,3 @@ make_source_filter (defined_filter_types type, Federate *fed, const std::string 
 }
 
 }  // namespace helics
-

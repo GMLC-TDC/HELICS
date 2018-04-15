@@ -6,10 +6,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../common/BlockingPriorityQueue.hpp"
+#include "../common/TripWire.hpp"
 #include "ActionMessage.hpp"
 #include <functional>
 #include <thread>
-#include "../common/TripWire.hpp"
 namespace helics
 {
 class NetworkBrokerData;
@@ -134,4 +134,3 @@ class conditionalChangeOnDestroy
 };
 
 }  // namespace helics
-

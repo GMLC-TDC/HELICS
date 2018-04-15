@@ -33,7 +33,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param[in] name the name of the federate
     @param[in] jsonString can be either a json file or a string containing json code
     */
-    MessageFederate(const std::string &name, const std::string &jsonString);
+    MessageFederate (const std::string &name, const std::string &jsonString);
     /** move constructor*/
     MessageFederate (MessageFederate &&mFed) noexcept;
     /** default constructor*/
@@ -204,4 +204,3 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     std::unique_ptr<MessageFederateManager> mfManager;
 };
 }  // namespace helics
-

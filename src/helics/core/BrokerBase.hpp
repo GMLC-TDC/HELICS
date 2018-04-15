@@ -28,7 +28,8 @@ class ForwardingTimeCoordinator;
 class BrokerBase
 {
   protected:
-    std::atomic<Core::federate_id_t> global_broker_id{0}; //!< the unique identifier for the broker(core or broker)
+    std::atomic<Core::federate_id_t> global_broker_id{
+      0};  //!< the unique identifier for the broker(core or broker)
     Core::federate_id_t higher_broker_id = 0;  //!< the id code of the broker 1 level about this broker
     std::atomic<int32_t> maxLogLevel{1};  //!< the logging level to use levels >=this will be logged
     int32_t consoleLogLevel = 1;  //!< the logging level for console display
@@ -49,7 +50,7 @@ class BrokerBase
     std::atomic<bool> haltOperations{false};  //!< flag indicating that no further message should be processed
   private:
     std::atomic<bool> mainLoopIsRunning{false};  //!< flag indicating that the main processing loop is running
-    bool dumplog = false; //!< flag indicating the broker should capture a dump log
+    bool dumplog = false;  //!< flag indicating the broker should capture a dump log
 
   protected:
     std::string logFile;  //< the file to log message to
@@ -77,7 +78,7 @@ class BrokerBase
     bool waitingForServerPingReply = false;  //!< flag indicating we are waiting for a ping reply
     bool hasFilters = false;  //!< flag indicating filters come through the broker
   public:
-      /** display help messages for the broker*/
+    /** display help messages for the broker*/
     static void displayHelp ();
     BrokerBase () noexcept;
     BrokerBase (const std::string &broker_name);
@@ -150,4 +151,3 @@ class BrokerBase
 };
 
 }  // namespace helics
-

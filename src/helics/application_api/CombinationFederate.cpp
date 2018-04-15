@@ -23,10 +23,10 @@ CombinationFederate::CombinationFederate (const std::string &jsonString)
     registerInterfaces (jsonString);
 }
 
-CombinationFederate::CombinationFederate(const std::string &name, const std::string &jsonString)
-    : Federate(loadFederateInfo(name,jsonString)), ValueFederate(true), MessageFederate(true)
+CombinationFederate::CombinationFederate (const std::string &name, const std::string &jsonString)
+    : Federate (loadFederateInfo (name, jsonString)), ValueFederate (true), MessageFederate (true)
 {
-    registerInterfaces(jsonString);
+    registerInterfaces (jsonString);
 }
 
 CombinationFederate::CombinationFederate (CombinationFederate &&) noexcept = default;
@@ -65,4 +65,3 @@ void CombinationFederate::registerInterfaces (const std::string &jsonString)
     Federate::registerFilterInterfaces (jsonString);
 }
 }  // namespace helics
-

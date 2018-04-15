@@ -63,7 +63,7 @@ std::shared_ptr<FilterOperator> DelayFilterOperation::getOperator ()
 }
 
 /** enumeration of possible random number generator distributions */
- enum class random_dists_t : int
+enum class random_dists_t : int
 {
     constant,
     uniform,
@@ -251,13 +251,13 @@ void RandomDelayFilterOperation::setString (const std::string &property, const s
     }
     else if ((property == "param1") || (property == "mean") || (property == "min") || (property == "alpha"))
     {
-        auto tm = loadTimeFromString(val);
-        rdelayGen->param1.store(static_cast<double>(tm));
+        auto tm = loadTimeFromString (val);
+        rdelayGen->param1.store (static_cast<double> (tm));
     }
     else if ((property == "param2") || (property == "stddev") || (property == "max") || (property == "beta"))
     {
-        auto tm = loadTimeFromString(val);
-        rdelayGen->param2.store(static_cast<double>(tm));
+        auto tm = loadTimeFromString (val);
+        rdelayGen->param2.store (static_cast<double> (tm));
     }
 }
 
@@ -289,8 +289,8 @@ std::shared_ptr<FilterOperator> RandomDropFilterOperation::getOperator ()
 
 RerouteFilterOperation::RerouteFilterOperation ()
 {
-    op =
-      std::make_shared<MessageDestOperator> ([this](const std::string &src, const std::string &dest) { return rerouteOperation (src, dest); });
+    op = std::make_shared<MessageDestOperator> (
+      [this](const std::string &src, const std::string &dest) { return rerouteOperation (src, dest); });
 }
 
 RerouteFilterOperation::~RerouteFilterOperation () = default;
@@ -326,33 +326,33 @@ std::shared_ptr<FilterOperator> RerouteFilterOperation::getOperator ()
     return std::static_pointer_cast<FilterOperator> (op);
 }
 
-std::string newDestGeneration(const std::string &src, const std::string &dest, const std::string &formula)
+std::string newDestGeneration (const std::string &src, const std::string &dest, const std::string &formula)
 {
-    if (formula.find_first_of('$') == std::string::npos)
+    if (formula.find_first_of ('$') == std::string::npos)
     {
         return formula;
     }
     std::string newDest = formula;
-    std::regex srcreg("\\$\\{source\\}");
-    std::regex_replace(newDest,srcreg, src); 
-    std::regex destreg("\\$\\{dest\\}");
-    std::regex_replace(newDest, destreg, dest);
+    std::regex srcreg ("\\$\\{source\\}");
+    std::regex_replace (newDest, srcreg, src);
+    std::regex destreg ("\\$\\{dest\\}");
+    std::regex_replace (newDest, destreg, dest);
     return newDest;
 }
 
-std::string RerouteFilterOperation::rerouteOperation ( const std::string & src, const std::string &dest) const
+std::string RerouteFilterOperation::rerouteOperation (const std::string &src, const std::string &dest) const
 {
     auto cond = conditions.lock_shared ();
     if (cond->empty ())
     {
-        return newDestGeneration(src,dest,newDest.load());
+        return newDestGeneration (src, dest, newDest.load ());
     }
     for (auto &sr : *cond)
     {
         std::regex reg (sr);
         if (std::regex_match (dest, reg))
         {
-            return newDestGeneration(src, dest, newDest.load());
+            return newDestGeneration (src, dest, newDest.load ());
         }
     }
     return dest;
@@ -411,4 +411,3 @@ void CloneFilterOperation::sendMessage (const Message *mess) const
     }
 }
 }  // namespace helics
-

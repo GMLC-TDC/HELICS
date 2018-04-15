@@ -267,4 +267,3 @@ size_t base64_decode (std::string const &encoded_string, void *data, size_t max_
     return dataIndex;
 }
 }  // namespace utilities
-

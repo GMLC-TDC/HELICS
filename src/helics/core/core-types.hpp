@@ -40,8 +40,6 @@ enum class core_type : int
 
 };
 
-
-
 /** enumeration of the possible states of convergence*/
 enum class iteration_state : signed char
 {
@@ -96,8 +94,7 @@ core_type coreTypeFromString (std::string type);
  * Returns true if core/broker type specified is available in current compilation.
  */
 bool isCoreTypeAvailable (core_type type) noexcept;
-} //namespace helics
+}  // namespace helics
 
 #define PUBLICATION_REQUIRED helics::handle_check_mode::required
 #define PUBLICATION_OPTIONAL helics::handle_check_mode::optional
-

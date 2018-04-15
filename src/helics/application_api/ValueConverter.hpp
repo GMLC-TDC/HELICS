@@ -59,4 +59,3 @@ class ValueConverter<std::string>
     static std::string type () { return "string"; }
 };
 }  // namespace helics
-

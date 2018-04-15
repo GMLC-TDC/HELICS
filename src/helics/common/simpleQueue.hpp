@@ -259,4 +259,3 @@ class SimpleQueue
         return t;
     }
 };
-
