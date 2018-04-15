@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright Â© 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -20,7 +20,7 @@ public:
     Subscription() {};
 
     Subscription(const Subscription &subscription) :sub(subscription.sub)
-    {  
+    {
     }
 
     Subscription &operator=(const Subscription &subscription)
@@ -155,7 +155,7 @@ public:
         return result;
     }
 
-   
+
     std::string getUnits() const
     {
         char str[255];
