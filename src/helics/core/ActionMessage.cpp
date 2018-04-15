@@ -469,8 +469,8 @@ constexpr size_t errEnd = sizeof(errorStrings) / sizeof(errorPair);
 const char *commandErrorString(int errorcode)
 {
     auto pptr = static_cast<const errorPair *> (errorStrings);
-    auto res = std::find_if(pptr, pptr + actEnd, [errorcode](const auto &pt) { return (pt.first == errorcode); });
-    if (res != pptr + actEnd)
+    auto res = std::find_if(pptr, pptr + errEnd, [errorcode](const auto &pt) { return (pt.first == errorcode); });
+    if (res != pptr + errEnd)
     {
         return res->second;
     }

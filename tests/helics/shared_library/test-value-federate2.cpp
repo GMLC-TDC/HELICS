@@ -42,7 +42,7 @@ BOOST_DATA_TEST_CASE(test_block_send_receive, bdata::make(core_types), core_type
     CE(helicsFederateSetTimeDelta(vFed1, 1.0));
 
     CE(helicsFederateEnterExecutionMode(vFed1));
-    CE(helicsPublicationPublish(pubid3, s.data(), len));
+    CE(helicsPublicationPublishRaw(pubid3, s.data(), len));
 
     CE(helicsFederateRequestTime(vFed1, 1.0, &gtime));
 
@@ -73,7 +73,9 @@ BOOST_DATA_TEST_CASE(test_async_calls, bdata::make(core_types), core_type)
 	helics_time_t gtime;
 	helics_time_t f1time;
 	//federate_state state;
-	char s[100] = "";
+#define STRINGLEN 100
+	char s[STRINGLEN] = "";
+    int len;
     FederateTestFixture fixture;
     fixture.SetupTest(helicsCreateValueFederate, core_type.c_str(), 2);
     auto vFed1 = fixture.GetFederateAt(0);
@@ -103,7 +105,7 @@ BOOST_DATA_TEST_CASE(test_async_calls, bdata::make(core_types), core_type)
 	BOOST_CHECK_EQUAL(gtime, 1.0);
 
 	// get the value
-    CE(helicsSubscriptionGetString(subid, s, 100));
+    CE(helicsSubscriptionGetString(subid, s, STRINGLEN,&len));
 
 	// make sure the string is what we expect
 	BOOST_CHECK_EQUAL(s, "string1");
@@ -112,7 +114,7 @@ BOOST_DATA_TEST_CASE(test_async_calls, bdata::make(core_types), core_type)
     CE(helicsPublicationPublishString(pubid, "string2"));
 
 	// make sure the value is still what we expect
-    CE(helicsSubscriptionGetString(subid, s, 100));
+    CE(helicsSubscriptionGetString(subid, s, STRINGLEN,&len));
 	BOOST_CHECK_EQUAL(s, "string1");
 
 	// advance time
@@ -125,7 +127,7 @@ BOOST_DATA_TEST_CASE(test_async_calls, bdata::make(core_types), core_type)
 	BOOST_CHECK_EQUAL(gtime, 2.0);
 
 	// make sure the value was updated
-    CE(helicsSubscriptionGetString(subid, s, 100));
+    CE(helicsSubscriptionGetString(subid, s, STRINGLEN, &len));
 	BOOST_CHECK_EQUAL(s, "string2");
 
     CE(helicsFederateFinalize(vFed1));

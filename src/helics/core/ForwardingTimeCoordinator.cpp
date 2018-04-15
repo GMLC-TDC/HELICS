@@ -276,7 +276,7 @@ void ForwardingTimeCoordinator::removeDependent (Core::federate_id_t fedID)
     }
 }
 
-DependencyInfo *ForwardingTimeCoordinator::getDependencyInfo (Core::federate_id_t ofed)
+const DependencyInfo *ForwardingTimeCoordinator::getDependencyInfo (Core::federate_id_t ofed) const
 {
     return dependencies.getDependencyInfo (ofed);
 }
@@ -319,14 +319,105 @@ iteration_state ForwardingTimeCoordinator::checkExecEntry ()
     return ret;
 }
 
+ActionMessage ForwardingTimeCoordinator::generateTimeRequestIgnoreDependency(const ActionMessage &msg, Core::federate_id_t iFed) const
+{
+    ActionMessage nTime(msg);
+    Time minNext = Time::maxVal();
+    Time minminDe = Time::maxVal();
+    Time minDe = minminDe;
+    Core::federate_id_t minFed = invalid_fed_id;
+    DependencyInfo::time_state_t tState = DependencyInfo::time_state_t::time_requested;
+    for (auto &dep : dependencies)
+    {
+        if ((dep.minFed == source_id)||(dep.fedID==iFed))
+        {
+            continue;
+        }
+        if (dep.Tnext < minNext)
+        {
+            minNext = dep.Tnext;
+            tState = dep.time_state;
+        }
+        else if (dep.Tnext == minNext)
+        {
+            if (dep.time_state == DependencyInfo::time_state_t::time_granted)
+            {
+                tState = dep.time_state;
+            }
+        }
+        if (dep.Tdemin >= dep.Tnext)
+        {
+            if (dep.Tdemin < minminDe)
+            {
+                minminDe = dep.Tdemin;
+                minFed = dep.fedID;
+            }
+            else if (dep.Tdemin == minminDe)
+            {
+                minFed = invalid_fed_id;
+            }
+        }
+        else
+        {
+            // this minimum dependent event time received was invalid and can't be trusted
+            // therefore it can't be used to determine a time grant
+            minminDe = -1;
+        }
+
+        if (dep.Te < minDe)
+        {
+            minDe = dep.Te;
+        }
+    }
+
+    minminDe = std::min(minDe, minminDe);
+
+    if (minminDe < Time::maxVal())
+    {
+        if (minminDe > minNext)
+        {
+            minNext = minminDe;
+        }
+    }
+    nTime.actionTime = minNext;
+    nTime.Tdemin = minminDe;
+    nTime.Te = minDe;
+    nTime.dest_id = iFed;
+    return nTime;
+}
+
 void ForwardingTimeCoordinator::transmitTimingMessage(ActionMessage &msg) const
 {
     if (sendMessageFunction)
     {
-        for (auto dep : dependents)
+        if (msg.action() == CMD_TIME_REQUEST)
         {
-            msg.dest_id = dep;
-            sendMessageFunction(msg);
+            for (auto dep : dependents)
+            {
+                if (isBroker(dep))
+                {
+                    auto di = getDependencyInfo(dep);
+                    if (di != nullptr)
+                    {
+                        if (di->Tnext == msg.actionTime)
+                        {
+                            sendMessageFunction(generateTimeRequestIgnoreDependency(msg, dep));
+                            continue;
+                        }
+                    }
+                }
+                
+                msg.dest_id = dep;
+                sendMessageFunction(msg);
+            }
+        }
+        else
+        {
+            for (auto dep : dependents)
+            {
+                msg.dest_id = dep;
+                sendMessageFunction(msg);
+            }
         }
     }
 }

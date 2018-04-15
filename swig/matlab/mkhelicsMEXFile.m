@@ -1,0 +1,1 @@
+mex('-IC:/Users/phlpt/Documents/HELICS2/src/helics/shared_api_library/', '-LC:/msys64/home/phlpt/HELICS2/build_gcc/src/helics/shared_api_library','-llibhelicsSharedLib', '-largeArrayDims','C:/msys64/home/phlpt/HELICS2/build_gcc/swig/matlab/helicsMEX.cpp')

@@ -68,6 +68,11 @@ FederateTestFixture::~FederateTestFixture ()
         {
             federate_state state;
             helicsFederateGetState (fed, &state);
+            helics_core core = helicsFederateGetCoreObject(fed);
+            if (core != nullptr)
+            {
+                helicsCoreDisconnect(core);
+            }
             if (state != helics_finalize_state)
             {
                 helicsFederateFinalize (fed);

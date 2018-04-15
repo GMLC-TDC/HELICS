@@ -28,7 +28,7 @@ function launch_federation_with_broker () {
     done
 
     # Launch broker in the background with the number of federates
-    if [[ "$VERBOSE" ]]; then
+    if [[ ${VERBOSE+x} ]]; then
         echo "Launching ${helics_broker} with ${num_federates} federate(s)"
     fi
     {
@@ -44,7 +44,7 @@ function launch_federation_with_broker () {
     # Wait for the broker to finish running (until timeout is reached)
     wait ${broker_pid}
     if $(grep -q 124 ${broker_returncode}); then
-        if [[ "$VERBOSE" ]]; then
+        if [[ ${VERBOSE+x} ]]; then
             echo "ERROR Broker exceeded timeout ($(cat $broker_returncode))"
         fi
         test_exit_status=1
@@ -104,7 +104,7 @@ function launch_federation () {
         outputfiles+=(${output_file})
         returncodes+=(${returncode_file})
         # Launch federate
-        if [[ "$VERBOSE" ]]; then
+        if [[ ${VERBOSE+x} ]]; then
             echo "Launching ${fed}"
         fi
         {
@@ -122,7 +122,7 @@ function launch_federation () {
     for returncode_file in ${returncodes[@]}
     do
         if $(grep -q 124 ${returncode_file}); then
-            if [[ "$VERBOSE" ]]; then
+            if [[ ${VERBOSE+x} ]]; then
                 echo "ERROR Federate exceeded timeout ($(cat $returncode_file))"
             fi
             test_exit_status=1
@@ -140,7 +140,7 @@ function launch_federation () {
 
         # Check for "key output" indicating failure
         if $(grep -inr error ${output_file}); then
-            if [[ "$VERBOSE" ]]; then
+            if [[ ${VERBOSE+x} ]]; then
                 echo "ERROR Problem occurred during federate execution"
             fi
             test_exit_status=1
@@ -160,7 +160,7 @@ else
 fi
 
 # Output ok/not ok followed by a string provided by a test runner for TAP format output
-if [[ "$TAP_OUTPUT" ]]; then
+if [[ ${TAP_OUTPUT+x} ]]; then
     if [[ "${test_exit_status}" == "0" ]]; then
         echo "ok ${TAP_OUTPUT}"
     else

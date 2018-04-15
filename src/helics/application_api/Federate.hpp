@@ -15,6 +15,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <atomic>
 #include <memory>
 #include <stdexcept>
+#include <functional>
+#include <mutex>
 
 /**
  * HELICS Application API
@@ -77,15 +79,15 @@ class Federate
     enum class op_states : char
     {
         startup = 0,  //!< when created the federate is in startup state
-        initialization,  //!< entered after the enterInitializationState call has returned
-        execution,  //!< entered after the enterExectuationState call has returned
-        finalize,  //!< the federate has finished executing normally final values may be retrieved
-        error,  //!< error state no core communication is possible but values can be retrieved
+        initialization=1,  //!< entered after the enterInitializationState call has returned
+        execution=2,  //!< entered after the enterExectuationState call has returned
+        finalize=3,  //!< the federate has finished executing normally final values may be retrieved
+        error=4,  //!< error state no core communication is possible but values can be retrieved
         // the following states are for asynchronous operations
-        pending_init,  //!< indicator that the federate is pending entry to initialization state
-        pending_exec,  //!< state pending EnterExecution State
-        pending_time,  //!< state that the federate is pending a timeRequest
-        pending_iterative_time  //!< state that the federate is pending an iterative time request
+        pending_init=5,  //!< indicator that the federate is pending entry to initialization state
+        pending_exec=6,  //!< state pending EnterExecution State
+        pending_time=7,  //!< state that the federate is pending a timeRequest
+        pending_iterative_time=8  //!< state that the federate is pending an iterative time request
     };
 
   protected:
@@ -99,6 +101,7 @@ class Federate
     Time currentTime;  //!< the current simulation time
     FederateInfo FedInfo;  //!< the information structure that contains the data on the federate
   private:
+      mutable std::mutex asyncLock;  //!< mutex protecting asyncCallInfo
     std::unique_ptr<AsyncFedCallInfo> asyncCallInfo;  //!< pointer to a class defining the async call information
     std::vector<std::shared_ptr<Filter>>
       localFilters;  //!< vector of filters created through the register interfaces function
@@ -253,6 +256,19 @@ class Federate
     @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
     */
     void setLoggingLevel (int loggingLevel);
+    /**  set the maximum number of local iterations
+    @param maxIterations the maximum number of allowed iterations before helics forces a return
+    */
+    void setMaxIterations(int maxIterations);
+
+    /** define a logging function to use for logging message and notices from the federation and individual
+    federate
+    @param logFunction the callback function for doing something with a log message
+    it takes 3 inputs an integer for logLevel 0-4+  0 -error, 1- warning 2-status, 3-debug 44trace
+    A string indicating the source of the message and another string with the actual message
+    */
+    void setLoggingCallback(
+        const std::function<void(int, const std::string &, const std::string &)> &logFunction);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of

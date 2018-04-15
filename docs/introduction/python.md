@@ -69,3 +69,42 @@ If done correctly, you should see an output like so:
 ![Python Example](../img/python-example.png)
 
 
+You should see something like the following in the PI RECEIVER window (2nd one in directions above)
+
+```
+$ python pireceiver.py
+PI RECEIVER: Helics version = 1.0.0.alpha (01-18-18)
+PI RECEIVER: Creating Federate Info
+PI RECEIVER: Setting Federate Info Name
+PI RECEIVER: Setting Federate Info Core Type
+PI RECEIVER: Setting Federate Info Init String
+PI RECEIVER: Setting Federate Info Time Delta
+PI RECEIVER: Setting Federate Info Logging
+PI RECEIVER: Creating Value Federate
+PI RECEIVER: Value federate created
+PI RECEIVER: Subscription registered
+PI RECEIVER: Entering execution mode
+PI RECEIVER: Current time is 5.0
+PI RECEIVER: Received value = 3.142857142857143 at time 5.0 from PI SENDER
+PI RECEIVER: Received value = 3.142857142857143 at time 6.0 from PI SENDER
+PI RECEIVER: Received value = 3.142857142857143 at time 7.0 from PI SENDER
+PI RECEIVER: Received value = 3.142857142857143 at time 8.0 from PI SENDER
+PI RECEIVER: Received value = 3.142857142857143 at time 9.0 from PI SENDER
+PI RECEIVER: Federate finalized
+end of master Object Holder destructor
+```
+
+Corresponding output should appear from the PI SENDER (window 1).
+
+__Background:__ Running a HELICS federation (via low level commands) requires first starting a helics broker and then running the desired set of federates with it. In this case, the pisender starts this broker and then joins as a federate.
+
+**Tips**
+
+Ensure that the install location is added to your `PATH`. If you've installed to the default installation, you may not need to do this.
+To ensure that the Python extension works correctly, you may add the following to your `PYTHONPATH`. You can do so by pasting the following in your .bashrc file.
+
+```bash
+export PYTHONPATH="~/local/helics_install/python"
+```
+
+

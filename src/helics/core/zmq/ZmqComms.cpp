@@ -716,7 +716,7 @@ CLOSE_TX_LOOP:
     routes.clear ();
     if (rx_status == connection_status::connected)
     {
-        controlSocket.send ("close");
+        controlSocket.send (std::string("close"),ZMQ_NOBLOCK);
     }
 
     controlSocket.close ();

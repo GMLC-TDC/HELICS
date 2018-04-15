@@ -43,12 +43,12 @@ public class data_t {
     return helicsJNI.data_t_data_get(swigCPtr, this);
   }
 
-  public void setLength(SWIGTYPE_p_int64_t value) {
-    helicsJNI.data_t_length_set(swigCPtr, this, SWIGTYPE_p_int64_t.getCPtr(value));
+  public void setLength(long value) {
+    helicsJNI.data_t_length_set(swigCPtr, this, value);
   }
 
-  public SWIGTYPE_p_int64_t getLength() {
-    return new SWIGTYPE_p_int64_t(helicsJNI.data_t_length_get(swigCPtr, this), true);
+  public long getLength() {
+    return helicsJNI.data_t_length_get(swigCPtr, this);
   }
 
   public data_t() {

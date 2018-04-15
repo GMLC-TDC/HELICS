@@ -38,8 +38,8 @@ public class helics implements helicsConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsCreateCoreFromArgs(String type, String name, int argc, SWIGTYPE_p_p_char argv) {
-    long cPtr = helicsJNI.helicsCreateCoreFromArgs(type, name, argc, SWIGTYPE_p_p_char.getCPtr(argv));
+  public static SWIGTYPE_p_void helicsCreateCoreFromArgs(String type, String name, String[] argc) {
+    long cPtr = helicsJNI.helicsCreateCoreFromArgs(type, name, argc);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -53,8 +53,8 @@ public class helics implements helicsConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsCreateBrokerFromArgs(String type, String name, int argc, SWIGTYPE_p_p_char argv) {
-    long cPtr = helicsJNI.helicsCreateBrokerFromArgs(type, name, argc, SWIGTYPE_p_p_char.getCPtr(argv));
+  public static SWIGTYPE_p_void helicsCreateBrokerFromArgs(String type, String name, String[] argc) {
+    long cPtr = helicsJNI.helicsCreateBrokerFromArgs(type, name, argc);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -71,16 +71,16 @@ public class helics implements helicsConstants {
     return helicsJNI.helicsCoreIsConnected(SWIGTYPE_p_void.getCPtr(core));
   }
 
-  public static helics_status helicsBrokerGetIdentifier(SWIGTYPE_p_void broker, String identifier, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsBrokerGetIdentifier(SWIGTYPE_p_void.getCPtr(broker), identifier, maxlen));
+  public static helics_status helicsBrokerGetIdentifier(SWIGTYPE_p_void broker, byte[] identifier) {
+    return helics_status.swigToEnum(helicsJNI.helicsBrokerGetIdentifier(SWIGTYPE_p_void.getCPtr(broker), identifier));
   }
 
-  public static helics_status helicsCoreGetIdentifier(SWIGTYPE_p_void core, String identifier, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsCoreGetIdentifier(SWIGTYPE_p_void.getCPtr(core), identifier, maxlen));
+  public static helics_status helicsCoreGetIdentifier(SWIGTYPE_p_void core, byte[] identifier) {
+    return helics_status.swigToEnum(helicsJNI.helicsCoreGetIdentifier(SWIGTYPE_p_void.getCPtr(core), identifier));
   }
 
-  public static helics_status helicsBrokerGetAddress(SWIGTYPE_p_void broker, String address, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsBrokerGetAddress(SWIGTYPE_p_void.getCPtr(broker), address, maxlen));
+  public static helics_status helicsBrokerGetAddress(SWIGTYPE_p_void broker, byte[] address) {
+    return helics_status.swigToEnum(helicsJNI.helicsBrokerGetAddress(SWIGTYPE_p_void.getCPtr(broker), address));
   }
 
   public static helics_status helicsCoreSetReadyToInit(SWIGTYPE_p_void core) {
@@ -148,8 +148,8 @@ public class helics implements helicsConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static helics_status helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void fi, int argc, SWIGTYPE_p_p_char argv) {
-    return helics_status.swigToEnum(helicsJNI.helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void.getCPtr(fi), argc, SWIGTYPE_p_p_char.getCPtr(argv)));
+  public static helics_status helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void fi, String[] argc) {
+    return helics_status.swigToEnum(helicsJNI.helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void.getCPtr(fi), argc));
   }
 
   public static void helicsFederateInfoFree(SWIGTYPE_p_void fi) {
@@ -293,8 +293,8 @@ public class helics implements helicsConstants {
     return helics_status.swigToEnum(helicsJNI.helicsFederateRequestTimeIterativeComplete(SWIGTYPE_p_void.getCPtr(fed), timeOut, outIterate));
   }
 
-  public static helics_status helicsFederateGetName(SWIGTYPE_p_void fed, String str, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsFederateGetName(SWIGTYPE_p_void.getCPtr(fed), str, maxlen));
+  public static helics_status helicsFederateGetName(SWIGTYPE_p_void fed, byte[] outputString) {
+    return helics_status.swigToEnum(helicsJNI.helicsFederateGetName(SWIGTYPE_p_void.getCPtr(fed), outputString));
   }
 
   public static helics_status helicsFederateSetTimeDelta(SWIGTYPE_p_void fed, double time) {
@@ -319,6 +319,10 @@ public class helics implements helicsConstants {
 
   public static helics_status helicsFederateSetLoggingLevel(SWIGTYPE_p_void fed, int loggingLevel) {
     return helics_status.swigToEnum(helicsJNI.helicsFederateSetLoggingLevel(SWIGTYPE_p_void.getCPtr(fed), loggingLevel));
+  }
+
+  public static helics_status helicsFederateSetMaxIterations(SWIGTYPE_p_void fi, int maxIterations) {
+    return helics_status.swigToEnum(helicsJNI.helicsFederateSetMaxIterations(SWIGTYPE_p_void.getCPtr(fi), maxIterations));
   }
 
   public static helics_status helicsFederateGetCurrentTime(SWIGTYPE_p_void fed, double[] time) {
@@ -394,16 +398,16 @@ public class helics implements helicsConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static helics_status helicsPublicationPublish(SWIGTYPE_p_void pub, byte[] data) {
-    return helics_status.swigToEnum(helicsJNI.helicsPublicationPublish(SWIGTYPE_p_void.getCPtr(pub), data));
+  public static helics_status helicsPublicationPublishRaw(SWIGTYPE_p_void pub, SWIGTYPE_p_void data, int inputDataLength) {
+    return helics_status.swigToEnum(helicsJNI.helicsPublicationPublishRaw(SWIGTYPE_p_void.getCPtr(pub), SWIGTYPE_p_void.getCPtr(data), inputDataLength));
   }
 
   public static helics_status helicsPublicationPublishString(SWIGTYPE_p_void pub, String str) {
     return helics_status.swigToEnum(helicsJNI.helicsPublicationPublishString(SWIGTYPE_p_void.getCPtr(pub), str));
   }
 
-  public static helics_status helicsPublicationPublishInteger(SWIGTYPE_p_void pub, SWIGTYPE_p_int64_t val) {
-    return helics_status.swigToEnum(helicsJNI.helicsPublicationPublishInteger(SWIGTYPE_p_void.getCPtr(pub), SWIGTYPE_p_int64_t.getCPtr(val)));
+  public static helics_status helicsPublicationPublishInteger(SWIGTYPE_p_void pub, long val) {
+    return helics_status.swigToEnum(helicsJNI.helicsPublicationPublishInteger(SWIGTYPE_p_void.getCPtr(pub), val));
   }
 
   public static helics_status helicsPublicationPublishDouble(SWIGTYPE_p_void pub, double val) {
@@ -414,20 +418,20 @@ public class helics implements helicsConstants {
     return helics_status.swigToEnum(helicsJNI.helicsPublicationPublishComplex(SWIGTYPE_p_void.getCPtr(pub), real, imag));
   }
 
-  public static helics_status helicsPublicationPublishVector(SWIGTYPE_p_void pub, SWIGTYPE_p_double data, int len) {
-    return helics_status.swigToEnum(helicsJNI.helicsPublicationPublishVector(SWIGTYPE_p_void.getCPtr(pub), SWIGTYPE_p_double.getCPtr(data), len));
+  public static helics_status helicsPublicationPublishVector(SWIGTYPE_p_void pub, double[] vectorInput, int vectorlength) {
+    return helics_status.swigToEnum(helicsJNI.helicsPublicationPublishVector(SWIGTYPE_p_void.getCPtr(pub), vectorInput, vectorlength));
   }
 
   public static int helicsSubscriptionGetValueSize(SWIGTYPE_p_void sub) {
     return helicsJNI.helicsSubscriptionGetValueSize(SWIGTYPE_p_void.getCPtr(sub));
   }
 
-  public static helics_status helicsSubscriptionGetValue(SWIGTYPE_p_void sub, String data, int maxlen, int[] actualLength) {
-    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionGetValue(SWIGTYPE_p_void.getCPtr(sub), data, maxlen, actualLength));
+  public static helics_status helicsSubscriptionGetRawValue(SWIGTYPE_p_void sub, SWIGTYPE_p_void data, int maxlen, int[] actualLength) {
+    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionGetRawValue(SWIGTYPE_p_void.getCPtr(sub), SWIGTYPE_p_void.getCPtr(data), maxlen, actualLength));
   }
 
-  public static helics_status helicsSubscriptionGetString(SWIGTYPE_p_void sub, String str, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionGetString(SWIGTYPE_p_void.getCPtr(sub), str, maxlen));
+  public static helics_status helicsSubscriptionGetString(SWIGTYPE_p_void sub, byte[] outputString, int[] actualLength) {
+    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionGetString(SWIGTYPE_p_void.getCPtr(sub), outputString, actualLength));
   }
 
   public static helics_status helicsSubscriptionGetInteger(SWIGTYPE_p_void sub, long[] val) {
@@ -450,16 +454,16 @@ public class helics implements helicsConstants {
     return helics_status.swigToEnum(helicsJNI.helicsSubscriptionGetVector(SWIGTYPE_p_void.getCPtr(sub), SWIGTYPE_p_double.getCPtr(data), maxlen, actualSize));
   }
 
-  public static helics_status helicsSubscriptionSetDefault(SWIGTYPE_p_void sub, byte[] data) {
-    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionSetDefault(SWIGTYPE_p_void.getCPtr(sub), data));
+  public static helics_status helicsSubscriptionSetDefaultRaw(SWIGTYPE_p_void sub, SWIGTYPE_p_void data, int inputDataLength) {
+    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionSetDefaultRaw(SWIGTYPE_p_void.getCPtr(sub), SWIGTYPE_p_void.getCPtr(data), inputDataLength));
   }
 
   public static helics_status helicsSubscriptionSetDefaultString(SWIGTYPE_p_void sub, String str) {
     return helics_status.swigToEnum(helicsJNI.helicsSubscriptionSetDefaultString(SWIGTYPE_p_void.getCPtr(sub), str));
   }
 
-  public static helics_status helicsSubscriptionSetDefaultInteger(SWIGTYPE_p_void sub, SWIGTYPE_p_int64_t val) {
-    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionSetDefaultInteger(SWIGTYPE_p_void.getCPtr(sub), SWIGTYPE_p_int64_t.getCPtr(val)));
+  public static helics_status helicsSubscriptionSetDefaultInteger(SWIGTYPE_p_void sub, long val) {
+    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionSetDefaultInteger(SWIGTYPE_p_void.getCPtr(sub), val));
   }
 
   public static helics_status helicsSubscriptionSetDefaultDouble(SWIGTYPE_p_void sub, double val) {
@@ -470,32 +474,32 @@ public class helics implements helicsConstants {
     return helics_status.swigToEnum(helicsJNI.helicsSubscriptionSetDefaultComplex(SWIGTYPE_p_void.getCPtr(sub), real, imag));
   }
 
-  public static helics_status helicsSubscriptionSetDefaultVector(SWIGTYPE_p_void sub, double[] data, int len) {
-    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionSetDefaultVector(SWIGTYPE_p_void.getCPtr(sub), data, len));
+  public static helics_status helicsSubscriptionSetDefaultVector(SWIGTYPE_p_void sub, double[] vectorInput, int vectorlength) {
+    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionSetDefaultVector(SWIGTYPE_p_void.getCPtr(sub), vectorInput, vectorlength));
   }
 
-  public static helics_status helicsSubscriptionGetType(SWIGTYPE_p_void sub, String str, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionGetType(SWIGTYPE_p_void.getCPtr(sub), str, maxlen));
+  public static helics_status helicsSubscriptionGetType(SWIGTYPE_p_void sub, byte[] outputString) {
+    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionGetType(SWIGTYPE_p_void.getCPtr(sub), outputString));
   }
 
-  public static helics_status helicsPublicationGetType(SWIGTYPE_p_void pub, String str, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsPublicationGetType(SWIGTYPE_p_void.getCPtr(pub), str, maxlen));
+  public static helics_status helicsPublicationGetType(SWIGTYPE_p_void pub, byte[] outputString) {
+    return helics_status.swigToEnum(helicsJNI.helicsPublicationGetType(SWIGTYPE_p_void.getCPtr(pub), outputString));
   }
 
-  public static helics_status helicsSubscriptionGetKey(SWIGTYPE_p_void sub, String str, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionGetKey(SWIGTYPE_p_void.getCPtr(sub), str, maxlen));
+  public static helics_status helicsSubscriptionGetKey(SWIGTYPE_p_void sub, byte[] outputString) {
+    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionGetKey(SWIGTYPE_p_void.getCPtr(sub), outputString));
   }
 
-  public static helics_status helicsPublicationGetKey(SWIGTYPE_p_void pub, String str, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsPublicationGetKey(SWIGTYPE_p_void.getCPtr(pub), str, maxlen));
+  public static helics_status helicsPublicationGetKey(SWIGTYPE_p_void pub, byte[] outputString) {
+    return helics_status.swigToEnum(helicsJNI.helicsPublicationGetKey(SWIGTYPE_p_void.getCPtr(pub), outputString));
   }
 
-  public static helics_status helicsSubscriptionGetUnits(SWIGTYPE_p_void sub, String str, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionGetUnits(SWIGTYPE_p_void.getCPtr(sub), str, maxlen));
+  public static helics_status helicsSubscriptionGetUnits(SWIGTYPE_p_void sub, byte[] outputString) {
+    return helics_status.swigToEnum(helicsJNI.helicsSubscriptionGetUnits(SWIGTYPE_p_void.getCPtr(sub), outputString));
   }
 
-  public static helics_status helicsPublicationGetUnits(SWIGTYPE_p_void pub, String str, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsPublicationGetUnits(SWIGTYPE_p_void.getCPtr(pub), str, maxlen));
+  public static helics_status helicsPublicationGetUnits(SWIGTYPE_p_void pub, byte[] outputString) {
+    return helics_status.swigToEnum(helicsJNI.helicsPublicationGetUnits(SWIGTYPE_p_void.getCPtr(pub), outputString));
   }
 
   public static int helicsSubscriptionIsUpdated(SWIGTYPE_p_void sub) {
@@ -528,12 +532,12 @@ public class helics implements helicsConstants {
     return helics_status.swigToEnum(helicsJNI.helicsEndpointSetDefaultDestination(SWIGTYPE_p_void.getCPtr(endpoint), dest));
   }
 
-  public static helics_status helicsEndpointSendMessageRaw(SWIGTYPE_p_void endpoint, String dest, byte[] data) {
-    return helics_status.swigToEnum(helicsJNI.helicsEndpointSendMessageRaw(SWIGTYPE_p_void.getCPtr(endpoint), dest, data));
+  public static helics_status helicsEndpointSendMessageRaw(SWIGTYPE_p_void endpoint, String dest, SWIGTYPE_p_void data, int inputDataLength) {
+    return helics_status.swigToEnum(helicsJNI.helicsEndpointSendMessageRaw(SWIGTYPE_p_void.getCPtr(endpoint), dest, SWIGTYPE_p_void.getCPtr(data), inputDataLength));
   }
 
-  public static helics_status helicsEndpointSendEventRaw(SWIGTYPE_p_void endpoint, String dest, byte[] data, double time) {
-    return helics_status.swigToEnum(helicsJNI.helicsEndpointSendEventRaw(SWIGTYPE_p_void.getCPtr(endpoint), dest, data, time));
+  public static helics_status helicsEndpointSendEventRaw(SWIGTYPE_p_void endpoint, String dest, SWIGTYPE_p_void data, int inputDataLength, double time) {
+    return helics_status.swigToEnum(helicsJNI.helicsEndpointSendEventRaw(SWIGTYPE_p_void.getCPtr(endpoint), dest, SWIGTYPE_p_void.getCPtr(data), inputDataLength, time));
   }
 
   public static helics_status helicsEndpointSendMessage(SWIGTYPE_p_void endpoint, message_t message) {
@@ -568,12 +572,12 @@ public class helics implements helicsConstants {
     return new message_t(helicsJNI.helicsFederateGetMessage(SWIGTYPE_p_void.getCPtr(fed)), true);
   }
 
-  public static helics_status helicsEndpointGetType(SWIGTYPE_p_void endpoint, String str, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsEndpointGetType(SWIGTYPE_p_void.getCPtr(endpoint), str, maxlen));
+  public static helics_status helicsEndpointGetType(SWIGTYPE_p_void endpoint, byte[] outputString) {
+    return helics_status.swigToEnum(helicsJNI.helicsEndpointGetType(SWIGTYPE_p_void.getCPtr(endpoint), outputString));
   }
 
-  public static helics_status helicsEndpointGetName(SWIGTYPE_p_void endpoint, String str, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsEndpointGetName(SWIGTYPE_p_void.getCPtr(endpoint), str, maxlen));
+  public static helics_status helicsEndpointGetName(SWIGTYPE_p_void endpoint, byte[] outputString) {
+    return helics_status.swigToEnum(helicsJNI.helicsEndpointGetName(SWIGTYPE_p_void.getCPtr(endpoint), outputString));
   }
 
   public static int helicsFederateGetEndpointCount(SWIGTYPE_p_void fed) {
@@ -605,17 +609,17 @@ public class helics implements helicsConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsCoreRegisterCloningFilter(SWIGTYPE_p_void fed, String deliveryEndpoint) {
-    long cPtr = helicsJNI.helicsCoreRegisterCloningFilter(SWIGTYPE_p_void.getCPtr(fed), deliveryEndpoint);
+  public static SWIGTYPE_p_void helicsCoreRegisterCloningFilter(SWIGTYPE_p_void core, String deliveryEndpoint) {
+    long cPtr = helicsJNI.helicsCoreRegisterCloningFilter(SWIGTYPE_p_void.getCPtr(core), deliveryEndpoint);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static helics_status helicsFilterGetTarget(SWIGTYPE_p_void filt, String str, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsFilterGetTarget(SWIGTYPE_p_void.getCPtr(filt), str, maxlen));
+  public static helics_status helicsFilterGetTarget(SWIGTYPE_p_void filt, byte[] outputString) {
+    return helics_status.swigToEnum(helicsJNI.helicsFilterGetTarget(SWIGTYPE_p_void.getCPtr(filt), outputString));
   }
 
-  public static helics_status helicsFilterGetName(SWIGTYPE_p_void filt, String str, int maxlen) {
-    return helics_status.swigToEnum(helicsJNI.helicsFilterGetName(SWIGTYPE_p_void.getCPtr(filt), str, maxlen));
+  public static helics_status helicsFilterGetName(SWIGTYPE_p_void filt, byte[] outputString) {
+    return helics_status.swigToEnum(helicsJNI.helicsFilterGetName(SWIGTYPE_p_void.getCPtr(filt), outputString));
   }
 
   public static helics_status helicsFilterSet(SWIGTYPE_p_void filt, String property, double val) {

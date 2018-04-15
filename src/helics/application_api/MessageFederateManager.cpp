@@ -1,11 +1,12 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "MessageFederateManager.hpp"
 #include "../core/Core.hpp"
+#include <cassert>
+
 namespace helics
 {
 MessageFederateManager::MessageFederateManager (Core *coreOb, Core::federate_id_t id)
@@ -297,7 +298,9 @@ void MessageFederateManager::registerCallback (endpoint_id_t id, const std::func
 {
     if (id.value () < endpointCount)
     {
-        (*local_endpoints.lock())[id.value ()]->callbackIndex = static_cast<int> (callbacks.size ());
+        auto eplock = local_endpoints.lock();
+        assert(eplock);
+        (*eplock)[id.value ()]->callbackIndex = static_cast<int> (callbacks.size ());
         callbacks.push_back (callback);
     }
     else
@@ -314,6 +317,7 @@ void MessageFederateManager::registerCallback (const std::vector<endpoint_id_t> 
     callbacks.push_back (callback);
     auto cnt = endpointCount.load();
     auto eptLock = local_endpoints.lock();
+    assert(eptLock);
     for (auto id : ids)
     {
         if (id.value () < cnt)

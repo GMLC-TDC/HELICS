@@ -81,39 +81,69 @@ helics_status helicsEndpointSetDefaultDestination (helics_endpoint endpoint, con
     return helics_ok;
 }
 
-helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const char *data, int len)
+helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength)
 {
     if (endpoint == nullptr)
     {
         return helics_invalid_object;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    if ((dest == nullptr) || (std::string (dest).empty ()))
+    if ((data == nullptr) || (inputDataLength <= 0))
     {
-        endObj->endptr->send (data, len);
+        if ((dest == nullptr) || (std::string(dest).empty()))
+        {
+            endObj->endptr->send(std::string());
+        }
+        else
+        {
+            endObj->endptr->send(dest, std::string());
+        }
     }
     else
     {
-        endObj->endptr->send (dest, data, len);
+        if ((dest == nullptr) || (std::string(dest).empty()))
+        {
+            endObj->endptr->send((const char *)data, inputDataLength);
+        }
+        else
+        {
+            endObj->endptr->send(dest, (const char *)data, inputDataLength);
+        }
     }
+    
     return helics_ok;
 }
 
-helics_status helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time)
+helics_status helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength, helics_time_t time)
 {
     if (endpoint == nullptr)
     {
         return helics_invalid_object;
     }
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    if ((dest == nullptr) || (std::string (dest).empty ()))
+    if ((data == nullptr) || (inputDataLength <= 0))
     {
-        endObj->endptr->send (data, len, time);
+        if ((dest == nullptr) || (std::string(dest).empty()))
+        {
+            endObj->endptr->send(std::string(), time);
+        }
+        else
+        {
+            endObj->endptr->send(dest, std::string(), time);
+        }
     }
     else
     {
-        endObj->endptr->send (dest, data, len, time);
+        if ((dest == nullptr) || (std::string(dest).empty()))
+        {
+            endObj->endptr->send((const char *)data, inputDataLength, time);
+        }
+        else
+        {
+            endObj->endptr->send(dest, (const char *)data, inputDataLength, time);
+        }
     }
+    
     return helics_ok;
 }
 

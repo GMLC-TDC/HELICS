@@ -23,6 +23,7 @@ helics::Federate *getFed (helics_federate fed)
     if (fedObj->valid == fedValidationIdentifier)
     {
         return fedObj->fedptr.get ();
+
     }
     return nullptr;
 }
@@ -289,11 +290,13 @@ helics_status helicsFederateEnterExecutionMode (helics_federate fed)
     }
     try
     {
+        //printf("current state=%d\n", static_cast<int>(fedObj->getCurrentState()));
         fedObj->enterExecutionState ();
         return helics_ok;
     }
     catch (helics::InvalidFunctionCall &)
     {
+      //  printf("current state=%d\n", static_cast<int>(fedObj->getCurrentState()));
         return helics_invalid_state_transition;
     }
 }
@@ -611,6 +614,17 @@ helics_status helicsFederateSetLoggingLevel (helics_federate fed, int loggingLev
         return helics_invalid_object;
     }
     fedObj->setLoggingLevel (loggingLevel);
+    return helics_ok;
+}
+
+helics_status helicsFederateSetMaxIterations(helics_federate fed, int maxIterations)
+{
+    auto fedObj = getFed(fed);
+    if (fedObj == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    fedObj->setMaxIterations(maxIterations);
     return helics_ok;
 }
 

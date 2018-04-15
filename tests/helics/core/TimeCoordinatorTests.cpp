@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(dependency_test_message)
     BOOST_CHECK(deps.size() == 2);
     BOOST_CHECK(deps[0] == 2);
     BOOST_CHECK(deps[1] == 3);
-    //test redundency checking
+    //test redundancy checking
     ftc.processDependencyUpdateMessage(addDep);
     deps = ftc.getDependencies();
     BOOST_CHECK(deps.size() == 2);
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(dependent_test_message)
     BOOST_CHECK(deps.size() == 2);
     BOOST_CHECK(deps[0] == 2);
     BOOST_CHECK(deps[1] == 3);
-    //test redundency checking
+    //test redundancy checking
     ftc.processDependencyUpdateMessage(addDep);
     BOOST_CHECK(deps.size() == 2);
     BOOST_CHECK(deps[0] == 2);

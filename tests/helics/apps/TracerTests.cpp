@@ -691,7 +691,9 @@ BOOST_DATA_TEST_CASE(simple_tracer_test_message_files_exe,
     int mcount = 0;
     int valcount = 0;
     auto vec = stringOps::splitline(outAct, "\n\r", stringOps::delimiter_compression::on);
-    BOOST_CHECK_EQUAL(vec.size(), 7);
+    //6 messages, 1 return line, 1 empty line
+    BOOST_CHECK_EQUAL(vec.size(), 8);
+    BOOST_CHECK_EQUAL(vec[6], "execution returned 0");
     for (const auto &line : vec)
     {
         if (line.find("]value") != std::string::npos)

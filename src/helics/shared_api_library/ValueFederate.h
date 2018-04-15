@@ -158,7 +158,7 @@ regardless of the function used to publish the data
 @param len the size in bytes of the data to publish
 @return helics_ok if everything was OK
 */
-HELICS_Export helics_status helicsPublicationPublish (helics_publication pub, const char *data, int len);
+HELICS_Export helics_status helicsPublicationPublishRaw (helics_publication pub, const void *data, int inputDataLength);
 
 /** publish a string
 @param pub the publication to publish for
@@ -217,7 +217,7 @@ HELICS_Export int helicsSubscriptionGetValueSize (helics_subscription sub);
 @param[out] actualLength  the actual length of data copied to data
 @return a helics_status value, helics_ok if everything went fine
 */
-HELICS_Export helics_status helicsSubscriptionGetRawValue (helics_subscription sub, char *data, int maxlen, int *actualLength);
+HELICS_Export helics_status helicsSubscriptionGetRawValue (helics_subscription sub, void *data, int maxlen, int *actualLength);
 
 /** get a string value from a subscription
 @param sub the subscription to get the data for
@@ -225,7 +225,7 @@ HELICS_Export helics_status helicsSubscriptionGetRawValue (helics_subscription s
 @param maxlen the maximum size of information that str can hold
 @return a helics_status value, helics_ok if everything went fine
 */
-HELICS_Export helics_status helicsSubscriptionGetString (helics_subscription sub, char *outputString, int maxlen);
+HELICS_Export helics_status helicsSubscriptionGetString (helics_subscription sub, char *outputString, int maxStringlen, int *actualLength);
 
 /** get an integer value from a subscription
 @param sub the subscription to get the data for
@@ -276,7 +276,7 @@ HELICS_Export helics_status helicsSubscriptionGetVector (helics_subscription sub
 @param len the size of the raw data
 @return helics_ok if everything was OK
 */
-HELICS_Export helics_status helicsSubscriptionSetDefault (helics_subscription sub, const char *data, int len);
+HELICS_Export helics_status helicsSubscriptionSetDefaultRaw (helics_subscription sub, const void *data, int inputDataLength);
 
 /** set the default as a string
 @param sub the subscription to set the default for

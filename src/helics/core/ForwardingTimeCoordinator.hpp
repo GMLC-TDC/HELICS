@@ -61,7 +61,7 @@ class ForwardingTimeCoordinator
     /** take a global id and get a pointer to the dependencyInfo for the other fed
     will be nullptr if it doesn't exist
     */
-    DependencyInfo *getDependencyInfo (Core::federate_id_t ofed);
+    const DependencyInfo *getDependencyInfo (Core::federate_id_t ofed) const;
     /** check whether a federate is a dependency*/
     bool isDependency (Core::federate_id_t ofed) const;
 
@@ -69,6 +69,9 @@ class ForwardingTimeCoordinator
     /**send out the latest time request command*/
     void sendTimeRequest () const;
     void transmitTimingMessage(ActionMessage &msg) const;
+    /** generate a new timing request message by recalculating the times ignoring a particular brokers input
+    */
+    ActionMessage generateTimeRequestIgnoreDependency(const ActionMessage &msg, Core::federate_id_t iFed) const;
   public:
     /** process a message related to time
     @return a message_process_result if it did anything
