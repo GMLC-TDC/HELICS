@@ -319,8 +319,6 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequestIgnoreDependency (co
     Time minNext = Time::maxVal ();
     Time minminDe = Time::maxVal ();
     Time minDe = minminDe;
-    Core::federate_id_t minFed = invalid_fed_id;
-    DependencyInfo::time_state_t tState = DependencyInfo::time_state_t::time_requested;
     for (auto &dep : dependencies)
     {
         if ((dep.minFed == source_id) || (dep.fedID == iFed))
@@ -330,25 +328,12 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequestIgnoreDependency (co
         if (dep.Tnext < minNext)
         {
             minNext = dep.Tnext;
-            tState = dep.time_state;
-        }
-        else if (dep.Tnext == minNext)
-        {
-            if (dep.time_state == DependencyInfo::time_state_t::time_granted)
-            {
-                tState = dep.time_state;
-            }
         }
         if (dep.Tdemin >= dep.Tnext)
         {
             if (dep.Tdemin < minminDe)
             {
                 minminDe = dep.Tdemin;
-                minFed = dep.fedID;
-            }
-            else if (dep.Tdemin == minminDe)
-            {
-                minFed = invalid_fed_id;
             }
         }
         else

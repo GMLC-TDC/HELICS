@@ -5,6 +5,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
+
+#include "testFixtures.hpp"
+#include "helics/application_api/Publications.hpp"
+#include "helics/application_api/Subscriptions.hpp"
+#include "helics/application_api/ValueFederate.hpp"
+
 template <class X>
 void runFederateTest (const std::string &core_type_str,
                       const X &defaultValue,
