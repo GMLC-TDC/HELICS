@@ -23,6 +23,7 @@ Welcome to the repository for the Hierarchical Engine for Large-scale Infrastruc
 [Linux](https://gmlc-tdc.github.io/HELICS-src/installation/linux.html)
 
 # Getting Started
+
 We've created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://github.com/GMLC-TDC/HELICS-Tutorial).   
 
 The [Introduction to the HELICS documentation](https://gmlc-tdc.github.io/HELICS-src/introduction/index.html) steps through a series of examples that step through the basic usage and concepts of HELICS.
@@ -30,7 +31,6 @@ The [Introduction to the HELICS documentation](https://gmlc-tdc.github.io/HELICS
 The [HELICS-Tutorial repository](https://github.com/GMLC-TDC/HELICS-Tutorial) provides a series of tutorials using HELICS to build a co-simulation using domain-specific external modeling tools that is built around an electric power system use case with integrated transmission-distribution-market-communication quasi-steady-state-timeseries (QSTS) simulation.
 
 The [HELICS-Use-Cases repository](https://github.com/GMLC-TDC/HELICS-Use-Cases) includes examples for a growing range of research use cases for inspiration.
-
 
 # Documentation
 
@@ -71,7 +71,7 @@ We are always looking for help adding support for more tools, so please contact 
 
 [1] B. Palmintier, D. Krishnamurthy, P. Top, S. Smith, J. Daily, and J. Fuller, “Design of the HELICS High-Performance Transmission-Distribution-Communication-Market Co-Simulation Framework,” in *Proc. of the 2017 Workshop on Modeling and Simulation of Cyber-Physical Energy Systems*, Pittsburgh, PA, 2017. [pre-print](https://www.nrel.gov/docs/fy17osti/67928.pdf) [published](https://ieeexplore.ieee.org/document/8064542/) 
 
-#### Research using HELICS
+
 
 
 
