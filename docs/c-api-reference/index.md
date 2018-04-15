@@ -46,66 +46,6 @@
 .. doxygenfunction:: HELICS_DATA_TYPE_VECTOR
    :project: helics
 
-.. doxygenfunction:: __builtin__
-   :project: helics
-
-.. doxygenfunction:: __builtins__
-   :project: helics
-
-.. doxygenfunction:: __cached__
-   :project: helics
-
-.. doxygenfunction:: __doc__
-   :project: helics
-
-.. doxygenfunction:: __file__
-   :project: helics
-
-.. doxygenfunction:: __loader__
-   :project: helics
-
-.. doxygenfunction:: __name__
-   :project: helics
-
-.. doxygenfunction:: __package__
-   :project: helics
-
-.. doxygenfunction:: __spec__
-   :project: helics
-
-.. doxygenfunction:: _helics
-   :project: helics
-
-.. doxygenfunction:: _newclass
-   :project: helics
-
-.. doxygenfunction:: _object
-   :project: helics
-
-.. doxygenfunction:: _swig_getattr
-   :project: helics
-
-.. doxygenfunction:: _swig_property
-   :project: helics
-
-.. doxygenfunction:: _swig_repr
-   :project: helics
-
-.. doxygenfunction:: _swig_setattr
-   :project: helics
-
-.. doxygenfunction:: _swig_setattr_nondynamic
-   :project: helics
-
-.. doxygenfunction:: cvar
-   :project: helics
-
-.. doxygenfunction:: data_t
-   :project: helics
-
-.. doxygenfunction:: data_t_swigregister
-   :project: helics
-
 .. doxygenfunction:: force_iteration
    :project: helics
 
