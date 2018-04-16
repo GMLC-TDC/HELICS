@@ -244,7 +244,7 @@ static helics::CloningFilter *getCloningFilter (helics_filter filt)
 }
 
 /** get the target of the filter*/
-helics_status helicsFilterGetTarget (helics_filter filt, char *str, int maxlen)
+helics_status helicsFilterGetTarget (helics_filter filt, char *outputString, int maxlen)
 {
     auto filter = getFilter (filt);
     if (filter == nullptr)
@@ -254,16 +254,16 @@ helics_status helicsFilterGetTarget (helics_filter filt, char *str, int maxlen)
     auto target = filter->getTarget ();
     if (static_cast<int> (target.size ()) > maxlen)
     {
-        strncpy (str, target.c_str (), maxlen);
-        str[maxlen - 1] = 0;
+        strncpy (outputString, target.c_str (), maxlen);
+        outputString[maxlen - 1] = 0;
         return helics_warning;
     }
-    strcpy (str, target.c_str ());
+    strcpy (outputString, target.c_str ());
     return helics_ok;
 }
 
 /** get the name of the filter*/
-helics_status helicsFilterGetName (helics_filter filt, char *str, int maxlen)
+helics_status helicsFilterGetName (helics_filter filt, char *outputString, int maxlen)
 {
     auto filter = getFilter (filt);
     if (filter == nullptr)
@@ -273,11 +273,11 @@ helics_status helicsFilterGetName (helics_filter filt, char *str, int maxlen)
     auto name = filter->getTarget ();
     if (static_cast<int> (name.size ()) > maxlen)
     {
-        strncpy (str, name.c_str (), maxlen);
-        str[maxlen - 1] = 0;
+        strncpy (outputString, name.c_str (), maxlen);
+        outputString[maxlen - 1] = 0;
         return helics_warning;
     }
-    strcpy (str, name.c_str ());
+    strcpy (outputString, name.c_str ());
     return helics_ok;
 }
 
@@ -414,4 +414,3 @@ helics_status helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char
     cfilt->removeDeliveryEndpoint (delivery);
     return helics_ok;
 }
-

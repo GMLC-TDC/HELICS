@@ -47,7 +47,7 @@ constexpr interface_visibility LOCAL = interface_visibility::local;
 enum class interface_availability
 {
     required,  //!< the matching interface is required to exist
-    optional    //!< the matching interface is NOT required
+    optional  //!< the matching interface is NOT required
 };
 
 constexpr interface_availability OPTIONAL = interface_availability::optional;
@@ -142,6 +142,14 @@ inline std::string typeNameString<float> ()
 {
     return "float";
 }
+
+/** for boolean*/
+template <>
+inline std::string typeNameString<bool> ()
+{
+    return "bool";
+}
+
 /** for character*/
 template <>
 inline std::string typeNameString<char> ()
@@ -197,7 +205,7 @@ inline std::string typeNameString<std::string> ()
 }
 
 template <>
-inline std::string typeNameString<named_point>()
+inline std::string typeNameString<named_point> ()
 {
     return "named_point";
 }
@@ -212,6 +220,7 @@ enum class helics_type_t : int
     helicsVector = 4,
     helicsComplexVector = 5,
     helicsNamedPoint = 6,
+    helicsBool = 7,
     helicsInvalid = 23425,
     helicsAny = 247652,
 };
@@ -227,9 +236,9 @@ std::string helicsComplexString (std::complex<double> val);
 std::string helicsVectorString (const std::vector<double> &val);
 std::string helicsVectorString (const double *vals, size_t size);
 std::string helicsComplexVectorString (const std::vector<std::complex<double>> &val);
-std::string helicsNamedPointString(const named_point &point);
-std::string helicsNamedPointString(const std::string &pointName, double val);
-std::string helicsNamedPointString(const char *pointName, double val);
+std::string helicsNamedPointString (const named_point &point);
+std::string helicsNamedPointString (const std::string &pointName, double val);
+std::string helicsNamedPointString (const char *pointName, double val);
 /** convert a string to a complex number*/
 std::complex<double> helicsGetComplex (const std::string &val);
 /** convert a string to a vector*/
@@ -237,7 +246,7 @@ std::vector<double> helicsGetVector (const std::string &val);
 /** convert a string to a complex vector*/
 std::vector<std::complex<double>> helicsGetComplexVector (const std::string &val);
 
-named_point helicsGetNamedPoint(const std::string &val);
+named_point helicsGetNamedPoint (const std::string &val);
 
 void helicsGetVector (const std::string &val, std::vector<double> &data);
 void helicsGetComplexVector (const std::string &val, std::vector<std::complex<double>> &data);
@@ -254,9 +263,10 @@ data_block typeConvert (helics_type_t type, const std::vector<double> &val);
 data_block typeConvert (helics_type_t type, const double *vals, size_t size);
 data_block typeConvert (helics_type_t type, const std::vector<std::complex<double>> &val);
 data_block typeConvert (helics_type_t type, const std::complex<double> &val);
-data_block typeConvert(helics_type_t type, named_point &val);
-data_block typeConvert(helics_type_t type, const char *str, double val);
-data_block typeConvert(helics_type_t type, const std::string &str, double val);
+data_block typeConvert (helics_type_t type, named_point &val);
+data_block typeConvert (helics_type_t type, const char *str, double val);
+data_block typeConvert (helics_type_t type, const std::string &str, double val);
+data_block typeConvert (helics_type_t type, bool val);
 
 /** template class for generating a known name of a type*/
 template <class X>
@@ -272,11 +282,22 @@ constexpr helics_type_t helicsType<int64_t> ()
 }
 
 template <>
+constexpr helics_type_t helicsType<bool> ()
+{
+    return helics_type_t::helicsBool;
+}
+
+template <>
 constexpr helics_type_t helicsType<std::string> ()
 {
     return helics_type_t::helicsString;
 }
 
+template <>
+constexpr helics_type_t helicsType<named_point> ()
+{
+    return helics_type_t::helicsNamedPoint;
+}
 template <>
 constexpr helics_type_t helicsType<double> ()
 {
@@ -308,13 +329,6 @@ constexpr bool isConvertableType ()
     return false;
 }
 
-template <class X>
-constexpr typename std::enable_if<helicsType<X> () != helics_type_t::helicsInvalid, bool>::type
-isConvertableType ()
-{
-    return false;
-}
-
 template <>
 constexpr bool isConvertableType<float> ()
 {
@@ -335,6 +349,12 @@ constexpr bool isConvertableType<int> ()
 
 template <>
 constexpr bool isConvertableType<short> ()
+{
+    return true;
+}
+
+template <>
+constexpr bool isConvertableType<unsigned short> ()
 {
     return true;
 }
@@ -383,4 +403,3 @@ constexpr std::complex<double> invalidValue<std::complex<double>> ()
 }
 
 }  // namespace helics
-

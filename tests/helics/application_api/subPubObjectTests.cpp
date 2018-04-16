@@ -62,7 +62,6 @@ BOOST_AUTO_TEST_CASE (subscriptionTObject_tests)
     vFed->finalize ();
 }
 
-
 BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (subscriptionObject_tests)
 {
@@ -134,7 +133,6 @@ void runPubSubTypeTests (const TX &valtx, const RX &valrx)
 #define SKIPTEST
 #endif
 
-
 BOOST_TEST_DECORATOR (*utf::timeout (35))
 BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests)
 {
@@ -146,7 +144,6 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests)
     SKIPTEST runPubSubTypeTests<int64_t, std::string> (34, "34");
     SKIPTEST runPubSubTypeTests<std::string, int64_t> ("34.14", 34);
 }
-
 
 BOOST_TEST_DECORATOR (*utf::timeout (35))
 BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests)
@@ -170,7 +167,6 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests)
     SKIPTEST runPubSubTypeTests<c, double> (c (3.0, 4.0), 5.0);
     SKIPTEST runPubSubTypeTests<c, int64_t> (c (3.0, 4.0), 5);
 }
-
 
 BOOST_TEST_DECORATOR (*utf::timeout (45))
 BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests)
@@ -209,7 +205,6 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests)
 
     SKIPTEST runPubSubTypeTests<int64_t, v> (56, v{56});
 }
-
 
 BOOST_TEST_DECORATOR (*utf::timeout (35))
 BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
@@ -256,4 +251,3 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
-

@@ -25,7 +25,7 @@ int main(int /*argc*/,char ** /*argv*/)
   std::string    initstring="2 --name=mainbroker";
   std::string    fedinitstring="--federates=1";
   double         deltat=0.01;
-  helics_publication pub;
+  helics::Publication pub;
 
   std::string helicsversion = helics::getHelicsVersionString();
 
@@ -65,11 +65,11 @@ int main(int /*argc*/,char ** /*argv*/)
   printf("PI SENDER: Publication registered\n");
 
   /* Enter initialization state */
-  vfed->enterInitializationState(); // can throw helics::InvalidStateTransition exception
+  vfed->enterInitializationMode(); // can throw helics::InvalidStateTransition exception
   printf("PI SENDER: Entered initialization state\n");
 
   /* Enter execution state */
-  vfed->enterExecutionState(); // can throw helics::InvalidStateTransition exception
+  vfed->enterExecutionMode(); // can throw helics::InvalidStateTransition exception
   printf("PI SENDER: Entered execution state\n");
 
   /* This federate will be publishing deltat*pi for numsteps steps */
@@ -82,7 +82,7 @@ int main(int /*argc*/,char ** /*argv*/)
     double val = currenttime*value;
 
     printf("PI SENDER: Sending value %3.2fpi = %4.3f at time %3.2f to PI RECEIVER\n",deltat*i,val,currenttime);
-    vfed->publish(pub, val);
+    pub.publish( val);
 
     currenttime = vfed->requestTime(currenttime);
   }

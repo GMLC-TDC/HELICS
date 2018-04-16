@@ -54,7 +54,6 @@ through other functions
 */
 HELICS_Export helics_filter helicsFederateRegisterCloningFilter (helics_federate fed, const char *deliveryEndpoint);
 
-
 /** create a source Filter on the specified core
 @details filters can be created through a federate or a core , linking through a federate allows
 a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
@@ -90,21 +89,21 @@ through other functions
 @param deliveryEndpoint the specified endpoint to deliver the message
 @return a helics_filter object
 */
-HELICS_Export helics_filter helicsCoreRegisterCloningFilter (helics_core fed, const char *deliveryEndpoint);
+HELICS_Export helics_filter helicsCoreRegisterCloningFilter (helics_core core, const char *deliveryEndpoint);
 
 /** get the target of the filter and store in the given string
 @param filt the given filter
-@param[out] str storage for the name of the target
+@param[out] outputString storage for the name of the target
 @param maxlen the maximum length of string that str can store
 @return a helics_status enumeration helics_ok if everything worked*/
-HELICS_Export helics_status helicsFilterGetTarget (helics_filter filt, char *str, int maxlen);
+HELICS_Export helics_status helicsFilterGetTarget (helics_filter filt, char *outputString, int maxlen);
 
 /** get the name of the filter and store in the given string
 @param filt the given filter
-@param[out] str storage for the name of the target
+@param[out] outputString storage for the name of the target
 @param maxlen the maximum length of string that str can store
 @return a helics_status enumeration helics_ok if everything worked*/
-HELICS_Export helics_status helicsFilterGetName (helics_filter filt, char *str, int maxlen);
+HELICS_Export helics_status helicsFilterGetName (helics_filter filt, char *outputString, int maxlen);
 
 /** set a property on a filter
 @param filt the filter to modify
@@ -154,4 +153,3 @@ HELICS_Export helics_status helicsFilterRemoveDeliveryEndpoint (helics_filter fi
 #endif
 
 #endif /* HELICS_APISHARED_MESSAGE_FILTER_FEDERATE_FUNCTIONS_H_*/
-

@@ -7,8 +7,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../core/core-data.hpp"
 #include "Federate.hpp"
-#include "data_view.hpp"
 #include "ValueConverter.hpp"
+#include "data_view.hpp"
 #include <functional>
 
 namespace helics
@@ -32,16 +32,20 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] jsonString can be either a json file or a string containing json code
     */
     explicit ValueFederate (const std::string &jsonString);
+    /**constructor taking a string with the required information
+    @param[in] jsonString can be either a json file or a string containing json code
+    */
+    ValueFederate (const std::string &name, const std::string &jsonString);
 
     /** default constructor*/
     explicit ValueFederate ();
 
     /** special constructor called by child class to initialize the class vs the default constructor
-    */
+     */
     explicit ValueFederate (bool res);
 
   public:
-      /** federate is not copyable*/
+    /** federate is not copyable*/
     ValueFederate (const ValueFederate &fed) = delete;
     /** default move constructor*/
     ValueFederate (ValueFederate &&fed) noexcept;
@@ -503,7 +507,7 @@ operation vs the member getValue calls
 template <class X>
 void getValue (std::shared_ptr<ValueFederate> &fed, const std::string &Key, X &obj)
 {
-    obj=fed->getValue<X> (fed->getSubscriptionId (Key));
+    obj = fed->getValue<X> (fed->getSubscriptionId (Key));
 }
 
 /** get a value directly from the subscription key name
@@ -530,7 +534,6 @@ operation vs the member getValue calls
 template <class X>
 void getValue (ValueFederate &fed, const std::string &Key, X &obj)
 {
-    obj=fed.getValue<X> (fed.getSubscriptionId (Key));
+    obj = fed.getValue<X> (fed.getSubscriptionId (Key));
 }
 }  // namespace helics
-

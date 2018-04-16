@@ -14,16 +14,22 @@ namespace helics
 {
 MessageFederate::MessageFederate (const FederateInfo &fi) : Federate (fi)
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
 }
-MessageFederate::MessageFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : Federate (core, fi)
+MessageFederate::MessageFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi) : Federate (core, fi)
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
 }
 MessageFederate::MessageFederate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
+    registerInterfaces (jsonString);
+}
+
+MessageFederate::MessageFederate (const std::string &name, const std::string &jsonString)
+    : Federate (loadFederateInfo (name, jsonString))
+{
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
     registerInterfaces (jsonString);
 }
 
@@ -35,7 +41,7 @@ MessageFederate::MessageFederate ()
 MessageFederate::MessageFederate (bool)
 {  // this constructor should only be called by child class that has already constructed the underlying federate in
    // a virtual inheritance
-    mfManager = std::make_unique<MessageFederateManager> (coreObject.get(), getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
 }
 MessageFederate::MessageFederate (MessageFederate &&) noexcept = default;
 
@@ -99,7 +105,7 @@ void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
     {
         for (const auto &ept : doc["endpoints"])
         {
-            auto name = ept["name"].asString ();
+            auto name = getKey (ept);
             auto type = (ept.isMember ("type")) ? ept["type"].asString () : "";
             bool global = (ept.isMember ("global")) ? (ept["global"].asBool ()) : false;
             endpoint_id_t epid;
@@ -309,7 +315,8 @@ void MessageFederate::registerEndpointCallback (const std::function<void(endpoin
 {
     mfManager->registerCallback (func);
 }
-void MessageFederate::registerEndpointCallback (endpoint_id_t ep, const std::function<void(endpoint_id_t, Time)> &func)
+void MessageFederate::registerEndpointCallback (endpoint_id_t ep,
+                                                const std::function<void(endpoint_id_t, Time)> &func)
 {
     mfManager->registerCallback (ep, func);
 }
@@ -323,4 +330,3 @@ void MessageFederate::registerEndpointCallback (const std::vector<endpoint_id_t>
 int MessageFederate::getEndpointCount () const { return mfManager->getEndpointCount (); }
 
 }  // namespace helics
-

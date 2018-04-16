@@ -16,14 +16,14 @@ using namespace std::string_literals;
 
 namespace helics
 {
-static const ArgDescriptors extraArgs{{"interface"s,
-                                       "the local interface to use for the receive ports"s},
-                                      {"broker,b"s, "identifier for the broker"s},
-                                      {"broker_address", "location of the broker i.e network address"},
-                                      {"brokerport"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker priority port"s},
-                                      {"localport"s, ArgDescriptor::arg_type_t::int_type, "port number for the local receive port"s},
-                                      {"port"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker's port"s},
-                                      {"portstart"s, ArgDescriptor::arg_type_t::int_type, "starting port for automatic port definitions"s}};
+static const ArgDescriptors extraArgs{
+  {"interface"s, "the local interface to use for the receive ports"s},
+  {"broker,b"s, "identifier for the broker"s},
+  {"broker_address", "location of the broker i.e network address"},
+  {"brokerport"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker priority port"s},
+  {"localport"s, ArgDescriptor::arg_type_t::int_type, "port number for the local receive port"s},
+  {"port"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker's port"s},
+  {"portstart"s, ArgDescriptor::arg_type_t::int_type, "starting port for automatic port definitions"s}};
 
 void NetworkBrokerData::displayHelp ()
 {
@@ -69,37 +69,36 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
         {
             addr = brkr->getAddress ();
         }
-        if (brokerAddress.empty())
+        if (brokerAddress.empty ())
         {
-            auto sc = addr.find_first_of(';', 1);
+            auto sc = addr.find_first_of (';', 1);
             if (sc == std::string::npos)
             {
-                auto brkprt = extractInterfaceandPort(addr);
+                auto brkprt = extractInterfaceandPort (addr);
                 brokerAddress = brkprt.first;
                 brokerPort = brkprt.second;
             }
             else
             {
-                auto brkprt = extractInterfaceandPort(addr.substr(0, sc));
+                auto brkprt = extractInterfaceandPort (addr.substr (0, sc));
                 brokerAddress = brkprt.first;
                 brokerPort = brkprt.second;
-                brkprt = extractInterfaceandPort(addr.substr(sc + 1));
+                brkprt = extractInterfaceandPort (addr.substr (sc + 1));
                 if (brkprt.first != brokerAddress)
                 {
                     // TODO::Print a message?
                 }
             }
-            checkAndUpdateBrokerAddress(localAddress);
+            checkAndUpdateBrokerAddress (localAddress);
         }
         else
         {
             brokerName = addr;
         }
-
     }
-    if (vm.count("brokername") > 0)
+    if (vm.count ("brokername") > 0)
     {
-        brokerName = vm["brokername"].as<std::string>();
+        brokerName = vm["brokername"].as<std::string> ();
     }
 
     if (vm.count ("interface") > 0)
@@ -238,4 +237,3 @@ std::string getLocalExternalAddressV4 (const std::string & /*server*/)
 }
 
 }  // namespace helics
-

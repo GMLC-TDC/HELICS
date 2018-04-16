@@ -1,9 +1,9 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+
 #ifndef HELICS_APISHARED_FUNCTIONS_H_
 #define HELICS_APISHARED_FUNCTIONS_H_
 
@@ -22,7 +22,7 @@ extern "C" {
   it may be set to __declspec(dllimport).
 */
 #if !defined(HELICS_Export)
-#if defined _WIN32 || defined __CYGWIN__
+#if defined(_WIN32) || defined(__CYGWIN__)
 /* Note: both gcc & MSVC on Windows support this syntax. */
 #define HELICS_Export __declspec(dllexport)
 #else
@@ -66,8 +66,8 @@ HELICS_Export helics_core helicsCreateCoreFromArgs (const char *type, const char
 /** create a new reference to an existing broker
 @details this will create a new broker object that references the existing broker it must be freed as well
 @param broker an existing helics_broker
-@return a new refernce to the same broker*/
-HELICS_Export helics_core helicsCoreClone(helics_core core);
+@return a new reference to the same broker*/
+HELICS_Export helics_core helicsCoreClone (helics_core core);
 
 /** create a broker object
 @param type the type of the broker to create
@@ -89,8 +89,8 @@ HELICS_Export helics_broker helicsCreateBrokerFromArgs (const char *type, const 
 /** create a new reference to an existing broker
 @details this will create a new broker object that references the existing broker it must be freed as well
 @param broker an existing helics_broker
-@return a new refernce to the same broker*/
-HELICS_Export helics_broker helicsBrokerClone(helics_broker broker);
+@return a new reference to the same broker*/
+HELICS_Export helics_broker helicsBrokerClone (helics_broker broker);
 /** check if a broker is connected
 a connected broker implies is attached to cores or cores could reach out to communicate
 return 0 if not connected , something else if it is connected*/
@@ -129,7 +129,7 @@ HELICS_Export helics_status helicsBrokerGetAddress (helics_broker broker, char *
 @details this function is used for cores that have filters but no federates so there needs to be
 a direct signal to the core to trigger the federation initialization
 */
-HELICS_Export helics_status helicsCoreSetReadyToInit(helics_core core);
+HELICS_Export helics_status helicsCoreSetReadyToInit (helics_core core);
 
 /** get an identifier for the core
 @param core the core to query
@@ -144,7 +144,7 @@ HELICS_Export helics_status helicsCoreDisconnect (helics_core core);
 must still be active in the process
 @param fedName the name of the federate to retrieve
 @return NULL if no fed is available by that name otherwise a helics_federate with that name*/
-HELICS_Export helics_federate helicsGetFederateByName(const char *fedName);
+HELICS_Export helics_federate helicsGetFederateByName (const char *fedName);
 
 /** get the network address associated with a broker
 @param broker the broker to query
@@ -210,7 +210,7 @@ HELICS_Export helics_federate helicsCreateCombinationFederateFromJson (const cha
 @details this will create a new helics_federate object that references the existing federate it must be freed as well
 @param fed an existing helics_federate
 @return a new reference to the same federate*/
-HELICS_Export helics_federate helicsFederateClone(helics_federate fed);
+HELICS_Export helics_federate helicsFederateClone (helics_federate fed);
 
 /** create a federate info object for specifying federate information when constructing a federate
 @return a helics_federate_info_t object which is a reference to the created object
@@ -276,21 +276,24 @@ HELICS_Export helics_status helicsFederateInfoSetFlag (helics_federate_info_t fi
 /** set the output delay for a federate
 @param fi the federate info object to alter
 @param outputDelay the desired output delay of the federate
-@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the specified outputdelay is invalid
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the
+specified outputdelay is invalid
 */
 
 HELICS_Export helics_status helicsFederateInfoSetOutputDelay (helics_federate_info_t fi, helics_time_t outputDelay);
 /** set the minimum time delta between returns for a federate info object
 @param fi the federate info object to alter
 @param timeDelta the desired output delay of the federate
-@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the specified time_delta is invalid
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the
+specified time_delta is invalid
 */
 
 HELICS_Export helics_status helicsFederateInfoSetTimeDelta (helics_federate_info_t fi, helics_time_t timeDelta);
 /** set the input delay for a federate info object
 @param fi the federate info object to alter
 @param inputDelay the desired output delay of the federate
-@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the specified inputDelay is invalid
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the
+specified inputDelay is invalid
 */
 HELICS_Export helics_status helicsFederateInfoSetInputDelay (helics_federate_info_t fi, helics_time_t inputDelay);
 
@@ -299,7 +302,8 @@ HELICS_Export helics_status helicsFederateInfoSetInputDelay (helics_federate_inf
 the offset will shift this return by some amount of time such that the federate will only grant times such as \f$ N*period+offset \f$
 @param fi the federateInfo object to alter
 @param timeOffset the desired timeOffset
-@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the specified offset is invalid
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the
+specified offset is invalid
 */
 HELICS_Export helics_status helicsFederateInfoSetTimeOffset (helics_federate_info_t fi, helics_time_t timeOffset);
 
@@ -309,7 +313,8 @@ the offset will shift this return by some amount of time such that the federate 
 period must be strictly greater than 0, though setting to 0 implies a period of the timeEpsilon used in HELICS
 @param fi the federateInfo object to alter
 @param period the desired period
-@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the specified period is invalid
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the
+specified period is invalid
 */
 HELICS_Export helics_status helicsFederateInfoSetPeriod (helics_federate_info_t fi, helics_time_t period);
 
@@ -317,7 +322,8 @@ HELICS_Export helics_status helicsFederateInfoSetPeriod (helics_federate_info_t 
 @details a federate will iterate for at most min(maxIterations,core maxIterations)
 @param fi the federateInfo object to alter
 @param maxIterations the maximum number of iterations a federate is allowed per timestep
-@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the specified offset is invalid
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the
+specified offset is invalid
 */
 HELICS_Export helics_status helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int maxIterations);
 
@@ -477,11 +483,11 @@ HELICS_Export helics_status helicsFederateRequestTimeIterativeComplete (helics_f
 
 /** get the name of the federate
 @param fed the federate object to query
-@param[out] str memory buffer to store the result
+@param[out] outputString memory buffer to store the result
 @param maxlen the maximum size of the buffer
 @return helics_status object indicating success or error
 */
-HELICS_Export helics_status helicsFederateGetName (helics_federate fed, char *str, int maxlen);
+HELICS_Export helics_status helicsFederateGetName (helics_federate fed, char *outputString, int maxlen);
 
 /** set the minimum time delta for the federate
 @param[in] tdelta the minimum time delta to return from a time request function
@@ -518,6 +524,15 @@ HELICS_Export helics_status helicsFederateSetFlag (helics_federate fed, int flag
 */
 HELICS_Export helics_status helicsFederateSetLoggingLevel (helics_federate fed, int loggingLevel);
 
+/** set the max iteration count to use in federate in the info object
+@details a federate will iterate for at most min(maxIterations,core maxIterations)
+@param fi the federateInfo object to alter
+@param maxIterations the maximum number of iterations a federate is allowed per timestep
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fed is not a valid reference helics_discard if the
+specified offset is invalid
+*/
+HELICS_Export helics_status helicsFederateSetMaxIterations (helics_federate_info_t fi, int maxIterations);
+
 /** get the current time of the federate
 @param fed the federate object to query
 @param[out] time storage location for the time variable
@@ -528,7 +543,7 @@ HELICS_Export helics_status helicsFederateGetCurrentTime (helics_federate fed, h
 @details a query object consists of a target and query string
 */
 HELICS_Export helics_query helicsCreateQuery (const char *target, const char *query);
- 
+
 /** Execute a query
 @details the call will block until the query finishes which may require communication or other delays
 @param query the query object to use in the query
@@ -572,4 +587,3 @@ HELICS_Export void helicsCleanupHelicsLibrary ();
 #endif
 
 #endif
-

@@ -30,6 +30,10 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     @param[in] file a file defining the federate information
     */
     explicit CombinationFederate (const std::string &jsonString);
+    /**constructor taking a federate name and a file with the required information
+    @param[in] file a file defining the federate information
+    */
+    CombinationFederate (const std::string &name, const std::string &jsonString);
 
     /** move construction*/
     CombinationFederate (CombinationFederate &&fed) noexcept;
@@ -49,4 +53,3 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     virtual void registerInterfaces (const std::string &jsonString) override;
 };
 }  // namespace helics
-

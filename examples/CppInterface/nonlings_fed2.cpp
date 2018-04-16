@@ -13,8 +13,8 @@ int main(int /*argc*/,char ** /*argv*/)
 {
   std::string    fedinitstring="--federates=1";
   double         deltat=0.01;
-  helics_subscription sub;
-  helics_publication  pub;
+  helics::Subscription sub;
+  helics::Publication  pub;
 
 
   std::string helicsversion = helics::getHelicsVersionString();
@@ -48,14 +48,14 @@ int main(int /*argc*/,char ** /*argv*/)
 
 
   /* Enter initialization state */
-  vfed->enterInitializationState(); // can throw helics::InvalidStateTransition exception
+  vfed->enterInitializationMode(); // can throw helics::InvalidStateTransition exception
   printf(" Entered initialization state\n");
   double y = 1.0, /*xprv = 100,*/yprv=100;
 
-  vfed->publish(pub, y);
+  pub.publish(y);
   fflush(NULL);
   /* Enter execution state */
-  vfed->enterExecutionState(); // can throw helics::InvalidStateTransition exception
+  vfed->enterExecutionMode(); // can throw helics::InvalidStateTransition exception
   printf(" Entered execution state\n");
 
   fflush(NULL);
@@ -70,7 +70,7 @@ int main(int /*argc*/,char ** /*argv*/)
   {
 
 //    xprv = x;
-    double x = vfed->getDouble(sub);
+    double x = sub.getDouble();
     ++helics_iter;
     int    newt_conv = 0, max_iter=10,iter=0;
 
@@ -95,7 +95,7 @@ int main(int /*argc*/,char ** /*argv*/)
 
     if ((fabs(y-yprv)>tol)||(helics_iter<5))
     {
-      vfed->publish(pub,y);
+      pub.publish(y);
       printf("Fed2: publishing y\n");
     }
     fflush(NULL);

@@ -1,15 +1,16 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "ZmqCore.h"
-#include "ZmqComms.h"
 
+#include "ZmqCore.h"
+#include "../../common/zmqContextManager.h"
+#include "ZmqComms.h"
 namespace helics
 {
-namespace zeromq {
+namespace zeromq
+{
 ZmqCore::ZmqCore () noexcept {}
 
 ZmqCore::~ZmqCore () = default;
@@ -27,6 +28,7 @@ void ZmqCore::initializeFromArgs (int argc, const char *const *argv)
 
 bool ZmqCore::brokerConnect ()
 {
+    zmqContextManager::startContext ();
     std::lock_guard<std::mutex> lock (dataMutex);
     if (netInfo.brokerAddress.empty ())  // cores require a broker
     {
@@ -65,6 +67,5 @@ std::string ZmqCore::getAddress () const
     }
 }
 
-} // namespace zeromq
+}  // namespace zeromq
 }  // namespace helics
-

@@ -41,7 +41,7 @@ std::shared_ptr<zmqContextManager> zmqContextManager::getContextPointer (const s
     {
         return fnd->second;
     }
-   // std::cout << "creating context in " << std::this_thread::get_id() << std::endl;
+    // std::cout << "creating context in " << std::this_thread::get_id() << std::endl;
     auto newContext = std::shared_ptr<zmqContextManager> (new zmqContextManager (contextName));
     contexts.emplace (contextName, newContext);
     return newContext;
@@ -51,6 +51,17 @@ std::shared_ptr<zmqContextManager> zmqContextManager::getContextPointer (const s
 zmq::context_t &zmqContextManager::getContext (const std::string &contextName)
 {
     return getContextPointer (contextName)->getBaseContext ();
+}
+
+void zmqContextManager::startContext (const std::string &contextName)
+{
+    std::lock_guard<std::mutex> conlock (contextLock);
+    auto fnd = contexts.find (contextName);
+    if (fnd == contexts.end ())
+    {
+        auto newContext = std::shared_ptr<zmqContextManager> (new zmqContextManager (contextName));
+        contexts.emplace (contextName, std::move (newContext));
+    }
 }
 
 void zmqContextManager::closeContext (const std::string &contextName)
@@ -75,8 +86,8 @@ bool zmqContextManager::setContextToLeakOnDelete (const std::string &contextName
 }
 zmqContextManager::~zmqContextManager ()
 {
-    //std::cout << "destroying context in " << std::this_thread::get_id() << std::endl;
-    
+    // std::cout << "destroying context in " << std::this_thread::get_id() << std::endl;
+
     if (leakOnDelete)
     {
         // yes I am purposefully leaking this PHILIP TOP
@@ -85,7 +96,7 @@ zmqContextManager::~zmqContextManager ()
     }
     else
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        std::this_thread::sleep_for (std::chrono::milliseconds (200));
     }
 }
 
@@ -93,4 +104,3 @@ zmqContextManager::zmqContextManager (const std::string &contextName)
     : name (contextName), zcontext (std::make_unique<zmq::context_t> ())
 {
 }
-

@@ -15,9 +15,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/PublicationInfo.hpp"
 #include "helics/core/SubscriptionInfo.hpp"
 
-federateStateTestFixture::federateStateTestFixture ():fs(std::make_unique<helics::FederateState>("fed_name",helics::CoreFederateInfo()))
+federateStateTestFixture::federateStateTestFixture ()
+    : fs (std::make_unique<helics::FederateState> ("fed_name", helics::CoreFederateInfo ()))
 {
-
 }
 
 federateStateTestFixture::~federateStateTestFixture () = default;
@@ -29,4 +29,3 @@ coreBrokerTestFixture::~coreBrokerTestFixture () = default;
 commonCoreTestFixture::commonCoreTestFixture () = default;
 
 commonCoreTestFixture::~commonCoreTestFixture () = default;
-

@@ -64,8 +64,8 @@ BOOST_AUTO_TEST_CASE (InterprocessCore_test)
     BOOST_REQUIRE (core);
     helics::CoreFactory::unregisterCore (core->getIdentifier ());
     core = nullptr;
-    //make sure the OS has the chance to clean up a file
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // make sure the OS has the chance to clean up a file
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
     auto core2 = helics::CoreFactory::create (helics::core_type::IPC, "");
     BOOST_REQUIRE (core2);
     helics::CoreFactory::unregisterCore (core2->getIdentifier ());
@@ -110,4 +110,3 @@ BOOST_AUTO_TEST_CASE (udpCore_test)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
-

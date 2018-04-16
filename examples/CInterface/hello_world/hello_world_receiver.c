@@ -64,8 +64,9 @@ int main ()
     isUpdated = helicsSubscriptionIsUpdated (sub);
     if (isUpdated)
     { /* get the value*/
+        int actualLen;
         char value[128] = ""; /**space to store the sent value*/
-        helicsSubscriptionGetString(sub, value, 128);
+        helicsSubscriptionGetString(sub, value, 128,&actualLen);
         printf("%s\n", value);
     }
     else

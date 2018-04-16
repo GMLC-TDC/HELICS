@@ -5,11 +5,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "ZmqBroker.h"
+#include "../../common/zmqContextManager.h"
 #include "ZmqComms.h"
-
 namespace helics
 {
-namespace zeromq {
+namespace zeromq
+{
 ZmqBroker::ZmqBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 ZmqBroker::ZmqBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
@@ -42,6 +43,7 @@ bool ZmqBroker::brokerConnect ()
     {
         setAsRoot ();
     }
+    zmqContextManager::startContext ();
     comms = std::make_unique<ZmqComms> (netInfo);
     comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
@@ -75,6 +77,5 @@ std::string ZmqBroker::getAddress () const
     }
 }
 
-} // namespace zeromq
+}  // namespace zeromq
 }  // namespace helics
-

@@ -1,3 +1,9 @@
+##############################################################################
+#Copyright © 2017-2018,
+#Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+#All rights reserved. See LICENSE file and DISCLAIMER for more details.
+##############################################################################
+
 cmake_minimum_required (VERSION 3.4)
 project (HELICS)
 
@@ -7,9 +13,9 @@ project (HELICS)
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
 set (HELICS_VERSION_PATCH 0)
-set (HELICS_VERSION_BUILD beta.2)
-set (HELICS_DATE "03-20-18")
-set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}-${HELICS_VERSION_BUILD}")
+set (HELICS_VERSION_BUILD 0)
+set (HELICS_DATE "04-15-18")
+set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}")
 set (HELICS_VERSION_STRING "${HELICS_VERSION} ${HELICS_DATE}")
 
 #-----------------------------------------------------------------------------
@@ -17,9 +23,12 @@ set (HELICS_VERSION_STRING "${HELICS_VERSION} ${HELICS_DATE}")
 #-----------------------------------------------------------------------------
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 	 if (WIN32)
-		if (MSVC)
+		if (MSYS)
+			set (CMAKE_INSTALL_PREFIX "/usr/local/helics_${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}/" CACHE PATH "default install path" FORCE )
+		else(MSYS)
 			set (CMAKE_INSTALL_PREFIX "C:/local/helics_${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}/" CACHE PATH "default install path" FORCE )
-		endif(MSVC)
+		endif(MSYS)
+		
 	endif(WIN32)
 endif()
 
@@ -35,7 +44,7 @@ OPTION(BUILD_HELICS_EXAMPLES "Enable the example Executables to be built" ON)
 
 OPTION(BUILD_PYTHON_INTERFACE "Build Python extension" OFF)
 OPTION(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF)
-OPTION(BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF)
+OPTION(BUILD_OCTAVE_INTERFACE "Build Octave extension (very experimental)" OFF)
 OPTION(BUILD_JAVA_INTERFACE "Build Java extension" OFF)
 
 OPTION(DISABLE_SWIG "Disable the use of swig to generate interface code and use repo code" OFF)
@@ -105,9 +114,11 @@ IF (USE_BOOST_STATIC_LIBS)
   set(Boost_USE_STATIC_LIBS ON)
   set(BOOST_STATIC ON)
 ENDIF ()
+
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
+IF(BUILD_HELICS_TESTS)
  option (TEST_CODE_COVERAGE "Build a target for testing code coverage" OFF)
  if (TEST_CODE_COVERAGE)
  include(CodeCoverage)
@@ -120,6 +131,7 @@ ENDIF ()
 	)
 
  endif(TEST_CODE_COVERAGE)
+ endif(BUILD_HELICS_TESTS)
 
 
 # -------------------------------------------------------------
@@ -160,7 +172,7 @@ add_library(helics-static STATIC
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
-message(STATUS "setting version option to \"${VERSION_OPTION}\"")
+message(STATUS "setting version build options to \"${VERSION_OPTION}\"")
 IF (VERSION_OPTION)
 	IF (MSVC)
 		target_compile_options(helics-static PUBLIC ${VERSION_OPTION})
@@ -348,12 +360,18 @@ endif()
 
 add_subdirectory (src)
 
+if (BUILD_PYTHON_INTERFACE)
+SET(Python_ADDITIONAL_VERSIONS 3.4 3.5 3.6 3.7 3.8)
+find_package(PythonInterp 3)
+find_package(PythonLibs 3 REQUIRED )
+endif(BUILD_PYTHON_INTERFACE)
+
 #-----------------------------------------------------------------------------
 # Setup CTEST environment
 #-----------------------------------------------------------------------------
-IF (BUILD_HELICS_TESTS)
-	include (CTest)
-	add_subdirectory (tests)
+IF(BUILD_HELICS_TESTS)
+include (CTest)
+add_subdirectory (tests)
 ENDIF(BUILD_HELICS_TESTS)
 
 if (BUILD_HELICS_EXAMPLES)
@@ -380,11 +398,12 @@ endif()
 
 add_subdirectory(docs)
 
-set(HELICS_CMAKECONFIG_INSTALL_DIR "cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
+set(HELICS_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
 
 install (TARGETS helics-static EXPORT helics-targets
 	DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs)
 
+	#install(FILES $<TARGET_PDB_FILE:helics-static> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs OPTIONAL)
 	set(helics_static_file "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}")
 	set(helics_static_file_debug "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 IF(BUILD_CXX_SHARED_LIB)
@@ -460,8 +479,8 @@ configure_package_config_file(config/${PROJECT_NAME}Config.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
                               INSTALL_DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-                                 VERSION ${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}.${HELICS_VERSION_BUILD}
-                                 COMPATIBILITY AnyNewerVersion)
+                                 VERSION ${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}-${HELICS_VERSION_BUILD}
+                                 COMPATIBILITY SameMajorVersion)
 
 configure_file(config/${PROJECT_NAME}Import.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake" @ONLY)
@@ -514,9 +533,9 @@ set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
  set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION "additional language interfaces for HELICS")
  
  set(CPACK_COMPONENT_LIBS_DEPENDS headers)
- SET(CPACK_COMPONENT_RUNTIME_REQUIRED ON)
+ set(CPACK_COMPONENT_RUNTIME_REQUIRED ON)
  
- set(CPACK_PACKAGE_EXECUTABLES "helics_broker" "Helics Broker")
+ set(CPACK_PACKAGE_EXECUTABLES "helics_broker" "Helics Broker" "helics_app" "Helics app executable")
  if (WIN32)
 	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico")
 	set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
@@ -532,10 +551,6 @@ else (WIN32)
 endif(WIN32)
 
 
-
-
-
-	
 set(CPACK_SOURCE_IGNORE_FILES  "/Build*/;/build*/;/.git/")
 #THIS LINE MUST BE LAST
 include(CPack)

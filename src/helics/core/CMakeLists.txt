@@ -23,9 +23,9 @@ set(SRC_FILES
 	CommsInterface.cpp
 	CommsBroker.cpp
 	NetworkBrokerData.cpp
-	helicsVersion.cpp
 	helics-time.cpp
 	HandleManager.cpp
+	HandlePointerManager.cpp
 )
 
 set(TESTCORE_SOURCE_FILES
@@ -103,6 +103,7 @@ set(INCLUDE_FILES
 	FilterFunctions.hpp
 	NetworkBrokerData.hpp
 	HandleManager.hpp
+	HandlePointerManager.hpp
 )
 
 set(TESTCORE_HEADER_FILES

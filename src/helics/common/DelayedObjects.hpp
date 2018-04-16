@@ -101,4 +101,3 @@ class DelayedObjects
 };
 
 #endif /* _HELICS_DELAYED_OBJECTS_ */
-

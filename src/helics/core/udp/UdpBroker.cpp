@@ -9,7 +9,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-namespace udp {
+namespace udp
+{
 UdpBroker::UdpBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 UdpBroker::UdpBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
@@ -67,6 +68,5 @@ std::string UdpBroker::getAddress () const
     }
     return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
-} // namespace udp
+}  // namespace udp
 }  // namespace helics
-

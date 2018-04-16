@@ -14,7 +14,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
  */
 
 #include "helics/common/BlockingQueue.hpp"
-#include "helics/common/blocking_queue.h"
+//#include "helics/common/blocking_queue.h"
 
 BOOST_AUTO_TEST_SUITE (blocking_queue_tests)
 
@@ -359,117 +359,4 @@ BOOST_AUTO_TEST_CASE (pop_callback_tests)
     BOOST_CHECK_EQUAL (pushcnt, 127 + 25);
 }
 
-    //#define PERFORMANCE_TESTS
-
-#ifdef PERFORMANCE_TESTS
-#include <chrono>
-const std::string testString = "this is a test string that is sufficiently long";
-const std::pair<std::string, std::string> pairString{"this is a test string that is sufficiently long", "string2"};
-/** test with multiple producer/multiple consumer*/
-BOOST_AUTO_TEST_CASE (multithreaded_tests_perf)
-{
-    BlockingQueue<std::pair<std::string, std::string>> sq;
-    int64_t cnt = 5'000'000;
-    sq.reserve (3 * cnt);
-
-    auto prod1 = [&]() {
-        for (int64_t ii = 0; ii < cnt; ++ii)
-        {
-            sq.push (pairString);
-        }
-    };
-
-    auto cons = [&]() {
-        auto res = sq.pop ();
-        int64_t cntr = 0;
-        while (!res.first.empty ())
-        {
-            ++cntr;
-            res = sq.pop ();
-        }
-        return cnt;
-    };
-
-    auto start_t = std::chrono::high_resolution_clock::now ();
-
-    auto ret1 = std::async (std::launch::async, prod1);
-    auto ret2 = std::async (std::launch::async, prod1);
-    auto ret3 = std::async (std::launch::async, prod1);
-
-    auto res1 = std::async (std::launch::async, cons);
-    // auto res2 = std::async(std::launch::async, cons);
-    // auto res3 = std::async(std::launch::async, cons);
-    ret1.wait ();
-    ret2.wait ();
-    ret3.wait ();
-    sq.push (std::make_pair (std::string (), std::string ()));
-    // sq.push(std::make_pair(std::string(), std::string()));
-    // sq.push(std::make_pair(std::string(), std::string()));
-    auto V1 = res1.get ();
-    // auto V2 = res2.get();
-
-    // auto V3 = res3.get();
-
-    auto stop_t = std::chrono::high_resolution_clock::now ();
-    std::chrono::duration<double> time_taken = stop_t - start_t;
-
-    printf ("BlockingQueue 3 prod 3 cons completed in %f\n", time_taken.count ());
-
-    BOOST_CHECK_EQUAL (V1 /*+ V2 + V3*/, 3 * cnt);
-}
-
-/** test with multiple producer/multiple consumer*/
-BOOST_AUTO_TEST_CASE (multithreaded_tests_perf_bq)
-{
-    helics::BlockingQueue<std::pair<std::string, std::string>> sq;
-    int64_t cnt = 5'000'000;
-    auto prod1 = [&]() {
-        for (int64_t ii = 0; ii < cnt; ++ii)
-        {
-            sq.push (pairString);
-        }
-    };
-
-    auto cons = [&]() {
-        auto res = sq.pop ();
-        int64_t cntr = 0;
-        while (!res.first.empty ())
-        {
-            ++cntr;
-            res = sq.pop ();
-        }
-        return cnt;
-    };
-
-    auto start_t = std::chrono::high_resolution_clock::now ();
-
-    auto ret1 = std::async (std::launch::async, prod1);
-    auto ret2 = std::async (std::launch::async, prod1);
-    auto ret3 = std::async (std::launch::async, prod1);
-
-    auto res1 = std::async (std::launch::async, cons);
-    // auto res2 = std::async(std::launch::async, cons);
-    // auto res3 = std::async(std::launch::async, cons);
-    ret1.wait ();
-    ret2.wait ();
-    ret3.wait ();
-    sq.push (std::make_pair (std::string (), std::string ()));
-    // sq.push(std::make_pair(std::string(), std::string()));
-    // sq.push(std::make_pair(std::string(), std::string()));
-
-    auto V1 = res1.get ();
-    // auto V2 = res2.get();
-    // auto V3 = res3.get();
-
-    auto stop_t = std::chrono::high_resolution_clock::now ();
-
-    std::chrono::duration<double> time_taken = stop_t - start_t;
-
-    printf ("BlockingQueue 3 prod 3 cons completed in %f\n", time_taken.count ());
-
-    BOOST_CHECK_EQUAL (V1 /* + V2 + V3*/, 3 * cnt);
-}
-
-#endif
 BOOST_AUTO_TEST_SUITE_END ()
-

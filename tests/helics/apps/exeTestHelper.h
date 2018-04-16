@@ -21,7 +21,7 @@ class exeTestRunner
 {
   private:
     std::string exeString;
-    bool active=false;
+    bool active = false;
     static int counter;
     std::string outFile;
 
@@ -39,4 +39,3 @@ class exeTestRunner
 };
 
 #endif
-

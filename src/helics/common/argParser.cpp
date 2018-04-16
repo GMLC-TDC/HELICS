@@ -21,38 +21,37 @@ static void loadArguments (po::options_description &config, const ArgDescriptors
         switch (addArg.type_)
         {
         case ArgDescriptor::arg_type_t::flag_type:
-            config.add_options() (addArg.arg_.c_str(), addArg.desc_.c_str());
+            config.add_options () (addArg.arg_.c_str (), addArg.desc_.c_str ());
             break;
         case ArgDescriptor::arg_type_t::string_type:
-            config.add_options() (addArg.arg_.c_str(), po::value<std::string>(), addArg.desc_.c_str());
+            config.add_options () (addArg.arg_.c_str (), po::value<std::string> (), addArg.desc_.c_str ());
             break;
         case ArgDescriptor::arg_type_t::int_type:
-            config.add_options() (addArg.arg_.c_str(), po::value<int>(), addArg.desc_.c_str());
+            config.add_options () (addArg.arg_.c_str (), po::value<int> (), addArg.desc_.c_str ());
             break;
         case ArgDescriptor::arg_type_t::double_type:
-            config.add_options() (addArg.arg_.c_str(), po::value<double>(), addArg.desc_.c_str());
+            config.add_options () (addArg.arg_.c_str (), po::value<double> (), addArg.desc_.c_str ());
             break;
         case ArgDescriptor::arg_type_t::vector_string:
-            config.add_options() (addArg.arg_.c_str(), po::value<std::vector<std::string>>(),
-                addArg.desc_.c_str());
+            config.add_options () (addArg.arg_.c_str (), po::value<std::vector<std::string>> (),
+                                   addArg.desc_.c_str ());
             break;
         case ArgDescriptor::arg_type_t::vector_double:
-            config.add_options() (addArg.arg_.c_str(), po::value<std::vector<double>>(),
-                addArg.desc_.c_str());
+            config.add_options () (addArg.arg_.c_str (), po::value<std::vector<double>> (), addArg.desc_.c_str ());
             break;
         }
     }
 }
 
 int argumentParser (int argc,
-                     const char *const *argv,
-                     variable_map &vm_map,
-                     const ArgDescriptors &argDefinitions, const std::string &posName)
+                    const char *const *argv,
+                    variable_map &vm_map,
+                    const ArgDescriptors &argDefinitions,
+                    const std::string &posName)
 {
     po::options_description cmd_only ("command line only");
     po::options_description config ("configuration");
     po::options_description hidden ("hidden");
-
 
     // clang-format off
 	// input boost controls
@@ -72,27 +71,39 @@ int argumentParser (int argc,
     config_file.add (config);
     visible.add (cmd_only).add (config);
 
-    if (!posName.empty())
+    if (!posName.empty ())
     {
-        hidden.add_options() (posName.c_str(), po::value<std::string>(), "positional argument");
-        cmd_line.add(hidden);
-        config_file.add(hidden);
+        hidden.add_options () (posName.c_str (), po::value<std::string> (), "positional argument");
+        cmd_line.add (hidden);
+        config_file.add (hidden);
     }
 
     variable_map cmd_vm;
+    int xstyle = po::command_line_style::allow_long | po::command_line_style::allow_short |
+                 po::command_line_style::short_allow_adjacent | po::command_line_style::short_allow_next |
+                 po::command_line_style::allow_long | po::command_line_style::long_allow_adjacent |
+                 po::command_line_style::long_allow_next | po::command_line_style::allow_sticky |
+                 po::command_line_style::allow_dash_for_short;
+
+#ifdef WIN32
+    xstyle |= po::command_line_style::allow_slash_for_short;
+#endif
     try
     {
-        if (posName.empty())
+        if (posName.empty ())
         {
-            po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().run(), cmd_vm);
+            po::store (po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered ().run (),
+                       cmd_vm);
         }
         else
         {
             po::positional_options_description p;
-            p.add(posName.c_str(), -1);
-            po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().positional(p).run(), cmd_vm);
+            p.add (posName.c_str (), -1);
+            po::command_line_parser parser{argc, argv};
+            parser.options (cmd_line).allow_unregistered ().positional (p);
+            parser.style (xstyle);
+            po::store (parser.run (), cmd_vm);
         }
-
     }
     catch (std::exception &e)
     {
@@ -110,21 +121,28 @@ int argumentParser (int argc,
         std::cout << visible << '\n';
         return helpReturn;
     }
-    if (cmd_vm.count("version") > 0)
+    if (cmd_vm.count ("version") > 0)
     {
         return versionReturn;
     }
-    if (posName.empty())
+    if (posName.empty ())
     {
-        po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().run(), vm_map);
+        po::store (
+          po::command_line_parser (argc, argv).options (cmd_line).allow_unregistered ().style (xstyle).run (),
+          vm_map);
     }
     else
     {
         po::positional_options_description p;
-        p.add(posName.c_str(), -1);
-        po::store(po::command_line_parser(argc, argv).options(cmd_line).allow_unregistered().positional(p).run(), vm_map);
+        p.add (posName.c_str (), -1);
+        po::store (po::command_line_parser (argc, argv)
+                     .options (cmd_line)
+                     .allow_unregistered ()
+                     .positional (p)
+                     .style (xstyle)
+                     .run (),
+                   vm_map);
     }
-
 
     if (cmd_vm.count ("config-file") > 0)
     {
@@ -147,4 +165,3 @@ int argumentParser (int argc,
 }
 
 }  // namespace helics
-

@@ -1,6 +1,6 @@
 shallow_clone: true
 
-version: 1.0.0.beta.1.{build}
+version: 1.0.0.{build}
 
 image: Visual Studio 2015
 
@@ -20,7 +20,7 @@ before_build:
   - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install swig --yes --limit-output #> $null
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 14 2015 Win64" -DAUTOBUILD_ZMQ=ON -DBOOST_INSTALL_PATH=C:/libraries/boost_1_63_0 -DBUILD_RELEASE_ONLY=ON -DBUILD_C_SHARED_LIB=ON -DBUILD_HELICS_EXAMPLES=ON
+  - cmake .. -G "Visual Studio 14 2015 Win64" -DAUTOBUILD_ZMQ=ON -DBOOST_INSTALL_PATH=C:/libraries/boost_1_63_0 -DBUILD_RELEASE_ONLY=ON -DBUILD_C_SHARED_LIB=ON -DBUILD_JAVA_INTERFACE=ON -DBUILD_HELICS_EXAMPLES=ON
   - cd ..
 
 build:
@@ -29,6 +29,9 @@ build:
   verbosity: minimal
 
 after_build:
+  - cd build
+  - cpack -B %cd%/installer-output
+  - cd ..
 
 test_script:
   - cd build
@@ -42,9 +45,11 @@ test_script:
   # 6 = shared_library tests
   # 7 = helics-apps tests
   - ctest -C Release --verbose --timeout 120 -I 0,0,0,1
-  - ctest -C Release --verbose --timeout 90 -I 0,0,0,2
+  - ctest -C Release --verbose --timeout 120 -I 0,0,0,2
   - ctest -C Release --verbose --timeout 240 -I 0,0,0,4
-  #- ctest -C Release --verbose --timeout 90 -I 0,0,0,7
+  - ctest -C Release --verbose --timeout 120 -I 0,0,0,8
+  - ctest --verbose -L Java
+  - cd ..
 
 artifacts:
-
+  - path: build/installer-output/Helics-*.exe

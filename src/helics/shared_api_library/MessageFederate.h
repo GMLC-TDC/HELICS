@@ -54,7 +54,10 @@ HELICS_Export helics_status helicsEndpointSetDefaultDestination (helics_endpoint
 @param len the length of the data to send
 @return helics_ok if everything worked
 */
-HELICS_Export helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const char *data, int len);
+HELICS_Export helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint,
+                                                          const char *dest,
+                                                          const void *data,
+                                                          int inputDataLength);
 
 /** send a message at a specific time to the specified destination
 @param endpoint the endpoint to send the data from
@@ -65,7 +68,7 @@ HELICS_Export helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoi
 @return helics_ok if everything worked
 */
 HELICS_Export helics_status
-helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const char *data, int len, helics_time_t time);
+helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength, helics_time_t time);
 
 /** send a message object from a specific endpoint
 @param endpoint the endpoint to send the data from
@@ -114,27 +117,26 @@ HELICS_Export message_t helicsFederateGetMessage (helics_federate fed);
 
 /** get the type specified for an endpoint
 @param endpoint  the endpoint object in question
-@param[out] str the location where the string is stored
+@param[out] outputString the location where the string is stored
 @param[in] maxlen the maximum string length that can be stored in str
 @return a status variable
 */
-HELICS_Export helics_status helicsEndpointGetType (helics_endpoint endpoint, char *str, int maxlen);
+HELICS_Export helics_status helicsEndpointGetType (helics_endpoint endpoint, char *outputString, int maxlen);
 
 /** get the name of an endpoint
 @param endpoint  the endpoint object in question
-@param[out] str the location where the string is stored
+@param[out] outputString the location where the string is stored
 @param[in] maxlen the maximum string length that can be stored in str
 @return a status variable
 */
-HELICS_Export helics_status helicsEndpointGetName (helics_endpoint endpoint, char *str, int maxlen);
+HELICS_Export helics_status helicsEndpointGetName (helics_endpoint endpoint, char *outputString, int maxlen);
 
 /** get the number of endpoints in a federate
 @return (-1) if fed was not a valid federate otherwise returns the number of subscriptions*/
-HELICS_Export int helicsFederateGetEndpointCount(helics_federate fed);
+HELICS_Export int helicsFederateGetEndpointCount (helics_federate fed);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif
 
 #endif /*HELICS_APISHARED_MESSAGE_FEDERATE_FUNCTIONS_H_*/
-

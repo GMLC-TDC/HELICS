@@ -5,12 +5,12 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "BrokerFactory.hpp"
+#include "../common/TripWire.hpp"
 #include "../common/delayedDestructor.hpp"
 #include "../common/searchableObjectHolder.hpp"
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
 #include "helics/helics-config.h"
-#include "../common/TripWire.hpp"
 #if HELICS_HAVE_ZEROMQ
 #include "zmq/ZmqBroker.h"
 #endif
@@ -134,7 +134,7 @@ namespace BrokerFactory
 {
 std::shared_ptr<Broker> create (core_type type, const std::string &initializationString)
 {
-    auto broker = makeBroker (type, "");
+    auto broker = makeBroker (type, std::string ());
     broker->initialize (initializationString);
     registerBroker (broker);
     broker->connect ();
@@ -172,7 +172,7 @@ std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, 
     if (!reg)
     {
     }
-    broker->connect();
+    broker->connect ();
     return broker;
 }
 
@@ -194,7 +194,7 @@ static DelayedDestructor<CoreBroker>
 
 static SearchableObjectHolder<CoreBroker> searchableObjects;  //!< the object managing the searchable objects
 
-//this will trip the line when it is destroyed at global destruction time
+// this will trip the line when it is destroyed at global destruction time
 static tripwire::TripWireTrigger tripTrigger;
 
 std::shared_ptr<Broker> findBroker (const std::string &brokerName)
@@ -258,7 +258,7 @@ void displayHelp (core_type type)
         break;
     case core_type::TCP:
 #ifndef DISABLE_TCP_CORE
-       tcp::TcpBroker::displayHelp(true);
+        tcp::TcpBroker::displayHelp (true);
 #endif
         break;
     case core_type::UDP:
@@ -275,7 +275,7 @@ void displayHelp (core_type type)
 
         testcore::TestBroker::displayHelp (true);
 #ifndef DISABLE_TCP_CORE
-        tcp::TcpBroker::displayHelp(true);
+        tcp::TcpBroker::displayHelp (true);
 #endif
         udp::UdpBroker::displayHelp (true);
         break;
@@ -286,4 +286,3 @@ void displayHelp (core_type type)
 
 }  // namespace BrokerFactory
 }  // namespace helics
-

@@ -55,6 +55,48 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
     fut.get ();
 }
 
+BOOST_AUTO_TEST_CASE (simple_player_test_iterative)
+{
+    helics::FederateInfo fi ("player1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core1";
+    fi.coreInitString = "2";
+    helics::apps::Player play1 (fi);
+    fi.name = "block1";
+    play1.addPublication ("pub1", helics::helics_type_t::helicsDouble);
+    play1.addPoint (1.0, 0, "pub1", 0.5);
+    play1.addPoint (1.0, 1, "pub1", 0.7);
+    play1.addPoint (1.0, 2, "pub1", 0.8);
+
+    helics::ValueFederate vfed (fi);
+    helics::Subscription sub1 (&vfed, "pub1");
+    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    vfed.enterExecutionState ();
+    auto retTime = vfed.requestTimeIterative (5, helics::iteration_request::iterate_if_needed);
+    BOOST_CHECK_EQUAL (retTime.grantedTime, 1.0);
+    BOOST_CHECK (retTime.state == helics::iteration_result::next_step);
+    auto val = sub1.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 0.5);
+
+    retTime = vfed.requestTimeIterative (5, helics::iteration_request::iterate_if_needed);
+    BOOST_CHECK_EQUAL (retTime.grantedTime, 1.0);
+    BOOST_CHECK (retTime.state == helics::iteration_result::iterating);
+    val = sub1.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 0.7);
+
+    retTime = vfed.requestTimeIterative (5, helics::iteration_request::iterate_if_needed);
+    BOOST_CHECK_EQUAL (retTime.grantedTime, 1.0);
+    BOOST_CHECK (retTime.state == helics::iteration_result::iterating);
+    val = sub1.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 0.8);
+
+    retTime = vfed.requestTimeIterative (5, helics::iteration_request::iterate_if_needed);
+    BOOST_CHECK_EQUAL (retTime.grantedTime, 5.0);
+    BOOST_CHECK (retTime.state == helics::iteration_result::next_step);
+    vfed.finalize ();
+    fut.get ();
+}
+
 BOOST_AUTO_TEST_CASE (simple_player_test2)
 {
     helics::FederateInfo fi ("player1");
@@ -115,7 +157,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (si
     helics::FederateInfo fi ("player1");
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core3";
-    fi.coreName.push_back(indx++);
+    fi.coreName.push_back (indx++);
     fi.coreInitString = "2";
     helics::apps::Player play1 (fi);
     fi.name = "block1";
@@ -208,12 +250,12 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
 
 BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make (simple_files), file)
 {
-    exeTestRunner playerExe (std::string(HELICS_BIN_LOC)+"/apps/", "helics_player");
+    exeTestRunner playerExe (std::string (HELICS_BIN_LOC) + "/apps/", "helics_player");
 
-    exeTestRunner brokerExe (std::string(HELICS_BIN_LOC)+"/core/", "helics_broker");
+    exeTestRunner brokerExe (std::string (HELICS_BIN_LOC) + "/core/", "helics_broker");
 
-BOOST_REQUIRE(playerExe.isActive());
-BOOST_REQUIRE(brokerExe.isActive());
+    BOOST_REQUIRE (playerExe.isActive ());
+    BOOST_REQUIRE (brokerExe.isActive ());
     auto res = brokerExe.runAsync ("2 --type=zmq --name=zmq_broker");
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
     auto res2 = playerExe.runCaptureOutputAsync ("--name=player --core=zmq " + exampleFile);
@@ -253,10 +295,9 @@ BOOST_REQUIRE(brokerExe.isActive());
     retTime = vfed.requestTime (5);
     BOOST_CHECK_EQUAL (retTime, 5.0);
     vfed.finalize ();
-    auto out2 = res2.get();
-    res.get();
-   // out = 0;
-
+    auto out2 = res2.get ();
+    res.get ();
+    // out = 0;
 }
 
 BOOST_AUTO_TEST_CASE (simple_player_testjson)
@@ -453,7 +494,7 @@ BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::
     helics::FederateInfo fi ("player1");
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core11";
-    fi.coreName.push_back(indx++);
+    fi.coreName.push_back (indx++);
     fi.coreInitString = "2";
     helics::apps::Player play1 (fi);
     fi.name = "block1";
@@ -519,4 +560,3 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
 }
 */
 BOOST_AUTO_TEST_SUITE_END ()
-

@@ -7,7 +7,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** @file
 functions for dealing with query results*/
 
-
 #pragma once
 
 #include <string>
@@ -53,4 +52,3 @@ bool waitForInit (helics::Federate *fed, const std::string &fedName, int timeout
 @return true if the federate exists, false if the timeout occurred
 */
 bool waitForFed (helics::Federate *fed, const std::string &fedName, int timeout = 10000 /*time in ms*/);
-

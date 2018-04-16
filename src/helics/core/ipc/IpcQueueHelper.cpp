@@ -68,8 +68,8 @@ bool ownedQueue::connect (const std::string &connection, int maxMessages, int ma
 
     try
     {
-        rqueue = std::make_unique<ipc_queue> (boostipc::create_only, connectionName.c_str (),
-                                              maxMessages, maxSize);
+        rqueue =
+          std::make_unique<ipc_queue> (boostipc::create_only, connectionName.c_str (), maxMessages, maxSize);
     }
     catch (boost::interprocess::interprocess_exception const &ipe)
     {
@@ -264,4 +264,3 @@ void sendToQueue::sendMessage (const ActionMessage &cmd, int priority)
 }
 }  // namespace ipc
 }  // namespace helics
-

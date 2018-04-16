@@ -17,9 +17,10 @@ static const std::string doubleString ("double");
 static const std::string intString ("int64");
 static const std::string stringString ("string");
 static const std::string complexString ("complex");
+static const std::string boolString ("complex");
 static const std::string doubleVecString ("double_vector");
 static const std::string complexVecString ("complex_vector");
-static const std::string namedPointString("named_point");
+static const std::string namedPointString ("named_point");
 static const std::string nullString;
 
 const std::string &typeNameStringRef (helics_type_t type)
@@ -30,6 +31,8 @@ const std::string &typeNameStringRef (helics_type_t type)
         return doubleString;
     case helics_type_t::helicsInt:
         return intString;
+    case helics_type_t::helicsBool:
+        return boolString;
     case helics_type_t::helicsString:
         return stringString;
     case helics_type_t::helicsComplex:
@@ -63,6 +66,10 @@ std::string helicsComplexString (std::complex<double> val)
 
 static const std::map<std::string, helics_type_t> typeMap{{"double", helics_type_t::helicsDouble},
                                                           {"string", helics_type_t::helicsString},
+                                                          {"binary", helics_type_t::helicsBool},
+                                                          {"bool", helics_type_t::helicsBool},
+                                                          {"boolean", helics_type_t::helicsBool},
+                                                          {"flag", helics_type_t::helicsBool},
                                                           {"float", helics_type_t::helicsDouble},
                                                           {"vector", helics_type_t::helicsVector},
                                                           {"double_vector", helics_type_t::helicsVector},
@@ -80,10 +87,10 @@ static const std::map<std::string, helics_type_t> typeMap{{"double", helics_type
                                                           {"i", helics_type_t::helicsInt},
                                                           {"i64", helics_type_t::helicsInt},
                                                           {"cv", helics_type_t::helicsComplexVector},
-                                                          {"np",helics_type_t::helicsNamedPoint},
-                                                          {"point",helics_type_t::helicsNamedPoint},
-                                                          { "pt",helics_type_t::helicsNamedPoint },
-                                                          {"named_point",helics_type_t::helicsNamedPoint},
+                                                          {"np", helics_type_t::helicsNamedPoint},
+                                                          {"point", helics_type_t::helicsNamedPoint},
+                                                          {"pt", helics_type_t::helicsNamedPoint},
+                                                          {"named_point", helics_type_t::helicsNamedPoint},
                                                           {"default", helics_type_t::helicsAny},
                                                           {"def", helics_type_t::helicsAny},
                                                           {"any", helics_type_t::helicsAny},
@@ -110,7 +117,7 @@ std::complex<double> helicsGetComplex (const std::string &val)
         return std::complex<double> (-1e49, -1e49);
     }
     std::smatch m;
-    double re = 0.0;
+    double re = -1e49;
     double im = 0.0;
     std::regex_search (val, m, creg);
     try
@@ -133,6 +140,7 @@ std::complex<double> helicsGetComplex (const std::string &val)
                 auto strval = val.substr (0, val.size () - 1);
                 boost::algorithm::trim (strval);
                 im = boost::lexical_cast<double> (strval);
+                re = 0.0;
             }
             else
             {
@@ -144,7 +152,7 @@ std::complex<double> helicsGetComplex (const std::string &val)
     }
     catch (const boost::bad_lexical_cast &)
     {
-        im = 0.0;
+        re = -1e49;
     }
     return {re, im};
 }
@@ -209,44 +217,43 @@ std::string helicsComplexVectorString (const std::vector<std::complex<double>> &
     return vString;
 }
 
-
-std::string helicsNamedPointString(const named_point &point)
+std::string helicsNamedPointString (const named_point &point)
 {
-    return helicsNamedPointString(point.first, point.second);
+    return helicsNamedPointString (point.first, point.second);
 }
-std::string helicsNamedPointString(const std::string &pointName, double val)
+std::string helicsNamedPointString (const std::string &pointName, double val)
 {
     std::string retStr = "{\"";
-    if (!pointName.empty())
+    if (!pointName.empty ())
     {
-        retStr.append(pointName);
+        retStr.append (pointName);
     }
     else
     {
-        retStr.append("value");
+        retStr.append ("value");
     }
-    retStr.push_back('"');
-    retStr.push_back(':');
-    retStr.append(std::to_string(val));
-    retStr.push_back('}');
+    retStr.push_back ('"');
+    retStr.push_back (':');
+    retStr.append (std::to_string (val));
+    retStr.push_back ('}');
     return retStr;
 }
 
-std::string helicsNamedPointString(const char *pointName, double val)
+std::string helicsNamedPointString (const char *pointName, double val)
 {
     std::string retStr = "{\"";
-    if (pointName!=nullptr)
+    if (pointName != nullptr)
     {
-        retStr.append(pointName);
+        retStr.append (pointName);
     }
     else
     {
-        retStr.append("value");
+        retStr.append ("value");
     }
-    retStr.push_back('"');
-    retStr.push_back(':');
-    retStr.append(std::to_string(val));
-    retStr.push_back('}');
+    retStr.push_back ('"');
+    retStr.push_back (':');
+    retStr.append (std::to_string (val));
+    retStr.push_back ('}');
     return retStr;
 }
 
@@ -264,20 +271,20 @@ std::vector<std::complex<double>> helicsGetComplexVector (const std::string &val
     return V;
 }
 
-named_point helicsGetNamedPoint(const std::string &val)
+named_point helicsGetNamedPoint (const std::string &val)
 {
-    auto loc = val.find_first_of('{');
-    auto locsep = val.find_last_of(':');
-    auto locend = val.find_last_of('}');
-    auto str1 = val.substr(loc + 1, locsep - loc);
-    boost::algorithm::trim(str1);
-    str1.pop_back();
+    auto loc = val.find_first_of ('{');
+    auto locsep = val.find_last_of (':');
+    auto locend = val.find_last_of ('}');
+    auto str1 = val.substr (loc + 1, locsep - loc);
+    boost::algorithm::trim (str1);
+    str1.pop_back ();
 
     named_point point;
-    point.first = str1.substr(1);
-    auto vstr = val.substr(locsep + 1, locend - locsep - 1);
-    boost::algorithm::trim(vstr);
-    point.second = boost::lexical_cast<double>(vstr);
+    point.first = str1.substr (1);
+    auto vstr = val.substr (locsep + 1, locend - locsep - 1);
+    boost::algorithm::trim (vstr);
+    point.second = boost::lexical_cast<double> (vstr);
     return point;
 }
 
@@ -406,34 +413,39 @@ void helicsGetComplexVector (const std::string &val, std::vector<std::complex<do
     return;
 }
 
-data_block emptyBlock(helics_type_t outputType, helics_type_t inputType=helics_type_t::helicsAny)
+data_block emptyBlock (helics_type_t outputType, helics_type_t inputType = helics_type_t::helicsAny)
 {
     switch (outputType)
     {
     case helics_type_t::helicsDouble:
     default:
-        return ValueConverter<double>::convert(0.0);
+        return ValueConverter<double>::convert (0.0);
     case helics_type_t::helicsInt:
-        return ValueConverter<int64_t>::convert(0);
+        return ValueConverter<int64_t>::convert (0);
     case helics_type_t::helicsComplex:
-        return ValueConverter<std::complex<double>>::convert(std::complex<double>(0.0, 0.0));
+        return ValueConverter<std::complex<double>>::convert (std::complex<double> (0.0, 0.0));
+    case helics_type_t::helicsBool:
+        return "0";
+    case helics_type_t::helicsNamedPoint:
+        return ValueConverter<named_point>::convert (named_point{"", std::nan ("0")});
     case helics_type_t::helicsString:
         switch (inputType)
         {
         default:
-            return std::string();
+            return std::string ();
         case helics_type_t::helicsVector:
-            return helicsVectorString(std::vector<double>());
+            return helicsVectorString (std::vector<double> ());
         case helics_type_t::helicsComplexVector:
-            return helicsComplexVectorString(std::vector<std::complex<double>>());
+            return helicsComplexVectorString (std::vector<std::complex<double>> ());
+        case helics_type_t::helicsNamedPoint:
+            return "{\"\":0}";
         }
-
     case helics_type_t::helicsComplexVector:
     {
-        return ValueConverter<std::vector<std::complex<double>>>::convert(std::vector<std::complex<double>>());
+        return ValueConverter<std::vector<std::complex<double>>>::convert (std::vector<std::complex<double>> ());
     }
     case helics_type_t::helicsVector:
-        return ValueConverter<std::vector<double>>::convert(std::vector<double>());
+        return ValueConverter<std::vector<double>>::convert (std::vector<double> ());
     }
 }
 data_block typeConvert (helics_type_t type, double val)
@@ -447,8 +459,12 @@ data_block typeConvert (helics_type_t type, double val)
         return ValueConverter<int64_t>::convert (static_cast<int64_t> (val));
     case helics_type_t::helicsComplex:
         return ValueConverter<std::complex<double>>::convert (std::complex<double> (val, 0.0));
+    case helics_type_t::helicsBool:
+        return (val != 0.0) ? "1" : "0";
     case helics_type_t::helicsString:
         return std::to_string (val);
+    case helics_type_t::helicsNamedPoint:
+        return ValueConverter<named_point>::convert (named_point{"value", val});
     case helics_type_t::helicsComplexVector:
     {
         std::complex<double> v2 (val, 0.0);
@@ -469,8 +485,20 @@ data_block typeConvert (helics_type_t type, int64_t val)
         return ValueConverter<int64_t>::convert (val);
     case helics_type_t::helicsComplex:
         return ValueConverter<std::complex<double>>::convert (std::complex<double> (val, 0.0));
+    case helics_type_t::helicsBool:
+        return (val != 0) ? "1" : "0";
     case helics_type_t::helicsString:
         return std::to_string (val);
+    case helics_type_t::helicsNamedPoint:
+        if (std::abs (val) > (2ll << 51))
+        {
+            return ValueConverter<named_point>::convert (named_point{std::to_string (val), std::nan ("0")});
+        }
+        else
+        {
+            return ValueConverter<named_point>::convert (named_point{"value", static_cast<double> (val)});
+        }
+
     case helics_type_t::helicsComplexVector:
     {
         std::complex<double> v2 (static_cast<double> (val), 0.0);
@@ -488,7 +516,7 @@ data_block typeConvert (helics_type_t type, const char *val)
 {
     if (val == nullptr)
     {
-        return emptyBlock(type);
+        return emptyBlock (type);
     }
     switch (type)
     {
@@ -498,9 +526,13 @@ data_block typeConvert (helics_type_t type, const char *val)
         return ValueConverter<int64_t>::convert (boost::lexical_cast<int64_t> (val));
     case helics_type_t::helicsComplex:
         return ValueConverter<std::complex<double>>::convert (helicsGetComplex (val));
+    case helics_type_t::helicsBool:
+        return (std::string ("0") == val) ? "0" : "1";
     case helics_type_t::helicsString:
     default:
         return data_block (val);
+    case helics_type_t::helicsNamedPoint:
+        return ValueConverter<named_point>::convert (named_point{val, std::nan ("0")});
     case helics_type_t::helicsComplexVector:
         return ValueConverter<std::vector<std::complex<double>>>::convert (helicsGetComplexVector (val));
     case helics_type_t::helicsVector:
@@ -510,9 +542,9 @@ data_block typeConvert (helics_type_t type, const char *val)
 
 data_block typeConvert (helics_type_t type, const std::string &val)
 {
-    if (val.empty())
+    if (val.empty ())
     {
-        return emptyBlock(type);
+        return emptyBlock (type);
     }
 
     switch (type)
@@ -523,9 +555,13 @@ data_block typeConvert (helics_type_t type, const std::string &val)
         return ValueConverter<int64_t>::convert (boost::lexical_cast<int64_t> (val));
     case helics_type_t::helicsComplex:
         return ValueConverter<std::complex<double>>::convert (helicsGetComplex (val));
+    case helics_type_t::helicsBool:
+        return (val == "0") ? val : "1";
     case helics_type_t::helicsString:
     default:
         return val;
+    case helics_type_t::helicsNamedPoint:
+        return ValueConverter<named_point>::convert (named_point{val, std::nan ("0")});
     case helics_type_t::helicsComplexVector:
         return ValueConverter<std::vector<std::complex<double>>>::convert (helicsGetComplexVector (val));
     case helics_type_t::helicsVector:
@@ -533,39 +569,49 @@ data_block typeConvert (helics_type_t type, const std::string &val)
     }
 }
 
-data_block typeConvert(helics_type_t type, const named_point &point)
+data_block typeConvert (helics_type_t type, const named_point &point)
 {
     switch (type)
     {
     case helics_type_t::helicsDouble:
-        return ValueConverter<double>::convert(point.second);
+        return ValueConverter<double>::convert (point.second);
     case helics_type_t::helicsInt:
-        return ValueConverter<int64_t>::convert(boost::lexical_cast<int64_t> (point.second));
+        return ValueConverter<int64_t>::convert (boost::lexical_cast<int64_t> (point.second));
     case helics_type_t::helicsComplex:
-        return ValueConverter<std::complex<double>>::convert(std::complex<double>(point.second,0.0));
+        return ValueConverter<std::complex<double>>::convert (std::complex<double> (point.second, 0.0));
     case helics_type_t::helicsNamedPoint:
     default:
-        return ValueConverter<named_point>::convert(point);
+        return ValueConverter<named_point>::convert (point);
+    case helics_type_t::helicsBool:
+        if (std::isnan (point.second))
+        {
+            return (point.first != "0") ? "1" : "0";
+        }
+        else
+        {
+            return (point.second != 0.0) ? "1" : "0";
+        }
+
     case helics_type_t::helicsString:
-        return helicsNamedPointString(point);
+        return helicsNamedPointString (point);
     case helics_type_t::helicsComplexVector:
     {
-        std::complex<double> v2(point.second, 0.0);
-        return ValueConverter<std::complex<double>>::convert(&v2, 1);
+        std::complex<double> v2 (point.second, 0.0);
+        return ValueConverter<std::complex<double>>::convert (&v2, 1);
     }
     case helics_type_t::helicsVector:
     {
         auto v2 = static_cast<double> (point.second);
-        return ValueConverter<double>::convert(&v2, 1);
+        return ValueConverter<double>::convert (&v2, 1);
     }
     }
 }
 
 data_block typeConvert (helics_type_t type, const std::vector<double> &val)
 {
-    if (val.empty())
+    if (val.empty ())
     {
-        return emptyBlock(type, helics_type_t::helicsVector);
+        return emptyBlock (type, helics_type_t::helicsVector);
     }
     switch (type)
     {
@@ -587,8 +633,12 @@ data_block typeConvert (helics_type_t type, const std::vector<double> &val)
         }
         return ValueConverter<std::complex<double>>::convert (V);
     }
+    case helics_type_t::helicsBool:
+        return (val[0] != 0.0) ? "1" : "0";
     case helics_type_t::helicsString:
         return helicsVectorString (val);
+    case helics_type_t::helicsNamedPoint:
+        return ValueConverter<named_point>::convert (named_point{helicsVectorString (val), std::nan ("0")});
     case helics_type_t::helicsComplexVector:
     {
         std::vector<std::complex<double>> CD;
@@ -608,9 +658,9 @@ data_block typeConvert (helics_type_t type, const std::vector<double> &val)
 
 data_block typeConvert (helics_type_t type, const double *vals, size_t size)
 {
-    if ((vals == nullptr)||(size==0))
+    if ((vals == nullptr) || (size == 0))
     {
-        return emptyBlock(type, helics_type_t::helicsVector);
+        return emptyBlock (type, helics_type_t::helicsVector);
     }
     switch (type)
     {
@@ -632,15 +682,19 @@ data_block typeConvert (helics_type_t type, const double *vals, size_t size)
         }
         return ValueConverter<std::complex<double>>::convert (V);
     }
+    case helics_type_t::helicsBool:
+        return (vals[0] != 0.0) ? "1" : "0";
     case helics_type_t::helicsString:
         return helicsVectorString (vals, size);
+    case helics_type_t::helicsNamedPoint:
+        return ValueConverter<named_point>::convert (named_point{helicsVectorString (vals, size), std::nan ("0")});
     case helics_type_t::helicsComplexVector:
     {
         std::vector<std::complex<double>> CD;
-        CD.reserve(size / 2);
+        CD.reserve (size / 2);
         for (size_t ii = 0; ii < size - 1; ++ii)
         {
-            CD.emplace_back(vals[ii], vals[ii + 1]);
+            CD.emplace_back (vals[ii], vals[ii + 1]);
         }
         return ValueConverter<std::vector<std::complex<double>>>::convert (CD);
     }
@@ -653,9 +707,9 @@ data_block typeConvert (helics_type_t type, const double *vals, size_t size)
 
 data_block typeConvert (helics_type_t type, const std::vector<std::complex<double>> &val)
 {
-    if (val.empty())
+    if (val.empty ())
     {
-        return emptyBlock(type,helics_type_t::helicsComplexVector);
+        return emptyBlock (type, helics_type_t::helicsComplexVector);
     }
     switch (type)
     {
@@ -665,8 +719,12 @@ data_block typeConvert (helics_type_t type, const std::vector<std::complex<doubl
         return ValueConverter<int64_t>::convert (std::abs (val[0]));
     case helics_type_t::helicsComplex:
         return ValueConverter<std::complex<double>>::convert (val[0]);
+    case helics_type_t::helicsBool:
+        return (std::abs (val[0]) != 0.0) ? "1" : "0";
     case helics_type_t::helicsString:
         return helicsComplexVectorString (val);
+    case helics_type_t::helicsNamedPoint:
+        return ValueConverter<named_point>::convert (named_point{helicsComplexVectorString (val), std::nan ("0")});
     case helics_type_t::helicsComplexVector:
     default:
         return ValueConverter<std::vector<std::complex<double>>>::convert (val);
@@ -694,8 +752,19 @@ data_block typeConvert (helics_type_t type, const std::complex<double> &val)
     case helics_type_t::helicsComplex:
     default:
         return ValueConverter<std::complex<double>>::convert (val);
+    case helics_type_t::helicsBool:
+        return (std::abs (val) != 0.0) ? "1" : "0";
     case helics_type_t::helicsString:
         return helicsComplexString (val);
+    case helics_type_t::helicsNamedPoint:
+        if (val.imag () == 0)
+        {
+            return ValueConverter<named_point>::convert (named_point{"value", val.real ()});
+        }
+        else
+        {
+            return ValueConverter<named_point>::convert (named_point{helicsComplexString (val), std::nan ("0")});
+        }
     case helics_type_t::helicsComplexVector:
         return ValueConverter<std::complex<double>>::convert (&val, 1);
     case helics_type_t::helicsVector:
@@ -706,60 +775,96 @@ data_block typeConvert (helics_type_t type, const std::complex<double> &val)
     }
 }
 
-
-data_block typeConvert(helics_type_t type, named_point &val)
+data_block typeConvert (helics_type_t type, named_point &val)
 {
     switch (type)
     {
     case helics_type_t::helicsDouble:
-        return ValueConverter<double>::convert(val.second);
+        return ValueConverter<double>::convert (val.second);
     case helics_type_t::helicsInt:
-        return ValueConverter<int64_t>::convert(static_cast<int64_t> (val.second));
+        return ValueConverter<int64_t>::convert (static_cast<int64_t> (val.second));
     case helics_type_t::helicsComplex:
-        return ValueConverter<std::complex<double>>::convert(std::complex<double>(val.second, 0.0));
+        return ValueConverter<std::complex<double>>::convert (std::complex<double> (val.second, 0.0));
+    case helics_type_t::helicsBool:
+        return (val.second != 0) ? "1" : "0";
     case helics_type_t::helicsNamedPoint:
     default:
-        return ValueConverter<named_point>::convert(val);
+        return ValueConverter<named_point>::convert (val);
     case helics_type_t::helicsString:
-        return helicsNamedPointString(val);
+        return helicsNamedPointString (val);
     case helics_type_t::helicsComplexVector:
     {
-        std::complex<double> v2(val.second, 0.0);
-        return ValueConverter<std::complex<double>>::convert(&v2, 1);
+        std::complex<double> v2 (val.second, 0.0);
+        return ValueConverter<std::complex<double>>::convert (&v2, 1);
     }
     case helics_type_t::helicsVector:
-        return ValueConverter<double>::convert(&(val.second), 1);
+        return ValueConverter<double>::convert (&(val.second), 1);
     }
 }
 
-data_block typeConvert(helics_type_t type, const char *str, double val)
+data_block typeConvert (helics_type_t type, const char *str, double val)
 {
     switch (type)
     {
     case helics_type_t::helicsDouble:
-        return ValueConverter<double>::convert(val);
+        return ValueConverter<double>::convert (val);
     case helics_type_t::helicsInt:
-        return ValueConverter<int64_t>::convert(static_cast<int64_t> (val));
+        return ValueConverter<int64_t>::convert (static_cast<int64_t> (val));
     case helics_type_t::helicsComplex:
-        return ValueConverter<std::complex<double>>::convert(std::complex<double>(val, 0.0));
+        return ValueConverter<std::complex<double>>::convert (std::complex<double> (val, 0.0));
+    case helics_type_t::helicsBool:
+        return (val != 0) ? "1" : "0";
     case helics_type_t::helicsNamedPoint:
     default:
-        return ValueConverter<named_point>::convert(named_point(str,val));
+        return ValueConverter<named_point>::convert (named_point (str, val));
     case helics_type_t::helicsString:
-        return helicsNamedPointString(str,val);
+        return helicsNamedPointString (str, val);
     case helics_type_t::helicsComplexVector:
     {
-        std::complex<double> v2(val, 0.0);
-        return ValueConverter<std::complex<double>>::convert(&v2, 1);
+        std::complex<double> v2 (val, 0.0);
+        return ValueConverter<std::complex<double>>::convert (&v2, 1);
     }
     case helics_type_t::helicsVector:
-        return ValueConverter<double>::convert(&(val), 1);
+        return ValueConverter<double>::convert (&(val), 1);
     }
 }
-data_block typeConvert(helics_type_t type, const std::string &str, double val)
+
+data_block typeConvert (helics_type_t type, bool val)
 {
-    return typeConvert(type, str.c_str(), val);
+    switch (type)
+    {
+    case helics_type_t::helicsDouble:
+        return ValueConverter<double>::convert (val ? 1.0 : 0.0);
+    case helics_type_t::helicsInt:
+        return ValueConverter<int64_t>::convert (val ? 1 : 0);
+    case helics_type_t::helicsComplex:
+        return ValueConverter<std::complex<double>>::convert (std::complex<double> (val ? 1.0 : 0.0, 0.0));
+    case helics_type_t::helicsString:
+    case helics_type_t::helicsBool:
+    default:
+        return val ? "1" : "0";
+    case helics_type_t::helicsNamedPoint:
+    {
+        named_point np{"value", val ? 1.0 : 0.0};
+        return ValueConverter<named_point>::convert (np);
+    }
+
+    case helics_type_t::helicsComplexVector:
+    {
+        std::complex<double> v2 (val ? 1.0 : 0.0, 0.0);
+        return ValueConverter<std::complex<double>>::convert (&v2, 1);
+    }
+    case helics_type_t::helicsVector:
+    {
+        auto v2 = val ? 1.0 : 0.0;
+        return ValueConverter<double>::convert (&v2, 1);
+    }
+    }
+}
+
+data_block typeConvert (helics_type_t type, const std::string &str, double val)
+{
+    return typeConvert (type, str.c_str (), val);
 }
 
 }  // namespace helics
-

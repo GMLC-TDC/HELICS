@@ -251,4 +251,3 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls)
     Fed2->finalize ();
 }
 BOOST_AUTO_TEST_SUITE_END ()
-

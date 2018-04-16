@@ -63,6 +63,28 @@ void Publication::publish (int64_t val) const
         fed->publish (id, db);
     }
 }
+void Publication::publish (bool val) const
+{
+    bool doPublish = true;
+    std::string bstring = val ? "1" : "0";
+    if (changeDetectionEnabled)
+    {
+        if (changeDetected (prevValue, bstring, delta))
+        {
+            prevValue = bstring;
+        }
+        else
+        {
+            doPublish = false;
+        }
+    }
+    if (doPublish)
+    {
+        auto db = typeConvert (pubType, bstring);
+        fed->publish (id, db);
+    }
+}
+
 void Publication::publish (const char *val) const
 {
     bool doPublish = true;
@@ -189,7 +211,7 @@ void Publication::publish (std::complex<double> val) const
 
 data_block typeConvert (helics_type_t type, const defV &val)
 {
-    switch (val.index())
+    switch (val.index ())
     {
     case doubleLoc:  // double
         return typeConvert (type, mpark::get<double> (val));
@@ -228,4 +250,3 @@ void Publication::publish (const defV &val) const
     }
 }
 }  // namespace helics
-

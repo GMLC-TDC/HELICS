@@ -16,16 +16,23 @@ namespace helics
  */
 ValueFederate::ValueFederate (const FederateInfo &fi) : Federate (fi)
 {
-	//the core object get instantiated in the Federate constructor
-    vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
+    // the core object get instantiated in the Federate constructor
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
 }
 ValueFederate::ValueFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi) : Federate (core, fi)
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
 }
 ValueFederate::ValueFederate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
+    registerInterfaces (jsonString);
+}
+
+ValueFederate::ValueFederate (const std::string &name, const std::string &jsonString)
+    : Federate (loadFederateInfo (name, jsonString))
+{
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
     registerInterfaces (jsonString);
 }
 
@@ -33,7 +40,7 @@ ValueFederate::ValueFederate () = default;
 
 ValueFederate::ValueFederate (bool /*res*/)
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject.get(), getID ());
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
 }
 
 ValueFederate::ValueFederate (ValueFederate &&) noexcept = default;
@@ -127,9 +134,7 @@ void ValueFederate::registerValueInterfaces (const std::string &jsonString)
         auto pubs = doc["publications"];
         for (const auto &pub : pubs)
         {
-            auto key = (pub.isMember ("key")) ?
-                         pub["key"].asString () :
-                         ((pub.isMember ("name")) ? pub["name"].asString () : std::string ());
+            auto key = getKey (pub);
 
             auto id = vfManager->getPublicationId (key);
             if (id != invalid_id_value)
@@ -154,9 +159,7 @@ void ValueFederate::registerValueInterfaces (const std::string &jsonString)
         auto subs = doc["subscriptions"];
         for (const auto &sub : subs)
         {
-            auto key = (sub.isMember ("key")) ?
-                         sub["key"].asString () :
-                         ((sub.isMember ("name")) ? sub["name"].asString () : std::string ());
+            auto key = getKey (sub);
             auto id = vfManager->getSubscriptionId (key);
             if (id != invalid_id_value)
             {
@@ -306,4 +309,3 @@ int ValueFederate::getPublicationCount () const { return vfManager->getPublicati
 /** get a count of the number subscriptions registered*/
 int ValueFederate::getSubscriptionCount () const { return vfManager->getSubscriptionCount (); }
 }  // namespace helics
-

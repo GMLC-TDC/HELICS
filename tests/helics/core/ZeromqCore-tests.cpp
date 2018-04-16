@@ -24,12 +24,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 BOOST_AUTO_TEST_SUITE (ZMQCore_tests)
 
 using helics::Core;
-const std::string defServer("tcp://127.0.0.1:23405");
+const std::string defServer ("tcp://127.0.0.1:23405");
 const std::string host = "tcp://127.0.0.1";
 
-const std::string defRoute1("tcp://127.0.0.1:23406");
+const std::string defRoute1 ("tcp://127.0.0.1:23406");
 
-const std::string defRoute2("tcp://127.0.0.1:23407");
+const std::string defRoute2 ("tcp://127.0.0.1:23407");
 
 BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
 {
@@ -63,7 +63,6 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
 /** test the request set class with various scenarios*/
 BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
 {
-
     helics::zeromq::ZmqRequestSets reqset;
 
     auto ctx = zmqContextManager::getContextPointer ();
@@ -531,12 +530,11 @@ BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
 
     core->disconnect ();
 
-    BOOST_CHECK(!core->isConnected());
+    BOOST_CHECK (!core->isConnected ());
     broker->disconnect ();
-    BOOST_CHECK(!broker->isConnected());
+    BOOST_CHECK (!broker->isConnected ());
     helics::CoreFactory::cleanUpCores (200);
     helics::BrokerFactory::cleanUpBrokers (200);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
-

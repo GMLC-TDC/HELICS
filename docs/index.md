@@ -29,6 +29,7 @@ series simulation.
  introduction/index
  developer-guide/index
  apps/index
- API <https://gmlc-tdc.github.io/HELICS-src/doxygen/>
+ c-api-reference/index
+ API Doxygen <https://gmlc-tdc.github.io/HELICS-src/doxygen/>
 ```
 

@@ -1,11 +1,12 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "MessageFederateManager.hpp"
 #include "../core/Core.hpp"
+#include <cassert>
+
 namespace helics
 {
 MessageFederateManager::MessageFederateManager (Core *coreOb, Core::federate_id_t id)
@@ -21,11 +22,11 @@ void MessageFederateManager::disconnect ()
 }
 endpoint_id_t MessageFederateManager::registerEndpoint (const std::string &name, const std::string &type)
 {
-	auto handle=coreObject->registerEndpoint(fedID, name, type);
-    auto eptHandle = local_endpoints.lock();
+    auto handle = coreObject->registerEndpoint (fedID, name, type);
+    auto eptHandle = local_endpoints.lock ();
     endpoint_id_t id = static_cast<identifier_type> (eptHandle->size ());
     ++endpointCount;
-    eptHandle->insert(name,handle,name, type,id,handle);
+    eptHandle->insert (name, handle, name, type, id, handle);
 
     return id;
 }
@@ -33,7 +34,7 @@ endpoint_id_t MessageFederateManager::registerEndpoint (const std::string &name,
 void MessageFederateManager::registerKnownCommunicationPath (endpoint_id_t localEndpoint,
                                                              const std::string &remoteEndpoint)
 {
-    auto sharedElock = local_endpoints.lock_shared();
+    auto sharedElock = local_endpoints.lock_shared ();
     if (localEndpoint.value () < endpointCount)
     {
         coreObject->registerFrequentCommunicationsPair ((*sharedElock)[localEndpoint.value ()]->name,
@@ -45,7 +46,7 @@ void MessageFederateManager::subscribe (endpoint_id_t endpoint, const std::strin
 {
     if (endpoint.value () < endpointCount)
     {
-        auto h = coreObject->registerSubscription (fedID, name, type, std::string(), handle_check_mode::optional);
+        auto h = coreObject->registerSubscription (fedID, name, type, std::string (), handle_check_mode::optional);
         std::lock_guard<std::mutex> eLock (endpointLock);
         subHandleLookup.emplace (h, std::make_pair (endpoint, name));
         hasSubscriptions = true;
@@ -129,7 +130,8 @@ void MessageFederateManager::sendMessage (endpoint_id_t source, const std::strin
 {
     if (source.value () < endpointCount)
     {
-        coreObject->send ((*local_endpoints.lock_shared())[source.value ()]->handle, dest, message.data (), message.size ());
+        coreObject->send ((*local_endpoints.lock_shared ())[source.value ()]->handle, dest, message.data (),
+                          message.size ());
     }
     else
     {
@@ -144,8 +146,8 @@ void MessageFederateManager::sendMessage (endpoint_id_t source,
 {
     if (source.value () < endpointCount)
     {
-        coreObject->sendEvent (sendTime, (*local_endpoints.lock_shared())[source.value ()]->handle, dest, message.data (),
-                               message.size ());
+        coreObject->sendEvent (sendTime, (*local_endpoints.lock_shared ())[source.value ()]->handle, dest,
+                               message.data (), message.size ());
     }
     else
     {
@@ -157,7 +159,7 @@ void MessageFederateManager::sendMessage (endpoint_id_t source, std::unique_ptr<
 {
     if (source.value () < endpointCount)
     {
-        coreObject->sendMessage ((*local_endpoints.lock_shared())[source.value ()]->handle, std::move (message));
+        coreObject->sendMessage ((*local_endpoints.lock_shared ())[source.value ()]->handle, std::move (message));
     }
     else
     {
@@ -182,7 +184,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
         }
 
         /** find the id*/
-        auto fid = (local_endpoints.lock())->find (endpoint_id);
+        auto fid = (local_endpoints.lock ())->find (endpoint_id);
         if (fid != nullptr)
         {  // assign the data
 
@@ -190,7 +192,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             messageQueues[localEndpointIndex].emplace (std::move (message));
             if (fid->callbackIndex >= 0)
             {
-                //need to be copied otherwise there is a potential race condition on lock removal
+                // need to be copied otherwise there is a potential race condition on lock removal
                 auto cb = callbacks[fid->callbackIndex];
                 eplock.unlock ();
                 cb (fid->id, CurrentTime);
@@ -198,7 +200,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             }
             else if (allCallbackIndex >= 0)
             {
-                //need to be copied otherwise there is a potential race condition on lock removal
+                // need to be copied otherwise there is a potential race condition on lock removal
                 auto ac = callbacks[allCallbackIndex];
                 eplock.unlock ();
                 ac (fid->id, CurrentTime);
@@ -217,7 +219,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
                 auto mv = std::make_unique<Message> ();
                 mv->source = sfnd->second.second;
                 auto localEndpointIndex = sfnd->second.first.value ();
-                auto eptInfo = (*local_endpoints.lock())[localEndpointIndex];
+                auto eptInfo = (*local_endpoints.lock ())[localEndpointIndex];
                 mv->dest = eptInfo->name;
                 mv->original_source = mv->source;
                 // get the data value
@@ -247,10 +249,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     }
 }
 
-void MessageFederateManager::startupToInitializeStateTransition ()
-{
-    messageQueues.resize (endpointCount);
-}
+void MessageFederateManager::startupToInitializeStateTransition () { messageQueues.resize (endpointCount); }
 
 void MessageFederateManager::initializeToExecuteStateTransition () {}
 
@@ -258,19 +257,19 @@ static const std::string nullStr;
 
 std::string MessageFederateManager::getEndpointName (endpoint_id_t id) const
 {
-    return (id.value () < endpointCount) ? (*local_endpoints.lock_shared())[id.value ()]->name : nullStr;
+    return (id.value () < endpointCount) ? (*local_endpoints.lock_shared ())[id.value ()]->name : nullStr;
 }
 
 endpoint_id_t MessageFederateManager::getEndpointId (const std::string &name) const
 {
-    auto sharedEpt = local_endpoints.lock_shared();
+    auto sharedEpt = local_endpoints.lock_shared ();
     auto sub = sharedEpt->find (name);
     return (sub != nullptr) ? sub->id : 0;
 }
 
 std::string MessageFederateManager::getEndpointType (endpoint_id_t id) const
 {
-    return (id.value () < endpointCount) ? (*local_endpoints.lock_shared())[id.value ()]->type : nullStr;
+    return (id.value () < endpointCount) ? (*local_endpoints.lock_shared ())[id.value ()]->type : nullStr;
 }
 
 int MessageFederateManager::getEndpointCount () const
@@ -293,11 +292,14 @@ void MessageFederateManager::registerCallback (const std::function<void(endpoint
     }
 }
 
-void MessageFederateManager::registerCallback (endpoint_id_t id, const std::function<void(endpoint_id_t, Time)> &callback)
+void MessageFederateManager::registerCallback (endpoint_id_t id,
+                                               const std::function<void(endpoint_id_t, Time)> &callback)
 {
     if (id.value () < endpointCount)
     {
-        (*local_endpoints.lock())[id.value ()]->callbackIndex = static_cast<int> (callbacks.size ());
+        auto eplock = local_endpoints.lock ();
+        assert (eplock);
+        (*eplock)[id.value ()]->callbackIndex = static_cast<int> (callbacks.size ());
         callbacks.push_back (callback);
     }
     else
@@ -309,11 +311,11 @@ void MessageFederateManager::registerCallback (endpoint_id_t id, const std::func
 void MessageFederateManager::registerCallback (const std::vector<endpoint_id_t> &ids,
                                                const std::function<void(endpoint_id_t, Time)> &callback)
 {
-
     int ind = static_cast<int> (callbacks.size ());
     callbacks.push_back (callback);
-    auto cnt = endpointCount.load();
-    auto eptLock = local_endpoints.lock();
+    auto cnt = endpointCount.load ();
+    auto eptLock = local_endpoints.lock ();
+    assert (eptLock);
     for (auto id : ids)
     {
         if (id.value () < cnt)
@@ -344,4 +346,3 @@ void MessageFederateManager::removeOrderedMessage (unsigned int index)
     }
 }
 }  // namespace helics
-

@@ -11,9 +11,10 @@ For example, you can run the following on an OSX machine where you have `swig` i
 git clone https://github.com/GMLC-TDC/HELICS-src
 cd HELICS-src
 mkdir build-osx
-cmake -DBUILD_PYTHON=ON -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/ -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ .. && make -j 8 && make install
+cmake -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/ -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ .. && make -j 8 && make install
 cd swig/python
 cp helicsPYTHON_wrap.c ../../../swig/python/helics_wrap.c
+cp helics.py ../../../swig/python/helics.py
 ```
 
 This method verifies that the C file generated from CMake using SWIG compiles correctly into a Python extension.

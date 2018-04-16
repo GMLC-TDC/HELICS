@@ -71,4 +71,3 @@ std::string TcpBroker::getAddress () const
 
 }  // namespace tcp
 }  // namespace helics
-

@@ -15,7 +15,8 @@ CommsInterface::CommsInterface (const std::string &localTarget, const std::strin
 }
 
 CommsInterface::CommsInterface (const NetworkBrokerData &netInfo)
-    : localTarget_ (netInfo.localInterface), brokerTarget_ (netInfo.brokerAddress),brokerName_(netInfo.brokerName)
+    : localTarget_ (netInfo.localInterface), brokerTarget_ (netInfo.brokerAddress),
+      brokerName_ (netInfo.brokerName)
 {
 }
 /** destructor*/
@@ -128,7 +129,7 @@ bool CommsInterface::connect ()
 void CommsInterface::setName (const std::string &name_) { name = name_; }
 void CommsInterface::disconnect ()
 {
-    if (tripDetector.isTripped())
+    if (tripDetector.isTripped ())
     {
         rx_status = connection_status::terminated;
         tx_status = connection_status::terminated;
@@ -157,8 +158,8 @@ void CommsInterface::disconnect ()
             std::cerr << "unable to terminate connection\n";
             break;
         }
-        //check the trip detector
-        if (tripDetector.isTripped())
+        // check the trip detector
+        if (tripDetector.isTripped ())
         {
             rx_status = connection_status::terminated;
             tx_status = connection_status::terminated;
@@ -180,8 +181,8 @@ void CommsInterface::disconnect ()
             std::cerr << "unable to terminate connection\n";
             break;
         }
-        //check the trip detector
-        if (tripDetector.isTripped())
+        // check the trip detector
+        if (tripDetector.isTripped ())
         {
             rx_status = connection_status::terminated;
             tx_status = connection_status::terminated;
@@ -267,4 +268,3 @@ void CommsInterface::reconnectReceiver ()
 }
 
 }  // namespace helics
-

@@ -72,7 +72,7 @@ extensions = [
 ]
 
 breathe_projects = {
-    "helics": "./xml",
+    "helics": "./../build-doxygen/docs/xml",
 }
 
 breathe_default_project = "helics"
@@ -93,7 +93,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'HELICS-src'
-copyright = '2017-2018, Battelle Memorial Institute. All rights reserved.'
+copyright = 'Copyright © 2017-2018,\nBattelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC\nAll rights reserved. See LICENSE file and DISCLAIMER for more details.'
 author = 'Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller'
 
 # The version info for the project you're documenting, acts as replacement for

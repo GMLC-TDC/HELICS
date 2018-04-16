@@ -3,6 +3,7 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "../common/TripWire.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../helics.hpp"
 #include "helics.h"
@@ -12,7 +13,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <memory>
 #include <mutex>
 #include <vector>
-#include "../common/TripWire.hpp"
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
 static const int fedValidationIdentifier = 0x2352188;
@@ -88,7 +88,6 @@ std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate
     }
     return nullptr;
 }
-
 
 /* Creation and destruction of Federates */
 helics_federate helicsCreateValueFederate (const helics_federate_info_t fi)
@@ -174,7 +173,7 @@ helics_federate helicsCreateCombinationFederateFromJson (const char *json)
     return reinterpret_cast<void *> (fed);
 }
 
-helics_federate helicsFederateClone(helics_federate fed)
+helics_federate helicsFederateClone (helics_federate fed)
 {
     if (fed == nullptr)
     {
@@ -183,7 +182,7 @@ helics_federate helicsFederateClone(helics_federate fed)
     auto *fedObj = reinterpret_cast<helics::FedObject *> (fed);
     auto *fedClone = new helics::FedObject;
     fedClone->fedptr = fedObj->fedptr;
-    fedClone->index = getMasterHolder()->addFed(fedClone);
+    fedClone->index = getMasterHolder ()->addFed (fedClone);
     fedClone->type = fedObj->type;
     fedClone->valid = fedObj->valid;
     return reinterpret_cast<void *> (fedClone);
@@ -289,27 +288,29 @@ helics_status helicsFederateEnterExecutionMode (helics_federate fed)
     }
     try
     {
+        // printf("current state=%d\n", static_cast<int>(fedObj->getCurrentState()));
         fedObj->enterExecutionState ();
         return helics_ok;
     }
     catch (helics::InvalidFunctionCall &)
     {
+        //  printf("current state=%d\n", static_cast<int>(fedObj->getCurrentState()));
         return helics_invalid_state_transition;
     }
 }
 
-static helics::helics_iteration_request getIterationRequest (helics_iteration_request iterate)
+static helics::iteration_request getIterationRequest (helics_iteration_request iterate)
 {
     switch (iterate)
     {
     case no_iteration:
     default:
-        return helics::helics_iteration_request::no_iterations;
+        return helics::iteration_request::no_iterations;
     case force_iteration:
-        return helics::helics_iteration_request::force_iteration;
+        return helics::iteration_request::force_iteration;
 
     case iterate_if_needed:
-        return helics::helics_iteration_request::iterate_if_needed;
+        return helics::iteration_request::iterate_if_needed;
     }
 }
 
@@ -526,26 +527,26 @@ helics_status helicsFederateGetState (helics_federate fed, federate_state *state
     return helics_ok;
 }
 
-helics_status helicsFederateGetName (helics_federate fed, char *str, int maxlen)
+helics_status helicsFederateGetName (helics_federate fed, char *outputString, int maxlen)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
     {
         return helics_invalid_object;
     }
-    if (str == nullptr)
+    if (outputString == nullptr)
     {
         return helics_discard;
     }
     auto &ident = fedObj->getName ();
     if (static_cast<int> (ident.size ()) > maxlen)
     {
-        strncpy (str, ident.c_str (), maxlen);
-        str[maxlen - 1] = 0;
+        strncpy (outputString, ident.c_str (), maxlen);
+        outputString[maxlen - 1] = 0;
     }
     else
     {
-        strcpy (str, ident.c_str ());
+        strcpy (outputString, ident.c_str ());
     }
     return helics_ok;
 }
@@ -614,6 +615,17 @@ helics_status helicsFederateSetLoggingLevel (helics_federate fed, int loggingLev
     return helics_ok;
 }
 
+helics_status helicsFederateSetMaxIterations (helics_federate fed, int maxIterations)
+{
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    fedObj->setMaxIterations (maxIterations);
+    return helics_ok;
+}
+
 /** get the current time of the federate
 @param fed the federate object to query
 @param[out] time storage location for the time variable
@@ -648,4 +660,3 @@ helicsFederateRequestTimeIterativeComplete (helics_federate fed, helics_time_t *
     *timeOut = static_cast<double> (val.grantedTime);
     return helics_ok;
 }
-

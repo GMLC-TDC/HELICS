@@ -10,22 +10,20 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "helics/chelics.h"
 
-#define CE(status) BOOST_CHECK_EQUAL(status, helics_ok)
+#define CE(status) BOOST_CHECK_EQUAL (status, helics_ok)
 #define HELICS_SIZE_MAX 512
-
 
 #ifndef DISABLE_TCP_CORE
 const std::string core_types[] = {"test",   "ipc",   "zmq",   "udp",   "tcp",
                                   "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
-const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp"
-                                        };
+const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp"};
 #else
-const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2", "test_3", "zmq_3", "udp_3" ,
-"test_4", "zmq_4", "udp_4" };
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp","test_3", "zmq_3", "udp_3" };
+const std::string core_types[] = {"test",  "ipc",    "zmq",   "udp",   "test_2", "ipc_2", "zmq_2",
+                                  "udp_2", "test_3", "zmq_3", "udp_3", "test_4", "zmq_4", "udp_4"};
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp", "test_3", "zmq_3", "udp_3"};
 #endif
 
-typedef helics_federate (*FedCreator)(helics_federate_info_t);
+typedef helics_federate (*FedCreator) (helics_federate_info_t);
 
 struct FederateTestFixture
 {
@@ -35,25 +33,23 @@ struct FederateTestFixture
     helics_broker AddBroker (const std::string &core_type_name, int count);
     helics_broker AddBroker (const std::string &core_type_name, const std::string &initialization_string);
 
-    void SetupTest (
-            FedCreator ctor,
-            const std::string &core_type_name,
-            int count,
-            helics_time_t time_delta = helics_time_zero,
-            const std::string &name_prefix = "fed")
+    void SetupTest (FedCreator ctor,
+                    const std::string &core_type_name,
+                    int count,
+                    helics_time_t time_delta = helics_time_zero,
+                    const std::string &name_prefix = "fed")
     {
         helics_broker broker = AddBroker (core_type_name, count);
-        BOOST_CHECK(nullptr != broker);
+        BOOST_CHECK (nullptr != broker);
         AddFederates (ctor, core_type_name, count, broker, time_delta, name_prefix);
     }
 
-    std::vector<helics_federate> AddFederates (
-            FedCreator ctor,
-            std::string core_type_name,
-            int count,
-            helics_broker broker,
-            helics_time_t time_delta = helics_time_zero,
-            const std::string &name_prefix = "fed")
+    std::vector<helics_federate> AddFederates (FedCreator ctor,
+                                               std::string core_type_name,
+                                               int count,
+                                               helics_broker broker,
+                                               helics_time_t time_delta = helics_time_zero,
+                                               const std::string &name_prefix = "fed")
     {
         char tmp[HELICS_SIZE_MAX];
         bool hasIndex = hasIndexCode (core_type_name);
@@ -78,62 +74,60 @@ struct FederateTestFixture
         }
 
         helics_federate_info_t fi = helicsFederateInfoCreate ();
-        CE( helicsFederateInfoSetFederateName (fi, ""));
-        CE( helicsFederateInfoSetCoreTypeFromString (fi, core_type_name.c_str()));
-        CE( helicsFederateInfoSetTimeDelta (fi, time_delta));
+        CE (helicsFederateInfoSetFederateName (fi, ""));
+        CE (helicsFederateInfoSetCoreTypeFromString (fi, core_type_name.c_str ()));
+        CE (helicsFederateInfoSetTimeDelta (fi, time_delta));
 
         std::vector<helics_federate> federates_added;
-
-
 
         switch (setup)
         {
         case 1:
         default:
         {
-            auto init = initString + " --federates "+ std::to_string(count);
-            auto core = helicsCreateCore (core_type_name.c_str(), NULL, init.c_str());
+            auto init = initString + " --federates " + std::to_string (count);
+            auto core = helicsCreateCore (core_type_name.c_str (), NULL, init.c_str ());
             CE (helicsCoreGetIdentifier (core, tmp, HELICS_SIZE_MAX));
             CE (helicsFederateInfoSetCoreName (fi, tmp));
-            size_t offset = federates.size();
-            federates.resize(count + offset);
+            size_t offset = federates.size ();
+            federates.resize (count + offset);
             for (int ii = 0; ii < count; ++ii)
             {
-                auto name = name_prefix + std::to_string (ii+offset);
-                CE (helicsFederateInfoSetFederateName (fi, name.c_str()));
+                auto name = name_prefix + std::to_string (ii + offset);
+                CE (helicsFederateInfoSetFederateName (fi, name.c_str ()));
                 auto fed = ctor (fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
             }
-            helicsCoreFree(core);
+            helicsCoreFree (core);
         }
         break;
         case 2:
         {  // each federate has its own core
-            size_t offset = federates.size();
-            federates.resize(count + offset);
+            size_t offset = federates.size ();
+            federates.resize (count + offset);
             for (int ii = 0; ii < count; ++ii)
             {
                 auto init = initString + " --federates 1";
-                auto core = helicsCreateCore (core_type_name.c_str(), NULL, init.c_str());
+                auto core = helicsCreateCore (core_type_name.c_str (), NULL, init.c_str ());
                 CE (helicsCoreGetIdentifier (core, tmp, HELICS_SIZE_MAX));
                 CE (helicsFederateInfoSetCoreName (fi, tmp));
 
-                auto name = name_prefix + std::to_string (ii+offset);
-                CE (helicsFederateInfoSetFederateName (fi, name.c_str()));
+                auto name = name_prefix + std::to_string (ii + offset);
+                CE (helicsFederateInfoSetFederateName (fi, name.c_str ()));
                 auto fed = ctor (fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
-                helicsCoreFree(core);
+                helicsCoreFree (core);
             }
         }
         break;
         case 3:
         {
-            auto subbroker = AddBroker(core_type_name, initString + " --federates " + std::to_string(count));
+            auto subbroker = AddBroker (core_type_name, initString + " --federates " + std::to_string (count));
             auto newTypeString = core_type_name;
-            newTypeString.push_back('_');
-            newTypeString.push_back('2');
+            newTypeString.push_back ('_');
+            newTypeString.push_back ('2');
             for (int ii = 0; ii < count; ++ii)
             {
                 AddFederates (ctor, newTypeString, 1, subbroker, time_delta, name_prefix);
@@ -143,11 +137,11 @@ struct FederateTestFixture
         case 4:
         {
             auto newTypeString = core_type_name;
-            newTypeString.push_back('_');
-            newTypeString.push_back('2');
+            newTypeString.push_back ('_');
+            newTypeString.push_back ('2');
             for (int ii = 0; ii < count; ++ii)
             {
-                auto subbroker = AddBroker(core_type_name, initString + " --federates 1");
+                auto subbroker = AddBroker (core_type_name, initString + " --federates 1");
                 AddFederates (ctor, newTypeString, 1, subbroker, time_delta, name_prefix);
             }
         }
@@ -159,7 +153,11 @@ struct FederateTestFixture
 
     helics_federate GetFederateAt (int index)
     {
-        return federates.at(index);
+        if (index < static_cast<int> (federates.size ()))
+        {
+            return federates.at (index);
+        }
+        return nullptr;
     }
 
     std::vector<helics_broker> brokers;
@@ -172,4 +170,3 @@ struct FederateTestFixture
     int getIndexCode (const std::string &type_name);
     auto AddBrokerImp (const std::string &core_type_name, const std::string &initialization_string);
 };
-

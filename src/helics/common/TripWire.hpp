@@ -10,16 +10,15 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** namespace for the global variable in tripwire*/
 namespace tripwire
 {
-
 /** the actual tripwire type*/
 using triplineType = std::shared_ptr<std::atomic<bool>>;
 
 /** singleton class containing the actual trip line*/
 class TripWire
 {
-private:
+  private:
     /** get the tripwire*/
-    static triplineType getline();
+    static triplineType getline ();
 
     friend class TripWireDetector;
     friend class TripWireTrigger;
@@ -28,22 +27,23 @@ private:
 /** class to check if a trip line was tripped*/
 class TripWireDetector
 {
-public:
-    TripWireDetector();
+  public:
+    TripWireDetector ();
     /** check if the line was tripped*/
-    bool isTripped() const;
-private:
-    std::shared_ptr<const std::atomic<bool>> lineDetector; //!< const pointer to the tripwire
+    bool isTripped () const;
+
+  private:
+    std::shared_ptr<const std::atomic<bool>> lineDetector;  //!< const pointer to the tripwire
 };
 
 /** class to trigger a tripline on destruction */
 class TripWireTrigger
 {
-public:
-    TripWireTrigger();
-    ~TripWireTrigger();
-private:
-    triplineType lineTrigger; //!< the tripwire
-};
-} //namespace tripwire
+  public:
+    TripWireTrigger ();
+    ~TripWireTrigger ();
 
+  private:
+    triplineType lineTrigger;  //!< the tripwire
+};
+}  // namespace tripwire

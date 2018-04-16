@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #pragma once
 
+#include <functional>
 #include <string>
 
 namespace helics
@@ -49,6 +50,13 @@ class Broker
     virtual const std::string &getIdentifier () const = 0;
     /** get the connection address for the broker*/
     virtual std::string getAddress () const = 0;
+
+    /** set the logging callback function
+    @param logFunction a function with a signature of void(int level,  const std::string &source,  const
+    std::string &message) the function takes a level indicating the logging level string with the source name and a
+    string with the message
+    */
+    virtual void
+    setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction) = 0;
 };
 }  // namespace helics
-

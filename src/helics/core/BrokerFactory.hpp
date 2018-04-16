@@ -69,4 +69,3 @@ void copyBrokerIdentifier (const std::string &copyFromName, const std::string &c
 void displayHelp (core_type type = core_type::UNRECOGNIZED);
 }  // namespace BrokerFactory
 }  // namespace helics
-

@@ -23,8 +23,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/zmqContextManager.h"
 #endif
 
-
-const char *helicsGetVersion(void) { return helics::versionString; }
+const char *helicsGetVersion (void) { return helics::versionString; }
 
 helics_bool_t helicsIsCoreTypeAvailable (const char *type)
 {
@@ -320,7 +319,7 @@ helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int ar
     return reinterpret_cast<helics_core> (core);
 }
 
-helics_core helicsCoreClone(helics_core core)
+helics_core helicsCoreClone (helics_core core)
 {
     if (core == nullptr)
     {
@@ -328,22 +327,21 @@ helics_core helicsCoreClone(helics_core core)
     }
     auto *coreObj = reinterpret_cast<helics::CoreObject *> (core);
     auto *coreClone = new helics::CoreObject;
-    coreClone->index = getMasterHolder()->addCore(coreClone);
+    coreClone->index = getMasterHolder ()->addCore (coreClone);
     coreClone->valid = coreValidationIdentifier;
     coreClone->coreptr = coreObj->coreptr;
     return reinterpret_cast<helics_core> (coreClone);
 }
 
-helics_federate helicsGetFederateByName( const char *fedName)
+helics_federate helicsGetFederateByName (const char *fedName)
 {
-    auto mob = getMasterHolder();
-    auto fed = mob->findFed(fedName);
+    auto mob = getMasterHolder ();
+    auto fed = mob->findFed (fedName);
     if (fed == nullptr)
     {
         return nullptr;
     }
-    return helicsFederateClone(reinterpret_cast<helics_federate>(fed));
-
+    return helicsFederateClone (reinterpret_cast<helics_federate> (fed));
 }
 helics_broker helicsCreateBroker (const char *type, const char *name, const char *initString)
 {
@@ -382,7 +380,7 @@ helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, in
     return reinterpret_cast<helics_broker> (broker);
 }
 
-helics_broker helicsBrokerClone(helics_broker broker)
+helics_broker helicsBrokerClone (helics_broker broker)
 {
     if (broker == nullptr)
     {
@@ -390,7 +388,7 @@ helics_broker helicsBrokerClone(helics_broker broker)
     }
     auto *brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
     auto *brokerClone = new helics::BrokerObject;
-    brokerClone->index = getMasterHolder()->addBroker(brokerClone);
+    brokerClone->index = getMasterHolder ()->addBroker (brokerClone);
     brokerClone->valid = brokerValidationIdentifier;
     brokerClone->brokerptr = brokerObj->brokerptr;
     return reinterpret_cast<helics_broker> (brokerClone);
@@ -497,18 +495,18 @@ helics_status helicsBrokerGetAddress (helics_broker broker, char *address, int m
     return helics_ok;
 }
 
-helics_status helicsCoreSetReadyToInit(helics_core core)
+helics_status helicsCoreSetReadyToInit (helics_core core)
 {
     if (core == nullptr)
     {
         return helics_invalid_object;
     }
-    auto cr = getCore(core);
+    auto cr = getCore (core);
     if (cr == nullptr)
     {
         return helics_invalid_object;
     }
-    cr->setCoreReadyToInit();
+    cr->setCoreReadyToInit ();
     return helics_ok;
 }
 
@@ -620,7 +618,7 @@ void helicsCloseLibrary ()
     }
 #endif
     helics::LoggerManager::closeLogger ();
-    //helics::cleanupHelicsLibrary();
+    // helics::cleanupHelicsLibrary();
 }
 
 helics_query helicsCreateQuery (const char *target, const char *query)
@@ -726,61 +724,60 @@ HELICS_Export helics_bool_t helicsQueryIsCompleted (helics_query query)
 
 void helicsQueryFree (helics_query query) { delete reinterpret_cast<helics::queryObject *> (query); }
 
-void helicsCleanupHelicsLibrary()
+void helicsCleanupHelicsLibrary ()
 {
-    helics::cleanupHelicsLibrary();
-  //  helics::LoggerManager::closeLogger();
-    
-  //  zmqContextManager::closeContext();
+    helics::cleanupHelicsLibrary ();
+    //  helics::LoggerManager::closeLogger();
+
+    //  zmqContextManager::closeContext();
 }
 
+MasterObjectHolder::MasterObjectHolder () noexcept {}
 
-MasterObjectHolder::MasterObjectHolder() noexcept {}
-
-MasterObjectHolder::~MasterObjectHolder()
+MasterObjectHolder::~MasterObjectHolder ()
 {
 #if HELICS_HAVE_ZEROMQ > 0
-    if (zmqContextManager::setContextToLeakOnDelete())
+    if (zmqContextManager::setContextToLeakOnDelete ())
     {
-        zmqContextManager::getContext().close();
+        zmqContextManager::getContext ().close ();
     }
 #endif
-    helics::LoggingCore::setFastShutdown();
-    deleteAll();
-    //std::cout << "end of master Object Holder destructor" << std::endl;
+    helics::LoggingCore::setFastShutdown ();
+    deleteAll ();
+    // std::cout << "end of master Object Holder destructor" << std::endl;
 }
-int MasterObjectHolder::addBroker(helics::BrokerObject *broker)
+int MasterObjectHolder::addBroker (helics::BrokerObject *broker)
 {
-    auto handle = brokers.lock();
-    auto index = static_cast<int> (handle->size());
-    handle->push_back(broker);
+    auto handle = brokers.lock ();
+    auto index = static_cast<int> (handle->size ());
+    handle->push_back (broker);
     return index;
 }
 
-int MasterObjectHolder::addCore(helics::CoreObject *core)
+int MasterObjectHolder::addCore (helics::CoreObject *core)
 {
-    auto handle = cores.lock();
-    auto index = static_cast<int> (handle->size());
-    handle->push_back(core);
+    auto handle = cores.lock ();
+    auto index = static_cast<int> (handle->size ());
+    handle->push_back (core);
     return index;
 }
 
-int MasterObjectHolder::addFed(helics::FedObject *fed)
+int MasterObjectHolder::addFed (helics::FedObject *fed)
 {
-    auto handle = feds.lock();
-    auto index = static_cast<int> (handle->size());
-    handle->push_back(fed);
+    auto handle = feds.lock ();
+    auto index = static_cast<int> (handle->size ());
+    handle->push_back (fed);
     return index;
 }
 
-helics::FedObject *MasterObjectHolder::findFed(const std::string &fedName)
+helics::FedObject *MasterObjectHolder::findFed (const std::string &fedName)
 {
-    auto handle = feds.lock();
+    auto handle = feds.lock ();
     for (auto fed : (*handle))
     {
         if (fed->fedptr)
         {
-            if (fed->fedptr->getName() == fedName)
+            if (fed->fedptr->getName () == fedName)
             {
                 return fed;
             }
@@ -789,80 +786,77 @@ helics::FedObject *MasterObjectHolder::findFed(const std::string &fedName)
     return nullptr;
 }
 
-void MasterObjectHolder::clearBroker(int index)
+void MasterObjectHolder::clearBroker (int index)
 {
-    auto broker = brokers.lock();
-    if (index < static_cast<int> (broker->size()))
+    auto broker = brokers.lock ();
+    if (index < static_cast<int> (broker->size ()))
     {
         (*broker)[index] = nullptr;
     }
 }
 
-void MasterObjectHolder::clearCore(int index)
+void MasterObjectHolder::clearCore (int index)
 {
-    auto core = cores.lock();
-    if (index < static_cast<int> (core->size()))
+    auto core = cores.lock ();
+    if (index < static_cast<int> (core->size ()))
     {
         (*core)[index] = nullptr;
     }
 }
 
-void MasterObjectHolder::clearFed(int index)
+void MasterObjectHolder::clearFed (int index)
 {
-    auto fed = feds.lock();
-    if (index < static_cast<int> (fed->size()))
+    auto fed = feds.lock ();
+    if (index < static_cast<int> (fed->size ()))
     {
         (*fed)[index] = nullptr;
     }
 }
 
-void MasterObjectHolder::deleteAll()
+void MasterObjectHolder::deleteAll ()
 {
-    if (tripDetect.isTripped())
+    if (tripDetect.isTripped ())
     {
         return;
     }
     {
-        auto brokerHandle = brokers.lock();
+        auto brokerHandle = brokers.lock ();
         for (auto obj : *brokerHandle)
         {
             delete obj;
         }
-        brokerHandle->clear();
+        brokerHandle->clear ();
     }
     {
-        auto coreHandle = cores.lock();
+        auto coreHandle = cores.lock ();
         for (auto obj : *coreHandle)
         {
             delete obj;
         }
-        coreHandle->clear();
+        coreHandle->clear ();
     }
-    auto fedHandle = feds.lock();
+    auto fedHandle = feds.lock ();
     for (auto obj : *fedHandle)
     {
         delete obj;
     }
-    fedHandle->clear();
-
+    fedHandle->clear ();
 }
 
-std::shared_ptr<MasterObjectHolder> getMasterHolder()
+std::shared_ptr<MasterObjectHolder> getMasterHolder ()
 {
-    static auto instance = std::make_shared<MasterObjectHolder>();
+    static auto instance = std::make_shared<MasterObjectHolder> ();
     static tripwire::TripWireTrigger tripTriggerholder;
     return instance;
 }
 
 tripwire::TripWireTrigger tripTrigger;
 
-void clearAllObjects()
+void clearAllObjects ()
 {
-    auto v = getMasterHolder();
+    auto v = getMasterHolder ();
     if (v)
     {
-        v->deleteAll();
+        v->deleteAll ();
     }
-
 }
-

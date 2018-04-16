@@ -81,8 +81,8 @@ HELICS_Export helics_subscription helicsFederateRegisterOptionalSubscription (he
 for subscriptions and publications optional implies that there may or may not be matching publication elsewhere in the federation
 @param fed the federate object in which to create a subscription
 @param key the identifier matching a publication to get a subscription for
-@param type a known type identifier HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT, HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR,
-HELICS_DATA_TYPE_RAW
+@param type a known type identifier HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT, HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX,
+HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_RAW
 @param units a string listing the units of the subscription maybe NULL
 @return an object containing the subscription
 */
@@ -110,7 +110,8 @@ HELICS_Export helics_publication helicsFederateRegisterPublication (helics_feder
 for subscriptions and publications
 @param fed the federate object in which to create a publication
 @param key the identifier for the publication
-@param type a code identifying the type of the publication one of HELICS_STRING_TYPE, HELICS_DOUBLE_TYPE, HELICS_INT_TYPE, HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE
+@param type a code identifying the type of the publication one of HELICS_STRING_TYPE, HELICS_DOUBLE_TYPE, HELICS_INT_TYPE,
+HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE
 @param units a string listing the units of the subscription maybe NULL
 @return an object containing the publication
 */
@@ -135,7 +136,8 @@ HELICS_Export helics_publication helicsFederateRegisterGlobalPublication (helics
 for subscriptions and publications
 @param fed the federate object in which to create a publication
 @param key the identifier for the publication
-@param type a code identifying the type of the publication one of HELICS_STRING_TYPE, HELICS_DOUBLE_TYPE, HELICS_INT_TYPE, HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE
+@param type a code identifying the type of the publication one of HELICS_STRING_TYPE, HELICS_DOUBLE_TYPE, HELICS_INT_TYPE,
+HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE
 @param units a string listing the units of the subscription maybe NULL
 @return an object containing the publication
 */
@@ -158,7 +160,7 @@ regardless of the function used to publish the data
 @param len the size in bytes of the data to publish
 @return helics_ok if everything was OK
 */
-HELICS_Export helics_status helicsPublicationPublish (helics_publication pub, const char *data, int len);
+HELICS_Export helics_status helicsPublicationPublishRaw (helics_publication pub, const void *data, int inputDataLength);
 
 /** publish a string
 @param pub the publication to publish for
@@ -195,7 +197,7 @@ HELICS_Export helics_status helicsPublicationPublishComplex (helics_publication 
 @param len the number of points to publish
 @return helics_ok if everything was OK
 */
-HELICS_Export helics_status helicsPublicationPublishVector (helics_publication pub, const double data[], int len);
+HELICS_Export helics_status helicsPublicationPublishVector (helics_publication pub, const double *vectorInput, int vectorlength);
 
 /**@}*/
 
@@ -217,7 +219,7 @@ HELICS_Export int helicsSubscriptionGetValueSize (helics_subscription sub);
 @param[out] actualLength  the actual length of data copied to data
 @return a helics_status value, helics_ok if everything went fine
 */
-HELICS_Export helics_status helicsSubscriptionGetValue (helics_subscription sub, char *data, int maxlen, int *actualLength);
+HELICS_Export helics_status helicsSubscriptionGetRawValue (helics_subscription sub, void *data, int maxlen, int *actualLength);
 
 /** get a string value from a subscription
 @param sub the subscription to get the data for
@@ -225,7 +227,7 @@ HELICS_Export helics_status helicsSubscriptionGetValue (helics_subscription sub,
 @param maxlen the maximum size of information that str can hold
 @return a helics_status value, helics_ok if everything went fine
 */
-HELICS_Export helics_status helicsSubscriptionGetString (helics_subscription sub, char *str, int maxlen);
+HELICS_Export helics_status helicsSubscriptionGetString (helics_subscription sub, char *outputString, int maxStringlen, int *actualLength);
 
 /** get an integer value from a subscription
 @param sub the subscription to get the data for
@@ -276,7 +278,7 @@ HELICS_Export helics_status helicsSubscriptionGetVector (helics_subscription sub
 @param len the size of the raw data
 @return helics_ok if everything was OK
 */
-HELICS_Export helics_status helicsSubscriptionSetDefault (helics_subscription sub, const char *data, int len);
+HELICS_Export helics_status helicsSubscriptionSetDefaultRaw (helics_subscription sub, const void *data, int inputDataLength);
 
 /** set the default as a string
 @param sub the subscription to set the default for
@@ -313,57 +315,57 @@ HELICS_Export helics_status helicsSubscriptionSetDefaultComplex (helics_subscrip
 @param len the number of points to publish
 @return helics_ok if everything was OK
 */
-HELICS_Export helics_status helicsSubscriptionSetDefaultVector (helics_subscription sub, const double *data, int len);
+HELICS_Export helics_status helicsSubscriptionSetDefaultVector (helics_subscription sub, const double *vectorInput, int vectorlength);
 
 /**@}*/
 
 /**
-* \defgroup information retrieval
-* @{
-*/
+ * \defgroup information retrieval
+ * @{
+ */
 
 /** get the type of a subscription
 @param sub the subscription to query
-@param[out] str a pointer to a memory location to store the resulting string
+@param[out] outputString a pointer to a memory location to store the resulting string
 @param maxlen the maximum size of string that str can store
 @return a helics_status enumeration, helics_ok if everything worked*/
-HELICS_Export helics_status helicsSubscriptionGetType (helics_subscription sub, char *str, int maxlen);
+HELICS_Export helics_status helicsSubscriptionGetType (helics_subscription sub, char *outputString, int maxlen);
 
 /** get the type of a publication
 @param pub the publication to query
-@param[out] str a pointer to a memory location to store the resulting string
+@param[out] outputString a pointer to a memory location to store the resulting string
 @param maxlen the maximum size of string that str can store
 @return a helics_status enumeration, helics_ok if everything worked*/
-HELICS_Export helics_status helicsPublicationGetType (helics_publication pub, char *str, int maxlen);
+HELICS_Export helics_status helicsPublicationGetType (helics_publication pub, char *outputString, int maxlen);
 
 /** get the key of a subscription
 @param sub the subscription to query
-@param[out] str a pointer to a memory location to store the resulting string
+@param[out] outputString a pointer to a memory location to store the resulting string
 @param maxlen the maximum size of string that str can store
 @return a helics_status enumeration, helics_ok if everything worked*/
-HELICS_Export helics_status helicsSubscriptionGetKey (helics_subscription sub, char *str, int maxlen);
+HELICS_Export helics_status helicsSubscriptionGetKey (helics_subscription sub, char *outputString, int maxlen);
 
 /** get the key of a publication
 @details this will be the global key used to identify the publication to the federation
 @param pub the publication to query
-@param[out] str a pointer to a memory location to store the resulting string
+@param[out] outputString a pointer to a memory location to store the resulting string
 @param maxlen the maximum size of string that str can store
 @return a helics_status enumeration, helics_ok if everything worked*/
-HELICS_Export helics_status helicsPublicationGetKey (helics_publication pub, char *str, int maxlen);
+HELICS_Export helics_status helicsPublicationGetKey (helics_publication pub, char *outputString, int maxlen);
 
 /** get the units of a subscription
 @param sub the subscription to query
-@param[out] str a pointer to a memory location to store the resulting string
+@param[out] outputString a pointer to a memory location to store the resulting string
 @param maxlen the maximum size of string that str can store
 @return a helics_status enumeration, helics_ok if everything worked*/
-HELICS_Export helics_status helicsSubscriptionGetUnits (helics_subscription sub, char *str, int maxlen);
+HELICS_Export helics_status helicsSubscriptionGetUnits (helics_subscription sub, char *outputString, int maxlen);
 
 /** get the units of a publication
 @param pub the publication to query
-@param[out] str a pointer to a memory location to store the resulting string
+@param[out] outputString a pointer to a memory location to store the resulting string
 @param maxlen the maximum size of string that str can store
 @return a helics_status enumeration, helics_ok if everything worked*/
-HELICS_Export helics_status helicsPublicationGetUnits (helics_publication pub, char *str, int maxlen);
+HELICS_Export helics_status helicsPublicationGetUnits (helics_publication pub, char *outputString, int maxlen);
 
 /**@}*/
 
@@ -374,15 +376,14 @@ HELICS_Export helics_bool_t helicsSubscriptionIsUpdated (helics_subscription sub
 HELICS_Export helics_time_t helicsSubscriptionLastUpdateTime (helics_subscription sub);
 /** get the number of publications in a federate
 @return (-1) if fed was not a valid federate otherwise returns the number of publications*/
-HELICS_Export int helicsFederateGetPublicationCount(helics_federate fed);
+HELICS_Export int helicsFederateGetPublicationCount (helics_federate fed);
 
 /** get the number of subscriptions in a federate
 @return (-1) if fed was not a valid federate otherwise returns the number of subscriptions*/
-HELICS_Export int helicsFederateGetSubscriptionCount(helics_federate fed);
+HELICS_Export int helicsFederateGetSubscriptionCount (helics_federate fed);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif
 
 #endif /* HELICS_APISHARED_VALUE_FEDERATE_FUNCTIONS_H_*/
-

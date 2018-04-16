@@ -186,6 +186,5 @@ void TestCore::addRoute (int route_id, const std::string &routeInfo)
 
 std::string TestCore::getAddress () const { return getIdentifier (); }
 
-} // namespace testcore
+}  // namespace testcore
 }  // namespace helics
-

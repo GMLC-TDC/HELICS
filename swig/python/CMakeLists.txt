@@ -22,14 +22,14 @@ ELSE()
 # https://stackoverflow.com/a/3818084/5451769
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   # Update if necessary
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes")
 endif()
 
-FIND_PACKAGE(PythonLibs REQUIRED)
+
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
 
-SET(CMAKE_SWIG_FLAGS "")
+SET(CMAKE_SWIG_FLAGS "-py3")
 
 set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
@@ -39,9 +39,9 @@ SET_PROPERTY(SOURCE ../helics.i PROPERTY SWIG_MODULE_NAME helics)
 
 IF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.7)
   SWIG_ADD_LIBRARY(helics TYPE MODULE LANGUAGE python SOURCES helicsPython.i)
-ELSE (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.7)
+ELSE ()
   SWIG_ADD_MODULE(helics python helicsPython.i)
-ENDIF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.7)
+ENDIF ()
 
 SWIG_LINK_LIBRARIES(helics helicsSharedLib)
 
@@ -61,7 +61,21 @@ set_target_properties (_helics PROPERTIES FOLDER interfaces)
 
 INSTALL(TARGETS _helics DESTINATION python COMPONENT python)
 
+foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
+add_custom_command(TARGET _helics POST_BUILD        # Adds a post-build event to api tests
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        "${keyfile}"      # <--this is in-file
+        "$<TARGET_FILE_DIR:_helics>/")                 # <--this is out-file path
+endforeach(keyfile)
+
+add_custom_command(TARGET _helics POST_BUILD        # Adds a post-build event to api tests
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
+        "$<TARGET_FILE_DIR:_helics>/")                 # <--this is out-file path
+		
 ENDIF ()
+
+
 
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT python)
 INSTALL(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION python COMPONENT python)

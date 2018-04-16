@@ -13,16 +13,14 @@ file linking with version info and containing some convenience functions
 */
 namespace helics
 {
-
 /** @returns a string containing version information*/
-extern const char * versionString;
+constexpr auto versionString = HELICS_VERSION_STRING;
 
 /** get the Major version number*/
-constexpr int versionMajor=HELICS_VERSION_MAJOR;
+constexpr int versionMajor = HELICS_VERSION_MAJOR;
 /** get the Minor version number*/
-constexpr int versionMinor=HELICS_VERSION_MINOR;
+constexpr int versionMinor = HELICS_VERSION_MINOR;
 /** get the patch number*/
-constexpr int versionPatch=HELICS_VERSION_PATCH;
+constexpr int versionPatch = HELICS_VERSION_PATCH;
 
-} //namespace helics
-
+}  // namespace helics

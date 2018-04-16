@@ -23,7 +23,8 @@ static const int DEFAULT_BROKER_REP_PORT_NUMBER = 23404;
 
 namespace helics
 {
-namespace zeromq {
+namespace zeromq
+{
 ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTarget)
     : CommsInterface (brokerTarget, localTarget)
 {
@@ -159,13 +160,13 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
         break;
         case REQUEST_PORTS:
         {
-            if (!M.name.empty())
+            if (!M.name.empty ())
             {
                 if (M.name != name)
                 {
-                    ActionMessage portReply(CMD_PROTOCOL);
+                    ActionMessage portReply (CMD_PROTOCOL);
                     portReply.index = NAME_NOT_FOUND;
-                    sock.send(portReply.to_string());
+                    sock.send (portReply.to_string ());
                 }
             }
             auto openPorts = findOpenPorts ();
@@ -233,11 +234,13 @@ void ZmqComms::queue_rx_function ()
                 {
                     if (pullPortNumber < BEGIN_OPEN_PORT_RANGE_SUBBROKER)
                     {
-                        openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER + (pullPortNumber - BEGIN_OPEN_PORT_RANGE) * 10;
+                        openPortStart =
+                          BEGIN_OPEN_PORT_RANGE_SUBBROKER + (pullPortNumber - BEGIN_OPEN_PORT_RANGE) * 10;
                     }
                     else
                     {
-                        openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER + (pullPortNumber - BEGIN_OPEN_PORT_RANGE_SUBBROKER) * 10+10;
+                        openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER +
+                                        (pullPortNumber - BEGIN_OPEN_PORT_RANGE_SUBBROKER) * 10 + 10;
                     }
                 }
                 if (repPortNumber < 0)
@@ -370,18 +373,19 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
             brokerReqPort = DEFAULT_BROKER_REP_PORT_NUMBER;
         }
         zmq::socket_t brokerReq (ctx->getContext (), ZMQ_REQ);
-        brokerReq.setsockopt(ZMQ_LINGER, 50);
+        brokerReq.setsockopt (ZMQ_LINGER, 50);
         try
         {
-            brokerReq.connect (makePortAddress (brokerTarget_, brokerReqPort)); 
+            brokerReq.connect (makePortAddress (brokerTarget_, brokerReqPort));
         }
         catch (zmq::error_t &ze)
         {
-            std::cerr << "unable to connect with broker at "<< makePortAddress(brokerTarget_, brokerReqPort) <<":" << ze.what () << '\n';
+            std::cerr << "unable to connect with broker at " << makePortAddress (brokerTarget_, brokerReqPort)
+                      << ":" << ze.what () << '\n';
             tx_status = connection_status::error;
-            ActionMessage M(CMD_PROTOCOL);
+            ActionMessage M (CMD_PROTOCOL);
             M.index = DISCONNECT_ERROR;
-            controlSocket.send(M.to_string());
+            controlSocket.send (M.to_string ());
             return (-1);
         }
 
@@ -394,7 +398,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
             {
                 ActionMessage getPorts (CMD_PROTOCOL);
                 getPorts.index = QUERY_PORTS;
-                if (!brokerName_.empty())
+                if (!brokerName_.empty ())
                 {
                     getPorts.name = brokerName_;
                 }
@@ -415,9 +419,9 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 }
                 if (tx_status == connection_status::error)
                 {
-                    ActionMessage M(CMD_PROTOCOL);
+                    ActionMessage M (CMD_PROTOCOL);
                     M.index = DISCONNECT_ERROR;
-                    controlSocket.send(M.to_string());
+                    controlSocket.send (M.to_string ());
                     return (-1);
                 }
                 brokerReq.recv (&msg);
@@ -451,9 +455,9 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 {
                     // we can't get the broker to respond with port numbers
                     tx_status = connection_status::error;
-                    ActionMessage M(CMD_PROTOCOL);
+                    ActionMessage M (CMD_PROTOCOL);
                     M.index = DISCONNECT_ERROR;
-                    controlSocket.send(M.to_string());
+                    controlSocket.send (M.to_string ());
                     return (-1);
                 }
             }
@@ -483,7 +487,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 {
                     ActionMessage M (CMD_PROTOCOL);
                     M.index = DISCONNECT_ERROR;
-                    controlSocket.send (M.to_string());
+                    controlSocket.send (M.to_string ());
                     return (-1);
                 }
                 brokerReq.recv (&msg);
@@ -498,7 +502,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                             brokerPushPort = rxcmd.source_id;
                         }
                         controlSocket.send (msg);
-						return 0;
+                        return 0;
                     }
                     else if (rxcmd.index == DISCONNECT)
                     {
@@ -563,7 +567,7 @@ void ZmqComms::queue_tx_function ()
     auto res = initializeBrokerConnections (controlSocket);
     if (res < 0)
     {
-        controlSocket.close();
+        controlSocket.close ();
         return;
     }
 
@@ -716,7 +720,7 @@ CLOSE_TX_LOOP:
     routes.clear ();
     if (rx_status == connection_status::connected)
     {
-        controlSocket.send ("close");
+        controlSocket.send (std::string ("close"), ZMQ_NOBLOCK);
     }
 
     controlSocket.close ();
@@ -777,6 +781,5 @@ std::string ZmqComms::getPushAddress () const
     }
 }
 
-} // namespace zeromq
+}  // namespace zeromq
 }  // namespace helics
-

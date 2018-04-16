@@ -216,6 +216,5 @@ void TestBroker::addRoute (int route_id, const std::string &routeInfo)
 
 std::string TestBroker::getAddress () const { return getIdentifier (); }
 
-} // namespace testcore
+}  // namespace testcore
 }  // namespace helics
-

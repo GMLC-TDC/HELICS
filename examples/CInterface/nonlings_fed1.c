@@ -60,6 +60,7 @@ int main ()
     helics_publication pub;
     helics_subscription sub;
     int converged;
+    int actualStringSize;
     char sendbuf[100],recvbuf[100];
         double x = 0.0, y = 1.0, xprv=100;
     helics_time_t currenttime = 0.0;
@@ -134,7 +135,7 @@ int main ()
 
     while (currenttimeiter == iterating) {
         int global_conv;
-      helicsSubscriptionGetString(sub, recvbuf,100);
+      helicsSubscriptionGetString(sub, recvbuf,100, &actualStringSize);
       sscanf(recvbuf,"%lf,%d",&y,&other_conv);
 
       /* Check for global convergence */

@@ -109,7 +109,7 @@ Building HELICS with python support
 -----------------------------------
 
 ```bash
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0" -DBOOST_ROOT="C:\local\boost_1_65_1" -DBUILD_PYTHON=ON -G "Visual Studio 14 2015 Win64" -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)\include\python3.6m\ -DPYTHON_LIBRARY=$(python3-config --prefix)\lib\python3.6m\libpython3.6m.dll ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0" -DBOOST_ROOT="C:\local\boost_1_65_1" -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)\include\python3.6m\ -DPYTHON_LIBRARY=$(python3-config --prefix)\lib\python3.6m\libpython3.6m.dll ..
 cmake --build . --config Release --target install
 ```
 

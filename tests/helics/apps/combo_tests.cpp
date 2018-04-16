@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE (save_load_file1)
 
     helics::Publication pub1 (helics::GLOBAL, &mfed, "pub1", helics::helics_type_t::helicsDouble);
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.run (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
     mfed2.enterExecutionStateAsync ();
     mfed.enterExecutionState ();
     mfed2.enterExecutionStateComplete ();
@@ -130,4 +130,3 @@ BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("comb
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
-

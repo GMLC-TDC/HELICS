@@ -9,7 +9,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-namespace tcp {
+namespace tcp
+{
 TcpCore::TcpCore () noexcept {}
 
 TcpCore::~TcpCore () = default;
@@ -58,6 +59,5 @@ std::string TcpCore::getAddress () const
     return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
 
-} // namespace tcp
+}  // namespace tcp
 }  // namespace helics
-

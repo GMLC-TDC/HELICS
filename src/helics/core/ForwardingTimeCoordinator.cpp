@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -19,18 +18,12 @@ void ForwardingTimeCoordinator::enteringExecMode ()
         return;
     }
     checkingExec = true;
-    if ((!dependents.empty ()) && (sendMessageFunction))
-    {
-        ActionMessage execreq (CMD_EXEC_REQUEST);
-        execreq.source_id = source_id;
-        sendMessageFunction (execreq);
-    }
+    ActionMessage execreq (CMD_EXEC_REQUEST);
+    execreq.source_id = source_id;
+    transmitTimingMessage (execreq);
 }
 
-static inline bool isBroker(Core::federate_id_t id)
-{
-    return ((id == 1) || (id >= 0x7000'0000));
-}
+static inline bool isBroker (Core::federate_id_t id) { return ((id == 1) || (id >= 0x7000'0000)); }
 
 void ForwardingTimeCoordinator::updateTimeFactors ()
 {
@@ -82,19 +75,13 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
         }
     }
 
-    minminDe = std::min(minDe, minminDe);
+    minminDe = std::min (minDe, minminDe);
 
-    bool update = (time_state!=tState);
+    bool update = (time_state != tState);
     time_state = tState;
 
     Time prev_next = time_next;
     time_next = minNext;
-    //	printf("%d UDPATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
-    // static_cast<double>(minminDe), static_cast<double>(minDe));
-    if (prev_next != time_next)
-    {
-        update = true;
-    }
 
     if (minDe != time_minDe)
     {
@@ -107,18 +94,31 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
         update = true;
     }
 
+    if (time_minminDe < Time::maxVal ())
+    {
+        if (time_minminDe > time_next)
+        {
+            time_next = time_minminDe;
+        }
+    }
+    //	printf("%d UDPATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
+    // static_cast<double>(minminDe), static_cast<double>(minDe));
+    if (prev_next != time_next)
+    {
+        update = true;
+    }
+
     if (minFed != lastMinFed)
     {
         lastMinFed = minFed;
-        if (isBroker(minFed))
+        if (isBroker (minFed))
         {
             update = true;
         }
-
     }
     if (update)
     {
-        sendTimeRequest();
+        sendTimeRequest ();
     }
 }
 /*
@@ -183,19 +183,19 @@ void ForwardingTimeCoordinator::sendTimeRequest () const
     }
     if (time_state == DependencyInfo::time_state_t::time_granted)
     {
-        ActionMessage upd(CMD_TIME_GRANT);
+        ActionMessage upd (CMD_TIME_GRANT);
         upd.source_id = source_id;
         upd.source_handle = lastMinFed;
         upd.actionTime = time_next;
         if (iterating)
         {
-            setActionFlag(upd, iterationRequested);
+            setActionFlag (upd, iteration_requested_flag);
         }
-        sendMessageFunction(upd);
+        transmitTimingMessage (upd);
     }
     else
     {
-        ActionMessage upd(CMD_TIME_REQUEST);
+        ActionMessage upd (CMD_TIME_REQUEST);
         upd.source_id = source_id;
         upd.source_handle = lastMinFed;
         upd.actionTime = time_next;
@@ -203,14 +203,13 @@ void ForwardingTimeCoordinator::sendTimeRequest () const
         upd.Tdemin = time_minminDe;
         if (iterating)
         {
-            setActionFlag(upd, iterationRequested);
+            setActionFlag (upd, iteration_requested_flag);
         }
-        sendMessageFunction(upd);
+        transmitTimingMessage (upd);
 
         //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
         // static_cast<double>(time_exec), static_cast<double>(time_minDe));
     }
-
 }
 
 std::string ForwardingTimeCoordinator::printTimeStatus () const
@@ -270,7 +269,7 @@ void ForwardingTimeCoordinator::removeDependent (Core::federate_id_t fedID)
     }
 }
 
-DependencyInfo *ForwardingTimeCoordinator::getDependencyInfo (Core::federate_id_t ofed)
+const DependencyInfo *ForwardingTimeCoordinator::getDependencyInfo (Core::federate_id_t ofed) const
 {
     return dependencies.getDependencyInfo (ofed);
 }
@@ -285,9 +284,9 @@ std::vector<Core::federate_id_t> ForwardingTimeCoordinator::getDependencies () c
     return deps;
 }
 
-bool ForwardingTimeCoordinator::hasActiveTimeDependencies() const
+bool ForwardingTimeCoordinator::hasActiveTimeDependencies () const
 {
-    return dependencies.hasActiveTimeDependencies();
+    return dependencies.hasActiveTimeDependencies ();
 }
 
 iteration_state ForwardingTimeCoordinator::checkExecEntry ()
@@ -305,14 +304,101 @@ iteration_state ForwardingTimeCoordinator::checkExecEntry ()
     time_state = DependencyInfo::time_state_t::time_granted;
     time_minDe = timeZero;
     time_minminDe = timeZero;
-    if (sendMessageFunction)
-    {
-        ActionMessage execgrant (CMD_EXEC_GRANT);
-        execgrant.source_id = source_id;
-        sendMessageFunction (execgrant);
-    }
+
+    ActionMessage execgrant (CMD_EXEC_GRANT);
+    execgrant.source_id = source_id;
+    transmitTimingMessage (execgrant);
 
     return ret;
+}
+
+ActionMessage ForwardingTimeCoordinator::generateTimeRequestIgnoreDependency (const ActionMessage &msg,
+                                                                              Core::federate_id_t iFed) const
+{
+    ActionMessage nTime (msg);
+    Time minNext = Time::maxVal ();
+    Time minminDe = Time::maxVal ();
+    Time minDe = minminDe;
+    for (auto &dep : dependencies)
+    {
+        if ((dep.minFed == source_id) || (dep.fedID == iFed))
+        {
+            continue;
+        }
+        if (dep.Tnext < minNext)
+        {
+            minNext = dep.Tnext;
+        }
+        if (dep.Tdemin >= dep.Tnext)
+        {
+            if (dep.Tdemin < minminDe)
+            {
+                minminDe = dep.Tdemin;
+            }
+        }
+        else
+        {
+            // this minimum dependent event time received was invalid and can't be trusted
+            // therefore it can't be used to determine a time grant
+            minminDe = -1;
+        }
+
+        if (dep.Te < minDe)
+        {
+            minDe = dep.Te;
+        }
+    }
+
+    minminDe = std::min (minDe, minminDe);
+
+    if (minminDe < Time::maxVal ())
+    {
+        if (minminDe > minNext)
+        {
+            minNext = minminDe;
+        }
+    }
+    nTime.actionTime = minNext;
+    nTime.Tdemin = minminDe;
+    nTime.Te = minDe;
+    nTime.dest_id = iFed;
+    return nTime;
+}
+
+void ForwardingTimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
+{
+    if (sendMessageFunction)
+    {
+        if (msg.action () == CMD_TIME_REQUEST)
+        {
+            for (auto dep : dependents)
+            {
+                if (isBroker (dep))
+                {
+                    auto di = getDependencyInfo (dep);
+                    if (di != nullptr)
+                    {
+                        if (di->Tnext == msg.actionTime)
+                        {
+                            sendMessageFunction (generateTimeRequestIgnoreDependency (msg, dep));
+                            continue;
+                        }
+                    }
+                }
+
+                msg.dest_id = dep;
+                sendMessageFunction (msg);
+            }
+        }
+        else
+        {
+            for (auto dep : dependents)
+            {
+                msg.dest_id = dep;
+                sendMessageFunction (msg);
+            }
+        }
+    }
 }
 
 bool ForwardingTimeCoordinator::processTimeMessage (const ActionMessage &cmd)
@@ -350,4 +436,3 @@ void ForwardingTimeCoordinator::processDependencyUpdateMessage (const ActionMess
 }
 
 }  // namespace helics
-

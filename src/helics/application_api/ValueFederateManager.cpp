@@ -7,8 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-ValueFederateManager::ValueFederateManager (Core *coreOb, Core::federate_id_t id)
-    : coreObject (coreOb), fedID (id)
+ValueFederateManager::ValueFederateManager (Core *coreOb, Core::federate_id_t id) : coreObject (coreOb), fedID (id)
 {
 }
 ValueFederateManager::~ValueFederateManager () = default;
@@ -36,12 +35,12 @@ publication_id_t ValueFederateManager::registerPublication (const std::string &k
                                                             const std::string &units)
 {
     auto sz = getTypeSize (type);
-	auto coreID = coreObject->registerPublication(fedID, key, type, units);
+    auto coreID = coreObject->registerPublication (fedID, key, type, units);
 
     std::lock_guard<std::mutex> publock (publication_mutex);
     publication_id_t id = static_cast<identifier_type> (publications.size ());
     ++publicationCount;
-	publications.insert(key, key, type,units);
+    publications.insert (key, key, type, units);
     publications.back ().id = id;
     publications.back ().size = sz;
     publications.back ().coreID = coreID;
@@ -52,13 +51,13 @@ subscription_id_t ValueFederateManager::registerRequiredSubscription (const std:
                                                                       const std::string &type,
                                                                       const std::string &units)
 {
-	auto coreID= coreObject->registerSubscription(fedID, key, type, units, handle_check_mode::required);
+    auto coreID = coreObject->registerSubscription (fedID, key, type, units, handle_check_mode::required);
     std::lock_guard<std::mutex> sublock (subscription_mutex);
     subscription_id_t id = static_cast<identifier_type> (subscriptions.size ());
     ++subscriptionCount;
-    subscriptions.insert(key,coreID,key, type, units);
-	subscriptions.back ().id = id;
-	subscriptions.back().coreID = coreID;
+    subscriptions.insert (key, coreID, key, type, units);
+    subscriptions.back ().id = id;
+    subscriptions.back ().coreID = coreID;
     lastData.resize (id.value () + 1);
     return id;
 }
@@ -67,17 +66,15 @@ subscription_id_t ValueFederateManager::registerOptionalSubscription (const std:
                                                                       const std::string &type,
                                                                       const std::string &units)
 {
-
-	auto coreID = coreObject->registerSubscription(fedID, key, type, units, handle_check_mode::optional);
-	std::lock_guard<std::mutex> sublock(subscription_mutex);
-	subscription_id_t id = static_cast<identifier_type> (subscriptions.size());
+    auto coreID = coreObject->registerSubscription (fedID, key, type, units, handle_check_mode::optional);
+    std::lock_guard<std::mutex> sublock (subscription_mutex);
+    subscription_id_t id = static_cast<identifier_type> (subscriptions.size ());
     ++subscriptionCount;
-	subscriptions.insert(key, coreID, key, type, units);
-	subscriptions.back().id = id;
-	subscriptions.back().coreID = coreID;
-	lastData.resize(id.value() + 1);
-	return id;
-
+    subscriptions.insert (key, coreID, key, type, units);
+    subscriptions.back ().id = id;
+    subscriptions.back ().coreID = coreID;
+    lastData.resize (id.value () + 1);
+    return id;
 }
 
 void ValueFederateManager::addSubscriptionShortcut (subscription_id_t subid, const std::string &shortcutName)
@@ -85,7 +82,7 @@ void ValueFederateManager::addSubscriptionShortcut (subscription_id_t subid, con
     if (subid.value () < subscriptionCount)
     {
         std::lock_guard<std::mutex> sublock (subscription_mutex);
-       subscriptions.addSearchTermForIndex (shortcutName, subid.value());
+        subscriptions.addSearchTermForIndex (shortcutName, subid.value ());
     }
     else
     {
@@ -118,7 +115,7 @@ void ValueFederateManager::getUpdateFromCore (Core::handle_id_t updatedHandle)
     if (fid != subscriptions.end ())
     {  // assign the data
         std::lock_guard<std::mutex> sublock (subscription_mutex);
-        lastData[fid->id.value()] = data_view (std::move (data));
+        lastData[fid->id.value ()] = data_view (std::move (data));
         fid->lastUpdate = CurrentTime;
     }
 }
@@ -128,8 +125,8 @@ data_view ValueFederateManager::getValue (subscription_id_t id)
     if (id.value () < subscriptionCount)
     {
         std::lock_guard<std::mutex> sublock (subscription_mutex);
-		subscriptions[id.value ()].lastQuery = CurrentTime;
-		subscriptions[id.value ()].hasUpdate = false;
+        subscriptions[id.value ()].lastQuery = CurrentTime;
+        subscriptions[id.value ()].hasUpdate = false;
         return lastData[id.value ()];
     }
     else
@@ -228,7 +225,7 @@ void ValueFederateManager::startupToInitializeStateTransition ()
 {
     lastData.resize (subscriptionCount);
     // get the actual publication types
-	subscriptions.apply([this](auto &sub) {sub.pubtype = coreObject->getType(sub.coreID); });
+    subscriptions.apply ([this](auto &sub) { sub.pubtype = coreObject->getType (sub.coreID); });
 }
 
 void ValueFederateManager::initializeToExecuteStateTransition () { updateTime (0.0, 0.0); }
@@ -315,15 +312,9 @@ std::string ValueFederateManager::getPublicationType (publication_id_t pub_id) c
 }
 
 /** get a count of the number publications registered*/
-int ValueFederateManager::getPublicationCount () const
-{
-    return static_cast<int> (publicationCount);
-}
+int ValueFederateManager::getPublicationCount () const { return static_cast<int> (publicationCount); }
 /** get a count of the number subscriptions registered*/
-int ValueFederateManager::getSubscriptionCount () const
-{
-    return static_cast<int> (subscriptionCount);
-}
+int ValueFederateManager::getSubscriptionCount () const { return static_cast<int> (subscriptionCount); }
 
 void ValueFederateManager::registerCallback (std::function<void(subscription_id_t, Time)> callback)
 {
@@ -345,7 +336,7 @@ void ValueFederateManager::registerCallback (subscription_id_t id,
     if (id.value () < subscriptionCount)
     {
         std::lock_guard<std::mutex> sublock (subscription_mutex);
-		subscriptions[id.value ()].callbackIndex = static_cast<int> (callbacks.size ());
+        subscriptions[id.value ()].callbackIndex = static_cast<int> (callbacks.size ());
         callbacks.emplace_back (std::move (callback));
     }
     else
@@ -364,9 +355,8 @@ void ValueFederateManager::registerCallback (const std::vector<subscription_id_t
     {
         if (id.value () < subscriptions.size ())
         {
-			subscriptions[id.value ()].callbackIndex = ind;
+            subscriptions[id.value ()].callbackIndex = ind;
         }
     }
 }
 }  // namespace helics
-

@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -33,17 +32,18 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction, int32
 }
 
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
-    : messageAction (act.messageAction), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
-      dest_handle (act.dest_handle), index (dest_handle), counter (act.counter), flags (act.flags),
-      actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin), payload (std::move (act.payload)),
-      name (payload), extraInfo (std::move (act.extraInfo))
+    : messageAction (act.messageAction), source_id (act.source_id), source_handle (act.source_handle),
+      dest_id (act.dest_id), dest_handle (act.dest_handle), index (dest_handle), counter (act.counter),
+      flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin),
+      payload (std::move (act.payload)), name (payload), extraInfo (std::move (act.extraInfo))
 {
 }
 
 ActionMessage::ActionMessage (const ActionMessage &act)
-    : messageAction (act.messageAction), source_id (act.source_id), source_handle (act.source_handle), dest_id (act.dest_id),
-      dest_handle (act.dest_handle), index (dest_handle), counter (act.counter), flags (act.flags),
-      actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin), payload (act.payload), name (payload)
+    : messageAction (act.messageAction), source_id (act.source_id), source_handle (act.source_handle),
+      dest_id (act.dest_id), dest_handle (act.dest_handle), index (dest_handle), counter (act.counter),
+      flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin), payload (act.payload),
+      name (payload)
 
 {
     if (act.extraInfo)
@@ -54,7 +54,7 @@ ActionMessage::ActionMessage (const ActionMessage &act)
 
 ActionMessage::ActionMessage (std::unique_ptr<Message> message)
     : messageAction (CMD_SEND_MESSAGE), index (dest_handle), actionTime (message->time),
-      payload (std::move (message->data.m_data)), name (payload), extraInfo(std::make_unique<AdditionalInfo>())
+      payload (std::move (message->data.m_data)), name (payload), extraInfo (std::make_unique<AdditionalInfo> ())
 {
     extraInfo->source = std::move (message->source);
     extraInfo->orig_source = std::move (message->original_source);
@@ -342,7 +342,7 @@ std::unique_ptr<Message> createMessageFromCommand (const ActionMessage &cmd)
     msg->dest = cmd.info ().target;
     msg->data = cmd.payload;
     msg->time = cmd.actionTime;
-    msg->messageID = cmd.info().messageID;
+    msg->messageID = cmd.info ().messageID;
     msg->source = cmd.info ().source;
 
     return msg;
@@ -357,11 +357,14 @@ std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd)
     msg->data = std::move (cmd.payload);
     msg->time = cmd.actionTime;
     msg->source = std::move (cmd.info ().source);
-    msg->messageID = cmd.info().messageID;
+    msg->messageID = cmd.info ().messageID;
     return msg;
 }
 
 constexpr char nullStr[] = "unknown";
+
+// done in this screwy way because this can be called after things have started to be deconstructed so static
+// consts can cause seg faults
 
 constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
   // priority commands
@@ -398,6 +401,8 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
 
   {action_message_def::action_t::cmd_time_grant, "time_grant"},
   {action_message_def::action_t::cmd_time_check, "time_check"},
+  {action_message_def::action_t::cmd_time_block, "time_block"},
+  {action_message_def::action_t::cmd_time_unblock, "time_unblock"},
   {action_message_def::action_t::cmd_pub, "pub"},
   {action_message_def::action_t::cmd_bye, "bye"},
   {action_message_def::action_t::cmd_log, "log"},
@@ -420,7 +425,7 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_send_for_filter, "send_for_filter"},
   {action_message_def::action_t::cmd_filter_result, "result from running a filter"},
   {action_message_def::action_t::cmd_send_for_filter_return, "send_for_filter_return"},
-  {action_message_def::action_t::cmd_null_message, "null message" },
+  {action_message_def::action_t::cmd_null_message, "null message"},
 
   {action_message_def::action_t::cmd_reg_pub, "reg_pub"},
   {action_message_def::action_t::cmd_notify_pub, "notify_pub"},
@@ -447,6 +452,25 @@ const char *actionMessageType (action_message_def::action_t action)
     auto pptr = static_cast<const actionPair *> (actionStrings);
     auto res = std::find_if (pptr, pptr + actEnd, [action](const auto &pt) { return (pt.first == action); });
     if (res != pptr + actEnd)
+    {
+        return res->second;
+    }
+    return static_cast<const char *> (nullStr);
+}
+
+constexpr std::pair<int, const char *> errorStrings[] = {
+  // priority commands
+  {5, "already in initialization mode"},
+  {6, "duplicate federate name detected"}};
+
+using errorPair = std::pair<int, const char *>;
+constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
+
+const char *commandErrorString (int errorcode)
+{
+    auto pptr = static_cast<const errorPair *> (errorStrings);
+    auto res = std::find_if (pptr, pptr + errEnd, [errorcode](const auto &pt) { return (pt.first == errorcode); });
+    if (res != pptr + errEnd)
     {
         return res->second;
     }
@@ -501,10 +525,11 @@ std::string prettyPrintString (const ActionMessage &command)
     case CMD_FED_CONFIGURE:
         break;
     case CMD_SEND_MESSAGE:
-        ret.push_back(':');
-        ret.append((boost::format("From (%s)(%d:%d) To %s size %d at %f") % command.info().orig_source%command.source_id % command.source_handle %
-            command.info().target % command.payload.size() % static_cast<double> (command.actionTime))
-            .str());
+        ret.push_back (':');
+        ret.append ((boost::format ("From (%s)(%d:%d) To %s size %d at %f") % command.info ().orig_source %
+                     command.source_id % command.source_handle % command.info ().target % command.payload.size () %
+                     static_cast<double> (command.actionTime))
+                      .str ());
         break;
     default:
         break;
@@ -518,4 +543,3 @@ std::ostream &operator<< (std::ostream &os, const ActionMessage &command)
     return os;
 }
 }  // namespace helics
-

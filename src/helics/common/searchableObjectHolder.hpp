@@ -8,13 +8,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define HELICS_SEARCHABLE_OBJECT_HOLDER_HPP_
 #pragma once
 
+#include "TripWire.hpp"
 #include <functional>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <thread>
-#include "TripWire.hpp"
 
 /** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
  * threading issues*/
@@ -25,14 +25,15 @@ class SearchableObjectHolder
     std::mutex mapLock;
     std::map<std::string, std::shared_ptr<X>> ObjectMap;
     tripwire::TripWireDetector trippedDetect;
+
   public:
     SearchableObjectHolder () = default;
     SearchableObjectHolder (SearchableObjectHolder &&) noexcept = delete;
     SearchableObjectHolder &operator= (SearchableObjectHolder &&) noexcept = delete;
     ~SearchableObjectHolder ()
     {
-        //this is a short circuit used to detect shutdown
-        if (trippedDetect.isTripped())
+        // this is a short circuit used to detect shutdown
+        if (trippedDetect.isTripped ())
         {
             return;
         }
@@ -137,4 +138,3 @@ class SearchableObjectHolder
     }
 };
 #endif /*HELICS_SEARCHABLE_OBJECT_HOLDER_HPP_*/
-

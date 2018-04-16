@@ -5,12 +5,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #pragma once
+#include "MapTraits.hpp"
+#include "helics_includes/optional.hpp"
+#include <algorithm>
+#include <map>
 #include <string>
 #include <unordered_map>
-#include <map>
 #include <vector>
-#include <algorithm>
-#include "MapTraits.hpp"
 
 /** class combining a vector of objects with a map to search them by a separate index term
 the main use case is a bunch of inserts then searching with limited to no removal since removal is a rather
@@ -20,25 +21,46 @@ template <class VType, class searchType = std::string>
 class MappedVector
 {
   public:
-	  /** insert an element into the mapped vector
-	  @param searchValue the unique index to use for the value if it exists the existing value is replaced
-	  @return the index of the value placed
-	  */
+    /** insert an element into the mapped vector
+    @param searchValue the unique index to use for the value if it exists the existing value is replaced
+    @return the index of the value placed
+    */
     template <typename... Us>
-    size_t insert (const searchType &searchValue, Us &&... data)
+    stx::optional<size_t> insert (const searchType &searchValue, Us &&... data)
+    {
+        auto fnd = lookup.find (searchValue);
+        if (fnd != lookup.end ())
+        {
+            return stx::nullopt;
+        }
+        else
+        {
+            auto index = dataStorage.size ();
+            dataStorage.emplace_back (std::forward<Us> (data)...);
+            lookup.emplace (searchValue, index);
+            return index;
+        }
+    }
+
+    /** insert an element into the mapped vector
+    @param searchValue the unique index to use for the value if it exists the existing value is replaced
+    @return the index of the value placed
+    */
+    template <typename... Us>
+    size_t insert_or_assign (const searchType &searchValue, Us &&... data)
     {
         auto fnd = lookup.find (searchValue);
         if (fnd != lookup.end ())
         {
             dataStorage[fnd->second] = VType (std::forward<Us> (data)...);
-			return fnd->second;
+            return fnd->second;
         }
         else
         {
-			auto index = dataStorage.size();
+            auto index = dataStorage.size ();
             dataStorage.emplace_back (std::forward<Us> (data)...);
             lookup.emplace (searchValue, index);
-			return index;
+            return index;
         }
     }
 
@@ -72,86 +94,86 @@ class MappedVector
 
     const VType &operator[] (size_t index) const { return dataStorage[index]; }
 
-	/** get the last element of the vector*/
-	VType &back() { return dataStorage.back(); }
+    /** get the last element of the vector*/
+    VType &back () { return dataStorage.back (); }
 
-	/** get a const reference to the last element of the vector*/
-	const VType &back() const { return dataStorage.back(); }
-	/** remove an element by its index*/
+    /** get a const reference to the last element of the vector*/
+    const VType &back () const { return dataStorage.back (); }
+    /** remove an element by its index*/
     void removeIndex (size_t index)
-	{
+    {
         if (index >= dataStorage.size ())
-		{
-			return;
-		}
+        {
+            return;
+        }
         dataStorage.erase (dataStorage.begin () + index);
-		searchType ind;
-		for (auto &el2 : lookup)
-		{
-			if (el2.second > index)
-			{
-				el2.second -= 1;
-			}
-			else if (el2.second == index)
-			{
-				ind = el2.first;
-			}
-		}
+        searchType ind;
+        for (auto &el2 : lookup)
+        {
+            if (el2.second > index)
+            {
+                el2.second -= 1;
+            }
+            else if (el2.second == index)
+            {
+                ind = el2.first;
+            }
+        }
         auto fnd = lookup.find (ind);
         if (fnd != lookup.end ())
-		{
+        {
             lookup.erase (fnd);
-		}
-	}
+        }
+    }
 
     void remove (const searchType &search)
-	{
+    {
         auto el = lookup.find (search);
         if (el == lookup.end ())
-		{
-			return;
-		}
-		auto index = el->second;
+        {
+            return;
+        }
+        auto index = el->second;
         dataStorage.erase (dataStorage.begin () + index);
-		for (auto &el2 : lookup)
-		{
-			if (el2.second > index)
-			{
-				el2.second -= 1;
-			}
-		}
+        for (auto &el2 : lookup)
+        {
+            if (el2.second > index)
+            {
+                el2.second -= 1;
+            }
+        }
         lookup.erase (el);
-	}
+    }
 
-	/** apply a function to all the values
-	@param F must be a function with signature like void fun(const VType &a);*/
+    /** apply a function to all the values
+    @param F must be a function with signature like void fun(const VType &a);*/
     template <class UnaryFunction>
     void apply (UnaryFunction F)
-	{
+    {
         std::for_each (dataStorage.begin (), dataStorage.end (), F);
-	}
+    }
 
-	/** transform all the values
-	F must be a function with signature like void VType(const VType &a);*/
+    /** transform all the values
+    F must be a function with signature like void VType(const VType &a);*/
     template <class UnaryFunction>
     void transform (UnaryFunction F)
-	{
+    {
         std::transform (dataStorage.begin (), dataStorage.end (), dataStorage.begin (), F);
-	}
-	/*NOTE:: only constant iterators allowed since this would introduce the possibilty
-	of using iterators for various algorithms which could cause the object to go to a indeterminate state
-	therefore constant iterators are allowed but not modifable iterators
-	someone determined to screw it up could still easily do so*/
+    }
+    /*NOTE:: only constant iterators allowed since this would introduce the possibilty
+    of using iterators for various algorithms which could cause the object to go to a indeterminate state
+    therefore constant iterators are allowed but not modifable iterators
+    someone determined to screw it up could still easily do so*/
 
-	/** get a const iterator to the beginning of the data vector*/
+    /** get a const iterator to the beginning of the data vector*/
     auto begin () const { return dataStorage.cbegin (); }
     /** the a constant iterator to the end of the vector*/
-	auto end () const { return dataStorage.cend (); }
+    auto end () const { return dataStorage.cend (); }
 
-	/** get the size of the vector*/
+    /** get the size of the vector*/
     auto size () const { return dataStorage.size (); }
 
-	/** clear the vector of all data*/
+    /** clear the vector of all data*/
     void clear ()
     {
         dataStorage.clear ();
@@ -160,6 +182,8 @@ class MappedVector
 
   private:
     std::vector<VType> dataStorage;
-    std::conditional_t<is_easily_hashable<searchType>::value, std::unordered_map<searchType, size_t>, std::map<searchType, size_t>> lookup;	//!< map to lookup the index
+    std::conditional_t<is_easily_hashable<searchType>::value,
+                       std::unordered_map<searchType, size_t>,
+                       std::map<searchType, size_t>>
+      lookup;  //!< map to lookup the index
 };
-

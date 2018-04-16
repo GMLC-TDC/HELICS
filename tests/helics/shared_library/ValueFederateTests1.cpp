@@ -72,9 +72,9 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
     CE (helicsPublicationGetUnits (pubid3, tmp, HELICS_SIZE_MAX));
     BOOST_CHECK_EQUAL (tmp, "V");
 
-    //BOOST_CHECK (vFed1->getPublicationId ("pub1") == pubid);
-    //BOOST_CHECK (vFed1->getPublicationId ("pub2") == pubid2);
-    //BOOST_CHECK (vFed1->getPublicationId ("fed0/pub1") == pubid);
+    // BOOST_CHECK (vFed1->getPublicationId ("pub1") == pubid);
+    // BOOST_CHECK (vFed1->getPublicationId ("pub2") == pubid2);
+    // BOOST_CHECK (vFed1->getPublicationId ("fed0/pub1") == pubid);
     CE (helicsFederateFinalize (vFed1));
 
     CE (helicsFederateGetState (vFed1, &state));
@@ -87,8 +87,8 @@ BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_t
     auto vFed1 = GetFederateAt (0);
 
     auto pubid = helicsFederateRegisterTypePublication (vFed1, "pub1", HELICS_STRING_TYPE, "");
-    auto pubid2  = helicsFederateRegisterGlobalTypePublication (vFed1, "pub2", HELICS_INT_TYPE, "");
-    auto pubid3  = helicsFederateRegisterTypePublication (vFed1, "pub3", HELICS_DOUBLE_TYPE, "V");
+    auto pubid2 = helicsFederateRegisterGlobalTypePublication (vFed1, "pub2", HELICS_INT_TYPE, "");
+    auto pubid3 = helicsFederateRegisterTypePublication (vFed1, "pub3", HELICS_DOUBLE_TYPE, "V");
     CE (helicsFederateEnterExecutionMode (vFed1));
 
     federate_state state;
@@ -111,9 +111,9 @@ BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_t
     CE (helicsPublicationGetUnits (pubid3, tmp, HELICS_SIZE_MAX));
     BOOST_CHECK_EQUAL (tmp, "V");
 
-    //BOOST_CHECK (vFed1->getPublicationId ("pub1") == pubid.getID ());
-    //BOOST_CHECK (vFed1->getPublicationId ("pub2") == pubid2.getID ());
-    //BOOST_CHECK (vFed1->getPublicationId ("fed0/pub1") == pubid.getID ());
+    // BOOST_CHECK (vFed1->getPublicationId ("pub1") == pubid.getID ());
+    // BOOST_CHECK (vFed1->getPublicationId ("pub2") == pubid2.getID ());
+    // BOOST_CHECK (vFed1->getPublicationId ("fed0/pub1") == pubid.getID ());
     CE (helicsFederateFinalize (vFed1));
 
     CE (helicsFederateGetState (vFed1, &state));
@@ -144,7 +144,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     char sub3name[HELICS_SIZE_MAX];
     CE (helicsSubscriptionGetKey (subid3, sub3name, HELICS_SIZE_MAX));
 
-    //vFed1->addSubscriptionShortcut (subid, "Shortcut");
+    // vFed1->addSubscriptionShortcut (subid, "Shortcut");
     BOOST_CHECK_EQUAL (sub3name, "sub3");
 
     char tmp[HELICS_SIZE_MAX];
@@ -153,10 +153,10 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     CE (helicsSubscriptionGetUnits (subid3, tmp, HELICS_SIZE_MAX));
     BOOST_CHECK_EQUAL (tmp, "V");
 
-    //BOOST_CHECK (vFed1->getSubscriptionId ("sub1") == subid);
-    //BOOST_CHECK (vFed1->getSubscriptionId ("sub2") == subid2);
+    // BOOST_CHECK (vFed1->getSubscriptionId ("sub1") == subid);
+    // BOOST_CHECK (vFed1->getSubscriptionId ("sub2") == subid2);
 
-    //BOOST_CHECK (vFed1->getSubscriptionId ("Shortcut") == subid);
+    // BOOST_CHECK (vFed1->getSubscriptionId ("Shortcut") == subid);
 
     CE (helicsFederateFinalize (vFed1));
 
@@ -1135,4 +1135,3 @@ BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_type
 }
 #endif
 BOOST_AUTO_TEST_SUITE_END ()
-

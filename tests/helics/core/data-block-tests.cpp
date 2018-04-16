@@ -140,4 +140,3 @@ BOOST_AUTO_TEST_CASE (data_block_swap)
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
-

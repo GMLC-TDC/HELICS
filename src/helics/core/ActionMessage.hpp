@@ -39,23 +39,17 @@ class ActionMessage
         /** copy constructor*/
         AdditionalInfo (const AdditionalInfo &ai)
             : source (ai.source), type (source), target (ai.target), units (target), orig_source (ai.orig_source),
-              type_out (orig_source), original_dest (ai.original_dest), messageID(ai.messageID){};
+              type_out (orig_source), original_dest (ai.original_dest), messageID (ai.messageID){};
         /** move constructor*/
         AdditionalInfo (AdditionalInfo &&ai) noexcept
             : source (std::move (ai.source)), type (source), target (std::move (ai.target)), units (target),
               orig_source (std::move (ai.orig_source)), type_out (orig_source),
-              original_dest (std::move (ai.original_dest)), messageID(ai.messageID) {};
-        ~AdditionalInfo() = default;
+              original_dest (std::move (ai.original_dest)), messageID (ai.messageID){};
+        ~AdditionalInfo () = default;
         template <class Archive>
-        void save (Archive &ar) const
+        void serialize (Archive &ar)
         {
-            ar (source, target, orig_source, original_dest,messageID);
-        }
-
-        template <class Archive>
-        void load (Archive &ar)
-        {
-            ar (source, target, orig_source, original_dest,messageID);
+            ar (source, target, orig_source, original_dest, messageID);
         }
     };
 
@@ -78,7 +72,8 @@ class ActionMessage
       payload;  //!< string containing the data	//64 std::string is 32 bytes on most platforms (except libc++)
     std::string &name;  //!< alias payload to a name reference for registration functions
   private:
-    std::unique_ptr<AdditionalInfo> extraInfo;  //!< pointer to an additional info structure with more data if required
+    std::unique_ptr<AdditionalInfo>
+      extraInfo;  //!< pointer to an additional info structure with more data if required
   public:
     /** default constructor*/
     ActionMessage () noexcept : index (dest_handle), name (payload){};
@@ -87,7 +82,7 @@ class ActionMessage
     @param startingAction from an action message definition
     */
     // cppcheck-suppress noExplicitConstructor
-    /* implicit */ActionMessage (action_message_def::action_t startingAction);
+    /* implicit */ ActionMessage (action_message_def::action_t startingAction);
     /** construct from action, source and destination id's
      */
     ActionMessage (action_message_def::action_t startingAction, int32_t sourceId, int32_t destId);
@@ -177,7 +172,7 @@ class ActionMessage
     void to_string (std::string &data) const;
     /** convert to a byte string*/
     std::string to_string () const;
-    /** packettize the message with a simple header and tail sequence
+    /** packetize the message with a simple header and tail sequence
      */
     std::string packetize () const;
     /** covert to a byte vector using a reference*/
@@ -198,23 +193,23 @@ class ActionMessage
 
 /** template function to set a flag in an object containing a flags field*/
 template <class FlagContainer, class FlagIndex>
-inline void setActionFlag(FlagContainer &M, FlagIndex flag)
+inline void setActionFlag (FlagContainer &M, FlagIndex flag)
 {
-    M.flags |= (decltype(M.flags)(1) << (flag));
+    M.flags |= (decltype (M.flags) (1) << (flag));
 }
 
 /** template function to check a flag in an object containing a flags field*/
 template <class FlagContainer, class FlagIndex>
-inline bool checkActionFlag(const FlagContainer &M, FlagIndex flag)
+inline bool checkActionFlag (const FlagContainer &M, FlagIndex flag)
 {
-    return ((M.flags & (decltype(M.flags)(1) << (flag))) != 0);
+    return ((M.flags & (decltype (M.flags) (1) << (flag))) != 0);
 }
 
 /** template function to clear a flag in an object containing a flags field*/
 template <class FlagContainer, class FlagIndex>
-inline void clearActionFlag(FlagContainer &M, FlagIndex flag)
+inline void clearActionFlag (FlagContainer &M, FlagIndex flag)
 {
-    M.flags &= ~(decltype(M.flags)(1) << (flag));
+    M.flags &= ~(decltype (M.flags) (1) << (flag));
 }
 
 /** create a new message object that copies all the information from the ActionMessage into newly allocated memory
@@ -295,4 +290,3 @@ std::ostream &operator<< (std::ostream &os, const ActionMessage &command);
 
 }  // namespace helics
 #endif
-
