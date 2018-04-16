@@ -4,49 +4,49 @@
 
 
 ```eval_rst
-.. doxygenfunction:: HELICS_CORE_TYPE_DEFAULT
+.. doxygendefine:: HELICS_CORE_TYPE_DEFAULT
    :project: helics
 
-.. doxygenfunction:: HELICS_CORE_TYPE_INTERPROCESS
+.. doxygendefine:: HELICS_CORE_TYPE_INTERPROCESS
    :project: helics
 
-.. doxygenfunction:: HELICS_CORE_TYPE_IPC
+.. doxygendefine:: HELICS_CORE_TYPE_IPC
    :project: helics
 
-.. doxygenfunction:: HELICS_CORE_TYPE_MPI
+.. doxygendefine:: HELICS_CORE_TYPE_MPI
    :project: helics
 
-.. doxygenfunction:: HELICS_CORE_TYPE_TCP
+.. doxygendefine:: HELICS_CORE_TYPE_TCP
    :project: helics
 
-.. doxygenfunction:: HELICS_CORE_TYPE_TEST
+.. doxygendefine:: HELICS_CORE_TYPE_TEST
    :project: helics
 
-.. doxygenfunction:: HELICS_CORE_TYPE_UDP
+.. doxygendefine:: HELICS_CORE_TYPE_UDP
    :project: helics
 
-.. doxygenfunction:: HELICS_CORE_TYPE_ZMQ
+.. doxygendefine:: HELICS_CORE_TYPE_ZMQ
    :project: helics
 
-.. doxygenfunction:: HELICS_DATA_TYPE_COMPLEX
+.. doxygendefine:: HELICS_DATA_TYPE_COMPLEX
    :project: helics
 
-.. doxygenfunction:: HELICS_DATA_TYPE_DOUBLE
+.. doxygendefine:: HELICS_DATA_TYPE_DOUBLE
    :project: helics
 
-.. doxygenfunction:: HELICS_DATA_TYPE_INT
+.. doxygendefine:: HELICS_DATA_TYPE_INT
    :project: helics
 
-.. doxygenfunction:: HELICS_DATA_TYPE_RAW
+.. doxygendefine:: HELICS_DATA_TYPE_RAW
    :project: helics
 
-.. doxygenfunction:: HELICS_DATA_TYPE_STRING
+.. doxygendefine:: HELICS_DATA_TYPE_STRING
    :project: helics
 
-.. doxygenfunction:: HELICS_DATA_TYPE_VECTOR
+.. doxygendefine:: HELICS_DATA_TYPE_VECTOR
    :project: helics
 
-.. doxygenfunction:: force_iteration
+.. doxygenenumvalue:: force_iteration
    :project: helics
 
 .. doxygenfunction:: helicsBrokerClone
@@ -496,112 +496,112 @@
 .. doxygenfunction:: helicsSubscriptionSetDefaultVector
    :project: helics
 
-.. doxygenfunction:: helics_clone_filter
+.. doxygenenumvalue:: helics_clone_filter
    :project: helics
 
-.. doxygenfunction:: helics_custom_filter
+.. doxygenenumvalue:: helics_custom_filter
    :project: helics
 
-.. doxygenfunction:: helics_delay_filter
+.. doxygenenumvalue:: helics_delay_filter
    :project: helics
 
-.. doxygenfunction:: helics_discard
+.. doxygenenumvalue:: helics_discard
    :project: helics
 
-.. doxygenfunction:: helics_error
+.. doxygenenumvalue:: helics_error
    :project: helics
 
-.. doxygenfunction:: helics_error_state
+.. doxygenenumvalue:: helics_error_state
    :project: helics
 
-.. doxygenfunction:: helics_execution_state
+.. doxygenenumvalue:: helics_execution_state
    :project: helics
 
-.. doxygenfunction:: helics_false
+.. doxygenenumvalue:: helics_false
    :project: helics
 
-.. doxygenfunction:: helics_finalize_state
+.. doxygenenumvalue:: helics_finalize_state
    :project: helics
 
-.. doxygenfunction:: helics_initialization_state
+.. doxygenenumvalue:: helics_initialization_state
    :project: helics
 
-.. doxygenfunction:: helics_invalid_argument
+.. doxygenenumvalue:: helics_invalid_argument
    :project: helics
 
-.. doxygenfunction:: helics_invalid_function_call
+.. doxygenenumvalue:: helics_invalid_function_call
    :project: helics
 
-.. doxygenfunction:: helics_invalid_object
+.. doxygenenumvalue:: helics_invalid_object
    :project: helics
 
-.. doxygenfunction:: helics_invalid_state_transition
+.. doxygenenumvalue:: helics_invalid_state_transition
    :project: helics
 
-.. doxygenfunction:: helics_ok
+.. doxygenenumvalue:: helics_ok
    :project: helics
 
-.. doxygenfunction:: helics_pending_exec_state
+.. doxygenenumvalue:: helics_pending_exec_state
    :project: helics
 
-.. doxygenfunction:: helics_pending_init_state
+.. doxygenenumvalue:: helics_pending_init_state
    :project: helics
 
-.. doxygenfunction:: helics_pending_iterative_time_state
+.. doxygenenumvalue:: helics_pending_iterative_time_state
    :project: helics
 
-.. doxygenfunction:: helics_pending_time_state
+.. doxygenenumvalue:: helics_pending_time_state
    :project: helics
 
-.. doxygenfunction:: helics_randomDelay_filter
+.. doxygenenumvalue:: helics_randomDelay_filter
    :project: helics
 
-.. doxygenfunction:: helics_randomDrop_filter
+.. doxygenenumvalue:: helics_randomDrop_filter
    :project: helics
 
-.. doxygenfunction:: helics_reroute_filter
+.. doxygenenumvalue:: helics_reroute_filter
    :project: helics
 
-.. doxygenfunction:: helics_startup_state
+.. doxygenenumvalue:: helics_startup_state
    :project: helics
 
-.. doxygenfunction:: helics_terminated
+.. doxygenenumvalue:: helics_terminated
    :project: helics
 
-.. doxygenfunction:: helics_time_epsilon
+.. doxygenenumvalue:: helics_time_epsilon
    :project: helics
 
-.. doxygenfunction:: helics_time_zero
+.. doxygenenumvalue:: helics_time_zero
    :project: helics
 
-.. doxygenfunction:: helics_true
+.. doxygenenumvalue:: helics_true
    :project: helics
 
-.. doxygenfunction:: helics_warning
+.. doxygenenumvalue:: helics_warning
    :project: helics
 
-.. doxygenfunction:: iterate_if_needed
+.. doxygenenumvalue:: iterate_if_needed
    :project: helics
 
-.. doxygenfunction:: iterating
+.. doxygenenumvalue:: iterating
    :project: helics
 
-.. doxygenfunction:: iteration_error
+.. doxygenenumvalue:: iteration_error
    :project: helics
 
-.. doxygenfunction:: iteration_halted
+.. doxygenenumvalue:: iteration_halted
    :project: helics
 
-.. doxygenfunction:: message_t
+.. doxygenstruct:: message_t
    :project: helics
 
-.. doxygenfunction:: message_t_swigregister
+.. doxygenenumvalue:: message_t_swigregister
    :project: helics
 
-.. doxygenfunction:: next_step
+.. doxygenenumvalue:: next_step
    :project: helics
 
-.. doxygenfunction:: no_iteration
+.. doxygenenumvalue:: no_iteration
    :project: helics
 
 
