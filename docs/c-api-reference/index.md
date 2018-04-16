@@ -517,7 +517,7 @@
 .. doxygenenumvalue:: helics_execution_state
    :project: helics
 
-.. doxygenenumvalue:: helics_false
+.. doxygenvariable:: helics_false
    :project: helics
 
 .. doxygenenumvalue:: helics_finalize_state
@@ -568,13 +568,13 @@
 .. doxygenenumvalue:: helics_terminated
    :project: helics
 
-.. doxygenenumvalue:: helics_time_epsilon
+.. doxygenvariable:: helics_time_epsilon
    :project: helics
 
-.. doxygenenumvalue:: helics_time_zero
+.. doxygenvariable:: helics_time_zero
    :project: helics
 
-.. doxygenenumvalue:: helics_true
+.. doxygenvariable:: helics_true
    :project: helics
 
 .. doxygenenumvalue:: helics_warning
