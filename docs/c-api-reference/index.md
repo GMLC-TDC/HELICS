@@ -595,9 +595,6 @@
 .. doxygenstruct:: message_t
    :project: helics
 
-.. doxygenenumvalue:: message_t_swigregister
-   :project: helics
-
 .. doxygenenumvalue:: next_step
    :project: helics
 
