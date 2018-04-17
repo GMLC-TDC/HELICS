@@ -13,6 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../core/Core.hpp"
 #include "AsyncFedCallInfo.hpp"
 #include "helics/helics-config.h"
+#include "../common/GuardedTypes.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -70,7 +71,7 @@ Federate::Federate (const std::string &name, const FederateInfo &fi) : FedInfo (
     fedID = coreObject->registerFederate (name, fi);
     separator_ = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
-    asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
+    asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
 }
 
 Federate::Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi) : coreObject (core), FedInfo (fi)
@@ -109,7 +110,7 @@ Federate::Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi) :
     }
     separator_ = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
-    asyncCallInfo = std::make_unique<AsyncFedCallInfo> ();
+    asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
 }
 
 Federate::Federate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
@@ -163,18 +164,19 @@ Federate::~Federate ()
 
 void Federate::enterInitializationState ()
 {
-    if (state == op_states::startup)
+    auto currentState = state.load();
+    if (currentState == op_states::startup)
     {
         coreObject->enterInitializingState (fedID);
         state = op_states::initialization;
         currentTime = coreObject->getCurrentTime (fedID);
         startupToInitializeStateTransition ();
     }
-    else if (state == op_states::pending_init)
+    else if (currentState == op_states::pending_init)
     {
         enterInitializationStateComplete ();
     }
-    else if (state != op_states::initialization)  // if we are already in initialization do nothing
+    else if (currentState != op_states::initialization)  // if we are already in initialization do nothing
     {
         throw (InvalidFunctionCall ("cannot transition from current state to initialization state"));
     }
@@ -182,11 +184,11 @@ void Federate::enterInitializationState ()
 
 void Federate::enterInitializationStateAsync ()
 {
-    std::lock_guard<std::mutex> alock (asyncLock);
+    auto asyncInfo = asyncCallInfo->lock();
     if (state == op_states::startup)
     {
         state = op_states::pending_init;
-        asyncCallInfo->initFuture =
+        asyncInfo->initFuture =
           std::async (std::launch::async, [this]() { coreObject->enterInitializingState (fedID); });
     }
     else if (state == op_states::pending_init)
@@ -201,17 +203,17 @@ void Federate::enterInitializationStateAsync ()
 
 bool Federate::isAsyncOperationCompleted () const
 {
-    std::lock_guard<std::mutex> alock (asyncLock);
+    auto asyncInfo = asyncCallInfo->lock_shared();
     switch (state)
     {
     case op_states::pending_init:
-        return (asyncCallInfo->initFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
+        return (asyncInfo->initFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
     case op_states::pending_exec:
-        return (asyncCallInfo->execFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
+        return (asyncInfo->execFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
     case op_states::pending_time:
-        return (asyncCallInfo->timeRequestFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
+        return (asyncInfo->timeRequestFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
     case op_states::pending_iterative_time:
-        return (asyncCallInfo->timeRequestIterativeFuture.wait_for (std::chrono::seconds (0)) ==
+        return (asyncInfo->timeRequestIterativeFuture.wait_for (std::chrono::seconds (0)) ==
                 std::future_status::ready);
     default:
         return false;
@@ -220,12 +222,13 @@ bool Federate::isAsyncOperationCompleted () const
 
 void Federate::enterInitializationStateComplete ()
 {
-    std::lock_guard<std::mutex> alock (asyncLock);
+    
     switch (state)
     {
     case op_states::pending_init:
     {
-        asyncCallInfo->initFuture.get ();
+        auto asyncInfo = asyncCallInfo->lock();
+        asyncInfo->initFuture.get ();
         state = op_states::initialization;
         currentTime = coreObject->getCurrentTime (fedID);
         startupToInitializeStateTransition ();
@@ -293,7 +296,7 @@ iteration_result Federate::enterExecutionState (iteration_request iterate)
 
 void Federate::enterExecutionStateAsync (iteration_request iterate)
 {
-    std::lock_guard<std::mutex> alock (asyncLock);
+    
     switch (state)
     {
     case op_states::startup:
@@ -303,9 +306,9 @@ void Federate::enterExecutionStateAsync (iteration_request iterate)
             startupToInitializeStateTransition ();
             return coreObject->enterExecutingState (fedID, iterate);
         };
-
+        auto asyncInfo = asyncCallInfo->lock();
         state = op_states::pending_exec;
-        asyncCallInfo->execFuture = std::async (std::launch::async, eExecFunc);
+        asyncInfo->execFuture = std::async (std::launch::async, eExecFunc);
     }
     break;
     case op_states::pending_init:
@@ -314,8 +317,9 @@ void Federate::enterExecutionStateAsync (iteration_request iterate)
     case op_states::initialization:
     {
         auto eExecFunc = [this, iterate]() { return coreObject->enterExecutingState (fedID, iterate); };
+        auto asyncInfo = asyncCallInfo->lock();
         state = op_states::pending_exec;
-        asyncCallInfo->execFuture = std::async (std::launch::async, eExecFunc);
+        asyncInfo->execFuture = std::async (std::launch::async, eExecFunc);
     }
     break;
     case op_states::pending_exec:
@@ -331,12 +335,13 @@ void Federate::enterExecutionStateAsync (iteration_request iterate)
 
 iteration_result Federate::enterExecutionStateComplete ()
 {
-    std::lock_guard<std::mutex> alock (asyncLock);
+    
     if (state != op_states::pending_exec)
     {
         throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
     }
-    auto res = asyncCallInfo->execFuture.get ();
+    auto asyncInfo = asyncCallInfo->lock();
+    auto res = asyncInfo->execFuture.get ();
     switch (res)
     {
     case iteration_result::next_step:
@@ -538,11 +543,11 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
 
 void Federate::requestTimeAsync (Time nextInternalTimeStep)
 {
-    std::lock_guard<std::mutex> alock (asyncLock);
+    auto asyncInfo = asyncCallInfo->lock();
     if (state == op_states::execution)
     {
         state = op_states::pending_time;
-        asyncCallInfo->timeRequestFuture = std::async (std::launch::async, [this, nextInternalTimeStep]() {
+        asyncInfo->timeRequestFuture = std::async (std::launch::async, [this, nextInternalTimeStep]() {
             return coreObject->timeRequest (fedID, nextInternalTimeStep);
         });
     }
@@ -557,11 +562,11 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 @return the granted time step*/
 void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
-    std::lock_guard<std::mutex> alock (asyncLock);
+    auto asyncInfo = asyncCallInfo->lock();
     if (state == op_states::execution)
     {
         state = op_states::pending_iterative_time;
-        asyncCallInfo->timeRequestIterativeFuture =
+        asyncInfo->timeRequestIterativeFuture =
           std::async (std::launch::async, [this, nextInternalTimeStep, iterate]() {
               return coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
           });
@@ -577,10 +582,10 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_r
 @return the granted time step*/
 Time Federate::requestTimeComplete ()
 {
-    std::lock_guard<std::mutex> alock (asyncLock);
+    auto asyncInfo = asyncCallInfo->lock();
     if (state == op_states::pending_time)
     {
-        auto newTime = asyncCallInfo->timeRequestFuture.get ();
+        auto newTime = asyncInfo->timeRequestFuture.get ();
         state = op_states::execution;
         Time oldTime = currentTime;
         currentTime = newTime;
@@ -598,10 +603,10 @@ Time Federate::requestTimeComplete ()
 @return the granted time step*/
 iteration_time Federate::requestTimeIterativeComplete ()
 {
-    std::lock_guard<std::mutex> alock (asyncLock);
+    auto asyncInfo = asyncCallInfo->lock();
     if (state == op_states::pending_iterative_time)
     {
-        auto iterativeTime = asyncCallInfo->timeRequestIterativeFuture.get ();
+        auto iterativeTime = asyncInfo->timeRequestIterativeFuture.get ();
         state = op_states::execution;
         Time oldTime = currentTime;
         switch (iterativeTime.state)
@@ -819,30 +824,31 @@ std::string Federate::query (const std::string &target, const std::string &query
 
 query_id_t Federate::queryAsync (const std::string &target, const std::string &queryStr)
 {
-    std::lock_guard<std::mutex> alock (asyncLock);
-    int cnt = asyncCallInfo->queryCounter++;
-
     auto queryFut =
-      std::async (std::launch::async, [this, target, queryStr]() { return coreObject->query (target, queryStr); });
-    asyncCallInfo->inFlightQueries.emplace (cnt, std::move (queryFut));
+        std::async(std::launch::async, [this, target, queryStr]() { return coreObject->query(target, queryStr); });
+    auto asyncInfo = asyncCallInfo->lock();
+    int cnt = asyncInfo->queryCounter++;
+   
+    asyncInfo->inFlightQueries.emplace (cnt, std::move (queryFut));
     return cnt;
 }
 
 query_id_t Federate::queryAsync (const std::string &queryStr)
 {
-    std::lock_guard<std::mutex> alock (asyncLock);
-    int cnt = asyncCallInfo->queryCounter++;
+    auto queryFut = std::async(std::launch::async, [this, queryStr]() { return query(queryStr); });
+    auto asyncInfo = asyncCallInfo->lock();
+    int cnt = asyncInfo->queryCounter++;
 
-    auto queryFut = std::async (std::launch::async, [this, queryStr]() { return query (queryStr); });
-    asyncCallInfo->inFlightQueries.emplace (cnt, std::move (queryFut));
+    
+    asyncInfo->inFlightQueries.emplace (cnt, std::move (queryFut));
     return cnt;
 }
 
 std::string Federate::queryComplete (query_id_t queryIndex)
 {
-    std::lock_guard<std::mutex> alock (asyncLock);
-    auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value ());
-    if (fnd != asyncCallInfo->inFlightQueries.end ())
+    auto asyncInfo = asyncCallInfo->lock();
+    auto fnd = asyncInfo->inFlightQueries.find (queryIndex.value ());
+    if (fnd != asyncInfo->inFlightQueries.end ())
     {
         return fnd->second.get ();
     }
@@ -851,9 +857,9 @@ std::string Federate::queryComplete (query_id_t queryIndex)
 
 bool Federate::isQueryCompleted (query_id_t queryIndex) const
 {
-    std::lock_guard<std::mutex> alock (asyncLock);
-    auto fnd = asyncCallInfo->inFlightQueries.find (queryIndex.value ());
-    if (fnd != asyncCallInfo->inFlightQueries.end ())
+    auto asyncInfo = asyncCallInfo->lock();
+    auto fnd = asyncInfo->inFlightQueries.find (queryIndex.value ());
+    if (fnd != asyncInfo->inFlightQueries.end ())
     {
         return (fnd->second.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
     }

@@ -17,11 +17,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/DualMappedVector.hpp"
 #include "../common/GuardedTypes.hpp"
 #include "../common/MappedPointerVector.hpp"
+#include "../common/AirLock.hpp"
 #include "HandlePointerManager.hpp"
 #include <atomic>
 #include <cstdint>
 #include <thread>
 #include <utility>
+#include <array>
 
 namespace helics
 {
@@ -273,6 +275,8 @@ class CommonCore : public Core, public BrokerBase
 
     /** handle command with the core itself as a destination at the core*/
     void processCommandsForCore (const ActionMessage &cmd);
+    /** process configure commands for the core*/
+    void processCoreConfigureCommands(ActionMessage &cmd);
     /** check if a newly registered subscription has a local publication
     if it does return true*/
     bool checkForLocalPublication (ActionMessage &cmd);
@@ -304,7 +308,8 @@ class CommonCore : public Core, public BrokerBase
                             fed_handle_pair> filters;  //!< storage for all the filters
     mutable std::mutex
       _handlemutex;  //!< mutex protecting the publications, subscription, endpoint and filter structures
-    /** a logging function for logging or printing messages*/
+    std::atomic<uint16_t> lastUsedAirlock{ 0 };
+    std::array<AirLock<std::shared_ptr<FilterOperator>>, 4> filterOpAirlocks;  //!< airlocks for updating the filter operators
 
   protected:
     /** deliver a message to the appropriate location*/

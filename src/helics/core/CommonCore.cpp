@@ -1727,36 +1727,31 @@ void CommonCore::setFilterOperator (handle_id_t filter, std::shared_ptr<FilterOp
     {
         throw (InvalidIdentifier ("filter identifier does not point a filter"));
     }
+    ActionMessage filtOpUpdate (CMD_CORE_CONFIGURE);
+    filtOpUpdate.index = UPDATE_FILTER_OPERATOR;
+    if (!callback)
+    {
+        callback = nullFilt;
+    }
+    uint16_t ii = ++lastUsedAirlock;
 
-    auto FiltI = filters.find (fed_handle_pair{global_broker_id.load (), filter});
+    if (ii > 3)
+    {
+        auto exp = ii;
 
-    if (brokerState < operating)
-    {
-        if (callback)
-        {
-            FiltI->filterOp = std::move (callback);
+        while (exp > 3)
+        {  // doing a lock free modulus we need to make sure the lastUsedAirLock<4
+            if (lastUsedAirlock.compare_exchange_weak (exp, exp % 4))
+            {
+                break;
+            }
         }
-        else
-        {
-            FiltI->filterOp = nullFilt;
-        }
+        ii %= 4;
     }
-    else if (brokerState == operating)
-    {
-        // TODO:: This is not thread safe yet
-        if (callback)
-        {
-            FiltI->filterOp = std::move (callback);
-        }
-        else
-        {
-            FiltI->filterOp = nullFilt;
-        }
-    }
-    else
-    {
-        throw (InvalidFunctionCall (" filter operation can not be set in current state"));
-    }
+    filterOpAirlocks[ii].load (std::move (callback));
+    filtOpUpdate.counter = ii;
+    filtOpUpdate.source_handle = filter;
+    actionQueue.push (filtOpUpdate);
 }
 
 FilterCoordinator *CommonCore::getFilterCoordinator (handle_id_t id_)
@@ -2454,34 +2449,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     }
     break;
     case CMD_CORE_CONFIGURE:
-        if (command.index == UPDATE_FLAG)
-        {
-            if (command.dest_id == ENABLE_INIT_ENTRY)
-            {
-                if (delayInitCounter <= 1)
-                {
-                    delayInitCounter = 0;
-                    if (allInitReady ())
-                    {
-                        broker_state_t exp = connected;
-                        if (brokerState.compare_exchange_strong (exp, broker_state_t::initializing))
-                        {  // make sure we only do this once
-                            checkDependencies ();
-                            command.source_id = global_broker_id;
-                            transmit (0, command);
-                        }
-                    }
-                }
-                else
-                {
-                    --delayInitCounter;
-                }
-            }
-        }
-        else if (command.index == UPDATE_LOG_LEVEL)
-        {
-            setLogLevel (command.dest_id);
-        }
+        processCoreConfigureCommands(command);
         break;
     case CMD_INIT:
     {
@@ -2854,6 +2822,49 @@ void CommonCore::organizeFilterOperations ()
                              "unable to match types on some filters");
             }
         }
+    }
+}
+void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
+{
+    switch (cmd.index)
+    {
+    case UPDATE_FLAG:
+        if (cmd.dest_id == ENABLE_INIT_ENTRY)
+        {
+            if (delayInitCounter <= 1)
+            {
+                delayInitCounter = 0;
+                if (allInitReady ())
+                {
+                    broker_state_t exp = connected;
+                    if (brokerState.compare_exchange_strong (exp, broker_state_t::initializing))
+                    {  // make sure we only do this once
+                        checkDependencies ();
+                        cmd.source_id = global_broker_id;
+                        transmit (0, cmd);
+                    }
+                }
+            }
+            else
+            {
+                --delayInitCounter;
+            }
+        }
+        break;
+    case UPDATE_LOG_LEVEL:
+        setLogLevel (cmd.dest_id);
+        break;
+    case UPDATE_FILTER_OPERATOR:
+    {
+        auto FiltI = filters.find (fed_handle_pair{global_broker_id.load (), cmd.source_handle});
+        int ii = cmd.counter;
+        auto op = filterOpAirlocks[ii].try_unload ();
+        if (op)
+        {
+            FiltI->filterOp = std::move (*op);
+        }
+    }
+    break;
     }
 }
 
