@@ -24,7 +24,7 @@ Welcome to the repository for the Hierarchical Engine for Large-scale Infrastruc
 
 # Getting Started
 
-We've created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://github.com/GMLC-TDC/HELICS-Tutorial).   
+We've created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg).   
 
 The [Introduction to the HELICS documentation](https://gmlc-tdc.github.io/HELICS-src/introduction/index.html) steps through a series of examples that step through the basic usage and concepts of HELICS.
 
