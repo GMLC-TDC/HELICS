@@ -137,6 +137,7 @@ bool TestBroker::tryReconnect ()
         return true;
     }
     auto broker = BrokerFactory::findBroker (brokerName);
+    std::lock_guard<std::mutex> lock(routeMutex);
     tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
     return static_cast<bool> (tbroker);
 }
@@ -154,7 +155,6 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
     {
         return;  // no message sent in terminating or higher state
     }
-    // only activate the lock if we not in an operating state
     std::unique_lock<std::mutex> lock (routeMutex);
 
     if ((tbroker) && (route_id == 0))

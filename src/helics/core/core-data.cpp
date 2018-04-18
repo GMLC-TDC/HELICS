@@ -78,11 +78,7 @@ bool matchingTypes (const std::string &type1, const std::string &type2)
         return true;
     }
     res = global_match_strings.find (type2);
-    if (res != global_match_strings.end ())
-    {
-        return true;
-    }
-
-    return false;
+    return (res != global_match_strings.end());
+   
 }
 }  // namespace helics

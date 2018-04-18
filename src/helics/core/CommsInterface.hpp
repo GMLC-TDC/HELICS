@@ -27,7 +27,7 @@ class CommsInterface
     */
     CommsInterface (const std::string &localTarget, const std::string &brokerTarget);
     /** construct from a NetworkBrokerData structure*/
-    CommsInterface (const NetworkBrokerData &netInfo);
+    explicit CommsInterface (const NetworkBrokerData &netInfo);
     /** destructor*/
     virtual ~CommsInterface ();
     /** transmit a message along a particular route

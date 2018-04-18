@@ -33,13 +33,13 @@ class HandleManager
     HandleManager () = default;
     /** add a handle to manage*/
     BasicHandleInfo &addHandle (Core::federate_id_t fed_id,
-                                BasicHandleType what,
+                                handle_type_t what,
                                 const std::string &key,
                                 const std::string &type,
                                 const std::string &units);
     /** add a handle to manage*/
     BasicHandleInfo &addHandle (Core::federate_id_t fed_id,
-                                BasicHandleType what,
+                                handle_type_t what,
                                 const std::string &key,
                                 const std::string &target,
                                 const std::string &type_in,
@@ -47,14 +47,14 @@ class HandleManager
     /** add a handle to manage*/
     BasicHandleInfo &addHandle (Core::federate_id_t fed_id,
                                 Core::handle_id_t local_id,
-                                BasicHandleType what,
+                                handle_type_t what,
                                 const std::string &key,
                                 const std::string &type,
                                 const std::string &units);
     /** add a handle to manage*/
     BasicHandleInfo &addHandle (Core::federate_id_t fed_id,
                                 Core::handle_id_t local_id,
-                                BasicHandleType what,
+                                handle_type_t what,
                                 const std::string &key,
                                 const std::string &target,
                                 const std::string &type_in,
@@ -80,7 +80,7 @@ class HandleManager
 
   private:
     void addSearchFields (const BasicHandleInfo &handle, int32_t index);
-    std::string generateName (BasicHandleType what) const;
+    std::string generateName (handle_type_t what) const;
 };
 
 }  // namespace helics

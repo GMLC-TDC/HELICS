@@ -317,16 +317,15 @@ void BrokerBase::queueProcessingLoop ()
         switch (command.action ())
         {
         case CMD_TICK:
-
+            if (checkActionFlag(command, error_flag))
+            {
+                serviceLoop = nullptr;
+                serviceLoop = AsioServiceManager::runServiceLoop();
+            }
             if (messagesSinceLastTick == 0)
             {
                 //   std::cout << "sending tick " << std::endl;
                 processCommand (std::move (command));
-            }
-            if (checkActionFlag (command, error_flag))
-            {
-                serviceLoop = nullptr;
-                serviceLoop = AsioServiceManager::runServiceLoop ();
             }
             messagesSinceLastTick = 0;
             // reschedule the timer

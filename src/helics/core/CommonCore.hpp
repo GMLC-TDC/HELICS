@@ -18,6 +18,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/GuardedTypes.hpp"
 #include "../common/MappedPointerVector.hpp"
 #include "../common/AirLock.hpp"
+#include "helics_includes/any.hpp"
 #include "HandlePointerManager.hpp"
 #include <atomic>
 #include <cstdint>
@@ -35,7 +36,7 @@ class FilterCoordinator;
 class Logger;
 class FilterInfo;
 
-enum BasicHandleType : char;
+enum class handle_type_t : char;
 
 /** base class implementing a standard interaction strategy between federates
 @details the CommonCore is virtual class that manages local federates and handles most of the
@@ -47,11 +48,11 @@ class CommonCore : public Core, public BrokerBase
     /** default constructor*/
     CommonCore () noexcept;
     /**function mainly to match some other object constructors does the same thing as the default constructor*/
-    CommonCore (bool arg) noexcept;
+    explicit CommonCore (bool arg) noexcept;
     /** construct from a core name*/
-    CommonCore (const std::string &core_name);
+    explicit CommonCore (const std::string &core_name);
     /** virtual destructor*/
-    virtual ~CommonCore ();
+    virtual ~CommonCore () override;
     virtual void initialize (const std::string &initializationString) override final;
     /** initialize the core manager with command line arguments
     @param[in] argc the number of arguments
@@ -80,7 +81,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void setOutputDelay (federate_id_t federateID, Time outputDelayTime) override final;
     virtual void setPeriod (federate_id_t federateID, Time timePeriod) override final;
     virtual void setTimeOffset (federate_id_t federateID, Time timeOffset) override final;
-    virtual void setInputDelay (federate_id_t federateID, Time impactTime) override final;
+    virtual void setInputDelay (federate_id_t federateID, Time inputDelayTime) override final;
     virtual void setLoggingLevel (federate_id_t federateID, int loggingLevel) override final;
     virtual void setFlag (federate_id_t federateID, int flag, bool flagValue = true) override final;
     virtual handle_id_t registerSubscription (federate_id_t federateID,
@@ -280,7 +281,8 @@ class CommonCore : public Core, public BrokerBase
     /** check if a newly registered subscription has a local publication
     if it does return true*/
     bool checkForLocalPublication (ActionMessage &cmd);
-
+    /** get an index for an airlock*/
+    uint16_t getNextAirlockIndex();
   private:
     int32_t _global_federation_size = 0;  //!< total size of the federation
     std::atomic<int16_t> delayInitCounter{
@@ -308,8 +310,8 @@ class CommonCore : public Core, public BrokerBase
                             fed_handle_pair> filters;  //!< storage for all the filters
     mutable std::mutex
       _handlemutex;  //!< mutex protecting the publications, subscription, endpoint and filter structures
-    std::atomic<uint16_t> lastUsedAirlock{ 0 };
-    std::array<AirLock<std::shared_ptr<FilterOperator>>, 4> filterOpAirlocks;  //!< airlocks for updating the filter operators
+    std::atomic<uint16_t> nextAirLock{ 0 }; //!< the index of the next airlock to use
+    std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating the filter operators
 
   protected:
     /** deliver a message to the appropriate location*/
@@ -321,7 +323,7 @@ class CommonCore : public Core, public BrokerBase
     */
     BasicHandleInfo *createBasicHandle (federate_id_t global_federateId,
                                         federate_id_t local_federateId,
-                                        BasicHandleType HandleType,
+                                        handle_type_t HandleType,
                                         const std::string &key,
                                         const std::string &type,
                                         const std::string &units,
@@ -332,7 +334,7 @@ class CommonCore : public Core, public BrokerBase
     */
     BasicHandleInfo *createBasicHandle (federate_id_t global_federateId,
                                         federate_id_t local_federateId,
-                                        BasicHandleType HandleType,
+                                        handle_type_t HandleType,
                                         const std::string &key,
                                         const std::string &target,
                                         const std::string &type_in,
