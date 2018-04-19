@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Set variables based on build environment
-WAIT_COMMAND=''
 if [[ "$TRAVIS" == "true" ]]; then
     if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         HOMEBREW_NO_AUTO_UPDATE=1 brew install pcre
@@ -21,7 +20,6 @@ if [[ "$TRAVIS" == "true" ]]; then
     fi
 else
     export CI_DEPENDENCY_DIR=$1
-    WAIT_COMMAND=wait
     commit_msg=""
     os_name="$(uname -s)"
 fi
