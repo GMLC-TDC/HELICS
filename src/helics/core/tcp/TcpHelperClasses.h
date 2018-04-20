@@ -176,7 +176,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 
 /** helper class for a server*/
 
-class TcpServer
+class TcpServer : public std::enable_shared_from_this<TcpServer>
 {
   public:
     TcpServer (boost::asio::io_service &io_service, int PortNum, int nominalBufferSize = 10192)
@@ -204,7 +204,7 @@ class TcpServer
     void handle_accept (TcpRxConnection::pointer new_connection, const boost::system::error_code &error);
 
     boost::asio::ip::tcp::acceptor acceptor_;
-
+    std::atomic<bool> accepting{ false };
     size_t bufferSize;
     std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
     std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &error)> errorCall;
