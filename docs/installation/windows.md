@@ -119,6 +119,9 @@ setting `-DBUILD_PYTHON_INTERFACE=ON` will generate a project to build the pytho
 path then the appropriate libraries and flags will be automatically found.  If SWIG is available and you wish to regenerate the interface
 set SWIG\_EXECUTABLE to the location of swig.exe.  Otherwise DISABLE\_SWIG can be set to ON to build using repo sources for the interface.
 
+![](../img/windows-command-line-install.png)
+
+
 ```bash
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0"  -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" ..
 cmake --build . --config Release --target install
@@ -128,6 +131,8 @@ otherwise they can be set through CMAKE flags
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0"  -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)\include\python3.6m\ -DPYTHON_LIBRARY=$(python3-config --prefix)\lib\python3.6m\libpython3.6m.dll ..
 cmake --build . --config Release --target install
 ```
+
+![](../img/windows-command-line-success.png)
 
 Add the following to the Windows PYTHONPATH environment variable or run the following in the command line.
 
@@ -149,4 +154,6 @@ In [2]: helics.helicsGetVersion()
 Out[2]: '1.0.0 (04-15-18)'
 
 ```
+
+![](../img/windows-python-success.png)
 
