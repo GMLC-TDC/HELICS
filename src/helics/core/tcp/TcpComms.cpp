@@ -137,7 +137,7 @@ void TcpComms::txPriorityReceive (std::shared_ptr<TcpConnection> /*connection*/,
                                   size_t bytes_received,
                                   const boost::system::error_code &error)
 {
-    if (error != nullptr)
+    if (error)
     {
         return;
     }
