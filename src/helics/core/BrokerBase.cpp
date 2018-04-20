@@ -253,6 +253,7 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
 }
 
 using activeProtector = std::shared_ptr<libguarded::guarded<bool>>;
+
 void timerTickHandler (BrokerBase *bbase, activeProtector active, const boost::system::error_code &error)
 {
     auto p = active->lock ();

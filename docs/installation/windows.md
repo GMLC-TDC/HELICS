@@ -19,10 +19,15 @@ To set up your environment:
 1. Install Microsoft Visual C++ 2015 or newer
 2. Install
    [Boost](http://www.boost.org/doc/libs/1_64_0/more/getting_started/windows.html)
+    [Windows downloads](https://dl.bintray.com/boostorg/release/1.66.0/binaries/)
    1.61 or later recommended (core library should build with 1.58,
    but tests will not). For CMake to detect it automatically either
-   extract Boost to the root of your drive, or set the BOOST\_ROOT
-   environment variable to the install location.
+   extract Boost to the root of your drive, or set the BOOST\_INSTALL\_PATH
+   environment variable to the install location. The cmake will only automatically find 
+    boost 1.61 or newer. 
+   Building with Visual Studio 2017 will require boost 1.65.1 or newer and cmake 3.9
+    or newer.  Use 14.0 versions for Visual Studio 2015, 14.1 files for Visual studio 2017.
+    Boost 1.66 with cmake 3.11 is the current recommended configuration.  
 3. *Optional* Install [ZeroMQ](http://zeromq.org/build:_start) if you
    need ZeroMQ support and need a copy in a global system location.
    We recommend skipping this step and running cmake with the
@@ -32,9 +37,13 @@ To set up your environment:
 4. *Optional* Install
    [MS-MPI](https://msdn.microsoft.com/en-us/library/bb524831(v=vs.85).aspx)
    if you need MPI support.
-5. Open a Visual Studio Command Prompt, and go to your working
+5. *Optional* Install
+   [SWIG](http://www.swig.org/download.html)
+   if you wish to generate the interface libraries, appropriate build files are 
+    included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified
+6. Open a Visual Studio Command Prompt, and go to your working
    directory.
-6. Make sure *cmake* and *git* are available in the Command Prompt.
+7. Make sure *cmake* and *git* are available in the Command Prompt.
    If they aren't, add them to the system PATH variable.
 
 Getting and building from source:
@@ -59,10 +68,8 @@ cd build
 
 4. Run cmake. It should automatically detect where MPI is installed
    if the system path variables are set up correctly, otherwise you
-   will have to set the cmake path manually. Optionally, you can use
-   the option `-DAUTOBUILD_ZMQ=ON` to have cmake attempt to
-   automatically download, build, and configure paths for a
-   project-only copy of ZeroMQ.
+   will have to set the cmake path manually. The AUTOBUILD_ZMQ is set to ON
+    so ZeroMQ will automatically be built unless the option is changed.
 
 ```bash
 cmake ..
@@ -78,7 +85,7 @@ project. To avoid problems when building later, this should match the
 version of the Boost libraries you are using.
 
 If you installed boost into the root of the C or D drives with the
-default name (or the BOOST\_ROOT environment variable has been set),
+default localtion (or the BOOST\_INSTALL\_PATH environment variable has been set),
 cmake should automatically detect their location. Otherwise the
 location will need to be manually given to cmake.
 
@@ -93,7 +100,7 @@ Testing
 -------
 
 A quick test is to double check the versions of the HELICS player and
-recorder (located in the buildsrchelicsplayerDebug folder):
+recorder (located in the 'build\src\helics\apps\player\Debug' folder):
 
 ```bash
 > cd C:\Path\To\build\src\helics\player\Debug
@@ -108,11 +115,19 @@ recorder (located in the buildsrchelicsplayerDebug folder):
 Building HELICS with python support
 -----------------------------------
 
+setting `-DBUILD_PYTHON_INTERFACE=ON` will generate a project to build the python interface, if python is installed to a system
+path then the appropriate libraries and flags will be automatically found.  If SWIG is available and you wish to regenerate the interface
+set SWIG\_EXECUTABLE to the location of swig.exe.  Otherwise DISABLE\_SWIG can be set to ON to build using repo sources for the interface.
+
 ```bash
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0" -DBOOST_ROOT="C:\local\boost_1_65_1" -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)\include\python3.6m\ -DPYTHON_LIBRARY=$(python3-config --prefix)\lib\python3.6m\libpython3.6m.dll ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0"  -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" ..
 cmake --build . --config Release --target install
 ```
-
+otherwise they can be set through CMAKE flags
+```bash
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0"  -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)\include\python3.6m\ -DPYTHON_LIBRARY=$(python3-config --prefix)\lib\python3.6m\libpython3.6m.dll ..
+cmake --build . --config Release --target install
+```
 
 Add the following to the Windows PYTHONPATH environment variable or run the following in the command line.
 
@@ -131,7 +146,7 @@ IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
 In [1]: import helics
 
 In [2]: helics.helicsGetVersion()
-Out[2]: '1.0.0-alpha.3 (02-12-18)'
+Out[2]: '1.0.0 (04-15-18)'
 
 ```
 

@@ -17,7 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/zmq/ZmqComms.h"
 #include "helics/core/zmq/ZmqCore.h"
 #include "helics/core/zmq/ZmqRequestSets.h"
-
+#include "helics/common/GuardedTypes.hpp"
 //#include "boost/process.hpp"
 #include <future>
 
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
 BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
 {
     std::atomic<int> counter{0};
-    helics::ActionMessage act;
+    guarded<helics::ActionMessage> act;
     helics::zeromq::ZmqComms comm (host, host);
 
     auto ctx = zmqContextManager::getContextPointer ();
@@ -317,7 +317,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
 
     std::this_thread::sleep_for (std::chrono::milliseconds (250));
     BOOST_REQUIRE_EQUAL (counter, 1);
-    BOOST_CHECK (act.action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act.lock()->action () == helics::action_message_def::action_t::cmd_ack);
     comm.disconnect ();
     repSocket.close ();
     pullSocket.close ();
@@ -328,8 +328,8 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
 {
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
-    helics::ActionMessage act;
-    helics::ActionMessage act2;
+    guarded<helics::ActionMessage> act;
+    guarded<helics::ActionMessage> act2;
 
     helics::zeromq::ZmqComms comm (host, host);
     helics::zeromq::ZmqComms comm2 (host, "");
@@ -349,7 +349,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
         act2 = m;
     });
 
-    // need to launch the connection commands at the same time since they depend on eachother in this case
+    // need to launch the connection commands at the same time since they depend on each other in this case
     auto connected_fut = std::async (std::launch::async, [&comm] { return comm.connect (); });
 
     bool connected = comm2.connect ();
@@ -365,7 +365,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
         std::this_thread::sleep_for (std::chrono::milliseconds (500));
     }
     BOOST_REQUIRE_EQUAL (counter2, 1);
-    BOOST_CHECK (act2.action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
     comm2.disconnect ();
@@ -391,9 +391,9 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     comm.setPortNumber (23407);
     comm3.setPortNumber (23409);
 
-    helics::ActionMessage act;
-    helics::ActionMessage act2;
-    helics::ActionMessage act3;
+    guarded<helics::ActionMessage> act;
+    guarded<helics::ActionMessage> act2;
+    guarded<helics::ActionMessage> act3;
 
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
@@ -422,13 +422,13 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
 
     std::this_thread::sleep_for (std::chrono::milliseconds (250));
     BOOST_REQUIRE_EQUAL (counter2, 1);
-    BOOST_CHECK (act2.action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm3.transmit (0, helics::CMD_ACK);
 
     std::this_thread::sleep_for (std::chrono::milliseconds (250));
     BOOST_REQUIRE_EQUAL (counter2, 2);
-    BOOST_CHECK (act2.action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.addRoute (3, comm3.getAddress ());
 
@@ -440,7 +440,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
         std::this_thread::sleep_for (std::chrono::milliseconds (250));
     }
     BOOST_REQUIRE_EQUAL (counter3, 1);
-    BOOST_CHECK (act3.action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act3.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.addRoute (4, comm.getAddress ());
 
@@ -448,7 +448,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
 
     std::this_thread::sleep_for (std::chrono::milliseconds (250));
     BOOST_REQUIRE_EQUAL (counter, 1);
-    BOOST_CHECK (act.action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
     comm2.disconnect ();
