@@ -108,11 +108,14 @@ recorder (located in the buildsrchelicsplayerDebug folder):
 Building HELICS with python support
 -----------------------------------
 
+![](../img/windows-command-line-install.png)
+
 ```bash
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0" -DBOOST_ROOT="C:\local\boost_1_65_1" -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)\include\python3.6m\ -DPYTHON_LIBRARY=$(python3-config --prefix)\lib\python3.6m\libpython3.6m.dll ..
 cmake --build . --config Release --target install
 ```
 
+![](../img/windows-command-line-success.png)
 
 Add the following to the Windows PYTHONPATH environment variable or run the following in the command line.
 
@@ -134,4 +137,6 @@ In [2]: helics.helicsGetVersion()
 Out[2]: '1.0.0-alpha.3 (02-12-18)'
 
 ```
+
+![](../img/windows-python-success.png)
 
