@@ -38,15 +38,23 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     helics::tcp::TcpServer server (srv->getBaseService (), TCP_BROKER_PORT);
     auto serviceLoop = srv->runServiceLoop ();
     std::vector<char> data (1024);
-    auto dataCheck = [&counter](helics::tcp::TcpRxConnection::pointer, const char *datablock, size_t datasize) {
+    std::atomic<bool> validData{ true };
+
+    auto dataCheck = [&counter,&validData](helics::tcp::TcpRxConnection::pointer, const char *datablock, size_t datasize) {
         size_t used = 0;
         while (datasize - used >= 20)
         {
             ++counter;
-            BOOST_CHECK_GE (datasize, 20);
+            if (datasize < 20)
+            {
+                validData = false;
+            }
             for (int ii = 1; ii < 20; ++ii)
             {
-                BOOST_CHECK_EQUAL (ii + datablock[used + 0], datablock[used + ii]);
+                if (ii + datablock[used + 0] != datablock[used + ii])
+                {
+                    validData = false;
+                }
             }
             used += 20;
         }
@@ -100,6 +108,7 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
         }
     }
     BOOST_CHECK_EQUAL (counter, 200);
+    BOOST_CHECK(validData);
     conn1->close ();
     conn2->close ();
     conn3->close ();
@@ -286,7 +295,7 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     BOOST_REQUIRE (connected);
 
     comm.transmit (0, helics::CMD_ACK);
-
+    BOOST_CHECK(connected);
     std::this_thread::sleep_for (std::chrono::milliseconds (250));
     if (counter2 != 1)
     {
