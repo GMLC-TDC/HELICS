@@ -53,7 +53,11 @@ void TcpRxConnection::handle_read (const boost::system::error_code &error, size_
             data.assign (data.size (), 0);
         }
         receiving = false;
-        start ();
+        if (!disconnected)
+        {
+            start();
+        }
+        
     }
     else if (error == boost::asio::error::operation_aborted)
     {
@@ -84,7 +88,10 @@ void TcpRxConnection::handle_read (const boost::system::error_code &error, size_
             if (errorCall (shared_from_this (), error))
             {
                 receiving = false;
-                start ();
+                if (!disconnected)
+                {
+                    start();
+                }
             }
         }
         else if ((error != boost::asio::error::eof)&& (error != boost::asio::error::connection_reset))
