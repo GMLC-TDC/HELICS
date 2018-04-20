@@ -108,6 +108,8 @@ AsioServiceManager::~AsioServiceManager ()
     //  std::cout << "deleting service manager\n";
     if (running)
     {
+        std::lock_guard<std::mutex> serveLock(
+            serviceLock);
         nullwork.reset ();
         iserv->stop ();
         loopRet.get ();
@@ -172,6 +174,7 @@ void AsioServiceManager::haltServiceLoop ()
         }
         if (runCounter <= 0)
         {
+            std::lock_guard<std::mutex> serveLock(serviceLock);
             //    std::cout << "calling halt on service loop \n";
             if (nullwork)
             {
