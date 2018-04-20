@@ -2862,6 +2862,7 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
         break;
     case UPDATE_FILTER_OPERATOR:
     {
+        std::lock_guard<std::mutex> lock(_handlemutex);
         auto FiltI = filters.find (fed_handle_pair{global_broker_id.load (), cmd.source_handle});
         int ii = cmd.counter;
         auto op = dataAirlocks[ii].try_unload ();

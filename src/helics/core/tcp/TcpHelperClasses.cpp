@@ -110,9 +110,9 @@ void TcpRxConnection::close ()
     disconnected = true;
     boost::system::error_code ec;
     socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_send, ec);
-    if (ec != nullptr)
+    if (ec)
     {
-        std::cerr << "error occurred sending shutdown" << std::endl;
+        std::cerr << "error occurred sending shutdown::" <<ec<< std::endl;
     }
     socket_.close ();
 }
