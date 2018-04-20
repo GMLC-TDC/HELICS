@@ -544,9 +544,9 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
 void Federate::requestTimeAsync (Time nextInternalTimeStep)
 {
     auto asyncInfo = asyncCallInfo->lock();
-    if (state == op_states::execution)
+    auto exp = op_states::execution;
+    if (state.compare_exchange_strong(exp,op_states::pending_time))
     {
-        state = op_states::pending_time;
         asyncInfo->timeRequestFuture = std::async (std::launch::async, [this, nextInternalTimeStep]() {
             return coreObject->timeRequest (fedID, nextInternalTimeStep);
         });
@@ -563,9 +563,9 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
     auto asyncInfo = asyncCallInfo->lock();
-    if (state == op_states::execution)
+    auto exp = op_states::execution;
+    if (state.compare_exchange_strong(exp, op_states::pending_iterative_time))
     {
-        state = op_states::pending_iterative_time;
         asyncInfo->timeRequestIterativeFuture =
           std::async (std::launch::async, [this, nextInternalTimeStep, iterate]() {
               return coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
@@ -583,10 +583,10 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_r
 Time Federate::requestTimeComplete ()
 {
     auto asyncInfo = asyncCallInfo->lock();
-    if (state == op_states::pending_time)
+    auto exp = op_states::pending_time;
+    if (state.compare_exchange_strong(exp, op_states::execution))
     {
         auto newTime = asyncInfo->timeRequestFuture.get ();
-        state = op_states::execution;
         Time oldTime = currentTime;
         currentTime = newTime;
         updateTime (newTime, oldTime);
@@ -604,10 +604,10 @@ Time Federate::requestTimeComplete ()
 iteration_time Federate::requestTimeIterativeComplete ()
 {
     auto asyncInfo = asyncCallInfo->lock();
-    if (state == op_states::pending_iterative_time)
+    auto exp = op_states::pending_iterative_time;
+    if (state.compare_exchange_strong(exp, op_states::execution))
     {
         auto iterativeTime = asyncInfo->timeRequestIterativeFuture.get ();
-        state = op_states::execution;
         Time oldTime = currentTime;
         switch (iterativeTime.state)
         {
