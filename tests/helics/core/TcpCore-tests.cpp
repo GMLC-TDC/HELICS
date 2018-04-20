@@ -305,6 +305,7 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
+    BOOST_CHECK(!comm.isConnected());
     comm2.disconnect ();
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
