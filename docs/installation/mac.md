@@ -175,8 +175,11 @@ Unzip the folder boost\_1\_64\_0 to any location, for example Downloads.
 ```bash
 $ cd ~/Downloads/boost_1_64_0
 $ ./bootstrap.sh --with-python=/Users/$USER/miniconda3/python3 --prefix=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7
+$ ./bootstrap.sh --prefix=/ --prefix=/Users/$USER/local/boost-gcc-1.64
 $ ./b2
-$ ./b2 install --prefix=/Users/$USER/local/boost-gcc-1.64
+$ ./b2 install
+$ # OR
+$ ./bjam cxxflags='-fPIC' cflags='-fPIC' -a link=static install # For static linking
 ```
 
 This will install boost in the \~/local/boost-gcc-1.64 folder
