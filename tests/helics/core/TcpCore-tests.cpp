@@ -21,6 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 //#include "boost/process.hpp"
 #include <future>
+#include <mutex>
 
 BOOST_AUTO_TEST_SUITE (TcpCore_tests)
 
@@ -285,15 +286,15 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
         ++counter2;
         act2 = m;
     });
-
+    std::mutex commprotector;
     // need to launch the connection commands at the same time since they depend on each other in this case
-    auto connected_fut = std::async (std::launch::async, [&comm] { return comm.connect (); });
+    auto connected_fut = std::async(std::launch::async, [&comm, &commprotector] {std::lock_guard<std::mutex> lock(commprotector); return comm.connect(); });
 
     bool connected = comm2.connect ();
     BOOST_REQUIRE (connected);
     connected = connected_fut.get ();
     BOOST_REQUIRE (connected);
-
+    std::lock_guard<std::mutex> lock(commprotector);
     comm.transmit (0, helics::CMD_ACK);
     BOOST_CHECK(connected);
     std::this_thread::sleep_for (std::chrono::milliseconds (250));
