@@ -53,10 +53,10 @@ void TcpRxConnection::handle_read (const boost::system::error_code &error, size_
             data.assign (data.size (), 0);
         }
         receiving = false;
-      //  if (!disconnected)
-      //  {
+        if (!disconnected)
+        {
             start();
-      //  }
+        }
    //     
    // }
    // else if (error == boost::asio::error::operation_aborted)
@@ -227,9 +227,9 @@ void TcpConnection::close ()
 
 void TcpServer::start ()
 {
-    //bool exp = false;
-    //if (accepting.compare_exchange_strong(exp, true))
-    //{
+    bool exp = false;
+    if (accepting.compare_exchange_strong(exp, true))
+    {
         if (!connections.empty())
         {
             for (auto &conn : connections)
@@ -242,7 +242,7 @@ void TcpServer::start ()
             [this, new_connection](const boost::system::error_code &error) {
             handle_accept(new_connection, error);
         });
-    //}
+   }
 }
 
 void TcpServer::handle_accept (TcpRxConnection::pointer new_connection, const boost::system::error_code &error)
@@ -256,26 +256,26 @@ void TcpServer::handle_accept (TcpRxConnection::pointer new_connection, const bo
         // the previous 3 calls have to be made before this call since they could be used immediately
         new_connection->start ();
         connections.push_back (std::move (new_connection));
-        //accepting = false;
+        accepting = false;
         start ();
     }
     else if (error != boost::asio::error::operation_aborted)
     {
-     //   accepting = false;
+        accepting = false;
         std::cerr << " error in accept::" << error.message () << std::endl;
     }
-   // else
-   // {
-    //    accepting = false;
-   // }
+    else
+    {
+        accepting = false;
+    }
 }
 
 void TcpServer::stop ()
 {
-    //if (accepting)
-    //{
+    if (accepting)
+    {
         acceptor_.cancel();
-    //}
+    }
     for (auto &conn : connections)
     {
         conn->stop ();
@@ -284,19 +284,19 @@ void TcpServer::stop ()
 
 void TcpServer::close ()
 {
-    //if (accepting)
-    //{
+    if (accepting)
+    {
         acceptor_.cancel();
-    //}
+    }
     
     for (auto &conn : connections)
     {
         conn->close();
     }
-   // while (accepting)
-   // {
-    //    std::this_thread::yield();
-    //}
+    while (accepting)
+    {
+        std::this_thread::yield();
+    }
     connections.clear ();
 }
 
