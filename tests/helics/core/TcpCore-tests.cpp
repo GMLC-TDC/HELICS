@@ -286,9 +286,9 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
         ++counter2;
         act2 = m;
     });
-    std::mutex commprotector;
+   // std::mutex commprotector;
     // need to launch the connection commands at the same time since they depend on each other in this case
-    auto connected_fut = std::async(std::launch::async, [&comm, &commprotector] {std::lock_guard<std::mutex> lock(commprotector); return comm.connect(); });
+    auto connected_fut = std::async(std::launch::async, [&comm] {/*std::lock_guard<std::mutex> lock(commprotector);*/ return comm.connect(); });
 
     bool connected = comm2.connect ();
     BOOST_REQUIRE (connected);
@@ -307,7 +307,7 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
    
     comm2.disconnect();
     BOOST_CHECK(!comm2.isConnected());
-    std::lock_guard<std::mutex> lock(commprotector);
+    //std::lock_guard<std::mutex> lock(commprotector);
     comm.disconnect ();
     BOOST_CHECK(!comm.isConnected());
     

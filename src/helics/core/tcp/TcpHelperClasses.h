@@ -176,7 +176,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 
 /** helper class for a server*/
 
-class TcpServer : public std::enable_shared_from_this<TcpServer>
+class TcpServer 
 {
   public:
     TcpServer (boost::asio::io_service &io_service, int PortNum, int nominalBufferSize = 10192)
