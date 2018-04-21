@@ -2568,7 +2568,9 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                     return;
                 }
             }
+            std::unique_lock<std::mutex> hlock(_handlemutex);
             auto filter = filters.find (fed_handle_pair (command.source_id, command.source_handle));
+            hlock.unlock();
             if (filter == nullptr)
             {
                 filter = createDestFilter (command.source_id, command.source_handle, command.payload,
@@ -2578,7 +2580,9 @@ void CommonCore::processFilterInfo (ActionMessage &command)
             filterInfo->hasDestFilters = true;
             if (checkActionFlag (command, clone_flag))
             {
+                hlock.lock();
                 filter->cloning = true;
+                hlock.unlock();
                 filterInfo->cloningDestFilters.push_back (filter);
             }
             else
@@ -2603,7 +2607,9 @@ void CommonCore::processFilterInfo (ActionMessage &command)
         }
         if (!FilterAlreadyPresent)
         {
+            std::unique_lock<std::mutex> hlock(_handlemutex);
             auto newFilter = filters.find (fed_handle_pair (command.source_id, command.source_handle));
+            hlock.unlock();
             if (newFilter == nullptr)
             {
                 newFilter =
@@ -2611,10 +2617,11 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                                       command.info ().target, command.info ().type, command.info ().type_out);
                 if (checkActionFlag (command, clone_flag))
                 {
+                    hlock.lock();
                     newFilter->cloning = true;
+                    hlock.unlock();
                 }
             }
-            std::lock_guard<std::mutex> hlock (_handlemutex);
             filterInfo->allSourceFilters.push_back (newFilter);
             filterInfo->hasSourceFilters = true;
         }

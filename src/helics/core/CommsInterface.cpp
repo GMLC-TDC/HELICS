@@ -5,7 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "CommsInterface.hpp"
 #include "NetworkBrokerData.hpp"
-#include <cassert>
+
 namespace helics
 {
 CommsInterface::CommsInterface (const std::string &localTarget, const std::string &brokerTarget)
@@ -128,7 +128,6 @@ bool CommsInterface::connect ()
 void CommsInterface::setName (const std::string &name_) { name = name_; }
 void CommsInterface::disconnect ()
 {
-    assert(this != nullptr);
     if (tripDetector.isTripped ())
     {
         rx_status = connection_status::terminated;
