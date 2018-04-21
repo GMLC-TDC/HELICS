@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     BOOST_REQUIRE (connected);
     connected = connected_fut.get ();
     BOOST_REQUIRE (connected);
-    std::lock_guard<std::mutex> lock(commprotector);
+    
     comm.transmit (0, helics::CMD_ACK);
     BOOST_CHECK(connected);
     std::this_thread::sleep_for (std::chrono::milliseconds (250));
@@ -304,9 +304,10 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     }
     BOOST_REQUIRE_EQUAL (counter2, 1);
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
-
+   
     comm2.disconnect();
     BOOST_CHECK(!comm2.isConnected());
+    std::lock_guard<std::mutex> lock(commprotector);
     comm.disconnect ();
     BOOST_CHECK(!comm.isConnected());
     
