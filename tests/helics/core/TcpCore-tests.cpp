@@ -257,6 +257,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     std::lock_guard<std::mutex> lock (actguard);
     BOOST_CHECK (act.action () == helics::action_message_def::action_t::cmd_ack);
     txconn->close ();
+    server->close();
     comm.disconnect ();
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
