@@ -103,7 +103,7 @@ A quick test is to double check the versions of the HELICS player and
 recorder (located in the 'build\src\helics\apps\player\Debug' folder):
 
 ```bash
-> cd C:\Path\To\build\src\helics\player\Debug
+> cd C:\Path\To\build\src\helics\apps\Debug
 
 > helics_player.exe --version
 0.1

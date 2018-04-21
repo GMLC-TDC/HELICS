@@ -336,20 +336,20 @@ void BrokerBase::queueProcessingLoop ()
         case CMD_IGNORE:
             break;
         case CMD_TERMINATE_IMMEDIATELY:
+            active->store(false);
             ticktimer.cancel ();
             serviceLoop = nullptr;
             mainLoopIsRunning.store (false);
-            active->store (false);
             logDump ();
             return;  // immediate return
         case CMD_STOP:
+            active->store(false);
             ticktimer.cancel ();
             serviceLoop = nullptr;
             if (!haltOperations)
             {
                 processCommand (std::move (command));
                 mainLoopIsRunning.store (false);
-                active->store (false);
                 logDump ();
                 return processDisconnect ();
             }
