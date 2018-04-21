@@ -279,13 +279,13 @@ void TcpServer::stop ()
 void TcpServer::close ()
 {
     acceptor_.cancel ();
+    for (auto &conn : connections)
+    {
+        conn->close();
+    }
     while (accepting)
     {
         std::this_thread::yield();
-    }
-    for (auto &conn : connections)
-    {
-        conn->close ();
     }
     connections.clear ();
 }

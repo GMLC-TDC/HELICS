@@ -270,7 +270,7 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
 
     std::string host = "localhost";
     helics::tcp::TcpComms comm (host, host);
-    helics::tcp::TcpComms comm2 (host, "");
+    helics::tcp::TcpComms comm2 (host, std::string());
 
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setName ("tests");

@@ -287,6 +287,8 @@ SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
 
+SET(CMAKE_BUILD_RPATH "${CMAKE_BINARY_DIR}/libs/bin")
+
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -300,7 +302,9 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 
 if (NOT Boost_USE_STATIC_LIBS)
 list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
+list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
 endif()
+
 
 OPTION(BUILD_PLAYER "Build a helics player" ON)
 OPTION(BUILD_RECORDER "Build a helics recorder" ON)
