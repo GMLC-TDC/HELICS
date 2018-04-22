@@ -179,7 +179,7 @@ script:
   # 5 = extended_api tests
   # 6 = shared_library tests
   # 7 = helics-apps tests
-  - ctest --verbose --timeout 120 -I 0,0,0,1
+  - ctest --verbose --timeout 220 -I 0,0,0,1
   # - ctest --verbose --timeout 120 -I 0,0,0,2
   - ctest --verbose --timeout 240 -I 0,0,0,6
   # - ctest --verbose --timeout 240 -I 0,0,0,7

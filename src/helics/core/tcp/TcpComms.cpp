@@ -266,16 +266,16 @@ void TcpComms::queue_rx_function ()
         return;
     }
     auto ioserv = AsioServiceManager::getServicePointer ();
-    TcpServer server (ioserv->getBaseService (), PortNumber, maxMessageSize_);
+    auto server = helics::tcp::TcpServer::create (ioserv->getBaseService (), PortNumber, maxMessageSize_);
 
     auto serviceLoop = ioserv->runServiceLoop ();
-    server.setDataCall ([this](TcpRxConnection::pointer connection, const char *data, size_t datasize) {
+    server->setDataCall ([this](TcpRxConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     });
-    server.setErrorCall ([this](TcpRxConnection::pointer connection, const boost::system::error_code &error) {
+    server->setErrorCall ([this](TcpRxConnection::pointer connection, const boost::system::error_code &error) {
         return commErrorHandler (connection, error);
     });
-    server.start ();
+    server->start ();
     rx_status = connection_status::connected;
     bool loopRunning = true;
     while (loopRunning)
@@ -294,7 +294,7 @@ void TcpComms::queue_rx_function ()
     }
 
     disconnecting = true;
-    server.close ();
+    server->close ();
     rx_status = connection_status::terminated;
 }
 

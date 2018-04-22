@@ -18,6 +18,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/interprocess/ipc/message_queue.hpp>
 
 #include "helics/core/ipc/IpcQueueHelper.h"
+#include "helics/common/GuardedTypes.hpp"
 
 //#include "boost/process.hpp"
 #include <future>
@@ -52,7 +53,7 @@ BOOST_AUTO_TEST_CASE (ipccomms_broker_test)
 BOOST_AUTO_TEST_CASE (ipccomms_rx_test)
 {
     std::atomic<int> counter{0};
-    helics::ActionMessage act;
+    guarded<helics::ActionMessage> act;
     std::string brokerLoc = "";
     std::string localLoc = "localIPC";
     helics::ipc::IpcComms comm (localLoc, brokerLoc);
@@ -72,7 +73,7 @@ BOOST_AUTO_TEST_CASE (ipccomms_rx_test)
     mq.sendMessage (cmd, 1);
     std::this_thread::sleep_for (std::chrono::milliseconds (250));
     BOOST_REQUIRE_EQUAL (counter, 1);
-    BOOST_CHECK (act.action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act.lock()->action () == helics::action_message_def::action_t::cmd_ack);
     comm.disconnect ();
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
 }
@@ -84,8 +85,8 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_through)
     std::string localLoc = "localIPC";
     // just to make sure these are not already present from a failure
     std::atomic<int> counter2{0};
-    helics::ActionMessage act;
-    helics::ActionMessage act2;
+    guarded<helics::ActionMessage> act;
+    guarded<helics::ActionMessage> act2;
 
     helics::ipc::IpcComms comm (localLoc, brokerLoc);
     helics::ipc::IpcComms comm2 (brokerLoc, "");
@@ -112,7 +113,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_through)
 
     std::this_thread::sleep_for (std::chrono::milliseconds (250));
     BOOST_REQUIRE_EQUAL (counter2, 1);
-    BOOST_CHECK (act2.action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
     comm2.disconnect ();
@@ -132,9 +133,9 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
 
     std::atomic<int> counter2{0};
     std::atomic<int> counter3{0};
-    helics::ActionMessage act;
-    helics::ActionMessage act2;
-    helics::ActionMessage act3;
+    guarded<helics::ActionMessage> act;
+    guarded<helics::ActionMessage> act2;
+    guarded<helics::ActionMessage> act3;
 
     helics::ipc::IpcComms comm (localLoc, brokerLoc);
     helics::ipc::IpcComms comm2 (brokerLoc, "");
@@ -171,7 +172,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
         std::this_thread::sleep_for (std::chrono::milliseconds (350));
     }
     BOOST_REQUIRE_EQUAL (counter2, 1);
-    BOOST_CHECK (act2.action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm3.transmit (0, helics::CMD_ACK);
 
@@ -181,7 +182,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
         std::this_thread::sleep_for (std::chrono::milliseconds (350));
     }
     BOOST_REQUIRE_EQUAL (counter2, 2);
-    BOOST_CHECK (act2.action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.addRoute (3, localLocB);
 
@@ -193,7 +194,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
         std::this_thread::sleep_for (std::chrono::milliseconds (350));
     }
     BOOST_REQUIRE_EQUAL (counter3, 1);
-    BOOST_CHECK (act3.action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act3.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.addRoute (4, localLoc);
 
@@ -205,7 +206,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
         std::this_thread::sleep_for (std::chrono::milliseconds (350));
     }
     BOOST_REQUIRE_EQUAL (counter.load (), 1);
-    BOOST_CHECK (act.action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
     comm2.disconnect ();

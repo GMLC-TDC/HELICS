@@ -34,7 +34,7 @@ class BasicFedInfo
     std::string name;  //!< name of the federate
     Core::federate_id_t global_id = invalid_fed_id;  //!< the identification code for the federate
     int32_t route_id = invalid_fed_id;  //!< the routing information for data to be sent to the federate
-    BasicFedInfo (const std::string &fedname) : name (fedname){};
+    explicit BasicFedInfo (const std::string &fedname) : name (fedname){};
 };
 
 /** class defining the common information about a broker federate*/

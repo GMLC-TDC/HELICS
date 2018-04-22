@@ -437,6 +437,7 @@ BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 3);
+    BOOST_REQUIRE(broker);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter2");
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
@@ -445,6 +446,9 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (cor
     auto fFed2 = GetFederateAs<helics::MessageFederate> (1);
     auto mFed = GetFederateAs<helics::MessageFederate> (2);
 
+    BOOST_REQUIRE(fFed);
+    BOOST_REQUIRE(fFed2);
+    BOOST_REQUIRE(mFed);
     auto p1 = mFed->registerGlobalEndpoint ("port1");
     auto p2 = mFed->registerGlobalEndpoint ("port2");
 

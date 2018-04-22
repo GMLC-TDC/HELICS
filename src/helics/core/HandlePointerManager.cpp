@@ -8,7 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 BasicHandleInfo *HandlePointerManager::addHandle (Core::federate_id_t fed_id,
-                                                  BasicHandleType what,
+                                                  handle_type_t what,
                                                   const std::string &key,
                                                   const std::string &type,
                                                   const std::string &units)
@@ -22,7 +22,7 @@ BasicHandleInfo *HandlePointerManager::addHandle (Core::federate_id_t fed_id,
 }
 
 BasicHandleInfo *HandlePointerManager::addHandle (Core::federate_id_t fed_id,
-                                                  BasicHandleType what,
+                                                  handle_type_t what,
                                                   const std::string &key,
                                                   const std::string &target,
                                                   const std::string &type_in,
@@ -94,23 +94,23 @@ int32_t HandlePointerManager::getLocalFedID (Core::handle_id_t id_) const
 
 void HandlePointerManager::addType (BasicHandleInfo *handle, int32_t index)
 {
-    switch (handle->what)
+    switch (handle->handle_type)
     {
-    case BasicHandleType::HANDLE_END:
+    case handle_type_t::endpoint:
         endpoints.emplace (handle->key, index);
         break;
-    case BasicHandleType::HANDLE_PUB:
+    case handle_type_t::publication:
         publications.emplace (handle->key, index);
         break;
-    case BasicHandleType::HANDLE_CLONE_FILTER:
-    case BasicHandleType::HANDLE_DEST_FILTER:
-    case BasicHandleType::HANDLE_SOURCE_FILTER:
+    case handle_type_t::cloning_filter:
+    case handle_type_t::destination_filter:
+    case handle_type_t::source_filter:
         if (!handle->key.empty ())
         {
             filters.emplace (handle->key, index);
         }
         break;
-    case BasicHandleType::HANDLE_SUB:
+    case handle_type_t::subscription:
         subscriptions.emplace (handle->key, index);
         break;
     default:
@@ -118,19 +118,19 @@ void HandlePointerManager::addType (BasicHandleInfo *handle, int32_t index)
     }
 }
 
-std::string HandlePointerManager::generateName (BasicHandleType what)
+std::string HandlePointerManager::generateName (handle_type_t what)
 {
     switch (what)
     {
-    case BasicHandleType::HANDLE_END:
+    case handle_type_t::endpoint:
         return std::string ("ept_") + std::to_string (handles.size ());
-    case BasicHandleType::HANDLE_PUB:
+    case handle_type_t::publication:
         return std::string ("pub_") + std::to_string (handles.size ());
-    case BasicHandleType::HANDLE_CLONE_FILTER:
+    case handle_type_t::cloning_filter:
         return std::string ("cFilter_") + std::to_string (handles.size ());
-    case BasicHandleType::HANDLE_DEST_FILTER:
+    case handle_type_t::destination_filter:
         return std::string ("dFilter_") + std::to_string (handles.size ());
-    case BasicHandleType::HANDLE_SOURCE_FILTER:
+    case handle_type_t::source_filter:
         return std::string ("sFilter_") + std::to_string (handles.size ());
     default:
         return std::string ("handle_") + std::to_string (handles.size ());

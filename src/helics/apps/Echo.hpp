@@ -78,7 +78,6 @@ class Echo:public App
   private:
     std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
     Time delayTime = timeZero;  //!< respond to each message with the specified delay
-    Time stopTime = Time::maxVal ();  //!< the time the Player should stop
     size_t echoCounter = 0;  //!< the current message index
     std::mutex delayTimeLock; //mutex protecting delayTime
 };

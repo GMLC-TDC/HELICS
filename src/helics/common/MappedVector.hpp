@@ -33,13 +33,10 @@ class MappedVector
         {
             return stx::nullopt;
         }
-        else
-        {
-            auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::forward<Us> (data)...);
-            lookup.emplace (searchValue, index);
-            return index;
-        }
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::forward<Us> (data)...);
+        lookup.emplace (searchValue, index);
+        return index;
     }
 
     /** insert an element into the mapped vector
@@ -55,13 +52,10 @@ class MappedVector
             dataStorage[fnd->second] = VType (std::forward<Us> (data)...);
             return fnd->second;
         }
-        else
-        {
-            auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::forward<Us> (data)...);
-            lookup.emplace (searchValue, index);
-            return index;
-        }
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::forward<Us> (data)...);
+        lookup.emplace (searchValue, index);
+        return index;
     }
 
     auto find (const searchType &searchValue)
@@ -71,10 +65,7 @@ class MappedVector
         {
             return dataStorage.begin () + fnd->second;
         }
-        else
-        {
-            return dataStorage.end ();
-        }
+        return dataStorage.end ();
     }
 
     auto find (const searchType &searchValue) const
@@ -84,10 +75,7 @@ class MappedVector
         {
             return dataStorage.begin () + fnd->second;
         }
-        else
-        {
-            return dataStorage.end ();
-        }
+        return dataStorage.end ();
     }
 
     VType &operator[] (size_t index) { return dataStorage[index]; }

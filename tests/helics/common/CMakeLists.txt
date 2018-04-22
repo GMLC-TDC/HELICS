@@ -38,7 +38,7 @@ target_link_libraries(common-tests ${Boost_LIBRARIES_test})
 
 
 
-add_test(NAME common-tests COMMAND common-tests --log_level=warning --report_level=short)
+add_test(NAME common-tests COMMAND common-tests --log_level=message --report_level=short)
 set_target_properties (common-tests PROPERTIES FOLDER tests)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)

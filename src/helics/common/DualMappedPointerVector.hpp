@@ -36,14 +36,11 @@ class DualMappedPointerVector
         {
             return stx::nullopt;
         }
-        else
-        {
             auto index = dataStorage.size ();
             dataStorage.emplace_back (std::move (ptr));
             lookup1.emplace (searchValue1, index);
             lookup2.emplace (searchValue2, index);
             return index;
-        }
     }
     /** insert a new element into the vector*/
     template <typename... Us>
@@ -54,14 +51,11 @@ class DualMappedPointerVector
         {
             return stx::nullopt;
         }
-        else
-        {
             auto index = dataStorage.size ();
             dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
             lookup1.emplace (searchValue1, index);
             lookup2.emplace (searchValue2, index);
             return index;
-        }
     }
 
     /** insert a new element into the vector*/
@@ -73,13 +67,10 @@ class DualMappedPointerVector
         {
             return stx::nullopt;
         }
-        else
-        {
             auto index = dataStorage.size ();
             dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
             lookup1.emplace (searchValue1, index);
             return index;
-        }
     }
 
     /** insert a new element into the vector*/
@@ -91,13 +82,10 @@ class DualMappedPointerVector
         {
             return stx::nullopt;
         }
-        else
-        {
             auto index = dataStorage.size ();
             dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
             lookup2.emplace (searchValue2, index);
             return index;
-        }
     }
 
     /** insert a new element into the vector directly from an existing unique ptr*/
@@ -112,14 +100,11 @@ class DualMappedPointerVector
             lookup2[searchValue2] = fnd->second;
             return fnd->second;
         }
-        else
-        {
             auto index = dataStorage.size ();
             dataStorage.emplace_back (std::move (ptr));
             lookup1.emplace (searchValue1, index);
             lookup2.emplace (searchValue2, index);
             return index;
-        }
     }
     /** insert a new element into the vector*/
     template <typename... Us>
@@ -132,14 +117,11 @@ class DualMappedPointerVector
             lookup2[searchValue2] = fnd->second;
             return fnd->second;
         }
-        else
-        {
             auto index = dataStorage.size ();
             dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
             lookup1.emplace (searchValue1, index);
             lookup2.emplace (searchValue2, index);
             return index;
-        }
     }
 
     /** insert a new element into the vector*/
@@ -152,13 +134,10 @@ class DualMappedPointerVector
             dataStorage[fnd->second] = std::make_unique<VType> (std::forward<Us> (data)...);
             return fnd->second;
         }
-        else
-        {
             auto index = dataStorage.size ();
             dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
             lookup1.emplace (searchValue1, index);
             return index;
-        }
     }
 
     /** insert a new element into the vector*/
@@ -171,13 +150,10 @@ class DualMappedPointerVector
             dataStorage[fnd->second] = std::make_unique<VType> (std::forward<Us> (data)...);
             return fnd->second;
         }
-        else
-        {
             auto index = dataStorage.size ();
             dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
             lookup2.emplace (searchValue2, index);
             return index;
-        }
     }
 
     /** find an element based on the search value
