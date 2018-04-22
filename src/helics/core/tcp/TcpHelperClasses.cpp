@@ -44,7 +44,7 @@ void TcpRxConnection::setDataCall(std::function<size_t(TcpRxConnection::pointer,
     }
     else
     {
-        throw(std::exception("cannot set data callback after socket is started"));
+        throw(std::runtime_error("cannot set data callback after socket is started"));
     }
 }
 void TcpRxConnection::setErrorCall(std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &)> errorFunc)
@@ -55,9 +55,8 @@ void TcpRxConnection::setErrorCall(std::function<bool(TcpRxConnection::pointer, 
     }
     else
     {
-        throw(std::exception("cannot set error callback after socket is started"));
+        throw(std::runtime_error("cannot set error callback after socket is started"));
     }
-   
 }
 
 void TcpRxConnection::handle_read (const boost::system::error_code &error, size_t bytes_transferred)
