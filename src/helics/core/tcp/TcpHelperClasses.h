@@ -10,6 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <string>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include "../../common/GuardedTypes.hpp"
 
 namespace helics
 {
@@ -212,7 +213,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     size_t bufferSize;
     std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
     std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &error)> errorCall;
-    std::vector<std::shared_ptr<TcpRxConnection>> connections;
+    guarded<std::vector<std::shared_ptr<TcpRxConnection>>> connections;
 };
 
 }  // namespace tcp

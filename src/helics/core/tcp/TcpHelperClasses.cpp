@@ -233,18 +233,20 @@ void TcpServer::start ()
     bool exp = false;
     if (accepting.compare_exchange_strong (exp, true))
     {
-        if (!connections.empty ())
+        auto connects = connections.lock();
+        if (!connects->empty ())
         {
-            for (auto &conn : connections)
+            for (auto &conn :*connects)
             {
                 conn->start ();
             }
         }
         TcpRxConnection::pointer new_connection =
           TcpRxConnection::create (acceptor_.get_io_service (), bufferSize);
-        acceptor_.async_accept (new_connection->socket (), [server = shared_from_this (), new_connection](
+        auto &socket = new_connection->socket();
+        acceptor_.async_accept (socket, [server = shared_from_this (), connection=std::move(new_connection)](
                                                              const boost::system::error_code &error) {
-            server->handle_accept (new_connection, error);
+            server->handle_accept (connection, error);
         });
     }
 }
@@ -255,17 +257,20 @@ void TcpServer::handle_accept (TcpRxConnection::pointer new_connection, const bo
     {
         new_connection->setDataCall (dataCall);
         new_connection->setErrorCall (errorCall);
-        new_connection->index = static_cast<int> (connections.size ());
-        // the previous 3 calls have to be made before this call since they could be used immediately
-        new_connection->start ();
-        connections.push_back (std::move (new_connection));
+        {  //scope for the connection lock
+            auto connects = connections.lock();
+            new_connection->index = static_cast<int> (connects->size());
+            // the previous 3 calls have to be made before this call since they could be used immediately
+            new_connection->start();
+            connects->push_back(std::move(new_connection));
+        }
         accepting = false;
         start ();
     }
     else if (error != boost::asio::error::operation_aborted)
     {
+        std::cerr << " error in accept::" << error.message() << std::endl;
         accepting = false;
-        std::cerr << " error in accept::" << error.message () << std::endl;
     }
     else
     {
@@ -279,7 +284,8 @@ void TcpServer::stop ()
     {
         acceptor_.cancel ();
     }
-    for (auto &conn : connections)
+    auto connects = connections.lock();
+    for (auto &conn : *connects)
     {
         conn->stop ();
     }
@@ -291,8 +297,8 @@ void TcpServer::close ()
     {
         acceptor_.cancel ();
     }
-
-    for (auto &conn : connections)
+    auto connects = connections.lock();
+    for (auto &conn : *connects)
     {
         conn->close ();
     }
@@ -300,7 +306,7 @@ void TcpServer::close ()
     {
         std::this_thread::yield ();
     }
-    connections.clear ();
+    connects->clear ();
 }
 
 }  // namespace tcp
