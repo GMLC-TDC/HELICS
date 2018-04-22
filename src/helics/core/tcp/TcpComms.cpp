@@ -266,7 +266,7 @@ void TcpComms::queue_rx_function ()
         return;
     }
     auto ioserv = AsioServiceManager::getServicePointer ();
-    auto server = helics::tcp::TcpServer::create(ioserv->getBaseService (), PortNumber, maxMessageSize_);
+    auto server = helics::tcp::TcpServer::create (ioserv->getBaseService (), PortNumber, maxMessageSize_);
 
     auto serviceLoop = ioserv->runServiceLoop ();
     server->setDataCall ([this](TcpRxConnection::pointer connection, const char *data, size_t datasize) {

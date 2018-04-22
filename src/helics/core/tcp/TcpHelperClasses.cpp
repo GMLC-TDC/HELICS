@@ -30,7 +30,6 @@ void TcpRxConnection::start ()
 
 void TcpRxConnection::handle_read (const boost::system::error_code &error, size_t bytes_transferred)
 {
-    
     if (disconnected)
     {
         receiving = false;
@@ -55,15 +54,14 @@ void TcpRxConnection::handle_read (const boost::system::error_code &error, size_
         receiving = false;
         if (!disconnected)
         {
-            start();
+            start ();
         }
-        
     }
     else if (error == boost::asio::error::operation_aborted)
     {
         receiving = false;
         return;
-   }
+    }
     else
     {
         if (bytes_transferred > 0)
@@ -86,12 +84,12 @@ void TcpRxConnection::handle_read (const boost::system::error_code &error, size_
         receiving = false;
         if (errorCall)
         {
-            if (errorCall(shared_from_this(), error))
+            if (errorCall (shared_from_this (), error))
             {
                 receiving = false;
                 if (!disconnected)
                 {
-                    start();
+                    start ();
                 }
             }
         }
@@ -99,7 +97,7 @@ void TcpRxConnection::handle_read (const boost::system::error_code &error, size_
         {
             if (error != boost::asio::error::connection_reset)
             {
-            std::cerr << "receive error " << error.message () << std::endl;
+                std::cerr << "receive error " << error.message () << std::endl;
             }
         }
     }
@@ -127,12 +125,12 @@ void TcpRxConnection::close ()
     socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_send, ec);
     if (ec)
     {
-        std::cerr << "error occurred sending shutdown::" <<ec<< std::endl;
+        std::cerr << "error occurred sending shutdown::" << ec << std::endl;
     }
     socket_.close ();
     while (receiving)
     {
-        std::this_thread::yield();
+        std::this_thread::yield ();
     }
 }
 
@@ -225,35 +223,34 @@ void TcpConnection::close ()
     socket_.close ();
 }
 
-
-TcpServer::pointer TcpServer::create(boost::asio::io_service &io_service, int PortNum, int nominalBufferSize)
+TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service, int PortNum, int nominalBufferSize)
 {
-    return pointer(new TcpServer(io_service, PortNum, nominalBufferSize));
+    return pointer (new TcpServer (io_service, PortNum, nominalBufferSize));
 }
 
 void TcpServer::start ()
 {
     bool exp = false;
-    if (accepting.compare_exchange_strong(exp, true))
+    if (accepting.compare_exchange_strong (exp, true))
     {
-        if (!connections.empty())
+        if (!connections.empty ())
         {
             for (auto &conn : connections)
             {
-                conn->start();
+                conn->start ();
             }
         }
-        TcpRxConnection::pointer new_connection = TcpRxConnection::create(acceptor_.get_io_service(), bufferSize);
-        acceptor_.async_accept(new_connection->socket(),
-            [server = shared_from_this(), new_connection](const boost::system::error_code &error) {
-            server->handle_accept(new_connection, error);
+        TcpRxConnection::pointer new_connection =
+          TcpRxConnection::create (acceptor_.get_io_service (), bufferSize);
+        acceptor_.async_accept (new_connection->socket (), [server = shared_from_this (), new_connection](
+                                                             const boost::system::error_code &error) {
+            server->handle_accept (new_connection, error);
         });
     }
 }
 
 void TcpServer::handle_accept (TcpRxConnection::pointer new_connection, const boost::system::error_code &error)
 {
-    
     if (!error)
     {
         new_connection->setDataCall (dataCall);
@@ -271,17 +268,17 @@ void TcpServer::handle_accept (TcpRxConnection::pointer new_connection, const bo
         std::cerr << " error in accept::" << error.message () << std::endl;
     }
     else
-   {
+    {
         accepting = false;
-   }
+    }
 }
 
 void TcpServer::stop ()
 {
     if (accepting)
     {
-        acceptor_.cancel();
-   }
+        acceptor_.cancel ();
+    }
     for (auto &conn : connections)
     {
         conn->stop ();
@@ -292,16 +289,16 @@ void TcpServer::close ()
 {
     if (accepting)
     {
-        acceptor_.cancel();
+        acceptor_.cancel ();
     }
-    
+
     for (auto &conn : connections)
     {
-        conn->close();
+        conn->close ();
     }
     while (accepting)
     {
-        std::this_thread::yield();
+        std::this_thread::yield ();
     }
     connections.clear ();
 }
