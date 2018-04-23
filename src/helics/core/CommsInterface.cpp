@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -148,7 +147,7 @@ void CommsInterface::disconnect ()
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
         ++cnt;
-        if ((cnt & 31) == 0)  // call this every 32*50 seconds
+        if ((cnt & 31) == 0)  // call this every 32*50 milliseconds
         {
             // try calling closeReceiver again
             closeReceiver ();
@@ -173,7 +172,7 @@ void CommsInterface::disconnect ()
         ++cnt;
         if ((cnt & 31) == 0)
         {
-            // try calling closeReceiver again
+            // try calling closeTransmitter again
             closeTransmitter ();
         }
         if (cnt == 400)

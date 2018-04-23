@@ -18,6 +18,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <mutex>
 #include <stdexcept>
 
+namespace libguarded
+{
+    template<class T, class M>
+    class shared_guarded;
+}
+
 /**
  * HELICS Application API
  */
@@ -25,6 +31,9 @@ namespace helics
 {
 class Core;
 class AsyncFedCallInfo;
+
+
+
 class MessageOperator;
 class Filter;
 /** data class defining federate properties and information
@@ -101,8 +110,7 @@ class Federate
     Time currentTime;  //!< the current simulation time
     FederateInfo FedInfo;  //!< the information structure that contains the data on the federate
   private:
-    mutable std::mutex asyncLock;  //!< mutex protecting asyncCallInfo
-    std::unique_ptr<AsyncFedCallInfo> asyncCallInfo;  //!< pointer to a class defining the async call information
+    std::unique_ptr<libguarded::shared_guarded<AsyncFedCallInfo,std::mutex>> asyncCallInfo;  //!< pointer to a class defining the async call information
     std::vector<std::shared_ptr<Filter>>
       localFilters;  //!< vector of filters created through the register interfaces function
   public:

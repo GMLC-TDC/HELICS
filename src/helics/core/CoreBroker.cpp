@@ -101,7 +101,7 @@ void CoreBroker::generateQueryResult (const ActionMessage &command)
         repStr.push_back ('[');
         for (const auto &handle : handles)
         {
-            if (handle.what == HANDLE_PUB)
+            if (handle.handle_type == handle_type_t::publication)
             {
                 repStr.append (handle.key);
                 repStr.push_back (';');
@@ -113,7 +113,7 @@ void CoreBroker::generateQueryResult (const ActionMessage &command)
         repStr.push_back ('[');
         for (const auto &handle : handles)
         {
-            if (handle.what == HANDLE_END)
+            if (handle.handle_type == handle_type_t::endpoint)
             {
                 repStr.append (handle.key);
                 repStr.push_back (';');
@@ -168,7 +168,7 @@ int32_t CoreBroker::fillMessageRouteInformation (ActionMessage &mess)
     if (handle != nullptr)
     {
         mess.dest_id = handle->fed_id;
-        mess.dest_handle = handle->id;
+        mess.dest_handle = handle->handle;
         return getRoute (handle->fed_id);
     }
     auto fnd2 = knownExternalEndpoints.find (endpointName);
@@ -766,7 +766,7 @@ void CoreBroker::addLocalInfo (BasicHandleInfo &handleInfo, const ActionMessage 
 void CoreBroker::addPublication (ActionMessage &m)
 {
     auto &pub =
-      handles.addHandle (m.source_id, m.source_handle, HANDLE_PUB, m.name, m.info ().type, m.info ().units);
+      handles.addHandle (m.source_id, m.source_handle, handle_type_t::publication, m.name, m.info ().type, m.info ().units);
 
     addLocalInfo (pub, m);
     if (!_isRoot)
@@ -781,7 +781,7 @@ void CoreBroker::addPublication (ActionMessage &m)
 void CoreBroker::addSubscription (ActionMessage &m)
 {
     auto &sub =
-      handles.addHandle (m.source_id, m.source_handle, HANDLE_SUB, m.name, m.info ().type, m.info ().units);
+      handles.addHandle (m.source_id, m.source_handle, handle_type_t::subscription, m.name, m.info ().type, m.info ().units);
 
     addLocalInfo (sub, m);
     sub.processed = checkActionFlag (m, processing_complete_flag);
@@ -804,7 +804,7 @@ void CoreBroker::addSubscription (ActionMessage &m)
 void CoreBroker::addEndpoint (ActionMessage &m)
 {
     auto &ept =
-      handles.addHandle (m.source_id, m.source_handle, HANDLE_END, m.name, m.info ().type, m.info ().units);
+      handles.addHandle (m.source_id, m.source_handle, handle_type_t::endpoint, m.name, m.info ().type, m.info ().units);
 
     addLocalInfo (ept, m);
 
@@ -831,7 +831,7 @@ void CoreBroker::addEndpoint (ActionMessage &m)
 }
 void CoreBroker::addSourceFilter (ActionMessage &m)
 {
-    auto &filt = handles.addHandle (m.source_id, m.source_handle, HANDLE_SOURCE_FILTER, m.name, m.info ().target,
+    auto &filt = handles.addHandle (m.source_id, m.source_handle, handle_type_t::source_filter, m.name, m.info ().target,
                                     m.info ().type, m.info ().type_out);
     addLocalInfo (filt, m);
     if (checkActionFlag (m, clone_flag))
@@ -870,7 +870,7 @@ bool CoreBroker::updateSourceFilterOperator (ActionMessage &m)
         if (endHandle != nullptr)
         {
             m.dest_id = endHandle->fed_id;
-            m.dest_handle = endHandle->id;
+            m.dest_handle = endHandle->handle;
 
             transmit (getRoute (m.dest_id), m);
             return true;
@@ -881,7 +881,7 @@ bool CoreBroker::updateSourceFilterOperator (ActionMessage &m)
 
 void CoreBroker::addDestFilter (ActionMessage &m)
 {
-    auto &filt = handles.addHandle (m.source_id, m.source_handle, HANDLE_DEST_FILTER, m.name, m.info ().target,
+    auto &filt = handles.addHandle (m.source_id, m.source_handle, handle_type_t::destination_filter, m.name, m.info ().target,
                                     m.info ().type, m.info ().type_out);
     addLocalInfo (filt, m);
     if (checkActionFlag (m, clone_flag))
@@ -1097,18 +1097,18 @@ bool CoreBroker::FindandNotifySubscriptionPublisher (BasicHandleInfo &handleInfo
             // notify the subscription about its publisher
             ActionMessage m (CMD_NOTIFY_PUB);
             m.source_id = pubHandle->fed_id;
-            m.source_handle = pubHandle->id;
+            m.source_handle = pubHandle->handle;
             m.dest_id = handleInfo.fed_id;
-            m.dest_handle = handleInfo.id;
+            m.dest_handle = handleInfo.handle;
             m.payload = pubHandle->type;
             transmit (getRoute (m.dest_id), m);
 
             // notify the publisher about its subscription
             m.setAction (CMD_NOTIFY_SUB);
             m.source_id = handleInfo.fed_id;
-            m.source_handle = handleInfo.id;
+            m.source_handle = handleInfo.handle;
             m.dest_id = pubHandle->fed_id;
-            m.dest_handle = pubHandle->id;
+            m.dest_handle = pubHandle->handle;
 
             transmit (getRoute (m.dest_id), m);
 
@@ -1136,18 +1136,18 @@ void CoreBroker::FindandNotifyPublicationSubscribers (BasicHandleInfo &handleInf
         // notify the publication about its subscriber
         ActionMessage m (CMD_NOTIFY_SUB);
         m.source_id = subInfo.fed_id;
-        m.source_handle = subInfo.id;
+        m.source_handle = subInfo.handle;
         m.dest_id = handleInfo.fed_id;
-        m.dest_handle = handleInfo.id;
+        m.dest_handle = handleInfo.handle;
 
         transmit (getRoute (m.dest_id), m);
 
         // notify the subscriber about its publisher
         m.setAction (CMD_NOTIFY_PUB);
         m.source_id = handleInfo.fed_id;
-        m.source_handle = handleInfo.id;
+        m.source_handle = handleInfo.handle;
         m.dest_id = subInfo.fed_id;
-        m.dest_handle = subInfo.id;
+        m.dest_handle = subInfo.handle;
         m.payload = handleInfo.type;
         transmit (getRoute (m.dest_id), m);
         subInfo.processed = true;
@@ -1169,23 +1169,23 @@ bool CoreBroker::FindandNotifyFilterEndpoint (BasicHandleInfo &handleInfo)
             // notify the filter about its endpoint
             ActionMessage m (CMD_NOTIFY_END);
             m.source_id = endHandle->fed_id;
-            m.source_handle = endHandle->id;
+            m.source_handle = endHandle->handle;
             m.dest_id = handleInfo.fed_id;
-            m.dest_handle = handleInfo.id;
+            m.dest_handle = handleInfo.handle;
 
             transmit (getRoute (m.dest_id), m);
 
             // notify the endpoint about its filter
-            m.setAction ((handleInfo.what == HANDLE_SOURCE_FILTER) ? CMD_NOTIFY_SRC_FILTER :
+            m.setAction ((handleInfo.handle_type == handle_type_t::source_filter) ? CMD_NOTIFY_SRC_FILTER :
                                                                      CMD_NOTIFY_DST_FILTER);
             m.source_id = handleInfo.fed_id;
-            m.source_handle = handleInfo.id;
+            m.source_handle = handleInfo.handle;
             if (handleInfo.cloning)
             {
                 setActionFlag (m, clone_flag);
             }
             m.dest_id = endHandle->fed_id;
-            m.dest_handle = endHandle->id;
+            m.dest_handle = endHandle->handle;
             transmit (getRoute (m.dest_id), m);
 
             handleInfo.processed = true;
@@ -1210,12 +1210,12 @@ void CoreBroker::FindandNotifyEndpointFilters (BasicHandleInfo &handleInfo)
             // pubInfo->type << ENDL;
         }
         // notify the endpoint about a filter
-        ActionMessage m ((handleInfo.what == HANDLE_SOURCE_FILTER) ? CMD_NOTIFY_SRC_FILTER :
+        ActionMessage m ((handleInfo.handle_type == handle_type_t::source_filter) ? CMD_NOTIFY_SRC_FILTER :
                                                                      CMD_NOTIFY_DST_FILTER);
         m.source_id = filtInfo.fed_id;
-        m.source_handle = filtInfo.id;
+        m.source_handle = filtInfo.handle;
         m.dest_id = handleInfo.fed_id;
-        m.dest_handle = handleInfo.id;
+        m.dest_handle = handleInfo.handle;
         if (handleInfo.flag)
         {
             setActionFlag (m, indicator_flag);
@@ -1225,9 +1225,9 @@ void CoreBroker::FindandNotifyEndpointFilters (BasicHandleInfo &handleInfo)
         // notify the publisher about its subscription
         m.setAction (CMD_NOTIFY_END);
         m.source_id = handleInfo.fed_id;
-        m.source_handle = handleInfo.id;
+        m.source_handle = handleInfo.handle;
         m.dest_id = filtInfo.fed_id;
-        m.dest_handle = filtInfo.id;
+        m.dest_handle = filtInfo.handle;
 
         transmit (getRoute (m.dest_id), m);
         filtInfo.processed = true;
@@ -1240,7 +1240,7 @@ void CoreBroker::checkSubscriptions ()
     // LOG(INFO) << "performing pub/sub check" << ENDL;
     for (auto &hndl : handles)
     {
-        if (hndl.what == HANDLE_SUB)
+        if (hndl.handle_type == handle_type_t::subscription)
         {
             if (!hndl.processed)
             {
@@ -1434,7 +1434,7 @@ void CoreBroker::checkFilters ()
     // LOG(INFO) << "performing filter check" << ENDL;
     for (auto &hndl : handles)
     {
-        if ((hndl.what == HANDLE_DEST_FILTER) || (hndl.what == HANDLE_SOURCE_FILTER))
+        if ((hndl.handle_type == handle_type_t::destination_filter) || (hndl.handle_type == handle_type_t::source_filter))
         {
             auto fnd = FindandNotifyFilterEndpoint (hndl);
             if (!fnd)

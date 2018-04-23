@@ -253,6 +253,7 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
 }
 
 using activeProtector = std::shared_ptr<libguarded::guarded<bool>>;
+
 void timerTickHandler (BrokerBase *bbase, activeProtector active, const boost::system::error_code &error)
 {
     auto p = active->lock ();
@@ -317,16 +318,15 @@ void BrokerBase::queueProcessingLoop ()
         switch (command.action ())
         {
         case CMD_TICK:
-
+            if (checkActionFlag(command, error_flag))
+            {
+                serviceLoop = nullptr;
+                serviceLoop = AsioServiceManager::runServiceLoop();
+            }
             if (messagesSinceLastTick == 0)
             {
                 //   std::cout << "sending tick " << std::endl;
                 processCommand (std::move (command));
-            }
-            if (checkActionFlag (command, error_flag))
-            {
-                serviceLoop = nullptr;
-                serviceLoop = AsioServiceManager::runServiceLoop ();
             }
             messagesSinceLastTick = 0;
             // reschedule the timer
@@ -336,20 +336,20 @@ void BrokerBase::queueProcessingLoop ()
         case CMD_IGNORE:
             break;
         case CMD_TERMINATE_IMMEDIATELY:
+            active->store(false);
             ticktimer.cancel ();
             serviceLoop = nullptr;
             mainLoopIsRunning.store (false);
-            active->store (false);
             logDump ();
             return;  // immediate return
         case CMD_STOP:
+            active->store(false);
             ticktimer.cancel ();
             serviceLoop = nullptr;
             if (!haltOperations)
             {
                 processCommand (std::move (command));
                 mainLoopIsRunning.store (false);
-                active->store (false);
                 logDump ();
                 return processDisconnect ();
             }

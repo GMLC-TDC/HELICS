@@ -17,10 +17,10 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
 {
     // All default values
     helics::BasicHandleInfo defHnd;
-    BOOST_CHECK_EQUAL (defHnd.id, helics::invalid_handle);
+    BOOST_CHECK_EQUAL (defHnd.handle, helics::invalid_handle);
     BOOST_CHECK_EQUAL (defHnd.fed_id, helics::invalid_fed_id);
     BOOST_CHECK_EQUAL (defHnd.local_fed_id, helics::invalid_fed_id);
-    BOOST_CHECK_EQUAL (defHnd.what, helics::HANDLE_UNKNOWN);
+    BOOST_CHECK (defHnd.handle_type==helics::handle_type_t::unknown);
     BOOST_CHECK_EQUAL (defHnd.flag, false);
     BOOST_CHECK_EQUAL (defHnd.hasDestFilter, false);
     BOOST_CHECK (defHnd.key.empty ());
@@ -29,58 +29,58 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     BOOST_CHECK (defHnd.target.empty ());
 
     // Constructor with last parameter default value
-    helics::BasicHandleInfo hnd1 (10, 15, helics::HANDLE_END, "key", "type", "units");
-    BOOST_CHECK_EQUAL (hnd1.id, 10);
+    helics::BasicHandleInfo hnd1 (10, 15, helics::handle_type_t::endpoint, "key", "type", "units");
+    BOOST_CHECK_EQUAL (hnd1.handle, 10);
     BOOST_CHECK_EQUAL (hnd1.fed_id, 15);
     BOOST_CHECK_EQUAL (hnd1.local_fed_id, helics::invalid_fed_id);
-    BOOST_CHECK_EQUAL (hnd1.what, helics::HANDLE_END);
+    BOOST_CHECK(hnd1.handle_type==helics::handle_type_t::endpoint);
     BOOST_CHECK_EQUAL (hnd1.flag, false);
     BOOST_CHECK_EQUAL (hnd1.hasDestFilter, false);
-    BOOST_CHECK (hnd1.key.compare ("key") == 0);
-    BOOST_CHECK (hnd1.type.compare ("type") == 0);
-    BOOST_CHECK (hnd1.units.compare ("units") == 0);
+    BOOST_CHECK_EQUAL(hnd1.key,"key");
+    BOOST_CHECK_EQUAL(hnd1.type,"type");
+    BOOST_CHECK_EQUAL(hnd1.units,"units");
     BOOST_CHECK (hnd1.target.empty ());
 
     // Constructor overriding last parameter default value
-    helics::BasicHandleInfo hnd2 (100, 1500, helics::HANDLE_END, "key", "type", "units");
-    BOOST_CHECK_EQUAL (hnd2.id, 100);
+    helics::BasicHandleInfo hnd2 (100, 1500, helics::handle_type_t::endpoint, "key", "type", "units");
+    BOOST_CHECK_EQUAL (hnd2.handle, 100);
     BOOST_CHECK_EQUAL (hnd2.fed_id, 1500);
     BOOST_CHECK_EQUAL (hnd2.local_fed_id, helics::invalid_fed_id);
-    BOOST_CHECK_EQUAL (hnd2.what, helics::HANDLE_END);
+    BOOST_CHECK (hnd2.handle_type==helics::handle_type_t::endpoint);
     BOOST_CHECK_EQUAL (hnd2.hasDestFilter, false);
-    BOOST_CHECK (hnd2.key.compare ("key") == 0);
-    BOOST_CHECK (hnd2.type.compare ("type") == 0);
-    BOOST_CHECK (hnd2.units.compare ("units") == 0);
-    BOOST_CHECK (hnd2.target.empty ());
+    BOOST_CHECK_EQUAL(hnd2.key,"key");
+    BOOST_CHECK_EQUAL(hnd2.type,"type");
+    BOOST_CHECK_EQUAL(hnd2.units,"units");
+    BOOST_CHECK(hnd2.target.empty ());
 
     // Test handles created with HANDLE_FILTER
 
     // Source filter handle
     // destFilter should be false, and target should be equal to what was passed in for units
-    helics::BasicHandleInfo srcFiltHnd (1, 2, helics::HANDLE_SOURCE_FILTER, "key", "target", "type_in",
+    helics::BasicHandleInfo srcFiltHnd (1, 2, helics::handle_type_t::source_filter, "key", "target", "type_in",
                                         "type_out");
-    BOOST_CHECK_EQUAL (srcFiltHnd.id, 1);
+    BOOST_CHECK_EQUAL (srcFiltHnd.handle, 1);
     BOOST_CHECK_EQUAL (srcFiltHnd.fed_id, 2);
     BOOST_CHECK_EQUAL (srcFiltHnd.local_fed_id, helics::invalid_fed_id);
-    BOOST_CHECK_EQUAL (srcFiltHnd.what, helics::HANDLE_SOURCE_FILTER);
+    BOOST_CHECK(srcFiltHnd.handle_type==helics::handle_type_t::source_filter);
     BOOST_CHECK_EQUAL (srcFiltHnd.flag, false);
     BOOST_CHECK_EQUAL (srcFiltHnd.hasDestFilter, false);
-    BOOST_CHECK (srcFiltHnd.key.compare ("key") == 0);
-    BOOST_CHECK (srcFiltHnd.type_in.compare ("type_in") == 0);
-    BOOST_CHECK (srcFiltHnd.type_out.compare ("type_out") == 0);
-    BOOST_CHECK (srcFiltHnd.target.compare ("target") == 0);
+    BOOST_CHECK_EQUAL(srcFiltHnd.key,"key");
+    BOOST_CHECK_EQUAL(srcFiltHnd.type_in,"type_in");
+    BOOST_CHECK_EQUAL(srcFiltHnd.type_out,"type_out");
+    BOOST_CHECK_EQUAL(srcFiltHnd.target,"target");
 
     // Destination filter handle
     // destFilter should be true, and target should be equal to what was passed in for units
-    helics::BasicHandleInfo dstFiltHnd (7, 3, helics::HANDLE_DEST_FILTER, "key", "target", "type_in", "type_out");
-    BOOST_CHECK_EQUAL (dstFiltHnd.id, 7);
+    helics::BasicHandleInfo dstFiltHnd (7, 3, helics::handle_type_t::destination_filter, "key", "target", "type_in", "type_out");
+    BOOST_CHECK_EQUAL (dstFiltHnd.handle, 7);
     BOOST_CHECK_EQUAL (dstFiltHnd.fed_id, 3);
-    BOOST_CHECK_EQUAL (dstFiltHnd.local_fed_id, helics::invalid_fed_id);
-    BOOST_CHECK_EQUAL (dstFiltHnd.what, helics::HANDLE_DEST_FILTER);
-    BOOST_CHECK (dstFiltHnd.key.compare ("key") == 0);
-    BOOST_CHECK (dstFiltHnd.type_in.compare ("type_in") == 0);
-    BOOST_CHECK (dstFiltHnd.type_out.compare ("type_out") == 0);
-    BOOST_CHECK (dstFiltHnd.target.compare ("target") == 0);
+    BOOST_CHECK_EQUAL(dstFiltHnd.local_fed_id,helics::invalid_fed_id);
+    BOOST_CHECK(dstFiltHnd.handle_type==helics::handle_type_t::destination_filter);
+    BOOST_CHECK_EQUAL (dstFiltHnd.key,"key");
+    BOOST_CHECK_EQUAL (dstFiltHnd.type_in,"type_in");
+    BOOST_CHECK_EQUAL (dstFiltHnd.type_out,"type_out");
+    BOOST_CHECK_EQUAL (dstFiltHnd.target,"target");
 }
 
 BOOST_AUTO_TEST_CASE (endpointinfo_test)
@@ -257,10 +257,10 @@ BOOST_AUTO_TEST_CASE (filterinfo_test)
     helics::FilterInfo filtI (5, 13, "name", "target", "type_in", "type_out", true);
     BOOST_CHECK_EQUAL (filtI.handle, 13);
     BOOST_CHECK_EQUAL (filtI.fed_id, 5);
-    BOOST_CHECK (filtI.key.compare ("name") == 0);
-    BOOST_CHECK (filtI.inputType.compare ("type_in") == 0);
-    BOOST_CHECK (filtI.outputType.compare ("type_out") == 0);
-    BOOST_CHECK (filtI.filterTarget.compare ("target") == 0);
+    BOOST_CHECK_EQUAL(filtI.key,"name");
+    BOOST_CHECK_EQUAL(filtI.inputType,"type_in");
+    BOOST_CHECK_EQUAL(filtI.outputType,"type_out");
+    BOOST_CHECK_EQUAL(filtI.filterTarget,"target");
     BOOST_CHECK_EQUAL (filtI.dest_filter, true);
 }
 
@@ -273,9 +273,9 @@ BOOST_AUTO_TEST_CASE (subscriptioninfo_test)
     helics::SubscriptionInfo subI (13, 5, "key", "type", "units", true);
     BOOST_CHECK_EQUAL (subI.id, 13);
     BOOST_CHECK_EQUAL (subI.fed_id, 5);
-    BOOST_CHECK (subI.key.compare ("key") == 0);
-    BOOST_CHECK (subI.type.compare ("type") == 0);
-    BOOST_CHECK (subI.units.compare ("units") == 0);
+    BOOST_CHECK_EQUAL(subI.key,"key");
+    BOOST_CHECK_EQUAL(subI.type,"type");
+    BOOST_CHECK_EQUAL(subI.units,"units");
     BOOST_CHECK_EQUAL (subI.required, true);
 
     // No data available, shouldn't get a data_block back
@@ -290,7 +290,7 @@ BOOST_AUTO_TEST_CASE (subscriptioninfo_test)
 
     // When movement of data is updated (see above), this can be uncommented and updated
     BOOST_CHECK_EQUAL (ret_data->size (), 11);
-    BOOST_CHECK (0 == strncmp (ret_data->data (), hello_data->data (), ret_data->size ()));
+    BOOST_CHECK_EQUAL(ret_data->to_string(), hello_data->to_string());
 
     auto time_one_data = std::make_shared<helics::data_block> ("time one");
     auto time_one_repeat_data = std::make_shared<helics::data_block> ("time one repeat");
@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_CASE (subscriptioninfo_test)
 
     subI.updateTimeInclusive (1.0);
     ret_data = subI.getData ();
-    BOOST_CHECK (ret_data->to_string () == "time one repeat");
+    BOOST_CHECK_EQUAL(ret_data->to_string (),"time one repeat");
     subI.addData (2, 0, time_one_data);
     subI.addData (2, 1, time_one_repeat_data);
 

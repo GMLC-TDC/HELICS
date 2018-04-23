@@ -25,6 +25,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <string>
 #include <map>
 #include <future>
+#include <mutex>
 
 #include <boost/asio/io_service.hpp>
 
@@ -39,6 +40,7 @@ private:
     std::unique_ptr<boost::asio::io_service::work> nullwork; //!< pointer to an object used to keep a service running
     bool leakOnDelete = false; //!< this is done to prevent some warning messages for use in DLL's
     std::atomic<bool> running{ false };
+    std::mutex runningLoopLock;  //lock protecting the nullwork object the return future
 
     std::future<void> loopRet;
 	AsioServiceManager(const std::string &contextName);
@@ -116,10 +118,10 @@ private:
     */
     void haltServiceLoop();
 
-    friend void serviceRunLoop(std::shared_ptr<AsioServiceManager> ptr);
+    friend void serviceProcessingLoop(std::shared_ptr<AsioServiceManager> ptr);
 };
 
-void serviceRunLoop(std::shared_ptr<AsioServiceManager> ptr);
+void serviceProcessingLoop(std::shared_ptr<AsioServiceManager> ptr);
 
 #endif
 

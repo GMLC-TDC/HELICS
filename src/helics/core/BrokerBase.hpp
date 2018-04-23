@@ -81,7 +81,7 @@ class BrokerBase
     /** display help messages for the broker*/
     static void displayHelp ();
     BrokerBase () noexcept;
-    BrokerBase (const std::string &broker_name);
+    explicit BrokerBase (const std::string &broker_name);
 
     virtual ~BrokerBase ();
 

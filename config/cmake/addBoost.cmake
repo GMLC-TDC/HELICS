@@ -2,6 +2,7 @@ SHOW_VARIABLE(BOOST_INSTALL_PATH PATH "Boost root directory" "${BOOST_INSTALL_PA
 IF (MSVC)
 
 set (boost_versions
+boost_1_67_0
 boost_1_66_0
 boost_1_65_1
 boost_1_65_0

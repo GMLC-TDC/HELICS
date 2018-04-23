@@ -203,12 +203,9 @@ bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const
             return (dep.time_state == DependencyInfo::time_state_t::initialized);
         });
     }
-    else
-    {
-        return std::none_of (dependencies.begin (), dependencies.end (), [](const auto &dep) {
-            return (dep.time_state < DependencyInfo::time_state_t::exec_requested);
-        });
-    }
+    return std::none_of (dependencies.begin (), dependencies.end (), [](const auto &dep) {
+        return (dep.time_state < DependencyInfo::time_state_t::exec_requested);
+    });
 }
 
 constexpr Core::federate_id_t global_federate_id_shift = 0x0001'0000;
