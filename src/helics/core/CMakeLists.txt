@@ -174,6 +174,10 @@ IF (VERSION_OPTION)
 	ENDIF (MSVC)
 ENDIF(VERSION_OPTION)
 
+if (APPLE)
+	target_compile_definitions(helics_core PUBLIC "-DSTX_NO_STD_ANY=1")
+endif(APPLE)
+
 if (${MPI_C_FOUND})
 source_group("mpi" FILES ${MPI_SOURCE_FILES} ${MPI_HEADER_FILES})
 endif (${MPI_C_FOUND})
