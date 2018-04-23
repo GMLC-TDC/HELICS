@@ -9,6 +9,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/AsioServiceManager.h"
 #include "../common/argParser.h"
 #include "../common/logger.h"
+#include "../common/delayedDestructor.hpp"
+
 #include "ForwardingTimeCoordinator.hpp"
 #include "helics/helics-config.h"
 #include "helicsVersion.hpp"
@@ -252,7 +254,10 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
     }
 }
 
+
 using activeProtector = std::shared_ptr<libguarded::guarded<bool>>;
+
+static DelayedDestructor<libguarded::guarded<bool>> protectors;
 
 void timerTickHandler (BrokerBase *bbase, activeProtector active, const boost::system::error_code &error)
 {
@@ -290,6 +295,7 @@ void BrokerBase::queueProcessingLoop ()
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
     auto active = std::make_shared<libguarded::guarded<bool>> (true);
 
+    protectors.addObjectsToBeDestroyed(active);
     auto timerCallback = [this, active](const boost::system::error_code &ec) {
         timerTickHandler (this, active, ec);
     };
@@ -341,6 +347,7 @@ void BrokerBase::queueProcessingLoop ()
             serviceLoop = nullptr;
             mainLoopIsRunning.store (false);
             logDump ();
+            protectors.destroyObjects();
             return;  // immediate return
         case CMD_STOP:
             active->store(false);
@@ -351,9 +358,10 @@ void BrokerBase::queueProcessingLoop ()
                 processCommand (std::move (command));
                 mainLoopIsRunning.store (false);
                 logDump ();
+                protectors.destroyObjects();
                 return processDisconnect ();
             }
-
+            protectors.destroyObjects();
             return;
         default:
             if (!haltOperations)
@@ -370,5 +378,6 @@ void BrokerBase::queueProcessingLoop ()
             }
         }
     }
+    protectors.destroyObjects();
 }
 }  // namespace helics
