@@ -23,11 +23,11 @@ To set up your environment:
    1.61 or later recommended (core library should build with 1.58,
    but tests will not). For CMake to detect it automatically either
    extract Boost to the root of your drive, or set the BOOST\_INSTALL\_PATH
-   environment variable to the install location. The cmake will only automatically find 
-    boost 1.61 or newer. 
+   environment variable to the install location. The cmake will only automatically find
+    boost 1.61 or newer.
    Building with Visual Studio 2017 will require boost 1.65.1 or newer and cmake 3.9
     or newer.  Use 14.0 versions for Visual Studio 2015, 14.1 files for Visual studio 2017.
-    Boost 1.66 with cmake 3.11 is the current recommended configuration.  
+    Boost 1.66 with cmake 3.11 is the current recommended configuration.
 3. *Optional* Install [ZeroMQ](http://zeromq.org/build:_start) if you
    need ZeroMQ support and need a copy in a global system location.
    We recommend skipping this step and running cmake with the
@@ -39,7 +39,7 @@ To set up your environment:
    if you need MPI support.
 5. *Optional* Install
    [SWIG](http://www.swig.org/download.html)
-   if you wish to generate the interface libraries, appropriate build files are 
+   if you wish to generate the interface libraries, appropriate build files are
     included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified
 6. Open a Visual Studio Command Prompt, and go to your working
    directory.
@@ -115,9 +115,12 @@ recorder (located in the 'build\src\helics\apps\player\Debug' folder):
 Building HELICS with python support
 -----------------------------------
 
-setting `-DBUILD_PYTHON_INTERFACE=ON` will generate a project to build the python interface, if python is installed to a system
+Setting `-DBUILD_PYTHON_INTERFACE=ON` will generate a project to build the python interface, if python is installed to a system
 path then the appropriate libraries and flags will be automatically found.  If SWIG is available and you wish to regenerate the interface
 set SWIG\_EXECUTABLE to the location of swig.exe.  Otherwise DISABLE\_SWIG can be set to ON to build using repo sources for the interface.
+We highly recommend using Anaconda3/Miniconda3 for the Python distribution.
+Additionally, you will need to ensure that the Python distribution used is built using the same compiler architecture (x86/x64) as the one you are using to build HELICS, as well as the one that was used to build Boost (as mentioned above).
+ZeroMQ will be built using the CMake build process.
 
 ![](../img/windows-command-line-install.png)
 
