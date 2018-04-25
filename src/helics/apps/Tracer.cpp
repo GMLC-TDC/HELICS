@@ -50,13 +50,16 @@ static const ArgDescriptors InfoArgs{
 
 Tracer::Tracer(int argc, char *argv[]):App("tracer",argc,argv)
 {
-    fed->setFlag(OBSERVER_FLAG);
-    variable_map vm_map;
-    argumentParser(argc, argv, vm_map, InfoArgs);
-    loadArguments(vm_map);
-    if (!masterFileName.empty())
+    if (!deactivated)
     {
-        loadFile(masterFileName);
+        fed->setFlag(OBSERVER_FLAG);
+        variable_map vm_map;
+        argumentParser(argc, argv, vm_map, InfoArgs);
+        loadArguments(vm_map);
+        if (!masterFileName.empty())
+        {
+            loadFile(masterFileName);
+        }
     }
 }
 

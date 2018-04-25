@@ -49,14 +49,18 @@ static const ArgDescriptors InfoArgs{
 
 Recorder::Recorder (int argc, char *argv[]):App("recorder",argc,argv)
 {
-    fed->setFlag (OBSERVER_FLAG);
-    variable_map vm_map;
-    argumentParser(argc, argv, vm_map, InfoArgs);
-    loadArguments(vm_map);
-    if (!masterFileName.empty())
+    if (!deactivated)
     {
-        loadFile(masterFileName);
+        fed->setFlag(OBSERVER_FLAG);
+        variable_map vm_map;
+        argumentParser(argc, argv, vm_map, InfoArgs);
+        loadArguments(vm_map);
+        if (!masterFileName.empty())
+        {
+            loadFile(masterFileName);
+        }
     }
+    
 }
 
 Recorder::Recorder (const std::shared_ptr<Core> &core, const FederateInfo &fi):App(core,fi)

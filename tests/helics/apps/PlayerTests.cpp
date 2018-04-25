@@ -541,6 +541,18 @@ BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::
     fut.get ();
 }
 
+BOOST_AUTO_TEST_CASE(player_test_help)
+{
+    StringToCmdLine cmdArg("--version --quiet"); 
+    helics::apps::Player play1(cmdArg.getArgCount(),cmdArg.getArgV());
+
+    BOOST_CHECK(!play1.isActive());
+
+    StringToCmdLine cmdArg2("-? --quiet");
+    helics::apps::Player play2(cmdArg2.getArgCount(), cmdArg2.getArgV());
+
+    BOOST_CHECK(!play2.isActive());
+}
 /*
 BOOST_AUTO_TEST_CASE (simple_player_test)
 {

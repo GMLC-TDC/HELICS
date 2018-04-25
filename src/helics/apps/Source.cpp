@@ -45,13 +45,16 @@ static const ArgDescriptors InfoArgs{
 
 Source::Source (int argc, char *argv[]):App("source",argc,argv)
 {
-    fed->setFlag(SOURCE_ONLY_FLAG);
-    variable_map vm_map;
-    argumentParser(argc, argv, vm_map, InfoArgs, "input"s);
-    loadArguments(vm_map);
-    if (!masterFileName.empty())
+    if (!deactivated)
     {
-        loadFile(masterFileName);
+        fed->setFlag(SOURCE_ONLY_FLAG);
+        variable_map vm_map;
+        argumentParser(argc, argv, vm_map, InfoArgs, "input"s);
+        loadArguments(vm_map);
+        if (!masterFileName.empty())
+        {
+            loadFile(masterFileName);
+        }
     }
 }
 
