@@ -5,7 +5,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "TcpHelperClasses.h"
-#include "../../common/delayedDestructor.hpp"
 #include <iostream>
 #include <thread>
 
@@ -271,8 +270,6 @@ void TcpConnection::close ()
     socket_.close ();
 }
 
-DelayedDestructor<TcpRxConnection> connectionBuffer;
-
 TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service, int PortNum, int nominalBufferSize)
 {
     return pointer (new TcpServer (io_service, PortNum, nominalBufferSize));
@@ -294,7 +291,6 @@ void TcpServer::start ()
         }
         TcpRxConnection::pointer new_connection =
           TcpRxConnection::create (acceptor_.get_io_service (), bufferSize);
-        connectionBuffer.addObjectsToBeDestroyed(new_connection);
         auto &socket = new_connection->socket();
         acceptor_.async_accept (socket, [server = shared_from_this (), connection=std::move(new_connection)](
                                                              const boost::system::error_code &error) {
@@ -346,7 +342,6 @@ void TcpServer::close ()
         std::this_thread::yield ();
     }
     connects->clear ();
-    connectionBuffer.destroyObjects();
 }
 
 }  // namespace tcp
