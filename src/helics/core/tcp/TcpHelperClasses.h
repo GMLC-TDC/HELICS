@@ -29,20 +29,20 @@ class TcpRxConnection : public std::enable_shared_from_this<TcpRxConnection>
       };
 
     typedef std::shared_ptr<TcpRxConnection> pointer;
-
+    /** create an RxConnection object using the specified service and bufferSize*/
     static pointer create (boost::asio::io_service &io_service, size_t bufferSize)
     {
         return pointer (new TcpRxConnection (io_service, bufferSize));
     }
-
+    /** get the underlying socket object*/
     boost::asio::ip::tcp::socket &socket () { return socket_; }
     /** start the receiving loop*/
     void start();
     /** close the socket*/
     void close ();
-
+    /** set the callback for the data object*/
     void setDataCall(std::function<size_t(TcpRxConnection::pointer, const char *, size_t)> dataFunc);
-    
+    /** set the callback for an error*/
     void setErrorCall(std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &)> errorFunc);
 
     /** send raw data
@@ -59,12 +59,13 @@ class TcpRxConnection : public std::enable_shared_from_this<TcpRxConnection>
         : socket_ (io_service), data (bufferSize)
     {
     }
-
+    /** function for handling the asynchronous return from a read request*/
     void handle_read (const boost::system::error_code &error, size_t bytes_transferred);
     std::atomic<size_t> residBufferSize{0};
     boost::asio::ip::tcp::socket socket_;
     std::vector<char> data;
     std::atomic<bool> triggerhalt{ false };
+    std::atomic<bool> receiving{ false };
     std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
     std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &)> errorCall;
     std::atomic<connection_state_t> state{connection_state_t::prestart};
