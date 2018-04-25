@@ -694,4 +694,18 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
     boost::filesystem::remove (filename);
     boost::filesystem::remove (filename2);
 }
+
+BOOST_AUTO_TEST_CASE(recorder_test_help)
+{
+    StringToCmdLine cmdArg("--version --quiet");
+    helics::apps::Recorder rec1(cmdArg.getArgCount(), cmdArg.getArgV());
+
+    BOOST_CHECK(!rec1.isActive());
+
+    StringToCmdLine cmdArg2("-? --quiet");
+    helics::apps::Recorder rec2(cmdArg2.getArgCount(), cmdArg2.getArgV());
+
+    BOOST_CHECK(!rec2.isActive());
+}
+
 BOOST_AUTO_TEST_SUITE_END ()

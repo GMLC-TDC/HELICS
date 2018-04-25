@@ -8,10 +8,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "Recorder.hpp"
 #include "Echo.hpp"
 #include "Tracer.hpp"
+#include "Source.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsVersion.hpp"
 #include <iostream>
+#include <boost/algorithm/string.hpp>
 
 void showHelp()
 {
@@ -26,6 +28,7 @@ int main (int argc, char *argv[])
     if (argc == 1)
     {
         showHelp();
+        return 0;
     }
     std::string arg1(argv[1]);
     //now redo the arguments remove the second argument which is the app name
@@ -36,7 +39,7 @@ int main (int argc, char *argv[])
     }
     try
     {
-        if (arg1 == "player")
+        if (boost::iequals(arg1,"player"))
         {
             helics::apps::Player Player(argc, argv);
             if (Player.isActive())
@@ -45,7 +48,7 @@ int main (int argc, char *argv[])
             }
 
         }
-        else if (arg1 == "recorder")
+        else if (boost::iequals(arg1, "recorder"))
         {
             helics::apps::Recorder Recorder(argc, argv);
             if (Recorder.isActive())
@@ -62,7 +65,7 @@ int main (int argc, char *argv[])
         {
             showHelp();
         }
-        else if (arg1 == "echo")
+        else if (boost::iequals(arg1, "echo"))
         {
             helics::apps::Echo Echo(argc, argv);
             if (Echo.isActive())
@@ -70,15 +73,19 @@ int main (int argc, char *argv[])
                 Echo.run();
             }
         }
-        else if (arg1 == "source")
+        else if (boost::iequals(arg1, "source"))
+        {
+            helics::apps::Source Source(argc, argv);
+            if (Source.isActive())
+            {
+                Source.run();
+            }
+        }
+        else if (boost::iequals(arg1, "broker"))
         {
 
         }
-        else if (arg1 == "broker")
-        {
-
-        }
-        else if (arg1 == "tracer")
+        else if (boost::iequals(arg1, "tracer"))
         {
             helics::apps::Tracer Tracer(argc, argv);
             if (Tracer.isActive())
