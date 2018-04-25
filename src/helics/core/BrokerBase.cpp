@@ -9,7 +9,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/AsioServiceManager.h"
 #include "../common/argParser.h"
 #include "../common/logger.h"
-#include "../common/delayedDestructor.hpp"
 
 #include "ForwardingTimeCoordinator.hpp"
 #include "helics/helics-config.h"
@@ -255,14 +254,35 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
 }
 
 
-using activeProtector = std::shared_ptr<libguarded::guarded<bool>>;
+using activeProtector = libguarded::guarded<std::pair<bool,bool>>;
 
-static DelayedDestructor<libguarded::guarded<bool>> protectors;
-
-void timerTickHandler (BrokerBase *bbase, activeProtector active, const boost::system::error_code &error)
+static void haltTimer(activeProtector &active, boost::asio::steady_timer &tickTimer)
 {
-    auto p = active->lock ();
-    if (*p)
+    bool TimerRunning = true;
+    {
+        auto p = active.lock();
+        if (p->second)
+        {
+            p->first = false;
+            tickTimer.cancel();
+        }
+        else
+        {
+            TimerRunning = false;
+        }
+    }
+    while (TimerRunning)
+    {
+        std::this_thread::yield();
+        auto res = active.load();
+        TimerRunning = res.second;
+    }
+}
+
+static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const boost::system::error_code &error)
+{
+    auto p = active.lock ();
+    if (p->first)
     {
         if (error != boost::asio::error::operation_aborted)
         {
@@ -273,7 +293,7 @@ void timerTickHandler (BrokerBase *bbase, activeProtector active, const boost::s
             catch (std::exception &e)
             {
                 std::cout << "exception caught from addActionMessage" << std::endl;
-            }
+            } 
         }
         else
         {
@@ -282,6 +302,7 @@ void timerTickHandler (BrokerBase *bbase, activeProtector active, const boost::s
             bbase->addActionMessage (M);
         }
     }
+    p->second = false;
 }
 
 bool BrokerBase::tryReconnect () { return false; }
@@ -293,13 +314,13 @@ void BrokerBase::queueProcessingLoop ()
     auto serv = AsioServiceManager::getServicePointer ();
     auto serviceLoop = AsioServiceManager::runServiceLoop ();
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
-    auto active = std::make_shared<libguarded::guarded<bool>> (true);
+    activeProtector active(true,false);
 
-    protectors.addObjectsToBeDestroyed(active);
-    auto timerCallback = [this, active](const boost::system::error_code &ec) {
+    auto timerCallback = [this, &active](const boost::system::error_code &ec) {
         timerTickHandler (this, active, ec);
     };
     ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
+    active = std::make_pair(true, true);
     ticktimer.async_wait (timerCallback);
     int messagesSinceLastTick = 0;
     auto logDump = [&, this]() {
@@ -337,31 +358,27 @@ void BrokerBase::queueProcessingLoop ()
             messagesSinceLastTick = 0;
             // reschedule the timer
             ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
+            active = std::make_pair(true, true);
             ticktimer.async_wait (timerCallback);
             break;
         case CMD_IGNORE:
             break;
         case CMD_TERMINATE_IMMEDIATELY:
-            active->store(false);
-            ticktimer.cancel ();
+            haltTimer(active, ticktimer);
             serviceLoop = nullptr;
-            mainLoopIsRunning.store (false);
-            logDump ();
-            protectors.destroyObjects();
+            mainLoopIsRunning.store(false);
+            logDump();
             return;  // immediate return
         case CMD_STOP:
-            active->store(false);
-            ticktimer.cancel ();
+            haltTimer(active, ticktimer);
             serviceLoop = nullptr;
             if (!haltOperations)
             {
                 processCommand (std::move (command));
                 mainLoopIsRunning.store (false);
                 logDump ();
-                protectors.destroyObjects();
                 return processDisconnect ();
             }
-            protectors.destroyObjects();
             return;
         default:
             if (!haltOperations)
@@ -378,6 +395,5 @@ void BrokerBase::queueProcessingLoop ()
             }
         }
     }
-    protectors.destroyObjects();
 }
 }  // namespace helics

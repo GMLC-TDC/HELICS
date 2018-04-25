@@ -397,11 +397,11 @@ INSTALL(FILES ${KEY_LIBRARY_FILES}
 OPTION(ENABLE_CLANG_TOOLS "if clang is found enable some custom targets for clang formatting and tidy" OFF)
 
 if (ENABLE_CLANG_TOOLS)
-include(clang-cxx-dev-tools)
+	include(clang-cxx-dev-tools)
 endif(ENABLE_CLANG_TOOLS)
 
 if (BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE)
-add_subdirectory(swig)
+	add_subdirectory(swig)
 endif()
 
 
@@ -507,7 +507,9 @@ endif()
 # -------------------------------------------------------------
 # CPack 
 # -------------------------------------------------------------
+OPTION(ENABLE_PACKAGE_BUILD "Add projects for making packages and installers for HELICS" OFF)
 
+IF(ENABLE_PACKAGE_BUILD)
 set(CPACK_PACKAGE_NAME "Helics")
 set(CPACK_PACKAGE_VENDOR "GMLC")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HELICS")
@@ -563,3 +565,4 @@ endif(WIN32)
 set(CPACK_SOURCE_IGNORE_FILES  "/Build*/;/build*/;/.git/")
 #THIS LINE MUST BE LAST
 include(CPack)
+ENDIF(ENABLE_PACKAGE_BUILD)
