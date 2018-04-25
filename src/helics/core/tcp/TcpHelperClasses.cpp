@@ -35,9 +35,9 @@ void TcpRxConnection::start ()
         }
         socket_.async_receive (boost::asio::buffer (data.data () + residBufferSize,
                                                     data.size () - residBufferSize),
-                               [connection = shared_from_this ()](const boost::system::error_code &error,
+                               [this](const boost::system::error_code &error,
                                                                   size_t bytes_transferred) {
-                                   connection->handle_read (error, bytes_transferred);
+                                   handle_read (error, bytes_transferred);
                                });
     }
     else if (exp!=connection_state_t::receiving)
