@@ -278,6 +278,10 @@ TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service, int P
 
 void TcpServer::start ()
 {
+    if (halted)
+    {
+        return;
+    }
     bool exp = false;
     if (accepting.compare_exchange_strong (exp, true))
     {
@@ -286,15 +290,18 @@ void TcpServer::start ()
         {
             for (auto &conn :*connects)
             {
-                conn->start ();
+                if (!conn->isReceiving())
+                {
+                    conn->start();
+                }
             }
         }
         TcpRxConnection::pointer new_connection =
           TcpRxConnection::create (acceptor_.get_io_service (), bufferSize);
         auto &socket = new_connection->socket();
-        acceptor_.async_accept (socket, [server = shared_from_this (), connection=std::move(new_connection)](
+        acceptor_.async_accept (socket, [this, connection=std::move(new_connection)](
                                                              const boost::system::error_code &error) {
-            server->handle_accept (connection, error);
+            handle_accept (connection, error);
         });
     }
 }
@@ -313,7 +320,10 @@ void TcpServer::handle_accept (TcpRxConnection::pointer new_connection, const bo
             connects->push_back(std::move(new_connection));
         }
         accepting = false;
-        start ();
+        if (!halted)
+        {
+            start();
+        }
     }
     else if (error != boost::asio::error::operation_aborted)
     {
@@ -328,10 +338,8 @@ void TcpServer::handle_accept (TcpRxConnection::pointer new_connection, const bo
 
 void TcpServer::close ()
 {
-    if (accepting)
-    {
-        acceptor_.close();
-    }
+    halted = true;
+    acceptor_.close();
     auto connects = connections.lock();
     for (auto &conn : *connects)
     {

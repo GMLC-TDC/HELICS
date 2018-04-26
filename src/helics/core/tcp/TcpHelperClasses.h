@@ -40,6 +40,10 @@ class TcpRxConnection : public std::enable_shared_from_this<TcpRxConnection>
     void start();
     /** close the socket*/
     void close ();
+    bool isReceiving() const
+    {
+        return receiving.load();
+    }
     /** set the callback for the data object*/
     void setDataCall(std::function<size_t(TcpRxConnection::pointer, const char *, size_t)> dataFunc);
     /** set the callback for an error*/
@@ -215,6 +219,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     size_t bufferSize;
     std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
     std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &error)> errorCall;
+    std::atomic<bool> halted{ false };
     guarded<std::vector<std::shared_ptr<TcpRxConnection>>> connections;
 };
 
