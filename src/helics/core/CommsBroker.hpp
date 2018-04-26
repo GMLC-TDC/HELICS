@@ -36,9 +36,10 @@ class CommsBroker : public BrokerT
     ~CommsBroker ();
 
   private:
-    virtual void brokerDisconnect () override final;
+    virtual void brokerDisconnect () override;
     virtual bool tryReconnect () override;
-
+    /** disconnect the comm object*/
+    void commDisconnect();
   public:
     virtual void transmit (int route_id, const ActionMessage &cmd) override;
 

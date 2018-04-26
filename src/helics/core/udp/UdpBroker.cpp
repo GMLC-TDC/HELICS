@@ -15,8 +15,6 @@ UdpBroker::UdpBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 UdpBroker::UdpBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
-UdpBroker::~UdpBroker () = default;
-
 void UdpBroker::displayHelp (bool local_only)
 {
     std::cout << " Help for UDP Broker: \n";

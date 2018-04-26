@@ -24,9 +24,6 @@ public:
     static void displayHelp(bool local_only = false);
     void initializeFromArgs(int argc, const char *const *argv) override;
 
-    /**destructor*/
-    virtual ~IpcBroker();
-
     virtual std::string getAddress() const override;
 
 private:

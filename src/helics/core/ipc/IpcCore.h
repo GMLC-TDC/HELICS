@@ -21,8 +21,7 @@ class IpcCore final : public CommsBroker<IpcComms, CommonCore>
     /** default constructor*/
     IpcCore () noexcept;
     IpcCore (const std::string &core_name);
-    /** destructor*/
-    ~IpcCore ();
+
     virtual void initializeFromArgs (int argc, const char *const *argv) override;
 
   public:

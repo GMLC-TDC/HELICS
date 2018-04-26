@@ -14,8 +14,6 @@ TcpBroker::TcpBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 TcpBroker::TcpBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
-TcpBroker::~TcpBroker () = default;
-
 void TcpBroker::displayHelp (bool local_only)
 {
     std::cout << " Help for TCP Broker: \n";

@@ -20,7 +20,7 @@ class TcpCore final : public CommsBroker<TcpComms, CommonCore>
     /** default constructor*/
     TcpCore () noexcept;
     TcpCore (const std::string &core_name);
-    ~TcpCore ();
+
     virtual void initializeFromArgs (int argc, const char *const *argv) override;
 
   public:
