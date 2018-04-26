@@ -147,4 +147,29 @@ BOOST_AUTO_TEST_CASE (timing_with_impact_window)
     vFed2
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
+
+BOOST_AUTO_TEST_CASE(timing_with_minDelta_change)
+{
+    SetupTest<helics::ValueFederate>("test", 1,1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    vFed1->enterExecutionState();
+    
+    auto res = vFed1->requestTime(1.0);
+    // check that the request is only granted at the appropriate period
+    BOOST_CHECK_EQUAL(res, 1.0);
+    ept1.send("e2", "test1");
+    vFed1->requestTimeAsync(1.9);
+    res = vFed2->requestTimeComplete();
+    BOOST_CHECK_EQUAL(
+        res, 1.1);  // the message should show up at the next available time point after the impact window
+    vFed2->requestTimeAsync(2.0);
+    res = vFed1->requestTimeComplete();
+    BOOST_CHECK_EQUAL(res, 1.9);
+    res = vFed2->requestTimeComplete();
+    BOOST_CHECK_EQUAL(res, 2.0);
+    vFed1->finalize();
+    vFed2
+        ->finalize();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
+}
 BOOST_AUTO_TEST_SUITE_END ()
