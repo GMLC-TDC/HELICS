@@ -1036,40 +1036,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
 
         break;
-        /*
-    case CMD_REG_DST_FILTER:
-    case CMD_NOTIFY_DST_FILTER:
-    {
-        if (!checkActionFlag (cmd, clone_flag))
-        {
-            auto endI = getEndpoint (cmd.dest_handle);
-            if (endI != nullptr)
-            {
-                addDependency (cmd.source_id);
-            }
-        }
-        else
-        {
-            auto endI = getEndpoint(cmd.dest_handle);
-            if (endI != nullptr)
-            {
-                addDependency(cmd.source_id);
-            }
-        }
-        break;
-    }
-    case CMD_REG_SRC_FILTER:
-    case CMD_NOTIFY_SRC_FILTER:
-    {
-        auto endI = getEndpoint (cmd.dest_handle);
-        if (endI != nullptr)
-        {
-            endI->hasFilter = true;
-            addDependent (cmd.source_id);
-        }
-    }
-    break;
-    */
+   
     case CMD_FED_ACK:
         if (state != HELICS_CREATED)
         {
@@ -1086,6 +1053,9 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             timeCoord->source_id = global_id;
             return iteration_state::next_step;
         }
+        break;
+    case CMD_FED_CONFIGURE:
+        processConfigUpdate(cmd);
         break;
     }
     return iteration_state::continue_processing;
