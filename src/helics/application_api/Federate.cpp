@@ -543,10 +543,11 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
 
 void Federate::requestTimeAsync (Time nextInternalTimeStep)
 {
-    auto asyncInfo = asyncCallInfo->lock();
+   
     auto exp = op_states::execution;
     if (state.compare_exchange_strong(exp,op_states::pending_time))
     {
+        auto asyncInfo = asyncCallInfo->lock();
         asyncInfo->timeRequestFuture = std::async (std::launch::async, [this, nextInternalTimeStep]() {
             return coreObject->timeRequest (fedID, nextInternalTimeStep);
         });
@@ -562,10 +563,11 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 @return the granted time step*/
 void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
-    auto asyncInfo = asyncCallInfo->lock();
+   
     auto exp = op_states::execution;
     if (state.compare_exchange_strong(exp, op_states::pending_iterative_time))
     {
+        auto asyncInfo = asyncCallInfo->lock();
         asyncInfo->timeRequestIterativeFuture =
           std::async (std::launch::async, [this, nextInternalTimeStep, iterate]() {
               return coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
@@ -582,11 +584,14 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_r
 @return the granted time step*/
 Time Federate::requestTimeComplete ()
 {
-    auto asyncInfo = asyncCallInfo->lock();
+    
     auto exp = op_states::pending_time;
     if (state.compare_exchange_strong(exp, op_states::execution))
     {
+
+        auto asyncInfo = asyncCallInfo->lock();
         auto newTime = asyncInfo->timeRequestFuture.get ();
+        asyncInfo = nullptr; //remove the lock;
         Time oldTime = currentTime;
         currentTime = newTime;
         updateTime (newTime, oldTime);

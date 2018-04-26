@@ -16,8 +16,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 * LLNS Copyright End
 */
 
-#ifndef ASIO_SERVICE_MANAGER_HEADER_
-#define ASIO_SERVICE_MANAGER_HEADER_
+#pragma once
 
 #include <vector>
 #include <memory>
@@ -123,5 +122,4 @@ private:
 
 void serviceProcessingLoop(std::shared_ptr<AsioServiceManager> ptr);
 
-#endif
 

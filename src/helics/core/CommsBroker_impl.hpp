@@ -43,7 +43,7 @@ CommsBroker<COMMS, BrokerT>::~CommsBroker ()
             if (exp == 0)
             {
                 lock.unlock ();
-                brokerDisconnect ();
+                commDisconnect ();
                 lock.lock ();
                 exp = 1;
             }
@@ -61,15 +61,21 @@ CommsBroker<COMMS, BrokerT>::~CommsBroker ()
 template <class COMMS, class BrokerT>
 void CommsBroker<COMMS, BrokerT>::brokerDisconnect ()
 {
-    std::unique_lock<std::mutex> lock (dataMutex);
+    commDisconnect();
+}
+
+template <class COMMS, class BrokerT>
+void CommsBroker<COMMS, BrokerT>::commDisconnect()
+{
+    std::unique_lock<std::mutex> lock(dataMutex);
     if (comms)
     {
         int exp = 0;
-        if (disconnectionStage.compare_exchange_strong (exp, 1))
+        if (disconnectionStage.compare_exchange_strong(exp, 1))
         {
-            auto comm_ptr = comms.get ();
-            lock.unlock ();  // we don't want to hold the lock while calling disconnect that could cause deadlock
-            comm_ptr->disconnect ();
+            auto comm_ptr = comms.get();
+            lock.unlock();  // we don't want to hold the lock while calling disconnect that could cause deadlock
+            comm_ptr->disconnect();
             disconnectionStage = 2;
         }
     }

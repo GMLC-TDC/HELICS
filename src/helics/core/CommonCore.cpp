@@ -2400,12 +2400,17 @@ void CommonCore::processCommand (ActionMessage &&command)
     {
         if (command.dest_id == global_broker_id)
         {
-            auto filtI = filters.find (fed_handle_pair (global_broker_id, command.dest_handle));
-            if (filtI != nullptr)
-            {
-                filtI->target = {command.source_id, command.source_handle};
-                timeCoord->addDependency (command.source_id);
+            helics::FilterInfo *filtI = nullptr;
+            { //scope for the lock_guard
+                std::lock_guard<std::mutex> lock(_handlemutex);
+                filtI = filters.find(fed_handle_pair(global_broker_id, command.dest_handle));
+                if (filtI != nullptr)
+                {
+                    filtI->target = { command.source_id, command.source_handle };
+                    timeCoord->addDependency(command.source_id);
+                }
             }
+            
             auto filthandle = getHandleInfo (command.dest_handle);
             if (filthandle != nullptr)
             {

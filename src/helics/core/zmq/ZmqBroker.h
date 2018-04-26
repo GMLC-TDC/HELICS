@@ -26,9 +26,6 @@ public:
 
 	void initializeFromArgs(int argc, const char * const *argv) override;
 
-	/**destructor*/
-	virtual ~ZmqBroker();
-
 	virtual std::string getAddress() const override;
 	static void displayHelp(bool local_only = false);
 private:

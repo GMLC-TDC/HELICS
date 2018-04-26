@@ -162,12 +162,17 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
 
     repSocket3.send (msg);
     // make sure the check receives all messages
-    reqset.checkForMessages (std::chrono::milliseconds (150));
+    reqset.checkForMessages (std::chrono::milliseconds (50));
     if (reqset.waiting ())
     {
-        reqset.checkForMessages (std::chrono::milliseconds (150));
+        reqset.checkForMessages (std::chrono::milliseconds (50));
     }
-    BOOST_CHECK (!reqset.waiting ());
+    //since we have 3 sockets we might have to do this twice since it returns immediately if it has a message
+    if (reqset.waiting())
+    {
+        reqset.checkForMessages(std::chrono::milliseconds(50));
+    }
+    BOOST_REQUIRE (!reqset.waiting ());
     reqset.transmit (1, M);
     reqset.transmit (2, M);
     reqset.transmit (3, M);

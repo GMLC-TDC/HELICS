@@ -994,7 +994,7 @@ bool CoreBroker::connect ()
 bool CoreBroker::isConnected () const { return ((brokerState == operating) || (brokerState == connected)); }
 
 void CoreBroker::processDisconnect (bool skipUnregister)
-{
+{ 
     LOG_NORMAL (0, getIdentifier (), "||disconnecting");
     if (brokerState > broker_state_t::initialized)
     {

@@ -13,8 +13,6 @@ namespace tcp
 {
 TcpCore::TcpCore () noexcept {}
 
-TcpCore::~TcpCore () = default;
-
 TcpCore::TcpCore (const std::string &core_name) : CommsBroker (core_name) {}
 
 void TcpCore::initializeFromArgs (int argc, const char *const *argv)
