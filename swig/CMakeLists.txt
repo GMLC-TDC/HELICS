@@ -12,6 +12,10 @@ if (BUILD_PYTHON_INTERFACE)
     ADD_SUBDIRECTORY(python)
 endif()
 
+if (BUILD_PYTHON2_INTERFACE)
+    ADD_SUBDIRECTORY(python2)
+endif()
+
 if (BUILD_JAVA_INTERFACE)
     ADD_SUBDIRECTORY(java)
 endif ()
