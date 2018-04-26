@@ -36,7 +36,7 @@ class CommsBroker : public BrokerT
     ~CommsBroker ();
 
   private:
-    virtual void brokerDisconnect () override;
+    virtual void brokerDisconnect () override final;
     virtual bool tryReconnect () override;
 
   public:
