@@ -127,6 +127,6 @@
   $result = SWIG_Python_AppendOutput($result, o2);
 }
 
-%apply (char *outputString, int maxlen) { (const void *data, int inputDataLength) };
+%apply (char *STRING, size_t LENGTH) { (const void *data, int inputDataLength) };
 
 %apply (char *outputString, int maxStringlen, int *actualLength) {(void *data, int maxDatalen, int *actualSize)};
