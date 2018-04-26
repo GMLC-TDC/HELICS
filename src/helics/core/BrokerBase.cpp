@@ -377,7 +377,7 @@ void BrokerBase::queueProcessingLoop ()
                 processCommand (std::move (command));
                 mainLoopIsRunning.store (false);
                 logDump ();
-                return processDisconnect ();
+                processDisconnect ();
             }
             return;
         default:
