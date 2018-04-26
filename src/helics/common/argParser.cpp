@@ -74,6 +74,7 @@ int argumentParser (int argc,
     if (!posName.empty ())
     {
         hidden.add_options () (posName.c_str (), po::value<std::string> (), "positional argument");
+        hidden.add_options() ("extra_positional_arguments", po::value<std::vector<std::string>>(), "unknown positional argument");
         cmd_line.add (hidden);
         config_file.add (hidden);
     }
@@ -98,7 +99,8 @@ int argumentParser (int argc,
         else
         {
             po::positional_options_description p;
-            p.add (posName.c_str (), -1);
+            p.add (posName.c_str (), 1);
+            p.add("extra_positional_arguments", 20);
             po::command_line_parser parser{argc, argv};
             parser.options (cmd_line).allow_unregistered ().positional (p);
             parser.style (xstyle);
@@ -118,7 +120,10 @@ int argumentParser (int argc,
     // program options control
     if (cmd_vm.count ("help") > 0)
     {
-        std::cout << visible << '\n';
+        if (cmd_vm.count("quiet") == 0)
+        {
+            std::cout << visible << '\n';
+        }
         return helpReturn;
     }
     if (cmd_vm.count ("version") > 0)
@@ -134,7 +139,8 @@ int argumentParser (int argc,
     else
     {
         po::positional_options_description p;
-        p.add (posName.c_str (), -1);
+        p.add (posName.c_str (), 1);
+        p.add("extra_positional_arguments", 20);
         po::store (po::command_line_parser (argc, argv)
                      .options (cmd_line)
                      .allow_unregistered ()
