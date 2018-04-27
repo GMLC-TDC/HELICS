@@ -106,10 +106,10 @@ recorder (located in the 'build\src\helics\apps\player\Debug' folder):
 > cd C:\Path\To\build\src\helics\apps\Debug
 
 > helics_player.exe --version
-0.1
+1.0.2 04-28-2018
 
 > helics_recorder.exe --version
-0.1
+1.0.2 04-28-2018
 ```
 
 Building HELICS with python support
@@ -140,7 +140,7 @@ cmake --build . --config Release --target install
 Add the following to the Windows PYTHONPATH environment variable or run the following in the command line.
 
 ```bash
-set PYTHONPATH=C:\local\helics-v1.0.0\python;%PYTHONPATH%
+set PYTHONPATH=C:\local\helics-v1.0.2\python;%PYTHONPATH%
 ```
 
 If you open a interactive Python session and import helics, you should be able to get the version of `helics` and an output that is similar to the following.
@@ -154,9 +154,8 @@ IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
 In [1]: import helics
 
 In [2]: helics.helicsGetVersion()
-Out[2]: '1.0.0 (04-15-18)'
+Out[2]: '1.0.2 (04-28-18)'
 
 ```
 
 ![](../img/windows-python-success.png)
-

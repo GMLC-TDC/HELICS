@@ -437,8 +437,7 @@ iteration_result FederateState::enterExecutingState (iteration_request iterate)
         }
 
         addAction (exec);
-        ActionMessage execReq (CMD_EXEC_CHECK);
-        queue.emplace (execReq);
+       
         auto ret = processQueue ();
         if (ret == iteration_state::next_step)
         {
@@ -523,7 +522,6 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         addAction (treq);
         LOG_TRACE (timeCoord->printTimeStatus ());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
-        queue.push (CMD_TIME_CHECK);
 
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
@@ -765,35 +763,13 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             {
                 if (state == HELICS_INITIALIZING)
                 {
-                    auto grant = timeCoord->checkExecEntry ();
-                    switch (grant)
-                    {
-                    case iteration_state::iterating:
-                        timeGranted_mode = true;
-                        return grant;
-                    case iteration_state::next_step:
-                        setState (HELICS_EXECUTING);
-                        LOG_DEBUG ("Granting Execution");
-                        timeGranted_mode = true;
-                        return grant;
-                    case iteration_state::continue_processing:
-                        break;
-                    default:
-                        timeGranted_mode = true;
-                        return grant;
-                    }
+                    cmd.setAction(CMD_EXEC_CHECK);
+                    return processActionMessage(cmd);
                 }
                 else if (state == HELICS_EXECUTING)
                 {
-                    auto ret = timeCoord->checkTimeGrant ();
-                    if (ret != iteration_state::continue_processing)
-                    {
-                        time_granted = timeCoord->getGrantedTime ();
-                        allowed_send_time = timeCoord->allowedSendTime ();
-                        LOG_DEBUG (std::string ("Granted Time=") + std::to_string (time_granted));
-                        timeGranted_mode = true;
-                        return ret;
-                    }
+                    cmd.setAction(CMD_TIME_CHECK);
+                    return processActionMessage(cmd);
                 }
             }
         }
@@ -819,7 +795,13 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             }
             timeCoord->enteringExecMode (iterate);
             timeGranted_mode = false;
-            return processDelayQueue ();
+            auto ret = processDelayQueue();
+            if (ret != iteration_state::continue_processing)
+            {
+                return ret;
+            }
+            cmd.setAction(CMD_EXEC_CHECK);
+            return processActionMessage(cmd);
         }
         FALLTHROUGH
     case CMD_EXEC_GRANT:
@@ -924,7 +906,13 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             }
             timeCoord->timeRequest (cmd.actionTime, iterate, nextValueTime (), nextMessageTime ());
             timeGranted_mode = false;
-            return processDelayQueue ();
+            auto ret=processDelayQueue ();
+            if (ret != iteration_state::continue_processing)
+            {
+                return ret;
+            }
+            cmd.setAction(CMD_TIME_CHECK);
+            return processActionMessage(cmd);
         }
         FALLTHROUGH
     case CMD_TIME_GRANT:

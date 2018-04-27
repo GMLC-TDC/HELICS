@@ -1,7 +1,7 @@
 helics_app
 =======
 
-The helics apps executable is one of the HELICS apps available with the library
+The HELICS apps executable is one of the HELICS apps available with the library
 Its purpose is to provide a common executable for running any of the other as
 
 typical syntax is as follows
@@ -11,9 +11,9 @@ helics-app.exe <app> <app arguments ...>
 possible apps are
 
 #### Echo
-The [Echo](echo.md) app is a responsive app that will echo any message sent to its endpoints back to the orginal source with a specified delay
+The [Echo](echo.md) app is a responsive app that will echo any message sent to its endpoints back to the original source with a specified delay
 
-THis is useful for testing communication pathways and in combination with filters can be used to create some interesting situations
+This is useful for testing communication pathways and in combination with filters can be used to create some interesting situations
 
 #### Player
 The [player](Player.md) app will generate signals through specified interfaces from prescribed data
@@ -29,9 +29,9 @@ The additional purpose is used as a library object as the basis for additional d
 
 #### Source
 
-The [Source](Source.md) app is a signal generator like the player execpt that is can generate signals from defined patterns including some random signals in value and timing, and other patterns like sine, square wave, ramps
+The [Source](Source.md) app is a signal generator like the player except that is can generate signals from defined patterns including some random signals in value and timing, and other patterns like sine, square wave, ramps
 and others.  Used much like the player in situations some test signals are needed.
 
 #### Broker
 
-The [Broker](Broker.md) executes a broker like the stand alone Broker app. 
+The [Broker](Broker.md) executes a broker like the stand alone Broker app.
