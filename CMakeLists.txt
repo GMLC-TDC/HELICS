@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright © 2017-2018,
+#Copyright Â© 2017-2018,
 #Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
@@ -43,9 +43,16 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 OPTION(BUILD_HELICS_EXAMPLES "Enable the example Executables to be built" ON)
 
 OPTION(BUILD_PYTHON_INTERFACE "Build Python extension" OFF)
+OPTION(BUILD_PYTHON2_INTERFACE "Build Python2.7 extension(Requires swig and will not build if python interface is active)" OFF)
 OPTION(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF)
 OPTION(BUILD_OCTAVE_INTERFACE "Build Octave extension (very experimental)" OFF)
 OPTION(BUILD_JAVA_INTERFACE "Build Java extension" OFF)
+
+if (BUILD_PYTHON_INTERFACE OR BUILD_PYTHON2_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
+set(INTERFACE_BUILD ON)
+else()
+set(INTERFACE_BUILD OFF)
+endif()
 
 OPTION(DISABLE_SWIG "Disable the use of swig to generate interface code and use repo code" OFF)
 
@@ -54,14 +61,14 @@ IF(NOT MSVC)
 	OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface gcc/clang only" OFF)
 ENDIF()
 
-if (BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
+if (INTERFACE_BUILD OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
 	set(BUILD_SHARED_LIBS ON)
 else()
 	OPTION(USE_POSITION_INDEPENDENT_CODE "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library" OFF)
 endif()
 
 
-if (BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE OR BUILD_C_SHARED_LIB)
+if (INTERFACE_BUILD OR BUILD_C_SHARED_LIB)
 	set(BUILT_C_SHARED_LIB ON)
 endif()
 
@@ -328,7 +335,7 @@ IF(BUILD_SHARED_LIBS AND NOT BUILD_CXX_SHARED_LIB)
 ENDIF()
 
 IF(BUILD_CXX_SHARED_LIB)
-	if (BUILD_C_SHARED_LIB OR BUILD_PYTHON_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_OCTAVE_INTERFACE)
+	if (BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
 		message(WARNING "Building the CXX shared library and C shared library in the same build is not advisable due to conflicting symbol visibility guidelines and is unlikely to work very well")
 	endif()
 
@@ -400,8 +407,8 @@ if (ENABLE_CLANG_TOOLS)
 	include(clang-cxx-dev-tools)
 endif(ENABLE_CLANG_TOOLS)
 
-if (BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE)
-	add_subdirectory(swig)
+if (INTERFACE_BUILD)
+add_subdirectory(swig)
 endif()
 
 
