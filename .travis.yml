@@ -191,7 +191,7 @@ script:
     # - echo "$LD_LIBRARY_PATH"
     # - echo "$DYLD_FALLBACK_LIBRARY_PATH"
   - python3 -m helics
-  - python3 -m pytest -v ../tests/python_helics
+  - python3 -m pytest -sv ../tests/python_helics
 
 notifications:
     email: false

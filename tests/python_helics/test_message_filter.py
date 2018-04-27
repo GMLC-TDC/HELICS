@@ -116,25 +116,26 @@ def test_message_filter_function(broker):
     assert status == 0
     assert state == 2
     data = "hello world"
-    # TODO: Fix segfaults on the next line
+    print("step 1")
     h.helicsEndpointSendMessageRaw(p1, "port2", data)
-
-    # TODO: Also segfaults
+    print("step 2")
     grantedtime = h.helicsFederateRequestTimeAsync (mFed, 1.0)
     assert grantedtime == 0
     status, grantedtime = h.helicsFederateRequestTime(fFed, 1.0)
+    print("step 3")
     assert status == 0
     assert grantedtime == 1.0
     status, grantedtime = h.helicsFederateRequestTimeComplete (mFed)
+    print("step 4")
     assert status == 0
     assert grantedtime == 1.0
 
-    f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "filter2", "port2")
-    ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
-    f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "", "filter0/fout")
+    h.helicsFederateFinalize(mFed)
+    h.helicsFederateFinalize(fFed)
+    print("step 5")
+    #f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "filter2", "port2")
+    #ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
+    #f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "", "filter0/fout")
 
     FreeFederate(fFed)
     FreeFederate(mFed)
-
-
-

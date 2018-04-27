@@ -82,7 +82,7 @@ IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
 In [1]: import helics
 
 In [2]: helics.helicsGetVersion()
-Out[2]: '1.0.0-alpha.3 (02-12-18)'
+Out[2]: '1.0.2 (04-28-18)'
 
 ```
 
