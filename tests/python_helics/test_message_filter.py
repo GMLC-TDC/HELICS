@@ -94,6 +94,7 @@ def test_message_filter_registration(broker):
 
     FreeFederate(fFed)
     FreeFederate(mFed)
+    time.sleep(1.0)
 
 def test_message_filter_function(broker):
 
