@@ -1,10 +1,10 @@
 Source
 =======
 
-The Source app generates signals for other federates, it functions similarly to the 
+The Source app generates signals for other federates, it functions similarly to the
 player but doesn't take a prescribed file instead it generates signals according to some
-mathematical function, like sine, ramp, pulse, or random walk. 
-THis can be useful for sending probing signals or just testing responses of the federate to various stimuli.
+mathematical function, like sine, ramp, pulse, or random walk.
+This can be useful for sending probing signals or just testing responses of the federate to various stimuli.
 
 
 Command line arguments

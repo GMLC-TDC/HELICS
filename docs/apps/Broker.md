@@ -1,7 +1,7 @@
 Broker
 =======
 
-Brokers function as intermediaries or roots in the HELICS hiearchy
+Brokers function as intermediaries or roots in the HELICS hierarchy
 The Broker can be run through the helics_broker or via helics-app
 
 
@@ -51,7 +51,7 @@ the player executable also takes an untagged argument of a file name for example
 helics_player player_file.txt --stop 5
 ```
 
-Players support both delimited text files and json files some examples can be found in
+Players support both delimited text files and JSON files some examples can be found in
 
 [Player configuation Examples](https://github.com/GMLC-TDC/HELICS-src/tree/master/tests/helics/apps/test_files)
 
@@ -79,7 +79,7 @@ the optional third column specifies a type valid types are
 time specifications are typically numerical with optional units
 `5` or `"500 ms"` or `23.7us` if there is a space between the number and units it must be enclosed in quotes
 if no units are specified the time defaults to units specified via `--timeunits` or seconds if none were specified
-valid units are "s", "ms","us","min", "day", "hr", "ns", "ps" the default precision in HELICS is ns so time specified in ps is not guaranteed to be precise
+valid units are "s", "ms", "us", "min", "day", "hr", "ns", "ps" the default precision in HELICS is ns so time specified in ps is not guaranteed to be precise
 
 
 | identifier       | type          | Example  |
@@ -194,5 +194,5 @@ Example JSON
 }
 ```
 
-some configuration can also be done through JSON through elements of "stop","local","separator","timeunits"
+some configuration can also be done through JSON through elements of "stop", "local", "separator", "timeunits"
 and file elements can be used to load up additional files

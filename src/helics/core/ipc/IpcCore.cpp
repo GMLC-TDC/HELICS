@@ -42,8 +42,6 @@ IpcCore::IpcCore () noexcept {}
 
 IpcCore::IpcCore (const std::string &core_name) : CommsBroker (core_name) {}
 
-IpcCore::~IpcCore () = default;
-
 void IpcCore::initializeFromArgs (int argc, const char *const *argv)
 {
     if (brokerState == created)

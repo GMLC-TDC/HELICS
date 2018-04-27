@@ -44,8 +44,6 @@ IpcBroker::IpcBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 IpcBroker::IpcBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
 
-IpcBroker::~IpcBroker () = default;
-
 void IpcBroker::displayHelp (bool local_only)
 {
     std::cout << " Help for Interprocess Broker: \n";

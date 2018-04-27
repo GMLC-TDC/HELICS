@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright © 2017-2018,
+#Copyright Â© 2017-2018,
 #Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
@@ -12,9 +12,9 @@ project (HELICS)
 #-----------------------------------------------------------------------------
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
-set (HELICS_VERSION_PATCH 1)
+set (HELICS_VERSION_PATCH 2)
 set (HELICS_VERSION_BUILD 0)
-set (HELICS_DATE "04-22-18")
+set (HELICS_DATE "04-28-18")
 set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}")
 set (HELICS_VERSION_STRING "${HELICS_VERSION} ${HELICS_DATE}")
 
@@ -404,7 +404,7 @@ INSTALL(FILES ${KEY_LIBRARY_FILES}
 OPTION(ENABLE_CLANG_TOOLS "if clang is found enable some custom targets for clang formatting and tidy" OFF)
 
 if (ENABLE_CLANG_TOOLS)
-include(clang-cxx-dev-tools)
+	include(clang-cxx-dev-tools)
 endif(ENABLE_CLANG_TOOLS)
 
 if (INTERFACE_BUILD)
@@ -514,7 +514,9 @@ endif()
 # -------------------------------------------------------------
 # CPack 
 # -------------------------------------------------------------
+OPTION(ENABLE_PACKAGE_BUILD "Add projects for making packages and installers for HELICS" OFF)
 
+IF(ENABLE_PACKAGE_BUILD)
 set(CPACK_PACKAGE_NAME "Helics")
 set(CPACK_PACKAGE_VENDOR "GMLC")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HELICS")
@@ -570,3 +572,4 @@ endif(WIN32)
 set(CPACK_SOURCE_IGNORE_FILES  "/Build*/;/build*/;/.git/")
 #THIS LINE MUST BE LAST
 include(CPack)
+ENDIF(ENABLE_PACKAGE_BUILD)

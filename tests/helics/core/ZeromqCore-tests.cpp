@@ -162,12 +162,17 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
 
     repSocket3.send (msg);
     // make sure the check receives all messages
-    reqset.checkForMessages (std::chrono::milliseconds (150));
+    reqset.checkForMessages (std::chrono::milliseconds (50));
     if (reqset.waiting ())
     {
-        reqset.checkForMessages (std::chrono::milliseconds (150));
+        reqset.checkForMessages (std::chrono::milliseconds (50));
     }
-    BOOST_CHECK (!reqset.waiting ());
+    //since we have 3 sockets we might have to do this twice since it returns immediately if it has a message
+    if (reqset.waiting())
+    {
+        reqset.checkForMessages(std::chrono::milliseconds(50));
+    }
+    BOOST_REQUIRE (!reqset.waiting ());
     reqset.transmit (1, M);
     reqset.transmit (2, M);
     reqset.transmit (3, M);
@@ -378,7 +383,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     std::atomic<int> counter2{0};
     std::atomic<int> counter3{0};
     helics::zeromq::ZmqComms comm (host, host);
-    helics::zeromq::ZmqComms comm2 (host, "");
+    helics::zeromq::ZmqComms comm2 (host, std::string());
     helics::zeromq::ZmqComms comm3 (host, host);
 
     comm.setBrokerPort (23405);
@@ -420,13 +425,25 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
 
     comm.transmit (0, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::yield();
+    if (counter2 != 1)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
     BOOST_REQUIRE_EQUAL (counter2, 1);
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm3.transmit (0, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::yield();
+    if (counter2 != 2)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+    if (counter2 != 2)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
     BOOST_REQUIRE_EQUAL (counter2, 2);
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
@@ -434,10 +451,14 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
 
     comm2.transmit (3, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::yield();
     if (counter3 != 1)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (250));
+        std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    }
+    if (counter3 != 1)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
     BOOST_REQUIRE_EQUAL (counter3, 1);
     BOOST_CHECK (act3.lock()->action () == helics::action_message_def::action_t::cmd_ack);
@@ -446,7 +467,15 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
 
     comm2.transmit (4, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::yield();
+    if (counter != 1)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+    if (counter != 1)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
     BOOST_REQUIRE_EQUAL (counter, 1);
     BOOST_CHECK (act.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 

@@ -13,8 +13,6 @@ namespace zeromq
 {
 ZmqCore::ZmqCore () noexcept {}
 
-ZmqCore::~ZmqCore () = default;
-
 ZmqCore::ZmqCore (const std::string &core_name) : CommsBroker (core_name) {}
 
 void ZmqCore::initializeFromArgs (int argc, const char *const *argv)

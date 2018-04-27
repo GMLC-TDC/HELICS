@@ -37,24 +37,46 @@ namespace helics
 namespace apps
 {
 
-static const ArgDescriptors InfoArgs{
+static const ArgDescriptors basicAppArgs{
     {"local", ArgDescriptor::arg_type_t::flag_type, "specify otherwise unspecified endpoints and publications as local( i.e.the keys will be prepended with the player name"},
-    {"stop",  "the time to stop the player"}
+    {"stop",  "the time to stop the player"},
+    {"quiet", ArgDescriptor::arg_type_t::flag_type, "turn off most display output"}
 };
 
 App::App (const std::string &appName,int argc, char *argv[])
 {
     variable_map vm_map;
-    auto res = argumentParser(argc, argv, vm_map, InfoArgs,"input");
+    //check for quiet mode
+    for (int ii = 0; ii < argc; ++ii)
+    {
+        if (argv[ii] != nullptr)
+        {
+            if (strcmp(argv[ii], "--quiet") == 0)
+            {
+                quietMode = true;
+            }
+        }
+    }
+    auto res = argumentParser(argc, argv, vm_map, basicAppArgs,"input");
+    if (vm_map.count("quiet") > 0)
+    {
+        quietMode = true;
+    }
     if (res == versionReturn)
     {
-        std::cout << helics::versionString<< '\n';
+        if (!quietMode)
+        {
+            std::cout << helics::versionString << '\n';
+        }
     }
     if (res == helpReturn)
     {
-        FederateInfo helpTemp(argc, argv);
+        if (!quietMode)
+        {
+            FederateInfo helpTemp(argc, argv);
+        }
     }
-    if (res < 0)
+    if (res != 0)
     {
         deactivated = true;
         return;

@@ -108,6 +108,7 @@ private:
     bool useLocal = false;
     bool fileLoaded = false;
     bool deactivated = false;
+    bool quietMode = false;
 };
 }  // namespace apps
 } // namespace helics
