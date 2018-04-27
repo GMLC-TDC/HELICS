@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE (simple_source_test2)
         src1.finalize ();
     });
     vfed.enterExecutionState ();
-    auto retTime = vfed.requestTime (5);
+    auto retTime = vfed.requestTime (1.1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     auto val = sub1.getValue<double> ();
     BOOST_CHECK_EQUAL (val, 1.3);
@@ -189,9 +189,9 @@ BOOST_AUTO_TEST_CASE (sine_source_test)
 
 BOOST_AUTO_TEST_CASE (simple_source_test_file)
 {
-    helics::FederateInfo fi ("player1");
+    helics::FederateInfo fi ("source1");
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core1";
+    fi.coreName = "corep";
     fi.coreInitString = "2";
     helics::apps::Source src1 (fi);
     src1.loadFile (std::string (TEST_DIR) + "/test_files/simple_source_test.json");
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE (simple_source_test_file)
         src1.finalize ();
     });
     vfed.enterExecutionState ();
-    auto retTime = vfed.requestTime (5);
+    auto retTime = vfed.requestTime (1.1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     auto val = sub1.getValue<double> ();
     BOOST_CHECK_EQUAL (val, 1.3);
