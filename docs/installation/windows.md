@@ -1,8 +1,7 @@
-Windows Installation
-====================
+# Windows Installation
 
-Requirements
-------------
+
+## Requirements
 
 - Microsoft Visual C++ 2015 or newer (MS Build Tools also works)
 - CMake 3.4 or newer
@@ -11,8 +10,7 @@ Requirements
 - ZeroMQ 4.2.0 or newer (if ZeroMQ support is needed)
 - MS-MPI v8 or newer (if MPI support is needed)
 
-Setup
------
+## Setup
 
 To set up your environment:
 
@@ -96,8 +94,11 @@ location will need to be manually given to cmake.
    replaced with the name of one of the projects to build only that
    part of HELICS.
 
-Testing
--------
+## Windows Installers
+
+Windows installers are available with the different [releases](https://github.com/GMLC-TDC/HELICS-src/releases).  The release includes installers for the Debug version and Release version. As well as a zip file of the install directory. The static libraries included with the installer will work with Visual Studio 2017.  
+
+## Testing
 
 A quick test is to double check the versions of the HELICS player and
 recorder (located in the 'build\src\helics\apps\player\Debug' folder):
@@ -112,8 +113,7 @@ recorder (located in the 'build\src\helics\apps\player\Debug' folder):
 1.0.2 04-28-2018
 ```
 
-Building HELICS with python support
------------------------------------
+## Building HELICS with python support
 
 Setting `-DBUILD_PYTHON_INTERFACE=ON` will generate a project to build the python interface, if python is installed to a system
 path then the appropriate libraries and flags will be automatically found.  If SWIG is available and you wish to regenerate the interface
