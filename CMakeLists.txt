@@ -318,8 +318,9 @@ list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
 endif()
 
 
-OPTION(BUILD_PLAYER "Build a helics player" ON)
-OPTION(BUILD_RECORDER "Build a helics recorder" ON)
+OPTION(BUILD_PLAYER "Build a helics player standalone executable" ON)
+OPTION(BUILD_RECORDER "Build a helics recorder standalone executable" ON)
+OPTION(BUILD_APPS "Build helics applications" ON)
 
 # we aren't ready for this for the whole library yet
 IF(BUILD_SHARED_LIBS AND NOT BUILD_CXX_SHARED_LIB)
