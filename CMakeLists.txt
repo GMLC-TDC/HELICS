@@ -48,7 +48,7 @@ OPTION(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF)
 OPTION(BUILD_OCTAVE_INTERFACE "Build Octave extension (very experimental)" OFF)
 OPTION(BUILD_JAVA_INTERFACE "Build Java extension" OFF)
 
-if (BUILD_PYTHON_INTERFACE OR BUILD_PYTHON2_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
+if (BUILD_PYTHON_INTERFACE OR BUILD_PYTHON2_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE)
 set(INTERFACE_BUILD ON)
 else()
 set(INTERFACE_BUILD OFF)
@@ -236,7 +236,7 @@ IF (UNIX AND NOT APPLE)
 	target_link_libraries(helics-static PUBLIC rt)
 ENDIF()
 
-IF(MINGW)
+IF(MSYS)
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	if (BOOST_VERSION_LEVEL GREATER 1)
 	#set(DISABLE_TCP_CORE TRUE)
@@ -244,7 +244,7 @@ IF(MINGW)
 		target_link_libraries(helics-static PUBLIC wsock32 ws2_32)
 	else()
 		set(DISABLE_TCP_CORE TRUE)
-		message(status, "disabling TCP core |${DISABLE_TCP_CORE}|")
+		message(STATUS, "disabling TCP core |${DISABLE_TCP_CORE}|")
 		target_link_libraries(helics-static PUBLIC ws2_32)
 	endif()
 
@@ -252,7 +252,7 @@ IF(MINGW)
 		target_link_libraries(helics-static PUBLIC wsock32 ws2_32)
 	endif()
 
-ENDIF(MINGW)
+ENDIF(MSYS)
 
 if (${ZeroMQ_FOUND})
 	if (ZMQ_USE_STATIC_LIBRARY)
@@ -275,7 +275,7 @@ endif (${MPI_C_FOUND})
 
 
 
-link_directories(${Boost_LIBRARY_DIRS})
+#link_directories(${Boost_LIBRARY_DIRS})
 
 target_link_libraries(helics-static PUBLIC ${Boost_LIBRARIES_core})
 
@@ -459,9 +459,9 @@ IF (UNIX AND NOT APPLE)
 	list(APPEND helics_dependencies rt)
 ENDIF()
 
-IF(MINGW)
+IF(MSYS)
 	list(APPEND helics_dependencies wsock32 ws2_32)
-ENDIF(MINGW)
+ENDIF(MSYS)
 
 if (ZeroMQ_FOUND)
 	list(APPEND helics_dependencies ${ZeroMQ_DEPENDENCY})

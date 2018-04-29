@@ -14,8 +14,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include <set>
 
-#include "PrecHelper.hpp"
-
 namespace helics
 {
 namespace apps

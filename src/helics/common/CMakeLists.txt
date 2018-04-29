@@ -21,7 +21,6 @@ stringOps.h
 charMapper.h
 generic_string_ops.hpp
 base64.h
-argParser.h
 MappedVector.hpp
 DualMappedVector.hpp
 MappedPointerVector.hpp
@@ -63,6 +62,7 @@ set(zmq_sources
 
 set (helics_public_common
 timeRepresentation.hpp
+argParser.h
 )
 
 if (HELICS_HAVE_ZEROMQ)
