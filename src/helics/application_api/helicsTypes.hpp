@@ -225,17 +225,28 @@ enum class helics_type_t : int
     helicsAny = 247652,
 };
 
-/** sometime we just need a ref to a string for the basic types*/
+/** sometimes we just need a ref to a string for the basic types*/
 const std::string &typeNameStringRef (helics_type_t type);
 
 /** convert a string to a type*/
 helics_type_t getTypeFromString (const std::string &typeName);
 
+/** generate a string representation of a complex number from separate real and imaginary parts*/
 std::string helicsComplexString (double real, double imag);
+/** generate a string representation of a complex number */
 std::string helicsComplexString (std::complex<double> val);
+/** generate a string representation of a vector 
+@details string will look like v[1.02,45]*/
 std::string helicsVectorString (const std::vector<double> &val);
+/** generate a string representation of a vector from pointer and size
+@details string will look like v[1.02,45]*/
 std::string helicsVectorString (const double *vals, size_t size);
+/** generate a string representation of a complex vector
+@details string will look like cv[1.02+2j,45]*/
 std::string helicsComplexVectorString (const std::vector<std::complex<double>> &val);
+/** generate a named point string 
+@details string will look like {<name>:val}
+*/
 std::string helicsNamedPointString (const named_point &point);
 std::string helicsNamedPointString (const std::string &pointName, double val);
 std::string helicsNamedPointString (const char *pointName, double val);

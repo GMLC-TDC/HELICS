@@ -13,21 +13,22 @@ timeRepresentation.hpp
 delayedDestructor.hpp
 DelayedObjects.hpp
 searchableObjectHolder.hpp
+argParser.h
 JsonProcessingFunctions.hpp
 stringToCmdLine.h
 AsioServiceManager.h
 logger.h
 stringOps.h
-charMapper.h
+MapTraits.hpp
+GuardedTypes.hpp
 generic_string_ops.hpp
+charMapper.h
 base64.h
 MappedVector.hpp
 DualMappedVector.hpp
 MappedPointerVector.hpp
 DualMappedPointerVector.hpp
-GuardedTypes.hpp
 TripWire.hpp
-MapTraits.hpp
 )
 
 set(common_sources
@@ -60,9 +61,18 @@ set(zmq_sources
 	#zmqProxyHub.cpp
 )
 
+#headers that are part of the public interface
 set (helics_public_common
 timeRepresentation.hpp
 argParser.h
+JsonProcessingFunctions.hpp
+stringToCmdLine.h
+AsioServiceManager.h
+logger.h
+stringOps.h
+MapTraits.hpp
+GuardedTypes.hpp
+generic_string_ops.hpp
 )
 
 if (HELICS_HAVE_ZEROMQ)
