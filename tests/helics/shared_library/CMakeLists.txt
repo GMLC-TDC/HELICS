@@ -4,8 +4,6 @@
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 
-
-
 set(c_shared_library_test_sources
 ctestFixtures.cpp
 shared-library-tests.cpp
@@ -37,9 +35,6 @@ test-message-federate_cpp.cpp
 #subPubObjectTests.cpp
 #QueryTests.cpp
 )
-
-
-
 
 add_executable(shared-library-tests ${c_shared_library_test_sources} ctestFixtures.hpp)
 

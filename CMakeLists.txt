@@ -12,11 +12,17 @@ project (HELICS)
 #-----------------------------------------------------------------------------
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
-set (HELICS_VERSION_PATCH 3)
+set (HELICS_VERSION_PATCH 4)
 set (HELICS_VERSION_BUILD 0)
-set (HELICS_DATE "04-28-18")
+set (HELICS_DATE "05-05-18")
 set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}")
 set (HELICS_VERSION_STRING "${HELICS_VERSION} ${HELICS_DATE}")
+
+#-----------------------------------------------------------------------------
+# set the module path and include some common macros
+#-----------------------------------------------------------------------------
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/")
+include(extraMacros)
 
 #-----------------------------------------------------------------------------
 # set the install path to a local directory
@@ -49,16 +55,19 @@ OPTION(BUILD_OCTAVE_INTERFACE "Build Octave extension (very experimental)" OFF)
 OPTION(BUILD_JAVA_INTERFACE "Build Java extension" OFF)
 
 if (BUILD_PYTHON_INTERFACE OR BUILD_PYTHON2_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE)
-set(INTERFACE_BUILD ON)
+	set(INTERFACE_BUILD ON)
+	HIDE_VARIABLE(BUILD_C_SHARED_LIB)
+	SHOW_VARIABLE(DISABLE_SWIG BOOL "Disable the use of swig to generate interface code and use repo code" OFF)
 else()
-set(INTERFACE_BUILD OFF)
+	set(INTERFACE_BUILD OFF)
+	HIDE_VARIABLE(DISABLE_SWIG)
+	SHOW_VARIABLE(BUILD_C_SHARED_LIB BOOL "Build the Shared Libraries with a C interface" ON)
 endif()
 
-OPTION(DISABLE_SWIG "Disable the use of swig to generate interface code and use repo code" OFF)
 
-OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" ON)
-IF(NOT MSVC)
+IF(NOT WIN32)
 	OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface gcc/clang only" OFF)
+	mark_as_advanced(BUILD_CXX_SHARED_LIB)
 ENDIF()
 
 if (INTERFACE_BUILD OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
@@ -68,15 +77,9 @@ else()
 endif()
 
 
-if (INTERFACE_BUILD OR BUILD_C_SHARED_LIB)
-	set(BUILT_C_SHARED_LIB ON)
-endif()
-
 IF(BUILD_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
     SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
 ENDIF()
-
-
 
 
 #-----------------------------------------------------------------------------
@@ -87,12 +90,12 @@ if (NOT CMAKE_DEBUG_POSTFIX)
 	set(CMAKE_DEBUG_POSTFIX d)
 endif()
 
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/")
 
+#these are for the common locations of build directories.  they will get copied over for install if needed outside of build
 include_directories ("${PROJECT_SOURCE_DIR}/ThirdParty")
 include_directories ("${PROJECT_BINARY_DIR}/libs/include")
 
-include(extraMacros)
+
 
 # Prohibit in-source build
 IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
@@ -106,13 +109,13 @@ IF(UNIX)
   # CMake, turn off using CMake build and find include/libs the
   # regular way.
   set(Boost_NO_BOOST_CMAKE ON)
-  set(Boost_USE_MULTITHREADED      OFF)   # Needed if MT libraries not built
+  set(Boost_USE_MULTITHREADED OFF)   # Needed if MT libraries not built
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
 ELSE(UNIX)
   IF(MSYS)
 	option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
   ELSE(MSYS)
-  #this would most likely be MSVC
+  #this will be MSYS or stand alone Mingw
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
   ENDIF(MSYS)
 ENDIF(UNIX)
@@ -125,19 +128,19 @@ ENDIF ()
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
-IF(BUILD_HELICS_TESTS)
- option (TEST_CODE_COVERAGE "Build a target for testing code coverage" OFF)
- if (TEST_CODE_COVERAGE)
- include(CodeCoverage)
+if(BUILD_HELICS_TESTS)
+	option (TEST_CODE_COVERAGE "Build a target for testing code coverage" OFF)
+	if (TEST_CODE_COVERAGE)
+		include(CodeCoverage)
 
- set(COVERAGE_EXCLUDES 'ThirdParty/*' 'tests/*' 'swig/*' 'examples/*')
- add_compile_options(${COVERAGE_COMPILER_FLAGS})
-  SETUP_TARGET_FOR_COVERAGE(
-     NAME helics_coverage                    # New target name
-     EXECUTABLE CTest # Executable in PROJECT_BINARY_DIR
-	)
+		set(COVERAGE_EXCLUDES 'ThirdParty/*' 'tests/*' 'swig/*' 'examples/*' 'build*/*')
+		add_compile_options(${COVERAGE_COMPILER_FLAGS})
+		SETUP_TARGET_FOR_COVERAGE(
+			NAME helics_coverage                    # New target name
+			EXECUTABLE CTest # Executable in PROJECT_BINARY_DIR
+		)
 
- endif(TEST_CODE_COVERAGE)
+	endif(TEST_CODE_COVERAGE)
  endif(BUILD_HELICS_TESTS)
 
 
@@ -148,21 +151,21 @@ IF(BUILD_HELICS_TESTS)
 set(CONFIGURE_TARGET_LOCATION ${PROJECT_BINARY_DIR}/libs/include/helics/)
 include(configGenerator)
 
-option (HELICS_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
+option (GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
 
-IF (HELICS_GENERATE_DOXYGEN_DOC)
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
+if (GENERATE_DOXYGEN_DOC)
+	find_package(Doxygen)
+	if(DOXYGEN_FOUND)
 
-	SHOW_VARIABLE(DOXYGEN_OUTPUT_DIR PATH "location to put Doxygen docs" "${PROJECT_BINARY_DIR}/docs")
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-	add_custom_target(doc
-	${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-	WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
-	COMMENT "Generating API documentation with Doxygen" VERBATIM
-)
-endif(DOXYGEN_FOUND)
-endif (HELICS_GENERATE_DOXYGEN_DOC)
+		SHOW_VARIABLE(DOXYGEN_OUTPUT_DIR PATH "location to put Doxygen docs" "${PROJECT_BINARY_DIR}/docs")
+		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+		add_custom_target(doc
+			${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+			WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
+			COMMENT "Generating API documentation with Doxygen" VERBATIM
+		)
+	endif(DOXYGEN_FOUND)
+endif (GENERATE_DOXYGEN_DOC)
 
 FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 
@@ -174,11 +177,16 @@ FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 # -------------------------------------------------------------
 include(addBoost)
 
+# -------------------------------------------------------------
+# Add the main HELICS library
+# -------------------------------------------------------------
+
 add_library(helics-static STATIC
     $<TARGET_OBJECTS:application_api>
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
+
 message(STATUS "setting version build options to \"${VERSION_OPTION}\"")
 IF (VERSION_OPTION)
 	IF (MSVC)
@@ -214,9 +222,9 @@ ENDIF(ZeroMQ_ENABLE)
 
 OPTION(MPI_ENABLE "Enable MPI networking library" OFF)
 IF (MPI_ENABLE)
-	find_package(MPI)
+	include(addMPI)
 	if (MPI_C_FOUND)
-   set(HELICS_HAVE_MPI TRUE)
+		set(HELICS_HAVE_MPI TRUE)
 	else()
 		set(HELICS_HAVE_MPI FALSE)
 	endif (MPI_C_FOUND)
@@ -238,15 +246,15 @@ ENDIF()
 
 IF(MSYS)
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	if (BOOST_VERSION_LEVEL GREATER 1)
-	#set(DISABLE_TCP_CORE TRUE)
-		set(DISABLE_TCP_CORE FALSE)
-		target_link_libraries(helics-static PUBLIC wsock32 ws2_32)
-	else()
-		set(DISABLE_TCP_CORE TRUE)
-		message(STATUS, "disabling TCP core |${DISABLE_TCP_CORE}|")
-		target_link_libraries(helics-static PUBLIC ws2_32)
-	endif()
+		if (BOOST_VERSION_LEVEL GREATER 1)
+			#set(DISABLE_TCP_CORE TRUE)
+			set(DISABLE_TCP_CORE FALSE)
+			target_link_libraries(helics-static PUBLIC wsock32 ws2_32)
+		else()
+			set(DISABLE_TCP_CORE TRUE)
+			message(STATUS, "disabling TCP core |${DISABLE_TCP_CORE}|")
+			target_link_libraries(helics-static PUBLIC ws2_32)
+		endif()
 
 	else()
 		target_link_libraries(helics-static PUBLIC wsock32 ws2_32)
@@ -254,28 +262,25 @@ IF(MSYS)
 
 ENDIF(MSYS)
 
-if (${ZeroMQ_FOUND})
+if (ZeroMQ_FOUND)
 	if (ZMQ_USE_STATIC_LIBRARY)
 		set(ZeroMQ_DEPENDENCY ${ZeroMQ_STATIC_LIBRARY})
-		ADD_DEFINITIONS(-DZMQ_STATIC)
+		target_add_definitions(helics-static PUBLIC -DZMQ_STATIC)
 	else()
 		set(ZeroMQ_DEPENDENCY ${ZeroMQ_LIBRARY})
 	endif()
 	message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
 	target_link_libraries(helics-static PUBLIC ${ZeroMQ_DEPENDENCY})
-else()
+else(ZeroMQ_FOUND)
    if (ZeroMQ_ENABLE)
-   message(WARNING "ZeroMQ not found")
+	  message(WARNING "ZeroMQ not found")
    endif()
-endif ()
+endif (ZeroMQ_FOUND)
 
-if (${MPI_C_FOUND})
+if (MPI_C_FOUND)
    target_link_libraries(helics-static PUBLIC ${MPI_C_LIBRARIES})
-endif (${MPI_C_FOUND})
+endif (MPI_C_FOUND)
 
-
-
-#link_directories(${Boost_LIBRARY_DIRS})
 
 target_link_libraries(helics-static PUBLIC ${Boost_LIBRARIES_core})
 
@@ -377,20 +382,20 @@ endif()
 
 add_subdirectory (src)
 
-if (BUILD_PYTHON_INTERFACE)
-SET(Python_ADDITIONAL_VERSIONS 3.4 3.5 3.6 3.7 3.8)
-find_package(PythonInterp 3)
-find_package(PythonLibs 3 REQUIRED )
-endif(BUILD_PYTHON_INTERFACE)
+
 
 #-----------------------------------------------------------------------------
 # Setup CTEST environment
 #-----------------------------------------------------------------------------
 IF(BUILD_HELICS_TESTS)
-include (CTest)
-add_subdirectory (tests)
+	include (CTest)
+	mark_as_advanced(BUILD_TESTING)
+	add_subdirectory (tests)
 ENDIF(BUILD_HELICS_TESTS)
 
+#-----------------------------------------------------------------------------
+# Setup Examples
+#-----------------------------------------------------------------------------
 if (BUILD_HELICS_EXAMPLES)
 	add_subdirectory (examples)
 endif(BUILD_HELICS_EXAMPLES)
@@ -409,7 +414,7 @@ if (ENABLE_CLANG_TOOLS)
 endif(ENABLE_CLANG_TOOLS)
 
 if (INTERFACE_BUILD)
-add_subdirectory(swig)
+	add_subdirectory(swig)
 endif()
 
 
@@ -424,7 +429,7 @@ install (TARGETS helics-static EXPORT helics-targets
 	set(helics_static_file "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}")
 	set(helics_static_file_debug "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 IF(BUILD_CXX_SHARED_LIB)
-install (TARGETS helics-shared EXPORT helics-targets
+	install (TARGETS helics-shared EXPORT helics-targets
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -468,7 +473,9 @@ if (ZeroMQ_FOUND)
 	list(APPEND helics_dependencies ${ZeroMQ_DEPENDENCY})
 endif(ZeroMQ_FOUND)
 
-
+if (MPI_C_FOUND)
+	list(APPEND helics_dependencies ${MPI_C_LIBRARIES})
+endif(MPI_C_FOUND)
 
 #-----------------------------------------------------------------------------
 # Setup configure.h file for accessing configure options
