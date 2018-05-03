@@ -159,10 +159,10 @@ if (HELICS_HAVE_ZEROMQ)
    list(APPEND INCLUDE_FILES ${ZMQ_HEADER_FILES})
 endif (HELICS_HAVE_ZEROMQ)
 
-if (${MPI_C_FOUND})
+if (HELICS_HAVE_MPI)
    list(APPEND SRC_FILES ${MPI_SOURCE_FILES})
    list(APPEND INCLUDE_FILES ${MPI_HEADER_FILES})
-endif (${MPI_C_FOUND})
+endif (HELICS_HAVE_MPI)
 
 add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
@@ -178,9 +178,9 @@ if (APPLE)
 	target_compile_definitions(helics_core PUBLIC "-DSTX_NO_STD_ANY=1")
 endif(APPLE)
 
-if (${MPI_C_FOUND})
-source_group("mpi" FILES ${MPI_SOURCE_FILES} ${MPI_HEADER_FILES})
-endif (${MPI_C_FOUND})
+if (HELICS_HAVE_MPI)
+	source_group("mpi" FILES ${MPI_SOURCE_FILES} ${MPI_HEADER_FILES})
+endif (HELICS_HAVE_MPI)
 
 if (HELICS_HAVE_ZMQ)
 	source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
@@ -202,7 +202,7 @@ if (HELICS_HAVE_ZEROMQ)
 endif (HELICS_HAVE_ZEROMQ)
 
 if (HELICS_HAVE_MPI)
-   target_include_directories(helics_core PRIVATE "${MPI_C_INCLUDE_PATH}")
+   target_include_directories(helics_core PRIVATE "${MPI_C_INCLUDE_DIR}" "${MPI_C_HEADER_DIR}"  "${MPI_C_ADDITIONAL_INCLUDE_DIRS}")
 endif(HELICS_HAVE_MPI)
 
 install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/core COMPONENT headers)

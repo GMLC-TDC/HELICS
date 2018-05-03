@@ -235,7 +235,9 @@ ENDIF(MPI_ENABLE)
 # -------------------------------------------------------------
 # add threading support
 # -------------------------------------------------------------
-set(THREADS_PREFER_PTHREAD_FLAG ON)
+if (NOT MSVC)
+	set(THREADS_PREFER_PTHREAD_FLAG ON)
+endif(NOT MSVC)
 find_package(Threads REQUIRED)
 
 target_link_libraries(helics-static PUBLIC Threads::Threads)
@@ -262,7 +264,7 @@ IF(MSYS)
 
 ENDIF(MSYS)
 
-if (ZeroMQ_FOUND)
+if (HELICS_HAVE_ZEROMQ)
 	if (ZMQ_USE_STATIC_LIBRARY)
 		set(ZeroMQ_DEPENDENCY ${ZeroMQ_STATIC_LIBRARY})
 		target_add_definitions(helics-static PUBLIC -DZMQ_STATIC)
@@ -271,11 +273,11 @@ if (ZeroMQ_FOUND)
 	endif()
 	message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
 	target_link_libraries(helics-static PUBLIC ${ZeroMQ_DEPENDENCY})
-else(ZeroMQ_FOUND)
+else(HELICS_HAVE_ZEROMQ)
    if (ZeroMQ_ENABLE)
 	  message(WARNING "ZeroMQ not found")
    endif()
-endif (ZeroMQ_FOUND)
+endif (HELICS_HAVE_ZEROMQ)
 
 if (MPI_C_FOUND)
    target_link_libraries(helics-static PUBLIC ${MPI_C_LIBRARIES})
@@ -318,8 +320,8 @@ IF("${isSystemDir}" STREQUAL "-1")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 if (NOT Boost_USE_STATIC_LIBS)
-list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
-list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
+	list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
+	list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
 endif()
 
 
@@ -371,8 +373,8 @@ message(STATUS "key files ${KEY_LIBRARY_FILES}")
 
 OPTION(DISABLE_LOGGING "disable all normal, debug, and trace logging in HELICS" OFF)
 if (NOT DISABLE_LOGGING)
-OPTION(DISABLE_TRACE_LOGGING "disable trace logging" OFF)
-OPTION(DISABLE_DEBUG_LOGGING "disable debug logging" OFF)
+	OPTION(DISABLE_TRACE_LOGGING "disable trace logging" OFF)
+	OPTION(DISABLE_DEBUG_LOGGING "disable debug logging" OFF)
 endif()
 
 
@@ -469,13 +471,13 @@ IF(MSYS)
 	list(APPEND helics_dependencies wsock32 ws2_32)
 ENDIF(MSYS)
 
-if (ZeroMQ_FOUND)
+if (HELICS_HAVE_ZEROMQ)
 	list(APPEND helics_dependencies ${ZeroMQ_DEPENDENCY})
-endif(ZeroMQ_FOUND)
+endif(HELICS_HAVE_ZEROMQ)
 
-if (MPI_C_FOUND)
+if (HELICS_HAVE_MPI)
 	list(APPEND helics_dependencies ${MPI_C_LIBRARIES})
-endif(MPI_C_FOUND)
+endif(HELICS_HAVE_MPI)
 
 #-----------------------------------------------------------------------------
 # Setup configure.h file for accessing configure options
