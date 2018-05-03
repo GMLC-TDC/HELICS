@@ -762,24 +762,24 @@ int MasterObjectHolder::addCore (helics::CoreObject *core)
     return index;
 }
 
-int MasterObjectHolder::addFed (helics::FedObject *fed)
+int MasterObjectHolder::addFed (std::unique_ptr<helics::FedObject> fed)
 {
     auto handle = feds.lock ();
     auto index = static_cast<int> (handle->size ());
-    handle->push_back (fed);
+    handle->push_back (std::move(fed));
     return index;
 }
 
 helics::FedObject *MasterObjectHolder::findFed (const std::string &fedName)
 {
     auto handle = feds.lock ();
-    for (auto fed : (*handle))
+    for (auto &fed : (*handle))
     {
         if (fed->fedptr)
         {
             if (fed->fedptr->getName () == fedName)
             {
-                return fed;
+                return fed.get();
             }
         }
     }
@@ -836,10 +836,6 @@ void MasterObjectHolder::deleteAll ()
         coreHandle->clear ();
     }
     auto fedHandle = feds.lock ();
-    for (auto obj : *fedHandle)
-    {
-        delete obj;
-    }
     fedHandle->clear ();
 }
 

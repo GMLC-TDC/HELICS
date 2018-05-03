@@ -171,7 +171,7 @@ class MasterObjectHolder
 private:
     guarded<std::vector<helics::BrokerObject *>> brokers;
     guarded<std::vector<helics::CoreObject *>> cores;
-    guarded<std::vector<helics::FedObject *>> feds;
+    guarded<std::vector<std::unique_ptr<helics::FedObject>>> feds;
     tripwire::TripWireDetector tripDetect;
 public:
     MasterObjectHolder() noexcept;
@@ -179,7 +179,7 @@ public:
     helics::FedObject *findFed(const std::string &fedName);
     int addBroker(helics::BrokerObject * broker);
     int addCore(helics::CoreObject *core);
-    int addFed(helics::FedObject *fed);
+    int addFed(std::unique_ptr<helics::FedObject> fed);
     void clearBroker(int index);
     void clearCore(int index);
     void clearFed(int index);
