@@ -293,12 +293,14 @@ helics_core helicsCreateCore (const char *type, const char *name, const char *in
     {
         return nullptr;
     }
-    auto *core = new helics::CoreObject;
-    core->index = getMasterHolder ()->addCore (core);
+    auto core = std::make_unique<helics::CoreObject>();
     core->valid = coreValidationIdentifier;
     core->coreptr = helics::CoreFactory::FindOrCreate (ct, (name != nullptr) ? std::string (name) : nullstr,
                                                        (initString != nullptr) ? std::string (initString) : nullstr);
-    return reinterpret_cast<helics_core> (core);
+    auto retcore = reinterpret_cast<helics_core> (core.get());
+    getMasterHolder()->addCore(std::move(core));
+   
+    return retcore;
 }
 
 helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, const char *const *argv)
@@ -312,11 +314,14 @@ helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int ar
     {
         return nullptr;
     }
-    auto *core = new helics::CoreObject;
-    core->index = getMasterHolder ()->addCore (core);
+    auto core = std::make_unique<helics::CoreObject>();
+    
     core->valid = coreValidationIdentifier;
     core->coreptr = helics::CoreFactory::FindOrCreate (ct, (name != nullptr) ? std::string (name) : nullstr, argc, argv);
-    return reinterpret_cast<helics_core> (core);
+    auto retcore = reinterpret_cast<helics_core> (core.get());
+    getMasterHolder()->addCore(std::move(core));
+    
+    return retcore;
 }
 
 helics_core helicsCoreClone (helics_core core)
@@ -326,11 +331,13 @@ helics_core helicsCoreClone (helics_core core)
         return nullptr;
     }
     auto *coreObj = reinterpret_cast<helics::CoreObject *> (core);
-    auto *coreClone = new helics::CoreObject;
-    coreClone->index = getMasterHolder ()->addCore (coreClone);
+    auto coreClone = std::make_unique<helics::CoreObject>();
     coreClone->valid = coreValidationIdentifier;
     coreClone->coreptr = coreObj->coreptr;
-    return reinterpret_cast<helics_core> (coreClone);
+    auto retcore = reinterpret_cast<helics_core> (coreClone.get());
+    getMasterHolder()->addCore(std::move(coreClone));
+    
+    return retcore;
 }
 
 helics_federate helicsGetFederateByName (const char *fedName)
@@ -354,12 +361,13 @@ helics_broker helicsCreateBroker (const char *type, const char *name, const char
     {
         return nullptr;
     }
-    auto broker = new helics::BrokerObject;
-    broker->index = getMasterHolder ()->addBroker (broker);
+    auto broker = std::make_unique<helics::BrokerObject>(); 
     broker->valid = brokerValidationIdentifier;
     broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string (name) : nullstr,
                                                        (initString != nullptr) ? std::string (initString) : nullstr);
-    return reinterpret_cast<helics_broker> (broker);
+    auto retbroker = reinterpret_cast<helics_broker> (broker.get());
+    getMasterHolder()->addBroker(std::move(broker));
+    return retbroker;
 }
 
 helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, const char *const *argv)
@@ -373,11 +381,12 @@ helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, in
     {
         return nullptr;
     }
-    auto *broker = new helics::BrokerObject;
-    broker->index = getMasterHolder ()->addBroker (broker);
+    auto broker = std::make_unique<helics::BrokerObject>();
     broker->valid = brokerValidationIdentifier;
     broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string (name) : nullstr, argc, argv);
-    return reinterpret_cast<helics_broker> (broker);
+    auto retbroker = reinterpret_cast<helics_broker> (broker.get());
+    getMasterHolder()->addBroker(std::move(broker));
+    return retbroker;
 }
 
 helics_broker helicsBrokerClone (helics_broker broker)
@@ -387,11 +396,12 @@ helics_broker helicsBrokerClone (helics_broker broker)
         return nullptr;
     }
     auto *brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
-    auto *brokerClone = new helics::BrokerObject;
-    brokerClone->index = getMasterHolder ()->addBroker (brokerClone);
+    auto brokerClone = std::make_unique<helics::BrokerObject>();
     brokerClone->valid = brokerValidationIdentifier;
     brokerClone->brokerptr = brokerObj->brokerptr;
-    return reinterpret_cast<helics_broker> (brokerClone);
+    auto retbroker = reinterpret_cast<helics_broker> (brokerClone.get());
+    getMasterHolder()->addBroker(std::move(brokerClone));
+    return retbroker;
 }
 
 helics_bool_t helicsBrokerIsConnected (helics_broker broker)
@@ -547,7 +557,6 @@ void helicsCoreFree (helics_core core)
     if (coreObj != nullptr)
     {
         getMasterHolder ()->clearCore (coreObj->index);
-        delete coreObj;
     }
     helics::CoreFactory::cleanUpCores ();
 }
@@ -558,7 +567,6 @@ void helicsBrokerFree (helics_broker broker)
     if (brokerObj != nullptr)
     {
         getMasterHolder ()->clearBroker (brokerObj->index);
-        delete brokerObj;
     }
     helics::BrokerFactory::cleanUpBrokers ();
 }
@@ -569,7 +577,6 @@ void helicsFederateFree (helics_federate fed)
     if (fedObj != nullptr)
     {
         getMasterHolder ()->clearFed (fedObj->index);
-        delete fedObj;
     }
 
     helics::CoreFactory::cleanUpCores ();
@@ -746,19 +753,21 @@ MasterObjectHolder::~MasterObjectHolder ()
     deleteAll ();
     // std::cout << "end of master Object Holder destructor" << std::endl;
 }
-int MasterObjectHolder::addBroker (helics::BrokerObject *broker)
+int MasterObjectHolder::addBroker (std::unique_ptr<helics::BrokerObject> broker)
 {
     auto handle = brokers.lock ();
     auto index = static_cast<int> (handle->size ());
-    handle->push_back (broker);
+    broker->index = index;
+    handle->push_back (std::move(broker));
     return index;
 }
 
-int MasterObjectHolder::addCore (helics::CoreObject *core)
+int MasterObjectHolder::addCore (std::unique_ptr<helics::CoreObject> core)
 {
     auto handle = cores.lock ();
     auto index = static_cast<int> (handle->size ());
-    handle->push_back (core);
+    core->index = index;
+    handle->push_back (std::move(core));
     return index;
 }
 
@@ -766,6 +775,7 @@ int MasterObjectHolder::addFed (std::unique_ptr<helics::FedObject> fed)
 {
     auto handle = feds.lock ();
     auto index = static_cast<int> (handle->size ());
+    fed->index = index;
     handle->push_back (std::move(fed));
     return index;
 }
@@ -821,18 +831,10 @@ void MasterObjectHolder::deleteAll ()
     }
     {
         auto brokerHandle = brokers.lock ();
-        for (auto obj : *brokerHandle)
-        {
-            delete obj;
-        }
         brokerHandle->clear ();
     }
     {
         auto coreHandle = cores.lock ();
-        for (auto obj : *coreHandle)
-        {
-            delete obj;
-        }
         coreHandle->clear ();
     }
     auto fedHandle = feds.lock ();

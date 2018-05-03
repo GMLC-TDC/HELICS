@@ -72,7 +72,6 @@ namespace helics
     class PublicationObject;
     class EndpointObject;
 
-
 	/** object wrapping a federate for the c-api*/
 	class FedObject
 	{
@@ -169,16 +168,16 @@ std::shared_ptr<helics::Core> getCoreSharedPtr(helics_core core);
 class MasterObjectHolder
 {
 private:
-    guarded<std::vector<helics::BrokerObject *>> brokers;
-    guarded<std::vector<helics::CoreObject *>> cores;
+    guarded<std::vector<std::unique_ptr<helics::BrokerObject>>> brokers;
+    guarded<std::vector<std::unique_ptr<helics::CoreObject>>> cores;
     guarded<std::vector<std::unique_ptr<helics::FedObject>>> feds;
     tripwire::TripWireDetector tripDetect;
 public:
     MasterObjectHolder() noexcept;
     ~MasterObjectHolder();
     helics::FedObject *findFed(const std::string &fedName);
-    int addBroker(helics::BrokerObject * broker);
-    int addCore(helics::CoreObject *core);
+    int addBroker(std::unique_ptr<helics::BrokerObject> broker);
+    int addCore(std::unique_ptr<helics::CoreObject> core);
     int addFed(std::unique_ptr<helics::FedObject> fed);
     void clearBroker(int index);
     void clearCore(int index);
