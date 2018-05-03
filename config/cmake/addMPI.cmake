@@ -26,7 +26,7 @@ if(MSVC)
 		set(MPI_C_COMPILER "${CMAKE_C_COMPILER}" CACHE FILEPATH "Mpi c compiler" FORCE)
 	endif(NOT MPI_CXX_COMPILER)
 	
-	message(STATUS "mpi lib ${MPI_C_LIBRARIES} CXX ${MPI_CXX_LIBRARIES}")
+	#message(STATUS "mpi lib ${MPI_C_LIBRARIES} CXX ${MPI_CXX_LIBRARIES}")
    #This is for finding MS-MPI.
    #set(_MPI_PREFIX_PATH)
   #list(APPEND _MPI_PREFIX_PATH
