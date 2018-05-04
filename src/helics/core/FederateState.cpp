@@ -978,6 +978,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     break;
     case CMD_ERROR:
         setState (HELICS_ERROR);
+        errorString = commandErrorString(cmd.index);
         return iteration_state::error;
     case CMD_REG_PUB:
     {
@@ -1035,6 +1036,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             if (checkActionFlag (cmd, error_flag))
             {
                 setState (HELICS_ERROR);
+                errorString = commandErrorString(cmd.index);
                 return iteration_state::error;
             }
             global_id = cmd.dest_id;

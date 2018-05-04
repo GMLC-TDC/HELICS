@@ -12,7 +12,7 @@ project (HELICS)
 #-----------------------------------------------------------------------------
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
-set (HELICS_VERSION_PATCH 2)
+set (HELICS_VERSION_PATCH 3)
 set (HELICS_VERSION_BUILD 0)
 set (HELICS_DATE "04-28-18")
 set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}")
