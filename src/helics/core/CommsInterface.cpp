@@ -8,14 +8,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-CommsInterface::CommsInterface (const std::string &localTarget, const std::string &brokerTarget)
-    : localTarget_ (localTarget), brokerTarget_ (brokerTarget), interfaceNetwork(interface_networks::local)
+CommsInterface::CommsInterface (const std::string &localTarget, const std::string &brokerTarget, interface_networks targetNetwork)
+    : localTarget_ (localTarget), brokerTarget_ (brokerTarget), interfaceNetwork(targetNetwork)
 {
 }
 
 CommsInterface::CommsInterface (const NetworkBrokerData &netInfo)
     : localTarget_ (netInfo.localInterface), brokerTarget_ (netInfo.brokerAddress),
-      brokerName_ (netInfo.brokerName), interfaceNetwork(interfaceNetwork)
+      brokerName_ (netInfo.brokerName), interfaceNetwork(netInfo.interfaceNetwork)
 {
 }
 

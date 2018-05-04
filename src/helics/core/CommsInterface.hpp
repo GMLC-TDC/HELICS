@@ -7,12 +7,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/BlockingPriorityQueue.hpp"
 #include "../common/TripWire.hpp"
+#include "NetworkBrokerData.hpp"
 #include "ActionMessage.hpp"
 #include <functional>
 #include <thread>
 namespace helics
 {
-class NetworkBrokerData;
 enum class interface_networks :char;
 
 /** implementation of a generic communications interface
@@ -26,7 +26,7 @@ class CommsInterface
     @param localTarget the interface or specification that should be set to receive incoming connections
     @param brokerTarget the target of the broker Interface to link to
     */
-    CommsInterface (const std::string &localTarget, const std::string &brokerTarget);
+    CommsInterface (const std::string &localTarget, const std::string &brokerTarget, interface_networks targetNetwork = interface_networks::local);
     /** construct from a NetworkBrokerData structure*/
     explicit CommsInterface (const NetworkBrokerData &netInfo);
     /** destructor*/

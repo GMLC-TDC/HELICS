@@ -37,7 +37,7 @@ class UdpComms final : public CommsInterface
   public:
     /** default constructor*/
     UdpComms ();
-    UdpComms (const std::string &brokerTarget, const std::string &localTarget);
+    UdpComms (const std::string &brokerTarget, const std::string &localTarget, interface_networks targetNetwork = interface_networks::local);
     UdpComms (const NetworkBrokerData &netInfo);
     /** destructor*/
     ~UdpComms ();

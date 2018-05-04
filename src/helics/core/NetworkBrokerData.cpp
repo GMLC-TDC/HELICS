@@ -8,7 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/argParser.h"
 #include "BrokerFactory.hpp"
 
-#include <boost/asio/io_service.hpp>
+#include "../common/AsioServiceManager.h"
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
@@ -20,6 +20,7 @@ static const ArgDescriptors extraArgs{
   {"interface"s, "the local interface to use for the receive ports"s},
   {"broker,b"s, "identifier for the broker"s},
   {"broker_address", "location of the broker i.e network address"},
+  { "brokername", "the name of the broker" },
   { "local", ArgDescriptor::arg_type_t::flag_type,"use local interface(default)" },
   {"ipv4", ArgDescriptor::arg_type_t::flag_type,"use external ipv4 addresses"},
   { "ipv6", ArgDescriptor::arg_type_t::flag_type,"use external ipv6 addresses" },
@@ -234,14 +235,43 @@ std::pair<std::string, std::string> extractInterfaceandPortString (const std::st
 
 bool isipv6(const std::string &address)
 {
-    return false;
+    auto cntcolon = std::count(address.begin(), address.end(), ':');
+    if (cntcolon > 2)
+    {
+        return true;
+    }
+    else
+    {
+        auto brkcnt = address.find_first_of('[');
+        if (brkcnt != std::string::npos)
+        {
+            return true;
+        }
+        if (address.compare(0, 2, "::") == 0)
+        {
+            return true;
+        }
+        return false;
+    }
+    
+}
+
+template<class InputIt1, class InputIt2>
+auto
+matchcount(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2)
+{
+    int cnt = 0;
+    while (first1 != last1 && first2 != last2 && *first1 == *first2) {
+        ++first1, ++first2, ++cnt;
+    }
+    return cnt;
 }
 
 std::string getLocalExternalAddressV4 ()
 {
-    boost::asio::io_service io_service;
+    auto srv = AsioServiceManager::getServicePointer();
 
-    boost::asio::ip::tcp::resolver resolver (io_service);
+    boost::asio::ip::tcp::resolver resolver (srv->getBaseService());
     boost::asio::ip::tcp::resolver::query query (boost::asio::ip::tcp::v4 (), boost::asio::ip::host_name (), "");
     boost::asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
     boost::asio::ip::tcp::endpoint endpoint = *it;
@@ -249,24 +279,48 @@ std::string getLocalExternalAddressV4 ()
     return endpoint.address ().to_string ();
 }
 
-std::string getLocalExternalAddressV4 (const std::string & /*server*/)
+std::string getLocalExternalAddressV4 (const std::string &server)
 {
-    boost::asio::io_service io_service;
+    auto srv = AsioServiceManager::getServicePointer();
 
-    boost::asio::ip::tcp::resolver resolver (io_service);
+    boost::asio::ip::tcp::resolver resolver (srv->getBaseService());
+
+    boost::asio::ip::tcp::resolver::query query_server(boost::asio::ip::tcp::v4(), server, "");
+    boost::asio::ip::tcp::resolver::iterator it_server = resolver.resolve(query_server);
+    boost::asio::ip::tcp::endpoint servep = *it_server;
+
+    boost::asio::ip::tcp::resolver::iterator end;
+
+    auto sstring = (it_server == end) ? server : servep.address().to_string();
+
     boost::asio::ip::tcp::resolver::query query (boost::asio::ip::tcp::v4 (), boost::asio::ip::host_name (), "");
     boost::asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
     boost::asio::ip::tcp::endpoint endpoint = *it;
-
-    return endpoint.address ().to_string ();
+    int cnt = 0;
+    std::string def= endpoint.address ().to_string ();
+    cnt = matchcount(sstring.begin(), sstring.end(), def.begin(), def.end());
+    ++it;
+    while (it != end)
+    {
+        boost::asio::ip::tcp::endpoint ept = *it;
+        std::string ndef = ept.address().to_string();
+        auto mcnt=matchcount(sstring.begin(), sstring.end(), ndef.begin(), ndef.end());
+        if ((mcnt > cnt)&&(mcnt>=7))
+        {
+            def = ndef;
+            cnt = mcnt;
+        }
+        ++it;
+    }
+    return def;
 }
 
 
 std::string getLocalExternalAddressV6()
 {
-    boost::asio::io_service io_service;
+    auto srv = AsioServiceManager::getServicePointer();
 
-    boost::asio::ip::tcp::resolver resolver(io_service);
+    boost::asio::ip::tcp::resolver resolver(srv->getBaseService());
     boost::asio::ip::tcp::resolver::query query(boost::asio::ip::tcp::v6(), boost::asio::ip::host_name(), "");
     boost::asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
     boost::asio::ip::tcp::endpoint endpoint = *it;
@@ -274,16 +328,44 @@ std::string getLocalExternalAddressV6()
     return endpoint.address().to_string();
 }
 
-std::string getLocalExternalAddressV6(const std::string & /*server*/)
+std::string getLocalExternalAddressV6(const std::string & server)
 {
-    boost::asio::io_service io_service;
+    auto srv = AsioServiceManager::getServicePointer();
 
-    boost::asio::ip::tcp::resolver resolver(io_service);
+    boost::asio::ip::tcp::resolver resolver(srv->getBaseService());
+
+    boost::asio::ip::tcp::resolver::query query_server(boost::asio::ip::tcp::v6(), server, "");
+    boost::asio::ip::tcp::resolver::iterator it_server = resolver.resolve(query_server);
+    boost::asio::ip::tcp::endpoint servep = *it_server;
+    boost::asio::ip::tcp::resolver::iterator end;
+
+    auto sstring = (it_server == end)?server:servep.address().to_string();
+
     boost::asio::ip::tcp::resolver::query query(boost::asio::ip::tcp::v6(), boost::asio::ip::host_name(), "");
     boost::asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
     boost::asio::ip::tcp::endpoint endpoint = *it;
-
-    return endpoint.address().to_string();
+    
+    if (it == end)
+    {
+        return std::string();
+    }
+    int cnt = 0;
+    std::string def = endpoint.address().to_string();
+    cnt = matchcount(sstring.begin(), sstring.end(), def.begin(), def.end());
+    ++it;
+    while (it != end)
+    {
+        boost::asio::ip::tcp::endpoint ept = *it;
+        std::string ndef = ept.address().to_string();
+        auto mcnt = matchcount(sstring.begin(), sstring.end(), ndef.begin(), ndef.end());
+        if ((mcnt > cnt)&&(mcnt>=9))
+        {
+            def = ndef;
+            cnt = mcnt;
+        }
+        ++it;
+    }
+    return def;
 }
 
 std::string getLocalExternalAddress(const std::string &server)
@@ -320,7 +402,7 @@ std::string generateMatchingInterfaceAddress(const std::string &server, interfac
         }
         else
         {
-            newInterface = getLocalExternalAddress(server);
+            newInterface = getLocalExternalAddressV4(server);
         }
         break;
     case interface_networks::ipv6:
@@ -330,7 +412,7 @@ std::string generateMatchingInterfaceAddress(const std::string &server, interfac
         }
         else
         {
-            newInterface = getLocalExternalAddress(server);
+            newInterface = getLocalExternalAddressV6(server);
         }
         break;
     case interface_networks::all:
@@ -344,6 +426,7 @@ std::string generateMatchingInterfaceAddress(const std::string &server, interfac
         }
         break;
     }
+    return newInterface;
 }
 
 }  // namespace helics

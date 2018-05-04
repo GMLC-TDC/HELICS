@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -25,8 +24,8 @@ namespace helics
 {
 namespace zeromq
 {
-ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTarget)
-    : CommsInterface (brokerTarget, localTarget)
+ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTarget, interface_networks targetNetwork)
+    : CommsInterface (brokerTarget, localTarget,targetNetwork)
 {
     if (localTarget_.empty ())
     {
@@ -40,11 +39,27 @@ ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTar
         }
         else if (brokerTarget_.empty())
         {
-            localTarget_= "tcp://127.0.0.1";
+            switch (interfaceNetwork)
+            {
+            case interface_networks::local:
+                localTarget_ = "tcp://127.0.0.1";
+                break;
+            default:
+                localTarget_ = "tcp://*";
+                break;
+            }
         }
         else
         {
             localTarget_ = generateMatchingInterfaceAddress(brokerTarget_);
+            if (brokerTarget_.compare(0, 3, "tcp"))
+            {
+                localTarget_ = "tcp://" + localTarget_;
+            }
+            else if (brokerTarget_.compare(0, 3, "udp"))
+            {
+                localTarget_ = "udp://" + localTarget_;
+            }
         }
     }
 }
@@ -61,9 +76,30 @@ ZmqComms::ZmqComms (const NetworkBrokerData &netInfo) : CommsInterface (netInfo)
         {
             localTarget_ = "udp://127.0.0.1";
         }
+        else if (brokerTarget_.empty())
+        {
+            switch (interfaceNetwork)
+            {
+            case interface_networks::local:
+                localTarget_ = "tcp://127.0.0.1";
+                break;
+            default:
+                localTarget_ = "tcp://*";
+                break;
+            }
+            
+        }
         else
         {
             localTarget_ = generateMatchingInterfaceAddress(brokerTarget_, interfaceNetwork);
+            if (brokerTarget_.compare(0, 3, "tcp"))
+            {
+                localTarget_ = "tcp://" + localTarget_;
+            }
+            else if (brokerTarget_.compare(0, 3, "udp"))
+            {
+                localTarget_ = "udp://" + localTarget_;
+            }
             
         }
     }
