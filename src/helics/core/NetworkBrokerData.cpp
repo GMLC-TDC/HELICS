@@ -20,6 +20,10 @@ static const ArgDescriptors extraArgs{
   {"interface"s, "the local interface to use for the receive ports"s},
   {"broker,b"s, "identifier for the broker"s},
   {"broker_address", "location of the broker i.e network address"},
+  { "local", ArgDescriptor::arg_type_t::flag_type,"use local interface(default)" },
+  {"ipv4", ArgDescriptor::arg_type_t::flag_type,"use external ipv4 addresses"},
+  { "ipv6", ArgDescriptor::arg_type_t::flag_type,"use external ipv6 addresses" },
+  { "external", ArgDescriptor::arg_type_t::flag_type,"use all external interfaces" },
   {"brokerport"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker priority port"s},
   {"localport"s, ArgDescriptor::arg_type_t::int_type, "port number for the local receive port"s},
   {"port"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker's port"s},
@@ -36,7 +40,22 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
 {
     variable_map vm;
     argumentParser (argc, argv, vm, extraArgs);
-
+    if (vm.count("local")>0)
+    {
+        interfaceNetwork = interface_networks::local;
+    }
+    else if (vm.count("ipv4")>0)
+    {
+        interfaceNetwork = interface_networks::ipv4;
+    }
+    else if (vm.count("ipv6")>0)
+    {
+        interfaceNetwork = interface_networks::ipv6;
+    }
+    else if (vm.count("external")>0)
+    {
+        interfaceNetwork = interface_networks::all;
+    }
     if (vm.count ("broker_address") > 0)
     {
         auto addr = vm["broker_address"].as<std::string> ();
@@ -166,6 +185,7 @@ void NetworkBrokerData::checkAndUpdateBrokerAddress (const std::string &localAdd
         break;
     }
 }
+
 std::string makePortAddress (const std::string &networkInterface, int portNumber)
 {
     std::string newAddress = networkInterface;
@@ -212,6 +232,11 @@ std::pair<std::string, std::string> extractInterfaceandPortString (const std::st
     return std::make_pair (address.substr (0, lastColon), address.substr (lastColon + 1));
 }
 
+bool isipv6(const std::string &address)
+{
+    return false;
+}
+
 std::string getLocalExternalAddressV4 ()
 {
     boost::asio::io_service io_service;
@@ -234,6 +259,91 @@ std::string getLocalExternalAddressV4 (const std::string & /*server*/)
     boost::asio::ip::tcp::endpoint endpoint = *it;
 
     return endpoint.address ().to_string ();
+}
+
+
+std::string getLocalExternalAddressV6()
+{
+    boost::asio::io_service io_service;
+
+    boost::asio::ip::tcp::resolver resolver(io_service);
+    boost::asio::ip::tcp::resolver::query query(boost::asio::ip::tcp::v6(), boost::asio::ip::host_name(), "");
+    boost::asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+    boost::asio::ip::tcp::endpoint endpoint = *it;
+
+    return endpoint.address().to_string();
+}
+
+std::string getLocalExternalAddressV6(const std::string & /*server*/)
+{
+    boost::asio::io_service io_service;
+
+    boost::asio::ip::tcp::resolver resolver(io_service);
+    boost::asio::ip::tcp::resolver::query query(boost::asio::ip::tcp::v6(), boost::asio::ip::host_name(), "");
+    boost::asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+    boost::asio::ip::tcp::endpoint endpoint = *it;
+
+    return endpoint.address().to_string();
+}
+
+std::string getLocalExternalAddress(const std::string &server)
+{
+    if (isipv6(server))
+    {
+        return getLocalExternalAddressV6(server);
+    }
+    else
+    {
+        return getLocalExternalAddressV4(server);
+    }
+}
+
+std::string generateMatchingInterfaceAddress(const std::string &server, interface_networks network)
+{
+    std::string newInterface;
+    switch (network)
+    {
+    case interface_networks::local:
+        if (server.empty())
+        {
+            newInterface = "tcp://127.0.0.1";
+        }
+        else
+        {
+            newInterface = getLocalExternalAddress(server);
+        }
+        break;
+    case interface_networks::ipv4:
+        if (server.empty())
+        {
+            newInterface = "tcp://*";
+        }
+        else
+        {
+            newInterface = getLocalExternalAddress(server);
+        }
+        break;
+    case interface_networks::ipv6:
+        if (server.empty())
+        {
+            newInterface = "tcp://*";
+        }
+        else
+        {
+            newInterface = getLocalExternalAddress(server);
+        }
+        break;
+    case interface_networks::all:
+        if (server.empty())
+        {
+            newInterface = "tcp://*";
+        }
+        else
+        {
+            newInterface = getLocalExternalAddress(server);
+        }
+        break;
+    }
 }
 
 }  // namespace helics

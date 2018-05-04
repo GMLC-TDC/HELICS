@@ -34,10 +34,17 @@ ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTar
         {
             localTarget_ = "tcp://127.0.0.1";
         }
+        else if ((brokerTarget_ == "udp://127.0.0.1") || (brokerTarget_ == "udp://localhost"))
+        {
+            localTarget_ = "udp://127.0.0.1";
+        }
+        else if (brokerTarget_.empty())
+        {
+            localTarget_= "tcp://127.0.0.1";
+        }
         else
         {
-            localTarget_ =
-              "tcp://127.0.0.1";  // TODO this is not correct yet, but I need other functionality to fix it
+            localTarget_ = generateMatchingInterfaceAddress(brokerTarget_);
         }
     }
 }
@@ -50,10 +57,14 @@ ZmqComms::ZmqComms (const NetworkBrokerData &netInfo) : CommsInterface (netInfo)
         {
             localTarget_ = "tcp://127.0.0.1";
         }
+        else if ((brokerTarget_ == "udp://127.0.0.1") || (brokerTarget_ == "udp://localhost"))
+        {
+            localTarget_ = "udp://127.0.0.1";
+        }
         else
         {
-            localTarget_ =
-              "tcp://127.0.0.1";  // TODO this is not correct yet, but I need other functionality to fix it
+            localTarget_ = generateMatchingInterfaceAddress(brokerTarget_, interfaceNetwork);
+            
         }
     }
     if (netInfo.brokerPort > 0)
