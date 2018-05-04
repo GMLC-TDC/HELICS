@@ -8,7 +8,7 @@ import com.java.helics.helics;
 import com.java.helics.helics_status;
 
 public class ApplicationApiTest {
-	
+
 	public static SWIGTYPE_p_void createValueFederate(final String fedName, final double timeDelta) {
 		SWIGTYPE_p_void fi = helics.helicsFederateInfoCreate();
 		helics_status rv = helics.helicsFederateInfoSetFederateName(fi,fedName);
@@ -18,7 +18,7 @@ public class ApplicationApiTest {
 		SWIGTYPE_p_void valFed = helics.helicsCreateValueFederate(fi);
 		return valFed;
 	}
-	
+
 	public static void main(String[] args) {
         SWIGTYPE_p_void broker = helics.helicsCreateBroker("zmq", "", "1");
         SWIGTYPE_p_void myFederate = ApplicationApiTest.createValueFederate("javaFederate", 1);
@@ -51,6 +51,6 @@ public class ApplicationApiTest {
 		// we have exited our time loop so we are done simulating. Lets exit the co-simulation.
 		rv = helics.helicsFederateFinalize(myFederate);
 		System.out.println(String.format("%s has successfully exited the co-simulation.", "javaFederate"));
+		helics.helicsCloseLibrary();
 	}
 }
-
