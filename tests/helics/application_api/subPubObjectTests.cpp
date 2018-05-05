@@ -122,7 +122,7 @@ void runPubSubTypeTests (const TX &valtx, const RX &valrx)
     BOOST_CHECK_EQUAL (gtime, 1.0);
     auto s = subObj.getValue<RX> ();
     // int64_t val = subObj.getValue<int64_t>();
-    // make sure the string is what we expect
+    // make sure the object is what we expect
     BOOST_CHECK (s == valrx);
     vFed->finalize ();
 }
@@ -143,6 +143,23 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests)
     SKIPTEST runPubSubTypeTests<int64_t, double> (34, 34.0);
     SKIPTEST runPubSubTypeTests<int64_t, std::string> (34, "34");
     SKIPTEST runPubSubTypeTests<std::string, int64_t> ("34.14", 34);
+    SKIPTEST runPubSubTypeTests<helics::named_point, double>({ std::string(),-3.14159 }, -3.14159);
+    SKIPTEST runPubSubTypeTests<helics::named_point, int64_t>({ std::string(),-3.14159 }, -3);
+}
+
+
+BOOST_TEST_DECORATOR(*utf::timeout(35))
+BOOST_AUTO_TEST_CASE(subscriptionObject_bool_tests)
+{
+    runPubSubTypeTests<bool, int64_t>(true, 1);
+    runPubSubTypeTests<bool, std::string>(true, "1");
+    SKIPTEST runPubSubTypeTests<bool, double>(false, 0.0);
+    runPubSubTypeTests<double, bool>(47.9, true);
+    runPubSubTypeTests < std::string, bool > ("0", false);
+    SKIPTEST runPubSubTypeTests < int64_t, bool >(-10, true);
+    SKIPTEST runPubSubTypeTests < int64_t, bool >(0, false);
+    SKIPTEST runPubSubTypeTests<helics::named_point, bool>({ std::string(),-3.14159 }, true);
+    SKIPTEST runPubSubTypeTests<helics::named_point, bool>({"0",std::nan("0") }, false);
 }
 
 BOOST_TEST_DECORATOR (*utf::timeout (35))
@@ -155,6 +172,8 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests)
     SKIPTEST runPubSubTypeTests<std::string, c> ("3.14159-2j", c (3.14159, -2));
     SKIPTEST runPubSubTypeTests<std::string, c> ("-3.14159-2j", c (-3.14159, -2));
     runPubSubTypeTests<std::string, c> ("-3.14159 - 2i", c (-3.14159, -2));
+    runPubSubTypeTests<helics::named_point, c>({ "-3.14159 - 2i",std::nan("0") }, c(-3.14159, -2));
+    runPubSubTypeTests<helics::named_point, c>({"",-3.14159 }, c(-3.14159,0));
     SKIPTEST runPubSubTypeTests<std::string, c> ("-3.14159 + 2i", c (-3.14159, 2));
 
     SKIPTEST runPubSubTypeTests<std::string, c> ("2i", c (0, 2));
@@ -228,6 +247,9 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
 
     runPubSubTypeTests<vc, std::string> (eVec, helics::helicsComplexVectorString (eVec));
     runPubSubTypeTests<std::string, vc> (helics::helicsComplexVectorString (eVec), eVec);
+
+
+    runPubSubTypeTests<vc, helics::named_point>(tcvec2, { helics::helicsComplexVectorString(tcvec2),std::nan("0") });
 
     SKIPTEST runPubSubTypeTests<std::string, vc> ("3.14159-2j", vc{c{3.14159, -2}});
     SKIPTEST runPubSubTypeTests<std::string, vc> ("-3.14159-2j", vc{c{-3.14159, -2}});

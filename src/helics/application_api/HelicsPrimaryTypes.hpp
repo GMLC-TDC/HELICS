@@ -48,8 +48,23 @@ bool changeDetected (const defV &prevValue, const double *vals, size_t size, dou
 bool changeDetected (const defV &prevValue, const std::complex<double> &val, double deltaV);
 bool changeDetected (const defV &prevValue, double val, double deltaV);
 bool changeDetected (const defV &prevValue, int64_t val, double deltaV);
-bool changeDetected (const defV &prevValue, named_point val, double deltaV);
+bool changeDetected (const defV &prevValue, const named_point &val, double deltaV);
 bool changeDetected (const defV &prevValue, bool val, double deltaV);
+
+/** directly convert the boolean to integer*/
+inline int64_t make_valid(bool obj)
+{
+    return (obj) ? 1 : 0;
+}
+
+/** this template should do nothing for most classes the specific overloads are the important ones*/
+template<class X>
+X &make_valid(X &obj)
+{
+    return obj;
+}
+
+
 
 void valueExtract (const defV &dv, std::string &val);
 
@@ -203,7 +218,30 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
     case helics_type_t::helicsNamedPoint:
     {
         auto npval = ValueConverter<named_point>::interpret (dv);
-        val = static_cast<X> (npval.second);
+        if (std::isnan(npval.value))
+        {
+            try
+            {
+                if
+                    IF_CONSTEXPR(std::is_integral<X>::value)
+                {
+                    val = static_cast<X> (std::stoll(npval.name));
+                }
+                else
+                {
+                    val = static_cast<X> (std::stod(npval.name));
+                }
+            }
+            catch (const std::invalid_argument &)
+            {
+                val = static_cast<X>(invalidValue<double>());
+            }
+        }
+        else
+        {
+            val = static_cast<X> (npval.value);
+        }
+        
         break;
     }
     case helics_type_t::helicsDouble:

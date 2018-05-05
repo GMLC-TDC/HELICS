@@ -215,7 +215,7 @@ class Subscription : public SubscriptionBase
                 {
                     if (changeDetected (lastValue, out, delta))
                     {
-                        lastValue = out;
+                        lastValue = make_valid(out);
                     }
                     else
                     {
@@ -224,7 +224,7 @@ class Subscription : public SubscriptionBase
                 }
                 else
                 {
-                    lastValue = out;
+                    lastValue = make_valid(out);
                 }
             }
             else

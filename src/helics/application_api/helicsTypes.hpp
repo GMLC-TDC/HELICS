@@ -103,7 +103,24 @@ using endpoint_id_t = identifier_id_t<identifier_type, identifiers::endpoint, in
 using filter_id_t = identifier_id_t<identifier_type, identifiers::filter, invalid_id_value>;
 using query_id_t = identifier_id_t<identifier_type, identifiers::query, invalid_id_value>;
 
-using named_point = std::pair<std::string, double>;
+/** data class for pair of a string and double*/
+class named_point
+{
+public:
+    std::string name;
+    double value;
+    named_point() = default;
+    named_point(std::string valname,double valval):name(std::move(valname)),value(valval)
+    {}
+    bool operator==(const named_point &opt) const
+    {
+        return ((isnan(value)) && (isnan(opt.value))) ? (name == opt.name) :((value == opt.value) && (name == opt.name));
+    }
+    bool operator!=(const named_point &opt) const
+    {
+        return !operator==(opt);
+    }
+};
 
 /** template class for generating a known name of a type*/
 template <class X>
@@ -263,7 +280,7 @@ data_block typeConvert (helics_type_t type, const std::vector<double> &val);
 data_block typeConvert (helics_type_t type, const double *vals, size_t size);
 data_block typeConvert (helics_type_t type, const std::vector<std::complex<double>> &val);
 data_block typeConvert (helics_type_t type, const std::complex<double> &val);
-data_block typeConvert (helics_type_t type, named_point &val);
+data_block typeConvert (helics_type_t type, const named_point &val);
 data_block typeConvert (helics_type_t type, const char *str, double val);
 data_block typeConvert (helics_type_t type, const std::string &str, double val);
 data_block typeConvert (helics_type_t type, bool val);

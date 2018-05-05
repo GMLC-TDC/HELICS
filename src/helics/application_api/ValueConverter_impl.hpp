@@ -10,6 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../core/core-data.hpp"
 #include "data_view.hpp"
+#include "helicsTypes.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cereal/archives/portable_binary.hpp>
@@ -60,6 +61,14 @@ void load (Archive &ar, data_view &db)
     std::string val;
     ar (val);
     db = data_view (std::move (val));
+}
+
+
+template<class Archive>
+void serialize(Archive & archive,
+    named_point & m)
+{
+    archive(m.name, m.value);
 }
 
 template <class X>
@@ -148,6 +157,13 @@ template <class X>
 constexpr std::enable_if_t<std::is_convertible<X, std::string>::value, size_t> getMinSize ()
 {
     return 0;
+}
+
+/** min size for a named point*/
+template<>
+constexpr size_t getMinSize<named_point>()
+{
+    return 10;
 }
 
 template <class X>

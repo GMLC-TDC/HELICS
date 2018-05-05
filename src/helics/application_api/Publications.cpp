@@ -226,6 +226,8 @@ data_block typeConvert (helics_type_t type, const defV &val)
         return typeConvert (type, mpark::get<std::vector<double>> (val));
     case complexVectorLoc:  // complex
         return typeConvert (type, mpark::get<std::vector<std::complex<double>>> (val));
+    case namedPointLoc:
+        return typeConvert(type, mpark::get<named_point>(val));
     }
 }
 
